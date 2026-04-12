@@ -124,6 +124,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .game-tile:active { transform:scale(0.93)translateY(4px);box-shadow:0 2px 8px rgba(0,0,0,0.12); }
 @media(hover:hover){.game-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)} .game-tile:hover::after{opacity:1}}
 .game-tile .g-icon { font-size:48px;display:block;margin-bottom:10px;animation:tileIconFloat ease-in-out infinite; }
+.g-banner{width:calc(100% + 28px);height:68px;margin:-22px -14px 10px -14px;overflow:hidden;border-radius:var(--radius) var(--radius) 0 0;flex-shrink:0;}
+.g-banner img{width:100%;height:100%;object-fit:cover;display:block;}
 .game-tile .g-name { font-size:15px;font-weight:900;font-family:var(--font-display);color:var(--text);line-height:1.3;margin-bottom:8px; }
 .game-tile .g-tag { font-size:12px;font-weight:700;padding:5px 14px;border-radius:100px;color:white;display:inline-block; }
 @keyframes tileIconFloat { 0%,100%{transform:translateY(0)scale(1)} 50%{transform:translateY(-6px)scale(1.05)} }
@@ -136,6 +138,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .game-tile.g7::before{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g7 .g-icon{animation-duration:2.7s} .game-tile.g7 .g-tag{background:linear-gradient(90deg,#2DD4BF,#14B8A6)} .game-tile.g7::after{background:linear-gradient(135deg,rgba(45,212,191,0.08),transparent)}
 .game-tile.g8::before{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g8 .g-icon{animation-duration:3.1s} .game-tile.g8 .g-tag{background:linear-gradient(90deg,#FDA4AF,#F43F5E)} .game-tile.g8::after{background:linear-gradient(135deg,rgba(244,63,94,0.08),transparent)}
 .game-tile.g9::before{background:linear-gradient(90deg,#A3E635,#84CC16)} .game-tile.g9 .g-icon{animation-duration:2.0s} .game-tile.g9 .g-tag{background:linear-gradient(90deg,#A3E635,#84CC16)} .game-tile.g9::after{background:linear-gradient(135deg,rgba(132,204,22,0.08),transparent)}
+.game-tile.g10::before{background:linear-gradient(90deg,#FBBF24,#F97316)} .game-tile.g10 .g-icon{animation-duration:2.3s} .game-tile.g10 .g-tag{background:linear-gradient(90deg,#FBBF24,#F97316)} .game-tile.g10::after{background:linear-gradient(135deg,rgba(249,115,22,0.08),transparent)}
+.game-tile.g11::before{background:linear-gradient(90deg,#34D399,#10B981)} .game-tile.g11 .g-icon{animation-duration:2.9s} .game-tile.g11 .g-tag{background:linear-gradient(90deg,#34D399,#10B981)} .game-tile.g11::after{background:linear-gradient(135deg,rgba(16,185,129,0.08),transparent)}
+.game-tile.g12::before{background:linear-gradient(90deg,#818CF8,#6366F1)} .game-tile.g12 .g-icon{animation-duration:3.3s} .game-tile.g12 .g-tag{background:linear-gradient(90deg,#818CF8,#6366F1)} .game-tile.g12::after{background:linear-gradient(135deg,rgba(99,102,241,0.08),transparent)}
+.game-tile.g13::before{background:linear-gradient(90deg,#FB923C,#EF4444)} .game-tile.g13 .g-icon{animation-duration:2.1s} .game-tile.g13 .g-tag{background:linear-gradient(90deg,#FB923C,#EF4444)} .game-tile.g13::after{background:linear-gradient(135deg,rgba(239,68,68,0.1),transparent)}
+.game-tile.g5a::before{background:linear-gradient(90deg,#F9A8D4,#EC4899)} .game-tile.g5a .g-icon{animation-duration:2.6s} .game-tile.g5a .g-tag{background:linear-gradient(90deg,#F9A8D4,#EC4899)} .game-tile.g5a::after{background:linear-gradient(135deg,rgba(236,72,153,0.08),transparent)}
+.game-tile.g5b::before{background:linear-gradient(90deg,#6EE7B7,#10B981)} .game-tile.g5b .g-icon{animation-duration:2.3s} .game-tile.g5b .g-tag{background:linear-gradient(90deg,#6EE7B7,#10B981)} .game-tile.g5b::after{background:linear-gradient(135deg,rgba(16,185,129,0.08),transparent)}
+.game-tile.g5c::before{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g5c .g-icon{animation-duration:3.0s} .game-tile.g5c .g-tag{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g5c::after{background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent)}
+.game-tile.g5d::before{background:linear-gradient(90deg,#93C5FD,#3B82F6)} .game-tile.g5d .g-icon{animation-duration:2.7s} .game-tile.g5d .g-tag{background:linear-gradient(90deg,#93C5FD,#3B82F6)} .game-tile.g5d::after{background:linear-gradient(135deg,rgba(59,130,246,0.08),transparent)}
 
 /* World zones */
 .world-zone { width:100%;max-width:500px;margin-bottom:12px; }
@@ -208,7 +218,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes correctPulse { 0%{transform:scale(1)} 40%{transform:scale(1.08)} 100%{transform:scale(1)} }
 
 /* G1 */
-#screen-game1 { background:linear-gradient(180deg,#FFF1F3 0%,#FFE4E6 50%,#FFF8E7 100%); }
+#screen-game1 { background:url('assets/bg-game1-emosi.webp') center/cover no-repeat, linear-gradient(180deg,#FFF1F3 0%,#FFE4E6 50%,#FFF8E7 100%); }
 .world-hearts { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
 .world-hearts span { position:absolute;bottom:-30px;font-size:18px;opacity:0;animation:heartRise linear infinite; }
 @keyframes heartRise { 0%{transform:translateY(0)rotate(0deg);opacity:0} 10%{opacity:0.6} 90%{opacity:0.4} 100%{transform:translateY(-100vh)rotate(30deg);opacity:0} }
@@ -229,7 +239,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g1-progress { font-size:15px;color:var(--text-light);font-weight:700;margin-top:8px;position:relative;z-index:1; }
 
 /* G2 */
-#screen-game2 { background:linear-gradient(180deg,#F3E8FF 0%,#EDE9FE 50%,#DDD6FE 100%); }
+#screen-game2 { background:url('assets/bg-game2-napas.webp') center/cover no-repeat, linear-gradient(180deg,#F3E8FF 0%,#EDE9FE 50%,#DDD6FE 100%); }
 .world-clouds { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
 .cloud { position:absolute;background:white;border-radius:50px;opacity:0.85;animation:cloudDrift linear infinite; }
 .sun-circle { position:absolute;top:40px;right:40px;width:60px;height:60px;background:radial-gradient(circle,#FCD34D,#F59E0B);border-radius:50%;box-shadow:0 0 30px #FCD34D88;pointer-events:none;z-index:0;animation:sunPulse 3s ease-in-out infinite; }
@@ -250,7 +260,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .cycle-dot.done { background:var(--brand);border-color:var(--brand-light);transform:scale(1.2);box-shadow:0 0 12px rgba(139,92,246,0.5); }
 
 /* G3 */
-#screen-game3 { background:linear-gradient(180deg,#CCFBF1 0%,#D1FAE5 40%,#F0FDFA 100%); }
+#screen-game3 { background:url('assets/bg-game3-huruf.webp') center/cover no-repeat, linear-gradient(180deg,#CCFBF1 0%,#D1FAE5 40%,#F0FDFA 100%); }
 .world-jungle { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
 .jungle-letter { position:absolute;font-size:28px;font-weight:900;color:rgba(15,118,110,0.2);font-family:var(--font);animation:letterFloat ease-in-out infinite; }
 @keyframes letterFloat { 0%,100%{transform:translateY(0)rotate(-5deg)} 50%{transform:translateY(-20px)rotate(5deg)} }
@@ -271,7 +281,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g3-progress { font-size:15px;color:#0F766E;font-weight:700;text-align:center;margin-top:10px;position:relative;z-index:1; }
 
 /* G4 */
-#screen-game4 { background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 50%,#FFF8E1 100%); }
+#screen-game4 { background:url('assets/bg-game4-savanna.webp') center/cover no-repeat, linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 50%,#FFF8E1 100%); }
 .world-savanna { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
 .savanna-sun { position:absolute;top:30px;left:50%;transform:translateX(-50%);width:70px;height:70px;background:radial-gradient(circle,#FCD34D,#F59E0B);border-radius:50%;box-shadow:0 0 40px #FCD34D99;animation:sunPulse 3s ease-in-out infinite; }
 .grass-strip { position:absolute;bottom:0;left:0;right:0;height:60px;background:#84CC16;border-radius:60px 60px 0 0;opacity:0.5; }
@@ -301,7 +311,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g4-poke-img{width:72px;height:72px;image-rendering:pixelated;object-fit:contain;transition:opacity 0.2s;}
 
 /* G5 */
-#screen-game5 { background:radial-gradient(ellipse at 50% 0%,#DDD6FE 0%,#EDE9FE 50%,#F3E8FF 100%); }
+#screen-game5 { background:url('assets/bg-game5-memory.webp') center/cover no-repeat, radial-gradient(ellipse at 50% 0%,#DDD6FE 0%,#EDE9FE 50%,#F3E8FF 100%); }
 .world-dream { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
 .star-twinkle { position:absolute;font-size:14px;animation:twinkle ease-in-out infinite; }
 @keyframes twinkle { 0%,100%{opacity:0.1;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
@@ -439,7 +449,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g8-progress { font-size:15px;color:var(--text-light);font-weight:700;text-align:center;margin-top:10px; }
 
 /* G9 */
-#screen-game9 { background:linear-gradient(180deg,#F7FEE7 0%,#ECFCCB 50%,#D9F99D 100%); }
+#screen-game9 { background:url('assets/bg-game9-trace.webp') center/cover no-repeat, linear-gradient(180deg,#F7FEE7 0%,#ECFCCB 50%,#D9F99D 100%); }
 .g9-letter-display { font-size:80px;font-family:var(--font-display);font-weight:900;background:linear-gradient(135deg,#84CC16,#A3E635);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;line-height:1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 .g9-instruction { font-size:16px;font-weight:700;color:var(--text-light);margin-bottom:16px; }
 .g9-canvas-wrap { position:relative;width:300px;height:300px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);border:4px solid #A3E635;background:white; }
@@ -1188,14 +1198,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .level-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); }
 
 /* ── 8. INDIVIDUAL GAME SCREEN BACKGROUNDS ── */
-#screen-game1 { background: linear-gradient(180deg, #1a0020 0%, #3B0764 50%, #1a0020 100%); }
-#screen-game2 { background: linear-gradient(180deg, #0C1445 0%, #1a237e 50%, #0C1445 100%); }
-#screen-game3 { background: linear-gradient(180deg, #0A2818 0%, #14532D 50%, #0A2818 100%); }
-#screen-game4 { background: linear-gradient(180deg, #451A03 0%, #78350F 50%, #451A03 100%); }
-#screen-game5 { background: radial-gradient(ellipse at 50% 0%, #1C1030 0%, #0F172A 100%); }
+#screen-game1 { background: url('assets/bg-game1-emosi.webp') center/cover no-repeat, linear-gradient(180deg, #1a0020 0%, #3B0764 50%, #1a0020 100%); }
+#screen-game2 { background: url('assets/bg-game2-napas.webp') center/cover no-repeat, linear-gradient(180deg, #0C1445 0%, #1a237e 50%, #0C1445 100%); }
+#screen-game3 { background: url('assets/bg-game3-huruf.webp') center/cover no-repeat, linear-gradient(180deg, #0A2818 0%, #14532D 50%, #0A2818 100%); }
+#screen-game4 { background: url('assets/bg-game4-savanna.webp') center/cover no-repeat, linear-gradient(180deg, #451A03 0%, #78350F 50%, #451A03 100%); }
+#screen-game5 { background: url('assets/bg-game5-memory.webp') center/cover no-repeat, radial-gradient(ellipse at 50% 0%, #1C1030 0%, #0F172A 100%); }
 #screen-game7 { background: linear-gradient(180deg, #0A2818 0%, #0F3D28 50%, #0C1E10 100%); }
 #screen-game8 { background: linear-gradient(160deg, #1a0020 0%, #2D1B69 50%, #1a0020 100%); }
-#screen-game9 { background: linear-gradient(180deg, #0A1A00 0%, #1A3300 50%, #0A1A00 100%); }
+#screen-game9 { background: url('assets/bg-game9-trace.webp') center/cover no-repeat, linear-gradient(180deg, #0A1A00 0%, #1A3300 50%, #0A1A00 100%); }
 
 /* ── 9. GAME CONTENT TEXT COLOR FIXES FOR DARK BG ── */
 .g1-question { color: white; -webkit-text-fill-color: white; background: none; }
@@ -2025,20 +2035,62 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* ===== GAME 13 — Evolusi Math Adventure ===== */
 #screen-game13{
   background:linear-gradient(180deg,#0A0A1A 0%,#0F1A35 40%,#0A0A20 100%);
-  display:flex;flex-direction:column;overflow:hidden;
+  flex-direction:column;overflow:hidden;
 }
 
 /* G13 battle field */
 .g13-field{
-  flex:1 1 0;position:relative;overflow:hidden;display:grid;
+  flex:1 1 0;min-height:0;position:relative;overflow:hidden;display:grid;
   grid-template-rows:1fr 1fr;grid-template-columns:1fr 1fr;
   background:linear-gradient(180deg,#101828 0%,#1B2A4A 50%,#0E1820 100%);
 }
+/* Arena backgrounds by type — color overlay on top of bg image */
+.g13-arena-Grass{--arena-tint:rgba(10,50,4,0.52)}
+.g13-arena-Fire{--arena-tint:rgba(90,15,0,0.52)}
+.g13-arena-Water{--arena-tint:rgba(0,20,60,0.52)}
+.g13-arena-Electric{--arena-tint:rgba(40,40,0,0.52)}
+.g13-arena-Psychic{--arena-tint:rgba(40,0,80,0.52)}
+.g13-arena-Ghost{--arena-tint:rgba(3,3,20,0.6)}
+.g13-arena-Rock{--arena-tint:rgba(30,18,4,0.52)}
+.g13-arena-Ice{--arena-tint:rgba(0,25,50,0.52)}
+.g13-arena-Normal{--arena-tint:rgba(16,16,24,0.5)}
+.g13-arena-Dragon{--arena-tint:rgba(8,0,24,0.55)}
+.g13-arena-Fighting{--arena-tint:rgba(40,8,0,0.52)}
+.g13-arena-Steel{--arena-tint:rgba(8,14,24,0.52)}
+.g13-arena-Fairy{--arena-tint:rgba(40,0,26,0.52)}
+.g13-arena-Poison{--arena-tint:rgba(20,0,24,0.52)}
+.g13-arena-Bug{--arena-tint:rgba(4,13,0,0.52)}
+.g13-arena-Ground{--arena-tint:rgba(21,10,0,0.52)}
+.g13-field[class*="g13-arena-"]{
+  background-size:cover!important;background-position:center!important;
+}
 .g13-field-bg{
   position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 80% 40% at 50% 20%,rgba(249,115,22,0.08),transparent),
-             radial-gradient(ellipse 60% 30% at 50% 80%,rgba(59,130,246,0.08),transparent);
+  background:var(--arena-tint,rgba(10,10,26,0.5));
+  z-index:0;
 }
+
+/* Attack type projectile effects */
+@keyframes g13ProjFly{0%{opacity:0;transform:scale(0.5)}10%{opacity:1}80%{opacity:1}100%{opacity:0;transform:scale(0.3)}}
+@keyframes g13ProjSlide{0%{left:var(--from-x);top:var(--from-y);opacity:0;transform:scale(0.5)}10%{opacity:1;transform:scale(1)}85%{opacity:1}100%{left:var(--to-x);top:var(--to-y);opacity:0;transform:scale(1.5)}}
+.g13-proj{position:absolute;font-size:28px;pointer-events:none;z-index:20;animation:g13ProjSlide 0.55s cubic-bezier(0.2,0,0.8,1) forwards;line-height:1;}
+.g13-proj-trail{position:absolute;font-size:16px;pointer-events:none;z-index:19;opacity:0;animation:g13ProjFly 0.3s ease forwards;}
+
+/* Evolution ready button */
+.g13-evo-btn{
+  width:100%;padding:14px;margin-top:4px;
+  background:linear-gradient(135deg,#F97316,#FBBF24,#F97316);
+  background-size:200% 100%;
+  border:none;border-radius:18px;
+  font-size:20px;font-weight:900;color:#1a1a1a;
+  cursor:pointer;font-family:'Fredoka One',cursive;
+  box-shadow:0 4px 0 #C2410C,0 0 30px rgba(249,115,22,0.6);
+  animation:g13EvoBtnPulse 1s ease infinite,g13EvoBtnSlide 0.5s ease forwards;
+  letter-spacing:0.5px;
+}
+@keyframes g13EvoBtnPulse{0%,100%{box-shadow:0 4px 0 #C2410C,0 0 20px rgba(249,115,22,0.5)}50%{box-shadow:0 4px 0 #C2410C,0 0 50px rgba(251,191,36,0.9),0 0 80px rgba(249,115,22,0.4)}}
+@keyframes g13EvoBtnSlide{from{opacity:0;transform:translateY(20px)scale(0.9)}to{opacity:1;transform:translateY(0)scale(1)}}
+.g13-evo-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #C2410C}
 
 /* Info boxes — same layout as G10 */
 .g13-infobox{
@@ -2091,10 +2143,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 .g13-wspr{/* enemy faces left naturally */}
 .g13-pspr{transform:scaleX(-1);}/* player faces right */
-.g13-oval{
-  width:70%;height:12px;background:radial-gradient(ellipse,rgba(0,0,0,0.35),transparent);
-  border-radius:50%;margin-top:-4px;
-}
+.g13-oval{width:90%;height:auto;margin-top:-6px;display:block;opacity:0.82;pointer-events:none;}
 
 /* Sprite animations */
 .g13-spr.spr-atk{animation:g13WAtkAnim 0.35s ease;}
@@ -3482,15 +3531,15 @@ body { background: #0a0a1a !important; }
   background-color: #1a2810 !important;
 }
 #screen-game6.map-space .g6-road {
-  background-image: url('assets/bg-space.webp') !important;
-  background-size: cover !important;
-  background-position: center !important;
+  background-image: url('assets/bg-road-space.webp'), url('assets/bg-space.webp') !important;
+  background-size: 100% auto, cover !important;
+  background-position: center top, center !important;
   background-color: #05061a !important;
 }
 #screen-game6.map-body .g6-road {
-  background-image: url('assets/bg-body.webp') !important;
-  background-size: cover !important;
-  background-position: center !important;
+  background-image: url('assets/bg-road-body.webp'), url('assets/bg-body.webp') !important;
+  background-size: 100% auto, cover !important;
+  background-position: center top, center !important;
   background-color: #1a0810 !important;
 }
 /* Forest divider — green tint */
@@ -3531,6 +3580,16 @@ body { background: #0a0a1a !important; }
 }
 #screen-welcome.day-mode .home-title-sub { color: rgba(255,255,255,0.9) !important; }
 #screen-welcome.day-mode .fx-lightning { opacity: 0; }
+/* Day mode: CSS background on wlc-bg (bypasses picture element re-eval issues) */
+#screen-welcome.day-mode .wlc-bg {
+  background: url('assets/bg-landing-mobile-day.webp') center top / cover no-repeat;
+}
+#screen-welcome.day-mode .wlc-bg img { visibility: hidden; }
+@media (orientation:landscape) and (min-width:600px) {
+  #screen-welcome.day-mode .wlc-bg {
+    background-image: url('assets/bg-landing-desktop-day.webp');
+  }
+}
 </style>
 </head>
 <body>
@@ -3725,22 +3784,63 @@ body { background: #0a0a1a !important; }
     </div>
     <div class="game-grid-2">
       <div class="game-tile g1" id="gtile-1" onclick="playClick(); openLevelSelect(1)">
+        <div class="g-banner"><img src="assets/banner-game1.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🎭</span>
         <div class="g-name">Aku Merasa...</div>
         <div class="g-stars-row" id="gstars-1"></div>
         <span class="g-tag">Emosi</span>
       </div>
       <div class="game-tile g2" id="gtile-2" onclick="playClick(); openLevelSelect(2)">
+        <div class="g-banner"><img src="assets/banner-game2.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🌬️</span>
         <div class="g-name">Napas Pelangi</div>
         <div class="g-stars-row" id="gstars-2"></div>
         <span class="g-tag">Tenang</span>
       </div>
       <div class="game-tile g5" id="gtile-5" onclick="playClick(); openLevelSelect(5)">
+        <div class="g-banner"><img src="assets/banner-game5.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🃏</span>
         <div class="g-name">Cocokkan Emosi</div>
         <div class="g-stars-row" id="gstars-5"></div>
         <span class="g-tag">Fokus</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- World 1.5: Memory Zone -->
+  <div class="world-zone">
+    <div class="world-zone-header">
+      <span class="world-zone-icon">🃏</span>
+      <span class="world-zone-name">Memory Zone</span>
+    </div>
+    <div class="game-grid-2">
+      <div class="game-tile g5a" id="gtile-5a" onclick="playClick(); setG5SubModeAndOpen('emosi')">
+        <div class="g-banner"><img src="assets/banner-game5.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
+        <span class="g-icon">😊</span>
+        <div class="g-name">Emosi Match</div>
+        <div class="g-stars-row" id="gstars-5a"></div>
+        <span class="g-tag">Emosi</span>
+      </div>
+      <div class="game-tile g5b" id="gtile-5b" onclick="playClick(); setG5SubModeAndOpen('pokemon')">
+        <div class="g-banner"><img src="assets/banner-game5.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
+        <span class="g-icon">⚡</span>
+        <div class="g-name">Pokemon Match</div>
+        <div class="g-stars-row" id="gstars-5b"></div>
+        <span class="g-tag">Pokemon</span>
+      </div>
+      <div class="game-tile g5c" id="gtile-5c" onclick="playClick(); setG5SubModeAndOpen('hewan')">
+        <div class="g-banner"><img src="assets/banner-game5.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
+        <span class="g-icon">🐘</span>
+        <div class="g-name">Hewan Match</div>
+        <div class="g-stars-row" id="gstars-5c"></div>
+        <span class="g-tag">Hewan</span>
+      </div>
+      <div class="game-tile g5d" id="gtile-5d" onclick="playClick(); setG5SubModeAndOpen('buah')">
+        <div class="g-banner"><img src="assets/banner-game5.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
+        <span class="g-icon">🍎</span>
+        <div class="g-name">Buah Match</div>
+        <div class="g-stars-row" id="gstars-5d"></div>
+        <span class="g-tag">Buah</span>
       </div>
     </div>
   </div>
@@ -3753,18 +3853,21 @@ body { background: #0a0a1a !important; }
     </div>
     <div class="game-grid-2">
       <div class="game-tile g3" id="gtile-3" onclick="playClick(); openLevelSelect(3)">
+        <div class="g-banner"><img src="assets/banner-game3.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🔤</span>
         <div class="g-name">Huruf Hutan</div>
         <div class="g-stars-row" id="gstars-3"></div>
         <span class="g-tag">Huruf</span>
       </div>
       <div class="game-tile g4" id="gtile-4" onclick="playClick(); openLevelSelect(4)">
+        <div class="g-banner"><img src="assets/banner-game4.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🔢</span>
         <div class="g-name">Hitung Binatang</div>
         <div class="g-stars-row" id="gstars-4"></div>
         <span class="g-tag">Hitung</span>
       </div>
       <div class="game-tile g7" id="gtile-7" onclick="playClick(); openLevelSelect(7)">
+        <div class="g-banner"><img src="assets/banner-game7.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🖼️</span>
         <div class="g-name">Tebak Gambar</div>
         <div class="g-stars-row" id="gstars-7"></div>
@@ -3781,18 +3884,21 @@ body { background: #0a0a1a !important; }
     </div>
     <div class="game-grid-2">
       <div class="game-tile g6" id="gtile-6" onclick="playClick(); openLevelSelect(6)">
+        <div class="g-banner"><img src="assets/banner-game6.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🚗</span>
         <div class="g-name">Petualangan Mobil</div>
         <div class="g-stars-row" id="gstars-6"></div>
         <span class="g-tag">Adventure</span>
       </div>
       <div class="game-tile g8" id="gtile-8" onclick="playClick(); openLevelSelect(8)">
+        <div class="g-banner"><img src="assets/banner-game8.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🔡</span>
         <div class="g-name">Susun Kata</div>
         <div class="g-stars-row" id="gstars-8"></div>
         <span class="g-tag">Menulis</span>
       </div>
       <div class="game-tile g9" id="gtile-9" onclick="playClick(); openLevelSelect(9)">
+        <div class="g-banner"><img src="assets/banner-game9.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">✍️</span>
         <div class="g-name">Jejak Huruf</div>
         <div class="g-stars-row" id="gstars-9"></div>
@@ -3809,25 +3915,29 @@ body { background: #0a0a1a !important; }
     </div>
     <div class="game-grid-2">
       <div class="game-tile g10" id="gtile-10" onclick="playClick(); openLevelSelect(10)">
+        <div class="g-banner"><img src="assets/banner-game10.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon" style="padding:4px;"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" style="width:72px;height:72px;image-rendering:pixelated;display:block;" onerror="this.outerHTML='⚡'"></span>
         <div class="g-name">Pertarungan Pokemon</div>
         <div class="g-stars-row" id="gstars-10"></div>
         <span class="g-tag">Battle</span>
       </div>
       <div class="game-tile g11" id="gtile-11" onclick="playClick(); openLevelSelect(11)">
+        <div class="g-banner"><img src="assets/banner-game11.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🔬</span>
         <div class="g-name">Kuis Sains</div>
         <div class="g-stars-row" id="gstars-11"></div>
         <span class="g-tag">Sains</span>
       </div>
       <div class="game-tile g12" id="gtile-12" onclick="playClick(); openLevelSelect(12)">
+        <div class="g-banner"><img src="assets/banner-game12.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <span class="g-icon">🌑</span>
         <div class="g-name">Tebak Bayangan</div>
         <div class="g-stars-row" id="gstars-12"></div>
         <span class="g-tag">Puzzle</span>
       </div>
       <div class="game-tile g13" id="gtile-13" onclick="playClick(); openLevelSelect(13)">
-        <span class="g-icon" style="padding:4px;"><img src="https://img.pokemondb.net/sprites/home/normal/charmander.png" style="width:72px;height:72px;object-fit:contain;display:block;" onerror="this.outerHTML='🔥'"></span>
+        <div class="g-banner"><img src="assets/zone-banner-arena.webp" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
+        <span class="g-icon" style="padding:4px;"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" style="width:72px;height:72px;object-fit:contain;display:block;" onerror="this.outerHTML='🔥'"></span>
         <div class="g-name">Evolusi Math</div>
         <div class="g-stars-row" id="gstars-13"></div>
         <span class="g-tag">Battle</span>
@@ -3990,12 +4100,12 @@ body { background: #0a0a1a !important; }
     <!-- Wild sprite: top-right -->
     <div class="g13-wspr-wrap" id="g13-wspr-wrap">
       <img class="g13-spr g13-wspr" id="g13-wspr" src="" alt="">
-      <div class="g13-oval"></div>
+      <img class="g13-oval" src="assets/battle-platform-enemy.webp" alt="" onerror="this.style.display='none'">
     </div>
     <!-- Player sprite: bottom-left -->
     <div class="g13-pspr-wrap" id="g13-pspr-wrap">
-      <div class="g13-oval"></div>
       <img class="g13-spr g13-pspr" id="g13-pspr" src="" alt="">
+      <img class="g13-oval" src="assets/battle-platform-player.webp" alt="" onerror="this.style.display='none'">
     </div>
     <!-- Player info: bottom-right -->
     <div class="g13-infobox g13-player-info" id="g13-player-info">
@@ -4032,6 +4142,7 @@ body { background: #0a0a1a !important; }
     <div class="g13-atk-lbl" id="g13-atk-lbl">Hitung untuk menyerang!</div>
     <div class="g13-math pop" id="g13-math">— + — = ?</div>
     <div class="g13-choices" id="g13-choices"></div>
+    <button class="g13-evo-btn" id="g13-evo-btn" style="display:none" onclick="g13DoEvolution()">⚡ EVOLUSI SEKARANG! ⚡</button>
   </div>
 
   <!-- Evolution overlay -->
@@ -4059,7 +4170,8 @@ body { background: #0a0a1a !important; }
   <!-- Result overlay -->
   <div class="g13-result-overlay" id="g13-result-overlay" style="display:none;">
     <div class="g13-result-card">
-      <div style="font-size:64px;margin-bottom:8px;" id="g13-result-icon">🏆</div>
+      <img id="g13-result-banner-img" src="assets/victory-banner.webp" alt="" style="width:100%;height:80px;object-fit:cover;border-radius:16px 16px 0 0;margin:-20px -20px 12px -20px;width:calc(100% + 40px);display:block;" onerror="this.style.display='none'">
+      <div style="font-size:56px;margin-bottom:8px;" id="g13-result-icon">🏆</div>
       <div style="font-size:24px;font-weight:900;color:white;font-family:'Fredoka One',cursive;margin-bottom:6px;" id="g13-result-title">Menang!</div>
       <div style="font-size:14px;color:rgba(255,255,255,0.65);margin-bottom:16px;" id="g13-result-subtitle"></div>
       <div style="font-size:36px;margin-bottom:20px;" id="g13-result-stars">⭐⭐⭐</div>
@@ -4686,6 +4798,8 @@ const ASSET_FALLBACK = {
   'img-monyet.png':'🐒','img-panda.png':'🐼','img-rusa.png':'🦌','img-singa.png':'🦁','img-tikus.png':'🐭',
   'img-apel.png':'🍎','img-bola.png':'⚽','img-buku.png':'📚','img-daun.png':'🍃','img-meja.png':'🪑'
 }
+// webp aliases for word images
+Object.entries(ASSET_FALLBACK).forEach(([k,v])=>{ if(k.startsWith('img-')&&k.endsWith('.png')) ASSET_FALLBACK[k.replace('.png','.webp')]=v })
 function getAssetEmoji(filename) { return ASSET_FALLBACK[filename] || ASSET_FALLBACK[filename.replace('.webp','.png')] || '❓' }
 function renderAsset(filename, size=80) {
   const emoji = getAssetEmoji(filename)
@@ -4708,21 +4822,21 @@ const DRIVE_OBSTACLES = {city:'🚧',forest:'🪨',space:'☄️',body:'🦠'}
 
 // Game 7 image data
 const WORD_IMAGES = [
-  {id:'ayam',   emoji:'🐓',word:'AYAM',   file:'img-ayam.png',   suku:'A-YAM'},
-  {id:'bebek',  emoji:'🦆',word:'BEBEK',  file:'img-bebek.png',  suku:'BE-BEK'},
-  {id:'gajah',  emoji:'🐘',word:'GAJAH',  file:'img-gajah.png',  suku:'GA-JAH'},
-  {id:'harimau',emoji:'🐯',word:'HARIMAU',file:'img-harimau.png',suku:'HA-RI-MAU'},
-  {id:'ikan',   emoji:'🐟',word:'IKAN',   file:'img-ikan.png',   suku:'I-KAN'},
-  {id:'jerapah',emoji:'🦒',word:'JERAPAH',file:'img-jerapah.png',suku:'JE-RA-PAH'},
-  {id:'kuda',   emoji:'🐴',word:'KUDA',   file:'img-kuda.png',   suku:'KU-DA'},
-  {id:'monyet', emoji:'🐒',word:'MONYET', file:'img-monyet.png', suku:'MON-YET'},
-  {id:'panda',  emoji:'🐼',word:'PANDA',  file:'img-panda.png',  suku:'PAN-DA'},
-  {id:'singa',  emoji:'🦁',word:'SINGA',  file:'img-singa.png',  suku:'SIN-GA'},
-  {id:'apel',   emoji:'🍎',word:'APEL',   file:'img-apel.png',   suku:'A-PEL'},
-  {id:'bola',   emoji:'⚽',word:'BOLA',   file:'img-bola.png',   suku:'BO-LA'},
-  {id:'buku',   emoji:'📚',word:'BUKU',   file:'img-buku.png',   suku:'BU-KU'},
-  {id:'daun',   emoji:'🍃',word:'DAUN',   file:'img-daun.png',   suku:'DA-UN'},
-  {id:'meja',   emoji:'🪑',word:'MEJA',   file:'img-meja.png',   suku:'ME-JA'}
+  {id:'ayam',   emoji:'🐓',word:'AYAM',   file:'img-ayam.webp',   suku:'A-YAM'},
+  {id:'bebek',  emoji:'🦆',word:'BEBEK',  file:'img-bebek.webp',  suku:'BE-BEK'},
+  {id:'gajah',  emoji:'🐘',word:'GAJAH',  file:'img-gajah.webp',  suku:'GA-JAH'},
+  {id:'harimau',emoji:'🐯',word:'HARIMAU',file:'img-harimau.webp',suku:'HA-RI-MAU'},
+  {id:'ikan',   emoji:'🐟',word:'IKAN',   file:'img-ikan.webp',   suku:'I-KAN'},
+  {id:'jerapah',emoji:'🦒',word:'JERAPAH',file:'img-jerapah.webp',suku:'JE-RA-PAH'},
+  {id:'kuda',   emoji:'🐴',word:'KUDA',   file:'img-kuda.webp',   suku:'KU-DA'},
+  {id:'monyet', emoji:'🐒',word:'MONYET', file:'img-monyet.webp', suku:'MON-YET'},
+  {id:'panda',  emoji:'🐼',word:'PANDA',  file:'img-panda.webp',  suku:'PAN-DA'},
+  {id:'singa',  emoji:'🦁',word:'SINGA',  file:'img-singa.webp',  suku:'SIN-GA'},
+  {id:'apel',   emoji:'🍎',word:'APEL',   file:'img-apel.webp',   suku:'A-PEL'},
+  {id:'bola',   emoji:'⚽',word:'BOLA',   file:'img-bola.webp',   suku:'BO-LA'},
+  {id:'buku',   emoji:'📚',word:'BUKU',   file:'img-buku.webp',   suku:'BU-KU'},
+  {id:'daun',   emoji:'🍃',word:'DAUN',   file:'img-daun.webp',   suku:'DA-UN'},
+  {id:'meja',   emoji:'🪑',word:'MEJA',   file:'img-meja.webp',   suku:'ME-JA'}
 ]
 
 // Game 8 word bank
@@ -4904,7 +5018,8 @@ const GAME_INFO = {
   9:  { desc:'Ikuti titik panduan untuk melatih menulis huruf dengan benar!', grad:'rgba(132,204,22,0.35)', glow:'rgba(132,204,22,0.5)' },
   10: { desc:'Kalahkan Pokemon musuh dengan menjawab soal matematika!', grad:'rgba(255,203,5,0.35)', glow:'rgba(255,203,5,0.5)' },
   11: { desc:'Uji pengetahuan sains — tumbuhan, hewan, dan alam semesta!', grad:'rgba(56,189,248,0.35)', glow:'rgba(56,189,248,0.5)' },
-  12: { desc:'Tebak nama hewan dari siluet bayangannya yang tersembunyi!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' }
+  12: { desc:'Tebak nama hewan dari siluet bayangannya yang tersembunyi!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' },
+  13: { desc:'Kalahkan wild Pokemon dengan menjawab soal matematika — dan evolusi!', grad:'rgba(249,115,22,0.35)', glow:'rgba(249,115,22,0.5)' }
 }
 
 // Progress storage
@@ -4945,6 +5060,11 @@ function openLevelSelect(gameNum) {
   banner.style.setProperty('--icon-glow', glow)
   banner.style.setProperty('--icon-bg', glowAlpha('0.14'))
   banner.style.setProperty('--icon-border', glowAlpha('0.5'))
+  // Banner image — use banner-gameN.webp as background if available
+  const bannerImg = `assets/banner-game${gameNum}.webp`
+  banner.style.backgroundImage = `url('${bannerImg}'), var(--banner-base, linear-gradient(180deg,#1a0540,#0a0a25))`
+  banner.style.backgroundSize = 'cover, 100% 100%'
+  banner.style.backgroundPosition = 'center, center'
 
   // Icon
   const iconEl = document.getElementById('level-game-icon')
@@ -5371,7 +5491,12 @@ function checkAchievements(context) {
 function showAchievement(key) {
   const ach=ACHIEVEMENTS[key]; if(!ach)return
   const toast=document.getElementById('achievement-toast')
-  document.getElementById('at-icon').textContent=ach.icon; document.getElementById('at-name').textContent=ach.name
+  const BADGE_MAP={first_star:'badge-first-win.webp',perfect_emotion:'badge-perfect.webp',hard_mode:'badge-perfect.webp',memory_master:'badge-pokemon-master.webp',letter_master:'badge-reader.webp',word_master:'badge-reader.webp',streak3:'badge-streak-7.webp'}
+  const badgeFile=BADGE_MAP[key]
+  const iconEl=document.getElementById('at-icon')
+  if(badgeFile){iconEl.innerHTML=`<img src="assets/${badgeFile}" style="width:36px;height:36px;object-fit:contain" onerror="this.outerHTML='${ach.icon}'">`}
+  else{iconEl.textContent=ach.icon}
+  document.getElementById('at-name').textContent=ach.name
   toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3500)
 }
 
@@ -5937,6 +6062,10 @@ function setG5Mode(mode,btn){
   else if(mode==='spatial') initG5Spatial()
   else if(mode==='sequence') initG5Sequence()
 }
+function setG5SubModeAndOpen(subMode) {
+  g5SubMode = subMode
+  openLevelSelect(5)
+}
 function setG5SubMode(sub,btn){
   g5SubMode=sub; playClick()
   document.querySelectorAll('.g5-sub-tab').forEach(t=>t.classList.remove('active'))
@@ -5993,7 +6122,7 @@ function initG5Visual(){
     })
   }
   g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
-  const turnTexts={emosi:'Cocokkan semua pasangan! 🃏',hewan:'Cocokkan gambar & nama hewan! 🐾',buah:'Cocokkan gambar & nama buah! 🍎',pokemon:'Cocokkan Pokémon & namanya! ⚡'}
+  const turnTexts={emosi:'Cocokkan semua pasangan! 🃏',hewan:'Cocokkan gambar & nama hewan! 🐾',buah:'Cocokkan gambar & nama buah! 🍎',pokemon:'Cocokkan gambar Pokémon yang sama! ⚡'}
   const scoresEl=document.getElementById('g5-scores')
   if(state.mode==='duo'){scoresEl.innerHTML=[0,1].map(i=>`<div class="g5-player-score ${i===g5State.currentPlayer?'active':''}" id="g5-ps-${i}"><div class="ps-name">${state.players[i].animal} ${state.players[i].name}</div><div class="ps-val" id="g5-score-${i}">0 pasang</div></div>`).join('');document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`}
   else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=turnTexts[g5SubMode]||'Cocokkan semua pasangan! 🃏'}
@@ -6008,13 +6137,15 @@ function renderG5Grid(){
     let back
     if(g5SubMode==='pokemon'){
       if(card.cardSide==='A'){
-        // Sprite side — HD from pokemondb
+        // Side A: HD artwork
         const hdSrc=`https://img.pokemondb.net/sprites/home/normal/${card.slug}.png`
-        const fbSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`
-        back=`<img class="g5-poke-img" style="width:64px;height:64px;image-rendering:auto" src="${hdSrc}" onerror="this.src='${fbSrc}'" alt="${card.label}" loading="lazy">`
+        const fbSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${card.id}.png`
+        back=`<img class="g5-poke-img" style="width:72px;height:72px;image-rendering:auto;object-fit:contain" src="${hdSrc}" onerror="this.src='${fbSrc}'" alt="${card.label}" loading="lazy">`
       } else {
-        // Name side — styled text
-        back=`<span style="font-size:15px;font-weight:900;text-align:center;color:#FFD700;font-family:'Fredoka One',cursive;line-height:1.2;padding:4px;text-shadow:0 2px 8px rgba(0,0,0,0.6)">${card.label}</span>`
+        // Side B: pixel/game sprite (different art style, same Pokémon)
+        const pixelSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`
+        const fbSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${card.id}.png`
+        back=`<img class="g5-poke-img" style="width:72px;height:72px;image-rendering:pixelated;object-fit:contain" src="${pixelSrc}" onerror="this.src='${fbSrc}'" alt="${card.label}" loading="lazy">`
       }
     } else if(g5SubMode==='hewan'||g5SubMode==='buah'){
       if(card.cardSide==='A'){
@@ -6778,7 +6909,7 @@ function showDashboard() {
     <div style="background:linear-gradient(135deg,#A78BFA,#8B5CF6);border-radius:24px;padding:20px;color:white;width:100%;max-width:500px;box-shadow:0 8px 24px rgba(91,33,182,0.3);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <div style="font-family:var(--font-display);font-size:20px">${tier.icon} Level: ${tier.name}</div>
-        <div style="font-size:17px;font-weight:900">${xp} XP</div>
+        <div style="font-size:17px;font-weight:900"><img src="assets/xp-crystal.webp" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;" onerror="this.outerHTML='💎'"> ${xp} XP</div>
       </div>
       <div style="background:rgba(255,255,255,0.25);border-radius:100px;height:12px;overflow:hidden;">
         <div style="background:white;height:100%;width:${progress}%;border-radius:100px;transition:width 1s ease;"></div>
@@ -6787,10 +6918,15 @@ function showDashboard() {
     </div>`
   // Achievements
   const unlocked=JSON.parse(localStorage.getItem('dunia-emosi-achievements')||'{}')
+  const BADGE_MAP={first_star:'badge-first-win.webp',perfect_emotion:'badge-perfect.webp',hard_mode:'badge-perfect.webp',memory_master:'badge-pokemon-master.webp',letter_master:'badge-reader.webp',word_master:'badge-reader.webp',streak3:'badge-streak-7.webp'}
   const achHtml=Object.entries(ACHIEVEMENTS).map(([key,ach])=>{
     const done=!!unlocked[key]
+    const badgeFile=BADGE_MAP[key]
+    const iconHtml=badgeFile
+      ?`<img src="assets/${badgeFile}" alt="" style="width:40px;height:40px;object-fit:contain;" onerror="this.outerHTML='<span style=font-size:32px>${ach.icon}</span>'">`
+      :`<span style="font-size:32px">${ach.icon}</span>`
     return `<div style="display:flex;align-items:center;gap:12px;background:white;border-radius:18px;padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,0.06);opacity:${done?1:0.4};width:100%;max-width:500px;">
-      <span style="font-size:32px">${ach.icon}</span>
+      ${iconHtml}
       <div><div style="font-weight:800;font-size:15px">${ach.name}</div><div style="font-size:13px;color:var(--text-light)">${ach.desc}</div></div>
       ${done?'<span style="margin-left:auto;color:#14B8A6;font-size:20px">✓</span>':''}
     </div>`
@@ -6803,7 +6939,7 @@ function showDashboard() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:500px;">
       <div class="dash-stat-card"><div class="dash-stat-num">🔥 ${streak}</div><div class="dash-stat-lbl">Hari Streak</div></div>
       <div class="dash-stat-card"><div class="dash-stat-num">🎮 ${Object.keys(played).length}</div><div class="dash-stat-lbl">Game Dimainkan</div></div>
-      <div class="dash-stat-card"><div class="dash-stat-num">⭐ ${p.stars}</div><div class="dash-stat-lbl">Total Bintang</div></div>
+      <div class="dash-stat-card"><div class="dash-stat-num"><img src="assets/star-reward.webp" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;" onerror="this.outerHTML='⭐'"> ${p.stars}</div><div class="dash-stat-lbl">Total Bintang</div></div>
       <div class="dash-stat-card"><div class="dash-stat-num">${xp} XP</div><div class="dash-stat-lbl">Total XP</div></div>
     </div>`
   showScreen('screen-dashboard')
@@ -7910,15 +8046,9 @@ function g12Answer(correct,btn,grid){
 try{
   const xp=getXP(); if(xp>0){const tier=getLevelTier(xp);const el=document.getElementById('welcome-level-badge');if(el){el.style.display='block';el.textContent=`${tier.icon} ${tier.name} — ${xp} XP`}}
 }catch(e){}
-// Service Worker for offline
+// Unregister any lingering service workers to prevent stale cache issues
 if('serviceWorker' in navigator){
-  const swCode=`
-const CACHE='dunia-emosi-v1'
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.add('/Apps/dunia-emosi/index.html')));self.skipWaiting()})
-self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/Apps/dunia-emosi/index.html'))))})
-`
-  const blob=new Blob([swCode],{type:'text/javascript'})
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{})
+  navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister())).catch(()=>{})
 }
 
 // ================================================================
@@ -8184,43 +8314,43 @@ function applyG10Weather() {
 
 // 40 Evolution Chains: [player base, evolved form, wild opponent]
 const G13_CHAINS = [
-  // === EASY (1-10): simple addition ===
+  // === EASY (1-10): addition up to 10 ===
   {id:1, icon:'🌿', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Bulbasaur',slug:'bulbasaur',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Ivysaur',slug:'ivysaur',type:'Grass',tc:'#22C55E'},
-   wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
+   wild:{name:'Oddish',slug:'oddish',type:'Grass',tc:'#22C55E'}},
   {id:2, icon:'🔥', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Charmander',slug:'charmander',type:'Fire',tc:'#F97316'},
    evolved:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
-   wild:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'}},
+   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
   {id:3, icon:'💧', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Squirtle',slug:'squirtle',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Wartortle',slug:'wartortle',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Psyduck',slug:'psyduck',type:'Water',tc:'#38BDF8'}},
   {id:4, icon:'🐛', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Caterpie',slug:'caterpie',type:'Bug',tc:'#84CC16'},
    evolved:{name:'Metapod',slug:'metapod',type:'Bug',tc:'#84CC16'},
-   wild:{name:'Butterfree',slug:'butterfree',type:'Bug',tc:'#84CC16'}},
+   wild:{name:'Exeggcute',slug:'exeggcute',type:'Grass',tc:'#22C55E'}},
   {id:5, icon:'⚡', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Pikachu',slug:'pikachu',type:'Electric',tc:'#FBBF24'},
    evolved:{name:'Raichu',slug:'raichu',type:'Electric',tc:'#FBBF24'},
-   wild:{name:'Jolteon',slug:'jolteon',type:'Electric',tc:'#FBBF24'}},
+   wild:{name:'Poliwag',slug:'poliwag',type:'Water',tc:'#38BDF8'}},
   {id:6, icon:'🐱', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Meowth',slug:'meowth',type:'Normal',tc:'#A3A3A3'},
    evolved:{name:'Persian',slug:'persian',type:'Normal',tc:'#A3A3A3'},
-   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
+   wild:{name:'Eevee',slug:'eevee',type:'Normal',tc:'#A3A3A3'}},
   {id:7, icon:'💪', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Machop',slug:'machop',type:'Fighting',tc:'#EF4444'},
    evolved:{name:'Machoke',slug:'machoke',type:'Fighting',tc:'#EF4444'},
-   wild:{name:'Machamp',slug:'machamp',type:'Fighting',tc:'#EF4444'}},
+   wild:{name:'Geodude',slug:'geodude',type:'Rock',tc:'#A16207'}},
   {id:8, icon:'🪨', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Geodude',slug:'geodude',type:'Rock',tc:'#A16207'},
    evolved:{name:'Graveler',slug:'graveler',type:'Rock',tc:'#A16207'},
-   wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
+   wild:{name:'Cubone',slug:'cubone',type:'Ground',tc:'#D97706'}},
   {id:9, icon:'👻', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Gastly',slug:'gastly',type:'Ghost',tc:'#7C3AED'},
    evolved:{name:'Haunter',slug:'haunter',type:'Ghost',tc:'#7C3AED'},
-   wild:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'}},
+   wild:{name:'Slowpoke',slug:'slowpoke',type:'Psychic',tc:'#EC4899'}},
   {id:10, icon:'🐟', diff:'easy', maxNum:10, ops:['+'],
    player:{name:'Magikarp',slug:'magikarp',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'},
@@ -8230,35 +8360,35 @@ const G13_CHAINS = [
   {id:11, icon:'🌊', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Eevee',slug:'eevee',type:'Normal',tc:'#A3A3A3'},
    evolved:{name:'Vaporeon',slug:'vaporeon',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Dewgong',slug:'dewgong',type:'Ice',tc:'#BAE6FD'}},
+   wild:{name:'Seel',slug:'seel',type:'Ice',tc:'#BAE6FD'}},
   {id:12, icon:'🦊', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Vulpix',slug:'vulpix',type:'Fire',tc:'#F97316'},
    evolved:{name:'Ninetales',slug:'ninetales',type:'Fire',tc:'#F97316'},
-   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
+   wild:{name:'Flareon',slug:'flareon',type:'Fire',tc:'#F97316'}},
   {id:13, icon:'🌸', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Oddish',slug:'oddish',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Gloom',slug:'gloom',type:'Grass',tc:'#22C55E'},
-   wild:{name:'Vileplume',slug:'vileplume',type:'Grass',tc:'#22C55E'}},
+   wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
   {id:14, icon:'🔮', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Abra',slug:'abra',type:'Psychic',tc:'#EC4899'},
    evolved:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'},
-   wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
+   wild:{name:'Slowbro',slug:'slowbro',type:'Psychic',tc:'#EC4899'}},
   {id:15, icon:'🦆', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Psyduck',slug:'psyduck',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Golduck',slug:'golduck',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Slowbro',slug:'slowbro',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Marill',slug:'marill',type:'Water',tc:'#38BDF8'}},
   {id:16, icon:'🐸', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Poliwag',slug:'poliwag',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Poliwhirl',slug:'poliwhirl',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Poliwrath',slug:'poliwrath',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Horsea',slug:'horsea',type:'Water',tc:'#38BDF8'}},
   {id:17, icon:'🐠', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Horsea',slug:'horsea',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Seadra',slug:'seadra',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Staryu',slug:'staryu',type:'Water',tc:'#38BDF8'}},
   {id:18, icon:'🦭', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Seel',slug:'seel',type:'Ice',tc:'#BAE6FD'},
    evolved:{name:'Dewgong',slug:'dewgong',type:'Ice',tc:'#BAE6FD'},
-   wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Cloyster',slug:'cloyster',type:'Ice',tc:'#BAE6FD'}},
   {id:19, icon:'🦴', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Cubone',slug:'cubone',type:'Ground',tc:'#D97706'},
    evolved:{name:'Marowak',slug:'marowak',type:'Ground',tc:'#D97706'},
@@ -8266,41 +8396,41 @@ const G13_CHAINS = [
   {id:20, icon:'⭐', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Staryu',slug:'staryu',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'},
-   wild:{name:'Cloyster',slug:'cloyster',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Golduck',slug:'golduck',type:'Water',tc:'#38BDF8'}},
   {id:21, icon:'🥚', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Exeggcute',slug:'exeggcute',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'},
-   wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
+   wild:{name:'Gloom',slug:'gloom',type:'Grass',tc:'#22C55E'}},
   {id:22, icon:'☠️', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Koffing',slug:'koffing',type:'Poison',tc:'#A855F7'},
    evolved:{name:'Weezing',slug:'weezing',type:'Poison',tc:'#A855F7'},
-   wild:{name:'Muk',slug:'muk',type:'Poison',tc:'#A855F7'}},
+   wild:{name:'Marowak',slug:'marowak',type:'Ground',tc:'#D97706'}},
   {id:23, icon:'🐉', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Dratini',slug:'dratini',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'},
-   wild:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#6366F1'}},
+   wild:{name:'Snorlax',slug:'snorlax',type:'Normal',tc:'#A3A3A3'}},
   {id:24, icon:'🐚', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Omanyte',slug:'omanyte',type:'Rock',tc:'#A16207'},
    evolved:{name:'Omastar',slug:'omastar',type:'Rock',tc:'#A16207'},
-   wild:{name:'Kabutops',slug:'kabutops',type:'Rock',tc:'#A16207'}},
+   wild:{name:'Kabuto',slug:'kabuto',type:'Rock',tc:'#A16207'}},
   {id:25, icon:'🦀', diff:'medium', maxNum:20, ops:['+','-'],
    player:{name:'Kabuto',slug:'kabuto',type:'Rock',tc:'#A16207'},
    evolved:{name:'Kabutops',slug:'kabutops',type:'Rock',tc:'#A16207'},
-   wild:{name:'Omastar',slug:'omastar',type:'Rock',tc:'#A16207'}},
+   wild:{name:'Omanyte',slug:'omanyte',type:'Rock',tc:'#A16207'}},
 
   // === HARD (26-40): mixed ops up to 30 ===
   {id:26, icon:'🔥', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Cyndaquil',slug:'cyndaquil',type:'Fire',tc:'#F97316'},
    evolved:{name:'Quilava',slug:'quilava',type:'Fire',tc:'#F97316'},
-   wild:{name:'Typhlosion',slug:'typhlosion',type:'Fire',tc:'#F97316'}},
+   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
   {id:27, icon:'🐊', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Totodile',slug:'totodile',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Croconaw',slug:'croconaw',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Feraligatr',slug:'feraligatr',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
   {id:28, icon:'🌱', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Chikorita',slug:'chikorita',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Bayleef',slug:'bayleef',type:'Grass',tc:'#22C55E'},
-   wild:{name:'Meganium',slug:'meganium',type:'Grass',tc:'#22C55E'}},
+   wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
   {id:29, icon:'🥚', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Togepi',slug:'togepi',type:'Fairy',tc:'#FB7185'},
    evolved:{name:'Togetic',slug:'togetic',type:'Fairy',tc:'#FB7185'},
@@ -8308,19 +8438,19 @@ const G13_CHAINS = [
   {id:30, icon:'💧', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Marill',slug:'marill',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Azumarill',slug:'azumarill',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Slowbro',slug:'slowbro',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Vaporeon',slug:'vaporeon',type:'Water',tc:'#38BDF8'}},
   {id:31, icon:'🐻', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Teddiursa',slug:'teddiursa',type:'Normal',tc:'#A3A3A3'},
    evolved:{name:'Ursaring',slug:'ursaring',type:'Normal',tc:'#A3A3A3'},
-   wild:{name:'Snorlax',slug:'snorlax',type:'Normal',tc:'#A3A3A3'}},
+   wild:{name:'Kangaskhan',slug:'kangaskhan',type:'Normal',tc:'#A3A3A3'}},
   {id:32, icon:'🐶', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Snubbull',slug:'snubbull',type:'Fairy',tc:'#FB7185'},
    evolved:{name:'Granbull',slug:'granbull',type:'Fairy',tc:'#FB7185'},
-   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
+   wild:{name:'Persian',slug:'persian',type:'Normal',tc:'#A3A3A3'}},
   {id:33, icon:'🦖', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Larvitar',slug:'larvitar',type:'Rock',tc:'#A16207'},
    evolved:{name:'Pupitar',slug:'pupitar',type:'Rock',tc:'#A16207'},
-   wild:{name:'Tyranitar',slug:'tyranitar',type:'Rock',tc:'#A16207'}},
+   wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
   {id:34, icon:'🌋', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Slugma',slug:'slugma',type:'Fire',tc:'#F97316'},
    evolved:{name:'Magcargo',slug:'magcargo',type:'Fire',tc:'#F97316'},
@@ -8328,27 +8458,27 @@ const G13_CHAINS = [
   {id:35, icon:'🐗', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Swinub',slug:'swinub',type:'Ice',tc:'#BAE6FD'},
    evolved:{name:'Piloswine',slug:'piloswine',type:'Ice',tc:'#BAE6FD'},
-   wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Dewgong',slug:'dewgong',type:'Ice',tc:'#BAE6FD'}},
   {id:36, icon:'💧', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Mudkip',slug:'mudkip',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Marshtomp',slug:'marshtomp',type:'Water',tc:'#38BDF8'},
-   wild:{name:'Swampert',slug:'swampert',type:'Water',tc:'#38BDF8'}},
+   wild:{name:'Psyduck',slug:'psyduck',type:'Water',tc:'#38BDF8'}},
   {id:37, icon:'🍃', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Treecko',slug:'treecko',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Grovyle',slug:'grovyle',type:'Grass',tc:'#22C55E'},
-   wild:{name:'Sceptile',slug:'sceptile',type:'Grass',tc:'#22C55E'}},
+   wild:{name:'Bulbasaur',slug:'bulbasaur',type:'Grass',tc:'#22C55E'}},
   {id:38, icon:'🐓', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Torchic',slug:'torchic',type:'Fire',tc:'#F97316'},
    evolved:{name:'Combusken',slug:'combusken',type:'Fire',tc:'#F97316'},
-   wild:{name:'Blaziken',slug:'blaziken',type:'Fire',tc:'#F97316'}},
+   wild:{name:'Vulpix',slug:'vulpix',type:'Fire',tc:'#F97316'}},
   {id:39, icon:'🌀', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Ralts',slug:'ralts',type:'Psychic',tc:'#EC4899'},
    evolved:{name:'Kirlia',slug:'kirlia',type:'Psychic',tc:'#EC4899'},
-   wild:{name:'Gardevoir',slug:'gardevoir',type:'Psychic',tc:'#EC4899'}},
+   wild:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'}},
   {id:40, icon:'⚙️', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Beldum',slug:'beldum',type:'Steel',tc:'#94A3B8'},
    evolved:{name:'Metang',slug:'metang',type:'Steel',tc:'#94A3B8'},
-   wild:{name:'Metagross',slug:'metagross',type:'Steel',tc:'#94A3B8'}},
+   wild:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'}},
 ]
 
 // HP config by difficulty
@@ -8376,35 +8506,30 @@ function g13PickChain(lv) {
 }
 
 function initGame13() {
-  try { _initGame13Impl() } catch(e) {
-    console.error('initGame13 crash:', e)
-    const dbg = document.getElementById('g13-debug-err')
+  const dbg = document.getElementById('g13-debug-err')
+  if (dbg) dbg.style.display = 'none'
+  try {
+    _initGame13Impl()
+  } catch(e) {
+    console.error('[G13] crash:', e)
     if (dbg) { dbg.textContent = '⚠️ ' + e.message; dbg.style.display = 'block' }
   }
 }
+window.initGame13 = initGame13
+
 function _initGame13Impl() {
-  // === PROBE: first thing — update name element so we know this code runs ===
-  const _probeEl = document.getElementById('g13-wname')
-  if (_probeEl) _probeEl.textContent = '⏳'
   battleBgmPlay()
   const lv = Math.max(1, Math.min(20, state.selectedLevelNum || 1))
-  // Hardcoded fallback chain in case G13_CHAINS fails
   const _FALLBACK = {id:0,icon:'🔥',diff:'easy',maxNum:10,ops:['+'],
     player:{name:'Charmander',slug:'charmander',type:'Fire',tc:'#F97316'},
     evolved:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
     wild:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'}}
   let chain
-  try { chain = g13PickChain(lv) } catch(e) { console.error('g13PickChain err',e) }
-  if (!chain) {
-    console.warn('g13PickChain returned null for lv='+lv+', using fallback. G13_CHAINS len='+(typeof G13_CHAINS!=='undefined'?G13_CHAINS.length:'UNDEF'))
-    chain = _FALLBACK
-  }
+  try { chain = g13PickChain(lv) } catch(e) {}
+  if (!chain) chain = _FALLBACK
   let cfg
-  try { cfg = G13_DIFF[chain.diff] } catch(e) { console.error('G13_DIFF err',e) }
-  if (!cfg) {
-    console.warn('G13_DIFF missing diff='+chain.diff+', using fallback cfg')
-    cfg = {playerHp:5, wildHp:8, attacksToEvo:4, damage:1, wildDamage:1}
-  }
+  try { cfg = G13_DIFF[chain.diff] } catch(e) {}
+  if (!cfg) cfg = {playerHp:5, wildHp:8, attacksToEvo:4, damage:1, wildDamage:1}
 
   g13State = {
     chain, lv, cfg,
@@ -8412,71 +8537,89 @@ function _initGame13Impl() {
     wildHp: cfg.wildHp, wildMaxHp: cfg.wildHp,
     evoPoints: 0, evoNeeded: cfg.attacksToEvo,
     evolved: false, locked: false,
-    attackIdx: 0,   // how many player attacks this exchange
-    phase: 'player_attack',  // player_attack | wild_counter | evolution | victory | defeat
+    attackIdx: 0,
+    phase: 'player_attack',
     correctThisExchange: 0,
     currentAnswer: 0,
     stars: 0,
   }
 
   // Set header
-  document.getElementById('g13-level').textContent = `Lv.${lv}`
-  document.getElementById('g13-stars').textContent = '⭐ 0'
-  document.getElementById('g13-chain-badge').textContent = `${chain.icon} ${chain.player.name}→${chain.evolved.name}`
+  const lvEl = document.getElementById('g13-level'); if(lvEl) lvEl.textContent = `Lv.${lv}`
+  const stEl = document.getElementById('g13-stars'); if(stEl) stEl.textContent = '⭐ 0'
+  const bdg = document.getElementById('g13-chain-badge'); if(bdg) bdg.textContent = `${chain.icon} ${chain.player.name}→${chain.evolved.name}`
 
-  // Hide overlays
-  document.getElementById('g13-evo-overlay').style.display = 'none'
-  document.getElementById('g13-result-overlay').style.display = 'none'
-  document.getElementById('g13-qpanel').style.opacity = '1'
-  document.getElementById('g13-qpanel').style.pointerEvents = ''
+  // Ensure overlays hidden, qpanel fully visible
+  const evoOv = document.getElementById('g13-evo-overlay'); if(evoOv) evoOv.style.display = 'none'
+  const resOv = document.getElementById('g13-result-overlay'); if(resOv) resOv.style.display = 'none'
+  const qp = document.getElementById('g13-qpanel')
+  if (qp) { qp.style.opacity = '1'; qp.style.pointerEvents = ''; qp.style.display = 'flex' }
+  const evoBtn = document.getElementById('g13-evo-btn')
+  if (evoBtn) evoBtn.style.display = 'none'
+  const choicesEl2 = document.getElementById('g13-choices')
+  if (choicesEl2) choicesEl2.style.display = ''
+  const mathEl2 = document.getElementById('g13-math')
+  if (mathEl2) mathEl2.style.color = ''
 
-  // Load sprites
-  const wImg = document.getElementById('g13-wspr')
-  const pImg = document.getElementById('g13-pspr')
+  // Sprite loading: show emoji immediately, replace with image async
   const POKE_IDS = {bulbasaur:1,ivysaur:2,venusaur:3,charmander:4,charmeleon:5,charizard:6,squirtle:7,wartortle:8,blastoise:9,caterpie:10,metapod:11,butterfree:12,pikachu:25,raichu:26,jolteon:135,flareon:136,vaporeon:134,arcanine:59,meowth:52,persian:53,machop:66,machoke:67,machamp:68,geodude:74,graveler:75,golem:76,gastly:92,haunter:93,gengar:94,magikarp:129,gyarados:130,lapras:131,eevee:133,snorlax:143,dratini:147,dragonair:148,dragonite:149,abra:63,kadabra:64,alakazam:65,psyduck:54,golduck:55,slowpoke:79,slowbro:80,poliwag:60,poliwhirl:61,poliwrath:62,horsea:116,seadra:117,vulpix:37,ninetales:38,oddish:43,gloom:44,vileplume:45,exeggcute:102,exeggutor:103,koffing:109,weezing:110,cubone:104,marowak:105,kabuto:140,kabutops:141,omanyte:138,omastar:139,cyndaquil:155,quilava:156,typhlosion:157,totodile:158,croconaw:159,feraligatr:160,chikorita:152,bayleef:153,meganium:154,togepi:175,togetic:176,marill:183,azumarill:184,teddiursa:216,ursaring:217,slugma:218,magcargo:219,swinub:220,piloswine:221,larvitar:246,pupitar:247,tyranitar:248,mudkip:258,marshtomp:259,swampert:260,treecko:252,grovyle:253,sceptile:254,torchic:255,combusken:256,blaziken:257,ralts:280,kirlia:281,gardevoir:282,beldum:374,metang:375,metagross:376,snubbull:209,granbull:210,clefable:36,dewgong:87,seel:86,cloyster:91,staryu:120,starmie:121,kangaskhan:115,muk:89}
-  const pokeUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` : `https://img.pokemondb.net/sprites/home/normal/${slug}.png` }
-  const sprFallback = (img, emoji) => {
-    img.style.display = 'none'
-    const fb = img.parentElement.querySelector('.g13-spr-fb')
-    if (!fb) {
-      const el = document.createElement('div')
-      el.className = 'g13-spr-fb'
-      el.style.cssText = 'font-size:min(20vw,12vh);line-height:1;display:flex;align-items:center;justify-content:center;width:min(40vw,20vh);height:min(40vw,20vh);'
-      el.textContent = emoji
-      img.parentElement.insertBefore(el, img.nextSibling)
-    }
-  }
-  wImg.style.display = ''
-  wImg.src = pokeUrl(chain.wild.slug)
-  wImg.onerror = () => sprFallback(wImg, chain.icon || '❓')
-  pImg.style.display = ''
-  pImg.src = pokeUrl(chain.player.slug)
-  pImg.onerror = () => sprFallback(pImg, chain.icon || '❓')
+  const pokeUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` : null }
+  const sprFbStyle = 'font-size:min(18vw,11vh);line-height:1;display:flex;align-items:center;justify-content:center;width:min(40vw,20vh);height:min(40vw,20vh);'
 
-  // Entrance animations
-  wImg.style.animation = 'none'; void wImg.offsetWidth; wImg.style.animation = 'g13Enter 0.5s cubic-bezier(0.34,1.56,0.64,1)'
-  pImg.style.animation = 'none'; void pImg.offsetWidth; pImg.style.animation = 'g13EnterFlip 0.5s cubic-bezier(0.34,1.56,0.64,1)'
+  function loadSpr(imgId, wrapId, slug, emoji) {
+    const wrap = document.getElementById(wrapId)
+    if (!wrap) return
+    // Remove old fallback if any
+    const old = wrap.querySelector('.g13-spr-fb'); if(old) old.remove()
+    const img = document.getElementById(imgId)
+    const url = pokeUrl(slug)
+    if (!url) {
+      if(img) img.style.display = 'none'
+      const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
+      wrap.insertBefore(fb, wrap.firstChild)
+      return
+    }
+    // Show emoji first (instant), then swap to image if it loads
+    if(img) img.style.display = 'none'
+    const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
+    wrap.insertBefore(fb, wrap.firstChild)
+    const testImg = new Image()
+    testImg.onload = () => { if(img){img.style.display='';img.src=url} ; fb.remove() }
+    testImg.onerror = () => { /* keep emoji */ }
+    testImg.src = url
+  }
+
+  loadSpr('g13-wspr', 'g13-wspr-wrap', chain.wild.slug, chain.icon || '❓')
+  loadSpr('g13-pspr', 'g13-pspr-wrap', chain.player.slug, chain.icon || '❓')
 
   // Wild name/type
-  document.getElementById('g13-wname').textContent = chain.wild.name
-  document.getElementById('g13-wlv').textContent = `Lv${lv + 5}`
+  const wnEl = document.getElementById('g13-wname'); if(wnEl) wnEl.textContent = chain.wild.name
+  const wlEl = document.getElementById('g13-wlv');   if(wlEl) wlEl.textContent = `Lv${lv + 5}`
   const wtype = document.getElementById('g13-wtype')
-  wtype.textContent = chain.wild.type
-  wtype.style.background = chain.wild.tc + '33'
-  wtype.style.color = chain.wild.tc
-  wtype.style.border = `1px solid ${chain.wild.tc}66`
+  if (wtype) { wtype.textContent = chain.wild.type; wtype.style.background = chain.wild.tc+'33'; wtype.style.color = chain.wild.tc; wtype.style.border = `1px solid ${chain.wild.tc}66` }
 
   // Player name/type
-  document.getElementById('g13-pname').textContent = chain.player.name
-  document.getElementById('g13-plv').textContent = `Lv${lv}`
+  const pnEl = document.getElementById('g13-pname'); if(pnEl) pnEl.textContent = chain.player.name
+  const plEl = document.getElementById('g13-plv');   if(plEl) plEl.textContent = `Lv${lv}`
   const ptype = document.getElementById('g13-ptype')
-  ptype.textContent = chain.player.type
-  ptype.style.background = chain.player.tc + '33'
-  ptype.style.color = chain.player.tc
-  ptype.style.border = `1px solid ${chain.player.tc}66`
+  if (ptype) { ptype.textContent = chain.player.type; ptype.style.background = chain.player.tc+'33'; ptype.style.color = chain.player.tc; ptype.style.border = `1px solid ${chain.player.tc}66` }
 
   g13UpdateHpBars()
   g13UpdateEvoBar()
+  // Apply arena background based on wild type
+  const field = document.getElementById('g13-field')
+  if (field) {
+    field.className = field.className.replace(/g13-arena-\S+/g, '').trim()
+    field.classList.add('g13-field', `g13-arena-${chain.wild.type}`)
+    // Random day/dark, responsive mobile/pc
+    const isDark = Math.random() < 0.5
+    const isMobile = window.innerWidth <= 768
+    const variant = Math.random() < 0.5 ? '' : '-2'
+    const bgKey = isDark
+      ? (isMobile ? `bg-arena-dark-mobile${variant}` : `bg-arena-dark-pc${variant}`)
+      : (isMobile ? `bg-arena-day-mobile${variant}` : `bg-arena-day-pc${variant}`)
+    field.style.backgroundImage = `url('assets/${bgKey}.webp')`
+  }
   g13NextQuestion()
 }
 
@@ -8541,7 +8684,7 @@ function g13GenQuestion() {
 
 function g13NextQuestion() {
   const s = g13State
-  if (s.locked || s.phase === 'victory' || s.phase === 'defeat') return
+  if (s.locked || s.phase === 'victory' || s.phase === 'defeat' || s.phase === 'evo_ready') return
   const q = g13GenQuestion()
   s.currentAnswer = q.ans
   s.locked = false
@@ -8565,6 +8708,48 @@ function g13NextQuestion() {
   })
 }
 
+function g13SpawnAttackEffect(type, fromPlayer) {
+  const field = document.getElementById('g13-field')
+  if (!field) return
+  const typeImg = {Fire:'attack-fx-fire.webp',Water:'attack-fx-water.webp',Grass:'attack-fx-grass.webp',Electric:'attack-fx-electric.webp'}
+  const typeEmoji = {Rock:'🪨',Ghost:'👻',Psychic:'🌀',Normal:'⭐',Ice:'❄️',Dragon:'💥',Fighting:'👊',Steel:'⚔️',Poison:'☠️',Bug:'🐛',Fairy:'✨',Ground:'💨',Flying:'🌪️'}
+  const hasImg = !!typeImg[type]
+  const imgSrc = hasImg ? `assets/${typeImg[type]}` : null
+  const emoji = typeEmoji[type] || '💥'
+  const fieldRect = field.getBoundingClientRect()
+  // Positions: player bottom-left, wild top-right (field-relative %)
+  const fromX = fromPlayer ? '15%' : '75%'
+  const fromY = fromPlayer ? '70%' : '15%'
+  const toX   = fromPlayer ? '75%' : '15%'
+  const toY   = fromPlayer ? '15%' : '70%'
+  const proj = document.createElement('div')
+  proj.className = 'g13-proj'
+  if (hasImg) {
+    proj.style.width = '44px'; proj.style.height = '44px'; proj.style.fontSize = '0'
+    proj.innerHTML = `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 8px rgba(255,255,255,0.8))" alt="">`
+  } else { proj.textContent = emoji }
+  proj.style.setProperty('--from-x', fromX)
+  proj.style.setProperty('--from-y', fromY)
+  proj.style.setProperty('--to-x',   toX)
+  proj.style.setProperty('--to-y',   toY)
+  proj.style.left = fromX
+  proj.style.top  = fromY
+  field.appendChild(proj)
+  setTimeout(() => proj.remove(), 600)
+  // Trail particles
+  for (let i = 0; i < 3; i++) {
+    const trail = document.createElement('div')
+    trail.className = 'g13-proj-trail'
+    if (hasImg) { trail.style.width = '22px'; trail.style.height = '22px'; trail.style.fontSize = '0'; trail.innerHTML = `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:contain;opacity:0.6" alt="">` }
+    else { trail.textContent = emoji }
+    trail.style.left = `calc(${fromX} + ${(Math.random()-0.5)*20}%)`
+    trail.style.top  = `calc(${fromY} + ${(Math.random()-0.5)*20}%)`
+    trail.style.animationDelay = `${i*0.08}s`
+    field.appendChild(trail)
+    setTimeout(() => trail.remove(), 500)
+  }
+}
+
 function g13Answer(val, btn) {
   const s = g13State
   if (s.locked || s.phase !== 'player_attack') return
@@ -8586,6 +8771,7 @@ function g13Answer(val, btn) {
     // Player lunge + attack sound
     const atkType = s.evolved ? s.chain.evolved.type : s.chain.player.type
     playAttackSound(atkType)
+    g13SpawnAttackEffect(atkType, true)
     const pspr = document.getElementById('g13-pspr')
     if (pspr) { pspr.classList.remove('spr-atk'); void pspr.offsetWidth; pspr.classList.add('spr-atk'); setTimeout(()=>pspr.classList.remove('spr-atk'),350) }
     // Wild hit animation
@@ -8641,8 +8827,8 @@ function g13WildCounterPhase() {
       s.correctThisExchange = 0
       if (s.playerHp <= 0) { g13Defeat(); return }
       if (!s.evolved && s.evoPoints >= s.evoNeeded) {
-        s.phase = 'evolution'
-        setTimeout(() => g13TriggerEvolution(), 500)
+        s.phase = 'evo_ready'
+        setTimeout(() => g13ShowEvoButton(), 300)
       } else {
         s.phase = 'player_attack'
         s.locked = false
@@ -8655,6 +8841,7 @@ function g13WildCounterPhase() {
       const wspr = document.getElementById('g13-wspr')
       const pspr = document.getElementById('g13-pspr')
       playAttackSound(s.chain.wild.type)
+      g13SpawnAttackEffect(s.chain.wild.type, false)
       if (wspr) { wspr.classList.remove('spr-atk'); void wspr.offsetWidth; wspr.classList.add('spr-atk'); setTimeout(()=>wspr.classList.remove('spr-atk'),350) }
       setTimeout(() => {
         if (pspr) { pspr.classList.remove('spr-hit'); void pspr.offsetWidth; pspr.classList.add('spr-hit'); setTimeout(()=>pspr.classList.remove('spr-hit'),400) }
@@ -8682,6 +8869,28 @@ function g13TriggerFlash() {
 function g13SetStatus(phaseText, battleText) {
   const pt = document.getElementById('g13-phase-txt'); if (pt) pt.textContent = phaseText
   const bt = document.getElementById('g13-battle-status'); if (bt) bt.textContent = battleText
+}
+
+function g13ShowEvoButton() {
+  const btn = document.getElementById('g13-evo-btn')
+  const choices = document.getElementById('g13-choices')
+  const math = document.getElementById('g13-math')
+  const atk = document.getElementById('g13-atk-lbl')
+  if (btn) btn.style.display = 'block'
+  if (choices) choices.style.display = 'none'
+  if (math) { math.textContent = '⚡ EVO SIAP!'; math.style.color = '#FBBF24' }
+  if (atk) atk.textContent = 'Pokemon kamu siap berevolusi!'
+  g13SetStatus('EVO 100%!', '⚡ Tekan tombol untuk berevolusi!')
+}
+
+function g13DoEvolution() {
+  const btn = document.getElementById('g13-evo-btn')
+  const choices = document.getElementById('g13-choices')
+  const math = document.getElementById('g13-math')
+  if (btn) btn.style.display = 'none'
+  if (choices) choices.style.display = ''
+  if (math) { math.textContent = '— + — = ?'; math.style.color = '' }
+  g13TriggerEvolution()
 }
 
 function g13TriggerEvolution() {
@@ -8851,6 +9060,8 @@ function g13Victory() {
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
     const evolved = s.evolved
+    const bannerImg = document.getElementById('g13-result-banner-img')
+    if(bannerImg) bannerImg.src = 'assets/victory-banner.webp'
     const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = evolved ? '🌟' : '⭐'
     const title = document.getElementById('g13-result-title'); if(title) title.textContent = evolved ? `${s.chain.evolved.name} Menang!` : 'Kamu Menang!'
     const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = evolved
@@ -8874,6 +9085,8 @@ function g13Defeat() {
   setTimeout(() => {
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
+    const bannerImg = document.getElementById('g13-result-banner-img')
+    if(bannerImg) bannerImg.src = 'assets/defeat-banner.webp'
     const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = '💔'
     const title = document.getElementById('g13-result-title'); if(title) title.textContent = 'Kalah...'
     const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = `${s.chain.wild.name} terlalu kuat! Coba lagi!`
