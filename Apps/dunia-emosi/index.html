@@ -117,6 +117,17 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .player-chip .p-stars { font-size:14px;font-weight:900;background:var(--amber-light);border-radius:12px;padding:3px 10px; }
 .player-chip .p-streak { font-size:12px;font-weight:900;background:linear-gradient(135deg,#A78BFA,#FCD34D);border-radius:12px;padding:3px 8px;color:#3B0764; }
 
+.menu-deco-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.menu-deco{position:absolute;opacity:0;pointer-events:none;animation:decoFloat ease-in-out infinite;}
+.menu-deco.d1{width:32px;top:8%;left:5%;animation-duration:6s;animation-delay:0s;opacity:0.35;}
+.menu-deco.d2{width:44px;top:15%;right:8%;animation-duration:7s;animation-delay:1s;opacity:0.25;}
+.menu-deco.d3{width:24px;top:55%;left:3%;animation-duration:5.5s;animation-delay:2s;opacity:0.3;}
+.menu-deco.d4{width:28px;top:30%;right:4%;animation-duration:4.8s;animation-delay:0.5s;opacity:0.4;}
+.menu-deco.d5{width:36px;bottom:18%;left:8%;animation-duration:6.5s;animation-delay:1.5s;opacity:0.3;}
+.menu-deco.d6{width:20px;bottom:30%;right:6%;animation-duration:5s;animation-delay:3s;opacity:0.35;}
+.menu-deco.d7{width:22px;top:70%;left:15%;animation-duration:7.2s;animation-delay:2.5s;opacity:0.3;}
+.menu-deco.d8{width:28px;bottom:8%;right:12%;animation-duration:5.8s;animation-delay:1.8s;opacity:0.25;}
+@keyframes decoFloat{0%,100%{transform:translateY(0)rotate(0deg);opacity:0.3}50%{transform:translateY(-12px)rotate(8deg);opacity:0.5}}
 .game-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:500px; }
 .game-tile { background:white;border-radius:var(--radius);padding:22px 14px;text-align:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:var(--shadow);border:none;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s; }
 .game-tile::before { content:'';position:absolute;top:0;left:0;right:0;height:6px;border-radius:4px 4px 0 0; }
@@ -1155,7 +1166,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* ── 6. MENU SCREEN — Dark premium ── */
 #screen-menu {
-  background: linear-gradient(160deg, #1C1030 0%, #0F172A 50%, #1a2744 100%);
+  background: url('assets/bg-menu-dark.webp') center/cover no-repeat, linear-gradient(160deg, #1C1030 0%, #0F172A 50%, #1a2744 100%);
 }
 .world-zone-name { color: rgba(255,255,255,0.5); }
 .world-zone-header { border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
@@ -2012,7 +2023,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes pokeEnterFlip { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1);opacity:1} }
 
 /* Game 11 — Science Quiz */
-#screen-game11{background:linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
+#screen-game11{background:url('assets/sci-bg.webp') center/cover no-repeat, linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
 .sci-question-img{font-size:72px;text-align:center;display:block;margin:8px auto;animation:mascotBounce 2s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.4));}
 .sci-question-text{font-size:18px;font-weight:700;color:white;text-align:center;margin:8px 16px;line-height:1.5;background:rgba(255,255,255,0.08);border-radius:16px;padding:14px;}
 .sci-choices{display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px;margin-top:8px;}
@@ -2022,7 +2033,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .sci-choice.wrong{background:rgba(244,63,94,0.25);border-color:#F43F5E;}
 
 /* Game 12 — Tebak Bayangan */
-#screen-game12{background:linear-gradient(180deg,#0D0620 0%,#1A0840 50%,#080310 100%);}
+#screen-game12{background:url('assets/shadow-bg.webp') center/cover no-repeat, linear-gradient(180deg,#0D0620 0%,#1A0840 50%,#080310 100%);}
 .shadow-desc{font-size:16px;font-weight:700;color:rgba(255,255,255,0.85);text-align:center;margin:8px 16px;line-height:1.6;background:rgba(255,255,255,0.08);border-radius:16px;padding:16px;max-width:400px;width:100%;}
 .shadow-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:400px;margin-top:8px;}
 .shadow-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:20px;font-size:48px;cursor:pointer;text-align:center;transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);filter:brightness(0.1) contrast(5);}
@@ -2111,7 +2122,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g13-type-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:0.5px;}
 .g13-hp-row{display:flex;align-items:center;gap:5px;margin-top:4px;}
 .g13-hp-lbl{font-size:10px;font-weight:900;color:#6EE7B7;}
-.g13-hp-track{flex:1;height:7px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;min-width:70px;}
+.g13-hp-track{flex:1;height:7px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;min-width:70px;position:relative;}
+.g13-hp-track::after{content:'';position:absolute;inset:-3px -4px;background:url('assets/battle-hp-frame.webp') center/100% 100% no-repeat;pointer-events:none;opacity:0.7;}
 .g13-hp-fill{height:100%;background:linear-gradient(90deg,#4ADE80,#22C55E);border-radius:4px;transition:width 0.5s ease;}
 .g13-hp-fill.low{background:linear-gradient(90deg,#FB923C,#EF4444);}
 .g13-hp-nums{font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;text-align:right;margin-top:2px;}
@@ -3770,6 +3782,17 @@ body { background: #0a0a1a !important; }
 
 <!-- MENU -->
 <div id="screen-menu" class="screen">
+  <!-- Floating deco layer -->
+  <div class="menu-deco-layer" aria-hidden="true">
+    <img class="menu-deco d1" src="assets/deco-star-burst.webp" alt="">
+    <img class="menu-deco d2" src="assets/deco-cloud-white.webp" alt="">
+    <img class="menu-deco d3" src="assets/deco-heart-pink.webp" alt="">
+    <img class="menu-deco d4" src="assets/deco-lightning-yellow.webp" alt="">
+    <img class="menu-deco d5" src="assets/deco-leaf-green.webp" alt="">
+    <img class="menu-deco d6" src="assets/deco-bubble.webp" alt="">
+    <img class="menu-deco d7" src="assets/deco-flower-small.webp" alt="">
+    <img class="menu-deco d8" src="assets/deco-mushroom.webp" alt="">
+  </div>
   <div style="display:flex;justify-content:flex-end;padding:4px 4px 0;width:100%">
     <button onclick="playClick(); showScreen('screen-welcome')" style="background:rgba(139,92,246,0.15);border:none;border-radius:14px;padding:8px 16px;font-size:18px;cursor:pointer;color:#8B5CF6;font-weight:700" title="Kembali ke Beranda">⌂ Beranda</button>
   </div>
@@ -4049,6 +4072,7 @@ body { background: #0a0a1a !important; }
   <span class="sci-question-img" id="g11-emoji">🦁</span>
   <div class="sci-question-text" id="g11-question">Memuat soal...</div>
   <div class="sci-choices" id="g11-choices"></div>
+  <img id="g11-correct-flash" src="assets/sci-correct.webp" alt="" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;object-fit:contain;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:10;">
   <div id="g11-explain" style="display:none;margin:10px 16px 0;padding:12px 14px;background:rgba(255,255,255,0.08);border-radius:14px;border-left:4px solid #22D3EE;font-size:13px;line-height:1.5;color:rgba(255,255,255,0.9);"></div>
   <button id="g11-lanjut" style="display:none;margin:10px auto 0;padding:10px 32px;background:linear-gradient(135deg,#06B6D4,#0EA5E9);color:#fff;border:none;border-radius:100px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 #0369A1;" onclick="g11Next()">Lanjut ▶</button>
 </div>
@@ -4067,6 +4091,7 @@ body { background: #0a0a1a !important; }
   <p style="font-size:13px;color:rgba(255,255,255,0.55);text-align:center;margin-top:12px;font-weight:700;" id="g12-progress">Soal 1/10</p>
   <div class="shadow-desc" id="g12-question">Hewan apa ini?</div>
   <div class="shadow-grid" id="g12-choices"></div>
+  <img id="g12-reveal-fx" src="assets/shadow-reveal-fx.webp" alt="" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;object-fit:contain;opacity:0;transition:opacity 0.15s;pointer-events:none;z-index:10;">
 </div>
 
 <!-- GAME 13 — Evolusi Math Adventure -->
@@ -4594,6 +4619,7 @@ body { background: #0a0a1a !important; }
 <!-- FEEDBACK OVERLAY -->
 <div id="overlay-feedback">
   <div class="feedback-card">
+    <img id="fb-leo" src="assets/leo-celebrating.webp" alt="" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 4px;animation:tileIconFloat 2s ease-in-out infinite;" onerror="this.style.display='none'">
     <span class="feedback-emoji" id="fb-emoji">🎉</span>
     <div class="feedback-title" id="fb-title">Benar!</div>
     <div class="feedback-sub" id="fb-sub">Hebat sekali!</div>
@@ -5512,6 +5538,8 @@ function showFeedback(correct, starsEarned, customMsg, callback) {
   document.getElementById('fb-title').textContent=titles[Math.floor(Math.random()*titles.length)]
   document.getElementById('fb-sub').textContent=customMsg||(correct?'Kamu pintar sekali! 😄':'Tidak apa-apa, kamu pasti bisa! 💪')
   document.getElementById('fb-stars').textContent=starsEarned>0?'⭐'.repeat(Math.min(starsEarned,5)):''
+  const leoEl = document.getElementById('fb-leo')
+  if(leoEl) leoEl.src = correct ? 'assets/leo-celebrating.webp' : 'assets/leo-angry.webp'
   document.getElementById('overlay-feedback').classList.add('show')
   if(correct&&starsEarned>0) launchConfetti()
 }
@@ -5619,7 +5647,12 @@ function goToMenu()   { state.maxPossibleStars = null; buildMenuHeader(); showSc
 // ================================================================
 function launchConfetti() {
   const colors=['#F43F5E','#FCD34D','#14B8A6','#38BDF8','#8B5CF6','#FDA4AF','#A3E635','#FCD34D']
-  for(let i=0;i<50;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';const size=8+Math.random()*12,dx=(Math.random()-0.5)*200+'px',rot=Math.random()*1080+'deg';p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${size}px;height:${size*1.4}px;border-radius:${Math.random()>0.5?'50%':'4px'};animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`;document.body.appendChild(p);setTimeout(()=>p.remove(),3200)},i*35)}
+  for(let i=0;i<50;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';const size=8+Math.random()*12,dx=(Math.random()-0.5)*200+'px',rot=Math.random()*1080+'deg';const useStarImg = Math.random() > 0.65
+if(useStarImg){
+  p.style.cssText=`left:${Math.random()*100}vw;background:url('assets/confetti-star.webp') center/contain no-repeat;width:${size}px;height:${size}px;border-radius:0;animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`
+}else{
+  p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${size}px;height:${size*1.4}px;border-radius:${Math.random()>0.5?'50%':'4px'};animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`
+}document.body.appendChild(p);setTimeout(()=>p.remove(),3200)},i*35)}
 }
 function spawnSparkles() {
   const icons=['⭐','✨','💫','🌟','❤️','🎉']
@@ -6430,7 +6463,13 @@ function setupDriveMap(map) {
     const bodyRect = carSvg.querySelectorAll('rect')[0];
     if(bodyRect) bodyRect.setAttribute('fill', carColors[map]||'#DC2626');
   }
-  document.getElementById('g6-vehicle-icon').textContent = vehicle
+  const vImgMap = {city:'car-red.webp',forest:'car-red.webp',space:'rocket.webp',body:'submarine.webp'}
+  const vIconEl = document.getElementById('g6-vehicle-icon')
+  if(vIconEl) {
+    const vFile = vImgMap[map]
+    if(vFile) vIconEl.innerHTML = `<img src="assets/${vFile}" style="width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5))" onerror="this.outerHTML='${vehicle}'">`
+    else vIconEl.textContent = vehicle
+  }
   pickNextWord()
   document.getElementById('g6-start-overlay').classList.add('visible')
 }
@@ -7928,6 +7967,9 @@ function g11Answer(idx,btn){
   }
   correct ? playCorrect() : playWrong()
   if(correct){
+    // Flash sci-correct image briefly
+    const sciCorrectEl = document.getElementById('g11-correct-flash')
+    if(sciCorrectEl) { sciCorrectEl.style.opacity='1'; setTimeout(()=>sciCorrectEl.style.opacity='0', 800) }
     s.stars++
     state.players[state.currentPlayer].stars++
     document.getElementById('g11-stars').textContent=`⭐ ${s.stars}`
@@ -8031,6 +8073,8 @@ function g12Answer(correct,btn,grid){
   if(!correct) btn.classList.add('wrong')
   correct ? playCorrect() : playWrong()
   if(correct){
+    const rfx = document.getElementById('g12-reveal-fx')
+    if(rfx) { rfx.style.opacity='1'; setTimeout(()=>rfx.style.opacity='0', 700) }
     s.stars++; state.players[state.currentPlayer].stars++
     document.getElementById('g12-stars').textContent=`⭐ ${s.stars}`
   } else {
