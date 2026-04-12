@@ -786,7 +786,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* ── 1. GAME SCREENS — Full Screen Layout ── */
 #screen-game1, #screen-game2, #screen-game3, #screen-game4, #screen-game5,
 #screen-game6, #screen-game7, #screen-game8, #screen-game9,
-#screen-game10, #screen-game11, #screen-game12, #screen-game13,
+#screen-game10, #screen-game11, #screen-game12, #screen-game13, #screen-game13b,
 #screen-game14, #screen-game15, #screen-game16, #screen-game17, #screen-game18 {
   position: fixed;
   inset: 0;
@@ -1230,23 +1230,47 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .breathe-instruction { color: #C4B5FD; }
 .breathe-sub { color: #A78BFA; }
 
-.g3-word { color: white; -webkit-text-fill-color: white; background: none; }
-.g3-hint { color: rgba(255,255,255,0.7); }
-.g3-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
-.g3-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
-.g3-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
-.g3-mode-badge { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.2); }
-.g3-progress { color: rgba(255,255,255,0.6); }
+/* G3 — Huruf Hutan: opaque forest-green palette, readable text */
+.g3-word { color: white !important; -webkit-text-fill-color: white !important; background: none !important; text-shadow: 0 2px 12px rgba(0,0,0,0.9),0 0 20px rgba(74,222,128,0.3); }
+.g3-hint { color: #BBF7D0 !important; text-shadow: 0 1px 6px rgba(0,0,0,0.8); background: rgba(0,0,0,0.4); border-radius: 10px; padding: 4px 14px; display: inline-block; }
+.g3-choice-btn { background: linear-gradient(135deg,#14532D,#166534) !important; border: 3px solid #4ADE80 !important; color: white !important; box-shadow: 0 5px 0 #052E16 !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+.g3-choice-btn.correct { background: linear-gradient(135deg,#15803D,#16A34A) !important; border-color: #86EFAC !important; box-shadow: 0 5px 0 #052E16,0 0 20px rgba(74,222,128,0.5) !important; }
+.g3-choice-btn.wrong { background: linear-gradient(135deg,#7F1D1D,#991B1B) !important; border-color: #FCA5A5 !important; box-shadow: 0 5px 0 #450A0A !important; }
+.g3-mode-badge { background: linear-gradient(135deg,#B45309,#D97706) !important; color: white !important; box-shadow: 0 4px 0 #78350F !important; }
+.g3-progress { color: rgba(255,255,255,0.9) !important; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.g3-choices { margin: 0 auto !important; }
+/* G3 center + safe area */
+#screen-game3 { align-items: center !important; padding-bottom: 15vh !important; }
+#screen-game3 .game-header,
+#screen-game3 .progress-bar-wrap,
+#screen-game3 .round-dots { align-self: stretch !important; }
 
-.g4-question { color: white; -webkit-text-fill-color: white; background: none; }
-.g4-animals-grid { background: rgba(255,255,255,0.08); border-color: rgba(245,158,11,0.3); }
+/* G4 — Hitung Binatang: opaque backgrounds, visible text */
+.g4-question { color: white !important; -webkit-text-fill-color: white !important; background: none !important; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
+.g4-animals-grid { background: rgba(0,0,0,0.62) !important; border-color: rgba(245,158,11,0.7) !important; backdrop-filter: blur(10px) !important; margin: 0 auto !important; }
+.g4-mode-toggle { margin: 0 auto !important; }
+.g4-mode-btn { background: rgba(0,0,0,0.55) !important; color: rgba(255,255,255,0.9) !important; border-color: rgba(255,255,255,0.3) !important; }
+.g4-mode-btn.active { background: linear-gradient(135deg,#FCD34D,#F59E0B) !important; color: #78350F !important; border-color: #F59E0B !important; }
 /* Colorful buttons on dark bg — nth-child colors already set in base, just keep text white */
 .g4-choice-btn { color: white; }
 .g4-choice-btn:nth-child(3) { color: #5a4000; }
 .g4-choice-btn.correct { background: linear-gradient(135deg,#06D6A0,#059669) !important; border-color: #059669 !important; color: white !important; box-shadow: 0 5px 0 #047857 !important; }
 .g4-choice-btn.wrong { background: linear-gradient(135deg,#F43F5E,#e11d48) !important; border-color: #e11d48 !important; color: white !important; box-shadow: 0 5px 0 #9f1239 !important; animation: wrongShake 0.4s ease; }
-.g4-progress { color: rgba(255,255,255,0.6); }
-.g4-timer-text { color: rgba(255,255,255,0.6); }
+.g4-choices { margin: 0 auto !important; }
+.g4-timer-track { margin: 0 auto !important; }
+.g4-progress { color: rgba(255,255,255,0.9) !important; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.g4-timer-text { color: rgba(255,255,255,0.9) !important; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+/* G4 center + safe area */
+#screen-game4 { align-items: center !important; padding-bottom: 15vh !important; }
+#screen-game4 .game-header,
+#screen-game4 .progress-bar-wrap,
+#screen-game4 .round-dots { align-self: stretch !important; }
+
+/* Global safe area: bottom 15vh for all game screens (mobile browser chrome) */
+#screen-game1,#screen-game2,#screen-game3,#screen-game4,
+#screen-game5,#screen-game6,#screen-game7,#screen-game8,#screen-game9 {
+  padding-bottom: max(15vh, 72px);
+}
 .g4-mode-btn { border-color: rgba(255,255,255,0.25); }
 
 .g5-player-score { background: rgba(255,255,255,0.08); }
@@ -1588,6 +1612,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .game-tile.g13 .g-icon{animation-duration:1.5s;animation-delay:-0.3s}
 .game-tile.g13 .g-tag{background:linear-gradient(90deg,#F97316,#FBBF24);color:#1a1a1a;}
 .game-tile.g13::after{background:linear-gradient(135deg,rgba(249,115,22,0.12),transparent)}
+.game-tile.g13b::before{background:linear-gradient(90deg,#FBBF24,#06B6D4)}
+.game-tile.g13b .g-icon{animation-duration:1.4s;animation-delay:-0.2s}
+.game-tile.g13b .g-tag{background:linear-gradient(90deg,#FBBF24,#06B6D4);color:#1a1a1a;}
+.game-tile.g13b::after{background:linear-gradient(135deg,rgba(6,182,212,0.14),transparent)}
 
 /* ===== GAME 10 — Pertarungan Pokemon (Classic DS Battle Layout) ===== */
 #screen-game10 {
@@ -2107,12 +2135,12 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* Obstacle: moves left-to-right across each row */
 /* AI train image in its lane */
 .g14-ai-train {
-  position:absolute;z-index:6;height:52%;width:auto;
+  position:absolute;z-index:6;height:10%;width:auto;
   top:50%;transform:translateY(-50%) scaleX(-1);
 }
 /* Player train image */
 #g14-player {
-  position:absolute;z-index:10;height:62%;width:auto;
+  position:absolute;z-index:10;height:12%;width:auto;
   left:13%;transform:translateY(-50%) scaleX(-1);
   transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
   filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7));
@@ -2219,13 +2247,30 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g15-letter-tile:active { transform:translateY(2px);box-shadow:0 2px 0 #0D47A1; }
 .g15-letter-tile.used   { opacity:0.3;pointer-events:none;transform:scale(0.85); }
 .g15-chain-link {
-  font-size:22px;transition:all 0.4s;display:inline-block;
+  display:inline-block;width:26px;height:16px;
+  border:3.5px solid #B8860B;border-radius:50%;
+  background:linear-gradient(145deg,#FFE97A,#D4A017 45%,#8B6000);
+  box-shadow:inset 0 2px 2px rgba(255,255,255,0.5),0 2px 6px rgba(0,0,0,0.5);
+  transition:all 0.35s ease;position:relative;margin:0 2px;
+  vertical-align:middle;
+}
+.g15-chain-link.broken {
+  border-color:#4A4A4A;
+  background:linear-gradient(145deg,#777,#333 45%,#111);
+  opacity:0.35;transform:rotate(30deg) scale(0.7);
+  box-shadow:none;
 }
 .g15-chain-link.breaking { animation:g15ChainBreak 0.6s ease-out forwards; }
 @keyframes g15ChainBreak {
-  0%  { transform:scale(1) rotate(0deg);opacity:1; }
-  40% { transform:scale(1.5) rotate(-20deg);opacity:0.8;filter:brightness(3); }
-  100%{ transform:scale(0) rotate(45deg);opacity:0; }
+  0%  { transform:scale(1) rotate(0deg);opacity:1;border-color:#B8860B;background:linear-gradient(145deg,#FFE97A,#D4A017 45%,#8B6000); }
+  35% { transform:scale(1.4) rotate(-15deg);opacity:0.9;filter:brightness(2);border-color:#FFD700; }
+  100%{ transform:rotate(35deg) scale(0.65);opacity:0.3;border-color:#4A4A4A;background:linear-gradient(145deg,#777,#333 45%,#111);box-shadow:none; }
+}
+#g15-chains {
+  display:flex;align-items:center;gap:2px;justify-content:center;
+  min-height:30px;padding:5px 10px;
+  background:rgba(0,0,0,0.25);border-radius:20px;
+  border:1px solid rgba(255,255,255,0.1);
 }
 @keyframes g15TrainBounce {
   0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
@@ -2467,11 +2512,13 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   width:min(40vw,20vh);height:min(40vw,20vh);
   object-fit:contain;image-rendering:auto;
   filter:drop-shadow(0 6px 16px rgba(0,0,0,0.7));
-  transition:filter 0.3s;
+  transition:filter 0.3s,width 0.5s cubic-bezier(0.34,1.56,0.64,1),height 0.5s cubic-bezier(0.34,1.56,0.64,1);
   position:relative;z-index:2;
 }
 .g13-wspr{/* enemy faces left naturally */}
 .g13-pspr{transform:scaleX(-1);}/* player faces right */
+/* 1.3× bigger after evolution */
+.g13-pspr.evolved{width:min(52vw,26vh);height:min(52vw,26vh);}
 .g13-oval{
   position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
   width:110%;height:auto;
@@ -2903,6 +2950,216 @@ body { background: #0a0a1a !important; }
   background: rgba(255,255,255,0.15) !important;
   color: white !important;
   border: 1px solid rgba(255,255,255,0.25) !important;
+}
+
+/* ===== GAME 13B — QUICK FIRE ⚡ ===== */
+#screen-game13b { background:#050510; flex-direction:column; overflow:hidden; position:relative; }
+/* Battle arena */
+.g13b-field {
+  flex:1 1 0; min-height:0; position:relative; overflow:hidden;
+  background-size:cover; background-position:center 20%; background-color:#0a0a1a;
+}
+.g13b-field-overlay {
+  position:absolute; inset:0; z-index:0;
+  background:linear-gradient(180deg,rgba(0,0,0,0.28) 0%,rgba(0,0,0,0.1) 55%,rgba(0,0,0,0.6) 100%);
+}
+/* Timer (top-right) */
+.g13b-timer {
+  position:absolute; top:8px; right:8px; z-index:10;
+  background:rgba(0,0,0,0.72); border:2px solid rgba(251,191,36,0.65); border-radius:12px;
+  padding:4px 11px; font-size:20px; font-weight:900; font-family:'Fredoka One',cursive;
+  color:#FBBF24; letter-spacing:1px; transition:color 0.3s,border-color 0.3s;
+}
+.g13b-timer.warning { color:#EF4444; border-color:rgba(239,68,68,0.85); animation:g13bTimerWarn 0.45s ease infinite alternate; }
+@keyframes g13bTimerWarn { from{transform:scale(1)} to{transform:scale(1.1);text-shadow:0 0 14px rgba(239,68,68,0.9)} }
+/* Kill counter (top-left) */
+.g13b-kills {
+  position:absolute; top:8px; left:8px; z-index:10;
+  background:rgba(0,0,0,0.72); border:2px solid rgba(6,182,212,0.6); border-radius:12px;
+  padding:4px 10px; font-size:16px; font-weight:900; font-family:'Fredoka One',cursive; color:#67E8F9;
+}
+.g13b-kills.pop-kill { animation:g13bKillPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes g13bKillPop { 0%{transform:scale(1)} 50%{transform:scale(1.35)} 100%{transform:scale(1)} }
+/* HP bar (top-center, for legendary) */
+.g13b-hp-wrap {
+  position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:10;
+  display:flex; align-items:center; gap:5px;
+  background:rgba(0,0,0,0.7); border:1.5px solid rgba(255,255,255,0.2); border-radius:20px;
+  padding:4px 10px; white-space:nowrap;
+}
+.g13b-hp-track { width:80px; height:7px; background:rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; }
+.g13b-hp-fill { height:100%; background:linear-gradient(90deg,#22C55E,#86EFAC); border-radius:4px; transition:width 0.25s ease; }
+.g13b-hp-fill.low { background:linear-gradient(90deg,#EF4444,#FCA5A5); }
+/* Wild sprite — center of arena, large */
+.g13b-wspr-wrap {
+  position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
+  z-index:5; display:flex; flex-direction:column; align-items:center;
+}
+.g13b-wspr {
+  width:min(44vw,26vh); height:min(44vw,26vh); object-fit:contain;
+  filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65));
+}
+.g13b-wspr.wild-enter { animation:g13bWildIn 0.42s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.g13b-wspr.wild-die   { animation:g13bWildDie 0.38s ease forwards; }
+.g13b-wspr.wspr-hit   { animation:g13bWsprHit 0.38s ease; }
+@keyframes g13bWildIn {
+  0%  { opacity:0; transform:translateX(90px) scale(0.35); }
+  65% { transform:translateX(-8px) scale(1.08); }
+  100%{ opacity:1; transform:translateX(0) scale(1); }
+}
+@keyframes g13bWildDie {
+  0%  { opacity:1; transform:scale(1); filter:drop-shadow(0 0 0 transparent); }
+  30% { transform:scale(1.35) rotate(8deg); filter:brightness(3) saturate(0); }
+  100%{ opacity:0; transform:scale(0.15) rotate(-25deg); }
+}
+@keyframes g13bWsprHit {
+  0%,100%{ transform:scale(1); filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65)); }
+  40%    { transform:scale(0.88) translateX(-8px); filter:brightness(3) saturate(0); }
+}
+/* Wild name badge */
+.g13b-wname-badge {
+  margin-top:5px; background:rgba(0,0,0,0.68); border:1.5px solid rgba(255,255,255,0.22);
+  border-radius:20px; padding:3px 10px; font-size:12px; font-weight:900;
+  font-family:'Fredoka One',cursive; color:white; white-space:nowrap; z-index:6;
+}
+/* Legendary badge (above wild name) */
+.g13b-legendary-badge {
+  position:absolute; top:48px; left:50%; transform:translateX(-50%);
+  z-index:12; font-size:10px; font-weight:900; font-family:'Fredoka One',cursive; color:#FBBF24;
+  background:linear-gradient(135deg,rgba(124,58,237,0.88),rgba(220,38,38,0.88));
+  border:1.5px solid rgba(251,191,36,0.75); border-radius:20px; padding:2px 10px;
+  white-space:nowrap; display:none;
+}
+/* Player sprite — bottom-left, smaller */
+.g13b-pspr-wrap {
+  position:absolute; left:6%; bottom:10%; z-index:5;
+  display:flex; flex-direction:column; align-items:center;
+}
+.g13b-pspr {
+  width:min(20vw,12vh); height:min(20vw,12vh); object-fit:contain;
+  filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+}
+.g13b-pspr.atk { animation:g13bPAtk 0.35s ease forwards; }
+@keyframes g13bPAtk {
+  0%  { transform:translateX(0) scale(1); }
+  40% { transform:translateX(22px) scale(1.12); }
+  100%{ transform:translateX(0) scale(1); }
+}
+/* COMBO overlay */
+.g13b-combo-overlay {
+  position:absolute; top:36%; left:50%; transform:translateX(-50%);
+  z-index:20; pointer-events:none; opacity:0; text-align:center; width:220px;
+}
+.g13b-combo-overlay.show { animation:g13bComboShow 1.0s ease forwards; }
+@keyframes g13bComboShow {
+  0%  { opacity:0; transform:translateX(-50%) scale(0.35); }
+  18% { opacity:1; transform:translateX(-50%) scale(1.18); }
+  70% { opacity:1; transform:translateX(-50%) scale(1); }
+  100%{ opacity:0; transform:translateX(-50%) scale(0.85) translateY(-18px); }
+}
+.g13b-combo-txt {
+  font-size:clamp(28px,8vw,44px); font-weight:900; font-family:'Fredoka One',cursive;
+  color:#FBBF24; text-shadow:0 0 22px rgba(251,191,36,0.9),2px 2px 0 rgba(0,0,0,0.65); line-height:1;
+}
+.g13b-combo-sub { font-size:13px; color:#67E8F9; font-weight:700; margin-top:3px; font-family:'Fredoka One',cursive; }
+/* Lightning bolts for combo FX */
+.g13b-bolt {
+  position:absolute; font-size:30px; pointer-events:none; z-index:21;
+  animation:g13bBoltFly 0.55s ease forwards;
+}
+@keyframes g13bBoltFly {
+  0%  { opacity:1; transform:scale(0.4) rotate(0deg); }
+  50% { opacity:1; transform:scale(1.25) rotate(18deg); }
+  100%{ opacity:0; transform:scale(0.2) rotate(-35deg) translateY(-28px); }
+}
+/* Legendary entrance banner */
+.g13b-legendary-banner {
+  position:absolute; inset:0; z-index:30;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  background:radial-gradient(ellipse at center,rgba(124,58,237,0.88) 0%,rgba(5,5,16,0.95) 70%);
+  pointer-events:none;
+}
+.g13b-legendary-banner.hide { display:none; }
+.g13b-leg-spr {
+  width:min(42vw,24vh); height:min(42vw,24vh); object-fit:contain;
+  animation:g13bLegBounce 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+  filter:drop-shadow(0 0 24px rgba(251,191,36,0.85));
+}
+.g13b-leg-banner-txt {
+  font-family:'Fredoka One',cursive; font-size:clamp(24px,7vw,46px); font-weight:900;
+  color:#FBBF24; text-shadow:0 0 32px rgba(251,191,36,1),0 4px 0 rgba(0,0,0,0.6);
+  animation:g13bLegBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both; text-align:center; line-height:1.1;
+}
+.g13b-leg-banner-sub {
+  font-family:'Fredoka One',cursive; font-size:clamp(13px,4vw,19px); color:#67E8F9; font-weight:700;
+  animation:g13bLegBounce 0.5s 0.18s cubic-bezier(0.34,1.56,0.64,1) both; text-align:center;
+}
+@keyframes g13bLegBounce {
+  0%  { transform:scale(0.25) translateY(30px); opacity:0; }
+  60% { transform:scale(1.12) translateY(-6px); opacity:1; }
+  100%{ transform:scale(1) translateY(0); opacity:1; }
+}
+/* Field flash */
+.g13b-flash { position:absolute; inset:0; background:white; opacity:0; pointer-events:none; z-index:25; }
+.g13b-flash.hit { animation:g13bFlashAnim 0.28s ease forwards; }
+@keyframes g13bFlashAnim { 0%{opacity:0.65} 100%{opacity:0} }
+/* Screen shake */
+@keyframes g13bShake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-9px)} 40%{transform:translateX(9px)}
+  60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+}
+#screen-game13b.shake { animation:g13bShake 0.38s ease; }
+/* Question panel — bottom 30% */
+.g13b-qpanel {
+  flex-shrink:0; min-height:30%; max-height:36%;
+  background:linear-gradient(180deg,rgba(3,7,20,0.97) 0%,#030714 100%);
+  border-top:2px solid rgba(251,191,36,0.3);
+  padding:8px 14px max(calc(env(safe-area-inset-bottom,0px) + 10px),12px);
+  display:flex; flex-direction:column; gap:6px; z-index:10;
+}
+.g13b-atk-lbl { font-size:11px; font-weight:700; color:rgba(255,255,255,0.42); text-align:center; letter-spacing:0.5px; }
+.g13b-math {
+  font-size:clamp(22px,6.5vw,34px); font-weight:900; font-family:'Fredoka One',cursive;
+  color:white; text-align:center; letter-spacing:2px;
+}
+.g13b-choices { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.g13b-choice-btn {
+  background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(6,182,212,0.07));
+  border:1.5px solid rgba(251,191,36,0.32); border-radius:14px;
+  padding:11px 8px; font-size:20px; font-weight:900; font-family:'Fredoka One',cursive;
+  color:white; cursor:pointer; text-align:center; transition:transform 0.1s,background 0.1s;
+}
+.g13b-choice-btn:active { transform:scale(0.92); }
+.g13b-choice-btn.correct { background:linear-gradient(135deg,#16A34A,#22C55E)!important; border-color:#22C55E; }
+.g13b-choice-btn.wrong   { background:linear-gradient(135deg,#B91C1C,#EF4444)!important; border-color:#EF4444; }
+/* Streak dots row */
+.g13b-streak-row { display:flex; align-items:center; justify-content:center; gap:7px; }
+.g13b-streak-dot {
+  width:9px; height:9px; border-radius:50%;
+  background:rgba(255,255,255,0.14); border:1.5px solid rgba(255,255,255,0.28);
+  transition:background 0.2s,transform 0.2s,box-shadow 0.2s;
+}
+.g13b-streak-dot.active { background:#FBBF24; transform:scale(1.25); box-shadow:0 0 7px rgba(251,191,36,0.85); }
+/* Result overlay — covers full game screen */
+.g13b-result-overlay {
+  position:absolute; inset:0; z-index:50;
+  background:linear-gradient(160deg,rgba(3,7,20,0.97),rgba(20,10,40,0.98));
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:20px; gap:8px;
+}
+.g13b-result-icon { font-size:62px; animation:g13bResPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes g13bResPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.g13b-result-title { font-size:26px; font-weight:900; font-family:'Fredoka One',cursive; color:white; text-align:center; }
+.g13b-result-kills {
+  font-size:58px; font-weight:900; font-family:'Fredoka One',cursive;
+  color:#FBBF24; text-shadow:0 0 22px rgba(251,191,36,0.65); line-height:1;
+}
+.g13b-result-sub { font-size:13px; color:rgba(255,255,255,0.55); text-align:center; font-family:'Fredoka One',cursive; }
+.g13b-result-stars { font-size:30px; letter-spacing:4px; }
+.g13b-result-btns { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; justify-content:center; }
+.g13b-result-btns button {
+  padding:12px 22px; border:none; border-radius:16px; font-size:16px; font-weight:900;
+  font-family:'Fredoka One',cursive; cursor:pointer;
 }
 
 /* ── GH-PAUSE BUTTON ── */
@@ -4291,6 +4548,13 @@ body { background: #0a0a1a !important; }
         <div class="g-stars-row" id="gstars-13"></div>
         <span class="g-tag">Battle</span>
       </div>
+      <div class="game-tile g13b" id="gtile-13b" onclick="playClick(); startQuickFire()">
+        <div class="g-banner" style="height:60px;overflow:hidden;border-radius:0;"><img src="assets/Pokemon/g13b/bg.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;" onerror="this.parentNode.style.background='linear-gradient(135deg,#FBBF24,#06B6D4)';this.remove()"></div>
+        <span class="g-icon" style="padding:4px;">⚡</span>
+        <div class="g-name">Quick Fire</div>
+        <div class="g-stars-row" id="gstars-13b"></div>
+        <span class="g-tag">60 Detik</span>
+      </div>
     </div>
   </div>
 
@@ -4588,6 +4852,77 @@ body { background: #0a0a1a !important; }
   <div class="g10-burst-fx" id="g13-burst-fx"></div>
   <!-- Debug error display (hidden unless crash) -->
   <div id="g13-debug-err" style="display:none;position:fixed;top:60px;left:0;right:0;z-index:9999;background:#B91C1C;color:white;font-size:13px;font-weight:700;padding:8px 16px;text-align:center;"></div>
+</div>
+
+<!-- GAME 13B — Quick Fire ⚡ -->
+<div id="screen-game13b" class="screen">
+  <!-- Header -->
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 10px;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);">
+    <button class="gh-back" onclick="exitGame13b()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">⌂</button>
+    <span style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">⚡ Quick Fire</span>
+    <span style="font-size:11px;color:rgba(255,255,255,0.5);font-family:'Fredoka One',cursive;">60 detik!</span>
+  </div>
+
+  <!-- Battle field -->
+  <div class="g13b-field" id="g13b-field">
+    <div class="g13b-field-overlay"></div>
+    <!-- Kill counter top-left -->
+    <div class="g13b-kills" id="g13b-kills">💀 0</div>
+    <!-- HP bar top-center -->
+    <div class="g13b-hp-wrap" id="g13b-hp-wrap">
+      <span style="font-size:9px;font-weight:900;color:rgba(255,255,255,0.55);">HP</span>
+      <div class="g13b-hp-track"><div class="g13b-hp-fill" id="g13b-hp-fill" style="width:100%"></div></div>
+      <span id="g13b-hp-nums" style="font-size:9px;font-weight:900;color:white;min-width:26px;text-align:right;"></span>
+    </div>
+    <!-- Timer top-right -->
+    <div class="g13b-timer" id="g13b-timer">⏱ 60</div>
+    <!-- Legendary badge (below hp bar) -->
+    <div class="g13b-legendary-badge" id="g13b-leg-badge">🌟 LEGENDARY!</div>
+    <!-- Wild sprite center -->
+    <div class="g13b-wspr-wrap" id="g13b-wspr-wrap">
+      <img class="g13b-wspr" id="g13b-wspr" src="" alt="?" style="display:block;">
+      <div class="g13b-wname-badge" id="g13b-wname">—</div>
+    </div>
+    <!-- Player sprite bottom-left -->
+    <div class="g13b-pspr-wrap" id="g13b-pspr-wrap">
+      <img class="g13b-pspr" id="g13b-pspr" src="" alt="⚡" style="display:block;">
+    </div>
+    <!-- COMBO overlay -->
+    <div class="g13b-combo-overlay" id="g13b-combo">
+      <div class="g13b-combo-txt" id="g13b-combo-txt">COMBO x3!</div>
+      <div class="g13b-combo-sub" id="g13b-combo-sub">3 serangan berturut!</div>
+    </div>
+    <!-- Legendary entrance banner -->
+    <div class="g13b-legendary-banner hide" id="g13b-leg-banner">
+      <img class="g13b-leg-spr" id="g13b-leg-spr" src="" alt="🌟">
+      <div class="g13b-leg-banner-txt">🌟 LEGENDARY! 🌟</div>
+      <div class="g13b-leg-banner-sub" id="g13b-leg-sub">Kalahkan dengan 3 serangan!</div>
+    </div>
+    <!-- Flash FX -->
+    <div class="g13b-flash" id="g13b-flash"></div>
+  </div>
+
+  <!-- Question panel (bottom 30%) -->
+  <div class="g13b-qpanel" id="g13b-qpanel">
+    <div class="g13b-atk-lbl" id="g13b-atk-lbl">Hitung untuk menyerang!</div>
+    <div class="g13b-math pop" id="g13b-math">— + — = ?</div>
+    <div class="g13b-streak-row" id="g13b-streak-row"></div>
+    <div class="g13b-choices" id="g13b-choices"></div>
+  </div>
+
+  <!-- Result overlay -->
+  <div class="g13b-result-overlay" id="g13b-result" style="display:none;">
+    <div class="g13b-result-icon" id="g13b-res-icon">⚡</div>
+    <div class="g13b-result-title" id="g13b-res-title">Waktu Habis!</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.45);font-family:'Fredoka One',cursive;">Pokémon dikalahkan:</div>
+    <div class="g13b-result-kills" id="g13b-res-kills">0</div>
+    <div class="g13b-result-sub" id="g13b-res-sub">Combo terbaik: —</div>
+    <div class="g13b-result-stars" id="g13b-res-stars">⭐⭐⭐</div>
+    <div class="g13b-result-btns">
+      <button onclick="startQuickFire()" style="background:linear-gradient(135deg,#FBBF24,#06B6D4);color:#1a1a1a;">Main Lagi ⚡</button>
+      <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Menu</button>
+    </div>
+  </div>
 </div>
 
 <!-- GAME 14 — Balapan Kereta -->
@@ -9544,6 +9879,83 @@ const G13_CHAINS = [
    evolved:{name:'Sliggoo',slug:'sliggoo',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Goodra',slug:'goodra',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#F97316'}},
+
+  // === 2STAGE (levels 18-32): 2-stage evolution, numbers 15-20, addition+subtraction ===
+  {id:41,icon:'💪',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Machop',slug:'machop',type:'Fighting',tc:'#EF4444'},
+   evolved:{name:'Machoke',slug:'machoke',type:'Fighting',tc:'#EF4444'},
+   evolved2:{name:'Machamp',slug:'machamp',type:'Fighting',tc:'#EF4444'},
+   wild:{name:'Primeape',slug:'primeape',type:'Fighting',tc:'#EF4444'}},
+  {id:42,icon:'🔮',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Abra',slug:'abra',type:'Psychic',tc:'#EC4899'},
+   evolved:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'},
+   evolved2:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'},
+   wild:{name:'Slowbro',slug:'slowbro',type:'Psychic',tc:'#EC4899'}},
+  {id:43,icon:'🪨',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Geodude',slug:'geodude',type:'Rock',tc:'#A16207'},
+   evolved:{name:'Graveler',slug:'graveler',type:'Rock',tc:'#A16207'},
+   evolved2:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'},
+   wild:{name:'Onix',slug:'onix',type:'Rock',tc:'#A16207'}},
+  {id:44,icon:'🌿',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Bellsprout',slug:'bellsprout',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Weepinbell',slug:'weepinbell',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Victreebel',slug:'victreebel',type:'Grass',tc:'#22C55E'},
+   wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
+  {id:45,icon:'💜',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Nidoran♀',slug:'nidoran-f',type:'Poison',tc:'#A855F7'},
+   evolved:{name:'Nidorina',slug:'nidorina',type:'Poison',tc:'#A855F7'},
+   evolved2:{name:'Nidoqueen',slug:'nidoqueen',type:'Poison',tc:'#A855F7'},
+   wild:{name:'Clefairy',slug:'clefairy',type:'Fairy',tc:'#FB7185'}},
+  {id:46,icon:'💙',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Nidoran♂',slug:'nidoran-m',type:'Poison',tc:'#A855F7'},
+   evolved:{name:'Nidorino',slug:'nidorino',type:'Poison',tc:'#A855F7'},
+   evolved2:{name:'Nidoking',slug:'nidoking',type:'Poison',tc:'#A855F7'},
+   wild:{name:'Jigglypuff',slug:'jigglypuff',type:'Normal',tc:'#A3A3A3'}},
+  {id:47,icon:'⚡',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Pichu',slug:'pichu',type:'Electric',tc:'#FBBF24'},
+   evolved:{name:'Pikachu',slug:'pikachu',type:'Electric',tc:'#FBBF24'},
+   evolved2:{name:'Raichu',slug:'raichu',type:'Electric',tc:'#FBBF24'},
+   wild:{name:'Voltorb',slug:'voltorb',type:'Electric',tc:'#FBBF24'}},
+  {id:48,icon:'⭐',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Cleffa',slug:'cleffa',type:'Fairy',tc:'#FB7185'},
+   evolved:{name:'Clefairy',slug:'clefairy',type:'Fairy',tc:'#FB7185'},
+   evolved2:{name:'Clefable',slug:'clefable',type:'Fairy',tc:'#FB7185'},
+   wild:{name:'Togetic',slug:'togetic',type:'Fairy',tc:'#FB7185'}},
+  {id:49,icon:'🎵',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Igglybuff',slug:'igglybuff',type:'Normal',tc:'#A3A3A3'},
+   evolved:{name:'Jigglypuff',slug:'jigglypuff',type:'Normal',tc:'#A3A3A3'},
+   evolved2:{name:'Wigglytuff',slug:'wigglytuff',type:'Normal',tc:'#A3A3A3'},
+   wild:{name:'Clefairy',slug:'clefairy',type:'Fairy',tc:'#FB7185'}},
+  {id:50,icon:'🌱',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Chikorita',slug:'chikorita',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Bayleef',slug:'bayleef',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Meganium',slug:'meganium',type:'Grass',tc:'#22C55E'},
+   wild:{name:'Sunflora',slug:'sunflora',type:'Grass',tc:'#22C55E'}},
+  {id:57,icon:'🍃',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Hoppip',slug:'hoppip',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Skiploom',slug:'skiploom',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Jumpluff',slug:'jumpluff',type:'Grass',tc:'#22C55E'},
+   wild:{name:'Meganium',slug:'meganium',type:'Grass',tc:'#22C55E'}},
+  {id:58,icon:'🧊',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Spheal',slug:'spheal',type:'Ice',tc:'#BAE6FD'},
+   evolved:{name:'Sealeo',slug:'sealeo',type:'Ice',tc:'#BAE6FD'},
+   evolved2:{name:'Walrein',slug:'walrein',type:'Ice',tc:'#BAE6FD'},
+   wild:{name:'Dewgong',slug:'dewgong',type:'Ice',tc:'#BAE6FD'}},
+  {id:59,icon:'🐉',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Bagon',slug:'bagon',type:'Dragon',tc:'#6366F1'},
+   evolved:{name:'Shelgon',slug:'shelgon',type:'Dragon',tc:'#6366F1'},
+   evolved2:{name:'Salamence',slug:'salamence',type:'Dragon',tc:'#6366F1'},
+   wild:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'}},
+  {id:60,icon:'⚙️',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Aron',slug:'aron',type:'Steel',tc:'#94A3B8'},
+   evolved:{name:'Lairon',slug:'lairon',type:'Steel',tc:'#94A3B8'},
+   evolved2:{name:'Aggron',slug:'aggron',type:'Steel',tc:'#94A3B8'},
+   wild:{name:'Steelix',slug:'steelix',type:'Steel',tc:'#94A3B8'}},
+  {id:72,icon:'😴',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Slakoth',slug:'slakoth',type:'Normal',tc:'#A3A3A3'},
+   evolved:{name:'Vigoroth',slug:'vigoroth',type:'Normal',tc:'#A3A3A3'},
+   evolved2:{name:'Slaking',slug:'slaking',type:'Normal',tc:'#A3A3A3'},
+   wild:{name:'Kangaskhan',slug:'kangaskhan',type:'Normal',tc:'#A3A3A3'}},
 ]
 
 // HP config by difficulty
@@ -9551,6 +9963,7 @@ const G13_DIFF = {
   easy:      { playerHp:5, wildHp:8,  attacksToEvo:3, damage:1, wildDamage:1 },
   medium:    { playerHp:6, wildHp:10, attacksToEvo:4, damage:1, wildDamage:1 },
   hard:      { playerHp:7, wildHp:12, attacksToEvo:5, damage:1, wildDamage:1 },
+  '2stage':  { playerHp:7, wildHp:13, attacksToEvo:5, damage:1, wildDamage:1 },
   epic:      { playerHp:8, wildHp:15, attacksToEvo:4, damage:1, wildDamage:1 },
   legendary: { playerHp:9, wildHp:18, attacksToEvo:4, damage:1, wildDamage:1 },
 }
@@ -9567,7 +9980,7 @@ let g13State = {}
 
 let g13LastChainId = -1
 function g13PickChain(lv) {
-  const tier = lv <= 8 ? 'easy' : lv <= 14 ? 'medium' : lv <= 17 ? 'hard' : lv <= 22 ? 'epic' : 'legendary'
+  const tier = lv <= 8 ? 'easy' : lv <= 14 ? 'medium' : lv <= 17 ? 'hard' : lv <= 32 ? '2stage' : lv <= 44 ? 'epic' : 'legendary'
   let pool = G13_CHAINS.filter(c => c.diff === tier)
   if (!pool.length) pool = [...G13_CHAINS]
   // Prevent immediate repeat — filter out last chain if pool is large enough
@@ -9591,7 +10004,7 @@ window.initGame13 = initGame13
 
 function _initGame13Impl() {
   battleBgmPlay()
-  const lv = Math.max(1, Math.min(30, state.selectedLevelNum || 1))
+  const lv = Math.max(1, Math.min(55, state.selectedLevelNum || 1))
   const _FALLBACK = {id:0,icon:'🔥',diff:'easy',maxNum:10,ops:['+'],
     player:{name:'Charmander',slug:'charmander',type:'Fire',tc:'#F97316'},
     evolved:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
@@ -10172,6 +10585,7 @@ function g13TriggerEvolution() {
     if (pspr) {
       pspr.src = `https://img.pokemondb.net/sprites/home/normal/${nowForm.slug}.png`
       pspr.onerror = () => { const eid=POKE_IDS2[nowForm.slug]; if(eid) pspr.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${eid}.png`; pspr.onerror=null }
+      pspr.classList.add('evolved') // 1.3× bigger after evolution
       pspr.style.animation = 'none'; void pspr.offsetWidth
       pspr.style.animation = 'g13EnterFlip 0.6s cubic-bezier(0.34,1.56,0.64,1)'
     }
@@ -10201,35 +10615,40 @@ function g13TriggerEvolution() {
   }, 7500)
 }
 
+let _g13EvoAudio = null
 function g13PlayEvoSfx() {
   try {
     if (!isSoundOn()) return
+    // Use the Pokémon evolution MP3 if available
+    if (!_g13EvoAudio) {
+      _g13EvoAudio = new Audio('assets/pokemon-evolve.mp3')
+      _g13EvoAudio.volume = 0.75
+    }
+    _g13EvoAudio.currentTime = 0
+    _g13EvoAudio.play().catch(() => _g13PlayEvoSfxFallback())
+  } catch(e) { _g13PlayEvoSfxFallback() }
+}
+function _g13PlayEvoSfxFallback() {
+  try {
+    if (!isSoundOn()) return
     const ctx = audioCtx
-    // Rising tone sequence
     const freqs = [220, 330, 440, 550, 660, 880, 1100, 1320]
     freqs.forEach((freq, i) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+      const osc = ctx.createOscillator(); const gain = ctx.createGain()
       osc.connect(gain); gain.connect(ctx.destination)
-      osc.frequency.value = freq
-      osc.type = 'sine'
+      osc.frequency.value = freq; osc.type = 'sine'
       const t = ctx.currentTime + i * 0.3
-      gain.gain.setValueAtTime(0, t)
-      gain.gain.linearRampToValueAtTime(0.15, t + 0.1)
+      gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.15, t + 0.1)
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6)
       osc.start(t); osc.stop(t + 0.6)
     })
-    // Final chord burst at ~2.4s
     const chordFreqs = [440, 550, 660, 880]
     chordFreqs.forEach(freq => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+      const osc = ctx.createOscillator(); const gain = ctx.createGain()
       osc.connect(gain); gain.connect(ctx.destination)
-      osc.frequency.value = freq
-      osc.type = 'triangle'
+      osc.frequency.value = freq; osc.type = 'triangle'
       const t = ctx.currentTime + 2.4
-      gain.gain.setValueAtTime(0.12, t)
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5)
+      gain.gain.setValueAtTime(0.12, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5)
       osc.start(t); osc.stop(t + 1.5)
     })
   } catch(e) {}
@@ -10290,6 +10709,479 @@ function g13Defeat() {
     const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '🌑🌑🌑'
     ro.style.display = 'flex'
   }, 1200)
+}
+
+// ============================================================
+// GAME 13B — QUICK FIRE ⚡ 60 Detik Serangan Matematika
+// ============================================================
+const G13B_MOBILE_BG = [
+  'Gemini_Generated_Image_13vm6c13vm6c13vm.png','Gemini_Generated_Image_3e7nl23e7nl23e7n.png',
+  'Gemini_Generated_Image_61gamh61gamh61ga.png','Gemini_Generated_Image_dsnyj6dsnyj6dsny.png',
+  'Gemini_Generated_Image_klimtxklimtxklim.png','Gemini_Generated_Image_ozk0zeozk0zeozk0.png',
+  'Gemini_Generated_Image_qor6mpqor6mpqor6.png','Gemini_Generated_Image_sg3ymdsg3ymdsg3y.png',
+  'Gemini_Generated_Image_vaean7vaean7vaea.png','Gemini_Generated_Image_w061r3w061r3w061.png',
+  'Gemini_Generated_Image_za0fyeza0fyeza0f.png',
+]
+const G13B_PC_BG = [
+  'Gemini_Generated_Image_26eyja26eyja26ey.png','Gemini_Generated_Image_7k4vs27k4vs27k4v.png',
+  'Gemini_Generated_Image_8lzmsu8lzmsu8lzm.png','Gemini_Generated_Image_dyn2nwdyn2nwdyn2.png',
+  'Gemini_Generated_Image_fr02m6fr02m6fr02.png','Gemini_Generated_Image_h4dcu9h4dcu9h4dc.png',
+  'Gemini_Generated_Image_hzmzmhhzmzmhhzmz.png','Gemini_Generated_Image_ocxx4aocxx4aocxx.png',
+  'Gemini_Generated_Image_u0otymu0otymu0ot.png','Gemini_Generated_Image_wou0m2wou0m2wou0.png',
+  'Gemini_Generated_Image_yoxnghyoxnghyoxn.png',
+]
+
+// Wild Pokémon pool — fast rotation variety
+const G13B_WILDS = [
+  {name:'Pikachu',slug:'pikachu',type:'Electric',icon:'⚡',hp:1},
+  {name:'Charmander',slug:'charmander',type:'Fire',icon:'🔥',hp:1},
+  {name:'Squirtle',slug:'squirtle',type:'Water',icon:'💧',hp:1},
+  {name:'Bulbasaur',slug:'bulbasaur',type:'Grass',icon:'🌿',hp:1},
+  {name:'Rattata',slug:'rattata',type:'Normal',icon:'🐭',hp:1},
+  {name:'Geodude',slug:'geodude',type:'Rock',icon:'🪨',hp:1},
+  {name:'Gastly',slug:'gastly',type:'Ghost',icon:'👻',hp:1},
+  {name:'Machop',slug:'machop',type:'Fighting',icon:'💪',hp:1},
+  {name:'Abra',slug:'abra',type:'Psychic',icon:'🔮',hp:1},
+  {name:'Oddish',slug:'oddish',type:'Grass',icon:'🌿',hp:1},
+  {name:'Vulpix',slug:'vulpix',type:'Fire',icon:'🔥',hp:1},
+  {name:'Poliwag',slug:'poliwag',type:'Water',icon:'💧',hp:1},
+  {name:'Slowpoke',slug:'slowpoke',type:'Water',icon:'💧',hp:1},
+  {name:'Koffing',slug:'koffing',type:'Poison',icon:'☠️',hp:1},
+  {name:'Cubone',slug:'cubone',type:'Ground',icon:'💨',hp:1},
+  {name:'Magikarp',slug:'magikarp',type:'Water',icon:'🐟',hp:1},
+  {name:'Togepi',slug:'togepi',type:'Fairy',icon:'✨',hp:1},
+  {name:'Marill',slug:'marill',type:'Fairy',icon:'✨',hp:1},
+  {name:'Cyndaquil',slug:'cyndaquil',type:'Fire',icon:'🔥',hp:1},
+  {name:'Chikorita',slug:'chikorita',type:'Grass',icon:'🌿',hp:1},
+  {name:'Totodile',slug:'totodile',type:'Water',icon:'💧',hp:1},
+  {name:'Swinub',slug:'swinub',type:'Ice',icon:'❄️',hp:1},
+  {name:'Ralts',slug:'ralts',type:'Psychic',icon:'🔮',hp:1},
+  {name:'Treecko',slug:'treecko',type:'Grass',icon:'🌿',hp:1},
+  {name:'Torchic',slug:'torchic',type:'Fire',icon:'🔥',hp:1},
+  {name:'Mudkip',slug:'mudkip',type:'Water',icon:'💧',hp:1},
+  {name:'Riolu',slug:'riolu',type:'Fighting',icon:'💪',hp:1},
+  {name:'Bagon',slug:'bagon',type:'Dragon',icon:'🐉',hp:1},
+  {name:'Snubbull',slug:'snubbull',type:'Fairy',icon:'✨',hp:1},
+  {name:'Horsea',slug:'horsea',type:'Water',icon:'💧',hp:1},
+]
+
+// Legendary Pokémon — every 10 kills, needs 3 hits
+const G13B_LEGENDARIES = [
+  {name:'Charizard',slug:'charizard',type:'Fire',icon:'🔥🔥',hp:3},
+  {name:'Blastoise',slug:'blastoise',type:'Water',icon:'💧💧',hp:3},
+  {name:'Gengar',slug:'gengar',type:'Ghost',icon:'👻👻',hp:3},
+  {name:'Gyarados',slug:'gyarados',type:'Water',icon:'🐉💧',hp:3},
+  {name:'Alakazam',slug:'alakazam',type:'Psychic',icon:'🔮🔮',hp:3},
+  {name:'Dragonite',slug:'dragonite',type:'Dragon',icon:'🐉',hp:3},
+  {name:'Venusaur',slug:'venusaur',type:'Grass',icon:'🌿🌿',hp:3},
+  {name:'Arcanine',slug:'arcanine',type:'Fire',icon:'🔥',hp:3},
+]
+
+let g13bState = {}
+let g13bTimerInterval = null
+let g13bLastWildIdx = -1
+let _g13bEvoAudio = null
+
+function startQuickFire() {
+  showScreen('screen-game13b')
+  setTimeout(() => initGame13b(), 80)
+}
+window.startQuickFire = startQuickFire
+
+function exitGame13b() {
+  if (g13bTimerInterval) { clearInterval(g13bTimerInterval); g13bTimerInterval = null }
+  battleBgmStop()
+  showScreen('screen-menu')
+}
+window.exitGame13b = exitGame13b
+
+function initGame13b() {
+  if (g13bTimerInterval) { clearInterval(g13bTimerInterval); g13bTimerInterval = null }
+  battleBgmPlay()
+
+  // Random background: mobile vs pc based on viewport width
+  const isMobile = window.innerWidth < 768
+  const pool = isMobile ? G13B_MOBILE_BG : G13B_PC_BG
+  const folder = isMobile ? 'mobile' : 'pc'
+  const pick = pool[Math.floor(Math.random() * pool.length)]
+  const field = document.getElementById('g13b-field')
+  if (field) {
+    field.style.backgroundImage = `url('assets/Pokemon/g13b/background/${folder}/${encodeURIComponent(pick)}')`
+    field.style.backgroundSize = 'cover'
+    field.style.backgroundPosition = 'center 22%'
+  }
+
+  // Init state
+  g13bState = {
+    time: 60, kills: 0, streak: 0, bestCombo: 0,
+    isLegendary: false, wildHp: 1, wildMaxHp: 1,
+    locked: false, currentAnswer: 0, phase: 'playing',
+    legendaryIdx: 0, currentWild: null,
+  }
+
+  // Hide result + legendary banner + badge
+  const res = document.getElementById('g13b-result')
+  if (res) res.style.display = 'none'
+  const legBanner = document.getElementById('g13b-leg-banner')
+  if (legBanner) legBanner.classList.add('hide')
+  const legBadge = document.getElementById('g13b-leg-badge')
+  if (legBadge) legBadge.style.display = 'none'
+  const timer = document.getElementById('g13b-timer')
+  if (timer) { timer.classList.remove('warning'); timer.textContent = '⏱ 60' }
+
+  // Player sprite: Pikachu
+  const pspr = document.getElementById('g13b-pspr')
+  if (pspr) {
+    pspr.src = 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'
+    pspr.onerror = function(){ this.alt = '⚡' }
+  }
+
+  g13bRenderStreak()
+  g13bUpdateTimer()
+  g13bUpdateKills()
+  g13bSpawnWild()
+
+  // 60-second countdown
+  g13bTimerInterval = setInterval(() => {
+    if (g13bState.phase !== 'playing') return
+    g13bState.time = Math.max(0, g13bState.time - 1)
+    g13bUpdateTimer()
+    if (g13bState.time <= 10) {
+      const t = document.getElementById('g13b-timer')
+      if (t) t.classList.add('warning')
+      if (g13bState.time <= 5 && g13bState.time > 0) try { playClick() } catch(e) {}
+    }
+    if (g13bState.time <= 0) g13bGameOver()
+  }, 1000)
+}
+
+function g13bSpawnWild() {
+  const s = g13bState
+  s.locked = false
+
+  let wild
+  if (s.isLegendary) {
+    wild = G13B_LEGENDARIES[s.legendaryIdx % G13B_LEGENDARIES.length]
+    s.wildHp = wild.hp; s.wildMaxHp = wild.hp
+    const lb = document.getElementById('g13b-leg-badge')
+    if (lb) lb.style.display = 'block'
+  } else {
+    // Avoid immediate repeat
+    let idx
+    do { idx = Math.floor(Math.random() * G13B_WILDS.length) } while (idx === g13bLastWildIdx && G13B_WILDS.length > 1)
+    g13bLastWildIdx = idx
+    wild = G13B_WILDS[idx]
+    s.wildHp = 1; s.wildMaxHp = 1
+    const lb = document.getElementById('g13b-leg-badge')
+    if (lb) lb.style.display = 'none'
+  }
+  s.currentWild = wild
+
+  // Load wild sprite with entrance animation
+  const wspr = document.getElementById('g13b-wspr')
+  const wname = document.getElementById('g13b-wname')
+  if (wspr) {
+    wspr.classList.remove('wild-enter','wild-die','wspr-hit')
+    wspr.style.opacity = '1'
+    wspr.src = `https://img.pokemondb.net/sprites/home/normal/${wild.slug}.png`
+    wspr.onerror = function(){ this.alt = wild.icon || '?' }
+    void wspr.offsetWidth
+    wspr.classList.add('wild-enter')
+    wspr.addEventListener('animationend', () => wspr.classList.remove('wild-enter'), {once:true})
+  }
+  if (wname) wname.textContent = s.isLegendary ? `★ ${wild.name}` : wild.name
+
+  g13bUpdateHpBar()
+  g13bNextQuestion()
+}
+
+function g13bNextQuestion() {
+  const s = g13bState
+  if (s.phase !== 'playing') return
+
+  // Difficulty scales with kills
+  let maxNum, ops
+  if      (s.kills < 10) { maxNum = 10; ops = ['+'] }
+  else if (s.kills < 20) { maxNum = 15; ops = ['+','-'] }
+  else if (s.kills < 30) { maxNum = 20; ops = ['+','-'] }
+  else                   { maxNum = 20; ops = ['+','-','*'] }
+
+  const op = ops[Math.floor(Math.random() * ops.length)]
+  let a, b, ans
+  if (op === '+') {
+    a = Math.floor(Math.random() * Math.max(1, maxNum - 2)) + 1
+    b = Math.floor(Math.random() * Math.max(1, maxNum - a)) + 1
+    ans = a + b
+  } else if (op === '-') {
+    b = Math.floor(Math.random() * Math.max(1, maxNum - 2)) + 1
+    a = b + Math.floor(Math.random() * Math.max(1, maxNum - b)) + 1
+    ans = a - b
+  } else {
+    a = Math.floor(Math.random() * 9) + 1
+    b = Math.floor(Math.random() * 9) + 1
+    ans = a * b
+  }
+  a = Math.max(1, Math.round(a)); b = Math.max(1, Math.round(b))
+  if (op === '+') ans = a + b
+  else if (op === '-') ans = a - b
+  else ans = a * b
+
+  s.currentAnswer = ans
+  const opDisp = op === '*' ? '×' : op
+
+  const mathEl = document.getElementById('g13b-math')
+  if (mathEl) {
+    mathEl.textContent = `${a} ${opDisp} ${b} = ?`
+    mathEl.classList.remove('pop'); void mathEl.offsetWidth; mathEl.classList.add('pop')
+  }
+  const lbl = document.getElementById('g13b-atk-lbl')
+  if (lbl) lbl.textContent = s.isLegendary ? `💥 LEGENDARY! Serang ${s.currentWild.name}!` : `⚡ Serang ${s.currentWild.name}!`
+
+  // Generate choices
+  const wrongs = new Set()
+  let tries = 0
+  while (wrongs.size < 3 && tries++ < 200) {
+    const off = (Math.floor(Math.random() * 6) + 1) * (Math.random() < 0.5 ? 1 : -1)
+    const w = ans + off
+    if (Number.isFinite(w) && w > 0 && w !== ans) wrongs.add(w)
+  }
+  while (wrongs.size < 3) wrongs.add(ans + wrongs.size + 1)
+
+  const choices = [ans, ...[...wrongs].slice(0,3)].sort(() => Math.random() - 0.5)
+  const container = document.getElementById('g13b-choices')
+  if (!container) return
+  container.innerHTML = ''
+  choices.forEach(val => {
+    const btn = document.createElement('button')
+    btn.className = 'g13b-choice-btn'
+    btn.textContent = val
+    btn.onclick = () => g13bAnswer(val, btn)
+    container.appendChild(btn)
+  })
+}
+
+function g13bAnswer(val, btn) {
+  const s = g13bState
+  if (s.locked || s.phase !== 'playing') return
+  s.locked = true
+
+  const correct = val === s.currentAnswer
+  btn.classList.add(correct ? 'correct' : 'wrong')
+  const container = document.getElementById('g13b-choices')
+  if (container) container.querySelectorAll('.g13b-choice-btn').forEach(b => { b.disabled = true })
+
+  if (correct) {
+    playCorrect()
+    vibrate(12)
+    s.streak++
+    if (s.streak > s.bestCombo) s.bestCombo = s.streak
+    g13bRenderStreak()
+
+    // Player attack lunge
+    const pspr = document.getElementById('g13b-pspr')
+    if (pspr) { pspr.classList.remove('atk'); void pspr.offsetWidth; pspr.classList.add('atk'); setTimeout(()=>pspr.classList.remove('atk'),350) }
+
+    // Field flash
+    const flash = document.getElementById('g13b-flash')
+    if (flash) { flash.classList.remove('hit'); void flash.offsetWidth; flash.classList.add('hit') }
+
+    // Wild hit animation (delayed slightly)
+    setTimeout(() => {
+      const wspr = document.getElementById('g13b-wspr')
+      if (wspr) { wspr.classList.remove('wspr-hit'); void wspr.offsetWidth; wspr.classList.add('wspr-hit'); setTimeout(()=>wspr.classList.remove('wspr-hit'),380) }
+    }, 180)
+
+    // Particle burst
+    try { spawnParticleBurst(btn.getBoundingClientRect().left + btn.offsetWidth/2, btn.getBoundingClientRect().top) } catch(e) {}
+
+    // Spawn attack projectile reusing G13 type FX
+    try { g13SpawnAttackEffect(s.currentWild ? s.currentWild.type : 'Normal', true) } catch(e) {}
+
+    // COMBO FX at streak >= 3
+    if (s.streak >= 3) g13bShowCombo(s.streak)
+
+    // Reduce wild HP
+    s.wildHp = Math.max(0, s.wildHp - 1)
+    g13bUpdateHpBar()
+
+    setTimeout(() => {
+      if (s.wildHp <= 0) g13bKillWild()
+      else { s.locked = false; g13bNextQuestion() }
+    }, 480)
+  } else {
+    playWrong()
+    vibrate(30)
+    s.streak = 0
+    g13bRenderStreak()
+    const scr = document.getElementById('screen-game13b')
+    if (scr) { scr.classList.remove('shake'); void scr.offsetWidth; scr.classList.add('shake'); setTimeout(()=>scr.classList.remove('shake'),400) }
+    setTimeout(() => { s.locked = false; g13bNextQuestion() }, 480)
+  }
+}
+
+function g13bKillWild() {
+  const s = g13bState
+  const earnedKills = s.isLegendary ? 3 : 1
+  s.kills += earnedKills
+  if (s.isLegendary) { s.legendaryIdx++; s.isLegendary = false }
+  g13bUpdateKills()
+
+  // Kill animation on sprite
+  const wspr = document.getElementById('g13b-wspr')
+  if (wspr) { wspr.classList.remove('wild-die'); void wspr.offsetWidth; wspr.classList.add('wild-die') }
+
+  // Check for legendary threshold (every 10 kills)
+  const prevKills = s.kills - earnedKills
+  const newKills = s.kills
+  const prevTens = Math.floor(prevKills / 10)
+  const newTens = Math.floor(newKills / 10)
+  if (newTens > prevTens) {
+    setTimeout(() => g13bTriggerLegendary(), 550)
+  } else {
+    setTimeout(() => g13bSpawnWild(), 550)
+  }
+}
+
+function g13bTriggerLegendary() {
+  const s = g13bState
+  s.phase = 'legendary_entrance'
+  s.isLegendary = true
+
+  const leg = G13B_LEGENDARIES[s.legendaryIdx % G13B_LEGENDARIES.length]
+
+  // Legendary entrance banner
+  const banner = document.getElementById('g13b-leg-banner')
+  const legSpr = document.getElementById('g13b-leg-spr')
+  const legSub = document.getElementById('g13b-leg-sub')
+  if (banner) banner.classList.remove('hide')
+  if (legSpr) {
+    legSpr.src = `https://img.pokemondb.net/sprites/home/normal/${leg.slug}.png`
+    legSpr.onerror = function(){ this.alt = leg.icon || '🌟' }
+  }
+  if (legSub) legSub.textContent = `${leg.name} muncul! Butuh 3 serangan tepat!`
+
+  // Golden flash + shake
+  const flash = document.getElementById('g13b-flash')
+  if (flash) {
+    flash.style.background = 'rgba(251,191,36,0.75)'
+    flash.classList.remove('hit'); void flash.offsetWidth; flash.classList.add('hit')
+    setTimeout(() => { if (flash) flash.style.background = 'white' }, 60)
+  }
+  const scr = document.getElementById('screen-game13b')
+  if (scr) { scr.classList.remove('shake'); void scr.offsetWidth; scr.classList.add('shake') }
+
+  // Spawn extra lightning bolts
+  const field = document.getElementById('g13b-field')
+  if (field) {
+    for (let i = 0; i < 8; i++) {
+      const bolt = document.createElement('div')
+      bolt.className = 'g13b-bolt'
+      bolt.textContent = '⚡'
+      bolt.style.cssText = `left:${8 + Math.random()*84}%;top:${5 + Math.random()*70}%;font-size:${28+Math.floor(Math.random()*18)}px;animation-delay:${(i*0.07).toFixed(2)}s;`
+      field.appendChild(bolt)
+      bolt.addEventListener('animationend', () => bolt.remove(), {once:true})
+    }
+  }
+
+  vibrate([80, 40, 80, 40, 120])
+
+  // After 2.2s, hide banner and start legendary battle
+  setTimeout(() => {
+    if (banner) banner.classList.add('hide')
+    s.phase = 'playing'
+    g13bSpawnWild()
+  }, 2200)
+}
+
+function g13bShowCombo(streak) {
+  // Lightning bolts
+  const field = document.getElementById('g13b-field')
+  if (field) {
+    const boltCount = Math.min(streak - 1, 7)
+    for (let i = 0; i < boltCount; i++) {
+      const bolt = document.createElement('div')
+      bolt.className = 'g13b-bolt'
+      bolt.textContent = streak >= 6 ? '🌟' : '⚡'
+      bolt.style.cssText = `left:${10 + Math.random()*80}%;top:${8 + Math.random()*65}%;animation-delay:${(i*0.07).toFixed(2)}s;`
+      field.appendChild(bolt)
+      bolt.addEventListener('animationend', () => bolt.remove(), {once:true})
+    }
+  }
+  const el = document.getElementById('g13b-combo')
+  const txt = document.getElementById('g13b-combo-txt')
+  const sub = document.getElementById('g13b-combo-sub')
+  if (txt) txt.textContent = `COMBO x${streak}!`
+  if (sub) sub.textContent = streak >= 7 ? '🔥 GILA! KAMU TERBAIK!' : streak >= 5 ? '🌟 LUAR BIASA!' : `${streak} serangan berturut!`
+  if (el) {
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show')
+    el.addEventListener('animationend', () => el.classList.remove('show'), {once:true})
+  }
+}
+
+function g13bRenderStreak() {
+  const row = document.getElementById('g13b-streak-row')
+  if (!row) return
+  const dots = row.querySelectorAll('.g13b-streak-dot')
+  const activeCount = g13bState.streak > 0 ? ((g13bState.streak - 1) % 3) + 1 : 0
+  if (dots.length === 3) {
+    dots.forEach((d, i) => { d.classList.toggle('active', i < activeCount) })
+  } else {
+    row.innerHTML = ''
+    for (let i = 0; i < 3; i++) {
+      const d = document.createElement('div')
+      d.className = 'g13b-streak-dot' + (i < activeCount ? ' active' : '')
+      row.appendChild(d)
+    }
+  }
+}
+
+function g13bUpdateHpBar() {
+  const s = g13bState
+  const fill = document.getElementById('g13b-hp-fill')
+  const nums = document.getElementById('g13b-hp-nums')
+  const pct = s.wildMaxHp > 0 ? (s.wildHp / s.wildMaxHp) * 100 : 0
+  if (fill) { fill.style.width = `${pct}%`; fill.className = 'g13b-hp-fill' + (pct <= 33 ? ' low' : '') }
+  if (nums) nums.textContent = `${s.wildHp}/${s.wildMaxHp}`
+}
+
+function g13bUpdateTimer() {
+  const el = document.getElementById('g13b-timer')
+  if (el) el.textContent = `⏱ ${g13bState.time}`
+}
+
+function g13bUpdateKills() {
+  const el = document.getElementById('g13b-kills')
+  if (!el) return
+  el.textContent = `💀 ${g13bState.kills}`
+  el.classList.remove('pop-kill'); void el.offsetWidth; el.classList.add('pop-kill')
+  el.addEventListener('animationend', () => el.classList.remove('pop-kill'), {once:true})
+}
+
+function g13bGameOver() {
+  const s = g13bState
+  if (s.phase === 'done') return
+  s.phase = 'done'
+  if (g13bTimerInterval) { clearInterval(g13bTimerInterval); g13bTimerInterval = null }
+  battleBgmStop()
+
+  const stars = s.kills >= 30 ? 3 : s.kills >= 15 ? 2 : s.kills >= 1 ? 1 : 0
+  vibrate([30, 20, 50])
+  try { if (stars >= 2) playCorrect() } catch(e) {}
+
+  setTimeout(() => {
+    const res = document.getElementById('g13b-result')
+    const icon = document.getElementById('g13b-res-icon')
+    const title = document.getElementById('g13b-res-title')
+    const killsEl = document.getElementById('g13b-res-kills')
+    const sub = document.getElementById('g13b-res-sub')
+    const starsEl = document.getElementById('g13b-res-stars')
+    if (icon)    icon.textContent   = stars >= 3 ? '🏆' : stars >= 2 ? '⚡' : stars >= 1 ? '✨' : '😅'
+    if (title)   title.textContent  = stars >= 3 ? 'Luar Biasa!' : stars >= 2 ? 'Keren Banget!' : stars >= 1 ? 'Bagus!' : 'Terus Berlatih!'
+    if (killsEl) killsEl.textContent = s.kills
+    if (sub)     sub.textContent    = `Combo terbaik: x${s.bestCombo}  |  30+ kill = ⭐⭐⭐`
+    if (starsEl) starsEl.textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
+    if (res) res.style.display = 'flex'
+  }, 900)
 }
 
 // ============================================================
@@ -10696,8 +11588,7 @@ function g15RenderChains() {
     const span = document.createElement('span')
     span.className = 'g15-chain-link'
     span.id = `g15-chain-${i}`
-    span.textContent = i < g15State.chainsLeft ? '⛓️' : '✅'
-    span.style.opacity = i < g15State.chainsLeft ? '1' : '0.4'
+    if (i >= g15State.chainsLeft) span.classList.add('broken')
     wrap.appendChild(span)
   }
   document.getElementById('g15-chain-count').textContent = `⛓️ ${g15State.chainsLeft}`
@@ -10767,7 +11658,7 @@ function g15WordComplete() {
   const chainEl = document.getElementById(`g15-chain-${chainIdx}`)
   if (chainEl) {
     chainEl.classList.add('breaking')
-    setTimeout(() => { chainEl.textContent = '✅'; chainEl.style.opacity = '0.4'; chainEl.classList.remove('breaking') }, 600)
+    setTimeout(() => { chainEl.classList.remove('breaking'); chainEl.classList.add('broken') }, 600)
   }
   document.getElementById('g15-progress-msg').textContent = '⛓️ Rantai putus! 🎉'
   const trainIcon = document.getElementById('g15-train-icon')
