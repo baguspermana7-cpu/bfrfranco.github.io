@@ -8625,57 +8625,40 @@ function _initGame13Impl() {
   const pokeFallbackUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png` : null }
   const sprFbStyle = 'font-size:min(18vw,11vh);line-height:1;display:flex;align-items:center;justify-content:center;width:min(40vw,20vh);height:min(40vw,20vh);position:relative;z-index:2;'
 
+  // Load sprite exactly like G10: set src directly, onerror for fallback
   function loadSpr(imgId, wrapId, slug, emoji) {
     const wrap = document.getElementById(wrapId)
     if (!wrap) return
-    // Remove old fallback if any
     const old = wrap.querySelector('.g13-spr-fb'); if(old) old.remove()
     const img = document.getElementById(imgId)
+    if (!img) return
     const url = pokeUrl(slug)
     if (!url) {
-      if(img) img.style.display = 'none'
+      img.style.display = 'none'
       const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
-      wrap.insertBefore(fb, wrap.firstChild)
-      return
+      wrap.insertBefore(fb, img); return
     }
-    // Show emoji first (instant), then swap to image if it loads
-    if(img) img.style.display = 'none'
-    const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
-    wrap.insertBefore(fb, wrap.firstChild)
-    const testImg = new Image()
-    testImg.onload = () => {
-      if (img) {
-        img.style.display = ''
-        img.src = url
-        img.onerror = () => {
-          // pokemondb failed → try PokeAPI fallback
-          const fb2url = pokeFallbackUrl(slug)
-          if (fb2url) {
-            img.onerror = () => {
-              img.style.display = 'none'
-              const fb2 = document.createElement('div')
-              fb2.className = 'g13-spr-fb'; fb2.style.cssText = sprFbStyle; fb2.textContent = emoji
-              wrap.prepend(fb2); img.onerror = null
-            }
-            img.src = fb2url
-          } else {
-            img.style.display = 'none'
-            const fb2 = document.createElement('div')
-            fb2.className = 'g13-spr-fb'; fb2.style.cssText = sprFbStyle; fb2.textContent = emoji
-            wrap.prepend(fb2); img.onerror = null
-          }
-        }
-      }
-      fb.remove()
-    }
-    testImg.onerror = () => {
-      // pokemondb test failed → try PokeAPI
+    img.style.display = ''
+    img.src = url
+    img.onerror = () => {
       const fbUrl = pokeFallbackUrl(slug)
-      if (fbUrl && img) {
-        const t2 = new Image()
-        t2.onload = () => { if(img){img.style.display='';img.src=fbUrl} ; fb.remove() }
-        t2.onerror = () => { /* keep emoji fb */ }
-        t2.src = fbUrl
+      if (fbUrl) {
+        img.src = fbUrl
+        img.onerror = () => {
+          img.style.display = 'none'
+          if (!wrap.querySelector('.g13-spr-fb')) {
+            const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
+            wrap.insertBefore(fb, img)
+          }
+          img.onerror = null
+        }
+      } else {
+        img.style.display = 'none'
+        if (!wrap.querySelector('.g13-spr-fb')) {
+          const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
+          wrap.insertBefore(fb, img)
+        }
+        img.onerror = null
       }
     }
   }
