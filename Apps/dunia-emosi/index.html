@@ -8905,6 +8905,11 @@ function _initGame13Impl() {
     const old = wrap.querySelector('.g13-spr-fb'); if(old) old.remove()
     const img = document.getElementById(imgId)
     if (!img) return
+    // Reset all spr-* animation classes + inline styles left by previous battle/evo
+    img.className = img.className.replace(/\bspr-\S+/g, '').trim()
+    img.style.opacity = '1'
+    img.style.animation = ''
+    img.style.transform = ''
     const url = pokeUrl(slug)
     if (!url) {
       img.style.display = 'none'
