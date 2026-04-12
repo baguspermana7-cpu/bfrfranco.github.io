@@ -371,7 +371,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g5-num-cell{aspect-ratio:1;border-radius:18px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);}
 .g5-num-cell .ncell-front,.g5-num-cell .ncell-back{position:absolute;inset:0;border-radius:18px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
 .g5-num-cell .ncell-front{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:white;font-size:36px;font-weight:900;font-family:var(--font);}
-.g5-num-cell .ncell-back{background:linear-gradient(135deg,#1E1B4B,#312E81);border:2px solid rgba(139,92,246,0.5);color:rgba(255,255,255,0.3);font-size:13px;transform:rotateY(180deg);}
+.g5-num-cell .ncell-back{background:linear-gradient(135deg,#1E1B4B,#312E81);border:2px solid rgba(139,92,246,0.5);color:transparent;font-size:13px;transform:rotateY(180deg);}
 .g5-num-cell.face-down{transform:rotateY(180deg);}
 .g5-num-cell.correct-tap .ncell-back{background:linear-gradient(135deg,#059669,#34D399);color:white;font-size:28px;font-weight:900;border-color:#059669;}
 .g5-num-cell.wrong-tap{animation:wrongShake 0.4s ease;}
@@ -2170,6 +2170,11 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g13-spr.spr-hit{animation:g13HitAnim 0.4s ease;}
 .g13-pspr.spr-hit{animation:g13PHitAnim 0.4s ease;}
 .g13-spr.spr-defeat{animation:g13DefeatAnim 0.8s ease forwards;opacity:0;}
+/* Hit flash — brightness burst on impact (preserves scaleX for player) */
+.g13-spr.spr-flash{animation:g13WFlash 0.45s ease;}
+@keyframes g13WFlash{0%,100%{filter:drop-shadow(0 6px 16px rgba(0,0,0,0.7)) brightness(1)}30%,70%{filter:brightness(8) saturate(0) drop-shadow(0 0 18px white)}55%{filter:drop-shadow(0 6px 16px rgba(0,0,0,0.7)) brightness(1)}}
+.g13-pspr.spr-flash{animation:g13PFlash 0.45s ease;}
+@keyframes g13PFlash{0%,100%{transform:scaleX(-1);filter:drop-shadow(0 6px 16px rgba(0,0,0,0.7)) brightness(1)}30%,70%{transform:scaleX(-1);filter:brightness(8) saturate(0) drop-shadow(0 0 18px white)}55%{transform:scaleX(-1);filter:drop-shadow(0 6px 16px rgba(0,0,0,0.7)) brightness(1)}}
 @keyframes g13WAtkAnim{0%{transform:none}40%{transform:translateX(-22px) scale(1.1)}100%{transform:none}}
 @keyframes g13PAtkAnim{0%{transform:scaleX(-1)}40%{transform:scaleX(-1) translateX(22px) scale(1.1)}100%{transform:scaleX(-1)}}
 @keyframes g13HitAnim{0%,100%{transform:none}20%{transform:translateX(10px) rotate(3deg)}50%{transform:translateX(-8px) rotate(-2deg)}}
@@ -5102,7 +5107,7 @@ function openLevelSelect(gameNum) {
   // Icon
   const iconEl = document.getElementById('level-game-icon')
   if (gameNum === 10) {
-    iconEl.innerHTML = '<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" style="width:60px;height:60px;image-rendering:pixelated;display:block;" onerror="this.outerHTML=\'⚡\'">'
+    iconEl.innerHTML = '<img src="https://img.pokemondb.net/sprites/home/normal/pikachu.png" style="width:60px;height:60px;image-rendering:auto;display:block;" onerror="this.outerHTML=\'⚡\'">'
   } else {
     iconEl.textContent = meta.icon
   }
@@ -6047,7 +6052,8 @@ function renderG4Content(){
     items.forEach((poke,i)=>{
       const img=document.createElement('img')
       img.className='g4-animal-item g4-poke-img'
-      img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id}.png`
+      img.src=`https://img.pokemondb.net/sprites/home/normal/${poke.name.toLowerCase()}.png`
+      img.onerror=()=>{img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id}.png`;img.onerror=null}
       img.alt=poke.name
       img.style.animationDelay=(i*55)+'ms'
       // Slightly dim distractors so target stands out without removing the challenge
@@ -6182,10 +6188,10 @@ function renderG5Grid(){
         const fbSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${card.id}.png`
         back=`<img class="g5-poke-img" style="width:72px;height:72px;image-rendering:auto;object-fit:contain" src="${hdSrc}" onerror="this.src='${fbSrc}'" alt="${card.label}" loading="lazy">`
       } else {
-        // Side B: pixel/game sprite (different art style, same Pokémon)
-        const pixelSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`
-        const fbSrc=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${card.id}.png`
-        back=`<img class="g5-poke-img" style="width:72px;height:72px;image-rendering:pixelated;object-fit:contain" src="${pixelSrc}" onerror="this.src='${fbSrc}'" alt="${card.label}" loading="lazy">`
+        // Side B: same HD HOME sprite — consistent art style
+        const hdSrc2=`https://img.pokemondb.net/sprites/home/normal/${card.slug}.png`
+        const fbSrc2=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`
+        back=`<img class="g5-poke-img" style="width:72px;height:72px;image-rendering:auto;object-fit:contain" src="${hdSrc2}" onerror="this.src='${fbSrc2}'" alt="${card.label}" loading="lazy">`
       }
     } else if(g5SubMode==='hewan'||g5SubMode==='buah'){
       if(card.cardSide==='A'){
@@ -8614,9 +8620,9 @@ function _initGame13Impl() {
 
   // Sprite loading: show emoji immediately, replace with image async
   const POKE_IDS = {bulbasaur:1,ivysaur:2,venusaur:3,charmander:4,charmeleon:5,charizard:6,squirtle:7,wartortle:8,blastoise:9,caterpie:10,metapod:11,butterfree:12,pikachu:25,raichu:26,jolteon:135,flareon:136,vaporeon:134,arcanine:59,meowth:52,persian:53,machop:66,machoke:67,machamp:68,geodude:74,graveler:75,golem:76,gastly:92,haunter:93,gengar:94,magikarp:129,gyarados:130,lapras:131,eevee:133,snorlax:143,dratini:147,dragonair:148,dragonite:149,abra:63,kadabra:64,alakazam:65,psyduck:54,golduck:55,slowpoke:79,slowbro:80,poliwag:60,poliwhirl:61,poliwrath:62,horsea:116,seadra:117,vulpix:37,ninetales:38,oddish:43,gloom:44,vileplume:45,exeggcute:102,exeggutor:103,koffing:109,weezing:110,cubone:104,marowak:105,kabuto:140,kabutops:141,omanyte:138,omastar:139,cyndaquil:155,quilava:156,typhlosion:157,totodile:158,croconaw:159,feraligatr:160,chikorita:152,bayleef:153,meganium:154,togepi:175,togetic:176,marill:183,azumarill:184,teddiursa:216,ursaring:217,slugma:218,magcargo:219,swinub:220,piloswine:221,larvitar:246,pupitar:247,tyranitar:248,mudkip:258,marshtomp:259,swampert:260,treecko:252,grovyle:253,sceptile:254,torchic:255,combusken:256,blaziken:257,ralts:280,kirlia:281,gardevoir:282,beldum:374,metang:375,metagross:376,snubbull:209,granbull:210,clefable:36,dewgong:87,seel:86,cloyster:91,staryu:120,starmie:121,kangaskhan:115,muk:89}
-  // jsDelivr CDN: reliable global cache of PokeAPI sprites, works in Indonesia
-  const pokeUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/other/official-artwork/${id}.png` : null }
-  const pokeFallbackUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` : null }
+  // Same HD HOME sprites as G10 — pokemondb allows hotlinking these
+  const pokeUrl = slug => POKE_IDS[slug] ? `https://img.pokemondb.net/sprites/home/normal/${slug}.png` : null
+  const pokeFallbackUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png` : null }
   const sprFbStyle = 'font-size:min(18vw,11vh);line-height:1;display:flex;align-items:center;justify-content:center;width:min(40vw,20vh);height:min(40vw,20vh);position:relative;z-index:2;'
 
   function loadSpr(imgId, wrapId, slug, emoji) {
@@ -8834,6 +8840,48 @@ function g13SpawnAttackEffect(type, fromPlayer) {
   }
 }
 
+// Type-based hit impact FX — spawns particles on the target sprite zone
+function g13TypeHitFX(type, onEnemy) {
+  const field = document.getElementById('g13-field')
+  if (!field) return
+  const CFG = {
+    Fire:     {emojis:['🔥','✨'], anim:'fxRise',   color:'#FF6B35', count:7},
+    Water:    {emojis:['💧','🌊'], anim:'fxRain',   color:'#4FC3F7', count:6},
+    Electric: {emojis:['⚡','✨'], anim:'fxZap',    color:'#FFCB05', count:9},
+    Grass:    {emojis:['🍃','🌿'], anim:'fxSwirl',  color:'#4CAF50', count:7},
+    Dark:     {emojis:['🌑','💢'], anim:'fxShadow', color:'#3a0a5a', count:5},
+    Psychic:  {emojis:['🔮','💫'], anim:'fxSpiral', color:'#F95587', count:7},
+    Ice:      {emojis:['❄️','💎'], anim:'fxSnow',   color:'#98D8D8', count:7},
+    Ghost:    {emojis:['👻','💜'], anim:'fxFloat',  color:'#705898', count:5},
+    Flying:   {emojis:['🌪️','💨'], anim:'fxWind',   color:'#A890F0', count:6},
+    Dragon:   {emojis:['💫','🐉'], anim:'fxSpin',   color:'#7038F8', count:6},
+    Fighting: {emojis:['💥','👊'], anim:'fxBurst',  color:'#C03028', count:7},
+    Rock:     {emojis:['🪨','💥'], anim:'fxDrop',   color:'#B8A038', count:5},
+    Poison:   {emojis:['☠️','💜'], anim:'fxFloat',  color:'#A040A0', count:5},
+    Ground:   {emojis:['💥','🌍'], anim:'fxBurst',  color:'#E0C068', count:6},
+    Bug:      {emojis:['✨','🌿'], anim:'fxSwirl',  color:'#A8B820', count:6},
+    Steel:    {emojis:['⚔️','✨'], anim:'fxSpark',  color:'#B8B8D0', count:5},
+    Normal:   {emojis:['💢','✨'], anim:'fxBurst',  color:'#A8A878', count:5},
+    Fairy:    {emojis:['✨','💖'], anim:'fxSwirl',  color:'#EE99AC', count:7},
+  }
+  const cfg = CFG[type] || CFG.Normal
+  // Particle zone: enemy = top-right quarter, player = bottom-left quarter
+  const xBase = onEnemy ? 53 : 5
+  const yBase = onEnemy ? 5  : 43
+  for (let i = 0; i < cfg.count; i++) {
+    const p = document.createElement('span')
+    const px = xBase + Math.random() * 32
+    const py = yBase + Math.random() * 32
+    const sz = 18 + Math.random() * 14
+    const dur = 0.55 + Math.random() * 0.45
+    const del = i * 0.055
+    p.style.cssText = `position:absolute;font-size:${sz}px;left:${px}%;top:${py}%;z-index:25;pointer-events:none;animation:${cfg.anim} ${dur}s ${del}s ease-out both;filter:drop-shadow(0 0 6px ${cfg.color});`
+    p.textContent = cfg.emojis[i % cfg.emojis.length]
+    field.appendChild(p)
+    setTimeout(() => p.remove(), (dur + del) * 1000 + 120)
+  }
+}
+
 function g13Answer(val, btn) {
   const s = g13State
   if (s.locked || s.phase !== 'player_attack') return
@@ -8858,10 +8906,15 @@ function g13Answer(val, btn) {
     g13SpawnAttackEffect(atkType, true)
     const pspr = document.getElementById('g13-pspr')
     if (pspr) { pspr.classList.remove('spr-atk'); void pspr.offsetWidth; pspr.classList.add('spr-atk'); setTimeout(()=>pspr.classList.remove('spr-atk'),350) }
-    // Wild hit animation
+    // Wild hit animation + type hit FX
     const wspr = document.getElementById('g13-wspr')
     setTimeout(() => {
-      if (wspr) { wspr.classList.remove('spr-hit'); void wspr.offsetWidth; wspr.classList.add('spr-hit'); setTimeout(()=>wspr.classList.remove('spr-hit'),400) }
+      if (wspr) {
+        wspr.classList.remove('spr-hit','spr-flash'); void wspr.offsetWidth
+        wspr.classList.add('spr-hit','spr-flash')
+        setTimeout(()=>wspr.classList.remove('spr-hit','spr-flash'),450)
+      }
+      g13TypeHitFX(atkType, true)
     }, 300)
     // Flash
     g13TriggerFlash()
@@ -8934,7 +8987,12 @@ function g13WildCounterPhase() {
       g13SpawnAttackEffect(s.chain.wild.type, false)
       if (wspr) { wspr.classList.remove('spr-atk'); void wspr.offsetWidth; wspr.classList.add('spr-atk'); setTimeout(()=>wspr.classList.remove('spr-atk'),350) }
       setTimeout(() => {
-        if (pspr) { pspr.classList.remove('spr-hit'); void pspr.offsetWidth; pspr.classList.add('spr-hit'); setTimeout(()=>pspr.classList.remove('spr-hit'),400) }
+        if (pspr) {
+          pspr.classList.remove('spr-hit','spr-flash'); void pspr.offsetWidth
+          pspr.classList.add('spr-hit','spr-flash')
+          setTimeout(()=>pspr.classList.remove('spr-hit','spr-flash'),450)
+        }
+        g13TypeHitFX(s.chain.wild.type, false)
         s.playerHp = Math.max(0, s.playerHp - s.cfg.wildDamage)
         g13UpdateHpBars()
         g13TriggerFlash()
@@ -8998,7 +9056,7 @@ function g13TriggerEvolution() {
   const textEl = document.getElementById('g13-evo-text')
   if (!baseImg || !evolvedImg || !nameEl || !textEl) { overlay.style.display = 'none'; return }
   const POKE_IDS2 = {bulbasaur:1,ivysaur:2,venusaur:3,charmander:4,charmeleon:5,charizard:6,squirtle:7,wartortle:8,blastoise:9,caterpie:10,metapod:11,butterfree:12,pikachu:25,raichu:26,jolteon:135,flareon:136,vaporeon:134,arcanine:59,meowth:52,persian:53,machop:66,machoke:67,machamp:68,geodude:74,graveler:75,golem:76,gastly:92,haunter:93,gengar:94,magikarp:129,gyarados:130,lapras:131,eevee:133,snorlax:143,dratini:147,dragonair:148,dragonite:149,abra:63,kadabra:64,alakazam:65,psyduck:54,golduck:55,slowpoke:79,slowbro:80,poliwag:60,poliwhirl:61,poliwrath:62,horsea:116,seadra:117,vulpix:37,ninetales:38,oddish:43,gloom:44,vileplume:45,exeggcute:102,exeggutor:103,koffing:109,weezing:110,cubone:104,marowak:105,kabuto:140,kabutops:141,omanyte:138,omastar:139,cyndaquil:155,quilava:156,typhlosion:157,totodile:158,croconaw:159,feraligatr:160,chikorita:152,bayleef:153,meganium:154,togepi:175,togetic:176,marill:183,azumarill:184,teddiursa:216,ursaring:217,slugma:218,magcargo:219,swinub:220,piloswine:221,larvitar:246,pupitar:247,tyranitar:248,mudkip:258,marshtomp:259,swampert:260,treecko:252,grovyle:253,sceptile:254,torchic:255,combusken:256,blaziken:257,ralts:280,kirlia:281,gardevoir:282,beldum:374,metang:375,metagross:376,snubbull:209,granbull:210,clefable:36,dewgong:87,seel:86,cloyster:91,staryu:120,starmie:121,kangaskhan:115,muk:89}
-  const pokeUrl = slug => { const id = POKE_IDS2[slug]; return id ? `https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/other/official-artwork/${id}.png` : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${POKE_IDS2[slug]||0}.png` }
+  const pokeUrl = slug => `https://img.pokemondb.net/sprites/home/normal/${slug}.png`
 
   baseImg.src = pokeUrl(s.chain.player.slug)
   evolvedImg.src = pokeUrl(s.chain.evolved.slug)
@@ -9069,9 +9127,8 @@ function g13TriggerEvolution() {
     // Update player sprite to evolved form
     const pspr = document.getElementById('g13-pspr')
     if (pspr) {
-      const evoId = POKE_IDS2[s.chain.evolved.slug]
-      pspr.src = evoId ? `https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/other/official-artwork/${evoId}.png` : ''
-      pspr.onerror = () => { if(evoId) pspr.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${evoId}.png`; pspr.onerror=null }
+      pspr.src = `https://img.pokemondb.net/sprites/home/normal/${s.chain.evolved.slug}.png`
+      pspr.onerror = () => { const eid=POKE_IDS2[s.chain.evolved.slug]; if(eid) pspr.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${eid}.png`; pspr.onerror=null }
       pspr.style.animation = 'none'; void pspr.offsetWidth
       pspr.style.animation = 'g13EnterFlip 0.6s cubic-bezier(0.34,1.56,0.64,1)'
     }
