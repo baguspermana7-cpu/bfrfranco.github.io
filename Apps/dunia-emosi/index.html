@@ -8628,9 +8628,23 @@ function _initGame13Impl() {
     const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
     wrap.insertBefore(fb, wrap.firstChild)
     const testImg = new Image()
-    testImg.onload = () => { if(img){img.style.display='';img.src=url} ; fb.remove() }
-    testImg.onerror = () => { /* keep emoji */ }
-    testImg.src = url
+    testImg.onload = () => {
+      if (img) {
+        img.style.display = ''
+        img.src = url
+        img.onerror = () => {
+          img.style.display = 'none'
+          const fb2 = document.createElement('div')
+          fb2.className = 'g13-spr-fb'
+          fb2.style.cssText = sprFbStyle
+          fb2.textContent = emoji
+          wrap.prepend(fb2)
+          img.onerror = null
+        }
+      }
+      fb.remove()
+    }
+    testImg.onerror = () => { /* keep emoji fb */ }
   }
 
   loadSpr('g13-wspr', 'g13-wspr-wrap', chain.wild.slug, chain.icon || '❓')
@@ -8658,10 +8672,9 @@ function _initGame13Impl() {
     // Random day/dark, responsive mobile/pc
     const isDark = Math.random() < 0.5
     const isMobile = window.innerWidth <= 768
-    const variant = Math.random() < 0.5 ? '' : '-2'
     const bgKey = isDark
-      ? (isMobile ? `bg-arena-dark-mobile${variant}` : `bg-arena-dark-pc${variant}`)
-      : (isMobile ? `bg-arena-day-mobile${variant}` : `bg-arena-day-pc${variant}`)
+      ? (isMobile ? 'bg-arena-dark-mobile' : 'bg-arena-dark-pc')
+      : (isMobile ? 'bg-arena-day-mobile' : 'bg-arena-day-pc')
     field.style.backgroundImage = `url('assets/${bgKey}.webp')`
   }
   g13NextQuestion()
@@ -8846,8 +8859,14 @@ function g13Answer(val, btn) {
     }
     // After 3 attacks, switch to wild counter phase
     if (s.attackIdx >= 3) {
-      s.phase = 'wild_counter'
-      g13WildCounterPhase()
+      // Check evo BEFORE wild counter, so player can't die before evolving
+      if (!s.evolved && s.evoPoints >= s.evoNeeded) {
+        s.phase = 'evo_ready'
+        setTimeout(() => g13ShowEvoButton(), 300)
+      } else {
+        s.phase = 'wild_counter'
+        g13WildCounterPhase()
+      }
     } else {
       s.locked = false
       g13NextQuestion()
