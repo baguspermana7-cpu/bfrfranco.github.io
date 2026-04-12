@@ -2129,7 +2129,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* Question panel */
 .g13-qpanel{
   flex:0 0 auto;display:flex;flex-direction:column;align-items:center;
-  padding:10px 16px 14px;gap:6px;
+  padding:10px 16px calc(14px + env(safe-area-inset-bottom, 0px));gap:6px;
   background:rgba(10,10,24,0.99);border-top:2px solid rgba(249,115,22,0.25);
 }
 .g13-atk-lbl{font-size:12px;font-weight:900;color:rgba(249,115,22,0.85);text-transform:uppercase;letter-spacing:0.5px;}
@@ -4070,6 +4070,8 @@ body { background: #0a0a1a !important; }
 
   <!-- FX burst -->
   <div class="g10-burst-fx" id="g13-burst-fx"></div>
+  <!-- Debug error display (hidden unless crash) -->
+  <div id="g13-debug-err" style="display:none;position:fixed;top:60px;left:0;right:0;z-index:9999;background:#B91C1C;color:white;font-size:13px;font-weight:700;padding:8px 16px;text-align:center;"></div>
 </div>
 
 <!-- LEVEL SELECT — Per-game landing page with 20 progressive levels -->
@@ -8374,11 +8376,20 @@ function g13PickChain(lv) {
 }
 
 function initGame13() {
+  try { _initGame13Impl() } catch(e) {
+    console.error('initGame13 crash:', e)
+    const dbg = document.getElementById('g13-debug-err')
+    if (dbg) { dbg.textContent = '⚠️ ' + e.message; dbg.style.display = 'block' }
+  }
+}
+function _initGame13Impl() {
   battleBgmPlay()
   const p = state.players[state.currentPlayer]
   const lv = Math.max(1, Math.min(20, state.selectedLevelNum || 1))
   const chain = g13PickChain(lv)
+  if (!chain) { console.error('No chain found for lv', lv); return }
   const cfg = G13_DIFF[chain.diff]
+  if (!cfg) { console.error('No cfg for diff', chain && chain.diff); return }
 
   g13State = {
     chain, lv, cfg,
@@ -8408,7 +8419,7 @@ function initGame13() {
   const wImg = document.getElementById('g13-wspr')
   const pImg = document.getElementById('g13-pspr')
   const POKE_IDS = {bulbasaur:1,ivysaur:2,venusaur:3,charmander:4,charmeleon:5,charizard:6,squirtle:7,wartortle:8,blastoise:9,caterpie:10,metapod:11,butterfree:12,pikachu:25,raichu:26,jolteon:135,flareon:136,vaporeon:134,arcanine:59,meowth:52,persian:53,machop:66,machoke:67,machamp:68,geodude:74,graveler:75,golem:76,gastly:92,haunter:93,gengar:94,magikarp:129,gyarados:130,lapras:131,eevee:133,snorlax:143,dratini:147,dragonair:148,dragonite:149,abra:63,kadabra:64,alakazam:65,psyduck:54,golduck:55,slowpoke:79,slowbro:80,poliwag:60,poliwhirl:61,poliwrath:62,horsea:116,seadra:117,vulpix:37,ninetales:38,oddish:43,gloom:44,vileplume:45,exeggcute:102,exeggutor:103,koffing:109,weezing:110,cubone:104,marowak:105,kabuto:140,kabutops:141,omanyte:138,omastar:139,cyndaquil:155,quilava:156,typhlosion:157,totodile:158,croconaw:159,feraligatr:160,chikorita:152,bayleef:153,meganium:154,togepi:175,togetic:176,marill:183,azumarill:184,teddiursa:216,ursaring:217,slugma:218,magcargo:219,swinub:220,piloswine:221,larvitar:246,pupitar:247,tyranitar:248,mudkip:258,marshtomp:259,swampert:260,treecko:252,grovyle:253,sceptile:254,torchic:255,combusken:256,blaziken:257,ralts:280,kirlia:281,gardevoir:282,beldum:374,metang:375,metagross:376,snubbull:209,granbull:210,clefable:36,dewgong:87,seel:86,cloyster:91,staryu:120,starmie:121,kangaskhan:115,muk:89}
-  const pokeUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png` : `https://img.pokemondb.net/sprites/home/normal/${slug}.png` }
+  const pokeUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` : `https://img.pokemondb.net/sprites/home/normal/${slug}.png` }
   const sprFallback = (img, emoji) => {
     img.style.display = 'none'
     const fb = img.parentElement.querySelector('.g13-spr-fb')
@@ -8673,7 +8684,7 @@ function g13TriggerEvolution() {
   const textEl = document.getElementById('g13-evo-text')
   if (!baseImg || !evolvedImg || !nameEl || !textEl) { overlay.style.display = 'none'; return }
   const POKE_IDS2 = {bulbasaur:1,ivysaur:2,venusaur:3,charmander:4,charmeleon:5,charizard:6,squirtle:7,wartortle:8,blastoise:9,caterpie:10,metapod:11,butterfree:12,pikachu:25,raichu:26,jolteon:135,flareon:136,vaporeon:134,arcanine:59,meowth:52,persian:53,machop:66,machoke:67,machamp:68,geodude:74,graveler:75,golem:76,gastly:92,haunter:93,gengar:94,magikarp:129,gyarados:130,lapras:131,eevee:133,snorlax:143,dratini:147,dragonair:148,dragonite:149,abra:63,kadabra:64,alakazam:65,psyduck:54,golduck:55,slowpoke:79,slowbro:80,poliwag:60,poliwhirl:61,poliwrath:62,horsea:116,seadra:117,vulpix:37,ninetales:38,oddish:43,gloom:44,vileplume:45,exeggcute:102,exeggutor:103,koffing:109,weezing:110,cubone:104,marowak:105,kabuto:140,kabutops:141,omanyte:138,omastar:139,cyndaquil:155,quilava:156,typhlosion:157,totodile:158,croconaw:159,feraligatr:160,chikorita:152,bayleef:153,meganium:154,togepi:175,togetic:176,marill:183,azumarill:184,teddiursa:216,ursaring:217,slugma:218,magcargo:219,swinub:220,piloswine:221,larvitar:246,pupitar:247,tyranitar:248,mudkip:258,marshtomp:259,swampert:260,treecko:252,grovyle:253,sceptile:254,torchic:255,combusken:256,blaziken:257,ralts:280,kirlia:281,gardevoir:282,beldum:374,metang:375,metagross:376,snubbull:209,granbull:210,clefable:36,dewgong:87,seel:86,cloyster:91,staryu:120,starmie:121,kangaskhan:115,muk:89}
-  const pokeUrl = slug => { const id = POKE_IDS2[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${id}.png` : `https://img.pokemondb.net/sprites/home/normal/${slug}.png` }
+  const pokeUrl = slug => { const id = POKE_IDS2[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` : `https://img.pokemondb.net/sprites/home/normal/${slug}.png` }
 
   baseImg.src = pokeUrl(s.chain.player.slug)
   evolvedImg.src = pokeUrl(s.chain.evolved.slug)
