@@ -2994,14 +2994,14 @@ body { background: #0a0a1a !important; }
   background:linear-gradient(180deg,rgba(0,0,0,0.28) 0%,rgba(0,0,0,0.1) 55%,rgba(0,0,0,0.6) 100%);
 }
 /* Timer (top-right) */
-.g13b-timer {
+/* Selesai button top-right */
+.g13b-selesai-btn {
   position:absolute; top:8px; right:8px; z-index:10;
   background:rgba(0,0,0,0.72); border:2px solid rgba(251,191,36,0.65); border-radius:12px;
-  padding:4px 11px; font-size:20px; font-weight:900; font-family:'Fredoka One',cursive;
-  color:#FBBF24; letter-spacing:1px; transition:color 0.3s,border-color 0.3s;
+  padding:5px 12px; font-size:14px; font-weight:900; font-family:'Fredoka One',cursive;
+  color:#FBBF24; letter-spacing:0.5px; cursor:pointer;
 }
-.g13b-timer.warning { color:#EF4444; border-color:rgba(239,68,68,0.85); animation:g13bTimerWarn 0.45s ease infinite alternate; }
-@keyframes g13bTimerWarn { from{transform:scale(1)} to{transform:scale(1.1);text-shadow:0 0 14px rgba(239,68,68,0.9)} }
+.g13b-selesai-btn:active { transform:scale(0.94); }
 /* Kill counter (top-left) */
 .g13b-kills {
   position:absolute; top:8px; left:8px; z-index:10;
@@ -4583,7 +4583,7 @@ body { background: #0a0a1a !important; }
         <span class="g-icon" style="padding:4px;">⚡</span>
         <div class="g-name">Quick Fire</div>
         <div class="g-stars-row" id="gstars-13b"></div>
-        <span class="g-tag">60 Detik</span>
+        <span class="g-tag">Santai</span>
       </div>
     </div>
   </div>
@@ -4904,8 +4904,8 @@ body { background: #0a0a1a !important; }
       <div class="g13b-hp-track"><div class="g13b-hp-fill" id="g13b-hp-fill" style="width:100%"></div></div>
       <span id="g13b-hp-nums" style="font-size:9px;font-weight:900;color:white;min-width:26px;text-align:right;"></span>
     </div>
-    <!-- Timer top-right -->
-    <div class="g13b-timer" id="g13b-timer">⏱ 60</div>
+    <!-- Selesai button top-right -->
+    <button class="g13b-selesai-btn" onclick="g13bGameOver()">✅ Selesai</button>
     <!-- Legendary badge (below hp bar) -->
     <div class="g13b-legendary-badge" id="g13b-leg-badge">🌟 LEGENDARY!</div>
     <!-- Wild sprite center -->
@@ -10819,7 +10819,6 @@ const G13B_LEGENDARIES = [
 ]
 
 let g13bState = {}
-let g13bTimerInterval = null
 let g13bLastWildIdx = -1
 let _g13bEvoAudio = null
 
@@ -10830,14 +10829,12 @@ function startQuickFire() {
 window.startQuickFire = startQuickFire
 
 function exitGame13b() {
-  if (g13bTimerInterval) { clearInterval(g13bTimerInterval); g13bTimerInterval = null }
   battleBgmStop()
   showScreen('screen-menu')
 }
 window.exitGame13b = exitGame13b
 
 function initGame13b() {
-  if (g13bTimerInterval) { clearInterval(g13bTimerInterval); g13bTimerInterval = null }
   battleBgmPlay()
 
   // Random background: mobile vs pc based on viewport width
@@ -10854,7 +10851,7 @@ function initGame13b() {
 
   // Init state
   g13bState = {
-    time: 60, kills: 0, streak: 0, bestCombo: 0,
+    kills: 0, streak: 0, bestCombo: 0,
     isLegendary: false, wildHp: 1, wildMaxHp: 1,
     locked: false, currentAnswer: 0, phase: 'playing',
     legendaryIdx: 0, currentWild: null,
@@ -10867,8 +10864,6 @@ function initGame13b() {
   if (legBanner) legBanner.classList.add('hide')
   const legBadge = document.getElementById('g13b-leg-badge')
   if (legBadge) legBadge.style.display = 'none'
-  const timer = document.getElementById('g13b-timer')
-  if (timer) { timer.classList.remove('warning'); timer.textContent = '⏱ 60' }
 
   // Player sprite: Pikachu
   const pspr = document.getElementById('g13b-pspr')
@@ -10878,22 +10873,8 @@ function initGame13b() {
   }
 
   g13bRenderStreak()
-  g13bUpdateTimer()
   g13bUpdateKills()
   g13bSpawnWild()
-
-  // 60-second countdown
-  g13bTimerInterval = setInterval(() => {
-    if (g13bState.phase !== 'playing') return
-    g13bState.time = Math.max(0, g13bState.time - 1)
-    g13bUpdateTimer()
-    if (g13bState.time <= 10) {
-      const t = document.getElementById('g13b-timer')
-      if (t) t.classList.add('warning')
-      if (g13bState.time <= 5 && g13bState.time > 0) try { playClick() } catch(e) {}
-    }
-    if (g13bState.time <= 0) g13bGameOver()
-  }, 1000)
 }
 
 function g13bSpawnWild() {
@@ -11185,11 +11166,6 @@ function g13bUpdateHpBar() {
   if (nums) nums.textContent = `${s.wildHp}/${s.wildMaxHp}`
 }
 
-function g13bUpdateTimer() {
-  const el = document.getElementById('g13b-timer')
-  if (el) el.textContent = `⏱ ${g13bState.time}`
-}
-
 function g13bUpdateKills() {
   const el = document.getElementById('g13b-kills')
   if (!el) return
@@ -11202,7 +11178,6 @@ function g13bGameOver() {
   const s = g13bState
   if (s.phase === 'done') return
   s.phase = 'done'
-  if (g13bTimerInterval) { clearInterval(g13bTimerInterval); g13bTimerInterval = null }
   battleBgmStop()
 
   const stars = s.kills >= 30 ? 3 : s.kills >= 15 ? 2 : s.kills >= 1 ? 1 : 0
