@@ -9184,9 +9184,10 @@ function g13Victory() {
   const wspr = document.getElementById('g13-wspr')
   if (wspr) { wspr.classList.add('spr-defeat') }
 
-  const stars = s.stars >= s.cfg.evoNeeded * 2 ? 3 : s.stars >= s.cfg.evoNeeded ? 2 : 1
-  state.players[state.currentPlayer].stars += stars
-  endGame(stars)
+  // Victory: evolved = 5★, won without evolving = 3★ (on 5-scale for endGame)
+  const perfStars = s.evolved ? 5 : 3
+  state.players[state.currentPlayer].stars += (s.evolved ? 3 : 2)
+  endGame(perfStars)
 
   setTimeout(() => {
     const ro = document.getElementById('g13-result-overlay')
