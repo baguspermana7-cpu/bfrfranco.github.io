@@ -2,7 +2,7 @@
 
 > **Vault Location**: `/home/baguspermana7/rz-work/Apps/second brain/obsidian-knowledge-vault/`
 > **Last Updated**: 2026-04-11
-> **Total Nodes**: 60+ pages mapped
+> **Total Nodes**: 118 nodes, ~150 edges — all isolated nodes now connected
 
 This vault is the Obsidian mirror of the [ResistanceZero website](https://bfrfranco.github.io). Use Obsidian's **Graph View** (`Ctrl+G`) to visualize relationships.
 

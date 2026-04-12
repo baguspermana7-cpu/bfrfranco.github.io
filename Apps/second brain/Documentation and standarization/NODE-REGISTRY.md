@@ -2,7 +2,10 @@
 
 > Complete registry of all graph nodes and relationships.
 > Source of truth for both `index.html` rawNodes and Obsidian vault.
-> Last updated: 2026-04-11 | Total: 60 nodes, ~70 edges
+> Last updated: 2026-04-11 | Total: 118 nodes, ~150 edges
+>
+> **New in this version**: LTC lab cross-links, isolated comparison nodes connected,
+> pillar page extensions, +3 documentation nodes (vault, sbdoc, rzstd), +40 edges.
 
 ---
 

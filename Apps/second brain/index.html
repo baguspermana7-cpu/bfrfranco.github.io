@@ -4,526 +4,572 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Second Brain — ResistanceZero</title>
-<meta name="description" content="Interactive knowledge graph — ResistanceZero content map.">
+<meta name="description" content="Interactive knowledge graph — full ResistanceZero ecosystem map.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
 <style>
-/* ═══════ TOKENS ═══════ */
 :root{
-  --ink:#010209;
-  --surface:#060a14;
-  --panel:rgba(6,10,20,0.93);
-  --glass:rgba(255,255,255,0.03);
-  --rim:rgba(255,255,255,0.06);
-  --rim-neon:rgba(0,229,196,0.2);
-
-  /* PRIMARY: electric teal — nothing like Claude */
-  --neon:#00e5c4;
-  --neon-dim:#00b89c;
-  --neon-glow:rgba(0,229,196,0.18);
-  --blue:#0ea5e9;
-  --coral:#ff6b6b;
-  --gold:#ffd166;
-
-  --text:#d9eaf5;
-  --text-2:#4d7a96;
-  --text-3:#1e3d52;
-  --mono:'Space Mono',monospace;
-  --sans:'Inter',system-ui,sans-serif;
-
-  --nav-h:52px;
-  --tool-h:46px;
-  --sb-w:330px;
+  --ink:#010209; --surf:#060a14; --panel:rgba(6,10,20,0.95);
+  --glass:rgba(255,255,255,0.025); --rim:rgba(255,255,255,0.07);
+  --rim-hi:rgba(0,229,196,0.22);
+  --neon:#00e5c4; --neon-d:#00b89c; --neon-g:rgba(0,229,196,0.15);
+  --blue:#38bdf8; --coral:#ff6b6b; --gold:#ffd166;
+  --text:#d4eaf5; --t2:#3d6a84; --t3:#1b3245;
+  --mono:'Space Mono',monospace; --sans:'Inter',system-ui,sans-serif;
+  --nav-h:56px; --tool-h:48px; --sb-w:340px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{background:var(--ink);color:var(--text);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased}
 
-/* ═══════ STAR CANVAS ═══════ */
+/* ── STAR CANVAS ── */
 #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* ═══════ COLOR BLOBS ═══════ */
-.blob{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;opacity:0.55}
-.blob-a{width:500px;height:500px;top:-120px;left:-60px;
-  background:radial-gradient(circle,rgba(0,160,140,0.12) 0%,transparent 70%);
-  animation:b1 28s ease-in-out infinite}
-.blob-b{width:420px;height:420px;bottom:-80px;right:-40px;
-  background:radial-gradient(circle,rgba(14,165,233,0.08) 0%,transparent 70%);
-  animation:b2 22s ease-in-out infinite}
-.blob-c{width:300px;height:300px;top:40%;left:55%;
-  background:radial-gradient(circle,rgba(255,107,107,0.06) 0%,transparent 70%);
-  animation:b3 35s ease-in-out infinite}
-@keyframes b1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,25px)}}
-@keyframes b2{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,-20px)}}
-@keyframes b3{0%,100%{transform:translate(0,0)}33%{transform:translate(20px,-15px)}66%{transform:translate(-15px,20px)}}
+/* ── BLOBS ── */
+.blob{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0}
+.b1{width:540px;height:540px;top:-160px;left:-80px;opacity:.5;
+  background:radial-gradient(circle,rgba(0,185,156,0.13),transparent 70%);
+  animation:b1 26s ease-in-out infinite}
+.b2{width:440px;height:440px;bottom:-100px;right:-60px;opacity:.4;
+  background:radial-gradient(circle,rgba(56,189,248,0.09),transparent 70%);
+  animation:b2 20s ease-in-out infinite}
+.b3{width:320px;height:320px;top:35%;left:60%;opacity:.35;
+  background:radial-gradient(circle,rgba(255,107,107,0.07),transparent 70%);
+  animation:b3 32s ease-in-out infinite}
+@keyframes b1{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,22px)}}
+@keyframes b2{0%,100%{transform:translate(0,0)}50%{transform:translate(-22px,-18px)}}
+@keyframes b3{0%,100%{transform:translate(0,0)}33%{transform:translate(18px,-14px)}66%{transform:translate(-12px,18px)}}
 
-/* ═══════ LOADER ═══════ */
-#loader{
-  position:fixed;inset:0;z-index:999;background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  transition:opacity 0.6s,visibility 0.6s;
-}
-#loader.gone{opacity:0;visibility:hidden;pointer-events:none}
-.ld-icon{
-  width:56px;height:56px;position:relative;
-  display:flex;align-items:center;justify-content:center;
-}
-.ld-ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:1.5px solid var(--rim);
-  border-top-color:var(--neon);
-  border-right-color:var(--blue);
-  animation:spin 1s linear infinite;
-}
+/* ── LOADER ── */
+#ldr{position:fixed;inset:0;z-index:999;background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .7s,visibility .7s}
+#ldr.gone{opacity:0;visibility:hidden;pointer-events:none}
+.lring{width:54px;height:54px;border-radius:50%;
+  border:1.5px solid var(--rim);border-top-color:var(--neon);border-right-color:var(--blue);
+  animation:spin 0.9s linear infinite;position:relative}
+.ldot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:8px;height:8px;border-radius:50%;background:var(--neon);
+  box-shadow:0 0 12px var(--neon),0 0 24px var(--neon-g)}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ld-dot{width:8px;height:8px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon)}
-.ld-title{font-family:var(--mono);font-size:0.75rem;color:var(--neon);letter-spacing:0.2em;text-transform:uppercase}
-.ld-sub{font-size:0.7rem;color:var(--text-2);letter-spacing:0.08em}
+.lt{font-family:var(--mono);font-size:.72rem;color:var(--neon);letter-spacing:.2em;text-transform:uppercase}
+.ls{font-size:.65rem;color:var(--t2);letter-spacing:.08em}
+.lpb{width:180px;height:2px;background:var(--rim);border-radius:1px;margin-top:4px;overflow:hidden}
+.lpf{height:100%;background:linear-gradient(90deg,var(--neon),var(--blue));border-radius:1px;
+  animation:pb 0.75s ease forwards}
+@keyframes pb{from{width:0}to{width:100%}}
 
-/* ═══════ NAV ═══════ */
+/* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  height:var(--nav-h);
-  display:flex;align-items:center;gap:0;
-  background:rgba(1,2,9,0.9);
-  backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--rim);
-  box-shadow:0 1px 0 var(--rim-neon);
-}
-.nav-logo{
-  display:flex;align-items:center;gap:10px;padding:0 16px;
-  height:100%;border-right:1px solid var(--rim);
-  text-decoration:none;flex-shrink:0;
-}
-.nav-hex{
-  width:30px;height:30px;position:relative;flex-shrink:0;
-}
-.nav-hex svg{display:block}
-.nav-wordmark{
-  font-family:var(--mono);font-size:0.72rem;font-weight:700;
-  color:var(--neon);letter-spacing:0.14em;text-transform:uppercase;
-  text-shadow:0 0 14px rgba(0,229,196,0.5);
-}
-.nav-sub{font-size:0.6rem;color:var(--text-2);letter-spacing:0.06em;font-family:var(--mono);margin-top:1px}
-
-.nav-stats{
-  display:flex;align-items:center;padding:0 16px;gap:20px;flex:1;
-  height:100%;border-right:1px solid var(--rim);
-}
-.nav-stat{display:flex;flex-direction:column;align-items:center;gap:1px}
-.nav-stat-val{font-family:var(--mono);font-size:0.85rem;font-weight:700;color:var(--neon);line-height:1}
-.nav-stat-lbl{font-size:0.57rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono)}
-.nav-sep{width:1px;height:20px;background:var(--rim)}
-
-.nav-back{
-  display:flex;align-items:center;gap:6px;
-  padding:0 16px;height:100%;
-  font-family:var(--mono);font-size:0.65rem;color:var(--text-2);
-  text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;
-  transition:color 0.2s;flex-shrink:0;
-}
-.nav-back:hover{color:var(--neon)}
-.nav-back svg{color:var(--neon)}
-
-/* ═══════ TOOLBAR ═══════ */
-.toolbar{
-  position:fixed;top:var(--nav-h);left:0;right:0;z-index:190;
-  height:var(--tool-h);
-  display:flex;align-items:center;gap:8px;
-  padding:0 12px;
-  background:rgba(3,6,16,0.88);
-  backdrop-filter:blur(16px);
+  position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);
+  display:flex;align-items:stretch;
+  background:rgba(1,2,9,0.92);backdrop-filter:blur(28px);
   border-bottom:1px solid var(--rim);
 }
+/* animated neon line at bottom of nav */
+nav::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,var(--neon) 30%,var(--blue) 70%,transparent 100%);
+  opacity:.35;animation:nl 6s ease-in-out infinite}
+@keyframes nl{0%,100%{opacity:.2;transform:scaleX(.5)}50%{opacity:.5;transform:scaleX(1)}}
 
-/* search */
-.srch{
-  position:relative;flex-shrink:0;width:200px;
-}
-.srch svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
-#searchInput{
-  width:100%;height:30px;padding:0 8px 0 26px;
-  background:var(--glass);border:1px solid var(--rim);
-  border-radius:6px;color:var(--text);font-size:0.75rem;font-family:var(--sans);
-  outline:none;transition:border-color 0.15s;
-}
-#searchInput::placeholder{color:var(--text-3)}
-#searchInput:focus{border-color:var(--rim-neon)}
+.nl{display:flex;align-items:center;gap:10px;padding:0 16px;
+  border-right:1px solid var(--rim);flex-shrink:0;text-decoration:none}
+.nhex{flex-shrink:0}
+.nwm{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--neon);
+  letter-spacing:.12em;text-transform:uppercase;text-shadow:0 0 16px rgba(0,229,196,.5);line-height:1.1}
+.nsub{font-size:.55rem;color:var(--t2);letter-spacing:.05em;font-family:var(--mono);margin-top:2px}
 
-/* vertical divider */
-.tdiv{width:1px;height:22px;background:var(--rim);flex-shrink:0}
+/* live indicator */
+.nlive{display:flex;align-items:center;gap:6px;padding:0 14px;
+  border-right:1px solid var(--rim);flex-shrink:0}
+.nlive-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;
+  box-shadow:0 0 8px #22c55e;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px #22c55e}50%{opacity:.5;box-shadow:0 0 3px #22c55e}}
+.nlive-txt{font-family:var(--mono);font-size:.58rem;color:#22c55e;letter-spacing:.08em;text-transform:uppercase}
+
+.nstats{display:flex;align-items:center;gap:0;flex:1;padding:0 4px}
+.nstat{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 16px;height:100%;border-right:1px solid var(--rim);cursor:default;
+  transition:background .2s}
+.nstat:hover{background:var(--glass)}
+.nval{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--neon);line-height:1;
+  transition:color .3s}
+.nlbl{font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--mono);margin-top:2px}
+
+.nbk{display:flex;align-items:center;gap:6px;padding:0 14px;
+  font-family:var(--mono);font-size:.6rem;color:var(--t2);text-decoration:none;
+  letter-spacing:.06em;text-transform:uppercase;transition:color .2s;flex-shrink:0;
+  border-left:1px solid var(--rim)}
+.nbk:hover{color:var(--neon)}
+.nbk svg{color:var(--neon-d)}
+
+/* ── TOOLBAR ── */
+.tbr{
+  position:fixed;top:var(--nav-h);left:0;right:0;z-index:190;height:var(--tool-h);
+  display:flex;align-items:center;gap:8px;padding:0 10px;
+  background:rgba(2,4,12,0.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--rim);
+}
+.tsrch{position:relative;width:190px;flex-shrink:0}
+.tsrch svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none}
+#si{width:100%;height:28px;padding:0 8px 0 26px;background:var(--glass);border:1px solid var(--rim);
+  border-radius:5px;color:var(--text);font-size:.72rem;font-family:var(--sans);
+  outline:none;transition:border-color .15s}
+#si::placeholder{color:var(--t3)}
+#si:focus{border-color:var(--rim-hi)}
+.tdv{width:1px;height:20px;background:var(--rim);flex-shrink:0}
 
 /* filter pills */
-.filters{display:flex;align-items:center;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
+.fps{display:flex;align-items:center;gap:3px;overflow-x:auto;flex:1;scrollbar-width:none;padding:2px 0}
+.fps::-webkit-scrollbar{display:none}
 .fp{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 9px;border-radius:4px;
-  font-size:0.67rem;font-weight:600;font-family:var(--mono);letter-spacing:0.02em;
-  border:1px solid transparent;cursor:pointer;white-space:nowrap;
-  background:transparent;transition:all 0.15s;color:var(--text-3);
+  position:relative;display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:4px;border:1px solid transparent;
+  font-size:.62rem;font-weight:700;font-family:var(--mono);letter-spacing:.03em;
+  cursor:pointer;white-space:nowrap;background:transparent;color:var(--t3);
+  transition:all .15s;
 }
 .fp .fd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.fp .fc{font-size:0.6rem;opacity:0.6;margin-left:1px}
-.fp:hover{color:var(--text-2);background:var(--glass)}
-.fp.on{color:var(--text);background:var(--glass);border-color:var(--rim)}
+.fp .fc{font-size:.55rem;opacity:.55}
+.fp:hover{color:var(--t2);background:var(--glass);border-color:var(--rim)}
+.fp.on{color:var(--text);background:rgba(255,255,255,.04);border-color:var(--rim)}
+.fp.on::after{content:'';position:absolute;bottom:-2px;left:4px;right:4px;
+  height:2px;border-radius:1px;background:currentColor;transition:width .2s}
+.tbr-r{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.lb{width:26px;height:26px;border-radius:5px;background:transparent;border:1px solid var(--rim);
+  color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .15s}
+.lb:hover{border-color:var(--rim-hi);color:var(--neon)}
+.lb.on{background:rgba(0,229,196,.08);border-color:var(--rim-hi);color:var(--neon)}
 
-/* active indicator line below */
-.fp.on::after{content:'';display:block;position:absolute;bottom:-1px;left:0;right:0;height:2px;background:currentColor;border-radius:2px}
-.fp{position:relative}
+/* ── GRAPH WRAP ── */
+#gw{position:fixed;top:calc(var(--nav-h) + var(--tool-h));left:0;right:0;bottom:0;
+  transition:right .3s cubic-bezier(.4,0,.2,1)}
+#gw.sbo{right:var(--sb-w)}
+#emp{display:none;position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.ei{width:48px;height:48px;border-radius:50%;border:1px solid var(--rim);
+  display:flex;align-items:center;justify-content:center;color:var(--t3);margin:0 auto 10px}
+#emp p{font-family:var(--mono);font-size:.68rem;color:var(--t3);letter-spacing:.08em}
 
-/* layout toggles */
-.ltog{display:flex;align-items:center;gap:3px;flex-shrink:0}
-.lb{
-  width:26px;height:26px;border-radius:5px;
-  background:transparent;border:1px solid var(--rim);
-  color:var(--text-3);cursor:pointer;font-size:0.7rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.15s;
-}
-.lb:hover{border-color:var(--rim-neon);color:var(--neon)}
-.lb.on{background:rgba(0,229,196,0.08);border-color:var(--rim-neon);color:var(--neon)}
-
-/* ═══════ GRAPH ═══════ */
-#gWrap{
-  position:fixed;
-  top:calc(var(--nav-h) + var(--tool-h));
-  left:0;right:0;bottom:0;
-  transition:right 0.3s cubic-bezier(.4,0,.2,1);
-}
-#gWrap.sb-open{right:var(--sb-w)}
-
-/* ═══════ EMPTY ═══════ */
-#empty{
-  display:none;position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);text-align:center;pointer-events:none;
-}
-#empty .ei{
-  width:52px;height:52px;border-radius:50%;
-  border:1px solid var(--rim);margin:0 auto 10px;
-  display:flex;align-items:center;justify-content:center;color:var(--text-3);
-}
-#empty p{font-size:0.75rem;color:var(--text-3);font-family:var(--mono);letter-spacing:0.05em}
-
-/* ═══════ SIDEBAR ═══════ */
-#sidebar{
-  position:fixed;top:0;right:0;bottom:0;
-  width:var(--sb-w);z-index:180;
-  background:rgba(4,8,18,0.97);
-  backdrop-filter:blur(24px);
+/* ── SIDEBAR ── */
+#sb{position:fixed;top:0;right:0;bottom:0;width:var(--sb-w);z-index:180;
+  background:rgba(3,7,16,0.98);backdrop-filter:blur(28px);
   border-left:1px solid var(--rim);
-  transform:translateX(100%);
-  transition:transform 0.3s cubic-bezier(.4,0,.2,1);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-}
-#sidebar.open{transform:translateX(0)}
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden}
+#sb.open{transform:translateX(0)}
+#sbStr{height:3px;flex-shrink:0;transition:background .3s}
+.sbh{flex-shrink:0;padding:12px 13px 10px;border-bottom:1px solid var(--rim)}
+.sbh1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px}
+.sbbdg{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;
+  font-family:var(--mono);font-size:.55rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid}
+.sbx{width:22px;height:22px;border-radius:4px;flex-shrink:0;
+  background:var(--glass);border:1px solid var(--rim);color:var(--t2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.sbx:hover{border-color:var(--coral);color:var(--coral)}
+#sbTi{font-size:.95rem;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:5px}
+#sbDe{font-size:.72rem;color:var(--t2);line-height:1.6}
+.sbb{flex:1;overflow-y:auto;padding:10px 13px 20px;scrollbar-width:thin;scrollbar-color:var(--rim) transparent}
+.sbb::-webkit-scrollbar{width:2px}
+.sbb::-webkit-scrollbar-thumb{background:var(--rim);border-radius:1px}
+.sbm{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px}
+.smi{background:var(--glass);border:1px solid var(--rim);border-radius:5px;padding:7px 9px}
+.sml{font-family:var(--mono);font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.smv{font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--text)}
+.sbtg{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}
+.stg{font-family:var(--mono);font-size:.57rem;color:var(--t2);
+  background:var(--glass);border:1px solid var(--rim);border-radius:3px;padding:2px 5px}
+.sbst{font-family:var(--mono);font-size:.54rem;color:var(--t3);text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:5px;font-weight:700}
+.cns{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}
+.cn{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;
+  font-size:.65rem;color:var(--t2);background:var(--glass);border:1px solid var(--rim);
+  cursor:pointer;transition:all .15s}
+.cn .cd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.cn:hover{background:rgba(0,229,196,.05);border-color:var(--rim-hi);color:var(--text)}
+/* file path display */
+.sbpath{font-family:var(--mono);font-size:.58rem;color:var(--t2);
+  background:var(--glass);border:1px solid var(--rim);border-radius:4px;
+  padding:5px 8px;margin-bottom:10px;word-break:break-all;line-height:1.5}
+.sbpath-l{font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.sbd{border:none;border-top:1px solid var(--rim);margin:8px 0}
+.sbbn{display:flex;align-items:center;justify-content:center;gap:5px;
+  width:100%;padding:8px;border-radius:5px;font-size:.72rem;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all .2s;border:none;font-family:var(--sans)}
+.sbbn-p{background:linear-gradient(135deg,var(--neon-d),#0e7fe8);color:#fff;
+  box-shadow:0 3px 14px rgba(0,229,196,.22)}
+.sbbn-p:hover{box-shadow:0 4px 22px rgba(0,229,196,.4);transform:translateY(-1px)}
+.sbbn-s{background:var(--glass);border:1px solid var(--rim);color:var(--t2);margin-top:5px}
+.sbbn-s:hover{border-color:var(--rim-hi);color:var(--neon)}
 
-/* colored stripe at top based on group */
-#sbStripe{height:3px;flex-shrink:0;transition:background 0.3s}
+/* ── LEGEND ── */
+#leg{position:fixed;bottom:14px;left:14px;z-index:100;
+  background:rgba(3,6,16,0.94);backdrop-filter:blur(14px);
+  border:1px solid var(--rim);border-radius:8px;padding:9px 11px;
+  transition:opacity .3s}
+.legt{font-family:var(--mono);font-size:.5rem;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.legr{display:flex;align-items:center;gap:5px;font-size:.64rem;color:var(--t2);margin-bottom:2px;cursor:default;
+  transition:color .15s;border-radius:3px;padding:1px 3px}
+.legr:hover{color:var(--text)}
+.legd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 
-.sb-head{
-  flex-shrink:0;padding:14px 14px 10px;
-  border-bottom:1px solid var(--rim);
-}
-.sb-row1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.sb-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:2px 8px;border-radius:3px;
-  font-family:var(--mono);font-size:0.58rem;font-weight:700;
-  letter-spacing:0.1em;text-transform:uppercase;
-  border:1px solid;
-}
-.sb-x{
-  width:24px;height:24px;border-radius:4px;flex-shrink:0;
-  background:var(--glass);border:1px solid var(--rim);
-  color:var(--text-2);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.15s;
-}
-.sb-x:hover{border-color:var(--coral);color:var(--coral)}
-#sbTitle{
-  font-family:var(--sans);font-size:1rem;font-weight:600;
-  color:var(--text);line-height:1.3;margin-bottom:6px;
-}
-#sbDesc{font-size:0.75rem;color:var(--text-2);line-height:1.6}
+/* ── ZOOM ── */
+#zc{position:fixed;bottom:14px;right:14px;z-index:100;
+  display:flex;flex-direction:column;gap:4px;transition:right .3s cubic-bezier(.4,0,.2,1)}
+#zc.sbo{right:calc(var(--sb-w) + 14px)}
+.zb{width:30px;height:30px;border-radius:5px;
+  background:rgba(3,6,16,.94);backdrop-filter:blur(14px);border:1px solid var(--rim);
+  color:var(--t2);cursor:pointer;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--mono)}
+.zb:hover{border-color:var(--rim-hi);color:var(--neon);background:rgba(0,229,196,.06)}
 
-.sb-body{flex:1;overflow-y:auto;padding:12px 14px 20px;scrollbar-width:thin;scrollbar-color:var(--rim) transparent}
-.sb-body::-webkit-scrollbar{width:3px}
-.sb-body::-webkit-scrollbar-thumb{background:var(--rim);border-radius:2px}
-
-.sb-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
-.sb-m{
-  background:var(--glass);border:1px solid var(--rim);
-  border-radius:6px;padding:8px 10px;
-}
-.sb-m-l{font-family:var(--mono);font-size:0.55rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px}
-.sb-m-v{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--text)}
-
-.sb-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
-.sb-tag{
-  font-family:var(--mono);font-size:0.6rem;color:var(--text-2);
-  background:var(--glass);border:1px solid var(--rim);
-  border-radius:3px;padding:2px 6px;
-}
-
-.sb-s-title{
-  font-family:var(--mono);font-size:0.58rem;color:var(--text-3);
-  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;font-weight:700;
-}
-.conns{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
-.conn{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:3px 8px;border-radius:4px;
-  font-size:0.68rem;color:var(--text-2);
-  background:var(--glass);border:1px solid var(--rim);
-  cursor:pointer;transition:all 0.15s;
-}
-.conn .cd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.conn:hover{background:rgba(0,229,196,0.06);border-color:var(--rim-neon);color:var(--text)}
-
-.sb-div{border:none;border-top:1px solid var(--rim);margin:10px 0}
-
-.sb-btn{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  width:100%;padding:9px 12px;border-radius:6px;
-  font-size:0.75rem;font-weight:600;cursor:pointer;
-  text-decoration:none;transition:all 0.2s;border:none;font-family:var(--sans);
-}
-.sb-btn-p{
-  background:linear-gradient(135deg,var(--neon-dim),var(--blue));
-  color:#fff;box-shadow:0 4px 16px rgba(0,229,196,0.25);
-}
-.sb-btn-p:hover{box-shadow:0 4px 24px rgba(0,229,196,0.4);transform:translateY(-1px)}
-.sb-btn-s{
-  background:var(--glass);border:1px solid var(--rim);
-  color:var(--text-2);margin-top:6px;
-}
-.sb-btn-s:hover{border-color:var(--rim-neon);color:var(--neon)}
-
-/* ═══════ LEGEND ═══════ */
-#legend{
-  position:fixed;bottom:16px;left:16px;z-index:100;
-  background:rgba(4,8,18,0.92);backdrop-filter:blur(12px);
-  border:1px solid var(--rim);border-radius:8px;
-  padding:10px 12px;
-  transition:right 0.3s cubic-bezier(.4,0,.2,1),opacity 0.3s;
-}
-.leg-t{font-family:var(--mono);font-size:0.55rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
-.leg-r{display:flex;align-items:center;gap:6px;font-size:0.68rem;color:var(--text-2);margin-bottom:3px}
-.leg-d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-
-/* ═══════ ZOOM ═══════ */
-#zctrl{
-  position:fixed;bottom:16px;right:16px;z-index:100;
-  display:flex;flex-direction:column;gap:4px;
-  transition:right 0.3s cubic-bezier(.4,0,.2,1);
-}
-#zctrl.sb-open{right:calc(var(--sb-w) + 16px)}
-.zb{
-  width:32px;height:32px;border-radius:6px;
-  background:rgba(4,8,18,0.92);backdrop-filter:blur(12px);
-  border:1px solid var(--rim);color:var(--text-2);
-  cursor:pointer;font-size:0.9rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.15s;font-family:var(--mono);
-}
-.zb:hover{border-color:var(--rim-neon);color:var(--neon);background:rgba(0,229,196,0.06)}
-
-/* ═══════ VIS TOOLTIP OVERRIDE ═══════ */
+/* ── VIS TOOLTIP ── */
 .vis-tooltip{
-  background:rgba(4,8,18,0.97) !important;
-  border:1px solid var(--rim-neon) !important;
-  border-radius:8px !important;
-  font-size:12px !important;
-  padding:0 !important;
-  box-shadow:0 8px 32px rgba(0,0,0,0.7) !important;
-  color:var(--text) !important;
-}
+  background:rgba(3,6,16,.97) !important;border:1px solid rgba(0,229,196,.28) !important;
+  border-radius:8px !important;font-size:12px !important;padding:0 !important;
+  box-shadow:0 8px 28px rgba(0,0,0,.8) !important;color:var(--text) !important}
 
-@media(max-width:720px){
-  :root{--sb-w:100vw}
-  #legend{display:none}
-  .nav-stats{display:none}
-  .srch{width:140px}
+/* ── MINI-MAP ── */
+#mmwrap{position:fixed;bottom:58px;right:14px;z-index:100;
+  background:rgba(2,4,12,.93);backdrop-filter:blur(12px);
+  border:1px solid var(--rim);border-radius:7px;overflow:hidden;width:138px;
+  transition:right .3s cubic-bezier(.4,0,.2,1)}
+#mmwrap.sbo{right:calc(var(--sb-w) + 14px)}
+#mmwrap:hover{border-color:var(--rim-hi)}
+#mm{display:block;cursor:crosshair}
+.mmlbl{font-family:var(--mono);font-size:.42rem;color:var(--t3);text-transform:uppercase;
+  letter-spacing:.1em;padding:2px 6px;border-top:1px solid var(--rim);text-align:center}
+/* ── PATH TOAST ── */
+#ptst{position:fixed;bottom:56px;left:50%;z-index:210;
+  transform:translateX(-50%) translateY(8px);
+  background:rgba(2,4,12,.97);backdrop-filter:blur(16px);
+  border:1px solid rgba(0,229,196,.28);border-radius:8px;padding:9px 13px;
+  min-width:220px;max-width:560px;opacity:0;pointer-events:none;
+  transition:opacity .22s,transform .22s}
+#ptst.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.pthd{font-family:var(--mono);font-size:.5rem;color:var(--neon);letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.ptrow{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.ptn{font-family:var(--mono);font-size:.62rem;padding:2px 6px;background:var(--glass);
+  border-radius:3px;cursor:pointer;transition:color .15s,border-color .15s;border:1px solid}
+.ptn:hover{background:rgba(0,229,196,.06)}
+.ptarr{color:var(--neon);opacity:.5;font-size:.8rem;user-select:none}
+.ptnone{font-family:var(--mono);font-size:.62rem;color:var(--t2)}
+.ptclose{background:none;border:none;color:var(--t2);cursor:pointer;
+  font-family:var(--mono);font-size:.75rem;padding:0;line-height:1;flex-shrink:0}
+.ptclose:hover{color:var(--text)}
+/* path mode active button */
+.lb.pon{background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.5);color:var(--gold)}
+/* focus mode active */
+.lb.fon{background:rgba(192,132,252,.08);border-color:rgba(192,132,252,.5);color:#c084fc}
+
+/* ── FOCUS BANNER ── */
+#focbanner{position:fixed;top:calc(var(--nav-h) + var(--tool-h) + 8px);left:50%;
+  transform:translateX(-50%);z-index:150;
+  background:rgba(2,4,12,.95);border:1px solid rgba(192,132,252,.45);border-radius:6px;
+  padding:5px 14px;font-family:var(--mono);font-size:.58rem;color:#c084fc;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap}
+#focbanner.show{opacity:1;pointer-events:auto}
+#focbanner:hover{background:rgba(192,132,252,.08)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(8px);
+  z-index:260;background:rgba(2,4,12,.97);border:1px solid var(--rim);border-radius:6px;
+  padding:7px 14px;font-family:var(--mono);font-size:.62rem;color:var(--text);
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── ANNOTATION ── */
+.sbanno-wrap{margin-bottom:10px}
+.sbanno{width:100%;min-height:56px;resize:vertical;background:var(--glass);
+  border:1px solid var(--rim);border-radius:4px;color:var(--text);
+  font-family:var(--mono);font-size:.65rem;padding:6px 8px;line-height:1.5;
+  outline:none;transition:border-color .15s;box-sizing:border-box;display:block}
+.sbanno:focus{border-color:var(--rim-hi)}
+.sbanno-btns{display:flex;gap:5px;margin-top:4px}
+.sbanno-save{font-size:.58rem;color:var(--neon);background:rgba(0,229,196,.07);
+  border:1px solid rgba(0,229,196,.25);border-radius:3px;cursor:pointer;
+  font-family:var(--mono);padding:2px 8px;transition:all .15s}
+.sbanno-save:hover{background:rgba(0,229,196,.16)}
+.sbanno-del{font-size:.58rem;color:var(--t2);background:none;
+  border:1px solid var(--rim);border-radius:3px;cursor:pointer;
+  font-family:var(--mono);padding:2px 8px;transition:all .15s}
+.sbanno-del:hover{color:var(--coral);border-color:var(--coral)}
+
+/* ── TOP CONNECTED ── */
+.legdiv{height:1px;background:var(--rim);margin:6px 0}
+.legt2{font-family:var(--mono);font-size:.45rem;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.legtp{display:flex;align-items:center;justify-content:space-between;gap:4px;
+  font-size:.62rem;color:var(--t2);margin-bottom:2px;cursor:pointer;
+  border-radius:3px;padding:1px 3px;transition:color .15s}
+.legtp:hover{color:var(--text)}
+.legtpn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px}
+.legtpd{font-family:var(--mono);font-size:.52rem;color:var(--t3);flex-shrink:0}
+
+/* ── LIGHT MODE ── */
+html.light{
+  --ink:#eef2f7;--surf:#e4e9f0;--panel:rgba(238,242,247,.97);
+  --glass:rgba(0,0,0,.04);--rim:rgba(0,0,0,.1);--rim-hi:rgba(0,160,136,.35);
+  --neon:#009980;--neon-d:#007a66;--neon-g:rgba(0,153,128,.12);
+  --text:#1a2d3e;--t2:#4a6a84;--t3:#8aaccc;
 }
+html.light body{background:var(--ink)}
+html.light nav{background:rgba(238,242,247,.97);border-color:rgba(0,0,0,.1)}
+html.light .tbr{background:rgba(232,238,245,.94);border-color:rgba(0,0,0,.08)}
+html.light #sb{background:rgba(232,238,248,.99)}
+html.light #leg,html.light #mmwrap,html.light #ptst,html.light #toast,html.light #focbanner,html.light #ctxmenu{
+  background:rgba(232,238,248,.98);border-color:rgba(0,0,0,.1)}
+html.light .blob{opacity:.04}
+html.light #stars{opacity:.06}
+
+/* ── CONTEXT MENU ── */
+#ctxmenu{position:fixed;z-index:300;background:rgba(3,7,16,.97);
+  border:1px solid var(--rim);border-radius:7px;padding:4px;
+  min-width:160px;display:none;box-shadow:0 8px 28px rgba(0,0,0,.7)}
+#ctxmenu.show{display:block}
+.ctxi{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:4px;
+  font-size:.7rem;color:var(--t2);cursor:pointer;transition:all .12s;
+  font-family:var(--sans);white-space:nowrap}
+.ctxi:hover{background:var(--glass);color:var(--text)}
+.ctxi-ico{font-size:.8rem;width:14px;text-align:center;flex-shrink:0}
+.ctxdiv{height:1px;background:var(--rim);margin:3px 0}
+
+/* ── HISTORY BACK BUTTON ── */
+.sbback{display:none;align-items:center;gap:4px;width:100%;padding:5px 8px;margin-bottom:8px;
+  background:var(--glass);border:1px solid var(--rim);border-radius:4px;
+  font-family:var(--mono);font-size:.6rem;color:var(--t2);cursor:pointer;transition:all .15s}
+.sbback:hover{border-color:var(--rim-hi);color:var(--text)}
+.sbback svg{flex-shrink:0}
+
+/* ── IN/OUT EDGE LISTS ── */
+.sbio{display:flex;gap:6px;margin-bottom:10px}
+.sbioc{flex:1;min-width:0}
+.sbioh{font-family:var(--mono);font-size:.5rem;color:var(--t3);text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:4px;display:flex;align-items:center;gap:3px}
+.sbioarr{font-size:.7rem}
+.sbioc .cns{flex-direction:column;gap:2px}
+.sbioc .cn{font-size:.6rem}
+
+@media(max-width:720px){:root{--sb-w:100vw}#leg{display:none}#mmwrap{display:none}.nstats{display:none}.tsrch{width:130px}}
 </style>
 </head>
 <body>
 
-<!-- STAR FIELD (canvas drawn by JS) -->
 <canvas id="stars"></canvas>
-
-<!-- COLOR BLOBS -->
-<div class="blob blob-a"></div>
-<div class="blob blob-b"></div>
-<div class="blob blob-c"></div>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
 
 <!-- LOADER -->
-<div id="loader">
-  <div class="ld-icon">
-    <div class="ld-ring"></div>
-    <div class="ld-dot"></div>
-  </div>
-  <div class="ld-title">Second Brain</div>
-  <div class="ld-sub">mapping knowledge graph…</div>
+<div id="ldr">
+  <div class="lring"><div class="ldot"></div></div>
+  <div class="lt">Second Brain</div>
+  <div class="ls">mapping knowledge graph…</div>
+  <div class="lpb"><div class="lpf"></div></div>
 </div>
 
 <!-- NAV -->
 <nav>
-  <a href="../../index.html" class="nav-logo">
-    <div class="nav-hex">
-      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-        <polygon points="15,2 27,8.5 27,21.5 15,28 3,21.5 3,8.5" stroke="#00e5c4" stroke-width="1.5" fill="rgba(0,229,196,0.06)"/>
-        <circle cx="15" cy="15" r="4" fill="#00e5c4" opacity="0.9"/>
-        <line x1="15" y1="2" x2="15" y2="11" stroke="#00e5c4" stroke-width="0.8" opacity="0.4"/>
-        <line x1="27" y1="8.5" x2="19.2" y2="12.5" stroke="#00e5c4" stroke-width="0.8" opacity="0.4"/>
-        <line x1="27" y1="21.5" x2="19.2" y2="17.5" stroke="#00e5c4" stroke-width="0.8" opacity="0.4"/>
-        <line x1="15" y1="28" x2="15" y2="19" stroke="#00e5c4" stroke-width="0.8" opacity="0.4"/>
-        <line x1="3" y1="21.5" x2="10.8" y2="17.5" stroke="#00e5c4" stroke-width="0.8" opacity="0.4"/>
-        <line x1="3" y1="8.5" x2="10.8" y2="12.5" stroke="#00e5c4" stroke-width="0.8" opacity="0.4"/>
+  <a href="../../index.html" class="nl">
+    <div class="nhex">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <polygon points="14,2 25,8 25,20 14,26 3,20 3,8" stroke="#00e5c4" stroke-width="1.5" fill="rgba(0,229,196,0.05)"/>
+        <circle cx="14" cy="14" r="3.5" fill="#00e5c4" opacity=".9"/>
+        <line x1="14" y1="2" x2="14" y2="10.5" stroke="#00e5c4" stroke-width=".7" opacity=".35"/>
+        <line x1="25" y1="8" x2="17.5" y2="12" stroke="#00e5c4" stroke-width=".7" opacity=".35"/>
+        <line x1="25" y1="20" x2="17.5" y2="16" stroke="#00e5c4" stroke-width=".7" opacity=".35"/>
+        <line x1="14" y1="26" x2="14" y2="17.5" stroke="#00e5c4" stroke-width=".7" opacity=".35"/>
+        <line x1="3" y1="20" x2="10.5" y2="16" stroke="#00e5c4" stroke-width=".7" opacity=".35"/>
+        <line x1="3" y1="8" x2="10.5" y2="12" stroke="#00e5c4" stroke-width=".7" opacity=".35"/>
       </svg>
     </div>
     <div>
-      <div class="nav-wordmark">Second Brain</div>
-      <div class="nav-sub">ResistanceZero · Knowledge Graph</div>
+      <div class="nwm">Second Brain</div>
+      <div class="nsub">ResistanceZero · Knowledge Graph</div>
     </div>
   </a>
 
-  <div class="nav-stats">
-    <div class="nav-stat">
-      <div class="nav-stat-val" id="statNodes">—</div>
-      <div class="nav-stat-lbl">Nodes</div>
-    </div>
-    <div class="nav-sep"></div>
-    <div class="nav-stat">
-      <div class="nav-stat-val" id="statEdges">—</div>
-      <div class="nav-stat-lbl">Links</div>
-    </div>
-    <div class="nav-sep"></div>
-    <div class="nav-stat">
-      <div class="nav-stat-val">9</div>
-      <div class="nav-stat-lbl">Categories</div>
-    </div>
+  <div class="nlive">
+    <div class="nlive-dot"></div>
+    <span class="nlive-txt">Live</span>
   </div>
 
-  <a href="../../index.html" class="nav-back">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  <div class="nstats">
+    <div class="nstat"><div class="nval" id="sN">—</div><div class="nlbl">Nodes</div></div>
+    <div class="nstat"><div class="nval" id="sE">—</div><div class="nlbl">Links</div></div>
+    <div class="nstat"><div class="nval" id="sC">11</div><div class="nlbl">Categories</div></div>
+    <div class="nstat" title="Graph density = 2E / N(N-1)"><div class="nval" id="sG">—</div><div class="nlbl">Density</div></div>
+  </div>
+
+  <button id="bTheme" class="nbk" style="background:none;border:none;cursor:pointer;border-left:1px solid var(--rim)" title="Toggle light/dark mode">
+    <svg id="themeIco" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+
+  <a href="../../index.html" class="nbk">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     Back to site
   </a>
 </nav>
 
 <!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="srch">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" id="searchInput" placeholder="Search nodes… (⌘K)" autocomplete="off" spellcheck="false">
+<div class="tbr">
+  <div class="tsrch">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="si" placeholder="Search… (⌘K)" autocomplete="off" spellcheck="false">
   </div>
-  <div class="tdiv"></div>
+  <div class="tdv"></div>
 
-  <div class="filters" id="filters">
-    <button class="fp on" data-g="all">
-      <div class="fd" style="background:var(--neon)"></div>ALL
-      <span class="fc" id="cn-all">0</span>
-    </button>
-    <button class="fp" data-g="core">
-      <div class="fd" style="background:#c4b5fd"></div>CORE
-      <span class="fc" id="cn-core">7</span>
-    </button>
-    <button class="fp" data-g="articles">
-      <div class="fd" style="background:#22d3ee"></div>ARTICLES
-      <span class="fc" id="cn-articles">29</span>
-    </button>
-    <button class="fp" data-g="calculators">
-      <div class="fd" style="background:#fbbf24"></div>CALCS
-      <span class="fc" id="cn-calculators">7</span>
-    </button>
-    <button class="fp" data-g="comparisons">
-      <div class="fd" style="background:#34d399"></div>COMPARE
-      <span class="fc" id="cn-comparisons">10</span>
-    </button>
-    <button class="fp" data-g="reports">
-      <div class="fd" style="background:#f87171"></div>REPORTS
-      <span class="fc" id="cn-reports">6</span>
-    </button>
-    <button class="fp" data-g="apps">
-      <div class="fd" style="background:#f472b6"></div>APPS
-      <span class="fc" id="cn-apps">4</span>
-    </button>
-    <button class="fp" data-g="series">
-      <div class="fd" style="background:#c084fc"></div>SERIES
-      <span class="fc" id="cn-series">2</span>
-    </button>
-    <button class="fp" data-g="standards">
-      <div class="fd" style="background:#94a3b8"></div>STANDARDS
-      <span class="fc" id="cn-standards">10</span>
-    </button>
+  <div class="fps" id="fps">
+    <button class="fp on" data-g="all"><div class="fd" style="background:var(--neon)"></div>ALL <span class="fc" id="ca">0</span></button>
+    <button class="fp" data-g="core"><div class="fd" style="background:#c4b5fd"></div>CORE <span class="fc" id="cc">0</span></button>
+    <button class="fp" data-g="articles"><div class="fd" style="background:#22d3ee"></div>ARTICLES <span class="fc" id="car">0</span></button>
+    <button class="fp" data-g="calculators"><div class="fd" style="background:#fbbf24"></div>CALCS <span class="fc" id="cca">0</span></button>
+    <button class="fp" data-g="comparisons"><div class="fd" style="background:#34d399"></div>COMPARE <span class="fc" id="cco">0</span></button>
+    <button class="fp" data-g="reports"><div class="fd" style="background:#f87171"></div>REPORTS <span class="fc" id="crp">0</span></button>
+    <button class="fp" data-g="apps"><div class="fd" style="background:#f472b6"></div>APPS <span class="fc" id="cap">0</span></button>
+    <button class="fp" data-g="series"><div class="fd" style="background:#c084fc"></div>SERIES <span class="fc" id="cse">0</span></button>
+    <button class="fp" data-g="standards"><div class="fd" style="background:#94a3b8"></div>STANDARDS <span class="fc" id="cst">0</span></button>
+    <button class="fp" data-g="projects"><div class="fd" style="background:#fb923c"></div>PROJECTS <span class="fc" id="cpr">0</span></button>
+    <button class="fp" data-g="memory"><div class="fd" style="background:#a3e635"></div>MEMORY <span class="fc" id="cme">0</span></button>
   </div>
 
-  <div class="tdiv"></div>
-  <div class="ltog">
-    <button class="lb on" id="bForce" title="Force layout">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="6" y1="7" x2="11" y2="17"/><line x1="18" y1="7" x2="13" y2="17"/></svg>
+  <div class="tdv"></div>
+  <div class="tbr-r">
+    <button class="lb on" id="bF" title="Force">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="6" y1="7" x2="11" y2="17"/><line x1="18" y1="7" x2="13" y2="17"/></svg>
     </button>
-    <button class="lb" id="bHier" title="Hierarchical">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="2" width="5" height="4" rx="1"/><rect x="8" y="13" width="5" height="4" rx="1"/><rect x="15" y="13" width="5" height="4" rx="1"/><line x1="5" y1="6" x2="5" y2="9"/><line x1="5" y1="9" x2="10" y2="13"/><line x1="5" y1="9" x2="17" y2="13"/></svg>
+    <button class="lb" id="bH" title="Hierarchical">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="2" width="5" height="4" rx="1"/><rect x="8" y="13" width="5" height="4" rx="1"/><rect x="15" y="13" width="5" height="4" rx="1"/><line x1="5" y1="6" x2="5" y2="9"/><line x1="5" y1="9" x2="10" y2="13"/><line x1="5" y1="9" x2="17" y2="13"/></svg>
     </button>
-    <button class="lb" id="bFit" title="Fit all">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+    <button class="lb" id="bFt" title="Fit">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+    </button>
+    <div class="tdv" style="margin:0 2px"></div>
+    <button class="lb" id="bPth" title="Path Finder — click two nodes">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="4" cy="12" r="2.5"/><circle cx="20" cy="12" r="2.5"/><path d="M6.5 12h11"/><path d="M13 7l4.5 5-4.5 5"/></svg>
+    </button>
+    <button class="lb" id="bFoc" title="Focus Mode — double-click a node">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="4 2"/></svg>
+    </button>
+    <button class="lb" id="bOrph" title="Find Orphan Nodes">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-dasharray="2 2"/></svg>
+    </button>
+    <div class="tdv" style="margin:0 2px"></div>
+    <button class="lb" id="bPng" title="Export PNG">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    </button>
+    <button class="lb" id="bJson" title="Export JSON">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+    </button>
+    <div class="tdv" style="margin:0 2px"></div>
+    <button class="lb" id="bPart" title="Particle Flow — animate edges">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     </button>
   </div>
 </div>
 
+<!-- RIGHT-CLICK CONTEXT MENU -->
+<div id="ctxmenu">
+  <div class="ctxi" id="ctxFocus"><span class="ctxi-ico">⊙</span>Focus here</div>
+  <div class="ctxi" id="ctxPin"><span class="ctxi-ico">📌</span>Pin node</div>
+  <div class="ctxdiv"></div>
+  <div class="ctxi" id="ctxCopy"><span class="ctxi-ico">📋</span>Copy ID</div>
+  <div class="ctxi" id="ctxOpen"><span class="ctxi-ico">↗</span>Open page</div>
+</div>
+
+<!-- FOCUS BANNER -->
+<div id="focbanner">⊙ Focus Mode — double-click empty area or press Esc to exit</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
 <!-- GRAPH -->
-<div id="gWrap">
-  <div id="empty">
-    <div class="ei"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+<div id="gw">
+  <div id="emp">
+    <div class="ei"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
     <p>no nodes match</p>
   </div>
 </div>
 
 <!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="sbStripe"></div>
-  <div class="sb-head">
-    <div class="sb-row1">
-      <span id="sbBadge" class="sb-badge"></span>
-      <button class="sb-x" onclick="closeSidebar()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+<div id="sb">
+  <div id="sbStr"></div>
+  <div class="sbh">
+    <div class="sbh1">
+      <span id="sbBdg" class="sbbdg"></span>
+      <button class="sbx" onclick="closeSB()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
-    <div id="sbTitle"></div>
-    <div id="sbDesc"></div>
+    <div id="sbTi"></div>
+    <div id="sbDe"></div>
   </div>
-  <div class="sb-body">
-    <div class="sb-metrics" id="sbM"></div>
-    <div class="sb-tags" id="sbT"></div>
+  <div class="sbb">
+    <button class="sbback" id="sbBack" onclick="navBack()">
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <span id="sbBackLbl">Back</span>
+    </button>
+    <div class="sbm" id="sbM"></div>
+    <div id="sbPath"></div>
+    <div class="sbtg" id="sbT"></div>
+    <div id="sbIO"></div>
     <div id="sbC"></div>
-    <hr class="sb-div">
+    <hr class="sbd">
     <div id="sbA"></div>
+    <hr class="sbd">
+    <div class="sbanno-wrap">
+      <div class="sbst">Note <span id="sbAnnoInd" style="color:var(--neon);font-size:.5rem"></span></div>
+      <textarea class="sbanno" id="sbanno" placeholder="Add a personal note for this node…"></textarea>
+      <div class="sbanno-btns">
+        <button class="sbanno-save" id="sbannosa">Save</button>
+        <button class="sbanno-del" id="sbannodl">Clear</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- LEGEND -->
-<div id="legend">
-  <div class="leg-t">Node types</div>
-  <div class="leg-r"><div class="leg-d" style="background:#c4b5fd"></div>Core</div>
-  <div class="leg-r"><div class="leg-d" style="background:#22d3ee"></div>Articles</div>
-  <div class="leg-r"><div class="leg-d" style="background:#fbbf24"></div>Calculators</div>
-  <div class="leg-r"><div class="leg-d" style="background:#34d399"></div>Comparisons</div>
-  <div class="leg-r"><div class="leg-d" style="background:#f87171"></div>Reports</div>
-  <div class="leg-r"><div class="leg-d" style="background:#f472b6"></div>Apps</div>
-  <div class="leg-r"><div class="leg-d" style="background:#c084fc"></div>Series</div>
-  <div class="leg-r"><div class="leg-d" style="background:#94a3b8"></div>Standards</div>
+<div id="leg">
+  <div class="legt">Node types</div>
+  <div class="legr"><div class="legd" style="background:#c4b5fd"></div>Core</div>
+  <div class="legr"><div class="legd" style="background:#22d3ee"></div>Articles</div>
+  <div class="legr"><div class="legd" style="background:#fbbf24"></div>Calculators</div>
+  <div class="legr"><div class="legd" style="background:#34d399"></div>Comparisons</div>
+  <div class="legr"><div class="legd" style="background:#f87171"></div>Reports</div>
+  <div class="legr"><div class="legd" style="background:#f472b6"></div>Apps</div>
+  <div class="legr"><div class="legd" style="background:#c084fc"></div>Series</div>
+  <div class="legr"><div class="legd" style="background:#94a3b8"></div>Standards</div>
+  <div class="legr"><div class="legd" style="background:#fb923c"></div>Projects</div>
+  <div class="legr"><div class="legd" style="background:#a3e635"></div>Memory</div>
+  <div class="legdiv"></div>
+  <div class="legt2">Top Connected</div>
+  <div id="legtop"></div>
+</div>
+
+<!-- MINI-MAP -->
+<div id="mmwrap">
+  <canvas id="mm" width="138" height="100"></canvas>
+  <div class="mmlbl">OVERVIEW</div>
+</div>
+
+<!-- PATH TOAST -->
+<div id="ptst">
+  <div class="pthd">Shortest Path <button class="ptclose" id="ptcl">✕</button></div>
+  <div class="ptrow" id="ptrow"></div>
 </div>
 
 <!-- ZOOM -->
-<div id="zctrl">
-  <button class="zb" id="zIn">+</button>
-  <button class="zb" id="zOut">−</button>
-  <button class="zb" id="zFit">⌖</button>
+<div id="zc">
+  <button class="zb" id="zI">+</button>
+  <button class="zb" id="zO">−</button>
+  <button class="zb" id="zR">⌖</button>
+  <button class="zb" id="zFs" title="Full screen">⛶</button>
 </div>
 
 <script>
@@ -531,373 +577,1012 @@ nav{
 
 /* ── STAR FIELD ── */
 (function(){
-  const c=document.getElementById('stars');
-  const ctx=c.getContext('2d');
-  function resize(){c.width=innerWidth;c.height=innerHeight}
-  resize();window.addEventListener('resize',resize);
-  const stars=Array.from({length:90},()=>({
+  const cv=document.getElementById('stars'), x=cv.getContext('2d');
+  const resize=()=>{cv.width=innerWidth;cv.height=innerHeight};
+  resize(); window.addEventListener('resize',resize);
+  const S=Array.from({length:100},()=>({
     x:Math.random(),y:Math.random(),
-    r:Math.random()*1.2+0.2,
-    a:Math.random()*0.6+0.1,
-    speed:Math.random()*0.0003+0.0001,
-    phase:Math.random()*Math.PI*2,
+    r:Math.random()*1.3+0.15,
+    a:Math.random()*.55+.1,
+    spd:Math.random()*.0004+.0001,
+    ph:Math.random()*Math.PI*2
   }));
-  function draw(){
-    ctx.clearRect(0,0,c.width,c.height);
-    const now=performance.now()/1000;
-    stars.forEach(s=>{
-      const alpha=s.a*(0.7+0.3*Math.sin(now*s.speed*100+s.phase));
-      ctx.beginPath();
-      ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(210,230,255,${alpha})`;
-      ctx.fill();
+  (function draw(){
+    x.clearRect(0,0,cv.width,cv.height);
+    const t=performance.now()/1000;
+    S.forEach(s=>{
+      const a=s.a*(.65+.35*Math.sin(t*s.spd*100+s.ph));
+      x.beginPath();x.arc(s.x*cv.width,s.y*cv.height,s.r,0,Math.PI*2);
+      x.fillStyle=`rgba(195,220,255,${a})`;x.fill();
     });
     requestAnimationFrame(draw);
-  }
-  draw();
+  })();
 })();
 
-/* ── DATA ── */
 const BASE='../../';
+const MEM='../../../.claude/projects/-home-baguspermana7/memory/';
 
+/* ── GROUPS ── */
 const G={
-  core:       {col:'#c4b5fd',brd:'#9d6ff7',sz:26,glow:'rgba(196,181,253,0.45)'},
-  articles:   {col:'#22d3ee',brd:'#0891b2',sz:17,glow:'rgba(34,211,238,0.45)'},
-  calculators:{col:'#fbbf24',brd:'#d97706',sz:21,glow:'rgba(251,191,36,0.45)'},
-  comparisons:{col:'#34d399',brd:'#059669',sz:16,glow:'rgba(52,211,153,0.4)'},
-  reports:    {col:'#f87171',brd:'#dc2626',sz:19,glow:'rgba(248,113,113,0.45)'},
-  apps:       {col:'#f472b6',brd:'#db2777',sz:21,glow:'rgba(244,114,182,0.45)'},
-  series:     {col:'#c084fc',brd:'#9333ea',sz:25,glow:'rgba(192,132,252,0.5)'},
-  standards:  {col:'#94a3b8',brd:'#64748b',sz:16,glow:'rgba(148,163,184,0.35)'},
+  core:        {col:'#c4b5fd',brd:'#9d6ff7',sz:25,gl:'rgba(196,181,253,.5)'},
+  articles:    {col:'#22d3ee',brd:'#0891b2',sz:16,gl:'rgba(34,211,238,.45)'},
+  calculators: {col:'#fbbf24',brd:'#d97706',sz:20,gl:'rgba(251,191,36,.45)'},
+  comparisons: {col:'#34d399',brd:'#059669',sz:15,gl:'rgba(52,211,153,.4)'},
+  reports:     {col:'#f87171',brd:'#dc2626',sz:18,gl:'rgba(248,113,113,.45)'},
+  apps:        {col:'#f472b6',brd:'#db2777',sz:20,gl:'rgba(244,114,182,.45)'},
+  series:      {col:'#c084fc',brd:'#9333ea',sz:24,gl:'rgba(192,132,252,.5)'},
+  standards:   {col:'#94a3b8',brd:'#64748b',sz:15,gl:'rgba(148,163,184,.35)'},
+  projects:    {col:'#fb923c',brd:'#ea580c',sz:20,gl:'rgba(251,146,60,.45)'},
+  memory:      {col:'#a3e635',brd:'#65a30d',sz:15,gl:'rgba(163,230,53,.4)'},
 };
 
+/* ── NODES ── */
 const RAW=[
-  {id:'index',     label:'Home',              group:'core',       url:'index.html',        desc:'Main landing page — DC engineering hub.',tags:['landing','portfolio']},
-  {id:'articles',  label:'Engineering Journal',group:'core',       url:'articles.html',     desc:'All long-form technical DC engineering articles.',tags:['journal','articles']},
-  {id:'insights',  label:'All Insights',       group:'core',       url:'insights.html',     desc:'Aggregated hub: Engineering, Geopolitics, Future Forward.',tags:['hub','insights']},
-  {id:'dashboard', label:'Dashboard',          group:'core',       url:'dashboard.html',    desc:'Real-time DC operations dashboard with live metrics.',tags:['dashboard','ops']},
-  {id:'glossary',  label:'Glossary',           group:'core',       url:'glossary.html',     desc:'Comprehensive DC engineering terminology reference.',tags:['reference']},
-  {id:'dc-sol',    label:'DC Solutions',       group:'core',       url:'datacenter-solutions.html',desc:'Overview of data center solutions and services.',tags:['solutions']},
-  {id:'achieve',   label:'Achievements',        group:'core',       url:'achievements.html', desc:'Professional certifications and milestones.',tags:['portfolio']},
-  {id:'geo-hub',   label:'Geopolitics',         group:'series',     url:'geopolitics.html',  desc:'3-part geopolitical risk analysis for global DC infrastructure.',tags:['geopolitics','risk']},
-  {id:'ff-hub',    label:'Future Forward',      group:'series',     url:'future-forward.html',desc:'Paradigm-shift analysis series. Violet accent.',tags:['future','tech']},
-  ...[...Array(23)].map((_,i)=>({id:`art-${i+1}`,label:`Art-${i+1}`,group:'articles',url:`article-${i+1}.html`,desc:`DC engineering article #${i+1}.`,tags:['article','dc']})),
-  {id:'art-24',label:"FF-1: The Web Didn't Die", group:'articles',url:'article-24.html',desc:'Future Forward #1 — web split into walled gardens vs open protocols.',tags:['future-forward','web']},
-  {id:'art-25',label:'FF-2: Engineer Shortage',  group:'articles',url:'article-25.html',desc:'Future Forward #2 — DC engineer shortage is misdiagnosed.',tags:['future-forward','talent']},
-  {id:'art-26',label:'Art-26: PFAS',             group:'articles',url:'article-26.html',desc:'PFAS contamination from DC cooling maintenance vapor. Global Analysis.',tags:['pfas','cooling']},
-  {id:'geo-1', label:'Geo-1: 72-Hour Warning',   group:'articles',url:'geopolitics-1.html',desc:'What happens to your DC in the first 72h of regional conflict.',tags:['geopolitics','risk']},
-  {id:'geo-2', label:'Geo-2: $50T Shift',        group:'articles',url:'geopolitics-2.html',desc:'$50T infrastructure shift reshaping global capital flows.',tags:['geopolitics','capital']},
-  {id:'geo-3', label:'Geo-3: Hormuz Shock',      group:'articles',url:'geopolitics-3.html',desc:'Undersea cable vulnerabilities through Strait of Hormuz.',tags:['geopolitics','cable']},
-  {id:'calc-pue',   label:'PUE Calculator',  group:'calculators',url:'pue-calculator.html',  desc:'Power Usage Effectiveness — 12-location benchmarks.',tags:['pue','power']},
-  {id:'calc-capex', label:'CAPEX Calculator',group:'calculators',url:'capex-calculator.html',desc:'Capital expenditure modeling across regions.',tags:['capex','build']},
-  {id:'calc-opex',  label:'OPEX Calculator', group:'calculators',url:'opex-calculator.html', desc:'Operating expense projections with energy escalation.',tags:['opex','energy']},
-  {id:'calc-roi',   label:'ROI Calculator',  group:'calculators',url:'roi-calculator.html',  desc:'ROI with Monte Carlo sensitivity analysis.',tags:['roi']},
-  {id:'calc-tco',   label:'TCO Calculator',  group:'calculators',url:'tco-calculator.html',  desc:'Build vs Colo vs Cloud — WACC, NPV, S-curve.',tags:['tco','cloud']},
-  {id:'calc-co2',   label:'Carbon Footprint',group:'calculators',url:'carbon-footprint.html',desc:'DC carbon emissions with renewable offset modeling.',tags:['carbon']},
-  {id:'calc-cx',    label:'CX Calculator',   group:'calculators',url:'cx-calculator.html',   desc:'Customer experience and SLA cost impact.',tags:['cx','sla']},
-  {id:'cmp-tier',  label:'Tier 3 vs Tier 4',     group:'comparisons',url:'compare-tier-3-vs-tier-4.html',      desc:'Uptime Institute Tier III vs IV — cost, uptime, redundancy.',tags:['tier','uptime']},
-  {id:'cmp-cool',  label:'Air vs Liquid Cooling', group:'comparisons',url:'compare-air-vs-liquid-cooling.html',  desc:'CRAC vs rear-door/immersion cooling PUE & cost.',tags:['cooling','pue']},
-  {id:'cmp-gen',   label:'Diesel vs Gas Gen',     group:'comparisons',url:'compare-diesel-vs-gas-generator.html',desc:'Generator cost & emissions comparison.',tags:['generator']},
-  {id:'cmp-pue',   label:'PUE vs DCiE',           group:'comparisons',url:'compare-pue-vs-dcie.html',            desc:'Power Usage Effectiveness vs DC Infrastructure Efficiency.',tags:['pue','metrics']},
-  {id:'cmp-n1',    label:'N+1 vs 2N',             group:'comparisons',url:'compare-n1-vs-2n.html',              desc:'Redundancy architecture tradeoffs.',tags:['redundancy']},
-  {id:'cmp-ash',   label:'ASHRAE vs Uptime',       group:'comparisons',url:'compare-ashrae-vs-uptime.html',      desc:'Thermal standards vs Uptime Institute requirements.',tags:['ashrae']},
-  {id:'cmp-fire',  label:'FM200 vs Novec',         group:'comparisons',url:'compare-fm200-vs-novec.html',        desc:'Fire suppression agent comparison.',tags:['fire']},
-  {id:'cmp-floor', label:'Raised Floor vs Slab',  group:'comparisons',url:'compare-raised-floor-vs-slab.html',  desc:'Airflow, cost, and flexibility comparison.',tags:['floor']},
-  {id:'cmp-ups',   label:'UPS Online vs Offline', group:'comparisons',url:'compare-ups-online-vs-offline.html', desc:'UPS topology comparison.',tags:['ups','power']},
-  {id:'cmp-wet',   label:'Wet vs Pre-Action',     group:'comparisons',url:'compare-wet-vs-preaction.html',      desc:'Sprinkler system comparison for DC.',tags:['fire']},
-  {id:'asean',    label:'ASEAN DC Report 2026',  group:'reports',url:'asean-dc-report-2026.html',          desc:'SEA market: SG 850MW, ID 350MW. CBRE 2025.',tags:['asean','market']},
-  {id:'datahall', label:'DataHall AI',            group:'reports',url:'datahallAI.html',                   desc:'AI-ready DC platform. NVLink 1800 GB/s.',tags:['ai','gpu']},
-  {id:'inf-pue',  label:'PUE Infographic',        group:'reports',url:'infographic-pue-global.html',       desc:'Global PUE forecast 1.40→1.55. IRENA 2024.',tags:['pue','forecast']},
-  {id:'inf-sust', label:'DC Sustainability',      group:'reports',url:'infographic-dc-sustainability.html',desc:'DC power 350→620 TWh, AWS 100% renewable. IEA 2025.',tags:['sustainability']},
-  {id:'inf-cost', label:'DC Cost Breakdown',      group:'reports',url:'infographic-dc-cost-breakdown.html', desc:'Cost breakdown: Tier IV 2(N+1), AI rack 40-132kW.',tags:['cost','tier']},
-  {id:'dc-mkt',   label:'DC Market Tracker',      group:'reports',url:'dc-market-tracker.html',            desc:'Interactive world map of 25+ DC markets.',tags:['market','map']},
-  {id:'app-fin',  label:'Finance Terminal', group:'apps',url:'Apps/finance-terminal/index.html', desc:'Real-time financial terminal with quote caching.',tags:['finance','api']},
-  {id:'app-sb',   label:'Second Brain',     group:'apps',url:'Apps/second brain/index.html',     desc:'This knowledge graph — maps all rz-work relationships.',tags:['knowledge','graph']},
-  {id:'app-dca',  label:'DCA App',          group:'apps',url:'Apps/dca-app/index.html',          desc:'Dollar Cost Averaging calculator.',tags:['dca']},
-  {id:'dcmoc',    label:'DC MOC App',       group:'apps',url:'dcmoc/',                           desc:'Next.js 16 Management Operations Center.',tags:['nextjs','react']},
-  {id:'tia',      label:'TIA-942 Checklist',group:'standards',url:'tia-942-checklist.html',          desc:'Interactive TIA-942 compliance checklist.',tags:['tia-942']},
-  {id:'tier-adv', label:'Tier Advisor',     group:'standards',url:'tier-advisor.html',               desc:'Wizard to determine optimal Uptime Institute tier.',tags:['tier']},
-  {id:'rfs',      label:'RFS Workbench',    group:'standards',url:'rfs-readiness-workbench.html',    desc:'Ready For Service assessment workbench.',tags:['rfs']},
-  {id:'ltc-lab',  label:'LTC System Lab',   group:'standards',url:'ltc-system-modelling-lab.html',   desc:'LTC electrical system modelling.',tags:['ltc']},
-  {id:'ltc-std',  label:'Standards LTC Lab',group:'standards',url:'standards-ltc-lab.html',          desc:'Standards reference for LTC system design.',tags:['ltc']},
-  {id:'dc-conv',  label:'DC Conventional',  group:'standards',url:'dc-conventional.html',            desc:'Conventional DC design reference.',tags:['conventional']},
-  {id:'s-chill',  label:'Chiller Plant',    group:'standards',url:'chiller-plant.html',              desc:'Chiller plant SCADA and cooling overview.',tags:['chiller']},
-  {id:'s-fire',   label:'Fire System',      group:'standards',url:'fire-system.html',                desc:'DC fire suppression system.',tags:['fire']},
-  {id:'s-fuel',   label:'Fuel System',      group:'standards',url:'fuel-system.html',                desc:'Generator fuel management.',tags:['fuel']},
-  {id:'s-water',  label:'Water System',     group:'standards',url:'water-system.html',               desc:'Cooling water treatment.',tags:['water']},
+  /* ─ CORE ─ */
+  {id:'idx',    label:'Home',               group:'core',  url:'index.html',              desc:'Main landing page — DC engineering hub, navigation root.',tags:['landing','root'],path:'rz-work/index.html'},
+  {id:'arts',   label:'Engineering Journal',group:'core',  url:'articles.html',           desc:'All 26 long-form technical DC engineering articles.',tags:['journal','articles'],path:'rz-work/articles.html'},
+  {id:'ins',    label:'All Insights',        group:'core',  url:'insights.html',           desc:'Aggregated hub: Engineering Journal, Geopolitics, Future Forward.',tags:['hub','insights'],path:'rz-work/insights.html'},
+  {id:'dash',   label:'Dashboard',           group:'core',  url:'dashboard.html',          desc:'Real-time DC operations dashboard with live metrics and tool links.',tags:['dashboard','ops'],path:'rz-work/dashboard.html'},
+  {id:'glos',   label:'Glossary',            group:'core',  url:'glossary.html',           desc:'Comprehensive DC engineering terminology reference.',tags:['reference','glossary'],path:'rz-work/glossary.html'},
+  {id:'dcsol',  label:'DC Solutions',        group:'core',  url:'datacenter-solutions.html',desc:'Overview of data center solutions, services, and system pages.',tags:['solutions'],path:'rz-work/datacenter-solutions.html'},
+  {id:'ach',    label:'Achievements',         group:'core',  url:'achievements.html',       desc:'Professional certifications, projects, and milestones.',tags:['portfolio'],path:'rz-work/achievements.html'},
+  {id:'rzops',  label:'Admin Console',        group:'core',  url:'rz-ops-p7x3k9m.html',    desc:'Site admin console. Logout redirects to index.html.',tags:['admin','ops'],path:'rz-work/rz-ops-p7x3k9m.html'},
+
+  /* ─ SERIES ─ */
+  {id:'geo',    label:'Geopolitics Series',  group:'series',url:'geopolitics.html',        desc:'3-part geopolitical risk series on global DC infrastructure threats.',tags:['geopolitics','series'],path:'rz-work/geopolitics.html'},
+  {id:'ff',     label:'Future Forward',      group:'series',url:'future-forward.html',     desc:'Paradigm-shift analysis series. Violet accent #a855f7. CSS prefix -ff.',tags:['future','tech','series'],path:'rz-work/future-forward.html'},
+
+  /* ─ ARTICLES ─ */
+  ...[...Array(23)].map((_,i)=>({id:`a${i+1}`,label:`Art-${i+1}`,group:'articles',url:`article-${i+1}.html`,desc:`DC engineering article #${i+1}.`,tags:['article','dc'],path:`rz-work/article-${i+1}.html`})),
+  {id:'a24',label:"FF-1: The Web Didn't Die", group:'articles',url:'article-24.html',desc:'Future Forward #1 — web split: walled gardens vs open protocols. Violet.',tags:['ff','web'],path:'rz-work/article-24.html'},
+  {id:'a25',label:'FF-2: Engineer Shortage',  group:'articles',url:'article-25.html',desc:'Future Forward #2 — DC engineer shortage is misdiagnosed. Amber.',tags:['ff','talent'],path:'rz-work/article-25.html'},
+  {id:'a26',label:'Art-26: PFAS',             group:'articles',url:'article-26.html',desc:'Global Analysis — PFAS contamination from DC cooling maintenance vapor. Red.',tags:['pfas','cooling'],path:'rz-work/article-26.html'},
+  {id:'g1', label:'Geo-1: 72-Hour Warning',   group:'articles',url:'geopolitics-1.html',desc:'What happens to your DC in the first 72h of regional conflict.',tags:['geopolitics','risk'],path:'rz-work/geopolitics-1.html'},
+  {id:'g2', label:'Geo-2: $50T Shift',        group:'articles',url:'geopolitics-2.html',desc:'$50T infrastructure shift reshaping global capital flows.',tags:['geopolitics','capital'],path:'rz-work/geopolitics-2.html'},
+  {id:'g3', label:'Geo-3: Hormuz Shock',      group:'articles',url:'geopolitics-3.html',desc:'Undersea cable vulnerabilities through the Strait of Hormuz.',tags:['geopolitics','cable'],path:'rz-work/geopolitics-3.html'},
+
+  /* ─ CALCULATORS ─ */
+  {id:'cpue',  label:'PUE Calculator',  group:'calculators',url:'pue-calculator.html',  desc:'Power Usage Effectiveness — 12-location benchmarks. Dark mode.',tags:['pue','power'],path:'rz-work/pue-calculator.html'},
+  {id:'ccap',  label:'CAPEX Calculator',group:'calculators',url:'capex-calculator.html',desc:'Capital expenditure modeling across regions. Dark mode.',tags:['capex','build'],path:'rz-work/capex-calculator.html'},
+  {id:'copx',  label:'OPEX Calculator', group:'calculators',url:'opex-calculator.html', desc:'Operating expense projections with energy escalation. Dark mode.',tags:['opex','energy'],path:'rz-work/opex-calculator.html'},
+  {id:'croi',  label:'ROI Calculator',  group:'calculators',url:'roi-calculator.html',  desc:'ROI with Monte Carlo sensitivity analysis. Dark mode.',tags:['roi'],path:'rz-work/roi-calculator.html'},
+  {id:'ctco',  label:'TCO Calculator',  group:'calculators',url:'tco-calculator.html',  desc:'Build vs Colo vs Cloud — WACC, NPV, S-curve. Dark mode.',tags:['tco','cloud'],path:'rz-work/tco-calculator.html'},
+  {id:'cco2',  label:'Carbon Footprint',group:'calculators',url:'carbon-footprint.html',desc:'DC carbon emissions with renewable offset modeling.',tags:['carbon'],path:'rz-work/carbon-footprint.html'},
+  {id:'ccx',   label:'CX Calculator',   group:'calculators',url:'cx-calculator.html',   desc:'Customer experience and SLA cost impact.',tags:['cx','sla'],path:'rz-work/cx-calculator.html'},
+
+  /* ─ COMPARISONS ─ */
+  {id:'cpt',label:'Tier 3 vs Tier 4',    group:'comparisons',url:'compare-tier-3-vs-tier-4.html',      desc:'Uptime Institute Tier III vs IV — cost, uptime, redundancy. Premium 35-60%.',tags:['tier'],path:'rz-work/compare-tier-3-vs-tier-4.html'},
+  {id:'cpc',label:'Air vs Liquid Cool',  group:'comparisons',url:'compare-air-vs-liquid-cooling.html',  desc:'CRAC vs rear-door/immersion cooling PUE & cost comparison.',tags:['cooling','pue'],path:'rz-work/compare-air-vs-liquid-cooling.html'},
+  {id:'cpg',label:'Diesel vs Gas Gen',   group:'comparisons',url:'compare-diesel-vs-gas-generator.html',desc:'Generator cost & emissions comparison.',tags:['generator'],path:'rz-work/compare-diesel-vs-gas-generator.html'},
+  {id:'cpp',label:'PUE vs DCiE',         group:'comparisons',url:'compare-pue-vs-dcie.html',            desc:'Power Usage Effectiveness vs DC Infrastructure Efficiency metrics.',tags:['pue','metrics'],path:'rz-work/compare-pue-vs-dcie.html'},
+  {id:'cpn',label:'N+1 vs 2N',           group:'comparisons',url:'compare-n1-vs-2n.html',              desc:'Redundancy architecture tradeoffs: N+1 vs 2N vs 2(N+1).',tags:['redundancy'],path:'rz-work/compare-n1-vs-2n.html'},
+  {id:'cpa',label:'ASHRAE vs Uptime',    group:'comparisons',url:'compare-ashrae-vs-uptime.html',      desc:'ASHRAE thermal standards vs Uptime Institute requirements.',tags:['ashrae'],path:'rz-work/compare-ashrae-vs-uptime.html'},
+  {id:'cpf',label:'FM200 vs Novec',      group:'comparisons',url:'compare-fm200-vs-novec.html',        desc:'Fire suppression agent comparison: FM-200 vs 3M Novec 1230.',tags:['fire'],path:'rz-work/compare-fm200-vs-novec.html'},
+  {id:'cpl',label:'Raised Floor vs Slab',group:'comparisons',url:'compare-raised-floor-vs-slab.html',  desc:'Raised floor vs concrete slab: airflow, cost, flexibility.',tags:['floor'],path:'rz-work/compare-raised-floor-vs-slab.html'},
+  {id:'cpu',label:'UPS Online vs Offline',group:'comparisons',url:'compare-ups-online-vs-offline.html',desc:'Online double-conversion vs offline/standby UPS topology.',tags:['ups'],path:'rz-work/compare-ups-online-vs-offline.html'},
+  {id:'cpw',label:'Wet vs Pre-Action',   group:'comparisons',url:'compare-wet-vs-preaction.html',      desc:'Wet pipe vs pre-action sprinkler for DC environments.',tags:['fire'],path:'rz-work/compare-wet-vs-preaction.html'},
+
+  /* ─ REPORTS ─ */
+  {id:'asean',  label:'ASEAN DC Report 2026',group:'reports',url:'asean-dc-report-2026.html',          desc:'SEA DC market: SG 850MW, ID 350MW, MY/TH expansion. CBRE 2025.',tags:['asean','market'],path:'rz-work/asean-dc-report-2026.html'},
+  {id:'dhall',  label:'DataHall AI',          group:'reports',url:'datahallAI.html',                   desc:'AI-ready DC platform overview. NVLink 1800 GB/s, 3 tiers.',tags:['ai','gpu'],path:'rz-work/datahallAI.html'},
+  {id:'ipue',   label:'PUE Infographic',      group:'reports',url:'infographic-pue-global.html',       desc:'Global PUE forecast 1.40→1.55 across 12 locations. IRENA 2024.',tags:['pue','forecast'],path:'rz-work/infographic-pue-global.html'},
+  {id:'isust',  label:'DC Sustainability',    group:'reports',url:'infographic-dc-sustainability.html',desc:'DC power 350→620 TWh, AWS 100% renewable. IEA 2025.',tags:['sustainability'],path:'rz-work/infographic-dc-sustainability.html'},
+  {id:'icost',  label:'DC Cost Breakdown',    group:'reports',url:'infographic-dc-cost-breakdown.html',desc:'Cost breakdown: Tier IV 2(N+1), AI rack 40-132kW.',tags:['cost','tier'],path:'rz-work/infographic-dc-cost-breakdown.html'},
+  {id:'dcmkt',  label:'DC Market Tracker',    group:'reports',url:'dc-market-tracker.html',            desc:'Interactive SVG world map of 25+ DC markets with filterable data.',tags:['market','map'],path:'rz-work/dc-market-tracker.html'},
+
+  /* ─ DC MARKET CITIES ─ */
+  {id:'m-sg',   label:'Market: Singapore',     group:'reports',url:'dc-market/singapore.html',      desc:'Singapore DC market: 850MW capacity, Tier III-IV, CBRE 2025.',tags:['singapore','market'],path:'rz-work/dc-market/singapore.html'},
+  {id:'m-jk',   label:'Market: Jakarta',       group:'reports',url:'dc-market/jakarta.html',        desc:'Jakarta DC market: 350MW, growing hyperscaler demand. JLL 2025.',tags:['jakarta','indonesia'],path:'rz-work/dc-market/jakarta.html'},
+  {id:'m-kl',   label:'Market: Kuala Lumpur',  group:'reports',url:'dc-market/kuala-lumpur.html',   desc:'Kuala Lumpur DC market: expanding colocation hub. MY electricity.',tags:['kuala-lumpur','malaysia'],path:'rz-work/dc-market/kuala-lumpur.html'},
+  {id:'m-tk',   label:'Market: Tokyo',         group:'reports',url:'dc-market/tokyo.html',          desc:'Tokyo DC market: Tier IV dense, BOJ inflation impact on opex.',tags:['tokyo','japan'],path:'rz-work/dc-market/tokyo.html'},
+  {id:'m-sy',   label:'Market: Sydney',        group:'reports',url:'dc-market/sydney.html',         desc:'Sydney DC market: APAC anchor, renewable energy push.',tags:['sydney','australia'],path:'rz-work/dc-market/sydney.html'},
+  {id:'m-lo',   label:'Market: London',        group:'reports',url:'dc-market/london.html',         desc:'London DC market: FLAP-D hub, sustainability regulation.',tags:['london','uk'],path:'rz-work/dc-market/london.html'},
+  {id:'m-fr',   label:'Market: Frankfurt',     group:'reports',url:'dc-market/frankfurt.html',      desc:'Frankfurt DC market: largest European DC hub.',tags:['frankfurt','europe'],path:'rz-work/dc-market/frankfurt.html'},
+  {id:'m-db',   label:'Market: Dubai',         group:'reports',url:'dc-market/dubai.html',          desc:'Dubai DC market: MENA connectivity hub, free zone expansion.',tags:['dubai','mena'],path:'rz-work/dc-market/dubai.html'},
+  {id:'m-mb',   label:'Market: Mumbai',        group:'reports',url:'dc-market/mumbai.html',         desc:'Mumbai DC market: India hyperscaler growth zone.',tags:['mumbai','india'],path:'rz-work/dc-market/mumbai.html'},
+  {id:'m-va',   label:'Market: N. Virginia',   group:'reports',url:'dc-market/northern-virginia.html',desc:'Northern Virginia: largest DC market globally. elecPrice 0.065/kWh.',tags:['virginia','usa'],path:'rz-work/dc-market/northern-virginia.html'},
+
+  /* ─ APPS (rz-work) ─ */
+  {id:'afin',  label:'Finance Terminal', group:'apps',url:'Apps/finance-terminal/index.html',desc:'Real-time financial terminal. QUOTE_CACHE 5min TTL, batchQuotes(), RateLimiter.',tags:['finance','api'],path:'rz-work/Apps/finance-terminal/index.html'},
+  {id:'asb',   label:'Second Brain',     group:'apps',url:'Apps/second brain/index.html',    desc:'This knowledge graph — maps the full ResistanceZero ecosystem.',tags:['knowledge','graph','meta'],path:'rz-work/Apps/second brain/index.html'},
+  {id:'adca',  label:'DCA App',          group:'apps',url:'Apps/dca-app/index.html',         desc:'Dollar Cost Averaging calculator for systematic investment.',tags:['dca','investment'],path:'rz-work/Apps/dca-app/index.html'},
+  {id:'ademo', label:'Dunia Emosi',      group:'apps',url:'Apps/dunia-emosi/index.html',     desc:'Educational emotion game for kids aged 5-10. 9 game modules. "Dreamy Meadow" purple.',tags:['kids','game','education'],path:'rz-work/Apps/dunia-emosi/index.html'},
+  {id:'dcmoc', label:'DC MOC App',       group:'apps',url:'dcmoc/',                          desc:'Next.js 16 Management Operations Center. React 19, TypeScript, Tailwind, Zustand.',tags:['nextjs','react','ops'],path:'rz-work/dcmoc/'},
+  {id:'astock',label:'Stock Screener',   group:'apps',url:'Apps/stock_screener/',            desc:'Stock analysis and screening tool.',tags:['stocks','finance'],path:'rz-work/Apps/stock_screener/'},
+
+  /* ─ STANDARDS ─ */
+  {id:'stia',  label:'TIA-942 Checklist',  group:'standards',url:'tia-942-checklist.html',          desc:'Interactive TIA-942 compliance checklist with scoring.',tags:['tia-942','compliance'],path:'rz-work/tia-942-checklist.html'},
+  {id:'stier', label:'Tier Advisor',       group:'standards',url:'tier-advisor.html',               desc:'Wizard to determine optimal Uptime Institute tier.',tags:['tier'],path:'rz-work/tier-advisor.html'},
+  {id:'srfs',  label:'RFS Workbench',      group:'standards',url:'rfs-readiness-workbench.html',    desc:'Ready For Service assessment workbench.',tags:['rfs'],path:'rz-work/rfs-readiness-workbench.html'},
+  {id:'sltc',  label:'LTC System Lab',     group:'standards',url:'ltc-system-modelling-lab.html',   desc:'LTC electrical system modelling. elecPrice 0.065 Virginia.',tags:['ltc','electrical'],path:'rz-work/ltc-system-modelling-lab.html'},
+  {id:'sltcr', label:'Standards LTC Lab',  group:'standards',url:'standards-ltc-lab.html',          desc:'Standards reference for LTC system design.',tags:['ltc','standards'],path:'rz-work/standards-ltc-lab.html'},
+  {id:'sdcv',  label:'DC Conventional',    group:'standards',url:'dc-conventional.html',            desc:'Conventional DC design reference and specifications.',tags:['conventional'],path:'rz-work/dc-conventional.html'},
+  {id:'sch',   label:'Chiller Plant',      group:'standards',url:'chiller-plant.html',              desc:'Chiller plant SCADA and cooling overview.',tags:['chiller','scada'],path:'rz-work/chiller-plant.html'},
+  {id:'sfr',   label:'Fire System',        group:'standards',url:'fire-system.html',                desc:'DC fire suppression system documentation.',tags:['fire'],path:'rz-work/fire-system.html'},
+  {id:'sfu',   label:'Fuel System',        group:'standards',url:'fuel-system.html',                desc:'Generator fuel management and day tank system.',tags:['fuel'],path:'rz-work/fuel-system.html'},
+  {id:'swt',   label:'Water System',       group:'standards',url:'water-system.html',               desc:'Cooling water treatment and distribution.',tags:['water'],path:'rz-work/water-system.html'},
+  /* LTC lab series */
+  {id:'ltc1',  label:'LTC: TIA Topology',  group:'standards',url:'ltc-ansi-tia-topology-readiness.html', desc:'ANSI/TIA topology readiness assessment lab.',tags:['ltc','tia'],path:'rz-work/ltc-ansi-tia-topology-readiness.html'},
+  {id:'ltc2',  label:'LTC: ASHRAE Thermal',group:'standards',url:'ltc-ashrae-thermal-control.html',      desc:'ASHRAE thermal control lab module.',tags:['ltc','ashrae'],path:'rz-work/ltc-ashrae-thermal-control.html'},
+  {id:'ltc3',  label:'LTC: ISO Energy',    group:'standards',url:'ltc-iso-energy-governance.html',       desc:'ISO energy governance lab module.',tags:['ltc','iso'],path:'rz-work/ltc-iso-energy-governance.html'},
+  {id:'ltc4',  label:'LTC: NFPA Fire Risk',group:'standards',url:'ltc-nfpa-fire-risk.html',              desc:'NFPA fire risk assessment lab module.',tags:['ltc','nfpa'],path:'rz-work/ltc-nfpa-fire-risk.html'},
+  {id:'ltc5',  label:'LTC: Uptime Tier',   group:'standards',url:'ltc-uptime-tier-alignment.html',       desc:'Uptime tier alignment lab module.',tags:['ltc','uptime'],path:'rz-work/ltc-uptime-tier-alignment.html'},
+  /* Pillar pages */
+  {id:'pcool', label:'Pillar: Cooling',    group:'standards',url:'pillar-cooling.html',        desc:'Cooling systems pillar content page.',tags:['pillar','cooling'],path:'rz-work/pillar-cooling.html'},
+  {id:'pfire', label:'Pillar: Fire Safety',group:'standards',url:'pillar-fire-safety.html',    desc:'Fire safety pillar content page.',tags:['pillar','fire'],path:'rz-work/pillar-fire-safety.html'},
+  {id:'ppwr',  label:'Pillar: Power',      group:'standards',url:'pillar-power.html',          desc:'Power systems pillar content page.',tags:['pillar','power'],path:'rz-work/pillar-power.html'},
+  {id:'pstd',  label:'Pillar: Standards',  group:'standards',url:'pillar-standards.html',      desc:'Standards pillar content page.',tags:['pillar','standards'],path:'rz-work/pillar-standards.html'},
+  {id:'psust', label:'Pillar: Sustainability',group:'standards',url:'pillar-sustainability.html',desc:'Sustainability pillar content page.',tags:['pillar','sustainability'],path:'rz-work/pillar-sustainability.html'},
+
+  /* ─ PROJECTS (Bagus_Apps) ─ */
+  {id:'mp2',   label:'MoneyPrinter V2',    group:'projects',url:null,desc:'AI video generation pipeline. Ollama llama3.2, Gemini API, KittenTTS. Flask dashboard. Python 3.13.',tags:['video','ai','youtube'],path:'Bagus_Apps/MoneyPrinter2/'},
+  {id:'nemo',  label:'NemoClaw Bot',       group:'projects',url:null,desc:'Telegram RZ-Agent (@Moldbot#1). Gemini 2.5 Flash Lite. Docker container on port 8080.',tags:['telegram','bot','gemini'],path:'Bagus_Apps/ (Docker container)'},
+  {id:'clip',  label:'Clipper Project',    group:'projects',url:null,desc:'115 clips from 8 videos for TikTok/YouTube Shorts. Leon(30)+GenZ(10)+Uang(15)+Agenda(15)+Emir(45).',tags:['tiktok','shorts','video'],path:'Bagus_Apps/video/Clipper Project/'},
+  {id:'aff',   label:'Affiliate App',      group:'projects',url:'https://baguspermana7-cpu.github.io/affiliate-apps/',desc:'Video ad & thumbnail generator. Gemini image-edit prompts. GitHub Pages PWA.',tags:['affiliate','pwa','gemini'],path:'Bagus_Apps/Affiliate/apps/index.html'},
+  {id:'myvid', label:'My-Video (Remotion)', group:'projects',url:null,desc:'Remotion TypeScript project for generating product/article promo videos.',tags:['remotion','video','typescript'],path:'my-video/'},
+  {id:'tl',    label:'Timelapse Project',   group:'projects',url:null,desc:'Renovation timelapse. 12 Gemini images → Veo 3.1 clips → assembly.',tags:['timelapse','veo','gemini'],path:'Bagus_Apps/video/renovasi/'},
+
+  /* ─ DOCUMENTATION / STANDARDIZATION ─ */
+  {id:'vault',  label:'Obsidian Vault',      group:'memory',url:null,desc:'Knowledge vault — 7 hub categories, 60+ mapped nodes, Graphify Protocol, Obsidian graph view.',tags:['vault','obsidian','docs'],path:'rz-work/Apps/second brain/obsidian-knowledge-vault/'},
+  {id:'sbdoc',  label:'Second Brain Docs',   group:'memory',url:null,desc:'Documentation & standardization for this app — NODE-REGISTRY, GRAPHIFY-PROTOCOL, OBSIDIAN-SETUP standards.',tags:['docs','standard','second-brain'],path:'rz-work/Apps/second brain/Documentation and standarization/'},
+  {id:'rzstd',  label:'RZ Standardization',  group:'memory',url:null,desc:'Global rz-work standards — PRO_MODE, PDF_EXPORT, TOOLTIP, AUTH, UI_FEATURES, SEO, LEGAL, DATAHALL_AI.',tags:['standard','rz-work'],path:'rz-work/standarization/'},
+
+  /* ─ MEMORY ─ */
+  {id:'mem',    label:'MEMORY.md (Hub)',     group:'memory',url:null,desc:'Master memory index for all Claude sessions. 200-line index of all memory files.',tags:['memory','index'],path:'.claude/projects/-home-baguspermana7/memory/MEMORY.md'},
+  {id:'mde',    label:'Mem: Dunia Emosi',   group:'memory',url:null,desc:'Dunia Emosi app details — 9 modules, color palette, game mechanics.',tags:['memory','dunia-emosi'],path:'memory/dunia-emosi-details.md'},
+  {id:'mdcm',   label:'Mem: DCMOC',         group:'memory',url:null,desc:'DC MOC app details — Next.js stack, module breakdown, API endpoints.',tags:['memory','dcmoc'],path:'memory/dcmoc-details.md'},
+  {id:'mpf',    label:'Mem: Portfolio',     group:'memory',url:null,desc:'Portfolio website details — 28+ HTML files, CSS patterns, fixes applied.',tags:['memory','portfolio'],path:'memory/portfolio-details.md'},
+  {id:'mmp',    label:'Mem: MoneyPrinter',  group:'memory',url:null,desc:'MoneyPrinter V2 session — setup, patches, pipeline status.',tags:['memory','moneyprinter'],path:'memory/moneyprinter-session-0322.md'},
+  {id:'mclip',  label:'Mem: Clipper',       group:'memory',url:null,desc:'Clipper project session — 115 clips, campaign details, smart re-clip.',tags:['memory','clipper'],path:'memory/clipper-session-0401.md'},
+  {id:'mclips', label:'Mem: Clipping Std',  group:'memory',url:null,desc:'Clipping standard — naming, export settings, TikTok format spec.',tags:['memory','standard'],path:'memory/clipping-standard.md'},
+  {id:'mtl',    label:'Mem: Timelapse',     group:'memory',url:null,desc:'Timelapse video session — Gemini prompts, Veo workflow, lessons learned.',tags:['memory','timelapse'],path:'memory/timelapse-video-session.md'},
+  {id:'mdh',    label:'Mem: DataHall AI',   group:'memory',url:null,desc:'DataHall AI session details — NVLink corrections, market data.',tags:['memory','datahall'],path:'memory/datahallai-details.md'},
+  {id:'mch',    label:'Mem: Chiller SCADA', group:'memory',url:null,desc:'Chiller plant SCADA session — system design, data points.',tags:['memory','chiller'],path:'memory/chiller-plant-session.md'},
+  {id:'msec',   label:'Mem: Security Audit',group:'memory',url:null,desc:'Security & SEO audit — XSS fixes, nginx hardening, auth.js guard.',tags:['memory','security'],path:'memory/security-seo-audit-session.md'},
+  {id:'mii',    label:'Mem: Idea Improve',  group:'memory',url:null,desc:'Idea improvement notes — standardization, new feature ideas.',tags:['memory','ideas'],path:'memory/idea-improvement.md'},
+  {id:'maffil', label:'Mem: Affiliate App', group:'memory',url:null,desc:'Affiliate app details — variable counts, architecture, deploy process.',tags:['memory','affiliate'],path:'memory/affiliate-app-details.md'},
+  {id:'mfba',   label:'Feedback: Auth',     group:'memory',url:null,desc:'Auth standard feedback — always use AUTH_STANDARD.md, no prompt().',tags:['feedback','auth'],path:'memory/feedback_auth_standard.md'},
+  {id:'mfbm',   label:'Feedback: Maps',     group:'memory',url:null,desc:'Map style feedback — use Leaflet.js real map, not SVG bubble maps.',tags:['feedback','map'],path:'memory/feedback_map_style.md'},
+  {id:'mfbi',   label:'Feedback: Isolation',group:'memory',url:null,desc:'Project isolation — MoneyPrinter (Bagus_Apps) separate from rz-work.',tags:['feedback','isolation'],path:'memory/feedback_project_isolation.md'},
 ];
 
-const EDGES=[
-  ['index','articles'],['index','insights'],['index','dashboard'],['index','dc-sol'],['index','achieve'],
-  ['insights','articles'],['insights','geo-hub'],['insights','ff-hub'],
-  ['geo-hub','geo-1'],['geo-hub','geo-2'],['geo-hub','geo-3'],
-  ['ff-hub','art-24'],['ff-hub','art-25'],
-  ...Array.from({length:25},(_,i)=>['articles',`art-${i+1}`]),
-  ['articles','art-26'],['articles','geo-1'],['articles','geo-2'],['articles','geo-3'],['articles','art-24'],['articles','art-25'],
-  ['dashboard','calc-pue'],['dashboard','calc-capex'],['dashboard','calc-opex'],
-  ['dashboard','calc-roi'],['dashboard','calc-tco'],['dashboard','calc-co2'],
-  ['calc-capex','calc-opex'],['calc-opex','calc-roi'],['calc-roi','calc-tco'],['calc-tco','calc-capex'],
-  ['calc-pue','calc-co2'],
-  ['cmp-pue','calc-pue'],['cmp-tier','calc-capex'],['cmp-cool','calc-pue'],['cmp-cool','calc-opex'],
-  ['cmp-tier','tier-adv'],['cmp-ash','tia'],['cmp-fire','s-fire'],
-  ['asean','datahall'],['asean','dc-mkt'],['dc-mkt','datahall'],
-  ['inf-pue','calc-pue'],['inf-sust','calc-co2'],['inf-cost','calc-capex'],['inf-cost','cmp-tier'],
-  ['app-sb','app-fin'],['app-sb','dcmoc'],['dcmoc','dashboard'],
-  ['tia','tier-adv'],['ltc-lab','ltc-std'],
-  ['dc-sol','dc-conv'],['dc-sol','s-chill'],['dc-sol','s-fire'],['dc-sol','s-fuel'],['dc-sol','s-water'],
-  ['art-26','cmp-fire'],['art-26','inf-sust'],
+/* ── EDGES ── */
+const E=[
+  ['idx','arts'],['idx','ins'],['idx','dash'],['idx','dcsol'],['idx','ach'],['idx','rzops'],
+  ['ins','arts'],['ins','geo'],['ins','ff'],['ins','asb'],
+  ['geo','g1'],['geo','g2'],['geo','g3'],
+  ['ff','a24'],['ff','a25'],
+  ...Array.from({length:25},(_,i)=>['arts',`a${i+1}`]),
+  ['arts','a26'],['arts','g1'],['arts','g2'],['arts','g3'],['arts','a24'],['arts','a25'],
+  ['dash','cpue'],['dash','ccap'],['dash','copx'],['dash','croi'],['dash','ctco'],['dash','cco2'],
+  ['ccap','copx'],['copx','croi'],['croi','ctco'],['ctco','ccap'],['cpue','cco2'],
+  ['cpp','cpue'],['cpt','ccap'],['cpc','cpue'],['cpc','copx'],
+  ['cpt','stier'],['cpa','stia'],['cpf','sfr'],
+  ['asean','dhall'],['asean','dcmkt'],['dcmkt','dhall'],
+  ['ipue','cpue'],['isust','cco2'],['icost','ccap'],['icost','cpt'],
+  /* market cities → tracker hub */
+  ['dcmkt','m-sg'],['dcmkt','m-jk'],['dcmkt','m-kl'],['dcmkt','m-tk'],
+  ['dcmkt','m-sy'],['dcmkt','m-lo'],['dcmkt','m-fr'],['dcmkt','m-db'],['dcmkt','m-mb'],['dcmkt','m-va'],
+  /* apps */
+  ['asb','afin'],['asb','dcmoc'],['dcmoc','dash'],['ademo','adca'],
+  ['dcsol','sdcv'],['dcsol','sch'],['dcsol','sfr'],['dcsol','sfu'],['dcsol','swt'],
+  ['stia','stier'],['sltc','sltcr'],
+  /* LTC labs → hub */
+  ['sltc','ltc1'],['sltc','ltc2'],['sltc','ltc3'],['sltc','ltc4'],['sltc','ltc5'],
+  ['sltcr','ltc1'],
+  /* LTC lab cross-connections — each lab links to relevant comparison/system/pillar */
+  ['ltc1','stia'],['ltc1','cpt'],                   // TIA Topology → TIA-942 + Tier
+  ['ltc2','cpa'],['ltc2','sch'],['ltc2','pcool'],   // ASHRAE Thermal → ASHRAE compare + Chiller + Cooling pillar
+  ['ltc3','cco2'],['ltc3','copx'],['ltc3','psust'], // ISO Energy → Carbon + OPEX + Sustainability pillar
+  ['ltc4','sfr'],['ltc4','cpf'],['ltc4','pfire'],   // NFPA Fire → Fire System + FM200 + Fire pillar
+  ['ltc5','stier'],['ltc5','cpt'],['ltc5','cpa'],   // Uptime Tier → Tier Advisor + Tier compare + ASHRAE compare
+  /* pillar pages */
+  ['dcsol','pcool'],['dcsol','pfire'],['dcsol','ppwr'],['dcsol','pstd'],['dcsol','psust'],
+  ['pcool','sch'],['pfire','sfr'],['ppwr','sfu'],
+  /* pillar extensions — connect pillars to relevant comparisons/calculators */
+  ['pcool','cpc'],['pcool','cpl'],                  // Cooling pillar → Air vs Liquid + Raised Floor
+  ['pfire','cpf'],['pfire','cpw'],                  // Fire pillar → FM200 vs Novec + Wet vs Pre-Action
+  ['ppwr','cpu'],['ppwr','cpg'],['ppwr','cpn'],      // Power pillar → UPS + Diesel vs Gas + N+1 vs 2N
+  ['pstd','stia'],['pstd','stier'],['pstd','srfs'], // Standards pillar → TIA-942 + Tier Advisor + RFS
+  ['psust','cco2'],['psust','isust'],               // Sustainability pillar → Carbon calc + Sustainability infographic
+  /* Diesel vs Gas Gen connections (was isolated) */
+  ['cpg','sfu'],['cpg','sfr'],['cpg','ppwr'],['cpg','cpn'],
+  /* UPS Online vs Offline connections (was isolated) */
+  ['cpu','cpn'],['cpu','ppwr'],['cpu','stier'],['cpu','ccap'],
+  /* Wet vs Pre-Action connections (was isolated) */
+  ['cpw','sfr'],['cpw','cpf'],['cpw','pfire'],['cpw','a26'],
+  /* Raised Floor vs Slab connections (was isolated) */
+  ['cpl','pcool'],['cpl','cpc'],['cpl','sch'],
+  /* N+1 vs 2N connections (was isolated) */
+  ['cpn','stier'],['cpn','cpt'],['cpn','ppwr'],['cpn','ccap'],
+  /* ASHRAE vs Uptime additional connections */
+  ['cpa','stier'],['cpa','cpt'],['cpa','pcool'],
+  /* PUE vs DCiE additional connections */
+  ['cpp','ipue'],['cpp','cco2'],
+  /* articles cross-links */
+  ['a26','cpf'],['a26','isust'],
+  /* projects */
+  ['mp2','nemo'],['mp2','clip'],['clip','aff'],
+  ['asb','myvid'],['asb','tl'],
+  /* projects → apps/articles */
+  ['ademo','asb'],['aff','asb'],
+  ['mp2','asb'],
+  /* documentation nodes */
+  ['vault','asb'],['vault','mem'],['sbdoc','asb'],['sbdoc','vault'],
+  ['rzstd','idx'],['rzstd','sbdoc'],['mem','rzstd'],['mem','vault'],
+  /* memory → hub */
+  ['mem','mde'],['mem','mdcm'],['mem','mpf'],['mem','mmp'],['mem','mclip'],
+  ['mem','mclips'],['mem','mtl'],['mem','mdh'],['mem','mch'],['mem','msec'],
+  ['mem','mii'],['mem','maffil'],['mem','mfba'],['mem','mfbm'],['mem','mfbi'],
+  /* memory → related nodes */
+  ['mde','ademo'],['mdcm','dcmoc'],['mpf','idx'],
+  ['mmp','mp2'],['mclip','clip'],['mclips','clip'],
+  ['mtl','tl'],['mdh','dhall'],['mch','sch'],
+  ['msec','rzops'],['maffil','aff'],
+  /* feedback → projects */
+  ['mfba','ademo'],['mfbm','dcmoc'],
 ];
 
 /* ── GRAPH ── */
-let net=null, vN=null, vE=null, activeG='all', q='';
+let net=null,vN=null,vE=null,ag='all',q='',adj={},hoverId=null,pathMode=false,pathSel=null,focusId=null,curSBid=null;
+let navHistory=[],pinnedNodes=new Set(),particleOn=false,particles=[],partRaf=null,ctxNodeId=null;
 
 function build(){
-  const fil=RAW.filter(n=>{
-    const gm=activeG==='all'||n.group===activeG;
+  let fil=RAW.filter(n=>{
+    const gm=ag==='all'||n.group===ag;
     const sm=!q||n.label.toLowerCase().includes(q)||n.id.includes(q)||(n.tags||[]).some(t=>t.includes(q));
     return gm&&sm;
   });
+  /* reset path state on rebuild */
+  pathMode=false;pathSel=null;hoverId=null;
+  const bpBtn=document.getElementById('bPth');
+  if(bpBtn)bpBtn.classList.remove('pon');
+  const ptEl=document.getElementById('ptst');
+  if(ptEl)ptEl.classList.remove('show');
+
+  /* focus mode pre-filter: build temp adj from ALL edges to find neighbours */
+  if(focusId){
+    const tmpAdj={};RAW.forEach(n=>{tmpAdj[n.id]=new Set()});
+    E.forEach(([a,b])=>{if(tmpAdj[a])tmpAdj[a].add(b);if(tmpAdj[b])tmpAdj[b].add(a)});
+    const focusSet=new Set([focusId,...(tmpAdj[focusId]||[])]);
+    fil=fil.filter(n=>focusSet.has(n.id));
+  }
+
   const ids=new Set(fil.map(n=>n.id));
-  const edges=EDGES.filter(([a,b])=>ids.has(a)&&ids.has(b));
+  const edges=E.filter(([a,b])=>ids.has(a)&&ids.has(b));
+  /* build adjacency map for hover highlight + path finder */
+  adj={};RAW.forEach(n=>{adj[n.id]=new Set()});
+  edges.forEach(([a,b])=>{if(adj[a])adj[a].add(b);if(adj[b])adj[b].add(a)});
   const deg={};
   edges.forEach(([a,b])=>{deg[a]=(deg[a]||0)+1;deg[b]=(deg[b]||0)+1});
 
+  const isLight=document.documentElement.classList.contains('light');
+  const fCol=isLight?'#1a2d3e':'#c8dff0';
+  const fStk=isLight?'rgba(238,242,247,.92)':'rgba(0,0,0,.88)';
   const vNodes=fil.map(n=>{
-    const g=G[n.group]||G.core;
-    const d=deg[n.id]||0;
-    const sz=g.sz+Math.min(d*1.6,13);
+    const g=G[n.group]||G.core, d=deg[n.id]||0;
+    const fixed=pinnedNodes.has(n.id);
     return {
       id:n.id,label:n.label,
-      color:{
-        background:g.col,border:g.brd,
-        highlight:{background:'#ffffff',border:g.brd},
-        hover:{background:g.col,border:'#ffffff'},
-      },
-      size:sz,
-      borderWidth:1.5,borderWidthSelected:3,
-      font:{color:'#cde8f5',size:11,face:"'Inter',system-ui,sans-serif",
-        strokeWidth:4,strokeColor:'rgba(0,0,0,0.85)'},
-      shadow:{enabled:true,color:g.glow,size:14,x:0,y:0},
+      color:{background:g.col,border:fixed?'#fff':g.brd,
+        highlight:{background:'#fff',border:g.brd},
+        hover:{background:g.col,border:'#fff'}},
+      size:g.sz+Math.min(d*1.5,12),
+      borderWidth:fixed?2.5:1.5,borderWidthSelected:3,
+      font:{color:fCol,size:11,face:"'Inter',system-ui,sans-serif",
+        strokeWidth:3,strokeColor:fStk},
+      shadow:{enabled:true,color:g.gl,size:16,x:0,y:0},
       title:mkTip(n,d),_raw:n,
     };
   });
 
   const vEdges=edges.map(([a,b],i)=>{
     const ga=G[(fil.find(n=>n.id===a)||{}).group]||G.core;
+    /* opacity 90 hex = ~56% — fully visible by default */
     return {
       id:'e'+i,from:a,to:b,
-      color:{color:ga.col+'40',highlight:ga.col+'cc',hover:ga.col+'99'},
-      width:1,hoverWidth:2.5,selectionWidth:3,
+      color:{color:ga.col+'90',highlight:ga.col+'ff',hover:ga.col+'dd'},
+      width:1.4,hoverWidth:2.8,selectionWidth:3.5,
       smooth:{type:'dynamic'},
-      arrows:{to:{enabled:true,scaleFactor:0.35}},
+      arrows:{to:{enabled:true,scaleFactor:.35}},
     };
   });
 
-  document.getElementById('empty').style.display=fil.length?'none':'block';
-  document.getElementById('statNodes').textContent=fil.length;
-  document.getElementById('statEdges').textContent=edges.length;
+  const density=fil.length>1?(2*edges.length/(fil.length*(fil.length-1))).toFixed(3):'0';
+  document.getElementById('emp').style.display=fil.length?'none':'block';
+  document.getElementById('sN').textContent=fil.length;
+  document.getElementById('sE').textContent=edges.length;
+  document.getElementById('sG').textContent=density;
 
-  const container=document.getElementById('gWrap');
-  vN=new vis.DataSet(vNodes);
-  vE=new vis.DataSet(vEdges);
+  const ct=document.getElementById('gw');
+  vN=new vis.DataSet(vNodes); vE=new vis.DataSet(vEdges);
 
   const opts={
-    physics:{
-      enabled:true,solver:'forceAtlas2Based',
-      forceAtlas2Based:{gravitationalConstant:-55,centralGravity:0.005,springLength:130,springConstant:0.055,damping:0.4},
-      stabilization:{iterations:260,fit:true},
-    },
-    interaction:{
-      hover:true,tooltipDelay:280,
-      hideEdgesOnDrag:false,   /* ← FIXED: edges visible while dragging */
-      keyboard:{enabled:true,speed:{x:8,y:8,zoom:0.03}},
-      zoomView:true,
-    },
-    nodes:{shape:'dot',scaling:{min:14,max:44}},
+    physics:{enabled:true,solver:'forceAtlas2Based',
+      forceAtlas2Based:{gravitationalConstant:-50,centralGravity:0.004,
+        springLength:125,springConstant:0.05,damping:.42},
+      stabilization:{iterations:280,fit:true}},
+    interaction:{hover:true,tooltipDelay:260,
+      hideEdgesOnDrag:false,  /* edges always visible */
+      keyboard:{enabled:true,speed:{x:8,y:8,zoom:.03}},zoomView:true},
+    nodes:{shape:'dot',scaling:{min:12,max:46}},
     edges:{selectionWidth:3},
   };
 
-  if(net){net.destroy();}
-  net=new vis.Network(container,{nodes:vN,edges:vE},opts);
-
+  if(net)net.destroy();
+  net=new vis.Network(ct,{nodes:vN,edges:vE},opts);
   net.on('click',p=>{
-    if(p.nodes.length)openSB(p.nodes[0]);
-    else closeSidebar();
+    if(pathMode){
+      if(!p.nodes.length)return;
+      const nid=p.nodes[0];
+      if(!pathSel){
+        pathSel=nid;dimAll(nid);
+        document.getElementById('ptrow').innerHTML='<span class="ptnone">Click second node…</span>';
+      }else if(pathSel!==nid){
+        const path=bfs(pathSel,nid);restoreAll();showPath(path);pathSel=null;
+      }
+      return;
+    }
+    p.nodes.length?openSB(p.nodes[0]):closeSB();
   });
-
+  net.on('hoverNode',p=>{if(pathMode)return;hoverId=p.node;dimAll(p.node)});
+  net.on('blurNode',()=>{if(pathMode||pathSel)return;hoverId=null;restoreAll()});
+  net.on('afterDrawing',ctx=>{requestAnimationFrame(drawMM);if(particleOn)drawParticles(ctx)});
+  net.on('oncontext',p=>{
+    p.event.preventDefault();
+    if(!p.nodes.length)return;
+    ctxNodeId=p.nodes[0];
+    const r=document.getElementById('gw').getBoundingClientRect();
+    const m=document.getElementById('ctxmenu');
+    m.style.left=(r.left+p.pointer.DOM.x)+'px';
+    m.style.top=(r.top+p.pointer.DOM.y)+'px';
+    m.classList.add('show');
+    /* update pin label */
+    const raw=RAW.find(n=>n.id===ctxNodeId);
+    document.getElementById('ctxPin').querySelector('.ctxi-ico').textContent=pinnedNodes.has(ctxNodeId)?'📍':'📌';
+    document.getElementById('ctxPin').lastChild.textContent=pinnedNodes.has(ctxNodeId)?' Unpin node':' Pin node';
+    /* show/hide open page */
+    document.getElementById('ctxOpen').style.display=raw&&raw.url?'flex':'none';
+  });
+  net.on('doubleClick',p=>{
+    if(p.nodes.length){
+      focusId=p.nodes[0];
+      document.getElementById('bFoc').classList.add('fon');
+      const lbl=RAW.find(n=>n.id===focusId)?.label||focusId;
+      document.getElementById('focbanner').textContent=`⊙ Focus: ${lbl} — double-click empty or Esc to exit`;
+      document.getElementById('focbanner').classList.add('show');
+      build();
+    }else if(focusId){exitFocus();}
+  });
   net.on('stabilizationIterationsDone',()=>{
-    net.setOptions({physics:{
-      enabled:true,solver:'forceAtlas2Based',
-      forceAtlas2Based:{gravitationalConstant:-28,centralGravity:0.002,springLength:130,springConstant:0.018,damping:0.65},
-    }});
+    net.setOptions({physics:{enabled:true,solver:'forceAtlas2Based',
+      forceAtlas2Based:{gravitationalConstant:-26,centralGravity:.002,
+        springLength:125,springConstant:.016,damping:.68}}});
+    if(particleOn)initParticles();
   });
+  updateTopNodes(deg);
+  updateHash();
 }
 
-/* ── TOOLTIP (DOM element, no HTML leak) ── */
-function mkTip(n,deg){
+/* ── TOOLTIP (DOM, no HTML leak) ── */
+function mkTip(n,d){
   const g=G[n.group]||G.core;
   const w=document.createElement('div');
-  w.style.cssText='background:#030810;border:1px solid rgba(0,229,196,0.25);border-radius:8px;padding:10px 13px;max-width:230px;font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.5;box-shadow:0 8px 32px rgba(0,0,0,0.8);pointer-events:none';
-
+  w.style.cssText='background:#02050e;border:1px solid rgba(0,229,196,.22);border-radius:8px;padding:10px 13px;width:230px;max-width:230px;overflow:hidden;font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.5;box-shadow:0 8px 28px rgba(0,0,0,.85);pointer-events:none';
   const row=document.createElement('div');
   row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:4px';
   const dot=document.createElement('span');
-  dot.style.cssText=`width:7px;height:7px;border-radius:50%;background:${g.col};display:inline-block;box-shadow:0 0 6px ${g.col}`;
+  dot.style.cssText=`width:7px;height:7px;border-radius:50%;background:${g.col};display:inline-block;box-shadow:0 0 7px ${g.col}`;
   const lbl=document.createElement('span');
-  lbl.style.cssText=`color:${g.col};font-weight:600;font-size:12px`;
+  lbl.style.cssText=`color:${g.col};font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px`;
   lbl.textContent=n.label;
   row.append(dot,lbl);
-
   const meta=document.createElement('div');
-  meta.style.cssText='font-family:Space Mono,monospace;font-size:10px;color:#336680;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px';
-  meta.textContent=`${n.group}  ·  ${deg} conn`;
-
+  meta.style.cssText='font-family:Space Mono,monospace;font-size:10px;color:#2a5570;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px';
+  meta.textContent=`${n.group}  ·  ${d} connections`;
   const desc=document.createElement('div');
-  desc.style.cssText='color:#6b98b4;font-size:11px;line-height:1.55';
+  desc.style.cssText='color:#4d7a96;font-size:11px;line-height:1.55;word-wrap:break-word;overflow-wrap:break-word;white-space:normal';
   desc.textContent=n.desc;
-
   w.append(row,meta,desc);
   return w;
 }
 
 /* ── SIDEBAR ── */
-function openSB(nodeId){
-  const node=vN.get(nodeId);
-  if(!node)return;
+function openSB(id){
+  const node=vN.get(id); if(!node)return;
+  curSBid=id;
+  /* breadcrumb history */
+  if(navHistory[navHistory.length-1]!==id){navHistory.push(id);if(navHistory.length>30)navHistory.shift();}
+  const backBtn=document.getElementById('sbBack');
+  if(backBtn){
+    backBtn.style.display=navHistory.length>1?'flex':'none';
+    const prev=navHistory[navHistory.length-2];
+    const prevRaw=prev?RAW.find(n=>n.id===prev):null;
+    const lbl=document.getElementById('sbBackLbl');
+    if(lbl)lbl.textContent=prevRaw?prevRaw.label:'Back';
+  }
   const r=node._raw, g=G[r.group]||G.core;
   const ae=vE.get();
-  const cids=ae.filter(e=>e.from===r.id||e.to===r.id).map(e=>e.from===r.id?e.to:e.from);
-  const cnodes=cids.map(id=>RAW.find(n=>n.id===id)).filter(Boolean);
+  const outIds=ae.filter(e=>e.from===r.id).map(e=>e.to);
+  const inIds =ae.filter(e=>e.to===r.id).map(e=>e.from);
+  const allIds=[...new Set([...outIds,...inIds])];
+  const cn=allIds.map(i=>RAW.find(n=>n.id===i)).filter(Boolean);
 
-  document.getElementById('sbStripe').style.background=
-    `linear-gradient(90deg,${g.col},${g.brd})`;
+  document.getElementById('sbStr').style.background=`linear-gradient(90deg,${g.col},${g.brd})`;
 
-  const badge=document.getElementById('sbBadge');
-  badge.textContent=r.group;
-  badge.style.cssText=`background:${g.col}12;color:${g.col};border-color:${g.col}40;font-family:Space Mono,monospace;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;border:1px solid`;
+  const bdg=document.getElementById('sbBdg');
+  bdg.textContent=r.group;
+  bdg.style.cssText=`background:${g.col}14;color:${g.col};border-color:${g.col}40;font-family:Space Mono,monospace;font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;border:1px solid`;
 
-  document.getElementById('sbTitle').textContent=r.label;
-  document.getElementById('sbDesc').textContent=r.desc;
+  document.getElementById('sbTi').textContent=r.label;
+  document.getElementById('sbDe').textContent=r.desc;
 
   document.getElementById('sbM').innerHTML=`
-    <div class="sb-m">
-      <div class="sb-m-l">Connections</div>
-      <div class="sb-m-v" style="color:${g.col}">${cnodes.length}</div>
-    </div>
-    <div class="sb-m">
-      <div class="sb-m-l">Category</div>
-      <div class="sb-m-v">${r.group}</div>
-    </div>`;
+    <div class="smi"><div class="sml">Out</div><div class="smv" style="color:${g.col}">${outIds.length}</div></div>
+    <div class="smi"><div class="sml">In</div><div class="smv" style="color:${g.col}">${inIds.length}</div></div>
+    <div class="smi"><div class="sml">Total</div><div class="smv" style="color:${g.col}">${cn.length}</div></div>
+    <div class="smi" style="cursor:pointer" onclick="copyId('${r.id}')"><div class="sml">ID</div><div class="smv" style="font-size:.7rem;color:var(--t2)">${r.id}</div></div>`;
 
-  document.getElementById('sbT').innerHTML=(r.tags||[])
-    .map(t=>`<span class="sb-tag">${t}</span>`).join('');
+  /* file path */
+  const pathEl=document.getElementById('sbPath');
+  if(r.path){
+    pathEl.innerHTML=`<div class="sbpath-l">File Path</div><div class="sbpath">${r.path}</div>`;
+  }else{pathEl.innerHTML='';}
 
-  let ch='';
-  if(cnodes.length){
-    ch=`<div class="sb-s-title">Connected (${cnodes.length})</div><div class="conns">`;
-    cnodes.slice(0,14).forEach(cn=>{
-      const cg=G[cn.group]||G.core;
-      ch+=`<span class="conn" onclick="focusNode('${cn.id}')"><span class="cd" style="background:${cg.col}"></span>${cn.label}</span>`;
+  document.getElementById('sbT').innerHTML=(r.tags||[]).map(t=>`<span class="stg" style="cursor:pointer" onclick="tagFilter('${t}')" title="Filter by #${t}">${t}</span>`).join('');
+
+  /* inbound / outbound split */
+  function cnChips(ids,label){
+    if(!ids.length)return'';
+    const arr=ids.map(i=>RAW.find(n=>n.id===i)).filter(Boolean);
+    let s=`<div class="sbioc"><div class="sbioh"><span class="sbioarr">${label==='Out'?'→':'←'}</span>${label} (${arr.length})</div><div class="cns">`;
+    arr.slice(0,8).forEach(c=>{
+      const cg=G[c.group]||G.core;
+      s+=`<span class="cn" onclick="focN('${c.id}')"><span class="cd" style="background:${cg.col}"></span>${c.label}</span>`;
     });
-    if(cnodes.length>14)ch+=`<span style="font-size:.65rem;color:var(--text-3)">+${cnodes.length-14}</span>`;
-    ch+='</div>';
+    if(arr.length>8)s+=`<span style="font-size:.58rem;color:var(--t3)">+${arr.length-8}</span>`;
+    s+='</div></div>';return s;
   }
-  document.getElementById('sbC').innerHTML=ch;
+  document.getElementById('sbIO').innerHTML=
+    (outIds.length||inIds.length)
+      ? `<div class="sbio">${cnChips(outIds,'Out')}${cnChips(inIds,'In')}</div>`
+      : '';
 
-  const url=r.url.startsWith('http')?r.url:BASE+r.url;
-  document.getElementById('sbA').innerHTML=`
-    <a href="${url}" target="_blank" class="sb-btn sb-btn-p">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      Open Page
-    </a>
-    <button class="sb-btn sb-btn-s" onclick="hilite('${r.id}')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-      Highlight Network
-    </button>`;
+  /* legacy "connected" section hidden (replaced by sbIO) */
+  document.getElementById('sbC').innerHTML='';
 
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('gWrap').classList.add('sb-open');
-  document.getElementById('zctrl').classList.add('sb-open');
+  const url=r.url?(r.url.startsWith('http')?r.url:BASE+r.url):null;
+  document.getElementById('sbA').innerHTML=url
+    ? `<a href="${url}" target="_blank" class="sbbn sbbn-p">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open Page
+      </a>
+      <button class="sbbn sbbn-s" onclick="hilit('${r.id}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Highlight Network
+      </button>`
+    : `<div style="font-family:Space Mono,monospace;font-size:.6rem;color:var(--t3);text-align:center;padding:8px;border:1px dashed var(--rim);border-radius:5px">
+        Local file — no URL
+       </div>
+       <button class="sbbn sbbn-s" style="margin-top:6px" onclick="hilit('${r.id}')">Highlight Network</button>`;
+
+  /* annotation */
+  const saved=localStorage.getItem('note_'+r.id)||'';
+  document.getElementById('sbanno').value=saved;
+  document.getElementById('sbAnnoInd').textContent=saved?'●':'';
+
+  document.getElementById('sb').classList.add('open');
+  document.getElementById('gw').classList.add('sbo');
+  document.getElementById('zc').classList.add('sbo');
+  document.getElementById('mmwrap').classList.add('sbo');
 }
 
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('gWrap').classList.remove('sb-open');
-  document.getElementById('zctrl').classList.remove('sb-open');
+function closeSB(){
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('gw').classList.remove('sbo');
+  document.getElementById('zc').classList.remove('sbo');
+  document.getElementById('mmwrap').classList.remove('sbo');
 }
-
-window.focusNode=function(id){
+window.focN=function(id){
   if(!net)return;
   net.selectNodes([id]);
-  net.focus(id,{scale:1.3,animation:{duration:500,easingFunction:'easeInOutQuad'}});
+  net.focus(id,{scale:1.3,animation:{duration:480,easingFunction:'easeInOutQuad'}});
   openSB(id);
 };
-window.hilite=function(id){
+window.hilit=function(id){
   if(!net)return;
   const e=vE.get();
   const c=e.filter(x=>x.from===id||x.to===id).map(x=>x.from===id?x.to:x.from);
   net.selectNodes([id,...c]);
-  net.fit({nodes:[id,...c],animation:{duration:600,easingFunction:'easeInOutQuad'}});
+  net.fit({nodes:[id,...c],animation:{duration:550,easingFunction:'easeInOutQuad'}});
 };
 
-/* ── FILTER BUTTONS ── */
-document.querySelectorAll('.fp').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.fp').forEach(b=>b.classList.remove('on'));
-    btn.classList.add('on');
-    activeG=btn.dataset.g;
-    build();
-    if(net)net.fit({animation:{duration:500,easingFunction:'easeInOutQuad'}});
+/* ── HOVER HIGHLIGHT — dim non-neighbours ── */
+function dimAll(focusId){
+  if(!vN)return;
+  const nb=adj[focusId]||new Set();
+  vN.update(vN.get().map(n=>{
+    const raw=RAW.find(r=>r.id===n.id);
+    const g=G[(raw||{}).group]||G.core;
+    const on=n.id===focusId||nb.has(n.id);
+    return on
+      ?{id:n.id,
+          color:{background:g.col,border:g.brd,highlight:{background:'#fff',border:g.brd},hover:{background:g.col,border:'#fff'}},
+          font:{color:'#eef6ff',size:11,face:"'Inter',system-ui,sans-serif",strokeWidth:4,strokeColor:'rgba(0,0,0,.92)'}}
+      :{id:n.id,
+          color:{background:g.col+'16',border:g.brd+'0d',highlight:{background:g.col+'22',border:g.brd+'22'},hover:{background:g.col+'16',border:g.brd+'16'}},
+          font:{color:'rgba(200,223,240,0.08)',size:11,face:"'Inter',system-ui,sans-serif",strokeWidth:0,strokeColor:'transparent'}};
+  }));
+}
+function restoreAll(){
+  if(!vN)return;
+  const isLight=document.documentElement.classList.contains('light');
+  const fCol=isLight?'#1a2d3e':'#c8dff0';
+  const fStk=isLight?'rgba(238,242,247,.92)':'rgba(0,0,0,.88)';
+  vN.update(vN.get().map(n=>{
+    const raw=RAW.find(r=>r.id===n.id);
+    const g=G[(raw||{}).group]||G.core;
+    const fixed=pinnedNodes.has(n.id);
+    return{id:n.id,
+      color:{background:g.col,border:fixed?'#fff':g.brd,highlight:{background:'#fff',border:g.brd},hover:{background:g.col,border:'#fff'}},
+      font:{color:fCol,size:11,face:"'Inter',system-ui,sans-serif",strokeWidth:3,strokeColor:fStk}};
+  }));
+}
+
+/* ── BFS PATH FINDER ── */
+function bfs(s,e){
+  if(s===e)return[s];
+  const vis=new Set([s]),q=[[s,[s]]];
+  while(q.length){
+    const[nd,path]=q.shift();
+    for(const nb of(adj[nd]||new Set())){
+      if(nb===e)return[...path,e];
+      if(!vis.has(nb)){vis.add(nb);q.push([nb,[...path,nb]]);}
+    }
+  }
+  return null;
+}
+function showPath(path){
+  const row=document.getElementById('ptrow');
+  if(!path){
+    row.innerHTML='<span class="ptnone">No path found between these nodes</span>';
+  }else{
+    row.innerHTML=path.map((id,i)=>{
+      const raw=RAW.find(n=>n.id===id);
+      const lbl=raw?raw.label:id;
+      const g=G[(raw||{}).group]||G.core;
+      return(i?'<span class="ptarr">›</span>':'')+
+        `<span class="ptn" style="border-color:${g.col}55;color:${g.col}" onclick="focN('${id}')">${lbl}</span>`;
+    }).join('');
+    net.selectNodes(path);
+    net.fit({nodes:path,animation:{duration:520,easingFunction:'easeInOutQuad'}});
+    /* highlight path edges */
+    const ps=new Set();
+    path.forEach((id,i)=>{if(i<path.length-1){ps.add(id+'|'+path[i+1]);ps.add(path[i+1]+'|'+id);}});
+    const pe=vE.get().filter(e=>ps.has(e.from+'|'+e.to)).map(e=>e.id);
+    if(pe.length)net.selectEdges(pe);
+  }
+  document.getElementById('ptst').classList.add('show');
+}
+
+/* ── MINI-MAP ── */
+const MM_W=138,MM_H=100;
+function drawMM(){
+  const mc=document.getElementById('mm');
+  if(!mc||!net||!vN)return;
+  const mx=mc.getContext('2d');
+  const pos=net.getPositions();
+  const pids=Object.keys(pos);
+  if(!pids.length)return;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  pids.forEach(id=>{const p=pos[id];minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y)});
+  const pw=Math.max(maxX-minX,1),ph=Math.max(maxY-minY,1);
+  const pad=10,sc=Math.min((MM_W-pad*2)/pw,(MM_H-pad*2)/ph);
+  const ox=(MM_W-pw*sc)/2-minX*sc,oy=(MM_H-ph*sc)/2-minY*sc;
+  mx.clearRect(0,0,MM_W,MM_H);
+  /* edges */
+  mx.lineWidth=.4;
+  vE.get().forEach(e=>{
+    const a=pos[e.from],b=pos[e.to];
+    if(!a||!b)return;
+    mx.strokeStyle='rgba(0,229,196,0.1)';
+    mx.beginPath();mx.moveTo(a.x*sc+ox,a.y*sc+oy);mx.lineTo(b.x*sc+ox,b.y*sc+oy);mx.stroke();
+  });
+  /* nodes */
+  pids.forEach(id=>{
+    const p=pos[id],raw=RAW.find(n=>n.id===id);
+    const g=G[(raw||{}).group]||G.core;
+    mx.beginPath();mx.arc(p.x*sc+ox,p.y*sc+oy,1.8,0,Math.PI*2);
+    mx.fillStyle=g.col+'cc';mx.fill();
+  });
+  /* viewport rectangle */
+  const vp=net.getViewPosition(),scale=net.getScale();
+  const gwEl=document.getElementById('gw');
+  const vw=gwEl.offsetWidth/scale,vh=gwEl.offsetHeight/scale;
+  const rx=(vp.x-vw/2)*sc+ox,ry=(vp.y-vh/2)*sc+oy;
+  mx.strokeStyle='rgba(0,229,196,.55)';mx.lineWidth=1;
+  mx.strokeRect(rx,ry,vw*sc,vh*sc);
+}
+
+/* ── FILTERS ── */
+document.querySelectorAll('.fp').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.fp').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');ag=b.dataset.g;focusId=null;
+    document.getElementById('focbanner').classList.remove('show');
+    document.getElementById('bFoc').classList.remove('fon');
+    build();if(net)net.fit({animation:{duration:500,easingFunction:'easeInOutQuad'}});
   });
 });
 
-/* counts */
-['core','articles','calculators','comparisons','reports','apps','series','standards'].forEach(c=>{
-  const el=document.getElementById('cn-'+c);
-  if(el)el.textContent=RAW.filter(n=>n.group===c).length;
+/* update counts */
+const CK={all:'ca',core:'cc',articles:'car',calculators:'cca',comparisons:'cco',
+  reports:'crp',apps:'cap',series:'cse',standards:'cst',projects:'cpr',memory:'cme'};
+Object.entries(CK).forEach(([g,id])=>{
+  const el=document.getElementById(id);
+  if(el)el.textContent=g==='all'?RAW.length:RAW.filter(n=>n.group===g).length;
 });
-document.getElementById('cn-all').textContent=RAW.length;
 
 /* ── SEARCH ── */
 let st;
-document.getElementById('searchInput').addEventListener('input',e=>{
-  clearTimeout(st);
-  st=setTimeout(()=>{
+document.getElementById('si').addEventListener('input',e=>{
+  clearTimeout(st);st=setTimeout(()=>{
     q=e.target.value.toLowerCase().trim();
-    build();
-    if(net&&q)net.fit({animation:{duration:400}});
+    build();if(net&&q)net.fit({animation:{duration:380}});updateHash();
   },200);
 });
 
+/* ── FOCUS MODE ── */
+function exitFocus(){
+  focusId=null;
+  document.getElementById('bFoc').classList.remove('fon');
+  document.getElementById('focbanner').classList.remove('show');
+  build();
+}
+
+/* ── ORPHAN DETECTOR ── */
+function findOrphans(){
+  const conn=new Set();E.forEach(([a,b])=>{conn.add(a);conn.add(b)});
+  const orph=RAW.filter(n=>!conn.has(n.id)).map(n=>n.id);
+  if(!orph.length){showToast('✅ No orphans — all nodes connected');return;}
+  const vis_orph=orph.filter(id=>vN&&vN.get(id));
+  if(vis_orph.length){net.selectNodes(vis_orph);net.fit({nodes:vis_orph,animation:{duration:520}});}
+  showToast(`⚠ ${orph.length} orphan node${orph.length>1?'s':''} found`);
+}
+
+/* ── EXPORT PNG ── */
+function exportPNG(){
+  try{
+    const cv=net.canvas.frame.canvas;
+    const a=document.createElement('a');
+    a.href=cv.toDataURL('image/png');
+    a.download='second-brain-'+new Date().toISOString().slice(0,10)+'.png';
+    a.click();
+    showToast('📸 PNG exported');
+  }catch(e){showToast('⚠ Export failed — try a different browser');}
+}
+
+/* ── EXPORT JSON ── */
+function exportJSON(){
+  const data={
+    exported:new Date().toISOString(),
+    nodes:RAW.length,edges:E.length,
+    graph:{nodes:RAW,edges:E}
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='second-brain-graph.json';a.click();
+  URL.revokeObjectURL(url);
+  showToast('📦 JSON exported');
+}
+
+/* ── COPY NODE ID ── */
+window.copyId=function(id){
+  navigator.clipboard.writeText(id).then(()=>showToast(`📋 Copied: ${id}`)).catch(()=>showToast('Copy failed'));
+};
+
+/* ── TOAST ── */
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ── TOP CONNECTED ── */
+function updateTopNodes(deg){
+  const el=document.getElementById('legtop');if(!el)return;
+  const top=Object.entries(deg).sort(([,a],[,b])=>b-a).slice(0,6);
+  el.innerHTML=top.map(([id,d])=>{
+    const raw=RAW.find(n=>n.id===id);if(!raw)return'';
+    const g=G[raw.group]||G.core;
+    return `<div class="legtp" onclick="focN('${id}')">
+      <span style="width:5px;height:5px;border-radius:50%;background:${g.col};flex-shrink:0;display:inline-block"></span>
+      <span class="legtpn">${raw.label}</span>
+      <span class="legtpd">${d}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── URL PERMALINK ── */
+function updateHash(){
+  const p=new URLSearchParams();
+  if(ag!=='all')p.set('g',ag);
+  if(q)p.set('q',q);
+  if(focusId)p.set('f',focusId);
+  const h=p.toString();
+  history.replaceState(null,'',h?'#'+h:location.pathname+location.search);
+}
+function readHash(){
+  const h=location.hash.slice(1);
+  if(!h)return;
+  const p=new URLSearchParams(h);
+  if(p.has('g')){ag=p.get('g');document.querySelectorAll('.fp').forEach(b=>{b.classList.toggle('on',b.dataset.g===ag)});}
+  if(p.has('q')){q=p.get('q');const si=document.getElementById('si');if(si)si.value=q;}
+  if(p.has('f'))focusId=p.get('f');
+}
+
+/* ── NAV HISTORY BACK ── */
+window.navBack=function(){
+  if(navHistory.length<2)return;
+  navHistory.pop();
+  const prev=navHistory[navHistory.length-1];
+  navHistory.pop(); // openSB will re-push it
+  focN(prev);
+};
+
+/* ── TAG FILTER ── */
+window.tagFilter=function(tag){
+  q=tag;
+  const si=document.getElementById('si');
+  if(si)si.value=tag;
+  closeSB();
+  build();
+  if(net)net.fit({animation:{duration:400}});
+  updateHash();
+  showToast(`🏷 Filtered by: ${tag}`);
+};
+
+/* ── LIGHT MODE ── */
+function toggleTheme(){
+  const isLight=document.documentElement.classList.toggle('light');
+  const ico=document.getElementById('themeIco');
+  ico.innerHTML=isLight
+    ?'<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+    :'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  localStorage.setItem('sb-theme',isLight?'light':'dark');
+  build(); // rebuild to update node/edge colors
+  showToast(isLight?'☀ Light mode':'🌙 Dark mode');
+}
+
+/* ── PARTICLE FLOW ── */
+function initParticles(){
+  if(!vE)return;
+  particles=vE.get().map(e=>({
+    from:e.from,to:e.to,
+    t:Math.random(),
+    spd:0.0006+Math.random()*0.001,
+    col:(G[(RAW.find(n=>n.id===e.from)||{}).group]||G.core).col
+  }));
+}
+function drawParticles(ctx){
+  if(!net||!particles.length)return;
+  const pos=net.getPositions();
+  ctx.save();
+  particles.forEach(p=>{
+    const a=pos[p.from],b=pos[p.to];
+    if(!a||!b)return;
+    p.t=(p.t+p.spd)%1;
+    const x=a.x+(b.x-a.x)*p.t, y=a.y+(b.y-a.y)*p.t;
+    ctx.beginPath();
+    ctx.arc(x,y,2.2,0,Math.PI*2);
+    ctx.fillStyle=p.col+'ee';
+    ctx.shadowColor=p.col;
+    ctx.shadowBlur=7;
+    ctx.fill();
+  });
+  ctx.shadowBlur=0;
+  ctx.restore();
+}
+function startParticles(){
+  particleOn=true;initParticles();
+  (function loop(){if(!particleOn)return;if(net)net.redraw();partRaf=requestAnimationFrame(loop)})();
+}
+function stopParticles(){
+  particleOn=false;cancelAnimationFrame(partRaf);if(net)net.redraw();
+}
+
+/* ── PIN NODE ── */
+function pinNode(id){
+  if(pinnedNodes.has(id)){
+    pinnedNodes.delete(id);
+    vN.update({id,fixed:false});
+    showToast('Node unpinned');
+  }else{
+    pinnedNodes.add(id);
+    const p=net.getPositions([id])[id];
+    vN.update({id,fixed:{x:true,y:true},x:p.x,y:p.y});
+    showToast('📌 Node pinned at current position');
+  }
+  /* rebuild to update border styling */
+  const raw=RAW.find(n=>n.id===id);
+  const g=G[(raw||{}).group]||G.core;
+  vN.update({id,color:{background:g.col,border:pinnedNodes.has(id)?'#fff':g.brd,
+    highlight:{background:'#fff',border:g.brd},hover:{background:g.col,border:'#fff'}},
+    borderWidth:pinnedNodes.has(id)?2.5:1.5});
+}
+
+/* ── CONTEXT MENU ── */
+function hideCtxMenu(){document.getElementById('ctxmenu').classList.remove('show');}
+document.addEventListener('click',e=>{if(!e.target.closest('#ctxmenu'))hideCtxMenu()});
+document.getElementById('ctxFocus').addEventListener('click',()=>{
+  if(!ctxNodeId)return;
+  hideCtxMenu();
+  focusId=ctxNodeId;
+  document.getElementById('bFoc').classList.add('fon');
+  const lbl=RAW.find(n=>n.id===ctxNodeId)?.label||ctxNodeId;
+  document.getElementById('focbanner').textContent=`⊙ Focus: ${lbl} — double-click empty or Esc to exit`;
+  document.getElementById('focbanner').classList.add('show');
+  build();
+});
+document.getElementById('ctxPin').addEventListener('click',()=>{
+  if(!ctxNodeId)return;pinNode(ctxNodeId);hideCtxMenu();
+});
+document.getElementById('ctxCopy').addEventListener('click',()=>{
+  if(!ctxNodeId)return;copyId(ctxNodeId);hideCtxMenu();
+});
+document.getElementById('ctxOpen').addEventListener('click',()=>{
+  if(!ctxNodeId)return;
+  const raw=RAW.find(n=>n.id===ctxNodeId);
+  if(raw&&raw.url){
+    const url=raw.url.startsWith('http')?raw.url:BASE+raw.url;
+    window.open(url,'_blank');
+  }
+  hideCtxMenu();
+});
+
+/* ── PATH FINDER ── */
+document.getElementById('bPth').addEventListener('click',()=>{
+  pathMode=!pathMode;
+  document.getElementById('bPth').classList.toggle('pon',pathMode);
+  if(!pathMode){pathSel=null;restoreAll();document.getElementById('ptst').classList.remove('show');}
+  else{document.getElementById('ptrow').innerHTML='<span class="ptnone">Click first node…</span>';document.getElementById('ptst').classList.add('show');}
+});
+document.getElementById('ptcl').addEventListener('click',()=>{
+  pathMode=false;pathSel=null;restoreAll();
+  document.getElementById('bPth').classList.remove('pon');
+  document.getElementById('ptst').classList.remove('show');
+});
+
+/* ── THEME TOGGLE ── */
+document.getElementById('bTheme').addEventListener('click',toggleTheme);
+
+/* ── PARTICLE TOGGLE ── */
+document.getElementById('bPart').addEventListener('click',()=>{
+  if(particleOn){stopParticles();document.getElementById('bPart').classList.remove('pon');}
+  else{startParticles();document.getElementById('bPart').classList.add('pon');}
+});
+
+/* ── FOCUS / ORPHAN / EXPORT ── */
+document.getElementById('bFoc').addEventListener('click',()=>{
+  if(focusId)exitFocus();
+  else showToast('Double-click a node to enter Focus Mode');
+});
+document.getElementById('bOrph').addEventListener('click',findOrphans);
+document.getElementById('bPng').addEventListener('click',exportPNG);
+document.getElementById('bJson').addEventListener('click',exportJSON);
+
+/* ── ANNOTATION ── */
+document.getElementById('sbannosa').addEventListener('click',()=>{
+  if(!curSBid)return;
+  const val=document.getElementById('sbanno').value.trim();
+  if(val)localStorage.setItem('note_'+curSBid,val);
+  else localStorage.removeItem('note_'+curSBid);
+  document.getElementById('sbAnnoInd').textContent=val?'●':'';
+  showToast(val?'📝 Note saved':'🗑 Note cleared');
+});
+document.getElementById('sbannodl').addEventListener('click',()=>{
+  if(!curSBid)return;
+  localStorage.removeItem('note_'+curSBid);
+  document.getElementById('sbanno').value='';
+  document.getElementById('sbAnnoInd').textContent='';
+  showToast('🗑 Note cleared');
+});
+
+/* ── MINI-MAP CLICK TO NAVIGATE ── */
+document.getElementById('mm').addEventListener('click',ev=>{
+  if(!net||!vN)return;
+  const pos=net.getPositions();const pids=Object.keys(pos);if(!pids.length)return;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  pids.forEach(id=>{const p=pos[id];minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y)});
+  const pw=Math.max(maxX-minX,1),ph=Math.max(maxY-minY,1);
+  const pad=10,sc=Math.min((MM_W-pad*2)/pw,(MM_H-pad*2)/ph);
+  const ox=(MM_W-pw*sc)/2-minX*sc,oy=(MM_H-ph*sc)/2-minY*sc;
+  const rect=ev.currentTarget.getBoundingClientRect();
+  net.moveTo({position:{x:(ev.clientX-rect.left-ox)/sc,y:(ev.clientY-rect.top-oy)/sc},
+    animation:{duration:300,easingFunction:'easeInOutQuad'}});
+});
+
 /* ── LAYOUT ── */
-document.getElementById('bForce').addEventListener('click',()=>{
+document.getElementById('bF').addEventListener('click',()=>{
   if(net)net.setOptions({layout:{improvedLayout:true},physics:{enabled:true,solver:'forceAtlas2Based'}});
   document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('bForce').classList.add('on');
+  document.getElementById('bF').classList.add('on');
 });
-document.getElementById('bHier').addEventListener('click',()=>{
-  if(net)net.setOptions({layout:{hierarchical:{direction:'UD',sortMethod:'directed',levelSeparation:110}},physics:{enabled:false}});
+document.getElementById('bH').addEventListener('click',()=>{
+  if(net)net.setOptions({layout:{hierarchical:{direction:'UD',sortMethod:'directed',levelSeparation:105}},physics:{enabled:false}});
   document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('bHier').classList.add('on');
+  document.getElementById('bH').classList.add('on');
 });
-document.getElementById('bFit').addEventListener('click',()=>{
-  if(net)net.fit({animation:{duration:600,easingFunction:'easeInOutQuad'}});
-});
+document.getElementById('bFt').addEventListener('click',()=>net&&net.fit({animation:{duration:550,easingFunction:'easeInOutQuad'}}));
 
 /* ── ZOOM ── */
-document.getElementById('zIn').addEventListener('click',()=>net&&net.moveTo({scale:net.getScale()*1.3,animation:{duration:200}}));
-document.getElementById('zOut').addEventListener('click',()=>net&&net.moveTo({scale:net.getScale()*0.75,animation:{duration:200}}));
-document.getElementById('zFit').addEventListener('click',()=>net&&net.fit({animation:{duration:500,easingFunction:'easeInOutQuad'}}));
+document.getElementById('zI').addEventListener('click',()=>net&&net.moveTo({scale:net.getScale()*1.3,animation:{duration:180}}));
+document.getElementById('zO').addEventListener('click',()=>net&&net.moveTo({scale:net.getScale()*.75,animation:{duration:180}}));
+document.getElementById('zR').addEventListener('click',()=>net&&net.fit({animation:{duration:480,easingFunction:'easeInOutQuad'}}));
 
 /* ── KEYBOARD ── */
+const GROUP_KEYS=['all','core','articles','calculators','comparisons','reports','apps','series','standards','projects'];
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')closeSidebar();
-  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();}
+  const inInput=document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA';
+  if(e.key==='Escape'){
+    if(pathMode){pathMode=false;pathSel=null;restoreAll();document.getElementById('bPth').classList.remove('pon');document.getElementById('ptst').classList.remove('show');}
+    if(focusId)exitFocus();
+    closeSB();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('si').focus();}
+  if(inInput)return;
+  /* Tab: cycle through visible nodes */
+  if(e.key==='Tab'){
+    e.preventDefault();
+    if(!vN)return;
+    const all=vN.get().map(n=>n.id);if(!all.length)return;
+    const sel=net.getSelectedNodes();
+    const cur=sel.length?sel[0]:null;
+    const idx=cur?all.indexOf(cur):-1;
+    const next=e.shiftKey?all[(idx-1+all.length)%all.length]:all[(idx+1)%all.length];
+    net.selectNodes([next]);
+    net.focus(next,{scale:Math.max(net.getScale(),.8),animation:{duration:220,easingFunction:'easeInOutQuad'}});
+    openSB(next);
+  }
+  /* number keys 1-0 → group filter */
+  if(/^[0-9]$/.test(e.key)){
+    const n=parseInt(e.key);
+    const g=n===0?'memory':GROUP_KEYS[n]||'all';
+    document.querySelectorAll('.fp').forEach(b=>{
+      if(b.dataset.g===g)b.click();
+    });
+  }
+  /* H = fit view */
+  if(e.key==='h'||e.key==='H')net&&net.fit({animation:{duration:480}});
+});
+
+/* ── FULLSCREEN ── */
+document.getElementById('zFs').addEventListener('click',()=>{
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+    document.getElementById('zFs').textContent='⛶';
+  }else{
+    document.exitFullscreen();
+  }
+});
+document.addEventListener('fullscreenchange',()=>{
+  document.getElementById('zFs').textContent=document.fullscreenElement?'⊡':'⛶';
 });
 
 /* ── INIT ── */
+/* restore theme */
+if(localStorage.getItem('sb-theme')==='light'){
+  document.documentElement.classList.add('light');
+  const ico=document.getElementById('themeIco');
+  if(ico)ico.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+}
+readHash();
 build();
-setTimeout(()=>document.getElementById('loader').classList.add('gone'),800);
+document.getElementById('focbanner').addEventListener('click',exitFocus);
+setTimeout(()=>document.getElementById('ldr').classList.add('gone'),850);
 
 })();
 </script>
