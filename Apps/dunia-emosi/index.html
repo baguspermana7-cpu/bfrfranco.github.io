@@ -8383,13 +8383,28 @@ function initGame13() {
   }
 }
 function _initGame13Impl() {
+  // === PROBE: first thing — update name element so we know this code runs ===
+  const _probeEl = document.getElementById('g13-wname')
+  if (_probeEl) _probeEl.textContent = '⏳'
   battleBgmPlay()
-  const p = state.players[state.currentPlayer]
   const lv = Math.max(1, Math.min(20, state.selectedLevelNum || 1))
-  const chain = g13PickChain(lv)
-  if (!chain) { console.error('No chain found for lv', lv); return }
-  const cfg = G13_DIFF[chain.diff]
-  if (!cfg) { console.error('No cfg for diff', chain && chain.diff); return }
+  // Hardcoded fallback chain in case G13_CHAINS fails
+  const _FALLBACK = {id:0,icon:'🔥',diff:'easy',maxNum:10,ops:['+'],
+    player:{name:'Charmander',slug:'charmander',type:'Fire',tc:'#F97316'},
+    evolved:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
+    wild:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'}}
+  let chain
+  try { chain = g13PickChain(lv) } catch(e) { console.error('g13PickChain err',e) }
+  if (!chain) {
+    console.warn('g13PickChain returned null for lv='+lv+', using fallback. G13_CHAINS len='+(typeof G13_CHAINS!=='undefined'?G13_CHAINS.length:'UNDEF'))
+    chain = _FALLBACK
+  }
+  let cfg
+  try { cfg = G13_DIFF[chain.diff] } catch(e) { console.error('G13_DIFF err',e) }
+  if (!cfg) {
+    console.warn('G13_DIFF missing diff='+chain.diff+', using fallback cfg')
+    cfg = {playerHp:5, wildHp:8, attacksToEvo:4, damage:1, wildDamage:1}
+  }
 
   g13State = {
     chain, lv, cfg,
