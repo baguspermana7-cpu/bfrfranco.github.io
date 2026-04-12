@@ -5551,6 +5551,44 @@ document.addEventListener('click', function _unlockMusic(){
   }
 }, {once:true, capture:true})
 
+// ================================================================
+// ATTACK SFX — type-based Pokemon attack sounds
+// ================================================================
+const G_ATK_SOUNDS = {
+  bug:      ['Sounds/Attack/Bug/Attack Order.mp3'],
+  dark:     ['Sounds/Attack/Dark/Bite.mp3','Sounds/Attack/Dark/Beat Up.mp3'],
+  dragon:   ['Sounds/Attack/Other/Boomburst.mp3'],
+  electric: ['Sounds/Attack/Electric/Bolt Strike.mp3'],
+  fairy:    ['Sounds/Attack/Fairy/Baby-Doll Eyes.mp3'],
+  fighting: ['Sounds/Attack/Fighting/Arm Thrust 2hits.mp3','Sounds/Attack/Fighting/Aura Sphere.mp3'],
+  fire:     ['Sounds/Attack/Fire/Blast Burn.mp3','Sounds/Attack/Fire/Blaze Kick.mp3','Sounds/Attack/Fire/Blue Flare.mp3'],
+  flying:   ['Sounds/Attack/Flying/Aerial Ace.mp3','Sounds/Attack/Flying/Air Slash.mp3','Sounds/Attack/Flying/Acrobatics.mp3'],
+  ghost:    ['Sounds/Attack/Ghost/Astonish.mp3'],
+  grass:    ['Sounds/Attack/Grass/Absorb.mp3'],
+  ground:   ['Sounds/Attack/Ground/Bone Club.mp3','Sounds/Attack/Ground/Bonemerang 2hits.mp3'],
+  ice:      ['Sounds/Attack/Ice/Aurora Beam.mp3','Sounds/Attack/Ice/Avalanche.mp3','Sounds/Attack/Ice/Blizzard.mp3'],
+  normal:   ['Sounds/Attack/Normal/Body Slam.mp3','Sounds/Attack/Normal/Barrage 2hits.mp3','Sounds/Attack/Normal/Bind.mp3'],
+  poison:   ['Sounds/Attack/Poison/Acid.mp3','Sounds/Attack/Poison/Acid Spray.mp3','Sounds/Attack/Poison/Belch.mp3'],
+  psychic:  ['Sounds/Attack/Psychic/Barrier.mp3'],
+  rock:     ['Sounds/Attack/Rock/Ancient Power.mp3'],
+  steel:    ['Sounds/Attack/Steel/Autotomize.mp3'],
+  water:    ['Sounds/Attack/Water/Aqua Jet.mp3','Sounds/Attack/Water/Aqua Tail.mp3'],
+}
+
+// Cache Audio elements per unique src to avoid repeated allocation
+const _atkAudioCache = {}
+function playAttackSound(type) {
+  if (!isSoundOn()) return
+  const key = (type || 'normal').toLowerCase()
+  const pool = G_ATK_SOUNDS[key] || G_ATK_SOUNDS.normal
+  const src = pool[Math.floor(Math.random() * pool.length)]
+  if (!_atkAudioCache[src]) _atkAudioCache[src] = new Audio(src)
+  const audio = _atkAudioCache[src]
+  audio.volume = 0.62
+  audio.currentTime = 0
+  audio.play().catch(() => {})
+}
+
 // Battle BGM (G10, G13 battle screens)
 let _battleBgmEl = null
 function battleBgmPlay(){
@@ -7540,6 +7578,7 @@ function g10TypeFX(type, targetSide){
 }
 
 function g10DoAttack(type, fromSide, toSide, onDone){
+  playAttackSound(type)
   const emoji=TYPE_EMOJI[type]||'💥'
   const atkEl=document.getElementById('g10-atk-fx')
   const emojiEl=document.getElementById('g10-atk-emoji')
@@ -8369,10 +8408,23 @@ function initGame13() {
   const wImg = document.getElementById('g13-wspr')
   const pImg = document.getElementById('g13-pspr')
   const pokeUrl = slug => `https://img.pokemondb.net/sprites/home/normal/${slug}.png`
+  const sprFallback = (img, emoji) => {
+    img.style.display = 'none'
+    const fb = img.parentElement.querySelector('.g13-spr-fb')
+    if (!fb) {
+      const el = document.createElement('div')
+      el.className = 'g13-spr-fb'
+      el.style.cssText = 'font-size:min(20vw,12vh);line-height:1;display:flex;align-items:center;justify-content:center;width:min(40vw,20vh);height:min(40vw,20vh);'
+      el.textContent = emoji
+      img.parentElement.insertBefore(el, img.nextSibling)
+    }
+  }
+  wImg.style.display = ''
   wImg.src = pokeUrl(chain.wild.slug)
-  wImg.onerror = () => { wImg.src = ''; wImg.alt = chain.wild.name[0] }
+  wImg.onerror = () => sprFallback(wImg, chain.icon || '❓')
+  pImg.style.display = ''
   pImg.src = pokeUrl(chain.player.slug)
-  pImg.onerror = () => { pImg.src = ''; pImg.alt = chain.player.name[0] }
+  pImg.onerror = () => sprFallback(pImg, chain.icon || '❓')
 
   // Entrance animations
   wImg.style.animation = 'none'; void wImg.offsetWidth; wImg.style.animation = 'g13Enter 0.5s cubic-bezier(0.34,1.56,0.64,1)'
@@ -8427,27 +8479,37 @@ function g13UpdateEvoBar() {
 
 function g13GenQuestion() {
   const s = g13State
-  const max = s.evolved ? s.cfg.maxNum + 5 : s.cfg.maxNum
+  // FIX: maxNum lives on chain, not cfg
+  const baseMax = s.chain.maxNum || 10
+  const max = s.evolved ? baseMax + 5 : baseMax
   const op = s.chain.ops[Math.floor(Math.random() * s.chain.ops.length)]
   let a, b, ans
   if (op === '+') {
-    a = Math.floor(Math.random() * (max - 1)) + 1
-    b = Math.floor(Math.random() * (max - a)) + 1
+    a = Math.floor(Math.random() * Math.max(1, max - 2)) + 1
+    b = Math.floor(Math.random() * Math.max(1, max - a)) + 1
     ans = a + b
   } else {
-    a = Math.floor(Math.random() * (max - 1)) + 2
-    b = Math.floor(Math.random() * (a - 1)) + 1
+    // subtraction: ensure a > b > 0
+    b = Math.floor(Math.random() * Math.max(1, max - 2)) + 1
+    a = b + Math.floor(Math.random() * Math.max(1, max - b)) + 1
     ans = a - b
   }
+  // Ensure valid integers
+  a = Math.max(1, Math.round(a))
+  b = Math.max(1, Math.round(b))
+  ans = op === '+' ? a + b : a - b
   s.currentAnswer = ans
-  // Generate 3 wrong options
+  // Generate 3 unique wrong options — guarded loop (max 200 tries)
   const wrongs = new Set()
-  while (wrongs.size < 3) {
-    const offset = (Math.floor(Math.random() * 5) + 1) * (Math.random() < 0.5 ? 1 : -1)
+  let tries = 0
+  while (wrongs.size < 3 && tries++ < 200) {
+    const offset = (Math.floor(Math.random() * 6) + 1) * (Math.random() < 0.5 ? 1 : -1)
     const w = ans + offset
-    if (w > 0 && w !== ans) wrongs.add(w)
+    if (Number.isFinite(w) && w > 0 && w !== ans) wrongs.add(w)
   }
-  return { expr: `${a} ${op} ${b} = ?`, ans, wrongs: [...wrongs] }
+  // Fallback if wrongs still empty (should never happen now)
+  if (wrongs.size === 0) { wrongs.add(ans + 1); wrongs.add(ans + 2); wrongs.add(ans + 3) }
+  return { expr: `${a} ${op} ${b} = ?`, ans, wrongs: [...wrongs].slice(0, 3) }
 }
 
 function g13NextQuestion() {
@@ -8483,7 +8545,8 @@ function g13Answer(val, btn) {
 
   const correct = val === s.currentAnswer
   btn.classList.add(correct ? 'correct' : 'wrong')
-  document.getElementById('g13-choices').querySelectorAll('.g13-choice-btn').forEach(b => b.disabled = true)
+  const choicesEl = document.getElementById('g13-choices')
+  if (choicesEl) choicesEl.querySelectorAll('.g13-choice-btn').forEach(b => b.disabled = true)
 
   if (correct) {
     playCorrect()
@@ -8492,10 +8555,17 @@ function g13Answer(val, btn) {
     s.evoPoints = Math.min(s.evoNeeded, s.evoPoints + 1)
     s.correctThisExchange++
     s.stars++
-    document.getElementById('g13-stars').textContent = `⭐ ${s.stars}`
+    const starDisp = document.getElementById('g13-stars'); if(starDisp) starDisp.textContent = `⭐ ${s.stars}`
+    // Player lunge + attack sound
+    const atkType = s.evolved ? s.chain.evolved.type : s.chain.player.type
+    playAttackSound(atkType)
+    const pspr = document.getElementById('g13-pspr')
+    if (pspr) { pspr.classList.remove('spr-atk'); void pspr.offsetWidth; pspr.classList.add('spr-atk'); setTimeout(()=>pspr.classList.remove('spr-atk'),350) }
     // Wild hit animation
     const wspr = document.getElementById('g13-wspr')
-    if (wspr) { wspr.classList.remove('spr-hit'); void wspr.offsetWidth; wspr.classList.add('spr-hit'); setTimeout(()=>wspr.classList.remove('spr-hit'),400) }
+    setTimeout(() => {
+      if (wspr) { wspr.classList.remove('spr-hit'); void wspr.offsetWidth; wspr.classList.add('spr-hit'); setTimeout(()=>wspr.classList.remove('spr-hit'),400) }
+    }, 300)
     // Flash
     g13TriggerFlash()
     // Particle burst
@@ -8532,15 +8602,14 @@ function g13WildCounterPhase() {
   const s = g13State
   const attacks = 3
   let done = 0
-  document.getElementById('g13-qpanel').style.opacity = '0.3'
-  document.getElementById('g13-qpanel').style.pointerEvents = 'none'
+  const qpanel = document.getElementById('g13-qpanel')
+  if (qpanel) { qpanel.style.opacity = '0.3'; qpanel.style.pointerEvents = 'none' }
   g13SetStatus(`${s.chain.wild.name} menyerang!`, '⚔️ Bertahan...')
 
   function doWildAttack(i) {
     if (i >= attacks) {
       // Done — check evo or continue
-      document.getElementById('g13-qpanel').style.opacity = '1'
-      document.getElementById('g13-qpanel').style.pointerEvents = ''
+      if (qpanel) { qpanel.style.opacity = '1'; qpanel.style.pointerEvents = '' }
       s.attackIdx = 0
       s.correctThisExchange = 0
       if (s.playerHp <= 0) { g13Defeat(); return }
@@ -8555,9 +8624,10 @@ function g13WildCounterPhase() {
       return
     }
     setTimeout(() => {
-      // Wild attack animation
+      // Wild attack animation + sound
       const wspr = document.getElementById('g13-wspr')
       const pspr = document.getElementById('g13-pspr')
+      playAttackSound(s.chain.wild.type)
       if (wspr) { wspr.classList.remove('spr-atk'); void wspr.offsetWidth; wspr.classList.add('spr-atk'); setTimeout(()=>wspr.classList.remove('spr-atk'),350) }
       setTimeout(() => {
         if (pspr) { pspr.classList.remove('spr-hit'); void pspr.offsetWidth; pspr.classList.add('spr-hit'); setTimeout(()=>pspr.classList.remove('spr-hit'),400) }
@@ -8600,6 +8670,7 @@ function g13TriggerEvolution() {
   const evolvedImg = document.getElementById('g13-evo-evolved-img')
   const nameEl = document.getElementById('g13-evo-newname')
   const textEl = document.getElementById('g13-evo-text')
+  if (!baseImg || !evolvedImg || !nameEl || !textEl) { overlay.style.display = 'none'; return }
   const pokeUrl = slug => `https://img.pokemondb.net/sprites/home/normal/${slug}.png`
 
   baseImg.src = pokeUrl(s.chain.player.slug)
@@ -8752,12 +8823,12 @@ function g13Victory() {
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
     const evolved = s.evolved
-    document.getElementById('g13-result-icon').textContent = evolved ? '🌟' : '⭐'
-    document.getElementById('g13-result-title').textContent = evolved ? `${s.chain.evolved.name} Menang!` : 'Kamu Menang!'
-    document.getElementById('g13-result-subtitle').textContent = evolved
+    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = evolved ? '🌟' : '⭐'
+    const title = document.getElementById('g13-result-title'); if(title) title.textContent = evolved ? `${s.chain.evolved.name} Menang!` : 'Kamu Menang!'
+    const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = evolved
       ? `${s.chain.player.name} berhasil berevolusi menjadi ${s.chain.evolved.name}!`
       : `${s.chain.wild.name} dikalahkan — tapi ${s.chain.player.name} belum berevolusi!`
-    document.getElementById('g13-result-stars').textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
+    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
     ro.style.display = 'flex'
   }, 1000)
 }
@@ -8775,10 +8846,10 @@ function g13Defeat() {
   setTimeout(() => {
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
-    document.getElementById('g13-result-icon').textContent = '💔'
-    document.getElementById('g13-result-title').textContent = 'Kalah...'
-    document.getElementById('g13-result-subtitle').textContent = `${s.chain.wild.name} terlalu kuat! Coba lagi!`
-    document.getElementById('g13-result-stars').textContent = '🌑🌑🌑'
+    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = '💔'
+    const title = document.getElementById('g13-result-title'); if(title) title.textContent = 'Kalah...'
+    const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = `${s.chain.wild.name} terlalu kuat! Coba lagi!`
+    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '🌑🌑🌑'
     ro.style.display = 'flex'
   }, 1200)
 }
