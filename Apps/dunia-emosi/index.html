@@ -153,6 +153,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .game-tile.g11::before{background:linear-gradient(90deg,#34D399,#10B981)} .game-tile.g11 .g-icon{animation-duration:2.9s} .game-tile.g11 .g-tag{background:linear-gradient(90deg,#34D399,#10B981)} .game-tile.g11::after{background:linear-gradient(135deg,rgba(16,185,129,0.08),transparent)}
 .game-tile.g12::before{background:linear-gradient(90deg,#818CF8,#6366F1)} .game-tile.g12 .g-icon{animation-duration:3.3s} .game-tile.g12 .g-tag{background:linear-gradient(90deg,#818CF8,#6366F1)} .game-tile.g12::after{background:linear-gradient(135deg,rgba(99,102,241,0.08),transparent)}
 .game-tile.g13::before{background:linear-gradient(90deg,#FB923C,#EF4444)} .game-tile.g13 .g-icon{animation-duration:2.1s} .game-tile.g13 .g-tag{background:linear-gradient(90deg,#FB923C,#EF4444)} .game-tile.g13::after{background:linear-gradient(135deg,rgba(239,68,68,0.1),transparent)}
+.game-tile.g13b::before{background:linear-gradient(90deg,#FBBF24,#06B6D4)} .game-tile.g13b .g-icon{animation-duration:1.4s;animation-delay:-0.2s} .game-tile.g13b .g-tag{background:linear-gradient(90deg,#FBBF24,#06B6D4);color:#1a1a1a;} .game-tile.g13b::after{background:linear-gradient(135deg,rgba(6,182,212,0.14),transparent)}
 .game-tile.g5a::before{background:linear-gradient(90deg,#F9A8D4,#EC4899)} .game-tile.g5a .g-icon{animation-duration:2.6s} .game-tile.g5a .g-tag{background:linear-gradient(90deg,#F9A8D4,#EC4899)} .game-tile.g5a::after{background:linear-gradient(135deg,rgba(236,72,153,0.08),transparent)}
 .game-tile.g5b::before{background:linear-gradient(90deg,#6EE7B7,#10B981)} .game-tile.g5b .g-icon{animation-duration:2.3s} .game-tile.g5b .g-tag{background:linear-gradient(90deg,#6EE7B7,#10B981)} .game-tile.g5b::after{background:linear-gradient(135deg,rgba(16,185,129,0.08),transparent)}
 .game-tile.g5c::before{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g5c .g-icon{animation-duration:3.0s} .game-tile.g5c .g-tag{background:linear-gradient(90deg,#FCD34D,#F59E0B)} .game-tile.g5c::after{background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent)}
@@ -2103,84 +2104,118 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* ===== GAME 14 — Balapan Kereta (horizontal side-scroller) ===== */
 #screen-game14 { background:#0d1a07;flex-direction:column; }
-/* Three horizontal lane rows stacked vertically */
-#g14-lane-area { position:absolute;inset:0;display:flex;flex-direction:column; }
+#g14-lane-area { position:absolute;inset:0;display:flex;flex-direction:column;z-index:4; }
 .g14-lane-row {
   flex:1;position:relative;overflow:hidden;
-  border-bottom:1px solid rgba(255,255,255,0.05);
+  border-bottom:3px solid rgba(0,0,0,0.5);
+  background:linear-gradient(180deg,rgba(12,38,6,0.92) 0%,rgba(22,58,10,0.88) 55%,rgba(15,44,7,0.92) 100%);
 }
-/* Grass/ground behind each lane — semi-transparent to show parallax behind */
-.g14-lane-row { background:rgba(20,55,10,0.75); }
-/* Scrolling railway ties */
+.g14-lane-row:last-child { border-bottom:none; }
+/* Railway ties */
 .g14-lane-row::before {
-  content:'';position:absolute;top:38%;left:0;right:0;height:24%;
+  content:'';position:absolute;top:30%;left:0;right:0;height:40%;
   background:repeating-linear-gradient(90deg,
-    #3B2008 0px,#3B2008 28px,
-    #5C3510 28px,#5C3510 36px,
-    #3B2008 36px,#3B2008 64px,
-    #5C3510 64px,#5C3510 72px
+    #2d1b0a 0px,#2d1b0a 20px,
+    #3d2510 20px,#3d2510 26px,
+    #2d1b0a 26px,#2d1b0a 54px,
+    #3d2510 54px,#3d2510 60px
   );
-  background-size:80px 100%;
+  background-size:62px 100%;
   animation:g14RailScroll var(--rspd,0.35s) linear infinite;
 }
-/* Two parallel rails */
+/* Two golden rails */
 .g14-lane-row::after {
   content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
   background:
-    linear-gradient(transparent 38%,#9E7B4A 38%,#9E7B4A 43%,transparent 43%),
-    linear-gradient(transparent 57%,#9E7B4A 57%,#9E7B4A 62%,transparent 62%);
+    linear-gradient(transparent 31%,#7a5c0a 31%,#DAA520 34%,#B8860B 37%,transparent 37%),
+    linear-gradient(transparent 63%,#7a5c0a 63%,#DAA520 66%,#B8860B 69%,transparent 69%);
 }
-.g14-lane-row.active-lane::before { opacity:1.0; }
-.g14-lane-row:last-child { border-bottom:none; }
-/* Obstacle: moves left-to-right across each row */
-/* AI train image in its lane */
+/* Active lane glow */
+.g14-lane-row.active-lane {
+  background:linear-gradient(180deg,rgba(16,50,8,0.95) 0%,rgba(30,70,12,0.92) 55%,rgba(18,52,8,0.95) 100%);
+  box-shadow:inset 0 0 24px rgba(90,200,50,0.18);
+}
+/* Lane danger warning (right edge) */
+.g14-lane-warning {
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  z-index:14;font-size:22px;display:none;pointer-events:none;
+  animation:g14WarnFlash 0.22s ease infinite alternate;
+}
+@keyframes g14WarnFlash { from{opacity:1;transform:translateY(-50%) scale(1)} to{opacity:0.2;transform:translateY(-50%) scale(1.25)} }
+/* AI train */
 .g14-ai-train {
-  position:absolute;z-index:6;height:10%;width:auto;
+  position:absolute;z-index:6;height:18%;width:auto;
   top:50%;transform:translateY(-50%) scaleX(-1);
+  filter:drop-shadow(0 3px 10px rgba(0,0,0,0.6)) brightness(0.8);
 }
-/* Player train image */
+/* Player train */
 #g14-player {
-  position:absolute;z-index:10;height:12%;width:auto;
+  position:absolute;z-index:10;height:24%;width:auto;
   left:13%;transform:translateY(-50%) scaleX(-1);
-  transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
-  filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7));
+  transition:top 0.20s cubic-bezier(0.34,1.56,0.64,1);
+  filter:drop-shadow(0 5px 16px rgba(0,0,0,0.75)) brightness(1.08);
 }
+/* Speed lines overlay during boost */
+#g14-speed-lines {
+  position:absolute;inset:0;z-index:8;pointer-events:none;display:none;
+  background:repeating-linear-gradient(
+    -6deg,
+    transparent 0px,transparent 16px,
+    rgba(255,255,255,0.06) 16px,rgba(255,255,255,0.06) 18px,
+    transparent 18px,transparent 36px,
+    rgba(255,255,255,0.03) 36px,rgba(255,255,255,0.03) 38px
+  );
+  animation:g14SpeedLines 0.07s linear infinite;
+}
+@keyframes g14SpeedLines { from{background-position:0 0} to{background-position:38px 0} }
 @keyframes g14Crash {
-  0%,100%{filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7))}
-  20%,60%{filter:drop-shadow(0 0 18px rgba(239,68,68,0.9)) brightness(1.4)}
+  0%,100%{filter:drop-shadow(0 5px 16px rgba(0,0,0,0.75)) brightness(1.08)}
+  20%,60%{filter:drop-shadow(0 0 22px rgba(239,68,68,1)) brightness(1.7) saturate(2)}
 }
-@keyframes g14RailScroll { from{background-position:0 0} to{background-position:-80px 0} }
-@keyframes g14BoostFlare {
-  0%{opacity:0;transform:translateY(-50%) scaleX(-1) scaleX(0.4)}
-  50%{opacity:1;transform:translateY(-50%) scaleX(-1) scaleX(1.3)}
-  100%{opacity:0;transform:translateY(-50%) scaleX(-1) scaleX(0.7)}
-}
-/* Boost fire behind player */
+@keyframes g14RailScroll { from{background-position:0 0} to{background-position:-62px 0} }
 #g14-boost-fire {
   position:absolute;z-index:9;
-  left:calc(13% + 40px);
-  width:36px;height:48px;
+  left:calc(13% + 52px);
+  width:44px;height:58px;
   transform:translateY(-50%);
   display:none;pointer-events:none;
-  transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  transition:top 0.20s cubic-bezier(0.34,1.56,0.64,1);
 }
-/* Crash spark particles */
 @keyframes g14Spark {
   0%{opacity:1;transform:translate(0,0) scale(1)}
   100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}
 }
 .g14-spark {
-  position:absolute;width:6px;height:6px;border-radius:50%;
+  position:absolute;width:8px;height:8px;border-radius:50%;
   pointer-events:none;z-index:15;
-  animation:g14Spark 0.45s ease-out forwards;
+  animation:g14Spark 0.5s ease-out forwards;
 }
-/* SVG obstacle styling */
 .g14-obstacle {
   position:absolute;z-index:5;
   top:50%;transform:translateY(-50%);
   line-height:1;
 }
 .g14-obstacle svg { display:block; }
+/* Math boost popup (appears above controls during boost) */
+#g14-math-popup {
+  position:absolute;bottom:0;left:0;right:0;z-index:25;
+  background:rgba(8,18,4,0.97);backdrop-filter:blur(8px);
+  border-top:3px solid #E63946;padding:10px 14px 14px;display:none;
+}
+.g14-math-q {
+  text-align:center;color:white;font-size:24px;font-weight:900;
+  font-family:'Fredoka One',cursive;margin-bottom:8px;letter-spacing:0.5px;
+}
+.g14-math-sub { text-align:center;color:rgba(255,209,102,0.8);font-size:11px;font-weight:700;margin-bottom:8px; }
+.g14-math-choices { display:flex;gap:8px;justify-content:center; }
+.g14-math-btn {
+  flex:1;max-width:90px;padding:12px 4px;
+  border:2px solid rgba(255,255,255,0.25);border-radius:12px;
+  background:rgba(255,255,255,0.08);color:white;
+  font-size:20px;font-weight:900;cursor:pointer;transition:all 0.15s;
+  font-family:'Fredoka One',cursive;
+}
+.g14-math-btn:active { transform:scale(0.92);background:rgba(230,57,70,0.4); }
 .g14-train-select-btn {
   background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);
   border-radius:14px;padding:8px 12px;cursor:pointer;text-align:center;
@@ -2190,31 +2225,26 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6)); transform:scaleX(-1); }
 .g14-train-select-btn.selected { background:rgba(230,57,70,0.45);border-color:#E63946;transform:scale(1.06); }
 .g14-train-select-btn:hover { background:rgba(255,255,255,0.18);transform:scale(1.04); }
-/* Speed dial indicator in header */
 .g14-speedometer {
   font-size:11px;font-weight:900;color:#FFD166;letter-spacing:0.5px;
   background:rgba(0,0,0,0.4);padding:2px 8px;border-radius:8px;
 }
-/* Parallax sky + mountain background behind lanes */
 #g14-sky {
   position:absolute;inset:0;z-index:0;
-  background:linear-gradient(180deg,#1a3a6c 0%,#2d6a9e 30%,#87CEEB 60%,#4a8a2a 85%,#2d5a14 100%);
+  background:linear-gradient(180deg,#070e1e 0%,#0e2448 22%,#1a3a6c 45%,#2d6a9e 65%,#4a8a2a 82%,#2d5a14 100%);
 }
-/* Scrolling mountain silhouette layer */
 #g14-mountains {
   position:absolute;bottom:0;left:0;right:0;height:60%;z-index:1;
   background-repeat:repeat-x;background-position:bottom;background-size:400px 80%;
   animation:g14Mountains 8s linear infinite;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Cpolygon points='0,200 80,60 160,120 240,40 320,90 400,50 400,200' fill='%23264d17' opacity='0.8'/%3E%3Cpolygon points='0,200 60,80 120,130 200,55 280,100 360,65 400,80 400,200' fill='%23355e22' opacity='0.6'/%3E%3C/svg%3E");
 }
-/* Scrolling trees (medium parallax) */
 #g14-trees {
   position:absolute;bottom:0;left:0;right:0;height:40%;z-index:2;
   background-repeat:repeat-x;background-position:bottom;background-size:200px 100%;
   animation:g14Trees 3s linear infinite;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect x='18' y='80' width='8' height='40' fill='%235C3D11'/%3E%3Cpolygon points='22,20 8,80 36,80' fill='%23228B22'/%3E%3Cpolygon points='22,35 6,75 38,75' fill='%2332CD32'/%3E%3Crect x='88' y='85' width='6' height='35' fill='%235C3D11'/%3E%3Cpolygon points='91,28 79,85 103,85' fill='%23228B22'/%3E%3Crect x='158' y='88' width='7' height='32' fill='%235C3D11'/%3E%3Cpolygon points='162,30 148,88 176,88' fill='%23228B22'/%3E%3Cpolygon points='162,42 147,82 177,82' fill='%2332CD32'/%3E%3C/svg%3E");
 }
-/* Scrolling fence foreground */
 #g14-fence {
   position:absolute;bottom:0;left:0;right:0;height:25%;z-index:3;
   background-repeat:repeat-x;background-position:bottom;background-size:60px 60%;
@@ -4944,11 +4974,19 @@ body { background: #0a0a1a !important; }
     <div id="g14-mountains"></div>
     <div id="g14-trees"></div>
     <div id="g14-fence"></div>
+    <!-- Speed lines overlay (boost FX) -->
+    <div id="g14-speed-lines"></div>
     <!-- 3 Horizontal Lane Rows (on top of parallax) -->
     <div id="g14-lane-area" style="z-index:4;">
-      <div class="g14-lane-row" data-lane="0"></div>
-      <div class="g14-lane-row" data-lane="1"></div>
-      <div class="g14-lane-row" data-lane="2"></div>
+      <div class="g14-lane-row" data-lane="0"><div class="g14-lane-warning" id="g14-warn-0">🚨</div></div>
+      <div class="g14-lane-row" data-lane="1"><div class="g14-lane-warning" id="g14-warn-1">🚨</div></div>
+      <div class="g14-lane-row" data-lane="2"><div class="g14-lane-warning" id="g14-warn-2">🚨</div></div>
+    </div>
+    <!-- Math boost popup -->
+    <div id="g14-math-popup">
+      <div class="g14-math-sub">🔥 JAWAB UNTUK BOOST!</div>
+      <div class="g14-math-q" id="g14-math-q-text">?</div>
+      <div class="g14-math-choices" id="g14-math-choices"></div>
     </div>
 
     <!-- Boost fire (shown behind player during boost) -->
@@ -5012,11 +5050,14 @@ body { background: #0a0a1a !important; }
   <div style="display:flex;align-items:stretch;gap:8px;padding:10px 12px;background:rgba(0,0,0,0.88);flex-shrink:0;">
     <button onclick="g14LaneUp()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px 6px;font-size:18px;font-weight:900;cursor:pointer;line-height:1;">▲<br><span style="font-size:10px;opacity:0.7">Atas</span></button>
     <div style="flex:1.8;display:flex;flex-direction:column;align-items:center;gap:4px;">
-      <div style="color:rgba(255,209,102,0.8);font-size:10px;font-weight:800;letter-spacing:0.5px;">⚙️ BOILER</div>
+      <div style="color:rgba(255,209,102,0.8);font-size:10px;font-weight:800;letter-spacing:0.5px;">⚙️ BOILER — Jawab math untuk BOOST!</div>
       <div style="background:rgba(255,255,255,0.1);border-radius:6px;height:10px;overflow:hidden;width:100%;position:relative;">
         <div id="g14-pressure-bar" style="height:100%;width:50%;background:linear-gradient(90deg,#FFD166,#FF6B35,#E63946);border-radius:6px;transition:width 0.3s;"></div>
       </div>
-      <button id="g14-boost-btn" onclick="g14Boost()" style="background:linear-gradient(135deg,#FF6B35,#E63946);color:white;border:none;border-radius:10px;padding:7px 16px;font-size:13px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 3px 0 #7A0A12;">🔥 BOOST!</button>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button id="g14-boost-btn" onclick="g14Boost()" style="background:linear-gradient(135deg,#FF6B35,#E63946);color:white;border:none;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:900;cursor:pointer;flex:1;box-shadow:0 3px 0 #7A0A12;">🔥 BOOST!</button>
+        <div id="g14-boost-ready" style="display:none;color:#4ade80;font-size:10px;font-weight:800;white-space:nowrap;">✅ SIAP!</div>
+      </div>
     </div>
     <button onclick="g14LaneDown()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px 6px;font-size:18px;font-weight:900;cursor:pointer;line-height:1;">▼<br><span style="font-size:10px;opacity:0.7">Bawah</span></button>
   </div>
@@ -11247,6 +11288,20 @@ function initGame14() {
   document.getElementById('g14-stars').textContent = '🏁 0m'
   document.getElementById('g14-position').style.display = 'none'
   document.getElementById('g14-speedometer').textContent = '0 km/h'
+  document.getElementById('g14-math-popup').style.display = 'none'
+  document.getElementById('g14-speed-lines').style.display = 'none'
+  // Touch swipe for lane switching
+  const track = document.getElementById('g14-track')
+  if (!track._g14SwipeAttached) {
+    track._g14SwipeAttached = true
+    let _swipeY = 0
+    track.addEventListener('touchstart', e => { _swipeY = e.touches[0].clientY }, {passive:true})
+    track.addEventListener('touchend', e => {
+      const dy = e.changedTouches[0].clientY - _swipeY
+      if (dy < -38) g14LaneUp()
+      else if (dy > 38) g14LaneDown()
+    }, {passive:true})
+  }
   g14RenderTrainSelect()
 }
 
@@ -11359,7 +11414,15 @@ function g14Loop() {
   })
   toRemove.forEach(o => {
     if (o.el.parentNode) o.el.remove()
+    g14HideLaneWarning(o.lane)
     s.obstacles = s.obstacles.filter(x => x !== o)
+  })
+  // Show danger warning when obstacle enters warning zone
+  s.obstacles.forEach(obs => {
+    if (!obs.warned && obs.x < trackW * 0.62) {
+      obs.warned = true
+      g14ShowLaneWarning(obs.lane)
+    }
   })
 
   // Advance distance
@@ -11450,11 +11513,17 @@ function g14Crash() {
     setTimeout(() => { if (player) player.style.animation = '' }, 500)
   }
   g14SpawnSparks(g14State.lane)
+  // Dismiss math popup if open
+  clearTimeout(g14State.mathTimeout)
+  document.getElementById('g14-math-popup').style.display = 'none'
   playWrong()
   vibrate(30)
   if (g14State.hp <= 0) {
     g14State.running = false
     cancelAnimationFrame(g14State.animFrame)
+    // Clear all warnings
+    ;[0,1,2].forEach(l => g14HideLaneWarning(l))
+    document.getElementById('g14-speed-lines').style.display = 'none'
     setTimeout(() => g14ShowResult(false), 600)
   }
 }
@@ -11479,32 +11548,93 @@ function g14UpdatePlayerPos() {
 
 function g14Boost() {
   if (!g14State.running || g14State.boosting || g14State.boostCooldown || g14State.pressure < 30) return
-  g14State.boosting = true
-  g14State.boostCooldown = true
-  g14State.pressure = Math.max(10, g14State.pressure - 30)
-  g14UpdatePressure()
-  const origSpeed = g14State.speed
-  g14State.speed = origSpeed * g14State.trainCfg.boostMult
-  document.getElementById('g14-boost-btn').textContent = '🔥 BOOSTING!'
-  document.getElementById('g14-boost-btn').style.opacity = '0.6'
-  const fireEl = document.getElementById('g14-boost-fire')
-  if (fireEl) { fireEl.style.display = 'block'; fireEl.style.top = g14State.laneTopPct[g14State.lane] + '%' }
-  clearTimeout(g14State.boostTimer)
-  g14State.boostTimer = setTimeout(() => {
-    g14State.speed = origSpeed
-    g14State.boosting = false
-    if (fireEl) fireEl.style.display = 'none'
-    document.getElementById('g14-boost-btn').textContent = '⏳ Cooldown...'
-    document.getElementById('g14-boost-ready').style.display = 'none'
-    setTimeout(() => {
-      g14State.boostCooldown = false
-      document.getElementById('g14-boost-btn').textContent = '🔥 BOOST!'
-      document.getElementById('g14-boost-btn').style.opacity = '1'
-      document.getElementById('g14-boost-ready').style.display = 'block'
-      setTimeout(() => { document.getElementById('g14-boost-ready').style.display = 'none' }, 2000)
-    }, 6000)
-  }, g14State.trainCfg.boostDur)
+  // Show math question — boost executes only on correct answer
+  const ops = g14State.diff === 'easy' ? ['+'] : g14State.diff === 'medium' ? ['+','-'] : ['+','-','×']
+  const op = ops[Math.floor(Math.random() * ops.length)]
+  let a, b, answer
+  if (op === '+') { a = Math.floor(Math.random()*12)+1; b = Math.floor(Math.random()*12)+1; answer = a+b }
+  else if (op === '-') { a = Math.floor(Math.random()*15)+6; b = Math.floor(Math.random()*a)+1; answer = a-b }
+  else { a = Math.floor(Math.random()*6)+2; b = Math.floor(Math.random()*6)+2; answer = a*b }
+  g14State.boostQ = { answer, origSpeed: g14State.speed }
+  const wrong = new Set()
+  while (wrong.size < 2) {
+    const delta = Math.floor(Math.random()*6)+1
+    const w = answer + (Math.random() < 0.5 ? delta : -delta)
+    if (w !== answer && w > 0) wrong.add(w)
+  }
+  const choices = [answer, ...[...wrong]].sort(() => Math.random() - 0.5)
+  document.getElementById('g14-math-q-text').textContent = `${a} ${op.replace('×','×')} ${b} = ?`
+  const choicesEl = document.getElementById('g14-math-choices')
+  choicesEl.innerHTML = ''
+  choices.forEach(c => {
+    const btn = document.createElement('button')
+    btn.className = 'g14-math-btn'
+    btn.textContent = c
+    btn.onclick = () => g14BoostAnswer(c)
+    choicesEl.appendChild(btn)
+  })
+  document.getElementById('g14-math-popup').style.display = 'block'
+  clearTimeout(g14State.mathTimeout)
+  g14State.mathTimeout = setTimeout(() => {
+    document.getElementById('g14-math-popup').style.display = 'none'
+  }, 4000)
   playClick()
+}
+
+function g14BoostAnswer(val) {
+  clearTimeout(g14State.mathTimeout)
+  document.getElementById('g14-math-popup').style.display = 'none'
+  if (!g14State.running || g14State.boosting) return
+  if (val === g14State.boostQ.answer) {
+    // Correct — execute boost
+    g14State.boosting = true
+    g14State.boostCooldown = true
+    g14State.pressure = Math.max(10, g14State.pressure - 30)
+    g14UpdatePressure()
+    const origSpeed = g14State.boostQ.origSpeed
+    g14State.speed = origSpeed * g14State.trainCfg.boostMult
+    document.getElementById('g14-boost-btn').textContent = '🔥 BOOSTING!'
+    document.getElementById('g14-boost-btn').style.opacity = '0.6'
+    const fireEl = document.getElementById('g14-boost-fire')
+    if (fireEl) { fireEl.style.display = 'block'; fireEl.style.top = g14State.laneTopPct[g14State.lane] + '%' }
+    const linesEl = document.getElementById('g14-speed-lines')
+    if (linesEl) linesEl.style.display = 'block'
+    playCorrect()
+    clearTimeout(g14State.boostTimer)
+    g14State.boostTimer = setTimeout(() => {
+      g14State.speed = origSpeed
+      g14State.boosting = false
+      if (fireEl) fireEl.style.display = 'none'
+      if (linesEl) linesEl.style.display = 'none'
+      document.getElementById('g14-boost-btn').textContent = '⏳ Cooldown...'
+      document.getElementById('g14-boost-ready').style.display = 'none'
+      setTimeout(() => {
+        g14State.boostCooldown = false
+        document.getElementById('g14-boost-btn').textContent = '🔥 BOOST!'
+        document.getElementById('g14-boost-btn').style.opacity = '1'
+        document.getElementById('g14-boost-ready').style.display = 'block'
+        setTimeout(() => { document.getElementById('g14-boost-ready').style.display = 'none' }, 2000)
+      }, 5000)
+    }, g14State.trainCfg.boostDur)
+  } else {
+    // Wrong — pressure penalty, no boost
+    g14State.pressure = Math.max(10, g14State.pressure - 18)
+    g14UpdatePressure()
+    const btn = document.getElementById('g14-boost-btn')
+    btn.textContent = '❌ Salah!'
+    setTimeout(() => { btn.textContent = '🔥 BOOST!' }, 1200)
+    playWrong()
+    vibrate(20)
+  }
+}
+
+function g14ShowLaneWarning(lane) {
+  const el = document.getElementById('g14-warn-' + lane)
+  if (el) el.style.display = 'block'
+}
+function g14HideLaneWarning(lane) {
+  const el = document.getElementById('g14-warn-' + lane)
+  if (el) el.style.display = 'none'
 }
 
 function g14UpdatePressure() {
@@ -11514,6 +11644,10 @@ function g14UpdatePressure() {
 function g14Finish(won) {
   g14State.running = false
   cancelAnimationFrame(g14State.animFrame)
+  ;[0,1,2].forEach(l => g14HideLaneWarning(l))
+  document.getElementById('g14-speed-lines').style.display = 'none'
+  clearTimeout(g14State.mathTimeout)
+  document.getElementById('g14-math-popup').style.display = 'none'
   setTimeout(() => g14ShowResult(won), 300)
 }
 
