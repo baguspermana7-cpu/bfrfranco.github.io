@@ -2045,9 +2045,26 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes revealPop{0%{transform:scale(0.8)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
 
 /* ===== WORLD ZONE 5 — Dunia Kereta ===== */
-#zone-kereta .world-zone-header { background:linear-gradient(135deg,#263238,#37474F); }
-#zone-kereta .world-zone-icon   { color:#CFD8DC; }
-#zone-kereta .world-zone-name   { color:#ECEFF1; }
+#zone-kereta .world-zone-header {
+  background:linear-gradient(135deg,#0d1a2e 0%,#1a3a5c 50%,#2c1a0a 100%);
+  background-image:url('assets/train/zone-kereta-banner.webp'),linear-gradient(135deg,#0d1a2e,#1a3a5c);
+  background-size:cover;background-position:center 60%;
+  min-height:100px;position:relative;overflow:hidden;
+}
+#zone-kereta .world-zone-header::before {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.55) 100%);
+}
+#zone-kereta .world-zone-icon   { color:#FFD166;position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,0.7);font-size:32px; }
+#zone-kereta .world-zone-name   { color:#ECEFF1;position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,0.8);font-size:18px;font-weight:900; }
+/* Train zone music button */
+#zone-kereta-music-btn {
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:2;
+  background:rgba(255,255,255,0.2);border:none;border-radius:50%;
+  width:36px;height:36px;font-size:16px;cursor:pointer;
+  backdrop-filter:blur(4px);transition:background 0.2s;
+}
+#zone-kereta-music-btn:hover { background:rgba(255,255,255,0.35); }
 .game-tile.g14 { --tile-accent:#E63946; }
 .game-tile.g15 { --tile-accent:#2196F3; }
 .game-tile.g16 { --tile-accent:#FF9800; }
@@ -2056,32 +2073,79 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .game-tile.g14:hover,.game-tile.g15:hover,.game-tile.g16:hover,
 .game-tile.g17:hover,.game-tile.g18:hover { transform:translateY(-4px) scale(1.02); }
 
-/* ===== GAME 14 — Balapan Kereta ===== */
-#screen-game14 { background:#1a3a0a;flex-direction:column; }
-.g14-lane {
-  flex:1; background:rgba(0,0,0,0.4); border-left:3px dashed rgba(255,255,255,0.2);
-  border-right:3px dashed rgba(255,255,255,0.2); position:relative; overflow:hidden;
+/* ===== GAME 14 — Balapan Kereta (horizontal side-scroller) ===== */
+#screen-game14 { background:#0d1a07;flex-direction:column; }
+/* Three horizontal lane rows stacked vertically */
+#g14-lane-area { position:absolute;inset:0;display:flex;flex-direction:column; }
+.g14-lane-row {
+  flex:1;position:relative;overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,0.05);
 }
+/* Grass/ground behind each lane */
+.g14-lane-row { background:linear-gradient(180deg,#1a4a0a 0%,#0d2a05 100%); }
+/* Scrolling railway ties */
+.g14-lane-row::before {
+  content:'';position:absolute;top:38%;left:0;right:0;height:24%;
+  background:repeating-linear-gradient(90deg,
+    #3B2008 0px,#3B2008 28px,
+    #5C3510 28px,#5C3510 36px,
+    #3B2008 36px,#3B2008 64px,
+    #5C3510 64px,#5C3510 72px
+  );
+  background-size:80px 100%;
+  animation:g14RailScroll var(--rspd,0.35s) linear infinite;
+}
+/* Two parallel rails */
+.g14-lane-row::after {
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
+  background:
+    linear-gradient(transparent 38%,#9E7B4A 38%,#9E7B4A 43%,transparent 43%),
+    linear-gradient(transparent 57%,#9E7B4A 57%,#9E7B4A 62%,transparent 62%);
+}
+.g14-lane-row.active-lane::before { opacity:1.0; }
+.g14-lane-row:last-child { border-bottom:none; }
+/* Obstacle: moves left-to-right across each row */
 .g14-obstacle {
-  position:absolute;font-size:24px;transition:top 0.016s linear;
-  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
-  z-index:5; left:50%; transform:translateX(-50%);
+  position:absolute;font-size:28px;z-index:5;
+  top:50%;transform:translateY(-50%);
+  line-height:1;
 }
+/* AI train image in its lane */
 .g14-ai-train {
-  position:absolute;font-size:28px;z-index:8;
-  transform:rotate(90deg); transition:top 0.016s linear;
-  left:50%; transform:translateX(-50%) rotate(90deg);
+  position:absolute;z-index:6;height:52%;width:auto;
+  top:50%;transform:translateY(-50%) scaleX(-1);
 }
-@keyframes g14Crash { 0%,100%{transform:translateX(-50%) rotate(90deg)} 25%{transform:translateX(-55%) rotate(95deg)} 75%{transform:translateX(-45%) rotate(85deg)} }
-@keyframes g14RailScroll { from{background-position:0 0} to{background-position:0 80px} }
-@keyframes g14BoostFlare { 0%{opacity:0;transform:scaleX(0.5)} 50%{opacity:1;transform:scaleX(1.2)} 100%{opacity:0;transform:scaleX(0.8)} }
+/* Player train image */
+#g14-player {
+  position:absolute;z-index:10;height:62%;width:auto;
+  left:13%;transform:translateY(-50%) scaleX(-1);
+  transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7));
+}
+@keyframes g14Crash {
+  0%,100%{filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7))}
+  20%,60%{filter:drop-shadow(0 0 18px rgba(239,68,68,0.9)) brightness(1.4)}
+}
+@keyframes g14RailScroll { from{background-position:0 0} to{background-position:-80px 0} }
+@keyframes g14BoostFlare {
+  0%{opacity:0;transform:translateY(-50%) scaleX(-1) scaleX(0.4)}
+  50%{opacity:1;transform:translateY(-50%) scaleX(-1) scaleX(1.3)}
+  100%{opacity:0;transform:translateY(-50%) scaleX(-1) scaleX(0.7)}
+}
 .g14-train-select-btn {
-  background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);
-  border-radius:14px;padding:10px 14px;cursor:pointer;text-align:center;
-  transition:all 0.2s;color:white;min-width:70px;
+  background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);
+  border-radius:14px;padding:8px 12px;cursor:pointer;text-align:center;
+  transition:all 0.2s;color:white;min-width:80px;
 }
-.g14-train-select-btn.selected { background:rgba(230,57,70,0.5);border-color:#E63946;transform:scale(1.06); }
-.g14-train-select-btn:hover { background:rgba(255,255,255,0.2);transform:scale(1.04); }
+.g14-train-select-btn img { width:80px;height:auto;display:block;margin:0 auto 4px;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6)); transform:scaleX(-1); }
+.g14-train-select-btn.selected { background:rgba(230,57,70,0.45);border-color:#E63946;transform:scale(1.06); }
+.g14-train-select-btn:hover { background:rgba(255,255,255,0.18);transform:scale(1.04); }
+/* Speed dial indicator in header */
+.g14-speedometer {
+  font-size:11px;font-weight:900;color:#FFD166;letter-spacing:0.5px;
+  background:rgba(0,0,0,0.4);padding:2px 8px;border-radius:8px;
+}
 
 /* ===== GAME 15 — Lokomotif Pemberani ===== */
 #screen-game15 { flex-direction:column; }
@@ -2115,6 +2179,132 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes g15TrainBounce {
   0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
 }
+
+/* ===== GAME 16 — Selamatkan Kereta ===== */
+#screen-game16 { background:linear-gradient(180deg,#1a0a2e,#2d1660);flex-direction:column; }
+#g16-arena { background:linear-gradient(180deg,#0a1628 0%,#1a2a4a 50%,#8B7355 50%,#6B5A3E 100%); }
+.g16-timing-track {
+  width:80%;max-width:300px;height:28px;border-radius:14px;
+  background:linear-gradient(90deg,#E53935 0%,#E53935 30%,#43A047 30%,#43A047 70%,#E53935 70%,#E53935 100%);
+  position:relative;overflow:hidden;border:3px solid rgba(255,255,255,0.3);
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+}
+.g16-timing-needle {
+  position:absolute;top:0;bottom:0;width:6px;border-radius:3px;
+  background:white;box-shadow:0 0 8px white;transition:left 0.02s linear;
+}
+.g16-pull-bar-track {
+  width:80%;max-width:320px;height:20px;border-radius:10px;
+  background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);overflow:hidden;
+}
+.g16-pull-bar-fill {
+  height:100%;width:0%;border-radius:10px;
+  background:linear-gradient(90deg,#43A047,#8BC34A);transition:width 0.3s;
+}
+.g16-letter-tile {
+  width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;
+  font-size:18px;font-weight:900;color:white;
+  background:linear-gradient(135deg,#7B1FA2,#9C27B0);
+  box-shadow:0 4px 0 #4A148C;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;
+  margin:3px;
+}
+.g16-letter-tile:active { transform:translateY(2px);box-shadow:0 2px 0 #4A148C; }
+.g16-letter-tile.used { opacity:0.25;pointer-events:none; }
+.g16-word-slot {
+  width:36px;height:42px;border-radius:8px;border:2px solid rgba(255,255,255,0.4);
+  background:rgba(255,255,255,0.1);display:inline-flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;color:white;margin:3px;
+}
+.g16-word-slot.filled { background:rgba(156,39,176,0.5);border-color:#CE93D8; }
+@keyframes g16RopeSwing { 0%,100%{transform:scaleX(1)} 50%{transform:scaleX(0.95)} }
+@keyframes g16VictimShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(4px)} 75%{transform:translateX(-4px)} }
+@keyframes g16DangerPulse { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.5) drop-shadow(0 0 8px #E53935)} }
+.g16-victim-danger { animation:g16DangerPulse 0.8s infinite; }
+
+/* ===== GAME 17 — Jembatan Goyang ===== */
+#screen-game17 { background:linear-gradient(180deg,#1a2a0a,#2d4a0a);flex-direction:column; }
+.g17-block {
+  flex:1;min-width:28px;height:52px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;color:white;transition:all 0.2s;
+  border:3px solid rgba(255,255,255,0.2);
+  background:linear-gradient(135deg,#5D4037,#795548);
+  box-shadow:0 4px 0 rgba(0,0,0,0.4);
+  user-select:none;
+}
+.g17-block.active {
+  background:linear-gradient(135deg,#FDD835,#F9A825) !important;
+  border-color:#FFF59D !important;
+  transform:scale(1.1) translateY(-4px) !important;
+  box-shadow:0 8px 20px rgba(253,216,53,0.6) !important;
+  animation:g17BlockGlow 0.5s ease-in-out infinite alternate;
+}
+.g17-block.correct {
+  background:linear-gradient(135deg,#43A047,#66BB6A) !important;
+  border-color:#A5D6A7 !important;
+  transform:scale(0.95) !important;
+}
+.g17-block.wrong {
+  background:linear-gradient(135deg,#E53935,#EF5350) !important;
+  border-color:#FFCDD2 !important;
+  animation:g17BlockWrong 0.35s;
+}
+@keyframes g17BlockGlow {
+  from { box-shadow:0 8px 20px rgba(253,216,53,0.6); }
+  to   { box-shadow:0 8px 30px rgba(253,216,53,0.9); }
+}
+@keyframes g17BlockWrong {
+  0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+}
+@keyframes g17TrainCross {
+  from { left:-10%; }
+  to   { left:110%; }
+}
+.g17-train-cross { animation:g17TrainCross 1.5s ease-in-out forwards; }
+@keyframes g17CrackGrow { from{opacity:0;transform:scaleX(0)} to{opacity:1;transform:scaleX(1)} }
+.g17-crack-line {
+  position:absolute;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#8B4513,transparent);
+  animation:g17CrackGrow 0.3s ease-out forwards;
+  transform-origin:center;
+}
+
+/* ===== GAME 18 — Museum Kereta ===== */
+#screen-game18 { background:linear-gradient(180deg,#1a0a3e,#2d1060);flex-direction:column; }
+.g18-card {
+  background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05));
+  border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 10px;
+  text-align:center;cursor:pointer;transition:all 0.25s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.g18-card:hover,.g18-card:active { transform:scale(1.03);border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.15); }
+.g18-card-emoji { font-size:36px; }
+.g18-card-name { color:white;font-size:13px;font-weight:900;font-family:'Fredoka One',cursive;line-height:1.2; }
+.g18-card-country { color:rgba(255,255,255,0.7);font-size:11px;font-weight:700; }
+.g18-speed-badge {
+  background:linear-gradient(135deg,#7B1FA2,#AB47BC);color:white;
+  border-radius:100px;padding:2px 8px;font-size:10px;font-weight:900;
+  box-shadow:0 2px 0 #4A148C;
+}
+.g18-modal-overlay {
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);
+  flex-direction:column;align-items:center;justify-content:center;z-index:200;
+  padding:20px;
+}
+.g18-modal-box {
+  background:linear-gradient(135deg,#2d1660,#3d1a7a);
+  border:2px solid rgba(255,255,255,0.25);border-radius:20px;
+  padding:20px;max-width:340px;width:100%;text-align:center;
+}
+.g18-quiz-option {
+  width:100%;background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.06));
+  border:2px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 14px;
+  color:white;font-size:14px;font-weight:800;cursor:pointer;margin:4px 0;
+  text-align:left;transition:all 0.15s;
+}
+.g18-quiz-option:hover { background:rgba(123,31,162,0.4);border-color:#CE93D8; }
+.g18-quiz-option.correct { background:rgba(67,160,71,0.5);border-color:#A5D6A7; }
+.g18-quiz-option.wrong   { background:rgba(229,57,53,0.5);border-color:#FFCDD2; }
 
 /* ===== GAME 13 — Evolusi Math Adventure ===== */
 #screen-game13{
@@ -2195,9 +2385,9 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g13-type-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:0.5px;}
 .g13-hp-row{display:flex;align-items:center;gap:5px;margin-top:4px;}
 .g13-hp-lbl{font-size:10px;font-weight:900;color:#6EE7B7;}
-.g13-hp-track{flex:1;height:7px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;min-width:70px;position:relative;}
+.g13-hp-track{flex:1;height:10px;background:rgba(255,255,255,0.15);border-radius:5px;overflow:hidden;min-width:105px;position:relative;}
 .g13-hp-track::after{content:'';position:absolute;inset:-3px -4px;background:url('assets/battle-hp-frame.webp') center/100% 100% no-repeat;pointer-events:none;opacity:0.7;}
-.g13-hp-fill{height:100%;background:linear-gradient(90deg,#4ADE80,#22C55E);border-radius:4px;transition:width 0.5s ease;}
+.g13-hp-fill{height:100%;background:linear-gradient(90deg,#4ADE80,#22C55E);border-radius:5px;transition:width 0.5s ease;}
 .g13-hp-fill.low{background:linear-gradient(90deg,#FB923C,#EF4444);}
 .g13-hp-nums{font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;text-align:right;margin-top:2px;}
 
@@ -2275,7 +2465,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* Question panel */
 .g13-qpanel{
   flex:0 0 auto;display:flex;flex-direction:column;align-items:center;
-  padding:10px 16px calc(14px + env(safe-area-inset-bottom, 0px));gap:6px;
+  padding:10px 16px calc(24px + env(safe-area-inset-bottom, 0px));gap:8px;
   background:rgba(10,10,24,0.99);border-top:2px solid rgba(249,115,22,0.25);
 }
 .g13-atk-lbl{font-size:12px;font-weight:900;color:rgba(249,115,22,0.85);text-transform:uppercase;letter-spacing:0.5px;}
@@ -4055,9 +4245,10 @@ body { background: #0a0a1a !important; }
 
   <!-- World 5: Dunia Kereta -->
   <div class="world-zone" id="zone-kereta">
-    <div class="world-zone-header">
+    <div class="world-zone-header" style="position:relative;" onmouseenter="g14ZoneHover()" onclick="g14ZoneTap()">
       <span class="world-zone-icon">🚂</span>
       <span class="world-zone-name">Dunia Kereta</span>
+      <button id="zone-kereta-music-btn" title="Putar/Hentikan musik kereta" onclick="event.stopPropagation();g14ToggleZoneMusic()">🎵</button>
     </div>
     <div class="game-grid-2">
       <div class="game-tile g14" id="gtile-14" onclick="playClick(); openLevelSelect(14)">
@@ -4350,62 +4541,80 @@ body { background: #0a0a1a !important; }
 
 <!-- GAME 14 — Balapan Kereta -->
 <div id="screen-game14" class="screen">
-  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
+  <!-- Header -->
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
-    <span id="g14-train-emoji" style="font-size:22px;flex-shrink:0;">🚂</span>
-    <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Balapan Kereta</span>
+    <img id="g14-train-icon-hdr" src="assets/train/cc201-indonesia.svg" style="height:28px;width:auto;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));transform:scaleX(-1);" alt="">
+    <span class="gh-title" style="flex:1;font-size:14px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Balapan Kereta</span>
+    <span class="g14-speedometer" id="g14-speedometer">0 km/h</span>
     <span class="gh-level" id="g14-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
-    <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⏸</button>
-    <span class="gh-stars" id="g14-stars" style="background:linear-gradient(135deg,#E63946,#B52733);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #7A0A12;color:white;flex-shrink:0;">🏁 0</span>
+    <span class="gh-stars" id="g14-stars" style="background:linear-gradient(135deg,#E63946,#B52733);border-radius:100px;padding:4px 10px;font-size:13px;font-weight:900;box-shadow:0 3px 0 #7A0A12;color:white;flex-shrink:0;">🏁 0m</span>
   </div>
-  <!-- Race Track -->
-  <div id="g14-track" style="position:relative;flex:1;overflow:hidden;background:#2D5016;">
-    <!-- BG will be set via JS -->
-    <div id="g14-bg-scroll" style="position:absolute;inset:0;background-image:repeating-linear-gradient(180deg,#3a6b1e 0px,#3a6b1e 40px,#4a8a2a 40px,#4a8a2a 80px);background-size:100% 80px;"></div>
-    <!-- Rail tracks (3 lanes) -->
-    <div id="g14-lanes" style="position:absolute;inset:0;display:flex;gap:4px;padding:0 12px;">
-      <div class="g14-lane" data-lane="0"></div>
-      <div class="g14-lane" data-lane="1"></div>
-      <div class="g14-lane" data-lane="2"></div>
+
+  <!-- Race Track: horizontal side-scroller -->
+  <div id="g14-track" style="position:relative;flex:1;overflow:hidden;">
+    <!-- 3 Horizontal Lane Rows -->
+    <div id="g14-lane-area">
+      <div class="g14-lane-row" data-lane="0"></div>
+      <div class="g14-lane-row" data-lane="1"></div>
+      <div class="g14-lane-row" data-lane="2"></div>
     </div>
-    <!-- Player train -->
-    <div id="g14-player" style="position:absolute;bottom:20px;font-size:36px;transition:left 0.2s cubic-bezier(0.34,1.56,0.64,1);z-index:10;transform:rotate(90deg);">🚂</div>
-    <!-- Distance marker -->
-    <div id="g14-dist-bar" style="position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:white;font-size:13px;font-weight:800;padding:4px 14px;border-radius:20px;z-index:20;">🏁 0 / 500m</div>
+
+    <!-- Player train (SVG image, positioned left side, moves vertically) -->
+    <img id="g14-player" src="assets/train/cc201-indonesia.svg" alt="kereta">
+
+    <!-- Active lane highlight bar (left edge indicator) -->
+    <div id="g14-lane-indicator" style="position:absolute;left:0;width:4px;background:rgba(230,57,70,0.8);border-radius:0 4px 4px 0;z-index:12;transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);height:33.3%;"></div>
+
+    <!-- HUD: distance progress bar -->
+    <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:20;display:flex;align-items:center;gap:6px;">
+      <div style="background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);border-radius:20px;padding:4px 14px;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:14px;">🏁</span>
+        <div style="width:100px;height:8px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;">
+          <div id="g14-dist-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#FFD166,#E63946);border-radius:4px;transition:width 0.3s;"></div>
+        </div>
+        <span id="g14-dist-bar" style="color:white;font-size:11px;font-weight:800;">0m</span>
+      </div>
+    </div>
+
     <!-- Lives -->
-    <div id="g14-lives" style="position:absolute;top:40px;left:8px;font-size:18px;z-index:20;">❤️❤️❤️</div>
-    <!-- Boost cooldown badge -->
-    <div id="g14-boost-ready" style="position:absolute;top:40px;right:8px;font-size:12px;font-weight:800;padding:3px 8px;border-radius:10px;background:#FFD166;color:#1a1a1a;z-index:20;display:none;">BOOST SIAP!</div>
+    <div id="g14-lives" style="position:absolute;top:38px;left:8px;font-size:16px;z-index:20;display:flex;gap:2px;">❤️❤️❤️</div>
+
+    <!-- Race position indicator -->
+    <div id="g14-position" style="position:absolute;top:38px;right:8px;font-size:11px;font-weight:900;color:#FFD166;background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:8px;z-index:20;display:none;">🥇 POSISI 1</div>
+
     <!-- Start overlay -->
-    <div id="g14-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.7);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:12px;">
-      <div style="font-size:48px;">🚂</div>
-      <div style="color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;" id="g14-start-msg">Pilih Kereta!</div>
-      <div id="g14-train-select" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 16px;"></div>
-      <button id="g14-go-btn" onclick="g14StartRace()" style="display:none;background:linear-gradient(135deg,#E63946,#B52733);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #7A0A12;cursor:pointer;margin-top:4px;">🏁 BALAPAN!</button>
+    <div id="g14-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.78);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:14px;backdrop-filter:blur(6px);">
+      <div style="font-size:14px;font-weight:900;color:#FFD166;letter-spacing:1px;text-transform:uppercase;">Pilih Kereta</div>
+      <div id="g14-train-select" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 16px;max-width:340px;"></div>
+      <div id="g14-start-msg" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;text-align:center;"></div>
+      <button id="g14-go-btn" onclick="g14StartRace()" style="display:none;background:linear-gradient(135deg,#E63946,#B52733);color:white;border:none;border-radius:14px;padding:14px 36px;font-size:19px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #7A0A12;cursor:pointer;">🏁 BALAPAN!</button>
     </div>
+
     <!-- Result overlay -->
-    <div id="g14-result-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.82);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:10px;">
+    <div id="g14-result-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:10px;backdrop-filter:blur(6px);">
       <div id="g14-res-icon" style="font-size:56px;">🏆</div>
       <div id="g14-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
-      <div id="g14-res-stars" style="font-size:28px;"></div>
-      <div id="g14-res-info" style="color:rgba(255,255,255,0.75);font-size:14px;font-weight:700;text-align:center;padding:0 20px;"></div>
+      <div id="g14-res-stars" style="font-size:28px;letter-spacing:3px;"></div>
+      <div id="g14-res-info" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;text-align:center;padding:0 24px;max-width:300px;"></div>
       <div style="display:flex;gap:10px;margin-top:6px;">
-        <button onclick="g14Replay()" style="background:#E63946;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
-        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
+        <button onclick="g14Replay()" style="background:#E63946;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
+        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;">✅ Selesai</button>
       </div>
     </div>
   </div>
-  <!-- Controls -->
-  <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(0,0,0,0.8);flex-shrink:0;">
-    <button onclick="g14LaneUp()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px;font-size:20px;font-weight:900;cursor:pointer;">▲ Atas</button>
-    <div style="flex:1.5;text-align:center;">
-      <div style="color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;">BOILER</div>
-      <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:12px;overflow:hidden;margin-bottom:4px;">
-        <div id="g14-pressure-bar" style="height:100%;width:50%;background:linear-gradient(90deg,#FFD166,#E63946);border-radius:8px;transition:width 0.3s;"></div>
+
+  <!-- Controls bar -->
+  <div style="display:flex;align-items:stretch;gap:8px;padding:10px 12px;background:rgba(0,0,0,0.88);flex-shrink:0;">
+    <button onclick="g14LaneUp()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px 6px;font-size:18px;font-weight:900;cursor:pointer;line-height:1;">▲<br><span style="font-size:10px;opacity:0.7">Atas</span></button>
+    <div style="flex:1.8;display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div style="color:rgba(255,209,102,0.8);font-size:10px;font-weight:800;letter-spacing:0.5px;">⚙️ BOILER</div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:6px;height:10px;overflow:hidden;width:100%;position:relative;">
+        <div id="g14-pressure-bar" style="height:100%;width:50%;background:linear-gradient(90deg,#FFD166,#FF6B35,#E63946);border-radius:6px;transition:width 0.3s;"></div>
       </div>
-      <button id="g14-boost-btn" onclick="g14Boost()" style="background:linear-gradient(135deg,#FF6B35,#E63946);color:white;border:none;border-radius:10px;padding:8px 20px;font-size:14px;font-weight:900;cursor:pointer;width:100%;">🔥 BOOST!</button>
+      <button id="g14-boost-btn" onclick="g14Boost()" style="background:linear-gradient(135deg,#FF6B35,#E63946);color:white;border:none;border-radius:10px;padding:7px 16px;font-size:13px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 3px 0 #7A0A12;">🔥 BOOST!</button>
     </div>
-    <button onclick="g14LaneDown()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px;font-size:20px;font-weight:900;cursor:pointer;">▼ Bawah</button>
+    <button onclick="g14LaneDown()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px 6px;font-size:18px;font-weight:900;cursor:pointer;line-height:1;">▼<br><span style="font-size:10px;opacity:0.7">Bawah</span></button>
   </div>
 </div>
 
@@ -4449,45 +4658,190 @@ body { background: #0a0a1a !important; }
   </div>
 </div>
 
-<!-- GAME 16 — Selamatkan Kereta (Placeholder) -->
-<div id="screen-game16" class="screen" style="background:linear-gradient(135deg,#E65100,#FF9800);">
-  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding:8px 12px;background:rgba(0,0,0,0.3);">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;">⌂</button>
-    <span style="flex:1;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🆘 Selamatkan Kereta!</span>
+<!-- GAME 16 — Selamatkan Kereta -->
+<div id="screen-game16" class="screen">
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
+    <span style="font-size:20px;flex-shrink:0;">🆘</span>
+    <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Selamatkan Kereta!</span>
+    <span id="g16-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
+    <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⏸</button>
+    <span id="g16-stars-badge" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #4A148C;color:white;flex-shrink:0;">🆘 0</span>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center;">
-    <div style="font-size:72px;">🚨</div>
-    <div style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;">Segera Hadir!</div>
-    <div style="color:rgba(255,255,255,0.8);font-size:15px;font-weight:700;">Game ini sedang dalam pengembangan.<br>Pantau terus ya! 🚂</div>
-    <button onclick="exitGame()" style="background:white;color:#E65100;border:none;border-radius:14px;padding:14px 28px;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px;">← Kembali</button>
+  <!-- Arena -->
+  <div id="g16-arena" style="flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
+    <!-- Scene elements -->
+    <div id="g16-hero-train" style="position:absolute;left:6%;bottom:42%;font-size:44px;z-index:5;transition:transform 0.3s;">🚂</div>
+    <div id="g16-rope" style="position:absolute;bottom:calc(42% + 28px);left:calc(6% + 48px);right:calc(8% + 44px);height:6px;background:linear-gradient(90deg,#8D6E63,#BCAAA4,#8D6E63);border-radius:3px;z-index:4;transform-origin:left center;transition:all 0.3s;"></div>
+    <div id="g16-victim-train" style="position:absolute;right:8%;bottom:42%;font-size:44px;z-index:5;transition:right 0.5s;">🚃</div>
+    <div id="g16-cliff-edge" style="position:absolute;right:0;bottom:38%;font-size:36px;z-index:3;">🏔️</div>
+    <div id="g16-danger-meter" style="position:absolute;top:10px;right:10px;z-index:20;text-align:center;">
+      <div style="color:rgba(255,255,255,0.8);font-size:10px;font-weight:800;margin-bottom:2px;">BAHAYA</div>
+      <div style="width:64px;height:10px;background:rgba(255,255,255,0.15);border-radius:5px;overflow:hidden;">
+        <div id="g16-danger-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#FDD835,#E53935);border-radius:5px;transition:width 0.5s;"></div>
+      </div>
+    </div>
+    <!-- Phase 1: Hook timing -->
+    <div id="g16-phase1" style="display:none;flex-direction:column;align-items:center;gap:12px;z-index:10;background:rgba(0,0,0,0.7);border-radius:20px;padding:20px;width:88%;max-width:360px;">
+      <div style="color:white;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;">Lempar kait pada zona HIJAU!</div>
+      <div style="position:relative;">
+        <div class="g16-timing-track">
+          <div id="g16-needle" class="g16-timing-needle" style="left:0%;"></div>
+        </div>
+      </div>
+      <div id="g16-hook-result" style="color:white;font-size:14px;font-weight:800;min-height:20px;"></div>
+      <button id="g16-throw-btn" onclick="g16ThrowHook()" style="background:linear-gradient(135deg,#E65100,#FF7043);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #BF360C;cursor:pointer;">🪝 LEMPAR KAIT!</button>
+      <div id="g16-hook-tries" style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;"></div>
+    </div>
+    <!-- Phase 2: Word pull -->
+    <div id="g16-phase2" style="display:none;flex-direction:column;align-items:center;gap:10px;z-index:10;background:rgba(0,0,0,0.7);border-radius:20px;padding:16px;width:92%;max-width:380px;">
+      <div style="color:white;font-size:14px;font-weight:900;font-family:'Fredoka One',cursive;">Eja kata untuk MENARIK kereta! 🔤</div>
+      <div style="width:100%;text-align:center;">
+        <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:4px;">KEKUATAN TARIK</div>
+        <div class="g16-pull-bar-track"><div id="g16-pull-fill" class="g16-pull-bar-fill"></div></div>
+      </div>
+      <div id="g16-image-clue" style="font-size:52px;line-height:1;">❓</div>
+      <div id="g16-word-slots" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:48px;align-items:center;"></div>
+      <div id="g16-letters-wrap" style="display:flex;flex-wrap:wrap;justify-content:center;max-width:320px;gap:2px;"></div>
+      <div id="g16-word-progress" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;"></div>
+    </div>
+    <!-- Start overlay -->
+    <div id="g16-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:14px;padding:20px;text-align:center;">
+      <div style="font-size:56px;">🆘</div>
+      <div style="color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;">Kereta butuh pertolongan!</div>
+      <div style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;line-height:1.6;">1️⃣ Lempar kait di zona hijau<br>2️⃣ Eja kata untuk menarik kereta<br>3️⃣ Selamatkan sebelum jatuh ke jurang!</div>
+      <button onclick="g16BeginGame()" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #4A148C;cursor:pointer;margin-top:4px;">🆘 MULAI!</button>
+    </div>
+    <!-- Result overlay -->
+    <div id="g16-result" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:12px;padding:20px;">
+      <div id="g16-res-icon" style="font-size:60px;">🎉</div>
+      <div id="g16-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;text-align:center;"></div>
+      <div id="g16-res-stars" style="font-size:30px;"></div>
+      <div id="g16-res-info" style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:700;text-align:center;"></div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button onclick="initGame16()" style="background:#7B1FA2;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
+        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- GAME 17 — Jembatan Goyang (Placeholder) -->
-<div id="screen-game17" class="screen" style="background:linear-gradient(135deg,#2E7D32,#4CAF50);">
-  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding:8px 12px;background:rgba(0,0,0,0.3);">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;">⌂</button>
-    <span style="flex:1;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🌉 Jembatan Goyang</span>
+<!-- GAME 17 — Jembatan Goyang -->
+<div id="screen-game17" class="screen">
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
+    <span style="font-size:20px;flex-shrink:0;">🌉</span>
+    <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Jembatan Goyang</span>
+    <span id="g17-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
+    <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⏸</button>
+    <span id="g17-stars-badge" style="background:linear-gradient(135deg,#2E7D32,#43A047);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #1B5E20;color:white;flex-shrink:0;">🌉 0</span>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center;">
-    <div style="font-size:72px;">🌉</div>
-    <div style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;">Segera Hadir!</div>
-    <div style="color:rgba(255,255,255,0.8);font-size:15px;font-weight:700;">Rhythm game seru memperbaiki jembatan.<br>Segera tersedia! 🔨</div>
-    <button onclick="exitGame()" style="background:white;color:#2E7D32;border:none;border-radius:14px;padding:14px 28px;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px;">← Kembali</button>
+  <!-- Scene -->
+  <div id="g17-scene" style="flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 48%,#6B8E23 48%,#4a6a10 100%);">
+    <!-- Clouds -->
+    <div style="position:absolute;top:8%;left:10%;font-size:28px;opacity:0.7;">☁️</div>
+    <div style="position:absolute;top:14%;right:18%;font-size:22px;opacity:0.6;">☁️</div>
+    <!-- Sun -->
+    <div style="position:absolute;top:6%;right:8%;font-size:32px;">☀️</div>
+    <!-- Train waiting left -->
+    <div id="g17-train-waiting" style="position:absolute;left:4%;bottom:44%;font-size:42px;z-index:5;transition:all 1.5s ease-in-out;">🚂</div>
+    <!-- Bridge structure -->
+    <div style="position:absolute;bottom:46%;left:22%;right:22%;height:12px;background:linear-gradient(90deg,#5D4037,#795548,#5D4037);border-radius:3px;z-index:3;"></div>
+    <!-- Bridge blocks row -->
+    <div id="g17-bridge" style="position:absolute;bottom:calc(46% + 8px);left:20%;right:20%;display:flex;gap:3px;z-index:6;"></div>
+    <!-- Bridge supports -->
+    <div style="position:absolute;bottom:38%;left:20%;width:12px;height:8%;background:#5D4037;border-radius:2px;z-index:2;"></div>
+    <div style="position:absolute;bottom:38%;right:20%;width:12px;height:8%;background:#5D4037;border-radius:2px;z-index:2;"></div>
+    <!-- Crack overlay -->
+    <div id="g17-cracks" style="position:absolute;bottom:calc(46% + 8px);left:20%;right:20%;height:52px;z-index:7;pointer-events:none;"></div>
+    <!-- Timer bar -->
+    <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:70%;max-width:280px;z-index:20;">
+      <div style="color:white;font-size:11px;font-weight:800;text-align:center;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,0.7);">⏱️ <span id="g17-timer-text">30</span>s</div>
+      <div style="background:rgba(0,0,0,0.35);border-radius:8px;height:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.3);">
+        <div id="g17-timer-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#43A047,#FDD835,#E53935);border-radius:6px;transition:width 0.5s linear;transform-origin:left;"></div>
+      </div>
+    </div>
+    <!-- Combo display -->
+    <div id="g17-combo" style="position:absolute;top:52px;left:50%;transform:translateX(-50%);color:white;font-size:13px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.8);z-index:20;min-height:20px;text-align:center;"></div>
+    <!-- Start overlay -->
+    <div id="g17-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:14px;padding:20px;text-align:center;">
+      <div style="font-size:56px;">🌉</div>
+      <div style="color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;">Jembatan butuh diperbaiki!</div>
+      <div style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;line-height:1.7;">🔨 Ketuk balok yang MENYALA<br>⚡ Makin cepat makin bagus!<br>❤️ 3 nyawa — jangan salah ketuk!</div>
+      <button onclick="g17StartGame()" style="background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #1B5E20;cursor:pointer;margin-top:4px;">🔨 MULAI!</button>
+    </div>
+    <!-- Result overlay -->
+    <div id="g17-result" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:12px;padding:20px;">
+      <div id="g17-res-icon" style="font-size:60px;">🎉</div>
+      <div id="g17-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;text-align:center;"></div>
+      <div id="g17-res-stars" style="font-size:30px;"></div>
+      <div id="g17-res-info" style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:700;text-align:center;line-height:1.6;"></div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button onclick="initGame17()" style="background:#2E7D32;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
+        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
+      </div>
+    </div>
+  </div>
+  <!-- Bottom instruction bar -->
+  <div id="g17-instruction" style="padding:10px 12px;background:rgba(0,0,0,0.8);flex-shrink:0;text-align:center;color:rgba(255,255,255,0.85);font-size:13px;font-weight:800;">
+    Ketuk balok yang menyala kuning! 🔨
   </div>
 </div>
 
-<!-- GAME 18 — Museum Kereta (Placeholder) -->
-<div id="screen-game18" class="screen" style="background:linear-gradient(135deg,#6A1B9A,#9C27B0);">
-  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding:8px 12px;background:rgba(0,0,0,0.3);">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;">⌂</button>
-    <span style="flex:1;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🏛️ Museum Kereta</span>
+<!-- GAME 18 — Museum Kereta -->
+<div id="screen-game18" class="screen">
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
+    <span style="font-size:20px;flex-shrink:0;">🏛️</span>
+    <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Museum Kereta</span>
+    <span id="g18-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
+    <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⏸</button>
+    <span id="g18-stars-badge" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #38006b;color:white;flex-shrink:0;">🏛️ 0</span>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center;">
-    <div style="font-size:72px;">🏛️</div>
-    <div style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;">Segera Hadir!</div>
-    <div style="color:rgba(255,255,255,0.8);font-size:15px;font-weight:700;">Galeri interaktif kereta dari seluruh dunia.<br>Database sedang dikumpulkan! 🚂</div>
-    <button onclick="exitGame()" style="background:white;color:#6A1B9A;border:none;border-radius:14px;padding:14px 28px;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px;">← Kembali</button>
+  <!-- Gallery view -->
+  <div id="g18-gallery" style="flex:1;overflow-y:auto;padding:12px;">
+    <div style="color:white;font-size:13px;font-weight:800;text-align:center;margin-bottom:10px;opacity:0.75;">Ketuk kartu untuk info lengkap! 🔍</div>
+    <div id="g18-card-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:0 auto;"></div>
+    <div style="text-align:center;margin-top:14px;padding-bottom:4px;">
+      <button onclick="g18StartQuiz()" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);color:white;border:none;border-radius:14px;padding:14px 28px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #38006b;cursor:pointer;">📝 MULAI KUIS!</button>
+    </div>
+  </div>
+  <!-- Quiz view -->
+  <div id="g18-quiz-view" style="display:none;flex:1;overflow-y:auto;padding:12px;flex-direction:column;gap:12px;">
+    <div style="color:white;font-size:13px;font-weight:800;text-align:center;opacity:0.75;">
+      Pertanyaan <span id="g18-q-num">1</span> dari 5
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:16px;text-align:center;">
+      <div id="g18-q-image" style="font-size:44px;margin-bottom:8px;"></div>
+      <div id="g18-q-text" style="color:white;font-size:15px;font-weight:800;line-height:1.5;"></div>
+    </div>
+    <div id="g18-q-options" style="display:flex;flex-direction:column;gap:6px;"></div>
+    <div id="g18-q-feedback" style="color:white;font-size:13px;font-weight:800;text-align:center;min-height:20px;"></div>
+    <div id="g18-q-next-wrap" style="text-align:center;display:none;">
+      <button id="g18-q-next-btn" onclick="g18NextQuestion()" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #38006b;">▶ Lanjut</button>
+    </div>
+  </div>
+  <!-- Detail modal -->
+  <div id="g18-modal" class="g18-modal-overlay">
+    <div class="g18-modal-box">
+      <div id="g18-modal-emoji" style="font-size:56px;margin-bottom:8px;"></div>
+      <div id="g18-modal-name" style="color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;margin-bottom:4px;"></div>
+      <div id="g18-modal-country" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;margin-bottom:10px;"></div>
+      <div id="g18-modal-details" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
+      <div id="g18-modal-fact" style="background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;line-height:1.5;text-align:left;margin-bottom:12px;"></div>
+      <button onclick="g18CloseModal()" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;width:100%;">✅ Mengerti!</button>
+    </div>
+  </div>
+  <!-- Result overlay -->
+  <div id="g18-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);flex-direction:column;align-items:center;justify-content:center;z-index:300;gap:12px;padding:20px;text-align:center;">
+    <div id="g18-res-icon" style="font-size:64px;">🏆</div>
+    <div id="g18-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
+    <div id="g18-res-stars" style="font-size:32px;"></div>
+    <div id="g18-res-info" style="color:rgba(255,255,255,0.75);font-size:14px;font-weight:700;line-height:1.7;"></div>
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="initGame18()" style="background:#6A1B9A;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
+      <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
+    </div>
   </div>
 </div>
 
@@ -8748,7 +9102,34 @@ const G13_CHAINS = [
    evolved:{name:'Kabutops',slug:'kabutops',type:'Rock',tc:'#A16207'},
    wild:{name:'Omanyte',slug:'omanyte',type:'Rock',tc:'#A16207'}},
 
-  // === HARD (26-40): mixed ops up to 30 ===
+  // === HARD (26-40): mixed ops up to 30, some start as stage-1 ===
+  // Player starts as first evolution → evolves to final form
+  {id:26, icon:'🔥', diff:'hard', maxNum:30, ops:['+','-'],
+   player:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'},
+   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
+  {id:51, icon:'🌊', diff:'hard', maxNum:30, ops:['+','-'],
+   player:{name:'Wartortle',slug:'wartortle',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'},
+   wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
+  {id:52, icon:'🌿', diff:'hard', maxNum:30, ops:['+','-'],
+   player:{name:'Ivysaur',slug:'ivysaur',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'},
+   wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
+  {id:53, icon:'👻', diff:'hard', maxNum:30, ops:['+','-'],
+   player:{name:'Haunter',slug:'haunter',type:'Ghost',tc:'#7C3AED'},
+   evolved:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'},
+   wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
+  {id:54, icon:'🐉', diff:'hard', maxNum:30, ops:['+','-'],
+   player:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'},
+   evolved:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#6366F1'},
+   wild:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'}},
+  {id:55, icon:'🔮', diff:'hard', maxNum:30, ops:['+','-'],
+   player:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'},
+   evolved:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'},
+   wild:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'}},
+
+  // Hard (original #26 moved)
   {id:26, icon:'🔥', diff:'hard', maxNum:30, ops:['+','-'],
    player:{name:'Cyndaquil',slug:'cyndaquil',type:'Fire',tc:'#F97316'},
    evolved:{name:'Quilava',slug:'quilava',type:'Fire',tc:'#F97316'},
@@ -8809,13 +9190,56 @@ const G13_CHAINS = [
    player:{name:'Beldum',slug:'beldum',type:'Steel',tc:'#94A3B8'},
    evolved:{name:'Metang',slug:'metang',type:'Steel',tc:'#94A3B8'},
    wild:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'}},
+
+  // === EPIC (level 17-20): 2-stage evolution! Base → Stage1 → Final ===
+  {id:61, icon:'🔥', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Charmander',slug:'charmander',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
+   evolved2:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'},
+   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
+  {id:62, icon:'💧', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Squirtle',slug:'squirtle',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Wartortle',slug:'wartortle',type:'Water',tc:'#38BDF8'},
+   evolved2:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'},
+   wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
+  {id:63, icon:'🌿', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Bulbasaur',slug:'bulbasaur',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Ivysaur',slug:'ivysaur',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'},
+   wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
+  {id:64, icon:'👻', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Gastly',slug:'gastly',type:'Ghost',tc:'#7C3AED'},
+   evolved:{name:'Haunter',slug:'haunter',type:'Ghost',tc:'#7C3AED'},
+   evolved2:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'},
+   wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
+  {id:65, icon:'🐉', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Dratini',slug:'dratini',type:'Dragon',tc:'#6366F1'},
+   evolved:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'},
+   evolved2:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#F97316'},
+   wild:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'}},
+  {id:66, icon:'⚙️', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Beldum',slug:'beldum',type:'Steel',tc:'#94A3B8'},
+   evolved:{name:'Metang',slug:'metang',type:'Steel',tc:'#94A3B8'},
+   evolved2:{name:'Metagross',slug:'metagross',type:'Steel',tc:'#94A3B8'},
+   wild:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'}},
+  {id:67, icon:'🦖', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Larvitar',slug:'larvitar',type:'Rock',tc:'#A16207'},
+   evolved:{name:'Pupitar',slug:'pupitar',type:'Rock',tc:'#A16207'},
+   evolved2:{name:'Tyranitar',slug:'tyranitar',type:'Dark',tc:'#4B5563'},
+   wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
+  {id:68, icon:'🌀', diff:'epic', maxNum:35, ops:['+','-'],
+   player:{name:'Ralts',slug:'ralts',type:'Psychic',tc:'#EC4899'},
+   evolved:{name:'Kirlia',slug:'kirlia',type:'Psychic',tc:'#EC4899'},
+   evolved2:{name:'Gardevoir',slug:'gardevoir',type:'Psychic',tc:'#EC4899'},
+   wild:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'}},
 ]
 
 // HP config by difficulty
 const G13_DIFF = {
-  easy:   { playerHp:5, wildHp:8,  attacksToEvo:4, damage:1, wildDamage:1 },
-  medium: { playerHp:6, wildHp:10, attacksToEvo:5, damage:1, wildDamage:1 },
-  hard:   { playerHp:7, wildHp:12, attacksToEvo:6, damage:1, wildDamage:1 },
+  easy:   { playerHp:5, wildHp:8,  attacksToEvo:3, damage:1, wildDamage:1 },
+  medium: { playerHp:6, wildHp:10, attacksToEvo:4, damage:1, wildDamage:1 },
+  hard:   { playerHp:7, wildHp:12, attacksToEvo:5, damage:1, wildDamage:1 },
+  epic:   { playerHp:8, wildHp:15, attacksToEvo:4, damage:1, wildDamage:1 },
 }
 
 // Type color map for badge
@@ -8829,9 +9253,9 @@ const G13_TYPE_COLORS = {
 let g13State = {}
 
 function g13PickChain(lv) {
-  // level 1-10: easy chains, 11-20: medium, else: hard
-  const tier = lv <= 10 ? 'easy' : lv <= 20 ? 'medium' : 'hard'
+  const tier = lv <= 8 ? 'easy' : lv <= 14 ? 'medium' : lv <= 17 ? 'hard' : 'epic'
   const pool = G13_CHAINS.filter(c => c.diff === tier)
+  if (!pool.length) return G13_CHAINS[Math.floor(Math.random()*G13_CHAINS.length)]
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
@@ -8866,7 +9290,7 @@ function _initGame13Impl() {
     playerHp: cfg.playerHp, playerMaxHp: cfg.playerHp,
     wildHp: cfg.wildHp, wildMaxHp: cfg.wildHp,
     evoPoints: 0, evoNeeded: cfg.attacksToEvo,
-    evolved: false, locked: false,
+    evolved: false, evolved2: false, locked: false,
     attackIdx: 0,
     phase: 'player_attack',
     correctThisExchange: 0,
@@ -8877,7 +9301,7 @@ function _initGame13Impl() {
   // Set header
   const lvEl = document.getElementById('g13-level'); if(lvEl) lvEl.textContent = `Lv.${lv}`
   const stEl = document.getElementById('g13-stars'); if(stEl) stEl.textContent = '⭐ 0'
-  const bdg = document.getElementById('g13-chain-badge'); if(bdg) bdg.textContent = `${chain.icon} ${chain.player.name}→${chain.evolved.name}`
+  const bdg = document.getElementById('g13-chain-badge'); if(bdg) bdg.textContent = chain.evolved2 ? `${chain.icon} ${chain.player.name}→${chain.evolved.name}→${chain.evolved2.name}` : `${chain.icon} ${chain.player.name}→${chain.evolved.name}`
 
   // Ensure overlays hidden, qpanel fully visible
   const evoOv = document.getElementById('g13-evo-overlay'); if(evoOv) evoOv.style.display = 'none'
@@ -8902,43 +9326,45 @@ function _initGame13Impl() {
   function loadSpr(imgId, wrapId, slug, emoji) {
     const wrap = document.getElementById(wrapId)
     if (!wrap) return
-    const old = wrap.querySelector('.g13-spr-fb'); if(old) old.remove()
     const img = document.getElementById(imgId)
     if (!img) return
-    // Reset all spr-* animation classes + inline styles left by previous battle/evo
+    // Reset animation classes and inline styles from previous battle
     img.className = img.className.replace(/\bspr-\S+/g, '').trim()
     img.style.opacity = '1'
     img.style.animation = ''
     img.style.transform = ''
+    img.style.display = 'none'  // hide while loading
+
+    // Always show emoji fallback immediately — swap to img only after confirmed load
+    const old = wrap.querySelector('.g13-spr-fb'); if (old) old.remove()
+    const fb = document.createElement('div')
+    fb.className = 'g13-spr-fb'
+    fb.style.cssText = sprFbStyle
+    fb.textContent = emoji
+    wrap.insertBefore(fb, img)
+
     const url = pokeUrl(slug)
-    if (!url) {
-      img.style.display = 'none'
-      const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
-      wrap.insertBefore(fb, img); return
+    if (!url) return  // keep emoji fallback
+
+    // Preload — only swap emoji→img after the image is confirmed loaded
+    const test = new Image()
+    test.onload = () => {
+      const existFb = wrap.querySelector('.g13-spr-fb'); if (existFb) existFb.remove()
+      img.src = url
+      img.style.display = ''
     }
-    img.style.display = ''
-    img.src = url
-    img.onerror = () => {
+    test.onerror = () => {
       const fbUrl = pokeFallbackUrl(slug)
-      if (fbUrl) {
+      if (!fbUrl) return
+      const test2 = new Image()
+      test2.onload = () => {
+        const existFb = wrap.querySelector('.g13-spr-fb'); if (existFb) existFb.remove()
         img.src = fbUrl
-        img.onerror = () => {
-          img.style.display = 'none'
-          if (!wrap.querySelector('.g13-spr-fb')) {
-            const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
-            wrap.insertBefore(fb, img)
-          }
-          img.onerror = null
-        }
-      } else {
-        img.style.display = 'none'
-        if (!wrap.querySelector('.g13-spr-fb')) {
-          const fb = document.createElement('div'); fb.className='g13-spr-fb'; fb.style.cssText=sprFbStyle; fb.textContent=emoji
-          wrap.insertBefore(fb, img)
-        }
-        img.onerror = null
+        img.style.display = ''
       }
+      test2.src = fbUrl
     }
+    test.src = url
   }
 
   loadSpr('g13-wspr', 'g13-wspr-wrap', chain.wild.slug, chain.icon || '❓')
@@ -9200,8 +9626,10 @@ function g13Answer(val, btn) {
     }
     // After 3 attacks, switch to wild counter phase
     if (s.attackIdx >= 3) {
-      // Check evo BEFORE wild counter, so player can't die before evolving
-      if (!s.evolved && s.evoPoints >= s.evoNeeded) {
+      // Check evo BEFORE wild counter — stage 1 or stage 2
+      const canEvo1 = !s.evolved && s.evoPoints >= s.evoNeeded
+      const canEvo2 = s.evolved && !s.evolved2 && s.chain.evolved2 && s.evoPoints >= s.evoNeeded
+      if (canEvo1 || canEvo2) {
         s.phase = 'evo_ready'
         setTimeout(() => g13ShowEvoButton(), 300)
       } else {
@@ -9230,7 +9658,9 @@ function g13WildCounterPhase() {
       s.attackIdx = 0
       s.correctThisExchange = 0
       if (s.playerHp <= 0) { g13Defeat(); return }
-      if (!s.evolved && s.evoPoints >= s.evoNeeded) {
+      const canEvo1 = !s.evolved && s.evoPoints >= s.evoNeeded
+      const canEvo2 = s.evolved && !s.evolved2 && s.chain.evolved2 && s.evoPoints >= s.evoNeeded
+      if (canEvo1 || canEvo2) {
         s.phase = 'evo_ready'
         setTimeout(() => g13ShowEvoButton(), 300)
       } else {
@@ -9319,9 +9749,13 @@ function g13TriggerEvolution() {
   const POKE_IDS2 = {bulbasaur:1,ivysaur:2,venusaur:3,charmander:4,charmeleon:5,charizard:6,squirtle:7,wartortle:8,blastoise:9,caterpie:10,metapod:11,butterfree:12,pikachu:25,raichu:26,jolteon:135,flareon:136,vaporeon:134,arcanine:59,meowth:52,persian:53,machop:66,machoke:67,machamp:68,geodude:74,graveler:75,golem:76,gastly:92,haunter:93,gengar:94,magikarp:129,gyarados:130,lapras:131,eevee:133,snorlax:143,dratini:147,dragonair:148,dragonite:149,abra:63,kadabra:64,alakazam:65,psyduck:54,golduck:55,slowpoke:79,slowbro:80,poliwag:60,poliwhirl:61,poliwrath:62,horsea:116,seadra:117,vulpix:37,ninetales:38,oddish:43,gloom:44,vileplume:45,exeggcute:102,exeggutor:103,koffing:109,weezing:110,cubone:104,marowak:105,kabuto:140,kabutops:141,omanyte:138,omastar:139,cyndaquil:155,quilava:156,typhlosion:157,totodile:158,croconaw:159,feraligatr:160,chikorita:152,bayleef:153,meganium:154,togepi:175,togetic:176,marill:183,azumarill:184,teddiursa:216,ursaring:217,slugma:218,magcargo:219,swinub:220,piloswine:221,larvitar:246,pupitar:247,tyranitar:248,mudkip:258,marshtomp:259,swampert:260,treecko:252,grovyle:253,sceptile:254,torchic:255,combusken:256,blaziken:257,ralts:280,kirlia:281,gardevoir:282,beldum:374,metang:375,metagross:376,snubbull:209,granbull:210,clefable:36,dewgong:87,seel:86,cloyster:91,staryu:120,starmie:121,kangaskhan:115,muk:89}
   const pokeUrl = slug => `https://img.pokemondb.net/sprites/home/normal/${slug}.png`
 
-  baseImg.src = pokeUrl(s.chain.player.slug)
-  evolvedImg.src = pokeUrl(s.chain.evolved.slug)
-  nameEl.textContent = s.chain.evolved.name
+  // Determine which evolution stage is triggering
+  const isStage2 = s.evolved && s.chain.evolved2 && !s.evolved2
+  const fromForm = isStage2 ? s.chain.evolved : s.chain.player
+  const toForm   = isStage2 ? s.chain.evolved2 : s.chain.evolved
+  baseImg.src = pokeUrl(fromForm.slug)
+  evolvedImg.src = pokeUrl(toForm.slug)
+  nameEl.textContent = toForm.name
   nameEl.classList.remove('show')
   textEl.textContent = 'Sedang berevolusi...'
   baseImg.style.animation = 'none'
@@ -9383,36 +9817,51 @@ function g13TriggerEvolution() {
   // 7.5s: close overlay, update battle state
   setTimeout(() => {
     overlay.style.display = 'none'
-    s.evolved = true
 
-    // Update player sprite to evolved form
+    // Determine which stage just evolved
+    const wasStage2 = s.evolved && s.chain.evolved2 && !s.evolved2
+    const nowForm = wasStage2 ? s.chain.evolved2 : s.chain.evolved
+
+    if (wasStage2) {
+      s.evolved2 = true
+    } else {
+      s.evolved = true
+    }
+
+    // Reset evo bar for potential stage 2
+    s.evoPoints = 0
+    g13UpdateEvoBar()
+
+    // Update player sprite to new form
     const pspr = document.getElementById('g13-pspr')
     if (pspr) {
-      pspr.src = `https://img.pokemondb.net/sprites/home/normal/${s.chain.evolved.slug}.png`
-      pspr.onerror = () => { const eid=POKE_IDS2[s.chain.evolved.slug]; if(eid) pspr.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${eid}.png`; pspr.onerror=null }
+      pspr.src = `https://img.pokemondb.net/sprites/home/normal/${nowForm.slug}.png`
+      pspr.onerror = () => { const eid=POKE_IDS2[nowForm.slug]; if(eid) pspr.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${eid}.png`; pspr.onerror=null }
       pspr.style.animation = 'none'; void pspr.offsetWidth
       pspr.style.animation = 'g13EnterFlip 0.6s cubic-bezier(0.34,1.56,0.64,1)'
     }
-    // Update player name in info box
-    document.getElementById('g13-pname').textContent = s.chain.evolved.name
+    // Update player info box
+    document.getElementById('g13-pname').textContent = nowForm.name
     const ptype = document.getElementById('g13-ptype')
-    ptype.textContent = s.chain.evolved.type
-    ptype.style.background = s.chain.evolved.tc + '33'
-    ptype.style.color = s.chain.evolved.tc
-    ptype.style.border = `1px solid ${s.chain.evolved.tc}66`
+    ptype.textContent = nowForm.type
+    ptype.style.background = nowForm.tc + '33'
+    ptype.style.color = nowForm.tc
+    ptype.style.border = `1px solid ${nowForm.tc}66`
 
     // Update chain badge
-    document.getElementById('g13-chain-badge').textContent = `⚡ ${s.chain.evolved.name}`
+    const bdg = document.getElementById('g13-chain-badge')
+    if (bdg) bdg.textContent = wasStage2 ? `⭐ ${nowForm.name} (MAX!)` : `⚡ ${nowForm.name}`
 
-    // Give evolved form bonus HP/damage
-    s.cfg = { ...s.cfg, damage: 2 }
+    // Bonus damage per evo stage
+    s.cfg = { ...s.cfg, damage: wasStage2 ? 3 : 2 }
 
     document.getElementById('g13-qpanel').style.opacity = '1'
     document.getElementById('g13-qpanel').style.pointerEvents = ''
     s.phase = 'player_attack'
     s.attackIdx = 0
     s.locked = false
-    g13SetStatus('Evolved!', `${s.chain.evolved.name} siap menyerang!`)
+    const stageTxt = wasStage2 ? `${nowForm.name} FINAL FORM!` : `Evolved!`
+    g13SetStatus(stageTxt, `${nowForm.name} siap menyerang!`)
     g13NextQuestion()
   }, 7500)
 }
@@ -9462,23 +9911,25 @@ function g13Victory() {
   const wspr = document.getElementById('g13-wspr')
   if (wspr) { wspr.classList.add('spr-defeat') }
 
-  // Victory: evolved = 5★, won without evolving = 3★ (on 5-scale for endGame)
-  const perfStars = s.evolved ? 5 : 3
-  state.players[state.currentPlayer].stars += (s.evolved ? 3 : 2)
+  // Victory stars: evolved2 = 5★, evolved once = 4★, no evo = 3★
+  const perfStars = s.evolved2 ? 5 : s.evolved ? 4 : 3
+  state.players[state.currentPlayer].stars += (s.evolved2 ? 4 : s.evolved ? 3 : 2)
   endGame(perfStars)
 
   setTimeout(() => {
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
-    const evolved = s.evolved
+    const finalForm = s.evolved2 ? s.chain.evolved2 : s.evolved ? s.chain.evolved : null
     const bannerImg = document.getElementById('g13-result-banner-img')
     if(bannerImg) bannerImg.src = 'assets/victory-banner.webp'
-    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = evolved ? '🌟' : '⭐'
-    const title = document.getElementById('g13-result-title'); if(title) title.textContent = evolved ? `${s.chain.evolved.name} Menang!` : 'Kamu Menang!'
-    const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = evolved
-      ? `${s.chain.player.name} berhasil berevolusi menjadi ${s.chain.evolved.name}!`
-      : `${s.chain.wild.name} dikalahkan — tapi ${s.chain.player.name} belum berevolusi!`
-    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
+    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = s.evolved2 ? '🌟' : s.evolved ? '⭐' : '✨'
+    const title = document.getElementById('g13-result-title'); if(title) title.textContent = finalForm ? `${finalForm.name} Menang!` : 'Kamu Menang!'
+    const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = s.evolved2
+      ? `${s.chain.player.name}→${s.chain.evolved.name}→${s.chain.evolved2.name}! Evolusi sempurna!`
+      : s.evolved
+        ? `${s.chain.player.name} berhasil berevolusi menjadi ${s.chain.evolved.name}!`
+        : `${s.chain.wild.name} dikalahkan — tapi ${s.chain.player.name} belum berevolusi!`
+    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '⭐'.repeat(perfStars) + '🌑'.repeat(Math.max(0,3 - perfStars))
     ro.style.display = 'flex'
   }, 1000)
 }
@@ -9517,36 +9968,58 @@ function endGameFromOverlay() {
 // GAME 14 — BALAPAN KERETA 🏁
 // ============================================================
 const TRAIN_TYPES_14 = {
-  steam:      { name:'Kereta Uap',     emoji:'🚂', baseSpeed:2.0, boostMult:1.40, boostDur:2000, color:'#8B4513', kmh:60  },
-  diesel:     { name:'Kereta Diesel',  emoji:'🚃', baseSpeed:2.6, boostMult:1.38, boostDur:2100, color:'#546E7A', kmh:85  },
-  emu:        { name:'Kereta Listrik', emoji:'🚄', baseSpeed:3.1, boostMult:1.36, boostDur:2200, color:'#1565C0', kmh:110 },
-  shinkansen: { name:'Shinkansen',     emoji:'🚅', baseSpeed:3.5, boostMult:1.35, boostDur:2300, color:'#E53935', kmh:140 }
+  bb302:  { name:'Kereta Uap BB302',  svg:'assets/train/bb302-indonesia.svg',   emoji:'🚂', baseSpeed:2.0, boostMult:1.40, boostDur:2000, color:'#5D3A1A', kmh:60,  desc:'Lokomotif Uap BB302 Indonesia (1954)' },
+  cc201:  { name:'Diesel CC201',      svg:'assets/train/cc201-indonesia.svg',   emoji:'🚃', baseSpeed:2.6, boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'Lokomotif Diesel CC201 — kuda kerja rel Indonesia' },
+  krl:    { name:'KRL Commuter Line', svg:'assets/train/commuter-line-krl.svg', emoji:'🚄', baseSpeed:3.1, boostMult:1.36, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line Jabodetabek' },
+  shink:  { name:'Shinkansen N700',   svg:'assets/train/shinkansen-n700.svg',   emoji:'🚅', baseSpeed:3.5, boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:140, desc:'Shinkansen N700 — tercepat di dunia!' },
 }
+// AI train pool
+const G14_AI_POOL = [
+  { name:'TGV',        svg:'assets/train/tgv-inoui.svg',          color:'#003189' },
+  { name:'ICE-3',      svg:'assets/train/ice-3.svg',              color:'#D0D0D0' },
+  { name:'CC203',      svg:'assets/train/cc203-indonesia.svg',     color:'#1A4A1A' },
+  { name:'KTX',        svg:'assets/train/ktx-i.svg',              color:'#0A2A7A' },
+  { name:'Shinkansen E5', svg:'assets/train/shinkansen-e5.svg',   color:'#2C7043' },
+  { name:'BB303',      svg:'assets/train/bb303-indonesia.svg',     color:'#2A1A08' },
+]
 
 let g14State = {}
 
 function initGame14() {
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
+  // Clean up any leftover DOM elements from previous race
+  if (g14State.aiTrains) g14State.aiTrains.forEach(a => { if(a.el && a.el.parentNode) a.el.remove() })
+  if (g14State.obstacles) g14State.obstacles.forEach(o => { if(o.el && o.el.parentNode) o.el.remove() })
+  if (g14State.animFrame) cancelAnimationFrame(g14State.animFrame)
+
   g14State = {
-    lane: 1, trainType: 'steam', trainCfg: TRAIN_TYPES_14.steam,
-    speed: 0, pressure: 60, boosting: false, boostCooldown: false,
-    boostTimer: null, hp: 3, frame: 0, distance: 0,
-    finishLine: diff === 'easy' ? 300 : diff === 'medium' ? 500 : 700,
+    lane: 1,
+    trainType: 'cc201',
+    trainCfg: TRAIN_TYPES_14.cc201,
+    speed: 0, pressure: 70,
+    boosting: false, boostCooldown: false, boostTimer: null,
+    hp: 3, frame: 0, distance: 0,
+    finishLine: diff === 'easy' ? 400 : diff === 'medium' ? 700 : 1000,
     running: false, animFrame: null,
     aiTrains: [], obstacles: [],
-    obstacleInterval: diff === 'easy' ? 120 : diff === 'medium' ? 80 : 50,
-    lanePositions: ['16.6%','50%','83.3%'],
-    diff, lv, stars: 0
+    obstacleInterval: diff === 'easy' ? 140 : diff === 'medium' ? 90 : 55,
+    // Lane top% positions — center of each of 3 equal rows
+    laneTopPct: [16.7, 50, 83.3],
+    diff, lv, stars: 0,
+    trackW: 0,  // set when race starts
   }
   document.getElementById('g14-level').textContent = `Lv.${lv}`
-  document.getElementById('g14-start-msg').textContent = 'Pilih Kereta!'
+  document.getElementById('g14-start-msg').textContent = ''
   document.getElementById('g14-go-btn').style.display = 'none'
   document.getElementById('g14-result-overlay').style.display = 'none'
   document.getElementById('g14-start-overlay').style.display = 'flex'
-  document.getElementById('g14-dist-bar').textContent = `🏁 0 / ${g14State.finishLine}m`
-  document.getElementById('g14-lives').textContent = '❤️❤️❤️'
-  document.getElementById('g14-stars').textContent = '🏁 0'
+  document.getElementById('g14-dist-bar').textContent = '0m'
+  document.getElementById('g14-dist-fill').style.width = '0%'
+  document.getElementById('g14-lives').innerHTML = '❤️❤️❤️'
+  document.getElementById('g14-stars').textContent = '🏁 0m'
+  document.getElementById('g14-position').style.display = 'none'
+  document.getElementById('g14-speedometer').textContent = '0 km/h'
   g14RenderTrainSelect()
 }
 
@@ -9556,15 +10029,19 @@ function g14RenderTrainSelect() {
   Object.entries(TRAIN_TYPES_14).forEach(([key, cfg]) => {
     const btn = document.createElement('button')
     btn.className = 'g14-train-select-btn'
-    btn.innerHTML = `<div style="font-size:28px;">${cfg.emoji}</div><div style="font-size:11px;font-weight:800;margin-top:2px;">${cfg.name}</div><div style="font-size:10px;opacity:0.7;">${cfg.kmh} km/h</div>`
+    btn.innerHTML = `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'"><div style="font-size:11px;font-weight:800;margin-top:2px;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.kmh} km/h</div>`
     btn.onclick = () => {
       wrap.querySelectorAll('.g14-train-select-btn').forEach(b => b.classList.remove('selected'))
       btn.classList.add('selected')
       g14State.trainType = key
       g14State.trainCfg = cfg
-      document.getElementById('g14-train-emoji').textContent = cfg.emoji
-      document.getElementById('g14-player').textContent = cfg.emoji
-      document.getElementById('g14-start-msg').textContent = `${cfg.name} siap balapan!`
+      // Update header train icon
+      const hdrImg = document.getElementById('g14-train-icon-hdr')
+      if (hdrImg) { hdrImg.src = cfg.svg }
+      // Update player SVG
+      const playerImg = document.getElementById('g14-player')
+      if (playerImg) { playerImg.src = cfg.svg }
+      document.getElementById('g14-start-msg').textContent = cfg.desc
       document.getElementById('g14-go-btn').style.display = 'block'
       playClick()
     }
@@ -9574,33 +10051,37 @@ function g14RenderTrainSelect() {
 
 function g14StartRace() {
   if (!g14State.trainCfg) return
+  const track = document.getElementById('g14-track')
+  g14State.trackW = track.clientWidth
   g14State.speed = g14State.trainCfg.baseSpeed
   g14State.running = true
   document.getElementById('g14-start-overlay').style.display = 'none'
-  g14SpawnAI()
+  document.getElementById('g14-position').style.display = 'block'
   g14UpdatePlayerPos()
+  g14SpawnAI()
   g14Loop()
   playClick()
 }
 
 function g14SpawnAI() {
   const ai = []
-  const types = Object.entries(TRAIN_TYPES_14)
   const allLanes = [0,1,2]
-  const playerLane = g14State.lane
-  const aiLanes = allLanes.filter(l => l !== playerLane)
+  const aiLanes = allLanes.filter(l => l !== g14State.lane)
+  const pool = [...G14_AI_POOL].sort(() => Math.random() - 0.5)
+  const track = document.getElementById('g14-track')
   aiLanes.forEach((lane, i) => {
-    const [,cfg] = types[i % types.length]
-    const variationFactor = 0.97 + Math.random() * 0.06  // ±3%
-    const el = document.createElement('div')
+    const cfg = pool[i % pool.length]
+    const variationFactor = 0.97 + Math.random() * 0.06  // ±3% speed variance
+    const el = document.createElement('img')
     el.className = 'g14-ai-train'
-    el.textContent = cfg.emoji
-    el.style.fontSize = '28px'
-    el.style.top = '-40px'
-    el.style.left = g14State.lanePositions[lane]
-    el.style.transform = 'translateX(-50%) rotate(90deg)'
-    document.getElementById('g14-track').appendChild(el)
-    ai.push({ lane, speed: cfg.baseSpeed * variationFactor, y: -40, el, name: cfg.name })
+    el.src = cfg.svg
+    el.alt = cfg.name
+    // Start AI trains slightly ahead of player (~65% from left)
+    const startX = g14State.trackW * (0.55 + i * 0.12)
+    el.style.left = startX + 'px'
+    el.style.top = g14State.laneTopPct[lane] + '%'
+    track.appendChild(el)
+    ai.push({ lane, speed: g14State.trainCfg.baseSpeed * variationFactor, x: startX, el, name: cfg.name })
   })
   g14State.aiTrains = ai
 }
@@ -9608,85 +10089,108 @@ function g14SpawnAI() {
 function g14Loop() {
   if (!g14State.running) return
   g14State.frame++
+  const s = g14State
+  const track = document.getElementById('g14-track')
+  const trackW = track.clientWidth || s.trackW || 375
+  const playerX = trackW * 0.15  // player fixed x position
 
-  // Scroll bg
-  const bg = document.getElementById('g14-bg-scroll')
-  const offset = (g14State.frame * g14State.speed * 2) % 80
-  bg.style.backgroundPositionY = offset + 'px'
+  // Animate rail scroll speed on lane rows via CSS variable
+  const railSpd = Math.max(0.1, 0.6 / s.speed).toFixed(2) + 's'
+  document.querySelectorAll('.g14-lane-row').forEach(r => r.style.setProperty('--rspd', railSpd))
 
-  // Move AI trains
-  g14State.aiTrains.forEach(ai => {
-    ai.y += ai.speed * 2
-    if (ai.y > window.innerHeight + 40) ai.y = -40
-    ai.el.style.top = ai.y + 'px'
+  // Move AI trains — relative movement to player (if AI faster, they drift right; if slower, drift left)
+  s.aiTrains.forEach(ai => {
+    const relSpeed = (ai.speed - s.speed) * 1.8
+    ai.x += relSpeed
+    // Wrap: if off left, wrap to far right; if off right, wrap to slightly right
+    if (ai.x < -120) ai.x = trackW + 80
+    if (ai.x > trackW + 120) ai.x = -80
+    ai.el.style.left = ai.x + 'px'
   })
 
   // Spawn obstacles
-  if (g14State.frame % g14State.obstacleInterval === 0) g14SpawnObstacle()
+  if (s.frame % s.obstacleInterval === 0) g14SpawnObstacle()
 
-  // Move obstacles + check collision
-  const track = document.getElementById('g14-track')
-  const trackH = track.clientHeight
-  const playerY = trackH - 70
+  // Move obstacles left (they come from right)
+  const obsSpeed = s.speed * 2.5 + 1
   const toRemove = []
-  g14State.obstacles.forEach(obs => {
-    obs.y += g14State.speed * 2
-    obs.el.style.top = obs.y + 'px'
-    const bottom = obs.y + 36
-    if (bottom >= playerY - 10 && bottom <= playerY + 40 && obs.lane === g14State.lane) {
+  s.obstacles.forEach(obs => {
+    obs.x -= obsSpeed
+    obs.el.style.left = obs.x + 'px'
+    // Collision: obstacle passes through player zone (x=playerX, same lane)
+    if (obs.x <= playerX + 55 && obs.x >= playerX - 20 && obs.lane === s.lane && !obs.hit) {
+      obs.hit = true
       g14Crash()
       toRemove.push(obs)
     }
-    if (obs.y > trackH + 20) toRemove.push(obs)
+    if (obs.x < -60) toRemove.push(obs)
   })
-  toRemove.forEach(o => { if (o.el.parentNode) o.el.remove(); g14State.obstacles = g14State.obstacles.filter(x => x !== o) })
+  toRemove.forEach(o => {
+    if (o.el.parentNode) o.el.remove()
+    s.obstacles = s.obstacles.filter(x => x !== o)
+  })
 
   // Advance distance
-  g14State.distance += g14State.speed * 0.08
-  document.getElementById('g14-dist-bar').textContent = `🏁 ${Math.floor(g14State.distance)} / ${g14State.finishLine}m`
+  s.distance += s.speed * 0.12
+  const distFrac = Math.min(1, s.distance / s.finishLine)
+  document.getElementById('g14-dist-bar').textContent = `${Math.floor(s.distance)}m`
+  document.getElementById('g14-dist-fill').style.width = (distFrac * 100).toFixed(1) + '%'
+  document.getElementById('g14-stars').textContent = `🏁 ${Math.floor(s.distance)}m`
+
+  // Speedometer (show km/h from trainCfg, boosted if boosting)
+  const dispKmh = Math.round(s.trainCfg.kmh * (s.boosting ? s.trainCfg.boostMult : 1))
+  document.getElementById('g14-speedometer').textContent = dispKmh + ' km/h'
+
+  // Race position: count how many AI are ahead (x > playerX)
+  const aiAhead = s.aiTrains.filter(a => a.x > playerX).length
+  const pos = aiAhead + 1
+  const medals = ['🥇','🥈','🥉','4️⃣']
+  const posEl = document.getElementById('g14-position')
+  if (posEl) posEl.textContent = (medals[pos-1] || pos + '.') + ' POSISI ' + pos
 
   // Pressure auto-recovery
-  if (!g14State.boosting && g14State.pressure < 100) {
-    g14State.pressure = Math.min(100, g14State.pressure + 0.3)
+  if (!s.boosting && s.pressure < 100) {
+    s.pressure = Math.min(100, s.pressure + 0.35)
     g14UpdatePressure()
   }
 
-  // Stars based on distance
-  const rawStars = Math.floor(g14State.distance / g14State.finishLine * 5)
-  g14State.stars = Math.min(5, rawStars + (g14State.hp === 3 ? 1 : 0))
-  document.getElementById('g14-stars').textContent = `🏁 ${Math.floor(g14State.distance)}`
-
   // Check finish
-  if (g14State.distance >= g14State.finishLine) {
-    g14Finish(true)
-    return
-  }
+  if (s.distance >= s.finishLine) { g14Finish(true); return }
 
-  g14State.animFrame = requestAnimationFrame(g14Loop)
+  s.animFrame = requestAnimationFrame(g14Loop)
 }
 
 function g14SpawnObstacle() {
-  const types = ['🪨','⚠️','🐄','🌲']
+  const types = ['🪨','⚠️','🐄','🌲','🐓','🪵','🔴']
+  const track = document.getElementById('g14-track')
+  const trackW = track.clientWidth || 375
+  // Spawn in a random lane (prefer non-player lane for fairness sometimes)
   const lane = Math.floor(Math.random() * 3)
   const type = types[Math.floor(Math.random() * types.length)]
   const el = document.createElement('div')
   el.className = 'g14-obstacle'
   el.textContent = type
-  el.style.top = '-40px'
-  el.style.left = g14State.lanePositions[lane]
-  document.getElementById('g14-track').appendChild(el)
-  g14State.obstacles.push({ lane, y: -40, el, type })
+  const startX = trackW + 40
+  el.style.left = startX + 'px'
+  el.style.top = g14State.laneTopPct[lane] + '%'
+  track.appendChild(el)
+  g14State.obstacles.push({ lane, x: startX, el, type, hit: false })
 }
 
 function g14Crash() {
   if (g14State.hp <= 0) return
   g14State.hp--
   const livesEl = document.getElementById('g14-lives')
-  livesEl.textContent = '❤️'.repeat(g14State.hp) + '🖤'.repeat(3 - g14State.hp)
+  livesEl.innerHTML = '❤️'.repeat(g14State.hp) + '🖤'.repeat(3 - g14State.hp)
   const player = document.getElementById('g14-player')
-  player.style.animation = 'g14Crash 0.4s'
-  setTimeout(() => { player.style.animation = '' }, 400)
+  if (player) {
+    player.style.animation = 'none'
+    void player.offsetWidth
+    player.style.animation = 'g14Crash 0.5s ease'
+    setTimeout(() => { if (player) player.style.animation = '' }, 500)
+  }
   playWrong()
+  vibrate(30)
   if (g14State.hp <= 0) {
     g14State.running = false
     cancelAnimationFrame(g14State.animFrame)
@@ -9703,7 +10207,12 @@ function g14LaneDown() {
   if (g14State.lane < 2) { g14State.lane++; g14UpdatePlayerPos(); playClick() }
 }
 function g14UpdatePlayerPos() {
-  document.getElementById('g14-player').style.left = g14State.lanePositions[g14State.lane]
+  const topPct = g14State.laneTopPct[g14State.lane]
+  const player = document.getElementById('g14-player')
+  if (player) player.style.top = topPct + '%'
+  // Move lane indicator bar
+  const ind = document.getElementById('g14-lane-indicator')
+  if (ind) ind.style.top = ((g14State.lane) * 33.33) + '%'
 }
 
 function g14Boost() {
@@ -9751,11 +10260,12 @@ function g14ShowResult(won) {
   document.getElementById('g14-res-icon').textContent = won ? '🏆' : '💨'
   document.getElementById('g14-res-title').textContent = won ? 'MENANG! 🎉' : 'Kurang Jauh...'
   document.getElementById('g14-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
+  const cfg = g14State.trainCfg
   document.getElementById('g14-res-info').textContent = won
-    ? `${g14State.trainCfg.name} melaju ${Math.floor(g14State.finishLine)}m! HP: ${g14State.hp}/3`
+    ? `${cfg.name} melaju ${Math.floor(g14State.finishLine)}m! Sisa HP: ${g14State.hp}/3`
     : `Sudah ${Math.floor(g14State.distance)}m dari ${g14State.finishLine}m. Coba lagi!`
   overlay.style.display = 'flex'
-  if (won) playCorrect()
+  if (won) { playCorrect(); endGame(perfStars) }
 }
 
 function g14Replay() {
@@ -9910,10 +10420,739 @@ function g15Win() {
   playCorrect()
 }
 
-// Placeholder inits for G16-G18
-function initGame16() { document.getElementById('screen-game16').style.display='flex' }
-function initGame17() { document.getElementById('screen-game17').style.display='flex' }
-function initGame18() { document.getElementById('screen-game18').style.display='flex' }
+// ============================================================
+// GAME 16 — SELAMATKAN KERETA 🆘
+// ============================================================
+const G16_WORDS = {
+  easy:   [{word:'KAIT',emoji:'🪝'},{word:'TALI',emoji:'🪢'},{word:'KUAT',emoji:'💪'},{word:'BISA',emoji:'✅'},{word:'MAJU',emoji:'🚀'},{word:'JAGA',emoji:'🛡️'}],
+  medium: [{word:'SELAMAT',emoji:'🎉'},{word:'KERETATALI',emoji:'🚃'},{word:'TARIK',emoji:'💪'},{word:'BERANI',emoji:'🦁'},{word:'JURANG',emoji:'⛰️'},{word:'BANTU',emoji:'🤝'}],
+  hard:   [{word:'PERTOLONGAN',emoji:'🆘'},{word:'PEMBERANI',emoji:'🦸'},{word:'JEMBATAN',emoji:'🌉'},{word:'SELAMATKAN',emoji:'✅'},{word:'KEBERANIAN',emoji:'💎'}]
+}
+
+let g16State = {}
+
+function initGame16() {
+  const lv = state.selectedLevelNum || 1
+  const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
+  g16State = {
+    diff, lv, running: false,
+    words: [...G16_WORDS[diff]].sort(() => Math.random() - 0.5),
+    wordIdx: 0, wordsNeeded: diff === 'easy' ? 3 : diff === 'medium' ? 4 : 5,
+    wordsComplete: 0,
+    currentWord: '', currentEmoji: '', collectedIdx: 0,
+    phase: 0,
+    needlePos: 0, needleDir: 1, needleSpeed: diff === 'easy' ? 0.8 : diff === 'medium' ? 1.2 : 1.8,
+    needleInterval: null,
+    hookTries: 0, maxHookTries: diff === 'easy' ? 5 : diff === 'medium' ? 4 : 3,
+    hookSuccess: false,
+    danger: 0, dangerInterval: null,
+    pullProgress: 0
+  }
+  document.getElementById('g16-level').textContent = `Lv.${lv}`
+  document.getElementById('g16-stars-badge').textContent = '🆘 0'
+  document.getElementById('g16-result').style.display = 'none'
+  document.getElementById('g16-phase1').style.display = 'none'
+  document.getElementById('g16-phase2').style.display = 'none'
+  document.getElementById('g16-start-overlay').style.display = 'flex'
+  document.getElementById('g16-victim-train').style.right = '8%'
+  document.getElementById('g16-danger-fill').style.width = '0%'
+  document.getElementById('g16-victim-train').className = ''
+}
+
+function g16BeginGame() {
+  document.getElementById('g16-start-overlay').style.display = 'none'
+  g16State.running = true
+  g16StartDangerTimer()
+  g16StartPhase1()
+}
+
+function g16StartDangerTimer() {
+  clearInterval(g16State.dangerInterval)
+  g16State.dangerInterval = setInterval(() => {
+    if (!g16State.running) { clearInterval(g16State.dangerInterval); return }
+    g16State.danger = Math.min(100, g16State.danger + 2)
+    document.getElementById('g16-danger-fill').style.width = g16State.danger + '%'
+    const victim = document.getElementById('g16-victim-train')
+    const rightPct = 8 + (g16State.danger / 100) * 14
+    victim.style.right = (22 - rightPct) + '%'
+    if (g16State.danger >= 30) victim.classList.add('g16-victim-danger')
+    if (g16State.danger >= 100) {
+      clearInterval(g16State.dangerInterval)
+      g16EndGame(false)
+    }
+  }, 600)
+}
+
+function g16StartPhase1() {
+  g16State.phase = 1
+  g16State.hookTries = 0
+  g16State.hookSuccess = false
+  document.getElementById('g16-phase1').style.display = 'flex'
+  document.getElementById('g16-phase2').style.display = 'none'
+  document.getElementById('g16-hook-result').textContent = ''
+  g16UpdateHookTries()
+  clearInterval(g16State.needleInterval)
+  g16State.needlePos = 0
+  g16State.needleDir = 1
+  g16State.needleInterval = setInterval(() => {
+    g16State.needlePos += g16State.needleDir * g16State.needleSpeed
+    if (g16State.needlePos >= 100) { g16State.needlePos = 100; g16State.needleDir = -1 }
+    if (g16State.needlePos <= 0)   { g16State.needlePos = 0;   g16State.needleDir = 1  }
+    const needle = document.getElementById('g16-needle')
+    if (needle) needle.style.left = `calc(${g16State.needlePos}% - 3px)`
+  }, 20)
+}
+
+function g16UpdateHookTries() {
+  const el = document.getElementById('g16-hook-tries')
+  if (el) el.textContent = `Percobaan: ${g16State.hookTries} / ${g16State.maxHookTries}`
+}
+
+function g16ThrowHook() {
+  if (g16State.hookSuccess || g16State.phase !== 1) return
+  const pos = g16State.needlePos
+  const inGreen = pos >= 30 && pos <= 70
+  g16State.hookTries++
+  g16UpdateHookTries()
+  const resultEl = document.getElementById('g16-hook-result')
+  if (inGreen) {
+    clearInterval(g16State.needleInterval)
+    g16State.hookSuccess = true
+    resultEl.textContent = '✅ KENA! Kait berhasil!'
+    resultEl.style.color = '#A5D6A7'
+    document.getElementById('g16-throw-btn').disabled = true
+    playCorrect()
+    // Speed up danger a bit to build tension
+    clearInterval(g16State.dangerInterval)
+    g16State.dangerInterval = setInterval(() => {
+      if (!g16State.running) return
+      g16State.danger = Math.min(100, g16State.danger + 1.5)
+      document.getElementById('g16-danger-fill').style.width = g16State.danger + '%'
+      if (g16State.danger >= 100) { clearInterval(g16State.dangerInterval); g16EndGame(false) }
+    }, 600)
+    setTimeout(() => {
+      document.getElementById('g16-phase1').style.display = 'none'
+      document.getElementById('g16-throw-btn').disabled = false
+      g16StartPhase2()
+    }, 800)
+  } else {
+    resultEl.textContent = '❌ Meleset! Coba lagi...'
+    resultEl.style.color = '#FFCDD2'
+    playWrong()
+    if (g16State.hookTries >= g16State.maxHookTries) {
+      clearInterval(g16State.needleInterval)
+      setTimeout(() => g16EndGame(false), 600)
+    }
+  }
+}
+
+function g16StartPhase2() {
+  g16State.phase = 2
+  const entry = g16State.words[g16State.wordIdx % g16State.words.length]
+  g16State.currentWord = entry.word.replace('-','')
+  g16State.currentEmoji = entry.emoji
+  g16State.collectedIdx = 0
+  document.getElementById('g16-phase2').style.display = 'flex'
+  document.getElementById('g16-image-clue').textContent = g16State.currentEmoji
+  g16RenderWordSlots()
+  g16RenderLetters()
+  const pullPct = (g16State.wordsComplete / g16State.wordsNeeded) * 100
+  document.getElementById('g16-pull-fill').style.width = pullPct + '%'
+  document.getElementById('g16-word-progress').textContent = `Kata ${g16State.wordsComplete + 1} / ${g16State.wordsNeeded}`
+}
+
+function g16RenderWordSlots() {
+  const wrap = document.getElementById('g16-word-slots')
+  wrap.innerHTML = ''
+  for (let i = 0; i < g16State.currentWord.length; i++) {
+    const slot = document.createElement('div')
+    slot.className = 'g16-word-slot'
+    slot.id = `g16-slot-${i}`
+    slot.textContent = i < g16State.collectedIdx ? g16State.currentWord[i] : '_'
+    if (i < g16State.collectedIdx) slot.classList.add('filled')
+    wrap.appendChild(slot)
+  }
+}
+
+function g16RenderLetters() {
+  const word = g16State.currentWord
+  const decoys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c => !word.includes(c))
+  const extra = Math.max(2, Math.min(5, 10 - word.length))
+  const shuffled = [...word.split(''), ...decoys.slice(0, extra)].sort(() => Math.random() - 0.5)
+  const wrap = document.getElementById('g16-letters-wrap')
+  wrap.innerHTML = ''
+  shuffled.forEach((letter, idx) => {
+    const btn = document.createElement('button')
+    btn.className = 'g16-letter-tile'
+    btn.id = `g16-ltile-${idx}`
+    btn.textContent = letter
+    btn.onclick = () => g16TapLetter(letter, idx)
+    wrap.appendChild(btn)
+  })
+}
+
+function g16TapLetter(letter, tileIdx) {
+  if (g16State.phase !== 2) return
+  const needed = g16State.currentWord[g16State.collectedIdx]
+  const slot = document.getElementById(`g16-slot-${g16State.collectedIdx}`)
+  const tile = document.getElementById(`g16-ltile-${tileIdx}`)
+  if (letter === needed) {
+    g16State.collectedIdx++
+    if (slot) { slot.textContent = letter; slot.classList.add('filled') }
+    if (tile) tile.classList.add('used')
+    playCorrect()
+    if (g16State.collectedIdx >= g16State.currentWord.length) {
+      setTimeout(() => g16WordComplete(), 300)
+    }
+  } else {
+    if (tile) { tile.style.opacity = '0.4'; setTimeout(() => { tile.style.opacity = '' }, 300) }
+    // Wrong letter = increase danger
+    g16State.danger = Math.min(95, g16State.danger + 6)
+    document.getElementById('g16-danger-fill').style.width = g16State.danger + '%'
+    playWrong()
+  }
+}
+
+function g16WordComplete() {
+  g16State.wordsComplete++
+  g16State.wordIdx++
+  const pct = (g16State.wordsComplete / g16State.wordsNeeded) * 100
+  document.getElementById('g16-pull-fill').style.width = pct + '%'
+  // Victim train moves away from cliff
+  g16State.danger = Math.max(0, g16State.danger - 20)
+  document.getElementById('g16-danger-fill').style.width = g16State.danger + '%'
+  const victim = document.getElementById('g16-victim-train')
+  const newRight = Math.min(20, 8 + (g16State.danger / 100) * 14)
+  victim.style.right = (22 - newRight) + '%'
+  document.getElementById('g16-stars-badge').textContent = `🆘 ${g16State.wordsComplete}`
+  if (g16State.wordsComplete >= g16State.wordsNeeded) {
+    clearInterval(g16State.dangerInterval)
+    setTimeout(() => g16EndGame(true), 600)
+  } else {
+    document.getElementById('g16-word-progress').textContent = `Kata ${g16State.wordsComplete + 1} / ${g16State.wordsNeeded}`
+    setTimeout(() => {
+      g16StartPhase2()
+    }, 700)
+  }
+}
+
+function g16EndGame(won) {
+  g16State.running = false
+  clearInterval(g16State.needleInterval)
+  clearInterval(g16State.dangerInterval)
+  document.getElementById('g16-phase1').style.display = 'none'
+  document.getElementById('g16-phase2').style.display = 'none'
+  const pct = g16State.wordsComplete / g16State.wordsNeeded
+  const perfStars = won ? (g16State.danger < 20 ? 5 : g16State.danger < 50 ? 4 : 3) : (pct >= 0.5 ? 2 : 1)
+  state.gameStars[state.currentPlayer] = perfStars
+  const res = document.getElementById('g16-result')
+  document.getElementById('g16-res-icon').textContent = won ? '🎉' : '😢'
+  document.getElementById('g16-res-title').textContent = won ? 'KERETA SELAMAT! 🚂' : 'Kereta Jatuh...'
+  document.getElementById('g16-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
+  document.getElementById('g16-res-info').textContent = won
+    ? `Berhasil menyelamatkan kereta dengan ${g16State.wordsComplete} kata!\nAnjuran: Saling membantu itu hebat! 🤝`
+    : `Sudah ${g16State.wordsComplete} dari ${g16State.wordsNeeded} kata. Jangan menyerah!`
+  res.style.display = 'flex'
+  if (won) playCorrect(); else playWrong()
+}
+
+// ============================================================
+// GAME 17 — JEMBATAN GOYANG 🌉
+// ============================================================
+let g17State = {}
+
+function initGame17() {
+  const lv = state.selectedLevelNum || 1
+  const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
+  const totalBlocks = diff === 'easy' ? 8 : diff === 'medium' ? 10 : 12
+  g17State = {
+    diff, lv, totalBlocks,
+    blocks: [], currentActive: -1,
+    tapped: [], damage: 0, maxDamage: 3,
+    timer: 30, timerInterval: null,
+    baseDelay: diff === 'easy' ? 1800 : diff === 'medium' ? 1400 : 1000,
+    stepDelay: diff === 'easy' ? 50 : diff === 'medium' ? 40 : 30,
+    lightTimeout: null, running: false,
+    correct: 0, combo: 0, bestCombo: 0, stars: 0
+  }
+  document.getElementById('g17-level').textContent = `Lv.${lv}`
+  document.getElementById('g17-stars-badge').textContent = '🌉 0'
+  document.getElementById('g17-combo').textContent = ''
+  document.getElementById('g17-result').style.display = 'none'
+  document.getElementById('g17-train-waiting').style.animation = ''
+  document.getElementById('g17-train-waiting').style.left = '4%'
+  document.getElementById('g17-start-overlay').style.display = 'flex'
+  document.getElementById('g17-cracks').innerHTML = ''
+  g17RenderBlocks()
+}
+
+function g17RenderBlocks() {
+  const bridge = document.getElementById('g17-bridge')
+  bridge.innerHTML = ''
+  const colors = ['#E53935','#FB8C00','#FDD835','#43A047','#1E88E5','#8E24AA','#00ACC1','#F06292','#78909C','#6D4C41','#26A69A','#EC407A']
+  g17State.blocks = []
+  for (let i = 0; i < g17State.totalBlocks; i++) {
+    const block = document.createElement('div')
+    block.className = 'g17-block'
+    const num = i + 1
+    block.textContent = num <= 9 ? `${num}` : ['🔴','🟠','🟡','🟢','🔵','🟣','⚫','🟤','⬛','🔶','🔷','❇️'][i % 12]
+    block.style.background = `linear-gradient(135deg,${colors[i % colors.length]},${colors[(i+3) % colors.length]})`
+    block.dataset.idx = i
+    block.onclick = () => g17TapBlock(i)
+    bridge.appendChild(block)
+    g17State.blocks.push({ el: block, idx: i, tapped: false })
+  }
+}
+
+function g17StartGame() {
+  document.getElementById('g17-start-overlay').style.display = 'none'
+  g17State.running = true
+  g17State.timer = 30
+  g17StartTimer()
+  setTimeout(() => g17LightNextBlock(), 400)
+}
+
+function g17StartTimer() {
+  clearInterval(g17State.timerInterval)
+  g17State.timerInterval = setInterval(() => {
+    if (!g17State.running) { clearInterval(g17State.timerInterval); return }
+    g17State.timer = Math.max(0, g17State.timer - 1)
+    const timerText = document.getElementById('g17-timer-text')
+    const timerBar = document.getElementById('g17-timer-bar')
+    if (timerText) timerText.textContent = g17State.timer
+    if (timerBar) timerBar.style.width = (g17State.timer / 30 * 100) + '%'
+    if (g17State.timer <= 0) {
+      clearInterval(g17State.timerInterval)
+      if (g17State.running) g17EndGame(false)
+    }
+  }, 1000)
+}
+
+function g17LightNextBlock() {
+  if (!g17State.running) return
+  // Find next un-tapped block
+  const remaining = g17State.blocks.filter(b => !b.tapped)
+  if (remaining.length === 0) {
+    g17EndGame(true)
+    return
+  }
+  // Pick random from remaining
+  const pick = remaining[Math.floor(Math.random() * remaining.length)]
+  g17State.currentActive = pick.idx
+  pick.el.classList.add('active')
+  // Auto-remove active after timeout (penalty if not tapped)
+  const delay = Math.max(500, g17State.baseDelay - g17State.correct * g17State.stepDelay)
+  clearTimeout(g17State.lightTimeout)
+  g17State.lightTimeout = setTimeout(() => {
+    if (!g17State.running) return
+    // Missed — apply damage
+    if (pick.el.classList.contains('active')) {
+      pick.el.classList.remove('active')
+      g17State.damage++
+      g17State.combo = 0
+      document.getElementById('g17-combo').textContent = '💨 Terlewat!'
+      document.getElementById('g17-combo').style.color = '#FFCDD2'
+      g17AddCrack()
+      playWrong()
+      if (g17State.damage >= g17State.maxDamage) {
+        g17EndGame(false)
+        return
+      }
+    }
+    setTimeout(() => g17LightNextBlock(), 300)
+  }, delay)
+}
+
+function g17TapBlock(idx) {
+  if (!g17State.running) return
+  const block = g17State.blocks[idx]
+  if (!block || block.tapped) return
+  if (idx === g17State.currentActive) {
+    // Correct!
+    clearTimeout(g17State.lightTimeout)
+    block.el.classList.remove('active')
+    block.el.classList.add('correct')
+    block.tapped = true
+    g17State.correct++
+    g17State.combo++
+    if (g17State.combo > g17State.bestCombo) g17State.bestCombo = g17State.combo
+    document.getElementById('g17-stars-badge').textContent = `🌉 ${g17State.correct}`
+    const comboEl = document.getElementById('g17-combo')
+    if (g17State.combo >= 3) {
+      comboEl.textContent = `🔥 COMBO x${g17State.combo}!`
+      comboEl.style.color = '#FDD835'
+    } else {
+      comboEl.textContent = '✅ Tepat!'
+      comboEl.style.color = '#A5D6A7'
+    }
+    playCorrect()
+    const remaining = g17State.blocks.filter(b => !b.tapped)
+    if (remaining.length === 0) {
+      clearTimeout(g17State.lightTimeout)
+      setTimeout(() => g17EndGame(true), 500)
+      return
+    }
+    setTimeout(() => g17LightNextBlock(), 250)
+  } else {
+    // Wrong block
+    block.el.classList.add('wrong')
+    setTimeout(() => block.el.classList.remove('wrong'), 400)
+    g17State.damage++
+    g17State.combo = 0
+    document.getElementById('g17-combo').textContent = '❌ Salah!'
+    document.getElementById('g17-combo').style.color = '#FFCDD2'
+    g17AddCrack()
+    playWrong()
+    if (g17State.damage >= g17State.maxDamage) {
+      clearTimeout(g17State.lightTimeout)
+      g17EndGame(false)
+    }
+  }
+}
+
+function g17AddCrack() {
+  const cracks = document.getElementById('g17-cracks')
+  const line = document.createElement('div')
+  line.className = 'g17-crack-line'
+  const top = 15 + Math.random() * 25
+  const left = 5 + Math.random() * 60
+  const width = 20 + Math.random() * 30
+  const angle = -10 + Math.random() * 20
+  line.style.cssText = `top:${top}px;left:${left}%;width:${width}%;transform:rotate(${angle}deg);`
+  cracks.appendChild(line)
+}
+
+function g17EndGame(won) {
+  g17State.running = false
+  clearTimeout(g17State.lightTimeout)
+  clearInterval(g17State.timerInterval)
+  // Remove active state from current block
+  if (g17State.currentActive >= 0 && g17State.blocks[g17State.currentActive]) {
+    g17State.blocks[g17State.currentActive].el.classList.remove('active')
+  }
+  if (won) {
+    // Train crosses bridge!
+    const trainEl = document.getElementById('g17-train-waiting')
+    trainEl.classList.add('g17-train-cross')
+    playCorrect()
+  }
+  const pct = g17State.correct / g17State.totalBlocks
+  const perfStars = won
+    ? (g17State.damage === 0 ? 5 : g17State.damage <= 1 ? 4 : 3)
+    : (pct >= 0.6 ? 2 : 1)
+  state.gameStars[state.currentPlayer] = perfStars
+  setTimeout(() => {
+    const res = document.getElementById('g17-result')
+    document.getElementById('g17-res-icon').textContent = won ? '🏆' : '💔'
+    document.getElementById('g17-res-title').textContent = won ? 'JEMBATAN SELESAI! 🚂' : 'Jembatan Retak...'
+    document.getElementById('g17-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
+    const facts = [
+      '🌉 Jembatan kereta pertama dibangun di Inggris tahun 1825!',
+      '🚂 Rel kereta terbuat dari baja yang sangat kuat!',
+      '🔨 Membangun jembatan butuh kerja sama tim yang hebat!'
+    ]
+    document.getElementById('g17-res-info').textContent =
+      `${g17State.correct}/${g17State.totalBlocks} balok • Combo terbaik: x${g17State.bestCombo}\n${facts[Math.floor(Math.random() * facts.length)]}`
+    res.style.display = 'flex'
+    if (!won) playWrong()
+  }, won ? 1600 : 400)
+}
+
+// ============================================================
+// GAME 18 — MUSEUM KERETA 🏛️
+// ============================================================
+const G18_TRAINS = [
+  {
+    emoji:'🚂', name:'Locomotief C5107', country:'🇮🇩 Indonesia', year:1922,
+    fuel:'Batubara (Uap)', speed:80, type:'Lokomotif Uap',
+    fact:'Kereta uap bersejarah dari era kolonial! Kini dipajang di Museum Kereta Api Ambarawa. Asapnya bisa terlihat dari jauh! ☁️',
+    quizHint:'kereta uap bersejarah Indonesia'
+  },
+  {
+    emoji:'🚅', name:'Shinkansen N700', country:'🇯🇵 Jepang', year:2007,
+    fuel:'Listrik', speed:320, type:'Kereta Cepat',
+    fact:'Shinkansen dijuluki "Peluru" karena hidungnya seperti peluru! Tepat waktu hingga detik — keterlambatan rata-rata hanya 36 detik! ⚡',
+    quizHint:'kereta peluru Jepang'
+  },
+  {
+    emoji:'🚃', name:'Argo Bromo Anggrek', country:'🇮🇩 Indonesia', year:1997,
+    fuel:'Solar (Diesel)', speed:120, type:'Kereta Ekspress',
+    fact:'Kereta terbaik Indonesia! Melaju dari Jakarta ke Surabaya hanya sekitar 9 jam. Dinamai dari Gunung Bromo yang indah! 🌋',
+    quizHint:'kereta ekspress Jakarta-Surabaya'
+  },
+  {
+    emoji:'🚄', name:'KRL Commuter', country:'🇮🇩 Indonesia', year:2013,
+    fuel:'Listrik', speed:100, type:'Kereta Listrik',
+    fact:'KRL mengangkut lebih dari 1 JUTA penumpang SETIAP HARI di Jabodetabek! Tanpa asap dan ramah lingkungan! 🌿',
+    quizHint:'kereta listrik Jabodetabek'
+  },
+  {
+    emoji:'🚄', name:'TGV', country:'🇫🇷 Perancis', year:1981,
+    fuel:'Listrik', speed:574, type:'Kereta Cepat',
+    fact:'TGV pemegang rekor dunia kereta konvensional — 574 km/jam! Hampir secepat pesawat kecil! Vive la France! 🇫🇷',
+    quizHint:'kereta tercepat Perancis'
+  },
+  {
+    emoji:'🚂', name:'Thomas Si Kereta', country:'🇬🇧 UK', year:1945,
+    fuel:'Uap (Fiksi)', speed:'?', type:'Karakter Buku',
+    fact:'Thomas lahir dari cerita Reverend Wilbert Awdry untuk anaknya yang sakit. Sekarang sudah jadi acara TV di 185 negara! 📺',
+    quizHint:'kereta biru berwajah dari UK'
+  },
+  {
+    emoji:'🚇', name:'MRT Jakarta', country:'🇮🇩 Indonesia', year:2019,
+    fuel:'Listrik', speed:80, type:'Mass Rapid Transit',
+    fact:'MRT Jakarta adalah kereta bawah tanah pertama Indonesia! Dibangun lebih dari 10 tahun dan melewati 16 stasiun. Ayo naik MRT! 🏙️',
+    quizHint:'kereta bawah tanah Jakarta'
+  },
+  {
+    emoji:'🚅', name:'SCMaglev', country:'🇯🇵 Jepang', year:2015,
+    fuel:'Magnet', speed:603, type:'Maglev',
+    fact:'SCMaglev tidak menyentuh rel sama sekali — melayang di atas magnet! Rekor dunia 603 km/jam! Ini nyata, bukan film fiksi ilmiah! 🧲',
+    quizHint:'kereta magnet tercepat dunia'
+  }
+]
+
+const G18_QUIZ = [
+  { q:'Kereta manakah yang melayang di atas rel menggunakan magnet?', correct:7, options:[0,3,7,1], emoji:'🧲' },
+  { q:'Kereta KRL Commuter menggunakan bahan bakar apa?', correct:3, options:[0,2,3,5], field:'fuel', emoji:'⚡' },
+  { q:'Shinkansen berasal dari negara mana?', correct:1, options:[1,2,4,6], field:'country', emoji:'🗾' },
+  { q:'Kereta TGV dari Perancis punya kecepatan record berapa km/jam?', correct:4, options:[4,1,7,2], field:'speed', emoji:'🏎️' },
+  { q:'Kereta pertama Indonesia yang jadi museum ada di mana?', correct:0, options:[0,2,6,3], emoji:'🏛️' }
+]
+
+let g18State = {}
+
+function initGame18() {
+  const lv = state.selectedLevelNum || 1
+  g18State = {
+    lv, quizIdx: 0, quizScore: 0, quizActive: false,
+    answeredCurrent: false
+  }
+  document.getElementById('g18-level').textContent = `Lv.${lv}`
+  document.getElementById('g18-stars-badge').textContent = '🏛️ 0'
+  document.getElementById('g18-result').style.display = 'none'
+  document.getElementById('g18-modal').style.display = 'none'
+  document.getElementById('g18-gallery').style.display = 'block'
+  document.getElementById('g18-quiz-view').style.display = 'none'
+  g18RenderGallery()
+}
+
+function g18RenderGallery() {
+  const grid = document.getElementById('g18-card-grid')
+  grid.innerHTML = ''
+  G18_TRAINS.forEach((train, i) => {
+    const card = document.createElement('div')
+    card.className = 'g18-card'
+    card.innerHTML = `
+      <div class="g18-card-emoji">${train.emoji}</div>
+      <div class="g18-card-name">${train.name}</div>
+      <div class="g18-card-country">${train.country}</div>
+      <div class="g18-speed-badge">⚡ ${train.speed} km/j</div>
+      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;margin-top:2px;">${train.year}</div>
+    `
+    card.onclick = () => g18ShowDetail(i)
+    grid.appendChild(card)
+  })
+}
+
+function g18ShowDetail(idx) {
+  const train = G18_TRAINS[idx]
+  document.getElementById('g18-modal-emoji').textContent = train.emoji
+  document.getElementById('g18-modal-name').textContent = train.name
+  document.getElementById('g18-modal-country').textContent = `${train.country} • ${train.year}`
+  const details = document.getElementById('g18-modal-details')
+  details.innerHTML = `
+    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
+      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">KECEPATAN</div>
+      <div style="color:white;font-size:16px;font-weight:900;">${train.speed} km/j</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
+      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">BAHAN BAKAR</div>
+      <div style="color:white;font-size:13px;font-weight:900;">${train.fuel}</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
+      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">TIPE</div>
+      <div style="color:white;font-size:12px;font-weight:900;">${train.type}</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
+      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">TAHUN</div>
+      <div style="color:white;font-size:16px;font-weight:900;">${train.year}</div>
+    </div>
+  `
+  document.getElementById('g18-modal-fact').textContent = '💡 ' + train.fact
+  document.getElementById('g18-modal').style.display = 'flex'
+  playClick()
+}
+
+function g18CloseModal() {
+  document.getElementById('g18-modal').style.display = 'none'
+}
+
+function g18StartQuiz() {
+  g18State.quizIdx = 0
+  g18State.quizScore = 0
+  g18State.quizActive = true
+  document.getElementById('g18-gallery').style.display = 'none'
+  document.getElementById('g18-quiz-view').style.display = 'flex'
+  g18RenderQuestion()
+}
+
+function g18RenderQuestion() {
+  const q = G18_QUIZ[g18State.quizIdx]
+  g18State.answeredCurrent = false
+  document.getElementById('g18-q-num').textContent = g18State.quizIdx + 1
+  document.getElementById('g18-q-image').textContent = q.emoji
+  document.getElementById('g18-q-text').textContent = q.q
+  document.getElementById('g18-q-feedback').textContent = ''
+  document.getElementById('g18-q-next-wrap').style.display = 'none'
+  const opts = document.getElementById('g18-q-options')
+  opts.innerHTML = ''
+  // Shuffle answer indices
+  const shuffled = [...q.options].sort(() => Math.random() - 0.5)
+  shuffled.forEach(trainIdx => {
+    const train = G18_TRAINS[trainIdx]
+    const btn = document.createElement('button')
+    btn.className = 'g18-quiz-option'
+    let label = train.name
+    if (q.field === 'fuel') label = train.fuel
+    else if (q.field === 'country') label = train.country
+    else if (q.field === 'speed') label = `${train.speed} km/j`
+    btn.innerHTML = `${train.emoji} ${label}`
+    btn.onclick = () => g18AnswerQuestion(trainIdx, q.correct, btn)
+    opts.appendChild(btn)
+  })
+}
+
+function g18AnswerQuestion(picked, correct, btn) {
+  if (g18State.answeredCurrent) return
+  g18State.answeredCurrent = true
+  const opts = document.getElementById('g18-q-options')
+  opts.querySelectorAll('.g18-quiz-option').forEach(b => b.style.pointerEvents = 'none')
+  if (picked === correct) {
+    btn.classList.add('correct')
+    g18State.quizScore++
+    document.getElementById('g18-q-feedback').textContent = '✅ Benar! ' + G18_TRAINS[correct].emoji
+    document.getElementById('g18-q-feedback').style.color = '#A5D6A7'
+    playCorrect()
+  } else {
+    btn.classList.add('wrong')
+    // Highlight correct answer
+    opts.querySelectorAll('.g18-quiz-option').forEach(b => {
+      const trainName = G18_TRAINS[correct].name
+      if (b.textContent.includes(G18_TRAINS[correct].emoji)) b.classList.add('correct')
+    })
+    document.getElementById('g18-q-feedback').textContent = `❌ Jawaban: ${G18_TRAINS[correct].name}`
+    document.getElementById('g18-q-feedback').style.color = '#FFCDD2'
+    playWrong()
+  }
+  document.getElementById('g18-stars-badge').textContent = `🏛️ ${g18State.quizScore}`
+  const nextWrap = document.getElementById('g18-q-next-wrap')
+  nextWrap.style.display = 'block'
+  const nextBtn = document.getElementById('g18-q-next-btn')
+  nextBtn.textContent = g18State.quizIdx >= G18_QUIZ.length - 1 ? '🏆 Lihat Hasil!' : '▶ Lanjut'
+}
+
+function g18NextQuestion() {
+  g18State.quizIdx++
+  if (g18State.quizIdx >= G18_QUIZ.length) {
+    g18FinishQuiz()
+  } else {
+    g18RenderQuestion()
+  }
+}
+
+function g18FinishQuiz() {
+  const score = g18State.quizScore
+  const total = G18_QUIZ.length
+  const perfStars = score === 5 ? 5 : score === 4 ? 4 : score === 3 ? 3 : score >= 2 ? 2 : 1
+  state.gameStars[state.currentPlayer] = perfStars
+  const gradeEmoji = score === 5 ? '🏆' : score >= 3 ? '⭐' : '📚'
+  const gradeMsg = score === 5 ? 'SEMPURNA! Kamu ahli kereta!' : score >= 3 ? 'Bagus! Terus belajar!' : 'Jangan lupa baca kartu museumnya ya!'
+  document.getElementById('g18-quiz-view').style.display = 'none'
+  const res = document.getElementById('g18-result')
+  document.getElementById('g18-res-icon').textContent = gradeEmoji
+  document.getElementById('g18-res-title').textContent = gradeMsg
+  document.getElementById('g18-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
+  document.getElementById('g18-res-info').textContent =
+    `Skor kuis: ${score} / ${total} benar\n🚂 Ada ${G18_TRAINS.length} kereta di museum ini — sudah kamu pelajari semua?`
+  res.style.display = 'flex'
+  if (score >= 3) playCorrect(); else playWrong()
+}
+
+// ============================================================
+// ZONE KERETA — Landing Page Music & Banner
+// ============================================================
+const G_ZONE_MUSIC_PARTS = 5
+let gZoneMusicAudio = null
+let gZoneMusicPlaying = false
+let gZoneMusicPart = -1
+
+function g14GetRandomPart() {
+  // Avoid repeating the same part
+  let part
+  do { part = Math.floor(Math.random() * G_ZONE_MUSIC_PARTS) + 1 }
+  while (part === gZoneMusicPart && G_ZONE_MUSIC_PARTS > 1)
+  return part
+}
+
+function g14PlayZoneMusic() {
+  if (!isSoundOn()) return
+  if (gZoneMusicPlaying && gZoneMusicAudio) return
+  const part = g14GetRandomPart()
+  gZoneMusicPart = part
+  if (gZoneMusicAudio) { gZoneMusicAudio.pause(); gZoneMusicAudio = null }
+  const audio = new Audio(`assets/train/brave-loco-part${part}.mp3`)
+  audio.volume = 0.45
+  gZoneMusicAudio = audio
+  gZoneMusicPlaying = true
+  audio.play().catch(() => {})
+  audio.onended = () => {
+    gZoneMusicPlaying = false
+    // Play another random part after a short pause
+    setTimeout(() => {
+      const el = document.getElementById('zone-kereta')
+      if (el && document.getElementById('screen-home').style.display !== 'none') {
+        g14PlayZoneMusic()
+      }
+    }, 1200)
+  }
+  const btn = document.getElementById('zone-kereta-music-btn')
+  if (btn) btn.textContent = '🔊'
+}
+
+function g14StopZoneMusic() {
+  if (gZoneMusicAudio) { gZoneMusicAudio.pause(); gZoneMusicAudio.currentTime = 0; gZoneMusicAudio = null }
+  gZoneMusicPlaying = false
+  const btn = document.getElementById('zone-kereta-music-btn')
+  if (btn) btn.textContent = '🎵'
+}
+
+function g14ToggleZoneMusic() {
+  if (gZoneMusicPlaying) g14StopZoneMusic(); else g14PlayZoneMusic()
+}
+
+function g14ZoneHover() {
+  if (!gZoneMusicPlaying) g14PlayZoneMusic()
+}
+
+function g14ZoneTap() {
+  // Touch devices: tap on zone header starts music
+  if (!gZoneMusicPlaying) g14PlayZoneMusic()
+}
+
+// Stop zone music when entering a game
+function stopZoneKeretaMusic() {
+  g14StopZoneMusic()
+}
+
+// Patch showScreen to stop zone music when leaving home screen
+const _origShowScreen = typeof showScreen === 'function' ? showScreen : null
+if (_origShowScreen) {
+  window.showScreen = function(id) {
+    if (id !== 'screen-home') g14StopZoneMusic()
+    _origShowScreen(id)
+  }
+}
 </script>
 </body>
 </html>
