@@ -233,7 +233,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* G1 */
 #screen-game1 { background:url('assets/bg-game1-emosi.webp') center/cover no-repeat, linear-gradient(180deg,#FFF1F3 0%,#FFE4E6 50%,#FFF8E7 100%); }
-.world-hearts { position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0; }
+.world-hearts { position:absolute;inset:0;overflow:hidden;z-index:0; pointer-events:none; }
+.world-hearts span { pointer-events:auto; }
 .world-hearts span { position:absolute;bottom:-30px;font-size:18px;opacity:0;animation:heartRise linear infinite; }
 @keyframes heartRise { 0%{transform:translateY(0)rotate(0deg);opacity:0} 10%{opacity:0.6} 90%{opacity:0.4} 100%{transform:translateY(-100vh)rotate(30deg);opacity:0} }
 .g1-animal-display { font-size:110px;text-align:center;display:block;margin:0 auto 4px;filter:drop-shadow(0 8px 16px rgba(244,63,94,0.3));animation:g1Wobble 0.6s cubic-bezier(0.36,0.07,0.19,0.97);position:relative;z-index:1; }
@@ -1240,13 +1241,79 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 #screen-game8 { background: linear-gradient(160deg, #1a0020 0%, #2D1B69 50%, #1a0020 100%); }
 #screen-game9 { background: url('assets/bg-game9-trace.webp') center/cover no-repeat, linear-gradient(180deg, #0A1A00 0%, #1A3300 50%, #0A1A00 100%); }
 
-/* ── 9. GAME CONTENT TEXT COLOR FIXES FOR DARK BG ── */
-.g1-question { color: white; -webkit-text-fill-color: white; background: none; }
-.g1-choice-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
-.g1-choice-btn .choice-label { color: white; }
-.g1-choice-btn.correct { background: linear-gradient(135deg, rgba(20,184,166,0.4), rgba(20,184,166,0.2)); border-color: #14B8A6; }
-.g1-choice-btn.wrong { background: linear-gradient(135deg, rgba(244,63,94,0.3), rgba(244,63,94,0.1)); border-color: #F43F5E; }
-.g1-progress { color: rgba(255,255,255,0.6); }
+/* ── 9. GAME 1 — Readable UI on colorful background image ── */
+/* Question: frosted pill so it "floats" above any background */
+.g1-question {
+  background: rgba(255,255,255,0.92) !important;
+  -webkit-text-fill-color: #9F1239 !important;
+  color: #9F1239 !important;
+  border-radius: 100px;
+  padding: 12px 28px;
+  box-shadow: 0 4px 16px rgba(244,63,94,0.18), 0 2px 8px rgba(0,0,0,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 20px;
+}
+/* Choice buttons: solid white with shadow for depth */
+.g1-choice-btn {
+  background: rgba(255,255,255,0.96) !important;
+  border-color: #FFE4E6 !important;
+  color: var(--text) !important;
+  box-shadow: 0 6px 0 #FDA4AF, 0 2px 12px rgba(0,0,0,0.12) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.g1-choice-btn .choice-label { color: var(--text) !important; }
+.g1-choice-btn.correct { background: linear-gradient(135deg,#CCFBF1,#f0fffd) !important; border-color: var(--teal) !important; box-shadow: 0 4px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3) !important; }
+.g1-choice-btn.wrong { background: linear-gradient(135deg,#FFF1F3,white) !important; border-color: var(--rose) !important; box-shadow: 0 4px 0 var(--rose-shadow) !important; }
+/* Progress text: pill badge */
+.g1-progress {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 100px;
+  padding: 4px 16px;
+  color: #9F1239 !important;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(244,63,94,0.12);
+}
+/* Animal: character big + emotion badge overlay */
+#g1-animal {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 6px;
+  font-size: 0 !important;   /* reset so children control their own size */
+  filter: none !important;   /* filter moved to .g1-char */
+  animation: none !important; /* animation moved to .g1-char */
+}
+.g1-char {
+  font-size: 108px;
+  filter: drop-shadow(0 8px 16px rgba(244,63,94,0.3));
+  animation: g1Wobble 0.6s cubic-bezier(0.36,0.07,0.19,0.97), g1AnimalIdle 3.5s ease-in-out 0.7s infinite;
+  display: block;
+}
+@keyframes g1AnimalIdle {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  30% { transform:scale(1.04) rotate(-2.5deg); }
+  70% { transform:scale(1.04) rotate(2.5deg); }
+}
+.g1-emot-badge {
+  position: absolute;
+  bottom: 4px; right: -14px;
+  font-size: 52px;
+  background: white;
+  border-radius: 50%;
+  padding: 5px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+  border: 3px solid rgba(244,63,94,0.18);
+  animation: emotBadgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
+}
+@keyframes emotBadgePop { from{transform:scale(0) rotate(-30deg)} to{transform:scale(1) rotate(0)} }
+/* Tappable hearts pop animation */
+@keyframes heartPop { 0%{transform:scale(1) translateY(0);opacity:1} 100%{transform:scale(2.5) translateY(-30px);opacity:0} }
+.world-hearts span.popping { animation:heartPop 0.35s ease-out forwards !important; pointer-events:none !important; }
 
 .breathe-instruction { color: #C4B5FD; }
 .breathe-sub { color: #A78BFA; }
@@ -6616,7 +6683,22 @@ function initFloatingStars() {
 function initHeartWorld() {
   const c = document.getElementById('world-hearts'); if(!c)return; c.innerHTML=''
   const hearts=['❤️','💖','💕','💗','🩷','💓']
-  for(let i=0;i<8;i++){const s=document.createElement('span');s.textContent=hearts[i%hearts.length];s.style.cssText=`left:${10+i*11}%;animation-duration:${6+Math.random()*6}s;animation-delay:${Math.random()*5}s;font-size:${14+Math.random()*14}px;`;c.appendChild(s)}
+  function spawnHeart(i) {
+    const s=document.createElement('span')
+    s.textContent=hearts[Math.floor(Math.random()*hearts.length)]
+    s.style.cssText=`left:${5+i*11}%;animation-duration:${6+Math.random()*6}s;animation-delay:${Math.random()*5}s;font-size:${16+Math.random()*16}px;cursor:pointer;pointer-events:auto;`
+    s.addEventListener('click', () => {
+      if(s.classList.contains('popping')) return
+      s.classList.add('popping')
+      playCorrect()
+      setTimeout(() => {
+        s.remove()
+        setTimeout(() => { if(c.isConnected) spawnHeart(i) }, 1500)
+      }, 350)
+    })
+    c.appendChild(s)
+  }
+  for(let i=0;i<8;i++) spawnHeart(i)
 }
 function initCloudWorld() {
   const c = document.getElementById('world-clouds'); if(!c)return; c.innerHTML=''
@@ -7480,7 +7562,7 @@ function nextG1Round(){
   const pool=shuffled.slice(0,numChoices).sort(()=>Math.random()-0.5)
   if(!pool.find(e=>e.name===correct.name))pool[0]=correct
   const choices=pool.sort(()=>Math.random()-0.5)
-  document.getElementById('g1-animal').textContent=correct.emoji+' '+correct.animal
+  document.getElementById('g1-animal').innerHTML=`<span class="g1-char">${correct.animal}</span><span class="g1-emot-badge">${correct.emoji}</span>`
   document.getElementById('g1-progress-bar').style.width=((roundInSet/g1State.maxRound)*100)+'%'
   const choicesEl=document.getElementById('g1-choices')
   choicesEl.style.gridTemplateColumns=numChoices<=3?'1fr 1fr 1fr':(numChoices<=4?'1fr 1fr':'1fr 1fr 1fr')
