@@ -1890,7 +1890,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* ── Party Picker Overlay ── */
 .g10-party-overlay {
   display: none;
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.65);
   backdrop-filter: blur(4px);
@@ -2107,8 +2107,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 #g14-lane-area { position:absolute;inset:0;display:flex;flex-direction:column;z-index:4; }
 .g14-lane-row {
   flex:1;position:relative;overflow:hidden;
-  border-bottom:3px solid rgba(0,0,0,0.5);
-  background:linear-gradient(180deg,rgba(12,38,6,0.92) 0%,rgba(22,58,10,0.88) 55%,rgba(15,44,7,0.92) 100%);
+  border-bottom:2px solid rgba(0,0,0,0.7);
+  background:linear-gradient(180deg,rgba(8,28,4,0.95) 0%,rgba(15,45,6,0.90) 45%,rgba(10,35,5,0.95) 100%);
 }
 .g14-lane-row:last-child { border-bottom:none; }
 /* Railway ties */
@@ -2132,8 +2132,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 /* Active lane glow */
 .g14-lane-row.active-lane {
-  background:linear-gradient(180deg,rgba(16,50,8,0.95) 0%,rgba(30,70,12,0.92) 55%,rgba(18,52,8,0.95) 100%);
-  box-shadow:inset 0 0 24px rgba(90,200,50,0.18);
+  background:linear-gradient(180deg,rgba(12,45,6,0.97) 0%,rgba(25,65,10,0.95) 50%,rgba(14,48,7,0.97) 100%);
+  box-shadow:inset 0 0 30px rgba(100,220,60,0.22),inset 0 2px 0 rgba(100,220,60,0.1);
 }
 /* Lane danger warning (right edge) */
 .g14-lane-warning {
@@ -2144,16 +2144,16 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes g14WarnFlash { from{opacity:1;transform:translateY(-50%) scale(1)} to{opacity:0.2;transform:translateY(-50%) scale(1.25)} }
 /* AI train */
 .g14-ai-train {
-  position:absolute;z-index:6;height:18%;width:auto;
+  position:absolute;z-index:6;height:20%;width:auto;
   top:50%;transform:translateY(-50%) scaleX(-1);
-  filter:drop-shadow(0 3px 10px rgba(0,0,0,0.6)) brightness(0.8);
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7)) brightness(0.85) saturate(0.9);
 }
 /* Player train */
 #g14-player {
-  position:absolute;z-index:10;height:24%;width:auto;
-  left:13%;transform:translateY(-50%) scaleX(-1);
-  transition:top 0.20s cubic-bezier(0.34,1.56,0.64,1);
-  filter:drop-shadow(0 5px 16px rgba(0,0,0,0.75)) brightness(1.08);
+  position:absolute;z-index:10;height:28%;width:auto;
+  left:10%;transform:translateY(-50%) scaleX(-1);
+  transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  filter:drop-shadow(0 6px 20px rgba(0,0,0,0.8)) brightness(1.12) saturate(1.1);
 }
 /* Speed lines overlay during boost */
 #g14-speed-lines {
@@ -2217,14 +2217,17 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 .g14-math-btn:active { transform:scale(0.92);background:rgba(230,57,70,0.4); }
 .g14-train-select-btn {
-  background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);
-  border-radius:14px;padding:8px 12px;cursor:pointer;text-align:center;
-  transition:all 0.2s;color:white;min-width:80px;
+  background:rgba(255,255,255,0.08);border:2.5px solid rgba(255,255,255,0.2);
+  border-radius:16px;padding:10px 14px;cursor:pointer;text-align:center;
+  transition:all 0.2s;color:white;min-width:90px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
-.g14-train-select-btn img { width:80px;height:auto;display:block;margin:0 auto 4px;
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6)); transform:scaleX(-1); }
-.g14-train-select-btn.selected { background:rgba(230,57,70,0.45);border-color:#E63946;transform:scale(1.06); }
-.g14-train-select-btn:hover { background:rgba(255,255,255,0.18);transform:scale(1.04); }
+.g14-train-select-btn img { width:90px;height:auto;display:block;margin:0 auto 6px;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,0.7)); transform:scaleX(-1); }
+.g14-train-select-btn .g14-sel-name { font-size:11px;font-weight:800;color:rgba(255,255,255,0.85);margin-bottom:1px; }
+.g14-train-select-btn .g14-sel-speed { font-size:10px;color:rgba(255,209,102,0.8);font-weight:700; }
+.g14-train-select-btn.selected { background:rgba(230,57,70,0.4);border-color:#E63946;transform:scale(1.08);box-shadow:0 6px 20px rgba(230,57,70,0.4); }
+.g14-train-select-btn:active { transform:scale(1.04); }
 .g14-speedometer {
   font-size:11px;font-weight:900;color:#FFD166;letter-spacing:0.5px;
   background:rgba(0,0,0,0.4);padding:2px 8px;border-radius:8px;
@@ -2257,7 +2260,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes g14Fence { from{background-position:0 bottom} to{background-position:-60px bottom} }
 
 /* ===== GAME 15 — Lokomotif Pemberani ===== */
-#screen-game15 { flex-direction:column; }
+#screen-game15 { flex-direction:column;background:linear-gradient(180deg,#0a1525 0%,#0d2040 40%,#163060 75%,#1a4070 100%); }
 .g15-slot {
   width:46px;height:52px;border-radius:12px;border:2.5px solid rgba(255,255,255,0.3);
   background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;
@@ -2277,6 +2280,22 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g15-letter-tile:hover  { transform:translateY(-4px);box-shadow:0 9px 0 #0D47A1; }
 .g15-letter-tile:active { transform:translateY(3px);box-shadow:0 2px 0 #0D47A1; }
 .g15-letter-tile.used   { opacity:0.28;pointer-events:none;transform:scale(0.82);box-shadow:none; }
+/* Rail track visual below train in G15 */
+#g15-rail-track {
+  width:100%;height:18px;flex-shrink:0;
+  background:
+    repeating-linear-gradient(90deg,#3d2206 0px,#3d2206 18px,#5C3A1A 18px,#5C3A1A 24px,#3d2206 24px,#3d2206 50px,#5C3A1A 50px,#5C3A1A 56px),
+    linear-gradient(#2a1504,#4a2508);
+  box-shadow:0 -2px 0 #DAA520, 0 2px 0 #8B6914, inset 0 6px 0 rgba(0,0,0,0.3);
+  position:relative;
+}
+#g15-rail-track::before, #g15-rail-track::after {
+  content:'';position:absolute;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,#8B6914,#DAA520 15%,#B8860B 30%,#DAA520 60%,#B8860B 80%,#DAA520);
+  border-radius:2px;
+}
+#g15-rail-track::before { top:2px; }
+#g15-rail-track::after { bottom:2px; }
 /* Game 15 — chain links (horizontal, trailing behind train) */
 .g15-chain-link {
   display:inline-block;width:30px;height:18px;
@@ -2313,7 +2332,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 
 /* ===== GAME 16 — Selamatkan Kereta ===== */
 #screen-game16 { background:linear-gradient(180deg,#1a0a2e,#2d1660);flex-direction:column; }
-#g16-arena { background:linear-gradient(180deg,#0a1628 0%,#1a2a4a 50%,#8B7355 50%,#6B5A3E 100%); }
+#g16-arena { background:linear-gradient(180deg,#080d24 0%,#0d1845 25%,#1a2860 45%,#4a5530 56%,#3a4520 70%,#2a3510 100%); }
 .g16-timing-track {
   width:80%;max-width:300px;height:28px;border-radius:14px;
   background:linear-gradient(90deg,#E53935 0%,#E53935 30%,#43A047 30%,#43A047 70%,#E53935 70%,#E53935 100%);
@@ -2353,14 +2372,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g16-victim-danger { animation:g16DangerPulse 0.8s infinite; }
 
 /* ===== GAME 17 — Jembatan Goyang ===== */
-#screen-game17 { background:linear-gradient(180deg,#1a2a0a,#2d4a0a);flex-direction:column; }
+#screen-game17 { background:#1a2a0a;flex-direction:column; }
 .g17-block {
-  flex:1;min-width:28px;height:52px;border-radius:8px;cursor:pointer;
+  flex:1;min-width:32px;height:62px;border-radius:12px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:900;color:white;transition:all 0.2s;
-  border:3px solid rgba(255,255,255,0.2);
-  background:linear-gradient(135deg,#5D4037,#795548);
-  box-shadow:0 4px 0 rgba(0,0,0,0.4);
+  font-size:22px;font-weight:900;color:white;transition:all 0.18s;
+  border:3px solid rgba(255,255,255,0.25);
+  background:linear-gradient(145deg,#4E342E,#6D4C41,#795548);
+  box-shadow:0 6px 0 rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);
   user-select:none;
 }
 .g17-block.active {
@@ -2393,6 +2412,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 .g17-train-cross { animation:g17TrainCross 1.5s ease-in-out forwards; }
 @keyframes g17CrackGrow { from{opacity:0;transform:scaleX(0)} to{opacity:1;transform:scaleX(1)} }
+@keyframes g17Cloud1 { 0%{transform:translateX(0)} 100%{transform:translateX(12px)} }
 .g17-crack-line {
   position:absolute;height:4px;border-radius:2px;
   background:linear-gradient(90deg,transparent,#8B4513,transparent);
@@ -2403,13 +2423,15 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* ===== GAME 18 — Museum Kereta Ambarawa ===== */
 #screen-game18 { background:linear-gradient(180deg,#1a0e06,#2d1a0a,#3e2510);flex-direction:column; }
 .g18-card {
-  background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05));
-  border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 10px;
-  text-align:center;cursor:pointer;transition:all 0.25s;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05));
+  border:2.5px solid rgba(255,255,255,0.22);border-radius:18px;padding:14px 10px 16px;
+  text-align:center;cursor:pointer;transition:all 0.22s;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);
+  min-height:140px;justify-content:center;
 }
-.g18-card:hover,.g18-card:active { transform:scale(1.03);border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.15); }
-.g18-card-emoji { font-size:36px; }
+.g18-card:hover,.g18-card:active { transform:scale(1.04);border-color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.16);box-shadow:0 10px 28px rgba(0,0,0,0.6); }
+.g18-card-emoji { font-size:40px;line-height:1.1; }
 .g18-card-name { color:white;font-size:13px;font-weight:900;font-family:'Fredoka One',cursive;line-height:1.2; }
 .g18-card-country { color:rgba(255,255,255,0.7);font-size:11px;font-weight:700; }
 .g18-speed-badge {
@@ -3080,6 +3102,21 @@ body { background: #0a0a1a !important; }
   0%  { transform:scaleX(-1) translateX(0) scale(1); }
   40% { transform:scaleX(-1) translateX(22px) scale(1.12); }
   100%{ transform:scaleX(-1) translateX(0) scale(1); }
+}
+/* Aura ring before attack */
+.g13b-aura-ring {
+  position:absolute; inset:-14px;
+  border-radius:50%;
+  border:3px solid var(--aura-color, #a78bfa);
+  box-shadow:0 0 14px 4px var(--aura-color, #a78bfa),inset 0 0 10px 2px var(--aura-color, #a78bfa);
+  opacity:0; pointer-events:none; z-index:6;
+  animation:g13bAura 0.5s ease-out forwards;
+}
+@keyframes g13bAura {
+  0%   { opacity:0; transform:scale(0.6); }
+  35%  { opacity:1; transform:scale(1.15); }
+  70%  { opacity:0.85; transform:scale(1); }
+  100% { opacity:0; transform:scale(1.25); }
 }
 /* Pokéball catch animation */
 .g13b-catch-ball {
@@ -4762,16 +4799,17 @@ body { background: #0a0a1a !important; }
   <div class="g10-atk-fx" id="g10-atk-fx" style="position:fixed;z-index:201;pointer-events:none;width:88px;height:88px;opacity:0;transform:translate(-50%,-50%);"><span id="g10-atk-emoji">⚡</span></div>
   <div class="g10-burst-fx" id="g10-burst-fx"></div>
 
-  <!-- Party Picker Overlay -->
-  <div class="g10-party-overlay" id="g10-party-overlay" onclick="if(event.target===this)closePartyPicker()">
-    <div class="g10-party-sheet">
-      <div class="g10-party-hdr">
-        <span class="g10-party-hdr-title">⚙️ Ganti Pokémon</span>
-        <button class="g10-party-close" onclick="closePartyPicker()">✕</button>
-      </div>
-      <div class="g10-trainer-tabs" id="g10-trainer-tabs"></div>
-      <div class="g10-party-grid" id="g10-party-grid"></div>
+</div>
+
+<!-- Party Picker Overlay (global — works from G10 and G13B) -->
+<div class="g10-party-overlay" id="g10-party-overlay" onclick="if(event.target===this)closePartyPicker()">
+  <div class="g10-party-sheet">
+    <div class="g10-party-hdr">
+      <span class="g10-party-hdr-title">⚙️ Ganti Pokémon</span>
+      <button class="g10-party-close" onclick="closePartyPicker()">✕</button>
     </div>
+    <div class="g10-trainer-tabs" id="g10-trainer-tabs"></div>
+    <div class="g10-party-grid" id="g10-party-grid"></div>
   </div>
 </div>
 
@@ -5087,11 +5125,11 @@ body { background: #0a0a1a !important; }
     <div id="g14-position" style="position:absolute;top:38px;right:8px;font-size:11px;font-weight:900;color:#FFD166;background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:8px;z-index:20;display:none;">🥇 POSISI 1</div>
 
     <!-- Start overlay -->
-    <div id="g14-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.78);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:14px;backdrop-filter:blur(6px);">
-      <div style="font-size:14px;font-weight:900;color:#FFD166;letter-spacing:1px;text-transform:uppercase;">Pilih Kereta</div>
-      <div id="g14-train-select" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 16px;max-width:340px;"></div>
-      <div id="g14-start-msg" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;text-align:center;"></div>
-      <button id="g14-go-btn" onclick="g14StartRace()" style="display:none;background:linear-gradient(135deg,#E63946,#B52733);color:white;border:none;border-radius:14px;padding:14px 36px;font-size:19px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #7A0A12;cursor:pointer;">🏁 BALAPAN!</button>
+    <div id="g14-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.82);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:50;backdrop-filter:blur(6px);overflow-y:auto;padding:20px 16px 24px;">
+      <div style="font-size:13px;font-weight:900;color:#FFD166;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">🏁 Pilih Kategori Kereta</div>
+      <div id="g14-train-select" style="display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;max-width:360px;"></div>
+      <div id="g14-start-msg" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;text-align:center;margin-top:10px;padding:0 24px;min-height:18px;"></div>
+      <button id="g14-go-btn" onclick="g14StartRace()" style="display:none;margin-top:12px;background:linear-gradient(135deg,#E63946,#B52733);color:white;border:none;border-radius:14px;padding:14px 36px;font-size:19px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #7A0A12;cursor:pointer;">🏁 BALAPAN!</button>
     </div>
 
     <!-- Result overlay -->
@@ -5107,20 +5145,24 @@ body { background: #0a0a1a !important; }
     </div>
   </div>
 
-  <!-- Controls bar -->
-  <div style="display:flex;align-items:stretch;gap:8px;padding:10px 12px;background:rgba(0,0,0,0.88);flex-shrink:0;">
-    <button onclick="g14LaneUp()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px 6px;font-size:18px;font-weight:900;cursor:pointer;line-height:1;">▲<br><span style="font-size:10px;opacity:0.7">Atas</span></button>
-    <div style="flex:1.8;display:flex;flex-direction:column;align-items:center;gap:4px;">
-      <div style="color:rgba(255,209,102,0.8);font-size:10px;font-weight:800;letter-spacing:0.5px;">⚙️ BOILER — Jawab math untuk BOOST!</div>
-      <div style="background:rgba(255,255,255,0.1);border-radius:6px;height:10px;overflow:hidden;width:100%;position:relative;">
-        <div id="g14-pressure-bar" style="height:100%;width:50%;background:linear-gradient(90deg,#FFD166,#FF6B35,#E63946);border-radius:6px;transition:width 0.3s;"></div>
+  <!-- Controls bar — redesigned -->
+  <div style="background:linear-gradient(180deg,rgba(0,0,0,0.95),rgba(10,10,10,0.98));border-top:3px solid rgba(230,57,70,0.7);flex-shrink:0;padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+    <!-- Boiler pressure row -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:11px;color:#FFD166;font-weight:900;letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;">⚙️ BOILER</span>
+      <div style="flex:1;height:16px;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.12);position:relative;">
+        <div id="g14-pressure-bar" style="height:100%;width:50%;background:linear-gradient(90deg,#4ade80,#FFD166 50%,#E63946);border-radius:8px;transition:width 0.3s;"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.12),transparent);border-radius:8px;pointer-events:none;"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <button id="g14-boost-btn" onclick="g14Boost()" style="background:linear-gradient(135deg,#FF6B35,#E63946);color:white;border:none;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:900;cursor:pointer;flex:1;box-shadow:0 3px 0 #7A0A12;">🔥 BOOST!</button>
-        <div id="g14-boost-ready" style="display:none;color:#4ade80;font-size:10px;font-weight:800;white-space:nowrap;">✅ SIAP!</div>
-      </div>
+      <button id="g14-boost-btn" onclick="g14Boost()" style="background:linear-gradient(135deg,#FF6B35,#E63946);color:white;border:none;border-radius:12px;padding:10px 18px;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #7A0A12;flex-shrink:0;letter-spacing:0.5px;">🔥 BOOST!</button>
+      <div id="g14-boost-ready" style="display:none;color:#4ade80;font-size:12px;font-weight:900;white-space:nowrap;flex-shrink:0;">✅ SIAP!</div>
     </div>
-    <button onclick="g14LaneDown()" style="flex:1;background:linear-gradient(135deg,#37474F,#546E7A);color:white;border:none;border-radius:12px;padding:14px 6px;font-size:18px;font-weight:900;cursor:pointer;line-height:1;">▼<br><span style="font-size:10px;opacity:0.7">Bawah</span></button>
+    <!-- Lane switch buttons -->
+    <div style="display:flex;gap:10px;align-items:stretch;">
+      <button onclick="g14LaneUp()" style="flex:1;background:linear-gradient(145deg,#263238,#37474F);color:white;border:2px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px 6px;font-size:32px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #1C313A;transition:transform 0.1s,box-shadow 0.1s;">⬆</button>
+      <div style="flex:0.7;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:10px;font-weight:800;text-align:center;letter-spacing:0.5px;gap:2px;"><span>PINDAH</span><span>JALUR</span></div>
+      <button onclick="g14LaneDown()" style="flex:1;background:linear-gradient(145deg,#263238,#37474F);color:white;border:2px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px 6px;font-size:32px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #1C313A;transition:transform 0.1s,box-shadow 0.1s;">⬇</button>
+    </div>
   </div>
 </div>
 
@@ -5154,7 +5196,9 @@ body { background: #0a0a1a !important; }
       <div id="g15-chains" style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;flex-shrink:0;"></div>
     </div>
     <!-- Progress label below train area -->
-    <div id="g15-progress-msg" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;text-align:center;min-height:16px;margin-top:-4px;flex-shrink:0;"></div>
+    <div id="g15-progress-msg" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;text-align:center;min-height:16px;flex-shrink:0;"></div>
+    <!-- Rail track visual -->
+    <div id="g15-rail-track" style="width:100%;margin:0 0 2px;"></div>
 
     <!-- Image hint — bigger, more prominent -->
     <div id="g15-image-wrap" style="width:120px;height:120px;border-radius:20px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;font-size:68px;border:2.5px solid rgba(255,255,255,0.3);flex-shrink:0;box-shadow:0 6px 20px rgba(0,0,0,0.5);">❓</div>
@@ -5186,12 +5230,25 @@ body { background: #0a0a1a !important; }
     <span id="g16-stars-badge" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #4A148C;color:white;flex-shrink:0;">🆘 0</span>
   </div>
   <!-- Arena -->
-  <div id="g16-arena" style="flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
+  <div id="g16-arena" style="flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:linear-gradient(180deg,#080d24 0%,#0d1845 25%,#1a2860 45%,#4a5530 56%,#3a4520 70%,#2a3510 100%);">
+    <!-- Sky stars -->
+    <div style="position:absolute;top:0;left:0;right:0;height:55%;z-index:0;pointer-events:none;overflow:hidden;">
+      <div style="position:absolute;top:8%;left:15%;font-size:6px;color:white;opacity:0.6;">★</div>
+      <div style="position:absolute;top:12%;left:40%;font-size:4px;color:white;opacity:0.5;">★</div>
+      <div style="position:absolute;top:5%;left:70%;font-size:5px;color:white;opacity:0.7;">★</div>
+      <div style="position:absolute;top:18%;left:85%;font-size:4px;color:white;opacity:0.5;">★</div>
+      <div style="position:absolute;top:22%;left:25%;font-size:3px;color:white;opacity:0.6;">★</div>
+      <div style="position:absolute;top:10%;left:55%;font-size:5px;color:white;opacity:0.4;">★</div>
+      <!-- Moon -->
+      <div style="position:absolute;top:6%;left:8%;font-size:28px;filter:drop-shadow(0 0 8px rgba(255,240,150,0.5));">🌕</div>
+    </div>
     <!-- Scene elements -->
-    <div id="g16-hero-train" style="position:absolute;left:6%;bottom:42%;z-index:5;transition:transform 0.3s;"><img src="assets/train/linus-brave_char.svg" style="height:68px;width:auto;transform:scaleX(-1);filter:drop-shadow(0 3px 10px rgba(0,0,0,0.6));" alt="Hero" onerror="this.outerHTML='<span style=\'font-size:44px;\'>🚂</span>'"></div>
-    <div id="g16-rope" style="position:absolute;bottom:calc(42% + 28px);left:calc(6% + 60px);right:calc(8% + 60px);height:6px;background:linear-gradient(90deg,#8D6E63,#BCAAA4,#8D6E63);border-radius:3px;z-index:4;transform-origin:left center;transition:all 0.3s;"></div>
-    <div id="g16-victim-train" style="position:absolute;right:8%;bottom:42%;z-index:5;transition:right 0.5s;"><img src="assets/train/caseyjr-dumbo_char.svg" style="height:68px;width:auto;transform:scaleX(1);filter:drop-shadow(0 3px 10px rgba(0,0,0,0.6));" alt="Victim" onerror="this.outerHTML='<span style=\'font-size:44px;\'>🚃</span>'"></div>
-    <div id="g16-cliff-edge" style="position:absolute;right:0;bottom:38%;font-size:36px;z-index:3;">🏔️</div>
+    <div id="g16-hero-train" style="position:absolute;left:4%;bottom:40%;z-index:5;transition:transform 0.3s;"><img src="assets/train/linus-brave_char.svg" style="height:84px;width:auto;transform:scaleX(-1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7));" alt="Hero" onerror="this.outerHTML='<span style=\'font-size:56px;\'>🚂</span>'"></div>
+    <div id="g16-rope" style="position:absolute;bottom:calc(40% + 36px);left:calc(4% + 74px);right:calc(5% + 74px);height:8px;background:linear-gradient(90deg,#5D4037,#8D6E63 20%,#BCAAA4 50%,#8D6E63 80%,#5D4037);border-radius:4px;z-index:4;transform-origin:left center;transition:all 0.3s;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
+    <div id="g16-victim-train" style="position:absolute;right:5%;bottom:40%;z-index:5;transition:right 0.5s;"><img src="assets/train/caseyjr-dumbo_char.svg" style="height:84px;width:auto;transform:scaleX(1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7));" alt="Victim" onerror="this.outerHTML='<span style=\'font-size:56px;\'>🚃</span>'"></div>
+    <div id="g16-cliff-edge" style="position:absolute;right:-4px;bottom:35%;font-size:48px;z-index:3;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.6));">🏔️</div>
+    <!-- Ground/terrain line -->
+    <div style="position:absolute;bottom:38%;left:0;right:0;height:3px;background:linear-gradient(90deg,rgba(100,150,40,0.6),rgba(80,120,30,0.8),rgba(60,90,20,0.4));z-index:2;"></div>
     <div id="g16-danger-meter" style="position:absolute;top:10px;right:10px;z-index:20;text-align:center;">
       <div style="color:rgba(255,255,255,0.8);font-size:10px;font-weight:800;margin-bottom:2px;">BAHAYA</div>
       <div style="width:64px;height:10px;background:rgba(255,255,255,0.15);border-radius:5px;overflow:hidden;">
@@ -5254,12 +5311,15 @@ body { background: #0a0a1a !important; }
     <span id="g17-stars-badge" style="background:linear-gradient(135deg,#2E7D32,#43A047);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #1B5E20;color:white;flex-shrink:0;">🌉 0</span>
   </div>
   <!-- Scene -->
-  <div id="g17-scene" style="flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 48%,#6B8E23 48%,#4a6a10 100%);">
-    <!-- Clouds -->
-    <div style="position:absolute;top:8%;left:10%;font-size:28px;opacity:0.7;">☁️</div>
-    <div style="position:absolute;top:14%;right:18%;font-size:22px;opacity:0.6;">☁️</div>
+  <div id="g17-scene" style="flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#0d2a4a 0%,#1a3d6b 20%,#2e6494 38%,#87CEEB 52%,#87CEEB 54%,#5a8a30 54%,#4a7820 68%,#3a6010 100%);">
+    <!-- Sky elements -->
+    <div style="position:absolute;top:6%;left:5%;font-size:30px;opacity:0.85;animation:g17Cloud1 12s ease-in-out infinite alternate;">☁️</div>
+    <div style="position:absolute;top:12%;left:35%;font-size:22px;opacity:0.6;animation:g17Cloud1 18s ease-in-out infinite alternate-reverse;">☁️</div>
+    <div style="position:absolute;top:8%;right:12%;font-size:26px;opacity:0.75;animation:g17Cloud1 15s ease-in-out infinite alternate;">☁️</div>
     <!-- Sun -->
-    <div style="position:absolute;top:6%;right:8%;font-size:32px;">☀️</div>
+    <div style="position:absolute;top:4%;right:6%;font-size:36px;filter:drop-shadow(0 0 12px rgba(255,230,50,0.7));">☀️</div>
+    <!-- Mountain silhouettes in background -->
+    <div style="position:absolute;bottom:44%;left:0;right:0;height:20%;background:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 100%22%3E%3Cpolygon points=%220,100 60,20 120,55 180,10 240,45 300,15 360,40 400,5 400,100%22 fill=%22%231a3a1a%22 opacity=%220.7%22/%3E%3C/svg%3E') repeat-x bottom/400px 100%;z-index:1;"></div>
     <!-- Train waiting left -->
     <div id="g17-train-waiting" style="position:absolute;left:4%;bottom:44%;z-index:5;transition:all 1.5s ease-in-out;"><img src="assets/train/malivlak_char.svg" style="height:60px;width:auto;transform:scaleX(-1);filter:drop-shadow(0 3px 10px rgba(0,0,0,0.5));" alt="Train" onerror="this.outerHTML='<span style=\'font-size:42px;\'>🚂</span>'"></div>
     <!-- Bridge structure -->
@@ -5299,9 +5359,9 @@ body { background: #0a0a1a !important; }
       </div>
     </div>
   </div>
-  <!-- Bottom instruction bar -->
-  <div id="g17-instruction" style="padding:10px 12px;background:rgba(0,0,0,0.8);flex-shrink:0;text-align:center;color:rgba(255,255,255,0.85);font-size:13px;font-weight:800;">
-    Ketuk balok yang menyala kuning! 🔨
+  <!-- Bottom instruction bar — enhanced -->
+  <div id="g17-instruction" style="padding:12px 16px;background:linear-gradient(180deg,rgba(10,25,5,0.95),rgba(5,15,2,0.98));border-top:2.5px solid rgba(67,160,71,0.6);flex-shrink:0;text-align:center;color:rgba(255,255,255,0.9);font-size:13px;font-weight:800;letter-spacing:0.3px;">
+    🔨 Ketuk balok yang menyala kuning! ⚡ Makin cepat = lebih banyak bintang!
   </div>
 </div>
 
@@ -11114,6 +11174,28 @@ function g13bAnswer(val, btn) {
     // Particle burst
     try { spawnParticleBurst(btn.getBoundingClientRect().left + btn.offsetWidth/2, btn.getBoundingClientRect().top) } catch(e) {}
 
+    // Aura ring around player Pokémon before attack
+    try {
+      const playerType = g13bSavedPoke ? g13bSavedPoke.type : 'Electric'
+      const auraColors = {
+        Fire:'#f97316',Water:'#38bdf8',Grass:'#4ade80',Electric:'#facc15',
+        Psychic:'#e879f9',Ice:'#67e8f9',Dragon:'#818cf8',Dark:'#6b7280',
+        Fighting:'#f87171',Ghost:'#c084fc',Steel:'#94a3b8',Fairy:'#f9a8d4',
+        Rock:'#a8a29e',Ground:'#d97706',Flying:'#7dd3fc',Bug:'#a3e635',
+        Poison:'#c084fc',Normal:'#d1d5db'
+      }
+      const auraColor = auraColors[playerType] || '#a78bfa'
+      const pWrap = document.querySelector('.g13b-pspr-wrap')
+      if (pWrap) {
+        const ring = document.createElement('div')
+        ring.className = 'g13b-aura-ring'
+        ring.style.setProperty('--aura-color', auraColor)
+        pWrap.style.position = 'relative'
+        pWrap.appendChild(ring)
+        setTimeout(() => ring.remove(), 520)
+      }
+    } catch(e) {}
+
     // Spawn attack projectile — type based on player's chosen Pokémon
     try {
       const playerType = g13bSavedPoke ? g13bSavedPoke.type : 'Electric'
@@ -11417,21 +11499,42 @@ function endGameFromOverlay() {
 // ============================================================
 // GAME 14 — BALAPAN KERETA 🏁
 // ============================================================
-const TRAIN_TYPES_14 = {
-  bb302:  { name:'Kereta Uap BB302',  svg:'assets/train/bb302-indonesia.svg',   emoji:'🚂', baseSpeed:2.0, boostMult:1.40, boostDur:2000, color:'#5D3A1A', kmh:60,  desc:'Lokomotif Uap BB302 Indonesia (1954)' },
-  cc201:  { name:'Diesel CC201',      svg:'assets/train/cc201-indonesia.svg',   emoji:'🚃', baseSpeed:2.6, boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'Lokomotif Diesel CC201 — kuda kerja rel Indonesia' },
-  krl:    { name:'KRL Commuter Line', svg:'assets/train/commuter-line-krl.svg', emoji:'🚄', baseSpeed:3.1, boostMult:1.36, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line Jabodetabek' },
-  shink:  { name:'Shinkansen N700',   svg:'assets/train/shinkansen-n700.svg',   emoji:'🚅', baseSpeed:3.5, boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:140, desc:'Shinkansen N700 — tercepat di dunia!' },
-}
-// AI train pool
-const G14_AI_POOL = [
-  { name:'TGV',        svg:'assets/train/tgv-inoui.svg',          color:'#003189' },
-  { name:'ICE-3',      svg:'assets/train/ice-3.svg',              color:'#D0D0D0' },
-  { name:'CC203',      svg:'assets/train/cc203-indonesia.svg',     color:'#1A4A1A' },
-  { name:'KTX',        svg:'assets/train/ktx-i.svg',              color:'#0A2A7A' },
-  { name:'Shinkansen E5', svg:'assets/train/shinkansen-e5.svg',   color:'#2C7043' },
-  { name:'BB303',      svg:'assets/train/bb303-indonesia.svg',     color:'#2A1A08' },
+// G14 Categories with trains grouped by type
+const G14_CATEGORIES = [
+  {
+    key:'steam', label:'Uap', emoji:'🚂', color:'#92400e', bg:'rgba(146,64,14,0.25)',
+    desc:'Lokomotif bertenaga uap legendaris',
+    trains:[
+      { key:'bb302', name:'BB 302',  sub:'Indonesia 1954', svg:'assets/train/bb302-indonesia.svg', baseSpeed:2.0, boostMult:1.45, boostDur:2000, color:'#5D3A1A', kmh:60,  desc:'Lokomotif Uap BB302 Indonesia — baja dan uap!' },
+      { key:'bb303', name:'BB 303',  sub:'Indonesia 1956', svg:'assets/train/bb303-indonesia.svg', baseSpeed:2.1, boostMult:1.43, boostDur:2000, color:'#2A1A08', kmh:65,  desc:'Lokomotif Uap BB303 — lebih bertenaga dari BB302' },
+    ]
+  },
+  {
+    key:'diesel', label:'Diesel', emoji:'🚃', color:'#166534', bg:'rgba(22,101,52,0.25)',
+    desc:'Mesin diesel kuat dan handal',
+    trains:[
+      { key:'cc201', name:'CC 201',  sub:'Diesel Indonesia', svg:'assets/train/cc201-indonesia.svg', baseSpeed:2.6, boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'CC201 — kuda kerja rel Indonesia' },
+      { key:'cc203', name:'CC 203',  sub:'Diesel Modern',    svg:'assets/train/cc203-indonesia.svg', baseSpeed:2.8, boostMult:1.36, boostDur:2100, color:'#1A4A1A', kmh:95,  desc:'CC203 — diesel modern Indonesia' },
+    ]
+  },
+  {
+    key:'electric', label:'Listrik', emoji:'⚡', color:'#1e3a8a', bg:'rgba(30,58,138,0.25)',
+    desc:'Kereta listrik super cepat',
+    trains:[
+      { key:'krl',   name:'KRL',         sub:'Commuter Jabodetabek', svg:'assets/train/commuter-line-krl.svg', baseSpeed:3.0, boostMult:1.37, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line — andalan ibu kota' },
+      { key:'shink', name:'Shinkansen N700', sub:'Jepang',          svg:'assets/train/shinkansen-n700.svg',   baseSpeed:3.5, boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:140, desc:'Shinkansen N700 — peluru Jepang!' },
+      { key:'e5',    name:'Shinkansen E5',   sub:'Jepang Hijau',    svg:'assets/train/shinkansen-e5.svg',     baseSpeed:3.6, boostMult:1.34, boostDur:2300, color:'#2C7043', kmh:150, desc:'Shinkansen E5 Hayabusa — hijau dan kilat!' },
+      { key:'tgv',   name:'TGV Inouï',       sub:'Perancis',        svg:'assets/train/tgv-inoui.svg',         baseSpeed:3.8, boostMult:1.33, boostDur:2400, color:'#003189', kmh:160, desc:'TGV Inouï — kebanggaan Prancis' },
+      { key:'ice3',  name:'ICE-3',           sub:'Jerman',          svg:'assets/train/ice-3.svg',             baseSpeed:3.7, boostMult:1.34, boostDur:2350, color:'#D0D0D0', kmh:155, desc:'ICE-3 — ekspres Jerman yang elegan' },
+      { key:'ktx',   name:'KTX-I',           sub:'Korea',           svg:'assets/train/ktx-i.svg',             baseSpeed:3.6, boostMult:1.35, boostDur:2300, color:'#0A2A7A', kmh:145, desc:'KTX-I — peluru Korea Selatan' },
+    ]
+  },
 ]
+// Build flat lookup from all category trains
+const TRAIN_TYPES_14 = {}
+G14_CATEGORIES.forEach(cat => cat.trains.forEach(t => { TRAIN_TYPES_14[t.key] = {...t, category: cat.key} }))
+// AI train pool (all trains can appear as AI)
+const G14_AI_POOL = Object.values(TRAIN_TYPES_14)
 
 let g14State = {}
 
@@ -11445,15 +11548,15 @@ function initGame14() {
 
   g14State = {
     lane: 1,
-    trainType: 'cc201',
-    trainCfg: TRAIN_TYPES_14.cc201,
+    trainType: null,
+    trainCfg: null,
     speed: 0, pressure: 70,
     boosting: false, boostCooldown: false, boostTimer: null,
     hp: 3, frame: 0, distance: 0,
     finishLine: diff === 'easy' ? 400 : diff === 'medium' ? 700 : 1000,
     running: false, animFrame: null,
     aiTrains: [], obstacles: [],
-    obstacleInterval: diff === 'easy' ? 140 : diff === 'medium' ? 90 : 55,
+    obstacleInterval: diff === 'easy' ? 220 : diff === 'medium' ? 150 : 90,
     // Lane top% positions — center of each of 3 equal rows
     laneTopPct: [16.7, 50, 83.3],
     diff, lv, stars: 0,
@@ -11490,27 +11593,56 @@ function initGame14() {
 function g14RenderTrainSelect() {
   const wrap = document.getElementById('g14-train-select')
   wrap.innerHTML = ''
-  Object.entries(TRAIN_TYPES_14).forEach(([key, cfg]) => {
+  wrap.style.maxWidth = '360px'
+  // Step 1: Category cards
+  G14_CATEGORIES.forEach(cat => {
     const btn = document.createElement('button')
     btn.className = 'g14-train-select-btn'
-    btn.innerHTML = `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'"><div style="font-size:11px;font-weight:800;margin-top:2px;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.kmh} km/h</div>`
+    btn.style.cssText = `width:100%;max-width:320px;padding:14px 18px;display:flex;align-items:center;gap:14px;background:${cat.bg};border:2px solid ${cat.color};border-radius:14px;cursor:pointer;text-align:left;`
+    btn.innerHTML = `<span style="font-size:32px;line-height:1;">${cat.emoji}</span><div><div style="font-size:15px;font-weight:900;color:white;">${cat.label}</div><div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">${cat.desc}</div></div><span style="margin-left:auto;font-size:20px;color:rgba(255,255,255,0.35);">›</span>`
+    btn.onclick = () => { playClick(); g14ShowTrainsForCategory(cat) }
+    wrap.appendChild(btn)
+  })
+}
+
+function g14ShowTrainsForCategory(cat) {
+  const wrap = document.getElementById('g14-train-select')
+  wrap.innerHTML = ''
+  wrap.style.maxWidth = '380px'
+  // Back button
+  const backBtn = document.createElement('button')
+  backBtn.style.cssText = 'width:100%;max-width:320px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;text-align:left;'
+  backBtn.innerHTML = `← Kembali ke Kategori`
+  backBtn.onclick = () => { playClick(); g14RenderTrainSelect(); document.getElementById('g14-start-msg').textContent=''; document.getElementById('g14-go-btn').style.display='none' }
+  wrap.appendChild(backBtn)
+  const catLabel = document.createElement('div')
+  catLabel.style.cssText = 'color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:4px 0;'
+  catLabel.textContent = `${cat.emoji} ${cat.label} — Pilih keretamu`
+  wrap.appendChild(catLabel)
+  // Train grid
+  const grid = document.createElement('div')
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:320px;'
+  cat.trains.forEach(cfg => {
+    const btn = document.createElement('button')
+    btn.className = 'g14-train-select-btn'
+    btn.style.padding = '12px 8px'
+    btn.innerHTML = `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'" style="width:80px;height:auto;display:block;margin:0 auto 6px;"><div style="font-size:12px;font-weight:800;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.sub}</div><div style="font-size:11px;color:#FFD166;font-weight:700;margin-top:2px;">${cfg.kmh} km/h</div>`
     btn.onclick = () => {
-      wrap.querySelectorAll('.g14-train-select-btn').forEach(b => b.classList.remove('selected'))
+      grid.querySelectorAll('.g14-train-select-btn').forEach(b => b.classList.remove('selected'))
       btn.classList.add('selected')
-      g14State.trainType = key
+      g14State.trainType = cfg.key
       g14State.trainCfg = cfg
-      // Update header train icon
       const hdrImg = document.getElementById('g14-train-icon-hdr')
       if (hdrImg) { hdrImg.src = cfg.svg }
-      // Update player SVG
       const playerImg = document.getElementById('g14-player')
       if (playerImg) { playerImg.src = cfg.svg }
       document.getElementById('g14-start-msg').textContent = cfg.desc
       document.getElementById('g14-go-btn').style.display = 'block'
       playClick()
     }
-    wrap.appendChild(btn)
+    grid.appendChild(btn)
   })
+  wrap.appendChild(grid)
 }
 
 function g14StartRace() {
@@ -11639,19 +11771,19 @@ function g14Loop() {
 
 const G14_OBS_SVGS = [
   // Rock
-  `<svg viewBox="0 0 46 34" width="46" height="34"><ellipse cx="23" cy="28" rx="20" ry="6" fill="#4b5563" opacity="0.3"/><polygon points="8,28 15,10 31,8 38,28" fill="#9ca3af"/><polygon points="15,10 23,5 31,8" fill="#d1d5db"/><polygon points="8,28 15,10 6,20" fill="#6b7280"/></svg>`,
+  `<svg viewBox="0 0 46 34" width="82" height="60"><ellipse cx="23" cy="28" rx="20" ry="6" fill="#4b5563" opacity="0.3"/><polygon points="8,28 15,10 31,8 38,28" fill="#9ca3af"/><polygon points="15,10 23,5 31,8" fill="#d1d5db"/><polygon points="8,28 15,10 6,20" fill="#6b7280"/></svg>`,
   // Warning sign
-  `<svg viewBox="0 0 42 38" width="42" height="38"><polygon points="21,2 40,36 2,36" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/><rect x="19" y="16" width="4" height="11" rx="2" fill="#1f2937"/><circle cx="21" cy="31" r="2.5" fill="#1f2937"/></svg>`,
+  `<svg viewBox="0 0 42 38" width="82" height="74"><polygon points="21,2 40,36 2,36" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/><rect x="19" y="16" width="4" height="11" rx="2" fill="#1f2937"/><circle cx="21" cy="31" r="2.5" fill="#1f2937"/></svg>`,
   // Cow
-  `<svg viewBox="0 0 54 42" width="54" height="42"><ellipse cx="27" cy="40" rx="22" ry="4" fill="#374151" opacity="0.2"/><rect x="12" y="20" width="30" height="18" rx="9" fill="white" stroke="#374151" stroke-width="1.5"/><circle cx="27" cy="20" r="11" fill="white" stroke="#374151" stroke-width="1.5"/><circle cx="22" cy="17" r="3" fill="#374151"/><circle cx="32" cy="17" r="3" fill="#374151"/><circle cx="22" cy="17" r="1.2" fill="white"/><circle cx="32" cy="17" r="1.2" fill="white"/><ellipse cx="27" cy="26" rx="5" ry="3" fill="#374151" opacity="0.25"/><line x1="17" y1="38" x2="17" y2="42" stroke="#374151" stroke-width="2"/><line x1="24" y1="38" x2="24" y2="42" stroke="#374151" stroke-width="2"/><line x1="30" y1="38" x2="30" y2="42" stroke="#374151" stroke-width="2"/><line x1="37" y1="38" x2="37" y2="42" stroke="#374151" stroke-width="2"/></svg>`,
+  `<svg viewBox="0 0 54 42" width="90" height="70"><ellipse cx="27" cy="40" rx="22" ry="4" fill="#374151" opacity="0.2"/><rect x="12" y="20" width="30" height="18" rx="9" fill="white" stroke="#374151" stroke-width="1.5"/><circle cx="27" cy="20" r="11" fill="white" stroke="#374151" stroke-width="1.5"/><circle cx="22" cy="17" r="3" fill="#374151"/><circle cx="32" cy="17" r="3" fill="#374151"/><circle cx="22" cy="17" r="1.2" fill="white"/><circle cx="32" cy="17" r="1.2" fill="white"/><ellipse cx="27" cy="26" rx="5" ry="3" fill="#374151" opacity="0.25"/><line x1="17" y1="38" x2="17" y2="42" stroke="#374151" stroke-width="2"/><line x1="24" y1="38" x2="24" y2="42" stroke="#374151" stroke-width="2"/><line x1="30" y1="38" x2="30" y2="42" stroke="#374151" stroke-width="2"/><line x1="37" y1="38" x2="37" y2="42" stroke="#374151" stroke-width="2"/></svg>`,
   // Log
-  `<svg viewBox="0 0 56 30" width="56" height="30"><rect x="4" y="8" width="48" height="16" rx="8" fill="#92400e"/><ellipse cx="52" cy="16" rx="5" ry="8" fill="#a16207"/><ellipse cx="52" cy="16" rx="3" ry="5" fill="#78350f"/><line x1="4" y1="8" x2="4" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/><line x1="16" y1="8" x2="16" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/><line x1="30" y1="8" x2="30" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/><line x1="43" y1="8" x2="43" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/></svg>`,
+  `<svg viewBox="0 0 56 30" width="92" height="50"><rect x="4" y="8" width="48" height="16" rx="8" fill="#92400e"/><ellipse cx="52" cy="16" rx="5" ry="8" fill="#a16207"/><ellipse cx="52" cy="16" rx="3" ry="5" fill="#78350f"/><line x1="4" y1="8" x2="4" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/><line x1="16" y1="8" x2="16" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/><line x1="30" y1="8" x2="30" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/><line x1="43" y1="8" x2="43" y2="24" stroke="#78350f" stroke-width="0.5" opacity="0.5"/></svg>`,
   // Broken rail
-  `<svg viewBox="0 0 48 36" width="48" height="36"><rect x="0" y="6" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(-15 9 8)"/><rect x="30" y="6" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(15 39 8)"/><rect x="0" y="22" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(10 9 24)"/><rect x="30" y="22" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(-10 39 24)"/><line x1="22" y1="4" x2="26" y2="32" stroke="#fbbf24" stroke-width="2" opacity="0.8"/></svg>`,
+  `<svg viewBox="0 0 48 36" width="84" height="63"><rect x="0" y="6" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(-15 9 8)"/><rect x="30" y="6" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(15 39 8)"/><rect x="0" y="22" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(10 9 24)"/><rect x="30" y="22" width="18" height="5" rx="2" fill="#ef4444" transform="rotate(-10 39 24)"/><line x1="22" y1="4" x2="26" y2="32" stroke="#fbbf24" stroke-width="2" opacity="0.8"/></svg>`,
   // Chicken
-  `<svg viewBox="0 0 38 38" width="38" height="38"><ellipse cx="19" cy="26" rx="14" ry="12" fill="#fbbf24"/><circle cx="19" cy="13" r="8" fill="#fbbf24"/><polygon points="14,13 12,10 17,12" fill="#f97316"/><circle cx="22" cy="11" r="2" fill="#1f2937"/><circle cx="22.7" cy="10.3" r="0.8" fill="white"/><polygon points="14,38 14,30 17,38" fill="#f97316"/><polygon points="24,38 24,30 21,38" fill="#f97316"/><polygon points="12,16 8,14 11,18" fill="#ef4444"/></svg>`,
+  `<svg viewBox="0 0 38 38" width="72" height="72"><ellipse cx="19" cy="26" rx="14" ry="12" fill="#fbbf24"/><circle cx="19" cy="13" r="8" fill="#fbbf24"/><polygon points="14,13 12,10 17,12" fill="#f97316"/><circle cx="22" cy="11" r="2" fill="#1f2937"/><circle cx="22.7" cy="10.3" r="0.8" fill="white"/><polygon points="14,38 14,30 17,38" fill="#f97316"/><polygon points="24,38 24,30 21,38" fill="#f97316"/><polygon points="12,16 8,14 11,18" fill="#ef4444"/></svg>`,
   // Large rock / boulder
-  `<svg viewBox="0 0 50 38" width="50" height="38"><ellipse cx="25" cy="34" rx="22" ry="5" fill="#374151" opacity="0.25"/><circle cx="25" cy="22" r="16" fill="#6b7280"/><circle cx="20" cy="18" r="8" fill="#9ca3af"/><circle cx="31" cy="28" r="5" fill="#4b5563"/></svg>`,
+  `<svg viewBox="0 0 50 38" width="88" height="67"><ellipse cx="25" cy="34" rx="22" ry="5" fill="#374151" opacity="0.25"/><circle cx="25" cy="22" r="16" fill="#6b7280"/><circle cx="20" cy="18" r="8" fill="#9ca3af"/><circle cx="31" cy="28" r="5" fill="#4b5563"/></svg>`,
 ]
 function g14SpawnObstacle() {
   const track = document.getElementById('g14-track')
