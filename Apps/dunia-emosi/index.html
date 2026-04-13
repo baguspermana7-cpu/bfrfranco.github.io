@@ -1840,6 +1840,15 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   50%{transform:scale(1.5)rotate(12deg);opacity:1}
   100%{transform:scale(2.3)rotate(30deg);opacity:0}
 }
+/* Aura ring on attacker sprite (G10 + G13B shared) */
+.g10-aura-ring {
+  position:absolute; inset:-16px;
+  border-radius:50%;
+  border:3px solid var(--aura-color, #a78bfa);
+  box-shadow:0 0 16px 5px var(--aura-color, #a78bfa),inset 0 0 12px 3px var(--aura-color, #a78bfa);
+  opacity:0; pointer-events:none; z-index:10;
+  animation:g13bAura 0.52s ease-out forwards;
+}
 /* Defeat burst FX */
 .g10-burst-fx{
   position:fixed;z-index:200;pointer-events:none;inset:0;opacity:0;
@@ -9019,47 +9028,77 @@ function g10TypeFX(type, targetSide){
 
 function g10DoAttack(type, fromSide, toSide, onDone){
   playAttackSound(type)
-  const emoji=TYPE_EMOJI[type]||'💥'
-  const atkEl=document.getElementById('g10-atk-fx')
-  const emojiEl=document.getElementById('g10-atk-emoji')
+  const emoji = TYPE_EMOJI[type] || '💥'
+  const atkEl = document.getElementById('g10-atk-fx')
+  const emojiEl = document.getElementById('g10-atk-emoji')
+
+  // Aura ring on attacker
+  const auraColors = {Fire:'#f97316',Water:'#38bdf8',Grass:'#4ade80',Electric:'#facc15',
+    Psychic:'#e879f9',Ice:'#67e8f9',Dragon:'#818cf8',Dark:'#6b7280',Fighting:'#f87171',
+    Ghost:'#c084fc',Steel:'#94a3b8',Fairy:'#f9a8d4',Rock:'#a8a29e',Ground:'#d97706',
+    Flying:'#7dd3fc',Bug:'#a3e635',Poison:'#a855f7',Normal:'#d1d5db'}
+  const auraColor = auraColors[type] || '#a78bfa'
+  const fromWrapId = fromSide === 'player' ? 'g10-pspr-wrap' : 'g10-espr-wrap'
+  const fromWrapEl = document.getElementById(fromWrapId)
+  if (fromWrapEl) {
+    const aura = document.createElement('div')
+    aura.className = 'g10-aura-ring'
+    aura.style.setProperty('--aura-color', auraColor)
+    fromWrapEl.appendChild(aura)
+    setTimeout(() => aura.remove(), 540)
+  }
 
   // Attacker lunges
-  const atkSprId=fromSide==='player'?'g10-pspr':'g10-espr'
-  const atkSpr=document.getElementById(atkSprId)
-  atkSpr.classList.remove('spr-atk')
-  void atkSpr.offsetWidth
+  const atkSprId = fromSide === 'player' ? 'g10-pspr' : 'g10-espr'
+  const atkSpr = document.getElementById(atkSprId)
+  atkSpr.classList.remove('spr-atk'); void atkSpr.offsetWidth
   atkSpr.classList.add('spr-atk')
-  setTimeout(()=>atkSpr.classList.remove('spr-atk'),400)
+  setTimeout(() => atkSpr.classList.remove('spr-atk'), 400)
 
   // Type-specific particle effects on the field
   g10TypeFX(type, toSide)
 
-  // Fly emoji to target
-  const targetWrapId=toSide==='enemy'?'g10-espr-wrap':'g10-pspr-wrap'
-  const rect=document.getElementById(targetWrapId).getBoundingClientRect()
-  atkEl.style.left=(rect.left+rect.width/2)+'px'
-  atkEl.style.top=(rect.top+rect.height/2)+'px'
-  emojiEl.textContent=emoji
-  emojiEl.style.animation='none'
+  // Fly projectile FROM attacker TO target
+  const fromRect = fromWrapEl ? fromWrapEl.getBoundingClientRect() : {left:0,top:0,width:80,height:80}
+  const toWrapId = toSide === 'enemy' ? 'g10-espr-wrap' : 'g10-pspr-wrap'
+  const toRect = document.getElementById(toWrapId).getBoundingClientRect()
+  const startX = fromRect.left + fromRect.width / 2
+  const startY = fromRect.top + fromRect.height / 2
+  const endX = toRect.left + toRect.width / 2
+  const endY = toRect.top + toRect.height / 2
+  const dx = endX - startX
+  const dy = endY - startY
+
+  emojiEl.textContent = emoji
+  emojiEl.style.animation = 'none'
   void emojiEl.offsetWidth
-  emojiEl.style.animation='g10AtkFly 0.65s ease-out forwards'
-  atkEl.style.opacity='1'
+
+  atkEl.style.left = startX + 'px'
+  atkEl.style.top = startY + 'px'
+  atkEl.style.opacity = '1'
+  atkEl.style.transition = 'none'
+
+  // Animate projectile flying from attacker to target
+  atkEl.animate([
+    {transform:`translate(-50%,-50%) scale(0.7)`, opacity:1},
+    {transform:`translate(calc(-50% + ${dx * 0.5}px), calc(-50% + ${dy * 0.5}px)) scale(1.3)`, opacity:1, offset:0.6},
+    {transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.8)`, opacity:0}
+  ], {duration:360, easing:'ease-in', fill:'forwards'})
 
   // Screen flash
-  const flash=document.getElementById('poke-flash')
-  flash.className='poke-flash '+type
-  setTimeout(()=>flash.className='poke-flash',700)
+  const flash = document.getElementById('poke-flash')
+  flash.className = 'poke-flash ' + type
+  setTimeout(() => flash.className = 'poke-flash', 700)
 
-  // Defender shakes + flashes
-  setTimeout(()=>{
-    atkEl.style.opacity='0'
-    const defSprId=toSide==='enemy'?'g10-espr':'g10-pspr'
-    const defSpr=document.getElementById(defSprId)
-    defSpr.classList.remove('spr-hit','spr-flash')
-    void defSpr.offsetWidth
+  // Defender shakes + flashes after projectile arrives
+  setTimeout(() => {
+    atkEl.style.opacity = '0'
+    const defSprId = toSide === 'enemy' ? 'g10-espr' : 'g10-pspr'
+    const defSpr = document.getElementById(defSprId)
+    defSpr.classList.remove('spr-hit','spr-flash'); void defSpr.offsetWidth
     defSpr.classList.add('spr-hit','spr-flash')
-    setTimeout(()=>{ defSpr.classList.remove('spr-hit','spr-flash'); onDone() },480)
-  },320)
+    setTimeout(() => { defSpr.classList.remove('spr-hit','spr-flash'); onDone() }, 480)
+  }, 340)
 }
 
 function g10EnemyDefeated(){
@@ -10185,6 +10224,7 @@ const G13_DIFF = {
   '2stage':  { playerHp:7, wildHp:13, attacksToEvo:5, damage:1, wildDamage:1 },
   epic:      { playerHp:8, wildHp:15, attacksToEvo:4, damage:1, wildDamage:1 },
   legendary: { playerHp:9, wildHp:18, attacksToEvo:4, damage:1, wildDamage:1 },
+  '3stage':  { playerHp:8, wildHp:24, attacksToEvo:5, damage:1, wildDamage:1 },
 }
 
 // Type color map for badge
@@ -10234,6 +10274,8 @@ function _initGame13Impl() {
   let cfg
   try { cfg = G13_DIFF[chain.diff] } catch(e) {}
   if (!cfg) cfg = {playerHp:5, wildHp:8, attacksToEvo:4, damage:1, wildDamage:1}
+  // 3-stage chains: override to a longer scenario so all 3 evolutions can happen
+  if (chain.evolved2) cfg = G13_DIFF['3stage']
 
   g13State = {
     chain, lv, cfg,
@@ -11190,7 +11232,6 @@ function g13bAnswer(val, btn) {
         const ring = document.createElement('div')
         ring.className = 'g13b-aura-ring'
         ring.style.setProperty('--aura-color', auraColor)
-        pWrap.style.position = 'relative'
         pWrap.appendChild(ring)
         setTimeout(() => ring.remove(), 520)
       }
