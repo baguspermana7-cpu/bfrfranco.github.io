@@ -10691,18 +10691,10 @@ function g13Answer(val, btn) {
       g13Victory()
       return
     }
-    // After 3 attacks, switch to wild counter phase
+    // After 3 attacks, ALWAYS trigger wild counter-attack first — evo check runs after counter
     if (s.attackIdx >= 3) {
-      // Check evo BEFORE wild counter — stage 1 or stage 2
-      const canEvo1 = !s.evolved && s.evoPoints >= s.evoNeeded
-      const canEvo2 = s.evolved && !s.evolved2 && s.chain.evolved2 && s.evoPoints >= s.evoNeeded
-      if (canEvo1 || canEvo2) {
-        s.phase = 'evo_ready'
-        setTimeout(() => g13ShowEvoButton(), 300)
-      } else {
-        s.phase = 'wild_counter'
-        g13WildCounterPhase()
-      }
+      s.phase = 'wild_counter'
+      g13WildCounterPhase()
     } else {
       s.locked = false
       g13NextQuestion()
