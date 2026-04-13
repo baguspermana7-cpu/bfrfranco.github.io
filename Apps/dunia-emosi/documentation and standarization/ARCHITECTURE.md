@@ -1,7 +1,7 @@
 # Dunia Emosi — Architecture Document
 
-**Version**: 2.0
-**Last Updated**: 2026-04-11
+**Version**: 2.2
+**Last Updated**: 2026-04-13
 **Target Age**: 5–10 years
 
 ---
@@ -77,6 +77,29 @@ dunia-emosi/
 | 7 | `game7` | Tebak Gambar | Membaca | 🔲 Phase 2 |
 | 8 | `game8` | Susun Kata | Membaca | 🔲 Phase 2 |
 | 9 | `game9` | Jejak Huruf | Menulis | 🔲 Phase 2 |
+
+---
+
+## Pokemon Database
+
+| Property | Value |
+|----------|-------|
+| Source file | `assets/Pokemon/pokemon-db.json` |
+| Total entries | 1,025 (Gen 1–9, all Pokémon) |
+| Sprite location | `assets/Pokemon/sprites/{slug}.png` (local, primary) |
+| Sprite fallback | `https://img.pokemondb.net/sprites/home/normal/{slug}.png` |
+| Fields | `id, name, slug, type, type2, gen, tier` |
+| Tier system | 1=basic, 2=mid-evo, 3=final-evo, 4=legendary |
+| Legendary count | 79 IDs in `_LEGENDARY_IDS` |
+| In-game array | `POKEMON_DB` (inline JS, ~79KB) |
+
+**Tier-based size scaling (G13/G13b):**
+- tier 1 → 1.0× base size
+- tier 2 → 1.2× base size
+- tier 3 → 1.3× base size
+- tier 4 → 1.6× base size (legendary)
+
+**5-star modal standard:** All game result screens use `⭐`.repeat(n) + `☆`.repeat(5-n) for star display.
 
 ---
 

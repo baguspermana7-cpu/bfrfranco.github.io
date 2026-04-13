@@ -1,5 +1,32 @@
 # Changelog — Dunia Emosi
 
+## v2.2.0 — 2026-04-13
+### Bug Fixes
+- G13b: "Lanjut" button now correctly closes Level Complete modal before starting new round (critical bug — game was stuck)
+- G13b: Wild counter-attack no longer plays wrong-answer sound; uses distinct impact tone instead
+- G13b: Pikachu player sprite now faces right (toward enemy) via CSS scaleX(-1)
+- G13b: Star display replaced from `🌑` (renders as blue circle on some systems) to `☆` (universal hollow star)
+
+### Features
+- G13b: 5-star scoring system (was 3-star) — consistent with G14/G16 standard
+- G13b: Result subtitle now shows actual score instead of hardcoded "30+ kill = ⭐⭐⭐"
+- G13b: Wild Pokémon size scales by evolution tier (basic=1x, mid=1.2x, final=1.3x, legendary=1.6x)
+- Pokemon DB: Expanded from 186 → 1,025 entries (all Gen 1-9) with `tier` and `gen` fields
+- Pokemon DB: Local sprites used as primary source (`assets/Pokemon/sprites/`) with CDN fallback
+- Pokemon DB: `_LEGENDARY_IDS` expanded to cover all Gen 1-9 legendaries/mythicals (79 total)
+- G5: Card grid/tabs now correctly center on all screen sizes (mobile + desktop)
+- G5: Pokémon tab icon changed to CSS Pokéball (no dependency on missing image)
+- G5: Moon crescent decorative element hidden (was overlapping navbar)
+- G14: Train sprites always in front (z-index 25 player, 18 AI) — were behind track elements
+- G14: Smoke particles spawn 3 per call at 60% pressure threshold (was 1 at 80%)
+- G14: Train colors more vibrant (brightness 1.35 + saturation 2.2)
+- G14: AI trains have entrance animation when spawning
+- G14: All bullet train emojis (🚄🚅) replaced with steam (🚂) in quiz content
+- G17: Train z-index raised to 10 (was 5, behind bridge blocks at z-index 6)
+- G17: Train crossing speed slowed from 1.5s → 2.8s
+- G3: Mode badge hidden (was redundant with level indicator)
+- Ideas: 50 game expansion ideas saved to `prompt/ide/50-ide-game-pokemon.md`
+
 ## v2.1.0 — 2026-04-11
 ### Added
 - Level selector now works for ALL 9 games (G6-G9 previously hardcoded medium)
