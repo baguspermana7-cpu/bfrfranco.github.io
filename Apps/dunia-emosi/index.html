@@ -2673,13 +2673,17 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g13-choices{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:380px;}
 .g13-choice-btn{
   min-width:72px;padding:10px 16px;font-size:20px;font-weight:900;
-  border-radius:16px;border:none;cursor:pointer;
-  background:linear-gradient(135deg,#1E2A4A,#2A3A60);
+  border-radius:18px;border:none;cursor:pointer;
+  background:linear-gradient(160deg,#7C3AED,#5B21B6);
   color:white;font-family:'Fredoka One',cursive;
-  box-shadow:0 4px 0 rgba(0,0,0,0.4);
+  box-shadow:0 5px 0 #3B0764,0 0 0 2px rgba(167,139,250,0.25),inset 0 1px 0 rgba(255,255,255,0.25);
   transition:transform 0.1s,box-shadow 0.1s;
+  text-shadow:0 1px 3px rgba(0,0,0,0.4);
 }
-.g13-choice-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,0.4);}
+.g13-choice-btn:nth-child(2){background:linear-gradient(160deg,#0369A1,#1D4ED8);box-shadow:0 5px 0 #1E3A8A,0 0 0 2px rgba(96,165,250,0.25),inset 0 1px 0 rgba(255,255,255,0.25);}
+.g13-choice-btn:nth-child(3){background:linear-gradient(160deg,#B45309,#D97706);box-shadow:0 5px 0 #78350F,0 0 0 2px rgba(251,191,36,0.25),inset 0 1px 0 rgba(255,255,255,0.25);}
+.g13-choice-btn:nth-child(4){background:linear-gradient(160deg,#065F46,#059669);box-shadow:0 5px 0 #022C22,0 0 0 2px rgba(52,211,153,0.25),inset 0 1px 0 rgba(255,255,255,0.25);}
+.g13-choice-btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.15);}
 .g13-choice-btn.correct{background:linear-gradient(135deg,#059669,#10B981);animation:g13ChoiceCorrect 0.4s ease;}
 .g13-choice-btn.wrong{background:linear-gradient(135deg,#DC2626,#EF4444);animation:g13ChoiceWrong 0.3s ease;}
 @keyframes g13ChoiceCorrect{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
@@ -5501,6 +5505,42 @@ body { background: #0a0a1a !important; }
       </div>
       <div class="lvl-tier-body" id="level-dots-4"></div>
     </div>
+    <div class="lvl-tier-card" id="level-tier-5">
+      <div class="lvl-tier-hdr">
+        <span class="lvl-tier-hdr-icon">💎</span>
+        <span class="lvl-tier-hdr-name">LEGEND</span>
+        <span class="lvl-tier-hdr-range">Level 21–25</span>
+        <span class="lvl-tier-hdr-stars" id="tier-stars-5"></span>
+      </div>
+      <div class="lvl-tier-body" id="level-dots-5"></div>
+    </div>
+    <div class="lvl-tier-card" id="level-tier-6">
+      <div class="lvl-tier-hdr">
+        <span class="lvl-tier-hdr-icon">🔱</span>
+        <span class="lvl-tier-hdr-name">GRANDMASTER</span>
+        <span class="lvl-tier-hdr-range">Level 26–30</span>
+        <span class="lvl-tier-hdr-stars" id="tier-stars-6"></span>
+      </div>
+      <div class="lvl-tier-body" id="level-dots-6"></div>
+    </div>
+    <div class="lvl-tier-card" id="level-tier-7">
+      <div class="lvl-tier-hdr">
+        <span class="lvl-tier-hdr-icon">🌌</span>
+        <span class="lvl-tier-hdr-name">MYTHIC</span>
+        <span class="lvl-tier-hdr-range">Level 31–35</span>
+        <span class="lvl-tier-hdr-stars" id="tier-stars-7"></span>
+      </div>
+      <div class="lvl-tier-body" id="level-dots-7"></div>
+    </div>
+    <div class="lvl-tier-card" id="level-tier-8">
+      <div class="lvl-tier-hdr">
+        <span class="lvl-tier-hdr-icon">🌟</span>
+        <span class="lvl-tier-hdr-name">POKÉMON MASTER</span>
+        <span class="lvl-tier-hdr-range">Level 36–40</span>
+        <span class="lvl-tier-hdr-stars" id="tier-stars-8"></span>
+      </div>
+      <div class="lvl-tier-body" id="level-dots-8"></div>
+    </div>
   </div>
 </div>
 
@@ -6386,13 +6426,21 @@ function openLevelSelect(gameNum) {
   // Progress bar
   const completed = gp.completed.length
   const totalStars = Object.values(gp.stars||{}).reduce((a,b)=>a+b,0)
-  document.getElementById('level-prog-txt').textContent = `${completed} / 20 level selesai`
-  document.getElementById('level-prog-fill').style.width = (completed/20*100) + '%'
+  const totalLevels = state.currentGame === 13 ? 40 : 20
+  document.getElementById('level-prog-txt').textContent = `${completed} / ${totalLevels} level selesai`
+  document.getElementById('level-prog-fill').style.width = (completed/totalLevels*100) + '%'
   document.getElementById('level-total-stars').textContent = '⭐ ' + totalStars
 
   // Per-tier dot colors + star count
-  for (let tier = 1; tier <= 4; tier++) {
+  const numTiers = state.currentGame === 13 ? 8 : 4
+  // Show/hide extended tiers
+  for (let t = 5; t <= 8; t++) {
+    const tc2 = document.getElementById('level-tier-'+t)
+    if (tc2) tc2.style.display = state.currentGame === 13 ? '' : 'none'
+  }
+  for (let tier = 1; tier <= numTiers; tier++) {
     const dotsEl = document.getElementById('level-dots-'+tier)
+    if (!dotsEl) continue
     dotsEl.innerHTML = ''
     let tierStars = 0
     for (let i = 1; i <= 5; i++) {
@@ -6434,7 +6482,7 @@ function startGameWithLevel(levelNum) {
   document.getElementById('pause-overlay').style.display='none'
   // Map level 1-20 to difficulty string for backward compat
   state.selectedLevelNum = levelNum
-  state.selectedLevel = levelNum <= 7 ? 'easy' : levelNum <= 14 ? 'medium' : 'hard'
+  state.selectedLevel = levelNum <= 13 ? 'easy' : levelNum <= 26 ? 'medium' : 'hard'
   state.gameStars = [0,0]
   state.maxPossibleStars = null
   state.currentPlayer = 0
