@@ -5132,7 +5132,7 @@ body { background: #0a0a1a !important; }
     <div class="g13b-result-stars" id="g13b-res-stars">⭐⭐⭐</div>
     <div class="g13b-result-btns">
       <button onclick="startQuickFire()" style="background:linear-gradient(135deg,#FBBF24,#06B6D4);color:#1a1a1a;">Main Lagi ⚡</button>
-      <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Menu</button>
+      <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Beranda</button>
     </div>
   </div>
 
@@ -5147,7 +5147,7 @@ body { background: #0a0a1a !important; }
     <div class="g13b-result-stars" id="g13b-lc-stars">⭐⭐⭐</div>
     <div class="g13b-result-btns">
       <button onclick="startQuickFire()" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#1a1a1a;font-size:16px;">Lanjut ▶</button>
-      <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Menu</button>
+      <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Beranda</button>
     </div>
   </div>
 </div>
@@ -11336,8 +11336,10 @@ function startQuickFire() {
 window.startQuickFire = startQuickFire
 
 function exitGame13b() {
+  if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
   battleBgmStop()
-  showScreen('screen-menu')
+  clearTimers()
+  showScreen('screen-welcome')
 }
 window.exitGame13b = exitGame13b
 
