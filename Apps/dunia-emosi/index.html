@@ -2134,17 +2134,27 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   background-size:62px 100%;
   animation:g14RailScroll var(--rspd,0.35s) linear infinite;
 }
-/* Two golden rails */
+/* Two steel rails — silver/dark, realistic track */
 .g14-lane-row::after {
   content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
   background:
-    linear-gradient(transparent 31%,#7a5c0a 31%,#DAA520 34%,#B8860B 37%,transparent 37%),
-    linear-gradient(transparent 63%,#7a5c0a 63%,#DAA520 66%,#B8860B 69%,transparent 69%);
+    linear-gradient(transparent 30%,#1a1a1a 30%,#444 32%,#ccc 33.5%,#e8e8e8 35%,#aaa 36.5%,#333 38%,transparent 38%),
+    linear-gradient(transparent 62%,#1a1a1a 62%,#444 64%,#ccc 65.5%,#e8e8e8 67%,#aaa 68.5%,#333 70%,transparent 70%);
 }
-/* Active lane glow */
+/* Active lane glow — bright neon highlight on current player lane */
 .g14-lane-row.active-lane {
-  background:linear-gradient(180deg,rgba(12,45,6,0.97) 0%,rgba(25,65,10,0.95) 50%,rgba(14,48,7,0.97) 100%);
-  box-shadow:inset 0 0 30px rgba(100,220,60,0.22),inset 0 2px 0 rgba(100,220,60,0.1);
+  background:linear-gradient(180deg,rgba(18,60,8,0.98) 0%,rgba(35,85,12,0.96) 50%,rgba(18,60,8,0.98) 100%);
+  box-shadow:inset 0 0 28px rgba(80,220,50,0.35), inset 0 0 8px rgba(80,220,50,0.25),
+             inset 0 2px 0 rgba(120,255,80,0.45), inset 0 -2px 0 rgba(120,255,80,0.45);
+  border-top:1.5px solid rgba(100,255,60,0.5);
+  border-bottom:1.5px solid rgba(100,255,60,0.5);
+  animation:g14LaneGlow 1.2s ease-in-out infinite alternate;
+}
+@keyframes g14LaneGlow {
+  from { box-shadow:inset 0 0 28px rgba(80,220,50,0.35), inset 0 0 8px rgba(80,220,50,0.25),
+                    inset 0 2px 0 rgba(120,255,80,0.45), inset 0 -2px 0 rgba(120,255,80,0.45); }
+  to   { box-shadow:inset 0 0 42px rgba(80,220,50,0.55), inset 0 0 16px rgba(80,220,50,0.35),
+                    inset 0 2px 0 rgba(160,255,100,0.65), inset 0 -2px 0 rgba(160,255,100,0.65); }
 }
 /* Lane danger warning (right edge) */
 .g14-lane-warning {
@@ -2181,6 +2191,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   animation:g14SpeedLines 0.07s linear infinite;
 }
 @keyframes g14SpeedLines { from{background-position:0 0} to{background-position:38px 0} }
+@keyframes g14GoBtnPulse {
+  from { box-shadow:0 5px 0 #7A0A12,0 0 18px rgba(230,57,70,0.4); transform:scale(1); }
+  to   { box-shadow:0 5px 0 #7A0A12,0 0 36px rgba(230,57,70,0.75); transform:scale(1.03); }
+}
 @keyframes g14Crash {
   0%,100%{filter:drop-shadow(0 5px 16px rgba(0,0,0,0.75)) brightness(1.08)}
   20%,60%{filter:drop-shadow(0 0 22px rgba(239,68,68,1)) brightness(1.7) saturate(2)}
@@ -2191,6 +2205,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   left:calc(13% + 52px);
   width:44px;height:58px;
   transform:translateY(-50%);
+  display:none;pointer-events:none;
+  transition:top 0.20s cubic-bezier(0.34,1.56,0.64,1);
+}
+/* Wheel fire sparks during boost — 2 small flames at wheel positions */
+.g14-wheel-fire {
+  position:absolute;z-index:9;
+  width:22px;height:30px;
+  transform:translateY(18px);
   display:none;pointer-events:none;
   transition:top 0.20s cubic-bezier(0.34,1.56,0.64,1);
 }
@@ -2687,6 +2709,23 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g13-choice-btn.correct{background:linear-gradient(135deg,#059669,#10B981);animation:g13ChoiceCorrect 0.4s ease;}
 .g13-choice-btn.wrong{background:linear-gradient(135deg,#DC2626,#EF4444);animation:g13ChoiceWrong 0.3s ease;}
 @keyframes g13ChoiceCorrect{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
+/* ── Move name popup ─────────────────────────────────────── */
+.move-popup{
+  position:fixed;z-index:9999;pointer-events:none;
+  font-family:'Fredoka One',cursive;font-size:13px;font-weight:900;letter-spacing:0.5px;
+  color:white;text-shadow:0 1px 4px rgba(0,0,0,0.7);
+  padding:4px 11px;border-radius:20px;white-space:nowrap;
+  border:1.5px solid rgba(255,255,255,0.35);
+  box-shadow:0 3px 14px rgba(0,0,0,0.5);
+  transform:translateX(-50%);
+  animation:movePop 1.0s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes movePop{
+  0%  {opacity:0;transform:translateX(-50%) translateY(0) scale(0.6);}
+  15% {opacity:1;transform:translateX(-50%) translateY(-6px) scale(1.08);}
+  55% {opacity:1;transform:translateX(-50%) translateY(-18px) scale(1);}
+  100%{opacity:0;transform:translateX(-50%) translateY(-34px) scale(0.9);}
+}
 @keyframes g13ChoiceWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
 /* FX flash overlay */
@@ -3262,7 +3301,38 @@ body { background: #0a0a1a !important; }
 /* Field flash */
 .g13b-flash { position:absolute; inset:0; background:white; opacity:0; pointer-events:none; z-index:25; }
 .g13b-flash.hit { animation:g13bFlashAnim 0.28s ease forwards; }
+.g13b-flash.red-hit { background:rgba(220,38,38,0.6); animation:g13bFlashAnim 0.35s ease forwards; }
 @keyframes g13bFlashAnim { 0%{opacity:0.65} 100%{opacity:0} }
+/* Player name badge — below player sprite */
+.g13b-pname-badge {
+  margin-top:4px; background:rgba(0,0,0,0.7); border:1.5px solid rgba(99,102,241,0.5);
+  border-radius:14px; padding:2px 9px; font-size:11px; font-weight:900;
+  font-family:'Fredoka One',cursive; color:white; white-space:nowrap; z-index:6;
+}
+/* Player HP bar — bottom-left near player */
+#g13b-php-wrap {
+  position:absolute; left:6%; bottom:calc(10% - 30px); z-index:10;
+  display:flex; align-items:center; gap:4px;
+  background:rgba(0,0,0,0.72); border:1.5px solid rgba(239,68,68,0.5); border-radius:16px;
+  padding:3px 8px; white-space:nowrap;
+}
+.g13b-php-track { width:58px; height:6px; background:rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; }
+.g13b-php-fill { height:100%; background:linear-gradient(90deg,#22C55E,#86EFAC); border-radius:4px; transition:width 0.25s ease; }
+.g13b-php-fill.low { background:linear-gradient(90deg,#EF4444,#FCA5A5); animation:g13bPhpBlink 0.7s ease infinite; }
+@keyframes g13bPhpBlink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+/* Wild attack lunge toward player */
+.g13b-wspr.wild-atk { animation:g13bWildAtk 0.38s ease; }
+@keyframes g13bWildAtk {
+  0%,100%{ transform:scaleX(-1) scale(1) translateX(0); }
+  45%    { transform:scaleX(-1) scale(1.15) translateX(-22px); filter:brightness(1.6) hue-rotate(15deg); }
+}
+/* Player hit shake */
+.g13b-pspr.player-hit { animation:g13bPlayerHit 0.4s ease; }
+@keyframes g13bPlayerHit {
+  0%,100%{ transform:translateX(0); filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
+  20%,60%{ transform:translateX(-7px); filter:brightness(3) saturate(0); }
+  40%,80%{ transform:translateX(4px); }
+}
 /* Screen shake */
 @keyframes g13bShake {
   0%,100%{transform:translateX(0)} 20%{transform:translateX(-9px)} 40%{transform:translateX(9px)}
@@ -5021,6 +5091,13 @@ body { background: #0a0a1a !important; }
         <ellipse cx="40" cy="9" rx="30" ry="7" fill="#6B3A1F"/>
         <ellipse cx="40" cy="6" rx="22" ry="5" fill="#8B5A2B" opacity="0.9"/>
       </svg>
+      <div class="g13b-pname-badge" id="g13b-pname">—</div>
+    </div>
+    <!-- Player HP bar (bottom-left, below player sprite) -->
+    <div id="g13b-php-wrap">
+      <span style="font-size:9px;font-weight:900;color:rgba(255,100,100,0.85);">HP</span>
+      <div class="g13b-php-track"><div class="g13b-php-fill" id="g13b-php-fill" style="width:100%"></div></div>
+      <span id="g13b-php-nums" style="font-size:9px;font-weight:900;color:white;min-width:24px;text-align:right;"></span>
     </div>
     <!-- COMBO overlay -->
     <div class="g13b-combo-overlay" id="g13b-combo">
@@ -5122,6 +5199,32 @@ body { background: #0a0a1a !important; }
         <animate attributeName="cy" values="16;11;16" dur="0.14s" repeatCount="indefinite"/>
       </ellipse>
     </svg>
+    <!-- Wheel fire — rear axle (left of train center) -->
+    <svg id="g14-wfire-r" class="g14-wheel-fire" viewBox="0 0 22 32" style="left:calc(15% - 42px);" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="11" cy="28" rx="7" ry="4" fill="#ef4444" opacity="0.95">
+        <animate attributeName="ry" values="4;7;4" dur="0.09s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="11" cy="17" rx="4" ry="9" fill="#f97316">
+        <animate attributeName="cy" values="17;12;17" dur="0.14s" repeatCount="indefinite"/>
+        <animate attributeName="rx" values="4;6;4" dur="0.11s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="11" cy="7" rx="3" ry="5" fill="#fbbf24">
+        <animate attributeName="cy" values="7;3;7" dur="0.12s" repeatCount="indefinite"/>
+      </ellipse>
+    </svg>
+    <!-- Wheel fire — front axle (right of train center) -->
+    <svg id="g14-wfire-f" class="g14-wheel-fire" viewBox="0 0 22 32" style="left:calc(15% + 28px);" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="11" cy="28" rx="6" ry="4" fill="#f97316" opacity="0.95">
+        <animate attributeName="ry" values="4;8;4" dur="0.10s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="11" cy="17" rx="5" ry="9" fill="#fbbf24">
+        <animate attributeName="cy" values="17;11;17" dur="0.16s" repeatCount="indefinite"/>
+        <animate attributeName="rx" values="5;7;5" dur="0.13s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="11" cy="7" rx="3" ry="6" fill="#fef08a">
+        <animate attributeName="cy" values="7;2;7" dur="0.14s" repeatCount="indefinite"/>
+      </ellipse>
+    </svg>
     <!-- Player train (inline SVG with animated wheels, positioned left side, moves vertically) -->
     <div id="g14-player" style="pointer-events:none;"></div>
 
@@ -5146,11 +5249,14 @@ body { background: #0a0a1a !important; }
     <div id="g14-position" style="position:absolute;top:38px;right:8px;font-size:11px;font-weight:900;color:#FFD166;background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:8px;z-index:20;display:none;">🥇 POSISI 1</div>
 
     <!-- Start overlay -->
-    <div id="g14-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.82);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:50;backdrop-filter:blur(6px);overflow-y:auto;padding:20px 16px 24px;">
+    <div id="g14-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.82);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:50;backdrop-filter:blur(6px);overflow-y:auto;padding:16px 16px 100px;">
       <div style="font-size:13px;font-weight:900;color:#FFD166;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">🏁 Pilih Kategori Kereta</div>
       <div id="g14-train-select" style="display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;max-width:360px;"></div>
       <div id="g14-start-msg" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;text-align:center;margin-top:10px;padding:0 24px;min-height:18px;"></div>
-      <button id="g14-go-btn" onclick="g14StartRace()" style="display:none;margin-top:12px;background:linear-gradient(135deg,#E63946,#B52733);color:white;border:none;border-radius:14px;padding:14px 36px;font-size:19px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #7A0A12;cursor:pointer;">🏁 BALAPAN!</button>
+      <!-- BALAPAN button sticky at bottom of overlay -->
+      <div id="g14-go-btn-wrap" style="display:none;position:sticky;bottom:0;width:100%;padding:12px 0 4px;background:linear-gradient(transparent,rgba(0,0,0,0.92) 40%);text-align:center;z-index:2;">
+        <button id="g14-go-btn" onclick="g14StartRace()" style="background:linear-gradient(135deg,#E63946,#B52733);color:white;border:none;border-radius:16px;padding:16px 48px;font-size:21px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 5px 0 #7A0A12,0 0 24px rgba(230,57,70,0.5);cursor:pointer;animation:g14GoBtnPulse 1.1s ease-in-out infinite alternate;letter-spacing:1px;">🏁 BALAPAN!</button>
+      </div>
     </div>
 
     <!-- Result overlay -->
@@ -5433,7 +5539,7 @@ body { background: #0a0a1a !important; }
       <div id="g18-modal-emoji" style="font-size:56px;margin-bottom:8px;min-height:70px;display:flex;align-items:center;justify-content:center;"></div>
       <div id="g18-modal-name" style="color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;margin-bottom:4px;"></div>
       <div id="g18-modal-country" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;margin-bottom:10px;"></div>
-      <div id="g18-modal-details" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
+      <div id="g18-modal-details" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;"></div>
       <div id="g18-modal-fact" style="background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;line-height:1.5;text-align:left;margin-bottom:12px;"></div>
       <button onclick="g18CloseModal()" style="background:linear-gradient(135deg,#5D3A1A,#8D6E63);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;width:100%;">✅ Mengerti!</button>
     </div>
@@ -8300,6 +8406,132 @@ try {
 // ================================================================
 // GAME 10 — PERTARUNGAN POKEMON
 // ================================================================
+// ── Signature move lookup (slug → [moves]) ───────────────
+const POKE_MOVES = {
+  // Gen 1
+  bulbasaur:['Vine Whip','Razor Leaf'],ivysaur:['Razor Leaf','Solar Beam'],venusaur:['Petal Blizzard','Solar Beam','Petal Dance'],
+  charmander:['Ember','Scratch'],charmeleon:['Flamethrower','Dragon Rage'],charizard:['Flamethrower','Wing Attack','Blast Burn'],
+  squirtle:['Water Gun','Bubble'],wartortle:['Water Pulse','Aqua Tail'],blastoise:['Hydro Pump','Flash Cannon'],
+  caterpie:['String Shot','Bug Bite'],metapod:['Tackle','Harden'],butterfree:['Sleep Powder','Bug Buzz'],
+  pikachu:['Thunderbolt','Quick Attack','Volt Tackle'],raichu:['Volt Tackle','Thunder','Thunderbolt'],pichu:['Thundershock','Sweet Kiss'],
+  jigglypuff:['Sing','Pound','Hyper Voice'],wigglytuff:['Hyper Voice','Double-Edge','Dazzling Gleam'],
+  meowth:['Scratch','Pay Day','Bite'],persian:['Pay Day','Slash','Feint Attack'],
+  psyduck:['Water Gun','Confusion'],golduck:['Hydro Pump','Confusion','Aqua Jet'],
+  abra:['Teleport','Psybeam'],kadabra:['Psybeam','Psychic'],alakazam:['Psychic','Shadow Ball','Future Sight'],
+  geodude:['Rock Throw','Magnitude'],graveler:['Rollout','Rock Blast'],golem:['Stone Edge','Earthquake','Explosion'],
+  gastly:['Lick','Hex','Shadow Ball'],haunter:['Shadow Ball','Confuse Ray'],gengar:['Shadow Ball','Sludge Bomb','Hex'],
+  magikarp:['Splash','Flail','Tackle'],gyarados:['Hydro Pump','Dragon Dance','Crunch'],
+  lapras:['Ice Beam','Surf','Blizzard'],eevee:['Quick Attack','Bite','Last Resort'],
+  vaporeon:['Hydro Pump','Water Pulse','Surf'],jolteon:['Thunderbolt','Thunder Wave','Wild Charge'],
+  flareon:['Flamethrower','Lava Plume','Fire Spin'],
+  snorlax:['Body Slam','Hyper Beam','Giga Impact'],
+  articuno:['Blizzard','Ice Beam','Sheer Cold'],zapdos:['Thunder','Thunderbolt','Discharge'],moltres:['Fire Blast','Flamethrower','Heat Wave'],
+  dratini:['Dragon Rage','Twister'],dragonair:['Dragon Rush','Aqua Tail','Twister'],dragonite:['Dragon Rush','Hyper Beam','Fire Punch'],
+  mewtwo:['Psystrike','Shadow Ball','Aura Sphere'],mew:['Psychic','Aura Sphere','Transform'],
+  arcanine:['Flare Blitz','Extreme Speed','Close Combat'],
+  clefairy:['Moonblast','Metronome'],clefable:['Moonblast','Meteor Mash','Soft-Boiled'],
+  slowpoke:['Water Gun','Confusion'],slowbro:['Psychic','Surf','Slack Off'],
+  magmar:['Fire Punch','Flamethrower','Lava Plume'],electabuzz:['Thunderbolt','Thunder Punch','Discharge'],
+  machop:['Karate Chop','Low Kick'],machoke:['Cross Chop','Dynamic Punch'],machamp:['Cross Chop','Stone Edge','Dynamic Punch'],
+  oddish:['Absorb','Acid'],gloom:['Petal Dance','Sludge Bomb'],vileplume:['Petal Blizzard','Sludge Bomb','Solar Beam'],
+  poliwag:['Bubble','Water Gun'],poliwhirl:['Bubblebeam','DoubleSlap'],poliwrath:['Waterfall','Dynamic Punch','Focus Blast'],
+  horsea:['Water Gun','Twister'],seadra:['Dragon Breath','Twister','Hydro Pump'],
+  vulpix:['Ember','Quick Attack'],ninetales:['Flamethrower','Extrasensory','Fire Spin'],
+  exeggcute:['Barrage','Confusion','Leech Seed'],exeggutor:['Psychic','Egg Bomb','Solar Beam'],
+  cubone:['Bone Club','Rage'],marowak:['Bonemerang','Earthquake','Stone Edge'],
+  kabuto:['Scratch','Aqua Jet'],kabutops:['Slash','Aqua Jet','Stone Edge'],
+  omanyte:['Brine','Rock Blast'],omastar:['Hydro Pump','Rock Blast','Ancientpower'],
+  koffing:['Sludge','Self-Destruct','Toxic'],weezing:['Sludge Bomb','Nasty Plot','Toxic'],
+  seel:['Icy Wind','Aqua Jet'],dewgong:['Ice Beam','Surf','Sheer Cold'],
+  cloyster:['Icicle Spear','Shell Smash','Ice Shard'],
+  staryu:['Water Gun','Rapid Spin'],starmie:['Psychic','Surf','Ice Beam'],
+  kangaskhan:['Mega Punch','Sucker Punch','Dizzy Punch'],
+  muk:['Gunk Shot','Sludge Bomb','Poison Gas'],
+  pidgey:['Gust','Quick Attack'],pidgeotto:['Wing Attack','Gust'],pidgeot:['Hurricane','Air Slash'],
+  rattata:['Hyper Fang','Quick Attack'],raticate:['Hyper Fang','Super Fang','Crunch'],
+  spearow:['Peck','Fury Attack'],fearow:['Drill Peck','Aerial Ace','Mirror Move'],
+  ekans:['Poison Sting','Bite'],arbok:['Gunk Shot','Glare','Coil'],
+  sandshrew:['Sand Attack','Slash'],sandslash:['Earthquake','Slash','Rapid Spin'],
+  paras:['Spore','Leech Life'],parasect:['Spore','X-Scissor','Leech Life'],
+  venonat:['Poison Powder','Psybeam'],venomoth:['Bug Buzz','Psychic','Stun Spore'],
+  mankey:['Karate Chop','Rage'],primeape:['Cross Chop','Close Combat','Rage'],
+  growlithe:['Ember','Flamethrower','Crunch'],
+  bellsprout:['Vine Whip','Acid'],weepinbell:['Razor Leaf','Sludge Bomb'],
+  doduo:['Peck','Fury Attack'],dodrio:['Drill Peck','Jump Kick','Thrash'],
+  magneton:['Thunderbolt','Tri Attack','Zap Cannon'],
+  shellder:['Icicle Spear','Clamp'],diglett:['Dig','Magnitude'],
+  voltorb:['Thunderbolt','Rollout'],electrode:['Thunderbolt','Explosion'],
+  goldeen:['Waterfall','Horn Drill'],seaking:['Waterfall','Megahorn','Bounce'],
+  tauros:['Horn Attack','Giga Impact'],hitmonchan:['Mach Punch','Fire Punch','Counter'],
+  // Gen 2
+  chikorita:['Razor Leaf','Vine Whip'],bayleef:['Razor Leaf','Synthesis'],meganium:['Petal Dance','Solar Beam'],
+  cyndaquil:['Ember','Quick Attack'],quilava:['Flamethrower','Swift'],typhlosion:['Eruption','Flamethrower'],
+  totodile:['Water Gun','Scratch'],croconaw:['Water Gun','Slash'],feraligatr:['Crunch','Waterfall','Ice Fang'],
+  togepi:['Metronome','Sweet Kiss'],togetic:['Moonblast','Fairy Wind','Air Slash'],
+  marill:['Bubble','Aqua Tail'],azumarill:['Play Rough','Aqua Tail','Superpower'],
+  teddiursa:['Scratch','Fury Swipes'],ursaring:['Slash','Hammer Arm','Giga Impact'],
+  slugma:['Ember','Smog'],magcargo:['Flamethrower','Rock Blast','Earth Power'],
+  swinub:['Powder Snow','Ice Shard'],piloswine:['Icicle Crash','Earthquake','Ice Shard'],
+  larvitar:['Bite','Rock Slide'],pupitar:['Crunch','Thrash'],tyranitar:['Crunch','Stone Edge','Hyper Beam'],
+  misdreavus:['Astonish','Shadow Ball'],mismagius:['Shadow Ball','Mystical Fire','Power Gem'],
+  sneasel:['Ice Shard','Night Slash'],weavile:['Night Slash','Ice Punch','Blizzard'],
+  hoppip:['Tackle','Dazzling Gleam'],skiploom:['Bullet Seed','Petal Dance'],
+  stantler:['Stomp','Megahorn','Zen Headbutt'],wyrdeer:['Zen Headbutt','Psyshield Bash'],
+  snubbull:['Bite','Charm'],granbull:['Play Rough','Crunch','Outrage'],
+  piloswine:['Icicle Crash','Earthquake'],
+  elekid:['Thundershock','Quick Attack'],electabuzz:['Thunderbolt','Thunder Punch'],electivire:['Thunder Punch','Ice Punch','Wild Charge'],
+  magby:['Ember','Fire Punch'],magmortar:['Lava Plume','Fire Blast','Thunderbolt'],
+  // Gen 3
+  mudkip:['Water Gun','Mud-Slap'],marshtomp:['Mud Shot','Surf'],swampert:['Muddy Water','Earthquake','Hydro Pump'],
+  treecko:['Bullet Seed','Quick Attack'],grovyle:['Leaf Blade','Detect'],sceptile:['Leaf Blade','Dragon Claw','Leaf Storm'],
+  torchic:['Ember','Peck'],combusken:['Double Kick','Blaze Kick'],blaziken:['Blaze Kick','High Jump Kick','Blast Burn'],
+  ralts:['Confusion','Disarming Voice'],kirlia:['Magical Leaf','Psychic'],gardevoir:['Moonblast','Psychic','Dazzling Gleam'],
+  beldum:['Take Down','Metal Claw'],metang:['Meteor Mash','Confusion'],metagross:['Meteor Mash','Psychic','Earthquake'],
+  electrike:['Spark','Bite'],manectric:['Thunderbolt','Discharge','Overheat'],
+  swablu:['Peck','Dragon Breath'],altaria:['Dragon Breath','Moonblast','Dragon Dance'],
+  shroomish:['Absorb','Stun Spore'],breloom:['Mach Punch','Spore','Seed Bomb'],
+  wailmer:['Water Pulse','Amnesia'],wailord:['Water Spout','Surf','Heavy Slam'],
+  meditite:['Meditate','Hi Jump Kick'],medicham:['Hi Jump Kick','Force Palm','Psychic'],
+  skitty:['Attract','Copycat'],delcatty:['Play Rough','Attract','Assist'],
+  snorunt:['Ice Shard','Crunch'],glalie:['Crunch','Freeze-Dry','Blizzard'],
+  bagon:['Bite','Dragon Breath'],shelgon:['Dragon Breath','Protect'],salamence:['Dragon Claw','Flamethrower','Hyper Voice'],
+  // Gen 4+
+  roggenrola:['Rock Blast','Smack Down'],boldore:['Rock Blast','Power Gem'],gigalith:['Stone Edge','Meteor Beam'],
+  litwick:['Ember','Hex'],lampent:['Hex','Will-O-Wisp'],chandelure:['Shadow Ball','Fire Blast'],
+  gible:['Dragon Breath','Sand Attack'],gabite:['Dragon Claw','Sand Tomb'],garchomp:['Dragon Claw','Earthquake','Dual Chop'],
+  timburr:['Pound','Low Kick'],gurdurr:['Dynamic Punch','Superpower'],conkeldurr:['Dynamic Punch','Hammer Arm','Stone Edge'],
+  sandile:['Bite','Torment'],krokorok:['Crunch','Dig'],krookodile:['Crunch','Earthquake','Outrage'],
+  // Fallback by type
+  _fire:['Ember','Flamethrower','Fire Blast'],_water:['Water Gun','Bubble','Hydro Pump'],
+  _grass:['Vine Whip','Razor Leaf','Petal Blizzard'],_electric:['Thunderbolt','Spark','Discharge'],
+  _psychic:['Confusion','Psybeam','Psychic'],_ice:['Icy Wind','Ice Shard','Blizzard'],
+  _ghost:['Shadow Ball','Hex','Lick'],_dragon:['Dragon Rage','Dragon Breath','Dragon Claw'],
+  _rock:['Rock Throw','Rock Blast','Stone Edge'],_ground:['Dig','Magnitude','Earthquake'],
+  _fighting:['Karate Chop','Low Kick','Dynamic Punch'],_poison:['Sludge','Acid','Gunk Shot'],
+  _dark:['Bite','Crunch','Sucker Punch'],_steel:['Metal Claw','Flash Cannon','Iron Head'],
+  _bug:['Bug Bite','Silver Wind','Bug Buzz'],_flying:['Gust','Wing Attack','Air Slash'],
+  _normal:['Tackle','Quick Attack','Body Slam'],_fairy:['Fairy Wind','Moonblast','Dazzling Gleam'],
+}
+function getPokeMove(slug, type) {
+  const moves = POKE_MOVES[slug] || POKE_MOVES['_'+(type||'normal').toLowerCase()] || ['Tackle']
+  return moves[Math.floor(Math.random() * moves.length)]
+}
+// Show move name popup above attacker sprite wrap
+function showMovePopup(wrapEl, moveName, typeColor) {
+  if (!wrapEl || !moveName) return
+  const rect = wrapEl.getBoundingClientRect()
+  const popup = document.createElement('div')
+  popup.className = 'move-popup'
+  popup.textContent = moveName
+  popup.style.left = (rect.left + rect.width / 2) + 'px'
+  popup.style.top = (rect.top - 6) + 'px'
+  popup.style.background = typeColor
+    ? `linear-gradient(135deg,${typeColor},${typeColor}cc)`
+    : 'linear-gradient(135deg,#7C3AED,#4c1d95)'
+  document.body.appendChild(popup)
+  popup.addEventListener('animationend', () => popup.remove(), {once:true})
+}
+
 const POKEMON_DB=[
   {id:1,name:'Bulbasaur',slug:'bulbasaur',type:'grass',type2:'poison'},
   {id:4,name:'Charmander',slug:'charmander',type:'fire'},
@@ -9108,6 +9340,11 @@ function g10DoAttack(type, fromSide, toSide, onDone){
     fromWrapEl.appendChild(aura)
     setTimeout(() => aura.remove(), 540)
   }
+
+  // Move name popup
+  const atkSlug = fromSide === 'player' ? (g10State.playerPoke ? g10State.playerPoke.slug : '') : (g10State.enemyPoke ? g10State.enemyPoke.slug : '')
+  const atkType = fromSide === 'player' ? (g10State.playerPoke ? g10State.playerPoke.type : type) : (g10State.enemyPoke ? g10State.enemyPoke.type : type)
+  showMovePopup(fromWrapEl, getPokeMove(atkSlug, atkType), auraColor)
 
   // Attacker lunges
   const atkSprId = fromSide === 'player' ? 'g10-pspr' : 'g10-espr'
@@ -10374,7 +10611,14 @@ function _initGame13Impl() {
     misdreavus:200,mismagius:429,sneasel:215,weavile:461,hoppip:187,skiploom:188,stantler:234,wyrdeer:899,
     electrike:309,manectric:310,swablu:333,altaria:334,shroomish:285,breloom:286,wailmer:320,wailord:321,meditite:307,medicham:308,skitty:300,delcatty:301,snorunt:361,glalie:362,
     bagon:371,shelgon:372,salamence:373,roggenrola:524,boldore:525,gigalith:526,litwick:607,lampent:608,chandelure:609,gible:443,gabite:444,garchomp:445,timburr:532,gurdurr:533,conkeldurr:534,elekid:239,electabuzz:125,electivire:466,magby:240,magmar:126,magmortar:467,sandile:551,krokorok:552,krookodile:553,
-    riolu:447,lucario:448,deino:633,zweilous:634,hydreigon:635,trapinch:328,vibrava:329,flygon:330,axew:610,fraxure:611,haxorus:612,feebas:349,milotic:350,goomy:704,sliggoo:705,goodra:706}
+    riolu:447,lucario:448,deino:633,zweilous:634,hydreigon:635,trapinch:328,vibrava:329,flygon:330,axew:610,fraxure:611,haxorus:612,feebas:349,milotic:350,goomy:704,sliggoo:705,goodra:706,
+    onix:95,steelix:208,lairon:305,aggron:306,
+    victreebel:71,'nidoran-f':29,nidorina:30,nidoqueen:31,'nidoran-m':32,nidorino:33,nidoking:34,
+    cleffa:173,igglybuff:174,sunflora:192,jumpluff:189,
+    spheal:363,sealeo:364,walrein:365,
+    slakoth:287,vigoroth:288,slaking:289,
+    umbreon:197,espeon:196,leafeon:470,glaceon:471,sylveon:700,
+    togekiss:468,roserade:407,lopunny:428,honchkrow:430,porygon:137,porygon2:233,porygonz:474}
   // Same HD HOME sprites as G10 — pokemondb allows hotlinking these
   const pokeUrl = slug => POKE_IDS[slug] ? `https://img.pokemondb.net/sprites/home/normal/${slug}.png` : null
   const pokeFallbackUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png` : null }
@@ -10658,6 +10902,8 @@ function g13Answer(val, btn) {
     const atkType = s.evolved ? s.chain.evolved.type : s.chain.player.type
     playAttackSound(atkType)
     g13SpawnAttackEffect(atkType, true)
+    const playerSlugG13 = s.evolved2 ? s.chain.evolved2.slug : (s.evolved ? s.chain.evolved.slug : s.chain.player.slug)
+    showMovePopup(document.getElementById('g13-pspr-wrap'), getPokeMove(playerSlugG13, atkType), ({'Fire':'#f97316','Water':'#38bdf8','Grass':'#4ade80','Electric':'#facc15','Psychic':'#e879f9','Ice':'#67e8f9','Dragon':'#818cf8','Dark':'#6b7280','Fighting':'#f87171','Ghost':'#c084fc','Steel':'#94a3b8','Fairy':'#f9a8d4','Rock':'#a8a29e','Ground':'#d97706','Flying':'#7dd3fc','Bug':'#a3e635','Poison':'#a855f7','Normal':'#d1d5db'})[atkType] || '#7C3AED')
     const pspr = document.getElementById('g13-pspr')
     if (pspr) { pspr.classList.remove('spr-atk'); void pspr.offsetWidth; pspr.classList.add('spr-atk'); setTimeout(()=>pspr.classList.remove('spr-atk'),350) }
     // Wild hit animation + type hit FX
@@ -10735,6 +10981,7 @@ function g13WildCounterPhase() {
       const pspr = document.getElementById('g13-pspr')
       playAttackSound(s.chain.wild.type)
       g13SpawnAttackEffect(s.chain.wild.type, false)
+      showMovePopup(document.getElementById('g13-wspr-wrap'), getPokeMove(s.chain.wild.slug, s.chain.wild.type), null)
       if (wspr) { wspr.classList.remove('spr-atk'); void wspr.offsetWidth; wspr.classList.add('spr-atk'); setTimeout(()=>wspr.classList.remove('spr-atk'),350) }
       setTimeout(() => {
         if (pspr) {
@@ -11062,16 +11309,25 @@ const G13B_WILDS = POKEMON_DB
   })
 
 // Legendary Pokémon — every 10 kills, needs 3 hits — built from POKEMON_DB legendary IDs
-const G13B_LEGENDARIES = POKEMON_DB
-  .filter(p => _LEGENDARY_IDS.has(p.id))
-  .map(p => {
-    const t = p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : 'Psychic'
-    return { name: p.name, slug: p.slug, type: t, icon: '🌟', hp: 3 }
-  })
+const G13B_LEGENDARIES = (() => {
+  const arr = POKEMON_DB
+    .filter(p => _LEGENDARY_IDS.has(p.id))
+    .map(p => {
+      const t = p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : 'Psychic'
+      return { name: p.name, slug: p.slug, type: t, icon: '🌟', hp: 3 }
+    })
+  // Fisher-Yates shuffle so order is random every page load
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+})()
 
 let g13bState = {}
 let g13bLastWildIdx = -1
 let _g13bEvoAudio = null
+let _g13bLegAutoAtk = null  // interval ID for legendary periodic attacks
 
 function startQuickFire() {
   showScreen('screen-game13b')
@@ -11100,12 +11356,16 @@ function initGame13b() {
     field.style.backgroundPosition = 'center 22%'
   }
 
+  // Clear any leftover legendary auto-attack timer from previous session
+  if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
+
   // Init state
   g13bState = {
     kills: 0, streak: 0, bestCombo: 0,
     isLegendary: false, wildHp: 1, wildMaxHp: 1,
+    playerHp: 6, playerMaxHp: 6,
     locked: false, currentAnswer: 0, phase: 'playing',
-    legendaryIdx: 0, currentWild: null,
+    legendaryIdx: Math.floor(Math.random() * G13B_LEGENDARIES.length), currentWild: null,
   }
 
   // Hide result + legendary banner + badge
@@ -11116,16 +11376,19 @@ function initGame13b() {
   const legBadge = document.getElementById('g13b-leg-badge')
   if (legBadge) legBadge.style.display = 'none'
 
-  // Player sprite: use saved selection or default Pikachu
+  // Player sprite + name: use saved selection or default Pikachu
   const pspr = document.getElementById('g13b-pspr')
   if (pspr) {
     const saved = g13bSavedPoke
     pspr.src = saved ? pokeSpriteOnline(saved.slug) : 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'
     pspr.onerror = function(){ this.src = 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'; this.onerror = null }
   }
+  const pnameEl = document.getElementById('g13b-pname')
+  if (pnameEl) pnameEl.textContent = g13bSavedPoke ? g13bSavedPoke.name : 'Pikachu'
 
   g13bRenderStreak()
   g13bUpdateKills()
+  g13bUpdatePlayerHp()
   g13bSpawnWild()
 }
 
@@ -11166,6 +11429,21 @@ function g13bSpawnWild() {
   if (wname) wname.textContent = s.isLegendary ? `★ ${wild.name}` : wild.name
 
   g13bUpdateHpBar()
+
+  // Start legendary periodic auto-attack (every 8s they attack even without wrong answer)
+  if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
+  if (s.isLegendary) {
+    _g13bLegAutoAtk = setInterval(() => {
+      const st = g13bState
+      if (st.phase !== 'playing' || st.locked || st.playerHp <= 0 || !st.isLegendary) {
+        clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null; return
+      }
+      // Legendary fires an autonomous strike between questions
+      st.locked = true
+      g13bWildHitsPlayer(() => { st.locked = false })
+    }, 8000)
+  }
+
   g13bNextQuestion()
 }
 
@@ -11308,6 +11586,8 @@ function g13bAnswer(val, btn) {
     try {
       const playerType = g13bSavedPoke ? g13bSavedPoke.type : 'Electric'
       g13SpawnAttackEffect(playerType, true, 'g13b-field')
+      const auraColsG13b = {Fire:'#f97316',Water:'#38bdf8',Grass:'#4ade80',Electric:'#facc15',Psychic:'#e879f9',Ice:'#67e8f9',Dragon:'#818cf8',Dark:'#6b7280',Fighting:'#f87171',Ghost:'#c084fc',Steel:'#94a3b8',Fairy:'#f9a8d4',Rock:'#a8a29e',Ground:'#d97706',Flying:'#7dd3fc',Bug:'#a3e635',Poison:'#a855f7',Normal:'#d1d5db'}
+      showMovePopup(document.getElementById('g13b-pspr-wrap'), getPokeMove(g13bSavedPoke ? g13bSavedPoke.slug : '', playerType), auraColsG13b[playerType] || '#7C3AED')
     } catch(e) {}
 
     // COMBO FX at streak >= 3
@@ -11318,8 +11598,14 @@ function g13bAnswer(val, btn) {
     g13bUpdateHpBar()
 
     setTimeout(() => {
-      if (s.wildHp <= 0) g13bKillWild()
-      else { s.locked = false; g13bNextQuestion() }
+      if (s.wildHp <= 0) {
+        g13bKillWild()
+      } else if (Math.random() < (s.isLegendary ? 0.60 : 0.30)) {
+        // 60% counter-attack for legendary, 30% for regular wild
+        g13bWildHitsPlayer(() => { s.locked = false; g13bNextQuestion() })
+      } else {
+        s.locked = false; g13bNextQuestion()
+      }
     }, 480)
   } else {
     playWrong()
@@ -11328,12 +11614,15 @@ function g13bAnswer(val, btn) {
     g13bRenderStreak()
     const scr = document.getElementById('screen-game13b')
     if (scr) { scr.classList.remove('shake'); void scr.offsetWidth; scr.classList.add('shake'); setTimeout(()=>scr.classList.remove('shake'),400) }
-    setTimeout(() => { s.locked = false; g13bNextQuestion() }, 480)
+    // Wrong answer → wild always attacks player
+    g13bWildHitsPlayer(() => { s.locked = false; g13bNextQuestion() })
   }
 }
 
 function g13bKillWild() {
   const s = g13bState
+  // Clear any legendary auto-attack timer
+  if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
   const earnedKills = s.isLegendary ? 3 : 1
   const wasLegendary = s.isLegendary
   s.kills += earnedKills
@@ -11558,6 +11847,50 @@ function g13bUpdateHpBar() {
   if (nums) nums.textContent = `${s.wildHp}/${s.wildMaxHp}`
 }
 
+function g13bUpdatePlayerHp() {
+  const s = g13bState
+  const fill = document.getElementById('g13b-php-fill')
+  const nums = document.getElementById('g13b-php-nums')
+  const pct = s.playerMaxHp > 0 ? (s.playerHp / s.playerMaxHp) * 100 : 0
+  if (fill) { fill.style.width = `${pct}%`; fill.className = 'g13b-php-fill' + (pct <= 33 ? ' low' : '') }
+  if (nums) nums.textContent = `${s.playerHp}/${s.playerMaxHp}`
+}
+
+function g13bWildHitsPlayer(onDone) {
+  const s = g13bState
+  // Wild lunge animation
+  const wspr = document.getElementById('g13b-wspr')
+  if (wspr) { wspr.classList.remove('wild-atk'); void wspr.offsetWidth; wspr.classList.add('wild-atk'); setTimeout(()=>wspr.classList.remove('wild-atk'),400) }
+  // Player sprite shakes
+  const pspr = document.getElementById('g13b-pspr')
+  if (pspr) { pspr.classList.remove('player-hit'); void pspr.offsetWidth; pspr.classList.add('player-hit'); setTimeout(()=>pspr.classList.remove('player-hit'),420) }
+  // Red flash
+  const flash = document.getElementById('g13b-flash')
+  if (flash) { flash.classList.remove('hit','red-hit'); void flash.offsetWidth; flash.classList.add('red-hit') }
+  // Move popup on wild sprite
+  try { showMovePopup(document.getElementById('g13b-wspr-wrap'), getPokeMove(s.currentWild ? s.currentWild.slug : '', s.currentWild ? (s.currentWild.type||'Normal') : 'Normal'), null) } catch(e) {}
+  // Status label
+  const lbl = document.getElementById('g13b-atk-lbl')
+  const prevLbl = lbl ? lbl.textContent : ''
+  if (lbl) lbl.textContent = s.isLegendary
+    ? `🌟 SERANGAN LEGENDARIS! ${s.currentWild ? s.currentWild.name : 'Wild'} menyerang!`
+    : `💥 ${s.currentWild ? s.currentWild.name : 'Wild'} menyerang!`
+  // Reduce player HP
+  const dmg = s.isLegendary ? 2 : 1
+  s.playerHp = Math.max(0, s.playerHp - dmg)
+  g13bUpdatePlayerHp()
+  playWrong()
+  vibrate(25)
+  setTimeout(() => {
+    if (lbl && s.phase === 'playing') lbl.textContent = prevLbl
+    if (s.playerHp <= 0) {
+      g13bGameOver('defeated')
+    } else {
+      if (onDone) onDone()
+    }
+  }, 540)
+}
+
 function g13bUpdateKills() {
   const el = document.getElementById('g13b-kills')
   if (!el) return
@@ -11566,16 +11899,21 @@ function g13bUpdateKills() {
   el.addEventListener('animationend', () => el.classList.remove('pop-kill'), {once:true})
 }
 
-function g13bGameOver() {
+function g13bGameOver(reason) {
   const s = g13bState
   if (s.phase === 'done') return
   s.phase = 'done'
+  if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
   battleBgmStop()
 
-  const stars = s.kills >= 30 ? 3 : s.kills >= 15 ? 2 : s.kills >= 1 ? 1 : 0
+  const defeated = reason === 'defeated'
+  const stars = defeated
+    ? (s.kills >= 15 ? 2 : s.kills >= 5 ? 1 : 0)
+    : (s.kills >= 30 ? 3 : s.kills >= 15 ? 2 : s.kills >= 1 ? 1 : 0)
   vibrate([30, 20, 50])
   try { if (stars >= 2) playCorrect() } catch(e) {}
 
+  const delay = defeated ? 600 : 900
   setTimeout(() => {
     const res = document.getElementById('g13b-result')
     const icon = document.getElementById('g13b-res-icon')
@@ -11583,13 +11921,20 @@ function g13bGameOver() {
     const killsEl = document.getElementById('g13b-res-kills')
     const sub = document.getElementById('g13b-res-sub')
     const starsEl = document.getElementById('g13b-res-stars')
-    if (icon)    icon.textContent   = stars >= 3 ? '🏆' : stars >= 2 ? '⚡' : stars >= 1 ? '✨' : '😅'
-    if (title)   title.textContent  = stars >= 3 ? 'Luar Biasa!' : stars >= 2 ? 'Keren Banget!' : stars >= 1 ? 'Bagus!' : 'Terus Berlatih!'
+    if (defeated) {
+      if (icon)  icon.textContent  = '💀'
+      if (title) title.textContent = `${s.currentWild ? s.currentWild.name : 'Wild'} mengalahkanmu!`
+    } else {
+      if (icon)  icon.textContent  = stars >= 3 ? '🏆' : stars >= 2 ? '⚡' : stars >= 1 ? '✨' : '😅'
+      if (title) title.textContent = stars >= 3 ? 'Luar Biasa!' : stars >= 2 ? 'Keren Banget!' : stars >= 1 ? 'Bagus!' : 'Terus Berlatih!'
+    }
     if (killsEl) killsEl.textContent = s.kills
-    if (sub)     sub.textContent    = `Combo terbaik: x${s.bestCombo}  |  30+ kill = ⭐⭐⭐`
+    if (sub)     sub.textContent    = defeated
+      ? `HP habis setelah ${s.kills} kemenangan! Combo terbaik: x${s.bestCombo}`
+      : `Combo terbaik: x${s.bestCombo}  |  30+ kill = ⭐⭐⭐`
     if (starsEl) starsEl.textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
     if (res) res.style.display = 'flex'
-  }, 900)
+  }, delay)
 }
 
 function g13bLevelComplete() {
@@ -11737,6 +12082,73 @@ function buildModernTrainSVG(cfg, opts = {}) {
 </svg>`
 }
 
+// Inline SVG diesel locomotive builder
+function buildDieselLocoSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor  || '#1B5E20'
+  const ac = cfg.accentColor || '#FFD166'
+  const wa = animate ? ' class="train-wheel"' : ''
+  return `<svg viewBox="0 0 200 72" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="100" cy="70" rx="88" ry="4" fill="rgba(0,0,0,0.22)"/>
+  <rect x="10"  y="32" width="120" height="28" rx="5"   fill="${bc}"/>
+  <rect x="10"  y="30" width="120" height="8"  rx="3"   fill="rgba(255,255,255,0.1)"/>
+  <rect x="130" y="18" width="52"  height="42" rx="7"   fill="${bc}"/>
+  <rect x="128" y="15" width="56"  height="9"  rx="4"   fill="${ac}" opacity="0.88"/>
+  <rect x="136" y="24" width="38"  height="22" rx="4"   fill="rgba(135,206,235,0.88)"/>
+  <circle cx="14" cy="40" r="5.5" fill="#FFD166" opacity="0.9"/>
+  <circle cx="14" cy="40" r="3.5" fill="white"   opacity="0.85"/>
+  <rect x="22"  y="34" width="3"  height="20" rx="1.5" fill="rgba(0,0,0,0.28)"/>
+  <rect x="30"  y="34" width="3"  height="20" rx="1.5" fill="rgba(0,0,0,0.28)"/>
+  <rect x="38"  y="34" width="3"  height="20" rx="1.5" fill="rgba(0,0,0,0.28)"/>
+  <rect x="46"  y="34" width="3"  height="20" rx="1.5" fill="rgba(0,0,0,0.28)"/>
+  <rect x="10"  y="44" width="120" height="5" rx="2"   fill="${ac}" opacity="0.65"/>
+  <rect x="84"  y="20" width="8"  height="16" rx="3"   fill="#333"/>
+  <rect x="80"  y="16" width="16" height="7"  rx="3"   fill="#555"/>
+  <circle${wa} cx="38"  cy="62" r="9"  fill="#2a2a2a" stroke="#888" stroke-width="1.5"/>
+  <circle       cx="38"  cy="62" r="3.5" fill="#aaa"/>
+  <circle${wa} cx="64"  cy="62" r="9"  fill="#2a2a2a" stroke="#888" stroke-width="1.5"/>
+  <circle       cx="64"  cy="62" r="3.5" fill="#aaa"/>
+  <circle${wa} cx="90"  cy="62" r="9"  fill="#2a2a2a" stroke="#888" stroke-width="1.5"/>
+  <circle       cx="90"  cy="62" r="3.5" fill="#aaa"/>
+  <circle${wa} cx="152" cy="62" r="9"  fill="#2a2a2a" stroke="#888" stroke-width="1.5"/>
+  <circle       cx="152" cy="62" r="3.5" fill="#aaa"/>
+  <circle${wa} cx="176" cy="62" r="9"  fill="#2a2a2a" stroke="#888" stroke-width="1.5"/>
+  <circle       cx="176" cy="62" r="3.5" fill="#aaa"/>
+  <rect x="10" y="56" width="168" height="5" rx="2.5" fill="rgba(0,0,0,0.3)"/>
+</svg>`
+}
+
+// Inline SVG electric/bullet train builder
+function buildElectricLocoSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor  || '#1a1a6b'
+  const ac = cfg.accentColor || '#00b4d8'
+  const wa = animate ? ' class="train-wheel"' : ''
+  return `<svg viewBox="0 0 220 64" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="110" cy="62" rx="96" ry="4" fill="rgba(0,0,0,0.2)"/>
+  <polygon points="10,52 2,38 2,22 10,12" fill="${bc}"/>
+  <rect x="10"  y="12" width="185" height="40" rx="6"  fill="${bc}"/>
+  <rect x="10"  y="12" width="185" height="12" rx="6"  fill="rgba(255,255,255,0.13)"/>
+  <rect x="195" y="12" width="20"  height="40" rx="6"  fill="${bc}"/>
+  <rect x="10"  y="32" width="185" height="5"  rx="2"  fill="${ac}" opacity="0.75"/>
+  <circle cx="5"  cy="28" r="5.5" fill="#FFD166" opacity="0.92"/>
+  <rect x="24"  y="18" width="30" height="18" rx="4"   fill="rgba(135,206,235,0.88)"/>
+  <rect x="68"  y="18" width="30" height="18" rx="4"   fill="rgba(135,206,235,0.88)"/>
+  <rect x="118" y="18" width="30" height="18" rx="4"   fill="rgba(135,206,235,0.88)"/>
+  <rect x="160" y="18" width="25" height="18" rx="4"   fill="rgba(135,206,235,0.88)"/>
+  <rect x="8"   y="8"  width="40" height="5"  rx="2.5" fill="#555"/>
+  <rect x="20"  y="5"  width="15" height="5"  rx="2"   fill="#777"/>
+  <circle${wa} cx="44"  cy="54" r="8" fill="#222" stroke="#999" stroke-width="1.5"/>
+  <circle       cx="44"  cy="54" r="3" fill="#aaa"/>
+  <circle${wa} cx="84"  cy="54" r="8" fill="#222" stroke="#999" stroke-width="1.5"/>
+  <circle       cx="84"  cy="54" r="3" fill="#aaa"/>
+  <circle${wa} cx="128" cy="54" r="8" fill="#222" stroke="#999" stroke-width="1.5"/>
+  <circle       cx="128" cy="54" r="3" fill="#aaa"/>
+  <circle${wa} cx="170" cy="54" r="8" fill="#222" stroke="#999" stroke-width="1.5"/>
+  <circle       cx="170" cy="54" r="3" fill="#aaa"/>
+</svg>`
+}
+
 // G14 Categories with trains grouped by type
 const G14_CATEGORIES = [
   {
@@ -11753,26 +12165,40 @@ const G14_CATEGORIES = [
       { key:'b50',   name:'B 50',     sub:'Jawa 1880 • Jerman',        isSteam:true, rack:false, tender:false, bodyColor:'#2a1e08', wheelColor:'#150f00', baseSpeed:1.42, boostMult:1.56, boostDur:1700, color:'#2a1e08', kmh:25,  desc:'B50 — Salah satu loko tertua Jawa! Jerman 1880-an. Lambat tapi punya legenda! 🦕' },
       { key:'bb302', name:'BB 302',   sub:'Indonesia 1954',             isSteam:true, rack:false, tender:true,  bodyColor:'#5D3A1A', wheelColor:'#3a2010', baseSpeed:2.0,  boostMult:1.45, boostDur:2000, color:'#5D3A1A', kmh:60,  desc:'BB302 — Lokomotif era peralihan Indonesia 1954. Baja murni Tanah Air! 🇮🇩' },
       { key:'bb303', name:'BB 303',   sub:'Indonesia 1956',             isSteam:true, rack:false, tender:true,  bodyColor:'#2A1A08', wheelColor:'#1a0a00', baseSpeed:2.1,  boostMult:1.43, boostDur:2000, color:'#2A1A08', kmh:65,  desc:'BB303 — Lebih bertenaga dari BB302! Kereta masa transisi terbaik Indonesia! ⚡' },
+      { key:'e10',   name:'E 10',     sub:'Jawa Barat 1928 • Inggris', isSteam:true, rack:false, tender:true,  bodyColor:'#1C1C3A', wheelColor:'#0a0a20', baseSpeed:1.75, boostMult:1.46, boostDur:1950, color:'#1C1C3A', kmh:40,  desc:'E10 — Lokomotif listrik pertama Hindia Belanda! Jalur Batavia-Buitenzorg 1928. ⚡🏛️' },
+      { key:'d300',  name:'D 301',    sub:'Jawa 1954 • USA',           isSteam:true, rack:false, tender:false, bodyColor:'#3D1515', wheelColor:'#1f0a0a', baseSpeed:1.90, boostMult:1.44, boostDur:1950, color:'#3D1515', kmh:55,  desc:'D301 — Lokomotif Amerika era 1950-an! Mesin kuat buatan Baldwin Locomotive Works. 🇺🇸' },
+      { key:'b51',   name:'B 51',     sub:'Jawa 1900 • Belanda',       isSteam:true, rack:false, tender:false, bodyColor:'#1A3A1A', wheelColor:'#0a1f0a', baseSpeed:1.50, boostMult:1.53, boostDur:1750, color:'#1A3A1A', kmh:28,  desc:'B51 — Tram lokomotif Belanda 1900! Mungil tapi perkasa di jalanan kota! 🏙️' },
+      { key:'c2706', name:'C 27 06',  sub:'Jawa 1916 • Hartmann',      isSteam:true, rack:false, tender:true,  bodyColor:'#0a1a2a', wheelColor:'#050e17', baseSpeed:1.68, boostMult:1.48, boostDur:1850, color:'#0a1a2a', kmh:37,  desc:'C2706 — Kelas C27 buatan Hartmann Jerman 1916. Mesin tangguh jalur Priangan! 🌿' },
     ]
   },
   {
     key:'diesel', label:'Diesel', emoji:'🚃', color:'#166534', bg:'rgba(22,101,52,0.25)',
     desc:'Mesin diesel kuat dan handal',
     trains:[
-      { key:'cc201', name:'CC 201',  sub:'Diesel Indonesia', svg:'assets/train/cc201-indonesia.svg', baseSpeed:2.6, boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'CC201 — kuda kerja rel Indonesia' },
-      { key:'cc203', name:'CC 203',  sub:'Diesel Modern',    svg:'assets/train/cc203-indonesia.svg', baseSpeed:2.8, boostMult:1.36, boostDur:2100, color:'#1A4A1A', kmh:95,  desc:'CC203 — diesel modern Indonesia' },
+      { key:'cc201',  name:'CC 201',   sub:'Indonesia • Diesel',    isDiesel:true, bodyColor:'#1B4A1B', accentColor:'#FFD166', baseSpeed:2.6,  boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'CC201 — Kuda kerja rel Indonesia! Ribuan CC201 melintasi Jawa setiap hari. 💪🇮🇩' },
+      { key:'cc203',  name:'CC 203',   sub:'Indonesia • Diesel Modern', isDiesel:true, bodyColor:'#0f3d1a', accentColor:'#00e676', baseSpeed:2.8, boostMult:1.36, boostDur:2100, color:'#1A4A1A', kmh:95,  desc:'CC203 — Diesel modern Indonesia! Lebih kencang dan andal dari CC201! 🟢⚡' },
+      { key:'cc206',  name:'CC 206',   sub:'Indonesia • General Electric', isDiesel:true, bodyColor:'#1a2a4a', accentColor:'#ff6600', baseSpeed:3.0, boostMult:1.35, boostDur:2150, color:'#1a2a4a', kmh:100, desc:'CC206 — Generasi terbaru diesel Indonesia! Buatan General Electric 2012. 🔶🇺🇸' },
+      { key:'bb301',  name:'BB 301',   sub:'Indonesia • Diesel',    isDiesel:true, bodyColor:'#2a1a00', accentColor:'#ffa500', baseSpeed:2.4,  boostMult:1.40, boostDur:2050, color:'#2a1a00', kmh:75,  desc:'BB301 — Diesel tua tapi kokoh! Masih mengangkut barang di jalur-jalur pinggiran Jawa. 🚛' },
+      { key:'de10',   name:'DE 10',    sub:'Jepang • JNR Diesel',   isDiesel:true, bodyColor:'#4a2000', accentColor:'#ff3300', baseSpeed:2.2,  boostMult:1.41, boostDur:2000, color:'#4a2000', kmh:70,  desc:'DE10 — Diesel langsir JNR Jepang! Sangat fleksibel, bisa bolak-balik arah! 🇯🇵' },
+      { key:'class66', name:'Class 66', sub:'Inggris • EWS Diesel',  isDiesel:true, bodyColor:'#5a1a1a', accentColor:'#ffd700', baseSpeed:2.7,  boostMult:1.37, boostDur:2100, color:'#5a1a1a', kmh:92,  desc:'Class 66 — Diesel barang Inggris yang ikonik! Dipakai di seluruh Eropa! 🇬🇧🌍' },
+      { key:'sd70m',  name:'SD70M',    sub:'Amerika • EMD Diesel',  isDiesel:true, bodyColor:'#003366', accentColor:'#ff0000', baseSpeed:3.1,  boostMult:1.34, boostDur:2200, color:'#003366', kmh:105, desc:'SD70M — Raksasa rel Amerika! Mesin EMD bertenaga 4300 hp untuk jalur panjang! 🇺🇸🦅' },
+      { key:'df8b',   name:'DF8B',     sub:'China • Diesel',        isDiesel:true, bodyColor:'#1a3a1a', accentColor:'#ff4444', baseSpeed:2.9,  boostMult:1.35, boostDur:2150, color:'#1a3a1a', kmh:98,  desc:'DF8B — Diesel angkut barang China yang perkasa! Tulang punggung jalur batubara! 🇨🇳' },
     ]
   },
   {
     key:'electric', label:'Listrik', emoji:'⚡', color:'#1e3a8a', bg:'rgba(30,58,138,0.25)',
     desc:'Kereta listrik super cepat',
     trains:[
-      { key:'krl',   name:'KRL',         sub:'Commuter Jabodetabek', svg:'assets/train/commuter-line-krl.svg', baseSpeed:3.0, boostMult:1.37, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line — andalan ibu kota' },
-      { key:'shink', name:'Shinkansen N700', sub:'Jepang',          svg:'assets/train/shinkansen-n700.svg',   baseSpeed:3.5, boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:140, desc:'Shinkansen N700 — peluru Jepang!' },
-      { key:'e5',    name:'Shinkansen E5',   sub:'Jepang Hijau',    svg:'assets/train/shinkansen-e5.svg',     baseSpeed:3.6, boostMult:1.34, boostDur:2300, color:'#2C7043', kmh:150, desc:'Shinkansen E5 Hayabusa — hijau dan kilat!' },
-      { key:'tgv',   name:'TGV Inouï',       sub:'Perancis',        svg:'assets/train/tgv-inoui.svg',         baseSpeed:3.8, boostMult:1.33, boostDur:2400, color:'#003189', kmh:160, desc:'TGV Inouï — kebanggaan Prancis' },
-      { key:'ice3',  name:'ICE-3',           sub:'Jerman',          svg:'assets/train/ice-3.svg',             baseSpeed:3.7, boostMult:1.34, boostDur:2350, color:'#D0D0D0', kmh:155, desc:'ICE-3 — ekspres Jerman yang elegan' },
-      { key:'ktx',   name:'KTX-I',           sub:'Korea',           svg:'assets/train/ktx-i.svg',             baseSpeed:3.6, boostMult:1.35, boostDur:2300, color:'#0A2A7A', kmh:145, desc:'KTX-I — peluru Korea Selatan' },
+      { key:'krl',    name:'KRL',             sub:'Commuter Jabodetabek', isElectric:true, bodyColor:'#0D47A1', accentColor:'#e53935', baseSpeed:3.0,  boostMult:1.37, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line — andalan ibu kota! Angkut jutaan penumpang Jakarta setiap hari! 🏙️🇮🇩' },
+      { key:'lrt',    name:'LRT Jakarta',      sub:'Indonesia 2019',       isElectric:true, bodyColor:'#c62828', accentColor:'#ffeb3b', baseSpeed:2.8,  boostMult:1.38, boostDur:2150, color:'#c62828', kmh:90,  desc:'LRT Jakarta — Kereta ringan melayang di atas kota! Modern dan ramah lingkungan! 🌇✨' },
+      { key:'mrt',    name:'MRT Jakarta',      sub:'Indonesia 2019',       isElectric:true, bodyColor:'#37474f', accentColor:'#26c6da', baseSpeed:3.1,  boostMult:1.36, boostDur:2250, color:'#37474f', kmh:115, desc:'MRT Jakarta — Kereta bawah dan layang pertama Jakarta! Cepat dan nyaman! 🚇💨' },
+      { key:'shink',  name:'Shinkansen N700',  sub:'Jepang • JR Central',  isElectric:true, bodyColor:'#1A1A6B', accentColor:'#0077cc', baseSpeed:3.5,  boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:285, desc:'Shinkansen N700 — Peluru Jepang! Kecepatan 285 km/h membelah pegunungan Jepang! 🏔️🇯🇵' },
+      { key:'e5',     name:'Shinkansen E5',    sub:'Jepang • Hayabusa',    isElectric:true, bodyColor:'#1B4332', accentColor:'#ff69b4', baseSpeed:3.6,  boostMult:1.34, boostDur:2300, color:'#2C7043', kmh:320, desc:'Shinkansen E5 Hayabusa — Elang Hijau Jepang! 320 km/h memecah angin! 🦅💚' },
+      { key:'tgv',    name:'TGV Inouï',        sub:'Perancis • SNCF',      isElectric:true, bodyColor:'#003189', accentColor:'#e63946', baseSpeed:3.8,  boostMult:1.33, boostDur:2400, color:'#003189', kmh:320, desc:'TGV Inouï — Kebanggaan Prancis! Sempat jadi kereta tercepat dunia! 🇫🇷⚡' },
+      { key:'ice3',   name:'ICE-3',            sub:'Jerman • DB',          isElectric:true, bodyColor:'#e8e8e8', accentColor:'#e63946', baseSpeed:3.7,  boostMult:1.34, boostDur:2350, color:'#D0D0D0', kmh:300, desc:'ICE-3 — Ekspres Jerman yang elegan! Berlari 300 km/h antar kota Eropa! 🇩🇪🚄' },
+      { key:'ktx',    name:'KTX-I',            sub:'Korea Selatan • Korail', isElectric:true, bodyColor:'#0A2A7A', accentColor:'#ff6b35', baseSpeed:3.6, boostMult:1.35, boostDur:2300, color:'#0A2A7A', kmh:305, desc:'KTX-I — Peluru Korea! 305 km/h menghubungkan Seoul ke Busan hanya 2.5 jam! 🇰🇷⚡' },
+      { key:'cr400',  name:'CR400AF',          sub:'China • Fuxing',       isElectric:true, bodyColor:'#b71c1c', accentColor:'#ffc107', baseSpeed:4.0,  boostMult:1.32, boostDur:2450, color:'#b71c1c', kmh:350, desc:'CR400AF Fuxing — Kereta TERCEPAT beroperasi di dunia! 350 km/h jalur China! 🇨🇳🏆' },
+      { key:'maglev', name:'SCMaglev L0',      sub:'Jepang • Maglev',      isElectric:true, bodyColor:'#1a1a2e', accentColor:'#00f5ff', baseSpeed:4.5,  boostMult:1.30, boostDur:2600, color:'#1a1a2e', kmh:603, desc:'SCMaglev L0 — PEMEGANG REKOR DUNIA! 603 km/h! Melayang di atas rel dengan magnet superkonduktor! 🌌🚀' },
     ]
   },
 ]
@@ -11785,6 +12211,7 @@ const G14_AI_POOL = Object.values(TRAIN_TYPES_14)
 let g14State = {}
 
 function initGame14() {
+  battleBgmStop()
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
   // Clean up any leftover DOM elements from previous race
@@ -11810,7 +12237,7 @@ function initGame14() {
   }
   document.getElementById('g14-level').textContent = `Lv.${lv}`
   document.getElementById('g14-start-msg').textContent = ''
-  document.getElementById('g14-go-btn').style.display = 'none'
+  document.getElementById('g14-go-btn-wrap').style.display = 'none'
   document.getElementById('g14-result-overlay').style.display = 'none'
   document.getElementById('g14-start-overlay').style.display = 'flex'
   document.getElementById('g14-dist-bar').textContent = '0m'
@@ -11859,7 +12286,7 @@ function g14ShowTrainsForCategory(cat) {
   const backBtn = document.createElement('button')
   backBtn.style.cssText = 'width:100%;max-width:320px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;text-align:left;'
   backBtn.innerHTML = `← Kembali ke Kategori`
-  backBtn.onclick = () => { playClick(); g14RenderTrainSelect(); document.getElementById('g14-start-msg').textContent=''; document.getElementById('g14-go-btn').style.display='none' }
+  backBtn.onclick = () => { playClick(); g14RenderTrainSelect(); document.getElementById('g14-start-msg').textContent=''; document.getElementById('g14-go-btn-wrap').style.display='none' }
   wrap.appendChild(backBtn)
   const catLabel = document.createElement('div')
   catLabel.style.cssText = 'color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:4px 0;'
@@ -11874,7 +12301,11 @@ function g14ShowTrainsForCategory(cat) {
     btn.style.padding = '12px 8px'
     const previewHtml = cfg.isSteam
       ? buildSteamLocoSVG(cfg, {animate:false, width:80, height:36})
-      : `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'" style="width:80px;height:auto;display:block;margin:0 auto;">`
+      : cfg.isDiesel
+        ? buildDieselLocoSVG(cfg, {animate:false, width:80, height:36})
+        : cfg.isElectric
+          ? buildElectricLocoSVG(cfg, {animate:false, width:80, height:36})
+          : `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'" style="width:80px;height:auto;display:block;margin:0 auto;">`
     btn.innerHTML = `<div style="display:block;margin:0 auto 6px;text-align:center;height:38px;display:flex;align-items:center;justify-content:center;">${previewHtml}</div><div style="font-size:12px;font-weight:800;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.sub}</div><div style="font-size:11px;color:#FFD166;font-weight:700;margin-top:2px;">${cfg.kmh} km/h</div>`
     btn.onclick = () => {
       grid.querySelectorAll('.g14-train-select-btn').forEach(b => b.classList.remove('selected'))
@@ -11886,10 +12317,14 @@ function g14ShowTrainsForCategory(cat) {
       if (hdrWrap) {
         hdrWrap.innerHTML = cfg.isSteam
           ? buildSteamLocoSVG(cfg, {animate:false, width:54, height:24})
-          : `<img src="${cfg.svg}" alt="${cfg.name}" style="height:28px;width:auto;" onerror="this.style.display='none'">`
+          : cfg.isDiesel
+            ? buildDieselLocoSVG(cfg, {animate:false, width:54, height:24})
+            : cfg.isElectric
+              ? buildElectricLocoSVG(cfg, {animate:false, width:54, height:24})
+              : `<img src="${cfg.svg}" alt="${cfg.name}" style="height:28px;width:auto;" onerror="this.style.display='none'">`
       }
       document.getElementById('g14-start-msg').textContent = cfg.desc
-      document.getElementById('g14-go-btn').style.display = 'block'
+      document.getElementById('g14-go-btn-wrap').style.display = 'block'
       playClick()
     }
     grid.appendChild(btn)
@@ -11909,7 +12344,11 @@ function g14StartRace() {
     const cfg = g14State.trainCfg
     playerDiv.innerHTML = cfg.isSteam
       ? buildSteamLocoSVG(cfg, {animate:true, width:136, height:60})
-      : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:120px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:36px;\'>🚂</span>'">`
+      : cfg.isDiesel
+        ? buildDieselLocoSVG(cfg, {animate:true, width:136, height:60})
+        : cfg.isElectric
+          ? buildElectricLocoSVG(cfg, {animate:true, width:136, height:60})
+          : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:120px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:36px;\'>🚂</span>'">`
   }
   document.getElementById('g14-start-overlay').style.display = 'none'
   document.getElementById('g14-position').style.display = 'block'
@@ -11933,7 +12372,11 @@ function g14SpawnAI() {
     el.style.cssText = `position:absolute;z-index:4;pointer-events:none;`
     el.innerHTML = cfg.isSteam
       ? buildSteamLocoSVG(cfg, {animate:true, width:110, height:48})
-      : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:100px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:28px;\'>🚂</span>'">`
+      : cfg.isDiesel
+        ? buildDieselLocoSVG(cfg, {animate:true, width:110, height:48})
+        : cfg.isElectric
+          ? buildElectricLocoSVG(cfg, {animate:true, width:110, height:48})
+          : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:100px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:28px;\'>🚂</span>'">`
     const startX = g14State.trackW * (0.55 + i * 0.12)
     el.style.left = startX + 'px'
     el.style.top = `calc(${g14State.laneTopPct[lane]}% - 24px)`
@@ -12117,8 +12560,18 @@ function g14UpdatePlayerPos() {
   if (player) player.style.top = topPct + '%'
   const fire = document.getElementById('g14-boost-fire')
   if (fire && g14State.boosting) fire.style.top = topPct + '%'
+  if (g14State.boosting) {
+    const wfr = document.getElementById('g14-wfire-r')
+    const wff = document.getElementById('g14-wfire-f')
+    if (wfr) wfr.style.top = topPct + '%'
+    if (wff) wff.style.top = topPct + '%'
+  }
   const ind = document.getElementById('g14-lane-indicator')
   if (ind) ind.style.top = ((g14State.lane) * 33.33) + '%'
+  // Highlight active lane with neon glow
+  document.querySelectorAll('.g14-lane-row').forEach((row, i) => {
+    row.classList.toggle('active-lane', i === g14State.lane)
+  })
 }
 
 function g14Boost() {
@@ -12152,7 +12605,7 @@ function g14Boost() {
   clearTimeout(g14State.mathTimeout)
   g14State.mathTimeout = setTimeout(() => {
     document.getElementById('g14-math-popup').style.display = 'none'
-  }, 4000)
+  }, 10000)
   playClick()
 }
 
@@ -12171,7 +12624,12 @@ function g14BoostAnswer(val) {
     document.getElementById('g14-boost-btn').textContent = '🔥 BOOSTING!'
     document.getElementById('g14-boost-btn').style.opacity = '0.6'
     const fireEl = document.getElementById('g14-boost-fire')
-    if (fireEl) { fireEl.style.display = 'block'; fireEl.style.top = g14State.laneTopPct[g14State.lane] + '%' }
+    const wFireR = document.getElementById('g14-wfire-r')
+    const wFireF = document.getElementById('g14-wfire-f')
+    const lanePct = g14State.laneTopPct[g14State.lane] + '%'
+    if (fireEl) { fireEl.style.display = 'block'; fireEl.style.top = lanePct }
+    if (wFireR) { wFireR.style.display = 'block'; wFireR.style.top = lanePct }
+    if (wFireF) { wFireF.style.display = 'block'; wFireF.style.top = lanePct }
     const linesEl = document.getElementById('g14-speed-lines')
     if (linesEl) linesEl.style.display = 'block'
     playCorrect()
@@ -12180,6 +12638,8 @@ function g14BoostAnswer(val) {
       g14State.speed = origSpeed
       g14State.boosting = false
       if (fireEl) fireEl.style.display = 'none'
+      if (wFireR) wFireR.style.display = 'none'
+      if (wFireF) wFireF.style.display = 'none'
       if (linesEl) linesEl.style.display = 'none'
       document.getElementById('g14-boost-btn').textContent = '⏳ Cooldown...'
       document.getElementById('g14-boost-ready').style.display = 'none'
@@ -12262,6 +12722,7 @@ const G15_WORDS = {
 let g15State = {}
 
 function initGame15() {
+  battleBgmStop()
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
   const totalChains = diff === 'easy' ? 4 : diff === 'medium' ? 5 : 6
@@ -12405,6 +12866,7 @@ const G16_WORDS = {
 let g16State = {}
 
 function initGame16() {
+  battleBgmStop()
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
   g16State = {
@@ -12641,6 +13103,7 @@ function g16EndGame(won) {
 let g17State = {}
 
 function initGame17() {
+  battleBgmStop()
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
   const totalBlocks = diff === 'easy' ? 8 : diff === 'medium' ? 10 : 12
@@ -12814,8 +13277,11 @@ function g17EndGame(won) {
     const trainEl = document.getElementById('g17-train-waiting')
     const steamCfg = { isSteam:true, tender:true, rack:false, bodyColor:'#1a1a2e', wheelColor:'#0d0d1a' }
     trainEl.innerHTML = buildSteamLocoSVG(steamCfg, {animate:true, width:120, height:54})
+    // Snap off transition so bottom change doesn't cause diagonal slide
+    trainEl.style.transition = 'none'
     trainEl.style.position = 'absolute'
-    trainEl.style.bottom = '18%'
+    trainEl.style.bottom = '44%'
+    void trainEl.offsetWidth  // reflow to apply snap
     trainEl.classList.add('g17-train-cross')
     playCorrect()
   }
@@ -12845,98 +13311,187 @@ function g17EndGame(won) {
 // GAME 18 — MUSEUM KERETA AMBARAWA 🏛️
 // Koleksi Museum Kereta Api Ambarawa + kereta-kereta terkenal dunia
 // ============================================================
+// G18 inline SVG builder — context-aware for museum gallery
+function g18TrainSVG(t, w, h) {
+  if (t.isSteam) return buildSteamLocoSVG(t, {animate:false, width:w||120, height:h||52})
+  if (t.isDiesel) return buildDieselLocoSVG(t, {animate:false, width:w||120, height:h||52})
+  if (t.isElectric) return buildElectricLocoSVG(t, {animate:false, width:w||120, height:h||52})
+  return `<span style="font-size:40px;line-height:1;">${t.emoji}</span>`
+}
+
 const G18_TRAINS = [
   // ── KOLEKSI MUSEUM KERETA API AMBARAWA ──
   {
-    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'B2507 — Kereta Bergerigi', country:'🇮🇩 Ambarawa', year:1902,
-    fuel:'Batubara (Uap)', speed:30, type:'Lokomotif Rack (Bergerigi)',
+    emoji:'🚂', name:'B 2507 — Kereta Bergerigi', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1902,
+    fuel:'Batubara (Uap)', speed:30, type:'Lokomotif Rack (Bergerigi)', builder:'SLM Swiss', axles:'B-B',
+    isSteam:true, rack:true, tender:false, bodyColor:'#1a1a2e', wheelColor:'#0d0d1a',
     fact:'Bintang utama Museum Ambarawa! B2507 dibuat di Swiss oleh SLM tahun 1902. Punya roda BERGERIGI (cogwheel) khusus untuk mendaki gunung terjal — salah satu dari sedikit kereta rack yang masih ada di dunia! ⛰️',
+    funFact:'🏔️ Jalur B2507 punya tanjakan 65‰ — artinya naik 65 meter setiap 1 km! Sangat curam!',
+    route:'Ambarawa ↔ Bedono via Jambu',
     quizHint:'kereta bergerigi pendaki gunung di Ambarawa'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb303-indonesia.svg', name:'B2521 — Rack Ambarawa-Bedono', country:'🇮🇩 Ambarawa', year:1912,
-    fuel:'Batubara (Uap)', speed:25, type:'Lokomotif Uap Bergerigi',
-    fact:'B2521 melayani jalur Ambarawa–Bedono yang sangat terjal melewati perkebunan kopi dan teh dengan pemandangan Gunung Merbabu! Jalur bergigi ini punya kemiringan 65‰ — sangat curam! 🌋',
+    emoji:'🚂', name:'B 2521 — Rack Ambarawa-Bedono', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1912,
+    fuel:'Batubara (Uap)', speed:25, type:'Lokomotif Uap Bergerigi', builder:'SLM Swiss',
+    isSteam:true, rack:true, tender:false, bodyColor:'#0d2a0d', wheelColor:'#061606',
+    fact:'B2521 melayani jalur Ambarawa–Bedono yang sangat terjal! Melewati perkebunan kopi dan teh di kaki Gunung Merbabu. Kemiringan jalurnya 65‰ — salah satu yang terextrim di dunia! 🌋',
+    funFact:'☕ Jalur ini dulu dipakai untuk mengangkut hasil perkebunan kopi & teh ke kota!',
+    route:'Ambarawa ↔ Bedono (tanjakan curam)',
     quizHint:'kereta rack jalur Ambarawa-Bedono gunung'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'C5107 — Lok Uap Kolonial', country:'🇮🇩 Ambarawa', year:1921,
-    fuel:'Batubara (Uap)', speed:80, type:'Lokomotif Uap Tender',
-    fact:'C5107 buatan Hartmann, Jerman (1921). Dipakai di era Hindia Belanda untuk penumpang & hasil perkebunan. Kini jadi bintang Kereta Wisata Ambarawa–Tuntang yang bisa kamu naiki! ☕',
+    emoji:'🚂', name:'C 5107 — Lok Tender Kolonial', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1921,
+    fuel:'Batubara (Uap)', speed:60, type:'Lokomotif Uap Tender', builder:'Hartmann, Jerman',
+    isSteam:true, rack:false, tender:true, bodyColor:'#0f0f0f', wheelColor:'#050505',
+    fact:'C5107 buatan pabrik Hartmann, Jerman (1921). Di era Hindia Belanda, mengangkut penumpang & hasil bumi. Kini jadi bintang Kereta Wisata Ambarawa–Tuntang yang masih beroperasi! ☕🚂',
+    funFact:'🎉 Kamu bisa naiki kereta wisata ini! Rute Ambarawa–Tuntang sejauh ±5 km!',
+    route:'Ambarawa ↔ Tuntang (kereta wisata)',
     quizHint:'kereta wisata uap Ambarawa-Tuntang'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'D1415 — Tender Steam Hanomag', country:'🇮🇩 Ambarawa', year:1908,
-    fuel:'Batubara (Uap)', speed:70, type:'Lokomotif Uap Tender',
-    fact:'D1415 dibuat oleh Hanomag, Jerman tahun 1908. Punya tangki air besar (tender) di belakang untuk perjalanan panjang. Dulu mengangkut gula, kopi, dan teh dari perkebunan Jawa! 💨',
+    emoji:'🚂', name:'D 1415 — Tender Hanomag', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1908,
+    fuel:'Batubara (Uap)', speed:55, type:'Lokomotif Uap Tender', builder:'Hanomag, Jerman',
+    isSteam:true, rack:false, tender:true, bodyColor:'#2a1a0a', wheelColor:'#150a00',
+    fact:'D1415 buatan Hanomag, Jerman 1908. Punya tangki air besar (tender) di belakang untuk perjalanan panjang. Dulu mengangkut gula, kopi, dan teh dari perkebunan Jawa! 💨🌿',
+    funFact:'🪨 Tender di belakangnya menyimpan batubara untuk 5–6 jam perjalanan!',
+    route:'Jalur pegunungan Jawa Tengah',
     quizHint:'kereta uap dengan tender besar di belakang'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'C1218 — Lokomotif Tertua RI', country:'🇮🇩 Ambarawa', year:1891,
-    fuel:'Batubara (Uap)', speed:60, type:'Lokomotif Tank Uap',
-    fact:'C1218 adalah salah satu lokomotif TERTUA di Indonesia! Dibuat oleh Beyer Peacock, Inggris pada 1891 — sudah lebih dari 130 tahun! Terawat sangat baik di Museum Ambarawa. Luar biasa! 🎩',
+    emoji:'🚂', name:'C 1218 — Lokomotif Tertua RI', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1891,
+    fuel:'Batubara (Uap)', speed:50, type:'Lokomotif Tank Uap', builder:'Beyer Peacock, Inggris',
+    isSteam:true, rack:false, tender:false, bodyColor:'#4a1515', wheelColor:'#2a0808',
+    fact:'C1218 adalah salah satu lokomotif TERTUA di Indonesia! Buatan Beyer Peacock, Inggris 1891 — sudah 130+ tahun! Masih terawat baik di Museum Ambarawa. Luar biasa! 🎩👑',
+    funFact:'📅 C1218 dibuat saat Indonesia masih bernama Hindia Belanda dan Presiden Soekarno belum lahir!',
+    route:'Berbagai jalur Jawa era kolonial',
     quizHint:'lokomotif tertua 1891 di Indonesia'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb303-indonesia.svg', name:'B2801 — Rack SLM Swiss', country:'🇮🇩 Ambarawa', year:1907,
-    fuel:'Batubara (Uap)', speed:28, type:'Lokomotif Rack Gunung',
-    fact:'B2801 buatan Swiss Locomotive Works (SLM) 1907. Mesin uap dan gigi bergabung untuk menaklukkan tanjakan 65‰ — naik 65 meter setiap 1000 meter! Salah satu tanjakan kereta terextrim! 😱',
+    emoji:'🚂', name:'B 2801 — Rack SLM Merbabu', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1907,
+    fuel:'Batubara (Uap)', speed:28, type:'Lokomotif Rack Gunung', builder:'SLM Swiss',
+    isSteam:true, rack:true, tender:false, bodyColor:'#0a1f0a', wheelColor:'#051005',
+    fact:'B2801 buatan Swiss Locomotive Works 1907. Mesin uap + roda gigi bergabung menaklukkan tanjakan 65‰ — naik 65 meter setiap 1 km! Satu-satunya di dunia yang masih beroperasi tourist! 😱⛰️',
+    funFact:'🇨🇭 SLM (Swiss Locomotive Works) juga membuat kereta gunung terkenal di Alpen Swiss!',
+    route:'Ambarawa ↔ Bedono (wisata gunung)',
     quizHint:'kereta rack Swiss tanjakan paling curam'
   },
   {
-    emoji:'🚃', svg:'assets/train/cc201-indonesia.svg', name:'CC200 — Setan Ijo', country:'🇮🇩 Indonesia', year:1953,
-    fuel:'Solar (Diesel)', speed:120, type:'Lokomotif Diesel Elektrik',
-    fact:'CC200 adalah lokomotif diesel PERTAMA Indonesia! Dibuat General Electric (GE), Amerika 1953. Para masinis menjulukinya "Setan Ijo" karena cat hijau dan tenaganya dahsyat! Revolusi perkeretaapian Indonesia! 🦾',
+    emoji:'🚂', name:'B 2503 — Rack Pionir', country:'🇮🇩 Ambarawa, Jawa Tengah', year:1898,
+    fuel:'Batubara (Uap)', speed:22, type:'Lokomotif Rack Tua', builder:'SLM Swiss',
+    isSteam:true, rack:true, tender:false, bodyColor:'#1a0f00', wheelColor:'#0d0700',
+    fact:'B2503 adalah lokomotif rack tertua di koleksi Ambarawa! Dibuat SLM Swiss 1898, sudah 125+ tahun! Generasi pertama kereta bergigi di Indonesia yang membuka jalur gunung! 🎖️',
+    funFact:'🌄 Tanpa B2503 dan kawan-kawannya, kawasan Bedono & Jambu sulit dijangkau di era kolonial!',
+    route:'Ambarawa ↔ Bedono (jalur historis)',
+    quizHint:'lokomotif rack tertua Ambarawa 1898'
+  },
+  {
+    emoji:'🚂', name:'C 28 — Biru Malam Kolonial', country:'🇮🇩 Jawa', year:1920,
+    fuel:'Batubara (Uap)', speed:70, type:'Lokomotif Tender Cepat', builder:'Hartmann, Jerman',
+    isSteam:true, rack:false, tender:true, bodyColor:'#0f1540', wheelColor:'#070a25',
+    fact:'Kelas C28 Hindia Belanda 1920! Cat biru malam yang elegan di jalur perbukitan. Lokomotif ini melayani penumpang kelas satu — para tuan tanah dan pejabat Belanda! 🌙👒',
+    funFact:'💼 Dulu ada gerbong kelas 1 (pejabat Belanda), kelas 2 (pedagang), dan kelas 3 (rakyat biasa)!',
+    route:'Jalur Priangan & Jawa Tengah',
+    quizHint:'kereta biru malam C28 Hindia Belanda'
+  },
+  {
+    emoji:'🚃', name:'CC 200 — Setan Ijo', country:'🇮🇩 Indonesia', year:1953,
+    fuel:'Solar (Diesel)', speed:120, type:'Lokomotif Diesel Elektrik', builder:'General Electric, Amerika',
+    isDiesel:true, bodyColor:'#1a3a1a', accentColor:'#22c55e',
+    fact:'CC200 adalah lokomotif diesel PERTAMA Indonesia! General Electric, Amerika 1953. Masinis menjuluki "Setan Ijo" karena cat hijau dan tenaganya dahsyat! Revolusi kereta Indonesia! 🦾🇺🇸',
+    funFact:'🟢 "Setan Ijo" artinya Setan Hijau — para masinis takjub dengan kekuatan mesin GE yang luar biasa!',
+    route:'Jakarta ↔ Surabaya (ekspres awal)',
     quizHint:'diesel pertama Indonesia Setan Ijo GE'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb303-indonesia.svg', name:'E1060 — Lok Listrik 1924', country:'🇮🇩 Indonesia', year:1924,
-    fuel:'Listrik', speed:90, type:'Lokomotif Listrik Antik',
-    fact:'E1060 membuktikan Indonesia sudah punya kereta LISTRIK sejak 1924! Lebih dari 100 tahun lalu! Kini jadi koleksi langka di Ambarawa yang sangat berharga dan jarang ada di dunia! ⚡',
+    emoji:'🚂', name:'E 1060 — Listrik Antik 1924', country:'🇮🇩 Indonesia', year:1924,
+    fuel:'Listrik', speed:90, type:'Lokomotif Listrik Antik', builder:'Belanda',
+    isElectric:true, bodyColor:'#1a1a4a', accentColor:'#ffd700',
+    fact:'E1060 membuktikan Indonesia sudah punya kereta LISTRIK sejak 1924 — 100 tahun lalu! Kini jadi koleksi langka di Ambarawa yang sangat berharga. Jarang sekali ada di dunia! ⚡🏆',
+    funFact:'💡 Jalur listrik pertama Indonesia: Batavia (Jakarta) – Buitenzorg (Bogor) 1925!',
+    route:'Jalur listrik Batavia era kolonial',
     quizHint:'kereta listrik antik Indonesia 1924'
   },
   {
-    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'Kereta Wisata Ambarawa', country:'🇮🇩 Ambarawa', year:2000,
-    fuel:'Batubara (Uap)', speed:30, type:'Kereta Wisata Heritage',
-    fact:'Kereta Wisata Ambarawa melayani rute Ambarawa–Tuntang ±5 km dengan lokomotif uap tua yang MASIH JALAN! Kamu bisa naik dan merasakan asap dan suara "tur...tut!" seperti zaman dulu! ☁️🎉',
+    emoji:'🚂', name:'B 50 — Si Tua Jawa', country:'🇮🇩 Jawa', year:1880,
+    fuel:'Batubara (Uap)', speed:45, type:'Lokomotif Tank Tua', builder:'Krupp, Jerman',
+    isSteam:true, rack:false, tender:false, bodyColor:'#2a1e08', wheelColor:'#150f00',
+    fact:'B50 buatan Krupp Jerman 1880-an! Salah satu lokomotif tertua di Jawa. Lambat tapi legendaris — membangun fondasi perkeretaapian Indonesia di era awal kolonial! 🦕🎖️',
+    funFact:'⛏️ Jalur kereta pertama Indonesia dibuka 1867 rute Semarang–Tanggung, hanya 25 km!',
+    route:'Jalur Semarang & Jawa Tengah awal',
+    quizHint:'kereta tua B50 Krupp Jerman 1880'
+  },
+  {
+    emoji:'🚂', name:'Kereta Wisata Ambarawa', country:'🇮🇩 Ambarawa', year:2000,
+    fuel:'Batubara (Uap)', speed:30, type:'Kereta Wisata Heritage', builder:'Gabungan lok tua',
+    isSteam:true, rack:false, tender:true, bodyColor:'#5D3A1A', wheelColor:'#3a2010',
+    fact:'Kereta Wisata Ambarawa masih beroperasi menggunakan lokomotif uap tua! Rute Ambarawa–Tuntang ±5 km melewati sawah dan danau. Kamu bisa naiki dan rasakan serunya! ☁️🎉🚂',
+    funFact:'📸 Inilah satu-satunya jalur kereta bergigi yang masih aktif untuk wisata di Asia Tenggara!',
+    route:'Ambarawa ↔ Tuntang (wisata aktif)',
     quizHint:'kereta wisata uap yang bisa dinaiki'
   },
-  // ── KERETA TERKENAL DUNIA (untuk perbandingan) ──
+  // ── KERETA TERKENAL DUNIA ──
   {
-    emoji:'🚅', svg:'assets/train/shinkansen-n700.svg', name:'Shinkansen N700', country:'🇯🇵 Jepang', year:2007,
-    fuel:'Listrik', speed:320, type:'Kereta Cepat',
-    fact:'Shinkansen dijuluki "Peluru" karena hidungnya seperti peluru! Tepat waktu hingga detik — keterlambatan rata-rata hanya 36 detik setahun! Dibanding kereta uap Ambarawa, 10× lebih cepat! ⚡',
+    emoji:'🚅', name:'Shinkansen N700 — Peluru Jepang', country:'🇯🇵 Jepang', year:2007,
+    fuel:'Listrik', speed:320, type:'Kereta Cepat (Shinkansen)', builder:'Kawasaki Heavy Industries',
+    isElectric:true, bodyColor:'#1A1A6B', accentColor:'#0077cc',
+    fact:'Shinkansen dijuluki "Peluru" karena hidungnya seperti peluru! Tepat waktu hingga detik — keterlambatan rata-rata hanya 36 detik per tahun! Dibanding B2507 Ambarawa, 10× lebih cepat! ⚡🇯🇵',
+    funFact:'⏱️ Jika keterlambatan >1 menit, perusahaan minta MAAF resmi dan memberi surat keterlambatan!',
+    route:'Tokyo ↔ Osaka (515 km, 2,5 jam)',
     quizHint:'kereta peluru Jepang 320 km/jam'
   },
   {
-    emoji:'🚃', svg:'assets/train/cc203-indonesia.svg', name:'Argo Bromo Anggrek', country:'🇮🇩 Indonesia', year:1997,
-    fuel:'Solar (Diesel)', speed:120, type:'Kereta Ekspress',
-    fact:'Kereta ekspress terbaik Indonesia! Jakarta–Surabaya ±9 jam. Dinamai Gunung Bromo. Dibanding B2507 yang 30 km/jam, ini 4× lebih cepat dan tidak perlu bergigi! 🌋',
-    quizHint:'kereta ekspress Jakarta-Surabaya'
+    emoji:'🚃', name:'Argo Bromo Anggrek', country:'🇮🇩 Indonesia', year:1997,
+    fuel:'Solar (Diesel)', speed:120, type:'Kereta Ekspress', builder:'INKA Indonesia',
+    isDiesel:true, bodyColor:'#0a1a3a', accentColor:'#f59e0b',
+    fact:'Kereta ekspress terbaik Indonesia! Jakarta–Surabaya ±9 jam. Dinamai Gunung Bromo. CC204 sebagai lokomotifnya — 4× lebih cepat dari B2507 Ambarawa! 🌋🏆',
+    funFact:'🇮🇩 Gerbong keretanya buatan INKA di Madiun, Jawa Timur! Bangga produk lokal!',
+    route:'Jakarta Gambir ↔ Surabaya Gubeng',
+    quizHint:'kereta ekspress Jakarta-Surabaya Argo Bromo'
   },
   {
-    emoji:'🚄', svg:'assets/train/commuter-line-krl.svg', name:'KRL Commuter Jabodetabek', country:'🇮🇩 Indonesia', year:2013,
-    fuel:'Listrik', speed:100, type:'Kereta Listrik',
-    fact:'KRL mengangkut lebih dari 1 JUTA penumpang SETIAP HARI! Tanpa asap dan ramah lingkungan. Beda sekali dengan lokomotif uap Ambarawa yang butuh batubara berkeranjang-keranjang! 🌿',
-    quizHint:'kereta listrik 1 juta penumpang sehari'
+    emoji:'🚄', name:'KRL Commuter Jabodetabek', country:'🇮🇩 Indonesia', year:2013,
+    fuel:'Listrik', speed:100, type:'Kereta Listrik Komuter', builder:'Tokyu/Kawasaki (bekas Jepang)',
+    isElectric:true, bodyColor:'#0D47A1', accentColor:'#e53935',
+    fact:'KRL mengangkut lebih dari 1 JUTA penumpang SETIAP HARI! Tanpa asap dan ramah lingkungan. Beda sekali dengan B2507 Ambarawa yang butuh batubara berkeranjang-keranjang! 🌿💙',
+    funFact:'♻️ KRL yang beroperasi di Jakarta dulunya adalah kereta bekas Jepang yang direkondisi ulang!',
+    route:'Bogor/Bekasi/Tangerang ↔ Jakarta',
+    quizHint:'kereta listrik 1 juta penumpang sehari Jabodetabek'
   },
   {
-    emoji:'🚄', svg:'assets/train/tgv-inoui.svg', name:'TGV', country:'🇫🇷 Perancis', year:1981,
-    fuel:'Listrik', speed:574, type:'Kereta Cepat',
-    fact:'TGV rekor dunia kereta konvensional — 574 km/jam! Hampir secepat pesawat! Bayangkan: kalau Ambarawa ke Jakarta ±350km, TGV cuma butuh 37 menit, kereta uap butuh 4+ jam! 🚀',
-    quizHint:'kereta tercepat Perancis 574 km/jam'
+    emoji:'🚄', name:'TGV — Kereta Cepat Prancis', country:'🇫🇷 Perancis', year:1981,
+    fuel:'Listrik (Nuklir)', speed:574, type:'Train à Grande Vitesse', builder:'Alstom, Perancis',
+    isElectric:true, bodyColor:'#003189', accentColor:'#e63946',
+    fact:'TGV rekor dunia kereta konvensional — 574 km/jam! Hampir secepat pesawat! Ambarawa ke Jakarta ±350 km: TGV 37 menit, kereta uap Ambarawa 4+ jam! 🚀🇫🇷',
+    funFact:'⚛️ Listrik TGV berasal dari energi nuklir Prancis — hijau dan sangat bertenaga!',
+    route:'Paris ↔ Lyon (400 km, 2 jam)',
+    quizHint:'kereta tercepat konvensional Perancis 574 km/jam'
   },
   {
-    emoji:'🚇', svg:'assets/train/stadler-flirt.svg', name:'MRT Jakarta', country:'🇮🇩 Indonesia', year:2019,
-    fuel:'Listrik', speed:80, type:'Mass Rapid Transit',
-    fact:'MRT Jakarta adalah kereta bawah tanah PERTAMA Indonesia! Dibangun 10+ tahun, melewati 16 stasiun. Beda dengan B2507 yang mendaki gunung, MRT Jakarta malah menyelam ke bawah tanah! 🏙️',
-    quizHint:'kereta bawah tanah pertama Indonesia'
+    emoji:'🚇', name:'MRT Jakarta — Kereta Bawah Tanah', country:'🇮🇩 Indonesia', year:2019,
+    fuel:'Listrik', speed:80, type:'Mass Rapid Transit', builder:'Sumitomo, Jepang',
+    isElectric:true, bodyColor:'#37474f', accentColor:'#26c6da',
+    fact:'MRT Jakarta adalah kereta bawah tanah PERTAMA Indonesia! 16 stasiun, dibangun 10+ tahun. Beda dengan B2507 mendaki gunung, MRT justru menyelam ke bawah tanah kota! 🏙️🚇',
+    funFact:'🔭 Stasiun MRT terdalam di Jakarta sampai 26 meter di bawah tanah — sedalam gedung 8 lantai!',
+    route:'Lebak Bulus ↔ Bundaran HI (16 km)',
+    quizHint:'kereta bawah tanah pertama Indonesia MRT'
   },
   {
-    emoji:'🚅', svg:'assets/train/shinkansen-n700s.svg', name:'SCMaglev — Kereta Magnet', country:'🇯🇵 Jepang', year:2015,
-    fuel:'Magnet (Superkonduktor)', speed:603, type:'Maglev',
-    fact:'SCMaglev tidak MENYENTUH REL sama sekali — melayang di atas magnet! 603 km/jam, rekor dunia! Kebalikan dari B2507 yang butuh bergigi agar tidak tergelincir! Teknologi masa depan! 🧲',
-    quizHint:'kereta magnet melayang tercepat dunia'
+    emoji:'🚅', name:'SCMaglev L0 — Kereta Magnet', country:'🇯🇵 Jepang', year:2015,
+    fuel:'Magnet Superkonduktor', speed:603, type:'Maglev (Kereta Melayang)', builder:'JR Central, Jepang',
+    isElectric:true, bodyColor:'#1a1a2e', accentColor:'#00f5ff',
+    fact:'SCMaglev L0 tidak menyentuh rel sama sekali — melayang di atas magnet! 603 km/jam, rekor dunia! Kebalikan B2507 yang bergigi agar tidak tergelincir. Teknologi masa depan! 🧲🚀',
+    funFact:'🌡️ Magnet superkonduktor butuh didinginkan hingga −269°C — lebih dingin dari luar angkasa!',
+    route:'Tokyo ↔ Nagoya (target 2027, 40 menit)',
+    quizHint:'kereta magnet melayang tercepat dunia 603 km/jam'
+  },
+  {
+    emoji:'🚄', name:'CR400 Fuxing — Kereta Tercepat Beroperasi', country:'🇨🇳 China', year:2017,
+    fuel:'Listrik', speed:350, type:'High-Speed Rail', builder:'CRRC, China',
+    isElectric:true, bodyColor:'#b71c1c', accentColor:'#ffc107',
+    fact:'CR400 Fuxing adalah kereta penumpang TERCEPAT yang beroperasi reguler di dunia! 350 km/h setiap hari. China kini punya >40.000 km jalur HSR — lebih panjang dari keliling bumi! 🇨🇳🏆',
+    funFact:'🌏 Nama "Fuxing" artinya "Kebangkitan" — simbol kemajuan teknologi China modern!',
+    route:'Beijing ↔ Shanghai (1318 km, 4,5 jam)',
+    quizHint:'kereta terkencang beroperasi Fuxing China 350 km/jam'
   }
 ]
 
@@ -13009,6 +13564,118 @@ const G18_QUESTIONS_BANK = [
   { q:'Kenapa kereta lebih ramah lingkungan daripada pesawat?', emoji:'🌿', answers:['Mengangkut banyak orang dengan bahan bakar lebih sedikit','Bisa terbang tanpa emisi','Kereta tidak menggunakan bahan bakar','Kereta berjalan lebih lambat'], correct:0 },
   { q:'Apa nama baju resmi masinis kereta api?', emoji:'👔', answers:['Seragam masinis','Jas pesta','Baju renang','Baju olahraga'], correct:0 },
   { q:'Museum Ambarawa menyimpan kereta-kereta bersejarah agar?', emoji:'🏛️', answers:['Kita bisa belajar sejarah dan menghargai kereta lama','Kereta bisa berlomba','Kereta bisa dijual kembali','Kereta bisa dipakai masak'], correct:0 },
+
+  // === BAGIAN KERETA INDONESIA ===
+  { q:'Apa nama kereta komuter paling terkenal di Jakarta?', emoji:'🚆', answers:['KRL Commuter Line','Kereta Naga','Bus Kota Express','MRT Tanah Abang'], correct:0 },
+  { q:'KRL singkatan dari apa?', emoji:'⚡', answers:['Kereta Rel Listrik','Kereta Rel Lama','Kereta Roda Listrik','Kereta Rel Laut'], correct:0 },
+  { q:'MRT di Jakarta berjalan di atas dan di bawah apa?', emoji:'🚇', answers:['Di atas jalan (layang) dan di bawah tanah','Hanya di bawah tanah','Hanya di atas air','Di atas pegunungan'], correct:0 },
+  { q:'Lokomotif CC 201 adalah kereta jenis apa?', emoji:'🚂', answers:['Lokomotif diesel','Kereta uap','Kereta listrik','Kereta magnet'], correct:0 },
+  { q:'Kereta mana yang melayani rute Jakarta–Surabaya paling cepat?', emoji:'🏎️', answers:['Kereta Argo Bromo Anggrek','Kereta Barang','KRL Commuter','Kereta Gigi'], correct:0 },
+  { q:'PT KAI singkatan dari apa?', emoji:'🇮🇩', answers:['Kereta Api Indonesia','Kereta Angkut Indonesia','Kendaraan Antar Indonesia','Kapal Angkut Indonesia'], correct:0 },
+  { q:'LRT adalah singkatan dari?', emoji:'🚈', answers:['Light Rail Transit','Large Rail Train','Long Route Track','Light Road Train'], correct:0 },
+  { q:'Stasiun kereta terbesar dan terkenal di Jakarta adalah?', emoji:'🏛️', answers:['Stasiun Gambir','Stasiun Ambarawa','Stasiun Bogor','Stasiun Bandung'], correct:0 },
+  { q:'Kereta Argo dalam bahasa Indonesia berarti apa?', emoji:'⛰️', answers:['Gunung','Laut','Sungai','Angin'], correct:0 },
+  { q:'Berapakah kelas pelayanan utama kereta penumpang di Indonesia?', emoji:'🎫', answers:['Tiga kelas: Eksekutif, Bisnis, Ekonomi','Satu kelas saja','Dua kelas saja','Lima kelas'], correct:0 },
+  { q:'Jalur kereta api pertama di Indonesia dibangun oleh siapa?', emoji:'📜', answers:['Pemerintah Belanda','Pemerintah Jepang','Pemerintah Indonesia','Pemerintah Inggris'], correct:0 },
+  { q:'Kota mana yang terkenal dengan wisata kereta uap Ambarawa?', emoji:'🗺️', answers:['Ambarawa, Jawa Tengah','Yogyakarta','Surabaya','Medan'], correct:0 },
+  { q:'Kereta wisata Ambarawa terkenal karena bisa mendaki bukit dengan apa?', emoji:'⚙️', answers:['Rel bergerigi di tengah rel','Roda yang sangat besar','Mesin jet','Baling-baling di bawah'], correct:0 },
+  { q:'Di kota mana ada kereta gantung/cable car terkenal di Indonesia?', emoji:'🚡', answers:['Puncak, Jawa Barat','Bali','Lombok','Medan'], correct:0 },
+  { q:'Lokomotif D 301 adalah kereta uap yang berjalan di atas rel dengan lebar berapa?', emoji:'📏', answers:['1067 mm (rel sempit)','1435 mm (rel standar)','500 mm (rel mini)','2000 mm (rel lebar)'], correct:0 },
+
+  // === BAGIAN SAINS KERETA ===
+  { q:'Mengapa roda kereta dan rel terbuat dari besi/baja?', emoji:'🔩', answers:['Karena besi sangat keras dan tahan lama','Karena besi murah sekali','Karena besi bisa mengapung','Karena besi ringan'], correct:0 },
+  { q:'Bagaimana kereta bisa berhenti jika tidak ada rem?', emoji:'🛑', answers:['Tidak bisa, makanya kereta pasti punya rem!','Dengan menabrak tembok','Dengan melompat dari rel','Dengan terbang ke atas'], correct:0 },
+  { q:'Kenapa rel kereta ada jarak kecil di setiap sambungannya?', emoji:'🌡️', answers:['Supaya rel bisa memuai saat panas tanpa melengkung','Supaya terlihat indah','Supaya lebih murah','Supaya kereta bisa melompat'], correct:0 },
+  { q:'Apa yang dimaksud dengan "trek lurus" pada rel kereta?', emoji:'📐', answers:['Jalur rel yang tidak memiliki tikungan','Rel yang sangat pendek','Rel untuk kereta tua','Rel yang bergelombang'], correct:0 },
+  { q:'Kereta Maglev bisa sangat cepat karena tidak ada apa?', emoji:'🧲', answers:['Tidak ada gesekan antara roda dan rel','Tidak ada penumpang','Tidak ada bahan bakar','Tidak ada masinis'], correct:0 },
+  { q:'Apa yang terjadi jika rel kereta terlalu panas?', emoji:'🌞', answers:['Rel bisa melengkung dan berbahaya','Kereta menjadi lebih cepat','Rel berubah warna menjadi merah','Kereta bisa terbang'], correct:0 },
+  { q:'Mengapa kereta lebih hemat bahan bakar daripada mobil?', emoji:'🌿', answers:['Karena satu kereta bisa angkut ratusan orang sekaligus','Karena kereta lebih kecil','Karena kereta tidak butuh energi','Karena kereta berjalan lebih pelan'], correct:0 },
+  { q:'Sistem pengereman kereta modern menggunakan apa?', emoji:'💨', answers:['Rem udara (pneumatik)','Rem tangan biasa','Air panas','Magnet saja'], correct:0 },
+  { q:'Apa yang dimaksud dengan "wesel" pada rel kereta?', emoji:'🔀', answers:['Alat untuk memindahkan kereta ke jalur lain','Nama masinis','Jenis bahan bakar','Bagian dari gerbong'], correct:0 },
+  { q:'Kereta dapat mengangkut banyak barang berat karena apa?', emoji:'💪', answers:['Karena gesekan roda besi di rel besi sangat kecil','Karena kereta punya sayap','Karena kereta terbuat dari plastik ringan','Karena kereta punya 100 roda'], correct:0 },
+  { q:'Panton atau "pantograph" pada kereta listrik berfungsi apa?', emoji:'⚡', answers:['Mengambil listrik dari kawat di atas kepala','Sebagai antena TV','Untuk memberi sinyal ke penumpang','Sebagai rem darurat'], correct:0 },
+  { q:'Apa itu "sinyal semaphore" yang digunakan di zaman kereta dulu?', emoji:'🚦', answers:['Alat sinyal berlengan yang memberi tanda aman atau bahaya','Nama stasiun di Jawa','Jenis kereta uap','Bahan bakar kereta'], correct:0 },
+  { q:'Mengapa kereta cepat (HSR) memiliki hidung yang sangat runcing?', emoji:'🔺', answers:['Supaya bisa membelah angin dengan lebih mudah','Supaya terlihat keren','Supaya bisa dipakai sebagai senjata','Supaya bisa mengangkut lebih banyak penumpang'], correct:0 },
+  { q:'Apa yang terjadi saat dua kereta bertemu di jalur yang sama dan berlawanan arah?', emoji:'😱', answers:['Sangat berbahaya! Itu sebabnya ada sistem sinyal khusus','Kereta saling melompati','Salah satu kereta terbang','Tidak mungkin terjadi'], correct:0 },
+  { q:'Apa nama alat yang mengukur kecepatan kereta?', emoji:'🖥️', answers:['Speedometer/tachometer','Termometer','Barometer','Kompas'], correct:0 },
+
+  // === BAGIAN KERETA DUNIA ===
+  { q:'Negara mana yang memiliki jaringan kereta cepat (HSR) terpanjang di dunia?', emoji:'🌏', answers:['China','Jepang','Prancis','Jerman'], correct:0 },
+  { q:'Kereta ICE yang terkenal berasal dari negara mana?', emoji:'🇩🇪', answers:['Jerman','Italia','Spanyol','Belgia'], correct:0 },
+  { q:'Kereta KTX berasal dari negara mana?', emoji:'🇰🇷', answers:['Korea Selatan','Korea Utara','Jepang','Taiwan'], correct:0 },
+  { q:'Apa nama kereta cepat terbaru China yang bisa melampaui 350 km/jam?', emoji:'🚄', answers:['CR400 Fuxing','Shinkansen N700','TGV Duplex','ICE 4'], correct:0 },
+  { q:'Trans-Siberia Railway adalah rute kereta terpanjang di dunia. Ada di negara mana?', emoji:'🇷🇺', answers:['Rusia','Amerika','Australia','India'], correct:0 },
+  { q:'Kereta Orient Express yang terkenal di buku cerita melayani rute di mana?', emoji:'🌍', answers:['Eropa (dari Paris ke Istanbul)','Asia (dari Tokyo ke Beijing)','Afrika (dari Kairo ke Capetown)','Amerika (dari New York ke Los Angeles)'], correct:0 },
+  { q:'Berapa kira-kira kecepatan maksimum Shinkansen saat ini?', emoji:'🚄', answers:['Sekitar 320 km/jam','Sekitar 100 km/jam','Sekitar 500 km/jam','Sekitar 50 km/jam'], correct:0 },
+  { q:'Apa nama stasiun kereta paling sibuk di dunia yang ada di Jepang?', emoji:'🏙️', answers:['Stasiun Shinjuku, Tokyo','Stasiun Grand Central, New York','Stasiun Waterloo, London','Stasiun Gare du Nord, Paris'], correct:0 },
+  { q:'Eurostar adalah kereta yang melintas di bawah laut antara negara mana?', emoji:'🌊', answers:['Inggris dan Prancis','Amerika dan Kanada','Jepang dan Korea','Swedia dan Denmark'], correct:0 },
+  { q:'Kereta yang terkenal melewati pegunungan Alpen ada di negara mana?', emoji:'🏔️', answers:['Swiss','Brasil','Australia','Meksiko'], correct:0 },
+  { q:'Negara manakah yang pertama kali membuat kereta uap di dunia?', emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', answers:['Inggris','Amerika','Prancis','Jerman'], correct:0 },
+  { q:'Siapa penemu lokomotif uap pertama yang terkenal?', emoji:'👨‍🔬', answers:['George Stephenson','Albert Einstein','Thomas Edison','James Watt'], correct:0 },
+  { q:'Tahun berapa kereta uap pertama kali berjalan di lintasan penumpang?', emoji:'📅', answers:['Tahun 1825','Tahun 1900','Tahun 1750','Tahun 1950'], correct:0 },
+  { q:'Kereta Swiss yang terkenal melewati pegunungan tinggi disebut?', emoji:'⛰️', answers:['Glacier Express','Polar Express','Desert Express','Ocean Express'], correct:0 },
+  { q:'Kereta mana yang pernah jadi yang tercepat di dunia dengan 574 km/jam?', emoji:'🏆', answers:['TGV (Prancis)','Shinkansen (Jepang)','Maglev SCMaglev (Jepang)','ICE (Jerman)'], correct:0 },
+
+  // === BAGIAN KESELAMATAN LEBIH BANYAK ===
+  { q:'Apa yang harus kamu lakukan jika ketinggalan kereta?', emoji:'😅', answers:['Tunggu kereta berikutnya dengan aman','Kejar kereta sambil berlari di rel','Coba naik ke kereta yang sudah jalan','Melompat ke atas kereta'], correct:0 },
+  { q:'Saat di dalam kereta yang penuh sesak, kamu harus?', emoji:'🚶', answers:['Tetap tenang dan berpegangan','Berteriak keras','Mendorong penumpang lain','Lari ke gerbong lain tanpa berpegangan'], correct:0 },
+  { q:'Apa yang TIDAK boleh kamu lempar ke luar jendela kereta?', emoji:'🚮', answers:['Semua benda apapun, termasuk sampah!','Hanya kertas','Hanya makanan','Hanya batu'], correct:0 },
+  { q:'Saat kereta darurat harus berhenti mendadak, apa yang sebaiknya kamu lakukan?', emoji:'🆘', answers:['Pegang pegangan erat-erat dan duduk','Berdiri dan berlari','Buka pintu dan keluar','Berteriak sekeras mungkin'], correct:0 },
+  { q:'Mengapa perlintasan kereta api memiliki palang (portal) yang turun?', emoji:'⛔', answers:['Untuk mencegah kendaraan melintas saat kereta lewat','Karena sedang diperbaiki','Untuk menghitung kendaraan yang lewat','Karena rel sedang basah'], correct:0 },
+  { q:'Berapa jauh jarak aman yang harus kamu jaga dari tepi peron kereta?', emoji:'🟡', answers:['Di belakang garis kuning yang ada di peron','Tepat di tepi peron','Satu langkah dari rel','Tidak perlu jaga jarak'], correct:0 },
+
+  // === BAGIAN FAKTA MENARIK ===
+  { q:'Kereta barang terpanjang di dunia bisa mencapai panjang berapa kilometer?', emoji:'😲', answers:['Lebih dari 7 km panjangnya!','Hanya 100 meter','Tepat 1 km','Sekitar 500 meter'], correct:0 },
+  { q:'Apa nama suara khas yang dihasilkan roda kereta saat melewati sambungan rel?', emoji:'🎵', answers:['Klakson-klakson (clackety-clack)','Zing-zing','Boom-boom','Bip-bip'], correct:0 },
+  { q:'Kereta wisata mini yang sering ada di kebun binatang atau taman disebut?', emoji:'🎠', answers:['Kereta mini/kereta kecil','Kereta uap bersar','MRT','Monorel'], correct:0 },
+  { q:'Kereta di Disneyland yang mengelilingi taman menggunakan tenaga apa?', emoji:'🎡', answers:['Kereta uap (steam train)','Kereta listrik','Kereta diesel','Kereta angin'], correct:0 },
+  { q:'Apa nama kereta legendaris yang ada di film "Polar Express"?', emoji:'🎄', answers:['Kereta Natal ajaib yang pergi ke Kutub Utara','Shinkansen Kutub Utara','KRL Natal','TGV Salju'], correct:0 },
+  { q:'Kereta yang membawa susu dan hasil ladang dari desa ke kota biasa disebut?', emoji:'🐄', answers:['Kereta barang / freight train','Kereta penumpang kelas bisnis','Shinkansen perdesaan','MRT pertanian'], correct:0 },
+  { q:'Mengapa kereta wisata uap di Ambarawa sangat populer untuk wisata keluarga?', emoji:'❤️', answers:['Karena jarang bisa melihat kereta uap asli yang masih berjalan','Karena sangat cepat','Karena gratis untuk semua orang','Karena ada di semua kota'], correct:0 },
+  { q:'Di Eropa, kereta antar kota biasanya disebut apa?', emoji:'🇪🇺', answers:['InterCity atau Intercity Express','LocalCity','SlowCity','NightBus'], correct:0 },
+  { q:'Gerbong tidur (sleeper car) di kereta malam biasanya memiliki apa di dalamnya?', emoji:'🌙', answers:['Tempat tidur bersusun dan bantal','Hanya kursi biasa','Kolam renang kecil','Dapur dan kompor'], correct:0 },
+  { q:'Kenapa kereta api disebut "kereta api" padahal tidak selalu pakai api?', emoji:'🔥', answers:['Karena dulu kereta pertama menggunakan uap dari api untuk bergerak','Karena kereta terbuat dari besi yang panas','Karena kereta berjalan secepat api','Karena penumpang dilarang membawa api'], correct:0 },
+  { q:'Berapa berat sebuah lokomotif kereta uap besar kira-kira?', emoji:'⚖️', answers:['Bisa mencapai 100-200 ton lebih!','Hanya sekitar 1 ton','Sekitar 5 ton','Persis sama dengan truk biasa'], correct:0 },
+  { q:'Apa itu "gerbong restorasi" di kereta penumpang?', emoji:'🍽️', answers:['Gerbong tempat penumpang bisa makan dan minum','Gerbong yang sedang diperbaiki','Gerbong untuk menyimpan makanan saja','Gerbong khusus masinis'], correct:0 },
+
+  // === BAGIAN KERETA DAN ALAM ===
+  { q:'Mengapa membangun jalur kereta di pegunungan sangat sulit?', emoji:'🏔️', answers:['Karena harus membuat terowongan dan jembatan yang sangat besar','Karena tidak ada tanah datar','Karena gunung bergerak','Karena kereta tidak bisa naik turun'], correct:0 },
+  { q:'Terowongan kereta yang menembus gunung biasanya dibangun menggunakan apa?', emoji:'⛏️', answers:['Mesin bor raksasa (TBM) dan dinamit','Tangan manusia saja','Sihir','Air keras'], correct:0 },
+  { q:'Jembatan kereta yang sangat tinggi di atas lembah disebut apa?', emoji:'🌉', answers:['Viaduct','Overpass','Flyover','Causeway'], correct:0 },
+  { q:'Kereta yang bisa berjalan di atas air menggunakan apa?', emoji:'🌊', answers:['Jembatan atau terowongan bawah laut, bukan langsung di air','Pontoon / rakit besar','Roda khusus anti air','Kereta tidak bisa melewati air'], correct:0 },
+  { q:'Saat musim salju, rel kereta bisa tertutup salju. Apa yang dilakukan petugas?', emoji:'❄️', answers:['Membersihkan salju dengan snowplow khusus di kereta','Membiarkan kereta menabrak salju','Menutup semua stasiun permanen','Mengalihkan kereta ke jalan raya'], correct:0 },
+  { q:'Di daerah pegunungan yang sangat terjal, kereta bergerigi bisa naik karena?', emoji:'⛰️', answers:['Ada roda gigi yang mengait rel bergerigi di tengah rel','Ada sayap kecil di badan kereta','Mesin yang sangat kuat tanpa tanjakan','Ada perekat di roda kereta'], correct:0 },
+
+  // === BAGIAN GAMBAR / BENTUK KERETA ===
+  { q:'Apa ciri khas bentuk kepala kereta uap zaman dulu?', emoji:'🚂', answers:['Memiliki cerobong asap besar di depan','Hidung sangat runcing','Berbentuk kotak persegi','Tidak memiliki kepala sama sekali'], correct:0 },
+  { q:'Kereta peluru (bullet train) mendapat namanya karena?', emoji:'🔫', answers:['Bentuk hidungnya yang runcing seperti peluru dan kecepatannya','Karena bisa menembak','Karena suaranya seperti tembakan','Karena terbuat dari bahan seperti peluru'], correct:0 },
+  { q:'Warna dominan Shinkansen seri N700 Jepang adalah?', emoji:'🎨', answers:['Putih dengan garis biru','Merah dan kuning','Hitam seluruhnya','Hijau dan emas'], correct:0 },
+  { q:'Apa yang ada di atas kepala kereta listrik yang menyentuh kabel listrik di atas?', emoji:'🔌', answers:['Pantograph (semacam tangan besi berbentuk V atau Z)','Antena radio','Kamera pengawas','Bendera nasional'], correct:0 },
+  { q:'Gerbong kereta yang paling di belakang sering disebut apa di zaman kereta uap?', emoji:'🔚', answers:['Caboose (gerbong belakang pengawas)','Tender (gerbong batu bara)','Bagasi','Restorasi'], correct:0 },
+  { q:'Tender pada kereta uap berfungsi untuk menyimpan apa?', emoji:'🛢️', answers:['Batu bara dan air untuk ketel uap','Penumpang kelas satu','Senjata api','Mesin cadangan'], correct:0 },
+
+  // === PERTANYAAN SAINS ANAK ===
+  { q:'Energi apa yang menggerakkan kereta uap?', emoji:'🌡️', answers:['Energi panas yang diubah menjadi energi gerak (mekanik)','Energi cahaya matahari langsung','Energi kimia dari baterai','Energi angkasa luar'], correct:0 },
+  { q:'Mengapa jalur rel lebih ramah lingkungan dibanding jalan tol untuk angkutan barang?', emoji:'🌍', answers:['Kereta mengangkut lebih banyak barang dengan emisi lebih sedikit per ton','Rel tidak perlu perawatan','Kereta bisa terbang menghindari kemacetan','Rel terbuat dari bahan daur ulang'], correct:0 },
+  { q:'Apa yang membuat kereta lebih aman dari mobil saat hujan deras?', emoji:'🌧️', answers:['Kereta berjalan di rel khusus, tidak terganggu hujan seperti di jalan raya','Kereta punya payung raksasa','Kereta bisa berenang','Kereta tidak pernah hujan'], correct:0 },
+  { q:'Apa nama proses mengubah air menjadi uap dengan cara dipanaskan?', emoji:'♨️', answers:['Penguapan (evaporasi)','Pembekuan','Kristalisasi','Kondensasi'], correct:0 },
+  { q:'Ketika uap air mendingin dan berubah kembali menjadi air, proses ini disebut?', emoji:'💧', answers:['Kondensasi','Evaporasi','Sublimasi','Kristalisasi'], correct:0 },
+  { q:'Mengapa badan kereta terbuat dari baja bukan dari kayu?', emoji:'🔩', answers:['Baja lebih kuat, tahan api, dan tahan lama','Kayu lebih berat dari baja','Baja lebih murah dari kayu','Karena pohon langka'], correct:0 },
+
+  // === PERTANYAAN SEJARAH LOKAL ===
+  { q:'Kereta uap B 2507 di Museum Ambarawa dibuat di negara mana?', emoji:'🇨🇭', answers:['Swiss (SLM Winterthur)','Jerman','Belanda','Amerika'], correct:0 },
+  { q:'Jalur kereta bergerigi Ambarawa–Bedono dibangun pada tahun berapa?', emoji:'📅', answers:['Sekitar tahun 1900-an (zaman Belanda)','Tahun 1960-an','Tahun 1985','Tahun 2000'], correct:0 },
+  { q:'Siapa yang membangun jaringan kereta api pertama di Jawa?', emoji:'🏗️', answers:['Pemerintah Kolonial Belanda','Kerajaan Mataram','Pemerintah Indonesia merdeka','Perusahaan Inggris'], correct:0 },
+  { q:'Apa nama perusahaan kereta api Belanda yang pernah beroperasi di Jawa?', emoji:'🇳🇱', answers:['NIS (Nederlandsch-Indische Spoorweg Maatschappij)','VOC Express','Java Rail','Dutch Train Co.'], correct:0 },
+  { q:'Setelah Indonesia merdeka, kereta api di Indonesia dikelola oleh?', emoji:'🇮🇩', answers:['PT Kereta Api Indonesia (PT KAI)','Pemerintah Belanda','Perusahaan swasta asing','Tidak ada yang mengelola'], correct:0 },
+  { q:'Jalur kereta api pertama di Indonesia ada di kota mana?', emoji:'📍', answers:['Semarang–Tanggung, Jawa Tengah','Jakarta–Bogor','Surabaya–Malang','Bandung–Cimahi'], correct:0 },
+
+  // === PERTANYAAN PENUTUP MENYENANGKAN ===
+  { q:'Jika kamu jadi masinis, hal pertama apa yang harus kamu cek sebelum berangkat?', emoji:'✅', answers:['Rem, sinyal, dan kondisi jalur kereta','Warna baju penumpang','Berapa banyak snack di gerbong','Cuaca di luar negeri'], correct:0 },
+  { q:'Apa hadiah terbaik untuk seorang anak yang suka kereta api?', emoji:'🎁', answers:['Mainan kereta set atau buku kereta api','Mainan boneka','Sepatu bola','Ikan hias'], correct:0 },
+  { q:'Apakah ada kereta api di luar angkasa?', emoji:'🚀', answers:['Belum ada, tapi ada rencana lunar railway di masa depan!','Ya, ada di planet Mars sekarang','Ya, mengelilingi bulan','Tidak mungkin selamanya'], correct:0 },
+  { q:'Apa cita-citamu jika berhubungan dengan kereta api?', emoji:'💭', answers:['Jadi masinis, insinyur kereta, atau arsitek stasiun!','Tidak ada pilihan','Hanya bisa jadi penumpang','Tidak ada karir kereta api'], correct:0 },
+  { q:'Kenapa belajar tentang kereta api itu penting?', emoji:'📚', answers:['Karena kereta menghubungkan kota, membawa barang, dan ramah lingkungan!','Karena kereta sudah tidak ada lagi','Hanya untuk orang dewasa','Karena tidak ada transportasi lain'], correct:0 },
 ]
 
 // Quiz session: pick 8 random questions from the bank
@@ -13026,6 +13693,7 @@ const G18_QUIZ = G18_QUESTIONS_BANK
 let g18State = {}
 
 function initGame18() {
+  battleBgmStop()
   const lv = state.selectedLevelNum || 1
   g18State = {
     lv, quizIdx: 0, quizScore: 0, quizActive: false,
@@ -13043,14 +13711,13 @@ function initGame18() {
 function g18RenderGallery() {
   const grid = document.getElementById('g18-card-grid')
   grid.innerHTML = ''
-  // Section separator index: Ambarawa collection = 0-8, World trains = 9+
-  const ambarawaCount = 9
+  // First 12 = Ambarawa/Indonesia historic, rest = World trains
+  const ambarawaCount = 12
   G18_TRAINS.forEach((train, i) => {
-    // Section header
     if (i === 0) {
       const hdr = document.createElement('div')
       hdr.style.cssText = 'grid-column:1/-1;color:#FFD082;font-size:12px;font-weight:900;letter-spacing:1.5px;padding:4px 2px 2px;border-bottom:1.5px solid rgba(255,193,100,0.35);margin-bottom:2px;'
-      hdr.textContent = '🏛️ KOLEKSI MUSEUM AMBARAWA'
+      hdr.textContent = '🏛️ KOLEKSI MUSEUM AMBARAWA & INDONESIA'
       grid.appendChild(hdr)
     } else if (i === ambarawaCount) {
       const hdr = document.createElement('div')
@@ -13061,18 +13728,15 @@ function g18RenderGallery() {
 
     const card = document.createElement('div')
     card.className = 'g18-card'
-    // Ambarawa cards get a warm amber tint
     if (i < ambarawaCount) card.style.borderColor = 'rgba(255,193,80,0.35)'
-    const fb = `<div class="g18-card-emoji">${train.emoji}</div>`
-    const imgEl = train.svg
-      ? `<img src="${train.svg}" style="width:100%;height:64px;object-fit:contain;" alt="${train.name}" onerror="this.parentNode.innerHTML='${train.emoji.replace(/'/g,"&#39;")}';">`
-      : fb
+    else card.style.borderColor = 'rgba(100,150,255,0.35)'
+    const svgHtml = g18TrainSVG(train, 110, 48)
     card.innerHTML = `
-      <div style="width:100%;height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;">${imgEl}</div>
-      <div class="g18-card-name">${train.name}</div>
-      <div class="g18-card-country">${train.country}</div>
+      <div style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;overflow:hidden;">${svgHtml}</div>
+      <div class="g18-card-name" style="font-size:11px;">${train.name}</div>
+      <div class="g18-card-country" style="font-size:9px;">${train.country.split(',')[0]}</div>
       <div class="g18-speed-badge">⚡ ${train.speed} km/j</div>
-      <div style="color:rgba(255,255,255,0.55);font-size:10px;font-weight:700;margin-top:2px;">${train.year}</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:9px;font-weight:700;margin-top:2px;">${train.year}</div>
     `
     card.onclick = () => g18ShowDetail(i)
     grid.appendChild(card)
@@ -13082,33 +13746,24 @@ function g18RenderGallery() {
 function g18ShowDetail(idx) {
   const train = G18_TRAINS[idx]
   const emojiEl = document.getElementById('g18-modal-emoji')
-  if (train.svg) {
-    emojiEl.innerHTML = `<img src="${train.svg}" style="width:140px;height:70px;object-fit:contain;" alt="${train.name}" onerror="this.outerHTML='${train.emoji}'">`
-  } else {
-    emojiEl.textContent = train.emoji
-  }
+  emojiEl.innerHTML = g18TrainSVG(train, 160, 70)
   document.getElementById('g18-modal-name').textContent = train.name
   document.getElementById('g18-modal-country').textContent = `${train.country} • ${train.year}`
   const details = document.getElementById('g18-modal-details')
-  details.innerHTML = `
-    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
-      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">KECEPATAN</div>
-      <div style="color:white;font-size:16px;font-weight:900;">${train.speed} km/j</div>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
-      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">BAHAN BAKAR</div>
-      <div style="color:white;font-size:13px;font-weight:900;">${train.fuel}</div>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
-      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">TIPE</div>
-      <div style="color:white;font-size:12px;font-weight:900;">${train.type}</div>
-    </div>
-    <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
-      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;">TAHUN</div>
-      <div style="color:white;font-size:16px;font-weight:900;">${train.year}</div>
-    </div>
-  `
-  document.getElementById('g18-modal-fact').textContent = '💡 ' + train.fact
+  const cell = (label, val, emoji='') => `<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
+    <div style="color:rgba(255,255,255,0.55);font-size:9px;font-weight:700;letter-spacing:0.5px;">${label}</div>
+    <div style="color:white;font-size:12px;font-weight:900;line-height:1.3;margin-top:2px;">${emoji}${val}</div>
+  </div>`
+  details.innerHTML =
+    cell('KECEPATAN MAX', `${train.speed} km/j`, '⚡ ') +
+    cell('TAHUN DIBUAT', train.year, '📅 ') +
+    cell('BAHAN BAKAR', train.fuel, '⛽ ') +
+    cell('TIPE', train.type, '') +
+    (train.builder ? cell('PEMBUAT', train.builder, '🏭 ') : '') +
+    (train.route ? cell('RUTE', train.route, '🗺️ ') : '')
+  document.getElementById('g18-modal-fact').innerHTML =
+    `<div style="margin-bottom:6px;">💡 ${train.fact}</div>` +
+    (train.funFact ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.12);">${train.funFact}</div>` : '')
   document.getElementById('g18-modal').style.display = 'flex'
   playClick()
 }
