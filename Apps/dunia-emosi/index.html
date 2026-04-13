@@ -1301,9 +1301,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 #screen-game5 { background: radial-gradient(ellipse at 50% 0%, #1C1030 0%, #0F172A 100%); }
 #screen-game7 {
   background:
-    radial-gradient(ellipse 65% 45% at 50% 42%, rgba(20,184,166,0.18) 0%, transparent 70%),
-    linear-gradient(180deg,rgba(10,40,24,0.62) 0%,rgba(15,61,40,0.52) 50%,rgba(12,30,16,0.62) 100%),
-    url('assets/bg-forest.webp') center/cover no-repeat !important;
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(109,40,217,0.22) 0%, transparent 70%),
+    url('assets/bg-game7-bayangan.webp') center/cover no-repeat !important;
 }
 #screen-game8 { background: linear-gradient(160deg, #1a0020 0%, #2D1B69 50%, #1a0020 100%); }
 #screen-game9 { background: url('assets/bg-game9-trace.webp') center/cover no-repeat, linear-gradient(180deg, #0A1A00 0%, #1A3300 50%, #0A1A00 100%); }
@@ -1321,18 +1320,39 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   -webkit-backdrop-filter: blur(10px);
   font-size: 20px;
 }
-/* Choice buttons: solid white with shadow for depth */
-.g1-choice-btn {
-  background: rgba(255,255,255,0.96) !important;
-  border-color: #FFE4E6 !important;
-  color: var(--text) !important;
-  box-shadow: 0 6px 0 #FDA4AF, 0 2px 12px rgba(0,0,0,0.12) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+/* Choice buttons: glass-morphism centered grid */
+.g1-choices {
+  width: fit-content !important;
+  min-width: min(300px,88vw) !important;
+  max-width: min(480px,96vw) !important;
+  align-self: center !important;
+  margin: 0 auto !important;
 }
-.g1-choice-btn .choice-label { color: var(--text) !important; }
-.g1-choice-btn.correct { background: linear-gradient(135deg,#CCFBF1,#f0fffd) !important; border-color: var(--teal) !important; box-shadow: 0 4px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3) !important; }
-.g1-choice-btn.wrong { background: linear-gradient(135deg,#FFF1F3,white) !important; border-color: var(--rose) !important; box-shadow: 0 4px 0 var(--rose-shadow) !important; }
+.g1-choice-btn {
+  background: linear-gradient(135deg,rgba(255,255,255,0.22),rgba(255,255,255,0.10)) !important;
+  border: 2px solid rgba(255,255,255,0.35) !important;
+  border-radius: 20px !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+  padding: 16px 14px !important;
+  min-width: 90px !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s !important;
+}
+.g1-choice-btn .choice-emoji { font-size: 44px !important; }
+.g1-choice-btn .choice-label {
+  font-size: 15px !important; color: white !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5) !important; font-weight: 900 !important;
+}
+.g1-choice-btn.correct {
+  background: linear-gradient(135deg,rgba(20,184,166,0.6),rgba(20,184,166,0.35)) !important;
+  border-color: #14B8A6 !important; box-shadow: 0 0 24px rgba(20,184,166,0.6) !important;
+}
+.g1-choice-btn.wrong {
+  background: linear-gradient(135deg,rgba(239,68,68,0.55),rgba(239,68,68,0.25)) !important;
+  border-color: #EF4444 !important;
+}
 /* Progress text: pill badge */
 .g1-progress {
   background: rgba(255,255,255,0.82);
@@ -1673,6 +1693,10 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   box-shadow: 0 8px 32px rgba(0,0,0,0.65),
               inset 0 2px 0 rgba(255,220,100,0.25),
               0 0 0 2px #DAA520 !important;
+  width: min(460px,92vw) !important;
+  height: min(460px,92vw) !important;
+  align-self: center !important;
+  margin: 0 auto 16px !important;
 }
 .g9-dot {
   width: 22px !important; height: 22px !important;
@@ -1871,6 +1895,47 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   width:5px; height:5px; border-radius:50%;
   background:#fff; border:2px solid #222;
 }
+/* G5 responsive grid */
+.g5-grid { max-width:min(520px,94vw)!important; gap:max(6px,1.8vw)!important; }
+.g5-grid.grid-3x4 { max-width:min(380px,94vw)!important; }
+.g5-card { min-width:0!important; }
+
+/* G7 — Tebak Bayangan choices centering */
+.g7-choices {
+  width:fit-content!important;
+  min-width:min(340px,90vw)!important;
+  max-width:min(440px,96vw)!important;
+  align-self:center!important;
+  margin:0 auto!important;
+}
+.g7-choice-btn {
+  background:rgba(255,255,255,0.92)!important;
+  border:2px solid rgba(139,92,246,0.4)!important;
+  border-radius:18px!important;
+  box-shadow:0 6px 20px rgba(0,0,0,0.35),0 0 0 1px rgba(255,255,255,0.08)!important;
+  padding:14px 10px!important;
+  backdrop-filter:blur(8px)!important;
+  -webkit-backdrop-filter:blur(8px)!important;
+  transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1)!important;
+}
+.g7-choice-btn:hover:not(.correct):not(.wrong) {
+  transform:scale(1.05)!important; border-color:rgba(139,92,246,0.7)!important;
+}
+.g7-choice-btn .g7-choice-img { font-size:52px!important; }
+.g7-choice-btn .g7-choice-text { color:#1F2937!important; font-size:15px!important; font-weight:900!important; }
+.g7-choice-btn.correct { background:linear-gradient(135deg,#CCFBF1,#F0FDFA)!important; border-color:#14B8A6!important; box-shadow:0 0 20px rgba(20,184,166,0.5)!important; }
+.g7-choice-btn.wrong { border-color:#EF4444!important; background:linear-gradient(135deg,#FFF1F3,white)!important; }
+
+/* G8 — Susun Kata centering */
+.g8-slots { align-self:center!important; margin:0 auto 20px!important; width:fit-content!important; max-width:min(440px,96vw)!important; }
+.g8-letters { align-self:center!important; margin:0 auto!important; width:fit-content!important; max-width:min(440px,96vw)!important; }
+
+/* gh-level-back button */
+.gh-level-back {
+  font-size:17px!important; font-weight:900!important;
+  background:rgba(255,255,255,0.18)!important;
+  color:white!important; border:none!important;
+}
 
 /* ── 10. G6 PETUALANGAN MOBIL — Full Screen Road ── */
 #screen-game6 {
@@ -1924,7 +1989,23 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   font-size: 64px !important;
   bottom: 16px !important;
   filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6));
-  transition: left 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  transition: left 0.24s cubic-bezier(0.34,1.2,0.64,1) !important;
+}
+@keyframes g6VehicleIdle {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  20%     { transform: translateY(-1.8px) rotate(0.18deg); }
+  40%     { transform: translateY(-0.9px) rotate(-0.12deg); }
+  60%     { transform: translateY(-2px) rotate(0.22deg); }
+  80%     { transform: translateY(-0.6px) rotate(-0.16deg); }
+}
+.g6-emoji-vehicle {
+  font-size: clamp(52px,14vw,80px) !important;
+  line-height: 1 !important;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.6)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  animation: g6VehicleIdle 0.32s ease-in-out infinite !important;
 }
 
 .g6-controls {
@@ -2737,19 +2818,19 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* AI train container */
 .g14-ai-train {
   position:absolute;z-index:18;
-  transform:scaleX(-1);
+  transform:scaleX(-1) scale(1.2);
   filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7)) brightness(1.2) saturate(2.0);
   pointer-events:none;
 }
 @keyframes g14TrainEnter {
-  0%   { opacity:0; transform:scaleX(-1) translateX(80px) scale(0.8); }
-  100% { opacity:1; transform:scaleX(-1) translateX(0) scale(1); }
+  0%   { opacity:0; transform:scaleX(-1) scale(1.2) translateX(80px) scale(0.8); }
+  100% { opacity:1; transform:scaleX(-1) scale(1.2) translateX(0); }
 }
 .g14-ai-train.entering { animation:g14TrainEnter 0.5s cubic-bezier(0.34,1.2,0.64,1) both; }
 /* Player train container */
 #g14-player {
   position:absolute;z-index:25;
-  left:15%;transform:translate(-50%,-50%) scaleX(-1);
+  left:15%;transform:translate(-50%,-50%) scaleX(-1) scale(1.2);
   transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
   filter:drop-shadow(0 6px 20px rgba(0,0,0,0.8)) brightness(1.35) saturate(2.2);
   pointer-events:none;
@@ -6078,6 +6159,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game15" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(21,101,192,0.9);backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;">←</button>
     <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🚂 Lokomotif Pemberani</span>
     <span class="gh-level" id="g15-level" style="color:rgba(255,255,255,0.9);">Lv.1</span>
     <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;">⏸</button>
@@ -6096,10 +6178,7 @@ body { background: #0a0a1a !important; }
 
     <!-- Train (2x) + chains behind it -->
     <div id="g15-train-wrap" style="position:relative;width:100%;max-width:420px;display:flex;align-items:center;justify-content:flex-start;padding:0 8px;flex-shrink:0;">
-      <img id="g15-train-icon" src="assets/train/linus-brave_char.svg"
-        style="width:260px;height:auto;flex-shrink:0;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65));z-index:20;position:relative;"
-        alt="Linus"
-        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=\'font-size:96px;\'>🚂</div>')">
+      <div id="g15-train-icon" style="flex-shrink:0;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65));z-index:20;position:relative;"></div>
       <div id="g15-chain-rope" style="width:14px;height:6px;flex-shrink:0;background:linear-gradient(90deg,#8D6E63,#BCAAA4,#8D6E63);border-radius:3px;box-shadow:0 2px 5px rgba(0,0,0,0.55);margin-left:-2px;z-index:1;"></div>
       <div id="g15-chains" style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;flex-shrink:0;"></div>
     </div>
@@ -6130,6 +6209,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game16" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">←</button>
     <span style="font-size:20px;flex-shrink:0;">🆘</span>
     <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Selamatkan Kereta!</span>
     <span id="g16-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
@@ -6150,9 +6230,9 @@ body { background: #0a0a1a !important; }
       <div style="position:absolute;top:6%;left:8%;font-size:28px;filter:drop-shadow(0 0 8px rgba(255,240,150,0.5));">🌕</div>
     </div>
     <!-- Scene elements -->
-    <div id="g16-hero-train" style="position:absolute;left:4%;bottom:40%;z-index:5;transition:transform 0.3s;"><img src="assets/train/linus-brave_char.svg" style="height:84px;width:auto;transform:scaleX(-1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7));" alt="Hero" onerror="this.outerHTML='<span style=\'font-size:56px;\'>🚂</span>'"></div>
+    <div id="g16-hero-train" style="position:absolute;left:4%;bottom:40%;z-index:5;transition:transform 0.3s;transform:scaleX(-1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7));"></div>
     <div id="g16-rope" style="position:absolute;bottom:calc(40% + 36px);left:calc(4% + 74px);right:calc(5% + 74px);height:8px;background:linear-gradient(90deg,#5D4037,#8D6E63 20%,#BCAAA4 50%,#8D6E63 80%,#5D4037);border-radius:4px;z-index:4;transform-origin:left center;transition:all 0.3s;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
-    <div id="g16-victim-train" style="position:absolute;right:5%;bottom:40%;z-index:5;transition:right 0.5s;"><img src="assets/train/caseyjr-dumbo_char.svg" style="height:84px;width:auto;transform:scaleX(1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7));" alt="Victim" onerror="this.outerHTML='<span style=\'font-size:56px;\'>🚃</span>'"></div>
+    <div id="g16-victim-train" style="position:absolute;right:5%;bottom:40%;z-index:5;transition:right 0.5s;filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7));"></div>
     <div id="g16-cliff-edge" style="position:absolute;right:-4px;bottom:35%;font-size:48px;z-index:3;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.6));">🏔️</div>
     <!-- Ground/terrain line -->
     <div style="position:absolute;bottom:38%;left:0;right:0;height:3px;background:linear-gradient(90deg,rgba(100,150,40,0.6),rgba(80,120,30,0.8),rgba(60,90,20,0.4));z-index:2;"></div>
@@ -6180,23 +6260,23 @@ body { background: #0a0a1a !important; }
       <button id="g16-throw-btn" onclick="g16ThrowHook()" style="background:linear-gradient(135deg,#E65100,#FF7043);color:white;border:none;border-radius:16px;padding:16px 40px;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 5px 0 #BF360C;cursor:pointer;letter-spacing:0.5px;">🪝 LEMPAR KAIT!</button>
       <div id="g16-hook-tries" style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;"></div>
     </div>
-    <!-- Phase 2: Word pull -->
-    <div id="g16-phase2" style="display:none;flex-direction:column;align-items:center;gap:10px;z-index:10;background:rgba(0,0,0,0.7);border-radius:20px;padding:16px;width:92%;max-width:380px;">
-      <div style="color:white;font-size:14px;font-weight:900;font-family:'Fredoka One',cursive;">Eja kata untuk MENARIK kereta! 🔤</div>
+    <!-- Phase 2: Rapid Tap Pull -->
+    <div id="g16-phase2" style="display:none;flex-direction:column;align-items:center;gap:12px;z-index:10;background:rgba(0,0,0,0.78);border-radius:24px;padding:20px 16px;width:92%;max-width:380px;">
+      <div style="color:white;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;">💪 TARIK! Ketuk terus untuk selamatkan kereta!</div>
       <div style="width:100%;text-align:center;">
         <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:4px;">KEKUATAN TARIK</div>
         <div class="g16-pull-bar-track"><div id="g16-pull-fill" class="g16-pull-bar-fill"></div></div>
       </div>
-      <div id="g16-image-clue" style="font-size:52px;line-height:1;">❓</div>
-      <div id="g16-word-slots" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:48px;align-items:center;"></div>
-      <div id="g16-letters-wrap" style="display:flex;flex-wrap:wrap;justify-content:center;max-width:320px;gap:2px;"></div>
+      <div id="g16-tap-count-display" style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:800;letter-spacing:1px;">TAP 0 / 8</div>
+      <button id="g16-tap-btn" onclick="g16TapPull()" ontouchstart="g16TapPull();event.preventDefault()"
+        style="background:linear-gradient(135deg,#E65100,#FF7043);color:white;border:none;border-radius:50%;width:130px;height:130px;font-size:52px;font-weight:900;box-shadow:0 8px 0 #BF360C,0 0 0 6px rgba(255,160,80,0.25);cursor:pointer;transition:transform 0.08s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.08s;-webkit-tap-highlight-color:transparent;user-select:none;">💪</button>
       <div id="g16-word-progress" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;"></div>
     </div>
     <!-- Start overlay -->
     <div id="g16-start-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:14px;padding:20px;text-align:center;">
       <div style="font-size:56px;">🆘</div>
       <div style="color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;">Kereta butuh pertolongan!</div>
-      <div style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;line-height:1.6;">1️⃣ Lempar kait di zona hijau<br>2️⃣ Eja kata untuk menarik kereta<br>3️⃣ Selamatkan sebelum jatuh ke jurang!</div>
+      <div style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;line-height:1.6;">1️⃣ Lempar kait di zona hijau<br>2️⃣ Ketuk TARIK! sekeras mungkin<br>3️⃣ Selamatkan sebelum jatuh ke jurang!</div>
       <button onclick="g16BeginGame()" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #4A148C;cursor:pointer;margin-top:4px;">🆘 MULAI!</button>
     </div>
     <!-- Result overlay -->
@@ -6217,6 +6297,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game17" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">←</button>
     <span style="font-size:20px;flex-shrink:0;">🌉</span>
     <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Jembatan Goyang</span>
     <span id="g17-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
@@ -6234,7 +6315,7 @@ body { background: #0a0a1a !important; }
     <!-- Mountain silhouettes in background -->
     <div style="position:absolute;bottom:44%;left:0;right:0;height:20%;background:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 100%22%3E%3Cpolygon points=%220,100 60,20 120,55 180,10 240,45 300,15 360,40 400,5 400,100%22 fill=%22%231a3a1a%22 opacity=%220.7%22/%3E%3C/svg%3E') repeat-x bottom/400px 100%;z-index:1;"></div>
     <!-- Train waiting left -->
-    <div id="g17-train-waiting" style="position:absolute;left:4%;bottom:44%;z-index:10;transition:all 2.5s ease-in-out;"><img src="assets/train/malivlak_char.svg" style="height:72px;width:auto;transform:scaleX(-1);filter:drop-shadow(0 3px 10px rgba(0,0,0,0.5));" alt="Train" onerror="this.outerHTML='<span style=\'font-size:42px;\'>🚂</span>'"></div>
+    <div id="g17-train-waiting" style="position:absolute;left:4%;bottom:44%;z-index:10;transition:all 2.5s ease-in-out;transform:scaleX(-1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.6));"></div>
     <!-- Bridge structure -->
     <div style="position:absolute;bottom:46%;left:8%;right:8%;height:12px;background:linear-gradient(90deg,#5D4037,#795548,#5D4037);border-radius:3px;z-index:3;"></div>
     <!-- Bridge blocks row -->
@@ -6485,6 +6566,7 @@ body { background: #0a0a1a !important; }
   <div class="world-hearts" id="world-hearts"></div>
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🎭 Aku Merasa...</span>
     <span class="gh-level" id="g1-level">Lv.1</span>
     <span class="gh-player" id="g1-player-icon"></span>
@@ -6511,6 +6593,7 @@ body { background: #0a0a1a !important; }
   <div class="sun-circle"></div>
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🌬️ Napas Pelangi</span>
     <span class="gh-level" id="g2-level">Lv.1</span>
     <span class="gh-player" id="g2-player-icon"></span>
@@ -6541,6 +6624,7 @@ body { background: #0a0a1a !important; }
   <div class="tree-left"></div><div class="tree-right"></div>
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🔤 Huruf Hutan</span>
     <span class="gh-level" id="g3-level">Lv.1</span>
     <span class="gh-player" id="g3-player-icon"></span>
@@ -6569,6 +6653,7 @@ body { background: #0a0a1a !important; }
   </div>
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🔢 Hitung Binatang</span>
     <span class="gh-level" id="g4-level">Lv.1</span>
     <span class="gh-player" id="g4-player-icon"></span>
@@ -6599,6 +6684,7 @@ body { background: #0a0a1a !important; }
   <div class="moon-crescent"></div>
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🧠 Memory Pintar</span>
     <span class="gh-level" id="g5-level">Lv.1</span>
     <span class="gh-stars" id="g5-stars" style="display:none">⭐ 0</span>
@@ -6635,6 +6721,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game6" class="screen map-city">
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🚗 Petualangan Mobil</span>
     <span class="gh-level" id="g6-level">Lv.1</span>
     <span class="gh-player" id="g6-player-icon"></span>
@@ -6716,6 +6803,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game7" class="screen">
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🖼️ Tebak Gambar</span>
     <span class="gh-level" id="g7-level">Lv.1</span>
     <span class="gh-player" id="g7-player-icon"></span>
@@ -6738,6 +6826,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game8" class="screen">
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">🔡 Susun Kata</span>
     <span class="gh-level" id="g8-level">Lv.1</span>
     <span class="gh-player" id="g8-player-icon"></span>
@@ -6761,6 +6850,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game9" class="screen">
   <div class="game-header">
     <button class="gh-back" onclick="exitGame()">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level">←</button>
     <span class="gh-title">✍️ Jejak Huruf</span>
     <span class="gh-level" id="g9-level">Lv.1</span>
     <span class="gh-player" id="g9-player-icon"></span>
@@ -7701,6 +7791,13 @@ function exitGame() {
   document.getElementById('settings-overlay').style.display='none'
   playClick(); clearTimers(); stopAmbient(); battleBgmStop(); showScreen('screen-welcome')
 }
+function backToLevelSelect() {
+  state.paused = false
+  document.getElementById('pause-overlay').style.display='none'
+  document.getElementById('settings-overlay').style.display='none'
+  if(g6State?.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
+  clearTimers(); stopAmbient(); battleBgmStop(); playClick(); showScreen('screen-level')
+}
 function clearTimers() {
   if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
   if(state.g4Timer){clearInterval(state.g4Timer);state.g4Timer=null}
@@ -8439,8 +8536,8 @@ function renderG5Grid(){
         // Emoji side
         back=`<span style="font-size:52px;line-height:1">${card.emoji}</span>`
       } else {
-        // Word side
-        back=`<span style="font-size:16px;font-weight:900;text-align:center;color:white;font-family:'Fredoka One',cursive;line-height:1.2;padding:4px;text-shadow:0 2px 6px rgba(0,0,0,0.5)">${card.label}</span>`
+        // Emoji side (image-to-image matching)
+        back=`<span style="font-size:52px;line-height:1">${card.emoji}</span>`
       }
     } else {
       const isLetter=card.cardSide==='A'&&typeof card.id==='string'&&card.id.startsWith('l')
@@ -8694,6 +8791,13 @@ function checkG5Match(){
 let g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:5,stars:0,map:'city',speed:1.5,frameCount:0,running:false,animFrame:null,penaltyPause:false,wrongCount:0,lives:3}
 
 // G6 Car catalog (emoji + name + SVG color)
+const G6_VEHICLE_MAP = {
+  sedan:'city', sport:'city', jeep:'forest', truck:'city', van:'city',
+  police:'city', taxi:'city', bus:'city', firetruck:'city', ambulance:'city',
+  tractor:'forest', scooter:'forest', bike:'forest',
+  rocket:'space', heli:'space', sub:'space',
+  ship:'body', train:'city'
+}
 const G6_CARS = [
   {id:'sedan',   e:'🚗',  name:'Sedan',    color:'#DC2626'},
   {id:'sport',   e:'🏎️', name:'Sport',    color:'#E63946'},
@@ -8732,6 +8836,10 @@ function g6BuildCarSelector() {
       tile.classList.add('selected')
       g6CarState.selectedCar = car
       document.getElementById('g6-vehicle-icon').textContent = car.e
+      // Auto-switch map based on vehicle type
+      const autoMap = G6_VEHICLE_MAP[car.id] || 'city'
+      const mapBtn = document.querySelector(`.g6-map-btn[data-map="${autoMap}"]`)
+      if(mapBtn) { selectDriveMap(autoMap, mapBtn) }
     }
     grid.appendChild(tile)
   })
@@ -8838,12 +8946,10 @@ function renderCollectedSlots() {
 }
 function beginDrive() {
   document.getElementById('g6-start-overlay').classList.remove('visible')
-  // Apply chosen car color to SVG body
-  const carSvg = document.getElementById('g6-car-svg')
-  if(carSvg && g6CarState?.selectedColor) {
-    const bodyRect = carSvg.querySelectorAll('rect')[0]
-    if(bodyRect) bodyRect.setAttribute('fill', g6CarState.selectedColor)
-  }
+  // Replace SVG with selected emoji vehicle
+  const carDiv = document.getElementById('g6-car')
+  const car = g6CarState.selectedCar || G6_CARS[0]
+  carDiv.innerHTML = `<div class="g6-emoji-vehicle">${car.e}</div>`
   g6State.running = true; g6State.frameCount = 0; g6State.tiles = []
   startAmbient(g6State.map); updateCarPosition(); driveTick()
 }
@@ -14362,6 +14468,15 @@ const G14_CATEGORIES = [
       { key:'240loco',   name:'2-4-0',       sub:'Eropa 1860 • Klasik',           isSteam:true, rack:false, tender:true,  bodyColor:'#3a1a0a', wheelColor:'#1f0d00', baseSpeed:1.45, boostMult:1.55, boostDur:1700, color:'#3a1a0a', stripeColor:'#e63946', kmh:55,  desc:'2-4-0 — Konfigurasi klasik abad 19: 2 roda depan, 4 roda penggerak. Tulang punggung jalur kereta pertama di Eropa & Amerika! 🏛️🚂' },
       { key:'caseyjr',   name:'Casey Jr',    sub:'Sirkus • Dumbo Disney',         isSteam:true, rack:false, tender:false, bodyColor:'#c0392b', wheelColor:'#7f0000', baseSpeed:1.80, boostMult:1.60, boostDur:1600, color:'#c0392b', stripeColor:'#ffd700', kmh:60,  desc:'Casey Jr — Kereta Sirkus dari film Dumbo (Disney 1941)! "I think I can, I think I can!" Semangat pantang menyerah! 🎪🐘' },
       { key:'malivlakb250', name:'B 250',    sub:'Malivlak • Indonesia',          isSteam:true, rack:false, tender:true,  bodyColor:'#1a2a1a', wheelColor:'#0a150a', baseSpeed:1.55, boostMult:1.50, boostDur:1800, color:'#1a2a1a', stripeColor:'#00c853', kmh:45,  desc:'B250 Malivlak — Lokomotif uap Indonesia yang perkasa! Melintasi hutan dan perkebunan Nusantara dengan gagah. 🌴🇮🇩' },
+      { key:'flyingscotsman', name:'Flying Scotsman', sub:'UK 1923 • LNER Apple Green', isSteam:true, rack:false, tender:true, bodyColor:'#2d6a2d', wheelColor:'#1a3d1a', baseSpeed:2.2, boostMult:1.46, boostDur:2000, color:'#2d6a2d', stripeColor:'#FFD700', kmh:160, desc:'Flying Scotsman — BINTANG DUNIA! Loko uap pertama capai 100 mph (160 km/h)! Legenda LNER hijau elegan. 🇬🇧⚡' },
+      { key:'bigboy', name:'Big Boy UP 4014', sub:'USA 1941 • Union Pacific', isSteam:true, rack:false, tender:true, bodyColor:'#1a1a1a', wheelColor:'#0d0d0d', baseSpeed:2.0, boostMult:1.55, boostDur:1900, color:'#111', stripeColor:'#FFA500', kmh:130, desc:'Big Boy — TERBESAR & TERBERAT di dunia! 7000 HP, 135 ton, kereta uap Amerika yang perkasa! 🦅🇺🇸' },
+      { key:'mallard', name:'Mallard A4', sub:'UK 1938 • LNER Garter Blue', isSteam:true, rack:false, tender:true, bodyColor:'#1a3a6b', wheelColor:'#0d1f3a', baseSpeed:2.5, boostMult:1.48, boostDur:2000, color:'#1a3a6b', stripeColor:'#C0C0C0', kmh:203, desc:'Mallard — REKOR DUNIA ABADI! 203 km/h pada 1938, tak tertandingi lokomotif uap hingga kini! 🏆🇬🇧' },
+      { key:'c62japan', name:'C62', sub:'Jepang 1948 • JNR Hitam', isSteam:true, rack:false, tender:true, bodyColor:'#111111', wheelColor:'#060606', baseSpeed:2.3, boostMult:1.47, boostDur:1950, color:'#111', stripeColor:'#e63946', kmh:145, desc:'C62 — Kebanggaan JNR Jepang! Loko uap terbesar Jepang, menarik Tsubame & Hato ekspres elite! 🇯🇵✨' },
+      { key:'p36', name:'P36', sub:'Uni Soviet 1950 • LKZ', isSteam:true, rack:false, tender:true, bodyColor:'#2a5f2a', wheelColor:'#163016', baseSpeed:2.1, boostMult:1.48, boostDur:1950, color:'#2a5f2a', stripeColor:'#FFD700', kmh:125, desc:'P36 — Lokomotif uap terakhir dan termegah Uni Soviet! Bintang merah di badan hijau elegan! ⭐🇷🇺' },
+      { key:'sar25', name:'SAR Class 25', sub:'Afrika Selatan 1953', isSteam:true, rack:false, tender:true, bodyColor:'#7a1a1a', wheelColor:'#3d0d0d', baseSpeed:1.9, boostMult:1.50, boostDur:1900, color:'#7a1a1a', stripeColor:'#FFC107', kmh:110, desc:'SAR Class 25 — Lokomotif uap terbesar & terkuat Afrika! Mesin kondensasi inovatif! 🦁🌍' },
+      { key:'db01', name:'DB Class 01', sub:'Jerman 1926 • Reichsbahn', isSteam:true, rack:false, tender:true, bodyColor:'#1a1a2a', wheelColor:'#0d0d15', baseSpeed:2.0, boostMult:1.49, boostDur:1950, color:'#1a1a2a', stripeColor:'#C0C0C0', kmh:130, desc:'DB Class 01 — Lokomotif ekspres Jerman Reichsbahn era 1920an! Desain klasik Prusia yang kokoh! 🇩🇪🚂' },
+      { key:'gwrcastle', name:'GWR Castle', sub:'UK 1923 • Great Western', isSteam:true, rack:false, tender:true, bodyColor:'#8B4513', wheelColor:'#4a2208', baseSpeed:2.1, boostMult:1.47, boostDur:1950, color:'#8B4513', stripeColor:'#FFD700', kmh:150, desc:'GWR Castle Class — Kastil beroda! Desain Collett 1923, sempat jadi terkencang di UK. 🏰🇬🇧' },
+      { key:'bb1000id', name:'BB 1000', sub:'Indonesia • Heritage Steam', isSteam:true, rack:false, tender:false, bodyColor:'#8B0000', wheelColor:'#4a0000', baseSpeed:1.95, boostMult:1.52, boostDur:1850, color:'#8B0000', stripeColor:'#FFD700', kmh:85, desc:'BB 1000 — Loko uap heritage Indonesia! Livery merah maroon mewah, simbol kejayaan rel Nusantara! 🇮🇩❤️' },
     ]
   },
   {
@@ -14376,6 +14491,16 @@ const G14_CATEGORIES = [
       { key:'class66', name:'Class 66', sub:'Inggris • EWS Hood Diesel',   isDiesel:true, builder:'hood_diesel', bodyColor:'#5a1a1a', accentColor:'#ffd700', baseSpeed:2.7,  boostMult:1.37, boostDur:2100, color:'#5a1a1a', kmh:92,  desc:'Class 66 — Hood diesel barang Inggris yang ikonik! Dipakai di seluruh Eropa! 🇬🇧🌍' },
       { key:'sd70m',  name:'SD70M',    sub:'Amerika • EMD Diesel',         isDiesel:true, bodyColor:'#003366', accentColor:'#ff0000', baseSpeed:3.1,  boostMult:1.34, boostDur:2200, color:'#003366', kmh:105, desc:'SD70M — Raksasa rel Amerika! Mesin EMD bertenaga 4300 hp untuk jalur panjang! 🇺🇸🦅' },
       { key:'df8b',   name:'DF8B',     sub:'China • Diesel Hood Unit',     isDiesel:true, builder:'hood_diesel', bodyColor:'#1a3a1a', accentColor:'#ff4444', baseSpeed:2.9,  boostMult:1.35, boostDur:2150, color:'#1a3a1a', kmh:98,  desc:'DF8B — Hood diesel angkut barang China yang perkasa! Tulang punggung jalur batubara! 🇨🇳' },
+      { key:'cc205', name:'CC 205', sub:'Indonesia • GE C30ACi', isDiesel:true, builder:'hood_diesel', bodyColor:'#00695c', accentColor:'#e0f2f1', baseSpeed:3.2, boostMult:1.33, boostDur:2200, color:'#004d40', kmh:110, desc:'CC205 — GE C30ACi! Diesel andalan Sumatra, bodi teal elegan angkut batubara Tanjung Enim! 🟢🇮🇩' },
+      { key:'cc300', name:'CC 300', sub:'Indonesia • Hyundai Rotem', isDiesel:true, builder:'dual_cab', bodyColor:'#1565c0', accentColor:'#e3f2fd', baseSpeed:3.4, boostMult:1.32, boostDur:2250, color:'#0d47a1', kmh:120, desc:'CC300 — Diesel paling modern Indonesia dari Hyundai Rotem! Dual-cab bertenaga tinggi! 🔵🇰🇷🇮🇩' },
+      { key:'cc400', name:'CC 400', sub:'Indonesia • Siemens Eurosprinter', isDiesel:true, builder:'dual_cab', bodyColor:'#4a148c', accentColor:'#e8eaf6', baseSpeed:3.6, boostMult:1.30, boostDur:2300, color:'#311b92', kmh:130, desc:'CC400 — Eurosprinter Siemens! Diesel paling cepat KAI, teknologi Eropa jantung Indonesia! 💜🇩🇪🇮🇩' },
+      { key:'alco', name:'ALCO RS-11', sub:'Amerika • Railroad Diesel', isDiesel:true, bodyColor:'#5d3a00', accentColor:'#FFA726', baseSpeed:2.5, boostMult:1.39, boostDur:2050, color:'#3e2800', kmh:105, desc:'ALCO RS-11 — Road Switcher klasik Amerika! Desain ikonik hood unit warisan era 1950an. 🦅🇺🇸' },
+      { key:'class47', name:'Class 47', sub:'Inggris • Brush Sulzer', isDiesel:true, builder:'hood_diesel', bodyColor:'#003087', accentColor:'#ffffff', baseSpeed:2.6, boostMult:1.38, boostDur:2100, color:'#003087', kmh:153, desc:'Class 47 — Diesel paling populer di UK! 500+ unit dibangun, menarik hampir semua rute Inggris! 🇬🇧' },
+      { key:'renfe333', name:'RENFE 333', sub:'Spanyol • Alsthom', isDiesel:true, builder:'dual_cab', bodyColor:'#8b0000', accentColor:'#ffe0b2', baseSpeed:2.9, boostMult:1.36, boostDur:2150, color:'#7a0000', kmh:160, desc:'RENFE 333 — Diesel ekspres Spanyol! Dual-cab Alsthom Perancis dengan livery merah mewah! 🇪🇸🌹' },
+      { key:'kiha261', name:'KiHa 261', sub:'Jepang • JR Hokkaido Diesel', isDiesel:true, builder:'dual_cab', bodyColor:'#1a1a4a', accentColor:'#ff6f61', baseSpeed:3.0, boostMult:1.35, boostDur:2200, color:'#0f0f30', kmh:130, desc:'KiHa 261 — DMU ekspres JR Hokkaido! Dirancang tahan salju, berlari di padang beku! ❄️🇯🇵' },
+      { key:'br218', name:'DB Class 218', sub:'Jerman • Henschel V160', isDiesel:true, builder:'hood_diesel', bodyColor:'#003a6b', accentColor:'#cccccc', baseSpeed:2.8, boostMult:1.37, boostDur:2100, color:'#002a50', kmh:140, desc:'DB Class 218 — V160 Henschel! Diesel serbaguna DB yang paling banyak dipakai di Jerman! 🇩🇪🔵' },
+      { key:'emd38', name:'EMD GP38', sub:'Amerika • General Motors', isDiesel:true, bodyColor:'#002244', accentColor:'#ff0000', baseSpeed:2.7, boostMult:1.37, boostDur:2100, color:'#001a33', kmh:112, desc:'EMD GP38 — General Purpose General Motors! Tulang punggung jalur regional di seluruh Amerika! 🇺🇸💪' },
+      { key:'bb75000', name:'BB 75000', sub:'Perancis • SNCF Diesel', isDiesel:true, builder:'dual_cab', bodyColor:'#003153', accentColor:'#d4af37', baseSpeed:3.1, boostMult:1.34, boostDur:2200, color:'#002040', kmh:120, desc:'BB 75000 — Diesel serbaguna SNCF Perancis! Prima power dual-cab yang handal! 🇫🇷💛' },
     ]
   },
   {
@@ -14393,6 +14518,16 @@ const G14_CATEGORIES = [
       { key:'ktx',    name:'KTX-I',            sub:'Korea Selatan • Korail',   isElectric:true, builder:'highspeed',    bodyColor:'#0A2A7A', accentColor:'#ff6b35', noseLen:50, baseSpeed:3.6, boostMult:1.35, boostDur:2300, color:'#0A2A7A', kmh:305, desc:'KTX-I — Peluru Korea berbasis TGV! 305 km/h Seoul-Busan hanya 2.5 jam! 🇰🇷⚡' },
       { key:'cr400',  name:'CR400AF',          sub:'China • Fuxing',           isElectric:true, builder:'highspeed',    bodyColor:'#b71c1c', accentColor:'#ffc107', noseLen:46, baseSpeed:4.0, boostMult:1.32, boostDur:2450, color:'#b71c1c', kmh:350, desc:'CR400AF Fuxing — Kereta TERCEPAT beroperasi di dunia! 350 km/h jalur China! 🇨🇳🏆' },
       { key:'maglev', name:'SCMaglev L0',      sub:'Jepang • Superconducting', isElectric:true, builder:'maglev',       bodyColor:'#1a1a2e', accentColor:'#00f5ff', baseSpeed:4.5, boostMult:1.30, boostDur:2600, color:'#1a1a2e', kmh:603, desc:'SCMaglev L0 — PEMEGANG REKOR DUNIA! 603 km/h! Melayang di atas rel, roda tidak menyentuh tanah! 🌌🚀' },
+      { key:'whoosh', name:'Whoosh KCIC', sub:'Indonesia 2023 • CR400AF', isElectric:true, builder:'highspeed', bodyColor:'#c62828', accentColor:'#e0e0e0', noseLen:46, baseSpeed:3.9, boostMult:1.32, boostDur:2400, color:'#b71c1c', kmh:350, desc:'Whoosh — KERETA CEPAT PERTAMA RI! Jakarta-Bandung 46 menit! CR400AF made in China, milik Indonesia! 🇮🇩🏆🚀' },
+      { key:'ice4', name:'ICE 4', sub:'Jerman 2017 • Siemens', isElectric:true, builder:'highspeed', bodyColor:'#f5f5f5', accentColor:'#e63946', noseLen:30, baseSpeed:3.8, boostMult:1.33, boostDur:2350, color:'#ffffff', kmh:250, desc:'ICE 4 — Generasi terbaru ICE Jerman! Kenyamanan & efisiensi terbaik, rangkaian terpanjang 346m! 🇩🇪✨' },
+      { key:'acela2', name:'Acela II', sub:'Amerika 2024 • Alstom Avelia', isElectric:true, builder:'highspeed', bodyColor:'#1a3a6b', accentColor:'#cc0000', noseLen:36, baseSpeed:3.6, boostMult:1.34, boostDur:2300, color:'#12284a', kmh:300, desc:'Acela Express 2 — Bullet train Amerika! Alstom Avelia Liberty, koridor NEC Boston-DC! 🇺🇸🗽' },
+      { key:'agvitalo', name:'AGV Italo', sub:'Italia 2012 • NTV Italo', isElectric:true, builder:'highspeed', bodyColor:'#c62828', accentColor:'#ff8f00', noseLen:40, baseSpeed:3.7, boostMult:1.33, boostDur:2350, color:'#b71c1c', kmh:300, desc:'AGV Italo — Kereta swasta Italia pertama! Desain Pininfarina nan elegan, 300 km/h di jalur Roma-Milano! 🇮🇹🏎️' },
+      { key:'pendolino', name:'Pendolino ETR610', sub:'Italia/Swiss • Alstom', isElectric:true, builder:'emu', bodyColor:'#c62828', accentColor:'#ffd600', baseSpeed:3.4, boostMult:1.35, boostDur:2250, color:'#b71c1c', kmh:250, desc:'Pendolino ETR610 — Kereta miring ikonik! Teknologi tilting di tikungan pegunungan Alpen! ⛰️🇮🇹' },
+      { key:'s103', name:'RENFE S-103', sub:'Spanyol • Velaro E Siemens', isElectric:true, builder:'highspeed', bodyColor:'#c0c0c0', accentColor:'#ffeb3b', noseLen:35, baseSpeed:3.8, boostMult:1.33, boostDur:2350, color:'#a0a0a0', kmh:350, desc:'RENFE S-103 Velaro E — TERCEPAT di Eropa saat diluncurkan! 350 km/h jalur AVE Spanyol! 🇪🇸⚡' },
+      { key:'ktxsan', name:'KTX-Sancheon', sub:'Korea 2010 • Hyundai Rotem', isElectric:true, builder:'highspeed', bodyColor:'#002366', accentColor:'#00bfff', noseLen:48, baseSpeed:3.7, boostMult:1.34, boostDur:2300, color:'#001a4a', kmh:305, desc:'KTX-Sancheon — Bullet train BUATAN Korea sendiri! Desain dalam negeri 100%, nama dari gunung Sancheon! 🇰🇷🏔️' },
+      { key:'shink500', name:'Shinkansen 500', sub:'Jepang 1997 • JR West', isElectric:true, builder:'highspeed', bodyColor:'#1a1a3a', accentColor:'#6699cc', noseLen:80, baseSpeed:3.8, boostMult:1.33, boostDur:2350, color:'#111130', kmh:300, desc:'Shinkansen 500 — HIDUNG TERPANJANG 15m! Desain paling futuristik Shinkansen, menginspirasi desainer dunia! 🛸🇯🇵' },
+      { key:'alphax', name:'Alpha-X Series', sub:'Jepang 2019 • JR East R&D', isElectric:true, builder:'highspeed', bodyColor:'#e8e8e8', accentColor:'#ff6600', noseLen:65, baseSpeed:4.1, boostMult:1.31, boostDur:2500, color:'#d0d0d0', kmh:400, desc:'Alpha-X — Prototipe MASA DEPAN JR East! Hidung 22m, target 400 km/h! Kereta paling aerodinamis Jepang! 🔬🇯🇵🚀' },
+      { key:'frecciarossa', name:'Frecciarossa 1000', sub:'Italia 2015 • AnsaldoBreda', isElectric:true, builder:'highspeed', bodyColor:'#c62828', accentColor:'#f5f5f5', noseLen:38, baseSpeed:3.8, boostMult:1.33, boostDur:2350, color:'#b71c1c', kmh:400, desc:'Frecciarossa 1000 — Panah Merah Italia! 400 km/h prototype, 300 km/h operasional. Desain Ferrari untuk kereta! 🏎️🇮🇹❤️' },
     ]
   },
 ]
@@ -14963,7 +15098,9 @@ function initGame15() {
   }
   document.getElementById('g15-level').textContent = `Lv.${lv}`
   document.getElementById('g15-result').style.display = 'none'
-  document.getElementById('g15-train-icon').style.animation = ''
+  const g15TrainEl = document.getElementById('g15-train-icon')
+  const g15Cfg = TRAIN_TYPES_14['caseyjr'] || TRAIN_TYPES_14['malivlakb250'] || G14_CATEGORIES[0].trains[0]
+  g15TrainEl.innerHTML = buildSteamLocoSVG(g15Cfg, {width:200, height:88, animate:true})
   g15LoadWord()
 }
 
@@ -15121,6 +15258,11 @@ function initGame16() {
   document.getElementById('g16-victim-train').style.right = '8%'
   document.getElementById('g16-danger-fill').style.width = '0%'
   document.getElementById('g16-victim-train').className = ''
+  // Render SVG trains using G14 builders
+  const heroCfg = TRAIN_TYPES_14['malivlakb250'] || TRAIN_TYPES_14['b2507'] || G14_CATEGORIES[0].trains[0]
+  const victimCfg = TRAIN_TYPES_14['caseyjr'] || TRAIN_TYPES_14['c1218'] || G14_CATEGORIES[0].trains[2]
+  document.getElementById('g16-hero-train').innerHTML = buildSteamLocoSVG(heroCfg, {width:130, height:58, animate:true})
+  document.getElementById('g16-victim-train').innerHTML = buildSteamLocoSVG(victimCfg, {width:130, height:58, animate:true})
 }
 
 function g16BeginGame() {
@@ -15218,90 +15360,66 @@ function g16ThrowHook() {
 
 function g16StartPhase2() {
   g16State.phase = 2
-  const entry = g16State.words[g16State.wordIdx % g16State.words.length]
-  g16State.currentWord = entry.word.replace('-','')
-  g16State.currentEmoji = entry.emoji
-  g16State.collectedIdx = 0
+  const tapsNeeded = g16State.diff === 'easy' ? 5 : g16State.diff === 'medium' ? 8 : 12
+  g16State.tapsNeeded = tapsNeeded
+  g16State.tapCount = 0
   document.getElementById('g16-phase2').style.display = 'flex'
-  document.getElementById('g16-image-clue').textContent = g16State.currentEmoji
-  g16RenderWordSlots()
-  g16RenderLetters()
-  const pullPct = (g16State.wordsComplete / g16State.wordsNeeded) * 100
-  document.getElementById('g16-pull-fill').style.width = pullPct + '%'
-  document.getElementById('g16-word-progress').textContent = `Kata ${g16State.wordsComplete + 1} / ${g16State.wordsNeeded}`
+  document.getElementById('g16-pull-fill').style.width = '0%'
+  document.getElementById('g16-tap-count-display').textContent = `TAP 0 / ${tapsNeeded}`
+  document.getElementById('g16-word-progress').textContent = `Tarik ${g16State.wordsComplete + 1} / ${g16State.wordsNeeded}`
+  const btn = document.getElementById('g16-tap-btn')
+  if (btn) btn.style.transform = 'scale(1)'
 }
 
-function g16RenderWordSlots() {
-  const wrap = document.getElementById('g16-word-slots')
-  wrap.innerHTML = ''
-  for (let i = 0; i < g16State.currentWord.length; i++) {
-    const slot = document.createElement('div')
-    slot.className = 'g16-word-slot'
-    slot.id = `g16-slot-${i}`
-    slot.textContent = i < g16State.collectedIdx ? g16State.currentWord[i] : '_'
-    if (i < g16State.collectedIdx) slot.classList.add('filled')
-    wrap.appendChild(slot)
-  }
-}
-
-function g16RenderLetters() {
-  const word = g16State.currentWord
-  const decoys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c => !word.includes(c))
-  const extra = Math.max(2, Math.min(5, 10 - word.length))
-  const shuffled = [...word.split(''), ...decoys.slice(0, extra)].sort(() => Math.random() - 0.5)
-  const wrap = document.getElementById('g16-letters-wrap')
-  wrap.innerHTML = ''
-  shuffled.forEach((letter, idx) => {
-    const btn = document.createElement('button')
-    btn.className = 'g16-letter-tile'
-    btn.id = `g16-ltile-${idx}`
-    btn.textContent = letter
-    btn.onclick = () => g16TapLetter(letter, idx)
-    wrap.appendChild(btn)
-  })
-}
-
-function g16TapLetter(letter, tileIdx) {
+function g16TapPull() {
   if (g16State.phase !== 2) return
-  const needed = g16State.currentWord[g16State.collectedIdx]
-  const slot = document.getElementById(`g16-slot-${g16State.collectedIdx}`)
-  const tile = document.getElementById(`g16-ltile-${tileIdx}`)
-  if (letter === needed) {
-    g16State.collectedIdx++
-    if (slot) { slot.textContent = letter; slot.classList.add('filled') }
-    if (tile) tile.classList.add('used')
-    playCorrect()
-    if (g16State.collectedIdx >= g16State.currentWord.length) {
-      setTimeout(() => g16WordComplete(), 300)
-    }
-  } else {
-    if (tile) { tile.style.opacity = '0.4'; setTimeout(() => { tile.style.opacity = '' }, 300) }
-    // Wrong letter = increase danger
-    g16State.danger = Math.min(95, g16State.danger + 6)
-    document.getElementById('g16-danger-fill').style.width = g16State.danger + '%'
-    playWrong()
+  g16State.tapCount++
+  // Button bounce animation
+  const btn = document.getElementById('g16-tap-btn')
+  if (btn) {
+    btn.style.transform = 'scale(0.82)'
+    btn.style.boxShadow = '0 3px 0 #BF360C,0 0 0 6px rgba(255,160,80,0.25)'
+    setTimeout(() => {
+      btn.style.transform = 'scale(1.08)'
+      btn.style.boxShadow = '0 8px 0 #BF360C,0 0 0 6px rgba(255,160,80,0.4)'
+      setTimeout(() => { btn.style.transform = 'scale(1)'; btn.style.boxShadow = '' }, 80)
+    }, 80)
+  }
+  // Rope shake
+  const rope = document.getElementById('g16-rope')
+  if (rope) { rope.style.transform = 'scaleX(0.94) rotate(-1.5deg)'; setTimeout(() => rope.style.transform = '', 90) }
+  // Sound
+  playTone(Math.min(300 + g16State.tapCount * 25, 900), 0.18, 0.07)
+  // Update bar and counter
+  const pct = Math.min(100, (g16State.tapCount / g16State.tapsNeeded) * 100)
+  document.getElementById('g16-pull-fill').style.width = pct + '%'
+  document.getElementById('g16-tap-count-display').textContent = `TAP ${g16State.tapCount} / ${g16State.tapsNeeded}`
+  if (g16State.tapCount >= g16State.tapsNeeded) {
+    document.getElementById('g16-phase2').style.display = 'none'
+    g16PullComplete()
   }
 }
 
-function g16WordComplete() {
+function g16PullComplete() {
   g16State.wordsComplete++
   g16State.wordIdx++
-  const pct = (g16State.wordsComplete / g16State.wordsNeeded) * 100
-  document.getElementById('g16-pull-fill').style.width = pct + '%'
-  // Victim train moves away from cliff
-  g16State.danger = Math.max(0, g16State.danger - 20)
+  // Reduce danger and move victim train away from cliff
+  g16State.danger = Math.max(0, g16State.danger - 25)
   document.getElementById('g16-danger-fill').style.width = g16State.danger + '%'
   const victim = document.getElementById('g16-victim-train')
   const newRight = Math.min(20, 8 + (g16State.danger / 100) * 14)
   victim.style.right = (22 - newRight) + '%'
   document.getElementById('g16-stars-badge').textContent = `🆘 ${g16State.wordsComplete}`
+  playCorrect()
   if (g16State.wordsComplete >= g16State.wordsNeeded) {
     clearInterval(g16State.dangerInterval)
     setTimeout(() => g16EndGame(true), 600)
   } else {
-    document.getElementById('g16-word-progress').textContent = `Kata ${g16State.wordsComplete + 1} / ${g16State.wordsNeeded}`
+    // Go back to Phase 1 (hook throw) for next pull
     setTimeout(() => {
-      g16StartPhase2()
+      g16State.hookSuccess = false
+      document.getElementById('g16-throw-btn').disabled = false
+      g16StartPhase1()
     }, 700)
   }
 }
@@ -15320,8 +15438,8 @@ function g16EndGame(won) {
   document.getElementById('g16-res-title').textContent = won ? 'KERETA SELAMAT! 🚂' : 'Kereta Jatuh...'
   document.getElementById('g16-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
   document.getElementById('g16-res-info').textContent = won
-    ? `Berhasil menyelamatkan kereta dengan ${g16State.wordsComplete} kata!\nAnjuran: Saling membantu itu hebat! 🤝`
-    : `Sudah ${g16State.wordsComplete} dari ${g16State.wordsNeeded} kata. Jangan menyerah!`
+    ? `Berhasil menyelamatkan kereta dengan ${g16State.wordsComplete} tarikan! Saling membantu itu hebat! 🤝`
+    : `Sudah ${g16State.wordsComplete} dari ${g16State.wordsNeeded} tarikan. Jangan menyerah!`
   res.style.display = 'flex'
   if (won) playCorrect(); else playWrong()
 }
@@ -15350,8 +15468,12 @@ function initGame17() {
   document.getElementById('g17-stars-badge').textContent = '🌉 0'
   document.getElementById('g17-combo').textContent = ''
   document.getElementById('g17-result').style.display = 'none'
-  document.getElementById('g17-train-waiting').style.animation = ''
-  document.getElementById('g17-train-waiting').style.left = '4%'
+  const trainWrap = document.getElementById('g17-train-waiting')
+  trainWrap.style.animation = ''
+  trainWrap.style.left = '4%'
+  // Render a proper steam loco SVG using G14 builder
+  const g17Cfg = TRAIN_TYPES_14['malivlakb250'] || TRAIN_TYPES_14['b2507'] || G14_CATEGORIES[0].trains[0]
+  trainWrap.innerHTML = buildSteamLocoSVG(g17Cfg, {width:160, height:70, animate:true})
   document.getElementById('g17-start-overlay').style.display = 'flex'
   document.getElementById('g17-cracks').innerHTML = ''
   g17RenderBlocks()
