@@ -2259,35 +2259,36 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* ===== GAME 15 — Lokomotif Pemberani ===== */
 #screen-game15 { flex-direction:column; }
 .g15-slot {
-  width:36px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,0.35);
-  background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:900;color:white;transition:all 0.2s;
+  width:46px;height:52px;border-radius:12px;border:2.5px solid rgba(255,255,255,0.3);
+  background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:900;color:white;transition:all 0.2s;box-shadow:0 4px 0 rgba(0,0,0,0.3);
 }
-.g15-slot.filled { background:rgba(33,150,243,0.45);border-color:#64B5F6;transform:scale(1.05); }
-.g15-slot.correct { background:rgba(76,175,80,0.5);border-color:#81C784; }
+.g15-slot.filled { background:rgba(33,150,243,0.5);border-color:#64B5F6;transform:scale(1.06);box-shadow:0 0 12px rgba(33,150,243,0.6); }
+.g15-slot.correct { background:rgba(76,175,80,0.55);border-color:#81C784;box-shadow:0 0 14px rgba(76,175,80,0.6); }
 .g15-slot.wrong   { background:rgba(244,67,54,0.5);border-color:#EF9A9A;animation:g15Shake 0.35s; }
-@keyframes g15Shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+@keyframes g15Shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 .g15-letter-tile {
-  width:44px;height:44px;border-radius:10px;border:none;cursor:pointer;
-  font-size:20px;font-weight:900;color:white;
-  background:linear-gradient(135deg,#1565C0,#2196F3);
-  box-shadow:0 4px 0 #0D47A1;transition:all 0.15s;display:flex;align-items:center;justify-content:center;
+  min-width:48px;height:54px;border-radius:12px;border:none;cursor:pointer;
+  font-size:22px;font-weight:900;color:white;
+  background:linear-gradient(145deg,#1565C0,#1976D2);
+  box-shadow:0 5px 0 #0D47A1;transition:transform 0.12s,box-shadow 0.12s;
+  display:flex;align-items:center;justify-content:center;padding:0 8px;
 }
-.g15-letter-tile:hover  { transform:translateY(-3px);box-shadow:0 7px 0 #0D47A1; }
-.g15-letter-tile:active { transform:translateY(2px);box-shadow:0 2px 0 #0D47A1; }
-.g15-letter-tile.used   { opacity:0.3;pointer-events:none;transform:scale(0.85); }
+.g15-letter-tile:hover  { transform:translateY(-4px);box-shadow:0 9px 0 #0D47A1; }
+.g15-letter-tile:active { transform:translateY(3px);box-shadow:0 2px 0 #0D47A1; }
+.g15-letter-tile.used   { opacity:0.28;pointer-events:none;transform:scale(0.82);box-shadow:none; }
+/* Game 15 — chain links (horizontal, trailing behind train) */
 .g15-chain-link {
-  display:inline-block;width:26px;height:16px;
+  display:inline-block;width:30px;height:18px;
   border:3.5px solid #B8860B;border-radius:50%;
   background:linear-gradient(145deg,#FFE97A,#D4A017 45%,#8B6000);
-  box-shadow:inset 0 2px 2px rgba(255,255,255,0.5),0 2px 6px rgba(0,0,0,0.5);
-  transition:all 0.35s ease;position:relative;margin:0 2px;
-  vertical-align:middle;
+  box-shadow:inset 0 2px 3px rgba(255,255,255,0.55),0 3px 8px rgba(0,0,0,0.6);
+  transition:all 0.35s ease;position:relative;flex-shrink:0;
 }
 .g15-chain-link.broken {
   border-color:#4A4A4A;
   background:linear-gradient(145deg,#777,#333 45%,#111);
-  opacity:0.35;transform:rotate(30deg) scale(0.7);
+  opacity:0.32;transform:rotate(30deg) scale(0.7);
   box-shadow:none;
 }
 .g15-chain-link.breaking { animation:g15ChainBreak 0.6s ease-out forwards; }
@@ -2297,10 +2298,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   100%{ transform:rotate(35deg) scale(0.65);opacity:0.3;border-color:#4A4A4A;background:linear-gradient(145deg,#777,#333 45%,#111);box-shadow:none; }
 }
 #g15-chains {
-  display:flex;align-items:center;gap:2px;justify-content:center;
-  min-height:30px;padding:5px 10px;
-  background:rgba(0,0,0,0.25);border-radius:20px;
-  border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;gap:2px;flex-wrap:nowrap;flex-shrink:0;
+}
+/* Rope connector from train to first chain */
+#g15-chain-rope {
+  width:18px;height:6px;flex-shrink:0;
+  background:linear-gradient(90deg,#8D6E63,#BCAAA4,#8D6E63);
+  border-radius:3px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.5);
 }
 @keyframes g15TrainBounce {
   0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
@@ -2395,8 +2400,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   transform-origin:center;
 }
 
-/* ===== GAME 18 — Museum Kereta ===== */
-#screen-game18 { background:linear-gradient(180deg,#1a0a3e,#2d1060);flex-direction:column; }
+/* ===== GAME 18 — Museum Kereta Ambarawa ===== */
+#screen-game18 { background:linear-gradient(180deg,#1a0e06,#2d1a0a,#3e2510);flex-direction:column; }
 .g18-card {
   background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05));
   border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 10px;
@@ -2428,7 +2433,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   color:white;font-size:14px;font-weight:800;cursor:pointer;margin:4px 0;
   text-align:left;transition:all 0.15s;
 }
-.g18-quiz-option:hover { background:rgba(123,31,162,0.4);border-color:#CE93D8; }
+.g18-quiz-option:hover { background:rgba(141,110,99,0.4);border-color:#BCAAA4; }
 .g18-quiz-option.correct { background:rgba(67,160,71,0.5);border-color:#A5D6A7; }
 .g18-quiz-option.wrong   { background:rgba(229,57,53,0.5);border-color:#FFCDD2; }
 
@@ -4666,7 +4671,7 @@ body { background: #0a0a1a !important; }
       <div class="game-tile g18" id="gtile-18" onclick="playClick(); openLevelSelect(18)">
         <div class="g-banner" style="background:linear-gradient(135deg,#6A1B9A,#9C27B0);display:flex;align-items:center;justify-content:center;height:60px;font-size:40px;">🏛️</div>
         <span class="g-icon">📚</span>
-        <div class="g-name">Museum Kereta</div>
+        <div class="g-name">Museum Ambarawa</div>
         <div class="g-stars-row" id="gstars-18"></div>
         <span class="g-tag">Edukasi</span>
       </div>
@@ -4929,7 +4934,7 @@ body { background: #0a0a1a !important; }
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 10px;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);">
     <button class="gh-back" onclick="exitGame13b()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">⌂</button>
     <span style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">⚡ Quick Fire</span>
-    <span style="font-size:11px;color:rgba(255,255,255,0.5);font-family:'Fredoka One',cursive;">60 detik!</span>
+    <button onclick="openG13bPartyPicker()" title="Ganti Pokémon" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:5px 10px;font-size:18px;cursor:pointer;flex-shrink:0;">🎒</button>
   </div>
 
   <!-- Battle field -->
@@ -4991,6 +4996,21 @@ body { background: #0a0a1a !important; }
     <div class="g13b-result-stars" id="g13b-res-stars">⭐⭐⭐</div>
     <div class="g13b-result-btns">
       <button onclick="startQuickFire()" style="background:linear-gradient(135deg,#FBBF24,#06B6D4);color:#1a1a1a;">Main Lagi ⚡</button>
+      <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Menu</button>
+    </div>
+  </div>
+
+  <!-- Level Complete overlay — shown after defeating legendary -->
+  <div class="g13b-result-overlay" id="g13b-level-complete" style="display:none;background:radial-gradient(ellipse at center,rgba(251,191,36,0.25) 0%,rgba(5,5,16,0.97) 70%);">
+    <div class="g13b-result-icon" id="g13b-lc-icon">🌟</div>
+    <div class="g13b-result-title" id="g13b-lc-title" style="color:#FBBF24;">Level Selesai!</div>
+    <div id="g13b-lc-pokemon" style="font-size:13px;color:rgba(255,255,255,0.7);font-family:'Fredoka One',cursive;margin-bottom:4px;">Kamu mengalahkan Legendary!</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.45);font-family:'Fredoka One',cursive;">Pokémon dikalahkan:</div>
+    <div class="g13b-result-kills" id="g13b-lc-kills">0</div>
+    <div class="g13b-result-sub" id="g13b-lc-sub">Combo terbaik: —</div>
+    <div class="g13b-result-stars" id="g13b-lc-stars">⭐⭐⭐</div>
+    <div class="g13b-result-btns">
+      <button onclick="startQuickFire()" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#1a1a1a;font-size:16px;">Lanjut ▶</button>
       <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Menu</button>
     </div>
   </div>
@@ -5114,22 +5134,33 @@ body { background: #0a0a1a !important; }
     <span id="g15-chain-count" style="background:rgba(255,160,0,0.9);color:#1a1a1a;border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 2px 0 #CC6600;">⛓️ 5</span>
   </div>
   <!-- Main game area -->
-  <div id="g15-arena" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 16px;gap:10px;overflow:hidden;background:linear-gradient(180deg,#0d1b3e 0%,#1a237e 60%,#0d47a1 100%);">
+  <div id="g15-arena" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 14px 8px;gap:8px;overflow:hidden;background:linear-gradient(180deg,#0a1228 0%,#0d1b3e 40%,#1a237e 80%,#0d47a1 100%);">
     <!-- Target word display -->
-    <div style="background:rgba(255,255,255,0.12);border-radius:12px;padding:8px 18px;text-align:center;">
-      <div style="color:rgba(255,255,255,0.65);font-size:11px;font-weight:700;letter-spacing:2px;margin-bottom:2px;">KATA TARGET</div>
-      <div id="g15-word-slots" style="display:flex;gap:6px;justify-content:center;min-height:44px;align-items:center;flex-wrap:wrap;"></div>
+    <div style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;padding:10px 20px;text-align:center;width:100%;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.4);flex-shrink:0;">
+      <div style="color:rgba(255,255,255,0.55);font-size:10px;font-weight:800;letter-spacing:3px;margin-bottom:6px;">KATA TARGET</div>
+      <div id="g15-word-slots" style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;min-height:50px;"></div>
     </div>
-    <!-- Train & chains visual -->
-    <div id="g15-train-wrap" style="position:relative;width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-      <div id="g15-chains" style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;min-height:28px;"></div>
-      <img id="g15-train-icon" src="assets/train/linus-brave_char.svg" style="width:160px;height:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5));" alt="Linus" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=\'font-size:56px;\'>🚂</div>')">
-      <div id="g15-progress-msg" style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;text-align:center;min-height:18px;"></div>
+
+    <!-- Train (2x) + chains behind it -->
+    <div id="g15-train-wrap" style="position:relative;width:100%;max-width:420px;display:flex;align-items:center;justify-content:flex-start;padding:0 8px;flex-shrink:0;">
+      <!-- Train image 2x bigger -->
+      <img id="g15-train-icon" src="assets/train/linus-brave_char.svg"
+        style="width:280px;height:auto;flex-shrink:0;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65));z-index:2;position:relative;"
+        alt="Linus"
+        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=\'font-size:96px;\'>🚂</div>')">
+      <!-- Rope connector -->
+      <div id="g15-chain-rope" style="width:16px;height:7px;flex-shrink:0;background:linear-gradient(90deg,#8D6E63,#BCAAA4,#8D6E63);border-radius:3px;box-shadow:0 2px 5px rgba(0,0,0,0.55);margin-left:-2px;z-index:1;"></div>
+      <!-- Chains trailing behind -->
+      <div id="g15-chains" style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;flex-shrink:0;"></div>
     </div>
-    <!-- Image hint -->
-    <div id="g15-image-wrap" style="width:100px;height:100px;border-radius:16px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:56px;border:2px solid rgba(255,255,255,0.2);flex-shrink:0;">❓</div>
-    <!-- Letter tiles -->
-    <div id="g15-letters" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px;max-width:360px;"></div>
+    <!-- Progress label below train area -->
+    <div id="g15-progress-msg" style="color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;text-align:center;min-height:16px;margin-top:-4px;flex-shrink:0;"></div>
+
+    <!-- Image hint — bigger, more prominent -->
+    <div id="g15-image-wrap" style="width:120px;height:120px;border-radius:20px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;font-size:68px;border:2.5px solid rgba(255,255,255,0.3);flex-shrink:0;box-shadow:0 6px 20px rgba(0,0,0,0.5);">❓</div>
+
+    <!-- Letter tiles — at the bottom -->
+    <div id="g15-letters" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:4px 4px 6px;max-width:380px;margin-top:auto;"></div>
   </div>
   <!-- Result overlay -->
   <div id="g15-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:12px;">
@@ -5274,28 +5305,31 @@ body { background: #0a0a1a !important; }
   </div>
 </div>
 
-<!-- GAME 18 — Museum Kereta -->
+<!-- GAME 18 — Museum Kereta Ambarawa -->
 <div id="screen-game18" class="screen">
-  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);">
+  <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:linear-gradient(135deg,rgba(62,39,35,0.95),rgba(93,57,34,0.95));backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
-    <span style="font-size:20px;flex-shrink:0;">🏛️</span>
-    <span class="gh-title" style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Museum Kereta</span>
-    <span id="g18-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
+    <span class="gh-title" style="flex:1;font-size:14px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">🏛️ Museum Kereta Ambarawa</span>
+    <span id="g18-level" style="color:rgba(255,220,150,0.9);flex-shrink:0;font-weight:800;">Lv.1</span>
     <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⏸</button>
-    <span id="g18-stars-badge" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #38006b;color:white;flex-shrink:0;">🏛️ 0</span>
+    <span id="g18-stars-badge" style="background:linear-gradient(135deg,#8D6E63,#A1887F);border-radius:100px;padding:4px 10px;font-size:14px;font-weight:900;box-shadow:0 3px 0 #4E342E;color:white;flex-shrink:0;">🏛️ 0</span>
   </div>
   <!-- Gallery view -->
-  <div id="g18-gallery" style="flex:1;overflow-y:auto;padding:12px;">
-    <div style="color:white;font-size:13px;font-weight:800;text-align:center;margin-bottom:10px;opacity:0.75;">Ketuk kartu untuk info lengkap! 🔍</div>
-    <div id="g18-card-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:0 auto;"></div>
-    <div style="text-align:center;margin-top:14px;padding-bottom:4px;">
-      <button onclick="g18StartQuiz()" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);color:white;border:none;border-radius:14px;padding:14px 28px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #38006b;cursor:pointer;">📝 MULAI KUIS!</button>
+  <div id="g18-gallery" style="flex:1;overflow-y:auto;padding:10px 12px;">
+    <!-- Hero banner -->
+    <div style="background:linear-gradient(135deg,rgba(93,57,34,0.8),rgba(62,39,35,0.9));border:1px solid rgba(255,193,100,0.3);border-radius:14px;padding:10px 14px;margin-bottom:10px;text-align:center;">
+      <div style="color:#FFD082;font-size:13px;font-weight:900;letter-spacing:1px;">📍 AMBARAWA, KABUPATEN SEMARANG, JAWA TENGAH</div>
+      <div style="color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;margin-top:2px;">Bekas Stasiun Willem I (1873) · Ketuk kartu untuk info! 🔍</div>
+    </div>
+    <div id="g18-card-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;"></div>
+    <div style="text-align:center;margin-top:14px;padding-bottom:8px;">
+      <button onclick="g18StartQuiz()" style="background:linear-gradient(135deg,#5D3A1A,#8D6E63);color:white;border:none;border-radius:14px;padding:14px 28px;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #3E2723;cursor:pointer;">📝 MULAI KUIS!</button>
     </div>
   </div>
   <!-- Quiz view -->
   <div id="g18-quiz-view" style="display:none;flex:1;overflow-y:auto;padding:12px;flex-direction:column;gap:12px;">
-    <div style="color:white;font-size:13px;font-weight:800;text-align:center;opacity:0.75;">
-      Pertanyaan <span id="g18-q-num">1</span> dari 5
+    <div style="color:rgba(255,220,150,0.9);font-size:13px;font-weight:800;text-align:center;">
+      Pertanyaan <span id="g18-q-num">1</span> dari 6
     </div>
     <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:16px;text-align:center;">
       <div id="g18-q-image" style="font-size:44px;margin-bottom:8px;"></div>
@@ -5304,7 +5338,7 @@ body { background: #0a0a1a !important; }
     <div id="g18-q-options" style="display:flex;flex-direction:column;gap:6px;"></div>
     <div id="g18-q-feedback" style="color:white;font-size:13px;font-weight:800;text-align:center;min-height:20px;"></div>
     <div id="g18-q-next-wrap" style="text-align:center;display:none;">
-      <button id="g18-q-next-btn" onclick="g18NextQuestion()" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #38006b;">▶ Lanjut</button>
+      <button id="g18-q-next-btn" onclick="g18NextQuestion()" style="background:linear-gradient(135deg,#5D3A1A,#8D6E63);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #3E2723;">▶ Lanjut</button>
     </div>
   </div>
   <!-- Detail modal -->
@@ -5423,6 +5457,10 @@ body { background: #0a0a1a !important; }
       <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;">
         <span style="color:white;font-size:16px;font-weight:700;">📳 Getar</span>
         <button id="settings-vibrate-btn" onclick="toggleVibrateSetting()" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:white;border:none;border-radius:20px;padding:7px 20px;font-size:14px;font-weight:900;cursor:pointer;min-width:60px;">ON</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;">
+        <span style="color:white;font-size:16px;font-weight:700;">✖️ Perkalian &amp; Pembagian</span>
+        <button id="settings-mathadv-btn" onclick="toggleMathAdvanced()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:20px;padding:7px 20px;font-size:14px;font-weight:900;cursor:pointer;min-width:60px;">OFF</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;">
         <span style="color:white;font-size:16px;font-weight:700;">👤 Pemain</span>
@@ -5895,7 +5933,7 @@ const GAME_META = {
   15:{icon:'💪',name:'Lokomotif Pemberani'},
   16:{icon:'🆘',name:'Selamatkan Kereta!'},
   17:{icon:'🌉',name:'Jembatan Goyang'},
-  18:{icon:'🏛️',name:'Museum Kereta'}
+  18:{icon:'🏛️',name:'Museum Ambarawa'}
 }
 
 // XP & Level system
@@ -6554,6 +6592,8 @@ function openSettingsFromPause() {
   sb.style.background=sv==='off'?'rgba(255,255,255,0.15)':'linear-gradient(135deg,#8B5CF6,#6D28D9)'
   vb.textContent=vv==='off'?'OFF':'ON'
   vb.style.background=vv==='off'?'rgba(255,255,255,0.15)':'linear-gradient(135deg,#8B5CF6,#6D28D9)'
+  const mb=document.getElementById('settings-mathadv-btn')
+  if(mb){const adv=isMathAdvanced();mb.textContent=adv?'ON':'OFF';mb.style.background=adv?'linear-gradient(135deg,#8B5CF6,#6D28D9)':'rgba(255,255,255,0.15)'}
   document.getElementById('settings-overlay').style.display='flex'
 }
 function toggleSoundSetting() {
@@ -6565,6 +6605,13 @@ function toggleSoundSetting() {
   // Control background music with sound toggle
   const active=document.querySelector('.screen.active')
   bgMusicToggle(next!=='off' && active && MUSIC_SCREENS.has(active.id))
+}
+function isMathAdvanced(){return localStorage.getItem('dunia-emosi-mathadv')==='on'}
+function toggleMathAdvanced(){
+  const next=isMathAdvanced()?'off':'on'
+  localStorage.setItem('dunia-emosi-mathadv',next)
+  const btn=document.getElementById('settings-mathadv-btn')
+  if(btn){btn.textContent=next==='on'?'ON':'OFF';btn.style.background=next==='on'?'linear-gradient(135deg,#8B5CF6,#6D28D9)':'rgba(255,255,255,0.15)'}
 }
 function toggleVibrateSetting() {
   const next=localStorage.getItem('dunia-emosi-vibrate')==='off'?'on':'off'
@@ -8442,8 +8489,11 @@ const TRAINER_PARTIES = [
 ]
 
 let g10ActiveTrainer = 'ash'
+let partyPickerCtx = 'g10' // 'g10' | 'g13b'
+let g13bSavedPoke = null   // persists chosen pokemon across G13B rounds
 
 function openPartyPicker(){
+  partyPickerCtx = 'g10'
   const overlay = document.getElementById('g10-party-overlay')
   if(!overlay) return
   overlay.classList.add('open')
@@ -8498,7 +8548,12 @@ function renderPartyGrid(trainerId){
     img.src = pokeSpriteOnline(slug)
     img.onerror = () => { img.src = pokeSpriteBackup(poke.id); img.onerror = null }
     if(!isCurrent){
-      card.onclick = () => { playClick(); switchPlayerPoke(poke); closePartyPicker() }
+      card.onclick = () => {
+        playClick()
+        if (partyPickerCtx === 'g13b') { switchG13bPlayerPoke(poke) }
+        else { switchPlayerPoke(poke) }
+        closePartyPicker()
+      }
     }
     gridEl.appendChild(card)
   })
@@ -8540,11 +8595,33 @@ function switchPlayerPoke(poke){
   }, 280)
 }
 
+function openG13bPartyPicker() {
+  partyPickerCtx = 'g13b'
+  const overlay = document.getElementById('g10-party-overlay')
+  if (!overlay) return
+  overlay.classList.add('open')
+  renderTrainerTabs()
+  renderPartyGrid(g10ActiveTrainer)
+}
+
+function switchG13bPlayerPoke(poke) {
+  g13bSavedPoke = { ...poke, slug: poke.name.toLowerCase().replace(/\s/g, '-') }
+  const pspr = document.getElementById('g13b-pspr')
+  if (!pspr) return
+  pspr.src = pokeSpriteOnline(g13bSavedPoke.slug)
+  pspr.onerror = function() { this.src = pokeSpriteBackup(poke.id); this.onerror = null }
+}
+
+// Legendary & special Pokémon ID sets (used by G10, G13, G13B pools)
+const _LEGENDARY_IDS = new Set([144,145,146,150,151,243,244,245,249,250,251,380,381,382,383,384,385,386,480,481,482,483,484,487,491,492,493,638,639,640,641,642,643,644,645,646,649,716,717,718,785,786,787,788,791,792,800,801,802,807,888,889,890,894,895,896,897,898,987,1004,1007,1008])
+const _PSEUDO_IDS   = new Set([149,248,373,376,445,635,646,706,784,887])
+const _CUTE_IDS     = new Set([1,4,7,25,39,52,133,172,175,216,495,498,501,650,653,656,722,725,728,810,813,816,906,909,912,915,921,924])
+
 // Pokemon pool by level — anak bisa kenal favorit lebih dulu
 const G10_POOL = {
-  favorite: [25,4,7,1,133,39,143,63,52,172,175,216],  // Pikachu, Charmander, Squirtle, Bulbasaur, Eevee, Jigglypuff, Snorlax, Abra, Meowth, Pichu, Togepi, Teddiursa
-  mid:      [6,9,3,135,136,134,152,155,158,179,196,197,280,255,258,252,403,417,387,390,393,448,425,427,311,312,315], // evolutions + gen 2/3/4
-  boss:     [150,151,144,145,146,249,250,251,382,383,384,385,386,445,484,487,493,643,644,646,716,717,718,800]  // legendaries + pseudolegendary
+  favorite: POKEMON_DB.filter(p => _CUTE_IDS.has(p.id)).map(p => p.id),
+  mid:      POKEMON_DB.filter(p => !_LEGENDARY_IDS.has(p.id) && !_PSEUDO_IDS.has(p.id) && !_CUTE_IDS.has(p.id)).map(p => p.id),
+  boss:     POKEMON_DB.filter(p => _LEGENDARY_IDS.has(p.id) || _PSEUDO_IDS.has(p.id)).map(p => p.id),
 }
 
 function pickPokeForLevel(lv){
@@ -9590,191 +9667,191 @@ const G13_CHAINS = [
 
   // === HARD (26-40): mixed ops up to 30, some start as stage-1 ===
   // Player starts as first evolution → evolves to final form
-  {id:56, icon:'🔥', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:56, icon:'🔥', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
    evolved:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'},
    wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
-  {id:51, icon:'🌊', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:51, icon:'🌊', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Wartortle',slug:'wartortle',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'},
    wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
-  {id:52, icon:'🌿', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:52, icon:'🌿', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Ivysaur',slug:'ivysaur',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'},
    wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
-  {id:53, icon:'👻', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:53, icon:'👻', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Haunter',slug:'haunter',type:'Ghost',tc:'#7C3AED'},
    evolved:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'},
    wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
-  {id:54, icon:'🐉', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:54, icon:'🐉', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'}},
-  {id:55, icon:'🔮', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:55, icon:'🔮', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'},
    evolved:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'},
    wild:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'}},
 
   // Hard (original #26 moved)
-  {id:26, icon:'🔥', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:26, icon:'🔥', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Cyndaquil',slug:'cyndaquil',type:'Fire',tc:'#F97316'},
    evolved:{name:'Quilava',slug:'quilava',type:'Fire',tc:'#F97316'},
    wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
-  {id:27, icon:'🐊', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:27, icon:'🐊', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Totodile',slug:'totodile',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Croconaw',slug:'croconaw',type:'Water',tc:'#38BDF8'},
    wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
-  {id:28, icon:'🌱', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:28, icon:'🌱', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Chikorita',slug:'chikorita',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Bayleef',slug:'bayleef',type:'Grass',tc:'#22C55E'},
    wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
-  {id:29, icon:'🥚', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:29, icon:'🥚', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Togepi',slug:'togepi',type:'Fairy',tc:'#FB7185'},
    evolved:{name:'Togetic',slug:'togetic',type:'Fairy',tc:'#FB7185'},
    wild:{name:'Clefable',slug:'clefable',type:'Fairy',tc:'#FB7185'}},
-  {id:30, icon:'💧', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:30, icon:'💧', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Marill',slug:'marill',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Azumarill',slug:'azumarill',type:'Water',tc:'#38BDF8'},
    wild:{name:'Vaporeon',slug:'vaporeon',type:'Water',tc:'#38BDF8'}},
-  {id:31, icon:'🐻', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:31, icon:'🐻', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Teddiursa',slug:'teddiursa',type:'Normal',tc:'#A3A3A3'},
    evolved:{name:'Ursaring',slug:'ursaring',type:'Normal',tc:'#A3A3A3'},
    wild:{name:'Kangaskhan',slug:'kangaskhan',type:'Normal',tc:'#A3A3A3'}},
-  {id:32, icon:'🐶', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:32, icon:'🐶', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Snubbull',slug:'snubbull',type:'Fairy',tc:'#FB7185'},
    evolved:{name:'Granbull',slug:'granbull',type:'Fairy',tc:'#FB7185'},
    wild:{name:'Persian',slug:'persian',type:'Normal',tc:'#A3A3A3'}},
-  {id:33, icon:'🦖', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:33, icon:'🦖', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Larvitar',slug:'larvitar',type:'Rock',tc:'#A16207'},
    evolved:{name:'Pupitar',slug:'pupitar',type:'Rock',tc:'#A16207'},
    wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
-  {id:34, icon:'🌋', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:34, icon:'🌋', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Slugma',slug:'slugma',type:'Fire',tc:'#F97316'},
    evolved:{name:'Magcargo',slug:'magcargo',type:'Fire',tc:'#F97316'},
    wild:{name:'Ninetales',slug:'ninetales',type:'Fire',tc:'#F97316'}},
-  {id:35, icon:'🐗', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:35, icon:'🐗', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Swinub',slug:'swinub',type:'Ice',tc:'#BAE6FD'},
    evolved:{name:'Piloswine',slug:'piloswine',type:'Ice',tc:'#BAE6FD'},
    wild:{name:'Dewgong',slug:'dewgong',type:'Ice',tc:'#BAE6FD'}},
-  {id:36, icon:'💧', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:36, icon:'💧', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Mudkip',slug:'mudkip',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Marshtomp',slug:'marshtomp',type:'Water',tc:'#38BDF8'},
    wild:{name:'Psyduck',slug:'psyduck',type:'Water',tc:'#38BDF8'}},
-  {id:37, icon:'🍃', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:37, icon:'🍃', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Treecko',slug:'treecko',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Grovyle',slug:'grovyle',type:'Grass',tc:'#22C55E'},
    wild:{name:'Bulbasaur',slug:'bulbasaur',type:'Grass',tc:'#22C55E'}},
-  {id:38, icon:'🐓', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:38, icon:'🐓', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Torchic',slug:'torchic',type:'Fire',tc:'#F97316'},
    evolved:{name:'Combusken',slug:'combusken',type:'Fire',tc:'#F97316'},
    wild:{name:'Vulpix',slug:'vulpix',type:'Fire',tc:'#F97316'}},
-  {id:39, icon:'🌀', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:39, icon:'🌀', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Ralts',slug:'ralts',type:'Psychic',tc:'#EC4899'},
    evolved:{name:'Kirlia',slug:'kirlia',type:'Psychic',tc:'#EC4899'},
    wild:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'}},
-  {id:40, icon:'⚙️', diff:'hard', maxNum:30, ops:['+','-'],
+  {id:40, icon:'⚙️', diff:'hard', maxNum:20, ops:['+','-'],
    player:{name:'Beldum',slug:'beldum',type:'Steel',tc:'#94A3B8'},
    evolved:{name:'Metang',slug:'metang',type:'Steel',tc:'#94A3B8'},
    wild:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'}},
 
   // === EPIC (level 17-20): 2-stage evolution! Base → Stage1 → Final ===
-  {id:61, icon:'🔥', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:61, icon:'🔥', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Charmander',slug:'charmander',type:'Fire',tc:'#F97316'},
    evolved:{name:'Charmeleon',slug:'charmeleon',type:'Fire',tc:'#F97316'},
    evolved2:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'},
    wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
-  {id:62, icon:'💧', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:62, icon:'💧', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Squirtle',slug:'squirtle',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Wartortle',slug:'wartortle',type:'Water',tc:'#38BDF8'},
    evolved2:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'},
    wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
-  {id:63, icon:'🌿', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:63, icon:'🌿', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Bulbasaur',slug:'bulbasaur',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Ivysaur',slug:'ivysaur',type:'Grass',tc:'#22C55E'},
    evolved2:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'},
    wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
-  {id:64, icon:'👻', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:64, icon:'👻', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Gastly',slug:'gastly',type:'Ghost',tc:'#7C3AED'},
    evolved:{name:'Haunter',slug:'haunter',type:'Ghost',tc:'#7C3AED'},
    evolved2:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'},
    wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
-  {id:65, icon:'🐉', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:65, icon:'🐉', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Dratini',slug:'dratini',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#F97316'},
    wild:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'}},
-  {id:66, icon:'⚙️', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:66, icon:'⚙️', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Beldum',slug:'beldum',type:'Steel',tc:'#94A3B8'},
    evolved:{name:'Metang',slug:'metang',type:'Steel',tc:'#94A3B8'},
    evolved2:{name:'Metagross',slug:'metagross',type:'Steel',tc:'#94A3B8'},
    wild:{name:'Starmie',slug:'starmie',type:'Psychic',tc:'#EC4899'}},
-  {id:67, icon:'🦖', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:67, icon:'🦖', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Larvitar',slug:'larvitar',type:'Rock',tc:'#A16207'},
    evolved:{name:'Pupitar',slug:'pupitar',type:'Rock',tc:'#A16207'},
    evolved2:{name:'Tyranitar',slug:'tyranitar',type:'Dark',tc:'#4B5563'},
    wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
-  {id:68, icon:'🌀', diff:'epic', maxNum:35, ops:['+','-'],
+  {id:68, icon:'🌀', diff:'epic', maxNum:20, ops:['+','-'],
    player:{name:'Ralts',slug:'ralts',type:'Psychic',tc:'#EC4899'},
    evolved:{name:'Kirlia',slug:'kirlia',type:'Psychic',tc:'#EC4899'},
    evolved2:{name:'Gardevoir',slug:'gardevoir',type:'Psychic',tc:'#EC4899'},
    wild:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'}},
   // More epic chains (2-stage, multiplication range)
-  {id:69, icon:'🔥', diff:'epic', maxNum:40, ops:['+','-','*'],
+  {id:69, icon:'🔥', diff:'epic', maxNum:20, ops:['+','-','*'],
    player:{name:'Torchic',slug:'torchic',type:'Fire',tc:'#F97316'},
    evolved:{name:'Combusken',slug:'combusken',type:'Fire',tc:'#F97316'},
    evolved2:{name:'Blaziken',slug:'blaziken',type:'Fighting',tc:'#EF4444'},
    wild:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'}},
-  {id:70, icon:'💧', diff:'epic', maxNum:40, ops:['+','-','*'],
+  {id:70, icon:'💧', diff:'epic', maxNum:20, ops:['+','-','*'],
    player:{name:'Mudkip',slug:'mudkip',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Marshtomp',slug:'marshtomp',type:'Water',tc:'#38BDF8'},
    evolved2:{name:'Swampert',slug:'swampert',type:'Water',tc:'#38BDF8'},
    wild:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'}},
-  {id:71, icon:'🌿', diff:'epic', maxNum:40, ops:['+','-','*'],
+  {id:71, icon:'🌿', diff:'epic', maxNum:20, ops:['+','-','*'],
    player:{name:'Treecko',slug:'treecko',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Grovyle',slug:'grovyle',type:'Grass',tc:'#22C55E'},
    evolved2:{name:'Sceptile',slug:'sceptile',type:'Grass',tc:'#22C55E'},
    wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
 
   // === LEGENDARY (level 21-30): multiplication + division, all 2-stage ===
-  {id:80, icon:'🌋', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:80, icon:'🌋', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Cyndaquil',slug:'cyndaquil',type:'Fire',tc:'#F97316'},
    evolved:{name:'Quilava',slug:'quilava',type:'Fire',tc:'#F97316'},
    evolved2:{name:'Typhlosion',slug:'typhlosion',type:'Fire',tc:'#F97316'},
    wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
-  {id:81, icon:'🌊', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:81, icon:'🌊', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Totodile',slug:'totodile',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Croconaw',slug:'croconaw',type:'Water',tc:'#38BDF8'},
    evolved2:{name:'Feraligatr',slug:'feraligatr',type:'Water',tc:'#38BDF8'},
    wild:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'}},
-  {id:82, icon:'🌱', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:82, icon:'🌱', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Chikorita',slug:'chikorita',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Bayleef',slug:'bayleef',type:'Grass',tc:'#22C55E'},
    evolved2:{name:'Meganium',slug:'meganium',type:'Grass',tc:'#22C55E'},
    wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
-  {id:83, icon:'🐊', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:83, icon:'🐊', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Omanyte',slug:'omanyte',type:'Rock',tc:'#A16207'},
    evolved:{name:'Omastar',slug:'omastar',type:'Rock',tc:'#A16207'},
    wild:{name:'Kabutops',slug:'kabutops',type:'Rock',tc:'#A16207'}},
-  {id:84, icon:'⭐', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:84, icon:'⭐', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Eevee',slug:'eevee',type:'Normal',tc:'#A3A3A3'},
    evolved:{name:'Jolteon',slug:'jolteon',type:'Electric',tc:'#FBBF24'},
    wild:{name:'Raichu',slug:'raichu',type:'Electric',tc:'#FBBF24'}},
-  {id:85, icon:'🌊', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:85, icon:'🌊', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Machop',slug:'machop',type:'Fighting',tc:'#EF4444'},
    evolved:{name:'Machoke',slug:'machoke',type:'Fighting',tc:'#EF4444'},
    evolved2:{name:'Machamp',slug:'machamp',type:'Fighting',tc:'#EF4444'},
    wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
-  {id:86, icon:'💎', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:86, icon:'💎', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Abra',slug:'abra',type:'Psychic',tc:'#EC4899'},
    evolved:{name:'Kadabra',slug:'kadabra',type:'Psychic',tc:'#EC4899'},
    evolved2:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'},
    wild:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'}},
-  {id:87, icon:'🌟', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:87, icon:'🌟', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Pichu',slug:'pichu',type:'Electric',tc:'#FBBF24'},
    evolved:{name:'Pikachu',slug:'pikachu',type:'Electric',tc:'#FBBF24'},
    evolved2:{name:'Raichu',slug:'raichu',type:'Electric',tc:'#FBBF24'},
    wild:{name:'Jolteon',slug:'jolteon',type:'Electric',tc:'#FBBF24'}},
-  {id:88, icon:'🏆', diff:'legendary', maxNum:50, ops:['+','-','*'],
+  {id:88, icon:'🏆', diff:'legendary', maxNum:20, ops:['+','-','*'],
    player:{name:'Larvitar',slug:'larvitar',type:'Rock',tc:'#A16207'},
    evolved:{name:'Pupitar',slug:'pupitar',type:'Rock',tc:'#A16207'},
    evolved2:{name:'Tyranitar',slug:'tyranitar',type:'Dark',tc:'#4B5563'},
@@ -9857,106 +9934,106 @@ const G13_CHAINS = [
    wild:{name:'Tauros',slug:'tauros',type:'Normal',tc:'#A3A3A3'}},
 
   // === ADDITIONAL HARD (IDs 120-127) ===
-  {id:120,icon:'⚡',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:120,icon:'⚡',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Electrike',slug:'electrike',type:'Electric',tc:'#FBBF24'},
    evolved:{name:'Manectric',slug:'manectric',type:'Electric',tc:'#FBBF24'},
    wild:{name:'Raichu',slug:'raichu',type:'Electric',tc:'#FBBF24'}},
-  {id:121,icon:'🐲',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:121,icon:'🐲',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Swablu',slug:'swablu',type:'Normal',tc:'#BAE6FD'},
    evolved:{name:'Altaria',slug:'altaria',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Dragonair',slug:'dragonair',type:'Dragon',tc:'#6366F1'}},
-  {id:122,icon:'🍄',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:122,icon:'🍄',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Shroomish',slug:'shroomish',type:'Grass',tc:'#22C55E'},
    evolved:{name:'Breloom',slug:'breloom',type:'Fighting',tc:'#EF4444'},
    wild:{name:'Parasect',slug:'parasect',type:'Bug',tc:'#84CC16'}},
-  {id:123,icon:'🌊',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:123,icon:'🌊',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Wailmer',slug:'wailmer',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Wailord',slug:'wailord',type:'Water',tc:'#38BDF8'},
    wild:{name:'Lapras',slug:'lapras',type:'Water',tc:'#38BDF8'}},
-  {id:124,icon:'🥊',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:124,icon:'🥊',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Meditite',slug:'meditite',type:'Fighting',tc:'#EF4444'},
    evolved:{name:'Medicham',slug:'medicham',type:'Fighting',tc:'#EF4444'},
    wild:{name:'Hitmonchan',slug:'hitmonchan',type:'Fighting',tc:'#EF4444'}},
-  {id:125,icon:'🐱',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:125,icon:'🐱',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Skitty',slug:'skitty',type:'Normal',tc:'#A3A3A3'},
    evolved:{name:'Delcatty',slug:'delcatty',type:'Normal',tc:'#A3A3A3'},
    wild:{name:'Persian',slug:'persian',type:'Normal',tc:'#A3A3A3'}},
-  {id:126,icon:'🧊',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:126,icon:'🧊',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Snorunt',slug:'snorunt',type:'Ice',tc:'#BAE6FD'},
    evolved:{name:'Glalie',slug:'glalie',type:'Ice',tc:'#BAE6FD'},
    wild:{name:'Piloswine',slug:'piloswine',type:'Ice',tc:'#BAE6FD'}},
-  {id:127,icon:'🌿',diff:'hard',maxNum:30,ops:['+','-'],
+  {id:127,icon:'🌿',diff:'hard',maxNum:20,ops:['+','-'],
    player:{name:'Paras',slug:'paras',type:'Bug',tc:'#84CC16'},
    evolved:{name:'Parasect',slug:'parasect',type:'Bug',tc:'#84CC16'},
    wild:{name:'Venomoth',slug:'venomoth',type:'Bug',tc:'#84CC16'}},
 
   // === ADDITIONAL EPIC (IDs 130-137): 2-stage evolutions ===
-  {id:130,icon:'🐲',diff:'epic',maxNum:35,ops:['+','-'],
+  {id:130,icon:'🐲',diff:'epic',maxNum:20,ops:['+','-'],
    player:{name:'Bagon',slug:'bagon',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Shelgon',slug:'shelgon',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Salamence',slug:'salamence',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#F97316'}},
-  {id:131,icon:'🪨',diff:'epic',maxNum:35,ops:['+','-'],
+  {id:131,icon:'🪨',diff:'epic',maxNum:20,ops:['+','-'],
    player:{name:'Roggenrola',slug:'roggenrola',type:'Rock',tc:'#A16207'},
    evolved:{name:'Boldore',slug:'boldore',type:'Rock',tc:'#A16207'},
    evolved2:{name:'Gigalith',slug:'gigalith',type:'Rock',tc:'#A16207'},
    wild:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'}},
-  {id:132,icon:'🕯️',diff:'epic',maxNum:35,ops:['+','-'],
+  {id:132,icon:'🕯️',diff:'epic',maxNum:20,ops:['+','-'],
    player:{name:'Litwick',slug:'litwick',type:'Ghost',tc:'#7C3AED'},
    evolved:{name:'Lampent',slug:'lampent',type:'Ghost',tc:'#7C3AED'},
    evolved2:{name:'Chandelure',slug:'chandelure',type:'Ghost',tc:'#7C3AED'},
    wild:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'}},
-  {id:133,icon:'🐉',diff:'epic',maxNum:40,ops:['+','-','*'],
+  {id:133,icon:'🐉',diff:'epic',maxNum:20,ops:['+','-','*'],
    player:{name:'Gible',slug:'gible',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Gabite',slug:'gabite',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Garchomp',slug:'garchomp',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#F97316'}},
-  {id:134,icon:'💪',diff:'epic',maxNum:35,ops:['+','-'],
+  {id:134,icon:'💪',diff:'epic',maxNum:20,ops:['+','-'],
    player:{name:'Timburr',slug:'timburr',type:'Fighting',tc:'#EF4444'},
    evolved:{name:'Gurdurr',slug:'gurdurr',type:'Fighting',tc:'#EF4444'},
    evolved2:{name:'Conkeldurr',slug:'conkeldurr',type:'Fighting',tc:'#EF4444'},
    wild:{name:'Machamp',slug:'machamp',type:'Fighting',tc:'#EF4444'}},
-  {id:135,icon:'⚡',diff:'epic',maxNum:40,ops:['+','-','*'],
+  {id:135,icon:'⚡',diff:'epic',maxNum:20,ops:['+','-','*'],
    player:{name:'Elekid',slug:'elekid',type:'Electric',tc:'#FBBF24'},
    evolved:{name:'Electabuzz',slug:'electabuzz',type:'Electric',tc:'#FBBF24'},
    evolved2:{name:'Electivire',slug:'electivire',type:'Electric',tc:'#FBBF24'},
    wild:{name:'Raichu',slug:'raichu',type:'Electric',tc:'#FBBF24'}},
-  {id:136,icon:'🔥',diff:'epic',maxNum:40,ops:['+','-','*'],
+  {id:136,icon:'🔥',diff:'epic',maxNum:20,ops:['+','-','*'],
    player:{name:'Magby',slug:'magby',type:'Fire',tc:'#F97316'},
    evolved:{name:'Magmar',slug:'magmar',type:'Fire',tc:'#F97316'},
    evolved2:{name:'Magmortar',slug:'magmortar',type:'Fire',tc:'#F97316'},
    wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
-  {id:137,icon:'🐊',diff:'epic',maxNum:40,ops:['+','-','*'],
+  {id:137,icon:'🐊',diff:'epic',maxNum:20,ops:['+','-','*'],
    player:{name:'Sandile',slug:'sandile',type:'Ground',tc:'#D97706'},
    evolved:{name:'Krokorok',slug:'krokorok',type:'Ground',tc:'#D97706'},
    evolved2:{name:'Krookodile',slug:'krookodile',type:'Ground',tc:'#D97706'},
    wild:{name:'Tyranitar',slug:'tyranitar',type:'Dark',tc:'#4B5563'}},
 
   // === ADDITIONAL LEGENDARY (IDs 140-145) ===
-  {id:140,icon:'🦊',diff:'legendary',maxNum:50,ops:['+','-','*'],
+  {id:140,icon:'🦊',diff:'legendary',maxNum:20,ops:['+','-','*'],
    player:{name:'Riolu',slug:'riolu',type:'Fighting',tc:'#EF4444'},
    evolved:{name:'Lucario',slug:'lucario',type:'Steel',tc:'#94A3B8'},
    wild:{name:'Machamp',slug:'machamp',type:'Fighting',tc:'#EF4444'}},
-  {id:141,icon:'🐉',diff:'legendary',maxNum:50,ops:['+','-','*'],
+  {id:141,icon:'🐉',diff:'legendary',maxNum:20,ops:['+','-','*'],
    player:{name:'Deino',slug:'deino',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Zweilous',slug:'zweilous',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Hydreigon',slug:'hydreigon',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Dragonite',slug:'dragonite',type:'Dragon',tc:'#F97316'}},
-  {id:142,icon:'🏆',diff:'legendary',maxNum:50,ops:['+','-','*'],
+  {id:142,icon:'🏆',diff:'legendary',maxNum:20,ops:['+','-','*'],
    player:{name:'Trapinch',slug:'trapinch',type:'Ground',tc:'#D97706'},
    evolved:{name:'Vibrava',slug:'vibrava',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Flygon',slug:'flygon',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Garchomp',slug:'garchomp',type:'Dragon',tc:'#6366F1'}},
-  {id:143,icon:'🌟',diff:'legendary',maxNum:50,ops:['+','-','*'],
+  {id:143,icon:'🌟',diff:'legendary',maxNum:20,ops:['+','-','*'],
    player:{name:'Axew',slug:'axew',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Fraxure',slug:'fraxure',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Haxorus',slug:'haxorus',type:'Dragon',tc:'#6366F1'},
    wild:{name:'Salamence',slug:'salamence',type:'Dragon',tc:'#6366F1'}},
-  {id:144,icon:'💧',diff:'legendary',maxNum:50,ops:['+','-','*'],
+  {id:144,icon:'💧',diff:'legendary',maxNum:20,ops:['+','-','*'],
    player:{name:'Feebas',slug:'feebas',type:'Water',tc:'#38BDF8'},
    evolved:{name:'Milotic',slug:'milotic',type:'Water',tc:'#38BDF8'},
    wild:{name:'Gyarados',slug:'gyarados',type:'Water',tc:'#38BDF8'}},
-  {id:145,icon:'🐌',diff:'legendary',maxNum:50,ops:['+','-','*'],
+  {id:145,icon:'🐌',diff:'legendary',maxNum:20,ops:['+','-','*'],
    player:{name:'Goomy',slug:'goomy',type:'Dragon',tc:'#6366F1'},
    evolved:{name:'Sliggoo',slug:'sliggoo',type:'Dragon',tc:'#6366F1'},
    evolved2:{name:'Goodra',slug:'goodra',type:'Dragon',tc:'#6366F1'},
@@ -10245,8 +10322,10 @@ function g13UpdateEvoBar() {
 function g13GenQuestion() {
   const s = g13State
   const baseMax = s.chain.maxNum || 10
-  const max = s.evolved2 ? baseMax + 10 : s.evolved ? baseMax + 5 : baseMax
-  const op = s.chain.ops[Math.floor(Math.random() * s.chain.ops.length)]
+  const max = Math.min(s.evolved2 ? baseMax + 10 : s.evolved ? baseMax + 5 : baseMax, 20)
+  const allowedOps = isMathAdvanced() ? s.chain.ops : s.chain.ops.filter(o => o !== '*' && o !== '/')
+  const filteredOps = allowedOps.length > 0 ? allowedOps : ['+']
+  const op = filteredOps[Math.floor(Math.random() * filteredOps.length)]
   let a, b, ans
   if (op === '+') {
     a = Math.floor(Math.random() * Math.max(1, max - 2)) + 1
@@ -10310,8 +10389,8 @@ function g13NextQuestion() {
   })
 }
 
-function g13SpawnAttackEffect(type, fromPlayer) {
-  const field = document.getElementById('g13-field')
+function g13SpawnAttackEffect(type, fromPlayer, fieldId = 'g13-field') {
+  const field = document.getElementById(fieldId)
   if (!field) return
   const typeImg = {Fire:'attack-fx-fire.webp',Water:'attack-fx-water.webp',Grass:'attack-fx-grass.webp',Electric:'attack-fx-electric.webp'}
   const typeEmoji = {Rock:'🪨',Ghost:'👻',Psychic:'🌀',Normal:'⭐',Ice:'❄️',Dragon:'💥',Fighting:'👊',Steel:'⚔️',Poison:'☠️',Bug:'🐛',Fairy:'✨',Ground:'💨',Flying:'🌪️'}
@@ -10819,51 +10898,21 @@ const G13B_BALLS = [
   'safariball','quickball','luxuryball','timerball','netball'
 ]
 
-// Wild Pokémon pool — fast rotation variety
-const G13B_WILDS = [
-  {name:'Pikachu',slug:'pikachu',type:'Electric',icon:'⚡',hp:1},
-  {name:'Charmander',slug:'charmander',type:'Fire',icon:'🔥',hp:1},
-  {name:'Squirtle',slug:'squirtle',type:'Water',icon:'💧',hp:1},
-  {name:'Bulbasaur',slug:'bulbasaur',type:'Grass',icon:'🌿',hp:1},
-  {name:'Rattata',slug:'rattata',type:'Normal',icon:'🐭',hp:1},
-  {name:'Geodude',slug:'geodude',type:'Rock',icon:'🪨',hp:1},
-  {name:'Gastly',slug:'gastly',type:'Ghost',icon:'👻',hp:1},
-  {name:'Machop',slug:'machop',type:'Fighting',icon:'💪',hp:1},
-  {name:'Abra',slug:'abra',type:'Psychic',icon:'🔮',hp:1},
-  {name:'Oddish',slug:'oddish',type:'Grass',icon:'🌿',hp:1},
-  {name:'Vulpix',slug:'vulpix',type:'Fire',icon:'🔥',hp:1},
-  {name:'Poliwag',slug:'poliwag',type:'Water',icon:'💧',hp:1},
-  {name:'Slowpoke',slug:'slowpoke',type:'Water',icon:'💧',hp:1},
-  {name:'Koffing',slug:'koffing',type:'Poison',icon:'☠️',hp:1},
-  {name:'Cubone',slug:'cubone',type:'Ground',icon:'💨',hp:1},
-  {name:'Magikarp',slug:'magikarp',type:'Water',icon:'🐟',hp:1},
-  {name:'Togepi',slug:'togepi',type:'Fairy',icon:'✨',hp:1},
-  {name:'Marill',slug:'marill',type:'Fairy',icon:'✨',hp:1},
-  {name:'Cyndaquil',slug:'cyndaquil',type:'Fire',icon:'🔥',hp:1},
-  {name:'Chikorita',slug:'chikorita',type:'Grass',icon:'🌿',hp:1},
-  {name:'Totodile',slug:'totodile',type:'Water',icon:'💧',hp:1},
-  {name:'Swinub',slug:'swinub',type:'Ice',icon:'❄️',hp:1},
-  {name:'Ralts',slug:'ralts',type:'Psychic',icon:'🔮',hp:1},
-  {name:'Treecko',slug:'treecko',type:'Grass',icon:'🌿',hp:1},
-  {name:'Torchic',slug:'torchic',type:'Fire',icon:'🔥',hp:1},
-  {name:'Mudkip',slug:'mudkip',type:'Water',icon:'💧',hp:1},
-  {name:'Riolu',slug:'riolu',type:'Fighting',icon:'💪',hp:1},
-  {name:'Bagon',slug:'bagon',type:'Dragon',icon:'🐉',hp:1},
-  {name:'Snubbull',slug:'snubbull',type:'Fairy',icon:'✨',hp:1},
-  {name:'Horsea',slug:'horsea',type:'Water',icon:'💧',hp:1},
-]
+// Wild Pokémon pool — built dynamically from all non-legendary POKEMON_DB entries
+const G13B_WILDS = POKEMON_DB
+  .filter(p => !_LEGENDARY_IDS.has(p.id))
+  .map(p => {
+    const t = p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : 'Normal'
+    return { name: p.name, slug: p.slug, type: t, hp: 1 }
+  })
 
-// Legendary Pokémon — every 10 kills, needs 3 hits
-const G13B_LEGENDARIES = [
-  {name:'Charizard',slug:'charizard',type:'Fire',icon:'🔥🔥',hp:3},
-  {name:'Blastoise',slug:'blastoise',type:'Water',icon:'💧💧',hp:3},
-  {name:'Gengar',slug:'gengar',type:'Ghost',icon:'👻👻',hp:3},
-  {name:'Gyarados',slug:'gyarados',type:'Water',icon:'🐉💧',hp:3},
-  {name:'Alakazam',slug:'alakazam',type:'Psychic',icon:'🔮🔮',hp:3},
-  {name:'Dragonite',slug:'dragonite',type:'Dragon',icon:'🐉',hp:3},
-  {name:'Venusaur',slug:'venusaur',type:'Grass',icon:'🌿🌿',hp:3},
-  {name:'Arcanine',slug:'arcanine',type:'Fire',icon:'🔥',hp:3},
-]
+// Legendary Pokémon — every 10 kills, needs 3 hits — built from POKEMON_DB legendary IDs
+const G13B_LEGENDARIES = POKEMON_DB
+  .filter(p => _LEGENDARY_IDS.has(p.id))
+  .map(p => {
+    const t = p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : 'Psychic'
+    return { name: p.name, slug: p.slug, type: t, icon: '🌟', hp: 3 }
+  })
 
 let g13bState = {}
 let g13bLastWildIdx = -1
@@ -10912,11 +10961,12 @@ function initGame13b() {
   const legBadge = document.getElementById('g13b-leg-badge')
   if (legBadge) legBadge.style.display = 'none'
 
-  // Player sprite: Pikachu
+  // Player sprite: use saved selection or default Pikachu
   const pspr = document.getElementById('g13b-pspr')
   if (pspr) {
-    pspr.src = 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'
-    pspr.onerror = function(){ this.alt = '⚡' }
+    const saved = g13bSavedPoke
+    pspr.src = saved ? pokeSpriteOnline(saved.slug) : 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'
+    pspr.onerror = function(){ this.src = 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'; this.onerror = null }
   }
 
   g13bRenderStreak()
@@ -10970,10 +11020,11 @@ function g13bNextQuestion() {
 
   // Difficulty scales with kills
   let maxNum, ops
+  const adv = isMathAdvanced()
   if      (s.kills < 10) { maxNum = 10; ops = ['+'] }
   else if (s.kills < 20) { maxNum = 15; ops = ['+','-'] }
   else if (s.kills < 30) { maxNum = 20; ops = ['+','-'] }
-  else                   { maxNum = 20; ops = ['+','-','*'] }
+  else                   { maxNum = 20; ops = adv ? ['+','-','*'] : ['+','-'] }
 
   const op = ops[Math.floor(Math.random() * ops.length)]
   let a, b, ans
@@ -11063,8 +11114,11 @@ function g13bAnswer(val, btn) {
     // Particle burst
     try { spawnParticleBurst(btn.getBoundingClientRect().left + btn.offsetWidth/2, btn.getBoundingClientRect().top) } catch(e) {}
 
-    // Spawn attack projectile reusing G13 type FX
-    try { g13SpawnAttackEffect(s.currentWild ? s.currentWild.type : 'Normal', true) } catch(e) {}
+    // Spawn attack projectile — type based on player's chosen Pokémon
+    try {
+      const playerType = g13bSavedPoke ? g13bSavedPoke.type : 'Electric'
+      g13SpawnAttackEffect(playerType, true, 'g13b-field')
+    } catch(e) {}
 
     // COMBO FX at streak >= 3
     if (s.streak >= 3) g13bShowCombo(s.streak)
@@ -11103,15 +11157,19 @@ function g13bKillWild() {
   // Show Pokéball catch animation (legendary gets heavyball, others random)
   g13bShowCatch(wasLegendary)
 
-  // Check for legendary threshold (every 10 kills)
-  const prevKills = s.kills - earnedKills
-  const newKills = s.kills
-  const prevTens = Math.floor(prevKills / 10)
-  const newTens = Math.floor(newKills / 10)
-  if (newTens > prevTens) {
-    setTimeout(() => g13bTriggerLegendary(), 1800)
+  // Legendary defeated → level complete; otherwise check for next legendary threshold
+  if (wasLegendary) {
+    setTimeout(() => g13bLevelComplete(), 1900)
   } else {
-    setTimeout(() => g13bSpawnWild(), 1700)
+    const prevKills = s.kills - earnedKills
+    const newKills = s.kills
+    const prevTens = Math.floor(prevKills / 10)
+    const newTens = Math.floor(newKills / 10)
+    if (newTens > prevTens) {
+      setTimeout(() => g13bTriggerLegendary(), 1800)
+    } else {
+      setTimeout(() => g13bSpawnWild(), 1700)
+    }
   }
 }
 
@@ -11306,6 +11364,47 @@ function g13bGameOver() {
     if (starsEl) starsEl.textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
     if (res) res.style.display = 'flex'
   }, 900)
+}
+
+function g13bLevelComplete() {
+  const s = g13bState
+  if (s.phase === 'done') return
+  s.phase = 'done'
+  battleBgmStop()
+
+  const stars = s.kills >= 30 ? 3 : s.kills >= 15 ? 2 : s.kills >= 1 ? 1 : 0
+  vibrate([50, 30, 80, 30, 120])
+  try { playCorrect() } catch(e) {}
+
+  // Fireworks burst on the field
+  const field = document.getElementById('g13b-field')
+  if (field) {
+    const fx = ['🌟','✨','💫','⭐','🎉','🎊']
+    for (let i = 0; i < 12; i++) {
+      const bolt = document.createElement('div')
+      bolt.className = 'g13b-bolt'
+      bolt.textContent = fx[i % fx.length]
+      bolt.style.cssText = `left:${5+Math.random()*90}%;top:${5+Math.random()*75}%;font-size:${22+Math.floor(Math.random()*16)}px;animation-delay:${(i*0.06).toFixed(2)}s;`
+      field.appendChild(bolt)
+      bolt.addEventListener('animationend', () => bolt.remove(), {once:true})
+    }
+  }
+
+  setTimeout(() => {
+    const overlay = document.getElementById('g13b-level-complete')
+    const legName = s.currentWild ? s.currentWild.name : 'Legendary'
+    const icon  = document.getElementById('g13b-lc-icon')
+    const poke  = document.getElementById('g13b-lc-pokemon')
+    const kills = document.getElementById('g13b-lc-kills')
+    const sub   = document.getElementById('g13b-lc-sub')
+    const starsEl = document.getElementById('g13b-lc-stars')
+    if (icon)    icon.textContent   = stars >= 3 ? '🏆' : '🌟'
+    if (poke)    poke.textContent   = `${legName} berhasil ditaklukkan!`
+    if (kills)   kills.textContent  = s.kills
+    if (sub)     sub.textContent    = `Combo terbaik: x${s.bestCombo}  |  30+ kill = ⭐⭐⭐`
+    if (starsEl) starsEl.textContent = '⭐'.repeat(stars) + '🌑'.repeat(3 - stars)
+    if (overlay) overlay.style.display = 'flex'
+  }, 800)
 }
 
 // ============================================================
@@ -12340,65 +12439,111 @@ function g17EndGame(won) {
 }
 
 // ============================================================
-// GAME 18 — MUSEUM KERETA 🏛️
+// GAME 18 — MUSEUM KERETA AMBARAWA 🏛️
+// Koleksi Museum Kereta Api Ambarawa + kereta-kereta terkenal dunia
 // ============================================================
 const G18_TRAINS = [
+  // ── KOLEKSI MUSEUM KERETA API AMBARAWA ──
   {
-    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'Locomotief C5107', country:'🇮🇩 Indonesia', year:1922,
-    fuel:'Batubara (Uap)', speed:80, type:'Lokomotif Uap',
-    fact:'Kereta uap bersejarah dari era kolonial! Kini dipajang di Museum Kereta Api Ambarawa. Asapnya bisa terlihat dari jauh! ☁️',
-    quizHint:'kereta uap bersejarah Indonesia'
+    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'B2507 — Kereta Bergerigi', country:'🇮🇩 Ambarawa', year:1902,
+    fuel:'Batubara (Uap)', speed:30, type:'Lokomotif Rack (Bergerigi)',
+    fact:'Bintang utama Museum Ambarawa! B2507 dibuat di Swiss oleh SLM tahun 1902. Punya roda BERGERIGI (cogwheel) khusus untuk mendaki gunung terjal — salah satu dari sedikit kereta rack yang masih ada di dunia! ⛰️',
+    quizHint:'kereta bergerigi pendaki gunung di Ambarawa'
   },
+  {
+    emoji:'🚂', svg:'assets/train/bb303-indonesia.svg', name:'B2521 — Rack Ambarawa-Bedono', country:'🇮🇩 Ambarawa', year:1912,
+    fuel:'Batubara (Uap)', speed:25, type:'Lokomotif Uap Bergerigi',
+    fact:'B2521 melayani jalur Ambarawa–Bedono yang sangat terjal melewati perkebunan kopi dan teh dengan pemandangan Gunung Merbabu! Jalur bergigi ini punya kemiringan 65‰ — sangat curam! 🌋',
+    quizHint:'kereta rack jalur Ambarawa-Bedono gunung'
+  },
+  {
+    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'C5107 — Lok Uap Kolonial', country:'🇮🇩 Ambarawa', year:1921,
+    fuel:'Batubara (Uap)', speed:80, type:'Lokomotif Uap Tender',
+    fact:'C5107 buatan Hartmann, Jerman (1921). Dipakai di era Hindia Belanda untuk penumpang & hasil perkebunan. Kini jadi bintang Kereta Wisata Ambarawa–Tuntang yang bisa kamu naiki! ☕',
+    quizHint:'kereta wisata uap Ambarawa-Tuntang'
+  },
+  {
+    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'D1415 — Tender Steam Hanomag', country:'🇮🇩 Ambarawa', year:1908,
+    fuel:'Batubara (Uap)', speed:70, type:'Lokomotif Uap Tender',
+    fact:'D1415 dibuat oleh Hanomag, Jerman tahun 1908. Punya tangki air besar (tender) di belakang untuk perjalanan panjang. Dulu mengangkut gula, kopi, dan teh dari perkebunan Jawa! 💨',
+    quizHint:'kereta uap dengan tender besar di belakang'
+  },
+  {
+    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'C1218 — Lokomotif Tertua RI', country:'🇮🇩 Ambarawa', year:1891,
+    fuel:'Batubara (Uap)', speed:60, type:'Lokomotif Tank Uap',
+    fact:'C1218 adalah salah satu lokomotif TERTUA di Indonesia! Dibuat oleh Beyer Peacock, Inggris pada 1891 — sudah lebih dari 130 tahun! Terawat sangat baik di Museum Ambarawa. Luar biasa! 🎩',
+    quizHint:'lokomotif tertua 1891 di Indonesia'
+  },
+  {
+    emoji:'🚂', svg:'assets/train/bb303-indonesia.svg', name:'B2801 — Rack SLM Swiss', country:'🇮🇩 Ambarawa', year:1907,
+    fuel:'Batubara (Uap)', speed:28, type:'Lokomotif Rack Gunung',
+    fact:'B2801 buatan Swiss Locomotive Works (SLM) 1907. Mesin uap dan gigi bergabung untuk menaklukkan tanjakan 65‰ — naik 65 meter setiap 1000 meter! Salah satu tanjakan kereta terextrim! 😱',
+    quizHint:'kereta rack Swiss tanjakan paling curam'
+  },
+  {
+    emoji:'🚃', svg:'assets/train/cc201-indonesia.svg', name:'CC200 — Setan Ijo', country:'🇮🇩 Indonesia', year:1953,
+    fuel:'Solar (Diesel)', speed:120, type:'Lokomotif Diesel Elektrik',
+    fact:'CC200 adalah lokomotif diesel PERTAMA Indonesia! Dibuat General Electric (GE), Amerika 1953. Para masinis menjulukinya "Setan Ijo" karena cat hijau dan tenaganya dahsyat! Revolusi perkeretaapian Indonesia! 🦾',
+    quizHint:'diesel pertama Indonesia Setan Ijo GE'
+  },
+  {
+    emoji:'🚂', svg:'assets/train/bb303-indonesia.svg', name:'E1060 — Lok Listrik 1924', country:'🇮🇩 Indonesia', year:1924,
+    fuel:'Listrik', speed:90, type:'Lokomotif Listrik Antik',
+    fact:'E1060 membuktikan Indonesia sudah punya kereta LISTRIK sejak 1924! Lebih dari 100 tahun lalu! Kini jadi koleksi langka di Ambarawa yang sangat berharga dan jarang ada di dunia! ⚡',
+    quizHint:'kereta listrik antik Indonesia 1924'
+  },
+  {
+    emoji:'🚂', svg:'assets/train/bb302-indonesia.svg', name:'Kereta Wisata Ambarawa', country:'🇮🇩 Ambarawa', year:2000,
+    fuel:'Batubara (Uap)', speed:30, type:'Kereta Wisata Heritage',
+    fact:'Kereta Wisata Ambarawa melayani rute Ambarawa–Tuntang ±5 km dengan lokomotif uap tua yang MASIH JALAN! Kamu bisa naik dan merasakan asap dan suara "tur...tut!" seperti zaman dulu! ☁️🎉',
+    quizHint:'kereta wisata uap yang bisa dinaiki'
+  },
+  // ── KERETA TERKENAL DUNIA (untuk perbandingan) ──
   {
     emoji:'🚅', svg:'assets/train/shinkansen-n700.svg', name:'Shinkansen N700', country:'🇯🇵 Jepang', year:2007,
     fuel:'Listrik', speed:320, type:'Kereta Cepat',
-    fact:'Shinkansen dijuluki "Peluru" karena hidungnya seperti peluru! Tepat waktu hingga detik — keterlambatan rata-rata hanya 36 detik! ⚡',
-    quizHint:'kereta peluru Jepang'
+    fact:'Shinkansen dijuluki "Peluru" karena hidungnya seperti peluru! Tepat waktu hingga detik — keterlambatan rata-rata hanya 36 detik setahun! Dibanding kereta uap Ambarawa, 10× lebih cepat! ⚡',
+    quizHint:'kereta peluru Jepang 320 km/jam'
   },
   {
     emoji:'🚃', svg:'assets/train/cc203-indonesia.svg', name:'Argo Bromo Anggrek', country:'🇮🇩 Indonesia', year:1997,
     fuel:'Solar (Diesel)', speed:120, type:'Kereta Ekspress',
-    fact:'Kereta terbaik Indonesia! Melaju dari Jakarta ke Surabaya hanya sekitar 9 jam. Dinamai dari Gunung Bromo yang indah! 🌋',
+    fact:'Kereta ekspress terbaik Indonesia! Jakarta–Surabaya ±9 jam. Dinamai Gunung Bromo. Dibanding B2507 yang 30 km/jam, ini 4× lebih cepat dan tidak perlu bergigi! 🌋',
     quizHint:'kereta ekspress Jakarta-Surabaya'
   },
   {
-    emoji:'🚄', svg:'assets/train/commuter-line-krl.svg', name:'KRL Commuter', country:'🇮🇩 Indonesia', year:2013,
+    emoji:'🚄', svg:'assets/train/commuter-line-krl.svg', name:'KRL Commuter Jabodetabek', country:'🇮🇩 Indonesia', year:2013,
     fuel:'Listrik', speed:100, type:'Kereta Listrik',
-    fact:'KRL mengangkut lebih dari 1 JUTA penumpang SETIAP HARI di Jabodetabek! Tanpa asap dan ramah lingkungan! 🌿',
-    quizHint:'kereta listrik Jabodetabek'
+    fact:'KRL mengangkut lebih dari 1 JUTA penumpang SETIAP HARI! Tanpa asap dan ramah lingkungan. Beda sekali dengan lokomotif uap Ambarawa yang butuh batubara berkeranjang-keranjang! 🌿',
+    quizHint:'kereta listrik 1 juta penumpang sehari'
   },
   {
     emoji:'🚄', svg:'assets/train/tgv-inoui.svg', name:'TGV', country:'🇫🇷 Perancis', year:1981,
     fuel:'Listrik', speed:574, type:'Kereta Cepat',
-    fact:'TGV pemegang rekor dunia kereta konvensional — 574 km/jam! Hampir secepat pesawat kecil! Vive la France! 🇫🇷',
-    quizHint:'kereta tercepat Perancis'
-  },
-  {
-    emoji:'🚂', svg:'assets/train/linus-brave_char.svg', name:'Thomas Si Kereta', country:'🇬🇧 UK', year:1945,
-    fuel:'Uap (Fiksi)', speed:'?', type:'Karakter Buku',
-    fact:'Thomas lahir dari cerita Reverend Wilbert Awdry untuk anaknya yang sakit. Sekarang sudah jadi acara TV di 185 negara! 📺',
-    quizHint:'kereta biru berwajah dari UK'
+    fact:'TGV rekor dunia kereta konvensional — 574 km/jam! Hampir secepat pesawat! Bayangkan: kalau Ambarawa ke Jakarta ±350km, TGV cuma butuh 37 menit, kereta uap butuh 4+ jam! 🚀',
+    quizHint:'kereta tercepat Perancis 574 km/jam'
   },
   {
     emoji:'🚇', svg:'assets/train/stadler-flirt.svg', name:'MRT Jakarta', country:'🇮🇩 Indonesia', year:2019,
     fuel:'Listrik', speed:80, type:'Mass Rapid Transit',
-    fact:'MRT Jakarta adalah kereta bawah tanah pertama Indonesia! Dibangun lebih dari 10 tahun dan melewati 16 stasiun. Ayo naik MRT! 🏙️',
-    quizHint:'kereta bawah tanah Jakarta'
+    fact:'MRT Jakarta adalah kereta bawah tanah PERTAMA Indonesia! Dibangun 10+ tahun, melewati 16 stasiun. Beda dengan B2507 yang mendaki gunung, MRT Jakarta malah menyelam ke bawah tanah! 🏙️',
+    quizHint:'kereta bawah tanah pertama Indonesia'
   },
   {
-    emoji:'🚅', svg:'assets/train/shinkansen-n700s.svg', name:'SCMaglev', country:'🇯🇵 Jepang', year:2015,
-    fuel:'Magnet', speed:603, type:'Maglev',
-    fact:'SCMaglev tidak menyentuh rel sama sekali — melayang di atas magnet! Rekor dunia 603 km/jam! Ini nyata, bukan film fiksi ilmiah! 🧲',
-    quizHint:'kereta magnet tercepat dunia'
+    emoji:'🚅', svg:'assets/train/shinkansen-n700s.svg', name:'SCMaglev — Kereta Magnet', country:'🇯🇵 Jepang', year:2015,
+    fuel:'Magnet (Superkonduktor)', speed:603, type:'Maglev',
+    fact:'SCMaglev tidak MENYENTUH REL sama sekali — melayang di atas magnet! 603 km/jam, rekor dunia! Kebalikan dari B2507 yang butuh bergigi agar tidak tergelincir! Teknologi masa depan! 🧲',
+    quizHint:'kereta magnet melayang tercepat dunia'
   }
 ]
 
 const G18_QUIZ = [
-  { q:'Kereta manakah yang melayang di atas rel menggunakan magnet?', correct:7, options:[0,3,7,1], emoji:'🧲' },
-  { q:'Kereta KRL Commuter menggunakan bahan bakar apa?', correct:3, options:[0,2,3,5], field:'fuel', emoji:'⚡' },
-  { q:'Shinkansen berasal dari negara mana?', correct:1, options:[1,2,4,6], field:'country', emoji:'🗾' },
-  { q:'Kereta TGV dari Perancis punya kecepatan record berapa km/jam?', correct:4, options:[4,1,7,2], field:'speed', emoji:'🏎️' },
-  { q:'Kereta pertama Indonesia yang jadi museum ada di mana?', correct:0, options:[0,2,6,3], emoji:'🏛️' }
+  { q:'Lokomotif mana yang punya roda bergerigi untuk mendaki gunung di Ambarawa?', correct:0, options:[0,2,6,9], emoji:'⛰️' },
+  { q:'Kereta CC200 mendapat julukan apa dari para masinis Indonesia?', correct:6, options:[6,2,0,7], emoji:'🦾' },
+  { q:'Lokomotif tertua di Indonesia dibuat tahun berapa?', correct:4, options:[0,1,4,3], field:'year', emoji:'🎩' },
+  { q:'Kereta Wisata Ambarawa melayani rute apa yang bisa kamu naiki?', correct:8, options:[8,0,10,6], emoji:'🚂' },
+  { q:'Kereta mana yang paling cepat di seluruh koleksi museum ini?', correct:14, options:[14,9,11,12], field:'speed', emoji:'🚀' },
+  { q:'SCMaglev dari Jepang bisa mencapai kecepatan berapa km/jam?', correct:14, options:[14,9,12,11], emoji:'🧲' }
 ]
 
 let g18State = {}
@@ -12421,9 +12566,26 @@ function initGame18() {
 function g18RenderGallery() {
   const grid = document.getElementById('g18-card-grid')
   grid.innerHTML = ''
+  // Section separator index: Ambarawa collection = 0-8, World trains = 9+
+  const ambarawaCount = 9
   G18_TRAINS.forEach((train, i) => {
+    // Section header
+    if (i === 0) {
+      const hdr = document.createElement('div')
+      hdr.style.cssText = 'grid-column:1/-1;color:#FFD082;font-size:12px;font-weight:900;letter-spacing:1.5px;padding:4px 2px 2px;border-bottom:1.5px solid rgba(255,193,100,0.35);margin-bottom:2px;'
+      hdr.textContent = '🏛️ KOLEKSI MUSEUM AMBARAWA'
+      grid.appendChild(hdr)
+    } else if (i === ambarawaCount) {
+      const hdr = document.createElement('div')
+      hdr.style.cssText = 'grid-column:1/-1;color:rgba(180,210,255,0.9);font-size:12px;font-weight:900;letter-spacing:1.5px;padding:10px 2px 2px;border-bottom:1.5px solid rgba(150,200,255,0.25);margin-bottom:2px;'
+      hdr.textContent = '🌍 KERETA TERKENAL DUNIA'
+      grid.appendChild(hdr)
+    }
+
     const card = document.createElement('div')
     card.className = 'g18-card'
+    // Ambarawa cards get a warm amber tint
+    if (i < ambarawaCount) card.style.borderColor = 'rgba(255,193,80,0.35)'
     const fb = `<div class="g18-card-emoji">${train.emoji}</div>`
     const imgEl = train.svg
       ? `<img src="${train.svg}" style="width:100%;height:64px;object-fit:contain;" alt="${train.name}" onerror="this.parentNode.innerHTML='${train.emoji.replace(/'/g,"&#39;")}';">`
@@ -12433,7 +12595,7 @@ function g18RenderGallery() {
       <div class="g18-card-name">${train.name}</div>
       <div class="g18-card-country">${train.country}</div>
       <div class="g18-speed-badge">⚡ ${train.speed} km/j</div>
-      <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;margin-top:2px;">${train.year}</div>
+      <div style="color:rgba(255,255,255,0.55);font-size:10px;font-weight:700;margin-top:2px;">${train.year}</div>
     `
     card.onclick = () => g18ShowDetail(i)
     grid.appendChild(card)
