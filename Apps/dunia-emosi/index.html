@@ -1689,43 +1689,43 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
  */
 .g10-espr{
   width:min(44vw, 22vh);height:min(44vw, 22vh);
+  transform:scaleX(-1);
   filter:drop-shadow(0 6px 18px rgba(0,0,0,0.7)) drop-shadow(0 0 10px rgba(255,220,50,0.45));
 }
 .g10-pspr{
   width:min(44vw, 22vh);height:min(44vw, 22vh);
-  transform:scaleX(-1);
   filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(100,180,255,0.45));
 }
 /* Sprite action animations */
-/* Enemy (top-right, natural facing left) lunges toward player at lower-left */
+/* Enemy (top-right, scaleX(-1) → faces left toward player at lower-left) lunges left */
 .g10-espr.spr-atk{animation:g10EAtk 0.35s ease;}
-@keyframes g10EAtk{0%{transform:none}35%{transform:translateX(-26px) translateY(7px) scale(1.12)}100%{transform:none}}
-/* Player (bottom-left, scaleX(-1) → faces right) lunges toward enemy at upper-right */
-.g10-pspr.spr-atk{animation:g10PAtkFlip 0.35s ease;}
-@keyframes g10PAtkFlip{0%{transform:scaleX(-1)}35%{transform:scaleX(-1) translateX(26px) translateY(-7px) scale(1.12)}100%{transform:scaleX(-1)}}
-/* Generic hit wobble (enemy — no flip) */
-.g10-spr.spr-hit{animation:g10Hit 0.45s ease;}
-@keyframes g10Hit{0%,100%{transform:none}15%{transform:translateX(-10px) rotate(-3deg)}30%{transform:translateX(12px) rotate(2deg)}50%{transform:translateX(-7px)}70%{transform:translateX(8px)}85%{transform:translateX(-3px)}}
-/* Player hit — preserve scaleX(-1) */
-.g10-pspr.spr-hit{animation:g10PHitFlip 0.45s ease;}
-@keyframes g10PHitFlip{0%,100%{transform:scaleX(-1)}15%{transform:scaleX(-1) translateX(-10px) rotate(-3deg)}30%{transform:scaleX(-1) translateX(12px) rotate(2deg)}50%{transform:scaleX(-1) translateX(-7px)}70%{transform:scaleX(-1) translateX(8px)}85%{transform:scaleX(-1) translateX(-3px)}}
+@keyframes g10EAtk{0%{transform:scaleX(-1)}35%{transform:scaleX(-1) translateX(26px) translateY(7px) scale(1.12)}100%{transform:scaleX(-1)}}
+/* Player (bottom-left, natural facing right toward enemy at upper-right) lunges right */
+.g10-pspr.spr-atk{animation:g10PAtk 0.35s ease;}
+@keyframes g10PAtk{0%{transform:none}35%{transform:translateX(26px) translateY(-7px) scale(1.12)}100%{transform:none}}
+/* Enemy hit — preserve scaleX(-1) */
+.g10-espr.spr-hit{animation:g10EHitFlip 0.45s ease;}
+@keyframes g10EHitFlip{0%,100%{transform:scaleX(-1)}15%{transform:scaleX(-1) translateX(10px) rotate(-3deg)}30%{transform:scaleX(-1) translateX(-12px) rotate(2deg)}50%{transform:scaleX(-1) translateX(7px)}70%{transform:scaleX(-1) translateX(-8px)}85%{transform:scaleX(-1) translateX(3px)}}
+/* Player hit — no flip */
+.g10-pspr.spr-hit{animation:g10PHit 0.45s ease;}
+@keyframes g10PHit{0%,100%{transform:none}15%{transform:translateX(-10px) rotate(-3deg)}30%{transform:translateX(12px) rotate(2deg)}50%{transform:translateX(-7px)}70%{transform:translateX(8px)}85%{transform:translateX(-3px)}}
 .g10-spr.spr-flash{animation:g10Flash 0.45s ease;}
 @keyframes g10Flash{0%,100%{filter:drop-shadow(0 6px 24px rgba(0,0,0,0.65)) brightness(1)}20%,60%{filter:brightness(8) saturate(0)}40%,80%{filter:drop-shadow(0 6px 24px rgba(0,0,0,0.65)) brightness(1)}}
-/* Defeat — enemy (no flip) */
-.g10-spr.spr-defeat{animation:g10Defeat 0.85s ease forwards;}
-@keyframes g10Defeat{
-  0%{transform:none;filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.4));opacity:1}
-  25%{transform:translateY(-18px) scale(1.18);filter:brightness(7) saturate(0);opacity:1}
-  60%{transform:translateY(-40px) scale(0.75);filter:brightness(9) saturate(0);opacity:0.6}
-  100%{transform:translateY(-70px) scale(0.2);filter:brightness(12) saturate(0);opacity:0}
-}
-/* Player defeat — preserve scaleX(-1) */
-.g10-pspr.spr-defeat{animation:g10PDefeatFlip 0.85s ease forwards;}
-@keyframes g10PDefeatFlip{
-  0%{transform:scaleX(-1);opacity:1}
+/* Defeat — enemy (scaleX(-1) preserved) */
+.g10-espr.spr-defeat{animation:g10EDefeatFlip 0.85s ease forwards;}
+@keyframes g10EDefeatFlip{
+  0%{transform:scaleX(-1);filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.4));opacity:1}
   25%{transform:scaleX(-1) translateY(-18px) scale(1.18);filter:brightness(7) saturate(0);opacity:1}
-  60%{transform:scaleX(-1) translateY(-40px) scale(0.75);opacity:0.6}
-  100%{transform:scaleX(-1) translateY(-70px) scale(0.2);opacity:0}
+  60%{transform:scaleX(-1) translateY(-40px) scale(0.75);filter:brightness(9) saturate(0);opacity:0.6}
+  100%{transform:scaleX(-1) translateY(-70px) scale(0.2);filter:brightness(12) saturate(0);opacity:0}
+}
+/* Player defeat — no flip */
+.g10-pspr.spr-defeat{animation:g10PDefeat 0.85s ease forwards;}
+@keyframes g10PDefeat{
+  0%{transform:none;opacity:1}
+  25%{transform:translateY(-18px) scale(1.18);filter:brightness(7) saturate(0);opacity:1}
+  60%{transform:translateY(-40px) scale(0.75);opacity:0.6}
+  100%{transform:translateY(-70px) scale(0.2);opacity:0}
 }
 /* ── Type particle FX keyframes ── */
 @keyframes fxRise{0%{transform:scale(0) translateY(0);opacity:0.9}50%{transform:scale(1.3) translateY(-45px);opacity:0.8}100%{transform:scale(0.4) translateY(-90px);opacity:0}}
@@ -3086,31 +3086,32 @@ body { background: #0a0a1a !important; }
 .g13b-hp-track { width:80px; height:7px; background:rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; }
 .g13b-hp-fill { height:100%; background:linear-gradient(90deg,#22C55E,#86EFAC); border-radius:4px; transition:width 0.25s ease; }
 .g13b-hp-fill.low { background:linear-gradient(90deg,#EF4444,#FCA5A5); }
-/* Wild sprite — center of arena, large */
+/* Wild sprite — center of arena, large, faces LEFT toward player */
 .g13b-wspr-wrap {
   position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
   z-index:5; display:flex; flex-direction:column; align-items:center;
 }
 .g13b-wspr {
   width:min(44vw,26vh); height:min(44vw,26vh); object-fit:contain;
+  transform:scaleX(-1);
   filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65));
 }
 .g13b-wspr.wild-enter { animation:g13bWildIn 0.42s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 .g13b-wspr.wild-die   { animation:g13bWildDie 0.38s ease forwards; }
 .g13b-wspr.wspr-hit   { animation:g13bWsprHit 0.38s ease; }
 @keyframes g13bWildIn {
-  0%  { opacity:0; transform:translateX(90px) scale(0.35); }
-  65% { transform:translateX(-8px) scale(1.08); }
-  100%{ opacity:1; transform:translateX(0) scale(1); }
+  0%  { opacity:0; transform:scaleX(-1) translateX(-90px) scale(0.35); }
+  65% { transform:scaleX(-1) translateX(8px) scale(1.08); }
+  100%{ opacity:1; transform:scaleX(-1) scale(1); }
 }
 @keyframes g13bWildDie {
-  0%  { opacity:1; transform:scale(1); filter:drop-shadow(0 0 0 transparent); }
-  30% { transform:scale(1.35) rotate(8deg); filter:brightness(3) saturate(0); }
-  100%{ opacity:0; transform:scale(0.15) rotate(-25deg); }
+  0%  { opacity:1; transform:scaleX(-1) scale(1); filter:drop-shadow(0 0 0 transparent); }
+  30% { transform:scaleX(-1) scale(1.35) rotate(8deg); filter:brightness(3) saturate(0); }
+  100%{ opacity:0; transform:scaleX(-1) scale(0.15) rotate(-25deg); }
 }
 @keyframes g13bWsprHit {
-  0%,100%{ transform:scale(1); filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65)); }
-  40%    { transform:scale(0.88) translateX(-8px); filter:brightness(3) saturate(0); }
+  0%,100%{ transform:scaleX(-1) scale(1); filter:drop-shadow(0 6px 20px rgba(0,0,0,0.65)); }
+  40%    { transform:scaleX(-1) scale(0.88) translateX(8px); filter:brightness(3) saturate(0); }
 }
 /* Wild name badge */
 .g13b-wname-badge {
@@ -3126,7 +3127,7 @@ body { background: #0a0a1a !important; }
   border:1.5px solid rgba(251,191,36,0.75); border-radius:20px; padding:2px 10px;
   white-space:nowrap; display:none;
 }
-/* Player sprite — bottom-left, smaller */
+/* Player sprite — bottom-left, smaller, faces RIGHT toward wild */
 .g13b-pspr-wrap {
   position:absolute; left:6%; bottom:10%; z-index:5;
   display:flex; flex-direction:column; align-items:center;
@@ -3134,13 +3135,12 @@ body { background: #0a0a1a !important; }
 .g13b-pspr {
   width:min(20vw,12vh); height:min(20vw,12vh); object-fit:contain;
   filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5));
-  transform:scaleX(-1);
 }
 .g13b-pspr.atk { animation:g13bPAtk 0.35s ease forwards; }
 @keyframes g13bPAtk {
-  0%  { transform:scaleX(-1) translateX(0) scale(1); }
-  40% { transform:scaleX(-1) translateX(22px) scale(1.12); }
-  100%{ transform:scaleX(-1) translateX(0) scale(1); }
+  0%  { transform:translateX(0) scale(1); }
+  40% { transform:translateX(22px) scale(1.12); }
+  100%{ transform:translateX(0) scale(1); }
 }
 /* Aura ring before attack */
 .g13b-aura-ring {
@@ -3156,6 +3156,12 @@ body { background: #0a0a1a !important; }
   35%  { opacity:1; transform:scale(1.15); }
   70%  { opacity:0.85; transform:scale(1); }
   100% { opacity:0; transform:scale(1.25); }
+}
+@keyframes g13bSpeedBonus {
+  0%   { opacity:0; transform:translateX(-50%) scale(0.6) translateY(0); }
+  20%  { opacity:1; transform:translateX(-50%) scale(1.2) translateY(-4px); }
+  70%  { opacity:1; transform:translateX(-50%) scale(1) translateY(-12px); }
+  100% { opacity:0; transform:translateX(-50%) scale(0.8) translateY(-24px); }
 }
 /* Pokéball catch animation */
 .g13b-catch-ball {
@@ -5035,10 +5041,20 @@ body { background: #0a0a1a !important; }
     <div class="g13b-wspr-wrap" id="g13b-wspr-wrap">
       <img class="g13b-wspr" id="g13b-wspr" src="" alt="?" style="display:block;">
       <div class="g13b-wname-badge" id="g13b-wname">—</div>
+      <svg viewBox="0 0 100 22" width="90" height="18" style="margin-top:-2px;overflow:visible;flex-shrink:0;">
+        <ellipse cx="50" cy="16" rx="48" ry="13" fill="#3B1F0A" opacity="0.85"/>
+        <ellipse cx="50" cy="11" rx="40" ry="9" fill="#6B3A1F"/>
+        <ellipse cx="50" cy="8" rx="32" ry="6" fill="#8B5A2B" opacity="0.9"/>
+      </svg>
     </div>
     <!-- Player sprite bottom-left -->
     <div class="g13b-pspr-wrap" id="g13b-pspr-wrap">
       <img class="g13b-pspr" id="g13b-pspr" src="" alt="⚡" style="display:block;">
+      <svg viewBox="0 0 80 18" width="70" height="14" style="margin-top:-2px;overflow:visible;flex-shrink:0;">
+        <ellipse cx="40" cy="13" rx="38" ry="11" fill="#3B1F0A" opacity="0.85"/>
+        <ellipse cx="40" cy="9" rx="30" ry="7" fill="#6B3A1F"/>
+        <ellipse cx="40" cy="6" rx="22" ry="5" fill="#8B5A2B" opacity="0.9"/>
+      </svg>
     </div>
     <!-- COMBO overlay -->
     <div class="g13b-combo-overlay" id="g13b-combo">
@@ -5433,7 +5449,7 @@ body { background: #0a0a1a !important; }
   <!-- Quiz view -->
   <div id="g18-quiz-view" style="display:none;flex:1;overflow-y:auto;padding:12px;flex-direction:column;gap:12px;">
     <div style="color:rgba(255,220,150,0.9);font-size:13px;font-weight:800;text-align:center;">
-      Pertanyaan <span id="g18-q-num">1</span> dari 6
+      Pertanyaan <span id="g18-q-num">1</span> dari 8
     </div>
     <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:16px;text-align:center;">
       <div id="g18-q-image" style="font-size:44px;margin-bottom:8px;"></div>
@@ -11184,6 +11200,7 @@ function g13bNextQuestion() {
   else ans = a * b
 
   s.currentAnswer = ans
+  s.questionStartTime = Date.now()
   const opDisp = op === '*' ? '×' : op
 
   const mathEl = document.getElementById('g13b-math')
@@ -11233,6 +11250,19 @@ function g13bAnswer(val, btn) {
     s.streak++
     if (s.streak > s.bestCombo) s.bestCombo = s.streak
     g13bRenderStreak()
+
+    // Speed bonus: answer in <5 seconds
+    const elapsed = Date.now() - (s.questionStartTime || Date.now())
+    if (elapsed < 5000) {
+      const field = document.getElementById('g13b-field')
+      if (field) {
+        const bonus = document.createElement('div')
+        bonus.textContent = '⚡ CEPAT!'
+        bonus.style.cssText = 'position:absolute;top:22%;left:50%;transform:translateX(-50%);font-size:20px;font-weight:900;font-family:"Fredoka One",cursive;color:#FDE047;text-shadow:0 2px 8px rgba(0,0,0,0.7);z-index:30;pointer-events:none;animation:g13bSpeedBonus 0.9s ease forwards;'
+        field.appendChild(bonus)
+        bonus.addEventListener('animationend', () => bonus.remove(), {once:true})
+      }
+    }
 
     // Player attack lunge
     const pspr = document.getElementById('g13b-pspr')
@@ -11326,8 +11356,44 @@ function g13bKillWild() {
     if (newTens > prevTens) {
       setTimeout(() => g13bTriggerLegendary(), 1800)
     } else {
-      setTimeout(() => g13bSpawnWild(), 1700)
+      // ~25% chance wild escapes and re-attacks before can be caught
+      const escapeRoll = Math.random()
+      if (!s.isLegendary && escapeRoll < 0.25 && s.kills >= 2) {
+        setTimeout(() => g13bWildEscape(), 1800)
+      } else {
+        setTimeout(() => g13bSpawnWild(), 1700)
+      }
     }
+  }
+}
+
+function g13bWildEscape() {
+  const s = g13bState
+  if (s.phase !== 'playing') return
+  // Show escape banner
+  const field = document.getElementById('g13b-field')
+  if (field) {
+    const banner = document.createElement('div')
+    banner.textContent = '💨 KABUR! Serang lagi!'
+    banner.style.cssText = 'position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:900;font-family:"Fredoka One",cursive;color:#FCA5A5;background:rgba(0,0,0,0.75);border-radius:14px;padding:8px 18px;z-index:30;pointer-events:none;animation:g13bWildIn 0.35s ease;'
+    field.appendChild(banner)
+    setTimeout(() => banner.remove(), 1200)
+  }
+  // Re-spawn same wild at 60% HP
+  const wild = s.currentWild
+  if (wild) {
+    s.wildHp = Math.max(2, Math.round((s.wildMaxHp || 3) * 0.6))
+    const wspr = document.getElementById('g13b-wspr')
+    if (wspr) {
+      wspr.src = `https://img.pokemondb.net/sprites/home/normal/${wild.slug}.png`
+      wspr.classList.remove('wild-enter', 'wild-die', 'wspr-hit')
+      void wspr.offsetWidth
+      wspr.classList.add('wild-enter')
+    }
+    g13bUpdateHpBar()
+    setTimeout(() => { s.locked = false; g13bNextQuestion() }, 900)
+  } else {
+    setTimeout(() => g13bSpawnWild(), 1000)
   }
 }
 
@@ -12872,14 +12938,88 @@ const G18_TRAINS = [
   }
 ]
 
-const G18_QUIZ = [
-  { q:'Lokomotif mana yang punya roda bergerigi untuk mendaki gunung di Ambarawa?', correct:0, options:[0,2,6,9], emoji:'⛰️' },
-  { q:'Kereta CC200 mendapat julukan apa dari para masinis Indonesia?', correct:6, options:[6,2,0,7], emoji:'🦾' },
-  { q:'Lokomotif tertua di Indonesia dibuat tahun berapa?', correct:4, options:[0,1,4,3], field:'year', emoji:'🎩' },
-  { q:'Kereta Wisata Ambarawa melayani rute apa yang bisa kamu naiki?', correct:8, options:[8,0,10,6], emoji:'🚂' },
-  { q:'Kereta mana yang paling cepat di seluruh koleksi museum ini?', correct:14, options:[14,9,11,12], field:'speed', emoji:'🚀' },
-  { q:'SCMaglev dari Jepang bisa mencapai kecepatan berapa km/jam?', correct:14, options:[14,9,12,11], emoji:'🧲' }
+// Child-friendly question bank for ages 5–8 (60+ questions)
+const G18_QUESTIONS_BANK = [
+  // Bagian kereta
+  { q:'Apa nama orang yang mengemudikan kereta?', emoji:'🧑‍✈️', answers:['Masinis','Pilot','Kapten','Sopir bus'], correct:0 },
+  { q:'Di mana kereta berjalan?', emoji:'🛤️', answers:['Di atas rel','Di atas jalan raya','Di atas air','Di udara'], correct:0 },
+  { q:'Apa gunanya roda kereta?', emoji:'🎡', answers:['Supaya bisa jalan di rel','Supaya bisa terbang','Supaya bisa berenang','Supaya bisa berputar di udara'], correct:0 },
+  { q:'Bagian kereta yang menghubungkan satu gerbong ke gerbong lain disebut apa?', emoji:'🔗', answers:['Sambungan/Kopling','Roda','Cerobong','Boiler'], correct:0 },
+  { q:'Apa nama tempat kereta berhenti untuk menaikkan penumpang?', emoji:'🏛️', answers:['Stasiun','Terminal bus','Bandara','Pelabuhan'], correct:0 },
+  { q:'Cerobong pada kereta uap berguna untuk apa?', emoji:'🏭', answers:['Tempat keluarnya asap','Tempat masuk penumpang','Menyimpan air','Sebagai roda cadangan'], correct:0 },
+  { q:'Apa yang membuat kereta uap bisa bergerak?', emoji:'♨️', answers:['Uap panas dari air yang dipanaskan','Bensin seperti mobil','Tenaga angin','Baterai besar'], correct:0 },
+  { q:'Boiler pada kereta uap berfungsi untuk apa?', emoji:'🫙', answers:['Memanaskan air menjadi uap','Menyimpan penumpang','Memberi cahaya di malam hari','Mengatur kecepatan'], correct:0 },
+  { q:'Kereta yang ditenagai oleh listrik disebut kereta apa?', emoji:'⚡', answers:['Kereta listrik','Kereta uap','Kereta balon','Kereta angin'], correct:0 },
+  { q:'Suara khas kereta yang sering kita dengar adalah?', emoji:'📢', answers:['Tuuut tuuut!','Wooosh!','Bzzz!','Splash!'], correct:0 },
+  // Fakta sederhana
+  { q:'Kereta api bergerak di atas apa?', emoji:'🛤️', answers:['Rel baja','Jalan aspal','Pasir','Rumput'], correct:0 },
+  { q:'Berapa jalur rel yang biasanya digunakan kereta?', emoji:'🔢', answers:['Dua jalur (kiri dan kanan)','Satu jalur saja','Empat jalur','Tidak ada jalur'], correct:0 },
+  { q:'Apa warna lampu merah di pintu perlintasan kereta artinya?', emoji:'🚦', answers:['Berhenti, kereta akan lewat!','Boleh jalan terus','Kereta sudah pergi','Masuk ke dalam kereta'], correct:0 },
+  { q:'Gerbong kereta yang khusus untuk mengangkut barang disebut?', emoji:'📦', answers:['Gerbong barang/kargo','Gerbong penumpang','Gerbong makan','Gerbong tidur'], correct:0 },
+  { q:'Kereta yang bisa naik ke gunung pakai rel bergerigi disebut?', emoji:'⛰️', answers:['Kereta gigi/bergigi','Kereta super cepat','Kereta selam','Kereta terbang'], correct:0 },
+  { q:'Apa yang harus kita lakukan saat kereta akan melintas di perlintasan?', emoji:'⚠️', answers:['Berhenti dan menunggu','Lari menyeberang cepat','Diam di tengah rel','Melambai ke masinis'], correct:0 },
+  { q:'Di Museum Kereta Ambarawa ada banyak kereta tua. Museum ini ada di mana?', emoji:'🗺️', answers:['Jawa Tengah, Indonesia','Bali','Jakarta','Surabaya'], correct:0 },
+  { q:'Kereta tercepat di dunia menggunakan teknologi apa?', emoji:'🧲', answers:['Magnet (Maglev)','Roda bergerigi','Baling-baling','Roket'], correct:0 },
+  { q:'Rel kereta biasanya terbuat dari apa?', emoji:'⚙️', answers:['Baja/besi','Kayu','Plastik','Karet'], correct:0 },
+  { q:'Apa nama tempat tidur di dalam kereta malam?', emoji:'🛏️', answers:['Sleeper / gerbong tidur','Kursi biasa','Bangku taman','Kasur melayang'], correct:0 },
+  // Kereta uap
+  { q:'Bahan bakar utama kereta uap zaman dulu adalah?', emoji:'🪨', answers:['Batu bara','Bensin','Angin','Listrik'], correct:0 },
+  { q:'Asap yang keluar dari cerobong kereta uap berasal dari?', emoji:'💨', answers:['Pembakaran batu bara','Mesin pendingin','Kipas angin','Uap air dingin'], correct:0 },
+  { q:'Mengapa roda kereta uap terbuat dari besi?', emoji:'⚙️', answers:['Supaya kuat dan tidak mudah rusak','Supaya ringan','Supaya bisa mengapung','Supaya bisa terbang'], correct:0 },
+  { q:'Selain batu bara, kereta uap juga bisa pakai bahan bakar apa?', emoji:'🪵', answers:['Kayu bakar','Gula','Air laut','Daun kering'], correct:0 },
+  { q:'Kereta uap mulai banyak digunakan sekitar abad ke berapa?', emoji:'📅', answers:['Abad ke-19 (1800-an)','Abad ke-21 (2000-an)','Abad ke-15 (1400-an)','Abad ke-10 (900-an)'], correct:0 },
+  // Kereta diesel & listrik
+  { q:'Kereta diesel menggunakan bahan bakar apa?', emoji:'🛢️', answers:['Solar/diesel','Batu bara','Angin','Baterai saja'], correct:0 },
+  { q:'Kereta listrik mendapat aliran listrik dari mana?', emoji:'⚡', answers:['Kawat listrik di atas rel atau dari rel ketiga','Baterai di dalam gerbong saja','Panel surya di atap saja','Generator bensin'], correct:0 },
+  { q:'Kereta mana yang tidak mengeluarkan asap hitam sama sekali?', emoji:'🌿', answers:['Kereta listrik','Kereta uap','Kereta diesel','Kereta batu bara'], correct:0 },
+  // Museum & Ambarawa
+  { q:'Museum Kereta Api Ambarawa dulunya adalah sebuah?', emoji:'🏚️', answers:['Stasiun kereta','Pabrik baja','Sekolah masinis','Rumah sakit'], correct:0 },
+  { q:'Kereta wisata Ambarawa berjalan melewati daerah yang terkenal karena apa?', emoji:'🌄', answers:['Pemandangan alam yang indah dan pegunungan','Pantai yang panjang','Padang pasir','Hutan es'], correct:0 },
+  // Keselamatan
+  { q:'Saat naik kereta, kita harus berdiri di belakang garis kuning karena?', emoji:'🟡', answers:['Supaya aman dari kereta yang lewat','Supaya bisa naik lebih cepat','Garis itu untuk hiasan','Agar bisa melihat kereta dari dekat'], correct:0 },
+  { q:'Bolehkah kita bermain di atas rel kereta?', emoji:'❌', answers:['Tidak boleh, sangat berbahaya!','Boleh kalau tidak ada kereta','Boleh di malam hari','Boleh kalau bersama orang dewasa'], correct:0 },
+  { q:'Apa yang harus kita pegang saat naik tangga kereta?', emoji:'🤝', answers:['Pegangan tangan/handrail','Tas kita','Teman kita saja','Tidak perlu pegang apapun'], correct:0 },
+  { q:'Kapan kita boleh masuk ke dalam kereta?', emoji:'🚪', answers:['Setelah pintu terbuka dan penumpang keluar dulu','Langsung saja masuk','Sebelum kereta berhenti','Saat kereta masih berjalan'], correct:0 },
+  // Kereta di dunia
+  { q:'Kereta Shinkansen yang terkenal berasal dari negara mana?', emoji:'🇯🇵', answers:['Jepang','China','Prancis','Amerika'], correct:0 },
+  { q:'Kereta TGV yang super cepat berasal dari negara mana?', emoji:'🇫🇷', answers:['Prancis','Jepang','Jerman','Indonesia'], correct:0 },
+  { q:'Apa arti "Shinkansen" dalam bahasa Jepang?', emoji:'🚄', answers:['Jalur baru / kereta peluru','Kereta tua','Kereta angin','Kereta uap'], correct:0 },
+  { q:'Kereta Maglev bergerak dengan cara apa yang unik?', emoji:'🧲', answers:['Melayang di atas rel menggunakan magnet','Berjalan di atas air','Menggunakan roda biasa yang sangat cepat','Ditarik oleh pesawat'], correct:0 },
+  { q:'Kereta bawah tanah di kota besar biasa disebut apa?', emoji:'🚇', answers:['Subway atau MRT','Bus kota','Trem','Monorel'], correct:0 },
+  // Menyenangkan & ringan
+  { q:'Berapa banyak rel yang dibutuhkan agar kereta bisa berjalan lurus?', emoji:'🛤️', answers:['Dua (kiri dan kanan)','Satu','Empat','Tiga'], correct:0 },
+  { q:'Kereta yang bergelantung di bawah rel atas disebut apa?', emoji:'🚡', answers:['Monorel gantung','Kereta selam','Kereta uap','Kereta angin'], correct:0 },
+  { q:'Warna tradisional lokomotif uap Ambarawa kebanyakan adalah?', emoji:'🎨', answers:['Hitam','Merah cerah','Kuning terang','Biru muda'], correct:0 },
+  { q:'Kereta barang bisa mengangkut benda-benda berat seperti?', emoji:'⛏️', answers:['Batu bara, kayu, kontainer','Makanan segar saja','Penumpang saja','Buku sekolah saja'], correct:0 },
+  { q:'Apa yang terdengar saat roda kereta melintasi sambungan rel?', emoji:'👂', answers:['Klak-klak klak-klak!','Vroom vroom!','Bip bip!','Ciut ciut!'], correct:0 },
+  { q:'Kenapa jendela kereta terbuat dari kaca tebal?', emoji:'🪟', answers:['Supaya kuat dan aman untuk penumpang','Supaya terlihat bagus saja','Supaya kereta lebih ringan','Karena kaca murah'], correct:0 },
+  { q:'Apa yang dimaksud dengan "kereta ekspres"?', emoji:'⚡', answers:['Kereta yang hanya berhenti di stasiun besar saja','Kereta yang membawa paket ekspedisi','Kereta yang selalu terlambat','Kereta yang berjalan sangat pelan'], correct:0 },
+  { q:'Siapa yang bertanggung jawab menjaga keamanan penumpang di dalam kereta?', emoji:'👮', answers:['Petugas/kondektur kereta','Penumpang sendiri','Anak-anak','Tidak ada yang bertanggung jawab'], correct:0 },
+  { q:'Apa fungsi klakson/sirine pada kereta?', emoji:'📯', answers:['Memberi peringatan kepada orang di depan kereta','Sebagai lagu pengiring','Untuk mengisi bahan bakar','Untuk membuka pintu'], correct:0 },
+  { q:'Kereta yang berjalan di atas satu rel disebut?', emoji:'🚝', answers:['Monorel','Kereta ganda','Kereta uap','Tramway'], correct:0 },
+  { q:'Apa yang biasanya dijual di gerbong restoran kereta?', emoji:'🍱', answers:['Makanan dan minuman','Baju dan sepatu','Mainan','Buku pelajaran'], correct:0 },
+  { q:'Berapa lama kereta uap zaman dulu biasanya mengisi ulang batu baranya?', emoji:'⏱️', answers:['Di setiap stasiun besar','Setiap 5 menit','Hanya sekali seumur hidup','Tidak perlu diisi ulang'], correct:0 },
+  // Extra simple
+  { q:'Kereta api adalah kendaraan yang berjalan di atas...?', emoji:'🚂', answers:['Rel','Jalan raya','Lautan','Langit'], correct:0 },
+  { q:'Gerbong pertama yang ada mesinnya disebut?', emoji:'🚂', answers:['Lokomotif','Gerbong makan','Gerbong tidur','Gerbong barang'], correct:0 },
+  { q:'Apa warna api yang membakar batu bara di dalam kereta uap?', emoji:'🔥', answers:['Merah-oranye','Hijau','Biru dingin','Ungu'], correct:0 },
+  { q:'Jika kereta mau belok arah, apa yang diubah?', emoji:'🔀', answers:['Posisi rel (wesel)','Warna kereta','Jumlah penumpang','Nama stasiun'], correct:0 },
+  { q:'Kenapa kereta lebih ramah lingkungan daripada pesawat?', emoji:'🌿', answers:['Mengangkut banyak orang dengan bahan bakar lebih sedikit','Bisa terbang tanpa emisi','Kereta tidak menggunakan bahan bakar','Kereta berjalan lebih lambat'], correct:0 },
+  { q:'Apa nama baju resmi masinis kereta api?', emoji:'👔', answers:['Seragam masinis','Jas pesta','Baju renang','Baju olahraga'], correct:0 },
+  { q:'Museum Ambarawa menyimpan kereta-kereta bersejarah agar?', emoji:'🏛️', answers:['Kita bisa belajar sejarah dan menghargai kereta lama','Kereta bisa berlomba','Kereta bisa dijual kembali','Kereta bisa dipakai masak'], correct:0 },
 ]
+
+// Quiz session: pick 8 random questions from the bank
+const G18_QUIZ_COUNT = 8
+let G18_QUIZ_SESSION = []
+
+function g18ShuffleQuiz() {
+  const shuffled = [...G18_QUESTIONS_BANK].sort(() => Math.random() - 0.5)
+  G18_QUIZ_SESSION = shuffled.slice(0, G18_QUIZ_COUNT)
+}
+
+// Legacy alias (used by g18FinishQuiz star calculation)
+const G18_QUIZ = G18_QUESTIONS_BANK
 
 let g18State = {}
 
@@ -12976,6 +13116,7 @@ function g18CloseModal() {
 }
 
 function g18StartQuiz() {
+  g18ShuffleQuiz()
   g18State.quizIdx = 0
   g18State.quizScore = 0
   g18State.quizActive = true
@@ -12985,7 +13126,7 @@ function g18StartQuiz() {
 }
 
 function g18RenderQuestion() {
-  const q = G18_QUIZ[g18State.quizIdx]
+  const q = G18_QUIZ_SESSION[g18State.quizIdx]
   g18State.answeredCurrent = false
   document.getElementById('g18-q-num').textContent = g18State.quizIdx + 1
   document.getElementById('g18-q-image').textContent = q.emoji
@@ -12994,18 +13135,14 @@ function g18RenderQuestion() {
   document.getElementById('g18-q-next-wrap').style.display = 'none'
   const opts = document.getElementById('g18-q-options')
   opts.innerHTML = ''
-  // Shuffle answer indices
-  const shuffled = [...q.options].sort(() => Math.random() - 0.5)
-  shuffled.forEach(trainIdx => {
-    const train = G18_TRAINS[trainIdx]
+  // Shuffle answers
+  const indices = q.answers.map((_,i) => i).sort(() => Math.random() - 0.5)
+  indices.forEach(idx => {
     const btn = document.createElement('button')
     btn.className = 'g18-quiz-option'
-    let label = train.name
-    if (q.field === 'fuel') label = train.fuel
-    else if (q.field === 'country') label = train.country
-    else if (q.field === 'speed') label = `${train.speed} km/j`
-    btn.innerHTML = `${train.emoji} ${label}`
-    btn.onclick = () => g18AnswerQuestion(trainIdx, q.correct, btn)
+    btn.textContent = q.answers[idx]
+    btn.dataset.ansIdx = idx
+    btn.onclick = () => g18AnswerQuestion(idx, q.correct, btn)
     opts.appendChild(btn)
   })
 }
@@ -13015,20 +13152,20 @@ function g18AnswerQuestion(picked, correct, btn) {
   g18State.answeredCurrent = true
   const opts = document.getElementById('g18-q-options')
   opts.querySelectorAll('.g18-quiz-option').forEach(b => b.style.pointerEvents = 'none')
+  const q = G18_QUIZ_SESSION[g18State.quizIdx]
   if (picked === correct) {
     btn.classList.add('correct')
     g18State.quizScore++
-    document.getElementById('g18-q-feedback').textContent = '✅ Benar! ' + G18_TRAINS[correct].emoji
+    document.getElementById('g18-q-feedback').textContent = '✅ Benar! Kamu pintar!'
     document.getElementById('g18-q-feedback').style.color = '#A5D6A7'
     playCorrect()
   } else {
     btn.classList.add('wrong')
     // Highlight correct answer
     opts.querySelectorAll('.g18-quiz-option').forEach(b => {
-      const trainName = G18_TRAINS[correct].name
-      if (b.textContent.includes(G18_TRAINS[correct].emoji)) b.classList.add('correct')
+      if (parseInt(b.dataset.ansIdx) === correct) b.classList.add('correct')
     })
-    document.getElementById('g18-q-feedback').textContent = `❌ Jawaban: ${G18_TRAINS[correct].name}`
+    document.getElementById('g18-q-feedback').textContent = `❌ Jawaban: ${q.answers[correct]}`
     document.getElementById('g18-q-feedback').style.color = '#FFCDD2'
     playWrong()
   }
@@ -13036,12 +13173,12 @@ function g18AnswerQuestion(picked, correct, btn) {
   const nextWrap = document.getElementById('g18-q-next-wrap')
   nextWrap.style.display = 'block'
   const nextBtn = document.getElementById('g18-q-next-btn')
-  nextBtn.textContent = g18State.quizIdx >= G18_QUIZ.length - 1 ? '🏆 Lihat Hasil!' : '▶ Lanjut'
+  nextBtn.textContent = g18State.quizIdx >= G18_QUIZ_SESSION.length - 1 ? '🏆 Lihat Hasil!' : '▶ Lanjut'
 }
 
 function g18NextQuestion() {
   g18State.quizIdx++
-  if (g18State.quizIdx >= G18_QUIZ.length) {
+  if (g18State.quizIdx >= G18_QUIZ_SESSION.length) {
     g18FinishQuiz()
   } else {
     g18RenderQuestion()
@@ -13050,8 +13187,8 @@ function g18NextQuestion() {
 
 function g18FinishQuiz() {
   const score = g18State.quizScore
-  const total = G18_QUIZ.length
-  const perfStars = score === 5 ? 5 : score === 4 ? 4 : score === 3 ? 3 : score >= 2 ? 2 : 1
+  const total = G18_QUIZ_SESSION.length
+  const perfStars = score === total ? 5 : score >= Math.round(total*0.75) ? 4 : score >= Math.round(total*0.5) ? 3 : score >= 2 ? 2 : 1
   state.gameStars[state.currentPlayer] = perfStars
   const gradeEmoji = score === 5 ? '🏆' : score >= 3 ? '⭐' : '📚'
   const gradeMsg = score === 5 ? 'SEMPURNA! Kamu ahli kereta!' : score >= 3 ? 'Bagus! Terus belajar!' : 'Jangan lupa baca kartu museumnya ya!'
@@ -13061,7 +13198,7 @@ function g18FinishQuiz() {
   document.getElementById('g18-res-title').textContent = gradeMsg
   document.getElementById('g18-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
   document.getElementById('g18-res-info').textContent =
-    `Skor kuis: ${score} / ${total} benar\n🚂 Ada ${G18_TRAINS.length} kereta di museum ini — sudah kamu pelajari semua?`
+    `Skor kuis: ${score} / ${total} benar\n🚂 Ada ${G18_TRAINS.length} kereta di museum ini — sudah kamu pelajari semua?\n🎲 Soal berubah setiap main, coba lagi!`
   res.style.display = 'flex'
   if (score >= 3) playCorrect(); else playWrong()
 }
