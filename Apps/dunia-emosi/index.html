@@ -12292,6 +12292,352 @@ function buildElectricLocoSVG(cfg, opts = {}) {
 </svg>`
 }
 
+// ===== HOOD DIESEL (CC201, CC203 — Indonesian GE/EMD hood unit, C-C bogies) =====
+function buildHoodDieselSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor || '#1B5E20'
+  const ac = cfg.accentColor || '#FFD166'
+  const wa = animate ? ' class="train-wheel"' : ''
+  const smk = animate ? `
+    <circle class="diesel-smoke" cx="68" cy="10" r="7"   fill="rgba(16,16,16,0.92)" style="animation-delay:0s"/>
+    <circle class="diesel-smoke" cx="60" cy="5"  r="5.5" fill="rgba(24,24,24,0.76)" style="animation-delay:0.2s"/>
+    <circle class="diesel-smoke" cx="76" cy="3"  r="6"   fill="rgba(8,8,8,0.62)"    style="animation-delay:0.4s"/>
+    <circle class="diesel-smoke" cx="54" cy="-1" r="4.5" fill="rgba(30,30,30,0.48)" style="animation-delay:0.6s"/>` : ''
+  return `<svg viewBox="0 0 215 72" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="107" cy="70" rx="92" ry="4" fill="rgba(0,0,0,0.25)"/>
+  <rect x="8" y="45" width="199" height="11" rx="3" fill="#0d0d0d"/>
+  <!-- Long hood (machinery section) -->
+  <rect x="62" y="20" width="140" height="33" rx="5" fill="${bc}"/>
+  <!-- Hood grille vents -->
+  <rect x="76"  y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="86"  y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="96"  y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="106" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="116" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="128" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="138" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="150" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="160" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="170" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <rect x="180" y="25" width="3" height="22" rx="1" fill="rgba(0,0,0,0.42)"/>
+  <!-- Exhaust stack -->
+  <rect x="68" y="10" width="10" height="12" rx="3" fill="#222"/>
+  <rect x="65" y="7"  width="16" height="6"  rx="2" fill="#333"/>
+  ${smk}
+  <!-- Hood accent stripe -->
+  <rect x="62" y="40" width="140" height="4" rx="2" fill="${ac}" opacity="0.88"/>
+  <!-- Short walkway -->
+  <rect x="36" y="26" width="28" height="27" rx="3" fill="${bc}" opacity="0.82"/>
+  <!-- Cab (front, left) -->
+  <rect x="8"  y="15" width="32" height="38" rx="5" fill="${bc}"/>
+  <rect x="6"  y="13" width="36" height="9"  rx="3" fill="${ac}" opacity="0.92"/>
+  <rect x="12" y="21" width="11" height="15" rx="3" fill="rgba(135,206,235,0.92)"/>
+  <rect x="26" y="21" width="10" height="15" rx="3" fill="rgba(135,206,235,0.92)"/>
+  <circle cx="10" cy="40" r="6.5" fill="#FFD166" opacity="0.95"/>
+  <circle cx="10" cy="40" r="3.8" fill="white"   opacity="0.9"/>
+  <rect x="13" y="37" width="22" height="7" rx="2" fill="rgba(0,0,0,0.55)"/>
+  <!-- Couplers -->
+  <rect x="2"   y="46" width="9" height="8" rx="2" fill="#555"/>
+  <rect x="204" y="46" width="9" height="8" rx="2" fill="#555"/>
+  <!-- C bogie 1 (3 axles) -->
+  <rect x="10" y="56" width="78" height="10" rx="4" fill="#181818" stroke="#555" stroke-width="1"/>
+  <circle${wa} cx="22"  cy="63" r="7" fill="#282828" stroke="#888" stroke-width="1.5"/><circle cx="22"  cy="63" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="42"  cy="63" r="7" fill="#282828" stroke="#888" stroke-width="1.5"/><circle cx="42"  cy="63" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="62"  cy="63" r="7" fill="#282828" stroke="#888" stroke-width="1.5"/><circle cx="62"  cy="63" r="2.5" fill="#aaa"/>
+  <!-- C bogie 2 (3 axles) -->
+  <rect x="125" y="56" width="78" height="10" rx="4" fill="#181818" stroke="#555" stroke-width="1"/>
+  <circle${wa} cx="137" cy="63" r="7" fill="#282828" stroke="#888" stroke-width="1.5"/><circle cx="137" cy="63" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="157" cy="63" r="7" fill="#282828" stroke="#888" stroke-width="1.5"/><circle cx="157" cy="63" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="177" cy="63" r="7" fill="#282828" stroke="#888" stroke-width="1.5"/><circle cx="177" cy="63" r="2.5" fill="#aaa"/>
+  <rect x="80" y="52" width="42" height="8" rx="3" fill="#080808"/>
+</svg>`
+}
+
+// ===== DUAL-CAB DIESEL (CC206 — cabs at both ends, C-C bogies) =====
+function buildDualCabSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor || '#1a2a4a'
+  const ac = cfg.accentColor || '#ff6600'
+  const wa = animate ? ' class="train-wheel"' : ''
+  const smk = animate ? `
+    <circle class="diesel-smoke" cx="112" cy="10" r="7"   fill="rgba(16,16,16,0.92)" style="animation-delay:0s"/>
+    <circle class="diesel-smoke" cx="104" cy="5"  r="5.5" fill="rgba(24,24,24,0.75)" style="animation-delay:0.22s"/>
+    <circle class="diesel-smoke" cx="120" cy="3"  r="6"   fill="rgba(8,8,8,0.60)"    style="animation-delay:0.44s"/>` : ''
+  return `<svg viewBox="0 0 230 70" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="115" cy="68" rx="100" ry="4" fill="rgba(0,0,0,0.25)"/>
+  <rect x="8" y="46" width="214" height="10" rx="3" fill="#0a0a0a"/>
+  <!-- Body full length -->
+  <rect x="10" y="18" width="210" height="32" rx="6" fill="${bc}"/>
+  <rect x="10" y="18" width="210" height="10" rx="6" fill="rgba(255,255,255,0.1)"/>
+  <!-- Front cab (LEFT) -->
+  <rect x="8"  y="13" width="54" height="39" rx="6" fill="${bc}"/>
+  <rect x="6"  y="11" width="58" height="10" rx="4" fill="${ac}" opacity="0.95"/>
+  <rect x="14" y="20" width="17" height="18" rx="4" fill="rgba(135,206,235,0.92)"/>
+  <rect x="35" y="20" width="17" height="18" rx="4" fill="rgba(135,206,235,0.92)"/>
+  <circle cx="9"  cy="40" r="7" fill="#FFD166" opacity="0.95"/><circle cx="9" cy="40" r="4" fill="white" opacity="0.9"/>
+  <!-- Rear cab (RIGHT) — mirrored -->
+  <rect x="168" y="13" width="54" height="39" rx="6" fill="${bc}"/>
+  <rect x="166" y="11" width="58" height="10" rx="4" fill="${ac}" opacity="0.95"/>
+  <rect x="178" y="20" width="17" height="18" rx="4" fill="rgba(135,206,235,0.92)"/>
+  <rect x="199" y="20" width="17" height="18" rx="4" fill="rgba(135,206,235,0.92)"/>
+  <circle cx="221" cy="40" r="7" fill="#FFD166" opacity="0.65"/><circle cx="221" cy="40" r="4" fill="white" opacity="0.6"/>
+  <!-- Engine hood (centre) -->
+  <rect x="62" y="16" width="106" height="36" rx="4" fill="${bc}"/>
+  <rect x="70"  y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="79"  y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="88"  y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="100" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="109" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="118" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="130" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="139" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="148" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <rect x="157" y="22" width="3" height="24" rx="1" fill="rgba(0,0,0,0.45)"/>
+  <!-- Exhaust -->
+  <rect x="107" y="6"  width="10" height="12" rx="3" fill="#222"/>
+  <rect x="104" y="3"  width="16" height="6"  rx="2" fill="#333"/>
+  ${smk}
+  <!-- Full-length accent stripe -->
+  <rect x="10" y="42" width="210" height="4" rx="2" fill="${ac}" opacity="0.82"/>
+  <rect x="2"  y="46" width="10" height="8" rx="2" fill="#555"/>
+  <rect x="218" y="46" width="10" height="8" rx="2" fill="#555"/>
+  <!-- Bogie 1 — C (left) -->
+  <rect x="10" y="55" width="90" height="10" rx="4" fill="#181818" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="22"  cy="62" r="7" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="22"  cy="62" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="42"  cy="62" r="7" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="42"  cy="62" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="62"  cy="62" r="7" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="62"  cy="62" r="2.5" fill="#aaa"/>
+  <!-- Bogie 2 — C (right) -->
+  <rect x="130" y="55" width="90" height="10" rx="4" fill="#181818" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="142" cy="62" r="7" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="142" cy="62" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="162" cy="62" r="7" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="162" cy="62" r="2.5" fill="#aaa"/>
+  <circle${wa} cx="182" cy="62" r="7" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="182" cy="62" r="2.5" fill="#aaa"/>
+</svg>`
+}
+
+// ===== EMU (KRL, LRT, MRT — commuter multiple unit, cabs at both ends) =====
+function buildEmuSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor || '#0D47A1'
+  const ac = cfg.accentColor || '#e53935'
+  const wa = animate ? ' class="train-wheel"' : ''
+  const spk = animate ? `
+    <polyline class="elec-spark"  points="90,4 84,1 92,3 86,-2" fill="none" stroke="#00f5ff" stroke-width="1.8" stroke-linecap="round"/>
+    <circle   class="elec-spark2" cx="84" cy="-2" r="1.8" fill="#fff"/>` : ''
+  return `<svg viewBox="0 0 250 62" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="125" cy="60" rx="110" ry="4" fill="rgba(0,0,0,0.2)"/>
+  <!-- Rear car body -->
+  <rect x="152" y="16" width="86" height="34" rx="5" fill="${bc}"/>
+  <rect x="152" y="16" width="86" height="10" rx="5" fill="rgba(255,255,255,0.12)"/>
+  <rect x="162" y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <rect x="182" y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <rect x="202" y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <rect x="222" y="22" width="12" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <!-- Inter-car bellows -->
+  <rect x="140" y="22" width="14" height="26" rx="3" fill="rgba(0,0,0,0.45)"/>
+  <!-- Front car (cab) -->
+  <polygon points="10,50 2,38 2,26 10,16" fill="${bc}"/>
+  <rect x="10" y="14" width="132" height="36" rx="6" fill="${bc}"/>
+  <rect x="10" y="14" width="132" height="11" rx="6" fill="rgba(255,255,255,0.12)"/>
+  <!-- Accent stripe full length -->
+  <rect x="2"  y="38" width="236" height="5" rx="2.5" fill="${ac}" opacity="0.92"/>
+  <!-- Headlights -->
+  <circle cx="4"  cy="28" r="5.5" fill="#FFD166" opacity="0.95"/><circle cx="4" cy="28" r="3" fill="white" opacity="0.9"/>
+  <circle cx="4"  cy="44" r="3.5" fill="#FF6B35" opacity="0.85"/>
+  <!-- Panoramic front window -->
+  <rect x="14" y="20" width="24" height="17" rx="4" fill="rgba(135,206,235,0.92)"/>
+  <!-- Side windows -->
+  <rect x="46"  y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <rect x="66"  y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <rect x="86"  y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <rect x="106" y="22" width="14" height="13" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <!-- Pantograph -->
+  <rect x="80" y="8" width="40" height="4" rx="2" fill="#555"/>
+  <rect x="87" y="4" width="26" height="4" rx="2" fill="#777"/>
+  <rect x="94" y="1" width="12" height="4" rx="1.5" fill="#888"/>
+  ${spk}
+  <!-- Bogies — front car -->
+  <rect x="14" y="50" width="50" height="8" rx="3" fill="#111" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="24" cy="56" r="6" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="24" cy="56" r="2" fill="#aaa"/>
+  <circle${wa} cx="52" cy="56" r="6" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="52" cy="56" r="2" fill="#aaa"/>
+  <rect x="82" y="50" width="50" height="8" rx="3" fill="#111" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="92"  cy="56" r="6" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="92"  cy="56" r="2" fill="#aaa"/>
+  <circle${wa} cx="120" cy="56" r="6" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="120" cy="56" r="2" fill="#aaa"/>
+  <!-- Bogies — rear car -->
+  <rect x="164" y="50" width="62" height="8" rx="3" fill="#111" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="176" cy="56" r="6" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="176" cy="56" r="2" fill="#aaa"/>
+  <circle${wa} cx="212" cy="56" r="6" fill="#222" stroke="#888" stroke-width="1.5"/><circle cx="212" cy="56" r="2" fill="#aaa"/>
+</svg>`
+}
+
+// ===== SHINKANSEN 0 SERIES (round bullet nose, 1964 Tokyo Olympics) =====
+function buildShinkansen0SVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor || '#f0f0f0'
+  const ac = cfg.accentColor || '#0052cc'
+  const wa = animate ? ' class="train-wheel"' : ''
+  const spk = animate ? `
+    <polyline class="elec-spark"  points="98,4 92,1 100,3" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
+    <circle   class="elec-spark2" cx="92" cy="0" r="1.5" fill="#fff"/>` : ''
+  return `<svg viewBox="0 0 265 60" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="130" cy="58" rx="114" ry="4" fill="rgba(0,0,0,0.16)"/>
+  <!-- Main body -->
+  <rect x="40" y="14" width="216" height="36" rx="4" fill="${bc}" stroke="rgba(200,200,200,0.5)" stroke-width="0.8"/>
+  <rect x="40" y="14" width="216" height="11" rx="4" fill="rgba(0,0,0,0.03)"/>
+  <!-- Iconic ROUND/OVAL nose — the defining 0-series shape -->
+  <ellipse cx="34" cy="32" rx="30" ry="22" fill="${bc}" stroke="rgba(200,200,200,0.5)" stroke-width="0.8"/>
+  <!-- Blue belly stripe (iconic) -->
+  <rect x="4"  y="35" width="252" height="9"  rx="2" fill="${ac}" opacity="0.95"/>
+  <!-- Thin upper accent line -->
+  <rect x="40" y="27" width="216" height="3.5" rx="1.5" fill="${ac}" opacity="0.5"/>
+  <!-- Large circular front window (signature) -->
+  <circle cx="32" cy="26" r="13" fill="rgba(100,180,255,0.18)"/>
+  <circle cx="32" cy="26" r="10" fill="rgba(135,206,235,0.88)"/>
+  <circle cx="32" cy="26" r="7"  fill="rgba(165,220,255,0.92)"/>
+  <!-- Headlights (2 small below window) -->
+  <circle cx="20" cy="42" r="4.5" fill="#FFD166" opacity="0.92"/><circle cx="20" cy="42" r="2.5" fill="white" opacity="0.9"/>
+  <circle cx="40" cy="43" r="3"   fill="#FFD166" opacity="0.72"/>
+  <!-- Windows (0-series: square with rounded corners) -->
+  <rect x="56"  y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="78"  y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="100" y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="122" y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="144" y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="166" y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="188" y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="210" y="19" width="15" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <rect x="233" y="19" width="16" height="14" rx="3" fill="rgba(135,206,235,0.85)"/>
+  <!-- Pantograph -->
+  <rect x="86" y="7" width="44" height="5" rx="2.5" fill="#666"/>
+  <rect x="94" y="3" width="28" height="5" rx="2"   fill="#888"/>
+  <rect x="102" y="0" width="12" height="4" rx="1.5" fill="#999"/>
+  ${spk}
+  <!-- Bogies (4 shown for 0-series 16-car train feel) -->
+  <rect x="42"  y="50" width="50" height="8" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+  <circle${wa} cx="52"  cy="56" r="6" fill="#1a1a1a" stroke="#999" stroke-width="1.5"/><circle cx="52"  cy="56" r="2" fill="#ccc"/>
+  <circle${wa} cx="80"  cy="56" r="6" fill="#1a1a1a" stroke="#999" stroke-width="1.5"/><circle cx="80"  cy="56" r="2" fill="#ccc"/>
+  <rect x="110" y="50" width="50" height="8" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+  <circle${wa} cx="120" cy="56" r="6" fill="#1a1a1a" stroke="#999" stroke-width="1.5"/><circle cx="120" cy="56" r="2" fill="#ccc"/>
+  <circle${wa} cx="148" cy="56" r="6" fill="#1a1a1a" stroke="#999" stroke-width="1.5"/><circle cx="148" cy="56" r="2" fill="#ccc"/>
+  <rect x="178" y="50" width="50" height="8" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+  <circle${wa} cx="188" cy="56" r="6" fill="#1a1a1a" stroke="#999" stroke-width="1.5"/><circle cx="188" cy="56" r="2" fill="#ccc"/>
+  <circle${wa} cx="216" cy="56" r="6" fill="#1a1a1a" stroke="#999" stroke-width="1.5"/><circle cx="216" cy="56" r="2" fill="#ccc"/>
+</svg>`
+}
+
+// ===== HIGH-SPEED TRAIN (N700, E5, TGV, ICE, KTX, CR400 — varying nose) =====
+function buildHighSpeedSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor || '#1a1a6b'
+  const ac = cfg.accentColor || '#0077cc'
+  const wa = animate ? ' class="train-wheel"' : ''
+  const nl = cfg.noseLen || 44  // how far the nose tip extends from body
+  const spk = animate ? `
+    <polyline class="elec-spark"  points="${nl+32},4 ${nl+26},1 ${nl+34},3" fill="none" stroke="${ac}" stroke-width="1.8" stroke-linecap="round"/>
+    <circle   class="elec-spark2" cx="${nl+26}" cy="0" r="1.5" fill="#fff"/>` : ''
+  return `<svg viewBox="0 0 272 60" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="136" cy="58" rx="120" ry="4" fill="rgba(0,0,0,0.2)"/>
+  <!-- Body -->
+  <rect x="${nl}" y="14" width="${272-nl}" height="36" rx="5" fill="${bc}"/>
+  <rect x="${nl}" y="14" width="${272-nl}" height="11" rx="5" fill="rgba(255,255,255,0.12)"/>
+  <!-- Aerodynamic pointed nose -->
+  <polygon points="${nl},50 4,36 4,28 ${nl},14" fill="${bc}"/>
+  <!-- Accent stripe -->
+  <rect x="4" y="36" width="268" height="6" rx="2.5" fill="${ac}" opacity="0.88"/>
+  <!-- LED headlight strip on nose -->
+  <line x1="${nl-8}" y1="23" x2="${nl+16}" y2="23" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="${nl-5}" cy="31" r="4.5" fill="#FFD166" opacity="0.92"/><circle cx="${nl-5}" cy="31" r="2.5" fill="white" opacity="0.9"/>
+  <!-- Cab window -->
+  <rect x="${nl+4}" y="19" width="22" height="16" rx="4" fill="rgba(135,206,235,0.9)"/>
+  <!-- Side windows -->
+  <rect x="${nl+34}"  y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <rect x="${nl+54}"  y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <rect x="${nl+74}"  y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <rect x="${nl+94}"  y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <rect x="${nl+114}" y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <rect x="${nl+134}" y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <rect x="${nl+154}" y="19" width="14" height="13" rx="3" fill="rgba(135,206,235,0.82)"/>
+  <!-- Pantograph -->
+  <rect x="${nl+42}" y="7" width="44" height="5" rx="2.5" fill="#666"/>
+  <rect x="${nl+50}" y="3" width="28" height="5" rx="2" fill="#888"/>
+  <rect x="${nl+58}" y="0" width="12" height="4" rx="1.5" fill="#999"/>
+  ${spk}
+  <!-- Bogies -->
+  <rect x="${nl+4}"  y="50" width="58" height="8" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="${nl+16}" cy="56" r="6" fill="#111" stroke="#888" stroke-width="1.5"/><circle cx="${nl+16}" cy="56" r="2" fill="#bbb"/>
+  <circle${wa} cx="${nl+48}" cy="56" r="6" fill="#111" stroke="#888" stroke-width="1.5"/><circle cx="${nl+48}" cy="56" r="2" fill="#bbb"/>
+  <rect x="${nl+80}" y="50" width="58" height="8" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+  <circle${wa} cx="${nl+92}"  cy="56" r="6" fill="#111" stroke="#888" stroke-width="1.5"/><circle cx="${nl+92}"  cy="56" r="2" fill="#bbb"/>
+  <circle${wa} cx="${nl+124}" cy="56" r="6" fill="#111" stroke="#888" stroke-width="1.5"/><circle cx="${nl+124}" cy="56" r="2" fill="#bbb"/>
+</svg>`
+}
+
+// ===== SCMaglev L0 (no wheels, superconducting magnetic levitation) =====
+function buildMaglevSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc = cfg.bodyColor || '#1a1a2e'
+  const ac = cfg.accentColor || '#00f5ff'
+  const spk = animate ? `
+    <circle   class="elec-spark"  cx="60" cy="10" r="3"   fill="${ac}" opacity="0.9"/>
+    <circle   class="elec-spark2" cx="68" cy="8"  r="2"   fill="#fff"  opacity="0.8"/>
+    <polyline class="elec-spark"  points="54,12 60,8 66,10 72,6" fill="none" stroke="${ac}" stroke-width="1.5" stroke-linecap="round"/>` : ''
+  return `<svg viewBox="0 0 290 56" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <!-- Floating glow (no ground shadow — it levitates) -->
+  <ellipse cx="145" cy="54" rx="118" ry="3" fill="rgba(0,200,255,0.08)" opacity="0.6"/>
+  <!-- T-channel guideway at bottom -->
+  <rect x="16" y="46" width="258" height="8" rx="3" fill="#101020"/>
+  <rect x="10" y="49" width="270" height="5" rx="2" fill="#080818" stroke="${ac}" stroke-width="0.8" opacity="0.6"/>
+  <!-- Superconducting coil strips (bottom edge) -->
+  <rect x="46" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="64" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="82" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="100" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="118" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="136" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="154" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="172" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="190" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="208" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="226" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <rect x="244" y="43" width="12" height="4" rx="2" fill="${ac}" opacity="0.72"/>
+  <!-- Main aerodynamic body -->
+  <rect x="42" y="13" width="242" height="32" rx="7" fill="${bc}"/>
+  <rect x="42" y="13" width="242" height="10" rx="7" fill="rgba(255,255,255,0.1)"/>
+  <!-- Ultra-long tapered nose (≈60px) -->
+  <polygon points="42,45 4,29 42,13" fill="${bc}"/>
+  <circle cx="5" cy="29" r="5" fill="${bc}"/>
+  <!-- Cyan accent glow stripe -->
+  <rect x="4" y="33" width="280" height="4" rx="2" fill="${ac}" opacity="0.88"/>
+  <!-- Cockpit windshield -->
+  <rect x="44" y="18" width="24" height="14" rx="3" fill="rgba(135,206,235,0.88)"/>
+  <!-- Narrow speed-slit windows -->
+  <rect x="76"  y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="100" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="124" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="148" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="172" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="196" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="220" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <rect x="244" y="20" width="16" height="9" rx="3" fill="rgba(135,206,235,0.72)"/>
+  <!-- No wheels — MAGLEV! -->
+  ${spk}
+</svg>`
+}
+
+// ===== TRAIN SVG DISPATCHER — routes to correct builder per cfg.builder =====
+function dispatchTrainSVG(cfg, opts) {
+  const b = cfg.builder
+  if (b === 'hood_diesel')  return buildHoodDieselSVG(cfg, opts)
+  if (b === 'dual_cab')     return buildDualCabSVG(cfg, opts)
+  if (b === 'emu')          return buildEmuSVG(cfg, opts)
+  if (b === 'shinkansen_0') return buildShinkansen0SVG(cfg, opts)
+  if (b === 'highspeed')    return buildHighSpeedSVG(cfg, opts)
+  if (b === 'maglev')       return buildMaglevSVG(cfg, opts)
+  if (cfg.isSteam)          return buildSteamLocoSVG(cfg, opts)
+  if (cfg.isDiesel)         return buildDieselLocoSVG(cfg, opts)
+  if (cfg.isElectric)       return buildElectricLocoSVG(cfg, opts)
+  return buildDieselLocoSVG(cfg, opts)
+}
+
 // G14 Categories with trains grouped by type
 const G14_CATEGORIES = [
   {
@@ -12321,30 +12667,31 @@ const G14_CATEGORIES = [
     key:'diesel', label:'Diesel', emoji:'🚃', color:'#166534', bg:'rgba(22,101,52,0.25)',
     desc:'Mesin diesel kuat dan handal',
     trains:[
-      { key:'cc201',  name:'CC 201',   sub:'Indonesia • Diesel',    isDiesel:true, bodyColor:'#1B4A1B', accentColor:'#FFD166', baseSpeed:2.6,  boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'CC201 — Kuda kerja rel Indonesia! Ribuan CC201 melintasi Jawa setiap hari. 💪🇮🇩' },
-      { key:'cc203',  name:'CC 203',   sub:'Indonesia • Diesel Modern', isDiesel:true, bodyColor:'#0f3d1a', accentColor:'#00e676', baseSpeed:2.8, boostMult:1.36, boostDur:2100, color:'#1A4A1A', kmh:95,  desc:'CC203 — Diesel modern Indonesia! Lebih kencang dan andal dari CC201! 🟢⚡' },
-      { key:'cc206',  name:'CC 206',   sub:'Indonesia • General Electric', isDiesel:true, bodyColor:'#1a2a4a', accentColor:'#ff6600', baseSpeed:3.0, boostMult:1.35, boostDur:2150, color:'#1a2a4a', kmh:100, desc:'CC206 — Generasi terbaru diesel Indonesia! Buatan General Electric 2012. 🔶🇺🇸' },
-      { key:'bb301',  name:'BB 301',   sub:'Indonesia • Diesel',    isDiesel:true, bodyColor:'#2a1a00', accentColor:'#ffa500', baseSpeed:2.4,  boostMult:1.40, boostDur:2050, color:'#2a1a00', kmh:75,  desc:'BB301 — Diesel tua tapi kokoh! Masih mengangkut barang di jalur-jalur pinggiran Jawa. 🚛' },
-      { key:'de10',   name:'DE 10',    sub:'Jepang • JNR Diesel',   isDiesel:true, bodyColor:'#4a2000', accentColor:'#ff3300', baseSpeed:2.2,  boostMult:1.41, boostDur:2000, color:'#4a2000', kmh:70,  desc:'DE10 — Diesel langsir JNR Jepang! Sangat fleksibel, bisa bolak-balik arah! 🇯🇵' },
-      { key:'class66', name:'Class 66', sub:'Inggris • EWS Diesel',  isDiesel:true, bodyColor:'#5a1a1a', accentColor:'#ffd700', baseSpeed:2.7,  boostMult:1.37, boostDur:2100, color:'#5a1a1a', kmh:92,  desc:'Class 66 — Diesel barang Inggris yang ikonik! Dipakai di seluruh Eropa! 🇬🇧🌍' },
-      { key:'sd70m',  name:'SD70M',    sub:'Amerika • EMD Diesel',  isDiesel:true, bodyColor:'#003366', accentColor:'#ff0000', baseSpeed:3.1,  boostMult:1.34, boostDur:2200, color:'#003366', kmh:105, desc:'SD70M — Raksasa rel Amerika! Mesin EMD bertenaga 4300 hp untuk jalur panjang! 🇺🇸🦅' },
-      { key:'df8b',   name:'DF8B',     sub:'China • Diesel',        isDiesel:true, bodyColor:'#1a3a1a', accentColor:'#ff4444', baseSpeed:2.9,  boostMult:1.35, boostDur:2150, color:'#1a3a1a', kmh:98,  desc:'DF8B — Diesel angkut barang China yang perkasa! Tulang punggung jalur batubara! 🇨🇳' },
+      { key:'cc201',  name:'CC 201',   sub:'Indonesia • EMD Hood Unit',    isDiesel:true, builder:'hood_diesel', bodyColor:'#1B4A1B', accentColor:'#FFD166', baseSpeed:2.6,  boostMult:1.38, boostDur:2100, color:'#1B5E20', kmh:85,  desc:'CC201 — Kuda kerja rel Indonesia! Hood unit C-C, ribuan CC201 melintasi Jawa setiap hari. 💪🇮🇩' },
+      { key:'cc203',  name:'CC 203',   sub:'Indonesia • Hood Unit Modern',  isDiesel:true, builder:'hood_diesel', bodyColor:'#0f3d1a', accentColor:'#00e676', baseSpeed:2.8, boostMult:1.36, boostDur:2100, color:'#1A4A1A', kmh:95,  desc:'CC203 — Diesel modern Indonesia! Hood unit lebih bertenaga, livery hijau metalik! 🟢⚡' },
+      { key:'cc206',  name:'CC 206',   sub:'Indonesia • GE Dual-Cab C-C',  isDiesel:true, builder:'dual_cab',   bodyColor:'#1a2a4a', accentColor:'#ff6600', baseSpeed:3.0, boostMult:1.35, boostDur:2150, color:'#1a2a4a', kmh:100, desc:'CC206 — GE ES43ACi terbaru Indonesia! Desain kabin ganda (bi-directional), 6 gandar, 4300 HP! 🔶🇺🇸' },
+      { key:'bb301',  name:'BB 301',   sub:'Indonesia • Diesel',           isDiesel:true, builder:'hood_diesel', bodyColor:'#3a2800', accentColor:'#ffa500', baseSpeed:2.4,  boostMult:1.40, boostDur:2050, color:'#2a1a00', kmh:75,  desc:'BB301 — Diesel tua tapi kokoh! Masih mengangkut barang di jalur-jalur pinggiran Jawa. 🚛' },
+      { key:'de10',   name:'DE 10',    sub:'Jepang • JNR Diesel',          isDiesel:true, bodyColor:'#4a2000', accentColor:'#ff3300', baseSpeed:2.2,  boostMult:1.41, boostDur:2000, color:'#4a2000', kmh:70,  desc:'DE10 — Diesel langsir JNR Jepang! Sangat fleksibel, bisa bolak-balik arah! 🇯🇵' },
+      { key:'class66', name:'Class 66', sub:'Inggris • EWS Hood Diesel',   isDiesel:true, builder:'hood_diesel', bodyColor:'#5a1a1a', accentColor:'#ffd700', baseSpeed:2.7,  boostMult:1.37, boostDur:2100, color:'#5a1a1a', kmh:92,  desc:'Class 66 — Hood diesel barang Inggris yang ikonik! Dipakai di seluruh Eropa! 🇬🇧🌍' },
+      { key:'sd70m',  name:'SD70M',    sub:'Amerika • EMD Diesel',         isDiesel:true, bodyColor:'#003366', accentColor:'#ff0000', baseSpeed:3.1,  boostMult:1.34, boostDur:2200, color:'#003366', kmh:105, desc:'SD70M — Raksasa rel Amerika! Mesin EMD bertenaga 4300 hp untuk jalur panjang! 🇺🇸🦅' },
+      { key:'df8b',   name:'DF8B',     sub:'China • Diesel Hood Unit',     isDiesel:true, builder:'hood_diesel', bodyColor:'#1a3a1a', accentColor:'#ff4444', baseSpeed:2.9,  boostMult:1.35, boostDur:2150, color:'#1a3a1a', kmh:98,  desc:'DF8B — Hood diesel angkut barang China yang perkasa! Tulang punggung jalur batubara! 🇨🇳' },
     ]
   },
   {
     key:'electric', label:'Listrik', emoji:'⚡', color:'#1e3a8a', bg:'rgba(30,58,138,0.25)',
     desc:'Kereta listrik super cepat',
     trains:[
-      { key:'krl',    name:'KRL',             sub:'Commuter Jabodetabek', isElectric:true, bodyColor:'#0D47A1', accentColor:'#e53935', baseSpeed:3.0,  boostMult:1.37, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line — andalan ibu kota! Angkut jutaan penumpang Jakarta setiap hari! 🏙️🇮🇩' },
-      { key:'lrt',    name:'LRT Jakarta',      sub:'Indonesia 2019',       isElectric:true, bodyColor:'#c62828', accentColor:'#ffeb3b', baseSpeed:2.8,  boostMult:1.38, boostDur:2150, color:'#c62828', kmh:90,  desc:'LRT Jakarta — Kereta ringan melayang di atas kota! Modern dan ramah lingkungan! 🌇✨' },
-      { key:'mrt',    name:'MRT Jakarta',      sub:'Indonesia 2019',       isElectric:true, bodyColor:'#37474f', accentColor:'#26c6da', baseSpeed:3.1,  boostMult:1.36, boostDur:2250, color:'#37474f', kmh:115, desc:'MRT Jakarta — Kereta bawah dan layang pertama Jakarta! Cepat dan nyaman! 🚇💨' },
-      { key:'shink',  name:'Shinkansen N700',  sub:'Jepang • JR Central',  isElectric:true, bodyColor:'#1A1A6B', accentColor:'#0077cc', baseSpeed:3.5,  boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:285, desc:'Shinkansen N700 — Peluru Jepang! Kecepatan 285 km/h membelah pegunungan Jepang! 🏔️🇯🇵' },
-      { key:'e5',     name:'Shinkansen E5',    sub:'Jepang • Hayabusa',    isElectric:true, bodyColor:'#1B4332', accentColor:'#ff69b4', baseSpeed:3.6,  boostMult:1.34, boostDur:2300, color:'#2C7043', kmh:320, desc:'Shinkansen E5 Hayabusa — Elang Hijau Jepang! 320 km/h memecah angin! 🦅💚' },
-      { key:'tgv',    name:'TGV Inouï',        sub:'Perancis • SNCF',      isElectric:true, bodyColor:'#003189', accentColor:'#e63946', baseSpeed:3.8,  boostMult:1.33, boostDur:2400, color:'#003189', kmh:320, desc:'TGV Inouï — Kebanggaan Prancis! Sempat jadi kereta tercepat dunia! 🇫🇷⚡' },
-      { key:'ice3',   name:'ICE-3',            sub:'Jerman • DB',          isElectric:true, bodyColor:'#e8e8e8', accentColor:'#e63946', baseSpeed:3.7,  boostMult:1.34, boostDur:2350, color:'#D0D0D0', kmh:300, desc:'ICE-3 — Ekspres Jerman yang elegan! Berlari 300 km/h antar kota Eropa! 🇩🇪🚄' },
-      { key:'ktx',    name:'KTX-I',            sub:'Korea Selatan • Korail', isElectric:true, bodyColor:'#0A2A7A', accentColor:'#ff6b35', baseSpeed:3.6, boostMult:1.35, boostDur:2300, color:'#0A2A7A', kmh:305, desc:'KTX-I — Peluru Korea! 305 km/h menghubungkan Seoul ke Busan hanya 2.5 jam! 🇰🇷⚡' },
-      { key:'cr400',  name:'CR400AF',          sub:'China • Fuxing',       isElectric:true, bodyColor:'#b71c1c', accentColor:'#ffc107', baseSpeed:4.0,  boostMult:1.32, boostDur:2450, color:'#b71c1c', kmh:350, desc:'CR400AF Fuxing — Kereta TERCEPAT beroperasi di dunia! 350 km/h jalur China! 🇨🇳🏆' },
-      { key:'maglev', name:'SCMaglev L0',      sub:'Jepang • Maglev',      isElectric:true, bodyColor:'#1a1a2e', accentColor:'#00f5ff', baseSpeed:4.5,  boostMult:1.30, boostDur:2600, color:'#1a1a2e', kmh:603, desc:'SCMaglev L0 — PEMEGANG REKOR DUNIA! 603 km/h! Melayang di atas rel dengan magnet superkonduktor! 🌌🚀' },
+      { key:'krl',    name:'KRL',             sub:'Commuter Jabodetabek',    isElectric:true, builder:'emu',          bodyColor:'#0D47A1', accentColor:'#e53935', baseSpeed:3.0, boostMult:1.37, boostDur:2200, color:'#0D47A1', kmh:110, desc:'KRL Commuter Line — andalan ibu kota! EMU dua kabin, angkut jutaan penumpang Jakarta! 🏙️🇮🇩' },
+      { key:'lrt',    name:'LRT Jakarta',      sub:'Indonesia 2019',           isElectric:true, builder:'emu',          bodyColor:'#c62828', accentColor:'#ffeb3b', baseSpeed:2.8, boostMult:1.38, boostDur:2150, color:'#c62828', kmh:90,  desc:'LRT Jakarta — Kereta ringan melayang di atas kota! EMU modern dan ramah lingkungan! 🌇✨' },
+      { key:'mrt',    name:'MRT Jakarta',      sub:'Indonesia 2019',           isElectric:true, builder:'emu',          bodyColor:'#37474f', accentColor:'#26c6da', baseSpeed:3.1, boostMult:1.36, boostDur:2250, color:'#37474f', kmh:115, desc:'MRT Jakarta — EMU pertama Jakarta! Pantograph ganda, sistem CBTC canggih! 🚇💨' },
+      { key:'shink0', name:'Shinkansen 0',     sub:'Jepang 1964 • JNR Klasik', isElectric:true, builder:'shinkansen_0', bodyColor:'#f0f0f0', accentColor:'#0052cc', baseSpeed:2.8, boostMult:1.38, boostDur:2100, color:'#f0f0f0', kmh:210, desc:'Shinkansen 0 Series — LEGENDA 1964! Hidung bulat ikonik, debut saat Olimpiade Tokyo. Bapak semua bullet train dunia! 🇯🇵🏅' },
+      { key:'shink',  name:'Shinkansen N700',  sub:'Jepang • JR Central',      isElectric:true, builder:'highspeed',    bodyColor:'#1A1A6B', accentColor:'#0077cc', noseLen:44, baseSpeed:3.5, boostMult:1.35, boostDur:2300, color:'#1A1A6B', kmh:285, desc:'Shinkansen N700 — Aerodynamic aero-wing car! 285 km/h, anti-derailment sistem aktif! 🏔️🇯🇵' },
+      { key:'e5',     name:'Shinkansen E5',    sub:'Jepang • Hayabusa',        isElectric:true, builder:'highspeed',    bodyColor:'#1B4332', accentColor:'#ff69b4', noseLen:70, baseSpeed:3.6, boostMult:1.34, boostDur:2300, color:'#2C7043', kmh:320, desc:'Shinkansen E5 Hayabusa — Hidung TERPANJANG! 15m "Iguana nose", 320 km/h memecah angin! 🦅💚' },
+      { key:'tgv',    name:'TGV Inouï',        sub:'Perancis • SNCF',          isElectric:true, builder:'highspeed',    bodyColor:'#003189', accentColor:'#e63946', noseLen:52, baseSpeed:3.8, boostMult:1.33, boostDur:2400, color:'#003189', kmh:320, desc:'TGV Inouï — Kebanggaan Prancis! Power car di ujung, 320 km/h! 🇫🇷⚡' },
+      { key:'ice3',   name:'ICE-3',            sub:'Jerman • DB',              isElectric:true, builder:'highspeed',    bodyColor:'#e8e8e8', accentColor:'#e63946', noseLen:32, baseSpeed:3.7, boostMult:1.34, boostDur:2350, color:'#D0D0D0', kmh:300, desc:'ICE-3 — Motor tersebar (distributed traction) pertama Jerman! 300 km/h tanpa lokomotif terpisah! 🇩🇪🚄' },
+      { key:'ktx',    name:'KTX-I',            sub:'Korea Selatan • Korail',   isElectric:true, builder:'highspeed',    bodyColor:'#0A2A7A', accentColor:'#ff6b35', noseLen:50, baseSpeed:3.6, boostMult:1.35, boostDur:2300, color:'#0A2A7A', kmh:305, desc:'KTX-I — Peluru Korea berbasis TGV! 305 km/h Seoul-Busan hanya 2.5 jam! 🇰🇷⚡' },
+      { key:'cr400',  name:'CR400AF',          sub:'China • Fuxing',           isElectric:true, builder:'highspeed',    bodyColor:'#b71c1c', accentColor:'#ffc107', noseLen:46, baseSpeed:4.0, boostMult:1.32, boostDur:2450, color:'#b71c1c', kmh:350, desc:'CR400AF Fuxing — Kereta TERCEPAT beroperasi di dunia! 350 km/h jalur China! 🇨🇳🏆' },
+      { key:'maglev', name:'SCMaglev L0',      sub:'Jepang • Superconducting', isElectric:true, builder:'maglev',       bodyColor:'#1a1a2e', accentColor:'#00f5ff', baseSpeed:4.5, boostMult:1.30, boostDur:2600, color:'#1a1a2e', kmh:603, desc:'SCMaglev L0 — PEMEGANG REKOR DUNIA! 603 km/h! Melayang di atas rel, roda tidak menyentuh tanah! 🌌🚀' },
     ]
   },
 ]
@@ -12445,13 +12792,7 @@ function g14ShowTrainsForCategory(cat) {
     const btn = document.createElement('button')
     btn.className = 'g14-train-select-btn'
     btn.style.padding = '12px 8px'
-    const previewHtml = cfg.isSteam
-      ? buildSteamLocoSVG(cfg, {animate:false, width:80, height:36})
-      : cfg.isDiesel
-        ? buildDieselLocoSVG(cfg, {animate:false, width:80, height:36})
-        : cfg.isElectric
-          ? buildElectricLocoSVG(cfg, {animate:false, width:80, height:36})
-          : `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'" style="width:80px;height:auto;display:block;margin:0 auto;">`
+    const previewHtml = dispatchTrainSVG(cfg, {animate:false, width:80, height:36})
     btn.innerHTML = `<div style="display:block;margin:0 auto 6px;text-align:center;height:38px;display:flex;align-items:center;justify-content:center;">${previewHtml}</div><div style="font-size:12px;font-weight:800;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.sub}</div><div style="font-size:11px;color:#FFD166;font-weight:700;margin-top:2px;">${cfg.kmh} km/h</div>`
     btn.onclick = () => {
       grid.querySelectorAll('.g14-train-select-btn').forEach(b => b.classList.remove('selected'))
@@ -12461,13 +12802,7 @@ function g14ShowTrainsForCategory(cat) {
       // Update header icon
       const hdrWrap = document.getElementById('g14-train-icon-hdr')
       if (hdrWrap) {
-        hdrWrap.innerHTML = cfg.isSteam
-          ? buildSteamLocoSVG(cfg, {animate:false, width:54, height:24})
-          : cfg.isDiesel
-            ? buildDieselLocoSVG(cfg, {animate:false, width:54, height:24})
-            : cfg.isElectric
-              ? buildElectricLocoSVG(cfg, {animate:false, width:54, height:24})
-              : `<img src="${cfg.svg}" alt="${cfg.name}" style="height:28px;width:auto;" onerror="this.style.display='none'">`
+        hdrWrap.innerHTML = dispatchTrainSVG(cfg, {animate:false, width:54, height:24})
       }
       document.getElementById('g14-start-msg').textContent = cfg.desc
       document.getElementById('g14-go-btn-wrap').style.display = 'block'
@@ -12493,13 +12828,7 @@ function g14StartRace() {
   const playerDiv = document.getElementById('g14-player')
   if (playerDiv) {
     const cfg = g14State.trainCfg
-    playerDiv.innerHTML = cfg.isSteam
-      ? buildSteamLocoSVG(cfg, {animate:true, width:136, height:60})
-      : cfg.isDiesel
-        ? buildDieselLocoSVG(cfg, {animate:true, width:136, height:60})
-        : cfg.isElectric
-          ? buildElectricLocoSVG(cfg, {animate:true, width:136, height:60})
-          : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:120px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:36px;\'>🚂</span>'">`
+    playerDiv.innerHTML = dispatchTrainSVG(cfg, {animate:true, width:136, height:60})
   }
   document.getElementById('g14-start-overlay').style.display = 'none'
   document.getElementById('g14-position').style.display = 'block'
@@ -12521,13 +12850,7 @@ function g14SpawnAI() {
     const el = document.createElement('div')
     el.className = 'g14-ai-train'
     el.style.cssText = `position:absolute;z-index:4;pointer-events:none;`
-    el.innerHTML = cfg.isSteam
-      ? buildSteamLocoSVG(cfg, {animate:true, width:110, height:48})
-      : cfg.isDiesel
-        ? buildDieselLocoSVG(cfg, {animate:true, width:110, height:48})
-        : cfg.isElectric
-          ? buildElectricLocoSVG(cfg, {animate:true, width:110, height:48})
-          : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:100px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:28px;\'>🚂</span>'">`
+    el.innerHTML = dispatchTrainSVG(cfg, {animate:true, width:110, height:48})
     const startX = g14State.trackW * (0.55 + i * 0.12)
     el.style.left = startX + 'px'
     el.style.top = `calc(${g14State.laneTopPct[lane]}% - 24px)`
