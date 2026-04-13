@@ -2153,18 +2153,20 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   animation:g14WarnFlash 0.22s ease infinite alternate;
 }
 @keyframes g14WarnFlash { from{opacity:1;transform:translateY(-50%) scale(1)} to{opacity:0.2;transform:translateY(-50%) scale(1.25)} }
-/* AI train */
+/* AI train container */
 .g14-ai-train {
-  position:absolute;z-index:6;height:20%;width:auto;
-  top:50%;transform:translateY(-50%) scaleX(-1);
+  position:absolute;z-index:6;
+  transform:scaleX(-1);
   filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7)) brightness(0.85) saturate(0.9);
+  pointer-events:none;
 }
-/* Player train */
+/* Player train container */
 #g14-player {
-  position:absolute;z-index:10;height:28%;width:auto;
-  left:10%;transform:translateY(-50%) scaleX(-1);
+  position:absolute;z-index:10;
+  left:15%;transform:translate(-50%,-50%) scaleX(-1);
   transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
   filter:drop-shadow(0 6px 20px rgba(0,0,0,0.8)) brightness(1.12) saturate(1.1);
+  pointer-events:none;
 }
 /* Speed lines overlay during boost */
 #g14-speed-lines {
@@ -2345,14 +2347,27 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 #screen-game16 { background:linear-gradient(180deg,#1a0a2e,#2d1660);flex-direction:column; }
 #g16-arena { background:linear-gradient(180deg,#080d24 0%,#0d1845 25%,#1a2860 45%,#4a5530 56%,#3a4520 70%,#2a3510 100%); }
 .g16-timing-track {
-  width:100%;max-width:320px;height:32px;border-radius:16px;
-  background:linear-gradient(90deg,#E53935 0%,#E53935 30%,#43A047 30%,#43A047 70%,#E53935 70%,#E53935 100%);
-  position:relative;overflow:hidden;border:3px solid rgba(255,255,255,0.3);
-  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  width:100%;max-width:400px;height:56px;border-radius:28px;
+  background:linear-gradient(90deg,#E53935 0%,#E53935 33%,#43A047 33%,#43A047 67%,#E53935 67%,#E53935 100%);
+  position:relative;overflow:hidden;border:3px solid rgba(255,255,255,0.45);
+  box-shadow:0 4px 18px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.18);
 }
 .g16-timing-needle {
-  position:absolute;top:0;bottom:0;width:6px;border-radius:3px;
-  background:white;box-shadow:0 0 8px white;transition:left 0.02s linear;
+  position:absolute;top:0;bottom:0;width:8px;border-radius:4px;
+  background:white;box-shadow:0 0 14px 4px white,0 0 6px white;transition:left 0.02s linear;
+}
+.g16-tap-indicator {
+  font-size:22px;font-weight:900;color:#FFF59D;letter-spacing:2px;
+  font-family:'Fredoka One',cursive;text-shadow:0 0 14px rgba(255,245,0,0.85);
+  opacity:0;transition:opacity 0.12s;min-height:28px;
+}
+.g16-tap-indicator.show {
+  opacity:1;
+  animation:g16TapPulse 0.45s ease-in-out infinite alternate;
+}
+@keyframes g16TapPulse {
+  from { transform:scale(1);   opacity:0.85; }
+  to   { transform:scale(1.13);opacity:1; }
 }
 .g16-pull-bar-track {
   width:100%;max-width:340px;height:22px;border-radius:11px;
@@ -2430,6 +2445,20 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   animation:g17CrackGrow 0.3s ease-out forwards;
   transform-origin:center;
 }
+
+/* ===== TRAIN WHEEL + SMOKE ANIMATION (shared by G14/G17) ===== */
+@keyframes wheelSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.train-wheel { transform-box:fill-box;transform-origin:center;animation:wheelSpin 0.48s linear infinite; }
+@keyframes smokePuff {
+  0%   { opacity:0.75;transform:translateY(0)   scale(0.5); }
+  100% { opacity:0;   transform:translateY(-24px) scale(1.6); }
+}
+.train-smoke { transform-box:fill-box;transform-origin:center;animation:smokePuff 1s ease-out infinite; }
+.g14-player-svg,.g14-ai-train-svg {
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  pointer-events:none;display:block;
+}
+.g14-player-svg { left:15%;z-index:5; }
 
 /* ===== GAME 18 — Museum Kereta Ambarawa ===== */
 #screen-game18 { background:linear-gradient(180deg,#1a0e06,#2d1a0a,#3e2510);flex-direction:column; }
@@ -5069,7 +5098,7 @@ body { background: #0a0a1a !important; }
   <!-- Header -->
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
-    <img id="g14-train-icon-hdr" src="assets/train/cc201-indonesia.svg" style="height:28px;width:auto;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));transform:scaleX(-1);" alt="">
+    <div id="g14-train-icon-hdr" style="height:28px;width:56px;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));transform:scaleX(-1);display:flex;align-items:center;"></div>
     <span class="gh-title" style="flex:1;font-size:14px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">Balapan Kereta</span>
     <span class="g14-speedometer" id="g14-speedometer">0 km/h</span>
     <span class="gh-level" id="g14-level" style="color:rgba(255,255,255,0.9);flex-shrink:0;">Lv.1</span>
@@ -5111,8 +5140,8 @@ body { background: #0a0a1a !important; }
         <animate attributeName="cy" values="16;11;16" dur="0.14s" repeatCount="indefinite"/>
       </ellipse>
     </svg>
-    <!-- Player train (SVG image, positioned left side, moves vertically) -->
-    <img id="g14-player" src="assets/train/cc201-indonesia.svg" alt="kereta">
+    <!-- Player train (inline SVG with animated wheels, positioned left side, moves vertically) -->
+    <div id="g14-player" style="position:absolute;left:15%;z-index:5;transform:translate(-50%,-50%);pointer-events:none;"></div>
 
     <!-- Active lane highlight bar (left edge indicator) -->
     <div id="g14-lane-indicator" style="position:absolute;left:0;width:4px;background:rgba(230,57,70,0.8);border-radius:0 4px 4px 0;z-index:12;transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);height:33.3%;"></div>
@@ -5213,7 +5242,7 @@ body { background: #0a0a1a !important; }
     <div id="g15-progress-msg" style="color:rgba(255,255,255,0.55);font-size:11px;font-weight:700;text-align:center;flex-shrink:0;"></div>
 
     <!-- Letter tiles -->
-    <div id="g15-letters" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px;max-width:380px;margin-top:auto;"></div>
+    <div id="g15-letters" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px;max-width:380px;margin-top:8px;padding-bottom:max(env(safe-area-inset-bottom,0px),16px);"></div>
   </div>
   <!-- Result overlay -->
   <div id="g15-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:12px;">
@@ -5265,15 +5294,21 @@ body { background: #0a0a1a !important; }
       </div>
     </div>
     <!-- Phase 1: Hook timing -->
-    <div id="g16-phase1" style="display:none;flex-direction:column;align-items:center;gap:12px;z-index:10;background:rgba(0,0,0,0.7);border-radius:20px;padding:20px;width:88%;max-width:360px;">
-      <div style="color:white;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;">Lempar kait pada zona HIJAU!</div>
-      <div style="position:relative;">
-        <div class="g16-timing-track">
+    <div id="g16-phase1" style="display:none;flex-direction:column;align-items:center;gap:10px;z-index:10;background:rgba(0,0,0,0.75);border-radius:22px;padding:20px 16px;width:92%;max-width:400px;">
+      <div style="color:white;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;">🪝 Lempar kait saat jarum di zona HIJAU!</div>
+      <div id="g16-tap-indicator" class="g16-tap-indicator">TAP! 🎯</div>
+      <div style="position:relative;width:100%;display:flex;align-items:center;justify-content:center;">
+        <div class="g16-timing-track" style="width:100%;">
           <div id="g16-needle" class="g16-timing-needle" style="left:0%;"></div>
         </div>
       </div>
+      <div style="display:flex;justify-content:space-between;width:100%;max-width:400px;padding:0 4px;">
+        <span style="color:#E53935;font-size:10px;font-weight:800;">❌ MELESET</span>
+        <span style="color:#43A047;font-size:10px;font-weight:800;">✅ ZONA AMAN</span>
+        <span style="color:#E53935;font-size:10px;font-weight:800;">MELESET ❌</span>
+      </div>
       <div id="g16-hook-result" style="color:white;font-size:14px;font-weight:800;min-height:20px;"></div>
-      <button id="g16-throw-btn" onclick="g16ThrowHook()" style="background:linear-gradient(135deg,#E65100,#FF7043);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #BF360C;cursor:pointer;">🪝 LEMPAR KAIT!</button>
+      <button id="g16-throw-btn" onclick="g16ThrowHook()" style="background:linear-gradient(135deg,#E65100,#FF7043);color:white;border:none;border-radius:16px;padding:16px 40px;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 5px 0 #BF360C;cursor:pointer;letter-spacing:0.5px;">🪝 LEMPAR KAIT!</button>
       <div id="g16-hook-tries" style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;"></div>
     </div>
     <!-- Phase 2: Word pull -->
@@ -11540,14 +11575,116 @@ function endGameFromOverlay() {
 // ============================================================
 // GAME 14 — BALAPAN KERETA 🏁
 // ============================================================
+
+// Inline SVG steam locomotive builder — used for animated train in G14 + G17
+function buildSteamLocoSVG(cfg, opts = {}) {
+  const { animate = true, width = 148, height = 64 } = opts
+  const bc  = cfg.bodyColor  || '#1a1a2e'
+  const wc  = cfg.wheelColor || '#111130'
+  const wa  = animate ? ' class="train-wheel"' : ''
+  const hasTender = cfg.tender !== false
+
+  const smokeHtml = animate ? `
+    <circle class="train-smoke" cx="52" cy="5"  r="5.5" fill="rgba(190,190,190,0.75)" style="animation-delay:0s"/>
+    <circle class="train-smoke" cx="46" cy="1"  r="4"   fill="rgba(210,210,210,0.55)" style="animation-delay:0.38s"/>
+    <circle class="train-smoke" cx="59" cy="-1" r="3"   fill="rgba(170,170,170,0.4)"  style="animation-delay:0.72s"/>` : ''
+
+  const tenderHtml = hasTender ? `
+    <rect x="140" y="32" width="48" height="26" rx="5" fill="${bc}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <rect x="142" y="28" width="44" height="10" rx="3" fill="${wc}"/>
+    <ellipse cx="164" cy="28" rx="20" ry="5.5" fill="#1a1a1a"/>
+    <rect x="186" y="46" width="12" height="5" rx="2.5" fill="#777"/>
+    <circle${wa} cx="153" cy="61" r="9"  fill="${wc}" stroke="#aaa" stroke-width="1.5"/>
+    <circle       cx="153" cy="61" r="3"  fill="#aaa"/>
+    <circle${wa} cx="171" cy="61" r="9"  fill="${wc}" stroke="#aaa" stroke-width="1.5"/>
+    <circle       cx="171" cy="61" r="3"  fill="#aaa"/>` : ''
+
+  const rackHtml = cfg.rack ? `
+    <rect x="32" y="65" width="90" height="5" rx="2" fill="#666" opacity="0.8"/>
+    <rect x="37"  y="65" width="3" height="8" rx="1" fill="#999"/>
+    <rect x="48"  y="65" width="3" height="8" rx="1" fill="#999"/>
+    <rect x="59"  y="65" width="3" height="8" rx="1" fill="#999"/>
+    <rect x="70"  y="65" width="3" height="8" rx="1" fill="#999"/>
+    <rect x="81"  y="65" width="3" height="8" rx="1" fill="#999"/>
+    <rect x="92"  y="65" width="3" height="8" rx="1" fill="#999"/>
+    <rect x="103" y="65" width="3" height="8" rx="1" fill="#999"/>` : ''
+
+  const totalW = hasTender ? 200 : 148
+  return `<svg viewBox="0 0 ${totalW} 74" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="${hasTender ? 96 : 72}" cy="72" rx="${hasTender ? 84 : 66}" ry="4" fill="rgba(0,0,0,0.22)"/>
+  ${tenderHtml}
+  <rect x="18" y="44" width="${hasTender ? 126 : 114}" height="7" rx="3" fill="${wc}"/>
+  <rect x="22" y="24" width="${hasTender ? 118 : 106}" height="28" rx="11" fill="${bc}"/>
+  <rect x="26" y="26" width="${hasTender ? 110 : 98}"  height="9"  rx="5"  fill="rgba(255,255,255,0.09)"/>
+  <ellipse cx="24" cy="38" rx="11" ry="15" fill="${bc}"/>
+  <ellipse cx="22" cy="38" rx="7.5" ry="11" fill="${wc}" opacity="0.55"/>
+  <circle cx="18" cy="32" r="6.5" fill="#FFD166" opacity="0.92"/>
+  <circle cx="18" cy="32" r="4"   fill="white"   opacity="0.85"/>
+  <rect x="${hasTender ? 120 : 108}" y="12" width="26" height="40" rx="5" fill="${wc}"/>
+  <rect x="${hasTender ? 117 : 105}" y="10" width="32" height="7"  rx="3" fill="${bc}"/>
+  <rect x="${hasTender ? 124 : 112}" y="17" width="15" height="13" rx="3" fill="#87CEEB" opacity="0.88"/>
+  <rect x="42" y="7"  width="11" height="19" rx="3" fill="${wc}"/>
+  <rect x="38" y="5"  width="19" height="7"  rx="3" fill="${wc}"/>
+  ${smokeHtml}
+  <ellipse cx="80" cy="23" rx="15" ry="8" fill="${wc}"/>
+  <ellipse cx="${hasTender ? 106 : 94}" cy="23" rx="9" ry="6" fill="${wc}"/>
+  <rect    cx="${hasTender ? 109 : 97}" y="19" width="4" height="9" rx="2" fill="#999"/>
+  <circle${wa} cx="36"  cy="60" r="9"  fill="${wc}" stroke="#999" stroke-width="1.5"/>
+  <circle       cx="36"  cy="60" r="3"  fill="#aaa"/>
+  <circle${wa} cx="60"  cy="58" r="14" fill="${wc}" stroke="#bbb" stroke-width="2"/>
+  <circle       cx="60"  cy="58" r="5"  fill="#bbb"/>
+  <circle${wa} cx="86"  cy="58" r="14" fill="${wc}" stroke="#bbb" stroke-width="2"/>
+  <circle       cx="86"  cy="58" r="5"  fill="#bbb"/>
+  <circle${wa} cx="112" cy="58" r="14" fill="${wc}" stroke="#bbb" stroke-width="2"/>
+  <circle       cx="112" cy="58" r="5"  fill="#bbb"/>
+  <rect x="60" y="56" width="52" height="4" rx="2" fill="#888"/>
+  <rect x="18" y="54" width="46" height="5" rx="2.5" fill="#666"/>
+  ${rackHtml}
+</svg>`
+}
+
+// Modern/electric train inline SVG (for header icon display)
+function buildModernTrainSVG(cfg, opts = {}) {
+  const { width = 148, height = 64 } = opts
+  const col = cfg.color || '#1a4a8a'
+  return `<svg viewBox="0 0 200 60" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="100" cy="58" rx="88" ry="4" fill="rgba(0,0,0,0.2)"/>
+  <rect x="8"   y="14" width="172" height="34" rx="8" fill="${col}"/>
+  <rect x="8"   y="14" width="172" height="11" rx="8" fill="rgba(255,255,255,0.12)"/>
+  <rect x="180" y="14" width="18"  height="34" rx="8" fill="${col}"/>
+  <polygon points="8,48 2,38 2,24 8,14" fill="${col}"/>
+  <circle cx="6"  cy="24" r="5" fill="#FFD166" opacity="0.9"/>
+  <rect x="22"  y="20" width="28" height="16" rx="4" fill="rgba(135,206,235,0.85)"/>
+  <rect x="64"  y="20" width="28" height="16" rx="4" fill="rgba(135,206,235,0.85)"/>
+  <rect x="110" y="20" width="28" height="16" rx="4" fill="rgba(135,206,235,0.85)"/>
+  <rect x="155" y="20" width="22" height="16" rx="4" fill="rgba(135,206,235,0.85)"/>
+  <circle cx="40"  cy="52" r="8" fill="#333" stroke="#999" stroke-width="1.5"/>
+  <circle cx="40"  cy="52" r="3" fill="#aaa"/>
+  <circle cx="80"  cy="52" r="8" fill="#333" stroke="#999" stroke-width="1.5"/>
+  <circle cx="80"  cy="52" r="3" fill="#aaa"/>
+  <circle cx="122" cy="52" r="8" fill="#333" stroke="#999" stroke-width="1.5"/>
+  <circle cx="122" cy="52" r="3" fill="#aaa"/>
+  <circle cx="162" cy="52" r="8" fill="#333" stroke="#999" stroke-width="1.5"/>
+  <circle cx="162" cy="52" r="3" fill="#aaa"/>
+</svg>`
+}
+
 // G14 Categories with trains grouped by type
 const G14_CATEGORIES = [
   {
-    key:'steam', label:'Uap', emoji:'🚂', color:'#92400e', bg:'rgba(146,64,14,0.25)',
-    desc:'Lokomotif bertenaga uap legendaris',
+    key:'steam', label:'Uap 🇮🇩', emoji:'🚂', color:'#92400e', bg:'rgba(146,64,14,0.25)',
+    desc:'10 lokomotif uap Ambarawa & Indonesia',
     trains:[
-      { key:'bb302', name:'BB 302',  sub:'Indonesia 1954', svg:'assets/train/bb302-indonesia.svg', baseSpeed:2.0, boostMult:1.45, boostDur:2000, color:'#5D3A1A', kmh:60,  desc:'Lokomotif Uap BB302 Indonesia — baja dan uap!' },
-      { key:'bb303', name:'BB 303',  sub:'Indonesia 1956', svg:'assets/train/bb303-indonesia.svg', baseSpeed:2.1, boostMult:1.43, boostDur:2000, color:'#2A1A08', kmh:65,  desc:'Lokomotif Uap BB303 — lebih bertenaga dari BB302' },
+      { key:'b2507', name:'B 25 07',  sub:'Ambarawa 1902 • Swiss SLM', isSteam:true, rack:true,  tender:false, bodyColor:'#1a1a2e', wheelColor:'#0d0d1a', baseSpeed:1.55, boostMult:1.52, boostDur:1800, color:'#1a1a2e', kmh:30,  desc:'B2507 — Bintang Museum Ambarawa! Kereta rack bergerigi pendaki gunung dari Swiss SLM 1902. ⛰️' },
+      { key:'b2521', name:'B 25 21',  sub:'Ambarawa 1912 • Swiss',     isSteam:true, rack:true,  tender:false, bodyColor:'#0d2a0d', wheelColor:'#061606', baseSpeed:1.62, boostMult:1.50, boostDur:1800, color:'#0d2a0d', kmh:32,  desc:'B2521 — Rack Ambarawa-Bedono jalur gunung legendaris, Swiss SLM 1912. 🌄' },
+      { key:'c1218', name:'C 12 18',  sub:'Ambarawa 1891 • Jerman',    isSteam:true, rack:false, tender:true,  bodyColor:'#4a1515', wheelColor:'#2a0808', baseSpeed:1.48, boostMult:1.54, boostDur:1750, color:'#4a1515', kmh:28,  desc:'C1218 — Lokomotif TERTUA di Indonesia! Buatan Jerman 1891. Usia 130+ tahun! 🏺' },
+      { key:'c5107', name:'C 51 07',  sub:'Ambarawa 1921 • Jerman',    isSteam:true, rack:false, tender:true,  bodyColor:'#0f0f0f', wheelColor:'#050505', baseSpeed:1.65, boostMult:1.49, boostDur:1900, color:'#111', kmh:35,  desc:'C5107 — Lokomotif tender uap Ambarawa buatan Jerman 1921. Pengirim barang era kolonial! 🪨' },
+      { key:'d1415', name:'D 14 15',  sub:'Ambarawa 1908 • Hanomag',   isSteam:true, rack:false, tender:false, bodyColor:'#2a1a0a', wheelColor:'#150a00', baseSpeed:1.58, boostMult:1.48, boostDur:1850, color:'#2a1a0a', kmh:30,  desc:'D1415 — Hanomag Jerman 1908! Kekar dan andal, tulang punggung perkebunan Jawa! 💪' },
+      { key:'b2801', name:'B 28 01',  sub:'Ambarawa 1907 • Swiss SLM', isSteam:true, rack:true,  tender:false, bodyColor:'#0a1f0a', wheelColor:'#051005', baseSpeed:1.60, boostMult:1.49, boostDur:1800, color:'#0a1f0a', kmh:31,  desc:'B2801 — Rack Swiss 1907! Mendaki lereng Gunung Merbabu dengan penuh keberanian! 🏔️' },
+      { key:'c28',   name:'C 28',     sub:'Jawa 1920 • Belanda',       isSteam:true, rack:false, tender:true,  bodyColor:'#0f1540', wheelColor:'#070a25', baseSpeed:1.70, boostMult:1.47, boostDur:1900, color:'#0f1540', kmh:36,  desc:'C28 — Kelas C28 Hindia Belanda 1920. Elegan biru malam di jalur perbukitan! 🌙' },
+      { key:'b50',   name:'B 50',     sub:'Jawa 1880 • Jerman',        isSteam:true, rack:false, tender:false, bodyColor:'#2a1e08', wheelColor:'#150f00', baseSpeed:1.42, boostMult:1.56, boostDur:1700, color:'#2a1e08', kmh:25,  desc:'B50 — Salah satu loko tertua Jawa! Jerman 1880-an. Lambat tapi punya legenda! 🦕' },
+      { key:'bb302', name:'BB 302',   sub:'Indonesia 1954',             isSteam:true, rack:false, tender:true,  bodyColor:'#5D3A1A', wheelColor:'#3a2010', baseSpeed:2.0,  boostMult:1.45, boostDur:2000, color:'#5D3A1A', kmh:60,  desc:'BB302 — Lokomotif era peralihan Indonesia 1954. Baja murni Tanah Air! 🇮🇩' },
+      { key:'bb303', name:'BB 303',   sub:'Indonesia 1956',             isSteam:true, rack:false, tender:true,  bodyColor:'#2A1A08', wheelColor:'#1a0a00', baseSpeed:2.1,  boostMult:1.43, boostDur:2000, color:'#2A1A08', kmh:65,  desc:'BB303 — Lebih bertenaga dari BB302! Kereta masa transisi terbaik Indonesia! ⚡' },
     ]
   },
   {
@@ -11667,16 +11804,22 @@ function g14ShowTrainsForCategory(cat) {
     const btn = document.createElement('button')
     btn.className = 'g14-train-select-btn'
     btn.style.padding = '12px 8px'
-    btn.innerHTML = `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'" style="width:80px;height:auto;display:block;margin:0 auto 6px;"><div style="font-size:12px;font-weight:800;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.sub}</div><div style="font-size:11px;color:#FFD166;font-weight:700;margin-top:2px;">${cfg.kmh} km/h</div>`
+    const previewHtml = cfg.isSteam
+      ? buildSteamLocoSVG(cfg, {animate:false, width:80, height:36})
+      : `<img src="${cfg.svg}" alt="${cfg.name}" onerror="this.style.display='none'" style="width:80px;height:auto;display:block;margin:0 auto;">`
+    btn.innerHTML = `<div style="display:block;margin:0 auto 6px;text-align:center;height:38px;display:flex;align-items:center;justify-content:center;">${previewHtml}</div><div style="font-size:12px;font-weight:800;color:white;">${cfg.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.55);">${cfg.sub}</div><div style="font-size:11px;color:#FFD166;font-weight:700;margin-top:2px;">${cfg.kmh} km/h</div>`
     btn.onclick = () => {
       grid.querySelectorAll('.g14-train-select-btn').forEach(b => b.classList.remove('selected'))
       btn.classList.add('selected')
       g14State.trainType = cfg.key
       g14State.trainCfg = cfg
-      const hdrImg = document.getElementById('g14-train-icon-hdr')
-      if (hdrImg) { hdrImg.src = cfg.svg }
-      const playerImg = document.getElementById('g14-player')
-      if (playerImg) { playerImg.src = cfg.svg }
+      // Update header icon
+      const hdrWrap = document.getElementById('g14-train-icon-hdr')
+      if (hdrWrap) {
+        hdrWrap.innerHTML = cfg.isSteam
+          ? buildSteamLocoSVG(cfg, {animate:false, width:54, height:24})
+          : `<img src="${cfg.svg}" alt="${cfg.name}" style="height:28px;width:auto;" onerror="this.style.display='none'">`
+      }
       document.getElementById('g14-start-msg').textContent = cfg.desc
       document.getElementById('g14-go-btn').style.display = 'block'
       playClick()
@@ -11692,6 +11835,14 @@ function g14StartRace() {
   g14State.trackW = track.clientWidth
   g14State.speed = g14State.trainCfg.baseSpeed
   g14State.running = true
+  // Inject animated player train SVG
+  const playerDiv = document.getElementById('g14-player')
+  if (playerDiv) {
+    const cfg = g14State.trainCfg
+    playerDiv.innerHTML = cfg.isSteam
+      ? buildSteamLocoSVG(cfg, {animate:true, width:136, height:60})
+      : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:120px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:36px;\'>🚂</span>'">`
+  }
   document.getElementById('g14-start-overlay').style.display = 'none'
   document.getElementById('g14-position').style.display = 'block'
   g14UpdatePlayerPos()
@@ -11708,15 +11859,16 @@ function g14SpawnAI() {
   const track = document.getElementById('g14-track')
   aiLanes.forEach((lane, i) => {
     const cfg = pool[i % pool.length]
-    const variationFactor = 0.97 + Math.random() * 0.06  // ±3% speed variance
-    const el = document.createElement('img')
+    const variationFactor = 0.97 + Math.random() * 0.06
+    const el = document.createElement('div')
     el.className = 'g14-ai-train'
-    el.src = cfg.svg
-    el.alt = cfg.name
-    // Start AI trains slightly ahead of player (~65% from left)
+    el.style.cssText = `position:absolute;z-index:4;pointer-events:none;`
+    el.innerHTML = cfg.isSteam
+      ? buildSteamLocoSVG(cfg, {animate:true, width:110, height:48})
+      : `<img src="${cfg.svg}" alt="${cfg.name}" style="width:100px;height:auto;display:block;" onerror="this.outerHTML='<span style=\'font-size:28px;\'>🚂</span>'">`
     const startX = g14State.trackW * (0.55 + i * 0.12)
     el.style.left = startX + 'px'
-    el.style.top = g14State.laneTopPct[lane] + '%'
+    el.style.top = `calc(${g14State.laneTopPct[lane]}% - 24px)`
     track.appendChild(el)
     ai.push({ lane, speed: g14State.trainCfg.baseSpeed * variationFactor, x: startX, el, name: cfg.name })
   })
@@ -12252,7 +12404,13 @@ function g16StartPhase1() {
     if (g16State.needlePos >= 100) { g16State.needlePos = 100; g16State.needleDir = -1 }
     if (g16State.needlePos <= 0)   { g16State.needlePos = 0;   g16State.needleDir = 1  }
     const needle = document.getElementById('g16-needle')
-    if (needle) needle.style.left = `calc(${g16State.needlePos}% - 3px)`
+    if (needle) needle.style.left = `calc(${g16State.needlePos}% - 4px)`
+    // Show TAP indicator when needle is in green zone (33-67%)
+    const tapEl = document.getElementById('g16-tap-indicator')
+    if (tapEl) {
+      const inGreen = g16State.needlePos >= 33 && g16State.needlePos <= 67
+      tapEl.classList.toggle('show', inGreen)
+    }
   }, 20)
 }
 
@@ -12264,7 +12422,7 @@ function g16UpdateHookTries() {
 function g16ThrowHook() {
   if (g16State.hookSuccess || g16State.phase !== 1) return
   const pos = g16State.needlePos
-  const inGreen = pos >= 30 && pos <= 70
+  const inGreen = pos >= 33 && pos <= 67
   g16State.hookTries++
   g16UpdateHookTries()
   const resultEl = document.getElementById('g16-hook-result')
@@ -12584,8 +12742,12 @@ function g17EndGame(won) {
     g17State.blocks[g17State.currentActive].el.classList.remove('active')
   }
   if (won) {
-    // Train crosses bridge!
+    // Replace static train with animated inline SVG, then cross bridge
     const trainEl = document.getElementById('g17-train-waiting')
+    const steamCfg = { isSteam:true, tender:true, rack:false, bodyColor:'#1a1a2e', wheelColor:'#0d0d1a' }
+    trainEl.innerHTML = buildSteamLocoSVG(steamCfg, {animate:true, width:120, height:54})
+    trainEl.style.position = 'absolute'
+    trainEl.style.bottom = '18%'
     trainEl.classList.add('g17-train-cross')
     playCorrect()
   }
