@@ -2819,7 +2819,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g14-ai-train {
   position:absolute;z-index:18;
   transform:scaleX(-1) scale(1.2);
-  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7)) brightness(1.2) saturate(2.0);
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.7)) brightness(1.5) saturate(2.8) !important;
   pointer-events:none;
 }
 @keyframes g14TrainEnter {
@@ -2832,7 +2832,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   position:absolute;z-index:25;
   left:15%;transform:translate(-50%,-50%) scaleX(-1) scale(1.2);
   transition:top 0.22s cubic-bezier(0.34,1.56,0.64,1);
-  filter:drop-shadow(0 6px 20px rgba(0,0,0,0.8)) brightness(1.35) saturate(2.2);
+  filter:drop-shadow(0 6px 20px rgba(0,0,0,0.8)) brightness(1.6) saturate(2.8) !important;
   pointer-events:none;
 }
 /* Speed lines overlay during boost */
@@ -3003,8 +3003,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 @keyframes g14SmokePuff {
   0%   { opacity:0.85;transform:translate(0,0) scale(0.5); }
-  30%  { opacity:0.7;transform:translate(-8px,-16px) scale(1.2); }
-  100% { opacity:0;transform:translate(-20px,-40px) scale(2.5); }
+  30%  { opacity:0.7;transform:translate(-3px,-18px) scale(1.2); }
+  100% { opacity:0;transform:translate(-6px,-46px) scale(2.5); }
 }
 /* "PINDAH JALUR" redesigned as icon area */
 .g14-switch-label {
@@ -3880,6 +3880,18 @@ body { background: #0a0a1a !important; }
   box-shadow: none !important;
   width: 40px !important; height: 40px !important;
 }
+/* G14 back/pause buttons — amber/gold to be visible on dark race BG */
+#screen-game14 .gh-back, #screen-game14 .gh-pause {
+  background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+  border: none !important;
+  box-shadow: 0 3px 10px rgba(245,158,11,0.5) !important;
+}
+/* G6 back/pause buttons — green to be visible on dark adventure BG */
+#screen-game6 .gh-back, #screen-game6 .gh-pause {
+  background: linear-gradient(135deg, #10B981, #059669) !important;
+  border: none !important;
+  box-shadow: 0 3px 10px rgba(16,185,129,0.5) !important;
+}
 
 /* ===== GAME 13B — QUICK FIRE ⚡ ===== */
 #screen-game13b { background:#050510; flex-direction:column; overflow:hidden; position:relative; }
@@ -4120,9 +4132,9 @@ body { background: #0a0a1a !important; }
 /* Player hit shake */
 .g13b-pspr.player-hit { animation:g13bPlayerHit 0.4s ease; }
 @keyframes g13bPlayerHit {
-  0%,100%{ transform:translateX(0); filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
-  20%,60%{ transform:translateX(-7px); filter:brightness(3) saturate(0); }
-  40%,80%{ transform:translateX(4px); }
+  0%,100%{ transform:scaleX(-1) translateX(0); filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
+  20%,60%{ transform:scaleX(-1) translateX(-7px); filter:brightness(3) saturate(0); }
+  40%,80%{ transform:scaleX(-1) translateX(4px); }
 }
 /* Screen shake */
 @keyframes g13bShake {
@@ -7789,14 +7801,14 @@ function exitGame() {
   state.paused = false
   document.getElementById('pause-overlay').style.display='none'
   document.getElementById('settings-overlay').style.display='none'
-  playClick(); clearTimers(); stopAmbient(); battleBgmStop(); showScreen('screen-welcome')
+  playClick(); clearTimers(); stopAmbient(); battleBgmStop(); g14StopAllAudio(); showScreen('screen-welcome')
 }
 function backToLevelSelect() {
   state.paused = false
   document.getElementById('pause-overlay').style.display='none'
   document.getElementById('settings-overlay').style.display='none'
   if(g6State?.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
-  clearTimers(); stopAmbient(); battleBgmStop(); playClick(); showScreen('screen-level')
+  clearTimers(); stopAmbient(); battleBgmStop(); g14StopAllAudio(); playClick(); showScreen('screen-level')
 }
 function clearTimers() {
   if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
@@ -12859,7 +12871,6 @@ function g13Answer(val, btn) {
     }
     // After 3 attacks, ALWAYS trigger wild counter-attack first — evo check runs after counter
     if (s.attackIdx >= 3) {
-      s.phase = 'wild_counter'
       g13WildCounterPhase()
     } else {
       s.locked = false
@@ -12870,7 +12881,9 @@ function g13Answer(val, btn) {
 
 function g13WildCounterPhase() {
   const s = g13State
-  const attacks = 3
+  if (s.phase === 'wild_counter') return   // guard: prevent double-call race condition
+  s.phase = 'wild_counter'                  // set phase immediately
+  const attacks = s.cfg?.difficulty === 'hard' ? 2 : 1  // reduced from 3 to keep win rate ~99%
   let done = 0
   const qpanel = document.getElementById('g13-qpanel')
   if (qpanel) { qpanel.style.opacity = '0.3'; qpanel.style.pointerEvents = 'none' }
@@ -14539,6 +14552,26 @@ const G14_AI_POOL = Object.values(TRAIN_TYPES_14)
 
 let g14State = {}
 
+// G14 Audio — train station ambient + race BG loop + horn
+const g14StationAudio = new Audio('assets/sfx-train-station.mp3')
+g14StationAudio.loop = true; g14StationAudio.volume = 0.3
+const g14BgAudio = new Audio('assets/sfx-train-bg.mp3')
+g14BgAudio.loop = true; g14BgAudio.volume = 0.35
+const g14HornAudio = new Audio('assets/sfx-train-horn.mp3')
+g14HornAudio.volume = 0.7
+
+function g14StopAllAudio() {
+  g14StationAudio.pause(); g14StationAudio.currentTime = 0
+  g14BgAudio.pause(); g14BgAudio.currentTime = 0
+  g14HornAudio.pause(); g14HornAudio.currentTime = 0
+}
+function g14ScheduleHorn() {
+  if (!g14State.running) return
+  g14HornAudio.currentTime = 0
+  g14HornAudio.play().catch(()=>{})
+  setTimeout(g14ScheduleHorn, 18000 + Math.random() * 12000)
+}
+
 function initGame14() {
   battleBgmStop()
   const lv = state.selectedLevelNum || 1
@@ -14591,6 +14624,10 @@ function initGame14() {
       else if (dy > 38) g14LaneDown()
     }, {passive:true})
   }
+  // Play station ambient during train selection
+  g14StopAllAudio()
+  g14StationAudio.currentTime = 0
+  g14StationAudio.play().catch(()=>{})
   g14RenderTrainSelect()
 }
 
@@ -14653,6 +14690,11 @@ function g14ShowTrainsForCategory(cat) {
 
 function g14StartRace() {
   if (!g14State.trainCfg) return
+  // Switch from station ambient to race BG audio
+  g14StopAllAudio()
+  g14BgAudio.currentTime = 0
+  g14BgAudio.play().catch(()=>{})
+  setTimeout(g14ScheduleHorn, 8000)
   // Reset checkpoints
   ;['g14-cp1','g14-cp2','g14-cp3'].forEach(id => {
     const cp = document.getElementById(id)
@@ -14666,7 +14708,7 @@ function g14StartRace() {
   const playerDiv = document.getElementById('g14-player')
   if (playerDiv) {
     const cfg = g14State.trainCfg
-    playerDiv.innerHTML = dispatchTrainSVG(cfg, {animate:true, width:136, height:60})
+    playerDiv.innerHTML = dispatchTrainSVG(cfg, {animate:true, width:200, height:88})
   }
   document.getElementById('g14-start-overlay').style.display = 'none'
   document.getElementById('g14-position').style.display = 'block'
@@ -14688,7 +14730,7 @@ function g14SpawnAI() {
     const el = document.createElement('div')
     el.className = 'g14-ai-train entering'
     el.style.cssText = `position:absolute;pointer-events:none;`
-    el.innerHTML = dispatchTrainSVG(cfg, {animate:true, width:110, height:48})
+    el.innerHTML = dispatchTrainSVG(cfg, {animate:true, width:160, height:70})
     const startX = g14State.trackW * (0.55 + i * 0.12)
     el.style.left = startX + 'px'
     el.style.top = `calc(${g14State.laneTopPct[lane]}% - 24px)`
@@ -15040,6 +15082,8 @@ function g14EmitSmoke() {
 
 function g14Finish(won) {
   g14State.running = false
+  g14BgAudio.pause(); g14BgAudio.currentTime = 0
+  g14HornAudio.pause(); g14HornAudio.currentTime = 0
   cancelAnimationFrame(g14State.animFrame)
   ;[0,1,2].forEach(l => g14HideLaneWarning(l))
   document.getElementById('g14-speed-lines').style.display = 'none'
