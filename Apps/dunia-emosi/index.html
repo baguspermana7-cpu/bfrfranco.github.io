@@ -8372,10 +8372,10 @@ function nextG3Round(){
     const wrongLetters=ALL_LETTERS.split('').filter(l=>l!==item.letter).sort(()=>Math.random()-0.5).slice(0,numChoices-1)
     renderG3Choices([item.letter,...wrongLetters].sort(()=>Math.random()-0.5),item.letter,false,numChoices)
   } else {
-    const maxNum=state.selectedLevel==='hard'?15:10,displayCount=Math.min(item.num,9)
+    const maxNum=state.selectedLevel==='hard'?9:8,displayCount=Math.min(item.num,9)
     document.getElementById('g3-word').textContent=item.animal.repeat(displayCount)
     document.getElementById('g3-hint').textContent=`Ada berapa ${item.word.toLowerCase()} di atas?`
-    const correctNum=item.num,wrongs=new Set()
+    const correctNum=displayCount,wrongs=new Set()
     while(wrongs.size<numChoices-1){const r=Math.max(1,Math.min(maxNum,correctNum+Math.floor(Math.random()*6)-3));if(r!==correctNum)wrongs.add(r)}
     renderG3Choices([correctNum,...[...wrongs]].sort(()=>Math.random()-0.5).map(String),String(correctNum),true,numChoices)
   }
