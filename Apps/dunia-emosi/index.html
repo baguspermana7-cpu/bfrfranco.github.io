@@ -2714,6 +2714,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* Sprite battle entrance animations */
 @keyframes pokeEnter { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1) scale(1) translateY(0);opacity:1} }
 @keyframes pokeEnterFlip { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1);opacity:1} }
+@keyframes pokeEnterPlayer { 0%{transform:scale(0.5) translateY(20px);opacity:0} 60%{transform:scale(1.08) translateY(-4px);opacity:1} 100%{transform:none;opacity:1} }
 
 /* Game 11 — Science Quiz */
 #screen-game11{background:url('assets/sci-bg.webp') center/cover no-repeat, linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
@@ -3001,6 +3002,25 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   animation:g14WindLines 0.05s linear infinite;
 }
 @keyframes g14WindLines { from{background-position:0 0} to{background-position:30px 0} }
+/* Ambient clouds drifting across track */
+.g14-cloud { position:absolute;background:rgba(255,255,255,0.14);border-radius:50px;pointer-events:none;z-index:2;animation:g14CloudDrift linear infinite; }
+@keyframes g14CloudDrift { 0%{left:110%} 100%{left:-30%} }
+/* Rain drops ambient */
+.g14-raindrop { position:absolute;width:2px;border-radius:1px;pointer-events:none;z-index:3;background:linear-gradient(180deg,transparent,rgba(174,214,241,0.55));animation:g14RainFall linear infinite; }
+@keyframes g14RainFall { 0%{top:-8%} 100%{top:108%} }
+/* Boost wind streaks — intense horizontal lines showing speed */
+#g14-boost-wind { position:absolute;inset:0;z-index:9;pointer-events:none;display:none;
+  background:repeating-linear-gradient(90deg,
+    transparent 0px,transparent 22px,
+    rgba(255,255,255,0.28) 22px,rgba(255,255,255,0.28) 24px,
+    transparent 24px,transparent 54px,
+    rgba(255,255,255,0.14) 54px,rgba(255,255,255,0.14) 56px,
+    transparent 56px,transparent 80px,
+    rgba(255,255,255,0.08) 80px,rgba(255,255,255,0.08) 82px
+  );
+  animation:g14BoostWind 0.06s linear infinite;
+}
+@keyframes g14BoostWind { from{background-position:0 0} to{background-position:-82px 0} }
 /* Boost smoke enhanced — larger puffs during boost */
 .g14-boost-smoke {
   position:absolute;left:calc(15% + 12px);width:18px;height:18px;
@@ -5350,6 +5370,22 @@ body { background: #0a0a1a !important; }
 }
 @keyframes woodPulse { from{transform:scale(1)} to{transform:scale(1.06)} }
 .g17-block.active { animation:woodPulse 0.45s ease-in-out infinite alternate; }
+
+/* Pokeball icon for map nodes */
+.map-pokeball {
+  display:inline-block;width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(180deg,#e3000b 50%,white 50%);
+  border:3px solid #222;position:relative;flex-shrink:0;
+}
+.map-pokeball::before {
+  content:'';position:absolute;left:0;right:0;
+  top:calc(50% - 2px);height:4px;background:#222;
+}
+.map-pokeball::after {
+  content:'';width:11px;height:11px;border-radius:50%;
+  background:white;border:3px solid #222;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+}
 </style>
 </head>
 <body>
@@ -5675,7 +5711,7 @@ body { background: #0a0a1a !important; }
       <div class="map-island-badge">⚡ Arena Petualangan</div>
       <div class="map-nodes">
         <div class="map-node" id="gtile-10" style="background:linear-gradient(135deg,#D97706,#FCD34D);box-shadow:0 6px 0 #92400E,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(10)" title="Pertarungan Pokemon">
-          ⚡<span class="map-node-label" id="gstars-10-lbl">Pertarungan Pokemon</span>
+          <span class="map-pokeball"></span><span class="map-node-label" id="gstars-10-lbl">Pertarungan Pokemon</span>
         </div>
         <div class="map-node" id="gtile-11" style="background:linear-gradient(135deg,#B45309,#FDE68A);box-shadow:0 6px 0 #78350F,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(11)" title="Kuis Sains">
           🔬<span class="map-node-label" id="gstars-11-lbl">Kuis Sains</span>
@@ -5684,10 +5720,10 @@ body { background: #0a0a1a !important; }
           🌑<span class="map-node-label" id="gstars-12-lbl">Tebak Bayangan</span>
         </div>
         <div class="map-node" id="gtile-13" style="background:linear-gradient(135deg,#78350F,#FB923C);box-shadow:0 6px 0 #431407,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(13)" title="Evolusi Math">
-          🔥<span class="map-node-label" id="gstars-13-lbl">Evolusi Math</span>
+          <span class="map-pokeball"></span><span class="map-node-label" id="gstars-13-lbl">Evolusi Math</span>
         </div>
         <div class="map-node" id="gtile-13b" style="background:linear-gradient(135deg,#F59E0B,#06B6D4);box-shadow:0 6px 0 #B45309,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();startQuickFire()" title="Quick Fire">
-          ⚡<span class="map-node-label" id="gstars-13b-lbl">Quick Fire</span>
+          <span class="map-pokeball"></span><span class="map-node-label" id="gstars-13b-lbl">Quick Fire</span>
         </div>
       </div>
     </div>
@@ -6109,10 +6145,26 @@ body { background: #0a0a1a !important; }
     <div id="g14-mountains"></div>
     <div id="g14-trees"></div>
     <div id="g14-fence"></div>
+    <!-- Ambient clouds -->
+    <div class="g14-cloud" style="width:110px;height:34px;top:8%;animation-duration:18s;opacity:0.7;"></div>
+    <div class="g14-cloud" style="width:72px;height:22px;top:22%;animation-duration:24s;animation-delay:-7s;opacity:0.5;"></div>
+    <div class="g14-cloud" style="width:90px;height:28px;top:62%;animation-duration:20s;animation-delay:-13s;opacity:0.6;"></div>
+    <div class="g14-cloud" style="width:56px;height:18px;top:80%;animation-duration:28s;animation-delay:-3s;opacity:0.4;"></div>
+    <!-- Ambient rain drops -->
+    <div class="g14-raindrop" style="left:12%;height:14px;animation-duration:1.1s;animation-delay:0s;opacity:0.5;"></div>
+    <div class="g14-raindrop" style="left:28%;height:18px;animation-duration:0.9s;animation-delay:-0.3s;opacity:0.4;"></div>
+    <div class="g14-raindrop" style="left:44%;height:12px;animation-duration:1.3s;animation-delay:-0.7s;opacity:0.45;"></div>
+    <div class="g14-raindrop" style="left:58%;height:16px;animation-duration:1.0s;animation-delay:-0.5s;opacity:0.5;"></div>
+    <div class="g14-raindrop" style="left:70%;height:10px;animation-duration:1.2s;animation-delay:-0.2s;opacity:0.35;"></div>
+    <div class="g14-raindrop" style="left:85%;height:15px;animation-duration:0.95s;animation-delay:-0.9s;opacity:0.4;"></div>
+    <div class="g14-raindrop" style="left:7%;height:13px;animation-duration:1.15s;animation-delay:-0.4s;opacity:0.45;"></div>
+    <div class="g14-raindrop" style="left:52%;height:11px;animation-duration:1.05s;animation-delay:-1.1s;opacity:0.3;"></div>
     <!-- Speed lines overlay (boost FX) -->
     <div id="g14-speed-lines"></div>
     <!-- Wind lines overlay (high speed) -->
     <div id="g14-wind-lines"></div>
+    <!-- Boost wind streaks (intense) -->
+    <div id="g14-boost-wind"></div>
     <!-- 3 Horizontal Lane Rows (on top of parallax) -->
     <div id="g14-lane-area" style="z-index:4;">
       <div class="g14-lane-row" data-lane="0"><div class="g14-lane-env"></div><div class="g14-lane-warning" id="g14-warn-0">🚨</div></div>
@@ -11630,7 +11682,7 @@ const SHADOW_ITEMS=[
   {desc:'Hewan putih bersih yang menghasilkan susu', ans:'🐄', wrong:['🐑','🐐','🐖']},
   {desc:'Reptil besar yang hidup di sungai Afrika', ans:'🐊', wrong:['🦎','🐢','🐍']},
   {desc:'Serangga kecil kuning-hitam penghasil madu', ans:'🐝', wrong:['🦗','🐛','🐜']},
-  {desc:'Planet keempat dari Matahari berwarna merah', ans:'🔴', wrong:['🟡','🔵','🟢']},
+  {desc:'Planet yang punya cincin indah mengelilinginya', ans:'🪐', wrong:['🌙','⭐','🌞']},
   {desc:'Alat musik petik berdawai banyak', ans:'🎸', wrong:['🥁','🎹','🎺']},
   {desc:'Hewan malam yang bisa terbang dan hidup di gua', ans:'🦇', wrong:['🦉','🐦','🕊️']},
   {desc:'Makanan laut yang berbentuk bulat berlengan banyak', ans:'🐙', wrong:['🦑','🦀','🦞']},
@@ -11679,6 +11731,7 @@ function g12Answer(correct,btn,grid){
   if(!correct) btn.classList.add('wrong')
   correct ? playCorrect() : playWrong()
   if(correct){
+    spawnSparkles(btn); flashScreen('green')
     const rfx = document.getElementById('g12-reveal-fx')
     if(rfx) { rfx.style.opacity='1'; setTimeout(()=>rfx.style.opacity='0', 700) }
     s.stars++; state.players[state.currentPlayer].stars++
@@ -11908,7 +11961,7 @@ window.g10NewBattle = function() {
     const es = document.getElementById('g10-espr')
     const ps = document.getElementById('g10-pspr')
     if (es) { es.style.animation='none'; void es.offsetWidth; es.style.animation='pokeEnter 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
-    if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnterFlip 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
+    if (ps) { ps.style.animation='none'; void ps.offsetWidth; ps.style.animation='pokeEnterPlayer 0.5s cubic-bezier(0.34,1.56,0.64,1)' }
   }, 100)
   // Apply random weather effect to battle field
   applyG10Weather()
@@ -13443,8 +13496,8 @@ function g13bSpawnWild() {
   if (wspr) {
     wspr.classList.remove('wild-enter','wild-die','wspr-hit')
     wspr.style.opacity = '1'
-    wspr.src = pokeSprite(wild.slug)
-    wspr.onerror = function(){ this.src=pokeSpriteOnline(wild.slug); this.onerror=()=>{ this.alt = wild.icon || '?' } }
+    wspr.src = pokeSpriteOnline(wild.slug)
+    wspr.onerror = function(){ this.src=pokeSprite(wild.slug); this.onerror=()=>{ this.alt = wild.icon || '?' } }
     // Apply tier-based size scaling
     const tierScale = {1:1.0, 2:1.2, 3:1.3, 4:1.6}[wild.tier||1] || 1.0
     wspr.style.width = wspr.style.height = tierScale === 1.0 ? '' : `calc(min(44vw,26vh) * ${tierScale})`
@@ -13702,8 +13755,8 @@ function g13bWildEscape() {
     s.wildHp = Math.max(2, Math.round((s.wildMaxHp || 3) * 0.6))
     const wspr = document.getElementById('g13b-wspr')
     if (wspr) {
-      wspr.src = pokeSprite(wild.slug)
-      wspr.onerror = function(){ this.src=pokeSpriteOnline(wild.slug); this.onerror=null }
+      wspr.src = pokeSpriteOnline(wild.slug)
+      wspr.onerror = function(){ this.src=pokeSprite(wild.slug); this.onerror=null }
       wspr.classList.remove('wild-enter', 'wild-die', 'wspr-hit')
       void wspr.offsetWidth
       wspr.classList.add('wild-enter')
@@ -14670,7 +14723,7 @@ function initGame14() {
     trainType: null,
     trainCfg: null,
     speed: 0, pressure: 70,
-    boosting: false, boostCooldown: false, boostTimer: null,
+    boosting: false, boostCooldown: false, boostTimer: null, slowMode: false,
     hp: 3, frame: 0, distance: 0,
     finishLine: diff === 'easy' ? 400 : diff === 'medium' ? 700 : 1000,
     running: false, animFrame: null,
@@ -14833,21 +14886,24 @@ function g14Loop() {
   const trackW = track.clientWidth || s.trackW || 375
   const playerX = trackW * 0.15  // player fixed x position
 
+  // Slow-mode when boost math popup is open — everything crawls so kids can think
+  const speedFactor = s.slowMode ? 0.22 : 1
+
   // Animate rail + parallax scroll speeds based on train speed
-  const railSpd = Math.max(0.1, 0.6 / s.speed).toFixed(2) + 's'
+  const railSpd = Math.max(0.1, 0.6 / (s.speed * speedFactor)).toFixed(2) + 's'
   document.querySelectorAll('.g14-lane-row').forEach(r => r.style.setProperty('--rspd', railSpd))
   // Treeline strips scroll a bit slower than rails (parallax effect)
-  const envSpd = Math.max(0.2, 1.1 / s.speed).toFixed(2) + 's'
+  const envSpd = Math.max(0.2, 1.1 / (s.speed * speedFactor)).toFixed(2) + 's'
   document.querySelectorAll('.g14-lane-env').forEach(e => e.style.animationDuration = envSpd)
   // Parallax layers — update animation durations for speed feel
   const fenceEl = document.getElementById('g14-fence')
   const treeEl = document.getElementById('g14-trees')
-  if (fenceEl) fenceEl.style.animationDuration = Math.max(0.3, 1.2 / s.speed).toFixed(2) + 's'
-  if (treeEl) treeEl.style.animationDuration = Math.max(0.8, 3 / s.speed).toFixed(2) + 's'
+  if (fenceEl) fenceEl.style.animationDuration = Math.max(0.3, 1.2 / (s.speed * speedFactor)).toFixed(2) + 's'
+  if (treeEl) treeEl.style.animationDuration = Math.max(0.8, 3 / (s.speed * speedFactor)).toFixed(2) + 's'
 
   // Move AI trains — relative movement to player (if AI faster, they drift right; if slower, drift left)
   s.aiTrains.forEach(ai => {
-    const relSpeed = (ai.speed - s.speed) * 1.8
+    const relSpeed = (ai.speed - s.speed) * 1.8 * speedFactor
     ai.x += relSpeed
     // Wrap: if off left, wrap to far right; if off right, wrap to slightly right
     if (ai.x < -120) ai.x = trackW + 80
@@ -14859,7 +14915,7 @@ function g14Loop() {
   if (s.frame % s.obstacleInterval === 0) g14SpawnObstacle()
 
   // Move obstacles left (they come from right)
-  const obsSpeed = s.speed * 2.5 + 1
+  const obsSpeed = (s.speed * 2.5 + 1) * speedFactor
   const toRemove = []
   s.obstacles.forEach(obs => {
     obs.x -= obsSpeed
@@ -14886,7 +14942,7 @@ function g14Loop() {
   })
 
   // Advance distance
-  s.distance += s.speed * 0.12
+  s.distance += s.speed * 0.12 * speedFactor
   const distFrac = Math.min(1, s.distance / s.finishLine)
   document.getElementById('g14-dist-bar').textContent = `${Math.floor(s.distance)}m`
   document.getElementById('g14-dist-fill').style.width = (distFrac * 100).toFixed(1) + '%'
@@ -14999,6 +15055,8 @@ function g14Crash() {
     ;[0,1,2].forEach(l => g14HideLaneWarning(l))
     document.getElementById('g14-speed-lines').style.display = 'none'
     const _wlA = document.getElementById('g14-wind-lines'); if (_wlA) _wlA.style.display = 'none'
+    const _bwA = document.getElementById('g14-boost-wind'); if (_bwA) _bwA.style.display = 'none'
+    g14State.slowMode = false
     setTimeout(() => g14ShowResult(false), 600)
   }
 }
@@ -15033,6 +15091,8 @@ function g14UpdatePlayerPos() {
 
 function g14Boost() {
   if (!g14State.running || g14State.boosting || g14State.boostCooldown || g14State.pressure < 30) return
+  // Slow down the world so kids can think without stress
+  g14State.slowMode = true
   // Show math question — boost executes only on correct answer
   const ops = g14State.diff === 'easy' ? ['+'] : g14State.diff === 'medium' ? ['+','-'] : ['+','-','×']
   const op = ops[Math.floor(Math.random() * ops.length)]
@@ -15062,13 +15122,15 @@ function g14Boost() {
   clearTimeout(g14State.mathTimeout)
   g14State.mathTimeout = setTimeout(() => {
     document.getElementById('g14-math-popup').style.display = 'none'
-  }, 10000)
+    g14State.slowMode = false
+  }, 15000)
   playClick()
 }
 
 function g14BoostAnswer(val) {
   clearTimeout(g14State.mathTimeout)
   document.getElementById('g14-math-popup').style.display = 'none'
+  g14State.slowMode = false  // restore normal speed regardless of answer
   if (!g14State.running || g14State.boosting) return
   if (val === g14State.boostQ.answer) {
     // Correct — execute boost
@@ -15089,6 +15151,8 @@ function g14BoostAnswer(val) {
     if (wFireF) { wFireF.style.display = 'block'; wFireF.style.top = lanePct }
     const linesEl = document.getElementById('g14-speed-lines')
     if (linesEl) linesEl.style.display = 'block'
+    const windEl = document.getElementById('g14-boost-wind')
+    if (windEl) windEl.style.display = 'block'
     playCorrect()
     clearTimeout(g14State.boostTimer)
     g14State.boostTimer = setTimeout(() => {
@@ -15098,6 +15162,7 @@ function g14BoostAnswer(val) {
       if (wFireR) wFireR.style.display = 'none'
       if (wFireF) wFireF.style.display = 'none'
       if (linesEl) linesEl.style.display = 'none'
+      if (windEl) windEl.style.display = 'none'
       document.getElementById('g14-boost-btn').textContent = '⏳ Cooldown...'
       document.getElementById('g14-boost-ready').style.display = 'none'
       setTimeout(() => {
@@ -15106,7 +15171,7 @@ function g14BoostAnswer(val) {
         document.getElementById('g14-boost-btn').style.opacity = '1'
         document.getElementById('g14-boost-ready').style.display = 'block'
         setTimeout(() => { document.getElementById('g14-boost-ready').style.display = 'none' }, 2000)
-      }, 5000)
+      }, 3000)
     }, g14State.trainCfg.boostDur)
   } else {
     // Wrong — pressure penalty, no boost
@@ -15172,6 +15237,7 @@ function g14Finish(won) {
   ;[0,1,2].forEach(l => g14HideLaneWarning(l))
   document.getElementById('g14-speed-lines').style.display = 'none'
   const _wlB = document.getElementById('g14-wind-lines'); if (_wlB) _wlB.style.display = 'none'
+  const _bwnd = document.getElementById('g14-boost-wind'); if (_bwnd) _bwnd.style.display = 'none'
   const _bwB = document.getElementById('g14-boiler-wrap'); if (_bwB) _bwB.classList.remove('danger')
   clearTimeout(g14State.mathTimeout)
   document.getElementById('g14-math-popup').style.display = 'none'
