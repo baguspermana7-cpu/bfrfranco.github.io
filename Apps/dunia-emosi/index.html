@@ -239,12 +239,12 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes heartRise { 0%{transform:translateY(0)rotate(0deg);opacity:0} 10%{opacity:0.6} 90%{opacity:0.4} 100%{transform:translateY(-100vh)rotate(30deg);opacity:0} }
 .g1-animal-display { font-size:110px;text-align:center;display:block;margin:0 auto 4px;filter:drop-shadow(0 8px 16px rgba(244,63,94,0.3));animation:g1Wobble 0.6s cubic-bezier(0.36,0.07,0.19,0.97);position:relative;z-index:1; }
 @keyframes g1Wobble { 0%,100%{transform:rotate(0deg)scale(1)} 20%{transform:rotate(-10deg)scale(1.1)} 40%{transform:rotate(10deg)scale(0.95)} 60%{transform:rotate(-6deg)scale(1.05)} 80%{transform:rotate(4deg)scale(0.98)} }
-.g1-question { font-size:22px;font-weight:900;text-align:center;background:linear-gradient(135deg,#F43F5E,#FDA4AF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:20px;position:relative;z-index:1; }
+.g1-question { font-size:22px;font-weight:900;text-align:center;color:white;text-shadow:0 2px 8px rgba(180,50,70,0.55),0 0 24px rgba(244,63,94,0.3);-webkit-text-fill-color:unset;background:none;-webkit-background-clip:unset;background-clip:unset;margin-bottom:20px;position:relative;z-index:1; }
 .g1-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:480px;position:relative;z-index:1; }
-.g1-choice-btn { background:white;border:3px solid #FFE4E6;border-radius:22px;padding:18px 10px;font-family:var(--font);font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 4px 0 #FDA4AF;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s,box-shadow 0.15s; }
-.g1-choice-btn:active { transform:scale(0.93)translateY(3px);box-shadow:0 1px 0 #FDA4AF; }
-.g1-choice-btn .choice-emoji { font-size:38px; }
-.g1-choice-btn .choice-label { font-size:17px;color:var(--text); }
+.g1-choice-btn { background:white;border:3px solid #FFD6DC;border-radius:20px;padding:16px 10px;font-family:var(--font);font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 8px 0 #FBBBC4,0 10px 20px rgba(244,63,94,0.12);transition:transform 0.1s,box-shadow 0.1s; }
+.g1-choice-btn:active { transform:translateY(6px);box-shadow:0 2px 0 #FBBBC4; }
+.g1-choice-btn .choice-emoji { font-size:42px; }
+.g1-choice-btn .choice-label { font-size:16px;color:#374151;font-weight:900; }
 .g1-choice-btn.correct { border-color:var(--teal);background:linear-gradient(135deg,#CCFBF1,white);box-shadow:0 4px 0 var(--teal-shadow),0 0 20px rgba(20,184,166,0.3);animation:correctPulse 0.4s ease; }
 .g1-choice-btn.wrong   { border-color:var(--rose);background:linear-gradient(135deg,#FFF1F3,white);box-shadow:0 4px 0 var(--rose-shadow);animation:wrongShake 0.4s ease; }
 .g1-tip { background:linear-gradient(135deg,#CCFBF1,#F0FDFA);border-radius:22px;padding:18px 20px;text-align:center;box-shadow:var(--shadow);max-width:480px;width:100%;border-left:6px solid var(--teal);animation:tipSlideUp 0.4s cubic-bezier(0.34,1.2,0.64,1);position:relative;z-index:1; }
@@ -543,12 +543,13 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .mascot-guide { display:flex;align-items:flex-end;gap:12px;width:100%;max-width:480px;margin:0 0 10px;position:relative;z-index:1; }
 .mg-char { font-size:52px;flex-shrink:0;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.18));animation:mgBounce 2.8s ease-in-out infinite; }
 @keyframes mgBounce { 0%,100%{transform:translateY(0)rotate(-4deg)} 50%{transform:translateY(-9px)rotate(4deg)} }
-.mg-bubble { background:white;border-radius:18px 18px 18px 4px;padding:10px 16px;font-size:14px;font-weight:700;color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.1);border:2px solid rgba(139,92,246,0.15);line-height:1.5;flex:1; }
+.mg-bubble { background:white;border-radius:18px 18px 18px 4px;padding:10px 16px;font-size:14px;font-weight:700;color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,0.12);border:2px solid rgba(139,92,246,0.12);line-height:1.5;flex:1;position:relative; }
+.mg-bubble::before { content:'';position:absolute;left:-10px;bottom:10px;border:5px solid transparent;border-right-color:white;filter:drop-shadow(-2px 0 0 rgba(139,92,246,0.08)); }
 
 /* G1 enhancements */
-.g1-choice-btn .choice-emoji { font-size:52px; }
-.g1-choice-btn .choice-label { font-size:19px; }
-.g1-choice-btn { padding:22px 12px;border-radius:28px; }
+.g1-choice-btn .choice-emoji { font-size:44px; }
+.g1-choice-btn .choice-label { font-size:16px; }
+.g1-choice-btn { padding:18px 12px;border-radius:20px; }
 /* G3 enhancements */
 .g3-choice-btn { font-size:52px;padding:26px 12px;border-radius:28px; }
 /* G7 enhancements */
@@ -1386,18 +1387,27 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   30% { transform:scale(1.04) rotate(-2.5deg); }
   70% { transform:scale(1.04) rotate(2.5deg); }
 }
-.g1-emot-badge {
+.g1-emot-bubble {
   position: absolute;
-  bottom: 4px; right: -14px;
-  font-size: 52px;
+  top: -20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 64px;
   background: white;
   border-radius: 50%;
-  padding: 5px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-  border: 3px solid rgba(244,63,94,0.18);
+  width: 88px; height: 88px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.2), 0 0 0 4px rgba(255,255,255,0.7);
   animation: emotBadgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
 }
-@keyframes emotBadgePop { from{transform:scale(0) rotate(-30deg)} to{transform:scale(1) rotate(0)} }
+.g1-emot-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -13px; left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: white;
+}
+@keyframes emotBadgePop { from{transform:translateX(-50%) scale(0) rotate(-20deg)} to{transform:translateX(-50%) scale(1) rotate(0)} }
 /* Tappable hearts pop animation */
 @keyframes heartPop { 0%{transform:scale(1) translateY(0);opacity:1} 100%{transform:scale(2.5) translateY(-30px);opacity:0} }
 .world-hearts span.popping { animation:heartPop 0.35s ease-out forwards !important; pointer-events:none !important; }
@@ -6954,16 +6964,16 @@ const DIFF = {
 // DATA
 // ================================================================
 const EMOTIONS = [
-  { emoji:'😊',name:'Senang',   animal:'🦁',tip:'💡 Tunjukkan kesenanganmu dengan senyuman! Ceritakan ke teman.',   scenario:'Kamu dapat hadiah ulang tahun yang kamu impikan!',  bodyCue:'Pipi terasa hangat, ingin melompat-lompat',  safeAction:'Tersenyum dan ceritakan ke teman' },
-  { emoji:'😢',name:'Sedih',    animal:'🐰',tip:'💡 Tidak apa-apa bersedih. Ceritakan ke Ayah atau Ibu.',           scenario:'Mainan kesayanganmu rusak dan tidak bisa diperbaiki.',bodyCue:'Mata terasa perih, tenggorokan sesak',       safeAction:'Ceritakan ke Ayah atau Ibu, tidak apa-apa menangis' },
-  { emoji:'😠',name:'Marah',    animal:'🐯',tip:'💡 Kalau marah, tarik napas 3x. Hitung 1-2-3 pelan-pelan.',       scenario:'Temanmu mengambil mainanmu tanpa izin.',            bodyCue:'Wajah terasa panas, tangan mengepal',        safeAction:'Tarik napas 3x, lalu bilang: aku tidak suka itu' },
-  { emoji:'😨',name:'Takut',    animal:'🐘',tip:'💡 Kalau takut, pegang tangan orang yang kamu sayang.',           scenario:'Kamu sendirian di ruangan gelap.',                  bodyCue:'Jantung berdebar, badan merinding',          safeAction:'Pegang tangan orang yang kamu sayang, nyalakan lampu' },
-  { emoji:'😲',name:'Terkejut', animal:'🦊',tip:'💡 Terkejut itu normal! Tarik napas, lalu tenangkan diri.',       scenario:'Teman-temanmu berteriak "Selamat Ulang Tahun!" tiba-tiba.', bodyCue:'Napas tertahan sejenak, mata melebar', safeAction:'Tarik napas, tersenyum, bilang terima kasih' },
-  { emoji:'😳',name:'Malu',     animal:'🐸',tip:'💡 Semua orang pernah malu. Itu artinya kamu peduli!',            scenario:'Kamu menjawab salah di depan kelas, teman-teman melihat.',  bodyCue:'Pipi memerah, ingin bersembunyi',     safeAction:'Tarik napas dalam, ingat: semua orang pernah salah' },
-  { emoji:'🥰',name:'Bahagia',  animal:'🐼',tip:'💡 Bagikan kebahagiaanmu! Peluk orang yang kamu sayang.',         scenario:'Kamu bermain bersama sahabat terbaik sepanjang hari.',      bodyCue:'Badan terasa ringan, ingin bernyanyi',safeAction:'Peluk orang yang kamu sayang, ceritakan kebahagiaan' },
-  { emoji:'😑',name:'Bosan',    animal:'🐨',tip:'💡 Kalau bosan, coba aktivitas baru. Ajak teman bermain!',        scenario:'Tidak ada yang bisa dilakukan di rumah, semua terasa membosankan.',bodyCue:'Badan lesu, sulit fokus',          safeAction:'Coba aktivitas baru: gambar, main lego, atau ajak teman' },
-  { emoji:'😤',name:'Kesal',    animal:'🐺',tip:'💡 Kalau kesal, ceritakan perasaanmu dengan kata-kata.',          scenario:'Adikmu menghancurkan bangunan balok yang kamu buat lama.',  bodyCue:'Rahang mengeras, ingin berteriak',   safeAction:'Ceritakan perasaanmu dengan kata-kata, jangan memukul' },
-  { emoji:'🤩',name:'Kagum',    animal:'🦄',tip:'💡 Rasa kagum itu indah! Eksplorasi hal baru setiap hari.',       scenario:'Kamu melihat pelangi besar setelah hujan deras.',           bodyCue:'Mata berbinar, mulut terbuka kagum',  safeAction:'Tunjukkan ke orang lain, tanya kenapa bisa terjadi' }
+  { emoji:'😊',name:'Senang',   color:'#F59E0B',animal:'🦁',tip:'💡 Tunjukkan kesenanganmu dengan senyuman! Ceritakan ke teman.',   scenario:'Kamu dapat hadiah ulang tahun yang kamu impikan!',  bodyCue:'Pipi terasa hangat, ingin melompat-lompat',  safeAction:'Tersenyum dan ceritakan ke teman' },
+  { emoji:'😢',name:'Sedih',    color:'#60A5FA',animal:'🐰',tip:'💡 Tidak apa-apa bersedih. Ceritakan ke Ayah atau Ibu.',           scenario:'Mainan kesayanganmu rusak dan tidak bisa diperbaiki.',bodyCue:'Mata terasa perih, tenggorokan sesak',       safeAction:'Ceritakan ke Ayah atau Ibu, tidak apa-apa menangis' },
+  { emoji:'😠',name:'Marah',    color:'#F87171',animal:'🐯',tip:'💡 Kalau marah, tarik napas 3x. Hitung 1-2-3 pelan-pelan.',       scenario:'Temanmu mengambil mainanmu tanpa izin.',            bodyCue:'Wajah terasa panas, tangan mengepal',        safeAction:'Tarik napas 3x, lalu bilang: aku tidak suka itu' },
+  { emoji:'😨',name:'Takut',    color:'#A78BFA',animal:'🐘',tip:'💡 Kalau takut, pegang tangan orang yang kamu sayang.',           scenario:'Kamu sendirian di ruangan gelap.',                  bodyCue:'Jantung berdebar, badan merinding',          safeAction:'Pegang tangan orang yang kamu sayang, nyalakan lampu' },
+  { emoji:'😲',name:'Terkejut', color:'#34D399',animal:'🦊',tip:'💡 Terkejut itu normal! Tarik napas, lalu tenangkan diri.',       scenario:'Teman-temanmu berteriak "Selamat Ulang Tahun!" tiba-tiba.', bodyCue:'Napas tertahan sejenak, mata melebar', safeAction:'Tarik napas, tersenyum, bilang terima kasih' },
+  { emoji:'😳',name:'Malu',     color:'#F472B6',animal:'🐸',tip:'💡 Semua orang pernah malu. Itu artinya kamu peduli!',            scenario:'Kamu menjawab salah di depan kelas, teman-teman melihat.',  bodyCue:'Pipi memerah, ingin bersembunyi',     safeAction:'Tarik napas dalam, ingat: semua orang pernah salah' },
+  { emoji:'🥰',name:'Bahagia',  color:'#FCD34D',animal:'🐼',tip:'💡 Bagikan kebahagiaanmu! Peluk orang yang kamu sayang.',         scenario:'Kamu bermain bersama sahabat terbaik sepanjang hari.',      bodyCue:'Badan terasa ringan, ingin bernyanyi',safeAction:'Peluk orang yang kamu sayang, ceritakan kebahagiaan' },
+  { emoji:'😑',name:'Bosan',    color:'#94A3B8',animal:'🐨',tip:'💡 Kalau bosan, coba aktivitas baru. Ajak teman bermain!',        scenario:'Tidak ada yang bisa dilakukan di rumah, semua terasa membosankan.',bodyCue:'Badan lesu, sulit fokus',          safeAction:'Coba aktivitas baru: gambar, main lego, atau ajak teman' },
+  { emoji:'😤',name:'Kesal',    color:'#FB923C',animal:'🐺',tip:'💡 Kalau kesal, ceritakan perasaanmu dengan kata-kata.',          scenario:'Adikmu menghancurkan bangunan balok yang kamu buat lama.',  bodyCue:'Rahang mengeras, ingin berteriak',   safeAction:'Ceritakan perasaanmu dengan kata-kata, jangan memukul' },
+  { emoji:'🤩',name:'Kagum',    color:'#22D3EE',animal:'🦄',tip:'💡 Rasa kagum itu indah! Eksplorasi hal baru setiap hari.',       scenario:'Kamu melihat pelangi besar setelah hujan deras.',           bodyCue:'Mata berbinar, mulut terbuka kagum',  safeAction:'Tunjukkan ke orang lain, tanya kenapa bisa terjadi' }
 ]
 
 const ANIMAL_LETTERS = [
@@ -8181,7 +8191,8 @@ function nextG1Round(){
   const pool=shuffled.slice(0,numChoices).sort(()=>Math.random()-0.5)
   if(!pool.find(e=>e.name===correct.name))pool[0]=correct
   const choices=pool.sort(()=>Math.random()-0.5)
-  document.getElementById('g1-animal').innerHTML=`<span class="g1-char">${correct.animal}</span><span class="g1-emot-badge">${correct.emoji}</span>`
+  const moodColor=correct.color||'#F43F5E'
+  document.getElementById('g1-animal').innerHTML=`<span class="g1-char" style="filter:drop-shadow(0 0 28px ${moodColor}99) drop-shadow(0 8px 16px rgba(0,0,0,0.18));">${correct.animal}</span><span class="g1-emot-bubble">${correct.emoji}</span>`
   document.getElementById('g1-progress-bar').style.width=((roundInSet/g1State.maxRound)*100)+'%'
   const choicesEl=document.getElementById('g1-choices')
   choicesEl.style.gridTemplateColumns=numChoices<=3?'1fr 1fr 1fr':(numChoices<=4?'1fr 1fr':'1fr 1fr 1fr')
@@ -8208,8 +8219,8 @@ function nextG1Round(){
     }
     choicesEl.appendChild(btn)
   })
-  const p=state.mode==='duo'?`${state.players[state.currentPlayer].name} — Soal ${roundInSet+1} dari ${g1State.maxRound}`:`Soal ${g1State.round+1} dari ${g1State.maxRound}`
-  document.getElementById('g1-progress').textContent=p
+  if(state.mode==='duo')document.getElementById('g1-progress').textContent=`${state.players[state.currentPlayer].name}`
+  else document.getElementById('g1-progress').textContent=''
 }
 
 // ================================================================
