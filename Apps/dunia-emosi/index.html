@@ -2328,21 +2328,22 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 .g10-pspr{
   width:min(44vw, 22vh);height:min(44vw, 22vh);
+  transform:scaleX(-1);
   filter:drop-shadow(0 4px 12px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(100,180,255,0.45));
 }
 /* Sprite action animations */
 /* Enemy (top-right, scaleX(-1) → faces left toward player at lower-left) lunges left */
 .g10-espr.spr-atk{animation:g10EAtk 0.35s ease;}
 @keyframes g10EAtk{0%{transform:scaleX(-1)}35%{transform:scaleX(-1) translateX(26px) translateY(7px) scale(1.12)}100%{transform:scaleX(-1)}}
-/* Player (bottom-left, natural facing right toward enemy at upper-right) lunges right */
+/* Player (bottom-left, scaleX(-1) → faces right toward enemy at upper-right) lunges right */
 .g10-pspr.spr-atk{animation:g10PAtk 0.35s ease;}
-@keyframes g10PAtk{0%{transform:none}35%{transform:translateX(26px) translateY(-7px) scale(1.12)}100%{transform:none}}
+@keyframes g10PAtk{0%{transform:scaleX(-1)}35%{transform:scaleX(-1) translateX(-26px) translateY(-7px) scale(1.12)}100%{transform:scaleX(-1)}}
 /* Enemy hit — preserve scaleX(-1) */
 .g10-espr.spr-hit{animation:g10EHitFlip 0.45s ease;}
 @keyframes g10EHitFlip{0%,100%{transform:scaleX(-1)}15%{transform:scaleX(-1) translateX(10px) rotate(-3deg)}30%{transform:scaleX(-1) translateX(-12px) rotate(2deg)}50%{transform:scaleX(-1) translateX(7px)}70%{transform:scaleX(-1) translateX(-8px)}85%{transform:scaleX(-1) translateX(3px)}}
-/* Player hit — no flip */
+/* Player hit — preserve scaleX(-1) */
 .g10-pspr.spr-hit{animation:g10PHit 0.45s ease;}
-@keyframes g10PHit{0%,100%{transform:none}15%{transform:translateX(-10px) rotate(-3deg)}30%{transform:translateX(12px) rotate(2deg)}50%{transform:translateX(-7px)}70%{transform:translateX(8px)}85%{transform:translateX(-3px)}}
+@keyframes g10PHit{0%,100%{transform:scaleX(-1)}15%{transform:scaleX(-1) translateX(10px) rotate(-3deg)}30%{transform:scaleX(-1) translateX(-12px) rotate(2deg)}50%{transform:scaleX(-1) translateX(-7px)}70%{transform:scaleX(-1) translateX(8px)}85%{transform:scaleX(-1) translateX(-3px)}}
 .g10-spr.spr-flash{animation:g10Flash 0.45s ease;}
 @keyframes g10Flash{0%,100%{filter:drop-shadow(0 6px 24px rgba(0,0,0,0.65)) brightness(1)}20%,60%{filter:brightness(8) saturate(0)}40%,80%{filter:drop-shadow(0 6px 24px rgba(0,0,0,0.65)) brightness(1)}}
 /* Defeat — enemy (scaleX(-1) preserved) */
@@ -2353,13 +2354,13 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   60%{transform:scaleX(-1) translateY(-40px) scale(0.75);filter:brightness(9) saturate(0);opacity:0.6}
   100%{transform:scaleX(-1) translateY(-70px) scale(0.2);filter:brightness(12) saturate(0);opacity:0}
 }
-/* Player defeat — no flip */
+/* Player defeat — preserve scaleX(-1) */
 .g10-pspr.spr-defeat{animation:g10PDefeat 0.85s ease forwards;}
 @keyframes g10PDefeat{
-  0%{transform:none;opacity:1}
-  25%{transform:translateY(-18px) scale(1.18);filter:brightness(7) saturate(0);opacity:1}
-  60%{transform:translateY(-40px) scale(0.75);opacity:0.6}
-  100%{transform:translateY(-70px) scale(0.2);opacity:0}
+  0%{transform:scaleX(-1);opacity:1}
+  25%{transform:scaleX(-1) translateY(-18px) scale(1.18);filter:brightness(7) saturate(0);opacity:1}
+  60%{transform:scaleX(-1) translateY(-40px) scale(0.75);opacity:0.6}
+  100%{transform:scaleX(-1) translateY(-70px) scale(0.2);opacity:0}
 }
 /* ── Type particle FX keyframes ── */
 @keyframes fxRise{0%{transform:scale(0) translateY(0);opacity:0.9}50%{transform:scale(1.3) translateY(-45px);opacity:0.8}100%{transform:scale(0.4) translateY(-90px);opacity:0}}
@@ -2691,12 +2692,12 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* Swap animation on player sprite — preserve scaleX(-1) */
 .g10-pspr.spr-swap-out { animation: g10SwapOut 0.25s ease forwards; }
 .g10-pspr.spr-swap-in  { animation: g10SwapIn  0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-@keyframes g10SwapOut { 0%{transform:none;opacity:1} 100%{transform:translateX(-80px) scale(0.6);opacity:0} }
-@keyframes g10SwapIn  { 0%{transform:translateX(-80px) scale(0.4);opacity:0} 100%{transform:none;opacity:1} }
+@keyframes g10SwapOut { 0%{transform:scaleX(-1);opacity:1} 100%{transform:scaleX(-1) translateX(80px) scale(0.6);opacity:0} }
+@keyframes g10SwapIn  { 0%{transform:scaleX(-1) translateX(80px) scale(0.4);opacity:0} 100%{transform:scaleX(-1);opacity:1} }
 /* Sprite battle entrance animations */
 @keyframes pokeEnter { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1) scale(1) translateY(0);opacity:1} }
 @keyframes pokeEnterFlip { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1);opacity:1} }
-@keyframes pokeEnterPlayer { 0%{transform:scale(0.5) translateY(20px);opacity:0} 60%{transform:scale(1.08) translateY(-4px);opacity:1} 100%{transform:none;opacity:1} }
+@keyframes pokeEnterPlayer { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1);opacity:1} }
 
 /* Game 11 — Science Quiz */
 #screen-game11{background:url('assets/sci-bg.webp') center/cover no-repeat, linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
@@ -6572,13 +6573,13 @@ body { background: #0a0a1a !important; }
   <!-- Result overlay -->
   <div class="g13-result-overlay" id="g13-result-overlay" style="display:none;">
     <div class="g13-result-card">
-      <img id="g13-result-banner-img" src="assets/victory-banner.webp" alt="" style="width:100%;height:80px;object-fit:cover;border-radius:16px 16px 0 0;margin:-20px -20px 12px -20px;width:calc(100% + 40px);display:block;" onerror="this.style.display='none'">
-      <div style="font-size:56px;margin-bottom:8px;" id="g13-result-icon">🏆</div>
-      <div style="font-size:24px;font-weight:900;color:white;font-family:'Fredoka One',cursive;margin-bottom:6px;" id="g13-result-title">Menang!</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.65);margin-bottom:16px;" id="g13-result-subtitle"></div>
-      <div style="font-size:36px;margin-bottom:20px;" id="g13-result-stars">⭐⭐⭐</div>
-      <button onclick="initGame13()" style="width:100%;padding:14px;background:linear-gradient(135deg,#F97316,#FBBF24);border:none;border-radius:16px;font-size:18px;font-weight:900;color:#1a1a1a;cursor:pointer;font-family:'Fredoka One',cursive;margin-bottom:8px;">Main Lagi 🔄</button>
-      <button onclick="exitGame()" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;font-family:'Fredoka One',cursive;">⌂ Menu</button>
+      <div style="font-size:52px;margin-bottom:6px;" id="g13-result-icon">🏆</div>
+      <div style="font-size:24px;font-weight:900;color:white;font-family:'Fredoka One',cursive;margin-bottom:4px;" id="g13-result-title">Menang!</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:12px;" id="g13-result-subtitle"></div>
+      <div style="font-size:30px;letter-spacing:2px;margin-bottom:18px;" id="g13-result-stars">⭐⭐⭐☆☆</div>
+      <button id="g13-next-btn" onclick="playClick();startGameWithLevel((g13State.lv||1)+1)" style="width:100%;padding:13px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:16px;font-size:17px;font-weight:900;color:white;cursor:pointer;font-family:'Fredoka One',cursive;margin-bottom:8px;display:none;">Level Berikutnya ➡️</button>
+      <button onclick="playClick();initGame13()" style="width:100%;padding:13px;background:linear-gradient(135deg,#F97316,#FBBF24);border:none;border-radius:16px;font-size:17px;font-weight:900;color:#1a1a1a;cursor:pointer;font-family:'Fredoka One',cursive;margin-bottom:8px;">Coba Lagi 🔄</button>
+      <button onclick="playClick();exitGame()" style="width:100%;padding:11px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;font-size:15px;font-weight:700;color:white;cursor:pointer;font-family:'Fredoka One',cursive;">⌂ Menu</button>
     </div>
   </div>
 
@@ -6701,7 +6702,8 @@ body { background: #0a0a1a !important; }
   <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:1;"></div>
   <!-- Header -->
   <div class="game-header" style="position:relative;z-index:10;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);padding:8px 12px;">
-    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;">⌂</button>
+    <button class="gh-back" onclick="playClick();exitGame()" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;">⌂</button>
+    <button class="gh-back" onclick="playClick();g13cBuildLetterSelect()" title="Pilih gym" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:15px;cursor:pointer;">←</button>
     <span style="flex:1;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🏅 Gym Huruf & Suara</span>
     <span id="g13c-badge-count" style="font-size:13px;font-weight:900;color:#FCD34D;">🏅 0</span>
   </div>
@@ -6881,9 +6883,10 @@ body { background: #0a0a1a !important; }
       <div id="g14-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
       <div id="g14-res-stars" style="font-size:28px;letter-spacing:3px;"></div>
       <div id="g14-res-info" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;text-align:center;padding:0 24px;max-width:300px;"></div>
-      <div style="display:flex;gap:10px;margin-top:6px;">
-        <button onclick="g14Replay()" style="background:#E63946;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
-        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;">✅ Selesai</button>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;margin-top:6px;">
+        <button id="g14-next-btn" onclick="playClick();startGameWithLevel((state.selectedLevelNum||1)+1)" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;width:100%;">Level Berikutnya ➡️</button>
+        <button onclick="playClick();g14Replay()" style="background:#E63946;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;width:100%;">🔄 Coba Lagi</button>
+        <button onclick="playClick();endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;width:100%;">⌂ Menu</button>
       </div>
     </div>
   </div>
@@ -7123,6 +7126,7 @@ body { background: #0a0a1a !important; }
 <div id="screen-game18" class="screen">
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 12px;background:linear-gradient(135deg,rgba(62,39,35,0.95),rgba(93,57,34,0.95));backdrop-filter:blur(10px);">
     <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⌂</button>
+    <button class="gh-back gh-level-back" onclick="backToLevelSelect()" title="Pilih level" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">←</button>
     <span class="gh-title" style="flex:1;font-size:14px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">🏛️ Museum Kereta Ambarawa</span>
     <span id="g18-level" style="color:rgba(255,220,150,0.9);flex-shrink:0;font-weight:800;">Lv.1</span>
     <button class="gh-pause" onclick="pauseGame()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;">⏸</button>
@@ -7671,9 +7675,9 @@ body { background: #0a0a1a !important; }
   </div>
   <div class="result-scores" id="result-scores" style="display:none;"></div>
   <div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;max-width:400px;">
-    <button id="result-next-btn" class="btn btn-lg" onclick="playClick(); nextLevel()" style="display:none;background:linear-gradient(135deg,#06D6A0,#059669);color:#fff;font-weight:800;">Level Berikutnya ▶</button>
-    <button class="btn btn-lg btn-brand" onclick="playClick(); playAgain()">Main Lagi! 🎮</button>
-    <button class="btn btn-lg btn-white" onclick="playClick(); goToMenu()">Pilih Game Lain 🏠</button>
+    <button id="result-next-btn" class="btn btn-lg" onclick="playClick(); nextLevel()" style="display:none;background:linear-gradient(135deg,#06D6A0,#059669);color:#fff;font-weight:800;">Level Berikutnya ➡️</button>
+    <button class="btn btn-lg btn-brand" onclick="playClick(); playAgain()">Coba Lagi 🔄</button>
+    <button class="btn btn-lg btn-white" onclick="playClick(); goToMenu()">⌂ Menu</button>
   </div>
 </div>
 
@@ -9654,7 +9658,10 @@ function battleBgmPlay(){
   _battleBgmEl.volume = 0.45
   _battleBgmEl.currentTime = 0
   const p = _battleBgmEl.play()
-  if(p && p.catch) p.catch(()=>{})
+  if(p && p.catch) p.catch(()=>{
+    // Retry once — some mobile browsers need a second attempt after gesture context
+    setTimeout(()=>{ if(_battleBgmEl && isSoundOn()){ _battleBgmEl.currentTime=0; _battleBgmEl.play().catch(()=>{}) } }, 300)
+  })
 }
 function battleBgmStop(){
   if(!_battleBgmEl) _battleBgmEl = document.getElementById('battle-bgm')
@@ -15201,14 +15208,16 @@ function g13Victory() {
     const finalForm = s.evolved2 ? s.chain.evolved2 : s.evolved ? s.chain.evolved : null
     const bannerImg = document.getElementById('g13-result-banner-img')
     if(bannerImg) bannerImg.src = 'assets/victory-banner.webp'
-    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = s.evolved2 ? '🌟' : s.evolved ? '⭐' : '✨'
+    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = '🏆'
     const title = document.getElementById('g13-result-title'); if(title) title.textContent = finalForm ? `${finalForm.name} Menang!` : 'Kamu Menang!'
     const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = s.evolved2
       ? `${s.chain.player.name}→${s.chain.evolved.name}→${s.chain.evolved2.name}! Evolusi sempurna!`
       : s.evolved
         ? `${s.chain.player.name} berhasil berevolusi menjadi ${s.chain.evolved.name}!`
         : `${s.chain.wild.name} dikalahkan — tapi ${s.chain.player.name} belum berevolusi!`
-    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '⭐'.repeat(perfStars) + '🌑'.repeat(Math.max(0,3 - perfStars))
+    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '⭐'.repeat(_g13stars) + '☆'.repeat(3 - _g13stars)
+    const nextBtn = document.getElementById('g13-next-btn')
+    if(nextBtn) nextBtn.style.display = (_g13lv < 55) ? 'block' : 'none'
     ro.style.display = 'flex'
   }, 1000)
 }
@@ -15228,12 +15237,11 @@ function g13Defeat() {
     g13ResultTimeout = null
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
-    const bannerImg = document.getElementById('g13-result-banner-img')
-    if(bannerImg) bannerImg.src = 'assets/defeat-banner.webp'
     const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = '💔'
     const title = document.getElementById('g13-result-title'); if(title) title.textContent = 'Kalah...'
     const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = `${s.chain.wild.name} terlalu kuat! Coba lagi!`
-    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '🌑🌑🌑'
+    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '☆☆☆'
+    const nextBtn = document.getElementById('g13-next-btn'); if(nextBtn) nextBtn.style.display = 'none'
     ro.style.display = 'flex'
   }, 1200)
 }
@@ -17160,11 +17168,14 @@ function g14ShowResult(won) {
   const overlay = document.getElementById('g14-result-overlay')
   document.getElementById('g14-res-icon').textContent = won ? '🏆' : '💨'
   document.getElementById('g14-res-title').textContent = won ? 'MENANG! 🎉' : 'Kurang Jauh...'
-  document.getElementById('g14-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
+  const displayStars = won ? (perfStars >= 5 ? 3 : perfStars >= 4 ? 2 : 1) : 0
+  document.getElementById('g14-res-stars').textContent = '⭐'.repeat(displayStars) + '☆'.repeat(3 - displayStars)
   const cfg = g14State.trainCfg
   document.getElementById('g14-res-info').textContent = won
     ? `${cfg.name} melaju ${Math.floor(g14State.finishLine)}m! Sisa HP: ${g14State.hp}/3`
     : `Sudah ${Math.floor(g14State.distance)}m dari ${g14State.finishLine}m. Coba lagi!`
+  const nextBtn = document.getElementById('g14-next-btn')
+  if(nextBtn) nextBtn.style.display = (won && (state.selectedLevelNum||1) < 20) ? 'block' : 'none'
   overlay.style.display = 'flex'
   if (won) { playCorrect(); endGame(perfStars) }
 }
