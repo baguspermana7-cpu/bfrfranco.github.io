@@ -554,7 +554,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* G3 enhancements */
 .g3-choice-btn { font-size:52px;padding:26px 12px;border-radius:28px; }
 /* G7 enhancements */
-.g7-display { width:min(360px,88vw);height:min(360px,88vw);font-size:min(160px,42vw); }
+.g7-display { width:min(58vh,88vw);height:min(58vh,88vw);font-size:min(50vh,76vw); }
 /* G8 enhancements */
 .g8-slot { min-width:52px;height:62px;font-size:28px;border-radius:16px; }
 .g8-letter-btn { width:58px;height:58px;border-radius:16px;font-size:26px; }
@@ -1278,7 +1278,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .level-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); }
 
 /* ── 8. INDIVIDUAL GAME SCREEN BACKGROUNDS ── */
-#screen-game1 { background: url('assets/bg-game1-emosi.webp') center/cover no-repeat, linear-gradient(180deg, #1a0020 0%, #3B0764 50%, #1a0020 100%); }
+#screen-game1 { background: url('assets/bg-game1-emosi.webp') center/auto 100% no-repeat, linear-gradient(180deg, #1a0020 0%, #3B0764 50%, #1a0020 100%); }
 #screen-game2 { background: url('assets/bg-game2-napas.webp') center/cover no-repeat, linear-gradient(180deg, #0C1445 0%, #1a237e 50%, #0C1445 100%); }
 #screen-game3 { background: url('assets/bg-forest.webp') center/cover no-repeat, linear-gradient(180deg, #0A2818 0%, #14532D 50%, #0A2818 100%); }
 #screen-game4 { background: url('assets/bg-game4-savanna.webp') center/cover no-repeat, linear-gradient(180deg, #451A03 0%, #78350F 50%, #451A03 100%); }
@@ -1313,29 +1313,31 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   margin: 0 auto !important;
 }
 .g1-choice-btn {
-  background: linear-gradient(135deg,rgba(255,255,255,0.22),rgba(255,255,255,0.10)) !important;
-  border: 2px solid rgba(255,255,255,0.35) !important;
+  background: white !important;
+  border: 3px solid #FFD6DC !important;
   border-radius: 20px !important;
-  color: white !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+  color: #374151 !important;
+  box-shadow: 0 8px 0 #FBBBC4, 0 10px 20px rgba(244,63,94,0.12) !important;
   padding: 16px 14px !important;
   min-width: 90px !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: transform 0.1s, box-shadow 0.1s !important;
 }
 .g1-choice-btn .choice-emoji { font-size: 44px !important; }
 .g1-choice-btn .choice-label {
-  font-size: 15px !important; color: white !important;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.5) !important; font-weight: 900 !important;
+  font-size: 15px !important; color: #374151 !important;
+  text-shadow: none !important; font-weight: 900 !important;
 }
 .g1-choice-btn.correct {
-  background: linear-gradient(135deg,rgba(20,184,166,0.6),rgba(20,184,166,0.35)) !important;
-  border-color: #14B8A6 !important; box-shadow: 0 0 24px rgba(20,184,166,0.6) !important;
+  background: linear-gradient(135deg,#CCFBF1,white) !important;
+  border-color: var(--teal) !important;
+  box-shadow: 0 4px 0 var(--teal-shadow), 0 0 20px rgba(20,184,166,0.3) !important;
 }
 .g1-choice-btn.wrong {
-  background: linear-gradient(135deg,rgba(239,68,68,0.55),rgba(239,68,68,0.25)) !important;
-  border-color: #EF4444 !important;
+  background: linear-gradient(135deg,#FFF1F3,white) !important;
+  border-color: var(--rose) !important;
+  box-shadow: 0 4px 0 var(--rose-shadow) !important;
 }
 /* Progress text: pill badge */
 .g1-progress {
@@ -1348,12 +1350,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   font-size: 13px;
   box-shadow: 0 2px 8px rgba(244,63,94,0.12);
 }
-/* Animal: character big + emotion badge overlay */
+/* Animal: character big + emotion badge side-by-side */
 #g1-animal {
   position: relative !important;
   display: inline-flex !important;
+  flex-direction: row !important;
   align-items: center;
   justify-content: center;
+  gap: 12px !important;
   margin: 0 auto 6px;
   font-size: 0 !important;   /* reset so children control their own size */
   filter: none !important;   /* filter moved to .g1-char */
@@ -1371,9 +1375,9 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   70% { transform:scale(1.04) rotate(2.5deg); }
 }
 .g1-emot-bubble {
-  position: absolute;
-  top: -20px; left: 50%;
-  transform: translateX(-50%);
+  position: relative !important;
+  top: auto !important; left: auto !important;
+  transform: none !important;
   font-size: 64px;
   background: white;
   border-radius: 50%;
@@ -1381,16 +1385,17 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 6px 24px rgba(0,0,0,0.2), 0 0 0 4px rgba(255,255,255,0.7);
   animation: emotBadgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
+  flex-shrink: 0;
 }
 .g1-emot-bubble::after {
   content: '';
   position: absolute;
-  bottom: -13px; left: 50%;
-  transform: translateX(-50%);
+  top: 50%; right: -13px;
+  transform: translateY(-50%);
   border: 7px solid transparent;
-  border-top-color: white;
+  border-left-color: white;
 }
-@keyframes emotBadgePop { from{transform:translateX(-50%) scale(0) rotate(-20deg)} to{transform:translateX(-50%) scale(1) rotate(0)} }
+@keyframes emotBadgePop { from{transform:scale(0) rotate(-20deg)} to{transform:scale(1) rotate(0)} }
 /* Tappable hearts pop animation */
 @keyframes heartPop { 0%{transform:scale(1) translateY(0);opacity:1} 100%{transform:scale(2.5) translateY(-30px);opacity:0} }
 .world-hearts span.popping { animation:heartPop 0.35s ease-out forwards !important; pointer-events:none !important; }
@@ -1549,6 +1554,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* Display frame: polaroid pop-out */
 .g7-display { background:white !important; border:4px solid rgba(255,255,255,0.92) !important; border-radius:24px !important; box-shadow:0 14px 44px rgba(0,0,0,0.5),0 4px 16px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.7) !important; }
 .g7-display.anim-correct { animation:g7DisplayPop 0.65s cubic-bezier(0.34,1.56,0.64,1) !important; }
+.g7-display.anim-wrong { animation:g7DisplayShake 0.5s ease !important; }
+@keyframes g7DisplayShake {
+  0%,100%{transform:translateX(0) rotate(0)}
+  20%{transform:translateX(-10px) rotate(-2deg)}
+  40%{transform:translateX(10px) rotate(2deg)}
+  60%{transform:translateX(-8px) rotate(-1.5deg)}
+  80%{transform:translateX(8px) rotate(1.5deg)}
+}
 @keyframes g7DisplayPop {
   0%  { transform:scale(1) rotate(0deg); }
   30% { transform:scale(1.13) rotate(-2.5deg); }
@@ -2701,8 +2714,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes pokeEnterPlayer { 0%{transform:scaleX(-1) scale(0.5) translateY(20px);opacity:0} 60%{transform:scaleX(-1) scale(1.08) translateY(-4px);opacity:1} 100%{transform:scaleX(-1);opacity:1} }
 
 /* Game 11 — Science Quiz */
-#screen-game11{background:url('assets/sci-bg.webp') center/cover no-repeat, linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%);}
-.sci-question-img{font-size:72px;text-align:center;display:block;margin:8px auto;animation:mascotBounce 2s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.4));}
+#screen-game11{background:url('assets/sci-bg.webp') center/auto 100% no-repeat, linear-gradient(180deg,#0A1628 0%,#0D2240 50%,#061020 100%); align-items:center !important;}
+.sci-question-img{font-size:min(200px,28vw);text-align:center;display:block;margin:8px auto;animation:mascotBounce 2s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.4));}
 .sci-question-text{font-size:18px;font-weight:700;color:white;text-align:center;margin:8px 16px;line-height:1.5;background:rgba(255,255,255,0.08);border-radius:16px;padding:14px;}
 .sci-choices{display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px;margin-top:8px;}
 .sci-choice{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 18px;font-size:17px;font-weight:700;color:white;cursor:pointer;text-align:left;font-family:var(--font);transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);}
@@ -4668,27 +4681,12 @@ body { background: #0a0a1a !important; }
 
 /* Science Quiz upgrade */
 .sci-question-text {
-  background: rgba(255,255,255,0.07) !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  background: rgba(0,0,0,0.72) !important;
+  border: 2px solid rgba(255,255,255,0.22) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
   color: white !important;
   font-size: 17px !important;
-}
-.sci-choice {
-  background: rgba(255,255,255,0.07) !important;
-  border: 1.5px solid rgba(255,255,255,0.15) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08) !important;
-}
-.sci-choice:active { transform: scale(0.95); }
-.sci-choice.correct {
-  background: rgba(45,212,191,0.2) !important;
-  border-color: #2DD4BF !important;
-  box-shadow: 0 0 20px rgba(45,212,191,0.3) !important;
-}
-.sci-choice.wrong {
-  background: rgba(244,63,94,0.2) !important;
-  border-color: #F43F5E !important;
-  box-shadow: 0 0 20px rgba(244,63,94,0.3) !important;
+  font-weight: 800 !important;
 }
 
 /* Shadow buttons — overridden in dark-bg section with bright card style */
@@ -10797,6 +10795,7 @@ function answerG7(isCorrect,btn,correct){
   const qEl=document.getElementById('g7-question')
   if(isCorrect){
     btn.classList.add('correct'); playCorrect(); addStars(1)
+    spawnSparkles(btn); flashScreen('green')
     // Pop the display image
     const dispEl=document.getElementById('g7-display')
     if(dispEl){dispEl.classList.remove('anim-correct');void dispEl.offsetWidth;dispEl.classList.add('anim-correct')}
@@ -10813,7 +10812,10 @@ function answerG7(isCorrect,btn,correct){
       const txt=b.querySelector('.g7-choice-text')
       if(txt&&(txt.textContent===correct.word))b.classList.add('correct')
     })
-    playWrong()
+    playWrong(); flashScreen('red')
+    // Shake the display frame
+    const dispElW=document.getElementById('g7-display')
+    if(dispElW){dispElW.classList.remove('anim-wrong');void dispElW.offsetWidth;dispElW.classList.add('anim-wrong')}
     // Show phonics clue: first letter + syllable hint
     if(qEl){
       const firstLetter=correct.word[0]
