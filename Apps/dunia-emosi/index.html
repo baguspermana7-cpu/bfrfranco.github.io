@@ -3110,6 +3110,14 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   background:linear-gradient(145deg,#FFE97A,#D4A017 45%,#8B6000);
   box-shadow:inset 0 2px 3px rgba(255,255,255,0.55),0 3px 8px rgba(0,0,0,0.6);
   transition:all 0.35s ease;position:relative;flex-shrink:0;
+  animation:g15ChainSway 1.8s ease-in-out infinite alternate;
+}
+.g15-chain-link:nth-child(odd)  { animation-duration:2.1s;animation-delay:-0.4s; }
+.g15-chain-link:nth-child(3n)   { animation-duration:1.6s;animation-delay:-0.9s; }
+@keyframes g15ChainSway {
+  0%   { transform:rotate(-4deg) translateY(0px); }
+  50%  { transform:rotate(0deg)  translateY(-2px); }
+  100% { transform:rotate(4deg)  translateY(0px); }
 }
 .g15-chain-link.broken {
   border-color:#4A4A4A;
@@ -3233,6 +3241,22 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g17-train-cross { animation:g17TrainCross 2.8s ease-in-out forwards; }
 @keyframes g17CrackGrow { from{opacity:0;transform:scaleX(0)} to{opacity:1;transform:scaleX(1)} }
 @keyframes g17Cloud1 { 0%{transform:translateX(0)} 100%{transform:translateX(12px)} }
+/* Bridge gentle idle sway */
+@keyframes g17BridgeIdle {
+  0%,100% { transform:rotate(0deg) translateY(0); }
+  30%     { transform:rotate(0.6deg) translateY(-1.5px); }
+  70%     { transform:rotate(-0.6deg) translateY(1px); }
+}
+/* Bridge stress shake on wrong tap */
+@keyframes g17BridgeShake {
+  0%,100% { transform:rotate(0deg); }
+  20%     { transform:rotate(-1.8deg) translateY(-3px); }
+  40%     { transform:rotate(1.8deg) translateY(2px); }
+  60%     { transform:rotate(-1.2deg) translateY(-2px); }
+  80%     { transform:rotate(1.2deg) translateY(1px); }
+}
+#g17-bridge-group { transform-origin:50% 100%; animation:g17BridgeIdle 3.2s ease-in-out infinite; }
+#g17-bridge-group.bridge-shake { animation:g17BridgeShake 0.5s ease; }
 .g17-crack-line {
   position:absolute;height:4px;border-radius:2px;
   background:linear-gradient(90deg,transparent,#8B4513,transparent);
@@ -3323,9 +3347,21 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   box-shadow:0 2px 0 #4A148C;
 }
 .g18-modal-overlay {
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);
+  display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.88);
   flex-direction:column;align-items:center;justify-content:center;z-index:200;
   padding:20px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity 0.22s ease,visibility 0.22s;
+}
+.g18-modal-overlay.open {
+  opacity:1;visibility:visible;pointer-events:auto;
+}
+.g18-modal-overlay .g18-modal-box {
+  transform:scale(0.92) translateY(12px);
+  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.g18-modal-overlay.open .g18-modal-box {
+  transform:scale(1) translateY(0);
 }
 .g18-modal-box {
   background:linear-gradient(135deg,#3E2723,#4E342E);
@@ -7001,15 +7037,18 @@ body { background: #0a0a1a !important; }
     <div style="position:absolute;bottom:44%;left:0;right:0;height:20%;background:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 100%22%3E%3Cpolygon points=%220,100 60,20 120,55 180,10 240,45 300,15 360,40 400,5 400,100%22 fill=%22%231a3a1a%22 opacity=%220.7%22/%3E%3C/svg%3E') repeat-x bottom/400px 100%;z-index:1;"></div>
     <!-- Train waiting left -->
     <div id="g17-train-waiting" style="position:absolute;left:4%;bottom:44%;z-index:10;transition:all 2.5s ease-in-out;transform:scaleX(-1);filter:drop-shadow(0 4px 14px rgba(0,0,0,0.6));"></div>
-    <!-- Bridge structure -->
-    <div style="position:absolute;bottom:46%;left:8%;right:8%;height:12px;background:linear-gradient(90deg,#5D4037,#795548,#5D4037);border-radius:3px;z-index:3;"></div>
-    <!-- Bridge blocks row -->
-    <div id="g17-bridge" style="position:absolute;bottom:calc(46% + 8px);left:6%;right:6%;display:flex;gap:3px;z-index:6;"></div>
-    <!-- Bridge supports -->
-    <div style="position:absolute;bottom:38%;left:6%;width:12px;height:8%;background:#5D4037;border-radius:2px;z-index:2;"></div>
-    <div style="position:absolute;bottom:38%;right:6%;width:12px;height:8%;background:#5D4037;border-radius:2px;z-index:2;"></div>
-    <!-- Crack overlay -->
-    <div id="g17-cracks" style="position:absolute;bottom:calc(46% + 8px);left:6%;right:6%;height:52px;z-index:7;pointer-events:none;"></div>
+    <!-- Bridge group (animated together) -->
+    <div id="g17-bridge-group" style="position:absolute;bottom:38%;left:6%;right:6%;z-index:3;">
+      <!-- Bridge beam -->
+      <div style="position:absolute;bottom:calc(8% + 4px);left:2%;right:2%;height:12px;background:linear-gradient(90deg,#5D4037,#795548,#5D4037);border-radius:3px;"></div>
+      <!-- Bridge blocks row -->
+      <div id="g17-bridge" style="position:absolute;bottom:calc(8% + 20px);left:0;right:0;display:flex;gap:3px;"></div>
+      <!-- Bridge supports (pillars) -->
+      <div style="position:absolute;bottom:0;left:0;width:12px;height:8%;background:#5D4037;border-radius:2px;"></div>
+      <div style="position:absolute;bottom:0;right:0;width:12px;height:8%;background:#5D4037;border-radius:2px;"></div>
+      <!-- Crack overlay -->
+      <div id="g17-cracks" style="position:absolute;bottom:calc(8% + 20px);left:0;right:0;height:52px;pointer-events:none;"></div>
+    </div>
     <!-- Timer bar -->
     <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:70%;max-width:280px;z-index:20;">
       <div style="color:white;font-size:11px;font-weight:800;text-align:center;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,0.7);">⏱️ <span id="g17-timer-text">30</span>s</div>
@@ -8081,6 +8120,117 @@ const WORD_IMAGES = [
   {id:'nasi',   emoji:'🍚',word:'NASI',   file:null,suku:'NA-SI'},
   {id:'wortel', emoji:'🥕',word:'WORTEL', file:null,suku:'WOR-TEL'},
   {id:'jagung', emoji:'🌽',word:'JAGUNG', file:null,suku:'JA-GUNG'},
+  // --- More animals ---
+  {id:'sapi',   emoji:'🐄',word:'SAPI',   file:null,suku:'SA-PI'},
+  {id:'kambing',emoji:'🐐',word:'KAMBING',file:null,suku:'KAM-BING'},
+  {id:'tikus2', emoji:'🐀',word:'TIKUS',  file:null,suku:'TI-KUS'},
+  {id:'gorila', emoji:'🦍',word:'GORILA', file:null,suku:'GO-RI-LA'},
+  {id:'zebra',  emoji:'🦓',word:'ZEBRA',  file:null,suku:'ZEB-RA'},
+  {id:'kuda-nil',emoji:'🦛',word:'BADAK', file:null,suku:'BA-DAK'},
+  {id:'pinguin',emoji:'🐧',word:'PINGUIN',file:null,suku:'PIN-GUIN'},
+  {id:'flamingo',emoji:'🦩',word:'BANGAU',file:null,suku:'BA-NGAU'},
+  {id:'merak',  emoji:'🦚',word:'MERAK',  file:null,suku:'ME-RAK'},
+  {id:'buaya',  emoji:'🐊',word:'BUAYA',  file:null,suku:'BU-A-YA'},
+  {id:'kura2',  emoji:'🐢',word:'KURA-KURA',file:null,suku:'KU-RA KU-RA'},
+  {id:'landak', emoji:'🦔',word:'LANDAK', file:null,suku:'LAN-DAK'},
+  {id:'kepiting',emoji:'🦀',word:'KEPITING',file:null,suku:'KE-PI-TING'},
+  {id:'ubur',   emoji:'🪼',word:'UBUR',   file:null,suku:'U-BUR'},
+  {id:'udang',  emoji:'🦐',word:'UDANG',  file:null,suku:'U-DANG'},
+  {id:'cumi',   emoji:'🦑',word:'CUMI',   file:null,suku:'CU-MI'},
+  {id:'gurita', emoji:'🐙',word:'GURITA', file:null,suku:'GU-RI-TA'},
+  {id:'hiu',    emoji:'🦈',word:'HIU',    file:null,suku:'HI-U'},
+  {id:'paus',   emoji:'🐋',word:'PAUS',   file:null,suku:'PA-US'},
+  {id:'kuda-laut',emoji:'🐠',word:'IKAN HIAS',file:null,suku:'I-KAN HI-AS'},
+  {id:'babi',   emoji:'🐷',word:'BABI',   file:null,suku:'BA-BI'},
+  {id:'kerbau', emoji:'🐃',word:'KERBAU', file:null,suku:'KER-BAU'},
+  {id:'kijang', emoji:'🦌',word:'KIJANG', file:null,suku:'KI-JANG'},
+  {id:'serigala',emoji:'🐺',word:'SERIGALA',file:null,suku:'SE-RI-GA-LA'},
+  {id:'rubah',  emoji:'🦊',word:'RUBAH',  file:null,suku:'RU-BAH'},
+  {id:'berang', emoji:'🦦',word:'BERANG-BERANG',file:null,suku:'BE-RANG BE-RANG'},
+  {id:'musang', emoji:'🦨',word:'MUSANG', file:null,suku:'MU-SANG'},
+  // --- More foods ---
+  {id:'tomat',  emoji:'🍅',word:'TOMAT',  file:null,suku:'TO-MAT'},
+  {id:'terong', emoji:'🍆',word:'TERONG', file:null,suku:'TE-RONG'},
+  {id:'brokoli',emoji:'🥦',word:'BROKOLI',file:null,suku:'BRO-KO-LI'},
+  {id:'labu',   emoji:'🎃',word:'LABU',   file:null,suku:'LA-BU'},
+  {id:'cabe',   emoji:'🌶️',word:'CABE',   file:null,suku:'CA-BE'},
+  {id:'bawang', emoji:'🧅',word:'BAWANG', file:null,suku:'BA-WANG'},
+  {id:'kentang',emoji:'🥔',word:'KENTANG',file:null,suku:'KEN-TANG'},
+  {id:'timun',  emoji:'🥒',word:'TIMUN',  file:null,suku:'TI-MUN'},
+  {id:'nanas',  emoji:'🍍',word:'NANAS',  file:null,suku:'NA-NAS'},
+  {id:'stroberi',emoji:'🍓',word:'STROBERI',file:null,suku:'ST-RO-BE-RI'},
+  {id:'ceri',   emoji:'🍒',word:'CERI',   file:null,suku:'CE-RI'},
+  {id:'kiwi',   emoji:'🥝',word:'KIWI',   file:null,suku:'KI-WI'},
+  {id:'melon',  emoji:'🍈',word:'MELON',  file:null,suku:'ME-LON'},
+  {id:'leci',   emoji:'🍑',word:'PERSIK', file:null,suku:'PER-SIK'},
+  {id:'kelapa', emoji:'🥥',word:'KELAPA', file:null,suku:'KE-LA-PA'},
+  {id:'kurma',  emoji:'🌴',word:'KURMA',  file:null,suku:'KUR-MA'},
+  {id:'kacang', emoji:'🥜',word:'KACANG', file:null,suku:'KA-CANG'},
+  // --- Household & school objects ---
+  {id:'pensil', emoji:'✏️',word:'PENSIL', file:null,suku:'PEN-SIL'},
+  {id:'penggaris',emoji:'📏',word:'PENGGARIS',file:null,suku:'PENG-GA-RIS'},
+  {id:'gunting',emoji:'✂️',word:'GUNTING',file:null,suku:'GUN-TING'},
+  {id:'pulpen', emoji:'🖊️',word:'PULPEN', file:null,suku:'PUL-PEN'},
+  {id:'kertas', emoji:'📄',word:'KERTAS', file:null,suku:'KER-TAS'},
+  {id:'tas',    emoji:'🎒',word:'TAS',    file:null,suku:'TAS'},
+  {id:'kursi',  emoji:'🪑',word:'KURSI',  file:null,suku:'KUR-SI'},
+  {id:'pintu',  emoji:'🚪',word:'PINTU',  file:null,suku:'PIN-TU'},
+  {id:'jendela',emoji:'🪟',word:'JENDELA',file:null,suku:'JEN-DE-LA'},
+  {id:'cermin', emoji:'🪞',word:'CERMIN', file:null,suku:'CER-MIN'},
+  {id:'sikat',  emoji:'🪥',word:'SIKAT',  file:null,suku:'SI-KAT'},
+  {id:'sabun',  emoji:'🧼',word:'SABUN',  file:null,suku:'SA-BUN'},
+  {id:'handuk', emoji:'🧣',word:'HANDUK', file:null,suku:'HAN-DUK'},
+  {id:'sendok', emoji:'🥄',word:'SENDOK', file:null,suku:'SEN-DOK'},
+  {id:'garpu',  emoji:'🍴',word:'GARPU',  file:null,suku:'GAR-PU'},
+  {id:'gelas',  emoji:'🥛',word:'GELAS',  file:null,suku:'GE-LAS'},
+  {id:'mangkok',emoji:'🍜',word:'MANGKOK',file:null,suku:'MANG-KOK'},
+  {id:'sapu',   emoji:'🧹',word:'SAPU',   file:null,suku:'SA-PU'},
+  {id:'ember',  emoji:'🪣',word:'EMBER',  file:null,suku:'EM-BER'},
+  // --- Nature ---
+  {id:'gunung', emoji:'⛰️',word:'GUNUNG', file:null,suku:'GU-NUNG'},
+  {id:'sungai', emoji:'🌊',word:'SUNGAI', file:null,suku:'SU-NGAI'},
+  {id:'hutan',  emoji:'🌲',word:'HUTAN',  file:null,suku:'HU-TAN'},
+  {id:'danau',  emoji:'🏔️',word:'DANAU',  file:null,suku:'DA-NAU'},
+  {id:'pantai', emoji:'🏖️',word:'PANTAI', file:null,suku:'PAN-TAI'},
+  {id:'langit', emoji:'☁️',word:'LANGIT', file:null,suku:'LA-NGIT'},
+  {id:'angin',  emoji:'💨',word:'ANGIN',  file:null,suku:'A-NGIN'},
+  {id:'salju',  emoji:'❄️',word:'SALJU',  file:null,suku:'SAL-JU'},
+  {id:'pelangi2',emoji:'🌈',word:'PELANGI',file:null,suku:'PE-LA-NGI'},
+  {id:'api',    emoji:'🔥',word:'API',    file:null,suku:'A-PI'},
+  {id:'air',    emoji:'💧',word:'AIR',    file:null,suku:'A-IR'},
+  {id:'tanah',  emoji:'🪨',word:'BATU',   file:null,suku:'BA-TU'},
+  // --- Transport & places ---
+  {id:'mobil',  emoji:'🚗',word:'MOBIL',  file:null,suku:'MO-BIL'},
+  {id:'bus',    emoji:'🚌',word:'BUS',    file:null,suku:'BUS'},
+  {id:'motor',  emoji:'🏍️',word:'MOTOR',  file:null,suku:'MO-TOR'},
+  {id:'helikopter',emoji:'🚁',word:'HELIKOPTER',file:null,suku:'HE-LI-KOP-TER'},
+  {id:'kapal-selam',emoji:'🚀',word:'ROKET',file:null,suku:'RO-KET'},
+  {id:'ambulans',emoji:'🚑',word:'AMBULANS',file:null,suku:'AM-BU-LANS'},
+  {id:'pemadam',emoji:'🚒',word:'PEMADAM', file:null,suku:'PE-MA-DAM'},
+  {id:'polisi-car',emoji:'🚓',word:'POLISI',file:null,suku:'PO-LI-SI'},
+  {id:'sekolah2',emoji:'🏫',word:'SEKOLAH',file:null,suku:'SE-KO-LAH'},
+  {id:'pasar',  emoji:'🏪',word:'PASAR',  file:null,suku:'PA-SAR'},
+  {id:'masjid', emoji:'🕌',word:'MASJID', file:null,suku:'MAS-JID'},
+  {id:'gereja', emoji:'⛪',word:'GEREJA', file:null,suku:'GE-RE-JA'},
+  {id:'bank',   emoji:'🏦',word:'BANK',   file:null,suku:'BANK'},
+  // --- Colors & shapes ---
+  {id:'merah',  emoji:'🔴',word:'MERAH',  file:null,suku:'ME-RAH'},
+  {id:'biru',   emoji:'🔵',word:'BIRU',   file:null,suku:'BI-RU'},
+  {id:'hijau',  emoji:'🟢',word:'HIJAU',  file:null,suku:'HI-JAU'},
+  {id:'kuning', emoji:'🟡',word:'KUNING', file:null,suku:'KU-NING'},
+  {id:'ungu',   emoji:'🟣',word:'UNGU',   file:null,suku:'U-NGU'},
+  {id:'putih',  emoji:'⬜',word:'PUTIH',  file:null,suku:'PU-TIH'},
+  {id:'hitam',  emoji:'⬛',word:'HITAM',  file:null,suku:'HI-TAM'},
+  {id:'oranye', emoji:'🟠',word:'ORANYE', file:null,suku:'O-RA-NYE'},
+  // --- Emotions & people ---
+  {id:'senang', emoji:'😊',word:'SENANG', file:null,suku:'SE-NANG'},
+  {id:'sedih',  emoji:'😢',word:'SEDIH',  file:null,suku:'SE-DIH'},
+  {id:'marah',  emoji:'😠',word:'MARAH',  file:null,suku:'MA-RAH'},
+  {id:'takut',  emoji:'😨',word:'TAKUT',  file:null,suku:'TA-KUT'},
+  {id:'kaget',  emoji:'😲',word:'KAGET',  file:null,suku:'KA-GET'},
+  {id:'malu',   emoji:'😳',word:'MALU',   file:null,suku:'MA-LU'},
+  {id:'sakit',  emoji:'🤒',word:'SAKIT',  file:null,suku:'SA-KIT'},
+  {id:'sehat',  emoji:'💪',word:'SEHAT',  file:null,suku:'SE-HAT'},
 ]
 
 // Game 8 word bank (tiered: easy=3-4 letters, medium=5-6, hard=7+)
@@ -8153,6 +8303,139 @@ const WORD_BUILD_BANK = [
   {word:'PERSAHABATAN',emoji:'🤝',hint:'Rasa kasih antarteman',tier:'hard'},
   {word:'PETUALANGAN',emoji:'🗺️',hint:'Perjalanan seru dan menantang',tier:'hard'},
   {word:'PENGETAHUAN',emoji:'🧠',hint:'Ilmu yang kita pelajari',tier:'hard'},
+  // --- Easy additions ---
+  {word:'SAPI',emoji:'🐄',hint:'Hewan penghasil susu',tier:'easy'},
+  {word:'BABI',emoji:'🐷',hint:'Hewan gemuk berkaki pendek',tier:'easy'},
+  {word:'ULAR',emoji:'🐍',hint:'Hewan melata tanpa kaki',tier:'easy'},
+  {word:'KURA',emoji:'🐢',hint:'Hewan bercangkang keras',tier:'easy'},
+  {word:'DAUN',emoji:'🍃',hint:'Bagian hijau dari pohon',tier:'easy'},
+  {word:'AKAR',emoji:'🌱',hint:'Bagian bawah tanaman',tier:'easy'},
+  {word:'BIJI',emoji:'🌰',hint:'Cikal bakal tanaman baru',tier:'easy'},
+  {word:'TALI',emoji:'🪢',hint:'Dipakai untuk mengikat',tier:'easy'},
+  {word:'SAPU',emoji:'🧹',hint:'Alat membersihkan lantai',tier:'easy'},
+  {word:'RODA',emoji:'⚙️',hint:'Bagian bulat pada kendaraan',tier:'easy'},
+  {word:'JARI',emoji:'🖐️',hint:'Bagian dari tangan',tier:'easy'},
+  {word:'GIGI',emoji:'🦷',hint:'Bagian mulut untuk mengunyah',tier:'easy'},
+  {word:'GULA',emoji:'🍬',hint:'Bahan pemanis makanan',tier:'easy'},
+  {word:'BATU',emoji:'🪨',hint:'Benda keras dari alam',tier:'easy'},
+  {word:'EMAS',emoji:'🏅',hint:'Logam mulia berwarna kuning',tier:'easy'},
+  {word:'TAHU',emoji:'🟨',hint:'Makanan dari kedelai',tier:'easy'},
+  {word:'MEJA',emoji:'🪑',hint:'Tempat meletakkan benda',tier:'easy'},
+  {word:'PENA',emoji:'🖊️',hint:'Alat tulis berisi tinta',tier:'easy'},
+  {word:'BIRU',emoji:'💙',hint:'Warna langit dan laut',tier:'easy'},
+  {word:'NAGA',emoji:'🐉',hint:'Hewan mitos bernapas api',tier:'easy'},
+  {word:'BAYI',emoji:'👶',hint:'Manusia yang baru lahir',tier:'easy'},
+  {word:'DUIT',emoji:'💰',hint:'Alat tukar barang',tier:'easy'},
+  {word:'KAIN',emoji:'🧵',hint:'Bahan untuk membuat pakaian',tier:'easy'},
+  {word:'KACA',emoji:'🪟',hint:'Benda bening dan keras',tier:'easy'},
+  {word:'RUSA',emoji:'🦌',hint:'Hewan bertanduk di hutan',tier:'easy'},
+  {word:'BULU',emoji:'🪶',hint:'Penutup tubuh burung',tier:'easy'},
+  {word:'SAKU',emoji:'👝',hint:'Kantong kecil di baju',tier:'easy'},
+  {word:'DURI',emoji:'🌵',hint:'Bagian tajam di tanaman',tier:'easy'},
+  {word:'SOFA',emoji:'🛋️',hint:'Kursi empuk panjang',tier:'easy'},
+  {word:'TAMU',emoji:'🙋',hint:'Orang yang berkunjung ke rumah',tier:'easy'},
+  {word:'CUCI',emoji:'🧼',hint:'Membersihkan dengan air',tier:'easy'},
+  {word:'PAGI',emoji:'🌅',hint:'Waktu setelah matahari terbit',tier:'easy'},
+  {word:'SORE',emoji:'🌇',hint:'Waktu menjelang senja',tier:'easy'},
+  {word:'SIKU',emoji:'💪',hint:'Sendi di tengah lengan',tier:'easy'},
+  {word:'JALA',emoji:'🎣',hint:'Alat untuk menangkap ikan',tier:'easy'},
+  {word:'API',emoji:'🔥',hint:'Cahaya panas yang menyala',tier:'easy'},
+  {word:'TARI',emoji:'💃',hint:'Gerakan tubuh mengikuti irama',tier:'easy'},
+  {word:'LELE',emoji:'🐠',hint:'Ikan berkumis dari sungai',tier:'easy'},
+  {word:'CUMI',emoji:'🦑',hint:'Hewan laut bertentakel',tier:'easy'},
+  {word:'KUTU',emoji:'🦟',hint:'Serangga kecil parasit',tier:'easy'},
+  // --- Medium additions ---
+  {word:'DOMBA',emoji:'🐑',hint:'Hewan berbulu penghasil wol',tier:'medium'},
+  {word:'PENYU',emoji:'🐢',hint:'Kura-kura yang hidup di laut',tier:'medium'},
+  {word:'KODOK',emoji:'🐸',hint:'Hewan hijau pelompat',tier:'medium'},
+  {word:'ELANG',emoji:'🦅',hint:'Burung pemangsa besar',tier:'medium'},
+  {word:'ZEBRA',emoji:'🦓',hint:'Hewan bergaris hitam putih',tier:'medium'},
+  {word:'BADAK',emoji:'🦏',hint:'Hewan bercula di hidung',tier:'medium'},
+  {word:'TIKUS',emoji:'🐭',hint:'Hewan pengerat kecil',tier:'medium'},
+  {word:'RUBAH',emoji:'🦊',hint:'Hewan licik berwarna oranye',tier:'medium'},
+  {word:'MACAN',emoji:'🐆',hint:'Hewan berbintik-bintik',tier:'medium'},
+  {word:'KERBAU',emoji:'🐃',hint:'Hewan besar membantu membajak sawah',tier:'medium'},
+  {word:'MERAH',emoji:'❤️',hint:'Warna darah dan apel',tier:'medium'},
+  {word:'HIJAU',emoji:'💚',hint:'Warna pohon dan daun',tier:'medium'},
+  {word:'KUNING',emoji:'💛',hint:'Warna pisang dan matahari',tier:'medium'},
+  {word:'PUTIH',emoji:'🤍',hint:'Warna salju dan susu',tier:'medium'},
+  {word:'HITAM',emoji:'🖤',hint:'Warna gelap tanpa cahaya',tier:'medium'},
+  {word:'COKLAT',emoji:'🤎',hint:'Warna tanah dan kayu',tier:'medium'},
+  {word:'JINGGA',emoji:'🧡',hint:'Warna antara merah dan kuning',tier:'medium'},
+  {word:'HIDUNG',emoji:'👃',hint:'Alat penciuman di wajah',tier:'medium'},
+  {word:'BIBIR',emoji:'👄',hint:'Bagian terluar dari mulut',tier:'medium'},
+  {word:'KEPALA',emoji:'🧠',hint:'Bagian tubuh paling atas',tier:'medium'},
+  {word:'TANGAN',emoji:'🤚',hint:'Bagian tubuh untuk memegang',tier:'medium'},
+  {word:'LUTUT',emoji:'🦵',hint:'Sendi di tengah kaki',tier:'medium'},
+  {word:'PERUT',emoji:'🫃',hint:'Bagian tubuh tempat makanan',tier:'medium'},
+  {word:'MULUT',emoji:'😮',hint:'Alat bicara dan makan',tier:'medium'},
+  {word:'RAMBUT',emoji:'💇',hint:'Tumbuh di atas kepala',tier:'medium'},
+  {word:'TUBUH',emoji:'🧍',hint:'Seluruh bagian fisik kita',tier:'medium'},
+  {word:'TOMAT',emoji:'🍅',hint:'Buah/sayuran berwarna merah bulat',tier:'medium'},
+  {word:'TERONG',emoji:'🍆',hint:'Sayuran panjang berwarna ungu',tier:'medium'},
+  {word:'TIMUN',emoji:'🥒',hint:'Sayuran panjang hijau berair',tier:'medium'},
+  {word:'BAWANG',emoji:'🧅',hint:'Bumbu dapur berbau kuat',tier:'medium'},
+  {word:'LOBAK',emoji:'🥬',hint:'Sayuran akar berwarna putih',tier:'medium'},
+  {word:'BAYAM',emoji:'🥬',hint:'Sayuran hijau bergizi tinggi',tier:'medium'},
+  {word:'PENSIL',emoji:'✏️',hint:'Alat tulis dari kayu',tier:'medium'},
+  {word:'KERTAS',emoji:'📄',hint:'Lembaran tipis untuk menulis',tier:'medium'},
+  {word:'PULPEN',emoji:'🖊️',hint:'Alat tulis berisi tinta cair',tier:'medium'},
+  {word:'KAPAL',emoji:'🚢',hint:'Kendaraan besar di laut',tier:'medium'},
+  {word:'MOTOR',emoji:'🛵',hint:'Kendaraan beroda dua bermesin',tier:'medium'},
+  {word:'BECAK',emoji:'🛺',hint:'Kendaraan roda tiga bertenaga kayuh',tier:'medium'},
+  {word:'RUMAH',emoji:'🏠',hint:'Tempat tinggal keluarga',tier:'medium'},
+  {word:'PASAR',emoji:'🏪',hint:'Tempat jual beli barang',tier:'medium'},
+  {word:'TAMAN',emoji:'🌿',hint:'Tempat bermain dengan banyak tanaman',tier:'medium'},
+  {word:'MASJID',emoji:'🕌',hint:'Tempat ibadah umat Islam',tier:'medium'},
+  {word:'MUSEUM',emoji:'🏛️',hint:'Tempat menyimpan benda sejarah',tier:'medium'},
+  {word:'KANTOR',emoji:'🏢',hint:'Tempat bekerja',tier:'medium'},
+  {word:'DOKTER',emoji:'👨‍⚕️',hint:'Orang yang menyembuhkan penyakit',tier:'medium'},
+  {word:'POLISI',emoji:'👮',hint:'Penjaga keamanan dan ketertiban',tier:'medium'},
+  {word:'PETANI',emoji:'👨‍🌾',hint:'Orang yang bercocok tanam',tier:'medium'},
+  {word:'PILOT',emoji:'👨‍✈️',hint:'Pengemudi pesawat terbang',tier:'medium'},
+  {word:'SABUN',emoji:'🧴',hint:'Pembersih berbusa',tier:'medium'},
+  {word:'EMBER',emoji:'🪣',hint:'Wadah bulat untuk menampung air',tier:'medium'},
+  // --- Hard additions ---
+  {word:'KELELAWAR',emoji:'🦇',hint:'Mamalia terbang di malam hari',tier:'hard'},
+  {word:'ORANG-UTAN',emoji:'🦧',hint:'Kera besar berambut merah dari Kalimantan',tier:'hard'},
+  {word:'MERPATI',emoji:'🕊️',hint:'Burung putih lambang perdamaian',tier:'hard'},
+  {word:'LUMBA-LUMBA',emoji:'🐬',hint:'Mamalia laut yang cerdas',tier:'hard'},
+  {word:'RAMBUTAN',emoji:'🍈',hint:'Buah berbulu merah rasanya manis',tier:'hard'},
+  {word:'ALPUKAT',emoji:'🥑',hint:'Buah hijau berlemak sehat',tier:'hard'},
+  {word:'BELIMBING',emoji:'⭐',hint:'Buah berbentuk seperti bintang',tier:'hard'},
+  {word:'MANGGIS',emoji:'🍇',hint:'Buah dengan kulit ungu tebal',tier:'hard'},
+  {word:'BANDARA',emoji:'✈️',hint:'Tempat pesawat mendarat dan terbang',tier:'hard'},
+  {word:'STADION',emoji:'🏟️',hint:'Tempat pertandingan olahraga besar',tier:'hard'},
+  {word:'LAPANGAN',emoji:'🏃',hint:'Tempat bermain dan berolahraga',tier:'hard'},
+  {word:'PELABUHAN',emoji:'⚓',hint:'Tempat kapal bersandar',tier:'hard'},
+  {word:'PELAJAR',emoji:'🎒',hint:'Orang yang sedang belajar di sekolah',tier:'hard'},
+  {word:'KARYAWAN',emoji:'💼',hint:'Orang yang bekerja di perusahaan',tier:'hard'},
+  {word:'WARTAWAN',emoji:'📰',hint:'Orang yang menulis berita',tier:'hard'},
+  {word:'ILMUWAN',emoji:'🔬',hint:'Orang yang melakukan penelitian',tier:'hard'},
+  {word:'PEDAGANG',emoji:'🛍️',hint:'Orang yang berjualan barang',tier:'hard'},
+  {word:'BERJALAN',emoji:'🚶',hint:'Bergerak dengan kaki perlahan',tier:'hard'},
+  {word:'BERLARI',emoji:'🏃',hint:'Bergerak dengan kaki secepat mungkin',tier:'hard'},
+  {word:'BERNYANYI',emoji:'🎤',hint:'Mengeluarkan suara berirama',tier:'hard'},
+  {word:'BELAJAR',emoji:'📖',hint:'Menuntut ilmu dan pengetahuan',tier:'hard'},
+  {word:'BERMAIN',emoji:'🎮',hint:'Bersenang-senang dengan permainan',tier:'hard'},
+  {word:'MELUKIS',emoji:'🎨',hint:'Membuat gambar dengan cat',tier:'hard'},
+  {word:'MEMASAK',emoji:'👨‍🍳',hint:'Membuat makanan dengan cara dimasak',tier:'hard'},
+  {word:'MENULIS',emoji:'✍️',hint:'Membuat tulisan dengan tangan',tier:'hard'},
+  {word:'MEMBACA',emoji:'📚',hint:'Melihat dan memahami tulisan',tier:'hard'},
+  {word:'MEMBANTU',emoji:'🤝',hint:'Menolong orang yang membutuhkan',tier:'hard'},
+  {word:'KELUARGA',emoji:'👨‍👩‍👧‍👦',hint:'Ayah ibu dan anak-anak bersama',tier:'hard'},
+  {word:'KEMERDEKAAN',emoji:'🎆',hint:'Kebebasan suatu bangsa dari penjajahan',tier:'hard'},
+  {word:'KEBERANIAN',emoji:'🦁',hint:'Sifat tidak takut menghadapi tantangan',tier:'hard'},
+  {word:'KEBAIKAN',emoji:'💝',hint:'Sifat suka menolong dan berbagi',tier:'hard'},
+  {word:'KEJUJURAN',emoji:'🤞',hint:'Sifat selalu berkata benar',tier:'hard'},
+  {word:'BERSYUKUR',emoji:'🙏',hint:'Merasa terima kasih atas semua nikmat',tier:'hard'},
+  {word:'PENGALAMAN',emoji:'🗺️',hint:'Hal-hal yang pernah kita lalui',tier:'hard'},
+  {word:'PERSATUAN',emoji:'🤜',hint:'Bersatu padu dalam satu tujuan',tier:'hard'},
+  {word:'KEHIDUPAN',emoji:'🌱',hint:'Proses tumbuh dan berkembang makhluk hidup',tier:'hard'},
+  {word:'PAHLAWAN',emoji:'🦸',hint:'Orang yang berjasa bagi bangsa',tier:'hard'},
+  {word:'ASTRONOT',emoji:'👨‍🚀',hint:'Orang yang pergi ke luar angkasa',tier:'hard'},
+  {word:'PELAJARAN',emoji:'📝',hint:'Materi yang dipelajari di sekolah',tier:'hard'},
+  {word:'PETUALANG',emoji:'🧭',hint:'Orang yang suka menjelajah tempat baru',tier:'hard'},
 ]
 
 // Game 9 letter guides
@@ -16825,7 +17108,7 @@ function initGame16() {
   document.getElementById('g16-phase1').style.display = 'none'
   document.getElementById('g16-phase2').style.display = 'none'
   document.getElementById('g16-start-overlay').style.display = 'flex'
-  document.getElementById('g16-victim-train').style.right = '8%'
+  document.getElementById('g16-victim-train').style.right = '14%'
   document.getElementById('g16-danger-fill').style.width = '0%'
   document.getElementById('g16-victim-train').className = ''
   // Render SVG trains using G14 builders
@@ -17115,6 +17398,8 @@ function g17LightNextBlock() {
       g17State.combo = 0
       document.getElementById('g17-combo').textContent = '💨 Terlewat!'
       document.getElementById('g17-combo').style.color = '#FFCDD2'
+      const bg = document.getElementById('g17-bridge-group')
+      if (bg) { bg.classList.add('bridge-shake'); setTimeout(() => bg.classList.remove('bridge-shake'), 520) }
       g17AddCrack()
       playWrong()
       if (g17State.damage >= g17State.maxDamage) {
@@ -17164,6 +17449,9 @@ function g17TapBlock(idx) {
     g17State.combo = 0
     document.getElementById('g17-combo').textContent = '❌ Salah!'
     document.getElementById('g17-combo').style.color = '#FFCDD2'
+    // Bridge shake on wrong tap
+    const bg = document.getElementById('g17-bridge-group')
+    if (bg) { bg.classList.add('bridge-shake'); setTimeout(() => bg.classList.remove('bridge-shake'), 520) }
     g17AddCrack()
     playWrong()
     if (g17State.damage >= g17State.maxDamage) {
@@ -17623,7 +17911,7 @@ function initGame18() {
   document.getElementById('g18-level').textContent = `Lv.${lv}`
   document.getElementById('g18-stars-badge').textContent = '🏛️ 0'
   document.getElementById('g18-result').style.display = 'none'
-  document.getElementById('g18-modal').style.display = 'none'
+  document.getElementById('g18-modal').classList.remove('open')
   document.getElementById('g18-gallery').style.display = 'block'
   document.getElementById('g18-quiz-view').style.display = 'none'
   g18RenderGallery()
@@ -17685,12 +17973,12 @@ function g18ShowDetail(idx) {
   document.getElementById('g18-modal-fact').innerHTML =
     `<div style="margin-bottom:6px;">💡 ${train.fact}</div>` +
     (train.funFact ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.12);">${train.funFact}</div>` : '')
-  document.getElementById('g18-modal').style.display = 'flex'
+  document.getElementById('g18-modal').classList.add('open')
   playClick()
 }
 
 function g18CloseModal() {
-  document.getElementById('g18-modal').style.display = 'none'
+  document.getElementById('g18-modal').classList.remove('open')
 }
 
 function g18StartQuiz() {
