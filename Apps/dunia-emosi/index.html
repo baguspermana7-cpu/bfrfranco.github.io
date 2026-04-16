@@ -9106,6 +9106,7 @@ function clearTimers() {
   if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
   if(state.g4Timer){clearInterval(state.g4Timer);state.g4Timer=null}
   if(g6State && g6State.animFrame){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
+  if(g13ResultTimeout){clearTimeout(g13ResultTimeout);g13ResultTimeout=null;const ro=document.getElementById('g13-result-overlay');if(ro)ro.style.display='none'}
   if(g9Canvas){
     g9Canvas.removeEventListener('mousedown',g9StartDraw)
     g9Canvas.removeEventListener('mousemove',g9Draw)
