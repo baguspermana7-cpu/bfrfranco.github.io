@@ -6051,7 +6051,7 @@ body { background: #0a0a1a !important; }
           <!-- G13: Evolusi Math -->
           <div class="wmap-node" id="gtile-13" onclick="playClick();openLevelSelect(13)" title="Evolusi Math">
             <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#78350F,#F59E0B);">
-              <span class="wn-icon"><span class="map-evo-stone" style="width:36px;height:36px;font-size:14px;box-shadow:0 0 18px rgba(251,191,36,1),0 0 6px rgba(251,191,36,0.6);"></span></span>
+              <span class="wn-icon">🔮</span>
             </div>
             <div class="wmap-node-name">Evolusi Math</div>
             <div class="wmap-node-stars" id="gstars-13-lbl"></div>
@@ -8321,6 +8321,8 @@ function showScreen(id) {
   if(po) po.style.display='none'
   if(so) so.style.display='none'
   window.scrollTo(0,0)
+  const screenEl = document.getElementById(id)
+  if (screenEl) screenEl.scrollTop = 0
   // Welcome screen effects
   if (id === 'screen-welcome') {
     initWelcomeParticles()
@@ -12300,6 +12302,10 @@ function switchPlayerPoke(poke){
     }
     pSpr.classList.add('spr-swap-in')
     setTimeout(()=>pSpr.classList.remove('spr-swap-in'),350)
+    // Apply tier sizing for new player Pokemon
+    const _g10swTierSz = t => ({1:1.0, 2:1.2, 3:1.3, 4:1.3}[t||1] || 1.0)
+    const swPTierSc = _g10swTierSz(poke.tier)
+    pSpr.style.width = pSpr.style.height = swPTierSc !== 1.0 ? `calc(min(44vw,22vh) * ${swPTierSc})` : ''
     // Update info box
     document.getElementById('g10-pname').textContent = poke.name
     document.getElementById('g10-plv').textContent = 'Lv'+(Math.floor(Math.random()*10)+s.levelNum)
@@ -12327,6 +12333,9 @@ function switchG13bPlayerPoke(poke) {
   if (!pspr) return
   pspr.src = pokeSpriteOnline(g13bSavedPoke.slug)
   pspr.onerror = function() { this.src = pokeSpriteBackup(poke.id); this.onerror = null }
+  const pTier = poke.tier || 1
+  const pScale = {1:1.0, 2:1.2, 3:1.3, 4:1.3}[pTier] || 1.0
+  pspr.style.width = pspr.style.height = pScale === 1.0 ? '' : `calc(min(20vw,12vh) * ${pScale})`
   const pnameEl = document.getElementById('g13b-pname')
   if (pnameEl) pnameEl.textContent = g13bSavedPoke.name
 }
@@ -12469,6 +12478,12 @@ function g10NewBattle(){
   const pEl=document.getElementById('g10-pspr')
   if(eEl) eEl.style.transform='scaleX(-1)'
   if(pEl) pEl.style.transform=''
+  // Tier-based sprite sizing: basic=1x, mid=1.2x, final=1.3x, legendary=1.3x
+  const _g10TierSz = t => ({1:1.0, 2:1.2, 3:1.3, 4:1.3}[t||1] || 1.0)
+  const eTierSc = _g10TierSz(s.enemyPoke.tier)
+  const pTierSc = _g10TierSz(s.playerPoke.tier)
+  if(eEl) eEl.style.width = eEl.style.height = eTierSc !== 1.0 ? `calc(min(44vw,22vh) * ${eTierSc})` : ''
+  if(pEl) pEl.style.width = pEl.style.height = pTierSc !== 1.0 ? `calc(min(44vw,22vh) * ${pTierSc})` : ''
   // Reset wrapper entrance animations so they replay cleanly each battle
   const eWrap=document.getElementById('g10-espr-wrap')
   const pWrap=document.getElementById('g10-pspr-wrap')
@@ -14079,6 +14094,12 @@ function _initGame13Impl() {
 
   loadSpr('g13-wspr', 'g13-wspr-wrap', chain.wild.slug, chain.icon || '❓')
   loadSpr('g13-pspr', 'g13-pspr-wrap', chain.player.slug, chain.icon || '❓')
+  // Apply tier-based size to wild sprite (player scaling done via evolution CSS/inline)
+  const wEntry = POKEMON_DB.find(p => p.slug === chain.wild.slug)
+  const wTier = wEntry?.tier || 1
+  const wScale = {1:1.0, 2:1.2, 3:1.3, 4:1.3}[wTier] || 1.0
+  const wImg = document.getElementById('g13-wspr')
+  if (wImg && wScale !== 1.0) wImg.style.width = wImg.style.height = `calc(min(40vw,20vh) * ${wScale})`
 
   // Wild name/type
   const wnEl = document.getElementById('g13-wname'); if(wnEl) wnEl.textContent = chain.wild.name
@@ -14558,7 +14579,7 @@ function g13TriggerEvolution() {
     if (pspr) {
       pspr.src = `https://img.pokemondb.net/sprites/home/normal/${nowForm.slug}.png`
       pspr.onerror = () => { const eid=POKE_IDS2[nowForm.slug]; if(eid) pspr.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${eid}.png`; pspr.onerror=null }
-      pspr.classList.add('evolved') // 1.3× bigger after evolution
+      pspr.style.width = pspr.style.height = wasStage2 ? 'calc(min(40vw,20vh) * 1.3)' : 'calc(min(40vw,20vh) * 1.2)'
       pspr.style.animation = 'none'; void pspr.offsetWidth
       pspr.style.animation = 'g13EnterFlip 0.6s cubic-bezier(0.34,1.56,0.64,1)'
     }
@@ -14715,7 +14736,7 @@ const G13B_WILDS = POKEMON_DB
   .filter(p => !_LEGENDARY_IDS.has(p.id))
   .map(p => {
     const t = p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : 'Normal'
-    return { name: p.name, slug: p.slug, type: t, hp: 1 }
+    return { name: p.name, slug: p.slug, type: t, hp: 1, tier: p.tier || 1 }
   })
 
 // Legendary Pokémon — every 10 kills, needs 3 hits — built from POKEMON_DB legendary IDs
@@ -14724,7 +14745,7 @@ const G13B_LEGENDARIES = (() => {
     .filter(p => _LEGENDARY_IDS.has(p.id))
     .map(p => {
       const t = p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : 'Psychic'
-      return { name: p.name, slug: p.slug, type: t, icon: '🌟', hp: 3 }
+      return { name: p.name, slug: p.slug, type: t, icon: '🌟', hp: 3, tier: p.tier || 4 }
     })
   // Fisher-Yates shuffle so order is random every page load
   for (let i = arr.length - 1; i > 0; i--) {
@@ -14801,6 +14822,9 @@ function initGame13b() {
     const saved = g13bSavedPoke
     pspr.src = saved ? pokeSpriteOnline(saved.slug) : 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'
     pspr.onerror = function(){ this.src = 'https://img.pokemondb.net/sprites/home/normal/pikachu.png'; this.onerror = null }
+    const pTier = saved?.tier || 2  // Pikachu default = tier 2
+    const pScale = {1:1.0, 2:1.2, 3:1.3, 4:1.3}[pTier] || 1.0
+    pspr.style.width = pspr.style.height = pScale === 1.0 ? '' : `calc(min(20vw,12vh) * ${pScale})`
   }
   const pnameEl = document.getElementById('g13b-pname')
   if (pnameEl) pnameEl.textContent = g13bSavedPoke ? g13bSavedPoke.name : 'Pikachu'
@@ -14842,7 +14866,7 @@ function g13bSpawnWild() {
     wspr.src = pokeSpriteOnline(wild.slug)
     wspr.onerror = function(){ this.src=pokeSprite(wild.slug); this.onerror=()=>{ this.alt = wild.icon || '?' } }
     // Apply tier-based size scaling
-    const tierScale = {1:1.0, 2:1.2, 3:1.44, 4:1.728}[wild.tier||1] || 1.0
+    const tierScale = {1:1.0, 2:1.2, 3:1.3, 4:1.3}[wild.tier||1] || 1.0
     wspr.style.width = wspr.style.height = tierScale === 1.0 ? '' : `calc(min(44vw,26vh) * ${tierScale})`
     void wspr.offsetWidth
     wspr.classList.add('wild-enter')
