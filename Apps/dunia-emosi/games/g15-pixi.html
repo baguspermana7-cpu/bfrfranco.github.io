@@ -8,55 +8,75 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#03050f;font-family:'Fredoka One',sans-serif;touch-action:none}
+html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fredoka One',sans-serif;touch-action:none}
 #pixi-canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 
-/* HUD Top */
-#hud-top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 14px 8px;background:linear-gradient(180deg,rgba(0,0,0,0.8) 0%,transparent 100%);pointer-events:none}
-#btn-back{background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;color:#fff;padding:7px 12px;font-size:15px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
+/* ── HUD Top ── */
+#hud-top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 14px 8px;background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,transparent 100%);pointer-events:none}
+#btn-back{background:#FFF8E7;border:2.5px solid #FFD6A0;border-radius:12px;color:#8B4513;padding:7px 13px;font-size:16px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0;box-shadow:0 3px 0 #D4956A;font-weight:900}
+#btn-back:active{transform:translateY(2px);box-shadow:0 1px 0 #D4956A}
 #word-display{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
-#word-emoji{font-size:22px;flex-shrink:0}
+#word-emoji{font-size:24px;flex-shrink:0}
 #word-slots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
-.slot{display:inline-flex;align-items:center;justify-content:center;width:28px;height:32px;border-radius:8px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.4);color:#fff;font-size:15px;font-weight:900;transition:all .2s}
-.slot.filled{border-color:#fbbf24;background:rgba(251,191,36,0.25);color:#fbbf24}
-.slot.done{border-color:#4ade80;background:rgba(74,222,128,0.25);color:#4ade80}
-#chains-hud{display:flex;align-items:center;gap:3px;flex-shrink:0}
-.chain-link{font-size:18px;transition:all .3s;display:inline-block}
-.chain-link.broken{opacity:0.25;transform:scale(0.7)}
+.slot{display:inline-flex;align-items:center;justify-content:center;width:28px;height:32px;border-radius:8px;border:2px solid rgba(255,255,255,0.35);background:rgba(0,0,0,0.35);color:#fff;font-size:15px;font-weight:900;transition:all .2s}
+.slot.filled{border-color:#fbbf24;background:rgba(251,191,36,0.28);color:#fde68a}
+.slot.done{border-color:#4ade80;background:rgba(74,222,128,0.28);color:#bbf7d0;animation:slotPop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slotPop{from{transform:scale(0.7)}to{transform:scale(1)}}
+#lives-hud{display:flex;gap:3px;flex-shrink:0}
+.life-heart{font-size:20px;transition:all .3s;display:inline-block}
+.life-heart.lost{opacity:0.18;transform:scale(0.65);filter:grayscale(1)}
 
-/* HUD Bottom */
-#hud-bottom{position:fixed;bottom:0;left:0;right:0;z-index:50;padding:8px 14px 14px;background:linear-gradient(0deg,rgba(0,0,0,0.82) 0%,transparent 100%)}
-#ctrl-row{display:flex;gap:10px;align-items:stretch}
-.ctrl-btn{flex:1;padding:15px 0;border-radius:18px;border:2px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);color:#fff;font-size:20px;cursor:pointer;backdrop-filter:blur(6px);user-select:none;-webkit-user-select:none;transition:transform .08s,background .08s;font-family:inherit;-webkit-tap-highlight-color:transparent;line-height:1.2}
-.ctrl-btn:active{transform:scale(.91);background:rgba(255,255,255,.2)}
-#lane-indicator{flex:1.2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;border-radius:18px;border:2px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.4)}
-#lane-dots{display:flex;flex-direction:column;gap:5px;align-items:center}
-.lane-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all .2s}
-.lane-dot.active{background:#fbbf24;box-shadow:0 0 8px #fbbf24;transform:scale(1.4)}
-#lane-label{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-top:2px}
+/* ── Next letter hint ── */
+#next-letter{position:fixed;top:66px;left:50%;transform:translateX(-50%);z-index:49;background:rgba(255,248,231,0.92);border:2px solid #FFD6A0;border-radius:14px;padding:5px 16px;display:flex;align-items:center;gap:6px;pointer-events:none;box-shadow:0 3px 0 #D4956A}
+#next-label{font-size:10px;color:#92400e;letter-spacing:1.2px;font-weight:700}
+#next-char{font-size:24px;font-weight:900;color:#dc2626;text-shadow:0 0 10px rgba(220,38,38,0.35)}
 
-/* Next letter indicator */
-#next-letter{position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:49;background:rgba(251,191,36,0.15);border:2px solid rgba(251,191,36,0.5);border-radius:14px;padding:5px 14px;display:flex;align-items:center;gap:6px;pointer-events:none}
-#next-label{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1px}
-#next-char{font-size:22px;font-weight:900;color:#fbbf24;text-shadow:0 0 12px #fbbf24}
-
-/* Flash overlay */
+/* ── Flash ── */
 #flash{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity .05s}
 
-/* Overlay */
+/* ── HUD Bottom ── */
+#hud-bottom{position:fixed;bottom:0;left:0;right:0;z-index:50;padding:8px 14px calc(env(safe-area-inset-bottom,0px)+12px)}
+#ctrl-row{display:flex;gap:10px;align-items:stretch}
+#btn-up{flex:1;padding:15px 0;border-radius:18px;border:3px solid #50E0A0;background:linear-gradient(160deg,#2DBF7E,#1A9E66);color:#fff;font-size:22px;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .08s,box-shadow .08s;font-family:inherit;-webkit-tap-highlight-color:transparent;line-height:1.2;box-shadow:0 5px 0 #0A7A48,0 8px 20px rgba(45,191,126,0.3);font-weight:900}
+#btn-up:active{transform:scale(.91) translateY(4px);box-shadow:0 1px 0 #0A7A48}
+#btn-dn{flex:1;padding:15px 0;border-radius:18px;border:3px solid #F07050;background:linear-gradient(160deg,#E85A32,#C84020);color:#fff;font-size:22px;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .08s,box-shadow .08s;font-family:inherit;-webkit-tap-highlight-color:transparent;line-height:1.2;box-shadow:0 5px 0 #9A2A10,0 8px 20px rgba(232,90,50,0.3);font-weight:900}
+#btn-dn:active{transform:scale(.91) translateY(4px);box-shadow:0 1px 0 #9A2A10}
+#lane-indicator{flex:1.2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 6px;border-radius:18px;border:3px solid #B8D4FF;background:linear-gradient(160deg,#E8F4FF,#C8E8FF);box-shadow:0 5px 0 #7AADDD}
+#lane-dots{display:flex;flex-direction:column;gap:6px;align-items:center}
+.lane-dot{width:12px;height:12px;border-radius:50%;background:rgba(100,160,220,0.3);border:2px solid rgba(100,160,220,0.4);transition:all .2s}
+.lane-dot.active{background:#3B82F6;box-shadow:0 0 10px #3B82F6;border-color:#93C5FD;transform:scale(1.4)}
+#lane-label{font-size:10px;color:#1e40af;letter-spacing:1px;margin-top:2px;font-weight:700}
+
+/* ── Math Quiz Overlay ── */
+#math-quiz{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;background:rgba(10,5,25,0.82);backdrop-filter:blur(14px)}
+#math-quiz.show{display:flex}
+#math-card{background:linear-gradient(145deg,#1e1b4b,#312e81);border:3px solid #818cf8;border-radius:28px;padding:24px 20px;max-width:300px;width:88%;text-align:center;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 60px rgba(129,140,248,0.4),0 20px 40px rgba(0,0,0,.6)}
+#math-question{font-size:34px;font-weight:900;color:#e0e7ff;margin-bottom:4px}
+#math-timer-bar{height:6px;background:rgba(255,255,255,0.12);border-radius:4px;margin:8px 0 16px;overflow:hidden}
+#math-timer-fill{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:4px;transition:width 0.1s linear}
+#math-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.math-btn{padding:14px 8px;border-radius:16px;border:2px solid;color:#fff;font-size:20px;font-weight:900;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .08s}
+.math-btn:active{transform:scale(.91)}
+.math-btn:nth-child(1){background:linear-gradient(160deg,#6D28D9,#7C3AED);border-color:#A78BFA;box-shadow:0 4px 0 #4C1D95}
+.math-btn:nth-child(2){background:linear-gradient(160deg,#C2410C,#EA580C);border-color:#FB923C;box-shadow:0 4px 0 #9A3412}
+.math-btn:nth-child(3){background:linear-gradient(160deg,#0D9488,#14B8A6);border-color:#2DD4BF;box-shadow:0 4px 0 #0F766E}
+.math-btn:nth-child(4){background:linear-gradient(160deg,#D97706,#F59E0B);border-color:#FCD34D;box-shadow:0 4px 0 #B45309}
+#math-label{font-size:12px;color:#a5b4fc;letter-spacing:1.5px;margin-bottom:8px;font-weight:700}
+
+/* ── Result Overlay ── */
 .ovl{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78);backdrop-filter:blur(12px)}
 .ovl.show{display:flex}
-.ovl-card{background:linear-gradient(145deg,#03050f,#0a0d28);border:1px solid rgba(99,102,241,.45);border-radius:28px;padding:28px 24px;text-align:center;max-width:320px;width:90%;box-shadow:0 0 60px rgba(99,102,241,.3),0 20px 40px rgba(0,0,0,.6);color:#fff;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+.ovl-card{background:linear-gradient(145deg,#1e1b4b,#312e81);border:2px solid rgba(129,140,248,.5);border-radius:28px;padding:28px 24px;text-align:center;max-width:320px;width:90%;box-shadow:0 0 60px rgba(129,140,248,.3),0 20px 40px rgba(0,0,0,.6);color:#fff;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
 @keyframes popIn{from{transform:scale(.72);opacity:0}to{transform:scale(1);opacity:1}}
 .ovl-emoji{font-size:58px;display:block;margin-bottom:6px}
-.ovl-title{font-size:24px;font-weight:900;margin-bottom:6px}
-.ovl-msg{color:rgba(255,255,255,.6);font-size:13px;margin-bottom:14px;line-height:1.4}
-.ovl-stars{font-size:28px;letter-spacing:5px;margin:8px 0 18px}
+.ovl-title{font-size:26px;font-weight:900;margin-bottom:6px}
+.ovl-msg{color:rgba(255,255,255,.65);font-size:13px;margin-bottom:14px;line-height:1.5}
+.ovl-stars{font-size:30px;letter-spacing:5px;margin:8px 0 18px}
 .ovl-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);border:none;border-radius:16px;color:#fff;padding:14px 0;font-size:16px;font-weight:900;cursor:pointer;width:100%;margin-top:8px;box-shadow:0 5px 0 #3730a3;transition:transform .1s,box-shadow .1s;font-family:inherit;-webkit-tap-highlight-color:transparent}
 .ovl-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #3730a3}
 .ovl-btn.sec{background:rgba(255,255,255,.1);box-shadow:none;border:1.5px solid rgba(255,255,255,.22);margin-top:8px}
 
-/* Screen shake */
+/* ── Screen shake ── */
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .shaking{animation:shake .3s ease}
 </style>
@@ -71,7 +91,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#03050
     <span id="word-emoji">❓</span>
     <div id="word-slots"></div>
   </div>
-  <div id="chains-hud" id="chains-hud"></div>
+  <div id="lives-hud"></div>
 </div>
 
 <!-- Next letter hint -->
@@ -83,8 +103,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#03050
 <!-- HUD Bottom -->
 <div id="hud-bottom">
   <div id="ctrl-row">
-    <button class="ctrl-btn" id="btn-up"
-      ontouchstart="switchLane(-1);event.preventDefault()" onclick="switchLane(-1)">▲<br><span style="font-size:10px">ATAS</span></button>
+    <button id="btn-up" ontouchstart="switchLane(-1);event.preventDefault()" onclick="switchLane(-1)">▲<br><span style="font-size:11px">ATAS</span></button>
     <div id="lane-indicator">
       <div id="lane-dots">
         <div class="lane-dot" id="ld0"></div>
@@ -93,13 +112,22 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#03050
       </div>
       <div id="lane-label">JALUR</div>
     </div>
-    <button class="ctrl-btn" id="btn-dn"
-      ontouchstart="switchLane(1);event.preventDefault()" onclick="switchLane(1)">▼<br><span style="font-size:10px">BAWAH</span></button>
+    <button id="btn-dn" ontouchstart="switchLane(1);event.preventDefault()" onclick="switchLane(1)">▼<br><span style="font-size:11px">BAWAH</span></button>
   </div>
 </div>
 
 <!-- Flash -->
 <div id="flash"></div>
+
+<!-- Math Quiz -->
+<div id="math-quiz">
+  <div id="math-card">
+    <div id="math-label">❓ SOAL MATEMATIKA</div>
+    <div id="math-question">5 + 3 = ?</div>
+    <div id="math-timer-bar"><div id="math-timer-fill" style="width:100%"></div></div>
+    <div id="math-choices"></div>
+  </div>
+</div>
 
 <!-- Win/Lose overlay -->
 <div class="ovl" id="end-ovl">
@@ -117,16 +145,22 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#03050
 <script>
 'use strict';
 
-// ── Config ──────────────────────────────────────────────────────────────────
-const cfg = (() => {
-  try { return JSON.parse(sessionStorage.getItem('g15Config') || '{}'); } catch { return {}; }
-})();
+// ── Config ───────────────────────────────────────────────────────────────────
+const cfg = (() => { try { return JSON.parse(sessionStorage.getItem('g15Config') || '{}'); } catch { return {}; } })();
 const LEVEL = Math.max(1, Math.min(30, cfg.level || 1));
 
-function goBack() {
-  if (document.referrer) history.back();
-  else window.location.href = '../index.html';
-}
+function goBack() { if (document.referrer) history.back(); else window.location.href = '../index.html'; }
+
+// ── Background Themes (0=night, 1=sunrise, 2=forest, 3=mountain, 4=tropical) ─
+const BG_THEME = Math.min(4, Math.floor((LEVEL - 1) / 5));
+const THEMES = [
+  { sky: 0x03050f, skyMid: 0x070a1f, ground: 0x07090e, hill: 0x0a0e1e, railColor: 0x38bdf8, railShadow: 0x0ea5e9, sleeperColor: 0x92400e },
+  { sky: 0xff7c00, skyMid: 0xffd6a0, ground: 0x3d2b1f, hill: 0x9a5a2a, railColor: 0xfbbf24, railShadow: 0xf59e0b, sleeperColor: 0x6b3a1f },
+  { sky: 0x0c1f10, skyMid: 0x143520, ground: 0x071209, hill: 0x0a1e0d, railColor: 0x4ade80, railShadow: 0x22c55e, sleeperColor: 0x1a3a10 },
+  { sky: 0x0d1b2e, skyMid: 0x1a2f4a, ground: 0x081220, hill: 0x112240, railColor: 0x94a3b8, railShadow: 0x64748b, sleeperColor: 0x1e2a40 },
+  { sky: 0x1ea6ff, skyMid: 0x7dd3fc, ground: 0x1a5c1a, hill: 0x246824, railColor: 0xfcd34d, railShadow: 0xf59e0b, sleeperColor: 0x3d2b00 },
+];
+const T = THEMES[BG_THEME];
 
 // ── Word Banks ───────────────────────────────────────────────────────────────
 const WORDS = {
@@ -140,9 +174,9 @@ const WORDS = {
   medium: [
     {word:'SEKOLAH',emoji:'🏫'},{word:'JENDELA',emoji:'🪟'},{word:'KELINCI',emoji:'🐰'},
     {word:'BERUANG',emoji:'🐻'},{word:'PISANG',emoji:'🍌'},{word:'WORTEL',emoji:'🥕'},
-    {word:'JERUK',emoji:'🍊'},{word:'MELON',emoji:'🍈'},{word:'SEMANGKA',emoji:'🍉'},
-    {word:'PEPAYA',emoji:'🌺'},{word:'MANGGA',emoji:'🥭'},{word:'MAWAR',emoji:'🌹'},
-    {word:'BUNGA',emoji:'🌸'},{word:'POHON',emoji:'🌳'},{word:'LUMBA',emoji:'🐬'}
+    {word:'JERUK',emoji:'🍊'},{word:'SEMANGKA',emoji:'🍉'},{word:'PEPAYA',emoji:'🌺'},
+    {word:'MANGGA',emoji:'🥭'},{word:'MAWAR',emoji:'🌹'},{word:'BUNGA',emoji:'🌸'},
+    {word:'POHON',emoji:'🌳'},{word:'LUMBA',emoji:'🐬'},{word:'KUPU',emoji:'🦋'}
   ],
   hard: [
     {word:'KEMENANGAN',emoji:'🏆'},{word:'PEMBERANI',emoji:'🦸'},{word:'KEHIDUPAN',emoji:'🌱'},
@@ -151,16 +185,9 @@ const WORDS = {
     {word:'PENGETAHUAN',emoji:'📖'},{word:'KEINDAHAN',emoji:'🌟'},{word:'PERSAHABATAN',emoji:'🤝'}
   ]
 };
-
-function getDifficulty() {
-  if (LEVEL <= 7) return 'easy';
-  if (LEVEL <= 14) return 'medium';
-  return 'hard';
-}
-
+function getDifficulty() { return LEVEL <= 7 ? 'easy' : LEVEL <= 14 ? 'medium' : 'hard'; }
 function pickWords(count) {
-  const diff = getDifficulty();
-  const pool = [...WORDS[diff]];
+  const pool = [...WORDS[getDifficulty()]];
   const result = [];
   for (let i = 0; i < count && pool.length; i++) {
     const idx = Math.floor(Math.random() * pool.length);
@@ -168,239 +195,407 @@ function pickWords(count) {
   }
   return result;
 }
-
 const WORD_COUNT = Math.min(3 + Math.floor(LEVEL / 5), 6);
-const WORDS_LIST = pickWords(WORD_COUNT);
+let WORDS_LIST = pickWords(WORD_COUNT);
+
+// ── Lives System ─────────────────────────────────────────────────────────────
+const MAX_LIVES = getDifficulty() === 'easy' ? 4 : 3;
+let lives = MAX_LIVES;
 
 // ── Game State ───────────────────────────────────────────────────────────────
 let app, stage;
-let playerLane = 1;           // 0=top 1=mid 2=bottom
+let playerLane = 1;
 let currentWordIdx = 0;
 let currentLetterIdx = 0;
 let wrongTaps = 0;
+let mathCorrect = 0;
 let invincible = false;
-let gameSpeed = 2 + LEVEL * 0.15;
 let gameRunning = false;
+let mathQuizActive = false;
 let startTime = 0;
-let wordCompletedGreen = false;
+let gameSpeed = 2 + LEVEL * 0.15;
 
-// Pixi containers
-let bgLayer, trackLayer, trainContainer, boxLayer, particleLayer, hudLayer;
-let trainGfx;
+let bgLayer, trackLayer, trainContainer, boxLayer, particleLayer;
 let wheels = [];
 let steamPuffs = [];
 let letterBoxes = [];
-let stars = [];
+let bgStars = [];
 let sleepers = [];
+let bgClouds = [];
+let bgFireflies = [];
+let rainbow = null;
 let LANE_Y = [];
 let W = 0, H = 0;
-const TRAIN_X = 110;
+const TRAIN_X = 120;
+let mathBoxTimer = 0;
+const MATH_BOX_INTERVAL = () => 200 + Math.floor(Math.random() * 160);
+let nextMathAt = MATH_BOX_INTERVAL();
+let heartBoxTimer = 0;
+const HEART_BOX_INTERVAL = () => 350 + Math.floor(Math.random() * 200);
+let nextHeartAt = HEART_BOX_INTERVAL();
+let totalBoxSpawned = 0;
 
-// ── PixiJS Init ──────────────────────────────────────────────────────────────
+// ── Math Questions ────────────────────────────────────────────────────────────
+function genMathQuestion() {
+  const maxN = LEVEL <= 4 ? 5 : LEVEL <= 9 ? 10 : 15;
+  const useSubtract = LEVEL > 4;
+  const op = useSubtract && Math.random() < 0.4 ? '-' : '+';
+  let a, b, ans;
+  if (op === '+') {
+    a = Math.floor(Math.random() * (maxN + 1));
+    b = Math.floor(Math.random() * (maxN - a + 1));
+    ans = a + b;
+  } else {
+    a = Math.floor(Math.random() * (maxN + 1));
+    b = Math.floor(Math.random() * (a + 1));
+    ans = a - b;
+  }
+  return { text: `${a} ${op} ${b} = ?`, answer: ans };
+}
+
+function genWrongOptions(correct, count) {
+  const opts = new Set([correct]);
+  while (opts.size < count + 1) {
+    const delta = Math.floor(Math.random() * 5) + 1;
+    const wrong = Math.max(0, correct + (Math.random() < 0.5 ? delta : -delta));
+    if (wrong !== correct && wrong >= 0 && wrong <= 20) opts.add(wrong);
+  }
+  return shuffle([...opts]).slice(0, count + 1);
+}
+
+// ── PixiJS Init ───────────────────────────────────────────────────────────────
 async function initPixi() {
   app = new PIXI.Application();
   await app.init({
     canvas: document.getElementById('pixi-canvas'),
-    width: window.innerWidth,
-    height: window.innerHeight,
-    backgroundColor: 0x03050f,
-    antialias: true,
-    resolution: window.devicePixelRatio || 1,
-    autoDensity: true
+    width: window.innerWidth, height: window.innerHeight,
+    backgroundColor: T.sky, antialias: true,
+    resolution: window.devicePixelRatio || 1, autoDensity: true
   });
-
-  W = app.screen.width;
-  H = app.screen.height;
-
-  // Lane Y positions (vertical center of each lane)
-  const topHUD = 120;
-  const botHUD = 110;
+  W = app.screen.width; H = app.screen.height;
+  const topHUD = 120, botHUD = 115;
   const available = H - topHUD - botHUD;
   LANE_Y = [
     topHUD + available * 0.18,
-    topHUD + available * 0.5,
+    topHUD + available * 0.50,
     topHUD + available * 0.82
   ];
-
   stage = app.stage;
   bgLayer       = new PIXI.Container(); stage.addChild(bgLayer);
   trackLayer    = new PIXI.Container(); stage.addChild(trackLayer);
   trainContainer= new PIXI.Container(); stage.addChild(trainContainer);
   boxLayer      = new PIXI.Container(); stage.addChild(boxLayer);
   particleLayer = new PIXI.Container(); stage.addChild(particleLayer);
-  hudLayer      = new PIXI.Container(); stage.addChild(hudLayer);
 
   buildBackground();
   buildTracks();
   buildTrain();
-  buildHudLayer();
+  updateLivesHUD();
   updateLaneDots();
   refreshHUD();
 
   gameRunning = true;
   startTime = Date.now();
-
   let spawnTimer = 0;
-  const spawnInterval = () => 80 + (10 - Math.min(currentLetterIdx, 8)) * 8;
+  const spawnInterval = () => Math.max(45, 90 - LEVEL * 2);
 
   app.ticker.add((ticker) => {
-    if (!gameRunning) return;
+    if (!gameRunning || mathQuizActive) return;
     const dt = ticker.deltaTime;
 
     // Scroll sleepers
-    for (const s of sleepers) {
-      s.x -= gameSpeed * dt;
-      if (s.x < -20) s.x += W + 40;
+    for (const s of sleepers) { s.x -= gameSpeed * dt; if (s.x < -20) s.x += W + 40; }
+
+    // Stars (night/space theme)
+    if (BG_THEME === 0 || BG_THEME === 3) {
+      for (const st of bgStars) {
+        st.x -= st._speed * dt;
+        if (st.x < 0) { st.x = W; st.y = Math.random() * H * 0.65; }
+      }
     }
 
-    // Scroll stars
-    for (const st of stars) {
-      st.x -= st.speed * dt;
-      if (st.x < 0) { st.x = W; st.y = Math.random() * H * 0.65; }
+    // Clouds move
+    for (const c of bgClouds) {
+      c.x -= c._speed * dt;
+      if (c.x < -200) c.x = W + 150;
+    }
+
+    // Fireflies (forest theme)
+    if (BG_THEME === 2) {
+      for (const ff of bgFireflies) {
+        ff._phase += 0.04 * dt;
+        ff.alpha = 0.3 + Math.sin(ff._phase) * 0.6;
+        ff.x += ff._vx * dt;
+        ff.y += Math.sin(ff._phase * 0.7) * 0.3 * dt;
+        if (ff.x < 0) ff.x = W; if (ff.x > W) ff.x = 0;
+      }
+    }
+
+    // Rainbow fade
+    if (rainbow) {
+      rainbow.alpha -= 0.008 * dt;
+      if (rainbow.alpha <= 0) { bgLayer.removeChild(rainbow); rainbow = null; }
     }
 
     // Steam puffs
     for (let i = steamPuffs.length - 1; i >= 0; i--) {
       const p = steamPuffs[i];
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.alpha -= 0.025 * dt;
-      p.scale.x += 0.02 * dt;
-      p.scale.y += 0.02 * dt;
+      p.x += p._vx * dt; p.y += p._vy * dt;
+      p.alpha -= 0.018 * dt;
+      p.scale.x += 0.025 * dt; p.scale.y += 0.025 * dt;
       if (p.alpha <= 0) { particleLayer.removeChild(p); steamPuffs.splice(i, 1); }
     }
 
-    // Wheels spin
-    for (const w of wheels) {
-      w.rotation += 0.08 * dt * (gameSpeed / 2);
-    }
+    // Wheel spin
+    for (const w of wheels) w.rotation += 0.09 * dt * (gameSpeed / 2);
 
-    // Spawn letter boxes
+    // Spawn
     spawnTimer += dt;
+    totalBoxSpawned += dt;
+    mathBoxTimer += dt;
+    heartBoxTimer += dt;
+
     if (spawnTimer >= spawnInterval()) {
       spawnTimer = 0;
       spawnLetterBox();
     }
 
-    // Move letter boxes
+    // Math box
+    if (mathBoxTimer >= nextMathAt) {
+      mathBoxTimer = 0; nextMathAt = MATH_BOX_INTERVAL();
+      spawnSpecialBox('math');
+    }
+
+    // Heart box (only if lives < MAX)
+    if (heartBoxTimer >= nextHeartAt && lives < MAX_LIVES) {
+      heartBoxTimer = 0; nextHeartAt = HEART_BOX_INTERVAL();
+      spawnSpecialBox('heart');
+    }
+
+    // Move + check boxes
     for (let i = letterBoxes.length - 1; i >= 0; i--) {
       const b = letterBoxes[i];
       b.container.x -= gameSpeed * dt;
 
-      // Glow pulse for correct box
-      if (b.isTarget && b.glowGfx) {
-        b.glowPhase = (b.glowPhase || 0) + 0.1 * dt;
-        b.glowGfx.alpha = 0.5 + Math.sin(b.glowPhase) * 0.4;
+      // Glow pulse
+      if (b.glowGfx) {
+        b._glowPhase = (b._glowPhase || 0) + 0.1 * dt;
+        b.glowGfx.alpha = 0.45 + Math.sin(b._glowPhase) * 0.4;
       }
 
-      // Check collection
-      if (!invincible && b.container.x < TRAIN_X + 50 && b.container.x > TRAIN_X - 50) {
-        if (Math.round(b.lane) === playerLane) {
+      // Collision: must match lane AND be within Y proximity (fix phantom hit)
+      if (!invincible && b.container.x < TRAIN_X + 52 && b.container.x > TRAIN_X - 52) {
+        if (b.lane === playerLane && Math.abs(b.container.y - trainContainer.y) < 42) {
           collectBox(b, i);
           continue;
         }
       }
 
-      // Remove if off screen
-      if (b.container.x < -80) {
-        boxLayer.removeChild(b.container);
-        letterBoxes.splice(i, 1);
-      }
+      if (b.container.x < -90) { boxLayer.removeChild(b.container); letterBoxes.splice(i, 1); }
     }
 
-    // Train bounce landing
+    // Train bounce
     if (trainContainer._bounceT > 0) {
       trainContainer._bounceT -= 0.1 * dt;
-      const off = Math.sin(trainContainer._bounceT * Math.PI) * 6;
-      trainContainer.y = LANE_Y[playerLane] - off;
+      trainContainer.y = LANE_Y[playerLane] - Math.sin(trainContainer._bounceT * Math.PI) * 6;
     } else {
       trainContainer._bounceT = 0;
       trainContainer.y = LANE_Y[playerLane];
     }
 
-    // Emit steam occasionally
-    if (Math.random() < 0.04 * dt) emitSteam();
+    // Steam emit
+    if (Math.random() < 0.05 * dt) emitSteam();
   });
 }
 
-// ── Background ───────────────────────────────────────────────────────────────
+// ── Background ────────────────────────────────────────────────────────────────
 function buildBackground() {
-  // Sky gradient via mesh / rect trick
+  // Sky base
   const sky = new PIXI.Graphics();
-  sky.rect(0, 0, W, H).fill({color: 0x03050f});
+  sky.rect(0, 0, W, H).fill({ color: T.sky });
   bgLayer.addChild(sky);
 
-  // Moon
-  const moon = new PIXI.Graphics();
-  moon.circle(0, 0, 28).fill({color: 0xfef9c3});
-  moon.circle(-8, -8, 20).fill({color: 0x03050f});
-  moon.x = W * 0.85; moon.y = H * 0.1;
-  bgLayer.addChild(moon);
+  // Gradient overlay for sky depth
+  const skyGrad = new PIXI.Graphics();
+  skyGrad.rect(0, 0, W, H * 0.5).fill({ color: T.skyMid });
+  skyGrad.alpha = 0.4;
+  bgLayer.addChild(skyGrad);
 
-  // Stars
-  for (let i = 0; i < 80; i++) {
-    const g = new PIXI.Graphics();
-    const r = Math.random() * 1.5 + 0.5;
-    g.circle(0, 0, r).fill({color: 0xffffff});
-    g.x = Math.random() * W;
-    g.y = Math.random() * H * 0.65;
-    g.alpha = Math.random() * 0.6 + 0.2;
-    g.speed = Math.random() * 0.3 + 0.1;
-    bgLayer.addChild(g);
-    stars.push(g);
+  if (BG_THEME === 0) {
+    // Night: moon + stars
+    const moon = new PIXI.Graphics();
+    moon.circle(0, 0, 30).fill({ color: 0xfef9c3 });
+    moon.circle(-9, -9, 22).fill({ color: T.sky });
+    moon.x = W * 0.84; moon.y = H * 0.09;
+    bgLayer.addChild(moon);
+    for (let i = 0; i < 90; i++) {
+      const g = new PIXI.Graphics();
+      const r = Math.random() * 1.6 + 0.4;
+      g.circle(0, 0, r).fill({ color: 0xffffff });
+      g.x = Math.random() * W; g.y = Math.random() * H * 0.62;
+      g.alpha = Math.random() * 0.6 + 0.2;
+      g._speed = Math.random() * 0.2 + 0.05;
+      bgLayer.addChild(g); bgStars.push(g);
+    }
+  } else if (BG_THEME === 1) {
+    // Sunrise: orange sky, sun
+    const sun = new PIXI.Graphics();
+    sun.circle(0, 0, 38).fill({ color: 0xfbbf24 });
+    sun.circle(0, 0, 28).fill({ color: 0xfde68a });
+    sun.x = W * 0.8; sun.y = H * 0.22;
+    bgLayer.addChild(sun);
+    // Sun rays
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const ray = new PIXI.Graphics();
+      ray.rect(-3, 0, 6, 22).fill({ color: 0xfde68a });
+      ray.x = W * 0.8; ray.y = H * 0.22;
+      ray.rotation = angle; ray.alpha = 0.5;
+      ray.pivot.set(0, -44);
+      bgLayer.addChild(ray);
+    }
+  } else if (BG_THEME === 2) {
+    // Forest: fireflies
+    for (let i = 0; i < 20; i++) {
+      const ff = new PIXI.Graphics();
+      ff.circle(0, 0, 2.5).fill({ color: 0xfef08a });
+      ff.x = Math.random() * W; ff.y = Math.random() * H * 0.7;
+      ff._phase = Math.random() * Math.PI * 2;
+      ff._vx = (Math.random() - 0.5) * 0.4;
+      bgLayer.addChild(ff); bgFireflies.push(ff);
+    }
+  } else if (BG_THEME === 3) {
+    // Mountain: stars
+    for (let i = 0; i < 60; i++) {
+      const g = new PIXI.Graphics();
+      const r = Math.random() * 1.4 + 0.4;
+      g.circle(0, 0, r).fill({ color: 0xcfe8ff });
+      g.x = Math.random() * W; g.y = Math.random() * H * 0.55;
+      g.alpha = Math.random() * 0.5 + 0.2;
+      g._speed = Math.random() * 0.15 + 0.05;
+      bgLayer.addChild(g); bgStars.push(g);
+    }
+    // Snow peaks
+    const peaks = [[0.2, 0.55], [0.45, 0.45], [0.65, 0.52], [0.85, 0.42]];
+    for (const [px, py] of peaks) {
+      const p = new PIXI.Graphics();
+      const pw = 120 + Math.random() * 80;
+      p.poly([0, 0, -pw/2, pw*0.6, pw/2, pw*0.6]).fill({ color: 0x2a3f6a });
+      p.poly([0, 0, -pw*0.22, pw*0.22, pw*0.22, pw*0.22]).fill({ color: 0xe0f2fe });
+      p.x = W * px; p.y = H * py;
+      bgLayer.addChild(p);
+    }
+  } else if (BG_THEME === 4) {
+    // Tropical: sun + ocean shimmer
+    const sun = new PIXI.Graphics();
+    sun.circle(0, 0, 44).fill({ color: 0xfbbf24 });
+    sun.x = W * 0.7; sun.y = H * 0.15;
+    bgLayer.addChild(sun);
+    // Ocean band
+    const ocean = new PIXI.Graphics();
+    ocean.rect(0, H * 0.58, W, H * 0.14).fill({ color: 0x0ea5e9 });
+    ocean.alpha = 0.35;
+    bgLayer.addChild(ocean);
   }
 
-  // Ground silhouette
+  // Clouds (all themes)
+  const cloudCount = BG_THEME === 1 ? 5 : BG_THEME === 4 ? 4 : 3;
+  const cloudColors = BG_THEME === 0 ? [0x1e293b] : BG_THEME === 2 ? [0x1a3a20] : BG_THEME === 3 ? [0x2a4a70] : [0xffffff, 0xe0f2fe];
+  for (let i = 0; i < cloudCount; i++) {
+    const c = buildCloud(cloudColors[i % cloudColors.length], 0.6 + i * 0.1);
+    c.x = Math.random() * W; c.y = H * (0.06 + Math.random() * 0.20);
+    c._speed = 0.18 + Math.random() * 0.18;
+    bgLayer.addChild(c); bgClouds.push(c);
+  }
+
+  // Background silhouettes (trees/buildings)
+  if (BG_THEME === 2) {
+    // Tree line
+    for (let x = 0; x < W + 80; x += 55) {
+      const tree = new PIXI.Graphics();
+      tree.poly([0, 0, -18, 38, 18, 38]).fill({ color: 0x14532d });
+      tree.poly([0, -10, -14, 24, 14, 24]).fill({ color: 0x166534 });
+      tree.rect(-4, 38, 8, 16).fill({ color: 0x78350f });
+      tree.x = x + Math.random() * 20; tree.y = H * 0.65;
+      bgLayer.addChild(tree);
+    }
+  } else if (BG_THEME === 4) {
+    // Palm trees
+    for (let x = 0; x < W; x += 200) {
+      const palm = new PIXI.Graphics();
+      palm.rect(-5, 0, 10, 55).fill({ color: 0x92400e });
+      for (let a = 0; a < 6; a++) {
+        const angle = (a / 6) * Math.PI * 2;
+        palm.ellipse(Math.cos(angle) * 28, Math.sin(angle) * 14 - 8, 28, 9).fill({ color: 0x15803d });
+      }
+      palm.x = x + Math.random() * 80; palm.y = H * 0.6;
+      bgLayer.addChild(palm);
+    }
+  } else if (BG_THEME === 3) {
+    // Pine trees
+    for (let x = 0; x < W; x += 60) {
+      const pine = new PIXI.Graphics();
+      pine.poly([0, 0, -12, 30, 12, 30]).fill({ color: 0x1e3a5f });
+      pine.poly([0, -8, -9, 18, 9, 18]).fill({ color: 0x1e4060 });
+      pine.rect(-3, 30, 6, 12).fill({ color: 0x3b1f0a });
+      pine.x = x + Math.random() * 20; pine.y = H * 0.63;
+      bgLayer.addChild(pine);
+    }
+  }
+
+  // Ground
   const ground = new PIXI.Graphics();
-  ground.rect(0, H * 0.72, W, H * 0.28).fill({color: 0x07090e});
+  ground.rect(0, H * 0.72, W, H * 0.28).fill({ color: T.ground });
   bgLayer.addChild(ground);
 
   // Hills
-  for (let i = 0; i < 6; i++) {
-    const h = new PIXI.Graphics();
-    const bw = 160 + Math.random() * 120;
-    const bh = 50 + Math.random() * 60;
-    h.ellipse(0, 0, bw, bh).fill({color: 0x0a0e1e});
-    h.x = Math.random() * W;
-    h.y = H * 0.72;
-    bgLayer.addChild(h);
+  for (let i = 0; i < 5; i++) {
+    const hill = new PIXI.Graphics();
+    const bw = 180 + Math.random() * 130; const bh = 55 + Math.random() * 55;
+    hill.ellipse(0, 0, bw, bh).fill({ color: T.hill });
+    hill.x = Math.random() * W; hill.y = H * 0.72;
+    bgLayer.addChild(hill);
   }
 }
 
-// ── Tracks ───────────────────────────────────────────────────────────────────
+function buildCloud(color, alpha) {
+  const c = new PIXI.Container();
+  const g = new PIXI.Graphics();
+  g.circle(0, 0, 22).fill({ color });
+  g.circle(26, 4, 18).fill({ color });
+  g.circle(-24, 5, 16).fill({ color });
+  g.circle(12, -10, 16).fill({ color });
+  g.rect(-28, 5, 72, 18).fill({ color }); // base fill
+  c.addChild(g);
+  c.alpha = alpha;
+  return c;
+}
+
+// ── Tracks ────────────────────────────────────────────────────────────────────
 function buildTracks() {
   for (let lane = 0; lane < 3; lane++) {
-    const laneY = LANE_Y[lane];
-
-    // Rail top
+    const lY = LANE_Y[lane];
     const rail1 = new PIXI.Graphics();
-    rail1.rect(0, laneY + 14, W, 4).fill({color: 0x38bdf8});
+    rail1.rect(0, lY + 14, W, 5).fill({ color: T.railColor });
     trackLayer.addChild(rail1);
-
-    // Rail bottom
     const rail2 = new PIXI.Graphics();
-    rail2.rect(0, laneY + 24, W, 4).fill({color: 0x38bdf8});
+    rail2.rect(0, lY + 25, W, 5).fill({ color: T.railColor });
     trackLayer.addChild(rail2);
-
     // Rail glow
     const glow = new PIXI.Graphics();
-    glow.rect(0, laneY + 12, W, 18).fill({color: 0x0ea5e9});
-    glow.alpha = 0.15;
-    trackLayer.addChild(glow);
-
+    glow.rect(0, lY + 10, W, 24).fill({ color: T.railShadow });
+    glow.alpha = 0.18; trackLayer.addChild(glow);
     // Sleepers
     for (let x = 0; x < W + 40; x += 40) {
       const sl = new PIXI.Graphics();
-      sl.rect(-6, laneY + 10, 12, 22).fill({color: 0x92400e});
-      sl.rect(-6, laneY + 10, 12, 22).stroke({width:1, color:0x78350f});
-      sl.x = x;
-      trackLayer.addChild(sl);
-      sleepers.push(sl);
+      sl.rect(-7, lY + 10, 14, 24).fill({ color: T.sleeperColor });
+      sl.rect(-7, lY + 10, 14, 24).stroke({ width: 1, color: 0x000000, alpha: 0.3 });
+      sl.x = x; trackLayer.addChild(sl); sleepers.push(sl);
     }
   }
 }
 
-// ── Train ────────────────────────────────────────────────────────────────────
+// ── Train: Blue 4-car set ──────────────────────────────────────────────────────
 function buildTrain() {
   trainContainer.x = TRAIN_X;
   trainContainer.y = LANE_Y[1];
@@ -408,409 +603,482 @@ function buildTrain() {
 
   const g = new PIXI.Graphics();
 
-  // Tender (back car)
-  g.roundRect(18, -10, 36, 22, 4).fill({color: 0xb45309});
-  // Cab
-  g.roundRect(-28, -22, 52, 28, 6).fill({color: 0xd97706});
-  g.roundRect(-22, -30, 32, 12, 4).fill({color: 0xfbbf24}); // roof
-  // Window
-  g.roundRect(-18, -20, 12, 12, 3).fill({color: 0x7dd3fc});
-  g.roundRect(2, -20, 12, 12, 3).fill({color: 0x7dd3fc});
-  // Boiler
-  g.roundRect(-52, -16, 30, 24, 10).fill({color: 0xf59e0b});
-  // Chimney
-  g.roundRect(-44, -30, 12, 16, 4).fill({color: 0x92400e});
-  g.roundRect(-47, -34, 18, 6, 3).fill({color: 0x78350f});
-  // Stripe
-  g.rect(-52, -5, 80, 3).fill({color: 0xfcd34d});
+  // ── Locomotive (leftmost = front) ──
+  const LC = 0x1d4ed8;  // dark blue body
+  const LB = 0x3b82f6;  // mid blue boiler
+  const LL = 0x60a5fa;  // light blue cab
+  const LW = 0xbae6fd;  // window glass
+  const LK = 0x1c1917;  // black (chimney/smoke)
+  const LG = 0xfbbf24;  // gold detail
+
+  // Boiler body
+  g.roundRect(-78, -18, 55, 26, 12).fill({ color: LB });
+  // Boiler highlight stripe
+  g.rect(-76, -18, 51, 6).fill({ color: LL });
+  g.rect(-76, -18, 51, 6); // top highlight
+
+  // Chimney — CENTER of boiler (boiler center = -78 + 55/2 = -50.5)
+  g.roundRect(-57, -38, 14, 22, 4).fill({ color: LK });
+  g.roundRect(-61, -42, 22, 7, 3).fill({ color: LK }); // chimney cap
+  g.circle(-50, -44, 5).fill({ color: 0x374151 }); // smoke puff hint
+
+  // Dome (pressure dome, at ~2/3 of boiler)
+  g.circle(-40, -18, 9).fill({ color: LC });
+  g.circle(-40, -18, 6).fill({ color: LG });
+
+  // Headlamp
+  g.circle(-79, -10, 6).fill({ color: 0xfef9c3 });
+  g.circle(-79, -10, 6).stroke({ width: 1.5, color: LK });
+  g.circle(-79, -10, 4).fill({ color: 0xfde68a });
+
+  // Cab body
+  g.roundRect(-25, -24, 42, 32, 7).fill({ color: LL });
+  // Cab roof
+  g.roundRect(-27, -30, 46, 10, 5).fill({ color: LC });
+  // Cab windows (2)
+  g.roundRect(-21, -22, 14, 14, 3).fill({ color: LW });
+  g.roundRect(-21, -22, 14, 14, 3).stroke({ width: 1.5, color: LB });
+  g.roundRect(0, -22, 14, 14, 3).fill({ color: LW });
+  g.roundRect(0, -22, 14, 14, 3).stroke({ width: 1.5, color: LB });
+
+  // Gold stripe along full body
+  g.rect(-78, -3, 100, 4).fill({ color: LG });
+  // Underframe / skirt
+  g.roundRect(-78, 8, 100, 6, 2).fill({ color: LC });
+
   // Cow-catcher
-  g.poly([-52, 8, -62, 14, -52, 14]).fill({color: 0x6b7280});
+  g.poly([-78, 8, -92, 16, -78, 16]).fill({ color: 0x6b7280 });
+  g.poly([-78, 8, -92, 16, -78, 16]).stroke({ width: 1, color: 0x9ca3af });
+
+  // ── Tender ──
+  const gap = 4;
+  const TS = 18 + gap; // tender start x
+  g.roundRect(TS, -14, 38, 22, 5).fill({ color: LC });
+  g.roundRect(TS, -14, 38, 22, 5).stroke({ width: 1.5, color: LL });
+  // Coal pile
+  g.ellipse(TS + 19, -16, 17, 8).fill({ color: LK });
+  // Coal highlights
+  for (let ci = 0; ci < 4; ci++) {
+    g.circle(TS + 8 + ci * 6, -17, 2).fill({ color: 0x374151 });
+  }
+
+  // ── Passenger Car ──
+  const PC = 60; // start x
+  g.roundRect(PC, -18, 52, 28, 6).fill({ color: LL });
+  g.roundRect(PC, -18, 52, 28, 6).stroke({ width: 1.5, color: LC });
+  g.roundRect(PC, -18, 52, 8, 6).fill({ color: LC }); // roof
+  // Windows (3)
+  for (let wi = 0; wi < 3; wi++) {
+    g.roundRect(PC + 6 + wi * 15, -14, 9, 12, 2).fill({ color: LW });
+  }
+  // Stripe
+  g.rect(PC, -4, 52, 3).fill({ color: LG });
+  // Door line
+  g.rect(PC + 22, -10, 2, 18).fill({ color: LC });
+
+  // ── Caboose ──
+  const CC2 = 116; // caboose start x
+  const CABOOSE = 0x ef4444; // reddish — actually let's make it dark navy with red accent
+  g.roundRect(CC2, -16, 30, 24, 6).fill({ color: 0x1e3a8a }); // dark navy
+  g.roundRect(CC2, -16, 30, 24, 6).stroke({ width: 1.5, color: 0x3b82f6 });
+  g.roundRect(CC2, -16, 30, 8, 6).fill({ color: LC }); // roof
+  // Cupola
+  g.roundRect(CC2 + 8, -26, 14, 12, 4).fill({ color: 0x1d4ed8 });
+  g.roundRect(CC2 + 10, -24, 5, 8, 2).fill({ color: LW }); // cupola window
+  // Caboose marker (red light)
+  g.circle(CC2 + 28, -6, 4).fill({ color: 0xef4444 });
+  g.circle(CC2 + 28, -6, 4).stroke({ width: 1, color: 0xfca5a5 });
+
+  // ── Couplers ──
+  const couplerX = [TS - 2, PC - 2, CC2 - 2];
+  for (const cx of couplerX) {
+    g.roundRect(cx, -2, 4, 6, 1).fill({ color: 0x6b7280 });
+  }
 
   trainContainer.addChild(g);
-  trainGfx = g;
 
-  // Wheels (5 wheels)
-  const wheelPositions = [-44, -28, -10, 8, 28];
-  for (const wx of wheelPositions) {
+  // ── Wheels ──
+  // Loco: 3 large driving wheels, 1 small front, 1 small rear
+  const locoWheels = [
+    { x: -64, r: 11 }, { x: -47, r: 11 }, { x: -30, r: 11 }, // driving
+    { x: -73, r: 7 },  { x: 8, r: 7 }                         // small
+  ];
+  const smallCar = [
+    { x: TS + 4, r: 7 }, { x: TS + 28, r: 7 },   // tender
+    { x: PC + 6, r: 7 }, { x: PC + 38, r: 7 },    // passenger
+    { x: CC2 + 4, r: 7 }, { x: CC2 + 20, r: 7 },  // caboose
+  ];
+  for (const { x, r } of [...locoWheels, ...smallCar]) {
     const wc = new PIXI.Container();
-    wc.x = wx; wc.y = 12;
-
-    const wr = 8 + (Math.abs(wx) > 20 ? 0 : 2);
+    wc.x = x; wc.y = 14;
     const wg = new PIXI.Graphics();
-    wg.circle(0, 0, wr).fill({color: 0x1c1917});
-    wg.circle(0, 0, wr).stroke({width:2, color:0xfbbf24});
-    wg.rect(-1, -wr+2, 2, wr*2-4).fill({color: 0xfbbf24});
-    wg.rect(-wr+2, -1, wr*2-4, 2).fill({color: 0xfbbf24});
-    wg.circle(0, 0, 2).fill({color: 0xfbbf24});
+    wg.circle(0, 0, r).fill({ color: LK });
+    wg.circle(0, 0, r).stroke({ width: 2, color: 0x60a5fa });
+    wg.rect(-1.5, -r + 2, 3, r * 2 - 4).fill({ color: 0x93c5fd }); // spoke
+    wg.rect(-r + 2, -1.5, r * 2 - 4, 3).fill({ color: 0x93c5fd }); // spoke
+    wg.circle(0, 0, 2.5).fill({ color: 0x60a5fa });
     wc.addChild(wg);
     trainContainer.addChild(wc);
     wheels.push(wc);
   }
 }
 
-// ── Steam Puffs ──────────────────────────────────────────────────────────────
+// ── Steam ─────────────────────────────────────────────────────────────────────
 function emitSteam() {
-  const puff = new PIXI.Graphics();
-  const r = 4 + Math.random() * 4;
-  puff.circle(0, 0, r).fill({color: 0xe0e7ff});
-  puff.x = TRAIN_X - 44;
-  puff.y = trainContainer.y - 34;
-  puff.alpha = 0.5;
-  puff.vx = -(0.3 + Math.random() * 0.3);
-  puff.vy = -(0.4 + Math.random() * 0.5);
-  particleLayer.addChild(puff);
-  steamPuffs.push(puff);
+  for (let j = 0; j < 2; j++) {
+    const puff = new PIXI.Graphics();
+    const r = 5 + Math.random() * 5;
+    puff.circle(0, 0, r).fill({ color: 0xdbeafe });
+    puff.x = TRAIN_X - 50 + (Math.random() - 0.5) * 8;
+    puff.y = trainContainer.y - 42;
+    puff.alpha = 0.55;
+    puff._vx = -(0.4 + Math.random() * 0.5);
+    puff._vy = -(0.5 + Math.random() * 0.7);
+    particleLayer.addChild(puff);
+    steamPuffs.push(puff);
+  }
 }
 
-// ── Letter Boxes ─────────────────────────────────────────────────────────────
-const BOX_COLORS = [0xe11d48, 0x7c3aed, 0x0284c7, 0x059669, 0xd97706, 0xbe123c];
+// ── Letter / Special Boxes ────────────────────────────────────────────────────
+const BOX_COLORS = [0xe11d48, 0x7c3aed, 0x0284c7, 0x059669, 0xd97706, 0xbe123c, 0x0d9488, 0x6d28d9];
 
 function spawnLetterBox() {
   if (!gameRunning) return;
   const word = WORDS_LIST[currentWordIdx];
   if (!word) return;
-
-  // Decide what letters to put on lanes
   const targetLetter = word.word[currentLetterIdx];
   const allLetters = 'ABCDEFGHIJKLMNOPRSTUVWY';
-
-  // Fill 1-3 lanes
-  const lanesToFill = [0, 1, 2];
-  shuffle(lanesToFill);
-  const numBoxes = 1 + Math.floor(Math.random() * 2); // 1 or 2 boxes
-
-  const targetLane = lanesToFill[0];
-
+  const lanesToFill = shuffle([0, 1, 2]);
+  const numBoxes = 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < Math.min(numBoxes, 3); i++) {
     const lane = lanesToFill[i];
-    const isTarget = (i === 0); // first box is always the target letter on target lane
+    const isTarget = (i === 0);
     const letter = isTarget ? targetLetter : randomDistractor(targetLetter, allLetters);
     const color = BOX_COLORS[Math.floor(Math.random() * BOX_COLORS.length)];
-
-    const box = createLetterBox(letter, lane, isTarget, color);
-    letterBoxes.push(box);
+    letterBoxes.push(createBox({ type: 'letter', lane, letter, isTarget, color }));
   }
 }
 
-function randomDistractor(avoid, pool) {
-  let c;
-  do { c = pool[Math.floor(Math.random() * pool.length)]; } while (c === avoid);
-  return c;
+function spawnSpecialBox(type) {
+  if (!gameRunning) return;
+  const lane = Math.floor(Math.random() * 3);
+  const color = type === 'math' ? 0xd97706 : 0x16a34a;
+  letterBoxes.push(createBox({ type, lane, letter: type === 'math' ? '?' : '❤', isTarget: false, color }));
 }
 
-function createLetterBox(letter, lane, isTarget, color) {
-  const container = new PIXI.Container();
-  const laneY = LANE_Y[lane];
-  container.x = W + 50;
-  container.y = laneY - 8;
+function randomDistractor(avoid, pool) {
+  let c; do { c = pool[Math.floor(Math.random() * pool.length)]; } while (c === avoid); return c;
+}
 
+function createBox({ type, lane, letter, isTarget, color }) {
+  const container = new PIXI.Container();
+  const lY = LANE_Y[lane];
+  container.x = W + 55; container.y = lY - 8;
   const BW = 44, BH = 44;
 
-  // Glow for target
+  // Glow
   let glowGfx = null;
-  if (isTarget) {
+  const glowColor = type === 'math' ? 0xfbbf24 : type === 'heart' ? 0x4ade80 : isTarget ? 0xfbbf24 : null;
+  if (glowColor) {
     glowGfx = new PIXI.Graphics();
-    glowGfx.roundRect(-BW/2 - 6, -BH/2 - 6, BW + 12, BH + 12, 10).fill({color: 0xfbbf24});
-    glowGfx.alpha = 0.6;
+    glowGfx.roundRect(-BW/2 - 7, -BH/2 - 7, BW + 14, BH + 14, 11).fill({ color: glowColor });
+    glowGfx.alpha = 0.55;
     container.addChild(glowGfx);
   }
 
   // Box body
   const bg = new PIXI.Graphics();
-  bg.roundRect(-BW/2, -BH/2, BW, BH, 10).fill({color});
-  bg.roundRect(-BW/2, -BH/2, BW, BH, 10).stroke({width: isTarget ? 3 : 1.5, color: isTarget ? 0xfbbf24 : 0xffffff, alpha: isTarget ? 1 : 0.4});
+  bg.roundRect(-BW/2, -BH/2, BW, BH, 10).fill({ color });
+  bg.roundRect(-BW/2, -BH/2, BW, BH, 10).stroke({
+    width: isTarget || type !== 'letter' ? 3 : 1.5,
+    color: glowColor || 0xffffff,
+    alpha: glowColor ? 1 : 0.4
+  });
   container.addChild(bg);
 
-  // Letter text
+  // Top shine
+  const shine = new PIXI.Graphics();
+  shine.roundRect(-BW/2 + 2, -BH/2 + 2, BW - 4, 10, 6).fill({ color: 0xffffff });
+  shine.alpha = 0.18; container.addChild(shine);
+
+  // Label
+  const isEmoji = type !== 'letter';
   const txt = new PIXI.Text({
-    text: letter,
+    text: isEmoji ? (type === 'math' ? '?' : '♥') : letter,
     style: {
       fontFamily: 'Fredoka One, sans-serif',
-      fontSize: 22,
+      fontSize: isEmoji ? 26 : 22,
       fontWeight: '900',
       fill: 0xffffff,
-      dropShadow: true,
-      dropShadowBlur: 3,
-      dropShadowDistance: 2,
-      dropShadowColor: 0x000000
+      dropShadow: true, dropShadowBlur: 4, dropShadowDistance: 2, dropShadowColor: 0x000000
     }
   });
   txt.anchor.set(0.5);
   container.addChild(txt);
 
   boxLayer.addChild(container);
-  return { container, lane, letter, isTarget, glowGfx, glowPhase: 0 };
+  return { container, lane, letter, isTarget, type, glowGfx, _glowPhase: 0 };
 }
 
+// ── Box Collection ────────────────────────────────────────────────────────────
 function collectBox(box, idx) {
-  const word = WORDS_LIST[currentWordIdx];
-  if (!word) return;
-
-  if (box.isTarget) {
-    // Correct!
-    spawnCollectParticles(box.container.x, box.container.y);
+  if (box.type === 'heart') {
+    lives = Math.min(MAX_LIVES, lives + 1);
+    spawnCollectParticles(box.container.x, box.container.y, 0x4ade80);
+    updateLivesHUD();
+    flashScreen('green');
     boxLayer.removeChild(box.container);
     letterBoxes.splice(idx, 1);
-
-    // Advance
-    currentLetterIdx++;
-    if (currentLetterIdx >= word.word.length) {
-      onWordComplete();
-    } else {
-      refreshHUD();
-    }
-  } else {
-    // Wrong!
-    if (!invincible) {
-      wrongTaps++;
-      triggerWrong();
-    }
-    boxLayer.removeChild(box.container);
-    letterBoxes.splice(idx, 1);
-  }
-}
-
-// ── Particles ────────────────────────────────────────────────────────────────
-function spawnCollectParticles(x, y) {
-  const colors = [0xfbbf24, 0x4ade80, 0x38bdf8, 0xf472b6, 0xc084fc];
-  for (let i = 0; i < 12; i++) {
-    const p = new PIXI.Graphics();
-    const r = 3 + Math.random() * 3;
-    p.circle(0, 0, r).fill({color: colors[i % colors.length]});
-    p.x = x; p.y = y;
-    const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
-    const spd = 2 + Math.random() * 3;
-    p.vx = Math.cos(angle) * spd;
-    p.vy = Math.sin(angle) * spd - 1;
-    p.alpha = 1;
-    particleLayer.addChild(p);
-
-    const tick = app.ticker.add((t) => {
-      p.x += p.vx * t.deltaTime;
-      p.y += p.vy * t.deltaTime;
-      p.vy += 0.15 * t.deltaTime;
-      p.alpha -= 0.04 * t.deltaTime;
-      if (p.alpha <= 0) {
-        particleLayer.removeChild(p);
-        app.ticker.remove(tick);
-      }
-    });
-  }
-}
-
-function spawnChainBreakParticles() {
-  const chainsEl = document.getElementById('chains-hud');
-  for (let i = 0; i < 8; i++) {
-    const p = new PIXI.Graphics();
-    p.rect(-3, -3, 6, 6).fill({color: 0xfbbf24});
-    p.x = W * 0.85; p.y = 30;
-    const angle = Math.random() * Math.PI * 2;
-    p.vx = Math.cos(angle) * (2 + Math.random() * 3);
-    p.vy = Math.sin(angle) * (2 + Math.random() * 3);
-    p.alpha = 1;
-    particleLayer.addChild(p);
-    const tick = app.ticker.add((t) => {
-      p.x += p.vx * t.deltaTime;
-      p.y += p.vy * t.deltaTime;
-      p.vy += 0.1 * t.deltaTime;
-      p.alpha -= 0.05 * t.deltaTime;
-      if (p.alpha <= 0) { particleLayer.removeChild(p); app.ticker.remove(tick); }
-    });
-  }
-}
-
-// ── Word/Chain Logic ─────────────────────────────────────────────────────────
-function onWordComplete() {
-  // Flash slots green
-  const slots = document.querySelectorAll('.slot');
-  slots.forEach(s => { s.classList.remove('filled'); s.classList.add('done'); });
-
-  // Bounce train
-  trainContainer._bounceT = Math.PI;
-
-  // Break chain link
-  spawnChainBreakParticles();
-  const chainLinks = document.querySelectorAll('.chain-link');
-  const linkIdx = currentWordIdx;
-  if (chainLinks[linkIdx]) {
-    chainLinks[linkIdx].classList.add('broken');
-    chainLinks[linkIdx].textContent = '💥';
-  }
-
-  // Increase speed
-  gameSpeed *= 1.15;
-
-  // Flash green
-  const flash = document.getElementById('flash');
-  flash.style.background = 'rgba(74,222,128,0.25)';
-  flash.style.opacity = '1';
-  setTimeout(() => { flash.style.opacity = '0'; }, 300);
-
-  currentWordIdx++;
-  if (currentWordIdx >= WORDS_LIST.length) {
-    setTimeout(showWin, 600);
     return;
   }
 
+  if (box.type === 'math') {
+    boxLayer.removeChild(box.container);
+    letterBoxes.splice(idx, 1);
+    showMathQuiz();
+    return;
+  }
+
+  // Letter box
+  const word = WORDS_LIST[currentWordIdx];
+  if (!word) return;
+  if (box.isTarget) {
+    spawnCollectParticles(box.container.x, box.container.y, 0xfbbf24);
+    boxLayer.removeChild(box.container);
+    letterBoxes.splice(idx, 1);
+    currentLetterIdx++;
+    if (currentLetterIdx >= word.word.length) onWordComplete();
+    else refreshHUD();
+  } else {
+    if (!invincible) { wrongTaps++; triggerWrong(); }
+    boxLayer.removeChild(box.container);
+    letterBoxes.splice(idx, 1);
+  }
+}
+
+// ── Math Quiz ─────────────────────────────────────────────────────────────────
+let mathTimerRaf = null;
+function showMathQuiz() {
+  if (!gameRunning) return;
+  mathQuizActive = true;
+  const q = genMathQuestion();
+  const allAnswers = genWrongOptions(q.answer, 3);
+  document.getElementById('math-question').textContent = q.text;
+  const choicesEl = document.getElementById('math-choices');
+  choicesEl.innerHTML = '';
+  allAnswers.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'math-btn'; btn.textContent = opt;
+    btn.onclick = () => answerMath(opt === q.answer, btn);
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById('math-quiz').classList.add('show');
+
+  // Timer bar
+  const fill = document.getElementById('math-timer-fill');
+  fill.style.transition = 'none'; fill.style.width = '100%';
+  requestAnimationFrame(() => {
+    fill.style.transition = 'width 8s linear';
+    requestAnimationFrame(() => { fill.style.width = '0%'; });
+  });
+
+  // Auto-fail after 8s
+  let timedOut = false;
+  mathTimerRaf = setTimeout(() => {
+    if (mathQuizActive) { timedOut = true; answerMath(false, null, true); }
+  }, 8000);
+}
+
+function answerMath(correct, btnEl, timeout = false) {
+  if (!mathQuizActive) return;
+  clearTimeout(mathTimerRaf);
+  mathQuizActive = false;
+  document.getElementById('math-quiz').classList.remove('show');
+
+  if (correct) {
+    mathCorrect++;
+    spawnCollectParticles(W / 2, H / 2, 0x4ade80);
+    flashScreen('green');
+  } else if (!timeout) {
+    triggerWrong();
+  } else {
+    flashScreen('red');
+    lives--; if (lives < 0) lives = 0;
+    updateLivesHUD();
+    if (lives <= 0) { setTimeout(showLose, 600); return; }
+  }
+}
+
+// ── Rainbow effect ────────────────────────────────────────────────────────────
+function spawnRainbow() {
+  if (rainbow) { bgLayer.removeChild(rainbow); rainbow = null; }
+  const rb = new PIXI.Graphics();
+  const colors = [0xff6b6b, 0xffa500, 0xffd700, 0x4ade80, 0x38bdf8, 0x818cf8, 0xf472b6];
+  const cx = W * 0.5, cy = H * 0.85;
+  for (let i = 0; i < colors.length; i++) {
+    const r = 180 + i * 22;
+    rb.arc(cx, cy, r, Math.PI, 0, false).stroke({ width: 16, color: colors[i], alpha: 0.55 });
+  }
+  rb.alpha = 0.7;
+  bgLayer.addChild(rb);
+  rainbow = rb;
+}
+
+// ── Word Complete / Game Logic ─────────────────────────────────────────────────
+function onWordComplete() {
+  document.querySelectorAll('.slot').forEach(s => { s.classList.remove('filled'); s.classList.add('done'); });
+  trainContainer._bounceT = Math.PI;
+  spawnRainbow();
+  spawnCollectParticles(TRAIN_X, trainContainer.y, 0xfbbf24);
+  flashScreen('green');
+  gameSpeed = Math.min(gameSpeed * 1.12, 8);
+  currentWordIdx++;
+  if (currentWordIdx >= WORDS_LIST.length) { setTimeout(showWin, 700); return; }
   currentLetterIdx = 0;
   setTimeout(refreshHUD, 500);
 }
 
 function triggerWrong() {
+  if (invincible) return;
   invincible = true;
-
-  // Screen shake
+  lives--; if (lives < 0) lives = 0;
+  updateLivesHUD();
   document.body.classList.add('shaking');
-  setTimeout(() => document.body.classList.remove('shaking'), 300);
-
-  // Red flash
-  const flash = document.getElementById('flash');
-  flash.style.background = 'rgba(239,68,68,0.4)';
-  flash.style.opacity = '1';
-  setTimeout(() => { flash.style.opacity = '0'; }, 200);
-
-  // Chain shake animation
-  const chainLinks = document.querySelectorAll('.chain-link');
-  chainLinks.forEach(l => {
-    l.style.animation = 'shake .3s ease';
-    setTimeout(() => { l.style.animation = ''; }, 350);
-  });
-
-  setTimeout(() => { invincible = false; }, 800);
+  setTimeout(() => document.body.classList.remove('shaking'), 320);
+  flashScreen('red');
+  if (lives <= 0) { setTimeout(showLose, 600); return; }
+  setTimeout(() => { invincible = false; }, 900);
 }
 
-// ── HUD Updates ──────────────────────────────────────────────────────────────
+function flashScreen(type) {
+  const flash = document.getElementById('flash');
+  flash.style.background = type === 'green' ? 'rgba(74,222,128,0.28)' : 'rgba(239,68,68,0.38)';
+  flash.style.opacity = '1';
+  setTimeout(() => { flash.style.opacity = '0'; }, 200);
+}
+
+// ── Particles ─────────────────────────────────────────────────────────────────
+function spawnCollectParticles(x, y, mainColor) {
+  const colors = [mainColor, 0xfbbf24, 0x38bdf8, 0xf472b6, 0xc084fc, 0x4ade80];
+  for (let i = 0; i < 16; i++) {
+    const p = new PIXI.Graphics();
+    const r = 3 + Math.random() * 3.5;
+    p.circle(0, 0, r).fill({ color: colors[i % colors.length] });
+    p.x = x; p.y = y;
+    const angle = (Math.PI * 2 * i) / 16 + Math.random() * 0.5;
+    const spd = 2.5 + Math.random() * 4;
+    p._vx = Math.cos(angle) * spd; p._vy = Math.sin(angle) * spd - 1.5;
+    p.alpha = 1;
+    particleLayer.addChild(p);
+    const tick = app.ticker.add((t) => {
+      p.x += p._vx * t.deltaTime; p.y += p._vy * t.deltaTime;
+      p._vy += 0.18 * t.deltaTime;
+      p.alpha -= 0.035 * t.deltaTime;
+      if (p.alpha <= 0) { particleLayer.removeChild(p); app.ticker.remove(tick); }
+    });
+  }
+}
+
+// ── HUD ────────────────────────────────────────────────────────────────────────
+function updateLivesHUD() {
+  const el = document.getElementById('lives-hud');
+  el.innerHTML = '';
+  for (let i = 0; i < MAX_LIVES; i++) {
+    const s = document.createElement('span');
+    s.className = 'life-heart' + (i >= lives ? ' lost' : '');
+    s.textContent = '❤️';
+    el.appendChild(s);
+  }
+}
+
 function refreshHUD() {
-  const word = WORDS_LIST[currentWordIdx];
-  if (!word) return;
-
-  // Emoji
+  const word = WORDS_LIST[currentWordIdx]; if (!word) return;
   document.getElementById('word-emoji').textContent = word.emoji;
-
-  // Slots
   const slotsEl = document.getElementById('word-slots');
   slotsEl.innerHTML = '';
   for (let i = 0; i < word.word.length; i++) {
     const s = document.createElement('span');
-    s.className = 'slot';
-    if (i < currentLetterIdx) {
-      s.textContent = word.word[i];
-      s.classList.add('filled');
-    } else {
-      s.textContent = '_';
-    }
+    s.className = 'slot' + (i < currentLetterIdx ? ' filled' : '');
+    s.textContent = i < currentLetterIdx ? word.word[i] : '_';
     slotsEl.appendChild(s);
   }
-
-  // Next letter
   document.getElementById('next-char').textContent = word.word[currentLetterIdx] || '✓';
-
-  // Chains
-  const chainsEl = document.getElementById('chains-hud');
-  chainsEl.innerHTML = '';
-  for (let i = 0; i < WORDS_LIST.length; i++) {
-    const lnk = document.createElement('span');
-    lnk.className = 'chain-link';
-    lnk.id = 'chain-' + i;
-    lnk.textContent = i < currentWordIdx ? '💥' : '⛓️';
-    if (i < currentWordIdx) lnk.classList.add('broken');
-    chainsEl.appendChild(lnk);
-  }
 }
 
 function updateLaneDots() {
   for (let i = 0; i < 3; i++) {
-    const dot = document.getElementById('ld' + i);
-    if (dot) dot.classList.toggle('active', i === playerLane);
+    const d = document.getElementById('ld' + i);
+    if (d) d.classList.toggle('active', i === playerLane);
   }
 }
 
-// ── Controls ─────────────────────────────────────────────────────────────────
+// ── Controls ───────────────────────────────────────────────────────────────────
 function switchLane(dir) {
-  if (!gameRunning) return;
-  const newLane = Math.max(0, Math.min(2, playerLane + dir));
-  if (newLane === playerLane) return;
-  playerLane = newLane;
-  updateLaneDots();
+  if (!gameRunning || mathQuizActive) return;
+  const n = Math.max(0, Math.min(2, playerLane + dir));
+  if (n === playerLane) return;
+  playerLane = n; updateLaneDots();
 }
-
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', e => {
   if (e.key === 'ArrowUp') switchLane(-1);
   if (e.key === 'ArrowDown') switchLane(1);
 });
-
-// Tap on canvas area to switch to that lane
-document.getElementById('pixi-canvas').addEventListener('click', (e) => {
-  if (!gameRunning) return;
+document.getElementById('pixi-canvas').addEventListener('click', e => {
+  if (!gameRunning || mathQuizActive) return;
   const y = e.clientY;
   for (let i = 0; i < 3; i++) {
-    const laneScreenY = LANE_Y[i] / (app.renderer.resolution || 1);
-    if (Math.abs(y - laneScreenY) < 50) {
-      playerLane = i;
-      updateLaneDots();
-      return;
-    }
+    if (Math.abs(y - LANE_Y[i]) < 55) { playerLane = i; updateLaneDots(); return; }
   }
 });
 
-// ── HUD Layer (pixi side) ────────────────────────────────────────────────────
-function buildHudLayer() {
-  // nothing needed; HUD is HTML
-}
-
-// ── Win/Lose ─────────────────────────────────────────────────────────────────
+// ── Win / Lose ─────────────────────────────────────────────────────────────────
 function showWin() {
   gameRunning = false;
   const elapsed = (Date.now() - startTime) / 1000;
   const timeBonus = elapsed < WORDS_LIST.length * 15;
-
-  let stars = 3;
-  if (wrongTaps === 0) stars = Math.min(5, stars + 1);
-  if (timeBonus) stars = Math.min(5, stars + 1);
-
-  const starsStr = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
-
-  sessionStorage.setItem('g15Result', JSON.stringify({ stars }));
-
+  let s = 3;
+  if (wrongTaps === 0) s = Math.min(5, s + 1);
+  if (timeBonus) s = Math.min(5, s + 1);
+  if (mathCorrect >= 2) s = Math.min(5, s + 1);
+  sessionStorage.setItem('g15Result', JSON.stringify({ stars: Math.min(5, s) }));
   document.getElementById('end-emoji').textContent = '🏆';
   document.getElementById('end-title').textContent = 'Hore! Berhasil!';
   document.getElementById('end-msg').textContent =
     wrongTaps === 0
-      ? 'Sempurna! Tidak ada kesalahan! 🎉'
-      : `Kamu membuat ${wrongTaps} kesalahan. Terus berlatih!`;
-  document.getElementById('end-stars').textContent = starsStr;
+      ? `Sempurna! Tidak ada kesalahan! Soal Matematika Benar: ${mathCorrect} 🎉`
+      : `${wrongTaps} kesalahan. Matematika benar: ${mathCorrect}. Terus berlatih!`;
+  document.getElementById('end-stars').textContent = '⭐'.repeat(s) + '☆'.repeat(5 - s);
+  document.getElementById('end-ovl').classList.add('show');
+}
+
+function showLose() {
+  gameRunning = false;
+  sessionStorage.setItem('g15Result', JSON.stringify({ stars: 1 }));
+  document.getElementById('end-emoji').textContent = '💔';
+  document.getElementById('end-title').textContent = 'Habis Nyawa!';
+  document.getElementById('end-msg').textContent = 'Jangan menyerah, coba lagi!';
+  document.getElementById('end-stars').textContent = '⭐☆☆☆☆';
   document.getElementById('end-ovl').classList.add('show');
 }
 
 function restartGame() {
   document.getElementById('end-ovl').classList.remove('show');
-  // Clean up pixi
+  document.getElementById('math-quiz').classList.remove('show');
+  clearTimeout(mathTimerRaf);
   app.destroy(false, { children: true });
-  // Reset state
-  playerLane = 1;
-  currentWordIdx = 0;
-  currentLetterIdx = 0;
-  wrongTaps = 0;
-  invincible = false;
-  gameSpeed = 2 + LEVEL * 0.15;
-  gameRunning = false;
-  wheels = [];
-  steamPuffs = [];
-  letterBoxes = [];
-  stars = [];
-  sleepers = [];
-  LANE_Y = [];
-
-  // Re-pick words
-  Object.assign(WORDS_LIST, pickWords(WORD_COUNT));
-  WORDS_LIST.length = WORD_COUNT;
-  const fresh = pickWords(WORD_COUNT);
-  for (let i = 0; i < WORD_COUNT; i++) WORDS_LIST[i] = fresh[i];
-
+  playerLane = 1; currentWordIdx = 0; currentLetterIdx = 0;
+  wrongTaps = 0; mathCorrect = 0; invincible = false; mathQuizActive = false;
+  gameRunning = false; gameSpeed = 2 + LEVEL * 0.15;
+  lives = MAX_LIVES;
+  wheels = []; steamPuffs = []; letterBoxes = []; bgStars = []; sleepers = [];
+  bgClouds = []; bgFireflies = []; rainbow = null; LANE_Y = [];
+  mathBoxTimer = 0; heartBoxTimer = 0; totalBoxSpawned = 0;
+  nextMathAt = MATH_BOX_INTERVAL(); nextHeartAt = HEART_BOX_INTERVAL();
+  WORDS_LIST = pickWords(WORD_COUNT);
   initPixi();
 }
 
-// ── Utils ────────────────────────────────────────────────────────────────────
+// ── Utils ──────────────────────────────────────────────────────────────────────
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -819,7 +1087,7 @@ function shuffle(arr) {
   return arr;
 }
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
+// ── Boot ───────────────────────────────────────────────────────────────────────
 initPixi();
 </script>
 </body>
