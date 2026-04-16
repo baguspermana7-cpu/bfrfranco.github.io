@@ -5265,61 +5265,304 @@ body { background: #0a0a1a !important; }
   }
 }
 
-/* ===== INTERACTIVE MAP (screen-menu) ===== */
-.map-world {
-  width:100%;padding:8px 0 80px;overflow-y:auto;position:relative;
-  background:linear-gradient(180deg,#0f0c29 0%,#1a0533 20%,#302b63 50%,#1a4a2e 100%);
-  min-height:100%;
+/* ===== WORLD MAP (screen-menu) — Ultra Detail ===== */
+
+/* Root scrollable container */
+.wmap-root {
+  width:100%;min-height:100%;overflow-y:auto;overflow-x:hidden;position:relative;
+  background:linear-gradient(180deg,#050115 0%,#120832 8%,#1e0d4a 16%,#2a1660 24%,#1e3a2f 38%,#2d5c40 52%,#1a4030 65%,#0d2820 78%,#060e18 92%,#020509 100%);
+  padding-bottom:48px;
 }
-.map-world::before {
-  content:'✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦ ✧ ✦';
-  position:absolute;top:70px;left:0;right:0;text-align:center;
-  font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:8px;pointer-events:none;
+
+/* Sky strip — twinkling stars + drifting clouds */
+.wmap-sky {
+  position:sticky;top:0;left:0;right:0;height:72px;z-index:6;
+  pointer-events:none;overflow:hidden;
+  background:linear-gradient(180deg,rgba(5,1,21,0.98) 0%,rgba(5,1,21,0.6) 70%,transparent 100%);
 }
-.map-island {
-  position:relative;margin:0 auto 6px;width:88%;border-radius:24px;
-  padding:14px 14px 18px;backdrop-filter:blur(4px);
+.wmap-cloud {
+  position:absolute;border-radius:50px;
+  background:rgba(255,255,255,0.1);filter:blur(8px);
+  animation:wmapCloudDrift linear infinite;
 }
-.map-island.emosi  { background:linear-gradient(135deg,rgba(124,58,237,0.35),rgba(236,72,153,0.3));border:2px solid rgba(236,72,153,0.55); }
-.map-island.hutan  { background:linear-gradient(135deg,rgba(21,128,61,0.35),rgba(132,204,22,0.3));border:2px solid rgba(74,222,128,0.55); }
-.map-island.kota   { background:linear-gradient(135deg,rgba(3,105,161,0.35),rgba(56,189,248,0.3));border:2px solid rgba(56,189,248,0.55); }
-.map-island.arena  { background:linear-gradient(135deg,rgba(180,83,9,0.35),rgba(245,158,11,0.3));border:2px solid rgba(245,158,11,0.55); }
-.map-island.kereta { background:linear-gradient(135deg,rgba(120,53,15,0.35),rgba(217,119,6,0.3));border:2px solid rgba(217,119,6,0.55); }
-.map-island-badge {
-  display:flex;align-items:center;gap:8px;justify-content:center;
-  font-size:15px;font-weight:900;color:white;margin-bottom:14px;
-  text-shadow:0 1px 6px rgba(0,0,0,0.6);letter-spacing:0.5px;
+.wmap-cloud::before,.wmap-cloud::after {
+  content:'';position:absolute;border-radius:50%;background:inherit;
 }
-.map-nodes {
-  display:flex;flex-wrap:wrap;justify-content:center;gap:14px;
+.wmap-cloud-1 { width:110px;height:36px;top:14px;animation-duration:58s;animation-delay:0s; }
+.wmap-cloud-1::before { width:55px;height:44px;top:-18px;left:18px; }
+.wmap-cloud-1::after  { width:45px;height:36px;top:-12px;left:52px; }
+.wmap-cloud-2 { width:75px;height:28px;top:26px;animation-duration:78s;animation-delay:-22s;opacity:0.75; }
+.wmap-cloud-3 { width:150px;height:42px;top:8px;animation-duration:68s;animation-delay:-38s;opacity:0.65; }
+.wmap-cloud-3::before { width:70px;height:50px;top:-20px;left:28px; }
+.wmap-cloud-4 { width:95px;height:32px;top:22px;animation-duration:95s;animation-delay:-54s;opacity:0.5; }
+@keyframes wmapCloudDrift { from{transform:translateX(-220px)} to{transform:translateX(calc(100vw + 220px))} }
+
+/* Stars keyframe (alias of global twinkle) */
+@keyframes starTwinkle { 0%,100%{opacity:0.1;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+
+/* Stars in sky strip */
+.wmap-star {
+  position:absolute;background:white;border-radius:50%;
+  animation:starTwinkle ease-in-out infinite;
 }
-.map-node {
-  width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:30px;cursor:pointer;position:relative;
-  box-shadow:0 6px 0 rgba(0,0,0,0.35),0 8px 20px rgba(0,0,0,0.3);
-  transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.1s;
-  flex-shrink:0;
+
+/* Scrollable 2-column canvas */
+.wmap-canvas {
+  width:100%;max-width:760px;margin:0 auto;
+  padding:10px 10px 16px;
+  display:grid;grid-template-columns:1fr 1fr;gap:0;position:relative;
 }
-.map-node:active { transform:translateY(5px) scale(0.93);box-shadow:0 1px 0 rgba(0,0,0,0.3); }
-.map-node-label {
+
+/* Path divider between row pairs */
+.wmap-path-vert {
+  grid-column:1/-1;display:flex;justify-content:center;
+  align-items:center;height:28px;position:relative;z-index:2;
+}
+.wmap-path-vert::before {
+  content:'';position:absolute;width:5px;height:100%;
+  background:repeating-linear-gradient(to bottom,#B8935A 0,#B8935A 10px,transparent 10px,transparent 18px);
+  border-radius:3px;opacity:0.65;
+}
+.wmap-path-vert::after {
+  content:'✦';color:rgba(255,255,255,0.35);font-size:12px;position:relative;z-index:1;
+}
+
+/* Zone island cards */
+.wmap-zone {
+  border-radius:26px;padding:12px 10px 14px;margin:7px 5px;
+  position:relative;overflow:hidden;z-index:3;
+  transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s;
+}
+.wmap-zone::after {
+  content:'';position:absolute;inset:-2px;border-radius:28px;
+  border:2px solid transparent;transition:border-color 0.3s,box-shadow 0.3s;pointer-events:none;
+}
+.wmap-zone:hover { transform:translateY(-4px); }
+.wmap-zone:hover::after { border-color:rgba(255,255,255,0.3);box-shadow:0 0 24px rgba(255,255,255,0.08); }
+
+/* Zone themes */
+.wmap-zone--emosi {
+  background:linear-gradient(145deg,#2D1B69 0%,#7C3AED 55%,#EC4899 100%);
+  border:2px solid rgba(236,72,153,0.55);
+  box-shadow:0 7px 0 rgba(109,40,217,0.6),0 10px 35px rgba(236,72,153,0.3),inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.wmap-zone--huruf {
+  background:linear-gradient(145deg,#052E16 0%,#166534 55%,#16A34A 100%);
+  border:2px solid rgba(74,222,128,0.6);
+  box-shadow:0 7px 0 rgba(5,46,22,0.75),0 10px 35px rgba(34,197,94,0.25),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.wmap-zone--angka {
+  background:linear-gradient(145deg,#451A03 0%,#92400E 45%,#D97706 100%);
+  border:2px solid rgba(251,191,36,0.65);
+  box-shadow:0 7px 0 rgba(69,26,3,0.7),0 10px 35px rgba(245,158,11,0.3),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.wmap-zone--memori {
+  background:linear-gradient(145deg,#1E0845 0%,#4C1D95 55%,#7C3AED 100%);
+  border:2px solid rgba(167,139,250,0.6);
+  box-shadow:0 7px 0 rgba(30,8,69,0.75),0 10px 35px rgba(124,58,237,0.3),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.wmap-zone--mobil {
+  background:linear-gradient(145deg,#0C4A6E 0%,#0369A1 55%,#0EA5E9 100%);
+  border:2px solid rgba(56,189,248,0.6);
+  box-shadow:0 7px 0 rgba(12,74,110,0.7),0 10px 35px rgba(14,165,233,0.3),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.wmap-zone--pokemon {
+  background:linear-gradient(145deg,#1C0000 0%,#7C2D12 45%,#EA580C 85%,#FBBF24 100%);
+  border:2px solid rgba(251,146,60,0.65);
+  box-shadow:0 7px 0 rgba(28,0,0,0.85),0 10px 35px rgba(234,88,12,0.4),inset 0 1px 0 rgba(255,200,0,0.15);
+}
+.wmap-zone--sains {
+  background:linear-gradient(145deg,#020617 0%,#0F172A 55%,#1E3A5F 100%);
+  border:2px solid rgba(56,189,248,0.45);
+  box-shadow:0 7px 0 rgba(2,6,23,0.92),0 10px 35px rgba(56,189,248,0.18),inset 0 1px 0 rgba(56,189,248,0.08);
+}
+.wmap-zone--kereta {
+  background:linear-gradient(145deg,#0C0A09 0%,#1C1917 55%,#3B2B1A 100%);
+  border:2px solid rgba(217,119,6,0.55);
+  box-shadow:0 7px 0 rgba(0,0,0,0.95),0 10px 35px rgba(217,119,6,0.22),inset 0 1px 0 rgba(217,119,6,0.08);
+}
+
+/* Zone banner (header inside each island) */
+.wmap-zone-banner {
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,0.32);backdrop-filter:blur(6px);
+  border-radius:14px;padding:5px 9px;margin-bottom:10px;
+  border:1px solid rgba(255,255,255,0.12);
+}
+.wmap-zone-icon {
+  font-size:18px;line-height:1;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  animation:wmapIconGlow ease-in-out 3s infinite alternate;
+}
+@keyframes wmapIconGlow {
+  from{filter:drop-shadow(0 0 3px rgba(255,255,255,0.2))}
+  to  {filter:drop-shadow(0 0 8px rgba(255,255,255,0.55))}
+}
+.wmap-zone-name {
+  font-size:12px;font-weight:900;color:white;flex:1;
+  text-shadow:0 1px 5px rgba(0,0,0,0.8);letter-spacing:0.3px;
+  font-family:var(--font-display);
+}
+.wmap-zone-stars-total { font-size:10px;font-weight:700;color:#FBBF24;text-shadow:0 0 6px rgba(251,191,36,0.7); }
+
+/* Nodes container */
+.wmap-nodes {
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+  position:relative;z-index:2;
+}
+
+/* Individual game node */
+.wmap-node {
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;position:relative;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+  animation:wmapNodeBob ease-in-out infinite;
+}
+.wmap-node:nth-child(1){animation-duration:2.9s;animation-delay:0s}
+.wmap-node:nth-child(2){animation-duration:3.3s;animation-delay:-0.9s}
+.wmap-node:nth-child(3){animation-duration:2.6s;animation-delay:-1.7s}
+.wmap-node:nth-child(4){animation-duration:3.1s;animation-delay:-0.5s}
+.wmap-node:nth-child(5){animation-duration:2.8s;animation-delay:-1.3s}
+.wmap-node:nth-child(6){animation-duration:3.4s;animation-delay:-0.3s}
+@keyframes wmapNodeBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+.wmap-node:hover { animation:none;transform:translateY(-7px) scale(1.1);transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+.wmap-node:active { animation:none;transform:translateY(2px) scale(0.93); }
+
+/* Game node badge — bold rounded square, large emoji, 3D depth */
+.wmap-node-bldg {
+  width:84px;height:84px;border-radius:22px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:
+    0 8px 0 rgba(0,0,0,0.55),
+    0 13px 32px rgba(0,0,0,0.6),
+    inset 0 2px 0 rgba(255,255,255,0.28);
+  border:3px solid rgba(255,255,255,0.2);
+  overflow:hidden;
+  transition:box-shadow 0.15s;
+}
+/* Shine highlight overlay */
+.wmap-node-bldg::before {
+  content:'';position:absolute;inset:0;border-radius:20px;
+  background:radial-gradient(ellipse at 32% 18%, rgba(255,255,255,0.32), transparent 62%);
+  pointer-events:none;z-index:1;
+}
+.wn-icon {
+  font-size:40px;line-height:1;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,0.75));
+  position:relative;z-index:2;
+}
+
+/* Node text */
+.wmap-node-name {
   font-size:8.5px;font-weight:900;color:white;text-align:center;
-  position:absolute;bottom:-20px;width:82px;line-height:1.2;
-  text-shadow:0 1px 4px rgba(0,0,0,0.8);
+  margin-top:5px;line-height:1.3;max-width:88px;
+  text-shadow:0 1px 6px rgba(0,0,0,0.95);font-family:var(--font);
 }
-.map-node.locked { filter:grayscale(0.8);opacity:0.5;cursor:default; }
-.map-node.locked:active { transform:none;box-shadow:0 6px 0 rgba(0,0,0,0.35); }
-.map-node.locked::after {
-  content:'🔒';font-size:16px;position:absolute;top:-8px;right:-6px;
-  background:rgba(0,0,0,0.5);border-radius:50%;padding:2px;
+.wmap-node-stars {
+  font-size:9px;margin-top:1px;min-height:12px;color:#FBBF24;
+  text-shadow:0 0 6px rgba(251,191,36,0.9);letter-spacing:-1px;
 }
-.map-connector {
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:6px 0;gap:3px;
+
+/* Locked nodes */
+.wmap-node.locked { cursor:default;animation:none;opacity:0.7; }
+.wmap-node.locked .wmap-node-bldg {
+  filter:grayscale(1) brightness(0.35);
+  box-shadow:0 5px 0 rgba(0,0,0,0.4),0 8px 18px rgba(0,0,0,0.4);
 }
-.map-connector-dot {
-  width:6px;height:6px;border-radius:50%;
-  background:rgba(255,255,255,0.35);
+.wmap-node.locked::after {
+  content:'🔒';position:absolute;top:-6px;right:-4px;font-size:16px;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:none;
+}
+
+/* ── Terrain decorations ── */
+.wmap-forest,.wmap-carnival,.wmap-starfield { position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit; }
+
+/* Trees */
+.wmap-tree { position:absolute;display:flex;flex-direction:column;align-items:center;bottom:0; }
+.wmap-tree-top {
+  border-radius:50% 50% 40% 40%;
+  animation:treeSway ease-in-out infinite alternate;transform-origin:bottom center;
+}
+@keyframes treeSway { from{transform:rotate(-2deg)} to{transform:rotate(2deg)} }
+.wmap-tree-trunk { width:7px;background:linear-gradient(180deg,#78350F,#451A03);border-radius:2px; }
+
+/* Carnival bunting */
+.wmap-bunting { position:absolute;top:6px;left:0;right:0;height:18px; }
+.wmap-bunting::before { content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:rgba(255,255,255,0.3); }
+.wmap-flag {
+  position:absolute;width:11px;height:15px;top:0;
+  clip-path:polygon(0% 0%,100% 50%,0% 100%);
+  animation:flagWave ease-in-out infinite alternate;transform-origin:left center;
+}
+@keyframes flagWave { from{transform:rotate(-7deg) skewY(-2deg)} to{transform:rotate(7deg) skewY(2deg)} }
+
+/* Star field dots (Sains) */
+.wmap-starfield-dot { position:absolute;width:2px;height:2px;border-radius:50%;background:white;animation:starTwinkle ease-in-out infinite; }
+
+/* Observatory decoration */
+.wmap-obs { position:absolute;left:8px;top:12px;pointer-events:none;z-index:1; }
+.wmap-obs-dome { width:36px;height:20px;background:linear-gradient(180deg,#1E3A5F,#0F172A);border-radius:50% 50% 0 0;border:1.5px solid rgba(56,189,248,0.4); }
+.wmap-obs-body { width:26px;height:12px;background:#0F172A;border:1px solid rgba(56,189,248,0.28);margin:0 auto; }
+.wmap-obs-beam {
+  position:absolute;width:2px;height:50px;
+  background:linear-gradient(to top,rgba(56,189,248,0.75),transparent);
+  top:-50px;left:17px;transform-origin:bottom center;
+  animation:obBeam 3s ease-in-out infinite alternate;
+}
+@keyframes obBeam { from{opacity:0.3;transform:rotate(-6deg)} to{opacity:0.75;transform:rotate(6deg)} }
+
+/* Volcano decoration (Pokemon) */
+.wmap-volcano { position:absolute;right:10px;top:12px;pointer-events:none;z-index:1; }
+.wmap-volcano-cone { width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-bottom:38px solid #7C2D12;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.55)); }
+.wmap-volcano-lava { width:28px;height:9px;background:linear-gradient(180deg,#FBBF24,#EA580C);border-radius:50%;margin:-4px auto 0;animation:lavaGlow 1.8s ease-in-out infinite; }
+@keyframes lavaGlow { 0%,100%{opacity:0.45;transform:scale(1)} 50%{opacity:0.9;transform:scale(1.2)} }
+.wmap-smoke-1,.wmap-smoke-2,.wmap-smoke-3 { position:absolute;border-radius:50%;background:rgba(200,200,200,0.38);filter:blur(4px);animation:smokeRise linear infinite; }
+.wmap-smoke-1 { width:13px;height:13px;left:14px;top:-8px;animation-duration:2.1s;animation-delay:0s; }
+.wmap-smoke-2 { width:9px;height:9px;left:20px;top:-12px;animation-duration:2.6s;animation-delay:-0.7s; }
+.wmap-smoke-3 { width:16px;height:16px;left:8px;top:-6px;animation-duration:3.2s;animation-delay:-1.4s; }
+@keyframes smokeRise { 0%{opacity:0;transform:translateY(0) scale(0.5)} 30%{opacity:0.65} 100%{opacity:0;transform:translateY(-38px) scale(2)} }
+
+/* Rails (Kereta zone) */
+.wt-rails { position:absolute;bottom:16px;left:0;right:0;height:12px;display:flex;flex-direction:column;gap:4px; }
+.wt-rail-line { height:3px;background:repeating-linear-gradient(to right,#8B7355 0,#8B7355 20px,transparent 20px,transparent 28px);opacity:0.45; }
+.wt-rail-tie  { height:2px;background:linear-gradient(to right,transparent 4%,#5C4A1E 4%,#5C4A1E 96%,transparent 96%);opacity:0.35; }
+
+/* Animated mini train */
+.wmap-train-deco { position:absolute;bottom:20px;left:-80px;display:flex;gap:0;animation:trainLoop 10s linear infinite;z-index:1;pointer-events:none; }
+@keyframes trainLoop { from{transform:translateX(-90px)} to{transform:translateX(calc(100% + 160px))} }
+.wmap-train-car { height:18px;border-radius:3px;border:1.5px solid rgba(0,0,0,0.55);position:relative; }
+.wmap-train-engine { width:28px;background:linear-gradient(180deg,#B91C1C,#7F1D1D);border-radius:3px 7px 3px 3px; }
+.wmap-train-engine::before { content:'';position:absolute;top:-7px;right:4px;width:7px;height:7px;background:#374151;border-radius:50% 50% 0 0; }
+.wmap-train-wagon  { width:22px;background:linear-gradient(180deg,#374151,#1F2937);margin-left:3px; }
+.wmap-train-car::after { content:'● ●';position:absolute;bottom:-7px;left:1px;font-size:6px;color:#6B7280;letter-spacing:2px; }
+
+/* Floating hearts (Emosi zone) */
+.wmap-heart { position:absolute;font-size:11px;animation:heartFloat linear infinite;opacity:0;pointer-events:none;z-index:0; }
+@keyframes heartFloat { 0%{opacity:0;transform:translateY(0) scale(0.5)} 20%{opacity:0.8} 80%{opacity:0.35} 100%{opacity:0;transform:translateY(-55px) scale(1) rotate(18deg)} }
+
+/* Minimap scroll indicator */
+.wmap-minimap { position:sticky;bottom:10px;left:0;right:0;display:flex;justify-content:center;z-index:10;pointer-events:none; }
+.wmap-minimap-dots { display:flex;gap:6px;background:rgba(0,0,0,0.55);padding:5px 10px;border-radius:18px;backdrop-filter:blur(8px); }
+.wmap-minimap-dot { width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.28);transition:background 0.3s,transform 0.3s; }
+.wmap-minimap-dot.active { background:#8B5CF6;transform:scale(1.45); }
+
+/* Responsive adjustments */
+@media (max-width:420px) {
+  .wmap-canvas { grid-template-columns:1fr 1fr;padding:6px 4px 12px; }
+  .wmap-zone { margin:4px 3px;padding:9px 7px 11px;border-radius:20px; }
+  .wmap-zone-name { font-size:10.5px; }
+  .wmap-node-bldg { width:66px;height:66px;border-radius:18px; }
+  .wn-icon { font-size:32px; }
+  .wmap-node-name { font-size:7px;max-width:70px; }
+  .wmap-nodes { gap:8px; }
+  .wmap-zone-banner { padding:4px 7px; }
+}
+@media (min-width:680px) {
+  .wmap-canvas { max-width:700px;padding:14px 18px; }
+  .wmap-zone { border-radius:30px;padding:16px 14px 18px; }
+  .wmap-node-bldg { width:96px;height:96px;border-radius:26px; }
+  .wn-icon { font-size:46px; }
+  .wmap-node-name { font-size:9.5px;max-width:96px; }
 }
 
 /* G3 blank first-letter */
@@ -5371,7 +5614,7 @@ body { background: #0a0a1a !important; }
 @keyframes woodPulse { from{transform:scale(1)} to{transform:scale(1.06)} }
 .g17-block.active { animation:woodPulse 0.45s ease-in-out infinite alternate; }
 
-/* Pokeball icon for map nodes */
+/* Pokeball icon for map nodes (G10 - Pertarungan Pokemon) */
 .map-pokeball {
   display:inline-block;width:34px;height:34px;border-radius:50%;
   background:linear-gradient(180deg,#e3000b 50%,white 50%);
@@ -5384,6 +5627,32 @@ body { background: #0a0a1a !important; }
 .map-pokeball::after {
   content:'';width:11px;height:11px;border-radius:50%;
   background:white;border:3px solid #222;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+}
+/* Evolution Stone icon (G13 - Evolusi Math) */
+.map-evo-stone {
+  display:inline-block;width:32px;height:32px;flex-shrink:0;position:relative;
+  background:radial-gradient(circle at 35% 30%,#FDE68A,#F59E0B 50%,#B45309);
+  clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);
+  box-shadow:0 0 12px rgba(251,191,36,0.9),0 0 5px rgba(251,191,36,0.5);
+}
+.map-evo-stone::after {
+  content:'✦';position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);
+  font-size:11px;color:rgba(255,255,255,0.95);text-shadow:0 0 4px #F59E0B;
+}
+/* Ultra Ball icon (G13b - Quick Fire) */
+.map-ultraball {
+  display:inline-block;width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(180deg,#1C1917 50%,#FBBF24 50%);
+  border:3px solid #92400E;position:relative;flex-shrink:0;
+}
+.map-ultraball::before {
+  content:'';position:absolute;left:0;right:0;
+  top:calc(50% - 2px);height:4px;background:#92400E;
+}
+.map-ultraball::after {
+  content:'';width:11px;height:11px;border-radius:50%;
+  background:#FBBF24;border:3px solid #92400E;
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
 }
 </style>
@@ -5631,147 +5900,419 @@ body { background: #0a0a1a !important; }
   <div id="total-stars-banner" class="total-stars-banner" style="display:none;margin-bottom:12px;"></div>
 
   <!-- INTERACTIVE WORLD MAP -->
-  <div class="map-world">
+  <div class="wmap-root">
 
-    <!-- Island 1: Emosi Island -->
-    <div class="map-island emosi" id="gtile-zone-emosi">
-      <div class="map-island-badge">🏝️ Emosi Island</div>
-      <div class="map-nodes">
-        <div class="map-node" id="gtile-1" style="background:linear-gradient(135deg,#EC4899,#F472B6);box-shadow:0 6px 0 #9D174D,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(1)" title="Aku Merasa...">
-          🎭<span class="map-node-label" id="gstars-1-lbl">Aku Merasa</span>
+    <!-- Sticky sky strip: twinkling stars + drifting clouds -->
+    <div class="wmap-sky" aria-hidden="true">
+      <div class="wmap-cloud wmap-cloud-1"></div>
+      <div class="wmap-cloud wmap-cloud-2"></div>
+      <div class="wmap-cloud wmap-cloud-3"></div>
+      <div class="wmap-cloud wmap-cloud-4"></div>
+      <div class="wmap-star" style="width:2px;height:2px;top:10px;left:8%;animation-duration:2.1s;animation-delay:0s;"></div>
+      <div class="wmap-star" style="width:3px;height:3px;top:22px;left:23%;animation-duration:3.4s;animation-delay:-1.2s;"></div>
+      <div class="wmap-star" style="width:2px;height:2px;top:16px;left:42%;animation-duration:1.8s;animation-delay:-0.6s;"></div>
+      <div class="wmap-star" style="width:2px;height:2px;top:30px;left:61%;animation-duration:2.7s;animation-delay:-1.9s;"></div>
+      <div class="wmap-star" style="width:3px;height:3px;top:8px;left:78%;animation-duration:3.1s;animation-delay:-0.3s;"></div>
+      <div class="wmap-star" style="width:2px;height:2px;top:38px;left:91%;animation-duration:2.4s;animation-delay:-1.5s;"></div>
+    </div>
+
+    <!-- 2-column scrollable canvas -->
+    <div class="wmap-canvas">
+
+      <!-- ══════ ZONE 1: EMOSI (left) ══════ -->
+      <div class="wmap-zone wmap-zone--emosi">
+        <!-- Floating hearts decoration -->
+        <div class="wmap-heart" style="left:12%;animation-duration:3.4s;animation-delay:0s;">💗</div>
+        <div class="wmap-heart" style="left:35%;animation-duration:4.1s;animation-delay:-1.2s;">💜</div>
+        <div class="wmap-heart" style="left:62%;animation-duration:2.8s;animation-delay:-2.1s;">💖</div>
+        <div class="wmap-heart" style="left:82%;animation-duration:3.7s;animation-delay:-0.7s;">💕</div>
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">🌸</span>
+          <span class="wmap-zone-name">Pulau Emosi</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-emosi">⭐</span>
         </div>
-        <div class="map-node" id="gtile-2" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);box-shadow:0 6px 0 #5B21B6,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(2)" title="Napas Pelangi">
-          🌬️<span class="map-node-label" id="gstars-2-lbl">Napas Pelangi</span>
+        <div class="wmap-nodes">
+          <!-- G1: Aku Merasa -->
+          <div class="wmap-node" id="gtile-1" onclick="playClick();openLevelSelect(1)" title="Aku Merasa...">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#9D174D,#EC4899);">
+              <span class="wn-icon">🎭</span>
+            </div>
+            <div class="wmap-node-name">Aku Merasa</div>
+            <div class="wmap-node-stars" id="gstars-1-lbl"></div>
+          </div>
+          <!-- G2: Napas Pelangi -->
+          <div class="wmap-node" id="gtile-2" onclick="playClick();openLevelSelect(2)" title="Napas Pelangi">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#5B21B6,#A78BFA);">
+              <span class="wn-icon">🌬️</span>
+            </div>
+            <div class="wmap-node-name">Napas Pelangi</div>
+            <div class="wmap-node-stars" id="gstars-2-lbl"></div>
+          </div>
+          <!-- G5: Cocokkan Emosi -->
+          <div class="wmap-node" id="gtile-5" onclick="playClick();openLevelSelect(5)" title="Cocokkan Emosi">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#4C1D95,#C084FC);">
+              <span class="wn-icon">🃏</span>
+            </div>
+            <div class="wmap-node-name">Cocokkan Emosi</div>
+            <div class="wmap-node-stars" id="gstars-5-lbl"></div>
+          </div>
         </div>
-        <div class="map-node" id="gtile-5" style="background:linear-gradient(135deg,#7C3AED,#C084FC);box-shadow:0 6px 0 #4C1D95,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(5)" title="Cocokkan Emosi">
-          🃏<span class="map-node-label" id="gstars-5-lbl">Cocokkan Emosi</span>
+      </div><!-- end zone emosi -->
+
+      <!-- ══════ ZONE 2: HURUF (right) ══════ -->
+      <div class="wmap-zone wmap-zone--huruf">
+        <!-- Forest trees decoration -->
+        <div class="wmap-forest" aria-hidden="true">
+          <div class="wmap-tree" style="left:7%;bottom:0;">
+            <div class="wmap-tree-top" style="width:20px;height:28px;background:linear-gradient(180deg,#4ADE80,#16A34A);animation-duration:2.8s;"></div>
+            <div class="wmap-tree-trunk" style="height:12px;"></div>
+          </div>
+          <div class="wmap-tree" style="right:5%;bottom:0;">
+            <div class="wmap-tree-top" style="width:26px;height:36px;background:linear-gradient(180deg,#22C55E,#15803D);animation-duration:3.4s;animation-delay:-1s;"></div>
+            <div class="wmap-tree-trunk" style="height:10px;"></div>
+          </div>
+          <div class="wmap-tree" style="left:26%;bottom:0;">
+            <div class="wmap-tree-top" style="width:16px;height:22px;background:linear-gradient(180deg,#86EFAC,#16A34A);animation-duration:2.2s;animation-delay:-0.5s;"></div>
+            <div class="wmap-tree-trunk" style="height:8px;"></div>
+          </div>
         </div>
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">🌿</span>
+          <span class="wmap-zone-name">Hutan Kata</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-huruf">⭐</span>
+        </div>
+        <div class="wmap-nodes">
+          <!-- G3: Huruf Hutan -->
+          <div class="wmap-node" id="gtile-3" onclick="playClick();openLevelSelect(3)" title="Huruf Hutan">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#14532D,#4ADE80);">
+              <span class="wn-icon">🔤</span>
+            </div>
+            <div class="wmap-node-name">Huruf Hutan</div>
+            <div class="wmap-node-stars" id="gstars-3-lbl"></div>
+          </div>
+          <!-- G8: Susun Kata -->
+          <div class="wmap-node" id="gtile-8" onclick="playClick();openLevelSelect(8)" title="Susun Kata">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#065F46,#22C55E);">
+              <span class="wn-icon">🔡</span>
+            </div>
+            <div class="wmap-node-name">Susun Kata</div>
+            <div class="wmap-node-stars" id="gstars-8-lbl"></div>
+          </div>
+          <!-- G9: Jejak Huruf -->
+          <div class="wmap-node" id="gtile-9" onclick="playClick();openLevelSelect(9)" title="Jejak Huruf">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#134E4A,#2DD4BF);">
+              <span class="wn-icon">✍️</span>
+            </div>
+            <div class="wmap-node-name">Jejak Huruf</div>
+            <div class="wmap-node-stars" id="gstars-9-lbl"></div>
+          </div>
+          <!-- G13c: Gym Huruf & Suara -->
+          <div class="wmap-node" id="gtile-13c" onclick="playClick();openGymGame()" title="Gym Huruf & Suara">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1A3A1A,#2E7D32);">
+              <span class="wn-icon">🏅</span>
+            </div>
+            <div class="wmap-node-name">Gym Huruf & Suara</div>
+            <div class="wmap-node-stars" id="gstars-13c-lbl"></div>
+          </div>
+        </div>
+      </div><!-- end zone huruf -->
+
+      <!-- Path divider row 1→2 -->
+      <div class="wmap-path-vert" style="grid-column:1/-1;"></div>
+
+      <!-- ══════ ZONE 3: ANGKA (left) ══════ -->
+      <div class="wmap-zone wmap-zone--angka">
+        <!-- Carnival bunting decoration -->
+        <div class="wmap-carnival" aria-hidden="true">
+          <div class="wmap-bunting">
+            <div class="wmap-flag" style="left:4%;background:#EF4444;animation-duration:1.8s;"></div>
+            <div class="wmap-flag" style="left:17%;background:#FBBF24;animation-duration:2.2s;animation-delay:-0.4s;"></div>
+            <div class="wmap-flag" style="left:30%;background:#3B82F6;animation-duration:1.6s;animation-delay:-0.8s;"></div>
+            <div class="wmap-flag" style="left:43%;background:#10B981;animation-duration:2.0s;animation-delay:-1.2s;"></div>
+            <div class="wmap-flag" style="left:56%;background:#8B5CF6;animation-duration:1.9s;animation-delay:-0.2s;"></div>
+            <div class="wmap-flag" style="left:69%;background:#EC4899;animation-duration:2.3s;animation-delay:-0.6s;"></div>
+            <div class="wmap-flag" style="left:82%;background:#F59E0B;animation-duration:1.7s;animation-delay:-1.0s;"></div>
+          </div>
+        </div>
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">🔢</span>
+          <span class="wmap-zone-name">Kota Angka</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-angka">⭐</span>
+        </div>
+        <div class="wmap-nodes">
+          <!-- G4: Hitung Binatang -->
+          <div class="wmap-node" id="gtile-4" onclick="playClick();openLevelSelect(4)" title="Hitung Binatang">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#92400E,#FCD34D);">
+              <span class="wn-icon">🦁</span>
+            </div>
+            <div class="wmap-node-name">Hitung Binatang</div>
+            <div class="wmap-node-stars" id="gstars-4-lbl"></div>
+          </div>
+          <!-- G13: Evolusi Math -->
+          <div class="wmap-node" id="gtile-13" onclick="playClick();openLevelSelect(13)" title="Evolusi Math">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#78350F,#F59E0B);">
+              <span class="wn-icon"><span class="map-evo-stone" style="width:36px;height:36px;font-size:14px;box-shadow:0 0 18px rgba(251,191,36,1),0 0 6px rgba(251,191,36,0.6);"></span></span>
+            </div>
+            <div class="wmap-node-name">Evolusi Math</div>
+            <div class="wmap-node-stars" id="gstars-13-lbl"></div>
+          </div>
+        </div>
+      </div><!-- end zone angka -->
+
+      <!-- ══════ ZONE 4: MEMORI (right) ══════ -->
+      <div class="wmap-zone wmap-zone--memori">
+        <!-- Twinkling star field -->
+        <div class="wmap-starfield" aria-hidden="true">
+          <div class="wmap-starfield-dot" style="top:15%;left:12%;animation-duration:2.1s;animation-delay:0s;"></div>
+          <div class="wmap-starfield-dot" style="top:30%;left:45%;animation-duration:3.0s;animation-delay:-0.8s;"></div>
+          <div class="wmap-starfield-dot" style="top:55%;left:78%;animation-duration:1.8s;animation-delay:-1.5s;"></div>
+          <div class="wmap-starfield-dot" style="top:70%;left:28%;animation-duration:2.5s;animation-delay:-0.3s;"></div>
+          <div class="wmap-starfield-dot" style="top:20%;left:88%;animation-duration:2.8s;animation-delay:-1.1s;"></div>
+          <div class="wmap-starfield-dot" style="top:80%;left:60%;animation-duration:1.6s;animation-delay:-0.6s;width:3px;height:3px;"></div>
+        </div>
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">🧠</span>
+          <span class="wmap-zone-name">Menara Memori</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-memori">⭐</span>
+        </div>
+        <div class="wmap-nodes">
+          <!-- G7: Tebak Gambar -->
+          <div class="wmap-node" id="gtile-7" onclick="playClick();openLevelSelect(7)" title="Tebak Gambar">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1E0845,#7C3AED);">
+              <span class="wn-icon">🖼️</span>
+            </div>
+            <div class="wmap-node-name">Tebak Gambar</div>
+            <div class="wmap-node-stars" id="gstars-7-lbl"></div>
+          </div>
+          <!-- Locked placeholder -->
+          <div class="wmap-node locked" title="Segera Hadir">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1F2937,#4B5563);">
+              <span class="wn-icon">❓</span>
+            </div>
+            <div class="wmap-node-name">Segera Hadir</div>
+            <div class="wmap-node-stars"></div>
+          </div>
+        </div>
+      </div><!-- end zone memori -->
+
+      <!-- Path divider row 2→3 -->
+      <div class="wmap-path-vert" style="grid-column:1/-1;"></div>
+
+      <!-- ══════ ZONE 5: MOBIL (left) ══════ -->
+      <div class="wmap-zone wmap-zone--mobil">
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">🚗</span>
+          <span class="wmap-zone-name">Kota Balapan</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-mobil">⭐</span>
+        </div>
+        <div class="wmap-nodes">
+          <!-- G6: Petualangan Mobil -->
+          <div class="wmap-node" id="gtile-6" onclick="playClick();openLevelSelect(6)" title="Petualangan Mobil">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#0C4A6E,#38BDF8);">
+              <span class="wn-icon">🚗</span>
+            </div>
+            <div class="wmap-node-name">Petualangan Mobil</div>
+            <div class="wmap-node-stars" id="gstars-6-lbl"></div>
+          </div>
+          <!-- Locked slot -->
+          <div class="wmap-node locked" title="Segera Hadir">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1F2937,#4B5563);">
+              <span class="wn-icon">🏎️</span>
+            </div>
+            <div class="wmap-node-name">Segera Hadir</div>
+            <div class="wmap-node-stars"></div>
+          </div>
+        </div>
+      </div><!-- end zone mobil -->
+
+      <!-- ══════ ZONE 6: POKEMON (right) ══════ -->
+      <div class="wmap-zone wmap-zone--pokemon">
+        <!-- Volcano decoration -->
+        <div class="wmap-volcano" aria-hidden="true">
+          <div class="wmap-smoke-1"></div>
+          <div class="wmap-smoke-2"></div>
+          <div class="wmap-smoke-3"></div>
+          <div class="wmap-volcano-cone"></div>
+          <div class="wmap-volcano-lava"></div>
+        </div>
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">⚡</span>
+          <span class="wmap-zone-name">Arena Pokémon</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-pokemon">⭐</span>
+        </div>
+        <div class="wmap-nodes">
+          <!-- G10: Pertarungan Pokemon -->
+          <div class="wmap-node" id="gtile-10" onclick="playClick();openLevelSelect(10)" title="Pertarungan Pokemon">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#7F1D1D,#EF4444);">
+              <span class="wn-icon"><span class="map-pokeball" style="width:40px;height:40px;border-width:3px;"></span></span>
+            </div>
+            <div class="wmap-node-name">Pertarungan Pokémon</div>
+            <div class="wmap-node-stars" id="gstars-10-lbl"></div>
+          </div>
+          <!-- G13b: Quick Fire -->
+          <div class="wmap-node" id="gtile-13b" onclick="playClick();startQuickFire()" title="Quick Fire">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#0C0A09,#44403C);">
+              <span class="wn-icon"><span class="map-ultraball" style="width:40px;height:40px;border-width:3px;"></span></span>
+            </div>
+            <div class="wmap-node-name">Quick Fire</div>
+            <div class="wmap-node-stars" id="gstars-13b-lbl"></div>
+          </div>
+        </div>
+      </div><!-- end zone pokemon -->
+
+      <!-- Path divider row 3→4 -->
+      <div class="wmap-path-vert" style="grid-column:1/-1;"></div>
+
+      <!-- ══════ ZONE 7: SAINS (left) ══════ -->
+      <div class="wmap-zone wmap-zone--sains">
+        <!-- Star field + observatory -->
+        <div class="wmap-starfield" aria-hidden="true">
+          <div class="wmap-starfield-dot" style="top:10%;left:5%;animation-duration:2.3s;animation-delay:0s;width:3px;height:3px;"></div>
+          <div class="wmap-starfield-dot" style="top:25%;left:35%;animation-duration:1.9s;animation-delay:-0.7s;"></div>
+          <div class="wmap-starfield-dot" style="top:50%;left:55%;animation-duration:2.7s;animation-delay:-1.4s;"></div>
+          <div class="wmap-starfield-dot" style="top:15%;left:72%;animation-duration:3.1s;animation-delay:-0.3s;width:3px;height:3px;"></div>
+          <div class="wmap-starfield-dot" style="top:68%;left:18%;animation-duration:2.0s;animation-delay:-1.8s;"></div>
+          <div class="wmap-starfield-dot" style="top:80%;left:85%;animation-duration:1.7s;animation-delay:-0.5s;"></div>
+          <div class="wmap-starfield-dot" style="top:35%;left:90%;animation-duration:2.5s;animation-delay:-1.2s;width:3px;height:3px;"></div>
+          <div class="wmap-starfield-dot" style="top:60%;left:70%;animation-duration:2.2s;animation-delay:-0.9s;"></div>
+        </div>
+        <div class="wmap-obs" aria-hidden="true">
+          <div class="wmap-obs-beam"></div>
+          <div class="wmap-obs-dome"></div>
+          <div class="wmap-obs-body"></div>
+        </div>
+        <div class="wmap-zone-banner">
+          <span class="wmap-zone-icon">🔭</span>
+          <span class="wmap-zone-name">Lab Sains</span>
+          <span class="wmap-zone-stars-total" id="gstars-zone-sains">⭐</span>
+        </div>
+        <div class="wmap-nodes">
+          <!-- G11: Kuis Sains -->
+          <div class="wmap-node" id="gtile-11" onclick="playClick();openLevelSelect(11)" title="Kuis Sains">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#0F172A,#2563EB);">
+              <span class="wn-icon">🔬</span>
+            </div>
+            <div class="wmap-node-name">Kuis Sains</div>
+            <div class="wmap-node-stars" id="gstars-11-lbl"></div>
+          </div>
+          <!-- G12: Tebak Bayangan -->
+          <div class="wmap-node" id="gtile-12" onclick="playClick();openLevelSelect(12)" title="Tebak Bayangan">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#020617,#312E81);">
+              <span class="wn-icon">🌑</span>
+            </div>
+            <div class="wmap-node-name">Tebak Bayangan</div>
+            <div class="wmap-node-stars" id="gstars-12-lbl"></div>
+          </div>
+        </div>
+      </div><!-- end zone sains -->
+
+      <!-- ══════ ZONE 8: KERETA — full width ══════ -->
+      <div class="wmap-zone wmap-zone--kereta" style="grid-column:1/-1;">
+        <!-- Animated rails -->
+        <div class="wt-rails" aria-hidden="true">
+          <div class="wt-rail-line"></div>
+          <div class="wt-rail-tie"></div>
+          <div class="wt-rail-line"></div>
+        </div>
+        <!-- Animated mini train traversing the zone -->
+        <div class="wmap-train-deco" aria-hidden="true">
+          <div class="wmap-train-car wmap-train-engine"></div>
+          <div class="wmap-train-car wmap-train-wagon"></div>
+          <div class="wmap-train-car wmap-train-wagon"></div>
+        </div>
+        <div class="wmap-zone-banner" onmouseenter="g14ZoneHover()" onclick="g14ZoneTap()" style="cursor:pointer;">
+          <span class="wmap-zone-icon">🚂</span>
+          <span class="wmap-zone-name">Dunia Kereta</span>
+          <button id="zone-kereta-music-btn" title="Putar/Hentikan musik kereta" onclick="event.stopPropagation();g14ToggleZoneMusic()" style="background:none;border:none;font-size:14px;cursor:pointer;padding:0 2px;">🎵</button>
+          <span class="wmap-zone-stars-total" id="gstars-zone-kereta">⭐</span>
+        </div>
+        <div class="wmap-nodes" style="flex-wrap:wrap;justify-content:center;gap:12px 14px;">
+          <!-- G14: Balapan Kereta -->
+          <div class="wmap-node" id="gtile-14" onclick="playClick();openLevelSelect(14)" title="Balapan Kereta">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#7F1D1D,#E63946);">
+              <span class="wn-icon">🚂</span>
+            </div>
+            <div class="wmap-node-name">Balapan Kereta</div>
+            <div class="wmap-node-stars" id="gstars-14-lbl"></div>
+          </div>
+          <!-- G15: Lokomotif Pemberani -->
+          <div class="wmap-node" id="gtile-15" onclick="playClick();openLevelSelect(15)" title="Lokomotif Pemberani">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#0D47A1,#42A5F5);">
+              <span class="wn-icon">💪</span>
+            </div>
+            <div class="wmap-node-name">Lokomotif Pemberani</div>
+            <div class="wmap-node-stars" id="gstars-15-lbl"></div>
+          </div>
+          <!-- G16: Selamatkan Kereta! -->
+          <div class="wmap-node" id="gtile-16" onclick="playClick();openLevelSelect(16)" title="Selamatkan Kereta!">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#BF360C,#FF9800);">
+              <span class="wn-icon">🚨</span>
+            </div>
+            <div class="wmap-node-name">Selamatkan Kereta!</div>
+            <div class="wmap-node-stars" id="gstars-16-lbl"></div>
+          </div>
+          <!-- G17: Jembatan Goyang -->
+          <div class="wmap-node" id="gtile-17" onclick="playClick();openLevelSelect(17)" title="Jembatan Goyang">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1B5E20,#66BB6A);">
+              <span class="wn-icon">🔨</span>
+            </div>
+            <div class="wmap-node-name">Jembatan Goyang</div>
+            <div class="wmap-node-stars" id="gstars-17-lbl"></div>
+          </div>
+          <!-- G18: Museum Ambarawa -->
+          <div class="wmap-node" id="gtile-18" onclick="playClick();openLevelSelect(18)" title="Museum Ambarawa">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#4A148C,#AB47BC);">
+              <span class="wn-icon">📚</span>
+            </div>
+            <div class="wmap-node-name">Museum Ambarawa</div>
+            <div class="wmap-node-stars" id="gstars-18-lbl"></div>
+          </div>
+          <!-- Locked -->
+          <div class="wmap-node locked" title="Segera Hadir">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#263238,#546E7A);">
+              <span class="wn-icon">🚃</span>
+            </div>
+            <div class="wmap-node-name">Segera Hadir</div>
+            <div class="wmap-node-stars"></div>
+          </div>
+        </div>
+      </div><!-- end zone kereta -->
+
+    </div><!-- end .wmap-canvas -->
+
+    <!-- Minimap scroll indicator dots -->
+    <div class="wmap-minimap">
+      <div class="wmap-minimap-dots">
+        <div class="wmap-minimap-dot active" data-zone="0" title="Emosi &amp; Kata"></div>
+        <div class="wmap-minimap-dot" data-zone="1" title="Angka &amp; Memori"></div>
+        <div class="wmap-minimap-dot" data-zone="2" title="Mobil &amp; Pokémon"></div>
+        <div class="wmap-minimap-dot" data-zone="3" title="Sains &amp; Kereta"></div>
       </div>
     </div>
-    <!-- hidden gstars divs for JS compatibility -->
-    <div id="gstars-1" style="display:none"></div>
-    <div id="gstars-2" style="display:none"></div>
-    <div id="gstars-5" style="display:none"></div>
 
-    <!-- Connector -->
-    <div class="map-connector">
-      <div class="map-connector-dot"></div><div class="map-connector-dot"></div><div class="map-connector-dot"></div>
-    </div>
+  </div><!-- end .wmap-root -->
 
-    <!-- Island 2: Hutan Belajar -->
-    <div class="map-island hutan" id="gtile-zone-hutan" style="margin-left:auto;margin-right:6%;">
-      <div class="map-island-badge">🌿 Hutan Belajar</div>
-      <div class="map-nodes">
-        <div class="map-node" id="gtile-3" style="background:linear-gradient(135deg,#16A34A,#4ADE80);box-shadow:0 6px 0 #14532D,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(3)" title="Huruf Hutan">
-          🔤<span class="map-node-label" id="gstars-3-lbl">Huruf Hutan</span>
-        </div>
-        <div class="map-node" id="gtile-4" style="background:linear-gradient(135deg,#15803D,#86EFAC);box-shadow:0 6px 0 #14532D,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(4)" title="Hitung Binatang">
-          🔢<span class="map-node-label" id="gstars-4-lbl">Hitung Binatang</span>
-        </div>
-        <div class="map-node" id="gtile-7" style="background:linear-gradient(135deg,#065F46,#34D399);box-shadow:0 6px 0 #064E3B,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(7)" title="Tebak Gambar">
-          🖼️<span class="map-node-label" id="gstars-7-lbl">Tebak Gambar</span>
-        </div>
-      </div>
-    </div>
-    <div id="gstars-3" style="display:none"></div>
-    <div id="gstars-4" style="display:none"></div>
-    <div id="gstars-7" style="display:none"></div>
-
-    <!-- Connector -->
-    <div class="map-connector">
-      <div class="map-connector-dot"></div><div class="map-connector-dot"></div><div class="map-connector-dot"></div>
-    </div>
-
-    <!-- Island 3: Kota Petualangan -->
-    <div class="map-island kota" id="gtile-zone-kota" style="margin-left:6%;margin-right:auto;">
-      <div class="map-island-badge">🚀 Kota Petualangan</div>
-      <div class="map-nodes">
-        <div class="map-node" id="gtile-6" style="background:linear-gradient(135deg,#0369A1,#38BDF8);box-shadow:0 6px 0 #0C4A6E,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(6)" title="Petualangan Mobil">
-          🚗<span class="map-node-label" id="gstars-6-lbl">Petualangan Mobil</span>
-        </div>
-        <div class="map-node" id="gtile-8" style="background:linear-gradient(135deg,#0284C7,#7DD3FC);box-shadow:0 6px 0 #0C4A6E,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(8)" title="Susun Kata">
-          🔡<span class="map-node-label" id="gstars-8-lbl">Susun Kata</span>
-        </div>
-        <div class="map-node" id="gtile-9" style="background:linear-gradient(135deg,#0EA5E9,#BAE6FD);box-shadow:0 6px 0 #0C4A6E,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(9)" title="Jejak Huruf">
-          ✍️<span class="map-node-label" id="gstars-9-lbl">Jejak Huruf</span>
-        </div>
-      </div>
-    </div>
-    <div id="gstars-6" style="display:none"></div>
-    <div id="gstars-8" style="display:none"></div>
-    <div id="gstars-9" style="display:none"></div>
-
-    <!-- Connector -->
-    <div class="map-connector">
-      <div class="map-connector-dot"></div><div class="map-connector-dot"></div><div class="map-connector-dot"></div>
-    </div>
-
-    <!-- Island 4: Arena Petualangan -->
-    <div class="map-island arena" id="gtile-zone-arena" style="margin-left:auto;margin-right:6%;">
-      <div class="map-island-badge">⚡ Arena Petualangan</div>
-      <div class="map-nodes">
-        <div class="map-node" id="gtile-10" style="background:linear-gradient(135deg,#D97706,#FCD34D);box-shadow:0 6px 0 #92400E,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(10)" title="Pertarungan Pokemon">
-          <span class="map-pokeball"></span><span class="map-node-label" id="gstars-10-lbl">Pertarungan Pokemon</span>
-        </div>
-        <div class="map-node" id="gtile-11" style="background:linear-gradient(135deg,#B45309,#FDE68A);box-shadow:0 6px 0 #78350F,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(11)" title="Kuis Sains">
-          🔬<span class="map-node-label" id="gstars-11-lbl">Kuis Sains</span>
-        </div>
-        <div class="map-node" id="gtile-12" style="background:linear-gradient(135deg,#92400E,#F59E0B);box-shadow:0 6px 0 #78350F,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(12)" title="Tebak Bayangan">
-          🌑<span class="map-node-label" id="gstars-12-lbl">Tebak Bayangan</span>
-        </div>
-        <div class="map-node" id="gtile-13" style="background:linear-gradient(135deg,#78350F,#FB923C);box-shadow:0 6px 0 #431407,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(13)" title="Evolusi Math">
-          <span class="map-pokeball"></span><span class="map-node-label" id="gstars-13-lbl">Evolusi Math</span>
-        </div>
-        <div class="map-node" id="gtile-13b" style="background:linear-gradient(135deg,#F59E0B,#06B6D4);box-shadow:0 6px 0 #B45309,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();startQuickFire()" title="Quick Fire">
-          <span class="map-pokeball"></span><span class="map-node-label" id="gstars-13b-lbl">Quick Fire</span>
-        </div>
-      </div>
-    </div>
-    <div id="gstars-10" style="display:none"></div>
-    <div id="gstars-11" style="display:none"></div>
-    <div id="gstars-12" style="display:none"></div>
-    <div id="gstars-13" style="display:none"></div>
-    <div id="gstars-13b" style="display:none"></div>
-
-    <!-- Connector -->
-    <div class="map-connector">
-      <div class="map-connector-dot"></div><div class="map-connector-dot"></div><div class="map-connector-dot"></div>
-    </div>
-
-    <!-- Island 5: Dunia Kereta -->
-    <div class="map-island kereta" id="zone-kereta" style="margin-left:6%;margin-right:auto;">
-      <div class="map-island-badge" onmouseenter="g14ZoneHover()" onclick="g14ZoneTap()">
-        🚂 Dunia Kereta
-        <button id="zone-kereta-music-btn" title="Putar/Hentikan musik kereta" onclick="event.stopPropagation();g14ToggleZoneMusic()" style="background:none;border:none;font-size:16px;cursor:pointer;">🎵</button>
-      </div>
-      <div class="map-nodes">
-        <div class="map-node" id="gtile-14" style="background:linear-gradient(135deg,#9A1515,#E63946);box-shadow:0 6px 0 #7F1D1D,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(14)" title="Balapan Kereta">
-          🚂<span class="map-node-label" id="gstars-14-lbl">Balapan Kereta</span>
-        </div>
-        <div class="map-node" id="gtile-15" style="background:linear-gradient(135deg,#1565C0,#2196F3);box-shadow:0 6px 0 #0D47A1,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(15)" title="Lokomotif Pemberani">
-          💪<span class="map-node-label" id="gstars-15-lbl">Lokomotif Pemberani</span>
-        </div>
-        <div class="map-node" id="gtile-16" style="background:linear-gradient(135deg,#E65100,#FF9800);box-shadow:0 6px 0 #BF360C,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(16)" title="Selamatkan Kereta!">
-          🚨<span class="map-node-label" id="gstars-16-lbl">Selamatkan Kereta!</span>
-        </div>
-        <div class="map-node" id="gtile-17" style="background:linear-gradient(135deg,#2E7D32,#4CAF50);box-shadow:0 6px 0 #1B5E20,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(17)" title="Jembatan Goyang">
-          🔨<span class="map-node-label" id="gstars-17-lbl">Jembatan Goyang</span>
-        </div>
-        <div class="map-node" id="gtile-18" style="background:linear-gradient(135deg,#6A1B9A,#9C27B0);box-shadow:0 6px 0 #4A148C,0 8px 20px rgba(0,0,0,0.3);" onclick="playClick();openLevelSelect(18)" title="Museum Ambarawa">
-          📚<span class="map-node-label" id="gstars-18-lbl">Museum Ambarawa</span>
-        </div>
-        <div class="map-node locked" style="background:linear-gradient(135deg,#37474F,#546E7A);box-shadow:0 6px 0 #263238,0 8px 20px rgba(0,0,0,0.3);" title="Segera Hadir">
-          🚃<span class="map-node-label">Segera Hadir</span>
-        </div>
-      </div>
-    </div>
-    <div id="gstars-14" style="display:none"></div>
-    <div id="gstars-15" style="display:none"></div>
-    <div id="gstars-16" style="display:none"></div>
-    <div id="gstars-17" style="display:none"></div>
-    <div id="gstars-18" style="display:none"></div>
-
-  </div><!-- end .map-world -->
+  <!-- Hidden gstars divs for JS compatibility -->
+  <div id="gstars-1" style="display:none"></div>
+  <div id="gstars-2" style="display:none"></div>
+  <div id="gstars-3" style="display:none"></div>
+  <div id="gstars-4" style="display:none"></div>
+  <div id="gstars-5" style="display:none"></div>
+  <div id="gstars-6" style="display:none"></div>
+  <div id="gstars-7" style="display:none"></div>
+  <div id="gstars-8" style="display:none"></div>
+  <div id="gstars-9" style="display:none"></div>
+  <div id="gstars-10" style="display:none"></div>
+  <div id="gstars-11" style="display:none"></div>
+  <div id="gstars-12" style="display:none"></div>
+  <div id="gstars-13" style="display:none"></div>
+  <div id="gstars-13b" style="display:none"></div>
+  <div id="gstars-13c" style="display:none"></div>
+  <div id="gstars-14" style="display:none"></div>
+  <div id="gstars-15" style="display:none"></div>
+  <div id="gstars-16" style="display:none"></div>
+  <div id="gstars-17" style="display:none"></div>
+  <div id="gstars-18" style="display:none"></div>
 
   <button class="btn btn-sm" style="background:white;color:var(--text-light);border:3px solid #E0E0E0;box-shadow:0 3px 0 #C0C0C0;margin-top:8px;margin-bottom:8px;font-size:15px;" onclick="playClick(); showDashboard()">📊 Progress Saya</button>
 </div>
@@ -5829,6 +6370,8 @@ body { background: #0a0a1a !important; }
     </div>
     <!-- Field status message -->
     <div class="g10-field-status" id="g10-field-status"></div>
+    <!-- Pixi GPU canvas — FX overlay, pointer-events:none so buttons beneath still work -->
+    <canvas id="g10-pixi-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:10;"></canvas>
   </div>
 
   <!-- Round/status bar -->
@@ -5964,6 +6507,8 @@ body { background: #0a0a1a !important; }
     <div class="g13-flash" id="g13-flash"></div>
     <!-- Field status message -->
     <div class="g13-field-status" id="g13-field-status"></div>
+    <!-- Pixi GPU canvas for evolution rings + particles -->
+    <canvas id="g13-pixi-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:10;"></canvas>
   </div>
 
   <!-- Status bar -->
@@ -6086,6 +6631,8 @@ body { background: #0a0a1a !important; }
     </div>
     <!-- Flash FX -->
     <div class="g13b-flash" id="g13b-flash"></div>
+    <!-- Pixi GPU canvas for aura rings + combo text -->
+    <canvas id="g13b-pixi-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:10;"></canvas>
   </div>
 
   <!-- Question panel (bottom 30%) -->
@@ -6843,6 +7390,15 @@ body { background: #0a0a1a !important; }
     <button class="g5-sub-tab active" onclick="setG5SubMode('emosi',this)">😊 Emosi</button>
     <button class="g5-sub-tab" onclick="setG5SubMode('hewan',this)">🐾 Hewan</button>
     <button class="g5-sub-tab" onclick="setG5SubMode('buah',this)">🍎 Buah</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('sayur',this)">🥕 Sayur</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('kendaraan',this)">🚗 Kendaraan</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('warna',this)">🌈 Warna</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('benda',this)">📦 Benda</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('profesi',this)">👩‍⚕️ Profesi</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('alam',this)">🏔️ Alam</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('cuaca',this)">⛅ Cuaca</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('makanan',this)">🍜 Makanan</button>
+    <button class="g5-sub-tab" onclick="setG5SubMode('sekolah',this)">🏫 Sekolah</button>
     <button class="g5-sub-tab" onclick="setG5SubMode('pokemon',this)"><span class="g5-pokeball-icon"></span> Pokémon</button>
   </div>
   <div class="mascot-guide">
@@ -6876,6 +7432,10 @@ body { background: #0a0a1a !important; }
       <button class="g6-map-btn" data-map="forest" onclick="selectDriveMap('forest',this)">🌿 Hutan</button>
       <button class="g6-map-btn" data-map="space" onclick="selectDriveMap('space',this)">🚀 Angkasa</button>
       <button class="g6-map-btn" data-map="body" onclick="selectDriveMap('body',this)">🔬 Tubuh</button>
+      <button class="g6-map-btn" data-map="pantai" onclick="selectDriveMap('pantai',this)">🏖️ Pantai</button>
+      <button class="g6-map-btn" data-map="sekolah" onclick="selectDriveMap('sekolah',this)">🏫 Sekolah</button>
+      <button class="g6-map-btn" data-map="dapur" onclick="selectDriveMap('dapur',this)">🍳 Dapur</button>
+      <button class="g6-map-btn" data-map="kebun" onclick="selectDriveMap('kebun',this)">🌱 Kebun</button>
     </div>
     <div class="g6-target-row">
       <span class="g6-target-label">🎯</span>
@@ -7002,6 +7562,10 @@ body { background: #0a0a1a !important; }
     <span class="mg-char">🐌</span>
     <div class="mg-bubble" id="g9-mg">Ikuti garis hurufnya dengan jarimu! Pelan-pelan ya ✏️</div>
   </div>
+  <div class="g5-sub-tabs" id="g9-mode-tabs" style="margin-bottom:6px;">
+    <button class="g5-sub-tab active" id="g9-tab-huruf" onclick="setG9Mode('huruf',this)">🔤 Huruf</button>
+    <button class="g5-sub-tab" id="g9-tab-angka" onclick="setG9Mode('angka',this)">🔢 Angka</button>
+  </div>
   <div class="g9-letter-display" id="g9-letter-display">A</div>
   <p class="g9-instruction">Ikuti garis dengan jarimu! ✏️</p>
   <div class="g9-canvas-wrap">
@@ -7065,6 +7629,8 @@ body { background: #0a0a1a !important; }
   </div>
 </div>
 
+<!-- PixiJS v8 — GPU-accelerated 2D renderer for battle FX, weather, evolution VFX -->
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script>
 // ================================================================
 // DIFFICULTY CONFIG
@@ -7170,6 +7736,8 @@ const MATCH_PAIRS_HEWAN = [
   {id:'hw8',emoji:'🦅',label:'Elang'},
   {id:'hw9',emoji:'🐊',label:'Buaya'},
   {id:'hw10',emoji:'🦓',label:'Zebra'},
+  {id:'hw11',emoji:'🦊',label:'Rubah'},
+  {id:'hw12',emoji:'🐼',label:'Panda'},
 ]
 const MATCH_PAIRS_BUAH = [
   {id:'bu1',emoji:'🍎',label:'Apel'},
@@ -7182,15 +7750,175 @@ const MATCH_PAIRS_BUAH = [
   {id:'bu8',emoji:'🍍',label:'Nanas'},
   {id:'bu9',emoji:'🥝',label:'Kiwi'},
   {id:'bu10',emoji:'🍑',label:'Persik'},
+  {id:'bu11',emoji:'🍒',label:'Ceri'},
+  {id:'bu12',emoji:'🍐',label:'Pir'},
+]
+const MATCH_PAIRS_SAYUR = [
+  {id:'sv1',emoji:'🥕',label:'Wortel'},
+  {id:'sv2',emoji:'🥦',label:'Brokoli'},
+  {id:'sv3',emoji:'🌽',label:'Jagung'},
+  {id:'sv4',emoji:'🥬',label:'Selada'},
+  {id:'sv5',emoji:'🥒',label:'Timun'},
+  {id:'sv6',emoji:'🍆',label:'Terong'},
+  {id:'sv7',emoji:'🫑',label:'Paprika'},
+  {id:'sv8',emoji:'🧅',label:'Bawang'},
+  {id:'sv9',emoji:'🧄',label:'Bawang Putih'},
+  {id:'sv10',emoji:'🥔',label:'Kentang'},
+  {id:'sv11',emoji:'🌶️',label:'Cabai'},
+  {id:'sv12',emoji:'🍄',label:'Jamur'},
+]
+const MATCH_PAIRS_KENDARAAN = [
+  {id:'kd1',emoji:'🚗',label:'Mobil'},
+  {id:'kd2',emoji:'🚌',label:'Bus'},
+  {id:'kd3',emoji:'🚂',label:'Kereta'},
+  {id:'kd4',emoji:'✈️',label:'Pesawat'},
+  {id:'kd5',emoji:'🚀',label:'Roket'},
+  {id:'kd6',emoji:'🚁',label:'Helikopter'},
+  {id:'kd7',emoji:'🚢',label:'Kapal'},
+  {id:'kd8',emoji:'🚲',label:'Sepeda'},
+  {id:'kd9',emoji:'🏍️',label:'Motor'},
+  {id:'kd10',emoji:'🚜',label:'Traktor'},
+  {id:'kd11',emoji:'🚒',label:'Pemadam'},
+  {id:'kd12',emoji:'🚑',label:'Ambulans'},
+]
+const MATCH_PAIRS_WARNA = [
+  {id:'wr1',emoji:'🔴',label:'Merah'},
+  {id:'wr2',emoji:'🟠',label:'Oranye'},
+  {id:'wr3',emoji:'🟡',label:'Kuning'},
+  {id:'wr4',emoji:'🟢',label:'Hijau'},
+  {id:'wr5',emoji:'🔵',label:'Biru'},
+  {id:'wr6',emoji:'🟣',label:'Ungu'},
+  {id:'wr7',emoji:'⚫',label:'Hitam'},
+  {id:'wr8',emoji:'⚪',label:'Putih'},
+  {id:'wr9',emoji:'🟤',label:'Coklat'},
+  {id:'wr10',emoji:'🩷',label:'Merah Muda'},
+  {id:'wr11',emoji:'🩵',label:'Biru Muda'},
+  {id:'wr12',emoji:'🟫',label:'Krem'},
+]
+const MATCH_PAIRS_BENDA = [
+  {id:'bd1',emoji:'📚',label:'Buku'},
+  {id:'bd2',emoji:'✏️',label:'Pensil'},
+  {id:'bd3',emoji:'🪑',label:'Kursi'},
+  {id:'bd4',emoji:'🛏️',label:'Kasur'},
+  {id:'bd5',emoji:'🪟',label:'Jendela'},
+  {id:'bd6',emoji:'🚪',label:'Pintu'},
+  {id:'bd7',emoji:'💡',label:'Lampu'},
+  {id:'bd8',emoji:'📱',label:'Ponsel'},
+  {id:'bd9',emoji:'⌚',label:'Jam'},
+  {id:'bd10',emoji:'🎒',label:'Ransel'},
+  {id:'bd11',emoji:'🔑',label:'Kunci'},
+  {id:'bd12',emoji:'🪞',label:'Cermin'},
+]
+const MATCH_PAIRS_PROFESI = [
+  {id:'pf1',emoji:'👨‍⚕️',label:'Dokter'},
+  {id:'pf2',emoji:'👩‍🏫',label:'Guru'},
+  {id:'pf3',emoji:'👮',label:'Polisi'},
+  {id:'pf4',emoji:'👨‍🍳',label:'Koki'},
+  {id:'pf5',emoji:'🧑‍🚒',label:'Pemadam'},
+  {id:'pf6',emoji:'👨‍🔧',label:'Montir'},
+  {id:'pf7',emoji:'👩‍💼',label:'Pengusaha'},
+  {id:'pf8',emoji:'🧑‍🌾',label:'Petani'},
+  {id:'pf9',emoji:'🧑‍✈️',label:'Pilot'},
+  {id:'pf10',emoji:'👨‍🎨',label:'Seniman'},
+  {id:'pf11',emoji:'🧑‍💻',label:'Programmer'},
+  {id:'pf12',emoji:'👩‍⚕️',label:'Perawat'},
+]
+const MATCH_PAIRS_ALAM = [
+  {id:'al1',emoji:'🌋',label:'Gunung Berapi'},
+  {id:'al2',emoji:'🏔️',label:'Gunung'},
+  {id:'al3',emoji:'🏖️',label:'Pantai'},
+  {id:'al4',emoji:'🌊',label:'Ombak'},
+  {id:'al5',emoji:'🌴',label:'Pohon Kelapa'},
+  {id:'al6',emoji:'🌿',label:'Rumput'},
+  {id:'al7',emoji:'🌸',label:'Bunga Sakura'},
+  {id:'al8',emoji:'🍄',label:'Jamur'},
+  {id:'al9',emoji:'🌵',label:'Kaktus'},
+  {id:'al10',emoji:'🪨',label:'Batu'},
+  {id:'al11',emoji:'🏞️',label:'Danau'},
+  {id:'al12',emoji:'🌁',label:'Kabut'},
+]
+const MATCH_PAIRS_CUACA = [
+  {id:'cw1',emoji:'☀️',label:'Cerah'},
+  {id:'cw2',emoji:'🌤️',label:'Berawan'},
+  {id:'cw3',emoji:'🌧️',label:'Hujan'},
+  {id:'cw4',emoji:'⛈️',label:'Badai'},
+  {id:'cw5',emoji:'🌩️',label:'Petir'},
+  {id:'cw6',emoji:'🌪️',label:'Tornado'},
+  {id:'cw7',emoji:'❄️',label:'Salju'},
+  {id:'cw8',emoji:'🌈',label:'Pelangi'},
+  {id:'cw9',emoji:'🌬️',label:'Angin'},
+  {id:'cw10',emoji:'🌫️',label:'Berkabut'},
+  {id:'cw11',emoji:'🌞',label:'Matahari'},
+  {id:'cw12',emoji:'🌙',label:'Bulan'},
+]
+const MATCH_PAIRS_MAKANAN = [
+  {id:'mk1',emoji:'🍚',label:'Nasi'},
+  {id:'mk2',emoji:'🍜',label:'Mie'},
+  {id:'mk3',emoji:'🍞',label:'Roti'},
+  {id:'mk4',emoji:'🥩',label:'Daging'},
+  {id:'mk5',emoji:'🍣',label:'Sushi'},
+  {id:'mk6',emoji:'🍕',label:'Pizza'},
+  {id:'mk7',emoji:'🍔',label:'Burger'},
+  {id:'mk8',emoji:'🍦',label:'Es Krim'},
+  {id:'mk9',emoji:'🍰',label:'Kue'},
+  {id:'mk10',emoji:'🥗',label:'Salad'},
+  {id:'mk11',emoji:'🍲',label:'Sup'},
+  {id:'mk12',emoji:'🥪',label:'Sandwich'},
+]
+const MATCH_PAIRS_SEKOLAH = [
+  {id:'sk1',emoji:'📏',label:'Penggaris'},
+  {id:'sk2',emoji:'📐',label:'Segitiga'},
+  {id:'sk3',emoji:'📚',label:'Buku'},
+  {id:'sk4',emoji:'🎒',label:'Tas Sekolah'},
+  {id:'sk5',emoji:'🖍️',label:'Krayon'},
+  {id:'sk6',emoji:'🖊️',label:'Pena'},
+  {id:'sk7',emoji:'🔬',label:'Mikroskop'},
+  {id:'sk8',emoji:'🗺️',label:'Peta'},
+  {id:'sk9',emoji:'🧮',label:'Kalkulator'},
+  {id:'sk10',emoji:'🎨',label:'Cat'},
+  {id:'sk11',emoji:'🧪',label:'Tabung Uji'},
+  {id:'sk12',emoji:'📓',label:'Buku Tulis'},
 ]
 const ANIMALS_PICKER = ['🦁','🐰','🐘','🦊','🐸','🐯','🐼','🐨']
-const ANIMALS_G4 = ['🐘','🦁','🐯','🐸','🐰','🦊','🐼','🐨','🐧','🦆','🐓','🐑','🦒','🐴','🦋']
+const ANIMALS_G4 = [
+  '🐘','🦁','🐯','🐸','🐰','🦊','🐼','🐨','🐧','🦆','🐓','🐑','🦒','🐴','🦋',
+  '🦀','🐢','🐊','🦅','🦭','🦧','🦚','🦜','🦩','🐙','🦑','🐬','🦈','🐳','🦦',
+  '🦥','🐝','🐞','🐛','🐿️','🦔','🦎','🦘','🦙','🐐','🦌','🐻','🐺','🦝','🐗',
+  '🐪','🦏','🦛','🐆','🦓'
+]
+const FRUITS_G4 = ['🍎','🍌','🍇','🍓','🍊','🍉','🥭','🍍','🥝','🍑','🍒','🍐','🫐','🍋','🥥','🍈','🍏','🥑','🍅','🍆']
+const OBJECTS_G4 = ['📚','⚽','🎈','🎨','✏️','🪑','🛏️','🚗','✈️','🚂','🎸','🥁','🎭','🔭','🎮']
 const POKEMON_G4 = [
+  // Gen 1 starters & popular
   {id:25,name:'Pikachu'},{id:133,name:'Eevee'},{id:4,name:'Charmander'},{id:7,name:'Squirtle'},
   {id:1,name:'Bulbasaur'},{id:39,name:'Jigglypuff'},{id:52,name:'Meowth'},{id:54,name:'Psyduck'},
   {id:129,name:'Magikarp'},{id:143,name:'Snorlax'},{id:35,name:'Clefairy'},{id:172,name:'Pichu'},
   {id:110,name:'Weezing'},{id:94,name:'Gengar'},{id:113,name:'Chansey'},{id:79,name:'Slowpoke'},
-  {id:58,name:'Growlithe'},{id:116,name:'Horsea'},{id:81,name:'Magnemite'},{id:120,name:'Staryu'}
+  {id:58,name:'Growlithe'},{id:116,name:'Horsea'},{id:81,name:'Magnemite'},{id:120,name:'Staryu'},
+  // Gen 1 evolved
+  {id:6,name:'Charizard'},{id:9,name:'Blastoise'},{id:3,name:'Venusaur'},{id:150,name:'Mewtwo'},
+  {id:151,name:'Mew'},{id:136,name:'Flareon'},{id:134,name:'Vaporeon'},{id:135,name:'Jolteon'},
+  {id:196,name:'Espeon'},{id:197,name:'Umbreon'},{id:37,name:'Vulpix'},{id:63,name:'Abra'},
+  {id:92,name:'Gastly'},{id:66,name:'Machop'},{id:74,name:'Geodude'},{id:104,name:'Cubone'},
+  {id:109,name:'Koffing'},{id:147,name:'Dratini'},{id:123,name:'Scyther'},{id:137,name:'Porygon'},
+  // Gen 2
+  {id:152,name:'Chikorita'},{id:155,name:'Cyndaquil'},{id:158,name:'Totodile'},{id:175,name:'Togepi'},
+  {id:179,name:'Mareep'},{id:183,name:'Marill'},{id:185,name:'Sudowoodo'},{id:190,name:'Aipom'},
+  {id:193,name:'Yanma'},{id:194,name:'Wooper'},{id:198,name:'Murkrow'},{id:199,name:'Slowking'},
+  {id:200,name:'Misdreavus'},{id:203,name:'Girafarig'},{id:209,name:'Snubbull'},{id:216,name:'Teddiursa'},
+  {id:217,name:'Ursaring'},{id:220,name:'Swinub'},{id:225,name:'Delibird'},{id:228,name:'Houndour'},
+  // Gen 3
+  {id:252,name:'Treecko'},{id:255,name:'Torchic'},{id:258,name:'Mudkip'},{id:261,name:'Poochyena'},
+  {id:270,name:'Lotad'},{id:273,name:'Seedot'},{id:276,name:'Taillow'},{id:278,name:'Wingull'},
+  {id:280,name:'Ralts'},{id:285,name:'Shroomish'},{id:287,name:'Slakoth'},{id:293,name:'Whismur'},
+  {id:296,name:'Makuhita'},{id:298,name:'Azurill'},{id:300,name:'Skitty'},{id:303,name:'Mawile'},
+  {id:304,name:'Aron'},{id:307,name:'Meditite'},{id:311,name:'Plusle'},{id:312,name:'Minun'},
+  // Gen 4+
+  {id:393,name:'Piplup'},{id:390,name:'Chimchar'},{id:387,name:'Turtwig'},{id:399,name:'Bidoof'},
+  {id:403,name:'Shinx'},{id:406,name:'Budew'},{id:420,name:'Cherubi'},{id:427,name:'Buneary'},
+  {id:431,name:'Glameow'},{id:440,name:'Happiny'},{id:447,name:'Riolu'},{id:453,name:'Croagunk'},
+  {id:479,name:'Rotom'},{id:489,name:'Phione'},{id:495,name:'Snivy'},{id:498,name:'Tepig'},
+  {id:501,name:'Oshawott'},{id:509,name:'Purrloin'},{id:519,name:'Pidove'},{id:529,name:'Drilbur'}
 ]
 const ALL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -7212,7 +7940,8 @@ const GAME_META = {
   15:{icon:'💪',name:'Lokomotif Pemberani'},
   16:{icon:'🆘',name:'Selamatkan Kereta!'},
   17:{icon:'🌉',name:'Jembatan Goyang'},
-  18:{icon:'🏛️',name:'Museum Ambarawa'}
+  18:{icon:'🏛️',name:'Museum Ambarawa'},
+  '13c':{icon:'🏅',name:'Gym Huruf & Suara'}
 }
 
 // XP & Level system
@@ -7280,16 +8009,21 @@ function renderAsset(filename, size=80) {
 
 // Game 6 word banks
 const DRIVE_WORD_BANK = {
-  city:   ['BOLA','KUDA','APEL','SAPI','MEJA','KURSI','LAMPU','BUKU','RUMAH'],
-  forest: ['POHON','DAUN','BUNGA','BURUNG','KELINCI','HARIMAU'],
-  space:  ['BUMI','MARS','BULAN','BINTANG','PLANET'],
-  body:   ['MATA','KAKI','HATI','PARU','GIGI','JANTUNG']
+  city:   ['BOLA','KUDA','APEL','SAPI','MEJA','KURSI','LAMPU','BUKU','RUMAH','MOBIL','JALAN','TOKO','PASAR','KANTOR','POLISI','DOKTER','SEKOLAH','GEDUNG','BUS','TAKSI','JEMBATAN','KOTA'],
+  forest: ['POHON','DAUN','BUNGA','BURUNG','KELINCI','HARIMAU','HUTAN','SUNGAI','BATU','LUMUT','JAMUR','RUSA','BERUANG','RUBAH','KATAK','SEMUT','LEBAH','KUPU','ANGIN','AKAR','RANTING','HEWAN'],
+  space:  ['BUMI','MARS','BULAN','BINTANG','PLANET','ROKET','ORBIT','KOMET','GALAKSI','NEBULA','SATELIT','METEOR','ASTRONOT','MATAHARI','VENUS','YUPITER','SATURNUS','URANUS','NEPTUNUS','TELESKOP','ASTEROID','ANGKASA'],
+  body:   ['MATA','KAKI','HATI','PARU','GIGI','JANTUNG','OTAK','DARAH','TULANG','OTOT','KULIT','TANGAN','HIDUNG','MULUT','TELINGA','LEHER','PERUT','DADA','BAHU','LUTUT','SIKU','JARI'],
+  pantai: ['OMBAK','PASIR','KARANG','IKAN','KEPITING','BINTANG','PERAHU','JALA','LAUT','TERUMBU','CUMI','UDANG','SIPUT','KERANG','PENYU','LUMBA','HIU','PAUS','UBUR','NELAYAN','PANTAI','ANGIN'],
+  sekolah:['BUKU','PENSIL','MEJA','KURSI','PAPAN','GURU','MURID','NILAI','UJIAN','KELAS','KANTIN','PERPUS','LAPANGAN','BELAJAR','MENULIS','MEMBACA','BERHITUNG','MENGGAMBAR','PELAJARAN','ISTIRAHAT','TEMAN','PULANG'],
+  dapur:  ['NASI','MINYAK','GARAM','GULA','TELUR','AYAM','IKAN','SAYUR','BUAH','PANCI','WAJAN','PISAU','SENDOK','GARPU','PIRING','GELAS','BLENDER','OVEN','KOMPOR','KULKAS','SERBET','MANGKOK'],
+  kebun:  ['BUNGA','POHON','DAUN','BUAH','SAYUR','TANAH','AIR','BENIH','CANGKUL','PUPUK','ULAT','KUPU','LEBAH','CACING','SEMUT','MATAHARI','HUJAN','TUMBUH','PANEN','KEBUN','RUMPUT','BENIH']
 }
-const DRIVE_VEHICLES  = {city:'🚗',forest:'🚗',space:'🚀',body:'🤿'}
-const DRIVE_OBSTACLES = {city:'⛔',forest:'🌵',space:'💥',body:'🦠'}
+const DRIVE_VEHICLES  = {city:'🚗',forest:'🚗',space:'🚀',body:'🤿',pantai:'⛵',sekolah:'🚌',dapur:'🛺',kebun:'🚜'}
+const DRIVE_OBSTACLES = {city:'⛔',forest:'🌵',space:'💥',body:'🦠',pantai:'🪨',sekolah:'🎒',dapur:'🥄',kebun:'🌿'}
 
 // Game 7 image data
 const WORD_IMAGES = [
+  // --- Animals with image files ---
   {id:'ayam',   emoji:'🐓',word:'AYAM',   file:'img-ayam.webp',   suku:'A-YAM'},
   {id:'bebek',  emoji:'🦆',word:'BEBEK',  file:'img-bebek.webp',  suku:'BE-BEK'},
   {id:'gajah',  emoji:'🐘',word:'GAJAH',  file:'img-gajah.webp',  suku:'GA-JAH'},
@@ -7300,28 +8034,125 @@ const WORD_IMAGES = [
   {id:'monyet', emoji:'🐒',word:'MONYET', file:'img-monyet.webp', suku:'MON-YET'},
   {id:'panda',  emoji:'🐼',word:'PANDA',  file:'img-panda.webp',  suku:'PAN-DA'},
   {id:'singa',  emoji:'🦁',word:'SINGA',  file:'img-singa.webp',  suku:'SIN-GA'},
+  {id:'cicak',  emoji:'🦎',word:'CICAK',  file:'img-cicak.webp',  suku:'CI-CAK'},
+  {id:'domba',  emoji:'🐑',word:'DOMBA',  file:'img-domba.webp',  suku:'DOM-BA'},
+  {id:'elang',  emoji:'🦅',word:'ELANG',  file:'img-elang.webp',  suku:'E-LANG'},
+  {id:'rusa',   emoji:'🦌',word:'RUSA',   file:'img-rusa.webp',   suku:'RU-SA'},
+  {id:'tikus',  emoji:'🐭',word:'TIKUS',  file:'img-tikus.webp',  suku:'TI-KUS'},
+  // --- Objects with image files ---
   {id:'apel',   emoji:'🍎',word:'APEL',   file:'img-apel.webp',   suku:'A-PEL'},
   {id:'bola',   emoji:'⚽',word:'BOLA',   file:'img-bola.webp',   suku:'BO-LA'},
   {id:'buku',   emoji:'📚',word:'BUKU',   file:'img-buku.webp',   suku:'BU-KU'},
   {id:'daun',   emoji:'🍃',word:'DAUN',   file:'img-daun.webp',   suku:'DA-UN'},
-  {id:'meja',   emoji:'🪑',word:'MEJA',   file:'img-meja.webp',   suku:'ME-JA'}
+  {id:'meja',   emoji:'🪑',word:'MEJA',   file:'img-meja.webp',   suku:'ME-JA'},
+  // --- Animals emoji-only ---
+  {id:'kucing', emoji:'🐱',word:'KUCING', file:null,suku:'KU-CING'},
+  {id:'anjing', emoji:'🐶',word:'ANJING', file:null,suku:'AN-JING'},
+  {id:'kelinci',emoji:'🐰',word:'KELINCI',file:null,suku:'KE-LIN-CI'},
+  {id:'kura',   emoji:'🐢',word:'KURA',   file:null,suku:'KU-RA'},
+  {id:'burung', emoji:'🐦',word:'BURUNG', file:null,suku:'BU-RUNG'},
+  {id:'kupu',   emoji:'🦋',word:'KUPU',   file:null,suku:'KU-PU'},
+  {id:'lebah',  emoji:'🐝',word:'LEBAH',  file:null,suku:'LE-BAH'},
+  {id:'semut',  emoji:'🐜',word:'SEMUT',  file:null,suku:'SE-MUT'},
+  {id:'katak',  emoji:'🐸',word:'KATAK',  file:null,suku:'KA-TAK'},
+  {id:'ular',   emoji:'🐍',word:'ULAR',   file:null,suku:'U-LAR'},
+  {id:'beruang',emoji:'🐻',word:'BERUANG',file:null,suku:'BE-RU-ANG'},
+  {id:'lumba',  emoji:'🐬',word:'LUMBA',  file:null,suku:'LUM-BA'},
+  // --- Fruits emoji-only ---
+  {id:'pisang', emoji:'🍌',word:'PISANG', file:null,suku:'PI-SANG'},
+  {id:'jeruk',  emoji:'🍊',word:'JERUK',  file:null,suku:'JE-RUK'},
+  {id:'mangga', emoji:'🥭',word:'MANGGA', file:null,suku:'MANG-GA'},
+  {id:'anggur', emoji:'🍇',word:'ANGGUR', file:null,suku:'ANG-GUR'},
+  {id:'pepaya', emoji:'🍑',word:'PEPAYA', file:null,suku:'PE-PA-YA'},
+  {id:'semangka',emoji:'🍉',word:'SEMANGKA',file:null,suku:'SE-MANG-KA'},
+  // --- Transport emoji-only ---
+  {id:'sepeda', emoji:'🚲',word:'SEPEDA', file:null,suku:'SE-PE-DA'},
+  {id:'pesawat',emoji:'✈️',word:'PESAWAT',file:null,suku:'PE-SA-WAT'},
+  {id:'kapal',  emoji:'🚢',word:'KAPAL',  file:null,suku:'KA-PAL'},
+  {id:'kereta2',emoji:'🚂',word:'KERETA', file:null,suku:'KE-RE-TA'},
+  // --- Misc emoji-only ---
+  {id:'payung', emoji:'☂️',word:'PAYUNG', file:null,suku:'PA-YUNG'},
+  {id:'rumah',  emoji:'🏠',word:'RUMAH',  file:null,suku:'RU-MAH'},
+  {id:'bunga',  emoji:'🌸',word:'BUNGA',  file:null,suku:'BUNG-A'},
+  {id:'bintang2',emoji:'⭐',word:'BINTANG',file:null,suku:'BIN-TANG'},
+  {id:'lampu',  emoji:'💡',word:'LAMPU',  file:null,suku:'LAM-PU'},
+  {id:'pena',   emoji:'🖊️',word:'PENA',   file:null,suku:'PE-NA'},
+  {id:'gitar',  emoji:'🎸',word:'GITAR',  file:null,suku:'GI-TAR'},
+  {id:'nasi',   emoji:'🍚',word:'NASI',   file:null,suku:'NA-SI'},
+  {id:'wortel', emoji:'🥕',word:'WORTEL', file:null,suku:'WOR-TEL'},
+  {id:'jagung', emoji:'🌽',word:'JAGUNG', file:null,suku:'JA-GUNG'},
 ]
 
-// Game 8 word bank
+// Game 8 word bank (tiered: easy=3-4 letters, medium=5-6, hard=7+)
 const WORD_BUILD_BANK = [
-  {word:'AYAM',   emoji:'🐓',hint:'Hewan berkokok'},
-  {word:'KUDA',   emoji:'🐴',hint:'Hewan yang bisa berlari cepat'},
-  {word:'IKAN',   emoji:'🐟',hint:'Hewan yang hidup di air'},
-  {word:'BUKU',   emoji:'📚',hint:'Untuk baca dan belajar'},
-  {word:'GAJAH',  emoji:'🐘',hint:'Hewan terbesar di darat'},
-  {word:'PANDA',  emoji:'🐼',hint:'Hewan hitam putih suka bambu'},
-  {word:'SINGA',  emoji:'🦁',hint:'Raja hutan'},
-  {word:'BEBEK',  emoji:'🦆',hint:'Hewan yang suka di air dan bisa terbang'},
-  {word:'APEL',   emoji:'🍎',hint:'Buah berwarna merah'},
-  {word:'BOLA',   emoji:'⚽',hint:'Alat bermain yang bulat'},
-  {word:'HARIMAU',emoji:'🐯',hint:'Hewan bergaris-garis hitam'},
-  {word:'JERAPAH',emoji:'🦒',hint:'Hewan dengan leher sangat panjang'},
-  {word:'MONYET', emoji:'🐒',hint:'Hewan pandai panjat pohon'}
+  // --- Easy (3-4 huruf) ---
+  {word:'AYAM',emoji:'🐓',hint:'Hewan berkokok',tier:'easy'},
+  {word:'KUDA',emoji:'🐴',hint:'Hewan berlari cepat',tier:'easy'},
+  {word:'IKAN',emoji:'🐟',hint:'Hewan di air',tier:'easy'},
+  {word:'BUKU',emoji:'📚',hint:'Untuk baca dan belajar',tier:'easy'},
+  {word:'APEL',emoji:'🍎',hint:'Buah berwarna merah',tier:'easy'},
+  {word:'BOLA',emoji:'⚽',hint:'Alat bermain yang bulat',tier:'easy'},
+  {word:'NASI',emoji:'🍚',hint:'Makanan pokok Indonesia',tier:'easy'},
+  {word:'SUSU',emoji:'🥛',hint:'Minuman putih bergizi',tier:'easy'},
+  {word:'ROTI',emoji:'🍞',hint:'Makanan dari tepung',tier:'easy'},
+  {word:'TOPI',emoji:'🎩',hint:'Dipakai di kepala',tier:'easy'},
+  {word:'BAJU',emoji:'👕',hint:'Pakaian yang kita kenakan',tier:'easy'},
+  {word:'MADU',emoji:'🍯',hint:'Makanan manis dari lebah',tier:'easy'},
+  {word:'BUAH',emoji:'🍓',hint:'Makanan segar dari pohon',tier:'easy'},
+  {word:'KOPI',emoji:'☕',hint:'Minuman panas dari biji',tier:'easy'},
+  {word:'DADU',emoji:'🎲',hint:'Alat bermain berbentuk kubus',tier:'easy'},
+  {word:'BESI',emoji:'⚙️',hint:'Logam keras berwarna abu-abu',tier:'easy'},
+  {word:'KAYU',emoji:'🪵',hint:'Bahan dari pohon',tier:'easy'},
+  {word:'LAGU',emoji:'🎵',hint:'Musik yang dinyanyikan',tier:'easy'},
+  {word:'MATA',emoji:'👀',hint:'Digunakan untuk melihat',tier:'easy'},
+  {word:'KAKI',emoji:'🦵',hint:'Digunakan untuk berjalan',tier:'easy'},
+  // --- Medium (5-6 huruf) ---
+  {word:'PANDA',emoji:'🐼',hint:'Hewan hitam putih suka bambu',tier:'medium'},
+  {word:'SINGA',emoji:'🦁',hint:'Raja hutan',tier:'medium'},
+  {word:'BEBEK',emoji:'🦆',hint:'Hewan suka air bisa terbang',tier:'medium'},
+  {word:'GAJAH',emoji:'🐘',hint:'Hewan terbesar di darat',tier:'medium'},
+  {word:'BUNGA',emoji:'🌸',hint:'Bagian indah dari tanaman',tier:'medium'},
+  {word:'POHON',emoji:'🌳',hint:'Tumbuhan besar berkayu',tier:'medium'},
+  {word:'KUCING',emoji:'🐱',hint:'Hewan peliharaan berbunyi meong',tier:'medium'},
+  {word:'ANJING',emoji:'🐶',hint:'Hewan peliharaan setia',tier:'medium'},
+  {word:'BURUNG',emoji:'🐦',hint:'Hewan bersayap yang terbang',tier:'medium'},
+  {word:'PISANG',emoji:'🍌',hint:'Buah kuning berbentuk melengkung',tier:'medium'},
+  {word:'JERUK',emoji:'🍊',hint:'Buah berwarna oranye',tier:'medium'},
+  {word:'KELINCI',emoji:'🐰',hint:'Hewan berbulu dengan telinga panjang',tier:'medium'},
+  {word:'MANGGA',emoji:'🥭',hint:'Buah tropis berwarna kuning',tier:'medium'},
+  {word:'KATAK',emoji:'🐸',hint:'Hewan hijau suka melompat',tier:'medium'},
+  {word:'SEMUT',emoji:'🐜',hint:'Serangga kecil pekerja keras',tier:'medium'},
+  {word:'LEBAH',emoji:'🐝',hint:'Serangga penghasil madu',tier:'medium'},
+  {word:'WORTEL',emoji:'🥕',hint:'Sayuran berwarna oranye',tier:'medium'},
+  {word:'JAGUNG',emoji:'🌽',hint:'Tanaman pangan biji kuning',tier:'medium'},
+  {word:'ANGGUR',emoji:'🍇',hint:'Buah ungu atau hijau bergerombol',tier:'medium'},
+  {word:'GITAR',emoji:'🎸',hint:'Alat musik berdawai',tier:'medium'},
+  {word:'PAYUNG',emoji:'☂️',hint:'Pelindung dari hujan',tier:'medium'},
+  {word:'PIRING',emoji:'🍽️',hint:'Tempat menyajikan makanan',tier:'medium'},
+  {word:'SEPATU',emoji:'👟',hint:'Alas kaki',tier:'medium'},
+  {word:'HUJAN',emoji:'🌧️',hint:'Air turun dari langit',tier:'medium'},
+  {word:'BINTANG',emoji:'⭐',hint:'Benda bercahaya di langit malam',tier:'medium'},
+  // --- Hard (7+ huruf) ---
+  {word:'HARIMAU',emoji:'🐯',hint:'Hewan bergaris-garis hitam',tier:'hard'},
+  {word:'JERAPAH',emoji:'🦒',hint:'Hewan dengan leher sangat panjang',tier:'hard'},
+  {word:'MONYET',emoji:'🐒',hint:'Hewan pandai panjat pohon',tier:'hard'},
+  {word:'PELANGI',emoji:'🌈',hint:'Warna-warni setelah hujan',tier:'hard'},
+  {word:'BERUANG',emoji:'🐻',hint:'Hewan besar suka madu',tier:'hard'},
+  {word:'SEMANGKA',emoji:'🍉',hint:'Buah besar berisi merah',tier:'hard'},
+  {word:'KOMPUTER',emoji:'💻',hint:'Mesin cerdas untuk bekerja',tier:'hard'},
+  {word:'PESAWAT',emoji:'✈️',hint:'Kendaraan yang terbang',tier:'hard'},
+  {word:'KERETA',emoji:'🚂',hint:'Kendaraan di rel panjang',tier:'hard'},
+  {word:'KELINCI',emoji:'🐰',hint:'Hewan lompat berbulu lembut',tier:'hard'},
+  {word:'SEKOLAH',emoji:'🏫',hint:'Tempat belajar dan bermain',tier:'hard'},
+  {word:'JEMBATAN',emoji:'🌉',hint:'Penghubung dua tepi sungai',tier:'hard'},
+  {word:'PERPUSTAKAAN',emoji:'📚',hint:'Tempat menyimpan buku',tier:'hard'},
+  {word:'MATAHARI',emoji:'☀️',hint:'Bintang paling dekat dengan Bumi',tier:'hard'},
+  {word:'INDONESIA',emoji:'🇮🇩',hint:'Negara kita tercinta',tier:'hard'},
+  {word:'KUPU-KUPU',emoji:'🦋',hint:'Serangga bersayap indah',tier:'hard'},
+  {word:'DINOSAURUS',emoji:'🦕',hint:'Hewan purba yang sudah punah',tier:'hard'},
+  {word:'PERSAHABATAN',emoji:'🤝',hint:'Rasa kasih antarteman',tier:'hard'},
+  {word:'PETUALANGAN',emoji:'🗺️',hint:'Perjalanan seru dan menantang',tier:'hard'},
+  {word:'PENGETAHUAN',emoji:'🧠',hint:'Ilmu yang kita pelajari',tier:'hard'},
 ]
 
 // Game 9 letter guides
@@ -7356,6 +8187,21 @@ const LETTER_GUIDES = {
 const LETTER_SEQ_CILIK  = ['A','B','C','D','E','F']
 const LETTER_SEQ_TUMBUH = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N']
 const LETTER_SEQ_PINTAR = Object.keys(LETTER_GUIDES)
+
+// Game 9 number guides (digit dot paths)
+const ANGKA_GUIDES = {
+  '0':[{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.2,y:0.8},{x:0.5,y:0.95},{x:0.8,y:0.8},{x:0.9,y:0.5},{x:0.8,y:0.2},{x:0.5,y:0.05}],
+  '1':[{x:0.3,y:0.2},{x:0.5,y:0.05},{x:0.5,y:0.95},{x:0.2,y:0.95},{x:0.8,y:0.95}],
+  '2':[{x:0.2,y:0.2},{x:0.4,y:0.05},{x:0.7,y:0.1},{x:0.8,y:0.3},{x:0.5,y:0.55},{x:0.2,y:0.75},{x:0.15,y:0.95},{x:0.85,y:0.95}],
+  '3':[{x:0.2,y:0.1},{x:0.6,y:0.05},{x:0.85,y:0.25},{x:0.6,y:0.48},{x:0.35,y:0.5},{x:0.65,y:0.52},{x:0.88,y:0.75},{x:0.65,y:0.95},{x:0.2,y:0.9}],
+  '4':[{x:0.7,y:0.95},{x:0.7,y:0.05},{x:0.15,y:0.65},{x:0.85,y:0.65}],
+  '5':[{x:0.8,y:0.05},{x:0.2,y:0.05},{x:0.2,y:0.5},{x:0.65,y:0.48},{x:0.85,y:0.65},{x:0.75,y:0.9},{x:0.4,y:0.95},{x:0.2,y:0.85}],
+  '6':[{x:0.75,y:0.15},{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.15,y:0.75},{x:0.4,y:0.95},{x:0.7,y:0.9},{x:0.85,y:0.7},{x:0.8,y:0.52},{x:0.55,y:0.48},{x:0.2,y:0.5}],
+  '7':[{x:0.15,y:0.05},{x:0.85,y:0.05},{x:0.5,y:0.95}],
+  '8':[{x:0.5,y:0.05},{x:0.2,y:0.2},{x:0.2,y:0.45},{x:0.5,y:0.5},{x:0.8,y:0.55},{x:0.8,y:0.8},{x:0.5,y:0.95},{x:0.2,y:0.8},{x:0.2,y:0.55},{x:0.5,y:0.5},{x:0.8,y:0.45},{x:0.8,y:0.2},{x:0.5,y:0.05}],
+  '9':[{x:0.8,y:0.5},{x:0.5,y:0.48},{x:0.2,y:0.3},{x:0.25,y:0.1},{x:0.5,y:0.05},{x:0.78,y:0.15},{x:0.88,y:0.35},{x:0.85,y:0.5},{x:0.8,y:0.7},{x:0.6,y:0.9},{x:0.4,y:0.95}]
+}
+const LETTER_SEQ_ANGKA = ['0','1','2','3','4','5','6','7','8','9']
 
 // ================================================================
 // STATE
@@ -7526,6 +8372,22 @@ function setLevelComplete(gameNum, levelNum, stars) {
   if (!gp.completed.includes(levelNum)) gp.completed.push(levelNum)
   if ((gp.stars[levelNum]||0) < stars) gp.stars[levelNum] = stars
   saveProgress(prog)
+}
+
+function openGymGame() {
+  playClick()
+  const toast=document.createElement('div')
+  toast.textContent='🏅 Gym Huruf & Suara — Segera Hadir!'
+  Object.assign(toast.style,{
+    position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
+    background:'linear-gradient(135deg,#2E7D32,#66BB6A)',color:'white',
+    padding:'18px 28px',borderRadius:'16px',fontSize:'18px',fontWeight:'700',
+    boxShadow:'0 8px 32px rgba(0,0,0,0.5)',zIndex:'99999',textAlign:'center',
+    opacity:'0',transition:'opacity 0.3s'
+  })
+  document.body.appendChild(toast)
+  requestAnimationFrame(()=>{ toast.style.opacity='1' })
+  setTimeout(()=>{ toast.style.opacity='0'; setTimeout(()=>toast.remove(),300) },2200)
 }
 
 function openLevelSelect(gameNum) {
@@ -7844,13 +8706,18 @@ function buildMenuHeader() {
   const banner=document.getElementById('total-stars-banner')
   if(state.mode==='duo'){banner.style.display='flex';const total=state.players[0].stars+state.players[1].stars;banner.innerHTML=`<span class="tsb-label">Total Bintang Hari Ini ✨</span><span class="tsb-value">⭐ ${total}</span>`}
   else banner.style.display='none'
-  // Update per-game best stars display
+  // Update per-game best stars display on world map nodes
   try {
     const bestStars=JSON.parse(localStorage.getItem('dunia-emosi-best-stars')||'{}')
-    for(let g=1;g<=12;g++){
-      const el=document.getElementById('gstars-'+g)
-      if(el){const best=bestStars[g]||0;el.textContent=best>0?'⭐'.repeat(Math.min(best,5)):''}
-    }
+    const gameIds=[1,2,3,4,5,6,7,8,9,10,11,12,13,'13b','13c',14,15,16,17,18]
+    gameIds.forEach(g=>{
+      const best=bestStars[g]||0
+      const stars=best>0?'⭐'.repeat(Math.min(best,5)):''
+      // Update hidden legacy div
+      const el=document.getElementById('gstars-'+g); if(el) el.textContent=stars
+      // Update visible star label in new world map
+      const lbl=document.getElementById('gstars-'+g+'-lbl'); if(lbl) lbl.textContent=stars
+    })
   }catch(e){}
 }
 
@@ -7926,18 +8793,39 @@ function closeSettings() {
   document.getElementById('settings-overlay').style.display='none'
 }
 
+function stopAllGameSounds() {
+  stopAmbient()
+  battleBgmStop()
+  g14StopAllAudio()
+  // Stop G13b evolution/roar audio
+  if(typeof _g13bEvoAudio !== 'undefined' && _g13bEvoAudio) {
+    try { _g13bEvoAudio.pause(); _g13bEvoAudio.currentTime=0 } catch(e){}
+  }
+  // Clear G13b legendary auto-attack interval
+  if(typeof _g13bLegAutoAtk !== 'undefined' && _g13bLegAutoAtk) {
+    clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null
+  }
+  // Stop all HTML audio elements that may be playing
+  document.querySelectorAll('audio').forEach(a => {
+    if(!a.paused && !['bg-music'].includes(a.id)) {
+      try { a.pause(); a.currentTime=0 } catch(e){}
+    }
+  })
+}
 function exitGame() {
   state.paused = false
   document.getElementById('pause-overlay').style.display='none'
   document.getElementById('settings-overlay').style.display='none'
-  playClick(); clearTimers(); stopAmbient(); battleBgmStop(); g14StopAllAudio(); showScreen('screen-welcome')
+  // Cleanup Pixi apps to free GPU memory
+  PixiManager.destroyAll()
+  playClick(); clearTimers(); stopAllGameSounds(); showScreen('screen-welcome')
 }
 function backToLevelSelect() {
   state.paused = false
   document.getElementById('pause-overlay').style.display='none'
   document.getElementById('settings-overlay').style.display='none'
   if(g6State?.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
-  clearTimers(); stopAmbient(); battleBgmStop(); g14StopAllAudio(); playClick(); showScreen('screen-level')
+  clearTimers(); stopAllGameSounds(); playClick(); showScreen('screen-level')
 }
 function clearTimers() {
   if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
@@ -8501,7 +9389,10 @@ function nextG4Round(){
   document.getElementById('g4-progress').textContent=state.mode==='duo'?`${state.players[state.currentPlayer].name} — ${roundInSet+1}/${g4State.maxRound}`:`${roundInSet+1} / ${g4State.maxRound}`
   const maxCount=g4State.maxCount
   g4State.currentCount=1+Math.floor(Math.random()*maxCount)
-  g4State.currentAnimal=ANIMALS_G4[Math.floor(Math.random()*ANIMALS_G4.length)]
+  // Rotate category every 3 rounds for variety: hewan → buah → benda → ...
+  const catIdx=Math.floor((g4State.round-1)/3)%3
+  const catPool=[ANIMALS_G4,FRUITS_G4,OBJECTS_G4][catIdx]
+  g4State.currentAnimal=catPool[Math.floor(Math.random()*catPool.length)]
   // Pokemon mode: pick target + 2 distractor types, each 1-2 copies
   const pokeIdx=Math.floor(Math.random()*POKEMON_G4.length)
   g4State.currentPoke=POKEMON_G4[pokeIdx]
@@ -8633,9 +9524,13 @@ function initG5Visual(){
       flat.push({id:p.id,slug:p.slug,label:p.name,flipped:false,matched:false,cardSide:'A'})
       flat.push({id:p.id,slug:p.slug,label:p.name,flipped:false,matched:false,cardSide:'B'})
     })
-  } else if(g5SubMode==='hewan'||g5SubMode==='buah'){
+  } else if(['hewan','buah','sayur','kendaraan','warna','benda','profesi','alam','cuaca','makanan','sekolah'].includes(g5SubMode)){
     // Emoji (A) ↔ Name word (B) — educational matching
-    const src=g5SubMode==='hewan'?MATCH_PAIRS_HEWAN:MATCH_PAIRS_BUAH
+    const srcMap={hewan:MATCH_PAIRS_HEWAN,buah:MATCH_PAIRS_BUAH,sayur:MATCH_PAIRS_SAYUR,
+      kendaraan:MATCH_PAIRS_KENDARAAN,warna:MATCH_PAIRS_WARNA,benda:MATCH_PAIRS_BENDA,
+      profesi:MATCH_PAIRS_PROFESI,alam:MATCH_PAIRS_ALAM,cuaca:MATCH_PAIRS_CUACA,
+      makanan:MATCH_PAIRS_MAKANAN,sekolah:MATCH_PAIRS_SEKOLAH}
+    const src=srcMap[g5SubMode]||MATCH_PAIRS_HEWAN
     src.slice(0,totalPairs).forEach(item=>{
       flat.push({...item,flipped:false,matched:false,cardSide:'A'})
       flat.push({...item,flipped:false,matched:false,cardSide:'B'})
@@ -8652,7 +9547,7 @@ function initG5Visual(){
     })
   }
   g5State.cards=flat.sort(()=>Math.random()-0.5).map((c,i)=>({...c,idx:i}))
-  const turnTexts={emosi:'Cocokkan semua pasangan! 🃏',hewan:'Cocokkan gambar & nama hewan! 🐾',buah:'Cocokkan gambar & nama buah! 🍎',pokemon:'Cocokkan gambar Pokémon yang sama! ⚡'}
+  const turnTexts={emosi:'Cocokkan semua pasangan! 🃏',hewan:'Cocokkan gambar & nama hewan! 🐾',buah:'Cocokkan gambar & nama buah! 🍎',sayur:'Cocokkan gambar & nama sayur! 🥕',kendaraan:'Cocokkan kendaraan! 🚗',warna:'Cocokkan nama warna! 🌈',benda:'Cocokkan nama benda! 📦',profesi:'Cocokkan nama profesi! 👩‍⚕️',alam:'Cocokkan gambar alam! 🏔️',cuaca:'Cocokkan jenis cuaca! ⛅',makanan:'Cocokkan nama makanan! 🍜',sekolah:'Cocokkan alat sekolah! 🏫',pokemon:'Cocokkan gambar Pokémon yang sama! ⚡'}
   const scoresEl=document.getElementById('g5-scores')
   if(state.mode==='duo'){scoresEl.innerHTML=[0,1].map(i=>`<div class="g5-player-score ${i===g5State.currentPlayer?'active':''}" id="g5-ps-${i}"><div class="ps-name">${state.players[i].animal} ${state.players[i].name}</div><div class="ps-val" id="g5-score-${i}">0 pasang</div></div>`).join('');document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`}
   else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=turnTexts[g5SubMode]||'Cocokkan semua pasangan! 🃏'}
@@ -8677,12 +9572,10 @@ function renderG5Grid(){
         const fbSrc2=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`
         back=`<img class="g5-poke-img" style="width:72px;height:72px;image-rendering:auto;object-fit:contain" src="${hdSrc2}" onerror="this.src='${fbSrc2}'" alt="${card.label}" loading="lazy">`
       }
-    } else if(g5SubMode==='hewan'||g5SubMode==='buah'){
+    } else if(['hewan','buah','sayur','kendaraan','warna','benda','profesi','alam','cuaca','makanan','sekolah'].includes(g5SubMode)){
       if(card.cardSide==='A'){
-        // Emoji side
         back=`<span style="font-size:52px;line-height:1">${card.emoji}</span>`
       } else {
-        // Emoji side (image-to-image matching)
         back=`<span style="font-size:52px;line-height:1">${card.emoji}</span>`
       }
     } else {
@@ -9004,17 +9897,18 @@ function g6BuildCarSelector() {
 }
 
 function initGame6() {
-  document.getElementById('screen-game6').classList.remove('racing')
-  const diff=state.selectedLevel||'medium'
-  const spd=diff==='easy'?0.7:diff==='medium'?1.0:1.5
-  const words=diff==='easy'?4:diff==='medium'?6:8
-  g6State = {lane:1,tiles:[],targetWord:'',collectedIdx:0,wordsCompleted:0,totalWords:words,stars:0,map:'city',speed:spd,frameCount:0,running:false,animFrame:null,penaltyPause:false,wrongCount:0,lives:3}
-  document.querySelectorAll('.g6-map-btn').forEach(b=>b.classList.remove('active'))
-  const firstBtn = document.querySelector('.g6-map-btn[data-map="city"]')
-  if(firstBtn) firstBtn.classList.add('active')
-  g6BuildCarSelector()
-  updateGameStarDisplay()
-  setupDriveMap('city')
+  const lv = state.selectedLevelNum || state.selectedLevel || 5
+  const map = g6State?.map || 'city'
+  const words = Math.max(3, Math.min(10, Math.round(3 + lv * 0.35)))
+  const vehicle = DRIVE_VEHICLES[map] || '🚗'
+  const wordBank = DRIVE_WORD_BANK[map] || DRIVE_WORD_BANK.city
+  try {
+    sessionStorage.setItem('g6Config', JSON.stringify({
+      mapTheme: map, level: lv, playerIcon: vehicle,
+      totalWords: words, wordBank: wordBank
+    }))
+  } catch(_) {}
+  window.location.href = 'games/g6.html'
 }
 function setupDriveMap(map) {
   g6State.map = map
@@ -9367,8 +10261,12 @@ function initGame8(){
   const diff=state.selectedLevel||'medium'
   const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
   let bank=[...WORD_BUILD_BANK]
-  if(tier==='cilik')  bank=bank.filter(w=>w.word.length<=4)
-  if(tier==='tumbuh') bank=bank.filter(w=>w.word.length<=6)
+  // Filter by tier (age-based) — prefer tier property if present
+  if(tier==='cilik')  bank=bank.filter(w=>w.tier==='easy'||(w.tier==null&&w.word.length<=4))
+  if(tier==='tumbuh') bank=bank.filter(w=>w.tier==='easy'||w.tier==='medium'||(w.tier==null&&w.word.length<=6))
+  // Also filter by difficulty selection
+  if(diff==='easy')   bank=bank.filter(w=>w.tier==='easy'||(w.tier==null&&w.word.length<=4))
+  if(diff==='hard')   bank=[...WORD_BUILD_BANK] // all tiers for hard
   if(bank.length===0) bank=[...WORD_BUILD_BANK]
   g8State={round:0,maxRound:DIFF[diff].rounds,answered:false,currentWord:'',userInput:[],shuffled:bank.sort(()=>Math.random()-0.5),availableLetters:[]}
   state.currentPlayer=0; updateGameStarDisplay(); nextG8Round()
@@ -9463,11 +10361,23 @@ function g8Backspace(){
 // ================================================================
 let g9State={}, g9Canvas=null, g9Ctx=null, g9Drawing=false, g9UserPath=[]
 
+let g9TraceMode = 'huruf' // 'huruf' or 'angka'
+function setG9Mode(mode, btn) {
+  g9TraceMode = mode
+  document.querySelectorAll('#g9-mode-tabs .g5-sub-tab').forEach(b=>b.classList.remove('active'))
+  if(btn) btn.classList.add('active')
+  initGame9()
+}
 function initGame9(){
   const diff=state.selectedLevel||'medium'
   const tier=state.players[state.currentPlayer].ageTier||'tumbuh'
-  const seq=tier==='cilik'?LETTER_SEQ_CILIK:tier==='tumbuh'?LETTER_SEQ_TUMBUH:LETTER_SEQ_PINTAR
-  g9State={round:0,maxRound:Math.min(DIFF[diff].rounds,seq.length),sequence:seq,currentLetter:'A'}
+  let seq
+  if(g9TraceMode==='angka'){
+    seq=LETTER_SEQ_ANGKA
+  } else {
+    seq=tier==='cilik'?LETTER_SEQ_CILIK:tier==='tumbuh'?LETTER_SEQ_TUMBUH:LETTER_SEQ_PINTAR
+  }
+  g9State={round:0,maxRound:Math.min(DIFF[diff].rounds,seq.length),sequence:seq,currentLetter:'A',mode:g9TraceMode}
   state.currentPlayer=0
   g9Canvas=document.getElementById('g9-canvas')
   g9Ctx=g9Canvas.getContext('2d')
@@ -9495,14 +10405,18 @@ function nextG9Round(){
   document.getElementById('g9-progress').textContent=`${g9State.round+1} / ${g9State.maxRound}`
   g9Clear(); renderG9GuideDots(); g9State.round++
 }
+function getG9Guides(letter) {
+  return (g9State.mode==='angka' ? ANGKA_GUIDES : LETTER_GUIDES)[letter] || []
+}
 function renderG9GuideDots(){
-  const guides=LETTER_GUIDES[g9State.currentLetter]||[],container=document.getElementById('g9-guide-dots'); container.innerHTML=''
+  const guides=getG9Guides(g9State.currentLetter),container=document.getElementById('g9-guide-dots'); container.innerHTML=''
   guides.forEach((g,i)=>{const dot=document.createElement('div');dot.className='g9-dot';dot.id=`g9-dot-${i}`;dot.style.left=(g.x*300)+'px';dot.style.top=(g.y*300)+'px';dot.textContent=String(i+1);dot.style.cssText+=';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.9);';container.appendChild(dot)})
 }
 function g9Clear(){
   if(!g9Ctx)return; g9Ctx.clearRect(0,0,300,300); g9UserPath=[]
   const letter=g9State.currentLetter; if(!letter)return
-  g9Ctx.font='bold 220px Nunito'; g9Ctx.fillStyle='rgba(132,204,22,0.12)'
+  const fontSize=g9State.mode==='angka'?240:220
+  g9Ctx.font=`bold ${fontSize}px Nunito`; g9Ctx.fillStyle='rgba(132,204,22,0.12)'
   g9Ctx.textAlign='center'; g9Ctx.textBaseline='middle'; g9Ctx.fillText(letter,150,155)
   document.querySelectorAll('.g9-dot').forEach(d=>d.classList.remove('hit'))
 }
@@ -9520,11 +10434,11 @@ function g9TouchStart(e){e.preventDefault();if(e.touches[0])g9StartDraw(e.touche
 function g9TouchMove(e){e.preventDefault();if(e.touches[0])g9Draw(e.touches[0])}
 function g9EndDraw(){if(!g9Drawing)return;g9Drawing=false;g9Ctx.beginPath();setTimeout(evaluateG9Trace,500)}
 function checkGuideHits(pos){
-  const guides=LETTER_GUIDES[g9State.currentLetter]||[]
+  const guides=getG9Guides(g9State.currentLetter)
   guides.forEach((g,i)=>{const gx=g.x*300,gy=g.y*300,d=Math.hypot(pos.x-gx,pos.y-gy);if(d<35){const dot=document.getElementById(`g9-dot-${i}`);if(dot)dot.classList.add('hit')}})
 }
 function evaluateG9Trace(){
-  const guides=LETTER_GUIDES[g9State.currentLetter]||[]
+  const guides=getG9Guides(g9State.currentLetter)
   if(guides.length===0||g9UserPath.length<5)return
   let hits=0
   guides.forEach(g=>{const gx=g.x*300,gy=g.y*300,nearest=g9UserPath.reduce((best,p)=>Math.min(best,Math.hypot(p.x-gx,p.y-gy)),Infinity);if(nearest<45)hits++})
@@ -9620,6 +10534,390 @@ try {
   const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
   if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
 } catch(e){}
+// ================================================================
+// PIXIJS — GPU RENDERER (G10, G13, G13b battle FX)
+// ================================================================
+const PixiManager = {
+  _apps: {},
+
+  async init(canvasId) {
+    if (!window.PIXI) return null
+    const canvas = document.getElementById(canvasId)
+    if (!canvas) return null
+    const parent = canvas.parentElement
+    if (!parent) return null
+    this.destroy(canvasId)
+    const rect = parent.getBoundingClientRect()
+    const w = Math.max(rect.width, 200)
+    const h = Math.max(rect.height, 200)
+    const app = new PIXI.Application()
+    try {
+      await app.init({
+        canvas, width: w, height: h,
+        backgroundAlpha: 0,
+        antialias: true,
+        resolution: Math.min(window.devicePixelRatio || 1, 2),
+        autoDensity: true,
+        preference: 'webgl'
+      })
+    } catch(e) { return null }
+    this._apps[canvasId] = app
+    return app
+  },
+
+  get(id) { return this._apps[id] || null },
+
+  destroy(id) {
+    const app = this._apps[id]
+    if (!app) return
+    try { app.destroy(false, {children:true, texture:true}) } catch(e){}
+    delete this._apps[id]
+  },
+
+  destroyAll() {
+    Object.keys(this._apps).forEach(id => this.destroy(id))
+  },
+
+  resize(id) {
+    const app = this._apps[id]
+    if (!app) return
+    const canvas = document.getElementById(id)
+    if (!canvas || !canvas.parentElement) return
+    const r = canvas.parentElement.getBoundingClientRect()
+    try { app.renderer.resize(Math.max(r.width,200), Math.max(r.height,200)) } catch(e){}
+  }
+}
+
+// ── Pixi helpers: type flash, particles, weather, aura ring, evo rings ──
+
+const _PIXI_TYPE_COLORS = {
+  fire:0xff6b35, water:0x4fc3f7, electric:0xffcb05, grass:0x4caf50,
+  psychic:0xf95587, ghost:0x705898, ice:0x98d8d8, dark:0x200800,
+  fighting:0xc03028, dragon:0x7038f8, normal:0xa8a878, rock:0xb8a038,
+  poison:0xa040a0, ground:0xe0c068, flying:0xa890f0, bug:0xa8b820,
+  steel:0xb8b8d0, fairy:0xee99ac
+}
+
+/* Type screen flash — replaces .poke-flash CSS animation */
+function pixiTypeFlash(app, type) {
+  if (!app) return
+  const color = _PIXI_TYPE_COLORS[type] || 0xa8a878
+  const g = new PIXI.Graphics()
+  const {width:w, height:h} = app.screen
+  g.rect(0, 0, w, h).fill({color, alpha:0.42})
+  g.alpha = 0
+  app.stage.addChild(g)
+  let t = 0
+  const fn = (ticker) => {
+    t += ticker.deltaTime / 60
+    if (t < 0.1) { g.alpha = t / 0.1 * 0.42 }
+    else if (t < 0.28) { g.alpha = 0.42 }
+    else if (t < 0.6) { g.alpha = 0.42 * (1 - (t - 0.28) / 0.32) }
+    else { app.ticker.remove(fn); app.stage.removeChild(g); g.destroy() }
+  }
+  app.ticker.add(fn)
+}
+
+/* Type particle burst — replaces DOM div particles in g10TypeFX() */
+function pixiTypeFX(app, type, targetSide) {
+  if (!app) return
+  const color = _PIXI_TYPE_COLORS[type] || 0xa8a878
+  const {width:w, height:h} = app.screen
+  const isEnemy = targetSide === 'enemy'
+  const xBase = isEnemy ? w * 0.52 : w * 0.05
+  const yBase = isEnemy ? h * 0.04 : h * 0.42
+  const zW = w * 0.36, zH = h * 0.36
+  const container = new PIXI.Container()
+  app.stage.addChild(container)
+  const N = 10
+  const pts = Array.from({length:N}, () => {
+    const g = new PIXI.Graphics()
+    const r = 5 + Math.random() * 8
+    g.circle(0, 0, r).fill({color, alpha:0.9})
+    g.x = xBase + Math.random() * zW
+    g.y = yBase + Math.random() * zH
+    const vx = (Math.random() - 0.5) * 90
+    const vy = -(50 + Math.random() * 90)
+    const maxLife = 0.55 + Math.random() * 0.45
+    container.addChild(g)
+    return {g, vx, vy, life:0, maxLife}
+  })
+  const fn = (ticker) => {
+    const dt = ticker.deltaTime / 60
+    let alive = false
+    pts.forEach(p => {
+      p.life += dt
+      if (p.life < p.maxLife) {
+        alive = true
+        p.g.x += p.vx * dt
+        p.g.y += p.vy * dt
+        p.vy += 40 * dt
+        const prog = p.life / p.maxLife
+        p.g.alpha = 1 - prog
+        p.g.scale.set(1 - prog * 0.4)
+      } else { p.g.alpha = 0 }
+    })
+    if (!alive) {
+      app.ticker.remove(fn)
+      app.stage.removeChild(container)
+      container.destroy({children:true})
+    }
+  }
+  app.ticker.add(fn)
+}
+
+/* Aura ring pulse — replaces DOM g10-aura-ring div + CSS animation */
+function pixiAuraRing(app, side, auraColor) {
+  if (!app) return
+  const {width:w, height:h} = app.screen
+  // side: 'player' = bottom-left, 'enemy' = top-right
+  const cx = side === 'player' ? w * 0.22 : w * 0.72
+  const cy = side === 'player' ? h * 0.72 : h * 0.28
+  const color = typeof auraColor === 'string'
+    ? parseInt(auraColor.replace('#',''), 16)
+    : (auraColor || 0xa78bfa)
+  const g = new PIXI.Graphics()
+  app.stage.addChild(g)
+  let t = 0
+  const fn = (ticker) => {
+    t += ticker.deltaTime / 60
+    const prog = t / 0.52
+    if (prog < 1) {
+      const r = 28 + prog * 52
+      const alpha = prog < 0.35 ? prog / 0.35 : 1 - (prog - 0.35) / 0.65
+      g.clear()
+      g.circle(cx, cy, r).stroke({width: Math.max(1.2, 3 - prog * 2), color, alpha: alpha * 0.85})
+    } else {
+      app.ticker.remove(fn)
+      app.stage.removeChild(g)
+      g.destroy()
+    }
+  }
+  app.ticker.add(fn)
+}
+
+/* Weather overlay — replaces applyG10Weather() DOM particles */
+function pixiWeather(app, type) {
+  if (!app) return
+  pixiClearWeather(app)
+  if (!type || type === 'clear') return
+  const {width:w, height:h} = app.screen
+  const wc = new PIXI.Container()
+  wc._isPixiWeather = true
+  app.stage.addChildAt(wc, 0)
+  const particles = []
+
+  if (type === 'rain') {
+    for (let i = 0; i < 40; i++) {
+      const g = new PIXI.Graphics()
+      g.rect(0, 0, 1.5, 10).fill({color:0xaed6f1, alpha:0.55})
+      g.rotation = 0.3
+      g.x = Math.random() * w
+      g.y = Math.random() * h
+      particles.push({g, speed: 280 + Math.random() * 180})
+      wc.addChild(g)
+    }
+    const fn = (t) => { const dt=t.deltaTime/60; particles.forEach(p => {
+      p.g.y += p.speed*dt; p.g.x += p.speed*0.28*dt
+      if(p.g.y > h) { p.g.y=-12; p.g.x=Math.random()*w }
+    }) }
+    wc._fn = fn; app.ticker.add(fn)
+  } else if (type === 'snow') {
+    for (let i = 0; i < 30; i++) {
+      const g = new PIXI.Graphics()
+      g.circle(0, 0, 2 + Math.random() * 3.5).fill({color:0xffffff, alpha:0.75})
+      g.x = Math.random() * w; g.y = Math.random() * h
+      particles.push({g, speed:35+Math.random()*55, wT:Math.random()*Math.PI*2, wb:(Math.random()-0.5)*1.5})
+      wc.addChild(g)
+    }
+    const fn = (t) => { const dt=t.deltaTime/60; particles.forEach(p => {
+      p.wT+=dt*1.4; p.g.y+=p.speed*dt; p.g.x+=Math.sin(p.wT)*p.wb
+      if(p.g.y>h) { p.g.y=-12; p.g.x=Math.random()*w }
+    }) }
+    wc._fn = fn; app.ticker.add(fn)
+  } else if (type === 'wind') {
+    for (let i = 0; i < 22; i++) {
+      const len = 18 + Math.random() * 38
+      const g = new PIXI.Graphics()
+      g.rect(0, -1, len, 1.5).fill({color:0xffffff, alpha:0.22})
+      g.x = Math.random() * w; g.y = Math.random() * h
+      particles.push({g, speed:200+Math.random()*280, len})
+      wc.addChild(g)
+    }
+    const fn = (t) => { const dt=t.deltaTime/60; particles.forEach(p => {
+      p.g.x += p.speed*dt
+      if(p.g.x > w+p.len) { p.g.x=-p.len; p.g.y=Math.random()*h }
+    }) }
+    wc._fn = fn; app.ticker.add(fn)
+  } else if (type === 'night') {
+    for (let i = 0; i < 18; i++) {
+      const g = new PIXI.Graphics()
+      g.circle(0, 0, 1.5 + Math.random()*2).fill({color:0xffffc8, alpha:0.8})
+      g.x = Math.random()*w; g.y = Math.random()*h*0.6
+      particles.push({g, phase:Math.random()*Math.PI*2, speed:1.2+Math.random()*1.8})
+      wc.addChild(g)
+    }
+    const fn = (t) => { const dt=t.deltaTime/60; particles.forEach(p => {
+      p.phase+=p.speed*dt; p.g.alpha=0.35+Math.sin(p.phase)*0.45
+    }) }
+    wc._fn = fn; app.ticker.add(fn)
+  } else if (type === 'leaves' || type === 'sandstorm') {
+    const color = type === 'leaves' ? 0x7ec850 : 0xe0b860
+    for (let i = 0; i < 22; i++) {
+      const g = new PIXI.Graphics()
+      const r = 3 + Math.random()*4
+      g.circle(0, 0, r).fill({color, alpha:0.6})
+      g.x = Math.random()*w; g.y = Math.random()*h
+      particles.push({g, vx:(type==='leaves'?30:180)+Math.random()*80, vy:(Math.random()-0.5)*40, wT:Math.random()*6})
+      wc.addChild(g)
+    }
+    const fn = (t) => { const dt=t.deltaTime/60; particles.forEach(p => {
+      p.wT+=dt*2; p.g.x+=p.vx*dt; p.g.y+=Math.sin(p.wT)*p.vy*dt
+      if(p.g.x>w+10) { p.g.x=-10; p.g.y=Math.random()*h }
+    }) }
+    wc._fn = fn; app.ticker.add(fn)
+  }
+}
+
+function pixiClearWeather(app) {
+  if (!app) return
+  const toRemove = app.stage.children.filter(c => c._isPixiWeather)
+  toRemove.forEach(c => {
+    if (c._fn) { try { app.ticker.remove(c._fn) } catch(e){} }
+    app.stage.removeChild(c)
+    c.destroy({children:true})
+  })
+}
+
+/* Evolution rings — replaces 6 CSS g13Ring keyframes */
+function pixiEvoRings(app) {
+  if (!app) return
+  const {width:w, height:h} = app.screen
+  const cx = w/2, cy = h/2
+  const SIZES = [60,100,150,200,280,360]
+  const rings = SIZES.map((maxR, i) => {
+    const g = new PIXI.Graphics()
+    app.stage.addChild(g)
+    return {g, maxR, delay: 0.5 + i*0.3, life: 0}
+  })
+  let elapsed = 0
+  const fn = (ticker) => {
+    elapsed += ticker.deltaTime/60
+    let anyAlive = false
+    rings.forEach(r => {
+      if (elapsed < r.delay) { anyAlive = true; return }
+      r.life += ticker.deltaTime/60
+      const maxLife = r.maxR < 200 ? 2.0 : 2.5
+      if (r.life < maxLife) {
+        anyAlive = true
+        const prog = r.life / maxLife
+        const cr = prog * r.maxR
+        const alpha = (1 - prog) * 0.75
+        const lw = Math.max(0.8, 3.5 - prog * 3)
+        r.g.clear()
+        r.g.circle(cx, cy, cr).stroke({width:lw, color:0xfbbf24, alpha})
+      } else { r.g.clear() }
+    })
+    if (!anyAlive) {
+      app.ticker.remove(fn)
+      rings.forEach(r => { app.stage.removeChild(r.g); r.g.destroy() })
+    }
+  }
+  app.ticker.add(fn)
+}
+
+/* Evolution particles — replaces 25 DOM divs in g13TriggerEvolution() */
+function pixiEvoParticles(app) {
+  if (!app) return
+  const {width:w, height:h} = app.screen
+  const COLORS = [0xfbbf24,0xf97316,0xfacc15,0xffffff,0xfef3c7,0xfb923c]
+  const container = new PIXI.Container()
+  app.stage.addChildAt(container, 0)
+  const N = 32
+  const pts = Array.from({length:N}, () => {
+    const g = new PIXI.Graphics()
+    const r = 3 + Math.random()*5.5
+    g.circle(0, 0, r).fill({color: COLORS[Math.floor(Math.random()*COLORS.length)], alpha:0.88})
+    g.x = Math.random()*w; g.y = h*0.5 + Math.random()*h*0.5
+    container.addChild(g)
+    return {g, vx:(Math.random()-0.5)*80, vy:-(55+Math.random()*110),
+            delay:Math.random()*3, maxLife:2+Math.random()*3, life:-Math.random()*3}
+  })
+  let total = 0
+  const fn = (ticker) => {
+    total += ticker.deltaTime/60
+    pts.forEach(p => {
+      p.life += ticker.deltaTime/60
+      if (p.life < 0) { p.g.alpha=0; return }
+      if (p.life > p.maxLife) {
+        p.g.x = Math.random()*w; p.g.y = h*0.5+Math.random()*h*0.5
+        p.life = 0; return
+      }
+      const prog = p.life/p.maxLife
+      p.g.x += p.vx * ticker.deltaTime/60
+      p.g.y += p.vy * ticker.deltaTime/60
+      p.vy += 18 * ticker.deltaTime/60
+      p.g.alpha = prog < 0.2 ? prog/0.2 : 1-(prog-0.2)/0.8
+      p.g.scale.set(Math.max(0.1, 1-prog*0.5))
+    })
+    if (total > 8.5) {
+      app.ticker.remove(fn)
+      app.stage.removeChild(container)
+      container.destroy({children:true})
+    }
+  }
+  app.ticker.add(fn)
+}
+
+/* Burst flash (defeat) — replaces CSS g10Burst animation */
+function pixiBurstFlash(app, bxPct, byPct) {
+  if (!app) return
+  const {width:w, height:h} = app.screen
+  const cx = w * bxPct / 100, cy = h * byPct / 100
+  const g = new PIXI.Graphics()
+  app.stage.addChild(g)
+  let t = 0
+  const fn = (ticker) => {
+    t += ticker.deltaTime/60
+    g.clear()
+    if (t < 0.15) {
+      const r = (t/0.15) * Math.min(w,h)*0.6
+      const alpha = t/0.15 * 0.9
+      g.circle(cx, cy, r).fill({color:0xffffff, alpha})
+    } else if (t < 0.6) {
+      const fade = 1 - (t-0.15)/0.45
+      g.circle(cx, cy, Math.min(w,h)*0.6).fill({color:0xffee50, alpha: fade*0.4})
+    } else {
+      app.ticker.remove(fn); app.stage.removeChild(g); g.destroy()
+    }
+  }
+  app.ticker.add(fn)
+}
+
+/* G13b combo text pop — Pixi text burst */
+function pixiComboText(app, text) {
+  if (!app || !window.PIXI) return
+  const {width:w, height:h} = app.screen
+  const label = new PIXI.Text({text, style:{
+    fontFamily:'Fredoka One,sans-serif', fontSize:28, fontWeight:'900',
+    fill:0xfbbf24, stroke:{color:0x1a0a00, width:4}, align:'center',
+    dropShadow:{color:0x000000, blur:4, distance:3, alpha:0.7}
+  }})
+  label.anchor.set(0.5)
+  label.x = w/2; label.y = h*0.42
+  label.alpha = 0
+  app.stage.addChild(label)
+  let t = 0
+  const fn = (ticker) => {
+    t += ticker.deltaTime/60
+    if (t < 0.12) { label.scale.set(0.4+t/0.12*0.9); label.alpha=t/0.12 }
+    else if (t < 0.5) { label.scale.set(1.3-0.3*(t-0.12)/0.38); label.alpha=1 }
+    else if (t < 0.9) { label.alpha=1-(t-0.5)/0.4 }
+    else { app.ticker.remove(fn); app.stage.removeChild(label); label.destroy() }
+  }
+  app.ticker.add(fn)
+}
+
 // ================================================================
 // GAME 10 — PERTARUNGAN POKEMON
 // ================================================================
@@ -11029,6 +12327,8 @@ function switchG13bPlayerPoke(poke) {
   if (!pspr) return
   pspr.src = pokeSpriteOnline(g13bSavedPoke.slug)
   pspr.onerror = function() { this.src = pokeSpriteBackup(poke.id); this.onerror = null }
+  const pnameEl = document.getElementById('g13b-pname')
+  if (pnameEl) pnameEl.textContent = g13bSavedPoke.name
 }
 
 // Legendary & special Pokémon ID sets (used by G10, G13, G13B pools)
@@ -11108,6 +12408,8 @@ let g10State={}
 
 function initGame10(){
   battleBgmPlay()
+  // Init Pixi GPU canvas for battle FX (async, non-blocking)
+  PixiManager.init('g10-pixi-canvas').catch(()=>{})
   const p=state.players[state.currentPlayer]
   const _icon=document.getElementById('g10-player-icon'); if(_icon) _icon.textContent=p.animal
   document.getElementById('g10-stars').textContent='⭐ 0'
@@ -11139,6 +12441,7 @@ function g10NewBattle(){
     const el=document.getElementById(imgId)
     el.className=el.className.replace(/\bspr-\w+/g,'').trim()
     el.style.opacity='1'; el.style.imageRendering='auto'
+    el.style.animation='' // clear stale entrance animation so direction is clean
     // HOME sprites are HD transparent PNG — use directly, no local assets
     el.src=pokeSpriteOnline(slug)
     el.onerror=()=>{ el.src=pokeSpriteBackup(pokeId); el.onerror=null }
@@ -11158,6 +12461,19 @@ function g10NewBattle(){
   }
   loadSprHD('g10-espr', s.enemyPoke.slug, s.enemyPoke.id)
   loadSprPlayer('g10-pspr', s.playerPoke.id, s.playerPoke.slug)
+
+  // Force correct facing direction via inline style (overrides any stale animation fill)
+  // Enemy: top-right quadrant, must face LEFT toward player → scaleX(-1)
+  // Player: bottom-left quadrant, must face RIGHT toward enemy → default (no flip)
+  const eEl=document.getElementById('g10-espr')
+  const pEl=document.getElementById('g10-pspr')
+  if(eEl) eEl.style.transform='scaleX(-1)'
+  if(pEl) pEl.style.transform=''
+  // Reset wrapper entrance animations so they replay cleanly each battle
+  const eWrap=document.getElementById('g10-espr-wrap')
+  const pWrap=document.getElementById('g10-pspr-wrap')
+  if(eWrap){ eWrap.style.animation='none'; void eWrap.offsetWidth; eWrap.style.animation='' }
+  if(pWrap){ pWrap.style.animation='none'; void pWrap.offsetWidth; pWrap.style.animation='' }
 
   // Names + levels
   document.getElementById('g10-ename').textContent=s.enemyPoke.name
@@ -11333,43 +12649,31 @@ function g10Answer(val, btn){
   }
 }
 
-// Type-specific particle FX on battle field
+// Type-specific particle FX on battle field — GPU via Pixi, DOM fallback
 function g10TypeFX(type, targetSide){
+  const pixiApp = PixiManager.get('g10-pixi-canvas')
+  if (pixiApp) {
+    pixiTypeFX(pixiApp, type, targetSide)
+    return
+  }
+  // DOM fallback (used if Pixi hasn't loaded yet)
   const field=document.getElementById('g10-field')
   if(!field) return
   const CFG={
-    fire:    {emojis:['🔥','✨'],anim:'fxRise',  color:'#FF6B35',count:8},
-    water:   {emojis:['💧','🌊'],anim:'fxRain',  color:'#4FC3F7',count:7},
-    electric:{emojis:['⚡','✨'],anim:'fxZap',   color:'#FFCB05',count:10},
-    grass:   {emojis:['🍃','🌿'],anim:'fxSwirl', color:'#4CAF50',count:8},
-    dark:    {emojis:['🌑','💀'],anim:'fxShadow',color:'#1a0a00',count:6},
-    psychic: {emojis:['🔮','✨'],anim:'fxSpiral',color:'#F95587',count:7},
-    ice:     {emojis:['❄️','💎'],anim:'fxSnow',  color:'#98D8D8',count:8},
-    ghost:   {emojis:['👻','💜'],anim:'fxFloat', color:'#705898',count:5},
-    flying:  {emojis:['🌪️','💨'],anim:'fxWind',  color:'#A890F0',count:6},
-    dragon:  {emojis:['💫','🐉'],anim:'fxSpin',  color:'#7038F8',count:7},
-    fighting:{emojis:['💥','👊'],anim:'fxBurst', color:'#C03028',count:6},
-    rock:    {emojis:['🪨','💥'],anim:'fxDrop',  color:'#B8A038',count:5},
-    poison:  {emojis:['☠️','💜'],anim:'fxFloat', color:'#A040A0',count:6},
-    ground:  {emojis:['💥','🌍'],anim:'fxBurst', color:'#E0C068',count:6},
-    bug:     {emojis:['✨','🌿'],anim:'fxSwirl', color:'#A8B820',count:7},
-    steel:   {emojis:['⚔️','✨'],anim:'fxSpark', color:'#B8B8D0',count:6},
-    normal:  {emojis:['💢','✨'],anim:'fxBurst', color:'#A8A878',count:5},
-    fairy:   {emojis:['✨','💖'],anim:'fxSwirl', color:'#EE99AC',count:8},
+    fire:{emojis:['🔥','✨'],anim:'fxRise',color:'#FF6B35',count:8},
+    water:{emojis:['💧','🌊'],anim:'fxRain',color:'#4FC3F7',count:7},
+    electric:{emojis:['⚡','✨'],anim:'fxZap',color:'#FFCB05',count:10},
+    grass:{emojis:['🍃','🌿'],anim:'fxSwirl',color:'#4CAF50',count:8},
+    default:{emojis:['💥','✨'],anim:'fxBurst',color:'#a8a878',count:5},
   }
-  const cfg=CFG[type]||CFG.normal
+  const cfg=CFG[type]||CFG.default
   const isEnemy=targetSide==='enemy'
-  // Particle spawn zone: top-right for enemy, bottom-left for player
-  const xBase= isEnemy ? 52 : 5
-  const yBase= isEnemy ? 2  : 40
+  const xBase=isEnemy?52:5, yBase=isEnemy?2:40
   for(let i=0;i<cfg.count;i++){
     const p=document.createElement('span')
-    const px=xBase+Math.random()*38
-    const py=yBase+Math.random()*38
-    const sz=18+Math.random()*16
-    const dur=0.65+Math.random()*0.45
-    const del=i*0.055
-    p.style.cssText=`position:absolute;font-size:${sz}px;left:${px}%;top:${py}%;z-index:9;pointer-events:none;animation:${cfg.anim} ${dur}s ${del}s ease-out both;filter:drop-shadow(0 0 5px ${cfg.color});`
+    const px=xBase+Math.random()*38, py=yBase+Math.random()*38
+    const dur=0.65+Math.random()*0.45, del=i*0.055
+    p.style.cssText=`position:absolute;font-size:${18+Math.random()*16}px;left:${px}%;top:${py}%;z-index:9;pointer-events:none;animation:${cfg.anim} ${dur}s ${del}s ease-out both;filter:drop-shadow(0 0 5px ${cfg.color});`
     p.textContent=cfg.emojis[i%cfg.emojis.length]
     field.appendChild(p)
     setTimeout(()=>p.remove(),(dur+del)*1000+100)
@@ -11390,7 +12694,11 @@ function g10DoAttack(type, fromSide, toSide, onDone){
   const auraColor = auraColors[type] || '#a78bfa'
   const fromWrapId = fromSide === 'player' ? 'g10-pspr-wrap' : 'g10-espr-wrap'
   const fromWrapEl = document.getElementById(fromWrapId)
-  if (fromWrapEl) {
+  // Aura ring — Pixi primary, DOM fallback
+  const _pixiApp = PixiManager.get('g10-pixi-canvas') || PixiManager.get('g13b-pixi-canvas')
+  if (_pixiApp) {
+    pixiAuraRing(_pixiApp, fromSide, parseInt(auraColor.replace('#',''), 16))
+  } else if (fromWrapEl) {
     const aura = document.createElement('div')
     aura.className = 'g10-aura-ring'
     aura.style.setProperty('--aura-color', auraColor)
@@ -11440,10 +12748,15 @@ function g10DoAttack(type, fromSide, toSide, onDone){
     {transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.8)`, opacity:0}
   ], {duration:360, easing:'ease-in', fill:'forwards'})
 
-  // Screen flash
-  const flash = document.getElementById('poke-flash')
-  flash.className = 'poke-flash ' + type
-  setTimeout(() => flash.className = 'poke-flash', 700)
+  // Screen flash — Pixi primary, CSS fallback
+  const _flashPixi = PixiManager.get('g10-pixi-canvas') || PixiManager.get('g13b-pixi-canvas')
+  if (_flashPixi) {
+    pixiTypeFlash(_flashPixi, type)
+  } else {
+    const flash = document.getElementById('poke-flash')
+    flash.className = 'poke-flash ' + type
+    setTimeout(() => flash.className = 'poke-flash', 700)
+  }
 
   // Defender shakes + flashes after projectile arrives
   setTimeout(() => {
@@ -11463,16 +12776,21 @@ function g10EnemyDefeated(){
   eSpr.classList.remove('spr-defeat'); void eSpr.offsetWidth
   eSpr.classList.add('spr-defeat')
 
-  // Light burst at enemy position
+  // Light burst at enemy position — Pixi primary, CSS fallback
   const wrap=document.getElementById('g10-espr-wrap').getBoundingClientRect()
   const bx=((wrap.left+wrap.width/2)/window.innerWidth*100).toFixed(1)
   const by=((wrap.top+wrap.height/2)/window.innerHeight*100).toFixed(1)
-  const burst=document.getElementById('g10-burst-fx')
-  burst.style.setProperty('--bx',bx+'%')
-  burst.style.setProperty('--by',by+'%')
-  burst.classList.remove('show'); void burst.offsetWidth
-  burst.classList.add('show')
-  setTimeout(()=>burst.classList.remove('show'),950)
+  const _burstPixi = PixiManager.get('g10-pixi-canvas')
+  if (_burstPixi) {
+    pixiBurstFlash(_burstPixi, parseFloat(bx), parseFloat(by))
+  } else {
+    const burst=document.getElementById('g10-burst-fx')
+    burst.style.setProperty('--bx',bx+'%')
+    burst.style.setProperty('--by',by+'%')
+    burst.classList.remove('show'); void burst.offsetWidth
+    burst.classList.add('show')
+    setTimeout(()=>burst.classList.remove('show'),950)
+  }
 
   // Stars
   s.stars++
@@ -11754,6 +13072,26 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister())).catch(()=>{})
 }
 
+// ── AAA game result handlers: fire when returning from games/g*.html ──
+window.addEventListener('pageshow', function() {
+  const g6Raw  = sessionStorage.getItem('g6Result')
+  const g14Raw = sessionStorage.getItem('g14Result')
+  if (g6Raw) {
+    try {
+      const r = JSON.parse(g6Raw)
+      sessionStorage.removeItem('g6Result'); sessionStorage.removeItem('g6Config')
+      if (state.currentGame === 6) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
+    } catch(_) {}
+  }
+  if (g14Raw) {
+    try {
+      const r = JSON.parse(g14Raw)
+      sessionStorage.removeItem('g14Result'); sessionStorage.removeItem('g14Config')
+      if (state.currentGame === 14) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
+    } catch(_) {}
+  }
+})
+
 // ================================================================
 // AAA ENHANCEMENT JS — Visual upgrades
 // ================================================================
@@ -11970,52 +13308,51 @@ window.g10NewBattle = function() {
 // ── Battle Arena Weather FX ──
 const G10_WEATHERS = ['clear','clear','clear','snow','snow','rain','rain','wind','night','leaves']
 function applyG10Weather() {
+  const type = G10_WEATHERS[Math.floor(Math.random() * G10_WEATHERS.length)]
+  // Pixi weather primary
+  const pixiApp = PixiManager.get('g10-pixi-canvas')
+  if (pixiApp) {
+    pixiWeather(pixiApp, type)
+    return
+  }
+  // DOM weather fallback
   const field = document.getElementById('g10-field')
   if (!field) return
   const old = field.querySelector('.g10-weather')
   if (old) old.remove()
-  const type = G10_WEATHERS[Math.floor(Math.random() * G10_WEATHERS.length)]
   if (type === 'clear') return
   const layer = document.createElement('div')
   layer.className = `g10-weather g10-wx-${type}`
   if (type === 'snow') {
     for (let i = 0; i < 18; i++) {
-      const s = document.createElement('span')
-      s.className = 'g10-snow-flake'
+      const s = document.createElement('span'); s.className = 'g10-snow-flake'
       s.style.cssText = `left:${Math.random()*100}%;animation-delay:${(Math.random()*5).toFixed(1)}s;animation-duration:${(2.5+Math.random()*3).toFixed(1)}s;font-size:${7+Math.floor(Math.random()*9)}px;opacity:${(0.35+Math.random()*0.5).toFixed(2)}`
-      s.textContent = '❄'
-      layer.appendChild(s)
+      s.textContent = '❄'; layer.appendChild(s)
     }
   } else if (type === 'rain') {
     for (let i = 0; i < 22; i++) {
-      const r = document.createElement('span')
-      r.className = 'g10-rain-drop'
+      const r = document.createElement('span'); r.className = 'g10-rain-drop'
       r.style.cssText = `left:${(Math.random()*110-5).toFixed(1)}%;animation-delay:${(Math.random()*1.5).toFixed(2)}s;animation-duration:${(0.55+Math.random()*0.45).toFixed(2)}s;height:${12+Math.floor(Math.random()*18)}px;opacity:${(0.25+Math.random()*0.3).toFixed(2)}`
       layer.appendChild(r)
     }
   } else if (type === 'wind') {
     for (let i = 0; i < 10; i++) {
-      const w = document.createElement('span')
-      w.className = 'g10-wind-streak'
+      const w = document.createElement('span'); w.className = 'g10-wind-streak'
       w.style.cssText = `top:${(Math.random()*90).toFixed(1)}%;animation-delay:${(Math.random()*2).toFixed(1)}s;animation-duration:${(0.9+Math.random()*0.9).toFixed(1)}s;width:${18+Math.floor(Math.random()*40)}px`
       layer.appendChild(w)
     }
   } else if (type === 'night') {
     for (let i = 0; i < 14; i++) {
-      const star = document.createElement('span')
-      star.className = 'g10-night-star'
+      const star = document.createElement('span'); star.className = 'g10-night-star'
       star.style.cssText = `left:${(Math.random()*95).toFixed(1)}%;top:${(Math.random()*55).toFixed(1)}%;animation-delay:${(Math.random()*2.5).toFixed(1)}s;animation-duration:${(1.5+Math.random()*2).toFixed(1)}s;font-size:${5+Math.floor(Math.random()*8)}px`
-      star.textContent = '✦'
-      layer.appendChild(star)
+      star.textContent = '✦'; layer.appendChild(star)
     }
   } else if (type === 'leaves') {
     const leafSet = ['🍂','🍃','🍁']
     for (let i = 0; i < 14; i++) {
-      const l = document.createElement('span')
-      l.className = 'g10-leaf-fx'
+      const l = document.createElement('span'); l.className = 'g10-leaf-fx'
       l.style.cssText = `left:${(Math.random()*95).toFixed(1)}%;animation-delay:${(Math.random()*6).toFixed(1)}s;animation-duration:${(3.5+Math.random()*3.5).toFixed(1)}s;font-size:${9+Math.floor(Math.random()*9)}px;opacity:${(0.45+Math.random()*0.45).toFixed(2)}`
-      l.textContent = leafSet[Math.floor(Math.random()*3)]
-      layer.appendChild(l)
+      l.textContent = leafSet[Math.floor(Math.random()*3)]; layer.appendChild(l)
     }
   }
   field.appendChild(layer)
@@ -12619,6 +13956,8 @@ function g13PickChain(lv) {
 function initGame13() {
   const dbg = document.getElementById('g13-debug-err')
   if (dbg) dbg.style.display = 'none'
+  // Init Pixi GPU canvas for evolution FX
+  PixiManager.init('g13-pixi-canvas').catch(()=>{})
   try {
     _initGame13Impl()
   } catch(e) {
@@ -13143,29 +14482,30 @@ function g13TriggerEvolution() {
   baseImg.style.opacity = '1'
   evolvedImg.style.opacity = '0'
 
-  // Spawn evolution particles
-  const particleContainer = document.getElementById('g13-evo-particles')
-  if (particleContainer) {
-    particleContainer.innerHTML = ''
-    const emojis = ['✨','⭐','💫','🌟','🔥','⚡','🌈']
-    for (let i = 0; i < 25; i++) {
-      const p = document.createElement('div')
-      p.className = 'g13-evo-particle'
-      p.textContent = emojis[Math.floor(Math.random() * emojis.length)]
-      p.style.cssText = `left:${Math.random()*100}%;top:${50+Math.random()*50}%;
-        animation-delay:${(Math.random()*3).toFixed(1)}s;
-        animation-duration:${(2+Math.random()*3).toFixed(1)}s;
-        font-size:${10+Math.floor(Math.random()*16)}px;`
-      particleContainer.appendChild(p)
+  // Pixi: spawn evolution particles + rings (GPU-accelerated)
+  const _g13Pixi = PixiManager.get('g13-pixi-canvas')
+  if (_g13Pixi) {
+    pixiEvoParticles(_g13Pixi)
+    pixiEvoRings(_g13Pixi)
+  } else {
+    // DOM fallback: particles
+    const particleContainer = document.getElementById('g13-evo-particles')
+    if (particleContainer) {
+      particleContainer.innerHTML = ''
+      const emojis = ['✨','⭐','💫','🌟','🔥','⚡','🌈']
+      for (let i = 0; i < 25; i++) {
+        const p = document.createElement('div')
+        p.className = 'g13-evo-particle'
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)]
+        p.style.cssText = `left:${Math.random()*100}%;top:${50+Math.random()*50}%;animation-delay:${(Math.random()*3).toFixed(1)}s;animation-duration:${(2+Math.random()*3).toFixed(1)}s;font-size:${10+Math.floor(Math.random()*16)}px;`
+        particleContainer.appendChild(p)
+      }
     }
+    // DOM fallback: rings
+    const bgFlash = overlay.querySelector('.g13-evo-bg-flash')
+    if (bgFlash) { const cl = bgFlash.cloneNode(true); bgFlash.replaceWith(cl) }
+    overlay.querySelectorAll('.g13-evo-ring').forEach(r => { const cl = r.cloneNode(true); r.replaceWith(cl) })
   }
-
-  // Restart bg flash animation by re-inserting the element
-  const bgFlash = overlay.querySelector('.g13-evo-bg-flash')
-  if (bgFlash) { const cl = bgFlash.cloneNode(true); bgFlash.replaceWith(cl) }
-
-  // Restart ring animations
-  overlay.querySelectorAll('.g13-evo-ring').forEach(r => { const cl = r.cloneNode(true); r.replaceWith(cl) })
 
   overlay.style.display = 'flex'
 
@@ -13413,12 +14753,15 @@ function exitGame13b() {
   if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
   battleBgmStop()
   clearTimers()
+  PixiManager.destroy('g13b-pixi-canvas')
   showScreen('screen-welcome')
 }
 window.exitGame13b = exitGame13b
 
 function initGame13b() {
   battleBgmPlay()
+  // Init Pixi GPU canvas for aura rings + combo text
+  PixiManager.init('g13b-pixi-canvas').catch(()=>{})
 
   // Random background: mobile vs pc based on viewport width
   const isMobile = window.innerWidth < 768
@@ -13439,7 +14782,7 @@ function initGame13b() {
   g13bState = {
     kills: 0, streak: 0, bestCombo: 0,
     isLegendary: false, wildHp: 1, wildMaxHp: 1,
-    playerHp: 6, playerMaxHp: 6,
+    playerHp: 10, playerMaxHp: 10,
     locked: false, currentAnswer: 0, phase: 'playing',
     legendaryIdx: Math.floor(Math.random() * G13B_LEGENDARIES.length), currentWild: null,
   }
@@ -13499,7 +14842,7 @@ function g13bSpawnWild() {
     wspr.src = pokeSpriteOnline(wild.slug)
     wspr.onerror = function(){ this.src=pokeSprite(wild.slug); this.onerror=()=>{ this.alt = wild.icon || '?' } }
     // Apply tier-based size scaling
-    const tierScale = {1:1.0, 2:1.2, 3:1.3, 4:1.6}[wild.tier||1] || 1.0
+    const tierScale = {1:1.0, 2:1.2, 3:1.44, 4:1.728}[wild.tier||1] || 1.0
     wspr.style.width = wspr.style.height = tierScale === 1.0 ? '' : `calc(min(44vw,26vh) * ${tierScale})`
     void wspr.offsetWidth
     wspr.classList.add('wild-enter')
@@ -13520,7 +14863,7 @@ function g13bSpawnWild() {
       // Legendary fires an autonomous strike between questions
       st.locked = true
       g13bWildHitsPlayer(() => { st.locked = false })
-    }, 8000)
+    }, 14000)
   }
 
   g13bNextQuestion()
@@ -13679,8 +15022,8 @@ function g13bAnswer(val, btn) {
     setTimeout(() => {
       if (s.wildHp <= 0) {
         g13bKillWild()
-      } else if (Math.random() < (s.isLegendary ? 0.60 : 0.30)) {
-        // 60% counter-attack for legendary, 30% for regular wild
+      } else if (Math.random() < (s.isLegendary ? 0.40 : 0.20)) {
+        // 40% counter-attack for legendary, 20% for regular wild
         g13bWildHitsPlayer(() => { s.locked = false; g13bNextQuestion() })
       } else {
         s.locked = false; g13bNextQuestion()
@@ -13895,7 +15238,11 @@ function g13bShowCombo(streak) {
   const sub = document.getElementById('g13b-combo-sub')
   if (txt) txt.textContent = `COMBO x${streak}!`
   if (sub) sub.textContent = streak >= 7 ? '🔥 GILA! KAMU TERBAIK!' : streak >= 5 ? '🌟 LUAR BIASA!' : `${streak} serangan berturut!`
-  if (el) {
+  // Pixi combo text — GPU-rendered burst text
+  const _g13bPixi = PixiManager.get('g13b-pixi-canvas')
+  if (_g13bPixi) {
+    pixiComboText(_g13bPixi, `COMBO x${streak}!`)
+  } else if (el) {
     el.classList.remove('show'); void el.offsetWidth; el.classList.add('show')
     el.addEventListener('animationend', () => el.classList.remove('show'), {once:true})
   }
@@ -14711,6 +16058,11 @@ function g14ScheduleHorn() {
 
 function initGame14() {
   battleBgmStop()
+  const lv = state.selectedLevelNum || state.selectedLevel || 5
+  try { sessionStorage.setItem('g14Config', JSON.stringify({ level: lv })) } catch(_) {}
+  window.location.href = 'games/g14.html'
+}
+function _initGame14_legacy() {
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
   // Clean up any leftover DOM elements from previous race
@@ -15213,7 +16565,7 @@ function g14UpdatePressure() {
 function g14EmitSmoke() {
   const track = document.getElementById('g14-track')
   if (!track) return
-  const lane = g14State.playerLane
+  const lane = g14State.lane
   const topPct = ((lane + 0.5) * 33.33) + '%'
   // Spawn 3 particles per call
   for (let i = 0; i < 3; i++) {

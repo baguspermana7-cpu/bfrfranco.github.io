@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Balapan Kereta 🚂</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c02;font-family:'Fredoka One',sans-serif;touch-action:none}
+#pixi-canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
+
+/* ── HUD ── */
+#hud-top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 14px 8px;background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,transparent 100%);pointer-events:none}
+#btn-back{background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;color:#fff;padding:7px 12px;font-size:15px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
+#train-name-badge{background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.18);border-radius:10px;padding:5px 10px;color:#fbbf24;font-size:13px;font-weight:700;flex-shrink:0;white-space:nowrap}
+#race-info{flex:1;text-align:center;min-width:0}
+#distance-text{font-size:13px;color:#86efac;font-weight:700}
+#position-badge{font-size:17px;font-weight:900;color:#fff}
+#lives-hud{font-size:20px;letter-spacing:1px;flex-shrink:0}
+#speed-hud{background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.18);border-radius:10px;padding:5px 10px;color:#38bdf8;font-size:12px;font-weight:700;flex-shrink:0;white-space:nowrap;min-width:56px;text-align:center}
+
+/* Progress strip */
+#prog-strip{position:fixed;top:56px;left:0;right:0;z-index:49;height:4px;background:rgba(255,255,255,0.08)}
+#prog-fill{height:100%;background:linear-gradient(90deg,#86efac,#22d3ee);transition:width .2s;width:0%}
+
+/* Checkpoints */
+#cp-row{position:fixed;top:60px;left:0;right:0;z-index:48;display:flex;justify-content:space-around;pointer-events:none;padding:0 10%}
+.cp-dot{font-size:14px;opacity:0.35;transition:opacity .3s,transform .3s}
+.cp-dot.reached{opacity:1;transform:scale(1.4)}
+
+/* Bottom controls */
+#ctrl-area{position:fixed;bottom:0;left:0;right:0;z-index:50;padding:10px 14px 14px;background:linear-gradient(0deg,rgba(0,0,0,0.78) 0%,transparent 100%)}
+#ctrl-row{display:flex;gap:10px;align-items:stretch}
+.ctrl-btn{flex:1;padding:16px 0;border-radius:18px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.09);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);user-select:none;-webkit-user-select:none;transition:transform .08s,background .08s;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.ctrl-btn:active{transform:scale(.91);background:rgba(255,255,255,.2)}
+#btn-boost{background:linear-gradient(135deg,rgba(239,68,68,0.35),rgba(251,146,60,0.35));border-color:rgba(239,68,68,0.6);flex:1.4;font-size:14px;padding:14px 6px;line-height:1.2}
+#btn-boost.cooldown{opacity:0.45;pointer-events:none}
+#btn-boost.boosting{background:linear-gradient(135deg,rgba(239,68,68,0.6),rgba(251,146,60,0.6));animation:boostGlow .25s ease-in-out infinite alternate}
+@keyframes boostGlow{to{box-shadow:0 0 18px rgba(251,146,60,0.7)}}
+
+/* Pressure gauge */
+#pressure-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+#pressure-label{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;flex-shrink:0}
+#pressure-track{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px}
+#pressure-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#22d3ee,#86efac);transition:width .3s}
+#pressure-pct{font-size:10px;color:rgba(255,255,255,0.5);flex-shrink:0;min-width:28px;text-align:right}
+
+/* ── Math Quiz overlay ── */
+#quiz-ovl{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(5,12,2,0.97);backdrop-filter:blur(10px);border-top:3px solid #ef4444;padding:14px 16px 20px;display:none}
+#quiz-label{text-align:center;color:rgba(251,191,36,0.8);font-size:11px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+#quiz-q{text-align:center;color:white;font-size:26px;font-weight:900;margin-bottom:12px}
+#quiz-choices{display:flex;gap:10px;justify-content:center}
+.quiz-btn{flex:1;max-width:88px;padding:14px 4px;border:2px solid rgba(255,255,255,.22);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-size:20px;font-weight:900;cursor:pointer;transition:all .12s;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.quiz-btn:active{transform:scale(.9);background:rgba(239,68,68,.4)}
+
+/* ── Overlays ── */
+.ovl{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(10px)}
+.ovl.show{display:flex}
+.ovl-card{background:linear-gradient(145deg,#071005,#0d2008);border:1px solid rgba(134,239,172,.35);border-radius:28px;padding:28px 24px;text-align:center;max-width:310px;width:90%;box-shadow:0 0 50px rgba(34,197,94,.25),0 20px 40px rgba(0,0,0,.6);color:#fff;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.72);opacity:0}to{transform:scale(1);opacity:1}}
+.ovl-emoji{font-size:56px;display:block;margin-bottom:6px}
+.ovl-title{font-size:22px;font-weight:900;margin-bottom:6px}
+.ovl-msg{color:rgba(255,255,255,.6);font-size:13px;margin-bottom:18px;line-height:1.4}
+.ovl-stars{font-size:26px;letter-spacing:4px;margin:8px 0 16px}
+.ovl-btn{background:linear-gradient(135deg,#16a34a,#15803d);border:none;border-radius:16px;color:#fff;padding:14px 0;font-size:15px;font-weight:900;cursor:pointer;width:100%;margin-top:8px;box-shadow:0 5px 0 #14532d;transition:transform .1s,box-shadow .1s;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.ovl-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #14532d}
+.ovl-btn.sec{background:rgba(255,255,255,.1);box-shadow:none;border:1.5px solid rgba(255,255,255,.2);margin-top:8px}
+
+/* ── Train Select ── */
+#select-ovl{position:fixed;inset:0;z-index:400;background:linear-gradient(180deg,#050c02 0%,#0d2008 100%);display:flex;flex-direction:column;overflow:hidden}
+#select-header{padding:14px 16px 8px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+#sel-back{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;padding:7px 12px;font-size:15px;cursor:pointer;font-family:inherit}
+#sel-title{font-size:16px;font-weight:900;color:#86efac;flex:1;text-align:center}
+#select-body{flex:1;overflow-y:auto;padding:8px 16px 20px;-webkit-overflow-scrolling:touch}
+.cat-btn{width:100%;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;cursor:pointer;margin-bottom:10px;text-align:left;border:2px solid transparent;transition:all .15s;background:rgba(255,255,255,.06);color:#fff;font-family:inherit}
+.cat-btn:active{transform:scale(.97)}
+.cat-emoji{font-size:34px;flex-shrink:0}
+.cat-info{flex:1;min-width:0}
+.cat-name{font-size:15px;font-weight:900}
+.cat-desc{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.cat-arr{font-size:20px;color:rgba(255,255,255,.3)}
+.train-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.train-card{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);border-radius:14px;padding:12px 10px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;color:#fff}
+.train-card:active,.train-card.sel{border-color:#86efac;background:rgba(134,239,172,.12)}
+.train-emoji{font-size:36px;display:block;margin-bottom:6px}
+.train-nm{font-size:12px;font-weight:900;line-height:1.2}
+.train-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+.train-spd{font-size:11px;color:#fbbf24;font-weight:700;margin-top:3px}
+#go-btn-wrap{padding:12px 16px 20px;flex-shrink:0}
+#go-btn{width:100%;padding:16px 0;border-radius:18px;background:linear-gradient(135deg,#16a34a,#15803d);border:none;color:#fff;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #14532d;font-family:inherit;display:none}
+#go-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #14532d}
+
+/* Back crumb */
+#sel-crumb{display:none;align-items:center;gap:6px;padding:0 16px 8px;cursor:pointer;color:rgba(255,255,255,.5);font-size:13px}
+#sel-crumb:active{color:white}
+
+/* Flash */
+#flash{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity .05s}
+</style>
+</head>
+<body>
+<canvas id="pixi-canvas"></canvas>
+
+<!-- HUD Top -->
+<div id="hud-top">
+  <button id="btn-back" onclick="confirmBack()">⌂</button>
+  <div id="train-name-badge">🚂 —</div>
+  <div id="race-info">
+    <div id="distance-text">0 m</div>
+    <div id="position-badge">🏁 Mulai!</div>
+  </div>
+  <div id="lives-hud">❤️❤️❤️</div>
+  <div id="speed-hud">0 km/h</div>
+</div>
+<div id="prog-strip"><div id="prog-fill"></div></div>
+<div id="cp-row">
+  <span class="cp-dot" id="cp0">🚉</span>
+  <span class="cp-dot" id="cp1">🚉</span>
+  <span class="cp-dot" id="cp2">🚉</span>
+  <span class="cp-dot" id="cp3">🏁</span>
+</div>
+
+<!-- Controls -->
+<div id="ctrl-area">
+  <div id="ctrl-row">
+    <button class="ctrl-btn" id="btn-up"
+      ontouchstart="laneUp();event.preventDefault()" onclick="laneUp()">▲<br><span style="font-size:10px">ATAS</span></button>
+    <button class="ctrl-btn" id="btn-boost" onclick="triggerBoost()">🔥<br><span style="font-size:12px;font-weight:900">BOOST!</span></button>
+    <button class="ctrl-btn" id="btn-dn"
+      ontouchstart="laneDn();event.preventDefault()" onclick="laneDn()">▼<br><span style="font-size:10px">BAWAH</span></button>
+  </div>
+  <div id="pressure-row">
+    <span id="pressure-label">TEKANAN</span>
+    <div id="pressure-track"><div id="pressure-fill" style="width:70%"></div></div>
+    <span id="pressure-pct">70%</span>
+  </div>
+</div>
+
+<!-- Math Quiz -->
+<div id="quiz-ovl">
+  <div id="quiz-label">🔥 JAWAB UNTUK BOOST!</div>
+  <div id="quiz-q">? + ? = ?</div>
+  <div id="quiz-choices"></div>
+</div>
+
+<!-- Train Select -->
+<div id="select-ovl">
+  <div id="select-header">
+    <button id="sel-back" onclick="selBack()">←</button>
+    <div id="sel-title">Pilih Kereta 🚂</div>
+  </div>
+  <div id="sel-crumb" onclick="showCategories()">← Semua Kategori</div>
+  <div id="select-body"></div>
+  <div id="go-btn-wrap"><button id="go-btn" onclick="startRace()">🚦 Mulai Balapan!</button></div>
+</div>
+
+<!-- Finish -->
+<div class="ovl" id="ovl-fin">
+  <div class="ovl-card">
+    <span class="ovl-emoji" id="fin-emoji">🏆</span>
+    <div class="ovl-title" id="fin-title">Selesai!</div>
+    <div class="ovl-stars" id="fin-stars">⭐⭐⭐</div>
+    <div class="ovl-msg" id="fin-msg">Luar biasa!</div>
+    <button class="ovl-btn" onclick="finishGame()">Kembali 🏠</button>
+    <button class="ovl-btn sec" onclick="replayRace()">Main Lagi 🔄</button>
+  </div>
+</div>
+
+<div id="flash"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+<script>
+'use strict'
+// ═══════════════════════════════════════════════════════════
+//  TRAIN CATALOG
+// ═══════════════════════════════════════════════════════════
+const TRAIN_CATS = [
+  {
+    key:'steam', name:'Kereta Uap 🇮🇩', emoji:'🚂',
+    color:'#92400e', desc:'Lokomotif uap klasik Indonesia & Eropa',
+    trains:[
+      {key:'b2507', name:'B 25 07', sub:'Ambarawa 1902', emoji:'🚂', bodyColor:'#1a1a2e', accColor:'#e11d48', kmh:30, baseSpeed:1.55, boostMult:1.55, desc:'Pendaki gunung Ambarawa!'},
+      {key:'c2801', name:'C 28 01', sub:'Jawa 1921', emoji:'🚂', bodyColor:'#451a03', accColor:'#f59e0b', kmh:45, baseSpeed:1.75, boostMult:1.5, desc:'Lokomotif ekspres Jawa kuno'},
+      {key:'b1304', name:'B 13 04', sub:'Bandung 1914', emoji:'🚂', bodyColor:'#0c0a09', accColor:'#78716c', kmh:40, baseSpeed:1.65, boostMult:1.48, desc:'Hitam legam jalur pegunungan'},
+      {key:'d1408', name:'D 14 08', sub:'Malang 1930', emoji:'🚂', bodyColor:'#431407', accColor:'#dc2626', kmh:55, baseSpeed:1.9, boostMult:1.52, desc:'Si Api Merah Malang!'},
+    ]
+  },
+  {
+    key:'diesel', name:'Diesel Modern', emoji:'🚃',
+    color:'#1e40af', desc:'Lokomotif diesel era modern Indonesia',
+    trains:[
+      {key:'cc201', name:'CC 201', sub:'INKA 1977', emoji:'🚃', bodyColor:'#1e3a8a', accColor:'#3b82f6', kmh:120, baseSpeed:3.2, boostMult:1.45, desc:'Workhorse KAI sejati!'},
+      {key:'cc203', name:'CC 203', sub:'INKA 1994', emoji:'🚃', bodyColor:'#14532d', accColor:'#4ade80', kmh:130, baseSpeed:3.5, boostMult:1.42, desc:'Hijau roket jalur Jawa'},
+      {key:'cc206', name:'CC 206', sub:'GE 2012', emoji:'🚃', bodyColor:'#312e81', accColor:'#818cf8', kmh:140, baseSpeed:3.8, boostMult:1.4, desc:'GE paling modern KAI'},
+      {key:'cc300', name:'CC 300', sub:'INKA 2016', emoji:'🚃', bodyColor:'#1e1b4b', accColor:'#7c3aed', kmh:160, baseSpeed:4.2, boostMult:1.38, desc:'Masa depan diesel KAI'},
+    ]
+  },
+  {
+    key:'electric', name:'KRL & Listrik', emoji:'🚆',
+    color:'#0e7490', desc:'Kereta Rel Listrik Jabodetabek & cepat',
+    trains:[
+      {key:'krl205', name:'KRL 205', sub:'Tokyo Metro JR', emoji:'🚆', bodyColor:'#0c4a6e', accColor:'#38bdf8', kmh:100, baseSpeed:3.0, boostMult:1.5, desc:'Dari Tokyo ke Jakarta!'},
+      {key:'krl1000', name:'KRL 1000', sub:'Tokyu/JR 1990', emoji:'🚆', bodyColor:'#064e3b', accColor:'#34d399', kmh:110, baseSpeed:3.3, boostMult:1.48, desc:'Armada hijau Commuter'},
+      {key:'krlie', name:'KRL i-e', sub:'INKA 2019', emoji:'🚆', bodyColor:'#1e3a8a', accColor:'#bfdbfe', kmh:120, baseSpeed:3.6, boostMult:1.45, desc:'Commuter Line baru!'},
+      {key:'kci2000', name:'KCI 2000', sub:'J-TREC 2023', emoji:'🚆', bodyColor:'#0f172a', accColor:'#e0f2fe', kmh:120, baseSpeed:3.7, boostMult:1.44, desc:'Terbaru & ter-modern!'},
+    ]
+  },
+  {
+    key:'hsr', name:'Kereta Cepat', emoji:'🚄',
+    color:'#7c3aed', desc:'KCIC, Shinkansen & kereta ekspres mewah',
+    trains:[
+      {key:'kcic', name:'CR400AF', sub:'KCIC Whoosh 2023', emoji:'🚄', bodyColor:'#fafafa', accColor:'#dc2626', kmh:350, baseSpeed:5.5, boostMult:1.35, desc:'WHOOSH! Jakarta-Bandung'},
+      {key:'n700', name:'N700S', sub:'Shinkansen Tokyo', emoji:'🚄', bodyColor:'#f8fafc', accColor:'#1e40af', kmh:320, baseSpeed:5.2, boostMult:1.38, desc:'Shinkansen Jepang!'},
+      {key:'tgv', name:'TGV Duplex', sub:'SNCF Prancis', emoji:'🚄', bodyColor:'#172554', accColor:'#ef4444', kmh:320, baseSpeed:5.0, boostMult:1.4, desc:'Kereta cepat Eropa'},
+      {key:'magnet', name:'SCMaglev', sub:'JR Maglev L0', emoji:'🚄', bodyColor:'#f0f9ff', accColor:'#7c3aed', kmh:603, baseSpeed:6.5, boostMult:1.3, desc:'Tercepat di dunia! ⚡'},
+    ]
+  },
+]
+
+// Build flat lookup
+const TRAIN_MAP = {}
+TRAIN_CATS.forEach(cat => cat.trains.forEach(t => { TRAIN_MAP[t.key] = {...t, category: cat.key} }))
+const ALL_TRAINS = Object.values(TRAIN_MAP)
+
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+let cfg = { level: 5 }
+try { const s = sessionStorage.getItem('g14Config'); if(s) Object.assign(cfg, JSON.parse(s)) } catch(_){}
+const FINISH_M = 800 + cfg.level * 30
+const LANE_COUNT = 3
+const LIVES_MAX = 3
+const OBS_INTERVAL_MS = Math.max(900, 2800 - cfg.level * 60)
+const AI_COUNT = 2
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  running: false,
+  lane: 1, targetLane: 1,
+  trainCfg: null,
+  distance: 0, finishLine: FINISH_M,
+  speed: 3.0, baseSpeed: 3.0, maxSpeed: 10,
+  hp: LIVES_MAX,
+  boosting: false, boostCooldown: false,
+  pressure: 70,
+  boostQ: null,
+  quizOpen: false,
+  aiTrains: [],
+  obstacles: [], steam: [], sparks: [], speedLines: [],
+  invincible: 0,
+  frame: 0,
+  position: 1, // 1st/2nd/3rd
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PIXI
+// ═══════════════════════════════════════════════════════════
+let app, stage
+let L = {}   // named layers
+let playerSprite, playerGlow
+let laneYs = []  // pixel Y center of each lane (in game area)
+let gameTop, gameH, laneH
+let lastObsTime = 0, lastSteamTime = 0
+
+async function initPixi() {
+  const W = window.innerWidth, H = window.innerHeight
+  app = new PIXI.Application()
+  await app.init({
+    canvas: document.getElementById('pixi-canvas'),
+    width: W, height: H,
+    backgroundColor: 0x050c02,
+    antialias: true,
+    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    autoDensity: true,
+  })
+  stage = app.stage
+
+  // Game area between top HUD (~70px) and controls (~120px)
+  gameTop = 74
+  const gameBot = H - 122
+  gameH = gameBot - gameTop
+  laneH = gameH / LANE_COUNT
+  laneYs = Array.from({length: LANE_COUNT}, (_, i) => gameTop + laneH * i + laneH / 2)
+
+  buildSky()
+  buildClouds()
+  buildFarScenery()
+  buildMidScenery()
+  buildTracks()
+
+  L.obstacles = new PIXI.Container(); stage.addChild(L.obstacles)
+  L.ai = new PIXI.Container(); stage.addChild(L.ai)
+
+  buildPlayer()
+
+  L.fx = new PIXI.Container(); stage.addChild(L.fx)
+  L.speedlines = new PIXI.Container(); stage.addChild(L.speedlines)
+
+  app.ticker.add(loop)
+}
+
+// ── Sky ───────────────────────────────────────────────────
+function buildSky() {
+  const c = new PIXI.Container(); L.sky = c; stage.addChild(c)
+  const W = app.screen.width, H = app.screen.height
+
+  // Gradient sky
+  const steps = 10
+  for (let i = 0; i < steps; i++) {
+    const t = i / steps
+    const g = new PIXI.Graphics()
+    g.rect(0, 0, W, H / steps + 2).fill(lerpColor(0x071a0d, 0x0d3318, t))
+    g.y = H * i / steps
+    c.addChild(g)
+  }
+
+  // Stars
+  for (let i = 0; i < 60; i++) {
+    const r = 0.5 + Math.random() * 1.5
+    const s = new PIXI.Graphics()
+    s.circle(0, 0, r).fill(0xffffff)
+    s.x = Math.random() * W
+    s.y = Math.random() * gameTop + Math.random() * 10
+    s.alpha = 0.3 + Math.random() * 0.5
+    c.addChild(s)
+  }
+}
+
+// ── Clouds ────────────────────────────────────────────────
+let clouds = []
+function buildClouds() {
+  const c = new PIXI.Container(); L.clouds = c; stage.addChild(c)
+  const W = app.screen.width
+  for (let i = 0; i < 6; i++) {
+    const cloud = makeCloud()
+    cloud.x = Math.random() * W
+    cloud.y = gameTop + Math.random() * 40
+    cloud._speed = 0.2 + Math.random() * 0.3
+    c.addChild(cloud)
+    clouds.push(cloud)
+  }
+}
+function makeCloud() {
+  const g = new PIXI.Graphics()
+  const w = 60 + Math.random() * 80, h = 18 + Math.random() * 18
+  g.ellipse(0, 0, w, h).fill(0x1a3a1a)
+  g.ellipse(-w * 0.25, -h * 0.3, w * 0.55, h * 0.7).fill(0x1a3a1a)
+  g.ellipse(w * 0.2, -h * 0.25, w * 0.45, h * 0.65).fill(0x1a3a1a)
+  g.alpha = 0.4
+  return g
+}
+function tickClouds(delta) {
+  const W = app.screen.width
+  for (const c of clouds) {
+    c.x -= c._speed * delta
+    if (c.x < -150) { c.x = W + 50; c.y = gameTop + Math.random() * 40 }
+  }
+}
+
+// ── Far scenery ───────────────────────────────────────────
+function buildFarScenery() {
+  const c = new PIXI.Container(); L.far = c; stage.addChild(c)
+  const W = app.screen.width
+  // Mountain silhouettes
+  for (let i = 0; i < 12; i++) {
+    const g = new PIXI.Graphics()
+    const mW = 80 + Math.random() * 100
+    const mH = 50 + Math.random() * 80
+    g.moveTo(0, 0).lineTo(mW / 2, -mH).lineTo(mW, 0).fill(0x0d2510)
+    g.x = i * (W / 6) - 20 + Math.random() * 40
+    g.y = gameTop + 30 + Math.random() * 20
+    g._speed = 0.15
+    c.addChild(g)
+  }
+  c._speed = 0.15
+}
+
+// ── Mid scenery ───────────────────────────────────────────
+let midItems = []
+function buildMidScenery() {
+  const c = new PIXI.Container(); L.mid = c; stage.addChild(c)
+  const W = app.screen.width, H = app.screen.height
+  const treeEmojis = ['🌲','🌳','🌴','🌵','🎋']
+  for (let i = 0; i < 16; i++) {
+    const lane = i % LANE_COUNT
+    const yt = laneYs[lane] + laneH * 0.38 + (i % 2) * 8
+    // Top of lane (above rail)
+    const t = new PIXI.Text({ text: treeEmojis[i % treeEmojis.length], style: { fontSize: 20 + Math.random() * 10 } })
+    t.alpha = 0.55
+    t.x = (i * W / 8) + Math.random() * 30
+    t.y = yt - laneH * 0.3
+    t._speed = 0.4
+    t._laneY = yt - laneH * 0.3
+    c.addChild(t)
+    midItems.push(t)
+  }
+}
+
+// ── Tracks ────────────────────────────────────────────────
+let trackTies = []
+const TIE_W = 28, TIE_H = 6, TIE_GAP = 38
+
+function buildTracks() {
+  const c = new PIXI.Container(); L.tracks = c; stage.addChild(c)
+  const W = app.screen.width
+
+  // Per-lane track
+  for (let ln = 0; ln < LANE_COUNT; ln++) {
+    const cy = laneYs[ln]
+    const railOffset = laneH * 0.28
+
+    // Ground fill for lane
+    const ground = new PIXI.Graphics()
+    ground.rect(0, cy - laneH * 0.5, W, laneH).fill(ln === 1 ? 0x0d2008 : 0x071005)
+    ground.alpha = 0.6
+    c.addChild(ground)
+
+    // Lane separator
+    if (ln < LANE_COUNT - 1) {
+      const sep = new PIXI.Graphics()
+      sep.rect(0, cy + laneH * 0.5 - 1, W, 2).fill(0x1a3a1a)
+      sep.alpha = 0.6
+      c.addChild(sep)
+    }
+
+    // Rail lines (top + bottom of lane, inset)
+    for (const sign of [-1, 1]) {
+      const rail = new PIXI.Graphics()
+      rail.rect(0, cy + sign * railOffset - 2, W, 4).fill(0x4b5563)
+      c.addChild(rail)
+
+      // Glow strip
+      const glow = new PIXI.Graphics()
+      glow.rect(0, cy + sign * railOffset - 3, W, 6).fill(0x86efac)
+      glow.alpha = 0.12
+      c.addChild(glow)
+    }
+
+    // Ties (sleepers) — scrolling
+    const numTies = Math.ceil(W / (TIE_W + TIE_GAP)) + 3
+    for (let j = 0; j < numTies; j++) {
+      const tie = new PIXI.Graphics()
+      tie.rect(-TIE_W / 2, cy - railOffset - 2, TIE_W, railOffset * 2 + 4).fill(0x292524)
+      tie.x = j * (TIE_W + TIE_GAP)
+      c.addChild(tie)
+      trackTies.push({ g: tie, ln })
+    }
+  }
+}
+
+function tickTracks(delta) {
+  const W = app.screen.width
+  const px = S.speed * delta * 1.0
+  const period = (TIE_W + TIE_GAP) * (Math.ceil(W / (TIE_W + TIE_GAP)) + 3)
+  for (const t of trackTies) {
+    t.g.x -= px
+    if (t.g.x < -(TIE_W + 10)) t.g.x += period
+  }
+}
+
+// ── Mid items scroll ─────────────────────────────────────
+function tickMid(delta) {
+  const W = app.screen.width
+  for (const t of midItems) {
+    t.x -= t._speed * S.speed * delta * 0.4
+    if (t.x < -60) t.x = W + 20
+  }
+  // Far
+  if (L.far) {
+    L.far.children.forEach(c => {
+      c.x -= 0.15 * delta
+      if (c.x < -200) c.x = W + 50
+    })
+  }
+}
+
+// ── Player train ──────────────────────────────────────────
+const PLAYER_X = 0.15  // fraction of screen width
+
+function buildPlayer() {
+  const c = new PIXI.Container(); L.player = c; stage.addChild(c)
+  c.x = app.screen.width * PLAYER_X
+
+  // Glow ellipse
+  playerGlow = new PIXI.Graphics()
+  playerGlow.ellipse(0, 8, 35, 12).fill(0x86efac)
+  playerGlow.alpha = 0.25
+  c.addChild(playerGlow)
+
+  // Main emoji
+  playerSprite = new PIXI.Text({ text: '🚂', style: { fontSize: 50, fontFamily:'Arial' } })
+  playerSprite.anchor.set(0.5, 0.5)
+  playerSprite.scale.x = -1  // face right
+  c.addChild(playerSprite)
+
+  c.y = laneYs[S.lane]
+
+  // Steam container
+  L.steam = new PIXI.Container(); stage.addChild(L.steam)
+}
+
+function updatePlayerEmoji() {
+  if (!playerSprite || !S.trainCfg) return
+  playerSprite.text = S.trainCfg.emoji || '🚂'
+}
+
+function tickPlayer(delta) {
+  if (!L.player) return
+  const targetY = laneYs[S.targetLane]
+  const dy = targetY - L.player.y
+  L.player.y += dy * 0.22 * delta
+
+  // Bob
+  L.player.y += Math.sin(S.frame * 0.12) * 0.4
+
+  // Glow pulse
+  if (playerGlow) playerGlow.alpha = 0.18 + Math.sin(S.frame * 0.08) * 0.1
+
+  // Invincibility flash
+  if (S.invincible > 0) {
+    S.invincible -= delta
+    L.player.alpha = Math.sin(S.invincible * 0.7) > 0 ? 1 : 0.3
+    if (S.invincible <= 0) L.player.alpha = 1
+  }
+
+  // Screen shake on crash
+  if (S.shakeTimer > 0) {
+    S.shakeTimer -= delta
+    const t = S.shakeTimer / 22
+    stage.x = Math.sin(S.shakeTimer * 1.5) * 7 * t
+    stage.y = Math.cos(S.shakeTimer * 1.2) * 4 * t
+  } else {
+    stage.x *= 0.8
+    stage.y *= 0.8
+  }
+}
+
+// ── Steam ─────────────────────────────────────────────────
+function tickSteam(delta) {
+  S.frame++
+  if (S.frame % 3 === 0) spawnSteam()
+  for (let i = S.steam.length - 1; i >= 0; i--) {
+    const p = S.steam[i]
+    p.g.x -= (S.speed * 0.6 + p.vx) * delta
+    p.g.y += p.vy * delta
+    p.life -= p.decay * delta
+    p.g.alpha = p.life * 0.5
+    p.g.scale.set(1 + (1 - p.life) * 1.5)
+    if (p.life <= 0) { L.steam.removeChild(p.g); S.steam.splice(i, 1) }
+  }
+}
+function spawnSteam() {
+  if (!L.player) return
+  const px = L.player.x - 24  // top of boiler
+  const py = L.player.y - 22
+  const g = new PIXI.Graphics()
+  const r = 4 + Math.random() * 5
+  g.circle(0, 0, r).fill(S.boosting ? 0xff6622 : 0xaaaaaa)
+  g.x = px + (Math.random() - 0.5) * 8
+  g.y = py
+  g.alpha = 0.5
+  L.steam.addChild(g)
+  S.steam.push({ g, vx: 0.3 + Math.random() * 0.5, vy: -(0.8 + Math.random() * 1.2), life: 1, decay: 0.038 + Math.random() * 0.025 })
+}
+
+// ── AI Trains ─────────────────────────────────────────────
+function buildAI() {
+  L.ai.removeChildren()
+  S.aiTrains = []
+  const pool = shuffle([...ALL_TRAINS]).slice(0, AI_COUNT)
+  pool.forEach((cfg, i) => {
+    const c = new PIXI.Container()
+    const spr = new PIXI.Text({ text: cfg.emoji || '🚃', style: { fontSize: 40, fontFamily: 'Arial' } })
+    spr.anchor.set(0.5)
+    spr.scale.x = -1
+    c.addChild(spr)
+
+    // Glow
+    const glow = new PIXI.Graphics()
+    glow.ellipse(0, 8, 28, 9).fill(0x86efac)
+    glow.alpha = 0.18
+    c.addChild(glow)
+
+    const aiLane = [0, 1, 2].filter(l => l !== S.lane)[i % 2]
+    c.y = laneYs[aiLane]
+    c.x = app.screen.width * (0.55 + i * 0.15)
+    L.ai.addChild(c)
+
+    const variation = 0.96 + Math.random() * 0.08
+    S.aiTrains.push({
+      cfg, container: c,
+      lane: aiLane,
+      speed: S.baseSpeed * variation,
+      distance: 0,
+    })
+  })
+}
+
+function tickAI(delta) {
+  const W = app.screen.width
+  const playerX = W * PLAYER_X
+
+  S.aiTrains.forEach(ai => {
+    ai.distance += ai.speed * delta * 0.12
+    // Screen position based on relative distance
+    const relDist = ai.distance - S.distance
+    const screenX = playerX + relDist * 1.8
+    ai.container.x = screenX
+    ai.container.visible = screenX > -80 && screenX < W + 80
+    // Bob
+    ai.container.y = laneYs[ai.lane] + Math.sin(S.frame * 0.1 + ai.lane) * 0.5
+  })
+
+  // Update race position
+  const aiAhead = S.aiTrains.filter(a => a.distance > S.distance).length
+  S.position = aiAhead + 1
+  const posText = S.position === 1 ? '🥇 Posisi 1!' : S.position === 2 ? '🥈 Posisi 2' : '🥉 Posisi 3'
+  document.getElementById('position-badge').textContent = posText
+}
+
+// ── Obstacles ─────────────────────────────────────────────
+const OBS_EMOJIS = ['🪨','🐄','🐔','🌵','⚠️','🛑','🪵','🧱']
+const OBS_SIZE = 44
+
+function spawnObstacle() {
+  const lane = Math.floor(Math.random() * LANE_COUNT)
+  const W = app.screen.width
+  const emoji = OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)]
+
+  const c = new PIXI.Container()
+  const txt = new PIXI.Text({ text: emoji, style: { fontSize: OBS_SIZE, fontFamily: 'Arial' } })
+  txt.anchor.set(0.5)
+  c.addChild(txt)
+
+  // Warning glow
+  const wg = new PIXI.Graphics()
+  wg.circle(0, 0, OBS_SIZE * 0.65).fill(0xef4444)
+  wg.alpha = 0.15
+  c.addChild(wg)
+
+  c.x = W + OBS_SIZE
+  c.y = laneYs[lane]
+  c._lane = lane
+  c._alive = true
+  c._warned = false
+
+  L.obstacles.addChild(c)
+  S.obstacles.push(c)
+
+  // Lane warning
+  const warnBtns = ['btn-up','btn-boost','btn-dn']
+  // Flash the lane change button
+  const btnId = lane === 0 ? 'btn-dn' : lane === 2 ? 'btn-up' : null
+  if (btnId) {
+    const btn = document.getElementById(btnId)
+    if (btn) { btn.style.borderColor = '#ef4444'; btn.style.boxShadow = '0 0 12px rgba(239,68,68,0.6)'; setTimeout(() => { btn.style.borderColor = ''; btn.style.boxShadow = '' }, 600) }
+  }
+}
+
+function tickObstacles(delta) {
+  const W = app.screen.width
+  const playerX = W * PLAYER_X
+  const hitZoneX = playerX + 10
+
+  for (let i = S.obstacles.length - 1; i >= 0; i--) {
+    const o = S.obstacles[i]
+    if (!o._alive) { L.obstacles.removeChild(o); S.obstacles.splice(i, 1); continue }
+
+    o.x -= S.speed * delta * 1.0
+    // Pulse warning
+    o.children[1].alpha = 0.1 + Math.sin(S.frame * 0.2) * 0.1
+
+    if (o.x < -OBS_SIZE * 2) { o._alive = false; continue }
+
+    // Collision
+    if (S.invincible <= 0 && o._lane === S.lane &&
+        o.x > hitZoneX - OBS_SIZE && o.x < hitZoneX + OBS_SIZE) {
+      o._alive = false
+      crashHit()
+    }
+  }
+}
+
+function crashHit() {
+  if (S.invincible > 0) return
+  S.invincible = 60
+  S.shakeTimer = 24
+  S.hp--
+  spawnCrashFX(L.player.x, L.player.y)
+  playTone(200, 0.2, 'square')
+  screenFlash('rgba(255,60,60,0.35)')
+  updateHUD()
+  if (S.hp <= 0) setTimeout(endRace, 500)
+}
+
+// ── FX ────────────────────────────────────────────────────
+function spawnCrashFX(x, y) {
+  for (let i = 0; i < 18; i++) {
+    const g = new PIXI.Graphics()
+    const r = 2 + Math.random() * 5
+    g.circle(0, 0, r).fill(i % 2 === 0 ? 0xff4444 : 0xffaa44)
+    g.x = x; g.y = y
+    L.fx.addChild(g)
+    S.sparks.push({ g, vx: (Math.random() - 0.5) * 9, vy: -Math.random() * 7 - 1, gravity: 0.3, life: 1, decay: 0.022 + Math.random() * 0.02 })
+  }
+}
+
+function spawnBoostFX() {
+  for (let i = 0; i < 24; i++) {
+    const g = new PIXI.Graphics()
+    g.circle(0, 0, 3 + Math.random() * 4).fill(0xfbbf24)
+    g.x = L.player.x + (Math.random() - 0.5) * 40
+    g.y = L.player.y + (Math.random() - 0.5) * 20
+    L.fx.addChild(g)
+    S.sparks.push({ g, vx: -(3 + Math.random() * 5), vy: (Math.random() - 0.5) * 3, gravity: 0.05, life: 1, decay: 0.03 + Math.random() * 0.02 })
+  }
+}
+
+function tickFX(delta) {
+  for (let i = S.sparks.length - 1; i >= 0; i--) {
+    const p = S.sparks[i]
+    p.g.x += p.vx * delta; p.g.y += p.vy * delta
+    p.vy += p.gravity * delta
+    p.life -= p.decay * delta
+    p.g.alpha = p.life
+    if (p.life <= 0) { L.fx.removeChild(p.g); S.sparks.splice(i, 1) }
+  }
+}
+
+// ── Speed Lines ───────────────────────────────────────────
+let spdLines = []
+function tickSpeedLines(delta) {
+  if (!S.boosting) { L.speedlines.alpha *= 0.9; return }
+  L.speedlines.alpha = Math.min(1, L.speedlines.alpha + 0.1 * delta)
+
+  if (S.frame % 4 === 0) {
+    const W = app.screen.width
+    const g = new PIXI.Graphics()
+    const y = gameTop + Math.random() * gameH
+    const len = 60 + Math.random() * 120
+    g.rect(0, 0, len, 1.5).fill(0xffffff)
+    g.x = W; g.y = y; g.alpha = 0.4 + Math.random() * 0.4
+    g._vx = -(25 + Math.random() * 15)
+    L.speedlines.addChild(g)
+    spdLines.push(g)
+  }
+  for (let i = spdLines.length - 1; i >= 0; i--) {
+    const l = spdLines[i]
+    l.x += l._vx * delta
+    l.alpha -= 0.04 * delta
+    if (l.alpha <= 0 || l.x < -200) { L.speedlines.removeChild(l); spdLines.splice(i, 1) }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════════════
+function loop(ticker) {
+  if (!S.running) return
+  const delta = ticker.deltaTime
+  const now = performance.now()
+
+  // Spawn obstacle
+  if (now - lastObsTime > OBS_INTERVAL_MS) {
+    spawnObstacle()
+    lastObsTime = now
+  }
+
+  tickClouds(delta)
+  tickMid(delta)
+  tickTracks(delta)
+  tickSteam(delta)
+  tickPlayer(delta)
+  tickAI(delta)
+  tickObstacles(delta)
+  tickFX(delta)
+  tickSpeedLines(delta)
+
+  // Advance distance
+  const speedFactor = S.boosting ? S.trainCfg.boostMult : 1.0
+  S.distance += S.speed * delta * 0.12 * speedFactor
+  S.speed = Math.min(S.maxSpeed, S.speed + 0.0003 * delta)
+
+  // Pressure recovery
+  S.pressure = Math.min(100, S.pressure + 0.05 * delta)
+  updatePressure()
+
+  updateHUD()
+
+  // Checkpoints
+  const frac = S.distance / S.finishLine
+  ;[['cp0',0.25],['cp1',0.5],['cp2',0.75]].forEach(([id,th]) => {
+    const el = document.getElementById(id)
+    if (frac >= th && !el.classList.contains('reached')) el.classList.add('reached')
+  })
+  if (frac >= 1) {
+    document.getElementById('cp3').classList.add('reached')
+    endRace()
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME FLOW
+// ═══════════════════════════════════════════════════════════
+function startRace() {
+  if (!S.trainCfg) return
+  document.getElementById('select-ovl').style.display = 'none'
+  document.getElementById('go-btn').style.display = 'none'
+
+  S.distance = 0; S.hp = LIVES_MAX; S.pressure = 70
+  S.obstacles = []; S.steam = []; S.sparks = []; spdLines = []; S.frame = 0
+  S.boosting = false; S.boostCooldown = false; S.invincible = 0
+  S.lane = 1; S.targetLane = 1
+  S.speed = S.baseSpeed = S.trainCfg.baseSpeed
+  S.maxSpeed = S.trainCfg.baseSpeed * 2.5
+  L.obstacles.removeChildren(); L.ai.removeChildren()
+
+  updatePlayerEmoji()
+  buildAI()
+  updateHUD()
+  lastObsTime = performance.now() + 2500
+  S.running = true
+}
+
+function endRace() {
+  if (!S.running) return
+  S.running = false
+  document.getElementById('quiz-ovl').style.display = 'none'
+
+  const frac = Math.min(1, S.distance / S.finishLine)
+  const posScore = S.position === 1 ? 5 : S.position === 2 ? 3 : 1
+  const distScore = Math.round(frac * 3)
+  const stars = Math.min(5, posScore - (LIVES_MAX - S.hp))
+
+  document.getElementById('fin-emoji').textContent = stars >= 4 ? '🏆' : stars >= 2 ? '🥈' : '😤'
+  document.getElementById('fin-title').textContent =
+    S.position === 1 ? 'Juara 1! 🏆' : S.position === 2 ? 'Posisi 2 🥈' : 'Posisi 3 🥉'
+  document.getElementById('fin-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars)
+  document.getElementById('fin-msg').textContent =
+    stars >= 4 ? 'Luar biasa! Kamu juaranya!' :
+    stars >= 2 ? `${Math.floor(S.distance)}m ditempuh, bagus!` :
+    'Coba pilih kereta lebih cepat!'
+
+  document.getElementById('ovl-fin').classList.add('show')
+
+  try {
+    sessionStorage.setItem('g14Result', JSON.stringify({ stars, distance: Math.floor(S.distance), position: S.position }))
+  } catch(_) {}
+}
+
+function replayRace() {
+  document.getElementById('ovl-fin').classList.remove('show')
+  startRace()
+}
+
+function finishGame() { goBack() }
+function goBack() {
+  S.running = false
+  if (document.referrer) history.back()
+  else window.location.href = '../index.html'
+}
+function confirmBack() {
+  if (!S.running || confirm('Keluar dari balapan?')) goBack()
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BOOST + QUIZ
+// ═══════════════════════════════════════════════════════════
+function triggerBoost() {
+  if (!S.running || S.boostCooldown || S.boosting || S.pressure < 20) return
+  if (S.quizOpen) return
+  S.quizOpen = true
+  buildQuiz()
+  document.getElementById('quiz-ovl').style.display = 'block'
+  playTone(440, 0.08)
+}
+
+function buildQuiz() {
+  const lv = cfg.level || 5
+  let a, b, answer, op
+  const ops = lv <= 6 ? ['+'] : lv <= 12 ? ['+', '-'] : ['+', '-', '*']
+  op = ops[Math.floor(Math.random() * ops.length)]
+  if (op === '+') {
+    const max = 10 + lv * 3
+    a = Math.floor(Math.random() * max) + 1
+    b = Math.floor(Math.random() * max) + 1
+    answer = a + b
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 20) + 10
+    b = Math.floor(Math.random() * a) + 1
+    answer = a - b
+  } else {
+    a = Math.floor(Math.random() * 6) + 2
+    b = Math.floor(Math.random() * 6) + 2
+    answer = a * b
+  }
+  const symbol = op === '*' ? '×' : op
+  document.getElementById('quiz-q').textContent = `${a} ${symbol} ${b} = ?`
+  const wrong = new Set()
+  while (wrong.size < 3) {
+    const d = Math.floor(Math.random() * 8) + 1
+    const w = answer + (Math.random() < 0.5 ? d : -d)
+    if (w !== answer && w > 0) wrong.add(w)
+  }
+  const choices = [answer, ...[...wrong]].slice(0, 4).sort(() => Math.random() - 0.5)
+  const el = document.getElementById('quiz-choices')
+  el.innerHTML = ''
+  choices.forEach(c => {
+    const btn = document.createElement('button')
+    btn.className = 'quiz-btn'
+    btn.textContent = c
+    btn.onclick = () => answerQuiz(c, answer)
+    el.appendChild(btn)
+  })
+  S.boostQ = { answer }
+}
+
+function answerQuiz(val, correct) {
+  document.getElementById('quiz-ovl').style.display = 'none'
+  S.quizOpen = false
+  if (val === correct) {
+    executeBoost()
+  } else {
+    playTone(200, 0.15, 'square')
+    screenFlash('rgba(255,60,60,0.2)')
+  }
+}
+
+function executeBoost() {
+  if (!S.trainCfg) return
+  S.boosting = true
+  S.boostCooldown = true
+  S.pressure = Math.max(10, S.pressure - 30)
+  updatePressure()
+  document.getElementById('btn-boost').classList.add('boosting')
+  document.getElementById('btn-boost').textContent = ''
+  document.getElementById('btn-boost').innerHTML = '🔥<br><span style="font-size:12px">BOOSTING!</span>'
+  spawnBoostFX()
+  playTone(660, 0.12); playTone(880, 0.08)
+  screenFlash('rgba(251,191,36,0.2)')
+
+  setTimeout(() => {
+    S.boosting = false
+    S.speed = S.baseSpeed
+    document.getElementById('btn-boost').classList.remove('boosting')
+    document.getElementById('btn-boost').innerHTML = '🔥<br><span style="font-size:12px;font-weight:900">BOOST!</span>'
+    setTimeout(() => {
+      S.boostCooldown = false
+      document.getElementById('btn-boost').classList.remove('cooldown')
+    }, 3000)
+  }, (S.trainCfg.boostDur || 2000))
+  document.getElementById('btn-boost').classList.add('cooldown')
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════════
+function laneUp() { if (S.running && S.targetLane > 0) { S.targetLane--; playTone(500, 0.05) } }
+function laneDn() { if (S.running && S.targetLane < LANE_COUNT - 1) { S.targetLane++; playTone(400, 0.05) } }
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowUp') { laneUp(); e.preventDefault() }
+  if (e.key === 'ArrowDown') { laneDn(); e.preventDefault() }
+  if (e.key === ' ') { triggerBoost(); e.preventDefault() }
+})
+let touchY0 = null
+window.addEventListener('touchstart', e => { touchY0 = e.touches[0].clientY }, {passive:true})
+window.addEventListener('touchend', e => {
+  if (touchY0 === null) return
+  const dy = e.changedTouches[0].clientY - touchY0
+  if (Math.abs(dy) > 40) { dy < 0 ? laneUp() : laneDn() }
+  touchY0 = null
+}, {passive:true})
+
+// ═══════════════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════════════
+function updateHUD() {
+  const frac = Math.min(1, S.distance / S.finishLine)
+  document.getElementById('prog-fill').style.width = (frac * 100).toFixed(1) + '%'
+  document.getElementById('distance-text').textContent = `${Math.floor(S.distance)} / ${S.finishLine}m`
+  document.getElementById('lives-hud').textContent = '❤️'.repeat(S.hp) + '🖤'.repeat(LIVES_MAX - S.hp)
+  if (S.trainCfg) {
+    const displayKmh = Math.round(S.trainCfg.kmh * (S.speed / S.baseSpeed) * (S.boosting ? S.trainCfg.boostMult : 1))
+    document.getElementById('speed-hud').textContent = displayKmh + ' km/h'
+  }
+}
+function updatePressure() {
+  const pct = Math.round(S.pressure)
+  document.getElementById('pressure-fill').style.width = pct + '%'
+  document.getElementById('pressure-pct').textContent = pct + '%'
+  document.getElementById('pressure-fill').style.background =
+    pct < 20 ? 'linear-gradient(90deg,#ef4444,#f97316)' :
+    pct < 50 ? 'linear-gradient(90deg,#f97316,#fbbf24)' :
+    'linear-gradient(90deg,#22d3ee,#86efac)'
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TRAIN SELECTOR UI
+// ═══════════════════════════════════════════════════════════
+function showCategories() {
+  document.getElementById('sel-crumb').style.display = 'none'
+  document.getElementById('sel-title').textContent = 'Pilih Kereta 🚂'
+  document.getElementById('go-btn').style.display = 'none'
+  const body = document.getElementById('select-body')
+  body.innerHTML = ''
+  TRAIN_CATS.forEach(cat => {
+    const btn = document.createElement('button')
+    btn.className = 'cat-btn'
+    btn.style.borderColor = cat.color
+    btn.innerHTML = `<span class="cat-emoji">${cat.emoji}</span><div class="cat-info"><div class="cat-name">${cat.name}</div><div class="cat-desc">${cat.desc}</div></div><span class="cat-arr">›</span>`
+    btn.onclick = () => showTrainsForCat(cat)
+    body.appendChild(btn)
+  })
+}
+
+function showTrainsForCat(cat) {
+  document.getElementById('sel-crumb').style.display = 'flex'
+  document.getElementById('sel-title').textContent = cat.name
+  const body = document.getElementById('select-body')
+  body.innerHTML = ''
+  const grid = document.createElement('div')
+  grid.className = 'train-grid'
+  cat.trains.forEach(t => {
+    const card = document.createElement('button')
+    card.className = 'train-card'
+    card.innerHTML = `<span class="train-emoji">${t.emoji}</span><div class="train-nm">${t.name}</div><div class="train-sub">${t.sub}</div><div class="train-spd">${t.kmh} km/h</div>`
+    card.onclick = () => {
+      grid.querySelectorAll('.train-card').forEach(c => c.classList.remove('sel'))
+      card.classList.add('sel')
+      S.trainCfg = { ...t }
+      document.getElementById('train-name-badge').textContent = `${t.emoji} ${t.name}`
+      document.getElementById('go-btn').style.display = 'block'
+    }
+    grid.appendChild(card)
+  })
+  body.appendChild(grid)
+}
+
+function selBack() {
+  if (document.getElementById('sel-crumb').style.display !== 'none') {
+    showCategories()
+  } else {
+    goBack()
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════════════════════
+let audioCtx
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  if (audioCtx.state === 'suspended') audioCtx.resume()
+  return audioCtx
+}
+function playTone(freq, dur = 0.1, type = 'sine') {
+  try {
+    const ctx = ensureAudio()
+    const osc = ctx.createOscillator(), gain = ctx.createGain()
+    osc.connect(gain); gain.connect(ctx.destination)
+    osc.frequency.value = freq; osc.type = type
+    gain.gain.setValueAtTime(0.1, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur)
+    osc.start(); osc.stop(ctx.currentTime + dur)
+  } catch(_) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function lerpColor(a, b, t) {
+  const ar = (a>>16)&0xff, ag = (a>>8)&0xff, ab = a&0xff
+  const br = (b>>16)&0xff, bg = (b>>8)&0xff, bb = b&0xff
+  return ((Math.round(ar+(br-ar)*t)<<16)|(Math.round(ag+(bg-ag)*t)<<8)|Math.round(ab+(bb-ab)*t))
+}
+function shuffle(arr) {
+  for (let i = arr.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]] }
+  return arr
+}
+let flashTimer = null
+function screenFlash(color) {
+  const f = document.getElementById('flash')
+  f.style.background = color; f.style.opacity = '1'
+  clearTimeout(flashTimer); flashTimer = setTimeout(() => { f.style.opacity = '0' }, 80)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════
+;(async function boot() {
+  document.addEventListener('touchstart', ensureAudio, {once:true})
+  document.addEventListener('click', ensureAudio, {once:true})
+  await initPixi()
+  showCategories()
+})()
+</script>
+</body>
+</html>
