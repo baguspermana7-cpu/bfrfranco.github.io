@@ -3971,6 +3971,15 @@ body { background: #0a0a1a !important; }
 }
 .g13b-kills.pop-kill { animation:g13bKillPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 @keyframes g13bKillPop { 0%{transform:scale(1)} 50%{transform:scale(1.35)} 100%{transform:scale(1)} }
+@keyframes g13cBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.g13c-choice-btn { background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);color:white;font-family:'Fredoka One',cursive; }
+.g13c-choice-btn:active { transform:scale(0.9); }
+.g13c-choice-btn.correct { background:rgba(34,197,94,0.4);border-color:#22c55e;box-shadow:0 0 20px rgba(34,197,94,0.5); }
+.g13c-choice-btn.wrong { background:rgba(244,63,94,0.3);border-color:#f43f5e;animation:wrongShake 0.4s ease; }
+.g13c-letter-btn { border:3px solid rgba(255,255,255,0.15);border-radius:14px;background:rgba(255,255,255,0.07);color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;padding:10px 4px;text-align:center;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:2px; }
+.g13c-letter-btn:active { transform:scale(0.9); }
+.g13c-letter-btn.has-badge { border-color:#FCD34D;background:rgba(252,211,77,0.15); }
+.g13c-letter-btn .lbadge { font-size:10px; }
 /* HP bar (top-center, for legendary) */
 .g13b-hp-wrap {
   position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:10;
@@ -5388,6 +5397,7 @@ body { background: #0a0a1a !important; }
   background:linear-gradient(145deg,#1C0000 0%,#7C2D12 45%,#EA580C 85%,#FBBF24 100%);
   border:2px solid rgba(251,146,60,0.65);
   box-shadow:0 7px 0 rgba(28,0,0,0.85),0 10px 35px rgba(234,88,12,0.4),inset 0 1px 0 rgba(255,200,0,0.15);
+  overflow:visible;
 }
 .wmap-zone--sains {
   background:linear-gradient(145deg,#020617 0%,#0F172A 55%,#1E3A5F 100%);
@@ -5558,11 +5568,6 @@ body { background: #0a0a1a !important; }
 .wmap-heart { position:absolute;font-size:11px;animation:heartFloat linear infinite;opacity:0;pointer-events:none;z-index:0; }
 @keyframes heartFloat { 0%{opacity:0;transform:translateY(0) scale(0.5)} 20%{opacity:0.8} 80%{opacity:0.35} 100%{opacity:0;transform:translateY(-55px) scale(1) rotate(18deg)} }
 
-/* Minimap scroll indicator */
-.wmap-minimap { position:sticky;bottom:10px;left:0;right:0;display:flex;justify-content:center;z-index:10;pointer-events:none; }
-.wmap-minimap-dots { display:flex;gap:6px;background:rgba(0,0,0,0.55);padding:5px 10px;border-radius:18px;backdrop-filter:blur(8px); }
-.wmap-minimap-dot { width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.28);transition:background 0.3s,transform 0.3s; }
-.wmap-minimap-dot.active { background:#8B5CF6;transform:scale(1.45); }
 
 /* Responsive adjustments */
 @media (max-width:420px) {
@@ -6306,15 +6311,6 @@ body { background: #0a0a1a !important; }
 
     </div><!-- end .wmap-canvas -->
 
-    <!-- Minimap scroll indicator dots -->
-    <div class="wmap-minimap">
-      <div class="wmap-minimap-dots">
-        <div class="wmap-minimap-dot active" data-zone="0" title="Emosi &amp; Kata"></div>
-        <div class="wmap-minimap-dot" data-zone="1" title="Angka &amp; Memori"></div>
-        <div class="wmap-minimap-dot" data-zone="2" title="Mobil &amp; Pokémon"></div>
-        <div class="wmap-minimap-dot" data-zone="3" title="Sains &amp; Kereta"></div>
-      </div>
-    </div>
 
   </div><!-- end .wmap-root -->
 
@@ -6695,6 +6691,56 @@ body { background: #0a0a1a !important; }
     <div class="g13b-result-btns">
       <button onclick="document.getElementById('g13b-level-complete').style.display='none';startQuickFire()" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#1a1a1a;font-size:16px;">Lanjut ▶</button>
       <button onclick="exitGame13b()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:white;">⌂ Beranda</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 13c — Gym Huruf & Suara -->
+<div id="screen-game13c" class="screen">
+  <div id="g13c-gym-bg" style="position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:1;"></div>
+  <!-- Header -->
+  <div class="game-header" style="position:relative;z-index:10;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);padding:8px 12px;">
+    <button class="gh-back" onclick="exitGame()" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;">⌂</button>
+    <span style="flex:1;font-size:16px;font-weight:900;font-family:'Fredoka One',cursive;color:white;">🏅 Gym Huruf & Suara</span>
+    <span id="g13c-badge-count" style="font-size:13px;font-weight:900;color:#FCD34D;">🏅 0</span>
+  </div>
+
+  <!-- Letter Select overlay -->
+  <div id="g13c-letter-select" style="position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
+    <div style="background:rgba(10,4,30,0.92);border:2px solid rgba(167,139,250,0.4);border-radius:24px;padding:20px 16px;width:100%;max-width:360px;max-height:82vh;overflow-y:auto;">
+      <div style="text-align:center;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;color:white;margin-bottom:4px;">🏅 Pilih Gym Huruf</div>
+      <div style="text-align:center;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Latihan fonik — bunyi awal kata</div>
+      <div id="g13c-letter-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- Game area -->
+  <div id="g13c-game-area" style="position:relative;z-index:10;display:none;flex-direction:column;align-items:center;justify-content:flex-start;flex:1;padding:10px 12px;gap:8px;">
+    <!-- Letter + Progress -->
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;">
+      <div style="font-size:52px;font-weight:900;font-family:'Fredoka One',cursive;color:#FCD34D;text-shadow:0 0 20px rgba(252,211,77,0.8);" id="g13c-target-letter">A</div>
+      <div id="g13c-progress-dots" style="display:flex;gap:6px;align-items:center;"></div>
+    </div>
+    <!-- Question label -->
+    <div style="font-size:14px;font-weight:900;color:rgba(255,255,255,0.7);text-align:center;" id="g13c-question-lbl">Pilih benda yang mulai dengan huruf ini!</div>
+    <!-- Pokemon mascot -->
+    <img id="g13c-pokemon-img" src="" alt="" style="width:80px;height:80px;object-fit:contain;image-rendering:auto;animation:g13cBounce 1.2s ease-in-out infinite;" onerror="this.style.display='none'">
+    <!-- Choices grid -->
+    <div id="g13c-choices" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:380px;margin-top:4px;"></div>
+    <!-- Feedback -->
+    <div id="g13c-feedback" style="height:28px;font-size:15px;font-weight:900;text-align:center;"></div>
+  </div>
+
+  <!-- Result overlay -->
+  <div id="g13c-result-overlay" style="display:none;position:absolute;inset:0;z-index:30;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+    <div style="font-size:56px;" id="g13c-res-icon">🏅</div>
+    <div style="font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;color:white;" id="g13c-res-title">Gym Selesai!</div>
+    <div id="g13c-res-badge" style="font-size:36px;letter-spacing:4px;"></div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.6);" id="g13c-res-sub">Kamu mendapat badge!</div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button onclick="g13cNextLetter()" style="background:linear-gradient(135deg,#2E7D32,#66BB6A);color:white;border:none;border-radius:16px;padding:12px 20px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Fredoka One',cursive;">Gym Lain 🏅</button>
+      <button onclick="exitGame()" style="background:rgba(255,255,255,0.1);color:white;border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;padding:12px 20px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Fredoka One',cursive;">⌂ Beranda</button>
     </div>
   </div>
 </div>
@@ -8649,20 +8695,222 @@ function setLevelComplete(gameNum, levelNum, stars) {
   saveProgress(prog)
 }
 
+// ================================================================
+// GAME 13c — GYM HURUF & SUARA (Phonics Gym)
+// ================================================================
+const G13C_ITEMS = {
+  A: [{e:'🍎',n:'Apel'},{e:'🦢',n:'Angsa'},{e:'🔥',n:'Api'},{e:'🐜',n:'Semut',skip:true},{e:'🌊',n:'Awan'},{e:'🦅',n:'Ayam'/*close*/}],
+  B: [{e:'⚽',n:'Bola'},{e:'🎈',n:'Balon'},{e:'📚',n:'Buku'},{e:'🚌',n:'Bus'},{e:'🌸',n:'Bunga'},{e:'🦁',n:'Beruang'/*close*/}],
+  C: [{e:'💍',n:'Cincin'},{e:'🦑',n:'Cumi'},{e:'🍫',n:'Coklat'},{e:'🦋',n:'Capung'/*close*/}],
+  D: [{e:'🍃',n:'Daun'},{e:'🐑',n:'Domba'},{e:'🌙',n:'Dadu'/*close*/},{e:'🎃',n:'Duren'/*close*/}],
+  E: [{e:'🦅',n:'Elang'},{e:'🧊',n:'Es'},{e:'🪣',n:'Ember'}],
+  F: [{e:'📷',n:'Foto'},{e:'🌸',n:'Flamingo'/*close*/},{e:'🎠',n:'Ferris'/*close*/}],
+  G: [{e:'🐘',n:'Gajah'},{e:'🎸',n:'Gitar'},{e:'⛰️',n:'Gunung'},{e:'🕶️',n:'Gelas'/*close*/},{e:'🌀',n:'Gasing'}],
+  H: [{e:'🐯',n:'Harimau'},{e:'🌧️',n:'Hujan'},{e:'🌳',n:'Hutan'/*close*/},{e:'🦋',n:'Hijau'/*close*/}],
+  I: [{e:'🐟',n:'Ikan'},{e:'👩',n:'Ibu'},{e:'🦟',n:'Iguana'/*close*/},{e:'🔴',n:'Ijo'/*close*/}],
+  J: [{e:'🌽',n:'Jagung'},{e:'⏰',n:'Jam'},{e:'🦒',n:'Jerapah'},{e:'🍄',n:'Jamur'}],
+  K: [{e:'🐴',n:'Kuda'},{e:'🐈',n:'Kucing'},{e:'🎂',n:'Kue'},{e:'🐇',n:'Kelinci'},{e:'🦛',n:'Kuda Nil'}],
+  L: [{e:'🐬',n:'Lumba'},{e:'🐝',n:'Lebah'},{e:'🎃',n:'Labu'},{e:'🪲',n:'Lalat'},{e:'🌺',n:'Lotus'/*close*/}],
+  M: [{e:'☀️',n:'Matahari'},{e:'🥭',n:'Mangga'},{e:'🐒',n:'Monyet'},{e:'🌊',n:'Mawar'/*close*/},{e:'🍯',n:'Madu'}],
+  N: [{e:'🍚',n:'Nasi'},{e:'🍍',n:'Nanas'},{e:'🦟',n:'Nyamuk'},{e:'🌙',n:'Ninja'/*close*/}],
+  O: [{e:'🦧',n:'Orang Utan'},{e:'🌊',n:'Ombak'},{e:'💊',n:'Obat'},{e:'🦦',n:'Otter'}],
+  P: [{e:'🍌',n:'Pisang'},{e:'🌳',n:'Pohon'},{e:'🐼',n:'Panda'},{e:'🎉',n:'Pesta'},{e:'🌊',n:'Pantai'/*close*/}],
+  R: [{e:'🦌',n:'Rusa'},{e:'🚀',n:'Roket'},{e:'🦊',n:'Rubah'},{e:'🍇',n:'Rambutan'/*close*/}],
+  S: [{e:'🐜',n:'Semut'},{e:'🚲',n:'Sepeda'},{e:'🐄',n:'Sapi'},{e:'⭐',n:'Singa'/*close*/},{e:'🐍',n:'Ular',skip:true}],
+  T: [{e:'🎩',n:'Topi'},{e:'🐭',n:'Tikus'},{e:'🥚',n:'Telur'},{e:'🐯',n:'Taring'/*close*/},{e:'🌺',n:'Teratai'}],
+  U: [{e:'🪼',n:'Ubur'},{e:'🦐',n:'Udang'},{e:'🛸',n:'UFO'},{e:'🐛',n:'Ulat'}],
+  W: [{e:'🥕',n:'Wortel'},{e:'🎨',n:'Warna'},{e:'🦓',n:'Waran'/*close*/}],
+  Z: [{e:'🦓',n:'Zebra'},{e:'🫒',n:'Zaitun'}],
+}
+
+// Distractors pool (not starting with the target letter)
+const G13C_DISTRACTORS = {
+  A:['Bola','Kuda','Ikan','Gajah','Pohon'],
+  B:['Apel','Gajah','Kucing','Matahari','Nanas'],
+  C:['Apel','Bola','Domba','Ikan','Pohon'],
+  D:['Apel','Bola','Gajah','Ikan','Pohon'],
+  E:['Apel','Bola','Gajah','Kuda','Mangga'],
+  F:['Apel','Gajah','Kucing','Lumba','Pisang'],
+  G:['Apel','Bola','Ikan','Kucing','Pohon'],
+  H:['Apel','Bola','Gajah','Ikan','Kuda'],
+  I:['Apel','Bola','Gajah','Kuda','Pohon'],
+  J:['Apel','Bola','Gajah','Ikan','Kuda'],
+  K:['Apel','Bola','Gajah','Ikan','Pohon'],
+  L:['Apel','Bola','Gajah','Ikan','Pohon'],
+  M:['Apel','Bola','Gajah','Ikan','Pohon'],
+  N:['Apel','Bola','Gajah','Ikan','Kuda'],
+  O:['Apel','Bola','Gajah','Ikan','Kuda'],
+  P:['Apel','Gajah','Ikan','Kuda','Monyet'],
+  R:['Apel','Bola','Gajah','Ikan','Pohon'],
+  S:['Apel','Bola','Gajah','Kuda','Pohon'],
+  T:['Apel','Bola','Gajah','Kuda','Pohon'],
+  U:['Apel','Bola','Gajah','Ikan','Pohon'],
+  W:['Apel','Bola','Gajah','Ikan','Pohon'],
+  Z:['Apel','Bola','Gajah','Kuda','Pohon'],
+}
+
+const G13C_DISTRACTOR_EMOJIS = {
+  'Apel':'🍎','Bola':'⚽','Gajah':'🐘','Ikan':'🐟','Pohon':'🌳',
+  'Kuda':'🐴','Kucing':'🐈','Matahari':'☀️','Nanas':'🍍','Monyet':'🐒',
+  'Mangga':'🥭','Lumba':'🐬','Pisang':'🍌',
+}
+
+const G13C_GYM_POKEMON = {
+  A:'aipom',B:'bulbasaur',C:'caterpie',D:'dewgong',E:'eevee',
+  F:'fennekin',G:'gengar',H:'haunter',I:'ivysaur',J:'jigglypuff',
+  K:'kadabra',L:'lapras',M:'meowth',N:'ninetales',O:'onix',
+  P:'pikachu',R:'raichu',S:'snorlax',T:'togetic',U:'umbreon',
+  W:'wigglytuff',Z:'zubat',
+}
+
+const G13C_BG_POOL = [
+  'assets/background/gym/g13c-bg-gym-m.webp',
+  'assets/background/gym/g13c-bg-forest-m.webp',
+  'assets/background/gym/g13c-bg-volcano-m.webp',
+  'assets/background/gym/g13c-bg-water-m.webp',
+  'assets/background/gym/g13c-bg-gym2-m.webp',
+  'assets/background/gym/g13c-bg-water2-m.webp',
+  'assets/background/gym/g13c-bg-water3-m.webp',
+]
+
+const G13C_LETTERS_ORDER = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','R','S','T','U','W','Z']
+
+let g13cState = { letter:'', round:0, total:5, correct:0, badges:{} }
+try { const s=localStorage.getItem('g13c_badges'); if(s) g13cState.badges=JSON.parse(s) } catch(_){}
+
 function openGymGame() {
   playClick()
-  const toast=document.createElement('div')
-  toast.textContent='🏅 Gym Huruf & Suara — Segera Hadir!'
-  Object.assign(toast.style,{
-    position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
-    background:'linear-gradient(135deg,#2E7D32,#66BB6A)',color:'white',
-    padding:'18px 28px',borderRadius:'16px',fontSize:'18px',fontWeight:'700',
-    boxShadow:'0 8px 32px rgba(0,0,0,0.5)',zIndex:'99999',textAlign:'center',
-    opacity:'0',transition:'opacity 0.3s'
+  showScreen('screen-game13c')
+  g13cBuildLetterSelect()
+}
+
+function g13cBuildLetterSelect() {
+  const grid = document.getElementById('g13c-letter-grid')
+  if (!grid) return
+  grid.innerHTML = ''
+  document.getElementById('g13c-letter-select').style.display = 'flex'
+  document.getElementById('g13c-game-area').style.display = 'none'
+  document.getElementById('g13c-result-overlay').style.display = 'none'
+  const totalBadges = Object.values(g13cState.badges).filter(Boolean).length
+  document.getElementById('g13c-badge-count').textContent = `🏅 ${totalBadges}`
+  G13C_LETTERS_ORDER.forEach(l => {
+    if (!G13C_ITEMS[l]) return
+    const btn = document.createElement('button')
+    btn.className = 'g13c-letter-btn' + (g13cState.badges[l] ? ' has-badge' : '')
+    btn.innerHTML = `${l}<span class="lbadge">${g13cState.badges[l] === 'gold' ? '🥇' : g13cState.badges[l] === 'silver' ? '🥈' : g13cState.badges[l] === 'bronze' ? '🥉' : ''}</span>`
+    btn.onclick = () => g13cStartGym(l)
+    grid.appendChild(btn)
   })
-  document.body.appendChild(toast)
-  requestAnimationFrame(()=>{ toast.style.opacity='1' })
-  setTimeout(()=>{ toast.style.opacity='0'; setTimeout(()=>toast.remove(),300) },2200)
+}
+
+function g13cStartGym(letter) {
+  playClick()
+  g13cState.letter = letter
+  g13cState.round = 0
+  g13cState.correct = 0
+  const bg = G13C_BG_POOL[Math.floor(Math.random() * G13C_BG_POOL.length)]
+  document.getElementById('g13c-gym-bg').style.backgroundImage = `url('${bg}')`
+  document.getElementById('g13c-letter-select').style.display = 'none'
+  document.getElementById('g13c-result-overlay').style.display = 'none'
+  const ga = document.getElementById('g13c-game-area')
+  ga.style.display = 'flex'
+  const slug = G13C_GYM_POKEMON[letter] || 'pikachu'
+  const pImg = document.getElementById('g13c-pokemon-img')
+  pImg.src = `https://img.pokemondb.net/sprites/home/normal/${slug}.png`
+  pImg.style.display = 'block'
+  g13cShowRound()
+}
+
+function g13cShowRound() {
+  const s = g13cState
+  document.getElementById('g13c-target-letter').textContent = s.letter
+  // Progress dots
+  const dots = document.getElementById('g13c-progress-dots')
+  dots.innerHTML = ''
+  for (let i = 0; i < s.total; i++) {
+    const d = document.createElement('div')
+    d.style.cssText = `width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);background:${i < s.correct ? '#22c55e' : i === s.round ? '#FCD34D' : 'transparent'}`
+    dots.appendChild(d)
+  }
+  // Pick correct item
+  const pool = (G13C_ITEMS[s.letter] || []).filter(it => !it.skip)
+  if (!pool.length) { g13cShowResult(); return }
+  const correct = pool[Math.floor(Math.random() * pool.length)]
+  // Pick 2 distractors
+  const distNames = G13C_DISTRACTORS[s.letter] || ['Bola','Gajah','Pohon']
+  const shuffledDist = distNames.sort(() => Math.random() - 0.5).slice(0, 2)
+  const choices = [
+    { ...correct, isCorrect: true },
+    ...shuffledDist.map(n => ({ e: G13C_DISTRACTOR_EMOJIS[n] || '❓', n, isCorrect: false }))
+  ].sort(() => Math.random() - 0.5)
+
+  const grid = document.getElementById('g13c-choices')
+  grid.innerHTML = ''
+  document.getElementById('g13c-feedback').textContent = ''
+  choices.forEach(ch => {
+    const btn = document.createElement('button')
+    btn.className = 'g13c-choice-btn'
+    btn.innerHTML = `<span style="font-size:36px">${ch.e}</span><span style="font-size:13px;font-weight:900">${ch.n}</span>`
+    btn.onclick = () => g13cAnswer(ch.isCorrect, btn, choices, correct)
+    grid.appendChild(btn)
+  })
+}
+
+function g13cAnswer(isCorrect, btn, choices, correct) {
+  const s = g13cState
+  // Disable all buttons
+  document.querySelectorAll('.g13c-choice-btn').forEach(b => b.onclick = null)
+  const fb = document.getElementById('g13c-feedback')
+  if (isCorrect) {
+    btn.classList.add('correct')
+    s.correct++
+    playCorrect()
+    spawnSparkles(btn)
+    fb.style.color = '#22c55e'
+    fb.textContent = '✅ Benar! ' + correct.n + ' mulai dengan ' + s.letter
+  } else {
+    btn.classList.add('wrong')
+    // Reveal correct
+    document.querySelectorAll('.g13c-choice-btn').forEach(b => {
+      const name = b.querySelector('span:last-child')?.textContent
+      if (name === correct.n) b.classList.add('correct')
+    })
+    playWrong()
+    fb.style.color = '#f43f5e'
+    fb.textContent = `❌ Yang mulai ${s.letter} adalah ${correct.n} ${correct.e}`
+  }
+  s.round++
+  setTimeout(() => {
+    if (s.round >= s.total) g13cShowResult()
+    else g13cShowRound()
+  }, 1000)
+}
+
+function g13cShowResult() {
+  const s = g13cState
+  const pct = s.correct / s.total
+  const badge = pct >= 1 ? 'gold' : pct >= 0.8 ? 'silver' : pct >= 0.6 ? 'bronze' : null
+  if (badge) {
+    const prev = s.badges[s.letter]
+    const rank = { bronze:1, silver:2, gold:3 }
+    if (!prev || rank[badge] > rank[prev]) {
+      s.badges[s.letter] = badge
+      try { localStorage.setItem('g13c_badges', JSON.stringify(s.badges)) } catch(_){}
+    }
+    setLevelComplete('13c', 1, badge==='gold'?3:badge==='silver'?2:1)
+    saveStars()
+  }
+  const ro = document.getElementById('g13c-result-overlay')
+  document.getElementById('g13c-res-icon').textContent = pct >= 1 ? '🏆' : pct >= 0.6 ? '🏅' : '💪'
+  document.getElementById('g13c-res-title').textContent = pct >= 1 ? 'Sempurna! 🌟' : pct >= 0.6 ? 'Gym Selesai!' : 'Coba Lagi!'
+  document.getElementById('g13c-res-badge').textContent = badge === 'gold' ? '🥇🥇🥇' : badge === 'silver' ? '🥈🥈' : badge === 'bronze' ? '🥉' : '😅'
+  document.getElementById('g13c-res-sub').textContent = `${s.correct}/${s.total} benar — Huruf ${s.letter} ${badge ? 'badge ' + badge + '!' : '— latih lagi!'}`
+  ro.style.display = 'flex'
+}
+
+function g13cNextLetter() {
+  document.getElementById('g13c-result-overlay').style.display = 'none'
+  g13cBuildLetterSelect()
 }
 
 function openLevelSelect(gameNum) {
