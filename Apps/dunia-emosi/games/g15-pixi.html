@@ -79,6 +79,39 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 /* ── Screen shake ── */
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .shaking{animation:shake .3s ease}
+
+/* ── Train Select Screen ── */
+#train-select{position:fixed;inset:0;z-index:900;background:linear-gradient(180deg,#0a0212 0%,#120430 60%,#0a0212 100%);display:flex;flex-direction:column;overflow:hidden}
+#ts-header{padding:14px 16px 6px;flex-shrink:0}
+#ts-title{font-size:22px;font-weight:900;color:#e9d5ff;text-align:center;text-shadow:0 0 20px rgba(139,92,246,0.7)}
+#ts-subtitle{font-size:11px;color:rgba(233,213,255,0.45);letter-spacing:1.5px;text-align:center;margin:2px 0 8px}
+#station-intro{text-align:center;background:rgba(139,92,246,0.14);border:1.5px solid rgba(139,92,246,0.4);border-radius:14px;margin:0 14px 10px;padding:8px 14px;flex-shrink:0}
+.si-label{font-size:9px;color:rgba(233,213,255,0.5);letter-spacing:1.8px;font-weight:700}
+.si-icon{font-size:26px;display:block;margin:1px 0}
+.si-name{font-size:17px;font-weight:900;color:#e9d5ff}
+.si-landmark{font-size:11px;color:rgba(233,213,255,0.6);margin-top:2px}
+#ts-grid-wrap{flex:1;overflow-y:auto;padding:0 10px 16px;-webkit-overflow-scrolling:touch}
+#train-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+@media(min-width:380px){#train-grid{grid-template-columns:repeat(5,1fr)}}
+@media(min-width:520px){#train-grid{grid-template-columns:repeat(6,1fr)}}
+.tcard{border-radius:12px;border:2px solid rgba(139,92,246,0.22);background:rgba(139,92,246,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:hidden;display:flex;flex-direction:column;transition:all .12s}
+.tcard:active{transform:scale(0.9);background:rgba(139,92,246,0.25);border-color:rgba(167,139,250,0.6)}
+.tcard canvas{width:100%;height:48px;display:block}
+.tcard .tname{font-size:8px;font-weight:700;color:#c4b5fd;text-align:center;padding:2px 3px 5px;line-height:1.3;min-height:24px}
+
+/* ── Station Banner (shown at game start) ── */
+#station-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;display:none;flex-direction:column;align-items:center;gap:3px;background:rgba(0,0,0,0.88);border:2.5px solid rgba(139,92,246,0.7);border-radius:24px;padding:20px 32px;backdrop-filter:blur(18px);pointer-events:none;opacity:1;transition:opacity .5s,transform .5s}
+#station-banner.visible{display:flex}
+#station-banner.fade-out{opacity:0;transform:translate(-50%,-55%)}
+#sb-label{font-size:10px;color:rgba(233,213,255,0.5);letter-spacing:2.5px;font-weight:700}
+#sb-icon{font-size:40px;line-height:1;margin:4px 0}
+#sb-name{font-size:22px;font-weight:900;color:#e9d5ff;text-align:center;text-shadow:0 0 16px rgba(139,92,246,0.8)}
+#sb-landmark{font-size:13px;color:rgba(233,213,255,0.65);text-align:center}
+
+/* ── Station chip in HUD ── */
+#station-chip{position:fixed;top:66px;right:10px;z-index:49;background:rgba(0,0,0,0.68);border:1.5px solid rgba(139,92,246,0.45);border-radius:10px;padding:3px 9px;pointer-events:none}
+.sc-label{font-size:8px;color:rgba(233,213,255,0.45);letter-spacing:1.2px;display:block}
+.sc-name{font-size:10px;font-weight:700;color:#e9d5ff;white-space:nowrap;display:block}
 </style>
 </head>
 <body>
@@ -141,6 +174,35 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
   </div>
 </div>
 
+<!-- Train Select Screen -->
+<div id="train-select">
+  <div id="ts-header">
+    <div id="ts-title">🚂 Pilih Keretamu!</div>
+    <div id="ts-subtitle">PILIH KERETA UNTUK MEMULAI PERJALANAN</div>
+  </div>
+  <div id="station-intro">
+    <div class="si-label">STASIUN BERANGKAT</div>
+    <span class="si-icon" id="si-icon">🏛️</span>
+    <div class="si-name" id="si-name">Surabaya Kota</div>
+    <div class="si-landmark" id="si-landmark">Tugu Pahlawan</div>
+  </div>
+  <div id="ts-grid-wrap"><div id="train-grid"></div></div>
+</div>
+
+<!-- Station Banner -->
+<div id="station-banner">
+  <div id="sb-label">TIBA DI STASIUN</div>
+  <div id="sb-icon">🏛️</div>
+  <div id="sb-name">Surabaya Kota</div>
+  <div id="sb-landmark">Tugu Pahlawan</div>
+</div>
+
+<!-- Station chip -->
+<div id="station-chip" style="display:none">
+  <span class="sc-label">📍 STASIUN</span>
+  <span class="sc-name" id="sc-name">Surabaya Kota</span>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script>
 'use strict';
@@ -150,6 +212,195 @@ const cfg = (() => { try { return JSON.parse(sessionStorage.getItem('g15Config')
 const LEVEL = Math.max(1, Math.min(30, cfg.level || 1));
 
 function goBack() { if (document.referrer) history.back(); else window.location.href = '../index.html'; }
+
+// ── Java Station Route: Surabaya → Banten ────────────────────────────────────
+const JAVA_STATIONS = [
+  {name:'Surabaya Kota',      icon:'🏛️', landmark:'Tugu Pahlawan'},
+  {name:'Surabaya Gubeng',    icon:'🏢', landmark:'Gedung Gubernuran'},
+  {name:'Sidoarjo',           icon:'🌊', landmark:'Lumpur Lapindo'},
+  {name:'Mojokerto',          icon:'🏯', landmark:'Candi Trowulan'},
+  {name:'Jombang',            icon:'🕌', landmark:'Pondok Pesantren Tebuireng'},
+  {name:'Kertosono',          icon:'🛤️', landmark:'Persimpangan KA Kertosono'},
+  {name:'Nganjuk',            icon:'⛰️', landmark:'Lereng Gunung Wilis'},
+  {name:'Madiun',             icon:'🍛', landmark:'Pusat Wisata Pecel'},
+  {name:'Solo Balapan',       icon:'👑', landmark:'Keraton Kasunanan Solo'},
+  {name:'Klaten',             icon:'🏛️', landmark:'Candi Prambanan'},
+  {name:'Yogyakarta Tugu',    icon:'🎭', landmark:'Kraton Ngayogyakarta'},
+  {name:'Wates',              icon:'🏖️', landmark:'Pantai Glagah'},
+  {name:'Kebumen',            icon:'🕳️', landmark:'Goa Jatijajar'},
+  {name:'Kroya',              icon:'🛤️', landmark:'Simpang Besar KA Kroya'},
+  {name:'Purwokerto',         icon:'🌄', landmark:'Baturaden'},
+  {name:'Bumiayu',            icon:'💧', landmark:'Waduk Malahayu'},
+  {name:'Cirebon',            icon:'👑', landmark:'Keraton Kasepuhan Cirebon'},
+  {name:'Jatibarang',         icon:'🌾', landmark:'Sawah Indramayu'},
+  {name:'Cikampek',           icon:'🏭', landmark:'Pabrik Kereta INKA'},
+  {name:'Bekasi',             icon:'🏙️', landmark:'Kota Metropolitan Bekasi'},
+  {name:'Jakarta Kota',       icon:'🏛️', landmark:'Kawasan Kota Tua Jakarta'},
+  {name:'Gambir',             icon:'🗺️', landmark:'Monumen Nasional (Monas)'},
+  {name:'Tangerang',          icon:'🕌', landmark:'Masjid Agung Al-Ittihad'},
+  {name:'Serpong',            icon:'🏢', landmark:'Kawasan BSD City'},
+  {name:'Rangkasbitung',      icon:'🌿', landmark:'Kebun Teh Cianten'},
+  {name:'Serang',             icon:'🏛️', landmark:'Banten Lama & Mesjid Agung'},
+  {name:'Cilegon',            icon:'🏭', landmark:'Krakatau Steel'},
+  {name:'Anyer',              icon:'🏖️', landmark:'Pantai Anyer'},
+  {name:'Merak',              icon:'⛴️', landmark:'Pelabuhan Merak'},
+  {name:'TUJUAN AKHIR! 🎉',  icon:'🏆', landmark:'Selat Sunda — Selamat Tiba!'},
+];
+function getCurrentStation(){ return JAVA_STATIONS[Math.min(LEVEL-1,JAVA_STATIONS.length-1)]; }
+
+// ── Train Catalog: 20 models × 5 liveries = 100 unique trains ─────────────────
+// b=body, r=roof, s=stripe, w=window, k=dark(wheels/chimney)
+const TRAIN_MODELS = [
+  {id:'s1',name:'Uap Klasik',      type:'steam',   sub:'classic',  liveries:[
+    {name:'Biru KAI',      b:0x1d4ed8,r:0x1e3a8a,s:0xfbbf24,w:0xbae6fd,k:0x1c1917},
+    {name:'Merah Vintage', b:0x991b1b,r:0x7f1d1d,s:0xfde68a,w:0xfecaca,k:0x1c1917},
+    {name:'Hijau PJKA',    b:0x166534,r:0x14532d,s:0xfbbf24,w:0xbbf7d0,k:0x1c1917},
+    {name:'Hitam Baja',    b:0x27272a,r:0x18181b,s:0xd97706,w:0xe2e8f0,k:0x09090b},
+    {name:'Coklat Tua',    b:0x78350f,r:0x451a03,s:0xfcd34d,w:0xfde68a,k:0x1c1917},
+  ]},
+  {id:'s2',name:'Uap Pasifik',     type:'steam',   sub:'pacific',  liveries:[
+    {name:'Biru Langit',   b:0x0369a1,r:0x0c4a6e,s:0xe0f2fe,w:0x7dd3fc,k:0x1c1917},
+    {name:'Hijau British', b:0x15803d,r:0x052e16,s:0xfef9c3,w:0xd1fae5,k:0x1c1917},
+    {name:'Merah Apple',   b:0xb91c1c,r:0x7f1d1d,s:0xfef9c3,w:0xfee2e2,k:0x1c1917},
+    {name:'Biru Navy',     b:0x1e3a8a,r:0x172554,s:0xfde68a,w:0xdbeafe,k:0x1c1917},
+    {name:'Ungu Royal',    b:0x6d28d9,r:0x4c1d95,s:0xfde68a,w:0xede9fe,k:0x1c1917},
+  ]},
+  {id:'s3',name:'Uap Gunung',      type:'steam',   sub:'mountain', liveries:[
+    {name:'Abu Baja',      b:0x374151,r:0x1f2937,s:0xfbbf24,w:0xd1d5db,k:0x111827},
+    {name:'Coklat Manis',  b:0x92400e,r:0x78350f,s:0xfef08a,w:0xfef3c7,k:0x1c1917},
+    {name:'Hijau Hutan',   b:0x14532d,r:0x052e16,s:0xa3e635,w:0xd1fae5,k:0x1c1917},
+    {name:'Merah Gelap',   b:0x7f1d1d,r:0x450a0a,s:0xfca5a5,w:0xfee2e2,k:0x1c1917},
+    {name:'Biru Gelap',    b:0x172554,r:0x0f172a,s:0x60a5fa,w:0xdbeafe,k:0x1c1917},
+  ]},
+  {id:'s4',name:'Uap Tangki',      type:'steam',   sub:'tank',     liveries:[
+    {name:'Merah Muda',    b:0xdb2777,r:0x9d174d,s:0xfde68a,w:0xfce7f3,k:0x1c1917},
+    {name:'Kuning Cerah',  b:0xca8a04,r:0x92400e,s:0x1c1917,w:0xfef9c3,k:0x1c1917},
+    {name:'Teal Muda',     b:0x0f766e,r:0x0d4a41,s:0xe0fffe,w:0x99f6e4,k:0x1c1917},
+    {name:'Nila Tua',      b:0x3730a3,r:0x312e81,s:0xa5b4fc,w:0xe0e7ff,k:0x1c1917},
+    {name:'Oranye Api',    b:0xea580c,r:0xc2410c,s:0xfef9c3,w:0xffedd5,k:0x1c1917},
+  ]},
+  {id:'s5',name:'Uap Mini',        type:'steam',   sub:'prairie',  liveries:[
+    {name:'Hijau Mint',    b:0x059669,r:0x064e3b,s:0xfbbf24,w:0xa7f3d0,k:0x1c1917},
+    {name:'Biru Muda',     b:0x2563eb,r:0x1d4ed8,s:0xfde68a,w:0xdbeafe,k:0x1c1917},
+    {name:'Oranye Senja',  b:0xf59e0b,r:0xb45309,s:0x1c1917,w:0xfef3c7,k:0x1c1917},
+    {name:'Merah Marun',   b:0x881337,r:0x4c0519,s:0xfde68a,w:0xfce7f3,k:0x1c1917},
+    {name:'Ungu Gelap',    b:0x5b21b6,r:0x3b0764,s:0xddd6fe,w:0xede9fe,k:0x1c1917},
+  ]},
+  {id:'d1',name:'Diesel CC201',    type:'diesel',  sub:'hood',     liveries:[
+    {name:'Oranye KAI',    b:0xea580c,r:0xc2410c,s:0x1c1917,w:0xffedd5,k:0x1c1917},
+    {name:'Biru PJKA',     b:0x1d4ed8,r:0x1e3a8a,s:0xfbbf24,w:0xbae6fd,k:0x1c1917},
+    {name:'Hijau Tua',     b:0x166534,r:0x052e16,s:0xfbbf24,w:0xbbf7d0,k:0x1c1917},
+    {name:'Merah Tua',     b:0x991b1b,r:0x7f1d1d,s:0xfef9c3,w:0xfecaca,k:0x1c1917},
+    {name:'Putih Bersih',  b:0xe2e8f0,r:0xcbd5e1,s:0x1d4ed8,w:0xdbeafe,k:0x374151},
+  ]},
+  {id:'d2',name:'Diesel Kotak',    type:'diesel',  sub:'boxcab',   liveries:[
+    {name:'Abu Industrial',b:0x374151,r:0x1f2937,s:0xfbbf24,w:0xd1d5db,k:0x111827},
+    {name:'Merah Bara',    b:0xb91c1c,r:0x7f1d1d,s:0xe2e8f0,w:0xfee2e2,k:0x1c1917},
+    {name:'Kuning Cerah',  b:0xca8a04,r:0x92400e,s:0x1c1917,w:0xfef9c3,k:0x1c1917},
+    {name:'Biru Tua',      b:0x1e3a8a,r:0x172554,s:0x60a5fa,w:0xdbeafe,k:0x1c1917},
+    {name:'Hijau Lumut',   b:0x365314,r:0x1a2e05,s:0xa3e635,w:0xd9f99d,k:0x1c1917},
+  ]},
+  {id:'d3',name:'Diesel Streamline',type:'diesel', sub:'streamline',liveries:[
+    {name:'Silver Kilat',  b:0x94a3b8,r:0x64748b,s:0xef4444,w:0xe2e8f0,k:0x1e293b},
+    {name:'Biru Kencana',  b:0x0284c7,r:0x0c4a6e,s:0xfbbf24,w:0xe0f2fe,k:0x0f172a},
+    {name:'Merah Kilat',   b:0xdc2626,r:0x991b1b,s:0xf1f5f9,w:0xfecaca,k:0x1c1917},
+    {name:'Hijau Meriam',  b:0x15803d,r:0x052e16,s:0xd9f99d,w:0xbbf7d0,k:0x1c1917},
+    {name:'Emas Mewah',    b:0x92400e,r:0x78350f,s:0xfde68a,w:0xfef9c3,k:0x1c1917},
+  ]},
+  {id:'d4',name:'Lok Langsir',     type:'diesel',  sub:'shunter',  liveries:[
+    {name:'Kuning Lemon',  b:0xfbbf24,r:0xd97706,s:0x1c1917,w:0xfef9c3,k:0x1c1917},
+    {name:'Oranye Jinak',  b:0xf97316,r:0xea580c,s:0x1c1917,w:0xffedd5,k:0x1c1917},
+    {name:'Merah Tomat',   b:0xef4444,r:0xb91c1c,s:0xfef9c3,w:0xfee2e2,k:0x1c1917},
+    {name:'Biru Cobalt',   b:0x1d4ed8,r:0x1e3a8a,s:0x93c5fd,w:0xdbeafe,k:0x1c1917},
+    {name:'Hijau Terang',  b:0x16a34a,r:0x14532d,s:0xd9f99d,w:0xbbf7d0,k:0x1c1917},
+  ]},
+  {id:'d5',name:'Railbus',         type:'diesel',  sub:'railbus',  liveries:[
+    {name:'Ungu Lavender', b:0x7c3aed,r:0x5b21b6,s:0xfde68a,w:0xede9fe,k:0x2e1065},
+    {name:'Biru Lazur',    b:0x0891b2,r:0x164e63,s:0xe0f2fe,w:0xcffafe,k:0x0c4a6e},
+    {name:'Hijau Apel',    b:0x65a30d,r:0x365314,s:0xfef9c3,w:0xd9f99d,k:0x1a2e05},
+    {name:'Merah Rubi',    b:0xbe123c,r:0x881337,s:0xfce7f3,w:0xfce7f3,k:0x4c0519},
+    {name:'Emas Perunggu', b:0xb45309,r:0x78350f,s:0xfef9c3,w:0xfef3c7,k:0x451a03},
+  ]},
+  {id:'e1',name:'KRL Commuter',    type:'electric',sub:'krl',      liveries:[
+    {name:'Merah Jakarta', b:0xef4444,r:0xdc2626,s:0xfef9c3,w:0xfef2f2,k:0x1c1917},
+    {name:'Biru Bogor',    b:0x1d4ed8,r:0x1e3a8a,s:0xe0f2fe,w:0xdbeafe,k:0x1c1917},
+    {name:'Hijau Tanah',   b:0x16a34a,r:0x14532d,s:0xfef9c3,w:0xd1fae5,k:0x1c1917},
+    {name:'Oranye Panas',  b:0xea580c,r:0xc2410c,s:0xfef9c3,w:0xffedd5,k:0x1c1917},
+    {name:'Ungu Violet',   b:0x6d28d9,r:0x4c1d95,s:0xfde68a,w:0xede9fe,k:0x2e1065},
+  ]},
+  {id:'e2',name:'MRT Jakarta',     type:'electric',sub:'mrt',      liveries:[
+    {name:'Biru Laut',     b:0x0369a1,r:0x0c4a6e,s:0xbae6fd,w:0xe0f2fe,k:0x0f172a},
+    {name:'Silver Elegan', b:0x94a3b8,r:0x64748b,s:0x3b82f6,w:0xf0f9ff,k:0x1e293b},
+    {name:'Merah Muda',    b:0xbe123c,r:0x881337,s:0xfce7f3,w:0xfce7f3,k:0x4c0519},
+    {name:'Hijau MRT',     b:0x059669,r:0x064e3b,s:0xd1fae5,w:0xecfdf5,k:0x022c22},
+    {name:'Abu Modern',    b:0x475569,r:0x334155,s:0xf1f5f9,w:0xf8fafc,k:0x1e293b},
+  ]},
+  {id:'e3',name:'KA Cepat',        type:'highspeed',sub:'bullet',  liveries:[
+    {name:'Putih Kilat',   b:0xf8fafc,r:0xe2e8f0,s:0x1d4ed8,w:0xeff6ff,k:0x0f172a},
+    {name:'Merah Sonic',   b:0xdc2626,r:0x991b1b,s:0xfef9c3,w:0xfef2f2,k:0x1c1917},
+    {name:'Hijau Neon',    b:0x15803d,r:0x052e16,s:0x86efac,w:0xf0fdf4,k:0x022c22},
+    {name:'Biru Atlantik', b:0x1d4ed8,r:0x1e3a8a,s:0xbae6fd,w:0xdbeafe,k:0x172554},
+    {name:'Perak Emas',    b:0x94a3b8,r:0x64748b,s:0xfbbf24,w:0xfef9c3,k:0x1e293b},
+  ]},
+  {id:'e4',name:'LRT Ringan',      type:'electric',sub:'lrt',      liveries:[
+    {name:'Teal Modern',   b:0x0d9488,r:0x0f766e,s:0x99f6e4,w:0xf0fdfa,k:0x042f2e},
+    {name:'Ungu Futur',    b:0x7c3aed,r:0x5b21b6,s:0xddd6fe,w:0xf5f3ff,k:0x2e1065},
+    {name:'Oranye LRT',    b:0xf97316,r:0xea580c,s:0xfef9c3,w:0xfff7ed,k:0x431407},
+    {name:'Biru Langit',   b:0x38bdf8,r:0x0284c7,s:0xe0f2fe,w:0xf0f9ff,k:0x0c4a6e},
+    {name:'Pink Neon',     b:0xec4899,r:0xbe185d,s:0xfce7f3,w:0xfdf2f8,k:0x500724},
+  ]},
+  {id:'e5',name:'Trem Antik',      type:'tram',    sub:'classic',  liveries:[
+    {name:'Krem Nostalgia',b:0xd97706,r:0x92400e,s:0x1c1917,w:0xfef3c7,k:0x1c1917},
+    {name:'Merah Tua',     b:0x9f1239,r:0x4c0519,s:0xfde68a,w:0xfce7f3,k:0x1c1917},
+    {name:'Hijau Antik',   b:0x166534,r:0x052e16,s:0xfef9c3,w:0xd1fae5,k:0x1c1917},
+    {name:'Biru Prusia',   b:0x1e3a8a,r:0x172554,s:0xfde68a,w:0xdbeafe,k:0x1c1917},
+    {name:'Coklat Kereta', b:0x78350f,r:0x451a03,s:0xfbbf24,w:0xfef3c7,k:0x1c1917},
+  ]},
+  {id:'h1',name:'Ekspres Royal',   type:'heritage',sub:'royal',    liveries:[
+    {name:'Merah Kerajaan',b:0x7f1d1d,r:0x450a0a,s:0xfbbf24,w:0xfef9c3,k:0x1c1917},
+    {name:'Nila Kerajaan', b:0x172554,r:0x0f172a,s:0xfbbf24,w:0xdbeafe,k:0x0f172a},
+    {name:'Ungu Kerajaan', b:0x4c1d95,r:0x2e1065,s:0xfde68a,w:0xede9fe,k:0x1c1917},
+    {name:'Hitam Royal',   b:0x09090b,r:0x020617,s:0xd97706,w:0xfef3c7,k:0x020617},
+    {name:'Emas Murni',    b:0x92400e,r:0x78350f,s:0xfef9c3,w:0xfef9c3,k:0x1c1917},
+  ]},
+  {id:'h2',name:'Kereta Tempo Dulu',type:'heritage',sub:'heritage',liveries:[
+    {name:'Hijau Belanda', b:0x166534,r:0x052e16,s:0xd97706,w:0xbbf7d0,k:0x1c1917},
+    {name:'Coklat Belanda',b:0x78350f,r:0x451a03,s:0xfbbf24,w:0xfef3c7,k:0x1c1917},
+    {name:'Krem Jaman',    b:0x92400e,r:0x78350f,s:0xfef9c3,w:0xfef9c3,k:0x1c1917},
+    {name:'Biru Jaman',    b:0x1e3a8a,r:0x172554,s:0xfde68a,w:0xdbeafe,k:0x1c1917},
+    {name:'Merah Jaman',   b:0x881337,r:0x4c0519,s:0xfde68a,w:0xfce7f3,k:0x1c1917},
+  ]},
+  {id:'h3',name:'Kereta Perkebunan',type:'heritage',sub:'narrow',  liveries:[
+    {name:'Hijau Kebun',   b:0x16a34a,r:0x14532d,s:0xfbbf24,w:0xbbf7d0,k:0x1c1917},
+    {name:'Merah Kebun',   b:0xdc2626,r:0x991b1b,s:0xfef9c3,w:0xfecaca,k:0x1c1917},
+    {name:'Kuning Ceria',  b:0xfbbf24,r:0xd97706,s:0x1c1917,w:0xfef9c3,k:0x1c1917},
+    {name:'Biru Kebun',    b:0x0284c7,r:0x0c4a6e,s:0xe0f2fe,w:0xe0f2fe,k:0x1c1917},
+    {name:'Oranye Gula',   b:0xf97316,r:0xea580c,s:0xfef9c3,w:0xffedd5,k:0x1c1917},
+  ]},
+  {id:'h4',name:'Kereta 2 Lantai', type:'heritage',sub:'doubledeck',liveries:[
+    {name:'Biru Ganda',    b:0x1d4ed8,r:0x1e3a8a,s:0xfbbf24,w:0xbae6fd,k:0x1c1917},
+    {name:'Putih Elegan',  b:0xf1f5f9,r:0xe2e8f0,s:0x1d4ed8,w:0xeff6ff,k:0x334155},
+    {name:'Merah Ganda',   b:0xb91c1c,r:0x7f1d1d,s:0xe2e8f0,w:0xfee2e2,k:0x1c1917},
+    {name:'Hijau Ganda',   b:0x15803d,r:0x052e16,s:0xfef9c3,w:0xd1fae5,k:0x1c1917},
+    {name:'Oranye Ganda',  b:0xea580c,r:0xc2410c,s:0xfef9c3,w:0xffedd5,k:0x1c1917},
+  ]},
+  {id:'h5',name:'Maglev Futuristik',type:'highspeed',sub:'maglev', liveries:[
+    {name:'Putih Masa Dpn',b:0xf0f9ff,r:0xe0f2fe,s:0x0ea5e9,w:0xe0f2fe,k:0x0c4a6e},
+    {name:'Neon Biru',     b:0x0ea5e9,r:0x0369a1,s:0x7dd3fc,w:0xe0f2fe,k:0x0c4a6e},
+    {name:'Ungu Quantum',  b:0x8b5cf6,r:0x5b21b6,s:0xddd6fe,w:0xf5f3ff,k:0x2e1065},
+    {name:'Perak Titanium',b:0xd4d4d8,r:0xa1a1aa,s:0x2563eb,w:0xf4f4f5,k:0x3f3f46},
+    {name:'Hitam Stealth', b:0x18181b,r:0x09090b,s:0x22d3ee,w:0xcffafe,k:0x020617},
+  ]},
+];
+// Flatten: 20 models × 5 liveries = 100 catalog entries
+const TRAIN_CATALOG = TRAIN_MODELS.flatMap(m =>
+  m.liveries.map((l,li) => ({
+    id:`${m.id}-${li}`, modelName:m.name, name:l.name, type:m.type, sub:m.sub,
+    b:l.b, r:l.r, s:l.s, w:l.w, k:l.k
+  }))
+);
+
+let selectedTrain = null; // set by train select screen
 
 // ── Background Themes (0=night, 1=sunrise, 2=forest, 3=mountain, 4=tropical) ─
 const BG_THEME = Math.min(4, Math.floor((LEVEL - 1) / 5));
@@ -293,6 +544,8 @@ async function initPixi() {
   updateLivesHUD();
   updateLaneDots();
   refreshHUD();
+  updateStationChip();
+  showStationBanner(getCurrentStation());
 
   gameRunning = true;
   startTime = Date.now();
@@ -595,21 +848,237 @@ function buildTracks() {
   }
 }
 
-// ── Train: Blue 4-car set ──────────────────────────────────────────────────────
+// ── Train: Parametric from selectedTrain ──────────────────────────────────────
 function buildTrain() {
+  if (!selectedTrain) selectedTrain = TRAIN_CATALOG[0];
   trainContainer.x = TRAIN_X;
   trainContainer.y = LANE_Y[1];
   trainContainer._bounceT = 0;
 
   const g = new PIXI.Graphics();
+  const c = selectedTrain;
 
-  // ── Locomotive (leftmost = front) ──
-  const LC = 0x1d4ed8;  // dark blue body
-  const LB = 0x3b82f6;  // mid blue boiler
-  const LL = 0x60a5fa;  // light blue cab
-  const LW = 0xbae6fd;  // window glass
-  const LK = 0x1c1917;  // black (chimney/smoke)
-  const LG = 0xfbbf24;  // gold detail
+  // Dispatch to type-specific builder
+  if (c.type === 'steam') drawSteamBody(g, c);
+  else if (c.type === 'diesel') drawDieselBody(g, c);
+  else if (c.type === 'electric' || c.type === 'tram') drawElectricBody(g, c);
+  else if (c.type === 'highspeed') drawHighSpeedBody(g, c);
+  else if (c.type === 'heritage') drawHeritageBody(g, c);
+  else drawSteamBody(g, c); // fallback
+
+  trainContainer.addChild(g);
+  addWheels(c);
+}
+
+function drawSteamBody(g, c) {
+  const b=c.b,r=c.r,s=c.s,w=c.w,k=c.k;
+  const LL = r; // use roof color as cab color for steam
+  const boilerLight = blendColor(b, 0xffffff, 0.25);
+  // Boiler
+  g.roundRect(-78,-18,55,26,12).fill({color:boilerLight});
+  g.rect(-76,-18,51,6).fill({color:w});
+  // Chimney (centered at ~x=-50)
+  g.roundRect(-57,-38,14,22,4).fill({color:k});
+  g.roundRect(-61,-42,22,7,3).fill({color:k});
+  g.circle(-50,-44,5).fill({color:0x374151});
+  // Dome
+  g.circle(-40,-18,9).fill({color:b});
+  g.circle(-40,-18,6).fill({color:s});
+  // Headlamp
+  g.circle(-79,-10,6).fill({color:0xfef9c3});
+  g.circle(-79,-10,4).fill({color:0xfde68a});
+  // Cab
+  g.roundRect(-25,-24,42,32,7).fill({color:LL});
+  g.roundRect(-27,-30,46,10,5).fill({color:b});
+  g.roundRect(-21,-22,14,14,3).fill({color:w});
+  g.roundRect(0,-22,14,14,3).fill({color:w});
+  // Gold stripe
+  g.rect(-78,-3,100,4).fill({color:s});
+  g.roundRect(-78,8,100,6,2).fill({color:b});
+  // Cowcatcher
+  g.poly([-78,8,-92,16,-78,16]).fill({color:0x6b7280});
+  // Tender
+  const TS=22;
+  g.roundRect(TS,-14,38,22,5).fill({color:b});
+  g.roundRect(TS,-14,38,22,5).stroke({width:1.5,color:boilerLight});
+  g.ellipse(TS+19,-16,17,8).fill({color:k});
+  for(let ci=0;ci<4;ci++) g.circle(TS+8+ci*6,-17,2).fill({color:0x374151});
+  // Passenger car
+  const PC=64;
+  g.roundRect(PC,-18,52,28,6).fill({color:LL});
+  g.roundRect(PC,-18,52,28,6).stroke({width:1.5,color:b});
+  g.roundRect(PC,-18,52,8,6).fill({color:b});
+  for(let wi=0;wi<3;wi++) g.roundRect(PC+6+wi*15,-14,9,12,2).fill({color:w});
+  g.rect(PC,-4,52,3).fill({color:s});
+  g.rect(PC+22,-10,2,18).fill({color:b});
+  // Caboose
+  const CC=120;
+  g.roundRect(CC,-16,30,24,6).fill({color:r});
+  g.roundRect(CC,-16,30,24,6).stroke({width:1.5,color:b});
+  g.roundRect(CC,-16,30,8,6).fill({color:b});
+  g.roundRect(CC+8,-26,14,12,4).fill({color:b});
+  g.roundRect(CC+10,-24,5,8,2).fill({color:w});
+  g.circle(CC+28,-6,4).fill({color:0xef4444});
+  // Couplers
+  for(const cx of [TS-2,PC-2,CC-2]) g.roundRect(cx,-2,4,6,1).fill({color:0x6b7280});
+}
+
+function drawDieselBody(g, c) {
+  const b=c.b,r=c.r,s=c.s,w=c.w,k=c.k;
+  // Locomotive (hood type)
+  g.roundRect(-80,-20,60,28,8).fill({color:b}); // long hood
+  g.roundRect(-80,-20,60,8,8).fill({color:r});   // roof stripe
+  g.roundRect(-22,-24,44,32,7).fill({color:b});  // cab
+  g.roundRect(-24,-30,48,10,5).fill({color:r});  // cab roof
+  g.roundRect(-20,-22,12,14,3).fill({color:w});
+  g.roundRect(-4,-22,12,14,3).fill({color:w});
+  g.roundRect(12,-22,8,14,3).fill({color:w});
+  g.rect(-80,-3,106,4).fill({color:s});
+  // Grilles on hood
+  for(let xi=0;xi<4;xi++) g.rect(-72+xi*12,-14,4,16).fill({color:k}).stroke({width:0.5,color:0x6b7280,alpha:0.5});
+  // Headlamps
+  g.circle(-80,-10,5).fill({color:0xfef9c3});
+  g.circle(-80,-10,3).fill({color:0xfde68a});
+  // Underframe
+  g.roundRect(-80,8,106,6,2).fill({color:k});
+  g.poly([-80,8,-94,16,-80,16]).fill({color:0x6b7280});
+  // 2 coaches
+  const P1=30,P2=90;
+  for(const px of [P1,P2]) {
+    g.roundRect(px,-18,52,28,6).fill({color:blendColor(b,0xffffff,0.15)});
+    g.roundRect(px,-18,52,8,6).fill({color:r});
+    for(let wi=0;wi<4;wi++) g.roundRect(px+4+wi*11,-14,8,12,2).fill({color:w});
+    g.rect(px,-4,52,3).fill({color:s});
+    g.rect(px+22,-10,2,18).fill({color:b});
+  }
+  for(const cx of [P1-2,P2-2]) g.roundRect(cx,-2,4,6,1).fill({color:0x6b7280});
+}
+
+function drawElectricBody(g, c) {
+  const b=c.b,r=c.r,s=c.s,w=c.w,k=c.k;
+  // Electric has flat face + pantograph
+  g.roundRect(-80,-20,170,28,10).fill({color:b});
+  g.roundRect(-80,-20,170,8,10).fill({color:r});
+  g.rect(-80,-3,170,4).fill({color:s});
+  // Front face
+  g.roundRect(-80,-20,24,28,10).fill({color:blendColor(b,0x000000,0.2)});
+  g.roundRect(-76,-18,18,14,4).fill({color:w});
+  g.circle(-80,-10,5).fill({color:0xfef9c3});
+  // Windows along body
+  for(let wi=0;wi<7;wi++) g.roundRect(-48+wi*20,-16,14,12,3).fill({color:w});
+  // Doors
+  for(const dx of [-30,10,50]) { g.rect(dx,-18,3,26).fill({color:blendColor(b,0x000000,0.3)}); }
+  // Pantograph (on top)
+  g.rect(-20,-32,4,12).fill({color:k});  // support arm
+  g.rect(0,-32,4,12).fill({color:k});
+  g.rect(-20,-32,24,2).fill({color:0x94a3b8}); // top wire contact
+  g.rect(-26,-30,36,2).fill({color:0x6b7280});  // cross arm
+  // Underframe
+  g.roundRect(-80,8,170,5,2).fill({color:k});
+}
+
+function drawHighSpeedBody(g, c) {
+  const b=c.b,r=c.r,s=c.s,w=c.w,k=c.k;
+  // Aerodynamic nose
+  g.poly([-90,-8,-70,-20,-50,-20,-50,8,-70,8,-90,8]).fill({color:blendColor(b,0x000000,0.25)});
+  g.roundRect(-50,-20,170,28,6).fill({color:b});
+  g.roundRect(-50,-20,170,7,6).fill({color:r});
+  g.rect(-50,-4,170,4).fill({color:s});
+  // Nose window
+  g.poly([-85,-6,-70,-16,-55,-16,-55,4,-70,4,-85,4]).fill({color:w}).stroke({width:1,color:r,alpha:0.5});
+  // Windows along body
+  for(let wi=0;wi<6;wi++) g.roundRect(-35+wi*22,-16,16,11,4).fill({color:w});
+  // Pantograph
+  g.rect(20,-30,3,10).fill({color:k});
+  g.rect(36,-30,3,10).fill({color:k});
+  g.rect(18,-30,24,2).fill({color:0x94a3b8});
+  // Underframe (sleek)
+  g.roundRect(-90,8,210,6,3).fill({color:blendColor(b,0x000000,0.35)});
+}
+
+function drawHeritageBody(g, c) {
+  const b=c.b,r=c.r,s=c.s,w=c.w,k=c.k;
+  // Heritage: ornate, 4-car, old style
+  g.roundRect(-78,-18,50,26,10).fill({color:b});
+  g.roundRect(-78,-18,50,8,10).fill({color:r});
+  // Chimney (tall and fancy)
+  g.roundRect(-60,-42,16,26,3).fill({color:k});
+  g.roundRect(-65,-46,26,8,4).fill({color:k});
+  g.circle(-52,-48,7).fill({color:0x374151});
+  // Dome (golden)
+  g.circle(-38,-18,10).fill({color:s});
+  g.circle(-38,-18,6).fill({color:0xfef9c3});
+  // Ornate cab with gold trim
+  g.roundRect(-28,-26,48,34,8).fill({color:b});
+  g.roundRect(-30,-32,52,10,5).fill({color:r});
+  g.roundRect(-26,-24,14,14,4).fill({color:w});
+  g.roundRect(-6,-24,14,14,4).fill({color:w});
+  g.roundRect(12,-24,8,14,4).fill({color:w});
+  // Gold trim lines
+  g.rect(-78,-4,106,3).fill({color:s});
+  g.rect(-78,3,106,2).fill({color:s});
+  g.roundRect(-78,8,106,6,2).fill({color:b});
+  g.poly([-78,8,-93,16,-78,16]).fill({color:0x6b7280});
+  // 2 vintage coaches
+  const V1=32,V2=94;
+  for(const px of [V1,V2]) {
+    g.roundRect(px,-18,54,28,8).fill({color:blendColor(b,0xffffff,0.12)});
+    g.roundRect(px,-18,54,9,8).fill({color:r});
+    for(let wi=0;wi<3;wi++) g.roundRect(px+6+wi*16,-14,10,13,3).fill({color:w});
+    g.rect(px,-3,54,3).fill({color:s});
+    g.rect(px,-1,54,1).fill({color:s});
+    g.rect(px+24,-12,2,20).fill({color:blendColor(b,0x000000,0.3)});
+  }
+  for(const cx of [V1-2,V2-2]) g.roundRect(cx,-2,4,6,1).fill({color:0x6b7280});
+}
+
+// blend two hex colors (t=0 → a, t=1 → b)
+function blendColor(a,b,t){
+  const ar=(a>>16)&0xff,ag=(a>>8)&0xff,ab=a&0xff;
+  const br=(b>>16)&0xff,bg=(b>>8)&0xff,bb=b&0xff;
+  const nr=Math.round(ar+(br-ar)*t),ng=Math.round(ag+(bg-ag)*t),nb=Math.round(ab+(bb-ab)*t);
+  return (nr<<16)|(ng<<8)|nb;
+}
+
+function addWheels(c) {
+  const isSmall = (c.type==='tram'||c.sub==='shunter'||c.sub==='narrow'||c.sub==='prairie');
+  const isSteam = (c.type==='steam');
+  const wheelColor = c.k;
+
+  let wheelDefs;
+  if (isSteam) {
+    wheelDefs=[
+      {x:-64,r:11},{x:-47,r:11},{x:-30,r:11}, // driving
+      {x:-73,r:7},{x:8,r:7},                    // small loco
+      {x:30,r:7},{x:54,r:7},                    // tender
+      {x:70,r:7},{x:102,r:7},                   // passenger
+      {x:126,r:7},{x:142,r:7},                  // caboose
+    ];
+  } else if (c.type==='tram'||isSmall) {
+    wheelDefs=[{x:-30,r:8},{x:-10,r:8},{x:10,r:8},{x:30,r:8}];
+  } else if (c.type==='highspeed') {
+    wheelDefs=[{x:-70,r:9},{x:-40,r:9},{x:10,r:9},{x:60,r:9},{x:100,r:9},{x:140,r:9}];
+  } else {
+    wheelDefs=[
+      {x:-65,r:9},{x:-40,r:9},{x:-15,r:9}, // loco
+      {x:38,r:8},{x:68,r:8},                 // coach 1
+      {x:98,r:8},{x:128,r:8},                // coach 2
+    ];
+  }
+
+  for(const{x,r} of wheelDefs){
+    const wc=new PIXI.Container(); wc.x=x; wc.y=14;
+    const wg=new PIXI.Graphics();
+    wg.circle(0,0,r).fill({color:wheelColor});
+    wg.circle(0,0,r).stroke({width:2,color:c.b});
+    wg.rect(-1.5,-r+2,3,r*2-4).fill({color:c.w});
+    wg.rect(-r+2,-1.5,r*2-4,3).fill({color:c.w});
+    wg.circle(0,0,2.5).fill({color:c.b});
+    wc.addChild(wg);
+    trainContainer.addChild(wc);
+    wheels.push(wc);
+  }
+}
 
   // Boiler body
   g.roundRect(-78, -18, 55, 26, 12).fill({ color: LB });
@@ -1087,8 +1556,140 @@ function shuffle(arr) {
   return arr;
 }
 
+// ── Train Select Screen ──────────────────────────────────────────────────────
+function showTrainSelect() {
+  const station = getCurrentStation();
+  document.getElementById('si-icon').textContent = station.icon;
+  document.getElementById('si-name').textContent = station.name;
+  document.getElementById('si-landmark').textContent = station.landmark;
+  document.getElementById('train-select').style.display = 'flex';
+  document.getElementById('station-chip').style.display = 'none';
+  buildTrainGrid();
+}
+
+function buildTrainGrid() {
+  const grid = document.getElementById('train-grid');
+  grid.innerHTML = '';
+  TRAIN_CATALOG.forEach(entry => {
+    const card = document.createElement('div');
+    card.className = 'tcard';
+    const canvas = document.createElement('canvas');
+    canvas.width = 120; canvas.height = 48;
+    drawTrainPreview2d(canvas, entry);
+    const name = document.createElement('div');
+    name.className = 'tname';
+    name.textContent = entry.name;
+    card.appendChild(canvas);
+    card.appendChild(name);
+    card.addEventListener('click', () => {
+      selectedTrain = entry;
+      document.getElementById('train-select').style.display = 'none';
+      initPixi();
+    });
+    if (selectedTrain && selectedTrain.id === entry.id) {
+      card.style.borderColor = '#a78bfa';
+      card.style.background = 'rgba(139,92,246,0.25)';
+    }
+    grid.appendChild(card);
+  });
+}
+
+function _hex(n) {
+  return `rgb(${(n>>16)&0xff},${(n>>8)&0xff},${n&0xff})`;
+}
+
+function drawTrainPreview2d(canvas, c) {
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+  const bx = 6, by = 10, bw = CW - 12, bh = CH - 22;
+  const type = c.type, sub = c.sub;
+
+  if (type === 'highspeed' || sub === 'maglev') {
+    ctx.fillStyle = _hex(c.b);
+    ctx.beginPath();
+    ctx.moveTo(bx, by); ctx.lineTo(bx+bw, by);
+    ctx.lineTo(bx+bw+14, by+bh/2); ctx.lineTo(bx+bw, by+bh);
+    ctx.lineTo(bx, by+bh); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = _hex(c.r); ctx.fillRect(bx, by-4, bw+2, 5);
+    ctx.fillStyle = _hex(c.s); ctx.fillRect(bx, by+bh*0.55, bw+8, 3);
+    ctx.fillStyle = _hex(c.w);
+    for (let i=0;i<4;i++) ctx.fillRect(bx+8+i*22, by+3, 16, 7);
+  } else if (type === 'steam') {
+    ctx.fillStyle = _hex(c.b);
+    ctx.fillRect(bx, by+4, bw-20, bh-4);
+    ctx.fillRect(bx+bw-22, by, 22, bh);
+    ctx.fillStyle = _hex(c.r); ctx.fillRect(bx+bw-22, by-3, 22, 4);
+    ctx.fillStyle = _hex(c.s); ctx.fillRect(bx, by+bh-5, bw-20, 4);
+    ctx.fillStyle = _hex(c.k);
+    ctx.fillRect(bx+10, by-8, 8, 12); ctx.fillRect(bx+7, by-11, 14, 4);
+    ctx.fillStyle = _hex(c.b);
+    ctx.beginPath(); ctx.ellipse(bx+34, by+4, 9, 6, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = _hex(c.w); ctx.fillRect(bx+bw-18, by+4, 10, 8);
+  } else if (type === 'diesel') {
+    ctx.fillStyle = _hex(c.b); ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = _hex(c.r); ctx.fillRect(bx, by, bw, 5);
+    ctx.fillStyle = _hex(c.k); ctx.fillRect(bx+bw-14, by, 14, bh);
+    ctx.fillStyle = _hex(c.s); ctx.fillRect(bx, by+bh*0.38, bw-14, 4);
+    ctx.fillStyle = _hex(c.w);
+    for (let i=0;i<3;i++) ctx.fillRect(bx+8+i*24, by+3, 16, 8);
+  } else if (type === 'tram') {
+    ctx.fillStyle = _hex(c.b); ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = _hex(c.r); ctx.fillRect(bx, by-2, bw, 4);
+    ctx.fillStyle = _hex(c.s); ctx.fillRect(bx, by+bh-7, bw, 4);
+    ctx.fillStyle = _hex(c.w);
+    for (let i=0;i<5;i++) ctx.fillRect(bx+5+i*18, by+3, 12, 9);
+  } else if (type === 'electric') {
+    ctx.fillStyle = _hex(c.b); ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = _hex(c.r); ctx.fillRect(bx, by-4, bw, 5);
+    ctx.fillStyle = _hex(c.w); ctx.fillRect(bx+2, by+2, bw-4, 8);
+    ctx.fillStyle = _hex(c.s); ctx.fillRect(bx, by+bh-5, bw, 3);
+    ctx.strokeStyle = _hex(c.k); ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(bx+18,by-1); ctx.lineTo(bx+28,by-8);
+    ctx.lineTo(bx+44,by-4); ctx.lineTo(bx+55,by-8); ctx.stroke();
+  } else if (type === 'heritage') {
+    ctx.fillStyle = _hex(c.b); ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = _hex(c.r); ctx.fillRect(bx, by-2, bw, 5);
+    ctx.fillStyle = _hex(c.s); ctx.fillRect(bx, by+bh*0.44, bw, 3);
+    ctx.fillStyle = _hex(c.w);
+    for (let i=0;i<4;i++) {
+      ctx.beginPath(); ctx.roundRect(bx+8+i*22, by+4, 14, 9, 3); ctx.fill();
+    }
+  }
+
+  // Wheels
+  const wheelY = by + bh + 3;
+  [0.14, 0.37, 0.62, 0.82].forEach(fx => {
+    const wx = bx + bw * fx;
+    ctx.fillStyle = _hex(c.k); ctx.beginPath(); ctx.arc(wx, wheelY, 5, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _hex(c.s); ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(wx, wheelY, 5, 0, Math.PI*2); ctx.stroke();
+  });
+}
+
+// ── Station Banner ────────────────────────────────────────────────────────────
+function showStationBanner(station) {
+  const el = document.getElementById('station-banner');
+  document.getElementById('sb-icon').textContent = station.icon;
+  document.getElementById('sb-name').textContent = station.name;
+  document.getElementById('sb-landmark').textContent = station.landmark;
+  el.classList.remove('fade-out');
+  el.classList.add('visible');
+  setTimeout(() => {
+    el.classList.add('fade-out');
+    setTimeout(() => el.classList.remove('visible', 'fade-out'), 600);
+  }, 3000);
+}
+
+function updateStationChip() {
+  const station = getCurrentStation();
+  document.getElementById('sc-name').textContent = station.name;
+  document.getElementById('station-chip').style.display = 'block';
+}
+
 // ── Boot ───────────────────────────────────────────────────────────────────────
-initPixi();
+showTrainSelect();
 </script>
 </body>
 </html>
