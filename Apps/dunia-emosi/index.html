@@ -380,7 +380,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g5-mode-tab[data-m="spatial"].active {background:linear-gradient(135deg,#F59E0B,#FCD34D);color:#78350F;border-color:#B45309;box-shadow:0 4px 0 #B45309;}
 .g5-mode-tab[data-m="sequence"].active{background:linear-gradient(135deg,#22C55E,#4ADE80);color:white;border-color:#14532D;box-shadow:0 4px 0 #14532D;}
 /* Sub-tabs larger capsules */
-.g5-sub-tabs{display:flex;gap:8px;margin-bottom:8px;position:relative;z-index:1;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.g5-sub-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;position:relative;z-index:1;justify-content:center;padding:0 4px 2px;}
 .g5-sub-tabs::-webkit-scrollbar{display:none;}
 .g5-sub-tab{padding:7px 18px;border-radius:100px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 0 rgba(0,0,0,0.2);}
 .g5-sub-tab.active{background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:white;border-color:#7C3AED;box-shadow:0 3px 0 #5B21B6;}
@@ -495,7 +495,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* G7 */
 #screen-game7 { background:linear-gradient(180deg,#F0FDFA 0%,#CCFBF1 50%,#E0F2FE 100%); }
 .g7-mode-badge { background:linear-gradient(135deg,#2DD4BF,#14B8A6);color:white;border-radius:100px;padding:6px 18px;font-size:14px;font-weight:700;margin-bottom:14px;box-shadow:0 4px 0 #0F766E;align-self:center; }
-.g7-display { width:220px;height:220px;border-radius:28px;background:white;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:110px;margin-bottom:16px;border:4px solid #CCFBF1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1);align-self:center; }
+.g7-display { width:min(340px,82vw);height:min(340px,82vw);border-radius:28px;background:white;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:min(150px,38vw);margin-bottom:16px;border:4px solid #CCFBF1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1);align-self:center; }
 .g7-question { font-size:20px;font-weight:900;text-align:center;margin-bottom:18px;background:linear-gradient(135deg,#14B8A6,#2DD4BF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
 .g7-choices { display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:440px;align-self:center;padding-bottom:24px; }
 .g7-choice-btn { background:white;border:3px solid #CCFBF1;border-radius:20px;padding:16px 10px;font-family:var(--font);font-weight:900;font-size:18px;cursor:pointer;text-align:center;color:var(--text);box-shadow:0 4px 0 #A5F3EB;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s; }
@@ -554,7 +554,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 /* G3 enhancements */
 .g3-choice-btn { font-size:52px;padding:26px 12px;border-radius:28px; }
 /* G7 enhancements */
-.g7-display { width:250px;height:250px;font-size:130px; }
+.g7-display { width:min(360px,88vw);height:min(360px,88vw);font-size:min(160px,42vw); }
 /* G8 enhancements */
 .g8-slot { min-width:52px;height:62px;font-size:28px;border-radius:16px; }
 .g8-letter-btn { width:58px;height:58px;border-radius:16px;font-size:26px; }
@@ -1690,6 +1690,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   height: min(460px,92vw) !important;
   align-self: center !important;
   margin: 0 auto 16px !important;
+  flex-shrink: 0 !important;
 }
 .g9-dot {
   width: 22px !important; height: 22px !important;
@@ -2847,6 +2848,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   from { box-shadow:0 5px 0 #7A0A12,0 0 18px rgba(230,57,70,0.4); transform:scale(1); }
   to   { box-shadow:0 5px 0 #7A0A12,0 0 36px rgba(230,57,70,0.75); transform:scale(1.03); }
 }
+@keyframes g14FloatUp { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-50px) scale(1.15)} }
 @keyframes g14Crash {
   0%,100%{filter:drop-shadow(0 5px 16px rgba(0,0,0,0.75)) brightness(1.08)}
   20%,60%{filter:drop-shadow(0 0 22px rgba(239,68,68,1)) brightness(1.7) saturate(2)}
@@ -7435,7 +7437,7 @@ body { background: #0a0a1a !important; }
   </div>
   <div class="g4-mode-toggle">
     <button class="g4-mode-btn active" id="g4-btn-normal" onclick="setG4Mode(false)">🐾 Binatang</button>
-    <button class="g4-mode-btn" id="g4-btn-poke" onclick="setG4Mode(true)">⚡ Pokémon</button>
+    <button class="g4-mode-btn" id="g4-btn-poke" onclick="setG4Mode(true)"><span class="map-pokeball" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:4px;"></span>Pokémon</button>
   </div>
   <div class="g4-animals-grid" id="g4-animals"></div>
   <p class="g4-question" id="g4-question">Ada berapa binatang? 🤔</p>
@@ -10081,7 +10083,7 @@ function initG5Visual(){
   const turnTexts={emosi:'Cocokkan semua pasangan! 🃏',hewan:'Cocokkan gambar & nama hewan! 🐾',buah:'Cocokkan gambar & nama buah! 🍎',sayur:'Cocokkan gambar & nama sayur! 🥕',kendaraan:'Cocokkan kendaraan! 🚗',warna:'Cocokkan nama warna! 🌈',benda:'Cocokkan nama benda! 📦',profesi:'Cocokkan nama profesi! 👩‍⚕️',alam:'Cocokkan gambar alam! 🏔️',cuaca:'Cocokkan jenis cuaca! ⛅',makanan:'Cocokkan nama makanan! 🍜',sekolah:'Cocokkan alat sekolah! 🏫',pokemon:'Cocokkan gambar Pokémon yang sama! ⚡'}
   const scoresEl=document.getElementById('g5-scores')
   if(state.mode==='duo'){scoresEl.innerHTML=[0,1].map(i=>`<div class="g5-player-score ${i===g5State.currentPlayer?'active':''}" id="g5-ps-${i}"><div class="ps-name">${state.players[i].animal} ${state.players[i].name}</div><div class="ps-val" id="g5-score-${i}">0 pasang</div></div>`).join('');document.getElementById('g5-turn-text').textContent=`Giliran ${state.players[g5State.currentPlayer].name}! 🎮`}
-  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=turnTexts[g5SubMode]||'Cocokkan semua pasangan! 🃏'}
+  else{scoresEl.innerHTML=`<div class="g5-player-score active" style="flex:none;width:100%;max-width:520px;"><div class="ps-name">${state.players[0].animal} ${state.players[0].name}</div><div class="ps-val" id="g5-score-0">0 pasang</div></div>`;document.getElementById('g5-turn-text').textContent=''}
   const grid=document.getElementById('g5-grid')
   grid.className='g5-grid'+(gridClass?' '+gridClass:'')
   renderG5Grid()
@@ -10703,7 +10705,7 @@ function updateCarPosition(){const positions=['16.6%','50%','83.3%'];document.ge
 let g7State = {}
 function initGame7() {
   const diff = state.selectedLevel||'medium'
-  g7State = {round:0,maxRound:DIFF[diff].rounds,mode:'img2word',answered:false,shuffled:[...WORD_IMAGES].sort(()=>Math.random()-0.5)}
+  g7State = {round:0,maxRound:DIFF[diff].rounds,mode:'img2word',answered:false,shuffled:[...WORD_IMAGES].sort(()=>Math.random()-0.5),usedIds:new Set()}
   state.currentPlayer = 0; updateGameStarDisplay(); nextG7Round()
 }
 function nextG7Round() {
@@ -10716,7 +10718,10 @@ function nextG7Round() {
   const roundInSet = g7State.round % g7State.maxRound
   const diff = state.selectedLevel||'medium'
   g7State.mode = diff==='easy'?'img2word':(roundInSet<Math.ceil(g7State.maxRound/2)?'img2word':'word2img')
-  const correct = g7State.shuffled[roundInSet%WORD_IMAGES.length]
+  // Pick unused item — reset pool if exhausted
+  let pool = g7State.shuffled.filter(w => !g7State.usedIds.has(w.id))
+  if (!pool.length) { g7State.usedIds = new Set(); pool = [...g7State.shuffled] }
+  const correct = pool[0]; g7State.usedIds.add(correct.id)
   const decoys = [...WORD_IMAGES].filter(w=>w.id!==correct.id).sort(()=>Math.random()-0.5).slice(0,3)
   const choices = [correct,...decoys].sort(()=>Math.random()-0.5)
   document.getElementById('g7-mode-badge').textContent = g7State.mode==='img2word'?'Mode: Gambar → Kata 🔤':'Mode: Kata → Gambar 🖼️'
@@ -10912,6 +10917,9 @@ function initGame9(){
   state.currentPlayer=0
   g9Canvas=document.getElementById('g9-canvas')
   g9Ctx=g9Canvas.getContext('2d')
+  // Sync canvas buffer size to CSS display size so scaleX/Y = 1.0 (no coordinate offset)
+  const _g9sz = g9Canvas.offsetWidth || 300
+  g9Canvas.width = _g9sz; g9Canvas.height = _g9sz
   // Remove old listeners first (in case re-init)
   g9Canvas.removeEventListener('mousedown',g9StartDraw)
   g9Canvas.removeEventListener('mousemove',g9Draw)
@@ -10941,14 +10949,14 @@ function getG9Guides(letter) {
 }
 function renderG9GuideDots(){
   const guides=getG9Guides(g9State.currentLetter),container=document.getElementById('g9-guide-dots'); container.innerHTML=''
-  guides.forEach((g,i)=>{const dot=document.createElement('div');dot.className='g9-dot';dot.id=`g9-dot-${i}`;dot.style.left=(g.x*300)+'px';dot.style.top=(g.y*300)+'px';dot.textContent=String(i+1);dot.style.cssText+=';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.9);';container.appendChild(dot)})
+  guides.forEach((g,i)=>{const dot=document.createElement('div');dot.className='g9-dot';dot.id=`g9-dot-${i}`;dot.style.left=(g.x*100)+'%';dot.style.top=(g.y*100)+'%';dot.textContent=String(i+1);dot.style.cssText+=';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.9);';container.appendChild(dot)})
 }
 function g9Clear(){
-  if(!g9Ctx)return; g9Ctx.clearRect(0,0,300,300); g9UserPath=[]
+  if(!g9Ctx)return; const sz=g9Canvas.width||300; g9Ctx.clearRect(0,0,sz,sz); g9UserPath=[]
   const letter=g9State.currentLetter; if(!letter)return
-  const fontSize=g9State.mode==='angka'?240:220
+  const fontSize=g9State.mode==='angka'?Math.round(sz*0.8):Math.round(sz*0.73)
   g9Ctx.font=`bold ${fontSize}px Nunito`; g9Ctx.fillStyle='rgba(132,204,22,0.12)'
-  g9Ctx.textAlign='center'; g9Ctx.textBaseline='middle'; g9Ctx.fillText(letter,150,155)
+  g9Ctx.textAlign='center'; g9Ctx.textBaseline='middle'; g9Ctx.fillText(letter,sz/2,sz/2+sz*0.018)
   document.querySelectorAll('.g9-dot').forEach(d=>d.classList.remove('hit'))
 }
 function g9GetPos(e,canvas){const rect=canvas.getBoundingClientRect(),scaleX=canvas.width/rect.width,scaleY=canvas.height/rect.height;return{x:(e.clientX-rect.left)*scaleX,y:(e.clientY-rect.top)*scaleY}}
@@ -10965,14 +10973,14 @@ function g9TouchStart(e){e.preventDefault();if(e.touches[0])g9StartDraw(e.touche
 function g9TouchMove(e){e.preventDefault();if(e.touches[0])g9Draw(e.touches[0])}
 function g9EndDraw(){if(!g9Drawing)return;g9Drawing=false;g9Ctx.beginPath();setTimeout(evaluateG9Trace,500)}
 function checkGuideHits(pos){
-  const guides=getG9Guides(g9State.currentLetter)
-  guides.forEach((g,i)=>{const gx=g.x*300,gy=g.y*300,d=Math.hypot(pos.x-gx,pos.y-gy);if(d<35){const dot=document.getElementById(`g9-dot-${i}`);if(dot)dot.classList.add('hit')}})
+  const sz=g9Canvas.width||300; const guides=getG9Guides(g9State.currentLetter)
+  guides.forEach((g,i)=>{const gx=g.x*sz,gy=g.y*sz,d=Math.hypot(pos.x-gx,pos.y-gy);if(d<sz*0.12){const dot=document.getElementById(`g9-dot-${i}`);if(dot)dot.classList.add('hit')}})
 }
 function evaluateG9Trace(){
-  const guides=getG9Guides(g9State.currentLetter)
+  const sz=g9Canvas.width||300; const guides=getG9Guides(g9State.currentLetter)
   if(guides.length===0||g9UserPath.length<5)return
   let hits=0
-  guides.forEach(g=>{const gx=g.x*300,gy=g.y*300,nearest=g9UserPath.reduce((best,p)=>Math.min(best,Math.hypot(p.x-gx,p.y-gy)),Infinity);if(nearest<45)hits++})
+  guides.forEach(g=>{const gx=g.x*sz,gy=g.y*sz,nearest=g9UserPath.reduce((best,p)=>Math.min(best,Math.hypot(p.x-gx,p.y-gy)),Infinity);if(nearest<sz*0.15)hits++})
   const score=hits/guides.length
   let stars=0,msg=''
   if(score>=0.85){stars=3;msg='Sempurna! Tulisanmu bagus sekali! 🌟'}
@@ -16644,6 +16652,7 @@ function _initGame14_legacy() {
     hp: 3, frame: 0, distance: 0,
     finishLine: diff === 'easy' ? 400 : diff === 'medium' ? 700 : 1000,
     running: false, animFrame: null,
+    invincible: 0,
     aiTrains: [], obstacles: [],
     obstacleInterval: diff === 'easy' ? 220 : diff === 'medium' ? 150 : 90,
     // Lane top% positions — center of each of 3 equal rows
@@ -16818,14 +16827,24 @@ function g14Loop() {
   if (fenceEl) fenceEl.style.animationDuration = Math.max(0.3, 1.2 / (s.speed * speedFactor)).toFixed(2) + 's'
   if (treeEl) treeEl.style.animationDuration = Math.max(0.8, 3 / (s.speed * speedFactor)).toFixed(2) + 's'
 
+  // Tick down invincibility counter (post-crash grace period)
+  if (s.invincible > 0) s.invincible--
+
   // Move AI trains — relative movement to player (if AI faster, they drift right; if slower, drift left)
   s.aiTrains.forEach(ai => {
     const relSpeed = (ai.speed - s.speed) * 1.8 * speedFactor
     ai.x += relSpeed
-    // Wrap: if off left, wrap to far right; if off right, wrap to slightly right
-    if (ai.x < -120) ai.x = trackW + 80
-    if (ai.x > trackW + 120) ai.x = -80
+    // Wrap: avoid wrapping right through the player zone — jump to far side instead
+    if (ai.x < -120) ai.x = trackW + 100
+    if (ai.x > trackW + 120) ai.x = -100
     ai.el.style.left = ai.x + 'px'
+    // Show "PASS!" when AI train overlaps player in same lane (cosmetic only — no damage)
+    if (ai.lane === s.lane && Math.abs(ai.x - playerX) < 80 && !ai._passing) {
+      ai._passing = true
+      g14ShowPassText()
+    } else if (Math.abs(ai.x - playerX) >= 100) {
+      ai._passing = false
+    }
   })
 
   // Spawn obstacles
@@ -16837,8 +16856,8 @@ function g14Loop() {
   s.obstacles.forEach(obs => {
     obs.x -= obsSpeed
     obs.el.style.left = obs.x + 'px'
-    // Collision: obstacle passes through player zone (x=playerX, same lane)
-    if (obs.x <= playerX + 55 && obs.x >= playerX - 20 && obs.lane === s.lane && !obs.hit) {
+    // Collision: obstacle passes through player zone (x=playerX, same lane) — skip if invincible
+    if (obs.x <= playerX + 55 && obs.x >= playerX - 20 && obs.lane === s.lane && !obs.hit && !s.invincible) {
       obs.hit = true
       g14Crash()
       toRemove.push(obs)
@@ -16947,8 +16966,19 @@ function g14SpawnSparks(lane) {
     setTimeout(() => s.remove(), 500)
   })
 }
+function g14ShowPassText() {
+  const track = document.getElementById('g14-track')
+  if (!track) return
+  const el = document.createElement('div')
+  el.textContent = 'AMAN! 💨'
+  el.style.cssText = 'position:absolute;left:18%;font-size:13px;font-weight:900;color:#4ade80;font-family:\'Fredoka One\',cursive;pointer-events:none;z-index:20;animation:g14FloatUp 0.9s ease forwards;text-shadow:0 0 8px rgba(74,222,128,0.8);'
+  el.style.top = (g14State.laneTopPct[g14State.lane] || 30) + '%'
+  track.appendChild(el)
+  setTimeout(() => el.remove(), 900)
+}
 function g14Crash() {
   if (g14State.hp <= 0) return
+  g14State.invincible = 45  // ~750ms grace period at 60fps
   g14State.hp--
   const livesEl = document.getElementById('g14-lives')
   livesEl.innerHTML = '❤️'.repeat(g14State.hp) + '🖤'.repeat(3 - g14State.hp)

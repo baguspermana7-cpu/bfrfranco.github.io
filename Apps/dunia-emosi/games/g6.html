@@ -654,8 +654,12 @@ function spawnWave() {
   if (!word) return
 
   const nextLetter = word[S.letterIdx]
-  const numTiles = 2 + Math.floor(Math.random() * (LANES - 1)) // 2..4
-  const lanes = shuffle(Array.from({length:LANES},(_,i)=>i)).slice(0, numTiles)
+  const numTiles = 2 + Math.floor(Math.random() * (LANES - 2)) // 2..3 (never all 4)
+  const playerL = S.carTargetLane ?? S.carLane ?? 1
+  let lanePool = Array.from({length:LANES},(_,i)=>i)
+  // When 3 tiles spawn, exclude player's current lane so there's always 1 free lane
+  if (numTiles >= LANES - 1) lanePool = lanePool.filter(l => l !== playerL)
+  const lanes = shuffle(lanePool).slice(0, numTiles)
 
   // Guarantee correct letter appears ~60% of time
   const putCorrect = Math.random() < 0.62
