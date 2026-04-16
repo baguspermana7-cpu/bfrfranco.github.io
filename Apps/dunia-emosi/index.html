@@ -1100,26 +1100,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .home-cube > :first-child { font-size: 24px; line-height: 1; }
 .home-cube > span { font-size: 10px; font-weight: 900; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
 
-/* CSS terrain at bottom — rolling green hills */
-.home-terrain {
-  position: relative; height: 72px; flex-shrink: 0;
-  overflow: hidden; pointer-events: none; margin-top: -10px;
-}
-.home-terrain::before {
-  content: ''; position: absolute; bottom: 0; left: -5%; right: -5%; height: 64px;
-  background: linear-gradient(180deg, #4A8A2A 0%, #2E6010 55%, #1A3C08 100%);
-  clip-path: polygon(
-    0 55%, 5% 30%, 10% 48%, 16% 18%, 22% 40%, 28% 22%, 34% 44%,
-    40% 16%, 46% 36%, 52% 20%, 58% 42%, 65% 12%, 71% 32%, 78% 18%,
-    84% 38%, 90% 24%, 96% 42%, 100% 28%, 100% 100%, 0 100%);
-}
-.home-terrain::after {
-  content: ''; position: absolute; bottom: 0; left: -5%; right: -5%; height: 38px;
-  background: linear-gradient(180deg, #3A7A1A 0%, #1E5008 100%);
-  clip-path: polygon(
-    0 70%, 8% 40%, 16% 65%, 26% 28%, 34% 55%, 44% 35%, 52% 60%,
-    62% 30%, 70% 52%, 80% 20%, 88% 48%, 100% 32%, 100% 100%, 0 100%);
-}
+/* CSS terrain at bottom — hidden */
+.home-terrain { display: none; }
 
 /* ── PAUSE PANEL — jungle wood style ── */
 .pause-panel {
@@ -5801,7 +5783,15 @@ body { background: #0a0a1a !important; }
   <div class="home-terrain"></div>
   <!-- Decorative animated train on landing page -->
   <div id="wlc-train-wrap" aria-hidden="true">
-    <svg id="wlc-train-svg" viewBox="0 0 200 52" xmlns="http://www.w3.org/2000/svg">
+    <svg id="wlc-train-svg" viewBox="-30 0 230 52" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pokeball pushed by train — sits on ground at y=52 -->
+      <g id="wlc-pokeball">
+        <circle cx="-14" cy="40" r="12" fill="white" stroke="#222" stroke-width="2"/>
+        <path d="M -26,40 A 12,12 0 0,1 2,40 Z" fill="#e3000b"/>
+        <line x1="-26" y1="40" x2="2" y2="40" stroke="#222" stroke-width="2.5"/>
+        <circle cx="-14" cy="40" r="4" fill="white" stroke="#222" stroke-width="2"/>
+        <circle cx="-14" cy="40" r="1.5" fill="#bbb"/>
+      </g>
       <!-- Steam puffs -->
       <circle class="train-smoke" cx="44" cy="6"  r="6"   fill="rgba(210,210,210,0.8)" style="animation-delay:0s"/>
       <circle class="train-smoke" cx="38" cy="1"  r="4.5" fill="rgba(220,220,220,0.6)" style="animation-delay:0.25s"/>
@@ -6042,14 +6032,6 @@ body { background: #0a0a1a !important; }
             <div class="wmap-node-name">Jejak Huruf</div>
             <div class="wmap-node-stars" id="gstars-9-lbl"></div>
           </div>
-          <!-- G13c: Gym Huruf & Suara -->
-          <div class="wmap-node" id="gtile-13c" onclick="playClick();openGymGame()" title="Gym Huruf & Suara">
-            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1A3A1A,#2E7D32);">
-              <span class="wn-icon">🏅</span>
-            </div>
-            <div class="wmap-node-name">Gym Huruf & Suara</div>
-            <div class="wmap-node-stars" id="gstars-13c-lbl"></div>
-          </div>
         </div>
       </div><!-- end zone huruf -->
 
@@ -6083,14 +6065,6 @@ body { background: #0a0a1a !important; }
             </div>
             <div class="wmap-node-name">Hitung Binatang</div>
             <div class="wmap-node-stars" id="gstars-4-lbl"></div>
-          </div>
-          <!-- G13: Evolusi Math -->
-          <div class="wmap-node" id="gtile-13" onclick="playClick();openLevelSelect(13)" title="Evolusi Math">
-            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#78350F,#F59E0B);">
-              <span class="wn-icon">🔮</span>
-            </div>
-            <div class="wmap-node-name">Evolusi Math</div>
-            <div class="wmap-node-stars" id="gstars-13-lbl"></div>
           </div>
         </div>
       </div><!-- end zone angka -->
@@ -6192,6 +6166,22 @@ body { background: #0a0a1a !important; }
             </div>
             <div class="wmap-node-name">Quick Fire</div>
             <div class="wmap-node-stars" id="gstars-13b-lbl"></div>
+          </div>
+          <!-- G13: Evolusi Math -->
+          <div class="wmap-node" id="gtile-13" onclick="playClick();openLevelSelect(13)" title="Evolusi Math">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#78350F,#F59E0B);">
+              <span class="wn-icon"><img src="https://img.pokemondb.net/sprites/home/normal/raichu.png" style="width:44px;height:44px;image-rendering:auto;display:block;" onerror="this.outerHTML='⚡'"></span>
+            </div>
+            <div class="wmap-node-name">Evolusi Math</div>
+            <div class="wmap-node-stars" id="gstars-13-lbl"></div>
+          </div>
+          <!-- G13c: Gym Pokémon -->
+          <div class="wmap-node" id="gtile-13c" onclick="playClick();openGymGame()" title="Gym Pokémon">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#1A3A1A,#2E7D32);">
+              <span class="wn-icon"><img src="https://img.pokemondb.net/sprites/home/normal/eevee.png" style="width:44px;height:44px;image-rendering:auto;display:block;" onerror="this.outerHTML='🏅'"></span>
+            </div>
+            <div class="wmap-node-name">Gym Pokémon</div>
+            <div class="wmap-node-stars" id="gstars-13c-lbl"></div>
           </div>
         </div>
       </div><!-- end zone pokemon -->
@@ -14238,6 +14228,7 @@ const G13_TYPE_COLORS = {
 }
 
 let g13State = {}
+let g13ResultTimeout = null
 
 let g13LastChainId = -1
 function g13PickChain(lv) {
@@ -14252,6 +14243,9 @@ function g13PickChain(lv) {
 }
 
 function initGame13() {
+  if (g13ResultTimeout) { clearTimeout(g13ResultTimeout); g13ResultTimeout = null }
+  const ro = document.getElementById('g13-result-overlay')
+  if (ro) ro.style.display = 'none'
   const dbg = document.getElementById('g13-debug-err')
   if (dbg) dbg.style.display = 'none'
   // Init Pixi GPU canvas for evolution FX
@@ -14944,10 +14938,15 @@ function g13Victory() {
 
   // Victory stars: evolved2 = 5★, evolved once = 4★, no evo = 3★
   const perfStars = s.evolved2 ? 5 : s.evolved ? 4 : 3
-  state.players[state.currentPlayer].stars += (s.evolved2 ? 4 : s.evolved ? 3 : 2)
-  endGame(perfStars)
+  const _g13lv = s.lv || 1
+  const _g13stars = perfStars >= 5 ? 3 : perfStars >= 4 ? 2 : 1
+  setLevelComplete(13, _g13lv, _g13stars)
+  saveStars()
+  updateGameStarDisplay()
 
-  setTimeout(() => {
+  if (g13ResultTimeout) { clearTimeout(g13ResultTimeout); g13ResultTimeout = null }
+  g13ResultTimeout = setTimeout(() => {
+    g13ResultTimeout = null
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
     const finalForm = s.evolved2 ? s.chain.evolved2 : s.evolved ? s.chain.evolved : null
@@ -14975,7 +14974,9 @@ function g13Defeat() {
   const pspr = document.getElementById('g13-pspr')
   if (pspr) { pspr.classList.add('spr-defeat') }
 
-  setTimeout(() => {
+  if (g13ResultTimeout) { clearTimeout(g13ResultTimeout); g13ResultTimeout = null }
+  g13ResultTimeout = setTimeout(() => {
+    g13ResultTimeout = null
     const ro = document.getElementById('g13-result-overlay')
     if (!ro) return
     const bannerImg = document.getElementById('g13-result-banner-img')

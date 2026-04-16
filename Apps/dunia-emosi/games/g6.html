@@ -58,6 +58,17 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a0a1
 
 /* Flash overlay */
 #flash{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity .05s}
+
+/* Vehicle selector overlay */
+#ovl-start .ovl-card{max-height:90svh;overflow-y:auto;max-width:340px}
+.v-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 12px}
+.v-btn{font-size:26px;padding:6px 2px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.v-btn:active{transform:scale(.88)}
+.v-btn.sel{border-color:#a78bfa;background:rgba(139,92,246,0.35);box-shadow:0 0 12px rgba(139,92,246,.55)}
+.diff-row{display:flex;gap:8px;justify-content:center;margin:8px 0 14px}
+.diff-btn{flex:1;padding:9px 6px;border-radius:14px;border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.diff-btn.sel{border-color:#a78bfa;background:rgba(139,92,246,.35)}
+.sec-lbl{font-size:10px;font-weight:900;color:rgba(255,255,255,.4);letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -86,6 +97,21 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a0a1
   <button class="ctrl-btn" id="btn-right"
     ontouchstart="onRight();event.preventDefault()"
     onclick="onRight()">▶</button>
+</div>
+
+<!-- Vehicle selector — shown before game starts -->
+<div class="ovl show" id="ovl-start">
+  <div class="ovl-card">
+    <div class="sec-lbl">PILIH KENDARAAN</div>
+    <div class="v-grid" id="v-grid"></div>
+    <div id="v-preview" style="font-size:42px;text-align:center;margin:4px 0 10px">🚗</div>
+    <div class="sec-lbl">KESULITAN</div>
+    <div class="diff-row">
+      <button class="diff-btn sel" id="diff-easy" onclick="setDiff('easy')">😊 Mudah<br><span style="font-size:10px;opacity:.7">Nabrak = ½❤️</span></button>
+      <button class="diff-btn" id="diff-med" onclick="setDiff('medium')">😤 Sedang<br><span style="font-size:10px;opacity:.7">Nabrak = 1❤️</span></button>
+    </div>
+    <button class="ovl-btn" onclick="startFromSelect()">Mulai! 🚦</button>
+  </div>
 </div>
 
 <!-- Word complete -->
@@ -179,9 +205,56 @@ const TILE_SZ    = 54
 // ═══════════════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════════════
+// Vehicle catalog
+const VEHICLES = [
+  {e:'🚗',n:'Sedan'},{e:'🏎️',n:'Sport'},{e:'🚙',n:'Jeep'},
+  {e:'🚚',n:'Truk'},{e:'🚐',n:'Bemo'},{e:'🚓',n:'Polisi'},
+  {e:'🚕',n:'Taksi'},{e:'🚌',n:'Bis'},{e:'🚒',n:'Pemadam'},
+  {e:'🚑',n:'Ambulan'},{e:'🚜',n:'Traktor'},{e:'🛵',n:'Skuter'},
+  {e:'🚲',n:'Sepeda'},{e:'🛺',n:'Becak'},{e:'🚀',n:'Roket'},
+  {e:'🚢',n:'Kapal'},{e:'🚁',n:'Heli'},{e:'🚂',n:'Kereta'},
+  {e:'🛸',n:'UFO'},{e:'🚤',n:'Speedboat'},
+]
+let selectedVehicle = cfg.playerIcon || '🚗'
+let selectedDiff = 'easy'
+
+function buildVehicleGrid() {
+  const grid = document.getElementById('v-grid')
+  if (!grid) return
+  grid.innerHTML = ''
+  VEHICLES.forEach((v) => {
+    const btn = document.createElement('button')
+    btn.className = 'v-btn' + (v.e === selectedVehicle ? ' sel' : '')
+    btn.title = v.n
+    btn.textContent = v.e
+    btn.onclick = () => {
+      selectedVehicle = v.e
+      document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('sel'))
+      btn.classList.add('sel')
+      const p = document.getElementById('v-preview'); if(p) p.textContent = v.e
+    }
+    grid.appendChild(btn)
+  })
+}
+
+function setDiff(d) {
+  selectedDiff = d
+  document.getElementById('diff-easy').classList.toggle('sel', d==='easy')
+  document.getElementById('diff-med').classList.toggle('sel', d==='medium')
+}
+
+function startFromSelect() {
+  cfg.playerIcon = selectedVehicle
+  S.difficulty = selectedDiff
+  if (carSprite) carSprite.text = selectedVehicle
+  document.getElementById('ovl-start').classList.remove('show')
+  startWord()
+}
+
 const S = {
   running: false,
   lives: LIVES_MAX,
+  difficulty: 'easy',
   score: 0,
   wordIdx: 0,
   wordList: [],
@@ -692,7 +765,8 @@ function hitTile(t) {
     spawnCrash(t.x, t.y)
     playTone(200, 0.2, 'square')
     screenFlash('rgba(255,60,60,0.3)')
-    S.lives--
+    const dmg = S.difficulty === 'easy' ? 0.5 : 1
+    S.lives = Math.max(0, S.lives - dmg)
     updateHUD()
     if (S.lives <= 0) setTimeout(showGameOver, 500)
   }
@@ -798,7 +872,8 @@ function restartGame() {
   S.tiles.forEach(t => { t._alive = false })
   S.fx = []; S.exhaust = []
   updateHUD()
-  startWord()
+  // Show vehicle selector again
+  document.getElementById('ovl-start').classList.add('show')
 }
 
 function showFinish() {
@@ -853,7 +928,8 @@ function updateHUD() {
   document.getElementById('score-badge').textContent = `⭐ ${S.score}`
   // Lives
   const livesEl = document.getElementById('lives-row')
-  livesEl.textContent = '❤️'.repeat(S.lives) + '🖤'.repeat(Math.max(0, LIVES_MAX - S.lives))
+  const fullH = Math.floor(S.lives), hasHalf = S.lives % 1 >= 0.5
+  livesEl.textContent = '❤️'.repeat(fullH) + (hasHalf ? '🩶' : '') + '🖤'.repeat(Math.max(0, LIVES_MAX - Math.ceil(S.lives)))
   // Progress
   const pct = S.wordsDone / S.totalWords
   document.getElementById('prog-bar').style.width = `${pct * 100}%`
@@ -959,7 +1035,8 @@ window.addEventListener('resize', () => {
   S.totalWords = S.wordList.length
 
   updateHUD()
-  startWord()
+  buildVehicleGrid()
+  // Vehicle selector overlay already shown (has 'show' class in HTML)
 })()
 </script>
 </body>
