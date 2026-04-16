@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Selamatkan Kereta 🚂</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#1a0535;font-family:'Fredoka One',sans-serif;touch-action:none}
+#pixi-canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
+
+/* ── HUD Top ── */
+#hud-top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 14px 8px;background:linear-gradient(180deg,rgba(0,0,0,0.78) 0%,transparent 100%);pointer-events:none}
+#btn-back{background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;color:#fff;padding:7px 12px;font-size:15px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
+#game-badge{background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,200,0,0.35);border-radius:10px;padding:5px 10px;color:#fbbf24;font-size:12px;font-weight:700;flex-shrink:0;white-space:nowrap}
+#hud-center{flex:1;text-align:center}
+#level-text{font-size:12px;color:#c4b5fd;font-weight:700}
+#status-text{font-size:16px;font-weight:900;color:#fff}
+#obstacle-count{font-size:13px;color:#86efac;font-weight:700;flex-shrink:0}
+
+/* ── Danger Bar ── */
+#danger-wrap{position:fixed;top:56px;left:0;right:0;z-index:49;padding:4px 14px 2px;background:rgba(0,0,0,0.4)}
+#danger-inner{display:flex;align-items:center;gap:8px}
+#danger-label{font-size:9px;color:#ef4444;letter-spacing:2px;font-weight:700;flex-shrink:0;text-transform:uppercase;animation:dangerPulse 1s ease-in-out infinite}
+@keyframes dangerPulse{50%{opacity:0.4}}
+#danger-track{flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden}
+#danger-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#86efac,#fbbf24,#ef4444);transition:width .15s linear;width:0%}
+#cliff-icon{font-size:16px;flex-shrink:0}
+
+/* ── Quiz Panel ── */
+#quiz-panel{position:fixed;bottom:0;left:0;right:0;z-index:200;display:none;flex-direction:column;align-items:center;padding:14px 16px 20px;background:linear-gradient(0deg,rgba(10,2,25,0.98) 0%,rgba(26,5,53,0.95) 100%);border-top:3px solid #ef4444;backdrop-filter:blur(12px)}
+#quiz-panel.show{display:flex}
+#quiz-title{color:#ef4444;font-size:10px;font-weight:700;letter-spacing:3px;margin-bottom:4px;animation:dangerPulse 0.8s ease-in-out infinite}
+#quiz-question{color:#fff;font-size:28px;font-weight:900;text-align:center;margin-bottom:14px;text-shadow:0 0 20px rgba(251,191,36,0.6)}
+#quiz-choices{display:flex;gap:10px;justify-content:center;width:100%}
+.choice-btn{flex:1;max-width:90px;padding:16px 4px;border:2px solid rgba(255,255,255,0.2);border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;font-size:22px;font-weight:900;cursor:pointer;transition:all .12s;font-family:inherit;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
+.choice-btn:active{transform:scale(.9)}
+.choice-btn.correct{border-color:#4ade80;background:rgba(74,222,128,0.3);animation:correctFlash .4s ease}
+.choice-btn.wrong{border-color:#ef4444;background:rgba(239,68,68,0.3);animation:wrongShake .35s ease}
+@keyframes correctFlash{0%{transform:scale(1.1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}100%{transform:translateX(0)}}
+#mercy-bar{margin-top:10px;display:flex;gap:5px;align-items:center}
+.mercy-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.2);transition:all .2s}
+.mercy-dot.used{background:#ef4444;border-color:#ef4444}
+
+/* ── Speed Lines overlay ── */
+#speed-lines{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;transition:opacity .15s;background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,0.03) 40px,rgba(255,255,255,0.03) 42px)}
+
+/* ── Screen Flash ── */
+#flash{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity .08s}
+
+/* ── Overlays ── */
+.ovl{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px)}
+.ovl.show{display:flex}
+.ovl-card{background:linear-gradient(145deg,#0d0521,#1a0535);border:1px solid rgba(139,92,246,0.4);border-radius:28px;padding:28px 24px;text-align:center;max-width:320px;width:92%;box-shadow:0 0 60px rgba(139,92,246,0.3),0 20px 40px rgba(0,0,0,0.7);color:#fff;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.ovl-emoji{font-size:60px;display:block;margin-bottom:8px}
+.ovl-title{font-size:24px;font-weight:900;margin-bottom:6px}
+.ovl-msg{color:rgba(255,255,255,.65);font-size:13px;margin-bottom:18px;line-height:1.5}
+.ovl-stars{font-size:28px;letter-spacing:5px;margin:10px 0 18px;filter:drop-shadow(0 0 8px gold)}
+.ovl-btn{background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:16px;color:#fff;padding:15px 0;font-size:16px;font-weight:900;cursor:pointer;width:100%;margin-top:8px;box-shadow:0 5px 0 #3b0764;transition:transform .1s,box-shadow .1s;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.ovl-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #3b0764}
+.ovl-btn.sec{background:rgba(255,255,255,.08);box-shadow:none;border:1.5px solid rgba(255,255,255,.2);margin-top:8px}
+.ovl-btn.danger{background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 5px 0 #7f1d1d}
+.ovl-btn.danger:active{box-shadow:0 2px 0 #7f1d1d}
+</style>
+</head>
+<body>
+<canvas id="pixi-canvas"></canvas>
+
+<!-- HUD Top -->
+<div id="hud-top">
+  <button id="btn-back" onclick="confirmBack()">⌂</button>
+  <div id="game-badge">🚂 Signal Rush</div>
+  <div id="hud-center">
+    <div id="level-text">Level 1</div>
+    <div id="status-text">Bersiap...</div>
+  </div>
+  <div id="obstacle-count">🚧 0/0</div>
+</div>
+
+<!-- Danger Bar -->
+<div id="danger-wrap">
+  <div id="danger-inner">
+    <span id="danger-label">⚠ Bahaya</span>
+    <div id="danger-track"><div id="danger-fill"></div></div>
+    <span id="cliff-icon">🌋</span>
+  </div>
+</div>
+
+<!-- Quiz Panel -->
+<div id="quiz-panel">
+  <div id="quiz-title">🚨 HAPUS RINTANGAN!</div>
+  <div id="quiz-question">?</div>
+  <div id="quiz-choices"></div>
+  <div id="mercy-bar"></div>
+</div>
+
+<!-- Speed Lines -->
+<div id="speed-lines"></div>
+<!-- Flash -->
+<div id="flash"></div>
+
+<!-- Win Overlay -->
+<div class="ovl" id="ovl-win">
+  <div class="ovl-card">
+    <span class="ovl-emoji">🏆</span>
+    <div class="ovl-title" id="win-title">Kereta Selamat!</div>
+    <div class="ovl-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="ovl-msg" id="win-msg">Hebat sekali!</div>
+    <button class="ovl-btn" onclick="finishGame()">Kembali 🏠</button>
+    <button class="ovl-btn sec" onclick="restartGame()">Main Lagi 🔄</button>
+  </div>
+</div>
+
+<!-- Lose Overlay -->
+<div class="ovl" id="ovl-lose">
+  <div class="ovl-card">
+    <span class="ovl-emoji">💥</span>
+    <div class="ovl-title">Kereta Jatuh!</div>
+    <div class="ovl-msg" id="lose-msg">Kereta mencapai tebing... Coba lagi!</div>
+    <button class="ovl-btn danger" onclick="restartGame()">Coba Lagi 🔄</button>
+    <button class="ovl-btn sec" onclick="finishGame()">Kembali 🏠</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+<script>
+'use strict'
+
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+const cfg = { level: 1 }
+try { const s = sessionStorage.getItem('g16Config'); if (s) Object.assign(cfg, JSON.parse(s)) } catch(_){}
+
+// ═══════════════════════════════════════════════════════════
+//  QUESTION POOL
+// ═══════════════════════════════════════════════════════════
+const QUESTIONS = {
+  easy: [
+    { q:'🐱 Huruf awal?', ans:'K', wrong:['A','M','B'] },        // KUCING
+    { q:'🍎 Huruf awal?', ans:'A', wrong:['I','U','E'] },        // APEL
+    { q:'🐶 Huruf awal?', ans:'A', wrong:['K','M','B'] },        // ANJING
+    { q:'🦋 Huruf awal?', ans:'K', wrong:['L','S','P'] },        // KUPU-KUPU
+    { q:'🐟 Huruf awal?', ans:'I', wrong:['U','A','O'] },        // IKAN
+    { q:'🌸 Huruf awal?', ans:'B', wrong:['K','S','T'] },        // BUNGA
+    { q:'🐘 Huruf awal?', ans:'G', wrong:['A','K','L'] },        // GAJAH
+    { q:'🦒 Huruf awal?', ans:'J', wrong:['G','K','L'] },        // JERAPAH
+    { q:'🍌 Huruf awal?', ans:'P', wrong:['B','M','K'] },        // PISANG
+    { q:'🐸 Huruf awal?', ans:'K', wrong:['B','S','L'] },        // KATAK
+    { q:'🌙 Huruf awal?', ans:'B', wrong:['M','S','L'] },        // BULAN
+    { q:'☀️ Huruf awal?', ans:'M', wrong:['B','S','P'] },        // MATAHARI
+    { q:'Warna apa ini? 🔴', ans:'MERAH', wrong:['BIRU','HIJAU','KUNING'] },
+    { q:'Warna apa ini? 🔵', ans:'BIRU', wrong:['MERAH','HIJAU','UNGU'] },
+    { q:'Warna apa ini? 🟡', ans:'KUNING', wrong:['ORANYE','PUTIH','MERAH'] },
+    { q:'Warna apa ini? 🟢', ans:'HIJAU', wrong:['BIRU','KUNING','HITAM'] },
+    { q:'Angka berapa? ①', ans:'1', wrong:['2','3','4'] },
+    { q:'Angka berapa? ③', ans:'3', wrong:['2','4','5'] },
+    { q:'Angka berapa? ⑤', ans:'5', wrong:['4','6','3'] },
+    { q:'Angka berapa? ⑦', ans:'7', wrong:['6','8','9'] },
+    { q:'Angka berapa? ⑨', ans:'9', wrong:['8','7','6'] },
+  ],
+  medium: [
+    { q:'2 + 3 = ?', ans:'5', wrong:['4','6','7'] },
+    { q:'4 + 4 = ?', ans:'8', wrong:['7','9','6'] },
+    { q:'3 + 4 = ?', ans:'7', wrong:['6','8','5'] },
+    { q:'5 + 5 = ?', ans:'10', wrong:['9','8','11'] },
+    { q:'6 + 3 = ?', ans:'9', wrong:['8','7','10'] },
+    { q:'10 - 3 = ?', ans:'7', wrong:['6','8','4'] },
+    { q:'8 - 2 = ?', ans:'6', wrong:['5','7','4'] },
+    { q:'9 - 4 = ?', ans:'5', wrong:['4','6','3'] },
+    { q:'7 - 3 = ?', ans:'4', wrong:['3','5','6'] },
+    { q:'5 + 6 = ?', ans:'11', wrong:['10','12','9'] },
+    { q:'4 x 2 = ?', ans:'8', wrong:['6','10','7'] },
+    { q:'3 x 3 = ?', ans:'9', wrong:['6','12','8'] },
+    { q:'2 x 5 = ?', ans:'10', wrong:['8','12','9'] },
+    { q:'BUKU huruf ke-2?', ans:'U', wrong:['B','K','A'] },
+    { q:'MEJA huruf ke-3?', ans:'J', wrong:['M','E','A'] },
+    { q:'PAGAR huruf ke-4?', ans:'A', wrong:['P','G','R'] },
+    { q:'BULAN huruf ke-1?', ans:'B', wrong:['U','L','A'] },
+    { q:'PINTU huruf ke-5?', ans:'U', wrong:['P','I','T'] },
+  ],
+  hard: [
+    { q:'K-U-C-I-...?', ans:'N', wrong:['A','G','S'] },
+    { q:'B-U-K-...?', ans:'U', wrong:['A','O','E'] },
+    { q:'M-A-T-A-H-A-R-...?', ans:'I', wrong:['A','U','E'] },
+    { q:'P-I-S-A-N-...?', ans:'G', wrong:['K','S','T'] },
+    { q:'J-E-R-A-P-A-...?', ans:'H', wrong:['G','K','S'] },
+    { q:'12 + 5 = ?', ans:'17', wrong:['16','18','15'] },
+    { q:'15 - 8 = ?', ans:'7', wrong:['6','8','9'] },
+    { q:'3 x 4 = ?', ans:'12', wrong:['9','15','10'] },
+    { q:'20 - 7 = ?', ans:'13', wrong:['12','14','11'] },
+    { q:'6 x 2 = ?', ans:'12', wrong:['10','14','8'] },
+    { q:'Sebelum 10 = ?', ans:'9', wrong:['8','11','10'] },
+    { q:'Sesudah 14 = ?', ans:'15', wrong:['14','16','13'] },
+    { q:'Ganjil: 2,4,...,8', ans:'6', wrong:['5','7','9'] },
+    { q:'Genap: 3,5,...,9', ans:'7', wrong:['6','8','4'] },
+  ]
+}
+
+function getDifficulty(level) {
+  if (level <= 7) return 'easy'
+  if (level <= 14) return 'medium'
+  return 'hard'
+}
+
+function pickQuestions(level) {
+  const diff = getDifficulty(level)
+  const pool = [...QUESTIONS[diff]]
+  // Shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  const count = Math.min(3 + Math.min(level - 1, 4), pool.length, 7)
+  return pool.slice(0, count)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  running: false,
+  level: cfg.level,
+  obstacles: [],        // [{x, question, cleared, wrongCount}]
+  trainX: 0,
+  trainState: 'MOVING', // MOVING | BRAKING | STOPPED | CLEARING | BOOSTING | DEAD
+  trainVY: 0,           // bobbing
+  trainBobT: 0,
+  currentObstacleIdx: -1,
+  cleared: 0,
+  wrongTaps: 0,
+  totalObstacles: 0,
+  startTime: 0,
+  gameOver: false,
+  trackLength: 0,
+  brakeTimer: 0,
+  boostTimer: 0,
+  deadTimer: 0,
+  // stars tracking
+  noWrongAnswers: true,
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PIXI APP
+// ═══════════════════════════════════════════════════════════
+let app, stage
+let trainContainer, trainBody, trainWheelL, trainWheelR, trainChimney
+let smokePuffs = []
+let trackGraphics, skyGraphics, hillsGraphics, cliffGraphics
+let obstacleContainers = []
+let sparkParticles = []
+let railTies = []
+const RAIL_TIE_COUNT = 30
+
+async function initPixi() {
+  const W = window.innerWidth
+  const H = window.innerHeight
+
+  app = new PIXI.Application()
+  await app.init({
+    canvas: document.getElementById('pixi-canvas'),
+    width: W, height: H,
+    backgroundAlpha: 0,
+    antialias: true,
+    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    autoDensity: true,
+  })
+
+  stage = app.stage
+  S.trackLength = W * 0.92
+  S.trainX = W * 0.08
+
+  drawSky(W, H)
+  drawHills(W, H)
+  drawTrack(W, H)
+  drawCliff(W, H)
+  buildTrain(W, H)
+  buildObstaclesOnTrack(W, H)
+
+  app.ticker.add(gameLoop)
+  S.startTime = performance.now()
+  S.running = true
+
+  updateHUD()
+}
+
+// ── Background ──
+function drawSky(W, H) {
+  skyGraphics = new PIXI.Graphics()
+  // Night sky gradient via rectangles
+  const skyH = H * 0.65
+  const colors = [0x1a0535, 0x2d0a5e, 0x1a0535]
+  skyGraphics.rect(0, 0, W, skyH).fill({ color: 0x1a0535 })
+  // Stars
+  for (let i = 0; i < 80; i++) {
+    const sx = Math.random() * W
+    const sy = Math.random() * skyH * 0.75
+    const r = Math.random() * 1.5 + 0.3
+    skyGraphics.circle(sx, sy, r).fill({ color: 0xffffff, alpha: Math.random() * 0.8 + 0.2 })
+  }
+  // Moon
+  skyGraphics.circle(W * 0.85, H * 0.1, 24).fill({ color: 0xfff8dc })
+  skyGraphics.circle(W * 0.85 + 8, H * 0.1 - 6, 20).fill({ color: 0x2d0a5e })
+  stage.addChild(skyGraphics)
+}
+
+function drawHills(W, H) {
+  hillsGraphics = new PIXI.Graphics()
+  const trackY = getTrackY(H)
+
+  // Far hills (dark purple)
+  hillsGraphics.moveTo(0, trackY + 10)
+  hillsGraphics.bezierCurveTo(W * 0.1, trackY - 60, W * 0.2, trackY - 80, W * 0.35, trackY - 20)
+  hillsGraphics.bezierCurveTo(W * 0.5, trackY + 10, W * 0.65, trackY - 90, W * 0.8, trackY - 30)
+  hillsGraphics.bezierCurveTo(W * 0.9, trackY - 10, W, trackY + 10, W, trackY + 10)
+  hillsGraphics.lineTo(W, H)
+  hillsGraphics.lineTo(0, H)
+  hillsGraphics.closePath()
+  hillsGraphics.fill({ color: 0x1c0a35 })
+
+  // Near hills (darker green-purple)
+  hillsGraphics.moveTo(-10, trackY + 15)
+  hillsGraphics.bezierCurveTo(W * 0.05, trackY + 5, W * 0.15, trackY - 35, W * 0.28, trackY - 10)
+  hillsGraphics.bezierCurveTo(W * 0.42, trackY + 10, W * 0.55, trackY - 45, W * 0.7, trackY - 5)
+  hillsGraphics.bezierCurveTo(W * 0.82, trackY + 8, W * 0.95, trackY + 2, W + 10, trackY + 15)
+  hillsGraphics.lineTo(W + 10, H)
+  hillsGraphics.lineTo(-10, H)
+  hillsGraphics.closePath()
+  hillsGraphics.fill({ color: 0x0f1a08 })
+
+  stage.addChild(hillsGraphics)
+}
+
+function getTrackY(H) { return H * 0.58 }
+
+function drawTrack(W, H) {
+  trackGraphics = new PIXI.Graphics()
+  const trackY = getTrackY(H)
+  const railH = 5
+
+  // Ground fill below track
+  trackGraphics.rect(0, trackY + 6, W, H - trackY - 6).fill({ color: 0x0a0015 })
+
+  // Tie containers (will animate scroll)
+  const tieContainer = new PIXI.Container()
+  const tieSpacing = W / (RAIL_TIE_COUNT - 1)
+  for (let i = 0; i < RAIL_TIE_COUNT; i++) {
+    const tie = new PIXI.Graphics()
+    tie.rect(0, -4, 12, 18).fill({ color: 0x5d3a1a })
+    tie.x = i * tieSpacing - 6
+    tie.y = trackY
+    tieContainer.addChild(tie)
+    railTies.push({ gfx: tie, baseX: i * tieSpacing - 6, spacing: tieSpacing * RAIL_TIE_COUNT })
+  }
+
+  // Top rail
+  trackGraphics.rect(0, trackY - railH, W, railH).fill({ color: 0xDAA520 })
+  // Bottom rail
+  trackGraphics.rect(0, trackY + 10, W, railH).fill({ color: 0xDAA520 })
+  // Rail sheen
+  trackGraphics.rect(0, trackY - railH, W, 2).fill({ color: 0xffe066, alpha: 0.5 })
+
+  stage.addChild(trackGraphics)
+  stage.addChild(tieContainer)
+}
+
+function drawCliff(W, H) {
+  cliffGraphics = new PIXI.Graphics()
+  const trackY = getTrackY(H)
+  const cliffX = W * 0.97
+
+  // Red glow
+  const grd = new PIXI.FillGradient(cliffX, trackY - 40, cliffX + 40, trackY + 20)
+  grd.addColorStop(0, 0xff0000)
+  grd.addColorStop(1, 0xff0000)
+  cliffGraphics.rect(cliffX - 20, trackY - 60, 50, 80).fill({ color: 0xff0000, alpha: 0.18 })
+
+  // Cliff edge stripes
+  for (let i = 0; i < 6; i++) {
+    cliffGraphics.rect(cliffX + i * 5, trackY - 50 + i * 5, 4, 60 - i * 5)
+      .fill({ color: i % 2 === 0 ? 0xff0000 : 0xffffff, alpha: 0.7 })
+  }
+
+  // Danger sign
+  const sign = new PIXI.Graphics()
+  sign.poly([0, -24, 22, 10, -22, 10]).fill({ color: 0xff0000 })
+  sign.poly([0, -16, 14, 6, -14, 6]).fill({ color: 0xffd700 })
+  sign.x = cliffX + 10
+  sign.y = trackY - 55
+  cliffGraphics.addChild(sign)
+
+  // Lava below
+  cliffGraphics.rect(cliffX, trackY + 15, W - cliffX + 20, H - trackY).fill({ color: 0xff4400 })
+  cliffGraphics.rect(cliffX, trackY + 5, W - cliffX + 20, 12).fill({ color: 0xff8800, alpha: 0.8 })
+
+  stage.addChild(cliffGraphics)
+}
+
+// ── Train ──
+function buildTrain(W, H) {
+  const trackY = getTrackY(H)
+  trainContainer = new PIXI.Container()
+  trainContainer.x = S.trainX
+  trainContainer.y = trackY - 18
+
+  // Shadow
+  const shadow = new PIXI.Graphics()
+  shadow.ellipse(30, 22, 38, 6).fill({ color: 0x000000, alpha: 0.3 })
+  trainContainer.addChild(shadow)
+
+  // Body
+  trainBody = new PIXI.Graphics()
+  // Main body
+  trainBody.rect(-8, -28, 76, 34).fill({ color: 0xdc2626 })
+  // Front cab
+  trainBody.rect(52, -36, 22, 42).fill({ color: 0xb91c1c })
+  // Windows
+  trainBody.rect(56, -32, 14, 12).fill({ color: 0x7dd3fc, alpha: 0.9 })
+  // Boiler dome
+  trainBody.circle(10, -30, 9).fill({ color: 0x991b1b })
+  // Headlight
+  trainBody.circle(72, -20, 5).fill({ color: 0xfef08a })
+  trainBody.circle(72, -20, 3).fill({ color: 0xffffff })
+  // Red/white stripes along bottom
+  for (let i = 0; i < 5; i++) {
+    trainBody.rect(-8 + i * 15, 2, 7, 4).fill({ color: i % 2 === 0 ? 0xffffff : 0xef4444, alpha: 0.7 })
+  }
+  // White trim line
+  trainBody.rect(-8, -4, 76, 3).fill({ color: 0xffffff, alpha: 0.4 })
+  trainContainer.addChild(trainBody)
+
+  // Chimney
+  trainChimney = new PIXI.Graphics()
+  trainChimney.rect(-4, -18, 8, 18).fill({ color: 0x1c1917 })
+  trainChimney.rect(-7, -20, 14, 4).fill({ color: 0x1c1917 })
+  trainChimney.x = 8
+  trainChimney.y = -28
+  trainContainer.addChild(trainChimney)
+
+  // Wheels
+  const wheelPositions = [6, 36, 62]
+  for (const wx of wheelPositions) {
+    const wc = new PIXI.Container()
+    wc.x = wx
+    wc.y = 8
+    const wBody = new PIXI.Graphics()
+    wBody.circle(0, 0, 10).fill({ color: 0x292524 })
+    wBody.circle(0, 0, 7).fill({ color: 0x57534e })
+    wBody.circle(0, 0, 3).fill({ color: 0xfbbf24 })
+    // Spokes
+    for (let s = 0; s < 4; s++) {
+      const angle = (s * Math.PI) / 2
+      wBody.rect(-1, -8, 2, 16).fill({ color: 0x78716c, alpha: 0.7 })
+    }
+    wc.addChild(wBody)
+    if (wx === 6) trainWheelL = wc
+    else if (wx === 62) trainWheelR = wc
+    trainContainer.addChild(wc)
+  }
+
+  stage.addChild(trainContainer)
+}
+
+// ── Obstacles ──
+function buildObstaclesOnTrack(W, H) {
+  const trackY = getTrackY(H)
+  const questions = pickQuestions(S.level)
+  S.totalObstacles = questions.length
+  S.obstacles = []
+
+  // Space obstacles evenly between 25% and 88% of track
+  const startX = W * 0.28
+  const endX = W * 0.88
+  const spacing = (endX - startX) / Math.max(questions.length - 1, 1)
+
+  questions.forEach((q, i) => {
+    const ox = questions.length === 1 ? (startX + endX) / 2 : startX + i * spacing
+    const obs = {
+      x: ox,
+      question: q,
+      cleared: false,
+      wrongCount: 0,
+      container: null,
+      flashTimer: 0,
+    }
+    const container = buildObstacleGraphic(ox, trackY, i)
+    obs.container = container
+    stage.addChild(container)
+    S.obstacles.push(obs)
+    obstacleContainers.push(container)
+  })
+
+  document.getElementById('obstacle-count').textContent = `🚧 0/${S.totalObstacles}`
+}
+
+function buildObstacleGraphic(ox, trackY, idx) {
+  const container = new PIXI.Container()
+  container.x = ox
+  container.y = trackY
+
+  // Gate posts
+  const left = new PIXI.Graphics()
+  left.rect(-4, -55, 8, 55).fill({ color: 0x1c1917 })
+  left.x = -22
+  container.addChild(left)
+
+  const right = new PIXI.Graphics()
+  right.rect(-4, -55, 8, 55).fill({ color: 0x1c1917 })
+  right.x = 22
+  container.addChild(right)
+
+  // Barrier arm (striped red/white)
+  const barrier = new PIXI.Graphics()
+  for (let b = 0; b < 5; b++) {
+    barrier.rect(b * 9 - 22, -32, 8, 16).fill({ color: b % 2 === 0 ? 0xef4444 : 0xffffff })
+  }
+  barrier.name = 'barrier'
+  container.addChild(barrier)
+
+  // Question sign (background)
+  const signBg = new PIXI.Graphics()
+  signBg.roundRect(-34, -82, 68, 42, 10).fill({ color: 0x1e0845 })
+  signBg.roundRect(-34, -82, 68, 42, 10).stroke({ color: 0xef4444, width: 2.5 })
+  signBg.name = 'signBg'
+  container.addChild(signBg)
+
+  // Number badge
+  const badge = new PIXI.Graphics()
+  badge.circle(0, -95, 11).fill({ color: 0xef4444 })
+  badge.name = 'badge'
+  container.addChild(badge)
+
+  // Warning lights
+  const lightL = new PIXI.Graphics()
+  lightL.circle(0, 0, 5).fill({ color: 0xef4444 })
+  lightL.x = -22
+  lightL.y = -58
+  lightL.name = 'lightL'
+  container.addChild(lightL)
+
+  const lightR = new PIXI.Graphics()
+  lightR.circle(0, 0, 5).fill({ color: 0xef4444 })
+  lightR.x = 22
+  lightR.y = -58
+  lightR.name = 'lightR'
+  container.addChild(lightR)
+
+  return container
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════════════════════
+let _ticker_t = 0
+function gameLoop(ticker) {
+  if (!S.running || S.gameOver) return
+  const dt = ticker.deltaMS / 1000  // seconds
+  _ticker_t += dt
+
+  updateTrain(dt)
+  updateObstacles(dt)
+  updateSmoke(dt)
+  updateSparks(dt)
+  animateLights()
+  updateHUDFrame()
+}
+
+function updateTrain(dt) {
+  const W = app.screen.width
+  const H = app.screen.height
+  const trackY = getTrackY(H)
+
+  let speed = 0
+  const baseSpeed = 80 + S.level * 12  // px/s
+  const boostSpeed = baseSpeed * 2.2
+
+  // Find if near an uncleared obstacle
+  const nextObs = S.obstacles.find(o => !o.cleared && o.x > S.trainX - 10)
+  const stopDist = 80
+  const brakeDist = 200
+
+  if (S.trainState === 'DEAD') {
+    S.deadTimer -= dt
+    // Train falls off cliff
+    trainContainer.y += 90 * dt
+    trainContainer.rotation += 1.5 * dt
+    if (S.deadTimer <= 0) {
+      S.running = false
+      showLose()
+    }
+    return
+  }
+
+  if (S.trainState === 'BOOSTING') {
+    S.boostTimer -= dt
+    speed = boostSpeed
+    if (S.boostTimer <= 0) {
+      S.trainState = 'MOVING'
+      document.getElementById('speed-lines').style.opacity = '0'
+    }
+  } else if (S.trainState === 'MOVING') {
+    if (nextObs) {
+      const dist = nextObs.x - S.trainX
+      if (dist <= stopDist) {
+        // Stop and show quiz
+        S.trainState = 'STOPPED'
+        S.currentObstacleIdx = S.obstacles.indexOf(nextObs)
+        showQuizPanel(nextObs)
+        speed = 0
+      } else if (dist <= brakeDist) {
+        // Braking
+        const t = (dist - stopDist) / (brakeDist - stopDist)
+        speed = baseSpeed * Math.max(t * 0.5, 0.05)
+        showBrakeSparks()
+      } else {
+        speed = baseSpeed
+      }
+    } else {
+      speed = baseSpeed
+    }
+  } else if (S.trainState === 'BRAKING') {
+    speed = baseSpeed * 0.1
+  } else if (S.trainState === 'STOPPED') {
+    speed = 0
+  } else if (S.trainState === 'CLEARING') {
+    speed = 0
+  }
+
+  S.trainX += speed * dt
+
+  // Check cliff collision
+  const cliffX = W * 0.97 - 40
+  if (S.trainX > cliffX && S.trainState !== 'DEAD') {
+    triggerDeath()
+    return
+  }
+
+  // Check win (all obstacles cleared)
+  if (S.cleared === S.totalObstacles && S.trainState !== 'DEAD') {
+    // Let train reach finish naturally - but also check if it's cleared all
+    if (S.trainState !== 'BOOSTING' && S.trainState !== 'MOVING') {
+      S.trainState = 'BOOSTING'
+      S.boostTimer = 3
+    }
+    if (S.trainX > W * 0.9) {
+      triggerWin()
+      return
+    }
+  }
+
+  // Bob animation
+  S.trainBobT += dt * 4
+  const bob = Math.sin(S.trainBobT) * (S.trainState === 'BOOSTING' ? 3.5 : 1.5)
+  trainContainer.x = S.trainX
+  trainContainer.y = trackY - 18 + bob
+
+  // Wheel spin
+  const spinSpeed = speed * 0.04
+  if (trainWheelL) trainWheelL.rotation += spinSpeed * dt * 10
+  if (trainWheelR) trainWheelR.rotation += spinSpeed * dt * 10
+
+  // Boost tilt
+  if (S.trainState === 'BOOSTING') {
+    trainBody.rotation = Math.sin(_ticker_t * 8) * 0.04
+  } else {
+    trainBody.rotation *= 0.85
+  }
+}
+
+function triggerDeath() {
+  S.trainState = 'DEAD'
+  S.deadTimer = 1.2
+  S.gameOver = true
+  hideQuizPanel()
+  flashScreen('#ff0000', 0.5)
+}
+
+function triggerWin() {
+  if (S.gameOver) return
+  S.gameOver = true
+  S.running = false
+  hideQuizPanel()
+  document.getElementById('speed-lines').style.opacity = '0'
+  setTimeout(() => showWin(), 400)
+}
+
+function updateObstacles(dt) {
+  S.obstacles.forEach((obs, i) => {
+    if (!obs.container) return
+    // Flash warning lights
+    obs.flashTimer = (obs.flashTimer || 0) + dt
+    const lightL = obs.container.getChildByName('lightL')
+    const lightR = obs.container.getChildByName('lightR')
+    if (lightL && lightR) {
+      const on = Math.sin(obs.flashTimer * 8) > 0
+      lightL.tint = on ? 0xff0000 : 0x660000
+      lightR.tint = on ? 0x000000 : 0xff4400
+    }
+    // Barrier bobble when active
+    if (!obs.cleared && i === S.currentObstacleIdx) {
+      const barrier = obs.container.getChildByName('barrier')
+      if (barrier) {
+        barrier.rotation = Math.sin(obs.flashTimer * 12) * 0.05
+      }
+    }
+  })
+}
+
+// ── Smoke particles ──
+function updateSmoke(dt) {
+  // Emit
+  if (Math.random() < 0.3) {
+    const puff = new PIXI.Graphics()
+    const r = 4 + Math.random() * 6
+    puff.circle(0, 0, r).fill({ color: 0x888888, alpha: 0.5 })
+    puff.x = trainContainer.x + 8
+    puff.y = trainContainer.y - 46
+    puff._vx = (Math.random() - 0.5) * 30 - 15
+    puff._vy = -40 - Math.random() * 30
+    puff._life = 1.0
+    puff._maxLife = 1.0
+    stage.addChild(puff)
+    smokePuffs.push(puff)
+  }
+  // Update
+  smokePuffs = smokePuffs.filter(p => {
+    p._life -= dt * 1.4
+    if (p._life <= 0) { stage.removeChild(p); return false }
+    p.x += p._vx * dt
+    p.y += p._vy * dt
+    p.alpha = p._life * 0.55
+    p.scale.set(1 + (1 - p._life) * 1.5)
+    return true
+  })
+}
+
+// ── Spark particles ──
+function showBrakeSparks() {
+  if (Math.random() > 0.15) return
+  const spark = new PIXI.Graphics()
+  spark.rect(-1, -2, 2, 4).fill({ color: 0xfbbf24 })
+  spark.x = trainContainer.x + 75
+  spark.y = trainContainer.y + 8
+  spark._vx = (Math.random() + 0.5) * 60
+  spark._vy = (Math.random() - 0.5) * 40
+  spark._life = 0.3
+  stage.addChild(spark)
+  sparkParticles.push(spark)
+}
+
+function updateSparks(dt) {
+  sparkParticles = sparkParticles.filter(s => {
+    s._life -= dt * 3
+    if (s._life <= 0) { stage.removeChild(s); return false }
+    s.x += s._vx * dt
+    s.y += s._vy * dt
+    s._vy += 200 * dt
+    s.alpha = s._life
+    s.rotation += 5 * dt
+    return true
+  })
+}
+
+function animateLights() {
+  // Global obstacle glow effect (placeholder for perf)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  QUIZ PANEL
+// ═══════════════════════════════════════════════════════════
+let quizActive = false
+let quizLocked = false
+
+function showQuizPanel(obs) {
+  if (quizActive) return
+  quizActive = true
+  quizLocked = false
+
+  const panel = document.getElementById('quiz-panel')
+  const qEl = document.getElementById('quiz-question')
+  const choicesEl = document.getElementById('quiz-choices')
+  const mercyEl = document.getElementById('mercy-bar')
+
+  qEl.textContent = obs.question.q
+  choicesEl.innerHTML = ''
+
+  // Build shuffled choices
+  const choices = [obs.question.ans, ...obs.question.wrong]
+  for (let i = choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [choices[i], choices[j]] = [choices[j], choices[i]]
+  }
+
+  choices.forEach(c => {
+    const btn = document.createElement('button')
+    btn.className = 'choice-btn'
+    btn.textContent = c
+    btn.onclick = () => onChoiceTap(btn, c, obs)
+    choicesEl.appendChild(btn)
+  })
+
+  // Mercy dots (3 chances)
+  mercyEl.innerHTML = ''
+  for (let m = 0; m < 3; m++) {
+    const dot = document.createElement('div')
+    dot.className = 'mercy-dot' + (m < obs.wrongCount ? ' used' : '')
+    mercyEl.appendChild(dot)
+  }
+
+  panel.classList.add('show')
+}
+
+function onChoiceTap(btn, choice, obs) {
+  if (quizLocked) return
+  quizLocked = true
+
+  if (choice === obs.question.ans) {
+    // Correct!
+    btn.classList.add('correct')
+    flashScreen('#00ff44', 0.35)
+    setTimeout(() => clearObstacle(obs), 380)
+  } else {
+    // Wrong
+    S.wrongTaps++
+    S.noWrongAnswers = false
+    obs.wrongCount++
+
+    btn.classList.add('wrong')
+    // Jolt train back slightly
+    trainContainer.x -= 15
+    setTimeout(() => { trainContainer.x += 15 }, 150)
+    flashScreen('#ff8800', 0.25)
+
+    // Update mercy dots
+    const dots = document.querySelectorAll('.mercy-dot')
+    dots.forEach((d, i) => { if (i < obs.wrongCount) d.classList.add('used') })
+
+    // Mercy: 3 wrong = auto clear
+    if (obs.wrongCount >= 3) {
+      setTimeout(() => clearObstacle(obs), 450)
+    } else {
+      setTimeout(() => { quizLocked = false }, 500)
+    }
+  }
+}
+
+function clearObstacle(obs) {
+  hideQuizPanel()
+  obs.cleared = true
+  S.cleared++
+  S.currentObstacleIdx = -1
+
+  // Explosion effect on obstacle
+  explodeObstacle(obs)
+
+  // Speed burst
+  S.trainState = 'BOOSTING'
+  S.boostTimer = 0.9
+  document.getElementById('speed-lines').style.opacity = '0.6'
+  setTimeout(() => { document.getElementById('speed-lines').style.opacity = '0' }, 700)
+
+  // Update counter
+  document.getElementById('obstacle-count').textContent = `🚧 ${S.cleared}/${S.totalObstacles}`
+
+  // Check win
+  if (S.cleared === S.totalObstacles) {
+    setTimeout(() => triggerWin(), 600)
+  }
+}
+
+function explodeObstacle(obs) {
+  if (!obs.container) return
+  // Spawn burst particles
+  for (let i = 0; i < 16; i++) {
+    const p = new PIXI.Graphics()
+    const isGreen = i % 2 === 0
+    p.circle(0, 0, 3 + Math.random() * 5).fill({ color: isGreen ? 0x4ade80 : 0xfbbf24 })
+    p.x = obs.container.x
+    p.y = obs.container.y - 40
+    const angle = (i / 16) * Math.PI * 2
+    const speed = 120 + Math.random() * 100
+    p._vx = Math.cos(angle) * speed
+    p._vy = Math.sin(angle) * speed - 60
+    p._life = 0.6 + Math.random() * 0.3
+    stage.addChild(p)
+    sparkParticles.push(p)
+  }
+
+  // Fade out obstacle
+  let alpha = 1
+  const fadeInterval = setInterval(() => {
+    alpha -= 0.15
+    if (obs.container) obs.container.alpha = Math.max(alpha, 0)
+    if (alpha <= 0) {
+      clearInterval(fadeInterval)
+      if (obs.container) stage.removeChild(obs.container)
+    }
+  }, 30)
+}
+
+function hideQuizPanel() {
+  quizActive = false
+  quizLocked = false
+  document.getElementById('quiz-panel').classList.remove('show')
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HUD UPDATE
+// ═══════════════════════════════════════════════════════════
+function updateHUD() {
+  document.getElementById('level-text').textContent = `Level ${S.level}`
+  document.getElementById('status-text').textContent = 'Selamatkan Kereta!'
+  document.getElementById('obstacle-count').textContent = `🚧 0/${S.totalObstacles}`
+}
+
+function updateHUDFrame() {
+  const W = app.screen.width
+  const progress = (S.trainX - W * 0.08) / (W * 0.97 - 40 - W * 0.08)
+  const pct = Math.min(Math.max(progress * 100, 0), 100)
+  document.getElementById('danger-fill').style.width = pct + '%'
+
+  // Change bar color at danger zones
+  const fill = document.getElementById('danger-fill')
+  if (pct > 75) fill.style.background = 'linear-gradient(90deg,#ef4444,#dc2626)'
+  else if (pct > 50) fill.style.background = 'linear-gradient(90deg,#fbbf24,#ef4444)'
+  else fill.style.background = 'linear-gradient(90deg,#86efac,#fbbf24,#ef4444)'
+
+  // Status text
+  if (S.trainState === 'BOOSTING') {
+    document.getElementById('status-text').textContent = '💨 TURBO!'
+  } else if (S.trainState === 'STOPPED') {
+    document.getElementById('status-text').textContent = '🚨 Jawab!'
+  } else if (pct > 70) {
+    document.getElementById('status-text').textContent = '⚠️ Bahaya!'
+  } else {
+    document.getElementById('status-text').textContent = '🚂 Melaju...'
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  WIN / LOSE
+// ═══════════════════════════════════════════════════════════
+function calcStars() {
+  const elapsed = (performance.now() - S.startTime) / 1000
+  const W = app.screen.width
+  // Estimate total time based on track + obstacles
+  const estimatedTime = (S.trackLength / (80 + S.level * 12)) * 1.4
+  const timeRatio = elapsed / estimatedTime
+
+  let stars = 3
+  if (S.cleared < S.totalObstacles) stars = 1  // some not cleared (mercy used extensively)
+  if (S.noWrongAnswers) stars = Math.min(stars + 1, 5)
+  if (timeRatio < 0.6) stars = Math.min(stars + 1, 5)
+  return Math.max(stars, 1)
+}
+
+function showWin() {
+  const stars = calcStars()
+  const starsStr = '⭐'.repeat(stars) + '☆'.repeat(5 - stars)
+  document.getElementById('win-stars').textContent = starsStr
+
+  let msg = 'Kereta Selamat! '
+  if (stars >= 5) msg += 'Sempurna! Tidak ada jawaban salah!'
+  else if (stars >= 4) msg += 'Luar biasa cepat!'
+  else if (stars >= 3) msg += 'Bagus sekali!'
+  else msg += 'Terus berlatih!'
+  document.getElementById('win-msg').textContent = msg
+
+  let title = 'Kereta Selamat! 🎉'
+  if (stars >= 5) title = 'SEMPURNA! 🏆'
+  else if (stars >= 4) title = 'Hebat Sekali! 🌟'
+  document.getElementById('win-title').textContent = title
+
+  try {
+    sessionStorage.setItem('g16Result', JSON.stringify({ stars, level: S.level, cleared: S.cleared, total: S.totalObstacles }))
+  } catch(_){}
+
+  document.getElementById('ovl-win').classList.add('show')
+}
+
+function showLose() {
+  document.getElementById('lose-msg').textContent =
+    `Kereta jatuh ke tebing! Bersihkan semua rintangan lebih cepat! (${S.cleared}/${S.totalObstacles} bersih)`
+
+  try {
+    sessionStorage.setItem('g16Result', JSON.stringify({ stars: 0, level: S.level, cleared: S.cleared, total: S.totalObstacles }))
+  } catch(_){}
+
+  document.getElementById('ovl-lose').classList.add('show')
+}
+
+// ═══════════════════════════════════════════════════════════
+//  VISUAL FX
+// ═══════════════════════════════════════════════════════════
+function flashScreen(color, alpha) {
+  const el = document.getElementById('flash')
+  el.style.background = color
+  el.style.opacity = alpha
+  setTimeout(() => { el.style.opacity = '0' }, 120)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goBack() {
+  if (document.referrer) history.back()
+  else window.location.href = '../index.html'
+}
+
+function confirmBack() {
+  if (!S.running || S.gameOver) { goBack(); return }
+  if (confirm('Keluar dari permainan?')) goBack()
+}
+
+function finishGame() { goBack() }
+
+function restartGame() {
+  // Full page reload preserves sessionStorage config
+  location.reload()
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  if (!app) return
+  app.renderer.resize(window.innerWidth, window.innerHeight)
+})
+
+initPixi()
+</script>
+</body>
+</html>

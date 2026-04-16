@@ -3974,15 +3974,51 @@ body { background: #0a0a1a !important; }
 }
 .g13b-kills.pop-kill { animation:g13bKillPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 @keyframes g13bKillPop { 0%{transform:scale(1)} 50%{transform:scale(1.35)} 100%{transform:scale(1)} }
-@keyframes g13cBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-.g13c-choice-btn { background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);color:white;font-family:'Fredoka One',cursive; }
-.g13c-choice-btn:active { transform:scale(0.9); }
-.g13c-choice-btn.correct { background:rgba(34,197,94,0.4);border-color:#22c55e;box-shadow:0 0 20px rgba(34,197,94,0.5); }
-.g13c-choice-btn.wrong { background:rgba(244,63,94,0.3);border-color:#f43f5e;animation:wrongShake 0.4s ease; }
-.g13c-letter-btn { border:3px solid rgba(255,255,255,0.15);border-radius:14px;background:rgba(255,255,255,0.07);color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;padding:10px 4px;text-align:center;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:2px; }
-.g13c-letter-btn:active { transform:scale(0.9); }
-.g13c-letter-btn.has-badge { border-color:#FCD34D;background:rgba(252,211,77,0.15); }
-.g13c-letter-btn .lbadge { font-size:10px; }
+/* === G13c Battle System === */
+.g13c-letter-btn{border:3px solid rgba(255,255,255,0.15);border-radius:14px;background:rgba(255,255,255,0.07);color:white;font-size:20px;font-weight:900;font-family:'Fredoka One',cursive;cursor:pointer;padding:10px 4px;text-align:center;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.g13c-letter-btn:active{transform:scale(0.9)}
+.g13c-letter-btn.has-badge{border-color:#FCD34D;background:rgba(252,211,77,0.15)}
+.g13c-letter-btn .lbadge{font-size:10px}
+/* Battle field */
+#g13c-battle-field{flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#87CEEB 0%,#B0E0FF 50%,#3a8a3a 50%,#2d6e2d 100%)}
+/* Info boxes */
+#g13c-enemy-info-box,#g13c-player-info-box{position:absolute;z-index:5;background:rgba(0,0,0,0.72);border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:6px 10px;min-width:155px;max-width:190px}
+#g13c-enemy-info-box{top:10px;left:10px}
+#g13c-player-info-box{bottom:10px;right:10px}
+.g13c-poke-name{font-size:13px;font-weight:900;color:white;font-family:'Fredoka One',cursive}
+.g13c-hp-row{display:flex;align-items:center;gap:4px;margin-top:3px}
+.g13c-hp-lbl{font-size:9px;font-weight:900;color:#4ade80;flex-shrink:0}
+.g13c-hp-bar-outer{flex:1;height:7px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden}
+.g13c-hp-bar-fill{height:100%;border-radius:3px;background:#4ade80;transition:width 0.5s ease}
+.g13c-hp-bar-fill.hp-yellow{background:#facc15}
+.g13c-hp-bar-fill.hp-red{background:#f43f5e;animation:hpDangerPulse 0.6s ease-in-out infinite alternate}
+@keyframes hpDangerPulse{to{filter:brightness(1.4)}}
+/* Sprites */
+#g13c-enemy-sprite-wrap{position:absolute;right:14%;top:5%;z-index:4}
+#g13c-enemy-img{width:min(110px,26vw);height:min(110px,26vw);object-fit:contain;image-rendering:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5))}
+#g13c-player-sprite-wrap{position:absolute;left:8%;bottom:2%;z-index:4}
+#g13c-player-img{width:min(90px,22vw);height:min(90px,22vw);object-fit:contain;image-rendering:auto;transform:scaleX(-1);filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5))}
+/* Letter badge */
+#g13c-letter-badge{position:absolute;top:10px;right:10px;z-index:6;background:rgba(252,211,77,0.92);border:3px solid #1a1a1a;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;color:#1a1a1a;box-shadow:0 0 18px rgba(252,211,77,0.7)}
+/* Battle message box */
+#g13c-battle-msgbox{flex-shrink:0;background:rgba(8,4,24,0.96);border-top:2px solid rgba(255,255,255,0.12);padding:8px 14px;min-height:44px;display:flex;align-items:center}
+#g13c-battle-msg{font-size:13px;font-weight:900;color:white;font-family:'Fredoka One',cursive;line-height:1.35}
+/* Move panel */
+#g13c-move-panel{flex-shrink:0;background:rgba(10,4,30,0.97);border-top:1.5px solid rgba(255,255,255,0.1);padding:7px 10px 10px}
+.g13c-move-header{font-size:9px;font-weight:900;color:rgba(255,255,255,0.35);letter-spacing:2px;text-align:center;margin-bottom:5px}
+#g13c-choices{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:400px;margin:0 auto}
+.g13c-move-btn{border:none;border-radius:14px;cursor:pointer;padding:9px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.18);color:white;font-family:'Fredoka One',cursive;transition:all 0.12s cubic-bezier(0.34,1.56,0.64,1);min-height:68px;-webkit-tap-highlight-color:transparent}
+.g13c-move-btn:active{transform:scale(0.88)}
+.g13c-move-btn.correct{background:rgba(34,197,94,0.45);border-color:#22c55e;box-shadow:0 0 16px rgba(34,197,94,0.55)}
+.g13c-move-btn.wrong{background:rgba(244,63,94,0.38);border-color:#f43f5e;animation:wrongShake 0.4s ease}
+/* Battle animations */
+@keyframes g13cPlayerAtk{0%{transform:scaleX(-1) translateX(0)} 40%{transform:scaleX(-1) translateX(-40px)} 100%{transform:scaleX(-1) translateX(0)}}
+@keyframes g13cEnemyFlinch{0%,100%{transform:translateX(0)} 25%{transform:translateX(-18px)} 50%{transform:translateX(12px)} 75%{transform:translateX(-8px)}}
+@keyframes g13cEnemyAtk{0%{transform:translateX(0)} 40%{transform:translateX(30px)} 100%{transform:translateX(0)}}
+@keyframes g13cPlayerFlinch{0%,100%{transform:scaleX(-1) translateX(0)} 25%{transform:scaleX(-1) translateX(14px)} 50%{transform:scaleX(-1) translateX(-9px)} 75%{transform:scaleX(-1) translateX(6px)}}
+@keyframes g13cHitFlash{0%,100%{filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5))} 50%{filter:brightness(10) saturate(0) drop-shadow(0 6px 14px rgba(0,0,0,0.5))}}
+/* HP number */
+.g13c-hp-num{font-size:9px;color:rgba(255,255,255,0.55);flex-shrink:0}
 /* HP bar (top-center, for legendary) */
 .g13b-hp-wrap {
   position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:10;
@@ -8786,8 +8822,7 @@ try { const s=localStorage.getItem('g13c_badges'); if(s) g13cState.badges=JSON.p
 
 function openGymGame() {
   playClick()
-  showScreen('screen-game13c')
-  g13cBuildLetterSelect()
+  window.location.href = 'games/g13c-pixi.html'
 }
 
 function g13cBuildLetterSelect() {
@@ -13642,6 +13677,22 @@ window.addEventListener('pageshow', function() {
       if (state.currentGame === 14) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
     } catch(_) {}
   }
+  const g15Raw = sessionStorage.getItem('g15Result')
+  if (g15Raw) {
+    try {
+      const r = JSON.parse(g15Raw)
+      sessionStorage.removeItem('g15Result'); sessionStorage.removeItem('g15Config')
+      if (state.currentGame === 15) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
+    } catch(_) {}
+  }
+  const g16Raw = sessionStorage.getItem('g16Result')
+  if (g16Raw) {
+    try {
+      const r = JSON.parse(g16Raw)
+      sessionStorage.removeItem('g16Result'); sessionStorage.removeItem('g16Config')
+      if (state.currentGame === 16) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
+    } catch(_) {}
+  }
 })
 
 // ================================================================
@@ -17232,20 +17283,8 @@ let g15State = {}
 function initGame15() {
   battleBgmStop()
   const lv = state.selectedLevelNum || 1
-  const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
-  const totalChains = diff === 'easy' ? 4 : diff === 'medium' ? 5 : 6
-  g15State = {
-    diff, lv, totalChains, chainsLeft: totalChains,
-    words: [...G15_WORDS[diff]].sort(()=>Math.random()-0.5),
-    wordIdx: 0, currentWord: '', currentEmoji: '',
-    collectedIdx: 0, usedTiles: [], running: true
-  }
-  document.getElementById('g15-level').textContent = `Lv.${lv}`
-  document.getElementById('g15-result').style.display = 'none'
-  const g15TrainEl = document.getElementById('g15-train-icon')
-  const g15Cfg = TRAIN_TYPES_14['caseyjr'] || TRAIN_TYPES_14['malivlakb250'] || G14_CATEGORIES[0].trains[0]
-  g15TrainEl.innerHTML = buildSteamLocoSVG(g15Cfg, {width:200, height:88, animate:true})
-  g15LoadWord()
+  try { sessionStorage.setItem('g15Config', JSON.stringify({ level: lv })) } catch(_) {}
+  window.location.href = 'games/g15-pixi.html'
 }
 
 function g15LoadWord() {
@@ -17377,6 +17416,11 @@ let g16State = {}
 
 function initGame16() {
   battleBgmStop()
+  const lv = state.selectedLevelNum || 1
+  try { sessionStorage.setItem('g16Config', JSON.stringify({ level: lv })) } catch(_) {}
+  window.location.href = 'games/g16-pixi.html'
+}
+function _initGame16_legacy() {
   const lv = state.selectedLevelNum || 1
   const diff = lv <= 7 ? 'easy' : lv <= 14 ? 'medium' : 'hard'
   g16State = {
