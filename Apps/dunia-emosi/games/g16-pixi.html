@@ -542,11 +542,11 @@ function drawHills(W,H){
       }
     }
     // Animal silhouettes on hills (sparse, random)
-    const animalSeed = (layerIdx * 7 + i * 13) % 31
+    const animalSeed = (tile * 7 + 13) % 31
     if (animalSeed < 8) {
       const ax = ox + W * (0.2 + (animalSeed % 5) * 0.15)
       const ay = tY - 4
-      const ac = layerIdx === 0 ? 0x0a0e1e : layerIdx === 1 ? 0x0e1428 : 0x121a30
+      const ac = 0x0a0e1e
       if (animalSeed < 3) {
         // Wolf silhouette
         g.poly([ax,ay, ax+4,ay-8, ax+8,ay-10, ax+14,ay-9, ax+18,ay-6, ax+20,ay-8, ax+22,ay-6, ax+20,ay, ax+14,ay-1, ax+8,ay]).fill({color:ac})
