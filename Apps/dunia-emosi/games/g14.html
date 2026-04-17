@@ -156,18 +156,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c0
   <div id="go-btn-wrap"><button id="go-btn" onclick="startRace()">🚦 Mulai Balapan!</button></div>
 </div>
 
-<!-- Finish -->
-<div class="ovl" id="ovl-fin">
-  <div class="ovl-card">
-    <span class="ovl-emoji" id="fin-emoji">🏆</span>
-    <div class="ovl-title" id="fin-title">Selesai!</div>
-    <div class="ovl-stars" id="fin-stars">⭐⭐⭐</div>
-    <div class="ovl-msg" id="fin-msg">Luar biasa!</div>
-    <button class="ovl-btn" onclick="finishGame()">Kembali 🏠</button>
-    <button class="ovl-btn sec" onclick="replayRace()">Main Lagi 🔄</button>
-    <button class="ovl-btn sec" onclick="showSelectScreen()">Ganti Kereta 🚂</button>
-  </div>
-</div>
+<script src="game-modal.js"></script>
 
 <div id="flash"></div>
 
@@ -1345,36 +1334,29 @@ function endRace() {
   S.running = false
   document.getElementById('quiz-ovl').style.display = 'none'
 
-  const frac = Math.min(1, S.distance / S.finishLine)
   const posScore = S.position === 1 ? 5 : S.position === 2 ? 3 : 1
-  const distScore = Math.round(frac * 3)
   const stars = Math.min(5, posScore - (LIVES_MAX - S.hp))
-
-  document.getElementById('fin-emoji').textContent = stars >= 4 ? '🏆' : stars >= 2 ? '🥈' : '😤'
-  document.getElementById('fin-title').textContent =
-    S.position === 1 ? 'Juara 1! 🏆' : S.position === 2 ? 'Posisi 2 🥈' : 'Posisi 3 🥉'
-  document.getElementById('fin-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars)
-  document.getElementById('fin-msg').textContent =
-    stars >= 4 ? 'Luar biasa! Kamu juaranya!' :
+  const emoji = stars >= 4 ? '🏆' : stars >= 2 ? '🥈' : '😤'
+  const title = S.position === 1 ? 'Juara 1!' : S.position === 2 ? 'Posisi 2' : 'Posisi 3'
+  const msg = stars >= 4 ? 'Luar biasa! Kamu juaranya!' :
     stars >= 2 ? `${Math.floor(S.distance)}m ditempuh, bagus!` :
     'Coba pilih kereta lebih cepat!'
 
-  document.getElementById('ovl-fin').classList.add('show')
+  GameModal.show({
+    emoji, title, stars, msg,
+    onAgain: () => startRace(),
+    onBack: () => goBack(),
+    onExtra: { label: 'Ganti Kereta 🚂', action: () => showSelectScreen() }
+  })
 
   try {
     sessionStorage.setItem('g14Result', JSON.stringify({ stars, distance: Math.floor(S.distance), position: S.position }))
   } catch(_) {}
 }
 
-function replayRace() {
-  document.getElementById('ovl-fin').classList.remove('show')
-  startRace()
-}
-
 function showSelectScreen() {
   S.running = false
   document.getElementById('quiz-ovl').style.display = 'none'
-  document.getElementById('ovl-fin').classList.remove('show')
   const so = document.getElementById('select-ovl')
   so.style.display = 'flex'
   showCategories()

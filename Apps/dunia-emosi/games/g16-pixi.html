@@ -153,25 +153,7 @@ canvas.ts-preview{border-radius:8px;max-width:100%}
   <button id="ts-back" onclick="goBack()">◀ Kembali</button>
 </div>
 
-<div class="ovl" id="ovl-win">
-  <div class="ovl-card">
-    <span class="ovl-emoji">🏆</span>
-    <div class="ovl-title" id="win-title">Kereta Selamat!</div>
-    <div class="ovl-stars" id="win-stars">⭐⭐⭐</div>
-    <div class="ovl-msg" id="win-msg">Hebat sekali!</div>
-    <button class="ovl-btn" onclick="finishGame()">Kembali 🏠</button>
-    <button class="ovl-btn sec" onclick="restartGame()">Main Lagi 🔄</button>
-  </div>
-</div>
-<div class="ovl" id="ovl-lose">
-  <div class="ovl-card">
-    <span class="ovl-emoji">💥</span>
-    <div class="ovl-title">Kereta Jatuh!</div>
-    <div class="ovl-msg" id="lose-msg">Kereta mencapai tebing... Coba lagi!</div>
-    <button class="ovl-btn danger" onclick="restartGame()">Coba Lagi 🔄</button>
-    <button class="ovl-btn sec" onclick="finishGame()">Kembali 🏠</button>
-  </div>
-</div>
+<script src="game-modal.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script>
@@ -1332,17 +1314,21 @@ function calcStars(){
 }
 function showWin(){
   const stars=calcStars()
-  document.getElementById('win-stars').textContent='⭐'.repeat(stars)+'☆'.repeat(5-stars)
-  const msgs=['','','','Bagus sekali!','Luar biasa cepat!','SEMPURNA! 🏆']
-  document.getElementById('win-msg').textContent=msgs[stars]||'Terus berlatih!'
-  document.getElementById('win-title').textContent=stars>=5?'SEMPURNA! 🏆':stars>=4?'Hebat Sekali! 🌟':'Kereta Selamat! 🎉'
+  const msgs=['','','','Bagus sekali!','Luar biasa cepat!','SEMPURNA!']
+  const title=stars>=5?'SEMPURNA!':stars>=4?'Hebat Sekali!':'Kereta Selamat!'
   try{sessionStorage.setItem('g16Result',JSON.stringify({stars,level:S.level,cleared:S.cleared,total:S.totalObstacles}))}catch(_){}
-  document.getElementById('ovl-win').classList.add('show')
+  GameModal.show({
+    emoji:'🏆', title, stars, msg:msgs[stars]||'Terus berlatih!',
+    onAgain:()=>restartGame(), onBack:()=>finishGame()
+  })
 }
 function showLose(){
-  document.getElementById('lose-msg').textContent=`Kereta jatuh ke tebing! (${S.cleared}/${S.totalObstacles} rintangan bersih)`
   try{sessionStorage.setItem('g16Result',JSON.stringify({stars:0,level:S.level}))}catch(_){}
-  document.getElementById('ovl-lose').classList.add('show')
+  GameModal.show({
+    emoji:'💥', title:'Kereta Jatuh!', stars:0,
+    msg:`Kereta jatuh ke tebing! (${S.cleared}/${S.totalObstacles} rintangan bersih)`,
+    onAgain:()=>restartGame(), onBack:()=>finishGame()
+  })
 }
 
 // ── Arrival Station ───────────────────────────────────────────────────────────

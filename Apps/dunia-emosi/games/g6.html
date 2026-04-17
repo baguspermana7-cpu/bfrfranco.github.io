@@ -125,27 +125,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a0a1
   </div>
 </div>
 
-<!-- Game over -->
-<div class="ovl" id="ovl-go">
-  <div class="ovl-card">
-    <span class="ovl-emoji">💔</span>
-    <div class="ovl-title">Game Over!</div>
-    <div class="ovl-msg">Kehabisan nyawa. Coba lagi?</div>
-    <button class="ovl-btn" onclick="restartGame()">Coba Lagi 🔄</button>
-    <button class="ovl-btn sec" onclick="goBack()">Keluar</button>
-  </div>
-</div>
-
-<!-- Finish -->
-<div class="ovl" id="ovl-fin">
-  <div class="ovl-card">
-    <span class="ovl-emoji">🏆</span>
-    <div class="ovl-title">Selesai!</div>
-    <div class="ovl-stars" id="fin-stars">⭐⭐⭐⭐⭐</div>
-    <div class="ovl-msg" id="fin-msg">Luar biasa!</div>
-    <button class="ovl-btn" onclick="finishGame()">Kembali 🏠</button>
-  </div>
-</div>
+<script src="game-modal.js"></script>
 
 <div id="flash"></div>
 
@@ -862,11 +842,17 @@ function nextWord() {
 
 function showGameOver() {
   S.running = false
-  document.getElementById('ovl-go').classList.add('show')
+  GameModal.show({
+    emoji: '💔',
+    title: 'Game Over!',
+    stars: 1,
+    msg: 'Kehabisan nyawa. Coba lagi?',
+    onAgain: () => restartGame(),
+    onBack: () => goBack()
+  })
 }
 
 function restartGame() {
-  document.getElementById('ovl-go').classList.remove('show')
   S.lives = LIVES_MAX
   S.score = 0
   S.wordIdx = 0
@@ -876,20 +862,22 @@ function restartGame() {
   S.tiles.forEach(t => { t._alive = false })
   S.fx = []; S.exhaust = []
   updateHUD()
-  // Show vehicle selector again
   document.getElementById('ovl-start').classList.add('show')
 }
 
 function showFinish() {
   S.running = false
   const stars = Math.round((S.wordsDone / S.totalWords) * 5)
-  const starsStr = '⭐'.repeat(stars) + '☆'.repeat(5 - stars)
-  document.getElementById('fin-stars').textContent = starsStr
-  document.getElementById('fin-msg').textContent =
-    stars >= 5 ? 'Sempurna! Kamu bintang! 🌟' :
+  const msg = stars >= 5 ? 'Sempurna! Kamu bintang!' :
     stars >= 3 ? 'Bagus sekali! Terus berlatih!' : 'Coba lagi untuk nilai lebih baik!'
-  document.getElementById('ovl-fin').classList.add('show')
-
+  GameModal.show({
+    emoji: '🏆',
+    title: 'Selesai!',
+    stars,
+    msg,
+    onAgain: () => restartGame(),
+    onBack: () => goBack()
+  })
   try {
     sessionStorage.setItem('g6Result', JSON.stringify({ stars, score: S.score, wordsDone: S.wordsDone }))
   } catch(_) {}

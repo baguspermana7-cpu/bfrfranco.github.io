@@ -176,17 +176,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
   </div>
 </div>
 
-<!-- Win/Lose overlay -->
-<div class="ovl" id="end-ovl">
-  <div class="ovl-card">
-    <span class="ovl-emoji" id="end-emoji">🏆</span>
-    <div class="ovl-title" id="end-title">Hore!</div>
-    <div class="ovl-msg" id="end-msg">Kamu berhasil!</div>
-    <div class="ovl-stars" id="end-stars">⭐⭐⭐</div>
-    <button class="ovl-btn" onclick="restartGame()">🔄 Ulang</button>
-    <button class="ovl-btn sec" onclick="goBack()">🏠 Selesai</button>
-  </div>
-</div>
+<script src="game-modal.js"></script>
 
 <!-- Train Select Screen -->
 <div id="train-select">
@@ -1478,28 +1468,25 @@ function showWin() {
   if (timeBonus) s = Math.min(5, s + 1);
   if (mathCorrect >= 2) s = Math.min(5, s + 1);
   sessionStorage.setItem('g15Result', JSON.stringify({ stars: Math.min(5, s) }));
-  document.getElementById('end-emoji').textContent = '🏆';
-  document.getElementById('end-title').textContent = 'Hore! Berhasil!';
-  document.getElementById('end-msg').textContent =
-    wrongTaps === 0
-      ? `Sempurna! Tidak ada kesalahan! Soal Matematika Benar: ${mathCorrect} 🎉`
-      : `${wrongTaps} kesalahan. Matematika benar: ${mathCorrect}. Terus berlatih!`;
-  document.getElementById('end-stars').textContent = '⭐'.repeat(s) + '☆'.repeat(5 - s);
-  document.getElementById('end-ovl').classList.add('show');
+  const msg = wrongTaps === 0
+    ? `Sempurna! Tidak ada kesalahan! Matematika Benar: ${mathCorrect}`
+    : `${wrongTaps} kesalahan. Matematika benar: ${mathCorrect}. Terus berlatih!`;
+  GameModal.show({
+    emoji: '🏆', title: 'Hore! Berhasil!', stars: Math.min(5, s), msg,
+    onAgain: () => restartGame(), onBack: () => goBack()
+  });
 }
 
 function showLose() {
   gameRunning = false;
   sessionStorage.setItem('g15Result', JSON.stringify({ stars: 1 }));
-  document.getElementById('end-emoji').textContent = '💔';
-  document.getElementById('end-title').textContent = 'Habis Nyawa!';
-  document.getElementById('end-msg').textContent = 'Jangan menyerah, coba lagi!';
-  document.getElementById('end-stars').textContent = '⭐☆☆☆☆';
-  document.getElementById('end-ovl').classList.add('show');
+  GameModal.show({
+    emoji: '💔', title: 'Habis Nyawa!', stars: 1, msg: 'Jangan menyerah, coba lagi!',
+    onAgain: () => restartGame(), onBack: () => goBack()
+  });
 }
 
 function restartGame() {
-  document.getElementById('end-ovl').classList.remove('show');
   document.getElementById('math-quiz').classList.remove('show');
   clearTimeout(mathTimerRaf);
   app.destroy(false, { children: true });
