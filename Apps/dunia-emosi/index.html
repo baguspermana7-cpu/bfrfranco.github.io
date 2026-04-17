@@ -4286,7 +4286,7 @@ body { background: #0a0a1a !important; }
 .g13b-streak-dot.active { background:#FBBF24; transform:scale(1.25); box-shadow:0 0 7px rgba(251,191,36,0.85); }
 /* Result overlay — covers full game screen */
 .g13b-result-overlay {
-  position:absolute; inset:0; z-index:50;
+  position:fixed; inset:0; z-index:500;
   background:linear-gradient(160deg,rgba(3,7,20,0.97),rgba(20,10,40,0.98));
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   padding:20px; gap:8px;
@@ -6771,7 +6771,7 @@ body { background: #0a0a1a !important; }
   </div>
 
   <!-- Result overlay -->
-  <div id="g13c-result-overlay" style="display:none;position:absolute;inset:0;z-index:30;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+  <div id="g13c-result-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;gap:8px;">
     <div style="font-size:56px;" id="g13c-res-icon">🏅</div>
     <div style="font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;color:white;" id="g13c-res-title">Gym Selesai!</div>
     <div id="g13c-res-badge" style="font-size:36px;letter-spacing:4px;"></div>
@@ -6914,7 +6914,7 @@ body { background: #0a0a1a !important; }
     </div>
 
     <!-- Result overlay -->
-    <div id="g14-result-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:10px;backdrop-filter:blur(6px);">
+    <div id="g14-result-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:500;gap:10px;backdrop-filter:blur(6px);">
       <div id="g14-res-icon" style="font-size:56px;">🏆</div>
       <div id="g14-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
       <div id="g14-res-stars" style="font-size:28px;letter-spacing:3px;"></div>
@@ -9022,17 +9022,17 @@ function openLevelSelect(gameNum) {
   // Progress bar
   const completed = gp.completed.length
   const totalStars = Object.values(gp.stars||{}).reduce((a,b)=>a+b,0)
-  const totalLevels = state.currentGame === 13 ? 40 : 20
+  const totalLevels = (state.currentGame === 13 || state.currentGame === 16) ? 40 : 20
   document.getElementById('level-prog-txt').textContent = `${completed} / ${totalLevels} level selesai`
   document.getElementById('level-prog-fill').style.width = (completed/totalLevels*100) + '%'
   document.getElementById('level-total-stars').textContent = '⭐ ' + totalStars
 
   // Per-tier dot colors + star count
-  const numTiers = state.currentGame === 13 ? 8 : 4
+  const numTiers = (state.currentGame === 13 || state.currentGame === 16) ? 8 : 4
   // Show/hide extended tiers
   for (let t = 5; t <= 8; t++) {
     const tc2 = document.getElementById('level-tier-'+t)
-    if (tc2) tc2.style.display = state.currentGame === 13 ? '' : 'none'
+    if (tc2) tc2.style.display = (state.currentGame === 13 || state.currentGame === 16) ? '' : 'none'
   }
   for (let tier = 1; tier <= numTiers; tier++) {
     const dotsEl = document.getElementById('level-dots-'+tier)
