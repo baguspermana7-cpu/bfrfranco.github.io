@@ -481,16 +481,12 @@ function buildCar() {
   carGlow.alpha = 0.38
   carContainer.addChild(carGlow)
 
-  // Car sprite — try SVG texture, fallback to emoji
-  try {
-    const tex = PIXI.Texture.from('../assets/car and vehicle/racecar-icon.svg')
-    carSprite = new PIXI.Sprite(tex)
-    carSprite.width = 56; carSprite.height = 38
-    carSprite.anchor.set(0.5, 1)
-  } catch(_) {
-    carSprite = new PIXI.Text({ text: cfg.playerIcon || '🚗', style: { fontSize: 46, fontFamily: 'Arial' } })
-    carSprite.anchor.set(0.5, 1)
-  }
+  // Car sprite — selected vehicle emoji (top-down game)
+  carSprite = new PIXI.Text({
+    text: cfg.playerIcon || '🚗',
+    style: { fontSize: 52, fontFamily: 'Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Arial' }
+  })
+  carSprite.anchor.set(0.5, 1)
   carContainer.addChild(carSprite)
 
   // Headlight left
