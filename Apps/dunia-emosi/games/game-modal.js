@@ -10,19 +10,19 @@ const GameModal = (() => {
 
     const css = document.createElement('style');
     css.textContent = `
-      #gm-overlay{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px)}
+      #gm-overlay{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(15,10,30,0.78);backdrop-filter:blur(14px)}
       #gm-overlay.show{display:flex}
-      #gm-card{background:linear-gradient(160deg,#1e0845,#2d1b69);border:2px solid rgba(139,92,246,0.6);border-radius:28px;padding:28px 24px;text-align:center;width:min(360px,92vw);box-shadow:0 20px 60px rgba(139,92,246,0.35);animation:gmSlideIn .4s ease}
-      @keyframes gmSlideIn{from{opacity:0;transform:scale(0.85) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
+      #gm-card{background:linear-gradient(160deg,#f8f0ff,#ede2f6);border:2px solid rgba(180,160,220,0.45);border-radius:28px;padding:32px 24px;text-align:center;width:min(340px,92vw);box-shadow:0 16px 48px rgba(100,60,160,0.18);animation:gmSlideIn .4s cubic-bezier(.34,1.56,.64,1)}
+      @keyframes gmSlideIn{from{opacity:0;transform:scale(0.88) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
       #gm-emoji{font-size:56px;margin-bottom:4px}
-      #gm-title{font-size:28px;font-weight:900;color:#fff;margin-bottom:8px;font-family:'Fredoka One',sans-serif}
-      #gm-stars{font-size:36px;letter-spacing:4px;margin-bottom:8px}
-      #gm-msg{color:rgba(233,213,255,0.8);font-size:15px;margin-bottom:20px}
-      #gm-btns{display:flex;flex-direction:column;gap:10px}
+      #gm-title{font-size:26px;font-weight:900;color:#3b2066;margin-bottom:8px;font-family:'Fredoka One',sans-serif}
+      #gm-stars{font-size:34px;letter-spacing:4px;margin-bottom:8px}
+      #gm-msg{color:#6b5080;font-size:14px;margin-bottom:20px;line-height:1.5}
+      #gm-btns{display:flex;flex-direction:column;gap:8px}
       .gm-btn{display:block;width:100%;padding:14px;border:none;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Fredoka One',sans-serif;-webkit-tap-highlight-color:transparent;transition:transform .1s}
       .gm-btn:active{transform:scale(0.93)}
-      .gm-btn-primary{background:linear-gradient(160deg,#7C3AED,#6D28D9);color:#fff;box-shadow:0 5px 0 #4C1D95}
-      .gm-btn-secondary{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.25)}
+      .gm-btn-primary{background:linear-gradient(160deg,#a78bfa,#8b5cf6);color:#fff;box-shadow:0 4px 0 #6d28d9}
+      .gm-btn-secondary{background:rgba(139,92,246,0.06);color:#6b5080;border:1.5px solid rgba(139,92,246,0.22)}
     `;
     document.head.appendChild(css);
 

@@ -3654,18 +3654,20 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 }
 @keyframes g13ParticleFloat{0%{transform:translateY(0) rotate(0deg);opacity:0.9}100%{transform:translateY(-100vh) rotate(360deg);opacity:0}}
 
-/* ===== G13 Result screen ===== */
-.g13-result-overlay{
-  position:fixed;inset:0;z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
-}
-.g13-result-card{
-  background:linear-gradient(135deg,#1E2A4A,#0D1226);
-  border:2px solid rgba(249,115,22,0.4);
-  border-radius:28px;padding:28px 24px;width:min(90vw,340px);
-  text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(249,115,22,0.15);
-}
+/* ===== Unified Game Result Overlay (G13-G18) ===== */
+.gr-overlay{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(15,10,30,0.78);backdrop-filter:blur(14px)}
+.gr-overlay.show{display:flex}
+@keyframes grSlideIn{from{opacity:0;transform:scale(0.88) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.gr-card{background:linear-gradient(160deg,#f8f0ff,#ede2f6);border:2px solid rgba(180,160,220,0.45);border-radius:28px;padding:32px 24px;width:min(340px,90vw);text-align:center;box-shadow:0 16px 48px rgba(100,60,160,0.18);animation:grSlideIn .4s cubic-bezier(.34,1.56,.64,1)}
+.gr-emoji{font-size:56px;margin-bottom:4px}
+.gr-title{font-size:26px;font-weight:900;color:#3b2066;margin-bottom:8px;font-family:'Fredoka One',cursive}
+.gr-stars{font-size:34px;letter-spacing:4px;margin-bottom:8px}
+.gr-msg{color:#6b5080;font-size:14px;margin-bottom:20px;line-height:1.5}
+.gr-btns{display:flex;flex-direction:column;gap:8px}
+.gr-btn{display:block;width:100%;padding:14px;border:none;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Fredoka One',cursive;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.gr-btn:active{transform:scale(0.93)}
+.gr-btn-primary{background:linear-gradient(160deg,#a78bfa,#8b5cf6);color:#fff;box-shadow:0 4px 0 #6d28d9}
+.gr-btn-secondary{background:rgba(139,92,246,0.06);color:#6b5080;border:1.5px solid rgba(139,92,246,0.22)}
 
 /* AAA overrides for game 10/11/12/13 screens */
 #screen-game10, #screen-game11, #screen-game12, #screen-game13 {
@@ -6606,18 +6608,7 @@ body { background: #0a0a1a !important; }
     <div class="g13-evo-particles" id="g13-evo-particles"></div>
   </div>
 
-  <!-- Result overlay -->
-  <div class="g13-result-overlay" id="g13-result-overlay" style="display:none;">
-    <div class="g13-result-card">
-      <div style="font-size:52px;margin-bottom:6px;" id="g13-result-icon">🏆</div>
-      <div style="font-size:24px;font-weight:900;color:white;font-family:'Fredoka One',cursive;margin-bottom:4px;" id="g13-result-title">Menang!</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:12px;" id="g13-result-subtitle"></div>
-      <div style="font-size:30px;letter-spacing:2px;margin-bottom:18px;" id="g13-result-stars">⭐⭐⭐☆☆</div>
-      <button id="g13-next-btn" onclick="playClick();startGameWithLevel((g13State.lv||1)+1)" style="width:100%;padding:13px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:16px;font-size:17px;font-weight:900;color:white;cursor:pointer;font-family:'Fredoka One',cursive;margin-bottom:8px;display:none;">Level Berikutnya ➡️</button>
-      <button onclick="playClick();initGame13()" style="width:100%;padding:13px;background:linear-gradient(135deg,#F97316,#FBBF24);border:none;border-radius:16px;font-size:17px;font-weight:900;color:#1a1a1a;cursor:pointer;font-family:'Fredoka One',cursive;margin-bottom:8px;">Coba Lagi 🔄</button>
-      <button onclick="playClick();exitGame()" style="width:100%;padding:11px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;font-size:15px;font-weight:700;color:white;cursor:pointer;font-family:'Fredoka One',cursive;">⌂ Menu</button>
-    </div>
-  </div>
+  <!-- G13 uses shared #game-result-overlay -->
 
   <!-- FX burst -->
   <div class="g10-burst-fx" id="g13-burst-fx"></div>
@@ -6770,17 +6761,7 @@ body { background: #0a0a1a !important; }
     <div id="g13c-feedback" style="height:28px;font-size:15px;font-weight:900;text-align:center;"></div>
   </div>
 
-  <!-- Result overlay -->
-  <div id="g13c-result-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;gap:8px;">
-    <div style="font-size:56px;" id="g13c-res-icon">🏅</div>
-    <div style="font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;color:white;" id="g13c-res-title">Gym Selesai!</div>
-    <div id="g13c-res-badge" style="font-size:36px;letter-spacing:4px;"></div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.6);" id="g13c-res-sub">Kamu mendapat badge!</div>
-    <div style="display:flex;gap:10px;margin-top:8px;">
-      <button onclick="g13cNextLetter()" style="background:linear-gradient(135deg,#2E7D32,#66BB6A);color:white;border:none;border-radius:16px;padding:12px 20px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Fredoka One',cursive;">Gym Lain 🏅</button>
-      <button onclick="exitGame()" style="background:rgba(255,255,255,0.1);color:white;border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;padding:12px 20px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Fredoka One',cursive;">⌂ Beranda</button>
-    </div>
-  </div>
+  <!-- G13C uses shared #game-result-overlay -->
 </div>
 
 <!-- GAME 14 — Balapan Kereta -->
@@ -6913,18 +6894,7 @@ body { background: #0a0a1a !important; }
       </div>
     </div>
 
-    <!-- Result overlay -->
-    <div id="g14-result-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:500;gap:10px;backdrop-filter:blur(6px);">
-      <div id="g14-res-icon" style="font-size:56px;">🏆</div>
-      <div id="g14-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
-      <div id="g14-res-stars" style="font-size:28px;letter-spacing:3px;"></div>
-      <div id="g14-res-info" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;text-align:center;padding:0 24px;max-width:300px;"></div>
-      <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;margin-top:6px;">
-        <button id="g14-next-btn" onclick="playClick();startGameWithLevel((state.selectedLevelNum||1)+1)" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;width:100%;">Level Berikutnya ➡️</button>
-        <button onclick="playClick();g14Replay()" style="background:#E63946;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;width:100%;">🔄 Coba Lagi</button>
-        <button onclick="playClick();endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;width:100%;">⌂ Menu</button>
-      </div>
-    </div>
+    <!-- G14 uses shared #game-result-overlay -->
   </div>
 
   <!-- Controls bar — redesigned -->
@@ -6988,17 +6958,7 @@ body { background: #0a0a1a !important; }
     <!-- Letter tiles -->
     <div id="g15-letters" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px;max-width:380px;margin-top:8px;padding-bottom:max(env(safe-area-inset-bottom,0px),16px);"></div>
   </div>
-  <!-- Result overlay -->
-  <div id="g15-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:12px;">
-    <div id="g15-res-icon" style="font-size:64px;">🎉</div>
-    <div id="g15-res-title" style="color:white;font-size:24px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
-    <div id="g15-res-stars" style="font-size:32px;"></div>
-    <div id="g15-res-sub" style="color:rgba(255,255,255,0.75);font-size:14px;font-weight:700;text-align:center;padding:0 24px;"></div>
-    <div style="display:flex;gap:10px;margin-top:6px;">
-      <button onclick="initGame15()" style="background:#2196F3;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
-      <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
-    </div>
-  </div>
+  <!-- G15 uses shared #game-result-overlay -->
 </div>
 
 <!-- GAME 16 — Selamatkan Kereta -->
@@ -7075,17 +7035,7 @@ body { background: #0a0a1a !important; }
       <div style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;line-height:1.6;">1️⃣ Lempar kait di zona hijau<br>2️⃣ Ketuk TARIK! sekeras mungkin<br>3️⃣ Selamatkan sebelum jatuh ke jurang!</div>
       <button onclick="g16BeginGame()" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #4A148C;cursor:pointer;margin-top:4px;">🆘 MULAI!</button>
     </div>
-    <!-- Result overlay -->
-    <div id="g16-result" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:12px;padding:20px;">
-      <div id="g16-res-icon" style="font-size:60px;">🎉</div>
-      <div id="g16-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;text-align:center;"></div>
-      <div id="g16-res-stars" style="font-size:30px;"></div>
-      <div id="g16-res-info" style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:700;text-align:center;"></div>
-      <div style="display:flex;gap:10px;margin-top:6px;">
-        <button onclick="initGame16()" style="background:#7B1FA2;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
-        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
-      </div>
-    </div>
+    <!-- G16 uses shared #game-result-overlay -->
   </div>
 </div>
 
@@ -7140,17 +7090,7 @@ body { background: #0a0a1a !important; }
       <div style="color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;line-height:1.7;">🔨 Ketuk balok yang MENYALA<br>⚡ Makin cepat makin bagus!<br>❤️ 3 nyawa — jangan salah ketuk!</div>
       <button onclick="g17StartGame()" style="background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:14px;padding:14px 32px;font-size:18px;font-weight:900;font-family:'Fredoka One',cursive;box-shadow:0 4px 0 #1B5E20;cursor:pointer;margin-top:4px;">🔨 MULAI!</button>
     </div>
-    <!-- Result overlay -->
-    <div id="g17-result" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);flex-direction:column;align-items:center;justify-content:center;z-index:60;gap:12px;padding:20px;">
-      <div id="g17-res-icon" style="font-size:60px;">🎉</div>
-      <div id="g17-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;text-align:center;"></div>
-      <div id="g17-res-stars" style="font-size:30px;"></div>
-      <div id="g17-res-info" style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:700;text-align:center;line-height:1.6;"></div>
-      <div style="display:flex;gap:10px;margin-top:6px;">
-        <button onclick="initGame17()" style="background:#2E7D32;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
-        <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
-      </div>
-    </div>
+    <!-- G17 uses shared #game-result-overlay -->
   </div>
   <!-- Bottom instruction bar — enhanced -->
   <div id="g17-instruction" style="padding:12px 16px;background:linear-gradient(180deg,rgba(10,25,5,0.95),rgba(5,15,2,0.98));border-top:2.5px solid rgba(67,160,71,0.6);flex-shrink:0;text-align:center;color:rgba(255,255,255,0.9);font-size:13px;font-weight:800;letter-spacing:0.3px;">
@@ -7209,17 +7149,7 @@ body { background: #0a0a1a !important; }
       <button onclick="g18CloseModal()" style="background:linear-gradient(135deg,#5D3A1A,#8D6E63);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;width:100%;">✅ Mengerti!</button>
     </div>
   </div>
-  <!-- Result overlay -->
-  <div id="g18-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);flex-direction:column;align-items:center;justify-content:center;z-index:300;gap:12px;padding:20px;text-align:center;">
-    <div id="g18-res-icon" style="font-size:64px;">🏆</div>
-    <div id="g18-res-title" style="color:white;font-size:22px;font-weight:900;font-family:'Fredoka One',cursive;"></div>
-    <div id="g18-res-stars" style="font-size:32px;"></div>
-    <div id="g18-res-info" style="color:rgba(255,255,255,0.75);font-size:14px;font-weight:700;line-height:1.7;"></div>
-    <div style="display:flex;gap:10px;margin-top:6px;">
-      <button onclick="initGame18()" style="background:#6A1B9A;color:white;border:none;border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">🔄 Ulang</button>
-      <button onclick="endGameFromOverlay()" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer;">✅ Selesai</button>
-    </div>
-  </div>
+  <!-- G18 uses shared #game-result-overlay -->
 </div>
 
 <!-- LEVEL SELECT — Per-game landing page with 20 progressive levels -->
@@ -7312,6 +7242,17 @@ body { background: #0a0a1a !important; }
       </div>
       <div class="lvl-tier-body" id="level-dots-8"></div>
     </div>
+  </div>
+</div>
+
+<!-- SHARED GAME RESULT OVERLAY (G13-G18) — soft palette -->
+<div id="game-result-overlay" class="gr-overlay">
+  <div class="gr-card">
+    <div class="gr-emoji" id="gr-emoji">🏆</div>
+    <div class="gr-title" id="gr-title">Menang!</div>
+    <div class="gr-stars" id="gr-stars"></div>
+    <div class="gr-msg" id="gr-msg"></div>
+    <div class="gr-btns" id="gr-btns"></div>
   </div>
 </div>
 
@@ -8829,7 +8770,7 @@ function g13cBuildLetterSelect() {
   grid.innerHTML = ''
   document.getElementById('g13c-letter-select').style.display = 'flex'
   document.getElementById('g13c-game-area').style.display = 'none'
-  document.getElementById('g13c-result-overlay').style.display = 'none'
+  hideGameResult()
   const totalBadges = Object.values(g13cState.badges).filter(Boolean).length
   document.getElementById('g13c-badge-count').textContent = `🏅 ${totalBadges}`
   G13C_LETTERS_ORDER.forEach(l => {
@@ -8850,7 +8791,7 @@ function g13cStartGym(letter) {
   const bg = G13C_BG_POOL[Math.floor(Math.random() * G13C_BG_POOL.length)]
   document.getElementById('g13c-gym-bg').style.backgroundImage = `url('${bg}')`
   document.getElementById('g13c-letter-select').style.display = 'none'
-  document.getElementById('g13c-result-overlay').style.display = 'none'
+  hideGameResult()
   const ga = document.getElementById('g13c-game-area')
   ga.style.display = 'flex'
   const slug = G13C_GYM_POKEMON[letter] || 'pikachu'
@@ -8939,16 +8880,22 @@ function g13cShowResult() {
     setLevelComplete('13c', 1, badge==='gold'?3:badge==='silver'?2:1)
     saveStars()
   }
-  const ro = document.getElementById('g13c-result-overlay')
-  document.getElementById('g13c-res-icon').textContent = pct >= 1 ? '🏆' : pct >= 0.6 ? '🏅' : '💪'
-  document.getElementById('g13c-res-title').textContent = pct >= 1 ? 'Sempurna! 🌟' : pct >= 0.6 ? 'Gym Selesai!' : 'Coba Lagi!'
-  document.getElementById('g13c-res-badge').textContent = badge === 'gold' ? '🥇🥇🥇' : badge === 'silver' ? '🥈🥈' : badge === 'bronze' ? '🥉' : '😅'
-  document.getElementById('g13c-res-sub').textContent = `${s.correct}/${s.total} benar — Huruf ${s.letter} ${badge ? 'badge ' + badge + '!' : '— latih lagi!'}`
-  ro.style.display = 'flex'
+  const emoji = pct >= 1 ? '🏆' : pct >= 0.6 ? '🏅' : '💪'
+  const title = pct >= 1 ? 'Sempurna!' : pct >= 0.6 ? 'Gym Selesai!' : 'Coba Lagi!'
+  const badgeDisplay = badge === 'gold' ? '🥇🥇🥇' : badge === 'silver' ? '🥈🥈' : badge === 'bronze' ? '🥉' : '😅'
+  const stars = badge === 'gold' ? 5 : badge === 'silver' ? 3 : badge === 'bronze' ? 2 : 1
+  showGameResult({
+    emoji, title, stars,
+    msg: `${badgeDisplay}\n${s.correct}/${s.total} benar — Huruf ${s.letter} ${badge ? 'badge ' + badge + '!' : '— latih lagi!'}`,
+    buttons: [
+      {label:'Gym Lain 🏅', action:()=>g13cNextLetter()},
+      {label:'Kembali ⌂', action:()=>exitGame()}
+    ]
+  })
 }
 
 function g13cNextLetter() {
-  document.getElementById('g13c-result-overlay').style.display = 'none'
+  hideGameResult()
   g13cBuildLetterSelect()
 }
 
@@ -9395,7 +9342,7 @@ function clearTimers() {
   if(state.breatheInterval){clearInterval(state.breatheInterval);state.breatheInterval=null}
   if(state.g4Timer){clearInterval(state.g4Timer);state.g4Timer=null}
   if(g6State && g6State.animFrame){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
-  if(g13ResultTimeout){clearTimeout(g13ResultTimeout);g13ResultTimeout=null;const ro=document.getElementById('g13-result-overlay');if(ro)ro.style.display='none'}
+  if(g13ResultTimeout){clearTimeout(g13ResultTimeout);g13ResultTimeout=null;hideGameResult()}
   if(g9Canvas){
     g9Canvas.removeEventListener('mousedown',g9StartDraw)
     g9Canvas.removeEventListener('mousemove',g9Draw)
@@ -14563,8 +14510,7 @@ function g13PickChain(lv) {
 
 function initGame13() {
   if (g13ResultTimeout) { clearTimeout(g13ResultTimeout); g13ResultTimeout = null }
-  const ro = document.getElementById('g13-result-overlay')
-  if (ro) ro.style.display = 'none'
+  hideGameResult()
   const dbg = document.getElementById('g13-debug-err')
   if (dbg) dbg.style.display = 'none'
   // Init Pixi GPU canvas for evolution FX
@@ -14614,7 +14560,7 @@ function _initGame13Impl() {
 
   // Ensure overlays hidden, qpanel fully visible
   const evoOv = document.getElementById('g13-evo-overlay'); if(evoOv) evoOv.style.display = 'none'
-  const resOv = document.getElementById('g13-result-overlay'); if(resOv) resOv.style.display = 'none'
+  hideGameResult()
   const qp = document.getElementById('g13-qpanel')
   if (qp) { qp.style.opacity = '1'; qp.style.pointerEvents = ''; qp.style.display = 'flex' }
   const evoBtn = document.getElementById('g13-evo-btn')
@@ -15266,22 +15212,18 @@ function g13Victory() {
   if (g13ResultTimeout) { clearTimeout(g13ResultTimeout); g13ResultTimeout = null }
   g13ResultTimeout = setTimeout(() => {
     g13ResultTimeout = null
-    const ro = document.getElementById('g13-result-overlay')
-    if (!ro) return
     const finalForm = s.evolved2 ? s.chain.evolved2 : s.evolved ? s.chain.evolved : null
-    const bannerImg = document.getElementById('g13-result-banner-img')
-    if(bannerImg) bannerImg.src = 'assets/victory-banner.webp'
-    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = '🏆'
-    const title = document.getElementById('g13-result-title'); if(title) title.textContent = finalForm ? `${finalForm.name} Menang!` : 'Kamu Menang!'
-    const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = s.evolved2
+    const msg = s.evolved2
       ? `${s.chain.player.name}→${s.chain.evolved.name}→${s.chain.evolved2.name}! Evolusi sempurna!`
       : s.evolved
         ? `${s.chain.player.name} berhasil berevolusi menjadi ${s.chain.evolved.name}!`
         : `${s.chain.wild.name} dikalahkan — tapi ${s.chain.player.name} belum berevolusi!`
-    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '⭐'.repeat(_g13stars) + '☆'.repeat(3 - _g13stars)
-    const nextBtn = document.getElementById('g13-next-btn')
-    if(nextBtn) nextBtn.style.display = (_g13lv < 55) ? 'block' : 'none'
-    ro.style.display = 'flex'
+    const btns = [
+      {label:'Main Lagi 🔄', action:()=>initGame13()},
+    ]
+    if((_g13lv||1) < 55) btns.unshift({label:'Level Berikutnya ➡️', action:()=>startGameWithLevel((_g13lv||1)+1)})
+    btns.push({label:'Kembali ⌂', action:()=>exitGame()})
+    showGameResult({ emoji:'🏆', title: finalForm ? `${finalForm.name} Menang!` : 'Kamu Menang!', stars:_g13stars, msg, buttons:btns })
   }, 1000)
 }
 
@@ -15298,14 +15240,14 @@ function g13Defeat() {
   if (g13ResultTimeout) { clearTimeout(g13ResultTimeout); g13ResultTimeout = null }
   g13ResultTimeout = setTimeout(() => {
     g13ResultTimeout = null
-    const ro = document.getElementById('g13-result-overlay')
-    if (!ro) return
-    const icon = document.getElementById('g13-result-icon'); if(icon) icon.textContent = '💔'
-    const title = document.getElementById('g13-result-title'); if(title) title.textContent = 'Kalah...'
-    const sub = document.getElementById('g13-result-subtitle'); if(sub) sub.textContent = `${s.chain.wild.name} terlalu kuat! Coba lagi!`
-    const starEl = document.getElementById('g13-result-stars'); if(starEl) starEl.textContent = '☆☆☆'
-    const nextBtn = document.getElementById('g13-next-btn'); if(nextBtn) nextBtn.style.display = 'none'
-    ro.style.display = 'flex'
+    showGameResult({
+      emoji:'💔', title:'Kalah...', stars:0,
+      msg: `${s.chain.wild.name} terlalu kuat! Coba lagi!`,
+      buttons: [
+        {label:'Main Lagi 🔄', action:()=>initGame13()},
+        {label:'Kembali ⌂', action:()=>exitGame()}
+      ]
+    })
   }, 1200)
 }
 
@@ -16038,7 +15980,29 @@ function g13bLevelComplete() {
 // HELPER — called from in-game result overlays
 // ============================================================
 function endGameFromOverlay() {
+  hideGameResult()
   endGame(state.gameStars[state.currentPlayer] || 3)
+}
+
+// ── Unified Game Result Overlay (G13-G18) ────────────────────
+function showGameResult({ emoji, title, stars, msg, buttons }) {
+  document.getElementById('gr-emoji').textContent = emoji || '🏆'
+  document.getElementById('gr-title').textContent = title || 'Selesai!'
+  document.getElementById('gr-stars').textContent = '⭐'.repeat(Math.min(stars||0,5)) + '☆'.repeat(Math.max(0,5-(stars||0)))
+  document.getElementById('gr-msg').textContent = msg || ''
+  const btns = document.getElementById('gr-btns')
+  btns.innerHTML = ''
+  ;(buttons||[]).forEach((b, i) => {
+    const el = document.createElement('button')
+    el.className = 'gr-btn ' + (i === 0 ? 'gr-btn-primary' : 'gr-btn-secondary')
+    el.textContent = b.label
+    el.onclick = () => { playClick(); hideGameResult(); b.action() }
+    btns.appendChild(el)
+  })
+  document.getElementById('game-result-overlay').classList.add('show')
+}
+function hideGameResult() {
+  document.getElementById('game-result-overlay').classList.remove('show')
 }
 
 // ============================================================
@@ -16718,7 +16682,7 @@ function _initGame14_legacy() {
   document.getElementById('g14-level').textContent = `Lv.${lv}`
   document.getElementById('g14-start-msg').textContent = ''
   document.getElementById('g14-go-btn-wrap').style.display = 'none'
-  document.getElementById('g14-result-overlay').style.display = 'none'
+  hideGameResult()
   document.getElementById('g14-start-overlay').style.display = 'flex'
   document.getElementById('g14-dist-bar').textContent = '0m'
   document.getElementById('g14-dist-fill').style.width = '0%'
@@ -17250,18 +17214,14 @@ function g14ShowResult(won) {
   const pct = g14State.distance / g14State.finishLine
   const perfStars = won ? (g14State.hp === 3 ? 5 : pct >= 0.9 ? 4 : 3) : (pct >= 0.6 ? 2 : 1)
   state.gameStars[state.currentPlayer] = perfStars
-  const overlay = document.getElementById('g14-result-overlay')
-  document.getElementById('g14-res-icon').textContent = won ? '🏆' : '💨'
-  document.getElementById('g14-res-title').textContent = won ? 'MENANG! 🎉' : 'Kurang Jauh...'
-  const displayStars = won ? (perfStars >= 5 ? 3 : perfStars >= 4 ? 2 : 1) : 0
-  document.getElementById('g14-res-stars').textContent = '⭐'.repeat(displayStars) + '☆'.repeat(3 - displayStars)
   const cfg = g14State.trainCfg
-  document.getElementById('g14-res-info').textContent = won
+  const msg = won
     ? `${cfg.name} melaju ${Math.floor(g14State.finishLine)}m! Sisa HP: ${g14State.hp}/3`
     : `Sudah ${Math.floor(g14State.distance)}m dari ${g14State.finishLine}m. Coba lagi!`
-  const nextBtn = document.getElementById('g14-next-btn')
-  if(nextBtn) nextBtn.style.display = (won && (state.selectedLevelNum||1) < 20) ? 'block' : 'none'
-  overlay.style.display = 'flex'
+  const btns = [{label:'Main Lagi 🔄', action:()=>g14Replay()}]
+  if(won && (state.selectedLevelNum||1) < 20) btns.unshift({label:'Level Berikutnya ➡️', action:()=>startGameWithLevel((state.selectedLevelNum||1)+1)})
+  btns.push({label:'Kembali ⌂', action:()=>endGameFromOverlay()})
+  showGameResult({ emoji:won?'🏆':'💨', title:won?'MENANG!':'Kurang Jauh...', stars:perfStars, msg, buttons:btns })
   if (won) { playCorrect(); endGame(perfStars) }
 }
 
@@ -17398,12 +17358,11 @@ function g15Win() {
   g15State.running = false
   const perfStars = 5
   state.gameStars[state.currentPlayer] = perfStars
-  const res = document.getElementById('g15-result')
-  document.getElementById('g15-res-icon').textContent = '🚂💨'
-  document.getElementById('g15-res-title').textContent = 'Kereta Bebas! 🎉'
-  document.getElementById('g15-res-stars').textContent = '⭐⭐⭐⭐⭐'
-  document.getElementById('g15-res-sub').textContent = `Semua ${g15State.totalChains} rantai putus! Lokomotif pemberani berhasil!`
-  res.style.display = 'flex'
+  showGameResult({
+    emoji:'🚂', title:'Kereta Bebas!', stars:perfStars,
+    msg:`Semua ${g15State.totalChains} rantai putus! Lokomotif pemberani berhasil!`,
+    buttons:[{label:'Main Lagi 🔄', action:()=>initGame15()},{label:'Kembali ⌂', action:()=>endGameFromOverlay()}]
+  })
   playCorrect()
 }
 
@@ -17443,7 +17402,7 @@ function _initGame16_legacy() {
   }
   document.getElementById('g16-level').textContent = `Lv.${lv}`
   document.getElementById('g16-stars-badge').textContent = '🆘 0'
-  document.getElementById('g16-result').style.display = 'none'
+  hideGameResult()
   document.getElementById('g16-phase1').style.display = 'none'
   document.getElementById('g16-phase2').style.display = 'none'
   document.getElementById('g16-start-overlay').style.display = 'flex'
@@ -17625,14 +17584,13 @@ function g16EndGame(won) {
   const pct = g16State.wordsComplete / g16State.wordsNeeded
   const perfStars = won ? (g16State.danger < 20 ? 5 : g16State.danger < 50 ? 4 : 3) : (pct >= 0.5 ? 2 : 1)
   state.gameStars[state.currentPlayer] = perfStars
-  const res = document.getElementById('g16-result')
-  document.getElementById('g16-res-icon').textContent = won ? '🎉' : '😢'
-  document.getElementById('g16-res-title').textContent = won ? 'KERETA SELAMAT! 🚂' : 'Kereta Jatuh...'
-  document.getElementById('g16-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
-  document.getElementById('g16-res-info').textContent = won
-    ? `Berhasil menyelamatkan kereta dengan ${g16State.wordsComplete} tarikan! Saling membantu itu hebat! 🤝`
+  const msg = won
+    ? `Berhasil menyelamatkan kereta dengan ${g16State.wordsComplete} tarikan! Saling membantu itu hebat!`
     : `Sudah ${g16State.wordsComplete} dari ${g16State.wordsNeeded} tarikan. Jangan menyerah!`
-  res.style.display = 'flex'
+  showGameResult({
+    emoji:won?'🎉':'😢', title:won?'KERETA SELAMAT!':'Kereta Jatuh...', stars:perfStars, msg,
+    buttons:[{label:'Main Lagi 🔄', action:()=>initGame16()},{label:'Kembali ⌂', action:()=>endGameFromOverlay()}]
+  })
   if (won) playCorrect(); else playWrong()
 }
 
@@ -17659,7 +17617,7 @@ function initGame17() {
   document.getElementById('g17-level').textContent = `Lv.${lv}`
   document.getElementById('g17-stars-badge').textContent = '🌉 0'
   document.getElementById('g17-combo').textContent = ''
-  document.getElementById('g17-result').style.display = 'none'
+  hideGameResult()
   const trainWrap = document.getElementById('g17-train-waiting')
   trainWrap.style.animation = ''
   trainWrap.style.left = '4%'
@@ -17839,18 +17797,16 @@ function g17EndGame(won) {
     : (pct >= 0.6 ? 2 : 1)
   state.gameStars[state.currentPlayer] = perfStars
   setTimeout(() => {
-    const res = document.getElementById('g17-result')
-    document.getElementById('g17-res-icon').textContent = won ? '🏆' : '💔'
-    document.getElementById('g17-res-title').textContent = won ? 'JEMBATAN SELESAI! 🚂' : 'Jembatan Retak...'
-    document.getElementById('g17-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
     const facts = [
-      '🌉 Jembatan kereta pertama dibangun di Inggris tahun 1825!',
-      '🚂 Rel kereta terbuat dari baja yang sangat kuat!',
-      '🔨 Membangun jembatan butuh kerja sama tim yang hebat!'
+      'Jembatan kereta pertama dibangun di Inggris tahun 1825!',
+      'Rel kereta terbuat dari baja yang sangat kuat!',
+      'Membangun jembatan butuh kerja sama tim yang hebat!'
     ]
-    document.getElementById('g17-res-info').textContent =
-      `${g17State.correct}/${g17State.totalBlocks} balok • Combo terbaik: x${g17State.bestCombo}\n${facts[Math.floor(Math.random() * facts.length)]}`
-    res.style.display = 'flex'
+    showGameResult({
+      emoji:won?'🏆':'💔', title:won?'JEMBATAN SELESAI!':'Jembatan Retak...', stars:perfStars,
+      msg:`${g17State.correct}/${g17State.totalBlocks} balok • Combo terbaik: x${g17State.bestCombo}\n${facts[Math.floor(Math.random()*facts.length)]}`,
+      buttons:[{label:'Main Lagi 🔄', action:()=>initGame17()},{label:'Kembali ⌂', action:()=>endGameFromOverlay()}]
+    })
     if (!won) playWrong()
   }, won ? 1600 : 400)
 }
@@ -18249,7 +18205,7 @@ function initGame18() {
   }
   document.getElementById('g18-level').textContent = `Lv.${lv}`
   document.getElementById('g18-stars-badge').textContent = '🏛️ 0'
-  document.getElementById('g18-result').style.display = 'none'
+  hideGameResult()
   document.getElementById('g18-modal').classList.remove('open')
   document.getElementById('g18-gallery').style.display = 'block'
   document.getElementById('g18-quiz-view').style.display = 'none'
@@ -18400,13 +18356,11 @@ function g18FinishQuiz() {
   const gradeEmoji = score === 5 ? '🏆' : score >= 3 ? '⭐' : '📚'
   const gradeMsg = score === 5 ? 'SEMPURNA! Kamu ahli kereta!' : score >= 3 ? 'Bagus! Terus belajar!' : 'Jangan lupa baca kartu museumnya ya!'
   document.getElementById('g18-quiz-view').style.display = 'none'
-  const res = document.getElementById('g18-result')
-  document.getElementById('g18-res-icon').textContent = gradeEmoji
-  document.getElementById('g18-res-title').textContent = gradeMsg
-  document.getElementById('g18-res-stars').textContent = '⭐'.repeat(perfStars) + '☆'.repeat(5 - perfStars)
-  document.getElementById('g18-res-info').textContent =
-    `Skor kuis: ${score} / ${total} benar\n🚂 Ada ${G18_TRAINS.length} kereta di museum ini — sudah kamu pelajari semua?\n🎲 Soal berubah setiap main, coba lagi!`
-  res.style.display = 'flex'
+  showGameResult({
+    emoji:gradeEmoji, title:gradeMsg, stars:perfStars,
+    msg:`Skor kuis: ${score} / ${total} benar\nAda ${G18_TRAINS.length} kereta di museum — sudah kamu pelajari semua?\nSoal berubah setiap main, coba lagi!`,
+    buttons:[{label:'Main Lagi 🔄', action:()=>initGame18()},{label:'Kembali ⌂', action:()=>endGameFromOverlay()}]
+  })
   if (score >= 3) playCorrect(); else playWrong()
 }
 
