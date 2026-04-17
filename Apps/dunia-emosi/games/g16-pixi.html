@@ -949,17 +949,22 @@ function buildTrain(W,H){
 // ── Obstacles ─────────────────────────────────────────────────────────────────
 function buildObstaclesOnTrack(W,H){
   const tY=getTrackY(H)
-  const questions=pickQuestions(S.level)
-  S.totalObstacles=questions.length; S.obstacles=[]
+  const allQ=pickQuestions(S.level)
+  // Each station gets 3-5 questions (distribute evenly)
+  const stationCount = Math.max(2, Math.min(Math.ceil(allQ.length/3), 5))
+  const qPerStation = Math.ceil(allQ.length/stationCount)
+  S.totalObstacles=stationCount; S.obstacles=[]
   const startWX=WORLD_LENGTH*0.12, endWX=WORLD_LENGTH*0.78
-  const spacing=(endWX-startWX)/Math.max(questions.length-1,1)
-  questions.forEach((q,i)=>{
-    const wx=questions.length===1?(startWX+endWX)/2:startWX+i*spacing
-    const obs={worldX:wx,question:q,cleared:false,wrongCount:0,container:null,flashTimer:0}
+  const spacing=(endWX-startWX)/Math.max(stationCount-1,1)
+  for(let i=0;i<stationCount;i++){
+    const wx=stationCount===1?(startWX+endWX)/2:startWX+i*spacing
+    const stationQs=allQ.splice(0,qPerStation)
+    if(!stationQs.length) break
+    const obs={worldX:wx,questions:stationQs,qIdx:0,question:stationQs[0],cleared:false,wrongCount:0,container:null,flashTimer:0}
     obs.container=buildObstacleGraphic(wx,tY,i)
     worldContainer.addChild(obs.container)
     S.obstacles.push(obs); obstacleContainers.push(obs.container)
-  })
+  }
   document.getElementById('obstacle-count').textContent=`🚧 0/${S.totalObstacles}`
 }
 
@@ -1235,7 +1240,9 @@ function updateSparks(dt){
 let quizActive=false, quizLocked=false
 function showQuizPanel(obs){
   if(quizActive)return; quizActive=true; quizLocked=false
-  document.getElementById('quiz-question').textContent=obs.question.q
+  const qNum = (obs.qIdx||0)+1
+  const qTotal = obs.questions ? obs.questions.length : 1
+  document.getElementById('quiz-question').textContent = (qTotal>1?`(${qNum}/${qTotal}) `:'')+obs.question.q
   const choicesEl=document.getElementById('quiz-choices'); choicesEl.innerHTML=''
   const choices=[obs.question.ans,...obs.question.wrong]
   for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]];}
@@ -1254,7 +1261,14 @@ function onChoiceTap(btn,choice,obs){
   if(quizLocked)return; quizLocked=true
   if(choice===obs.question.ans){
     btn.classList.add('correct'); flashScreen('#00ff44',0.35)
-    setTimeout(()=>clearObstacle(obs),380)
+    // Advance to next question or clear station
+    obs.qIdx = (obs.qIdx||0)+1
+    if(obs.questions && obs.qIdx < obs.questions.length){
+      obs.question = obs.questions[obs.qIdx]
+      setTimeout(()=>{hideQuizPanel(); quizActive=false; showQuizPanel(obs)},500)
+    } else {
+      setTimeout(()=>clearObstacle(obs),380)
+    }
   } else {
     S.wrongTaps++; S.noWrongAnswers=false; obs.wrongCount++
     btn.classList.add('wrong'); S.cameraShake=1.0; flashScreen('#ff8800',0.28)
