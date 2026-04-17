@@ -940,13 +940,15 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
     g.roundRect(wx, -hH + 6, 11, 4, 2).fill({ color: 0xbfdbfe, alpha: 0.45 }) // reflection
     g.roundRect(wx, -hH + 6, 11, 9, 2).stroke({ color: 0x93c5fd, width: 1, alpha: 0.6 })
   }
-  // Cab section
-  g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).fill(aC)
-  g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).stroke({ color: 0xffffff, width: 1.2, alpha: 0.5 })
-  // Headlight on cab front
+  if (!(catKey && catKey.includes('steam'))) {
+    // Cab section (diesel/emu only — steam has boiler front instead)
+    g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).fill(aC)
+    g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).stroke({ color: 0xffffff, width: 1.2, alpha: 0.5 })
+  }
+  // Headlight
   g.circle(hW - 3, -4, 4.5).fill(0xfef08a)
   g.circle(hW - 3, -4, 2.5).fill(0xffffff)
-  g.circle(hW - 3, 6, 3.5).fill(0xfca5a5)  // red marker light
+  if (!(catKey && catKey.includes('steam'))) g.circle(hW - 3, 6, 3.5).fill(0xfca5a5)
   // Rivet dots on body
   for (const ry of [-hH + 1, hH - 2]) {
     for (let rx = -hW + 4; rx < hW - 4; rx += 10) {
