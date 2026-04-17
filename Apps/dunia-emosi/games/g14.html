@@ -874,114 +874,172 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
 
   if (catKey === 'maglev') {
     // ── Maglev streamlined capsule ──────────────────────────────────────
-    // Glow shell
     g.roundRect(-hW - 3, -hH - 3, W + 6, H + 6, 12).fill({ color: 0xffffff, alpha: 0.08 })
     g.roundRect(-hW - 1, -hH - 1, W + 2, H + 2, 10).fill({ color: 0xffffff, alpha: 0.18 })
-    // Body
     g.roundRect(-hW, -hH, W, H, 9).fill(bC)
     glowOutline(-hW, -hH, W, H, 9)
-    // Speed stripe
-    g.rect(-hW + 2, -2, W - 4, 4).fill(aC)
-    // Visor
-    g.roundRect(-hW + 5, -hH + 4, W - 10, 8).fill(0x1e40af)
-    // Visor highlight
-    g.roundRect(-hW + 5, -hH + 4, W - 10, 3).fill({ color: 0x93c5fd, alpha: 0.5 })
-    // Nose tip with headlight
-    g.roundRect(hW - 10, -hH, 10, H, 4).fill(aC)
-    g.circle(hW - 5, 0, 4).fill(0xfef08a)           // headlight
-    g.circle(hW - 5, 0, 2).fill(0xffffff)
+    // Upper body highlight
+    g.roundRect(-hW + 2, -hH + 1, W - 4, 5, 4).fill({ color: 0xffffff, alpha: 0.08 })
+    // Speed stripe (double)
+    g.rect(-hW + 2, -3, W - 4, 6).fill(aC)
+    g.rect(-hW + 2, -1, W - 4, 2).fill({ color: 0xffffff, alpha: 0.15 })
+    // Visor windshield
+    g.roundRect(-hW + 5, -hH + 3, W - 10, 9, 3).fill(0x0f172a)
+    g.roundRect(-hW + 5, -hH + 3, W - 10, 4, 3).fill({ color: 0x93c5fd, alpha: 0.5 })
+    // Window pillars
+    for (let wp = 0; wp < 4; wp++) g.rect(-hW + 14 + wp * 12, -hH + 3, 1.5, 9).fill({ color: bC, alpha: 0.6 })
+    // Nose cone
+    g.poly([hW - 8, -hH, hW + 8, 0, hW - 8, hH]).fill(bC)
+    g.poly([hW - 8, -hH, hW + 8, 0, hW - 8, hH]).stroke({ color: 0xffffff, width: 1, alpha: 0.5 })
+    g.roundRect(hW - 10, -hH, 4, H, 2).fill(aC)
+    // Headlights
+    g.circle(hW + 2, -3, 3).fill(0xfef08a); g.circle(hW + 2, -3, 1.5).fill(0xffffff)
+    g.circle(hW + 2, 3, 3).fill(0xfef08a); g.circle(hW + 2, 3, 1.5).fill(0xffffff)
     // Panel lines
-    g.rect(-hW + 2, -hH + 1, 1, H - 2).fill({ color: 0x000000, alpha: 0.2 })
-    g.rect(-hW + 10, -hH + 1, 1, H - 2).fill({ color: 0x000000, alpha: 0.2 })
-    // Levitation glow
-    g.rect(-hW + 8, hH, W - 16, 5).fill(0x38bdf8)
-    g.rect(-hW + 8, hH, W - 16, 2).fill({ color: 0x7dd3fc, alpha: 0.6 })
+    for (let pl = 0; pl < 5; pl++) g.rect(-hW + 4 + pl * 12, -hH + 1, 0.8, H - 2).fill({ color: 0x000000, alpha: 0.12 })
+    // Door markers
+    g.rect(-hW + 16, -hH + 2, 8, H - 4).stroke({ color: 0xffffff, width: 0.6, alpha: 0.2 })
+    g.rect(-hW + 40, -hH + 2, 8, H - 4).stroke({ color: 0xffffff, width: 0.6, alpha: 0.2 })
+    // Levitation rail + glow
+    g.rect(-hW + 6, hH, W - 12, 2).fill(0x1e3a8a)
+    g.rect(-hW + 6, hH + 2, W - 12, 4).fill(0x38bdf8)
+    g.rect(-hW + 6, hH + 2, W - 12, 2).fill({ color: 0x7dd3fc, alpha: 0.7 })
+    // Undercarriage sensors
+    for (let si = 0; si < 4; si++) g.circle(-hW + 15 + si * 14, hH + 1, 1.5).fill({ color: 0x38bdf8, alpha: 0.5 })
+    // Number plate
+    g.roundRect(-hW + 2, hH - 5, 14, 4, 1).fill({ color: 0x000000, alpha: 0.3 })
     return
   }
 
   if (catKey === 'hsr') {
-    // ── Bullet-nose high-speed ──────────────────────────────────────────
-    // Glow shell
-    g.roundRect(-hW - 3, -hH - 3, W - 6, H + 6, 6).fill({ color: 0xffffff, alpha: 0.08 })
-    g.roundRect(-hW - 1, -hH - 1, W - 10, H + 2, 5).fill({ color: 0xffffff, alpha: 0.18 })
-    // Body
+    // ── Bullet-nose high-speed train ────────────────────────────────────
+    g.roundRect(-hW - 2, -hH - 2, W - 8, H + 4, 5).fill({ color: 0xffffff, alpha: 0.1 })
+    // Main body
     g.roundRect(-hW, -hH, W - 12, H, 4).fill(bC)
-    g.poly([-hW + W - 12, -hH,  hW + 6, 0,  -hW + W - 12, hH]).fill(bC)
-    // White outline
-    g.roundRect(-hW, -hH, W - 12, H, 4).stroke({ color: 0xffffff, width: 1.8, alpha: 0.75 })
-    // Speed stripe
-    g.rect(-hW, -3, W - 8, 6).fill(aC)
-    // Visor strip
-    g.roundRect(-hW + 4, -hH + 4, W - 24, 8).fill(0x1e3a8a)
-    g.roundRect(-hW + 4, -hH + 4, W - 24, 3).fill({ color: 0xbfdbfe, alpha: 0.5 }) // reflection
-    // Headlight
-    g.circle(hW + 4, 0, 5).fill(0xfef08a)
-    g.circle(hW + 4, 0, 2.5).fill(0xffffff)
-    // Pantograph on roof
-    g.rect(-hW + 8, -hH - 8, 2, 8).fill({ color: 0xffffff, alpha: 0.7 })
-    g.rect(-hW + 8, -hH - 9, 14, 1.5).fill({ color: 0xffffff, alpha: 0.7 })
-    g.rect(-hW + 22, -hH - 8, 2, 8).fill({ color: 0xffffff, alpha: 0.7 })
-    // Wheels
-    for (const wx of [-22, -4, 14]) {
-      g.circle(wx, hH + 2, 5).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1.5 })
-      g.circle(wx, hH + 2, 2.5).fill(0x9ca3af)
-      // Wheel spokes
-      for (let a = 0; a < 3; a++) {
-        const ang = a * Math.PI * 2 / 3
-        g.rect(wx + Math.cos(ang) * 1, hH + 2 + Math.sin(ang) * 1, Math.cos(ang) * 3.5, 1).fill({ color: 0x9ca3af, alpha: 0.5 })
-      }
+    // Nose cone (elongated triangle)
+    g.poly([hW - 12, -hH, hW + 8, -2, hW + 8, 2, hW - 12, hH]).fill(bC)
+    g.poly([hW - 12, -hH, hW + 8, -2, hW + 8, 2, hW - 12, hH]).stroke({ color: 0xffffff, width: 1, alpha: 0.5 })
+    g.roundRect(-hW, -hH, W - 12, H, 4).stroke({ color: 0xffffff, width: 1.5, alpha: 0.7 })
+    // Upper highlight
+    g.roundRect(-hW + 2, -hH + 1, W - 16, 4, 2).fill({ color: 0xffffff, alpha: 0.08 })
+    // Speed stripe (accent band)
+    g.rect(-hW, -2, W - 6, 5).fill(aC)
+    g.rect(-hW, -1, W - 6, 1.5).fill({ color: 0xffffff, alpha: 0.12 })
+    // Windshield visor
+    g.roundRect(-hW + 4, -hH + 3, W - 22, 9, 2).fill(0x0f172a)
+    g.roundRect(-hW + 4, -hH + 3, W - 22, 4, 2).fill({ color: 0xbfdbfe, alpha: 0.5 })
+    // Window pillars
+    for (let wp = 0; wp < 3; wp++) g.rect(-hW + 14 + wp * 11, -hH + 3, 1, 9).fill({ color: bC, alpha: 0.5 })
+    // Headlights (dual)
+    g.circle(hW + 4, -2, 3.5).fill(0xfef08a); g.circle(hW + 4, -2, 2).fill(0xffffff)
+    g.circle(hW + 4, 2, 2.5).fill(0xfca5a5); g.circle(hW + 4, 2, 1.5).fill(0xfecdd3)
+    // Pantograph (detailed diamond shape)
+    const px = -hW + 12
+    g.rect(px, -hH - 7, 2, 7).fill({ color: 0xd1d5db, alpha: 0.8 })
+    g.rect(px + 16, -hH - 7, 2, 7).fill({ color: 0xd1d5db, alpha: 0.8 })
+    g.rect(px - 2, -hH - 8, 22, 1.5).fill({ color: 0xd1d5db, alpha: 0.8 })
+    // Cross-arm
+    g.moveTo(px + 1, -hH).lineTo(px + 9, -hH - 7).stroke({ color: 0xd1d5db, width: 1, alpha: 0.6 })
+    g.moveTo(px + 17, -hH).lineTo(px + 9, -hH - 7).stroke({ color: 0xd1d5db, width: 1, alpha: 0.6 })
+    // Contact wire
+    g.rect(px - 4, -hH - 10, 28, 1).fill({ color: 0xfbbf24, alpha: 0.4 })
+    // Bogies/Wheels with suspension detail
+    for (const bx of [-24, 10]) {
+      // Bogie frame
+      g.roundRect(bx - 4, hH - 1, 18, 4, 1.5).fill({ color: 0x1f2937, alpha: 0.6 })
+      // Wheels (paired)
+      g.circle(bx, hH + 3, 4.5).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1.2 })
+      g.circle(bx, hH + 3, 2).fill(0x9ca3af)
+      g.circle(bx + 10, hH + 3, 4.5).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1.2 })
+      g.circle(bx + 10, hH + 3, 2).fill(0x9ca3af)
+      // Suspension springs
+      g.rect(bx + 2, hH - 2, 6, 2).fill({ color: 0x6b7280, alpha: 0.4 })
     }
+    // Door markings
+    g.rect(-hW + 18, -hH + 2, 7, H - 4).stroke({ color: 0xffffff, width: 0.6, alpha: 0.2 })
+    // Skirt (lower body panel)
+    g.rect(-hW, hH - 3, W - 12, 3).fill({ color: 0x000000, alpha: 0.2 })
     // Number plate
-    g.roundRect(-hW + 2, -hH + 2, 18, 8, 1).fill({ color: 0x000000, alpha: 0.35 })
+    g.roundRect(-hW + 2, -hH + 2, 14, 6, 1).fill({ color: 0x000000, alpha: 0.3 })
     return
   }
 
   // ── General body: steam / diesel / emu ──────────────────────────────────
-  // Glow shell (draw BEFORE body)
+  const isSteam = catKey && catKey.includes('steam')
+  const isEmu = catKey && catKey.includes('emu')
+  // Glow shell
   g.roundRect(-hW - 3, -hH - 3, W + 6, H + 6, 7).fill({ color: 0xffffff, alpha: 0.08 })
-  g.roundRect(-hW - 1.5, -hH - 1.5, W + 3, H + 3, 6).fill({ color: 0xffffff, alpha: 0.18 })
+  g.roundRect(-hW - 1.5, -hH - 1.5, W + 3, H + 3, 6).fill({ color: 0xffffff, alpha: 0.15 })
   // Body
   g.roundRect(-hW, -hH, W, H, 4).fill(bC)
-  // White outline stroke
-  g.roundRect(-hW, -hH, W, H, 4).stroke({ color: 0xffffff, width: 1.8, alpha: 0.8 })
-  // Accent stripe
-  g.rect(-hW, -hH + 3, W, 5).fill(aC)
-  // Panel line shadow under stripe
-  g.rect(-hW, -hH + 8, W, 1).fill({ color: 0x000000, alpha: 0.25 })
-  // Windows with frames
-  for (let i = 0; i < 3; i++) {
-    const wx = -hW + 6 + i * 16
-    g.roundRect(wx, -hH + 6, 11, 9, 2).fill(0x0f172a)       // dark glass
-    g.roundRect(wx, -hH + 6, 11, 4, 2).fill({ color: 0xbfdbfe, alpha: 0.45 }) // reflection
-    g.roundRect(wx, -hH + 6, 11, 9, 2).stroke({ color: 0x93c5fd, width: 1, alpha: 0.6 })
+  g.roundRect(-hW, -hH, W, H, 4).stroke({ color: 0xffffff, width: 1.5, alpha: 0.7 })
+  // Upper body highlight
+  g.roundRect(-hW + 2, -hH + 1, W - 4, 3, 2).fill({ color: 0xffffff, alpha: 0.06 })
+  // Accent stripe (double band)
+  g.rect(-hW, -hH + 3, W, 4).fill(aC)
+  g.rect(-hW, -hH + 4, W, 1.5).fill({ color: 0xffffff, alpha: 0.1 })
+  g.rect(-hW, -hH + 7, W, 1).fill({ color: 0x000000, alpha: 0.2 })
+  // Windows
+  const winCount = isSteam ? 1 : isEmu ? 5 : 3
+  const winW = isEmu ? 8 : 11
+  const winGap = isEmu ? 11 : 16
+  for (let i = 0; i < winCount; i++) {
+    const wx = -hW + 6 + i * winGap
+    g.roundRect(wx, -hH + 6, winW, 9, 2).fill(0x0f172a)
+    g.roundRect(wx, -hH + 6, winW, 3.5, 2).fill({ color: 0xbfdbfe, alpha: 0.4 })
+    g.roundRect(wx, -hH + 6, winW, 9, 2).stroke({ color: 0x93c5fd, width: 0.8, alpha: 0.5 })
   }
-  if (!(catKey && catKey.includes('steam'))) {
-    // Cab section (diesel/emu only — steam has boiler front instead)
-    g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).fill(aC)
-    g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).stroke({ color: 0xffffff, width: 1.2, alpha: 0.5 })
+  if (!isSteam) {
+    // ── Diesel/EMU cab section ──
+    g.roundRect(hW - 14, -hH - 4, 14, H + 4, 3).fill(aC)
+    g.roundRect(hW - 14, -hH - 4, 14, H + 4, 3).stroke({ color: 0xffffff, width: 1, alpha: 0.45 })
+    // Cab windshield
+    g.roundRect(hW - 12, -hH - 2, 8, 8, 1.5).fill(0x0f172a)
+    g.roundRect(hW - 12, -hH - 2, 8, 3, 1.5).fill({ color: 0x87ceeb, alpha: 0.35 })
+    // Headlights (upper + lower)
+    g.circle(hW - 2, -5, 3.5).fill(0xfef08a); g.circle(hW - 2, -5, 2).fill(0xffffff)
+    g.circle(hW - 2, 5, 3).fill(0xfca5a5); g.circle(hW - 2, 5, 1.5).fill(0xfecdd3)
+    // Exhaust grille (diesel)
+    if (!isEmu) {
+      g.roundRect(-hW + 2, -hH - 4, 12, 4, 1).fill({ color: 0x000000, alpha: 0.25 })
+      for (let gi = 0; gi < 5; gi++) g.rect(-hW + 3 + gi * 2.2, -hH - 3, 1, 2).fill({ color: 0x6b7280, alpha: 0.3 })
+    }
+    // Pantograph (EMU)
+    if (isEmu) {
+      g.rect(-hW + 10, -hH - 7, 2, 7).fill({ color: 0xd1d5db, alpha: 0.7 })
+      g.rect(-hW + 10, -hH - 8, 16, 1.5).fill({ color: 0xd1d5db, alpha: 0.7 })
+      g.rect(-hW + 26, -hH - 7, 2, 7).fill({ color: 0xd1d5db, alpha: 0.7 })
+    }
+    // Door marking
+    g.rect(-hW + 22, -hH + 2, 6, H - 4).stroke({ color: 0xffffff, width: 0.5, alpha: 0.18 })
   }
-  // Headlight
-  g.circle(hW - 3, -4, 4.5).fill(0xfef08a)
-  g.circle(hW - 3, -4, 2.5).fill(0xffffff)
-  if (!(catKey && catKey.includes('steam'))) g.circle(hW - 3, 6, 3.5).fill(0xfca5a5)
-  // Rivet dots on body
+  // Rivet dots
   for (const ry of [-hH + 1, hH - 2]) {
-    for (let rx = -hW + 4; rx < hW - 4; rx += 10) {
-      g.circle(rx, ry, 1).fill({ color: 0xffffff, alpha: 0.25 })
+    for (let rx = -hW + 4; rx < hW - 14; rx += 8) {
+      g.circle(rx, ry, 0.8).fill({ color: 0xffffff, alpha: 0.2 })
     }
   }
   // Number board
-  g.roundRect(-hW + 2, -hH + 1, 16, 7, 1).fill({ color: 0x000000, alpha: 0.3 })
-  // Wheels with better detail
-  for (const wx of [-22, -2, 18]) {
-    g.circle(wx, hH + 3, 7).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1.5 })
-    g.circle(wx, hH + 3, 4).fill(0x374151)
-    g.circle(wx, hH + 3, 2).fill(0x9ca3af)  // hub
-    // Connecting rod
-    if (wx < 18) g.rect(wx + 4, hH, 14, 1.5).fill({ color: 0x9ca3af, alpha: 0.6 })
+  g.roundRect(-hW + 2, -hH + 1, 14, 6, 1).fill({ color: 0x000000, alpha: 0.3 })
+  // Bogies + Wheels
+  for (const bx of [-24, isSteam ? -4 : 8]) {
+    // Bogie frame
+    if (!isSteam) g.roundRect(bx - 3, hH - 1, 16, 3, 1).fill({ color: 0x1f2937, alpha: 0.5 })
+    // Wheels
+    g.circle(bx, hH + 3, 6).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1.2 })
+    g.circle(bx, hH + 3, 3.5).fill(0x374151)
+    g.circle(bx, hH + 3, 1.5).fill(0x9ca3af)
+    g.circle(bx + 10, hH + 3, 6).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1.2 })
+    g.circle(bx + 10, hH + 3, 3.5).fill(0x374151)
+    g.circle(bx + 10, hH + 3, 1.5).fill(0x9ca3af)
+    // Axle
+    g.rect(bx, hH + 2.5, 10, 1).fill({ color: 0x6b7280, alpha: 0.4 })
   }
-  // Undercarriage / footplate
-  g.rect(-hW, hH - 1, W, 3).fill({ color: 0x000000, alpha: 0.4 })
+  // Undercarriage
+  g.rect(-hW, hH - 1, W, 2.5).fill({ color: 0x000000, alpha: 0.35 })
+  // Coupling hooks
+  g.rect(-hW - 4, hH - 2, 4, 3).fill({ color: 0x6b7280, alpha: 0.4 })
+  if (!isSteam) g.rect(hW, hH - 2, 4, 3).fill({ color: 0x6b7280, alpha: 0.4 })
   if (catKey && catKey.includes('steam')) {
     const v = variant ? (variant-1) : (trainKey||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 5
     // ── Boiler bands (3 rings around cylindrical boiler) ──
