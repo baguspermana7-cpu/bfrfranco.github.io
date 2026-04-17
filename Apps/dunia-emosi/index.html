@@ -8008,12 +8008,33 @@ const LEVEL_TIERS = [
   {min:150, max:249, icon:'🦅', name:'Pintar'},
   {min:250, max:9999,icon:'👑', name:'Jagoan'}
 ]
+// Per-player localStorage key prefix
+function pkey(key) {
+  const slot = (window._pSlot && window._pSlot[0]) || 0
+  return `dunia-${slot}-${key}`
+}
+// Migrate old global keys to slot 0 (one-time)
+function migrateGlobalKeys() {
+  const oldKeys = ['dunia-emosi-xp','dunia-emosi-achievements','dunia-emosi-streak','dunia-progress','dunia-emosi-best-stars']
+  const migrated = localStorage.getItem('dunia-migrated-v1')
+  if (migrated) return
+  for (const k of oldKeys) {
+    const val = localStorage.getItem(k)
+    if (val !== null) {
+      localStorage.setItem(`dunia-0-${k.replace('dunia-emosi-','').replace('dunia-','')}`, val)
+      localStorage.removeItem(k)
+    }
+  }
+  localStorage.setItem('dunia-migrated-v1','1')
+}
+migrateGlobalKeys()
+
 function getXP() {
-  try { return parseInt(localStorage.getItem('dunia-emosi-xp')||'0') } catch(e){return 0}
+  try { return parseInt(localStorage.getItem(pkey('xp'))||'0') } catch(e){return 0}
 }
 function addXP(amount) {
   const prev=getXP(), next=prev+amount
-  try { localStorage.setItem('dunia-emosi-xp',next) } catch(e){}
+  try { localStorage.setItem(pkey('xp'),next) } catch(e){}
   return {prev, next, leveled: getLevelTier(prev).name !== getLevelTier(next).name}
 }
 function getLevelTier(xp) {
@@ -8655,11 +8676,11 @@ const GAME_INFO = {
 
 // Progress storage
 function loadProgress() {
-  try { return JSON.parse(localStorage.getItem('dunia-progress') || '{}') }
+  try { return JSON.parse(localStorage.getItem(pkey('progress')) || '{}') }
   catch(e) { return {} }
 }
 function saveProgress(prog) {
-  try { localStorage.setItem('dunia-progress', JSON.stringify(prog)) }
+  try { localStorage.setItem(pkey('progress'), JSON.stringify(prog)) }
   catch(e) {}
 }
 function getLevelProgress(gameNum) {
@@ -9160,7 +9181,7 @@ function confirmNames() {
     const s0=slots[window._pSlot[0]]
     if(s0){state.players[0].stars=s0.stars||0;state.players[0].ageTier=s0.ageTier||'tumbuh'}
     if(state.mode==='duo'){const s1=slots[window._pSlot[1]];if(s1){state.players[1].stars=s1.stars||0;state.players[1].ageTier=s1.ageTier||'tumbuh'}}
-    state.unlockedAchievements=JSON.parse(localStorage.getItem('dunia-emosi-achievements')||'{}')
+    state.unlockedAchievements=JSON.parse(localStorage.getItem(pkey('achievements'))||'{}')
   } catch(e){}
   updateStreak()
   state.currentPlayer=0
@@ -9183,12 +9204,12 @@ function saveStars() {
 function updateStreak() {
   try {
     const today=new Date().toDateString()
-    const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
+    const data=JSON.parse(localStorage.getItem(pkey('streak'))||'{}')
     const lastDay=data.lastDay||''
     const yesterday=new Date(Date.now()-86400000).toDateString()
     if(lastDay===today){}else if(lastDay===yesterday){data.streak=(data.streak||1)+1}else{data.streak=1}
     data.lastDay=today
-    localStorage.setItem('dunia-emosi-streak',JSON.stringify(data))
+    localStorage.setItem(pkey('streak'),JSON.stringify(data))
     const streakEl=document.getElementById('streak-badge'),streakText=document.getElementById('streak-text')
     if(data.streak>=2){streakEl.style.display='inline-flex';streakText.textContent=data.streak+' hari'}
     if(data.streak>=3) setTimeout(()=>checkAchievement('streak3'),1000)
@@ -9196,7 +9217,7 @@ function updateStreak() {
   } catch(e){return 1}
 }
 function getStreakCount() {
-  try{const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}');return data.streak||1}catch(e){return 1}
+  try{const data=JSON.parse(localStorage.getItem(pkey('streak'))||'{}');return data.streak||1}catch(e){return 1}
 }
 
 // ================================================================
@@ -9219,7 +9240,7 @@ function buildMenuHeader() {
   else banner.style.display='none'
   // Update per-game best stars display on world map nodes
   try {
-    const bestStars=JSON.parse(localStorage.getItem('dunia-emosi-best-stars')||'{}')
+    const bestStars=JSON.parse(localStorage.getItem(pkey('best-stars'))||'{}')
     const gameIds=[1,2,3,4,5,6,7,8,9,10,11,12,13,'13b','13c',14,15,16,17,18]
     gameIds.forEach(g=>{
       const best=bestStars[g]||0
@@ -9378,7 +9399,7 @@ function flashScreen(type) {
 function checkAchievement(key) {
   if(!state.unlockedAchievements[key]){
     state.unlockedAchievements[key]=true
-    try{localStorage.setItem('dunia-emosi-achievements',JSON.stringify(state.unlockedAchievements))}catch(e){}
+    try{localStorage.setItem(pkey('achievements'),JSON.stringify(state.unlockedAchievements))}catch(e){}
     showAchievement(key)
   }
 }
@@ -9480,7 +9501,7 @@ function showResult(mascot, title, msg) {
   if(state.mode==='duo'){scoresEl.style.display='flex';scoresEl.innerHTML=[0,1].map(i=>`<div class="rs-card"><div class="rs-animal">${state.players[i].animal}</div><div class="rs-name">${state.players[i].name}</div><div class="rs-stars">⭐ ${state.gameStars[i]}</div></div>`).join('')}
   else scoresEl.style.display='none'
   // Save best stars per game
-  try{const bs=JSON.parse(localStorage.getItem('dunia-emosi-best-stars')||'{}');const starsThisGame=state.gameStars[0]+state.gameStars[1];if(!bs[state.currentGame]||starsThisGame>bs[state.currentGame]){bs[state.currentGame]=starsThisGame;localStorage.setItem('dunia-emosi-best-stars',JSON.stringify(bs))}}catch(e){}
+  try{const bs=JSON.parse(localStorage.getItem(pkey('best-stars'))||'{}');const starsThisGame=state.gameStars[0]+state.gameStars[1];if(!bs[state.currentGame]||starsThisGame>bs[state.currentGame]){bs[state.currentGame]=starsThisGame;localStorage.setItem(pkey('best-stars'),JSON.stringify(bs))}}catch(e){}
   // XP reward
   const xpEarned=totalStars*10; const xpResult=addXP(xpEarned)
   const xpBanner=document.getElementById('result-xp-banner')
@@ -11021,7 +11042,7 @@ function showDashboard() {
       <div style="font-size:13px;margin-top:8px;opacity:0.85">${nextTier===tier?'Max level!':`${nextTier.min-xp} XP lagi ke ${nextTier.icon} ${nextTier.name}`}</div>
     </div>`
   // Achievements
-  const unlocked=JSON.parse(localStorage.getItem('dunia-emosi-achievements')||'{}')
+  const unlocked=JSON.parse(localStorage.getItem(pkey('achievements'))||'{}')
   const BADGE_MAP={first_star:'badge-first-win.webp',perfect_emotion:'badge-perfect.webp',hard_mode:'badge-perfect.webp',memory_master:'badge-pokemon-master.webp',letter_master:'badge-reader.webp',word_master:'badge-reader.webp',streak3:'badge-streak-7.webp'}
   const achHtml=Object.entries(ACHIEVEMENTS).map(([key,ach])=>{
     const done=!!unlocked[key]
@@ -11056,7 +11077,7 @@ initFloatingStars()
 buildAnimalPicker('p1-animals',0)
 buildAnimalPicker('p2-animals',1)
 try {
-  const data=JSON.parse(localStorage.getItem('dunia-emosi-streak')||'{}')
+  const data=JSON.parse(localStorage.getItem(pkey('streak'))||'{}')
   if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
 } catch(e){}
 // ================================================================
