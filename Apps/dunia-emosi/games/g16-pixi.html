@@ -384,7 +384,7 @@ function getDifficulty(l){return l<=8?'easy':l<=16?'medium':l<=24?'hard':'expert
 function pickQuestions(level){
   const pool=[...QUESTIONS[getDifficulty(level)]];
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-  return pool.slice(0,Math.min(3+Math.min(level-1,6),pool.length,9));
+  return pool.slice(0,Math.min(6+Math.min(level-1,8),pool.length,18));
 }
 
 // ── State & Globals ────────────────────────────────────────────────────────────
@@ -409,7 +409,7 @@ const TIE_SPACING=44
 
 async function initPixi(){
   const W=window.innerWidth, H=window.innerHeight
-  TRAIN_SCREEN_X=W*0.15; WORLD_LENGTH=W*7; STATION_X=WORLD_LENGTH*0.84
+  TRAIN_SCREEN_X=W*0.15; WORLD_LENGTH=W*4; STATION_X=WORLD_LENGTH*0.84
   app=new PIXI.Application()
   await app.init({
     canvas:document.getElementById('pixi-canvas'),
@@ -951,8 +951,8 @@ function buildObstaclesOnTrack(W,H){
   const tY=getTrackY(H)
   const allQ=pickQuestions(S.level)
   // Each station gets 3-5 questions (distribute evenly)
-  const stationCount = Math.max(2, Math.min(Math.ceil(allQ.length/3), 5))
-  const qPerStation = Math.ceil(allQ.length/stationCount)
+  const stationCount = Math.max(4, Math.min(Math.ceil(allQ.length/2), 8))
+  const qPerStation = Math.max(2, Math.ceil(allQ.length/stationCount))
   S.totalObstacles=stationCount; S.obstacles=[]
   const startWX=WORLD_LENGTH*0.12, endWX=WORLD_LENGTH*0.78
   const spacing=(endWX-startWX)/Math.max(stationCount-1,1)
@@ -1068,7 +1068,7 @@ function updateTrain(dt){
   const W=app.screen.width, H=app.screen.height
   const tY=getTrackY(H)
   let speed=0
-  const baseSpeed=(80+S.level*12)*1.5, boostSpeed=baseSpeed*2.2
+  const baseSpeed=(80+S.level*12)*2.25, boostSpeed=baseSpeed*2.2
   const nextObs=S.obstacles.find(o=>!o.cleared&&o.worldX>S.worldX-10)
   const stopDist=80, brakeDist=110
 
@@ -1242,7 +1242,8 @@ function showQuizPanel(obs){
   if(quizActive)return; quizActive=true; quizLocked=false
   const qNum = (obs.qIdx||0)+1
   const qTotal = obs.questions ? obs.questions.length : 1
-  document.getElementById('quiz-question').textContent = (qTotal>1?`(${qNum}/${qTotal}) `:'')+obs.question.q
+  document.getElementById('quiz-question').textContent = obs.question.q
+  // No (1/2) counter — mercy dots serve as indicator
   const choicesEl=document.getElementById('quiz-choices'); choicesEl.innerHTML=''
   const choices=[obs.question.ans,...obs.question.wrong]
   for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]];}

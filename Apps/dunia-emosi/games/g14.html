@@ -1240,7 +1240,12 @@ function tickPlayer(delta) {
 // ── Steam ─────────────────────────────────────────────────
 function tickSteam(delta) {
   S.frame++
-  if (S.frame % 3 === 0) spawnSteam()
+  // Only spawn smoke for steam trains
+  const cat = S.trainCfg?.category || ''
+  const isSteamTrain = cat.includes('steam')
+  if (S.frame % 3 === 0 && isSteamTrain) spawnSteam()
+  // Diesel gets small exhaust puffs (less visible)
+  if (S.frame % 8 === 0 && !isSteamTrain && cat.includes('diesel')) spawnSteam()
   for (let i = S.steam.length - 1; i >= 0; i--) {
     const p = S.steam[i]
     p.g.x -= (S.speed * 0.6 + p.vx) * delta
