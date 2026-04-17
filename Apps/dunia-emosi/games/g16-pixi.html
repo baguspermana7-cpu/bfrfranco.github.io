@@ -340,7 +340,7 @@ const QUESTIONS = {
     {q:'Warna 🔵?',ans:'BIRU',wrong:['MERAH','HIJAU','UNGU']},
     {q:'Warna 🟡?',ans:'KUNING',wrong:['ORANYE','PUTIH','MERAH']},
     {q:'Warna 🟢?',ans:'HIJAU',wrong:['BIRU','KUNING','HITAM']},
-    {q:'Angka ①?',ans:'1',wrong:['2','3','4']},{q:'Angka ③?',ans:'3',wrong:['2','4','5']},
+    {q:'3-2=?',ans:'1',wrong:['2','3','4']},{q:'1+2=?',ans:'3',wrong:['2','4','5']},
     {q:'🐮 Suaranya?',ans:'MOO',wrong:['BAA','OINK','QUACK']},
     {q:'🐏 Suaranya?',ans:'BAA',wrong:['MOO','BARK','MEW']},
     {q:'🐕 Suaranya?',ans:'GUKGUK',wrong:['MEONG','KWEK','EMBEK']},
@@ -424,6 +424,7 @@ const S={
   trainState:'MOVING',trainBobT:0,currentObstacleIdx:-1,
   cleared:0,wrongTaps:0,totalObstacles:0,startTime:0,gameOver:false,
   trackLength:0,boostTimer:0,deadTimer:0,noWrongAnswers:true,cameraShake:0,
+  arrivedFlag:false,winShown:false,
 }
 let app, stage
 let bgContainer, hillContainer, worldContainer
@@ -433,12 +434,13 @@ let railTies=[], obstacleContainers=[]
 let ambientBirds=[], ambientClouds=[], twinkleStars=[]
 let headlightBeam=null, fireGlow=null
 let _ticker_t=0
-let TRAIN_SCREEN_X=0, WORLD_LENGTH=0
+let TRAIN_SCREEN_X=0, WORLD_LENGTH=0, STATION_X=0
+let npcArmsUp=null, npcArmsDown=null, arrivalConfetti=false, npcWaveT=0
 const TIE_SPACING=44
 
 async function initPixi(){
   const W=window.innerWidth, H=window.innerHeight
-  TRAIN_SCREEN_X=W*0.15; WORLD_LENGTH=W*7
+  TRAIN_SCREEN_X=W*0.15; WORLD_LENGTH=W*7; STATION_X=WORLD_LENGTH*0.84
   app=new PIXI.Application()
   await app.init({
     canvas:document.getElementById('pixi-canvas'),
@@ -457,6 +459,7 @@ async function initPixi(){
   drawCliff(W,H)
   buildAmbient(W,H)
   buildObstaclesOnTrack(W,H)
+  buildArrivalStation(W,H)
   buildTrain(W,H)
   buildHeadlightBeam(W,H)
   buildFireGlow(W,H)
@@ -1012,11 +1015,12 @@ function buildObstacleGraphic(ox,tY,idx){
 
 // ── Game Loop ──────────────────────────────────────────────────────────────────
 function gameLoop(ticker){
-  if(!S.running||S.gameOver)return
+  if(!S.running)return
   const dt=ticker.deltaMS/1000; _ticker_t+=dt
+  if(S.gameOver && S.trainState!=='ARRIVED')return
   updateTrain(dt); updateObstacles(dt)
   updateSmoke(dt); updateSparks(dt)
-  updateAmbient(dt); updateFX(dt)
+  updateAmbient(dt); updateCelebration(dt); updateFX(dt)
   updateHUDFrame()
 }
 
@@ -1078,12 +1082,24 @@ function updateTrain(dt){
       else speed=baseSpeed
     } else speed=baseSpeed
   } else if(S.trainState==='STOPPED'||S.trainState==='CLEARING') speed=0
+  else if(S.trainState==='ARRIVING'){
+    const dist=STATION_X-S.worldX
+    if(dist>18){speed=Math.max(10,baseSpeed*0.28*Math.min(dist/200,1)+8)}
+    else{
+      speed=0
+      if(!S.arrivedFlag){
+        S.arrivedFlag=true; S.trainState='ARRIVED'
+        startArrivalCelebration(W,H)
+        setTimeout(()=>{if(!S.winShown){S.winShown=true;S.gameOver=true;S.running=false;showWin()}},2600)
+      }
+    }
+  } else if(S.trainState==='ARRIVED') speed=0
 
   S.worldX+=speed*dt
-  if(S.worldX>WORLD_LENGTH-40&&S.trainState!=='DEAD'){triggerDeath();return}
-  if(S.cleared===S.totalObstacles&&S.trainState!=='DEAD'){
+  if(S.worldX>WORLD_LENGTH-40&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){triggerDeath();return}
+  if(S.cleared===S.totalObstacles&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){
     if(S.trainState!=='BOOSTING'&&S.trainState!=='MOVING'){S.trainState='BOOSTING';S.boostTimer=3}
-    if(S.worldX>WORLD_LENGTH*0.9){triggerWin();return}
+    if(S.worldX>STATION_X-W*0.55){triggerArrival();return}
   }
 
   const cameraX=Math.max(0,S.worldX-TRAIN_SCREEN_X)
@@ -1196,9 +1212,9 @@ function showBrakeSparks(){
 
 function updateSparks(dt){
   sparkParticles=sparkParticles.filter(s=>{
-    s._life-=dt*3.2; if(s._life<=0){stage.removeChild(s);return false}
+    s._life-=dt*(s._decay||3.2); if(s._life<=0){stage.removeChild(s);return false}
     s.x+=s._vx*dt; s.y+=s._vy*dt; s._vy+=200*dt
-    s.alpha=s._life; s.rotation+=5*dt; return true
+    s.alpha=Math.min(s._life*1.5,1); s.rotation+=5*dt; return true
   })
   dustParticles=dustParticles.filter(d=>{
     d._life-=dt*2; if(d._life<=0){stage.removeChild(d);return false}
@@ -1252,7 +1268,6 @@ function clearObstacle(obs){
   document.getElementById('speed-lines').style.opacity='0.65'
   setTimeout(()=>{document.getElementById('speed-lines').style.opacity='0'},750)
   document.getElementById('obstacle-count').textContent=`🚧 ${S.cleared}/${S.totalObstacles}`
-  if(S.cleared===S.totalObstacles)setTimeout(()=>triggerWin(),600)
 }
 
 function explodeObstacle(obs){
@@ -1283,10 +1298,10 @@ function explodeObstacle(obs){
 function hideQuizPanel(){quizActive=false;quizLocked=false;document.getElementById('quiz-panel').classList.remove('show')}
 
 function triggerDeath(){S.trainState='DEAD';S.deadTimer=1.2;S.gameOver=true;hideQuizPanel();flashScreen('#ff0000',0.55)}
-function triggerWin(){
-  if(S.gameOver)return; S.gameOver=true; S.running=false; hideQuizPanel()
+function triggerArrival(){
+  if(S.trainState==='ARRIVING'||S.trainState==='ARRIVED'||S.gameOver)return
+  S.trainState='ARRIVING'; hideQuizPanel()
   document.getElementById('speed-lines').style.opacity='0'
-  setTimeout(()=>showWin(),400)
 }
 
 function updateHUD(){
@@ -1328,6 +1343,173 @@ function showLose(){
   document.getElementById('lose-msg').textContent=`Kereta jatuh ke tebing! (${S.cleared}/${S.totalObstacles} rintangan bersih)`
   try{sessionStorage.setItem('g16Result',JSON.stringify({stars:0,level:S.level}))}catch(_){}
   document.getElementById('ovl-lose').classList.add('show')
+}
+
+// ── Arrival Station ───────────────────────────────────────────────────────────
+function buildArrivalStation(W,H){
+  const tY=getTrackY(H)
+  const pX=STATION_X-W*0.06, pW=W*1.05, pH=34
+  const bCX=STATION_X+W*0.42, bW=138, bH=92
+
+  const g=new PIXI.Graphics()
+
+  // ── Platform ──
+  g.rect(pX,tY-pH,pW,pH).fill({color:0xd4c5a9})
+  g.rect(pX,tY-pH,pW,4).fill({color:0xfbbf24})
+  g.rect(pX,tY-pH+4,pW,3).fill({color:0xbdaf90})
+  g.rect(pX,tY,pW,9).fill({color:0xa89870})
+  for(let cx=pX+40;cx<pX+pW;cx+=90){
+    g.rect(cx-5,tY,10,18).fill({color:0x94a3b8})
+    g.rect(cx-7,tY+16,14,3).fill({color:0x64748b})
+  }
+
+  // ── Station Building ──
+  const bX=bCX-bW/2, bY=tY-pH
+  g.rect(bX,bY-bH,bW,bH).fill({color:0xfef3c7})
+  // Windows
+  for(const wx of[bX+20,bX+80]){
+    g.rect(wx,bY-bH+16,24,30).fill({color:0x7dd3fc,alpha:0.8})
+    g.rect(wx,bY-bH+16,24,30).stroke({width:2,color:0x475569})
+    g.rect(wx+11,bY-bH+16,2,30).fill({color:0x475569})
+    g.rect(wx,bY-bH+30,24,2).fill({color:0x475569})
+  }
+  // Door
+  g.roundRect(bX+bW/2-12,bY-30,24,30,3).fill({color:0x7c3aed})
+  g.roundRect(bX+bW/2-12,bY-30,24,30,3).stroke({width:1.5,color:0x5b21b6})
+  g.circle(bX+bW/2+6,bY-17,2.5).fill({color:0xfbbf24})
+  // Pillars
+  for(const px of[bX+8,bX+bW-16]){
+    g.rect(px,bY-bH,8,bH).fill({color:0xfde68a})
+    g.rect(px-3,bY-bH,14,6).fill({color:0xfcd34d})
+    g.rect(px-3,bY-2,14,5).fill({color:0xfcd34d})
+  }
+  // Roof (hip roof shape)
+  g.poly([bX-12,bY-bH,bX+bW+12,bY-bH,bX+bW+18,bY-bH-14,bX-18,bY-bH-14]).fill({color:0xe11d48})
+  g.rect(bX-18,bY-bH-22,bW+36,10).fill({color:0xfef9c3})
+  g.rect(bX-18,bY-bH-14,bW+36,4).fill({color:0xdc2626})
+  for(let rx=bX-12;rx<bX+bW+12;rx+=14)
+    g.moveTo(rx,bY-bH).lineTo(rx,bY-bH-14).stroke({width:0.8,color:0x991b1b,alpha:0.5})
+  // Sign board "SELAMAT TIBA"
+  g.rect(bX+14,bY-bH+56,bW-28,22).fill({color:0x1e3a8a})
+  g.rect(bX+14,bY-bH+56,bW-28,22).stroke({width:1.5,color:0x60a5fa,alpha:0.6})
+  // Draw text as PIXI Text
+  const signTxt=new PIXI.Text({text:'SELAMAT TIBA!',style:{fontFamily:'Fredoka One,sans-serif',fontSize:11,fill:0xfef9c3,fontWeight:'900',letterSpacing:1}})
+  signTxt.anchor.set(0.5,0.5); signTxt.x=bCX; signTxt.y=bY-bH+67
+  worldContainer.addChild(signTxt)
+
+  // ── Platform lamp posts ──
+  for(const lx of[pX+55,pX+200,pX+370,pX+550]){
+    if(lx>pX+pW)continue
+    g.rect(lx-2,tY-pH-58,4,58).fill({color:0x5d3a1a})
+    g.rect(lx-15,tY-pH-62,30,7).fill({color:0xfcd34d})
+    g.circle(lx,tY-pH-58,10).fill({color:0xfefce8,alpha:0.92})
+    g.circle(lx,tY-pH-58,18).fill({color:0xfefce8,alpha:0.05})
+  }
+
+  // ── Bunting flags ──
+  const flagCols=[0xef4444,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xf97316]
+  g.moveTo(pX+55,tY-pH-55).lineTo(bX+bW+20,tY-pH-55).stroke({width:0.9,color:0x9ca3af,alpha:0.55})
+  for(let i=0;i<16;i++){
+    const fx=pX+55+i*36, fy=tY-pH-55+Math.sin(i*0.72)*5
+    if(fx+28>bX+bW+20)break
+    g.poly([fx,fy,fx+14,fy+13,fx+28,fy]).fill({color:flagCols[i%6],alpha:0.88})
+  }
+  worldContainer.addChild(g)
+
+  // ── NPCs — two arm-state layers ──
+  npcArmsDown=new PIXI.Graphics()
+  npcArmsUp=new PIXI.Graphics()
+  const npcCols=[
+    {s:0xfde68a,c:0xef4444},{s:0xd4a574,c:0x3b82f6},{s:0xf4a460,c:0x22c55e},
+    {s:0xfbbf24,c:0xa855f7},{s:0xcd853f,c:0xf97316},{s:0xdeb887,c:0x06b6d4},
+    {s:0xfde68a,c:0xdc2626},{s:0xd4a574,c:0x1d4ed8},{s:0xf4a460,c:0x16a34a},
+  ]
+  for(let i=0;i<9;i++){
+    const nx=pX+68+i*40+((i%2)*10), ny=tY-pH
+    const col=npcCols[i%npcCols.length]
+    _drawNPC(npcArmsDown,nx,ny,col.s,col.c,false)
+    _drawNPC(npcArmsUp,nx,ny,col.s,col.c,true)
+  }
+  // Marching band (4 members, to the right)
+  const band=[{c:0xef4444,inst:'drum'},{c:0x3b82f6,inst:'trumpet'},{c:0x22c55e,inst:'flag'},{c:0xfbbf24,inst:'drum'}]
+  band.forEach((b,i)=>{
+    const bx=pX+440+i*44, by=tY-pH
+    if(bx>pX+pW)return
+    _drawBandMember(npcArmsDown,bx,by,b.c,b.inst,false)
+    _drawBandMember(npcArmsUp,bx,by,b.c,b.inst,true)
+  })
+  npcArmsUp.visible=false
+  worldContainer.addChild(npcArmsDown)
+  worldContainer.addChild(npcArmsUp)
+}
+
+function _drawNPC(g,x,y,skinC,clothC,armsUp){
+  g.circle(x,y-32,5.5).fill({color:skinC})
+  g.rect(x-4,y-26,8,17).fill({color:clothC})
+  if(armsUp){
+    g.rect(x-12,y-32,5,13).fill({color:clothC})
+    g.rect(x+7,y-32,5,13).fill({color:clothC})
+    g.circle(x-10,y-32,3).fill({color:skinC})
+    g.circle(x+12,y-32,3).fill({color:skinC})
+  }else{
+    g.rect(x-12,y-24,5,12).fill({color:clothC})
+    g.rect(x+7,y-24,5,12).fill({color:clothC})
+    g.circle(x-10,y-13,3).fill({color:skinC})
+    g.circle(x+12,y-13,3).fill({color:skinC})
+  }
+  g.rect(x-5,y-9,4,12).fill({color:0x1e293b})
+  g.rect(x+1,y-9,4,12).fill({color:0x1e293b})
+}
+
+function _drawBandMember(g,x,y,clothC,inst,armsUp){
+  _drawNPC(g,x,y,0xf5deb3,clothC,armsUp)
+  if(inst==='drum'&&!armsUp){
+    g.circle(x,y-14,7).fill({color:0x7c3aed})
+    g.circle(x,y-14,7).stroke({width:1.5,color:0xfbbf24})
+    g.rect(x-7,y-14,14,1.5).fill({color:0xfbbf24})
+  }else if(inst==='trumpet'&&!armsUp){
+    g.rect(x+5,y-22,15,4).fill({color:0xfbbf24})
+    g.circle(x+22,y-20,5).fill({color:0xfbbf24,alpha:0.55})
+  }else if(inst==='flag'){
+    g.rect(x+7,y-46,2.5,20).fill({color:0x5d3a1a})
+    g.poly([x+9.5,y-46,x+26,y-38,x+9.5,y-30]).fill({color:0xef4444})
+  }
+}
+
+function startArrivalCelebration(W,H){
+  arrivalConfetti=true
+  flashScreen('#22c55e',0.45)
+  document.getElementById('status-text').textContent='🎉 Selamat Tiba!'
+  document.getElementById('danger-fill').style.background='linear-gradient(90deg,#4ade80,#22c55e)'
+  // Reveal both NPC layers (will alternate in updateCelebration)
+  if(npcArmsUp)npcArmsUp.visible=true
+  if(npcArmsDown)npcArmsDown.visible=false
+}
+
+function spawnConfetti(){
+  const W=app.screen.width
+  const cols=[0xef4444,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xf97316,0xe879f9,0x38bdf8]
+  const p=new PIXI.Graphics()
+  const w=4+Math.random()*6, h=3+Math.random()*4
+  p.rect(-w/2,-h/2,w,h).fill({color:cols[Math.floor(Math.random()*cols.length)]})
+  p.rotation=Math.random()*Math.PI*2
+  p.x=Math.random()*W; p.y=-8
+  p._vx=(Math.random()-0.5)*55; p._vy=70+Math.random()*110
+  p._rot=(Math.random()-0.5)*5; p._life=1.0; p._decay=0.42
+  stage.addChild(p); sparkParticles.push(p)
+}
+
+function updateCelebration(dt){
+  if(S.trainState!=='ARRIVED')return
+  npcWaveT+=dt
+  if(npcWaveT>=0.42){
+    npcWaveT=0
+    if(npcArmsUp&&npcArmsDown){
+      const u=npcArmsUp.visible
+      npcArmsUp.visible=!u; npcArmsDown.visible=u
+    }
+  }
+  if(arrivalConfetti&&Math.random()<0.48)spawnConfetti()
 }
 
 function flashScreen(color,alpha){
