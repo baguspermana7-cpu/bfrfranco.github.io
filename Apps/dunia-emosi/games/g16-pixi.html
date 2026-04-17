@@ -1029,7 +1029,7 @@ function updateTrain(dt){
   const W=app.screen.width, H=app.screen.height
   const tY=getTrackY(H)
   let speed=0
-  const baseSpeed=80+S.level*12, boostSpeed=baseSpeed*2.2
+  const baseSpeed=(80+S.level*12)*1.5, boostSpeed=baseSpeed*2.2
   const nextObs=S.obstacles.find(o=>!o.cleared&&o.worldX>S.worldX-10)
   const stopDist=80, brakeDist=110
 
@@ -1119,20 +1119,20 @@ function updateObstacles(dt){
 // ── Smoke / Dust / Embers / Steam ─────────────────────────────────────────────
 function updateSmoke(dt){
   const TS=TRAIN_STYLES[selectedTrainIdx]
-  const rate=S.trainState==='BOOSTING'?0.7:S.trainState==='STOPPED'?0.06:0.28
+  const rate=S.trainState==='BOOSTING'?0.85:S.trainState==='STOPPED'?0.08:0.45
   if(Math.random()<rate){
     const p=new PIXI.Graphics()
-    const r=5+Math.random()*(S.trainState==='BOOSTING'?11:7)
-    p.circle(0,0,r).fill({color:TS.smokeCol||0x888888,alpha:0.5})
+    const r=5+Math.random()*(S.trainState==='BOOSTING'?14:9)
+    p.circle(0,0,r).fill({color:TS.smokeCol||0x888888,alpha:0.55})
     p.x=trainContainer.x+17; p.y=trainContainer.y-46
-    p._vx=(Math.random()-0.5)*28-10; p._vy=-38-Math.random()*28; p._life=1.0
+    p._vx=(Math.random()-0.5)*22-18; p._vy=-32-Math.random()*22; p._life=1.0
     stage.addChild(p); smokePuffs.push(p)
   }
-  if(S.trainState==='BOOSTING'&&Math.random()<0.5)spawnEmber()
+  if(S.trainState==='BOOSTING'&&Math.random()<0.6)spawnEmber()
   smokePuffs=smokePuffs.filter(p=>{
-    p._life-=dt*1.35; if(p._life<=0){stage.removeChild(p);return false}
+    p._life-=dt*0.7; if(p._life<=0){stage.removeChild(p);return false}
     p.x+=p._vx*dt; p.y+=p._vy*dt
-    p.alpha=p._life*0.52; p.scale.set(1+(1-p._life)*1.8); return true
+    p.alpha=p._life*0.45; p.scale.set(1+(1-p._life)*2.5); return true
   })
 }
 
