@@ -6306,7 +6306,7 @@ body { background: #0a0a1a !important; }
           <!-- G15: Lokomotif Pemberani -->
           <div class="wmap-node" id="gtile-15" onclick="playClick();openLevelSelect(15)" title="Lokomotif Pemberani">
             <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#0D47A1,#42A5F5);">
-              <span class="wn-icon">💪</span>
+              <img class="wn-icon" src="assets/train/lokomotif-front-red.svg" alt="🚂" style="width:40px;height:44px;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.75));">
             </div>
             <div class="wmap-node-name">Lokomotif Pemberani</div>
             <div class="wmap-node-stars" id="gstars-15-lbl"></div>
@@ -6314,7 +6314,7 @@ body { background: #0a0a1a !important; }
           <!-- G16: Selamatkan Kereta! -->
           <div class="wmap-node" id="gtile-16" onclick="playClick();openLevelSelect(16)" title="Selamatkan Kereta!">
             <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#BF360C,#FF9800);">
-              <span class="wn-icon">🚨</span>
+              <img class="wn-icon" src="assets/train/lokomotif-front-blue.svg" alt="🚂" style="width:40px;height:44px;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.75));">
             </div>
             <div class="wmap-node-name">Selamatkan Kereta!</div>
             <div class="wmap-node-stars" id="gstars-16-lbl"></div>
@@ -8052,8 +8052,8 @@ const GAME_META = {
   12:{icon:'🌑',name:'Tebak Bayangan'},
   13:{icon:'🔥',name:'Evolusi Math'},
   14:{icon:'🏁',name:'Balapan Kereta'},
-  15:{icon:'💪',name:'Lokomotif Pemberani'},
-  16:{icon:'🆘',name:'Selamatkan Kereta!'},
+  15:{icon:'🚂',name:'Lokomotif Pemberani',iconImg:'assets/train/lokomotif-front-red.svg'},
+  16:{icon:'🚂',name:'Selamatkan Kereta!',iconImg:'assets/train/lokomotif-front-blue.svg'},
   17:{icon:'🌉',name:'Jembatan Goyang'},
   18:{icon:'🏛️',name:'Museum Ambarawa'},
   '13c':{icon:'🏅',name:'Gym Huruf & Suara'}
@@ -8977,6 +8977,8 @@ function openLevelSelect(gameNum) {
   const iconEl = document.getElementById('level-game-icon')
   if (gameNum === 10) {
     iconEl.innerHTML = '<img src="https://img.pokemondb.net/sprites/home/normal/pikachu.png" style="width:60px;height:60px;image-rendering:auto;display:block;" onerror="this.outerHTML=\'⚡\'">'
+  } else if (meta.iconImg) {
+    iconEl.innerHTML = `<img src="${meta.iconImg}" style="width:64px;height:70px;display:block;" alt="${meta.icon}">`
   } else {
     iconEl.textContent = meta.icon
   }
