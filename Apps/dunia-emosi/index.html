@@ -7773,26 +7773,26 @@ const EMOTIONS = [
 ]
 
 const ANIMAL_LETTERS = [
-  {animal:'🐓',word:'AYAM',   letter:'A',num:1},
-  {animal:'🦆',word:'BEBEK',  letter:'B',num:2},
-  {animal:'🦎',word:'CICAK',  letter:'C',num:3},
-  {animal:'🐑',word:'DOMBA',  letter:'D',num:4},
-  {animal:'🦅',word:'ELANG',  letter:'E',num:5},
-  {animal:'🦩',word:'FLAMINGO',letter:'F',num:6},
-  {animal:'🐘',word:'GAJAH',  letter:'G',num:7},
-  {animal:'🐯',word:'HARIMAU',letter:'H',num:8},
-  {animal:'🐟',word:'IKAN',   letter:'I',num:9},
-  {animal:'🦒',word:'JERAPAH',letter:'J',num:10},
-  {animal:'🐴',word:'KUDA',   letter:'K',num:11},
-  {animal:'🐬',word:'LUMBA',  letter:'L',num:12},
-  {animal:'🐒',word:'MONYET', letter:'M',num:13},
-  {animal:'🦜',word:'NURI',   letter:'N',num:14},
-  {animal:'🦧',word:'ORANG UTAN',letter:'O',num:15},
-  {animal:'🐼',word:'PANDA',  letter:'P',num:16},
-  {animal:'🦌',word:'RUSA',   letter:'R',num:17},
-  {animal:'🦁',word:'SINGA',  letter:'S',num:18},
-  {animal:'🐭',word:'TIKUS',  letter:'T',num:19},
-  {animal:'🐛',word:'ULAT',   letter:'U',num:20}
+  {animal:'🐓',word:'AYAM',      letter:'A',num:1, hint:'Unggas yang berkokok saat matahari terbit setiap pagi'},
+  {animal:'🦆',word:'BEBEK',     letter:'B',num:2, hint:'Unggas gempal yang pandai berenang dan berbunyi kwek-kwek'},
+  {animal:'🦎',word:'CICAK',     letter:'C',num:3, hint:'Reptil kecil yang merayap di dinding dan memangsa nyamuk'},
+  {animal:'🐑',word:'DOMBA',     letter:'D',num:4, hint:'Hewan berkaki empat berbulu sangat tebal penghasil wol'},
+  {animal:'🦅',word:'ELANG',     letter:'E',num:5, hint:'Burung besar bercakar tajam yang terbang paling tinggi di langit'},
+  {animal:'🦩',word:'FLAMINGO',  letter:'F',num:6, hint:'Burung cantik berwarna merah muda yang sering berdiri dengan satu kaki'},
+  {animal:'🐘',word:'GAJAH',     letter:'G',num:7, hint:'Hewan darat terbesar di dunia, punya belalai panjang dan telinga sangat lebar'},
+  {animal:'🐯',word:'HARIMAU',   letter:'H',num:8, hint:'Kucing besar bergaris-garis hitam yang jago berburu di hutan'},
+  {animal:'🐟',word:'IKAN',      letter:'I',num:9, hint:'Makhluk bersisik yang hidup di air dan bernapas lewat insang'},
+  {animal:'🦒',word:'JERAPAH',   letter:'J',num:10,hint:'Hewan berbintik-bintik coklat dengan leher terpanjang di seluruh dunia'},
+  {animal:'🐴',word:'KUDA',      letter:'K',num:11,hint:'Hewan berkaki empat yang bisa berlari sangat kencang dan sering ditunggangi manusia'},
+  {animal:'🐬',word:'LUMBA',     letter:'L',num:12,hint:'Mamalia laut yang sangat cerdas dan suka melompat tinggi di lautan'},
+  {animal:'🐒',word:'MONYET',    letter:'M',num:13,hint:'Hewan pandai berlengan panjang yang jago melompat dan memanjat pohon'},
+  {animal:'🦜',word:'NURI',      letter:'N',num:14,hint:'Burung berwarna-warni cerah yang bisa menirukan suara percakapan manusia'},
+  {animal:'🦧',word:'ORANG UTAN',letter:'O',num:15,hint:'Kera besar berbulu merah-coklat yang hidup di hutan tropis Kalimantan'},
+  {animal:'🐼',word:'PANDA',     letter:'P',num:16,hint:'Hewan berbulu hitam-putih yang sangat gemar memakan batang bambu'},
+  {animal:'🦌',word:'RUSA',      letter:'R',num:17,hint:'Hewan berkaki empat yang jantannya memiliki tanduk bercabang-cabang indah'},
+  {animal:'🦁',word:'SINGA',     letter:'S',num:18,hint:'Hewan besar berbulu lebat di sekitar kepala yang dijuluki Raja Hutan'},
+  {animal:'🐭',word:'TIKUS',     letter:'T',num:19,hint:'Hewan pengerat kecil berekor panjang yang sangat cepat dan gemar mencuri makanan'},
+  {animal:'🐛',word:'ULAT',      letter:'U',num:20,hint:'Hewan berbadan lunak dan bersegmen yang kelak berubah menjadi kupu-kupu indah'}
 ]
 
 const MATCH_PAIRS = [
@@ -9874,7 +9874,7 @@ function nextG3Round(){
   document.getElementById('g3-progress-bar').style.width=((roundInSet/g3State.maxRound)*100)+'%'
   if(isLetterMode){
     document.getElementById('g3-word').innerHTML=item.word.split('').map((ch,i)=>i===0?`<span class="g3-letter g3-blank" id="g3-ltr-${i}">_</span>`:`<span class="g3-letter" id="g3-ltr-${i}">${ch}</span>`).join('')
-    document.getElementById('g3-hint').textContent=`Huruf apa yang ada di depan kata "${item.word}"?`
+    document.getElementById('g3-hint').textContent=`💡 ${item.hint}`
     const wrongLetters=ALL_LETTERS.split('').filter(l=>l!==item.letter).sort(()=>Math.random()-0.5).slice(0,numChoices-1)
     renderG3Choices([item.letter,...wrongLetters].sort(()=>Math.random()-0.5),item.letter,false,numChoices)
   } else {
