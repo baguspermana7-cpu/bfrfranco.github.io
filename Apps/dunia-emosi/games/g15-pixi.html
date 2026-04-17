@@ -1170,7 +1170,8 @@ function spawnLetterBox() {
   const targetLetter = word.word[currentLetterIdx];
   const allLetters = 'ABCDEFGHIJKLMNOPRSTUVWY';
   const lanesToFill = shuffle([0, 1, 2]);
-  const numBoxes = 1 + Math.floor(Math.random() * 2);
+  const isEasy = getDifficulty() === 'easy';
+  const numBoxes = isEasy ? 1 : 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < Math.min(numBoxes, 3); i++) {
     const lane = lanesToFill[i];
     const isTarget = (i === 0);
@@ -1362,6 +1363,12 @@ function onWordComplete() {
 function triggerWrong() {
   if (invincible) return;
   invincible = true;
+  // Easy mode: 50% chance to survive (shield)
+  if (getDifficulty() === 'easy' && Math.random() < 0.5) {
+    flashScreen('yellow');
+    setTimeout(() => { invincible = false; }, 800);
+    return;
+  }
   lives--; if (lives < 0) lives = 0;
   updateLivesHUD();
   document.body.classList.add('shaking');
