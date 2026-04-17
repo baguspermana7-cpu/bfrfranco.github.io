@@ -842,7 +842,7 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
 }
 
 // Draw a train silhouette on a PIXI.Graphics object (center-anchored, W≈70, H≈26)
-function drawTrainG(g, bodyC, accC, catKey, trainKey) {
+function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
   g.clear()
   const bC = hexN(bodyC), aC = hexN(accC)
   const W = 70, hW = 35, H = 26, hH = 13
@@ -966,8 +966,8 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey) {
   // Undercarriage / footplate
   g.rect(-hW, hH - 1, W, 3).fill({ color: 0x000000, alpha: 0.4 })
   if (catKey && catKey.includes('steam')) {
-    // Compute a visual variant from trainKey hash (0-4)
-    const hash = (trainKey||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 5
+    // Use variant from selection (1-5), fallback to hash
+    const hash = variant ? (variant-1) : (trainKey||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 5
     // Chimney — vary position and width
     const chimneyX = hW - 18 - hash * 2
     const chimneyW = 6 + (hash % 3)
@@ -1024,8 +1024,7 @@ function updatePlayerEmoji() {
   if (!playerSprite || !S.trainCfg) return
   const cat = S.trainCfg.category || ''
   const drawKey = cat.includes('maglev') ? 'maglev' : cat.includes('hsr') ? 'hsr' : cat.includes('steam') ? 'steam' : cat.includes('emu') ? 'emu' : 'diesel'
-  // Pass train key for variant differentiation within same category
-  drawTrainG(playerSprite, S.trainCfg.bodyColor, S.trainCfg.accColor, drawKey, S.trainCfg.key)
+  drawTrainG(playerSprite, S.trainCfg.bodyColor, S.trainCfg.accColor, drawKey, S.trainCfg.key, S.trainCfg.variant||1)
 }
 
 function tickPlayer(delta) {
@@ -1562,7 +1561,7 @@ function showTrainsForCat(cat) {
     card.onclick = () => {
       grid.querySelectorAll('.train-card').forEach(c => c.classList.remove('sel'))
       card.classList.add('sel')
-      S.trainCfg = { ...t, category: cat.key }
+      S.trainCfg = { ...t, category: cat.key, variant: trainV }
       document.getElementById('train-name-badge').textContent = t.name
       document.getElementById('go-btn').style.display = 'block'
     }
