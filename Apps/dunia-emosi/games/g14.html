@@ -165,6 +165,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c0
     <div class="ovl-msg" id="fin-msg">Luar biasa!</div>
     <button class="ovl-btn" onclick="finishGame()">Kembali 🏠</button>
     <button class="ovl-btn sec" onclick="replayRace()">Main Lagi 🔄</button>
+    <button class="ovl-btn sec" onclick="showSelectScreen()">Ganti Kereta 🚂</button>
   </div>
 </div>
 
@@ -1370,6 +1371,15 @@ function replayRace() {
   startRace()
 }
 
+function showSelectScreen() {
+  S.running = false
+  document.getElementById('quiz-ovl').style.display = 'none'
+  document.getElementById('ovl-fin').classList.remove('show')
+  const so = document.getElementById('select-ovl')
+  so.style.display = 'flex'
+  showCategories()
+}
+
 function finishGame() { goBack() }
 function goBack() {
   S.running = false
@@ -1377,7 +1387,12 @@ function goBack() {
   else window.location.href = '../index.html'
 }
 function confirmBack() {
-  if (!S.running || confirm('Keluar dari balapan?')) goBack()
+  if (!S.running) {
+    // On select screen → go back to index
+    goBack()
+  } else if (confirm('Keluar dari balapan?')) {
+    showSelectScreen()
+  }
 }
 
 // ═══════════════════════════════════════════════════════════

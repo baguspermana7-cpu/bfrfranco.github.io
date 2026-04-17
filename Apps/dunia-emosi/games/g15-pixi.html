@@ -82,22 +82,36 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 
 /* ── Train Select Screen ── */
 #train-select{position:fixed;inset:0;z-index:900;background:linear-gradient(180deg,#0a0212 0%,#120430 60%,#0a0212 100%);display:flex;flex-direction:column;overflow:hidden}
-#ts-header{padding:14px 16px 6px;flex-shrink:0}
-#ts-title{font-size:22px;font-weight:900;color:#e9d5ff;text-align:center;text-shadow:0 0 20px rgba(139,92,246,0.7)}
-#ts-subtitle{font-size:11px;color:rgba(233,213,255,0.45);letter-spacing:1.5px;text-align:center;margin:2px 0 8px}
-#station-intro{text-align:center;background:rgba(139,92,246,0.14);border:1.5px solid rgba(139,92,246,0.4);border-radius:14px;margin:0 14px 10px;padding:8px 14px;flex-shrink:0}
-.si-label{font-size:9px;color:rgba(233,213,255,0.5);letter-spacing:1.8px;font-weight:700}
-.si-icon{font-size:26px;display:block;margin:1px 0}
-.si-name{font-size:17px;font-weight:900;color:#e9d5ff}
-.si-landmark{font-size:11px;color:rgba(233,213,255,0.6);margin-top:2px}
-#ts-grid-wrap{flex:1;overflow-y:auto;padding:0 10px 16px;-webkit-overflow-scrolling:touch}
-#train-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-@media(min-width:380px){#train-grid{grid-template-columns:repeat(5,1fr)}}
-@media(min-width:520px){#train-grid{grid-template-columns:repeat(6,1fr)}}
-.tcard{border-radius:12px;border:2px solid rgba(139,92,246,0.22);background:rgba(139,92,246,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:hidden;display:flex;flex-direction:column;transition:all .12s}
-.tcard:active{transform:scale(0.9);background:rgba(139,92,246,0.25);border-color:rgba(167,139,250,0.6)}
-.tcard canvas{width:100%;height:48px;display:block}
-.tcard .tname{font-size:8px;font-weight:700;color:#c4b5fd;text-align:center;padding:2px 3px 5px;line-height:1.3;min-height:24px}
+#ts-header{padding:12px 16px 4px;flex-shrink:0;display:flex;align-items:center;gap:10px}
+#ts-back{background:rgba(139,92,246,0.2);border:2px solid rgba(139,92,246,0.45);border-radius:12px;color:#e9d5ff;padding:7px 12px;font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0;box-shadow:0 3px 0 rgba(88,28,135,0.6)}
+#ts-back:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(88,28,135,0.6)}
+#ts-title-wrap{flex:1;text-align:center}
+#ts-title{font-size:20px;font-weight:900;color:#e9d5ff;text-shadow:0 0 20px rgba(139,92,246,0.7);line-height:1}
+#ts-subtitle{font-size:10px;color:rgba(233,213,255,0.4);letter-spacing:1.5px;margin-top:1px}
+#station-intro{display:flex;align-items:center;gap:10px;background:rgba(139,92,246,0.14);border:1.5px solid rgba(139,92,246,0.4);border-radius:14px;margin:8px 12px 0;padding:8px 14px;flex-shrink:0}
+.si-icon{font-size:28px;flex-shrink:0}
+.si-text{text-align:left}
+.si-label{font-size:8px;color:rgba(233,213,255,0.45);letter-spacing:1.8px;font-weight:700;display:block}
+.si-name{font-size:15px;font-weight:900;color:#e9d5ff;display:block;line-height:1.2}
+.si-landmark{font-size:10px;color:rgba(233,213,255,0.55);display:block;margin-top:1px}
+/* Filter tabs */
+#type-filter{display:flex;gap:6px;overflow-x:auto;padding:10px 12px 2px;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#type-filter::-webkit-scrollbar{display:none}
+.tfbtn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:2px solid rgba(139,92,246,0.3);background:rgba(139,92,246,0.08);color:rgba(196,181,253,0.7);font-size:11px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;transition:all .12s;letter-spacing:0.3px}
+.tfbtn.active{background:rgba(139,92,246,0.45);border-color:#a78bfa;color:#fff;box-shadow:0 0 14px rgba(139,92,246,0.5)}
+/* Train count badge */
+#ts-count{font-size:9px;color:rgba(196,181,253,0.5);text-align:center;padding:4px 0 2px;letter-spacing:0.8px;flex-shrink:0}
+#ts-grid-wrap{flex:1;overflow-y:auto;padding:6px 12px 20px;-webkit-overflow-scrolling:touch}
+#train-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:480px){#train-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:700px){#train-grid{grid-template-columns:repeat(4,1fr)}}
+.tcard{border-radius:16px;border:2.5px solid rgba(139,92,246,0.22);background:rgba(20,8,48,0.6);cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:hidden;display:flex;flex-direction:column;transition:all .14s;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+.tcard.selected{border-color:#a78bfa;background:rgba(139,92,246,0.25);box-shadow:0 0 20px rgba(139,92,246,0.5),0 4px 12px rgba(0,0,0,0.4)}
+.tcard:active{transform:scale(0.93)}
+.tcard canvas{width:100%;aspect-ratio:120/48;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+.tcard-info{padding:7px 9px 9px}
+.tname{font-size:11px;font-weight:700;color:#e9d5ff;display:block;line-height:1.35}
+.tsub{font-size:9px;color:rgba(167,139,250,0.5);display:block;margin-top:2px;letter-spacing:0.4px;text-transform:uppercase}
 
 /* ── Station Banner (shown at game start) ── */
 #station-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;display:none;flex-direction:column;align-items:center;gap:3px;background:rgba(0,0,0,0.88);border:2.5px solid rgba(139,92,246,0.7);border-radius:24px;padding:20px 32px;backdrop-filter:blur(18px);pointer-events:none;opacity:1;transition:opacity .5s,transform .5s}
@@ -177,15 +191,30 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 <!-- Train Select Screen -->
 <div id="train-select">
   <div id="ts-header">
-    <div id="ts-title">🚂 Pilih Keretamu!</div>
-    <div id="ts-subtitle">PILIH KERETA UNTUK MEMULAI PERJALANAN</div>
+    <button id="ts-back" onclick="goBack()">⌂</button>
+    <div id="ts-title-wrap">
+      <div id="ts-title">🚂 Pilih Keretamu!</div>
+      <div id="ts-subtitle">PILIH KERETA UNTUK MEMULAI</div>
+    </div>
   </div>
   <div id="station-intro">
-    <div class="si-label">STASIUN BERANGKAT</div>
     <span class="si-icon" id="si-icon">🏛️</span>
-    <div class="si-name" id="si-name">Surabaya Kota</div>
-    <div class="si-landmark" id="si-landmark">Tugu Pahlawan</div>
+    <div class="si-text">
+      <span class="si-label">STASIUN BERANGKAT</span>
+      <span class="si-name" id="si-name">Surabaya Kota</span>
+      <span class="si-landmark" id="si-landmark">Tugu Pahlawan</span>
+    </div>
   </div>
+  <div id="type-filter">
+    <button class="tfbtn active" data-filter="all" onclick="setTrainFilter(this)">🚆 Semua</button>
+    <button class="tfbtn" data-filter="steam" onclick="setTrainFilter(this)">♨️ Steam</button>
+    <button class="tfbtn" data-filter="diesel" onclick="setTrainFilter(this)">🛢️ Diesel</button>
+    <button class="tfbtn" data-filter="electric" onclick="setTrainFilter(this)">⚡ Elektrik</button>
+    <button class="tfbtn" data-filter="highspeed" onclick="setTrainFilter(this)">💨 Highspeed</button>
+    <button class="tfbtn" data-filter="tram" onclick="setTrainFilter(this)">🚃 Tram</button>
+    <button class="tfbtn" data-filter="heritage" onclick="setTrainFilter(this)">👑 Heritage</button>
+  </div>
+  <div id="ts-count">100 KERETA TERSEDIA</div>
   <div id="ts-grid-wrap"><div id="train-grid"></div></div>
 </div>
 
@@ -395,14 +424,70 @@ const TRAIN_CATALOG = TRAIN_MODELS; // 100 unique trains, no livery system
 let selectedTrain = null; // set by train select screen
 
 // ── Background Themes (0=night, 1=sunrise, 2=forest, 3=mountain, 4=tropical) ─
-const BG_THEME = Math.min(4, Math.floor((LEVEL - 1) / 5));
+// 30 level-specific background themes — one dramatic look per level
 const THEMES = [
-  { sky: 0x03050f, skyMid: 0x070a1f, ground: 0x07090e, hill: 0x0a0e1e, railColor: 0x38bdf8, railShadow: 0x0ea5e9, sleeperColor: 0x92400e },
-  { sky: 0xff7c00, skyMid: 0xffd6a0, ground: 0x3d2b1f, hill: 0x9a5a2a, railColor: 0xfbbf24, railShadow: 0xf59e0b, sleeperColor: 0x6b3a1f },
-  { sky: 0x0c1f10, skyMid: 0x143520, ground: 0x071209, hill: 0x0a1e0d, railColor: 0x4ade80, railShadow: 0x22c55e, sleeperColor: 0x1a3a10 },
-  { sky: 0x0d1b2e, skyMid: 0x1a2f4a, ground: 0x081220, hill: 0x112240, railColor: 0x94a3b8, railShadow: 0x64748b, sleeperColor: 0x1e2a40 },
-  { sky: 0x1ea6ff, skyMid: 0x7dd3fc, ground: 0x1a5c1a, hill: 0x246824, railColor: 0xfcd34d, railShadow: 0xf59e0b, sleeperColor: 0x3d2b00 },
+  // Lv1  Deep night, stars, blue rails
+  { sky:0x03050f, skyMid:0x070a1f, ground:0x07090e, hill:0x0a0e1e, railColor:0x38bdf8, railShadow:0x0ea5e9, sleeperColor:0x92400e, variant:0 },
+  // Lv2  Purple dusk, violet sky
+  { sky:0x120420, skyMid:0x2d0a4e, ground:0x0e061a, hill:0x1a0630, railColor:0xa78bfa, railShadow:0x7c3aed, sleeperColor:0x4c1d95, variant:0 },
+  // Lv3  Sunrise orange
+  { sky:0xff7c00, skyMid:0xffd6a0, ground:0x3d2b1f, hill:0x9a5a2a, railColor:0xfbbf24, railShadow:0xf59e0b, sleeperColor:0x6b3a1f, variant:1 },
+  // Lv4  Early morning pink
+  { sky:0xffb3c6, skyMid:0xff85a1, ground:0x4a2030, hill:0x8a3050, railColor:0xfecdd3, railShadow:0xfb7185, sleeperColor:0x7f1d1d, variant:1 },
+  // Lv5  Tropical bright day
+  { sky:0x1ea6ff, skyMid:0x7dd3fc, ground:0x1a5c1a, hill:0x246824, railColor:0xfcd34d, railShadow:0xf59e0b, sleeperColor:0x3d2b00, variant:4 },
+  // Lv6  Forest green night
+  { sky:0x0c1f10, skyMid:0x143520, ground:0x071209, hill:0x0a1e0d, railColor:0x4ade80, railShadow:0x22c55e, sleeperColor:0x1a3a10, variant:2 },
+  // Lv7  Snowy mountain
+  { sky:0x0d1b2e, skyMid:0x1a2f4a, ground:0xdbeafe, hill:0xe0f2fe, railColor:0x94a3b8, railShadow:0x64748b, sleeperColor:0x1e2a40, variant:3 },
+  // Lv8  Desert noon
+  { sky:0xfef3c7, skyMid:0xfde68a, ground:0xd97706, hill:0xf59e0b, railColor:0xef4444, railShadow:0xb91c1c, sleeperColor:0x78350f, variant:5 },
+  // Lv9  Cyberpunk neon city
+  { sky:0x050014, skyMid:0x0d002a, ground:0x0a0018, hill:0x160030, railColor:0x22d3ee, railShadow:0x06b6d4, sleeperColor:0x500090, variant:6 },
+  // Lv10 Volcanic red
+  { sky:0x1c0200, skyMid:0x3d0800, ground:0x2d0600, hill:0x5c1200, railColor:0xff4500, railShadow:0xdc2626, sleeperColor:0x450a0a, variant:7 },
+  // Lv11 Arctic aurora
+  { sky:0x010c12, skyMid:0x012c22, ground:0x010e18, hill:0x013020, railColor:0x6ee7b7, railShadow:0x34d399, sleeperColor:0x1e3a2a, variant:8 },
+  // Lv12 Autumn golden
+  { sky:0x7c2d12, skyMid:0xc2410c, ground:0x431407, hill:0x9a3412, railColor:0xfbbf24, railShadow:0xf59e0b, sleeperColor:0x5c2010, variant:1 },
+  // Lv13 Ocean coast blue
+  { sky:0x0369a1, skyMid:0x0ea5e9, ground:0x0c4a6e, hill:0x0284c7, railColor:0x7dd3fc, railShadow:0x38bdf8, sleeperColor:0x0f172a, variant:4 },
+  // Lv14 Sunset purple gold
+  { sky:0x4c0519, skyMid:0x881337, ground:0x2d0614, hill:0x5c1020, railColor:0xfbbf24, railShadow:0xf59e0b, sleeperColor:0x7f1d1d, variant:1 },
+  // Lv15 Crystal cave glowing
+  { sky:0x0a0520, skyMid:0x150a38, ground:0x060312, hill:0x100828, railColor:0xe879f9, railShadow:0xd946ef, sleeperColor:0x4a044e, variant:9 },
+  // Lv16 Cherry blossom spring
+  { sky:0xfdf2f8, skyMid:0xfce7f3, ground:0xfcf7ff, hill:0xf3e8ff, railColor:0xf472b6, railShadow:0xec4899, sleeperColor:0x831843, variant:10 },
+  // Lv17 Monsoon rain dark
+  { sky:0x1e2937, skyMid:0x2a3a4a, ground:0x0f1a22, hill:0x1a2a36, railColor:0x7dd3fc, railShadow:0x38bdf8, sleeperColor:0x1e3a50, variant:11 },
+  // Lv18 Golden savanna
+  { sky:0xfbbf24, skyMid:0xfde68a, ground:0x78350f, hill:0x92400e, railColor:0xdc2626, railShadow:0x991b1b, sleeperColor:0x451a03, variant:5 },
+  // Lv19 Midnight jungle
+  { sky:0x042010, skyMid:0x063018, ground:0x021208, hill:0x042814, railColor:0x86efac, railShadow:0x4ade80, sleeperColor:0x14532d, variant:2 },
+  // Lv20 Space galaxy deep
+  { sky:0x02000a, skyMid:0x06001a, ground:0x030008, hill:0x08001c, railColor:0x818cf8, railShadow:0x6366f1, sleeperColor:0x1e1b4b, variant:12 },
+  // Lv21 Arctic blizzard white
+  { sky:0xdbeafe, skyMid:0xbfdbfe, ground:0xe0f2fe, hill:0xf0f9ff, railColor:0x475569, railShadow:0x334155, sleeperColor:0x1e293b, variant:3 },
+  // Lv22 Lava field molten
+  { sky:0x3d0800, skyMid:0x7c1200, ground:0x5c0a00, hill:0x9a1800, railColor:0xf97316, railShadow:0xea580c, sleeperColor:0x450a0a, variant:7 },
+  // Lv23 Crystal blue day
+  { sky:0x2563eb, skyMid:0x60a5fa, ground:0x1d4ed8, hill:0x2563eb, railColor:0xfef9c3, railShadow:0xfde68a, sleeperColor:0x1e3a8a, variant:4 },
+  // Lv24 Deep forest mist
+  { sky:0x071a0a, skyMid:0x0d2c10, ground:0x040e06, hill:0x082412, railColor:0xa3e635, railShadow:0x84cc16, sleeperColor:0x1a3a05, variant:2 },
+  // Lv25 Electric storm
+  { sky:0x0f172a, skyMid:0x1e293b, ground:0x0a1020, hill:0x142030, railColor:0xfde68a, railShadow:0xfbbf24, sleeperColor:0x1e2a50, variant:13 },
+  // Lv26 Rose gold sunset
+  { sky:0xfecdd3, skyMid:0xfda4af, ground:0xfce7f3, hill:0xfbcfe8, railColor:0xe11d48, railShadow:0x9f1239, sleeperColor:0x881337, variant:10 },
+  // Lv27 Emerald city
+  { sky:0x064e3b, skyMid:0x065f46, ground:0x022c22, hill:0x044838, railColor:0x34d399, railShadow:0x10b981, sleeperColor:0x064e3b, variant:2 },
+  // Lv28 Twilight indigo
+  { sky:0x1e1b4b, skyMid:0x312e81, ground:0x0f0d2e, hill:0x1e1b4b, railColor:0xc4b5fd, railShadow:0xa78bfa, sleeperColor:0x2e1065, variant:9 },
+  // Lv29 Crimson battlefield
+  { sky:0x1c0a0a, skyMid:0x450a0a, ground:0x3d0606, hill:0x7f1d1d, railColor:0xfca5a5, railShadow:0xf87171, sleeperColor:0x450a0a, variant:7 },
+  // Lv30 Final: cosmic rainbow
+  { sky:0x000000, skyMid:0x030014, ground:0x010010, hill:0x020020, railColor:0xe879f9, railShadow:0xa855f7, sleeperColor:0x4a044e, variant:14 },
 ];
+const BG_THEME = Math.min(THEMES.length - 1, LEVEL - 1);
 const T = THEMES[BG_THEME];
 
 // ── Word Banks ───────────────────────────────────────────────────────────────
@@ -846,6 +931,8 @@ function buildTrain() {
   trainContainer.x = TRAIN_X;
   trainContainer.y = LANE_Y[1];
   trainContainer._bounceT = 0;
+  // Flip so locomotive faces RIGHT (direction of travel)
+  trainContainer.scale.x = -1;
 
   const g = new PIXI.Graphics();
   const c = selectedTrain;
@@ -1078,7 +1165,8 @@ function emitSteam() {
     const puff = new PIXI.Graphics();
     const r = 5 + Math.random() * 5;
     puff.circle(0, 0, r).fill({ color: 0xdbeafe });
-    puff.x = TRAIN_X - 50 + (Math.random() - 0.5) * 8;
+    // Chimney is now on the LEFT side after flip (trainContainer.scale.x=-1 mirrors it)
+    puff.x = TRAIN_X - 62 + (Math.random() - 0.5) * 8;
     puff.y = trainContainer.y - 42;
     puff.alpha = 0.55;
     puff._vx = -(0.4 + Math.random() * 0.5);
@@ -1447,29 +1535,50 @@ function showTrainSelect() {
   buildTrainGrid();
 }
 
+let activeTrainFilter = 'all';
+
+function setTrainFilter(btn) {
+  activeTrainFilter = btn.dataset.filter;
+  document.querySelectorAll('.tfbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildTrainGrid();
+}
+
+const TYPE_LABEL = {
+  'steam':'Steam','diesel':'Diesel','electric':'Elektrik',
+  'highspeed':'Highspeed','tram':'Tram','heritage':'Heritage'
+};
+
 function buildTrainGrid() {
   const grid = document.getElementById('train-grid');
   grid.innerHTML = '';
-  TRAIN_CATALOG.forEach(entry => {
+  const filtered = activeTrainFilter === 'all'
+    ? TRAIN_CATALOG
+    : TRAIN_CATALOG.filter(e => e.type === activeTrainFilter);
+  const countEl = document.getElementById('ts-count');
+  if (countEl) countEl.textContent = filtered.length + ' KERETA ' + (activeTrainFilter === 'all' ? 'TERSEDIA' : (TYPE_LABEL[activeTrainFilter]||'').toUpperCase());
+  filtered.forEach(entry => {
     const card = document.createElement('div');
-    card.className = 'tcard';
+    card.className = 'tcard' + (selectedTrain && selectedTrain.id === entry.id ? ' selected' : '');
     const canvas = document.createElement('canvas');
     canvas.width = 120; canvas.height = 48;
-    const name = document.createElement('div');
+    const info = document.createElement('div');
+    info.className = 'tcard-info';
+    const name = document.createElement('span');
     name.className = 'tname';
     name.textContent = entry.name;
+    const sub = document.createElement('span');
+    sub.className = 'tsub';
+    sub.textContent = (TYPE_LABEL[entry.type] || entry.type) + (entry.sub ? ' · ' + entry.sub : '');
+    info.appendChild(name);
+    info.appendChild(sub);
     card.appendChild(canvas);
-    card.appendChild(name);
-    if (selectedTrain && selectedTrain.id === entry.id) {
-      card.style.borderColor = '#a78bfa';
-      card.style.background = 'rgba(139,92,246,0.25)';
-    }
+    card.appendChild(info);
     grid.appendChild(card);
     // Draw after append so a throw doesn't prevent card from showing
     try {
       drawTrainPreview2d(canvas, entry);
     } catch(e) {
-      // Fallback: solid color rect
       try {
         const ctx = canvas.getContext('2d');
         if (ctx) {
