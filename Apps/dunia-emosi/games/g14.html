@@ -213,6 +213,16 @@ const TRAIN_CATS = [
       {key:'c62_jnr',  name:'JNR C62',        sub:'Jepang 1948',   emoji:'🚂', bodyColor:'#1e293b', accColor:'#7dd3fc', kmh:130, baseSpeed:2.85, boostMult:1.54, boostDur:1680, desc:'Ekspres Hokkaido tercepat!'},
       {key:'sncf_141', name:'SNCF 141R',      sub:'Prancis 1945',  emoji:'🚂', bodyColor:'#172554', accColor:'#93c5fd', kmh:130, baseSpeed:2.85, boostMult:1.52, boostDur:1650, desc:'Lokomotif rekonstruksi Prancis pascaperang.'},
       {key:'selkirk',  name:'CPR Selkirk',    sub:'Kanada 1929',   emoji:'🚂', bodyColor:'#292524', accColor:'#a3e635', kmh:112, baseSpeed:2.68, boostMult:1.50, boostDur:1600, desc:'Penakluk Rocky Mountains Canada!'},
+      {key:'duchess',  name:'Duchess LMS',    sub:'Inggris 1937',  emoji:'🚂', bodyColor:'#7f1d1d', accColor:'#fca5a5', kmh:183, baseSpeed:3.30, boostMult:1.58, boostDur:1780, desc:'Coronation Scot — streamlined beauty!'},
+      {key:'a4_bittern',name:'LNER A4 Bittern',sub:'Inggris 1937', emoji:'🚂', bodyColor:'#14532d', accColor:'#86efac', kmh:180, baseSpeed:3.25, boostMult:1.57, boostDur:1760, desc:'Saudara Mallard, masih jalan hari ini!'},
+      {key:'gwr_king', name:'GWR King Class', sub:'Inggris 1927',  emoji:'🚂', bodyColor:'#14532d', accColor:'#fbbf24', kmh:150, baseSpeed:3.00, boostMult:1.54, boostDur:1700, desc:'Raja rel Great Western Railway!'},
+      {key:'up_844',   name:'UP 844',          sub:'USA 1944',      emoji:'🚂', bodyColor:'#1c1917', accColor:'#94a3b8', kmh:160, baseSpeed:3.10, boostMult:1.56, boostDur:1730, desc:'Satu-satunya lokomotif UP yg tidak pensiun!'},
+      {key:'nswgr_38', name:'NSWGR 38 Class', sub:'Australia 1943',emoji:'🚂', bodyColor:'#14532d', accColor:'#f97316', kmh:130, baseSpeed:2.85, boostMult:1.52, boostDur:1660, desc:'Pacific streamliner Australia!'},
+      {key:'dr_br52',  name:'DR BR 52',        sub:'Jerman 1942',   emoji:'🚂', bodyColor:'#292524', accColor:'#78716c', kmh:80,  baseSpeed:2.20, boostMult:1.48, boostDur:1550, desc:'Kriegslok — produksi massal WWII!'},
+      {key:'sncb_12',  name:'SNCB Type 12',   sub:'Belgia 1939',   emoji:'🚂', bodyColor:'#1e3a8a', accColor:'#93c5fd', kmh:165, baseSpeed:3.15, boostMult:1.55, boostDur:1720, desc:'Streamliner aerodinamis Belgia!'},
+      {key:'sar_15f',  name:'SAR Class 15F',  sub:'S.Afrika 1938', emoji:'🚂', bodyColor:'#1c1917', accColor:'#dc2626', kmh:90,  baseSpeed:2.30, boostMult:1.48, boostDur:1550, desc:'4-8-2 Mountain pekerja keras!'},
+      {key:'prr_t1',   name:'PRR T1',          sub:'USA 1942',      emoji:'🚂', bodyColor:'#0f172a', accColor:'#fbbf24', kmh:160, baseSpeed:3.10, boostMult:1.56, boostDur:1730, desc:'4-4-4-4 Duplex paling cantik!'},
+      {key:'renfe_242',name:'RENFE 242F',      sub:'Spanyol 1956',  emoji:'🚂', bodyColor:'#14532d', accColor:'#4ade80', kmh:120, baseSpeed:2.70, boostMult:1.50, boostDur:1620, desc:'Santa Fe Spanyol, Confederación!'},
     ]
   },
   {
@@ -990,19 +1000,20 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
     g.roundRect(wx, -hH + 6, winW, 9, 2).stroke({ color: 0x93c5fd, width: 0.8, alpha: 0.5 })
   }
   if (!isSteam) {
-    // ── Diesel/EMU cab section ──
-    g.roundRect(hW - 14, -hH - 4, 14, H + 4, 3).fill(aC)
-    g.roundRect(hW - 14, -hH - 4, 14, H + 4, 3).stroke({ color: 0xffffff, width: 1, alpha: 0.45 })
-    // Cab windshield
-    g.roundRect(hW - 12, -hH - 2, 8, 8, 1.5).fill(0x0f172a)
-    g.roundRect(hW - 12, -hH - 2, 8, 3, 1.5).fill({ color: 0x87ceeb, alpha: 0.35 })
-    // Headlights (upper + lower)
-    g.circle(hW - 2, -5, 3.5).fill(0xfef08a); g.circle(hW - 2, -5, 2).fill(0xffffff)
-    g.circle(hW - 2, 5, 3).fill(0xfca5a5); g.circle(hW - 2, 5, 1.5).fill(0xfecdd3)
-    // Exhaust grille (diesel)
+    // ── Diesel/EMU nose (integrated, no protruding block) ──
+    // Sloped nose end
+    g.poly([hW, -hH, hW + 6, -hH + 4, hW + 6, hH - 4, hW, hH]).fill(aC)
+    g.poly([hW, -hH, hW + 6, -hH + 4, hW + 6, hH - 4, hW, hH]).stroke({ color: 0xffffff, width: 0.8, alpha: 0.4 })
+    // Front windshield (on nose)
+    g.roundRect(hW - 10, -hH + 2, 10, 8, 2).fill(0x0f172a)
+    g.roundRect(hW - 10, -hH + 2, 10, 3.5, 2).fill({ color: 0x87ceeb, alpha: 0.35 })
+    // Headlights (flush with nose)
+    g.circle(hW + 3, -hH + 6, 2.5).fill(0xfef08a); g.circle(hW + 3, -hH + 6, 1.5).fill(0xffffff)
+    g.circle(hW + 3, hH - 6, 2).fill(0xfca5a5); g.circle(hW + 3, hH - 6, 1).fill(0xfecdd3)
+    // Exhaust grille (diesel hood)
     if (!isEmu) {
-      g.roundRect(-hW + 2, -hH - 4, 12, 4, 1).fill({ color: 0x000000, alpha: 0.25 })
-      for (let gi = 0; gi < 5; gi++) g.rect(-hW + 3 + gi * 2.2, -hH - 3, 1, 2).fill({ color: 0x6b7280, alpha: 0.3 })
+      g.roundRect(-hW + 2, -hH - 3, 12, 3, 1).fill({ color: 0x000000, alpha: 0.2 })
+      for (let gi = 0; gi < 5; gi++) g.rect(-hW + 3 + gi * 2.2, -hH - 2, 1, 1.5).fill({ color: 0x6b7280, alpha: 0.25 })
     }
     // Pantograph (EMU)
     if (isEmu) {
