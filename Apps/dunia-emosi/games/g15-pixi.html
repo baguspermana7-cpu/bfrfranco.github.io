@@ -13,7 +13,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 
 /* ── HUD Top ── */
 #hud-top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:10px 14px 8px;background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,transparent 100%);pointer-events:none}
-#btn-back{background:#FFF8E7;border:2.5px solid #FFD6A0;border-radius:12px;color:#8B4513;padding:7px 13px;font-size:16px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0;box-shadow:0 3px 0 #D4956A;font-weight:900}
+#btn-back{background:#fff3c4;border:2.5px solid #f59e0b;border-radius:8px;color:#3f2a08;padding:8px 12px;font-size:14px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0;box-shadow:0 3px 0 #b45309;font-weight:900;min-width:96px;text-align:center}
 #btn-back:active{transform:translateY(2px);box-shadow:0 1px 0 #D4956A}
 #word-display{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
 #word-emoji{font-size:24px;flex-shrink:0}
@@ -71,9 +71,9 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 
 /* ── Train Select Screen ── */
 #train-select{position:fixed;inset:0;z-index:900;background:linear-gradient(180deg,#0a0212 0%,#120430 60%,#0a0212 100%);display:flex;flex-direction:column;overflow:hidden}
-#ts-header{padding:12px 16px 4px;flex-shrink:0;display:flex;align-items:center;gap:10px}
-#ts-back{background:rgba(139,92,246,0.2);border:2px solid rgba(139,92,246,0.45);border-radius:12px;color:#e9d5ff;padding:7px 12px;font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0;box-shadow:0 3px 0 rgba(88,28,135,0.6)}
-#ts-back:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(88,28,135,0.6)}
+#ts-header{padding:12px 16px 6px;flex-shrink:0;display:flex;align-items:center;gap:10px;position:relative;z-index:2}
+#ts-back{background:#fff3c4;border:2.5px solid #f59e0b;border-radius:8px;color:#3f2a08;padding:8px 12px;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0;box-shadow:0 3px 0 #b45309;font-weight:900;min-width:112px;text-align:center}
+#ts-back:active{transform:translateY(2px);box-shadow:0 1px 0 #b45309}
 #ts-title-wrap{flex:1;text-align:center}
 #ts-title{font-size:20px;font-weight:900;color:#e9d5ff;text-shadow:0 0 20px rgba(139,92,246,0.7);line-height:1}
 #ts-subtitle{font-size:10px;color:rgba(233,213,255,0.4);letter-spacing:1.5px;margin-top:1px}
@@ -122,7 +122,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 
 <!-- HUD Top -->
 <div id="hud-top">
-  <button id="btn-back" onclick="goBack()">⌂</button>
+  <button id="btn-back" type="button" onclick="goBack()">← Kembali</button>
   <div id="word-display">
     <span id="word-emoji">❓</span>
     <div id="word-slots"></div>
@@ -170,7 +170,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 <!-- Train Select Screen -->
 <div id="train-select">
   <div id="ts-header">
-    <button id="ts-back" onclick="goBack()">⌂</button>
+    <button id="ts-back" type="button" onclick="goBack()">← Kembali</button>
     <div id="ts-title-wrap">
       <div id="ts-title">🚂 Pilih Keretamu!</div>
       <div id="ts-subtitle">PILIH KERETA UNTUK MEMULAI</div>
@@ -1461,9 +1461,12 @@ function showWin() {
   const msg = wrongTaps === 0
     ? `Sempurna! Tidak ada kesalahan! Matematika Benar: ${mathCorrect}`
     : `${wrongTaps} kesalahan. Matematika benar: ${mathCorrect}. Terus berlatih!`;
+  const finalStars = Math.min(5, s);
+  const title = finalStars >= 5 ? 'Sempurna!' : finalStars >= 4 ? 'Hebat Sekali!' : finalStars >= 3 ? 'Bagus!' : 'Selesai!';
+  const nextLevel = LEVEL < 30 ? () => { sessionStorage.setItem('g15Config', JSON.stringify({level: LEVEL + 1})); location.reload(); } : null;
   GameModal.show({
-    emoji: '🏆', title: 'Hore! Berhasil!', stars: Math.min(5, s), msg,
-    onAgain: () => restartGame(), onBack: () => goBack()
+    emoji: finalStars >= 4 ? '🏆' : '⭐', title, stars: finalStars, msg,
+    onNext: nextLevel, onAgain: () => restartGame(), onBack: () => goBack()
   });
 }
 

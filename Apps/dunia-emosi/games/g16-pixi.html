@@ -1304,9 +1304,10 @@ function showWin(){
   const msgs=['','','','Bagus sekali!','Luar biasa cepat!','SEMPURNA!']
   const title=stars>=5?'SEMPURNA!':stars>=4?'Hebat Sekali!':'Kereta Selamat!'
   try{sessionStorage.setItem('g16Result',JSON.stringify({stars,level:S.level,cleared:S.cleared,total:S.totalObstacles}))}catch(_){}
+  const nextLevel = S.level < 30 ? () => { sessionStorage.setItem('g16Config', JSON.stringify({level: S.level + 1})); location.reload(); } : null;
   GameModal.show({
-    emoji:'🏆', title, stars, msg:msgs[stars]||'Terus berlatih!',
-    onAgain:()=>restartGame(), onBack:()=>finishGame()
+    emoji:stars>=4?'🏆':'⭐', title, stars, msg:msgs[stars]||'Terus berlatih!',
+    onNext:nextLevel, onAgain:()=>restartGame(), onBack:()=>finishGame()
   })
 }
 function showLose(){

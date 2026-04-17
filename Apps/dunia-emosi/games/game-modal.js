@@ -1,6 +1,10 @@
 /**
  * Unified game result modal for standalone game pages
- * Usage: GameModal.show({ title, stars, msg, emoji, onAgain, onBack, onExtra })
+ * Usage: GameModal.show({ title, stars, msg, emoji, onNext, onAgain, onBack, onExtra })
+ *   onNext  → "Level Berikutnya ➡️" (optional, primary button)
+ *   onAgain → "Main Lagi 🔄"
+ *   onBack  → "Kembali 🏠"
+ *   onExtra → { label, action } custom button
  */
 const GameModal = (() => {
   let overlay;
@@ -22,6 +26,7 @@ const GameModal = (() => {
       .gm-btn{display:block;width:100%;padding:14px;border:none;border-radius:18px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Fredoka One',sans-serif;-webkit-tap-highlight-color:transparent;transition:transform .1s}
       .gm-btn:active{transform:scale(0.93)}
       .gm-btn-primary{background:linear-gradient(160deg,#a78bfa,#8b5cf6);color:#fff;box-shadow:0 4px 0 #6d28d9}
+      .gm-btn-green{background:linear-gradient(160deg,#4ade80,#22c55e);color:#fff;box-shadow:0 4px 0 #15803d}
       .gm-btn-secondary{background:rgba(139,92,246,0.06);color:#6b5080;border:1.5px solid rgba(139,92,246,0.22)}
     `;
     document.head.appendChild(css);
@@ -32,7 +37,7 @@ const GameModal = (() => {
     document.body.appendChild(overlay);
   }
 
-  function show({ emoji = '🏆', title = '', stars = 0, msg = '', onAgain, onBack, onExtra }) {
+  function show({ emoji = '🏆', title = '', stars = 0, msg = '', onNext, onAgain, onBack, onExtra }) {
     init();
     document.getElementById('gm-emoji').textContent = emoji;
     document.getElementById('gm-title').textContent = title;
@@ -41,6 +46,15 @@ const GameModal = (() => {
 
     const btns = document.getElementById('gm-btns');
     btns.innerHTML = '';
+
+    // Level Berikutnya — green, top priority
+    if (onNext) {
+      const b = document.createElement('button');
+      b.className = 'gm-btn gm-btn-green';
+      b.textContent = 'Level Berikutnya ➡️';
+      b.onclick = () => { hide(); onNext(); };
+      btns.appendChild(b);
+    }
 
     if (onAgain) {
       const b = document.createElement('button');

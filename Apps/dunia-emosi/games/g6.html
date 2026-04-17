@@ -870,11 +870,15 @@ function showFinish() {
   const stars = Math.round((S.wordsDone / S.totalWords) * 5)
   const msg = stars >= 5 ? 'Sempurna! Kamu bintang!' :
     stars >= 3 ? 'Bagus sekali! Terus berlatih!' : 'Coba lagi untuk nilai lebih baik!'
+  const curLevel = cfg.level || 1;
+  const nextLevel = curLevel < 30 ? () => { sessionStorage.setItem('g6Config', JSON.stringify({...cfg, level:curLevel+1})); location.reload(); } : null;
+  const title = stars >= 5 ? 'Sempurna!' : stars >= 4 ? 'Hebat!' : stars >= 3 ? 'Bagus!' : 'Selesai!';
   GameModal.show({
-    emoji: '🏆',
-    title: 'Selesai!',
+    emoji: stars >= 4 ? '🏆' : '⭐',
+    title,
     stars,
     msg,
+    onNext: nextLevel,
     onAgain: () => restartGame(),
     onBack: () => goBack()
   })
