@@ -1383,16 +1383,10 @@ function showSelectScreen() {
 function finishGame() { goBack() }
 function goBack() {
   S.running = false
-  if (document.referrer) history.back()
-  else window.location.href = '../index.html'
+  window.location.replace('../index.html')
 }
 function confirmBack() {
-  if (!S.running) {
-    // On select screen → go back to index
-    goBack()
-  } else if (confirm('Keluar dari balapan?')) {
-    showSelectScreen()
-  }
+  goBack()
 }
 
 // ═══════════════════════════════════════════════════════════

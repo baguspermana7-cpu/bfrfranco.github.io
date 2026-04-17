@@ -1516,8 +1516,8 @@ function flashScreen(color,alpha){
   const el=document.getElementById('flash'); el.style.background=color; el.style.opacity=alpha
   setTimeout(()=>{el.style.opacity='0'},130)
 }
-function goBack(){if(document.referrer)history.back();else window.location.href='../index.html'}
-function confirmBack(){if(!S.running||S.gameOver){goBack();return}if(confirm('Keluar?'))goBack()}
+function goBack(){S.running=false;window.location.replace('../index.html')}
+function confirmBack(){goBack()}
 function finishGame(){goBack()}
 function restartGame(){location.reload()}
 window.addEventListener('resize',()=>{if(app)app.renderer.resize(window.innerWidth,window.innerHeight)})

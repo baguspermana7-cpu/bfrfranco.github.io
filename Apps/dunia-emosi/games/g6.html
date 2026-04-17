@@ -898,12 +898,12 @@ function showFinish() {
 function finishGame() { goBack() }
 
 function goBack() {
-  if (document.referrer) history.back()
-  else window.location.href = '../index.html'
+  S.running = false
+  window.location.replace('../index.html')
 }
 
 function confirmBack() {
-  if (!S.running || confirm('Keluar dari game? Progress akan hilang.')) goBack()
+  goBack()
 }
 
 // ═══════════════════════════════════════════════════════════════════
