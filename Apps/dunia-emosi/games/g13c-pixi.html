@@ -23,16 +23,22 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
 /* Flash overlay */
 #flash{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;transition:opacity 0.15s}
 
-/* Trainer portraits — small, tucked behind pokemon */
-#portrait-enemy{position:fixed;top:52px;right:0;z-index:18;width:min(78px,16vw);height:min(92px,19vw);object-fit:cover;object-position:top center;filter:drop-shadow(-2px 2px 8px rgba(0,0,0,0.7));transform:scaleX(-1);opacity:0.6}
-#portrait-player{position:fixed;top:calc(100svh - 240px - min(100px,20vw));left:0;z-index:18;width:min(72px,15vw);height:min(86px,18vw);object-fit:cover;object-position:top center;filter:drop-shadow(2px 2px 8px rgba(0,0,0,0.7));opacity:0.6}
+/* Trainer portraits — solid, far corners, behind pokemon */
+#portrait-enemy{position:fixed;top:52px;right:-2px;z-index:15;width:min(68px,14vw);height:min(82px,17vw);object-fit:cover;object-position:top center;filter:drop-shadow(-2px 2px 8px rgba(0,0,0,0.7));transform:scaleX(-1)}
+#portrait-player{position:fixed;top:calc(100svh - 240px - min(90px,18vw));left:-2px;z-index:15;width:min(62px,13vw);height:min(76px,16vw);object-fit:cover;object-position:top center;filter:drop-shadow(2px 2px 8px rgba(0,0,0,0.7))}
 /* Trainer name badges */
-#trainer-name-enemy{position:fixed;top:calc(52px + min(92px,19vw) + 2px);right:0;z-index:19;background:rgba(0,0,0,0.72);color:#fde68a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:0 0 0 6px;max-width:min(78px,16vw);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.5px}
-#trainer-name-player{position:fixed;top:calc(100svh - 240px - min(100px,20vw) - 14px);left:0;z-index:19;background:rgba(0,0,0,0.72);color:#86efac;font-size:9px;font-weight:700;padding:2px 6px;border-radius:0 0 6px 0;max-width:min(72px,15vw);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.5px}
+#trainer-name-enemy{position:fixed;top:calc(52px + min(82px,17vw) + 2px);right:0;z-index:16;background:rgba(0,0,0,0.72);color:#fde68a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:0 0 0 6px;max-width:min(68px,14vw);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.5px}
+#trainer-name-player{position:fixed;top:calc(100svh - 240px - min(90px,18vw) - 14px);left:0;z-index:16;background:rgba(0,0,0,0.72);color:#86efac;font-size:9px;font-weight:700;padding:2px 6px;border-radius:0 0 6px 0;max-width:min(62px,13vw);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.5px}
 
-/* Pokemon sprites — diagonal: enemy top-RIGHT, player bottom-LEFT */
-#poke-enemy{position:fixed;top:min(110px,22vw);right:8px;z-index:20;width:min(140px,30vw);height:min(140px,30vw);object-fit:contain;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.55));transition:opacity 0.3s,transform 0.3s;image-rendering:auto}
-#poke-player{position:fixed;top:calc(100svh - 220px - min(148px,32vw));left:8px;z-index:20;width:min(148px,32vw);height:min(148px,32vw);object-fit:contain;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.55));transition:opacity 0.3s,transform 0.3s;image-rendering:auto;transform:scaleX(-1)}
+/* Pokemon sprites — shifted toward center, away from trainer */
+#poke-enemy{position:fixed;top:min(100px,20vw);right:min(50px,12vw);z-index:20;width:min(140px,30vw);height:min(140px,30vw);object-fit:contain;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.55));transition:opacity 0.3s,transform 0.3s;image-rendering:auto}
+#poke-player{position:fixed;top:calc(100svh - 220px - min(148px,32vw));left:min(50px,12vw);z-index:20;width:min(148px,32vw);height:min(148px,32vw);object-fit:contain;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.55));transition:opacity 0.3s,transform 0.3s;image-rendering:auto;transform:scaleX(-1)}
+
+/* Battle platform shadows under pokemon */
+.poke-platform{position:fixed;z-index:19;pointer-events:none}
+.poke-platform::after{content:'';display:block;width:100%;height:100%;background:radial-gradient(ellipse,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.1) 50%,transparent 70%);border-radius:50%}
+#platform-enemy{top:calc(min(100px,20vw) + min(140px,30vw) - 10px);right:min(40px,10vw);width:min(160px,34vw);height:20px}
+#platform-player{top:calc(100svh - 220px - 10px);left:min(40px,10vw);width:min(168px,36vw);height:22px}
 
 /* Floating HP cards — beside their pokemon */
 #hp-float-enemy{position:fixed;top:calc(min(110px,22vw) + min(140px,30vw) + 4px);right:8px;z-index:40;width:min(160px,42vw);min-width:110px;max-width:180px;pointer-events:none}
@@ -160,7 +166,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
 /* Fallback avatar when trainer sprite fails to load */
 .trainer-avatar-fb{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:34px;background:radial-gradient(circle,rgba(139,92,246,0.28),rgba(0,0,0,0.5));border-radius:50%;border:2px solid rgba(139,92,246,0.5);flex-shrink:0}
 /* Battle portrait fallback */
-#portrait-enemy-fb{position:fixed;top:52px;right:0;z-index:18;width:min(78px,16vw);height:min(92px,19vw);display:none;align-items:center;justify-content:center;font-size:min(40px,9vw);background:rgba(0,0,0,0.32);border-radius:0 0 0 12px;opacity:0.6}
+#portrait-enemy-fb{position:fixed;top:52px;right:-2px;z-index:15;width:min(68px,14vw);height:min(82px,17vw);display:none;align-items:center;justify-content:center;font-size:min(36px,8vw);background:rgba(0,0,0,0.32);border-radius:0 0 0 12px}
 
 /* Result overlay handled by game-modal.js */
 
@@ -227,7 +233,11 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
   </div>
 </div>
 
-<!-- Pokemon sprites (diagonal from portraits) -->
+<!-- Battle platforms -->
+<div class="poke-platform" id="platform-enemy"></div>
+<div class="poke-platform" id="platform-player"></div>
+
+<!-- Pokemon sprites -->
 <img id="poke-enemy" src="" alt="">
 <img id="poke-player" src="" alt="">
 
@@ -856,7 +866,7 @@ function updateHpUI(){
   const ppPct = Math.max(0,Math.round(pp.hp/pp.maxHp*100));
   updateHpBar('hpf-enemy-bar', epPct);
   updateHpBar('hpf-player-bar', ppPct);
-  document.getElementById('hpf-enemy-name').textContent = battle.trainer.name+"'s "+ep.name;
+  document.getElementById('hpf-enemy-name').textContent = ep.name;
   document.getElementById('hpf-player-name').textContent = pp.name;
   renderDots('hpf-enemy-dots', battle.enemyTeam);
   renderDots('hpf-player-dots', battle.playerTeam);
@@ -905,23 +915,51 @@ function executeMove(moveIdx, mathCorrect){
   const pp = battle.playerTeam[battle.playerIdx];
   const ep = battle.enemyTeam[battle.enemyIdx];
   const move = pp.moves[moveIdx];
-  let dmg = calcDmg(move.type, pp, ep);
-  if(!mathCorrect) dmg = Math.max(1, Math.floor(dmg*0.7));
-  const eff = getEff(move.type, ep.type);
-
   const ppEl = document.getElementById('poke-player');
   const epEl = document.getElementById('poke-enemy');
   const portraitPlayer = document.getElementById('portrait-player');
 
-  // Aura on attacker + trainer ripple
+  // ── WRONG ANSWER → self-damage, attack fails ──
+  if(!mathCorrect){
+    const selfDmg = 33; // 3 wrong answers = faint (33×3=99)
+    flashColor('red');
+    addHitEffect(ppEl, true);
+    spawnTypeHitFX(ppEl, 'normal');
+    pp.hp = Math.max(0, pp.hp - selfDmg);
+    updateHpUI();
+    const r = ppEl.getBoundingClientRect();
+    spawnSparkles(r.left+r.width/2, r.top+r.height/2, '#ef4444');
+
+    const msgs = [`Jawaban salah! ${pp.name} terluka!`];
+    if(pp.hp<=0){
+      msgs.push(`${pp.name} pingsan!`);
+      const anyAlive = battle.playerTeam.findIndex(p=>p.hp>0);
+      if(anyAlive===-1){
+        msgs.push(`Semua Pokémonmu pingsan! Kamu kalah...`);
+        queueMsgs(msgs, ()=>endBattleLose());
+      } else {
+        queueMsgs(msgs, ()=>{
+          buildSwitchPanel(true);
+          showBattleUI('switch');
+          setMsg('Pilih Pokémon berikutnya!');
+        });
+      }
+    } else {
+      queueMsgs(msgs, ()=>showActionMenu());
+    }
+    return;
+  }
+
+  // ── CORRECT ANSWER → normal attack on enemy ──
+  const dmg = calcDmg(move.type, pp, ep);
+  const eff = getEff(move.type, ep.type);
+
   addAura(ppEl);
   spawnRipple(portraitPlayer);
 
-  // Projectile fires after aura starts (0.3s * 2 = 0.6s)
   setTimeout(()=>{
     removeAura(ppEl);
     spawnProjectile(ppEl, epEl, move.type, ()=>{
-      // On impact: hit effect + type particles + damage
       addHitEffect(epEl, false);
       spawnTypeHitFX(epEl, move.type);
       ep.hp = Math.max(0, ep.hp-dmg);
@@ -932,7 +970,6 @@ function executeMove(moveIdx, mathCorrect){
       flashColor(eff>=2?'yellow':eff===0?'red':move.type);
 
       let effMsg = eff>=2?' Sangat efektif!':eff<=0.5&&eff>0?' Kurang efektif.':eff===0?' Tidak berpengaruh!':'';
-      if(!mathCorrect) effMsg += ' (serangan lemah!)';
       const msgs = [`${pp.name} menggunakan ${move.name}!${effMsg}`];
 
       if(ep.hp<=0){
