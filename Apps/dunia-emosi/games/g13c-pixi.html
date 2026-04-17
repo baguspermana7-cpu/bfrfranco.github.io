@@ -138,6 +138,10 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
 .trainer-card img{width:64px;height:64px;object-fit:contain;object-position:top}
 .trainer-card .tc-name{font-size:13px;font-weight:700;color:#e9d5ff;text-align:center}
 .trainer-card .tc-badge{font-size:18px;position:absolute;top:6px;right:8px}
+/* Fallback avatar when trainer sprite fails to load */
+.trainer-avatar-fb{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:34px;background:radial-gradient(circle,rgba(139,92,246,0.28),rgba(0,0,0,0.5));border-radius:50%;border:2px solid rgba(139,92,246,0.5);flex-shrink:0}
+/* Battle portrait fallback */
+#portrait-enemy-fb{position:fixed;top:52px;right:0;z-index:30;width:min(118px,23vw);height:min(138px,27vw);display:none;align-items:center;justify-content:center;font-size:min(64px,13vw);background:rgba(0,0,0,0.32);border-radius:0 0 0 12px}
 
 /* ── Result Overlay ── */
 #result-ovl{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px)}
@@ -193,6 +197,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
 
 <!-- Trainer portraits (far corners) -->
 <img id="portrait-enemy" src="" alt="">
+<div id="portrait-enemy-fb"></div>
 <img id="portrait-player" src="" alt="">
 <div id="trainer-name-enemy"></div>
 <div id="trainer-name-player">Kamu</div>
@@ -302,7 +307,7 @@ const TRAINERS = [
    team:[{name:'Tangela',slug:'tangela',type:'grass',hp:80},{name:'Weepinbell',slug:'weepinbell',type:'grass',hp:85},{name:'Gloom',slug:'gloom',type:'grass',hp:85},{name:'Victreebel',slug:'victreebel',type:'grass',hp:95},{name:'Vileplume',slug:'vileplume',type:'grass',hp:95},{name:'Exeggutor',slug:'exeggutor',type:'grass',hp:110}]},
   {id:'sabrina', name:'Sabrina', sprite:'sabrina', badge:'🔮', gym:'Saffron Gym',     bg:'gym2_m.png',   group:'kanto',
    team:[{name:'Abra',slug:'abra',type:'psychic',hp:65},{name:'Kadabra',slug:'kadabra',type:'psychic',hp:85},{name:'Mr. Mime',slug:'mr-mime',type:'psychic',hp:80},{name:'Jynx',slug:'jynx',type:'psychic',hp:85},{name:'Alakazam',slug:'alakazam',type:'psychic',hp:95},{name:'Espeon',slug:'espeon',type:'psychic',hp:100}]},
-  {id:'surge',   name:'Lt. Surge',sprite:'surge',  badge:'⚡', gym:'Vermilion Gym',   bg:'gym2_m.png',   group:'kanto',
+  {id:'surge',   name:'Lt. Surge',sprite:'ltsurge', badge:'⚡', gym:'Vermilion Gym',   bg:'gym2_m.png',   group:'kanto',
    team:[{name:'Voltorb',slug:'voltorb',type:'electric',hp:70},{name:'Pikachu',slug:'pikachu',type:'electric',hp:80},{name:'Raichu',slug:'raichu',type:'electric',hp:95},{name:'Electrode',slug:'electrode',type:'electric',hp:90},{name:'Jolteon',slug:'jolteon',type:'electric',hp:95},{name:'Magneton',slug:'magneton',type:'electric',hp:90}]},
   {id:'koga',    name:'Koga',    sprite:'koga',    badge:'☠️', gym:'Fuchsia Gym',     bg:'gym_m.png',    group:'kanto',
    team:[{name:'Koffing',slug:'koffing',type:'poison',hp:75},{name:'Muk',slug:'muk',type:'poison',hp:100},{name:'Weezing',slug:'weezing',type:'poison',hp:90},{name:'Venomoth',slug:'venomoth',type:'bug',hp:85},{name:'Arbok',slug:'arbok',type:'poison',hp:80},{name:'Nidorino',slug:'nidorino',type:'poison',hp:85}]},
@@ -414,7 +419,7 @@ const TRAINERS = [
    team:[{name:'Piplup',slug:'piplup',type:'water',hp:80},{name:'Buneary',slug:'buneary',type:'normal',hp:75},{name:'Pachirisu',slug:'pachirisu',type:'electric',hp:70},{name:'Mamoswine',slug:'mamoswine',type:'ice',hp:110},{name:'Togekiss',slug:'togekiss',type:'fairy',hp:100},{name:'Empoleon',slug:'empoleon',type:'water',hp:115}]},
   {id:'serena',  name:'Serena',  sprite:'serena',  badge:'🎀', gym:'Vaniville Town',  bg:'forest_m.png', group:'anime',
    team:[{name:'Braixen',slug:'braixen',type:'fire',hp:90},{name:'Pancham',slug:'pancham',type:'fighting',hp:80},{name:'Sylveon',slug:'sylveon',type:'fairy',hp:100},{name:'Fennekin',slug:'fennekin',type:'fire',hp:75},{name:'Glaceon',slug:'glaceon',type:'ice',hp:90},{name:'Delphox',slug:'delphox',type:'fire',hp:100}]},
-  {id:'go',      name:'Go',      sprite:'go',      badge:'🌀', gym:'Vermilion City',  bg:'gym2_m.png',   group:'anime',
+  {id:'go',      name:'Go',      sprite:'goh',     badge:'🌀', gym:'Vermilion City',  bg:'gym2_m.png',   group:'anime',
    team:[{name:'Inteleon',slug:'inteleon',type:'water',hp:105},{name:'Cinderace',slug:'cinderace',type:'fire',hp:100},{name:'Scyther',slug:'scyther',type:'bug',hp:90},{name:'Suicune',slug:'suicune',type:'water',hp:115},{name:'Flygon',slug:'flygon',type:'dragon',hp:100},{name:'Aerodactyl',slug:'aerodactyl',type:'rock',hp:95}]},
 ];
 const TRAINER_GROUPS = [
@@ -686,6 +691,14 @@ function answerMath(chosen, correct){
   }, isCorrect ? 420 : 720);
 }
 
+// Replace broken trainer img with badge-emoji avatar
+function trainerFallback(img, badge) {
+  const d = document.createElement('div');
+  d.className = 'trainer-avatar-fb';
+  d.textContent = badge;
+  img.parentNode.replaceChild(d, img);
+}
+
 // ─── GYM SELECT ──────────────────────────────────────────────────────────────
 function buildGymSelect(){
   const grid = document.getElementById('trainer-grid');
@@ -698,7 +711,7 @@ function buildGymSelect(){
     html += '<div class="tg-row">';
     gTrainers.forEach(t => {
       html += `<div class="trainer-card ${badges_obj[t.id]?'beaten':''}" onclick="startBattle('${t.id}')">
-        <img src="${TRAINER_SPRITE(t.sprite)}" onerror="this.src='../assets/Pokemon/sprites/pikachu.png'" alt="${t.name}">
+        <img src="${TRAINER_SPRITE(t.sprite)}" onerror="trainerFallback(this,'${t.badge}')" alt="${t.name}">
         <div class="tc-name">${t.name}</div>
         ${badges_obj[t.id]?`<div class="tc-badge">${t.badge}</div>`:''}
       </div>`;
@@ -724,8 +737,14 @@ function startBattle(trainerId){
   document.getElementById('battle-bg').style.backgroundImage = `url('${BG_BASE}${trainer.bg}')`;
 
   const ep = document.getElementById('portrait-enemy');
+  const epFb = document.getElementById('portrait-enemy-fb');
+  epFb.style.display = 'none'; epFb.textContent = '';
   ep.style.display = ''; ep.src = TRAINER_SPRITE(trainer.sprite);
-  ep.onerror = ()=>{ ep.style.display='none'; };
+  ep.onerror = ()=>{
+    ep.style.display = 'none';
+    epFb.textContent = trainer.badge;
+    epFb.style.display = 'flex';
+  };
   document.getElementById('trainer-name-enemy').textContent = trainer.name;
   const pp = document.getElementById('portrait-player');
   pp.style.display = ''; pp.src = TRAINER_SPRITE('ash');
