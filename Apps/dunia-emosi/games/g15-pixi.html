@@ -1521,247 +1521,413 @@ function drawTrainPreview2d(canvas, c) {
   const CW = canvas.width, CH = canvas.height;
   ctx.clearRect(0, 0, CW, CH);
   const type = c.type, sub = c.sub;
+  const B=_hex(c.b),R=_hex(c.r),S=_hex(c.s),W=_hex(c.w),K=_hex(c.k);
 
-  // Track at bottom (all types)
-  ctx.fillStyle = '#3b2a14'; ctx.fillRect(0, CH-7, CW, 7);
+  // ── Track (all types) ───────────────────────────────────────────────────
+  ctx.fillStyle='#3b2a14'; ctx.fillRect(0,CH-7,CW,7);
   for(let i=0;i<CW;i+=10){ctx.fillStyle='#5a3a1a';ctx.fillRect(i,CH-6,7,5);}
   ctx.fillStyle='#999'; ctx.fillRect(0,CH-7,CW,2);
   ctx.fillStyle='#999'; ctx.fillRect(0,CH-4,CW,2);
+  const tY=CH-7; // top of track
 
-  if (type==='steam') {
-    // Fat boiler cylinder + tall chimney + big spoked drive wheels + cab rear
-    const boilerEnd=CW-40, boilerY=9, boilerH=16, driveY=CH-8;
-    ctx.fillStyle=_hex(c.b);
-    ctx.fillRect(22,boilerY,boilerEnd-22,boilerH);
-    ctx.beginPath();ctx.ellipse(22,boilerY+boilerH/2,5,boilerH/2,0,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(boilerEnd,boilerY+boilerH/2,5,boilerH/2,0,0,Math.PI*2);ctx.fill();
-    // Boiler bands
-    ctx.fillStyle=_hex(c.s);
-    [38,52,68,82].forEach(bx=>{ctx.fillRect(bx,boilerY,2,boilerH);});
-    // Cab (taller box at rear)
-    ctx.fillStyle=_hex(c.r);
-    ctx.fillRect(boilerEnd+2,boilerY-5,CW-boilerEnd-6,boilerH+5);
-    ctx.fillStyle=_hex(c.w);
-    ctx.fillRect(boilerEnd+6,boilerY-2,12,9);
-    // Chimney (tall, front)
-    ctx.fillStyle='#1a1a1a';
-    ctx.fillRect(26,boilerY-13,9,14);
-    ctx.fillRect(23,boilerY-15,15,4);
-    // Dome
-    ctx.fillStyle=_hex(c.s);
-    ctx.beginPath();ctx.arc(boilerEnd-22,boilerY,5,Math.PI,0);ctx.fill();
-    ctx.fillStyle=_hex(c.b);
-    ctx.beginPath();ctx.arc(boilerEnd-22,boilerY,4,Math.PI,0);ctx.fill();
-    // Safety valve
-    ctx.fillStyle='#888';
-    ctx.beginPath();ctx.arc(boilerEnd-36,boilerY,4,Math.PI,0);ctx.fill();
-    // Smoke box front
-    ctx.fillStyle='#111';
-    ctx.beginPath();ctx.ellipse(18,boilerY+boilerH/2,4,boilerH/2+1,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#ffee88';
-    ctx.beginPath();ctx.arc(18,boilerY+5,3,0,Math.PI*2);ctx.fill();
-    // Large spoked drive wheels x3
-    [40,63,85].forEach(wx=>{
-      ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(wx,driveY,8,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle=_hex(c.s);ctx.lineWidth=1.8;
-      ctx.beginPath();ctx.arc(wx,driveY,8,0,Math.PI*2);ctx.stroke();
-      for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.beginPath();ctx.moveTo(wx,driveY);ctx.lineTo(wx+Math.cos(a)*6,driveY+Math.sin(a)*6);ctx.stroke();}
-      ctx.fillStyle=_hex(c.r);ctx.beginPath();ctx.arc(wx,driveY,2.5,0,Math.PI*2);ctx.fill();
-    });
-    // Small pilot wheel
-    ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(20,driveY+3,5,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=_hex(c.s);ctx.lineWidth=1;ctx.beginPath();ctx.arc(20,driveY+3,5,0,Math.PI*2);ctx.stroke();
-    // Connecting rod
-    ctx.strokeStyle=_hex(c.r);ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.moveTo(40,driveY);ctx.lineTo(85,driveY);ctx.stroke();
-    // Steam puffs
-    ctx.fillStyle='rgba(220,225,255,0.55)';
-    ctx.beginPath();ctx.arc(30,boilerY-16,5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(36,boilerY-20,7,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(44,boilerY-17,5,0,Math.PI*2);ctx.fill();
+  // ── Helper: draw spoked wheel ────────────────────────────────────────────
+  function wheel(cx,cy,r,rimC,spokeC,hubC,spokes){
+    ctx.fillStyle=rimC; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=spokeC; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+    const n=spokes||6;
+    for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*(r-1),cy+Math.sin(a)*(r-1));ctx.stroke();}
+    ctx.fillStyle=hubC; ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2); ctx.fill();
+  }
+  function bogie(cx,cy,rimC,spokeC){
+    // Two small wheels under a bogie frame
+    ctx.fillStyle='#555'; ctx.fillRect(cx-14,cy-3,28,5);
+    ctx.beginPath(); ctx.arc(cx-9,cy+1,5,0,Math.PI*2); ctx.fillStyle=rimC; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx+9,cy+1,5,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=spokeC; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(cx-9,cy+1,5,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx+9,cy+1,5,0,Math.PI*2); ctx.stroke();
+  }
+  function pantoV(cx,roofY,w,col){
+    ctx.strokeStyle=col||'#ccc'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx-w/2,roofY+1); ctx.lineTo(cx,roofY-9); ctx.lineTo(cx+w/2,roofY+1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-w/4,roofY-4); ctx.lineTo(cx+w/4,roofY-4); ctx.stroke();
+    ctx.fillStyle=col||'#ccc'; ctx.fillRect(cx-w/2-1,roofY,3,5); ctx.fillRect(cx+w/2-1,roofY,3,5);
+  }
+  function catWire(col){
+    ctx.strokeStyle=col||'rgba(180,180,180,0.6)'; ctx.lineWidth=1;
+    ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(0,4); ctx.lineTo(CW,4); ctx.stroke(); ctx.setLineDash([]);
+  }
 
-  } else if (type==='highspeed' || sub==='maglev') {
-    // Ultra-aerodynamic pointed wedge, very low/thin, NO chimney
-    const isML=(sub==='maglev'), nL=16, bY=13, bH=16;
-    ctx.fillStyle=_hex(c.b);
-    ctx.beginPath();
-    ctx.moveTo(6,bY);ctx.lineTo(CW-nL,bY);ctx.lineTo(CW-2,bY+bH/2);
-    ctx.lineTo(CW-nL,bY+bH);ctx.lineTo(6,bY+bH);ctx.lineTo(2,bY+bH/2);
-    ctx.closePath();ctx.fill();
-    // Roof stripe (follows wedge)
-    ctx.fillStyle=_hex(c.r);
-    ctx.beginPath();
-    ctx.moveTo(6,bY);ctx.lineTo(CW-nL,bY);ctx.lineTo(CW-4,bY+bH/2);
-    ctx.lineTo(CW-nL,bY+4);ctx.lineTo(6,bY+4);ctx.lineTo(4,bY+bH/2);
-    ctx.closePath();ctx.fill();
-    // Long panoramic window
-    ctx.fillStyle=_hex(c.w);
-    ctx.fillRect(20,bY+5,CW-nL-26,8);
-    // Bottom speed stripe
-    ctx.fillStyle=_hex(c.s);
-    ctx.fillRect(6,bY+bH-4,CW-nL-2,4);
-    // Speed blur lines (left)
-    ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1;
-    [0,3,6].forEach(dy=>{ctx.beginPath();ctx.moveTo(0,bY+6+dy);ctx.lineTo(14,bY+6+dy);ctx.stroke();});
-    // Headlight nose
-    ctx.fillStyle='rgba(255,248,180,0.85)';
-    ctx.beginPath();ctx.arc(CW-3,bY+bH/2,4,0,Math.PI*2);ctx.fill();
-    if(isML){
-      // Maglev: levitation skirt, no wheels, blue glow
-      ctx.fillStyle=_hex(c.k);ctx.fillRect(6,bY+bH,CW-nL-4,4);
-      ctx.fillStyle='rgba(100,200,255,0.45)';ctx.fillRect(6,bY+bH+4,CW-nL-4,3);
-    } else {
-      [22,46,72,96].forEach(wx=>{
-        ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(wx,CH-8,5,0,Math.PI*2);ctx.fill();
-        ctx.strokeStyle='#777';ctx.lineWidth=1;ctx.beginPath();ctx.arc(wx,CH-8,5,0,Math.PI*2);ctx.stroke();
-      });
+  // ══════════════════════════════════════════════════════════════════════════
+  // STEAM variants
+  // ══════════════════════════════════════════════════════════════════════════
+  if(type==='steam'){
+    const wY=tY; // wheel center on track
+
+    if(sub==='classic'){
+      // Medium boiler, 3 drive wheels, tall chimney front
+      ctx.fillStyle=B; ctx.fillRect(22,10,75,18); // boiler
+      ctx.beginPath(); ctx.ellipse(22,19,5,9,0,0,Math.PI*2); ctx.fill(); // front dome
+      ctx.beginPath(); ctx.ellipse(97,19,5,9,0,0,Math.PI*2); ctx.fill(); // rear
+      [38,55,72].forEach(x=>{ ctx.fillStyle=S; ctx.fillRect(x,10,2,18); }); // bands
+      ctx.fillStyle=R; ctx.fillRect(97,5,21,23); // cab
+      ctx.fillStyle=W; ctx.fillRect(100,8,8,8); // cab window
+      ctx.fillStyle='#111'; ctx.fillRect(26,0,8,11); ctx.fillRect(23,0,14,4); // chimney
+      ctx.fillStyle=S; ctx.beginPath(); ctx.arc(80,10,5,Math.PI,0); ctx.fill(); // dome
+      ctx.beginPath(); ctx.arc(62,10,4,Math.PI,0); ctx.fill(); // safety valve
+      [40,60,80].forEach(x=>wheel(x,wY,8,K,S,R,6));
+      wheel(22,wY+2,5,K,S,R,4); // pilot
+      ctx.strokeStyle=R; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.moveTo(40,wY); ctx.lineTo(80,wY); ctx.stroke(); // rod
+      ctx.fillStyle='rgba(210,220,255,0.5)';
+      ctx.beginPath(); ctx.arc(29,0,5,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(35,-3,4,0,Math.PI*2); ctx.fill();
+
+    } else if(sub==='pacific'){
+      // Long boiler extending far right, 3 big + 1 small pilot wheel
+      ctx.fillStyle=B; ctx.fillRect(16,11,88,16); // long boiler
+      ctx.beginPath(); ctx.ellipse(16,19,5,8,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(104,19,5,8,0,0,Math.PI*2); ctx.fill();
+      [32,52,70,88].forEach(x=>{ ctx.fillStyle=S; ctx.fillRect(x,11,2,16); });
+      ctx.fillStyle=R; ctx.fillRect(104,6,14,22); // cab (narrower)
+      ctx.fillStyle=W; ctx.fillRect(106,9,8,7); // window
+      ctx.fillStyle='#1a1a1a'; ctx.fillRect(20,2,7,10); ctx.fillRect(17,2,13,4); // chimney (lower, wider)
+      ctx.fillStyle=S; ctx.beginPath(); ctx.arc(88,11,5,Math.PI,0); ctx.fill(); // dome
+      // Smoke deflectors — wide rectangular plates each side
+      ctx.fillStyle=R; ctx.fillRect(14,4,7,15); ctx.fillRect(28,4,7,15); // deflectors (two blades front)
+      [38,60,82].forEach(x=>wheel(x,wY,9,K,S,R,6));
+      wheel(17,wY+3,5,K,S,R,4); // small pilot
+      wheel(105,wY+3,5,K,S,R,4); // trailing
+      ctx.strokeStyle=R; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.moveTo(38,wY); ctx.lineTo(82,wY); ctx.stroke();
+      ctx.fillStyle='rgba(200,215,255,0.55)';
+      ctx.beginPath(); ctx.arc(25,-1,6,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(32,2,4,0,Math.PI*2); ctx.fill();
+
+    } else if(sub==='mountain'){
+      // Very large drive wheels (radius 10), wide firebox at rear, thick chimney
+      ctx.fillStyle=B; ctx.fillRect(22,12,70,16); // boiler
+      ctx.beginPath(); ctx.ellipse(22,20,5,8,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=R; ctx.fillRect(92,4,26,24); // wide firebox/cab
+      ctx.fillStyle=W; ctx.fillRect(95,7,10,9); ctx.fillRect(107,7,8,9); // double windows
+      ctx.fillStyle='#111'; ctx.fillRect(24,0,11,13); ctx.fillRect(20,0,19,5); // THICK chimney
+      ctx.fillStyle=S; ctx.beginPath(); ctx.arc(72,12,5,Math.PI,0); ctx.fill();
+      [42,68].forEach(x=>wheel(x,wY,10,K,S,R,8)); // big drive wheels
+      wheel(20,wY+3,5,K,S,R,4); // pilot
+      wheel(95,wY+3,6,K,S,R,4); // trailing
+      ctx.strokeStyle=S; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(42,wY); ctx.lineTo(68,wY); ctx.stroke();
+      ctx.fillStyle='rgba(215,215,255,0.6)';
+      for(let i=0;i<3;i++) ctx.beginPath(),ctx.arc(28-i*3,-i*4,4+i,0,Math.PI*2),ctx.fill();
+
+    } else if(sub==='tank'){
+      // Compact: side tanks along boiler, NO tender, short chimney
+      ctx.fillStyle=B; ctx.fillRect(10,12,84,16); // boiler
+      ctx.beginPath(); ctx.ellipse(10,20,5,8,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(94,20,5,8,0,0,Math.PI*2); ctx.fill();
+      // Side tanks (flanking boiler)
+      ctx.fillStyle=R; ctx.fillRect(10,10,30,6); ctx.fillRect(10,26,30,5); // left tank top/bottom
+      ctx.fillStyle=R; ctx.fillRect(64,10,30,6); ctx.fillRect(64,26,30,5); // right tank
+      ctx.fillStyle=R; ctx.fillRect(94,8,22,22); // cab at rear
+      ctx.fillStyle=W; ctx.fillRect(97,11,8,8); // window
+      ctx.fillStyle='#111'; ctx.fillRect(14,4,7,9); ctx.fillRect(11,4,13,4); // short chimney
+      ctx.fillStyle=S; ctx.beginPath(); ctx.arc(50,12,5,Math.PI,0); ctx.fill(); // dome
+      [32,55,78].forEach(x=>wheel(x,wY,7,K,S,R,6));
+      ctx.strokeStyle=R; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(32,wY); ctx.lineTo(78,wY); ctx.stroke();
+
+    } else { // prairie — small, compact
+      ctx.fillStyle=B; ctx.fillRect(18,14,60,14); // short boiler
+      ctx.beginPath(); ctx.ellipse(18,21,4,7,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(78,21,4,7,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=R; ctx.fillRect(78,10,22,18); // cab
+      ctx.fillStyle=W; ctx.fillRect(81,13,7,7); // window
+      ctx.fillStyle='#111'; ctx.fillRect(21,6,6,9); ctx.fillRect(18,6,12,4); // tiny chimney
+      ctx.fillStyle=S; ctx.beginPath(); ctx.arc(58,14,4,Math.PI,0); ctx.fill(); // dome
+      [34,56].forEach(x=>wheel(x,wY,6,K,S,R,5));
+      wheel(16,wY+3,4,K,S,R,4); // pilot
+      ctx.strokeStyle=R; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(34,wY); ctx.lineTo(56,wY); ctx.stroke();
+      ctx.fillStyle='rgba(220,225,255,0.55)';
+      ctx.beginPath(); ctx.arc(25,2,4,0,Math.PI*2); ctx.fill();
     }
 
-  } else if (type==='diesel') {
-    // Box cab nose at RIGHT with hazard stripes + long flat hood left
-    const cabW=28, bY=10, hoodH=14, cabH=22;
-    // Hood (flat, low)
-    ctx.fillStyle=_hex(c.b);
-    ctx.fillRect(6,bY+8,CW-cabW-10,hoodH);
-    // Cab (taller box, right side)
-    ctx.fillStyle=_hex(c.b);
-    ctx.fillRect(CW-cabW-4,bY,cabW,cabH);
-    // Hazard warning stripes on cab nose
-    const nX=CW-cabW-4;
-    ['#f59e0b','#111','#f59e0b','#111','#f59e0b'].forEach((col,i)=>{
-      ctx.fillStyle=col;ctx.fillRect(nX,bY+i*4,4,4);
-    });
-    // Windshield
-    ctx.fillStyle=_hex(c.w);
-    ctx.fillRect(CW-cabW,bY+4,cabW-6,11);
-    // Windshield divider
-    ctx.fillStyle='rgba(0,0,0,0.18)';
-    ctx.fillRect(CW-cabW+(cabW-6)/2,bY+4,1.5,11);
-    // Exhaust stacks
-    ctx.fillStyle='#444';
-    ctx.fillRect(CW-cabW+3,bY-7,5,9);ctx.fillRect(CW-cabW+10,bY-5,4,7);
-    ctx.fillRect(CW-cabW,bY-9,9,3);
-    // Hood stripe
-    ctx.fillStyle=_hex(c.s);
-    ctx.fillRect(6,bY+8+hoodH-4,CW-cabW-10,4);
-    // Grille on hood
-    ctx.strokeStyle='rgba(0,0,0,0.22)';ctx.lineWidth=1;
-    for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(20+i*16,bY+10);ctx.lineTo(20+i*16,bY+8+hoodH-5);ctx.stroke();}
-    // 4 wheels (bogie style)
-    const wY=CH-8;
-    [18,40,CW-cabW-16,CW-16].forEach(wx=>{
-      ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(wx,wY,6,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#666';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(wx,wY,6,0,Math.PI*2);ctx.stroke();
-      ctx.fillStyle='#aaa';ctx.beginPath();ctx.arc(wx,wY,2,0,Math.PI*2);ctx.fill();
-    });
-    ctx.fillStyle='#333';
-    ctx.fillRect(12,CH-10,34,3);ctx.fillRect(CW-cabW-20,CH-10,34,3);
+  // ══════════════════════════════════════════════════════════════════════════
+  // DIESEL variants
+  // ══════════════════════════════════════════════════════════════════════════
+  } else if(type==='diesel'){
 
-  } else if (type==='tram') {
-    // VERY boxy body, 6 windows, distinctive pantograph V on roof
-    const tY=8, tH=24, tW=CW-10;
-    ctx.fillStyle=_hex(c.b);
-    ctx.fillRect(5,tY,tW,tH);
-    ctx.fillStyle=_hex(c.r);ctx.fillRect(5,tY,tW,5);
-    // 6 windows
-    ctx.fillStyle=_hex(c.w);
-    for(let i=0;i<6;i++) ctx.fillRect(7+i*18,tY+7,13,12);
-    // Doors visible
-    ctx.fillStyle='rgba(0,0,0,0.14)';
-    ctx.fillRect(24,tY+6,8,tH-6);ctx.fillRect(72,tY+6,8,tH-6);
-    // Bottom skirt stripe
-    ctx.fillStyle=_hex(c.s);ctx.fillRect(5,tY+tH-5,tW,5);
-    // Pantograph V on roof (very distinctive)
-    ctx.strokeStyle='#ddd';ctx.lineWidth=2;
-    const pX=5+tW/2;
-    ctx.beginPath();ctx.moveTo(pX-16,tY);ctx.lineTo(pX,tY-11);ctx.lineTo(pX+16,tY);ctx.stroke();
-    ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(pX-10,tY-5);ctx.lineTo(pX+10,tY-5);ctx.stroke();
-    // Trolley wire
-    ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(0,tY-11);ctx.lineTo(CW,tY-11);ctx.stroke();
-    // Small wheels
-    [18,40,CW-40,CW-18].forEach(wx=>{
-      ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(wx,CH-7,5,0,Math.PI*2);ctx.fill();
-    });
+    if(sub==='hood'){
+      // Long nose left, cab right, two exhaust stacks
+      ctx.fillStyle=B; ctx.fillRect(0,12,74,18); // hood
+      ctx.fillStyle='#1a1a1a'; // hazard stripes on nose
+      for(let i=0;i<4;i++){ if(i%2===0){ctx.fillStyle=S} else{ctx.fillStyle=B}; ctx.fillRect(i*5,12,5,18);}
+      ctx.fillStyle=B; ctx.fillRect(0,12,74,18); // re-draw hood
+      ctx.fillStyle='#e8e000'; ctx.fillRect(0,12,5,18); ctx.fillRect(10,12,5,18); ctx.fillRect(20,12,5,18); // nose stripes
+      ctx.fillStyle=R; ctx.fillRect(74,8,44,22); // cab
+      ctx.fillStyle=W; ctx.fillRect(78,11,10,9); ctx.fillRect(92,11,10,9); ctx.fillRect(106,11,10,9); // 3 windows
+      ctx.fillStyle='#555'; // exhaust stacks
+      ctx.fillRect(30,4,6,9); ctx.fillRect(46,4,6,9);
+      ctx.fillStyle='#333'; ctx.fillRect(29,2,8,4); ctx.fillRect(45,2,8,4);
+      ctx.fillStyle=B; ctx.fillRect(0,10,4,4); ctx.fillRect(116,10,4,4); // buffer beams
+      bogie(22,tY-1,K,S); bogie(88,tY-1,K,S);
 
-  } else if (type==='electric') {
-    // Symmetrical tapered both ends + central pantograph + catenary wire
-    const eY=11, eH=20, tp=12;
-    ctx.fillStyle=_hex(c.b);
-    ctx.beginPath();
-    ctx.moveTo(tp+2,eY);ctx.lineTo(CW-tp-2,eY);ctx.lineTo(CW-2,eY+eH/2);
-    ctx.lineTo(CW-tp-2,eY+eH);ctx.lineTo(tp+2,eY+eH);ctx.lineTo(2,eY+eH/2);
-    ctx.closePath();ctx.fill();
-    // Accent stripe top
-    ctx.fillStyle=_hex(c.r);
-    ctx.beginPath();
-    ctx.moveTo(tp+2,eY);ctx.lineTo(CW-tp-2,eY);ctx.lineTo(CW-6,eY+eH/2);
-    ctx.lineTo(CW-tp-2,eY+4);ctx.lineTo(tp+2,eY+4);ctx.lineTo(6,eY+eH/2);
-    ctx.closePath();ctx.fill();
-    // Full-width panoramic window
-    ctx.fillStyle=_hex(c.w);
-    ctx.fillRect(tp+6,eY+5,CW-tp*2-12,10);
-    // Bottom stripe
-    ctx.fillStyle=_hex(c.s);
-    ctx.fillRect(tp+2,eY+eH-3,CW-tp*2-4,3);
-    // Central pantograph (diamond shape)
-    ctx.strokeStyle='#ccc';ctx.lineWidth=2;
-    const epX=CW/2;
-    ctx.beginPath();ctx.moveTo(epX-12,eY);ctx.lineTo(epX,eY-9);ctx.lineTo(epX+12,eY);ctx.stroke();
-    ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(epX-8,eY-4);ctx.lineTo(epX+8,eY-4);ctx.stroke();
-    // Catenary wire
-    ctx.strokeStyle='rgba(200,200,200,0.45)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(0,eY-9);ctx.lineTo(CW,eY-9);ctx.stroke();
-    // Headlights both ends
-    ctx.fillStyle='rgba(255,255,180,0.8)';
-    ctx.beginPath();ctx.arc(4,eY+eH/2,4,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(CW-4,eY+eH/2,4,0,Math.PI*2);ctx.fill();
-    // Bogie pairs
-    [[16,CH-8,5],[32,CH-8,5],[CW-32,CH-8,5],[CW-16,CH-8,5]].forEach(([x,y,r])=>{
-      ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#777';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
-    });
-    ctx.fillStyle='#444';ctx.fillRect(10,CH-10,28,2);ctx.fillRect(CW-38,CH-10,28,2);
+    } else if(sub==='boxcab'){
+      // Symmetric: cabs both ends, raised engine hump center
+      ctx.fillStyle=R; ctx.fillRect(0,8,22,22); // cab left
+      ctx.fillStyle=R; ctx.fillRect(98,8,22,22); // cab right
+      ctx.fillStyle=B; ctx.fillRect(22,12,76,18); // engine body
+      ctx.fillStyle=B; ctx.fillRect(40,8,40,5); // roof hump
+      ctx.fillStyle=W; ctx.fillRect(4,12,14,8); // left window
+      ctx.fillStyle=W; ctx.fillRect(102,12,14,8); // right window
+      ctx.fillStyle='#555'; ctx.fillRect(50,3,5,8); ctx.fillRect(65,3,5,8); // exhaust
+      ctx.fillStyle=S; ctx.fillRect(22,18,76,3); ctx.fillRect(22,27,76,3); // waist stripes
+      bogie(28,tY-1,K,S); bogie(92,tY-1,K,S);
 
-  } else if (type==='heritage') {
-    // Victorian coach: arched roof, arched windows, 8-spoke wheels, ornate gold
-    const hY=7, hH=24, hW=CW-10;
-    ctx.fillStyle=_hex(c.b);
-    ctx.beginPath();
-    ctx.moveTo(5,hY+10);ctx.bezierCurveTo(5,hY,5,hY,14,hY);
-    ctx.lineTo(CW-14,hY);ctx.bezierCurveTo(CW-5,hY,CW-5,hY,CW-5,hY+10);
-    ctx.lineTo(CW-5,hY+hH);ctx.lineTo(5,hY+hH);ctx.closePath();ctx.fill();
-    // Gold ornate roof band
-    ctx.fillStyle=_hex(c.r);ctx.fillRect(12,hY,hW-4,4);
-    // Rivet dots along roof
-    ctx.fillStyle=_hex(c.s);
-    for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(14+i*10,hY+2,1.5,0,Math.PI*2);ctx.fill();}
-    // Arched windows (Victorian arch top)
-    ctx.fillStyle=_hex(c.w);
-    [14,35,56,77].forEach(wx=>{
-      ctx.fillRect(wx,hY+9+5,14,10);
-      ctx.beginPath();ctx.arc(wx+7,hY+14,7,Math.PI,0,false);ctx.fill();
-      ctx.strokeStyle=_hex(c.r);ctx.lineWidth=1;
-      ctx.strokeRect(wx,hY+14,14,10);
-      ctx.beginPath();ctx.arc(wx+7,hY+14,7,Math.PI,0,false);ctx.stroke();
-    });
-    // Lower panel stripe
-    ctx.fillStyle=_hex(c.s);ctx.fillRect(5,hY+hH-5,hW,5);
-    ctx.fillStyle=_hex(c.r);ctx.fillRect(5,hY+hH-8,hW,1.5);
-    // End cap pillars
-    ctx.fillStyle=_hex(c.r);ctx.fillRect(5,hY+8,3,hH-8);ctx.fillRect(CW-8,hY+8,3,hH-8);
-    // 8-spoke Victorian wheels
-    [18,45,75,CW-18].forEach(wx=>{
-      const r=7;
-      ctx.fillStyle=_hex(c.k);ctx.beginPath();ctx.arc(wx,CH-8,r,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle=_hex(c.r);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(wx,CH-8,r,0,Math.PI*2);ctx.stroke();
-      for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2;ctx.beginPath();ctx.moveTo(wx,CH-8);ctx.lineTo(wx+Math.cos(a)*(r-2),CH-8+Math.sin(a)*(r-2));ctx.stroke();}
-      ctx.fillStyle=_hex(c.s);ctx.beginPath();ctx.arc(wx,CH-8,2,0,Math.PI*2);ctx.fill();
-    });
+    } else if(sub==='streamline'){
+      // Aerodynamic rounded nose, sweeping body
+      ctx.fillStyle=B;
+      ctx.beginPath(); ctx.moveTo(0,28); ctx.quadraticCurveTo(12,28,18,14); ctx.lineTo(18,10); ctx.lineTo(116,10); ctx.lineTo(116,28); ctx.closePath(); ctx.fill();
+      // Streamline speed stripe
+      ctx.fillStyle=S;
+      ctx.beginPath(); ctx.moveTo(5,22); ctx.quadraticCurveTo(20,22,24,14); ctx.lineTo(116,14); ctx.lineTo(116,18); ctx.lineTo(24,18); ctx.quadraticCurveTo(22,26,5,26); ctx.closePath(); ctx.fill();
+      // Windows
+      ctx.fillStyle=W; [40,58,76,94].forEach(x=>ctx.fillRect(x,12,12,8));
+      // Front lights
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(4,20,4,0,Math.PI*2); ctx.fill();
+      bogie(26,tY-1,K,S); bogie(90,tY-1,K,S);
+
+    } else if(sub==='shunter'){
+      // Very short, mostly just cab, large footsteps
+      ctx.fillStyle=B; ctx.fillRect(10,10,65,20); // short body
+      ctx.fillStyle=R; ctx.fillRect(10,8,65,5); // cab roof
+      ctx.fillStyle=W; ctx.fillRect(20,14,10,9); ctx.fillRect(38,14,10,9); ctx.fillRect(56,14,10,9); // 3 windows
+      // Footsteps both sides
+      ctx.fillStyle='#555'; ctx.fillRect(4,25,8,5); ctx.fillRect(74,25,8,5);
+      ctx.fillStyle='#777'; ctx.fillRect(4,28,8,2); ctx.fillRect(74,28,8,2);
+      // Exhaust stack (short)
+      ctx.fillStyle='#333'; ctx.fillRect(30,2,8,9); ctx.fillRect(28,2,12,4);
+      // Large buffers
+      ctx.fillStyle=S; ctx.fillRect(0,18,8,8); ctx.fillRect(77,18,8,8);
+      bogie(38,tY-1,K,S); // single bogie center
+
+    } else { // railbus
+      // Bus-like: tall body, many windows, two bogies
+      ctx.fillStyle=B; ctx.fillRect(4,6,112,24); // tall body
+      ctx.fillStyle=R; ctx.fillRect(4,6,112,5); // roof band
+      ctx.fillStyle=R; ctx.fillRect(4,27,112,3); // skirt band
+      // Many windows (bus style)
+      ctx.fillStyle=W;
+      [12,28,44,60,76,92].forEach(x=>ctx.fillRect(x,9,12,12));
+      // Front face with headlight
+      ctx.fillStyle=R; ctx.fillRect(0,6,6,24);
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(3,14,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(3,22,3,0,Math.PI*2); ctx.fill();
+      // Destination board
+      ctx.fillStyle='#001133'; ctx.fillRect(8,7,30,5);
+      ctx.fillStyle='#ffffff'; ctx.font='4px sans-serif'; ctx.fillText('KERETA',9,11);
+      bogie(28,tY-1,K,S); bogie(90,tY-1,K,S);
+    }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HIGHSPEED / MAGLEV
+  // ══════════════════════════════════════════════════════════════════════════
+  } else if(type==='highspeed'){
+
+    if(sub==='maglev'){
+      // Levitation: no wheels, magnetic skirt, blue glow
+      // Levitation skirt glow
+      ctx.fillStyle='rgba(56,189,248,0.2)';
+      ctx.fillRect(10,tY-6,100,6);
+      ctx.fillStyle='rgba(56,189,248,0.5)';
+      ctx.fillRect(10,tY-4,100,2);
+      // Sleek body
+      ctx.fillStyle=B;
+      ctx.beginPath(); ctx.moveTo(0,22); ctx.lineTo(14,10); ctx.lineTo(106,10); ctx.quadraticCurveTo(120,10,120,20); ctx.lineTo(120,30); ctx.lineTo(0,30); ctx.closePath(); ctx.fill();
+      ctx.fillStyle=S; ctx.fillRect(14,13,106,4); // speed stripe
+      ctx.fillStyle=W; [22,40,60,80,98].forEach(x=>ctx.fillRect(x,15,14,8));
+      // Nose light
+      ctx.fillStyle='#38bdf8'; ctx.beginPath(); ctx.arc(4,20,5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#e0f2fe'; ctx.beginPath(); ctx.arc(4,20,2,0,Math.PI*2); ctx.fill();
+      // Skirt rails
+      ctx.strokeStyle='rgba(56,189,248,0.8)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(8,tY-3); ctx.lineTo(112,tY-3); ctx.stroke();
+
+    } else { // bullet
+      // Ultra-aerodynamic wedge nose, very low body
+      ctx.fillStyle=B;
+      ctx.beginPath(); ctx.moveTo(0,24); ctx.lineTo(22,10); ctx.lineTo(114,10); ctx.lineTo(118,16); ctx.lineTo(118,26); ctx.lineTo(0,26); ctx.closePath(); ctx.fill();
+      // Speed stripe
+      ctx.fillStyle=S; ctx.fillRect(22,12,96,4);
+      // Windows (small, aerodynamic)
+      ctx.fillStyle=W; [30,50,70,90,108].forEach(x=>ctx.fillRect(x,13,12,7));
+      // Nose tip light
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(2,22,3,0,Math.PI*2); ctx.fill();
+      // Rear pantograph (recessed)
+      ctx.fillStyle='#888'; ctx.fillRect(104,8,2,3); ctx.fillRect(112,8,2,3); ctx.fillRect(104,8,10,2);
+      bogie(28,tY-1,K,S); bogie(95,tY-1,K,S);
+    }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ELECTRIC variants
+  // ══════════════════════════════════════════════════════════════════════════
+  } else if(type==='electric'){
+    catWire(S);
+
+    if(sub==='krl'){
+      // Flat-faced commuter rail, center pantograph
+      ctx.fillStyle=B; ctx.fillRect(2,12,116,20); // body
+      ctx.fillStyle=R; ctx.fillRect(2,12,116,5); // roof color band
+      // Flat face with black visor
+      ctx.fillStyle='#111'; ctx.fillRect(2,12,4,20);
+      ctx.fillStyle='#0a0a2a'; ctx.fillRect(6,14,8,10); // dark front glass
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(4,15,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(4,25,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=W; [18,36,56,76,96].forEach(x=>ctx.fillRect(x,15,16,10));
+      pantoV(62,12,20,S);
+      bogie(28,tY-1,K,S); bogie(90,tY-1,K,S);
+
+    } else if(sub==='mrt'){
+      // Wider rounded front, sleek silver body
+      ctx.fillStyle=B; ctx.fillRect(8,10,108,22); // body
+      // Rounded front
+      ctx.beginPath(); ctx.arc(10,21,10,Math.PI*0.5,Math.PI*1.5); ctx.fillStyle=B; ctx.fill();
+      ctx.fillStyle=S; ctx.fillRect(8,13,108,4); // accent stripe
+      ctx.fillStyle=S; ctx.fillRect(8,27,108,3); // lower stripe
+      // Front visor
+      ctx.fillStyle='#0a1a3a'; ctx.fillRect(2,15,12,12);
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(6,18,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(6,26,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=W; [24,46,68,90].forEach(x=>ctx.fillRect(x,15,16,12));
+      pantoV(76,10,22,S);
+      bogie(26,tY-1,K,S); bogie(90,tY-1,K,S);
+
+    } else { // lrt
+      // Shorter, higher floor (elevated above track), more compact
+      ctx.fillStyle=B; ctx.fillRect(6,10,108,20); // body
+      ctx.fillStyle=R; ctx.fillRect(6,10,108,4); // roof stripe
+      ctx.fillStyle=R; ctx.fillRect(6,28,108,2); // floor stripe
+      // Boxy front
+      ctx.fillStyle=R; ctx.fillRect(2,10,6,20);
+      ctx.fillStyle=W; ctx.fillRect(4,14,4,8); // front window
+      ctx.fillStyle='#000'; ctx.fillRect(2,30,4,3); // headlight
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(4,13,2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=W; [18,38,58,78,98].forEach(x=>ctx.fillRect(x,13,16,11));
+      // Elevated floor gap
+      ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(6,30,108,3);
+      pantoV(60,10,18,S);
+      bogie(28,tY-1,K,S); bogie(88,tY-1,K,S);
+    }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // TRAM
+  // ══════════════════════════════════════════════════════════════════════════
+  } else if(type==='tram'){
+    catWire(S);
+    // Very boxy, low floor, 6 windows, V-pantograph
+    ctx.fillStyle=B; ctx.fillRect(4,8,112,24); // body
+    ctx.fillStyle=R; ctx.fillRect(4,8,112,4); // roof band
+    ctx.fillStyle=R; ctx.fillRect(4,30,112,2); // floor band
+    // Both ends are identical (bidirectional tram)
+    ctx.fillStyle=W; ctx.fillRect(4,11,8,14); ctx.fillRect(108,11,8,14); // end windows
+    ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(6,14,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(6,24,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(114,14,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(114,24,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=W; [22,42,62,82].forEach(x=>ctx.fillRect(x,11,14,14));
+    pantoV(60,8,24,S);
+    // Low-floor bogies (very close to ground)
+    bogie(28,tY-1,K,S); bogie(90,tY-1,K,S);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HERITAGE variants
+  // ══════════════════════════════════════════════════════════════════════════
+  } else if(type==='heritage'){
+
+    if(sub==='royal'){
+      // Victorian arched roof, ornate gold, large arched windows
+      // Roof arch (high arched roof)
+      ctx.fillStyle=B;
+      ctx.beginPath(); ctx.moveTo(4,30); ctx.lineTo(4,16);
+      ctx.bezierCurveTo(4,4,116,4,116,16); ctx.lineTo(116,30); ctx.closePath(); ctx.fill();
+      // Gold roof band
+      ctx.fillStyle=S;
+      ctx.beginPath(); ctx.moveTo(4,18); ctx.quadraticCurveTo(60,8,116,18); ctx.lineTo(116,22); ctx.quadraticCurveTo(60,13,4,22); ctx.closePath(); ctx.fill();
+      // Arched windows (ornate)
+      [14,36,58,80,100].forEach(x=>{
+        ctx.fillStyle='#001133'; ctx.fillRect(x,17,14,14);
+        ctx.fillStyle=W;
+        ctx.beginPath(); ctx.arc(x+7,17,7,Math.PI,0); ctx.fill();
+        ctx.fillRect(x,17,14,8);
+        ctx.strokeStyle=S; ctx.lineWidth=1; ctx.strokeRect(x,17,14,14);
+      });
+      // Gold trim along floor
+      ctx.fillStyle=S; ctx.fillRect(4,28,112,3);
+      [40,60,80].forEach(x=>wheel(x,tY,8,K,S,'#8B6914',8));
+      wheel(10,tY+2,5,K,S,'#8B6914',6); wheel(106,tY+2,5,K,S,'#8B6914',6);
+
+    } else if(sub==='heritage'){
+      // Classic wooden coach, arched lower windows, brass fittings
+      ctx.fillStyle=B; ctx.fillRect(4,12,112,22); // body
+      // Gentle roof curve
+      ctx.fillStyle=R;
+      ctx.beginPath(); ctx.moveTo(4,12); ctx.quadraticCurveTo(60,5,116,12); ctx.lineTo(116,12); ctx.lineTo(4,12); ctx.closePath(); ctx.fill();
+      // Waist brass band
+      ctx.fillStyle=S; ctx.fillRect(4,20,112,3);
+      // Windows with rounded tops
+      [14,34,54,74,94].forEach(x=>{
+        ctx.fillStyle='#1a3a1a'; ctx.fillRect(x,15,14,16);
+        ctx.fillStyle=W;
+        ctx.beginPath(); ctx.arc(x+7,15,7,Math.PI,0); ctx.fill();
+        ctx.fillRect(x,15,14,8);
+      });
+      // Gold corner pillars
+      ctx.fillStyle=S; [4,26,46,68,88,108].forEach(x=>ctx.fillRect(x,12,3,22));
+      [38,62,86].forEach(x=>wheel(x,tY,7,K,S,R,8));
+      wheel(10,tY+2,5,K,S,R,6); wheel(106,tY+2,5,K,S,R,6);
+
+    } else if(sub==='narrow'){
+      // Narrow gauge: compact short body, small wheels, wooden look
+      ctx.fillStyle=B; ctx.fillRect(10,14,100,20); // narrow body
+      ctx.fillStyle=R; ctx.fillRect(10,14,100,4); // roof
+      // Many small windows
+      ctx.fillStyle=W; [18,34,50,66,82,96].forEach(x=>ctx.fillRect(x,17,10,10));
+      ctx.fillStyle=S; ctx.fillRect(10,24,100,2); // waist line
+      // Decorative panels
+      ctx.fillStyle=R; [10,50,100].forEach(x=>ctx.fillRect(x,14,4,20));
+      // Wooden planks illusion
+      ctx.strokeStyle=R+'44'; ctx.lineWidth=1;
+      for(let y=14;y<34;y+=4){ctx.beginPath();ctx.moveTo(10,y);ctx.lineTo(110,y);ctx.stroke();}
+      // End platforms
+      ctx.fillStyle='#5a3a1a'; ctx.fillRect(0,28,12,6); ctx.fillRect(108,28,12,6);
+      [28,58,88].forEach(x=>wheel(x,tY,6,K,S,R,6));
+      wheel(8,tY+3,4,K,S,R,4); wheel(104,tY+3,4,K,S,R,4);
+
+    } else { // doubledeck
+      // Double-decker: two visible window rows, taller body
+      ctx.fillStyle=B; ctx.fillRect(4,2,112,32); // tall body
+      ctx.fillStyle=R; ctx.fillRect(4,2,112,4); // top roof
+      // Deck divider
+      ctx.fillStyle=S; ctx.fillRect(4,17,112,3);
+      // Upper deck windows
+      ctx.fillStyle=W; [14,32,52,72,92].forEach(x=>ctx.fillRect(x,5,14,10));
+      // Lower deck windows
+      ctx.fillStyle=W; [14,32,52,72,92].forEach(x=>ctx.fillRect(x,20,14,10));
+      // End pillars
+      ctx.fillStyle=R; ctx.fillRect(4,2,6,34); ctx.fillRect(110,2,6,34);
+      // Staircase hint (wavy line at one side)
+      ctx.strokeStyle=S; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(102,7); ctx.lineTo(102,32); ctx.stroke();
+      // Headlights
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(6,8,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffee88'; ctx.beginPath(); ctx.arc(6,27,3,0,Math.PI*2); ctx.fill();
+      bogie(26,tY-1,K,S); bogie(90,tY-1,K,S);
+    }
   }
 }
 
-// ── Station Banner ────────────────────────────────────────────────────────────
+
 function showStationBanner(station) {
   const el = document.getElementById('station-banner');
   document.getElementById('sb-icon').textContent = station.icon;

@@ -565,20 +565,68 @@ function tickMid(delta) {
 // ── Player train ──────────────────────────────────────────
 const PLAYER_X = 0.15  // fraction of screen width
 
+// Convert CSS hex string to PIXI integer color
+function hexN(h) { return parseInt(h.replace('#',''), 16) }
+
+// Draw a train silhouette on a PIXI.Graphics object (center-anchored, W≈70, H≈26)
+function drawTrainG(g, bodyC, accC, catKey) {
+  g.clear()
+  const bC = hexN(bodyC), aC = hexN(accC)
+  const W = 70, hW = 35, H = 26, hH = 13
+
+  if (catKey === 'maglev') {
+    // Streamlined capsule — no wheels, levitation glow
+    g.roundRect(-hW, -hH, W, H, 9).fill(bC)
+    g.rect(-hW + 2, -2, W - 4, 4).fill(aC)
+    g.roundRect(-hW + 5, -hH + 4, W - 10, 8).fill(0x93c5fd)  // visor strip
+    g.roundRect(hW - 10, -hH, 10, H, 4).fill(aC)              // nose tip
+    g.rect(-hW + 8, hH, W - 16, 5).fill(0x38bdf8)            // lev glow
+    return
+  }
+
+  if (catKey === 'hsr') {
+    // Bullet-nose highspeed
+    g.roundRect(-hW, -hH, W - 12, H, 4).fill(bC)
+    g.poly([-hW + W - 12, -hH,  hW + 6, 0,  -hW + W - 12, hH]).fill(bC)
+    g.rect(-hW, -3, W - 8, 6).fill(aC)
+    g.roundRect(-hW + 4, -hH + 4, W - 24, 8).fill(0xbfdbfe)
+    for (const wx of [-22, -4, 14]) {
+      g.circle(wx, hH + 2, 4).fill(0x1f2937)
+      g.circle(wx, hH + 2, 2).fill(0x6b7280)
+    }
+    return
+  }
+
+  // General body: steam / diesel / emu
+  g.roundRect(-hW, -hH, W, H, 4).fill(bC)
+  g.rect(-hW, -hH + 3, W, 5).fill(aC)
+  for (let i = 0; i < 3; i++) g.roundRect(-hW + 6 + i * 16, -hH + 6, 11, 9, 2).fill(0xdbeafe)
+  g.roundRect(hW - 12, -hH - 5, 12, H + 5, 4).fill(aC)   // cab
+
+  for (const wx of [-22, -2, 18]) {
+    g.circle(wx, hH + 3, 6).fill(0x1f2937)
+    g.circle(wx, hH + 3, 3).fill(0x6b7280)
+  }
+  if (catKey && catKey.includes('steam')) {
+    g.rect(hW - 20, -hH - 9, 7, 9).fill(bC)
+    g.roundRect(hW - 23, -hH - 11, 13, 5, 2).fill(0x292524)
+    g.circle(hW - 34, -hH - 3, 6).fill(0x6b7280)
+  }
+}
+
 function buildPlayer() {
   const c = new PIXI.Container(); L.player = c; stage.addChild(c)
   c.x = app.screen.width * PLAYER_X
 
   // Glow ellipse
   playerGlow = new PIXI.Graphics()
-  playerGlow.ellipse(0, 8, 35, 12).fill(0x86efac)
+  playerGlow.ellipse(0, 8, 38, 12).fill(0x86efac)
   playerGlow.alpha = 0.25
   c.addChild(playerGlow)
 
-  // Main emoji
-  playerSprite = new PIXI.Text({ text: '🚂', style: { fontSize: 50, fontFamily:'Arial' } })
-  playerSprite.anchor.set(0.5, 0.5)
-  playerSprite.scale.x = -1  // face right
+  // Train graphic (replaces emoji Text for cross-device compatibility)
+  playerSprite = new PIXI.Graphics()
+  drawTrainG(playerSprite, '#1e3a8a', '#3b82f6', 'diesel_id')  // default until train selected
   c.addChild(playerSprite)
 
   c.y = laneYs[S.lane]
@@ -589,7 +637,7 @@ function buildPlayer() {
 
 function updatePlayerEmoji() {
   if (!playerSprite || !S.trainCfg) return
-  playerSprite.text = S.trainCfg.emoji || '🚂'
+  drawTrainG(playerSprite, S.trainCfg.bodyColor, S.trainCfg.accColor, S.trainCfg.category)
 }
 
 function tickPlayer(delta) {
@@ -658,9 +706,8 @@ function buildAI() {
   const pool = shuffle([...ALL_TRAINS]).slice(0, AI_COUNT)
   pool.forEach((cfg, i) => {
     const c = new PIXI.Container()
-    const spr = new PIXI.Text({ text: cfg.emoji || '🚃', style: { fontSize: 40, fontFamily: 'Arial' } })
-    spr.anchor.set(0.5)
-    spr.scale.x = -1
+    const spr = new PIXI.Graphics()
+    drawTrainG(spr, cfg.bodyColor || '#374151', cfg.accColor || '#9ca3af', cfg.category)
     c.addChild(spr)
 
     // Glow
