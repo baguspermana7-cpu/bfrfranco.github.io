@@ -7703,6 +7703,10 @@ body { background: #0a0a1a !important; }
 <!-- PixiJS v8 — GPU-accelerated 2D renderer for battle FX, weather, evolution VFX -->
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script>
+window.onerror = function(msg, url, line, col, err) {
+  console.error('GLOBAL ERROR:', msg, 'at line', line, err)
+  return false
+}
 // ================================================================
 // DIFFICULTY CONFIG
 // ================================================================
@@ -11088,15 +11092,17 @@ function showDashboard() {
 }
 
 // ================================================================
-// BOOT
+// BOOT (wrapped in try-catch to prevent page freeze on any error)
 // ================================================================
-initFloatingStars()
-buildAnimalPicker('p1-animals',0)
-buildAnimalPicker('p2-animals',1)
 try {
-  const data=JSON.parse(localStorage.getItem(pkey('streak'))||'{}')
-  if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
-} catch(e){}
+  initFloatingStars()
+  buildAnimalPicker('p1-animals',0)
+  buildAnimalPicker('p2-animals',1)
+  try {
+    const data=JSON.parse(localStorage.getItem(pkey('streak'))||'{}')
+    if(data.streak>=2){document.getElementById('streak-badge').style.display='inline-flex';document.getElementById('streak-text').textContent=data.streak+' hari'}
+  } catch(e){}
+} catch(bootErr) { console.error('BOOT ERROR:', bootErr) }
 // ================================================================
 // PIXIJS — GPU RENDERER (G10, G13, G13b battle FX)
 // ================================================================
