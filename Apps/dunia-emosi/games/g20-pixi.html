@@ -92,9 +92,14 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
   <div class="start-icon">🦆🏐</div>
   <div class="start-title">Ducky Volley</div>
   <div class="start-sub" id="start-level"></div>
-  <div class="start-hint">Tap untuk Mulai!</div>
+  <div class="start-hint">Memuat game... ⏳</div>
 </div>
 
+<!-- Early tap handler — registers BEFORE PixiJS loads -->
+<script>
+window._earlyTaps=[];
+document.addEventListener('pointerdown',function(e){window._earlyTaps.push(e)});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script src="game-modal.js"></script>
 <script>
@@ -195,6 +200,9 @@ const particles = [], trails = []
   drawCourt()
   resetRound('player')
   app.ticker.add(gameLoop)
+  // Ready — update hint and process any taps during load
+  document.querySelector('.start-hint').textContent='Tap untuk Mulai!'
+  if(window._earlyTaps && window._earlyTaps.length>0) startGame()
 })().catch(e=>{
   console.error('G20 init failed:',e)
   document.querySelector('.start-hint').textContent='Gagal memuat. Muat ulang halaman.'
