@@ -79,6 +79,12 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0d102
 <div id="flash"></div>
 
 <!-- Start Overlay -->
+<!-- Ash + Pikachu running at ground level -->
+<img id="ash-runner" src="../assets/Pokemon/trainer/ash-running.webp"
+  style="position:fixed;z-index:39;pointer-events:none;height:10vh;width:auto;bottom:13%;left:8%;image-rendering:auto;display:none;">
+<img id="pika-runner" src="../assets/Pokemon/trainer/pikachu-run.webp"
+  style="position:fixed;z-index:39;pointer-events:none;height:2vh;width:auto;bottom:13.5%;left:2%;image-rendering:auto;display:none;">
+
 <div id="start-overlay">
   <div id="start-icon">🐦</div>
   <div id="start-title">Pokemon Birds</div>
@@ -169,12 +175,12 @@ function pickQuestions(level){
 //  LEVEL THEMES
 // ═══════════════════════════════════════════════════════════
 const LEVEL_THEMES = [
-  { name:'meadow', sky:0x87CEEB, skyMid:0xc8e8f8, hill1:0x22c55e, hill2:0x16a34a, hill3:0x0d7a34, ground:0x15803d, pipeColor:0x16a34a, hasMoon:false, hasStars:false, sunX:0.8 },
-  { name:'sunset', sky:0xff7c00, skyMid:0xffd6a0, hill1:0x9a5a2a, hill2:0x6b3a1a, hill3:0x3d2010, ground:0x4a2e1a, pipeColor:0x92400e, hasMoon:false, hasStars:false, sunX:0.15 },
-  { name:'night',  sky:0x03050f, skyMid:0x070a1f, hill1:0x1a0535, hill2:0x0f1a08, hill3:0x050d04, ground:0x0a1510, pipeColor:0x065f46, hasMoon:true,  hasStars:true,  sunX:null },
-  { name:'sakura', sky:0xfce7f3, skyMid:0xfbcfe8, hill1:0xc084fc, hill2:0x86405a, hill3:0x5a2a40, ground:0x6b2f50, pipeColor:0xf472b6, hasMoon:false, hasStars:false, sunX:0.6 },
-  { name:'storm',  sky:0x0e0820, skyMid:0x1a0f38, hill1:0x1a0f38, hill2:0x0d0820, hill3:0x050410, ground:0x0c0618, pipeColor:0x7c3aed, hasMoon:false, hasStars:true,  sunX:null },
-  { name:'aurora', sky:0x011a0a, skyMid:0x012412, hill1:0x012812, hill2:0x011a0c, hill3:0x010d06, ground:0x021a0e, pipeColor:0x059669, hasMoon:true,  hasStars:true,  sunX:null },
+  { name:'meadow', sky:0x87CEEB, skyMid:0xc8e8f8, hill1:0x22c55e, hill2:0x16a34a, hill3:0x0d7a34, ground:0x15803d, pipeColor:0xf59e0b, hasMoon:false, hasStars:false, sunX:0.8 },
+  { name:'sunset', sky:0xff7c00, skyMid:0xffd6a0, hill1:0x9a5a2a, hill2:0x6b3a1a, hill3:0x3d2010, ground:0x4a2e1a, pipeColor:0xc084fc, hasMoon:false, hasStars:false, sunX:0.15 },
+  { name:'night',  sky:0x03050f, skyMid:0x070a1f, hill1:0x1a0535, hill2:0x0f1a08, hill3:0x050d04, ground:0x0a1510, pipeColor:0x6366f1, hasMoon:true,  hasStars:true,  sunX:null },
+  { name:'sakura', sky:0xfce7f3, skyMid:0xfbcfe8, hill1:0xc084fc, hill2:0x86405a, hill3:0x5a2a40, ground:0x6b2f50, pipeColor:0xfb7185, hasMoon:false, hasStars:false, sunX:0.6 },
+  { name:'storm',  sky:0x0e0820, skyMid:0x1a0f38, hill1:0x1a0f38, hill2:0x0d0820, hill3:0x050410, ground:0x0c0618, pipeColor:0xa78bfa, hasMoon:false, hasStars:true,  sunX:null },
+  { name:'aurora', sky:0x011a0a, skyMid:0x012412, hill1:0x012812, hill2:0x011a0c, hill3:0x010d06, ground:0x021a0e, pipeColor:0xf97316, hasMoon:true,  hasStars:true,  sunX:null },
 ]
 const BG = LEVEL_THEMES[(cfg.level - 1) % LEVEL_THEMES.length]
 
@@ -561,6 +567,18 @@ function gameLoop(ticker) {
 
   updateHUD()
 
+  // Animate Ash + Pikachu running bob
+  const ashEl = document.getElementById('ash-runner')
+  const pikaEl = document.getElementById('pika-runner')
+  if (ashEl && ashEl.style.display !== 'none') {
+    const bob = Math.sin(S.frame * 0.2) * 3
+    ashEl.style.bottom = (13 + bob * 0.3) + '%'
+  }
+  if (pikaEl && pikaEl.style.display !== 'none') {
+    const bob2 = Math.sin(S.frame * 0.25 + 1) * 2
+    pikaEl.style.bottom = (13.5 + bob2 * 0.3) + '%'
+  }
+
   // Sync DOM bird image position — no rotation, only up/down
   if (window._birdImg) {
     const bi = window._birdImg
@@ -827,6 +845,11 @@ function flap() {
     S.running = true
     document.getElementById('start-overlay').classList.add('hidden')
     document.getElementById('status-text').textContent = 'Terbang!'
+    // Show Ash + Pikachu runners
+    const ash = document.getElementById('ash-runner')
+    const pika = document.getElementById('pika-runner')
+    if (ash) ash.style.display = 'block'
+    if (pika) pika.style.display = 'block'
   }
 
   if (S.paused) return
