@@ -123,6 +123,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;font-family:'Fred
 <!-- HUD Top -->
 <div id="hud-top">
   <button id="btn-back" type="button" onclick="goBack()">← Kembali</button>
+  <button id="btn-pause" onclick="togglePause()" style="pointer-events:all;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;color:#fff;padding:5px 8px;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0">⏸</button>
   <div id="word-display">
     <span id="word-emoji">❓</span>
     <div id="word-slots"></div>
@@ -239,6 +240,10 @@ const cfg = (() => { try { return JSON.parse(sessionStorage.getItem('g15Config')
 const LEVEL = Math.max(1, Math.min(30, cfg.level || 1));
 
 function goBack() { window.location.replace('../index.html'); }
+function togglePause() {
+  gamePaused = !gamePaused;
+  document.getElementById('btn-pause').textContent = gamePaused ? '▶' : '⏸';
+}
 
 // ── Java Station Route: Surabaya → Banten ────────────────────────────────────
 const JAVA_STATIONS = [
@@ -534,6 +539,7 @@ let wrongTaps = 0;
 let mathCorrect = 0;
 let invincible = false;
 let gameRunning = false;
+let gamePaused = false;
 let mathQuizActive = false;
 let startTime = 0;
 let gameSpeed = 2 + LEVEL * 0.15;
@@ -625,7 +631,7 @@ async function initPixi() {
   const spawnInterval = () => Math.max(45, 90 - LEVEL * 2);
 
   app.ticker.add((ticker) => {
-    if (!gameRunning || mathQuizActive) return;
+    if (!gameRunning || gamePaused || mathQuizActive) return;
     const dt = ticker.deltaTime;
 
     // Scroll sleepers

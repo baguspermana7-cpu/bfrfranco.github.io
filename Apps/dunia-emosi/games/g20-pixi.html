@@ -63,6 +63,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
 
 <div id="hud">
   <button id="btn-back" onclick="goBack()">◀</button>
+  <button id="btn-pause" onclick="togglePause()" style="pointer-events:all;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;color:#fff;padding:5px 8px;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0">⏸</button>
   <div id="game-badge">🏐 Ducky Volley</div>
   <div id="hud-center">
     <div id="level-text"></div>
@@ -784,6 +785,10 @@ window.addEventListener('keyup',e=>{
 document.getElementById('start-overlay').addEventListener('pointerdown',startGame)
 
 function goBack(){window.location.replace('../index.html')}
+function togglePause(){
+  S.paused=!S.paused
+  document.getElementById('btn-pause').textContent=S.paused?'▶':'⏸'
+}
 window.addEventListener('resize',()=>{if(app)app.renderer.resize(window.innerWidth,window.innerHeight)})
 </script>
 </body>

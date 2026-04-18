@@ -78,6 +78,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a0a1
 <div id="hud">
   <div id="hud-top">
     <button id="btn-back" onclick="confirmBack()">⌂</button>
+    <button id="btn-pause" onclick="togglePause()" style="pointer-events:all;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;color:#fff;padding:5px 8px;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0">⏸</button>
     <div id="hud-center">
       <div id="target-label">Kumpulkan huruf</div>
       <div id="target-word">—</div>
@@ -232,7 +233,7 @@ function startFromSelect() {
 }
 
 const S = {
-  running: false,
+  running: false, paused: false,
   lives: LIVES_MAX,
   difficulty: 'easy',
   score: 0,
@@ -760,7 +761,7 @@ function hitTile(t) {
 //  MAIN LOOP
 // ═══════════════════════════════════════════════════════════════════
 function loop(ticker) {
-  if (!S.running) return
+  if (!S.running || S.paused) return
   const delta = ticker.deltaTime
   const now = performance.now()
 
@@ -885,6 +886,11 @@ function showFinish() {
   try {
     sessionStorage.setItem('g6Result', JSON.stringify({ stars, score: S.score, wordsDone: S.wordsDone }))
   } catch(_) {}
+}
+
+function togglePause() {
+  S.paused = !S.paused
+  document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
 }
 
 function finishGame() { goBack() }

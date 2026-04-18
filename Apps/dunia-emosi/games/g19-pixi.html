@@ -461,7 +461,7 @@ async function createBird() {
   birdImg.id = 'bird-gif'
   birdImg.src = '../assets/Pokemon/birds/pidgeotto-r2.webp' // Pidgeotto (initial, smaller)
   const initSize = Math.round(BIRD_SIZE * 0.8) // Pidgeotto is 80% size
-  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+initSize+'px,15vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
+  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+initSize+'px,15vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;transform:scaleX(-1);'
   birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
   document.body.appendChild(birdImg)
   window._birdImg = birdImg
@@ -492,7 +492,7 @@ function gameLoop(ticker) {
       if (window._birdImg) {
         window._birdImg.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
         window._birdImg.style.top = (bobY - BIRD_SIZE/2) + 'px'
-        // no transform needed — pre-flipped GIF faces right
+        bi.style.transform = 'scaleX(-1)' // mirror to face right
       }
     }
     return
@@ -584,7 +584,7 @@ function gameLoop(ticker) {
     const bi = window._birdImg
     bi.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
     bi.style.top = (S.birdY - BIRD_SIZE/2) + 'px'
-    // no transform needed — pre-flipped GIF faces right
+    bi.style.transform = 'scaleX(-1)' // mirror to face right
   }
 }
 
