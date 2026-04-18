@@ -453,8 +453,8 @@ async function createBird() {
   // Use DOM <img> for animated GIF with transparency (PixiJS can't do animated GIF)
   const birdImg = document.createElement('img')
   birdImg.id = 'bird-gif'
-  birdImg.src = '../assets/Pokemon/birds/pidgeot-pokemon.gif'
-  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+BIRD_SIZE+'px,18vw);height:auto;transform:scaleX(-1);filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
+  birdImg.src = '../assets/Pokemon/birds/pidgeot-right.gif'
+  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+BIRD_SIZE+'px,18vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
   birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
   document.body.appendChild(birdImg)
   window._birdImg = birdImg
@@ -485,7 +485,7 @@ function gameLoop(ticker) {
       if (window._birdImg) {
         window._birdImg.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
         window._birdImg.style.top = (bobY - BIRD_SIZE/2) + 'px'
-        window._birdImg.style.transform = 'scaleX(-1)' // no rotation
+        // no transform needed — pre-flipped GIF faces right
       }
     }
     return
@@ -565,7 +565,7 @@ function gameLoop(ticker) {
     const bi = window._birdImg
     bi.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
     bi.style.top = (S.birdY - BIRD_SIZE/2) + 'px'
-    bi.style.transform = 'scaleX(-1)' // no rotation, just flip
+    // no transform needed — pre-flipped GIF faces right
   }
 }
 
@@ -794,23 +794,12 @@ async function triggerEvolution() {
     birdGlow.tint = 0xffffff
   }
 
-  // After 1.5s, swap sprite to evolved form (pidgeotto facing right = no flip needed)
+  // After 1.5s, swap DOM bird image to evolved form
   setTimeout(async () => {
-    try {
-      const evoTex = await loadImageTexture('../assets/Pokemon/birds/pidgeotto-pokemon.gif')
-      if (birdSprite) {
-        birdSprite.texture = evoTex
-        const ratio = BIRD_SIZE / evoTex.height
-        birdSprite.scale.set(ratio, ratio) // no flip — already faces right
-      }
-      if (birdGlow) {
-        birdGlow.texture = evoTex
-        const ratio = BIRD_SIZE / evoTex.height
-        birdGlow.scale.set(ratio * 1.35, ratio * 1.35)
-        birdGlow.tint = 0xFBBF24 // golden glow after evolution
-        birdGlow.alpha = 0.3
-      }
-    } catch(_) {}
+    if (window._birdImg) {
+      window._birdImg.src = '../assets/Pokemon/birds/pidgeotto-right.gif'
+      window._birdImg.style.filter = 'drop-shadow(0 0 12px rgba(251,191,36,0.7))'
+    }
 
     spawnFloatingText('EVOLUSI!', BIRD_X, S.birdY - 40, 0xfbbf24)
     flashScreen('#fbbf24')
