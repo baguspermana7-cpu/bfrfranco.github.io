@@ -34,9 +34,9 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c0
 /* Bottom controls */
 #ctrl-area{position:fixed;bottom:0;left:0;right:0;z-index:50;padding:10px 14px 14px;background:linear-gradient(0deg,rgba(0,0,0,0.78) 0%,transparent 100%)}
 #ctrl-row{display:flex;gap:10px;align-items:stretch}
-.ctrl-btn{flex:1;padding:16px 0;border-radius:18px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.09);color:#fff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);user-select:none;-webkit-user-select:none;transition:transform .08s,background .08s;font-family:inherit;-webkit-tap-highlight-color:transparent}
-.ctrl-btn:active{transform:scale(.91);background:rgba(255,255,255,.2)}
-#btn-boost{background:linear-gradient(135deg,rgba(239,68,68,0.35),rgba(251,146,60,0.35));border-color:rgba(239,68,68,0.6);flex:1.4;font-size:14px;padding:14px 6px;line-height:1.2}
+.ctrl-btn{flex:1;padding:16px 0;border-radius:20px;border:2.5px solid rgba(196,181,253,0.4);background:rgba(139,92,246,0.25);color:#e9d5ff;font-size:22px;cursor:pointer;backdrop-filter:blur(6px);user-select:none;-webkit-user-select:none;transition:transform .08s,background .08s;font-family:inherit;-webkit-tap-highlight-color:transparent;box-shadow:0 3px 0 rgba(91,33,182,0.3)}
+.ctrl-btn:active{transform:scale(.91) translateY(2px);background:rgba(139,92,246,.45);box-shadow:0 1px 0 rgba(91,33,182,0.3)}
+#btn-boost{background:linear-gradient(135deg,rgba(251,191,36,0.35),rgba(249,115,22,0.35));border-color:rgba(251,191,36,0.6);flex:1.4;font-size:14px;padding:14px 6px;line-height:1.2;color:#fef3c7;box-shadow:0 3px 0 rgba(146,64,14,0.3)}
 #btn-boost.cooldown{opacity:0.45;pointer-events:none}
 #btn-boost.boosting{background:linear-gradient(135deg,rgba(239,68,68,0.6),rgba(251,146,60,0.6));animation:boostGlow .25s ease-in-out infinite alternate}
 @keyframes boostGlow{to{box-shadow:0 0 18px rgba(251,146,60,0.7)}}
@@ -104,6 +104,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c0
     <div id="distance-text">0 m</div>
     <div id="position-badge">🏁 Mulai!</div>
   </div>
+  <button id="btn-pause" onclick="togglePause()" style="pointer-events:all;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;color:#fff;padding:5px 8px;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0">⏸</button>
   <div id="lives-hud">❤️❤️❤️</div>
   <div id="speed-hud">0 km/h</div>
 </div>
@@ -119,10 +120,10 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c0
 <div id="ctrl-area">
   <div id="ctrl-row">
     <button class="ctrl-btn" id="btn-up"
-      ontouchstart="laneUp();event.preventDefault()" onclick="laneUp()">▲<br><span style="font-size:10px">ATAS</span></button>
-    <button class="ctrl-btn" id="btn-boost" onclick="triggerBoost()">🔥<br><span style="font-size:12px;font-weight:900">BOOST!</span></button>
+      ontouchstart="laneUp();event.preventDefault()" onclick="laneUp()">⬆️<br><span style="font-size:10px;font-weight:700">Atas</span></button>
+    <button class="ctrl-btn" id="btn-boost" onclick="triggerBoost()">🚀<br><span style="font-size:12px;font-weight:900">BOOST!</span></button>
     <button class="ctrl-btn" id="btn-dn"
-      ontouchstart="laneDn();event.preventDefault()" onclick="laneDn()">▼<br><span style="font-size:10px">BAWAH</span></button>
+      ontouchstart="laneDn();event.preventDefault()" onclick="laneDn()">⬇️<br><span style="font-size:10px;font-weight:700">Bawah</span></button>
   </div>
   <div id="pressure-row">
     <span id="pressure-label">TEKANAN</span>
@@ -396,7 +397,7 @@ const AI_COUNT = 2
 //  STATE
 // ═══════════════════════════════════════════════════════════
 const S = {
-  running: false,
+  running: false, paused: false,
   lane: 1, targetLane: 1,
   trainCfg: null,
   distance: 0, finishLine: FINISH_M,
@@ -1555,11 +1556,11 @@ const OBS_EMOJIS = ['🪨','🐄','🐔','🌵','⚠️','🛑','🪵','🧱']
 const OBS_SIZE = 44
 
 function spawnObstacle() {
-  // Avoid spawning on AI train lanes to prevent invisible collisions
-  const aiLanes = S.aiTrains.map(a => a.lane)
-  let lane = Math.floor(Math.random() * LANE_COUNT)
-  let tries = 0
-  while (aiLanes.includes(lane) && tries < 5) { lane = Math.floor(Math.random() * LANE_COUNT); tries++ }
+  // Only spawn on lanes NOT occupied by AI trains
+  const aiLanes = new Set(S.aiTrains.map(a => a.lane))
+  const freeLanes = [0, 1, 2].filter(l => !aiLanes.has(l))
+  if (freeLanes.length === 0) return // no free lane — skip this obstacle
+  const lane = freeLanes[Math.floor(Math.random() * freeLanes.length)]
   const W = app.screen.width
   const emoji = OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)]
 
@@ -1692,7 +1693,7 @@ function tickSpeedLines(delta) {
 //  MAIN LOOP
 // ═══════════════════════════════════════════════════════════
 function loop(ticker) {
-  if (!S.running) return
+  if (!S.running || S.paused) return
   const delta = ticker.deltaTime
   const now = performance.now()
 
@@ -1794,6 +1795,14 @@ function showSelectScreen() {
 }
 
 function finishGame() { goBack() }
+function togglePause() {
+  if (!S.running && !S.paused) return
+  S.paused = !S.paused
+  S.running = !S.paused
+  document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
+  document.getElementById('position-badge').textContent = S.paused ? '⏸ PAUSE' : '🏁 Lanjut!'
+}
+
 function goBack() {
   S.running = false
   window.location.replace('../index.html')
