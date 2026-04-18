@@ -569,7 +569,7 @@ function checkCollisions() {
       // Check vertical collision (outside gap)
       const activeGap = S.evolved ? GAP_SIZE_EVO : GAP_SIZE
       const gapTop = p.gapY - activeGap / 2
-      const gapBottom = p.gapY + GAP_SIZE / 2
+      const gapBottom = p.gapY + activeGap / 2
       if (by - br < gapTop || by + br > gapBottom) {
         // HIT!
         p.hit = true
@@ -774,6 +774,8 @@ async function triggerEvolution() {
 
     setTimeout(() => {
       S.paused = false
+      // Post-evolution: 30% slower speed, much easier
+      PIPE_SPEED = PIPE_SPEED * 0.7
       document.getElementById('status-text').textContent = 'Pidgeot Berevolusi!'
     }, 800)
   }, 1500)
