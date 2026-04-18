@@ -1249,13 +1249,16 @@ function endBattleWin(){
   sessionStorage.setItem('g13cResult', JSON.stringify({stars, badges: total}));
   bgmStop()
   const tid = battle.trainer.id;
-  GameModal.show({
-    emoji: trainer.badge,
-    title: 'Kamu Menang!',
-    stars,
-    msg: `Lencana ${trainer.name} diraih! Total: ${total}/18`,
-    onAgain: ()=>{ battle=null; msgQueue=[]; waitingForTap=false; document.getElementById('gym-select').style.display='flex'; startBattle(tid); },
-    onBack: ()=>{ battle=null; msgQueue=[]; waitingForTap=false; document.getElementById('gym-select').style.display='flex'; }
+  // Show badge zoom animation, then modal
+  showBadgeZoom(trainer.badge, trainer.name, trainer.gym).then(() => {
+    GameModal.show({
+      emoji: trainer.badge,
+      title: 'Kamu Menang!',
+      stars,
+      msg: `Lencana ${trainer.name} diraih! Total: ${total} badges`,
+      onAgain: ()=>{ battle=null; msgQueue=[]; waitingForTap=false; document.getElementById('gym-select').style.display='flex'; startBattle(tid); },
+      onBack: ()=>{ battle=null; msgQueue=[]; waitingForTap=false; document.getElementById('gym-select').style.display='flex'; }
+    });
   });
 }
 
