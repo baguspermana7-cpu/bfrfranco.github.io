@@ -6007,22 +6007,17 @@ window.addEventListener('pageshow', function() {
       if (state.currentGame === 15) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
     } catch(_) {}
   }
-  const g16Raw = sessionStorage.getItem('g16Result')
-  if (g16Raw) {
-    try {
-      const r = JSON.parse(g16Raw)
-      sessionStorage.removeItem('g16Result'); sessionStorage.removeItem('g16Config')
-      if (state.currentGame === 16) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
-    } catch(_) {}
-  }
-  // Standalone games: save progress directly (don't rely on state.currentGame)
-  for (const gn of [19, 20]) {
+  // ALL standalone games: save progress directly (don't rely on state.currentGame)
+  for (const gn of [6, 14, 15, 16, 19, 20]) {
     const raw = sessionStorage.getItem(`g${gn}Result`)
     if (raw) {
       try {
         const r = JSON.parse(raw)
+        // Get level from result OR config (some games don't put level in result)
+        let lv = r.level || 1
+        const cfgRaw = sessionStorage.getItem(`g${gn}Config`)
+        if (cfgRaw) { try { const c = JSON.parse(cfgRaw); lv = c.level || lv } catch(_){} }
         sessionStorage.removeItem(`g${gn}Result`); sessionStorage.removeItem(`g${gn}Config`)
-        const lv = r.level || 1
         const stars = Math.min(5, r.stars || 0)
         const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : stars >= 1 ? 1 : 0
         setLevelComplete(gn, lv, mapped)
