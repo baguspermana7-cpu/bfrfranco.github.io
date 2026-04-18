@@ -1570,10 +1570,9 @@ const OBS_SIZE = 44
 
 function spawnObstacle() {
   // Only spawn on lanes NOT occupied by AI trains
-  const aiLanes = new Set(S.aiTrains.map(a => a.lane))
-  const freeLanes = [0, 1, 2].filter(l => !aiLanes.has(l))
-  if (freeLanes.length === 0) return // no free lane — skip this obstacle
-  const lane = freeLanes[Math.floor(Math.random() * freeLanes.length)]
+  // Spawn on any lane EXCEPT player's current lane (player should dodge to avoid)
+  const otherLanes = [0, 1, 2].filter(l => l !== S.lane)
+  const lane = otherLanes[Math.floor(Math.random() * otherLanes.length)]
   const W = app.screen.width
   const emoji = OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)]
 

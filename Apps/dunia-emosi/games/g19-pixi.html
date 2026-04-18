@@ -888,6 +888,16 @@ function showWin() {
   S.running = false; S.gameOver = true
   const stars = calcStars()
   try { sessionStorage.setItem('g19Result', JSON.stringify({ stars, level: S.level })) } catch(_){}
+  // Save progress DIRECTLY to localStorage (reliable, no pageshow dependency)
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g19) prog.g19 = { completed: [], stars: {} }
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g19.completed.includes(S.level)) prog.g19.completed.push(S.level)
+    if ((prog.g19.stars[S.level] || 0) < mapped) prog.g19.stars[S.level] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
   document.getElementById('status-text').textContent = 'Level Selesai!'
   sfxCorrect(); setTimeout(() => sfxCorrect(), 200)
 
@@ -1044,7 +1054,24 @@ function togglePause() {
   document.getElementById('status-text').textContent = S.paused ? 'PAUSE' : 'Terbang!'
 }
 
-function goBack() { S.running = false; history.back() }
+function goBack() {
+  S.running = false
+  // Save progress directly to localStorage (don't rely on pageshow handler)
+  if (S.gameOver && S.pipesCleared > 0) {
+    try {
+      const key = 'dunia-0-progress'
+      const prog = JSON.parse(localStorage.getItem(key) || '{}')
+      if (!prog.g19) prog.g19 = { completed: [], stars: {} }
+      const lv = S.level
+      const stars = calcStars()
+      const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+      if (!prog.g19.completed.includes(lv)) prog.g19.completed.push(lv)
+      if ((prog.g19.stars[lv] || 0) < mapped) prog.g19.stars[lv] = mapped
+      localStorage.setItem(key, JSON.stringify(prog))
+    } catch(_) {}
+  }
+  history.back()
+}
 
 // Resize
 window.addEventListener('resize', () => {
