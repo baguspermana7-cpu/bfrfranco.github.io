@@ -366,6 +366,16 @@ function buildPipes() {
     pipe.topGfx.x = x; pipe.bottomGfx.x = x
     worldContainer.addChild(pipe.topGfx)
     worldContainer.addChild(pipe.bottomGfx)
+
+    // Pokeball collectible in the gap center
+    const ball = new PIXI.Text({ text: i % 3 === 0 ? '⭐' : '🔴', style: { fontSize: 22 } })
+    ball.anchor.set(0.5)
+    ball.x = x + PIPE_WIDTH / 2
+    ball.y = gapY
+    worldContainer.addChild(ball)
+    pipe.ball = ball
+    pipe.ballCollected = false
+
     S.pipes.push(pipe)
   }
 }
@@ -373,23 +383,39 @@ function buildPipes() {
 function drawPipe(g, top, bottom, isTop) {
   const h = bottom - top
   const pC = BG.pipeColor
+  // Shadow
+  g.roundRect(3, top + 2, PIPE_WIDTH, h, 4).fill({ color: 0x000000, alpha: 0.15 })
   // Main pipe body
   g.roundRect(0, top, PIPE_WIDTH, h, 4).fill(pC)
-  // Highlight stripe
-  g.rect(4, top, 6, h).fill({ color: 0xffffff, alpha: 0.08 })
-  // Dark edge
-  g.rect(PIPE_WIDTH - 6, top, 6, h).fill({ color: 0x000000, alpha: 0.12 })
+  // Gradient highlight (left side lighter)
+  g.rect(3, top, 8, h).fill({ color: 0xffffff, alpha: 0.1 })
+  g.rect(6, top, 3, h).fill({ color: 0xffffff, alpha: 0.05 })
+  // Dark edge (right side)
+  g.rect(PIPE_WIDTH - 8, top, 8, h).fill({ color: 0x000000, alpha: 0.15 })
+  // Horizontal bands (wood/bamboo texture)
+  for (let by = top + 20; by < bottom - 10; by += 30) {
+    g.rect(0, by, PIPE_WIDTH, 1.5).fill({ color: 0x000000, alpha: 0.08 })
+  }
   // Lip (wider section at opening)
-  const lipY = isTop ? bottom - 12 : top
-  g.roundRect(-6, lipY, PIPE_WIDTH + 12, 14, 4).fill(pC)
-  g.roundRect(-6, lipY, PIPE_WIDTH + 12, 14, 4).stroke({ color: 0xffffff, width: 1, alpha: 0.2 })
-  // Vine decoration
+  const lipY = isTop ? bottom - 14 : top
+  g.roundRect(-8, lipY, PIPE_WIDTH + 16, 16, 5).fill(pC)
+  g.roundRect(-8, lipY, PIPE_WIDTH + 16, 16, 5).stroke({ color: 0xffffff, width: 1.2, alpha: 0.25 })
+  // Lip highlight
+  g.roundRect(-6, lipY + 1, PIPE_WIDTH + 12, 4, 3).fill({ color: 0xffffff, alpha: 0.1 })
+  // Vine/leaf decorations
+  const leafColor = { color: 0x4ade80, alpha: 0.45 }
   if (isTop) {
-    g.circle(PIPE_WIDTH / 2 - 8, bottom - 4, 5).fill({ color: 0x4ade80, alpha: 0.4 })
-    g.circle(PIPE_WIDTH / 2 + 10, bottom - 6, 4).fill({ color: 0x4ade80, alpha: 0.3 })
+    g.circle(PIPE_WIDTH / 2 - 10, bottom - 4, 6).fill(leafColor)
+    g.circle(PIPE_WIDTH / 2 + 12, bottom - 6, 5).fill(leafColor)
+    g.circle(PIPE_WIDTH / 2, bottom - 2, 4).fill({ color: 0x86efac, alpha: 0.3 })
+    // Hanging vine
+    g.rect(PIPE_WIDTH / 2 - 1, bottom, 2, 8).fill({ color: 0x22c55e, alpha: 0.3 })
   } else {
-    g.circle(PIPE_WIDTH / 2 - 6, top + 4, 5).fill({ color: 0x4ade80, alpha: 0.4 })
-    g.circle(PIPE_WIDTH / 2 + 8, top + 6, 4).fill({ color: 0x4ade80, alpha: 0.3 })
+    g.circle(PIPE_WIDTH / 2 - 8, top + 4, 6).fill(leafColor)
+    g.circle(PIPE_WIDTH / 2 + 10, top + 6, 5).fill(leafColor)
+    g.circle(PIPE_WIDTH / 2 + 2, top + 2, 4).fill({ color: 0x86efac, alpha: 0.3 })
+    // Growing vine
+    g.rect(PIPE_WIDTH / 2 - 1, top - 6, 2, 6).fill({ color: 0x22c55e, alpha: 0.3 })
   }
 }
 
@@ -554,14 +580,32 @@ function checkCollisions() {
   for (const p of S.pipes) {
     if (p.passed || p.hit || p.removing || !p.topGfx.visible) continue
 
-    // Check if bird passed the pipe
+    // Check if bird passed the pipe cleanly (no collision)
     if (bx - br > p.x + PIPE_WIDTH && !p.passed) {
       p.passed = true
       S.pipesCleared++
       S.score++
       sfxScore()
       spawnFloatingText('+1', p.x + PIPE_WIDTH / 2, p.gapY, 0x4ade80)
+      // Collect pokeball
+      if (p.ball && !p.ballCollected) {
+        p.ballCollected = true
+        S.correctAnswers++ // bonus for clean pass
+        p.ball.visible = false
+        spawnFloatingText('⭐', p.x + PIPE_WIDTH / 2, p.gapY - 20, 0xfbbf24)
+      }
       continue
+    }
+
+    // Collect ball when bird overlaps it
+    if (p.ball && !p.ballCollected && !p.hit) {
+      const bdx = Math.abs(bx - p.ball.x), bdy = Math.abs(by - p.ball.y)
+      if (bdx < 20 && bdy < 20) {
+        p.ballCollected = true
+        S.correctAnswers++
+        p.ball.visible = false
+        sfxScore()
+      }
     }
 
     // Check horizontal overlap
