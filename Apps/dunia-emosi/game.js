@@ -5982,38 +5982,13 @@ if('serviceWorker' in navigator){
 }
 
 // ── AAA game result handlers: fire when returning from games/g*.html ──
-window.addEventListener('pageshow', function() {
-  const g6Raw  = sessionStorage.getItem('g6Result')
-  const g14Raw = sessionStorage.getItem('g14Result')
-  if (g6Raw) {
-    try {
-      const r = JSON.parse(g6Raw)
-      sessionStorage.removeItem('g6Result'); sessionStorage.removeItem('g6Config')
-      if (state.currentGame === 6) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
-    } catch(_) {}
-  }
-  if (g14Raw) {
-    try {
-      const r = JSON.parse(g14Raw)
-      sessionStorage.removeItem('g14Result'); sessionStorage.removeItem('g14Config')
-      if (state.currentGame === 14) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
-    } catch(_) {}
-  }
-  const g15Raw = sessionStorage.getItem('g15Result')
-  if (g15Raw) {
-    try {
-      const r = JSON.parse(g15Raw)
-      sessionStorage.removeItem('g15Result'); sessionStorage.removeItem('g15Config')
-      if (state.currentGame === 15) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
-    } catch(_) {}
-  }
-  // ALL standalone games: save progress directly (don't rely on state.currentGame)
+window.addEventListener('pageshow', function(e) {
+  // Process ALL standalone game results and save progress
   for (const gn of [6, 14, 15, 16, 19, 20]) {
     const raw = sessionStorage.getItem(`g${gn}Result`)
     if (raw) {
       try {
         const r = JSON.parse(raw)
-        // Get level from result OR config (some games don't put level in result)
         let lv = r.level || 1
         const cfgRaw = sessionStorage.getItem(`g${gn}Config`)
         if (cfgRaw) { try { const c = JSON.parse(cfgRaw); lv = c.level || lv } catch(_){} }
@@ -6024,6 +5999,10 @@ window.addEventListener('pageshow', function() {
         saveStars()
       } catch(_) {}
     }
+  }
+  // Refresh level select if returning from bfcache
+  if (e.persisted && state.currentGame) {
+    try { openLevelSelect(state.currentGame) } catch(_) {}
   }
 })
 

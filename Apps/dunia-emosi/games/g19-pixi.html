@@ -85,6 +85,8 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:linear
   style="position:fixed;z-index:39;pointer-events:none;height:10vh;width:auto;bottom:13%;left:8%;image-rendering:auto;display:none;">
 <img id="pika-runner" src="../assets/Pokemon/trainer/pikachu-run.webp"
   style="position:fixed;z-index:39;pointer-events:none;height:2vh;width:auto;bottom:13.5%;left:2%;image-rendering:auto;display:none;">
+<audio id="wing-flap-sfx" src="../assets/Pokemon/sound/wing-flap.mp3" preload="auto" style="display:none"></audio>
+<audio id="game-bgm" preload="auto" loop style="display:none"></audio>
 
 <!-- Pokemon Bag Selector -->
 <div id="bag-overlay" style="position:fixed;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(10,2,25,0.95);backdrop-filter:blur(10px)">
@@ -255,7 +257,7 @@ const FLAP_POWER = -7.2
 const MAX_FALL = 9
 const BIRD_SIZE = 104 // pidgeot initial size (1.3x of 80)
 const PIPE_WIDTH = 68
-const PIPE_COUNT = 10 + Math.min(Math.floor((cfg.level - 1) / 6), 5)
+const PIPE_COUNT = 14 + Math.min(Math.floor((cfg.level - 1) / 5), 6) // ~20-30s longer
 const GAP_SIZE = Math.max(150, 250 - (cfg.level - 1) * 3) // 20% wider gaps
 const GAP_SIZE_EVO = Math.min(GAP_SIZE * 1.4, 280)
 let PIPE_SPEED = 2.1 + (cfg.level - 1) * 0.14
@@ -886,6 +888,8 @@ function calcStars() {
 function showWin() {
   if (S.gameOver) return // prevent double-call
   S.running = false; S.gameOver = true
+  // stop all audio
+  try { const bgm=document.getElementById('game-bgm'); bgm.pause(); bgm.currentTime=0 } catch(_){}
   const stars = calcStars()
   try { sessionStorage.setItem('g19Result', JSON.stringify({ stars, level: S.level })) } catch(_){}
   // Save progress DIRECTLY to localStorage (reliable, no pageshow dependency)
@@ -969,6 +973,12 @@ function flap() {
     S.running = true
     document.getElementById('start-overlay').classList.add('hidden')
     document.getElementById('status-text').textContent = 'Terbang!'
+    // Start BGM only (wing flap plays on each tap)
+    try {
+      const bgm=document.getElementById('game-bgm')
+      bgm.src = cfg.level % 2 === 1 ? '../assets/Pokemon/sound/bgm-odd.mp3' : '../assets/Pokemon/sound/bgm-even.mp3'
+      bgm.volume=0.15; bgm.play().catch(()=>{})
+    } catch(_){}
     // Show Ash + Pikachu runners
     const ash = document.getElementById('ash-runner')
     const pika = document.getElementById('pika-runner')
@@ -979,7 +989,8 @@ function flap() {
   if (S.paused) return
 
   S.birdVY = FLAP_POWER
-  sfxFlap()
+  // Play wing flap sound on each tap (no synth beep)
+  try { const wf=document.getElementById('wing-flap-sfx'); wf.currentTime=0; wf.volume=0.6; wf.play().catch(()=>{}) } catch(_){}
 
   // Wing flap visual (brief scale pulse)
   if (birdSprite) {
@@ -1052,10 +1063,15 @@ function togglePause() {
   S.running = !S.paused
   document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
   document.getElementById('status-text').textContent = S.paused ? 'PAUSE' : 'Terbang!'
+  // Pause/resume all audio
+  // wing flap is per-tap, no pause needed
+  try { const bgm=document.getElementById('game-bgm'); S.paused?bgm.pause():bgm.play().catch(()=>{}) } catch(_){}
 }
 
 function goBack() {
   S.running = false
+  // stop all audio
+  try { const bgm=document.getElementById('game-bgm'); bgm.pause(); bgm.currentTime=0 } catch(_){}
   // Save progress directly to localStorage (don't rely on pageshow handler)
   if (S.gameOver && S.pipesCleared > 0) {
     try {
