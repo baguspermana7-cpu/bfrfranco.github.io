@@ -489,11 +489,16 @@ function drawGround() {
 // ═══════════════════════════════════════════════════════════
 function buildPipes() {
   const startX = W + 100
+  let prevGapY = H * 0.4 // start at center
+  const maxShift = H * 0.18 // max vertical shift between pipes (gentle)
   for (let i = 0; i < PIPE_COUNT; i++) {
     const x = startX + i * PIPE_SPACING
-    const minGapY = 80 + GAP_SIZE / 2
-    const maxGapY = GROUND_Y - 40 - GAP_SIZE / 2
-    const gapY = minGapY + Math.random() * (maxGapY - minGapY)
+    const minGapY = 100 + GAP_SIZE / 2
+    const maxGapY = GROUND_Y - 60 - GAP_SIZE / 2
+    // Limit vertical shift from previous pipe for smoother gameplay
+    let gapY = prevGapY + (Math.random() - 0.5) * maxShift * 2
+    gapY = Math.max(minGapY, Math.min(maxGapY, gapY))
+    prevGapY = gapY
 
     const pipe = {
       x, gapY, passed: false, hit: false, quizShown: false,
