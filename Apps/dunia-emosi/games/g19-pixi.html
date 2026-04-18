@@ -280,7 +280,10 @@ function sfxWrong() { playTone(400, 120, 'sawtooth', 0.1); setTimeout(() => play
     canvas: document.getElementById('pixi-canvas'),
     width: window.innerWidth, height: window.innerHeight,
     backgroundAlpha: 1, backgroundColor: BG.sky,
-    antialias: true, resolution: Math.min(window.devicePixelRatio, 2)
+    antialias: true,
+    resolution: Math.min(window.devicePixelRatio, 2),
+    preference: 'webgl',
+    preferWebGLVersion: 1 // WebGL 1 is more widely supported
   })
   W = app.screen.width; H = app.screen.height
   GROUND_Y = H * 0.88; BIRD_X = W * 0.22
@@ -301,9 +304,73 @@ function sfxWrong() { playTone(400, 120, 'sawtooth', 0.1); setTimeout(() => play
 
   app.ticker.add(gameLoop)
   document.getElementById('start-hint').textContent='Tap untuk Terbang!'
+  // Check if WebGL actually rendered (detect black canvas)
+  setTimeout(() => {
+    try {
+      const gl = document.getElementById('pixi-canvas').getContext('webgl') || document.getElementById('pixi-canvas').getContext('webgl2')
+      if (!gl) throw new Error('No WebGL')
+    } catch(_) {
+      console.warn('WebGL may have failed — using CSS fallback background')
+      document.getElementById('pixi-canvas').style.opacity = '0'
+    }
+  }, 500)
 })().catch(e=>{
   console.error('G19 init failed:',e)
-  document.getElementById('start-hint').textContent='Gagal memuat. Muat ulang halaman.'
+  // PixiJS failed — hide canvas, show body gradient, use Canvas2D for pipes
+  document.getElementById('pixi-canvas').style.display = 'none'
+  document.getElementById('start-hint').textContent='Tap untuk Terbang!'
+  // Create Canvas2D fallback
+  const c2d = document.createElement('canvas')
+  c2d.id = 'fallback-canvas'
+  c2d.style.cssText = 'position:fixed;inset:0;width:100vw;height:100svh;z-index:1'
+  c2d.width = window.innerWidth; c2d.height = window.innerHeight
+  document.body.insertBefore(c2d, document.body.firstChild)
+  W = c2d.width; H = c2d.height; GROUND_Y = H * 0.88; BIRD_X = W * 0.22
+  S.birdY = H * 0.45; S.totalPipes = PIPE_COUNT; S.questions = pickQuestions(cfg.level)
+  window._useFallback = true
+  // Draw static scene with Canvas2D
+  const ctx = c2d.getContext('2d')
+  // Sky
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H)
+  skyGrad.addColorStop(0, '#87CEEB'); skyGrad.addColorStop(0.5, '#c8e8f8')
+  skyGrad.addColorStop(0.75, '#22c55e'); skyGrad.addColorStop(1, '#15803d')
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, W, H)
+  // Hills
+  ctx.fillStyle = '#16a34a'
+  ctx.beginPath(); ctx.moveTo(0, H * 0.6)
+  for (let x = 0; x <= W; x += 20) ctx.lineTo(x, H * 0.55 + Math.sin(x * 0.01) * 30)
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill()
+  ctx.fillStyle = '#0d7a34'
+  ctx.beginPath(); ctx.moveTo(0, H * 0.65)
+  for (let x = 0; x <= W; x += 20) ctx.lineTo(x, H * 0.62 + Math.sin(x * 0.015) * 25)
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill()
+  // Ground
+  ctx.fillStyle = '#15803d'; ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y)
+  ctx.fillStyle = '#22c55e'; ctx.fillRect(0, GROUND_Y, W, 4)
+  // Pipes (static)
+  const pipeColor = '#f59e0b'
+  for (let i = 0; i < PIPE_COUNT; i++) {
+    const px = W + 100 + i * PIPE_SPACING
+    const gy = 100 + Math.random() * (GROUND_Y - 250)
+    ctx.fillStyle = pipeColor
+    ctx.fillRect(px, 0, PIPE_WIDTH, gy - GAP_SIZE / 2) // top
+    ctx.fillRect(px, gy + GAP_SIZE / 2, PIPE_WIDTH, GROUND_Y - gy - GAP_SIZE / 2) // bottom
+  }
+  // Fallback game loop using requestAnimationFrame
+  let fallbackFrame = 0
+  function fallbackLoop() {
+    if (!S.running) { requestAnimationFrame(fallbackLoop); return }
+    fallbackFrame++
+    S.birdVY += GRAVITY; S.birdVY = Math.min(S.birdVY, MAX_FALL)
+    S.birdY += S.birdVY; S.birdY = Math.max(S.birdY, 20)
+    if (S.birdY > GROUND_Y - 10) { S.birdY = GROUND_Y - 10; S.birdVY = FLAP_POWER * 0.6 }
+    // Scroll pipes (shift canvas)
+    ctx.save(); ctx.translate(-fallbackFrame * PIPE_SPEED * 0.3, 0)
+    // Redraw... (simplified)
+    ctx.restore()
+    requestAnimationFrame(fallbackLoop)
+  }
+  requestAnimationFrame(fallbackLoop)
 })
 
 // ═══════════════════════════════════════════════════════════

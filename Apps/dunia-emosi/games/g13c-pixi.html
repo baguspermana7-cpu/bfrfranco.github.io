@@ -903,9 +903,10 @@ function buildGymSelect(){
     html += `<div class="tg-header" style="--gc:${grp.color}">${grp.label}</div>`;
     html += '<div class="tg-row">';
     gTrainers.forEach(t => {
-      html += `<div class="trainer-card ${badges_obj[t.id]?'beaten':''}" onclick="startBattle('${t.id}')">
+      html += `<div class="trainer-card ${badges_obj[t.id]?'beaten':''}" onclick="showGymWelcome('${t.id}')">
         <img src="${TRAINER_SPRITE(t.sprite)}" data-sprite="${t.sprite}" onerror="trainerFallback(this,'${t.badge}')" alt="${t.name}">
         <div class="tc-name">${t.name}</div>
+        <div class="tc-gym" style="font-size:8px;color:rgba(167,139,250,0.6);margin-top:2px">${t.gym}</div>
         ${badges_obj[t.id]?`<div class="tc-badge">${t.badge}</div>`:''}
       </div>`;
     });
@@ -920,6 +921,52 @@ function buildGymSelect(){
 
 function updateBadgeCount(){
   document.getElementById('badge-num').textContent = Object.keys(badges).length;
+}
+
+// ─── GYM WELCOME SCREEN ──────────────────────────────────────────────────────
+function showGymWelcome(trainerId) {
+  const trainer = TRAINERS.find(t => t.id === trainerId)
+  if (!trainer) return
+  document.getElementById('gw-badge').textContent = trainer.badge
+  document.getElementById('gw-gym').textContent = trainer.gym
+  const grp = TRAINER_GROUPS.find(g => g.id === trainer.group)
+  document.getElementById('gw-city').textContent = grp ? grp.label.replace(/^[^\s]+\s/, '') + ' Region' : ''
+  document.getElementById('gw-trainer').textContent = `Gym Leader: ${trainer.name}`
+  const typeMap = {water:'💧 Water',rock:'🪨 Rock',grass:'🌿 Grass',fire:'🔥 Fire',electric:'⚡ Electric',psychic:'🔮 Psychic',poison:'☠️ Poison',ice:'❄️ Ice',ghost:'👻 Ghost',dragon:'🐉 Dragon',flying:'🦅 Flying',bug:'🐛 Bug',fighting:'👊 Fighting',steel:'🔩 Steel',dark:'🌑 Dark',fairy:'✨ Fairy',ground:'🌍 Ground',normal:'⚖️ Normal'}
+  const mainType = trainer.team[0]?.type || 'normal'
+  document.getElementById('gw-type').textContent = 'Type: ' + (typeMap[mainType] || mainType)
+  const spr = document.getElementById('gw-sprite')
+  spr.src = TRAINER_SPRITE_LOCAL(trainer.sprite)
+  spr.onerror = () => { if (!spr.dataset.tried) { spr.dataset.tried = '1'; spr.src = TRAINER_SPRITE_REMOTE(trainer.sprite) } else { spr.style.display = 'none' } }
+  document.getElementById('gw-fight').onclick = () => { closeWelcome(); startBattle(trainerId) }
+  document.getElementById('gym-welcome').classList.add('show')
+}
+function closeWelcome() { document.getElementById('gym-welcome').classList.remove('show') }
+
+// ─── BADGE ZOOM ANIMATION ───────────────────────────────────────────────────
+function showBadgeZoom(badge, trainerName, gymName) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('badge-overlay')
+    document.getElementById('badge-emoji').textContent = badge
+    document.getElementById('badge-text').textContent = `${trainerName} Badge diraih!`
+    document.getElementById('badge-gym-text').textContent = gymName
+    overlay.classList.add('show')
+    // Sparkle particles
+    for (let i = 0; i < 8; i++) {
+      const sp = document.createElement('span')
+      sp.className = 'badge-sparkle'
+      sp.textContent = ['✨', '⭐', '💫', '🌟'][i % 4]
+      sp.style.left = (35 + Math.random() * 30) + '%'
+      sp.style.top = (30 + Math.random() * 30) + '%'
+      sp.style.animationDelay = (i * 0.12) + 's'
+      overlay.appendChild(sp)
+    }
+    setTimeout(() => {
+      overlay.classList.remove('show')
+      overlay.querySelectorAll('.badge-sparkle').forEach(s => s.remove())
+      resolve()
+    }, 3000)
+  })
 }
 
 // ─── START BATTLE ─────────────────────────────────────────────────────────────
