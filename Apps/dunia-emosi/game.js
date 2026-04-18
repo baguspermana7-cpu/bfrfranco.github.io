@@ -952,7 +952,9 @@ const MUSIC_SCREENS = new Set(['screen-welcome','screen-menu','screen-level','sc
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'))
-  document.getElementById(id).classList.add('active')
+  const el = document.getElementById(id)
+  if (!el) return // standalone game screens don't have a div
+  el.classList.add('active')
   // Always ensure overlays are hidden on screen change
   const po=document.getElementById('pause-overlay')
   const so=document.getElementById('settings-overlay')
