@@ -4962,6 +4962,14 @@ function pokeSpriteArtwork(slug){return `https://img.pokemondb.net/artwork/large
 function pokeSpriteOnline(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
 function pokeSpriteBackup(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
 function pokeSpriteBack(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`}
+// SVG variant — 751 vector Pokemon sprites for visual variety
+function pokeSpriteSVG(slug){const id=POKE_IDS[slug];return id?`assets/Pokemon/svg/${id}.svg`:null}
+// Random variant: 50% chance HD raster, 50% SVG vector (different art style per session)
+function pokeSpriteVariant(slug){
+  const svgUrl=pokeSpriteSVG(slug)
+  if(svgUrl && Math.random()<0.5) return svgUrl
+  return pokeSpriteOnline(slug)
+}
 
 // ── TRAINER PARTIES ──
 const TRAINER_PARTIES = [
@@ -5326,16 +5334,20 @@ function g10NewBattle(){
     const el=document.getElementById(imgId)
     el.className=el.className.replace(/\bspr-\w+/g,'').trim()
     el.style.opacity='1'; el.style.imageRendering='auto'
-    el.style.animation='' // clear stale entrance animation so direction is clean
-    // Try local sprite first, then online HD
-    const localSrc = `assets/Pokemon/sprites/${slug}.png`
-    const testLocal = new Image()
-    testLocal.onload = () => { el.src = localSrc }
-    testLocal.onerror = () => {
-      el.src=pokeSpriteOnline(slug)
-      el.onerror=()=>{ el.src=pokeSpriteBackup(pokeId); el.onerror=null }
+    el.style.animation=''
+    // Random variant: SVG vector or HD raster (different art style per session)
+    const variantSrc = pokeSpriteVariant(slug)
+    const testVar = new Image()
+    testVar.onload = () => { el.src = variantSrc }
+    testVar.onerror = () => {
+      // Fallback chain: local PNG → online HD → PokeAPI
+      const localSrc = `assets/Pokemon/sprites/${slug}.png`
+      const t2 = new Image()
+      t2.onload = () => { el.src = localSrc }
+      t2.onerror = () => { el.src=pokeSpriteOnline(slug); el.onerror=()=>{el.src=pokeSpriteBackup(pokeId);el.onerror=null} }
+      t2.src = localSrc
     }
-    testLocal.src = localSrc
+    testVar.src = variantSrc
   }
   // Player: try HD HOME front sprite first, fall back to PokeAPI back sprite
   function loadSprPlayer(imgId, pokeId, slug){
@@ -6961,7 +6973,8 @@ function _initGame13Impl() {
     togekiss:468,roserade:407,lopunny:428,honchkrow:430,porygon:137,porygon2:233,porygonz:474}
   // Same HD HOME sprites as G10 — pokemondb allows hotlinking these
   // Try local sprite first, then remote
-  const pokeUrl = slug => `assets/Pokemon/sprites/${slug}.png`
+  // Sprite variant: SVG or HD raster randomly per session
+  const pokeUrl = slug => { const sv=pokeSpriteSVG(slug); return (sv&&Math.random()<0.5)?sv:`assets/Pokemon/sprites/${slug}.png` }
   const pokeUrlRemote = slug => POKE_IDS[slug] ? `https://img.pokemondb.net/sprites/home/normal/${slug}.png` : null
   const pokeFallbackUrl = slug => { const id = POKE_IDS[slug]; return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png` : null }
   const sprFbStyle = 'font-size:min(18vw,11vh);line-height:1;display:flex;align-items:center;justify-content:center;width:min(40vw,20vh);height:min(40vw,20vh);position:relative;z-index:2;'
