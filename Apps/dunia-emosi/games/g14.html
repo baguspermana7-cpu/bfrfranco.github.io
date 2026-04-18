@@ -393,6 +393,17 @@ const LIVES_MAX = 3
 const OBS_INTERVAL_MS = Math.max(900, 2800 - cfg.level * 60)
 const AI_COUNT = 2
 
+// ── LEVEL THEMES (6 backgrounds, cycle every 5 levels) ──
+const THEMES = [
+  { name:'forest',  skyTop:0x071a0d, skyBot:0x0d3318, mountain:0x0d2510, tree:'🌲', ground1:0x0d2008, ground2:0x071005, rail:0x6b7280, stars:true },
+  { name:'desert',  skyTop:0xf97316, skyBot:0xfbbf24, mountain:0x92400e, tree:'🌵', ground1:0x92400e, ground2:0x78350f, rail:0xd97706, stars:false },
+  { name:'snow',    skyTop:0x1e3a5f, skyBot:0x7dd3fc, mountain:0xbfdbfe, tree:'🌲', ground1:0xbfdbfe, ground2:0x94a3b8, rail:0x94a3b8, stars:false },
+  { name:'coastal', skyTop:0x0891b2, skyBot:0x38bdf8, mountain:0x0d7a34, tree:'🌴', ground1:0x0d7a34, ground2:0x065f46, rail:0xfbbf24, stars:false },
+  { name:'urban',   skyTop:0x0f172a, skyBot:0x1e293b, mountain:0x374151, tree:'🏢', ground1:0x1f2937, ground2:0x111827, rail:0x9ca3af, stars:true },
+  { name:'volcano', skyTop:0x1c0000, skyBot:0x4a0000, mountain:0x7f1d1d, tree:'🔥', ground1:0x451a03, ground2:0x2d0800, rail:0xf97316, stars:false },
+]
+const TH = THEMES[((cfg.level || 1) - 1) % THEMES.length]
+
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
@@ -471,12 +482,13 @@ function buildSky() {
   for (let i = 0; i < steps; i++) {
     const t = i / steps
     const g = new PIXI.Graphics()
-    g.rect(0, 0, W, H / steps + 2).fill(lerpColor(0x071a0d, 0x0d3318, t))
+    g.rect(0, 0, W, H / steps + 2).fill(lerpColor(TH.skyTop, TH.skyBot, t))
     g.y = H * i / steps
     c.addChild(g)
   }
 
-  // Stars
+  // Stars (only for night/dark themes)
+  if (!TH.stars) return
   for (let i = 0; i < 60; i++) {
     const r = 0.5 + Math.random() * 1.5
     const s = new PIXI.Graphics()
@@ -528,7 +540,7 @@ function buildFarScenery() {
     const g = new PIXI.Graphics()
     const mW = 80 + Math.random() * 100
     const mH = 50 + Math.random() * 80
-    g.moveTo(0, 0).lineTo(mW / 2, -mH).lineTo(mW, 0).fill(0x0d2510)
+    g.moveTo(0, 0).lineTo(mW / 2, -mH).lineTo(mW, 0).fill(TH.mountain)
     g.x = i * (W / 6) - 20 + Math.random() * 40
     g.y = gameTop + 30 + Math.random() * 20
     g._speed = 0.15
@@ -542,7 +554,8 @@ let midItems = []
 function buildMidScenery() {
   const c = new PIXI.Container(); L.mid = c; stage.addChild(c)
   const W = app.screen.width, H = app.screen.height
-  const treeEmojis = ['🌲','🌳','🌴','🌵','🎋']
+  const treeMap = {forest:['🌲','🌳','🎋'],desert:['🌵','🏜️','☀️'],snow:['🌲','❄️','⛄'],coastal:['🌴','🌊','🐚'],urban:['🏢','🏗️','🏠'],volcano:['🔥','🌋','💨']}
+  const treeEmojis = treeMap[TH.name] || ['🌲','🌳','🌴']
   for (let i = 0; i < 16; i++) {
     const lane = i % LANE_COUNT
     const yt = laneYs[lane] + laneH * 0.38 + (i % 2) * 8
@@ -573,7 +586,7 @@ function buildTracks() {
 
     // Ground fill for lane
     const ground = new PIXI.Graphics()
-    ground.rect(0, cy - laneH * 0.5, W, laneH).fill(ln === 1 ? 0x0d2008 : 0x071005)
+    ground.rect(0, cy - laneH * 0.5, W, laneH).fill(ln === 1 ? TH.ground1 : TH.ground2)
     ground.alpha = 0.6
     c.addChild(ground)
 
