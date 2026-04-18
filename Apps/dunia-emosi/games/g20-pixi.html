@@ -195,7 +195,10 @@ const particles = [], trails = []
   drawCourt()
   resetRound('player')
   app.ticker.add(gameLoop)
-})()
+})().catch(e=>{
+  console.error('G20 init failed:',e)
+  document.querySelector('.start-hint').textContent='Gagal memuat. Muat ulang halaman.'
+})
 
 // ═══════════════════════════════════════════════════════════
 //  BACKGROUND (parallax beach)
@@ -497,6 +500,7 @@ function gameLoop(ticker){
   // Ball hits ground
   if(S.by>GROUND_Y-br){
     spawnSand(S.bx,GROUND_Y,8)
+    const server=S.bx<NET_X?'player':'cpu'
     if(S.bx<NET_X){
       S.cScore++; sfxWhistle()
       spawnConfetti(W*0.75,GROUND_Y-60)
@@ -505,8 +509,10 @@ function gameLoop(ticker){
       spawnConfetti(W*0.25,GROUND_Y-60)
     }
     updateHUD()
+    // Hold ball above ground during quiz to prevent instant re-score
+    S.bx=server==='player'?W*0.25:W*0.75; S.by=GROUND_Y-120; S.bvx=0; S.bvy=0
     checkRoundEnd()
-    resetRound(S.bx<NET_X?'player':'cpu')
+    if(!S.gameOver&&!S.quizActive) resetRound(server)
   }
 
   // Crab powerup
@@ -720,6 +726,8 @@ function showQuiz(){
       setTimeout(()=>{
         document.getElementById('quiz-panel').classList.remove('show')
         S.quizActive=false
+        // Reset round positions after quiz so ball doesn't score instantly
+        resetRound(S.bx<NET_X?'player':'cpu')
         updateHUD()
       },900)
     }

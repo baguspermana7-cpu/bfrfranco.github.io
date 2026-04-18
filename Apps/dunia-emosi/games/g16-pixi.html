@@ -1330,7 +1330,10 @@ function onChoiceTap(btn,choice,obs){
 function clearObstacle(obs){
   hideQuizPanel(); obs.cleared=true; S.cleared++; S.currentObstacleIdx=-1
   explodeObstacle(obs)
-  S.trainState='BOOSTING'; S.boostTimer=0.9
+  // Only boost if not already arriving/arrived (prevents state overwrite race)
+  if(S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){
+    S.trainState='BOOSTING'; S.boostTimer=0.9
+  }
   document.getElementById('speed-lines').style.opacity='0.65'
   setTimeout(()=>{document.getElementById('speed-lines').style.opacity='0'},750)
   document.getElementById('obstacle-count').textContent=`🚧 ${S.cleared}/${S.totalObstacles}`

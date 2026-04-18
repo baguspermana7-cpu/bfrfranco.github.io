@@ -256,7 +256,10 @@ function sfxWrong() { playTone(400, 120, 'sawtooth', 0.1); setTimeout(() => play
   updateHUD()
 
   app.ticker.add(gameLoop)
-})()
+})().catch(e=>{
+  console.error('G19 init failed:',e)
+  document.getElementById('start-hint').textContent='Gagal memuat. Muat ulang halaman.'
+})
 
 // ═══════════════════════════════════════════════════════════
 //  BACKGROUND
@@ -752,6 +755,7 @@ function calcStars() {
 }
 
 function showWin() {
+  if (S.gameOver) return // prevent double-call
   S.running = false; S.gameOver = true
   const stars = calcStars()
   try { sessionStorage.setItem('g19Result', JSON.stringify({ stars, level: S.level })) } catch(_){}
