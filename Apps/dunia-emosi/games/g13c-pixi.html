@@ -418,8 +418,18 @@ const TRAINERS = [
    team:[{name:'Weezing',slug:'weezing',type:'poison',hp:90},{name:'Victreebel',slug:'victreebel',type:'grass',hp:95},{name:'Mime-Jr',slug:'mime-jr',type:'psychic',hp:65},{name:'Carnivine',slug:'carnivine',type:'grass',hp:80},{name:'Chimecho',slug:'chimecho',type:'psychic',hp:75},{name:'Cacnea',slug:'cacnea',type:'grass',hp:70}]},
 
   // ── Anime Heroes ──────────────────────────────────────────────────────────
-  {id:'ash',     name:'Ash',     sprite:'ash',     badge:'⚡', gym:'Pallet Town',     bg:'gym2_m.png',   group:'anime',
+  {id:'ash',     name:'Ash (Kanto)',sprite:'ash',   badge:'⚡', gym:'Pallet Town',     bg:'gym2_m.png',   group:'anime',
    team:[{name:'Pikachu',slug:'pikachu',type:'electric',hp:100},{name:'Charizard',slug:'charizard',type:'fire',hp:120},{name:'Bulbasaur',slug:'bulbasaur',type:'grass',hp:90},{name:'Squirtle',slug:'squirtle',type:'water',hp:90},{name:'Snorlax',slug:'snorlax',type:'normal',hp:120},{name:'Lapras',slug:'lapras',type:'water',hp:110}]},
+  {id:'ash_johto',name:'Ash (Johto)',sprite:'ash',  badge:'⚡', gym:'New Bark Town',   bg:'forest_m.png', group:'anime',
+   team:[{name:'Pikachu',slug:'pikachu',type:'electric',hp:100},{name:'Heracross',slug:'heracross',type:'bug',hp:100},{name:'Bayleef',slug:'bayleef',type:'grass',hp:90},{name:'Quilava',slug:'quilava',type:'fire',hp:90},{name:'Totodile',slug:'totodile',type:'water',hp:85},{name:'Noctowl',slug:'noctowl',type:'flying',hp:90}]},
+  {id:'ash_hoenn',name:'Ash (Hoenn)',sprite:'ash',  badge:'⚡', gym:'Petalburg City',  bg:'water2_m.png', group:'anime',
+   team:[{name:'Pikachu',slug:'pikachu',type:'electric',hp:100},{name:'Swellow',slug:'swellow',type:'flying',hp:90},{name:'Sceptile',slug:'sceptile',type:'grass',hp:110},{name:'Corphish',slug:'corphish',type:'water',hp:85},{name:'Torkoal',slug:'torkoal',type:'fire',hp:95},{name:'Glalie',slug:'glalie',type:'ice',hp:90}]},
+  {id:'ash_sinnoh',name:'Ash (Sinnoh)',sprite:'ash',badge:'⚡', gym:'Twinleaf Town',   bg:'gym_m.png',    group:'anime',
+   team:[{name:'Pikachu',slug:'pikachu',type:'electric',hp:100},{name:'Infernape',slug:'infernape',type:'fire',hp:110},{name:'Torterra',slug:'torterra',type:'grass',hp:115},{name:'Buizel',slug:'buizel',type:'water',hp:80},{name:'Staraptor',slug:'staraptor',type:'flying',hp:95},{name:'Gible',slug:'gible',type:'dragon',hp:85}]},
+  {id:'ash_unova',name:'Ash (Unova)',sprite:'ash',  badge:'⚡', gym:'Nuvema Town',     bg:'gym2_m.png',   group:'anime',
+   team:[{name:'Pikachu',slug:'pikachu',type:'electric',hp:100},{name:'Krookodile',slug:'krookodile',type:'dark',hp:105},{name:'Leavanny',slug:'leavanny',type:'bug',hp:85},{name:'Pignite',slug:'pignite',type:'fire',hp:95},{name:'Oshawott',slug:'oshawott',type:'water',hp:80},{name:'Boldore',slug:'boldore',type:'rock',hp:90}]},
+  {id:'ash_kalos',name:'Ash (Kalos)',sprite:'ash',  badge:'⚡', gym:'Lumiose City',    bg:'forest_m.png', group:'anime',
+   team:[{name:'Pikachu',slug:'pikachu',type:'electric',hp:100},{name:'Greninja',slug:'greninja',type:'water',hp:115},{name:'Talonflame',slug:'talonflame',type:'fire',hp:90},{name:'Hawlucha',slug:'hawlucha',type:'fighting',hp:85},{name:'Noivern',slug:'noivern',type:'dragon',hp:100},{name:'Goodra',slug:'goodra',type:'dragon',hp:110}]},
   {id:'may',     name:'May',     sprite:'may',     badge:'🌺', gym:'Littleroot Town', bg:'forest_m.png', group:'anime',
    team:[{name:'Blaziken',slug:'blaziken',type:'fire',hp:110},{name:'Beautifly',slug:'beautifly',type:'bug',hp:70},{name:'Skitty',slug:'skitty',type:'normal',hp:70},{name:'Bulbasaur',slug:'bulbasaur',type:'grass',hp:90},{name:'Munchlax',slug:'munchlax',type:'normal',hp:100},{name:'Glaceon',slug:'glaceon',type:'ice',hp:90}]},
   {id:'dawn',    name:'Dawn',    sprite:'dawn',    badge:'❄️', gym:'Twinleaf Town',   bg:'water2_m.png', group:'anime',
@@ -820,6 +830,7 @@ function updateBadgeCount(){
 function startBattle(trainerId){
   const trainer = TRAINERS.find(t=>t.id===trainerId);
   if(!trainer) return;
+  bgmPlay()
   document.getElementById('gym-select').style.display='none';
   document.getElementById('battle-bg').style.backgroundImage = `url('${BG_BASE}${trainer.bg}')`;
 
@@ -1091,6 +1102,7 @@ function endBattleWin(){
   const stars = total>=15?5:total>=10?4:total>=5?3:total>=2?2:1;
   flashColor('yellow');
   sessionStorage.setItem('g13cResult', JSON.stringify({stars, badges: total}));
+  bgmStop()
   const tid = battle.trainer.id;
   GameModal.show({
     emoji: trainer.badge,
@@ -1106,6 +1118,7 @@ function endBattleLose(){
   if(!battle||battle.ended) return;
   battle.ended=true;
   flashColor('red');
+  bgmStop()
   const tid = battle?.trainer?.id;
   GameModal.show({
     emoji: '💔',
@@ -1120,7 +1133,34 @@ function endBattleLose(){
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
 document.getElementById('btn-back').onclick = ()=>goBack();
 document.getElementById('gs-back').onclick  = ()=>goBack();
+// ─── BATTLE BGM ──────────────────────────────────────────────────────────────
+let _bgmEl = null
+function bgmPlay(){
+  if(!_bgmEl){
+    _bgmEl = document.createElement('audio')
+    _bgmEl.src = '../Sounds/battle-bgm.mp3'
+    _bgmEl.loop = true
+    _bgmEl.volume = 0.35
+    document.body.appendChild(_bgmEl)
+  }
+  _bgmEl.currentTime = 0
+  const p = _bgmEl.play()
+  if(p && p.catch) p.catch(()=>{
+    setTimeout(()=>{ if(_bgmEl) _bgmEl.play().catch(()=>{}) }, 300)
+  })
+}
+function bgmStop(){
+  if(!_bgmEl || _bgmEl.paused) return
+  let v = _bgmEl.volume
+  const fade = setInterval(()=>{
+    v = Math.max(0, v - 0.04)
+    _bgmEl.volume = v
+    if(v <= 0){ clearInterval(fade); _bgmEl.pause(); _bgmEl.volume = 0.35 }
+  }, 40)
+}
+
 function goBack(){
+  bgmStop()
   window.location.replace('../index.html');
 }
 
