@@ -3056,7 +3056,7 @@ function nextG7Round() {
   const displayEl=document.getElementById('g7-display'),questionEl=document.getElementById('g7-question')
   displayEl.classList.remove('anim-correct')
   if(g7State.mode==='img2word'){
-    displayEl.innerHTML=`<span style="font-size:min(38vw,180px);line-height:1;display:flex;align-items:center;justify-content:center;max-width:80%;max-height:80%;overflow:hidden">${correct.emoji}</span>`
+    displayEl.innerHTML=`<span style="font-size:min(28vw,min(28vh,140px));line-height:1.1;display:flex;align-items:center;justify-content:center;padding:8%">${correct.emoji}</span>`
     questionEl.textContent='Ayo tebak, ini apa ya? 🤔'
     renderG7WordChoices(choices,correct)
   } else {
