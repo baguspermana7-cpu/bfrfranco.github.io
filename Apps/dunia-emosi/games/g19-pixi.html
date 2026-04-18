@@ -81,9 +81,9 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:linear
 <!-- Start Overlay -->
 <!-- Ash + Pikachu running at ground level -->
 <img id="ash-runner" src="../assets/Pokemon/trainer/ash-running.webp"
-  style="position:fixed;z-index:39;pointer-events:none;height:10vh;width:auto;bottom:13%;left:8%;image-rendering:auto;display:none;">
+  style="position:fixed;z-index:39;pointer-events:none;height:10vh;width:auto;left:8%;image-rendering:auto;display:none;">
 <img id="pika-runner" src="../assets/Pokemon/trainer/pikachu-run.webp"
-  style="position:fixed;z-index:39;pointer-events:none;height:2vh;width:auto;bottom:13.5%;left:2%;image-rendering:auto;display:none;">
+  style="position:fixed;z-index:39;pointer-events:none;height:6vh;width:auto;left:1%;image-rendering:auto;display:none;">
 <audio id="wing-flap-sfx" src="../assets/Pokemon/sound/wing-flap.mp3" preload="auto" style="display:none"></audio>
 <audio id="game-bgm" preload="auto" loop style="display:none"></audio>
 
@@ -713,7 +713,15 @@ function gameLoop(ticker) {
 
   updateHUD()
 
-  // Ash + Pikachu run steadily at ground level (no bobbing)
+  // Ash + Pikachu pinned to ground level (GROUND_Y) — always on grass
+  const ashEl = document.getElementById('ash-runner')
+  const pikaEl = document.getElementById('pika-runner')
+  if (ashEl && ashEl.style.display !== 'none') {
+    ashEl.style.top = (GROUND_Y - ashEl.offsetHeight) + 'px'
+  }
+  if (pikaEl && pikaEl.style.display !== 'none') {
+    pikaEl.style.top = (GROUND_Y - pikaEl.offsetHeight) + 'px'
+  }
 
   // Sync DOM bird image position — no rotation, only up/down
   if (window._birdImg) {
