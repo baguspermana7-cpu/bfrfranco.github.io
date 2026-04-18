@@ -667,6 +667,38 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
     ctx.strokeStyle='#aaa';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(px-5,roofY);ctx.lineTo(px,roofY-9);ctx.lineTo(px+5,roofY);ctx.stroke();
     ctx.beginPath();ctx.moveTo(px-7,roofY-9);ctx.lineTo(px+7,roofY-9);ctx.stroke();
+    // Cross-arm detail
+    ctx.lineWidth=0.6;
+    ctx.beginPath();ctx.moveTo(px-3,roofY-3);ctx.lineTo(px+3,roofY-6);ctx.stroke();
+  }
+  // Handrail helper
+  function handrail(x,y,len,color='rgba(251,191,36,.35)'){
+    ctx.fillStyle=color;rr(x,y,len,1);
+    rr(x,y-2,1,3);rr(x+len-1,y-2,1,3);
+  }
+  // Coupling hook helper
+  function coupling(x,y,dir=1){
+    ctx.fillStyle='#6b7280';rr(x,y,dir*4,3);rr(x+dir*3,y-1,dir*2,5,1);
+  }
+  // Number board helper
+  function numBoard(x,y,w=10,h=5){
+    ctx.fillStyle='rgba(0,0,0,.35)';rr(x,y,w,h,1);
+    ctx.fillStyle='rgba(255,255,255,.15)';rr(x+1,y+1,w-2,h-2,1);
+  }
+  // Rivet line helper
+  function rivets(x,y,count,gap=4){
+    ctx.fillStyle='rgba(255,255,255,.2)';
+    for(let i=0;i<count;i++){ctx.beginPath();ctx.arc(x+i*gap,y,0.7,0,Math.PI*2);ctx.fill();}
+  }
+  // Headlight pair helper
+  function headlights(x,y,r=3){
+    ctx.fillStyle='#fef08a';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,r*0.5,0,Math.PI*2);ctx.fill();
+  }
+  // Tail light pair helper
+  function taillights(x,y,r=2){
+    ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fca5a5';ctx.beginPath();ctx.arc(x,y,r*0.5,0,Math.PI*2);ctx.fill();
   }
 
   // ── MAGLEV ────────────────────────────────────────────────────────────────
@@ -676,8 +708,16 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         ctx.fillStyle=bodyC;rr(4,CH*.32,CW-10,CH*.42,8);
         ctx.fillStyle=accC;rr(4,CH*.5,CW-14,CH*.08);
         ctx.fillStyle='#93c5fd';rr(7,CH*.36,CW-20,CH*.18,3);
+        // Window pillars
+        for(let i=0;i<3;i++){ctx.fillStyle='rgba(0,0,0,.15)';rr(15+i*16,CH*.36,2,CH*.18);}
         ctx.fillStyle=accC;rr(CW-10,CH*.32,10,CH*.42,4);
+        headlights(CW-4,CH*.48,2.5);
+        // LED strip under body
+        ctx.fillStyle='rgba(56,189,248,.5)';rr(8,CH*.72,CW-20,2);
         ctx.fillStyle='rgba(56,189,248,.4)';rr(8,bodyB,CW-20,4);
+        // Door markings
+        ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=0.6;ctx.strokeRect(22,CH*.34,8,CH*.38);
+        numBoard(6,CH*.7,12,4);
       },
       ()=>{ // v2: Transrapid tall profile + visible undercarriage skirt
         ctx.fillStyle=bodyC;rr(4,CH*.22,CW-10,CH*.52,6);
@@ -724,7 +764,16 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         ctx.fillStyle=bodyC;ctx.beginPath();ctx.moveTo(CW-14,CH*.28);ctx.lineTo(CW+2,CH*.51);ctx.lineTo(CW-14,CH*.74);ctx.closePath();ctx.fill();
         ctx.fillStyle=accC;rr(4,CH*.44,CW-14,CH*.12);
         ctx.fillStyle='#bfdbfe';rr(6,CH*.32,CW-26,CH*.22,2);
+        // Window pillars
+        for(let i=0;i<3;i++){ctx.fillStyle='rgba(0,0,0,.12)';rr(12+i*14,CH*.32,1.5,CH*.22);}
+        headlights(CW-2,CH*.42,2.5);taillights(6,CH*.5,2);
+        // Door marking
+        ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=0.5;ctx.strokeRect(20,CH*.3,7,CH*.42);
+        // Skirt
+        ctx.fillStyle='rgba(0,0,0,.15)';rr(4,CH*.7,CW-18,3);
+        panto(CW*.4,CH*.28);
         for(const f of[.22,.46,.7]){ctx.fillStyle='#1f2937';ctx.beginPath();ctx.arc(4+CW*f*.9,tY-2,3,0,Math.PI*2);ctx.fill();}
+        numBoard(6,CH*.3,10,5);
       },
       ()=>{ // v2: Long extended Shinkansen bullet
         const n=20;ctx.fillStyle=bodyC;rr(4,CH*.3,CW-4-n,CH*.42,3);
@@ -767,7 +816,16 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         ctx.fillStyle='#e0f2fe';
         for(let i=0;i<4;i++)rr(7+i*16,CH*.28,12,CH*.26,2);
         ctx.fillStyle=accC;rr(CW-12,CH*.22,12,CH*.55,2);
+        headlights(CW-6,CH*.36,2);taillights(6,CH*.46,1.5);
+        // Door markings
+        ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=0.5;ctx.strokeRect(28,CH*.24,6,CH*.5);
+        // Destination LED board
+        ctx.fillStyle='#000';rr(7,CH*.58,14,4,1);
+        ctx.fillStyle='rgba(251,191,36,.5)';rr(8,CH*.59,12,2,0.5);
+        // AC unit on roof
+        ctx.fillStyle='rgba(0,0,0,.1)';rr(20,CH*.18,18,3,1);
         panto(CW-18,CH*.22);
+        numBoard(6,CH*.24);
         bwhl(20,bodyB,4);bwhl(CW-20,bodyB,4);
       },
       ()=>{ // v2: Metro/subway rounded ends, no panto, dark windows
@@ -818,8 +876,18 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         ctx.fillStyle='#dbeafe';rr(CW-22,CH*.3,16,CH*.2,2); // cab window
         ctx.fillStyle=accC;rr(4,CH*.37,CW-22,CH*.12);
         ctx.fillStyle='#292524';rr(12,CH*.16,6,CH*.12);rr(10,CH*.14,10,CH*.06,2); // stack
+        // Radiator fan
+        ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.arc(24,CH*.2,4,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(156,163,175,.3)';ctx.beginPath();ctx.arc(24,CH*.2,1.5,0,Math.PI*2);ctx.fill();
+        // Horn
+        ctx.fillStyle='#d97706';rr(CW-28,CH*.24,3,CH*.08,1);
         ctx.fillStyle='rgba(219,234,254,.6)';
         for(let i=0;i<3;i++)rr(6+i*16,CH*.32,12,CH*.16,2);
+        headlights(CW-6,CH*.42,2.5);taillights(6,CH*.5,1.5);
+        handrail(CW-8,CH*.58,10);
+        coupling(0,CH*.52,-1);
+        rivets(6,CH*.28,8,6);
+        numBoard(6,CH*.3);
         bwhl(22,bodyB,4.5);bwhl(CW-22,bodyB,4.5);
       },
       ()=>{ // v2: Cab unit (streamlined, rounded nose like Alco PA)
@@ -866,10 +934,23 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
     ()=>{ // v1: Small classic shunter (3 wheels, single chimney, short)
       const bW=CW*.62,bX=CW*.14;
       ctx.fillStyle=bodyC;rr(bX,CH*.28,bW,CH*.44,3);
+      // Boiler bands
+      for(let i=0;i<2;i++){ctx.fillStyle='rgba(255,255,255,.1)';rr(bX+bW*.3+i*bW*.25,CH*.28,2,CH*.44);}
       ctx.fillStyle='#6b7280';ctx.beginPath();ctx.arc(bX+bW*.55,CH*.28,CH*.11,Math.PI,0);ctx.fill(); // dome
       ctx.fillStyle='#1c1917';rr(bX+bW*.24,CH*.1,6,CH*.18);rr(bX+bW*.18,CH*.08,12,CH*.07,2); // chimney
+      // Whistle
+      ctx.fillStyle='#d97706';rr(bX+bW*.45,CH*.2,2,CH*.08);
       ctx.fillStyle=accC;rr(bX+bW,CH*.2,CW*.16,CH*.54,2); // cab
       ctx.fillStyle='#dbeafe';rr(bX+bW+2,CH*.26,CW*.11,CH*.22,2);
+      // Running board
+      ctx.fillStyle=accC;rr(bX-2,CH*.68,bW+4,2);
+      // Firebox glow
+      ctx.fillStyle='rgba(249,115,22,.15)';rr(bX+bW*.5,CH*.64,bW*.2,3);
+      headlights(bX+2,CH*.42,2);
+      // Cowcatcher
+      ctx.fillStyle='#374151';ctx.beginPath();ctx.moveTo(bX,CH*.62);ctx.lineTo(bX-6,CH*.72);ctx.lineTo(bX,CH*.72);ctx.closePath();ctx.fill();
+      // Connecting rod
+      ctx.fillStyle='rgba(156,163,175,.4)';rr(bX+bW*.28,tY-4,bW*.4,1.5);
       for(const f of[.28,.47,.66]) whl(bX+bW*f,tY-2,CH*.15,'#374151','#6b7280');
     },
     ()=>{ // v2: Express 4-coupled + small pilot wheel
@@ -978,10 +1059,22 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
     g.rect(-hW + 6, hH, W - 12, 2).fill(0x1e3a8a)
     g.rect(-hW + 6, hH + 2, W - 12, 4).fill(0x38bdf8)
     g.rect(-hW + 6, hH + 2, W - 12, 2).fill({ color: 0x7dd3fc, alpha: 0.7 })
+    // Pulsing LED strip under body
+    g.rect(-hW + 4, hH - 1, W - 8, 1.5).fill({ color: aC, alpha: 0.45 })
+    g.rect(-hW + 8, hH - 1, 6, 1.5).fill({ color: 0xffffff, alpha: 0.3 })
     // Undercarriage sensors
-    for (let si = 0; si < 4; si++) g.circle(-hW + 15 + si * 14, hH + 1, 1.5).fill({ color: 0x38bdf8, alpha: 0.5 })
+    for (let si = 0; si < 6; si++) {
+      g.circle(-hW + 12 + si * 10, hH + 1, 1.5).fill({ color: 0x38bdf8, alpha: 0.5 })
+      g.circle(-hW + 12 + si * 10, hH + 1, 0.8).fill({ color: 0xffffff, alpha: 0.7 })
+    }
+    // Ventilation grilles (roof)
+    for (let vi = 0; vi < 3; vi++) g.roundRect(-hW + 8 + vi * 16, -hH - 2, 10, 2, 1).fill({ color: 0x000000, alpha: 0.15 })
+    // Aerodynamic fairing covers
+    g.poly([-hW, hH, -hW - 4, hH + 3, -hW, hH + 3]).fill({ color: bC, alpha: 0.5 })
     // Number plate
     g.roundRect(-hW + 2, hH - 5, 14, 4, 1).fill({ color: 0x000000, alpha: 0.3 })
+    // Tail light
+    g.circle(-hW - 1, 0, 2.5).fill(0xef4444); g.circle(-hW - 1, 0, 1.2).fill(0xfca5a5)
     return
   }
 
@@ -1029,12 +1122,26 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
       // Suspension springs
       g.rect(bx + 2, hH - 2, 6, 2).fill({ color: 0x6b7280, alpha: 0.4 })
     }
-    // Door markings
+    // Door markings (double doors)
     g.rect(-hW + 18, -hH + 2, 7, H - 4).stroke({ color: 0xffffff, width: 0.6, alpha: 0.2 })
-    // Skirt (lower body panel)
+    g.rect(-hW + 38, -hH + 2, 7, H - 4).stroke({ color: 0xffffff, width: 0.5, alpha: 0.15 })
+    // Skirt (lower body panel / aerodynamic fairing)
     g.rect(-hW, hH - 3, W - 12, 3).fill({ color: 0x000000, alpha: 0.2 })
+    g.rect(-hW, hH - 5, W - 12, 2).fill({ color: bC, alpha: 0.3 })
+    // Brake disc indicators (between bogies)
+    for (let bi = 0; bi < 3; bi++) g.circle(-10 + bi * 8, hH + 1, 1).fill({ color: 0xd97706, alpha: 0.3 })
+    // Ventilation grilles (roof)
+    for (let vi = 0; vi < 2; vi++) g.roundRect(-hW + 6 + vi * 18, -hH - 3, 12, 2.5, 1).fill({ color: 0x000000, alpha: 0.12 })
+    // Destination LED board
+    g.roundRect(-hW + 3, -hH + 13, 16, 5, 1).fill(0x000000)
+    g.roundRect(-hW + 4, -hH + 14, 14, 3, 0.5).fill({ color: 0xfbbf24, alpha: 0.6 })
+    // Tail light
+    g.circle(-hW - 1, -4, 2).fill(0xef4444); g.circle(-hW - 1, -4, 1).fill(0xfca5a5)
+    g.circle(-hW - 1, 4, 2).fill(0xef4444); g.circle(-hW - 1, 4, 1).fill(0xfca5a5)
     // Number plate
     g.roundRect(-hW + 2, -hH + 2, 14, 6, 1).fill({ color: 0x000000, alpha: 0.3 })
+    // Coupler cover (nose)
+    g.roundRect(hW + 6, -3, 4, 6, 1).fill({ color: bC, alpha: 0.6 })
     return
   }
 
@@ -1068,25 +1175,66 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
     // Sloped nose end
     g.poly([hW, -hH, hW + 6, -hH + 4, hW + 6, hH - 4, hW, hH]).fill(aC)
     g.poly([hW, -hH, hW + 6, -hH + 4, hW + 6, hH - 4, hW, hH]).stroke({ color: 0xffffff, width: 0.8, alpha: 0.4 })
-    // Front windshield (on nose)
-    g.roundRect(hW - 10, -hH + 2, 10, 8, 2).fill(0x0f172a)
-    g.roundRect(hW - 10, -hH + 2, 10, 3.5, 2).fill({ color: 0x87ceeb, alpha: 0.35 })
-    // Headlights (flush with nose)
-    g.circle(hW + 3, -hH + 6, 2.5).fill(0xfef08a); g.circle(hW + 3, -hH + 6, 1.5).fill(0xffffff)
-    g.circle(hW + 3, hH - 6, 2).fill(0xfca5a5); g.circle(hW + 3, hH - 6, 1).fill(0xfecdd3)
-    // Exhaust grille (diesel hood)
+    // Nose highlight
+    g.poly([hW, -hH, hW + 4, -hH + 3, hW + 4, -hH + 6, hW, -hH + 4]).fill({ color: 0xffffff, alpha: 0.08 })
+    // Front windshield (on nose) — split pane
+    g.roundRect(hW - 12, -hH + 2, 12, 9, 2).fill(0x0f172a)
+    g.roundRect(hW - 12, -hH + 2, 12, 4, 2).fill({ color: 0x87ceeb, alpha: 0.35 })
+    g.rect(hW - 6, -hH + 2, 1, 9).fill({ color: bC, alpha: 0.4 }) // center pillar
+    // Headlights (dual top + marker bottom)
+    g.circle(hW + 3, -hH + 5, 3).fill(0xfef08a); g.circle(hW + 3, -hH + 5, 1.8).fill(0xffffff)
+    g.circle(hW + 3, -hH + 10, 2).fill(0xfef08a); g.circle(hW + 3, -hH + 10, 1).fill(0xffffff)
+    g.circle(hW + 3, hH - 5, 2.5).fill(0xfca5a5); g.circle(hW + 3, hH - 5, 1.2).fill(0xfecdd3)
+    // Ditch lights (low-mounted, widely spaced)
+    g.circle(hW + 1, hH - 10, 1.5).fill({ color: 0xfef08a, alpha: 0.6 })
+    // Exhaust + radiator (diesel hood)
     if (!isEmu) {
-      g.roundRect(-hW + 2, -hH - 3, 12, 3, 1).fill({ color: 0x000000, alpha: 0.2 })
-      for (let gi = 0; gi < 5; gi++) g.rect(-hW + 3 + gi * 2.2, -hH - 2, 1, 1.5).fill({ color: 0x6b7280, alpha: 0.25 })
+      // Exhaust stack
+      g.roundRect(-hW + 2, -hH - 4, 8, 4, 1).fill({ color: 0x1f2937, alpha: 0.5 })
+      g.roundRect(-hW + 3, -hH - 5, 6, 2, 1).fill({ color: 0x374151, alpha: 0.4 })
+      // Radiator grilles (long hood detail)
+      for (let gi = 0; gi < 6; gi++) g.rect(-hW + 3 + gi * 2, -hH - 3, 1, 2.5).fill({ color: 0x6b7280, alpha: 0.3 })
+      // Radiator fan (round on top)
+      g.circle(-hW + 18, -hH - 2, 4).fill({ color: 0x1f2937, alpha: 0.3 })
+      g.circle(-hW + 18, -hH - 2, 4).stroke({ color: 0x6b7280, width: 0.8, alpha: 0.3 })
+      g.circle(-hW + 18, -hH - 2, 1.5).fill({ color: 0x9ca3af, alpha: 0.3 })
+      // Horn (on roof)
+      g.rect(hW - 16, -hH - 5, 3, 5).fill({ color: 0xd1d5db, alpha: 0.5 })
+      g.roundRect(hW - 17, -hH - 7, 5, 3, 1).fill({ color: 0xfbbf24, alpha: 0.4 })
+      // Bell
+      g.circle(hW - 8, -hH - 3, 2.5).fill({ color: 0xd97706, alpha: 0.5 })
+      g.rect(hW - 8, -hH - 6, 1, 3).fill({ color: 0xd1d5db, alpha: 0.4 })
+      // Handrails (nose)
+      g.rect(hW - 2, -hH + 12, 8, 1).fill({ color: 0xfbbf24, alpha: 0.3 })
+      g.rect(hW + 5, -hH + 8, 1, 5).fill({ color: 0xfbbf24, alpha: 0.3 })
+      // Dynamic brake blister (roof hump)
+      g.roundRect(-hW + 28, -hH - 3, 14, 3, 1.5).fill({ color: 0x000000, alpha: 0.15 })
     }
-    // Pantograph (EMU)
+    // Pantograph (EMU — detailed diamond)
     if (isEmu) {
-      g.rect(-hW + 10, -hH - 7, 2, 7).fill({ color: 0xd1d5db, alpha: 0.7 })
-      g.rect(-hW + 10, -hH - 8, 16, 1.5).fill({ color: 0xd1d5db, alpha: 0.7 })
-      g.rect(-hW + 26, -hH - 7, 2, 7).fill({ color: 0xd1d5db, alpha: 0.7 })
+      const px = -hW + 10
+      g.rect(px, -hH - 8, 2, 8).fill({ color: 0xd1d5db, alpha: 0.7 })
+      g.rect(px + 18, -hH - 8, 2, 8).fill({ color: 0xd1d5db, alpha: 0.7 })
+      g.rect(px - 2, -hH - 9, 24, 1.5).fill({ color: 0xd1d5db, alpha: 0.7 })
+      // Cross arms
+      g.moveTo(px + 1, -hH).lineTo(px + 10, -hH - 8).stroke({ color: 0xd1d5db, width: 1, alpha: 0.5 })
+      g.moveTo(px + 19, -hH).lineTo(px + 10, -hH - 8).stroke({ color: 0xd1d5db, width: 1, alpha: 0.5 })
+      // Contact wire
+      g.rect(px - 4, -hH - 11, 30, 1).fill({ color: 0xfbbf24, alpha: 0.35 })
+      // Destination LED board
+      g.roundRect(-hW + 4, -hH + 14, 14, 4, 1).fill(0x000000)
+      g.roundRect(-hW + 5, -hH + 15, 12, 2, 0.5).fill({ color: 0xfbbf24, alpha: 0.5 })
+      // Inter-car connector (rear)
+      g.roundRect(-hW - 3, -hH + 3, 3, H - 6, 1).fill({ color: 0x374151, alpha: 0.4 })
+      // AC unit (roof)
+      g.roundRect(-hW + 32, -hH - 3, 12, 3, 1).fill({ color: 0xd1d5db, alpha: 0.2 })
     }
-    // Door marking
+    // Door markings (double door)
     g.rect(-hW + 22, -hH + 2, 6, H - 4).stroke({ color: 0xffffff, width: 0.5, alpha: 0.18 })
+    g.rect(-hW + 40, -hH + 2, 6, H - 4).stroke({ color: 0xffffff, width: 0.4, alpha: 0.12 })
+    // Grab irons (side handrails)
+    g.rect(-hW + 1, -hH + 8, 1, 10).fill({ color: 0xfbbf24, alpha: 0.25 })
+    g.rect(hW - 2, -hH + 8, 1, 10).fill({ color: 0xfbbf24, alpha: 0.25 })
   }
   // Rivet dots
   for (const ry of [-hH + 1, hH - 2]) {
@@ -1176,13 +1324,34 @@ function drawTrainG(g, bodyC, accC, catKey, trainKey, variant) {
     g.circle(-hW - 18, hH + 3, 2).fill(0x9ca3af)
     g.circle(-hW - 8, hH + 3, 5).fill(0x1f2937).stroke({ color: 0x6b7280, width: 1 })
     g.circle(-hW - 8, hH + 3, 2).fill(0x9ca3af)
-    // ── Connecting rods (detailed) ──
+    // ── Connecting rods (detailed, multiple) ──
     g.rect(-22, hH + 1, 40, 2).fill({ color: 0x9ca3af, alpha: 0.5 })
+    g.rect(-18, hH + 0, 34, 1).fill({ color: 0x6b7280, alpha: 0.3 })
     // ── Valve gear (Walschaerts motion) ──
     g.rect(-10, hH - 2, 18, 1.5).fill({ color: 0x9ca3af, alpha: 0.35 })
     g.circle(6, hH - 1, 2).fill({ color: 0x9ca3af, alpha: 0.4 })
+    // ── Piston cross-head (front) ──
+    g.roundRect(hW - 6, hH - 3, 6, 5, 1).fill({ color: 0x9ca3af, alpha: 0.4 })
+    g.rect(hW - 4, hH + 0, 8, 1.5).fill({ color: 0x6b7280, alpha: 0.35 })
     // ── Steam pipes (on side of boiler) ──
     g.rect(dX + 2, -hH + 2, hW - dX - 4, 1.5).fill({ color: 0x9ca3af, alpha: 0.3 })
+    // ── Firebox glow (under boiler, orange) ──
+    g.rect(-hW + 14, hH - 2, 12, 3).fill({ color: 0xf97316, alpha: 0.2 })
+    g.rect(-hW + 16, hH - 1, 8, 2).fill({ color: 0xfbbf24, alpha: 0.15 })
+    // ── Whistle (on boiler top) ──
+    g.rect(dX - 4, -hH - 5, 2, 5).fill({ color: 0xd97706, alpha: 0.5 })
+    g.circle(dX - 3, -hH - 6, 1.5).fill({ color: 0xf59e0b, alpha: 0.6 })
+    // ── Bell (front of boiler) ──
+    g.circle(hW - 10, -hH - 3, 2.5).fill({ color: 0xd97706, alpha: 0.45 })
+    g.rect(hW - 10, -hH - 6, 1, 3).fill({ color: 0xd1d5db, alpha: 0.35 })
+    // ── Handrails (running along boiler) ──
+    g.rect(-hW + 12, -hH + 2, hW * 2 - 26, 0.8).fill({ color: 0xfbbf24, alpha: 0.2 })
+    // ── Water gauge (cab side) ──
+    g.rect(-hW + 2, -hH + 8, 2, 8).fill({ color: 0x0891b2, alpha: 0.3 })
+    g.rect(-hW + 2, -hH + 12, 2, 4).fill({ color: 0x22d3ee, alpha: 0.4 })
+    // ── Splasher / wheel guard ──
+    g.poly([-16, hH - 2, -4, hH - 2, -4, hH + 1, -16, hH + 1]).fill({ color: bC, alpha: 0.3 })
+    g.arc(-10, hH + 3, 8, Math.PI, 0).stroke({ color: aC, width: 1.5, alpha: 0.3 })
   }
 }
 
