@@ -57,12 +57,13 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0d102
 
 <!-- HUD -->
 <div id="hud-top">
-  <button id="btn-back" onclick="goBack()">◀</button>
+  <button id="btn-back" onclick="goBack()" style="pointer-events:all">◀</button>
   <div id="game-badge">🐦 Pokemon Birds</div>
   <div id="hud-center">
     <div id="level-text"></div>
     <div id="status-text">Bersiap...</div>
   </div>
+  <button id="btn-pause" onclick="togglePause()" style="pointer-events:all;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;color:#fff;padding:6px 10px;font-size:15px;cursor:pointer;font-family:inherit;flex-shrink:0">⏸</button>
   <div id="hud-lives">⭐ 0</div>
   <div id="pipe-progress">🟢 0/0</div>
 </div>
@@ -197,13 +198,13 @@ const S = {
 const GRAVITY = 0.38
 const FLAP_POWER = -7.2
 const MAX_FALL = 9
-const BIRD_SIZE = 56
-const PIPE_WIDTH = 62
+const BIRD_SIZE = 80 // 1.5x bigger
+const PIPE_WIDTH = 68
 const PIPE_COUNT = 10 + Math.min(Math.floor((cfg.level - 1) / 6), 5)
-const GAP_SIZE = Math.max(90, 170 - (cfg.level - 1) * 3)
-const GAP_SIZE_EVO = Math.min(GAP_SIZE * 1.5, 200) // 50% wider after evolution
+const GAP_SIZE = Math.max(130, 220 - (cfg.level - 1) * 3) // wider gaps for bigger bird
+const GAP_SIZE_EVO = Math.min(GAP_SIZE * 1.4, 260)
 let PIPE_SPEED = 2.1 + (cfg.level - 1) * 0.14
-const PIPE_SPACING = Math.max(220, 300 - (cfg.level - 1) * 3)
+const PIPE_SPACING = Math.max(280, 380 - (cfg.level - 1) * 3) // wider spacing for bigger bird
 
 let W, H, GROUND_Y, BIRD_X
 let app, birdContainer, birdSprite, birdGlow, worldContainer, bgContainer, groundContainer
@@ -453,7 +454,7 @@ async function createBird() {
   const birdImg = document.createElement('img')
   birdImg.id = 'bird-gif'
   birdImg.src = '../assets/Pokemon/birds/pidgeot-pokemon.gif'
-  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:'+BIRD_SIZE+'px;height:auto;transform:scaleX(-1);filter:drop-shadow(0 0 8px rgba(196,181,253,0.5));image-rendering:auto;'
+  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+BIRD_SIZE+'px,18vw);height:auto;transform:scaleX(-1);filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
   birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
   document.body.appendChild(birdImg)
   window._birdImg = birdImg
@@ -484,7 +485,7 @@ function gameLoop(ticker) {
       if (window._birdImg) {
         window._birdImg.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
         window._birdImg.style.top = (bobY - BIRD_SIZE/2) + 'px'
-        window._birdImg.style.transform = 'scaleX(-1)'
+        window._birdImg.style.transform = 'scaleX(-1)' // no rotation
       }
     }
     return
@@ -498,11 +499,9 @@ function gameLoop(ticker) {
   S.birdY += S.birdVY * dt
   S.birdY = Math.max(S.birdY, 20)
 
-  // Bird rotation
+  // Bird position (no rotation — just up/down movement)
   if (birdContainer) {
     birdContainer.y = S.birdY
-    const targetRot = S.birdVY < 0 ? -0.4 : Math.min(S.birdVY * 0.08, 1.2)
-    birdContainer.rotation += (targetRot - birdContainer.rotation) * 0.15
   }
 
   // Glow pulse
@@ -561,13 +560,12 @@ function gameLoop(ticker) {
 
   updateHUD()
 
-  // Sync DOM bird image position to PixiJS container
+  // Sync DOM bird image position — no rotation, only up/down
   if (window._birdImg) {
     const bi = window._birdImg
     bi.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
     bi.style.top = (S.birdY - BIRD_SIZE/2) + 'px'
-    const rot = birdContainer ? birdContainer.rotation : 0
-    bi.style.transform = 'scaleX(-1) rotate(' + (rot * 57.3) + 'deg)'
+    bi.style.transform = 'scaleX(-1)' // no rotation, just flip
   }
 }
 
@@ -865,6 +863,14 @@ window.addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════════════
+function togglePause() {
+  if (!S.started || S.gameOver) return
+  S.paused = !S.paused
+  S.running = !S.paused
+  document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
+  document.getElementById('status-text').textContent = S.paused ? 'PAUSE' : 'Terbang!'
+}
+
 function goBack() { S.running = false; window.location.replace('../index.html') }
 
 // Resize
