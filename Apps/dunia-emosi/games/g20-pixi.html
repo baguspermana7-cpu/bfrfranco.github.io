@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ducky Volley 🏐</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#87CEEB;font-family:'Fredoka One',sans-serif;touch-action:none}
+canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
+
+/* ── HUD ── */
+#hud{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(180deg,rgba(0,0,0,0.6) 0%,transparent 100%);pointer-events:none}
+#btn-back{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;color:#fff;padding:6px 10px;font-size:14px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
+#game-badge{background:rgba(0,0,0,0.4);border:1.5px solid rgba(251,191,36,0.4);border-radius:10px;padding:4px 10px;color:#fbbf24;font-size:12px;font-weight:700;flex-shrink:0}
+#hud-center{flex:1;text-align:center}
+#score-display{font-size:clamp(18px,5vw,28px);font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
+#level-text{font-size:11px;color:#bfdbfe}
+#timer-display{font-size:14px;color:#86efac;font-weight:700;flex-shrink:0}
+
+/* ── Controls ── */
+#controls{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;padding:10px 16px 20px;pointer-events:none}
+.ctrl-zone{width:45%;height:80px;display:flex;gap:6px;pointer-events:all}
+.ctrl-btn{flex:1;border-radius:16px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.35);color:#fff;font-size:24px;font-weight:900;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
+.ctrl-btn:active{background:rgba(139,92,246,0.5);transform:scale(0.93)}
+#btn-jump{background:rgba(139,92,246,0.4);border-color:rgba(167,139,250,0.5)}
+
+/* ── Quiz ── */
+#quiz-panel{position:fixed;bottom:0;left:0;right:0;z-index:200;display:none;flex-direction:column;align-items:center;padding:12px 16px 24px;background:linear-gradient(0deg,rgba(10,2,25,0.97),rgba(26,5,53,0.95));border-top:3px solid #fbbf24;backdrop-filter:blur(14px)}
+#quiz-panel.show{display:flex}
+#quiz-question{color:#fff;font-size:clamp(20px,6vw,30px);font-weight:900;text-align:center;margin-bottom:12px;text-shadow:0 0 16px rgba(251,191,36,0.5)}
+#quiz-choices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.qbtn{min-width:60px;padding:12px 8px;border:2.5px solid rgba(255,255,255,0.3);border-radius:14px;background:linear-gradient(160deg,#7C3AED,#6D28D9);color:#fff;font-size:clamp(16px,5vw,24px);font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 #4C1D95;-webkit-tap-highlight-color:transparent}
+.qbtn:nth-child(2){background:linear-gradient(160deg,#E85A32,#C84020);box-shadow:0 4px 0 #9A2A10}
+.qbtn:nth-child(3){background:linear-gradient(160deg,#2DBF7E,#1A9E66);box-shadow:0 4px 0 #0A7A48}
+.qbtn:nth-child(4){background:linear-gradient(160deg,#F59E0B,#D97706);box-shadow:0 4px 0 #92400E}
+.qbtn.correct{border-color:#4ade80;background:rgba(74,222,128,0.3);animation:pop .4s ease}
+.qbtn.wrong{border-color:#ef4444;background:rgba(239,68,68,0.3);animation:shake .35s ease}
+@keyframes pop{0%{transform:scale(1.1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── Start Overlay ── */
+#start-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,60,0.92);backdrop-filter:blur(8px)}
+#start-overlay.hidden{display:none}
+.start-icon{font-size:72px}
+.start-title{font-size:clamp(26px,8vw,40px);font-weight:900;color:#fbbf24}
+.start-sub{font-size:16px;color:#bfdbfe}
+.start-hint{font-size:15px;color:#86efac;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5;transform:scale(.96)}}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <button id="btn-back" onclick="goBack()">◀</button>
+  <div id="game-badge">🏐 Ducky Volley</div>
+  <div id="hud-center">
+    <div id="level-text"></div>
+    <div id="score-display">0 — 0</div>
+  </div>
+  <div id="timer-display">⏱ 60</div>
+</div>
+
+<!-- Mobile Controls -->
+<div id="controls">
+  <div class="ctrl-zone" id="ctrl-left">
+    <button class="ctrl-btn" id="btn-left">◀</button>
+    <button class="ctrl-btn" id="btn-right">▶</button>
+  </div>
+  <div class="ctrl-zone" style="justify-content:flex-end">
+    <button class="ctrl-btn" id="btn-jump">🦆 LOMPAT</button>
+  </div>
+</div>
+
+<!-- Quiz Panel -->
+<div id="quiz-panel">
+  <div id="quiz-question"></div>
+  <div id="quiz-choices"></div>
+</div>
+
+<!-- Start Overlay -->
+<div id="start-overlay">
+  <div class="start-icon">🦆</div>
+  <div class="start-title">Ducky Volley</div>
+  <div class="start-sub" id="start-level"></div>
+  <div class="start-hint">Tap untuk Mulai!</div>
+</div>
+
+<script src="game-modal.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+const cfg = { level: 1 }
+try { const s = sessionStorage.getItem('g20Config'); if (s) Object.assign(cfg, JSON.parse(s)) } catch(_){}
+document.getElementById('level-text').textContent = `Level ${cfg.level}`
+document.getElementById('start-level').textContent = `Level ${cfg.level}`
+
+// ═══════════════════════════════════════════════════════════
+//  QUESTIONS
+// ═══════════════════════════════════════════════════════════
+const QUESTIONS = {
+  easy:[
+    {q:'1+1=?',ans:'2',wrong:['3','4','1']},{q:'2+3=?',ans:'5',wrong:['4','6','3']},
+    {q:'3+2=?',ans:'5',wrong:['4','6','7']},{q:'5-2=?',ans:'3',wrong:['2','4','1']},
+    {q:'🐱 Huruf awal?',ans:'K',wrong:['A','M','B']},{q:'🍎 Huruf awal?',ans:'A',wrong:['I','U','E']},
+    {q:'Warna 🔴?',ans:'MERAH',wrong:['BIRU','HIJAU','KUNING']},
+    {q:'Warna 🔵?',ans:'BIRU',wrong:['MERAH','HIJAU','UNGU']},
+    {q:'4-1=?',ans:'3',wrong:['2','5','4']},{q:'2+2=?',ans:'4',wrong:['3','5','6']},
+  ],
+  medium:[
+    {q:'4+4=?',ans:'8',wrong:['7','9','6']},{q:'6+3=?',ans:'9',wrong:['8','7','10']},
+    {q:'10-3=?',ans:'7',wrong:['6','8','4']},{q:'3x3=?',ans:'9',wrong:['6','12','8']},
+    {q:'🐘 ada di...?',ans:'HUTAN',wrong:['LAUT','UDARA','KOTA']},
+    {q:'Ibukota Jawa Barat?',ans:'BANDUNG',wrong:['JAKARTA','SURABAYA','BOGOR']},
+  ],
+  hard:[
+    {q:'7x3=?',ans:'21',wrong:['18','24','14']},{q:'25÷5=?',ans:'5',wrong:['4','6','7']},
+    {q:'Ibukota RI?',ans:'JAKARTA',wrong:['BANDUNG','SURABAYA','MEDAN']},
+    {q:'Planet terbesar?',ans:'YUPITER',wrong:['SATURNUS','MARS','URANUS']},
+  ]
+}
+function getDiff(l){return l<=10?'easy':l<=20?'medium':'hard'}
+function pickQ(){
+  const pool=QUESTIONS[getDiff(cfg.level)]
+  return pool[Math.floor(Math.random()*pool.length)]
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CANVAS + GAME STATE
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('c')
+const ctx = canvas.getContext('2d')
+let W, H
+
+function resize() {
+  W = canvas.width = window.innerWidth
+  H = canvas.height = window.innerHeight
+  GROUND_Y = H * 0.78
+  NET_X = W / 2
+  NET_TOP = GROUND_Y - H * 0.22
+}
+resize()
+window.addEventListener('resize', resize)
+
+let GROUND_Y, NET_X, NET_TOP
+const GRAVITY = 0.45
+const BALL_R = 14
+const DUCK_W = 50, DUCK_H = 44
+const JUMP_POWER = -11
+const MOVE_SPEED = 4.5
+
+const S = {
+  running: false, paused: false, started: false, gameOver: false,
+  playerScore: 0, cpuScore: 0, rally: 0,
+  timeLeft: 60 + Math.min(cfg.level * 5, 60), // 60-120s per level
+  quizActive: false, correctAnswers: 0, wrongAnswers: 0,
+  // Ball
+  ballX: 0, ballY: 0, ballVX: 0, ballVY: 0, ballServe: 'player',
+  // Player duck (left side)
+  px: 0, py: 0, pvx: 0, pvy: 0, pOnGround: true, pFacing: 1,
+  // CPU duck (right side)
+  cx: 0, cy: 0, cvx: 0, cvy: 0, cOnGround: true,
+  // Input
+  moveLeft: false, moveRight: false, jumpPressed: false,
+  frame: 0,
+}
+
+function resetBall(server) {
+  S.ballX = server === 'player' ? W * 0.25 : W * 0.75
+  S.ballY = GROUND_Y - 120
+  S.ballVX = 0
+  S.ballVY = 0
+  S.rally = 0
+}
+
+function resetPositions() {
+  S.px = W * 0.2; S.py = GROUND_Y
+  S.cx = W * 0.8; S.cy = GROUND_Y
+  S.pvx = 0; S.pvy = 0; S.cvx = 0; S.cvy = 0
+  S.pOnGround = true; S.cOnGround = true
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════════════════════
+let audioCtx
+function ensureAudio(){if(!audioCtx)try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(_){}}
+function tone(f,d,t='sine',v=0.12){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+d/1000);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d/1000)}
+function sfxHit(){tone(500,80);setTimeout(()=>tone(700,60),30)}
+function sfxScore(){tone(800,100);setTimeout(()=>tone(1000,150),80)}
+function sfxBounce(){tone(300,50,'square',0.08)}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════════════════════
+let lastTime = 0, timerAcc = 0
+
+function gameLoop(ts) {
+  requestAnimationFrame(gameLoop)
+  const dt = Math.min((ts - lastTime) / 16.67, 3) // normalize to ~60fps
+  lastTime = ts
+  S.frame++
+
+  draw()
+
+  if (!S.running || S.paused || S.quizActive) return
+
+  // Timer
+  timerAcc += dt
+  if (timerAcc >= 60) { // ~1 second
+    timerAcc -= 60
+    S.timeLeft--
+    document.getElementById('timer-display').textContent = `⏱ ${Math.max(0, Math.ceil(S.timeLeft))}`
+    if (S.timeLeft <= 0) { endGame(); return }
+  }
+
+  // Player movement
+  if (S.moveLeft) S.pvx = -MOVE_SPEED
+  else if (S.moveRight) S.pvx = MOVE_SPEED
+  else S.pvx *= 0.8
+  if (S.jumpPressed && S.pOnGround) { S.pvy = JUMP_POWER; S.pOnGround = false }
+  S.jumpPressed = false
+
+  // Player physics
+  S.pvy += GRAVITY * dt
+  S.px += S.pvx * dt
+  S.py += S.pvy * dt
+  // Clamp to left side
+  S.px = Math.max(DUCK_W / 2, Math.min(NET_X - DUCK_W / 2 - 8, S.px))
+  if (S.py >= GROUND_Y) { S.py = GROUND_Y; S.pvy = 0; S.pOnGround = true }
+
+  // CPU AI
+  updateCPU(dt)
+
+  // Ball physics
+  S.ballVY += GRAVITY * 0.6 * dt
+  S.ballX += S.ballVX * dt
+  S.ballY += S.ballVY * dt
+
+  // Ball bounces off walls
+  if (S.ballX < BALL_R) { S.ballX = BALL_R; S.ballVX = Math.abs(S.ballVX) * 0.8 }
+  if (S.ballX > W - BALL_R) { S.ballX = W - BALL_R; S.ballVX = -Math.abs(S.ballVX) * 0.8 }
+  // Ball bounces off ceiling
+  if (S.ballY < BALL_R + 50) { S.ballY = BALL_R + 50; S.ballVY = Math.abs(S.ballVY) * 0.5 }
+
+  // Net collision
+  if (S.ballY > NET_TOP && Math.abs(S.ballX - NET_X) < 10 && S.ballVY > 0) {
+    if (S.ballX < NET_X) { S.ballVX = -Math.abs(S.ballVX) - 1; S.ballX = NET_X - 10 }
+    else { S.ballVX = Math.abs(S.ballVX) + 1; S.ballX = NET_X + 10 }
+    S.ballVY *= -0.5
+    sfxBounce()
+  }
+
+  // Duck-ball collision (player)
+  const pdx = S.ballX - S.px, pdy = S.ballY - (S.py - DUCK_H / 2)
+  const pdist = Math.sqrt(pdx * pdx + pdy * pdy)
+  if (pdist < BALL_R + DUCK_W / 2) {
+    const angle = Math.atan2(pdy, pdx)
+    const power = 7 + Math.abs(S.pvx) * 0.5
+    S.ballVX = Math.cos(angle) * power + S.pvx * 0.3
+    S.ballVY = Math.sin(angle) * power - 4
+    S.ballVY = Math.min(S.ballVY, -3) // always go up
+    S.rally++
+    sfxHit()
+  }
+
+  // Duck-ball collision (CPU)
+  const cdx = S.ballX - S.cx, cdy = S.ballY - (S.cy - DUCK_H / 2)
+  const cdist = Math.sqrt(cdx * cdx + cdy * cdy)
+  if (cdist < BALL_R + DUCK_W / 2) {
+    const angle = Math.atan2(cdy, cdx)
+    const power = 6 + Math.random() * 2
+    S.ballVX = Math.cos(angle) * power + S.cvx * 0.3
+    S.ballVY = Math.sin(angle) * power - 3
+    S.ballVY = Math.min(S.ballVY, -3)
+    S.rally++
+    sfxHit()
+  }
+
+  // Ball hits ground → score
+  if (S.ballY > GROUND_Y - BALL_R) {
+    if (S.ballX < NET_X) {
+      // Ball landed on player's side → CPU scores
+      S.cpuScore++
+      S.ballServe = 'player'
+    } else {
+      // Ball landed on CPU's side → player scores
+      S.playerScore++
+      S.ballServe = 'cpu'
+      sfxScore()
+      // Quiz after every 2 player points
+      if (S.playerScore % 2 === 0) { showQuiz(); return }
+    }
+    updateScoreDisplay()
+    resetBall(S.ballServe)
+    resetPositions()
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CPU AI
+// ═══════════════════════════════════════════════════════════
+function updateCPU(dt) {
+  // Simple AI: move toward ball when on CPU's side
+  const difficulty = Math.min(0.7 + cfg.level * 0.03, 0.95) // 0.73 to 0.95
+  const reaction = Math.random() < difficulty
+
+  if (reaction) {
+    const targetX = S.ballX > NET_X ? S.ballX - 10 : W * 0.75
+    if (S.cx < targetX - 15) S.cvx = MOVE_SPEED * 0.85
+    else if (S.cx > targetX + 15) S.cvx = -MOVE_SPEED * 0.85
+    else S.cvx *= 0.8
+
+    // Jump when ball is coming down nearby
+    if (S.cOnGround && S.ballX > NET_X && S.ballY < GROUND_Y - 60 &&
+        Math.abs(S.ballX - S.cx) < 80 && S.ballVY > 0) {
+      S.cvy = JUMP_POWER * 0.9
+      S.cOnGround = false
+    }
+  } else {
+    S.cvx *= 0.9
+  }
+
+  S.cvy += GRAVITY * dt
+  S.cx += S.cvx * dt
+  S.cy += S.cvy * dt
+  S.cx = Math.max(NET_X + DUCK_W / 2 + 8, Math.min(W - DUCK_W / 2, S.cx))
+  if (S.cy >= GROUND_Y) { S.cy = GROUND_Y; S.cvy = 0; S.cOnGround = true }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DRAW
+// ═══════════════════════════════════════════════════════════
+function draw() {
+  // Sky gradient
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H)
+  skyGrad.addColorStop(0, '#38bdf8')
+  skyGrad.addColorStop(0.5, '#7dd3fc')
+  skyGrad.addColorStop(0.85, '#bae6fd')
+  skyGrad.addColorStop(1, '#22c55e')
+  ctx.fillStyle = skyGrad
+  ctx.fillRect(0, 0, W, H)
+
+  // Sun
+  ctx.fillStyle = '#fef08a'
+  ctx.globalAlpha = 0.8
+  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.12, 35, 0, Math.PI * 2); ctx.fill()
+  ctx.globalAlpha = 0.3
+  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.12, 50, 0, Math.PI * 2); ctx.fill()
+  ctx.globalAlpha = 1
+
+  // Clouds
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'
+    const cx = ((S.frame * 0.3 + i * W / 3) % (W + 100)) - 50
+    ctx.beginPath()
+    ctx.ellipse(cx, H * 0.1 + i * 30, 40 + i * 10, 18, 0, 0, Math.PI * 2); ctx.fill()
+    ctx.beginPath()
+    ctx.ellipse(cx + 25, H * 0.1 + i * 30 - 5, 30, 14, 0, 0, Math.PI * 2); ctx.fill()
+  }
+
+  // Sand/ground
+  ctx.fillStyle = '#f5d08a'
+  ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y)
+  ctx.fillStyle = '#e8c06a'
+  ctx.fillRect(0, GROUND_Y, W, 3)
+
+  // Beach details
+  ctx.fillStyle = 'rgba(56,189,248,0.15)'
+  ctx.fillRect(0, GROUND_Y + (H - GROUND_Y) * 0.7, W, (H - GROUND_Y) * 0.3)
+
+  // Net
+  ctx.fillStyle = '#f8fafc'
+  ctx.fillRect(NET_X - 3, NET_TOP, 6, GROUND_Y - NET_TOP)
+  // Net mesh
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+  ctx.lineWidth = 1
+  for (let ny = NET_TOP; ny < GROUND_Y; ny += 12) {
+    ctx.beginPath(); ctx.moveTo(NET_X - 15, ny); ctx.lineTo(NET_X + 15, ny); ctx.stroke()
+  }
+  // Net post
+  ctx.fillStyle = '#9ca3af'
+  ctx.fillRect(NET_X - 4, NET_TOP - 8, 8, 8)
+
+  // Draw ducks
+  drawDuck(S.px, S.py, '#fbbf24', '#f59e0b', S.pvx > 0 ? 1 : S.pvx < 0 ? -1 : 1, '🧢') // player yellow
+  drawDuck(S.cx, S.cy, '#ef4444', '#dc2626', S.cvx > 0 ? 1 : S.cvx < 0 ? -1 : -1, '🎀') // cpu red
+
+  // Draw ball
+  ctx.fillStyle = '#f8fafc'
+  ctx.beginPath(); ctx.arc(S.ballX, S.ballY, BALL_R, 0, Math.PI * 2); ctx.fill()
+  ctx.strokeStyle = '#94a3b8'
+  ctx.lineWidth = 2
+  ctx.stroke()
+  // Ball stripe
+  ctx.strokeStyle = '#3b82f6'
+  ctx.lineWidth = 1.5
+  ctx.beginPath(); ctx.arc(S.ballX, S.ballY, BALL_R - 2, -0.5, 0.5); ctx.stroke()
+  ctx.beginPath(); ctx.arc(S.ballX, S.ballY, BALL_R - 2, Math.PI - 0.5, Math.PI + 0.5); ctx.stroke()
+
+  // Ball shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'
+  ctx.beginPath()
+  ctx.ellipse(S.ballX, GROUND_Y + 2, BALL_R * 0.8, 4, 0, 0, Math.PI * 2)
+  ctx.fill()
+
+  // Score labels on court
+  ctx.font = '900 48px Fredoka One'
+  ctx.textAlign = 'center'
+  ctx.fillStyle = 'rgba(255,255,255,0.12)'
+  ctx.fillText(S.playerScore, W * 0.25, GROUND_Y - 30)
+  ctx.fillText(S.cpuScore, W * 0.75, GROUND_Y - 30)
+}
+
+function drawDuck(x, y, bodyColor, darkColor, facing, accessory) {
+  ctx.save()
+  ctx.translate(x, y)
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'
+  ctx.beginPath(); ctx.ellipse(0, 4, DUCK_W / 2, 6, 0, 0, Math.PI * 2); ctx.fill()
+  // Body
+  ctx.fillStyle = bodyColor
+  ctx.beginPath(); ctx.ellipse(0, -DUCK_H / 2, DUCK_W / 2, DUCK_H / 2, 0, 0, Math.PI * 2); ctx.fill()
+  // Belly
+  ctx.fillStyle = '#fef3c7'
+  ctx.beginPath(); ctx.ellipse(0, -DUCK_H / 2 + 6, DUCK_W / 2 - 8, DUCK_H / 2 - 8, 0, 0, Math.PI * 2); ctx.fill()
+  // Head
+  ctx.fillStyle = bodyColor
+  ctx.beginPath(); ctx.arc(facing * 14, -DUCK_H + 2, 16, 0, Math.PI * 2); ctx.fill()
+  // Eye
+  ctx.fillStyle = '#1c1917'
+  ctx.beginPath(); ctx.arc(facing * 20, -DUCK_H, 3.5, 0, Math.PI * 2); ctx.fill()
+  ctx.fillStyle = '#fff'
+  ctx.beginPath(); ctx.arc(facing * 21, -DUCK_H - 1, 1.5, 0, Math.PI * 2); ctx.fill()
+  // Beak
+  ctx.fillStyle = '#f97316'
+  ctx.beginPath()
+  ctx.moveTo(facing * 28, -DUCK_H + 2)
+  ctx.lineTo(facing * 36, -DUCK_H + 5)
+  ctx.lineTo(facing * 28, -DUCK_H + 8)
+  ctx.closePath(); ctx.fill()
+  // Accessory
+  ctx.font = '16px Arial'
+  ctx.textAlign = 'center'
+  ctx.fillText(accessory, facing * 10, -DUCK_H - 10)
+  // Wings (bob when moving)
+  const wingFlap = Math.sin(S.frame * 0.3) * 4
+  ctx.fillStyle = darkColor
+  ctx.beginPath()
+  ctx.ellipse(-facing * 12, -DUCK_H / 2 - 2, 10, 14 + wingFlap, facing * 0.3, 0, Math.PI * 2)
+  ctx.fill()
+  // Feet
+  ctx.fillStyle = '#f97316'
+  ctx.fillRect(-10, -4, 8, 4)
+  ctx.fillRect(4, -4, 8, 4)
+  ctx.restore()
+}
+
+// ═══════════════════════════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════════════════════════
+function showQuiz() {
+  S.quizActive = true
+  const q = pickQ()
+  document.getElementById('quiz-question').textContent = q.q
+  const choicesEl = document.getElementById('quiz-choices')
+  choicesEl.innerHTML = ''
+  const choices = [q.ans, ...q.wrong].sort(() => Math.random() - 0.5)
+  let answered = false
+  choices.forEach(c => {
+    const btn = document.createElement('button')
+    btn.className = 'qbtn'
+    btn.textContent = c
+    btn.onclick = () => {
+      if (answered) return; answered = true
+      if (c === q.ans) {
+        btn.classList.add('correct')
+        S.correctAnswers++
+        S.playerScore++ // bonus point
+        sfxScore()
+        updateScoreDisplay()
+      } else {
+        btn.classList.add('wrong')
+        S.wrongAnswers++
+        choicesEl.querySelectorAll('.qbtn').forEach(b => { if (b.textContent === q.ans) b.classList.add('correct') })
+      }
+      setTimeout(() => {
+        document.getElementById('quiz-panel').classList.remove('show')
+        S.quizActive = false
+        resetBall(S.ballServe)
+        resetPositions()
+      }, 800)
+    }
+    choicesEl.appendChild(btn)
+  })
+  document.getElementById('quiz-panel').classList.add('show')
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SCORE & END
+// ═══════════════════════════════════════════════════════════
+function updateScoreDisplay() {
+  document.getElementById('score-display').textContent = `${S.playerScore} — ${S.cpuScore}`
+}
+
+function endGame() {
+  S.running = false; S.gameOver = true
+  const diff = S.playerScore - S.cpuScore
+  const stars = diff >= 5 ? 5 : diff >= 3 ? 4 : diff >= 1 ? 3 : diff >= 0 ? 2 : 1
+  try { sessionStorage.setItem('g20Result', JSON.stringify({ stars, level: cfg.level })) } catch(_){}
+
+  const won = S.playerScore > S.cpuScore
+  setTimeout(() => {
+    const nextLevel = cfg.level < 30 ? () => {
+      try { sessionStorage.setItem('g20Config', JSON.stringify({ level: cfg.level + 1 })) } catch(_){}
+      location.reload()
+    } : null
+    GameModal.show({
+      emoji: won ? '🏆' : '🦆',
+      title: won ? 'Kamu Menang!' : 'Coba Lagi!',
+      stars,
+      msg: `Skor: ${S.playerScore} — ${S.cpuScore}`,
+      onNext: won ? nextLevel : null,
+      onAgain: () => location.reload(),
+      onBack: () => goBack()
+    })
+  }, 500)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════════
+function startGame() {
+  if (S.started) return
+  ensureAudio()
+  S.started = true; S.running = true
+  document.getElementById('start-overlay').classList.add('hidden')
+  resetPositions()
+  resetBall('player')
+  updateScoreDisplay()
+}
+
+// Touch controls
+document.getElementById('btn-left').addEventListener('touchstart', e => { e.preventDefault(); S.moveLeft = true })
+document.getElementById('btn-left').addEventListener('touchend', e => { e.preventDefault(); S.moveLeft = false })
+document.getElementById('btn-right').addEventListener('touchstart', e => { e.preventDefault(); S.moveRight = true })
+document.getElementById('btn-right').addEventListener('touchend', e => { e.preventDefault(); S.moveRight = false })
+document.getElementById('btn-jump').addEventListener('touchstart', e => { e.preventDefault(); S.jumpPressed = true })
+
+// Mouse fallback
+document.getElementById('btn-left').addEventListener('mousedown', () => S.moveLeft = true)
+document.getElementById('btn-left').addEventListener('mouseup', () => S.moveLeft = false)
+document.getElementById('btn-right').addEventListener('mousedown', () => S.moveRight = true)
+document.getElementById('btn-right').addEventListener('mouseup', () => S.moveRight = false)
+document.getElementById('btn-jump').addEventListener('mousedown', () => S.jumpPressed = true)
+
+// Keyboard
+window.addEventListener('keydown', e => {
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') S.moveLeft = true
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') S.moveRight = true
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); S.jumpPressed = true }
+})
+window.addEventListener('keyup', e => {
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') S.moveLeft = false
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') S.moveRight = false
+})
+
+// Start overlay
+document.getElementById('start-overlay').addEventListener('pointerdown', startGame)
+
+// Navigation
+function goBack() { window.location.replace('../index.html') }
+
+// Start game loop
+requestAnimationFrame(gameLoop)
+</script>
+</body>
+</html>

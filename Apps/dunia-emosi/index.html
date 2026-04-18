@@ -6176,6 +6176,14 @@ body { background: #0a0a1a !important; }
             <div class="wmap-node-name">Pokemon Birds</div>
             <div class="wmap-node-stars" id="gstars-19-lbl"></div>
           </div>
+          <!-- G20: Ducky Volley -->
+          <div class="wmap-node" id="gtile-20" onclick="playClick();openLevelSelect(20)" title="Ducky Volley">
+            <div class="wmap-node-bldg" style="background:linear-gradient(145deg,#0369A1,#38BDF8);">
+              <span class="wn-icon">🏐</span>
+            </div>
+            <div class="wmap-node-name">Ducky Volley</div>
+            <div class="wmap-node-stars" id="gstars-20-lbl"></div>
+          </div>
         </div>
       </div><!-- end zone mobil -->
 
@@ -8024,6 +8032,7 @@ const GAME_META = {
   17:{icon:'🌉',name:'Jembatan Goyang'},
   18:{icon:'🏛️',name:'Museum Ambarawa'},
   19:{icon:'🐦',name:'Pokemon Birds'},
+  20:{icon:'🏐',name:'Ducky Volley'},
   '13c':{icon:'🏅',name:'Gym Huruf & Suara'}
 }
 
@@ -8699,7 +8708,8 @@ const GAME_INFO = {
   11: { desc:'Uji pengetahuan sains — tumbuhan, hewan, dan alam semesta!', grad:'rgba(56,189,248,0.35)', glow:'rgba(56,189,248,0.5)' },
   12: { desc:'Tebak nama hewan dari siluet bayangannya yang tersembunyi!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' },
   13: { desc:'Kalahkan wild Pokemon dengan menjawab soal matematika — dan evolusi!', grad:'rgba(249,115,22,0.35)', glow:'rgba(249,115,22,0.5)' },
-  19: { desc:'Terbangkan Pidgeot melewati rintangan dan jawab soal untuk menang!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' }
+  19: { desc:'Terbangkan Pidgeot melewati rintangan dan jawab soal untuk menang!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' },
+  20: { desc:'Main voli pantai dengan bebek lucu! Kalahkan lawan dan jawab soal!', grad:'rgba(56,189,248,0.35)', glow:'rgba(56,189,248,0.5)' }
 }
 
 // Progress storage
@@ -9020,17 +9030,17 @@ function openLevelSelect(gameNum) {
   // Progress bar
   const completed = gp.completed.length
   const totalStars = Object.values(gp.stars||{}).reduce((a,b)=>a+b,0)
-  const totalLevels = (state.currentGame === 13 || state.currentGame === 16) ? 40 : state.currentGame === 19 ? 30 : 20
+  const totalLevels = (state.currentGame === 13 || state.currentGame === 16) ? 40 : (state.currentGame === 19 || state.currentGame === 20) ? 30 : 20
   document.getElementById('level-prog-txt').textContent = `${completed} / ${totalLevels} level selesai`
   document.getElementById('level-prog-fill').style.width = (completed/totalLevels*100) + '%'
   document.getElementById('level-total-stars').textContent = '⭐ ' + totalStars
 
   // Per-tier dot colors + star count
-  const numTiers = (state.currentGame === 13 || state.currentGame === 16) ? 8 : state.currentGame === 19 ? 6 : 4
+  const numTiers = (state.currentGame === 13 || state.currentGame === 16) ? 8 : (state.currentGame === 19 || state.currentGame === 20) ? 6 : 4
   // Show/hide extended tiers
   for (let t = 5; t <= 8; t++) {
     const tc2 = document.getElementById('level-tier-'+t)
-    if (tc2) tc2.style.display = (state.currentGame === 13 || state.currentGame === 16 || state.currentGame === 19) ? '' : 'none'
+    if (tc2) tc2.style.display = (state.currentGame === 13 || state.currentGame === 16 || state.currentGame === 19 || state.currentGame === 20) ? '' : 'none'
   }
   for (let tier = 1; tier <= numTiers; tier++) {
     const dotsEl = document.getElementById('level-dots-'+tier)
@@ -9085,7 +9095,7 @@ function startGameWithLevel(levelNum) {
   document.querySelectorAll('.gh-level').forEach(el => { el.textContent = lvLabel })
   if(state.selectedLevel==='hard') checkAchievement('hard_mode')
   showScreen('screen-game' + state.currentGame)
-  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9,initGame10,initGame11,initGame12,initGame13,initGame14,initGame15,initGame16,initGame17,initGame18,initGame19]
+  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9,initGame10,initGame11,initGame12,initGame13,initGame14,initGame15,initGame16,initGame17,initGame18,initGame19,initGame20]
   inits[state.currentGame]()
 }
 
@@ -9269,7 +9279,7 @@ function buildMenuHeader() {
   // Update per-game best stars display on world map nodes
   try {
     const bestStars=JSON.parse(localStorage.getItem(pkey('best-stars'))||'{}')
-    const gameIds=[1,2,3,4,5,6,7,8,9,10,11,12,13,'13b','13c',14,15,16,17,18,19]
+    const gameIds=[1,2,3,4,5,6,7,8,9,10,11,12,13,'13b','13c',14,15,16,17,18,19,20]
     gameIds.forEach(g=>{
       const best=bestStars[g]||0
       const stars=best>0?'⭐'.repeat(Math.min(best,5)):''
@@ -13712,6 +13722,14 @@ window.addEventListener('pageshow', function() {
       const r = JSON.parse(g19Raw)
       sessionStorage.removeItem('g19Result'); sessionStorage.removeItem('g19Config')
       if (state.currentGame === 19) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
+    } catch(_) {}
+  }
+  const g20Raw = sessionStorage.getItem('g20Result')
+  if (g20Raw) {
+    try {
+      const r = JSON.parse(g20Raw)
+      sessionStorage.removeItem('g20Result'); sessionStorage.removeItem('g20Config')
+      if (state.currentGame === 20) { state.maxPossibleStars = 5; endGame(r.stars || 0) }
     } catch(_) {}
   }
 })
@@ -18268,6 +18286,13 @@ function initGame19() {
   const lv = state.selectedLevelNum || 1
   try { sessionStorage.setItem('g19Config', JSON.stringify({ level: lv })) } catch(_) {}
   window.location.href = 'games/g19-pixi.html'
+}
+
+function initGame20() {
+  battleBgmStop()
+  const lv = state.selectedLevelNum || 1
+  try { sessionStorage.setItem('g20Config', JSON.stringify({ level: lv })) } catch(_) {}
+  window.location.href = 'games/g20-pixi.html'
 }
 
 function initGame18() {
