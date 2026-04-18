@@ -88,6 +88,21 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:linear
 <audio id="wing-flap-sfx" src="../assets/Pokemon/sound/wing-flap.mp3" preload="auto" style="display:none"></audio>
 <audio id="game-bgm" preload="auto" loop style="display:none"></audio>
 
+<!-- Pause Overlay -->
+<div id="pause-overlay" style="position:fixed;inset:0;z-index:350;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(10,2,25,0.92);backdrop-filter:blur(8px)">
+  <div style="font-size:36px">⏸</div>
+  <div style="font-size:24px;font-weight:900;color:#fbbf24">PAUSE</div>
+  <div style="width:80%;max-width:300px;display:flex;flex-direction:column;gap:12px;margin:12px 0">
+    <label style="color:#e9d5ff;font-size:13px;display:flex;align-items:center;gap:8px">🔊 Master<input type="range" id="vol-master" min="0" max="100" value="80" style="flex:1;accent-color:#8b5cf6" oninput="updateVolumes()"></label>
+    <label style="color:#e9d5ff;font-size:13px;display:flex;align-items:center;gap:8px">🐦 Sayap<input type="range" id="vol-flap" min="0" max="100" value="80" style="flex:1;accent-color:#fbbf24" oninput="updateVolumes()"></label>
+    <label style="color:#e9d5ff;font-size:13px;display:flex;align-items:center;gap:8px">🎵 BGM<input type="range" id="vol-bgm" min="0" max="100" value="50" style="flex:1;accent-color:#22c55e" oninput="updateVolumes()"></label>
+  </div>
+  <div style="display:flex;gap:12px">
+    <button onclick="togglePause()" style="padding:12px 28px;border-radius:14px;border:2px solid #4ade80;background:rgba(34,197,94,0.3);color:#4ade80;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit">▶ Lanjut</button>
+    <button onclick="goBack()" style="padding:12px 28px;border-radius:14px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#e9d5ff;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit">🏠 Keluar</button>
+  </div>
+</div>
+
 <!-- Pokemon Bag Selector -->
 <div id="bag-overlay" style="position:fixed;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(10,2,25,0.95);backdrop-filter:blur(10px)">
   <div style="font-size:24px;font-weight:900;color:#fbbf24">🎒 Pilih Pokemon</div>
@@ -977,7 +992,7 @@ function flap() {
     try {
       const bgm=document.getElementById('game-bgm')
       bgm.src = cfg.level % 2 === 1 ? '../assets/Pokemon/sound/bgm-odd.mp3' : '../assets/Pokemon/sound/bgm-even.mp3'
-      bgm.volume=0.15; bgm.play().catch(()=>{})
+      bgm.volume=window._volBGM||0.5; bgm.play().catch(()=>{})
     } catch(_){}
     // Show Ash + Pikachu runners
     const ash = document.getElementById('ash-runner')
@@ -989,8 +1004,8 @@ function flap() {
   if (S.paused) return
 
   S.birdVY = FLAP_POWER
-  // Play wing flap sound on each tap (no synth beep)
-  try { const wf=document.getElementById('wing-flap-sfx'); wf.currentTime=0; wf.volume=0.6; wf.play().catch(()=>{}) } catch(_){}
+  // Play wing flap sound on each tap
+  try { const wf=document.getElementById('wing-flap-sfx'); wf.currentTime=0; wf.volume=window._volFlap||0.8; wf.play().catch(()=>{}) } catch(_){}
 
   // Wing flap visual (brief scale pulse)
   if (birdSprite) {
@@ -1063,9 +1078,20 @@ function togglePause() {
   S.running = !S.paused
   document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
   document.getElementById('status-text').textContent = S.paused ? 'PAUSE' : 'Terbang!'
-  // Pause/resume all audio
-  // wing flap is per-tap, no pause needed
+  document.getElementById('pause-overlay').style.display = S.paused ? 'flex' : 'none'
   try { const bgm=document.getElementById('game-bgm'); S.paused?bgm.pause():bgm.play().catch(()=>{}) } catch(_){}
+}
+
+// Volume controls
+window._volFlap = 0.8
+window._volBGM = 0.5
+function updateVolumes() {
+  const master = document.getElementById('vol-master').value / 100
+  const flap = document.getElementById('vol-flap').value / 100
+  const bgm = document.getElementById('vol-bgm').value / 100
+  window._volFlap = flap * master
+  window._volBGM = bgm * master
+  try { document.getElementById('game-bgm').volume = window._volBGM } catch(_){}
 }
 
 function goBack() {
