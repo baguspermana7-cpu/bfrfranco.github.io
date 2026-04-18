@@ -7715,8 +7715,23 @@ body { background: #0a0a1a !important; }
   </div>
 </div>
 
-<!-- PixiJS v8 — GPU-accelerated 2D renderer for battle FX, weather, evolution VFX -->
-<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+<!-- PixiJS v8 — loaded async, games init after it's ready -->
+<script>
+// Lazy-load PixiJS only when a game needs it
+window._pixiReady = false
+window._pixiCallbacks = []
+function loadPixiJS(cb) {
+  if (window._pixiReady && typeof PIXI !== 'undefined') { if (cb) cb(); return }
+  if (cb) window._pixiCallbacks.push(cb)
+  if (document.getElementById('pixi-loader')) return // already loading
+  var s = document.createElement('script')
+  s.id = 'pixi-loader'
+  s.src = 'https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js'
+  s.onload = function() { window._pixiReady = true; window._pixiCallbacks.forEach(function(fn){fn()}); window._pixiCallbacks = [] }
+  s.onerror = function() { console.warn('PixiJS CDN failed — games using GPU effects will fall back') }
+  document.head.appendChild(s)
+}
+</script>
 <script>
 window.onerror = function(msg, url, line, col, err) {
   console.error('GLOBAL ERROR:', msg, 'at line', line, err)
@@ -13006,8 +13021,8 @@ let g10State={}
 
 function initGame10(){
   battleBgmPlay()
-  // Init Pixi GPU canvas for battle FX (async, non-blocking)
-  PixiManager.init('g10-pixi-canvas').catch(()=>{})
+  // Load PixiJS if not ready, then init GPU canvas
+  loadPixiJS(function(){ PixiManager.init('g10-pixi-canvas').catch(()=>{}) })
   const p=state.players[state.currentPlayer]
   const _icon=document.getElementById('g10-player-icon'); if(_icon) _icon.textContent=p.animal
   document.getElementById('g10-stars').textContent='⭐ 0'
@@ -14602,7 +14617,7 @@ function initGame13() {
   const dbg = document.getElementById('g13-debug-err')
   if (dbg) dbg.style.display = 'none'
   // Init Pixi GPU canvas for evolution FX
-  PixiManager.init('g13-pixi-canvas').catch(()=>{})
+  loadPixiJS(function(){ PixiManager.init('g13-pixi-canvas').catch(()=>{}) })
   try {
     _initGame13Impl()
   } catch(e) {
@@ -15410,7 +15425,7 @@ window.exitGame13b = exitGame13b
 function initGame13b() {
   battleBgmPlay()
   // Init Pixi GPU canvas for aura rings + combo text
-  PixiManager.init('g13b-pixi-canvas').catch(()=>{})
+  loadPixiJS(function(){ PixiManager.init('g13b-pixi-canvas').catch(()=>{}) })
 
   // Random background: mobile vs pc based on viewport width
   const isMobile = window.innerWidth < 768
