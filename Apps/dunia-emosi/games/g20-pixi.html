@@ -611,31 +611,46 @@ function updateCrab(dt){
     }
   }
 }
+let crabQMark = null
 function drawCrab(){
   crabGfx.clear()
+  if(crabQMark){crabQMark.visible=false}
   if(!S.crabActive)return
   const cx=S.crabX, cy=GROUND_Y+2
   // Body
   crabGfx.ellipse(cx,cy,12,8).fill(0xef4444)
-  // Claws
-  crabGfx.circle(cx-16,cy-2,5).fill(0xf87171)
-  crabGfx.circle(cx+16,cy-2,5).fill(0xf87171)
-  // Eyes
-  crabGfx.circle(cx-4,cy-8,3).fill(0x1c1917)
-  crabGfx.circle(cx+4,cy-8,3).fill(0x1c1917)
-  crabGfx.circle(cx-3,cy-9,1.5).fill(0xffffff)
-  crabGfx.circle(cx+5,cy-9,1.5).fill(0xffffff)
-  // Legs
+  crabGfx.ellipse(cx,cy-1,10,6).fill({color:0xf87171,alpha:0.5})
+  // Claws (animated pinch)
+  const pinch=Math.sin(S.frame*0.15)*2
+  crabGfx.circle(cx-16-pinch,cy-2,5).fill(0xf87171)
+  crabGfx.circle(cx-18-pinch,cy-4,3).fill(0xfca5a5)
+  crabGfx.circle(cx+16+pinch,cy-2,5).fill(0xf87171)
+  crabGfx.circle(cx+18+pinch,cy-4,3).fill(0xfca5a5)
+  // Eyes on stalks
+  crabGfx.rect(cx-5,cy-12,2,5).fill(0xef4444)
+  crabGfx.rect(cx+3,cy-12,2,5).fill(0xef4444)
+  crabGfx.circle(cx-4,cy-13,3).fill(0x1c1917)
+  crabGfx.circle(cx+4,cy-13,3).fill(0x1c1917)
+  crabGfx.circle(cx-3,cy-14,1.5).fill(0xffffff)
+  crabGfx.circle(cx+5,cy-14,1.5).fill(0xffffff)
+  // Legs (walking animation)
   for(let i=-2;i<=2;i++){
     if(i===0)continue
-    crabGfx.rect(cx+i*6,cy+4,2,4).fill({color:0xef4444,alpha:0.6})
+    const legY=Math.sin(S.frame*0.3+i)*2
+    crabGfx.rect(cx+i*5,cy+3+legY,2,5).fill({color:0xdc2626,alpha:0.6})
   }
-  // Powerup indicator (? above crab)
-  crabGfx.circle(cx,cy-18,8).fill({color:0xfbbf24,alpha:0.8})
-  // ?
-  const qt=new PIXI.Text({text:'?',style:{fontSize:12,fontWeight:'900',fill:0x1c1917,fontFamily:'Arial'}})
-  qt.anchor.set(0.5); qt.x=cx; qt.y=cy-19
-  crabGfx.addChild(qt)
+  // Powerup bubble
+  const bobY=Math.sin(S.frame*0.1)*3
+  crabGfx.circle(cx,cy-24+bobY,9).fill({color:0xfbbf24,alpha:0.85})
+  crabGfx.circle(cx,cy-24+bobY,9).stroke({color:0xf59e0b,width:1.5})
+  crabGfx.circle(cx,cy-24+bobY,4).fill(0xffffff)
+  // Use separate Text for ?
+  if(!crabQMark){
+    crabQMark=new PIXI.Text({text:'?',style:{fontSize:11,fontWeight:'900',fill:0x92400e,fontFamily:'Arial'}})
+    crabQMark.anchor.set(0.5)
+    entityLayer.addChild(crabQMark)
+  }
+  crabQMark.x=cx; crabQMark.y=cy-25+bobY; crabQMark.visible=true
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -718,6 +733,10 @@ function showQuiz(){
 // ═══════════════════════════════════════════════════════════
 function updateHUD(){
   document.getElementById('score-display').textContent=`${S.pScore} — ${S.cScore}`
+  const pwMap={big:'🔴 Bola Besar',speed:'🔵 Turbo',jump:'🟢 Super Lompat',slow:'🟡 Slow Ball'}
+  const rt=document.getElementById('round-text')
+  if(S.powerup) rt.textContent=`${pwMap[S.powerup]} ${Math.ceil(S.powerupTimer)}s`
+  else rt.textContent=`Round ${S.round}/${TOTAL_ROUNDS}`
 }
 
 // ═══════════════════════════════════════════════════════════
