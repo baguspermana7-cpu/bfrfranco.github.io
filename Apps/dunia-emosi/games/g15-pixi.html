@@ -239,7 +239,7 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 const cfg = (() => { try { return JSON.parse(sessionStorage.getItem('g15Config') || '{}'); } catch { return {}; } })();
 const LEVEL = Math.max(1, Math.min(30, cfg.level || 1));
 
-function goBack() { window.location.replace('../index.html'); }
+function goBack() { history.back(); }
 function togglePause() {
   gamePaused = !gamePaused;
   document.getElementById('btn-pause').textContent = gamePaused ? '▶' : '⏸';

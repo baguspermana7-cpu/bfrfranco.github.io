@@ -63,6 +63,7 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0d102
     <div id="level-text"></div>
     <div id="status-text">Bersiap...</div>
   </div>
+  <button id="btn-bag" onclick="openBag()" style="pointer-events:all;background:rgba(251,191,36,0.2);border:1.5px solid rgba(251,191,36,0.4);border-radius:10px;color:#fbbf24;padding:5px 8px;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0">🎒</button>
   <button id="btn-pause" onclick="togglePause()" style="pointer-events:all;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;color:#fff;padding:6px 10px;font-size:15px;cursor:pointer;font-family:inherit;flex-shrink:0">⏸</button>
   <div id="hud-lives">⭐ 0</div>
   <div id="pipe-progress">🟢 0/0</div>
@@ -85,6 +86,13 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0d102
 <img id="pika-runner" src="../assets/Pokemon/trainer/pikachu-run.webp"
   style="position:fixed;z-index:39;pointer-events:none;height:2vh;width:auto;bottom:13.5%;left:2%;image-rendering:auto;display:none;">
 
+<!-- Pokemon Bag Selector -->
+<div id="bag-overlay" style="position:fixed;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(10,2,25,0.95);backdrop-filter:blur(10px)">
+  <div style="font-size:24px;font-weight:900;color:#fbbf24">🎒 Pilih Pokemon</div>
+  <div id="bag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;width:90%;max-width:400px;max-height:60vh;overflow-y:auto;padding:10px"></div>
+  <button onclick="closeBag()" style="padding:10px 24px;border-radius:14px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#e9d5ff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Tutup</button>
+</div>
+
 <div id="start-overlay">
   <div id="start-icon">🐦</div>
   <div id="start-title">Pokemon Birds</div>
@@ -98,9 +106,38 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0d102
 // ═══════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════
-const cfg = { level: 1 }
+const cfg = { level: 1, pokemon: 0 }
 try { const s = sessionStorage.getItem('g19Config'); if (s) Object.assign(cfg, JSON.parse(s)) } catch(_){}
 document.getElementById('level-text').textContent = `Level ${cfg.level}`
+
+// ── POKEMON ROSTER ──
+const G19_POKEMON = [
+  // 2-stage evolution (Pidgeotto → Pidgeot)
+  { name:'Pidgeotto', evo:[
+    {name:'Pidgeotto',src:'../assets/Pokemon/g19/pidgeotto.webp',mirror:true,scale:0.8},
+    {name:'Pidgeot',src:'../assets/Pokemon/g19/pidgeot.webp',mirror:true,scale:1.3}
+  ]},
+  // 3-stage evolution (Zubat → Golbat → Crobat)
+  { name:'Zubat', evo:[
+    {name:'Zubat',src:'../assets/Pokemon/g19/zubat2.webp',mirror:false,scale:0.7},
+    {name:'Golbat',src:'../assets/Pokemon/g19/golbat-flying.webp',mirror:false,scale:1.0},
+    {name:'Crobat',src:'../assets/Pokemon/g19/shiny-crobat.webp',mirror:false,scale:1.2}
+  ]},
+  // 2-stage evolution (Gastly → Haunter)
+  { name:'Gastly', evo:[
+    {name:'Gastly',src:'../assets/Pokemon/g19/gastly.webp',mirror:false,scale:0.7},
+    {name:'Haunter',src:'../assets/Pokemon/g19/haunter.webp',mirror:false,scale:1.0}
+  ]},
+  // No evolution — stay same throughout
+  { name:'Aerodactyl', evo:[{name:'Aerodactyl',src:'../assets/Pokemon/g19/aerodactyl.webp',mirror:false,scale:1.1}]},
+  { name:'Butterfree', evo:[{name:'Butterfree',src:'../assets/Pokemon/g19/butterfree-cute.webp',mirror:false,scale:0.8}]},
+  { name:'Charizard', evo:[{name:'Charizard',src:'../assets/Pokemon/g19/charizard-flying.webp',mirror:false,scale:1.3}]},
+  { name:'Dragonite', evo:[{name:'Dragonite',src:'../assets/Pokemon/g19/dragonite.webp',mirror:false,scale:1.0}]},
+  { name:'Flygon', evo:[{name:'Flygon',src:'../assets/Pokemon/g19/flygon-pokemon.webp',mirror:false,scale:1.1}]},
+  { name:'Gyarados', evo:[{name:'Gyarados',src:'../assets/Pokemon/g19/gyarados.webp',mirror:false,scale:1.2}]},
+  { name:'Noivern', evo:[{name:'Noivern',src:'../assets/Pokemon/g19/noivern-flying.webp',mirror:false,scale:1.1}]},
+]
+let selectedPokemon = cfg.pokemon || 0
 document.getElementById('start-level').textContent = `Level ${cfg.level}`
 
 // ═══════════════════════════════════════════════════════════
@@ -459,9 +496,10 @@ async function createBird() {
   // Use DOM <img> for animated GIF with transparency (PixiJS can't do animated GIF)
   const birdImg = document.createElement('img')
   birdImg.id = 'bird-gif'
-  birdImg.src = '../assets/Pokemon/birds/pidgeotto-r2.webp' // Pidgeotto (initial, smaller)
-  const initSize = Math.round(BIRD_SIZE * 0.8) // Pidgeotto is 80% size
-  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+initSize+'px,15vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;transform:scaleX(-1);'
+  const initPoke = G19_POKEMON[selectedPokemon].evo[0]
+  birdImg.src = initPoke.src
+  const initSize = Math.round(BIRD_SIZE * initPoke.scale)
+  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+initSize+'px,'+Math.round(initPoke.scale*15)+'vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'+(initPoke.mirror?'transform:scaleX(-1);':'')
   birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
   document.body.appendChild(birdImg)
   window._birdImg = birdImg
@@ -556,7 +594,13 @@ function gameLoop(ticker) {
   }
 
   // Evolution at 50% progress
-  if (!S.evolveTriggered && S.pipesCleared >= Math.floor(S.totalPipes / 2) && S.totalPipes > 2) {
+  // Evolution triggers at 33% and 66% for 3-stage, 50% for 2-stage, never for 1-stage
+  const poke = G19_POKEMON[selectedPokemon]
+  const maxEvo = poke.evo.length - 1
+  const currentEvo = S.evoStage || 0
+  const progress = S.pipesCleared / S.totalPipes
+  const nextEvoAt = maxEvo >= 2 ? (currentEvo === 0 ? 0.33 : 0.66) : 0.5
+  if (currentEvo < maxEvo && progress >= nextEvoAt && !S.evolveTriggered && S.totalPipes > 2) {
     S.evolveTriggered = true
     triggerEvolution()
   }
@@ -813,21 +857,19 @@ async function triggerEvolution() {
     birdGlow.tint = 0xffffff
   }
 
-  // After 1.5s, swap DOM bird image to evolved form
+  // After 1.5s, evolve to next stage using roster
+  S.evoStage = (S.evoStage || 0) + 1
   setTimeout(async () => {
-    if (window._birdImg) {
-      window._birdImg.src = '../assets/Pokemon/birds/pidgeot-r2.webp' // Pidgeot (evolved, bigger)
-      window._birdImg.style.width = 'min(' + Math.round(BIRD_SIZE * 1.3) + 'px,22vw)' // 1.3x size
-      window._birdImg.style.filter = 'drop-shadow(0 0 14px rgba(251,191,36,0.8))'
-    }
+    applyPokemon(S.evoStage)
 
     spawnFloatingText('EVOLUSI!', BIRD_X, S.birdY - 40, 0xfbbf24)
     flashScreen('#fbbf24')
 
     setTimeout(() => {
       S.paused = false
-      // Post-evolution: 30% slower speed, much easier
-      PIPE_SPEED = PIPE_SPEED * 0.7
+      S.evolveTriggered = false // allow next evolution for 3-stage Pokemon
+      // Post-evolution: slightly slower speed
+      PIPE_SPEED = PIPE_SPEED * 0.85
       document.getElementById('status-text').textContent = 'Pidgeot Berevolusi!'
     }, 800)
   }, 1500)
@@ -877,6 +919,47 @@ window.addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════════════
+// ── BAG SYSTEM ──
+function openBag() {
+  if (S.started) { togglePause(); if (!S.paused) return } // pause if running
+  const grid = document.getElementById('bag-grid')
+  grid.innerHTML = ''
+  G19_POKEMON.forEach((p, i) => {
+    const card = document.createElement('div')
+    card.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border-radius:12px;border:2px solid '+(i===selectedPokemon?'#fbbf24':'rgba(255,255,255,0.15)')+';background:'+(i===selectedPokemon?'rgba(251,191,36,0.15)':'rgba(255,255,255,0.05)')+';cursor:pointer'
+    const img = document.createElement('img')
+    img.src = p.evo[0].src
+    img.style.cssText = 'width:60px;height:60px;object-fit:contain;'+(p.evo[0].mirror?'transform:scaleX(-1);':'')
+    card.appendChild(img)
+    const name = document.createElement('div')
+    name.style.cssText = 'font-size:10px;color:#e9d5ff;font-weight:700;text-align:center'
+    name.textContent = p.name
+    card.appendChild(name)
+    const evoLabel = document.createElement('div')
+    evoLabel.style.cssText = 'font-size:8px;color:#a78bfa'
+    evoLabel.textContent = p.evo.length > 2 ? '3x Evolusi' : p.evo.length > 1 ? '2x Evolusi' : 'Tetap'
+    card.appendChild(evoLabel)
+    card.onclick = () => { selectedPokemon = i; applyPokemon(0); closeBag() }
+    grid.appendChild(card)
+  })
+  document.getElementById('bag-overlay').style.display = 'flex'
+}
+function closeBag() { document.getElementById('bag-overlay').style.display = 'none' }
+
+function applyPokemon(evoStage) {
+  const p = G19_POKEMON[selectedPokemon]
+  const stage = Math.min(evoStage, p.evo.length - 1)
+  const evo = p.evo[stage]
+  if (window._birdImg) {
+    window._birdImg.src = evo.src
+    const sz = Math.round(BIRD_SIZE * evo.scale)
+    window._birdImg.style.width = 'min(' + sz + 'px,' + Math.round(evo.scale * 15) + 'vw)'
+    window._birdImg.style.transform = evo.mirror ? 'scaleX(-1)' : ''
+    window._birdImg.style.filter = evoStage > 0 ? 'drop-shadow(0 0 12px rgba(251,191,36,0.7))' : 'drop-shadow(0 0 10px rgba(196,181,253,0.6))'
+  }
+  document.getElementById('status-text').textContent = evoStage > 0 ? evo.name + ' Berevolusi!' : 'Terbang!'
+}
+
 function togglePause() {
   if (!S.started || S.gameOver) return
   S.paused = !S.paused
@@ -885,7 +968,7 @@ function togglePause() {
   document.getElementById('status-text').textContent = S.paused ? 'PAUSE' : 'Terbang!'
 }
 
-function goBack() { S.running = false; window.location.replace('../index.html') }
+function goBack() { S.running = false; history.back() }
 
 // Resize
 window.addEventListener('resize', () => {
