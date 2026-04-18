@@ -201,10 +201,10 @@ const MAX_FALL = 9
 const BIRD_SIZE = 104 // pidgeot initial size (1.3x of 80)
 const PIPE_WIDTH = 68
 const PIPE_COUNT = 10 + Math.min(Math.floor((cfg.level - 1) / 6), 5)
-const GAP_SIZE = Math.max(130, 220 - (cfg.level - 1) * 3) // wider gaps for bigger bird
-const GAP_SIZE_EVO = Math.min(GAP_SIZE * 1.4, 260)
+const GAP_SIZE = Math.max(150, 250 - (cfg.level - 1) * 3) // 20% wider gaps
+const GAP_SIZE_EVO = Math.min(GAP_SIZE * 1.4, 280)
 let PIPE_SPEED = 2.1 + (cfg.level - 1) * 0.14
-const PIPE_SPACING = Math.max(280, 380 - (cfg.level - 1) * 3) // wider spacing for bigger bird
+const PIPE_SPACING = Math.max(340, 450 - (cfg.level - 1) * 3) // 20% wider spacing
 
 let W, H, GROUND_Y, BIRD_X
 let app, birdContainer, birdSprite, birdGlow, worldContainer, bgContainer, groundContainer
@@ -453,7 +453,7 @@ async function createBird() {
   // Use DOM <img> for animated GIF with transparency (PixiJS can't do animated GIF)
   const birdImg = document.createElement('img')
   birdImg.id = 'bird-gif'
-  birdImg.src = '../assets/Pokemon/birds/char1-right.webp' // Pidgeotto (initial, smaller)
+  birdImg.src = '../assets/Pokemon/birds/pidgeotto-r2.webp' // Pidgeotto (initial, smaller)
   const initSize = Math.round(BIRD_SIZE * 0.8) // Pidgeotto is 80% size
   birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+initSize+'px,15vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
   birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
@@ -798,7 +798,7 @@ async function triggerEvolution() {
   // After 1.5s, swap DOM bird image to evolved form
   setTimeout(async () => {
     if (window._birdImg) {
-      window._birdImg.src = '../assets/Pokemon/birds/char2-right.webp' // Pidgeot (evolved, bigger)
+      window._birdImg.src = '../assets/Pokemon/birds/pidgeot-r2.webp' // Pidgeot (evolved, bigger)
       window._birdImg.style.width = 'min(' + Math.round(BIRD_SIZE * 1.3) + 'px,22vw)' // 1.3x size
       window._birdImg.style.filter = 'drop-shadow(0 0 14px rgba(251,191,36,0.8))'
     }
