@@ -453,8 +453,9 @@ async function createBird() {
   // Use DOM <img> for animated GIF with transparency (PixiJS can't do animated GIF)
   const birdImg = document.createElement('img')
   birdImg.id = 'bird-gif'
-  birdImg.src = '../assets/Pokemon/birds/pidgeot-right.webp'
-  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+BIRD_SIZE+'px,18vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
+  birdImg.src = '../assets/Pokemon/birds/char1-right.webp' // Pidgeotto (initial, smaller)
+  const initSize = Math.round(BIRD_SIZE * 0.8) // Pidgeotto is 80% size
+  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:min('+initSize+'px,15vw);height:auto;filter:drop-shadow(0 0 10px rgba(196,181,253,0.6));image-rendering:auto;transition:top 0.05s linear;'
   birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
   document.body.appendChild(birdImg)
   window._birdImg = birdImg
@@ -797,9 +798,9 @@ async function triggerEvolution() {
   // After 1.5s, swap DOM bird image to evolved form
   setTimeout(async () => {
     if (window._birdImg) {
-      window._birdImg.src = '../assets/Pokemon/birds/pidgeotto-right.webp'
-      window._birdImg.style.width = 'min(' + Math.round(BIRD_SIZE * 0.8) + 'px,15vw)' // 80% of pidgeot
-      window._birdImg.style.filter = 'drop-shadow(0 0 12px rgba(251,191,36,0.7))'
+      window._birdImg.src = '../assets/Pokemon/birds/char2-right.webp' // Pidgeot (evolved, bigger)
+      window._birdImg.style.width = 'min(' + Math.round(BIRD_SIZE * 1.3) + 'px,22vw)' // 1.3x size
+      window._birdImg.style.filter = 'drop-shadow(0 0 14px rgba(251,191,36,0.8))'
     }
 
     spawnFloatingText('EVOLUSI!', BIRD_X, S.birdY - 40, 0xfbbf24)
