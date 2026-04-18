@@ -673,8 +673,9 @@ function gameLoop(ticker) {
   }
 
   // Check level completion
-  const allDone = S.pipes.every(p => p.passed || p.removing || !p.topGfx.visible)
-  if (allDone && S.pipesCleared >= S.totalPipes) showWin()
+  // Win check: all pipes passed/removed/off-screen OR pipesCleared reached total
+  const allDone = S.pipes.every(p => p.passed || p.removing || !p.topGfx.visible || p.x < -200)
+  if (allDone || S.pipesCleared >= S.totalPipes) showWin()
 
   updateHUD()
 
@@ -851,7 +852,8 @@ function updateHUD() {
   document.getElementById('hud-lives').textContent = `⭐ ${S.correctAnswers}`
   document.getElementById('pipe-progress').textContent = `🟢 ${S.pipesCleared}/${S.totalPipes}`
   if (S.running && !S.paused) {
-    document.getElementById('status-text').textContent = S.evolved ? 'Pidgeot Berevolusi!' : 'Terbang!'
+    const evoName = G19_POKEMON[selectedPokemon]?.evo[S.evoStage||0]?.name || 'Pokemon'
+  document.getElementById('status-text').textContent = S.evolved ? evoName + ' Berevolusi!' : 'Terbang!'
   }
 }
 
@@ -927,7 +929,8 @@ async function triggerEvolution() {
       S.evolveTriggered = false // allow next evolution for 3-stage Pokemon
       // Post-evolution: slightly slower speed
       PIPE_SPEED = PIPE_SPEED * 0.85
-      document.getElementById('status-text').textContent = 'Pidgeot Berevolusi!'
+      const eName = G19_POKEMON[selectedPokemon]?.evo[S.evoStage||0]?.name || 'Pokemon'
+      document.getElementById('status-text').textContent = eName + ' Berevolusi!'
     }, 800)
   }, 1500)
 }
@@ -978,7 +981,11 @@ window.addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════
 // ── BAG SYSTEM ──
 function openBag() {
-  if (S.started) { togglePause(); if (!S.paused) return } // pause if running
+  // Always pause when opening bag (don't toggle)
+  if (S.started && !S.paused) {
+    S.paused = true; S.running = false
+    document.getElementById('btn-pause').textContent = '▶'
+  }
   const grid = document.getElementById('bag-grid')
   grid.innerHTML = ''
   G19_POKEMON.forEach((p, i) => {
