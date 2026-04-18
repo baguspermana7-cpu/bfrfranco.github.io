@@ -1555,7 +1555,11 @@ const OBS_EMOJIS = ['🪨','🐄','🐔','🌵','⚠️','🛑','🪵','🧱']
 const OBS_SIZE = 44
 
 function spawnObstacle() {
-  const lane = Math.floor(Math.random() * LANE_COUNT)
+  // Avoid spawning on AI train lanes to prevent invisible collisions
+  const aiLanes = S.aiTrains.map(a => a.lane)
+  let lane = Math.floor(Math.random() * LANE_COUNT)
+  let tries = 0
+  while (aiLanes.includes(lane) && tries < 5) { lane = Math.floor(Math.random() * LANE_COUNT); tries++ }
   const W = app.screen.width
   const emoji = OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)]
 
