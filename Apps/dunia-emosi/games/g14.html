@@ -860,7 +860,19 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         for(let i=0;i<4;i++)rr(6+i*16,CH*.18,12,CH*.2,2);
         ctx.fillStyle='#dbeafe';
         for(let i=0;i<4;i++)rr(6+i*16,CH*.5,12,CH*.18,2);
+        // Door markings
+        ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=0.5;
+        ctx.strokeRect(28,CH*.16,6,CH*.6);ctx.strokeRect(50,CH*.16,6,CH*.6);
+        // Inter-car connector (left end)
+        ctx.fillStyle='rgba(55,65,81,.4)';rr(1,CH*.22,3,CH*.5,1);
+        headlights(CW-5,CH*.38,2.5);taillights(3,CH*.44,1.5);
+        // Destination LED
+        ctx.fillStyle='#000';rr(6,CH*.68,12,3,1);
+        ctx.fillStyle='rgba(251,191,36,.5)';rr(7,CH*.69,10,2);
+        // AC unit
+        ctx.fillStyle='rgba(0,0,0,.08)';rr(14,CH*.1,20,3,1);
         panto(CW*.45,CH*.14);
+        numBoard(6,CH*.18,8,5);
         bwhl(18,bodyB,4.5);bwhl(CW-18,bodyB,4.5);
       },
     ][vi]();
@@ -894,9 +906,16 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         ctx.fillStyle=bodyC;rr(4,CH*.26,CW-16,CH*.48,5);
         ctx.fillStyle=bodyC;ctx.beginPath();ctx.ellipse(CW-12,CH*.5,14,CH*.24,0,0,Math.PI*2);ctx.fill();
         ctx.fillStyle=accC;rr(4,CH*.41,CW-12,CH*.12);
+        // Nose highlight
+        ctx.fillStyle='rgba(255,255,255,.06)';rr(CW-22,CH*.28,10,CH*.12,3);
         ctx.fillStyle='#bfdbfe';rr(CW-26,CH*.3,14,CH*.22,3);
         ctx.fillStyle='rgba(219,234,254,.5)';
         for(let i=0;i<2;i++)rr(8+i*20,CH*.3,16,CH*.22,3);
+        headlights(CW-2,CH*.42,3);taillights(6,CH*.48,2);
+        handrail(CW-6,CH*.58,8);
+        rivets(6,CH*.27,6,7);
+        numBoard(7,CH*.28,8,5);
+        coupling(0,CH*.52,-1);
         bwhl(20,bodyB,4.5);bwhl(CW-20,bodyB,4.5);
       },
       ()=>{ // v3: Boxcab — cabs at both ends
@@ -923,6 +942,16 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
         ctx.fillStyle='#bfdbfe';rr(CW-26,CH*.29,16,CH*.2,2);
         ctx.fillStyle='rgba(219,234,254,.5)';
         for(let i=0;i<3;i++)rr(6+i*18,CH*.3,14,CH*.2,3);
+        headlights(CW-1,CH*.44,3);headlights(CW-1,CH*.56,2);
+        taillights(6,CH*.5,2);
+        // Dynamic brake blister
+        ctx.fillStyle='rgba(0,0,0,.12)';rr(20,CH*.21,16,3,1);
+        // Horn + bell
+        ctx.fillStyle='#d97706';rr(CW-20,CH*.22,3,CH*.06,1);
+        handrail(CW-4,CH*.6,6);
+        rivets(6,CH*.25,10,5);
+        numBoard(7,CH*.27);
+        coupling(0,CH*.52,-1);
         bwhl(20,bodyB,4.5);bwhl(CW-20,bodyB,4.5);
       },
     ][vi]();
@@ -958,11 +987,25 @@ function drawTrainCard2d(canvas, bodyC, accC, catKey, v) {
       ctx.fillStyle=bodyC;rr(bX,CH*.26,bW,CH*.44,3);
       ctx.beginPath();ctx.ellipse(bX,CH*.48,5,CH*.22,0,0,Math.PI*2);ctx.fill();
       ctx.fillStyle=accC;rr(bX,CH*.28,bW,CH*.09);
+      // Boiler bands
+      for(let i=0;i<3;i++){ctx.fillStyle='rgba(255,255,255,.08)';rr(bX+bW*.25+i*bW*.2,CH*.26,1.5,CH*.44);}
       ctx.fillStyle='#9ca3af';ctx.beginPath();ctx.arc(bX+bW*.5,CH*.26,CH*.09,Math.PI,0);ctx.fill(); // dome
       ctx.fillStyle='#111';rr(bX+bW*.2,CH*.08,6,CH*.18);rr(bX+bW*.15,CH*.06,10,CH*.07,2);
       ctx.fillStyle='#6b7280';rr(bX+bW*.62,CH*.2,5,CH*.1,1);rr(bX+bW*.69,CH*.2,5,CH*.1,1); // safety valves
+      // Whistle + bell
+      ctx.fillStyle='#d97706';rr(bX+bW*.56,CH*.18,2,CH*.08);
       ctx.fillStyle=accC;rr(bX+bW-2,CH*.18,13,CH*.54,2);
       ctx.fillStyle='#e0f2fe';rr(bX+bW,CH*.24,10,CH*.24,2);
+      // Running board
+      ctx.fillStyle=accC;rr(bX-2,CH*.68,bW+4,2);
+      // Headlight
+      headlights(bX+2,CH*.38,2.5);
+      // Firebox glow
+      ctx.fillStyle='rgba(249,115,22,.12)';rr(bX+bW*.6,CH*.64,bW*.15,3);
+      // Connecting rods
+      ctx.fillStyle='rgba(156,163,175,.4)';rr(bX+bW*.28,tY-4,bW*.5,1.5);
+      // Cowcatcher
+      ctx.fillStyle='#374151';ctx.beginPath();ctx.moveTo(bX,CH*.62);ctx.lineTo(bX-5,tY);ctx.lineTo(bX,tY);ctx.closePath();ctx.fill();
       for(const f of[.28,.44,.6,.76]) whl(bX+bW*f,tY-2,CH*.17,'#292524',accC);
       whl(bX+bW*.1,tY,5,'#374151','#6b7280'); // pilot
     },
