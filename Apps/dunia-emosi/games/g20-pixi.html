@@ -193,6 +193,7 @@ const particles = [], trails = []
 
   drawBackground()
   drawCourt()
+  createEntities()
   resetRound('player')
   app.ticker.add(gameLoop)
   document.querySelector('.start-hint').textContent='Tap untuk Mulai!'
@@ -358,7 +359,7 @@ function createEntities(){
   ballGfx=new PIXI.Graphics(); entityLayer.addChild(ballGfx)
   crabGfx=new PIXI.Graphics(); entityLayer.addChild(crabGfx)
 }
-createEntities()
+// createEntities() moved inside init() after layers exist
 
 function drawBall(){
   ballGfx.clear()

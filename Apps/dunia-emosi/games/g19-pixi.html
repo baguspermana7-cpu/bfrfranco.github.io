@@ -479,7 +479,13 @@ function gameLoop(ticker) {
   if (!S.running || S.paused || S.gameOver) {
     // Idle bob before start
     if (!S.started && birdContainer) {
-      birdContainer.y = S.birdY + Math.sin(S.frame * 0.05) * 8
+      const bobY = S.birdY + Math.sin(S.frame * 0.05) * 8
+      birdContainer.y = bobY
+      if (window._birdImg) {
+        window._birdImg.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
+        window._birdImg.style.top = (bobY - BIRD_SIZE/2) + 'px'
+        window._birdImg.style.transform = 'scaleX(-1)'
+      }
     }
     return
   }
@@ -554,6 +560,15 @@ function gameLoop(ticker) {
   if (allDone && S.pipesCleared >= S.totalPipes) showWin()
 
   updateHUD()
+
+  // Sync DOM bird image position to PixiJS container
+  if (window._birdImg) {
+    const bi = window._birdImg
+    bi.style.left = (BIRD_X - BIRD_SIZE/2) + 'px'
+    bi.style.top = (S.birdY - BIRD_SIZE/2) + 'px'
+    const rot = birdContainer ? birdContainer.rotation : 0
+    bi.style.transform = 'scaleX(-1) rotate(' + (rot * 57.3) + 'deg)'
+  }
 }
 
 // ═══════════════════════════════════════════════════════════

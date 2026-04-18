@@ -1375,7 +1375,11 @@ function startGameWithLevel(levelNum) {
   const lvLabel = `Lv.${levelNum}`
   document.querySelectorAll('.gh-level').forEach(el => { el.textContent = lvLabel })
   if(state.selectedLevel==='hard') checkAchievement('hard_mode')
-  showScreen('screen-game' + state.currentGame)
+  // Standalone games navigate to separate HTML — skip showScreen (no screen-gameN div exists)
+  const standaloneGames = [6, 14, 15, 16, 19, 20]
+  if (!standaloneGames.includes(state.currentGame)) {
+    showScreen('screen-game' + state.currentGame)
+  }
   const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9,initGame10,initGame11,initGame12,initGame13,initGame14,initGame15,initGame16,initGame17,initGame18,initGame19,initGame20]
   inits[state.currentGame]()
 }
