@@ -8,24 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#87CEEB;font-family:'Fredoka One',sans-serif;touch-action:none}
-canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
+html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf8;font-family:'Fredoka One',sans-serif;touch-action:none}
+#pixi-canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 
 /* ── HUD ── */
-#hud{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(180deg,rgba(0,0,0,0.6) 0%,transparent 100%);pointer-events:none}
+#hud{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(180deg,rgba(0,0,0,0.55) 0%,transparent 100%);pointer-events:none}
 #btn-back{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;color:#fff;padding:6px 10px;font-size:14px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
 #game-badge{background:rgba(0,0,0,0.4);border:1.5px solid rgba(251,191,36,0.4);border-radius:10px;padding:4px 10px;color:#fbbf24;font-size:12px;font-weight:700;flex-shrink:0}
 #hud-center{flex:1;text-align:center}
-#score-display{font-size:clamp(18px,5vw,28px);font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
-#level-text{font-size:11px;color:#bfdbfe}
-#timer-display{font-size:14px;color:#86efac;font-weight:700;flex-shrink:0}
+#score-display{font-size:clamp(20px,6vw,32px);font-weight:900;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5)}
+#level-text{font-size:10px;color:#bfdbfe}
+#round-text{font-size:11px;color:#fbbf24;font-weight:700;flex-shrink:0}
 
 /* ── Controls ── */
-#controls{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;padding:10px 16px 20px;pointer-events:none}
-.ctrl-zone{width:45%;height:80px;display:flex;gap:6px;pointer-events:all}
-.ctrl-btn{flex:1;border-radius:16px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.35);color:#fff;font-size:24px;font-weight:900;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
+#controls{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;padding:8px 12px 16px;pointer-events:none}
+.ctrl-zone{width:44%;height:70px;display:flex;gap:5px;pointer-events:all}
+.ctrl-btn{flex:1;border-radius:14px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.4);color:#fff;font-size:22px;font-weight:900;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .ctrl-btn:active{background:rgba(139,92,246,0.5);transform:scale(0.93)}
-#btn-jump{background:rgba(139,92,246,0.4);border-color:rgba(167,139,250,0.5)}
+#btn-jump{background:rgba(251,191,36,0.4);border-color:rgba(251,191,36,0.5);font-size:16px}
 
 /* ── Quiz ── */
 #quiz-panel{position:fixed;bottom:0;left:0;right:0;z-index:200;display:none;flex-direction:column;align-items:center;padding:12px 16px 24px;background:linear-gradient(0deg,rgba(10,2,25,0.97),rgba(26,5,53,0.95));border-top:3px solid #fbbf24;backdrop-filter:blur(14px)}
@@ -41,6 +41,12 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 @keyframes pop{0%{transform:scale(1.1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
+/* ── Round Banner ── */
+#round-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none;flex-direction:column;align-items:center;gap:6px;background:rgba(0,0,0,0.85);border:3px solid #fbbf24;border-radius:24px;padding:24px 40px;backdrop-filter:blur(12px);color:#fff;font-weight:900}
+#round-banner.show{display:flex}
+#round-banner .rb-title{font-size:28px;color:#fbbf24}
+#round-banner .rb-score{font-size:20px;color:#bfdbfe}
+
 /* ── Start Overlay ── */
 #start-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,60,0.92);backdrop-filter:blur(8px)}
 #start-overlay.hidden{display:none}
@@ -53,9 +59,8 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 </head>
 <body>
 
-<canvas id="c"></canvas>
+<canvas id="pixi-canvas"></canvas>
 
-<!-- HUD -->
 <div id="hud">
   <button id="btn-back" onclick="goBack()">◀</button>
   <div id="game-badge">🏐 Ducky Volley</div>
@@ -63,34 +68,34 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
     <div id="level-text"></div>
     <div id="score-display">0 — 0</div>
   </div>
-  <div id="timer-display">⏱ 60</div>
+  <div id="round-text">Round 1/3</div>
 </div>
 
-<!-- Mobile Controls -->
 <div id="controls">
-  <div class="ctrl-zone" id="ctrl-left">
+  <div class="ctrl-zone">
     <button class="ctrl-btn" id="btn-left">◀</button>
     <button class="ctrl-btn" id="btn-right">▶</button>
   </div>
   <div class="ctrl-zone" style="justify-content:flex-end">
-    <button class="ctrl-btn" id="btn-jump">🦆 LOMPAT</button>
+    <button class="ctrl-btn" id="btn-jump">🦆 JUMP</button>
   </div>
 </div>
 
-<!-- Quiz Panel -->
 <div id="quiz-panel">
   <div id="quiz-question"></div>
   <div id="quiz-choices"></div>
 </div>
 
-<!-- Start Overlay -->
+<div id="round-banner"><div class="rb-title"></div><div class="rb-score"></div></div>
+
 <div id="start-overlay">
-  <div class="start-icon">🦆</div>
+  <div class="start-icon">🦆🏐</div>
   <div class="start-title">Ducky Volley</div>
   <div class="start-sub" id="start-level"></div>
   <div class="start-hint">Tap untuk Mulai!</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script src="game-modal.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -101,484 +106,656 @@ try { const s = sessionStorage.getItem('g20Config'); if (s) Object.assign(cfg, J
 document.getElementById('level-text').textContent = `Level ${cfg.level}`
 document.getElementById('start-level').textContent = `Level ${cfg.level}`
 
-// ═══════════════════════════════════════════════════════════
-//  QUESTIONS
-// ═══════════════════════════════════════════════════════════
-const QUESTIONS = {
-  easy:[
-    {q:'1+1=?',ans:'2',wrong:['3','4','1']},{q:'2+3=?',ans:'5',wrong:['4','6','3']},
-    {q:'3+2=?',ans:'5',wrong:['4','6','7']},{q:'5-2=?',ans:'3',wrong:['2','4','1']},
-    {q:'🐱 Huruf awal?',ans:'K',wrong:['A','M','B']},{q:'🍎 Huruf awal?',ans:'A',wrong:['I','U','E']},
-    {q:'Warna 🔴?',ans:'MERAH',wrong:['BIRU','HIJAU','KUNING']},
-    {q:'Warna 🔵?',ans:'BIRU',wrong:['MERAH','HIJAU','UNGU']},
-    {q:'4-1=?',ans:'3',wrong:['2','5','4']},{q:'2+2=?',ans:'4',wrong:['3','5','6']},
-  ],
-  medium:[
-    {q:'4+4=?',ans:'8',wrong:['7','9','6']},{q:'6+3=?',ans:'9',wrong:['8','7','10']},
-    {q:'10-3=?',ans:'7',wrong:['6','8','4']},{q:'3x3=?',ans:'9',wrong:['6','12','8']},
-    {q:'🐘 ada di...?',ans:'HUTAN',wrong:['LAUT','UDARA','KOTA']},
-    {q:'Ibukota Jawa Barat?',ans:'BANDUNG',wrong:['JAKARTA','SURABAYA','BOGOR']},
-  ],
-  hard:[
-    {q:'7x3=?',ans:'21',wrong:['18','24','14']},{q:'25÷5=?',ans:'5',wrong:['4','6','7']},
-    {q:'Ibukota RI?',ans:'JAKARTA',wrong:['BANDUNG','SURABAYA','MEDAN']},
-    {q:'Planet terbesar?',ans:'YUPITER',wrong:['SATURNUS','MARS','URANUS']},
-  ]
-}
-function getDiff(l){return l<=10?'easy':l<=20?'medium':'hard'}
-function pickQ(){
-  const pool=QUESTIONS[getDiff(cfg.level)]
-  return pool[Math.floor(Math.random()*pool.length)]
-}
+// Questions
+const QS = [
+  {q:'1+1=?',ans:'2',w:['3','4','1']},{q:'3+2=?',ans:'5',w:['4','6','7']},{q:'5-2=?',ans:'3',w:['2','4','1']},
+  {q:'4+4=?',ans:'8',w:['7','9','6']},{q:'2+3=?',ans:'5',w:['4','6','3']},{q:'6-3=?',ans:'3',w:['2','4','5']},
+  {q:'3x2=?',ans:'6',w:['4','8','5']},{q:'10-4=?',ans:'6',w:['5','7','4']},{q:'7+2=?',ans:'9',w:['8','10','11']},
+  {q:'Warna 🔴?',ans:'MERAH',w:['BIRU','HIJAU','KUNING']},{q:'Warna 🔵?',ans:'BIRU',w:['MERAH','HIJAU','UNGU']},
+  {q:'🐱 Huruf awal?',ans:'K',w:['A','M','B']},{q:'🍎 Huruf awal?',ans:'A',w:['I','U','E']},
+]
+function pickQ(){return QS[Math.floor(Math.random()*QS.length)]}
 
 // ═══════════════════════════════════════════════════════════
-//  CANVAS + GAME STATE
+//  GAME STATE
 // ═══════════════════════════════════════════════════════════
-const canvas = document.getElementById('c')
-const ctx = canvas.getContext('2d')
-let W, H
-
-function resize() {
-  W = canvas.width = window.innerWidth
-  H = canvas.height = window.innerHeight
-  GROUND_Y = H * 0.78
-  NET_X = W / 2
-  NET_TOP = GROUND_Y - H * 0.22
-}
-resize()
-window.addEventListener('resize', resize)
-
-let GROUND_Y, NET_X, NET_TOP
-const GRAVITY = 0.45
-const BALL_R = 14
-const DUCK_W = 50, DUCK_H = 44
-const JUMP_POWER = -11
-const MOVE_SPEED = 4.5
+let W, H, GROUND_Y, NET_X, NET_TOP, NET_H
+const GRAVITY = 0.42
+const BALL_R = 16
+const DUCK_R = 28
+const JUMP_POWER = -12
+const MOVE_SPD = 5
+const POINTS_TO_WIN = 5
+const TOTAL_ROUNDS = 3
 
 const S = {
-  running: false, paused: false, started: false, gameOver: false,
-  playerScore: 0, cpuScore: 0, rally: 0,
-  timeLeft: 60 + Math.min(cfg.level * 5, 60), // 60-120s per level
-  quizActive: false, correctAnswers: 0, wrongAnswers: 0,
+  running:false, paused:false, started:false, gameOver:false,
+  pScore:0, cScore:0, pRounds:0, cRounds:0, round:1,
+  quizActive:false, correctQ:0, wrongQ:0,
   // Ball
-  ballX: 0, ballY: 0, ballVX: 0, ballVY: 0, ballServe: 'player',
-  // Player duck (left side)
-  px: 0, py: 0, pvx: 0, pvy: 0, pOnGround: true, pFacing: 1,
-  // CPU duck (right side)
-  cx: 0, cy: 0, cvx: 0, cvy: 0, cOnGround: true,
+  bx:0, by:0, bvx:0, bvy:0, bSpin:0, lastHitter:'none',
+  // Player duck
+  px:0, py:0, pvx:0, pvy:0, pGnd:true, pSet:false, pHasCrown:false,
+  // CPU duck
+  cx:0, cy:0, cvx:0, cvy:0, cGnd:true, cHasCrown:false,
+  // Powerup
+  crabX:-100, crabDir:1, crabActive:false, crabTimer:0,
+  powerup:null, powerupTimer:0,
+  // FX
+  shakeX:0, shakeY:0, shakeTimer:0, frame:0,
+  // Physics variation
+  gravMod:1, bounceMod:1,
   // Input
-  moveLeft: false, moveRight: false, jumpPressed: false,
-  frame: 0,
+  moveL:false, moveR:false, jump:false,
 }
 
-function resetBall(server) {
-  S.ballX = server === 'player' ? W * 0.25 : W * 0.75
-  S.ballY = GROUND_Y - 120
-  S.ballVX = 0
-  S.ballVY = 0
-  S.rally = 0
-}
-
-function resetPositions() {
-  S.px = W * 0.2; S.py = GROUND_Y
-  S.cx = W * 0.8; S.cy = GROUND_Y
-  S.pvx = 0; S.pvy = 0; S.cvx = 0; S.cvy = 0
-  S.pOnGround = true; S.cOnGround = true
+function randomizePhysics(){
+  S.gravMod = 0.9 + Math.random()*0.2 // ±10%
+  S.bounceMod = 0.85 + Math.random()*0.3 // ±15%
+  NET_H = H*0.2 + Math.random()*H*0.06 // slight variation
+  NET_TOP = GROUND_Y - NET_H
 }
 
 // ═══════════════════════════════════════════════════════════
 //  AUDIO
 // ═══════════════════════════════════════════════════════════
-let audioCtx
-function ensureAudio(){if(!audioCtx)try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(_){}}
-function tone(f,d,t='sine',v=0.12){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+d/1000);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d/1000)}
-function sfxHit(){tone(500,80);setTimeout(()=>tone(700,60),30)}
-function sfxScore(){tone(800,100);setTimeout(()=>tone(1000,150),80)}
-function sfxBounce(){tone(300,50,'square',0.08)}
+let ac
+function ea(){if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(_){}}
+function tone(f,d,t='sine',v=0.12){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.linearRampToValueAtTime(0,ac.currentTime+d/1000);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d/1000)}
+function sfxHit(){tone(600,70);setTimeout(()=>tone(800,50),25)}
+function sfxSmash(){tone(200,120,'square',0.15);setTimeout(()=>tone(400,80),40)}
+function sfxScore(){tone(900,100);setTimeout(()=>tone(1100,120),80)}
+function sfxBounce(){tone(350,40,'triangle',0.08)}
+function sfxWhistle(){tone(1200,200);setTimeout(()=>tone(1000,150),120)}
+function sfxPowerup(){tone(600,80);setTimeout(()=>tone(900,100),60);setTimeout(()=>tone(1200,120),120)}
+
+// ═══════════════════════════════════════════════════════════
+//  PIXI INIT
+// ═══════════════════════════════════════════════════════════
+let app, bgLayer, courtLayer, entityLayer, fxLayer
+const particles = [], trails = []
+
+;(async function init(){
+  app = new PIXI.Application()
+  await app.init({
+    canvas: document.getElementById('pixi-canvas'),
+    width: window.innerWidth, height: window.innerHeight,
+    backgroundAlpha:1, backgroundColor:0x38bdf8,
+    antialias:true, resolution: Math.min(window.devicePixelRatio,2)
+  })
+  W = app.screen.width; H = app.screen.height
+  GROUND_Y = H * 0.75; NET_X = W / 2; NET_H = H * 0.22; NET_TOP = GROUND_Y - NET_H
+
+  bgLayer = new PIXI.Container(); app.stage.addChild(bgLayer)
+  courtLayer = new PIXI.Container(); app.stage.addChild(courtLayer)
+  entityLayer = new PIXI.Container(); app.stage.addChild(entityLayer)
+  fxLayer = new PIXI.Container(); app.stage.addChild(fxLayer)
+
+  drawBackground()
+  drawCourt()
+  resetRound('player')
+  app.ticker.add(gameLoop)
+})()
+
+// ═══════════════════════════════════════════════════════════
+//  BACKGROUND (parallax beach)
+// ═══════════════════════════════════════════════════════════
+let clouds=[], waveOffset=0, palmTrees=[]
+function drawBackground(){
+  // Sky gradient
+  const sky = new PIXI.Graphics()
+  sky.rect(0,0,W,GROUND_Y).fill(0x38bdf8)
+  sky.rect(0,0,W,H*0.3).fill({color:0x7dd3fc,alpha:0.5})
+  sky.rect(0,H*0.15,W,H*0.15).fill({color:0xbae6fd,alpha:0.3})
+  bgLayer.addChild(sky)
+
+  // Sun with glow
+  const sun = new PIXI.Graphics()
+  sun.circle(W*0.82,H*0.1,45).fill({color:0xfef08a,alpha:0.3})
+  sun.circle(W*0.82,H*0.1,32).fill({color:0xfef08a,alpha:0.7})
+  sun.circle(W*0.82,H*0.1,22).fill(0xfefce8)
+  bgLayer.addChild(sun)
+
+  // Clouds
+  for(let i=0;i<4;i++){
+    const cl=new PIXI.Graphics()
+    const cw=35+Math.random()*40
+    cl.ellipse(0,0,cw,cw*0.35).fill({color:0xffffff,alpha:0.65})
+    cl.ellipse(cw*0.5,-cw*0.1,cw*0.6,cw*0.3).fill({color:0xffffff,alpha:0.5})
+    cl.ellipse(-cw*0.4,-cw*0.05,cw*0.5,cw*0.25).fill({color:0xffffff,alpha:0.45})
+    cl.x=Math.random()*W; cl.y=H*0.06+Math.random()*H*0.12
+    cl._speed=0.15+Math.random()*0.2
+    bgLayer.addChild(cl); clouds.push(cl)
+  }
+
+  // Far mountains/hills
+  const hills=new PIXI.Graphics()
+  hills.moveTo(0,GROUND_Y)
+  for(let x=0;x<=W;x+=15){
+    const y=GROUND_Y-20-Math.sin(x*0.006)*25-Math.sin(x*0.015)*12
+    hills.lineTo(x,y)
+  }
+  hills.lineTo(W,GROUND_Y).closePath().fill({color:0x22c55e,alpha:0.4})
+  bgLayer.addChild(hills)
+
+  // Palm trees
+  for(const px of[W*0.08,W*0.92]){
+    const palm=new PIXI.Graphics()
+    // Trunk
+    palm.rect(px-4,GROUND_Y-80,8,80).fill(0x92400e)
+    palm.rect(px-3,GROUND_Y-80,6,80).fill({color:0xa16207,alpha:0.5})
+    // Leaves
+    for(let a=-2.5;a<=0.5;a+=0.5){
+      palm.moveTo(px,GROUND_Y-80)
+      const lx=px+Math.cos(a)*55, ly=GROUND_Y-80+Math.sin(a)*30
+      palm.quadraticCurveTo(px+Math.cos(a)*30,GROUND_Y-90,lx,ly)
+      palm.lineTo(px,GROUND_Y-78)
+      palm.fill({color:0x22c55e,alpha:0.7})
+    }
+    bgLayer.addChild(palm)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COURT + NET
+// ═══════════════════════════════════════════════════════════
+let netGfx
+function drawCourt(){
+  // Sand
+  const sand=new PIXI.Graphics()
+  sand.rect(0,GROUND_Y,W,H-GROUND_Y).fill(0xf5d08a)
+  sand.rect(0,GROUND_Y,W,4).fill({color:0xd4a843,alpha:0.5})
+  // Sand texture dots
+  for(let i=0;i<30;i++){
+    const sx=Math.random()*W, sy=GROUND_Y+5+Math.random()*(H-GROUND_Y-10)
+    sand.circle(sx,sy,1+Math.random()*1.5).fill({color:0xe8c06a,alpha:0.4})
+  }
+  courtLayer.addChild(sand)
+
+  // Ocean waves at bottom
+  const ocean=new PIXI.Graphics()
+  ocean.rect(0,H*0.92,W,H*0.08).fill({color:0x38bdf8,alpha:0.25})
+  ocean.rect(0,H*0.95,W,H*0.05).fill({color:0x0ea5e9,alpha:0.15})
+  courtLayer.addChild(ocean)
+
+  // Net
+  netGfx=new PIXI.Graphics()
+  drawNet()
+  courtLayer.addChild(netGfx)
+}
+
+function drawNet(){
+  netGfx.clear()
+  // Post
+  netGfx.rect(NET_X-4,NET_TOP-6,8,GROUND_Y-NET_TOP+6).fill(0x6b7280)
+  netGfx.rect(NET_X-3,NET_TOP-6,6,GROUND_Y-NET_TOP+6).fill({color:0x9ca3af,alpha:0.5})
+  // Post cap
+  netGfx.circle(NET_X,NET_TOP-6,6).fill(0xf8fafc)
+  // Net mesh
+  const meshW=24
+  for(let y=NET_TOP;y<GROUND_Y;y+=8){
+    netGfx.rect(NET_X-meshW,y,meshW*2,1).fill({color:0xf8fafc,alpha:0.3})
+  }
+  for(let x=NET_X-meshW;x<=NET_X+meshW;x+=6){
+    netGfx.rect(x,NET_TOP,1,GROUND_Y-NET_TOP).fill({color:0xf8fafc,alpha:0.2})
+  }
+  // Net border rope
+  netGfx.rect(NET_X-meshW,NET_TOP,meshW*2,2).fill({color:0xf8fafc,alpha:0.5})
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DUCK DRAWING
+// ═══════════════════════════════════════════════════════════
+function drawDuck(g, x, y, color, darkColor, facing, hasCrown, squash=1){
+  g.clear()
+  const sw=1/squash, sh=squash // squash/stretch
+
+  // Shadow
+  g.ellipse(x,GROUND_Y+3,DUCK_R*0.8,5).fill({color:0x000000,alpha:0.15})
+
+  // Body
+  g.ellipse(x,y-DUCK_R*0.5*sh,DUCK_R*sw,DUCK_R*0.6*sh).fill(color)
+  // Belly
+  g.ellipse(x,y-DUCK_R*0.4*sh,DUCK_R*0.7*sw,DUCK_R*0.4*sh).fill(0xfef3c7)
+  // Wing
+  const wingFlap=Math.sin(S.frame*0.25)*3
+  g.ellipse(x-facing*10,y-DUCK_R*0.5*sh,8*sw,(12+wingFlap)*sh).fill(darkColor)
+
+  // Head
+  const hx=x+facing*16, hy=y-DUCK_R*sh
+  g.circle(hx,hy,14*Math.min(sw,sh)).fill(color)
+  // Eye
+  g.circle(hx+facing*7,hy-2,4).fill(0x1c1917)
+  g.circle(hx+facing*8,hy-3,2).fill(0xffffff)
+  // Beak
+  g.poly([hx+facing*12,hy+1, hx+facing*22,hy+4, hx+facing*12,hy+7]).fill(0xf97316)
+  // Blush
+  g.circle(hx+facing*3,hy+6,4).fill({color:0xfca5a5,alpha:0.35})
+
+  // Feet
+  g.roundRect(x-10,y-3,8,4,2).fill(0xf97316)
+  g.roundRect(x+3,y-3,8,4,2).fill(0xf97316)
+
+  // Crown
+  if(hasCrown){
+    g.poly([hx-8,hy-16, hx-5,hy-22, hx-2,hy-16, hx+1,hy-24, hx+4,hy-16, hx+7,hy-22, hx+10,hy-16]).fill(0xfbbf24)
+    g.poly([hx-8,hy-16, hx-5,hy-22, hx-2,hy-16, hx+1,hy-24, hx+4,hy-16, hx+7,hy-22, hx+10,hy-16]).stroke({color:0xf59e0b,width:1})
+    g.circle(hx+1,hy-20,2).fill(0xef4444)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BALL DRAWING + TRAIL
+// ═══════════════════════════════════════════════════════════
+let ballGfx, playerGfx, cpuGfx, crabGfx
+function createEntities(){
+  playerGfx=new PIXI.Graphics(); entityLayer.addChild(playerGfx)
+  cpuGfx=new PIXI.Graphics(); entityLayer.addChild(cpuGfx)
+  ballGfx=new PIXI.Graphics(); entityLayer.addChild(ballGfx)
+  crabGfx=new PIXI.Graphics(); entityLayer.addChild(crabGfx)
+}
+createEntities()
+
+function drawBall(){
+  ballGfx.clear()
+  // Ball shadow
+  ballGfx.ellipse(S.bx,GROUND_Y+2,BALL_R*0.7,4).fill({color:0x000000,alpha:0.12})
+  // Ball body
+  ballGfx.circle(S.bx,S.by,BALL_R).fill(0xf8fafc)
+  ballGfx.circle(S.bx,S.by,BALL_R).stroke({color:0x94a3b8,width:2})
+  // Volleyball lines (rotate with spin)
+  const a=S.bSpin
+  for(let i=0;i<3;i++){
+    const ang=a+i*Math.PI/1.5
+    const x1=S.bx+Math.cos(ang)*(BALL_R-3), y1=S.by+Math.sin(ang)*(BALL_R-3)
+    const x2=S.bx+Math.cos(ang+Math.PI)*(BALL_R-3), y2=S.by+Math.sin(ang+Math.PI)*(BALL_R-3)
+    ballGfx.moveTo(x1,y1).lineTo(x2,y2).stroke({color:0x3b82f6,width:1.2,alpha:0.4})
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PARTICLES
+// ═══════════════════════════════════════════════════════════
+function spawnSand(x,y,count=6){
+  for(let i=0;i<count;i++){
+    const g=new PIXI.Graphics()
+    const r=1.5+Math.random()*2
+    g.circle(0,0,r).fill(0xf5d08a)
+    g.x=x; g.y=y
+    fxLayer.addChild(g)
+    particles.push({g, vx:(Math.random()-0.5)*4, vy:-Math.random()*5-2, grav:0.25, life:1, decay:0.03+Math.random()*0.02})
+  }
+}
+function spawnConfetti(x,y,count=12){
+  const colors=[0xfbbf24,0xef4444,0x22c55e,0x3b82f6,0xc084fc]
+  for(let i=0;i<count;i++){
+    const g=new PIXI.Graphics()
+    g.rect(0,0,4,4).fill(colors[i%colors.length])
+    g.x=x; g.y=y
+    fxLayer.addChild(g)
+    particles.push({g, vx:(Math.random()-0.5)*8, vy:-Math.random()*8-3, grav:0.18, life:1, decay:0.018})
+  }
+}
+function spawnTrail(){
+  if(S.frame%2!==0)return
+  const g=new PIXI.Graphics()
+  g.circle(0,0,BALL_R*0.6).fill({color:0xbfdbfe,alpha:0.3})
+  g.x=S.bx; g.y=S.by
+  fxLayer.addChild(g)
+  trails.push({g, life:1, decay:0.08})
+}
+function tickParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i]
+    p.vy+=p.grav*dt; p.g.x+=p.vx*dt; p.g.y+=p.vy*dt
+    p.life-=p.decay*dt; p.g.alpha=p.life
+    if(p.life<=0){fxLayer.removeChild(p.g);particles.splice(i,1)}
+  }
+  for(let i=trails.length-1;i>=0;i--){
+    const t=trails[i]
+    t.life-=t.decay*dt; t.g.alpha=t.life*0.3; t.g.scale.set(t.life)
+    if(t.life<=0){fxLayer.removeChild(t.g);trails.splice(i,1)}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RESET
+// ═══════════════════════════════════════════════════════════
+function resetRound(server){
+  S.px=W*0.22; S.py=GROUND_Y; S.pvx=0; S.pvy=0; S.pGnd=true; S.pSet=false
+  S.cx=W*0.78; S.cy=GROUND_Y; S.cvx=0; S.cvy=0; S.cGnd=true
+  S.bx=server==='player'?W*0.25:W*0.75; S.by=GROUND_Y-100
+  S.bvx=0; S.bvy=0; S.bSpin=0; S.lastHitter='none'
+  S.crabActive=false; S.crabTimer=0; S.powerup=null; S.powerupTimer=0
+  randomizePhysics()
+}
 
 // ═══════════════════════════════════════════════════════════
 //  GAME LOOP
 // ═══════════════════════════════════════════════════════════
-let lastTime = 0, timerAcc = 0
-
-function gameLoop(ts) {
-  requestAnimationFrame(gameLoop)
-  const dt = Math.min((ts - lastTime) / 16.67, 3) // normalize to ~60fps
-  lastTime = ts
+function gameLoop(ticker){
   S.frame++
+  const dt=ticker.deltaTime
+  if(!S.running||S.paused||S.quizActive||S.gameOver) return
 
-  draw()
+  // Screen shake decay
+  if(S.shakeTimer>0){
+    S.shakeTimer-=dt
+    S.shakeX=Math.sin(S.shakeTimer*2)*4*(S.shakeTimer/10)
+    S.shakeY=Math.cos(S.shakeTimer*1.5)*3*(S.shakeTimer/10)
+    app.stage.x=S.shakeX; app.stage.y=S.shakeY
+  } else { app.stage.x*=0.8; app.stage.y*=0.8 }
 
-  if (!S.running || S.paused || S.quizActive) return
-
-  // Timer
-  timerAcc += dt
-  if (timerAcc >= 60) { // ~1 second
-    timerAcc -= 60
-    S.timeLeft--
-    document.getElementById('timer-display').textContent = `⏱ ${Math.max(0, Math.ceil(S.timeLeft))}`
-    if (S.timeLeft <= 0) { endGame(); return }
-  }
+  // Clouds scroll
+  for(const cl of clouds){cl.x-=cl._speed*dt; if(cl.x<-80)cl.x=W+80}
 
   // Player movement
-  if (S.moveLeft) S.pvx = -MOVE_SPEED
-  else if (S.moveRight) S.pvx = MOVE_SPEED
-  else S.pvx *= 0.8
-  if (S.jumpPressed && S.pOnGround) { S.pvy = JUMP_POWER; S.pOnGround = false }
-  S.jumpPressed = false
+  const spd = MOVE_SPD * (S.powerup==='speed'?1.5:1)
+  if(S.moveL) S.pvx=-spd; else if(S.moveR) S.pvx=spd; else S.pvx*=0.82
+  if(S.jump&&S.pGnd){
+    S.pvy=JUMP_POWER*(S.powerup==='jump'?1.4:1); S.pGnd=false
+    spawnSand(S.px,GROUND_Y,4)
+  }
+  S.jump=false
 
   // Player physics
-  S.pvy += GRAVITY * dt
-  S.px += S.pvx * dt
-  S.py += S.pvy * dt
-  // Clamp to left side
-  S.px = Math.max(DUCK_W / 2, Math.min(NET_X - DUCK_W / 2 - 8, S.px))
-  if (S.py >= GROUND_Y) { S.py = GROUND_Y; S.pvy = 0; S.pOnGround = true }
+  S.pvy+=GRAVITY*S.gravMod*dt; S.px+=S.pvx*dt; S.py+=S.pvy*dt
+  S.px=Math.max(DUCK_R,Math.min(NET_X-DUCK_R-6,S.px))
+  if(S.py>=GROUND_Y){S.py=GROUND_Y;if(S.pvy>2)spawnSand(S.px,GROUND_Y,3);S.pvy=0;S.pGnd=true}
 
   // CPU AI
   updateCPU(dt)
 
   // Ball physics
-  S.ballVY += GRAVITY * 0.6 * dt
-  S.ballX += S.ballVX * dt
-  S.ballY += S.ballVY * dt
+  const ballSpd=S.powerup==='slow'?0.6:1
+  S.bvy+=GRAVITY*S.gravMod*0.55*dt*ballSpd
+  S.bx+=S.bvx*dt*ballSpd; S.by+=S.bvy*dt*ballSpd
+  S.bSpin+=S.bvx*0.015*dt // spin follows velocity
 
-  // Ball bounces off walls
-  if (S.ballX < BALL_R) { S.ballX = BALL_R; S.ballVX = Math.abs(S.ballVX) * 0.8 }
-  if (S.ballX > W - BALL_R) { S.ballX = W - BALL_R; S.ballVX = -Math.abs(S.ballVX) * 0.8 }
-  // Ball bounces off ceiling
-  if (S.ballY < BALL_R + 50) { S.ballY = BALL_R + 50; S.ballVY = Math.abs(S.ballVY) * 0.5 }
+  const br=BALL_R*(S.powerup==='big'?1.5:1)
+
+  // Wall bounces
+  if(S.bx<br){S.bx=br;S.bvx=Math.abs(S.bvx)*S.bounceMod;sfxBounce()}
+  if(S.bx>W-br){S.bx=W-br;S.bvx=-Math.abs(S.bvx)*S.bounceMod;sfxBounce()}
+  if(S.by<br+50){S.by=br+50;S.bvy=Math.abs(S.bvy)*0.5;sfxBounce()}
 
   // Net collision
-  if (S.ballY > NET_TOP && Math.abs(S.ballX - NET_X) < 10 && S.ballVY > 0) {
-    if (S.ballX < NET_X) { S.ballVX = -Math.abs(S.ballVX) - 1; S.ballX = NET_X - 10 }
-    else { S.ballVX = Math.abs(S.ballVX) + 1; S.ballX = NET_X + 10 }
-    S.ballVY *= -0.5
-    sfxBounce()
+  if(S.by>NET_TOP&&Math.abs(S.bx-NET_X)<12){
+    if(S.bx<NET_X){S.bvx=Math.min(S.bvx,-2);S.bx=NET_X-12}
+    else{S.bvx=Math.max(S.bvx,2);S.bx=NET_X+12}
+    S.bvy*=-0.6; sfxBounce()
   }
 
   // Duck-ball collision (player)
-  const pdx = S.ballX - S.px, pdy = S.ballY - (S.py - DUCK_H / 2)
-  const pdist = Math.sqrt(pdx * pdx + pdy * pdy)
-  if (pdist < BALL_R + DUCK_W / 2) {
-    const angle = Math.atan2(pdy, pdx)
-    const power = 7 + Math.abs(S.pvx) * 0.5
-    S.ballVX = Math.cos(angle) * power + S.pvx * 0.3
-    S.ballVY = Math.sin(angle) * power - 4
-    S.ballVY = Math.min(S.ballVY, -3) // always go up
-    S.rally++
-    sfxHit()
-  }
-
+  checkHit(S.px,S.py,S.pvx,S.pvy,S.pGnd,'player')
   // Duck-ball collision (CPU)
-  const cdx = S.ballX - S.cx, cdy = S.ballY - (S.cy - DUCK_H / 2)
-  const cdist = Math.sqrt(cdx * cdx + cdy * cdy)
-  if (cdist < BALL_R + DUCK_W / 2) {
-    const angle = Math.atan2(cdy, cdx)
-    const power = 6 + Math.random() * 2
-    S.ballVX = Math.cos(angle) * power + S.cvx * 0.3
-    S.ballVY = Math.sin(angle) * power - 3
-    S.ballVY = Math.min(S.ballVY, -3)
-    S.rally++
-    sfxHit()
+  checkHit(S.cx,S.cy,S.cvx,S.cvy,S.cGnd,'cpu')
+
+  // Ball trail
+  spawnTrail()
+
+  // Ball hits ground
+  if(S.by>GROUND_Y-br){
+    spawnSand(S.bx,GROUND_Y,8)
+    if(S.bx<NET_X){
+      S.cScore++; sfxWhistle()
+      spawnConfetti(W*0.75,GROUND_Y-60)
+    } else {
+      S.pScore++; sfxScore()
+      spawnConfetti(W*0.25,GROUND_Y-60)
+    }
+    updateHUD()
+    checkRoundEnd()
+    resetRound(S.bx<NET_X?'player':'cpu')
   }
 
-  // Ball hits ground → score
-  if (S.ballY > GROUND_Y - BALL_R) {
-    if (S.ballX < NET_X) {
-      // Ball landed on player's side → CPU scores
-      S.cpuScore++
-      S.ballServe = 'player'
-    } else {
-      // Ball landed on CPU's side → player scores
-      S.playerScore++
-      S.ballServe = 'cpu'
-      sfxScore()
-      // Quiz after every 2 player points
-      if (S.playerScore % 2 === 0) { showQuiz(); return }
-    }
-    updateScoreDisplay()
-    resetBall(S.ballServe)
-    resetPositions()
+  // Crab powerup
+  updateCrab(dt)
+
+  // Powerup timer
+  if(S.powerup&&S.powerupTimer>0){
+    S.powerupTimer-=dt/60
+    if(S.powerupTimer<=0){S.powerup=null}
   }
+
+  // Draw everything
+  tickParticles(dt)
+  const pFacing=S.pvx>0.5?1:S.pvx<-0.5?-1:1
+  const pSquash=S.pGnd?1:S.pvy<0?0.85:1.15
+  drawDuck(playerGfx,S.px,S.py,0xfbbf24,0xf59e0b,pFacing,S.pHasCrown,pSquash)
+  const cFacing=S.cvx>0.5?1:S.cvx<-0.5?-1:-1
+  const cSquash=S.cGnd?1:S.cvy<0?0.85:1.15
+  drawDuck(cpuGfx,S.cx,S.cy,0xef4444,0xdc2626,cFacing,S.cHasCrown,cSquash)
+  drawBall()
+  drawCrab()
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HIT MECHANICS (SET / SHOT / SMASH)
+// ═══════════════════════════════════════════════════════════
+function checkHit(dx,dy,dvx,dvy,onGnd,who){
+  const br=BALL_R*(S.powerup==='big'?1.5:1)
+  const ddx=S.bx-dx, ddy=S.by-(dy-DUCK_R*0.5)
+  const dist=Math.sqrt(ddx*ddx+ddy*ddy)
+  if(dist>br+DUCK_R)return
+  if(S.lastHitter===who&&S.frame%10!==0)return // debounce
+  S.lastHitter=who
+
+  const angle=Math.atan2(ddy,ddx)
+  let power, hitType
+  if(onGnd){
+    // SET: gentle lob upward
+    power=6; hitType='set'
+    if(who==='player')S.pSet=true
+  } else if(who==='player'&&S.pSet){
+    // SMASH: powerful spike after set
+    power=11; hitType='smash'
+    S.pSet=false
+    S.shakeTimer=10
+    sfxSmash()
+  } else {
+    // SHOT: jump first-touch
+    power=8; hitType='shot'
+  }
+
+  S.bvx=Math.cos(angle)*power+dvx*0.35
+  S.bvy=Math.sin(angle)*power-3
+  S.bvy=Math.min(S.bvy,-2)
+
+  if(hitType==='set') sfxHit()
+  else if(hitType==='shot') sfxHit()
 }
 
 // ═══════════════════════════════════════════════════════════
 //  CPU AI
 // ═══════════════════════════════════════════════════════════
-function updateCPU(dt) {
-  // Simple AI: move toward ball when on CPU's side
-  const difficulty = Math.min(0.7 + cfg.level * 0.03, 0.95) // 0.73 to 0.95
-  const reaction = Math.random() < difficulty
+function updateCPU(dt){
+  const diff=Math.min(0.6+cfg.level*0.035,0.96)
+  const react=Math.random()<diff
 
-  if (reaction) {
-    const targetX = S.ballX > NET_X ? S.ballX - 10 : W * 0.75
-    if (S.cx < targetX - 15) S.cvx = MOVE_SPEED * 0.85
-    else if (S.cx > targetX + 15) S.cvx = -MOVE_SPEED * 0.85
-    else S.cvx *= 0.8
+  if(react){
+    const target=S.bx>NET_X?S.bx-8:W*0.75
+    if(S.cx<target-12)S.cvx=MOVE_SPD*0.85
+    else if(S.cx>target+12)S.cvx=-MOVE_SPD*0.85
+    else S.cvx*=0.8
 
-    // Jump when ball is coming down nearby
-    if (S.cOnGround && S.ballX > NET_X && S.ballY < GROUND_Y - 60 &&
-        Math.abs(S.ballX - S.cx) < 80 && S.ballVY > 0) {
-      S.cvy = JUMP_POWER * 0.9
-      S.cOnGround = false
+    if(S.cGnd&&S.bx>NET_X&&S.by<GROUND_Y-50&&Math.abs(S.bx-S.cx)<70&&S.bvy>0){
+      S.cvy=JUMP_POWER*0.88; S.cGnd=false
+      spawnSand(S.cx,GROUND_Y,3)
     }
-  } else {
-    S.cvx *= 0.9
-  }
+  } else S.cvx*=0.9
 
-  S.cvy += GRAVITY * dt
-  S.cx += S.cvx * dt
-  S.cy += S.cvy * dt
-  S.cx = Math.max(NET_X + DUCK_W / 2 + 8, Math.min(W - DUCK_W / 2, S.cx))
-  if (S.cy >= GROUND_Y) { S.cy = GROUND_Y; S.cvy = 0; S.cOnGround = true }
+  S.cvy+=GRAVITY*S.gravMod*dt; S.cx+=S.cvx*dt; S.cy+=S.cvy*dt
+  S.cx=Math.max(NET_X+DUCK_R+6,Math.min(W-DUCK_R,S.cx))
+  if(S.cy>=GROUND_Y){S.cy=GROUND_Y;if(S.cvy>2)spawnSand(S.cx,GROUND_Y,2);S.cvy=0;S.cGnd=true}
 }
 
 // ═══════════════════════════════════════════════════════════
-//  DRAW
+//  CRAB POWERUP
 // ═══════════════════════════════════════════════════════════
-function draw() {
-  // Sky gradient
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, H)
-  skyGrad.addColorStop(0, '#38bdf8')
-  skyGrad.addColorStop(0.5, '#7dd3fc')
-  skyGrad.addColorStop(0.85, '#bae6fd')
-  skyGrad.addColorStop(1, '#22c55e')
-  ctx.fillStyle = skyGrad
-  ctx.fillRect(0, 0, W, H)
-
-  // Sun
-  ctx.fillStyle = '#fef08a'
-  ctx.globalAlpha = 0.8
-  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.12, 35, 0, Math.PI * 2); ctx.fill()
-  ctx.globalAlpha = 0.3
-  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.12, 50, 0, Math.PI * 2); ctx.fill()
-  ctx.globalAlpha = 1
-
-  // Clouds
-  for (let i = 0; i < 3; i++) {
-    ctx.fillStyle = 'rgba(255,255,255,0.6)'
-    const cx = ((S.frame * 0.3 + i * W / 3) % (W + 100)) - 50
-    ctx.beginPath()
-    ctx.ellipse(cx, H * 0.1 + i * 30, 40 + i * 10, 18, 0, 0, Math.PI * 2); ctx.fill()
-    ctx.beginPath()
-    ctx.ellipse(cx + 25, H * 0.1 + i * 30 - 5, 30, 14, 0, 0, Math.PI * 2); ctx.fill()
+function updateCrab(dt){
+  S.crabTimer+=dt/60
+  if(!S.crabActive&&S.crabTimer>12+Math.random()*8){
+    S.crabActive=true; S.crabX=-30; S.crabDir=1; S.crabTimer=0
   }
-
-  // Sand/ground
-  ctx.fillStyle = '#f5d08a'
-  ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y)
-  ctx.fillStyle = '#e8c06a'
-  ctx.fillRect(0, GROUND_Y, W, 3)
-
-  // Beach details
-  ctx.fillStyle = 'rgba(56,189,248,0.15)'
-  ctx.fillRect(0, GROUND_Y + (H - GROUND_Y) * 0.7, W, (H - GROUND_Y) * 0.3)
-
-  // Net
-  ctx.fillStyle = '#f8fafc'
-  ctx.fillRect(NET_X - 3, NET_TOP, 6, GROUND_Y - NET_TOP)
-  // Net mesh
-  ctx.strokeStyle = 'rgba(255,255,255,0.3)'
-  ctx.lineWidth = 1
-  for (let ny = NET_TOP; ny < GROUND_Y; ny += 12) {
-    ctx.beginPath(); ctx.moveTo(NET_X - 15, ny); ctx.lineTo(NET_X + 15, ny); ctx.stroke()
+  if(S.crabActive){
+    S.crabX+=S.crabDir*1.2*dt
+    if(S.crabX>W+30){S.crabActive=false;S.crabTimer=0}
+    // Player touches crab
+    if(Math.abs(S.px-S.crabX)<30&&S.py>GROUND_Y-10){
+      S.crabActive=false; S.crabTimer=0
+      const types=['big','speed','jump','slow']
+      S.powerup=types[Math.floor(Math.random()*types.length)]
+      S.powerupTimer=10
+      sfxPowerup()
+    }
   }
-  // Net post
-  ctx.fillStyle = '#9ca3af'
-  ctx.fillRect(NET_X - 4, NET_TOP - 8, 8, 8)
-
-  // Draw ducks
-  drawDuck(S.px, S.py, '#fbbf24', '#f59e0b', S.pvx > 0 ? 1 : S.pvx < 0 ? -1 : 1, '🧢') // player yellow
-  drawDuck(S.cx, S.cy, '#ef4444', '#dc2626', S.cvx > 0 ? 1 : S.cvx < 0 ? -1 : -1, '🎀') // cpu red
-
-  // Draw ball
-  ctx.fillStyle = '#f8fafc'
-  ctx.beginPath(); ctx.arc(S.ballX, S.ballY, BALL_R, 0, Math.PI * 2); ctx.fill()
-  ctx.strokeStyle = '#94a3b8'
-  ctx.lineWidth = 2
-  ctx.stroke()
-  // Ball stripe
-  ctx.strokeStyle = '#3b82f6'
-  ctx.lineWidth = 1.5
-  ctx.beginPath(); ctx.arc(S.ballX, S.ballY, BALL_R - 2, -0.5, 0.5); ctx.stroke()
-  ctx.beginPath(); ctx.arc(S.ballX, S.ballY, BALL_R - 2, Math.PI - 0.5, Math.PI + 0.5); ctx.stroke()
-
-  // Ball shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.15)'
-  ctx.beginPath()
-  ctx.ellipse(S.ballX, GROUND_Y + 2, BALL_R * 0.8, 4, 0, 0, Math.PI * 2)
-  ctx.fill()
-
-  // Score labels on court
-  ctx.font = '900 48px Fredoka One'
-  ctx.textAlign = 'center'
-  ctx.fillStyle = 'rgba(255,255,255,0.12)'
-  ctx.fillText(S.playerScore, W * 0.25, GROUND_Y - 30)
-  ctx.fillText(S.cpuScore, W * 0.75, GROUND_Y - 30)
 }
-
-function drawDuck(x, y, bodyColor, darkColor, facing, accessory) {
-  ctx.save()
-  ctx.translate(x, y)
-  // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.15)'
-  ctx.beginPath(); ctx.ellipse(0, 4, DUCK_W / 2, 6, 0, 0, Math.PI * 2); ctx.fill()
+function drawCrab(){
+  crabGfx.clear()
+  if(!S.crabActive)return
+  const cx=S.crabX, cy=GROUND_Y+2
   // Body
-  ctx.fillStyle = bodyColor
-  ctx.beginPath(); ctx.ellipse(0, -DUCK_H / 2, DUCK_W / 2, DUCK_H / 2, 0, 0, Math.PI * 2); ctx.fill()
-  // Belly
-  ctx.fillStyle = '#fef3c7'
-  ctx.beginPath(); ctx.ellipse(0, -DUCK_H / 2 + 6, DUCK_W / 2 - 8, DUCK_H / 2 - 8, 0, 0, Math.PI * 2); ctx.fill()
-  // Head
-  ctx.fillStyle = bodyColor
-  ctx.beginPath(); ctx.arc(facing * 14, -DUCK_H + 2, 16, 0, Math.PI * 2); ctx.fill()
-  // Eye
-  ctx.fillStyle = '#1c1917'
-  ctx.beginPath(); ctx.arc(facing * 20, -DUCK_H, 3.5, 0, Math.PI * 2); ctx.fill()
-  ctx.fillStyle = '#fff'
-  ctx.beginPath(); ctx.arc(facing * 21, -DUCK_H - 1, 1.5, 0, Math.PI * 2); ctx.fill()
-  // Beak
-  ctx.fillStyle = '#f97316'
-  ctx.beginPath()
-  ctx.moveTo(facing * 28, -DUCK_H + 2)
-  ctx.lineTo(facing * 36, -DUCK_H + 5)
-  ctx.lineTo(facing * 28, -DUCK_H + 8)
-  ctx.closePath(); ctx.fill()
-  // Accessory
-  ctx.font = '16px Arial'
-  ctx.textAlign = 'center'
-  ctx.fillText(accessory, facing * 10, -DUCK_H - 10)
-  // Wings (bob when moving)
-  const wingFlap = Math.sin(S.frame * 0.3) * 4
-  ctx.fillStyle = darkColor
-  ctx.beginPath()
-  ctx.ellipse(-facing * 12, -DUCK_H / 2 - 2, 10, 14 + wingFlap, facing * 0.3, 0, Math.PI * 2)
-  ctx.fill()
-  // Feet
-  ctx.fillStyle = '#f97316'
-  ctx.fillRect(-10, -4, 8, 4)
-  ctx.fillRect(4, -4, 8, 4)
-  ctx.restore()
+  crabGfx.ellipse(cx,cy,12,8).fill(0xef4444)
+  // Claws
+  crabGfx.circle(cx-16,cy-2,5).fill(0xf87171)
+  crabGfx.circle(cx+16,cy-2,5).fill(0xf87171)
+  // Eyes
+  crabGfx.circle(cx-4,cy-8,3).fill(0x1c1917)
+  crabGfx.circle(cx+4,cy-8,3).fill(0x1c1917)
+  crabGfx.circle(cx-3,cy-9,1.5).fill(0xffffff)
+  crabGfx.circle(cx+5,cy-9,1.5).fill(0xffffff)
+  // Legs
+  for(let i=-2;i<=2;i++){
+    if(i===0)continue
+    crabGfx.rect(cx+i*6,cy+4,2,4).fill({color:0xef4444,alpha:0.6})
+  }
+  // Powerup indicator (? above crab)
+  crabGfx.circle(cx,cy-18,8).fill({color:0xfbbf24,alpha:0.8})
+  // ?
+  const qt=new PIXI.Text({text:'?',style:{fontSize:12,fontWeight:'900',fill:0x1c1917,fontFamily:'Arial'}})
+  qt.anchor.set(0.5); qt.x=cx; qt.y=cy-19
+  crabGfx.addChild(qt)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ROUND + MATCH LOGIC
+// ═══════════════════════════════════════════════════════════
+function checkRoundEnd(){
+  if(S.pScore>=POINTS_TO_WIN||S.cScore>=POINTS_TO_WIN){
+    if(S.pScore>=POINTS_TO_WIN){S.pRounds++;S.pHasCrown=true;S.cHasCrown=false}
+    else{S.cRounds++;S.cHasCrown=true;S.pHasCrown=false}
+
+    if(S.pRounds>=2||S.cRounds>=2||S.round>=TOTAL_ROUNDS){
+      // Match over
+      endMatch()
+    } else {
+      // Next round + quiz
+      S.round++; S.pScore=0; S.cScore=0
+      showRoundBanner()
+      showQuiz()
+    }
+  }
+}
+
+function showRoundBanner(){
+  const rb=document.getElementById('round-banner')
+  rb.querySelector('.rb-title').textContent=`Round ${S.round}`
+  rb.querySelector('.rb-score').textContent=`${S.pRounds} — ${S.cRounds}`
+  rb.classList.add('show')
+  setTimeout(()=>rb.classList.remove('show'),2000)
+  document.getElementById('round-text').textContent=`Round ${S.round}/${TOTAL_ROUNDS}`
+}
+
+function endMatch(){
+  S.running=false; S.gameOver=true
+  const won=S.pRounds>S.cRounds
+  const stars=won?(S.correctQ>=2?5:S.cRounds===0?4:3):(S.pRounds>0?2:1)
+  try{sessionStorage.setItem('g20Result',JSON.stringify({stars,level:cfg.level}))}catch(_){}
+
+  setTimeout(()=>{
+    const next=won&&cfg.level<30?()=>{
+      try{sessionStorage.setItem('g20Config',JSON.stringify({level:cfg.level+1}))}catch(_){}
+      location.reload()
+    }:null
+    GameModal.show({
+      emoji:won?'🏆':'🦆', title:won?'Kamu Menang!':'Coba Lagi!', stars,
+      msg:`Rounds: ${S.pRounds}—${S.cRounds} | Quiz: ${S.correctQ}✅`,
+      onNext:next, onAgain:()=>location.reload(), onBack:()=>goBack()
+    })
+  },800)
 }
 
 // ═══════════════════════════════════════════════════════════
 //  QUIZ
 // ═══════════════════════════════════════════════════════════
-function showQuiz() {
-  S.quizActive = true
-  const q = pickQ()
-  document.getElementById('quiz-question').textContent = q.q
-  const choicesEl = document.getElementById('quiz-choices')
-  choicesEl.innerHTML = ''
-  const choices = [q.ans, ...q.wrong].sort(() => Math.random() - 0.5)
-  let answered = false
-  choices.forEach(c => {
-    const btn = document.createElement('button')
-    btn.className = 'qbtn'
-    btn.textContent = c
-    btn.onclick = () => {
-      if (answered) return; answered = true
-      if (c === q.ans) {
-        btn.classList.add('correct')
-        S.correctAnswers++
-        S.playerScore++ // bonus point
-        sfxScore()
-        updateScoreDisplay()
-      } else {
-        btn.classList.add('wrong')
-        S.wrongAnswers++
-        choicesEl.querySelectorAll('.qbtn').forEach(b => { if (b.textContent === q.ans) b.classList.add('correct') })
-      }
-      setTimeout(() => {
+function showQuiz(){
+  S.quizActive=true
+  const q=pickQ()
+  document.getElementById('quiz-question').textContent=q.q
+  const ch=document.getElementById('quiz-choices'); ch.innerHTML=''
+  const opts=[q.ans,...q.w].sort(()=>Math.random()-0.5)
+  let done=false
+  opts.forEach(c=>{
+    const b=document.createElement('button'); b.className='qbtn'; b.textContent=c
+    b.onclick=()=>{
+      if(done)return; done=true
+      if(c===q.ans){b.classList.add('correct');S.correctQ++;sfxScore()}
+      else{b.classList.add('wrong');S.wrongQ++;ch.querySelectorAll('.qbtn').forEach(x=>{if(x.textContent===q.ans)x.classList.add('correct')})}
+      setTimeout(()=>{
         document.getElementById('quiz-panel').classList.remove('show')
-        S.quizActive = false
-        resetBall(S.ballServe)
-        resetPositions()
-      }, 800)
+        S.quizActive=false
+        updateHUD()
+      },900)
     }
-    choicesEl.appendChild(btn)
+    ch.appendChild(b)
   })
   document.getElementById('quiz-panel').classList.add('show')
 }
 
 // ═══════════════════════════════════════════════════════════
-//  SCORE & END
+//  HUD
 // ═══════════════════════════════════════════════════════════
-function updateScoreDisplay() {
-  document.getElementById('score-display').textContent = `${S.playerScore} — ${S.cpuScore}`
-}
-
-function endGame() {
-  S.running = false; S.gameOver = true
-  const diff = S.playerScore - S.cpuScore
-  const stars = diff >= 5 ? 5 : diff >= 3 ? 4 : diff >= 1 ? 3 : diff >= 0 ? 2 : 1
-  try { sessionStorage.setItem('g20Result', JSON.stringify({ stars, level: cfg.level })) } catch(_){}
-
-  const won = S.playerScore > S.cpuScore
-  setTimeout(() => {
-    const nextLevel = cfg.level < 30 ? () => {
-      try { sessionStorage.setItem('g20Config', JSON.stringify({ level: cfg.level + 1 })) } catch(_){}
-      location.reload()
-    } : null
-    GameModal.show({
-      emoji: won ? '🏆' : '🦆',
-      title: won ? 'Kamu Menang!' : 'Coba Lagi!',
-      stars,
-      msg: `Skor: ${S.playerScore} — ${S.cpuScore}`,
-      onNext: won ? nextLevel : null,
-      onAgain: () => location.reload(),
-      onBack: () => goBack()
-    })
-  }, 500)
+function updateHUD(){
+  document.getElementById('score-display').textContent=`${S.pScore} — ${S.cScore}`
 }
 
 // ═══════════════════════════════════════════════════════════
 //  INPUT
 // ═══════════════════════════════════════════════════════════
-function startGame() {
-  if (S.started) return
-  ensureAudio()
-  S.started = true; S.running = true
+function startGame(){
+  if(S.started)return; ea()
+  S.started=true; S.running=true
   document.getElementById('start-overlay').classList.add('hidden')
-  resetPositions()
-  resetBall('player')
-  updateScoreDisplay()
+  resetRound('player'); updateHUD()
+  document.getElementById('round-text').textContent=`Round 1/${TOTAL_ROUNDS}`
 }
 
-// Touch controls
-document.getElementById('btn-left').addEventListener('touchstart', e => { e.preventDefault(); S.moveLeft = true })
-document.getElementById('btn-left').addEventListener('touchend', e => { e.preventDefault(); S.moveLeft = false })
-document.getElementById('btn-right').addEventListener('touchstart', e => { e.preventDefault(); S.moveRight = true })
-document.getElementById('btn-right').addEventListener('touchend', e => { e.preventDefault(); S.moveRight = false })
-document.getElementById('btn-jump').addEventListener('touchstart', e => { e.preventDefault(); S.jumpPressed = true })
-
+// Touch
+const bL=document.getElementById('btn-left'), bR=document.getElementById('btn-right'), bJ=document.getElementById('btn-jump')
+bL.addEventListener('touchstart',e=>{e.preventDefault();S.moveL=true})
+bL.addEventListener('touchend',e=>{e.preventDefault();S.moveL=false})
+bR.addEventListener('touchstart',e=>{e.preventDefault();S.moveR=true})
+bR.addEventListener('touchend',e=>{e.preventDefault();S.moveR=false})
+bJ.addEventListener('touchstart',e=>{e.preventDefault();S.jump=true})
 // Mouse fallback
-document.getElementById('btn-left').addEventListener('mousedown', () => S.moveLeft = true)
-document.getElementById('btn-left').addEventListener('mouseup', () => S.moveLeft = false)
-document.getElementById('btn-right').addEventListener('mousedown', () => S.moveRight = true)
-document.getElementById('btn-right').addEventListener('mouseup', () => S.moveRight = false)
-document.getElementById('btn-jump').addEventListener('mousedown', () => S.jumpPressed = true)
-
+bL.addEventListener('mousedown',()=>S.moveL=true); bL.addEventListener('mouseup',()=>S.moveL=false)
+bR.addEventListener('mousedown',()=>S.moveR=true); bR.addEventListener('mouseup',()=>S.moveR=false)
+bJ.addEventListener('mousedown',()=>S.jump=true)
 // Keyboard
-window.addEventListener('keydown', e => {
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA') S.moveLeft = true
-  if (e.code === 'ArrowRight' || e.code === 'KeyD') S.moveRight = true
-  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); S.jumpPressed = true }
+window.addEventListener('keydown',e=>{
+  if(e.code==='ArrowLeft'||e.code==='KeyA')S.moveL=true
+  if(e.code==='ArrowRight'||e.code==='KeyD')S.moveR=true
+  if(e.code==='Space'||e.code==='ArrowUp'||e.code==='KeyW'){e.preventDefault();S.jump=true}
 })
-window.addEventListener('keyup', e => {
-  if (e.code === 'ArrowLeft' || e.code === 'KeyA') S.moveLeft = false
-  if (e.code === 'ArrowRight' || e.code === 'KeyD') S.moveRight = false
+window.addEventListener('keyup',e=>{
+  if(e.code==='ArrowLeft'||e.code==='KeyA')S.moveL=false
+  if(e.code==='ArrowRight'||e.code==='KeyD')S.moveR=false
 })
+document.getElementById('start-overlay').addEventListener('pointerdown',startGame)
 
-// Start overlay
-document.getElementById('start-overlay').addEventListener('pointerdown', startGame)
-
-// Navigation
-function goBack() { window.location.replace('../index.html') }
-
-// Start game loop
-requestAnimationFrame(gameLoop)
+function goBack(){window.location.replace('../index.html')}
+window.addEventListener('resize',()=>{if(app)app.renderer.resize(window.innerWidth,window.innerHeight)})
 </script>
 </body>
 </html>
