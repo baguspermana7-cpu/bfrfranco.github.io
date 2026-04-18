@@ -302,8 +302,8 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .grass-strip { position:absolute;bottom:0;left:0;right:0;height:60px;background:#84CC16;border-radius:60px 60px 0 0;opacity:0.5; }
 .shimmer-dot { position:absolute;width:4px;height:4px;background:rgba(255,255,255,0.7);border-radius:50%;animation:shimmerDot ease-in-out infinite; }
 @keyframes shimmerDot { 0%,100%{opacity:0} 50%{opacity:1} }
-.g4-animals-grid { display:flex;flex-wrap:wrap;justify-content:center;gap:10px;width:100%;max-width:480px;min-height:130px;background:rgba(255,255,255,0.08);backdrop-filter:blur(4px);border-radius:var(--radius);padding:14px 20px;box-shadow:var(--shadow);margin-bottom:14px;align-content:center;border:3px solid rgba(245,158,11,0.25);position:relative;z-index:1; }
-.g4-animal-item { font-size:60px;animation:g4Pop 0.35s cubic-bezier(0.34,1.56,0.64,1) backwards;cursor:default; }
+.g4-animals-grid { display:flex;flex-wrap:wrap;justify-content:center;gap:6px;width:100%;max-width:480px;min-height:130px;max-height:50vh;background:rgba(255,255,255,0.08);backdrop-filter:blur(4px);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow);margin-bottom:14px;align-content:center;border:3px solid rgba(245,158,11,0.25);position:relative;z-index:1;overflow:hidden; }
+.g4-animal-item { font-size:clamp(36px,10vw,56px);animation:g4Pop 0.35s cubic-bezier(0.34,1.56,0.64,1) backwards;cursor:default; }
 @keyframes g4Pop { from{opacity:0;transform:scale(0.3)rotate(-30deg)} to{opacity:1;transform:scale(1)rotate(0)} }
 .g4-timer-track { width:100%;max-width:480px;height:14px;background:rgba(255,255,255,0.6);border-radius:100px;overflow:hidden;margin-bottom:6px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);position:relative;z-index:1; }
 .g4-timer-fill { height:100%;background:linear-gradient(90deg,#F59E0B,#FCD34D);border-radius:100px;transition:width 1s linear;box-shadow:0 0 8px rgba(245,158,11,0.5); }
@@ -323,7 +323,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g4-mode-toggle{display:flex;gap:8px;width:100%;max-width:480px;margin-bottom:10px;position:relative;z-index:1;}
 .g4-mode-btn{flex:1;padding:9px 12px;border-radius:100px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.65);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;}
 .g4-mode-btn.active{background:linear-gradient(135deg,#FCD34D,#F59E0B);color:#78350F;border-color:#F59E0B;box-shadow:0 3px 0 #B45309;}
-.g4-poke-img{width:72px;height:72px;image-rendering:pixelated;object-fit:contain;transition:opacity 0.2s;}
+.g4-poke-img{width:clamp(40px,12vw,64px);height:clamp(40px,12vw,64px);image-rendering:auto;object-fit:contain;transition:opacity 0.2s;flex-shrink:0;}
 
 /* G5 */
 #screen-game5 { background: radial-gradient(ellipse at 50% 0%,#DDD6FE 0%,#EDE9FE 50%,#F3E8FF 100%); }
@@ -9971,14 +9971,19 @@ function renderG4Content(){
     const distractors=g4State.distractors||[]
     distractors.forEach(d=>{ for(let i=0;i<d.count;i++) items.push(d.poke) })
     items.sort(()=>Math.random()-0.5)
+    // Dynamic size: shrink sprites when many items
+    const totalItems = items.length
+    const sprSize = totalItems > 12 ? 'clamp(30px,8vw,44px)' : totalItems > 8 ? 'clamp(36px,10vw,52px)' : 'clamp(40px,12vw,64px)'
     items.forEach((poke,i)=>{
       const img=document.createElement('img')
       img.className='g4-animal-item g4-poke-img'
-      img.src=`https://img.pokemondb.net/sprites/home/normal/${poke.name.toLowerCase()}.png`
-      img.onerror=()=>{img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id}.png`;img.onerror=null}
+      img.style.width=sprSize; img.style.height=sprSize
+      // Local sprite first, remote fallback
+      const slug = poke.name.toLowerCase().replace(/[^a-z0-9-]/g,'')
+      img.src=`assets/Pokemon/sprites/${slug}.png`
+      img.onerror=()=>{img.src=`https://img.pokemondb.net/sprites/home/normal/${slug}.png`;img.onerror=()=>{img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id}.png`;img.onerror=null}}
       img.alt=poke.name
       img.style.animationDelay=(i*55)+'ms'
-      // Slightly dim distractors so target stands out without removing the challenge
       if(poke.id!==currentPoke.id) img.style.opacity='0.75'
       grid.appendChild(img)
     })
