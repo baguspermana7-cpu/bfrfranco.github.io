@@ -293,10 +293,10 @@ function sfxWrong() { playTone(400, 120, 'sawtooth', 0.1); setTimeout(() => play
   worldContainer = new PIXI.Container(); app.stage.addChild(worldContainer)
   groundContainer = new PIXI.Container(); app.stage.addChild(groundContainer)
 
-  drawBackground()
-  drawGround()
-  buildPipes()
-  await createBird()
+  try { drawBackground() } catch(e) { console.error('drawBackground failed:', e) }
+  try { drawGround() } catch(e) { console.error('drawGround failed:', e) }
+  try { buildPipes() } catch(e) { console.error('buildPipes failed:', e) }
+  try { await createBird() } catch(e) { console.error('createBird failed:', e) }
   updateHUD()
 
   app.ticker.add(gameLoop)
@@ -611,17 +611,7 @@ function gameLoop(ticker) {
 
   updateHUD()
 
-  // Animate Ash + Pikachu running bob
-  const ashEl = document.getElementById('ash-runner')
-  const pikaEl = document.getElementById('pika-runner')
-  if (ashEl && ashEl.style.display !== 'none') {
-    const bob = Math.sin(S.frame * 0.2) * 3
-    ashEl.style.bottom = (13 + bob * 0.3) + '%'
-  }
-  if (pikaEl && pikaEl.style.display !== 'none') {
-    const bob2 = Math.sin(S.frame * 0.25 + 1) * 2
-    pikaEl.style.bottom = (13.5 + bob2 * 0.3) + '%'
-  }
+  // Ash + Pikachu run steadily at ground level (no bobbing)
 
   // Sync DOM bird image position — no rotation, only up/down
   if (window._birdImg) {
