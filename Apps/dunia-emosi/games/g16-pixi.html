@@ -1121,12 +1121,18 @@ function updateTrain(dt){
   }
   if(S.trainState==='BOOSTING'){
     S.boostTimer-=dt; speed=boostSpeed
-    if(S.boostTimer<=0){S.trainState='MOVING';document.getElementById('speed-lines').style.opacity='0'}
+    // Must still check for obstacles during boost — prevent overshoot
+    if(nextObs){
+      const dist=nextObs.worldX-S.worldX
+      if(dist<=stopDist+20){S.trainState='STOPPED';S.boostTimer=0;S.currentObstacleIdx=S.obstacles.indexOf(nextObs);showQuizPanel(nextObs);speed=0;document.getElementById('speed-lines').style.opacity='0'}
+      else if(dist<=brakeDist+100){speed=baseSpeed*0.4;S.boostTimer=0;S.trainState='MOVING';document.getElementById('speed-lines').style.opacity='0'}
+    }
+    if(S.boostTimer<=0&&S.trainState==='BOOSTING'){S.trainState='MOVING';document.getElementById('speed-lines').style.opacity='0'}
   } else if(S.trainState==='MOVING'){
     if(nextObs){
       const dist=nextObs.worldX-S.worldX
       if(dist<=stopDist){S.trainState='STOPPED';S.currentObstacleIdx=S.obstacles.indexOf(nextObs);showQuizPanel(nextObs);speed=0}
-      else if(dist<=brakeDist){speed=baseSpeed*Math.max((dist-stopDist)/(brakeDist-stopDist)*0.6,0.06);showBrakeSparks()}
+      else if(dist<=brakeDist){speed=baseSpeed*Math.max((dist-stopDist)/(brakeDist-stopDist)*0.5,0.04);showBrakeSparks()}
       else speed=baseSpeed
     } else speed=baseSpeed
   } else if(S.trainState==='STOPPED'||S.trainState==='CLEARING') speed=0
@@ -1143,7 +1149,9 @@ function updateTrain(dt){
     }
   } else if(S.trainState==='ARRIVED') speed=0
 
-  S.worldX+=speed*dt
+  // Clamp max movement per frame to prevent overshooting obstacles
+  const maxStep = nextObs && !nextObs.cleared ? Math.min(speed*dt, Math.max((nextObs.worldX-S.worldX)*0.8, 2)) : speed*dt
+  S.worldX+=maxStep
   if(S.worldX>WORLD_LENGTH+200&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){triggerDeath();return}
   if(S.cleared===S.totalObstacles&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){
     if(S.trainState!=='BOOSTING'&&S.trainState!=='MOVING'){S.trainState='BOOSTING';S.boostTimer=2}
