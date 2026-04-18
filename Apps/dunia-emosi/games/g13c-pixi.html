@@ -456,7 +456,9 @@ const TRAINER_GROUPS = [
 const BG_BASE      = '../assets/background/Gym pokemon/';
 const SPRITE_HD    = s => `https://img.pokemondb.net/sprites/home/normal/${s}.png`;
 const SPRITE_LOCAL = s => `../assets/Pokemon/sprites/${s}.png`;
-const TRAINER_SPRITE = s => `https://play.pokemonshowdown.com/sprites/trainers/${s}.png`;
+const TRAINER_SPRITE_LOCAL = s => `../assets/Pokemon/trainer/${s}.webp`;
+const TRAINER_SPRITE_REMOTE = s => `https://play.pokemonshowdown.com/sprites/trainers/${s}.png`;
+const TRAINER_SPRITE = s => TRAINER_SPRITE_LOCAL(s); // try local first
 
 // Type effectiveness
 const EFF = {
@@ -790,6 +792,13 @@ function answerMath(chosen, correct){
 
 // Replace broken trainer img with badge-emoji avatar
 function trainerFallback(img, badge) {
+  // Try remote CDN before falling back to emoji
+  const sprite = img.dataset.sprite;
+  if (sprite && !img.dataset.triedRemote) {
+    img.dataset.triedRemote = '1';
+    img.src = TRAINER_SPRITE_REMOTE(sprite);
+    return;
+  }
   const d = document.createElement('div');
   d.className = 'trainer-avatar-fb';
   d.textContent = badge;
@@ -808,7 +817,7 @@ function buildGymSelect(){
     html += '<div class="tg-row">';
     gTrainers.forEach(t => {
       html += `<div class="trainer-card ${badges_obj[t.id]?'beaten':''}" onclick="startBattle('${t.id}')">
-        <img src="${TRAINER_SPRITE(t.sprite)}" onerror="trainerFallback(this,'${t.badge}')" alt="${t.name}">
+        <img src="${TRAINER_SPRITE(t.sprite)}" data-sprite="${t.sprite}" onerror="trainerFallback(this,'${t.badge}')" alt="${t.name}">
         <div class="tc-name">${t.name}</div>
         ${badges_obj[t.id]?`<div class="tc-badge">${t.badge}</div>`:''}
       </div>`;
@@ -837,8 +846,10 @@ function startBattle(trainerId){
   const ep = document.getElementById('portrait-enemy');
   const epFb = document.getElementById('portrait-enemy-fb');
   epFb.style.display = 'none'; epFb.textContent = '';
-  ep.style.display = ''; ep.src = TRAINER_SPRITE(trainer.sprite);
+  ep.style.display = ''; ep.src = TRAINER_SPRITE_LOCAL(trainer.sprite);
   ep.onerror = ()=>{
+    // Try remote before emoji fallback
+    if(!ep.dataset.triedRemote){ep.dataset.triedRemote='1';ep.src=TRAINER_SPRITE_REMOTE(trainer.sprite);return}
     ep.style.display = 'none';
     epFb.textContent = trainer.badge;
     epFb.style.display = 'flex';
