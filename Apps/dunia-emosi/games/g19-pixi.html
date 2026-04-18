@@ -395,37 +395,60 @@ function drawPipe(g, top, bottom, isTop) {
 // ═══════════════════════════════════════════════════════════
 //  BIRD
 // ═══════════════════════════════════════════════════════════
+// Load image as PIXI texture (works with GIF/PNG/JPG)
+function loadImageTexture(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        resolve(PIXI.Texture.from(canvas))
+      } catch(e) { reject(e) }
+    }
+    img.onerror = reject
+    img.src = src
+  })
+}
+
 async function createBird() {
   birdContainer = new PIXI.Container()
   birdContainer.x = BIRD_X; birdContainer.y = S.birdY
 
-  // Load Pidgeot GIF as static sprite (PixiJS 8 can load it)
+  // Load Pidgeot via HTML Image → PIXI Texture (GIF not natively supported by PixiJS 8)
   try {
-    const tex = await PIXI.Assets.load('../assets/Pokemon/birds/pidgeot-pokemon.gif')
+    const tex = await loadImageTexture('../assets/Pokemon/birds/pidgeot-pokemon.gif')
     // Glow sprite (behind, larger, tinted pastel)
     birdGlow = new PIXI.Sprite(tex)
     birdGlow.anchor.set(0.5)
-    birdGlow.scale.set(-1.4, 1.4) // flip + slightly larger
-    birdGlow.tint = 0xC4B5FD // pastel purple
+    const ratio = BIRD_SIZE / tex.height
+    birdGlow.scale.set(-ratio * 1.35, ratio * 1.35) // flip + larger
+    birdGlow.tint = 0xC4B5FD
     birdGlow.alpha = 0.35
     birdContainer.addChild(birdGlow)
 
     // Main bird sprite
     birdSprite = new PIXI.Sprite(tex)
     birdSprite.anchor.set(0.5)
-    birdSprite.scale.set(-1, 1) // flip horizontally (faces left → right)
+    birdSprite.scale.set(-ratio, ratio) // flip horizontally
     birdContainer.addChild(birdSprite)
-
-    // Scale to ~56px height
-    const targetH = BIRD_SIZE
-    const ratio = targetH / birdSprite.texture.height
-    birdSprite.scale.set(-ratio, ratio)
-    birdGlow.scale.set(-ratio * 1.35, ratio * 1.35)
   } catch(_) {
-    // Fallback: emoji
-    birdSprite = new PIXI.Text({ text: '🐦', style: { fontSize: 48 } })
-    birdSprite.anchor.set(0.5)
-    birdContainer.addChild(birdSprite)
+    // Fallback: use local PNG sprite
+    try {
+      const tex2 = await loadImageTexture('../assets/Pokemon/sprites/pidgeot.png')
+      birdSprite = new PIXI.Sprite(tex2)
+      birdSprite.anchor.set(0.5)
+      const r2 = BIRD_SIZE / tex2.height
+      birdSprite.scale.set(-r2, r2)
+      birdContainer.addChild(birdSprite)
+    } catch(__) {
+      birdSprite = new PIXI.Text({ text: '🐦', style: { fontSize: 48 } })
+      birdSprite.anchor.set(0.5)
+      birdContainer.addChild(birdSprite)
+    }
   }
 
   // Pastel outline ring
@@ -729,7 +752,7 @@ async function triggerEvolution() {
   // After 1.5s, swap sprite to evolved form (pidgeotto facing right = no flip needed)
   setTimeout(async () => {
     try {
-      const evoTex = await PIXI.Assets.load('../assets/Pokemon/birds/pidgeotto-pokemon.gif')
+      const evoTex = await loadImageTexture('../assets/Pokemon/birds/pidgeotto-pokemon.gif')
       if (birdSprite) {
         birdSprite.texture = evoTex
         const ratio = BIRD_SIZE / evoTex.height
@@ -781,11 +804,11 @@ function flap() {
   }
 }
 
-document.getElementById('pixi-canvas').addEventListener('pointerdown', e => {
-  if (e.target.closest('#quiz-panel') || e.target.closest('#hud-top')) return
+// Touch/click anywhere to flap (mobile-first)
+document.addEventListener('pointerdown', e => {
+  if (e.target.closest('#quiz-panel') || e.target.closest('#hud-top') || e.target.closest('#btn-back')) return
   flap()
 })
-document.getElementById('start-overlay').addEventListener('pointerdown', flap)
 window.addEventListener('keydown', e => {
   if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); flap() }
 })
