@@ -886,6 +886,7 @@ function showFinish() {
   try {
     sessionStorage.setItem('g6Result', JSON.stringify({ stars, score: S.score, wordsDone: S.wordsDone }))
   } catch(_) {}
+  saveG6Progress(stars)
 }
 
 function togglePause() {
@@ -895,6 +896,19 @@ function togglePause() {
 
 function finishGame() { goBack() }
 
+// Save level progress directly to localStorage
+function saveG6Progress(stars) {
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g6) prog.g6 = { completed: [], stars: {} }
+    const lv = (typeof cfg !== 'undefined' ? cfg.level : (typeof S !== 'undefined' ? S.level : 1)) || 1
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g6.completed.includes(lv)) prog.g6.completed.push(lv)
+    if ((prog.g6.stars[lv] || 0) < mapped) prog.g6.stars[lv] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
+}
 function goBack() {
   S.running = false
   history.back()

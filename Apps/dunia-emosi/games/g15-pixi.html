@@ -239,6 +239,19 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 const cfg = (() => { try { return JSON.parse(sessionStorage.getItem('g15Config') || '{}'); } catch { return {}; } })();
 const LEVEL = Math.max(1, Math.min(30, cfg.level || 1));
 
+// Save level progress directly to localStorage
+function saveG15Progress(stars) {
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g15) prog.g15 = { completed: [], stars: {} }
+    const lv = (typeof cfg !== 'undefined' ? cfg.level : (typeof S !== 'undefined' ? S.level : 1)) || 1
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g15.completed.includes(lv)) prog.g15.completed.push(lv)
+    if ((prog.g15.stars[lv] || 0) < mapped) prog.g15.stars[lv] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
+}
 function goBack() { history.back(); }
 function togglePause() {
   gamePaused = !gamePaused;
@@ -1486,6 +1499,7 @@ function showWin() {
   if (timeBonus) s = Math.min(5, s + 1);
   if (mathCorrect >= 2) s = Math.min(5, s + 1);
   sessionStorage.setItem('g15Result', JSON.stringify({ stars: Math.min(5, s) }));
+  saveG15Progress(Math.min(5, s));
   const msg = wrongTaps === 0
     ? `Sempurna! Tidak ada kesalahan! Matematika Benar: ${mathCorrect}`
     : `${wrongTaps} kesalahan. Matematika benar: ${mathCorrect}. Terus berlatih!`;

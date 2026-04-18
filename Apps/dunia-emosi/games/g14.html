@@ -1796,6 +1796,7 @@ function endRace() {
   try {
     sessionStorage.setItem('g14Result', JSON.stringify({ stars, distance: Math.floor(S.distance), position: S.position }))
   } catch(_) {}
+  saveG14Progress(stars)
 }
 
 function showSelectScreen() {
@@ -1815,6 +1816,19 @@ function togglePause() {
   document.getElementById('position-badge').textContent = S.paused ? '⏸ PAUSE' : '🏁 Lanjut!'
 }
 
+// Save level progress directly to localStorage
+function saveG14Progress(stars) {
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g14) prog.g14 = { completed: [], stars: {} }
+    const lv = (typeof cfg !== 'undefined' ? cfg.level : (typeof S !== 'undefined' ? S.level : 1)) || 1
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g14.completed.includes(lv)) prog.g14.completed.push(lv)
+    if ((prog.g14.stars[lv] || 0) < mapped) prog.g14.stars[lv] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
+}
 function goBack() {
   S.running = false
   history.back()

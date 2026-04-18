@@ -696,6 +696,7 @@ function endMatch(){
   const won=S.pRounds>S.cRounds
   const stars=won?(S.correctQ>=2?5:S.cRounds===0?4:3):(S.pRounds>0?2:1)
   try{sessionStorage.setItem('g20Result',JSON.stringify({stars,level:cfg.level}))}catch(_){}
+  saveG20Progress(stars)
 
   setTimeout(()=>{
     const next=won&&cfg.level<30?()=>{
@@ -784,6 +785,19 @@ window.addEventListener('keyup',e=>{
 })
 document.getElementById('start-overlay').addEventListener('pointerdown',startGame)
 
+// Save level progress directly to localStorage
+function saveG20Progress(stars) {
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g20) prog.g20 = { completed: [], stars: {} }
+    const lv = (typeof cfg !== 'undefined' ? cfg.level : (typeof S !== 'undefined' ? S.level : 1)) || 1
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g20.completed.includes(lv)) prog.g20.completed.push(lv)
+    if ((prog.g20.stars[lv] || 0) < mapped) prog.g20.stars[lv] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
+}
 function goBack(){history.back()}
 function togglePause(){
   S.paused=!S.paused

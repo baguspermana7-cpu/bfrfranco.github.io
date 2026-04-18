@@ -1405,6 +1405,7 @@ function showWin(){
   const msgs=['','','','Bagus sekali!','Luar biasa cepat!','SEMPURNA!']
   const title=stars>=5?'SEMPURNA!':stars>=4?'Hebat Sekali!':'Kereta Selamat!'
   try{sessionStorage.setItem('g16Result',JSON.stringify({stars,level:S.level,cleared:S.cleared,total:S.totalObstacles}))}catch(_){}
+  saveG16Progress(stars)
   const nextLevel = S.level < 30 ? () => { sessionStorage.setItem('g16Config', JSON.stringify({level: S.level + 1})); location.reload(); } : null;
   GameModal.show({
     emoji:stars>=4?'🏆':'⭐', title, stars, msg:msgs[stars]||'Terus berlatih!',
@@ -1590,6 +1591,19 @@ function updateCelebration(dt){
 function flashScreen(color,alpha){
   const el=document.getElementById('flash'); el.style.background=color; el.style.opacity=alpha
   setTimeout(()=>{el.style.opacity='0'},130)
+}
+// Save level progress directly to localStorage
+function saveG16Progress(stars) {
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g16) prog.g16 = { completed: [], stars: {} }
+    const lv = (typeof cfg !== 'undefined' ? cfg.level : (typeof S !== 'undefined' ? S.level : 1)) || 1
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g16.completed.includes(lv)) prog.g16.completed.push(lv)
+    if ((prog.g16.stars[lv] || 0) < mapped) prog.g16.stars[lv] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
 }
 function goBack(){S.running=false;history.back()}
 function confirmBack(){goBack()}
