@@ -449,7 +449,7 @@ const TIE_SPACING=44
 
 async function initPixi(){
   const W=window.innerWidth, H=window.innerHeight
-  TRAIN_SCREEN_X=W*0.15; WORLD_LENGTH=W*4; STATION_X=WORLD_LENGTH*0.84
+  TRAIN_SCREEN_X=W*0.15; WORLD_LENGTH=W*5.5; STATION_X=WORLD_LENGTH*0.88
   app=new PIXI.Application()
   await app.init({
     canvas:document.getElementById('pixi-canvas'),
@@ -1110,7 +1110,7 @@ function updateTrain(dt){
   let speed=0
   const baseSpeed=(80+S.level*12)*2.25, boostSpeed=baseSpeed*2.2
   const nextObs=S.obstacles.find(o=>!o.cleared&&o.worldX>S.worldX-10)
-  const stopDist=80, brakeDist=110
+  const stopDist=100, brakeDist=220
 
   if(S.trainState==='DEAD'){
     S.deadTimer-=dt
@@ -1144,10 +1144,10 @@ function updateTrain(dt){
   } else if(S.trainState==='ARRIVED') speed=0
 
   S.worldX+=speed*dt
-  if(S.worldX>WORLD_LENGTH-40&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){triggerDeath();return}
+  if(S.worldX>WORLD_LENGTH+200&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){triggerDeath();return}
   if(S.cleared===S.totalObstacles&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){
-    if(S.trainState!=='BOOSTING'&&S.trainState!=='MOVING'){S.trainState='BOOSTING';S.boostTimer=3}
-    if(S.worldX>STATION_X-W*0.55){triggerArrival();return}
+    if(S.trainState!=='BOOSTING'&&S.trainState!=='MOVING'){S.trainState='BOOSTING';S.boostTimer=2}
+    if(S.worldX>STATION_X-W*0.8){triggerArrival();return}
   }
 
   const cameraX=Math.max(0,S.worldX-TRAIN_SCREEN_X)
