@@ -85,23 +85,9 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0d102
   <div id="start-hint">Memuat game... ⏳</div>
 </div>
 
-<!-- Early tap handler — registers BEFORE PixiJS loads -->
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+<script src="game-modal.js"></script>
 <script>
-window._earlyTaps=[];
-document.addEventListener('pointerdown',function(e){window._earlyTaps.push(e)});
-</script>
-<script>
-// Load PixiJS + game-modal async, then init
-function _loadScript(src){return new Promise(function(ok,err){var s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=err;document.head.appendChild(s)})}
-async function _boot(){
-  try{
-    await _loadScript('https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js')
-    await _loadScript('game-modal.js')
-  }catch(e){document.getElementById('start-hint').textContent='Gagal memuat PixiJS. Muat ulang.';return}
-  _startGame()
-}
-_boot()
-function _startGame(){
 // ═══════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════
@@ -270,9 +256,7 @@ function sfxWrong() { playTone(400, 120, 'sawtooth', 0.1); setTimeout(() => play
   updateHUD()
 
   app.ticker.add(gameLoop)
-  // Ready — update hint and process any taps that happened during load
   document.getElementById('start-hint').textContent='Tap untuk Terbang!'
-  if(window._earlyTaps && window._earlyTaps.length>0) flap()
 })().catch(e=>{
   console.error('G19 init failed:',e)
   document.getElementById('start-hint').textContent='Gagal memuat. Muat ulang halaman.'
@@ -465,38 +449,19 @@ async function createBird() {
   birdContainer = new PIXI.Container()
   birdContainer.x = BIRD_X; birdContainer.y = S.birdY
 
-  // Load Pidgeot via HTML Image → PIXI Texture (GIF not natively supported by PixiJS 8)
-  try {
-    const tex = await loadImageTexture('../assets/Pokemon/birds/pidgeot-pokemon.gif')
-    // Glow sprite (behind, larger, tinted pastel)
-    birdGlow = new PIXI.Sprite(tex)
-    birdGlow.anchor.set(0.5)
-    const ratio = BIRD_SIZE / tex.height
-    birdGlow.scale.set(-ratio * 1.35, ratio * 1.35) // flip + larger
-    birdGlow.tint = 0xC4B5FD
-    birdGlow.alpha = 0.35
-    birdContainer.addChild(birdGlow)
+  // Use DOM <img> for animated GIF with transparency (PixiJS can't do animated GIF)
+  const birdImg = document.createElement('img')
+  birdImg.id = 'bird-gif'
+  birdImg.src = '../assets/Pokemon/birds/pidgeot-pokemon.gif'
+  birdImg.style.cssText = 'position:fixed;z-index:40;pointer-events:none;width:'+BIRD_SIZE+'px;height:auto;transform:scaleX(-1);filter:drop-shadow(0 0 8px rgba(196,181,253,0.5));image-rendering:auto;'
+  birdImg.onerror = () => { birdImg.src = '../assets/Pokemon/sprites/pidgeot.png' }
+  document.body.appendChild(birdImg)
+  window._birdImg = birdImg
 
-    // Main bird sprite
-    birdSprite = new PIXI.Sprite(tex)
-    birdSprite.anchor.set(0.5)
-    birdSprite.scale.set(-ratio, ratio) // flip horizontally
-    birdContainer.addChild(birdSprite)
-  } catch(_) {
-    // Fallback: use local PNG sprite
-    try {
-      const tex2 = await loadImageTexture('../assets/Pokemon/sprites/pidgeot.png')
-      birdSprite = new PIXI.Sprite(tex2)
-      birdSprite.anchor.set(0.5)
-      const r2 = BIRD_SIZE / tex2.height
-      birdSprite.scale.set(-r2, r2)
-      birdContainer.addChild(birdSprite)
-    } catch(__) {
-      birdSprite = new PIXI.Text({ text: '🐦', style: { fontSize: 48 } })
-      birdSprite.anchor.set(0.5)
-      birdContainer.addChild(birdSprite)
-    }
-  }
+  // PixiJS placeholder (invisible, just for position tracking)
+  birdSprite = new PIXI.Graphics()
+  birdSprite.circle(0, 0, 2).fill({ color: 0xffffff, alpha: 0 })
+  birdContainer.addChild(birdSprite)
 
   // Pastel outline ring
   const ring = new PIXI.Graphics()
@@ -886,13 +851,11 @@ window.addEventListener('keydown', e => {
 //  NAVIGATION
 // ═══════════════════════════════════════════════════════════
 function goBack() { S.running = false; window.location.replace('../index.html') }
-function confirmBack() { goBack() }
 
 // Resize
 window.addEventListener('resize', () => {
   if (app) app.renderer.resize(window.innerWidth, window.innerHeight)
 })
-} // end _startGame
 </script>
 </body>
 </html>
