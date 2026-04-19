@@ -36,6 +36,18 @@
 - ✅ GameModal confetti: standalone games get graded confetti via game-modal.js
 - ✅ spawnSparkles() graded: accepts starCount param for intensity scaling
 
+## ✅ COMPLETED 2026-04-20 — G3 Huruf Hutan AAA Overhaul
+
+- ✅ **Background**: Switched from `bg-game3-huruf.webp` (bedroom-like overlay) to `bg-forest.webp`
+- ✅ **Word display**: Wooden plank style — amber/brown gradient with wood-grain stripes, white text with shadow, `#D97706` border, `#451A03` drop shadow
+- ✅ **Letter spans**: Word rendered per-character; first letter is blank `_` (fill-in-the-blank puzzle)
+- ✅ **Letter highlight**: On correct answer, blank fills with correct letter + gold `#FCD34D` burst animation (`g3LetterBurst` scale 1.6×)
+- ✅ **Hint speech bubble**: White pill with green border `#86EFAC`, soft shadow, readable dark-green text
+- ✅ **Choice buttons**: Carved wood log style — deep brown gradient `#7C2D12→#9A3412`, vertical wood-grain, orange border `#FB923C`, cream yellow letters, bouncy press
+- ✅ **Animal swing**: Gentle 3s hover animation — rotate -3°↔3° + translateY ±10px
+- ✅ **Mode badge hidden**: `display:none` (redundant with mascot guide bubble)
+- ✅ **Progress text hidden**: `display:none` on "1/6" (keeping only round-dots at top)
+
 ---
 
 ## ⬜ PENDING FIXES — BY GAME
