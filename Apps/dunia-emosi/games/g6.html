@@ -664,17 +664,18 @@ function spawnTile(lane, letter, isCorrect) {
 
   const bg = new PIXI.Graphics()
   if (isCorrect) {
-    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 13).fill(0x4c1d95)
-    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 13).stroke({color: 0xa78bfa, width: 3})
-    // Inner shine
+    // BRIGHT green pastel — clearly "collect me!"
+    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 14).fill(0x22c55e)
+    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 14).stroke({color: 0x86efac, width: 3})
     const shine = new PIXI.Graphics()
     shine.roundRect(-TILE_SZ/2+4, -TILE_SZ/2+4, TILE_SZ-8, 14, 6).fill(0xffffff)
-    shine.alpha = 0.12
+    shine.alpha = 0.2
     tc.addChild(bg)
     tc.addChild(shine)
   } else {
-    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 13).fill(0x1e1e3a)
-    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 13).stroke({color: 0x374151, width: 2})
+    // DARK red/danger — clearly "avoid me!"
+    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 14).fill(0x7f1d1d)
+    bg.roundRect(-TILE_SZ/2, -TILE_SZ/2, TILE_SZ, TILE_SZ, 14).stroke({color: 0xef4444, width: 2})
     tc.addChild(bg)
   }
   tc._bg = bg
@@ -685,7 +686,7 @@ function spawnTile(lane, letter, isCorrect) {
       fontSize: isCorrect ? 27 : 23,
       fontWeight: '900',
       fontFamily: 'Fredoka One, Arial',
-      fill: isCorrect ? 0xc4b5fd : 0x6b7280,
+      fill: isCorrect ? 0xffffff : 0xfca5a5,
     }
   })
   txt.anchor.set(0.5)
