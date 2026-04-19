@@ -249,17 +249,11 @@ function spawnCandy() {
   ball.ellipse(-ballR * 0.35, -ballR * 0.35, ballR * 0.2, ballR * 0.12).fill({ color: 0xffffff, alpha: 0.4 })
   container.addChild(ball)
 
-  // Pokemon SVG image inside ball (small, centered)
-  const pokeImg = new PIXI.Sprite()
-  try {
-    const tex = PIXI.Texture.from(`../assets/Pokemon/svg/${pokeId}.svg`)
-    pokeImg.texture = tex
-    pokeImg.anchor.set(0.5)
-    pokeImg.width = ballR * 1.0; pokeImg.height = ballR * 1.0
-    pokeImg.y = -2
-    pokeImg.alpha = 0.85
-    container.addChild(pokeImg)
-  } catch(_) {}
+  // Pokemon emoji inside ball (safe — no SVG texture loading)
+  const pokeEmojis = ['🐸','🔥','💧','🌿','⚡','👻','🐉','🪨','🦋','🐍','🐭','🐱','🐶','🐻','🦅','🐟','🌟','💎']
+  const pe = new PIXI.Text({text:pokeEmojis[Math.floor(Math.random()*pokeEmojis.length)], style:{fontSize:ballR*0.7}})
+  pe.anchor.set(0.5); pe.y = -2; pe.alpha = 0.8
+  container.addChild(pe)
 
   // Math question floating below ball
   const qText = new PIXI.Text({ text: q.q + '=?', style: { fontSize: 14, fontWeight: '900', fill: 0x1c1917, fontFamily: 'Fredoka One, Arial', align: 'center' } })
@@ -271,7 +265,7 @@ function spawnCandy() {
   container.addChild(qBg)
   container.addChild(qText)
 
-  container.interactive = true
+  container.eventMode = 'static'
   container.cursor = 'pointer'
   container.on('pointerdown', () => catchCandy(candy))
 

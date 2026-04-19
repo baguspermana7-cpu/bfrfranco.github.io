@@ -160,11 +160,11 @@ function pickQ(){return QS[Math.floor(Math.random()*QS.length)]}
 //  GAME STATE
 // ═══════════════════════════════════════════════════════════
 let W, H, GROUND_Y, NET_X, NET_TOP, NET_H
-const GRAVITY = 0.30 // very light for kids
-const BALL_R = 18
-const DUCK_R = 28
-const JUMP_POWER = -10
-const MOVE_SPD = 4.0
+const GRAVITY = 0.28 // very light for kids
+const BALL_R = 20 // bigger ball — easier to see and hit
+const DUCK_R = 30
+const JUMP_POWER = -9.5
+const MOVE_SPD = 5.0 // faster movement for responsive controls
 const POINTS_TO_WIN = 3 // faster rounds for kids (was 5)
 const TOTAL_ROUNDS = 3
 
@@ -458,18 +458,22 @@ function createEntities(){
 function drawBall(){
   ballGfx.clear()
   // Ball shadow
-  ballGfx.ellipse(S.bx,GROUND_Y+2,BALL_R*0.7,4).fill({color:0x000000,alpha:0.12})
-  // Ball body
+  ballGfx.ellipse(S.bx,GROUND_Y+2,BALL_R*0.8,5).fill({color:0x000000,alpha:0.15})
+  // Ball body — gradient effect
   ballGfx.circle(S.bx,S.by,BALL_R).fill(0xf8fafc)
-  ballGfx.circle(S.bx,S.by,BALL_R).stroke({color:0x94a3b8,width:2})
-  // Volleyball lines (rotate with spin)
+  ballGfx.circle(S.bx,S.by,BALL_R).stroke({color:0x64748b,width:2.5})
+  // Volleyball panel lines (rotate with spin — more visible)
   const a=S.bSpin
   for(let i=0;i<3;i++){
     const ang=a+i*Math.PI/1.5
-    const x1=S.bx+Math.cos(ang)*(BALL_R-3), y1=S.by+Math.sin(ang)*(BALL_R-3)
-    const x2=S.bx+Math.cos(ang+Math.PI)*(BALL_R-3), y2=S.by+Math.sin(ang+Math.PI)*(BALL_R-3)
-    ballGfx.moveTo(x1,y1).lineTo(x2,y2).stroke({color:0x3b82f6,width:1.2,alpha:0.4})
+    const x1=S.bx+Math.cos(ang)*(BALL_R-2), y1=S.by+Math.sin(ang)*(BALL_R-2)
+    const x2=S.bx+Math.cos(ang+Math.PI)*(BALL_R-2), y2=S.by+Math.sin(ang+Math.PI)*(BALL_R-2)
+    ballGfx.moveTo(x1,y1).lineTo(x2,y2).stroke({color:0x3b82f6,width:2,alpha:0.6})
   }
+  // Center dot
+  ballGfx.circle(S.bx,S.by,3).fill({color:0x3b82f6,alpha:0.3})
+  // Shine highlight (top-left)
+  ballGfx.ellipse(S.bx-BALL_R*0.3,S.by-BALL_R*0.3,BALL_R*0.25,BALL_R*0.15).fill({color:0xffffff,alpha:0.4})
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -569,11 +573,11 @@ function gameLoop(ticker){
   const ballSpd=S.powerup==='slow'?0.6:1
   S.bvy+=GRAVITY*S.gravMod*0.35*dt*ballSpd // very light ball — floats longer
   S.bx+=S.bvx*dt*ballSpd; S.by+=S.bvy*dt*ballSpd
-  // Cap max ball speed — slower = more playable for kids
-  const MAX_BALL_V = 6
+  // Cap max ball speed — very slow for kids
+  const MAX_BALL_V = 5
   if(Math.abs(S.bvx)>MAX_BALL_V) S.bvx=Math.sign(S.bvx)*MAX_BALL_V
   if(Math.abs(S.bvy)>MAX_BALL_V) S.bvy=Math.sign(S.bvy)*MAX_BALL_V
-  S.bSpin+=S.bvx*0.015*dt
+  S.bSpin+=S.bvx*0.04*dt // faster visible spin
 
   const br=BALL_R*(S.powerup==='big'?1.5:1)
 
