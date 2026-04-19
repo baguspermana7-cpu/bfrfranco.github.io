@@ -484,11 +484,18 @@ function buildCar() {
   carContainer.addChild(carGlow)
 
   // Car sprite — selected vehicle emoji (top-down game)
-  carSprite = new PIXI.Text({
-    text: cfg.playerIcon || '🚗',
-    style: { fontSize: 52, fontFamily: 'Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Arial' }
-  })
-  carSprite.anchor.set(0.5, 1)
+  // Top-view car image (fallback to emoji if image fails)
+  const carIdx = cfg.carIdx || Math.floor(Math.random() * 12)
+  const carFiles = ['top_car_white_gt_01.png','top_car_yellow_sport_02.png','top_car_white_track_03.png','top_car_blue_red_racer_04.png','top_car_cyan_sedan_05.png','top_car_white_stripe_gt_06.png','top_car_red_formula_07.png','top_car_yellow_rally_08.png','top_car_white_coupe_09.png','top_car_white_roadster_10.png','top_car_blue_compact_11.png','top_car_silver_sedan_12.png']
+  try {
+    const tex = PIXI.Texture.from(`../assets/car and vehicle/top-view/${carFiles[carIdx % carFiles.length]}`)
+    carSprite = new PIXI.Sprite(tex)
+    carSprite.anchor.set(0.5, 1)
+    carSprite.width = 48; carSprite.height = 84
+  } catch(_) {
+    carSprite = new PIXI.Text({ text: cfg.playerIcon || '🚗', style: { fontSize: 52, fontFamily: 'Arial' } })
+    carSprite.anchor.set(0.5, 1)
+  }
   carContainer.addChild(carSprite)
 
   // Headlight left
