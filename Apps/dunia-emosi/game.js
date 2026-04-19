@@ -3256,9 +3256,12 @@ function initGame9(){
   state.currentPlayer=0
   g9Canvas=document.getElementById('g9-canvas')
   g9Ctx=g9Canvas.getContext('2d')
-  // Sync canvas buffer size to CSS display size so scaleX/Y = 1.0 (no coordinate offset)
-  const _g9sz = g9Canvas.offsetWidth || 300
-  g9Canvas.width = _g9sz; g9Canvas.height = _g9sz
+  // Sync canvas buffer size to CSS display size — must be done after screen is visible
+  setTimeout(()=>{
+    const _g9sz = g9Canvas.offsetWidth || g9Canvas.clientWidth || 300
+    g9Canvas.width = _g9sz; g9Canvas.height = _g9sz
+    g9Clear(); renderG9GuideDots()
+  }, 100)
   // Remove old listeners first (in case re-init)
   g9Canvas.removeEventListener('mousedown',g9StartDraw)
   g9Canvas.removeEventListener('mousemove',g9Draw)
@@ -3302,7 +3305,7 @@ function g9GetPos(e,canvas){const rect=canvas.getBoundingClientRect(),scaleX=can
 function g9StartDraw(e){
   g9Drawing=true; const pos=g9GetPos(e,g9Canvas); g9UserPath.push(pos)
   g9Ctx.beginPath(); g9Ctx.moveTo(pos.x,pos.y)
-  g9Ctx.strokeStyle='#84CC16'; g9Ctx.lineWidth=12; g9Ctx.lineCap='round'; g9Ctx.lineJoin='round'
+  g9Ctx.strokeStyle='#84CC16'; g9Ctx.lineWidth=16; g9Ctx.lineCap='round'; g9Ctx.lineJoin='round'
 }
 function g9Draw(e){
   if(!g9Drawing)return; const pos=g9GetPos(e,g9Canvas); g9UserPath.push(pos)
@@ -3313,13 +3316,13 @@ function g9TouchMove(e){e.preventDefault();if(e.touches[0])g9Draw(e.touches[0])}
 function g9EndDraw(){if(!g9Drawing)return;g9Drawing=false;g9Ctx.beginPath();setTimeout(evaluateG9Trace,500)}
 function checkGuideHits(pos){
   const sz=g9Canvas.width||300; const guides=getG9Guides(g9State.currentLetter)
-  guides.forEach((g,i)=>{const gx=g.x*sz,gy=g.y*sz,d=Math.hypot(pos.x-gx,pos.y-gy);if(d<sz*0.12){const dot=document.getElementById(`g9-dot-${i}`);if(dot)dot.classList.add('hit')}})
+  guides.forEach((g,i)=>{const gx=g.x*sz,gy=g.y*sz,d=Math.hypot(pos.x-gx,pos.y-gy);if(d<sz*0.18){const dot=document.getElementById(`g9-dot-${i}`);if(dot)dot.classList.add('hit')}})
 }
 function evaluateG9Trace(){
   const sz=g9Canvas.width||300; const guides=getG9Guides(g9State.currentLetter)
   if(guides.length===0||g9UserPath.length<5)return
   let hits=0
-  guides.forEach(g=>{const gx=g.x*sz,gy=g.y*sz,nearest=g9UserPath.reduce((best,p)=>Math.min(best,Math.hypot(p.x-gx,p.y-gy)),Infinity);if(nearest<sz*0.15)hits++})
+  guides.forEach(g=>{const gx=g.x*sz,gy=g.y*sz,nearest=g9UserPath.reduce((best,p)=>Math.min(best,Math.hypot(p.x-gx,p.y-gy)),Infinity);if(nearest<sz*0.22)hits++})
   const score=hits/guides.length
   let stars=0,msg=''
   if(score>=0.85){stars=3;msg='Sempurna! Tulisanmu bagus sekali! 🌟'}
