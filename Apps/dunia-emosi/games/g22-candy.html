@@ -126,19 +126,27 @@ let W, H, app
 // Pokemon IDs for ball sprites (popular Pokemon)
 const POKE_BALL_IDS = [25,1,4,7,133,143,39,54,129,63,92,104,37,58,77,120,147,152,155,158,172,175,183,196,252,255,258,280,300,333,387,390,393,403,447,495,498,501,570,613,650,653,656,722,725,728]
 const BALL_COLORS = [0xef4444,0xf97316,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x14b8a6,0x6366f1,0xf43f5e]
-// Real pokeball SVGs — each type maps to a quiz category
-const POKEBALL_SVGS = [
-  '../assets/Pokemon/others/pokeball-pokemon-svgrepo-com.svg',
-  '../assets/Pokemon/others/great-ball.svg',
-  '../assets/Pokemon/others/ultra-ball.svg',
-  '../assets/Pokemon/others/master-ball.svg',
-  '../assets/Pokemon/others/fast-ball.svg',
-  '../assets/Pokemon/others/heal-ball.svg',
-  '../assets/Pokemon/others/luxury-ball.svg',
-  '../assets/Pokemon/others/quick-ball.svg',
-  '../assets/Pokemon/others/pokeball.svg',
+// Real pokeball PNGs (pre-rasterized from SVG 128px) — ballType index matches POKEBALL_PNGS, BALL_DESIGNS, and BALL_CATEGORIES
+const POKEBALL_PNGS = [
+  '../assets/Pokemon/pokeballs-png/pokeball-pokemon-svgrepo-com.png', // 0 Math
+  '../assets/Pokemon/pokeballs-png/great-ball.png',                   // 1 Warna
+  '../assets/Pokemon/pokeballs-png/ultra-ball.png',                   // 2 Hewan
+  '../assets/Pokemon/pokeballs-png/master-ball.png',                  // 3 Buah
+  '../assets/Pokemon/pokeballs-png/fast-ball.png',                    // 4 Math
+  '../assets/Pokemon/pokeballs-png/heal-ball.png',                    // 5 Warna
+  '../assets/Pokemon/pokeballs-png/luxury-ball.png',                  // 6 Hewan
+  '../assets/Pokemon/pokeballs-png/quick-ball.png',                   // 7 Buah
+  '../assets/Pokemon/pokeballs-png/pokeball.png',                     // 8 Math
 ]
 const _pokeballTexCache = {}
+async function preloadPokeballTextures(){
+  try {
+    const loads = POKEBALL_PNGS.map((url,i) =>
+      PIXI.Assets.load(url).then(tex => { _pokeballTexCache[i] = tex }).catch(() => { _pokeballTexCache[i] = null })
+    )
+    await Promise.all(loads)
+  } catch(_){}
+}
 
 const S = {
   running:false, paused:false, started:false, gameOver:false,
@@ -187,6 +195,9 @@ let bgLayer, gameLayer, fxLayer
 
   drawBackground()
   S.monsterX = W / 2
+
+  // Preload pokeball textures before gameplay starts (fire-and-forget — spawnCandy falls back to Graphics until ready)
+  preloadPokeballTextures()
 
   // Difficulty scaling
   S.spawnInterval = Math.max(0.6, 1.5 - cfg.level * 0.04)
@@ -279,21 +290,31 @@ function spawnCandy() {
     {top:0x22c55e,bot:0xf8fafc,accent:0x15803d,name:'Safari Ball'},    // green
   ]
   const bd = BALL_DESIGNS[ballType] || BALL_DESIGNS[0]
-  const ball = new PIXI.Graphics()
-  // Top half
-  ball.arc(0, 0, ballR, Math.PI, 0).fill(bd.top)
-  // Bottom half
-  ball.arc(0, 0, ballR, 0, Math.PI).fill(bd.bot)
-  // Center band
-  ball.rect(-ballR, -2.5, ballR * 2, 5).fill(0x1c1917)
-  // Center button
-  ball.circle(0, 0, 7).fill(bd.bot)
-  ball.circle(0, 0, 7).stroke({ color: 0x1c1917, width: 2.5 })
-  ball.circle(0, 0, 3.5).fill(bd.accent)
-  // Outer ring
-  ball.circle(0, 0, ballR).stroke({ color: 0x1c1917, width: 2.5 })
-  // Shine
-  ball.ellipse(-ballR * 0.3, -ballR * 0.35, ballR * 0.22, ballR * 0.1).fill({ color: 0xffffff, alpha: 0.45 })
+  // Prefer real pokeball texture (preloaded). Fallback to Graphics if texture missing.
+  const tex = _pokeballTexCache[ballType]
+  let ball
+  if (tex) {
+    ball = new PIXI.Sprite(tex)
+    ball.anchor.set(0.5)
+    ball.width = ballR * 2
+    ball.height = ballR * 2
+  } else {
+    ball = new PIXI.Graphics()
+    // Top half
+    ball.arc(0, 0, ballR, Math.PI, 0).fill(bd.top)
+    // Bottom half
+    ball.arc(0, 0, ballR, 0, Math.PI).fill(bd.bot)
+    // Center band
+    ball.rect(-ballR, -2.5, ballR * 2, 5).fill(0x1c1917)
+    // Center button
+    ball.circle(0, 0, 7).fill(bd.bot)
+    ball.circle(0, 0, 7).stroke({ color: 0x1c1917, width: 2.5 })
+    ball.circle(0, 0, 3.5).fill(bd.accent)
+    // Outer ring
+    ball.circle(0, 0, ballR).stroke({ color: 0x1c1917, width: 2.5 })
+    // Shine
+    ball.ellipse(-ballR * 0.3, -ballR * 0.35, ballR * 0.22, ballR * 0.1).fill({ color: 0xffffff, alpha: 0.45 })
+  }
   container.addChild(ball)
 
   // Math question floating below ball

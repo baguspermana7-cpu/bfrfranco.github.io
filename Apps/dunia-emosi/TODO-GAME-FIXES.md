@@ -91,18 +91,18 @@
 - ✅ **Guide dot polish**: Added pulsing glow animation, larger dots (20px), better hit feedback with glow
 
 ### G14 — Balapan Kereta (Train Race)
-- ⬜ **BGM**: Should use train-specific BGM, NOT Pokemon. Code shows `battle-bgm.mp3` — user might need cache clear
+- ✅ **BGM**: Wired `train-bgm.mp3` (was `battle-bgm.mp3`)
 - ⬜ **Background/environment**: Very sparse, lacks detail, "gambar2 nggak jelas" (unclear images)
 - ✅ **Buttons**: Removed emoji arrows (⬆️⬇️🚀), clean text only "Atas"/"Bawah"/"BOOST!" with pastel styling
 - ⬜ **Visual enhancement**: Train sprites, track, scenery all need more detail
 
 ### G15 — Lokomotif Pemberani
-- ⬜ **BGM**: Code reverted to `battle-bgm.mp3` — user said it should use train BGM they provided
+- ✅ **BGM**: Wired `train-bgm.mp3`
 - ✅ **Train selection UI**: Cards enlarged (68→110px min, up to 150px on desktop), rounded corners, hover effects, bigger text (8→10px names, 6→7px subs), better spacing (gap 3→8px, padding increased)
 - ⬜ **Visual enhancement**: Overall gameplay visuals
 
 ### G16 — Selamatkan Kereta (Signal Rush)
-- ⬜ **BGM**: Code reverted to `battle-bgm.mp3` — same train BGM issue
+- ✅ **BGM**: Wired `train-bgm.mp3`
 - ✅ **Boost effect removed**: `clearObstacle()` now sets MOVING instead of BOOSTING — no more speed burst after quiz
 - ⬜ **Visual/animation enhancement**: More visual effects, better animations
 
@@ -112,8 +112,8 @@
 - ⬜ **Gameplay revamp**: User says "gameplay sangat jelek" — needs visual, UI/UX, mechanics, animation overhaul
 
 ### G18 — Museum Kereta Ambarawa
-- ⬜ **Train catalog expansion**: User wants ALL Indonesian trains from 1400s to present, not just Ambarawa
-- ⬜ **Add lorry/tebu trains**: Sugar cane lorry trains and other historical types missing
+- ✅ **Train catalog expansion**: +5 Indonesian trains added (19→24). CC201, Whoosh KCIC, Argo Parahyangan, LRT Jabodebek, plus Lori Tebu.
+- ✅ **Add lorry/tebu trains**: Lori Tebu (1880, Orenstein & Koppel, 60cm narrow gauge) included.
 - ✅ **Story button**: Added "📖 Cerita" button in train detail modal — generates child-friendly story from train data (year, speed, fuel, builder, route). Toggleable panel with scrollable content.
 - ⬜ **Gameplay/mechanics development**: More interactive elements
 
@@ -129,7 +129,7 @@
 - ✅ **No multiplication/division**: Verified — QS bank only has + and - operations
 - ✅ **Monster → Psyduck**: Replaced broken monster icon with HD Psyduck sprite (pokemondb.net), local fallback
 - ✅ **Pokemon picker in pause menu**: Added 15 Pokemon grid (Psyduck, Pikachu, Eevee, Snorlax, etc). HD sprites from pokemondb. Switching changes catcher character instantly.
-- ⬜ **Different pokeball = different category**: pokeball=math, great-ball=bahasa, ultra-ball=sains, etc.
+- ✅ **Different pokeball = different category**: Ball design now indexed by `ballType` — Poké Ball=Math, Great Ball=Warna, Ultra Ball=Hewan, Master Ball=Buah. Quiz panel shows category chip.
 - ✅ **Physics smoothed**: Added sinusoidal wobble/sway to falling pokeballs, tighter speed range
 - ⬜ **Visual/UI very ugly**: Overall look and navigation needs major improvement — compare against original source
 - ⬜ **Navigation flow**: Menu, pause, game flow needs redesign to feel polished
@@ -139,7 +139,7 @@
 - ✅ **HD sprites restored**: Reverted from local-first (96px) back to HD-online-first (pokemondb 200-300px) with local fallback
 - ✅ **Hit effect**: Code exists (spr-hit, spr-flash, g10EHitFlip animations) — should be visible now with HD sprites
 - ✅ **WebGL context lost freeze**: Fixed — `backToLevelSelect()` now calls `PixiManager.destroyAll()` to free WebGL context before returning to level select.
-- ⬜ **Scoring broken**: User answered all correctly but got 2 stars — investigate endGame() normalization
+- ✅ **Scoring fixed**: Double-normalization bug — `endGame()` normalized to 5-star, then `showResult()` re-normalized using raw `maxRounds`. Fixed by setting `state.maxPossibleStars=5` so showResult passes through.
 - ✅ **CRITICAL: Result modal frozen**: Fixed — `showResult()` now closes overlay-feedback and game-result-overlay before showing screen-result. Overlays were blocking button clicks.
 - ⬜ **Unified modal engine**: User wants inline game result + standalone GameModal to share same engine. Currently two separate systems — `showResult()` in game.js for G1-G12, `GameModal.show()` in game-modal.js for standalone games.
 - ✅ **Shared pause menu engine**: Built `GamePause` in game-modal.js — `GamePause.init({onResume, onRetry, onHome, bgmEl})`, `GamePause.show()/hide()`. Has master+BGM volume sliders, resume/retry/home buttons. Games can import and use.
