@@ -377,6 +377,72 @@ function buildScenery(c, W, H) {
   c.addChild(sceneryR)
   c._sceneryL = sceneryL
   c._sceneryR = sceneryR
+
+  // Road signs container — spawned periodically, scroll with road
+  const signs = new PIXI.Container()
+  signs._signList = []
+  signs._spawnTimer = 0
+  c.addChild(signs)
+  c._signs = signs
+}
+
+const ROAD_SIGN_EMOJIS = {
+  city:   ['🛑','🚸','🚦','⛽','🅿️'],
+  forest: ['🛑','🦌','⚠️','🌳','📍'],
+  space:  ['🛑','🛸','⚠️','🌠','📡'],
+  body:   ['🛑','💊','⚠️','🧬','📍'],
+  pantai: ['🛑','🏖️','⚠️','🌊','⛱️'],
+  sekolah:['🛑','🚸','⚠️','📚','🏫'],
+  dapur:  ['🛑','🍳','⚠️','🧂','📍'],
+  kebun:  ['🛑','🌻','⚠️','🌾','📍']
+}
+
+function spawnRoadSign(signsContainer) {
+  const H = app.screen.height
+  const side = Math.random() < 0.5 ? 'L' : 'R'
+  const emojiSet = ROAD_SIGN_EMOJIS[cfg.mapTheme] || ROAD_SIGN_EMOJIS.city
+  const icon = emojiSet[Math.floor(Math.random() * emojiSet.length)]
+  // Sign post: vertical line + icon box
+  const post = new PIXI.Container()
+  const postBar = new PIXI.Graphics()
+  postBar.rect(-1.5, 0, 3, 28).fill(0x78716c)
+  post.addChild(postBar)
+  const signBox = new PIXI.Graphics()
+  signBox.roundRect(-16, -18, 32, 22, 4).fill(0xffffff)
+  signBox.roundRect(-16, -18, 32, 22, 4).stroke({ color: 0x1c1917, width: 2 })
+  post.addChild(signBox)
+  const txt = new PIXI.Text({ text: icon, style: { fontSize: 14 } })
+  txt.anchor.set(0.5); txt.y = -7
+  post.addChild(txt)
+  post.x = side === 'L' ? roadLeft - 28 - Math.random() * 14 : roadRight + 28 + Math.random() * 14
+  post.y = -40
+  signsContainer.addChild(post)
+  signsContainer._signList.push(post)
+}
+
+function tickRoadSigns(delta) {
+  const bg = layers.bg
+  if (!bg || !bg._signs) return
+  const signs = bg._signs
+  const H = app.screen.height
+  // Spawn every 3-5 seconds (at 60fps ≈ 180-300 frames)
+  signs._spawnTimer += delta
+  const nextSpawn = 180 + Math.random() * 120
+  if (signs._spawnTimer > nextSpawn) {
+    signs._spawnTimer = 0
+    spawnRoadSign(signs)
+  }
+  // Scroll & cull
+  const px = S.speed * delta * 1.1
+  for (let i = signs._signList.length - 1; i >= 0; i--) {
+    const s = signs._signList[i]
+    s.y += px
+    if (s.y > H + 60) {
+      signs.removeChild(s)
+      s.destroy({ children: true })
+      signs._signList.splice(i, 1)
+    }
+  }
 }
 
 // ── Road ─────────────────────────────────────────────────────────
@@ -447,10 +513,14 @@ function buildMarkings() {
 
   for (let lane = 0; lane < LANES - 1; lane++) {
     const x = roadLeft + laneW * (lane + 1)
+    // Center divider (between 2 center lanes for 3-lane / middle divider for 4-lane) uses warm yellow for classic road look
+    const isCenter = (lane === Math.floor((LANES - 1) / 2))
+    const dashColor = isCenter ? 0xFCD34D : 0xffffff
+    const dashAlpha = isCenter ? Math.max(0.55, THEME.markAlpha * 2) : THEME.markAlpha
     for (let j = 0; j < total; j++) {
       const d = new PIXI.Graphics()
-      d.rect(-DASH_W / 2, 0, DASH_W, DASH_H).fill(0xffffff)
-      d.alpha = THEME.markAlpha
+      d.rect(-DASH_W / 2, 0, DASH_W, DASH_H).fill(dashColor)
+      d.alpha = dashAlpha
       d.x = x
       d.y = j * (DASH_H + DASH_GAP)
       c.addChild(d)
@@ -808,6 +878,9 @@ function loop(ticker) {
 
   // Speed ramp
   S.speed = Math.min(MAX_SPEED, S.speed + 0.0004 * delta)
+
+  // Road signs tick
+  tickRoadSigns(delta)
 
   // Scenery scroll
   const bg = layers.bg
