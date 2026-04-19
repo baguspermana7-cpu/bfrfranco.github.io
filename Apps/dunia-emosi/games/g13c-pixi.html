@@ -926,10 +926,12 @@ function buildGymSelect(){
     </div>`;
     html += `<div class="tg-row ${collapsed?'collapsed':''}" id="region-${grp.id}">`;
 
+    // Unlock logic: all beaten + next 2 unbeaten trainers are open
+    let unbeatenShown = 0;
     gTrainers.forEach((t, idx) => {
       const beaten = !!badges[t.id];
-      const prevBeaten = idx === 0 || !!badges[gTrainers[idx-1].id];
-      const unlocked = beaten || prevBeaten;
+      const unlocked = beaten || unbeatenShown < 2;
+      if (!beaten && unlocked) unbeatenShown++;
       const isCurrent = unlocked && !beaten;
 
       html += `<div class="trainer-card ${beaten?'beaten':''} ${!unlocked?'locked':''} ${isCurrent?'current':''}"

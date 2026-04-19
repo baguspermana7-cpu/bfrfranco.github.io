@@ -6834,6 +6834,141 @@ const G13_CHAINS = [
    evolved:{name:'Vigoroth',slug:'vigoroth',type:'Normal',tc:'#A3A3A3'},
    evolved2:{name:'Slaking',slug:'slaking',type:'Normal',tc:'#A3A3A3'},
    wild:{name:'Kangaskhan',slug:'kangaskhan',type:'Normal',tc:'#A3A3A3'}},
+
+  // === NEW: Missing Pokemon chains (user requested) ===
+  // Froakie → Frogadier → Greninja (Water/Dark) — 3-stage
+  {id:200,icon:'🐸',diff:'medium',maxNum:20,ops:['+','-'],
+   player:{name:'Froakie',slug:'froakie',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Frogadier',slug:'frogadier',type:'Water',tc:'#38BDF8'},
+   wild:{name:'Psyduck',slug:'psyduck',type:'Water',tc:'#38BDF8'}},
+  {id:201,icon:'🐸',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Froakie',slug:'froakie',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Frogadier',slug:'frogadier',type:'Water',tc:'#38BDF8'},
+   evolved2:{name:'Greninja',slug:'greninja',type:'Dark',tc:'#4B5563'},
+   wild:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'}},
+
+  // Taillow → Swellow (Flying) — 2-stage
+  {id:202,icon:'🐦',diff:'easy',maxNum:10,ops:['+'],
+   player:{name:'Taillow',slug:'taillow',type:'Flying',tc:'#A78BFA'},
+   evolved:{name:'Swellow',slug:'swellow',type:'Flying',tc:'#A78BFA'},
+   wild:{name:'Pidgeotto',slug:'pidgeotto',type:'Normal',tc:'#A3A3A3'}},
+
+  // Gastly → Haunter → Gengar (Ghost) — 3-stage
+  {id:203,icon:'👻',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Gastly',slug:'gastly',type:'Ghost',tc:'#7C3AED'},
+   evolved:{name:'Haunter',slug:'haunter',type:'Ghost',tc:'#7C3AED'},
+   evolved2:{name:'Gengar',slug:'gengar',type:'Ghost',tc:'#7C3AED'},
+   wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
+
+  // Torchic → Combusken → Blaziken (Fire/Fighting) — 3-stage
+  {id:204,icon:'🔥',diff:'medium',maxNum:20,ops:['+','-'],
+   player:{name:'Torchic',slug:'torchic',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Combusken',slug:'combusken',type:'Fire',tc:'#F97316'},
+   wild:{name:'Arcanine',slug:'arcanine',type:'Fire',tc:'#F97316'}},
+  {id:205,icon:'🔥',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Torchic',slug:'torchic',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Combusken',slug:'combusken',type:'Fire',tc:'#F97316'},
+   evolved2:{name:'Blaziken',slug:'blaziken',type:'Fighting',tc:'#EF4444'},
+   wild:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'}},
+
+  // Fennekin → Braixen → Delphox (Fire/Psychic) — 3-stage
+  {id:206,icon:'🦊',diff:'medium',maxNum:20,ops:['+','-'],
+   player:{name:'Fennekin',slug:'fennekin',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Braixen',slug:'braixen',type:'Fire',tc:'#F97316'},
+   wild:{name:'Ninetales',slug:'ninetales',type:'Fire',tc:'#F97316'}},
+  {id:207,icon:'🦊',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Fennekin',slug:'fennekin',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Braixen',slug:'braixen',type:'Fire',tc:'#F97316'},
+   evolved2:{name:'Delphox',slug:'delphox',type:'Psychic',tc:'#EC4899'},
+   wild:{name:'Alakazam',slug:'alakazam',type:'Psychic',tc:'#EC4899'}},
+
+  // Chespin → Quilladin → Chesnaught (Grass/Fighting) — 3-stage
+  {id:208,icon:'🌿',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Chespin',slug:'chespin',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Quilladin',slug:'quilladin',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Chesnaught',slug:'chesnaught',type:'Fighting',tc:'#EF4444'},
+   wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
+
+  // Piplup → Prinplup → Empoleon (Water/Steel) — 3-stage
+  {id:209,icon:'🐧',diff:'medium',maxNum:20,ops:['+','-'],
+   player:{name:'Piplup',slug:'piplup',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Prinplup',slug:'prinplup',type:'Water',tc:'#38BDF8'},
+   wild:{name:'Golduck',slug:'golduck',type:'Water',tc:'#38BDF8'}},
+  {id:210,icon:'🐧',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Piplup',slug:'piplup',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Prinplup',slug:'prinplup',type:'Water',tc:'#38BDF8'},
+   evolved2:{name:'Empoleon',slug:'empoleon',type:'Steel',tc:'#94A3B8'},
+   wild:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'}},
+
+  // Turtwig → Grotle → Torterra (Grass/Ground) — 3-stage
+  {id:211,icon:'🐢',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Turtwig',slug:'turtwig',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Grotle',slug:'grotle',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Torterra',slug:'torterra',type:'Ground',tc:'#D97706'},
+   wild:{name:'Venusaur',slug:'venusaur',type:'Grass',tc:'#22C55E'}},
+
+  // Chimchar → Monferno → Infernape (Fire/Fighting) — 3-stage
+  {id:212,icon:'🐒',diff:'epic',maxNum:20,ops:['+','-'],
+   player:{name:'Chimchar',slug:'chimchar',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Monferno',slug:'monferno',type:'Fire',tc:'#F97316'},
+   evolved2:{name:'Infernape',slug:'infernape',type:'Fighting',tc:'#EF4444'},
+   wild:{name:'Blaziken',slug:'blaziken',type:'Fighting',tc:'#EF4444'}},
+
+  // Snivy → Servine → Serperior (Grass) — 3-stage
+  {id:213,icon:'🐍',diff:'hard',maxNum:20,ops:['+','-'],
+   player:{name:'Snivy',slug:'snivy',type:'Grass',tc:'#22C55E'},
+   evolved:{name:'Servine',slug:'servine',type:'Grass',tc:'#22C55E'},
+   evolved2:{name:'Serperior',slug:'serperior',type:'Grass',tc:'#22C55E'},
+   wild:{name:'Exeggutor',slug:'exeggutor',type:'Grass',tc:'#22C55E'}},
+
+  // Oshawott → Dewott → Samurott (Water) — 3-stage
+  {id:214,icon:'🦦',diff:'hard',maxNum:20,ops:['+','-'],
+   player:{name:'Oshawott',slug:'oshawott',type:'Water',tc:'#38BDF8'},
+   evolved:{name:'Dewott',slug:'dewott',type:'Water',tc:'#38BDF8'},
+   evolved2:{name:'Samurott',slug:'samurott',type:'Water',tc:'#38BDF8'},
+   wild:{name:'Blastoise',slug:'blastoise',type:'Water',tc:'#38BDF8'}},
+
+  // Tepig → Pignite → Emboar (Fire/Fighting) — 3-stage
+  {id:215,icon:'🐷',diff:'hard',maxNum:20,ops:['+','-'],
+   player:{name:'Tepig',slug:'tepig',type:'Fire',tc:'#F97316'},
+   evolved:{name:'Pignite',slug:'pignite',type:'Fire',tc:'#F97316'},
+   evolved2:{name:'Emboar',slug:'emboar',type:'Fighting',tc:'#EF4444'},
+   wild:{name:'Charizard',slug:'charizard',type:'Fire',tc:'#F97316'}},
+
+  // Pidgey → Pidgeotto → Pidgeot (Normal/Flying) — 3-stage
+  {id:216,icon:'🐦',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Pidgey',slug:'pidgey',type:'Normal',tc:'#A3A3A3'},
+   evolved:{name:'Pidgeotto',slug:'pidgeotto',type:'Flying',tc:'#A78BFA'},
+   evolved2:{name:'Pidgeot',slug:'pidgeot',type:'Flying',tc:'#A78BFA'},
+   wild:{name:'Swellow',slug:'swellow',type:'Flying',tc:'#A78BFA'}},
+
+  // Caterpie → Metapod → Butterfree (Bug/Flying) — 3-stage
+  {id:217,icon:'🐛',diff:'easy',maxNum:10,ops:['+'],
+   player:{name:'Caterpie',slug:'caterpie',type:'Bug',tc:'#84CC16'},
+   evolved:{name:'Metapod',slug:'metapod',type:'Bug',tc:'#84CC16'},
+   evolved2:{name:'Butterfree',slug:'butterfree',type:'Bug',tc:'#84CC16'},
+   wild:{name:'Venomoth',slug:'venomoth',type:'Bug',tc:'#84CC16'}},
+
+  // Weedle → Kakuna → Beedrill (Bug/Poison) — 3-stage
+  {id:218,icon:'🐝',diff:'easy',maxNum:10,ops:['+'],
+   player:{name:'Weedle',slug:'weedle',type:'Bug',tc:'#84CC16'},
+   evolved:{name:'Kakuna',slug:'kakuna',type:'Bug',tc:'#84CC16'},
+   evolved2:{name:'Beedrill',slug:'beedrill',type:'Bug',tc:'#84CC16'},
+   wild:{name:'Butterfree',slug:'butterfree',type:'Bug',tc:'#84CC16'}},
+
+  // Nidoran♂ → Nidorino → Nidoking (Poison/Ground) — 3-stage
+  {id:219,icon:'🦏',diff:'hard',maxNum:20,ops:['+','-'],
+   player:{name:'Nidoran♂',slug:'nidoran-m',type:'Poison',tc:'#A855F7'},
+   evolved:{name:'Nidorino',slug:'nidorino',type:'Poison',tc:'#A855F7'},
+   evolved2:{name:'Nidoking',slug:'nidoking',type:'Ground',tc:'#D97706'},
+   wild:{name:'Rhydon',slug:'rhydon',type:'Rock',tc:'#A16207'}},
+
+  // Geodude → Graveler → Golem (Rock/Ground) — 3-stage
+  {id:220,icon:'🪨',diff:'2stage',maxNum:20,ops:['+','-'],
+   player:{name:'Geodude',slug:'geodude',type:'Rock',tc:'#A16207'},
+   evolved:{name:'Graveler',slug:'graveler',type:'Rock',tc:'#A16207'},
+   evolved2:{name:'Golem',slug:'golem',type:'Rock',tc:'#A16207'},
+   wild:{name:'Rhydon',slug:'rhydon',type:'Rock',tc:'#A16207'}},
 ]
 
 // HP config by difficulty
