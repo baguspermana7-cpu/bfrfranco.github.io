@@ -555,9 +555,16 @@ let midItems = []
 function buildMidScenery() {
   const c = new PIXI.Container(); L.mid = c; stage.addChild(c)
   const W = app.screen.width, H = app.screen.height
-  const treeMap = {forest:['🌲','🌳','🎋'],desert:['🌵','🏜️','☀️'],snow:['🌲','❄️','⛄'],coastal:['🌴','🌊','🐚'],urban:['🏢','🏗️','🏠'],volcano:['🔥','🌋','💨']}
+  const treeMap = {
+    forest:['🌲','🌳','🎋','🍂','🐿️','🦌','🍄','🌻'],
+    desert:['🌵','🏜️','☀️','🦎','🐪','🏺','💀','🪨'],
+    snow:['🌲','❄️','⛄','🏔️','🎿','🦌','🧊','☃️'],
+    coastal:['🌴','🌊','🐚','🦀','⛵','🏖️','🐬','🦩'],
+    urban:['🏢','🏗️','🏠','🏪','🚦','🏫','🏥','🏛️'],
+    volcano:['🔥','🌋','💨','🪨','🦇','💎','⚡','☄️']
+  }
   const treeEmojis = treeMap[TH.name] || ['🌲','🌳','🌴']
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 20; i++) {
     const lane = i % LANE_COUNT
     const yt = laneYs[lane] + laneH * 0.38 + (i % 2) * 8
     // Top of lane (above rail)
