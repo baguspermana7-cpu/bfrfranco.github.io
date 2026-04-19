@@ -91,19 +91,22 @@ function pickQ(){return QS[Math.floor(Math.random()*QS.length)]}
 //  GAME STATE
 // ═══════════════════════════════════════════════════════════
 let W, H, app
-const CANDY_EMOJIS = ['🍬','🍭','🍫','🍪','🧁','🍩','🍰','🎂','🍡','🍮']
-const CANDY_COLORS = [0xef4444,0xf97316,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x14b8a6]
+// Pokemon IDs for ball sprites (popular Pokemon)
+const POKE_BALL_IDS = [25,1,4,7,133,143,39,54,129,63,92,104,37,58,77,120,147,152,155,158,172,175,183,196,252,255,258,280,300,333,387,390,393,403,447,495,498,501,570,613,650,653,656,722,725,728]
+const BALL_COLORS = [0xef4444,0xf97316,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x14b8a6,0x6366f1,0xf43f5e]
 
 const S = {
   running:false, paused:false, started:false, gameOver:false,
   score:0, lives:3, maxLives:3,
+  combo:0, maxCombo:0, // streak of correct answers
   candies:[], particles:[],
-  spawnTimer:0, spawnInterval:1.5, // seconds between spawns
-  fallSpeed:1.5, // base pixels per frame
+  spawnTimer:0, spawnInterval:1.5,
+  fallSpeed:1.5,
   level: cfg.level,
   quizActive:false, currentCandy:null,
+  totalCaught:0, totalMissed:0,
   frame:0,
-  monsterX:0, // monster follows touch/mouse
+  monsterX:0,
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -210,29 +213,53 @@ function drawBackground() {
 // ═══════════════════════════════════════════════════════════
 function spawnCandy() {
   const q = pickQ()
-  const emoji = CANDY_EMOJIS[Math.floor(Math.random() * CANDY_EMOJIS.length)]
-  const color = CANDY_COLORS[Math.floor(Math.random() * CANDY_COLORS.length)]
+  const pokeId = POKE_BALL_IDS[Math.floor(Math.random() * POKE_BALL_IDS.length)]
+  const color = BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)]
+  const ballR = 30
 
   const container = new PIXI.Container()
   container.x = 30 + Math.random() * (W - 60)
-  container.y = -50
+  container.y = -60
 
-  // Candy body (circle + emoji)
-  const bg = new PIXI.Graphics()
-  bg.circle(0, 0, 28).fill(color)
-  bg.circle(0, 0, 28).stroke({ color: 0xffffff, width: 2, alpha: 0.5 })
-  container.addChild(bg)
+  // Pokeball design
+  const ball = new PIXI.Graphics()
+  // Top half (red/color)
+  ball.arc(0, 0, ballR, Math.PI, 0).fill(color)
+  // Bottom half (white)
+  ball.arc(0, 0, ballR, 0, Math.PI).fill(0xf8fafc)
+  // Center line
+  ball.rect(-ballR, -2, ballR * 2, 4).fill(0x1c1917)
+  // Center button
+  ball.circle(0, 0, 8).fill(0xf8fafc)
+  ball.circle(0, 0, 8).stroke({ color: 0x1c1917, width: 2.5 })
+  ball.circle(0, 0, 4).fill(0xffffff)
+  // Outline
+  ball.circle(0, 0, ballR).stroke({ color: 0x1c1917, width: 2 })
+  // Shine highlight
+  ball.ellipse(-ballR * 0.35, -ballR * 0.35, ballR * 0.2, ballR * 0.12).fill({ color: 0xffffff, alpha: 0.4 })
+  container.addChild(ball)
 
-  // Math question on candy
-  const qText = new PIXI.Text({ text: q.q, style: { fontSize: 16, fontWeight: '900', fill: 0xffffff, fontFamily: 'Fredoka One, Arial', align: 'center', dropShadow: true, dropShadowDistance: 1 } })
+  // Pokemon SVG image inside ball (small, centered)
+  const pokeImg = new PIXI.Sprite()
+  try {
+    const tex = PIXI.Texture.from(`../assets/Pokemon/svg/${pokeId}.svg`)
+    pokeImg.texture = tex
+    pokeImg.anchor.set(0.5)
+    pokeImg.width = ballR * 1.0; pokeImg.height = ballR * 1.0
+    pokeImg.y = -2
+    pokeImg.alpha = 0.85
+    container.addChild(pokeImg)
+  } catch(_) {}
+
+  // Math question floating below ball
+  const qText = new PIXI.Text({ text: q.q + '=?', style: { fontSize: 14, fontWeight: '900', fill: 0x1c1917, fontFamily: 'Fredoka One, Arial', align: 'center' } })
   qText.anchor.set(0.5)
+  qText.y = ballR + 14
+  // Question background pill
+  const qBg = new PIXI.Graphics()
+  qBg.roundRect(-qText.width / 2 - 6, ballR + 4, qText.width + 12, 22, 8).fill({ color: 0xffffff, alpha: 0.85 })
+  container.addChild(qBg)
   container.addChild(qText)
-
-  // Emoji floating above
-  const emojiText = new PIXI.Text({ text: emoji, style: { fontSize: 24 } })
-  emojiText.anchor.set(0.5)
-  emojiText.y = -32
-  container.addChild(emojiText)
 
   container.interactive = true
   container.cursor = 'pointer'
@@ -292,13 +319,30 @@ function showCandyQuiz(candy) {
     btn.interactive = true; btn.cursor = 'pointer'
     btn.on('pointerdown', () => {
       if (c === correct) {
-        S.score++
+        S.combo++
+        if (S.combo > S.maxCombo) S.maxCombo = S.combo
+        const comboBonus = S.combo >= 5 ? 3 : S.combo >= 3 ? 2 : 1
+        S.score += comboBonus
+        S.totalCaught++
         sfxCorrect()
         spawnCatchFX(candy.x, candy.y, candy.color)
+        // Show Pokemon catch text
+        const catchText = S.combo >= 5 ? '🔥 SUPER COMBO x' + S.combo + '!' : S.combo >= 3 ? '⚡ COMBO x' + S.combo + '!' : 'Dapat!'
+        const ct = new PIXI.Text({ text: catchText, style: { fontSize: S.combo >= 3 ? 22 : 16, fontWeight: '900', fill: S.combo >= 5 ? 0xfbbf24 : S.combo >= 3 ? 0x3b82f6 : 0x22c55e, fontFamily: 'Fredoka One' } })
+        ct.anchor.set(0.5); ct.x = candy.x; ct.y = candy.y - 40
+        fxLayer.addChild(ct)
+        S.particles.push({ g: ct, vx: 0, vy: -1.5, grav: 0, life: 1, decay: 0.02 })
+        // Extra life at combo 10
+        if (S.combo === 10 && S.lives < S.maxLives) { S.lives++; spawnCatchFX(W/2, H*0.4, 0xef4444) }
       } else {
+        S.combo = 0 // reset combo on wrong answer
         sfxWrong()
+        // Show correct answer
+        const wrongText = new PIXI.Text({ text: '❌ Jawaban: ' + correct, style: { fontSize: 14, fontWeight: '700', fill: 0xef4444, fontFamily: 'Arial' } })
+        wrongText.anchor.set(0.5); wrongText.x = candy.x; wrongText.y = candy.y - 40
+        fxLayer.addChild(wrongText)
+        S.particles.push({ g: wrongText, vx: 0, vy: -1, grav: 0, life: 1, decay: 0.02 })
       }
-      // Remove quiz
       fxLayer.removeChild(panel)
       candy.container.visible = false
       gameLayer.removeChild(candy.container)
@@ -389,7 +433,8 @@ function gameLoop(ticker) {
 //  HUD
 // ═══════════════════════════════════════════════════════════
 function updateHUD() {
-  document.getElementById('score-display').textContent = `🍬 ${S.score}`
+  const comboText = S.combo >= 3 ? ` 🔥${S.combo}` : ''
+  document.getElementById('score-display').textContent = `🍬 ${S.score}${comboText}`
   const hearts = '❤️'.repeat(Math.max(0, S.lives)) + '🖤'.repeat(Math.max(0, S.maxLives - S.lives))
   document.getElementById('lives-display').textContent = hearts
 }
@@ -430,7 +475,7 @@ function endGame() {
       emoji: stars >= 4 ? '🏆' : '🍬',
       title: stars >= 3 ? 'Hebat!' : 'Coba Lagi!',
       stars,
-      msg: `Skor: ${S.score} permen | Level ${cfg.level}`,
+      msg: `🍬 ${S.score} poin | 🔥 Combo max: ${S.maxCombo} | Tangkap: ${S.totalCaught}`,
       onNext: nextLevel,
       onAgain: () => location.reload(),
       onBack: () => goBack()
