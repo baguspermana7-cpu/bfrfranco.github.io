@@ -254,6 +254,7 @@ function saveG15Progress(stars) {
   } catch(_) {}
 }
 function goBack() { try{document.getElementById('game-bgm').pause()}catch(_){}; history.back(); }
+window.addEventListener('resize',()=>{if(typeof app!=='undefined'&&app)app.renderer.resize(window.innerWidth,window.innerHeight)})
 function togglePause() {
   gamePaused = !gamePaused;
   document.getElementById('btn-pause').textContent = gamePaused ? '▶' : '⏸';
