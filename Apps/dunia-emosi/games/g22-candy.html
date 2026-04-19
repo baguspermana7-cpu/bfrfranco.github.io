@@ -278,8 +278,7 @@ function spawnCandy() {
     {top:0x38bdf8,bot:0xf0f9ff,accent:0xfbbf24,name:'Quick Ball'},     // light blue
     {top:0x22c55e,bot:0xf8fafc,accent:0x15803d,name:'Safari Ball'},    // green
   ]
-  const svgIdx = Math.floor(Math.random() * BALL_DESIGNS.length)
-  const bd = BALL_DESIGNS[svgIdx]
+  const bd = BALL_DESIGNS[ballType] || BALL_DESIGNS[0]
   const ball = new PIXI.Graphics()
   // Top half
   ball.arc(0, 0, ballR, Math.PI, 0).fill(bd.top)
@@ -315,7 +314,7 @@ function spawnCandy() {
   gameLayer.addChild(container)
 
   const candy = {
-    container, q, color,
+    container, q, color, ballType, ballName: bd.name, catName: BALL_CAT_NAMES[ballType] || 'Quiz',
     x: container.x, y: container.y,
     speed: S.fallSpeed * (0.85 + Math.random() * 0.3),
     rotation: (Math.random() - 0.5) * 0.02,
@@ -361,14 +360,20 @@ function showCandyQuiz(candy) {
   const panel = new PIXI.Container()
   panel.name = 'quiz-panel'
 
-  // Question label on top of panel
-  const qLabel = new PIXI.Text({ text: candy.q.q + ' = ?', style: { fontSize: 18, fontWeight: '900', fill: 0xfbbf24, fontFamily: 'Fredoka One, Arial' } })
+  // Question label on top of panel — format based on answer type
+  const isNumeric = typeof candy.q.a === 'number'
+  const labelText = isNumeric ? candy.q.q + ' = ?' : candy.q.q
+  const qLabel = new PIXI.Text({ text: labelText, style: { fontSize: 17, fontWeight: '900', fill: 0xfbbf24, fontFamily: 'Fredoka One, Arial', wordWrap: true, wordWrapWidth: 260, align: 'center' } })
   qLabel.anchor.set(0.5); qLabel.y = -38
+  // Category chip above question
+  const catChip = new PIXI.Text({ text: `🎯 ${candy.catName}`, style: { fontSize: 11, fontWeight: '700', fill: 0xffffff, fontFamily: 'Fredoka One, Arial' } })
+  catChip.anchor.set(0.5); catChip.y = -60
 
   const panelBg = new PIXI.Graphics()
-  panelBg.roundRect(-135, -52, 270, 95, 14).fill({ color: 0x1e0845, alpha: 0.92 })
-  panelBg.roundRect(-135, -52, 270, 95, 14).stroke({ color: 0x7c3aed, width: 2, alpha: 0.5 })
+  panelBg.roundRect(-135, -74, 270, 118, 14).fill({ color: 0x1e0845, alpha: 0.92 })
+  panelBg.roundRect(-135, -74, 270, 118, 14).stroke({ color: 0x7c3aed, width: 2, alpha: 0.5 })
   panel.addChild(panelBg)
+  panel.addChild(catChip)
   panel.addChild(qLabel)
 
   const btnColors = [0x7c3aed, 0x6366f1, 0x8b5cf6, 0xa855f7] // uniform pastel purples
