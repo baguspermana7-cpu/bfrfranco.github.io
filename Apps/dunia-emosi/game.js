@@ -1864,8 +1864,9 @@ function showResult(mascot, title, msg) {
 function endGame(stars) {
   // Normalize raw stars to 5-star scale based on totalRounds for this level
   const maxRounds = g10State?.totalRounds || g11State?.total || g12State?.total || 5
-  state.maxPossibleStars = maxRounds  // used by showResult for 5-star normalization
   const normalizedStars = Math.min(5, Math.round((stars||0) / maxRounds * 5))
+  // Pass the already-normalized value; tell showResult NOT to re-normalize.
+  state.maxPossibleStars = 5
   state.gameStars[state.currentPlayer] = normalizedStars
   state.players[state.currentPlayer].stars += normalizedStars
   // Save level progress
