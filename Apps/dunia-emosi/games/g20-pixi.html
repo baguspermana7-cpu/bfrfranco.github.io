@@ -73,15 +73,14 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
   <div id="round-text">Round 1/3</div>
 </div>
 
-<div id="controls">
-  <div class="ctrl-zone">
-    <button class="ctrl-btn" id="btn-left">◀</button>
-    <button class="ctrl-btn" id="btn-right">▶</button>
-  </div>
-  <div class="ctrl-zone" style="justify-content:flex-end">
-    <button class="ctrl-btn" id="btn-jump">🦆 JUMP</button>
-  </div>
+<!-- Screen zone controls — tap left/right half to move + jump -->
+<div id="controls" style="position:fixed;bottom:8px;left:0;right:0;z-index:45;display:flex;justify-content:center;pointer-events:none;opacity:0.5">
+  <div style="font-size:11px;color:#bfdbfe;background:rgba(0,0,0,0.3);padding:4px 16px;border-radius:20px;backdrop-filter:blur(4px)">⬅️ Tap kiri layar = gerak kiri | Tap kanan layar = gerak kanan ➡️</div>
 </div>
+<!-- Hidden buttons for keyboard/fallback -->
+<button id="btn-left" style="display:none"></button>
+<button id="btn-right" style="display:none"></button>
+<button id="btn-jump" style="display:none"></button>
 
 <div id="quiz-panel">
   <div id="quiz-question"></div>
@@ -935,18 +934,41 @@ function startGame(){
   document.getElementById('round-text').textContent=`Round 1/${TOTAL_ROUNDS}`
 }
 
-// Touch
+// Touch — screen zone control (tap left half = move left, right half = move right)
+// Much more intuitive than separate buttons for mobile volleyball
+let _touchActive = false, _touchX = 0
+document.addEventListener('touchstart', e => {
+  if (!S.started || S.paused || S.gameOver || S.quizActive) return
+  if (e.target.closest('#hud') || e.target.closest('#pause-overlay') || e.target.closest('#quiz-panel') || e.target.closest('#start-overlay') || e.target.closest('#poke-selector')) return
+  e.preventDefault()
+  _touchActive = true
+  _touchX = e.touches[0].clientX
+  const half = window.innerWidth / 2
+  S.moveL = _touchX < half
+  S.moveR = _touchX >= half
+  S.jump = true // always jump on tap
+}, {passive:false})
+document.addEventListener('touchmove', e => {
+  if (!_touchActive) return
+  e.preventDefault()
+  _touchX = e.touches[0].clientX
+  const half = window.innerWidth / 2
+  S.moveL = _touchX < half
+  S.moveR = _touchX >= half
+}, {passive:false})
+document.addEventListener('touchend', e => {
+  _touchActive = false; S.moveL = false; S.moveR = false
+})
+
+// Button fallback (still works if visible)
 const bL=document.getElementById('btn-left'), bR=document.getElementById('btn-right'), bJ=document.getElementById('btn-jump')
-bL.addEventListener('touchstart',e=>{e.preventDefault();S.moveL=true})
-bL.addEventListener('touchend',e=>{e.preventDefault();S.moveL=false})
-bR.addEventListener('touchstart',e=>{e.preventDefault();S.moveR=true})
-bR.addEventListener('touchend',e=>{e.preventDefault();S.moveR=false})
-bJ.addEventListener('touchstart',e=>{e.preventDefault();S.jump=true})
+if(bL){bL.addEventListener('touchstart',e=>{e.preventDefault();S.moveL=true});bL.addEventListener('touchend',e=>{e.preventDefault();S.moveL=false})}
+if(bR){bR.addEventListener('touchstart',e=>{e.preventDefault();S.moveR=true});bR.addEventListener('touchend',e=>{e.preventDefault();S.moveR=false})}
+if(bJ){bJ.addEventListener('touchstart',e=>{e.preventDefault();S.jump=true})}
 // Mouse fallback
-bL.addEventListener('mousedown',()=>S.moveL=true); bL.addEventListener('mouseup',()=>S.moveL=false)
-bR.addEventListener('mousedown',()=>S.moveR=true); bR.addEventListener('mouseup',()=>S.moveR=false)
-bJ.addEventListener('mousedown',()=>S.jump=true)
-bJ.addEventListener('mouseup',()=>S.jump=false)
+if(bL){bL.addEventListener('mousedown',()=>S.moveL=true);bL.addEventListener('mouseup',()=>S.moveL=false)}
+if(bR){bR.addEventListener('mousedown',()=>S.moveR=true);bR.addEventListener('mouseup',()=>S.moveR=false)}
+if(bJ){bJ.addEventListener('mousedown',()=>S.jump=true);bJ.addEventListener('mouseup',()=>S.jump=false)}
 // Keyboard
 window.addEventListener('keydown',e=>{
   if(e.code==='ArrowLeft'||e.code==='KeyA')S.moveL=true
