@@ -1837,6 +1837,16 @@ function confirmBack() {
   goBack()
 }
 
+// Recalculate lane positions on orientation change
+window.addEventListener('resize', () => {
+  if (!app) return
+  app.renderer.resize(window.innerWidth, window.innerHeight)
+  const H = app.screen.height
+  const laneH = (H - gameTop) / LANE_COUNT
+  laneYs = Array.from({length: LANE_COUNT}, (_, i) => gameTop + laneH * i + laneH / 2)
+  if (L.player) L.player.y = laneYs[S.lane]
+})
+
 // ═══════════════════════════════════════════════════════════
 //  BOOST + QUIZ
 // ═══════════════════════════════════════════════════════════
