@@ -642,20 +642,40 @@ function spawnWave() {
   const word = S.currentWord
   if (!word) return
 
+  // Occasionally spawn road obstacles instead of letters (20% chance)
+  if (Math.random() < 0.2 && S.letterIdx > 0) {
+    spawnRoadObstacle()
+    return
+  }
+
   const nextLetter = word[S.letterIdx]
-  const numTiles = 2 + Math.floor(Math.random() * (LANES - 2)) // 2..3 (never all 4)
+  const numTiles = 2 + Math.floor(Math.random() * (LANES - 2))
   const playerL = S.carTargetLane ?? S.carLane ?? 1
   let lanePool = Array.from({length:LANES},(_,i)=>i)
-  // When 3 tiles spawn, exclude player's current lane so there's always 1 free lane
   if (numTiles >= LANES - 1) lanePool = lanePool.filter(l => l !== playerL)
   const lanes = shuffle(lanePool).slice(0, numTiles)
 
-  // Guarantee correct letter appears ~60% of time
   const putCorrect = Math.random() < 0.62
   lanes.forEach((lane, i) => {
     const isCorrect = putCorrect && i === 0
     const letter = isCorrect ? nextLetter : wrongLetter(word, nextLetter)
     spawnTile(lane, letter, isCorrect)
+  })
+}
+
+// Road obstacles — decorative hazards (cones, trees, boxes)
+const ROAD_OBS = ['🚧','🦺','📦','🌲','🪨','🚶','🛑','🏗️','🚜','🐕']
+function spawnRoadObstacle() {
+  const numObs = 1 + Math.floor(Math.random() * 2)
+  const playerL = S.carTargetLane ?? S.carLane ?? 1
+  const lanes = shuffle(Array.from({length:LANES},(_,i)=>i).filter(l=>l!==playerL)).slice(0,numObs)
+  lanes.forEach(lane => {
+    const tc = new PIXI.Container()
+    tc.x = laneXs[lane]; tc.y = -TILE_SZ - 6
+    tc._lane = lane; tc._alive = true; tc._correct = false; tc._isObstacle = true
+    const txt = new PIXI.Text({text:ROAD_OBS[Math.floor(Math.random()*ROAD_OBS.length)], style:{fontSize:34}})
+    txt.anchor.set(0.5); tc.addChild(txt)
+    layers.tiles.addChild(tc); S.tiles.push(tc)
   })
 }
 
