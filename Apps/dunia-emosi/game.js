@@ -10526,6 +10526,52 @@ const G18_TRAINS = [
     funFact:'🌏 Nama "Fuxing" artinya "Kebangkitan" — simbol kemajuan teknologi China modern!',
     route:'Beijing ↔ Shanghai (1318 km, 4,5 jam)',
     quizHint:'kereta terkencang beroperasi Fuxing China 350 km/jam'
+  },
+  // ── KERETA LORI TEBU & INDUSTRI ──
+  {
+    emoji:'🚂', name:'Lori Tebu — Kereta Perkebunan', country:'🇮🇩 Jawa (Cirebon, Madiun, Jogja)', year:1880,
+    fuel:'Batubara (Uap)', speed:15, type:'Lokomotif Lori Perkebunan', builder:'Orenstein & Koppel, Jerman',
+    isSteam:true, rack:false, tender:false, bodyColor:'#14532D', wheelColor:'#052e16',
+    fact:'Lori Tebu adalah kereta KECIL khusus pabrik gula! Rel sempit hanya 60cm, bertugas mengangkut batang tebu dari kebun ke pabrik gula. Masih beroperasi di pabrik Sragi, Tasikmadu, dan Colomadu! 🎋🍬',
+    funFact:'🍭 Gula Indonesia dulu terkenal di Eropa — 1 kereta lori bisa mengangkut 4 ton tebu per perjalanan!',
+    route:'Kebun tebu ↔ Pabrik gula (rel sempit 600mm)',
+    quizHint:'kereta kecil pengangkut tebu pabrik gula'
+  },
+  {
+    emoji:'🚂', name:'CC201 — Diesel Legendaris PT KAI', country:'🇮🇩 Indonesia', year:1977,
+    fuel:'Solar (Diesel Elektrik)', speed:100, type:'Lokomotif Diesel Elektrik', builder:'General Electric, USA',
+    isDiesel:true, bodyColor:'#FF6B00', accentColor:'#FFD700',
+    fact:'CC201 adalah LOKOMOTIF DIESEL paling populer di Indonesia! Dibuat General Electric USA sejak 1977. Warna oranye-hitamnya khas — favorit anak-anak penggemar kereta! 🧡',
+    funFact:'🏆 Ada 140+ CC201 yang beroperasi. Satu lok bisa tarik 10-14 gerbong sekaligus!',
+    route:'Seluruh Jawa & Sumatera — penumpang & barang',
+    quizHint:'lokomotif diesel oranye populer Indonesia CC201'
+  },
+  {
+    emoji:'🚄', name:'KCIC400AF Whoosh — HSR Indonesia', country:'🇮🇩 Indonesia (Jakarta–Bandung)', year:2023,
+    fuel:'Listrik', speed:350, type:'High-Speed Rail', builder:'CRRC Qingdao Sifang',
+    isElectric:true, bodyColor:'#C8102E', accentColor:'#FFFFFF',
+    fact:'Whoosh adalah kereta cepat PERTAMA di Asia Tenggara! 🎉 Dari Jakarta ke Bandung cuma 45 menit (biasanya 3 jam naik mobil). Diresmikan Presiden Jokowi Oktober 2023! 🇮🇩⚡',
+    funFact:'💨 Nama "Whoosh" dipilih dari sayembara nasional — singkatan Waktu Hemat Operasi Optimal Sistem Hebat!',
+    route:'Halim (Jakarta) ↔ Tegalluar (Bandung) • 142 km',
+    quizHint:'kereta cepat pertama Asia Tenggara Jakarta Bandung'
+  },
+  {
+    emoji:'🚂', name:'Argo Parahyangan — Eksekutif Favorit', country:'🇮🇩 Indonesia (Jakarta–Bandung)', year:2010,
+    fuel:'Solar (Diesel) + Listrik', speed:120, type:'Kereta Eksekutif Penumpang', builder:'INKA, Madiun',
+    isDiesel:true, bodyColor:'#1E40AF', accentColor:'#FCD34D',
+    fact:'Argo Parahyangan adalah kereta EKSEKUTIF paling favorit di Pulau Jawa! Dibuat oleh INKA Madiun — industri kereta kebanggaan Indonesia. Melintasi terowongan Sasaksaat dan Jembatan Cisomang! 🏞️',
+    funFact:'🇮🇩 INKA Madiun juga ekspor kereta ke Bangladesh, Filipina, dan Selandia Baru!',
+    route:'Gambir (Jakarta) ↔ Bandung • 173 km, 3 jam',
+    quizHint:'kereta eksekutif Jakarta Bandung Argo Parahyangan INKA'
+  },
+  {
+    emoji:'🚋', name:'LRT Jabodebek — Tanpa Masinis', country:'🇮🇩 Jakarta (GoA Level 3)', year:2023,
+    fuel:'Listrik', speed:80, type:'Light Rail Transit (Otomatis)', builder:'INKA + Siemens',
+    isElectric:true, bodyColor:'#FF0000', accentColor:'#FFFFFF',
+    fact:'LRT Jabodebek adalah kereta TANPA MASINIS (driverless) pertama di Indonesia! 🤖 Dikendalikan komputer sepenuhnya — GoA Level 3. Juga kereta LRT pertama buatan INKA Madiun 🏭',
+    funFact:'🤖 Meski tanpa masinis, ada petugas di stasiun yang memantau via komputer pusat!',
+    route:'Dukuh Atas ↔ Harjamukti / Jatimulya • 44 km',
+    quizHint:'kereta tanpa masinis otomatis Jakarta LRT Jabodebek'
   }
 ]
 
