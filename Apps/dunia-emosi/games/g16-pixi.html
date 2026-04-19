@@ -1613,7 +1613,14 @@ function togglePause(){
 }
 function finishGame(){goBack()}
 function restartGame(){location.reload()}
-window.addEventListener('resize',()=>{if(app)app.renderer.resize(window.innerWidth,window.innerHeight)})
+window.addEventListener('resize',()=>{
+  if(!app)return
+  app.renderer.resize(window.innerWidth,window.innerHeight)
+  // Recalculate track position for new viewport
+  const newH=app.screen.height
+  const newTY=getTrackY(newH)
+  if(trainContainer) trainContainer.y=newTY-14
+})
 </script>
 </body>
 </html>
