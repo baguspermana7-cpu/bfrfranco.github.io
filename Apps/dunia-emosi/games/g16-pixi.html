@@ -1559,11 +1559,34 @@ function _drawBandMember(g,x,y,clothC,inst,armsUp){
 function startArrivalCelebration(W,H){
   arrivalConfetti=true
   flashScreen('#22c55e',0.45)
-  document.getElementById('status-text').textContent='🎉 Selamat Tiba!'
+  // Show train name greeting
+  const trainName = S.trainCfg ? S.trainCfg.name || S.trainCfg.key : 'Kereta'
+  document.getElementById('status-text').textContent=`🎉 Selamat datang, ${trainName}!`
   document.getElementById('danger-fill').style.background='linear-gradient(90deg,#4ade80,#22c55e)'
-  // Reveal both NPC layers (will alternate in updateCelebration)
   if(npcArmsUp)npcArmsUp.visible=true
   if(npcArmsDown)npcArmsDown.visible=false
+  // Fireworks — burst emojis in sky
+  spawnFireworks(W, H)
+}
+
+function spawnFireworks(W, H) {
+  const emojis = ['🎆','🎇','✨','🌟','💫','🎉','🎊']
+  for (let burst = 0; burst < 5; burst++) {
+    setTimeout(() => {
+      const cx = W * 0.15 + Math.random() * W * 0.7
+      const cy = H * 0.05 + Math.random() * H * 0.2
+      for (let i = 0; i < 6; i++) {
+        const fw = new PIXI.Text({text: emojis[Math.floor(Math.random()*emojis.length)], style:{fontSize:16+Math.random()*12}})
+        fw.anchor.set(0.5)
+        fw.x = cx; fw.y = cy
+        const angle = (i / 6) * Math.PI * 2
+        fw._vx = Math.cos(angle) * (40 + Math.random() * 30)
+        fw._vy = Math.sin(angle) * (40 + Math.random() * 30)
+        fw._life = 1.0; fw._decay = 0.6 + Math.random() * 0.3
+        stage.addChild(fw); sparkParticles.push(fw)
+      }
+    }, burst * 500)
+  }
 }
 
 function spawnConfetti(){
