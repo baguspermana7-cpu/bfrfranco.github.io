@@ -353,10 +353,27 @@ function drawCourt(){
   }
   courtLayer.addChild(sand)
 
-  // Ocean waves at bottom
+  // Beach decorations
+  const beachItems = ['🐚','⭐','🦀','👣','🌺']
+  for (let i = 0; i < 8; i++) {
+    const item = new PIXI.Text({text:beachItems[i%beachItems.length], style:{fontSize:10+Math.random()*8}})
+    item.x = Math.random()*W; item.y = GROUND_Y+8+Math.random()*(H-GROUND_Y)*0.5
+    item.alpha = 0.3+Math.random()*0.3; item.rotation = (Math.random()-0.5)*0.5
+    courtLayer.addChild(item)
+  }
+
+  // Ocean waves at bottom (layered for depth)
   const ocean=new PIXI.Graphics()
-  ocean.rect(0,H*0.92,W,H*0.08).fill({color:0x38bdf8,alpha:0.25})
-  ocean.rect(0,H*0.95,W,H*0.05).fill({color:0x0ea5e9,alpha:0.15})
+  ocean.rect(0,H*0.88,W,H*0.12).fill({color:0x38bdf8,alpha:0.2})
+  ocean.rect(0,H*0.91,W,H*0.09).fill({color:0x0ea5e9,alpha:0.2})
+  ocean.rect(0,H*0.94,W,H*0.06).fill({color:0x0284c7,alpha:0.15})
+  // Wave foam lines
+  for(let w=0;w<3;w++){
+    const wy=H*(0.89+w*0.03)
+    for(let x=0;x<W;x+=30+Math.random()*20){
+      ocean.ellipse(x,wy,12+Math.random()*8,2).fill({color:0xffffff,alpha:0.15+Math.random()*0.1})
+    }
+  }
   courtLayer.addChild(ocean)
 
   // Net
@@ -552,8 +569,8 @@ function gameLoop(ticker){
   const ballSpd=S.powerup==='slow'?0.6:1
   S.bvy+=GRAVITY*S.gravMod*0.35*dt*ballSpd // very light ball — floats longer
   S.bx+=S.bvx*dt*ballSpd; S.by+=S.bvy*dt*ballSpd
-  // Cap max ball speed to prevent chaos
-  const MAX_BALL_V = 8
+  // Cap max ball speed — slower = more playable for kids
+  const MAX_BALL_V = 6
   if(Math.abs(S.bvx)>MAX_BALL_V) S.bvx=Math.sign(S.bvx)*MAX_BALL_V
   if(Math.abs(S.bvy)>MAX_BALL_V) S.bvy=Math.sign(S.bvy)*MAX_BALL_V
   S.bSpin+=S.bvx*0.015*dt
