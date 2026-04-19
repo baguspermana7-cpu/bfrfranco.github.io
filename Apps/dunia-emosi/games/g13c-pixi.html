@@ -980,12 +980,12 @@ function startBattle(trainerId){
   const ep = document.getElementById('portrait-enemy');
   const epFb = document.getElementById('portrait-enemy-fb');
   epFb.style.display = 'none'; epFb.textContent = '';
-  ep.style.display = ''; ep.src = TRAINER_SPRITE_LOCAL(trainer.sprite);
+  ep.style.display = ''; ep.dataset.triedRemote = ''; // reset flag for new battle
+  ep.src = TRAINER_SPRITE_LOCAL(trainer.sprite);
   ep.onerror = ()=>{
-    // Try remote before emoji fallback
     if(!ep.dataset.triedRemote){ep.dataset.triedRemote='1';ep.src=TRAINER_SPRITE_REMOTE(trainer.sprite);return}
     ep.style.display = 'none';
-    epFb.textContent = trainer.badge;
+    epFb.textContent = trainer.name.charAt(0); // show first letter, not badge emoji
     epFb.style.display = 'flex';
   };
   document.getElementById('trainer-name-enemy').textContent = trainer.name;
