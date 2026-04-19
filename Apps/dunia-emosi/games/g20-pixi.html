@@ -89,6 +89,10 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
 
 <div id="round-banner"><div class="rb-title"></div><div class="rb-score"></div></div>
 
+<!-- Pokemon character sprites (DOM overlay) -->
+<img id="player-sprite" style="position:fixed;z-index:35;pointer-events:none;height:80px;width:auto;image-rendering:auto;display:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))">
+<img id="cpu-sprite" style="position:fixed;z-index:35;pointer-events:none;height:80px;width:auto;image-rendering:auto;display:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));transform:scaleX(-1)">
+
 <!-- Pause Overlay -->
 <div id="pause-overlay" style="position:fixed;inset:0;z-index:350;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,60,0.92);backdrop-filter:blur(8px)">
   <div style="font-size:36px">⏸</div>
@@ -96,8 +100,13 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
   <div style="width:80%;max-width:300px;display:flex;flex-direction:column;gap:10px;margin:10px 0">
     <label style="color:#bfdbfe;font-size:13px;display:flex;align-items:center;gap:8px">🔊 Master<input type="range" id="vol-master" min="0" max="100" value="80" style="flex:1;accent-color:#38bdf8" oninput="updateG20Vol()"></label>
   </div>
+  <div id="poke-selector" style="display:none;width:85%;max-width:360px;max-height:30vh;overflow-y:auto;margin:8px 0">
+    <div style="font-size:12px;color:#fbbf24;font-weight:700;margin-bottom:6px">🎒 Ganti Pokemon:</div>
+    <div id="poke-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div>
+  </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
     <button onclick="togglePause()" style="padding:12px 24px;border-radius:14px;border:2px solid #4ade80;background:rgba(34,197,94,0.3);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">▶ Lanjut</button>
+    <button onclick="showPokeSelector()" style="padding:12px 24px;border-radius:14px;border:2px solid #fbbf24;background:rgba(251,191,36,0.2);color:#fbbf24;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">🎒 Pokemon</button>
     <button onclick="goBack()" style="padding:12px 24px;border-radius:14px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#bfdbfe;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">🏠 Keluar</button>
   </div>
 </div>
@@ -115,10 +124,26 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
 // ═══════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════
-const cfg = { level: 1 }
+const cfg = { level: 1, playerPoke: 0, cpuPoke: 1 }
 try { const s = sessionStorage.getItem('g20Config'); if (s) Object.assign(cfg, JSON.parse(s)) } catch(_){}
 document.getElementById('level-text').textContent = `Level ${cfg.level}`
 document.getElementById('start-level').textContent = `Level ${cfg.level}`
+
+// Pokemon roster for volleyball
+const G20_POKEMON = [
+  { name:'Pikachu', slug:'pikachu', scale:0.9 },
+  { name:'Machamp', slug:'machamp', scale:1.1 },
+  { name:'Snorlax', slug:'snorlax', scale:1.3 },
+  { name:'Eevee', slug:'eevee', scale:0.8 },
+  { name:'Jigglypuff', slug:'jigglypuff', scale:0.85 },
+  { name:'Lucario', slug:'lucario', scale:1.0 },
+  { name:'Hitmonchan', slug:'hitmonchan', scale:1.0 },
+  { name:'Primeape', slug:'primeape', scale:0.95 },
+  { name:'Psyduck', slug:'psyduck', scale:0.9 },
+  { name:'Mewtwo', slug:'mewtwo', scale:1.2 },
+]
+let playerPokeIdx = cfg.playerPoke || 0
+let cpuPokeIdx = cfg.cpuPoke || Math.floor(Math.random() * G20_POKEMON.length)
 
 // Questions
 const QS = [
@@ -327,6 +352,7 @@ function drawNet(){
 // ═══════════════════════════════════════════════════════════
 function drawDuck(g, x, y, color, darkColor, facing, hasCrown, squash=1){
   g.clear()
+  g.alpha = 0.15 // fade PixiJS duck — Pokemon sprite shows on top
   const sw=1/squash, sh=squash // squash/stretch
 
   // Shadow
@@ -549,6 +575,20 @@ function gameLoop(ticker){
   const cSquash=S.cGnd?1:S.cvy<0?0.85:1.15
   drawDuck(cpuGfx,S.cx,S.cy,0xef4444,0xdc2626,cFacing,S.cHasCrown,cSquash)
   drawBall()
+
+  // Sync Pokemon DOM sprites to PixiJS duck positions
+  const pSpr=document.getElementById('player-sprite')
+  const cSpr=document.getElementById('cpu-sprite')
+  if(pSpr&&pSpr.style.display!=='none'){
+    pSpr.style.left=(S.px-pSpr.offsetWidth/2)+'px'
+    pSpr.style.top=(S.py-DUCK_R-pSpr.offsetHeight/2)+'px'
+    pSpr.style.transform=pFacing<0?'scaleX(-1)':''
+  }
+  if(cSpr&&cSpr.style.display!=='none'){
+    cSpr.style.left=(S.cx-cSpr.offsetWidth/2)+'px'
+    cSpr.style.top=(S.cy-DUCK_R-cSpr.offsetHeight/2)+'px'
+    cSpr.style.transform=cFacing>0?'':'scaleX(-1)'
+  }
   drawCrab()
 }
 
@@ -767,10 +807,31 @@ function updateHUD(){
 // ═══════════════════════════════════════════════════════════
 //  INPUT
 // ═══════════════════════════════════════════════════════════
+function loadPokeSprite(imgId, slug, mirror) {
+  const el = document.getElementById(imgId)
+  if (!el) return
+  // Try SVG first, then local PNG, then remote HD
+  const id = {pikachu:25,machamp:68,snorlax:143,eevee:133,jigglypuff:39,lucario:448,hitmonchan:107,primeape:57,psyduck:54,mewtwo:150}[slug]
+  const svgUrl = id ? `../assets/Pokemon/svg/${id}.svg` : null
+  const pngUrl = `../assets/Pokemon/sprites/${slug}.png`
+  const hdUrl = `https://img.pokemondb.net/sprites/home/normal/${slug}.png`
+  el.src = svgUrl || pngUrl
+  el.onerror = () => { el.src = pngUrl; el.onerror = () => { el.src = hdUrl; el.onerror = null } }
+  el.style.display = 'block'
+  if (mirror) el.style.transform = 'scaleX(-1)'
+}
+
 function startGame(){
   if(S.started)return; ea()
   S.started=true; S.running=true
   document.getElementById('start-overlay').classList.add('hidden')
+  // Load Pokemon sprites
+  const pPoke = G20_POKEMON[playerPokeIdx]
+  const cPoke = G20_POKEMON[cpuPokeIdx]
+  const pEl = document.getElementById('player-sprite')
+  const cEl = document.getElementById('cpu-sprite')
+  if (pEl) { pEl.style.height = Math.round(80 * pPoke.scale) + 'px'; loadPokeSprite('player-sprite', pPoke.slug, false) }
+  if (cEl) { cEl.style.height = Math.round(80 * cPoke.scale) + 'px'; loadPokeSprite('cpu-sprite', cPoke.slug, true) }
   resetRound('player'); updateHUD()
   document.getElementById('round-text').textContent=`Round 1/${TOTAL_ROUNDS}`
 }
@@ -818,6 +879,37 @@ function togglePause(){
   document.getElementById('btn-pause').textContent=S.paused?'▶':'⏸'
   document.getElementById('pause-overlay').style.display=S.paused?'flex':'none'
 }
+function showPokeSelector(){
+  const grid=document.getElementById('poke-grid')
+  const sel=document.getElementById('poke-selector')
+  if(sel.style.display==='none'){
+    grid.innerHTML=''
+    G20_POKEMON.forEach((p,i)=>{
+      const card=document.createElement('div')
+      card.style.cssText='display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;border-radius:10px;cursor:pointer;border:2px solid '+(i===playerPokeIdx?'#fbbf24':'rgba(255,255,255,0.1)')+';background:'+(i===playerPokeIdx?'rgba(251,191,36,0.15)':'rgba(255,255,255,0.05)')
+      const img=document.createElement('img')
+      img.src=`../assets/Pokemon/sprites/${p.slug}.png`
+      img.style.cssText='width:40px;height:40px;object-fit:contain'
+      card.appendChild(img)
+      const nm=document.createElement('div')
+      nm.style.cssText='font-size:8px;color:#bfdbfe;font-weight:700'
+      nm.textContent=p.name
+      card.appendChild(nm)
+      card.onclick=()=>{
+        playerPokeIdx=i
+        cpuPokeIdx=(i+1+Math.floor(Math.random()*(G20_POKEMON.length-1)))%G20_POKEMON.length
+        loadPokeSprite('player-sprite',G20_POKEMON[playerPokeIdx].slug,false)
+        loadPokeSprite('cpu-sprite',G20_POKEMON[cpuPokeIdx].slug,true)
+        document.getElementById('player-sprite').style.height=Math.round(80*G20_POKEMON[playerPokeIdx].scale)+'px'
+        document.getElementById('cpu-sprite').style.height=Math.round(80*G20_POKEMON[cpuPokeIdx].scale)+'px'
+        sel.style.display='none'
+      }
+      grid.appendChild(card)
+    })
+    sel.style.display='block'
+  } else sel.style.display='none'
+}
+
 function updateG20Vol(){
   const m=document.getElementById('vol-master').value/100
   // Apply to any future audio elements
