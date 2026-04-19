@@ -159,11 +159,11 @@ function pickQ(){return QS[Math.floor(Math.random()*QS.length)]}
 //  GAME STATE
 // ═══════════════════════════════════════════════════════════
 let W, H, GROUND_Y, NET_X, NET_TOP, NET_H
-const GRAVITY = 0.38 // slightly lighter for kids
-const BALL_R = 16
+const GRAVITY = 0.30 // very light for kids
+const BALL_R = 18
 const DUCK_R = 28
-const JUMP_POWER = -11
-const MOVE_SPD = 4.5
+const JUMP_POWER = -10
+const MOVE_SPD = 4.0
 const POINTS_TO_WIN = 3 // faster rounds for kids (was 5)
 const TOTAL_ROUNDS = 3
 
@@ -298,6 +298,42 @@ function drawBackground(){
     }
     bgLayer.addChild(palm)
   }
+
+  // Seagulls (3 birds flying across sky)
+  for(let i=0;i<3;i++){
+    const bird=new PIXI.Graphics()
+    // Simple V-shape seagull
+    bird.moveTo(-8,0).lineTo(0,4).lineTo(8,0).stroke({color:0x334155,width:1.5,alpha:0.6})
+    bird.x=Math.random()*W; bird.y=H*0.04+Math.random()*H*0.08
+    bird._speed=0.4+Math.random()*0.3
+    bird._bob=Math.random()*6
+    bgLayer.addChild(bird); clouds.push(bird) // reuse clouds array for animation
+  }
+
+  // Beach umbrella
+  const umb=new PIXI.Graphics()
+  umb.rect(W*0.15-1,GROUND_Y-45,2,45).fill(0x92400e)
+  umb.ellipse(W*0.15,GROUND_Y-45,20,8).fill(0xef4444)
+  umb.ellipse(W*0.15,GROUND_Y-45,20,8).stroke({color:0xdc2626,width:1})
+  bgLayer.addChild(umb)
+
+  // Beach towel
+  const towel=new PIXI.Graphics()
+  towel.roundRect(W*0.12,GROUND_Y+5,25,12,3).fill({color:0x3b82f6,alpha:0.5})
+  bgLayer.addChild(towel)
+
+  // Distant sailboat
+  const boat=new PIXI.Graphics()
+  boat.moveTo(W*0.6,GROUND_Y-15).lineTo(W*0.6+5,GROUND_Y-35).lineTo(W*0.6+10,GROUND_Y-15).fill({color:0xffffff,alpha:0.4})
+  boat.rect(W*0.6-8,GROUND_Y-15,26,6).fill({color:0x92400e,alpha:0.3})
+  bgLayer.addChild(boat)
+}
+
+// Dolphins jumping (animated in gameLoop)
+let dolphins=[]
+function spawnDolphin(){
+  const d={x:W*0.3+Math.random()*W*0.4, y:GROUND_Y+(H-GROUND_Y)*0.6, phase:0, speed:0.03+Math.random()*0.02, active:true}
+  dolphins.push(d)
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -513,9 +549,13 @@ function gameLoop(ticker){
 
   // Ball physics
   const ballSpd=S.powerup==='slow'?0.6:1
-  S.bvy+=GRAVITY*S.gravMod*0.42*dt*ballSpd // lighter ball drop
+  S.bvy+=GRAVITY*S.gravMod*0.35*dt*ballSpd // very light ball — floats longer
   S.bx+=S.bvx*dt*ballSpd; S.by+=S.bvy*dt*ballSpd
-  S.bSpin+=S.bvx*0.015*dt // spin follows velocity
+  // Cap max ball speed to prevent chaos
+  const MAX_BALL_V = 8
+  if(Math.abs(S.bvx)>MAX_BALL_V) S.bvx=Math.sign(S.bvx)*MAX_BALL_V
+  if(Math.abs(S.bvy)>MAX_BALL_V) S.bvy=Math.sign(S.bvy)*MAX_BALL_V
+  S.bSpin+=S.bvx*0.015*dt
 
   const br=BALL_R*(S.powerup==='big'?1.5:1)
 
@@ -568,6 +608,22 @@ function gameLoop(ticker){
 
   // Draw everything
   tickParticles(dt)
+
+  // Dolphin spawn + animation
+  if(Math.random()<0.003*dt && dolphins.length<2) spawnDolphin()
+  for(let i=dolphins.length-1;i>=0;i--){
+    const d=dolphins[i]; d.phase+=d.speed*dt*60
+    if(d.phase>Math.PI){dolphins.splice(i,1);continue}
+    const jumpY=-Math.sin(d.phase)*40
+    // Draw dolphin (simple arc shape)
+    const dg=new PIXI.Graphics()
+    dg.ellipse(0,0,12,6).fill({color:0x64748b,alpha:0.7})
+    dg.moveTo(10,0).lineTo(16,-4).lineTo(16,4).fill({color:0x64748b,alpha:0.5})
+    dg.x=d.x; dg.y=d.y+jumpY; dg.rotation=-d.phase*0.5
+    fxLayer.addChild(dg)
+    setTimeout(()=>{try{fxLayer.removeChild(dg)}catch(_){}},20)
+  }
+
   const pFacing=S.pvx>0.5?1:S.pvx<-0.5?-1:1
   const pSquash=S.pGnd?1:S.pvy<0?0.85:1.15
   drawDuck(playerGfx,S.px,S.py,0xfbbf24,0xf59e0b,pFacing,S.pHasCrown,pSquash)
@@ -607,17 +663,17 @@ function checkHit(dx,dy,dvx,dvy,onGnd,who){
   let power, hitType
   if(onGnd){
     // SET: gentle lob upward
-    power=5; hitType='set'
+    power=4; hitType='set'
     if(who==='player')S.pSet=true
   } else if(who==='player'&&S.pSet){
     // SMASH: powerful spike after set
-    power=9; hitType='smash'
+    power=7; hitType='smash'
     S.pSet=false
     S.shakeTimer=10
     sfxSmash()
   } else {
     // SHOT: jump first-touch
-    power=7; hitType='shot'
+    power=5.5; hitType='shot'
   }
 
   S.bvx=Math.cos(angle)*power+dvx*0.35
@@ -626,6 +682,23 @@ function checkHit(dx,dy,dvx,dvy,onGnd,who){
 
   if(hitType==='set') sfxHit()
   else if(hitType==='shot') sfxHit()
+
+  // Hit effect — spawn colored particles at ball position
+  const hitColors = {set:0x4ade80, shot:0x3b82f6, smash:0xfbbf24}
+  const hc = hitColors[hitType] || 0xffffff
+  for(let i=0;i<6;i++){
+    const g=new PIXI.Graphics()
+    g.circle(0,0,2+Math.random()*3).fill(hc)
+    g.x=S.bx; g.y=S.by
+    fxLayer.addChild(g)
+    particles.push({g, vx:(Math.random()-0.5)*6, vy:-Math.random()*5-1, grav:0.2, life:1, decay:0.04})
+  }
+  // Type emoji burst
+  const typeEmoji = {set:'🌿', shot:'💧', smash:'⚡'}
+  const te = new PIXI.Text({text:typeEmoji[hitType]||'💥', style:{fontSize:20}})
+  te.anchor.set(0.5); te.x=S.bx; te.y=S.by-15
+  fxLayer.addChild(te)
+  particles.push({g:te, vx:0, vy:-2, grav:0, life:1, decay:0.03})
 }
 
 // ═══════════════════════════════════════════════════════════
