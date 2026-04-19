@@ -22,8 +22,8 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#38bdf
 
 /* ── Controls ── */
 #controls{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;padding:8px 12px 16px;pointer-events:none}
-.ctrl-zone{width:44%;height:70px;display:flex;gap:5px;pointer-events:all}
-.ctrl-btn{flex:1;border-radius:14px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.4);color:#fff;font-size:22px;font-weight:900;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.ctrl-zone{width:46%;height:80px;display:flex;gap:5px;pointer-events:all}
+.ctrl-btn{flex:1;border-radius:18px;border:2.5px solid rgba(196,181,253,0.4);background:linear-gradient(160deg,rgba(139,92,246,0.3),rgba(167,139,250,0.2));color:#e9d5ff;font-size:20px;font-weight:900;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);box-shadow:0 3px 0 rgba(91,33,182,0.2)}
 .ctrl-btn:active{background:rgba(139,92,246,0.5);transform:scale(0.93)}
 #btn-jump{background:rgba(251,191,36,0.4);border-color:rgba(251,191,36,0.5);font-size:16px}
 
@@ -555,6 +555,8 @@ function gameLoop(ticker){
   // Player movement
   const spd = MOVE_SPD * (S.powerup==='speed'?1.5:1)
   if(S.moveL) S.pvx=-spd; else if(S.moveR) S.pvx=spd; else S.pvx*=0.82
+  // Auto-jump assist — if ball is close and heading toward player, auto-jump
+  if(S.pGnd && S.bx<NET_X && S.bvy>0 && Math.abs(S.bx-S.px)<60 && S.by<GROUND_Y-40) S.jump=true
   if(S.jump&&S.pGnd){
     S.pvy=JUMP_POWER*(S.powerup==='jump'?1.4:1); S.pGnd=false
     spawnSand(S.px,GROUND_Y,4)

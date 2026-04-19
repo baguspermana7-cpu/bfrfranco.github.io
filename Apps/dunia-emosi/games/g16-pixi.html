@@ -1009,6 +1009,29 @@ function buildObstaclesOnTrack(W,H){
     S.obstacles.push(obs); obstacleContainers.push(obs.container)
   }
   document.getElementById('obstacle-count').textContent=`🚧 0/${S.totalObstacles}`
+
+  // Mini quiz objects between stations
+  S.miniObs = S.miniObs || []
+  const miniEmojis = ['🪨','📦','🌳','🐄','🚧','🧱','🪵','🐔','🏗️','⚠️']
+  const miniSpacing = 300 + Math.random() * 200
+  for (let mwx = startWX + miniSpacing/2; mwx < endWX; mwx += miniSpacing) {
+    if (S.obstacles.some(o => Math.abs(o.worldX - mwx) < 200)) continue
+    const emoji = miniEmojis[Math.floor(Math.random() * miniEmojis.length)]
+    const a = Math.floor(Math.random() * 10) + 1
+    const b = Math.floor(Math.random() * (14 - a)) + 1
+    const isAdd = Math.random() < 0.5
+    const ans = isAdd ? a + b : Math.max(a, b) - Math.min(a, b)
+    const q = isAdd ? `${a}+${b}=?` : `${Math.max(a,b)}-${Math.min(a,b)}=?`
+    const mc = new PIXI.Container(); mc.x = mwx; mc.y = tY
+    const bg = new PIXI.Graphics()
+    bg.roundRect(-22,-40,44,36,8).fill({color:0xfbbf24,alpha:0.9})
+    bg.roundRect(-22,-40,44,36,8).stroke({color:0x92400e,width:2})
+    mc.addChild(bg)
+    const txt = new PIXI.Text({text: emoji, style:{fontSize:24}})
+    txt.anchor.set(0.5); txt.y = -22; mc.addChild(txt)
+    worldContainer.addChild(mc)
+    S.miniObs.push({worldX:mwx, container:mc, emoji, q, ans, cleared:false})
+  }
 }
 
 function buildObstacleGraphic(ox,tY,idx){
@@ -1156,6 +1179,19 @@ function updateTrain(dt){
   const maxStep = nextObs && !nextObs.cleared ? Math.min(speed*dt, Math.max((nextObs.worldX-S.worldX)*0.8, 2)) : speed*dt
   S.worldX+=maxStep
   if(S.worldX>WORLD_LENGTH+200&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){triggerDeath();return}
+  // Check mini-obstacles (quick math questions)
+  if(S.miniObs && S.trainState==='MOVING'){
+    const nextMini = S.miniObs.find(m=>!m.cleared && m.worldX > S.worldX && m.worldX - S.worldX < 80)
+    if(nextMini && !S.miniQuizActive){
+      S.miniQuizActive = true
+      S.trainState = 'STOPPED'; speed = 0
+      // Show quick quiz inline
+      const qEl = document.getElementById('quiz-label')
+      if(qEl) qEl.textContent = '🚧 Singkirkan rintangan!'
+      showQuizPanel({questions:[{q:nextMini.q,choices:generateMiniChoices(nextMini.ans),ans:nextMini.ans}],qIdx:0,question:{q:nextMini.q,choices:generateMiniChoices(nextMini.ans),ans:nextMini.ans},cleared:false,wrongCount:0,_mini:true,_miniRef:nextMini})
+    }
+  }
+
   if(S.cleared===S.totalObstacles&&S.trainState!=='DEAD'&&S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){
     if(S.trainState!=='BOOSTING'&&S.trainState!=='MOVING'){S.trainState='BOOSTING';S.boostTimer=2}
     if(S.worldX>STATION_X-W*0.8){triggerArrival();return}
@@ -1313,21 +1349,46 @@ function onChoiceTap(btn,choice,obs){
   if(quizLocked)return; quizLocked=true
   if(choice===obs.question.ans){
     btn.classList.add('correct'); flashScreen('#00ff44',0.35)
-    // Advance to next question or clear station
-    obs.qIdx = (obs.qIdx||0)+1
-    if(obs.questions && obs.qIdx < obs.questions.length){
-      obs.question = obs.questions[obs.qIdx]
-      setTimeout(()=>{hideQuizPanel(); quizActive=false; showQuizPanel(obs)},500)
+    if(obs._mini){
+      // Mini obstacle — just clear and resume
+      setTimeout(()=>clearMiniObstacle(obs._miniRef),380)
     } else {
-      setTimeout(()=>clearObstacle(obs),380)
+      obs.qIdx = (obs.qIdx||0)+1
+      if(obs.questions && obs.qIdx < obs.questions.length){
+        obs.question = obs.questions[obs.qIdx]
+        setTimeout(()=>{hideQuizPanel(); quizActive=false; showQuizPanel(obs)},500)
+      } else {
+        setTimeout(()=>clearObstacle(obs),380)
+      }
     }
   } else {
     S.wrongTaps++; S.noWrongAnswers=false; obs.wrongCount++
     btn.classList.add('wrong'); S.cameraShake=1.0; flashScreen('#ff8800',0.28)
     document.querySelectorAll('.mercy-dot').forEach((d,i)=>{if(i<obs.wrongCount)d.classList.add('used')})
-    if(obs.wrongCount>=3)setTimeout(()=>clearObstacle(obs),450)
+    if(obs._mini){
+      // Mini obstacle — wrong answer, just resume after delay
+      setTimeout(()=>{clearMiniObstacle(obs._miniRef)},600)
+    } else if(obs.wrongCount>=3) setTimeout(()=>clearObstacle(obs),450)
     else setTimeout(()=>{quizLocked=false},500)
   }
+}
+
+function generateMiniChoices(ans){
+  const choices = [String(ans)]
+  while(choices.length<4){
+    const w = ans + Math.floor(Math.random()*8)-4
+    if(w>=0 && w!==ans && !choices.includes(String(w))) choices.push(String(w))
+  }
+  return choices.sort(()=>Math.random()-0.5)
+}
+
+function clearMiniObstacle(mini){
+  mini.cleared = true
+  S.miniQuizActive = false
+  if(mini.container){mini.container.visible=false; try{worldContainer.removeChild(mini.container)}catch(_){}}
+  hideQuizPanel()
+  // Resume moving (no boost — just continue)
+  if(S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED') S.trainState='MOVING'
 }
 
 function clearObstacle(obs){
