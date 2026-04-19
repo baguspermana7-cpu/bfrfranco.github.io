@@ -157,12 +157,19 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
 #gs-body{flex:1;overflow-y:auto;padding:6px 14px 24px;-webkit-overflow-scrolling:touch}
 #trainer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(min-width:480px){#trainer-grid{grid-template-columns:repeat(4,1fr)}}
-.trainer-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:18px;border:2px solid rgba(139,92,246,0.3);background:rgba(139,92,246,0.08);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .12s;position:relative}
-.trainer-card:active{transform:scale(0.92);background:rgba(139,92,246,0.25)}
-.trainer-card.beaten{border-color:#fbbf24;background:rgba(251,191,36,0.1)}
-.trainer-card img{width:64px;height:64px;object-fit:contain;object-position:top}
-.trainer-card .tc-name{font-size:13px;font-weight:700;color:#e9d5ff;text-align:center}
-.trainer-card .tc-badge{font-size:18px;position:absolute;top:6px;right:8px}
+.trainer-card{display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;border:2px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.06);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .12s;position:relative}
+.trainer-card:active{transform:scale(0.97);background:rgba(139,92,246,0.18)}
+.trainer-card.beaten{border-color:#fbbf24;background:rgba(251,191,36,0.08)}
+.trainer-card.locked{opacity:0.35;pointer-events:none;filter:grayscale(0.8)}
+.trainer-card.current{border-color:#4ade80;background:rgba(74,222,128,0.08);box-shadow:0 0 12px rgba(74,222,128,0.2);animation:currentPulse 2s ease-in-out infinite}
+@keyframes currentPulse{50%{box-shadow:0 0 20px rgba(74,222,128,0.35)}}
+.trainer-card img{width:48px;height:48px;object-fit:contain;flex-shrink:0;border-radius:50%;background:rgba(139,92,246,0.1)}
+.tc-order{width:22px;font-size:13px;font-weight:900;color:var(--gc,#a78bfa);text-align:center;flex-shrink:0}
+.tc-info{flex:1;min-width:0}
+.tc-info .tc-name{font-size:13px;font-weight:700;color:#e9d5ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-info .tc-gym{font-size:9px;color:rgba(167,139,250,0.5);margin-top:1px}
+.tc-status{font-size:20px;flex-shrink:0}
+.trainer-card .tc-badge{display:none}
 /* Fallback avatar when trainer sprite fails to load */
 .trainer-avatar-fb{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:34px;background:radial-gradient(circle,rgba(139,92,246,0.28),rgba(0,0,0,0.5));border-radius:50%;border:2px solid rgba(139,92,246,0.5);flex-shrink:0}
 /* Battle portrait fallback */
@@ -217,9 +224,11 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a021
 .type-fairy{background:linear-gradient(160deg,#9d174d,#db2777);border-color:#fbcfe8;box-shadow:0 5px 0 #831843}
 
 /* ── Trainer group headers ── */
-.tg-header{font-size:13px;font-weight:900;color:var(--gc,#a78bfa);letter-spacing:1px;padding:10px 0 4px;border-bottom:2px solid var(--gc,rgba(167,139,250,0.4));margin:12px 0 8px}
-.tg-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
-@media(min-width:480px){.tg-row{grid-template-columns:repeat(4,1fr)}}
+.tg-header{font-size:13px;font-weight:900;color:var(--gc,#a78bfa);letter-spacing:1px;padding:10px 0 4px;border-bottom:2px solid var(--gc,rgba(167,139,250,0.4));margin:12px 0 8px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tg-progress{margin-left:auto;font-size:11px;opacity:0.7;font-weight:700}
+.tg-arrow{font-size:10px;opacity:0.5}
+.tg-row{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.tg-row.collapsed{display:none}
 #trainer-grid{display:block}
 </style>
 </head>
@@ -895,28 +904,52 @@ function trainerFallback(img, badge) {
 // ─── GYM SELECT ──────────────────────────────────────────────────────────────
 function buildGymSelect(){
   const grid = document.getElementById('trainer-grid');
-  const badges_obj = badges;
   let html = '';
   TRAINER_GROUPS.forEach(grp => {
     const gTrainers = TRAINERS.filter(t => t.group === grp.id);
     if (!gTrainers.length) return;
-    html += `<div class="tg-header" style="--gc:${grp.color}">${grp.label}</div>`;
-    html += '<div class="tg-row">';
-    gTrainers.forEach(t => {
-      html += `<div class="trainer-card ${badges_obj[t.id]?'beaten':''}" onclick="showGymWelcome('${t.id}')">
-        <img src="${TRAINER_SPRITE(t.sprite)}" data-sprite="${t.sprite}" onerror="trainerFallback(this,'${t.badge}')" alt="${t.name}">
-        <div class="tc-name">${t.name}</div>
-        <div class="tc-gym" style="font-size:8px;color:rgba(167,139,250,0.6);margin-top:2px">${t.gym}</div>
-        ${badges_obj[t.id]?`<div class="tc-badge">${t.badge}</div>`:''}
+    const beatenCount = gTrainers.filter(t => badges[t.id]).length;
+    const collapsed = localStorage.getItem('g13c_collapse_'+grp.id) === '1';
+
+    html += `<div class="tg-header" style="--gc:${grp.color}" onclick="toggleRegion('${grp.id}')">
+      ${grp.label}
+      <span class="tg-progress">${beatenCount}/${gTrainers.length}</span>
+      <span class="tg-arrow">${collapsed?'▶':'▼'}</span>
+    </div>`;
+    html += `<div class="tg-row ${collapsed?'collapsed':''}" id="region-${grp.id}">`;
+
+    gTrainers.forEach((t, idx) => {
+      const beaten = !!badges[t.id];
+      const prevBeaten = idx === 0 || !!badges[gTrainers[idx-1].id];
+      const unlocked = beaten || prevBeaten;
+      const isCurrent = unlocked && !beaten;
+
+      html += `<div class="trainer-card ${beaten?'beaten':''} ${!unlocked?'locked':''} ${isCurrent?'current':''}"
+        ${unlocked ? `onclick="showGymWelcome('${t.id}')"` : ''}>
+        <div class="tc-order" style="color:${grp.color}">${idx+1}</div>
+        <img src="${TRAINER_SPRITE(t.sprite)}" data-sprite="${t.sprite}"
+          onerror="trainerFallback(this,'${t.badge}')" alt="${t.name}">
+        <div class="tc-info">
+          <div class="tc-name">${t.name}</div>
+          <div class="tc-gym">${t.gym}</div>
+        </div>
+        <div class="tc-status">${beaten?t.badge:unlocked?'⚔️':'🔒'}</div>
       </div>`;
     });
     html += '</div>';
   });
   grid.innerHTML = html;
-  const total = TRAINERS.length;
-  document.getElementById('badge-num').textContent = Object.keys(badges_obj).length;
-  const tot = document.getElementById('total-trainers');
-  if(tot) tot.textContent = total;
+  updateBadgeCount();
+}
+
+function toggleRegion(groupId) {
+  const row = document.getElementById('region-' + groupId);
+  if (!row) return;
+  row.classList.toggle('collapsed');
+  localStorage.setItem('g13c_collapse_' + groupId, row.classList.contains('collapsed') ? '1' : '0');
+  const header = row.previousElementSibling;
+  const arrow = header ? header.querySelector('.tg-arrow') : null;
+  if (arrow) arrow.textContent = row.classList.contains('collapsed') ? '▶' : '▼';
 }
 
 function updateBadgeCount(){
