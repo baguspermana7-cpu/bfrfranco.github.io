@@ -75,6 +75,7 @@ canvas.ts-preview{border-radius:8px;max-width:100%}
 </head>
 <body>
 <canvas id="pixi-canvas"></canvas>
+<audio id="game-bgm" src="../Sounds/battle-bgm.mp3" loop preload="auto" style="display:none"></audio>
 
 <div id="hud-top">
   <button id="btn-back" onclick="confirmBack()">⌂</button>
@@ -475,6 +476,7 @@ async function initPixi(){
   buildFireGlow(W,H)
   app.ticker.add(gameLoop)
   S.startTime=performance.now(); S.running=true
+  try{const bgm=document.getElementById('game-bgm');bgm.volume=0.25;bgm.play().catch(()=>{})}catch(_){}
   updateHUD()
 }
 
@@ -1401,6 +1403,7 @@ function calcStars(){
   return Math.max(stars,1)
 }
 function showWin(){
+  try{document.getElementById('game-bgm').pause()}catch(_){}
   const stars=calcStars()
   const msgs=['','','','Bagus sekali!','Luar biasa cepat!','SEMPURNA!']
   const title=stars>=5?'SEMPURNA!':stars>=4?'Hebat Sekali!':'Kereta Selamat!'
@@ -1413,6 +1416,7 @@ function showWin(){
   })
 }
 function showLose(){
+  try{document.getElementById('game-bgm').pause()}catch(_){}
   try{sessionStorage.setItem('g16Result',JSON.stringify({stars:0,level:S.level}))}catch(_){}
   GameModal.show({
     emoji:'💥', title:'Kereta Jatuh!', stars:0,
@@ -1610,8 +1614,9 @@ function confirmBack(){goBack()}
 function togglePause(){
   S.paused=!S.paused
   document.getElementById('btn-pause').textContent=S.paused?'▶':'⏸'
+  try{const bgm=document.getElementById('game-bgm');S.paused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
 }
-function finishGame(){goBack()}
+function finishGame(){try{document.getElementById('game-bgm').pause()}catch(_){};goBack()}
 function restartGame(){location.reload()}
 window.addEventListener('resize',()=>{
   if(!app)return
@@ -1620,6 +1625,11 @@ window.addEventListener('resize',()=>{
   const newH=app.screen.height
   const newTY=getTrackY(newH)
   if(trainContainer) trainContainer.y=newTY-14
+  // Reposition obstacles and NPC to new track Y
+  if(S.obstacles) S.obstacles.forEach(o=>{if(o.container) o.container.y=newTY})
+  // Reposition headlight and fire glow
+  if(headlightBeam) headlightBeam.y=newTY-14
+  if(fireGlow) fireGlow.y=newTY-18
 })
 </script>
 </body>
