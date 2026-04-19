@@ -51,8 +51,13 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 <div id="pause-overlay">
   <div style="font-size:36px">⏸</div>
   <div style="font-size:24px;font-weight:900;color:#fbbf24">PAUSE</div>
-  <div style="display:flex;gap:10px">
+  <div id="poke-picker" style="display:none;width:85%;max-width:340px;max-height:28vh;overflow-y:auto;margin:8px 0">
+    <div style="font-size:11px;color:#fbbf24;font-weight:700;margin-bottom:6px">🎒 Ganti Pokemon:</div>
+    <div id="poke-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
     <button onclick="togglePause()" style="padding:12px 24px;border-radius:14px;border:2px solid #4ade80;background:rgba(34,197,94,0.3);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">▶ Lanjut</button>
+    <button onclick="togglePokePicker()" style="padding:12px 24px;border-radius:14px;border:2px solid #fbbf24;background:rgba(251,191,36,0.2);color:#fbbf24;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">🎒 Pokemon</button>
     <button onclick="goBack()" style="padding:12px 24px;border-radius:14px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#bfdbfe;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">🏠 Keluar</button>
   </div>
 </div>
@@ -65,7 +70,7 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 </div>
 
 <!-- Monster character (DOM overlay) -->
-<img id="monster-img" src="../assets/wants candy/icon.png" style="position:fixed;z-index:40;pointer-events:none;width:min(100px,22vw);height:auto;bottom:5%;left:50%;transform:translateX(-50%);display:none;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4))">
+<img id="monster-img" src="https://img.pokemondb.net/sprites/home/normal/psyduck.png" onerror="this.src='../assets/Pokemon/sprites/psyduck.png'" style="position:fixed;z-index:40;pointer-events:none;width:min(90px,20vw);height:auto;bottom:22%;left:50%;transform:translateX(-50%);display:none;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4))">
 
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
 <script src="game-modal.js"></script>
@@ -78,9 +83,8 @@ try { const s = sessionStorage.getItem('g22Config'); if (s) Object.assign(cfg, J
 document.getElementById('level-text').textContent = `Level ${cfg.level}`
 document.getElementById('start-level').textContent = `Level ${cfg.level}`
 
-// Questions (reuse bank)
-const QS = [
-  // Easy (single digit, result ≤10)
+// Multi-category question bank — each pokeball type pulls from different category
+const Q_MATH = [
   {q:'1+1',a:2},{q:'2+1',a:3},{q:'1+3',a:4},{q:'2+2',a:4},{q:'3+1',a:4},
   {q:'2+3',a:5},{q:'4+1',a:5},{q:'3+2',a:5},{q:'5-2',a:3},{q:'4-1',a:3},
   {q:'3+3',a:6},{q:'5+1',a:6},{q:'4+2',a:6},{q:'6-3',a:3},{q:'5-3',a:2},
@@ -88,14 +92,32 @@ const QS = [
   {q:'4+4',a:8},{q:'5+3',a:8},{q:'6+2',a:8},{q:'8-3',a:5},{q:'7-3',a:4},
   {q:'5+4',a:9},{q:'6+3',a:9},{q:'7+2',a:9},{q:'9-4',a:5},{q:'8-5',a:3},
   {q:'5+5',a:10},{q:'6+4',a:10},{q:'7+3',a:10},{q:'10-3',a:7},{q:'10-4',a:6},
-  // Medium (result ≤15)
   {q:'7+4',a:11},{q:'8+3',a:11},{q:'9+2',a:11},{q:'11-5',a:6},{q:'11-3',a:8},
   {q:'7+5',a:12},{q:'8+4',a:12},{q:'6+6',a:12},{q:'12-5',a:7},{q:'12-4',a:8},
   {q:'8+5',a:13},{q:'9+4',a:13},{q:'7+6',a:13},{q:'13-6',a:7},{q:'13-5',a:8},
-  {q:'8+6',a:14},{q:'9+5',a:14},{q:'7+7',a:14},{q:'14-6',a:8},{q:'14-7',a:7},
-  {q:'8+7',a:15},{q:'9+6',a:15},{q:'15-8',a:7},{q:'15-6',a:9},{q:'15-9',a:6},
 ]
-function pickQ(){return QS[Math.floor(Math.random()*QS.length)]}
+const Q_WARNA = [
+  {q:'Warna langit?',a:'Biru'},{q:'Warna daun?',a:'Hijau'},{q:'Warna matahari?',a:'Kuning'},
+  {q:'Warna darah?',a:'Merah'},{q:'Warna awan?',a:'Putih'},{q:'Warna batu bara?',a:'Hitam'},
+  {q:'Warna jeruk?',a:'Oranye'},{q:'Warna terong?',a:'Ungu'},{q:'Warna cokelat?',a:'Cokelat'},
+]
+const Q_HEWAN = [
+  {q:'Suara kucing?',a:'Meong'},{q:'Suara anjing?',a:'Guk-guk'},{q:'Suara sapi?',a:'Moo'},
+  {q:'Suara ayam?',a:'Kukuruyuk'},{q:'Suara bebek?',a:'Kwek'},{q:'Suara kambing?',a:'Mbee'},
+  {q:'Hewan terbesar?',a:'Paus Biru'},{q:'Burung tak bisa terbang?',a:'Penguin'},{q:'Raja hutan?',a:'Singa'},
+]
+const Q_BUAH = [
+  {q:'Buah kuning panjang?',a:'Pisang'},{q:'Buah merah kecil?',a:'Ceri'},{q:'Buah hijau besar?',a:'Semangka'},
+  {q:'Buah oranye bulat?',a:'Jeruk'},{q:'Buah ungu kecil?',a:'Anggur'},{q:'Buah merah hati?',a:'Stroberi'},
+]
+// Pokeball index → category mapping
+const BALL_CATEGORIES = [Q_MATH,Q_WARNA,Q_HEWAN,Q_BUAH,Q_MATH,Q_WARNA,Q_HEWAN,Q_BUAH,Q_MATH]
+const BALL_CAT_NAMES = ['Matematika','Warna','Hewan','Buah','Matematika','Warna','Hewan','Buah','Matematika']
+
+function pickQ(ballIdx){
+  const pool = BALL_CATEGORIES[ballIdx || 0] || Q_MATH
+  return pool[Math.floor(Math.random()*pool.length)]
+}
 
 // ═══════════════════════════════════════════════════════════
 //  GAME STATE
@@ -104,6 +126,19 @@ let W, H, app
 // Pokemon IDs for ball sprites (popular Pokemon)
 const POKE_BALL_IDS = [25,1,4,7,133,143,39,54,129,63,92,104,37,58,77,120,147,152,155,158,172,175,183,196,252,255,258,280,300,333,387,390,393,403,447,495,498,501,570,613,650,653,656,722,725,728]
 const BALL_COLORS = [0xef4444,0xf97316,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x14b8a6,0x6366f1,0xf43f5e]
+// Real pokeball SVGs — each type maps to a quiz category
+const POKEBALL_SVGS = [
+  '../assets/Pokemon/others/pokeball-pokemon-svgrepo-com.svg',
+  '../assets/Pokemon/others/great-ball.svg',
+  '../assets/Pokemon/others/ultra-ball.svg',
+  '../assets/Pokemon/others/master-ball.svg',
+  '../assets/Pokemon/others/fast-ball.svg',
+  '../assets/Pokemon/others/heal-ball.svg',
+  '../assets/Pokemon/others/luxury-ball.svg',
+  '../assets/Pokemon/others/quick-ball.svg',
+  '../assets/Pokemon/others/pokeball.svg',
+]
+const _pokeballTexCache = {}
 
 const S = {
   running:false, paused:false, started:false, gameOver:false,
@@ -222,8 +257,8 @@ function drawBackground() {
 //  CANDY SYSTEM
 // ═══════════════════════════════════════════════════════════
 function spawnCandy() {
-  const q = pickQ()
-  const pokeId = POKE_BALL_IDS[Math.floor(Math.random() * POKE_BALL_IDS.length)]
+  const ballType = Math.floor(Math.random() * 9)
+  const q = pickQ(ballType)
   const color = BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)]
   const ballR = 30
 
@@ -231,32 +266,40 @@ function spawnCandy() {
   container.x = 30 + Math.random() * (W - 60)
   container.y = -60
 
-  // Pokeball design
+  // Pokeball designs — each type has distinct top color + accent
+  const BALL_DESIGNS = [
+    {top:0xef4444,bot:0xf8fafc,accent:0x1c1917,name:'Poké Ball'},      // red classic
+    {top:0x3b82f6,bot:0xf8fafc,accent:0xef4444,name:'Great Ball'},     // blue
+    {top:0x1c1917,bot:0xfbbf24,accent:0xfbbf24,name:'Ultra Ball'},     // black+gold
+    {top:0x8b5cf6,bot:0xf8fafc,accent:0xec4899,name:'Master Ball'},    // purple+pink
+    {top:0xf97316,bot:0xfef3c7,accent:0xf97316,name:'Fast Ball'},      // orange
+    {top:0xec4899,bot:0xfbcfe8,accent:0xf9a8d4,name:'Heal Ball'},      // pink
+    {top:0x1c1917,bot:0xfbbf24,accent:0xef4444,name:'Luxury Ball'},    // black+gold+red
+    {top:0x38bdf8,bot:0xf0f9ff,accent:0xfbbf24,name:'Quick Ball'},     // light blue
+    {top:0x22c55e,bot:0xf8fafc,accent:0x15803d,name:'Safari Ball'},    // green
+  ]
+  const svgIdx = Math.floor(Math.random() * BALL_DESIGNS.length)
+  const bd = BALL_DESIGNS[svgIdx]
   const ball = new PIXI.Graphics()
-  // Top half (red/color)
-  ball.arc(0, 0, ballR, Math.PI, 0).fill(color)
-  // Bottom half (white)
-  ball.arc(0, 0, ballR, 0, Math.PI).fill(0xf8fafc)
-  // Center line
-  ball.rect(-ballR, -2, ballR * 2, 4).fill(0x1c1917)
+  // Top half
+  ball.arc(0, 0, ballR, Math.PI, 0).fill(bd.top)
+  // Bottom half
+  ball.arc(0, 0, ballR, 0, Math.PI).fill(bd.bot)
+  // Center band
+  ball.rect(-ballR, -2.5, ballR * 2, 5).fill(0x1c1917)
   // Center button
-  ball.circle(0, 0, 8).fill(0xf8fafc)
-  ball.circle(0, 0, 8).stroke({ color: 0x1c1917, width: 2.5 })
-  ball.circle(0, 0, 4).fill(0xffffff)
-  // Outline
-  ball.circle(0, 0, ballR).stroke({ color: 0x1c1917, width: 2 })
-  // Shine highlight
-  ball.ellipse(-ballR * 0.35, -ballR * 0.35, ballR * 0.2, ballR * 0.12).fill({ color: 0xffffff, alpha: 0.4 })
+  ball.circle(0, 0, 7).fill(bd.bot)
+  ball.circle(0, 0, 7).stroke({ color: 0x1c1917, width: 2.5 })
+  ball.circle(0, 0, 3.5).fill(bd.accent)
+  // Outer ring
+  ball.circle(0, 0, ballR).stroke({ color: 0x1c1917, width: 2.5 })
+  // Shine
+  ball.ellipse(-ballR * 0.3, -ballR * 0.35, ballR * 0.22, ballR * 0.1).fill({ color: 0xffffff, alpha: 0.45 })
   container.addChild(ball)
 
-  // Pokemon emoji inside ball (safe — no SVG texture loading)
-  const pokeEmojis = ['🐸','🔥','💧','🌿','⚡','👻','🐉','🪨','🦋','🐍','🐭','🐱','🐶','🐻','🦅','🐟','🌟','💎']
-  const pe = new PIXI.Text({text:pokeEmojis[Math.floor(Math.random()*pokeEmojis.length)], style:{fontSize:ballR*0.7}})
-  pe.anchor.set(0.5); pe.y = -2; pe.alpha = 0.8
-  container.addChild(pe)
-
   // Math question floating below ball
-  const qText = new PIXI.Text({ text: q.q + '=?', style: { fontSize: 14, fontWeight: '900', fill: 0x1c1917, fontFamily: 'Fredoka One, Arial', align: 'center' } })
+  const qLabel = typeof q.a === 'number' ? q.q + '=?' : q.q
+  const qText = new PIXI.Text({ text: qLabel, style: { fontSize: 13, fontWeight: '900', fill: 0x1c1917, fontFamily: 'Fredoka One, Arial', align: 'center' } })
   qText.anchor.set(0.5)
   qText.y = ballR + 14
   // Question background pill
@@ -272,10 +315,12 @@ function spawnCandy() {
   gameLayer.addChild(container)
 
   const candy = {
-    container, q, emoji, color,
+    container, q, color,
     x: container.x, y: container.y,
-    speed: S.fallSpeed * (0.8 + Math.random() * 0.4),
-    rotation: (Math.random() - 0.5) * 0.03,
+    speed: S.fallSpeed * (0.85 + Math.random() * 0.3),
+    rotation: (Math.random() - 0.5) * 0.02,
+    wobble: Math.random() * Math.PI * 2, // phase for side-to-side sway
+    wobbleAmp: 0.3 + Math.random() * 0.4, // sway amplitude
     alive: true, caught: false
   }
   S.candies.push(candy)
@@ -295,32 +340,50 @@ function showCandyQuiz(candy) {
   S.quizActive = true
   S.currentCandy = candy
 
-  // Generate choices
+  // Generate choices — works for both numeric and text answers
   const correct = candy.q.a
   const choices = [correct]
-  while (choices.length < 4) {
-    const wrong = correct + Math.floor(Math.random() * 10) - 5
-    if (wrong !== correct && wrong >= 0 && !choices.includes(wrong)) choices.push(wrong)
+  if (typeof correct === 'number') {
+    while (choices.length < 4) {
+      const wrong = correct + Math.floor(Math.random() * 10) - 5
+      if (wrong !== correct && wrong >= 0 && !choices.includes(wrong)) choices.push(wrong)
+    }
+  } else {
+    // Text answer — pick wrong answers from same category
+    const pool = [...Q_WARNA, ...Q_HEWAN, ...Q_BUAH].map(q => q.a).filter(a => a !== correct)
+    const shuffled = pool.sort(() => Math.random() - 0.5)
+    for (const w of shuffled) { if (!choices.includes(w) && choices.length < 4) choices.push(w) }
+    while (choices.length < 4) choices.push(['???','---','...'][choices.length - 1])
   }
   choices.sort(() => Math.random() - 0.5)
 
-  // Create choice buttons as PIXI
+  // Create choice buttons as PIXI — uniform colors, bigger for mobile
   const panel = new PIXI.Container()
   panel.name = 'quiz-panel'
-  const panelBg = new PIXI.Graphics()
-  panelBg.roundRect(-100, -30, 200, 60, 12).fill({ color: 0x1e0845, alpha: 0.9 })
-  panel.addChild(panelBg)
 
+  // Question label on top of panel
+  const qLabel = new PIXI.Text({ text: candy.q.q + ' = ?', style: { fontSize: 18, fontWeight: '900', fill: 0xfbbf24, fontFamily: 'Fredoka One, Arial' } })
+  qLabel.anchor.set(0.5); qLabel.y = -38
+
+  const panelBg = new PIXI.Graphics()
+  panelBg.roundRect(-135, -52, 270, 95, 14).fill({ color: 0x1e0845, alpha: 0.92 })
+  panelBg.roundRect(-135, -52, 270, 95, 14).stroke({ color: 0x7c3aed, width: 2, alpha: 0.5 })
+  panel.addChild(panelBg)
+  panel.addChild(qLabel)
+
+  const btnColors = [0x7c3aed, 0x6366f1, 0x8b5cf6, 0xa855f7] // uniform pastel purples
   choices.forEach((c, i) => {
     const btn = new PIXI.Container()
-    btn.x = -75 + i * 50
+    btn.x = -97 + i * 65
+    btn.y = 5
     const bg = new PIXI.Graphics()
-    bg.roundRect(-20, -18, 40, 36, 8).fill(c === correct ? 0x22c55e : [0x7c3aed, 0xef4444, 0xf97316, 0x3b82f6][i])
+    bg.roundRect(-27, -22, 54, 44, 10).fill(btnColors[i])
+    bg.roundRect(-27, -22, 54, 44, 10).stroke({ color: 0xffffff, width: 1.5, alpha: 0.3 })
     btn.addChild(bg)
-    const txt = new PIXI.Text({ text: '' + c, style: { fontSize: 16, fontWeight: '900', fill: 0xffffff, fontFamily: 'Arial' } })
+    const txt = new PIXI.Text({ text: '' + c, style: { fontSize: 20, fontWeight: '900', fill: 0xffffff, fontFamily: 'Fredoka One, Arial' } })
     txt.anchor.set(0.5)
     btn.addChild(txt)
-    btn.interactive = true; btn.cursor = 'pointer'
+    btn.eventMode = 'static'; btn.cursor = 'pointer'
     btn.on('pointerdown', () => {
       if (c === correct) {
         S.combo++
@@ -330,35 +393,49 @@ function showCandyQuiz(candy) {
         S.totalCaught++
         sfxCorrect()
         spawnCatchFX(candy.x, candy.y, candy.color)
-        // Show Pokemon catch text
-        const catchText = S.combo >= 5 ? '🔥 SUPER COMBO x' + S.combo + '!' : S.combo >= 3 ? '⚡ COMBO x' + S.combo + '!' : 'Dapat!'
-        const ct = new PIXI.Text({ text: catchText, style: { fontSize: S.combo >= 3 ? 22 : 16, fontWeight: '900', fill: S.combo >= 5 ? 0xfbbf24 : S.combo >= 3 ? 0x3b82f6 : 0x22c55e, fontFamily: 'Fredoka One' } })
-        ct.anchor.set(0.5); ct.x = candy.x; ct.y = candy.y - 40
+        // Flash button green briefly
+        bg.tint = 0x22c55e
+        // Combo feedback text
+        const catchText = S.combo >= 5 ? '🔥 SUPER x' + S.combo + '!' : S.combo >= 3 ? '⚡ COMBO x' + S.combo + '!' : 'Dapat!'
+        const ct = new PIXI.Text({ text: catchText, style: { fontSize: S.combo >= 3 ? 24 : 18, fontWeight: '900', fill: S.combo >= 5 ? 0xfbbf24 : S.combo >= 3 ? 0x3b82f6 : 0x22c55e, fontFamily: 'Fredoka One' } })
+        ct.anchor.set(0.5); ct.x = candy.x; ct.y = candy.y - 50
         fxLayer.addChild(ct)
         S.particles.push({ g: ct, vx: 0, vy: -1.5, grav: 0, life: 1, decay: 0.02 })
+        // Screen shake on combo 5+
+        if (S.combo >= 5) {
+          const origX = app.stage.x, origY = app.stage.y
+          let shakeFrames = 6
+          const shakeInterval = setInterval(() => {
+            app.stage.x = origX + (Math.random() - 0.5) * 8
+            app.stage.y = origY + (Math.random() - 0.5) * 8
+            if (--shakeFrames <= 0) { clearInterval(shakeInterval); app.stage.x = origX; app.stage.y = origY }
+          }, 30)
+        }
         // Extra life at combo 10
         if (S.combo === 10 && S.lives < S.maxLives) { S.lives++; spawnCatchFX(W/2, H*0.4, 0xef4444) }
       } else {
-        S.combo = 0 // reset combo on wrong answer
+        S.combo = 0
         sfxWrong()
-        // Show correct answer
-        const wrongText = new PIXI.Text({ text: '❌ Jawaban: ' + correct, style: { fontSize: 14, fontWeight: '700', fill: 0xef4444, fontFamily: 'Arial' } })
-        wrongText.anchor.set(0.5); wrongText.x = candy.x; wrongText.y = candy.y - 40
+        bg.tint = 0xef4444
+        const wrongText = new PIXI.Text({ text: '❌ = ' + correct, style: { fontSize: 16, fontWeight: '700', fill: 0xef4444, fontFamily: 'Fredoka One' } })
+        wrongText.anchor.set(0.5); wrongText.x = candy.x; wrongText.y = candy.y - 50
         fxLayer.addChild(wrongText)
         S.particles.push({ g: wrongText, vx: 0, vy: -1, grav: 0, life: 1, decay: 0.02 })
       }
-      fxLayer.removeChild(panel)
-      candy.container.visible = false
-      gameLayer.removeChild(candy.container)
-      S.quizActive = false
-      S.currentCandy = null
-      updateHUD()
+      setTimeout(() => {
+        fxLayer.removeChild(panel)
+        candy.container.visible = false
+        gameLayer.removeChild(candy.container)
+        S.quizActive = false
+        S.currentCandy = null
+        updateHUD()
+      }, 150)
     })
     panel.addChild(btn)
   })
 
-  panel.x = Math.max(110, Math.min(W - 110, candy.x))
-  panel.y = Math.max(50, candy.y - 50)
+  panel.x = Math.max(140, Math.min(W - 140, candy.x))
+  panel.y = Math.max(65, candy.y - 60)
   fxLayer.addChild(panel)
 }
 
@@ -385,28 +462,53 @@ function gameLoop(ticker) {
   if (!S.running || S.paused || S.gameOver) return
   const dt = ticker.deltaTime
 
-  // Spawn candies
-  S.spawnTimer += dt / 60
-  if (S.spawnTimer >= S.spawnInterval) {
-    S.spawnTimer = 0
-    spawnCandy()
+  // Spawn candies (pause spawning during quiz)
+  if (!S.quizActive) {
+    S.spawnTimer += dt / 60
+    if (S.spawnTimer >= S.spawnInterval) {
+      S.spawnTimer = 0
+      spawnCandy()
+    }
   }
 
-  // Update candies
+  // Update candies — pause falling when quiz is active
   for (let i = S.candies.length - 1; i >= 0; i--) {
     const c = S.candies[i]
     if (!c.alive && !c.caught) { S.candies.splice(i, 1); continue }
     if (c.caught) continue // waiting for quiz
 
+    // Freeze other candies while quiz is open
+    if (S.quizActive) continue
+
     c.y += c.speed * dt
+    c.wobble += 0.04 * dt
+    c.container.x += Math.sin(c.wobble) * c.wobbleAmp * dt // gentle sway
+    c.x = c.container.x
     c.container.y = c.y
     c.container.rotation += c.rotation * dt
+
+    // Warning glow when candy near bottom (last 30%)
+    const dangerZone = H * 0.7
+    if (c.y > dangerZone) {
+      const urgency = (c.y - dangerZone) / (H - dangerZone)
+      c.container.alpha = 0.5 + 0.5 * Math.abs(Math.sin(S.frame * 0.15))
+      c.container.scale.set(1 + urgency * 0.1 * Math.abs(Math.sin(S.frame * 0.12)))
+    }
+
+    // Monster auto-catch: candy reaches monster zone and is close enough
+    const monsterY = H * 0.75
+    if (c.y >= monsterY - 30 && c.y <= monsterY + 10 && Math.abs(c.x - S.monsterX) < 55) {
+      catchCandy(c)
+      continue
+    }
 
     // Candy reached bottom — miss!
     if (c.y > H + 30) {
       c.alive = false
       gameLayer.removeChild(c.container)
       S.candies.splice(i, 1)
+      S.totalMissed++
+      S.combo = 0
       S.lives--
       sfxMiss()
       updateHUD()
@@ -458,7 +560,7 @@ function startGame() {
 function endGame() {
   S.running = false; S.gameOver = true
   try{document.getElementById('game-bgm').pause()}catch(_){}
-  const stars = S.score >= 15 ? 5 : S.score >= 10 ? 4 : S.score >= 6 ? 3 : S.score >= 3 ? 2 : 1
+  const stars = GameScoring.calc({correct:S.totalCaught, total:S.totalCaught+S.totalMissed, wrong:S.totalMissed, lives:S.lives, maxLives:S.maxLives})
 
   // Save progress
   try { sessionStorage.setItem('g22Result', JSON.stringify({ stars, level: cfg.level })) } catch(_){}
@@ -481,7 +583,7 @@ function endGame() {
       emoji: stars >= 4 ? '🏆' : '🍬',
       title: stars >= 3 ? 'Hebat!' : 'Coba Lagi!',
       stars,
-      msg: `🍬 ${S.score} poin | 🔥 Combo max: ${S.maxCombo} | Tangkap: ${S.totalCaught}`,
+      msg: `🍬 ${S.score} poin | 🔥 Combo max: ${S.maxCombo} | Tangkap: ${S.totalCaught} | Lepas: ${S.totalMissed}`,
       onNext: nextLevel,
       onAgain: () => location.reload(),
       onBack: () => goBack()
@@ -503,6 +605,44 @@ function goBack() {
   history.back()
 }
 
+// Pokemon picker — favorite Pokemon for catcher character
+const G22_POKEMON = [
+  {slug:'psyduck',name:'Psyduck'},{slug:'pikachu',name:'Pikachu'},{slug:'eevee',name:'Eevee'},
+  {slug:'snorlax',name:'Snorlax'},{slug:'jigglypuff',name:'Jigglypuff'},{slug:'togepi',name:'Togepi'},
+  {slug:'mew',name:'Mew'},{slug:'gengar',name:'Gengar'},{slug:'bulbasaur',name:'Bulbasaur'},
+  {slug:'charmander',name:'Charmander'},{slug:'squirtle',name:'Squirtle'},{slug:'meowth',name:'Meowth'},
+  {slug:'marill',name:'Marill'},{slug:'teddiursa',name:'Teddiursa'},{slug:'piplup',name:'Piplup'},
+]
+let g22SelectedPoke = 'psyduck'
+
+function togglePokePicker() {
+  const picker = document.getElementById('poke-picker')
+  if (picker.style.display === 'none') {
+    picker.style.display = 'block'
+    renderPokePicker()
+  } else {
+    picker.style.display = 'none'
+  }
+}
+
+function renderPokePicker() {
+  const grid = document.getElementById('poke-grid')
+  grid.innerHTML = ''
+  G22_POKEMON.forEach(p => {
+    const card = document.createElement('div')
+    card.style.cssText = `background:${p.slug===g22SelectedPoke?'rgba(139,92,246,0.4)':'rgba(255,255,255,0.08)'};border:2px solid ${p.slug===g22SelectedPoke?'#a78bfa':'rgba(255,255,255,0.15)'};border-radius:10px;padding:4px;text-align:center;cursor:pointer;transition:all .12s`
+    card.innerHTML = `<img src="https://img.pokemondb.net/sprites/home/normal/${p.slug}.png" style="width:36px;height:36px;image-rendering:auto" onerror="this.src='../assets/Pokemon/sprites/${p.slug}.png'"><div style="font-size:8px;color:#e9d5ff;font-weight:700;margin-top:2px">${p.name}</div>`
+    card.onclick = () => {
+      g22SelectedPoke = p.slug
+      const img = document.getElementById('monster-img')
+      img.src = `https://img.pokemondb.net/sprites/home/normal/${p.slug}.png`
+      img.onerror = () => { img.src = `../assets/Pokemon/sprites/${p.slug}.png` }
+      renderPokePicker()
+    }
+    grid.appendChild(card)
+  })
+}
+
 // ═══════════════════════════════════════════════════════════
 //  INPUT
 // ═══════════════════════════════════════════════════════════
@@ -515,22 +655,12 @@ document.addEventListener('pointermove', e => {
 
 // Resize
 window.addEventListener('resize', () => {
-  if (app) app.renderer.resize(window.innerWidth, window.innerHeight)
+  if (app) {
+    app.renderer.resize(window.innerWidth, window.innerHeight)
+    W = app.screen.width; H = app.screen.height
+  }
 })
 
-// Save progress helper
-function saveG22Progress(stars) {
-  try {
-    const key = 'dunia-0-progress'
-    const prog = JSON.parse(localStorage.getItem(key) || '{}')
-    if (!prog.g22) prog.g22 = { completed: [], stars: {} }
-    const lv = cfg.level || 1
-    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
-    if (!prog.g22.completed.includes(lv)) prog.g22.completed.push(lv)
-    if ((prog.g22.stars[lv] || 0) < mapped) prog.g22.stars[lv] = mapped
-    localStorage.setItem(key, JSON.stringify(prog))
-  } catch(_) {}
-}
 </script>
 </body>
 </html>

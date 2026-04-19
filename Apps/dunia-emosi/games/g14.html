@@ -121,10 +121,10 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#050c0
 <div id="ctrl-area">
   <div id="ctrl-row">
     <button class="ctrl-btn" id="btn-up"
-      ontouchstart="laneUp();event.preventDefault()" onclick="laneUp()">⬆️<br><span style="font-size:10px;font-weight:700">Atas</span></button>
-    <button class="ctrl-btn" id="btn-boost" onclick="triggerBoost()">🚀<br><span style="font-size:12px;font-weight:900">BOOST!</span></button>
+      ontouchstart="laneUp();event.preventDefault()" onclick="laneUp()">Atas</button>
+    <button class="ctrl-btn" id="btn-boost" onclick="triggerBoost()">BOOST!</button>
     <button class="ctrl-btn" id="btn-dn"
-      ontouchstart="laneDn();event.preventDefault()" onclick="laneDn()">⬇️<br><span style="font-size:10px;font-weight:700">Bawah</span></button>
+      ontouchstart="laneDn();event.preventDefault()" onclick="laneDn()">Bawah</button>
   </div>
   <div id="pressure-row">
     <span id="pressure-label">TEKANAN</span>
@@ -1785,8 +1785,7 @@ function endRace() {
   S.running = false
   document.getElementById('quiz-ovl').style.display = 'none'
 
-  const posScore = S.position === 1 ? 5 : S.position === 2 ? 3 : 1
-  const stars = Math.min(5, posScore - (LIVES_MAX - S.hp))
+  const stars = GameScoring.calc({correct:S.correctAnswers||0, total:(S.correctAnswers||0)+(S.wrongAnswers||0)||1, wrong:S.wrongAnswers||0, lives:S.hp, maxLives:LIVES_MAX, bonus:S.position===1?1:0})
   const emoji = stars >= 4 ? '🏆' : stars >= 2 ? '🥈' : '😤'
   const title = S.position === 1 ? 'Juara 1!' : S.position === 2 ? 'Posisi 2' : 'Posisi 3'
   const msg = stars >= 4 ? 'Luar biasa! Kamu juaranya!' :

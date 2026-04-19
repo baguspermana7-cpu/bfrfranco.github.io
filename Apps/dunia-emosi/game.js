@@ -312,7 +312,7 @@ const GAME_META = {
   16:{icon:'🚂',name:'Selamatkan Kereta!',iconImg:'assets/train/lokomotif-front-blue.svg'},
   17:{icon:'🌉',name:'Jembatan Goyang'},
   18:{icon:'🏛️',name:'Museum Ambarawa'},
-  19:{icon:'🐦',name:'Pokemon Birds'},
+  19:{icon:'🐦',name:'Pokemon Birds',iconImg:'assets/Pokemon/sprites/pidgeot.png'},
   20:{icon:'🏐',name:'Ducky Volley'},
   22:{icon:'🍬',name:'Monster Candy'},
   '13c':{icon:'🏅',name:'Gym Huruf & Suara'}
@@ -1684,6 +1684,7 @@ function backToLevelSelect() {
   document.getElementById('pause-overlay').style.display='none'
   document.getElementById('settings-overlay').style.display='none'
   if(g6State?.running){cancelAnimationFrame(g6State.animFrame);g6State.running=false}
+  PixiManager.destroyAll() // free WebGL context — prevents "context was lost" freeze
   clearTimers(); stopAllGameSounds(); playClick(); showScreen('screen-level')
 }
 function clearTimers() {
@@ -1770,7 +1771,7 @@ function showFeedback(correct, starsEarned, customMsg, callback) {
   const leoEl = document.getElementById('fb-leo')
   if(leoEl) leoEl.src = correct ? 'assets/leo-celebrating.webp' : 'assets/leo-angry.webp'
   document.getElementById('overlay-feedback').classList.add('show')
-  if(correct&&starsEarned>0) launchConfetti()
+  if(correct&&starsEarned>=3) launchConfetti(1) // light confetti only for 3+ stars
 }
 function closeFeedback() {
   playClick(); document.getElementById('overlay-feedback').classList.remove('show')
@@ -1779,7 +1780,7 @@ function closeFeedback() {
 function addStars(n, answerEl) {
   state.players[state.currentPlayer].stars+=n
   state.gameStars[state.currentPlayer]+=n
-  saveStars(); updateGameStarDisplay(); spawnSparkles(answerEl)
+  saveStars(); updateGameStarDisplay(); spawnSparkles(answerEl, n)
   if(answerEl) flyStarToCounter(answerEl)
   checkAchievements(null)
 }
@@ -1809,6 +1810,9 @@ function flyStarToCounter(srcEl) {
 // ================================================================
 function showResult(mascot, title, msg) {
   clearTimers(); stopAmbient()
+  // Ensure no overlays block result screen
+  const fb = document.getElementById('overlay-feedback'); if(fb) fb.classList.remove('show')
+  const gr = document.getElementById('game-result-overlay'); if(gr) gr.classList.remove('show')
   const totalStars=state.gameStars[0]+state.gameStars[1]
   document.getElementById('result-mascot').textContent=mascot||state.players[state.currentPlayer].animal
   document.getElementById('result-title').textContent=title||'Bagus sekali!'
@@ -1849,7 +1853,12 @@ function showResult(mascot, title, msg) {
   const played=JSON.parse(localStorage.getItem('dunia-emosi-played-games')||'{}')
   played[state.currentGame]=true; localStorage.setItem('dunia-emosi-played-games',JSON.stringify(played))
   if(Object.keys(played).length>=12) checkAchievement('all_games')
-  buildMenuHeader(); showScreen('screen-result'); launchConfetti(); launchConfetti()
+  buildMenuHeader(); showScreen('screen-result')
+  // Graded celebration based on stars earned
+  if(earned>=5){launchConfetti(3);launchConfetti(3)}
+  else if(earned>=4) launchConfetti(2)
+  else if(earned>=3) launchConfetti(1)
+  // 1-2 stars: no confetti — just show result
 }
 // endGame — called by G10/G11/G12 with raw star count
 function endGame(stars) {
@@ -1874,21 +1883,38 @@ function goToMenu()   { state.maxPossibleStars = null; buildMenuHeader(); showSc
 // ================================================================
 // CONFETTI + SPARKLES
 // ================================================================
-function launchConfetti() {
-  const colors=['#F43F5E','#FCD34D','#14B8A6','#38BDF8','#8B5CF6','#FDA4AF','#A3E635','#FCD34D']
-  for(let i=0;i<50;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';const size=8+Math.random()*12,dx=(Math.random()-0.5)*200+'px',rot=Math.random()*1080+'deg';const useStarImg = Math.random() > 0.65
-if(useStarImg){
-  p.style.cssText=`left:${Math.random()*100}vw;background:url('assets/confetti-star.webp') center/contain no-repeat;width:${size}px;height:${size}px;border-radius:0;animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`
-}else{
-  p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${size}px;height:${size*1.4}px;border-radius:${Math.random()>0.5?'50%':'4px'};animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`
-}document.body.appendChild(p);setTimeout(()=>p.remove(),3200)},i*35)}
+// intensity: 0=none, 1=light(3★), 2=medium(4★), 3=full(5★)
+function launchConfetti(intensity) {
+  if(!intensity||intensity<=0)return
+  const count=intensity===3?60:intensity===2?30:15
+  const colors=intensity===3
+    ?['#FCD34D','#FBBF24','#F59E0B','#FFD700','#FDE68A','#F43F5E','#8B5CF6','#14B8A6','#38BDF8','#A3E635']
+    :intensity===2?['#F43F5E','#FCD34D','#14B8A6','#38BDF8','#8B5CF6','#A3E635']
+    :['#94A3B8','#CBD5E1','#A3E635','#38BDF8']
+  const starChance=intensity===3?0.4:intensity===2?0.2:0
+  for(let i=0;i<count;i++){setTimeout(()=>{
+    const p=document.createElement('div');p.className='confetti-piece'
+    const size=(intensity===3?10:7)+Math.random()*(intensity===3?14:10)
+    const dx=(Math.random()-0.5)*(intensity===3?300:200)+'px'
+    const rot=Math.random()*1080+'deg'
+    if(Math.random()<starChance){
+      p.style.cssText=`left:${Math.random()*100}vw;background:url('assets/confetti-star.webp') center/contain no-repeat;width:${size}px;height:${size}px;border-radius:0;animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`
+    }else{
+      p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${size}px;height:${size*1.4}px;border-radius:${Math.random()>0.5?'50%':'4px'};animation-duration:${1.8+Math.random()*1.4}s;--dx:${dx};--rot:${rot};`
+    }
+    document.body.appendChild(p);setTimeout(()=>p.remove(),3200)
+  },i*(intensity===3?25:40))}
 }
-function spawnSparkles(btn) {
-  const icons=['⭐','✨','💫','🌟','❤️','🎉']
+function spawnSparkles(btn,starCount) {
+  const sc=starCount||0
+  const n=sc>=5?12:sc>=3?6:3
+  const icons=sc>=5?['⭐','✨','💫','🌟','🏆','🎉']:sc>=3?['⭐','✨','💫','🌟']:['✨','💫']
   const rect=btn?btn.getBoundingClientRect():null
   const cx=rect?(rect.left+rect.width/2)+'px':'50%'
   const cy=rect?(rect.top+rect.height/2)+'px':'40%'
-  for(let i=0;i<8;i++){const s=document.createElement('div');s.className='sparkle';const angle=(i/8)*Math.PI*2,dist=60+Math.random()*80;s.style.cssText=`left:${cx};top:${cy};--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--rot:${Math.random()*360}deg;animation-duration:${0.5+Math.random()*0.5}s;animation-delay:${Math.random()*0.2}s;font-size:${16+Math.random()*14}px;`;s.textContent=icons[Math.floor(Math.random()*icons.length)];document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}
+  const maxDist=sc>=5?140:sc>=3?100:60
+  const fs=sc>=5?20:sc>=3?16:12
+  for(let i=0;i<n;i++){const s=document.createElement('div');s.className='sparkle';const angle=(i/n)*Math.PI*2,dist=50+Math.random()*maxDist;s.style.cssText=`left:${cx};top:${cy};--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--rot:${Math.random()*360}deg;animation-duration:${0.5+Math.random()*0.5}s;animation-delay:${Math.random()*0.2}s;font-size:${fs+Math.random()*10}px;`;s.textContent=icons[Math.floor(Math.random()*icons.length)];document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}
 }
 
 // ================================================================
@@ -3332,7 +3358,7 @@ function evaluateG9Trace(){
   const resultEl=document.getElementById('g9-result'); resultEl.style.display='block'
   document.getElementById('g9-stars-result').textContent=stars>0?'⭐'.repeat(stars):'💪'
   document.getElementById('g9-result-msg').textContent=msg
-  if(stars>0){addStars(stars);playCorrect();spawnSparkles()}else playWrong()
+  if(stars>0){addStars(stars);playCorrect();spawnSparkles(null,stars)}else playWrong()
   document.getElementById('g9-next-btn').style.display='flex'
 }
 
@@ -4962,6 +4988,9 @@ const TYPE_COLORS={fire:'#FF6B35',water:'#4FC3F7',electric:'#FFCB05',grass:'#4CA
 const TYPE_EMOJI={fire:'🔥',water:'💧',electric:'⚡',grass:'🍃',normal:'💢',psychic:'🔮',rock:'🪨',ice:'❄️',dragon:'🐉',ghost:'👻',flying:'🌪️',fighting:'👊',poison:'☠️',ground:'💥',bug:'🐛',steel:'⚔️',dark:'🌑',fairy:'✨'}
 const TYPE_TEXTCOLOR={electric:'#1a1a1a',ice:'#1a1a1a',normal:'white',rock:'white'}
 
+// Global slug→id lookup built from POKEMON_DB
+const POKE_IDS = Object.fromEntries(POKEMON_DB.map(p=>[p.slug,p.id]))
+
 function pokeSprite(slug){return `assets/Pokemon/sprites/${slug}.png`}
 function pokeSpriteArtwork(slug){return `https://img.pokemondb.net/artwork/large/${slug}.jpg`}
 function pokeSpriteOnline(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
@@ -5334,37 +5363,34 @@ function g10NewBattle(){
   const s=g10State
   s.locked=false
 
-  // Load sprites: HD HOME sprite primary, PokeAPI back as fallback for player
+  // Load sprites: HD online first, local 96px as fallback
   function loadSprHD(imgId, slug, pokeId){
     const el=document.getElementById(imgId)
     el.className=el.className.replace(/\bspr-\w+/g,'').trim()
     el.style.opacity='1'; el.style.imageRendering='auto'
     el.style.animation=''
-    // Random variant: SVG vector or HD raster (different art style per session)
+    // HD variant first (online or SVG), then local fallback
     const variantSrc = pokeSpriteVariant(slug)
     const testVar = new Image()
     testVar.onload = () => { el.src = variantSrc }
     testVar.onerror = () => {
-      // Fallback chain: local PNG → online HD → PokeAPI
-      const localSrc = `assets/Pokemon/sprites/${slug}.png`
-      const t2 = new Image()
-      t2.onload = () => { el.src = localSrc }
-      t2.onerror = () => { el.src=pokeSpriteOnline(slug); el.onerror=()=>{el.src=pokeSpriteBackup(pokeId);el.onerror=null} }
-      t2.src = localSrc
+      // Fallback: local PNG → online HD → PokeAPI
+      el.src = `assets/Pokemon/sprites/${slug}.png`
+      el.onerror = () => { el.src = pokeSpriteOnline(slug); el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null } }
     }
     testVar.src = variantSrc
   }
-  // Player: try HD HOME front sprite first, fall back to PokeAPI back sprite
   function loadSprPlayer(imgId, pokeId, slug){
     const el=document.getElementById(imgId)
     el.className=el.className.replace(/\bspr-\w+/g,'').trim()
     el.style.opacity='1'; el.style.imageRendering='auto'
-    el.src=pokeSpriteOnline(slug)
-    el.onerror=()=>{
-      // Fallback: PokeAPI back sprite (pixel art)
-      el.style.imageRendering='pixelated'
-      el.src=pokeSpriteBack(pokeId)
-      el.onerror=()=>{ el.src=pokeSpriteBackup(pokeId); el.onerror=null }
+    // HD online first, local fallback
+    el.src = pokeSpriteOnline(slug)
+    el.onerror = () => {
+      // Fallback: local sprite → PokeAPI
+      el.style.imageRendering = 'pixelated'
+      el.src = `assets/Pokemon/sprites/${slug}.png`
+      el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null }
     }
   }
   loadSprHD('g10-espr', s.enemyPoke.slug, s.enemyPoke.id)
@@ -7718,7 +7744,7 @@ function g13Victory() {
     ]
     if((_g13lv||1) < 55) btns.unshift({label:'Level Berikutnya ➡️', action:()=>startGameWithLevel((_g13lv||1)+1)})
     btns.push({label:'Kembali ⌂', action:()=>exitGame()})
-    showGameResult({ emoji:'🏆', title: finalForm ? `${finalForm.name} Menang!` : 'Kamu Menang!', stars:_g13stars, msg, buttons:btns })
+    showGameResult({ emoji:'🏆', title: finalForm ? `${finalForm.name} Menang!` : 'Kamu Menang!', stars:perfStars, msg, buttons:btns })
   }, 1000)
 }
 
@@ -7814,6 +7840,8 @@ window.startQuickFire = startQuickFire
 function exitGame13b() {
   if (_g13bLegAutoAtk) { clearInterval(_g13bLegAutoAtk); _g13bLegAutoAtk = null }
   battleBgmStop()
+  // Restore battle BGM src for G10/G13
+  if(_battleBgmEl) _battleBgmEl.src = 'assets/Pokemon/sound/06 Battle (VS Wild Pokémon)（１９９７－１９９８｜Ｍ１３） - Satoshi Sakai No Masta - SoundLoadMate.com.mp3'
   clearTimers()
   PixiManager.destroy('g13b-pixi-canvas')
   showScreen('screen-welcome')
@@ -7821,6 +7849,9 @@ function exitGame13b() {
 window.exitGame13b = exitGame13b
 
 function initGame13b() {
+  // G13b uses Ending theme instead of battle BGM
+  if(!_battleBgmEl) _battleBgmEl = document.getElementById('battle-bgm')
+  if(_battleBgmEl) _battleBgmEl.src = 'assets/Pokemon/sound/29 ~Ending~（１９９７－１９９８｜Ｍ２１） - Satoshi Sakai No Masta - SoundLoadMate.com.mp3'
   battleBgmPlay()
   // Init Pixi GPU canvas for aura rings + combo text
   loadPixiJS(function(){ PixiManager.init('g13b-pixi-canvas').catch(()=>{}) })
@@ -8072,6 +8103,7 @@ function g13bAnswer(val, btn) {
     // Spawn attack projectile — type based on player's chosen Pokémon
     try {
       const playerType = g13bSavedPoke ? g13bSavedPoke.type : 'Electric'
+      playAttackSound(playerType)
       g13SpawnAttackEffect(playerType, true, 'g13b-field')
       const auraColsG13b = {Fire:'#f97316',Water:'#38bdf8',Grass:'#4ade80',Electric:'#facc15',Psychic:'#e879f9',Ice:'#67e8f9',Dragon:'#818cf8',Dark:'#6b7280',Fighting:'#f87171',Ghost:'#c084fc',Steel:'#94a3b8',Fairy:'#f9a8d4',Rock:'#a8a29e',Ground:'#d97706',Flying:'#7dd3fc',Bug:'#a3e635',Poison:'#a855f7',Normal:'#d1d5db'}
       showMovePopup(document.getElementById('g13b-pspr-wrap'), getPokeMove(g13bSavedPoke ? g13bSavedPoke.slug : '', playerType), auraColsG13b[playerType] || '#7C3AED')
@@ -8371,8 +8403,7 @@ function g13bWildHitsPlayer(onDone) {
   const dmg = s.isLegendary ? 2 : 1
   s.playerHp = Math.max(0, s.playerHp - dmg)
   g13bUpdatePlayerHp()
-  playTone(180, 0.25, 'sawtooth', 0.08)
-  setTimeout(() => playTone(140, 0.2, 'sawtooth', 0.06), 120)
+  playAttackSound(s.currentWild ? (s.currentWild.type||'normal') : 'normal')
   vibrate(25)
   setTimeout(() => {
     if (lbl && s.phase === 'playing') lbl.textContent = prevLbl
@@ -10767,6 +10798,7 @@ function g18RenderGallery() {
 }
 
 function g18ShowDetail(idx) {
+  _g18CurrentTrainIdx = idx
   const train = G18_TRAINS[idx]
   const emojiEl = document.getElementById('g18-modal-emoji')
   emojiEl.innerHTML = g18TrainSVG(train, 160, 70)
@@ -10793,6 +10825,25 @@ function g18ShowDetail(idx) {
 
 function g18CloseModal() {
   document.getElementById('g18-modal').classList.remove('open')
+  document.getElementById('g18-story-panel').style.display = 'none'
+}
+
+let _g18CurrentTrainIdx = -1
+function g18ShowStory() {
+  const panel = document.getElementById('g18-story-panel')
+  if (panel.style.display !== 'none') { panel.style.display = 'none'; return } // toggle
+  panel.style.display = 'block'
+  const train = G18_TRAINS[_g18CurrentTrainIdx]
+  if (!train) return
+  // Generate a child-friendly story from train data
+  const stories = [
+    `Tahukah kamu? ${train.name} adalah kereta yang dibuat pada tahun ${train.year}. Kereta ini bisa melaju sampai ${train.speed} km/jam! ${train.fact}`,
+    `Bayangkan kamu hidup di tahun ${train.year}. Saat itu, ${train.name} adalah kereta yang sangat hebat! Kereta ini menggunakan ${train.fuel} sebagai bahan bakar. ${train.funFact || ''}`,
+    `Ayo kita berkenalan dengan ${train.name}! Kereta ini berasal dari ${train.country} dan dibuat tahun ${train.year}. ${train.builder ? 'Kereta ini dibuat oleh ' + train.builder + '.' : ''} ${train.fact}`,
+  ]
+  const story = stories[Math.floor(Math.random() * stories.length)]
+  const extra = train.route ? `\n\n🗺️ Rute: ${train.route}` : ''
+  document.getElementById('g18-story-text').textContent = story + extra
 }
 
 function g18StartQuiz() {

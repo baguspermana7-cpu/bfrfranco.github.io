@@ -1013,7 +1013,7 @@ function buildObstaclesOnTrack(W,H){
   // Mini quiz objects between stations
   S.miniObs = S.miniObs || []
   const miniEmojis = ['🪨','📦','🌳','🐄','🚧','🧱','🪵','🐔','🏗️','⚠️']
-  const miniSpacing = 300 + Math.random() * 200
+  const miniSpacing = 225 + Math.random() * 150
   for (let mwx = startWX + miniSpacing/2; mwx < endWX; mwx += miniSpacing) {
     if (S.obstacles.some(o => Math.abs(o.worldX - mwx) < 200)) continue
     const emoji = miniEmojis[Math.floor(Math.random() * miniEmojis.length)]
@@ -1188,7 +1188,8 @@ function updateTrain(dt){
       // Show quick quiz inline
       const qEl = document.getElementById('quiz-label')
       if(qEl) qEl.textContent = '🚧 Singkirkan rintangan!'
-      showQuizPanel({questions:[{q:nextMini.q,choices:generateMiniChoices(nextMini.ans),ans:nextMini.ans}],qIdx:0,question:{q:nextMini.q,choices:generateMiniChoices(nextMini.ans),ans:nextMini.ans},cleared:false,wrongCount:0,_mini:true,_miniRef:nextMini})
+      const _mc=generateMiniChoices(nextMini.ans), _mw=_mc.filter(c=>c!==String(nextMini.ans))
+      showQuizPanel({questions:[{q:nextMini.q,ans:String(nextMini.ans),wrong:_mw}],qIdx:0,question:{q:nextMini.q,ans:String(nextMini.ans),wrong:_mw},cleared:false,wrongCount:0,_mini:true,_miniRef:nextMini})
     }
   }
 
@@ -1394,12 +1395,10 @@ function clearMiniObstacle(mini){
 function clearObstacle(obs){
   hideQuizPanel(); obs.cleared=true; S.cleared++; S.currentObstacleIdx=-1
   explodeObstacle(obs)
-  // Only boost if not already arriving/arrived (prevents state overwrite race)
+  // Resume moving — no boost effect (just continue at normal speed)
   if(S.trainState!=='ARRIVING'&&S.trainState!=='ARRIVED'){
-    S.trainState='BOOSTING'; S.boostTimer=0.9
+    S.trainState='MOVING'
   }
-  document.getElementById('speed-lines').style.opacity='0.65'
-  setTimeout(()=>{document.getElementById('speed-lines').style.opacity='0'},750)
   document.getElementById('obstacle-count').textContent=`🚧 ${S.cleared}/${S.totalObstacles}`
 }
 
@@ -1456,12 +1455,15 @@ function updateHUDFrame(){
 }
 
 function calcStars(){
-  const elapsed=(performance.now()-S.startTime)/1000, est=(S.trackLength/(80+S.level*12))*1.4
-  let stars=3
-  if(S.cleared<S.totalObstacles)stars=1
-  if(S.noWrongAnswers)stars=Math.min(stars+1,5)
-  if(elapsed/est<0.6)stars=Math.min(stars+1,5)
-  return Math.max(stars,1)
+  const elapsed=(performance.now()-S.startTime)/1000
+  const est=(S.trackLength/(80+S.level*12))*1.4
+  return GameScoring.calc({
+    correct: S.cleared,
+    total: S.totalObstacles,
+    wrong: S.wrongTaps || 0,
+    time: elapsed,
+    maxTime: est
+  })
 }
 function showWin(){
   try{document.getElementById('game-bgm').pause()}catch(_){}

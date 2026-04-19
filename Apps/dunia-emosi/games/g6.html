@@ -95,10 +95,10 @@ html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#0a0a1
 <div id="ctrl-wrap">
   <button class="ctrl-btn" id="btn-left"
     ontouchstart="onLeft();event.preventDefault()"
-    onclick="onLeft()">⬅️ Kiri</button>
+    onclick="onLeft()">Kiri</button>
   <button class="ctrl-btn" id="btn-right"
     ontouchstart="onRight();event.preventDefault()"
-    onclick="onRight()">Kanan ➡️</button>
+    onclick="onRight()">Kanan</button>
 </div>
 
 <!-- Vehicle selector — shown before game starts -->
@@ -358,19 +358,19 @@ function buildScenery(c, W, H) {
   sceneryL._scroll = 0.55
   sceneryR._scroll = 0.55
 
-  for (let i = 0; i < 12; i++) {
-    // Left
-    const tL = new PIXI.Text({ text: icons[i % icons.length], style: { fontSize: 22 + Math.random() * 10 } })
-    tL.alpha = 0.45 + Math.random() * 0.3
-    tL.x = roadLeft * (0.15 + Math.random() * 0.65)
-    tL.y = i * (H / 8) + Math.random() * 30
+  for (let i = 0; i < 8; i++) {
+    // Left — subtle, small decorations near road edge
+    const tL = new PIXI.Text({ text: icons[i % icons.length], style: { fontSize: 14 + Math.random() * 6 } })
+    tL.alpha = 0.2 + Math.random() * 0.15
+    tL.x = roadLeft * (0.3 + Math.random() * 0.5)
+    tL.y = i * (H / 6) + Math.random() * 40
     sceneryL.addChild(tL)
 
     // Right
-    const tR = new PIXI.Text({ text: icons[(i + 2) % icons.length], style: { fontSize: 22 + Math.random() * 10 } })
-    tR.alpha = 0.45 + Math.random() * 0.3
-    tR.x = roadRight + (W - roadRight) * (0.15 + Math.random() * 0.65)
-    tR.y = i * (H / 8) + Math.random() * 30
+    const tR = new PIXI.Text({ text: icons[(i + 2) % icons.length], style: { fontSize: 14 + Math.random() * 6 } })
+    tR.alpha = 0.2 + Math.random() * 0.15
+    tR.x = roadRight + (W - roadRight) * (0.3 + Math.random() * 0.5)
+    tR.y = i * (H / 6) + Math.random() * 40
     sceneryR.addChild(tR)
   }
   c.addChild(sceneryL)
@@ -488,7 +488,7 @@ function buildCar() {
   const carIdx = cfg.carIdx || Math.floor(Math.random() * 12)
   const carFiles = ['top_car_white_gt_01.png','top_car_yellow_sport_02.png','top_car_white_track_03.png','top_car_blue_red_racer_04.png','top_car_cyan_sedan_05.png','top_car_white_stripe_gt_06.png','top_car_red_formula_07.png','top_car_yellow_rally_08.png','top_car_white_coupe_09.png','top_car_white_roadster_10.png','top_car_blue_compact_11.png','top_car_silver_sedan_12.png']
   try {
-    const tex = PIXI.Texture.from(`../assets/car and vehicle/top-view/${carFiles[carIdx % carFiles.length]}`)
+    const tex = PIXI.Texture.from(`../assets/car%20and%20vehicle/top-view/${carFiles[carIdx % carFiles.length]}`)
     carSprite = new PIXI.Sprite(tex)
     carSprite.anchor.set(0.5, 1)
     carSprite.width = 48; carSprite.height = 84
@@ -898,7 +898,7 @@ function restartGame() {
 
 function showFinish() {
   S.running = false
-  const stars = Math.round((S.wordsDone / S.totalWords) * 5)
+  const stars = GameScoring.calc({correct:S.wordsDone, total:S.totalWords, wrong:S.wrongCount||0, lives:S.lives, maxLives:3})
   const msg = stars >= 5 ? 'Sempurna! Kamu bintang!' :
     stars >= 3 ? 'Bagus sekali! Terus berlatih!' : 'Coba lagi untuk nilai lebih baik!'
   const curLevel = cfg.level || 1;

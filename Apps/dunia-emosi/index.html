@@ -17,7 +17,7 @@
 </div>
 <script>window.addEventListener('load',function(){var l=document.getElementById('page-loader');if(l)l.style.display='none'})</script>
 <audio id="bg-music" src="assets/bg-music.mp3" loop preload="none" style="display:none"></audio>
-<audio id="battle-bgm" src="Sounds/battle-bgm.mp3" loop preload="auto" style="display:none"></audio>
+<audio id="battle-bgm" src="assets/Pokemon/sound/06 Battle (VS Wild Pokémon)（１９９７－１９９８｜Ｍ１３） - Satoshi Sakai No Masta - SoundLoadMate.com.mp3" loop preload="auto" style="display:none"></audio>
 
 <!-- BG BLOBS -->
 <div class="bg-blobs">
@@ -941,6 +941,7 @@
   <!-- Header -->
   <div class="game-header" style="display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;position:relative;padding:8px 10px;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);">
     <button class="gh-back" onclick="exitGame13b()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">⌂</button>
+    <button class="gh-back" onclick="exitGame13b()" title="Kembali" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">←</button>
     <span style="flex:1;font-size:15px;font-weight:900;font-family:'Fredoka One',cursive;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">⚡ Quick Fire</span>
     <button onclick="openG13bPartyPicker()" title="Ganti Pokémon" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:5px 10px;font-size:18px;cursor:pointer;flex-shrink:0;">🎒</button>
   </div>
@@ -1488,7 +1489,14 @@
       <div id="g18-modal-country" style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;margin-bottom:10px;"></div>
       <div id="g18-modal-details" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;"></div>
       <div id="g18-modal-fact" style="background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;line-height:1.5;text-align:left;margin-bottom:12px;"></div>
-      <button onclick="g18CloseModal()" style="background:linear-gradient(135deg,#5D3A1A,#8D6E63);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:900;cursor:pointer;width:100%;">✅ Mengerti!</button>
+      <div id="g18-story-panel" style="display:none;background:rgba(255,255,255,0.06);border-radius:10px;padding:12px;color:rgba(255,255,255,0.9);font-size:12px;line-height:1.6;text-align:left;margin-bottom:12px;max-height:30vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:14px;font-weight:900;color:#fbbf24;margin-bottom:6px;">📖 Cerita untuk Anak-anak</div>
+        <div id="g18-story-text">Memuat cerita...</div>
+      </div>
+      <div style="display:flex;gap:8px;width:100%;">
+        <button onclick="g18ShowStory()" id="g18-story-btn" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:900;cursor:pointer;">📖 Cerita</button>
+        <button onclick="g18CloseModal()" style="flex:1;background:linear-gradient(135deg,#5D3A1A,#8D6E63);color:white;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:900;cursor:pointer;">✅ Mengerti!</button>
+      </div>
     </div>
   </div>
   <!-- G18 uses shared #game-result-overlay -->

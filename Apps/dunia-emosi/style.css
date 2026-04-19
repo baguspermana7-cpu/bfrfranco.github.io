@@ -520,14 +520,15 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 .g8-progress { font-size:15px;color:var(--text-light);font-weight:700;text-align:center;margin-top:10px; }
 
 /* G9 */
-#screen-game9 { background:url('assets/bg-game9-trace.webp') center/cover no-repeat, linear-gradient(180deg,#F7FEE7 0%,#ECFCCB 50%,#D9F99D 100%); }
+#screen-game9 { background:linear-gradient(160deg,#f0fdf4 0%,#dcfce7 30%,#bbf7d0 60%,#86efac 100%); }
 .g9-letter-display { font-size:80px;font-family:var(--font-display);font-weight:900;background:linear-gradient(135deg,#84CC16,#A3E635);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;line-height:1;animation:g3Pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 .g9-instruction { font-size:16px;font-weight:700;color:var(--text-light);margin-bottom:16px; }
-.g9-canvas-wrap { position:relative;width:300px;height:300px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);border:4px solid #A3E635;background:white; }
+.g9-canvas-wrap { position:relative;width:min(300px,80vw);height:min(300px,80vw);border-radius:24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.15);border:3px solid rgba(134,239,172,0.5);background:linear-gradient(145deg,#fefce8,#fffbeb); }
 #g9-canvas { position:absolute;inset:0;cursor:crosshair;touch-action:none; }
 .g9-guide-dots { position:absolute;inset:0;pointer-events:none; }
-.g9-dot { position:absolute;width:16px;height:16px;border-radius:50%;background:rgba(132,204,22,0.4);border:2px solid rgba(132,204,22,0.7);transform:translate(-50%,-50%);transition:background 0.3s,transform 0.3s; }
-.g9-dot.hit { background:#84CC16;border-color:#3F6212;transform:translate(-50%,-50%)scale(1.3); }
+.g9-dot { position:absolute;width:20px;height:20px;border-radius:50%;background:rgba(132,204,22,0.35);border:2.5px solid rgba(132,204,22,0.6);transform:translate(-50%,-50%);transition:all 0.3s ease;box-shadow:0 0 8px rgba(132,204,22,0.2);animation:g9DotPulse 2s ease-in-out infinite; }
+.g9-dot.hit { background:#84CC16;border-color:#3F6212;transform:translate(-50%,-50%)scale(1.35);box-shadow:0 0 16px rgba(132,204,22,0.7);animation:none; }
+@keyframes g9DotPulse{0%,100%{box-shadow:0 0 6px rgba(132,204,22,0.2)}50%{box-shadow:0 0 14px rgba(132,204,22,0.5)}}
 .g9-result { text-align:center;margin-top:12px;animation:feedbackPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
 .g9-stars { font-size:40px;margin-bottom:6px; }
 #g9-result-msg { font-size:18px;font-weight:700;color:var(--text-light); }
@@ -1273,7 +1274,7 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
     url('assets/bg-game7-bayangan.webp') center/cover no-repeat !important;
 }
 #screen-game8 { background: linear-gradient(160deg, #1a0020 0%, #2D1B69 50%, #1a0020 100%); }
-#screen-game9 { background: url('assets/bg-game9-trace.webp') center/cover no-repeat, linear-gradient(180deg, #0A1A00 0%, #1A3300 50%, #0A1A00 100%); }
+#screen-game9 { background: linear-gradient(160deg, #052e16 0%, #14532d 40%, #166534 70%, #15803d 100%); }
 
 /* ── 9. GAME 1 — Readable UI on colorful background image ── */
 /* Question: frosted pill so it "floats" above any background */
@@ -2374,8 +2375,9 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
 @keyframes fxBurst{0%{transform:scale(0);opacity:1}40%{transform:scale(1.6);opacity:0.9}100%{transform:scale(3.5);opacity:0}}
 @keyframes fxDrop{0%{transform:scale(1.3) translateY(-25px);opacity:0.9}65%{transform:scale(1) translateY(35px);opacity:0.7}100%{transform:scale(0.7) translateY(55px);opacity:0}}
 @keyframes fxSpark{0%{transform:scale(0) rotate(0deg);opacity:1}30%{transform:scale(1.6) rotate(-35deg);opacity:1}100%{transform:scale(0.1) rotate(70deg) translateX(60px);opacity:0}}
-.g10-oval{width:90px;height:18px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,0.28) 60%,transparent 100%);}
+.g10-oval{width:110px;height:22px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(139,90,43,0.55) 40%,rgba(139,90,43,0.25) 70%,transparent 100%);
+  border:2px solid rgba(120,53,15,0.3);margin-top:-4px;}
 /* Field status pop */
 .g10-field-status{
   position:absolute;z-index:5;

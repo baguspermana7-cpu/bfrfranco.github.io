@@ -1141,6 +1141,7 @@ function executeMove(moveIdx, mathCorrect){
   // ── WRONG ANSWER → self-damage, attack fails ──
   if(!mathCorrect){
     const selfDmg = 33; // 3 wrong answers = faint (33×3=99)
+    playAttackSound('normal');
     flashColor('red');
     addHitEffect(ppEl, true);
     spawnTypeHitFX(ppEl, 'normal');
@@ -1178,6 +1179,7 @@ function executeMove(moveIdx, mathCorrect){
 
   setTimeout(()=>{
     removeAura(ppEl);
+    playAttackSound(move.type);
     spawnProjectile(ppEl, epEl, move.type, ()=>{
       addHitEffect(epEl, false);
       spawnTypeHitFX(epEl, move.type);
@@ -1233,6 +1235,7 @@ function enemyTurn(){
 
   setTimeout(()=>{
     removeAura(epEl);
+    playAttackSound(ep.type);
     spawnProjectile(epEl, ppEl, ep.type, ()=>{
       addHitEffect(ppEl, true); // player has scaleX(-1)
       spawnTypeHitFX(ppEl, ep.type);
@@ -1349,7 +1352,7 @@ let _bgmEl = null
 function bgmPlay(){
   if(!_bgmEl){
     _bgmEl = document.createElement('audio')
-    _bgmEl.src = '../Sounds/battle-bgm.mp3'
+    _bgmEl.src = '../assets/Pokemon/sound/18 Pokémon Gym（１９９７－１９９８｜Ｍ５７Ｂ） - Satoshi Sakai No Masta - SoundLoadMate.com.mp3'
     _bgmEl.loop = true
     _bgmEl.volume = 0.35
     document.body.appendChild(_bgmEl)
@@ -1373,6 +1376,36 @@ function bgmStop(){
 function goBack(){
   bgmStop()
   history.back();
+}
+
+// ─── TYPE-MATCHED ATTACK SFX ────────────────────────────────────────────────
+const G_ATK_SOUNDS = {
+  bug:['../Sounds/Attack/Bug/Attack Order.mp3'],
+  dark:['../Sounds/Attack/Dark/Bite.mp3','../Sounds/Attack/Dark/Beat Up.mp3'],
+  dragon:['../Sounds/Attack/Other/Boomburst.mp3'],
+  electric:['../Sounds/Attack/Electric/Bolt Strike.mp3'],
+  fairy:['../Sounds/Attack/Fairy/Baby-Doll Eyes.mp3'],
+  fighting:['../Sounds/Attack/Fighting/Arm Thrust 2hits.mp3','../Sounds/Attack/Fighting/Aura Sphere.mp3'],
+  fire:['../Sounds/Attack/Fire/Blast Burn.mp3','../Sounds/Attack/Fire/Blaze Kick.mp3','../Sounds/Attack/Fire/Blue Flare.mp3'],
+  flying:['../Sounds/Attack/Flying/Aerial Ace.mp3','../Sounds/Attack/Flying/Air Slash.mp3','../Sounds/Attack/Flying/Acrobatics.mp3'],
+  ghost:['../Sounds/Attack/Ghost/Astonish.mp3'],
+  grass:['../Sounds/Attack/Grass/Absorb.mp3'],
+  ground:['../Sounds/Attack/Ground/Bone Club.mp3','../Sounds/Attack/Ground/Bonemerang 2hits.mp3'],
+  ice:['../Sounds/Attack/Ice/Aurora Beam.mp3','../Sounds/Attack/Ice/Avalanche.mp3','../Sounds/Attack/Ice/Blizzard.mp3'],
+  normal:['../Sounds/Attack/Normal/Body Slam.mp3','../Sounds/Attack/Normal/Barrage 2hits.mp3','../Sounds/Attack/Normal/Bind.mp3'],
+  poison:['../Sounds/Attack/Poison/Acid.mp3','../Sounds/Attack/Poison/Acid Spray.mp3','../Sounds/Attack/Poison/Belch.mp3'],
+  psychic:['../Sounds/Attack/Psychic/Barrier.mp3'],
+  rock:['../Sounds/Attack/Rock/Ancient Power.mp3'],
+  steel:['../Sounds/Attack/Steel/Autotomize.mp3'],
+  water:['../Sounds/Attack/Water/Aqua Jet.mp3','../Sounds/Attack/Water/Aqua Tail.mp3'],
+}
+const _atkCache={}
+function playAttackSound(type){
+  const key=(type||'normal').toLowerCase()
+  const pool=G_ATK_SOUNDS[key]||G_ATK_SOUNDS.normal
+  const src=pool[Math.floor(Math.random()*pool.length)]
+  if(!_atkCache[src])_atkCache[src]=new Audio(src)
+  const a=_atkCache[src]; a.volume=0.6; a.currentTime=0; a.play().catch(()=>{})
 }
 
 window.addEventListener('resize',()=>{if(app)app.renderer.resize(window.innerWidth,window.innerHeight)})
