@@ -48,6 +48,19 @@
 - ✅ **Train BGM wired**: Renamed `WhatsApp Audio ...mp3` to `Sounds/train-bgm.mp3` and swapped all 3 train games to use it instead of `battle-bgm.mp3` (Pokemon battle theme).
 - Files: `games/g14.html`, `games/g15-pixi.html`, `games/g16-pixi.html`
 
+### G10/G11/G12 Scoring — Double Normalization Fix
+- ✅ **Root cause**: `endGame()` normalized raw star count to 5-star scale, then `showResult()` normalized AGAIN using `maxPossibleStars` set to raw `maxRounds`. For Lv.10 (6 rounds) perfect run: `round(6/6*5)=5` in endGame → `round(5/6*5)=4` in showResult ❌
+- ✅ **Fix**: `endGame()` now sets `state.maxPossibleStars=5` (already-normalized scale) so showResult does `round(N/5*5)=N` and passes the correct value through.
+- **Impact**: Perfect runs on any level now correctly show 5★ instead of 4★ or fewer.
+
+### G18 Museum Kereta — +5 Indonesian Trains
+- ✅ **Lori Tebu (1880)**: 60cm narrow-gauge sugar cane plantation train (Sragi, Tasikmadu, Colomadu)
+- ✅ **CC201 (1977, GE USA)**: Iconic orange diesel locomotive — 140+ units in Indonesia
+- ✅ **Whoosh KCIC400AF (2023)**: First HSR in Southeast Asia — Jakarta→Bandung 45 min
+- ✅ **Argo Parahyangan (2010, INKA Madiun)**: Executive Jakarta-Bandung — showcases Indonesian INKA manufacturing
+- ✅ **LRT Jabodebek (2023)**: First driverless (GoA L3) train in Indonesia
+- Total trains: 19 → 24
+
 ## ✅ COMPLETED 2026-04-20 — G3 Huruf Hutan AAA Overhaul
 
 - ✅ **Background**: Switched from `bg-game3-huruf.webp` (bedroom-like overlay) to `bg-forest.webp`
