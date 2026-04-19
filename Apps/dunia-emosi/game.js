@@ -314,6 +314,7 @@ const GAME_META = {
   18:{icon:'🏛️',name:'Museum Ambarawa'},
   19:{icon:'🐦',name:'Pokemon Birds'},
   20:{icon:'🏐',name:'Ducky Volley'},
+  22:{icon:'🍬',name:'Monster Candy'},
   '13c':{icon:'🏅',name:'Gym Huruf & Suara'}
 }
 
@@ -992,7 +993,8 @@ const GAME_INFO = {
   12: { desc:'Tebak nama hewan dari siluet bayangannya yang tersembunyi!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' },
   13: { desc:'Kalahkan wild Pokemon dengan menjawab soal matematika — dan evolusi!', grad:'rgba(249,115,22,0.35)', glow:'rgba(249,115,22,0.5)' },
   19: { desc:'Terbangkan Pidgeot melewati rintangan dan jawab soal untuk menang!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' },
-  20: { desc:'Main voli pantai dengan bebek lucu! Kalahkan lawan dan jawab soal!', grad:'rgba(56,189,248,0.35)', glow:'rgba(56,189,248,0.5)' }
+  20: { desc:'Main voli pantai dengan bebek lucu! Kalahkan lawan dan jawab soal!', grad:'rgba(56,189,248,0.35)', glow:'rgba(56,189,248,0.5)' },
+  22: { desc:'Tangkap permen jatuh dan jawab soal untuk skor tinggi!', grad:'rgba(139,92,246,0.35)', glow:'rgba(139,92,246,0.5)' }
 }
 
 // Progress storage
@@ -1313,7 +1315,7 @@ function openLevelSelect(gameNum) {
   // Progress bar
   const completed = gp.completed.length
   const totalStars = Object.values(gp.stars||{}).reduce((a,b)=>a+b,0)
-  const totalLevels = (state.currentGame === 13 || state.currentGame === 16) ? 40 : (state.currentGame === 19 || state.currentGame === 20) ? 30 : 20
+  const totalLevels = (state.currentGame === 13 || state.currentGame === 16) ? 40 : (state.currentGame === 19 || state.currentGame === 20 || state.currentGame === 22) ? 30 : 20
   document.getElementById('level-prog-txt').textContent = `${completed} / ${totalLevels} level selesai`
   document.getElementById('level-prog-fill').style.width = (completed/totalLevels*100) + '%'
   document.getElementById('level-total-stars').textContent = '⭐ ' + totalStars
@@ -1378,11 +1380,11 @@ function startGameWithLevel(levelNum) {
   document.querySelectorAll('.gh-level').forEach(el => { el.textContent = lvLabel })
   if(state.selectedLevel==='hard') checkAchievement('hard_mode')
   // Standalone games navigate to separate HTML — skip showScreen (no screen-gameN div exists)
-  const standaloneGames = [6, 14, 15, 16, 19, 20]
+  const standaloneGames = [6, 14, 15, 16, 19, 20, 22]
   if (!standaloneGames.includes(state.currentGame)) {
     showScreen('screen-game' + state.currentGame)
   }
-  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9,initGame10,initGame11,initGame12,initGame13,initGame14,initGame15,initGame16,initGame17,initGame18,initGame19,initGame20]
+  const inits = [null,initGame1,initGame2,initGame3,initGame4,initGame5,initGame6,initGame7,initGame8,initGame9,initGame10,initGame11,initGame12,initGame13,initGame14,initGame15,initGame16,initGame17,initGame18,initGame19,initGame20,null,initGame22]
   inits[state.currentGame]()
 }
 
@@ -1566,7 +1568,7 @@ function buildMenuHeader() {
   // Update per-game best stars display on world map nodes
   try {
     const bestStars=JSON.parse(localStorage.getItem(pkey('best-stars'))||'{}')
-    const gameIds=[1,2,3,4,5,6,7,8,9,10,11,12,13,'13b','13c',14,15,16,17,18,19,20]
+    const gameIds=[1,2,3,4,5,6,7,8,9,10,11,12,13,'13b','13c',14,15,16,17,18,19,20,22]
     gameIds.forEach(g=>{
       const best=bestStars[g]||0
       const stars=best>0?'⭐'.repeat(Math.min(best,5)):''
@@ -5984,7 +5986,7 @@ if('serviceWorker' in navigator){
 // ── AAA game result handlers: fire when returning from games/g*.html ──
 window.addEventListener('pageshow', function(e) {
   // Process ALL standalone game results and save progress
-  for (const gn of [6, 14, 15, 16, 19, 20]) {
+  for (const gn of [6, 14, 15, 16, 19, 20, 22]) {
     const raw = sessionStorage.getItem(`g${gn}Result`)
     if (raw) {
       try {
@@ -10566,6 +10568,13 @@ function initGame20() {
   const lv = state.selectedLevelNum || 1
   try { sessionStorage.setItem('g20Config', JSON.stringify({ level: lv })) } catch(_) {}
   window.location.href = 'games/g20-pixi.html'
+}
+
+function initGame22() {
+  battleBgmStop()
+  const lv = state.selectedLevelNum || 1
+  try { sessionStorage.setItem('g22Config', JSON.stringify({ level: lv })) } catch(_) {}
+  window.location.href = 'games/g22-candy.html'
 }
 
 function initGame18() {

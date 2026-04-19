@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Monster Wants Candy 🍬</title>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;height:100svh;overflow:hidden;background:#B4D9E7;font-family:'Fredoka One',Arial,sans-serif;touch-action:none}
+canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
+
+#hud{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(180deg,rgba(0,0,0,0.5) 0%,transparent 100%);pointer-events:none}
+#btn-back{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;color:#fff;padding:6px 10px;font-size:14px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
+#btn-pause{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;color:#fff;padding:5px 8px;font-size:14px;cursor:pointer;font-family:inherit;pointer-events:all;flex-shrink:0}
+#game-badge{background:rgba(0,0,0,0.4);border:1.5px solid rgba(251,191,36,0.4);border-radius:10px;padding:4px 10px;color:#fbbf24;font-size:12px;font-weight:700;flex-shrink:0}
+#hud-center{flex:1;text-align:center}
+#score-display{font-size:clamp(20px,6vw,32px);font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
+#level-text{font-size:10px;color:#bfdbfe}
+#lives-display{font-size:16px;flex-shrink:0}
+
+#pause-overlay{position:fixed;inset:0;z-index:350;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,80,0.92);backdrop-filter:blur(8px)}
+#pause-overlay.show{display:flex}
+
+#start-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,80,0.92);backdrop-filter:blur(8px)}
+#start-overlay.hidden{display:none}
+.start-icon{font-size:72px}
+.start-title{font-size:clamp(26px,8vw,40px);font-weight:900;color:#fbbf24}
+.start-sub{font-size:16px;color:#bfdbfe}
+.start-hint{font-size:15px;color:#86efac;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5;transform:scale(.96)}}
+</style>
+</head>
+<body>
+
+<canvas id="pixi-canvas"></canvas>
+
+<div id="hud">
+  <button id="btn-back" onclick="goBack()">◀</button>
+  <button id="btn-pause" onclick="togglePause()">⏸</button>
+  <div id="game-badge">🍬 Monster Candy</div>
+  <div id="hud-center">
+    <div id="level-text"></div>
+    <div id="score-display">🍬 0</div>
+  </div>
+  <div id="lives-display">❤️❤️❤️</div>
+</div>
+
+<div id="pause-overlay">
+  <div style="font-size:36px">⏸</div>
+  <div style="font-size:24px;font-weight:900;color:#fbbf24">PAUSE</div>
+  <div style="display:flex;gap:10px">
+    <button onclick="togglePause()" style="padding:12px 24px;border-radius:14px;border:2px solid #4ade80;background:rgba(34,197,94,0.3);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">▶ Lanjut</button>
+    <button onclick="goBack()" style="padding:12px 24px;border-radius:14px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#bfdbfe;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit">🏠 Keluar</button>
+  </div>
+</div>
+
+<div id="start-overlay">
+  <div class="start-icon">🍬</div>
+  <div class="start-title">Monster Wants Candy</div>
+  <div class="start-sub" id="start-level"></div>
+  <div class="start-hint">Tap untuk Mulai!</div>
+</div>
+
+<!-- Monster character (DOM overlay) -->
+<img id="monster-img" src="../assets/wants candy/icon.png" style="position:fixed;z-index:40;pointer-events:none;width:min(100px,22vw);height:auto;bottom:5%;left:50%;transform:translateX(-50%);display:none;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4))">
+
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+<script src="game-modal.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+const cfg = { level: 1 }
+try { const s = sessionStorage.getItem('g22Config'); if (s) Object.assign(cfg, JSON.parse(s)) } catch(_){}
+document.getElementById('level-text').textContent = `Level ${cfg.level}`
+document.getElementById('start-level').textContent = `Level ${cfg.level}`
+
+// Questions (reuse bank)
+const QS = [
+  {q:'1+1',a:2},{q:'2+3',a:5},{q:'5-2',a:3},{q:'4+4',a:8},{q:'3+3',a:6},
+  {q:'6-3',a:3},{q:'2+5',a:7},{q:'9-4',a:5},{q:'3+4',a:7},{q:'8-3',a:5},
+  {q:'7+2',a:9},{q:'10-5',a:5},{q:'4+5',a:9},{q:'6+3',a:9},{q:'7-4',a:3},
+  {q:'2x3',a:6},{q:'3x2',a:6},{q:'4x2',a:8},{q:'5x2',a:10},{q:'3x3',a:9},
+  {q:'12-5',a:7},{q:'8+4',a:12},{q:'15-8',a:7},{q:'6+6',a:12},{q:'11-3',a:8},
+]
+function pickQ(){return QS[Math.floor(Math.random()*QS.length)]}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════════
+let W, H, app
+const CANDY_EMOJIS = ['🍬','🍭','🍫','🍪','🧁','🍩','🍰','🎂','🍡','🍮']
+const CANDY_COLORS = [0xef4444,0xf97316,0xfbbf24,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x14b8a6]
+
+const S = {
+  running:false, paused:false, started:false, gameOver:false,
+  score:0, lives:3, maxLives:3,
+  candies:[], particles:[],
+  spawnTimer:0, spawnInterval:1.5, // seconds between spawns
+  fallSpeed:1.5, // base pixels per frame
+  level: cfg.level,
+  quizActive:false, currentCandy:null,
+  frame:0,
+  monsterX:0, // monster follows touch/mouse
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════════════════════
+let ac
+function ea(){if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(_){}}
+function tone(f,d,t='sine',v=0.12){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.linearRampToValueAtTime(0,ac.currentTime+d/1000);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d/1000)}
+function sfxCatch(){tone(800,100);setTimeout(()=>tone(1000,80),50)}
+function sfxMiss(){tone(200,200,'square',0.1)}
+function sfxCorrect(){tone(900,100);setTimeout(()=>tone(1100,120),80)}
+function sfxWrong(){tone(150,300,'sawtooth',0.08)}
+
+// ═══════════════════════════════════════════════════════════
+//  PIXI INIT
+// ═══════════════════════════════════════════════════════════
+let bgLayer, gameLayer, fxLayer
+
+;(async function init(){
+  app = new PIXI.Application()
+  await app.init({
+    canvas: document.getElementById('pixi-canvas'),
+    width: window.innerWidth, height: window.innerHeight,
+    backgroundAlpha: 1, backgroundColor: 0xB4D9E7,
+    antialias: true, resolution: Math.min(window.devicePixelRatio, 2),
+    preference: 'webgl', preferWebGLVersion: 1
+  })
+  W = app.screen.width; H = app.screen.height
+
+  bgLayer = new PIXI.Container(); app.stage.addChild(bgLayer)
+  gameLayer = new PIXI.Container(); app.stage.addChild(gameLayer)
+  fxLayer = new PIXI.Container(); app.stage.addChild(fxLayer)
+
+  drawBackground()
+  S.monsterX = W / 2
+
+  // Difficulty scaling
+  S.spawnInterval = Math.max(0.6, 1.5 - cfg.level * 0.04)
+  S.fallSpeed = 1.5 + cfg.level * 0.08
+
+  app.ticker.add(gameLoop)
+  document.querySelector('.start-hint').textContent = 'Tap untuk Mulai!'
+})().catch(e=>{
+  console.error('G22 init failed:', e)
+  document.querySelector('.start-hint').textContent = 'Gagal memuat. Muat ulang.'
+})
+
+// ═══════════════════════════════════════════════════════════
+//  BACKGROUND
+// ═══════════════════════════════════════════════════════════
+function drawBackground() {
+  // Sky gradient
+  const sky = new PIXI.Graphics()
+  sky.rect(0, 0, W, H * 0.7).fill(0xB4D9E7)
+  sky.rect(0, H * 0.5, W, H * 0.2).fill({ color: 0x87CEEB, alpha: 0.3 })
+  bgLayer.addChild(sky)
+
+  // Clouds
+  for (let i = 0; i < 5; i++) {
+    const cl = new PIXI.Graphics()
+    const cw = 30 + Math.random() * 50
+    cl.ellipse(0, 0, cw, cw * 0.35).fill({ color: 0xffffff, alpha: 0.6 })
+    cl.ellipse(cw * 0.4, -cw * 0.1, cw * 0.5, cw * 0.25).fill({ color: 0xffffff, alpha: 0.45 })
+    cl.x = Math.random() * W; cl.y = H * 0.05 + Math.random() * H * 0.15
+    bgLayer.addChild(cl)
+  }
+
+  // Hills
+  const hills = new PIXI.Graphics()
+  hills.moveTo(0, H * 0.7)
+  for (let x = 0; x <= W; x += 10) {
+    const y = H * 0.65 + Math.sin(x * 0.008) * 25 + Math.sin(x * 0.02) * 12
+    hills.lineTo(x, y)
+  }
+  hills.lineTo(W, H).lineTo(0, H).closePath().fill(0x86efac)
+  bgLayer.addChild(hills)
+
+  // Ground
+  const ground = new PIXI.Graphics()
+  ground.rect(0, H * 0.75, W, H * 0.25).fill(0x22c55e)
+  ground.rect(0, H * 0.75, W, 4).fill({ color: 0x16a34a, alpha: 0.5 })
+  bgLayer.addChild(ground)
+
+  // Flowers on ground
+  for (let i = 0; i < 12; i++) {
+    const fl = new PIXI.Text({ text: ['🌸', '🌼', '🌺', '🌻'][i % 4], style: { fontSize: 14 + Math.random() * 8 } })
+    fl.x = Math.random() * W; fl.y = H * 0.76 + Math.random() * H * 0.08
+    fl.alpha = 0.6 + Math.random() * 0.3
+    bgLayer.addChild(fl)
+  }
+
+  // Rainbow
+  const rainbow = new PIXI.Graphics()
+  const rcx = W * 0.7, rcy = H * 0.3
+  const colors = [0xef4444, 0xf97316, 0xfbbf24, 0x22c55e, 0x3b82f6, 0x8b5cf6]
+  for (let i = colors.length - 1; i >= 0; i--) {
+    rainbow.arc(rcx, rcy, 120 + i * 8, Math.PI, 0).stroke({ color: colors[i], width: 6, alpha: 0.25 })
+  }
+  bgLayer.addChild(rainbow)
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CANDY SYSTEM
+// ═══════════════════════════════════════════════════════════
+function spawnCandy() {
+  const q = pickQ()
+  const emoji = CANDY_EMOJIS[Math.floor(Math.random() * CANDY_EMOJIS.length)]
+  const color = CANDY_COLORS[Math.floor(Math.random() * CANDY_COLORS.length)]
+
+  const container = new PIXI.Container()
+  container.x = 30 + Math.random() * (W - 60)
+  container.y = -50
+
+  // Candy body (circle + emoji)
+  const bg = new PIXI.Graphics()
+  bg.circle(0, 0, 28).fill(color)
+  bg.circle(0, 0, 28).stroke({ color: 0xffffff, width: 2, alpha: 0.5 })
+  container.addChild(bg)
+
+  // Math question on candy
+  const qText = new PIXI.Text({ text: q.q, style: { fontSize: 16, fontWeight: '900', fill: 0xffffff, fontFamily: 'Fredoka One, Arial', align: 'center', dropShadow: true, dropShadowDistance: 1 } })
+  qText.anchor.set(0.5)
+  container.addChild(qText)
+
+  // Emoji floating above
+  const emojiText = new PIXI.Text({ text: emoji, style: { fontSize: 24 } })
+  emojiText.anchor.set(0.5)
+  emojiText.y = -32
+  container.addChild(emojiText)
+
+  container.interactive = true
+  container.cursor = 'pointer'
+  container.on('pointerdown', () => catchCandy(candy))
+
+  gameLayer.addChild(container)
+
+  const candy = {
+    container, q, emoji, color,
+    x: container.x, y: container.y,
+    speed: S.fallSpeed * (0.8 + Math.random() * 0.4),
+    rotation: (Math.random() - 0.5) * 0.03,
+    alive: true, caught: false
+  }
+  S.candies.push(candy)
+}
+
+function catchCandy(candy) {
+  if (!candy.alive || S.quizActive || !S.running || S.paused) return
+  candy.alive = false
+  candy.caught = true
+  sfxCatch()
+
+  // Show answer choices
+  showCandyQuiz(candy)
+}
+
+function showCandyQuiz(candy) {
+  S.quizActive = true
+  S.currentCandy = candy
+
+  // Generate choices
+  const correct = candy.q.a
+  const choices = [correct]
+  while (choices.length < 4) {
+    const wrong = correct + Math.floor(Math.random() * 10) - 5
+    if (wrong !== correct && wrong >= 0 && !choices.includes(wrong)) choices.push(wrong)
+  }
+  choices.sort(() => Math.random() - 0.5)
+
+  // Create choice buttons as PIXI
+  const panel = new PIXI.Container()
+  panel.name = 'quiz-panel'
+  const panelBg = new PIXI.Graphics()
+  panelBg.roundRect(-100, -30, 200, 60, 12).fill({ color: 0x1e0845, alpha: 0.9 })
+  panel.addChild(panelBg)
+
+  choices.forEach((c, i) => {
+    const btn = new PIXI.Container()
+    btn.x = -75 + i * 50
+    const bg = new PIXI.Graphics()
+    bg.roundRect(-20, -18, 40, 36, 8).fill(c === correct ? 0x22c55e : [0x7c3aed, 0xef4444, 0xf97316, 0x3b82f6][i])
+    btn.addChild(bg)
+    const txt = new PIXI.Text({ text: '' + c, style: { fontSize: 16, fontWeight: '900', fill: 0xffffff, fontFamily: 'Arial' } })
+    txt.anchor.set(0.5)
+    btn.addChild(txt)
+    btn.interactive = true; btn.cursor = 'pointer'
+    btn.on('pointerdown', () => {
+      if (c === correct) {
+        S.score++
+        sfxCorrect()
+        spawnCatchFX(candy.x, candy.y, candy.color)
+      } else {
+        sfxWrong()
+      }
+      // Remove quiz
+      fxLayer.removeChild(panel)
+      candy.container.visible = false
+      gameLayer.removeChild(candy.container)
+      S.quizActive = false
+      S.currentCandy = null
+      updateHUD()
+    })
+    panel.addChild(btn)
+  })
+
+  panel.x = Math.max(110, Math.min(W - 110, candy.x))
+  panel.y = Math.max(50, candy.y - 50)
+  fxLayer.addChild(panel)
+}
+
+function spawnCatchFX(x, y, color) {
+  for (let i = 0; i < 10; i++) {
+    const g = new PIXI.Graphics()
+    g.circle(0, 0, 3 + Math.random() * 4).fill(color)
+    g.x = x; g.y = y
+    fxLayer.addChild(g)
+    S.particles.push({ g, vx: (Math.random() - 0.5) * 8, vy: -Math.random() * 6 - 2, grav: 0.2, life: 1, decay: 0.03 })
+  }
+  // Score text
+  const st = new PIXI.Text({ text: '+1 🍬', style: { fontSize: 20, fontWeight: '900', fill: 0xfbbf24, fontFamily: 'Fredoka One' } })
+  st.anchor.set(0.5); st.x = x; st.y = y - 20
+  fxLayer.addChild(st)
+  S.particles.push({ g: st, vx: 0, vy: -2, grav: 0, life: 1, decay: 0.025 })
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════════════════════
+function gameLoop(ticker) {
+  S.frame++
+  if (!S.running || S.paused || S.gameOver) return
+  const dt = ticker.deltaTime
+
+  // Spawn candies
+  S.spawnTimer += dt / 60
+  if (S.spawnTimer >= S.spawnInterval) {
+    S.spawnTimer = 0
+    spawnCandy()
+  }
+
+  // Update candies
+  for (let i = S.candies.length - 1; i >= 0; i--) {
+    const c = S.candies[i]
+    if (!c.alive && !c.caught) { S.candies.splice(i, 1); continue }
+    if (c.caught) continue // waiting for quiz
+
+    c.y += c.speed * dt
+    c.container.y = c.y
+    c.container.rotation += c.rotation * dt
+
+    // Candy reached bottom — miss!
+    if (c.y > H + 30) {
+      c.alive = false
+      gameLayer.removeChild(c.container)
+      S.candies.splice(i, 1)
+      S.lives--
+      sfxMiss()
+      updateHUD()
+      if (S.lives <= 0) { endGame(); return }
+    }
+  }
+
+  // Update particles
+  for (let i = S.particles.length - 1; i >= 0; i--) {
+    const p = S.particles[i]
+    p.vy += (p.grav || 0) * dt
+    p.g.x += (p.vx || 0) * dt
+    p.g.y += (p.vy || 0) * dt
+    p.life -= p.decay * dt
+    p.g.alpha = Math.max(0, p.life)
+    if (p.life <= 0) { fxLayer.removeChild(p.g); S.particles.splice(i, 1) }
+  }
+
+  // Monster follows last touch/mouse X
+  const monster = document.getElementById('monster-img')
+  if (monster && monster.style.display !== 'none') {
+    monster.style.left = S.monsterX + 'px'
+    monster.style.transform = 'translateX(-50%)'
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════════════
+function updateHUD() {
+  document.getElementById('score-display').textContent = `🍬 ${S.score}`
+  const hearts = '❤️'.repeat(Math.max(0, S.lives)) + '🖤'.repeat(Math.max(0, S.maxLives - S.lives))
+  document.getElementById('lives-display').textContent = hearts
+}
+
+// ═══════════════════════════════════════════════════════════
+//  START / END / PAUSE
+// ═══════════════════════════════════════════════════════════
+function startGame() {
+  if (S.started) return; ea()
+  S.started = true; S.running = true
+  document.getElementById('start-overlay').classList.add('hidden')
+  document.getElementById('monster-img').style.display = 'block'
+  updateHUD()
+}
+
+function endGame() {
+  S.running = false; S.gameOver = true
+  const stars = S.score >= 15 ? 5 : S.score >= 10 ? 4 : S.score >= 6 ? 3 : S.score >= 3 ? 2 : 1
+
+  // Save progress
+  try { sessionStorage.setItem('g22Result', JSON.stringify({ stars, level: cfg.level })) } catch(_){}
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g22) prog.g22 = { completed: [], stars: {} }
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g22.completed.includes(cfg.level)) prog.g22.completed.push(cfg.level)
+    if ((prog.g22.stars[cfg.level] || 0) < mapped) prog.g22.stars[cfg.level] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_){}
+
+  setTimeout(() => {
+    const nextLevel = cfg.level < 30 ? () => {
+      try { sessionStorage.setItem('g22Config', JSON.stringify({ level: cfg.level + 1 })) } catch(_){}
+      location.reload()
+    } : null
+    GameModal.show({
+      emoji: stars >= 4 ? '🏆' : '🍬',
+      title: stars >= 3 ? 'Hebat!' : 'Coba Lagi!',
+      stars,
+      msg: `Skor: ${S.score} permen | Level ${cfg.level}`,
+      onNext: nextLevel,
+      onAgain: () => location.reload(),
+      onBack: () => goBack()
+    })
+  }, 500)
+}
+
+function togglePause() {
+  if (!S.started || S.gameOver) return
+  S.paused = !S.paused
+  document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
+  document.getElementById('pause-overlay').style.display = S.paused ? 'flex' : 'none'
+}
+
+function goBack() {
+  S.running = false
+  history.back()
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════════
+document.getElementById('start-overlay').addEventListener('pointerdown', startGame)
+
+// Track touch/mouse position for monster
+document.addEventListener('pointermove', e => {
+  S.monsterX = e.clientX
+})
+
+// Resize
+window.addEventListener('resize', () => {
+  if (app) app.renderer.resize(window.innerWidth, window.innerHeight)
+})
+
+// Save progress helper
+function saveG22Progress(stars) {
+  try {
+    const key = 'dunia-0-progress'
+    const prog = JSON.parse(localStorage.getItem(key) || '{}')
+    if (!prog.g22) prog.g22 = { completed: [], stars: {} }
+    const lv = cfg.level || 1
+    const mapped = stars >= 4 ? 3 : stars >= 2 ? 2 : 1
+    if (!prog.g22.completed.includes(lv)) prog.g22.completed.push(lv)
+    if ((prog.g22.stars[lv] || 0) < mapped) prog.g22.stars[lv] = mapped
+    localStorage.setItem(key, JSON.stringify(prog))
+  } catch(_) {}
+}
+</script>
+</body>
+</html>
