@@ -36,6 +36,18 @@
 - ✅ GameModal confetti: standalone games get graded confetti via game-modal.js
 - ✅ spawnSparkles() graded: accepts starCount param for intensity scaling
 
+## ✅ COMPLETED 2026-04-20
+
+### G22 Monster Wants Candy — Pokeball Category Visual Match
+- ✅ **Ball visual = category**: Ball design indexed by `ballType` (not random) — Poké Ball=Math, Great Ball=Warna, Ultra Ball=Hewan, Master Ball=Buah, etc. Ball color now signals quiz domain.
+- ✅ **Category chip**: Quiz panel shows `🎯 Matematika / Warna / Hewan / Buah` label above question so player knows what they're answering.
+- ✅ **Text question fix**: Quiz label no longer appends `= ?` to non-numeric questions (e.g., "Apa warna langit?" not "Apa warna langit? = ?").
+- ✅ **Panel enlarged**: Quiz panel BG expanded to fit category chip without overlap.
+
+### Train BGM (G14/G15/G16)
+- ✅ **Train BGM wired**: Renamed `WhatsApp Audio ...mp3` to `Sounds/train-bgm.mp3` and swapped all 3 train games to use it instead of `battle-bgm.mp3` (Pokemon battle theme).
+- Files: `games/g14.html`, `games/g15-pixi.html`, `games/g16-pixi.html`
+
 ## ✅ COMPLETED 2026-04-20 — G3 Huruf Hutan AAA Overhaul
 
 - ✅ **Background**: Switched from `bg-game3-huruf.webp` (bedroom-like overlay) to `bg-forest.webp`
