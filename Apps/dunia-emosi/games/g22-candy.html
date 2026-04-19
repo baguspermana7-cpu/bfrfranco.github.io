@@ -35,6 +35,7 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 <body>
 
 <canvas id="pixi-canvas"></canvas>
+<audio id="game-bgm" src="../Sounds/battle-bgm.mp3" loop preload="auto" style="display:none"></audio>
 
 <div id="hud">
   <button id="btn-back" onclick="goBack()">◀</button>
@@ -448,11 +449,13 @@ function startGame() {
   S.started = true; S.running = true
   document.getElementById('start-overlay').classList.add('hidden')
   document.getElementById('monster-img').style.display = 'block'
+  try{const bgm=document.getElementById('game-bgm');bgm.volume=0.2;bgm.play().catch(()=>{})}catch(_){}
   updateHUD()
 }
 
 function endGame() {
   S.running = false; S.gameOver = true
+  try{document.getElementById('game-bgm').pause()}catch(_){}
   const stars = S.score >= 15 ? 5 : S.score >= 10 ? 4 : S.score >= 6 ? 3 : S.score >= 3 ? 2 : 1
 
   // Save progress
@@ -489,9 +492,11 @@ function togglePause() {
   S.paused = !S.paused
   document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
   document.getElementById('pause-overlay').style.display = S.paused ? 'flex' : 'none'
+  try{const bgm=document.getElementById('game-bgm');S.paused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
 }
 
 function goBack() {
+  try{document.getElementById('game-bgm').pause()}catch(_){}
   S.running = false
   history.back()
 }
