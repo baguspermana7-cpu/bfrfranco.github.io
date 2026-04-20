@@ -698,7 +698,12 @@ function gameLoop(ticker){
 
   // Player movement
   const spd = MOVE_SPD * (S.powerup==='speed'?1.5:1)
-  if(S.moveL) S.pvx=-spd; else if(S.moveR) S.pvx=spd; else S.pvx*=0.82
+  // Touch-drag drive: if finger is tracking, ease toward target X
+  if(S.pTargetX!=null){
+    const diff=S.pTargetX-S.px
+    if(Math.abs(diff)>2){ S.pvx=Math.max(-spd*1.4,Math.min(spd*1.4,diff*0.35)) }
+    else { S.pvx*=0.6; S.pTargetX=null }
+  } else if(S.moveL) S.pvx=-spd; else if(S.moveR) S.pvx=spd; else S.pvx*=0.82
   // Auto-jump assist — if ball is close and heading toward player, auto-jump
   if(S.pGnd && S.bx<NET_X && S.bvy>0 && Math.abs(S.bx-S.px)<60 && S.by<GROUND_Y-40) S.jump=true
   if(S.jump&&S.pGnd){
@@ -874,20 +879,29 @@ function checkHit(dx,dy,dvx,dvy,onGnd,who){
 //  CPU AI
 // ═══════════════════════════════════════════════════════════
 function updateCPU(dt){
-  const diff=Math.min(0.5+cfg.level*0.025,0.85) // easier for kids
+  const diff=Math.min(0.68+cfg.level*0.028,0.95)
+  const spd=MOVE_SPD*(0.92+cfg.level*0.008)
   const react=Math.random()<diff
 
   if(react){
-    const target=S.bx>NET_X?S.bx-8:W*0.75
-    if(S.cx<target-12)S.cvx=MOVE_SPD*0.85
-    else if(S.cx>target+12)S.cvx=-MOVE_SPD*0.85
+    // Predict ball landing instead of chasing current X
+    const landFrames=S.bvy>0.1?Math.max(1,(GROUND_Y-S.by)/Math.max(0.1,Math.abs(S.bvy))):0
+    const predX=S.bx+S.bvx*landFrames*0.6
+    const target=S.bx>NET_X?predX-8:W*0.75
+    if(S.cx<target-10)S.cvx=spd
+    else if(S.cx>target+10)S.cvx=-spd
     else S.cvx*=0.8
 
-    if(S.cGnd&&S.bx>NET_X&&S.by<GROUND_Y-50&&Math.abs(S.bx-S.cx)<70&&S.bvy>0){
-      S.cvy=JUMP_POWER*0.88; S.cGnd=false
+    // Earlier, wider jump window
+    if(S.cGnd&&S.bx>NET_X&&S.by<GROUND_Y-40&&Math.abs(S.bx-S.cx)<90&&S.bvy>0){
+      S.cvy=JUMP_POWER*0.92; S.cGnd=false
       spawnSand(S.cx,GROUND_Y,3)
     }
-  } else S.cvx*=0.9
+  } else {
+    // Drift to court center instead of flat stop — looks less idle
+    S.cvx+=(W*0.75-S.cx)*0.002
+    S.cvx*=0.92
+  }
 
   S.cvy+=GRAVITY*S.gravMod*dt; S.cx+=S.cvx*dt; S.cy+=S.cvy*dt
   S.cx=Math.max(NET_X+DUCK_R+6,Math.min(W-DUCK_R,S.cx))
@@ -1080,8 +1094,8 @@ function startGame(){
   document.getElementById('round-text').textContent=`Round 1/${TOTAL_ROUNDS}`
 }
 
-// Touch — screen zone control (tap left half = move left, right half = move right)
-// Much more intuitive than separate buttons for mobile volleyball
+// Touch — delta drag control: finger slide moves the duck smoothly
+// Tap also auto-jumps (existing feature). Left/right buttons still work.
 let _touchActive = false, _touchX = 0
 document.addEventListener('touchstart', e => {
   if (!S.started || S.paused || S.gameOver || S.quizActive) return
@@ -1089,21 +1103,21 @@ document.addEventListener('touchstart', e => {
   e.preventDefault()
   _touchActive = true
   _touchX = e.touches[0].clientX
-  const half = window.innerWidth / 2
-  S.moveL = _touchX < half
-  S.moveR = _touchX >= half
-  S.jump = true // always jump on tap
+  S.pTargetX = S.px // anchor drag origin to current player X
+  S.jump = true // tap = jump
 }, {passive:false})
 document.addEventListener('touchmove', e => {
   if (!_touchActive) return
   e.preventDefault()
-  _touchX = e.touches[0].clientX
-  const half = window.innerWidth / 2
-  S.moveL = _touchX < half
-  S.moveR = _touchX >= half
+  const cur = e.touches[0].clientX
+  const dx = cur - _touchX
+  _touchX = cur
+  const scale = W / window.innerWidth
+  S.pTargetX = (S.pTargetX ?? S.px) + dx * scale * 1.6
+  S.pTargetX = Math.max(DUCK_R, Math.min(NET_X - DUCK_R - 6, S.pTargetX))
 }, {passive:false})
 document.addEventListener('touchend', e => {
-  _touchActive = false; S.moveL = false; S.moveR = false
+  _touchActive = false
 })
 
 // Button fallback (still works if visible)
