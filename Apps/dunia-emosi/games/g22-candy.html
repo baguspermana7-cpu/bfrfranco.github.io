@@ -23,12 +23,15 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 #pause-overlay{position:fixed;inset:0;z-index:350;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,80,0.92);backdrop-filter:blur(8px)}
 #pause-overlay.show{display:flex}
 
-#start-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,30,80,0.92);backdrop-filter:blur(8px)}
+#start-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at 50% 30%,rgba(24,70,130,0.95) 0%,rgba(0,20,60,0.97) 70%);backdrop-filter:blur(10px)}
 #start-overlay.hidden{display:none}
-.start-icon{font-size:72px}
-.start-title{font-size:clamp(26px,8vw,40px);font-weight:900;color:#fbbf24}
-.start-sub{font-size:16px;color:#bfdbfe}
-.start-hint{font-size:15px;color:#86efac;animation:pulse 1.5s ease-in-out infinite}
+#start-overlay::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 25%,rgba(251,191,36,0.18),transparent 30%),radial-gradient(circle at 85% 70%,rgba(236,72,153,0.15),transparent 32%),radial-gradient(circle at 50% 90%,rgba(34,211,238,0.12),transparent 40%);pointer-events:none}
+.start-card{position:relative;z-index:1;background:linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border:2px solid rgba(251,191,36,0.45);border-radius:28px;padding:32px 36px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 12px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.15);max-width:88vw}
+.start-icon{font-size:84px;filter:drop-shadow(0 6px 14px rgba(251,191,36,0.5));animation:floatY 2.4s ease-in-out infinite}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+.start-title{font-size:clamp(26px,8vw,40px);font-weight:900;color:#fde68a;text-shadow:0 2px 12px rgba(251,191,36,0.45),0 0 24px rgba(236,72,153,0.25);letter-spacing:0.5px;text-align:center}
+.start-sub{font-size:14px;color:#bae6fd;background:rgba(14,116,144,0.3);border:1px solid rgba(186,230,253,0.25);border-radius:100px;padding:6px 16px;font-weight:700}
+.start-hint{font-size:16px;color:#86efac;font-weight:800;animation:pulse 1.5s ease-in-out infinite;margin-top:4px}
 @keyframes pulse{50%{opacity:.5;transform:scale(.96)}}
 </style>
 </head>
@@ -63,10 +66,12 @@ canvas{position:fixed;inset:0;width:100vw;height:100svh;display:block}
 </div>
 
 <div id="start-overlay">
-  <div class="start-icon">🍬</div>
-  <div class="start-title" style="font-size:clamp(22px,7vw,36px)">Monster Wants Candy</div>
-  <div class="start-sub" id="start-level"></div>
-  <div class="start-hint">Tap untuk Mulai!</div>
+  <div class="start-card">
+    <div class="start-icon">🍬</div>
+    <div class="start-title" style="font-size:clamp(22px,7vw,36px)">Monster Wants Candy</div>
+    <div class="start-sub" id="start-level"></div>
+    <div class="start-hint">👆 Tap untuk Mulai!</div>
+  </div>
 </div>
 
 <!-- Monster character (DOM overlay) -->
