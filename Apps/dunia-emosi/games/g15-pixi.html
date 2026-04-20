@@ -259,8 +259,23 @@ window.addEventListener('resize',()=>{if(typeof app!=='undefined'&&app)app.rende
 function togglePause() {
   gamePaused = !gamePaused;
   document.getElementById('btn-pause').textContent = gamePaused ? '▶' : '⏸';
-  try{const bgm=document.getElementById('game-bgm');gamePaused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
+  if (typeof GamePause !== 'undefined') {
+    if (gamePaused) GamePause.show(); else GamePause.hide();
+  } else {
+    try{const bgm=document.getElementById('game-bgm');gamePaused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
+  }
 }
+
+// Initialize shared pause overlay once game-modal.js loads
+(function setupG15Pause(){
+  if (typeof GamePause === 'undefined') { setTimeout(setupG15Pause, 60); return; }
+  GamePause.init({
+    bgmEl: document.getElementById('game-bgm'),
+    onResume: () => { gamePaused = false; document.getElementById('btn-pause').textContent = '⏸'; },
+    onRetry:  () => { location.reload(); },
+    onHome:   () => { try{document.getElementById('game-bgm').pause()}catch(_){}; history.back(); }
+  });
+})();
 
 // ── Java Station Route: Surabaya → Banten ────────────────────────────────────
 const JAVA_STATIONS = [
