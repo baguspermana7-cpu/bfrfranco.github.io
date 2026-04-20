@@ -7776,20 +7776,20 @@ function g13Defeat() {
 // GAME 13B — QUICK FIRE ⚡ 60 Detik Serangan Matematika
 // ============================================================
 const G13B_MOBILE_BG = [
-  'Gemini_Generated_Image_13vm6c13vm6c13vm.png','Gemini_Generated_Image_3e7nl23e7nl23e7n.png',
-  'Gemini_Generated_Image_61gamh61gamh61ga.png','Gemini_Generated_Image_dsnyj6dsnyj6dsny.png',
-  'Gemini_Generated_Image_klimtxklimtxklim.png','Gemini_Generated_Image_ozk0zeozk0zeozk0.png',
-  'Gemini_Generated_Image_qor6mpqor6mpqor6.png','Gemini_Generated_Image_sg3ymdsg3ymdsg3y.png',
-  'Gemini_Generated_Image_vaean7vaean7vaea.png','Gemini_Generated_Image_w061r3w061r3w061.png',
-  'Gemini_Generated_Image_za0fyeza0fyeza0f.png',
+  'Gemini_Generated_Image_13vm6c13vm6c13vm.webp','Gemini_Generated_Image_3e7nl23e7nl23e7n.webp',
+  'Gemini_Generated_Image_61gamh61gamh61ga.webp','Gemini_Generated_Image_dsnyj6dsnyj6dsny.webp',
+  'Gemini_Generated_Image_klimtxklimtxklim.webp','Gemini_Generated_Image_ozk0zeozk0zeozk0.webp',
+  'Gemini_Generated_Image_qor6mpqor6mpqor6.webp','Gemini_Generated_Image_sg3ymdsg3ymdsg3y.webp',
+  'Gemini_Generated_Image_vaean7vaean7vaea.webp','Gemini_Generated_Image_w061r3w061r3w061.webp',
+  'Gemini_Generated_Image_za0fyeza0fyeza0f.webp',
 ]
 const G13B_PC_BG = [
-  'Gemini_Generated_Image_26eyja26eyja26ey.png','Gemini_Generated_Image_7k4vs27k4vs27k4v.png',
-  'Gemini_Generated_Image_8lzmsu8lzmsu8lzm.png','Gemini_Generated_Image_dyn2nwdyn2nwdyn2.png',
-  'Gemini_Generated_Image_fr02m6fr02m6fr02.png','Gemini_Generated_Image_h4dcu9h4dcu9h4dc.png',
-  'Gemini_Generated_Image_hzmzmhhzmzmhhzmz.png','Gemini_Generated_Image_ocxx4aocxx4aocxx.png',
-  'Gemini_Generated_Image_u0otymu0otymu0ot.png','Gemini_Generated_Image_wou0m2wou0m2wou0.png',
-  'Gemini_Generated_Image_yoxnghyoxnghyoxn.png',
+  'Gemini_Generated_Image_26eyja26eyja26ey.webp','Gemini_Generated_Image_7k4vs27k4vs27k4v.webp',
+  'Gemini_Generated_Image_8lzmsu8lzmsu8lzm.webp','Gemini_Generated_Image_dyn2nwdyn2nwdyn2.webp',
+  'Gemini_Generated_Image_fr02m6fr02m6fr02.webp','Gemini_Generated_Image_h4dcu9h4dcu9h4dc.webp',
+  'Gemini_Generated_Image_hzmzmhhzmzmhhzmz.webp','Gemini_Generated_Image_ocxx4aocxx4aocxx.webp',
+  'Gemini_Generated_Image_u0otymu0otymu0ot.webp','Gemini_Generated_Image_wou0m2wou0m2wou0.webp',
+  'Gemini_Generated_Image_yoxnghyoxnghyoxn.webp',
 ]
 
 // Pokéball types for catch animation
