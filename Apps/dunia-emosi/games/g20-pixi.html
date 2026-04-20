@@ -165,7 +165,7 @@ const GRAVITY = 0.28 // very light for kids
 const BALL_R = 20 // bigger ball — easier to see and hit
 const DUCK_R = 30
 const JUMP_POWER = -9.5
-const MOVE_SPD = 5.0 // faster movement for responsive controls
+const MOVE_SPD = 4.2 // smoother, more controlled movement for kids
 const POINTS_TO_WIN = 3 // faster rounds for kids (was 5)
 const TOTAL_ROUNDS = 3
 
@@ -192,7 +192,7 @@ const S = {
 
 function randomizePhysics(){
   S.gravMod = 0.95 + Math.random()*0.1 // ±5% (more consistent)
-  S.bounceMod = 0.92 + Math.random()*0.1 // ±5% (less energy loss)
+  S.bounceMod = 0.80 + Math.random()*0.08 // 0.80–0.88: always lossy (no energy-gain bug)
   NET_H = H*0.2 + Math.random()*H*0.06 // slight variation
   NET_TOP = GROUND_Y - NET_H
 }
@@ -701,9 +701,9 @@ function gameLoop(ticker){
   // Touch-drag drive: if finger is tracking, ease toward target X
   if(S.pTargetX!=null){
     const diff=S.pTargetX-S.px
-    if(Math.abs(diff)>2){ S.pvx=Math.max(-spd*1.4,Math.min(spd*1.4,diff*0.35)) }
-    else { S.pvx*=0.6; S.pTargetX=null }
-  } else if(S.moveL) S.pvx=-spd; else if(S.moveR) S.pvx=spd; else S.pvx*=0.82
+    if(Math.abs(diff)>2){ const tv=Math.max(-spd,Math.min(spd,diff*0.22)); S.pvx=S.pvx*0.7+tv*0.3 }
+    else { S.pvx*=0.82; S.pTargetX=null }
+  } else if(S.moveL) S.pvx=-spd; else if(S.moveR) S.pvx=spd; else S.pvx*=0.88
   // Auto-jump assist — if ball is close and heading toward player, auto-jump
   if(S.pGnd && S.bx<NET_X && S.bvy>0 && Math.abs(S.bx-S.px)<60 && S.by<GROUND_Y-40) S.jump=true
   if(S.jump&&S.pGnd){
@@ -722,10 +722,10 @@ function gameLoop(ticker){
 
   // Ball physics
   const ballSpd=S.powerup==='slow'?0.6:1
-  S.bvy+=GRAVITY*S.gravMod*0.5*dt*ballSpd // heavier ball — shorter rallies, less waiting
+  S.bvy+=GRAVITY*S.gravMod*0.65*dt*ballSpd // heavier ball — shorter rallies, less waiting
   S.bx+=S.bvx*dt*ballSpd; S.by+=S.bvy*dt*ballSpd
   // Cap max ball speed — very slow for kids
-  const MAX_BALL_V = 5
+  const MAX_BALL_V = 3.8
   if(Math.abs(S.bvx)>MAX_BALL_V) S.bvx=Math.sign(S.bvx)*MAX_BALL_V
   if(Math.abs(S.bvy)>MAX_BALL_V) S.bvy=Math.sign(S.bvy)*MAX_BALL_V
   S.bSpin+=S.bvx*0.04*dt // faster visible spin
@@ -735,13 +735,13 @@ function gameLoop(ticker){
   // Wall bounces
   if(S.bx<br){S.bx=br;S.bvx=Math.abs(S.bvx)*S.bounceMod;sfxBounce()}
   if(S.bx>W-br){S.bx=W-br;S.bvx=-Math.abs(S.bvx)*S.bounceMod;sfxBounce()}
-  if(S.by<br+50){S.by=br+50;S.bvy=Math.abs(S.bvy)*0.75;sfxBounce()} // 75% energy kept (was 50%)
+  if(S.by<br+50){S.by=br+50;S.bvy=Math.abs(S.bvy)*0.60;sfxBounce()} // 60% energy kept
 
   // Net collision (narrower zone for easier play)
   if(S.by>NET_TOP&&Math.abs(S.bx-NET_X)<8){
     if(S.bx<NET_X){S.bvx=Math.min(S.bvx,-2);S.bx=NET_X-8}
     else{S.bvx=Math.max(S.bvx,2);S.bx=NET_X+8}
-    S.bvy*=-0.8; sfxBounce() // 80% energy kept (was 60%)
+    S.bvy*=-0.65; sfxBounce() // 65% energy kept
   }
 
   // Duck-ball collision (player)
@@ -837,22 +837,22 @@ function checkHit(dx,dy,dvx,dvy,onGnd,who){
   let power, hitType
   if(onGnd){
     // SET: gentle lob upward
-    power=4; hitType='set'
+    power=3.2; hitType='set'
     if(who==='player')S.pSet=true
   } else if(who==='player'&&S.pSet){
     // SMASH: powerful spike after set
-    power=7; hitType='smash'
+    power=5; hitType='smash'
     S.pSet=false
     S.shakeTimer=10
     sfxSmash()
   } else {
     // SHOT: jump first-touch
-    power=5.5; hitType='shot'
+    power=4.4; hitType='shot'
   }
 
-  S.bvx=Math.cos(angle)*power+dvx*0.35
-  S.bvy=Math.sin(angle)*power-3
-  S.bvy=Math.min(S.bvy,-2)
+  S.bvx=Math.cos(angle)*power+dvx*0.22
+  S.bvy=Math.sin(angle)*power-1.8
+  S.bvy=Math.min(S.bvy,-1.4)
 
   if(hitType==='set') sfxHit()
   else if(hitType==='shot') sfxHit()
@@ -1113,7 +1113,7 @@ document.addEventListener('touchmove', e => {
   const dx = cur - _touchX
   _touchX = cur
   const scale = W / window.innerWidth
-  S.pTargetX = (S.pTargetX ?? S.px) + dx * scale * 1.6
+  S.pTargetX = (S.pTargetX ?? S.px) + dx * scale * 1.1
   S.pTargetX = Math.max(DUCK_R, Math.min(NET_X - DUCK_R - 6, S.pTargetX))
 }, {passive:false})
 document.addEventListener('touchend', e => {
