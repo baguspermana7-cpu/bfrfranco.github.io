@@ -158,8 +158,8 @@
 - ✅ **Pokemon picker in pause menu**: Added 15 Pokemon grid (Psyduck, Pikachu, Eevee, Snorlax, etc). HD sprites from pokemondb. Switching changes catcher character instantly.
 - ✅ **Different pokeball = different category**: Ball design now indexed by `ballType` — Poké Ball=Math, Great Ball=Warna, Ultra Ball=Hewan, Master Ball=Buah. Quiz panel shows category chip.
 - ✅ **Physics smoothed**: Added sinusoidal wobble/sway to falling pokeballs, tighter speed range
-- ⬜ **Visual/UI very ugly**: Overall look and navigation needs major improvement — compare against original source
-- ⬜ **Navigation flow**: Menu, pause, game flow needs redesign to feel polished
+- 🔧 **Visual/UI very ugly**: Significant pass done — start overlay (glassmorphism card + radial accent pools + floating icon), pause overlay (matching card style + glow pause icon), HUD (gold glow score, pill badge, glass buttons). Full major-UI-elements revamp may need reference image from user for further polish.
+- ✅ **Navigation flow**: Pause menu now consistent visual language with start + HUD. Back/pause buttons have press animation for tactile feedback.
 
 ### G10 — Pertarungan Pokemon
 - ✅ **Platform/pedestal**: Made CSS `.g10-oval` more visible — brown color, border, larger size (110x22px)
@@ -170,7 +170,7 @@
 - ✅ **CRITICAL: Result modal frozen**: Fixed — `showResult()` now closes overlay-feedback and game-result-overlay before showing screen-result. Overlays were blocking button clicks.
 - ⬜ **Unified modal engine**: User wants inline game result + standalone GameModal to share same engine. Currently two separate systems — `showResult()` in game.js for G1-G12, `GameModal.show()` in game-modal.js for standalone games.
 - ✅ **Shared pause menu engine**: Built `GamePause` in game-modal.js — `GamePause.init({onResume, onRetry, onHome, bgmEl})`, `GamePause.show()/hide()`. Has master+BGM volume sliders, resume/retry/home buttons. Games can import and use.
-- ⬜ **Migrate games to GamePause**: Standalone games still have their own pause overlays — migrate to shared engine one by one
+- ✅ **Migrate games to GamePause (batch 1)**: G6, G14, G15, G16 — all had silent togglePause (no visible overlay). Now open full GamePause with volume sliders + Lanjut/Ulang/Keluar. G19/G20/G22 kept their custom pause overlays (Pokemon picker is game-specific feature).
 
 ### G20 — Ducky Volley
 - ⬜ **Mobile testing**: User said they'd test on mobile and give feedback — awaiting
