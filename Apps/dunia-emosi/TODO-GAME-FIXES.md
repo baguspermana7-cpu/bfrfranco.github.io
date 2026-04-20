@@ -61,6 +61,26 @@
 - ✅ **LRT Jabodebek (2023)**: First driverless (GoA L3) train in Indonesia
 - Total trains: 19 → 24
 
+### G22 Real Pokeball PNGs
+- ✅ **SVG → PNG rasterization**: ImageMagick `-density 300 -resize 128x128` produced 9 PNGs (19-29KB each) in `assets/Pokemon/pokeballs-png/`.
+- ✅ **PIXI.Assets.load()**: `preloadPokeballTextures()` fires during init, caches by ballType index.
+- ✅ **Sprite render**: `spawnCandy` uses `PIXI.Sprite(cachedTex)` when available, falls back to drawn Graphics otherwise.
+- Result: real authentic pokeball art (proper stripes, shading) replaces the drawn primitives.
+
+### G6 Petualangan Mobil — Road Polish
+- ✅ **Yellow center dash**: Middle lane divider now `#FCD34D` alpha 0.55+ (was faint white 0.08) — classic highway look.
+- ✅ **Road signs**: Spawner emits 3-5s cadence post + icon-boxed sign on random side, themed per map (city=🛑🚸🅿️, forest=🦌🌳, space=🛸🌠, pantai=🏖️🌊, sekolah=📚🏫, dapur=🍳🧂, kebun=🌻🌾, body=💊🧬). Scrolls with road speed, auto-culled off-screen.
+
+### G17 Jembatan Goyang — Juice
+- ✅ **Lives display**: ❤️❤️❤️ in HUD top-right, fills 🖤 as damage taken, shakes on hit via `g17HeartShake` keyframe.
+- ✅ **Floating numbers**: Red `-1 💔` on damage, gold `+1 ⭐` on correct tap, larger gold `COMBO xN!` on 3+ streak. Float-up animation `g17FloatUp` with scale + fade.
+- Addresses "gameplay sangat jelek" — whack-a-mole now has feedback loop.
+
+### G14 Balapan Kereta — Scenery Detail
+- ✅ **Bird flock**: 3-bird V-silhouette with wing-flap scaleY oscillation, drifts left (only forest/coastal/snow themes where it fits).
+- ✅ **Signal posts**: 4 alternating red/green LED posts with soft glow, scroll at 0.6× train speed as mid-layer parallax.
+- Addresses "sparse, lacks detail" — all scenery depths now have movement.
+
 ## ✅ COMPLETED 2026-04-20 — G3 Huruf Hutan AAA Overhaul
 
 - ✅ **Background**: Switched from `bg-game3-huruf.webp` (bedroom-like overlay) to `bg-forest.webp`
