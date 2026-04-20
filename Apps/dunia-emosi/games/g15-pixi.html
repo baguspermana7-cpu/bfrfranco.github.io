@@ -569,6 +569,8 @@ let bgStars = [];
 let sleepers = [];
 let bgClouds = [];
 let bgFireflies = [];
+let bgSignalPosts = [];
+let bgBirds = [];
 let rainbow = null;
 let LANE_Y = [];
 let W = 0, H = 0;
@@ -667,6 +669,23 @@ async function initPixi() {
     for (const c of bgClouds) {
       c.x -= c._speed * dt;
       if (c.x < -200) c.x = W + 150;
+    }
+
+    // Signal posts scroll with track
+    for (const p of bgSignalPosts) {
+      p.x -= gameSpeed * dt * 0.6;
+      if (p.x < -40) p.x = W + 40 + Math.random() * 50;
+    }
+
+    // Birds drift left
+    if (bgBirds.length) {
+      const t = performance.now() * 0.004;
+      for (const b of bgBirds) {
+        b.x -= b._speed * dt;
+        b.y = b._baseY + Math.sin(t + b._phase) * 5;
+        b.scale.y = 0.7 + Math.sin(t * 4 + b._phase) * 0.3;
+        if (b.x < -30) { b.x = W + 30; b._baseY = H * (0.1 + Math.random() * 0.18); }
+      }
     }
 
     // Fireflies (forest theme)
@@ -904,6 +923,44 @@ function buildBackground() {
     hill.ellipse(0, 0, bw, bh).fill({ color: T.hill });
     hill.x = Math.random() * W; hill.y = H * 0.72;
     bgLayer.addChild(hill);
+  }
+
+  // Signal posts — alternating red/green along track, above ground
+  const spacing = W * 0.6;
+  for (let i = 0; i < 4; i++) {
+    const post = new PIXI.Container();
+    const pole = new PIXI.Graphics();
+    pole.rect(-1.5, 0, 3, 26).fill({ color: 0x4b5563 });
+    post.addChild(pole);
+    const isRed = i % 2 === 0;
+    const color = isRed ? 0xef4444 : 0x22c55e;
+    const glow = new PIXI.Graphics();
+    glow.circle(0, -4, 9).fill({ color, alpha: 0.4 });
+    post.addChild(glow);
+    const lamp = new PIXI.Graphics();
+    lamp.circle(0, -4, 4.5).fill({ color });
+    lamp.circle(0, -4, 6).stroke({ color: 0x1f2937, width: 1.5 });
+    post.addChild(lamp);
+    post.x = i * spacing + Math.random() * 60;
+    post.y = H * 0.72 - 26;
+    bgLayer.addChild(post);
+    bgSignalPosts.push(post);
+  }
+
+  // Birds (night/mountain themes skip — too dark)
+  if ([1, 2, 4].includes(BG_THEME)) {
+    for (let i = 0; i < 3; i++) {
+      const b = new PIXI.Graphics();
+      b.moveTo(-6,0).lineTo(-3,-3).lineTo(0,0).lineTo(3,-3).lineTo(6,0).stroke({ color: 0x1f2937, width: 1.4 });
+      b.alpha = 0.6;
+      b.x = W + i * 50;
+      b.y = H * (0.1 + Math.random() * 0.18);
+      b._speed = 0.4 + Math.random() * 0.2;
+      b._baseY = b.y;
+      b._phase = Math.random() * Math.PI * 2;
+      bgLayer.addChild(b);
+      bgBirds.push(b);
+    }
   }
 }
 
