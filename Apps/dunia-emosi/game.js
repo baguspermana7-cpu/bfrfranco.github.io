@@ -10845,35 +10845,40 @@ function initGame18() {
 function g18RenderGallery() {
   const grid = document.getElementById('g18-card-grid')
   grid.innerHTML = ''
-  // First 12 = Ambarawa/Indonesia historic, rest = World trains
-  const ambarawaCount = 12
+  // Partition: Ambarawa (indices 0-11), Modern Indonesia (🇮🇩 outside Ambarawa), World (everything else)
+  const AMBARAWA_END = 12
+  const buckets = { ambarawa: [], modernID: [], world: [] }
   G18_TRAINS.forEach((train, i) => {
-    if (i === 0) {
-      const hdr = document.createElement('div')
-      hdr.style.cssText = 'grid-column:1/-1;color:#FFD082;font-size:12px;font-weight:900;letter-spacing:1.5px;padding:4px 2px 2px;border-bottom:1.5px solid rgba(255,193,100,0.35);margin-bottom:2px;'
-      hdr.textContent = '🏛️ KOLEKSI MUSEUM AMBARAWA & INDONESIA'
-      grid.appendChild(hdr)
-    } else if (i === ambarawaCount) {
-      const hdr = document.createElement('div')
-      hdr.style.cssText = 'grid-column:1/-1;color:rgba(180,210,255,0.9);font-size:12px;font-weight:900;letter-spacing:1.5px;padding:10px 2px 2px;border-bottom:1.5px solid rgba(150,200,255,0.25);margin-bottom:2px;'
-      hdr.textContent = '🌍 KERETA TERKENAL DUNIA'
-      grid.appendChild(hdr)
-    }
-
-    const card = document.createElement('div')
-    card.className = 'g18-card'
-    if (i < ambarawaCount) card.style.borderColor = 'rgba(255,193,80,0.35)'
-    else card.style.borderColor = 'rgba(100,150,255,0.35)'
-    const svgHtml = g18TrainSVG(train, 110, 48)
-    card.innerHTML = `
-      <div style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;overflow:hidden;">${svgHtml}</div>
-      <div class="g18-card-name" style="font-size:11px;">${train.name}</div>
-      <div class="g18-card-country" style="font-size:9px;">${train.country.split(',')[0]}</div>
-      <div class="g18-speed-badge">⚡ ${train.speed} km/j</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:9px;font-weight:700;margin-top:2px;">${train.year}</div>
-    `
-    card.onclick = () => g18ShowDetail(i)
-    grid.appendChild(card)
+    if (i < AMBARAWA_END) buckets.ambarawa.push({ train, i })
+    else if (train.country && train.country.startsWith('🇮🇩')) buckets.modernID.push({ train, i })
+    else buckets.world.push({ train, i })
+  })
+  const sections = [
+    { items: buckets.ambarawa, title: '🏛️ KOLEKSI MUSEUM AMBARAWA', color: '#FFD082', borderCol: 'rgba(255,193,80,0.35)', ruleCol: 'rgba(255,193,100,0.35)' },
+    { items: buckets.modernID, title: '🇮🇩 KERETA MODERN INDONESIA',  color: '#FCA5A5', borderCol: 'rgba(252,165,165,0.4)',  ruleCol: 'rgba(252,165,165,0.35)' },
+    { items: buckets.world,    title: '🌍 KERETA TERKENAL DUNIA',    color: 'rgba(180,210,255,0.9)', borderCol: 'rgba(100,150,255,0.35)', ruleCol: 'rgba(150,200,255,0.25)' }
+  ]
+  sections.forEach(sec => {
+    if (!sec.items.length) return
+    const hdr = document.createElement('div')
+    hdr.style.cssText = `grid-column:1/-1;color:${sec.color};font-size:12px;font-weight:900;letter-spacing:1.5px;padding:10px 2px 2px;border-bottom:1.5px solid ${sec.ruleCol};margin-bottom:2px;`
+    hdr.textContent = sec.title
+    grid.appendChild(hdr)
+    sec.items.forEach(({ train, i }) => {
+      const card = document.createElement('div')
+      card.className = 'g18-card'
+      card.style.borderColor = sec.borderCol
+      const svgHtml = g18TrainSVG(train, 110, 48)
+      card.innerHTML = `
+        <div style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;overflow:hidden;">${svgHtml}</div>
+        <div class="g18-card-name" style="font-size:11px;">${train.name}</div>
+        <div class="g18-card-country" style="font-size:9px;">${train.country.split(',')[0]}</div>
+        <div class="g18-speed-badge">⚡ ${train.speed} km/j</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:9px;font-weight:700;margin-top:2px;">${train.year}</div>
+      `
+      card.onclick = () => g18ShowDetail(i)
+      grid.appendChild(card)
+    })
   })
 }
 
