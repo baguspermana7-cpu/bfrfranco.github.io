@@ -692,6 +692,26 @@ function buildTrackDecorations(W,H){
 
   worldContainer.addChild(g)
 
+  // Railway signal masts (every 380px, farther apart than telegraph) — red/green alternating
+  for (let wx = 260; wx < WORLD_LENGTH + W; wx += 380) {
+    const sg = new PIXI.Graphics()
+    const isRed = Math.round(wx / 380) % 2 === 0
+    const color = isRed ? 0xef4444 : 0x22c55e
+    // Mast
+    sg.rect(-2.5, -75, 5, 75).fill({ color: 0x374151 })
+    // Arm
+    sg.rect(-2.5, -70, 22, 3).fill({ color: 0x1f2937 })
+    // Lamp housing
+    sg.circle(22, -69, 7).fill({ color: 0x0f172a })
+    sg.circle(22, -69, 7).stroke({ color: 0x6b7280, width: 1.5 })
+    // Lamp core + glow
+    sg.circle(22, -69, 13).fill({ color, alpha: 0.28 })
+    sg.circle(22, -69, 4.5).fill({ color })
+    sg.x = wx
+    sg.y = tY + 16
+    worldContainer.addChild(sg)
+  }
+
   // Forest/mountain silhouettes
   if(BG_THEME_IDX===2||BG_THEME_IDX===3){
     const sg=new PIXI.Graphics()
