@@ -5002,17 +5002,15 @@ function pokeTierScale(slug){
 
 function pokeSprite(slug){return `assets/Pokemon/sprites/${slug}.png`}
 function pokeSpriteArtwork(slug){return `https://img.pokemondb.net/artwork/large/${slug}.jpg`}
-function pokeSpriteOnline(slug){return `assets/Pokemon/sprites/${slug}.png`}
+function pokeSpriteOnline(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
 function pokeSpriteCDN(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
 function pokeSpriteBackup(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
 function pokeSpriteBack(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`}
 // SVG variant — 751 vector Pokemon sprites for visual variety
 function pokeSpriteSVG(slug){const id=POKE_IDS[slug];return id?`assets/Pokemon/svg/${id}.svg`:null}
-// Random variant: 50% chance HD raster, 50% SVG vector (different art style per session)
+// HD priority: local SVG (751 covered) → HD CDN raster. Low-res only as offline fallback.
 function pokeSpriteVariant(slug){
-  const svgUrl=pokeSpriteSVG(slug)
-  if(svgUrl && Math.random()<0.5) return svgUrl
-  return pokeSpriteOnline(slug)
+  return pokeSpriteSVG(slug) || pokeSpriteCDN(slug)
 }
 
 // ── TRAINER PARTIES ──
@@ -5393,13 +5391,16 @@ function g10NewBattle(){
   function loadSprPlayer(imgId, pokeId, slug){
     const el=document.getElementById(imgId)
     el.className=el.className.replace(/\bspr-\w+/g,'').trim()
-    el.style.opacity='1'; el.style.imageRendering='pixelated'
-    // Local first, HD online fallback, then PokeAPI
-    el.src = `assets/Pokemon/sprites/${slug}.png`
-    el.onerror = () => {
+    el.style.opacity='1'; el.style.imageRendering='auto'
+    // HD variant first (SVG or CDN), low-res local only as offline fallback
+    const variantSrc = pokeSpriteVariant(slug)
+    const test = new Image()
+    test.onload = () => { el.src = variantSrc }
+    test.onerror = () => {
       el.src = pokeSpriteCDN(slug)
-      el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null }
+      el.onerror = () => { el.src = pokeSprite(slug); el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null } }
     }
+    test.src = variantSrc
   }
   loadSprHD('g10-espr', s.enemyPoke.slug, s.enemyPoke.id)
   loadSprPlayer('g10-pspr', s.playerPoke.id, s.playerPoke.slug)
