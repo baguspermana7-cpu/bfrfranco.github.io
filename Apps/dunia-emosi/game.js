@@ -4991,6 +4991,14 @@ const TYPE_TEXTCOLOR={electric:'#1a1a1a',ice:'#1a1a1a',normal:'white',rock:'whit
 
 // Global slug→id lookup built from POKEMON_DB
 const POKE_IDS = Object.fromEntries(POKEMON_DB.map(p=>[p.slug,p.id]))
+// Global slug→tier lookup (1=basic, 2=1st evo, 3=2nd evo, 4=legendary)
+const POKE_TIERS = Object.fromEntries(POKEMON_DB.map(p=>[p.slug,p.tier]))
+// Tier-based size scaling for sprite consistency across games
+// basic 1.0×, 1st evo 1.2×, 2nd evo / legendary 1.3×
+function pokeTierScale(slug){
+  const t = POKE_TIERS[slug] || 1
+  return ({1:1.0, 2:1.2, 3:1.3, 4:1.3})[t] || 1.0
+}
 
 function pokeSprite(slug){return `assets/Pokemon/sprites/${slug}.png`}
 function pokeSpriteArtwork(slug){return `https://img.pokemondb.net/artwork/large/${slug}.jpg`}
@@ -5626,12 +5634,13 @@ function g10DoAttack(type, fromSide, toSide, onDone){
   const atkEl = document.getElementById('g10-atk-fx')
   const emojiEl = document.getElementById('g10-atk-emoji')
 
-  // Aura ring on attacker
-  const auraColors = {Fire:'#f97316',Water:'#38bdf8',Grass:'#4ade80',Electric:'#facc15',
-    Psychic:'#e879f9',Ice:'#67e8f9',Dragon:'#818cf8',Dark:'#6b7280',Fighting:'#f87171',
-    Ghost:'#c084fc',Steel:'#94a3b8',Fairy:'#f9a8d4',Rock:'#a8a29e',Ground:'#d97706',
-    Flying:'#7dd3fc',Bug:'#a3e635',Poison:'#a855f7',Normal:'#d1d5db'}
-  const auraColor = auraColors[type] || '#a78bfa'
+  // Aura ring on attacker — type keys lowercase to match POKEMON_DB.type values
+  const auraColors = {fire:'#f97316',water:'#38bdf8',grass:'#4ade80',electric:'#facc15',
+    psychic:'#e879f9',ice:'#67e8f9',dragon:'#818cf8',dark:'#6b7280',fighting:'#f87171',
+    ghost:'#c084fc',steel:'#94a3b8',fairy:'#f9a8d4',rock:'#a8a29e',ground:'#d97706',
+    flying:'#7dd3fc',bug:'#a3e635',poison:'#a855f7',normal:'#d1d5db'}
+  const typeLow = (type || '').toLowerCase()
+  const auraColor = auraColors[typeLow] || '#a78bfa'
   const fromWrapId = fromSide === 'player' ? 'g10-pspr-wrap' : 'g10-espr-wrap'
   const fromWrapEl = document.getElementById(fromWrapId)
   // Aura ring — Pixi primary, DOM fallback
@@ -7087,6 +7096,9 @@ function _initGame13Impl() {
   // Ensure overlays hidden, qpanel fully visible
   const evoOv = document.getElementById('g13-evo-overlay'); if(evoOv) evoOv.style.display = 'none'
   hideGameResult()
+  // Reset sprite state from previous level (defeat/hit/atk animations)
+  const pspr0 = document.getElementById('g13-pspr'); if (pspr0) pspr0.classList.remove('spr-defeat','spr-hit','spr-flash','spr-atk','wild-die','wild-enter')
+  const wspr0 = document.getElementById('g13-wspr'); if (wspr0) wspr0.classList.remove('spr-defeat','spr-hit','spr-flash','spr-atk','wild-die','wild-enter')
   const qp = document.getElementById('g13-qpanel')
   if (qp) { qp.style.opacity = '1'; qp.style.pointerEvents = ''; qp.style.display = 'flex' }
   const evoBtn = document.getElementById('g13-evo-btn')
@@ -8525,7 +8537,7 @@ function showGameResult({ emoji, title, stars, msg, buttons }) {
     const el = document.createElement('button')
     el.className = 'gr-btn ' + (i === 0 ? 'gr-btn-primary' : 'gr-btn-secondary')
     el.textContent = b.label
-    el.onclick = () => { playClick(); hideGameResult(); b.action() }
+    el.onclick = () => { playClick(); hideGameResult(); requestAnimationFrame(() => b.action()) }
     btns.appendChild(el)
   })
   document.getElementById('game-result-overlay').classList.add('show')

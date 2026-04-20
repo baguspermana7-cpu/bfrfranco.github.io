@@ -1,5 +1,32 @@
 # Changelog — Dunia Emosi
 
+## 2026-04-20 — Evening Session
+
+### Bug Fixes
+- **G13**: Level Berikutnya freeze fixed — `showGameResult` button handler now wraps `b.action()` in `requestAnimationFrame` so modal `display:none` flushes before new level init. `initGame13` also clears stale sprite classes from previous level's victory/defeat animations.
+- **G10**: Attack effect regression — `auraColors` map used capitalized keys (`Fire`, `Water`) but `POKEMON_DB.type` is lowercase (`fire`, `water`). Fixed to lowercase + added `typeLow` normalization for defensive safety. Silent fallback to purple aura is gone; type colors now render correctly.
+- **Cache bust**: `game.js` + `style.css` version `?v=20260418b` → `?v=20260420a` so fixes propagate to users with cached assets.
+
+### Added
+- `POKE_TIERS` global slug→tier lookup + `pokeTierScale(slug)` helper (game.js near POKEMON_DB). Returns 1.0 / 1.2 / 1.3 / 1.3.
+- CODING-STANDARDS.md section **Pokemon Assets Standard** — enforces tier-based sprite scaling across Pokemon games (G10/G13/G13b/G13c/G22, G19 exempted).
+- CODING-STANDARDS.md section **Type Key Convention** — lowercase enforcement for all Pokemon type-keyed maps.
+- CODING-STANDARDS.md section **Attack Effect Chain** — documents the 8-stage G10 pattern as standard for all battle games.
+- CODING-STANDARDS.md section **Documentation Workflow** — mandate: every fix must update BOTH TODO-GAME-FIXES.md AND CODING-STANDARDS.md.
+- Memory feedback: `feedback_always_document.md` enforces workflow at session start.
+
+### Deferred (not blocking)
+- Repo split migration: push to `baguspermana7-cpu/Dunia-Emosi` failed HTTP 408 (790 MB initial push timeout). Retry strategy TBD.
+- Full live-test of G10 attack chain — aura color was a known bug; other 7 stages need visual confirmation.
+
+### Note — Tier Scale Discrepancy
+Previous changelog entry (v2.2.0) documented tier 4 legendary as 1.6×. Current
+standard per user mandate (2026-04-20) is 1.3× for both tier 3 and tier 4.
+`pokeTierScale` helper uses 1.3× for both. Inconsistent legacy inline code may
+still use 1.6× for legendaries.
+
+---
+
 ## v2.2.0 — 2026-04-13
 ### Bug Fixes
 - G13b: "Lanjut" button now correctly closes Level Complete modal before starting new round (critical bug — game was stuck)

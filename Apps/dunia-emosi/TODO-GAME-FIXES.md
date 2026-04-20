@@ -36,6 +36,32 @@
 - ✅ GameModal confetti: standalone games get graded confetti via game-modal.js
 - ✅ spawnSparkles() graded: accepts starCount param for intensity scaling
 
+## ✅ COMPLETED 2026-04-20 (Session 2 — Evening)
+
+### G13 Pertarungan Pokemon — Level Berikutnya Freeze (P1)
+- ✅ **Button handler**: `showGameResult` onclick wrapped in `requestAnimationFrame(()=>b.action())` — modal `display:none` flushed before next level init (game.js:8528)
+- ✅ **Stale sprite cleanup**: `initGame13()` resets sprite classes (spr-defeat/spr-hit/spr-flash/spr-atk/wild-die/wild-enter) on both `g13-pspr` and `g13-wspr` (game.js:~7089)
+- ✅ **Cache bust**: `game.js` + `style.css` version `?v=20260418b` → `?v=20260420a` (index.html)
+- **Root cause**: old sprite classes from victory animation persisted; modal dismiss raced with new-level init
+
+### Pokemon Tier Sprite Scaling — Global Standard (P2)
+- ✅ **Global helper added**: `POKE_TIERS` lookup + `pokeTierScale(slug)` in game.js near POKEMON_DB (game.js:4993)
+- ✅ **Scale standard** (MANDATORY for all Pokemon games):
+  - tier 1 (basic, e.g., Charmander, Eevee) = 1.0×
+  - tier 2 (1st evo) = 1.2×
+  - tier 3 (2nd evo / final) = 1.3×
+  - tier 4 (legendary) = 1.3×
+- **Application**: G10 already has tier sizing inline (line 5414-5419, 5233-5236) — cache bust propagates fix
+- **Scope**: G10, G13, G13b, G13c, G22 (G19 skip — roster manually curated with per-entry scale)
+
+### G10 Pertarungan Pokemon — Hit Effect Regression (P3)
+- ✅ **Fixed `auraColors` key mismatch**: was capitalized `Fire/Water/...` keys, but POKEMON_DB `type` is lowercase → lookup always fell back to default purple (game.js:5638)
+- ✅ **Added `typeLow` normalization**: `type.toLowerCase()` before key lookup for safety
+- 🔧 **REMAINING**: Full live-test to confirm all 8 effect stages visible (audio → aura → name popup → lunge → particles → projectile → screen flash → shake)
+
+## 🔧 WORKFLOW RULE (user mandate 2026-04-20)
+**ALWAYS update TODO-GAME-FIXES.md + documentation/standarization/ docs for every fix or new pattern.** Not optional. Reference: feedback_always_document.md in memory.
+
 ## ✅ COMPLETED 2026-04-20
 
 ### G22 Monster Wants Candy — Pokeball Category Visual Match
@@ -164,7 +190,7 @@
 ### G10 — Pertarungan Pokemon
 - ✅ **Platform/pedestal**: Made CSS `.g10-oval` more visible — brown color, border, larger size (110x22px)
 - ✅ **HD sprites restored**: Reverted from local-first (96px) back to HD-online-first (pokemondb 200-300px) with local fallback
-- ✅ **Hit effect**: Code exists (spr-hit, spr-flash, g10EHitFlip animations) — should be visible now with HD sprites
+- 🔧 **Hit effect (REGRESSION 2026-04-20)**: auraColors keys fixed (lowercase). Full chain needs live verification — particles, projectile, flash, defender shake
 - ✅ **WebGL context lost freeze**: Fixed — `backToLevelSelect()` now calls `PixiManager.destroyAll()` to free WebGL context before returning to level select.
 - ✅ **Scoring fixed**: Double-normalization bug — `endGame()` normalized to 5-star, then `showResult()` re-normalized using raw `maxRounds`. Fixed by setting `state.maxPossibleStars=5` so showResult passes through.
 - ✅ **CRITICAL: Result modal frozen**: Fixed — `showResult()` now closes overlay-feedback and game-result-overlay before showing screen-result. Overlays were blocking button clicks.

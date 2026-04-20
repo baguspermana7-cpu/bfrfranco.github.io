@@ -161,3 +161,87 @@ screen-result
 - `requestAnimationFrame` for driving game loop only
 - All other animations: CSS transitions/keyframes (GPU composited)
 - Image format: WebP for backgrounds, PNG for characters/icons
+
+---
+
+## Pokemon Assets Standard (added 2026-04-20)
+
+### Sprite Tier Scaling — MANDATORY
+
+All Pokemon sprites across Pokemon-based games (G10, G13, G13b, G13c, G22) MUST use
+tier-based size scaling for visual consistency. Charizard (tier 3) should never
+appear smaller than Eevee (tier 2).
+
+| Tier | Meaning | Scale |
+|------|---------|-------|
+| 1 | Basic (e.g., Charmander, basic Eevee) | **1.0×** |
+| 2 | 1st evolution (e.g., Charmeleon) | **1.2×** |
+| 3 | 2nd evolution / final form (e.g., Charizard) | **1.3×** |
+| 4 | Legendary (e.g., Mewtwo) | **1.3×** |
+
+Use the global helper defined in `game.js` near POKEMON_DB:
+
+```js
+const scale = pokeTierScale(slug)  // returns 1.0 | 1.2 | 1.3
+el.style.width = el.style.height = `calc(min(44vw, 22vh) * ${scale})`
+```
+
+**Data source**: `POKEMON_DB[].tier` field. Unknown slug → fallback 1.0×.
+
+**Exemption**: G19 (Pokemon birds) has manually-curated `scale:X` per entry in its
+roster — do not override with tier helper there.
+
+### Type Key Convention — LOWERCASE ONLY
+
+All Pokemon type-keyed maps (colors, emojis, SFX configs, FX configs) MUST use
+lowercase keys to match `POKEMON_DB.type` field values:
+
+```js
+// ✅ CORRECT — matches POKEMON_DB.type='fire'
+const TYPE_COLORS = { fire:'#f97316', water:'#38bdf8', grass:'#4ade80' }
+
+// ❌ WRONG — lookup silently returns undefined → fallback to default color
+const TYPE_COLORS = { Fire:'#f97316', Water:'#38bdf8' }
+```
+
+**Rationale**: Past regression (G10 hit effect, 2026-04-20) — `auraColors` map
+used capitalized keys. Lookup always failed silently, falling back to purple.
+Attack effects looked broken even though all other infrastructure was intact.
+
+**Defensive pattern**: Normalize type at entry point of effect function:
+```js
+const typeLow = (type || '').toLowerCase()
+const color = TYPE_COLORS[typeLow] || DEFAULT
+```
+
+### Attack Effect Chain — Standard (G10 pattern)
+
+All Pokemon battle games SHOULD follow this 8-stage attack effect chain for
+consistency:
+
+1. `playAttackSound(type)` — type-specific audio cue
+2. Aura ring on attacker wrapper (Pixi primary, DOM fallback `.g10-aura-ring`)
+3. Move name popup (e.g., "Flamethrower!")
+4. `atkSpr.classList.add('spr-atk')` — lunge keyframe animation
+5. `g10TypeFX(type, toSide)` — type-specific particle burst at target
+6. Projectile flight via `element.animate([...])` WAAPI
+7. Screen type flash (`pixiTypeFlash` primary, `.poke-flash` CSS fallback)
+8. `defSpr.classList.add('spr-hit', 'spr-flash')` — defender shake + white flash
+
+Timing: ~700ms total. Attacker lunge starts immediately, projectile hits at 340ms,
+defender shake completes at 790ms. Adjust `onDone` callback timing if extending.
+
+---
+
+## Documentation Workflow — MANDATORY (added 2026-04-20)
+
+**Every fix, new pattern, or convention MUST be documented in BOTH places:**
+
+1. `TODO-GAME-FIXES.md` (project root) — add to current session's ✅ COMPLETED block
+2. This file (`CODING-STANDARDS.md`) — add a new section if it's a repeatable pattern
+
+**Why**: User mandate. Past issue — fixes silently applied were forgotten and
+users had to re-request. Source of truth prevents regression.
+
+**Cross-reference**: `~/.claude/.../feedback_always_document.md` enforces this at
+future session start.
