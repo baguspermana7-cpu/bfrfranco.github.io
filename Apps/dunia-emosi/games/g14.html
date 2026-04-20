@@ -473,6 +473,22 @@ async function initPixi() {
   L.speedlines = new PIXI.Container(); stage.addChild(L.speedlines)
 
   app.ticker.add(loop)
+
+  // Wire shared GamePause (game-modal.js)
+  try {
+    if (typeof GamePause !== 'undefined') {
+      GamePause.init({
+        bgmEl: document.getElementById('game-bgm'),
+        onResume: () => {
+          S.paused = false; S.running = true
+          document.getElementById('btn-pause').textContent = '⏸'
+          const pb = document.getElementById('position-badge'); if (pb) pb.textContent = '🏁 Lanjut!'
+        },
+        onRetry: () => { location.reload() },
+        onHome:  () => { S.running = false; history.back() }
+      })
+    }
+  } catch(_){}
 }
 
 // ── Sky ───────────────────────────────────────────────────
@@ -1894,7 +1910,11 @@ function togglePause() {
   S.running = !S.paused
   document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
   document.getElementById('position-badge').textContent = S.paused ? '⏸ PAUSE' : '🏁 Lanjut!'
-  try{const bgm=document.getElementById('game-bgm');S.paused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
+  if (typeof GamePause !== 'undefined') {
+    if (S.paused) GamePause.show(); else GamePause.hide()
+  } else {
+    try{const bgm=document.getElementById('game-bgm');S.paused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
+  }
 }
 
 // Save level progress directly to localStorage
