@@ -4994,7 +4994,8 @@ const POKE_IDS = Object.fromEntries(POKEMON_DB.map(p=>[p.slug,p.id]))
 
 function pokeSprite(slug){return `assets/Pokemon/sprites/${slug}.png`}
 function pokeSpriteArtwork(slug){return `https://img.pokemondb.net/artwork/large/${slug}.jpg`}
-function pokeSpriteOnline(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
+function pokeSpriteOnline(slug){return `assets/Pokemon/sprites/${slug}.png`}
+function pokeSpriteCDN(slug){return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`}
 function pokeSpriteBackup(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
 function pokeSpriteBack(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`}
 // SVG variant — 751 vector Pokemon sprites for visual variety
@@ -5377,20 +5378,18 @@ function g10NewBattle(){
     testVar.onerror = () => {
       // Fallback: local PNG → online HD → PokeAPI
       el.src = `assets/Pokemon/sprites/${slug}.png`
-      el.onerror = () => { el.src = pokeSpriteOnline(slug); el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null } }
+      el.onerror = () => { el.src = pokeSpriteCDN(slug); el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null } }
     }
     testVar.src = variantSrc
   }
   function loadSprPlayer(imgId, pokeId, slug){
     const el=document.getElementById(imgId)
     el.className=el.className.replace(/\bspr-\w+/g,'').trim()
-    el.style.opacity='1'; el.style.imageRendering='auto'
-    // HD online first, local fallback
-    el.src = pokeSpriteOnline(slug)
+    el.style.opacity='1'; el.style.imageRendering='pixelated'
+    // Local first, HD online fallback, then PokeAPI
+    el.src = `assets/Pokemon/sprites/${slug}.png`
     el.onerror = () => {
-      // Fallback: local sprite → PokeAPI
-      el.style.imageRendering = 'pixelated'
-      el.src = `assets/Pokemon/sprites/${slug}.png`
+      el.src = pokeSpriteCDN(slug)
       el.onerror = () => { el.src = pokeSpriteBackup(pokeId); el.onerror = null }
     }
   }
@@ -7937,7 +7936,7 @@ function g13bSpawnWild() {
     wspr.classList.remove('wild-enter','wild-die','wspr-hit')
     wspr.style.opacity = '1'
     wspr.src = pokeSpriteOnline(wild.slug)
-    wspr.onerror = function(){ this.src=pokeSprite(wild.slug); this.onerror=()=>{ this.alt = wild.icon || '?' } }
+    wspr.onerror = function(){ this.src=pokeSpriteCDN(wild.slug); this.onerror=()=>{ this.alt = wild.icon || '?' } }
     // Apply tier-based size scaling
     const tierScale = {1:1.0, 2:1.2, 3:1.3, 4:1.3}[wild.tier||1] || 1.0
     wspr.style.width = wspr.style.height = tierScale === 1.0 ? '' : `calc(min(44vw,26vh) * ${tierScale})`
@@ -8197,7 +8196,7 @@ function g13bWildEscape() {
     const wspr = document.getElementById('g13b-wspr')
     if (wspr) {
       wspr.src = pokeSpriteOnline(wild.slug)
-      wspr.onerror = function(){ this.src=pokeSprite(wild.slug); this.onerror=null }
+      wspr.onerror = function(){ this.src=pokeSpriteCDN(wild.slug); this.onerror=null }
       wspr.classList.remove('wild-enter', 'wild-die', 'wspr-hit')
       void wspr.offsetWidth
       wspr.classList.add('wild-enter')
