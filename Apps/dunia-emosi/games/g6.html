@@ -301,6 +301,18 @@ async function initPixi() {
   stage.addChild(layers.fx)
 
   app.ticker.add(loop)
+
+  // Wire shared pause menu (game-modal.js GamePause)
+  try {
+    if (typeof GamePause !== 'undefined') {
+      GamePause.init({
+        bgmEl: document.getElementById('game-bgm'),
+        onResume: () => { S.paused = false; document.getElementById('btn-pause').textContent = '⏸' },
+        onRetry:  () => { location.reload() },
+        onHome:   () => { S.running = false; history.back() }
+      })
+    }
+  } catch(_){}
 }
 
 // ── Background ────────────────────────────────────────────────────
@@ -995,7 +1007,11 @@ function showFinish() {
 function togglePause() {
   S.paused = !S.paused
   document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸'
-  try{const bgm=document.getElementById('game-bgm');S.paused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
+  if (typeof GamePause !== 'undefined') {
+    if (S.paused) GamePause.show(); else GamePause.hide()
+  } else {
+    try{const bgm=document.getElementById('game-bgm');S.paused?bgm.pause():bgm.play().catch(()=>{})}catch(_){}
+  }
 }
 
 function finishGame() { try{document.getElementById('game-bgm').pause()}catch(_){}; goBack() }
