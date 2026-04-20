@@ -380,12 +380,12 @@ const ACHIEVEMENTS = {
 
 // Asset fallback system
 const ASSET_FALLBACK = {
-  'leo-happy.png':'🦁','leo-excited.png':'🦁','leo-sad.png':'🦁',
-  'leo-surprised.png':'🦁','leo-proud.png':'🦁','leo-thinking.png':'🦁',
-  'car-red.png':'🚗','car-blue.png':'🚙','rocket.png':'🚀','submarine.png':'🤿',
+  'leo-happy.webp':'🦁','leo-excited.webp':'🦁','leo-sad.webp':'🦁',
+  'leo-surprised.webp':'🦁','leo-proud.webp':'🦁','leo-thinking.webp':'🦁',
+  'car-red.webp':'🚗','car-blue.webp':'🚙','rocket.png':'🚀','submarine.webp':'🤿',
   'bg-city.webp':null,'bg-forest.webp':null,'bg-space.webp':null,'bg-body.webp':null,'bg-menu.webp':null,
   'obstacle-cone.png':'🚧','obstacle-rock.png':'🪨','obstacle-asteroid.png':'☄️','obstacle-bacteria.png':'🦠',
-  'img-ayam.png':'🐓','img-bebek.png':'🦆','img-cicak.png':'🦎','img-domba.png':'🐑','img-elang.png':'🦅',
+  'img-ayam.webp':'🐓','img-bebek.webp':'🦆','img-cicak.png':'🦎','img-domba.png':'🐑','img-elang.png':'🦅',
   'img-gajah.png':'🐘','img-harimau.png':'🐯','img-ikan.png':'🐟','img-jerapah.png':'🦒','img-kuda.png':'🐴',
   'img-monyet.png':'🐒','img-panda.png':'🐼','img-rusa.png':'🦌','img-singa.png':'🦁','img-tikus.png':'🐭',
   'img-apel.png':'🍎','img-bola.png':'⚽','img-buku.png':'📚','img-daun.png':'🍃','img-meja.png':'🪑'
