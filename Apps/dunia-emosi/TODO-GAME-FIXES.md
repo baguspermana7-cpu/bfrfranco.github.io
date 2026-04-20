@@ -81,6 +81,13 @@
 - ✅ **Signal posts**: 4 alternating red/green LED posts with soft glow, scroll at 0.6× train speed as mid-layer parallax.
 - Addresses "sparse, lacks detail" — all scenery depths now have movement.
 
+### G15 Lokomotif Pemberani — Scenery Detail
+- ✅ **Signal posts**: 4 alternating red/green posts along horizon, scroll with track at 0.6× gameSpeed.
+- ✅ **Bird flock**: 3-bird silhouette added on sunrise/forest/tropical themes (skipped night/mountain for visibility).
+
+### G16 Selamatkan Kereta — Railway Signals
+- ✅ **Semaphore masts**: Red/green signal masts every 380px along track — mast + arm + dark lamp housing + soft glow + red/green core. Scrolls with worldContainer parallax alongside telegraph poles.
+
 ## ✅ COMPLETED 2026-04-20 — G3 Huruf Hutan AAA Overhaul
 
 - ✅ **Background**: Switched from `bg-game3-huruf.webp` (bedroom-like overlay) to `bg-forest.webp`
@@ -112,19 +119,19 @@
 
 ### G14 — Balapan Kereta (Train Race)
 - ✅ **BGM**: Wired `train-bgm.mp3` (was `battle-bgm.mp3`)
-- ⬜ **Background/environment**: Very sparse, lacks detail, "gambar2 nggak jelas" (unclear images)
+- ✅ **Background/environment**: Added bird flock + signal posts for scenery movement at all parallax depths
 - ✅ **Buttons**: Removed emoji arrows (⬆️⬇️🚀), clean text only "Atas"/"Bawah"/"BOOST!" with pastel styling
-- ⬜ **Visual enhancement**: Train sprites, track, scenery all need more detail
+- ✅ **Visual enhancement**: Bird flock animates with wing-flap; red/green signal posts with soft glow scroll at 0.6× speed
 
 ### G15 — Lokomotif Pemberani
 - ✅ **BGM**: Wired `train-bgm.mp3`
 - ✅ **Train selection UI**: Cards enlarged (68→110px min, up to 150px on desktop), rounded corners, hover effects, bigger text (8→10px names, 6→7px subs), better spacing (gap 3→8px, padding increased)
-- ⬜ **Visual enhancement**: Overall gameplay visuals
+- ✅ **Visual enhancement**: Signal posts along horizon + 3-bird flock on sunrise/forest/tropical themes
 
 ### G16 — Selamatkan Kereta (Signal Rush)
 - ✅ **BGM**: Wired `train-bgm.mp3`
 - ✅ **Boost effect removed**: `clearObstacle()` now sets MOVING instead of BOOSTING — no more speed burst after quiz
-- ⬜ **Visual/animation enhancement**: More visual effects, better animations
+- ✅ **Visual/animation enhancement**: Added semaphore signal masts with red/green lamps + soft glow every 380px along track
 
 ### G17 — Jembatan Goyang
 - ✅ **banner-game17.webp**: Generated via Gemini API
