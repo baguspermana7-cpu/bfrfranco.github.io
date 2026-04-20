@@ -10147,6 +10147,8 @@ function initGame17() {
   document.getElementById('g17-level').textContent = `Lv.${lv}`
   document.getElementById('g17-stars-badge').textContent = '🌉 0'
   document.getElementById('g17-combo').textContent = ''
+  g17RenderLives()
+  const flEl = document.getElementById('g17-floaters'); if(flEl) flEl.innerHTML = ''
   hideGameResult()
   const trainWrap = document.getElementById('g17-train-waiting')
   trainWrap.style.animation = ''
@@ -10228,6 +10230,9 @@ function g17LightNextBlock() {
       const bg = document.getElementById('g17-bridge-group')
       if (bg) { bg.classList.add('bridge-shake'); setTimeout(() => bg.classList.remove('bridge-shake'), 520) }
       g17AddCrack()
+      g17RenderLives()
+      const lv = document.getElementById('g17-lives'); if (lv) { lv.classList.remove('heart-loss'); void lv.offsetWidth; lv.classList.add('heart-loss') }
+      g17SpawnFloater('dmg', '-1 💔', pick.el)
       playWrong()
       if (g17State.damage >= g17State.maxDamage) {
         g17EndGame(false)
@@ -10256,9 +10261,11 @@ function g17TapBlock(idx) {
     if (g17State.combo >= 3) {
       comboEl.textContent = `🔥 COMBO x${g17State.combo}!`
       comboEl.style.color = '#FDD835'
+      g17SpawnFloater('combo', `COMBO x${g17State.combo}!`, block.el)
     } else {
       comboEl.textContent = '✅ Tepat!'
       comboEl.style.color = '#A5D6A7'
+      g17SpawnFloater('bonus', '+1 ⭐', block.el)
     }
     playCorrect()
     const remaining = g17State.blocks.filter(b => !b.tapped)
@@ -10280,6 +10287,9 @@ function g17TapBlock(idx) {
     const bg = document.getElementById('g17-bridge-group')
     if (bg) { bg.classList.add('bridge-shake'); setTimeout(() => bg.classList.remove('bridge-shake'), 520) }
     g17AddCrack()
+    g17RenderLives()
+    const lv2 = document.getElementById('g17-lives'); if (lv2) { lv2.classList.remove('heart-loss'); void lv2.offsetWidth; lv2.classList.add('heart-loss') }
+    g17SpawnFloater('dmg', '-1 💔', block.el)
     playWrong()
     if (g17State.damage >= g17State.maxDamage) {
       clearTimeout(g17State.lightTimeout)
@@ -10298,6 +10308,29 @@ function g17AddCrack() {
   const angle = -10 + Math.random() * 20
   line.style.cssText = `top:${top}px;left:${left}%;width:${width}%;transform:rotate(${angle}deg);`
   cracks.appendChild(line)
+}
+
+function g17RenderLives() {
+  const el = document.getElementById('g17-lives'); if (!el) return
+  const remaining = Math.max(0, (g17State.maxDamage || 3) - (g17State.damage || 0))
+  el.textContent = '❤️'.repeat(remaining) + '🖤'.repeat((g17State.maxDamage || 3) - remaining)
+}
+
+function g17SpawnFloater(kind, text, el) {
+  const host = document.getElementById('g17-floaters'); if (!host) return
+  const f = document.createElement('div')
+  f.className = 'g17-floater ' + kind
+  f.textContent = text
+  const rect = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null
+  const hostRect = host.getBoundingClientRect()
+  if (rect) {
+    f.style.left = (rect.left - hostRect.left + rect.width/2) + 'px'
+    f.style.top  = (rect.top  - hostRect.top) + 'px'
+  } else {
+    f.style.left = '50%'; f.style.top = '40%'
+  }
+  host.appendChild(f)
+  setTimeout(() => f.remove(), 1200)
 }
 
 function g17EndGame(won) {

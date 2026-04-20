@@ -3250,6 +3250,30 @@ body { font-family: var(--font); color: var(--text); min-height: 100vh; overflow
   transform-origin:center;
 }
 
+/* G17 floating damage/bonus numbers */
+.g17-floater {
+  position:absolute;font-family:'Fredoka One',cursive;font-weight:900;font-size:24px;
+  text-shadow:0 2px 8px rgba(0,0,0,0.8),0 0 12px currentColor;
+  pointer-events:none;animation:g17FloatUp 1.1s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.g17-floater.dmg{color:#FCA5A5;}
+.g17-floater.bonus{color:#FDE68A;}
+.g17-floater.combo{color:#FDE047;font-size:28px;}
+@keyframes g17FloatUp {
+  0%   { opacity:0;transform:translate(-50%,0) scale(0.5); }
+  20%  { opacity:1;transform:translate(-50%,-10px) scale(1.25); }
+  100% { opacity:0;transform:translate(-50%,-60px) scale(0.9); }
+}
+
+/* G17 lives heart loss animation */
+@keyframes g17HeartShake {
+  0%,100% { transform:translateX(0) scale(1); }
+  25%     { transform:translateX(-3px) scale(1.15); }
+  50%     { transform:translateX(3px) scale(0.92); }
+  75%     { transform:translateX(-2px) scale(1.08); }
+}
+#g17-lives.heart-loss { animation:g17HeartShake 0.38s ease-out; }
+
 /* ===== TRAIN WHEEL + SMOKE ANIMATION (shared by G14/G17) ===== */
 @keyframes wheelSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 .train-wheel { transform-box:fill-box;transform-origin:center;animation:wheelSpin 0.48s linear infinite; }
