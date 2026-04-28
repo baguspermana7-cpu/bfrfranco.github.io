@@ -665,6 +665,59 @@ Every component needs `[data-theme="dark"]` overrides:
 </div>
 ```
 
+### 3.8 References Section `[REQUIRED]`
+
+**MANDATORY for every analytical article.** Place immediately before `<div class="author-bio">`. Minimum **10 cited sources**, each linking to its primary source URL. Every named statistic, organization, or third-party claim in the article body must have a corresponding reference entry.
+
+This section was previously omitted on articles 23&ndash;27 and is now retroactively required. The pattern is established in `article-1.html` (lines 2989+) and the same pattern is now in articles 23&ndash;27.
+
+**CSS** (inline in article `<style>`, placed before `</style>`):
+
+```css
+/* References Section */
+.references-section { background: #f8fafc; padding: 2rem; border-radius: 16px; margin: 3rem 0 0; }
+[data-theme="dark"] .references-section { background: rgba(15,23,42,0.55); }
+.references-title { font-size: 1.25rem; font-weight: 700; color: [PRIMARY]; margin-bottom: 1.5rem; }
+[data-theme="dark"] .references-title { color: [PRIMARY-LIGHT]; }
+.references-list { display: grid; gap: 0.75rem; }
+.reference-item { display: flex; gap: 0.75rem; font-size: 0.85rem; color: #334155; line-height: 1.6; }
+[data-theme="dark"] .reference-item { color: #cbd5e1; }
+.reference-number { color: [PRIMARY]; font-weight: 700; flex-shrink: 0; min-width: 1.75rem; }
+.reference-source { color: #64748b; font-size: 0.78rem; margin-top: 0.15rem; }
+[data-theme="dark"] .reference-source { color: #94a3b8; }
+.reference-item a { color: [PRIMARY-DARK]; text-decoration: none; }
+[data-theme="dark"] .reference-item a { color: [PRIMARY-LIGHT]; }
+.reference-item a:hover { text-decoration: underline; }
+```
+
+**HTML** (place before author-bio):
+
+```html
+<!-- References -->
+<div class="references-section">
+    <h3 class="references-title">References</h3>
+    <div class="references-list">
+        <div class="reference-item" id="ref-1">
+            <span class="reference-number">[1]</span>
+            <div>
+                [Author / Org]. ([Year]). <a href="[PRIMARY URL]" target="_blank" rel="noopener noreferrer"><em>[Title].</em></a>
+                <div class="reference-source">[One-line description of why this source is cited / what claim it supports]</div>
+            </div>
+        </div>
+        <!-- Repeat for each citation. Minimum 10. Cap at ~25 for readability. -->
+    </div>
+</div>
+```
+
+**Rules:**
+
+- All `<a>` tags must have `target="_blank" rel="noopener noreferrer"`.
+- Use the article&rsquo;s series accent color for `[PRIMARY]`/`[PRIMARY-DARK]`/`[PRIMARY-LIGHT]` (Engineering Journal blue, Global Analysis red, Future Forward violet).
+- Cite the most authoritative primary source (Uptime Institute, AFCOM, EPA, BLS, FERC, etc.) &mdash; not a third-party blog summary.
+- Use academic formatting: `Org. (Year). *Title.* URL.` followed by `<div class="reference-source">` describing why the source is cited.
+- Every named stat in the article must trace to exactly one entry in this list. Hover-link IDs (`#ref-N`) are optional but recommended.
+- See `LEGAL_COMPLIANCE_STANDARD.md` Section 5 for the related table-source disclaimer pattern (per-table source attribution remains a separate requirement).
+
 ---
 
 ## 4. Scripts `[REQUIRED]`
@@ -1366,7 +1419,15 @@ Full analysis: https://resistancezero.com/article-[NN].html
 - [ ] search-index.json: new entry added
 - [ ] Previous article: "Latest Article" span updated to link
 
-### 9.6 Social Media
+### 9.6 References Section `[REQUIRED]`
+- [ ] `<div class="references-section">` block present immediately before `<div class="author-bio">`
+- [ ] Minimum 10 reference items, each with primary URL
+- [ ] All `<a>` tags use `target="_blank" rel="noopener noreferrer"`
+- [ ] Every named statistic in article body traces to a reference entry
+- [ ] References CSS block included (light + dark mode)
+- [ ] Per-table source disclaimers also present (see `LEGAL_COMPLIANCE_STANDARD.md` Section 5)
+
+### 9.7 Social Media
 - [ ] X posts: all <= 280 chars (body only)
 - [ ] Mastodon posts: all <= 500 chars (body + hashtags)
 - [ ] LinkedIn post: <= 3000 chars
