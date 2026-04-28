@@ -1217,7 +1217,7 @@
             .dcj-calculator { padding: 1.25rem; }
             .dcj-chart-container { height: 220px; }
         }
-    .dcj-login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+    .dcj-login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; }
     .dcj-login-overlay.active { display:flex; }
     .dcj-login-box { background:linear-gradient(135deg,#0f172a,#1e293b); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:2rem; max-width:380px; width:90%; }
     .dcj-login-box h3 { margin:0 0 0.5rem 0; color:#f8fafc; }
@@ -1821,9 +1821,15 @@
         return mean + z * stddev;
     }
 
-    // ── Auth ──
+    // ── Auth ── (S1 pilot: prefer RZEngine.auth.getSession with legacy fallback)
     function hasProAccess() {
         if (proUnlocked) return true;
+        // Prefer the shared engine
+        if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.getSession) {
+            if (window.RZEngine.auth.getSession()) { proUnlocked = true; return true; }
+            return false;
+        }
+        // Legacy fallback if engine missing
         try {
             if (typeof window.hasProAccess === 'function') {
                 var result = window.hasProAccess();
@@ -1853,30 +1859,60 @@
     window.dcjHandleLogin = function() {
         var email = document.getElementById('dcjLoginEmail').value.trim();
         var pass = document.getElementById('dcjLoginPass').value;
-        var VALID = [
-            { email: 'demo@resistancezero.com', password: 'demo2026' },
-            { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
-            { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
-        ];
-        var found = VALID.some(function(u) {
-            return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;
-        });
-        if (found) {
-            localStorage.setItem('rz_premium_session', JSON.stringify({
-                email: email, tier: 'pro',
-                expires: new Date(Date.now() + 30 * 86400000).toISOString()
-            }));
+        var matched = null;
+
+        // S1 pilot: prefer RZEngine.auth for credential validation + session write
+        if (window.RZEngine && window.RZEngine.auth) {
+            matched = window.RZEngine.auth.validateLogin(email, pass);
+            if (matched) {
+                window.RZEngine.auth.setSession(matched.email, matched.tier, matched.role);
+                window.RZEngine.auth.dispatchAuthChange('login', { email: matched.email, tier: matched.tier });
+            }
+        } else {
+            // Legacy fallback if engine missing
+            var VALID = [
+                { email: 'demo@resistancezero.com', password: 'demo2026' },
+                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
+                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
+            ];
+            var found = VALID.some(function(u) {
+                return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;
+            });
+            if (found) {
+                matched = { email: email, tier: 'pro' };
+                localStorage.setItem('rz_premium_session', JSON.stringify({
+                    email: email, tier: 'pro',
+                    expires: new Date(Date.now() + 30 * 86400000).toISOString()
+                }));
+                window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                    detail: { email: email, tier: 'pro', action: 'login' }
+                }));
+            }
+        }
+
+        if (matched) {
             proUnlocked = true;
             dcjHideLogin();
             setMode('pro');
             dcjCalculate();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                detail: { email: email, tier: 'pro', action: 'login' }
-            }));
         } else {
             document.getElementById('dcjLoginError').style.display = 'block';
         }
     };
+
+    // Listen for navbar/auth.js login propagation
+    window.addEventListener('rz-auth-change', function(e) {
+        if (!e || !e.detail) return;
+        if (e.detail.action === 'login') {
+            proUnlocked = true;
+            try { dcjHideLogin(); } catch (err) {}
+            try { setMode('pro'); } catch (err) {}
+            try { dcjCalculate(); } catch (err) {}
+        } else if (e.detail.action === 'logout') {
+            proUnlocked = false;
+            try { setMode('free'); } catch (err) {}
+        }
+    });
 
     // Close on overlay click
     document.getElementById('dcjLoginOverlay').addEventListener('click', function(e) {
@@ -2666,5 +2702,6 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 </script>
 
 <script src="auth.js?v=20260324b"></script>
+<script src="rz-engine.js?v=2026-04-28"></script>
 </body>
 </html>
