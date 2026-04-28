@@ -1445,12 +1445,20 @@ Full analysis: https://resistancezero.com/article-[NN].html
 - [ ] CHANGELOG.md entry lists new glossary terms under this article's release section
 - [ ] Existing terms expanded if this article adds new variant, regulation, or product context
 
-### 9.8 CHANGELOG `[REQUIRED]`
+### 9.8 Discoverability `[REQUIRED]`
+> **Mandatory**: every new page (article, report, tracker, infographic, calculator) must be reachable through visible site navigation. Orphaned pages are not allowed.
+
+- [ ] Second Brain graph (`Apps/second brain/index.html`) has a node entry for the new page with at least 3 edges to relevant articles, calculators, glossary, and `rzeng` (RZEngine).
+- [ ] Glossary link is present in this page's navbar Insights dropdown AND footer NAVIGATION column (verify `grep -c 'href="glossary.html"' page.html` returns ≥ 2).
+- [ ] If the page is a report / tracker / infographic, it has at least one visible inbound link from a hub page (`insights.html` "Reports &amp; Trackers" cluster, `articles.html`, `dashboard.html`, or `datacenter-solutions.html`).
+- [ ] If the page is a report / tracker / infographic / market analysis, it includes a References section per §3.8 with ≥ 8 cited primary sources.
+
+### 9.9 CHANGELOG `[REQUIRED]`
 - [ ] Added an entry under the appropriate date section in `CHANGELOG.md`
 - [ ] Listed Added / Changed / Fixed / Removed items as applicable
 - [ ] Cross-referenced relevant standardization docs
 
-### 9.9 Social Media
+### 9.10 Social Media
 - [ ] X posts: all <= 280 chars (body only)
 - [ ] Mastodon posts: all <= 500 chars (body + hashtags)
 - [ ] LinkedIn post: <= 3000 chars

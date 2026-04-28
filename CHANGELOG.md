@@ -22,6 +22,28 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28g] — Discoverability Audit (glossary nav + report refs + graph sync)
+
+### Added
+- **Glossary navigation surfaces:** glossary link in navbar Insights dropdown across 65 HTML pages (color #14b8a6) and in the footer NAVIGATION column across 60 HTML pages.
+- **References sections** for the three highest-traffic report pages:
+  - `dc-market-tracker.html` — 10 citations (CBRE 2025 Global DC Trends, JLL 2025, Cushman &amp; Wakefield 2025, Synergy Research 2024, Uptime 2024, IEA 2024, McKinsey, BloombergNEF, Data Center Frontier, government / utility filings).
+  - `asean-dc-report-2026.html` — 10 citations (CBRE APAC, JLL Asia Outlook, Synergy, IMDA Singapore, Kominfo Indonesia, MyDigital Malaysia, DEPA Thailand, Cushman, IEA, Uptime APAC). This page was previously orphaned with zero inbound visible links — now linked from `insights.html`.
+  - `datahallAI.html` — 10 citations (NVIDIA H100/GB200 datasheets, Uptime AI Survey, Equinix AI-Ready, ASHRAE TC 9.9, OCP, Schneider EcoStruxure, SemiAnalysis, IEA, LBNL).
+- **Reports &amp; Trackers cluster** on `insights.html` — 6 cards surfacing `dc-market-tracker`, `asean-dc-report-2026`, `datahallAI`, and the 3 infographics. Closes the inbound-link gap.
+- **Second Brain graph** new nodes: `a27` (Article 27 Workforce Crisis), `rzeng` (RZEngine v1.2.0), `sse` (SUPER_ENGINE.md), `scep` (CALC_ENGINE_PLAN.md), `scmp` (CALC_MODELS_PLAN.md).
+
+### Fixed
+- **Second Brain graph CX Calculator (`ccx`)** was 0-connection — now linked to dash, sdcv, copx, croi, rzeng (5 edges).
+- **Second Brain graph Glossary (`glos`)** was 0-connection — now linked to idx, arts, ins, articles 23-27, calculators with terms (cpue, cpp, cpa), rzeng (12 edges).
+- **Second Brain graph stale labels:** `a24` was "FF-1: The Web Didn't Die" → now "Art-24: Manpower Shortage". `a25` was "FF-2: Engineer Shortage" → now "Art-25: PJM 6 GW Short". Both moved out of Future Forward tagging into their actual content categories.
+
+### Unreleased follow-ups (logged for next session)
+- References sections for the 10 `dc-market/*.html` city pages (~5 region-specific refs each).
+- References sections for `infographic-pue-global.html`, `infographic-dc-sustainability.html`, `infographic-dc-cost-breakdown.html`.
+- References sections for `dashboard.html` and `datacenter-solutions.html`.
+- Glossary link insertion for the ~29 standalone calculator pages with `.nav-links` (custom navbar pattern, separate audit).
+
 ## [2026-04-28f] — Super Engine S4 + S5 + S6 (capex/opex/tco/pue math + UI primitives)
 
 ### Added

@@ -634,9 +634,10 @@ const RAW=[
 
   /* ─ ARTICLES ─ */
   ...[...Array(23)].map((_,i)=>({id:`a${i+1}`,label:`Art-${i+1}`,group:'articles',url:`article-${i+1}.html`,desc:`DC engineering article #${i+1}.`,tags:['article','dc'],path:`rz-work/article-${i+1}.html`})),
-  {id:'a24',label:"FF-1: The Web Didn't Die", group:'articles',url:'article-24.html',desc:'Future Forward #1 — web split: walled gardens vs open protocols. Violet.',tags:['ff','web'],path:'rz-work/article-24.html'},
-  {id:'a25',label:'FF-2: Engineer Shortage',  group:'articles',url:'article-25.html',desc:'Future Forward #2 — DC engineer shortage is misdiagnosed. Amber.',tags:['ff','talent'],path:'rz-work/article-25.html'},
+  {id:'a24',label:'Art-24: Manpower Shortage',group:'articles',url:'article-24.html',desc:'DC manpower shortage and AI careers. Career Analysis. Emerald.',tags:['workforce','careers'],path:'rz-work/article-24.html'},
+  {id:'a25',label:'Art-25: PJM 6 GW Short',   group:'articles',url:'article-25.html',desc:'Global Analysis — PJM grid 6 GW shortfall by 2027 driven by DC load growth. Red.',tags:['grid','energy','pjm'],path:'rz-work/article-25.html'},
   {id:'a26',label:'Art-26: PFAS',             group:'articles',url:'article-26.html',desc:'Global Analysis — PFAS contamination from DC cooling maintenance vapor. Red.',tags:['pfas','cooling'],path:'rz-work/article-26.html'},
+  {id:'a27',label:'Art-27: Workforce Crisis', group:'articles',url:'article-27.html',desc:'Global Analysis — DC AI workforce shortage, 20 strategies, target year 2025–2030. Red.',tags:['workforce','shortage','ai'],path:'rz-work/article-27.html'},
   {id:'g1', label:'Geo-1: 72-Hour Warning',   group:'articles',url:'geopolitics-1.html',desc:'What happens to your DC in the first 72h of regional conflict.',tags:['geopolitics','risk'],path:'rz-work/geopolitics-1.html'},
   {id:'g2', label:'Geo-2: $50T Shift',        group:'articles',url:'geopolitics-2.html',desc:'$50T infrastructure shift reshaping global capital flows.',tags:['geopolitics','capital'],path:'rz-work/geopolitics-2.html'},
   {id:'g3', label:'Geo-3: Hormuz Shock',      group:'articles',url:'geopolitics-3.html',desc:'Undersea cable vulnerabilities through the Strait of Hormuz.',tags:['geopolitics','cable'],path:'rz-work/geopolitics-3.html'},
@@ -649,6 +650,12 @@ const RAW=[
   {id:'ctco',  label:'TCO Calculator',  group:'calculators',url:'tco-calculator.html',  desc:'Build vs Colo vs Cloud — WACC, NPV, S-curve. Dark mode.',tags:['tco','cloud'],path:'rz-work/tco-calculator.html'},
   {id:'cco2',  label:'Carbon Footprint',group:'calculators',url:'carbon-footprint.html',desc:'DC carbon emissions with renewable offset modeling.',tags:['carbon'],path:'rz-work/carbon-footprint.html'},
   {id:'ccx',   label:'CX Calculator',   group:'calculators',url:'cx-calculator.html',   desc:'Customer experience and SLA cost impact.',tags:['cx','sla'],path:'rz-work/cx-calculator.html'},
+
+  /* ─ SUPER ENGINE & PLANS (added 2026-04-28) ─ */
+  {id:'rzeng', label:'RZEngine v1.2.0',  group:'core',     url:'rz-engine.js',                          desc:'Super Engine — shared data, math models, plumbing, UI primitives. v1.2.0, 35 KB.',tags:['engine','core','shared'],path:'rz-work/rz-engine.js'},
+  {id:'sse',   label:'Super Engine Doc', group:'standards',url:'standarization/SUPER_ENGINE.md',         desc:'Master architectural design for window.RZEngine.',tags:['architecture','engine','plan'],path:'rz-work/standarization/SUPER_ENGINE.md'},
+  {id:'scep',  label:'Calc Engine Plan', group:'standards',url:'standarization/CALC_ENGINE_PLAN.md',     desc:'Plumbing roadmap (auth/modal/PDF/charts).',tags:['plan','engine'],path:'rz-work/standarization/CALC_ENGINE_PLAN.md'},
+  {id:'scmp',  label:'Calc Models Plan', group:'standards',url:'standarization/CALC_MODELS_PLAN.md',     desc:'Math roadmap (workforce/capex/opex/roi/tco/pue).',tags:['plan','engine'],path:'rz-work/standarization/CALC_MODELS_PLAN.md'},
 
   /* ─ COMPARISONS ─ */
   {id:'cpt',label:'Tier 3 vs Tier 4',    group:'comparisons',url:'compare-tier-3-vs-tier-4.html',      desc:'Uptime Institute Tier III vs IV — cost, uptime, redundancy. Premium 35-60%.',tags:['tier'],path:'rz-work/compare-tier-3-vs-tier-4.html'},
@@ -821,6 +828,24 @@ const E=[
   ['msec','rzops'],['maffil','aff'],
   /* feedback → projects */
   ['mfba','ademo'],['mfbm','dcmoc'],
+
+  /* ─ DISCOVERABILITY AUDIT 2026-04-28 — connect previously-isolated nodes ─ */
+  /* CX Calculator (was 0 connections) */
+  ['ccx','dash'],['ccx','sdcv'],['ccx','copx'],['ccx','croi'],['ccx','rzeng'],
+  /* Glossary (was 0 connections) */
+  ['glos','idx'],['glos','arts'],['glos','ins'],
+  ['glos','a23'],['glos','a24'],['glos','a25'],['glos','a26'],['glos','a27'],
+  ['glos','cpue'],['glos','cpp'],['glos','cpa'],['glos','rzeng'],
+  /* RZEngine — connects every calculator + dcmoc + planning docs */
+  ['rzeng','cpue'],['rzeng','ccap'],['rzeng','copx'],['rzeng','croi'],
+  ['rzeng','ctco'],['rzeng','cco2'],['rzeng','ccx'],
+  ['rzeng','a26'],['rzeng','a27'],['rzeng','a24'],
+  ['rzeng','dcmoc'],['rzeng','idx'],
+  ['rzeng','sse'],['rzeng','scep'],['rzeng','scmp'],
+  ['sse','scep'],['sse','scmp'],['sse','rzstd'],['sse','idx'],
+  /* Article 27 — workforce-adjacent */
+  ['a27','arts'],['a27','geo'],['a27','rzeng'],['a27','glos'],
+  ['a27','a24'],['a27','a25'],['arts','a27'],
 ];
 
 /* ── GRAPH ── */
