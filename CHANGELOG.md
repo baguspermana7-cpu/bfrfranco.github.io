@@ -22,6 +22,38 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28h] — Tier-2 Discoverability backlog cleared
+
+### Added
+- **References sections** on all 10 `dc-market/*.html` city pages (~6 region-specific citations each, 60 citations total). Each uses authoritative regional sources:
+  - Singapore: IMDA, EMA, NEA, CBRE APAC, JLL Asia, IEA.
+  - Jakarta: Kominfo, PLN, BPS, JLL Indonesia, CBRE Indonesia, Asia Cloud Computing Association.
+  - Kuala Lumpur: MyDigital, MCMC, TNB, JLL/Cushman/EPU Malaysia.
+  - Tokyo: METI, MIC, TEPCO, JEMA, JLL/CBRE Japan.
+  - Sydney: AEMO, AER, ACMA, JLL Australia, Clean Energy Council, CBRE Pacific.
+  - London: Ofgem, National Grid ESO, Ofcom, JLL UK, CBRE EMEA, techUK.
+  - Frankfurt: Bundesnetzagentur, BMWK, DENA, JLL/CBRE Germany, eco Association.
+  - Dubai: TDRA, DEWA, RTA, JLL/Cushman MENA, UAE Ministry of Energy.
+  - Mumbai: TRAI, CEA, MAHADISCOM, JLL/CBRE India, NIXI.
+  - Northern Virginia: Dominion Energy IRP, FERC, NERC, PJM, Loudoun County EDA, JLL Mid-Atlantic.
+- **References sections** on all 3 infographic pages (~6 citations each, 18 citations total):
+  - PUE Global: IRENA, Uptime, IEA, LBNL, ASHRAE, Green Grid.
+  - DC Sustainability: IEA, AWS, Google, Microsoft, Greenpeace, CDP.
+  - DC Cost Breakdown: CBRE, JLL, Uptime, NVIDIA, OCP, Schneider.
+- `<script src="rz-engine.js">` wired into `article-23.html`, `article-25.html` (joining article-24, article-26, article-27 as Super Engine consumers — 5 of 27 articles now load the engine).
+
+### Status of discoverability audit
+- ✅ All Tier-1 (high-traffic report pages) have References.
+- ✅ All Tier-2 (10 city pages + 3 infographics) have References.
+- ✅ Glossary navigation in navbar + footer across 65 pages.
+- ✅ Reports & Trackers cluster surfaces all reports from `insights.html`.
+- ✅ Second Brain graph: 0-edge nodes (CX, Glossary) connected; stale labels fixed; RZEngine + 3 plan docs added.
+
+### Remaining
+- `dashboard.html` and `datacenter-solutions.html` References — these are tool pages, references optional.
+- ~29 standalone calculator pages with `.nav-links` (custom navbar pattern) still need glossary link addition. Separate audit.
+- IIFE migration of article-26's PFAS calculator to `RZEngine.auth.*` (kept as A/B control through the v1.2.0 ship; can migrate now since the engine is stable).
+
 ## [2026-04-28g] — Discoverability Audit (glossary nav + report refs + graph sync)
 
 ### Added
