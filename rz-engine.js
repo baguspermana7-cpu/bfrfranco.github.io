@@ -30,7 +30,7 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '1.0.0',
+        version: '1.1.0',
         lastUpdated: '2026-04-28',
 
         // Target-Year selector — used by every forecasting calculator
@@ -269,11 +269,222 @@
             off: offEvent
         },
 
-        // Stubs filled in later phases — present so consumers can feature-detect.
+        // Math models — domain-specific calculations sharing engine constants.
+        // S2 ships workforce + roi + forecast. capex/opex/tco/pue follow in S4/S6.
         models: {
-            workforce: {}, capex: {}, opex: {}, roi: {}, tco: {}, pue: {}, forecast: {}
+            workforce: {
+                /**
+                 * Annual hires required to close the staffing gap by target year,
+                 * including replacement of attrition losses.
+                 */
+                annualHiresRequired: function (currentStaff, targetStaff, attritionRate, yearsToTarget) {
+                    var gap = Math.max(0, (targetStaff || 0) - (currentStaff || 0));
+                    var years = Math.max(1, yearsToTarget || 1);
+                    var attrition = (attritionRate || 0) / 100;
+                    var attritionLossPerYear = (currentStaff || 0) * attrition;
+                    return Math.ceil((gap + attritionLossPerYear * years) / years);
+                },
+
+                /**
+                 * Annual cost of attrition (replacing voluntary leavers).
+                 * Uses RZEngine.data.attritionFactors.replacementCostMult by default (213%).
+                 */
+                attritionCost: function (staff, attritionRate, avgSalary, replacementMult) {
+                    var mult = replacementMult || DATA.attritionFactors.replacementCostMult;
+                    return Math.round((staff || 0) * ((attritionRate || 0) / 100) * (avgSalary || 0) * mult);
+                },
+
+                /**
+                 * 0.0–1.0 fit score for a strategy given workforce mix.
+                 * `mix.phys` and `mix.noc` should sum to 1.0.
+                 */
+                strategyFitScore: function (strategy, mix) {
+                    if (!strategy || !mix) return 0;
+                    var physScore = strategy.ph ? 1.0 : 0.2;
+                    var nocScore = strategy.nc ? 1.0 : 0.2;
+                    return Math.min(1.0, physScore * (mix.phys || 0.5) + nocScore * (mix.noc || 0.5));
+                },
+
+                /**
+                 * Cumulative hires over a horizon, applying a retention factor.
+                 * `retentionFactor` defaults to RZEngine.data.attritionFactors.apprenticeRetention.
+                 */
+                cumulativeHires: function (annualHires, years, retentionFactor) {
+                    var retain = retentionFactor == null ? DATA.attritionFactors.apprenticeRetention : retentionFactor;
+                    return Math.round((annualHires || 0) * (years || 0) * retain);
+                },
+
+                /** Years required to close gap at the projected effective hire rate. */
+                yearsToCloseGap: function (staffGap, annualHires, strategyCoverage) {
+                    var effective = (annualHires || 0) * Math.max(0.3, strategyCoverage || 0.3);
+                    if (!effective || !staffGap || staffGap <= 0) return 0;
+                    return Math.ceil(staffGap / effective);
+                }
+            },
+
+            roi: {
+                /** Payback period in years. Returns Infinity if never recovered. */
+                paybackPeriod: function (initialCost, annualBenefit, annualCost) {
+                    var net = (annualBenefit || 0) - (annualCost || 0);
+                    if (net <= 0) return Infinity;
+                    return (initialCost || 0) / net;
+                },
+
+                /** Net present value of cashflows array (year 0 = first element). */
+                npv: function (cashflows, discountRate) {
+                    if (!Array.isArray(cashflows)) return 0;
+                    var r = discountRate || 0;
+                    return cashflows.reduce(function (acc, cf, t) {
+                        return acc + cf / Math.pow(1 + r, t);
+                    }, 0);
+                },
+
+                /** IRR via bisection. Returns null if no root in [-0.99, 10]. */
+                irr: function (cashflows, guess) {
+                    if (!Array.isArray(cashflows) || cashflows.length < 2) return null;
+                    var lo = -0.99, hi = 10, npv = function (r) {
+                        return cashflows.reduce(function (a, cf, t) { return a + cf / Math.pow(1 + r, t); }, 0);
+                    };
+                    var fLo = npv(lo), fHi = npv(hi);
+                    if (fLo * fHi > 0) return null;
+                    for (var i = 0; i < 60; i++) {
+                        var mid = (lo + hi) / 2, fMid = npv(mid);
+                        if (Math.abs(fMid) < 1e-6) return mid;
+                        if (fLo * fMid < 0) { hi = mid; fHi = fMid; } else { lo = mid; fLo = fMid; }
+                    }
+                    return (lo + hi) / 2;
+                }
+            },
+
+            forecast: {
+                /** Future value after `years` of compounding at `ratePct` (0.025 = 2.5%/yr). */
+                compoundGrowth: function (base, ratePct, years) {
+                    return (base || 0) * Math.pow(1 + (ratePct || 0), years || 0);
+                },
+
+                /**
+                 * Simple linear regression on [{x, y}, ...] points.
+                 * Returns {slope, intercept, predict(x)}.
+                 */
+                linearTrend: function (points) {
+                    if (!Array.isArray(points) || points.length < 2) return { slope: 0, intercept: 0, predict: function () { return 0; } };
+                    var n = points.length, sx = 0, sy = 0, sxy = 0, sxx = 0;
+                    for (var i = 0; i < n; i++) {
+                        sx += points[i].x; sy += points[i].y;
+                        sxy += points[i].x * points[i].y;
+                        sxx += points[i].x * points[i].x;
+                    }
+                    var slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+                    var intercept = (sy - slope * sx) / n;
+                    return {
+                        slope: slope,
+                        intercept: intercept,
+                        predict: function (x) { return slope * x + intercept; }
+                    };
+                },
+
+                /**
+                 * Project a value year-by-year. Returns array of {year, value} from startYear to endYear.
+                 */
+                projectByYear: function (startVal, ratePct, startYear, endYear) {
+                    var out = [];
+                    var v = startVal || 0;
+                    for (var y = startYear; y <= endYear; y++) {
+                        out.push({ year: y, value: Math.round(v) });
+                        v = v * (1 + (ratePct || 0));
+                    }
+                    return out;
+                }
+            },
+
+            // Stubs filled in S4/S6
+            capex: {}, opex: {}, tco: {}, pue: {}
         },
-        modal:  { create: null, show: null, hide: null },     // S1 (next)
+        /**
+         * Modal helper. Creates a singleton DOM element keyed by `id`, returns
+         * { show, hide, destroy }. Reuses existing element on repeat calls.
+         *
+         * Usage:
+         *   var m = RZEngine.modal.create({
+         *       id: 'myLogin', title: 'Pro Analysis', accentColor: '#dc2626',
+         *       bodyHTML: '<input id="email" placeholder="email">',
+         *       onSubmit: function(box){ ... },
+         *       submitLabel: 'Unlock', closeLabel: '×'
+         *   });
+         *   m.show();
+         */
+        modal: {
+            create: function (opts) {
+                opts = opts || {};
+                var id = opts.id || 'rz-modal-' + Math.random().toString(36).slice(2, 8);
+                var existing = root.document && root.document.getElementById(id);
+                if (existing) {
+                    return {
+                        show: function () { existing.classList.add('open'); },
+                        hide: function () { existing.classList.remove('open'); },
+                        destroy: function () { if (existing.parentNode) existing.parentNode.removeChild(existing); }
+                    };
+                }
+                if (!root.document) return { show: function () {}, hide: function () {}, destroy: function () {} };
+
+                var accent = opts.accentColor || '#dc2626';
+                var overlay = root.document.createElement('div');
+                overlay.id = id;
+                overlay.className = 'rz-modal-overlay';
+                overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);' +
+                    'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
+                    'z-index:9999;align-items:center;justify-content:center;';
+                overlay.innerHTML =
+                    '<div class="rz-modal-box" style="background:linear-gradient(145deg,#0f172a,#1e293b);' +
+                        'border-radius:12px;padding:2rem;width:min(380px,92vw);position:relative;' +
+                        'border:1px solid #334155;color:#f1f5f9;">' +
+                        '<button class="rz-modal-close" aria-label="Close" style="position:absolute;top:0.75rem;' +
+                            'right:0.75rem;background:none;border:none;color:#94a3b8;font-size:1.4rem;cursor:pointer;">' +
+                            (opts.closeLabel || '&times;') + '</button>' +
+                        '<h3 style="color:#f1f5f9;font-size:1.1rem;margin:0 0 0.4rem;">' +
+                            '<i class="fas fa-lock" style="color:' + accent + ';margin-right:0.4rem;"></i>' +
+                            (opts.title || 'Sign in') + '</h3>' +
+                        (opts.subtitle ? '<p style="color:#94a3b8;font-size:0.82rem;margin:0 0 1.25rem;">' + opts.subtitle + '</p>' : '') +
+                        '<div class="rz-modal-body">' + (opts.bodyHTML || '') + '</div>' +
+                        (opts.submitLabel ? '<button class="rz-modal-submit" style="width:100%;padding:0.7rem;' +
+                            'background:' + accent + ';color:#fff;border:none;border-radius:7px;font-size:0.9rem;' +
+                            'font-weight:700;cursor:pointer;margin-top:0.25rem;">' + opts.submitLabel + '</button>' : '') +
+                    '</div>';
+                (root.document.body || root.document.documentElement).appendChild(overlay);
+
+                // Inject opacity-class style once
+                if (!root.document.getElementById('rz-modal-css')) {
+                    var s = root.document.createElement('style');
+                    s.id = 'rz-modal-css';
+                    s.textContent = '.rz-modal-overlay.open{display:flex !important;}';
+                    root.document.head.appendChild(s);
+                }
+
+                overlay.querySelector('.rz-modal-close').addEventListener('click', function () {
+                    overlay.classList.remove('open');
+                });
+                var submitBtn = overlay.querySelector('.rz-modal-submit');
+                if (submitBtn && typeof opts.onSubmit === 'function') {
+                    submitBtn.addEventListener('click', function () {
+                        try { opts.onSubmit(overlay); } catch (e) {}
+                    });
+                }
+
+                return {
+                    show: function () { overlay.classList.add('open'); },
+                    hide: function () { overlay.classList.remove('open'); },
+                    destroy: function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+                };
+            },
+            show: function (id) {
+                var el = root.document && root.document.getElementById(id);
+                if (el) el.classList.add('open');
+            },
+            hide: function (id) {
+                var el = root.document && root.document.getElementById(id);
+                if (el) el.classList.remove('open');
+            }
+        },
         pdf:    { exportPDF: null, generateTable: null },     // S3
         charts: {                                              // S5
             histogram: null, tornado: null, sensitivity: null,

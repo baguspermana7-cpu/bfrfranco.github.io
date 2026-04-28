@@ -22,6 +22,22 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28e] — Super Engine S2 (workforce + ROI + forecast models) + modal helper
+
+### Added
+- **`RZEngine.models.workforce`** — `annualHiresRequired`, `attritionCost`, `strategyFitScore`, `cumulativeHires`, `yearsToCloseGap`. Closed-form math, defaults pulled from `RZEngine.data.attritionFactors` so a single benchmark refresh propagates to every workforce calculator.
+- **`RZEngine.models.roi`** — `paybackPeriod`, `npv` (with discount rate), `irr` (bisection over [-0.99, 10]).
+- **`RZEngine.models.forecast`** — `compoundGrowth`, `linearTrend` (returns `{slope, intercept, predict}`), `projectByYear` (year-by-year array).
+- **`RZEngine.modal.create({id, title, accentColor, subtitle, bodyHTML, submitLabel, onSubmit})`** — singleton modal helper. Auto-injects backdrop with `rgba(0,0,0,0.85)` + `backdrop-filter:blur(8px)` per PRO_MODE standard. Returns `{show, hide, destroy}` controls. Reuses existing element on repeat calls (idempotent).
+- Engine bumped to `v1.1.0`.
+
+### Changed
+- **article-27 IIFE** now calls `RZEngine.models.workforce.attritionCost(...)` and `RZEngine.models.workforce.annualHiresRequired(...)` for the corresponding KPIs (with hardcoded fallbacks if engine missing). This is the first calculator on the site to share math via the engine, not just constants.
+
+### Verified
+- Node smoke tests pass: `annualHiresRequired(25,35,25,5)=9`, `attritionCost(25,25,75100)=$999,769`, `paybackPeriod(100K,30K,5K)=4 yr`, `npv([-100,40×4],0.10)=$26.79`, `compoundGrowth(75100,0.025,5)=$84,969`, `linearTrend(slope=2)`.
+- localhost: `rz-engine.js` now `23 KB / 499 LOC` (well under 50 KB budget per SUPER_ENGINE §H).
+
 ## [2026-04-28d] — Super Engine S0 + S1 Shipped (skeleton + auth + data + format + events)
 
 ### Added

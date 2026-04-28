@@ -1922,14 +1922,16 @@
         var yearsToTarget = Math.max(1, targetYear - BASELINE_YEAR);
 
         var staffGap = Math.max(0, targetStaff - currentStaff);
-        // RZEngine pilot: pull benchmark + attrition factor from shared engine
+        // RZEngine S2 pilot: pull benchmark + use workforce.attritionCost model
         var baseDcTechSalary = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.salaryBenchmarks
             && window.RZEngine.data.salaryBenchmarks.dcTechMid
             && window.RZEngine.data.salaryBenchmarks.dcTechMid.US) || 72000;
         var avgSalary = Math.round(baseDcTechSalary * regionMult);
         var replacementFactor = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.attritionFactors
             && window.RZEngine.data.attritionFactors.replacementCostMult) || 2.13;
-        var annualAttritionCost = Math.round(currentStaff * (attritionRate / 100) * avgSalary * replacementFactor);
+        var annualAttritionCost = (window.RZEngine && window.RZEngine.models && window.RZEngine.models.workforce && window.RZEngine.models.workforce.attritionCost)
+            ? window.RZEngine.models.workforce.attritionCost(currentStaff, attritionRate, avgSalary, replacementFactor)
+            : Math.round(currentStaff * (attritionRate / 100) * avgSalary * replacementFactor);
 
         var totalSetup = 0, minSpeed = 9999, maxRisk = 0, totalOpAnnual = 0;
         var budgetMult = budgetTier === 'low' ? 0.25 : budgetTier === 'medium' ? 0.55 : 1.0;
@@ -1955,7 +1957,9 @@
 
         // New: hiring trajectory KPIs
         var annualAttritionLoss = Math.round(currentStaff * (attritionRate / 100));
-        var annualHires = yearsToTarget > 0 ? Math.ceil((staffGap + annualAttritionLoss * yearsToTarget) / yearsToTarget) : staffGap;
+        var annualHires = (window.RZEngine && window.RZEngine.models && window.RZEngine.models.workforce && window.RZEngine.models.workforce.annualHiresRequired)
+            ? window.RZEngine.models.workforce.annualHiresRequired(currentStaff, targetStaff, attritionRate, yearsToTarget)
+            : (yearsToTarget > 0 ? Math.ceil((staffGap + annualAttritionLoss * yearsToTarget) / yearsToTarget) : staffGap);
         var effectiveAnnualHires = Math.max(1, Math.round(annualHires * Math.max(0.3, coverage)));
         var cumHires = effectiveAnnualHires * yearsToTarget;
         var yearsToClose = staffGap > 0 && effectiveAnnualHires > 0 ? Math.ceil(staffGap / effectiveAnnualHires) : 0;
