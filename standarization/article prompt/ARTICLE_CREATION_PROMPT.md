@@ -730,8 +730,16 @@ Scripts must appear in this exact order after `</footer>`:
 3. Reading Progress Bar <script>  (requestAnimationFrame scroll handler)
 4. TOC Sidebar <script>  (auto-discovers h2[id], builds sidebar + mobile drawer)
 5. [Optional: Calculator IIFE scripts]
-6. <script src="auth.js?v=20260228"></script>   ← ALWAYS LAST
+6. <script src="auth.js?v=20260228"></script>      ← AFTER your IIFE
+7. <script src="rz-engine.js?v=YYYY-MM-DD"></script>   ← MUST follow auth.js
 ```
+
+**Boot order** (load AT BOTTOM of `<body>`, in this exact sequence):
+- `auth.js` (navbar + global session) →
+- `rz-engine.js` (Super Engine: data, math, plumbing, UI primitives) →
+- inline article IIFE (consumes both via `window.RZEngine.*`).
+
+See `standarization/SUPER_ENGINE.md` for the master architecture and `standarization/CALC_ENGINE_PLAN.md` / `CALC_MODELS_PLAN.md` for phased rollout details.
 
 ### 4.1 Share Functions
 
