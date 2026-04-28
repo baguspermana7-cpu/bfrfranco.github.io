@@ -2,6 +2,8 @@
 
 > **Version**: 1.0 | **Created**: 2026-04-28
 > **Status**: Roadmap (no code shipped yet)
+> **Parent vision**: [`SUPER_ENGINE.md`](./SUPER_ENGINE.md) — master architectural design unifying this document and `CALC_MODELS_PLAN.md` under a single `window.RZEngine.*` API.
+> **Sibling plan**: [`CALC_MODELS_PLAN.md`](./CALC_MODELS_PLAN.md) — covers the **calculation math layer** (workforce, capex, opex, ROI, TCO, PUE). This document covers **plumbing** (auth, modal, PDF, charts).
 > **Related standards**: `AUTH_STANDARD.md`, `CALCULATOR_PROMPT_STANDARD.md`, `PRO_MODE_STANDARDIZATION.md`, `PDF_EXPORT_STANDARD.md`
 
 ---

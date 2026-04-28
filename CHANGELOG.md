@@ -22,6 +22,36 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28c] — Modal + Auth Hotfix + Super Engine Design
+
+### Fixed
+- article-27 + article-26 modal backdrop now `rgba(0,0,0,0.85)` + `backdrop-filter:blur(8px)` (was `rgba(0,0,0,0.7)` no blur — caused article body to bleed through behind the Pro Analysis modal).
+- article-27 IIFE now listens for `rz-auth-change` event so navbar login propagates to the embedded calculator without a page reload. Also fixed a session-format mismatch: IIFE was reading `sess.exp` (numeric timestamp) while `auth.js` writes `sess.expires` (ISOString) — IIFE now accepts both formats. Local IIFE login now writes the auth.js-compatible format and emits `rz-auth-change` so the navbar reflects the login state immediately. (Article-26 already had this listener; only the modal fix applied there.)
+
+### Added
+- `standarization/SUPER_ENGINE.md` — master architectural design unifying `CALC_ENGINE_PLAN.md` (plumbing) and `CALC_MODELS_PLAN.md` (math) under a single `window.RZEngine.*` API. Documents the **"Shared Anchor Parameters"** rule: even when a new calculator is custom-built, parameters like Target Year, Region, Currency, Inflation, salary benchmarks, attrition factors, PUE defaults, and power costs MUST be sourced from `RZEngine.data` rather than inlined. Includes 6-phase rollout (~10–11 weeks), versioning discipline, consumer template, DCMOC relationship, failure modes, and 5 open questions for review before S0 starts.
+- Cross-references: `CALC_ENGINE_PLAN.md` and `CALC_MODELS_PLAN.md` now declare `SUPER_ENGINE.md` as their parent vision.
+
+## [2026-04-28b] — Article-27 Polish + Calc Models Roadmap
+
+### Fixed
+- article-27 dark-mode group-header badges (CREATE/SUBSTITUTE/EXTEND) now have `[data-theme="dark"]` overrides; they were the empty-rectangle badges visible at the top of each strategy group in earlier dark-mode screenshots.
+
+### Changed
+- article-27 calculator expanded from 8 → 12 inputs and 7 → 10 KPIs.
+  - New inputs: **Target Year (2025–2030)**, **Region (US/EU/APAC/LATAM)**, **Workforce Mix (Physical-heavy/Balanced/NOC-heavy)**, **Risk Tolerance (Conservative/Balanced/Aggressive)**.
+  - New KPIs: Annual Hires Required, Cumulative Hires by [Target Year], Years to Close Gap.
+  - Cost-related KPIs now scale by region multiplier (US 1.00 / EU 0.85 / APAC 0.45 / LATAM 0.55).
+  - 5-Year Investment renamed to N-Year Investment, length driven by Target Year.
+  - Narrative auto-references Target Year, Region, Workforce Mix, and Risk Tolerance.
+- article-27 added a 5th Pro panel: **Year-by-Year Hiring Trajectory** chart (multi-line: Remaining Staff Gap, Cumulative Hires, Strategy Capacity with maturity ramp).
+- article-27 PDF export now includes the new KPIs and Target Year/Region in the header.
+- article-27 in-prose first occurrences of `AIOps`, `NOCaaS`, and `apprenticeship` now link to `glossary.html#term-[slug]` per the new glossary workflow.
+
+### Added
+- `standarization/CALC_MODELS_PLAN.md` — sibling roadmap to `CALC_ENGINE_PLAN.md` covering the **calculation math layer** (`CalcModels.{workforce, capex, opex, roi, tco, pue, forecast}` plus `CalcModels.data` for shared constants like salary benchmarks, region multipliers, attrition factors). 4-phase rollout. Closes user concern about scattered math without a "big engine" for shared parameters.
+- Cross-reference between `CALC_ENGINE_PLAN.md` and `CALC_MODELS_PLAN.md`.
+
 ## [2026-04-28] — Glossary Sync, Standards & Calculator Engine Roadmap
 
 ### Added
