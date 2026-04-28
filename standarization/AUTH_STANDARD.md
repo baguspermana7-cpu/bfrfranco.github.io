@@ -1,6 +1,13 @@
 # Authentication System Standard — ResistanceZero
 
 > **Version**: 1.0 | **Updated**: 2026-02-16
+>
+> **See also**: [`CALC_ENGINE_PLAN.md`](./CALC_ENGINE_PLAN.md) &mdash; Phase 1 of the
+> calculator engine consolidation roadmap extracts the inline auth pattern
+> documented below into a shared `calc-auth.js` library. **Do not add new
+> inline `VALID_USERS` arrays or session-check code to new calculators** &mdash;
+> consult the consolidation plan first so the new calculator can adopt the
+> shared engine when Phase 1 ships.
 
 ---
 

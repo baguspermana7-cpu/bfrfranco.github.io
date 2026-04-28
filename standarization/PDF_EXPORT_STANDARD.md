@@ -1,6 +1,13 @@
 # PDF Export Quality Standard — ResistanceZero
 
 > **Version**: 1.2 | **Updated**: 2026-02-23
+>
+> **See also**: [`CALC_ENGINE_PLAN.md`](./CALC_ENGINE_PLAN.md) &mdash; Phase 2 of
+> the calculator engine consolidation extracts the PDF export pattern
+> documented here into a shared `calc-pdf.js` library. The current per-page
+> `window.open()` implementation duplicates ~200 LOC across 7+ calculators;
+> the shared utility will accept a theme options object so per-calculator
+> color palettes (this document) remain configurable.
 
 ---
 

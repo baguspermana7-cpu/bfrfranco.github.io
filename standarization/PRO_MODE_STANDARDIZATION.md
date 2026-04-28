@@ -1,7 +1,13 @@
 # ResistanceZero Pro Enhancement Mode — Standardization Guide
 
 > **Version**: 2.1 | **Last Updated**: 2026-02-23 | **Status**: Active
-> **Applies to**: All article pages with interactive calculators (articles 1–15)
+> **Applies to**: All article pages with interactive calculators (articles 1–27)
+>
+> **See also**: [`CALC_ENGINE_PLAN.md`](./CALC_ENGINE_PLAN.md) &mdash; the login
+> modal, gate overlay, and session-check patterns documented below are
+> scheduled for extraction into the shared `calc-engine.js` (Phase 1 of the
+> consolidation roadmap). Future articles should design Pro panels with the
+> shared engine API in mind to minimise migration cost when the engine ships.
 
 ---
 

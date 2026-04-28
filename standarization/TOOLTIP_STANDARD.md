@@ -438,3 +438,44 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 - [ ] Tooltip colors match the article's theme color (see Per-Article table)
 - [ ] Hover test: every tooltip shows FULL content without clipping or truncation
 - [ ] Mobile: tooltips don't overflow viewport (JS viewport bounds check / touch support)
+
+---
+
+## Glossary Maintenance Workflow `[REQUIRED]`
+
+> **Source of truth**: `glossary.html` at site root (currently 320+ terms, alphabetically organized A&ndash;Z).
+> Every new article and every article update must keep the glossary in sync.
+
+### Why this matters
+
+`glossary.html` is the public reference for every domain-specific term used across the site. When articles introduce new vocabulary (e.g., "AIOps", "PFAS", "Megapack", "PJM Interconnection"), readers expect to look those terms up in the glossary and find authoritative definitions linked back to the originating article.
+
+When this workflow is skipped, terms exist only in scattered article tooltips and lose their cross-page discoverability. The audit on 2026-04-28 found 13 of 20 critical terms from articles 23&ndash;27 missing from the glossary.
+
+### Mandatory steps when publishing OR updating an article
+
+1. **Identify domain-specific terms** introduced or significantly used in the article. Aim for **5+ terms per analytical article**. Examples: acronyms, technical concepts, industry-specific jargon.
+2. **Check `glossary.html`** for each term using `grep -c 'id="term-[slug]"' glossary.html`.
+3. **For each missing term**, insert a new `<div class="term" id="term-[slug]">` block in the correct alphabetical letter section. HTML pattern:
+   ```html
+   <div class="term" id="term-[slug]"><h3 class="term-name">[Term Name] <span class="term-full">([Full form])</span></h3><p class="term-def">[2&ndash;4 sentence definition with at least one quantitative anchor or canonical reference.]</p><div class="term-links"><a href="article-NN.html">[Article title]</a></div></div>
+   ```
+4. **For each existing-but-thin term**, expand the definition where the article adds new context (e.g., a separate product variant, a new regulatory development).
+5. **Add `term-links`** pointing back to the article(s) that drove the entry. If multiple articles cover the term, list them all.
+6. **In the article body**, link the first prose occurrence of each new term to its glossary anchor: `<a href="glossary.html#term-aiops">AIOps</a>`. Do this for at least 3 first-occurrence terms per article.
+7. **CHANGELOG entry**: list new glossary terms under the article's release section in `CHANGELOG.md`.
+8. **CSS prefix mismatch caveat**: glossary uses the global `.term`, `.term-name`, `.term-def`, `.term-links` classes (defined in `glossary.html`'s own `<style>`). Do NOT use `.term-tooltip` here &mdash; that is the inline-tooltip class used inside articles.
+
+### Rules
+
+- **Frequency**: every article publish or major update triggers this workflow.
+- **Minimum**: 5 new glossary entries per analytical article. Smaller updates (e.g., date or stat refresh) may add zero, but always re-check the term-links to ensure the article still lives at its referenced URL.
+- **Backlink discipline**: every new term must have at least one `term-links` anchor back to an article.
+- **Alphabetical order**: insert each new entry in its correct letter section. The audit script at the start of `glossary.html` indexes by letter section (`<section id="section-A">` ... `<section id="section-Z">`).
+- **Slug convention**: lowercase, hyphenated. Example: `Maintenance Vapor Release` &rarr; `id="term-maintenance-vapor-release"`.
+
+### Related standards
+
+- `article prompt/ARTICLE_CREATION_PROMPT.md` checklist 9.7 enforces this on new articles.
+- `LEGAL_COMPLIANCE_STANDARD.md` Section 5 covers per-table source disclaimers (separate concern).
+- `CHANGELOG.md` tracks glossary additions per release.

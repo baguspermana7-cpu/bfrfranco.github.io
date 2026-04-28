@@ -3,6 +3,12 @@
 > **Version**: 1.0 | **Last Updated**: 2026-03-20 | **Status**: Active
 > **Purpose**: Reusable prompt template to request new article calculators with consistent architecture.
 > **Applies to**: All articles with interactive calculators — Future Forward, Engineering Journal, Global Analysis, and any standalone calculator pages.
+>
+> **See also**: [`CALC_ENGINE_PLAN.md`](./CALC_ENGINE_PLAN.md) &mdash; consolidation
+> roadmap that will replace the inline patterns in this standard with a shared
+> `calc-engine.js`. New calculators should be designed for easy migration to the
+> shared engine (avoid bespoke session/PDF/chart implementations where the
+> standard pattern suffices).
 
 ---
 

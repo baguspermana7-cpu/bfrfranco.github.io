@@ -1427,7 +1427,22 @@ Full analysis: https://resistancezero.com/article-[NN].html
 - [ ] References CSS block included (light + dark mode)
 - [ ] Per-table source disclaimers also present (see `LEGAL_COMPLIANCE_STANDARD.md` Section 5)
 
-### 9.7 Social Media
+### 9.7 Glossary Sync `[REQUIRED]`
+> **Mandatory**: every article publish or major update must keep `glossary.html` in sync. See `standarization/TOOLTIP_STANDARD.md` &mdash; "Glossary Maintenance Workflow".
+
+- [ ] Identified 5+ domain-specific terms introduced by this article
+- [ ] For each: verified `glossary.html` has a `<div class="term" id="term-[slug]">` entry
+- [ ] Missing terms added in alphabetical position with `term-name`, `term-def`, and `term-links` back to this article
+- [ ] In-prose first occurrence of at least 3 key terms linked to `glossary.html#term-[slug]`
+- [ ] CHANGELOG.md entry lists new glossary terms under this article's release section
+- [ ] Existing terms expanded if this article adds new variant, regulation, or product context
+
+### 9.8 CHANGELOG `[REQUIRED]`
+- [ ] Added an entry under the appropriate date section in `CHANGELOG.md`
+- [ ] Listed Added / Changed / Fixed / Removed items as applicable
+- [ ] Cross-referenced relevant standardization docs
+
+### 9.9 Social Media
 - [ ] X posts: all <= 280 chars (body only)
 - [ ] Mastodon posts: all <= 500 chars (body + hashtags)
 - [ ] LinkedIn post: <= 3000 chars
