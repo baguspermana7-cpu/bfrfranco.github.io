@@ -30,7 +30,7 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '1.1.0',
+        version: '1.2.0',
         lastUpdated: '2026-04-28',
 
         // Target-Year selector — used by every forecasting calculator
@@ -70,7 +70,26 @@
             airCooledTier3:    1.58,
             liquidCooledTier3: 1.20,
             immersionTier3:    1.05
-        }
+        },
+
+        // Capex per-MW build cost ranges (USD, raw build excluding land/IT). Tier-2 baseline.
+        // Sources: 451 Research 2024, JLL DC Operating Cost 2024, Cushman & Wakefield 2024.
+        capexPerMw: {
+            airCooledTier2:    7500000,   // $7.5M/MW
+            airCooledTier3:    10500000,  // $10.5M/MW (mainstream hyperscale)
+            airCooledTier4:    14000000,  // $14M/MW
+            liquidCooledTier3: 12500000,  // $12.5M/MW
+            immersionTier3:    15000000   // $15M/MW (premium for immersion infra)
+        },
+
+        // MEP percentage of total raw construction CAPEX (industry typical range 35-45%)
+        mepPctOfCapex: { tier2: 0.36, tier3: 0.42, tier4: 0.48 },
+
+        // Modular construction premium vs stick-built (negative = cheaper, positive = costlier)
+        modularPremiumPct: { tier2: -0.05, tier3: 0.08, tier4: 0.15 },
+
+        // Hours per year (constant, exposed for clarity in formulas)
+        hoursPerYear: 8760
     };
 
     /* ====================================================================
@@ -397,8 +416,116 @@
                 }
             },
 
-            // Stubs filled in S4/S6
-            capex: {}, opex: {}, tco: {}, pue: {}
+            capex: {
+                /**
+                 * Total raw build cost for `mw` of capacity at the given tier and region.
+                 * Pulls per-MW baselines from RZEngine.data.capexPerMw and applies regional multiplier.
+                 * Tier accepted: 2|3|4 or 'tier2'|'tier3'|'tier4'.
+                 */
+                datacenterBuildCost: function (mw, tier, region) {
+                    var key = 'airCooledTier' + (tier || 3);
+                    var perMw = (DATA.capexPerMw && DATA.capexPerMw[key]) || DATA.capexPerMw.airCooledTier3;
+                    var rdata = (region && DATA.regions[region.toUpperCase()]) || DATA.regions.US;
+                    return Math.round((mw || 0) * perMw * rdata.salaryMult);
+                },
+
+                /** Apply modular construction premium. `modularPct` 0.0–1.0 fraction modular. */
+                modularPremium: function (baseCost, modularPct, tier) {
+                    var key = 'tier' + (tier || 3);
+                    var premium = (DATA.modularPremiumPct && DATA.modularPremiumPct[key]) || 0;
+                    return Math.round((baseCost || 0) * (1 + premium * (modularPct || 0)));
+                },
+
+                /** MEP portion of total CAPEX (typically 35-45%). Returns dollars. */
+                mepDistribution: function (totalCapex, tier) {
+                    var key = 'tier' + (tier || 3);
+                    var pct = (DATA.mepPctOfCapex && DATA.mepPctOfCapex[key]) || 0.42;
+                    return Math.round((totalCapex || 0) * pct);
+                }
+            },
+
+            opex: {
+                /**
+                 * Annual power cost. mw = total IT load, pue applied to get total facility load.
+                 * regionPower defaults to RZEngine.data.regions[code].powerKwh.
+                 */
+                powerCostAnnual: function (mw, pue, regionPower, hoursPerYear) {
+                    var hrs = hoursPerYear || DATA.hoursPerYear;
+                    var price = regionPower != null ? regionPower : DATA.regions.US.powerKwh;
+                    var pueVal = pue || DATA.pueDefaults.airCooledTier3;
+                    return Math.round((mw || 0) * 1000 * pueVal * hrs * price);
+                },
+
+                /**
+                 * Cooling efficiency factor 0–1 based on climate zone and design delta-T.
+                 * Higher = better. climate: 'cold'|'temperate'|'hot'|'tropical'.
+                 */
+                coolingEfficiency: function (climate, designDeltaT) {
+                    var base = { cold: 0.85, temperate: 0.78, hot: 0.68, tropical: 0.62 };
+                    var b = base[climate] || 0.75;
+                    // Higher design delta-T (e.g. 12C vs 8C) improves efficiency by ~3% per degree
+                    var delta = designDeltaT || 10;
+                    return Math.min(0.95, b + (delta - 10) * 0.03);
+                },
+
+                /**
+                 * Annual staffing cost. role: 'dcTechMid'|'electricianJourneyman'|'cdfomSenior'.
+                 * Pulls regional salary from RZEngine.data.salaryBenchmarks and applies fully-loaded mult of 1.30.
+                 */
+                staffingCostAnnual: function (headcount, region, role) {
+                    var r = (region || 'US').toUpperCase();
+                    var roleKey = role || 'dcTechMid';
+                    var bench = DATA.salaryBenchmarks[roleKey];
+                    var salary = (bench && bench[r]) || (bench && bench.US) || 75100;
+                    return Math.round((headcount || 0) * salary * 1.30); // 30% fully-loaded multiplier
+                },
+
+                /** Outsourced contract cost annual. scope: 'small'|'medium'|'large' (per facility). */
+                contractCostAnnual: function (scope, region) {
+                    var base = { small: 30000, medium: 120000, large: 350000 };
+                    var b = base[scope] || base.medium;
+                    var rdata = (region && DATA.regions[region.toUpperCase()]) || DATA.regions.US;
+                    return Math.round(b * rdata.salaryMult);
+                }
+            },
+
+            tco: {
+                /**
+                 * Total cost of ownership. capex + opex×years + (refreshPct of capex per refresh cycle).
+                 * Default 5-year refresh cycle.
+                 */
+                lifecycle: function (capex, opexAnnual, years, refreshPct) {
+                    var rp = refreshPct == null ? 0.40 : refreshPct;
+                    var refreshCycles = Math.floor((years || 0) / 5);
+                    return Math.round((capex || 0) + (opexAnnual || 0) * (years || 0) + (capex || 0) * rp * refreshCycles);
+                },
+
+                /** Number of replacement cycles within `totalYears` given asset life. */
+                replacementCycles: function (assetLifeYears, totalYears) {
+                    if (!assetLifeYears || assetLifeYears <= 0) return 0;
+                    return Math.max(0, Math.floor((totalYears || 0) / assetLifeYears));
+                }
+            },
+
+            pue: {
+                /** Compute PUE from total facility load and IT load. */
+                pueFromInputs: function (itLoad, totalLoad) {
+                    if (!itLoad || itLoad <= 0) return 0;
+                    return (totalLoad || 0) / itLoad;
+                },
+
+                /** Data Center Infrastructure Efficiency = 1/PUE expressed as fraction. */
+                dcie: function (pue) {
+                    if (!pue || pue <= 0) return 0;
+                    return 1 / pue;
+                },
+
+                /** Annual energy cost given IT load (kW), PUE, and $/kWh rate. */
+                annualEnergyCost: function (itKw, pue, kwhRate, hoursPerYear) {
+                    var hrs = hoursPerYear || DATA.hoursPerYear;
+                    return Math.round((itKw || 0) * (pue || 1) * hrs * (kwhRate != null ? kwhRate : DATA.regions.US.powerKwh));
+                }
+            }
         },
         /**
          * Modal helper. Creates a singleton DOM element keyed by `id`, returns
@@ -490,8 +617,93 @@
             histogram: null, tornado: null, sensitivity: null,
             roiLine: null, hiringTrajectory: null, costStackedBar: null, radar: null
         },
-        ui: {                                                  // S5
-            gateOverlay: null, kpiCard: null, badge: null, tooltip: null, glossaryAnchor: null
+        /**
+         * UI primitives — pure DOM helpers that emit HTML strings or attach to existing elements.
+         * Keep these lightweight; they are called from many calculator IIFEs.
+         */
+        ui: {
+            /**
+             * Render a gate overlay HTML string. Caller injects as innerHTML or appendChild.
+             * Used to lock Pro panels behind login.
+             */
+            gateOverlay: function (message, ctaLabel, ctaHandlerName) {
+                message = message || 'Pro analysis required';
+                ctaLabel = ctaLabel || 'Unlock Pro';
+                var onclickAttr = ctaHandlerName ? (' onclick="' + ctaHandlerName + '()"') : '';
+                return '<div class="rz-gate" style="position:absolute;inset:0;display:flex;flex-direction:column;' +
+                    'align-items:center;justify-content:center;gap:0.75rem;background:rgba(15,23,42,0.85);' +
+                    'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:inherit;z-index:5;">' +
+                    '<i class="fas fa-lock" style="font-size:1.5rem;color:#dc2626;"></i>' +
+                    '<p style="color:#cbd5e1;font-size:0.85rem;margin:0;text-align:center;">' + message + '</p>' +
+                    '<button' + onclickAttr + ' style="padding:0.5rem 1.25rem;background:#dc2626;color:#fff;' +
+                        'border:none;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;">' +
+                        ctaLabel + '</button>' +
+                    '</div>';
+            },
+
+            /**
+             * KPI card HTML string. Caller appends to a grid container.
+             * Use accentColor to match article theme.
+             */
+            kpiCard: function (label, value, subLabel, accentColor) {
+                accentColor = accentColor || '#dc2626';
+                return '<div class="rz-kpi-card" style="background:#fff;border:1px solid #e5e7eb;' +
+                    'border-top:3px solid ' + accentColor + ';border-radius:10px;padding:0.875rem;">' +
+                    '<div class="rz-kpi-label" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;' +
+                        'letter-spacing:0.05em;color:#6b7280;margin-bottom:0.4rem;">' + (label || '') + '</div>' +
+                    '<div class="rz-kpi-value" style="font-size:1.4rem;font-weight:800;color:' + accentColor +
+                        ';line-height:1.1;margin-bottom:0.3rem;">' + (value == null ? '—' : value) + '</div>' +
+                    '<div class="rz-kpi-sub" style="font-size:0.72rem;color:#6b7280;line-height:1.4;">' +
+                        (subLabel || '') + '</div>' +
+                    '</div>';
+            },
+
+            /**
+             * Inline badge HTML string. Variants map to standard CALCULATOR_PROMPT_STANDARD palette.
+             * variant: 'create'|'sub'|'extend'|'fast'|'medium'|'slow'|'imm'|'cost1'|'cost2'|'cost3'|'cost4'
+             */
+            badge: function (text, variant) {
+                var map = {
+                    create:    { bg: '#dcfce7', fg: '#166534' },
+                    sub:       { bg: '#dbeafe', fg: '#1d4ed8' },
+                    extend:    { bg: '#fef3c7', fg: '#92400e' },
+                    imm:       { bg: '#f0fdf4', fg: '#15803d' },
+                    fast:      { bg: '#ecfdf5', fg: '#047857' },
+                    medium:    { bg: '#fffbeb', fg: '#b45309' },
+                    slow:      { bg: '#fff7ed', fg: '#c2410c' },
+                    vslow:     { bg: '#fef2f2', fg: '#991b1b' },
+                    cost1:     { bg: '#f0fdf4', fg: '#166534' },
+                    cost2:     { bg: '#fffbeb', fg: '#713f12' },
+                    cost3:     { bg: '#fff7ed', fg: '#9a3412' },
+                    cost4:     { bg: '#fef2f2', fg: '#991b1b' }
+                };
+                var c = map[variant] || map.create;
+                return '<span class="rz-badge" style="display:inline-block;font-size:0.7rem;font-weight:700;' +
+                    'padding:0.2rem 0.55rem;border-radius:6px;letter-spacing:0.04em;background:' + c.bg +
+                    ';color:' + c.fg + ';">' + (text || '') + '</span>';
+            },
+
+            /**
+             * Build an <a> tag pointing to a glossary term anchor.
+             * Returns HTML string. Use as `<p>... ' + RZEngine.ui.glossaryAnchor('AIOps','aiops') + ' ...</p>`
+             */
+            glossaryAnchor: function (term, slug) {
+                if (!term || !slug) return term || '';
+                return '<a href="glossary.html#term-' + slug + '" class="rz-glossary-link">' + term + '</a>';
+            },
+
+            /**
+             * Attach a hover tooltip to an existing element.
+             * `el` can be a DOM node or a selector string.
+             * Falls back to native `title` attribute if document is unavailable.
+             */
+            tooltip: function (el, content) {
+                if (!root.document) return;
+                var node = (typeof el === 'string') ? root.document.querySelector(el) : el;
+                if (!node) return;
+                node.setAttribute('title', content || '');
+                node.classList.add('rz-tooltip-target');
+            }
         }
     };
 

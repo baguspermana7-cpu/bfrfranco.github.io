@@ -22,6 +22,33 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28f] — Super Engine S4 + S5 + S6 (capex/opex/tco/pue math + UI primitives)
+
+### Added
+- **`RZEngine.data.capexPerMw`** — per-MW build cost baselines for `airCooledTier2/3/4`, `liquidCooledTier3`, `immersionTier3` (sources: 451 Research 2024, JLL DC OpCost 2024, Cushman & Wakefield 2024).
+- **`RZEngine.data.mepPctOfCapex`** — MEP percentage by tier (36/42/48% for T2/T3/T4).
+- **`RZEngine.data.modularPremiumPct`** — modular vs stick-built premium by tier.
+- **`RZEngine.data.hoursPerYear`** — `8760` constant.
+- **`RZEngine.models.capex`** — `datacenterBuildCost(mw, tier, region)`, `modularPremium(baseCost, modularPct, tier)`, `mepDistribution(totalCapex, tier)`. Pulls regional multipliers from `RZEngine.data.regions`.
+- **`RZEngine.models.opex`** — `powerCostAnnual(mw, pue, regionPower, hoursPerYear)`, `coolingEfficiency(climate, designDeltaT)`, `staffingCostAnnual(headcount, region, role)` (uses 1.30× fully-loaded mult), `contractCostAnnual(scope, region)`.
+- **`RZEngine.models.tco`** — `lifecycle(capex, opexAnnual, years, refreshPct)` (default 5-yr refresh cycle), `replacementCycles(assetLife, totalYears)`.
+- **`RZEngine.models.pue`** — `pueFromInputs(itLoad, totalLoad)`, `dcie(pue)`, `annualEnergyCost(itKw, pue, kwhRate, hoursPerYear)`.
+- **`RZEngine.ui`** — `gateOverlay(message, ctaLabel, ctaHandlerName)`, `kpiCard(label, value, subLabel, accentColor)`, `badge(text, variant)` (12 variants matching CALCULATOR_PROMPT_STANDARD palette), `glossaryAnchor(term, slug)`, `tooltip(el, content)`.
+- Engine bumped to **`v1.2.0`**. Now `35 KB / 711 LOC`, still under 50 KB SUPER_ENGINE §H budget.
+
+### Verified (node smoke tests)
+- `datacenterBuildCost(10, 3, 'US') = $105M`; `…'APAC' = $47.25M` (regional scaling correct).
+- `mepDistribution(100M, 3) = $42M` (42% of capex).
+- `powerCostAnnual(10MW, 1.4, $0.12, 8760h) = $14.72M`.
+- `coolingEfficiency('temperate', 12) = 0.84`.
+- `staffingCostAnnual(20, 'US', 'dcTechMid') = $1.95M` (20 × $75,100 × 1.30).
+- `lifecycle(150M, 8M, 10yr, 40%) = $350M`.
+- `pueFromInputs(8000, 11200) = 1.400`; `dcie(1.4) = 71.4%`.
+- `ui.badge`, `ui.kpiCard`, `ui.gateOverlay`, `ui.glossaryAnchor` all return well-formed HTML strings.
+
+### Status
+All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and core UI primitives now live in the engine. **Phases S0–S2, S4, S5, S6 of SUPER_ENGINE.md are SHIPPED** (S3 PDF consolidation deferred to remote agent on 2026-05-05).
+
 ## [2026-04-28e] — Super Engine S2 (workforce + ROI + forecast models) + modal helper
 
 ### Added
