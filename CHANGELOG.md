@@ -22,6 +22,35 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28d] — Super Engine S0 + S1 Shipped (skeleton + auth + data + format + events)
+
+### Added
+- **`rz-engine.js`** at repo root (~290 LOC, 12 KB unminified, vanilla ES5/ES6, zero deps).
+  Implements Phases S0 + S1 of `standarization/SUPER_ENGINE.md`:
+  - `RZEngine.data` — single source of truth for `version`, `lastUpdated`, `years` (2025–2030),
+    `baselineYear`, `regions` (US/EU/APAC/LATAM with salaryMult/powerKwh/currency),
+    `currency`, `inflationAnnual`, `salaryBenchmarks` (dcTechMid, electricianJourneyman, cdfomSenior),
+    `attritionFactors` (replacementCostMult, voluntaryAttritionAvg, apprenticeRetention),
+    `pueDefaults` (air/liquid/immersion Tier-3 baselines).
+  - `RZEngine.auth.{VALID_USERS, validateLogin, getSession, setSession, logout, dispatchAuthChange, onAuthChange}`
+    — auth.js-compatible session format, accepts both `{expires:ISOString}` and legacy `{exp:number}`.
+  - `RZEngine.format.{currency, percent, number, weeks, months, ymd}` — display helpers.
+  - `RZEngine.events.{dispatch, on, off}` — generic CustomEvent bus.
+  - Stubs for `RZEngine.{models, modal, pdf, charts, ui}` filled in S2–S6.
+- Script tag added to `article-27.html` (after auth.js, before script.min.js) and `article-26.html` (after auth.js).
+
+### Changed
+- **article-27 pilot** (S0 first consumer):
+  - `wsCheckSession` now delegates to `RZEngine.auth.getSession()` with legacy fallback.
+  - `REGION_MULT` and `REGION_LABEL` derived from `RZEngine.data.regions` at IIFE init (with hardcoded fallback if engine missing).
+  - `avgSalary` baseline pulled from `RZEngine.data.salaryBenchmarks.dcTechMid.US` ($75,100, was hardcoded $72,000 — refresh to 2024 BLS / Uptime number).
+  - `replacementFactor` pulled from `RZEngine.data.attritionFactors.replacementCostMult` (213%).
+- Constants are now editable in ONE place (`rz-engine.js`) and propagate to article-27. Future migrations move article-26 + standalone calculators to the same engine in subsequent phases.
+
+### Verified
+- Node smoke test: `RZEngine.auth.validateLogin('demo@resistancezero.com','demo2026')` returns `{email, tier:'pro', role:'demo'}`; bad password returns `null`.
+- localhost: `art-27=200, art-26=200, rz-engine.js=200 (12KB)`.
+
 ## [2026-04-28c] — Modal + Auth Hotfix + Super Engine Design
 
 ### Fixed

@@ -1785,6 +1785,7 @@
 </footer>
 
 <script src="auth.js" defer></script>
+<script src="rz-engine.js" defer></script>
 <script src="script.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -1877,8 +1878,24 @@
 
     // ===== CALCULATE =====
     // === Region multipliers (US baseline 1.0) ===
-    var REGION_MULT = { us: 1.0, eu: 0.85, apac: 0.45, latam: 0.55 };
-    var REGION_LABEL = { us: 'United States', eu: 'Europe', apac: 'Asia-Pacific', latam: 'Latin America' };
+    // RZEngine pilot (S0): pull regional anchors from the shared engine.
+    // Local fallbacks kept for robustness if rz-engine.js failed to load.
+    var REGION_MULT = (function () {
+        if (window.RZEngine && window.RZEngine.data && window.RZEngine.data.regions) {
+            var r = window.RZEngine.data.regions, out = {};
+            Object.keys(r).forEach(function (k) { out[k.toLowerCase()] = r[k].salaryMult; });
+            return out;
+        }
+        return { us: 1.0, eu: 0.85, apac: 0.45, latam: 0.55 };
+    })();
+    var REGION_LABEL = (function () {
+        if (window.RZEngine && window.RZEngine.data && window.RZEngine.data.regions) {
+            var r = window.RZEngine.data.regions, out = {};
+            Object.keys(r).forEach(function (k) { out[k.toLowerCase()] = r[k].label; });
+            return out;
+        }
+        return { us: 'United States', eu: 'Europe', apac: 'Asia-Pacific', latam: 'Latin America' };
+    })();
     var WORKFORCE_MIX = {
         physical: { phys: 0.7, noc: 0.3, label: 'physical-heavy' },
         balanced: { phys: 0.5, noc: 0.5, label: 'balanced' },
@@ -1905,8 +1922,13 @@
         var yearsToTarget = Math.max(1, targetYear - BASELINE_YEAR);
 
         var staffGap = Math.max(0, targetStaff - currentStaff);
-        var avgSalary = Math.round(72000 * regionMult);
-        var replacementFactor = 2.13;
+        // RZEngine pilot: pull benchmark + attrition factor from shared engine
+        var baseDcTechSalary = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.salaryBenchmarks
+            && window.RZEngine.data.salaryBenchmarks.dcTechMid
+            && window.RZEngine.data.salaryBenchmarks.dcTechMid.US) || 72000;
+        var avgSalary = Math.round(baseDcTechSalary * regionMult);
+        var replacementFactor = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.attritionFactors
+            && window.RZEngine.data.attritionFactors.replacementCostMult) || 2.13;
         var annualAttritionCost = Math.round(currentStaff * (attritionRate / 100) * avgSalary * replacementFactor);
 
         var totalSetup = 0, minSpeed = 9999, maxRisk = 0, totalOpAnnual = 0;
@@ -2288,18 +2310,21 @@
     }
 
     function wsCheckSession() {
+        // Pilot S0: delegate to RZEngine.auth.getSession() if engine is loaded.
+        // Falls back to legacy localStorage parse if engine missing (defensive).
+        if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.getSession) {
+            if (window.RZEngine.auth.getSession()) wsApplyProUI();
+            return;
+        }
+        // Legacy fallback (engine not loaded)
         try {
             var raw = localStorage.getItem(SESSION_KEY);
             if (!raw) return;
             var sess = JSON.parse(raw);
             if (!sess) return;
-            // Accept both auth.js format ({expires: ISOString}) and legacy IIFE format ({exp: number})
             var expValid = false;
-            if (sess.expires) {
-                expValid = new Date(sess.expires).getTime() > Date.now();
-            } else if (sess.exp) {
-                expValid = sess.exp > Date.now();
-            }
+            if (sess.expires) expValid = new Date(sess.expires).getTime() > Date.now();
+            else if (sess.exp) expValid = sess.exp > Date.now();
             if (expValid) wsApplyProUI();
         } catch(e) {}
     }
