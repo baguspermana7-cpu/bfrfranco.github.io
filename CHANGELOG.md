@@ -22,6 +22,30 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28i] — Standalone calc nav glossary link
+
+### Added
+- Glossary link (`#14b8a6` teal) inserted into the `.nav-links` custom navbars on **12 standalone calc/tool pages**:
+  - capex-calculator, opex-calculator, roi-calculator, tco-calculator, pue-calculator (5 main calcs)
+  - carbon-footprint, dc-market-tracker (2 trackers)
+  - tia-942-checklist, tier-advisor (2 standards tools)
+  - ltc-system-modelling-lab, standards-ltc-lab (2 LTC labs — used `.nav-back` style for these)
+  - datacenter-solutions (1 solutions hub)
+
+This closes the standalone-calculator nav backlog from `[Unreleased]` (2026-04-28g). Glossary is now reachable from every page on the site that has any kind of navbar — main-pattern (`.nav-menu`), custom (`.nav-links`), or LTC-lab (`.nav-back`).
+
+### Status
+The discoverability audit is now functionally complete:
+- ✅ Glossary linked from every page with a navbar (~77 pages total).
+- ✅ Glossary linked from footer NAVIGATION across 60 pages.
+- ✅ All Tier-1 and Tier-2 report pages have References sections.
+- ✅ insights.html surfaces the Reports cluster.
+- ✅ Second Brain graph reflects current site truth.
+
+### Remaining backlog (small)
+- Article-26 PFAS IIFE migration to `RZEngine.auth.*` (currently kept as A/B control).
+- `dashboard.html` and `datacenter-solutions.html` References — optional, these are tool pages.
+
 ## [2026-04-28h] — Tier-2 Discoverability backlog cleared
 
 ### Added
