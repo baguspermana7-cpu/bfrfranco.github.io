@@ -1771,8 +1771,16 @@ function copyLink() {
     var pfasMode = 'free';
     var mcChart = null, regChart = null, tornadoChart = null;
 
-    // ===== SESSION CHECK =====
+    // ===== SESSION CHECK ===== (S1 pilot: prefer RZEngine.auth.getSession)
     (function checkSession() {
+        if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.getSession) {
+            if (window.RZEngine.auth.getSession()) {
+                isPremium = true;
+                activatePremiumUI();
+            }
+            return;
+        }
+        // Legacy fallback if engine missing
         var s = null;
         try { s = JSON.parse(localStorage.getItem('rz_premium_session')); } catch(e) {}
         if (s && new Date(s.expires) > new Date()) {
@@ -1786,29 +1794,41 @@ function copyLink() {
         pfasSetMode('pro');
     }
 
-    // ===== AUTH =====
-    var VALID_USERS = [
-        { email: 'demo@resistancezero.com', password: 'demo2026' },
-        { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
-        { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
-    ];
-
+    // ===== AUTH ===== (S1 pilot: delegate to RZEngine.auth, with fallback)
     window.pfasHandleLogin = function() {
         var email = (document.getElementById('pfasLoginEmail').value || '').trim().toLowerCase();
         var pass = document.getElementById('pfasLoginPass').value || '';
-        var found = VALID_USERS.some(function(u) {
-            return u.email === email && u.password === pass;
-        });
-        if (found) {
-            localStorage.setItem('rz_premium_session', JSON.stringify({
-                email: email, tier: 'pro',
-                expires: new Date(Date.now() + 30 * 86400000).toISOString()
-            }));
+        var matched = null;
+
+        if (window.RZEngine && window.RZEngine.auth) {
+            matched = window.RZEngine.auth.validateLogin(email, pass);
+            if (matched) {
+                window.RZEngine.auth.setSession(matched.email, matched.tier, matched.role);
+                window.RZEngine.auth.dispatchAuthChange('login', { email: matched.email, tier: matched.tier });
+            }
+        } else {
+            // Legacy fallback
+            var VALID = [
+                { email: 'demo@resistancezero.com', password: 'demo2026' },
+                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!' },
+                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
+            ];
+            var found = VALID.some(function(u) { return u.email === email && u.password === pass; });
+            if (found) {
+                matched = { email: email, tier: 'pro' };
+                localStorage.setItem('rz_premium_session', JSON.stringify({
+                    email: email, tier: 'pro',
+                    expires: new Date(Date.now() + 30 * 86400000).toISOString()
+                }));
+                window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', action: 'login' } }));
+            }
+        }
+
+        if (matched) {
             isPremium = true;
             pfasHideLogin();
             unlockPanels();
             pfasSetMode('pro');
-            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: email, tier: 'pro', action: 'login' } }));
         } else {
             var errEl = document.getElementById('pfasLoginError');
             if (errEl) errEl.style.display = 'block';

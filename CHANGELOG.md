@@ -22,6 +22,22 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-28j] — Article-26 PFAS migrated to RZEngine.auth + bulk script-tag wiring
+
+### Changed
+- **article-26.html PFAS calculator IIFE** migrated from inline `VALID_USERS` array + bespoke session check to `RZEngine.auth.validateLogin`, `RZEngine.auth.getSession`, `RZEngine.auth.setSession`, `RZEngine.auth.dispatchAuthChange`. Inline `VALID_USERS` declaration removed entirely. Legacy fallback retained for safety if engine fails to load.
+- **`<script src="rz-engine.js?v=2026-04-28">` wired into 30 additional pages** (articles 1–22 + articles.html + 5 standalone calcs + dashboard adjacents). Total rz-engine.js consumers across the site now: **35 pages**. Most don't yet consume the engine API but are now set up for future migration without another script-tag pass.
+
+### Status: Super Engine consumers
+| Article | Loads engine | Uses `auth.*` | Uses `models.*` | Uses `data.*` |
+|---|---|---|---|---|
+| article-23 | ✅ | — | — | — |
+| article-24 | ✅ | ✅ | — | — |
+| article-25 | ✅ | — | — | — |
+| article-26 | ✅ | ✅ | — | — |
+| article-27 | ✅ | ✅ (S2 pilot) | ✅ workforce.* | ✅ regions, salaryBenchmarks, attritionFactors |
+| article-1 through article-22, articles.html, +standalone calcs | ✅ (script tag only) | — | — | — |
+
 ## [2026-04-28i] — Standalone calc nav glossary link
 
 ### Added
