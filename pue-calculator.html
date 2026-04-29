@@ -1090,10 +1090,14 @@
         const fireSuppKW = fireKW * rackCount;
         const facilityKW = lightingKW + securityKW + fireSuppKW;
 
-        // Totals
+        // Totals (S2 pilot: PUE + DCiE math via RZEngine.models.pue when available)
         const totalPower = itLoad + coolingKW + upsLossKW + transformerKW + pduLossKW + facilityKW;
-        const pue = totalPower / itLoad;
-        const dcie = (1 / pue) * 100;
+        const pue = (window.RZEngine && window.RZEngine.models && window.RZEngine.models.pue && window.RZEngine.models.pue.pueFromInputs)
+            ? window.RZEngine.models.pue.pueFromInputs(itLoad, totalPower)
+            : (totalPower / itLoad);
+        const dcie = (window.RZEngine && window.RZEngine.models && window.RZEngine.models.pue && window.RZEngine.models.pue.dcie)
+            ? window.RZEngine.models.pue.dcie(pue) * 100
+            : (1 / pue) * 100;
         const annualEnergy = totalPower * 8760;
         const annualCost = annualEnergy * energyCostPerKWh;
 
