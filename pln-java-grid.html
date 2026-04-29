@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GED7FX8RTV');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLN Java-Bali Grid Monitor | 500/275/150 kV Single-Line Diagram</title>
+    <meta name="description" content="Single-line diagram and geographic atlas of the PLN Jamali transmission system. 500, 275, and 150 kV backbone with substations, plants, and provincial detail.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="version" content="2026-04-29-v3">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/pln-java-grid.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/pln-java-grid.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/pln-java-grid.html">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/pln-java-grid.html">
+    <meta property="og:title" content="PLN Java-Bali Grid Monitor">
+    <meta property="og:description" content="Interactive 500/275/150 kV single-line diagram and Leaflet geographic atlas of the Java-Bali transmission backbone.">
+    <meta property="og:image" content="https://resistancezero.com/assets/Favicon.png">
+    <meta property="og:site_name" content="ResistanceZero">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="PLN Java-Bali Grid Monitor">
+    <meta name="twitter:description" content="500/275/150 kV single-line diagram and geographic atlas of the Java-Bali backbone.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/Favicon.png">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "PLN Java-Bali Grid Monitor",
+        "applicationCategory": "BusinessApplication",
+        "description": "Interactive single-line diagram and geographic atlas of the Java-Bali transmission backbone (500, 275, 150 kV) with provincial drill-down.",
+        "url": "https://resistancezero.com/pln-java-grid.html",
+        "operatingSystem": "Web Browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Geographic Leaflet/CARTO dark map of Java-Bali",
+            "Inline SVG IEC 60617 single-line diagram",
+            "Voltage and fuel-type layer toggles",
+            "Province-level detail drill-down",
+            "Substation slide-in side panel"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Java-Bali Grid Monitor" }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <!-- Inline boot theme to avoid FOUC; default dark -->
+    <script>(function(){try{var t=localStorage.getItem('rz_theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+
+    <style>
+        :root {
+            --pjg-primary: #3b82f6;
+            --pjg-accent: #60a5fa;
+            --pjg-primary-rgb: 59, 130, 246;
+            --pjg-gradient: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%);
+            --pjg-bg: #ffffff;
+            --pjg-bg2: #f8fafc;
+            --pjg-bg3: #f1f5f9;
+            --pjg-text: #1e293b;
+            --pjg-text2: #475569;
+            --pjg-text3: #94a3b8;
+            --pjg-border: #e2e8f0;
+            --pjg-glass: rgba(255,255,255,0.85);
+            --pjg-glass-border: rgba(59,130,246,0.12);
+            --pjg-shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --pjg-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --pjg-shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --pjg-v500: #3b82f6;
+            --pjg-v275: #a78bfa;
+            --pjg-v150: #f87171;
+            --pjg-v20:  #facc15;
+        }
+        [data-theme="dark"] {
+            --pjg-bg: #0b1220;
+            --pjg-bg2: #0f172a;
+            --pjg-bg3: #1e293b;
+            --pjg-text: #f1f5f9;
+            --pjg-text2: #cbd5e1;
+            --pjg-text3: #64748b;
+            --pjg-border: #1e293b;
+            --pjg-glass: rgba(11,18,32,0.85);
+            --pjg-glass-border: rgba(96,165,250,0.18);
+            --pjg-shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --pjg-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --pjg-shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--pjg-bg); color: var(--pjg-text);
+            min-height: 100vh; line-height: 1.6;
+        }
+        a { color: var(--pjg-primary); }
+
+        /* NAVBAR (mirrors dc-market-tracker.html) */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: var(--pjg-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--pjg-glass-border);
+            padding: 0 2rem; height: 64px;
+        }
+        .nav-container { max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--pjg-text); }
+        .nav-logo {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.7rem; color: white; letter-spacing: 0.5px;
+            background: var(--pjg-gradient);
+            box-shadow: 0 3px 10px rgba(59,130,246,0.35);
+        }
+        .nav-title { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+        .nav-subtitle { font-size: 0.7rem; color: var(--pjg-text3); font-weight: 400; }
+        .nav-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+        .nav-link {
+            text-decoration: none; font-size: 0.82rem; font-weight: 500;
+            color: var(--pjg-text2); transition: all 0.3s;
+        }
+        .nav-link:hover { color: var(--pjg-primary); transform: translateY(-1px); }
+        .nav-back {
+            display: flex; align-items: center; gap: 6px;
+            text-decoration: none; font-size: 0.82rem; font-weight: 600;
+            color: var(--pjg-primary); padding: 6px 14px; border-radius: 8px;
+            background: rgba(59,130,246,0.08); transition: all 0.3s;
+        }
+        .nav-back:hover { transform: translateY(-2px); background: rgba(59,130,246,0.14); }
+        .mobile-nav-toggle {
+            display: none; background: none; border: 1px solid var(--pjg-border);
+            border-radius: 8px; padding: 6px 10px; color: var(--pjg-text2); cursor: pointer;
+        }
+
+        /* HERO */
+        .pjg-hero {
+            background: linear-gradient(135deg, rgba(8,14,28,0.92) 0%, rgba(15,23,42,0.86) 50%, rgba(29,78,216,0.55) 100%);
+            padding: 7rem 2rem 3rem; color: white; position: relative; overflow: hidden;
+        }
+        .pjg-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(96,165,250,0.18) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(167,139,250,0.10) 0%, transparent 50%);
+        }
+        .pjg-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .pjg-hero h1 {
+            font-size: 2.4rem; font-weight: 900; line-height: 1.15;
+            margin-bottom: 0.6rem; letter-spacing: -0.02em;
+        }
+        .pjg-hero h1 span { background: var(--pjg-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .pjg-hero-sub {
+            font-size: 1rem; color: rgba(255,255,255,0.78); max-width: 760px;
+            line-height: 1.7; margin-bottom: 1.6rem;
+        }
+        .pjg-source-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .pjg-source-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+            font-size: 0.7rem; color: rgba(255,255,255,0.85); text-decoration: none;
+            transition: all 0.25s;
+        }
+        .pjg-source-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(96,165,250,0.4); }
+        .pjg-refresh-badge {
+            margin-left: auto;
+            font-size: 0.7rem; color: rgba(255,255,255,0.6); font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* MAIN */
+        .pjg-main { max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
+        .pjg-section { margin-bottom: 1.5rem; }
+        .pjg-section-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--pjg-text); }
+        .pjg-section-desc { font-size: 0.82rem; color: var(--pjg-text2); margin-bottom: 0.8rem; max-width: 760px; }
+
+        /* STAT TILES */
+        .pjg-stat-row {
+            display: grid; gap: 0.75rem;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            margin-bottom: 1.25rem;
+        }
+        .pjg-stat-tile {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 12px; padding: 0.85rem 1rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .pjg-stat-tile:hover { border-color: rgba(96,165,250,0.5); transform: translateY(-1px); }
+        .pjg-stat-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; color: var(--pjg-text3); text-transform: uppercase; }
+        .pjg-stat-value {
+            font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+            color: var(--pjg-text); line-height: 1.15; margin: 0.2rem 0;
+        }
+        .pjg-stat-sub { font-size: 0.7rem; color: var(--pjg-text2); }
+
+        /* VIEW SWITCHER */
+        .pjg-toolbar {
+            display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+        .pjg-segment {
+            display: inline-flex; background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 10px; padding: 3px;
+        }
+        .pjg-segment button {
+            padding: 7px 14px; border: none; background: transparent;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--pjg-text2); cursor: pointer; border-radius: 7px;
+            transition: all 0.2s;
+        }
+        .pjg-segment button.active {
+            background: var(--pjg-gradient); color: white;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+        }
+        .pjg-segment button:not(.active):hover { color: var(--pjg-primary); }
+
+        /* LAYER TOGGLES */
+        .pjg-layer-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 10px; padding: 8px 12px;
+            font-size: 0.78rem;
+        }
+        .pjg-layer-group { display: inline-flex; gap: 0.5rem; align-items: center; }
+        .pjg-layer-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; color: var(--pjg-text3); text-transform: uppercase; }
+        .pjg-toggle-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px; cursor: pointer;
+            background: var(--pjg-bg3); border: 1px solid var(--pjg-border);
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .pjg-toggle-chip input { accent-color: var(--pjg-primary); cursor: pointer; }
+        .pjg-toggle-chip.off { opacity: 0.45; }
+        .pjg-toggle-chip:hover { border-color: rgba(96,165,250,0.5); }
+        .pjg-tier-toggle {
+            margin-left: auto;
+            padding: 6px 12px; border: 1px solid var(--pjg-border);
+            border-radius: 8px; background: var(--pjg-bg3); color: var(--pjg-text2);
+            cursor: pointer; font-family: inherit; font-size: 0.75rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .pjg-tier-toggle:hover { border-color: var(--pjg-primary); color: var(--pjg-primary); }
+        .pjg-tier-toggle.active { background: var(--pjg-gradient); color: white; border-color: transparent; }
+
+        /* Layer toggles v3 — fieldset-grouped */
+        .pjg-toggles {
+            display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: stretch;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 10px; padding: 8px 12px;
+            font-size: 0.78rem;
+        }
+        .pjg-tog-group {
+            border: 1px solid var(--pjg-border); border-radius: 8px;
+            padding: 4px 10px 6px; margin: 0;
+            display: inline-flex; flex-wrap: wrap; gap: 0.45rem; align-items: center;
+            background: var(--pjg-bg3);
+        }
+        .pjg-tog-group legend {
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+            color: var(--pjg-text3); text-transform: uppercase;
+            padding: 0 6px;
+        }
+        .pjg-tog-group label {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 2px 6px; border-radius: 6px; cursor: pointer;
+            color: var(--pjg-text2); user-select: none;
+            transition: background 0.15s, color 0.15s;
+        }
+        .pjg-tog-group label:hover { background: rgba(96,165,250,0.12); color: var(--pjg-primary); }
+        .pjg-tog-group input[type="checkbox"] {
+            accent-color: var(--pjg-primary); cursor: pointer;
+            width: 14px; height: 14px; margin: 0;
+        }
+        @media (max-width: 700px) {
+            .pjg-toggles { flex-direction: column; align-items: stretch; }
+            .pjg-tog-group { flex-direction: column; align-items: flex-start; }
+            .pjg-tog-group label { width: 100%; }
+        }
+
+        /* SLD legend overlay */
+        .pjg-sld-legend {
+            position: absolute; top: 12px; right: 14px;
+            background: rgba(8,15,30,0.82); border: 1px solid rgba(96,165,250,0.25);
+            border-radius: 8px; padding: 6px 10px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+            color: #cbd5e1; pointer-events: none;
+            display: flex; flex-direction: column; gap: 3px;
+            z-index: 5;
+        }
+        .pjg-sld-legend .pjg-leg-h {
+            font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em;
+            color: #94a3b8; text-transform: uppercase;
+        }
+        .pjg-sld-legend .pjg-leg-row { display: inline-flex; align-items: center; gap: 5px; }
+        .pjg-sld-legend .pjg-leg-dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+        }
+        .pjg-leg-dot-hi { background: #22c55e; }
+        .pjg-leg-dot-med { background: #f59e0b; }
+        .pjg-leg-dot-low { background: #ef4444; }
+
+        /* MAP */
+        .pjg-map-wrap {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 6px; position: relative; overflow: hidden;
+        }
+        #pjg-map { width: 100%; height: min(60vh, 560px); border-radius: 10px; background: #0b1220; z-index: 1; }
+        /* Dark popup overrides — ported from dc-market-tracker.html */
+        .leaflet-popup-content-wrapper { background:#1e293b !important; color:#e2e8f0 !important; border:1px solid #334155 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.4) !important; }
+        .leaflet-popup-tip { background:#1e293b !important; border:1px solid #334155 !important; }
+        .leaflet-popup-content { margin:8px 12px !important; font-family:'Inter',sans-serif !important; font-size:0.78rem !important; }
+        .leaflet-popup-close-button { color:#64748b !important; font-size:1.2rem !important; }
+        .leaflet-popup-close-button:hover { color:#f1f5f9 !important; }
+        .leaflet-control-zoom a { background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important; }
+        .leaflet-control-zoom a:hover { background:#334155 !important; }
+        .leaflet-control-attribution { background:rgba(15,23,42,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
+        .leaflet-control-attribution a { color:#64748b !important; }
+        .leaflet-control-layers { background:#1e293b !important; color:#e2e8f0 !important; border:1px solid #334155 !important; }
+        .leaflet-control-layers label { color:#e2e8f0 !important; font-size:0.78rem !important; }
+        /* Leaflet plant divIcons */
+        .rzm-plant {
+            background: rgba(8,15,30,0.9); border: 1.5px solid #fbbf24;
+            border-radius: 50%; color: #fbbf24;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px;
+        }
+        .rzm-plant-coal { border-color: #f87171; color: #f87171; }
+        .rzm-plant-gas { border-color: #60a5fa; color: #60a5fa; }
+        .rzm-plant-hydro { border-color: #38bdf8; color: #38bdf8; }
+        .rzm-plant-geo { border-color: #fb923c; color: #fb923c; }
+        .rzm-plant-solar { border-color: #facc15; color: #facc15; }
+        .rzm-plant-biomass { border-color: #84cc16; color: #84cc16; }
+
+        /* SLD VIEW */
+        .pjg-sld-wrap {
+            background: linear-gradient(180deg, #050a18 0%, #0b1220 100%);
+            border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 8px; overflow: hidden;
+            height: min(70vh, 720px); position: relative;
+        }
+        #pjg-sld { width: 100%; height: 100%; display: block; touch-action: none; }
+        .pjg-sld-hint {
+            position: absolute; top: 12px; left: 14px;
+            background: rgba(8,15,30,0.7); border: 1px solid rgba(96,165,250,0.25);
+            padding: 4px 10px; border-radius: 50px;
+            font-size: 0.65rem; color: #cbd5e1; font-family: 'JetBrains Mono', monospace;
+            pointer-events: none;
+        }
+
+        /* SLD line classes */
+        .pjg-line { fill: none; stroke-linecap: round; stroke-width: 1.2; opacity: 0.95; }
+        .pjg-line-500 { stroke: var(--pjg-v500); stroke-dasharray: 8 4; filter: drop-shadow(0 0 2px rgba(59,130,246,0.65)); animation: pjg-flow 2.4s linear infinite; }
+        .pjg-line-275 { stroke: var(--pjg-v275); stroke-dasharray: 6 3; filter: drop-shadow(0 0 2px rgba(167,139,250,0.55)); animation: pjg-flow 2.6s linear infinite; }
+        .pjg-line-150 { stroke: var(--pjg-v150); stroke-dasharray: 4 3; filter: drop-shadow(0 0 1.5px rgba(248,113,113,0.5)); animation: pjg-flow 2.8s linear infinite; }
+        @keyframes pjg-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -24; } }
+
+        /* SLD nodes */
+        .pjg-node-station circle { fill: rgba(15,23,42,0.95); stroke: var(--pjg-v500); stroke-width: 1.5; transition: stroke-width 0.15s, fill 0.15s; }
+        .pjg-node-station[data-voltage="275"] circle { stroke: var(--pjg-v275); }
+        .pjg-node-station[data-voltage="150"] circle { stroke: var(--pjg-v150); }
+        .pjg-node-plant circle { fill: rgba(8,15,30,0.95); stroke: #facc15; stroke-width: 1.6; }
+        .pjg-node-plant[data-fuel="coal"] circle { stroke: #f87171; }
+        .pjg-node-plant[data-fuel="gas"] circle { stroke: #60a5fa; }
+        .pjg-node-plant[data-fuel="hydro"] circle { stroke: #38bdf8; }
+        .pjg-node-plant[data-fuel="geo"] circle { stroke: #fb923c; }
+        .pjg-node-plant[data-fuel="solar"] circle { stroke: #facc15; }
+        .pjg-node-plant[data-fuel="biomass"] circle { stroke: #84cc16; }
+        .pjg-node-station, .pjg-node-plant { cursor: pointer; }
+        .pjg-node-station:hover circle, .pjg-node-plant:hover circle { stroke-width: 2.6; fill: rgba(59,130,246,0.18); }
+        .pjg-node-label {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+            fill: #f1f5f9; paint-order: stroke fill;
+            stroke: rgba(8,15,30,0.85); stroke-width: 2.4; stroke-linejoin: round;
+            pointer-events: none;
+        }
+        .pjg-node-cap {
+            font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 500;
+            fill: #94a3b8; paint-order: stroke fill;
+            stroke: rgba(8,15,30,0.7); stroke-width: 2; stroke-linejoin: round;
+            pointer-events: none;
+        }
+        .pjg-kv-badge text { font-family: 'JetBrains Mono', monospace; font-size: 7px; fill: #cbd5e1; }
+        .pjg-particle { fill: #bfdbfe; opacity: 0.8; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .pjg-line-500, .pjg-line-275, .pjg-line-150 { animation: none !important; }
+            .pjg-particle { display: none !important; }
+        }
+
+        /* Layer-toggle CSS hooks (v3) */
+        .pjg-svg-root.hide-v500 .pjg-node-v500, .pjg-svg-root.hide-v500 .pjg-line-v500 { display: none; }
+        .pjg-svg-root.hide-v275 .pjg-node-v275, .pjg-svg-root.hide-v275 .pjg-line-v275 { display: none; }
+        .pjg-svg-root.hide-v150 .pjg-node-v150, .pjg-svg-root.hide-v150 .pjg-line-v150 { display: none; }
+        .pjg-svg-root.hide-v70 .pjg-node-v70, .pjg-svg-root.hide-v70 .pjg-line-v70 { display: none; }
+        .pjg-svg-root.hide-v20 .pjg-node-v20, .pjg-svg-root.hide-v20 .pjg-line-v20 { display: none; }
+        .pjg-svg-root.hide-coal .pjg-node-fuel-coal { display: none; }
+        .pjg-svg-root.hide-gas .pjg-node-fuel-gas { display: none; }
+        .pjg-svg-root.hide-hydro .pjg-node-fuel-hydro { display: none; }
+        .pjg-svg-root.hide-geo .pjg-node-fuel-geo { display: none; }
+        .pjg-svg-root.hide-solar .pjg-node-fuel-solar { display: none; }
+        .pjg-svg-root.hide-biomass .pjg-node-fuel-biomass { display: none; }
+        .pjg-svg-root.hide-wind .pjg-node-fuel-wind { display: none; }
+        .pjg-svg-root.no-labels .pjg-node-label { display: none; }
+        .pjg-svg-root.no-capacity .pjg-node-capacity { display: none; }
+        .pjg-svg-root.no-kvbadges .pjg-kv-badge { display: none; }
+        /* Level-of-detail: at SVG zoom < 0.6, hide tier-2 + 70/20 kV labels */
+        .pjg-svg-root.lod-low .pjg-node-v70 .pjg-node-label,
+        .pjg-svg-root.lod-low .pjg-node-v20 .pjg-node-label,
+        .pjg-svg-root.lod-low .pjg-node-conf-low .pjg-node-label,
+        .pjg-svg-root.lod-low .pjg-node-v70 .pjg-node-cap,
+        .pjg-svg-root.lod-low .pjg-node-v20 .pjg-node-cap { display: none; }
+
+        /* Hidden views */
+        .pjg-view { display: none; }
+        .pjg-view.active { display: block; }
+
+        /* PROVINCE CARDS — ported from datacenter-solutions.html lines 2391-2540 */
+        .ds-strategic-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem; margin-top: 0.75rem;
+        }
+        @media (max-width: 900px) { .ds-strategic-grid { grid-template-columns: 1fr; } }
+        .ds-strat-card {
+            background: var(--pjg-bg2);
+            border: 1px solid var(--pjg-border);
+            border-radius: 20px;
+            overflow: hidden; display: flex; flex-direction: column;
+            position: relative; transition: border-color 0.35s, box-shadow 0.35s, transform 0.25s;
+        }
+        .ds-strat-card:hover {
+            border-color: var(--card-border, rgba(96,165,250,0.45));
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 1px var(--card-border, rgba(96,165,250,0.18)),
+                        0 8px 40px var(--card-glow, rgba(96,165,250,0.18));
+        }
+        .ds-strat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; background: var(--card-gradient, linear-gradient(90deg, #3b82f6, #60a5fa));
+            border-radius: 20px 20px 0 0;
+        }
+        .ds-strat-top { padding: 1.4rem 1.5rem 0; display: flex; align-items: center; gap: 1rem; }
+        .ds-strat-icon {
+            width: 52px; height: 52px; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 14px var(--card-glow, rgba(96,165,250,0.3));
+        }
+        .ds-strat-card:hover .ds-strat-icon { transform: scale(1.08) translateY(-2px); }
+        .ds-strat-title-wrap { flex: 1; }
+        .ds-strat-title {
+            font-size: 1rem; font-weight: 800; color: var(--pjg-text);
+            margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+        }
+        .ds-strat-subtitle { font-size: 0.72rem; color: var(--pjg-text3); font-weight: 500; }
+        .ds-strat-desc {
+            font-size: 0.81rem; color: var(--pjg-text2); line-height: 1.65;
+            padding: 0.85rem 1.5rem 0.75rem; flex: 1;
+        }
+        .ds-strat-features {
+            padding: 0; border-top: 1px solid var(--pjg-border);
+            list-style: none; margin: 0;
+        }
+        .ds-strat-features li {
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.55rem 1.5rem; border-bottom: 1px solid var(--pjg-border);
+            font-size: 0.79rem; color: var(--pjg-text2);
+        }
+        .ds-strat-features li:last-child { border-bottom: none; }
+        .ds-strat-features li i {
+            font-size: 0.6rem; flex-shrink: 0; width: 14px; height: 14px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .ds-strat-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--pjg-border); }
+        .ds-strat-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.83rem; font-weight: 700; color: #fff;
+            text-decoration: none; padding: 8px 20px; border-radius: 10px;
+            background: var(--card-gradient, linear-gradient(135deg, #1d4ed8, #3b82f6));
+            border: none;
+            box-shadow: 0 3px 12px var(--card-glow, rgba(59,130,246,0.3));
+            transition: all 0.25s;
+        }
+        .ds-strat-cta:hover { box-shadow: 0 5px 20px var(--card-glow, rgba(59,130,246,0.45)); filter: brightness(1.1); }
+        .ds-strat-cta i { transition: transform 0.2s; font-size: 0.72rem; }
+        .ds-strat-cta:hover i { transform: translateX(3px); }
+        .ds-strat-card.is-soon { opacity: 0.55; filter: grayscale(0.15); }
+        .ds-strat-card.is-soon:hover { transform: none; box-shadow: none; }
+        .ds-strat-card.is-soon::before { opacity: 0.35; }
+        .ds-strat-card.is-soon .ds-strat-cta { pointer-events: none; }
+        .ds-soon-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 50px;
+            font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            background: rgba(148,163,184,0.18); color: #94a3b8;
+            border: 1px solid rgba(148,163,184,0.35);
+        }
+        .ds-strat-badge {
+            display: inline-flex; align-items: center;
+            padding: 2px 8px; border-radius: 5px;
+            font-size: 0.55rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+            background: linear-gradient(135deg, rgba(96,165,250,0.3), rgba(96,165,250,0.15));
+            border: 1px solid rgba(96,165,250,0.4); color: #93c5fd;
+        }
+
+        /* PROVINCE DETAIL PANEL */
+        .pjg-prov-panel {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 1.25rem 1.5rem; margin-top: 1.25rem;
+        }
+        .pjg-prov-tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .pjg-prov-tab {
+            padding: 6px 14px; border-radius: 50px; cursor: pointer; font-family: inherit;
+            font-size: 0.75rem; font-weight: 600; border: 1px solid var(--pjg-border);
+            background: var(--pjg-bg3); color: var(--pjg-text2); transition: all 0.2s;
+        }
+        .pjg-prov-tab:hover { border-color: var(--pjg-primary); color: var(--pjg-primary); }
+        .pjg-prov-tab.active { background: var(--pjg-gradient); color: white; border-color: transparent; }
+        .pjg-prov-grid {
+            display: grid; gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .pjg-prov-card {
+            background: var(--pjg-bg3); border: 1px solid var(--pjg-border);
+            border-radius: 10px; padding: 0.85rem 1rem;
+        }
+        .pjg-prov-card h4 {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+            color: var(--pjg-text3); text-transform: uppercase; margin-bottom: 0.5rem;
+        }
+        .pjg-prov-card .num {
+            font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+            color: var(--pjg-text);
+        }
+        .pjg-prov-card ul { list-style: none; padding: 0; margin: 0; }
+        .pjg-prov-card li { font-size: 0.78rem; padding: 3px 0; color: var(--pjg-text2); border-bottom: 1px dashed rgba(148,163,184,0.18); }
+        .pjg-prov-card li:last-child { border-bottom: none; }
+        .pjg-mix-bar {
+            height: 14px; border-radius: 50px; overflow: hidden; display: flex;
+            background: var(--pjg-bg); margin: 0.5rem 0;
+        }
+        .pjg-mix-seg { height: 100%; transition: width 0.4s; }
+        .pjg-mix-legend { display: flex; gap: 0.65rem; flex-wrap: wrap; font-size: 0.7rem; color: var(--pjg-text2); }
+        .pjg-mix-legend span { display: inline-flex; align-items: center; gap: 4px; }
+        .pjg-mix-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+
+        /* SIDE PANEL */
+        .pjg-side-panel {
+            position: fixed; top: 64px; right: 0; bottom: 0; width: 320px;
+            background: var(--pjg-bg); border-left: 1px solid var(--pjg-border);
+            box-shadow: var(--pjg-shadow-lg); z-index: 998;
+            transform: translateX(110%); transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        .pjg-side-panel.open { transform: translateX(0); }
+        .pjg-side-head {
+            padding: 1rem 1.25rem; border-bottom: 1px solid var(--pjg-border);
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+        .pjg-side-head h3 { font-size: 1rem; font-weight: 800; line-height: 1.2; flex: 1; }
+        .pjg-side-close {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            color: var(--pjg-text2); font-family: inherit;
+        }
+        .pjg-side-close:hover { color: var(--pjg-text); }
+        .pjg-side-body { padding: 1rem 1.25rem; }
+        .pjg-side-row {
+            display: flex; justify-content: space-between; gap: 0.75rem;
+            font-size: 0.8rem; padding: 6px 0; border-bottom: 1px dashed var(--pjg-border);
+        }
+        .pjg-side-row .lbl { color: var(--pjg-text3); font-weight: 500; }
+        .pjg-side-row .val { color: var(--pjg-text); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .pjg-side-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .pjg-side-btn {
+            flex: 1; padding: 8px 12px; border-radius: 8px;
+            font-family: inherit; font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none; text-align: center;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .pjg-side-btn.primary { background: var(--pjg-gradient); color: white; border: none; }
+        .pjg-side-btn.secondary {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border); color: var(--pjg-text);
+        }
+        .pjg-side-btn:hover { transform: translateY(-1px); }
+        .pjg-conf {
+            display: inline-block; padding: 2px 8px; border-radius: 50px;
+            font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .pjg-conf.high { background: rgba(34,197,94,0.18); color: #4ade80; }
+        .pjg-conf.medium { background: rgba(250,204,21,0.18); color: #facc15; }
+        .pjg-conf.low { background: rgba(248,113,113,0.18); color: #fca5a5; }
+        .pjg-kv-tag {
+            display: inline-block; padding: 1px 6px; border-radius: 4px;
+            font-size: 0.6rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+            margin-left: 0.4rem;
+        }
+        .pjg-kv-tag.v500 { background: rgba(59,130,246,0.18); color: #60a5fa; }
+        .pjg-kv-tag.v275 { background: rgba(167,139,250,0.18); color: #c4b5fd; }
+        .pjg-kv-tag.v150 { background: rgba(248,113,113,0.18); color: #fca5a5; }
+        .pjg-kv-tag.v20  { background: rgba(250,204,21,0.18); color: #facc15; }
+
+        /* Sources strip footer */
+        .pjg-sources-strip {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1.5rem;
+        }
+        .pjg-sources-strip .pjg-source-chip { background: var(--pjg-bg3); border-color: var(--pjg-border); color: var(--pjg-text2); }
+        .pjg-sources-strip .pjg-source-chip:hover { color: var(--pjg-primary); }
+
+        /* THEME TOGGLE */
+        .pjg-theme-toggle {
+            position: fixed; bottom: 24px; right: 24px; z-index: 999;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            cursor: pointer; box-shadow: var(--pjg-shadow-md); transition: all 0.3s;
+            font-size: 1.1rem; color: var(--pjg-text);
+        }
+        .pjg-theme-toggle:hover { transform: scale(1.1); border-color: var(--pjg-primary); }
+
+        /* FOOTER */
+        .pjg-footer {
+            background: linear-gradient(135deg, #0b1220 0%, #1e293b 100%);
+            color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;
+        }
+        .pjg-footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;
+        }
+        .pjg-footer a { color: #94a3b8; text-decoration: none; font-size: 0.8rem; }
+        .pjg-footer a:hover { color: #60a5fa; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .pjg-hero h1 { font-size: 1.8rem; }
+            .pjg-hero { padding: 6rem 1rem 2rem; }
+            .nav-links { display: none; }
+            .mobile-nav-toggle { display: inline-flex; }
+            .navbar.menu-open .nav-links {
+                display: flex; position: absolute; top: 64px; left: 0; right: 0;
+                background: var(--pjg-bg); border-bottom: 1px solid var(--pjg-border);
+                padding: 1rem; flex-direction: column; gap: 0.75rem; align-items: flex-start;
+            }
+            .pjg-footer-inner { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 700px) {
+            .pjg-side-panel {
+                top: auto; left: 0; right: 0; bottom: 0; width: 100%;
+                max-height: 70vh; border-left: none; border-top: 1px solid var(--pjg-border);
+                transform: translateY(110%);
+                border-radius: 18px 18px 0 0;
+            }
+            .pjg-side-panel.open { transform: translateY(0); }
+            .pjg-stat-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="pjgNavbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">PJG</div>
+                <div>
+                    <div class="nav-title">PLN Java-Bali Grid Monitor</div>
+                    <div class="nav-subtitle">500/275/150 kV Backbone &middot; Single-Line Diagram</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="tco-calculator.html" class="nav-link" style="color:#4f46e5;"><i class="fas fa-calculator"></i> TCO Calc</a>
+                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;"><i class="fas fa-tachometer-alt"></i> PUE Calc</a>
+                <a href="dc-market/" class="nav-link" style="color:#14b8a6;"><i class="fas fa-globe"></i> DC Markets</a>
+                <a href="datacenter-solutions.html" class="nav-link" style="color:#f59e0b;"><i class="fas fa-server"></i> Solutions</a>
+                <a href="datacenter-solutions.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <button class="mobile-nav-toggle" id="pjgMobileToggle" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="pjg-hero">
+        <div class="pjg-hero-inner">
+            <h1>PLN <span>Java-Bali</span> Grid Monitor</h1>
+            <p class="pjg-hero-sub">Single-line diagram and geographic atlas of the Jamali transmission system.<br>Click any substation, plant, or province for detail.</p>
+            <div class="pjg-source-strip">
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-file-pdf"></i> PLN P2B 2016 SLD</a>
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-book"></i> RUPTL 2025-2034</a>
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-chart-pie"></i> PLN AR 2024</a>
+                <a href="https://www.bps.go.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-database"></i> BPS 2024</a>
+                <a href="https://www.iea.org/countries/indonesia" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-globe"></i> IEA Indonesia 2024</a>
+                <span class="pjg-refresh-badge"><i class="fas fa-clock"></i> Refreshed 2026-04-29</span>
+            </div>
+        </div>
+    </section>
+
+    <main class="pjg-main">
+
+        <!-- NATIONAL STATS -->
+        <section class="pjg-section">
+            <h2 class="pjg-section-title">Java-Bali System Headlines</h2>
+            <p class="pjg-section-desc">Subsystem totals from PLN AR 2024 and the RUPTL 2025-2034 baseline. The Java-Bali backbone supplies roughly 70% of national peak demand on a single synchronous island chain.</p>
+            <div class="pjg-stat-row" id="pjg-stat-row"></div>
+        </section>
+
+        <!-- VIEW SWITCHER + LAYER BAR -->
+        <section class="pjg-section">
+            <div class="pjg-toolbar">
+                <div class="pjg-segment" role="tablist" aria-label="View mode">
+                    <button id="pjg-btn-map" class="active" role="tab" aria-selected="true"><i class="fas fa-map-location-dot"></i> Geographic Map</button>
+                    <button id="pjg-btn-sld" role="tab" aria-selected="false"><i class="fas fa-diagram-project"></i> Single-Line Diagram</button>
+                </div>
+            </div>
+            <div class="pjg-toggles" role="toolbar" aria-label="Layer visibility">
+                <fieldset class="pjg-tog-group">
+                    <legend>Voltage</legend>
+                    <label><input type="checkbox" data-layer="v500" checked> <span>500 kV</span></label>
+                    <label><input type="checkbox" data-layer="v275" checked> <span>275 kV</span></label>
+                    <label><input type="checkbox" data-layer="v150" checked> <span>150 kV</span></label>
+                    <label><input type="checkbox" data-layer="v70"> <span>70 kV</span></label>
+                    <label><input type="checkbox" data-layer="v20"> <span>20 kV</span></label>
+                </fieldset>
+                <fieldset class="pjg-tog-group">
+                    <legend>Plants</legend>
+                    <label><input type="checkbox" data-fuel="coal" checked> Coal</label>
+                    <label><input type="checkbox" data-fuel="gas" checked> Gas</label>
+                    <label><input type="checkbox" data-fuel="hydro" checked> Hydro</label>
+                    <label><input type="checkbox" data-fuel="geo" checked> Geo</label>
+                    <label><input type="checkbox" data-fuel="solar" checked> Solar</label>
+                    <label><input type="checkbox" data-fuel="biomass" checked> Biomass</label>
+                    <label><input type="checkbox" data-fuel="wind" checked> Wind</label>
+                </fieldset>
+                <fieldset class="pjg-tog-group">
+                    <legend>Display</legend>
+                    <label><input type="checkbox" data-display="labels" checked> Labels</label>
+                    <label><input type="checkbox" data-display="capacity"> Capacity</label>
+                    <label><input type="checkbox" data-display="kvbadges" checked> kV badges</label>
+                </fieldset>
+                <button id="pjg-tier2-toggle" class="pjg-tier-toggle" type="button">
+                    <i class="fas fa-eye"></i> Show all 150 kV
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: MAP -->
+        <section class="pjg-section pjg-view active" id="pjg-view-map" role="tabpanel" aria-label="Geographic map">
+            <div class="pjg-map-wrap">
+                <div id="pjg-map" aria-label="Geographic map of the Java-Bali transmission grid"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: SLD -->
+        <section class="pjg-section pjg-view" id="pjg-view-sld" role="tabpanel" aria-label="Single-line diagram">
+            <div class="pjg-sld-wrap">
+                <div class="pjg-sld-hint"><i class="fas fa-arrows-up-down-left-right"></i> drag to pan &middot; scroll to zoom</div>
+                <div class="pjg-sld-legend" aria-label="Coordinate confidence legend">
+                    <span class="pjg-leg-h">Coordinate confidence</span>
+                    <span class="pjg-leg-row"><span class="pjg-leg-dot pjg-leg-dot-hi"></span> HI &middot; surveyed</span>
+                    <span class="pjg-leg-row"><span class="pjg-leg-dot pjg-leg-dot-med"></span> MED &middot; OSM/derived</span>
+                    <span class="pjg-leg-row"><span class="pjg-leg-dot pjg-leg-dot-low"></span> LOW &middot; estimated</span>
+                </div>
+                <svg id="pjg-sld" viewBox="0 0 1800 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="PLN Java-Bali single-line diagram">
+                    <defs id="pjg-sld-defs">
+                        <marker id="pjg-arrow-500" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                            <path d="M0,0 L8,4 L0,8 z" fill="#3b82f6"/>
+                        </marker>
+                        <marker id="pjg-arrow-275" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                            <path d="M0,0 L8,4 L0,8 z" fill="#a78bfa"/>
+                        </marker>
+                        <marker id="pjg-arrow-150" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                            <path d="M0,0 L8,4 L0,8 z" fill="#f87171"/>
+                        </marker>
+                    </defs>
+                    <g id="pjg-svg-root">
+                        <g id="pjg-sld-edges"></g>
+                        <g id="pjg-sld-particles"></g>
+                        <g id="pjg-sld-badges"></g>
+                        <g id="pjg-sld-nodes"></g>
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- PROVINCE CARDS -->
+        <section class="pjg-section">
+            <h2 class="pjg-section-title">Drill Down by Province</h2>
+            <p class="pjg-section-desc">Open a province sub-page for the 20 kV DC-feeder overlay and operator-level detail. Two showcase pages are live; the remaining provinces are scheduled.</p>
+            <div class="ds-strategic-grid">
+                <!-- Card 1: Jakarta+Banten -->
+                <div class="ds-strat-card" style="--card-border: rgba(6,182,212,0.45); --card-glow: rgba(6,182,212,0.22); --card-gradient: linear-gradient(135deg, #0e7490, #06b6d4);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #0e7490, #06b6d4); color: white;"><i class="fas fa-city"></i></div>
+                        <div class="ds-strat-title-wrap">
+                            <h3 class="ds-strat-title">DKI Jakarta + Banten <span class="ds-strat-badge">New</span></h3>
+                            <div class="ds-strat-subtitle">Suralaya, Muara Karang, Cawang, Bekasi, Cikarang</div>
+                        </div>
+                    </div>
+                    <p class="ds-strat-desc">Highest-density node on the Java-Bali grid. Coastal coal + city-edge gas, 18 known DC operators, peak load ~11.5 GW. Drill-down adds the 20 kV DC-feeder overlay (DCI, NTT, BDx, Equinix, Princeton, GDS).</p>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-bolt" style="background:rgba(6,182,212,0.2);color:#06b6d4;"></i> Peak ~11.5 GW &middot; 25% reserve margin</li>
+                        <li><i class="fas fa-server" style="background:rgba(6,182,212,0.2);color:#06b6d4;"></i> 18 known data-centre operators</li>
+                        <li><i class="fas fa-fire" style="background:rgba(6,182,212,0.2);color:#06b6d4;"></i> 62% coal &middot; 28% gas</li>
+                        <li><i class="fas fa-network-wired" style="background:rgba(6,182,212,0.2);color:#06b6d4;"></i> 20 kV feeder overlay (~40 endpoints)</li>
+                    </ul>
+                    <div class="ds-strat-footer">
+                        <a href="pln-java-grid-jakarta-banten.html" class="ds-strat-cta">
+                            Open Jakarta+Banten Detail <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 2: Jawa Barat -->
+                <div class="ds-strat-card" style="--card-border: rgba(16,185,129,0.45); --card-glow: rgba(16,185,129,0.22); --card-gradient: linear-gradient(135deg, #047857, #10b981);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #047857, #10b981); color: white;"><i class="fas fa-mountain"></i></div>
+                        <div class="ds-strat-title-wrap">
+                            <h3 class="ds-strat-title">Jawa Barat <span class="ds-strat-badge">New</span></h3>
+                            <div class="ds-strat-subtitle">Cirata, Cibatu, Bandung, Cirebon, Indramayu</div>
+                        </div>
+                    </div>
+                    <p class="ds-strat-desc">Hydro + geothermal heartland, anchored by 1.0 GW Cirata reservoir and the Wayang Windu/Patuha geothermal complex. Hosts the Sentul + Karawang + Bandung DC clusters and a fast-growing edge layer.</p>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-bolt" style="background:rgba(16,185,129,0.2);color:#10b981;"></i> Peak ~8.2 GW &middot; 28% reserve margin</li>
+                        <li><i class="fas fa-water" style="background:rgba(16,185,129,0.2);color:#10b981;"></i> 22% hydro &middot; 10% geothermal</li>
+                        <li><i class="fas fa-server" style="background:rgba(16,185,129,0.2);color:#10b981;"></i> 6 DC operators &middot; Sentul, Bandung, Karawang</li>
+                        <li><i class="fas fa-network-wired" style="background:rgba(16,185,129,0.2);color:#10b981;"></i> 20 kV feeder overlay (~30 endpoints)</li>
+                    </ul>
+                    <div class="ds-strat-footer">
+                        <a href="pln-java-grid-jabar.html" class="ds-strat-cta">
+                            Open Jawa Barat Detail <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 3: Jawa Tengah + DIY (soon) -->
+                <div class="ds-strat-card is-soon" style="--card-border: rgba(245,158,11,0.45); --card-glow: rgba(245,158,11,0.18); --card-gradient: linear-gradient(135deg, #b45309, #f59e0b);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #b45309, #f59e0b); color: white;"><i class="fas fa-industry"></i></div>
+                        <div class="ds-strat-title-wrap">
+                            <h3 class="ds-strat-title">Jawa Tengah + DIY <span class="ds-soon-pill">Coming soon</span></h3>
+                            <div class="ds-strat-subtitle">Tanjung Jati, Cilacap, Adipala, Mrica</div>
+                        </div>
+                    </div>
+                    <p class="ds-strat-desc">Heavy coal corridor plus Mrica hydro. Edge data-centre footprint is small but growing around Semarang and Yogyakarta. Province sub-page in the next iteration.</p>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-bolt" style="background:rgba(245,158,11,0.2);color:#f59e0b;"></i> Peak ~5.4 GW &middot; 33% reserve margin</li>
+                        <li><i class="fas fa-fire" style="background:rgba(245,158,11,0.2);color:#f59e0b;"></i> 71% coal &middot; 9% geothermal &middot; 8% hydro</li>
+                        <li><i class="fas fa-server" style="background:rgba(245,158,11,0.2);color:#f59e0b;"></i> 3 known DC sites</li>
+                    </ul>
+                    <div class="ds-strat-footer">
+                        <a href="#" class="ds-strat-cta" aria-disabled="true">
+                            In progress <i class="fas fa-clock"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 4: Jawa Timur (soon) -->
+                <div class="ds-strat-card is-soon" style="--card-border: rgba(239,68,68,0.45); --card-glow: rgba(239,68,68,0.18); --card-gradient: linear-gradient(135deg, #b91c1c, #ef4444);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #b91c1c, #ef4444); color: white;"><i class="fas fa-fire-flame-curved"></i></div>
+                        <div class="ds-strat-title-wrap">
+                            <h3 class="ds-strat-title">Jawa Timur <span class="ds-soon-pill">Coming soon</span></h3>
+                            <div class="ds-strat-subtitle">Paiton, Gresik, Grati, Pacitan</div>
+                        </div>
+                    </div>
+                    <p class="ds-strat-desc">Largest single coal node in Indonesia (Paiton 4.71 GW) and the Surabaya peering hub. Sub-page will detail the 500/150 kV ring around Surabaya plus the Banyuwangi-Bali 275 kV interconnect.</p>
+                    <ul class="ds-strat-features">
+                        <li><i class="fas fa-bolt" style="background:rgba(239,68,68,0.2);color:#ef4444;"></i> Peak ~6.9 GW &middot; 30% reserve margin</li>
+                        <li><i class="fas fa-fire" style="background:rgba(239,68,68,0.2);color:#ef4444;"></i> 58% coal &middot; 22% gas</li>
+                        <li><i class="fas fa-server" style="background:rgba(239,68,68,0.2);color:#ef4444;"></i> 4 DC operators &middot; Surabaya cluster</li>
+                    </ul>
+                    <div class="ds-strat-footer">
+                        <a href="#" class="ds-strat-cta" aria-disabled="true">
+                            In progress <i class="fas fa-clock"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROVINCE DETAIL PANEL -->
+        <section class="pjg-section">
+            <h2 class="pjg-section-title">Province Snapshot</h2>
+            <p class="pjg-section-desc">Headline numbers for each Java-Bali province. Use the deep link <code>#prov=jabar</code> to land on a specific tab.</p>
+            <div class="pjg-prov-panel">
+                <div class="pjg-prov-tabs" id="pjg-prov-tabs"></div>
+                <div id="pjg-prov-body"></div>
+            </div>
+        </section>
+
+        <!-- SOURCES STRIP -->
+        <section class="pjg-section">
+            <div class="pjg-sources-strip">
+                <strong style="font-size:0.7rem;letter-spacing:0.12em;color:var(--pjg-text3);text-transform:uppercase;">Sources</strong>
+                <a class="pjg-source-chip" href="https://web.pln.co.id/" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PLN P2B 2016 single-line diagram</a>
+                <a class="pjg-source-chip" href="https://web.pln.co.id/" target="_blank" rel="noopener"><i class="fas fa-book"></i> RUPTL 2025-2034</a>
+                <a class="pjg-source-chip" href="https://web.pln.co.id/" target="_blank" rel="noopener"><i class="fas fa-chart-pie"></i> PLN Annual Report 2024</a>
+                <a class="pjg-source-chip" href="https://www.bps.go.id/" target="_blank" rel="noopener"><i class="fas fa-database"></i> BPS Statistical Indonesia 2024</a>
+                <a class="pjg-source-chip" href="https://www.iea.org/countries/indonesia" target="_blank" rel="noopener"><i class="fas fa-globe"></i> IEA Indonesia 2024</a>
+                <a class="pjg-source-chip" href="https://www.esdm.go.id/" target="_blank" rel="noopener"><i class="fas fa-landmark"></i> ESDM Statistics</a>
+                <a class="pjg-source-chip" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener"><i class="fas fa-map"></i> &copy; OpenStreetMap contributors</a>
+                <span class="pjg-refresh-badge" style="color:var(--pjg-text3);"><i class="fas fa-clock"></i> Refreshed 2026-04-29</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SIDE PANEL -->
+    <aside class="pjg-side-panel" id="pjg-side-panel" role="dialog" aria-modal="true" aria-labelledby="pjg-side-name">
+        <div class="pjg-side-head">
+            <div style="flex:1;">
+                <h3 id="pjg-side-name">&mdash;</h3>
+                <span id="pjg-side-kv"></span>
+            </div>
+            <button class="pjg-side-close" id="pjg-side-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="pjg-side-body" id="pjg-side-body"></div>
+    </aside>
+
+    <!-- FOOTER -->
+    <footer class="pjg-footer">
+        <div class="pjg-footer-inner">
+            <div>
+                <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.15em;color:#64748b;line-height:1.6;margin-bottom:1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                <p style="font-size:0.65rem;letter-spacing:0.1em;color:#475569;margin-bottom:0.75rem;">DATA: PLN P2B 2016, RUPTL 2025-2034, BPS 2024, IEA 2024.</p>
+                <p style="font-size:0.75rem;color:#64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">NAVIGATION</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                    <li><a href="pln-java-grid.html">Java Grid Monitor</a></li>
+                    <li><a href="dc-market/">DC Markets</a></li>
+                    <li><a href="articles.html">Articles</a></li>
+                    <li><a href="glossary.html">Glossary</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">CONNECT</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- THEME TOGGLE -->
+    <button class="pjg-theme-toggle" id="pjgThemeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+        <i class="fas fa-moon" id="pjgThemeIcon"></i>
+    </button>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js" defer></script>
+    <script src="script.min.js?v=20260324b" defer></script>
+    <script src="auth.js?v=20260324b" defer></script>
+    <script src="rz-engine.js?v=2026-04-28" defer></script>
+    <script src="js/rz-map.js?v=2026-04-29-v3" defer></script>
+    <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
+    <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // Hardcoded province snapshot (PLN AR 2024 estimates)
+        var PROV_DATA = {
+            'jakarta-banten': { label: 'DKI Jakarta + Banten', colour: '#06b6d4', peakMW: 11500, reservePct: 25, dcOpsCount: 18,
+                genMix: { coal: 62, gas: 28, solar: 8, biomass: 2 },
+                topPlants: ['Suralaya 3.4 GW (coal)', 'Muara Karang 1.75 GW (gas)', 'Tanjung Priok 1.12 GW (gas)'],
+                dcOps: ['DCI Indonesia (JK1-JK5)', 'NTT Jakarta (JKT1-JKT4)', 'BDx Indonesia', 'Equinix JK1-JK2', 'Princeton Digital Group', 'GDS Cibitung'] },
+            'jabar': { label: 'Jawa Barat', colour: '#10b981', peakMW: 8200, reservePct: 28, dcOpsCount: 6,
+                genMix: { coal: 48, gas: 18, hydro: 22, geo: 10, solar: 2 },
+                topPlants: ['Cirata 1.0 GW (hydro)', 'Cirebon 1.66 GW (coal)', 'Indramayu 990 MW (coal)', 'Wayang Windu 227 MW (geo)'],
+                dcOps: ['Telkomsigma Sentul', 'EDGE DC Bandung', 'Lintasarta Bandung'] },
+            'jateng': { label: 'Jawa Tengah + DIY', colour: '#f59e0b', peakMW: 5400, reservePct: 33, dcOpsCount: 3,
+                genMix: { coal: 71, gas: 6, hydro: 8, geo: 9, solar: 4, biomass: 2 },
+                topPlants: ['Tanjung Jati B 2.64 GW (coal)', 'Cilacap 1.4 GW (coal)', 'Adipala 660 MW (coal)', 'Mrica 184 MW (hydro)'],
+                dcOps: ['Edge nodes (Semarang)', 'PLN Icon+ Yogyakarta'] },
+            'jatim': { label: 'Jawa Timur', colour: '#ef4444', peakMW: 6900, reservePct: 30, dcOpsCount: 4,
+                genMix: { coal: 58, gas: 22, hydro: 6, geo: 8, solar: 3, biomass: 3 },
+                topPlants: ['Paiton 4.71 GW (coal)', 'Gresik 1.58 GW (gas)', 'Grati 865 MW (gas)', 'Pacitan 630 MW (coal)'],
+                dcOps: ['Equinix Surabaya peering', 'Telkomsigma Surabaya', 'Lintasarta Surabaya'] }
+        };
+        var FUEL_COLORS = { coal:'#f87171', gas:'#60a5fa', hydro:'#38bdf8', geo:'#fb923c', solar:'#facc15', biomass:'#84cc16', wind:'#a3e635' };
+        var VOLT_COLORS = { 500:'#3b82f6', 275:'#a78bfa', 150:'#f87171', 70:'#fbbf24', 20:'#5eead4' };
+
+        // Bumped viewBox 2026-04-29-v3: 1400x800 -> 1800x900
+        var VIEWBOX_W = 1800;
+        var VIEWBOX_H = 900;
+        var LOD_ZOOM_THRESHOLD = 0.6;
+
+        var STATE = {
+            view: 'map',
+            tier2Visible: false,
+            voltageOn: { 500: true, 275: true, 150: true, 70: false, 20: false },
+            fuelOn: { coal: true, gas: true, hydro: true, geo: true, solar: true, biomass: true, wind: true },
+            displayOn: { labels: true, capacity: false, kvbadges: true },
+            mapInst: null,
+            mapInited: false,
+            sldRendered: false,
+            sldPanZoom: null,
+            currentProv: 'jakarta-banten'
+        };
+
+        function $(id) { return document.getElementById(id); }
+        function fmtNum(n) { return (typeof n === 'number') ? n.toLocaleString('en-US') : (n || '—'); }
+        function el(tag, attrs, kids) {
+            var e = document.createElement(tag);
+            if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) {
+                if (k === 'style') e.setAttribute('style', attrs[k]);
+                else if (k === 'html') e.innerHTML = attrs[k];
+                else e.setAttribute(k, attrs[k]);
+            }
+            if (kids && kids.length) for (var i = 0; i < kids.length; i++) {
+                if (typeof kids[i] === 'string') e.appendChild(document.createTextNode(kids[i]));
+                else if (kids[i]) e.appendChild(kids[i]);
+            }
+            return e;
+        }
+        function svgEl(tag, attrs) {
+            var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) {
+                if (k === 'xlink:href') e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', attrs[k]);
+                else e.setAttribute(k, attrs[k]);
+            }
+            return e;
+        }
+
+        // ========== STAT TILES ==========
+        function renderStatTiles() {
+            var data = (window.PLN_JAVA_GRID && window.PLN_JAVA_GRID.national) || {};
+            var tiles = [
+                { label: 'Installed', value: fmtNum(data.installedMW || 47000) + ' MW', sub: 'Java-Bali subsystem (PLN AR 2024)' },
+                { label: 'Peak Load', value: fmtNum(data.peakMW || 32000) + ' MW', sub: '2024 system peak' },
+                { label: 'Reserve', value: (data.reservePct || 31.0).toFixed(1) + '%', sub: 'Margin over peak' },
+                { label: 'Renewable', value: (data.renewablePct || 13.5).toFixed(1) + '%', sub: 'Generation share' },
+                { label: 'DC Capacity', value: fmtNum(data.dcMW || 950) + ' MW', sub: 'Subscribed data-centre load' },
+                { label: 'Substations', value: fmtNum(data.substations || 142), sub: '500/275/150 kV named' }
+            ];
+            var row = $('pjg-stat-row');
+            row.innerHTML = '';
+            for (var i = 0; i < tiles.length; i++) {
+                var t = tiles[i];
+                row.appendChild(el('div', { class: 'pjg-stat-tile' }, [
+                    el('div', { class: 'pjg-stat-label' }, [t.label]),
+                    el('div', { class: 'pjg-stat-value' }, [t.value]),
+                    el('div', { class: 'pjg-stat-sub' }, [t.sub])
+                ]));
+            }
+        }
+
+        // ========== VIEW SWITCHER ==========
+        function showView(which) {
+            STATE.view = which;
+            var btnMap = $('pjg-btn-map'), btnSld = $('pjg-btn-sld');
+            btnMap.classList.toggle('active', which === 'map');
+            btnSld.classList.toggle('active', which === 'sld');
+            btnMap.setAttribute('aria-selected', which === 'map');
+            btnSld.setAttribute('aria-selected', which === 'sld');
+            $('pjg-view-map').classList.toggle('active', which === 'map');
+            $('pjg-view-sld').classList.toggle('active', which === 'sld');
+            if (which === 'map') {
+                if (!STATE.mapInited) initMap();
+                else if (STATE.mapInst && STATE.mapInst.refresh) STATE.mapInst.refresh();
+            } else {
+                if (!STATE.sldRendered) renderSLD();
+                else if (STATE.sldPanZoom && STATE.sldPanZoom.resize) {
+                    STATE.sldPanZoom.resize();
+                    STATE.sldPanZoom.fit();
+                    STATE.sldPanZoom.center();
+                }
+            }
+        }
+
+        // ========== MAP ==========
+        function buildPopupHtml(node) {
+            var v = node.voltage ? (node.voltage + ' kV') : (node.fuel || '—');
+            var cap = (node.kind === 'plant')
+                ? (fmtNum(node.mw || 0) + ' MW')
+                : (fmtNum(node.mva || 0) + ' MVA');
+            return '<div style="min-width:200px;">'
+                + '<div style="font-weight:700;color:#f1f5f9;margin-bottom:4px;">' + (node.name || node.id) + '</div>'
+                + '<div style="font-size:0.72rem;color:#94a3b8;">' + v + ' &middot; ' + cap + '</div>'
+                + '<div style="font-size:0.7rem;color:#64748b;margin-top:4px;">' + (node.prov || '') + (node.year ? (' &middot; ' + node.year) : '') + '</div>'
+                + '<div style="margin-top:6px;"><a href="#" data-pjg-side="' + node.id + '" style="font-size:0.72rem;color:#60a5fa;">View detail &rarr;</a></div>'
+                + '</div>';
+        }
+
+        function buildMarkers(nodes) {
+            var out = [];
+            for (var i = 0; i < nodes.length; i++) {
+                var n = nodes[i];
+                if (typeof n.lat !== 'number' || typeof n.lng !== 'number') continue;
+                if (n.kind === 'plant') {
+                    out.push({ id: n.id, kind: 'plant', fuel: n.fuel, lat: n.lat, lng: n.lng, label: n.name, popupHtml: buildPopupHtml(n), tooltipData: n });
+                } else {
+                    out.push({ id: n.id, kind: 'station', voltage: n.voltage, mva: n.mva, lat: n.lat, lng: n.lng, label: n.name, popupHtml: buildPopupHtml(n), tooltipData: n });
+                }
+            }
+            return out;
+        }
+
+        function buildLines(edges, nodesById) {
+            var out = [];
+            for (var i = 0; i < edges.length; i++) {
+                var e = edges[i];
+                var a = nodesById[e.from], b = nodesById[e.to];
+                if (!a || !b) continue;
+                if (typeof a.lat !== 'number' || typeof b.lat !== 'number') continue;
+                var km = (typeof e.km === 'number') ? e.km : (e.length_km || '—');
+                var circuits = e.circuits || e.ckts || 1;
+                var lineTooltip = {
+                    name: a.name + ' → ' + b.name,
+                    voltage: e.voltage,
+                    mva: null,
+                    served_areas: null,
+                    notes: 'Transmission corridor — ' + km + ' km, ' + circuits + ' circuits',
+                    source: e.source || 'pln-p2b-2016',
+                    confidence: 'medium'
+                };
+                out.push({ id: 'edge_' + i, voltage: e.voltage, coords: [[a.lat, a.lng], [b.lat, b.lng]], tooltipData: lineTooltip });
+            }
+            return out;
+        }
+
+        function initMap() {
+            if (typeof L === 'undefined' || !window.RZMap || !window.PLN_JAVA_GRID) return;
+            STATE.mapInited = true;
+            var nodes = window.PLN_JAVA_GRID.nodes || [];
+            var edges = window.PLN_JAVA_GRID.edges || [];
+            var nodesById = {};
+            for (var i = 0; i < nodes.length; i++) nodesById[nodes[i].id] = nodes[i];
+            var markers = buildMarkers(nodes);
+            var lines = buildLines(edges, nodesById);
+            try {
+                STATE.mapInst = window.RZMap.init('pjg-map', {
+                    tile: 'carto-dark',
+                    fitBounds: [[-9, 105], [-6, 115]],
+                    minZoom: 6, maxZoom: 13,
+                    worldCopyJump: false,
+                    markers: markers,
+                    lines: lines,
+                    layers: { voltage: true, fuel: true }
+                });
+            } catch (err) { console.warn('[PJG] RZMap.init failed', err); }
+            // Wire side-panel click on popup
+            document.addEventListener('click', function (ev) {
+                var t = ev.target;
+                if (t && t.getAttribute && t.getAttribute('data-pjg-side')) {
+                    ev.preventDefault();
+                    openSidePanel(t.getAttribute('data-pjg-side'));
+                }
+            });
+            setTimeout(function () { if (STATE.mapInst && STATE.mapInst.refresh) STATE.mapInst.refresh(); }, 120);
+        }
+
+        // ========== SLD ==========
+        function shouldShowNode(node) {
+            if (node.tier === 2 && !STATE.tier2Visible) return false;
+            if (node.kind === 'station' && node.voltage && !STATE.voltageOn[node.voltage]) return false;
+            if (node.kind === 'plant' && node.fuel && !STATE.fuelOn[node.fuel]) return false;
+            return true;
+        }
+        function shouldShowEdge(edge, nodesById) {
+            if (edge.tier === 2 && !STATE.tier2Visible) return false;
+            if (edge.voltage && !STATE.voltageOn[edge.voltage]) return false;
+            var a = nodesById[edge.from], b = nodesById[edge.to];
+            if (!a || !b) return false;
+            return shouldShowNode(a) && shouldShowNode(b);
+        }
+
+        function renderSLD() {
+            if (!window.PLN_JAVA_GRID) return;
+            STATE.sldRendered = true;
+            var nodes = window.PLN_JAVA_GRID.nodes || [];
+            var edges = window.PLN_JAVA_GRID.edges || [];
+            var nodesById = {};
+            for (var i = 0; i < nodes.length; i++) nodesById[nodes[i].id] = nodes[i];
+
+            var gEdges = $('pjg-sld-edges');
+            var gParticles = $('pjg-sld-particles');
+            var gBadges = $('pjg-sld-badges');
+            var gNodes = $('pjg-sld-nodes');
+            var defs = $('pjg-sld-defs');
+            gEdges.innerHTML = '';
+            gParticles.innerHTML = '';
+            gBadges.innerHTML = '';
+            gNodes.innerHTML = '';
+            // Clear stale defs paths but keep markers
+            var oldPaths = defs.querySelectorAll('path[id^="path-"]');
+            for (var p = 0; p < oldPaths.length; p++) defs.removeChild(oldPaths[p]);
+
+            var reduced = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+            // Edges
+            for (var j = 0; j < edges.length; j++) {
+                var e = edges[j];
+                if (!shouldShowEdge(e, nodesById)) continue;
+                var a = nodesById[e.from], b = nodesById[e.to];
+                var x1 = a.x, y1 = a.y, x2 = b.x, y2 = b.y;
+                var dx = x2 - x1, dy = y2 - y1;
+                var len = Math.sqrt(dx * dx + dy * dy);
+                if (!isFinite(len) || len === 0) continue;
+                var line = svgEl('line', {
+                    x1: x1, y1: y1, x2: x2, y2: y2,
+                    'class': 'pjg-line pjg-line-' + e.voltage + ' pjg-line-v' + e.voltage,
+                    'marker-end': 'url(#pjg-arrow-' + e.voltage + ')'
+                });
+                gEdges.appendChild(line);
+
+                // kV badge at midpoint, suppressed if line < 36 px
+                if (len >= 36) {
+                    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                    var bg = svgEl('g', { 'class': 'pjg-kv-badge', transform: 'translate(' + (mx - 7) + ',' + (my - 4.5) + ')' });
+                    bg.appendChild(svgEl('rect', { width: 14, height: 9, rx: 2, fill: 'rgba(8,15,30,0.9)', stroke: 'rgba(255,255,255,0.18)' }));
+                    var t = svgEl('text', { x: 7, y: 6.5, 'text-anchor': 'middle' });
+                    t.textContent = String(e.voltage);
+                    bg.appendChild(t);
+                    gBadges.appendChild(bg);
+                }
+
+                // Particle on 500 kV only
+                if (e.voltage === 500 && !reduced) {
+                    var pid = 'path-edge-' + j;
+                    var pth = svgEl('path', { id: pid, d: 'M' + x1 + ',' + y1 + ' L' + x2 + ',' + y2, fill: 'none' });
+                    defs.appendChild(pth);
+                    var c = svgEl('circle', { r: 2, 'class': 'pjg-particle' });
+                    var am = svgEl('animateMotion', { dur: '4s', repeatCount: 'indefinite' });
+                    var mp = svgEl('mpath', { 'xlink:href': '#' + pid });
+                    am.appendChild(mp);
+                    c.appendChild(am);
+                    gParticles.appendChild(c);
+                }
+            }
+
+            // Nodes + labels
+            var labelBoxes = [];
+            for (var k = 0; k < nodes.length; k++) {
+                var n = nodes[k];
+                if (!shouldShowNode(n)) continue;
+                if (typeof n.x !== 'number' || typeof n.y !== 'number') continue;
+
+                var nClass = 'pjg-node-' + (n.kind || 'station');
+                if (n.voltage) nClass += ' pjg-node-v' + n.voltage;
+                if (n.fuel) nClass += ' pjg-node-fuel-' + n.fuel;
+                if (n.confidence) nClass += ' pjg-node-conf-' + String(n.confidence).toLowerCase();
+                var g = svgEl('g', {
+                    'class': nClass,
+                    'data-id': n.id,
+                    'data-voltage': n.voltage || '',
+                    'data-fuel': n.fuel || ''
+                });
+                var r;
+                if (n.kind === 'plant') {
+                    r = 7 + Math.min(10, Math.sqrt(n.mw || 100) / 8);
+                } else {
+                    r = 5 + Math.min(8, Math.sqrt(n.mva || 500) / 8);
+                }
+                g.appendChild(svgEl('circle', { cx: n.x, cy: n.y, r: r }));
+
+                var labelAbove = (n.y >= 90);
+                var labelY = labelAbove ? (n.y - r - 5) : (n.y + r + 11);
+                var label = svgEl('text', {
+                    x: n.x, y: labelY, 'text-anchor': 'middle', 'class': 'pjg-node-label'
+                });
+                label.textContent = stripGI(n.name);
+                g.appendChild(label);
+
+                var capStr = '';
+                if (n.kind === 'plant' && n.mw) capStr = n.mw + ' MW';
+                else if (n.mva) capStr = n.mva + ' MVA';
+                var capText = null;
+                if (capStr) {
+                    var capY = labelAbove ? (labelY - 11) : (labelY + 9);
+                    capText = svgEl('text', {
+                        x: n.x, y: capY, 'text-anchor': 'middle', 'class': 'pjg-node-cap pjg-node-capacity', 'data-cap': '1'
+                    });
+                    capText.textContent = capStr;
+                    g.appendChild(capText);
+                }
+
+                g.addEventListener('click', (function (id) {
+                    return function () { openSidePanel(id); };
+                })(n.id));
+
+                gNodes.appendChild(g);
+
+                // Track AABB for collision pass (rough; ~6 px char width)
+                var w = Math.max(40, label.textContent.length * 5.5);
+                labelBoxes.push({
+                    nodeId: n.id, label: label, capText: capText,
+                    cx: n.x, cy: labelY,
+                    w: w, h: 11,
+                    priority: (n.mva || n.mw || 0)
+                });
+            }
+
+            // Collision pass — up to 10 iterations, ±20 px nudge (v3)
+            collisionNudge(labelBoxes, 10);
+
+            // Wire PLNTooltip on every SVG node (v3)
+            attachSldTooltips(nodes, edges, nodesById);
+
+            // Apply CSS-class-based layer visibility (display + voltage + fuel)
+            applyClassVisibility();
+
+            // Init or update svg-pan-zoom
+            if (typeof svgPanZoom !== 'undefined') {
+                if (STATE.sldPanZoom && STATE.sldPanZoom.destroy) {
+                    try { STATE.sldPanZoom.destroy(); } catch (err) { /* ignore */ }
+                }
+                try {
+                    STATE.sldPanZoom = svgPanZoom('#pjg-sld', {
+                        viewportSelector: '#pjg-svg-root',
+                        controlIconsEnabled: false,
+                        dblClickZoomEnabled: false,
+                        minZoom: 0.5, maxZoom: 8,
+                        zoomScaleSensitivity: 0.3,
+                        fit: true, center: true,
+                        onZoom: applyLodForZoom
+                    });
+                    applyLodForZoom(STATE.sldPanZoom.getZoom());
+                } catch (err) { /* ignore */ }
+            }
+        }
+
+        // Level-of-detail: at zoom < 0.6, hide tier-2, 70 kV, 20 kV labels
+        function applyLodForZoom(z) {
+            var root = $('pjg-svg-root');
+            if (!root) return;
+            if (typeof z !== 'number' && STATE.sldPanZoom) {
+                try { z = STATE.sldPanZoom.getZoom(); } catch (e) { z = 1; }
+            }
+            if (typeof z !== 'number') z = 1;
+            root.classList.toggle('lod-low', z < LOD_ZOOM_THRESHOLD);
+        }
+
+        function attachSldTooltips(nodes, edges, nodesById) {
+            if (typeof window.PLNTooltip === 'undefined' || !window.PLNTooltip) return;
+            var nodeEls = document.querySelectorAll('#pjg-sld-nodes [data-id]');
+            for (var i = 0; i < nodeEls.length; i++) {
+                var el = nodeEls[i];
+                var id = el.getAttribute('data-id');
+                var node = nodesById[id];
+                if (!node) continue;
+                try { window.PLNTooltip.attach(el, node, { variant: 'svg' }); } catch (e) { /* ignore */ }
+            }
+            // Wire PLNTooltip on edge midpoint kV badges
+            var badges = document.querySelectorAll('#pjg-sld-badges .pjg-kv-badge');
+            for (var j = 0; j < badges.length && j < edges.length; j++) {
+                // Badges are appended in same iteration order as visible edges; map best-effort
+                var be = edges[j];
+                if (!be) continue;
+                var aN = nodesById[be.from], bN = nodesById[be.to];
+                var fromName = aN ? aN.name : be.from;
+                var toName = bN ? bN.name : be.to;
+                var km = (typeof be.km === 'number') ? be.km : (be.length_km || '—');
+                var circuits = be.circuits || be.ckts || 1;
+                var edgeData = {
+                    name: fromName + ' → ' + toName,
+                    voltage: be.voltage,
+                    mva: null,
+                    served_areas: null,
+                    notes: 'Transmission corridor — ' + km + ' km, ' + circuits + ' circuits',
+                    source: be.source || 'pln-p2b-2016',
+                    confidence: 'medium'
+                };
+                try { window.PLNTooltip.attach(badges[j], edgeData, { variant: 'svg' }); } catch (e) { /* ignore */ }
+            }
+        }
+
+        function applyClassVisibility() {
+            var root = $('pjg-svg-root');
+            if (!root) return;
+            // Voltage tiers
+            var voltKeys = [500, 275, 150, 70, 20];
+            for (var i = 0; i < voltKeys.length; i++) {
+                var v = voltKeys[i];
+                root.classList.toggle('hide-v' + v, !STATE.voltageOn[v]);
+            }
+            // Fuels
+            var fuelKeys = ['coal', 'gas', 'hydro', 'geo', 'solar', 'biomass', 'wind'];
+            for (var k = 0; k < fuelKeys.length; k++) {
+                var f = fuelKeys[k];
+                root.classList.toggle('hide-' + f, !STATE.fuelOn[f]);
+            }
+            // Display
+            root.classList.toggle('no-labels', !STATE.displayOn.labels);
+            root.classList.toggle('no-capacity', !STATE.displayOn.capacity);
+            root.classList.toggle('no-kvbadges', !STATE.displayOn.kvbadges);
+        }
+
+        function stripGI(name) {
+            if (!name) return '';
+            return name.replace(/^GITET\s+/i, '').replace(/^GI\s+/i, '');
+        }
+
+        function aabbOverlap(a, b, pad) {
+            return (Math.abs(a.cx - b.cx) * 2 < (a.w + b.w + pad * 2))
+                && (Math.abs(a.cy - b.cy) * 2 < (a.h + b.h + pad * 2));
+        }
+
+        function collisionNudge(boxes, maxIter) {
+            // v3: widened nudge radius from 12 to 20 px; alternates direction per iteration to avoid runaway drift
+            for (var iter = 0; iter < maxIter; iter++) {
+                var moved = false;
+                var dy = (iter % 2 === 0) ? 20 : -20;
+                for (var i = 0; i < boxes.length; i++) {
+                    for (var j = i + 1; j < boxes.length; j++) {
+                        if (aabbOverlap(boxes[i], boxes[j], 4)) {
+                            // Lower priority moves
+                            var lo = (boxes[i].priority < boxes[j].priority) ? boxes[i] : boxes[j];
+                            // Pick axis with most slack — y is cheaper to nudge
+                            lo.cy += dy;
+                            lo.label.setAttribute('y', lo.cy);
+                            if (lo.capText) lo.capText.setAttribute('y', lo.cy + 9);
+                            moved = true;
+                        }
+                    }
+                }
+                if (!moved) return;
+            }
+            // Fallback: hide capacity line on any remaining colliders
+            for (var k = 0; k < boxes.length; k++) {
+                for (var m = k + 1; m < boxes.length; m++) {
+                    if (aabbOverlap(boxes[k], boxes[m], 4)) {
+                        var lo2 = (boxes[k].priority < boxes[m].priority) ? boxes[k] : boxes[m];
+                        if (lo2.capText && lo2.capText.parentNode) lo2.capText.parentNode.removeChild(lo2.capText);
+                        lo2.capText = null;
+                    }
+                }
+            }
+        }
+
+        // ========== LAYER TOGGLES ==========
+        function applyLayerVisibility() {
+            // SLD: prefer cheap CSS class flip; only re-render if voltage/fuel set changed shape (still cheap)
+            applyClassVisibility();
+
+            // Map: hide/show via Leaflet layer group internals via setMarkerVisible/setLineVisible if exposed
+            if (STATE.mapInst && window.PLN_JAVA_GRID) {
+                var nodes = window.PLN_JAVA_GRID.nodes || [];
+                var edges = window.PLN_JAVA_GRID.edges || [];
+                for (var i = 0; i < nodes.length; i++) {
+                    var n = nodes[i];
+                    var vis = shouldShowNode(n);
+                    if (STATE.mapInst.setMarkerVisible) STATE.mapInst.setMarkerVisible(n.id, vis);
+                }
+                for (var j = 0; j < edges.length; j++) {
+                    var e = edges[j];
+                    var visE = (!e.voltage || STATE.voltageOn[e.voltage]) && (!(e.tier === 2) || STATE.tier2Visible);
+                    if (STATE.mapInst.setLineVisible) STATE.mapInst.setLineVisible('edge_' + j, visE);
+                }
+            }
+            // SLD: re-render (rebuilds nodes that may have been pruned by shouldShowNode)
+            if (STATE.sldRendered) renderSLD();
+        }
+
+        function bindLayerToggles() {
+            var inputs = document.querySelectorAll('.pjg-toggles input[type="checkbox"]');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].addEventListener('change', function () {
+                    var layer = this.getAttribute('data-layer');     // v500, v275, v150, v70, v20
+                    var fuel = this.getAttribute('data-fuel');       // coal, gas, hydro, geo, solar, biomass, wind
+                    var display = this.getAttribute('data-display'); // labels, capacity, kvbadges
+                    if (layer && layer.charAt(0) === 'v') {
+                        var v = parseInt(layer.substring(1), 10);
+                        if (!isNaN(v)) STATE.voltageOn[v] = this.checked;
+                    }
+                    if (fuel) STATE.fuelOn[fuel] = this.checked;
+                    if (display) STATE.displayOn[display] = this.checked;
+                    applyLayerVisibility();
+                });
+            }
+            var t2 = $('pjg-tier2-toggle');
+            if (t2) {
+                t2.addEventListener('click', function () {
+                    STATE.tier2Visible = !STATE.tier2Visible;
+                    t2.classList.toggle('active', STATE.tier2Visible);
+                    t2.innerHTML = STATE.tier2Visible
+                        ? '<i class="fas fa-eye-slash"></i> Hide tier-2 150 kV'
+                        : '<i class="fas fa-eye"></i> Show all 150 kV';
+                    applyLayerVisibility();
+                });
+            }
+        }
+
+        // ========== SIDE PANEL ==========
+        function openSidePanel(nodeId) {
+            if (!window.PLN_JAVA_GRID) return;
+            var node = null;
+            var nodes = window.PLN_JAVA_GRID.nodes || [];
+            for (var i = 0; i < nodes.length; i++) if (nodes[i].id === nodeId) { node = nodes[i]; break; }
+            if (!node) return;
+            var v = node.voltage ? node.voltage : null;
+            $('pjg-side-name').textContent = node.name || nodeId;
+            $('pjg-side-kv').innerHTML = v
+                ? '<span class="pjg-kv-tag v' + v + '">' + v + ' kV</span>'
+                : (node.fuel ? '<span class="pjg-kv-tag" style="background:rgba(250,204,21,0.18);color:#facc15;">' + node.fuel.toUpperCase() + '</span>' : '');
+            var cap = (node.kind === 'plant') ? (fmtNum(node.mw) + ' MW') : (fmtNum(node.mva) + ' MVA');
+            var conf = (node.confidence || 'medium').toLowerCase();
+            var body = $('pjg-side-body');
+            var lat = (typeof node.lat === 'number') ? node.lat.toFixed(3) : '—';
+            var lng = (typeof node.lng === 'number') ? node.lng.toFixed(3) : '—';
+            var prov = node.prov ? (PROV_DATA[node.prov] ? PROV_DATA[node.prov].label : node.prov) : '—';
+            body.innerHTML = ''
+                + '<div class="pjg-side-row"><span class="lbl">Type</span><span class="val">' + (node.kind === 'plant' ? 'Power plant' : 'Substation') + '</span></div>'
+                + '<div class="pjg-side-row"><span class="lbl">Capacity</span><span class="val">' + cap + '</span></div>'
+                + (node.fuel ? '<div class="pjg-side-row"><span class="lbl">Fuel</span><span class="val">' + node.fuel + '</span></div>' : '')
+                + '<div class="pjg-side-row"><span class="lbl">Province</span><span class="val">' + prov + '</span></div>'
+                + '<div class="pjg-side-row"><span class="lbl">Year</span><span class="val">' + (node.year || '—') + '</span></div>'
+                + '<div class="pjg-side-row"><span class="lbl">Lat / Lng</span><span class="val">' + lat + ', ' + lng + '</span></div>'
+                + '<div class="pjg-side-row"><span class="lbl">Confidence</span><span class="val"><span class="pjg-conf ' + conf + '">' + conf + '</span></span></div>'
+                + '<div class="pjg-side-actions">'
+                + '  <button type="button" class="pjg-side-btn primary" id="pjg-side-viewmap"><i class="fas fa-map-pin"></i> View on Map</button>'
+                + '  <a class="pjg-side-btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng + '"><i class="fas fa-up-right-from-square"></i> Open Maps</a>'
+                + '</div>';
+            $('pjg-side-panel').classList.add('open');
+            var vm = $('pjg-side-viewmap');
+            vm.addEventListener('click', function () {
+                showView('map');
+                if (STATE.mapInst && STATE.mapInst.setView && typeof node.lat === 'number') {
+                    STATE.mapInst.setView([node.lat, node.lng], 11);
+                }
+            });
+        }
+        function closeSidePanel() { $('pjg-side-panel').classList.remove('open'); }
+
+        // ========== PROVINCE PANEL ==========
+        function renderProvinceTabs() {
+            var tabs = $('pjg-prov-tabs');
+            tabs.innerHTML = '';
+            var keys = ['jakarta-banten', 'jabar', 'jateng', 'jatim'];
+            for (var i = 0; i < keys.length; i++) {
+                (function (k) {
+                    var p = PROV_DATA[k];
+                    var btn = el('button', { 'class': 'pjg-prov-tab' + (k === STATE.currentProv ? ' active' : ''), 'data-prov': k, type: 'button' }, [p.label]);
+                    btn.addEventListener('click', function () { selectProvince(k); });
+                    tabs.appendChild(btn);
+                })(keys[i]);
+            }
+        }
+        function selectProvince(key) {
+            STATE.currentProv = key;
+            var tabs = document.querySelectorAll('.pjg-prov-tab');
+            for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i].getAttribute('data-prov') === key);
+            renderProvinceBody(key);
+            try { history.replaceState(null, '', '#prov=' + key); } catch (e) { /* ignore */ }
+        }
+        function renderProvinceBody(key) {
+            var p = PROV_DATA[key]; if (!p) return;
+            var body = $('pjg-prov-body');
+            // generation mix bar
+            var mixOrder = ['coal', 'gas', 'hydro', 'geo', 'solar', 'biomass'];
+            var mixHtml = '<div class="pjg-mix-bar">';
+            var mixLegend = '<div class="pjg-mix-legend">';
+            for (var i = 0; i < mixOrder.length; i++) {
+                var f = mixOrder[i], pct = p.genMix[f] || 0;
+                if (pct > 0) {
+                    mixHtml += '<div class="pjg-mix-seg" style="width:' + pct + '%;background:' + FUEL_COLORS[f] + ';" title="' + f + ' ' + pct + '%"></div>';
+                    mixLegend += '<span><i style="background:' + FUEL_COLORS[f] + ';"></i>' + f + ' ' + pct + '%</span>';
+                }
+            }
+            mixHtml += '</div>'; mixLegend += '</div>';
+
+            var plantsLi = '';
+            for (var j = 0; j < p.topPlants.length; j++) plantsLi += '<li>' + p.topPlants[j] + '</li>';
+            var opsLi = '';
+            for (var m = 0; m < p.dcOps.length; m++) opsLi += '<li>' + p.dcOps[m] + '</li>';
+
+            // Key substations from PLN_JAVA_GRID nodes
+            var subsLi = '';
+            if (window.PLN_JAVA_GRID && window.PLN_JAVA_GRID.nodes) {
+                var nodes = window.PLN_JAVA_GRID.nodes;
+                var picks = [];
+                for (var n = 0; n < nodes.length; n++) {
+                    var nd = nodes[n];
+                    if (nd.prov === key && nd.kind === 'station' && nd.tier === 1) {
+                        picks.push(nd);
+                    }
+                }
+                picks.sort(function (a, b) { return (b.mva || 0) - (a.mva || 0); });
+                picks = picks.slice(0, 6);
+                for (var q = 0; q < picks.length; q++) {
+                    var ps = picks[q];
+                    subsLi += '<li>' + stripGI(ps.name) + ' <span class="pjg-kv-tag v' + ps.voltage + '">' + ps.voltage + '</span> <span style="color:var(--pjg-text3);font-family:JetBrains Mono;">' + (ps.mva || 0) + ' MVA</span></li>';
+                }
+            }
+            if (!subsLi) subsLi = '<li style="color:var(--pjg-text3);">No substations indexed for this province.</li>';
+
+            body.innerHTML = ''
+                + '<div class="pjg-prov-grid">'
+                + '  <div class="pjg-prov-card"><h4>Peak Load</h4><div class="num">' + fmtNum(p.peakMW) + ' MW</div><div style="font-size:0.7rem;color:var(--pjg-text3);">Reserve margin ' + p.reservePct + '%</div></div>'
+                + '  <div class="pjg-prov-card"><h4>DC Operators</h4><div class="num">' + p.dcOpsCount + '</div><div style="font-size:0.7rem;color:var(--pjg-text3);">Known sites in ' + p.label + '</div></div>'
+                + '  <div class="pjg-prov-card" style="grid-column: span 2;min-width:0;"><h4>Generation Mix</h4>' + mixHtml + mixLegend + '</div>'
+                + '  <div class="pjg-prov-card"><h4>Top Plants</h4><ul>' + plantsLi + '</ul></div>'
+                + '  <div class="pjg-prov-card"><h4>Key Substations</h4><ul>' + subsLi + '</ul></div>'
+                + '  <div class="pjg-prov-card"><h4>DC Operators</h4><ul>' + opsLi + '</ul></div>'
+                + '</div>';
+        }
+
+        // ========== HASH ROUTING ==========
+        function readHash() {
+            var h = (window.location.hash || '').replace(/^#/, '');
+            if (!h) return null;
+            var parts = h.split('=');
+            if (parts.length === 2 && parts[0] === 'prov' && PROV_DATA[parts[1]]) return parts[1];
+            return null;
+        }
+
+        // ========== THEME ==========
+        function bindTheme() {
+            var btn = $('pjgThemeToggle');
+            var icon = $('pjgThemeIcon');
+            var saved = (function(){try{return localStorage.getItem('rz_theme');}catch(e){return null;}})() || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            icon.className = (saved === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
+            btn.addEventListener('click', function () {
+                var cur = document.documentElement.getAttribute('data-theme');
+                var nxt = (cur === 'dark') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', nxt);
+                try { localStorage.setItem('rz_theme', nxt); } catch (e) { /* ignore */ }
+                icon.className = (nxt === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
+            });
+        }
+
+        // ========== BIND ==========
+        function bindAll() {
+            $('pjg-btn-map').addEventListener('click', function () { showView('map'); });
+            $('pjg-btn-sld').addEventListener('click', function () { showView('sld'); });
+            $('pjg-side-close').addEventListener('click', closeSidePanel);
+            document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeSidePanel(); });
+            document.addEventListener('click', function (ev) {
+                var panel = $('pjg-side-panel');
+                if (!panel.classList.contains('open')) return;
+                if (panel.contains(ev.target)) return;
+                // Don't close on node clicks (handled by openSidePanel)
+                if (ev.target.closest && (ev.target.closest('.pjg-node-station') || ev.target.closest('.pjg-node-plant') || ev.target.closest('[data-pjg-side]'))) return;
+                if (ev.target.closest && ev.target.closest('.leaflet-popup-content')) return;
+                closeSidePanel();
+            });
+            var mob = $('pjgMobileToggle');
+            if (mob) mob.addEventListener('click', function () { $('pjgNavbar').classList.toggle('menu-open'); });
+            bindLayerToggles();
+            bindTheme();
+        }
+
+        // ========== BOOT ==========
+        function boot() {
+            if (!window.PLN_JAVA_GRID) {
+                // Data file may load slightly after DOMContentLoaded; retry briefly
+                var tries = 0;
+                var iv = setInterval(function () {
+                    tries++;
+                    if (window.PLN_JAVA_GRID || tries > 40) {
+                        clearInterval(iv);
+                        if (window.PLN_JAVA_GRID) realBoot();
+                        else console.warn('[PJG] PLN_JAVA_GRID never loaded');
+                    }
+                }, 75);
+                return;
+            }
+            realBoot();
+        }
+        function realBoot() {
+            renderStatTiles();
+            renderProvinceTabs();
+            var hashProv = readHash();
+            if (hashProv) STATE.currentProv = hashProv;
+            renderProvinceBody(STATE.currentProv);
+            bindAll();
+            // Default view = map. Initialize once Leaflet is available.
+            if (typeof L !== 'undefined' && window.RZMap) {
+                initMap();
+            } else {
+                var tries = 0;
+                var iv = setInterval(function () {
+                    tries++;
+                    if ((typeof L !== 'undefined' && window.RZMap) || tries > 60) {
+                        clearInterval(iv);
+                        if (typeof L !== 'undefined' && window.RZMap) initMap();
+                    }
+                }, 80);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+    })();
+    </script>
+
+</body>
+</html>

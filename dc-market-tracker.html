@@ -576,6 +576,64 @@
             font-size: 0.72rem; color: var(--dmt-text3);
         }
         .dmt-bm-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dmt-primary); }
+
+        /* MARKET GUIDES SECTION */
+        .dmt-markets-section {
+            max-width: 1400px; margin: 2.5rem auto; padding: 2rem;
+            background: var(--dmt-bg2); border: 1px solid var(--dmt-border);
+            border-radius: 16px;
+        }
+        .dmt-markets-section h2 {
+            font-size: 1.4rem; font-weight: 700; color: var(--dmt-text);
+            margin-bottom: 0.5rem;
+        }
+        .dmt-markets-section > p {
+            font-size: 0.85rem; color: var(--dmt-text2); margin-bottom: 1.5rem;
+            line-height: 1.55;
+        }
+        .dmt-markets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .dmt-market-card-link {
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 140px; padding: 1rem 1.1rem;
+            background: var(--dmt-bg3);
+            border: 1px solid var(--dmt-border);
+            border-left: 3px solid var(--dmt-accent);
+            border-radius: 12px;
+            text-decoration: none; color: var(--dmt-text);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dmt-market-card-link:hover {
+            transform: translateY(-2px);
+            border-color: var(--dmt-accent);
+            border-left-color: var(--dmt-primary);
+            box-shadow: var(--dmt-shadow-md);
+        }
+        .dmt-market-card-link .city {
+            font-size: 1rem; font-weight: 700; color: var(--dmt-text);
+            margin-bottom: 0.25rem;
+        }
+        .dmt-market-card-link .region {
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em;
+            color: var(--dmt-accent); text-transform: uppercase;
+        }
+        .dmt-market-card-link .meta {
+            font-size: 0.72rem; color: var(--dmt-text3); margin-top: 0.5rem;
+        }
+        .dmt-market-card-link.is-hub {
+            border-left-color: var(--dmt-violet);
+            background: linear-gradient(135deg, rgba(139,92,246,0.08), var(--dmt-bg3));
+        }
+        .dmt-market-card-link.is-hub:hover { border-left-color: var(--dmt-violet); }
+        .dmt-market-card-link.is-hub .region { color: var(--dmt-violet); }
+        @media (max-width: 640px) {
+            .dmt-markets-section { margin: 1.5rem 1rem; padding: 1.25rem; }
+            .dmt-markets-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+            .dmt-market-card-link { min-height: 120px; padding: 0.85rem 0.95rem; }
+        }
     </style>
 </head>
 <body>
@@ -589,6 +647,8 @@
                 </div>
             </a>
             <div class="nav-links">
+                <a href="dc-market/index.html" class="nav-link" style="color:#14b8a6;">DC Markets</a>
+                <a href="pln-java-grid.html" class="nav-link" style="color:#3b82f6;">PLN Java Grid</a>
                 <a href="tco-calculator.html" class="nav-link" style="color:#4f46e5;">TCO Calc</a>
                 <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;">PUE Calc</a>
                 <a href="capex-calculator.html" class="nav-link" style="color:#f59e0b;">CAPEX Calc</a>
@@ -835,6 +895,69 @@
         </div>
     </div>
 
+    <!-- Browse Market Guides -->
+    <section class="dmt-markets-section">
+        <h2>Browse In-Depth Market Guides</h2>
+        <p>Each market has a dedicated page covering capacity, PUE, regulation, hyperscale operators, and growth pipeline.</p>
+        <div class="dmt-markets-grid">
+            <a href="dc-market/index.html" class="dmt-market-card-link is-hub">
+                <span class="city">All Markets Hub</span>
+                <span class="region">Index page</span>
+                <span class="meta">10 cities indexed</span>
+            </a>
+            <a href="dc-market/northern-virginia.html" class="dmt-market-card-link">
+                <span class="city">Northern Virginia</span>
+                <span class="region">North America</span>
+                <span class="meta">~4 GW operational</span>
+            </a>
+            <a href="dc-market/london.html" class="dmt-market-card-link">
+                <span class="city">London</span>
+                <span class="region">Europe</span>
+                <span class="meta">~1.5 GW operational</span>
+            </a>
+            <a href="dc-market/frankfurt.html" class="dmt-market-card-link">
+                <span class="city">Frankfurt</span>
+                <span class="region">Europe</span>
+                <span class="meta">~900 MW operational</span>
+            </a>
+            <a href="dc-market/singapore.html" class="dmt-market-card-link">
+                <span class="city">Singapore</span>
+                <span class="region">Asia Pacific</span>
+                <span class="meta">~850 MW operational</span>
+            </a>
+            <a href="dc-market/tokyo.html" class="dmt-market-card-link">
+                <span class="city">Tokyo</span>
+                <span class="region">Asia Pacific</span>
+                <span class="meta">~1.2 GW operational</span>
+            </a>
+            <a href="dc-market/sydney.html" class="dmt-market-card-link">
+                <span class="city">Sydney</span>
+                <span class="region">Asia Pacific</span>
+                <span class="meta">~600 MW operational</span>
+            </a>
+            <a href="dc-market/mumbai.html" class="dmt-market-card-link">
+                <span class="city">Mumbai</span>
+                <span class="region">Asia Pacific</span>
+                <span class="meta">~500 MW operational</span>
+            </a>
+            <a href="dc-market/jakarta.html" class="dmt-market-card-link">
+                <span class="city">Jakarta</span>
+                <span class="region">Asia Pacific</span>
+                <span class="meta">~350 MW operational</span>
+            </a>
+            <a href="dc-market/kuala-lumpur.html" class="dmt-market-card-link">
+                <span class="city">Kuala Lumpur</span>
+                <span class="region">Asia Pacific</span>
+                <span class="meta">~250 MW operational</span>
+            </a>
+            <a href="dc-market/dubai.html" class="dmt-market-card-link">
+                <span class="city">Dubai</span>
+                <span class="region">Middle East</span>
+                <span class="meta">~200 MW operational</span>
+            </a>
+        </div>
+    </section>
+
     <!-- Login Modal -->
     <div id="dmtLoginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
         <div style="background:var(--dmt-bg);border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:dmtModalIn 0.3s ease;">
@@ -969,6 +1092,7 @@
     </button>
 
     <script src="script.min.js?v=20260324b"></script>
+    <script src="js/rz-map.js?v=2026-04-29"></script>
 
     <!-- Main IIFE -->
     <script>
@@ -1066,6 +1190,11 @@
         // ═══════════════════════════════════════════
         // LEAFLET MAP
         // ═══════════════════════════════════════════
+        // NOTE: js/rz-map.js (RZMap) is loaded for future shared-engine use,
+        // but this page keeps the inline Leaflet code because RZMap currently
+        // colors station markers by voltage (kV) and lacks a per-marker
+        // customColor opt. DC markets here use maturity-based colors instead.
+        // TODO: migrate to RZMap.init() once it supports custom marker colors per maturity.
         var dmtMap = null;
         var dmtMarkers = [];
 

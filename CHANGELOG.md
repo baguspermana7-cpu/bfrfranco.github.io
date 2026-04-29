@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## [2026-04-29] — PLN regional monitors split off landing page; shared `js/rz-map.js` engine
+
+### Added
+- **`pln-java-grid.html`** — new dedicated detail page for the PLN Java-Bali (Jamali) transmission system. Geographic Map view (Leaflet/CARTO dark, Java + Bali fitBounds) and Single-Line Diagram view (inline SVG, IEC 60617 symbols, ~100 nodes target with "Show all 150 kV" toggle for the long tail). Province tabs (Jakarta+Banten / Jabar / Jateng+DIY / Jatim) with deep-link support (`#prov=jabar`). Substation slide-in side panel on click.
+- **`js/rz-map.js`** — new shared Leaflet wrapper engine. Public API `window.RZMap.init(containerId, opts)` returning `{ map, addMarker, addLine, setMarkerVisible, setLineVisible, fitBounds, setView, refresh, destroy }`. Stations as `circleMarker` (color by voltage 500/275/150, radius `√(MVA)*0.35`). Plants as `divIcon` with FontAwesome glyph per fuel type. Polylines per voltage tier with `rzm-line-{500|275|150}` className for CSS dash-flow. Optional layer control on voltage/fuel toggles. `prefers-reduced-motion` guard. Resilient: no-ops if Leaflet isn't loaded.
+- **`js/pln-java-grid-data.js`** — data module for `window.PLN_JAVA_GRID` exposing `{ version, nodes[], edges[], national }`. Topology source: PLN P2B 2016 single-line diagram. Coordinate confidence flag per node (`high` from Wikipedia infobox / OSM Nominatim, `low` from province-centroid fallback — none invented).
+
+### Changed
+- **`datacenter-solutions.html` #pln-monitor section** reverted to a 6-card grid (`.ds-strat-card`). Java-Bali card is active and links to `pln-java-grid.html`. Sumatera, Kalimantan, Sulawesi, Maluku-Papua, Nusa Tenggara cards render as dimmed `is-soon` placeholders (`<div>` not `<a>`, `pointer-events:none`, "Coming soon" pill instead of CTA — not crawlable as dead links).
+- **`dc-market-tracker.html`** refactored to consume `RZMap.init()` instead of its inline `initLeafletMap()` IIFE. Visual output identical.
+- **`standarization/UI_FEATURES_STANDARD.md`**: replaced the earlier "SLD Inline-SVG Animation Pattern" section with the broader "Card → detail-page hub + shared `js/rz-map.js` engine" pattern.
+
+### Removed
+- All `.pln-*` CSS rules from `datacenter-solutions.html` (~280 lines of SLD-only styling). Verified by `grep -rln 'pln-grid-card\|pln-mini-stat\|pln-list-title' /home/baguspermana7/rz-work/` returning only the post-revert file itself.
+
+### Rationale
+- User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
+
+### 2026-04-29-v3 — Data accuracy expansion (OSM crawl + tooltip system + multi-tier toggles)
+
+- **Added** `tools/build-osm-dataset.py` — Python OSM Overpass crawler for Java+Bali. Queries `power=substation` and `power=plant`/`generator` features, parses voltage tags, writes `js/pln-java-grid-data.js` with provenance fields per node (`source`, `osm_id`, `wikidata`, `confidence`).
+- **Added** `tools/pln-java-grid-overlay.yaml` — hand-curated overlay (~60 entries) carrying `mva`, `year`, `served_areas`, `notes` for known substations and plants. Merged into the JS data file at build time.
+- **Added** `js/pln-tooltip.js` (471 LOC) — shared rich-tooltip module for SVG nodes + Leaflet markers. Lifecycle: shared singleton DOM, debounced show/hide, auto-position with viewport flipping, keyboard accessible (focus + Esc), mobile bottom-sheet variant.
+- **Modified** `js/rz-map.js` (303 → 317 LOC) — now accepts per-marker `tooltipData` opt; auto-wires `PLNTooltip.attach` if module is loaded. Backward-compatible (existing dc-market-tracker.html consumer unaffected).
+- **Modified** `pln-java-grid.html`, `pln-java-grid-jakarta-banten.html`, `pln-java-grid-jabar.html` — added 5-tier voltage layer toggles (500/275/150 default ON; 70/20 default OFF on overview, 20 default ON on province pages). Per-fuel plant toggles. Display master toggles (Labels / Capacity / kV badges). Wired tooltips on every node + edge midpoint. SLD viewBox bumped to 1800×900 (overview) and 1400×900 (province) to absorb the larger dataset. Collision-nudge increased from 6 to 10 iterations with ±20 px search radius.
+- **Schema additions per node**: `source`, `confidence` (high/medium/low), `osm_id`, `osm_type`, `wikidata`, `served_areas[]`, `notes`, `secondary_voltages[]`, `last_verified`. Visible in tooltip header (kV + confidence badges) and footer (OSM/Wikidata/Map links).
+- **Dataset growth**: from 118 nodes hand-curated → **744 nodes** OSM-sourced (563 stations + 181 plants), 6.3× expansion. Voltage breakdown: 33×500 kV / 1×275 kV / 442×150 kV / 55×70 kV / 213×20 kV. Province breakdown: jakarta-banten 213, jabar 196, jatim 185, jateng 112, bali 38. Confidence: 503 high / 224 medium / 17 low. User's specific concern resolved: `GIS Summarecon` now in dataset (`osm_way_966209499`, 150 kV, jakarta-banten, confidence:high) — alongside GIS Bekasi II, GISTET Tambun II, GI Tambun, GI Cikarang, GI Cikarang Lippo, KCIC Karawang, etc.
+- **Why**: user feedback on accuracy ("very accurate, very precise") and request that all voltage tiers be selectable. The user's specific complaint about GI Bekasi vs GI Summarecon is addressed via the `served_areas` annotation (Summarecon Bekasi, Harapan Indah, Logos Bekasi listed as served areas of GI Cibitung 150/20 kV).
+- Cards-on-landing → detail-page-on-click model matches the existing `.ds-strat-card` pattern used elsewhere in the section (TCO, ROI, DMT cards).
+
 ## [Unreleased]
 
 ### Planned

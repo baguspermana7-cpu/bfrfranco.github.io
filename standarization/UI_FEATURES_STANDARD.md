@@ -979,3 +979,523 @@ The minified files are what the browser actually loads. If not rebuilt, fixes ap
 3. [ ] Rebuild: `cleancss styles-index.css -o styles-index.min.css && cleancss styles.css -o styles.min.css`
 4. [ ] Visually verify both light AND dark themes
 5. [ ] Commit both `.css` and `.min.css` files together
+
+---
+
+## SLD Inline-SVG Animation Pattern
+
+> **Added**: 2026-04-29 (datacenter-solutions.html Java-Bali PLN monitor)
+
+Reusable pattern for power-grid single-line diagrams with animated flow visualization.
+
+### SVG Structure
+
+```html
+<svg viewBox="0 0 1000 380" class="pln-sld" style="width:100%; max-width:1000px;">
+    <!-- Background/frame -->
+    <rect x="10" y="10" width="980" height="360" fill="none" stroke="#e5e7eb" stroke-width="1" rx="8"/>
+    
+    <!-- Transmission lines (500 kV primary, 150 kV secondary, 275 kV submarine) -->
+    <path class="pln-line pln-500kv" d="M 50 190 L 500 190" stroke="#3b82f6" stroke-width="2.5"/>
+    <path class="pln-line pln-150kv" d="M 50 250 L 500 250" stroke="#f87171" stroke-width="2"/>
+    <path class="pln-line pln-275kv-sub" d="M 600 190 Q 650 100 750 190" stroke="#a78bfa" stroke-width="2" fill="none"/>
+    
+    <!-- Substations: filled circle + kV label -->
+    <circle class="pln-substation" cx="150" cy="190" r="5" fill="#3b82f6"/>
+    <text x="150" y="220" text-anchor="middle" font-size="11" fill="#475569">Bekasi 500</text>
+    
+    <!-- Generator plants: circle + "G" + plant icon overlay -->
+    <circle class="pln-generator" cx="800" cy="190" r="7" fill="#10b981"/>
+    <text x="800" y="195" text-anchor="middle" font-size="10" fill="white" font-weight="bold">G</text>
+    <text x="800" y="220" text-anchor="middle" font-size="11" fill="#475569">Paiton 4.7 GW</text>
+    
+    <!-- Transformer pictogram (if needed): two circles, side-by-side -->
+    <circle cx="450" cy="190" r="4" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+    <circle cx="460" cy="190" r="4" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+</svg>
+```
+
+### CSS Animation
+
+```css
+/* Dash-flow laser effect on transmission lines */
+@keyframes pln-flow {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -22; }  /* Must match (14 + 8) dash + gap sum */
+}
+
+.pln-line {
+    stroke-dasharray: 14 8;  /* 14px dash, 8px gap */
+    animation: pln-flow 60s linear infinite;
+}
+
+/* Optional: reduce motion override */
+@media (prefers-reduced-motion: reduce) {
+    .pln-line {
+        animation: none;
+        stroke-dasharray: none;
+    }
+}
+
+/* Light/dark mode consistency */
+[data-theme="dark"] .pln-line {
+    stroke-opacity: 0.85;
+}
+```
+
+### Voltage Color Convention (PLN)
+
+| Voltage Level | Color | Hex | Use Case |
+|---|---|---|---|
+| 500 kV (primary transmission) | Blue | `#3b82f6` | Long-distance backbone |
+| 150 kV (secondary transmission) | Red | `#f87171` | Regional distribution |
+| 275 kV (submarine/HVDC) | Violet | `#a78bfa` | Inter-island links |
+| 70 kV (distribution) | Amber | `#f59e0b` | Local grids (if needed) |
+
+Adopted from PLN P2B 2016 single-line diagram standard.
+
+### IEC 60617 Symbol Conventions
+
+| Component | Representation | CSS Class |
+|---|---|---|
+| Substation | Filled circle (5–6px) + kV label below | `.pln-substation` |
+| Generator/Plant | Circle + "G" label + plant-type icon overlay | `.pln-generator` |
+| Transformer | Two circles side-by-side (if diagram complexity allows) | `.pln-transformer` |
+| Transmission line | Stroked path with `stroke-dasharray` animation | `.pln-line` |
+| Bus bar (optional) | Horizontal/vertical line with junction dots | `.pln-busbar` |
+
+### Interactivity Pattern
+
+Province/region clickable areas drive a tabbed detail panel (data-driven):
+
+```javascript
+const PL_REGIONS = {
+    'dki-banten': {
+        label: 'DKI Jakarta + Banten',
+        demand: '24.5 GW',
+        generation: '12.3 GW',
+        mix: 'Coal 45%, Gas 35%, Hydro 15%, Renewables 5%'
+    },
+    'jawa-barat': {
+        label: 'Jawa Barat',
+        demand: '18.7 GW',
+        generation: '16.2 GW',
+        mix: 'Coal 60%, Gas 20%, Hydro 15%, Renewables 5%'
+    },
+    // ...
+};
+
+document.querySelectorAll('[data-region]').forEach(el => {
+    el.addEventListener('click', e => {
+        const regionKey = e.target.dataset.region;
+        const data = PLN_REGIONS[regionKey];
+        document.getElementById('detail-panel').innerHTML = buildDetailHTML(data);
+    });
+});
+```
+
+HTML structure:
+```html
+<div id="pln-detail-tabs" class="tabs">
+    <button data-region="dki-banten" class="tab-btn active">DKI + Banten</button>
+    <button data-region="jawa-barat" class="tab-btn">Jawa Barat</button>
+    <button data-region="jawa-tengah-diy" class="tab-btn">Jawa Tengah + DIY</button>
+    <button data-region="jawa-timur" class="tab-btn">Jawa Timur</button>
+</div>
+<div id="detail-panel" class="detail-panel">
+    <!-- Populated by JS on tab click -->
+</div>
+```
+
+### Responsive Behavior
+
+- **Desktop (>1024px)**: SLD 100% width, up to 1000px container width
+- **Tablet (768–1024px)**: SLD 95vw, slight label repositioning with `text-anchor: middle`
+- **Mobile (<768px)**: SLD stacks above detail tabs; tab buttons wrap to 2 per row; labels font-size reduced to 9px
+
+### Dark Mode Support
+
+All text and strokes inherit from `[data-theme="dark"]` root selector:
+
+```css
+[data-theme="dark"] .pln-sld text { fill: #d1d5db; }
+[data-theme="dark"] .pln-sld rect { stroke: #4b5563; }
+[data-theme="dark"] .pln-line { stroke-opacity: 0.8; }
+```
+
+### Reusability
+
+This pattern is reusable for future grid pages covering:
+- Sumatra PLN grid atlas
+- Kalimantan regional dispatch
+- Sulawesi demand patterns
+- Maluku-Papua interconnection roadmap
+
+Each subpage simply swaps the SVG viewBox coordinates, line paths, station markers, and `PLN_REGIONS` data object.
+
+### Performance Notes
+
+- Inline SVG renders directly; no external asset HTTP requests
+- CSS keyframe animation is GPU-accelerated (no JS RAF)
+- Typical SLD SVG: 800–1200 bytes unminified
+- Tab interactivity via vanilla JS event delegation (no jQuery or libraries)
+
+---
+
+## Hover-Tooltip Pattern for Dense Data Visualizations
+
+> **Added**: 2026-04-29-v3 (pln-java-grid.html + pln-tooltip.js)
+
+Use this pattern when a visualization (inline SVG or Leaflet map) has 30+ markers/nodes where label crowding would impair readability. Tooltips reveal detailed information on hover without permanently occupying viewport space.
+
+### When to Use
+
+- Grid maps with >30 data points (substations, data centers, network nodes)
+- Single-line diagrams with >50 components
+- Anywhere label density exceeds ~0.1 labels per 100 pixels² of viewport
+- Multi-tier systems where each node carries 4+ data attributes
+
+### Module: `js/pln-tooltip.js`
+
+**Public API**:
+```javascript
+PLNTooltip.attach(targetElement, tooltipData, opts)
+```
+
+**Parameters**:
+- `targetElement` — DOM node or selector string (SVG element, Leaflet marker container)
+- `tooltipData` — object with keys: `name`, `voltage`, `capacity`, `year`, `operator`, `served_areas`, `notes`, `source`, `osm_id`, `wikidata`, `confidence`
+- `opts` — optional: `{ showDelay: 80, hideDelay: 120, position: 'auto', mobile: true }`
+
+**Return**: `{ show(), hide(), destroy() }` controller.
+
+### Rendered Schema
+
+Tooltip DOM structure (shared singleton):
+
+```html
+<div class="pln-tooltip" role="tooltip">
+    <div class="pln-tooltip-header">
+        <div class="pln-tooltip-name">GI Bekasi 150 kV</div>
+        <div class="pln-tooltip-badges">
+            <span class="pln-tooltip-badge voltage">150 kV</span>
+            <span class="pln-tooltip-badge confidence high">High</span>
+        </div>
+    </div>
+    <div class="pln-tooltip-body">
+        <div class="pln-tooltip-row">
+            <span class="pln-tooltip-label">Capacity</span>
+            <span class="pln-tooltip-value">650 MVA</span>
+        </div>
+        <div class="pln-tooltip-row">
+            <span class="pln-tooltip-label">Year</span>
+            <span class="pln-tooltip-value">2015</span>
+        </div>
+        <div class="pln-tooltip-row">
+            <span class="pln-tooltip-label">Operator</span>
+            <span class="pln-tooltip-value">PLN P2B</span>
+        </div>
+        <div class="pln-tooltip-row">
+            <span class="pln-tooltip-label">Served Areas</span>
+            <span class="pln-tooltip-value">Summarecon Bekasi, Harapan Indah, Logos Bekasi</span>
+        </div>
+        <div class="pln-tooltip-row">
+            <span class="pln-tooltip-label">Notes</span>
+            <span class="pln-tooltip-value">Central hub for east-Bekasi distribution</span>
+        </div>
+    </div>
+    <div class="pln-tooltip-footer">
+        <div class="pln-tooltip-source">Source: OpenStreetMap (osm_id: 4567890)</div>
+        <div class="pln-tooltip-links">
+            <a href="https://openstreetmap.org/relation/4567890" target="_blank">View on OSM</a>
+            <a href="https://wikidata.org/wiki/Q123456" target="_blank">Wikidata</a>
+            <a href="https://maps.google.com/?q=..." target="_blank">Google Maps</a>
+        </div>
+    </div>
+</div>
+```
+
+### Lifecycle & Behavior
+
+- **Singleton DOM**: One tooltip element shared across entire page. Reused on every attach.
+- **Debounced show**: 80ms delay before tooltip appears (prevents flicker on mouse-over).
+- **Debounced hide**: 120ms delay before tooltip vanishes (user can move mouse to tooltip to keep it open).
+- **Auto-position**: Computed position checks viewport edges; if tooltip would overflow right → flip to left; if bottom → flip to top.
+- **Keyboard accessible**: `tabindex="0"` auto-applied to attached element; focus shows tooltip; `Esc` key hides it.
+- **Mobile bottom-sheet**: On viewport ≤700px, tooltip renders as pinned bottom-sheet with darkened backdrop; tap outside closes.
+
+### Integration with RZMap
+
+Pass `tooltipData` object per marker:
+
+```javascript
+RZMap.addMarker({
+    lat: -6.12,
+    lng: 107.01,
+    voltage: 150,
+    label: 'GI Bekasi',
+    tooltipData: {
+        name: 'GI Bekasi 150 kV',
+        voltage: '150 kV',
+        capacity: '650 MVA',
+        year: 2015,
+        operator: 'PLN P2B',
+        served_areas: ['Summarecon Bekasi', 'Harapan Indah'],
+        notes: 'Central hub',
+        source: 'OpenStreetMap',
+        osm_id: 4567890,
+        confidence: 'high'
+    }
+});
+```
+
+RZMap automatically calls `PLNTooltip.attach()` on marker container if the module is loaded.
+
+### CSS Theming
+
+Tooltip respects `[data-theme="light"]` and `[data-theme="dark"]`:
+
+**Light mode** (default):
+- Background: `#ffffff`, shadow: `0 8px 24px rgba(0,0,0,0.12)`
+- Text: `#1e293b`, labels: `#64748b`
+- Badge: white bg, accent border
+- Links: accent color, underline on hover
+
+**Dark mode** (`[data-theme="dark"]`):
+- Background: `#1e293b`, shadow: `0 8px 24px rgba(0,0,0,0.4)`
+- Text: `#e2e8f0`, labels: `#cbd5e1`
+- Badge: dark bg, light border
+- Links: light accent, underline on hover
+
+### Performance Characteristics
+
+- **Attach overhead**: O(N) one-time cost; each `.attach()` call registers a hover listener and stores data reference
+- **Per-frame work**: Zero; tooltip show/hide managed by debounced callbacks, no RAF-driven animation
+- **Memory**: Single DOM element + N event listeners + N data objects; negligible even at 300+ markers
+- **Typical page**: <5ms attach + <1ms per show/hide event
+
+---
+
+## Multi-Tier Voltage Layer Toggle Pattern
+
+> **Added**: 2026-04-29-v3 (pln-java-grid.html layers)
+
+Pattern for visualizations with 5+ categorical layers (e.g., power grid voltage tiers: 500/275/150/70/20 kV) where layer visibility toggles must coordinate with both SVG and Leaflet elements.
+
+### Layer Structure
+
+**5 voltage tiers**:
+- `v500` — 500 kV primary transmission (typically enabled by default on overview)
+- `v275` — 275 kV secondary transmission (enabled on overview, disabled on zoomed pages)
+- `v150` — 150 kV tertiary transmission (enabled on overview and region pages)
+- `v70` — 70 kV subtransmission (disabled by default on overview; enabled on some province pages)
+- `v20` — 20 kV distribution (enabled on province pages for DC feeder visibility)
+
+**Per-fuel plant toggles** (e.g., Coal, Gas, Hydro, Nuclear — optional but recommended):
+- Toggles affect only plant node visibility, not transmission lines
+- Separate from voltage toggles (user can show all voltages but only coal plants)
+
+**Display master toggles** (all optional):
+- `Labels` — show/hide kV labels on nodes and lines
+- `Capacity` — show/hide MVA capacity badges
+- `kV badges` — show/hide voltage tier badges on each node
+
+### Default Visibility Rules
+
+**Overview pages** (e.g., `pln-java-grid.html`):
+- Enabled: v500, v275, v150
+- Disabled: v70, v20
+- Rationale: high-level transmission topology without visual clutter of distribution
+
+**Province detail pages** (e.g., `pln-java-grid-jabar.html`):
+- Enabled: v500, v275, v150, v20
+- Disabled: v70
+- Rationale: show DC feeders (20 kV) for local awareness, skip 70 kV as intermediate
+
+### Implementation: Toggle Handler
+
+HTML structure:
+
+```html
+<div class="layer-controls">
+    <div class="toggle-group">
+        <label>Transmission Tiers</label>
+        <label class="toggle-label">
+            <input type="checkbox" class="voltage-toggle" value="v500" checked>
+            <span>500 kV</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" class="voltage-toggle" value="v275" checked>
+            <span>275 kV</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" class="voltage-toggle" value="v150" checked>
+            <span>150 kV</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" class="voltage-toggle" value="v70">
+            <span>70 kV</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" class="voltage-toggle" value="v20">
+            <span>20 kV</span>
+        </label>
+    </div>
+
+    <div class="toggle-group">
+        <label>Plant Types</label>
+        <label class="toggle-label">
+            <input type="checkbox" class="fuel-toggle" value="coal" checked>
+            <span>Coal</span>
+        </label>
+        <!-- More fuel types... -->
+    </div>
+
+    <div class="toggle-group">
+        <label>Display Options</label>
+        <label class="toggle-label">
+            <input type="checkbox" class="display-toggle" value="labels" checked>
+            <span>Labels</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" class="display-toggle" value="capacity" checked>
+            <span>Capacity</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" class="display-toggle" value="kv-badge" checked>
+            <span>kV Badges</span>
+        </label>
+    </div>
+</div>
+```
+
+JavaScript toggle handler:
+
+```javascript
+document.querySelectorAll('.voltage-toggle').forEach(chk => {
+    chk.addEventListener('change', e => {
+        const voltage = e.target.value;  // 'v500', 'v150', etc.
+        const isChecked = e.target.checked;
+        
+        // SVG: add/remove hide class
+        const svgRoot = document.querySelector('.svg-root');
+        const hideClass = `hide-${voltage}`;
+        if (isChecked) {
+            svgRoot.classList.remove(hideClass);
+        } else {
+            svgRoot.classList.add(hideClass);
+        }
+        
+        // Leaflet: show/hide markers and polylines
+        if (window.RZMap) {
+            const markerClass = `rzm-node-${voltage}`;
+            const lineClass = `rzm-line-${voltage}`;
+            document.querySelectorAll(`.${markerClass}`).forEach(el => {
+                RZMap.setMarkerVisible(el.dataset.markerId, isChecked);
+            });
+            document.querySelectorAll(`.${lineClass}`).forEach(el => {
+                RZMap.setLineVisible(el.dataset.lineId, isChecked);
+            });
+        }
+    });
+});
+```
+
+### CSS Implementation
+
+For SVG elements, use CSS classes to hide nodes and edges:
+
+```css
+/* SVG hide classes — add to svg.svg-root when unchecked */
+.svg-root.hide-v500 .node-v500,
+.svg-root.hide-v500 .line-v500 {
+    display: none;
+}
+
+.svg-root.hide-v275 .node-v275,
+.svg-root.hide-v275 .line-v275 {
+    display: none;
+}
+
+.svg-root.hide-v150 .node-v150,
+.svg-root.hide-v150 .line-v150 {
+    display: none;
+}
+
+.svg-root.hide-v70 .node-v70,
+.svg-root.hide-v70 .line-v70 {
+    display: none;
+}
+
+.svg-root.hide-v20 .node-v20,
+.svg-root.hide-v20 .line-v20 {
+    display: none;
+}
+
+/* Edge visibility: show only if both endpoints visible */
+.svg-root.hide-v500 .edge-v500-to-v150,
+.svg-root.hide-v150 .edge-v500-to-v150 {
+    display: none;
+}
+```
+
+Apply voltage classes to SVG elements:
+
+```html
+<circle class="node node-v150" cx="150" cy="190" r="5"/>
+<path class="line line-v150" d="M 50 250 L 500 250"/>
+<path class="edge edge-v500-to-v150" d="M 400 190 L 400 250"/>
+```
+
+### Edge Visibility Coordination
+
+An edge (transmission line connecting two nodes at different voltages) should only be visible if BOTH endpoint voltages are enabled. Handle this in the toggle handler:
+
+```javascript
+function updateEdgeVisibility() {
+    const svgRoot = document.querySelector('.svg-root');
+    const visibleVoltages = Array.from(
+        document.querySelectorAll('.voltage-toggle:checked')
+    ).map(el => el.value);  // ['v500', 'v150', ...]
+    
+    document.querySelectorAll('.edge').forEach(edge => {
+        const classes = Array.from(edge.classList);
+        const voltages = classes
+            .filter(c => c.startsWith('edge-'))
+            .map(c => c.replace('edge-', '').split('-to-'))
+            .flat();
+        
+        const bothVisible = voltages.every(v => visibleVoltages.includes(v));
+        edge.style.display = bothVisible ? 'initial' : 'none';
+    });
+}
+```
+
+### Leaflet Integration
+
+For `RZMap.setMarkerVisible(markerId, visible)` and `RZMap.setLineVisible(lineId, visible)`:
+
+```javascript
+RZMap.setMarkerVisible = function(markerId, visible) {
+    const marker = this._markers[markerId];
+    if (marker) {
+        marker.setOpacity(visible ? 1 : 0);
+        marker.setInteractive(visible);  // Prevent hover on hidden markers
+    }
+};
+
+RZMap.setLineVisible = function(lineId, visible) {
+    const line = this._lines[lineId];
+    if (line) {
+        line.setStyle({ opacity: visible ? 1 : 0.2 });
+        line.setInteractive(visible);
+    }
+};
+```
+
+### Lessons Learned
+
+- **Checkbox checked state must sync with visual state** — after toggling, verify CSS class and marker opacity match checkbox
+- **Mobile: render as collapsible sidebar or bottom sheet** — don't let controls waste 30% of mobile viewport
+- **Search index integration** — allow "Show only coal plants" + "Show only 150 kV" searches in unified control
+- **Performance at 300+ nodes** — use event delegation; don't attach listeners to each node. Use CSS classes for bulk updates

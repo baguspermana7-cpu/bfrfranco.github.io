@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GED7FX8RTV');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DKI Jakarta + Banten Provincial Grid Detail | PLN Java-Bali Monitor</title>
+    <meta name="description" content="Provincial detail of the DKI Jakarta + Banten 500/150 kV grid with the 20 kV DC-feeder overlay. Substations, plants, and 18+ data-centre operators on a Leaflet/CARTO dark map and inline single-line diagram.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/pln-java-grid-jakarta-banten.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/pln-java-grid-jakarta-banten.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/pln-java-grid-jakarta-banten.html">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/pln-java-grid-jakarta-banten.html">
+    <meta property="og:title" content="DKI Jakarta + Banten Provincial Grid Detail">
+    <meta property="og:description" content="500/150 kV grid + 20 kV DC-feeder overlay for the DKI Jakarta + Banten province on the PLN Java-Bali system.">
+    <meta property="og:image" content="https://resistancezero.com/assets/Favicon.png">
+    <meta property="og:site_name" content="ResistanceZero">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="DKI Jakarta + Banten Provincial Grid Detail">
+    <meta name="twitter:description" content="500/150 kV grid + 20 kV DC feeders for Jakarta + Banten on the PLN Java-Bali system.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/Favicon.png">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "DKI Jakarta + Banten Provincial Grid Detail",
+        "applicationCategory": "BusinessApplication",
+        "description": "Interactive geographic map and single-line diagram of the DKI Jakarta + Banten 500/150 kV grid with a 20 kV data-centre feeder overlay (~30 endpoints across DCI, NTT, BDx, Equinix, Princeton Digital Group, GDS, EdgeConneX, Telkomsigma, Lintasarta).",
+        "url": "https://resistancezero.com/pln-java-grid-jakarta-banten.html",
+        "operatingSystem": "Web Browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Geographic Leaflet/CARTO dark map of DKI Jakarta + Banten",
+            "Inline SVG single-line diagram with svg-pan-zoom",
+            "20 kV data-centre feeder overlay",
+            "Operator-level data-centre table",
+            "Voltage layer toggle (500 / 150 / 20 kV)"
+        ],
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "jobTitle": "Engineering Operations Manager",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "DC Solutions", "item": "https://resistancezero.com/datacenter-solutions.html" },
+            { "@type": "ListItem", "position": 3, "name": "Java-Bali Grid Monitor", "item": "https://resistancezero.com/pln-java-grid.html" },
+            { "@type": "ListItem", "position": 4, "name": "DKI Jakarta + Banten" }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <!-- Inline boot theme to avoid FOUC; default dark -->
+    <script>(function(){try{var t=localStorage.getItem('rz_theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+
+    <style>
+        :root {
+            --pjgkb-primary: #06b6d4;
+            --pjgkb-accent: #22d3ee;
+            --pjgkb-primary-rgb: 6, 182, 212;
+            --pjgkb-gradient: linear-gradient(135deg, #0e7490 0%, #06b6d4 50%, #22d3ee 100%);
+            --pjgkb-bg: #ffffff;
+            --pjgkb-bg2: #f8fafc;
+            --pjgkb-bg3: #f1f5f9;
+            --pjgkb-text: #1e293b;
+            --pjgkb-text2: #475569;
+            --pjgkb-text3: #94a3b8;
+            --pjgkb-border: #e2e8f0;
+            --pjgkb-glass: rgba(255,255,255,0.85);
+            --pjgkb-glass-border: rgba(6,182,212,0.14);
+            --pjgkb-shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --pjgkb-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --pjgkb-shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --pjgkb-v500: #3b82f6;
+            --pjgkb-v275: #a78bfa;
+            --pjgkb-v150: #f87171;
+            --pjgkb-v20:  #facc15;
+        }
+        [data-theme="dark"] {
+            --pjgkb-bg: #0b1220;
+            --pjgkb-bg2: #0f172a;
+            --pjgkb-bg3: #1e293b;
+            --pjgkb-text: #f1f5f9;
+            --pjgkb-text2: #cbd5e1;
+            --pjgkb-text3: #64748b;
+            --pjgkb-border: #1e293b;
+            --pjgkb-glass: rgba(11,18,32,0.85);
+            --pjgkb-glass-border: rgba(34,211,238,0.18);
+            --pjgkb-shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --pjgkb-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --pjgkb-shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--pjgkb-bg); color: var(--pjgkb-text);
+            min-height: 100vh; line-height: 1.6;
+        }
+        a { color: var(--pjgkb-primary); }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: var(--pjgkb-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--pjgkb-glass-border);
+            padding: 0 2rem; height: 64px;
+        }
+        .nav-container { max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--pjgkb-text); }
+        .nav-logo {
+            width: 44px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.7rem; color: white; letter-spacing: 0.5px;
+            background: var(--pjgkb-gradient);
+            box-shadow: 0 3px 10px rgba(6,182,212,0.35);
+        }
+        .nav-title { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+        .nav-subtitle { font-size: 0.7rem; color: var(--pjgkb-text3); font-weight: 400; }
+        .nav-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+        .nav-link {
+            text-decoration: none; font-size: 0.82rem; font-weight: 500;
+            color: var(--pjgkb-text2); transition: all 0.3s;
+        }
+        .nav-link:hover { transform: translateY(-1px); }
+        .nav-back {
+            display: flex; align-items: center; gap: 6px;
+            text-decoration: none; font-size: 0.82rem; font-weight: 600;
+            color: #3b82f6; padding: 6px 14px; border-radius: 8px;
+            background: rgba(59,130,246,0.08); transition: all 0.3s;
+        }
+        .nav-back:hover { transform: translateY(-2px); background: rgba(59,130,246,0.14); }
+        .mobile-nav-toggle {
+            display: none; background: none; border: 1px solid var(--pjgkb-border);
+            border-radius: 8px; padding: 6px 10px; color: var(--pjgkb-text2); cursor: pointer;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            max-width: 1400px; margin: 0 auto;
+            padding: 5.25rem 2rem 0.5rem;
+            font-size: 0.75rem; color: var(--pjgkb-text3);
+        }
+        .breadcrumb a {
+            color: var(--pjgkb-text2); text-decoration: none;
+            margin: 0 0.35rem;
+        }
+        .breadcrumb a:first-child { margin-left: 0; }
+        .breadcrumb a:hover { color: var(--pjgkb-primary); }
+        .breadcrumb .sep { color: var(--pjgkb-text3); }
+        .breadcrumb .current { color: var(--pjgkb-text); font-weight: 600; margin-left: 0.35rem; }
+
+        /* HERO */
+        .pjgkb-hero {
+            background: linear-gradient(135deg, rgba(8,14,28,0.92) 0%, rgba(15,23,42,0.86) 50%, rgba(14,116,144,0.55) 100%);
+            padding: 2.5rem 2rem 3rem; color: white; position: relative; overflow: hidden;
+        }
+        .pjgkb-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(34,211,238,0.18) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.10) 0%, transparent 50%);
+        }
+        .pjgkb-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .pjgkb-hero h1 {
+            font-size: 2.4rem; font-weight: 900; line-height: 1.15;
+            margin-bottom: 0.6rem; letter-spacing: -0.02em;
+        }
+        .pjgkb-hero h1 span { background: var(--pjgkb-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .pjgkb-hero-sub {
+            font-size: 1rem; color: rgba(255,255,255,0.78); max-width: 760px;
+            line-height: 1.7; margin-bottom: 1.6rem;
+        }
+        .pjgkb-source-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .pjgkb-source-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+            font-size: 0.7rem; color: rgba(255,255,255,0.85); text-decoration: none;
+            transition: all 0.25s;
+        }
+        .pjgkb-source-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(34,211,238,0.4); }
+        .pjgkb-refresh-badge {
+            margin-left: auto;
+            font-size: 0.7rem; color: rgba(255,255,255,0.6); font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* MAIN */
+        .pjgkb-main { max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
+        .pjgkb-section { margin-bottom: 1.5rem; }
+        .pjgkb-section-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--pjgkb-text); }
+        .pjgkb-section-desc { font-size: 0.82rem; color: var(--pjgkb-text2); margin-bottom: 0.8rem; max-width: 760px; }
+
+        /* STAT TILES */
+        .pjgkb-stat-row {
+            display: grid; gap: 0.75rem;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            margin-bottom: 1.25rem;
+        }
+        .pjgkb-stat-tile {
+            background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            border-radius: 12px; padding: 0.85rem 1rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .pjgkb-stat-tile:hover { border-color: rgba(34,211,238,0.5); transform: translateY(-1px); }
+        .pjgkb-stat-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; color: var(--pjgkb-text3); text-transform: uppercase; }
+        .pjgkb-stat-value {
+            font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+            color: var(--pjgkb-text); line-height: 1.15; margin: 0.2rem 0;
+        }
+        .pjgkb-stat-sub { font-size: 0.7rem; color: var(--pjgkb-text2); }
+
+        /* VIEW SWITCHER */
+        .pjgkb-toolbar {
+            display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+        .pjgkb-segment {
+            display: inline-flex; background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            border-radius: 10px; padding: 3px;
+        }
+        .pjgkb-segment button {
+            padding: 7px 14px; border: none; background: transparent;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--pjgkb-text2); cursor: pointer; border-radius: 7px;
+            transition: all 0.2s;
+        }
+        .pjgkb-segment button.active {
+            background: var(--pjgkb-gradient); color: white;
+            box-shadow: 0 2px 8px rgba(6,182,212,0.35);
+        }
+        .pjgkb-segment button:not(.active):hover { color: var(--pjgkb-primary); }
+
+        /* LAYER TOGGLES (v3 — full 5-voltage + fuel + overlay + display) */
+        .pjgkb-toggles {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: stretch;
+            margin-top: 0.6rem;
+        }
+        .pjgkb-tog-group {
+            border: 1px solid var(--pjgkb-border); border-radius: 10px;
+            padding: 6px 10px 8px; margin: 0;
+            background: var(--pjgkb-bg2);
+            display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center;
+        }
+        .pjgkb-tog-group legend {
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--pjgkb-text3);
+            padding: 0 6px;
+        }
+        .pjgkb-tog-group label {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 8px; border-radius: 50px;
+            background: var(--pjgkb-bg3); border: 1px solid var(--pjgkb-border);
+            font-size: 0.74rem; cursor: pointer; user-select: none;
+            transition: opacity 0.2s, border-color 0.2s;
+        }
+        .pjgkb-tog-group label:hover { border-color: rgba(34,211,238,0.5); }
+        .pjgkb-tog-group label.off { opacity: 0.42; }
+        .pjgkb-tog-group input { accent-color: var(--pjgkb-primary); cursor: pointer; }
+
+        /* SVG layer visibility classes (toggled on #pjgkb-svg-root) */
+        .pjgkb-svg-root.hide-v500 .pjgkb-node-v500,
+        .pjgkb-svg-root.hide-v500 .pjgkb-line-v500 { display: none; }
+        .pjgkb-svg-root.hide-v275 .pjgkb-node-v275,
+        .pjgkb-svg-root.hide-v275 .pjgkb-line-v275 { display: none; }
+        .pjgkb-svg-root.hide-v150 .pjgkb-node-v150,
+        .pjgkb-svg-root.hide-v150 .pjgkb-line-v150 { display: none; }
+        .pjgkb-svg-root.hide-v70  .pjgkb-node-v70,
+        .pjgkb-svg-root.hide-v70  .pjgkb-line-v70  { display: none; }
+        .pjgkb-svg-root.hide-v20  .pjgkb-node-v20,
+        .pjgkb-svg-root.hide-v20  .pjgkb-line-v20  { display: none; }
+        .pjgkb-svg-root.hide-coal    .pjgkb-node-fuel-coal    { display: none; }
+        .pjgkb-svg-root.hide-gas     .pjgkb-node-fuel-gas     { display: none; }
+        .pjgkb-svg-root.hide-hydro   .pjgkb-node-fuel-hydro   { display: none; }
+        .pjgkb-svg-root.hide-solar   .pjgkb-node-fuel-solar   { display: none; }
+        .pjgkb-svg-root.hide-biomass .pjgkb-node-fuel-biomass { display: none; }
+        .pjgkb-svg-root.hide-dc          .pjgkb-node-kind-dc         { display: none; }
+        .pjgkb-svg-root.hide-industrial  .pjgkb-node-kind-industrial { display: none; }
+        .pjgkb-svg-root.no-labels    .pjgkb-node-label { display: none; }
+        .pjgkb-svg-root.no-capacity  .pjgkb-node-cap   { display: none; }
+        .pjgkb-svg-root.no-kvbadges  .pjgkb-kv-badge   { display: none; }
+
+        /* Confidence legend (3-dot HI/MED/LOW) */
+        .pjgkb-conf-legend {
+            position: absolute; bottom: 12px; right: 14px;
+            background: rgba(8,15,30,0.78); border: 1px solid rgba(255,255,255,0.12);
+            padding: 5px 9px; border-radius: 50px;
+            font-size: 0.62rem; font-family: 'JetBrains Mono', monospace;
+            color: #cbd5e1; display: inline-flex; gap: 8px; align-items: center;
+            pointer-events: none;
+        }
+        .pjgkb-conf-legend .dot {
+            display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            margin-right: 4px; vertical-align: middle;
+        }
+        .pjgkb-conf-legend .dot.hi  { background: #86efac; }
+        .pjgkb-conf-legend .dot.med { background: #fcd34d; }
+        .pjgkb-conf-legend .dot.low { background: #fca5a5; }
+
+        /* MAP */
+        .pjgkb-map-wrap {
+            background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            border-radius: 14px; padding: 6px; position: relative; overflow: hidden;
+        }
+        #pjgkb-map { width: 100%; height: min(60vh, 540px); border-radius: 10px; background: #0b1220; z-index: 1; }
+        .leaflet-popup-content-wrapper { background:#1e293b !important; color:#e2e8f0 !important; border:1px solid #334155 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.4) !important; }
+        .leaflet-popup-tip { background:#1e293b !important; border:1px solid #334155 !important; }
+        .leaflet-popup-content { margin:8px 12px !important; font-family:'Inter',sans-serif !important; font-size:0.78rem !important; }
+        .leaflet-popup-close-button { color:#64748b !important; font-size:1.2rem !important; }
+        .leaflet-popup-close-button:hover { color:#f1f5f9 !important; }
+        .leaflet-control-zoom a { background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important; }
+        .leaflet-control-zoom a:hover { background:#334155 !important; }
+        .leaflet-control-attribution { background:rgba(15,23,42,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
+        .leaflet-control-attribution a { color:#64748b !important; }
+        .leaflet-control-layers { background:#1e293b !important; color:#e2e8f0 !important; border:1px solid #334155 !important; }
+        .leaflet-control-layers label { color:#e2e8f0 !important; font-size:0.78rem !important; }
+        .rzm-plant {
+            background: rgba(8,15,30,0.9); border: 1.5px solid #fbbf24;
+            border-radius: 50%; color: #fbbf24;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px;
+        }
+        .rzm-plant-coal { border-color: #f87171; color: #f87171; }
+        .rzm-plant-gas { border-color: #60a5fa; color: #60a5fa; }
+        .rzm-plant-hydro { border-color: #38bdf8; color: #38bdf8; }
+        .rzm-plant-geo { border-color: #fb923c; color: #fb923c; }
+        .rzm-plant-solar { border-color: #facc15; color: #facc15; }
+        /* DC marker style */
+        .rzm-dc {
+            background: rgba(8,15,30,0.9); border: 1.5px solid #facc15;
+            border-radius: 4px; color: #facc15;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+        .rzm-industrial {
+            background: rgba(8,15,30,0.9); border: 1.5px dashed #94a3b8;
+            border-radius: 50%; color: #cbd5e1;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px;
+        }
+
+        /* SLD VIEW */
+        .pjgkb-sld-wrap {
+            background: linear-gradient(180deg, #050a18 0%, #0b1220 100%);
+            border: 1px solid var(--pjgkb-border);
+            border-radius: 14px; padding: 8px; overflow: hidden;
+            height: min(70vh, 720px); position: relative;
+        }
+        #pjgkb-sld { width: 100%; height: 100%; display: block; touch-action: none; }
+        .pjgkb-sld-hint {
+            position: absolute; top: 12px; left: 14px;
+            background: rgba(8,15,30,0.7); border: 1px solid rgba(34,211,238,0.25);
+            padding: 4px 10px; border-radius: 50px;
+            font-size: 0.65rem; color: #cbd5e1; font-family: 'JetBrains Mono', monospace;
+            pointer-events: none;
+        }
+
+        /* SLD line classes */
+        .pjgkb-line { fill: none; stroke-linecap: round; stroke-width: 1.2; opacity: 0.95; }
+        .pjgkb-line-500 { stroke: var(--pjgkb-v500); stroke-dasharray: 8 4; filter: drop-shadow(0 0 2px rgba(59,130,246,0.65)); animation: pjgkb-flow 2.4s linear infinite; }
+        .pjgkb-line-150 { stroke: var(--pjgkb-v150); stroke-dasharray: 4 3; filter: drop-shadow(0 0 1.5px rgba(248,113,113,0.5)); animation: pjgkb-flow 2.8s linear infinite; }
+        .pjgkb-line-20  { stroke: var(--pjgkb-v20);  stroke-dasharray: 2 2; filter: drop-shadow(0 0 1.5px rgba(250,204,21,0.5)); animation: pjgkb-flow 3.0s linear infinite; }
+        @keyframes pjgkb-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -24; } }
+
+        /* SLD nodes */
+        .pjgkb-node-station circle { fill: rgba(15,23,42,0.95); stroke: var(--pjgkb-v500); stroke-width: 1.5; transition: stroke-width 0.15s, fill 0.15s; }
+        .pjgkb-node-station[data-voltage="150"] circle { stroke: var(--pjgkb-v150); }
+        .pjgkb-node-plant circle { fill: rgba(8,15,30,0.95); stroke: #facc15; stroke-width: 1.6; }
+        .pjgkb-node-plant[data-fuel="coal"] circle { stroke: #f87171; }
+        .pjgkb-node-plant[data-fuel="gas"] circle { stroke: #60a5fa; }
+        .pjgkb-node-plant[data-fuel="hydro"] circle { stroke: #38bdf8; }
+        .pjgkb-node-plant[data-fuel="solar"] circle { stroke: #facc15; }
+        .pjgkb-node-dc rect { fill: rgba(8,15,30,0.95); stroke: var(--pjgkb-v20); stroke-width: 1.6; }
+        .pjgkb-node-industrial circle { fill: rgba(8,15,30,0.85); stroke: #94a3b8; stroke-width: 1.2; stroke-dasharray: 2 2; }
+        .pjgkb-node-station, .pjgkb-node-plant, .pjgkb-node-dc, .pjgkb-node-industrial { cursor: pointer; }
+        .pjgkb-node-station:hover circle, .pjgkb-node-plant:hover circle { stroke-width: 2.6; fill: rgba(6,182,212,0.18); }
+        .pjgkb-node-dc:hover rect { stroke-width: 2.6; }
+        .pjgkb-node-label {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+            fill: #f1f5f9; paint-order: stroke fill;
+            stroke: rgba(8,15,30,0.85); stroke-width: 2.4; stroke-linejoin: round;
+            pointer-events: none;
+        }
+        .pjgkb-node-cap {
+            font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 500;
+            fill: #94a3b8; paint-order: stroke fill;
+            stroke: rgba(8,15,30,0.7); stroke-width: 2; stroke-linejoin: round;
+            pointer-events: none;
+        }
+        .pjgkb-kv-badge text { font-family: 'JetBrains Mono', monospace; font-size: 7px; fill: #cbd5e1; }
+        .pjgkb-particle { fill: #bfdbfe; opacity: 0.8; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .pjgkb-line-500, .pjgkb-line-150, .pjgkb-line-20 { animation: none !important; }
+            .pjgkb-particle { display: none !important; }
+        }
+
+        /* Hidden views */
+        .pjgkb-view { display: none; }
+        .pjgkb-view.active { display: block; }
+
+        /* DC OPERATORS TABLE */
+        .pjgkb-table-wrap {
+            background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            border-radius: 14px; overflow: hidden;
+        }
+        .pjgkb-table-scroll { overflow-x: auto; }
+        .pjgkb-table {
+            width: 100%; border-collapse: collapse; font-size: 0.82rem;
+            min-width: 760px;
+        }
+        .pjgkb-table thead {
+            background: var(--pjgkb-bg3);
+        }
+        .pjgkb-table th {
+            text-align: left; padding: 0.7rem 0.85rem;
+            font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em;
+            color: var(--pjgkb-text3); text-transform: uppercase;
+            border-bottom: 1px solid var(--pjgkb-border);
+        }
+        .pjgkb-table td {
+            padding: 0.6rem 0.85rem; color: var(--pjgkb-text2);
+            border-bottom: 1px solid var(--pjgkb-border); vertical-align: top;
+        }
+        .pjgkb-table tr:last-child td { border-bottom: none; }
+        .pjgkb-table tr:hover td { background: rgba(34,211,238,0.04); }
+        .pjgkb-table .op-name { font-weight: 700; color: var(--pjgkb-text); }
+        .pjgkb-table .num-cell { font-family: 'JetBrains Mono', monospace; color: var(--pjgkb-text); }
+        .pjgkb-table .feed-cell { font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--pjgkb-text2); }
+        .pjgkb-table .notes-cell { font-size: 0.74rem; color: var(--pjgkb-text2); max-width: 320px; line-height: 1.45; }
+        .pjgkb-table .conf {
+            display: inline-block; padding: 1px 6px; border-radius: 50px;
+            font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; margin-left: 0.4rem;
+        }
+        .pjgkb-table .conf.high { background: rgba(34,197,94,0.18); color: #4ade80; }
+        .pjgkb-table .conf.medium { background: rgba(250,204,21,0.18); color: #facc15; }
+        .pjgkb-table .conf.low { background: rgba(248,113,113,0.18); color: #fca5a5; }
+
+        /* SUB-LIST PANELS */
+        .pjgkb-grid2 {
+            display: grid; gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        .pjgkb-list-card {
+            background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            border-radius: 12px; padding: 1rem 1.15rem;
+        }
+        .pjgkb-list-card h3 {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+            color: var(--pjgkb-text3); text-transform: uppercase; margin-bottom: 0.65rem;
+        }
+        .pjgkb-list-card ul { list-style: none; padding: 0; margin: 0; }
+        .pjgkb-list-card li {
+            padding: 0.45rem 0; border-bottom: 1px dashed rgba(148,163,184,0.18);
+            font-size: 0.8rem; color: var(--pjgkb-text2);
+            display: flex; justify-content: space-between; gap: 0.5rem; align-items: center;
+        }
+        .pjgkb-list-card li:last-child { border-bottom: none; }
+        .pjgkb-kv-tag {
+            display: inline-block; padding: 1px 6px; border-radius: 4px;
+            font-size: 0.6rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+        }
+        .pjgkb-kv-tag.v500 { background: rgba(59,130,246,0.18); color: #60a5fa; }
+        .pjgkb-kv-tag.v150 { background: rgba(248,113,113,0.18); color: #fca5a5; }
+        .pjgkb-kv-tag.v20  { background: rgba(250,204,21,0.18); color: #facc15; }
+
+        /* CROSS-LINK CARD (ds-strat-card lite) */
+        .ds-strategic-grid {
+            display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 0.75rem;
+        }
+        .ds-strat-card {
+            background: var(--pjgkb-bg2);
+            border: 1px solid var(--pjgkb-border);
+            border-radius: 20px;
+            overflow: hidden; display: flex; flex-direction: column;
+            position: relative; transition: border-color 0.35s, box-shadow 0.35s, transform 0.25s;
+        }
+        .ds-strat-card:hover {
+            border-color: var(--card-border, rgba(16,185,129,0.45));
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 1px var(--card-border, rgba(16,185,129,0.18)),
+                        0 8px 40px var(--card-glow, rgba(16,185,129,0.18));
+        }
+        .ds-strat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; background: var(--card-gradient, linear-gradient(90deg, #047857, #10b981));
+            border-radius: 20px 20px 0 0;
+        }
+        .ds-strat-top { padding: 1.4rem 1.5rem 0; display: flex; align-items: center; gap: 1rem; }
+        .ds-strat-icon {
+            width: 52px; height: 52px; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 14px var(--card-glow, rgba(16,185,129,0.3));
+        }
+        .ds-strat-card:hover .ds-strat-icon { transform: scale(1.08) translateY(-2px); }
+        .ds-strat-title-wrap { flex: 1; }
+        .ds-strat-title {
+            font-size: 1rem; font-weight: 800; color: var(--pjgkb-text);
+            margin-bottom: 0.2rem;
+        }
+        .ds-strat-subtitle { font-size: 0.72rem; color: var(--pjgkb-text3); font-weight: 500; }
+        .ds-strat-desc {
+            font-size: 0.81rem; color: var(--pjgkb-text2); line-height: 1.65;
+            padding: 0.85rem 1.5rem 0.75rem;
+        }
+        .ds-strat-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--pjgkb-border); }
+        .ds-strat-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.83rem; font-weight: 700; color: #fff;
+            text-decoration: none; padding: 8px 20px; border-radius: 10px;
+            background: var(--card-gradient, linear-gradient(135deg, #047857, #10b981));
+            border: none;
+            box-shadow: 0 3px 12px var(--card-glow, rgba(16,185,129,0.3));
+            transition: all 0.25s;
+        }
+        .ds-strat-cta:hover { box-shadow: 0 5px 20px var(--card-glow, rgba(16,185,129,0.45)); filter: brightness(1.1); }
+
+        /* SOURCES */
+        .pjgkb-sources-strip {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+            background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1.5rem;
+        }
+        .pjgkb-sources-strip .pjgkb-source-chip { background: var(--pjgkb-bg3); border-color: var(--pjgkb-border); color: var(--pjgkb-text2); }
+        .pjgkb-sources-strip .pjgkb-source-chip:hover { color: var(--pjgkb-primary); }
+        .pjgkb-footnote {
+            margin-top: 0.75rem;
+            font-size: 0.7rem; color: var(--pjgkb-text3); line-height: 1.6;
+        }
+
+        /* THEME TOGGLE */
+        .pjgkb-theme-toggle {
+            position: fixed; bottom: 24px; right: 24px; z-index: 999;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--pjgkb-bg2); border: 1px solid var(--pjgkb-border);
+            cursor: pointer; box-shadow: var(--pjgkb-shadow-md); transition: all 0.3s;
+            font-size: 1.1rem; color: var(--pjgkb-text);
+        }
+        .pjgkb-theme-toggle:hover { transform: scale(1.1); border-color: var(--pjgkb-primary); }
+
+        /* FOOTER */
+        .dmt-footer, .pjgkb-footer {
+            background: linear-gradient(135deg, #0b1220 0%, #1e293b 100%);
+            color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;
+        }
+        .pjgkb-footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;
+        }
+        .pjgkb-footer a { color: #94a3b8; text-decoration: none; font-size: 0.8rem; }
+        .pjgkb-footer a:hover { color: #22d3ee; }
+
+        @media (max-width: 900px) {
+            .pjgkb-hero h1 { font-size: 1.8rem; }
+            .pjgkb-hero { padding: 2rem 1rem 2rem; }
+            .breadcrumb { padding: 5rem 1rem 0.5rem; }
+            .nav-links { display: none; }
+            .mobile-nav-toggle { display: inline-flex; }
+            .navbar.menu-open .nav-links {
+                display: flex; position: absolute; top: 64px; left: 0; right: 0;
+                background: var(--pjgkb-bg); border-bottom: 1px solid var(--pjgkb-border);
+                padding: 1rem; flex-direction: column; gap: 0.75rem; align-items: flex-start;
+            }
+            .pjgkb-footer-inner { grid-template-columns: 1fr; }
+            .pjgkb-stat-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="pjgkbNavbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">PJG-JKB</div>
+                <div>
+                    <div class="nav-title">Jakarta + Banten Grid</div>
+                    <div class="nav-subtitle">500/150 kV + 20 kV DC feeders</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="pln-java-grid.html" class="nav-link" style="color:#3b82f6;"><i class="fas fa-arrow-left"></i> Java Grid Overview</a>
+                <a href="pln-java-grid-jabar.html" class="nav-link" style="color:#10b981;"><i class="fas fa-mountain"></i> Jawa Barat</a>
+                <a href="dc-market/" class="nav-link" style="color:#14b8a6;"><i class="fas fa-globe"></i> DC Markets</a>
+                <a href="datacenter-solutions.html" class="nav-link" style="color:#f59e0b;"><i class="fas fa-server"></i> Solutions</a>
+                <a href="pln-java-grid.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <button class="mobile-nav-toggle" id="pjgkbMobileToggle" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="sep">/</span>
+        <a href="datacenter-solutions.html">DC Solutions</a>
+        <span class="sep">/</span>
+        <a href="pln-java-grid.html">Java-Bali Grid Monitor</a>
+        <span class="sep">/</span>
+        <span class="current">DKI Jakarta + Banten</span>
+    </nav>
+
+    <!-- HERO -->
+    <section class="pjgkb-hero">
+        <div class="pjgkb-hero-inner">
+            <h1>DKI Jakarta + Banten <span>Provincial Grid + DC Feeders</span></h1>
+            <p class="pjgkb-hero-sub">Highest-density node on the Java-Bali backbone. Coastal coal + city-edge gas, 18+ known data-centre operators, peak load ~11.5 GW.<br>This sub-page adds the 20 kV DC-feeder overlay to the 500/150 kV provincial map and single-line diagram.</p>
+            <div class="pjgkb-source-strip">
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjgkb-source-chip"><i class="fas fa-file-pdf"></i> PLN P2B 2016 SLD</a>
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjgkb-source-chip"><i class="fas fa-book"></i> RUPTL 2025-2034</a>
+                <a href="https://www.cushmanwakefield.com/" target="_blank" rel="noopener" class="pjgkb-source-chip"><i class="fas fa-server"></i> Cushman APAC DC 2024</a>
+                <a href="https://www.structureresearch.net/" target="_blank" rel="noopener" class="pjgkb-source-chip"><i class="fas fa-chart-bar"></i> Structure Research</a>
+                <span class="pjgkb-refresh-badge"><i class="fas fa-clock"></i> Refreshed 2026-04-29-v3</span>
+            </div>
+        </div>
+    </section>
+
+    <main class="pjgkb-main">
+
+        <!-- PROVINCIAL STAT TILES -->
+        <section class="pjgkb-section">
+            <h2 class="pjgkb-section-title">Provincial Headlines</h2>
+            <p class="pjgkb-section-desc">PLN Distribution UID Jakarta Raya + Banten estimates, 2024 baseline. DC numbers aggregate operator filings tracked in the overlay file.</p>
+            <div class="pjgkb-stat-row" id="pjgkb-stat-row"></div>
+        </section>
+
+        <!-- VIEW SWITCHER + LAYER BAR -->
+        <section class="pjgkb-section">
+            <div class="pjgkb-toolbar">
+                <div class="pjgkb-segment" role="tablist" aria-label="View mode">
+                    <button id="pjgkb-btn-map" class="active" role="tab" aria-selected="true"><i class="fas fa-map-location-dot"></i> Geographic Map</button>
+                    <button id="pjgkb-btn-sld" role="tab" aria-selected="false"><i class="fas fa-diagram-project"></i> Single-Line Diagram</button>
+                </div>
+            </div>
+            <div class="pjgkb-toggles" role="toolbar" aria-label="Layer visibility">
+                <fieldset class="pjgkb-tog-group">
+                    <legend>Voltage</legend>
+                    <label><input type="checkbox" data-layer="v500" checked> <span>500 kV</span></label>
+                    <label><input type="checkbox" data-layer="v275" checked> <span>275 kV</span></label>
+                    <label><input type="checkbox" data-layer="v150" checked> <span>150 kV</span></label>
+                    <label><input type="checkbox" data-layer="v70"> <span>70 kV</span></label>
+                    <label><input type="checkbox" data-layer="v20" checked> <span>20 kV</span></label>
+                </fieldset>
+                <fieldset class="pjgkb-tog-group">
+                    <legend>Plants</legend>
+                    <label><input type="checkbox" data-fuel="coal" checked> Coal</label>
+                    <label><input type="checkbox" data-fuel="gas" checked> Gas</label>
+                    <label><input type="checkbox" data-fuel="hydro" checked> Hydro</label>
+                    <label><input type="checkbox" data-fuel="solar" checked> Solar</label>
+                    <label><input type="checkbox" data-fuel="biomass" checked> Biomass</label>
+                </fieldset>
+                <fieldset class="pjgkb-tog-group">
+                    <legend>DC overlay</legend>
+                    <label><input type="checkbox" data-overlay="dc" checked> DC operators</label>
+                    <label><input type="checkbox" data-overlay="industrial" checked> Industrial intakes</label>
+                </fieldset>
+                <fieldset class="pjgkb-tog-group">
+                    <legend>Display</legend>
+                    <label><input type="checkbox" data-display="labels" checked> Labels</label>
+                    <label><input type="checkbox" data-display="capacity"> Capacity</label>
+                    <label><input type="checkbox" data-display="kvbadges" checked> kV badges</label>
+                </fieldset>
+            </div>
+        </section>
+
+        <!-- VIEW: MAP -->
+        <section class="pjgkb-section pjgkb-view active" id="pjgkb-view-map" role="tabpanel" aria-label="Geographic map">
+            <div class="pjgkb-map-wrap">
+                <div id="pjgkb-map" aria-label="Geographic map of the DKI Jakarta + Banten transmission grid with 20 kV DC-feeder overlay"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: SLD -->
+        <section class="pjgkb-section pjgkb-view" id="pjgkb-view-sld" role="tabpanel" aria-label="Single-line diagram">
+            <div class="pjgkb-sld-wrap">
+                <div class="pjgkb-sld-hint"><i class="fas fa-arrows-up-down-left-right"></i> drag to pan &middot; scroll to zoom</div>
+                <svg id="pjgkb-sld" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="DKI Jakarta + Banten provincial single-line diagram">
+                    <defs id="pjgkb-sld-defs">
+                        <marker id="pjgkb-arrow-500" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                            <path d="M0,0 L8,4 L0,8 z" fill="#3b82f6"/>
+                        </marker>
+                        <marker id="pjgkb-arrow-150" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                            <path d="M0,0 L8,4 L0,8 z" fill="#f87171"/>
+                        </marker>
+                        <marker id="pjgkb-arrow-20" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                            <path d="M0,0 L8,4 L0,8 z" fill="#facc15"/>
+                        </marker>
+                    </defs>
+                    <g id="pjgkb-svg-root" class="pjgkb-svg-root">
+                        <g id="pjgkb-sld-edges"></g>
+                        <g id="pjgkb-sld-particles"></g>
+                        <g id="pjgkb-sld-badges"></g>
+                        <g id="pjgkb-sld-nodes"></g>
+                    </g>
+                </svg>
+                <div class="pjgkb-conf-legend" aria-label="Confidence legend">
+                    <span><span class="dot hi"></span>HI</span>
+                    <span><span class="dot med"></span>MED</span>
+                    <span><span class="dot low"></span>LOW</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- DC OPERATORS TABLE -->
+        <section class="pjgkb-section">
+            <h2 class="pjgkb-section-title">Data-Centre Operators &middot; 20 kV Feeder Detail</h2>
+            <p class="pjgkb-section-desc">Operator-level detail of the 20 kV feeder overlay. Capacity expressed as IT load (MW) with the corresponding utility transformer rating (kVA). <em>Confidence</em> reflects how directly the address is sourced (high &rarr; press release / regulatory; medium &rarr; operator website; low &rarr; estate centroid).</p>
+            <div class="pjgkb-table-wrap">
+                <div class="pjgkb-table-scroll">
+                    <table class="pjgkb-table" id="pjgkb-dc-table">
+                        <thead>
+                            <tr>
+                                <th>Operator</th>
+                                <th>Site</th>
+                                <th>Capacity (MW / kVA)</th>
+                                <th>Feed Substation</th>
+                                <th>Year</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pjgkb-dc-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAJOR PLANTS + SUBSTATIONS -->
+        <section class="pjgkb-section">
+            <h2 class="pjgkb-section-title">Provincial Anchors</h2>
+            <p class="pjgkb-section-desc">500 kV substations and major power plants drawn from the provincial filter of the base data file.</p>
+            <div class="pjgkb-grid2">
+                <div class="pjgkb-list-card">
+                    <h3>Major Plants (sorted by capacity)</h3>
+                    <ul id="pjgkb-plants-list"></ul>
+                </div>
+                <div class="pjgkb-list-card">
+                    <h3>500 kV Substations</h3>
+                    <ul id="pjgkb-subs500-list"></ul>
+                </div>
+                <div class="pjgkb-list-card">
+                    <h3>150 kV Substations</h3>
+                    <ul id="pjgkb-subs150-list"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CROSS-LINK CARD: SIBLING PROVINCE -->
+        <section class="pjgkb-section">
+            <h2 class="pjgkb-section-title">Sibling Province</h2>
+            <p class="pjgkb-section-desc">Continue the drill-down south into Jawa Barat &mdash; the hydro and geothermal anchor for Jakarta's load centre.</p>
+            <div class="ds-strategic-grid">
+                <div class="ds-strat-card" style="--card-border: rgba(16,185,129,0.45); --card-glow: rgba(16,185,129,0.22); --card-gradient: linear-gradient(135deg, #047857, #10b981);">
+                    <div class="ds-strat-top">
+                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #047857, #10b981); color: white;"><i class="fas fa-mountain"></i></div>
+                        <div class="ds-strat-title-wrap">
+                            <h3 class="ds-strat-title">Jawa Barat &mdash; Hydro + Geothermal Heartland</h3>
+                            <div class="ds-strat-subtitle">Cirata, Cibatu, Bandung, Cirebon, Indramayu</div>
+                        </div>
+                    </div>
+                    <p class="ds-strat-desc">Anchored by 1.0 GW Cirata reservoir and the Wayang Windu / Patuha geothermal complex. Hosts the Sentul + Karawang + Bandung DC clusters and a fast-growing edge layer. Peak ~8.2 GW with a 28% reserve margin.</p>
+                    <div class="ds-strat-footer">
+                        <a href="pln-java-grid-jabar.html" class="ds-strat-cta">
+                            Open Jawa Barat Detail <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOURCES STRIP -->
+        <section class="pjgkb-section">
+            <div class="pjgkb-sources-strip">
+                <strong style="font-size:0.7rem;letter-spacing:0.12em;color:var(--pjgkb-text3);text-transform:uppercase;">Sources</strong>
+                <a class="pjgkb-source-chip" href="https://web.pln.co.id/" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PLN P2B 2016 single-line diagram</a>
+                <a class="pjgkb-source-chip" href="https://web.pln.co.id/" target="_blank" rel="noopener"><i class="fas fa-book"></i> RUPTL 2025-2034</a>
+                <a class="pjgkb-source-chip" href="https://www.cushmanwakefield.com/" target="_blank" rel="noopener"><i class="fas fa-server"></i> Cushman APAC DC Report 2024</a>
+                <a class="pjgkb-source-chip" href="https://www.structureresearch.net/" target="_blank" rel="noopener"><i class="fas fa-chart-bar"></i> Structure Research APAC DC Census</a>
+                <a class="pjgkb-source-chip" href="https://dci-indonesia.com/" target="_blank" rel="noopener"><i class="fas fa-link"></i> Operator websites (DCI, NTT, BDx, Equinix, PDG, GDS, EdgeConneX)</a>
+                <a class="pjgkb-source-chip" href="https://www.openstreetmap.org/" target="_blank" rel="noopener"><i class="fas fa-map"></i> OSM / Wikipedia geocoding</a>
+            </div>
+            <p class="pjgkb-footnote">Footnote: Cikarang and Cibitung industrial estates straddle the Bekasi/Jabar boundary, but they are operationally fed from the Jakarta-Banten 150 kV ring and are listed here for that reason. Four 150 kV intermediate substations (Cibitung, Sentul, Pulogadung, CSB) are <code>injected:true</code> in the overlay file because they are not present in the base 500/150 kV data; they anchor known DC clusters and are sourced from PLN UID Jakarta Raya feeder maps.</p>
+        </section>
+
+    </main>
+
+    <!-- THEME TOGGLE -->
+    <button class="pjgkb-theme-toggle" id="pjgkbThemeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+        <i class="fas fa-moon" id="pjgkbThemeIcon"></i>
+    </button>
+
+    <!-- FOOTER -->
+    <footer class="dmt-footer pjgkb-footer">
+        <div class="pjgkb-footer-inner">
+            <div>
+                <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.15em;color:#64748b;line-height:1.6;margin-bottom:1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                <p style="font-size:0.65rem;letter-spacing:0.1em;color:#475569;margin-bottom:0.75rem;">DATA: PLN P2B 2016, RUPTL 2025-2034, Cushman APAC DC 2024, Structure Research, operator filings.</p>
+                <p style="font-size:0.75rem;color:#64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">NAVIGATION</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                    <li><a href="pln-java-grid.html">Java Grid Monitor</a></li>
+                    <li><a href="pln-java-grid-jabar.html">Jawa Barat Detail</a></li>
+                    <li><a href="dc-market/">DC Markets</a></li>
+                    <li><a href="glossary.html">Glossary</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">CONNECT</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js" defer></script>
+    <script src="script.min.js?v=20260324b"></script>
+    <script src="auth.js?v=20260324b"></script>
+    <script src="rz-engine.js?v=2026-04-28"></script>
+    <script src="js/rz-map.js?v=2026-04-29-v3"></script>
+    <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
+    <script src="js/pln-java-grid-data.js?v=2026-04-29-v3"></script>
+    <script src="js/pln-java-grid-data-jakarta-banten.js?v=2026-04-29-v3"></script>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // Hardcoded provincial stats — sources cited in HTML footnote
+        var PROV_STATS = {
+            peakMW: 11500,
+            reservePct: 25,
+            renewablePct: 10,
+            coalPct: 62,
+            dcOps: 18,
+            dcMW: 690
+        };
+
+        var PROV_KEY = 'jakarta-banten';
+
+        // Bounds for fitBounds and SLD projection
+        var BOUNDS_SW = [-7.0, 105.5];
+        var BOUNDS_NE = [-5.7, 107.5];
+
+        // SLD viewBox: 1400 x 900 (v3 — scaled x by 1.27, y by 1.29 from 1100x700)
+        // x = 63.5 + (lng - 105.5) * 666.75  -> 105.5 -> 63.5, 107.5 -> 1396.99
+        // y = 64.5 + (-5.7 - lat) * 645      -> -5.7 -> 64.5, -7.0 -> 902.99
+        function projX(lng) { return 63.5 + (lng - 105.5) * 666.75; }
+        function projY(lat) { return 64.5 + (-5.7 - lat) * 645; }
+
+        var STATE = {
+            view: 'map',
+            // Province-page defaults: 500/275/150/20 ON, 70 OFF
+            voltageOn: { 500: true, 275: true, 150: true, 70: false, 20: true },
+            fuelOn: { coal: true, gas: true, hydro: true, solar: true, biomass: true },
+            overlayOn: { dc: true, industrial: true },
+            displayOn: { labels: true, capacity: false, kvbadges: true },
+            mapInst: null,
+            mapInited: false,
+            sldRendered: false,
+            sldPanZoom: null,
+            mergedNodes: [],
+            mergedEdges: [],
+            mergedById: {}
+        };
+
+        function $(id) { return document.getElementById(id); }
+        function fmtNum(n) { return (typeof n === 'number') ? n.toLocaleString('en-US') : (n || '—'); }
+        function el(tag, attrs, kids) {
+            var e = document.createElement(tag);
+            if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) {
+                if (k === 'style') e.setAttribute('style', attrs[k]);
+                else if (k === 'html') e.innerHTML = attrs[k];
+                else e.setAttribute(k, attrs[k]);
+            }
+            if (kids && kids.length) for (var i = 0; i < kids.length; i++) {
+                if (typeof kids[i] === 'string') e.appendChild(document.createTextNode(kids[i]));
+                else if (kids[i]) e.appendChild(kids[i]);
+            }
+            return e;
+        }
+        function svgEl(tag, attrs) {
+            var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) {
+                if (k === 'xlink:href') e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', attrs[k]);
+                else e.setAttribute(k, attrs[k]);
+            }
+            return e;
+        }
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function stripGI(name) {
+            if (!name) return '';
+            return name.replace(/^GITET\s+/i, '').replace(/^GI\s+/i, '');
+        }
+
+        // ========== MERGE BASE + OVERLAY (filtered to province) ==========
+        function buildMerged() {
+            var base = window.PLN_JAVA_GRID || { nodes: [], edges: [] };
+            var overlay = window.PLN_JAVA_GRID_JAKARTA_BANTEN || { nodes: [], edges: [] };
+
+            var inProv = {};
+            var nodes = [];
+            var i;
+
+            // Filter base nodes to province
+            for (i = 0; i < base.nodes.length; i++) {
+                var bn = base.nodes[i];
+                if (bn.prov === PROV_KEY) {
+                    nodes.push(bn);
+                    inProv[bn.id] = true;
+                }
+            }
+            // Add overlay nodes (already province-scoped); compute SVG x/y
+            for (i = 0; i < overlay.nodes.length; i++) {
+                var on = overlay.nodes[i];
+                var copy = {};
+                for (var k in on) if (on.hasOwnProperty(k)) copy[k] = on[k];
+                if (typeof copy.x !== 'number' && typeof copy.lng === 'number') copy.x = projX(copy.lng);
+                if (typeof copy.y !== 'number' && typeof copy.lat === 'number') copy.y = projY(copy.lat);
+                nodes.push(copy);
+                inProv[copy.id] = true;
+            }
+
+            var byId = {};
+            for (i = 0; i < nodes.length; i++) byId[nodes[i].id] = nodes[i];
+
+            // Filter base edges to those with both endpoints in province
+            var edges = [];
+            for (i = 0; i < base.edges.length; i++) {
+                var be = base.edges[i];
+                if (inProv[be.from] && inProv[be.to]) edges.push(be);
+            }
+            // Add overlay edges (uplinks may reference base nodes already kept)
+            for (i = 0; i < overlay.edges.length; i++) {
+                var oe = overlay.edges[i];
+                if (byId[oe.from] && byId[oe.to]) edges.push(oe);
+            }
+
+            STATE.mergedNodes = nodes;
+            STATE.mergedEdges = edges;
+            STATE.mergedById = byId;
+        }
+
+        // ========== STAT TILES ==========
+        function renderStatTiles() {
+            var tiles = [
+                { label: 'Peak Load', value: fmtNum(PROV_STATS.peakMW) + ' MW', sub: 'DKI Jakarta + Banten 2024' },
+                { label: 'Reserve', value: PROV_STATS.reservePct + '%', sub: 'Margin over peak' },
+                { label: 'Renewable', value: PROV_STATS.renewablePct + '%', sub: 'Generation share' },
+                { label: 'Coal Mix', value: PROV_STATS.coalPct + '%', sub: 'Largest fuel share' },
+                { label: 'DC Operators', value: fmtNum(PROV_STATS.dcOps), sub: 'Tracked in overlay' },
+                { label: 'DC Capacity', value: fmtNum(PROV_STATS.dcMW) + ' MW', sub: 'Aggregate IT load' }
+            ];
+            var row = $('pjgkb-stat-row');
+            row.innerHTML = '';
+            for (var i = 0; i < tiles.length; i++) {
+                var t = tiles[i];
+                row.appendChild(el('div', { 'class': 'pjgkb-stat-tile' }, [
+                    el('div', { 'class': 'pjgkb-stat-label' }, [t.label]),
+                    el('div', { 'class': 'pjgkb-stat-value' }, [t.value]),
+                    el('div', { 'class': 'pjgkb-stat-sub' }, [t.sub])
+                ]));
+            }
+        }
+
+        // ========== VIEW SWITCHER ==========
+        function showView(which) {
+            STATE.view = which;
+            var btnMap = $('pjgkb-btn-map'), btnSld = $('pjgkb-btn-sld');
+            btnMap.classList.toggle('active', which === 'map');
+            btnSld.classList.toggle('active', which === 'sld');
+            btnMap.setAttribute('aria-selected', which === 'map');
+            btnSld.setAttribute('aria-selected', which === 'sld');
+            $('pjgkb-view-map').classList.toggle('active', which === 'map');
+            $('pjgkb-view-sld').classList.toggle('active', which === 'sld');
+            if (which === 'map') {
+                if (!STATE.mapInited) initMap();
+                else if (STATE.mapInst && STATE.mapInst.refresh) STATE.mapInst.refresh();
+            } else {
+                if (!STATE.sldRendered) renderSLD();
+                else if (STATE.sldPanZoom && STATE.sldPanZoom.resize) {
+                    try { STATE.sldPanZoom.resize(); STATE.sldPanZoom.fit(); STATE.sldPanZoom.center(); } catch (e) { /* ignore */ }
+                }
+            }
+        }
+
+        // ========== MAP ==========
+        function buildPopupHtml(node) {
+            var v = node.voltage ? (node.voltage + ' kV') : (node.fuel || (node.kind === 'dc' ? 'DC site' : (node.kind === 'industrial' ? 'Industrial' : '—')));
+            var cap;
+            if (node.kind === 'plant') cap = fmtNum(node.mw || 0) + ' MW';
+            else if (node.kind === 'dc' || node.kind === 'industrial') cap = fmtNum(node.mw || 0) + ' MW IT';
+            else cap = fmtNum(node.mva || 0) + ' MVA';
+            var op = node.operator ? ('<div style="font-size:0.7rem;color:#cbd5e1;">' + escapeHtml(node.operator) + '</div>') : '';
+            return '<div style="min-width:200px;">'
+                + '<div style="font-weight:700;color:#f1f5f9;margin-bottom:4px;">' + escapeHtml(node.name || node.id) + '</div>'
+                + op
+                + '<div style="font-size:0.72rem;color:#94a3b8;">' + v + ' &middot; ' + cap + '</div>'
+                + '<div style="font-size:0.7rem;color:#64748b;margin-top:4px;">'
+                + (node.year ? ('Year ' + node.year) : '')
+                + (node.confidence ? (' &middot; conf ' + node.confidence) : '')
+                + '</div>'
+                + (node.notes ? ('<div style="font-size:0.68rem;color:#94a3b8;margin-top:4px;line-height:1.45;">' + escapeHtml(node.notes) + '</div>') : '')
+                + '</div>';
+        }
+
+        function tipDataForNode(n) {
+            return {
+                name: n.name || n.id,
+                voltage: n.voltage,
+                kind: n.kind,
+                fuel: n.fuel,
+                mw: n.mw,
+                mva: n.mva,
+                year: n.year,
+                operator: n.operator,
+                confidence: n.confidence,
+                prov: n.prov,
+                lat: n.lat,
+                lng: n.lng,
+                notes: n.notes,
+                served_areas: n.served_areas,
+                osm_id: n.osm_id,
+                wikidata: n.wikidata,
+                source: n.source || 'PLN'
+            };
+        }
+
+        function buildMarkers(nodes) {
+            var out = [];
+            for (var i = 0; i < nodes.length; i++) {
+                var n = nodes[i];
+                if (typeof n.lat !== 'number' || typeof n.lng !== 'number') continue;
+                var td = tipDataForNode(n);
+                if (n.kind === 'plant') {
+                    out.push({ id: n.id, kind: 'plant', fuel: n.fuel, lat: n.lat, lng: n.lng, label: n.name, popupHtml: buildPopupHtml(n), tooltipData: td });
+                } else if (n.kind === 'dc') {
+                    // Render DC as a station-style circle marker, voltage 20 (yellow)
+                    out.push({ id: n.id, kind: 'station', voltage: 20, mva: (n.capacity_kVA || 5000) / 1000, lat: n.lat, lng: n.lng, label: n.name, popupHtml: buildPopupHtml(n), tooltipData: td });
+                } else if (n.kind === 'industrial') {
+                    out.push({ id: n.id, kind: 'station', voltage: 20, mva: 250, lat: n.lat, lng: n.lng, label: n.name, popupHtml: buildPopupHtml(n), tooltipData: td });
+                } else {
+                    out.push({ id: n.id, kind: 'station', voltage: n.voltage, mva: n.mva, lat: n.lat, lng: n.lng, label: n.name, popupHtml: buildPopupHtml(n), tooltipData: td });
+                }
+            }
+            return out;
+        }
+
+        function buildLines(edges, nodesById) {
+            var out = [];
+            for (var i = 0; i < edges.length; i++) {
+                var e = edges[i];
+                var a = nodesById[e.from], b = nodesById[e.to];
+                if (!a || !b) continue;
+                if (typeof a.lat !== 'number' || typeof b.lat !== 'number') continue;
+                out.push({
+                    id: 'edge_' + i,
+                    voltage: e.voltage,
+                    coords: [[a.lat, a.lng], [b.lat, b.lng]],
+                    tooltipData: {
+                        name: (a.name || a.id) + ' ↔ ' + (b.name || b.id),
+                        voltage: e.voltage,
+                        kind: 'line',
+                        from: a.name || a.id,
+                        to: b.name || b.id,
+                        source: 'PLN P2B 2016 SLD'
+                    }
+                });
+            }
+            return out;
+        }
+
+        function initMap() {
+            if (typeof L === 'undefined' || !window.RZMap) return;
+            STATE.mapInited = true;
+            var markers = buildMarkers(STATE.mergedNodes);
+            var lines = buildLines(STATE.mergedEdges, STATE.mergedById);
+            try {
+                STATE.mapInst = window.RZMap.init('pjgkb-map', {
+                    tile: 'carto-dark',
+                    fitBounds: [BOUNDS_SW, BOUNDS_NE],
+                    minZoom: 8, maxZoom: 14,
+                    worldCopyJump: false,
+                    markers: markers,
+                    lines: lines,
+                    layers: { voltage: true, fuel: true }
+                });
+            } catch (err) { console.warn('[PJGKB] RZMap.init failed', err); }
+            setTimeout(function () { if (STATE.mapInst && STATE.mapInst.refresh) STATE.mapInst.refresh(); }, 120);
+        }
+
+        // ========== SLD ==========
+        function shouldShowNode(node) {
+            // Voltage gate
+            if (node.kind === 'station' && node.voltage && STATE.voltageOn[node.voltage] === false) return false;
+            // DC + industrial ride the 20 kV layer
+            if ((node.kind === 'dc' || node.kind === 'industrial') && !STATE.voltageOn[20]) return false;
+            // Overlay toggles for DC + industrial
+            if (node.kind === 'dc' && !STATE.overlayOn.dc) return false;
+            if (node.kind === 'industrial' && !STATE.overlayOn.industrial) return false;
+            // Plant — fuel toggle + at least one upstream voltage layer ON
+            if (node.kind === 'plant') {
+                if (node.fuel && STATE.fuelOn.hasOwnProperty(node.fuel) && !STATE.fuelOn[node.fuel]) return false;
+                var anyV = STATE.voltageOn[500] || STATE.voltageOn[275] || STATE.voltageOn[150] || STATE.voltageOn[70] || STATE.voltageOn[20];
+                if (!anyV) return false;
+            }
+            return true;
+        }
+        function shouldShowEdge(edge, nodesById) {
+            if (edge.voltage && !STATE.voltageOn[edge.voltage]) return false;
+            var a = nodesById[edge.from], b = nodesById[edge.to];
+            if (!a || !b) return false;
+            return shouldShowNode(a) && shouldShowNode(b);
+        }
+
+        function renderSLD() {
+            STATE.sldRendered = true;
+            var nodes = STATE.mergedNodes;
+            var edges = STATE.mergedEdges;
+            var nodesById = STATE.mergedById;
+
+            var gEdges = $('pjgkb-sld-edges');
+            var gParticles = $('pjgkb-sld-particles');
+            var gBadges = $('pjgkb-sld-badges');
+            var gNodes = $('pjgkb-sld-nodes');
+            var defs = $('pjgkb-sld-defs');
+            gEdges.innerHTML = '';
+            gParticles.innerHTML = '';
+            gBadges.innerHTML = '';
+            gNodes.innerHTML = '';
+            // Clear stale defs paths but keep markers
+            var oldPaths = defs.querySelectorAll('path[id^="pjgkb-path-"]');
+            for (var p = 0; p < oldPaths.length; p++) defs.removeChild(oldPaths[p]);
+
+            var reduced = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+            // Edges
+            for (var j = 0; j < edges.length; j++) {
+                var e = edges[j];
+                if (!shouldShowEdge(e, nodesById)) continue;
+                var a = nodesById[e.from], b = nodesById[e.to];
+                var x1 = (typeof a.x === 'number') ? a.x : projX(a.lng);
+                var y1 = (typeof a.y === 'number') ? a.y : projY(a.lat);
+                var x2 = (typeof b.x === 'number') ? b.x : projX(b.lng);
+                var y2 = (typeof b.y === 'number') ? b.y : projY(b.lat);
+                // For base 500 kV nodes whose x,y were calibrated for the original Java-wide viewBox,
+                // re-project using lat/lng so they sit correctly inside this 1400x900 provincial viewBox.
+                if (typeof a.lng === 'number' && typeof a.lat === 'number') { x1 = projX(a.lng); y1 = projY(a.lat); }
+                if (typeof b.lng === 'number' && typeof b.lat === 'number') { x2 = projX(b.lng); y2 = projY(b.lat); }
+
+                var dx = x2 - x1, dy = y2 - y1;
+                var len = Math.sqrt(dx * dx + dy * dy);
+                if (!isFinite(len) || len === 0) continue;
+                var line = svgEl('line', {
+                    x1: x1, y1: y1, x2: x2, y2: y2,
+                    'class': 'pjgkb-line pjgkb-line-' + e.voltage + ' pjgkb-line-v' + e.voltage,
+                    'marker-end': 'url(#pjgkb-arrow-' + e.voltage + ')'
+                });
+                gEdges.appendChild(line);
+                // PLN tooltip on edge
+                if (window.PLNTooltip && typeof window.PLNTooltip.attach === 'function') {
+                    try {
+                        window.PLNTooltip.attach(line, {
+                            name: (a.name || a.id) + ' ↔ ' + (b.name || b.id),
+                            voltage: e.voltage,
+                            kind: 'line',
+                            from: a.name || a.id,
+                            to: b.name || b.id,
+                            source: 'PLN P2B 2016 SLD'
+                        }, { variant: 'svg' });
+                    } catch (err) { /* ignore */ }
+                }
+
+                // kV badge at midpoint, suppressed if line < 36 px
+                if (len >= 36) {
+                    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                    var bg = svgEl('g', { 'class': 'pjgkb-kv-badge', transform: 'translate(' + (mx - 8) + ',' + (my - 4.5) + ')' });
+                    bg.appendChild(svgEl('rect', { width: 16, height: 9, rx: 2, fill: 'rgba(8,15,30,0.9)', stroke: 'rgba(255,255,255,0.18)' }));
+                    var t = svgEl('text', { x: 8, y: 6.5, 'text-anchor': 'middle' });
+                    t.textContent = String(e.voltage);
+                    bg.appendChild(t);
+                    gBadges.appendChild(bg);
+                    if (window.PLNTooltip && typeof window.PLNTooltip.attach === 'function') {
+                        try {
+                            window.PLNTooltip.attach(bg, {
+                                name: (a.name || a.id) + ' ↔ ' + (b.name || b.id),
+                                voltage: e.voltage,
+                                kind: 'edge-midpoint',
+                                from: a.name || a.id,
+                                to: b.name || b.id,
+                                source: 'PLN P2B 2016 SLD'
+                            }, { variant: 'svg' });
+                        } catch (err) { /* ignore */ }
+                    }
+                }
+
+                // Particle on 500 kV only
+                if (e.voltage === 500 && !reduced) {
+                    var pid = 'pjgkb-path-edge-' + j;
+                    var pth = svgEl('path', { id: pid, d: 'M' + x1 + ',' + y1 + ' L' + x2 + ',' + y2, fill: 'none' });
+                    defs.appendChild(pth);
+                    var c = svgEl('circle', { r: 2, 'class': 'pjgkb-particle' });
+                    var am = svgEl('animateMotion', { dur: '4s', repeatCount: 'indefinite' });
+                    var mp = svgEl('mpath', { 'xlink:href': '#' + pid });
+                    am.appendChild(mp);
+                    c.appendChild(am);
+                    gParticles.appendChild(c);
+                }
+            }
+
+            // Nodes + labels
+            var labelBoxes = [];
+            for (var k = 0; k < nodes.length; k++) {
+                var n = nodes[k];
+                if (!shouldShowNode(n)) continue;
+                var nx = (typeof n.lng === 'number') ? projX(n.lng) : n.x;
+                var ny = (typeof n.lat === 'number') ? projY(n.lat) : n.y;
+                if (typeof nx !== 'number' || typeof ny !== 'number') continue;
+
+                var nodeClasses = ['pjgkb-node-' + (n.kind || 'station')];
+                nodeClasses.push('pjgkb-node-kind-' + (n.kind || 'station'));
+                // Voltage class — DC + industrial nodes ride the 20 kV layer
+                var vTier = n.voltage;
+                if (n.kind === 'dc' || n.kind === 'industrial') vTier = 20;
+                if (vTier) nodeClasses.push('pjgkb-node-v' + vTier);
+                if (n.fuel) nodeClasses.push('pjgkb-node-fuel-' + n.fuel);
+                var g = svgEl('g', {
+                    'class': nodeClasses.join(' '),
+                    'data-id': n.id,
+                    'data-voltage': n.voltage || '',
+                    'data-fuel': n.fuel || ''
+                });
+                var r;
+                if (n.kind === 'plant') {
+                    r = 6 + Math.min(8, Math.sqrt(n.mw || 100) / 9);
+                    g.appendChild(svgEl('circle', { cx: nx, cy: ny, r: r }));
+                } else if (n.kind === 'dc') {
+                    r = 4 + Math.min(5, Math.sqrt(n.mw || 5) / 2);
+                    var size = r * 2;
+                    g.appendChild(svgEl('rect', { x: nx - r, y: ny - r, width: size, height: size, rx: 1.5 }));
+                } else if (n.kind === 'industrial') {
+                    r = 5 + Math.min(7, Math.sqrt(n.mw || 100) / 8);
+                    g.appendChild(svgEl('circle', { cx: nx, cy: ny, r: r }));
+                } else {
+                    r = 4 + Math.min(7, Math.sqrt(n.mva || 500) / 10);
+                    g.appendChild(svgEl('circle', { cx: nx, cy: ny, r: r }));
+                }
+
+                var labelAbove = (ny >= 116);
+                var labelY = labelAbove ? (ny - r - 5) : (ny + r + 11);
+                var label = svgEl('text', {
+                    x: nx, y: labelY, 'text-anchor': 'middle', 'class': 'pjgkb-node-label'
+                });
+                label.textContent = stripGI(n.name || n.id);
+                g.appendChild(label);
+
+                var capStr = '';
+                if (n.kind === 'plant' && n.mw) capStr = n.mw + ' MW';
+                else if (n.kind === 'dc' && n.mw) capStr = n.mw + ' MW';
+                else if (n.kind === 'industrial' && n.mw) capStr = n.mw + ' MW';
+                else if (n.mva) capStr = n.mva + ' MVA';
+                var capText = null;
+                if (capStr) {
+                    var capY = labelAbove ? (labelY - 11) : (labelY + 9);
+                    capText = svgEl('text', {
+                        x: nx, y: capY, 'text-anchor': 'middle', 'class': 'pjgkb-node-cap', 'data-cap': '1'
+                    });
+                    capText.textContent = capStr;
+                    g.appendChild(capText);
+                }
+
+                gNodes.appendChild(g);
+
+                // PLN tooltip on node — DC overlay nodes carry kind/operator/served/notes
+                if (window.PLNTooltip && typeof window.PLNTooltip.attach === 'function') {
+                    var tipData = {
+                        name: n.name || n.id,
+                        voltage: n.voltage,
+                        kind: n.kind,
+                        fuel: n.fuel,
+                        mw: n.mw,
+                        mva: n.mva,
+                        year: n.year,
+                        operator: n.operator,
+                        confidence: n.confidence,
+                        prov: n.prov,
+                        lat: n.lat,
+                        lng: n.lng,
+                        notes: n.notes,
+                        served_areas: n.served_areas,
+                        osm_id: n.osm_id,
+                        wikidata: n.wikidata,
+                        source: n.source || 'PLN'
+                    };
+                    if (n.kind === 'dc') {
+                        tipData.kind = 'dc';
+                        tipData.operator = n.operator;
+                        tipData.mw = n.mw;
+                        tipData.served_areas = n.served_areas;
+                        tipData.notes = n.notes;
+                    }
+                    try { window.PLNTooltip.attach(g, tipData, { variant: 'svg' }); }
+                    catch (err) { /* ignore */ }
+                }
+
+                var w = Math.max(40, label.textContent.length * 5.5);
+                labelBoxes.push({
+                    nodeId: n.id, label: label, capText: capText,
+                    cx: nx, cy: labelY,
+                    w: w, h: 11,
+                    priority: (n.mva || n.mw || 0)
+                });
+            }
+
+            // Collision pass — up to 6 iterations
+            collisionNudge(labelBoxes, 6);
+
+            // Init or update svg-pan-zoom
+            if (typeof svgPanZoom !== 'undefined') {
+                if (STATE.sldPanZoom && STATE.sldPanZoom.destroy) {
+                    try { STATE.sldPanZoom.destroy(); } catch (err) { /* ignore */ }
+                }
+                try {
+                    STATE.sldPanZoom = svgPanZoom('#pjgkb-sld', {
+                        viewportSelector: '#pjgkb-svg-root',
+                        controlIconsEnabled: false,
+                        dblClickZoomEnabled: false,
+                        minZoom: 0.5, maxZoom: 8,
+                        zoomScaleSensitivity: 0.3,
+                        fit: true, center: true
+                    });
+                } catch (err) { /* ignore */ }
+            }
+        }
+
+        function aabbOverlap(a, b, pad) {
+            return (Math.abs(a.cx - b.cx) * 2 < (a.w + b.w + pad * 2))
+                && (Math.abs(a.cy - b.cy) * 2 < (a.h + b.h + pad * 2));
+        }
+
+        function collisionNudge(boxes, maxIter) {
+            for (var iter = 0; iter < maxIter; iter++) {
+                var moved = false;
+                for (var i = 0; i < boxes.length; i++) {
+                    for (var j = i + 1; j < boxes.length; j++) {
+                        if (aabbOverlap(boxes[i], boxes[j], 4)) {
+                            var lo = (boxes[i].priority < boxes[j].priority) ? boxes[i] : boxes[j];
+                            lo.cy += 12;
+                            lo.label.setAttribute('y', lo.cy);
+                            if (lo.capText) lo.capText.setAttribute('y', lo.cy + 9);
+                            moved = true;
+                        }
+                    }
+                }
+                if (!moved) return;
+            }
+            // Fallback: hide capacity line on remaining colliders
+            for (var k = 0; k < boxes.length; k++) {
+                for (var m = k + 1; m < boxes.length; m++) {
+                    if (aabbOverlap(boxes[k], boxes[m], 4)) {
+                        var lo2 = (boxes[k].priority < boxes[m].priority) ? boxes[k] : boxes[m];
+                        if (lo2.capText && lo2.capText.parentNode) lo2.capText.parentNode.removeChild(lo2.capText);
+                        lo2.capText = null;
+                    }
+                }
+            }
+        }
+
+        // ========== LAYER TOGGLES ==========
+        function applyLayerVisibility() {
+            // Map: hide/show via setMarkerVisible + setLineVisible
+            if (STATE.mapInst) {
+                var nodes = STATE.mergedNodes;
+                var edges = STATE.mergedEdges;
+                for (var i = 0; i < nodes.length; i++) {
+                    var n = nodes[i];
+                    var vis = shouldShowNode(n);
+                    if (STATE.mapInst.setMarkerVisible) STATE.mapInst.setMarkerVisible(n.id, vis);
+                }
+                for (var j = 0; j < edges.length; j++) {
+                    var e = edges[j];
+                    var visE = (!e.voltage || STATE.voltageOn[e.voltage]);
+                    if (STATE.mapInst.setLineVisible) STATE.mapInst.setLineVisible('edge_' + j, visE);
+                }
+            }
+            if (STATE.sldRendered) renderSLD();
+        }
+
+        function syncSvgRootClasses() {
+            var root = $('pjgkb-svg-root');
+            if (!root) return;
+            var voltKeys = [500, 275, 150, 70, 20];
+            for (var i = 0; i < voltKeys.length; i++) {
+                root.classList.toggle('hide-v' + voltKeys[i], !STATE.voltageOn[voltKeys[i]]);
+            }
+            var fuels = ['coal', 'gas', 'hydro', 'solar', 'biomass'];
+            for (var j = 0; j < fuels.length; j++) {
+                root.classList.toggle('hide-' + fuels[j], !STATE.fuelOn[fuels[j]]);
+            }
+            root.classList.toggle('hide-dc', !STATE.overlayOn.dc);
+            root.classList.toggle('hide-industrial', !STATE.overlayOn.industrial);
+            root.classList.toggle('no-labels',   !STATE.displayOn.labels);
+            root.classList.toggle('no-capacity', !STATE.displayOn.capacity);
+            root.classList.toggle('no-kvbadges', !STATE.displayOn.kvbadges);
+        }
+
+        function bindLayerToggles() {
+            var togs = document.querySelectorAll('.pjgkb-toggles input[type="checkbox"]');
+            for (var i = 0; i < togs.length; i++) {
+                togs[i].addEventListener('change', function () {
+                    var lbl = this.parentNode;
+                    if (lbl && lbl.classList) lbl.classList.toggle('off', !this.checked);
+
+                    var layer = this.getAttribute('data-layer');
+                    var fuel = this.getAttribute('data-fuel');
+                    var overlay = this.getAttribute('data-overlay');
+                    var display = this.getAttribute('data-display');
+
+                    if (layer && layer.charAt(0) === 'v') {
+                        var v = parseInt(layer.slice(1), 10);
+                        if (!isNaN(v)) STATE.voltageOn[v] = this.checked;
+                    } else if (fuel) {
+                        STATE.fuelOn[fuel] = this.checked;
+                    } else if (overlay) {
+                        STATE.overlayOn[overlay] = this.checked;
+                    } else if (display) {
+                        STATE.displayOn[display] = this.checked;
+                    }
+                    syncSvgRootClasses();
+                    applyLayerVisibility();
+                });
+            }
+            // Initialize svg-root + label.off classes from defaults
+            for (var k = 0; k < togs.length; k++) {
+                togs[k].parentNode.classList.toggle('off', !togs[k].checked);
+            }
+            syncSvgRootClasses();
+        }
+
+        // ========== DC OPERATORS TABLE ==========
+        function renderDCTable() {
+            var tbody = $('pjgkb-dc-tbody');
+            if (!tbody) return;
+            var overlay = window.PLN_JAVA_GRID_JAKARTA_BANTEN || { nodes: [] };
+            var dcs = [];
+            for (var i = 0; i < overlay.nodes.length; i++) {
+                if (overlay.nodes[i].kind === 'dc') dcs.push(overlay.nodes[i]);
+            }
+            dcs.sort(function (a, b) { return (b.mw || 0) - (a.mw || 0); });
+
+            var html = '';
+            for (var j = 0; j < dcs.length; j++) {
+                var d = dcs[j];
+                var feedNode = d.feed_from ? STATE.mergedById[d.feed_from] : null;
+                var feedName = feedNode ? feedNode.name : (d.feed_from || '—');
+                var conf = (d.confidence || 'medium').toLowerCase();
+                var capCell = fmtNum(d.mw || 0) + ' MW <span style="color:var(--pjgkb-text3);">/ ' + fmtNum(d.capacity_kVA || 0) + ' kVA</span>';
+                html += '<tr>'
+                    + '<td><span class="op-name">' + escapeHtml(d.operator || '—') + '</span><span class="conf ' + conf + '">' + conf + '</span></td>'
+                    + '<td>' + escapeHtml(d.name || d.id) + '</td>'
+                    + '<td class="num-cell">' + capCell + '</td>'
+                    + '<td class="feed-cell">' + escapeHtml(feedName) + '</td>'
+                    + '<td class="num-cell">' + (d.year || '—') + '</td>'
+                    + '<td class="notes-cell">' + escapeHtml(d.notes || '') + '</td>'
+                    + '</tr>';
+            }
+            if (!html) html = '<tr><td colspan="6" style="text-align:center;color:var(--pjgkb-text3);padding:1.5rem;">No DC operators in overlay.</td></tr>';
+            tbody.innerHTML = html;
+        }
+
+        // ========== ANCHORS LISTS ==========
+        function renderAnchors() {
+            var base = window.PLN_JAVA_GRID || { nodes: [] };
+            var plants = [], subs500 = [], subs150 = [];
+            for (var i = 0; i < base.nodes.length; i++) {
+                var n = base.nodes[i];
+                if (n.prov !== PROV_KEY) continue;
+                if (n.kind === 'plant') plants.push(n);
+                else if (n.kind === 'station' && n.voltage === 500) subs500.push(n);
+                else if (n.kind === 'station' && n.voltage === 150) subs150.push(n);
+            }
+            plants.sort(function (a, b) { return (b.mw || 0) - (a.mw || 0); });
+            subs500.sort(function (a, b) { return (b.mva || 0) - (a.mva || 0); });
+            subs150.sort(function (a, b) { return (b.mva || 0) - (a.mva || 0); });
+
+            // Plants
+            var pl = $('pjgkb-plants-list');
+            if (pl) {
+                var ph = '';
+                for (var p = 0; p < plants.length; p++) {
+                    var pp = plants[p];
+                    var fuelTxt = pp.fuel ? (' &middot; ' + pp.fuel) : '';
+                    ph += '<li><span>' + escapeHtml(pp.name) + fuelTxt + '</span><span class="pjgkb-kv-tag v500" style="background:rgba(250,204,21,0.16);color:#facc15;">' + fmtNum(pp.mw || 0) + ' MW</span></li>';
+                }
+                pl.innerHTML = ph || '<li style="color:var(--pjgkb-text3);">No plants indexed.</li>';
+            }
+
+            // 500 kV substations
+            var sl = $('pjgkb-subs500-list');
+            if (sl) {
+                var sh = '';
+                for (var s = 0; s < subs500.length; s++) {
+                    var ss = subs500[s];
+                    sh += '<li><span>' + escapeHtml(stripGI(ss.name)) + '</span><span><span class="pjgkb-kv-tag v500">500</span> ' + fmtNum(ss.mva || 0) + ' MVA</span></li>';
+                }
+                sl.innerHTML = sh || '<li style="color:var(--pjgkb-text3);">None indexed.</li>';
+            }
+
+            // 150 kV substations
+            var sl2 = $('pjgkb-subs150-list');
+            if (sl2) {
+                var sh2 = '';
+                for (var t = 0; t < subs150.length; t++) {
+                    var tt = subs150[t];
+                    sh2 += '<li><span>' + escapeHtml(stripGI(tt.name)) + '</span><span><span class="pjgkb-kv-tag v150">150</span> ' + fmtNum(tt.mva || 0) + ' MVA</span></li>';
+                }
+                sl2.innerHTML = sh2 || '<li style="color:var(--pjgkb-text3);">None indexed.</li>';
+            }
+        }
+
+        // ========== THEME ==========
+        function bindTheme() {
+            var btn = $('pjgkbThemeToggle');
+            var icon = $('pjgkbThemeIcon');
+            var saved = (function () { try { return localStorage.getItem('rz_theme'); } catch (e) { return null; } })() || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            icon.className = (saved === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
+            btn.addEventListener('click', function () {
+                var cur = document.documentElement.getAttribute('data-theme');
+                var nxt = (cur === 'dark') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', nxt);
+                try { localStorage.setItem('rz_theme', nxt); } catch (e) { /* ignore */ }
+                icon.className = (nxt === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
+            });
+        }
+
+        // ========== BIND ==========
+        function bindAll() {
+            $('pjgkb-btn-map').addEventListener('click', function () { showView('map'); });
+            $('pjgkb-btn-sld').addEventListener('click', function () { showView('sld'); });
+            var mob = $('pjgkbMobileToggle');
+            if (mob) mob.addEventListener('click', function () { $('pjgkbNavbar').classList.toggle('menu-open'); });
+            bindLayerToggles();
+            bindTheme();
+        }
+
+        // ========== BOOT ==========
+        function realBoot() {
+            buildMerged();
+            renderStatTiles();
+            renderDCTable();
+            renderAnchors();
+            bindAll();
+            // Default view = map; initialize once Leaflet is ready
+            if (typeof L !== 'undefined' && window.RZMap) {
+                initMap();
+            } else {
+                var tries = 0;
+                var iv = setInterval(function () {
+                    tries++;
+                    if ((typeof L !== 'undefined' && window.RZMap) || tries > 60) {
+                        clearInterval(iv);
+                        if (typeof L !== 'undefined' && window.RZMap) initMap();
+                    }
+                }, 80);
+            }
+        }
+        function boot() {
+            // Both data files may load slightly after DOMContentLoaded; retry briefly
+            if (window.PLN_JAVA_GRID && window.PLN_JAVA_GRID_JAKARTA_BANTEN) {
+                realBoot(); return;
+            }
+            var tries = 0;
+            var iv = setInterval(function () {
+                tries++;
+                if ((window.PLN_JAVA_GRID && window.PLN_JAVA_GRID_JAKARTA_BANTEN) || tries > 60) {
+                    clearInterval(iv);
+                    if (window.PLN_JAVA_GRID && window.PLN_JAVA_GRID_JAKARTA_BANTEN) realBoot();
+                    else console.warn('[PJGKB] data files never loaded');
+                }
+            }, 80);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+    })();
+    </script>
+
+</body>
+</html>
