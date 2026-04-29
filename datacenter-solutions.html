@@ -2241,6 +2241,133 @@
             box-shadow: 0 2px 8px rgba(74,144,184,0.3);
         }
 
+        /* ── PLN Indonesia Grid Monitor (placeholder; data fills after publish) ── */
+        .pln-section { padding-top:0.5rem; }
+        .pln-monitor-banner {
+            display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem;
+            padding:0.75rem 1rem; margin-bottom:1.25rem; border-radius:14px;
+            background:linear-gradient(135deg, rgba(245,158,11,0.10), rgba(220,38,38,0.06));
+            border:1px solid rgba(245,158,11,0.30);
+            font-size:0.85rem; color:var(--text-secondary, #94a3b8);
+        }
+        .pln-monitor-banner .pln-tag {
+            background:#f59e0b; color:#1e293b; font-weight:800; padding:0.2rem 0.55rem;
+            border-radius:6px; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase;
+        }
+        .pln-overview-card {
+            background:linear-gradient(160deg, rgba(15,23,42,0.85), rgba(30,41,59,0.65));
+            border:1px solid rgba(245,158,11,0.40); border-radius:20px;
+            padding:1.5rem 1.75rem; margin-bottom:1.5rem;
+            box-shadow:0 8px 28px rgba(0,0,0,0.20);
+        }
+        .pln-overview-grid {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+            gap:0.875rem; margin-top:1rem;
+        }
+        .pln-stat-tile {
+            background:rgba(15,23,42,0.55); border:1px solid rgba(255,255,255,0.06);
+            border-left:3px solid #f59e0b; border-radius:10px; padding:0.85rem 1rem;
+        }
+        .pln-stat-tile .label { font-size:0.66rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; }
+        .pln-stat-tile .value { font-size:1.4rem; color:#fbbf24; font-weight:800; line-height:1.1; margin-top:0.25rem; font-family:'JetBrains Mono', monospace; }
+        .pln-stat-tile .sub { font-size:0.7rem; color:#64748b; margin-top:0.25rem; }
+        .pln-stat-tile.green { border-left-color:#10b981; }
+        .pln-stat-tile.green .value { color:#34d399; }
+        .pln-stat-tile.cyan { border-left-color:#06b6d4; }
+        .pln-stat-tile.cyan .value { color:#22d3ee; }
+        .pln-stat-tile.violet { border-left-color:#8b5cf6; }
+        .pln-stat-tile.violet .value { color:#a78bfa; }
+        .pln-stat-tile.red { border-left-color:#ef4444; }
+        .pln-stat-tile.red .value { color:#f87171; }
+
+        .pln-grid-cards {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+            gap:1rem;
+        }
+        .pln-grid-card {
+            background:linear-gradient(160deg, rgba(15,23,42,0.85), rgba(30,41,59,0.55));
+            border:1px solid rgba(245,158,11,0.18); border-radius:18px;
+            padding:1.25rem 1.4rem; transition:all 0.2s;
+            display:flex; flex-direction:column; gap:0.85rem;
+        }
+        .pln-grid-card:hover { border-color:rgba(245,158,11,0.45); transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,0,0,0.20); }
+        .pln-grid-card.priority { border-left:4px solid #f59e0b; }
+        .pln-grid-card-header { display:flex; align-items:center; gap:0.75rem; }
+        .pln-grid-card-icon {
+            width:42px; height:42px; border-radius:11px;
+            background:rgba(245,158,11,0.15); color:#fbbf24;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.05rem; flex-shrink:0;
+        }
+        .pln-grid-card.green .pln-grid-card-icon { background:rgba(16,185,129,0.15); color:#34d399; }
+        .pln-grid-card.cyan .pln-grid-card-icon { background:rgba(6,182,212,0.15); color:#22d3ee; }
+        .pln-grid-card.violet .pln-grid-card-icon { background:rgba(139,92,246,0.15); color:#a78bfa; }
+        .pln-grid-card.red .pln-grid-card-icon { background:rgba(239,68,68,0.15); color:#f87171; }
+        .pln-grid-card-title { flex:1; min-width:0; }
+        .pln-grid-card-title .name { font-size:1.05rem; font-weight:700; color:#f1f5f9; line-height:1.2; }
+        .pln-grid-card-title .sub { font-size:0.72rem; color:#94a3b8; margin-top:0.15rem; }
+        .pln-grid-card-status {
+            display:inline-flex; align-items:center; gap:0.3rem;
+            font-size:0.65rem; font-weight:800; padding:0.2rem 0.5rem;
+            border-radius:6px; letter-spacing:0.04em;
+            background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid rgba(245,158,11,0.35);
+        }
+        .pln-grid-card-status.live { background:rgba(16,185,129,0.18); color:#34d399; border-color:rgba(16,185,129,0.35); }
+        .pln-grid-card-status.live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981; animation:pln-pulse 1.6s ease-in-out infinite; }
+        @keyframes pln-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+        .pln-stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; }
+        .pln-stat-row .pln-mini-stat {
+            background:rgba(15,23,42,0.55); border:1px solid rgba(255,255,255,0.06);
+            border-radius:8px; padding:0.55rem 0.7rem; text-align:center;
+        }
+        .pln-stat-row .pln-mini-stat .label { font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+        .pln-stat-row .pln-mini-stat .value { font-size:0.95rem; color:#fbbf24; font-weight:800; line-height:1.2; margin-top:0.2rem; font-family:'JetBrains Mono', monospace; }
+        .pln-stat-row .pln-mini-stat.peak .value { color:#f87171; }
+        .pln-stat-row .pln-mini-stat.reserve .value { color:#34d399; }
+
+        .pln-mix-bar { display:flex; height:8px; border-radius:5px; overflow:hidden; background:rgba(15,23,42,0.55); border:1px solid rgba(255,255,255,0.05); }
+        .pln-mix-bar > span { display:block; transition:flex 0.3s; }
+        .pln-mix-bar .coal { background:#64748b; }
+        .pln-mix-bar .gas { background:#06b6d4; }
+        .pln-mix-bar .hydro { background:#3b82f6; }
+        .pln-mix-bar .geothermal { background:#dc2626; }
+        .pln-mix-bar .solar { background:#fbbf24; }
+        .pln-mix-bar .wind { background:#10b981; }
+        .pln-mix-bar .biomass { background:#84cc16; }
+        .pln-mix-bar .diesel { background:#7f1d1d; }
+        .pln-mix-legend { display:flex; flex-wrap:wrap; gap:0.5rem; font-size:0.65rem; color:#94a3b8; margin-top:0.35rem; }
+        .pln-mix-legend span { display:inline-flex; align-items:center; gap:0.3rem; }
+        .pln-mix-legend span::before { content:''; display:inline-block; width:8px; height:8px; border-radius:2px; }
+        .pln-mix-legend .lc::before { background:#64748b; }
+        .pln-mix-legend .lg::before { background:#06b6d4; }
+        .pln-mix-legend .lh::before { background:#3b82f6; }
+        .pln-mix-legend .lge::before { background:#dc2626; }
+        .pln-mix-legend .lso::before { background:#fbbf24; }
+        .pln-mix-legend .lw::before { background:#10b981; }
+        .pln-mix-legend .lb::before { background:#84cc16; }
+        .pln-mix-legend .ld::before { background:#7f1d1d; }
+
+        .pln-list { font-size:0.75rem; color:#cbd5e1; }
+        .pln-list .pln-list-title { font-size:0.65rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin-bottom:0.35rem; }
+        .pln-list ul { list-style:none; padding:0; margin:0; }
+        .pln-list li { padding:0.25rem 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; gap:0.5rem; }
+        .pln-list li:last-child { border-bottom:none; }
+        .pln-list li .meta { color:#64748b; font-size:0.7rem; font-family:'JetBrains Mono', monospace; }
+
+        .pln-cta {
+            display:inline-flex; align-items:center; justify-content:center; gap:0.4rem;
+            padding:0.5rem 0.95rem; border-radius:9px; font-size:0.78rem; font-weight:700;
+            background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid rgba(245,158,11,0.35);
+            text-decoration:none; transition:all 0.15s; align-self:flex-start; margin-top:auto;
+        }
+        .pln-cta:hover { background:rgba(245,158,11,0.30); }
+
+        @media (max-width: 600px) {
+            .pln-grid-cards { grid-template-columns: 1fr; }
+            .pln-stat-row { grid-template-columns: repeat(2,1fr); }
+        }
+
         /* ── Section aggregator cards (tools list) ── */
         .ds-section-card {
             background: var(--bg-secondary, #12121e);
@@ -2918,6 +3045,373 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             PLN Indonesia — Power Grid Monitor (Placeholder)
+             Cards rendered from a JS data object so the user can fill in real
+             2019 baseline data and expanded modern figures by editing one place.
+             Theme: warm amber (PLN brand-adjacent) + green (renewables) +
+             cyan (gas) + slate (coal). Status badges show LIVE vs 2019 BASELINE.
+             ═══════════════════════════════════════════════════════════════ -->
+        <section id="pln-monitor" class="solutions-section pln-section">
+            <div class="section-header">
+                <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:0.5rem;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-bolt" style="color:#f59e0b;font-size:1rem;"></i></div>
+                    <h2 style="margin:0;">PLN Indonesia &mdash; Power Grid Monitor</h2>
+                </div>
+                <p>Live overview of PLN regional grids — capacity, peak load, reserve margin, generation mix, transmission corridors, and DC operator clusters. Foundation for siting AI/HPC data centers across the archipelago.</p>
+            </div>
+
+            <div class="pln-monitor-banner">
+                <span class="pln-tag">2019 baseline</span>
+                <span>Cards seeded with PLN 2019 RUPTL baseline figures. Will be expanded with current capacity, generation mix, and DC operator data once user supplies the source dataset. <strong style="color:#f59e0b;">Placeholder data only — do not cite.</strong></span>
+            </div>
+
+            <!-- National Overview Card -->
+            <div class="pln-overview-card">
+                <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+                    <div style="width:46px;height:46px;border-radius:12px;background:rgba(245,158,11,0.18);color:#fbbf24;display:flex;align-items:center;justify-content:center;font-size:1.1rem;"><i class="fas fa-globe-asia"></i></div>
+                    <div style="flex:1;min-width:200px;">
+                        <div style="font-size:1.15rem;font-weight:700;color:#f1f5f9;">National Aggregate &mdash; Republic of Indonesia</div>
+                        <div style="font-size:0.78rem;color:#94a3b8;margin-top:0.2rem;">Sumatera + Jawa-Bali + Kalimantan + Sulawesi + Maluku-Papua + Nusa Tenggara</div>
+                    </div>
+                    <span class="pln-grid-card-status">2019 BASELINE</span>
+                </div>
+                <div class="pln-overview-grid">
+                    <div class="pln-stat-tile">
+                        <div class="label">Installed Capacity</div>
+                        <div class="value" data-pln-field="national-capacity">XX,XXX MW</div>
+                        <div class="sub">All technologies (incl. captive)</div>
+                    </div>
+                    <div class="pln-stat-tile red">
+                        <div class="label">Peak Load</div>
+                        <div class="value" data-pln-field="national-peak">XX,XXX MW</div>
+                        <div class="sub">National coincident peak</div>
+                    </div>
+                    <div class="pln-stat-tile green">
+                        <div class="label">Reserve Margin</div>
+                        <div class="value" data-pln-field="national-reserve">XX.X%</div>
+                        <div class="sub">Capacity above peak</div>
+                    </div>
+                    <div class="pln-stat-tile cyan">
+                        <div class="label">Renewable Mix</div>
+                        <div class="value" data-pln-field="national-renewable">XX.X%</div>
+                        <div class="sub">Hydro + geo + solar + wind + biomass</div>
+                    </div>
+                    <div class="pln-stat-tile violet">
+                        <div class="label">Transmission Lines</div>
+                        <div class="value" data-pln-field="national-tx-km">XX,XXX km</div>
+                        <div class="sub">150 / 275 / 500 kV combined</div>
+                    </div>
+                    <div class="pln-stat-tile">
+                        <div class="label">Substations</div>
+                        <div class="value" data-pln-field="national-substations">XXX</div>
+                        <div class="sub">High-voltage transmission</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pln-grid-cards">
+
+                <!-- 1. Sumatera Interconnected -->
+                <div class="pln-grid-card priority cyan">
+                    <div class="pln-grid-card-header">
+                        <div class="pln-grid-card-icon"><i class="fas fa-map"></i></div>
+                        <div class="pln-grid-card-title">
+                            <div class="name">Sumatera Interconnected</div>
+                            <div class="sub">North-Centre-South 150/275 kV backbone</div>
+                        </div>
+                        <span class="pln-grid-card-status">2019</span>
+                    </div>
+                    <div class="pln-stat-row">
+                        <div class="pln-mini-stat"><div class="label">Capacity</div><div class="value" data-pln-field="sumatera-capacity">— MW</div></div>
+                        <div class="pln-mini-stat peak"><div class="label">Peak</div><div class="value" data-pln-field="sumatera-peak">— MW</div></div>
+                        <div class="pln-mini-stat reserve"><div class="label">Reserve</div><div class="value" data-pln-field="sumatera-reserve">—%</div></div>
+                    </div>
+                    <div>
+                        <div class="pln-list-title" style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:0.35rem;">Generation Mix</div>
+                        <div class="pln-mix-bar">
+                            <span class="coal" style="flex:0;"></span>
+                            <span class="gas" style="flex:0;"></span>
+                            <span class="hydro" style="flex:0;"></span>
+                            <span class="geothermal" style="flex:0;"></span>
+                            <span class="diesel" style="flex:0;"></span>
+                        </div>
+                        <div class="pln-mix-legend">
+                            <span class="lc">Coal —%</span>
+                            <span class="lg">Gas —%</span>
+                            <span class="lh">Hydro —%</span>
+                            <span class="lge">Geo —%</span>
+                            <span class="ld">Diesel —%</span>
+                        </div>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">Major Substations</div>
+                        <ul>
+                            <li><span data-pln-field="sumatera-sub-1">Substation TBD</span><span class="meta">— MVA</span></li>
+                            <li><span data-pln-field="sumatera-sub-2">Substation TBD</span><span class="meta">— MVA</span></li>
+                            <li><span data-pln-field="sumatera-sub-3">Substation TBD</span><span class="meta">— MVA</span></li>
+                        </ul>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">DC Clusters / Operators</div>
+                        <ul>
+                            <li><span data-pln-field="sumatera-dc-1">Operator TBD (Medan / Batam)</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="sumatera-dc-2">Operator TBD</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <a href="#pln-monitor" class="pln-cta" data-pln-detail="sumatera">View Sumatera Detail &rarr;</a>
+                </div>
+
+                <!-- 2. Jawa-Bali (Jamali) — Priority -->
+                <div class="pln-grid-card priority">
+                    <div class="pln-grid-card-header">
+                        <div class="pln-grid-card-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="pln-grid-card-title">
+                            <div class="name">Jawa-Bali (Jamali) Interconnected</div>
+                            <div class="sub">Largest grid &middot; 500/150 kV &middot; 75%+ of national load</div>
+                        </div>
+                        <span class="pln-grid-card-status">2019 + DC</span>
+                    </div>
+                    <div class="pln-stat-row">
+                        <div class="pln-mini-stat"><div class="label">Capacity</div><div class="value" data-pln-field="jamali-capacity">— MW</div></div>
+                        <div class="pln-mini-stat peak"><div class="label">Peak</div><div class="value" data-pln-field="jamali-peak">— MW</div></div>
+                        <div class="pln-mini-stat reserve"><div class="label">Reserve</div><div class="value" data-pln-field="jamali-reserve">—%</div></div>
+                    </div>
+                    <div>
+                        <div class="pln-list-title" style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:0.35rem;">Generation Mix</div>
+                        <div class="pln-mix-bar">
+                            <span class="coal" style="flex:0;"></span>
+                            <span class="gas" style="flex:0;"></span>
+                            <span class="hydro" style="flex:0;"></span>
+                            <span class="geothermal" style="flex:0;"></span>
+                            <span class="solar" style="flex:0;"></span>
+                            <span class="wind" style="flex:0;"></span>
+                        </div>
+                        <div class="pln-mix-legend">
+                            <span class="lc">Coal —%</span>
+                            <span class="lg">Gas —%</span>
+                            <span class="lh">Hydro —%</span>
+                            <span class="lge">Geo —%</span>
+                            <span class="lso">Solar —%</span>
+                            <span class="lw">Wind —%</span>
+                        </div>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">Major Substations / Power Plants</div>
+                        <ul>
+                            <li><span data-pln-field="jamali-sub-1">Suralaya / Cilegon</span><span class="meta">— MVA</span></li>
+                            <li><span data-pln-field="jamali-sub-2">Cawang / Kembangan (Jakarta)</span><span class="meta">— MVA</span></li>
+                            <li><span data-pln-field="jamali-sub-3">Paiton (East Java)</span><span class="meta">— MVA</span></li>
+                            <li><span data-pln-field="jamali-sub-4">Gandul / Cibatu</span><span class="meta">— MVA</span></li>
+                        </ul>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">DC Clusters / Operators</div>
+                        <ul>
+                            <li><span data-pln-field="jamali-dc-1">DCI / NTT / BDx (Jakarta cluster)</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="jamali-dc-2">Princeton / Equinix (Bekasi)</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="jamali-dc-3">Batam / Cikarang campuses</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <a href="#pln-monitor" class="pln-cta" data-pln-detail="jamali">View Jamali Detail &rarr;</a>
+                </div>
+
+                <!-- 3. Kalimantan -->
+                <div class="pln-grid-card green">
+                    <div class="pln-grid-card-header">
+                        <div class="pln-grid-card-icon"><i class="fas fa-tree"></i></div>
+                        <div class="pln-grid-card-title">
+                            <div class="name">Kalimantan System</div>
+                            <div class="sub">4 sub-systems &middot; New IKN capital expansion</div>
+                        </div>
+                        <span class="pln-grid-card-status">2019</span>
+                    </div>
+                    <div class="pln-stat-row">
+                        <div class="pln-mini-stat"><div class="label">Capacity</div><div class="value" data-pln-field="kalimantan-capacity">— MW</div></div>
+                        <div class="pln-mini-stat peak"><div class="label">Peak</div><div class="value" data-pln-field="kalimantan-peak">— MW</div></div>
+                        <div class="pln-mini-stat reserve"><div class="label">Reserve</div><div class="value" data-pln-field="kalimantan-reserve">—%</div></div>
+                    </div>
+                    <div>
+                        <div class="pln-list-title" style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:0.35rem;">Generation Mix</div>
+                        <div class="pln-mix-bar">
+                            <span class="coal" style="flex:0;"></span>
+                            <span class="gas" style="flex:0;"></span>
+                            <span class="hydro" style="flex:0;"></span>
+                            <span class="diesel" style="flex:0;"></span>
+                        </div>
+                        <div class="pln-mix-legend">
+                            <span class="lc">Coal —%</span>
+                            <span class="lg">Gas —%</span>
+                            <span class="lh">Hydro —%</span>
+                            <span class="ld">Diesel —%</span>
+                        </div>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">Major Sub-systems</div>
+                        <ul>
+                            <li><span data-pln-field="kalimantan-sub-1">Khatulistiwa (West)</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="kalimantan-sub-2">Mahakam (East &amp; IKN)</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="kalimantan-sub-3">Barito (South-Central)</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">DC Clusters / Operators</div>
+                        <ul>
+                            <li><span data-pln-field="kalimantan-dc-1">Operator TBD (IKN edge)</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <a href="#pln-monitor" class="pln-cta" data-pln-detail="kalimantan">View Kalimantan Detail &rarr;</a>
+                </div>
+
+                <!-- 4. Sulawesi -->
+                <div class="pln-grid-card violet">
+                    <div class="pln-grid-card-header">
+                        <div class="pln-grid-card-icon"><i class="fas fa-water"></i></div>
+                        <div class="pln-grid-card-title">
+                            <div class="name">Sulawesi System</div>
+                            <div class="sub">North + South interconnection in progress</div>
+                        </div>
+                        <span class="pln-grid-card-status">2019</span>
+                    </div>
+                    <div class="pln-stat-row">
+                        <div class="pln-mini-stat"><div class="label">Capacity</div><div class="value" data-pln-field="sulawesi-capacity">— MW</div></div>
+                        <div class="pln-mini-stat peak"><div class="label">Peak</div><div class="value" data-pln-field="sulawesi-peak">— MW</div></div>
+                        <div class="pln-mini-stat reserve"><div class="label">Reserve</div><div class="value" data-pln-field="sulawesi-reserve">—%</div></div>
+                    </div>
+                    <div>
+                        <div class="pln-list-title" style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:0.35rem;">Generation Mix</div>
+                        <div class="pln-mix-bar">
+                            <span class="coal" style="flex:0;"></span>
+                            <span class="gas" style="flex:0;"></span>
+                            <span class="hydro" style="flex:0;"></span>
+                            <span class="diesel" style="flex:0;"></span>
+                        </div>
+                        <div class="pln-mix-legend">
+                            <span class="lc">Coal —%</span>
+                            <span class="lg">Gas —%</span>
+                            <span class="lh">Hydro —%</span>
+                            <span class="ld">Diesel —%</span>
+                        </div>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">Major Sub-systems</div>
+                        <ul>
+                            <li><span data-pln-field="sulawesi-sub-1">North (Manado-Gorontalo)</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="sulawesi-sub-2">South (Makassar-Palopo)</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">DC Clusters / Operators</div>
+                        <ul>
+                            <li><span data-pln-field="sulawesi-dc-1">Operator TBD</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <a href="#pln-monitor" class="pln-cta" data-pln-detail="sulawesi">View Sulawesi Detail &rarr;</a>
+                </div>
+
+                <!-- 5. Maluku & Papua -->
+                <div class="pln-grid-card red">
+                    <div class="pln-grid-card-header">
+                        <div class="pln-grid-card-icon"><i class="fas fa-island-tropical"></i></div>
+                        <div class="pln-grid-card-title">
+                            <div class="name">Maluku &amp; Papua System</div>
+                            <div class="sub">Isolated islands &middot; diesel-heavy &middot; renewable transition</div>
+                        </div>
+                        <span class="pln-grid-card-status">2019</span>
+                    </div>
+                    <div class="pln-stat-row">
+                        <div class="pln-mini-stat"><div class="label">Capacity</div><div class="value" data-pln-field="malukupapua-capacity">— MW</div></div>
+                        <div class="pln-mini-stat peak"><div class="label">Peak</div><div class="value" data-pln-field="malukupapua-peak">— MW</div></div>
+                        <div class="pln-mini-stat reserve"><div class="label">Reserve</div><div class="value" data-pln-field="malukupapua-reserve">—%</div></div>
+                    </div>
+                    <div>
+                        <div class="pln-list-title" style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:0.35rem;">Generation Mix</div>
+                        <div class="pln-mix-bar">
+                            <span class="diesel" style="flex:0;"></span>
+                            <span class="gas" style="flex:0;"></span>
+                            <span class="hydro" style="flex:0;"></span>
+                            <span class="solar" style="flex:0;"></span>
+                        </div>
+                        <div class="pln-mix-legend">
+                            <span class="ld">Diesel —%</span>
+                            <span class="lg">Gas —%</span>
+                            <span class="lh">Hydro —%</span>
+                            <span class="lso">Solar —%</span>
+                        </div>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">Major Sub-systems</div>
+                        <ul>
+                            <li><span data-pln-field="malukupapua-sub-1">Ambon-Seram</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="malukupapua-sub-2">Jayapura-Sentani</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="malukupapua-sub-3">Sorong-Manokwari</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">DC Clusters / Operators</div>
+                        <ul>
+                            <li><span data-pln-field="malukupapua-dc-1">Edge / government DCs only</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <a href="#pln-monitor" class="pln-cta" data-pln-detail="malukupapua">View Maluku-Papua Detail &rarr;</a>
+                </div>
+
+                <!-- 6. Nusa Tenggara -->
+                <div class="pln-grid-card cyan">
+                    <div class="pln-grid-card-header">
+                        <div class="pln-grid-card-icon"><i class="fas fa-mountain"></i></div>
+                        <div class="pln-grid-card-title">
+                            <div class="name">Nusa Tenggara System</div>
+                            <div class="sub">NTB + NTT &middot; Lombok-Sumbawa-Flores-Timor</div>
+                        </div>
+                        <span class="pln-grid-card-status">2019</span>
+                    </div>
+                    <div class="pln-stat-row">
+                        <div class="pln-mini-stat"><div class="label">Capacity</div><div class="value" data-pln-field="nusatenggara-capacity">— MW</div></div>
+                        <div class="pln-mini-stat peak"><div class="label">Peak</div><div class="value" data-pln-field="nusatenggara-peak">— MW</div></div>
+                        <div class="pln-mini-stat reserve"><div class="label">Reserve</div><div class="value" data-pln-field="nusatenggara-reserve">—%</div></div>
+                    </div>
+                    <div>
+                        <div class="pln-list-title" style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:0.35rem;">Generation Mix</div>
+                        <div class="pln-mix-bar">
+                            <span class="diesel" style="flex:0;"></span>
+                            <span class="gas" style="flex:0;"></span>
+                            <span class="hydro" style="flex:0;"></span>
+                            <span class="solar" style="flex:0;"></span>
+                            <span class="wind" style="flex:0;"></span>
+                        </div>
+                        <div class="pln-mix-legend">
+                            <span class="ld">Diesel —%</span>
+                            <span class="lg">Gas —%</span>
+                            <span class="lh">Hydro —%</span>
+                            <span class="lso">Solar —%</span>
+                            <span class="lw">Wind —%</span>
+                        </div>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">Major Sub-systems</div>
+                        <ul>
+                            <li><span data-pln-field="nusatenggara-sub-1">Lombok</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="nusatenggara-sub-2">Sumbawa</span><span class="meta">— MW</span></li>
+                            <li><span data-pln-field="nusatenggara-sub-3">Timor / Kupang</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <div class="pln-list">
+                        <div class="pln-list-title">DC Clusters / Operators</div>
+                        <ul>
+                            <li><span data-pln-field="nusatenggara-dc-1">Edge nodes only</span><span class="meta">— MW</span></li>
+                        </ul>
+                    </div>
+                    <a href="#pln-monitor" class="pln-cta" data-pln-detail="nusatenggara">View NT Detail &rarr;</a>
+                </div>
+
+            </div>
+
+            <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:1.25rem 0 0;text-align:center;max-width:900px;margin-left:auto;margin-right:auto;">
+                Cards above are <strong style="color:#f59e0b;">placeholders</strong> seeded with PLN 2019 RUPTL category structure. Upon user-supplied dataset, fields tagged <code>data-pln-field</code> will be populated with current capacity, peak, reserve, generation mix, substations, and DC operator clusters. Sources will include PLN annual reports, RUPTL 2025-2034, BPS, MEMR, IEA, and operator filings. Last placeholder render: 2026-04-28.
+            </p>
         </section>
 
         <!-- Category 2: Strategic Analysis & Market Intelligence -->
