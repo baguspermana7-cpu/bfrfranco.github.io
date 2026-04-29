@@ -298,6 +298,75 @@ def load_overlay() -> Dict[str, Dict[str, Any]]:
     return data
 
 
+def load_overlay_edges(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Load the curated `edges:` block from the YAML overlay.
+
+    Schema (top-level YAML):
+        edges:
+          - from: <slug-or-osm-id>
+            to:   <slug-or-osm-id>
+            voltage: 500|275|150|70|20
+            km: <int>           # optional
+            circuits: <int>     # optional
+            source: <str>       # optional, default 'pln-p2b-2016'
+
+    Slugs are resolved fuzzily against node names (same logic as annotations).
+    Returns [] if no overlay or no edges block.
+    """
+    if not OVERLAY_YAML.exists() or not HAS_YAML:
+        return []
+    try:
+        with OVERLAY_YAML.open() as f:
+            raw = yaml.safe_load(f) or {}
+    except Exception as e:
+        log(f"[overlay-edges] failed to load yaml: {e}")
+        return []
+
+    raw_edges = raw.get("edges") or []
+    if not isinstance(raw_edges, list):
+        return []
+
+    by_id = {n["id"]: n for n in nodes}
+
+    def resolve(ref: str) -> Optional[str]:
+        if not isinstance(ref, str):
+            return None
+        if ref in by_id:
+            return ref
+        # Fuzzy slug match against name
+        keywords = slug_to_name_keywords(ref)
+        if not keywords:
+            return None
+        for n in nodes:
+            nm = slug_normalize(n.get("name") or "")
+            if all(k in nm for k in keywords):
+                return n["id"]
+        return None
+
+    out: List[Dict[str, Any]] = []
+    unresolved = 0
+    for e in raw_edges:
+        if not isinstance(e, dict):
+            continue
+        a = resolve(e.get("from"))
+        b = resolve(e.get("to"))
+        if not a or not b or a == b:
+            unresolved += 1
+            continue
+        out.append({
+            "from": a,
+            "to": b,
+            "voltage": int(e.get("voltage", 150)),
+            "km": int(e.get("km", 0)) if e.get("km") else 0,
+            "circuits": int(e.get("circuits", 1)) if e.get("circuits") else 1,
+            "source": str(e.get("source", "pln-p2b-2016")),
+        })
+    if unresolved:
+        log(f"[overlay-edges] {unresolved} edges had unresolved endpoints (skipped)")
+    log(f"[overlay-edges] loaded {len(out)} curated edges from yaml")
+    return out
+
+
 def _parse_yaml_minimal(text: str) -> Dict[str, Dict[str, Any]]:
     """Tiny YAML parser: top-level mapping of mappings with scalar/list values."""
     out: Dict[str, Dict[str, Any]] = {}
@@ -570,12 +639,12 @@ def build_node_index(nodes: List[Dict[str, Any]]) -> List[Tuple[float, float, st
 
 def find_nearest_node(lat: float, lng: float,
                       idx: List[Tuple[float, float, str]],
-                      max_km: float = 0.5) -> Optional[str]:
+                      max_km: float = 1.5) -> Optional[str]:
     best = None
     best_km = max_km
     for nlat, nlng, nid in idx:
-        # quick lat/lng bounding-box prefilter (~0.01 deg = ~1.1 km)
-        if abs(nlat - lat) > 0.01 or abs(nlng - lng) > 0.01:
+        # bounding-box prefilter (~0.03 deg = ~3.3 km — wider than max_km on purpose)
+        if abs(nlat - lat) > 0.03 or abs(nlng - lng) > 0.03:
             continue
         d = haversine_km(lat, lng, nlat, nlng)
         if d < best_km:
@@ -829,11 +898,27 @@ def main() -> int:
     # 5. Sort for idempotency
     nodes.sort(key=lambda n: n["id"])
 
-    # 6. Edges
+    # 6. Edges (OSM power=line + curated YAML overlay)
     edges_payload = fetch_overpass(QUERY_LINES, force=args.force)
     edges = parse_edges(edges_payload, nodes)
+    osm_edge_count = len(edges)
+
+    # 6b. Overlay edges (curated topology from PLN P2B 2016 SLD)
+    overlay_edges = load_overlay_edges(nodes)
+    if overlay_edges:
+        # Dedup against OSM edges by (from, to) unordered pair
+        existing = {tuple(sorted([e["from"], e["to"]])) for e in edges}
+        added = 0
+        for oe in overlay_edges:
+            key = tuple(sorted([oe["from"], oe["to"]]))
+            if key not in existing:
+                edges.append(oe)
+                existing.add(key)
+                added += 1
+        log(f"[edges-overlay] +{added} curated edges merged ({len(overlay_edges) - added} dedup-skipped)")
+
     edges.sort(key=lambda e: (e["from"], e["to"], e["voltage"]))
-    log(f"[edges] kept {len(edges)} matched edges from {len(edges_payload.get('elements', []))} OSM lines")
+    log(f"[edges] OSM={osm_edge_count}, overlay-merged total={len(edges)}")
 
     # 7. Report
     print_breakdown(nodes)

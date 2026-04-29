@@ -29,6 +29,17 @@ release sections rather than semver.
 ### Rationale
 - User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
 
+### 2026-04-30-v4 — SLD readability fix (labels off, tier-graded thin lines, curated backbone edges)
+
+- **Labels default OFF** on the SLD across all 3 pln-java-grid pages. With 744 nodes, drawing every name produced massive overlap. Names now appear only via hover tooltip. Labels toggle is preserved for users who want them.
+- **Tier-graded stroke-widths**: 500 kV `1.6 px`, 275 kV `1.4 px`, 150 kV `1.0 px`, 70 kV `0.7 px`, 20 kV `0.6 px`. Visual hierarchy now matches electrical hierarchy.
+- **Laser-flow animation locked to ≥150 kV** only. 70 kV and 20 kV lines are static thin dashes (no `animation` property). Confirmed via CSS rule audit.
+- **OSM line-endpoint matching threshold relaxed** in `tools/build-osm-dataset.py` from `0.5 km` to `1.5 km` (bbox prefilter `0.01°` → `0.03°`).
+- **Curated edges block** added to `tools/pln-java-grid-overlay.yaml` — 28×500 kV backbone (Suralaya → Cilegon → Balaraja → Gandul → Bekasi → Cibatu → Cirata → … → Paiton plus radials + 275 kV Java-Bali submarine + key 150 kV corridors). Merged into the JS data file by the crawler with dedup against OSM. Edge total: 51 → **80** (28×500 / 1×275 / 47×150 / 4×70).
+- **Crawler enhancement**: `load_overlay_edges(nodes)` reads `edges:` block from YAML, fuzzy-matches `from`/`to` slugs against node names. Logs unresolved-endpoint warnings.
+- **First-paint** flicker prevented: SLD root group renders with `class="*-svg-root no-labels"` baked into the HTML (no JS race).
+- **Why**: user feedback after v3 deployment — "tulisan nama gardu sudah saya bilang jangan disini, tapi di tooltip" + "garis koneknnya kurang lengkap dan perlu yang tipis" + "arah flow laser itu hanya >=150kv saja" + "enhance banyak collision".
+
 ### 2026-04-29-v3 — Data accuracy expansion (OSM crawl + tooltip system + multi-tier toggles)
 
 - **Added** `tools/build-osm-dataset.py` — Python OSM Overpass crawler for Java+Bali. Queries `power=substation` and `power=plant`/`generator` features, parses voltage tags, writes `js/pln-java-grid-data.js` with provenance fields per node (`source`, `osm_id`, `wikidata`, `confidence`).
