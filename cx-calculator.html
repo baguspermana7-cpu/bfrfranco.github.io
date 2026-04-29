@@ -5173,23 +5173,32 @@ function cxAttemptLogin(){
     document.getElementById('cxLoginError').style.display='block';
     return;
   }
-  var match=CX_VALID_USERS.find(function(u){return u.email===email&&u.password===pass;});
-  if(match){
-    // Store session (30 days)
-    var expDate=new Date();expDate.setDate(expDate.getDate()+30);
-    localStorage.setItem('rz_premium_session',JSON.stringify({
-      email:match.email,tier:match.tier,role:match.role,
-      expires:expDate.toISOString()
-    }));
-    cxIsPremium=true;
+  // S1 pilot: prefer RZEngine.auth
+  var match = null;
+  if (window.RZEngine && window.RZEngine.auth) {
+    match = window.RZEngine.auth.validateLogin(email, pass);
+    if (match) {
+      window.RZEngine.auth.setSession(match.email, match.tier, match.role);
+      window.RZEngine.auth.dispatchAuthChange('login', { email: match.email, tier: match.tier, role: match.role });
+    }
+  } else {
+    // Legacy fallback
+    var m = CX_VALID_USERS.find(function(u){return u.email===email&&u.password===pass;});
+    if (m) {
+      match = { email: m.email, tier: m.tier, role: m.role };
+      var expDate = new Date(); expDate.setDate(expDate.getDate()+30);
+      localStorage.setItem('rz_premium_session', JSON.stringify({
+        email: match.email, tier: match.tier, role: match.role, expires: expDate.toISOString()
+      }));
+      window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: match.role, action: 'login' } }));
+    }
+  }
+  if (match) {
+    cxIsPremium = true;
     cxCloseModal();
     cxActivatePremiumUI();
-    document.getElementById('cxLoginError').style.display='none';
-    // Dispatch rz-auth-change event (standard)
-    window.dispatchEvent(new CustomEvent('rz-auth-change',{
-      detail:{email:match.email,tier:match.tier,role:match.role,action:'login'}
-    }));
-    if(cxLastResults)cxCalculate();
+    document.getElementById('cxLoginError').style.display = 'none';
+    if (cxLastResults) cxCalculate();
   } else {
     document.getElementById('cxLoginError').textContent='Invalid credentials. Check email and password.';
     document.getElementById('cxLoginError').style.display='block';

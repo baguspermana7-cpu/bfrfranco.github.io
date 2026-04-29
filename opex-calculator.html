@@ -4780,25 +4780,36 @@
                 return;
             }
 
-            var validUsers = [
-                { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },
-                { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
-                { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }
-            ];
-
-            var match = validUsers.find(function(u) { return u.email === email && u.password === password; });
+            var match = null;
+            // S1 pilot: prefer RZEngine.auth
+            if (window.RZEngine && window.RZEngine.auth) {
+                match = window.RZEngine.auth.validateLogin(email, password);
+                if (match) {
+                    window.RZEngine.auth.setSession(match.email, match.tier, match.role);
+                    window.RZEngine.auth.dispatchAuthChange('login', { email: match.email, tier: match.tier, role: match.role });
+                }
+            } else {
+                // Legacy fallback
+                var validUsers = [
+                    { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'pro' },
+                    { email: 'bagus@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' },
+                    { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!', tier: 'pro' }
+                ];
+                var m = validUsers.find(function(u) { return u.email === email && u.password === password; });
+                if (m) {
+                    match = { email: m.email, tier: m.tier, role: (m.email === 'admin@resistancezero.com' || m.email === 'bagus@resistancezero.com') ? 'root' : 'pro' };
+                    localStorage.setItem('rz_premium_session', JSON.stringify({
+                        email: match.email, tier: match.tier, role: match.role, expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                    }));
+                    window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { email: match.email, tier: match.tier, role: match.role, action: 'login' } }));
+                }
+            }
 
             if (match) {
-                localStorage.setItem('rz_premium_session', JSON.stringify({
-                    email: match.email, tier: match.tier, role: (match.email === 'admin@resistancezero.com' || match.email === 'bagus@resistancezero.com') ? 'root' : 'pro', expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-                }));
                 opexIsPremium = true;
                 opexUserTier = match.tier;
                 opexCloseLogin();
                 opexActivatePremium();
-                window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                    detail: { email: match.email, tier: match.tier, action: 'login' }
-                }));
             } else {
                 errEl.textContent = 'Invalid email or password';
                 errEl.style.display = 'block';
