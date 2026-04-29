@@ -955,14 +955,25 @@
     var currentMode = 'free';
 
     (function checkPremiumSession() {
-        try {
-            var session = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
-            if (session && session.tier === 'pro' && new Date(session.expires) > new Date()) {
+        // S1 pilot: prefer RZEngine.auth.getSession with legacy fallback
+        if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.getSession) {
+            var sess = window.RZEngine.auth.getSession();
+            if (sess) {
                 isPremiumUser = true;
-                userTier = 'pro';
+                userTier = sess.tier || 'pro';
                 activatePremiumUI();
+                return;
             }
-        } catch(e) {}
+        } else {
+            try {
+                var session = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+                if (session && session.tier === 'pro' && new Date(session.expires) > new Date()) {
+                    isPremiumUser = true;
+                    userTier = 'pro';
+                    activatePremiumUI();
+                }
+            } catch(e) {}
+        }
         try {
             var dcmocAuth = JSON.parse(localStorage.getItem('dcmoc-auth') || 'null');
             if (dcmocAuth && dcmocAuth.state && dcmocAuth.state.user) {
@@ -1001,24 +1012,35 @@
     function handleLogin() {
         var email = document.getElementById('loginEmail').value.trim().toLowerCase();
         var pass = document.getElementById('loginPassword').value;
-        if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
+        var matched = null;
+        // S1 pilot: prefer RZEngine.auth
+        if (window.RZEngine && window.RZEngine.auth) {
+            matched = window.RZEngine.auth.validateLogin(email, pass);
+            if (matched) {
+                window.RZEngine.auth.setSession(matched.email, matched.tier, matched.role);
+                window.RZEngine.auth.dispatchAuthChange('login', { email: matched.email, tier: matched.tier, role: matched.role });
+            }
+        } else if ((email === 'demo@resistancezero.com' && pass === 'demo2026') || ((email === 'bagus@resistancezero.com' || email === 'admin@resistancezero.com') && pass === 'RZ@Premium2026!')) {
+            // Legacy fallback
+            matched = { email: email, tier: 'pro', role: (email === 'admin@resistancezero.com' || email === 'bagus@resistancezero.com') ? 'root' : 'pro' };
             localStorage.setItem('rz_premium_session', JSON.stringify({
-                email: email, tier: 'pro', role: 'pro',
-               expires: new Date(Date.now() + 30 * 86400000).toISOString()
+                email: email, tier: 'pro', role: matched.role,
+                expires: new Date(Date.now() + 30 * 86400000).toISOString()
             }));
+            window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { tier: 'pro', role: matched.role, email: email, action: 'login' } }));
+        }
+        if (matched) {
             isPremiumUser = true;
-            userTier = 'pro';
+            userTier = matched.tier;
             closeLoginModal();
             activatePremiumUI();
-            window.dispatchEvent(new CustomEvent('rz-auth-change', {
-                detail: { tier: 'pro', role: (email === 'admin@resistancezero.com' || email === 'bagus@resistancezero.com') ? 'root' : 'pro', email: email }
-            }));
         } else {
             document.getElementById('loginError').style.display = 'block';
         }
     }
 
     function logoutPremium() {
+        if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.logout) { window.RZEngine.auth.logout(); }
         localStorage.removeItem('rz_premium_session');
         isPremiumUser = false;
         userTier = 'free';
