@@ -29,6 +29,15 @@ release sections rather than semver.
 ### Rationale
 - User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
 
+### 2026-04-30-v5 — Full province coverage + datahallAI cleanup + scheduled OSM refresh
+
+- **Added** `pln-java-grid-jateng.html` (Jawa Tengah + DIY) and `pln-java-grid-jatim.html` (Jawa Timur). Pages mirror the v4-fixed Jakarta+Banten / Jabar template: default labels OFF, tier-graded thin lines, animation only ≥150 kV, hover tooltips, 5-tier voltage toggles. Java-Bali sub-page family is now **4/4 complete**.
+- **Added** `js/pln-java-grid-data-jateng.js` and `js/pln-java-grid-data-jatim.js` — curated 20 kV DC + industrial overlays for each province.
+- **Promoted** Jawa Tengah + DIY and Jawa Timur cards on the overview page from `is-soon` placeholders to active links. All 4 province cards on `pln-java-grid.html` now click through to working sub-pages.
+- **Removed** the `<section>` with 10 academic-style references (NVIDIA, Uptime, Equinix, ASHRAE, OCP, Schneider, SemiAnalysis, IEA, Berkeley Lab, Lawrence Berkeley) from `datahallAI.html`. The page is a DC simulation tool, not a research article — citations were a category mismatch. `datahall.html` (DC conventional sibling) was already clean.
+- **Sitemap**: 2 new entries for the province pages, priority 0.85, monthly changefreq.
+- **Scheduled** quarterly OSM dataset refresh routine — `python3 tools/build-osm-dataset.py --force` runs on the 1st of each quarter; opens a PR if the dataset diff is non-trivial.
+
 ### 2026-04-30-v4.2 — Topology inference + plant evacuation + visual confidence
 
 - **infer_edges_by_proximity** in `tools/build-osm-dataset.py` connects any 500/275/150/70 kV station not already in an OSM or curated edge to its nearest same-voltage neighbour within 30 km (20 km for 70 kV). Source: `inferred-nn`.
