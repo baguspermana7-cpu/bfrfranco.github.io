@@ -388,6 +388,8 @@
         .pjgjb-line-70  { stroke: #f59e0b; stroke-width: 0.7; stroke-dasharray: 3 3; opacity: 0.65; }
         .pjgjb-line-20  { stroke: var(--pjgjb-v20); stroke-width: 0.6; stroke-dasharray: 2 2; opacity: 0.55; }
         .pjgjb-line-ind { stroke: var(--pjgjb-vind); stroke-width: 0.6; stroke-dasharray: 3 2; opacity: 0.55; }
+        /* Inferred edges — visually de-emphasized */
+        .pjgjb-line[data-source^="inferred"] { opacity: 0.35; stroke-dasharray: 1 4; animation: none !important; filter: none !important; }
         @keyframes pjgjb-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -24; } }
 
         /* SLD nodes */
@@ -1333,7 +1335,8 @@
                     x1: x1, y1: y1, x2: x2, y2: y2,
                     'class': edgeClass(e),
                     'marker-end': edgeMarkerEnd(e),
-                    'data-voltage': e.voltage || ''
+                    'data-voltage': e.voltage || '',
+                    'data-source': e.source || 'unknown'
                 });
                 gEdges.appendChild(line);
 

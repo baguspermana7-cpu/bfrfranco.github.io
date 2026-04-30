@@ -29,6 +29,15 @@ release sections rather than semver.
 ### Rationale
 - User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
 
+### 2026-04-30-v4.2 — Topology inference + plant evacuation + visual confidence
+
+- **infer_edges_by_proximity** in `tools/build-osm-dataset.py` connects any 500/275/150/70 kV station not already in an OSM or curated edge to its nearest same-voltage neighbour within 30 km (20 km for 70 kV). Source: `inferred-nn`.
+- **infer_plant_evacuation** connects each unattached plant to its nearest 500/275/150 kV substation within 5 km. Source: `inferred-evacuation`. Solves "plants float as isolated dots" issue.
+- **Visual confidence**: inferred edges render with `opacity:0.35` + tighter dash + no animation (CSS `[data-source^="inferred"]` rule on all 3 pages). Curated/OSM edges remain bright with full laser-flow. Users can see at a glance which edges are factual vs. heuristic.
+- Edge totals across iterations: 34 (v1) → 80 (v4.0 curated) → 363 (v4.1 inference) → **488** (v4.2 with plant evacuation + 70 kV).
+  - 500 kV 52, 275 kV 1, 150 kV 410, 70 kV 25.
+- Curated edges added to `tools/pln-java-grid-overlay.yaml` `edges:` block: 28 backbone 500 kV (Suralaya → Cilegon → Balaraja → Gandul → Bekasi → Cibatu → Cirata → Pemalang → Ungaran → Tanjung Jati / Pedan → Cilacap / Kediri → Krian → Gresik / Ngimbang → Grati → Paiton plus radials), 1×275 kV Java-Bali submarine, 12 key 150 kV corridors.
+
 ### 2026-04-30-v4 — SLD readability fix (labels off, tier-graded thin lines, curated backbone edges)
 
 - **Labels default OFF** on the SLD across all 3 pln-java-grid pages. With 744 nodes, drawing every name produced massive overlap. Names now appear only via hover tooltip. Labels toggle is preserved for users who want them.
