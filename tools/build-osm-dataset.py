@@ -713,6 +713,52 @@ def infer_edges_by_proximity(nodes: List[Dict[str, Any]],
     return out
 
 
+def infer_plant_evacuation(nodes: List[Dict[str, Any]],
+                            existing_edges: List[Dict[str, Any]],
+                            max_km: float = 5.0) -> List[Dict[str, Any]]:
+    """For each plant, connect it to its nearest 500/275/150 kV substation
+    within max_km. Source='inferred-evacuation'. Voltage of the edge = the
+    substation's voltage (plants don't carry voltage themselves at this tier).
+    """
+    out: List[Dict[str, Any]] = []
+    plants = [n for n in nodes if n.get("kind") == "plant"]
+    stations = [n for n in nodes if n.get("kind") == "station" and n.get("voltage") in (500, 275, 150)]
+    seen_pairs: set = set()
+    for e in existing_edges:
+        seen_pairs.add(tuple(sorted([e["from"], e["to"]])))
+
+    plant_already_connected = set()
+    for e in existing_edges:
+        plant_already_connected.add(e["from"])
+        plant_already_connected.add(e["to"])
+
+    for p in plants:
+        if p["id"] in plant_already_connected:
+            continue
+        best = None
+        best_km = max_km
+        for s in stations:
+            d = haversine_km(p["lat"], p["lng"], s["lat"], s["lng"])
+            if d < best_km:
+                best_km = d
+                best = s
+        if not best:
+            continue
+        pair = tuple(sorted([p["id"], best["id"]]))
+        if pair in seen_pairs:
+            continue
+        seen_pairs.add(pair)
+        out.append({
+            "from": p["id"],
+            "to": best["id"],
+            "voltage": best["voltage"],
+            "km": int(round(best_km * 10)) / 10 if best_km < 1 else int(round(best_km)),
+            "circuits": 1,
+            "source": "inferred-evacuation",
+        })
+    return out
+
+
 def parse_edges(payload: Dict[str, Any], nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     idx = build_node_index(nodes)
     edges: List[Dict[str, Any]] = []
@@ -977,13 +1023,24 @@ def main() -> int:
                 added += 1
         log(f"[edges-overlay] +{added} curated edges merged ({len(overlay_edges) - added} dedup-skipped)")
 
-    # 6c. Topology inference — for any high-voltage station that ended up isolated,
-    # connect it to the nearest same-voltage neighbour within 30 km. Marks the
-    # edge with source='inferred-nn' so the tooltip can downgrade confidence.
+    # 6c. Topology inference — substations
     inferred = infer_edges_by_proximity(nodes, edges, voltages=(500, 275, 150), max_km=30.0)
     if inferred:
         edges.extend(inferred)
-        log(f"[edges-inferred] +{len(inferred)} nearest-neighbor edges added (isolated-station fallback)")
+        log(f"[edges-inferred] +{len(inferred)} 500/275/150 kV nearest-neighbor edges")
+
+    # 6d. 70 kV legacy inference (smaller radius — they're city-level)
+    inferred_70 = infer_edges_by_proximity(nodes, edges, voltages=(70,), max_km=20.0)
+    if inferred_70:
+        edges.extend(inferred_70)
+        log(f"[edges-inferred] +{len(inferred_70)} 70 kV nearest-neighbor edges")
+
+    # 6e. Plant evacuation — connect each plant to the nearest 500/275/150 kV
+    # station within 5 km. Marks the edge with source='inferred-evacuation'.
+    plant_edges = infer_plant_evacuation(nodes, edges, max_km=5.0)
+    if plant_edges:
+        edges.extend(plant_edges)
+        log(f"[edges-inferred] +{len(plant_edges)} plant→substation evacuation edges")
 
     edges.sort(key=lambda e: (e["from"], e["to"], e["voltage"]))
     log(f"[edges] OSM={osm_edge_count}, overlay+inferred total={len(edges)}")
