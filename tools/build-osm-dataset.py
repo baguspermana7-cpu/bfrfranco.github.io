@@ -653,6 +653,66 @@ def find_nearest_node(lat: float, lng: float,
     return best
 
 
+def infer_edges_by_proximity(nodes: List[Dict[str, Any]],
+                              existing_edges: List[Dict[str, Any]],
+                              voltages: Tuple[int, ...] = (500, 275, 150),
+                              max_km: float = 30.0) -> List[Dict[str, Any]]:
+    """For nodes at the given voltages that are not in any existing edge,
+    connect each isolated node to its nearest same-voltage neighbour within
+    max_km. Marks the edge source as 'inferred-nn'.
+
+    Avoids cross-tier inferences (a 150 kV node only connects to another
+    150 kV node). Skips plants. Idempotent given the same dataset.
+    """
+    out: List[Dict[str, Any]] = []
+    connected_ids = set()
+    for e in existing_edges:
+        connected_ids.add(e["from"])
+        connected_ids.add(e["to"])
+
+    by_voltage: Dict[int, List[Dict[str, Any]]] = {}
+    for n in nodes:
+        if n.get("kind") != "station":
+            continue
+        v = n.get("voltage")
+        if v not in voltages:
+            continue
+        by_voltage.setdefault(v, []).append(n)
+
+    seen_pairs: set = set()
+    for e in existing_edges:
+        seen_pairs.add(tuple(sorted([e["from"], e["to"]])))
+
+    for v, group in by_voltage.items():
+        for n in group:
+            if n["id"] in connected_ids:
+                continue
+            best = None
+            best_km = max_km
+            for m in group:
+                if m["id"] == n["id"]:
+                    continue
+                d = haversine_km(n["lat"], n["lng"], m["lat"], m["lng"])
+                if d < best_km:
+                    best_km = d
+                    best = m
+            if not best:
+                continue
+            pair = tuple(sorted([n["id"], best["id"]]))
+            if pair in seen_pairs:
+                continue
+            seen_pairs.add(pair)
+            out.append({
+                "from": n["id"],
+                "to": best["id"],
+                "voltage": v,
+                "km": int(round(best_km)),
+                "circuits": 1,
+                "source": "inferred-nn",
+            })
+    return out
+
+
 def parse_edges(payload: Dict[str, Any], nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     idx = build_node_index(nodes)
     edges: List[Dict[str, Any]] = []
@@ -917,8 +977,16 @@ def main() -> int:
                 added += 1
         log(f"[edges-overlay] +{added} curated edges merged ({len(overlay_edges) - added} dedup-skipped)")
 
+    # 6c. Topology inference — for any high-voltage station that ended up isolated,
+    # connect it to the nearest same-voltage neighbour within 30 km. Marks the
+    # edge with source='inferred-nn' so the tooltip can downgrade confidence.
+    inferred = infer_edges_by_proximity(nodes, edges, voltages=(500, 275, 150), max_km=30.0)
+    if inferred:
+        edges.extend(inferred)
+        log(f"[edges-inferred] +{len(inferred)} nearest-neighbor edges added (isolated-station fallback)")
+
     edges.sort(key=lambda e: (e["from"], e["to"], e["voltage"]))
-    log(f"[edges] OSM={osm_edge_count}, overlay-merged total={len(edges)}")
+    log(f"[edges] OSM={osm_edge_count}, overlay+inferred total={len(edges)}")
 
     # 7. Report
     print_breakdown(nodes)
