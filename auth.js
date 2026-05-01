@@ -22,6 +22,15 @@
         var e = String(email || '').toLowerCase().trim();
         return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
     }
+    function isRootEmail(email) {
+        return ROOT_EMAILS.indexOf(String(email || '').toLowerCase().trim()) !== -1;
+    }
+    function isRootAccess(session) {
+        return !!(session && isRootEmail(session.email));
+    }
+    function isRootSession() {
+        return isRootAccess(getSession());
+    }
     function getRoleFromSession(session) {
         if (!session) return '';
         return session.role || detectRole(session.email);
@@ -34,11 +43,20 @@
             return String(href).toLowerCase().split('#')[0].split('?')[0];
         }
     }
+    var ROOT_ONLY_PATHS = [
+        '/dcmoc',
+        '/dc-market',
+        '/datahallai.html',
+        '/dc-conventional.html',
+        '/dc-market-tracker.html'
+    ];
     function isRootOnlyHref(href) {
         var path = normalizePathFromHref(href);
         if (!path) return false;
-        // datahallAI and dc-conventional allow pro+root (gate in their own page JS)
-        if (path === '/dcmoc' || path === '/dcmoc/' || path.indexOf('/dcmoc/') !== -1) return true;
+        for (var i = 0; i < ROOT_ONLY_PATHS.length; i++) {
+            var p = ROOT_ONLY_PATHS[i];
+            if (path === p || path === p + '/' || path.indexOf(p + '/') === 0) return true;
+        }
         return false;
     }
     function ensureLockIcon(link) {
@@ -426,6 +444,11 @@
 
     /* ───────── Public API ───────── */
     window._rzAuth = {
+        isRootEmail: isRootEmail,
+        isRootAccess: isRootAccess,
+        isRootSession: isRootSession,
+        isRootOnlyHref: isRootOnlyHref,
+
         showModal: function () {
             var overlay = document.getElementById('rzModalOverlay');
             var form = document.getElementById('rzModalForm');
