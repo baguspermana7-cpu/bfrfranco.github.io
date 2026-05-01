@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-data.js
  * @module PLN_ENERGY_DATA
- * @version 2026-05-01-v1
+ * @version 2026-05-01-v3
  *
  * Static representative energy data for the PLN Java-Bali Grid Monitor dashboard
  * (resistancezero.com). Loaded via <script src="js/pln-energy-data.js"></script>
@@ -214,7 +214,7 @@
    * ========================================================= */
 
   var PLN_ENERGY_DATA = {
-    version: '2026-05-01-v2',
+    version: '2026-05-01-v3',
     units: { power: 'MW', energy: 'GWh', emissions: 'gCO2/kWh' },
 
     // ---------- National snapshot (evening peak, representative of PLN AR 2024 + RUPTL 2025-2034) ----------
@@ -340,7 +340,191 @@
   };
 
   /* =========================================================
-   * 5. EXPORT
+   * 5. MULTI-RANGE TIME-SERIES (24h / 2d / 7d / 1M / 3M / 1Y)
+   *
+   * Synthesizes 6 datasets from the canonical hourly_24h profile.
+   * Each dataset has a uniform shape so the page can swap data
+   * without branching: { label, ticks, interval, by_fuel,
+   * demand, carbon_intensity, x_labels(i) }.
+   *
+   * Modulation:
+   *   - 7d: weekday/weekend (Mon-Fri 1.00, Sat 0.92, Sun 0.88)
+   *   - 1Y: seasonal — Indonesian dry season May-Oct +4%, rainy
+   *         season Nov-Apr baseline
+   *   - 1M / 3M: weekly cyclicity (~+/- 2% per week)
+   * Daily/weekly/monthly aggregates take the average per period.
+   * ========================================================= */
+
+  var FUELS = ['coal', 'gas', 'hydro', 'geothermal', 'biomass', 'solar', 'diesel'];
+  var FUEL_INTENSITY = { coal: 920, gas: 490, hydro: 0, geothermal: 0, biomass: 0, solar: 0, diesel: 700 };
+  var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  var DAY_FACTOR = [1.00, 1.00, 1.00, 1.00, 1.00, 0.92, 0.88]; // Mon..Sun
+  var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // Indonesian seasonal modulation (1.00 = baseline, 1.04 = dry season +4%)
+  var MONTH_FACTOR = [1.00, 1.00, 1.00, 1.01, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.01, 1.00];
+
+  function carbonAt(byFuelAtTick) {
+    var totalMw = 0, weighted = 0;
+    for (var k in byFuelAtTick) {
+      if (Object.prototype.hasOwnProperty.call(byFuelAtTick, k)) {
+        var v = byFuelAtTick[k];
+        totalMw += v;
+        weighted += v * (FUEL_INTENSITY[k] || 0);
+      }
+    }
+    return totalMw > 0 ? Math.round(weighted / totalMw) : 0;
+  }
+
+  function scaleByFuelAt(hourIdx, factor) {
+    var src = hourly24h[hourIdx % 24].by_fuel;
+    var out = {};
+    FUELS.forEach(function (f) { out[f] = Math.round((src[f] || 0) * factor); });
+    return out;
+  }
+
+  function avgByFuel(records) {
+    var out = {};
+    FUELS.forEach(function (f) {
+      var s = 0;
+      records.forEach(function (r) { s += r.by_fuel[f] || 0; });
+      out[f] = Math.round(s / Math.max(1, records.length));
+    });
+    return out;
+  }
+
+  function buildHourlyRange(numHours, factorAtHour) {
+    var byFuel = {}; FUELS.forEach(function (f) { byFuel[f] = []; });
+    var demand = [], carbon = [];
+    for (var h = 0; h < numHours; h++) {
+      var f = factorAtHour(h);
+      var record = scaleByFuelAt(h, f);
+      FUELS.forEach(function (fuel) { byFuel[fuel].push(record[fuel]); });
+      var d = 0;
+      FUELS.forEach(function (fuel) { d += record[fuel]; });
+      demand.push(d);
+      carbon.push(carbonAt(record));
+    }
+    return { by_fuel: byFuel, demand: demand, carbon_intensity: carbon };
+  }
+
+  function buildAggregateRange(numTicks, factorAtTick, hoursPerTick) {
+    // For each tick, average factor over the tick window applied to a 24h cycle
+    var byFuel = {}; FUELS.forEach(function (f) { byFuel[f] = []; });
+    var demand = [], carbon = [];
+    for (var t = 0; t < numTicks; t++) {
+      var factor = factorAtTick(t);
+      // Sum over 24 hourly slots scaled by factor — produces a daily-equivalent average
+      var fuelSum = {}; FUELS.forEach(function (fuel) { fuelSum[fuel] = 0; });
+      for (var h = 0; h < 24; h++) {
+        var rec = scaleByFuelAt(h, factor);
+        FUELS.forEach(function (fuel) { fuelSum[fuel] += rec[fuel]; });
+      }
+      // Convert to per-tick average MW (so all tick-types share GW units)
+      FUELS.forEach(function (fuel) { byFuel[fuel].push(Math.round(fuelSum[fuel] / 24)); });
+      var d = 0;
+      FUELS.forEach(function (fuel) { d += byFuel[fuel][t]; });
+      demand.push(d);
+      var perFuelAtT = {}; FUELS.forEach(function (fuel) { perFuelAtT[fuel] = byFuel[fuel][t]; });
+      carbon.push(carbonAt(perFuelAtT));
+    }
+    return { by_fuel: byFuel, demand: demand, carbon_intensity: carbon };
+  }
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  var range24h = (function () {
+    var b = buildHourlyRange(24, function () { return 1.00; });
+    return {
+      label: '24 hours', ticks: 24, interval: 'hour',
+      by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
+      x_labels: function (i) { return (i % 4 === 0) ? (pad2(i) + ':00') : ''; }
+    };
+  }());
+
+  var range2d = (function () {
+    var b = buildHourlyRange(48, function (h) { return h < 24 ? 0.97 : 1.00; }); // yesterday slightly lower
+    return {
+      label: '2 days', ticks: 48, interval: 'hour',
+      by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
+      x_labels: function (i) {
+        if (i === 0) return 'Yesterday 00:00';
+        if (i === 12) return 'Yesterday 12:00';
+        if (i === 24) return 'Today 00:00';
+        if (i === 36) return 'Today 12:00';
+        return '';
+      }
+    };
+  }());
+
+  var range7d = (function () {
+    var b = buildHourlyRange(168, function (h) {
+      var dayIdx = Math.floor(h / 24) % 7;
+      return DAY_FACTOR[dayIdx];
+    });
+    return {
+      label: '7 days', ticks: 168, interval: 'hour',
+      by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
+      x_labels: function (i) {
+        var hourOfDay = i % 24;
+        var dayIdx = Math.floor(i / 24);
+        return (hourOfDay === 12 && dayIdx < 7) ? DAY_NAMES[dayIdx] : '';
+      }
+    };
+  }());
+
+  var range1M = (function () {
+    var b = buildAggregateRange(30, function (t) {
+      var dayIdx = t % 7;
+      return DAY_FACTOR[dayIdx] * (1 + 0.005 * Math.sin(t / 4));
+    }, 24);
+    return {
+      label: '1 month', ticks: 30, interval: 'day',
+      by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
+      x_labels: function (i) { return (i % 5 === 0) ? ('Day ' + (i + 1)) : ''; }
+    };
+  }());
+
+  var range3M = (function () {
+    var b = buildAggregateRange(13, function (t) {
+      // 13 weeks ≈ Q3 (Jul-Sep, dry season)
+      return 1.04 + 0.01 * Math.sin(t / 2);
+    }, 168);
+    return {
+      label: '3 months', ticks: 13, interval: 'week',
+      by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
+      x_labels: function (i) { return 'W' + (i + 1); }
+    };
+  }());
+
+  var range1Y = (function () {
+    var b = buildAggregateRange(12, function (t) { return MONTH_FACTOR[t]; }, 730);
+    return {
+      label: '1 year', ticks: 12, interval: 'month',
+      by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
+      x_labels: function (i) { return MONTH_NAMES[i]; }
+    };
+  }());
+
+  PLN_ENERGY_DATA.multi_range = {
+    '24h': range24h,
+    '2d':  range2d,
+    '7d':  range7d,
+    '1M':  range1M,
+    '3M':  range3M,
+    '1Y':  range1Y
+  };
+
+  /**
+   * Get a range dataset by key.
+   * @param {string} rangeKey  '24h' | '2d' | '7d' | '1M' | '3M' | '1Y'
+   * @returns {{label,ticks,interval,by_fuel,demand,carbon_intensity,x_labels}}
+   */
+  PLN_ENERGY_DATA.getRange = function getRange(rangeKey) {
+    return PLN_ENERGY_DATA.multi_range[rangeKey] || PLN_ENERGY_DATA.multi_range['24h'];
+  };
+
+  /* =========================================================
+   * 6. EXPORT
    * ========================================================= */
   win.PLN_ENERGY_DATA = PLN_ENERGY_DATA;
 

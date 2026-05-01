@@ -1170,13 +1170,13 @@
 
             <!-- Top KPI bar (mirrors grid.iamkate.com compact KPI row) -->
             <div class="pjg-live-kpi-bar" aria-label="Live KPIs">
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Time</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-time">--:--</span></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Demand</span><span class="pjg-live-kpi-val" id="pjg-live-demand">-- GW</span><span class="pjg-live-kpi-delta" id="pjg-live-demand-delta"></span><svg class="pjg-spark" id="pjg-spark-demand" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Generation</span><span class="pjg-live-kpi-val" id="pjg-live-gen">-- GW</span><svg class="pjg-spark" id="pjg-spark-gen" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Reserve</span><span class="pjg-live-kpi-val" id="pjg-live-reserve">-- GW</span><svg class="pjg-spark" id="pjg-spark-reserve" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Emissions</span><span class="pjg-live-kpi-val pjg-live-kpi-warm" id="pjg-live-emissions">-- gCO₂/kWh</span><svg class="pjg-spark" id="pjg-spark-emissions" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Renewables</span><span class="pjg-live-kpi-val pjg-live-kpi-good" id="pjg-live-renew">--%</span><svg class="pjg-spark" id="pjg-spark-renew" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Frequency</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-freq">-- Hz</span></div>
+                <div class="pjg-live-kpi" title="Local Western Indonesia Time (WIB / GMT+7) of the snapshot."><span class="pjg-live-kpi-label">Time</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-time">--:--</span></div>
+                <div class="pjg-live-kpi" title="System-wide demand on the Java-Bali synchronous grid (GW). Indonesian peak is evening 18:00-20:00 driven by residential return + AC + lighting."><span class="pjg-live-kpi-label">Demand</span><span class="pjg-live-kpi-val" id="pjg-live-demand">-- GW</span><span class="pjg-live-kpi-delta" id="pjg-live-demand-delta"></span><svg class="pjg-spark" id="pjg-spark-demand" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi" title="Total dispatched generation (GW). Equals demand for an islanded system (no exports/imports on Java-Bali besides the small 275 kV submarine to Bali)."><span class="pjg-live-kpi-label">Generation</span><span class="pjg-live-kpi-val" id="pjg-live-gen">-- GW</span><svg class="pjg-spark" id="pjg-spark-gen" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi" title="Spinning + standby reserve = installed capacity (47 GW) − current demand. Java-Bali target ≥25% per RUPTL 2025-2034."><span class="pjg-live-kpi-label">Reserve</span><span class="pjg-live-kpi-val" id="pjg-live-reserve">-- GW</span><svg class="pjg-spark" id="pjg-spark-reserve" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi" title="Carbon intensity gCO₂/kWh — weighted-average emissions of dispatched mix. Java-Bali ~781 (coal-heavy). Compare: OECD avg 350, GB current ~150, RUPTL 2030 target 580."><span class="pjg-live-kpi-label">Emissions</span><span class="pjg-live-kpi-val pjg-live-kpi-warm" id="pjg-live-emissions">-- gCO₂/kWh</span><svg class="pjg-spark" id="pjg-spark-emissions" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi" title="Renewable share of generation (hydro + geothermal + biomass + solar). PLN AR 2024 reports 13.5% Java-Bali; RUPTL 2025-2034 target 23% by 2025."><span class="pjg-live-kpi-label">Renewables</span><span class="pjg-live-kpi-val pjg-live-kpi-good" id="pjg-live-renew">--%</span><svg class="pjg-spark" id="pjg-spark-renew" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi" title="System frequency. Nominal 50.00 Hz; control band ±0.05 Hz. Deviation indicates supply-demand imbalance — under-frequency triggers UFLS (Under-Frequency Load Shedding) at 49.30 Hz."><span class="pjg-live-kpi-label">Frequency</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-freq">-- Hz</span></div>
             </div>
 
             <!-- Generation mix horizontal stacked bar + filter pills -->
@@ -1184,10 +1184,10 @@
                 <div class="pjg-live-card-hdr">
                     <h3>Generation mix</h3>
                     <div class="pjg-live-pills" id="pjg-live-mix-pills">
-                        <button class="pjg-live-pill active" data-mix="all">All Sources</button>
-                        <button class="pjg-live-pill" data-mix="renewables">Renewables</button>
-                        <button class="pjg-live-pill" data-mix="low_carbon">Low Carbon</button>
-                        <button class="pjg-live-pill" data-mix="fossil">Fossil Fuels</button>
+                        <button class="pjg-live-pill active" data-mix="all" title="Show all 7 fuel categories at full opacity">All Sources</button>
+                        <button class="pjg-live-pill" data-mix="renewables" title="Highlight renewables only: hydro, geothermal, biomass, solar (other fuels dimmed)">Renewables</button>
+                        <button class="pjg-live-pill" data-mix="low_carbon" title="Highlight low-carbon sources: renewables + nuclear (none on Java-Bali grid currently)">Low Carbon</button>
+                        <button class="pjg-live-pill" data-mix="fossil" title="Highlight fossil fuels only: coal, gas, diesel">Fossil Fuels</button>
                     </div>
                 </div>
                 <div class="pjg-live-bar" id="pjg-live-mix-bar"></div>
@@ -1196,28 +1196,32 @@
                 <div class="pjg-live-prov-mix" id="pjg-live-prov-mix" aria-label="Per-province generation mix"></div>
             </div>
 
-            <!-- 24h Generation & Demand stacked-area chart -->
+            <!-- Generation & Demand stacked-area chart (multi-range) -->
             <div class="pjg-live-card">
                 <div class="pjg-live-card-hdr">
-                    <h3>24h Generation &amp; Demand</h3>
-                    <div class="pjg-live-toggles">
+                    <h3 id="pjg-live-stack-title" title="Stacked area: total generation by fuel; dashed line = total demand. Hover for hour-by-hour breakdown.">24h Generation &amp; Demand</h3>
+                    <div class="pjg-live-toggles" id="pjg-live-range-pills" role="group" aria-label="Time range">
                         <span class="pjg-live-toggle-label">Range</span>
-                        <button class="pjg-live-pill active" data-range="1d">1d</button>
-                        <button class="pjg-live-pill" data-range="2d">2d</button>
+                        <button class="pjg-live-pill active" data-range="24h" title="Last 24 hours, hourly resolution">24h</button>
+                        <button class="pjg-live-pill" data-range="2d" title="Yesterday + today, hourly resolution">2d</button>
+                        <button class="pjg-live-pill" data-range="7d" title="Last 7 days, hourly resolution. Weekend dip (~8-12% lower) typical for industrial-load grids.">7d</button>
+                        <button class="pjg-live-pill" data-range="1M" title="Last 30 days, daily averages">1M</button>
+                        <button class="pjg-live-pill" data-range="3M" title="Last quarter, weekly averages">3M</button>
+                        <button class="pjg-live-pill" data-range="1Y" title="Last 12 months, monthly averages. Indonesian dry season May-Oct shows ~4% higher demand (AC load).">1Y</button>
                     </div>
                 </div>
                 <div class="pjg-chart-wrap">
-                    <svg id="pjg-live-stack" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet" role="img" aria-label="24-hour generation and demand stacked area chart"></svg>
+                    <svg id="pjg-live-stack" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Generation and demand stacked-area chart"></svg>
                 </div>
             </div>
 
-            <!-- 24h Carbon intensity line chart -->
+            <!-- Carbon intensity line chart (shares the range selector above) -->
             <div class="pjg-live-card">
                 <div class="pjg-live-card-hdr">
-                    <h3>24h Carbon intensity</h3>
+                    <h3 id="pjg-live-carbon-title" title="Grid carbon intensity (gCO₂/kWh). Reference lines: RUPTL 2030 target (580), OECD avg (350), GB current (~150).">24h Carbon intensity</h3>
                 </div>
                 <div class="pjg-chart-wrap">
-                    <svg id="pjg-live-carbon" viewBox="0 0 720 140" preserveAspectRatio="xMidYMid meet" role="img" aria-label="24-hour carbon intensity line chart"></svg>
+                    <svg id="pjg-live-carbon" viewBox="0 0 720 140" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carbon intensity line chart"></svg>
                 </div>
             </div>
 
@@ -1228,11 +1232,11 @@
                 </div>
                 <table class="pjg-live-breakdown" id="pjg-live-breakdown">
                     <thead><tr>
-                        <th>Source</th>
-                        <th class="num">GW</th>
-                        <th class="num">%</th>
-                        <th class="num">GWh today</th>
-                        <th class="num">tCO₂ today</th>
+                        <th title="Fuel category — primary energy source for the dispatched generation">Source</th>
+                        <th class="num" title="Current dispatch (GW) at the snapshot hour 18:00 WIB">GW</th>
+                        <th class="num" title="Share of total generation (%)">%</th>
+                        <th class="num" title="Cumulative energy delivered today (GWh)">GWh today</th>
+                        <th class="num" title="Cumulative CO₂ emissions today (tonnes). Calculated as fuel.gwh_today × fuel.carbon_intensity / 1000.">tCO₂ today</th>
                     </tr></thead>
                     <tbody></tbody>
                 </table>
@@ -1330,7 +1334,7 @@
     <script src="js/rz-map.js?v=2026-05-01-v1" defer></script>
     <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
     <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
-    <script src="js/pln-energy-data.js?v=2026-05-01-v2" defer></script>
+    <script src="js/pln-energy-data.js?v=2026-05-01-v3" defer></script>
     <script src="js/pln-energy-dashboard.js?v=2026-05-01-v3" defer></script>
 
     <script>
@@ -1531,6 +1535,16 @@
             // ========== Map UI upgrade — top KPI strip + right-side technology panel ==========
             populateMapKpiStrip(nodes);
             mountTechnologyPanel(nodes);
+
+            // Auto-render the province choropleth (defaults ON now — was opt-in v1)
+            // The toggle in the right-side panel is checked by default; trigger it
+            // once the map + helpers are loaded so the gradient appears immediately.
+            setTimeout(function () {
+                var box = document.getElementById('pjg-choropleth-toggle');
+                if (box && box.checked) {
+                    box.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }, 350);
         }
 
         /* Populate the top KPI strip with site count + live snapshot from PLN_ENERGY_DATA. */
@@ -1602,7 +1616,7 @@
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="labels"><span class="pjg-tech-label">Labels</span></label>'
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="capacity"><span class="pjg-tech-label">Capacity</span></label>'
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="kvbadges" checked><span class="pjg-tech-label">kV badges</span></label>'
-                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="choropleth" id="pjg-choropleth-toggle"><span class="pjg-tech-label">Province utilization (choropleth)</span></label>';
+                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="choropleth" id="pjg-choropleth-toggle" checked><span class="pjg-tech-label">Province utilization (choropleth)</span></label>';
             var html = ''
                 + '<div class="rzm-info-panel pjg-tech-panel">'
                 + '<div class="pjg-tech-panel-hdr">'
@@ -2291,48 +2305,21 @@
                 });
             }
 
-            // ---- 24h stacked-area chart ----
-            var stackSvg = document.getElementById('pjg-live-stack');
-            if (stackSvg && typeof EDB.renderStackedAreaSVG === 'function') {
-                var hourLabels = [];
-                for (var h = 0; h < 24; h++) hourLabels.push((h % 4 === 0) ? (String(h).padStart(2, '0') + ':00') : '');
-                var series = ED.fuels.map(function (f) {
-                    return {
-                        id: f.id, label: f.label, color: f.color,
-                        values: ED.hourly_24h.map(function (hr) { return (hr.by_fuel[f.id] || 0) / 1000; })
-                    };
-                });
-                var demandLine = {
-                    values: ED.hourly_24h.map(function (hr) { return hr.demand_mw / 1000; }),
-                    label: 'Demand', color: '#f1f5f9'
-                };
-                EDB.renderStackedAreaSVG(stackSvg, series, {
-                    width: 720, height: 240, xLabels: hourLabels, yLabel: 'GW', overlayLine: demandLine
-                });
-            }
+            // ---- Multi-range stacked + carbon charts (initial render at 24h) ----
+            renderRange('24h');
 
-            // ---- 24h carbon intensity line chart ----
-            var carbonSvg = document.getElementById('pjg-live-carbon');
-            if (carbonSvg && typeof EDB.renderLineSVG === 'function') {
-                var carbonPoints = ED.hourly_24h.map(function (hr) {
-                    var totalMw = hr.demand_mw;
-                    var weightedCO2 = 0;
-                    ED.fuels.forEach(function (f) {
-                        weightedCO2 += (hr.by_fuel[f.id] || 0) * f.carbon_intensity;
+            // ---- Wire range pills to swap data on click ----
+            var rangePills = document.getElementById('pjg-live-range-pills');
+            if (rangePills) {
+                rangePills.addEventListener('click', function (ev) {
+                    var btn = ev.target.closest('.pjg-live-pill');
+                    if (!btn) return;
+                    var rangeKey = btn.getAttribute('data-range');
+                    if (!rangeKey) return;
+                    rangePills.querySelectorAll('.pjg-live-pill').forEach(function (b) {
+                        b.classList.toggle('active', b === btn);
                     });
-                    return totalMw > 0 ? Math.round(weightedCO2 / totalMw) : 0;
-                });
-                var hourLabels2 = [];
-                for (var h2 = 0; h2 < 24; h2++) hourLabels2.push((h2 % 4 === 0) ? (String(h2).padStart(2, '0') + ':00') : '');
-                EDB.renderLineSVG(carbonSvg, carbonPoints, {
-                    width: 720, height: 140,
-                    xLabels: hourLabels2, yLabel: 'gCO₂/kWh',
-                    color: '#ef4444', fillBelow: true,
-                    refLines: [
-                        { y: 580, label: 'RUPTL 2030 target', color: '#10b981', dash: '4 3' },
-                        { y: 350, label: 'OECD avg', color: '#94a3b8', dash: '4 3' },
-                        { y: 150, label: 'GB current', color: '#06b6d4', dash: '4 3' }
-                    ]
+                    renderRange(rangeKey);
                 });
             }
 
@@ -2345,11 +2332,12 @@
                     var totals = { mw: 0, gwh: 0, co2: 0 };
                     ED.fuels.forEach(function (f) {
                         var tr = document.createElement('tr');
-                        tr.innerHTML = '<td><span class="pjg-tech-dot" style="background:' + f.color + ';display:inline-block;width:10px;height:10px;border-radius:999px;margin-right:0.5rem;vertical-align:middle"></span>' + f.label + '</td>'
-                            + '<td class="num">' + (f.mw / 1000).toFixed(2) + '</td>'
-                            + '<td class="num">' + f.pct + '%</td>'
-                            + '<td class="num">' + f.gwh_today + '</td>'
-                            + '<td class="num">' + (f.tonnes_co2).toLocaleString() + '</td>';
+                        tr.title = f.label + ' — group: ' + f.group + ' · carbon intensity: ' + f.carbon_intensity + ' gCO₂/kWh · current dispatch ' + (f.mw / 1000).toFixed(2) + ' GW';
+                        tr.innerHTML = '<td><span class="pjg-tech-dot" title="Fuel color swatch" style="background:' + f.color + ';display:inline-block;width:10px;height:10px;border-radius:999px;margin-right:0.5rem;vertical-align:middle"></span>' + f.label + '</td>'
+                            + '<td class="num" title="Current dispatch in gigawatts">' + (f.mw / 1000).toFixed(2) + '</td>'
+                            + '<td class="num" title="Share of total generation">' + f.pct + '%</td>'
+                            + '<td class="num" title="Cumulative GWh delivered today">' + f.gwh_today + '</td>'
+                            + '<td class="num" title="Tonnes CO₂ emitted today (intensity ' + f.carbon_intensity + ' gCO₂/kWh)">' + (f.tonnes_co2).toLocaleString() + '</td>';
                         bdBody.appendChild(tr);
                         totals.mw += f.mw; totals.gwh += f.gwh_today; totals.co2 += f.tonnes_co2;
                     });
@@ -2397,6 +2385,62 @@
             renderTopPlants();
         }
 
+        function renderRange(rangeKey) {
+            var ED = window.PLN_ENERGY_DATA;
+            var EDB = window.PLN_ENERGY_DASHBOARD;
+            if (!ED || !EDB) return;
+            var range = ED.getRange(rangeKey);
+            if (!range) return;
+
+            // X-axis labels via the range's tick→label function
+            var xLabels = [];
+            for (var i = 0; i < range.ticks; i++) xLabels.push(range.x_labels(i));
+
+            // Stacked-area: per-fuel series in MW → divided to GW for axis
+            var stackSvg = document.getElementById('pjg-live-stack');
+            if (stackSvg && typeof EDB.renderStackedAreaSVG === 'function') {
+                var series = ED.fuels.map(function (f) {
+                    return {
+                        id: f.id, label: f.label, color: f.color,
+                        values: range.by_fuel[f.id].map(function (mw) { return mw / 1000; })
+                    };
+                });
+                var demandLine = {
+                    values: range.demand.map(function (mw) { return mw / 1000; }),
+                    label: 'Demand', color: '#f1f5f9'
+                };
+                EDB.renderStackedAreaSVG(stackSvg, series, {
+                    width: 720, height: 240,
+                    xLabels: xLabels, yLabel: 'GW',
+                    overlayLine: demandLine,
+                    legend: 'top-right',
+                    showGrid: true,
+                    hoverable: true
+                });
+            }
+
+            // Carbon-intensity line chart (same range)
+            var carbonSvg = document.getElementById('pjg-live-carbon');
+            if (carbonSvg && typeof EDB.renderLineSVG === 'function') {
+                EDB.renderLineSVG(carbonSvg, range.carbon_intensity.slice(), {
+                    width: 720, height: 140,
+                    xLabels: xLabels, yLabel: 'gCO₂/kWh',
+                    color: '#ef4444', fillBelow: true,
+                    refLines: [
+                        { y: 580, label: 'RUPTL 2030 target', color: '#10b981', dash: '4 3' },
+                        { y: 350, label: 'OECD avg', color: '#94a3b8', dash: '4 3' },
+                        { y: 150, label: 'GB current', color: '#06b6d4', dash: '4 3' }
+                    ]
+                });
+            }
+
+            // Update card titles to reflect the active range
+            var stackTitle = document.getElementById('pjg-live-stack-title');
+            var carbonTitle = document.getElementById('pjg-live-carbon-title');
+            if (stackTitle) stackTitle.textContent = range.label + ' Generation & Demand';
+            if (carbonTitle) carbonTitle.textContent = range.label + ' Carbon intensity';
+        }
+
         function renderSpark(elId, values, color) {
             var svg = document.getElementById(elId);
             if (!svg || !values || !values.length) return;
@@ -2427,22 +2471,26 @@
                 if (pkMw === 0) return;
                 var row = document.createElement('div');
                 row.className = 'pjg-live-prov-row';
+                row.title = (labels[p] || p) + ' — peak demand ' + (pkMw / 1000).toFixed(1) + ' GW. Generation mix mirrors the system-wide breakdown.';
                 var nameSpan = document.createElement('div');
                 nameSpan.className = 'prov-name';
                 nameSpan.textContent = labels[p] || p;
+                nameSpan.title = 'Province: ' + (labels[p] || p);
                 var bar = document.createElement('div');
                 bar.className = 'prov-bar';
+                bar.title = 'Generation mix for ' + (labels[p] || p);
                 ED.fuels.forEach(function (f) {
                     var seg = document.createElement('div');
                     seg.className = 'prov-bar-seg';
                     seg.style.background = f.color;
                     seg.style.flexGrow = String(f.pct);
-                    seg.title = f.label + ': ' + f.pct + '%';
+                    seg.title = f.label + ': ' + f.pct + '% (' + Math.round(pkMw * f.pct / 100) + ' MW share of ' + (pkMw / 1000).toFixed(1) + ' GW peak)';
                     bar.appendChild(seg);
                 });
                 var mw = document.createElement('div');
                 mw.className = 'prov-mw';
                 mw.textContent = (pkMw / 1000).toFixed(1) + ' GW';
+                mw.title = 'Province peak demand (PLN AR 2024 estimate)';
                 row.appendChild(nameSpan); row.appendChild(bar); row.appendChild(mw);
                 container.appendChild(row);
             });
@@ -2460,11 +2508,12 @@
             top.forEach(function (p) {
                 var li = document.createElement('li');
                 var iconCls = fuelIcons[p.fuel] || 'fa-bolt';
+                li.title = (p.name || '(unnamed plant)') + ' — ' + (p.fuel ? p.fuel + ' generation, ' : '') + Math.round(p.mva).toLocaleString() + ' MVA installed capacity, prov: ' + (p.prov || '?') + (p.year ? ', commissioned ' + p.year : '');
                 li.innerHTML =
-                    '<i class="fas ' + iconCls + ' plant-fuel-icon" aria-hidden="true"></i>'
-                    + '<span class="plant-name">' + (p.name || '(unnamed plant)') + '</span>'
-                    + '<span class="plant-prov">' + (p.prov || '?') + '</span>'
-                    + '<span class="plant-mw">' + Math.round(p.mva).toLocaleString() + ' MVA</span>';
+                    '<i class="fas ' + iconCls + ' plant-fuel-icon" aria-hidden="true" title="Fuel: ' + (p.fuel || 'unknown') + '"></i>'
+                    + '<span class="plant-name" title="Plant name (per OSM tag)">' + (p.name || '(unnamed plant)') + '</span>'
+                    + '<span class="plant-prov" title="Province">' + (p.prov || '?') + '</span>'
+                    + '<span class="plant-mw" title="Installed capacity (MVA)">' + Math.round(p.mva).toLocaleString() + ' MVA</span>';
                 ol.appendChild(li);
             });
             if (top.length === 0) {

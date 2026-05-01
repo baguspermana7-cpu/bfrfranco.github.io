@@ -209,8 +209,8 @@
             var util = agg.utilizationPct !== undefined ? agg.utilizationPct : 0;
             return {
               fillColor:   utilColor(util),
-              fillOpacity: 0.35,
-              weight:      1,
+              fillOpacity: 0.55,
+              weight:      1.5,
               color:       '#1e293b'
             };
           },
