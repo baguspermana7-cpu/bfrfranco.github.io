@@ -1173,6 +1173,10 @@
     // 7. FINANCIAL MATH UTILITIES
     // ══════════════════════════════════════════════════════════════
     function calcNPV(rate, cashflows) {
+        // S2 pilot: prefer RZEngine.models.roi.npv when available (engine arg order: cashflows, rate)
+        if (window.RZEngine && window.RZEngine.models && window.RZEngine.models.roi && typeof window.RZEngine.models.roi.npv === 'function') {
+            return window.RZEngine.models.roi.npv(cashflows, rate);
+        }
         var npv = 0;
         for (var i = 0; i < cashflows.length; i++) {
             npv += cashflows[i] / Math.pow(1 + rate, i);
@@ -1181,6 +1185,11 @@
     }
 
     function calcIRR(cashflows, guess) {
+        // S2 pilot: prefer RZEngine.models.roi.irr (bisection) when available, fall back to inline Newton-Raphson
+        if (window.RZEngine && window.RZEngine.models && window.RZEngine.models.roi && typeof window.RZEngine.models.roi.irr === 'function') {
+            var r = window.RZEngine.models.roi.irr(cashflows, guess);
+            if (r !== null && r !== undefined && isFinite(r)) return r;
+        }
         if (!guess) guess = 0.1;
         var maxIter = 200;
         var tol = 1e-7;
@@ -1768,9 +1777,9 @@
         // Footer
         html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>ROI Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';
 
-        html += '<script src="auth.js?v=20260324b"></script>
-<script src="rz-engine.js?v=2026-04-28"></script>
-</body></html>';
+        html += '<script src="auth.js?v=20260324b"><\/script>';
+        html += '<script src="rz-engine.js?v=2026-04-28"><\/script>';
+        html += '</body></html>';
         w.document.write(html);
         w.document.close();
         setTimeout(function() { w.print(); }, 500);
@@ -1936,5 +1945,7 @@
     })();
     </script>
 
+<script src="auth.js?v=20260324b"></script>
+<script src="rz-engine.js?v=2026-04-28"></script>
 </body>
 </html>
