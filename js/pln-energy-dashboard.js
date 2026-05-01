@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-01-v2
+ * @version 2026-05-01-v3
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -309,186 +309,301 @@
 
   /**
    * Render a stacked area chart into an SVG element.
+   * Uses D3-style margin convention. Legend is placed in the top margin
+   * (not on the X-axis). Overlay label sits in the right margin so it
+   * never clips. All SVG elements are appended directly to svgElement
+   * with absolute coordinates derived from the margin offsets.
    *
-   * @param {SVGElement} svgEl   target SVG (cleared before render)
-   * @param {Array<{label:string, color:string, values:number[]}>} series
+   * @param {SVGElement} svgElement  target SVG (cleared before render)
+   * @param {Array<{id:string, label:string, color:string, values:number[]}>} series
    *   Ordered bottom-to-top. Each series.values array must be same length.
    * @param {Object} opts
-   *   @param {number}   [opts.width=960]
-   *   @param {number}   [opts.height=400]
-   *   @param {string[]} [opts.xLabels]        labels for x-axis ticks
+   *   @param {number}   [opts.width=720]
+   *   @param {number}   [opts.height=240]
+   *   @param {Object}   [opts.margin]   {top:32, right:84, bottom:36, left:56}
+   *   @param {string[]} [opts.xLabels]  labels for x-axis ticks (non-empty rendered)
    *   @param {string}   [opts.yLabel='TWh']
-   *   @param {Object}   [opts.overlayLine]    { values:number[], label:string, color:string }
-   *   @param {number}   [opts.padL=60]
-   *   @param {number}   [opts.padR=20]
-   *   @param {number}   [opts.padT=20]
-   *   @param {number}   [opts.padB=48]
+   *   @param {Object}   [opts.overlayLine]  { values:number[], label:string, color:string }
+   *   @param {string}   [opts.legend='top-right']  'top-right'|'top-left'|'none'
+   *   @param {boolean}  [opts.showGrid=true]
+   *   @param {boolean}  [opts.hoverable=true]
    */
   function renderStackedAreaSVG(svgElement, series, opts) {
+    if (!svgElement) { warn('renderStackedAreaSVG: svgElement is null'); return; }
     opts = opts || {};
-    var W    = opts.width  || 960;
-    var H    = opts.height || 400;
-    var padL = opts.padL   !== undefined ? opts.padL : 60;
-    var padR = opts.padR   !== undefined ? opts.padR : 20;
-    var padT = opts.padT   !== undefined ? opts.padT : 20;
-    var padB = opts.padB   !== undefined ? opts.padB : 48;
-    var xLabels  = opts.xLabels  || [];
-    var yLabel   = opts.yLabel   || 'TWh';
-    var overlay  = opts.overlayLine || null;
+
+    var W = opts.width  || 720;
+    var H = opts.height || 240;
+
+    var defMargin = { top: 32, right: 84, bottom: 36, left: 56 };
+    var margin  = opts.margin  || defMargin;
+    var mTop    = (margin.top    !== undefined) ? margin.top    : defMargin.top;
+    var mRight  = (margin.right  !== undefined) ? margin.right  : defMargin.right;
+    var mBottom = (margin.bottom !== undefined) ? margin.bottom : defMargin.bottom;
+    var mLeft   = (margin.left   !== undefined) ? margin.left   : defMargin.left;
+
+    var innerW = W - mLeft - mRight;
+    var innerH = H - mTop  - mBottom;
+
+    var xLabels   = opts.xLabels   || [];
+    var yLabel    = opts.yLabel    || 'TWh';
+    var overlay   = opts.overlayLine || null;
+    var legendPos = (opts.legend !== undefined) ? opts.legend : 'top-right';
+    var showGrid  = (opts.showGrid  !== false);
 
     // Clear
     while (svgElement.firstChild) svgElement.removeChild(svgElement.firstChild);
 
-    if (!series || !series.length || !series[0].values.length) return;
+    svgElement.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+    if (!series || !series.length || !series[0].values || !series[0].values.length) return;
 
     var n = series[0].values.length;
 
-    // Build stacked totals (for y-axis scale)
+    // Build stacked column totals
     var stackedTotals = [];
     for (var i = 0; i < n; i++) {
-      var total = 0;
-      series.forEach(function (s) { total += (s.values[i] || 0); });
-      stackedTotals.push(total);
+      var colTotal = 0;
+      for (var si = 0; si < series.length; si++) { colTotal += (series[si].values[i] || 0); }
+      stackedTotals.push(colTotal);
     }
 
-    // Combine with overlay to find max
-    var allMax = stackedTotals.slice();
-    if (overlay && overlay.values) {
-      overlay.values.forEach(function (v) { allMax.push(v); });
+    // Max for scale — also consider overlay
+    var rawMax = Math.max.apply(null, stackedTotals);
+    if (overlay && overlay.values && overlay.values.length) {
+      var olMax = Math.max.apply(null, overlay.values);
+      if (olMax > rawMax) rawMax = olMax;
     }
-    var bounds = dataBounds(allMax, 0.10);
+    // Round up to a nice number
+    var niceMax = rawMax > 0 ? (Math.ceil(rawMax * 1.08 / 10) * 10) : 10;
 
-    // x-coordinates
-    var xs = [];
-    for (var xi = 0; xi < n; xi++) {
-      xs.push(toX(xi, n, W, padL, padR));
+    // Coordinate helpers — return ABSOLUTE svg coordinates
+    function absPy(v) {
+      // maps data value v → absolute y in the svg
+      if (niceMax === 0) return mTop + innerH;
+      return mTop + innerH - (v / niceMax) * innerH;
+    }
+    function absPx(idx) {
+      if (n <= 1) return mLeft;
+      return mLeft + (idx / (n - 1)) * innerW;
     }
 
-    // Y grid lines
-    var yTicks = 5;
-    var yTickStep = bounds.max / yTicks;
-    for (var t = 0; t <= yTicks; t++) {
-      var yVal = t * yTickStep;
-      var yPx  = toY(yVal, bounds.min, bounds.max, H, padT + (padB - 12));
-      // grid line
-      var gLine = svgEl('line', {
-        x1: padL, x2: W - padR, y1: yPx, y2: yPx,
-        stroke: 'rgba(148,163,184,0.15)', 'stroke-width': '1'
+    // Y-axis grid lines + tick labels
+    var yTickVals = [0, niceMax * 0.25, niceMax * 0.5, niceMax * 0.75, niceMax];
+    for (var ti = 0; ti < yTickVals.length; ti++) {
+      var tv   = yTickVals[ti];
+      var tyPx = absPy(tv);
+      if (showGrid) {
+        svgElement.appendChild(svgEl('line', {
+          x1: mLeft, x2: mLeft + innerW, y1: tyPx, y2: tyPx,
+          stroke: 'rgba(148,163,184,0.18)',
+          'stroke-width': '1',
+          'stroke-dasharray': '3 3'
+        }));
+      }
+      var tyText = svgEl('text', {
+        x: mLeft - 8, y: tyPx + 4,
+        fill: 'var(--pjg-text3,#64748b)',
+        'font-size': '10',
+        'text-anchor': 'end',
+        'font-family': 'monospace'
       });
-      svgElement.appendChild(gLine);
-      // y label
-      var yText = svgEl('text', {
-        x: padL - 8, y: yPx + 4,
-        fill: '#64748b', 'font-size': '11', 'text-anchor': 'end',
-        'font-family': "'JetBrains Mono', monospace"
-      });
-      yText.textContent = Math.round(yVal);
-      svgElement.appendChild(yText);
+      tyText.textContent = Math.round(tv);
+      svgElement.appendChild(tyText);
     }
 
-    // Y axis label
+    // Y-axis rotated label
+    var yLblCx = mLeft - 36;
+    var yLblCy = mTop + innerH / 2;
     var yLabelEl = svgEl('text', {
-      x: 14, y: H / 2,
-      fill: '#64748b', 'font-size': '11', 'text-anchor': 'middle',
-      'font-family': "'Inter', sans-serif",
-      transform: 'rotate(-90, 14, ' + (H / 2) + ')'
+      x: yLblCx, y: yLblCy,
+      fill: 'var(--pjg-text3,#64748b)',
+      'font-size': '11',
+      'text-anchor': 'middle',
+      'font-family': "'Inter',sans-serif",
+      transform: 'rotate(-90,' + yLblCx + ',' + yLblCy + ')'
     });
     yLabelEl.textContent = yLabel;
     svgElement.appendChild(yLabelEl);
 
-    // Build stacked areas (bottom-to-top accumulation)
-    var stackBase = new Array(n).fill(0);
+    // Build stacked area paths (bottom-to-top accumulation)
+    var cumBase = [];
+    for (var bi = 0; bi < n; bi++) { cumBase.push(0); }
 
-    series.forEach(function (s) {
-      var stackedTops = [];
-      for (var i = 0; i < n; i++) {
-        stackBase[i] += (s.values[i] || 0);
-        stackedTops.push(toY(stackBase[i], bounds.min, bounds.max, H, padT + (padB - 12)));
+    for (var si2 = 0; si2 < series.length; si2++) {
+      var s     = series[si2];
+      var tops2 = [], bots2 = [], axs2 = [];
+      for (var xi = 0; xi < n; xi++) {
+        var bot = cumBase[xi];
+        var top = bot + (s.values[xi] || 0);
+        cumBase[xi] = top;
+        bots2.push(absPy(bot));
+        tops2.push(absPy(top));
+        axs2.push(absPx(xi));
       }
-      // bottoms: current stack minus current series
-      var bottoms = [];
-      for (var j = 0; j < n; j++) {
-        var base = stackBase[j] - (s.values[j] || 0);
-        bottoms.push(toY(base, bounds.min, bounds.max, H, padT + (padB - 12)));
-      }
-
-      var pathD = buildAreaPath(xs, stackedTops, bottoms);
-      var areaPath = svgEl('path', {
-        d: pathD,
+      svgElement.appendChild(svgEl('path', {
+        d: buildAreaPath(axs2, tops2, bots2),
         fill: s.color,
-        opacity: '0.82',
+        opacity: '0.85',
         stroke: 'none'
-      });
-      svgElement.appendChild(areaPath);
-    });
+      }));
+    }
 
-    // Overlay line (demand)
+    // Overlay line
     if (overlay && overlay.values && overlay.values.length === n) {
-      var olYs = overlay.values.map(function (v) {
-        return toY(v, bounds.min, bounds.max, H, padT + (padB - 12));
-      });
-      var linePath = svgEl('path', {
-        d: buildLinePath(xs, olYs),
+      var olPts = [];
+      var olLastY = 0;
+      for (var oi = 0; oi < n; oi++) {
+        var oly = absPy(overlay.values[oi] || 0);
+        olPts.push(absPx(oi) + ',' + oly);
+        olLastY = oly;
+      }
+      svgElement.appendChild(svgEl('polyline', {
+        points: olPts.join(' '),
         fill: 'none',
         stroke: overlay.color || '#ffffff',
         'stroke-width': '2.5',
-        'stroke-dasharray': '6 3',
-        opacity: '0.9'
-      });
-      svgElement.appendChild(linePath);
-      // Overlay label at last point
-      var olLabel = svgEl('text', {
-        x: xs[n - 1] + 6,
-        y: olYs[n - 1],
+        'stroke-dasharray': '5 3',
+        opacity: '0.95'
+      }));
+      // Label at right edge of PLOT AREA (mLeft+innerW+6) — right margin gives clearance
+      var olLabelEl = svgEl('text', {
+        x: mLeft + innerW + 6,
+        y: olLastY,
         fill: overlay.color || '#ffffff',
         'font-size': '11',
-        'font-family': "'Inter', sans-serif",
-        'dominant-baseline': 'middle'
+        'font-weight': '700',
+        'text-anchor': 'start',
+        'dominant-baseline': 'middle',
+        'font-family': "'Inter',sans-serif"
       });
-      olLabel.textContent = overlay.label || 'Demand';
-      svgElement.appendChild(olLabel);
+      olLabelEl.textContent = overlay.label || 'Demand';
+      svgElement.appendChild(olLabelEl);
     }
 
-    // X-axis ticks and labels
-    for (var xi2 = 0; xi2 < n; xi2++) {
-      var xPos = xs[xi2];
-      var tickLine = svgEl('line', {
-        x1: xPos, x2: xPos,
-        y1: H - padB + 12, y2: H - padB + 18,
-        stroke: '#475569', 'stroke-width': '1'
+    // X-axis labels — only non-empty entries
+    for (var xl = 0; xl < n; xl++) {
+      var lbl = xLabels[xl];
+      if (lbl === undefined || lbl === null || lbl === '') continue;
+      var xTxt = svgEl('text', {
+        x: absPx(xl), y: mTop + innerH + 18,
+        fill: 'var(--pjg-text3,#64748b)',
+        'font-size': '10',
+        'text-anchor': 'middle',
+        'font-family': "'Inter',sans-serif"
       });
-      svgElement.appendChild(tickLine);
+      xTxt.textContent = String(lbl);
+      svgElement.appendChild(xTxt);
+    }
 
-      if (xLabels[xi2] !== undefined) {
-        var xText = svgEl('text', {
-          x: xPos, y: H - padB + 30,
-          fill: '#64748b', 'font-size': '11', 'text-anchor': 'middle',
-          'font-family': "'Inter', sans-serif"
+    // Legend — in top margin, rendered right-to-left from (mLeft+innerW)
+    if (legendPos !== 'none') {
+      var legendEntries = [];
+      if (overlay) {
+        legendEntries.push({ label: overlay.label || 'Demand', color: overlay.color || '#fff', dash: true });
+      }
+      var seriesRev = series.slice().reverse();
+      for (var li = 0; li < seriesRev.length; li++) {
+        legendEntries.push({ label: seriesRev[li].label, color: seriesRev[li].color, dash: false });
+      }
+      var legY      = mTop / 2;          // vertical midpoint of top margin
+      var swatchW   = 12, swatchH = 12;
+      var gapTS     = 4, gapBetween = 14;
+      var approxCW  = 6.5;
+      var curX      = mLeft + innerW;
+
+      for (var lei = 0; lei < legendEntries.length; lei++) {
+        var le    = legendEntries[lei];
+        var entryW = swatchW + gapTS + le.label.length * approxCW;
+        curX -= entryW;
+
+        if (le.dash) {
+          svgElement.appendChild(svgEl('line', {
+            x1: curX, x2: curX + swatchW,
+            y1: legY + swatchH / 2, y2: legY + swatchH / 2,
+            stroke: le.color, 'stroke-width': '2',
+            'stroke-dasharray': '4 2'
+          }));
+        } else {
+          svgElement.appendChild(svgEl('rect', {
+            x: curX, y: legY,
+            width: swatchW, height: swatchH,
+            fill: le.color, rx: '2', opacity: '0.88'
+          }));
+        }
+        var leText = svgEl('text', {
+          x: curX + swatchW + gapTS,
+          y: legY + 9,
+          fill: 'var(--pjg-text3,#94a3b8)',
+          'font-size': '11',
+          'font-family': "'Inter',sans-serif"
         });
-        xText.textContent = String(xLabels[xi2]);
-        svgElement.appendChild(xText);
+        leText.textContent = le.label;
+        svgElement.appendChild(leText);
+        curX -= gapBetween;
       }
     }
 
-    // Legend (bottom)
-    var legendX = padL;
-    var legendY = H - 10;
-    series.slice().reverse().forEach(function (s, idx) {
-      var lx = legendX + idx * 110;
-      if (lx + 100 > W) return; // overflow protection
-      var dot = svgEl('rect', {
-        x: lx, y: legendY - 8, width: 12, height: 8,
-        fill: s.color, rx: '2', opacity: '0.85'
+    // Hover catcher (invisible overlay with guide line + tooltip)
+    if (opts.hoverable !== false) {
+      var hoverG = svgEl('g', { 'class': 'pjg-chart-hover', style: 'display:none' });
+      var hGuide = svgEl('line', {
+        x1: mLeft, x2: mLeft, y1: mTop, y2: mTop + innerH,
+        stroke: 'rgba(148,163,184,0.5)', 'stroke-width': '1'
       });
-      svgElement.appendChild(dot);
-      var lText = svgEl('text', {
-        x: lx + 16, y: legendY,
-        fill: '#94a3b8', 'font-size': '10',
-        'font-family': "'Inter', sans-serif"
+      hoverG.appendChild(hGuide);
+
+      var ttBg = svgEl('rect', {
+        x: 0, y: 0, width: 110, height: 16 + series.length * 14,
+        fill: 'rgba(15,23,42,0.88)', rx: '4',
+        stroke: 'rgba(148,163,184,0.25)', 'stroke-width': '1'
       });
-      lText.textContent = s.label;
-      svgElement.appendChild(lText);
-    });
+      var ttG = svgEl('g', { 'class': 'pjg-chart-tt' });
+      ttG.appendChild(ttBg);
+
+      var ttLines = [];
+      for (var tli = 0; tli < series.length; tli++) {
+        var ttTxt = svgEl('text', {
+          x: 8, y: 14 + tli * 14,
+          fill: series[tli].color, 'font-size': '10',
+          'font-family': "'Inter',sans-serif"
+        });
+        ttTxt.textContent = '';
+        ttG.appendChild(ttTxt);
+        ttLines.push(ttTxt);
+      }
+      hoverG.appendChild(ttG);
+      svgElement.appendChild(hoverG);
+
+      var hitRect = svgEl('rect', {
+        x: mLeft, y: mTop, width: innerW, height: innerH,
+        fill: 'transparent', style: 'cursor:crosshair'
+      });
+      svgElement.appendChild(hitRect);
+
+      hitRect.addEventListener('mousemove', function (e) {
+        var rect = hitRect.getBoundingClientRect ? hitRect.getBoundingClientRect() : { left: mLeft, width: innerW };
+        var relX = (e.clientX !== undefined ? e.clientX : 0) - (rect.left || 0);
+        var idx  = Math.round(clamp(relX / innerW, 0, 1) * (n - 1));
+        var gx   = absPx(idx);
+
+        hGuide.setAttribute('x1', gx);
+        hGuide.setAttribute('x2', gx);
+        hoverG.style.display = '';
+
+        var ttX = (gx + 120 > mLeft + innerW) ? gx - 118 : gx + 8;
+        ttG.setAttribute('transform', 'translate(' + ttX + ',' + (mTop + 4) + ')');
+
+        for (var ki = 0; ki < series.length; ki++) {
+          ttLines[ki].textContent = series[ki].label + ': ' + fmt1(series[ki].values[idx] || 0);
+        }
+      });
+
+      hitRect.addEventListener('mouseleave', function () {
+        hoverG.style.display = 'none';
+      });
+    }
   }
 
   /* =========================================================
@@ -497,28 +612,26 @@
 
   /**
    * Render a single-series line chart into an SVG element.
-   * Accepts points as a flat number[] for the primary series.
-   * Use opts.refLines for reference lines (e.g. carbon-intensity thresholds).
+   * Uses D3-style margin convention. Reference-line labels are placed
+   * at the RIGHT EDGE (not stacked in the upper-left corner). Labels
+   * get an anti-overlap nudge and a pill background.
    *
    * For backward-compatible multi-line usage pass an array of
    * { label, color, values, dash? } objects as `points` and opts.multiLine=true.
    *
    * @param {SVGElement}  svgElement   Target SVG (cleared before render).
    * @param {number[]|Array<{label:string,color:string,values:number[],dash?:string}>} points
-   *   Flat number[] for single-series; object array when opts.multiLine=true.
    * @param {Object} opts
-   *   @param {number}   [opts.width=960]
-   *   @param {number}   [opts.height=280]
+   *   @param {number}   [opts.width=720]
+   *   @param {number}   [opts.height=140]
+   *   @param {Object}   [opts.margin]   {top:24, right:96, bottom:32, left:56}
    *   @param {string[]} [opts.xLabels]
    *   @param {string}   [opts.yLabel='GWh']
-   *   @param {string}   [opts.color='#60a5fa']      Single-series stroke colour.
-   *   @param {boolean}  [opts.fillBelow=false]       Fill below the line.
-   *   @param {Array}    [opts.refLines]              [{y, label, color, dash}]
-   *   @param {number}   [opts.padL=60]
-   *   @param {number}   [opts.padR=20]
-   *   @param {number}   [opts.padT=20]
-   *   @param {number}   [opts.padB=48]
-   *   @param {boolean}  [opts.multiLine=false]       Treat points as line-series array.
+   *   @param {string}   [opts.color='#60a5fa']
+   *   @param {boolean}  [opts.fillBelow=false]
+   *   @param {Array}    [opts.refLines]   [{y, label, color, dash}]
+   *   @param {string}   [opts.legend='top-right']  'top-right'|'none'
+   *   @param {boolean}  [opts.multiLine=false]
    */
   function renderLineSVG(svgElement, points, opts) {
     if (!svgElement) { warn('renderLineSVG: svgElement is null'); return; }
@@ -530,12 +643,19 @@
     var isMulti = opts.multiLine || (points.length > 0 && typeof points[0] === 'object' && points[0] !== null && !Array.isArray(points[0]) && points[0].values);
     if (isMulti) { return _renderMultiLineSVG(svgElement, points, opts); }
 
-    var W    = opts.width  || 960;
-    var H    = opts.height || 280;
-    var padL = opts.padL   !== undefined ? opts.padL : 60;
-    var padR = opts.padR   !== undefined ? opts.padR : 20;
-    var padT = opts.padT   !== undefined ? opts.padT : 20;
-    var padB = opts.padB   !== undefined ? opts.padB : 48;
+    var W = opts.width  || 720;
+    var H = opts.height || 140;
+
+    var defMargin = { top: 24, right: 96, bottom: 32, left: 56 };
+    var margin  = opts.margin  || defMargin;
+    var mTop    = (margin.top    !== undefined) ? margin.top    : defMargin.top;
+    var mRight  = (margin.right  !== undefined) ? margin.right  : defMargin.right;
+    var mBottom = (margin.bottom !== undefined) ? margin.bottom : defMargin.bottom;
+    var mLeft   = (margin.left   !== undefined) ? margin.left   : defMargin.left;
+
+    var innerW = W - mLeft - mRight;
+    var innerH = H - mTop  - mBottom;
+
     var xLabels   = opts.xLabels   || [];
     var yLabel    = opts.yLabel    || 'GWh';
     var lineColor = opts.color     || '#60a5fa';
@@ -548,83 +668,135 @@
     svgElement.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-    /* Compute domain — include ref lines in scale */
+    /* Compute domain — include ref line values so they're always in range */
     var allVals = points.slice();
-    refLines.forEach(function (rl) { allVals.push(rl.y); });
+    refLines.forEach(function (rl) { if (rl.y !== undefined) allVals.push(rl.y); });
     var bounds = dataBounds(allVals, 0.12);
+    if (bounds.max === 0) { bounds.max = 10; }
 
-    var xs = [];
-    for (var xi = 0; xi < n; xi++) { xs.push(toX(xi, n, W, padL, padR)); }
-
-    var chartBottom = H - padB + 12;
-
-    /* Y grid */
-    var yTicks = 5;
-    for (var t = 0; t <= yTicks; t++) {
-      var yVal = (t / yTicks) * bounds.max;
-      var yPx  = toY(yVal, bounds.min, bounds.max, H, padT + (padB - 12));
-      svgElement.appendChild(svgEl('line', {
-        x1: padL, x2: W - padR, y1: yPx, y2: yPx,
-        stroke: 'rgba(148,163,184,0.15)', 'stroke-width': '1'
-      }));
-      var yText = svgEl('text', {
-        x: padL - 8, y: yPx + 4,
-        fill: '#64748b', 'font-size': '11', 'text-anchor': 'end',
-        'font-family': "'JetBrains Mono', monospace"
-      });
-      yText.textContent = Math.round(yVal);
-      svgElement.appendChild(yText);
+    /* Absolute coordinate helpers */
+    function absPy(v) {
+      var range = bounds.max - bounds.min;
+      if (range === 0) return mTop + innerH / 2;
+      return mTop + innerH - ((v - bounds.min) / range) * innerH;
+    }
+    function absPx(idx) {
+      if (n <= 1) return mLeft;
+      return mLeft + (idx / (n - 1)) * innerW;
     }
 
-    /* Y label */
-    var yLblEl = svgEl('text', {
-      x: 14, y: H / 2,
-      fill: '#64748b', 'font-size': '11', 'text-anchor': 'middle',
-      'font-family': "'Inter', sans-serif",
-      transform: 'rotate(-90, 14, ' + (H / 2) + ')'
-    });
-    yLblEl.textContent = yLabel;
-    svgElement.appendChild(yLblEl);
-
-    /* Reference lines */
-    for (var ri = 0; ri < refLines.length; ri++) {
-      var rl   = refLines[ri];
-      var ryPx = toY(rl.y, bounds.min, bounds.max, H, padT + (padB - 12));
+    /* Y grid + tick labels */
+    var yTicks = 5;
+    for (var ti = 0; ti <= yTicks; ti++) {
+      var tv   = bounds.min + (ti / yTicks) * (bounds.max - bounds.min);
+      var tyPx = absPy(tv);
       svgElement.appendChild(svgEl('line', {
-        x1: padL, x2: W - padR, y1: ryPx, y2: ryPx,
+        x1: mLeft, x2: mLeft + innerW, y1: tyPx, y2: tyPx,
+        stroke: 'rgba(148,163,184,0.15)', 'stroke-width': '1'
+      }));
+      var tyText = svgEl('text', {
+        x: mLeft - 8, y: tyPx + 4,
+        fill: 'var(--pjg-text3,#64748b)', 'font-size': '10',
+        'text-anchor': 'end', 'font-family': 'monospace'
+      });
+      tyText.textContent = Math.round(tv);
+      svgElement.appendChild(tyText);
+    }
+
+    /* Y axis rotated label */
+    var yLblCx = mLeft - 36;
+    var yLblCy = mTop + innerH / 2;
+    var yLblEl2 = svgEl('text', {
+      x: yLblCx, y: yLblCy,
+      fill: 'var(--pjg-text3,#64748b)', 'font-size': '11',
+      'text-anchor': 'middle', 'font-family': "'Inter',sans-serif",
+      transform: 'rotate(-90,' + yLblCx + ',' + yLblCy + ')'
+    });
+    yLblEl2.textContent = yLabel;
+    svgElement.appendChild(yLblEl2);
+
+    /* Reference lines — label at RIGHT EDGE, anti-overlap nudge */
+    var sortedRefs = refLines.slice().map(function (rl) {
+      return { rl: rl, lineY: absPy(rl.y) };
+    }).sort(function (a, b) { return a.lineY - b.lineY; });
+
+    var prevLabelY = null;
+    for (var ri = 0; ri < sortedRefs.length; ri++) {
+      var entry  = sortedRefs[ri];
+      var rl     = entry.rl;
+      var ryPx   = entry.lineY;
+      var labelY = ryPx;
+
+      if (prevLabelY !== null && labelY - prevLabelY < 14) {
+        labelY = prevLabelY + 14;
+      }
+      prevLabelY = labelY;
+
+      svgElement.appendChild(svgEl('line', {
+        x1: mLeft, x2: mLeft + innerW, y1: ryPx, y2: ryPx,
         stroke: rl.color || '#f87171',
         'stroke-width': '1',
-        'stroke-dasharray': rl.dash || '5 3'
+        'stroke-dasharray': rl.dash || '4 3'
       }));
+
       if (rl.label) {
+        var pillW = rl.label.length * 6.2 + 8;
+        svgElement.appendChild(svgEl('rect', {
+          x: mLeft + innerW + 4,
+          y: labelY - 8,
+          width: pillW, height: 13,
+          rx: '3',
+          fill: rl.color || '#f87171',
+          'fill-opacity': '0.18',
+          stroke: rl.color || '#f87171',
+          'stroke-opacity': '0.4',
+          'stroke-width': '1'
+        }));
         var rlText = svgEl('text', {
-          x: padL + 4, y: ryPx - 3,
-          fill: rl.color || '#f87171', 'font-size': '9'
+          x: mLeft + innerW + 6,
+          y: labelY + 2,
+          fill: rl.color || '#f87171',
+          'font-size': '10',
+          'font-weight': '600',
+          'text-anchor': 'start',
+          'font-family': "'Inter',sans-serif"
         });
         rlText.textContent = rl.label;
         svgElement.appendChild(rlText);
       }
     }
 
-    /* Point y-pixels */
-    var ys = points.map(function (v) {
-      return toY(v, bounds.min, bounds.max, H, padT + (padB - 12));
-    });
+    /* Data point coordinates */
+    var xs = [], ys = [];
+    for (var xi = 0; xi < n; xi++) {
+      xs.push(absPx(xi));
+      ys.push(absPy(points[xi] || 0));
+    }
 
-    /* Fill below */
+    /* Fill below with linearGradient */
     if (fillBelow) {
-      var fillPts = [padL + ',' + chartBottom];
-      for (var fi = 0; fi < n; fi++) { fillPts.push(xs[fi] + ',' + ys[fi]); }
-      fillPts.push((W - padR) + ',' + chartBottom);
-      svgElement.appendChild(svgEl('polygon', {
-        points: fillPts.join(' '),
-        fill: lineColor, 'fill-opacity': '0.12'
+      var gradId = 'pjg-lfill-' + Math.floor(Math.random() * 0xffff).toString(16);
+      var defs   = svgEl('defs', {});
+      var grad   = svgEl('linearGradient', { id: gradId, x1: '0', y1: '0', x2: '0', y2: '1' });
+      var stop1  = svgEl('stop', { offset: '0%',   'stop-color': lineColor, 'stop-opacity': '0.4' });
+      var stop2  = svgEl('stop', { offset: '100%', 'stop-color': lineColor, 'stop-opacity': '0'   });
+      grad.appendChild(stop1);
+      grad.appendChild(stop2);
+      defs.appendChild(grad);
+      svgElement.appendChild(defs);
+
+      var bottom = mTop + innerH;
+      var areaD  = 'M ' + xs[0] + ' ' + bottom;
+      for (var ai = 0; ai < n; ai++) { areaD += ' L ' + xs[ai] + ' ' + ys[ai]; }
+      areaD += ' L ' + xs[n - 1] + ' ' + bottom + ' Z';
+      svgElement.appendChild(svgEl('path', {
+        d: areaD, fill: 'url(#' + gradId + ')', stroke: 'none'
       }));
     }
 
-    /* Line */
-    svgElement.appendChild(svgEl('path', {
-      d: buildLinePath(xs, ys),
+    /* Main line */
+    svgElement.appendChild(svgEl('polyline', {
+      points: xs.map(function (x, i) { return x + ',' + ys[i]; }).join(' '),
       fill: 'none',
       stroke: lineColor,
       'stroke-width': '2.5',
@@ -632,22 +804,17 @@
       'stroke-linecap': 'round'
     }));
 
-    /* X ticks */
-    for (var xi2 = 0; xi2 < n; xi2++) {
-      svgElement.appendChild(svgEl('line', {
-        x1: xs[xi2], x2: xs[xi2],
-        y1: chartBottom, y2: chartBottom + 6,
-        stroke: '#475569', 'stroke-width': '1'
-      }));
-      if (xLabels[xi2] !== undefined) {
-        var xText = svgEl('text', {
-          x: xs[xi2], y: chartBottom + 18,
-          fill: '#64748b', 'font-size': '11', 'text-anchor': 'middle',
-          'font-family': "'Inter', sans-serif"
-        });
-        xText.textContent = String(xLabels[xi2]);
-        svgElement.appendChild(xText);
-      }
+    /* X-axis labels (non-empty only) */
+    for (var xl2 = 0; xl2 < n; xl2++) {
+      var lbl2 = xLabels[xl2];
+      if (lbl2 === undefined || lbl2 === null || lbl2 === '') continue;
+      var xTxt2 = svgEl('text', {
+        x: absPx(xl2), y: mTop + innerH + 18,
+        fill: 'var(--pjg-text3,#64748b)', 'font-size': '10',
+        'text-anchor': 'middle', 'font-family': "'Inter',sans-serif"
+      });
+      xTxt2.textContent = String(lbl2);
+      svgElement.appendChild(xTxt2);
     }
   }
 
@@ -771,40 +938,136 @@
    * ========================================================= */
 
   /**
-   * Render a horizontal stacked bar into a container element.
-   * Segments are rendered as coloured divs.
+   * Determine whether a hex colour is perceptually light (luminance > 0.6).
+   * Used to pick contrasting foreground text inside bar segments.
+   * @param {string} hex  e.g. '#facc15'
+   * @returns {boolean}
+   * @private
+   */
+  function _isLight(hex) {
+    if (!hex || hex[0] !== '#') return false;
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    if (h.length !== 6) return false;
+    var r = parseInt(h.substr(0, 2), 16) / 255;
+    var g = parseInt(h.substr(2, 2), 16) / 255;
+    var b = parseInt(h.substr(4, 2), 16) / 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 0.6;
+  }
+
+  /**
+   * Render a horizontal stacked bar with an optional legend row.
+   * Two-row layout: bar row + legend row beneath.
    *
    * @param {HTMLElement} container  cleared and filled
-   * @param {Array<{label:string, color:string, pct:number}>} segments
+   * @param {Array<{id:string, label:string, color:string, pct:number, mw:number}>} segments
    * @param {Object} [opts]
-   *   @param {string} [opts.height='18px']
-   *   @param {number} [opts.borderRadius=4]
+   *   @param {boolean} [opts.showLegend=true]
+   *   @param {number}  [opts.height=30]  bar height in px
    */
   function renderBarSegment(container, segments, opts) {
     if (!container) { warn('renderBarSegment: container is null'); return; }
     if (!segments || !segments.length) { warn('renderBarSegment: segments is empty'); return; }
     opts = opts || {};
-    var h  = opts.height        || '18px';
-    var br = opts.borderRadius  !== undefined ? opts.borderRadius : 4;
+    var barH       = opts.height !== undefined ? opts.height : 30;
+    var showLegend = opts.showLegend !== false;
 
-    while (container.firstChild) container.removeChild(container.firstChild);
+    container.innerHTML = '';
 
     var total = 0;
-    segments.forEach(function (s) { total += s.pct; });
+    segments.forEach(function (s) { total += (s.pct || 0); });
     if (total === 0) return;
 
-    var bar = document.createElement('div');
-    bar.style.cssText = 'display:flex;width:100%;height:' + h + ';border-radius:' + br + 'px;overflow:hidden;gap:1px;';
+    /* --- Bar row --- */
+    var barRow = document.createElement('div');
+    barRow.className = 'pjg-bar-row';
+    barRow.style.cssText = [
+      'display:flex',
+      'height:' + barH + 'px',
+      'border-radius:6px',
+      'overflow:hidden'
+    ].join(';');
 
     segments.forEach(function (seg) {
-      var portion = (seg.pct / total) * 100;
-      var div = document.createElement('div');
-      div.style.cssText = 'width:' + portion.toFixed(2) + '%;background:' + seg.color + ';';
-      div.title = seg.label + ': ' + seg.pct.toFixed(1) + '%';
-      bar.appendChild(div);
+      var segPct = seg.pct || 0;
+      var flexVal = segPct / total;
+
+      var segDiv = document.createElement('div');
+      segDiv.className  = 'pjg-bar-seg';
+      if (seg.id) segDiv.setAttribute('data-fuel-id', seg.id);
+      segDiv.style.cssText = [
+        'flex-grow:' + flexVal.toFixed(6),
+        'background:' + seg.color,
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'position:relative',
+        'overflow:hidden'
+      ].join(';');
+      segDiv.title = seg.label + ': ' + segPct + '% (' + (seg.mw || 0) + ' GW)';
+
+      /* Inline label — only when segment is wide enough */
+      if (segPct >= 5) {
+        var span = document.createElement('span');
+        span.className = 'pjg-bar-seg-label';
+        span.textContent = seg.label + ' ' + segPct + '%';
+        span.style.cssText = [
+          'color:' + (_isLight(seg.color) ? '#0f172a' : '#fff'),
+          'font-size:10px',
+          'font-weight:700',
+          'white-space:nowrap',
+          'overflow:hidden',
+          'text-overflow:ellipsis',
+          'padding:0 3px',
+          'pointer-events:none'
+        ].join(';');
+        segDiv.appendChild(span);
+      }
+
+      barRow.appendChild(segDiv);
     });
 
-    container.appendChild(bar);
+    container.appendChild(barRow);
+
+    /* --- Legend row --- */
+    if (showLegend) {
+      var legendRow = document.createElement('div');
+      legendRow.className = 'pjg-bar-legend';
+      legendRow.style.cssText = [
+        'display:flex',
+        'flex-wrap:wrap',
+        'gap:0.6rem',
+        'margin-top:0.55rem',
+        'font-size:0.78rem'
+      ].join(';');
+
+      segments.forEach(function (seg) {
+        var item = document.createElement('span');
+        item.className = 'pjg-bar-legend-item';
+        item.style.cssText = 'display:inline-flex;align-items:center;';
+
+        var swatch = document.createElement('span');
+        swatch.className = 'pjg-bar-legend-swatch';
+        swatch.style.cssText = [
+          'display:inline-block',
+          'width:10px',
+          'height:10px',
+          'border-radius:2px',
+          'vertical-align:middle',
+          'margin-right:4px',
+          'flex-shrink:0',
+          'background:' + seg.color
+        ].join(';');
+
+        var lblSpan = document.createElement('span');
+        lblSpan.textContent = seg.label;
+        item.appendChild(swatch);
+        item.appendChild(lblSpan);
+        legendRow.appendChild(item);
+      });
+
+      container.appendChild(legendRow);
+    }
   }
 
   /* =========================================================

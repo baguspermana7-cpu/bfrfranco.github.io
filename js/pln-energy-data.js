@@ -214,7 +214,7 @@
    * ========================================================= */
 
   var PLN_ENERGY_DATA = {
-    version: '2026-05-01-v1',
+    version: '2026-05-01-v2',
     units: { power: 'MW', energy: 'GWh', emissions: 'gCO2/kWh' },
 
     // ---------- National snapshot (evening peak, representative of PLN AR 2024 + RUPTL 2025-2034) ----------
@@ -234,13 +234,13 @@
 
     // ---------- Generation fuel mix (% of generation_mw at snapshot) ----------
     fuels: [
-      { id: 'coal',       label: 'Coal',       color: '#475569', mw: 17608, pct: 62, gwh_today: 422, tonnes_co2: 388000, group: 'fossil',    carbon_intensity: 920 },
+      { id: 'coal',       label: 'Coal',       color: '#64748b', mw: 17608, pct: 62, gwh_today: 422, tonnes_co2: 388000, group: 'fossil',    carbon_intensity: 920 },
       { id: 'gas',        label: 'Gas',        color: '#3b82f6', mw:  6248, pct: 22, gwh_today: 151, tonnes_co2:  75000, group: 'fossil',    carbon_intensity: 490 },
       { id: 'hydro',      label: 'Hydro',      color: '#06b6d4', mw:  1704, pct:  6, gwh_today:  41, tonnes_co2:      0, group: 'renewable', carbon_intensity:   0 },
       { id: 'geothermal', label: 'Geothermal', color: '#f97316', mw:  1136, pct:  4, gwh_today:  27, tonnes_co2:      0, group: 'renewable', carbon_intensity:   0 },
       { id: 'biomass',    label: 'Biomass',    color: '#84cc16', mw:   568, pct:  2, gwh_today:  14, tonnes_co2:      0, group: 'renewable', carbon_intensity:   0 },
       { id: 'solar',      label: 'Solar',      color: '#facc15', mw:   568, pct:  2, gwh_today:  14, tonnes_co2:      0, group: 'renewable', carbon_intensity:   0 },
-      { id: 'diesel',     label: 'Diesel',     color: '#94a3b8', mw:   568, pct:  2, gwh_today:  14, tonnes_co2:  17000, group: 'fossil',    carbon_intensity: 700 }
+      { id: 'diesel',     label: 'Diesel',     color: '#9ca3af', mw:   568, pct:  2, gwh_today:  14, tonnes_co2:  17000, group: 'fossil',    carbon_intensity: 700 }
     ],
 
     // ---------- 24-hour synthetic demand profile ----------

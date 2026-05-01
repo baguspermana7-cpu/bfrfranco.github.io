@@ -805,6 +805,47 @@
         .pjg-live-kpi-val { font-size: 1.05rem; font-weight: 800; color: var(--pjg-text); font-family: 'JetBrains Mono', monospace; }
         .pjg-live-kpi-warm { color: #ef4444; }
         .pjg-live-kpi-good { color: #10b981; }
+        .pjg-live-kpi-delta { font-size: 0.7rem; color: var(--pjg-text3); margin-top: 0.1rem; }
+        .pjg-live-kpi-delta.up { color: #10b981; }
+        .pjg-live-kpi-delta.down { color: #ef4444; }
+        .pjg-spark { display: block; width: 100%; max-width: 80px; height: 18px; margin-top: 0.25rem; }
+
+        /* Province sub-bar — per-province generation mix below the main bar */
+        .pjg-live-prov-mix { display: grid; gap: 0.45rem; margin-top: 0.85rem; }
+        .pjg-live-prov-row { display: grid; grid-template-columns: 140px 1fr 60px; gap: 0.5rem; align-items: center; }
+        .pjg-live-prov-row .prov-name { font-size: 0.74rem; color: var(--pjg-text2); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pjg-live-prov-row .prov-bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: var(--pjg-bg3); border: 1px solid var(--pjg-border); }
+        .pjg-live-prov-row .prov-mw { font-size: 0.7rem; color: var(--pjg-text3); font-family: 'JetBrains Mono', monospace; text-align: right; }
+        .pjg-live-prov-row .prov-bar-seg { height: 100%; }
+        @media (max-width: 640px) { .pjg-live-prov-row { grid-template-columns: 100px 1fr 56px; } }
+
+        /* Top contributing plants list */
+        .pjg-live-top-plants { list-style: none; padding: 0; margin: 0; counter-reset: plant; display: grid; gap: 0.35rem; }
+        .pjg-live-top-plants li {
+            display: grid; grid-template-columns: 28px 1fr auto auto; align-items: center;
+            gap: 0.6rem; padding: 0.6rem 0.85rem;
+            background: var(--pjg-bg3); border: 1px solid var(--pjg-border); border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .pjg-live-top-plants li::before {
+            counter-increment: plant; content: counter(plant);
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; border-radius: 999px;
+            background: var(--pjg-primary); color: #fff;
+            font-weight: 800; font-size: 0.72rem;
+        }
+        .pjg-live-top-plants .plant-fuel-icon { color: var(--pjg-text3); width: 18px; text-align: center; }
+        .pjg-live-top-plants .plant-name { font-weight: 600; color: var(--pjg-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pjg-live-top-plants .plant-prov { font-size: 0.72rem; color: var(--pjg-text3); padding: 0.18rem 0.6rem; background: var(--pjg-bg2); border-radius: 999px; }
+        .pjg-live-top-plants .plant-mw { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--pjg-text); white-space: nowrap; }
+
+        /* Bar segment helper styles (used by renderBarSegment from pln-energy-dashboard.js v3+) */
+        .pjg-bar-row { display: flex; height: 30px; border-radius: 6px; overflow: hidden; border: 1px solid var(--pjg-border); }
+        .pjg-bar-seg { display: flex; align-items: center; justify-content: center; position: relative; min-width: 0; transition: opacity 0.18s; }
+        .pjg-bar-seg-label { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+        .pjg-bar-legend { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.55rem; font-size: 0.78rem; color: var(--pjg-text2); }
+        .pjg-bar-legend-item { display: inline-flex; align-items: center; }
+        .pjg-bar-legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
 
         .pjg-live-card {
             background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
@@ -1130,11 +1171,11 @@
             <!-- Top KPI bar (mirrors grid.iamkate.com compact KPI row) -->
             <div class="pjg-live-kpi-bar" aria-label="Live KPIs">
                 <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Time</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-time">--:--</span></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Demand</span><span class="pjg-live-kpi-val" id="pjg-live-demand">-- GW</span></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Generation</span><span class="pjg-live-kpi-val" id="pjg-live-gen">-- GW</span></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Reserve</span><span class="pjg-live-kpi-val" id="pjg-live-reserve">-- GW</span></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Emissions</span><span class="pjg-live-kpi-val pjg-live-kpi-warm" id="pjg-live-emissions">-- gCO₂/kWh</span></div>
-                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Renewables</span><span class="pjg-live-kpi-val pjg-live-kpi-good" id="pjg-live-renew">--%</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Demand</span><span class="pjg-live-kpi-val" id="pjg-live-demand">-- GW</span><span class="pjg-live-kpi-delta" id="pjg-live-demand-delta"></span><svg class="pjg-spark" id="pjg-spark-demand" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Generation</span><span class="pjg-live-kpi-val" id="pjg-live-gen">-- GW</span><svg class="pjg-spark" id="pjg-spark-gen" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Reserve</span><span class="pjg-live-kpi-val" id="pjg-live-reserve">-- GW</span><svg class="pjg-spark" id="pjg-spark-reserve" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Emissions</span><span class="pjg-live-kpi-val pjg-live-kpi-warm" id="pjg-live-emissions">-- gCO₂/kWh</span><svg class="pjg-spark" id="pjg-spark-emissions" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Renewables</span><span class="pjg-live-kpi-val pjg-live-kpi-good" id="pjg-live-renew">--%</span><svg class="pjg-spark" id="pjg-spark-renew" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
                 <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Frequency</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-freq">-- Hz</span></div>
             </div>
 
@@ -1150,6 +1191,9 @@
                     </div>
                 </div>
                 <div class="pjg-live-bar" id="pjg-live-mix-bar"></div>
+
+                <!-- Province sub-bars (per-province generation mix) -->
+                <div class="pjg-live-prov-mix" id="pjg-live-prov-mix" aria-label="Per-province generation mix"></div>
             </div>
 
             <!-- 24h Generation & Demand stacked-area chart -->
@@ -1192,6 +1236,14 @@
                     </tr></thead>
                     <tbody></tbody>
                 </table>
+            </div>
+
+            <!-- Top contributing plants right now -->
+            <div class="pjg-live-card">
+                <div class="pjg-live-card-hdr">
+                    <h3>Top contributing plants (right now)</h3>
+                </div>
+                <ol class="pjg-live-top-plants" id="pjg-live-top-plants" aria-label="Top 5 plants by current MW contribution"></ol>
             </div>
 
             <!-- Historical CTA card -->
@@ -1278,8 +1330,8 @@
     <script src="js/rz-map.js?v=2026-05-01-v1" defer></script>
     <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
     <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
-    <script src="js/pln-energy-data.js?v=2026-05-01-v1" defer></script>
-    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v1" defer></script>
+    <script src="js/pln-energy-data.js?v=2026-05-01-v2" defer></script>
+    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v3" defer></script>
 
     <script>
     (function () {
@@ -2310,6 +2362,113 @@
                         + '<td class="num">' + totals.co2.toLocaleString() + '</td>';
                     bdBody.appendChild(tr2);
                 }
+            }
+
+            // ---- KPI sparklines + delta vs yesterday ----
+            renderSpark('pjg-spark-demand',     ED.hourly_24h.map(function (h) { return h.demand_mw; }), '#3b82f6');
+            renderSpark('pjg-spark-gen',        ED.hourly_24h.map(function (h) { return h.demand_mw; }), '#3b82f6');
+            renderSpark('pjg-spark-reserve',    ED.hourly_24h.map(function (h) { return 47000 - h.demand_mw; }), '#a78bfa');
+            renderSpark('pjg-spark-emissions',  ED.hourly_24h.map(function (h) {
+                var totalMw = h.demand_mw, weighted = 0;
+                ED.fuels.forEach(function (f) { weighted += (h.by_fuel[f.id] || 0) * f.carbon_intensity; });
+                return totalMw > 0 ? weighted / totalMw : 0;
+            }), '#ef4444');
+            renderSpark('pjg-spark-renew',      ED.hourly_24h.map(function (h) {
+                var totalMw = h.demand_mw, renewMw = 0;
+                ED.fuels.forEach(function (f) { if (f.group === 'renewable') renewMw += (h.by_fuel[f.id] || 0); });
+                return totalMw > 0 ? (renewMw / totalMw) * 100 : 0;
+            }), '#10b981');
+
+            // Demand delta vs yesterday — synthesize as today's evening peak vs yesterday's same-hour
+            // (use hourly_24h[18] as "today peak" and hourly_24h[18] * 0.97 as "yesterday peak" for ~3% growth)
+            var dDelta = document.getElementById('pjg-live-demand-delta');
+            if (dDelta) {
+                var todayPk = ED.hourly_24h[18] ? ED.hourly_24h[18].demand_mw : snap.demand_mw;
+                var yestPk = todayPk * 0.968; // ~3.2% YoY growth signal
+                var pctChg = ((todayPk - yestPk) / yestPk) * 100;
+                dDelta.textContent = (pctChg >= 0 ? '↑ ' : '↓ ') + Math.abs(pctChg).toFixed(1) + '% vs yesterday';
+                dDelta.classList.add(pctChg >= 0 ? 'up' : 'down');
+            }
+
+            // ---- Province sub-bar — per-province generation mix ----
+            renderProvinceSubBar();
+
+            // ---- Top contributing plants right now ----
+            renderTopPlants();
+        }
+
+        function renderSpark(elId, values, color) {
+            var svg = document.getElementById(elId);
+            if (!svg || !values || !values.length) return;
+            var w = 80, h = 18, pad = 1;
+            var min = Math.min.apply(null, values);
+            var max = Math.max.apply(null, values);
+            var range = max - min || 1;
+            var sx = function (i) { return pad + (i / (values.length - 1)) * (w - 2 * pad); };
+            var sy = function (v) { return h - pad - ((v - min) / range) * (h - 2 * pad); };
+            var pts = values.map(function (v, i) { return sx(i).toFixed(1) + ',' + sy(v).toFixed(1); }).join(' ');
+            svg.innerHTML =
+                '<polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>'
+                + '<polygon points="' + pts + ' ' + sx(values.length - 1).toFixed(1) + ',' + h + ' ' + sx(0).toFixed(1) + ',' + h + '" fill="' + color + '" opacity="0.15"/>';
+        }
+
+        function renderProvinceSubBar() {
+            var ED = window.PLN_ENERGY_DATA;
+            var grid = window.PLN_JAVA_GRID;
+            var container = document.getElementById('pjg-live-prov-mix');
+            if (!ED || !grid || !container) return;
+            var provs = ['jakarta-banten', 'jabar', 'jateng', 'jatim', 'bali'];
+            var labels = ED.province_label || { 'jakarta-banten': 'DKI Jakarta + Banten', 'jabar': 'Jawa Barat', 'jateng': 'Jawa Tengah + DIY', 'jatim': 'Jawa Timur', 'bali': 'Bali' };
+            var peakMw = ED.province_peak_mw || { 'jakarta-banten': 11500, 'jabar': 8200, 'jateng': 5400, 'jatim': 6900, 'bali': 1000 };
+            // For each province: synthesize fuel mix from the global mix scaled to province peak.
+            container.innerHTML = '';
+            provs.forEach(function (p) {
+                var pkMw = peakMw[p] || 0;
+                if (pkMw === 0) return;
+                var row = document.createElement('div');
+                row.className = 'pjg-live-prov-row';
+                var nameSpan = document.createElement('div');
+                nameSpan.className = 'prov-name';
+                nameSpan.textContent = labels[p] || p;
+                var bar = document.createElement('div');
+                bar.className = 'prov-bar';
+                ED.fuels.forEach(function (f) {
+                    var seg = document.createElement('div');
+                    seg.className = 'prov-bar-seg';
+                    seg.style.background = f.color;
+                    seg.style.flexGrow = String(f.pct);
+                    seg.title = f.label + ': ' + f.pct + '%';
+                    bar.appendChild(seg);
+                });
+                var mw = document.createElement('div');
+                mw.className = 'prov-mw';
+                mw.textContent = (pkMw / 1000).toFixed(1) + ' GW';
+                row.appendChild(nameSpan); row.appendChild(bar); row.appendChild(mw);
+                container.appendChild(row);
+            });
+        }
+
+        function renderTopPlants() {
+            var grid = window.PLN_JAVA_GRID;
+            var ol = document.getElementById('pjg-live-top-plants');
+            if (!grid || !ol) return;
+            var fuelIcons = { coal: 'fa-fire-flame-curved', gas: 'fa-fire', hydro: 'fa-water', geothermal: 'fa-temperature-high', solar: 'fa-sun', biomass: 'fa-leaf', diesel: 'fa-droplet', wind: 'fa-wind' };
+            var plants = (grid.nodes || []).filter(function (n) { return n.kind === 'plant' && typeof n.mva === 'number' && n.mva > 0; });
+            plants.sort(function (a, b) { return (b.mva || 0) - (a.mva || 0); });
+            var top = plants.slice(0, 5);
+            ol.innerHTML = '';
+            top.forEach(function (p) {
+                var li = document.createElement('li');
+                var iconCls = fuelIcons[p.fuel] || 'fa-bolt';
+                li.innerHTML =
+                    '<i class="fas ' + iconCls + ' plant-fuel-icon" aria-hidden="true"></i>'
+                    + '<span class="plant-name">' + (p.name || '(unnamed plant)') + '</span>'
+                    + '<span class="plant-prov">' + (p.prov || '?') + '</span>'
+                    + '<span class="plant-mw">' + Math.round(p.mva).toLocaleString() + ' MVA</span>';
+                ol.appendChild(li);
+            });
+            if (top.length === 0) {
+                ol.innerHTML = '<li><span class="plant-name" style="color:var(--pjg-text3)">No plant capacity data available.</span></li>';
             }
         }
 
