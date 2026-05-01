@@ -5334,6 +5334,20 @@ s+=`<linearGradient id="retGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" s
 // Heat shimmer filter for hot surfaces
 s+=`<filter id="shimmer" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="turbulence" baseFrequency="0.02 0.04" numOctaves="2" seed="2"><animate attributeName="baseFrequency" values="0.02 0.04;0.03 0.06;0.02 0.04" dur="3s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" scale="1.5"/></filter>`;
 s+=tx(480,16,'COOLING & PIPING P&ID — DLC 85% (6,060 kW) + AIR 15% (1,070 kW) = 7,130 kW PER HALL | 8\u00D7 4MW Chiller Plant','var(--t3)',8,'middle',1);
+// ===== HEADER STATUS STRIP — ASHRAE class + free-cooling state + ISA-5.1 tag legend =====
+// ASHRAE TC 9.9 thermal class label (W4 = facility-water inlet up to 27 °C)
+s+=`<rect x="700" y="6" width="80" height="16" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
+s+=tx(740,13,'ASHRAE W4','var(--g)',4.5,'middle',1);
+s+=tx(740,19,'inlet ≤27°C','var(--g)',3,'middle');
+// Free-cooling state pill (subtle pulse — restrained per audit visual style)
+s+=`<rect x="784" y="6" width="78" height="16" rx="3" fill="rgba(6,182,212,.10)" stroke="var(--c)" stroke-width=".5"/>`;
+s+=`<circle cx="794" cy="14" r="2.2" fill="var(--c)"><animate attributeName="opacity" values=".4;1;.4" dur="2.2s" repeatCount="indefinite"/></circle>`;
+s+=tx(823,13,'FREE-COOL ENG','var(--c)',4.2,'middle',1);
+s+=tx(823,19,'OAT 24.6°C / WBT 22°C','var(--c)',2.8,'middle');
+// ISA-5.1 instrument-tag prefix legend
+s+=`<rect x="866" y="6" width="84" height="16" rx="3" fill="rgba(167,139,250,.08)" stroke="var(--p)" stroke-width=".5"/>`;
+s+=tx(908,13,'ISA-5.1 TAGS','var(--p)',4.2,'middle',1);
+s+=tx(908,19,'TT/PT/FT/AT/BTU','var(--p)',2.8,'middle');
 // ===== OUTDOOR / DRY COOLER ARRAY SECTION =====
 s+=`<rect x="10" y="28" width="180" height="210" rx="4" fill="rgba(139,92,246,.03)" stroke="rgba(139,92,246,.2)" stroke-width="1"/>`;
 // Gradient header band
@@ -5450,7 +5464,18 @@ s+=tx(412,51,'R-1234ze(E) | COP 6.8 | Mag Bearing | Water-Cooled | 32 MW total',
 // Evap/Cond side labels
 s+=tx(318,60,'EVAP','var(--c)',3.5);s+=tx(488,60,'COND','var(--r)',3.5,'end');
 // Chillers with load bars and animated status
-const chillers=[{x:312,id:'CH-1',st:'RUN'},{x:337,id:'CH-2',st:'RUN'},{x:362,id:'CH-3',st:'RUN'},{x:387,id:'CH-4',st:'RUN'},{x:412,id:'CH-5',st:'RUN'},{x:437,id:'CH-6',st:'RUN'},{x:462,id:'CH-7',st:'RUN'},{x:487,id:'CH-8',st:'STBY'}];
+// Lead-lag rotation: explicit DUTY-N ordering (CH-1 = lead/DUTY-1; rotates every 168 h per BMS sequence).
+// Runtime hours (rh) shown in chiller param table — e.g. CH-1 has the most hours since it leads first this week.
+const chillers=[
+{x:312,id:'CH-1',st:'RUN',duty:'DUTY-1',rh:14820},
+{x:337,id:'CH-2',st:'RUN',duty:'DUTY-2',rh:14580},
+{x:362,id:'CH-3',st:'RUN',duty:'DUTY-3',rh:14210},
+{x:387,id:'CH-4',st:'RUN',duty:'DUTY-4',rh:13940},
+{x:412,id:'CH-5',st:'RUN',duty:'DUTY-5',rh:13520},
+{x:437,id:'CH-6',st:'RUN',duty:'DUTY-6',rh:13180},
+{x:462,id:'CH-7',st:'RUN',duty:'DUTY-7',rh:12740},
+{x:487,id:'CH-8',st:'STBY',duty:'STBY',rh:9620}
+];
 chillers.forEach((ch,i)=>{
 const stC=ch.st==='RUN'?'var(--g)':'var(--o)';
 const loadPct=ch.st==='RUN'?RI(65,85):0;
@@ -5465,17 +5490,22 @@ s+=`<circle cx="${ch.x+17}" cy="80" r="4" fill="none" stroke="${ch.st==='RUN'?st
 if(ch.st==='RUN')s+=`<circle cx="${ch.x+17}" cy="80" r="1" fill="${stC}" opacity=".5"/>`;
 // Status label
 s+=tx(ch.x+11,100,ch.id,stC,3.5,'middle',1);
-// Status badge
+// Status badge: DUTY-N rotation order (lead-lag) for RUN, or STBY
 s+=`<rect x="${ch.x+2}" y="103" width="18" height="8" rx="1" fill="rgba(34,197,94,.12)" stroke="${stC}" stroke-width=".3"/>`;
 if(ch.st==='RUN'){
-s+=`<circle cx="${ch.x+6}" cy="107" r="1" fill="var(--g)"><animate attributeName="opacity" values=".4;1;.4" dur="2s" repeatCount="indefinite"/></circle>`;
+s+=`<circle cx="${ch.x+5}" cy="107" r="1" fill="var(--g)"><animate attributeName="opacity" values=".4;1;.4" dur="2s" repeatCount="indefinite"/></circle>`;
+s+=tx(ch.x+14,109,ch.duty.replace('DUTY-',''),stC,3.2,'middle',1);
+}else{
+s+=tx(ch.x+11,109,ch.st,stC,3,'middle');
 }
-s+=tx(ch.x+13,109,ch.st,stC,3,'middle');
-// Load bar
+// Load bar + runtime hours (per-equipment maintenance traceability)
 if(ch.st==='RUN'){
 s+=`<rect x="${ch.x+2}" y="113" width="18" height="3" rx="1" fill="var(--bg)" stroke="var(--bd)" stroke-width=".2"/>`;
 s+=`<rect x="${ch.x+2}" y="113" width="${18*loadPct/100}" height="3" rx="1" fill="${loadPct>80?'var(--o)':'var(--g)'}"/>`;
-s+=tx(ch.x+11,121,loadPct+'%','var(--t3)',2.5,'middle');
+s+=tx(ch.x+11,120,loadPct+'%','var(--t3)',2.5,'middle');
+s+=tx(ch.x+11,125,'rh '+(ch.rh/1000).toFixed(1)+'k','var(--t3)',2.4,'middle');
+}else{
+s+=tx(ch.x+11,120,'rh '+(ch.rh/1000).toFixed(1)+'k','var(--t3)',2.4,'middle');
 }
 s+='</g>'});
 // Chiller parameters — expanded with more data
