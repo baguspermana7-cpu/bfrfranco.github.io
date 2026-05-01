@@ -9751,10 +9751,28 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 <script src="rz-engine.js?v=2026-04-28"></script>
 <script>
 (function(){
-    /* Root-only gate: email-based check via _rzAuth.isRootSession (auth.js).
-       Demo account is rejected — only bagus@/admin@ pass. */
+    /* Root-only gate. Robust: prefers _rzAuth.isRootSession (auth.js) but falls
+       back to direct localStorage read so the gate works even if auth.js is
+       slow / fails / runs after this IIFE (the prior race-condition bug). */
+    var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+    function readSessionDirect(){
+        try {
+            var raw = localStorage.getItem('rz_premium_session');
+            if (!raw) return null;
+            var s = JSON.parse(raw);
+            if (!s || !s.email) return null;
+            if (s.expires && new Date(s.expires) < new Date()) return null;
+            return s;
+        } catch(e){ return null; }
+    }
+    function isRootDirect(){
+        var s = readSessionDirect();
+        return !!(s && ROOT_EMAILS.indexOf(String(s.email).toLowerCase()) !== -1);
+    }
     function applyGate(){
-        var ok = window._rzAuth && typeof window._rzAuth.isRootSession === 'function' && window._rzAuth.isRootSession();
+        var ok = (window._rzAuth && typeof window._rzAuth.isRootSession === 'function')
+                    ? window._rzAuth.isRootSession()
+                    : isRootDirect();
         document.body.classList.toggle('locked', !ok);
     }
     var b = document.getElementById('rootLoginBtn');
@@ -9762,6 +9780,8 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
         if (window._rzAuth && typeof window._rzAuth.showModal === 'function') window._rzAuth.showModal();
     });
     window.addEventListener('rz-auth-change', function(){ setTimeout(applyGate, 50); });
+    window.addEventListener('storage', function(e){ if (e.key === 'rz_premium_session') applyGate(); });
+    applyGate();
     setTimeout(applyGate, 60);
     setTimeout(applyGate, 550);
     setTimeout(applyGate, 1600);

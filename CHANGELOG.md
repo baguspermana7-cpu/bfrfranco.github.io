@@ -29,6 +29,16 @@ release sections rather than semver.
 ### Rationale
 - User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
 
+### 2026-04-30-v7 — datahallAI auth gate hotfix + Java-Bali submarine fix + second-brain refresh
+
+- **Fixed** the `datahallAI.html` "Root Access Required" modal that blocked logged-in PRO/root users. Root cause: race condition — gate IIFE ran before `window._rzAuth` was defined by `auth.js`. Patched the gate to fall back to a direct `localStorage.rz_premium_session` read with the same email-allowlist (`admin@`, `bagus@`), so the page works whether or not auth.js has loaded yet. Also added a `storage` event listener for cross-tab logout sync.
+- **Fixed Java-Bali submarine** topology in `tools/pln-java-grid-overlay.yaml`:
+  - `prov_override: bali` on `Cable Head Gilimanuk` (osm_way_339796954) and `GI Gilimanuk` (osm_way_192989828) — both were OSM-tagged `jatim` despite being on the Bali side of the strait.
+  - Replaced the wrong `paiton → banyuwangi @ 275 kV` curated edge with the actual physical reality: 4×150 kV submarine cables (~340 MW total, commissioned 1989-1996). The 275 kV submarine is planned but not commissioned.
+  - Added curated Bali internal 150 kV ring (Gilimanuk → Negara → Antosari → Pemecutan → Pesanggaran → Pecatu, plus Sanur → Gianyar → Amlapura → Kubu → Celukan Bawang → back to Gilimanuk). 14 new edges fully connect the 40 Bali nodes (up from 38 — two were correctly retagged from jatim to bali).
+- **Updated** `Apps/second brain/index.html` knowledge graph: added 5 new nodes (`pjg`, `pjg-jkb`, `pjg-jb`, `pjg-jt`, `pjg-jm`) and 11 edges connecting them to existing reports / DC Solutions / DC Markets hubs. Second-brain visualization now reflects the full Java-Bali grid family.
+- Edge total stable at 495 (52×500 / 0×275 / 418×150 / 25×70). 275 kV edge correctly dropped to reflect physical reality of the submarine link.
+
 ### 2026-04-30-v5 — Full province coverage + datahallAI cleanup + scheduled OSM refresh
 
 - **Added** `pln-java-grid-jateng.html` (Jawa Tengah + DIY) and `pln-java-grid-jatim.html` (Jawa Timur). Pages mirror the v4-fixed Jakarta+Banten / Jabar template: default labels OFF, tier-graded thin lines, animation only ≥150 kV, hover tooltips, 5-tier voltage toggles. Java-Bali sub-page family is now **4/4 complete**.

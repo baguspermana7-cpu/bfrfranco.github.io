@@ -486,6 +486,19 @@ annotations:
     year: 2019
     notes: "PLTU Jawa-7 — coal — 2x1000 MW USC, Banten. China-funded EPC."
 
+  # ============================================================
+  # BALI PROVINCE TAG OVERRIDES — OSM places these in 'jatim' but
+  # geographically they're Bali-side cable heads / Bali substations.
+  # ============================================================
+  osm_way_339796954:
+    prov_override: bali
+    notes: "Cable Head Gilimanuk — Bali landing point of Java-Bali submarine (4×150 kV, ~340 MW total, commissioned 1989-1996)."
+  osm_way_192989828:
+    prov_override: bali
+    notes: "GI Gilimanuk 150/20 kV — distributes submarine power across north-west Bali."
+  osm_way_339796951:
+    notes: "Cable Head Ketapang — Java landing point of Java-Bali submarine. Connects to GI Banyuwangi 150 kV ring."
+
 # ============================================================
 # CANONICAL EDGES — PLN P2B 2016 SLD topology
 # Endpoints resolved by slug→name fuzzy match against the OSM dataset.
@@ -522,7 +535,25 @@ edges:
   - { from: paiton,      to: kediri,      voltage: 500, km: 138, circuits: 1 }
 
   # ---- 275 kV Java-Bali submarine interconnect ----
-  - { from: paiton,      to: banyuwangi,  voltage: 275, km: 102, circuits: 1 }
+  # Java-Bali submarine (4×150 kV cables, ~340 MW, 1989-1996). 275 kV submarine doesn't exist yet (planned).
+  - { from: paiton,                 to: banyuwangi,             voltage: 150, km: 102, circuits: 1, source: 'pln-p2b-2016' }
+  - { from: osm_way_339796951,      to: osm_way_339796954,      voltage: 150, km: 35,  circuits: 4, source: 'pln-jbi-submarine' }
+  - { from: osm_way_339796951,      to: banyuwangi,             voltage: 150, km: 12,  circuits: 2, source: 'pln-jbi-submarine' }
+  - { from: osm_way_339796954,      to: gilimanuk,              voltage: 150, km: 8,   circuits: 2, source: 'pln-jbi-submarine' }
+  # Bali internal 150 kV ring (geographic order, north-west → south coast → east → north)
+  - { from: gilimanuk,              to: negara,                 voltage: 150, km: 30,  circuits: 2 }
+  - { from: negara,                 to: antosari,               voltage: 150, km: 35,  circuits: 1 }
+  - { from: antosari,               to: pemecutan,              voltage: 150, km: 22,  circuits: 2 }
+  - { from: pemecutan,              to: pesanggaran,            voltage: 150, km: 8,   circuits: 2 }
+  - { from: pesanggaran,            to: pecatu,                 voltage: 150, km: 18,  circuits: 1 }
+  - { from: pemecutan,              to: kapal,                  voltage: 150, km: 10,  circuits: 2 }
+  - { from: kapal,                  to: baturiti,               voltage: 150, km: 25,  circuits: 1 }
+  - { from: pemecutan,              to: sanur,                  voltage: 150, km: 6,   circuits: 2 }
+  - { from: sanur,                  to: gianyar,                voltage: 150, km: 18,  circuits: 1 }
+  - { from: gianyar,                to: amlapura,               voltage: 150, km: 38,  circuits: 1 }
+  - { from: amlapura,               to: kubu,                   voltage: 150, km: 32,  circuits: 1 }
+  - { from: kubu,                   to: celukan_bawang,         voltage: 150, km: 78,  circuits: 1 }
+  - { from: celukan_bawang,         to: gilimanuk,              voltage: 150, km: 95,  circuits: 1 }
 
   # ---- Major 150 kV corridors (Greater Jakarta + Bekasi-Cikarang) ----
   - { from: bekasi,      to: cibitung_150, voltage: 150, km: 8,  circuits: 2 }
