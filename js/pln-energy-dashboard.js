@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-01-v3
+ * @version 2026-05-01-v4
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -35,28 +35,22 @@
   var DEFAULT_GEOJSON_URL = 'js/pln-indonesia-provinces.geojson';
 
   /**
-   * Utilization colour ramp (electricitymaps.com brown-gradient style).
-   * Thresholds tested high-to-low; first match wins.
+   * Carbon-intensity gradient stops (gCO₂/kWh → hex colour).
+   * Continuous interpolation between adjacent stops.
+   * Range tuned for global grids 0-1500; mirrors electricitymaps.com.
    */
-  var UTIL_RAMP = [
-    [150, '#450a0a'],
-    [100, '#7c2d12'],
-    [80,  '#92400e'],
-    [60,  '#d97706'],
-    [40,  '#fbbf24'],
-    [20,  '#fde68a'],
-    [0,   '#fef3c7']
+  var CARBON_STOPS = [
+    [0,    '#fef3c7'],  // very clean — pale yellow
+    [300,  '#fde68a'],  // light yellow
+    [500,  '#fbbf24'],  // amber
+    [700,  '#f59e0b'],  // dark amber
+    [900,  '#b45309'],  // brown
+    [1100, '#7c2d12'],  // dark brown
+    [1500, '#3f1d10']   // very dirty — near-black brown
   ];
 
-  var LEGEND_ENTRIES = [
-    { label: '0 – 20 %',    color: '#fef3c7' },
-    { label: '20 – 40 %',   color: '#fde68a' },
-    { label: '40 – 60 %',   color: '#fbbf24' },
-    { label: '60 – 80 %',   color: '#d97706' },
-    { label: '80 – 100 %',  color: '#92400e' },
-    { label: '100 – 150 %', color: '#7c2d12' },
-    { label: '150 %+',      color: '#450a0a' }
-  ];
+  var CARBON_LEGEND_MIN = 0;
+  var CARBON_LEGEND_MAX = 1500;
 
   function warn(msg) {
     if (win.console && win.console.warn) {
@@ -64,14 +58,33 @@
     }
   }
 
-  /** Pick fill colour for a utilization percentage. */
-  function utilColor(pct) {
-    var p = +pct || 0;
-    for (var i = 0; i < UTIL_RAMP.length; i++) {
-      if (p >= UTIL_RAMP[i][0]) { return UTIL_RAMP[i][1]; }
-    }
-    return UTIL_RAMP[UTIL_RAMP.length - 1][1];
+  /** Linear-interpolate between two hex colours. t ∈ [0,1]. */
+  function lerpHex(a, b, t) {
+    var ar = parseInt(a.slice(1, 3), 16), ag = parseInt(a.slice(3, 5), 16), ab = parseInt(a.slice(5, 7), 16);
+    var br = parseInt(b.slice(1, 3), 16), bg = parseInt(b.slice(3, 5), 16), bb = parseInt(b.slice(5, 7), 16);
+    function pad(n) { var s = Math.round(n).toString(16); return s.length < 2 ? '0' + s : s; }
+    return '#' + pad(ar + (br - ar) * t) + pad(ag + (bg - ag) * t) + pad(ab + (bb - ab) * t);
   }
+
+  /** Pick fill colour for a carbon intensity (gCO₂/kWh) via continuous lerp. */
+  function carbonColor(gco2) {
+    var v = +gco2;
+    if (!isFinite(v)) v = 0;
+    if (v <= CARBON_STOPS[0][0]) return CARBON_STOPS[0][1];
+    var last = CARBON_STOPS.length - 1;
+    if (v >= CARBON_STOPS[last][0]) return CARBON_STOPS[last][1];
+    for (var i = 0; i < last; i++) {
+      var lo = CARBON_STOPS[i], hi = CARBON_STOPS[i + 1];
+      if (v >= lo[0] && v <= hi[0]) {
+        var t = (v - lo[0]) / (hi[0] - lo[0]);
+        return lerpHex(lo[1], hi[1], t);
+      }
+    }
+    return CARBON_STOPS[0][1];
+  }
+
+  /** Legacy alias preserved for callers that still reference `_utilColor`. */
+  function utilColor(_pct) { return carbonColor(_pct); }
 
   /** Escape HTML for popup content. */
   function escHtml(s) {
@@ -206,12 +219,13 @@
           style: function (feature) {
             var prov = feature.properties && feature.properties.prov;
             var agg  = (prov && provinceData[prov]) || {};
-            var util = agg.utilizationPct !== undefined ? agg.utilizationPct : 0;
+            var co2  = agg.carbonIntensity !== undefined ? agg.carbonIntensity : 0;
             return {
-              fillColor:   utilColor(util),
-              fillOpacity: 0.55,
-              weight:      1.5,
-              color:       '#1e293b'
+              fillColor:   carbonColor(co2),
+              fillOpacity: 0.88,
+              weight:      0,         // NO stroke — adjacent provinces meet pixel-perfect, no overlap
+              color:       'transparent',
+              stroke:      false
             };
           },
           onEachFeature: function (feature, lyr) {
@@ -219,6 +233,7 @@
             var prov     = props.prov  || '';
             var label    = props.label || prov;
             var agg      = provinceData[prov] || {};
+            var co2      = agg.carbonIntensity !== undefined ? fmtNum(agg.carbonIntensity, 0) : '—';
             var util     = agg.utilizationPct !== undefined ? fmtNum(agg.utilizationPct, 1) : '—';
             var peakMW   = agg.peakMW        !== undefined ? fmtNum(agg.peakMW, 0)         : '—';
             var instMW   = agg.installedMW   !== undefined ? fmtNum(agg.installedMW, 0)    : '—';
@@ -227,11 +242,12 @@
 
             lyr.bindPopup(
               '<strong>' + escHtml(label) + '</strong><br>' +
-              'Peak: '        + peakMW   + ' MW<br>' +
-              'Installed: '   + instMW   + ' MW<br>' +
-              'Utilization: ' + util     + '%<br>'   +
-              'Stations: '    + stations + '<br>'    +
-              'Plants: '      + plants
+              'Carbon intensity: ' + co2      + ' gCO₂/kWh<br>' +
+              'Peak: '             + peakMW   + ' MW<br>' +
+              'Installed: '        + instMW   + ' MW<br>' +
+              'Utilization: '      + util     + '%<br>' +
+              'Stations: '         + stations + '<br>' +
+              'Plants: '           + plants
             );
           }
         });
@@ -254,7 +270,7 @@
   function addChoroplethLegend(map, position) {
     if (!map) { warn('addChoroplethLegend: map is required'); return null; }
 
-    var ctrl = L.control({ position: position || 'bottomleft' });
+    var ctrl = L.control({ position: position || 'bottomright' });
 
     ctrl.onAdd = function () {
       var div = document.createElement('div');
@@ -262,41 +278,139 @@
       div.style.cssText = [
         'background:rgba(15,23,42,0.88)',
         'border:1px solid rgba(96,165,250,0.25)',
-        'border-radius:6px',
-        'padding:8px 12px',
-        'font-size:11px',
-        'line-height:1.6',
+        'border-radius:8px',
+        'padding:10px 12px',
         'color:#f1f5f9',
-        'min-width:130px'
+        'min-width:280px',
+        'box-shadow:0 4px 12px rgba(0,0,0,0.4)'
       ].join(';');
 
       var title = document.createElement('div');
-      title.style.cssText = 'font-weight:700;margin-bottom:6px;font-size:12px;';
-      title.textContent = 'Utilization %';
+      title.style.cssText = 'font-weight:700;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#cbd5e1;margin-bottom:8px;';
+      title.textContent = 'Carbon intensity';
       div.appendChild(title);
 
-      for (var i = 0; i < LEGEND_ENTRIES.length; i++) {
-        var entry  = LEGEND_ENTRIES[i];
-        var row    = document.createElement('div');
-        row.style.cssText = 'display:flex;align-items:center;gap:6px;margin:2px 0;';
+      // Continuous gradient bar (mirrors electricitymaps.com bottom-right legend)
+      var stops = CARBON_STOPS.map(function (s) {
+        var pct = ((s[0] - CARBON_LEGEND_MIN) / (CARBON_LEGEND_MAX - CARBON_LEGEND_MIN)) * 100;
+        return s[1] + ' ' + pct.toFixed(2) + '%';
+      }).join(', ');
 
-        var swatch = document.createElement('span');
-        swatch.style.cssText = [
-          'display:inline-block',
-          'width:14px', 'height:14px',
-          'border-radius:2px',
-          'flex-shrink:0',
-          'background:' + entry.color
-        ].join(';');
+      var bar = document.createElement('div');
+      bar.style.cssText = [
+        'width:100%',
+        'height:12px',
+        'border-radius:3px',
+        'background:linear-gradient(to right, ' + stops + ')',
+        'border:1px solid rgba(255,255,255,0.08)'
+      ].join(';');
+      div.appendChild(bar);
 
-        var lbl = document.createElement('span');
-        lbl.textContent = entry.label;
+      // Tick labels (0 / 300 / 600 / 900 / 1200 / 1500 gCO₂/kWh)
+      var ticks = document.createElement('div');
+      ticks.style.cssText = 'display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;margin-top:4px;font-family:"JetBrains Mono",monospace;font-weight:600;';
+      var tickValues = [0, 300, 600, 900, 1200, 1500];
+      tickValues.forEach(function (v) {
+        var t = document.createElement('span');
+        t.textContent = v;
+        ticks.appendChild(t);
+      });
+      div.appendChild(ticks);
 
-        row.appendChild(swatch);
-        row.appendChild(lbl);
-        div.appendChild(row);
-      }
+      var unit = document.createElement('div');
+      unit.style.cssText = 'font-size:9.5px;color:#64748b;margin-top:2px;text-align:right;font-family:"JetBrains Mono",monospace;';
+      unit.textContent = 'gCO₂eq / kWh';
+      div.appendChild(unit);
+
       return div;
+    };
+
+    ctrl.addTo(map);
+    return ctrl;
+  }
+
+  /**
+   * Add a prominent floating toggle button on the map that enables/disables
+   * the choropleth gradient layer + its legend. Stored as a Leaflet control.
+   *
+   * @param {L.Map} map
+   * @param {{layer: L.GeoJSON, legend: L.Control}} state  references to the
+   *        choropleth layer + legend; the toggle adds/removes both.
+   * @param {string} [position='topright']  Leaflet position
+   * @returns {L.Control|null}
+   */
+  function addChoroplethToggleButton(map, state, position) {
+    if (!map) { warn('addChoroplethToggleButton: map is required'); return null; }
+
+    var ctrl = L.control({ position: position || 'topright' });
+    var btnRef = null;
+    var enabled = !!(state && state.layer);
+
+    function updateBtn() {
+      if (!btnRef) return;
+      btnRef.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+      btnRef.title = enabled
+        ? 'Hide carbon-intensity gradient overlay on Java + Bali provinces (choropleth)'
+        : 'Show carbon-intensity gradient overlay on Java + Bali provinces (choropleth)';
+      // Visual: filled when ON, outlined when OFF
+      btnRef.style.background = enabled
+        ? 'linear-gradient(135deg,#f59e0b,#b45309)'
+        : 'rgba(15,23,42,0.85)';
+      btnRef.style.color = enabled ? '#fff' : '#cbd5e1';
+      btnRef.style.borderColor = enabled ? '#f59e0b' : 'rgba(96,165,250,0.3)';
+    }
+
+    ctrl.onAdd = function () {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pjg-choropleth-toggle-btn leaflet-bar';
+      btn.innerHTML = '<i class="fas fa-fire" aria-hidden="true"></i> <span>Gradient</span>';
+      btn.style.cssText = [
+        'display:inline-flex',
+        'align-items:center',
+        'gap:6px',
+        'padding:6px 12px',
+        'border-radius:6px',
+        'border:1px solid rgba(96,165,250,0.3)',
+        'background:rgba(15,23,42,0.85)',
+        'color:#cbd5e1',
+        'font:600 11px/1.1 Inter,system-ui,sans-serif',
+        'letter-spacing:0.04em',
+        'cursor:pointer',
+        'box-shadow:0 2px 6px rgba(0,0,0,0.4)',
+        'user-select:none'
+      ].join(';');
+      btn.setAttribute('aria-label', 'Toggle carbon-intensity gradient overlay');
+      btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+
+      L.DomEvent.disableClickPropagation(btn);
+      L.DomEvent.disableScrollPropagation(btn);
+      L.DomEvent.on(btn, 'click', function () {
+        if (enabled) {
+          // Hide
+          if (state.layer && map.hasLayer(state.layer)) { map.removeLayer(state.layer); }
+          if (state.legend && state.legend.remove) { try { state.legend.remove(); } catch (_) {} }
+          enabled = false;
+        } else {
+          // Show
+          if (state.layer && !map.hasLayer(state.layer)) { state.layer.addTo(map); }
+          // Re-mount legend if it was removed
+          if (state.legendFactory && (!state.legend || !state.legend._map)) {
+            state.legend = state.legendFactory(map);
+          }
+          enabled = true;
+        }
+        updateBtn();
+        // Mirror state into the side-panel checkbox if present
+        var panelBox = document.getElementById('pjg-choropleth-toggle');
+        if (panelBox && panelBox.checked !== enabled) {
+          panelBox.checked = enabled;
+        }
+      });
+
+      btnRef = btn;
+      updateBtn();
+      return btn;
     };
 
     ctrl.addTo(map);
@@ -1168,6 +1282,7 @@
   win.PLN_ENERGY_DASHBOARD = {
     renderProvinceChoropleth: renderProvinceChoropleth,
     addChoroplethLegend:      addChoroplethLegend,
+    addChoroplethToggleButton: addChoroplethToggleButton,
     renderStackedAreaSVG:     renderStackedAreaSVG,
     renderLineSVG:            renderLineSVG,
     renderBarSegment:         renderBarSegment,

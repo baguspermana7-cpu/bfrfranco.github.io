@@ -1334,8 +1334,8 @@
     <script src="js/rz-map.js?v=2026-05-01-v1" defer></script>
     <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
     <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
-    <script src="js/pln-energy-data.js?v=2026-05-01-v3" defer></script>
-    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v3" defer></script>
+    <script src="js/pln-energy-data.js?v=2026-05-01-v4" defer></script>
+    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v4" defer></script>
 
     <script>
     (function () {
@@ -1616,7 +1616,7 @@
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="labels"><span class="pjg-tech-label">Labels</span></label>'
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="capacity"><span class="pjg-tech-label">Capacity</span></label>'
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="kvbadges" checked><span class="pjg-tech-label">kV badges</span></label>'
-                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="choropleth" id="pjg-choropleth-toggle" checked><span class="pjg-tech-label">Province utilization (choropleth)</span></label>';
+                + '<label class="pjg-tech-row" title="Toggle the per-province carbon-intensity gradient overlay (electricitymaps.com style)"><input type="checkbox" data-panel-display="choropleth" id="pjg-choropleth-toggle" checked><span class="pjg-tech-label">Province carbon intensity (gradient)</span></label>';
             var html = ''
                 + '<div class="rzm-info-panel pjg-tech-panel">'
                 + '<div class="pjg-tech-panel-hdr">'
@@ -1678,39 +1678,57 @@
                 }
             });
 
-            // Province choropleth wire-up — toggles a Leaflet GeoJSON layer with
-            // utilization gradient (electricitymaps.com style brown ramp).
-            // Defaults OFF; opt-in via Display → "Province utilization (choropleth)".
-            var choroplethLayer = null;
-            var choroplethLegend = null;
-            document.addEventListener('change', function (ev) {
-                var t = ev.target;
-                if (!t || t.getAttribute('data-panel-display') !== 'choropleth') return;
-                if (!STATE.mapInst || !STATE.mapInst.map) return;
+            // Province choropleth wire-up — colors each Java+Bali province by
+            // dispatched-mix carbon intensity (gCO₂/kWh). Continuous lerp ramp,
+            // bottom-right legend, plus a floating Gradient toggle button on
+            // the map (top-right) and the side-panel checkbox.
+            // Defaults ON; user can disable via either control.
+            var choroplethState = { layer: null, legend: null, button: null, legendFactory: null };
+            function buildChoropleth() {
                 var ED = window.PLN_ENERGY_DATA;
                 var EDB = window.PLN_ENERGY_DASHBOARD;
+                if (!STATE.mapInst || !STATE.mapInst.map) return;
                 if (!ED || !EDB || typeof ED.computeProvinceAggregates !== 'function' ||
                     typeof EDB.renderProvinceChoropleth !== 'function') {
                     console.warn('[PJG] choropleth helpers missing'); return;
                 }
+                var aggs = ED.computeProvinceAggregates(window.PLN_JAVA_GRID || {});
+                choroplethState.legendFactory = function (m) {
+                    return EDB.addChoroplethLegend(m, 'bottomright');
+                };
+                Promise.resolve(EDB.renderProvinceChoropleth(STATE.mapInst.map, aggs, 'js/pln-indonesia-provinces.geojson'))
+                    .then(function (layer) {
+                        choroplethState.layer = layer;
+                        if (typeof EDB.addChoroplethLegend === 'function') {
+                            choroplethState.legend = choroplethState.legendFactory(STATE.mapInst.map);
+                        }
+                        if (typeof EDB.addChoroplethToggleButton === 'function' && !choroplethState.button) {
+                            choroplethState.button = EDB.addChoroplethToggleButton(STATE.mapInst.map, choroplethState, 'topright');
+                        }
+                    })
+                    .catch(function (err) { console.warn('[PJG] choropleth render failed', err); });
+            }
+
+            document.addEventListener('change', function (ev) {
+                var t = ev.target;
+                if (!t || t.getAttribute('data-panel-display') !== 'choropleth') return;
+                if (!STATE.mapInst || !STATE.mapInst.map) return;
                 if (t.checked) {
-                    var aggs = ED.computeProvinceAggregates(window.PLN_JAVA_GRID || {});
-                    Promise.resolve(EDB.renderProvinceChoropleth(STATE.mapInst.map, aggs, 'js/pln-indonesia-provinces.geojson'))
-                        .then(function (layer) {
-                            choroplethLayer = layer;
-                            if (typeof EDB.addChoroplethLegend === 'function') {
-                                choroplethLegend = EDB.addChoroplethLegend(STATE.mapInst.map, 'bottomleft');
-                            }
-                        })
-                        .catch(function (err) { console.warn('[PJG] choropleth render failed', err); });
+                    if (!choroplethState.layer) {
+                        buildChoropleth();
+                    } else if (!STATE.mapInst.map.hasLayer(choroplethState.layer)) {
+                        choroplethState.layer.addTo(STATE.mapInst.map);
+                        if (choroplethState.legendFactory && (!choroplethState.legend || !choroplethState.legend._map)) {
+                            choroplethState.legend = choroplethState.legendFactory(STATE.mapInst.map);
+                        }
+                    }
                 } else {
-                    if (choroplethLayer && STATE.mapInst.map.removeLayer) {
-                        try { STATE.mapInst.map.removeLayer(choroplethLayer); } catch (e) { /* no-op */ }
+                    if (choroplethState.layer && STATE.mapInst.map.hasLayer(choroplethState.layer)) {
+                        try { STATE.mapInst.map.removeLayer(choroplethState.layer); } catch (e) { /* no-op */ }
                     }
-                    if (choroplethLegend && choroplethLegend.remove) {
-                        try { choroplethLegend.remove(); } catch (e) { /* no-op */ }
+                    if (choroplethState.legend && choroplethState.legend.remove) {
+                        try { choroplethState.legend.remove(); } catch (e) { /* no-op */ }
                     }
-                    choroplethLayer = null; choroplethLegend = null;
                 }
             });
         }

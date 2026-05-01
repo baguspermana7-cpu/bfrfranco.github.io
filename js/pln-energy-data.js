@@ -214,7 +214,7 @@
    * ========================================================= */
 
   var PLN_ENERGY_DATA = {
-    version: '2026-05-01-v3',
+    version: '2026-05-01-v4',
     units: { power: 'MW', energy: 'GWh', emissions: 'gCO2/kWh' },
 
     // ---------- National snapshot (evening peak, representative of PLN AR 2024 + RUPTL 2025-2034) ----------
@@ -256,6 +256,22 @@
       'jateng':          5400,
       'jatim':           6900,
       'bali':            1000
+    },
+
+    // ---------- Per-province carbon intensity (gCO₂/kWh) ----------
+    // Reflects each province's bias in the dispatched mix.
+    // - jakarta-banten: Suralaya 4×600 MW coal anchor + Muara Karang/Tanjung Priok gas
+    // - jabar: Cirata + Saguling + Jatiluhur hydro + Wayang Windu/Patuha geothermal (cleanest)
+    // - jateng: Tanjung Jati B coal-heavy + Mrica hydro + Dieng geothermal
+    // - jatim: Paiton 4.71 GW coal anchor + Grati gas
+    // - bali: Pemaron gas + 4×150 kV submarine import (no coal on Bali island)
+    // Java-Bali system-wide weighted avg ≈ 781 gCO₂/kWh (matches snapshot).
+    province_carbon_intensity_gco2kwh: {
+      'jakarta-banten': 830,
+      'jabar':          580,
+      'jateng':         740,
+      'jatim':          830,
+      'bali':           520
     },
 
     province_label: {
@@ -317,6 +333,8 @@
       }
     });
 
+    var co2Table  = PLN_ENERGY_DATA.province_carbon_intensity_gco2kwh || {};
+
     // Build result array
     return PROVINCES.map(function (prov) {
       var a         = acc[prov];
@@ -326,15 +344,17 @@
       var utilPct   = installed > 0
         ? clamp((peakMW / installed) * 100, 0, 200)
         : 0;
+      var co2       = co2Table[prov] !== undefined ? co2Table[prov] : 0;
 
       return {
-        prov:           prov,
-        installedMW:    Math.round(installed),
-        peakMW:         peakMW,
-        reserveMW:      Math.round(reserveMW),
-        utilizationPct: parseFloat(utilPct.toFixed(2)),
-        stations:       a.stations,
-        plants:         a.plants
+        prov:            prov,
+        installedMW:     Math.round(installed),
+        peakMW:          peakMW,
+        reserveMW:       Math.round(reserveMW),
+        utilizationPct:  parseFloat(utilPct.toFixed(2)),
+        carbonIntensity: co2,
+        stations:        a.stations,
+        plants:          a.plants
       };
     });
   };
