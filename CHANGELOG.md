@@ -74,10 +74,58 @@ release sections rather than semver.
 
 ### Planned
 - Extract `calc-auth.js` shared engine (Phase 1 of calculator consolidation roadmap, see `standarization/CALC_ENGINE_PLAN.md`).
-- Tier 1 legal compliance fixes for articles 19–27 — add cookie banner, independence disclaimer, and terms/privacy footer links per `standarization/LEGAL_COMPLIANCE_STANDARD.md`.
+- **Phase S2.5** — expand `RZEngine.models.{opex,capex,tco}` API to support utilization-aware power, climate/cooling adjustments, multi-factor CAPEX build-up, and multi-stream TCO. Required before tco-/capex-/opex-calculator math can migrate to engine.
 - Hero images for articles 1–19 (currently missing `assets/article-N-hero.webp`).
-- References sections for articles 2, 4, 5, 6, 8–12, 14–22 (the older articles still missing references after the 2026-04-28 batch).
-- Article-16 `<div class="article-nav">` block (currently missing).
+- References sections for articles 2, 4, 5, 6, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20 — older articles still missing canonical `references-section` markup; some have legacy `<ol class="references">` and could be migrated to canonical pattern in a separate sweep (articles 21, 22 done 2026-04-30).
+- Tighten Independence Disclaimer placement in articles 19–27 (currently inserted before `</main>`; older convention is before References — cosmetic only).
+- Reconcile `auth.js` vs `rz-engine.js` `VALID_USERS` role strings (auth.js: demo='pro', bagus/admin='root'; rz-engine.js: demo='demo', bagus/admin='admin'). Email-based gate makes drift safe but harmonization remains hygiene work.
+
+---
+
+## [2026-04-30] — Backlog sweep + root-only gates + login button bug fixes
+
+### Added
+- **`article-16.html`** — bottom-of-article `<div class="article-nav">` block (Previous → `article-15.html`, Next → `article-17.html`), inline-SVG arrow style matching article-15.
+- **`article-22.html` References section** — 15 cited sources in canonical `references-section` markup (cyan `#0891b2` accent matched to article palette). NVIDIA Spectrum-X / Quantum-X Photonics, NCCL, Lumentum, Coherent, Open Compute Project, Optica/OFC, IEEE Spectrum, DCD, SemiAnalysis, Lightmatter, Ayar Labs, Wikipedia (silicon photonics).
+- **`article-21.html` References section** — 15 cited sources, emerald `#059669` accent. NRC, DOE Office of Nuclear Energy, IAEA ARIS, FERC (Dec 2025 co-location ruling), World Nuclear Association, NEI, IEEE Spectrum, all 5 SMR vendors profiled in §5 (NuScale, Oklo, X-Energy, TerraPower, Kairos Power), Constellation Energy (Microsoft / TMI deal), OPG Darlington BWRX-300, Wikipedia.
+- **Articles 19, 20, 21, 22, 23, 24, 25, 26, 27** — Tier-1 legal compliance components per `standarization/LEGAL_COMPLIANCE_STANDARD.md` §3 + §7: Independence Disclaimer (before `</main>`) + Cookie Consent Banner with JS (before `</body>`). Wired to `localStorage` key `rz_cookie_consent`; declining sets `window['ga-disable-G-GED7FX8RTV'] = true`. All 9 articles already load `styles.css` so `.cookie-banner` rules apply.
+- **`auth.js`** — added `isRootEmail(email)`, `isRootAccess(session)`, `isRootSession()` helpers exposed on `window._rzAuth.*`. Email-based check uses pre-existing `ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com']` and is robust to the role-string drift between `auth.js` and `rz-engine.js` `VALID_USERS` lists.
+- **`auth.js` `ROOT_ONLY_PATHS`** — extended from `['/dcmoc']` to `['/dcmoc', '/dc-market', '/datahallai.html', '/dc-conventional.html', '/dc-market-tracker.html']`. Auto-applies the navbar 🔒 lock icon (`fas fa-lock rz-lock-icon`) to all matching links across the 60+ pages with the dropdown — no per-page HTML edits needed for the lock visualization. Click handler enforces root-account gate via existing `handleRootOnlyLinkClick`.
+- **`dc-conventional.html`** — full root-only gate added (CSS `body.locked` blur + `.rz-restricted-overlay` modal + IIFE that subscribes to `rz-auth-change` and toggles `body.locked` based on `_rzAuth.isRootSession()`). Page was previously unguarded; demo and anonymous now blocked.
+- **`dc-market-tracker.html`** — same gate pattern (CSS + overlay + IIFE). Pre-existing hub card linking to `dc-market/` retained (PLN session added it on 2026-04-29).
+- **`/home/baguspermana7/.claude/projects/-home-baguspermana7/memory/feedback_simulation_pages_no_refs.md`** — new memory feedback rule: never add `<section>` References blocks to simulation/dashboard pages (`datahallAI.html`, `dc-conventional.html`, future BMS/SCADA-style mimics). Trigger: 2026-04-29's discoverability sweep mistakenly added one to `datahallAI.html`; reverted on 2026-04-30 commit `df0fbd7`.
+
+### Changed
+- **`datahallAI.html` gate** — replaced minified `ia(s){return!!(s&&(s.role==='root'||s.role==='pro'));}` IIFE (lines 9768-9779) with `_rzAuth.isRootSession()`-based check. Previous version allowed `role==='pro'` to pass — under `auth.js`'s `VALID_USERS`, the demo account had `role:'pro'`, so demo bypassed the gate. New version uses email-based `ROOT_EMAILS` check and rejects demo while admitting only `bagus@` / `admin@`.
+- **`roi-calculator.html` `calcNPV` and `calcIRR`** — both now delegate to `RZEngine.models.roi.npv` / `RZEngine.models.roi.irr` when the engine is available, falling back to inline math otherwise. Pattern matches `pue-calculator.html` S2 pilot. Engine smoke verified: `npv([-100, 30×5], 0.10) = 13.7236` matches inline; IRR via engine bisection = 0.1524 for the same series.
+- **DC Market dropdown consolidation** — across **66 HTML pages** (`articles.html`, `glossary.html`, `dashboard.html`, `insights.html`, `index.html`, all `article-N.html` 1-27, all `compare-*.html`, all `geopolitics-*.html`, all `pillar-*.html`, all `ltc-*.html`, all `infographic-*.html`, all `FF-*.html`, `future-forward.html`, `achievements.html`, `asean-dc-report-2026.html`, `tco-calculator.html`), the navbar dropdown's "Market Tracker" label was renamed to "DC Market" via `tools/dc-market-consolidator.py`. `index.html` additionally had its sibling "DC Markets (10 cities)" line consolidated into the single "DC Market" item — that secondary link is now reachable via the in-page hub card on `dc-market-tracker.html` instead. Locked icon auto-renders because `dc-market-tracker.html` is in `ROOT_ONLY_PATHS`.
+
+### Fixed
+- **`roi-calculator.html` JavaScript SyntaxError** (lines 1780-1782) — the printPDF function had a single-quoted string literal that spanned three lines without `\` continuations or template-literal backticks, causing the entire IIFE containing `calculate()`, `calcNPV()`, `calcIRR()`, `attemptLogin()`, `handlePremiumTab()` to fail to parse. Every JS-dependent feature on the calculator was silently broken in browsers (curl returned HTTP 200 because HTML still served). Fixed by splitting the broken multi-line string into three concatenated `html += '...';` statements with `<\/script>` escape sequences.
+- **`capex-calculator.html` and `opex-calculator.html` Login button no-response** — `<script src="auth.js">` and `<script src="rz-engine.js">` tags were trapped INSIDE the `printHTML` template literal (lines 4028-4029 and 4613-4614 respectively), so they only loaded inside the PDF print window, never on the calculator page itself. Result: `_rzAuth.*` and `RZEngine.auth.*` were undefined on the calculator page → login modal flow silently failed. Fixed by adding real top-level `<script>` tags before `</body>`. The script tags inside printHTML stay (they're correct for the PDF output).
+- **`roi-calculator.html` script tags** — same issue (top-level tags missing); added before `</body>`.
+- Reason: 2026-04-29 commits `72b81ce feat(capex,opex,cx-calculator): migrate to RZEngine.auth` and `af8875c feat(roi+tco-calculator): migrate to RZEngine.auth` mistakenly placed the migration's script tags inside the PDF print template literals on capex/opex/roi calculators. `tco-calculator.html`, `cx-calculator.html`, and `pue-calculator.html` were correctly wired (top-level tags before `</body>`) and weren't affected.
+
+### Status: Super Engine consumers (delta vs 2026-04-28j)
+| Calculator | Loads engine | Uses `auth.*` | Uses `models.*` | Uses `data.*` |
+|---|---|---|---|---|
+| pue-calculator | ✅ | ✅ | ✅ pue.* | — |
+| roi-calculator | ✅ (script tag fix) | ✅ | ✅ **roi.\*** (NEW) | — |
+| capex-calculator | ✅ (script tag fix) | ✅ | — (deferred) | — |
+| opex-calculator | ✅ (script tag fix) | ✅ | — (deferred) | — |
+| tco-calculator | ✅ | ✅ | — (deferred) | — |
+
+### Verification
+- All 7 affected pages serve HTTP 200 (`datahallAI.html`, `dc-conventional.html`, `dc-market-tracker.html`, `capex/opex/roi/tco-calculator.html`).
+- `auth.js` parses cleanly (browser-style sanity via `new Function(src)`); 7 expected helper definitions/exposures present.
+- 0 `>References<` / `id="ref-1"` markers in `datahallAI.html` (confirms PLN session's `df0fbd7` cleanup retained).
+- 0 remaining "Market Tracker" labels in nav dropdowns (66 → "DC Market"); 1 remaining standalone reference is the `<h1>` page title on `dc-market-tracker.html` itself, which is intentional (page is still the global Market Tracker dashboard).
+- Forged-session DevTools resistance: setting `rz_premium_session` with `{email:'demo@…', role:'root', tier:'pro'}` keeps the gate locked — email-based check rejects forged role strings.
+
+### Rationale
+- **Email-based root gate** chosen over role-based to neutralize the role-string drift between `auth.js` (`role:'pro'` for demo) and `rz-engine.js` (`role:'demo'` for demo). Whichever file writes the session wins; email is stable. `ROOT_EMAILS` already exists at `auth.js:20`, matching the working dcmoc gate convention.
+- **DC Market consolidation** keeps `dc-market-tracker.html` as the global Leaflet/Chart parent ("DC Market") with the 10-city deep-dive hub reached via in-page card linking to `dc-market/`. Single navbar item replaces the previous two-line "Market Tracker" + "DC Markets (10 cities)" pattern. User intent: "DC Market itu parentnya, tambahkan menu di page itu atau card untuk menuju /dc-market/".
+- **No References on simulation pages** — operational dashboards (datahallAI's 4-tab BMS mimic, dc-conventional's facility infographic) take a "Legal Notice" disclaimer instead of academic citations. New memory rule prevents future discoverability sweeps from re-adding them.
 
 ---
 
