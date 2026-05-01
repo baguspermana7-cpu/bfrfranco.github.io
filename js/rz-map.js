@@ -41,7 +41,10 @@
 
     function stationRadius(mva) {
         var m = (typeof mva === 'number' && mva > 0) ? mva : 500;
-        return Math.max(5, Math.min(18, Math.sqrt(m) * 0.35));
+        // Wider range so a 4×600MW Suralaya is visually distinct from a 100 MW peaker.
+        // Was: max(5, min(18, sqrt(m)*0.35)) → range ~5-18px
+        // Now: max(5, min(28, sqrt(m)*0.5))  → range ~5-28px
+        return Math.max(5, Math.min(28, Math.sqrt(m) * 0.5));
     }
 
     function buildPlantIcon(fuel) {
@@ -291,6 +294,23 @@
                 if (!leafletReady()) return null;
                 try { ctx.map.invalidateSize(); } catch (e) { /* ignore */ }
                 return null;
+            },
+            addInfoPanel: function (htmlOrFn, position) {
+                if (!leafletReady()) return null;
+                var Ctl = L.Control.extend({
+                    options: { position: position || 'topright' },
+                    onAdd: function () {
+                        var div = L.DomUtil.create('div', 'rzm-info-panel');
+                        div.innerHTML = (typeof htmlOrFn === 'function') ? htmlOrFn() : (htmlOrFn || '');
+                        // Prevent map drag/scroll when interacting with the panel
+                        L.DomEvent.disableClickPropagation(div);
+                        L.DomEvent.disableScrollPropagation(div);
+                        return div;
+                    }
+                });
+                var ctl = new Ctl();
+                ctl.addTo(ctx.map);
+                return ctl;
             },
             destroy: function () {
                 if (!leafletReady()) return null;

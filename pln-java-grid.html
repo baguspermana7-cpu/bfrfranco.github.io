@@ -683,6 +683,107 @@
             .pjg-side-panel.open { transform: translateY(0); }
             .pjg-stat-row { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* ============================================================
+           Map UI upgrade — top KPI strip + right-side technology panel
+           Mirrors energydashboard.co.uk/map design language; preserves
+           the existing horizontal fieldset toggles which stay bidirectional.
+           ============================================================ */
+        .pjg-map-kpi-strip {
+            display: flex; flex-wrap: wrap; gap: 0; align-items: stretch;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 12px 12px 0 0; padding: 0; margin: 0 0 -1px 0;
+            font-size: 0.78rem; overflow: hidden;
+        }
+        .pjg-kpi-cell {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            padding: 0.7rem 1.1rem;
+            border-right: 1px solid var(--pjg-border);
+            color: var(--pjg-text2); flex: 0 0 auto;
+        }
+        .pjg-kpi-cell:last-child { border-right: 0; flex: 1 1 auto; justify-content: flex-end; }
+        .pjg-kpi-cell i { color: var(--pjg-text3); width: 14px; text-align: center; }
+        .pjg-kpi-label { color: var(--pjg-text3); letter-spacing: 0.04em; }
+        .pjg-kpi-val { color: var(--pjg-text); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .pjg-kpi-val-warm { color: #ef4444; }
+        .pjg-kpi-mono { font-family: 'JetBrains Mono', monospace; }
+        .pjg-kpi-pill {
+            display: inline-block; padding: 0.18rem 0.6rem;
+            background: var(--pjg-bg3); color: var(--pjg-text2);
+            border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+            cursor: pointer; user-select: none; margin-right: 0.3rem;
+        }
+        .pjg-kpi-pill:last-child { margin-right: 0; }
+        .pjg-kpi-pill.active, .pjg-kpi-pill-live.active {
+            background: var(--pjg-primary); color: #fff;
+        }
+        .pjg-kpi-pill-live.active {
+            background: #ef4444;  /* red "LIVE" tag like the reference */
+        }
+        @media (max-width: 880px) {
+            .pjg-kpi-cell { padding: 0.55rem 0.7rem; font-size: 0.72rem; }
+            .pjg-kpi-cell:last-child { width: 100%; flex: 1 1 100%; justify-content: flex-start; border-top: 1px solid var(--pjg-border); }
+        }
+
+        /* The map container should clip its top corners flat where the KPI strip sits */
+        #pjg-view-map .pjg-map-wrap { border-radius: 0 0 10px 10px; overflow: hidden; }
+
+        /* Right-side floating Technology panel (Leaflet L.control via rz-map addInfoPanel) */
+        .rzm-info-panel.pjg-tech-panel {
+            background: var(--pjg-bg2); color: var(--pjg-text);
+            border: 1px solid var(--pjg-border); border-radius: 12px;
+            box-shadow: var(--pjg-shadow-md);
+            min-width: 250px; max-width: 290px;
+            font-family: 'Inter', sans-serif; font-size: 0.78rem;
+            overflow: hidden;
+        }
+        .pjg-tech-panel-hdr {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.65rem 0.85rem;
+            background: var(--pjg-bg3);
+            border-bottom: 1px solid var(--pjg-border);
+        }
+        .pjg-tech-panel-hdr h4 { font-size: 0.82rem; font-weight: 800; color: var(--pjg-text); margin: 0; letter-spacing: 0.04em; }
+        .pjg-tech-panel-close {
+            background: none; border: 0; color: var(--pjg-text3);
+            cursor: pointer; font-size: 1rem; padding: 0; line-height: 1;
+        }
+        .pjg-tech-panel-close:hover { color: var(--pjg-text); }
+        .pjg-tech-panel-body { padding: 0.5rem 0; max-height: 65vh; overflow-y: auto; }
+        .pjg-tech-section {
+            border-bottom: 1px solid var(--pjg-border);
+        }
+        .pjg-tech-section:last-child { border-bottom: 0; }
+        .pjg-tech-section-hdr {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.45rem 0.85rem; font-size: 0.7rem; letter-spacing: 0.08em;
+            color: var(--pjg-text3); text-transform: uppercase; font-weight: 700;
+        }
+        .pjg-tech-row {
+            display: flex; align-items: center; gap: 0.6rem;
+            padding: 0.34rem 0.85rem; cursor: pointer;
+            transition: background-color 0.1s;
+        }
+        .pjg-tech-row:hover { background: var(--pjg-bg3); }
+        .pjg-tech-row input[type="checkbox"] {
+            margin: 0; accent-color: var(--pjg-primary); flex: 0 0 auto;
+        }
+        .pjg-tech-row .pjg-tech-dot {
+            width: 10px; height: 10px; border-radius: 999px; flex: 0 0 auto;
+            background: var(--pjg-text3);
+        }
+        .pjg-tech-row .pjg-tech-label { flex: 1 1 auto; color: var(--pjg-text); }
+        .pjg-tech-row .pjg-tech-count {
+            color: var(--pjg-text3); font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;
+        }
+        .pjg-tech-row.disabled .pjg-tech-label,
+        .pjg-tech-row.disabled .pjg-tech-count { opacity: 0.4; text-decoration: line-through; }
+        .pjg-tech-total {
+            padding: 0.45rem 0.85rem; font-size: 0.72rem; color: var(--pjg-text2);
+            text-align: right; font-family: 'JetBrains Mono', monospace;
+            border-top: 1px solid var(--pjg-border);
+        }
+        .pjg-tech-panel-collapsed .pjg-tech-panel-body { display: none; }
     </style>
 </head>
 <body>
@@ -778,6 +879,15 @@
 
         <!-- VIEW: MAP -->
         <section class="pjg-section pjg-view active" id="pjg-view-map" role="tabpanel" aria-label="Geographic map">
+            <!-- TOP KPI STRIP (mirrors energydashboard.co.uk/map) -->
+            <div class="pjg-map-kpi-strip" id="pjg-map-kpi-strip" aria-label="Live grid KPIs">
+                <div class="pjg-kpi-cell"><i class="fas fa-bolt" aria-hidden="true"></i><span class="pjg-kpi-label">Sites</span><span class="pjg-kpi-val" id="pjg-kpi-sites">--</span></div>
+                <div class="pjg-kpi-cell"><span class="pjg-kpi-pill" id="pjg-kpi-pill-all">All</span><span class="pjg-kpi-pill pjg-kpi-pill-live" id="pjg-kpi-pill-live">Live</span></div>
+                <div class="pjg-kpi-cell"><i class="fas fa-broadcast-tower" aria-hidden="true"></i><span class="pjg-kpi-label">Net Output</span><span class="pjg-kpi-val pjg-kpi-val-warm" id="pjg-kpi-output">-- MW</span></div>
+                <div class="pjg-kpi-cell"><i class="fas fa-arrow-down" aria-hidden="true"></i><span class="pjg-kpi-label">Turn Down</span><span class="pjg-kpi-val" id="pjg-kpi-turndown">-- MW</span></div>
+                <div class="pjg-kpi-cell"><i class="fas fa-arrow-up" aria-hidden="true"></i><span class="pjg-kpi-label">Turn Up</span><span class="pjg-kpi-val" id="pjg-kpi-turnup">-- MW</span></div>
+                <div class="pjg-kpi-cell"><i class="far fa-clock" aria-hidden="true"></i><span class="pjg-kpi-val pjg-kpi-mono" id="pjg-kpi-time">--:-- WIB</span></div>
+            </div>
             <div class="pjg-map-wrap">
                 <div id="pjg-map" aria-label="Geographic map of the Java-Bali transmission grid"></div>
             </div>
@@ -992,9 +1102,11 @@
     <script src="script.min.js?v=20260324b" defer></script>
     <script src="auth.js?v=20260324b" defer></script>
     <script src="rz-engine.js?v=2026-04-28" defer></script>
-    <script src="js/rz-map.js?v=2026-04-29-v3" defer></script>
+    <script src="js/rz-map.js?v=2026-05-01-v1" defer></script>
     <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
     <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
+    <script src="js/pln-energy-data.js?v=2026-05-01-v1" defer></script>
+    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v1" defer></script>
 
     <script>
     (function () {
@@ -1190,6 +1302,141 @@
                 }
             });
             setTimeout(function () { if (STATE.mapInst && STATE.mapInst.refresh) STATE.mapInst.refresh(); }, 120);
+
+            // ========== Map UI upgrade — top KPI strip + right-side technology panel ==========
+            populateMapKpiStrip(nodes);
+            mountTechnologyPanel(nodes);
+        }
+
+        /* Populate the top KPI strip with site count + live snapshot from PLN_ENERGY_DATA. */
+        function populateMapKpiStrip(nodes) {
+            var $sites = document.getElementById('pjg-kpi-sites');
+            var $output = document.getElementById('pjg-kpi-output');
+            var $turndown = document.getElementById('pjg-kpi-turndown');
+            var $turnup = document.getElementById('pjg-kpi-turnup');
+            var $time = document.getElementById('pjg-kpi-time');
+            if ($sites) $sites.textContent = String(nodes.length);
+            var snap = (window.PLN_ENERGY_DATA && window.PLN_ENERGY_DATA.snapshot) || null;
+            if (snap) {
+                if ($output) $output.textContent = (snap.demand_mw / 1000).toFixed(1) + ' GW';
+                if ($turndown) $turndown.textContent = snap.turn_down_mw + ' MW';
+                if ($turnup) $turnup.textContent = snap.turn_up_mw + ' MW';
+                if ($time) {
+                    var d = new Date(snap.timestamp);
+                    if (!isNaN(d.getTime())) {
+                        $time.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ' WIB';
+                    }
+                }
+            }
+            // Pill toggle (visual only; both All and Live default visible)
+            var pillAll = document.getElementById('pjg-kpi-pill-all');
+            var pillLive = document.getElementById('pjg-kpi-pill-live');
+            if (pillLive) pillLive.classList.add('active');
+            if (pillAll) pillAll.addEventListener('click', function () {
+                pillAll.classList.add('active');
+                if (pillLive) pillLive.classList.remove('active');
+            });
+            if (pillLive) pillLive.addEventListener('click', function () {
+                pillLive.classList.add('active');
+                if (pillAll) pillAll.classList.remove('active');
+            });
+        }
+
+        /* Mount the right-side floating Technology panel via RZMap's addInfoPanel.
+           The panel is bidirectional with the existing horizontal fieldsets above
+           the map: any change in the panel updates the fieldset and vice versa. */
+        function mountTechnologyPanel(nodes) {
+            if (!STATE.mapInst || typeof STATE.mapInst.addInfoPanel !== 'function') return;
+            // Tally counts from the dataset
+            var fuelCounts = { coal: 0, gas: 0, hydro: 0, geo: 0, solar: 0, biomass: 0, wind: 0, diesel: 0 };
+            var voltageCounts = { v500: 0, v275: 0, v150: 0, v70: 0, v20: 0 };
+            for (var i = 0; i < nodes.length; i++) {
+                var n = nodes[i];
+                if (n.kind === 'plant' && n.fuel && fuelCounts.hasOwnProperty(n.fuel)) fuelCounts[n.fuel]++;
+                if (n.voltage && voltageCounts.hasOwnProperty('v' + n.voltage)) voltageCounts['v' + n.voltage]++;
+            }
+            var fuelDots = { coal: '#475569', gas: '#3b82f6', hydro: '#06b6d4', geo: '#f97316', solar: '#facc15', biomass: '#84cc16', wind: '#a78bfa', diesel: '#94a3b8' };
+            var totalPlants = 0;
+            for (var f in fuelCounts) if (fuelCounts.hasOwnProperty(f)) totalPlants += fuelCounts[f];
+            // Fuel rows
+            var fuelRows = '';
+            ['coal','gas','hydro','geo','solar','biomass','wind'].forEach(function (f) {
+                var checked = (STATE.fuelOn && STATE.fuelOn[f] !== false) ? 'checked' : '';
+                fuelRows += '<label class="pjg-tech-row"><input type="checkbox" data-panel-fuel="' + f + '" ' + checked + '><span class="pjg-tech-dot" style="background:' + fuelDots[f] + '"></span><span class="pjg-tech-label">' + (f.charAt(0).toUpperCase() + f.slice(1)) + '</span><span class="pjg-tech-count">' + fuelCounts[f] + '</span></label>';
+            });
+            // Voltage rows
+            var vRows = '';
+            [['v500','500 kV'],['v275','275 kV'],['v150','150 kV'],['v70','70 kV'],['v20','20 kV']].forEach(function (pair) {
+                var key = pair[0];
+                var label = pair[1];
+                var checked = (STATE.voltageOn && STATE.voltageOn[key.replace('v','')]) ? 'checked' : '';
+                vRows += '<label class="pjg-tech-row"><input type="checkbox" data-panel-layer="' + key + '" ' + checked + '><span class="pjg-tech-dot" style="background:' + (key === 'v500' ? '#3b82f6' : key === 'v275' ? '#a78bfa' : key === 'v150' ? '#f87171' : '#facc15') + '"></span><span class="pjg-tech-label">' + label + '</span><span class="pjg-tech-count">' + voltageCounts[key] + '</span></label>';
+            });
+            // Display rows
+            var displayRows = ''
+                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="labels"><span class="pjg-tech-label">Labels</span></label>'
+                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="capacity"><span class="pjg-tech-label">Capacity</span></label>'
+                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="kvbadges" checked><span class="pjg-tech-label">kV badges</span></label>';
+            var html = ''
+                + '<div class="rzm-info-panel pjg-tech-panel">'
+                + '<div class="pjg-tech-panel-hdr">'
+                + '<h4>Technology</h4>'
+                + '<button type="button" class="pjg-tech-panel-close" id="pjg-tech-panel-toggle" aria-label="Collapse panel">&minus;</button>'
+                + '</div>'
+                + '<div class="pjg-tech-panel-body">'
+                + '<div class="pjg-tech-section">'
+                + '<div class="pjg-tech-section-hdr"><span>Plants by fuel</span></div>'
+                + fuelRows
+                + '<div class="pjg-tech-total">Total plants: ' + totalPlants + '</div>'
+                + '</div>'
+                + '<div class="pjg-tech-section">'
+                + '<div class="pjg-tech-section-hdr"><span>Voltage</span></div>'
+                + vRows
+                + '</div>'
+                + '<div class="pjg-tech-section">'
+                + '<div class="pjg-tech-section-hdr"><span>Display</span></div>'
+                + displayRows
+                + '</div>'
+                + '</div>'
+                + '</div>';
+            try { STATE.mapInst.addInfoPanel(html, 'topright'); } catch (e) { /* no-op */ }
+            // Bidirectional sync: panel checkbox change → fire click on the matching horizontal fieldset checkbox
+            document.addEventListener('change', function (ev) {
+                var t = ev.target;
+                if (!t) return;
+                var f = t.getAttribute('data-panel-fuel');
+                var l = t.getAttribute('data-panel-layer');
+                var d = t.getAttribute('data-panel-display');
+                if (f) {
+                    var hf = document.querySelector('[data-fuel="' + f + '"]');
+                    if (hf && hf.checked !== t.checked) { hf.checked = t.checked; hf.dispatchEvent(new Event('change', { bubbles: true })); }
+                } else if (l) {
+                    var hl = document.querySelector('[data-layer="' + l + '"]');
+                    if (hl && hl.checked !== t.checked) { hl.checked = t.checked; hl.dispatchEvent(new Event('change', { bubbles: true })); }
+                } else if (d) {
+                    var hd = document.querySelector('[data-display="' + d + '"]');
+                    if (hd && hd.checked !== t.checked) { hd.checked = t.checked; hd.dispatchEvent(new Event('change', { bubbles: true })); }
+                } else {
+                    // Reverse direction: fieldset → panel
+                    var fwd = t.getAttribute('data-fuel') || t.getAttribute('data-layer') || t.getAttribute('data-display');
+                    if (!fwd) return;
+                    var sel = t.getAttribute('data-fuel') ? '[data-panel-fuel="' + fwd + '"]'
+                            : t.getAttribute('data-layer') ? '[data-panel-layer="' + fwd + '"]'
+                            : '[data-panel-display="' + fwd + '"]';
+                    var p = document.querySelector(sel);
+                    if (p && p.checked !== t.checked) p.checked = t.checked;
+                }
+            });
+            // Collapse toggle
+            document.addEventListener('click', function (ev) {
+                if (ev.target && ev.target.id === 'pjg-tech-panel-toggle') {
+                    var panel = ev.target.closest('.pjg-tech-panel');
+                    if (panel) {
+                        panel.classList.toggle('pjg-tech-panel-collapsed');
+                        ev.target.textContent = panel.classList.contains('pjg-tech-panel-collapsed') ? '+' : '−';
+                    }
+                }
+            });
         }
 
         // ========== SLD ==========
