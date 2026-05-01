@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/js/pln-java-grid-data.schema.json",
+  "title": "PLN Java-Bali Grid Dataset",
+  "description": "Schema for window.PLN_JAVA_GRID exposed by js/pln-java-grid-data.js. Authoritative narrative: standarization/PLN_DATA_SCHEMA.md",
+  "type": "object",
+  "required": ["version", "nodes", "edges", "national"],
+  "additionalProperties": true,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-v[0-9]+$",
+      "description": "YYYY-MM-DD-vN; matches tools/pln-java-grid-overlay.yaml version"
+    },
+    "nodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Node" }
+    },
+    "edges": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Edge" }
+    },
+    "national": { "$ref": "#/$defs/NationalStats" }
+  },
+  "$defs": {
+    "Voltage": {
+      "type": "integer",
+      "enum": [500, 275, 150, 70, 20]
+    },
+    "Province": {
+      "type": "string",
+      "enum": ["jakarta-banten", "jabar", "jateng", "jatim", "bali"]
+    },
+    "Confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "Tier": {
+      "type": "integer",
+      "enum": [1, 2]
+    },
+    "Kind": {
+      "type": "string",
+      "enum": ["station", "plant"]
+    },
+    "Fuel": {
+      "type": "string",
+      "enum": ["coal", "gas", "hydro", "geothermal", "biomass", "solar", "diesel", "wind"]
+    },
+    "OsmType": {
+      "type": "string",
+      "enum": ["way", "node"]
+    },
+    "EdgeType": {
+      "type": "string",
+      "enum": ["overhead", "underground", "submarine"]
+    },
+    "Source": {
+      "type": "string",
+      "description": "osm | curated | inferred-nn | inferred-evacuation | pln-p2b-2016 | other named provenance"
+    },
+    "Node": {
+      "type": "object",
+      "required": ["id", "name", "kind", "voltage", "lat", "lng", "prov", "confidence", "source", "tier"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(osm_(node|way)_[0-9]+|curated_[a-z0-9_]+)$",
+          "description": "Stable id; OSM crawl uses osm_node_<n> / osm_way_<n>; curated overlays use curated_<slug>"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "kind": { "$ref": "#/$defs/Kind" },
+        "voltage": { "$ref": "#/$defs/Voltage" },
+        "secondary_voltages": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Voltage" },
+          "uniqueItems": true
+        },
+        "mva": { "type": "integer", "minimum": 0 },
+        "year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
+        "cod": { "type": "integer", "minimum": 1900, "maximum": 2100 },
+        "fuel": { "$ref": "#/$defs/Fuel" },
+        "prov": { "$ref": "#/$defs/Province" },
+        "lat": { "type": "number", "minimum": -8.8, "maximum": -5.6 },
+        "lng": { "type": "number", "minimum": 105.0, "maximum": 115.7 },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "tier": { "$ref": "#/$defs/Tier" },
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "operator": { "type": "string" },
+        "served_areas": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" },
+        "source": { "$ref": "#/$defs/Source" },
+        "osm_id": { "type": "integer" },
+        "osm_type": { "$ref": "#/$defs/OsmType" },
+        "wikidata": { "type": "string", "pattern": "^Q[0-9]+$" }
+      },
+      "allOf": [
+        {
+          "description": "tier=1 implies voltage in {500,275,150}",
+          "if": { "properties": { "tier": { "const": 1 } }, "required": ["tier"] },
+          "then": { "properties": { "voltage": { "enum": [500, 275, 150] } } }
+        },
+        {
+          "description": "tier=2 implies voltage in {70,20}",
+          "if": { "properties": { "tier": { "const": 2 } }, "required": ["tier"] },
+          "then": { "properties": { "voltage": { "enum": [70, 20] } } }
+        }
+      ]
+    },
+    "Edge": {
+      "type": "object",
+      "required": ["from", "to", "voltage", "km", "circuits", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "voltage": {
+          "type": "integer",
+          "enum": [500, 275, 150, 70]
+        },
+        "km": { "type": "number", "minimum": 0 },
+        "circuits": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "tier": { "$ref": "#/$defs/Tier" },
+        "type": { "$ref": "#/$defs/EdgeType" },
+        "source": { "$ref": "#/$defs/Source" },
+        "osm_way_id": { "type": "integer" }
+      }
+    },
+    "NationalStats": {
+      "type": "object",
+      "required": ["installedMW", "peakMW", "reservePct", "renewablePct", "dcMW", "substations", "txKm"],
+      "additionalProperties": false,
+      "properties": {
+        "installedMW": { "type": "integer", "minimum": 0 },
+        "peakMW": { "type": "integer", "minimum": 0 },
+        "reservePct": { "type": "number" },
+        "renewablePct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "dcMW": { "type": "integer", "minimum": 0 },
+        "substations": { "type": "integer", "minimum": 0 },
+        "txKm": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "ProvinceAggregate": {
+      "description": "Computed at runtime by js/pln-energy-data.js — not stored in the dataset itself but documented here so consumers can rely on a stable shape.",
+      "type": "object",
+      "required": ["prov", "installedMW", "peakMW", "reserveMW", "utilizationPct", "stations", "plants"],
+      "additionalProperties": false,
+      "properties": {
+        "prov": { "$ref": "#/$defs/Province" },
+        "installedMW": { "type": "integer", "minimum": 0 },
+        "peakMW": { "type": "number", "minimum": 0 },
+        "reserveMW": { "type": "number" },
+        "utilizationPct": { "type": "number", "minimum": 0, "maximum": 200 },
+        "stations": { "type": "integer", "minimum": 0 },
+        "plants": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
