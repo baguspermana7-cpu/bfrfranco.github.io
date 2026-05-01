@@ -6892,7 +6892,7 @@ mc('var(--c)','Environmental','ASHRAE A1 + DLC',[['Dry bulb','18-27\u00B0C'],['H
 mc('var(--p)','Hall Layout','Dimensions (DLC-Adapted)',[['Size','32m\u00D720m (640m\u00B2)'],['Height','4.2m clear'],['Floor','Slab-on-grade (no raised floor)'],['Hot aisle','1.2m contained'],['Cold aisle','1.2m supply air'],['End-of-row','1.5m CDU + walkway'],['CDU','2\u00D7 EoR per row-pair (6 total)'],['TCS routing','Overhead \u2192 vertical riser \u2192 CDU \u2192 rack'],['Elec room','80m\u00B2 adjacent'],['Emergency exit','2\u00D7 opposite corners']])
 ].join('');
 // BMS ARCHITECTURE DIAGRAM - Ring Topology with Field to Server
-$('bmsSu').textContent='Field Devices → Gateways → PLC/DDC → Ring Network → Redundant Servers (MMR01/MMR02) → DCIM/SCADA';
+$('bmsSu').textContent='Field (L0) → Gateways → PLC/DDC (L1) → LDC operator touchpanels (L2) → Fiber ring → Redundant Servers (L3) → DCIM/SCADA';
 (function(){const el=$('bmsC');if(!el)return;let s='';
 s+=`<rect width="960" height="480" fill="var(--bg2)"/>`;
 s+=`<pattern id="bmsGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.015)" stroke-width=".3"/></pattern>`;
@@ -6974,10 +6974,50 @@ s+=tx(rn.x,148,rn.l,'var(--o)',isCore?6:4.5,'middle',1);
 // Status indicator - ONLY PULSE/GLOW, NOT MOVE
 s+=`<circle cx="${rn.x+18}" cy="140" r="3" fill="var(--g)"><animate attributeName="opacity" values="0.4;1;0.4" dur="${1.5+ri*0.1}s" repeatCount="indefinite"/><animate attributeName="r" values="2.5;3.5;2.5" dur="${1.5+ri*0.1}s" repeatCount="indefinite"/></circle>`;
 });
-// Connections from PLC to ring with flowing animation
+// Connections from PLC to ring with flowing animation (passes behind LDC layer)
 for(let i=0;i<8;i++){
 const px=92+i*120;
 s+=`<line x1="${px}" y1="225" x2="${px}" y2="157" stroke="var(--p)" stroke-width="1" stroke-dasharray="5 3" opacity=".6"><animate attributeName="stroke-dashoffset" values="0;-16" dur="${1.5+i*0.1}s" repeatCount="indefinite"/></line>`;
+}
+// ===== LDC LAYER — L2 Supervisory (Local Display Controllers) — IEC 62443 =====
+// Field-level operator touchpanels at chiller plant, e-house A/B, NOC, BMS room.
+// Sits between L1 Controller (PLC/DDC) and L3 Operations (Servers/SCADA).
+// Drawn AFTER PLC-to-Ring lines so the LDC boxes visually overlay them at the tap points.
+s+=`<rect x="10" y="163" width="940" height="32" rx="4" fill="rgba(167,139,250,.04)" stroke="rgba(167,139,250,.28)" stroke-width="1" stroke-dasharray="2 2"/>`;
+s+=tx(480,170,'L2 SUPERVISORY — LDC (LOCAL DISPLAY CONTROLLERS) — IEC 62443 ZONE','var(--p)',5.5,'middle',1);
+const ldcs=[
+{x:20,t:'LDC-01',s:'CHILLER PLT',c:'Schneider Magelis 12"',z:'L2'},
+{x:210,t:'LDC-02',s:'EHOUSE-A MV',c:'Siemens KTP1500 15"',z:'L2'},
+{x:400,t:'LDC-03',s:'EHOUSE-B MV',c:'Siemens KTP1500 15"',z:'L2'},
+{x:590,t:'LDC-04',s:'NOC CONSOLE',c:'Wonderware InTouch SE',z:'L2'},
+{x:780,t:'LDC-05',s:'BMS-RM ENG',c:'AVEVA SystemPlatform',z:'L2'}
+];
+ldcs.forEach((d,di)=>{
+s+=`<g data-tip="${d.t}: ${d.c} — Field operator touchpanel at ${d.s}. IEC 62443 Zone L2 Supervisory. Local override permitted; every action logged via OPC UA to historian. Connected to L1 controllers via Profinet/IEC 61850/BACnet.">`;
+s+=`<rect x="${d.x}" y="176" width="170" height="16" rx="2" fill="rgba(167,139,250,.10)" stroke="var(--p)" stroke-width=".7"/>`;
+// touchpanel screen indicator
+s+=`<rect x="${d.x+3}" y="178" width="22" height="12" rx=".5" fill="rgba(167,139,250,.22)" stroke="var(--p)" stroke-width=".3"/>`;
+// 3 horizontal "screen lines" suggest a UI
+s+=`<line x1="${d.x+5}" y1="181" x2="${d.x+22}" y2="181" stroke="var(--p)" stroke-width=".4" opacity=".7"/>`;
+s+=`<line x1="${d.x+5}" y1="184" x2="${d.x+18}" y2="184" stroke="var(--p)" stroke-width=".4" opacity=".5"/>`;
+s+=`<line x1="${d.x+5}" y1="187" x2="${d.x+20}" y2="187" stroke="var(--p)" stroke-width=".4" opacity=".5"/>`;
+s+=tx(d.x+38,184,d.t,'var(--p)',4.5,'start',1);
+s+=tx(d.x+38,190,d.s,'var(--t2)',3.5,'start');
+s+=tx(d.x+165,190,d.c,'var(--t3)',3,'end');
+// IEC 62443 zone badge
+s+=`<rect x="${d.x+150}" y="178" width="16" height="6" rx="1" fill="rgba(245,158,11,.2)" stroke="var(--o)" stroke-width=".3"/>`;
+s+=tx(d.x+158,182.5,d.z,'var(--o)',3.5,'middle',1);
+// pulsing screen-on indicator (subtle, professional — opacity only, no spatial movement)
+s+=`<circle cx="${d.x+18}" cy="182" r=".9" fill="var(--g)"><animate attributeName="opacity" values="0.45;1;0.45" dur="${2.4+di*0.15}s" repeatCount="indefinite"/></circle>`;
+s+='</g>';
+});
+// LDC tap-points: thin connections both up to ring (carrier) and down to PLC (controller)
+for(let i=0;i<5;i++){
+const lx=105+i*190;
+// upward to ring (OPC UA / read path)
+s+=`<line x1="${lx}" y1="176" x2="${lx}" y2="160" stroke="var(--p)" stroke-width=".5" stroke-dasharray="2 2" opacity=".35"/>`;
+// downward to PLC (control write path)
+s+=`<line x1="${lx}" y1="192" x2="${lx}" y2="225" stroke="var(--p)" stroke-width=".5" stroke-dasharray="2 2" opacity=".35"/>`;
 }
 // ===== SERVER LAYER (Top) =====
 s+=`<rect x="250" y="25" width="460" height="80" rx="4" fill="rgba(239,68,68,.03)" stroke="rgba(239,68,68,.2)" stroke-width="1"/>`;
