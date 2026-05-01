@@ -214,7 +214,7 @@
    * ========================================================= */
 
   var PLN_ENERGY_DATA = {
-    version: '2026-05-01-v4',
+    version: '2026-05-01-v5',
     units: { power: 'MW', energy: 'GWh', emissions: 'gCO2/kWh' },
 
     // ---------- National snapshot (evening peak, representative of PLN AR 2024 + RUPTL 2025-2034) ----------

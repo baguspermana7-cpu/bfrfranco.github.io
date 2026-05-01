@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-01-v4
+ * @version 2026-05-01-v5
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -37,16 +37,21 @@
   /**
    * Carbon-intensity gradient stops (gCO₂/kWh → hex colour).
    * Continuous interpolation between adjacent stops.
-   * Range tuned for global grids 0-1500; mirrors electricitymaps.com.
+   * Heat-map style: green (clean) → yellow → orange → red → dark brown
+   * → near-black (very dirty). Range tuned for global grids 0-1500
+   * with darker mid-range so 600-900 gCO₂/kWh (typical coal-heavy
+   * grids) lands on saturated brown — matches the electricitymaps
+   * Indonesia view where ~640 gCO₂eq/kWh shows deep brown.
    */
   var CARBON_STOPS = [
-    [0,    '#fef3c7'],  // very clean — pale yellow
-    [300,  '#fde68a'],  // light yellow
-    [500,  '#fbbf24'],  // amber
-    [700,  '#f59e0b'],  // dark amber
-    [900,  '#b45309'],  // brown
-    [1100, '#7c2d12'],  // dark brown
-    [1500, '#3f1d10']   // very dirty — near-black brown
+    [0,    '#10b981'],  // very clean — emerald green
+    [150,  '#a3e635'],  // low-carbon — lime
+    [300,  '#fde047'],  // moderate — yellow
+    [450,  '#fb923c'],  // elevated — orange
+    [600,  '#ea580c'],  // high — red-orange
+    [800,  '#9a3412'],  // very high — red-brown
+    [1000, '#7c2d12'],  // coal-heavy — dark brown
+    [1500, '#1c0701']   // worst case — near-black
   ];
 
   var CARBON_LEGEND_MIN = 0;
@@ -222,7 +227,7 @@
             var co2  = agg.carbonIntensity !== undefined ? agg.carbonIntensity : 0;
             return {
               fillColor:   carbonColor(co2),
-              fillOpacity: 0.88,
+              fillOpacity: 0.92,
               weight:      0,         // NO stroke — adjacent provinces meet pixel-perfect, no overlap
               color:       'transparent',
               stroke:      false
@@ -270,7 +275,7 @@
   function addChoroplethLegend(map, position) {
     if (!map) { warn('addChoroplethLegend: map is required'); return null; }
 
-    var ctrl = L.control({ position: position || 'bottomright' });
+    var ctrl = L.control({ position: position || 'bottomleft' });
 
     ctrl.onAdd = function () {
       var div = document.createElement('div');
@@ -342,7 +347,7 @@
   function addChoroplethToggleButton(map, state, position) {
     if (!map) { warn('addChoroplethToggleButton: map is required'); return null; }
 
-    var ctrl = L.control({ position: position || 'topright' });
+    var ctrl = L.control({ position: position || 'topleft' });
     var btnRef = null;
     var enabled = !!(state && state.layer);
 

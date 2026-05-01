@@ -1334,8 +1334,8 @@
     <script src="js/rz-map.js?v=2026-05-01-v1" defer></script>
     <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>
     <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
-    <script src="js/pln-energy-data.js?v=2026-05-01-v4" defer></script>
-    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v4" defer></script>
+    <script src="js/pln-energy-data.js?v=2026-05-01-v5" defer></script>
+    <script src="js/pln-energy-dashboard.js?v=2026-05-01-v5" defer></script>
 
     <script>
     (function () {
@@ -1692,9 +1692,19 @@
                     typeof EDB.renderProvinceChoropleth !== 'function') {
                     console.warn('[PJG] choropleth helpers missing'); return;
                 }
-                var aggs = ED.computeProvinceAggregates(window.PLN_JAVA_GRID || {});
+                // BUG FIX (2026-05-01-v5): computeProvinceAggregates returns an
+                // ARRAY but the choropleth helper expects a map keyed by prov.
+                // Convert here so each polygon picks up its actual carbonIntensity
+                // (was always 0 → palest stop → uniform pale-yellow render).
+                var aggsArr = ED.computeProvinceAggregates(window.PLN_JAVA_GRID || {});
+                var aggs = {};
+                if (Array.isArray(aggsArr)) {
+                    aggsArr.forEach(function (a) { if (a && a.prov) aggs[a.prov] = a; });
+                } else {
+                    aggs = aggsArr || {};
+                }
                 choroplethState.legendFactory = function (m) {
-                    return EDB.addChoroplethLegend(m, 'bottomright');
+                    return EDB.addChoroplethLegend(m, 'bottomleft');
                 };
                 Promise.resolve(EDB.renderProvinceChoropleth(STATE.mapInst.map, aggs, 'js/pln-indonesia-provinces.geojson'))
                     .then(function (layer) {
@@ -1703,7 +1713,7 @@
                             choroplethState.legend = choroplethState.legendFactory(STATE.mapInst.map);
                         }
                         if (typeof EDB.addChoroplethToggleButton === 'function' && !choroplethState.button) {
-                            choroplethState.button = EDB.addChoroplethToggleButton(STATE.mapInst.map, choroplethState, 'topright');
+                            choroplethState.button = EDB.addChoroplethToggleButton(STATE.mapInst.map, choroplethState, 'topleft');
                         }
                     })
                     .catch(function (err) { console.warn('[PJG] choropleth render failed', err); });
