@@ -634,6 +634,16 @@
             .dmt-markets-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
             .dmt-market-card-link { min-height: 120px; padding: 0.85rem 0.95rem; }
         }
+
+        /* Root-only gate overlay */
+        body.locked > nav, body.locked > section, body.locked > main, body.locked > .dmt-hero, body.locked > .dmt-markets-section { filter: blur(8px) saturate(0.6); pointer-events: none; user-select: none; }
+        .rz-restricted-overlay { position: fixed; inset: 0; z-index: 90000; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.85); backdrop-filter: blur(6px); }
+        body.locked .rz-restricted-overlay { display: flex; }
+        .rz-restricted-card { max-width: 420px; padding: 32px; background: #0f172a; border: 1px solid rgba(13,148,136,0.35); border-radius: 16px; text-align: center; color: #f1f5f9; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .rz-restricted-card h2 { margin: 0 0 8px; font-size: 1.25rem; }
+        .rz-restricted-card p { margin: 0 0 20px; color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
+        .rz-restricted-card button { padding: 10px 22px; border: none; border-radius: 10px; background: linear-gradient(135deg,#0d9488,#14b8a6); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        .rz-restricted-card button:hover { background: linear-gradient(135deg,#0f766e,#0d9488); }
     </style>
 </head>
 <body>
@@ -2106,5 +2116,46 @@
     <script src="rz-tracker.js"></script>
     <script src="auth.js?v=20260324b"></script>
 <script src="rz-engine.js?v=2026-04-28"></script>
+
+<!-- Root-only Gate Overlay -->
+<div class="rz-restricted-overlay" id="rzRestrictedOverlay" role="alertdialog" aria-labelledby="rzRestrictedTitle">
+    <div class="rz-restricted-card">
+        <h2 id="rzRestrictedTitle"><i class="fas fa-lock" style="color:#14b8a6;margin-right:8px;"></i>Restricted Access</h2>
+        <p>This module is available to root accounts only. Please sign in with an authorized account to continue.</p>
+        <button id="rootLoginBtn" type="button">Sign In</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    /* Email-based root gate via _rzAuth.isRootSession (auth.js).
+       Demo account is rejected — only bagus@/admin@ pass. */
+    function applyGate(){
+        var ok = window._rzAuth && typeof window._rzAuth.isRootSession === 'function' && window._rzAuth.isRootSession();
+        document.body.classList.toggle('locked', !ok);
+    }
+    document.addEventListener('click', function(e){
+        var t = e.target;
+        if (t && (t.id === 'rootLoginBtn' || (t.closest && t.closest('#rootLoginBtn')))) {
+            if (window._rzAuth) {
+                if (typeof window._rzAuth.showRootGatePrompt === 'function') {
+                    window._rzAuth.showRootGatePrompt('Root account required for DC Market.');
+                } else if (typeof window._rzAuth.showModal === 'function') {
+                    window._rzAuth.showModal();
+                }
+            }
+        }
+    });
+    window.addEventListener('rz-auth-change', function(){ setTimeout(applyGate, 50); });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyGate);
+    } else {
+        applyGate();
+    }
+    setTimeout(applyGate, 600);
+    setTimeout(applyGate, 1600);
+})();
+</script>
+
 </body>
 </html>
