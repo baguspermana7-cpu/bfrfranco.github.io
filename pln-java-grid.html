@@ -784,6 +784,91 @@
             border-top: 1px solid var(--pjg-border);
         }
         .pjg-tech-panel-collapsed .pjg-tech-panel-body { display: none; }
+
+        /* ============================================================
+           Live Energy Dashboard section (mirrors energydashboard.co.uk/live)
+           ============================================================ */
+        .pjg-live-kpi-bar {
+            display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 12px; overflow: hidden; margin: 0.6rem 0 1rem;
+        }
+        @media (max-width: 980px) { .pjg-live-kpi-bar { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 540px) { .pjg-live-kpi-bar { grid-template-columns: repeat(2, 1fr); } }
+        .pjg-live-kpi {
+            display: flex; flex-direction: column; gap: 0.25rem;
+            padding: 0.85rem 1rem;
+            border-right: 1px solid var(--pjg-border);
+            border-bottom: 1px solid var(--pjg-border);
+        }
+        .pjg-live-kpi-label { font-size: 0.66rem; letter-spacing: 0.12em; color: var(--pjg-text3); text-transform: uppercase; font-weight: 700; }
+        .pjg-live-kpi-val { font-size: 1.05rem; font-weight: 800; color: var(--pjg-text); font-family: 'JetBrains Mono', monospace; }
+        .pjg-live-kpi-warm { color: #ef4444; }
+        .pjg-live-kpi-good { color: #10b981; }
+
+        .pjg-live-card {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 1rem;
+        }
+        .pjg-live-card-hdr {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+        }
+        .pjg-live-card-hdr h3 { font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--pjg-text); }
+        .pjg-live-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .pjg-live-pill {
+            padding: 0.35rem 0.85rem; background: var(--pjg-bg3); color: var(--pjg-text2);
+            border: 1px solid var(--pjg-border); border-radius: 999px;
+            font-size: 0.74rem; font-weight: 600; cursor: pointer;
+            transition: all 0.15s;
+        }
+        .pjg-live-pill:hover { color: var(--pjg-primary); border-color: var(--pjg-primary); }
+        .pjg-live-pill.active {
+            background: var(--pjg-primary); color: white; border-color: var(--pjg-primary);
+        }
+        .pjg-live-toggles { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+        .pjg-live-toggle-label { font-size: 0.7rem; color: var(--pjg-text3); letter-spacing: 0.06em; }
+        .pjg-live-bar {
+            display: flex; width: 100%; height: 28px; border-radius: 6px; overflow: hidden;
+            background: var(--pjg-bg3); border: 1px solid var(--pjg-border);
+        }
+        .pjg-chart-wrap {
+            background: var(--pjg-bg); border: 1px solid var(--pjg-border);
+            border-radius: 10px; padding: 0.6rem; overflow: hidden;
+        }
+        .pjg-chart-wrap svg { display: block; width: 100%; height: auto; }
+        .pjg-live-breakdown {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+        }
+        .pjg-live-breakdown th, .pjg-live-breakdown td {
+            padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--pjg-border);
+            text-align: left;
+        }
+        .pjg-live-breakdown th {
+            background: var(--pjg-bg3); color: var(--pjg-text2); font-weight: 700;
+            font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .pjg-live-breakdown .num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+        .pjg-live-breakdown tr.total td { font-weight: 800; color: var(--pjg-text); border-bottom: 0; background: var(--pjg-bg3); }
+        .pjg-live-cta-card {
+            display: flex; align-items: center; gap: 1.1rem;
+            padding: 1.1rem 1.3rem;
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(168,139,250,0.04));
+            border: 1px solid rgba(59,130,246,0.25); border-radius: 14px;
+            text-decoration: none; color: inherit;
+            transition: transform 0.18s, border-color 0.18s, background 0.18s;
+        }
+        .pjg-live-cta-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--pjg-primary);
+            background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(168,139,250,0.08));
+        }
+        .pjg-live-cta-icon { font-size: 1.6rem; color: var(--pjg-primary); flex: 0 0 auto; }
+        .pjg-live-cta-body { flex: 1 1 auto; min-width: 0; }
+        .pjg-live-cta-body h3 { font-size: 1rem; font-weight: 800; margin: 0 0 0.3rem; color: var(--pjg-text); }
+        .pjg-live-cta-body p { font-size: 0.82rem; color: var(--pjg-text2); margin: 0; line-height: 1.5; }
+        .pjg-live-cta-body p a { color: var(--pjg-accent); text-decoration: none; border-bottom: 1px dashed var(--pjg-accent); }
+        .pjg-live-cta-arrow { font-size: 1.2rem; color: var(--pjg-primary); flex: 0 0 auto; }
     </style>
 </head>
 <body>
@@ -1030,6 +1115,94 @@
                 <div class="pjg-prov-tabs" id="pjg-prov-tabs"></div>
                 <div id="pjg-prov-body"></div>
             </div>
+        </section>
+
+        <!-- LIVE ENERGY DASHBOARD (mirrors energydashboard.co.uk/live) -->
+        <section class="pjg-section" id="pjg-live-dashboard">
+            <h2 class="pjg-section-title">Live Energy Dashboard</h2>
+            <p class="pjg-section-desc">
+                Java-Bali generation mix, demand, and carbon intensity — modeled after
+                <a href="https://www.energydashboard.co.uk/live" target="_blank" rel="noopener">energydashboard.co.uk/live</a>.
+                Static representative figures based on PLN AR 2024, RUPTL 2025-2034, BPS Statistical Indonesia 2024,
+                and IEA Indonesia 2024 — not real-time telemetry.
+            </p>
+
+            <!-- Top KPI bar (mirrors grid.iamkate.com compact KPI row) -->
+            <div class="pjg-live-kpi-bar" aria-label="Live KPIs">
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Time</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-time">--:--</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Demand</span><span class="pjg-live-kpi-val" id="pjg-live-demand">-- GW</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Generation</span><span class="pjg-live-kpi-val" id="pjg-live-gen">-- GW</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Reserve</span><span class="pjg-live-kpi-val" id="pjg-live-reserve">-- GW</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Emissions</span><span class="pjg-live-kpi-val pjg-live-kpi-warm" id="pjg-live-emissions">-- gCO₂/kWh</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Renewables</span><span class="pjg-live-kpi-val pjg-live-kpi-good" id="pjg-live-renew">--%</span></div>
+                <div class="pjg-live-kpi"><span class="pjg-live-kpi-label">Frequency</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-freq">-- Hz</span></div>
+            </div>
+
+            <!-- Generation mix horizontal stacked bar + filter pills -->
+            <div class="pjg-live-card">
+                <div class="pjg-live-card-hdr">
+                    <h3>Generation mix</h3>
+                    <div class="pjg-live-pills" id="pjg-live-mix-pills">
+                        <button class="pjg-live-pill active" data-mix="all">All Sources</button>
+                        <button class="pjg-live-pill" data-mix="renewables">Renewables</button>
+                        <button class="pjg-live-pill" data-mix="low_carbon">Low Carbon</button>
+                        <button class="pjg-live-pill" data-mix="fossil">Fossil Fuels</button>
+                    </div>
+                </div>
+                <div class="pjg-live-bar" id="pjg-live-mix-bar"></div>
+            </div>
+
+            <!-- 24h Generation & Demand stacked-area chart -->
+            <div class="pjg-live-card">
+                <div class="pjg-live-card-hdr">
+                    <h3>24h Generation &amp; Demand</h3>
+                    <div class="pjg-live-toggles">
+                        <span class="pjg-live-toggle-label">Range</span>
+                        <button class="pjg-live-pill active" data-range="1d">1d</button>
+                        <button class="pjg-live-pill" data-range="2d">2d</button>
+                    </div>
+                </div>
+                <div class="pjg-chart-wrap">
+                    <svg id="pjg-live-stack" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet" role="img" aria-label="24-hour generation and demand stacked area chart"></svg>
+                </div>
+            </div>
+
+            <!-- 24h Carbon intensity line chart -->
+            <div class="pjg-live-card">
+                <div class="pjg-live-card-hdr">
+                    <h3>24h Carbon intensity</h3>
+                </div>
+                <div class="pjg-chart-wrap">
+                    <svg id="pjg-live-carbon" viewBox="0 0 720 140" preserveAspectRatio="xMidYMid meet" role="img" aria-label="24-hour carbon intensity line chart"></svg>
+                </div>
+            </div>
+
+            <!-- Generation breakdown table -->
+            <div class="pjg-live-card">
+                <div class="pjg-live-card-hdr">
+                    <h3>Generation breakdown</h3>
+                </div>
+                <table class="pjg-live-breakdown" id="pjg-live-breakdown">
+                    <thead><tr>
+                        <th>Source</th>
+                        <th class="num">GW</th>
+                        <th class="num">%</th>
+                        <th class="num">GWh today</th>
+                        <th class="num">tCO₂ today</th>
+                    </tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Historical CTA card -->
+            <a href="pln-java-grid-historical.html" class="pjg-live-cta-card">
+                <div class="pjg-live-cta-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                <div class="pjg-live-cta-body">
+                    <h3>Historical Trends</h3>
+                    <p>10-year generation mix, demand growth, and renewable transition. Mirrors <a href="https://www.energydashboard.co.uk/historical" target="_blank" rel="noopener" onclick="event.stopPropagation()">energydashboard.co.uk/historical</a>.</p>
+                </div>
+                <div class="pjg-live-cta-arrow"><i class="fas fa-arrow-right"></i></div>
+            </a>
         </section>
 
         <!-- SOURCES STRIP -->
@@ -2011,6 +2184,145 @@
             document.addEventListener('DOMContentLoaded', boot);
         } else {
             boot();
+        }
+    })();
+    </script>
+
+    <!-- Live Energy Dashboard renderer (consumes window.PLN_ENERGY_DATA + window.PLN_ENERGY_DASHBOARD) -->
+    <script>
+    (function () {
+        function init() {
+            var ED = window.PLN_ENERGY_DATA;
+            var EDB = window.PLN_ENERGY_DASHBOARD;
+            if (!ED || !EDB) {
+                console.warn('[PJG-live] PLN_ENERGY_DATA or PLN_ENERGY_DASHBOARD missing; live dashboard skipped');
+                return;
+            }
+            var snap = ED.snapshot;
+            // ---- KPI bar ----
+            var d = new Date(snap.timestamp);
+            var hh = isNaN(d.getTime()) ? '--' : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            setText('pjg-live-time', hh);
+            setText('pjg-live-demand', (snap.demand_mw / 1000).toFixed(1) + ' GW');
+            setText('pjg-live-gen', (snap.generation_mw / 1000).toFixed(1) + ' GW');
+            setText('pjg-live-reserve', (snap.reserve_mw / 1000).toFixed(1) + ' GW');
+            setText('pjg-live-emissions', snap.carbon_intensity + ' gCO₂/kWh');
+            setText('pjg-live-renew', snap.renewable_pct.toFixed(1) + '%');
+            setText('pjg-live-freq', snap.frequency_hz.toFixed(2) + ' Hz');
+
+            // ---- Generation mix horizontal stacked bar ----
+            var bar = document.getElementById('pjg-live-mix-bar');
+            if (bar && typeof EDB.renderBarSegment === 'function') {
+                var segs = ED.fuels.map(function (f) {
+                    return { id: f.id, label: f.label, color: f.color, pct: f.pct };
+                });
+                EDB.renderBarSegment(bar, segs);
+            }
+            // Pill toggle: dim non-matching groups
+            var pillsEl = document.getElementById('pjg-live-mix-pills');
+            if (pillsEl) {
+                pillsEl.addEventListener('click', function (ev) {
+                    var btn = ev.target.closest('.pjg-live-pill');
+                    if (!btn) return;
+                    var mix = btn.getAttribute('data-mix');
+                    pillsEl.querySelectorAll('.pjg-live-pill').forEach(function (b) { b.classList.toggle('active', b === btn); });
+                    var segments = bar.querySelectorAll('[data-fuel-id]');
+                    segments.forEach(function (s) {
+                        var id = s.getAttribute('data-fuel-id');
+                        var fuel = ED.fuels.find(function (f) { return f.id === id; });
+                        var keep = (mix === 'all')
+                            || (mix === 'renewables' && fuel && fuel.group === 'renewable')
+                            || (mix === 'low_carbon' && fuel && (fuel.group === 'renewable' || fuel.id === 'nuclear'))
+                            || (mix === 'fossil' && fuel && fuel.group === 'fossil');
+                        s.style.opacity = keep ? '1' : '0.25';
+                    });
+                });
+            }
+
+            // ---- 24h stacked-area chart ----
+            var stackSvg = document.getElementById('pjg-live-stack');
+            if (stackSvg && typeof EDB.renderStackedAreaSVG === 'function') {
+                var hourLabels = [];
+                for (var h = 0; h < 24; h++) hourLabels.push((h % 4 === 0) ? (String(h).padStart(2, '0') + ':00') : '');
+                var series = ED.fuels.map(function (f) {
+                    return {
+                        id: f.id, label: f.label, color: f.color,
+                        values: ED.hourly_24h.map(function (hr) { return (hr.by_fuel[f.id] || 0) / 1000; })
+                    };
+                });
+                var demandLine = {
+                    values: ED.hourly_24h.map(function (hr) { return hr.demand_mw / 1000; }),
+                    label: 'Demand', color: '#f1f5f9'
+                };
+                EDB.renderStackedAreaSVG(stackSvg, series, {
+                    width: 720, height: 240, xLabels: hourLabels, yLabel: 'GW', overlayLine: demandLine
+                });
+            }
+
+            // ---- 24h carbon intensity line chart ----
+            var carbonSvg = document.getElementById('pjg-live-carbon');
+            if (carbonSvg && typeof EDB.renderLineSVG === 'function') {
+                var carbonPoints = ED.hourly_24h.map(function (hr) {
+                    var totalMw = hr.demand_mw;
+                    var weightedCO2 = 0;
+                    ED.fuels.forEach(function (f) {
+                        weightedCO2 += (hr.by_fuel[f.id] || 0) * f.carbon_intensity;
+                    });
+                    return totalMw > 0 ? Math.round(weightedCO2 / totalMw) : 0;
+                });
+                var hourLabels2 = [];
+                for (var h2 = 0; h2 < 24; h2++) hourLabels2.push((h2 % 4 === 0) ? (String(h2).padStart(2, '0') + ':00') : '');
+                EDB.renderLineSVG(carbonSvg, carbonPoints, {
+                    width: 720, height: 140,
+                    xLabels: hourLabels2, yLabel: 'gCO₂/kWh',
+                    color: '#ef4444', fillBelow: true,
+                    refLines: [
+                        { y: 580, label: 'RUPTL 2030 target', color: '#10b981', dash: '4 3' },
+                        { y: 350, label: 'OECD avg', color: '#94a3b8', dash: '4 3' },
+                        { y: 150, label: 'GB current', color: '#06b6d4', dash: '4 3' }
+                    ]
+                });
+            }
+
+            // ---- Generation breakdown table ----
+            var bdTable = document.getElementById('pjg-live-breakdown');
+            if (bdTable) {
+                var bdBody = bdTable.querySelector('tbody');
+                if (bdBody) {
+                    bdBody.innerHTML = '';
+                    var totals = { mw: 0, gwh: 0, co2: 0 };
+                    ED.fuels.forEach(function (f) {
+                        var tr = document.createElement('tr');
+                        tr.innerHTML = '<td><span class="pjg-tech-dot" style="background:' + f.color + ';display:inline-block;width:10px;height:10px;border-radius:999px;margin-right:0.5rem;vertical-align:middle"></span>' + f.label + '</td>'
+                            + '<td class="num">' + (f.mw / 1000).toFixed(2) + '</td>'
+                            + '<td class="num">' + f.pct + '%</td>'
+                            + '<td class="num">' + f.gwh_today + '</td>'
+                            + '<td class="num">' + (f.tonnes_co2).toLocaleString() + '</td>';
+                        bdBody.appendChild(tr);
+                        totals.mw += f.mw; totals.gwh += f.gwh_today; totals.co2 += f.tonnes_co2;
+                    });
+                    var tr2 = document.createElement('tr');
+                    tr2.className = 'total';
+                    tr2.innerHTML = '<td>Total</td>'
+                        + '<td class="num">' + (totals.mw / 1000).toFixed(2) + '</td>'
+                        + '<td class="num">100%</td>'
+                        + '<td class="num">' + totals.gwh + '</td>'
+                        + '<td class="num">' + totals.co2.toLocaleString() + '</td>';
+                    bdBody.appendChild(tr2);
+                }
+            }
+        }
+
+        function setText(id, text) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            // The energy data scripts are deferred — wait one tick.
+            setTimeout(init, 0);
         }
     })();
     </script>

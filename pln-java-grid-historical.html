@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GED7FX8RTV');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historical Energy Dashboard — PLN Java-Bali Grid Monitor</title>
+    <meta name="description" content="10-year historical generation mix, demand growth, and renewable transition trends for the PLN Java-Bali grid. Based on PLN AR 2024, RUPTL 2025-2034, BPS 2024, IEA Indonesia 2024.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="version" content="2026-05-01-v1">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://resistancezero.com/pln-java-grid-historical.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/pln-java-grid-historical.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/pln-java-grid-historical.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/pln-java-grid-historical.html">
+    <meta property="og:title" content="Historical Energy Dashboard — PLN Java-Bali Grid">
+    <meta property="og:description" content="10-year historical generation mix, demand growth, and renewable transition for the Java-Bali grid.">
+    <meta property="og:image" content="https://resistancezero.com/assets/Favicon.png">
+    <meta property="og:site_name" content="ResistanceZero">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@BagusDPermana">
+    <meta name="twitter:title" content="Historical Energy Dashboard — PLN Java-Bali Grid">
+    <meta name="twitter:description" content="10-year historical generation mix, demand growth, and renewable transition for the Java-Bali grid.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/Favicon.png">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Historical Energy Dashboard — PLN Java-Bali Grid",
+        "description": "10-year historical generation mix, demand growth, and renewable transition trends for the PLN Java-Bali grid.",
+        "url": "https://resistancezero.com/pln-java-grid-historical.html",
+        "isPartOf": { "@type": "WebSite", "url": "https://resistancezero.com/" },
+        "creator": {
+            "@type": "Person",
+            "name": "Bagus Dwi Permana",
+            "url": "https://resistancezero.com/"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resistancezero.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Java-Bali Grid Monitor", "item": "https://resistancezero.com/pln-java-grid.html" },
+            { "@type": "ListItem", "position": 3, "name": "Historical Dashboard" }
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <!-- Inline boot theme to avoid FOUC; default dark -->
+    <script>(function(){try{var t=localStorage.getItem('rz_theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+
+    <style>
+        /* ===== CSS VARIABLES (mirrors pln-java-grid.html exactly) ===== */
+        :root {
+            --pjg-primary: #3b82f6;
+            --pjg-accent: #60a5fa;
+            --pjg-primary-rgb: 59, 130, 246;
+            --pjg-gradient: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%);
+            --pjg-bg: #ffffff;
+            --pjg-bg2: #f8fafc;
+            --pjg-bg3: #f1f5f9;
+            --pjg-text: #1e293b;
+            --pjg-text2: #475569;
+            --pjg-text3: #94a3b8;
+            --pjg-border: #e2e8f0;
+            --pjg-glass: rgba(255,255,255,0.85);
+            --pjg-glass-border: rgba(59,130,246,0.12);
+            --pjg-shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --pjg-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --pjg-shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --pjg-v500: #3b82f6;
+            --pjg-v275: #a78bfa;
+            --pjg-v150: #f87171;
+            --pjg-v20:  #facc15;
+        }
+        [data-theme="dark"] {
+            --pjg-bg: #0b1220;
+            --pjg-bg2: #0f172a;
+            --pjg-bg3: #1e293b;
+            --pjg-text: #f1f5f9;
+            --pjg-text2: #cbd5e1;
+            --pjg-text3: #64748b;
+            --pjg-border: #1e293b;
+            --pjg-glass: rgba(11,18,32,0.85);
+            --pjg-glass-border: rgba(96,165,250,0.18);
+            --pjg-shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+            --pjg-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --pjg-shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--pjg-bg); color: var(--pjg-text);
+            min-height: 100vh; line-height: 1.6;
+        }
+        a { color: var(--pjg-primary); }
+
+        /* ===== NAVBAR (exact mirror of pln-java-grid.html) ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: var(--pjg-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--pjg-glass-border);
+            padding: 0 2rem; height: 64px;
+        }
+        .nav-container { max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--pjg-text); }
+        .nav-logo {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.7rem; color: white; letter-spacing: 0.5px;
+            background: var(--pjg-gradient);
+            box-shadow: 0 3px 10px rgba(59,130,246,0.35);
+        }
+        .nav-title { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+        .nav-subtitle { font-size: 0.7rem; color: var(--pjg-text3); font-weight: 400; }
+        .nav-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+        .nav-link {
+            text-decoration: none; font-size: 0.82rem; font-weight: 500;
+            color: var(--pjg-text2); transition: all 0.3s;
+        }
+        .nav-link:hover { color: var(--pjg-primary); transform: translateY(-1px); }
+        .nav-back {
+            display: flex; align-items: center; gap: 6px;
+            text-decoration: none; font-size: 0.82rem; font-weight: 600;
+            color: var(--pjg-primary); padding: 6px 14px; border-radius: 8px;
+            background: rgba(59,130,246,0.08); transition: all 0.3s;
+        }
+        .nav-back:hover { transform: translateY(-2px); background: rgba(59,130,246,0.14); }
+        .mobile-nav-toggle {
+            display: none; background: none; border: 1px solid var(--pjg-border);
+            border-radius: 8px; padding: 6px 10px; color: var(--pjg-text2); cursor: pointer;
+        }
+
+        /* ===== HERO ===== */
+        .pjg-hero {
+            background: linear-gradient(135deg, rgba(8,14,28,0.92) 0%, rgba(15,23,42,0.86) 50%, rgba(29,78,216,0.55) 100%);
+            padding: 7rem 2rem 3rem; color: white; position: relative; overflow: hidden;
+        }
+        .pjg-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(96,165,250,0.18) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(167,139,250,0.10) 0%, transparent 50%);
+        }
+        .pjg-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .pjg-hero h1 {
+            font-size: 2.4rem; font-weight: 900; line-height: 1.15;
+            margin-bottom: 0.6rem; letter-spacing: -0.02em;
+        }
+        .pjg-hero-accent { background: var(--pjg-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .pjg-hero-sub {
+            font-size: 1rem; color: rgba(255,255,255,0.78); max-width: 780px;
+            line-height: 1.7; margin-bottom: 1.6rem;
+        }
+        .pjg-hero-sub a { color: rgba(96,165,250,0.9); }
+        .pjg-source-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .pjg-source-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+            font-size: 0.7rem; color: rgba(255,255,255,0.85); text-decoration: none;
+            transition: all 0.25s;
+        }
+        .pjg-source-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(96,165,250,0.4); }
+        .pjg-refresh-badge {
+            margin-left: auto;
+            font-size: 0.7rem; color: rgba(255,255,255,0.6); font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .pjg-main { max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
+        .pjg-section { margin-bottom: 1.5rem; }
+        .pjg-section-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--pjg-text); }
+        .pjg-section-desc { font-size: 0.82rem; color: var(--pjg-text2); margin-bottom: 0.8rem; max-width: 760px; }
+
+        /* ===== THEME TOGGLE ===== */
+        .pjg-theme-toggle {
+            position: fixed; bottom: 24px; right: 24px; z-index: 999;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            cursor: pointer; box-shadow: var(--pjg-shadow-md); transition: all 0.3s;
+            font-size: 1.1rem; color: var(--pjg-text);
+        }
+        .pjg-theme-toggle:hover { transform: scale(1.1); border-color: var(--pjg-primary); }
+
+        /* ===== FOOTER ===== */
+        .pjg-footer {
+            background: linear-gradient(135deg, #0b1220 0%, #1e293b 100%);
+            color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;
+        }
+        .pjg-footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;
+        }
+        .pjg-footer a { color: #94a3b8; text-decoration: none; font-size: 0.8rem; }
+        .pjg-footer a:hover { color: #60a5fa; }
+
+        /* ===== HISTORICAL-SPECIFIC CLASSES ===== */
+
+        /* A. Hero back button */
+        .pjg-back-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--pjg-accent); text-decoration: none;
+            font-size: 0.85rem; margin-bottom: 1rem;
+        }
+        .pjg-back-btn:hover { color: var(--pjg-primary); }
+
+        /* B. Time-range pills */
+        .pjg-time-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .pjg-pill {
+            padding: 0.5rem 1.1rem;
+            background: var(--pjg-bg2); color: var(--pjg-text2);
+            border: 1px solid var(--pjg-border); border-radius: 999px;
+            cursor: pointer; font-size: 0.85rem; font-weight: 600;
+            transition: all 0.15s; font-family: inherit;
+        }
+        .pjg-pill:hover { color: var(--pjg-primary); border-color: var(--pjg-primary); }
+        .pjg-pill.active { background: var(--pjg-primary); color: white; border-color: var(--pjg-primary); }
+
+        /* C, G. Chart wrap */
+        .pjg-chart-wrap {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 1.2rem; overflow-x: auto;
+        }
+        .pjg-chart-wrap svg { display: block; width: 100%; height: auto; }
+
+        /* D. YoY tiles */
+        .pjg-yoy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+        @media (max-width: 880px) { .pjg-yoy-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .pjg-yoy-grid { grid-template-columns: 1fr 1fr; } }
+        .pjg-yoy-tile {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 1rem 1.2rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .pjg-yoy-tile:hover { border-color: rgba(96,165,250,0.4); transform: translateY(-1px); }
+        .pjg-yoy-label { font-size: 0.7rem; letter-spacing: 0.12em; color: var(--pjg-text3); text-transform: uppercase; margin-bottom: 0.4rem; }
+        .pjg-yoy-value { font-size: 1.6rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+        .pjg-yoy-up   { color: #10b981; }
+        .pjg-yoy-down { color: #ef4444; }
+        .pjg-yoy-sub { font-size: 0.75rem; color: var(--pjg-text3); margin-top: 0.3rem; }
+
+        /* E. Summary table */
+        .pjg-table-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; gap: 1rem;
+        }
+        .pjg-summary-table {
+            width: 100%; border-collapse: collapse;
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; overflow: hidden;
+        }
+        .pjg-summary-table th,
+        .pjg-summary-table td {
+            padding: 0.6rem 0.9rem; text-align: left;
+            border-bottom: 1px solid var(--pjg-border); font-size: 0.85rem;
+        }
+        .pjg-summary-table tr:last-child td { border-bottom: none; }
+        .pjg-summary-table th {
+            background: var(--pjg-bg3); font-weight: 700;
+            color: var(--pjg-text2); cursor: pointer; user-select: none;
+        }
+        .pjg-summary-table th:hover { color: var(--pjg-primary); }
+        .pjg-summary-table .num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+        .pjg-summary-table tbody tr:hover { background: rgba(59,130,246,0.04); }
+        .pjg-th-sort::after { content: ' ↕'; color: var(--pjg-text3); font-size: 0.75em; }
+        .pjg-th-sort.asc::after  { content: ' ↑'; color: var(--pjg-primary); }
+        .pjg-th-sort.desc::after { content: ' ↓'; color: var(--pjg-primary); }
+        .pjg-btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--pjg-bg2); color: var(--pjg-text);
+            border: 1px solid var(--pjg-border); border-radius: 8px;
+            cursor: pointer; font-size: 0.8rem; font-weight: 600; font-family: inherit;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s;
+        }
+        .pjg-btn-secondary:hover { border-color: var(--pjg-primary); color: var(--pjg-primary); }
+
+        /* F. Records */
+        .pjg-records-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+        @media (max-width: 880px) { .pjg-records-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .pjg-records-grid { grid-template-columns: 1fr 1fr; } }
+        .pjg-record-card {
+            background: var(--pjg-bg2); border: 1px solid var(--pjg-border);
+            border-radius: 14px; padding: 1.2rem; text-align: center;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .pjg-record-card:hover { border-color: rgba(59,130,246,0.4); transform: translateY(-1px); }
+        .pjg-record-icon { font-size: 1.6rem; color: var(--pjg-primary); margin-bottom: 0.6rem; }
+        .pjg-record-label { font-size: 0.7rem; letter-spacing: 0.12em; color: var(--pjg-text3); text-transform: uppercase; margin-bottom: 0.5rem; }
+        .pjg-record-value { font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--pjg-text); }
+        .pjg-record-when { font-size: 0.75rem; color: var(--pjg-text3); margin-top: 0.4rem; }
+
+        /* Mobile navbar */
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .mobile-nav-toggle { display: flex; align-items: center; }
+            .navbar.menu-open .nav-links {
+                display: flex; flex-direction: column; align-items: flex-start;
+                position: fixed; top: 64px; left: 0; right: 0;
+                background: var(--pjg-glass); backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--pjg-glass-border);
+                padding: 1rem 2rem; gap: 1rem; z-index: 999;
+            }
+        }
+        @media (max-width: 700px) {
+            .pjg-hero h1 { font-size: 1.7rem; }
+            .pjg-footer-inner { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .pjg-table-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR (mirrors pln-java-grid.html) -->
+    <nav class="navbar" id="pjgHistNavbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-logo">PJG</div>
+                <div>
+                    <div class="nav-title">PLN Java-Bali Grid Monitor</div>
+                    <div class="nav-subtitle">Historical Energy Dashboard &middot; 2014-2024</div>
+                </div>
+            </a>
+            <div class="nav-links" id="pjgHistNavLinks">
+                <a href="tco-calculator.html" class="nav-link" style="color:#4f46e5;"><i class="fas fa-calculator"></i> TCO Calc</a>
+                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;"><i class="fas fa-tachometer-alt"></i> PUE Calc</a>
+                <a href="dc-market/" class="nav-link" style="color:#14b8a6;"><i class="fas fa-globe"></i> DC Markets</a>
+                <a href="datacenter-solutions.html" class="nav-link" style="color:#f59e0b;"><i class="fas fa-server"></i> Solutions</a>
+                <a href="pln-java-grid.html" class="nav-back">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <button class="mobile-nav-toggle" id="pjgHistMobileToggle" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- A. HERO HEADER -->
+    <header class="pjg-hero">
+        <div class="pjg-hero-inner">
+            <a href="pln-java-grid.html" class="pjg-back-btn"><i class="fas fa-arrow-left"></i> Back to Live Dashboard</a>
+            <h1>Historical Energy Dashboard <span class="pjg-hero-accent">— Java-Bali</span></h1>
+            <p class="pjg-hero-sub">10-year generation mix, demand growth, and renewable transition trends. Modeled after <a href="https://www.energydashboard.co.uk/historical" target="_blank" rel="noopener">energydashboard.co.uk/historical</a>. Static representative figures based on PLN AR 2024, RUPTL 2025-2034, BPS Statistical Indonesia 2024, IEA Indonesia 2024 — not real-time telemetry.</p>
+            <div class="pjg-source-strip">
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-chart-pie"></i> PLN AR 2024</a>
+                <a href="https://web.pln.co.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-book"></i> RUPTL 2025-2034</a>
+                <a href="https://www.bps.go.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-database"></i> BPS Statistical Indonesia 2024</a>
+                <a href="https://www.iea.org/countries/indonesia" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-globe"></i> IEA Indonesia 2024</a>
+                <a href="https://www.esdm.go.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-bolt"></i> ESDM Statistics</a>
+                <span class="pjg-refresh-badge"><i class="fas fa-clock"></i> Updated 2026-05-01</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="pjg-main">
+
+        <!-- B. TIME-RANGE PILL ROW -->
+        <section class="pjg-section">
+            <div class="pjg-time-pills" role="tablist" aria-label="Historical time range">
+                <button class="pjg-pill" data-range="1y" role="tab" aria-selected="false">1 Year</button>
+                <button class="pjg-pill" data-range="3y" role="tab" aria-selected="false">3 Years</button>
+                <button class="pjg-pill active" data-range="5y" role="tab" aria-selected="true">5 Years</button>
+                <button class="pjg-pill" data-range="10y" role="tab" aria-selected="false">10 Years</button>
+                <button class="pjg-pill" data-range="all" role="tab" aria-selected="false">All-time (since 2014)</button>
+            </div>
+        </section>
+
+        <!-- C. ANNUAL GENERATION-MIX STACKED AREA CHART -->
+        <section class="pjg-section">
+            <h2 class="pjg-section-title">Annual Generation Mix</h2>
+            <p class="pjg-section-desc">TWh per year, stacked by fuel type. Dashed line shows total demand overlay.</p>
+            <div class="pjg-chart-wrap">
+                <svg id="pjg-hist-stack" viewBox="0 0 960 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Stacked area chart of annual generation mix 2014-2024"></svg>
+            </div>
+        </section>
+
+        <!-- D. YOY CHANGE TILES -->
+        <section class="pjg-section">
+            <div class="pjg-yoy-grid" id="pjg-yoy-grid">
+                <div class="pjg-yoy-tile">
+                    <div class="pjg-yoy-label">Demand Growth</div>
+                    <div class="pjg-yoy-value pjg-yoy-up" id="pjg-yoy-demand">+5.4% YoY</div>
+                    <div class="pjg-yoy-sub" id="pjg-yoy-demand-sub">5y avg +4.7%</div>
+                </div>
+                <div class="pjg-yoy-tile">
+                    <div class="pjg-yoy-label">CO&#x2082; Intensity</div>
+                    <div class="pjg-yoy-value pjg-yoy-down" id="pjg-yoy-co2">-3.1% YoY</div>
+                    <div class="pjg-yoy-sub">Trend: improving</div>
+                </div>
+                <div class="pjg-yoy-tile">
+                    <div class="pjg-yoy-label">Renewable Share</div>
+                    <div class="pjg-yoy-value pjg-yoy-up" id="pjg-yoy-re">+1.2pp YoY</div>
+                    <div class="pjg-yoy-sub" id="pjg-yoy-re-sub">Now: 13.5%</div>
+                </div>
+                <div class="pjg-yoy-tile">
+                    <div class="pjg-yoy-label">Coal Share</div>
+                    <div class="pjg-yoy-value pjg-yoy-down" id="pjg-yoy-coal">-1.0pp YoY</div>
+                    <div class="pjg-yoy-sub" id="pjg-yoy-coal-sub">Now: 62%</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- E. ANNUAL SUMMARY TABLE -->
+        <section class="pjg-section">
+            <div class="pjg-table-header">
+                <h2 class="pjg-section-title">Annual Summary</h2>
+                <button id="pjg-csv-download" class="pjg-btn-secondary" title="Download data as CSV">
+                    <i class="fas fa-download"></i> Download CSV
+                </button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="pjg-summary-table" id="pjg-annual-table">
+                    <thead>
+                        <tr>
+                            <th data-key="year" class="pjg-th-sort">Year</th>
+                            <th data-key="demand_twh" class="num pjg-th-sort">Demand (TWh)</th>
+                            <th data-key="peak_gw" class="num pjg-th-sort">Peak (GW)</th>
+                            <th data-key="renewable_pct" class="num pjg-th-sort">Renewable %</th>
+                            <th data-key="coal_pct" class="num pjg-th-sort">Coal %</th>
+                            <th data-key="gco2_per_kwh" class="num pjg-th-sort">gCO&#x2082;/kWh</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pjg-annual-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- F. RECORDS SECTION -->
+        <section class="pjg-section">
+            <h2 class="pjg-section-title">Records</h2>
+            <div class="pjg-records-grid" id="pjg-records-grid">
+                <!-- Populated by JS -->
+                <div class="pjg-record-card">
+                    <div class="pjg-record-icon"><i class="fas fa-fire"></i></div>
+                    <div class="pjg-record-label">Highest Demand Day</div>
+                    <div class="pjg-record-value" id="rec-demand-val">32.4 GW</div>
+                    <div class="pjg-record-when" id="rec-demand-when">14 Aug 2024 19:00</div>
+                </div>
+                <div class="pjg-record-card">
+                    <div class="pjg-record-icon" style="color:#10b981;"><i class="fas fa-leaf"></i></div>
+                    <div class="pjg-record-label">Highest Renewable Share</div>
+                    <div class="pjg-record-value" id="rec-re-val">16.2%</div>
+                    <div class="pjg-record-when" id="rec-re-when">Q1 2025</div>
+                </div>
+                <div class="pjg-record-card">
+                    <div class="pjg-record-icon" style="color:#06b6d4;"><i class="fas fa-wind"></i></div>
+                    <div class="pjg-record-label">Lowest CO&#x2082; Intensity</div>
+                    <div class="pjg-record-value" id="rec-co2-val">728 gCO&#x2082;/kWh</div>
+                    <div class="pjg-record-when" id="rec-co2-when">Q1 2024</div>
+                </div>
+                <div class="pjg-record-card">
+                    <div class="pjg-record-icon" style="color:#ef4444;"><i class="fas fa-triangle-exclamation"></i></div>
+                    <div class="pjg-record-label">Largest Blackout</div>
+                    <div class="pjg-record-value" id="rec-outage-val">21M affected</div>
+                    <div class="pjg-record-when" id="rec-outage-when">Aug 2019 (JMB)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- G. YEAR-ON-YEAR MONTHLY COMPARISON LINE CHART -->
+        <section class="pjg-section">
+            <h2 class="pjg-section-title">2024 vs 2023 Monthly Demand</h2>
+            <p class="pjg-section-desc">Year-over-year monthly demand comparison highlighting seasonal patterns and growth trend. Synthetic monthly profile derived from 24-hour demand shape with seasonal adjustment factors.</p>
+            <div class="pjg-chart-wrap">
+                <svg id="pjg-yoy-monthly" viewBox="0 0 960 280" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Year-on-year monthly demand comparison 2023 vs 2024"></svg>
+            </div>
+        </section>
+
+        <!-- H. SOURCES STRIP (inline, same style as parent) -->
+        <section class="pjg-section" style="margin-top:2rem;">
+            <div style="background:var(--pjg-bg2);border:1px solid var(--pjg-border);border-radius:14px;padding:1.2rem 1.5rem;">
+                <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.12em;color:var(--pjg-text3);text-transform:uppercase;margin-bottom:0.75rem;">Data Sources &amp; Methodology</p>
+                <p style="font-size:0.8rem;color:var(--pjg-text2);line-height:1.7;max-width:960px;">
+                    All figures are static representative estimates anchored to publicly available reports.
+                    Annual demand and generation figures: <strong>PLN Annual Report 2024</strong> (PT PLN Persero).
+                    10-year planning baseline and capacity projections: <strong>RUPTL 2025-2034</strong> (PLN / ESDM).
+                    Electricity consumption statistics: <strong>BPS Statistical Indonesia 2024</strong>.
+                    Emissions intensity and renewable capacity factors: <strong>IEA Indonesia 2024</strong>.
+                    Distribution and system loss data: <strong>ESDM Energy Statistics 2024</strong>.
+                    Intermediate years interpolated monotonically; 2020 reflects COVID-19 demand contraction.
+                    This page is <em>not</em> connected to PLN telemetry — figures do not update in real time.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="pjg-footer">
+        <div class="pjg-footer-inner">
+            <div>
+                <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.15em;color:#64748b;line-height:1.6;margin-bottom:1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
+                <p style="font-size:0.65rem;letter-spacing:0.1em;color:#475569;margin-bottom:0.75rem;">DATA: PLN AR 2024, RUPTL 2025-2034, BPS 2024, IEA 2024, ESDM 2024.</p>
+                <p style="font-size:0.75rem;color:#64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">NAVIGATION</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+                    <li><a href="pln-java-grid.html">Java Grid Monitor</a></li>
+                    <li><a href="pln-java-grid-historical.html">Historical Dashboard</a></li>
+                    <li><a href="dc-market/">DC Markets</a></li>
+                    <li><a href="articles.html">Articles</a></li>
+                    <li><a href="glossary.html">Glossary</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;">CONNECT</h4>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener">LinkedIn</a></li>
+                    <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                    <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- THEME TOGGLE -->
+    <button class="pjg-theme-toggle" id="pjgHistThemeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+        <i class="fas fa-moon" id="pjgHistThemeIcon"></i>
+    </button>
+
+    <!-- SCRIPTS -->
+    <script src="script.min.js?v=20260324b" defer></script>
+    <script src="auth.js?v=20260324b" defer></script>
+    <script src="rz-engine.js?v=2026-04-28" defer></script>
+    <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
+    <script src="js/pln-energy-data.js?v=2026-05-01"></script>
+    <script src="js/pln-energy-dashboard.js?v=2026-05-01"></script>
+
+    <!-- PAGE IIFE -->
+    <script>
+    (function () {
+        'use strict';
+
+        /* ============================================================
+         * CONSTANTS
+         * ============================================================ */
+
+        var FUEL_COLORS = {
+            coal:       '#f87171',
+            gas:        '#3b82f6',
+            hydro:      '#38bdf8',
+            geothermal: '#fb923c',
+            biomass:    '#84cc16',
+            solar:      '#facc15',
+            diesel:     '#94a3b8'
+        };
+
+        var FUEL_LABELS = {
+            coal:       'Coal',
+            gas:        'Gas',
+            hydro:      'Hydro',
+            geothermal: 'Geothermal',
+            biomass:    'Biomass',
+            solar:      'Solar',
+            diesel:     'Diesel'
+        };
+
+        // Ordered bottom-to-top for visual stacking
+        var FUEL_ORDER = ['diesel', 'solar', 'biomass', 'geothermal', 'hydro', 'gas', 'coal'];
+
+        var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        // Seasonal demand factors (monthly multipliers relative to annual average)
+        // Indonesia dry season (Jun-Sep) has marginally higher demand; Ramadan dips slightly
+        var MONTHLY_FACTORS = [
+            0.97,  // Jan
+            0.95,  // Feb (Ramadan period, cooling demand lower)
+            0.96,  // Mar
+            0.97,  // Apr
+            0.99,  // May
+            1.01,  // Jun
+            1.03,  // Jul
+            1.04,  // Aug (peak dry season, cooling)
+            1.02,  // Sep
+            1.00,  // Oct
+            0.99,  // Nov
+            0.98   // Dec
+        ];
+
+        /* ============================================================
+         * STATE
+         * ============================================================ */
+
+        var state = {
+            range: '5y',          // current time-range pill
+            sortKey: 'year',
+            sortDir: 'desc'
+        };
+
+        /* ============================================================
+         * HELPERS
+         * ============================================================ */
+
+        function $(id) { return document.getElementById(id); }
+
+        /**
+         * Slice annual_history array by the current range selection.
+         * @param {Object[]} history   all 11 entries 2014-2024
+         * @param {string}   range     '1y' | '3y' | '5y' | '10y' | 'all'
+         * @returns {Object[]}
+         */
+        function sliceHistory(history, range) {
+            if (!history || !history.length) return [];
+            var n = history.length;
+            switch (range) {
+                case '1y':  return history.slice(Math.max(0, n - 1));
+                case '3y':  return history.slice(Math.max(0, n - 3));
+                case '5y':  return history.slice(Math.max(0, n - 5));
+                case '10y': return history.slice(Math.max(0, n - 10));
+                default:    return history.slice();
+            }
+        }
+
+        /**
+         * Build series array from sliced history for renderStackedAreaSVG.
+         * Bottom-to-top order matches FUEL_ORDER.
+         */
+        function buildSeries(slicedHistory) {
+            return FUEL_ORDER.map(function (fuel) {
+                return {
+                    label:  FUEL_LABELS[fuel] || fuel,
+                    color:  FUEL_COLORS[fuel] || '#888',
+                    values: slicedHistory.map(function (y) {
+                        return y.by_fuel_twh ? (y.by_fuel_twh[fuel] || 0) : 0;
+                    })
+                };
+            });
+        }
+
+        /* ============================================================
+         * TABLE COLUMNS DEFINITION
+         * ============================================================ */
+
+        var TABLE_COLUMNS = [
+            { key: 'year',          label: 'Year',           numeric: false, fmt: function (v) { return String(v); } },
+            { key: 'demand_twh',    label: 'Demand (TWh)',   numeric: true,  fmt: function (v) { return typeof v === 'number' ? v.toFixed(1) : v; } },
+            { key: 'peak_gw',       label: 'Peak (GW)',      numeric: true,  fmt: function (v) { return typeof v === 'number' ? v.toFixed(1) : v; } },
+            { key: 'renewable_pct', label: 'Renewable %',    numeric: true,  fmt: function (v) { return typeof v === 'number' ? v.toFixed(1) + '%' : v; } },
+            { key: 'coal_pct',      label: 'Coal %',         numeric: true,  fmt: function (v) { return typeof v === 'number' ? v.toFixed(0) + '%' : v; } },
+            { key: 'gco2_per_kwh',  label: 'gCO₂/kWh', numeric: true,  fmt: function (v) { return typeof v === 'number' ? Math.round(v).toString() : v; } }
+        ];
+
+        /* ============================================================
+         * STACKED AREA CHART
+         * ============================================================ */
+
+        function renderStackedArea(history) {
+            var svgEl = $('pjg-hist-stack');
+            if (!svgEl || !window.PLN_ENERGY_DASHBOARD) return;
+
+            var series    = buildSeries(history);
+            var xLabels   = history.map(function (y) { return y.year; });
+            var demandVals = history.map(function (y) { return y.demand_twh; });
+
+            window.PLN_ENERGY_DASHBOARD.renderStackedAreaSVG(svgEl, series, {
+                width:   960,
+                height:  400,
+                xLabels: xLabels,
+                yLabel:  'TWh',
+                overlayLine: {
+                    values: demandVals,
+                    label:  'Demand',
+                    color:  '#ffffff'
+                }
+            });
+        }
+
+        /* ============================================================
+         * TABLE
+         * ============================================================ */
+
+        function sortRows(rows, key, dir) {
+            return rows.slice().sort(function (a, b) {
+                var av = a[key];
+                var bv = b[key];
+                if (typeof av === 'number' && typeof bv === 'number') {
+                    return dir === 'asc' ? av - bv : bv - av;
+                }
+                var as = String(av);
+                var bs = String(bv);
+                return dir === 'asc' ? as.localeCompare(bs) : bs.localeCompare(as);
+            });
+        }
+
+        function renderTable(history) {
+            var tbody = $('pjg-annual-tbody');
+            if (!tbody || !window.PLN_ENERGY_DASHBOARD) return;
+
+            var sorted = sortRows(history, state.sortKey, state.sortDir);
+            window.PLN_ENERGY_DASHBOARD.renderBreakdownTable(tbody, sorted, TABLE_COLUMNS);
+        }
+
+        function bindTableSort(history) {
+            var ths = document.querySelectorAll('#pjg-annual-table th[data-key]');
+            ths.forEach(function (th) {
+                th.addEventListener('click', function () {
+                    var key = th.getAttribute('data-key');
+                    if (state.sortKey === key) {
+                        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        state.sortKey = key;
+                        state.sortDir = 'desc';
+                    }
+                    // Update header classes
+                    ths.forEach(function (h) {
+                        h.classList.remove('asc', 'desc');
+                    });
+                    th.classList.add(state.sortDir);
+                    renderTable(history);
+                });
+            });
+            // Set initial indicator
+            var initialTh = document.querySelector('#pjg-annual-table th[data-key="year"]');
+            if (initialTh) initialTh.classList.add(state.sortDir);
+        }
+
+        /* ============================================================
+         * CSV DOWNLOAD
+         * ============================================================ */
+
+        function bindCsvDownload(history) {
+            var btn = $('pjg-csv-download');
+            if (!btn || !window.PLN_ENERGY_DASHBOARD) return;
+            btn.addEventListener('click', function () {
+                window.PLN_ENERGY_DASHBOARD.csvDownload(
+                    'pln-java-bali-annual.csv',
+                    history,
+                    TABLE_COLUMNS
+                );
+            });
+        }
+
+        /* ============================================================
+         * YOY TILES — computed from full history (last 2 years)
+         * ============================================================ */
+
+        function renderYoyTiles(allHistory) {
+            var n = allHistory.length;
+            if (n < 2) return;
+            var cur  = allHistory[n - 1];
+            var prev = allHistory[n - 2];
+
+            // Demand growth YoY
+            var demandYoy = ((cur.demand_twh - prev.demand_twh) / prev.demand_twh) * 100;
+            var demandEl  = $('pjg-yoy-demand');
+            if (demandEl) {
+                demandEl.textContent = (demandYoy >= 0 ? '+' : '') + demandYoy.toFixed(1) + '% YoY';
+                demandEl.className = 'pjg-yoy-value ' + (demandYoy >= 0 ? 'pjg-yoy-up' : 'pjg-yoy-down');
+            }
+
+            // 5y avg demand growth
+            if (n >= 6) {
+                var base5 = allHistory[n - 6].demand_twh;
+                var avg5  = (Math.pow(cur.demand_twh / base5, 1/5) - 1) * 100;
+                var subEl = $('pjg-yoy-demand-sub');
+                if (subEl) subEl.textContent = '5y avg ' + (avg5 >= 0 ? '+' : '') + avg5.toFixed(1) + '%';
+            }
+
+            // CO2 intensity YoY
+            var co2Yoy = ((cur.gco2_per_kwh - prev.gco2_per_kwh) / prev.gco2_per_kwh) * 100;
+            var co2El  = $('pjg-yoy-co2');
+            if (co2El) {
+                co2El.textContent = (co2Yoy >= 0 ? '+' : '') + co2Yoy.toFixed(1) + '% YoY';
+                // Improving = lower CO2 = green (down is good)
+                co2El.className = 'pjg-yoy-value ' + (co2Yoy < 0 ? 'pjg-yoy-down' : 'pjg-yoy-up');
+            }
+
+            // Renewable share YoY (percentage points)
+            var rePp  = cur.renewable_pct - prev.renewable_pct;
+            var reEl  = $('pjg-yoy-re');
+            if (reEl) {
+                reEl.textContent = (rePp >= 0 ? '+' : '') + rePp.toFixed(1) + 'pp YoY';
+                reEl.className = 'pjg-yoy-value ' + (rePp >= 0 ? 'pjg-yoy-up' : 'pjg-yoy-down');
+            }
+            var reSubEl = $('pjg-yoy-re-sub');
+            if (reSubEl) reSubEl.textContent = 'Now: ' + cur.renewable_pct.toFixed(1) + '%';
+
+            // Coal share YoY (percentage points)
+            var coalPp = cur.coal_pct - prev.coal_pct;
+            var coalEl = $('pjg-yoy-coal');
+            if (coalEl) {
+                coalEl.textContent = (coalPp >= 0 ? '+' : '') + coalPp.toFixed(1) + 'pp YoY';
+                // Lower coal = good (down is green)
+                coalEl.className = 'pjg-yoy-value ' + (coalPp < 0 ? 'pjg-yoy-down' : 'pjg-yoy-up');
+            }
+            var coalSubEl = $('pjg-yoy-coal-sub');
+            if (coalSubEl) coalSubEl.textContent = 'Now: ' + cur.coal_pct.toFixed(0) + '%';
+        }
+
+        /* ============================================================
+         * RECORDS SECTION
+         * ============================================================ */
+
+        function renderRecords() {
+            var rec = (window.PLN_ENERGY_DATA && window.PLN_ENERGY_DATA.records) || null;
+
+            // Highest demand
+            var demandVal  = $('rec-demand-val');
+            var demandWhen = $('rec-demand-when');
+            if (demandVal && rec && rec.highest_demand) {
+                demandVal.textContent = (rec.highest_demand.value_mw / 1000).toFixed(1) + ' GW';
+                if (demandWhen) {
+                    var d = new Date(rec.highest_demand.when);
+                    demandWhen.textContent = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ' 19:00';
+                }
+            }
+
+            // Highest renewable
+            var reVal  = $('rec-re-val');
+            var reWhen = $('rec-re-when');
+            if (reVal && rec && rec.highest_renewable) {
+                reVal.textContent = rec.highest_renewable.value_pct.toFixed(1) + '%';
+                if (reWhen) reWhen.textContent = rec.highest_renewable.when;
+            }
+
+            // Lowest CO2
+            var co2Val  = $('rec-co2-val');
+            var co2When = $('rec-co2-when');
+            if (co2Val && rec && rec.lowest_carbon) {
+                co2Val.innerHTML = rec.lowest_carbon.value_gco2 + ' gCO&#x2082;/kWh';
+                if (co2When) co2When.textContent = rec.lowest_carbon.when;
+            }
+
+            // Largest outage
+            var outageVal  = $('rec-outage-val');
+            var outageWhen = $('rec-outage-when');
+            if (outageVal && rec && rec.largest_outage) {
+                outageVal.textContent = rec.largest_outage.affected_million + 'M affected';
+                if (outageWhen) {
+                    var when = rec.largest_outage.when;
+                    // Format 2019-08 -> Aug 2019 (JMB)
+                    var parts = String(when).split('-');
+                    var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    if (parts.length === 2) {
+                        outageWhen.textContent = monthNames[parseInt(parts[1], 10) - 1] + ' ' + parts[0] + ' (JMB)';
+                    } else {
+                        outageWhen.textContent = when;
+                    }
+                }
+            }
+        }
+
+        /* ============================================================
+         * YOY MONTHLY CHART (2023 vs 2024)
+         * ============================================================ */
+
+        /**
+         * Derive monthly demand (GWh) from annual history entry and monthly factors.
+         * @param {Object} yearEntry
+         * @returns {number[]} 12 monthly GWh values
+         */
+        function monthlyFromYear(yearEntry) {
+            // Convert annual TWh to GWh, then distribute by monthly factor
+            var annualGwh = yearEntry.demand_twh * 1000;
+            var factorSum = MONTHLY_FACTORS.reduce(function (a, b) { return a + b; }, 0);
+            return MONTHLY_FACTORS.map(function (f) {
+                return Math.round((f / factorSum) * annualGwh);
+            });
+        }
+
+        function renderMonthlyChart(allHistory) {
+            var svgEl = $('pjg-yoy-monthly');
+            if (!svgEl || !window.PLN_ENERGY_DASHBOARD || allHistory.length < 2) return;
+
+            var n    = allHistory.length;
+            var y24  = allHistory[n - 1];  // 2024
+            var y23  = allHistory[n - 2];  // 2023
+
+            var vals24 = monthlyFromYear(y24);
+            var vals23 = monthlyFromYear(y23);
+
+            // Get actual primary color from CSS variable (fallback to #3b82f6)
+            var primaryColor = '#3b82f6';
+            try {
+                var cs = getComputedStyle(document.documentElement).getPropertyValue('--pjg-primary').trim();
+                if (cs) primaryColor = cs;
+            } catch (e) { /* ignore */ }
+
+            window.PLN_ENERGY_DASHBOARD.renderLineSVG(svgEl, [
+                {
+                    label:  String(y23.year) + ' Demand',
+                    color:  '#64748b',
+                    values: vals23,
+                    dash:   '5 3'
+                },
+                {
+                    label:  String(y24.year) + ' Demand',
+                    color:  primaryColor,
+                    values: vals24,
+                    dash:   'none'
+                }
+            ], {
+                width:   960,
+                height:  280,
+                xLabels: MONTHS_SHORT,
+                yLabel:  'GWh'
+            });
+        }
+
+        /* ============================================================
+         * TIME-RANGE PILLS
+         * ============================================================ */
+
+        function bindPills(allHistory) {
+            var pills = document.querySelectorAll('.pjg-pill[data-range]');
+            pills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    // Update active state
+                    pills.forEach(function (p) {
+                        p.classList.remove('active');
+                        p.setAttribute('aria-selected', 'false');
+                    });
+                    pill.classList.add('active');
+                    pill.setAttribute('aria-selected', 'true');
+
+                    state.range = pill.getAttribute('data-range');
+                    var sliced = sliceHistory(allHistory, state.range);
+
+                    // Re-render charts and table with new slice
+                    renderStackedArea(sliced);
+                    renderTable(sliced);
+                    bindCsvDownload(sliced);
+                    bindTableSort(sliced);
+                });
+            });
+        }
+
+        /* ============================================================
+         * THEME TOGGLE
+         * ============================================================ */
+
+        function bindTheme() {
+            var btn  = $('pjgHistThemeToggle');
+            var icon = $('pjgHistThemeIcon');
+            if (!btn) return;
+            var saved = (function () { try { return localStorage.getItem('rz_theme'); } catch (e) { return null; } })() || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            icon.className = (saved === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
+            btn.addEventListener('click', function () {
+                var cur = document.documentElement.getAttribute('data-theme');
+                var nxt = (cur === 'dark') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', nxt);
+                try { localStorage.setItem('rz_theme', nxt); } catch (e) { /* ignore */ }
+                icon.className = (nxt === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
+                // Re-render line chart to pick up new primary color
+                var n = allHistory.length;
+                if (n >= 2) renderMonthlyChart(allHistory);
+            });
+        }
+
+        /* ============================================================
+         * MOBILE NAV TOGGLE
+         * ============================================================ */
+
+        function bindMobileNav() {
+            var mob = $('pjgHistMobileToggle');
+            if (mob) mob.addEventListener('click', function () {
+                $('pjgHistNavbar').classList.toggle('menu-open');
+            });
+        }
+
+        /* ============================================================
+         * BOOT
+         * ============================================================ */
+
+        var allHistory = [];
+
+        function boot() {
+            if (!window.PLN_ENERGY_DATA || !window.PLN_ENERGY_DASHBOARD) {
+                // Both scripts loaded synchronously so this should not happen,
+                // but guard anyway with a brief retry.
+                var tries = 0;
+                var iv = setInterval(function () {
+                    tries++;
+                    if ((window.PLN_ENERGY_DATA && window.PLN_ENERGY_DASHBOARD) || tries > 50) {
+                        clearInterval(iv);
+                        if (window.PLN_ENERGY_DATA && window.PLN_ENERGY_DASHBOARD) run();
+                    }
+                }, 60);
+                return;
+            }
+            run();
+        }
+
+        function run() {
+            allHistory = window.PLN_ENERGY_DATA.annual_history || [];
+            var sliced = sliceHistory(allHistory, state.range);
+
+            // C. Stacked area chart
+            renderStackedArea(sliced);
+
+            // D. YoY tiles (always computed on full history)
+            renderYoyTiles(allHistory);
+
+            // E. Table
+            renderTable(sliced);
+            bindTableSort(sliced);
+            bindCsvDownload(sliced);
+
+            // F. Records
+            renderRecords();
+
+            // G. Monthly YoY line chart
+            renderMonthlyChart(allHistory);
+
+            // B. Pills
+            bindPills(allHistory);
+
+            // Theme + mobile nav
+            bindTheme();
+            bindMobileNav();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+
+    })();
+    </script>
+
+</body>
+</html>
