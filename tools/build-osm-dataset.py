@@ -815,8 +815,14 @@ def js_value(v: Any) -> str:
     if isinstance(v, (int, float)):
         return str(v)
     if isinstance(v, str):
-        # Use single quotes to match repo convention; escape internal single quotes.
-        esc = v.replace("\\", "\\\\").replace("'", "\\'")
+        # Use single quotes to match repo convention; escape backslashes,
+        # single quotes, and any control chars (newlines/tabs/CR) — bare
+        # newlines in a single-quoted string are a JS SyntaxError.
+        esc = (v.replace("\\", "\\\\")
+                 .replace("'", "\\'")
+                 .replace("\n", "\\n")
+                 .replace("\r", "\\r")
+                 .replace("\t", "\\t"))
         return f"'{esc}'"
     if isinstance(v, list):
         return "[" + ", ".join(js_value(i) for i in v) + "]"
