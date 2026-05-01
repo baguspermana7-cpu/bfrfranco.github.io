@@ -702,7 +702,7 @@
                     <li role="menuitem"><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
                     <li role="menuitem"><a href="roi-calculator.html" style="color: #3b82f6;">ROI Calculator</a></li>
                     <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                    <li role="menuitem"><a href="dc-market-tracker.html" style="color: #0d9488; font-weight: 600;">Market Tracker</a></li>
+                    <li role="menuitem"><a href="dc-market-tracker.html" style="color: #0d9488; font-weight: 600;">DC Market</a></li>
                     <li role="menuitem"><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
                 </ul>
             </li>
@@ -1752,6 +1752,12 @@
 </div>
 </div>
 </article>
+
+                <!-- Independence Disclaimer -->
+                <div style="margin:2rem 0 0;padding:1rem 0;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
+                    <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#8b5cf6;">Terms &amp; Disclaimer</a></p>
+                </div>
+
 </main>
 
 <aside class="share-buttons" id="shareButtons" aria-label="Share this article">
@@ -2487,7 +2493,38 @@
             '<span style="background:#22c55e;color:#fff;padding:2px 6px;border-radius:3px;font-size:8px;">Scale</span> ' +
             '<span style="background:#16a34a;color:#fff;padding:2px 6px;border-radius:3px;font-size:8px;">Live</span></div>' +
             '<div class="footer"><span>resistancezero.com</span><span>Estimates based on Uptime Institute, AFCOM, 7x24 Exchange 2024–2026 data</span><span>No data sent to server</span></div>' +
-            '</body></html>');
+            '
+<!-- Cookie Consent Banner -->
+<div class="cookie-banner hidden" id="cookieBanner">
+    <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+    <div class="cookie-actions">
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+        <button class="cookie-decline" id="cookieDecline">Decline</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    var cb = document.getElementById('cookieBanner');
+    var consent = localStorage.getItem('rz_cookie_consent');
+    if (!consent && cb) {
+        cb.classList.remove('hidden');
+    }
+    var acceptBtn = document.getElementById('cookieAccept');
+    var declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'accepted');
+        if (cb) cb.classList.add('hidden');
+    });
+    if (declineBtn) declineBtn.addEventListener('click', function(){
+        localStorage.setItem('rz_cookie_consent', 'declined');
+        if (cb) cb.classList.add('hidden');
+        window['ga-disable-G-GED7FX8RTV'] = true;
+    });
+})();
+</script>
+
+</body></html>');
         win.document.close();
         win.print();
     }
