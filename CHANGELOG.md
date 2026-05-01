@@ -29,6 +29,19 @@ release sections rather than semver.
 ### Rationale
 - User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
 
+### 2026-05-01-v8 — Inference widening + audit dashboard
+
+- **`infer_edges_by_proximity` widened**: radius 30 → 50 km, max 1 → 2 nearest neighbours per station. Builds rings instead of chains in dense regions; bridges sparse outliers without sacrificing tier-safety. Edges grew **495 → 698** (+203, mostly 150 kV: 410 → 608).
+- **NEW `tools/audit-dataset.py`** — quality dashboard. Runs 8 structural + semantic checks:
+  - required fields, duplicate IDs, geographic outliers (Java-Bali bbox)
+  - orphan stations (transmission tier ≥70 kV — distribution 20 kV expected isolated)
+  - confidence distribution per voltage tier (flags >50% low)
+  - province coverage (≥10 nodes per province)
+  - Bali isolation (must have ≥1 edge crossing the strait)
+  - cross-tier jumps (500↔20 without 150 kV intermediate)
+- Output as human-readable report or `--json`. `--strict` exits 1 on CRITICAL findings (CI-gate ready).
+- Current state: **0 CRITICAL, 38 HIGH** (32 remote orphans, 1 statistical confidence skew, 5 cross-tier jumps from OSM lazy line tagging — all candidates for future YAML-overlay corrections).
+
 ### 2026-04-30-v7 — datahallAI auth gate hotfix + Java-Bali submarine fix + second-brain refresh
 
 - **Fixed** the `datahallAI.html` "Root Access Required" modal that blocked logged-in PRO/root users. Root cause: race condition — gate IIFE ran before `window._rzAuth` was defined by `auth.js`. Patched the gate to fall back to a direct `localStorage.rz_premium_session` read with the same email-allowlist (`admin@`, `bagus@`), so the page works whether or not auth.js has loaded yet. Also added a `storage` event listener for cross-tab logout sync.

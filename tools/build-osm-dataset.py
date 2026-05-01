@@ -656,19 +656,24 @@ def find_nearest_node(lat: float, lng: float,
 def infer_edges_by_proximity(nodes: List[Dict[str, Any]],
                               existing_edges: List[Dict[str, Any]],
                               voltages: Tuple[int, ...] = (500, 275, 150),
-                              max_km: float = 30.0) -> List[Dict[str, Any]]:
-    """For nodes at the given voltages that are not in any existing edge,
-    connect each isolated node to its nearest same-voltage neighbour within
-    max_km. Marks the edge source as 'inferred-nn'.
+                              max_km: float = 50.0,
+                              max_neighbours: int = 2) -> List[Dict[str, Any]]:
+    """For each station at the given voltages, ensure it has up to N nearest
+    same-voltage neighbours within max_km. Marks edges as source='inferred-nn'.
 
-    Avoids cross-tier inferences (a 150 kV node only connects to another
-    150 kV node). Skips plants. Idempotent given the same dataset.
+    Differs from the v4 version: now connects under-connected nodes to up to
+    max_neighbours nearest, not just isolated nodes to 1. This builds rings
+    instead of chains in dense regions while still bridging sparse outliers.
+    Cross-tier safe — a 150 kV station only connects to another 150 kV.
+    Idempotent given the same dataset.
     """
     out: List[Dict[str, Any]] = []
-    connected_ids = set()
+
+    # Count existing connections per node
+    deg: Dict[str, int] = {}
     for e in existing_edges:
-        connected_ids.add(e["from"])
-        connected_ids.add(e["to"])
+        deg[e["from"]] = deg.get(e["from"], 0) + 1
+        deg[e["to"]] = deg.get(e["to"], 0) + 1
 
     by_voltage: Dict[int, List[Dict[str, Any]]] = {}
     for n in nodes:
@@ -685,31 +690,38 @@ def infer_edges_by_proximity(nodes: List[Dict[str, Any]],
 
     for v, group in by_voltage.items():
         for n in group:
-            if n["id"] in connected_ids:
+            already = deg.get(n["id"], 0)
+            need = max_neighbours - already
+            if need <= 0:
                 continue
-            best = None
-            best_km = max_km
+            # Score every other same-voltage station by distance
+            cands: List[Tuple[float, Dict[str, Any]]] = []
             for m in group:
                 if m["id"] == n["id"]:
                     continue
                 d = haversine_km(n["lat"], n["lng"], m["lat"], m["lng"])
-                if d < best_km:
-                    best_km = d
-                    best = m
-            if not best:
-                continue
-            pair = tuple(sorted([n["id"], best["id"]]))
-            if pair in seen_pairs:
-                continue
-            seen_pairs.add(pair)
-            out.append({
-                "from": n["id"],
-                "to": best["id"],
-                "voltage": v,
-                "km": int(round(best_km)),
-                "circuits": 1,
-                "source": "inferred-nn",
-            })
+                if d <= max_km:
+                    cands.append((d, m))
+            cands.sort(key=lambda t: t[0])
+            added_for_n = 0
+            for d, m in cands:
+                if added_for_n >= need:
+                    break
+                pair = tuple(sorted([n["id"], m["id"]]))
+                if pair in seen_pairs:
+                    continue
+                seen_pairs.add(pair)
+                out.append({
+                    "from": n["id"],
+                    "to": m["id"],
+                    "voltage": v,
+                    "km": int(round(d)),
+                    "circuits": 1,
+                    "source": "inferred-nn",
+                })
+                deg[n["id"]] = deg.get(n["id"], 0) + 1
+                deg[m["id"]] = deg.get(m["id"], 0) + 1
+                added_for_n += 1
     return out
 
 
