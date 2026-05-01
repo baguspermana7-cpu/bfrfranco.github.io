@@ -1376,7 +1376,8 @@
             var displayRows = ''
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="labels"><span class="pjg-tech-label">Labels</span></label>'
                 + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="capacity"><span class="pjg-tech-label">Capacity</span></label>'
-                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="kvbadges" checked><span class="pjg-tech-label">kV badges</span></label>';
+                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="kvbadges" checked><span class="pjg-tech-label">kV badges</span></label>'
+                + '<label class="pjg-tech-row"><input type="checkbox" data-panel-display="choropleth" id="pjg-choropleth-toggle"><span class="pjg-tech-label">Province utilization (choropleth)</span></label>';
             var html = ''
                 + '<div class="rzm-info-panel pjg-tech-panel">'
                 + '<div class="pjg-tech-panel-hdr">'
@@ -1435,6 +1436,42 @@
                         panel.classList.toggle('pjg-tech-panel-collapsed');
                         ev.target.textContent = panel.classList.contains('pjg-tech-panel-collapsed') ? '+' : '−';
                     }
+                }
+            });
+
+            // Province choropleth wire-up — toggles a Leaflet GeoJSON layer with
+            // utilization gradient (electricitymaps.com style brown ramp).
+            // Defaults OFF; opt-in via Display → "Province utilization (choropleth)".
+            var choroplethLayer = null;
+            var choroplethLegend = null;
+            document.addEventListener('change', function (ev) {
+                var t = ev.target;
+                if (!t || t.getAttribute('data-panel-display') !== 'choropleth') return;
+                if (!STATE.mapInst || !STATE.mapInst.map) return;
+                var ED = window.PLN_ENERGY_DATA;
+                var EDB = window.PLN_ENERGY_DASHBOARD;
+                if (!ED || !EDB || typeof ED.computeProvinceAggregates !== 'function' ||
+                    typeof EDB.renderProvinceChoropleth !== 'function') {
+                    console.warn('[PJG] choropleth helpers missing'); return;
+                }
+                if (t.checked) {
+                    var aggs = ED.computeProvinceAggregates(window.PLN_JAVA_GRID || {});
+                    Promise.resolve(EDB.renderProvinceChoropleth(STATE.mapInst.map, aggs, 'js/pln-indonesia-provinces.geojson'))
+                        .then(function (layer) {
+                            choroplethLayer = layer;
+                            if (typeof EDB.addChoroplethLegend === 'function') {
+                                choroplethLegend = EDB.addChoroplethLegend(STATE.mapInst.map, 'bottomleft');
+                            }
+                        })
+                        .catch(function (err) { console.warn('[PJG] choropleth render failed', err); });
+                } else {
+                    if (choroplethLayer && STATE.mapInst.map.removeLayer) {
+                        try { STATE.mapInst.map.removeLayer(choroplethLayer); } catch (e) { /* no-op */ }
+                    }
+                    if (choroplethLegend && choroplethLegend.remove) {
+                        try { choroplethLegend.remove(); } catch (e) { /* no-op */ }
+                    }
+                    choroplethLayer = null; choroplethLegend = null;
                 }
             });
         }
