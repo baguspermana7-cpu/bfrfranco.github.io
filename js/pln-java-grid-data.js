@@ -186,7 +186,16 @@ window.PLN_JAVA_GRID = {
     { id: 'osm_way_1314372463', name: 'Gardu Induk Pondok Kelapa', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.24272, lng: 106.95554, x: 322, y: 269, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 1314372463, osm_type: 'way' },
     { id: 'osm_way_1314372465', name: 'Gardu Induk Jatiwaringin', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.27571, lng: 106.96232, x: 323, y: 275, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 1314372465, osm_type: 'way' },
     { id: 'osm_way_1314373273', name: 'Gardu Induk Cibubur', kind: 'station', voltage: 150, mva: 250, year: 2008, prov: 'jakarta-banten', lat: -6.37439, lng: 106.92976, x: 319, y: 295, tier: 1, confidence: 'high', operator: 'PLN', served_areas: ['Cibubur residential', 'Cileungsi industrial', 'Jonggol'], source: 'osm', osm_id: 1314373273, osm_type: 'way' },
-    { id: 'osm_way_1314376180', name: 'GIS Bekasi II', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.22293, lng: 106.98311, x: 326, y: 265, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 1314376180, osm_type: 'way' },
+    { id: 'osm_way_1314376180', name: 'GIS Bekasi II', kind: 'station', voltage: 150, mva: 60, year: 2018, prov: 'jakarta-banten', lat: -6.22293, lng: 106.98311, x: 326, y: 265, tier: 1, confidence: 'high', operator: 'PLN', served_areas: ['Summarecon Bekasi residential', 'Summarecon Bekasi mall', 'Kota Bekasi commercial core', 'Pekayon residential', 'Galaxy residential', 'Bekasi Trade Centre'], notes: 'GIS 150 kV Bekasi II / Summarecon — gas-insulated indoor step-down on PLN ULTG Bekasi land.
+Aliases: "GIS Summarecon Bekasi", "GI Bekasi II", "Gardu Summarecon".
+Energized 2018-08 (Asian Games supply); fully integrated 2023-05 for KCJB launch.
+Connected via underground SKTT 150 kV cable to GI Traksi Halim (KCIC Jakarta-Bandung
+high-speed rail traction power). NOT to be confused with GIS Summarecon Serpong
+(osm_way_966209499) in Tangerang Selatan — that is a separate Banten-side substation
+in a Summarecon-developer area of a different city.
+Sources: PLN press release 2023-05 (web.pln.co.id/media/siaran-pers/2023/05),
+Bisnis Indonesia 2018-01 (ekonomi.bisnis.com/read/20180113/44/726138).
+', source: 'osm', osm_id: 1314376180, osm_type: 'way' },
     { id: 'osm_way_1314376181', name: 'GIS Penggilingan II', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.20634, lng: 106.95986, x: 323, y: 261, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 1314376181, osm_type: 'way' },
     { id: 'osm_way_1314443979', name: 'Gardu Induk Krakatau Tirta Industri', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.14139, lng: 105.87131, x: 188, y: 248, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 1314443979, osm_type: 'way' },
     { id: 'osm_way_1314443985', name: 'Gardu Induk Anyer', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.14983, lng: 105.86914, x: 188, y: 250, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 1314443985, osm_type: 'way' },
@@ -733,7 +742,14 @@ window.PLN_JAVA_GRID = {
     { id: 'osm_way_966209494', name: 'Gardu Induk Semen Baru', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.45626, lng: 106.93642, x: 320, y: 311, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 966209494, osm_type: 'way' },
     { id: 'osm_way_966209497', name: 'Gardu Induk ITP', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.48414, lng: 106.89095, x: 314, y: 317, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 966209497, osm_type: 'way' },
     { id: 'osm_way_966209498', name: 'Gardu Induk Bintaro II', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.2717, lng: 106.71146, x: 292, y: 274, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 966209498, osm_type: 'way' },
-    { id: 'osm_way_966209499', name: 'GIS Summarecon', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.24335, lng: 106.64335, x: 284, y: 269, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 966209499, osm_type: 'way' },
+    { id: 'osm_way_966209499', name: 'GIS Summarecon', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.24335, lng: 106.64335, x: 284, y: 269, tier: 1, confidence: 'high', operator: 'PLN', served_areas: ['Summarecon Serpong', 'Gading Serpong', 'BSD residential edge'], notes: 'GIS Summarecon Serpong — distribution substation in the Summarecon Serpong
+developer area, Tangerang Selatan (Banten), at lat -6.243 lng 106.643.
+OSM tag "GIS Summarecon" reflects the developer-area naming only; this is
+Banten-side and is NOT the same as the Bekasi-side "GIS Bekasi II / Summarecon"
+(osm_way_1314376180) at lat -6.223 lng 106.983 in Kota Bekasi (~25 km east).
+The two share the "Summarecon" brand because both are inside Summarecon-
+developed real estate, but they are physically and electrically distinct.
+', source: 'osm', osm_id: 966209499, osm_type: 'way' },
     { id: 'osm_way_966209505', name: 'Gardu Induk Tangerang', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.20687, lng: 106.64107, x: 283, y: 261, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 966209505, osm_type: 'way' },
     { id: 'osm_way_966209506', name: 'Gardu Induk Jatake', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.2142, lng: 106.58311, x: 276, y: 263, tier: 1, confidence: 'high', operator: 'PLN', source: 'osm', osm_id: 966209506, osm_type: 'way' },
     { id: 'osm_way_966209507', name: 'Gardu Induk KTT ITS', kind: 'station', voltage: 150, prov: 'jakarta-banten', lat: -6.16146, lng: 106.62625, x: 282, y: 252, tier: 1, confidence: 'high', operator: 'Perusahaan Listrik Negara', source: 'osm', osm_id: 966209507, osm_type: 'way' },
