@@ -18,7 +18,8 @@ This vault is the Obsidian mirror of the [ResistanceZero website](https://bfrfra
 | [[04-Series/Series-Hub]] | Geopolitics + Future Forward | 2 series | ✅ |
 | [[05-Standards/Standards-Hub]] | TIA-942, Tier Advisor, LTC labs, DC systems | 10 | ✅ |
 | [[06-Comparisons/Comparisons-Hub]] | 10 head-to-head comparisons | 10 | ✅ |
-| [[07-Reports/Reports-Hub]] | Infographics + market reports | 6 | ✅ |
+| [[07-Reports/Reports-Hub]] | Infographics + market reports + PLN grid family | 11 | ✅ |
+| [[08-Automation/Automation-Hub]] | Private engineering audits (gitignored) | 1 | ✅ |
 
 ---
 

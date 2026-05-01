@@ -7,11 +7,16 @@
 | ID | Name | File | Key Data |
 |---|---|---|---|
 | asean-report | [[ASEAN-DC-Report]] | asean-dc-report-2026.html | SG 850MW, ID 350MW |
-| datahallai | [[DataHall-AI]] | datahallAI.html | NVLink 1800 GB/s |
+| datahallai | [[DataHall-AI]] | datahallAI.html | NVLink 1800 GB/s · BMS audit pending [[../08-Automation/DC-AI-Engineering-Audit]] |
 | infog-pue | [[PUE-Infographic]] | infographic-pue-global.html | 1.40→1.55 forecast |
 | infog-sustain | [[DC-Sustainability]] | infographic-dc-sustainability.html | 350→620 TWh |
 | infog-cost | [[DC-Cost-Breakdown]] | infographic-dc-cost-breakdown.html | Tier IV 2(N+1) |
-| dc-market | [[DC-Market-Tracker]] | dc-market-tracker.html | 25+ markets SVG map |
+| dc-market | [[DC-Market-Tracker]] | dc-market-tracker.html | 25+ markets Leaflet/CARTO map |
+| pjg | [[PLN-Java-Grid]] | pln-java-grid.html | 744 nodes / 698 edges OSM-sourced |
+| pjg-jkb | [[PLN-Jakarta-Banten]] | pln-java-grid-jakarta-banten.html | 30-node 20kV DC overlay |
+| pjg-jb | [[PLN-Jawa-Barat]] | pln-java-grid-jabar.html | Cirata hydro + geo cluster |
+| pjg-jt | [[PLN-Jateng-DIY]] | pln-java-grid-jateng.html | Tanjung Jati B 2.64 GW anchor |
+| pjg-jm | [[PLN-Jawa-Timur]] | pln-java-grid-jatim.html | Paiton 4.71 GW + Java-Bali submarine |
 
 ## Data Sources
 

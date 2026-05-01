@@ -1,0 +1,74 @@
+---
+id: dcai-audit
+title: DC AI BMS — Engineering Audit & Improvement Roadmap
+file: /home/baguspermana7/rz-work/Automation/DC AI/Engineering-Audit-2026-05-01.md
+group: automation
+tags: [bms, scada, dcai, audit, p&id, sld, ldc, iec-62443]
+last_updated: 2026-05-01
+status: private
+gitignored: true
+parent: [[DataHall-AI]]
+---
+
+# DC AI BMS — Engineering Audit (private, gitignored)
+
+> **NOT public.** Lives in `/home/baguspermana7/rz-work/Automation/DC AI/`. Folder added to repo `.gitignore` at commit `30d99b0`.
+
+## What this document is
+
+A 547-line engineering audit + improvement roadmap for `datahallAI.html` (the DC AI BMS simulation page). Driven by user feedback: the page is visually rich but engineering-implausible — symbols, setpoints, and topology don't survive scrutiny by a real DC engineer.
+
+## Top 3 credibility blockers identified
+
+1. **Cooling & Piping** is drawn with cartoon shapes, not ISA-5.1 P&ID symbols. No setpoints, no loop split, no lead-lag.
+2. **Electrical SLD** has no IEC 60617 symbols, no equipment IDs, no ANSI relay codes (50/51/87/etc.), no arc-flash labels.
+3. **BMS Architecture** is missing the **LDC (Local Display Controller) layer** + IEC 62443 zone segmentation + alarm-management server.
+
+## Phased roadmap
+
+| Phase | Effort | Wins |
+|---|---|---|
+| **P0** — engineering credibility | 1–2 days | P&ID redraw, IEC 60617 SLD, LDC layer, visual style global pass |
+| **P1** — operator-grade detail | 2–3 days | Real-time PV+SP, alarm-priority colour code, trend mini-charts, lead-lag rotation |
+| **P2** — code-compliance polish | 1–2 days | Arc-flash labels, NFPA/ASHRAE/IEC standards-citation footers, aerial callouts, LOTO permits |
+
+## Visual style calibration (mandatory across all tabs)
+
+- **Lines**: 0.6–1.4 px tier-graded — never the 3-4 px slabs
+- **Colour**: pull back saturated greens/cyans for *decoration*; reserve for *state* (running/alarm/locked-out)
+- **Animation**: restrained — slow alarm pulse 1 Hz, smooth 200-300 ms cross-fade, parallel-stroke laser flow only on energised lines. Forbidden: bounce, spring, decorative particles, rainbow.
+- **Typography**: JetBrains Mono for numerics, Inter for labels.
+
+## Standards referenced (22 codes)
+
+ISA-5.1 / IEC 60617 / IEEE C37.2 / IEEE 1584 / NFPA 70E / IEC 60364-5-54 / IEEE 519 / IEC 60076 / IEC 62040-3 / ISO 8528 / ASHRAE TC 9.9 (W3-W5) / ASHRAE 90.4 / NFPA 72 / NFPA 2001 / NFPA 75 / NFPA 76 / TIA-942 / Uptime Institute Tier / IEC 62443 / BACnet / Modbus / IEC 61850 / IEEE 1588 PTP / ISO 50001
+
+## Symbol library checklist
+
+~50 SVG symbols to assemble across 4 categories: Mechanical (ISA-5.1), Electrical (IEC 60617), Fire & Safety, BMS / IT. See full checklist in the audit MD § 4.
+
+## LDC-layer addition spec (the user's primary call-out)
+
+Insert a new "L2 — Supervisory" swim-lane between L1 Controller and L3 Operations on the BMS Architecture page, containing 5 LDC nodes:
+
+- `LDC-01-CHILLER` — Schneider Magelis GTU 12" at chiller plant (Profinet to PLC)
+- `LDC-02-EHOUSE-A` — Siemens KTP1500 in MV switch-room A (IEC 61850 MMS)
+- `LDC-03-EHOUSE-B` — mirror of LDC-02 in switch-room B (redundant operator station)
+- `LDC-04-NOC` — Wonderware InTouch SE main console (OPC UA read-only on critical loops)
+- `LDC-05-BMS-RM` — AVEVA System Platform engineering ws (LOTO permit gateway)
+
+All LDC traffic transits through unidirectional gateway (data diode) to L3 historian, per IEC 62443.
+
+## Related
+
+- [[DataHall-AI]] — the page being audited
+- [[Standards-Hub]] — TIA-942, Tier ratings, ASHRAE thermal classes
+- [[../05-Standards/Standards-Hub#fire|Fire pillar]]
+- [[../00-Hub/Site-Architecture]]
+
+## Maintainer notes
+
+- DO NOT push the underlying audit file or its `SS 010526/` screenshots folder to the repo. The whole `Automation/` directory is gitignored.
+- This vault entry is safe to push (no sensitive content).
+- Re-read the audit MD before any iteration on `datahallAI.html`.
+- Per [[../00-Hub/README#Graphify Protocol]]: when querying via Graphify, the audit MD is the single-source-of-truth for what to fix on the BMS page. Don't re-crawl the source HTML.
