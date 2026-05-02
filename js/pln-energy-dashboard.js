@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-02-v8
+ * @version 2026-05-02-v9
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -1120,6 +1120,85 @@
       });
       lText.textContent = line.label;
       svgElement.appendChild(lText);
+    });
+
+    /* Hover crosshair + multi-series tooltip */
+    var hoverG = svgEl('g', { style: 'pointer-events:none;opacity:0;transition:opacity 0.1s ease;' });
+    var hGuide = svgEl('line', {
+      x1: 0, x2: 0,
+      y1: padT,
+      y2: H - padB + 12,
+      stroke: 'rgba(255,255,255,0.4)', 'stroke-width': '1', 'stroke-dasharray': '3 2'
+    });
+    hoverG.appendChild(hGuide);
+
+    /* Dots per line */
+    var hDots = lines.map(function (line) {
+      var dot = svgEl('circle', { r: '4', fill: line.color, stroke: '#fff', 'stroke-width': '1.5' });
+      hoverG.appendChild(dot);
+      return dot;
+    });
+
+    /* Tooltip pill */
+    var ttG   = svgEl('g', {});
+    var ttBg  = svgEl('rect', { rx: '4', fill: 'rgba(15,23,42,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
+    var ttXlbl = svgEl('text', { fill: '#94a3b8', 'font-size': '10', 'font-family': "'Inter',sans-serif" });
+    var ttSeriesTexts = lines.map(function (line) {
+      var t = svgEl('text', { fill: line.color, 'font-size': '10', 'font-family': "'Inter',sans-serif", 'font-weight': '600' });
+      ttG.appendChild(t);
+      return t;
+    });
+    ttG.insertBefore(ttBg, ttG.firstChild);
+    ttG.insertBefore(ttXlbl, ttG.firstChild);
+    hoverG.appendChild(ttG);
+    svgElement.appendChild(hoverG);
+
+    /* Transparent hit area */
+    var innerW2 = W - padL - padR;
+    var hitR = svgEl('rect', {
+      x: padL, y: padT, width: innerW2, height: H - padT - padB + 12,
+      fill: 'transparent', style: 'cursor:crosshair;pointer-events:all;'
+    });
+    svgElement.appendChild(hitR);
+
+    hitR.addEventListener('mousemove', function (e) {
+      var rect = hitR.getBoundingClientRect ? hitR.getBoundingClientRect() : { left: padL, width: innerW2 };
+      var relX = (e.clientX !== undefined ? e.clientX : 0) - (rect.left || 0);
+      var idx  = Math.round(Math.max(0, Math.min(1, relX / innerW2)) * (n - 1));
+      var gx   = xs[idx];
+
+      hGuide.setAttribute('x1', gx); hGuide.setAttribute('x2', gx);
+      hoverG.style.opacity = '1';
+
+      lines.forEach(function (line, li) {
+        var vy   = toY(line.values[idx] || 0, bounds.min, bounds.max, H, padT + (padB - 12));
+        hDots[li].setAttribute('cx', gx);
+        hDots[li].setAttribute('cy', vy);
+        ttSeriesTexts[li].textContent = (line.label || '') + ': ' + Math.round(line.values[idx] || 0).toLocaleString();
+      });
+
+      var lbl   = xLabels[idx] !== undefined ? String(xLabels[idx]) : '';
+      ttXlbl.textContent = lbl;
+
+      var lineH = 14;
+      var ttW   = Math.max.apply(null, lines.map(function (l, li) {
+        return ((l.label || '').length + String(Math.round(l.values[idx] || 0)).length + 4) * 7;
+      }).concat([lbl.length * 7 + 16])) + 16;
+      var ttH   = (lines.length + 1) * lineH + 8;
+      var tx    = gx + 10;
+      if (tx + ttW > W - padR) tx = gx - ttW - 10;
+      var ty    = padT + 4;
+
+      ttBg.setAttribute('x', tx); ttBg.setAttribute('y', ty);
+      ttBg.setAttribute('width', ttW); ttBg.setAttribute('height', ttH);
+      ttXlbl.setAttribute('x', tx + 8); ttXlbl.setAttribute('y', ty + lineH);
+      ttSeriesTexts.forEach(function (t, li) {
+        t.setAttribute('x', tx + 8);
+        t.setAttribute('y', ty + lineH * (li + 2));
+      });
+    });
+    hitR.addEventListener('mouseleave', function () {
+      hoverG.style.opacity = '0';
     });
   }
 

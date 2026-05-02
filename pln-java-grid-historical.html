@@ -365,7 +365,7 @@
                 <a href="https://www.bps.go.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-database"></i> BPS Statistical Indonesia 2024</a>
                 <a href="https://www.iea.org/countries/indonesia" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-globe"></i> IEA Indonesia 2024</a>
                 <a href="https://www.esdm.go.id/" target="_blank" rel="noopener" class="pjg-source-chip"><i class="fas fa-bolt"></i> ESDM Statistics</a>
-                <span class="pjg-refresh-badge"><i class="fas fa-clock"></i> Updated 2026-05-01</span>
+                <span class="pjg-refresh-badge"><i class="fas fa-clock"></i> Updated 2026-05-02</span>
             </div>
         </div>
     </header>
@@ -544,8 +544,8 @@
     <script src="auth.js?v=20260324b" defer></script>
     <script src="rz-engine.js?v=2026-04-28" defer></script>
     <script src="js/pln-java-grid-data.js?v=2026-04-29" defer></script>
-    <script src="js/pln-energy-data.js?v=2026-05-01"></script>
-    <script src="js/pln-energy-dashboard.js?v=2026-05-01"></script>
+    <script src="js/pln-energy-data.js?v=2026-05-02-v8"></script>
+    <script src="js/pln-energy-dashboard.js?v=2026-05-02-v9"></script>
 
     <!-- PAGE IIFE -->
     <script>
@@ -783,7 +783,7 @@
             if (co2El) {
                 co2El.textContent = (co2Yoy >= 0 ? '+' : '') + co2Yoy.toFixed(1) + '% YoY';
                 // Improving = lower CO2 = green (down is good)
-                co2El.className = 'pjg-yoy-value ' + (co2Yoy < 0 ? 'pjg-yoy-down' : 'pjg-yoy-up');
+                co2El.className = 'pjg-yoy-value ' + (co2Yoy < 0 ? 'pjg-yoy-up' : 'pjg-yoy-down');
             }
 
             // Renewable share YoY (percentage points)
@@ -802,7 +802,7 @@
             if (coalEl) {
                 coalEl.textContent = (coalPp >= 0 ? '+' : '') + coalPp.toFixed(1) + 'pp YoY';
                 // Lower coal = good (down is green)
-                coalEl.className = 'pjg-yoy-value ' + (coalPp < 0 ? 'pjg-yoy-down' : 'pjg-yoy-up');
+                coalEl.className = 'pjg-yoy-value ' + (coalPp < 0 ? 'pjg-yoy-up' : 'pjg-yoy-down');
             }
             var coalSubEl = $('pjg-yoy-coal-sub');
             if (coalSubEl) coalSubEl.textContent = 'Now: ' + cur.coal_pct.toFixed(0) + '%';
