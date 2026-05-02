@@ -12,6 +12,7 @@
 | app-sb | [[Second-Brain]] | `Apps/second brain/index.html` | vis.js | Live (this app) |
 | app-dca | [[DCA-App]] | `Apps/dca-app/index.html` | Vanilla JS | Live |
 | dcmoc | [[DC-MOC]] | `dcmoc/` | Next.js 16 | Live |
+| dunia | [[Dunia-Emosi/g13-battle-layout\|Dunia-Emosi]] | `Dunia-Emosi/` | HTML+Pixi 8 | Live (`dunia-emosi.vercel.app`) |
 
 ---
 

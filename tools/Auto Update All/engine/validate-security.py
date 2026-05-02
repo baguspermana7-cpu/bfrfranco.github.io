@@ -12,7 +12,8 @@ from pathlib import Path
 SITE_ROOT = '/home/baguspermana7/rz-work'
 
 SKIP_PATTERNS = ['node_modules', '.git', '.qa-screens', 'standarization', 'Article',
-                 'Automation', 'Apps', 'Data', 'dcmoc', 'rz-ops-p7x3k9m']
+                 'Automation', 'Apps', 'Data', 'dcmoc', 'rz-ops-p7x3k9m', 'Dunia-Emosi',
+                 'tools']
 
 # Patterns that indicate hardcoded secrets
 SECRET_PATTERNS = [
