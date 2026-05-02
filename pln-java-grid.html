@@ -1272,7 +1272,7 @@
                 <a class="pjg-source-chip" href="https://www.iea.org/countries/indonesia" target="_blank" rel="noopener"><i class="fas fa-globe"></i> IEA Indonesia 2024</a>
                 <a class="pjg-source-chip" href="https://www.esdm.go.id/" target="_blank" rel="noopener"><i class="fas fa-landmark"></i> ESDM Statistics</a>
                 <a class="pjg-source-chip" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener"><i class="fas fa-map"></i> &copy; OpenStreetMap contributors</a>
-                <span class="pjg-refresh-badge" style="color:var(--pjg-text3);"><i class="fas fa-clock"></i> Refreshed 2026-04-29</span>
+                <span class="pjg-refresh-badge" style="color:var(--pjg-text3);"><i class="fas fa-clock"></i> Refreshed 2026-05-02</span>
             </div>
         </section>
 
@@ -1611,7 +1611,7 @@
                 var key = pair[0];
                 var label = pair[1];
                 var checked = (STATE.voltageOn && STATE.voltageOn[key.replace('v','')]) ? 'checked' : '';
-                vRows += '<label class="pjg-tech-row"><input type="checkbox" data-panel-layer="' + key + '" ' + checked + '><span class="pjg-tech-dot" style="background:' + (key === 'v500' ? '#3b82f6' : key === 'v275' ? '#a78bfa' : key === 'v150' ? '#f87171' : '#facc15') + '"></span><span class="pjg-tech-label">' + label + '</span><span class="pjg-tech-count">' + voltageCounts[key] + '</span></label>';
+                vRows += '<label class="pjg-tech-row"><input type="checkbox" data-panel-layer="' + key + '" ' + checked + '><span class="pjg-tech-dot" style="background:' + (key === 'v500' ? '#3b82f6' : key === 'v275' ? '#a78bfa' : key === 'v150' ? '#f87171' : key === 'v70' ? '#fbbf24' : '#5eead4') + '"></span><span class="pjg-tech-label">' + label + '</span><span class="pjg-tech-count">' + voltageCounts[key] + '</span></label>';
             });
             // Display rows
             var displayRows = ''
@@ -2296,9 +2296,13 @@
             }
             var snap = ED.snapshot;
             // ---- KPI bar ----
-            var d = new Date(snap.timestamp);
-            var hh = isNaN(d.getTime()) ? '--' : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-            setText('pjg-live-time', hh);
+            function updateClock() {
+                var now = new Date();
+                var wib = new Date(now.getTime() + (7 * 60 * 60 * 1000) - (now.getTimezoneOffset() * 60 * 1000));
+                setText('pjg-live-time', String(wib.getHours()).padStart(2, '0') + ':' + String(wib.getMinutes()).padStart(2, '0') + ' WIB');
+            }
+            updateClock();
+            setInterval(updateClock, 60000);
             setText('pjg-live-demand', (snap.demand_mw / 1000).toFixed(1) + ' GW');
             setText('pjg-live-gen', (snap.generation_mw / 1000).toFixed(1) + ' GW');
             setText('pjg-live-reserve', (snap.reserve_mw / 1000).toFixed(1) + ' GW');
@@ -2384,7 +2388,9 @@
 
             // ---- KPI sparklines + delta vs yesterday ----
             renderSpark('pjg-spark-demand',     ED.hourly_24h.map(function (h) { return h.demand_mw; }), '#3b82f6');
-            renderSpark('pjg-spark-gen',        ED.hourly_24h.map(function (h) { return h.demand_mw; }), '#3b82f6');
+            renderSpark('pjg-spark-gen', ED.hourly_24h.map(function (h) {
+                return Object.keys(h.by_fuel).reduce(function (s, k) { return s + (h.by_fuel[k] || 0); }, 0);
+            }), '#10b981');
             renderSpark('pjg-spark-reserve',    ED.hourly_24h.map(function (h) { return 47000 - h.demand_mw; }), '#a78bfa');
             renderSpark('pjg-spark-emissions',  ED.hourly_24h.map(function (h) {
                 var totalMw = h.demand_mw, weighted = 0;
@@ -2530,20 +2536,20 @@
             var grid = window.PLN_JAVA_GRID;
             var ol = document.getElementById('pjg-live-top-plants');
             if (!grid || !ol) return;
-            var fuelIcons = { coal: 'fa-fire-flame-curved', gas: 'fa-fire', hydro: 'fa-water', geothermal: 'fa-temperature-high', solar: 'fa-sun', biomass: 'fa-leaf', diesel: 'fa-droplet', wind: 'fa-wind' };
-            var plants = (grid.nodes || []).filter(function (n) { return n.kind === 'plant' && typeof n.mva === 'number' && n.mva > 0; });
-            plants.sort(function (a, b) { return (b.mva || 0) - (a.mva || 0); });
+            var fuelIcons = { coal: 'fa-fire-flame-curved', gas: 'fa-fire', hydro: 'fa-water', geo: 'fa-temperature-high', geothermal: 'fa-temperature-high', solar: 'fa-sun', biomass: 'fa-leaf', diesel: 'fa-droplet', wind: 'fa-wind' };
+            var plants = (grid.nodes || []).filter(function (n) { return n.kind === 'plant' && typeof n.mw === 'number' && n.mw > 0; });
+            plants.sort(function (a, b) { return (b.mw || 0) - (a.mw || 0); });
             var top = plants.slice(0, 5);
             ol.innerHTML = '';
             top.forEach(function (p) {
                 var li = document.createElement('li');
                 var iconCls = fuelIcons[p.fuel] || 'fa-bolt';
-                li.title = (p.name || '(unnamed plant)') + ' — ' + (p.fuel ? p.fuel + ' generation, ' : '') + Math.round(p.mva).toLocaleString() + ' MVA installed capacity, prov: ' + (p.prov || '?') + (p.year ? ', commissioned ' + p.year : '');
+                li.title = (p.name || '(unnamed plant)') + ' — ' + (p.fuel ? p.fuel + ' generation, ' : '') + Math.round(p.mw).toLocaleString() + ' MW installed capacity, prov: ' + (p.prov || '?') + (p.year ? ', commissioned ' + p.year : '');
                 li.innerHTML =
                     '<i class="fas ' + iconCls + ' plant-fuel-icon" aria-hidden="true" title="Fuel: ' + (p.fuel || 'unknown') + '"></i>'
                     + '<span class="plant-name" title="Plant name (per OSM tag)">' + (p.name || '(unnamed plant)') + '</span>'
                     + '<span class="plant-prov" title="Province">' + (p.prov || '?') + '</span>'
-                    + '<span class="plant-mw" title="Installed capacity (MVA)">' + Math.round(p.mva).toLocaleString() + ' MVA</span>';
+                    + '<span class="plant-mw" title="Installed capacity (MW)">' + Math.round(p.mw).toLocaleString() + ' MW</span>';
                 ol.appendChild(li);
             });
             if (top.length === 0) {
