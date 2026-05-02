@@ -99,6 +99,7 @@
         if (ctx.opts.layers && ctx.opts.layers.voltage && spec.voltage) {
             var grp = ensureLayerGroup(ctx.voltageGroups, spec.voltage, ctx.map);
             grp.addLayer(marker);
+            marker._rzVoltageGroup = grp;
         } else {
             marker.addTo(ctx.map);
         }
@@ -268,8 +269,17 @@
                 if (!leafletReady()) return null;
                 var m = ctx.markersById[id];
                 if (!m) return null;
-                if (visible && !ctx.map.hasLayer(m)) ctx.map.addLayer(m);
-                if (!visible && ctx.map.hasLayer(m)) ctx.map.removeLayer(m);
+                var vg = m._rzVoltageGroup || null;
+                if (!visible) {
+                    if (vg && vg.hasLayer(m)) { vg.removeLayer(m); }
+                    else if (ctx.map.hasLayer(m)) { ctx.map.removeLayer(m); }
+                } else {
+                    var shown = (vg ? vg.hasLayer(m) : false) || ctx.map.hasLayer(m);
+                    if (!shown) {
+                        if (vg && ctx.map.hasLayer(vg)) { vg.addLayer(m); }
+                        else { m.addTo(ctx.map); }
+                    }
+                }
                 return m;
             },
             setLineVisible: function (id, visible) {
