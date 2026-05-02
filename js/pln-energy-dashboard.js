@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-01-v5
+ * @version 2026-05-01-v6
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -36,22 +36,18 @@
 
   /**
    * Carbon-intensity gradient stops (gCO₂/kWh → hex colour).
-   * Continuous interpolation between adjacent stops.
-   * Heat-map style: green (clean) → yellow → orange → red → dark brown
-   * → near-black (very dirty). Range tuned for global grids 0-1500
-   * with darker mid-range so 600-900 gCO₂/kWh (typical coal-heavy
-   * grids) lands on saturated brown — matches the electricitymaps
-   * Indonesia view where ~640 gCO₂eq/kWh shows deep brown.
+   * Evenly-spaced 300 gCO₂/kWh per stop — mirrors the electricitymaps.com
+   * legend bar (0 / 300 / 600 / 900 / 1200 / 1500). Saturated heat-map
+   * tones so each adjacent stop is visually distinct, even at moderate
+   * zoom levels.
    */
   var CARBON_STOPS = [
-    [0,    '#10b981'],  // very clean — emerald green
-    [150,  '#a3e635'],  // low-carbon — lime
-    [300,  '#fde047'],  // moderate — yellow
-    [450,  '#fb923c'],  // elevated — orange
-    [600,  '#ea580c'],  // high — red-orange
-    [800,  '#9a3412'],  // very high — red-brown
-    [1000, '#7c2d12'],  // coal-heavy — dark brown
-    [1500, '#1c0701']   // worst case — near-black
+    [0,    '#22c55e'],  // saturated green — clean grid
+    [300,  '#fde047'],  // saturated yellow — moderate
+    [600,  '#f97316'],  // saturated orange — high
+    [900,  '#dc2626'],  // saturated red — very high
+    [1200, '#7c2d12'],  // dark brown — coal-heavy
+    [1500, '#0c0a09']   // near-black — worst case
   ];
 
   var CARBON_LEGEND_MIN = 0;
@@ -227,8 +223,8 @@
             var co2  = agg.carbonIntensity !== undefined ? agg.carbonIntensity : 0;
             return {
               fillColor:   carbonColor(co2),
-              fillOpacity: 0.92,
-              weight:      0,         // NO stroke — adjacent provinces meet pixel-perfect, no overlap
+              fillOpacity: 1.0,        // full saturation — match electricitymaps look
+              weight:      0,          // base state: no stroke, pixel-perfect adjacency
               color:       'transparent',
               stroke:      false
             };
@@ -254,6 +250,26 @@
               'Stations: '         + stations + '<br>' +
               'Plants: '           + plants
             );
+
+            // Hover effect: bright stroke + bring-to-front + slight brightness lift
+            lyr.on('mouseover', function () {
+              lyr.setStyle({
+                weight:        2.5,
+                color:         '#ffffff',
+                stroke:        true,
+                fillOpacity:   1.0,
+                dashArray:     ''
+              });
+              if (lyr.bringToFront) { try { lyr.bringToFront(); } catch (e) { /* ignore */ } }
+            });
+            lyr.on('mouseout', function () {
+              lyr.setStyle({
+                weight:      0,
+                color:       'transparent',
+                stroke:      false,
+                fillOpacity: 1.0
+              });
+            });
           }
         });
         layer.addTo(map);
