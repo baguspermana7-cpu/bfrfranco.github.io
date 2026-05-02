@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-01-v6
+ * @version 2026-05-02-v7
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -223,10 +223,10 @@
             var co2  = agg.carbonIntensity !== undefined ? agg.carbonIntensity : 0;
             return {
               fillColor:   carbonColor(co2),
-              fillOpacity: 1.0,        // full saturation — match electricitymaps look
-              weight:      0,          // base state: no stroke, pixel-perfect adjacency
-              color:       'transparent',
-              stroke:      false
+              fillOpacity: 0.15,
+              weight:      1.2,
+              color:       'rgba(255,255,255,0.35)',
+              stroke:      true
             };
           },
           onEachFeature: function (feature, lyr) {
@@ -251,23 +251,21 @@
               'Plants: '           + plants
             );
 
-            // Hover effect: bright stroke + bring-to-front + slight brightness lift
             lyr.on('mouseover', function () {
               lyr.setStyle({
-                weight:        2.5,
-                color:         '#ffffff',
-                stroke:        true,
-                fillOpacity:   1.0,
-                dashArray:     ''
+                weight:      2.5,
+                color:       '#ffffff',
+                stroke:      true,
+                fillOpacity: 0.35
               });
-              if (lyr.bringToFront) { try { lyr.bringToFront(); } catch (e) { /* ignore */ } }
+              if (lyr.bringToFront) { try { lyr.bringToFront(); } catch (e) {} }
             });
             lyr.on('mouseout', function () {
               lyr.setStyle({
-                weight:      0,
-                color:       'transparent',
-                stroke:      false,
-                fillOpacity: 1.0
+                weight:      1.2,
+                color:       'rgba(255,255,255,0.35)',
+                stroke:      true,
+                fillOpacity: 0.15
               });
             });
           }
@@ -950,6 +948,63 @@
       });
       xTxt2.textContent = String(lbl2);
       svgElement.appendChild(xTxt2);
+    }
+
+    /* Interactive hover tooltip overlay */
+    var ttGroup = svgEl('g', { class: 'pjg-line-tooltip', style: 'pointer-events:none;opacity:0;' });
+    var ttVLine = svgEl('line', { x1: 0, x2: 0, y1: mTop, y2: mTop + innerH, stroke: 'rgba(255,255,255,0.5)', 'stroke-width': '1', 'stroke-dasharray': '3 2' });
+    var ttDot   = svgEl('circle', { cx: 0, cy: 0, r: '4.5', fill: lineColor, stroke: '#fff', 'stroke-width': '1.5' });
+    var ttRect  = svgEl('rect', { x: 0, y: 0, width: '1', height: '1', rx: '4', fill: 'rgba(15,23,42,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
+    var ttText1 = svgEl('text', { x: 0, y: 0, fill: '#f1f5f9', 'font-size': '11', 'font-weight': '700', 'font-family': "'Inter',sans-serif" });
+    var ttText2 = svgEl('text', { x: 0, y: 0, fill: '#94a3b8', 'font-size': '10', 'font-family': "'Inter',sans-serif" });
+    ttGroup.appendChild(ttVLine);
+    ttGroup.appendChild(ttRect);
+    ttGroup.appendChild(ttText1);
+    ttGroup.appendChild(ttText2);
+    ttGroup.appendChild(ttDot);
+    svgElement.appendChild(ttGroup);
+
+    var colW = n > 1 ? innerW / (n - 1) : innerW;
+    for (var hi = 0; hi < n; hi++) {
+      (function (idx) {
+        var hx = absPx(idx);
+        var hitRect = svgEl('rect', {
+          x: hx - colW / 2, y: mTop, width: colW, height: innerH,
+          fill: 'transparent', style: 'pointer-events:all;cursor:crosshair;'
+        });
+        hitRect.addEventListener('mouseenter', function () {
+          var val   = points[idx] || 0;
+          var label = xLabels[idx] || ('Point ' + (idx + 1));
+          var valStr = fmtNum(val, 0) + (yLabel ? ' ' + yLabel : '');
+          ttText1.textContent = valStr;
+          ttText2.textContent = String(label);
+          var px = absPx(idx);
+          var py = absPy(val);
+          ttVLine.setAttribute('x1', px);
+          ttVLine.setAttribute('x2', px);
+          ttDot.setAttribute('cx', px);
+          ttDot.setAttribute('cy', py);
+          var tw = Math.max(valStr.length, String(label).length) * 7 + 16;
+          var th = 36;
+          var tx = px + 10;
+          if (tx + tw > mLeft + innerW) tx = px - tw - 10;
+          var ty = py - th - 8;
+          if (ty < mTop) ty = py + 12;
+          ttRect.setAttribute('x', tx);
+          ttRect.setAttribute('y', ty);
+          ttRect.setAttribute('width', tw);
+          ttRect.setAttribute('height', th);
+          ttText1.setAttribute('x', tx + 8);
+          ttText1.setAttribute('y', ty + 15);
+          ttText2.setAttribute('x', tx + 8);
+          ttText2.setAttribute('y', ty + 28);
+          ttGroup.style.opacity = '1';
+        });
+        hitRect.addEventListener('mouseleave', function () {
+          ttGroup.style.opacity = '0';
+        });
+        svgElement.appendChild(hitRect);
+      })(hi);
     }
   }
 
