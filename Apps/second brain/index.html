@@ -1558,9 +1558,11 @@ document.getElementById('mm').addEventListener('click',ev=>{
 
 /* ── LAYOUT ── */
 document.getElementById('bF').addEventListener('click',()=>{
-  if(net)net.setOptions({layout:{improvedLayout:true},physics:{enabled:true,solver:'forceAtlas2Based'}});
+  /* vis-network 9.x can't switch back from hierarchical via setOptions — it bakes node
+   * positions and the simulation explodes. Full rebuild is the only clean reset. */
   document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));
   document.getElementById('bF').classList.add('on');
+  build();
 });
 document.getElementById('bH').addEventListener('click',()=>{
   if(net)net.setOptions({layout:{hierarchical:{direction:'UD',sortMethod:'directed',levelSeparation:105}},physics:{enabled:false}});
