@@ -1,7 +1,7 @@
 /**
  * @file pln-energy-dashboard.js
  * @module PLN_ENERGY_DASHBOARD
- * @version 2026-05-02-v7
+ * @version 2026-05-02-v8
  *
  * Chart-rendering and choropleth helpers for the PLN Java-Bali Grid Monitor.
  * Provides pure SVG rendering functions plus Leaflet choropleth helpers.
@@ -321,7 +321,7 @@
         'height:12px',
         'border-radius:3px',
         'background:linear-gradient(to right, ' + stops + ')',
-        'border:1px solid rgba(255,255,255,0.08)'
+        'border:1px solid rgba(96,165,250,0.18)'
       ].join(';');
       div.appendChild(bar);
 
@@ -690,7 +690,7 @@
       var ttBg = svgEl('rect', {
         x: 0, y: 0, width: 110, height: 16 + series.length * 14,
         fill: 'rgba(15,23,42,0.88)', rx: '4',
-        stroke: 'rgba(148,163,184,0.25)', 'stroke-width': '1'
+        stroke: 'rgba(96,165,250,0.25)', 'stroke-width': '1'
       });
       var ttG = svgEl('g', { 'class': 'pjg-chart-tt' });
       ttG.appendChild(ttBg);
@@ -951,7 +951,7 @@
     }
 
     /* Interactive hover tooltip overlay */
-    var ttGroup = svgEl('g', { class: 'pjg-line-tooltip', style: 'pointer-events:none;opacity:0;' });
+    var ttGroup = svgEl('g', { class: 'pjg-line-tooltip', style: 'pointer-events:none;opacity:0;transition:opacity 0.12s ease;' });
     var ttVLine = svgEl('line', { x1: 0, x2: 0, y1: mTop, y2: mTop + innerH, stroke: 'rgba(255,255,255,0.5)', 'stroke-width': '1', 'stroke-dasharray': '3 2' });
     var ttDot   = svgEl('circle', { cx: 0, cy: 0, r: '4.5', fill: lineColor, stroke: '#fff', 'stroke-width': '1.5' });
     var ttRect  = svgEl('rect', { x: 0, y: 0, width: '1', height: '1', rx: '4', fill: 'rgba(15,23,42,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
