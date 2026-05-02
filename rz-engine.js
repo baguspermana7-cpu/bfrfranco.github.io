@@ -7,13 +7,13 @@
  * Load order: auth.js -> rz-engine.js -> article IIFE.
  * No build step. Vanilla ES5/ES6. No external dependencies.
  *
- * Phase: S0 (skeleton) + S1 (auth)
+ * Phase: S0–S4 (skeleton + auth + workforce/roi/forecast + capex/opex/tco/pue)
  * Provides:
  *   - RZEngine.data           Single source of truth for site-wide constants.
  *   - RZEngine.auth.*         Login/session/event helpers (S1).
  *   - RZEngine.format.*       Currency / number / date formatters.
  *   - RZEngine.events.*       Custom-event bus.
- *   - RZEngine.models, ui     Stubs filled in later phases (S2-S6).
+ *   - RZEngine.models.*       Full calc math: workforce, roi, forecast, capex, opex, tco, pue (S2+S4).
  */
 (function (root) {
     'use strict';
@@ -441,6 +441,34 @@
                     var key = 'tier' + (tier || 3);
                     var pct = (DATA.mepPctOfCapex && DATA.mepPctOfCapex[key]) || 0.42;
                     return Math.round((totalCapex || 0) * pct);
+                },
+
+                /**
+                 * Single-call total CAPEX with full breakdown.
+                 * Returns { total, it, mep, civil, contingency, perMwCost } in USD.
+                 *
+                 * opts: { modularPct: 0–1, contingencyPct: 0.10, itPctOfCapex: 0.40 }
+                 */
+                totalCost: function (mw, tier, region, opts) {
+                    opts = opts || {};
+                    var t = tier || 3;
+                    var base = RZEngine.models.capex.datacenterBuildCost(mw, t, region);
+                    var withMod = RZEngine.models.capex.modularPremium(base, opts.modularPct || 0, t);
+                    var contingencyPct = opts.contingencyPct != null ? opts.contingencyPct : 0.10;
+                    var total = Math.round(withMod * (1 + contingencyPct));
+                    var mep = RZEngine.models.capex.mepDistribution(total, t);
+                    var itPct = opts.itPctOfCapex != null ? opts.itPctOfCapex : 0.40;
+                    var it = Math.round(total * itPct);
+                    var civil = total - mep - it;
+                    var contingency = Math.round(withMod * contingencyPct);
+                    return {
+                        total: total,
+                        it: it,
+                        mep: mep,
+                        civil: civil,
+                        contingency: contingency,
+                        perMwCost: (mw > 0) ? Math.round(total / mw) : 0
+                    };
                 }
             },
 
@@ -486,6 +514,33 @@
                     var b = base[scope] || base.medium;
                     var rdata = (region && DATA.regions[region.toUpperCase()]) || DATA.regions.US;
                     return Math.round(b * rdata.salaryMult);
+                },
+
+                /**
+                 * Single-call total annual OPEX with breakdown.
+                 * Returns { total, power, staffing, maintenance, contract, overhead } in USD/yr.
+                 *
+                 * opts: { maintenancePct: 0.02 (of capex), overheadPct: 0.08, contractScope, capex }
+                 */
+                totalAnnual: function (mw, pue, region, headcount, opts) {
+                    opts = opts || {};
+                    var rdata = (region && DATA.regions[(region || '').toUpperCase()]) || DATA.regions.US;
+                    var power    = RZEngine.models.opex.powerCostAnnual(mw, pue, rdata.powerKwh);
+                    var staffing = RZEngine.models.opex.staffingCostAnnual(headcount || 0, region);
+                    var contract = RZEngine.models.opex.contractCostAnnual(opts.contractScope || 'medium', region);
+                    var capexBase = opts.capex || 0;
+                    var maintenance = Math.round(capexBase * (opts.maintenancePct != null ? opts.maintenancePct : 0.02));
+                    var overheadPct = opts.overheadPct != null ? opts.overheadPct : 0.08;
+                    var subtotal    = power + staffing + contract + maintenance;
+                    var overhead    = Math.round(subtotal * overheadPct);
+                    return {
+                        total:       subtotal + overhead,
+                        power:       power,
+                        staffing:    staffing,
+                        maintenance: maintenance,
+                        contract:    contract,
+                        overhead:    overhead
+                    };
                 }
             },
 
@@ -504,6 +559,27 @@
                 replacementCycles: function (assetLifeYears, totalYears) {
                     if (!assetLifeYears || assetLifeYears <= 0) return 0;
                     return Math.max(0, Math.floor((totalYears || 0) / assetLifeYears));
+                },
+
+                /**
+                 * Generate year-by-year cashflow array suitable for NPV/IRR input.
+                 * Year 0 = -capex (initial outlay). Years 1..n = -opexAnnual + annualRevenue.
+                 * refreshPct of capex is charged at each 5-year refresh cycle.
+                 */
+                cashflows: function (capex, opexAnnual, years, annualRevenue, refreshPct) {
+                    var rp = refreshPct == null ? 0.40 : refreshPct;
+                    var flows = [-(capex || 0)];
+                    for (var y = 1; y <= (years || 0); y++) {
+                        var refresh = (y % 5 === 0) ? (capex || 0) * rp : 0;
+                        flows.push((annualRevenue || 0) - (opexAnnual || 0) - refresh);
+                    }
+                    return flows;
+                },
+
+                /** Cost per MW per year — useful KPI for benchmarking. */
+                costPerMwYear: function (totalTco, mw, years) {
+                    if (!mw || mw <= 0 || !years || years <= 0) return 0;
+                    return Math.round((totalTco || 0) / mw / years);
                 }
             },
 
