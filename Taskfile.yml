@@ -1,0 +1,50 @@
+version: '3'
+
+vars:
+  PORT: 8081
+  JS_SRC: script.js
+  JS_OUT: script.min.js
+  CSS_SRC: styles.css
+  CSS_OUT: styles.min.css
+
+tasks:
+  serve:
+    desc: Start dev server on port 8081
+    cmds:
+      - python3 -m http.server {{.PORT}}
+
+  minify:
+    desc: Minify JS and CSS
+    cmds:
+      - terser {{.JS_SRC}} -o {{.JS_OUT}} --compress --mangle
+      - cleancss {{.CSS_SRC}} -o {{.CSS_OUT}}
+
+  pln:build:
+    desc: Rebuild PLN OSM dataset from YAML overlay
+    dir: tools
+    cmds:
+      - python3 build-osm-dataset.py
+
+  security:
+    desc: Run security validation scan
+    cmds:
+      - python3 "tools/Auto Update All/engine/validate-security.py"
+
+  sync:
+    desc: Validate Obsidian vault against knowledge graph
+    dir: "Apps/second brain"
+    cmds:
+      - python3 sync-graph.py
+
+  deploy:
+    desc: Minify then push to GitHub Pages
+    cmds:
+      - task: minify
+      - git add script.min.js styles.min.css
+      - "git commit -m 'chore(assets): minify JS/CSS'"
+      - git push
+
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
