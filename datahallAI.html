@@ -6946,6 +6946,35 @@ s+=`<rect width="960" height="480" fill="var(--bg2)"/>`;
 s+=`<pattern id="bmsGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.015)" stroke-width=".3"/></pattern>`;
 s+=`<rect width="960" height="480" fill="url(#bmsGrid)"/>`;
 s+=tx(480,16,'BMS/DCIM ARCHITECTURE — RING TOPOLOGY — REDUNDANT SERVERS','var(--t3)',8,'middle',1);
+// ===== STANDARDS HEADER STRIP — IEC 62443 / BACnet / IEC 61850 / IEEE 1588 PTP =====
+// IEC 62443 zoning (matches the L0..L4 swim-lane structure)
+s+=`<rect x="6" y="4" width="80" height="20" rx="3" fill="rgba(167,139,250,.10)" stroke="var(--p)" stroke-width=".5"/>`;
+s+=tx(46,12,'IEC 62443','var(--p)',5,'middle',1);
+s+=tx(46,20,'L0..L4 zones','var(--p)',3.2,'middle');
+// BACnet / Modbus / IEC 61850 protocol stack legend
+s+=`<rect x="90" y="4" width="92" height="20" rx="3" fill="rgba(59,130,246,.10)" stroke="var(--b)" stroke-width=".5"/>`;
+s+=tx(136,12,'BACnet · Modbus','var(--b)',4.5,'middle',1);
+s+=tx(136,20,'IEC 61850 GOOSE/MMS','var(--b)',3,'middle');
+// IEEE 1588 PTP time-sync (sub-µs for IEDs)
+s+=`<rect x="186" y="4" width="78" height="20" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
+s+=`<circle cx="196" cy="14" r="2.2" fill="var(--g)"><animate attributeName="opacity" values=".4;1;.4" dur="2s" repeatCount="indefinite"/></circle>`;
+s+=tx(231,12,'PTP IEEE 1588','var(--g)',4.5,'middle',1);
+s+=tx(231,20,'GPS-synced · stratum-1','var(--g)',2.8,'middle');
+// Alarm-priority colour-code legend (P1..P4)
+s+=`<rect x="700" y="4" width="84" height="20" rx="3" fill="rgba(245,158,11,.10)" stroke="var(--o)" stroke-width=".5"/>`;
+s+=tx(742,12,'ALARM PRIO','var(--o)',5,'middle',1);
+s+=`<circle cx="710" cy="20" r="1.5" fill="var(--r)"/>`;s+=tx(715,21,'P1','var(--r)',3,'start');
+s+=`<circle cx="725" cy="20" r="1.5" fill="var(--o)"/>`;s+=tx(730,21,'P2','var(--o)',3,'start');
+s+=`<circle cx="740" cy="20" r="1.5" fill="#facc15"/>`;s+=tx(745,21,'P3','#facc15',3,'start');
+s+=`<circle cx="755" cy="20" r="1.5" fill="var(--b)"/>`;s+=tx(760,21,'P4','var(--b)',3,'start');
+// Active alarm count
+s+=`<rect x="788" y="4" width="68" height="20" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
+s+=tx(822,12,'ALARMS','var(--g)',5,'middle',1);
+s+=tx(822,20,'0 active · 0 ack','var(--g)',3.2,'middle');
+// Cyber posture
+s+=`<rect x="860" y="4" width="92" height="20" rx="3" fill="rgba(6,182,212,.10)" stroke="var(--c)" stroke-width=".5"/>`;
+s+=tx(906,12,'CYBER · DMZ','var(--c)',5,'middle',1);
+s+=tx(906,20,'L3.5 jump host · ACL','var(--c)',3,'middle');
 // ===== FIELD LAYER (Bottom) =====
 s+=`<rect x="10" y="380" width="940" height="90" rx="4" fill="rgba(34,197,94,.03)" stroke="rgba(34,197,94,.2)" stroke-width="1"/>`;
 s+=tx(480,395,'FIELD LAYER — SENSORS & ACTUATORS','var(--g)',7,'middle',1);
