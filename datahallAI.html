@@ -2466,6 +2466,23 @@ s+='<rect width="'+W+'" height="'+H+'" fill="url(#elOvG)"/>';
 // Title (0-28)
 s+='<rect x="0" y="0" width="'+W+'" height="28" fill="rgba(245,158,11,.06)"/>';
 s+=tx(600,19,'FACILITY ELECTRICAL SLD v5 \u2014 4 DATA HALLS \u2014 28.5 MW IT \u2014 TRUE 2N \u2014 FEED A (RED) / FEED B (GREEN)','var(--o)',8,'middle',1);
+// ===== STANDARDS / PROTECTION HEADER STRIP (IEC 60617 / IEEE C37.2 / Arc-flash / Earthing) =====
+// IEC 60617 symbol set (graphical symbols for diagrams)
+s+='<rect x="900" y="4" width="70" height="20" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>';
+s+=tx(935,12,'IEC 60617','var(--g)',5,'middle',1);
+s+=tx(935,20,'symbols','var(--g)',3.5,'middle');
+// IEEE C37.2 device function numbers
+s+='<rect x="974" y="4" width="74" height="20" rx="3" fill="rgba(59,130,246,.10)" stroke="var(--b)" stroke-width=".5"/>';
+s+=tx(1011,12,'IEEE C37.2','var(--b)',5,'middle',1);
+s+=tx(1011,20,'ANSI 50/51/87T','var(--b)',3.2,'middle');
+// Arc-flash / NFPA 70E
+s+='<rect x="1052" y="4" width="68" height="20" rx="3" fill="rgba(239,68,68,.10)" stroke="var(--r)" stroke-width=".5"/>';
+s+=tx(1086,12,'AF / 70E','var(--r)',5,'middle',1);
+s+=tx(1086,20,'PPE Cat 2','var(--r)',3.5,'middle');
+// Earthing per IEC 60364-5-54
+s+='<rect x="1124" y="4" width="72" height="20" rx="3" fill="rgba(167,139,250,.10)" stroke="var(--p)" stroke-width=".5"/>';
+s+=tx(1160,12,'TN-S 60364','var(--p)',5,'middle',1);
+s+=tx(1160,20,'<1\u03a9 ground','var(--p)',3.5,'middle');
 
 // ======== MV CUSTOMER SUBSTATION (30-210) ========
 s+=sH(30,'MV CUSTOMER SUBSTATION \u2014 Schneider SM6 24kV Gas-Insulated \u2014 11 Panels (2 Inc + 1 Tie + 8 Fdr)','var(--o)');
@@ -2486,7 +2503,7 @@ s+=tx(920,98,'150kV Substation','var(--t3)',5,'middle');
 s+='<line x1="150" y1="80" x2="200" y2="80" stroke="var(--r)" stroke-width="2" opacity=".7"/>';
 s+=symMeter(215,80,'var(--r)','kW');
 s+='<line x1="225" y1="80" x2="265" y2="80" stroke="var(--r)" stroke-width="2" opacity=".6"/>';
-s+=cbl(285,80,'VCB-INC-A',['630A/25kA'],'var(--r)');
+s+=cbl(285,80,'VCB-INC-A',['630A/25kA','ANSI 50/51/67N','CT 600/5 / PT 24kV/110V','AF 8.4 cal/cm² PPE2'],'var(--r)');
 s+='<line x1="293" y1="80" x2="320" y2="80" stroke="var(--r)" stroke-width="1.5" opacity=".5"/>';
 s+='<line x1="320" y1="80" x2="320" y2="120" stroke="var(--r)" stroke-width="1.5" opacity=".5"/>';
 
@@ -2494,7 +2511,7 @@ s+='<line x1="320" y1="80" x2="320" y2="120" stroke="var(--r)" stroke-width="1.5
 s+='<line x1="810" y1="80" x2="860" y2="80" stroke="var(--g)" stroke-width="2" opacity=".7"/>';
 s+=symMeter(795,80,'var(--g)','kW');
 s+='<line x1="740" y1="80" x2="785" y2="80" stroke="var(--g)" stroke-width="2" opacity=".6"/>';
-s+=cbl(720,80,'VCB-INC-B',['630A/25kA'],'var(--g)');
+s+=cbl(720,80,'VCB-INC-B',['630A/25kA','ANSI 50/51/67N','CT 600/5 / PT 24kV/110V','AF 8.4 cal/cm² PPE2'],'var(--g)');
 s+='<line x1="690" y1="80" x2="712" y2="80" stroke="var(--g)" stroke-width="1.5" opacity=".5"/>';
 s+='<line x1="690" y1="80" x2="690" y2="120" stroke="var(--g)" stroke-width="1.5" opacity=".5"/>';
 
@@ -2507,7 +2524,8 @@ s+=hB(520,123,280,'SM6 MV BUS SECTION B \u2014 20kV','var(--g)');
 s+='<line x1="490" y1="126" x2="520" y2="126" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="6 4"/>';
 s+=symCB(505,126,'var(--p)',false);
 s+=tx(505,145,'VCB-TIE','var(--p)',5,'middle',1);
-s+=tx(505,155,'N.O.','var(--o)',5,'middle');
+s+=tx(505,155,'N.O. · ANSI 25 sync-check','var(--o)',4,'middle');
+s+=tx(505,162,'CT 600/5 · 25kA · auto N.C. on under-voltage 27','var(--t3)',3.2,'middle');
 
 // 8 Feeder VCBs — Feed A (RED) from Bus A, Feed B (GREEN) from Bus B
 var fdrAx=[250,330,390,450];
