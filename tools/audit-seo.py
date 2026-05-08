@@ -50,6 +50,15 @@ def check_file(filepath):
     head_match = re.search(r'<head[^>]*>(.*?)</head>', content, re.DOTALL | re.IGNORECASE)
     head = head_match.group(1) if head_match else content[:5000]
 
+    # Skip noindex pages — they're intentionally not for search engines so
+    # missing meta tags isn't a real issue. Report STATUS=NOINDEX and bail.
+    noindex_match = re.search(
+        r'<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex',
+        head, re.IGNORECASE
+    )
+    if noindex_match:
+        return {"status": "NOINDEX", "issues": {}, "warnings": {}}
+
     errors = {}
     warnings = {}
 

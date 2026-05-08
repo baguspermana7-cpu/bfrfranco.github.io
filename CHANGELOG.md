@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.3.1 — 2026-05-09
+- **Fix**: `chiller-plant.html` — was missing canonical, all OG tags, all Twitter cards (audit-seo flagged as REQUIRED-tag errors). Added full meta-tag block + ai-content-declaration. Title bumped from 24 to 60 chars to fit SEO range.
+- **Fix**: `cx-calculator.html` — added missing `og:image` + `twitter:image` (using canonical fallback `assets/profile-photo.jpg`).
+- **Tooling**: `tools/audit-seo.py` now correctly skips `<meta name="robots" content="noindex...">` pages (LTC labs, redirects). Strict mode no longer false-positives on intentionally-internal pages.
+- **IndexNow**: synced `.indexnow-key` store to use the existing 2026-03 verification key (`768683436ffdfcc2bb9140345660b139.txt`) — Bing already verified this key, no need to register a new one.
+- audit-seo strict mode: 0 errors, clean pages 9 → 20.
+
 ## v1.3.0 — 2026-05-09 (Plan v14 — SEO + AI search sweep)
 
 - **Added**: `/llms.txt` — canonical LLM content map per llmstxt.org spec, listing all calculators / articles / tools / simulations.
