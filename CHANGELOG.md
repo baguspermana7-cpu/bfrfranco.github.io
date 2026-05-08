@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.2.0 — 2026-05-09 (Plan v13 — Calc dark-mode audit)
+
+- **Fixed**: `opex-calculator.html` — "Detailed Cost Breakdown" card (`.breakdown-table`) and "Category Comparison" chart card (`.chart-card`) showed WHITE backgrounds in dark mode. Added 35+ `[data-theme="dark"]` rules covering `.breakdown-table th/td/hover`, `.chart-card`, `.results-card`, `.results-panel`, `.input-section`, `.breakdown-card`, `.kpi-card`, `.narrative-card`, `.calc-disclaimer`, and mode-bar elements.
+- **Fixed**: `capex-calculator.html` — added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.breakdown-card`, `.breakdown-table` (th/td/hover), `.input-field`, `.calc-disclaimer`, `.kpi-card`, `.results-panel`, `.narrative-card`.
+- **Fixed**: `roi-calculator.html` — added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.input-field`, `.roi-mode-bar`, `.roi-btn-reset`, `.cashflow-table`, `.breakdown-table`, `.calc-disclaimer`, `.kpi-card`, `.pro-panel`, `.narrative-card`.
+- **Fixed**: `pue-calculator.html` — added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.input-field`, `.pue-mode-bar`, `.breakdown-table`, `.calc-disclaimer`, `.kpi-card`, `.pro-panel`, `.narrative-card`.
+- **Added**: `carbon-footprint.html` — had ZERO dark-mode rules. Added complete `[data-theme="dark"]` block (65+ rules) covering CSS variable overrides, body, navbar, input panel, results, charts, tab-bar, mode-bar, breakdown table, disclaimer, cookie banner. Added theme-init inline script and `toggleCalcTheme()` JS function. Added theme toggle button to navbar.
+- **Added**: `cx-calculator.html` — had ZERO dark-mode rules (was dark-only, no toggle). Added 45+ `[data-theme="dark"]` reinforcement rules + theme-init script + nav toggle button + `toggleCalcTheme()` function, making it consistent with other calc pages.
+- **Standard**: `standarization/UI_FEATURES_STANDARD.md` — appended Plan v13 dark-mode coverage mandate with pre-merge checklist.
+- **Version**: `js/rz-version.js` bumped `1.1.0` → `1.2.0`.
+
 ## v1.1.1 — 2026-05-09
 - **Fix**: hero gridline pattern was still visible after Plan v12 ship — agent had patched only `.hero-background::before` but the base `.hero-background` rule (and dark-mode override) carried the actual grid via crossed linear-gradients @ 60×60 px. Now both light + dark hero backgrounds are fully transparent; only the `::before` soft radial wash remains.
 

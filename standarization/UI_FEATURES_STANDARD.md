@@ -1555,3 +1555,31 @@ Every full HTML page (excluding fragments without `</head>`) must:
 3. Optional: place `<div id="rzVersionAnchor"></div>` inside the page footer to control where the stamp lands (default is `<body>` end).
 
 Bump version per `standarization/VERSIONING_STANDARD.md` semver scheme. Audit with `tools/audit-version-stamp.py --strict`.
+
+---
+
+### Calc-page dark-mode coverage (Plan v13 mandate, 2026-05-09)
+
+Every calc page MUST have `[data-theme="dark"]` overrides for at least:
+- `body` (background + text colour)
+- All `.{prefix}-card`, `.{prefix}-input-section`, `.{prefix}-results-card`, `.{prefix}-results-panel`
+- All `.{prefix}-input-field`, `.{prefix}-input-label`
+- All breakdown tables: `.breakdown-table`, including `th`, `td`, hover states
+- All chart card wrappers (`.chart-card`, `.cx-chart-box`, etc.)
+- Tooltip + dropdown colours (`.nav-user-dropdown`, `.nav-dd-header`, `.nav-dd-email`)
+- Mode-bar / tab-bar backgrounds (`.cf-tab-bar`, `.roi-mode-bar`, `.pue-mode-bar`, etc.)
+- Cookie banner + disclaimer overrides
+
+Reference: `tco-calculator.html` (49+ dark-mode rules, canonical pattern).
+
+Pages that have NO built-in theme toggle must add:
+1. Inline theme-init `<script>` after `rz-version.js` (reads `localStorage.getItem('theme')||'dark'`)
+2. A `.nav-theme-btn` button in the navbar calling `toggleCalcTheme()`
+3. A `toggleCalcTheme()` JS function in the main script block
+
+Pre-merge checklist for new calc pages:
+1. Toggle dark mode in browser
+2. Visually verify NO white-on-white text
+3. Visually verify NO unstyled card backgrounds
+4. Confirm chart legibility
+5. `grep -c '\[data-theme="dark"\]' new-calc.html` should be ≥30

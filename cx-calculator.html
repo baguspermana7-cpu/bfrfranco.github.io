@@ -554,8 +554,50 @@ a:hover{text-decoration:underline;}
   .cx-manual-sidebar{width:100%;position:static;max-height:none;}
   .cx-faq-header h2,.cx-manual-header h2{font-size:1.3rem;}
 }
+
+/* ===== PLAN v13 DARK-MODE OVERRIDES (cx is dark-first; these reinforce for data-theme consistency) ===== */
+[data-theme="dark"] body { background:#0f172a; color:#e2e8f0; }
+[data-theme="dark"] .cx-nav { background:rgba(15,23,42,0.95); border-bottom-color:rgba(148,163,184,0.1); }
+[data-theme="dark"] .cx-card { background:#1e293b; border-color:rgba(255,255,255,0.08); color:#f1f5f9; }
+[data-theme="dark"] .cx-input-field { background:#0f172a; color:#f1f5f9; border-color:rgba(255,255,255,0.12); }
+[data-theme="dark"] .cx-input-label { color:#cbd5e1; }
+[data-theme="dark"] .cx-input-section { background:#1e293b; border-color:rgba(255,255,255,0.08); }
+[data-theme="dark"] .cx-results-panel { background:#1e293b; border-color:rgba(255,255,255,0.08); }
+[data-theme="dark"] .cx-kpi-card { background:rgba(30,41,59,0.8); border-color:rgba(148,163,184,0.1); }
+[data-theme="dark"] .cx-kpi-label { color:#64748b; }
+[data-theme="dark"] .cx-kpi-sub { color:#475569; }
+[data-theme="dark"] .cx-chart-box { background:rgba(30,41,59,0.6); border-color:rgba(148,163,184,0.1); }
+[data-theme="dark"] .cx-chart-box h3 { color:#e2e8f0; }
+[data-theme="dark"] .cx-narrative { background:rgba(14,116,144,0.06); border-left-color:#0e7490; color:#94a3b8; }
+[data-theme="dark"] .cx-narrative strong { color:#e2e8f0; }
+[data-theme="dark"] .cx-pro-panel { background:rgba(30,41,59,0.6); border-color:rgba(148,163,184,0.1); }
+[data-theme="dark"] .cx-pro-panel h3 { color:#e2e8f0; }
+[data-theme="dark"] .cx-kpi-mini { background:rgba(15,23,42,0.5); border-color:rgba(148,163,184,0.08); }
+[data-theme="dark"] .cx-gantt-wrap { background:rgba(15,23,42,0.8); border-color:rgba(148,163,184,0.1); }
+[data-theme="dark"] .cx-gantt-header { background:rgba(30,41,59,0.5); border-bottom-color:rgba(148,163,184,0.15); }
+[data-theme="dark"] .cx-gantt-label { color:#e2e8f0; }
+[data-theme="dark"] .cx-gantt-legend-item { color:#94a3b8; }
+[data-theme="dark"] .cx-gantt-toolbar button,
+[data-theme="dark"] .cx-gantt-toolbar select { background:rgba(30,41,59,0.7); color:#e2e8f0; border-color:rgba(148,163,184,0.15); }
+[data-theme="dark"] .cx-modal { background:#1e293b; color:#f1f5f9; }
+[data-theme="dark"] .cx-scenario-bar { background:rgba(14,116,144,0.08); border-color:rgba(34,211,238,0.15); }
+[data-theme="dark"] .cx-scenario-bar label { color:#94a3b8; }
+[data-theme="dark"] .cx-scenario-bar select { background:#1e293b; color:#e2e8f0; border-color:rgba(148,163,184,0.2); }
+[data-theme="dark"] .cx-manual-chapter { background:rgba(30,41,59,0.4); border-color:rgba(148,163,184,0.08); }
+[data-theme="dark"] .cx-manual-chapter-head { background:rgba(14,116,144,0.06); border-bottom-color:rgba(148,163,184,0.06); }
+[data-theme="dark"] .cx-manual-chapter-head h3 { color:#f1f5f9; }
+[data-theme="dark"] .cx-manual-chapter-head p { color:#64748b; }
+[data-theme="dark"] .cx-manual-step { background:rgba(15,23,42,0.4); border-color:rgba(148,163,184,0.05); }
+[data-theme="dark"] .cx-manual-step-text { color:#cbd5e1; }
+[data-theme="dark"] .cx-manual-step-text strong { color:#f1f5f9; }
+[data-theme="dark"] .cx-comparison-card { background:rgba(30,41,59,0.5); border-color:rgba(148,163,184,0.08); }
+[data-theme="dark"] .cx-comparison-card h4 { color:#f1f5f9; }
+[data-theme="dark"] .cx-manual-table th { background:rgba(14,116,144,0.1); color:#22d3ee; border-color:rgba(148,163,184,0.08); }
+[data-theme="dark"] .cx-manual-table td { color:#cbd5e1; border-color:rgba(148,163,184,0.06); }
+[data-theme="dark"] .cx-currency-sel { background:rgba(30,41,59,0.6); color:#94a3b8; border-color:rgba(148,163,184,0.15); }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 
@@ -575,6 +617,7 @@ a:hover{text-decoration:underline;}
       <a href="opex-calculator.html" class="cx-nav-link" style="color:#10b981;">OPEX</a>
       <a href="tier-advisor.html" class="cx-nav-link">Tier Advisor</a>
       <a href="tia-942-checklist.html" class="cx-nav-link">TIA-942</a>
+      <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid rgba(148,163,184,0.15);background:transparent;color:#94a3b8;cursor:pointer;transition:all 0.25s;font-size:0.9rem;padding:0;flex-shrink:0;"><i id="themeIcon" class="fas fa-moon"></i></button>
       <a href="index.html" class="cx-nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
     </div>
   </div>
@@ -5983,6 +6026,20 @@ cxScrollBtn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;heig
 document.body.appendChild(cxScrollBtn);
 cxScrollBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
 window.addEventListener('scroll',function(){cxScrollBtn.style.display=window.scrollY>300?'flex':'none';});
+
+// --- THEME TOGGLE ---
+function toggleCalcTheme() {
+    var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    var icon = document.getElementById('themeIcon');
+    if (icon) { icon.className = t === 'dark' ? 'fas fa-moon' : 'fas fa-sun'; }
+}
+(function(){
+    var t = document.documentElement.getAttribute('data-theme');
+    var icon = document.getElementById('themeIcon');
+    if (icon) { icon.className = t === 'dark' ? 'fas fa-moon' : 'fas fa-sun'; }
+})();
 </script>
 
 <!-- Activity Detail Drawer -->
