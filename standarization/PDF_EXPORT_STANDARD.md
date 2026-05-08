@@ -311,4 +311,83 @@ function exportPDF() {
 
 ---
 
+## Lesson learnt — 2026-05-09 — Critical: escape `</script>` inside JS-built print-window HTML
+
+A series of pages (`capex-calculator`, `opex-calculator`, `carbon-footprint`, `tia-942-checklist`, `tier-advisor`) had **all interactive features dead**. Symptoms: login button click did nothing; parameter inputs didn't trigger recalc; Simple/Advanced tab toggle dead; Pro mode toggle dead; Save A/B dead; Export PDF dead.
+
+### Root cause
+
+Each affected page builds a complete HTML document string in JS (template literal or string concatenation) for `window.open(...).document.write(...)` PDF / print-window output. Inside that string, the `auth.js` and `rz-engine.js` script tags were emitted **with the literal closing tag `</script>`**:
+
+```js
+// ❌ WRONG — kills the surrounding <script> block on the calc page itself
+const printHTML = `
+  ...
+  <script src="auth.js?v=20260324b"></script>
+  <script src="rz-engine.js?v=2026-04-28"></script>
+  </body></html>`;
+```
+
+The browser's HTML tokenizer is **NOT JS-aware** inside a `<script>` element. It scans the script body looking for the literal `</script>` token. The first match terminates the surrounding `<script>` element. **Every function declared after that line is parsed as HTML, never registered as JS.** Inline `onclick="handlePremiumTab()"` then references undefined functions and silently fails.
+
+### The fix
+
+Escape the closing slash:
+
+```js
+// ✅ CORRECT
+const printHTML = `
+  ...
+  <script src="auth.js?v=20260324b"><\/script>
+  <script src="rz-engine.js?v=2026-04-28"><\/script>
+  </body></html>`;
+```
+
+`\/` is a valid (no-op) JS string escape; the HTML parser does NOT recognise `<\/script>` as a tag closer. The string content writes verbatim into the print-window where it parses normally.
+
+### Mandatory rules going forward
+
+1. **Always escape `</script>` to `<\/script>`** when emitting script tags inside ANY JS string literal, template literal, or string concatenation. No exceptions.
+2. **Run `python3 tools/audit-script-tags.py --strict` before pushing** any change that touches an HTML file with inline `<script>` blocks. The auditor walks every file and exits non-zero if the pattern reappears.
+3. **Prefer the engine helper** `RZEngine.pdf.scriptTagsHTML()` when you need to embed the canonical auth + engine tags in a PDF/print template — it returns the properly-escaped string so callers cannot get it wrong.
+
+### Quick reference
+
+| Context | Required form |
+|---|---|
+| HTML body (top-level, between `<body>` and `</body>`) | `<script src="..."></script>` |
+| Inside JS template literal / string | `<script src="..."><\/script>` |
+| Inside JSON string fields | `<script src=\"...\"><\\/script>` |
+
+### How to detect
+
+```bash
+# Site-wide audit (human report)
+python3 tools/audit-script-tags.py
+
+# Strict mode (CI / pre-push gate)
+python3 tools/audit-script-tags.py --strict
+```
+
+### Engine helper API (added 2026-05-09 in rz-engine.js)
+
+```js
+// Returns the auth.js + rz-engine.js script tags pre-escaped for safe
+// embedding inside any JS-built HTML string. ALWAYS use this in PDF /
+// print-window templates instead of writing the literal tags inline.
+RZEngine.pdf.scriptTagsHTML();
+```
+
+### Files fixed in the original incident
+
+- capex-calculator.html lines 4028-4029  → escaped
+- opex-calculator.html lines 4613-4614    → escaped
+- carbon-footprint.html lines 2310-2311   → escaped
+- tia-942-checklist.html lines 1452-1453  → escaped
+- tier-advisor.html lines 1610-1611       → escaped
+
+(`roi-calculator.html` was already correctly escaped; `tco-calculator.html`, `pue-calculator.html`, `cx-calculator.html` have no PDF print-window template so the bug couldn't apply.)
+
+---
+
 *Refer to PRO_MODE_STANDARDIZATION.md for the complete implementation guide.*

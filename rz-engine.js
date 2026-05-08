@@ -688,7 +688,31 @@
                 if (el) el.classList.remove('open');
             }
         },
-        pdf:    { exportPDF: null, generateTable: null },     // S3
+        pdf: {
+            exportPDF: null,        // S3 — full PDF export pipeline (TBD)
+            generateTable: null,    // S3
+            /**
+             * Return the canonical <script src="auth.js"> + <script src="rz-engine.js">
+             * pair pre-escaped for safe embedding inside ANY JS string / template literal.
+             *
+             * Always use this in PDF print-window templates instead of writing the
+             * literal tags inline. See standarization/PDF_EXPORT_STANDARD.md
+             * "Lesson learnt: 2026-05-09" for context.
+             *
+             * The escape `<\/script>` is a no-op JS string escape (interpreted as `</script>`
+             * at runtime) but is opaque to the HTML tokenizer — so it does NOT prematurely
+             * close the surrounding <script> block on the calling page.
+             */
+            scriptTagsHTML: function () {
+                // On disk this source uses `<\/script>` — a no-op JS escape
+                // that keeps the surrounding <script> block from closing on the
+                // calling page. At runtime the returned string is the real
+                // `</script>` characters which the print-window's HTML parser
+                // will see (correctly) as a tag closer.
+                return '<script src="auth.js?v=20260324b"><\/script>' +
+                       '<script src="rz-engine.js?v=2026-04-28"><\/script>';
+            }
+        },
         charts: {                                              // S5
             histogram: null, tornado: null, sensitivity: null,
             roiLine: null, hiringTrajectory: null, costStackedBar: null, radar: null
