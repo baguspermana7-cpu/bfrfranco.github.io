@@ -249,3 +249,49 @@ All new growth pages follow these standards:
 | 37 (GSC Dashboard) | Requires server-side API + OAuth — incompatible with static site |
 | 42 (CDN Setup) | Infrastructure-level, not code |
 | 44 (Dead CSS Removal) | High risk for 5900+ line stylesheet without test coverage |
+
+---
+
+## AI Search Optimisation (Plan v14 mandate, 2026-05-09)
+
+### llms.txt + llms-full.txt
+
+- `/llms.txt` — content map per https://llmstxt.org. Updated by `tools/build-llms-txt.py` after every batch of new pages.
+- `/llms-full.txt` — full-content variant for one-shot LLM context loading. Regenerated weekly or after any meaningful content change.
+
+### AI bot directives in robots.txt
+
+Explicit `Allow: /` blocks for: GPTBot, ClaudeBot, anthropic-ai, ChatGPT-User, OAI-SearchBot, PerplexityBot, Google-Extended, cohere-ai, Diffbot, Bingbot. Signals consent + improves crawl priority.
+
+### ai-content-declaration meta
+
+```html
+<meta name="ai-content-declaration" content="human-authored">
+```
+
+Add to all human-authored articles + calc pages. Be honest — pages with AI-assisted content should declare `content="partially-ai-assisted"`.
+
+### IndexNow workflow (Bing/Yandex/Seznam push indexing)
+
+After each git push touching `*.html`:
+```bash
+python3 tools/indexnow-submit.py --since HEAD~1
+```
+
+Pushes changed URLs → Bing/Yandex re-crawl within minutes. The IndexNow key lives at `/<keyhex>.txt` site root (Bing reads to verify ownership; the key only authorises submissions for THIS domain so leakage is low-impact).
+
+### FAQPage schema placement
+
+Calc pages (PUE/CAPEX/OPEX/ROI/TCO) MUST have FAQPage schema covering:
+1. "How is X calculated?"
+2. "What inputs affect Y the most?"
+3. "What's a typical range for Z in {region}?"
+
+Tool pages (TIA-942 checklist, tier-advisor) MUST have HowTo schema.
+
+### Audit gate
+
+Run before every push:
+```bash
+python3 tools/audit-seo.py --strict
+```

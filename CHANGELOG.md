@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.3.0 — 2026-05-09 (Plan v14 — SEO + AI search sweep)
+
+- **Added**: `/llms.txt` — canonical LLM content map per llmstxt.org spec, listing all calculators / articles / tools / simulations.
+- **Added**: `/llms-full.txt` — full-content variant for one-shot LLM context (Markdown extraction of all main pages).
+- **Added**: explicit AI-bot allows in `robots.txt` for GPTBot, ClaudeBot, anthropic-ai, PerplexityBot, OAI-SearchBot, Google-Extended, cohere-ai, ChatGPT-User, Diffbot, Bingbot. Signals consent + improves crawl priority.
+- **Added**: `<meta name="ai-content-declaration" content="human-authored">` to 39 key pages (all articles + calc pages + landing pages).
+- **Added**: `BingSiteAuth.xml` placeholder + IndexNow key file (Bing/Yandex/Seznam push indexing).
+- **Added**: `tools/audit-seo.py` (per-page SEO health check, strict-mode CI gate).
+- **Added**: `tools/build-sitemap.py` (regenerates sitemap.xml from filesystem; covers all 101 indexable pages, was 100).
+- **Added**: `tools/build-llms-txt.py` + `tools/build-llms-full.py` (regenerate AI files on demand).
+- **Added**: `tools/indexnow-submit.py` (push changed URLs to Bing IndexNow API).
+- **Updated**: `sitemap.xml` regenerated via build-sitemap.py — 101 indexable URLs, normalised lastmod ISO 8601, proper priority/changefreq by page type; 11 noindex pages correctly excluded.
+- **Updated**: `standarization/SEO_OPTIMIZATION_STANDARD.md` — major new "AI Search Optimisation" section.
+- **Version**: `js/rz-version.js` bumped 1.2.3 → 1.3.0 (MINOR — adds discoverability tier).
+
 ## v1.2.3 — 2026-05-09
 - **Fix**: dark-mode regression on `opex-calculator.html` — staffing-model cards (`.model-card` for In-House / Hybrid Mix / 100% Outsource) had hardcoded `background: white` (line 592) with no dark override. Unselected cards rendered as bright white blocks against the dark page. Added 8 `[data-theme="dark"] .model-card*` rules covering base, hover, active, name, desc, icon states. Audited other calc pages — only opex uses the `.model-card` pattern.
 
