@@ -2,6 +2,36 @@
    Bagus Dwi Permana - Portfolio Scripts
    ========================================== */
 
+/* ==========================================
+   Site-wide version stamp injection
+   Idempotent; runs once on DOMContentLoaded.
+   Reads window.RZ_VERSION from js/rz-version.js
+   (loaded as a separate <script defer> in each page).
+   ========================================== */
+(function(){
+  function injectVersionStamp(){
+    if (document.getElementById('rzVersionStamp')) return;
+    var anchor = document.getElementById('rzVersionAnchor') || document.body;
+    if (!anchor) return;
+    var v = window.RZ_VERSION || '1.0.0';
+    var stamp = document.createElement('div');
+    stamp.id = 'rzVersionStamp';
+    stamp.className = 'rz-version-stamp';
+    stamp.setAttribute('aria-label', 'Site version');
+    stamp.innerHTML = '<img src="assets/favicon-32.png" alt="" width="20" height="20" loading="lazy">' +
+                      '<span class="rz-version-label">Latest version</span>' +
+                      '<code class="rz-version-num">v' + v + '<\/code>';
+    anchor.appendChild(stamp);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectVersionStamp);
+  } else {
+    injectVersionStamp();
+  }
+  window.RZ = window.RZ || {};
+  window.RZ.injectVersionStamp = injectVersionStamp;
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
     // Critical path — needed for first paint
     initDarkMode();

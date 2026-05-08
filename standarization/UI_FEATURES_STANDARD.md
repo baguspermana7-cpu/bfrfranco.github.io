@@ -1499,3 +1499,59 @@ RZMap.setLineVisible = function(lineId, visible) {
 - **Mobile: render as collapsible sidebar or bottom sheet** — don't let controls waste 30% of mobile viewport
 - **Search index integration** — allow "Show only coal plants" + "Show only 150 kV" searches in unified control
 - **Performance at 300+ nodes** — use event delegation; don't attach listeners to each node. Use CSS classes for bulk updates
+
+---
+
+## Plan v12 patterns — 2026-05-09
+
+### Pixel Rise scroll cue (replaces the static SCROLL TO EXPLORE pattern)
+
+Soft bouncing chevron + uppercase letterspaced caption. Use on landing pages instead of `.scroll-indicator`.
+
+```html
+<a href="#firstSection" class="scroll-explore-pixel" aria-label="Scroll to explore">
+  <span class="scroll-explore-caption">Scroll to explore more</span>
+  <span class="scroll-explore-arrow" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </span>
+</a>
+```
+
+CSS lives in `styles.css` under `.scroll-explore-pixel`. Honours `prefers-reduced-motion`.
+
+### Floating share-button column (5 canonical platforms)
+
+Use `.share-buttons` + `.share-btn.{linkedin,twitter,whatsapp,instagram,facebook}` ONLY. Never invent per-page colour variants.
+- LinkedIn `#0A66C2`, X (twitter) `#000000`, WhatsApp `#25D366`, Instagram gradient `#F77737 → #E4405F → #C13584`, Facebook `#1877F2`.
+- Mount as `<aside class="share-buttons visible" id="...">` near `</body>`.
+- Mobile rule already in styles.css collapses to bottom bar.
+
+### Scroll-aware navbar Contact link + transparent → blur navbar
+
+- Transparent at top, frosted-glass `backdrop-filter: saturate(180%) blur(14px)` past 80 px scroll.
+- Contact link `.nav-link[href="#contact"]` hidden at top, fades in past 480 px scroll on landing pages.
+- IIFE pattern (RAF-throttled) — see `index.html` end-of-body inline `<script>` for the canonical version.
+
+### Hero — clean ambient (no grid noise)
+
+`.hero-background::before` carries ONLY soft radial washes (gold + mint, opacity ≤0.06). Never apply repeating dot/grid patterns — they read as "default Claude" noise. `::after` aurora overlays disabled.
+
+### Calm pastel bento card palette
+
+Bento cards in landing-page hero must use the 5-card pastel rotation (border-left 3 px accent + matching bullet dots):
+- Card 1: mint `#A7F3D0`
+- Card 2: lavender `#C7D2FE`
+- Card 3: peach `#FED7AA`
+- Card 4: pink `#FBCFE8`
+- Card 5: cream `#FDE68A`
+
+Award badges (`.bento-award`) use muted pastel chip (mint bg `#A7F3D0` + dark text `#064e3b`), NOT saturated emerald.
+
+### Site-wide version stamp
+
+Every full HTML page (excluding fragments without `</head>`) must:
+1. Load `js/rz-version.js?v=<date>` in `<head>` (use `tools/insert-version-script.py --apply` to roll out site-wide).
+2. Have `script.js` in scope (it auto-injects `#rzVersionStamp` on `DOMContentLoaded`).
+3. Optional: place `<div id="rzVersionAnchor"></div>` inside the page footer to control where the stamp lands (default is `<body>` end).
+
+Bump version per `standarization/VERSIONING_STANDARD.md` semver scheme. Audit with `tools/audit-version-stamp.py --strict`.

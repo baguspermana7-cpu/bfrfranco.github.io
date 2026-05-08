@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.1.0 — 2026-05-09 (in progress: Plan v12 ship)
+- **Landing**: removed rotated side tabs, replaced "↓ SCROLL TO EXPLORE" with Pixel Rise soft animation, added floating 5-icon share column (LinkedIn/X/WhatsApp/Instagram/Facebook), Get Started + Contact Us CTA pair in hero, navbar Contact link scroll-aware (hidden at top, fades in past hero), navbar transparent → frosted-glass on scroll.
+- **Visual**: removed dot-grid pattern from hero (clean ambient gradient now), pastel mint user pill replacing default purple, calm pastel bento card palette (mint/lavender/peach/pink/cream), GitHub label/URL removed from Contact and footer (kept in schema.org metadata).
+- **Video**: new Remotion intro composition `ResistanceZeroIntro` (30 s, 1920×1080), rendered to `assets/resistancezero-intro.mp4`. Plays in inline modal triggered by Get Started.
+- **Site-wide**: introduced `js/rz-version.js` as single-source-of-truth for version, `RZ.injectVersionStamp()` injects "Latest version: vX.Y.Z" stamp at every page footer.
+- **Tooling**: new `tools/insert-version-script.py` + `tools/audit-version-stamp.py`. New `standarization/VERSIONING_STANDARD.md`.
+
+## v1.0.0 — 2026-05-09 (semver baseline)
+
+First semver-tagged release. This entry consolidates prior shipped work and establishes the versioning regime. From this point forward, every meaningful change MUST bump `js/rz-version.js` and append a CHANGELOG entry per `standarization/VERSIONING_STANDARD.md`.
+
+Major shipped milestones (pre-baseline, abridged):
+- 18 calculator pages (PUE, CAPEX, OPEX, ROI, TCO, CX, Carbon Footprint, …)
+- 22+ articles (Future Forward series, Geopolitics series, Article 1–26)
+- DC market tracker + 11 city detail pages
+- PLN Java-Bali grid monitor (5 pages, OSM-backed dataset)
+- Datahall AI BMS simulation + DC conventional sibling
+- Engineering audits, security/SEO audit, navbar canonicalisation work
+- rz-engine.js (calc engine + auth + format + PDF), auth.js (auth widget)
+
+---
+
 ## [2026-04-29] — PLN regional monitors split off landing page; shared `js/rz-map.js` engine
 
 ### Added
