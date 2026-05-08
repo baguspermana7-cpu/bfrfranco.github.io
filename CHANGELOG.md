@@ -11,6 +11,10 @@ release sections rather than semver.
 
 ---
 
+## v1.2.1 — 2026-05-09
+- **Fix**: gridline pattern (linear-gradient 1px @ 50×50 px) was still present on `datacenter-solutions.html` — same noise that was killed on `index.html` in v1.1.1 had a sibling instance on the second-most-prominent landing page. Both `[data-theme="dark"] .page-background` (line 141) and base `.page-background` (line 256) now have only the soft radial washes, no grid.
+- Cross-page audit confirms 5 major landing pages are gridline-free: `index.html`, `datacenter-solutions.html`, `articles.html`, `dc-market-tracker.html`, `future-forward.html`.
+
 ## v1.2.0 — 2026-05-09 (Plan v13 — Calc dark-mode audit)
 
 - **Fixed**: `opex-calculator.html` — "Detailed Cost Breakdown" card (`.breakdown-table`) and "Category Comparison" chart card (`.chart-card`) showed WHITE backgrounds in dark mode. Added 35+ `[data-theme="dark"]` rules covering `.breakdown-table th/td/hover`, `.chart-card`, `.results-card`, `.results-panel`, `.input-section`, `.breakdown-card`, `.kpi-card`, `.narrative-card`, `.calc-disclaimer`, and mode-bar elements.
