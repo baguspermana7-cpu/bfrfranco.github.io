@@ -11,6 +11,9 @@ release sections rather than semver.
 
 ---
 
+## v1.2.2 — 2026-05-09
+- **Fix**: dark-mode regression on `opex-calculator.html` + `capex-calculator.html` — the `.brief-card` hero intro block (the "OPEX is what actually kills the margin..." paragraph + stats row) was rendered with a transparent gradient `rgba(16,185,129,0.04)` over a dark page, making the entire intro card invisible on dark mode. The Plan v13 dark-mode agent missed the `.brief-*` class family because tco uses prefixed `.tco-brief-*` while opex/capex use unprefixed `.brief-*`. Added 9 dark-mode rules per page covering `.brief-card`, `.brief-lead`, `.brief-body`, `.brief-stats`, `.brief-stat`, `.brief-stat-icon`, `.brief-disclaimer`, `.brief-hero-img`. The card now has a visible accent-coloured gradient + border in dark mode.
+
 ## v1.2.1 — 2026-05-09
 - **Fix**: gridline pattern (linear-gradient 1px @ 50×50 px) was still present on `datacenter-solutions.html` — same noise that was killed on `index.html` in v1.1.1 had a sibling instance on the second-most-prominent landing page. Both `[data-theme="dark"] .page-background` (line 141) and base `.page-background` (line 256) now have only the soft radial washes, no grid.
 - Cross-page audit confirms 5 major landing pages are gridline-free: `index.html`, `datacenter-solutions.html`, `articles.html`, `dc-market-tracker.html`, `future-forward.html`.
