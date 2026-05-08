@@ -11,7 +11,10 @@ release sections rather than semver.
 
 ---
 
-## v1.1.0 — 2026-05-09 (in progress: Plan v12 ship)
+## v1.1.1 — 2026-05-09
+- **Fix**: hero gridline pattern was still visible after Plan v12 ship — agent had patched only `.hero-background::before` but the base `.hero-background` rule (and dark-mode override) carried the actual grid via crossed linear-gradients @ 60×60 px. Now both light + dark hero backgrounds are fully transparent; only the `::before` soft radial wash remains.
+
+## v1.1.0 — 2026-05-09 (Plan v12 shipped, commits 22548ba + c1667a4)
 - **Landing**: removed rotated side tabs, replaced "↓ SCROLL TO EXPLORE" with Pixel Rise soft animation, added floating 5-icon share column (LinkedIn/X/WhatsApp/Instagram/Facebook), Get Started + Contact Us CTA pair in hero, navbar Contact link scroll-aware (hidden at top, fades in past hero), navbar transparent → frosted-glass on scroll.
 - **Visual**: removed dot-grid pattern from hero (clean ambient gradient now), pastel mint user pill replacing default purple, calm pastel bento card palette (mint/lavender/peach/pink/cream), GitHub label/URL removed from Contact and footer (kept in schema.org metadata).
 - **Video**: new Remotion intro composition `ResistanceZeroIntro` (30 s, 1920×1080), rendered to `assets/resistancezero-intro.mp4`. Plays in inline modal triggered by Get Started.
