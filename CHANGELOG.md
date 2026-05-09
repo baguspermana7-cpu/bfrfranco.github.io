@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.7.3 — 2026-05-09 (404 page Awwwards uplift)
+
+- **404.html re-themed** to dark-default matching v1.4.0 aesthetic. Was a light pastel design that clashed with the rest of the site.
+- **Aurora mesh body background** (mint/gold/violet radial gradients drifting on 22s loop)
+- **Gradient-shift text** on the big "404" + smaller H1 — different timing curves so they're not synced (12s + 8s)
+- **Mint return button** matching the index Get Started style (Motion+ feel, mint glow shadow on hover)
+- **Pill-row popular links** with backdrop-blur + mint hover
+- **Character image** now has soft mint glow halo + dark drop-shadow
+- **Subtle film grain overlay** (3% opacity, mix-blend-mode overlay) — matches sitewide pattern
+- Honours `prefers-reduced-motion`.
+
+Lost traffic now lands on a beautiful branded page with clear navigation back to popular content (Engineering Journal, DC Solutions, CAPEX Calculator, etc.).
+
 ## v1.7.2 — 2026-05-09
 - **Nav link**: added `Tools & Calculators` to index.html Insights dropdown with mint accent + NEW badge. Changelog `NEW` badge moved to Tools (more recent ship).
 - IndexNow ping for v1.7.x: 7 URLs submitted (HTTP 200).
