@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.8.5 — 2026-05-09 (Hamburger fix² — duplicate suppression + drawer scroll + universal navbar detection)
+
+User screenshots showed v1.8.4 regressions:
+1. **index.html** had TWO hamburger buttons (existing `<button class="hamburger">` at line 344 + my new `.rz-nav-burger`).
+2. **calc pages** appeared to have NO navbar (visual confusion).
+3. **Drawer couldn't scroll** to see menu items below the fold.
+4. **Drawer wouldn't collapse properly** in some cases.
+
+### Fixes
+
+**`js/rz-mobile-nav.js` — comprehensive rewrite**:
+- **Detect existing hamburger** before injecting: `.hamburger`, `.menu-toggle`, `[data-nav-toggle]`, `.nav-toggle`, `.mobile-menu-btn`, `button.menuButton` — if found, WIRE UP that button instead of double-injecting.
+- Mark wired buttons with `.rz-nav-burger-bound` class so CSS knows.
+- Expanded navbar selector: `nav.navbar, header.navbar, .navbar, nav.cx-nav, nav.rfs-navbar, header > nav, body > nav:first-of-type`.
+- Outside-click handler: properly closes drawer when clicking outside menu+navbar, but ignores burger clicks.
+- Lock both `body.style.overflow` AND `documentElement.style.overflow` (some browsers ignore body lock).
+- Older Safari fallback: `mq.addListener` if `addEventListener` unavailable.
+- Cache-bust bumped: `?v=2026-05-09b`.
+
+**CSS (both stylesheets — 2-stylesheet rule)**:
+- `body .hamburger:not(.rz-nav-burger-bound):not(.rz-nav-burger) { display: none; }` — orphan hamburgers hidden.
+- `body.rz-nav-open .nav-menu` gets `max-height: calc(100dvh - 56px); -webkit-overflow-scrolling: touch; overscroll-behavior: contain;` — proper scroll on iOS.
+- `100dvh` for modern mobile browsers (handles floating address bar).
+- z-index stacking: burger 1002, navbar 1003 when open — burger stays clickable above backdrop.
+- Smooth scrollbar styling inside drawer.
+
+**Cache-bust** on `js/rz-mobile-nav.js?v=2026-05-09b` across 101 pages.
+
+Bump 1.8.4 → 1.8.5 (PATCH — critical UX fix).
+
 ## v1.8.4 — 2026-05-09 (CRITICAL FIX: mobile hamburger nav menu)
 
 User: "Critical bug, menu tidak keluar saat di klik button menu yg hamburger button in mobile view. Please audit properly, fix comprehensive".

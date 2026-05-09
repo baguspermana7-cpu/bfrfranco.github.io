@@ -6059,3 +6059,53 @@ section {
         to   { opacity: 1; }
     }
 }
+
+/* ==========================================================================
+   v1.8.5 — Mobile hamburger fix: drawer scroll + duplicate suppression
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    /* Pre-existing .hamburger that ISN'T bound to our script — hide it (orphan) */
+    body .hamburger:not(.rz-nav-burger-bound):not(.rz-nav-burger) {
+        display: none !important;
+    }
+
+    /* Bound hamburger inherits .rz-nav-burger styling — make explicit */
+    .hamburger.rz-nav-burger-bound {
+        display: inline-flex !important;
+    }
+
+    /* Drawer must scroll smoothly on touch devices */
+    body.rz-nav-open .nav-menu,
+    body.rz-nav-open .nav-links,
+    body.rz-nav-open .cx-nav-links,
+    body.rz-nav-open .rfs-nav-links {
+        max-height: calc(100vh - 56px) !important;
+        max-height: calc(100dvh - 56px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+    }
+
+    /* Burger stays clickable above the backdrop when drawer is open */
+    .rz-nav-burger { z-index: 1002 !important; }
+    body.rz-nav-open .navbar,
+    body.rz-nav-open nav.cx-nav,
+    body.rz-nav-open nav.rfs-navbar { z-index: 1003 !important; }
+
+    /* Ensure dropdown menu items inside the open drawer DON'T block scroll */
+    body.rz-nav-open .dropdown-menu,
+    body.rz-nav-open .nav-dropdown-menu {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Smooth scrollbar inside drawer (Firefox + WebKit) */
+    body.rz-nav-open .nav-menu::-webkit-scrollbar,
+    body.rz-nav-open .nav-links::-webkit-scrollbar { width: 4px; }
+    body.rz-nav-open .nav-menu::-webkit-scrollbar-thumb,
+    body.rz-nav-open .nav-links::-webkit-scrollbar-thumb {
+        background: rgba(125,221,180,0.4);
+        border-radius: 2px;
+    }
+}
