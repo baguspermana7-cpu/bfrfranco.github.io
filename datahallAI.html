@@ -231,7 +231,7 @@ svg text{user-select:none}
         .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
         .cookie-accept { padding: 0.45rem 1.2rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .cookie-accept:hover { background: #1d4ed8; }
-        .cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #6b7280; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #94a3b8; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
         .cookie-decline:hover { background: #f3f4f6; color: #374151; }
         @media (max-width: 768px) { .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; } }
         @media print { .cookie-banner { display: none; } }
@@ -3546,40 +3546,40 @@ sldResultsToggle.textContent=sldResultsPanel.classList.contains('collapsed')?'\u
 function populateResults(type,dh){
 var h='';
 if(type==='mv-sub'||type==='rmu'||type==='tx'||type==='msb'){
-h+='<table><tr><th>Bus</th><th>V</th><th>Status</th></tr>';
+h+='<table><tr><th scope="col">Bus</th><th scope="col">V</th><th scope="col">Status</th></tr>';
 h+='<tr><td>SM6-A</td><td class="rv">'+R(19.8,20.2)+' kV</td><td style="color:var(--g)">OK</td></tr>';
 h+='<tr><td>SM6-B</td><td class="rv">'+R(19.8,20.2)+' kV</td><td style="color:var(--g)">OK</td></tr>';
 if(type==='msb'||type==='tx'){h+='<tr><td>LV-A</td><td class="rv">'+RI(396,400)+' V</td><td style="color:var(--g)">OK</td></tr>';
 h+='<tr><td>LV-B</td><td class="rv">'+RI(396,400)+' V</td><td style="color:var(--g)">OK</td></tr>';}
 h+='</table>';
 h+='<div style="margin-top:8px;color:var(--o);font-weight:600;font-size:8px">BRANCH FLOWS</div>';
-h+='<table><tr><th>Branch</th><th>P(kW)</th><th>I(A)</th></tr>';
+h+='<table><tr><th scope="col">Branch</th><th scope="col">P(kW)</th><th scope="col">I(A)</th></tr>';
 h+='<tr><td>Feed A</td><td class="rv">'+R(8200,9400)+'</td><td>'+RI(240,280)+'</td></tr>';
 h+='<tr><td>Feed B</td><td class="rv">'+R(8100,9300)+'</td><td>'+RI(238,278)+'</td></tr>';
 h+='</table>';
 h+='<div style="margin-top:8px;color:var(--o);font-weight:600;font-size:8px">LOADING</div>';
-h+='<table><tr><th>Equipment</th><th>%</th></tr>';
+h+='<table><tr><th scope="col">Equipment</th><th scope="col">%</th></tr>';
 h+='<tr><td>VCB-A</td><td>'+RI(38,44)+'%</td></tr>';
 h+='<tr><td>VCB-B</td><td>'+RI(37,43)+'%</td></tr>';
 h+='</table>';
 }else if(type==='ups-a'||type==='ups-b'){
 var u=type==='ups-a'?'A':'B';
 var lr=u==='A'?[65,70]:[64,69];
-h+='<table><tr><th>Bus</th><th>V</th></tr>';
+h+='<table><tr><th scope="col">Bus</th><th scope="col">V</th></tr>';
 h+='<tr><td>DC-'+u+'</td><td class="rv">'+RI(715,725)+' VDC</td></tr></table>';
 h+='<div style="margin-top:8px;color:var(--o);font-weight:600;font-size:8px">UPS-'+u+' STATUS</div>';
-h+='<table><tr><th>Param</th><th>Value</th></tr>';
+h+='<table><tr><th scope="col">Param</th><th scope="col">Value</th></tr>';
 h+='<tr><td>Load</td><td>'+RI(lr[0],lr[1])+'%</td></tr>';
 h+='<tr><td>Efficiency</td><td>'+R(96,96.5)+'%</td></tr>';
 h+='<tr><td>Mode</td><td style="color:var(--g)">Normal</td></tr>';
 h+='<tr><td>Battery</td><td>'+RI(8,12)+' min</td></tr>';
 h+='<tr><td>SOC</td><td>'+RI(94,100)+'%</td></tr></table>';
 }else if(type==='busway'){
-h+='<table><tr><th>Busway</th><th>V</th><th>I</th><th>Load</th></tr>';
+h+='<table><tr><th scope="col">Busway</th><th scope="col">V</th><th scope="col">I</th><th scope="col">Load</th></tr>';
 h+='<tr><td>BW-A</td><td class="rv">'+RI(396,400)+'V</td><td>'+RI(4800,5400)+'A</td><td>'+RI(62,70)+'%</td></tr>';
 h+='<tr><td>BW-B</td><td class="rv">'+RI(396,400)+'V</td><td>'+RI(4700,5300)+'A</td><td>'+RI(61,69)+'%</td></tr></table>';
 }else if(type==='rack-psu'){
-h+='<table><tr><th>PSU</th><th>In</th><th>Out</th><th>\u03b7</th></tr>';
+h+='<table><tr><th scope="col">PSU</th><th scope="col">In</th><th scope="col">Out</th><th scope="col">\u03b7</th></tr>';
 h+='<tr><td>PSU-A</td><td>'+RI(3200,3500)+'W</td><td>'+RI(3100,3400)+'W</td><td>'+R(97,97.8)+'%</td></tr>';
 h+='<tr><td>PSU-B</td><td>'+RI(3100,3400)+'W</td><td>'+RI(3000,3300)+'W</td><td>'+R(97,97.7)+'%</td></tr></table>';
 }else{

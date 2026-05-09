@@ -1427,12 +1427,12 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Market</th>
-                            <th>Operational (MW)</th>
-                            <th>Under Construction</th>
-                            <th>Pipeline/Planned</th>
-                            <th>Vacancy</th>
-                            <th>Risk Level</th>
+                            <th scope="col">Market</th>
+                            <th scope="col">Operational (MW)</th>
+                            <th scope="col">Under Construction</th>
+                            <th scope="col">Pipeline/Planned</th>
+                            <th scope="col">Vacancy</th>
+                            <th scope="col">Risk Level</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1506,11 +1506,11 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Operator</th>
-                            <th>Location</th>
-                            <th>Capacity</th>
-                            <th>Status</th>
-                            <th>Key Note</th>
+                            <th scope="col">Operator</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Capacity</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Key Note</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1654,10 +1654,10 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Metric</th>
-                            <th>Legacy DC (pre-2015)</th>
-                            <th>Modern AI-Ready DC</th>
-                            <th>Gap</th>
+                            <th scope="col">Metric</th>
+                            <th scope="col">Legacy DC (pre-2015)</th>
+                            <th scope="col">Modern AI-Ready DC</th>
+                            <th scope="col">Gap</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1759,10 +1759,10 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Indicator</th>
-                            <th>Classic Bubble Signal</th>
-                            <th>SEA DC Market 2026</th>
-                            <th>Signal?</th>
+                            <th scope="col">Indicator</th>
+                            <th scope="col">Classic Bubble Signal</th>
+                            <th scope="col">SEA DC Market 2026</th>
+                            <th scope="col">Signal?</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1855,11 +1855,11 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Occupancy</th>
-                            <th>Revenue (20 MW DC)</th>
-                            <th>OPEX Coverage</th>
-                            <th>Capex Payback</th>
-                            <th>Status</th>
+                            <th scope="col">Occupancy</th>
+                            <th scope="col">Revenue (20 MW DC)</th>
+                            <th scope="col">OPEX Coverage</th>
+                            <th scope="col">Capex Payback</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3301,7 +3301,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html+='<div class="kpi-box"><div class="kpi-val">'+(r.paybackYears<50?r.paybackYears.toFixed(1)+' yrs':'N/A')+'</div><div class="kpi-lbl">Payback</div></div>';
     html+='</div>';
     // Inputs table (2-col layout)
-    html+='<h2>Input Parameters</h2><table><tr><th style="width:30%">Parameter</th><th style="width:20%">Value</th><th style="width:30%">Parameter</th><th style="width:20%">Value</th></tr>';
+    html+='<h2>Input Parameters</h2><table><tr><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th></tr>';
     html+='<tr><td style="font-weight:600">Market</td><td>'+market+'</td><td style="font-weight:600">Current Operational</td><td>'+inputs.op.toLocaleString()+' MW</td></tr>';
     html+='<tr><td style="font-weight:600">Total Pipeline</td><td>'+inputs.pipe.toLocaleString()+' MW</td><td style="font-weight:600">Population</td><td>'+inputs.pop+'M</td></tr>';
     html+='<tr><td style="font-weight:600">Absorption Rate</td><td>'+inputs.absorb+' MW/yr</td><td style="font-weight:600">Pre-Committed</td><td>'+(inputs.precommit*100).toFixed(0)+'%</td></tr>';
@@ -3309,7 +3309,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html+='<tr><td style="font-weight:600">Build Cost</td><td>$'+inputs.costMW+'M/MW</td><td style="font-weight:600">Revenue/MW/Yr</td><td>$'+inputs.revMW+'M</td></tr>';
     html+='<tr><td style="font-weight:600">OPEX Ratio</td><td>'+(inputs.opexRatio*100).toFixed(0)+'%</td><td style="font-weight:600">WACC</td><td>'+(inputs.wacc*100).toFixed(1)+'%</td></tr></table>';
     // Results table
-    html+='<h2>Risk Analysis Results</h2><table><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>';
+    html+='<h2>Risk Analysis Results</h2><table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Assessment</th></tr>';
     html+='<tr><td>Supply-to-Demand Ratio</td><td style="font-weight:700;color:'+(r.sdRatio>2?'#dc2626':r.sdRatio>1.3?'#d97706':'#059669')+'">'+r.sdRatio.toFixed(1)+'x</td><td>'+(r.sdRatio>2?'Significant oversupply':r.sdRatio>1.3?'Moderate oversupply':'Balanced')+'</td></tr>';
     html+='<tr><td>Years to Absorb</td><td>'+r.yearsAbsorb.toFixed(1)+' yrs</td><td>'+(r.yearsAbsorb>10?'Extended timeline':r.yearsAbsorb>5?'Manageable':'Healthy')+'</td></tr>';
     html+='<tr><td>Projected Vacancy</td><td>'+r.actualVacancy.toFixed(0)+'%</td><td>'+(r.actualVacancy>25?'Pricing pressure likely':'Within norms')+'</td></tr>';
@@ -3344,7 +3344,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         }
         html+='</svg></div><div>';
         // Stats table beside
-        html+='<table><tr><th>Statistic</th><th>Value</th></tr>';
+        html+='<table><tr><th scope="col">Statistic</th><th scope="col">Value</th></tr>';
         html+='<tr><td>Mean Risk</td><td><strong>'+mc.mean.toFixed(1)+'</strong></td></tr>';
         html+='<tr><td>P5 (Best)</td><td>'+mc.p5.toFixed(1)+'</td></tr>';
         html+='<tr><td>Median (P50)</td><td>'+mc.p50.toFixed(1)+'</td></tr>';
@@ -3378,7 +3378,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         });
         html+='</svg></div><div>';
         // Sensitivity table beside
-        html+='<table><tr><th>Parameter</th><th>-20%</th><th>Base</th><th>+20%</th><th>Range</th></tr>';
+        html+='<table><tr><th scope="col">Parameter</th><th scope="col">-20%</th><th scope="col">Base</th><th scope="col">+20%</th><th scope="col">Range</th></tr>';
         top6.forEach(function(sr){
             html+='<tr><td>'+sr.name+'</td><td>'+sr.low.toFixed(1)+'</td><td>'+sr.base.toFixed(1)+'</td><td>'+sr.high.toFixed(1)+'</td><td><strong>'+sr.range.toFixed(1)+'</strong></td></tr>';
         });
@@ -3389,7 +3389,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         html+='<h2>Executive Risk Assessment</h2><div class="narrative">'+bubGenerateNarrative(inputs,r,mc,bubRunScenarios(inputs))+'</div>';
         // Scenarios table
         var scens=bubRunScenarios(inputs);
-        html+='<h2>Scenario Comparison</h2><table><tr><th>Scenario</th><th>Risk Score</th><th>S/D Ratio</th><th>NPV</th><th>Payback</th><th>Vacancy</th></tr>';
+        html+='<h2>Scenario Comparison</h2><table><tr><th scope="col">Scenario</th><th scope="col">Risk Score</th><th scope="col">S/D Ratio</th><th scope="col">NPV</th><th scope="col">Payback</th><th scope="col">Vacancy</th></tr>';
         scens.forEach(function(s){
             html+='<tr><td style="font-weight:600">'+s.name+'</td>';
             html+='<td style="color:'+(s.risk>=70?'#dc2626':s.risk>=30?'#d97706':'#059669')+';font-weight:700">'+s.risk.toFixed(0)+'/100</td>';

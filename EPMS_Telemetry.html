@@ -356,6 +356,8 @@
     <script src="js/rz-mobile-nav.js?v=2026-05-09d" defer></script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
 <svg id="viewport" viewBox="0 0 3600 2600">
     <defs>
@@ -1205,11 +1207,11 @@ function exportPDF() {
     html += '<h1>EPMS Telemetry Report</h1>';
     html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
     html += '<h2>System Metrics</h2>';
-    html += '<table><tr><th>Metric</th><th>Value</th></tr>';
+    html += '<table><tr><th scope="col">Metric</th><th scope="col">Value</th></tr>';
     html += '<tr><td>Total Load</td><td>' + data.totalLoad + '</td></tr>';
     html += '<tr><td>Power Factor</td><td>' + data.powerFactor + '</td></tr>';
     html += '<tr><td>Frequency</td><td>' + data.frequency + '</td></tr></table>';
-    html += '<h2>Power Sources</h2><table><tr><th>Source</th><th>Status</th></tr>';
+    html += '<h2>Power Sources</h2><table><tr><th scope="col">Source</th><th scope="col">Status</th></tr>';
     html += '<tr><td>Utility A</td><td class="' + (data.sources.A ? 'ok' : 'off') + '">' + (data.sources.A ? 'ACTIVE' : 'OFF') + '</td></tr>';
     html += '<tr><td>Utility B</td><td class="' + (data.sources.B ? 'ok' : 'off') + '">' + (data.sources.B ? 'ACTIVE' : 'OFF') + '</td></tr>';
     html += '<tr><td>Generator A</td><td class="' + (data.generators.A ? 'ok' : 'off') + '">' + (data.generators.A ? 'RUNNING' : 'STANDBY') + '</td></tr>';

@@ -1561,9 +1561,9 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Dimension</th>
-                                <th>Lagging Indicators</th>
-                                <th>Leading Indicators</th>
+                                <th scope="col">Dimension</th>
+                                <th scope="col">Lagging Indicators</th>
+                                <th scope="col">Leading Indicators</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1820,10 +1820,10 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Indicator</th>
-                                <th>Month 1</th>
-                                <th>Month 18</th>
-                                <th>Direction</th>
+                                <th scope="col">Indicator</th>
+                                <th scope="col">Month 1</th>
+                                <th scope="col">Month 18</th>
+                                <th scope="col">Direction</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1980,11 +1980,11 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Indicator</th>
-                                <th>Measurement</th>
-                                <th>Target</th>
-                                <th>Rationale</th>
+                                <th scope="col">#</th>
+                                <th scope="col">Indicator</th>
+                                <th scope="col">Measurement</th>
+                                <th scope="col">Target</th>
+                                <th scope="col">Rationale</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -3442,10 +3442,10 @@
             'h1 { color: #1e3a5f; font-size: 22px; border-bottom: 3px solid #8b5cf6; padding-bottom: 8px; }' +
             'h2 { color: #1e3a5f; font-size: 16px; margin-top: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }' +
             'h3 { color: #374151; font-size: 14px; }' +
-            '.header-meta { display: flex; justify-content: space-between; color: #6b7280; font-size: 11px; margin-bottom: 20px; }' +
+            '.header-meta { display: flex; justify-content: space-between; color: #94a3b8; font-size: 11px; margin-bottom: 20px; }' +
             '.score-hero { text-align: center; padding: 20px; background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-radius: 12px; margin: 16px 0; }' +
             '.score-hero .score { font-size: 48px; font-weight: 800; color: #8b5cf6; }' +
-            '.score-hero .label { color: #6b7280; font-size: 13px; }' +
+            '.score-hero .label { color: #94a3b8; font-size: 13px; }' +
             'table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }' +
             'th { background: #f8fafc; color: #1e3a5f; padding: 8px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }' +
             'td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1f2937; }' +
@@ -3458,7 +3458,7 @@
             '.badge-info { background: #f5f3ff; color: #7c3aed; }' +
             '.chart-container { text-align: center; margin: 16px 0; }' +
             '.footer { margin-top: 30px; padding-top: 12px; border-top: 2px solid #e2e8f0; font-size: 10px; color: #9ca3af; text-align: center; }' +
-            '.methodology { background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 11px; color: #6b7280; margin-top: 16px; }' +
+            '.methodology { background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 11px; color: #94a3b8; margin-top: 16px; }' +
             '@media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }' +
         '/* v1.5.0 — article typography uplift (Awwwards-tier polish) */
 
@@ -3629,7 +3629,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         '</div>' +
         '<h2>Input Parameters</h2>' +
         '<table>' +
-            '<tr><th>Parameter</th><th>Value</th><th>Benchmark</th><th>Status</th></tr>' +
+            '<tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Benchmark</th><th scope="col">Status</th></tr>' +
             '<tr><td>Near-Miss Reports/Month</td><td>' + inputs.nearMiss + '</td><td>10+</td><td>' + (inputs.nearMiss >= 10 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
             '<tr><td>Weak Signals/Month</td><td>' + inputs.weakSignals + '</td><td>15+</td><td>' + (inputs.weakSignals >= 15 ? '\u2713 Good' : '\u26a0 Below') + '</td></tr>' +
             '<tr><td>Open Audit Findings</td><td>' + inputs.audit + '</td><td>&lt;5</td><td>' + (inputs.audit <= 5 ? '\u2713 Good' : '\u26a0 High') + '</td></tr>' +
@@ -3642,7 +3642,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         '<h2>Dimension Analysis</h2>' +
         '<div class="chart-container">' + radarSVG(dims) + '</div>' +
         '<table>' +
-            '<tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Weighted</th></tr>' +
+            '<tr><th scope="col">Dimension</th><th scope="col">Score</th><th scope="col">Weight</th><th scope="col">Weighted</th></tr>' +
             DIM_LABELS.map(function(l,i) { return '<tr><td>' + l + '</td><td>' + dims[i].toFixed(1) + '%</td><td>' + (WEIGHTS[i]*100).toFixed(0) + '%</td><td>' + (dims[i]*WEIGHTS[i]).toFixed(1) + '</td></tr>'; }).join('') +
         '</table>' +
         '<div class="chart-container">' + gapBarSVG(dims) + '</div>' +
@@ -3657,7 +3657,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
             html += '<h2>Monte Carlo Simulation (10,000 Iterations)</h2>' +
             '<table>' +
-                '<tr><th>Metric</th><th>Value</th></tr>' +
+                '<tr><th scope="col">Metric</th><th scope="col">Value</th></tr>' +
                 '<tr><td>P5 (Worst Case)</td><td>' + mc.p5.toFixed(1) + '</td></tr>' +
                 '<tr><td>P50 (Median)</td><td>' + mc.p50.toFixed(1) + '</td></tr>' +
                 '<tr><td>P95 (Best Case)</td><td>' + mc.p95.toFixed(1) + '</td></tr>' +
@@ -3667,12 +3667,12 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             '</table>' +
             '<h2>Sensitivity Analysis</h2>' +
             '<table>' +
-                '<tr><th>Rank</th><th>Input Parameter</th><th>Impact (\u00b120%)</th></tr>' +
+                '<tr><th scope="col">Rank</th><th scope="col">Input Parameter</th><th scope="col">Impact (\u00b120%)</th></tr>' +
                 sensitivity.map(function(s,i) { return '<tr><td>#' + (i+1) + '</td><td>' + s.label + '</td><td>\u00b1' + s.range.toFixed(1) + ' points</td></tr>'; }).join('') +
             '</table>' +
             '<h2>Cost of Complacency</h2>' +
             '<table>' +
-                '<tr><th>Dimension</th><th>Gap</th><th>Risk Exposure</th></tr>' +
+                '<tr><th scope="col">Dimension</th><th scope="col">Gap</th><th scope="col">Risk Exposure</th></tr>' +
                 DIM_LABELS.map(function(l,i) { return '<tr><td>' + l + '</td><td>' + (gaps[i]*100).toFixed(0) + '%</td><td>$' + (costs[i]/1000).toFixed(0) + 'K</td></tr>'; }).join('') +
                 '<tr style="font-weight:700;"><td>TOTAL</td><td>\u2014</td><td>$' + (totalCost/1000).toFixed(0) + 'K</td></tr>' +
             '</table>';

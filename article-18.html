@@ -1231,6 +1231,7 @@
     <script src="js/rz-mobile-nav.js?v=2026-05-09d" defer></script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Reading Progress Bar -->
     <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -1465,7 +1466,7 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>Year</th><th>Platform</th><th>Per-Rack Density</th><th>GPUs per Rack</th><th>Interconnect</th></tr>
+                        <tr><th scope="col">Year</th><th scope="col">Platform</th><th scope="col">Per-Rack Density</th><th scope="col">GPUs per Rack</th><th scope="col">Interconnect</th></tr>
                     </thead>
                     <tbody>
                         <tr><td>2015</td><td>Traditional x86</td><td>5 kW</td><td>N/A</td><td>10 GbE</td></tr>
@@ -1521,7 +1522,7 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>Cooling Technology</th><th>PUE Range</th><th>Max Rack Density</th><th>Market Share 2025</th><th>Status</th></tr>
+                        <tr><th scope="col">Cooling Technology</th><th scope="col">PUE Range</th><th scope="col">Max Rack Density</th><th scope="col">Market Share 2025</th><th scope="col">Status</th></tr>
                     </thead>
                     <tbody>
                         <tr><td>Traditional Air</td><td>1.4 - 1.8</td><td>~30 kW</td><td>Declining</td><td>Legacy standard</td></tr>
@@ -1561,7 +1562,7 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>Attribute</th><th>Ultra Ethernet (UEC 1.0)</th><th>InfiniBand (NDR/XDR)</th></tr>
+                        <tr><th scope="col">Attribute</th><th scope="col">Ultra Ethernet (UEC 1.0)</th><th scope="col">InfiniBand (NDR/XDR)</th></tr>
                     </thead>
                     <tbody>
                         <tr><td>Bandwidth</td><td>400/800 GbE</td><td>400/800 Gb/s</td></tr>
@@ -1601,7 +1602,7 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>Company</th><th>2026 CAPEX (Planned)</th><th>% Revenue</th><th>Primary AI Focus</th></tr>
+                        <tr><th scope="col">Company</th><th scope="col">2026 CAPEX (Planned)</th><th scope="col">% Revenue</th><th scope="col">Primary AI Focus</th></tr>
                     </thead>
                     <tbody>
                         <tr><td>Amazon (AWS)</td><td>~$200B</td><td>~28%</td><td>Custom Trainium, Inferentia chips + NVIDIA</td></tr>
@@ -1702,7 +1703,7 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>Dimension</th><th>Traditional Data Center</th><th>AI Factory</th></tr>
+                        <tr><th scope="col">Dimension</th><th scope="col">Traditional Data Center</th><th scope="col">AI Factory</th></tr>
                     </thead>
                     <tbody>
                         <tr><td>Rack Density</td><td>5-10 kW</td><td>120-600 kW</td></tr>
@@ -1879,7 +1880,7 @@
                                 <div class="aif-kpi-card"><div class="kpi-label">Best Value</div><div class="kpi-value" id="tcoBest">-</div></div>
                             </div>
                             <table class="aif-tco-table" id="tcoTable">
-                                <thead><tr><th>Year</th><th>Traditional</th><th>Retrofit</th><th>Greenfield</th></tr></thead>
+                                <thead><tr><th scope="col">Year</th><th scope="col">Traditional</th><th scope="col">Retrofit</th><th scope="col">Greenfield</th></tr></thead>
                                 <tbody id="tcoBody"></tbody>
                             </table>
                             <p class="table-source" style="font-size:0.72rem;color:#64748b;font-style:italic;margin:0.4rem 0 1.2rem;">Source: Publicly available industry data and published standards. For educational and research purposes only.</p>
@@ -2884,14 +2885,14 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html += '</div>';
 
     // Input params
-    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<h2>Input Parameters</h2><table><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Parameter</th><th scope="col">Value</th></tr>';
     html += '<tr><td>Rack Density</td><td>' + inp.density + ' kW</td><td>Cooling Type</td><td>' + (inp.cooling === 'dtc' ? 'Direct-to-Chip' : inp.cooling === 'immersion' ? 'Immersion' : 'Air') + '</td></tr>';
     html += '<tr><td>Number of Racks</td><td>' + inp.racks + '</td><td>PUE</td><td>' + inp.pue + '</td></tr>';
     html += '<tr><td>Electricity Rate</td><td>$' + inp.elecRate + '/kWh</td><td>Facility Age</td><td>' + inp.age + ' years</td></tr>';
     html += '<tr><td>Floor Load</td><td>' + inp.floorLoad + ' kg/m&sup2;</td><td>LC Infrastructure</td><td>' + (inp.lcInfra === 'full' ? 'Full' : inp.lcInfra === 'partial' ? 'Partial' : 'None') + '</td></tr></table>';
 
     // Results table
-    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>';
+    html += '<h2>Assessment Results</h2><table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Assessment</th></tr>';
     html += '<tr><td>Total IT Load</td><td><strong>' + r.itLoadMW.toFixed(1) + ' MW</strong></td><td>' + (r.itLoadMW >= 10 ? 'Hyperscale class' : r.itLoadMW >= 1 ? 'Enterprise class' : 'Small deployment') + '</td></tr>';
     html += '<tr><td>Total Facility Power</td><td>' + r.facPowerMW.toFixed(1) + ' MW</td><td>PUE overhead: ' + ((r.facPowerMW/r.itLoadMW - 1) * 100).toFixed(0) + '%</td></tr>';
     html += '<tr><td>Annual Energy Cost</td><td>' + fmtMoney(r.annualEnergy) + '</td><td>' + fmtMoney(r.annualEnergy / 12) + '/month</td></tr>';
@@ -2937,7 +2938,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             html += '</svg></div>';
 
             // Percentile table
-            html += '<div><table style="margin-top:0"><tr><th>Percentile</th><th>Score</th><th>Assessment</th></tr>';
+            html += '<div><table style="margin-top:0"><tr><th scope="col">Percentile</th><th scope="col">Score</th><th scope="col">Assessment</th></tr>';
             html += '<tr><td style="color:#ef4444;font-weight:600">P5 (Worst Case)</td><td>' + mc.p5.toFixed(1) + '</td><td>' + (mc.p5 >= 50 ? 'Viable' : 'At risk') + '</td></tr>';
             html += '<tr><td>P25</td><td>' + mc.p25.toFixed(1) + '</td><td>' + (mc.p25 >= 50 ? 'Adequate' : 'Below threshold') + '</td></tr>';
             html += '<tr><td style="color:#3b82f6;font-weight:600">P50 (Median)</td><td><strong>' + mc.p50.toFixed(1) + '</strong></td><td>Most likely outcome</td></tr>';
@@ -2975,7 +2976,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             html += '</svg></div>';
 
             // TCO table
-            html += '<div><table style="margin-top:0"><tr><th>Year</th><th>Traditional</th><th>Retrofit</th><th>Greenfield</th></tr>';
+            html += '<div><table style="margin-top:0"><tr><th scope="col">Year</th><th scope="col">Traditional</th><th scope="col">Retrofit</th><th scope="col">Greenfield</th></tr>';
             tRows.forEach(function(row) { html += '<tr><td>Year ' + row[0] + '</td><td>' + fmtMoney(row[1]) + '</td><td>' + fmtMoney(row[2]) + '</td><td>' + fmtMoney(row[3]) + '</td></tr>'; });
             html += '<tr style="background:#f0f9ff;font-weight:700"><td>5-Yr Total</td><td>' + fmtMoney(tTotals[0]) + '</td><td>' + fmtMoney(tTotals[1]) + '</td><td>' + fmtMoney(tTotals[2]) + '</td></tr></table></div></div>';
         }
@@ -3003,7 +3004,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             html += '</svg></div>';
 
             // Data table
-            html += '<div><table style="margin-top:0"><tr><th>Parameter</th><th>-20%</th><th>Base</th><th>+20%</th><th>Range</th></tr>';
+            html += '<div><table style="margin-top:0"><tr><th scope="col">Parameter</th><th scope="col">-20%</th><th scope="col">Base</th><th scope="col">+20%</th><th scope="col">Range</th></tr>';
             top6.forEach(function(s) { html += '<tr><td>' + s.name + '</td><td style="color:#dc2626">' + s.scoreLo + '</td><td>' + s.base + '</td><td style="color:#059669">' + s.scoreHi + '</td><td><strong>' + s.range + '</strong></td></tr>'; });
             html += '</table></div></div>';
         }

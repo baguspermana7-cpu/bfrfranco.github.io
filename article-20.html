@@ -954,6 +954,7 @@
     <script src="js/rz-mobile-nav.js?v=2026-05-09d" defer></script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Scroll Progress Bar -->
 <div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress"></div></div>
@@ -1118,7 +1119,7 @@
 </div>
 
 <!-- Article Content -->
-<main>
+<main id="main-content">
 <article class="article-content">
 <div class="container">
 <div class="article-body">
@@ -1218,9 +1219,9 @@
     <table>
         <thead>
             <tr>
-                <th>Metric</th>
-                <th>Value</th>
-                <th>Source</th>
+                <th scope="col">Metric</th>
+                <th scope="col">Value</th>
+                <th scope="col">Source</th>
             </tr>
         </thead>
         <tbody>
@@ -1318,9 +1319,9 @@
     <table class="verdict-table">
         <thead>
             <tr>
-                <th>Altman's Claim</th>
-                <th>Verdict</th>
-                <th>Evidence</th>
+                <th scope="col">Altman's Claim</th>
+                <th scope="col">Verdict</th>
+                <th scope="col">Evidence</th>
             </tr>
         </thead>
         <tbody>
@@ -2120,14 +2121,14 @@ function wfcExportPDF() {
     html += '</div>';
 
     // Input Parameters
-    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<h2>Input Parameters</h2><table><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Parameter</th><th scope="col">Value</th></tr>';
     html += '<tr><td>AI Model</td><td><strong>' + selModel.name + '</strong> (' + selModel.company + ')</td><td>Queries/Day</td><td>' + queries + '</td></tr>';
     html += '<tr><td>Complexity</td><td>' + cmplx + '</td><td>Users</td><td>' + users + '</td></tr>';
     html += '<tr><td>Cooling Type</td><td>' + cool + '</td><td>Active Hours/Day</td><td>' + hours + '</td></tr>';
     html += '<tr><td>Upstream Water</td><td>' + upstream + '</td><td>Region</td><td>' + region + '</td></tr></table>';
 
     // Results
-    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Context</th></tr>';
+    html += '<h2>Assessment Results</h2><table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Context</th></tr>';
     html += '<tr><td>Daily Footprint</td><td><strong>' + document.getElementById('wfcDaily').textContent + '</strong></td><td>All users combined</td></tr>';
     html += '<tr><td>Monthly Footprint</td><td>' + document.getElementById('wfcMonthly').textContent + '</td><td>30-day estimate</td></tr>';
     html += '<tr><td>Annual Footprint</td><td><strong>' + document.getElementById('wfcAnnual').textContent + '</strong></td><td>365-day projection</td></tr>';
@@ -2329,7 +2330,7 @@ function dcwExportPDF() {
     html += '</div>';
 
     // Input Parameters
-    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<h2>Input Parameters</h2><table><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Parameter</th><th scope="col">Value</th></tr>';
     html += '<tr><td>IT Load</td><td><strong>' + load + ' MW</strong></td><td>PUE</td><td>' + pue + '</td></tr>';
     html += '<tr><td>Cooling Technology</td><td>' + (coolingNames[cool] || cool) + '</td><td>Climate Zone</td><td>' + climate + '</td></tr>';
     html += '<tr><td>Operating Hours/Year</td><td>' + hours + '</td><td>Water Source</td><td>' + source + '</td></tr>';
@@ -2337,7 +2338,7 @@ function dcwExportPDF() {
     html += '<tr><td>Renewable Energy</td><td>' + renewable + '%</td><td></td><td></td></tr></table>';
 
     // Assessment Results
-    html += '<h2>Assessment Results</h2><table><tr><th>Metric</th><th>Value</th><th>Context</th></tr>';
+    html += '<h2>Assessment Results</h2><table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Context</th></tr>';
     html += '<tr><td>Annual Consumption</td><td><strong>' + document.getElementById('dcwAnnual').textContent + '</strong></td><td>' + document.getElementById('dcwAnnualSub').textContent + '</td></tr>';
     html += '<tr><td>Daily Consumption</td><td>' + document.getElementById('dcwDaily').textContent + '</td><td>' + document.getElementById('dcwDailySub').textContent + '</td></tr>';
     html += '<tr><td>Water Use Effectiveness</td><td><strong>' + document.getElementById('dcwWUE').textContent + ' L/kWh</strong></td><td>' + (parseFloat(document.getElementById('dcwWUE').textContent) <= 0.5 ? 'Very Good' : parseFloat(document.getElementById('dcwWUE').textContent) <= 1.0 ? 'Average' : 'Below Average') + '</td></tr>';
@@ -2368,7 +2369,7 @@ function dcwExportPDF() {
     html += wcSVGBar(benchData, 'yours', 500, 20 * benchData.length + 50);
 
     // Benchmark table
-    html += '<table><tr><th>Facility</th><th>Annual L/MW</th><th>WUE</th><th>Note</th></tr>';
+    html += '<table><tr><th scope="col">Facility</th><th scope="col">Annual L/MW</th><th scope="col">WUE</th><th scope="col">Note</th></tr>';
     dcwBenchmarks.forEach(function(b) {
         html += '<tr><td>' + b.name + '</td><td>' + wcFmtVol(b.perMW) + '</td><td>' + b.wue.toFixed(2) + '</td><td style="font-size:9px">' + b.note + '</td></tr>';
     });
@@ -2701,13 +2702,13 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html += '</div>';
 
     // Input Parameters
-    html += '<h2>Input Parameters</h2><table><tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>';
+    html += '<h2>Input Parameters</h2><table><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Parameter</th><th scope="col">Value</th></tr>';
     html += '<tr><td>AI Model</td><td><strong>' + modelData.name + '</strong> (' + modelData.company + ')</td><td>Queries/Day</td><td>' + q + '</td></tr>';
     html += '<tr><td>Scale</td><td>' + (scaleLabels[scale] || scale) + '</td><td>Upstream Water</td><td>' + upstream + '</td></tr>';
     html += '<tr><td>Water/Query</td><td>' + perQueryML.toFixed(2) + ' mL</td><td>Total Queries</td><td>' + totalQ.toLocaleString() + '</td></tr></table>';
 
     // Everyday Comparisons
-    html += '<h2>Everyday Activity Comparisons</h2><table><tr><th>Activity</th><th>Equivalent</th><th>Reference Value</th><th>Context</th></tr>';
+    html += '<h2>Everyday Activity Comparisons</h2><table><tr><th scope="col">Activity</th><th scope="col">Equivalent</th><th scope="col">Reference Value</th><th scope="col">Context</th></tr>';
     avhComparisons.forEach(function(item) {
         var eq = waterL / item.unitL;
         var context = '';
@@ -2730,7 +2731,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html += wcSVGBar(chartData, model, 500, 20 * chartData.length + 50);
 
     // Full model table
-    html += '<table><tr><th>Model</th><th>Company</th><th>Type</th><th>mL/Query</th><th>' + wcFmtVol(totalQ) + ' Queries</th></tr>';
+    html += '<table><tr><th scope="col">Model</th><th scope="col">Company</th><th scope="col">Type</th><th scope="col">mL/Query</th><th scope="col">' + wcFmtVol(totalQ) + ' Queries</th></tr>';
     Object.keys(wcModelData).sort(function(a, b) { return wcModelData[b].water - wcModelData[a].water; }).forEach(function(k) {
         var m = wcModelData[k];
         var mw = m.water;
@@ -2858,7 +2859,7 @@ function wfcUpdatePro() {
     var models = Object.keys(wcModelData);
     var bestModel = null, bestWater = Infinity, worstModel = null, worstWater = 0;
 
-    var tableHTML = '<thead><tr><th>Model</th><th>Company</th><th>mL/Query</th><th>Daily (L)</th><th>Annual (L)</th><th>Cost/Year</th></tr></thead><tbody>';
+    var tableHTML = '<thead><tr><th scope="col">Model</th><th scope="col">Company</th><th scope="col">mL/Query</th><th scope="col">Daily (L)</th><th scope="col">Annual (L)</th><th scope="col">Cost/Year</th></tr></thead><tbody>';
     models.sort(function(a, b) { return wcModelData[b].water - wcModelData[a].water; });
 
     models.forEach(function(k) {
@@ -2912,7 +2913,7 @@ function dcwUpdatePro() {
     var coolingNames = { evaporative: 'Evaporative Tower', hybrid: 'Hybrid Adiabatic', aircooled: 'Air-Cooled Chiller', dlc: 'Direct-to-Chip', immersion: 'Immersion Cooling' };
     var upgradeCosts = { evaporative: 0, hybrid: 800000, aircooled: 1200000, dlc: 2500000, immersion: 4000000 };
 
-    var tableHTML = '<thead><tr><th>Cooling Technology</th><th>WUE</th><th>Annual Water</th><th>Savings</th><th>Upgrade Cost</th><th>Payback</th></tr></thead><tbody>';
+    var tableHTML = '<thead><tr><th scope="col">Cooling Technology</th><th scope="col">WUE</th><th scope="col">Annual Water</th><th scope="col">Savings</th><th scope="col">Upgrade Cost</th><th scope="col">Payback</th></tr></thead><tbody>';
     ['evaporative','hybrid','aircooled','dlc','immersion'].forEach(function(c) {
         var nWUE = (dcwWUEBase[c] || 1.8) * (dcwClimateMult[climate] || 1.0);
         var nAnnualL = totalKWh * nWUE * upFactor;
@@ -2953,7 +2954,7 @@ function avhUpdatePro() {
     var upstream = document.getElementById('avhUpstream').value;
     var models = Object.keys(wcModelData);
 
-    var tableHTML = '<thead><tr><th>Model</th><th>Type</th><th>mL/Query</th><th>1K Queries</th><th>1M Queries</th><th>1B Queries</th></tr></thead><tbody>';
+    var tableHTML = '<thead><tr><th scope="col">Model</th><th scope="col">Type</th><th scope="col">mL/Query</th><th scope="col">1K Queries</th><th scope="col">1M Queries</th><th scope="col">1B Queries</th></tr></thead><tbody>';
     models.sort(function(a, b) { return wcModelData[b].water - wcModelData[a].water; });
     models.forEach(function(k) {
         var m = wcModelData[k];

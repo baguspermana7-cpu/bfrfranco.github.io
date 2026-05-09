@@ -4924,12 +4924,12 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Scenario</th>
-                                        <th>PUE</th>
-                                        <th>System COP</th>
-                                        <th>Annual OPEX</th>
-                                        <th>Annual Carbon</th>
-                                        <th>WUE</th>
+                                        <th scope="col">Scenario</th>
+                                        <th scope="col">PUE</th>
+                                        <th scope="col">System COP</th>
+                                        <th scope="col">Annual OPEX</th>
+                                        <th scope="col">Annual Carbon</th>
+                                        <th scope="col">WUE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -5065,12 +5065,12 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Point</th>
-                                        <th>PUE</th>
-                                        <th>COP</th>
-                                        <th>Net OPEX</th>
-                                        <th>Carbon</th>
-                                        <th>Risk</th>
+                                        <th scope="col">Point</th>
+                                        <th scope="col">PUE</th>
+                                        <th scope="col">COP</th>
+                                        <th scope="col">Net OPEX</th>
+                                        <th scope="col">Carbon</th>
+                                        <th scope="col">Risk</th>
                                     </tr>
                                 </thead>
                                 <tbody id="paretoRows">
@@ -5122,10 +5122,10 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Metric</th>
-                                        <th>P10</th>
-                                        <th>P50</th>
-                                        <th>P90</th>
+                                        <th scope="col">Metric</th>
+                                        <th scope="col">P10</th>
+                                        <th scope="col">P50</th>
+                                        <th scope="col">P90</th>
                                     </tr>
                                 </thead>
                                 <tbody id="mcRows">
@@ -5248,10 +5248,10 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Metric</th>
-                                        <th>Target</th>
-                                        <th>Predicted</th>
-                                        <th>Residual %</th>
+                                        <th scope="col">Metric</th>
+                                        <th scope="col">Target</th>
+                                        <th scope="col">Predicted</th>
+                                        <th scope="col">Residual %</th>
                                     </tr>
                                 </thead>
                                 <tbody id="calQualityRows">
@@ -5275,10 +5275,10 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Test Case</th>
-                                        <th>Status</th>
-                                        <th>Check</th>
-                                        <th>Detail</th>
+                                        <th scope="col">Test Case</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Check</th>
+                                        <th scope="col">Detail</th>
                                     </tr>
                                 </thead>
                                 <tbody id="selfTestRows">
@@ -5320,11 +5320,11 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Parameter</th>
-                                        <th>Source</th>
-                                        <th>Owner</th>
-                                        <th>Confidence</th>
-                                        <th>Timestamp</th>
+                                        <th scope="col">Parameter</th>
+                                        <th scope="col">Source</th>
+                                        <th scope="col">Owner</th>
+                                        <th scope="col">Confidence</th>
+                                        <th scope="col">Timestamp</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ledgerRows">
@@ -5407,13 +5407,13 @@
                             <table class="scenario-table">
                                 <thead>
                                     <tr>
-                                        <th>Input Parameter</th>
-                                        <th>Step</th>
-                                        <th>Delta PUE</th>
-                                        <th>Delta COP</th>
-                                        <th>Delta Net OPEX</th>
-                                        <th>Delta Carbon</th>
-                                        <th>Delta Risk</th>
+                                        <th scope="col">Input Parameter</th>
+                                        <th scope="col">Step</th>
+                                        <th scope="col">Delta PUE</th>
+                                        <th scope="col">Delta COP</th>
+                                        <th scope="col">Delta Net OPEX</th>
+                                        <th scope="col">Delta Carbon</th>
+                                        <th scope="col">Delta Risk</th>
                                     </tr>
                                 </thead>
                                 <tbody id="impactRows">
@@ -9604,7 +9604,7 @@
 
             function renderSankeyDrillRows(spec) {
                 if (!spec || !spec.rows || !spec.rows.length) return '<div class="muted">No contribution rows available for this node.</div>';
-                return '<table class="sankey-drill-table"><thead><tr><th>Component</th><th>Value</th><th>Share</th><th>Notes</th></tr></thead><tbody>' +
+                return '<table class="sankey-drill-table"><thead><tr><th scope="col">Component</th><th scope="col">Value</th><th scope="col">Share</th><th scope="col">Notes</th></tr></thead><tbody>' +
                     spec.rows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.label) + '</td><td>' + fmtNum(r.value, 1) + ' kW</td><td>' + escapeHtml(r.pct || '-') + '</td><td>' + escapeHtml(r.note || '-') + '</td></tr>';
                     }).join('') +
@@ -9613,7 +9613,7 @@
 
             function renderSankeyCorrelationRows(spec) {
                 if (!spec || !spec.corrRows || !spec.corrRows.length) return '<div class="muted">No sensitivity rows available.</div>';
-                return '<table class="sankey-drill-table"><thead><tr><th>Parameter</th><th>Sens</th><th>kW Eq.</th><th>Impact</th></tr></thead><tbody>' +
+                return '<table class="sankey-drill-table"><thead><tr><th scope="col">Parameter</th><th scope="col">Sens</th><th scope="col">kW Eq.</th><th scope="col">Impact</th></tr></thead><tbody>' +
                     spec.corrRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.corr) + '</td><td>' + escapeHtml(r.kw) + '</td><td>' + escapeHtml(r.impact || '-') + '</td></tr>';
                     }).join('') +
@@ -9785,7 +9785,7 @@
             function renderModeHelpOptions(doc) {
                 var opts = doc && Array.isArray(doc.options) ? doc.options : [];
                 if (!opts.length) return '<div class="muted">No option breakdown available.</div>';
-                return '<table class="mode-help-table"><thead><tr><th>Option</th><th>When To Use</th><th>Impact</th></tr></thead><tbody>' +
+                return '<table class="mode-help-table"><thead><tr><th scope="col">Option</th><th scope="col">When To Use</th><th scope="col">Impact</th></tr></thead><tbody>' +
                     opts.map(function(o) {
                         return '<tr><td>' + escapeHtml(o.mode || '-') + '</td><td>' + escapeHtml(o.use || '-') + '</td><td>' + escapeHtml(o.impact || '-') + '</td></tr>';
                     }).join('') +
@@ -10864,12 +10864,12 @@
                     '.r-head h1{font-size:20px;margin:0 0 4px;color:#1e3a5f;} .r-head p{margin:0;font-size:12px;color:#374151;} .r-brand{margin-top:5px;font-size:9px;color:#64748b;letter-spacing:.09em;text-transform:uppercase;font-weight:700;} .r-head-meta{font-size:11px;line-height:1.55;text-align:right;color:#334155;}' +
                     '.r-sec{margin-top:12px;border:1px solid #dbe5ef;border-radius:10px;overflow:visible;break-inside:auto;page-break-inside:auto;} .r-sec h2{margin:0;padding:8px 10px;font-size:13px;color:#1e3a5f;background:#f8fafc;border-bottom:1px solid #dbe5ef;break-after:avoid-page;page-break-after:avoid;}' +
                     '.r-sec .r-body{padding:9px 10px;} .r-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}' +
-                    '.r-card{border:1px solid #dbe5ef;border-radius:8px;padding:8px;background:#f8fafc;} .r-card .k{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;}' +
+                    '.r-card{border:1px solid #dbe5ef;border-radius:8px;padding:8px;background:#f8fafc;} .r-card .k{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}' +
                     '.r-card .v{margin-top:3px;font-size:17px;font-weight:700;color:#1e3a5f;} .r-card .s{margin-top:3px;font-size:11px;color:#1f2937;line-height:1.4;}' +
-                    '.r-score-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;} .r-score-card{border:2px solid #dbe5ef;border-radius:10px;background:linear-gradient(135deg,#ecfeff,#f0f9ff);padding:10px;} .r-score-card .k{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;} .r-score-card .v{font-size:40px;line-height:1.0;color:#1e3a5f;font-weight:800;font-family:JetBrains Mono,Consolas,monospace;} .r-score-grade{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(37,99,235,0.12);color:#1d4ed8;} .r-score-note{margin-top:6px;font-size:11px;color:#374151;line-height:1.45;}' +
+                    '.r-score-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;} .r-score-card{border:2px solid #dbe5ef;border-radius:10px;background:linear-gradient(135deg,#ecfeff,#f0f9ff);padding:10px;} .r-score-card .k{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;} .r-score-card .v{font-size:40px;line-height:1.0;color:#1e3a5f;font-weight:800;font-family:JetBrains Mono,Consolas,monospace;} .r-score-grade{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(37,99,235,0.12);color:#1d4ed8;} .r-score-note{margin-top:6px;font-size:11px;color:#374151;line-height:1.45;}' +
                     '.r-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;} .r-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}' +
                     '.r-chart-wrap{border:1px solid #dbe5ef;border-radius:8px;padding:6px;background:#ffffff;overflow:visible;} .r-chart{width:100%;height:auto;display:block;}' +
-                    '.r-list{margin:0;padding-left:18px;} .r-list li{margin:0 0 4px;font-size:11px;color:#1f2937;} .r-note{font-size:11px;color:#6b7280;margin-top:6px;}' +
+                    '.r-list{margin:0;padding-left:18px;} .r-list li{margin:0 0 4px;font-size:11px;color:#1f2937;} .r-note{font-size:11px;color:#94a3b8;margin-top:6px;}' +
                     '.r-conclusion{margin-top:8px;padding:8px 10px;border:1px solid #cbd5e1;border-left:4px solid #2563eb;border-radius:8px;background:#f8fbff;font-size:11px;color:#1f2937;line-height:1.5;}' +
                     '.r-conclusion.ok{border-left-color:#059669;background:#f0fdf4;} .r-conclusion.warn{border-left-color:#d97706;background:#fffaf0;} .r-conclusion.bad{border-left-color:#dc2626;background:#fff5f5;}' +
                     'table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;break-inside:auto;page-break-inside:auto;} th,td{padding:6px 7px;border-bottom:1px solid #e5e7eb;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;color:#1f2937;} th{background:#f8fafc;text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:#374151;} tr{break-inside:avoid-page;page-break-inside:avoid;}' +
@@ -11084,7 +11084,7 @@
                 return [
                     '<div class="r-chart-wrap">',
                     '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Table') + '</strong></div>',
-                    '<table><thead><tr><th>' + escapeHtml(keyLabel || 'Parameter') + '</th><th>' + escapeHtml(valueLabel || 'Value') + '</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">' + escapeHtml(keyLabel || 'Parameter') + '</th><th scope="col">' + escapeHtml(valueLabel || 'Value') + '</th></tr></thead><tbody>',
                     list.map(function(r) {
                         return '<tr><td>' + escapeHtml(String((r && r.k != null) ? r.k : '-')) + '</td><td>' + escapeHtml(String((r && r.v != null) ? r.v : '-')) + '</td></tr>';
                     }).join(''),
@@ -11101,7 +11101,7 @@
                 return [
                     '<div class="r-chart-wrap allow-break">',
                     '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Pareto Ledger') + '</strong></div>',
-                    '<table><thead><tr><th>Point</th><th>Feasible</th><th>PUE</th><th>COP</th><th>Net OPEX</th><th>Carbon</th><th>Risk</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Point</th><th scope="col">Feasible</th><th scope="col">PUE</th><th scope="col">COP</th><th scope="col">Net OPEX</th><th scope="col">Carbon</th><th scope="col">Risk</th></tr></thead><tbody>',
                     list.map(function(r, idx) {
                         var sel = (selectedIdx != null && idx === selectedIdx) ? ' style="background:rgba(37,99,235,0.08);"' : '';
                         return '<tr' + sel + '><td>' + escapeHtml(String(r.point || '-')) + '</td><td>' + escapeHtml(String(r.feasible || '-')) + '</td><td>' + escapeHtml(String(r.pue || '-')) + '</td><td>' + escapeHtml(String(r.cop || '-')) + '</td><td>' + escapeHtml(String(r.opex || '-')) + '</td><td>' + escapeHtml(String(r.carbon || '-')) + '</td><td>' + escapeHtml(String(r.risk || '-')) + '</td></tr>';
@@ -11119,7 +11119,7 @@
                 return [
                     '<div class="r-chart-wrap allow-break">',
                     '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Monte Carlo Detail') + '</strong></div>',
-                    '<table><thead><tr><th>Metric</th><th>P5</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>P95</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Metric</th><th scope="col">P5</th><th scope="col">P10</th><th scope="col">P25</th><th scope="col">P50</th><th scope="col">P75</th><th scope="col">P90</th><th scope="col">P95</th><th scope="col">Mean</th><th scope="col">Std</th><th scope="col">Min</th><th scope="col">Max</th></tr></thead><tbody>',
                     list.map(function(r) {
                         return '<tr><td>' + escapeHtml(String(r.metric || '-')) + '</td><td>' + escapeHtml(String(r.p5 || '-')) + '</td><td>' + escapeHtml(String(r.p10 || '-')) + '</td><td>' + escapeHtml(String(r.p25 || '-')) + '</td><td>' + escapeHtml(String(r.p50 || '-')) + '</td><td>' + escapeHtml(String(r.p75 || '-')) + '</td><td>' + escapeHtml(String(r.p90 || '-')) + '</td><td>' + escapeHtml(String(r.p95 || '-')) + '</td><td>' + escapeHtml(String(r.mean || '-')) + '</td><td>' + escapeHtml(String(r.std || '-')) + '</td><td>' + escapeHtml(String(r.min || '-')) + '</td><td>' + escapeHtml(String(r.max || '-')) + '</td></tr>';
                     }).join(''),
@@ -11149,7 +11149,7 @@
                 return [
                     '<div class="r-chart-wrap allow-break">',
                     '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Glossary') + '</strong></div>',
-                    '<table><thead><tr><th>Key</th><th>Term</th><th>Definition</th><th>Formula / Reference</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Key</th><th scope="col">Term</th><th scope="col">Definition</th><th scope="col">Formula / Reference</th></tr></thead><tbody>',
                     list.map(function(r) {
                         return '<tr><td class="mono">' + escapeHtml(String(r.key || '-')) + '</td><td>' + escapeHtml(String(r.title || '-')) + '</td><td>' + escapeHtml(String(r.desc || '-')) + '</td><td>' + escapeHtml(String(r.formula || '-')) + '</td></tr>';
                     }).join(''),
@@ -11366,7 +11366,7 @@
                 return [
                     '<div class="r-chart-wrap">',
                     '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title) + '</strong></div>',
-                    '<table><thead><tr><th>Parameter</th><th>Sens</th><th>kW Eq.</th><th>Impact</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Parameter</th><th scope="col">Sens</th><th scope="col">kW Eq.</th><th scope="col">Impact</th></tr></thead><tbody>',
                     rows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.sens) + '</td><td>' + escapeHtml(r.kw) + '</td><td>' + escapeHtml(r.impact) + '</td></tr>';
                     }).join(''),
@@ -11408,7 +11408,7 @@
                 return [
                     '<div class="r-chart-wrap allow-break">',
                     '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title || 'Sankey Expanded Drilldown') + '</strong></div>',
-                    '<table><thead><tr><th>Node</th><th>Component</th><th>Value</th><th>Share</th><th>Top Correlated Parameters</th><th>Notes</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Node</th><th scope="col">Component</th><th scope="col">Value</th><th scope="col">Share</th><th scope="col">Top Correlated Parameters</th><th scope="col">Notes</th></tr></thead><tbody>',
                     list.map(function(r) {
                         return '<tr><td>' + escapeHtml(String(r.node || '-')) + '</td><td>' + escapeHtml(String(r.component || '-')) + '</td><td>' + escapeHtml(String(r.value || '-')) + '</td><td>' + escapeHtml(String(r.share || '-')) + '</td><td>' + escapeHtml(String(r.corr || '-')) + '</td><td>' + escapeHtml(String(r.note || '-')) + '</td></tr>';
                     }).join(''),
@@ -12042,7 +12042,7 @@
                     return [
                         '<div class="r-chart-wrap allow-break" style="margin-top:8px;">',
                         '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title) + ' Part ' + (idx + 1) + '/' + chunks.length + ' (' + chunk.length + ' rows)</strong></div>',
-                        '<table><thead><tr><th>Field Path</th><th>Type</th><th>Value</th></tr></thead><tbody>',
+                        '<table><thead><tr><th scope="col">Field Path</th><th scope="col">Type</th><th scope="col">Value</th></tr></thead><tbody>',
                         chunk.map(function(r) {
                             return '<tr><td class="mono">' + escapeHtml(String(r.path || '-')) + '</td><td>' + escapeHtml(String(r.type || '-')) + '</td><td>' + escapeHtml(String(r.value == null ? '-' : r.value)) + '</td></tr>';
                         }).join(''),
@@ -12084,7 +12084,7 @@
                     return [
                         '<div class="r-chart-wrap allow-break" style="margin-top:8px;">',
                         '<div class="muted" style="margin-bottom:6px;"><strong>' + escapeHtml(title) + ' Part ' + (idx + 1) + '/' + chunks.length + ' (' + chunk.length + ' rows)</strong></div>',
-                        '<table><thead><tr><th>Field Path</th><th>Left Type</th><th>Left Value</th><th>Right Type</th><th>Right Value</th><th>Status</th></tr></thead><tbody>',
+                        '<table><thead><tr><th scope="col">Field Path</th><th scope="col">Left Type</th><th scope="col">Left Value</th><th scope="col">Right Type</th><th scope="col">Right Value</th><th scope="col">Status</th></tr></thead><tbody>',
                         chunk.map(function(r) {
                             var cls = r.status === 'same' ? 'ok' : 'warn';
                             return '<tr><td class="mono">' + escapeHtml(r.path) + '</td><td>' + escapeHtml(r.lType) + '</td><td>' + escapeHtml(r.lValue) + '</td><td>' + escapeHtml(r.rType) + '</td><td>' + escapeHtml(r.rValue) + '</td><td><span class="' + cls + '">' + escapeHtml(r.status) + '</span></td></tr>';
@@ -12124,37 +12124,37 @@
                 return [
                     '<section class="r-sec page-break"><h2>' + escapeHtml(title) + '</h2><div class="r-body">',
                     '<div class="r-note">Structured runtime audit snapshot. Raw JSON dump is hidden to avoid print leakage, but full field-level map is included below.</div>',
-                    '<table><thead><tr><th>Audit Domain</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Audit Domain</th><th scope="col">Value</th><th scope="col">Interpretation</th></tr></thead><tbody>',
                     digestRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(String(r.v)) + '</td><td>' + escapeHtml(r.n) + '</td></tr>';
                     }).join(''),
                     '</tbody></table>',
-                    '<table style="margin-top:8px;"><thead><tr><th>Gate Rule</th><th>Expression</th></tr></thead><tbody>',
+                    '<table style="margin-top:8px;"><thead><tr><th scope="col">Gate Rule</th><th scope="col">Expression</th></tr></thead><tbody>',
                     '<tr><td>G1</td><td class="mono">' + escapeHtml(d.ruleG1) + '</td></tr>',
                     '<tr><td>G2</td><td class="mono">' + escapeHtml(d.ruleG2) + '</td></tr>',
                     '<tr><td>G3</td><td class="mono">' + escapeHtml(d.ruleG3) + '</td></tr>',
                     '</tbody></table>',
-                    '<table style="margin-top:8px;"><thead><tr><th>Guardrail Type</th><th>Status</th><th>Detail</th></tr></thead><tbody>',
+                    '<table style="margin-top:8px;"><thead><tr><th scope="col">Guardrail Type</th><th scope="col">Status</th><th scope="col">Detail</th></tr></thead><tbody>',
                     hardStops.map(function(t) { return '<tr><td>Hard Stop</td><td><span class="bad">BLOCK</span></td><td>' + escapeHtml(t) + '</td></tr>'; }).join(''),
                     warnings.map(function(t) { return '<tr><td>Warning</td><td><span class="warn">REVIEW</span></td><td>' + escapeHtml(t) + '</td></tr>'; }).join(''),
                     (!hardStops.length && !warnings.length ? '<tr><td>Guardrail</td><td><span class="ok">CLEAR</span></td><td>No hard stop or warning in this runtime snapshot.</td></tr>' : ''),
                     '</tbody></table>',
                     (mcRows.length
-                        ? ('<table style="margin-top:8px;"><thead><tr><th>Monte Carlo Metric</th><th>P5</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>P95</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
+                        ? ('<table style="margin-top:8px;"><thead><tr><th scope="col">Monte Carlo Metric</th><th scope="col">P5</th><th scope="col">P10</th><th scope="col">P25</th><th scope="col">P50</th><th scope="col">P75</th><th scope="col">P90</th><th scope="col">P95</th><th scope="col">Mean</th><th scope="col">Std</th><th scope="col">Min</th><th scope="col">Max</th></tr></thead><tbody>' +
                             mcRows.map(function(r) {
                                 return '<tr><td>' + escapeHtml(String(r.metric || '-')) + '</td><td>' + escapeHtml(String(r.p5 || '-')) + '</td><td>' + escapeHtml(String(r.p10 || '-')) + '</td><td>' + escapeHtml(String(r.p25 || '-')) + '</td><td>' + escapeHtml(String(r.p50 || '-')) + '</td><td>' + escapeHtml(String(r.p75 || '-')) + '</td><td>' + escapeHtml(String(r.p90 || '-')) + '</td><td>' + escapeHtml(String(r.p95 || '-')) + '</td><td>' + escapeHtml(String(r.mean || '-')) + '</td><td>' + escapeHtml(String(r.std || '-')) + '</td><td>' + escapeHtml(String(r.min || '-')) + '</td><td>' + escapeHtml(String(r.max || '-')) + '</td></tr>';
                             }).join('') +
                             '</tbody></table>')
                         : '<div class="muted" style="margin-top:8px;">Monte Carlo detail not available in current session snapshot.</div>'),
                     (scenarios.length
-                        ? ('<table style="margin-top:8px;"><thead><tr><th>Scenario</th><th>Version</th><th>Timestamp</th><th>PUE</th><th>COP</th><th>Net OPEX</th><th>Carbon</th><th>Risk</th></tr></thead><tbody>' +
+                        ? ('<table style="margin-top:8px;"><thead><tr><th scope="col">Scenario</th><th scope="col">Version</th><th scope="col">Timestamp</th><th scope="col">PUE</th><th scope="col">COP</th><th scope="col">Net OPEX</th><th scope="col">Carbon</th><th scope="col">Risk</th></tr></thead><tbody>' +
                             scenarios.map(function(r) {
                                 return '<tr><td>' + escapeHtml(String(r.name || '-')) + '</td><td>' + escapeHtml(String(r.version || '-')) + '</td><td>' + escapeHtml(String(r.ts || '-')) + '</td><td>' + escapeHtml(String(r.pue || '-')) + '</td><td>' + escapeHtml(String(r.cop || '-')) + '</td><td>' + escapeHtml(String(r.opex || '-')) + '</td><td>' + escapeHtml(String(r.carbon || '-')) + '</td><td>' + escapeHtml(String(r.risk || '-')) + '</td></tr>';
                             }).join('') +
                             '</tbody></table>')
                         : '<div class="muted" style="margin-top:8px;">No scenario records in runtime snapshot.</div>'),
                     (explorerBlocks.length
-                        ? ('<table style="margin-top:8px;"><thead><tr><th>Explorer Block</th><th>Summary</th><th>QA</th><th>Note</th></tr></thead><tbody>' +
+                        ? ('<table style="margin-top:8px;"><thead><tr><th scope="col">Explorer Block</th><th scope="col">Summary</th><th scope="col">QA</th><th scope="col">Note</th></tr></thead><tbody>' +
                             explorerBlocks.map(function(r) {
                                 return '<tr><td>' + escapeHtml(String(r.block || '-')) + '</td><td>' + escapeHtml(String(r.summary || '-')) + '</td><td>' + escapeHtml(String(r.qa || '-')) + '</td><td>' + escapeHtml(String(r.note || '-')) + '</td></tr>';
                             }).join('') +
@@ -12193,7 +12193,7 @@
                 return [
                     '<section class="r-sec page-break"><h2>Compare Runtime Snapshots (Structured Audit)</h2><div class="r-body">',
                     '<div class="r-note">Structured side-by-side runtime audit. Raw JSON is excluded from print output to prevent code-style leakage and rendering issues. Full field-level compare map is included below.</div>',
-                    '<table><thead><tr><th>Audit Domain</th><th>Left Snapshot</th><th>Right Snapshot</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Audit Domain</th><th scope="col">Left Snapshot</th><th scope="col">Right Snapshot</th></tr></thead><tbody>',
                     rows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(String(r.l)) + '</td><td>' + escapeHtml(String(r.r)) + '</td></tr>';
                     }).join(''),
@@ -12346,7 +12346,7 @@
                         '<div class="r-card"><div class="k">Interpretation</div><div class="s">Use P10/P50/P90 spread to validate robustness before deployment gates and capex commitment.</div></div>',
                         '</div>',
                         (mcChart || monteHistSvgPdf) ? ('<div class="r-chart-wrap" style="margin-top:8px;">' + (mcChart || monteHistSvgPdf) + '</div>') : '<div class="muted">Monte Carlo chart unavailable.</div>',
-                        '<table style="margin-top:8px;"><thead><tr><th>Metric</th><th>P10</th><th>P50</th><th>P90</th></tr></thead><tbody>',
+                        '<table style="margin-top:8px;"><thead><tr><th scope="col">Metric</th><th scope="col">P10</th><th scope="col">P50</th><th scope="col">P90</th></tr></thead><tbody>',
                         mcRows.map(function(r) {
                             return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + fmtNum(r.p10, r.d) + '</td><td>' + fmtNum(r.p50, r.d) + '</td><td>' + fmtNum(r.p90, r.d) + '</td></tr>';
                         }).join(''),
@@ -12423,7 +12423,7 @@
                     '<div class="r-card"><div class="k">Control Gates</div><div class="s">G1 ' + (gates.g1 ? '<span class="ok">OPEN</span>' : '<span class="bad">BLOCKED</span>') + ' | G2 ' + (gates.g2 ? '<span class="ok">OPEN</span>' : '<span class="bad">BLOCKED</span>') + ' | G3 ' + (gates.g3 ? '<span class="ok">OPEN</span>' : '<span class="bad">BLOCKED</span>') + '</div><div class="s mono">G1 ' + escapeHtml(rules.g1) + '</div><div class="s mono">G2 ' + escapeHtml(rules.g2) + '</div><div class="s mono">G3 ' + escapeHtml(rules.g3) + '</div></div>',
                     '<div class="r-card"><div class="k">Calibration Quality</div><div class="v">' + fmtNum(calScore, 1) + '/100</div><div class="s">Validation error ' + fmtNum(quality.valErr, 2) + '% | 95% CI ±' + fmtNum(quality.ci95, 2) + '%</div></div>',
                     '</div>',
-                    '<table style="margin-top:8px;"><thead><tr><th>Standard</th><th>Score</th><th>Status</th></tr></thead><tbody>',
+                    '<table style="margin-top:8px;"><thead><tr><th scope="col">Standard</th><th scope="col">Score</th><th scope="col">Status</th></tr></thead><tbody>',
                     standards.map(function(r) {
                         var cls = r.s >= 85 ? 'ok' : (r.s >= 75 ? 'warn' : 'bad');
                         var txt = r.s >= 85 ? 'Strong' : (r.s >= 75 ? 'Needs hardening' : 'Critical improvement');
@@ -12433,7 +12433,7 @@
                     narrativeHtml(nConstraint),
                     '</div></section>',
 
-                    '<section class="r-sec"><h2>Energy Distribution Matrix</h2><div class="r-body"><table><thead><tr><th>Domain</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>',
+                    '<section class="r-sec"><h2>Energy Distribution Matrix</h2><div class="r-body"><table><thead><tr><th scope="col">Domain</th><th scope="col">Value</th><th scope="col">Interpretation</th></tr></thead><tbody>',
                     energyRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(r.v) + '</td><td>' + escapeHtml(r.n) + '</td></tr>';
                     }).join(''),
@@ -12450,7 +12450,7 @@
                     narrativeHtml(nSensitivity),
                     '</div></section>',
 
-                    '<section class="r-sec page-break"><h2>Engineering Input Matrix (Full Traceability)</h2><div class="r-body"><table><thead><tr><th>Input Parameter</th><th>Value</th><th>Role</th></tr></thead><tbody>',
+                    '<section class="r-sec page-break"><h2>Engineering Input Matrix (Full Traceability)</h2><div class="r-body"><table><thead><tr><th scope="col">Input Parameter</th><th scope="col">Value</th><th scope="col">Role</th></tr></thead><tbody>',
                     inputRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(r.v) + '</td><td>' + escapeHtml(r.n) + '</td></tr>';
                     }).join(''),
@@ -12459,12 +12459,12 @@
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Output Vector + Solver Internals</h2><div class="r-body"><div class="split">',
-                    '<table><thead><tr><th>Output Metric</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Output Metric</th><th scope="col">Value</th><th scope="col">Interpretation</th></tr></thead><tbody>',
                     outputRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(r.v) + '</td><td>' + escapeHtml(r.n) + '</td></tr>';
                     }).join(''),
                     '</tbody></table>',
-                    '<table><thead><tr><th>Solver Internal</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Solver Internal</th><th scope="col">Value</th><th scope="col">Interpretation</th></tr></thead><tbody>',
                     solverRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(r.v) + '</td><td>' + escapeHtml(r.n) + '</td></tr>';
                     }).join(''),
@@ -12476,7 +12476,7 @@
                     mcSection,
 
                     '<section class="r-sec"><h2>Assumption Ledger (Audit Trail)</h2><div class="r-body">',
-                    '<table><thead><tr><th>Parameter</th><th>Source</th><th>Owner</th><th>Confidence</th><th>Timestamp</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Parameter</th><th scope="col">Source</th><th scope="col">Owner</th><th scope="col">Confidence</th><th scope="col">Timestamp</th></tr></thead><tbody>',
                     ledger.map(function(row) {
                         return '<tr><td>' + escapeHtml(row.label) + '</td><td>' + escapeHtml(row.source) + '</td><td>' + escapeHtml(row.owner) + '</td><td>' + escapeHtml(String(row.confidence)) + '%</td><td>' + escapeHtml(row.ts) + '</td></tr>';
                     }).join(''),
@@ -12494,7 +12494,7 @@
                     '<div class="r-card"><div class="k">Constraint Set</div><div class="s">PUE max ' + fmtNum(constraints.pueMax, 3) + ' | COP min ' + fmtNum(constraints.copMin, 2) + ' | Risk max ' + fmtNum(constraints.riskMax, 1) + ' | Pump%IT max ' + fmtNum(constraints.pumpPctMax, 2) + ' | enforce=' + (constraints.enforce ? 'yes' : 'no') + '</div></div>',
                     '<div class="r-card"><div class="k">Gate Rules</div><div class="s mono">G1 ' + escapeHtml(rules.g1) + '</div><div class="s mono">G2 ' + escapeHtml(rules.g2) + '</div><div class="s mono">G3 ' + escapeHtml(rules.g3) + '</div><div class="s">Gate state: G1 ' + (gates.g1 ? 'OPEN' : 'BLOCKED') + ' | G2 ' + (gates.g2 ? 'OPEN' : 'BLOCKED') + ' | G3 ' + (gates.g3 ? 'OPEN' : 'BLOCKED') + '</div></div>',
                     '</div>',
-                    '<table style="margin-top:8px;"><thead><tr><th>Input Guardrail</th><th>Status</th><th>Detail</th></tr></thead><tbody>',
+                    '<table style="margin-top:8px;"><thead><tr><th scope="col">Input Guardrail</th><th scope="col">Status</th><th scope="col">Detail</th></tr></thead><tbody>',
                     (inputGuard.hardStops || []).map(function(t) { return '<tr><td>Hard Stop</td><td><span class="bad">BLOCK</span></td><td>' + escapeHtml(t) + '</td></tr>'; }).join('') +
                     (inputGuard.warnings || []).map(function(t) { return '<tr><td>Warning</td><td><span class="warn">REVIEW</span></td><td>' + escapeHtml(t) + '</td></tr>'; }).join('') +
                     (!(inputGuard.hardStops || []).length && !(inputGuard.warnings || []).length ? '<tr><td>Guardrail</td><td><span class="ok">CLEAR</span></td><td>No hard stop or warning from current input set.</td></tr>' : ''),
@@ -12504,7 +12504,7 @@
                     '<section class="r-sec"><h2>Equation Trace (Complete)</h2><div class="r-body"><div class="r-chart-wrap allow-break"><pre class="mono r-json" style="margin:0;">' + escapeHtml(equationLinesPdf.join('\n')) + '</pre></div></div></section>',
 
                     '<section class="r-sec"><h2>Methodology + Simulation Configuration</h2><div class="r-body">',
-                    '<table><thead><tr><th>Method Block</th><th>Configuration</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Method Block</th><th scope="col">Configuration</th></tr></thead><tbody>',
                     methodologyRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.k) + '</td><td>' + escapeHtml(r.v) + '</td></tr>';
                     }).join(''),
@@ -12513,7 +12513,7 @@
                     narrativeHtml(nMethodology),
                     '</div></section>',
 
-                    '<section class="r-sec"><h2>Impact Matrix (All Tunable Parameters)</h2><div class="r-body"><table><thead><tr><th>Parameter</th><th>Step</th><th>dPUE</th><th>dCOP</th><th>dNet OPEX</th><th>dCarbon</th><th>dRisk</th></tr></thead><tbody>',
+                    '<section class="r-sec"><h2>Impact Matrix (All Tunable Parameters)</h2><div class="r-body"><table><thead><tr><th scope="col">Parameter</th><th scope="col">Step</th><th scope="col">dPUE</th><th scope="col">dCOP</th><th scope="col">dNet OPEX</th><th scope="col">dCarbon</th><th scope="col">dRisk</th></tr></thead><tbody>',
                     impactRowsPdf.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.step) + '</td><td>' + escapeHtml(r.dpue) + '</td><td>' + escapeHtml(r.dcop) + '</td><td>' + escapeHtml(r.dopex) + '</td><td>' + escapeHtml(r.dcarbon) + '</td><td>' + escapeHtml(r.drisk) + '</td></tr>';
                     }).join(''),
@@ -12521,7 +12521,7 @@
                     narrativeHtml(nImpact),
                     '</div></section>',
 
-                    '<section class="r-sec"><h2>Sensitivity Matrix (All Sankey Nodes)</h2><div class="r-body"><table><thead><tr><th>Node</th><th>Parameter</th><th>Sens</th><th>kW Eq.</th><th>Impact</th></tr></thead><tbody>',
+                    '<section class="r-sec"><h2>Sensitivity Matrix (All Sankey Nodes)</h2><div class="r-body"><table><thead><tr><th scope="col">Node</th><th scope="col">Parameter</th><th scope="col">Sens</th><th scope="col">kW Eq.</th><th scope="col">Impact</th></tr></thead><tbody>',
                     allNodeSensitivityRowsPdf.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.node) + '</td><td>' + escapeHtml(r.param) + '</td><td>' + escapeHtml(r.sens) + '</td><td>' + escapeHtml(r.kw) + '</td><td>' + escapeHtml(r.impact) + '</td></tr>';
                     }).join(''),
@@ -12531,7 +12531,7 @@
 
                     '<section class="r-sec"><h2>Pareto Frontier Ledger (Full Session)</h2><div class="r-body">',
                     (paretoLedgerRowsPdf.length
-                        ? ('<table><thead><tr><th>Point</th><th>Feasible</th><th>PUE</th><th>COP</th><th>Net OPEX</th><th>Carbon</th><th>Risk</th><th>IT Load</th><th>Capture</th><th>Supply</th><th>Pump Eff</th><th>Control</th></tr></thead><tbody>' +
+                        ? ('<table><thead><tr><th scope="col">Point</th><th scope="col">Feasible</th><th scope="col">PUE</th><th scope="col">COP</th><th scope="col">Net OPEX</th><th scope="col">Carbon</th><th scope="col">Risk</th><th scope="col">IT Load</th><th scope="col">Capture</th><th scope="col">Supply</th><th scope="col">Pump Eff</th><th scope="col">Control</th></tr></thead><tbody>' +
                             paretoLedgerRowsPdf.map(function(r, idx) {
                                 var sel = (idx === selectedParetoIdx) ? ' style="background:rgba(37,99,235,0.08);"' : '';
                                 return '<tr' + sel + '><td>' + escapeHtml(r.point) + '</td><td>' + escapeHtml(r.feasible) + '</td><td>' + escapeHtml(r.pue) + '</td><td>' + escapeHtml(r.cop) + '</td><td>' + escapeHtml(r.opex) + '</td><td>' + escapeHtml(r.carbon) + '</td><td>' + escapeHtml(r.risk) + '</td><td>' + escapeHtml(r.itLoad) + '</td><td>' + escapeHtml(r.capture) + '</td><td>' + escapeHtml(r.supply) + '</td><td>' + escapeHtml(r.pumpEff) + '</td><td>' + escapeHtml(r.control) + '</td></tr>';
@@ -12543,7 +12543,7 @@
 
                     '<section class="r-sec"><h2>Monte Carlo Detail Statistics</h2><div class="r-body">',
                     (mcDetailRowsPdf.length
-                        ? ('<table><thead><tr><th>Metric</th><th>P5</th><th>P10</th><th>P25</th><th>P50</th><th>P75</th><th>P90</th><th>P95</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
+                        ? ('<table><thead><tr><th scope="col">Metric</th><th scope="col">P5</th><th scope="col">P10</th><th scope="col">P25</th><th scope="col">P50</th><th scope="col">P75</th><th scope="col">P90</th><th scope="col">P95</th><th scope="col">Mean</th><th scope="col">Std</th><th scope="col">Min</th><th scope="col">Max</th></tr></thead><tbody>' +
                             mcDetailRowsPdf.map(function(r) {
                                 return '<tr><td>' + escapeHtml(r.metric) + '</td><td>' + escapeHtml(r.p5) + '</td><td>' + escapeHtml(r.p10) + '</td><td>' + escapeHtml(r.p25) + '</td><td>' + escapeHtml(r.p50) + '</td><td>' + escapeHtml(r.p75) + '</td><td>' + escapeHtml(r.p90) + '</td><td>' + escapeHtml(r.p95) + '</td><td>' + escapeHtml(r.mean) + '</td><td>' + escapeHtml(r.std) + '</td><td>' + escapeHtml(r.min) + '</td><td>' + escapeHtml(r.max) + '</td></tr>';
                             }).join('') +
@@ -12553,7 +12553,7 @@
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Explorer Block Audit (All Blocks)</h2><div class="r-body">',
-                    '<table><thead><tr><th>Block</th><th>Summary</th><th>Delta</th><th>QA</th><th>Engineer Note</th><th>Documentation</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Block</th><th scope="col">Summary</th><th scope="col">Delta</th><th scope="col">QA</th><th scope="col">Engineer Note</th><th scope="col">Documentation</th></tr></thead><tbody>',
                     explorerAuditRowsPdf.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.block) + '</td><td>' + escapeHtml(r.summary) + '</td><td>' + escapeHtml(r.delta) + '</td><td>' + escapeHtml(r.qa) + '</td><td>' + escapeHtml(r.note) + '</td><td>' + escapeHtml(r.doc) + '</td></tr>';
                     }).join(''),
@@ -12567,7 +12567,7 @@
                     '<div class="r-card"><div class="k">Operational Apply</div><div class="v">' + (telemetrySummaryPdf.applyOperational ? 'ON' : 'OFF') + '</div><div class="s">' + escapeHtml(telemetrySummaryPdf.status || '-') + '</div></div>',
                     '</div>',
                     '<div class="r-note">' + escapeHtml(telemetrySummaryPdf.meta || '-') + '</div>',
-                    '<table style="margin-top:8px;"><thead><tr><th>Metric</th><th>Mapped Column</th></tr></thead><tbody>',
+                    '<table style="margin-top:8px;"><thead><tr><th scope="col">Metric</th><th scope="col">Mapped Column</th></tr></thead><tbody>',
                     telemetryRowsPdf.map(function(r) { return '<tr><td>' + escapeHtml(r.metric) + '</td><td>' + escapeHtml(r.column) + '</td></tr>'; }).join(''),
                     '</tbody></table>',
                     narrativeHtml(nTelemetry),
@@ -12575,7 +12575,7 @@
 
                     '<section class="r-sec"><h2>Scenario Vault Snapshot</h2><div class="r-body">',
                     (scenarioRowsPdf.length
-                        ? ('<table><thead><tr><th>Name</th><th>Version</th><th>Timestamp</th><th>PUE</th><th>COP</th><th>Net OPEX</th><th>Carbon</th><th>Risk</th></tr></thead><tbody>' +
+                        ? ('<table><thead><tr><th scope="col">Name</th><th scope="col">Version</th><th scope="col">Timestamp</th><th scope="col">PUE</th><th scope="col">COP</th><th scope="col">Net OPEX</th><th scope="col">Carbon</th><th scope="col">Risk</th></tr></thead><tbody>' +
                             scenarioRowsPdf.map(function(r) {
                                 return '<tr><td>' + escapeHtml(r.name) + '</td><td>' + escapeHtml(r.version) + '</td><td>' + escapeHtml(r.ts) + '</td><td>' + escapeHtml(r.pue) + '</td><td>' + escapeHtml(r.cop) + '</td><td>' + escapeHtml(r.opex) + '</td><td>' + escapeHtml(r.carbon) + '</td><td>' + escapeHtml(r.risk) + '</td></tr>';
                             }).join('') +
@@ -12586,7 +12586,7 @@
 
                     '<section class="r-sec"><h2>Self-Test Snapshot (Latest UI Table)</h2><div class="r-body">',
                     (selfTestRowsPdf.length
-                        ? ('<table><thead><tr><th>Test Case</th><th>Status</th><th>Check</th><th>Detail</th></tr></thead><tbody>' +
+                        ? ('<table><thead><tr><th scope="col">Test Case</th><th scope="col">Status</th><th scope="col">Check</th><th scope="col">Detail</th></tr></thead><tbody>' +
                             selfTestRowsPdf.map(function(r) {
                                 return '<tr><td>' + escapeHtml(r.name) + '</td><td>' + escapeHtml(r.status) + '</td><td>' + escapeHtml(r.check) + '</td><td>' + escapeHtml(r.detail) + '</td></tr>';
                             }).join('') +
@@ -12793,7 +12793,7 @@
                     narrativeHtml(nCmpStandards),
                     '</div></section>',
 
-                    '<section class="r-sec"><h2>KPI Delta Matrix (Right - Left)</h2><div class="r-body"><table><thead><tr><th>Metric</th><th>Left</th><th>Right</th><th>Delta</th></tr></thead><tbody>',
+                    '<section class="r-sec"><h2>KPI Delta Matrix (Right - Left)</h2><div class="r-body"><table><thead><tr><th scope="col">Metric</th><th scope="col">Left</th><th scope="col">Right</th><th scope="col">Delta</th></tr></thead><tbody>',
                     metrics.map(function(m) {
                         return '<tr>' +
                             '<td>' + escapeHtml(m.key) + '</td>' +
@@ -12806,7 +12806,7 @@
                     narrativeHtml(nCmpKpi),
                     '</div></section>',
 
-                    '<section class="r-sec"><h2>Standards Score Delta (Right - Left)</h2><div class="r-body"><table><thead><tr><th>Standard</th><th>Left</th><th>Right</th><th>Delta</th></tr></thead><tbody>',
+                    '<section class="r-sec"><h2>Standards Score Delta (Right - Left)</h2><div class="r-body"><table><thead><tr><th scope="col">Standard</th><th scope="col">Left</th><th scope="col">Right</th><th scope="col">Delta</th></tr></thead><tbody>',
                     '<tr><td>ASHRAE</td><td>' + fmtNum(lm.scores.ashrae, 1) + '</td><td>' + fmtNum(rm.scores.ashrae, 1) + '</td><td>' + signed(rm.scores.ashrae - lm.scores.ashrae, 1, '') + '</td></tr>',
                     '<tr><td>ANSI/TIA-942</td><td>' + fmtNum(lm.scores.ansi, 1) + '</td><td>' + fmtNum(rm.scores.ansi, 1) + '</td><td>' + signed(rm.scores.ansi - lm.scores.ansi, 1, '') + '</td></tr>',
                     '<tr><td>ISO 50001</td><td>' + fmtNum(lm.scores.iso, 1) + '</td><td>' + fmtNum(rm.scores.iso, 1) + '</td><td>' + signed(rm.scores.iso - lm.scores.iso, 1, '') + '</td></tr>',
@@ -12817,7 +12817,7 @@
                     narrativeHtml(nCmpStandards),
                     '</div></section>',
 
-                    '<section class="r-sec"><h2>Input Assumption Delta (Right - Left)</h2><div class="r-body"><table><thead><tr><th>Input</th><th>Left</th><th>Right</th><th>Delta</th></tr></thead><tbody>',
+                    '<section class="r-sec"><h2>Input Assumption Delta (Right - Left)</h2><div class="r-body"><table><thead><tr><th scope="col">Input</th><th scope="col">Left</th><th scope="col">Right</th><th scope="col">Delta</th></tr></thead><tbody>',
                     inputDeltaRows.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.label) + '</td><td>' + r.lv + '</td><td>' + r.rv + '</td><td>' + escapeHtml(r.delta) + '</td></tr>';
                     }).join(''),
@@ -12826,7 +12826,7 @@
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Input Assumption Delta (Complete Field Map)</h2><div class="r-body">',
-                    '<table><thead><tr><th>Input Key</th><th>Left</th><th>Right</th><th>Delta</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Input Key</th><th scope="col">Left</th><th scope="col">Right</th><th scope="col">Delta</th></tr></thead><tbody>',
                     inputDeltaRowsAll.map(function(r) {
                         return '<tr><td>' + escapeHtml(r.key) + '</td><td>' + escapeHtml(r.left) + '</td><td>' + escapeHtml(r.right) + '</td><td>' + escapeHtml(r.delta) + '</td></tr>';
                     }).join(''),
@@ -12849,7 +12849,7 @@
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Methodology + Simulation Configuration (Compare)</h2><div class="r-body">',
-                    '<table><thead><tr><th>Method Block</th><th>Left Snapshot</th><th>Right Snapshot</th></tr></thead><tbody>',
+                    '<table><thead><tr><th scope="col">Method Block</th><th scope="col">Left Snapshot</th><th scope="col">Right Snapshot</th></tr></thead><tbody>',
                     '<tr><td>Solver Core</td><td>Deterministic thermo-hydraulic + control correction + loss model</td><td>Deterministic thermo-hydraulic + control correction + loss model</td></tr>',
                     '<tr><td>Constraint Policy</td><td>PUE&lt;=' + fmtNum(lConstraints.pueMax, 3) + ' | COP&gt;=' + fmtNum(lConstraints.copMin, 2) + ' | Risk&lt;=' + fmtNum(lConstraints.riskMax, 1) + ' | Pump%IT&lt;=' + fmtNum(lConstraints.pumpPctMax, 2) + '</td><td>PUE&lt;=' + fmtNum(rConstraints.pueMax, 3) + ' | COP&gt;=' + fmtNum(rConstraints.copMin, 2) + ' | Risk&lt;=' + fmtNum(rConstraints.riskMax, 1) + ' | Pump%IT&lt;=' + fmtNum(rConstraints.pumpPctMax, 2) + '</td></tr>',
                     '<tr><td>Pareto Frontier</td><td>' + fmtNum(lPareto.length, 0) + ' points</td><td>' + fmtNum(rPareto.length, 0) + ' points</td></tr>',

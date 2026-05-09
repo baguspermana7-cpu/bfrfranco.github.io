@@ -1789,9 +1789,9 @@
                 <table class="hfx-country-table">
                     <thead>
                         <tr>
-                            <th>Country / Node</th>
-                            <th>Relative Risk</th>
-                            <th>Why</th>
+                            <th scope="col">Country / Node</th>
+                            <th scope="col">Relative Risk</th>
+                            <th scope="col">Why</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1867,10 +1867,10 @@
                 <table class="hfx-timeline-table">
                     <thead>
                         <tr>
-                            <th>Window</th>
-                            <th>Engineering Reality</th>
-                            <th>Operational Effect</th>
-                            <th>Why It Matters</th>
+                            <th scope="col">Window</th>
+                            <th scope="col">Engineering Reality</th>
+                            <th scope="col">Operational Effect</th>
+                            <th scope="col">Why It Matters</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3645,7 +3645,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
         html += '<div class="pdf-score"><div class="pdf-score-num">' + data.shock + '</div><div class="pdf-score-meta"><strong>Shock Score /100</strong><br>Grade ' + grade.grade + ' — ' + grade.label + '<br>Capacity: ' + data.capacity + '% | RTT: +' + data.latency + 'ms | Repair: ' + data.repairDays + ' days</div></div>';
 
-        html += '<h2>Input Parameters</h2><table><tr><th style="width:30%">Parameter</th><th style="width:20%">Value</th><th style="width:30%">Parameter</th><th style="width:20%">Value</th></tr>';
+        html += '<h2>Input Parameters</h2><table><tr><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th></tr>';
         html += '<tr><td>Country</td><td>' + data.profile.label + '</td><td>Cable Faults</td><td>' + data.cables + '</td></tr>';
         html += '<tr><td>Route Diversity</td><td>' + data.diversity + '/10</td><td>Repair Delay</td><td>' + data.repairDelay + ' weeks</td></tr>';
         html += '<tr><td>Digital Dependence</td><td>' + data.dependence + '%</td><td>Priority Sector</td><td>' + data.sector.short + '</td></tr>';
@@ -3665,7 +3665,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
         html += '<h2>Sector & Recovery Analysis</h2>';
         html += '<div class="pdf-chart-row"><div>' + svgSectorBar() + '</div><div>';
-        html += '<table><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>';
+        html += '<table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Assessment</th></tr>';
         html += '<tr><td>Route Survival</td><td>' + data.routeSurvival + '%</td><td>' + (data.routeSurvival >= 60 ? 'Adequate' : data.routeSurvival >= 35 ? 'Strained' : 'Critical') + '</td></tr>';
         html += '<tr><td>Day 7 Stability</td><td>' + data.day7 + '%</td><td>' + (data.day7 >= 60 ? 'Stabilizing' : 'Degrading') + '</td></tr>';
         html += '<tr><td>Day 30 Stability</td><td>' + data.day30 + '%</td><td>' + (data.day30 >= 50 ? 'Recovering' : 'Prolonged stress') + '</td></tr>';
@@ -3676,7 +3676,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         if (mc) {
             html += '<h2>Monte Carlo Simulation (10,000 Runs)</h2>';
             html += '<div class="pdf-chart-row"><div>' + svgHistogram() + '</div><div>';
-            html += '<table><tr><th>Percentile</th><th>Score</th></tr>';
+            html += '<table><tr><th scope="col">Percentile</th><th scope="col">Score</th></tr>';
             html += '<tr><td>P5 (Best case)</td><td>' + mc.p5.toFixed(0) + '</td></tr>';
             html += '<tr><td>P25</td><td>' + mc.p25.toFixed(0) + '</td></tr>';
             html += '<tr><td>P50 (Median)</td><td>' + mc.p50.toFixed(0) + '</td></tr>';

@@ -1528,10 +1528,10 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Factor</th>
-                            <th>Effect on Per-Query Cost</th>
-                            <th>Effect on Total Demand</th>
-                            <th>Net Impact on DC Capacity</th>
+                            <th scope="col">Factor</th>
+                            <th scope="col">Effect on Per-Query Cost</th>
+                            <th scope="col">Effect on Total Demand</th>
+                            <th scope="col">Net Impact on DC Capacity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1630,10 +1630,10 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Country</th>
-                            <th>Sovereign AI Initiative</th>
-                            <th>Investment</th>
-                            <th>DC Demand Impact</th>
+                            <th scope="col">Country</th>
+                            <th scope="col">Sovereign AI Initiative</th>
+                            <th scope="col">Investment</th>
+                            <th scope="col">DC Demand Impact</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1737,10 +1737,10 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Metric</th>
-                            <th>Telecom 2001</th>
-                            <th>SEA DC 2026</th>
-                            <th>Signal</th>
+                            <th scope="col">Metric</th>
+                            <th scope="col">Telecom 2001</th>
+                            <th scope="col">SEA DC 2026</th>
+                            <th scope="col">Signal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1956,10 +1956,10 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Workload Type</th>
-                            <th>Typical Density</th>
-                            <th>% of Total DC Demand</th>
-                            <th>Growth Rate</th>
+                            <th scope="col">Workload Type</th>
+                            <th scope="col">Typical Density</th>
+                            <th scope="col">% of Total DC Demand</th>
+                            <th scope="col">Growth Rate</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2592,9 +2592,9 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Bear Argument</th>
-                            <th>Bull Rebuttal</th>
-                            <th>Evidence Strength</th>
+                            <th scope="col">Bear Argument</th>
+                            <th scope="col">Bull Rebuttal</th>
+                            <th scope="col">Evidence Strength</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3760,7 +3760,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html+='<div class="kpi-box"><div class="kpi-val">'+(r.irr*100).toFixed(1)+'%</div><div class="kpi-lbl">Projected IRR</div></div>';
     html+='</div>';
     // Inputs Table (2-col)
-    html+='<h2>Input Parameters</h2><table><tr><th style="width:30%">Parameter</th><th style="width:20%">Value</th><th style="width:30%">Parameter</th><th style="width:20%">Value</th></tr>';
+    html+='<h2>Input Parameters</h2><table><tr><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th></tr>';
     html+='<tr><td style="font-weight:600">Market</td><td>'+market+'</td><td style="font-weight:600">Current Operational</td><td>'+inputs.op.toLocaleString()+' MW</td></tr>';
     html+='<tr><td style="font-weight:600">Pipeline Capacity</td><td>'+inputs.pipe.toLocaleString()+' MW</td><td style="font-weight:600">Digital Economy Growth</td><td>'+(inputs.digiGrowth*100).toFixed(0)+'%/yr</td></tr>';
     html+='<tr><td style="font-weight:600">Sovereign AI Demand</td><td>'+inputs.sovDemand.toLocaleString()+' MW</td><td style="font-weight:600">AI Inference CAGR</td><td>'+(inputs.infCAGR*100).toFixed(0)+'%</td></tr>';
@@ -3768,7 +3768,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     html+='<tr><td style="font-weight:600">Revenue/MW/Year</td><td>$'+inputs.revMW+'M</td><td style="font-weight:600">OPEX Ratio</td><td>'+(inputs.opexRatio*100).toFixed(0)+'%</td></tr>';
     html+='<tr><td style="font-weight:600">WACC</td><td>'+(inputs.wacc*100).toFixed(1)+'%</td><td></td><td></td></tr></table>';
     // Results
-    html+='<h2>Results — Demand &amp; Financial Analysis</h2><table><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>';
+    html+='<h2>Results — Demand &amp; Financial Analysis</h2><table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Assessment</th></tr>';
     html+='<tr><td>Total Demand 2030</td><td><strong>'+Math.round(r.totalDemand).toLocaleString()+' MW</strong></td><td>Including uncounted demand</td></tr>';
     html+='<tr><td>Pipeline Utilization</td><td>'+r.utilization.toFixed(0)+'%</td><td>'+(r.utilization>=90?'Demand exceeds supply':'Moderate absorption')+'</td></tr>';
     html+='<tr><td>10-Year NPV</td><td style="color:'+(r.npv>0?'#059669':'#dc2626')+';font-weight:700">'+(r.npv>=0?'+$':'-$')+fmt(Math.abs(r.npv))+'</td><td>'+(r.npv>0?'Value-creating':'Value-destroying')+'</td></tr>';
@@ -3807,7 +3807,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         html+='<text x="'+(svgW/2)+'" y="'+(svgH-2)+'" text-anchor="middle" font-size="8" fill="#6b7280">IRR Distribution (%)</text>';
         html+='</svg></div>';
         // Percentile breakdown table
-        html+='<div><table style="margin-top:0"><tr><th>Percentile</th><th>IRR</th><th>Assessment</th></tr>';
+        html+='<div><table style="margin-top:0"><tr><th scope="col">Percentile</th><th scope="col">IRR</th><th scope="col">Assessment</th></tr>';
         html+='<tr><td style="color:#ef4444;font-weight:600">P5 (Worst Case)</td><td>'+mc.p5.toFixed(1)+'%</td><td>'+(mc.p5>waccPct?'Above WACC':'Below WACC')+'</td></tr>';
         html+='<tr><td>P25</td><td>'+mc.p25.toFixed(1)+'%</td><td>'+(mc.p25>waccPct?'Viable':'At risk')+'</td></tr>';
         html+='<tr><td style="color:#3b82f6;font-weight:600">P50 (Median)</td><td><strong>'+mc.p50.toFixed(1)+'%</strong></td><td>Most likely outcome</td></tr>';
@@ -3845,7 +3845,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         });
         html+='</svg></div>';
         // Data table
-        html+='<div><table style="margin-top:0"><tr><th>Parameter</th><th>-20%</th><th>Base</th><th>+20%</th><th>Range</th></tr>';
+        html+='<div><table style="margin-top:0"><tr><th scope="col">Parameter</th><th scope="col">-20%</th><th scope="col">Base</th><th scope="col">+20%</th><th scope="col">Range</th></tr>';
         top6.forEach(function(s){
             html+='<tr><td>'+s.name+'</td><td style="color:#dc2626">'+s.low.toFixed(1)+'%</td><td>'+s.base.toFixed(1)+'%</td><td style="color:#059669">'+s.high.toFixed(1)+'%</td><td><strong>'+s.range.toFixed(1)+'pp</strong></td></tr>';
         });
@@ -3875,7 +3875,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         var sTotal=Math.round(sGrowth+sSov+sRes);
         var sAlpha=(jev*0.5)+(sov*0.1)+0.3;
         html+='<h2>Strategic Intelligence Engine</h2>';
-        html+='<table><tr><th>Strategic Metric</th><th>Value</th><th>Driver</th></tr>';
+        html+='<table><tr><th scope="col">Strategic Metric</th><th scope="col">Value</th><th scope="col">Driver</th></tr>';
         html+='<tr><td>Target Addressable Market</td><td style="font-weight:700;color:#059669">$'+tam.toFixed(1)+'B</td><td>$602B &times; '+alloc+'% allocation &times; Jevons '+jev+'x</td></tr>';
         html+='<tr><td>Opportunity Score</td><td style="font-weight:700;color:'+(sTotal>80?'#059669':sTotal>50?'#d97706':'#dc2626')+'">'+sTotal+'/100</td><td>Growth '+sGrowth.toFixed(0)+' + Sovereignty '+sSov.toFixed(0)+' + Resilience '+sRes.toFixed(0)+'</td></tr>';
         html+='<tr><td>Alpha Multiplier</td><td style="font-weight:700;color:#d97706">'+sAlpha.toFixed(2)+'x</td><td>Jevons-driven return leverage vs market beta</td></tr>';

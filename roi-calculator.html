@@ -386,7 +386,7 @@
         .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
         .cookie-accept { padding: 8px 20px; border-radius: 8px; border: none; background: var(--primary-gradient); color: white; font-weight: 600; font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .cookie-accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
-        .cookie-decline { padding: 8px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: white; color: #6b7280; font-weight: 500; font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .cookie-decline { padding: 8px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: white; color: #94a3b8; font-weight: 500; font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .cookie-decline:hover { background: #f3f4f6; color: #374151; }
 
         /* ═══ SCROLL TO TOP ═══ */
@@ -547,6 +547,7 @@
 
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
     <div class="page-background"></div>
 
@@ -594,7 +595,7 @@
     </nav>
 
     <!-- ═══ MAIN CONTENT ═══ -->
-    <main>
+    <main id="main-content">
 
     <!-- ═══ HERO ═══ -->
     <section class="hero">
@@ -1721,7 +1722,7 @@
     // ══════════════════════════════════════════════════════════════
     function buildCashflowTable(years, revenues, opexes, nois, debtSvc, taxes, netCF, cumCF) {
         var html = '<table class="cashflow-table"><thead><tr>';
-        html += '<th>Year</th><th>Revenue</th><th>OPEX</th><th>NOI</th><th>Debt Svc</th><th>Tax</th><th>Net CF</th><th>Cumulative</th>';
+        html += '<th scope="col">Year</th><th scope="col">Revenue</th><th scope="col">OPEX</th><th scope="col">NOI</th><th scope="col">Debt Svc</th><th scope="col">Tax</th><th scope="col">Net CF</th><th scope="col">Cumulative</th>';
         html += '</tr></thead><tbody>';
         for (var i = 0; i < years.length; i++) {
             html += '<tr>';
@@ -1792,7 +1793,7 @@
         html += '.pdf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }';
         html += '.pdf-kpi-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; }';
         html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #1e3a5f; font-family: "JetBrains Mono", monospace; }';
-        html += '.pdf-kpi-label { font-size: 8px; color: #6b7280; margin-top: 3px; text-transform: uppercase; }';
+        html += '.pdf-kpi-label { font-size: 8px; color: #94a3b8; margin-top: 3px; text-transform: uppercase; }';
         html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
         html += '.pdf-narrative p { font-size: 10.5px; color: #374151; margin-bottom: 8px; }';
         html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #3b82f6; text-align: center; font-size: 8px; color: #94a3b8; }';
@@ -1935,7 +1936,7 @@
 
         // Cashflow table
         html += '<h2>Year-by-Year Cashflow</h2>';
-        html += '<table><thead><tr><th>Year</th><th style="text-align:right;">Revenue</th><th style="text-align:right;">OPEX</th><th style="text-align:right;">NOI</th><th style="text-align:right;">Net CF</th><th style="text-align:right;">Cumulative</th></tr></thead><tbody>';
+        html += '<table><thead><tr><th scope="col">Year</th><th style="text-align:right;"  scope="col">Revenue</th><th style="text-align:right;"  scope="col">OPEX</th><th style="text-align:right;"  scope="col">NOI</th><th style="text-align:right;"  scope="col">Net CF</th><th style="text-align:right;"  scope="col">Cumulative</th></tr></thead><tbody>';
         for (var i = 0; i < r.years.length; i++) {
             html += '<tr><td>' + r.years[i] + '</td>';
             html += '<td style="text-align:right;">$' + (r.revenues[i] / 1e6).toFixed(2) + 'M</td>';
@@ -1952,7 +1953,7 @@
 
         // Methodology
         html += '<h2>Methodology</h2>';
-        html += '<p style="font-size:10px;color:#6b7280;">NPV calculated using discounted cashflow analysis at the specified WACC. IRR computed via Newton-Raphson iterative method (200 max iterations, 1e-7 tolerance). Payback period uses undiscounted cumulative cashflows. Profitability Index = PV of inflows / PV of outflows. Occupancy ramp uses cubic interpolation between specified milestones. Debt service assumes level annual payments (P&I). Depreciation follows selected method (straight-line 20yr, MACRS 15yr, or 100% bonus). Monte Carlo simulation: 10,000 iterations with uniform distribution on revenue (+-20%), OPEX (+-15%), and occupancy (+-15%). Terminal value via cap rate capitalization of stabilized NOI. Industry benchmarks from Uptime Institute, JLL, CBRE Global Data Center reports.</p>';
+        html += '<p style="font-size:10px;color:#94a3b8;">NPV calculated using discounted cashflow analysis at the specified WACC. IRR computed via Newton-Raphson iterative method (200 max iterations, 1e-7 tolerance). Payback period uses undiscounted cumulative cashflows. Profitability Index = PV of inflows / PV of outflows. Occupancy ramp uses cubic interpolation between specified milestones. Debt service assumes level annual payments (P&I). Depreciation follows selected method (straight-line 20yr, MACRS 15yr, or 100% bonus). Monte Carlo simulation: 10,000 iterations with uniform distribution on revenue (+-20%), OPEX (+-15%), and occupancy (+-15%). Terminal value via cap rate capitalization of stabilized NOI. Industry benchmarks from Uptime Institute, JLL, CBRE Global Data Center reports.</p>';
 
         // Footer
         html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>ROI Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';

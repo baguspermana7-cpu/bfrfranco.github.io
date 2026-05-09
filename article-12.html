@@ -1558,10 +1558,10 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Company</th>
-                                <th>Current RE %</th>
-                                <th>2030 Target</th>
-                                <th>Notable Projects</th>
+                                <th scope="col">Company</th>
+                                <th scope="col">Current RE %</th>
+                                <th scope="col">2030 Target</th>
+                                <th scope="col">Notable Projects</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1608,10 +1608,10 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Company</th>
-                                <th>Nuclear Initiative</th>
-                                <th>Capacity</th>
-                                <th>Investment/Status</th>
+                                <th scope="col">Company</th>
+                                <th scope="col">Nuclear Initiative</th>
+                                <th scope="col">Capacity</th>
+                                <th scope="col">Investment/Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1825,10 +1825,10 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Country</th>
-                                <th>Big Tech Investment</th>
-                                <th>Jobs Created</th>
-                                <th>Digital Economy Contribution</th>
+                                <th scope="col">Country</th>
+                                <th scope="col">Big Tech Investment</th>
+                                <th scope="col">Jobs Created</th>
+                                <th scope="col">Digital Economy Contribution</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -4201,7 +4201,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         html+='<div class="kpi-item"><div class="kpi-val">'+(fin.budgetVar>=0?'+':'')+fin.budgetVar.toFixed(1)+'%</div><div class="kpi-lbl">Budget Variance</div></div>';
         html+='<div class="kpi-item"><div class="kpi-val">'+fmt(fin.npv)+'</div><div class="kpi-lbl">5-Year NPV</div></div>';
         html+='</div>';
-        html+='<table><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>';
+        html+='<table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Assessment</th></tr>';
         html+='<tr><td>Single Loss Expectancy</td><td>'+fmt(fin.sle)+'</td><td>Per-incident cost estimate</td></tr>';
         html+='<tr><td>Annualized Rate (ARO)</td><td>'+fin.aro.toFixed(2)+'</td><td>'+inp.incidents+' incidents \u00d7 15% loss rate</td></tr>';
         html+='<tr><td>Investment Required</td><td>'+fmt(fin.investmentCost)+'</td><td>'+inp.tierKey+' maturity program</td></tr>';
@@ -4231,7 +4231,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         html+='<div class="kpi-item"><div class="kpi-val">'+rel.wue.toFixed(2)+'</div><div class="kpi-lbl">WUE (L/kWh)</div></div>';
         html+='<div class="kpi-item"><div class="kpi-val">'+rel.pueBench+'</div><div class="kpi-lbl">PUE Peer Rank</div></div>';
         html+='</div>';
-        html+='<table><tr><th>Parameter</th><th>Value</th><th>Target ('+inp.tierKey+')</th></tr>';
+        html+='<table><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Target ('+inp.tierKey+')</th></tr>';
         html+='<tr><td>Availability Target</td><td>'+inp.tier.availTarget+'%</td><td>'+inp.tier.availTarget+'%</td></tr>';
         html+='<tr><td>Redundancy</td><td>'+inp.tier.redundancy+'</td><td>'+inp.tier.redundancy+'</td></tr>';
         html+='<tr><td>Annual Downtime Budget</td><td>'+(8760*(1-inp.tier.availTarget/100)).toFixed(1)+' hrs</td><td>'+(8760*(1-inp.tier.availTarget/100)).toFixed(1)+' hrs</td></tr>';
@@ -4253,7 +4253,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         html+='<div class="chart-wrap">'+buildHistogramSVG(mc)+'</div>';
         html+='<h3>Sensitivity Analysis</h3>';
         html+='<div class="chart-wrap">'+buildTornadoSVG(sens, mc.baseCost)+'</div>';
-        html+='<table><tr><th>Variable</th><th>Impact (+10%)</th><th>Absolute Swing</th></tr>';
+        html+='<table><tr><th scope="col">Variable</th><th scope="col">Impact (+10%)</th><th scope="col">Absolute Swing</th></tr>';
         sens.forEach(function(d){ html+='<tr><td>'+d.name+'</td><td>+'+d.impact.toFixed(1)+'%</td><td>'+fmt(d.absSwing)+'</td></tr>'; });
         html+='</table>';
 

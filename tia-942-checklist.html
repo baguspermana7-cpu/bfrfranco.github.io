@@ -208,7 +208,7 @@
         .check-weight{padding:2px 8px;border-radius:50px;font-size:0.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap}
         .check-weight.w3{background:rgba(239,68,68,0.1);color:#ef4444}
         .check-weight.w2{background:rgba(245,158,11,0.1);color:#f59e0b}
-        .check-weight.w1{background:rgba(107,114,128,0.1);color:#6b7280}
+        .check-weight.w1{background:rgba(107,114,128,0.1);color:#94a3b8}
         .check-ref{font-size:0.68rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;white-space:nowrap}
 
         /* Tooltips */
@@ -279,7 +279,7 @@
         .priority-badge{padding:2px 8px;border-radius:50px;font-size:0.65rem;font-weight:700}
         .priority-badge.p1{background:rgba(239,68,68,0.1);color:#ef4444}
         .priority-badge.p2{background:rgba(245,158,11,0.1);color:#f59e0b}
-        .priority-badge.p3{background:rgba(107,114,128,0.1);color:#6b7280}
+        .priority-badge.p3{background:rgba(107,114,128,0.1);color:#94a3b8}
 
         /* Login Modal */
         @keyframes modalSlideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
@@ -325,7 +325,7 @@
         .cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
         .cookie-accept { padding: 0.45rem 1.2rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .cookie-accept:hover { background: #1d4ed8; }
-        .cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #6b7280; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #94a3b8; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
         .cookie-decline:hover { background: #f3f4f6; color: #374151; }
         @media (max-width: 768px) { .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; } }
         @media print { .cookie-banner { display: none; } }
@@ -383,6 +383,7 @@
 
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="page-background"></div>
 
     <nav class="navbar">
@@ -429,7 +430,7 @@
         </div>
     </nav>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <section class="hero">
             <div class="hero-badge"><i class="fas fa-certificate"></i> TIA-942-B Compliance</div>
             <h1>TIA-942 Compliance Checklist</h1>
@@ -504,7 +505,7 @@
                         <div class="score-display">
                             <div class="score-value" id="scoreValue" style="color:#10b981;">0%</div>
                             <div class="score-label">Overall Compliance</div>
-                            <div class="score-grade" id="scoreGrade" style="background:rgba(107,114,128,0.1);color:#6b7280;">F — Incomplete</div>
+                            <div class="score-grade" id="scoreGrade" style="background:rgba(107,114,128,0.1);color:#94a3b8;">F — Incomplete</div>
                         </div>
                         <div class="metric-grid">
                             <div class="metric-box"><div class="metric-label">Checked</div><div class="metric-value" id="metricChecked">0</div></div>
@@ -571,7 +572,7 @@
                 <div class="pro-panel">
                     <h3><i class="fas fa-search" style="color:var(--accent-emerald);"></i> Gap Analysis <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></h3>
                     <table class="gap-table" id="gapTable">
-                        <thead><tr><th>Priority</th><th>Item</th><th>Category</th><th>Weight</th><th>Reference</th></tr></thead>
+                        <thead><tr><th scope="col">Priority</th><th scope="col">Item</th><th scope="col">Category</th><th scope="col">Weight</th><th scope="col">Reference</th></tr></thead>
                         <tbody id="gapTableBody"></tbody>
                     </table>
                 </div>
@@ -603,7 +604,7 @@
                 <div class="pro-panel">
                     <h3><i class="fas fa-road" style="color:var(--accent-gold);"></i> Remediation Roadmap <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></h3>
                     <table class="gap-table" id="roadmapTable">
-                        <thead><tr><th>Item</th><th>Effort</th><th>Est. Cost</th><th>Timeline</th><th>Impact</th></tr></thead>
+                        <thead><tr><th scope="col">Item</th><th scope="col">Effort</th><th scope="col">Est. Cost</th><th scope="col">Timeline</th><th scope="col">Impact</th></tr></thead>
                         <tbody id="roadmapBody"></tbody>
                     </table>
                 </div>
@@ -1193,7 +1194,7 @@
         });
 
         // Tier Comparison table
-        var tcHtml = '<table class="gap-table"><thead><tr><th>Category</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th><th>Tier 4</th></tr></thead><tbody>';
+        var tcHtml = '<table class="gap-table"><thead><tr><th scope="col">Category</th><th scope="col">Tier 1</th><th scope="col">Tier 2</th><th scope="col">Tier 3</th><th scope="col">Tier 4</th></tr></thead><tbody>';
         CATEGORIES.forEach(function(cat) {
             tcHtml += '<tr><td style="font-weight:600;">' + cat.label + '</td>';
             [1,2,3,4].forEach(function(t) {
@@ -1243,7 +1244,7 @@
             var pBadge = s.item.w === 3 ? '<span style="padding:1px 6px;border-radius:50px;font-size:0.6rem;font-weight:700;background:rgba(239,68,68,0.1);color:#ef4444;margin-left:6px;">P1</span>'
                        : (s.item.w === 2 ? '<span style="padding:1px 6px;border-radius:50px;font-size:0.6rem;font-weight:700;background:rgba(245,158,11,0.1);color:#f59e0b;margin-left:6px;">P2</span>' : '');
             sensHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
-                '<span style="font-size:0.72rem;color:#6b7280;width:16px;text-align:right;flex-shrink:0;">' + (idx+1) + '</span>' +
+                '<span style="font-size:0.72rem;color:#94a3b8;width:16px;text-align:right;flex-shrink:0;">' + (idx+1) + '</span>' +
                 '<span style="font-size:0.75rem;width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + s.item.label + pBadge + '</span>' +
                 '<div style="flex:1;height:18px;background:#f1f5f9;border-radius:4px;overflow:hidden;position:relative;"><div style="height:100%;width:' + barW + '%;background:linear-gradient(90deg,' + s.cat.color + '40,' + s.cat.color + ');border-radius:4px;transition:width 0.4s;"></div></div>' +
                 '<span style="font-size:0.72rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;width:55px;text-align:right;color:' + s.cat.color + ';">+' + s.impact.toFixed(2) + '%</span></div>';
@@ -1485,7 +1486,7 @@
         html += '.pdf-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}';
         html += '.pdf-kpi-card{background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:10px;text-align:center}';
         html += '.pdf-kpi-value{font-size:16px;font-weight:700;color:#065f46;font-family:"JetBrains Mono",monospace}';
-        html += '.pdf-kpi-label{font-size:8px;color:#6b7280;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px}';
+        html += '.pdf-kpi-label{font-size:8px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px}';
         html += '.pdf-footer{margin-top:20px;padding-top:10px;border-top:2px solid #10b981;text-align:center;font-size:8px;color:#94a3b8}';
         html += '
 /* v1.8.0 — mobile utility responsive patch */
@@ -1615,8 +1616,8 @@
         html += '<div class="pdf-kpi-card" style="grid-column:span 2;"><div class="pdf-kpi-value" style="font-size:13px;">'+dcTypeLabel+'</div><div class="pdf-kpi-label">Facility Type</div></div>';
         html += '</div></div></div>';
         html += '<h2>Category Scores</h2><div style="background:#fafbfc;border:1px solid #e5e7eb;border-radius:8px;padding:8px;">'+svgBar+'</div>';
-        if (gapRows) { html += '<h2>Gap Analysis</h2><table><tr><th>Priority</th><th>Item</th><th>Category</th><th>Weight</th><th>Ref</th></tr>'+gapRows+'</table>'; }
-        html += '<h2>Methodology</h2><p style="font-size:10px;color:#6b7280;">Compliance scored using weighted item assessment per ANSI/TIA-942-B standard. Items filtered by facility type ('+dcTypeLabel+') and tier level ('+currentTier+'). Category weights: Electrical (1.5×), Mechanical (1.3×), Fire (1.1×), Site/Telecom (1.0×), Security (0.9×). Grade scale: A+ ≥95%, A ≥85%, B ≥75%, C ≥65%, D ≥50%, F &lt;50%. Monte Carlo simulation uses 10,000 iterations with ±15% weight variance.</p>';
+        if (gapRows) { html += '<h2>Gap Analysis</h2><table><tr><th scope="col">Priority</th><th scope="col">Item</th><th scope="col">Category</th><th scope="col">Weight</th><th scope="col">Ref</th></tr>'+gapRows+'</table>'; }
+        html += '<h2>Methodology</h2><p style="font-size:10px;color:#94a3b8;">Compliance scored using weighted item assessment per ANSI/TIA-942-B standard. Items filtered by facility type ('+dcTypeLabel+') and tier level ('+currentTier+'). Category weights: Electrical (1.5×), Mechanical (1.3×), Fire (1.1×), Site/Telecom (1.0×), Security (0.9×). Grade scale: A+ ≥95%, A ≥85%, B ≥75%, C ≥65%, D ≥50%, F &lt;50%. Monte Carlo simulation uses 10,000 iterations with ±15% weight variance.</p>';
         html += '<div class="pdf-footer">resistancezero.com · Generated '+dateStr+' · All calculations performed client-side · No data transmitted<br>TIA-942 Compliance Checklist v1.0 — Bagus Dwi Permana Portfolio</div>';
         html += '<script src="auth.js?v=20260324b"><\/script>';
         html += '<script src="rz-engine.js?v=2026-04-28"><\/script>';

@@ -2332,9 +2332,9 @@ Where LMTD (Log Mean Temperature Difference) requires:
                             <table class="free-cooling-table">
                                 <thead>
                                     <tr>
-                                        <th>Location</th>
-                                        <th>Free Cooling Hours</th>
-                                        <th>% of Year</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Free Cooling Hours</th>
+                                        <th scope="col">% of Year</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -4560,10 +4560,10 @@ Where LMTD (Log Mean Temperature Difference) requires:
                 'h1 { color: #1e3a5f; font-size: 22px; border-bottom: 3px solid #3b82f6; padding-bottom: 8px; }' +
                 'h2 { color: #1e3a5f; font-size: 16px; margin-top: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }' +
                 'h3 { color: #374151; font-size: 14px; }' +
-                '.header-meta { display: flex; justify-content: space-between; color: #6b7280; font-size: 11px; margin-bottom: 20px; }' +
+                '.header-meta { display: flex; justify-content: space-between; color: #94a3b8; font-size: 11px; margin-bottom: 20px; }' +
                 '.score-hero { text-align: center; padding: 20px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 12px; margin: 16px 0; }' +
                 '.score-hero .score { font-size: 36px; font-weight: 800; color: #3b82f6; }' +
-                '.score-hero .label { color: #6b7280; font-size: 13px; }' +
+                '.score-hero .label { color: #94a3b8; font-size: 13px; }' +
                 'table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }' +
                 'th { background: #f8fafc; color: #1e3a5f; padding: 8px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }' +
                 'td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1f2937; }' +
@@ -4574,11 +4574,11 @@ Where LMTD (Log Mean Temperature Difference) requires:
                 '.kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }' +
                 '.kpi-card { text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }' +
                 '.kpi-value { font-size: 16px; font-weight: 800; color: #3b82f6; }' +
-                '.kpi-label { font-size: 10px; color: #6b7280; margin-top: 2px; }' +
+                '.kpi-label { font-size: 10px; color: #94a3b8; margin-top: 2px; }' +
                 '.kpi-sub { font-size: 9px; color: #9ca3af; margin-top: 1px; }' +
                 '.footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #9ca3af; text-align: center; }' +
                 '.badge-good { color: #16a34a; } .badge-warn { color: #d97706; } .badge-bad { color: #dc2626; }' +
-                '.section-note { font-size: 11px; color: #6b7280; font-style: italic; margin: 4px 0 8px; }' +
+                '.section-note { font-size: 11px; color: #94a3b8; font-style: italic; margin: 4px 0 8px; }' +
             '/* v1.5.0 — article typography uplift (Awwwards-tier polish) */
 
 /* Gradient drop-cap on first paragraph of article body */
@@ -4744,12 +4744,12 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             html += '<div class="score-hero">';
             html += '<div class="score">' + fmt(tco.savingsDLC10yr) + '</div>';
             html += '<div class="label">10-Year NPV Savings (DLC vs Traditional)</div>';
-            html += '<div style="margin-top:8px;font-size:12px;color:#6b7280;">Payback: ' + tco.paybackDLC.toFixed(1) + ' years | IRR: ' + (tco.irrDLC * 100).toFixed(1) + '% | CO2 Offset: ' + Math.round(tco.carbonOffsetDLC).toLocaleString() + ' tons/yr</div>';
+            html += '<div style="margin-top:8px;font-size:12px;color:#94a3b8;">Payback: ' + tco.paybackDLC.toFixed(1) + ' years | IRR: ' + (tco.irrDLC * 100).toFixed(1) + '% | CO2 Offset: ' + Math.round(tco.carbonOffsetDLC).toLocaleString() + ' tons/yr</div>';
             html += '</div>';
 
             // TCO Table
             html += '<h2>10-Year Total Cost of Ownership</h2>';
-            html += '<table><tr><th>Architecture</th><th>CAPEX</th><th>Annual Energy</th><th>Annual Maint.</th><th>10-Year NPV</th><th>PUE</th></tr>';
+            html += '<table><tr><th scope="col">Architecture</th><th scope="col">CAPEX</th><th scope="col">Annual Energy</th><th scope="col">Annual Maint.</th><th scope="col">10-Year NPV</th><th scope="col">PUE</th></tr>';
             ['traditional', 'hybrid', 'dlc'].forEach(function(arch) {
                 var r = tco[arch];
                 var label = arch === 'traditional' ? 'Traditional Chiller' : arch === 'hybrid' ? 'Hybrid DLC' : 'Warm-Water DLC';
@@ -4770,7 +4770,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
             // Regional Risk
             html += '<h2>Regional Risk Assessment</h2>';
-            html += '<table><tr><th>Region</th><th>Temp</th><th>RH</th><th>Free Hrs</th><th>Risk</th><th>PUE</th><th>TRL</th><th>Supply</th></tr>';
+            html += '<table><tr><th scope="col">Region</th><th scope="col">Temp</th><th scope="col">RH</th><th scope="col">Free Hrs</th><th scope="col">Risk</th><th scope="col">PUE</th><th scope="col">TRL</th><th scope="col">Supply</th></tr>';
             Object.keys(HVAC_REGIONS).forEach(function(key) {
                 var r = HVAC_REGIONS[key];
                 var isSelected = key === inputs.region;
@@ -4787,7 +4787,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             var phase2 = tco.dlc.capex * 0.35;
             var phase3 = tco.dlc.capex * 0.25;
             var training = tco.retrainingCost;
-            html += '<table><tr><th>Phase</th><th>Timeline</th><th>Investment</th><th>Focus</th></tr>';
+            html += '<table><tr><th scope="col">Phase</th><th scope="col">Timeline</th><th scope="col">Investment</th><th scope="col">Focus</th></tr>';
             html += '<tr><td>Phase 1</td><td>Year 0-1</td><td>' + fmt(phase1) + '</td><td>CDU infrastructure, piping, controls</td></tr>';
             html += '<tr><td>Phase 2</td><td>Year 2-3</td><td>' + fmt(phase2) + '</td><td>High-density rack DLC expansion</td></tr>';
             html += '<tr><td>Phase 3</td><td>Year 4-5</td><td>' + fmt(phase3) + '</td><td>Full migration, legacy decommission</td></tr>';
@@ -4823,7 +4823,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
                 // Sensitivity Tornado
                 html += '<h2>Sensitivity Analysis</h2>';
-                html += '<table><tr><th>Variable</th><th>Downside</th><th>Upside</th><th>Total Swing</th><th>Weight</th></tr>';
+                html += '<table><tr><th scope="col">Variable</th><th scope="col">Downside</th><th scope="col">Upside</th><th scope="col">Total Swing</th><th scope="col">Weight</th></tr>';
                 sensitivity.items.forEach(function(s) {
                     html += '<tr><td>' + s.label + '</td><td class="badge-bad">' + fmt(s.downside) + '</td><td class="badge-good">+' + fmt(s.upside) + '</td><td>' + fmt(s.totalSwing) + '</td><td>' + (s.pct * 100).toFixed(0) + '%</td></tr>';
                 });

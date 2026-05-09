@@ -2007,11 +2007,11 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Project</th>
-                                <th>Location</th>
-                                <th>Capacity</th>
-                                <th>Investment</th>
-                                <th>Water Stress<a href="#ref2" class="cite">[2]</a></th>
+                                <th scope="col">Project</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Capacity</th>
+                                <th scope="col">Investment</th>
+                                <th scope="col">Water Stress<a href="#ref2" class="cite">[2]</a></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -2138,11 +2138,11 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Location</th>
-                                <th>Country</th>
-                                <th>Water Stress</th>
-                                <th>Current Utilization</th>
-                                <th>Key Advantage</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Country</th>
+                                <th scope="col">Water Stress</th>
+                                <th scope="col">Current Utilization</th>
+                                <th scope="col">Key Advantage</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -3664,7 +3664,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             html += '<div class="kpi-item"><div class="kpi-val">+' + costData.riskPremiumPct + '%</div><div class="kpi-lbl">Risk Premium</div></div>';
             html += '<div class="kpi-item"><div class="kpi-val">' + costData.recyclePayback.toFixed(1) + 'yr</div><div class="kpi-lbl">Recycle ROI</div></div>';
             html += '</div>';
-            html += '<table><tr><th>Cooling Type</th><th>Annual Cost</th><th>vs Evaporative</th><th>Cost/ML</th></tr>';
+            html += '<table><tr><th scope="col">Cooling Type</th><th scope="col">Annual Cost</th><th scope="col">vs Evaporative</th><th scope="col">Cost/ML</th></tr>';
             html += '<tr><td>Evaporative Cooling</td><td>' + fmt(costData.evapCost) + '</td><td>Baseline</td><td>' + fmt(costData.costPerML_evap) + '</td></tr>';
             html += '<tr><td>Hybrid (50% DLC + 50% Evap)</td><td>' + fmt(costData.hybridCost) + '</td><td>-' + Math.round((1 - costData.hybridCost / Math.max(costData.evapCost, 1)) * 100) + '%</td><td>' + fmt(costData.costPerML_hybrid) + '</td></tr>';
             html += '<tr><td>Direct Liquid Cooling</td><td>' + fmt(costData.dlcCost) + '</td><td>-' + Math.round(costData.dlcSaving) + '%</td><td>' + fmt(costData.costPerML_dlc) + '</td></tr>';
@@ -3673,7 +3673,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
             // Section 2: Regional Risk Matrix
             html += '<h2>2. Regional Water Risk Matrix</h2>';
-            html += '<table><tr><th>Region</th><th>Stress</th><th>Risk</th><th>Price</th><th>Aquifer</th><th>Reg. Severity</th><th>Climate 2050</th></tr>';
+            html += '<table><tr><th scope="col">Region</th><th scope="col">Stress</th><th scope="col">Risk</th><th scope="col">Price</th><th scope="col">Aquifer</th><th scope="col">Reg. Severity</th><th scope="col">Climate 2050</th></tr>';
             Object.keys(WS_REGIONS).forEach(function(k) {
                 var r = WS_REGIONS[k];
                 var highlight = k === inputs.regionKey ? ' style="background:#f0f9ff;font-weight:600;"' : '';
@@ -3691,7 +3691,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             html += '<div class="kpi-item"><div class="kpi-val">' + sustain.esgReadiness + '%</div><div class="kpi-lbl">ESG Readiness</div></div>';
             html += '<div class="kpi-item"><div class="kpi-val">' + sustain.wuePercentile + '</div><div class="kpi-lbl">WUE Ranking</div></div>';
             html += '</div>';
-            html += '<table><tr><th>Metric</th><th>Status</th><th>Assessment</th></tr>';
+            html += '<table><tr><th scope="col">Metric</th><th scope="col">Status</th><th scope="col">Assessment</th></tr>';
             html += '<tr><td>Regulatory Exposure</td><td>' + sustain.regExposure + '</td><td>' + (sustain.regExposure === 'High' ? 'Immediate risk of permit restrictions' : sustain.regExposure === 'Medium' ? 'Monitoring required' : 'Low regulatory pressure') + '</td></tr>';
             html += '<tr><td>Water Recycle Rate</td><td>' + sustain.recycleRate + '</td><td>' + (parseInt(sustain.recycleRate) < 15 ? 'Below industry standard' : parseInt(sustain.recycleRate) < 35 ? 'Approaching best practice' : 'Strong performance') + '</td></tr>';
             html += '<tr><td>Compliance Gaps</td><td>' + sustain.critGaps + 'C / ' + sustain.majorGaps + 'M / ' + sustain.minorGaps + 'm</td><td>' + (sustain.critGaps > 0 ? 'Critical gaps require immediate action' : sustain.majorGaps > 0 ? 'Major gaps need resolution' : 'Compliance posture is strong') + '</td></tr>';
@@ -3718,7 +3718,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             // Sensitivity Tornado
             html += '<h3>Sensitivity Analysis</h3>';
             html += '<div class="chart-wrap">' + buildTornadoSVG() + '</div>';
-            html += '<table><tr><th>Variable</th><th>Impact (+10%)</th><th>Absolute Swing (+/- 10%)</th></tr>';
+            html += '<table><tr><th scope="col">Variable</th><th scope="col">Impact (+10%)</th><th scope="col">Absolute Swing (+/- 10%)</th></tr>';
             sensitivity.forEach(function(d) { html += '<tr><td>' + d.name + '</td><td>+' + d.impact.toFixed(1) + '%</td><td>' + fmt(d.absSwing) + '</td></tr>'; });
             html += '</table>';
 

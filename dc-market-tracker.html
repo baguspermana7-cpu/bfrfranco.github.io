@@ -502,7 +502,7 @@
         .dmt-cookie-banner a { color: #2563eb; text-decoration: underline; }
         .dmt-cookie-actions { display: flex; gap: 0.5rem; }
         .dmt-cookie-accept { padding: 6px 16px; border-radius: 6px; border: none; background: var(--dmt-primary); color: white; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; }
-        .dmt-cookie-decline { padding: 6px 16px; border-radius: 6px; border: 1px solid #d1d5db; background: white; color: #6b7280; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+        .dmt-cookie-decline { padding: 6px 16px; border-radius: 6px; border: 1px solid #d1d5db; background: white; color: #94a3b8; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit; }
 
         /* SCROLL TOP */
         .dmt-scroll-top {
@@ -651,6 +651,7 @@
     <script src="js/rz-mobile-nav.js?v=2026-05-09d" defer></script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-brand">
@@ -692,6 +693,7 @@
             <a href="datacenter-solutions.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back</a>
         </div>
     </nav>
+    <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
     <!-- Hero -->
     <section class="dmt-hero">
@@ -813,16 +815,16 @@
                 <table class="dmt-table" id="dmtTable">
                     <thead>
                         <tr>
-                            <th data-col="name" onclick="sortTable('name')">Market <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="region" onclick="sortTable('region')">Region <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="operational" onclick="sortTable('operational')">Operational (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="construction" onclick="sortTable('construction')">Construction (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="planned" onclick="sortTable('planned')">Planned (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="vacancy" onclick="sortTable('vacancy')">Vacancy % <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="coloPrice" onclick="sortTable('coloPrice')">Colo $/kW/mo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="powerCost" onclick="sortTable('powerCost')">Power $/kWh <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="cagr" onclick="sortTable('cagr')">CAGR <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                            <th data-col="maturity" onclick="sortTable('maturity')">Maturity <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="name" onclick="sortTable('name')"  scope="col">Market <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="region" onclick="sortTable('region')"  scope="col">Region <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="operational" onclick="sortTable('operational')"  scope="col">Operational (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="construction" onclick="sortTable('construction')"  scope="col">Construction (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="planned" onclick="sortTable('planned')"  scope="col">Planned (MW) <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="vacancy" onclick="sortTable('vacancy')"  scope="col">Vacancy % <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="coloPrice" onclick="sortTable('coloPrice')"  scope="col">Colo $/kW/mo <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="powerCost" onclick="sortTable('powerCost')"  scope="col">Power $/kWh <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="cagr" onclick="sortTable('cagr')"  scope="col">CAGR <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            <th data-col="maturity" onclick="sortTable('maturity')"  scope="col">Maturity <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                         </tr>
                     </thead>
                     <tbody id="dmtTableBody"></tbody>
@@ -2095,7 +2097,7 @@
             html += '</div>';
 
             html += '<h2>Market Data</h2>';
-            html += '<table><thead><tr><th>Market</th><th>Region</th><th style="text-align:right;">Operational (MW)</th><th style="text-align:right;">Construction (MW)</th><th style="text-align:right;">Planned (MW)</th><th style="text-align:right;">CAGR</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
+            html += '<table><thead><tr><th scope="col">Market</th><th scope="col">Region</th><th style="text-align:right;"  scope="col">Operational (MW)</th><th style="text-align:right;"  scope="col">Construction (MW)</th><th style="text-align:right;"  scope="col">Planned (MW)</th><th style="text-align:right;"  scope="col">CAGR</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
 
             if (isPremiumUser && p50 !== '--') {
                 html += '<h2>Monte Carlo Forecast (2030)</h2>';

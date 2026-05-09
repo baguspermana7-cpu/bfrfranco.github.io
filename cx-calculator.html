@@ -606,6 +606,7 @@ a:hover{text-decoration:underline;}
     <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Navigation -->
 <nav class="cx-nav">
@@ -628,6 +629,7 @@ a:hover{text-decoration:underline;}
     </div>
   </div>
 </nav>
+    <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
 <!-- Hero -->
 <section class="cx-hero">
@@ -978,7 +980,7 @@ a:hover{text-decoration:underline;}
         <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
         <h3><i class="fas fa-crown"></i> Resource Loading by Phase</h3>
         <table class="cx-resource-table" id="cxResTable">
-          <thead><tr><th>Phase</th><th>CxA Days</th><th>Field Tech Days</th><th>OEM Days</th><th>Witness Days</th><th>Est. Cost</th></tr></thead>
+          <thead><tr><th scope="col">Phase</th><th scope="col">CxA Days</th><th scope="col">Field Tech Days</th><th scope="col">OEM Days</th><th scope="col">Witness Days</th><th scope="col">Est. Cost</th></tr></thead>
           <tbody id="cxResTableBody"></tbody>
         </table>
       </div>
@@ -3668,7 +3670,7 @@ function cxRenderDrawerContent(tab){
   }else if(tab==='logsheet'){
     html+='<h4><i class="fas fa-table"></i> Commissioning Logsheet: '+proc.title+'</h4>';
     html+='<p style="font-size:0.72rem;color:#64748b;margin-bottom:1rem;"><i class="fas fa-info-circle" style="margin-right:4px;"></i>This logsheet template is generated based on industry standards. Export as PDF for field use.</p>';
-    html+='<table class="cx-drawer-logsheet"><thead><tr><th style="width:45%;">Field</th><th>Type</th><th>Value</th></tr></thead><tbody>';
+    html+='<table class="cx-drawer-logsheet"><thead><tr><th style="width:45%;"  scope="col">Field</th><th scope="col">Type</th><th scope="col">Value</th></tr></thead><tbody>';
     proc.logsheet.forEach(function(f){
       var typeLabel={text:'Text',number:'Number',date:'Date',textarea:'Multi-line',select:'Selection',calc:'Calculated',sign:'Signature'}[f.t]||f.t;
       var inputHtml='<span class="cx-ls-input">';
@@ -3739,7 +3741,7 @@ function cxExportActivityPDF(mode){
   }
   if(mode==='logsheet'||mode==='package'){
     html+='<h2>Commissioning Logsheet</h2>';
-    html+='<table><thead><tr><th style="width:40%;">Field</th><th style="width:15%;">Type</th><th>Value / Reading</th></tr></thead><tbody>';
+    html+='<table><thead><tr><th style="width:40%;"  scope="col">Field</th><th style="width:15%;"  scope="col">Type</th><th scope="col">Value / Reading</th></tr></thead><tbody>';
     proc.logsheet.forEach(function(f){
       var input='';
       if(f.t==='select'&&f.o)input='<span style="font-size:9pt;color:#64748b;">['+f.o.join(' / ')+']</span>';
@@ -3905,7 +3907,7 @@ function cxExportBulkProcedures(){
       if(proc.duration_note)html+='<p style="font-size:8pt;color:#64748b;"><em>Duration: '+proc.duration_note+'</em></p>';
       html+='<ol>';proc.procedure.forEach(function(s){html+='<li>'+s+'</li>';});html+='</ol>';
       html+='<div class="criteria-box"><strong>Acceptance:</strong> '+proc.acceptance.criteria+'<br><strong>Standard:</strong> '+proc.acceptance.standard+'</div>';
-      html+='<table><thead><tr><th>Logsheet Field</th><th>Type</th><th>Value</th></tr></thead><tbody>';
+      html+='<table><thead><tr><th scope="col">Logsheet Field</th><th scope="col">Type</th><th scope="col">Value</th></tr></thead><tbody>';
       proc.logsheet.forEach(function(f){
         var inp=f.t==='sign'?'________________':(f.t==='select'&&f.o)?'['+f.o.join('/')+']':'<span class="ls-input"></span>';
         html+='<tr><td><strong>'+f.f+'</strong></td><td>'+f.t+'</td><td>'+inp+'</td></tr>';
@@ -4071,7 +4073,7 @@ function cxExportPDF(){
   h+='h1{font-size:20px;color:#1e3a5f;text-align:center;margin:0 0 4px;}';
   h+='h2{font-size:13px;color:#1e3a5f;border-bottom:2px solid #0e7490;padding-bottom:4px;margin:18px 0 8px;}';
   h+='h3{font-size:11px;color:#374151;margin:10px 0 6px;}';
-  h+='.sub{text-align:center;font-size:10px;color:#6b7280;margin-bottom:16px;}';
+  h+='.sub{text-align:center;font-size:10px;color:#94a3b8;margin-bottom:16px;}';
   h+='.brand{text-align:center;font-size:10px;color:#0e7490;font-weight:700;letter-spacing:2px;margin-bottom:6px;}';
   h+='.sect{margin-bottom:14px;break-inside:avoid;}';
   h+='table{width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;}';
@@ -4081,7 +4083,7 @@ function cxExportPDF(){
   h+='.pdf-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;}';
   h+='.pdf-kpi-card{background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center;}';
   h+='.pdf-kpi-value{font-size:16px;font-weight:700;color:#1e3a5f;}';
-  h+='.pdf-kpi-label{font-size:8px;color:#6b7280;margin-top:3px;text-transform:uppercase;}';
+  h+='.pdf-kpi-label{font-size:8px;color:#94a3b8;margin-top:3px;text-transform:uppercase;}';
   h+='.pdf-chart-row{display:flex;gap:14px;margin:10px 0;}.pdf-chart-row>div{flex:1;min-width:0;}';
   h+='.pdf-chart-title{font-size:10px;font-weight:600;color:#374151;margin-bottom:5px;text-align:center;}';
   h+='.pdf-narr{background:#f0f9ff;border-left:4px solid #0e7490;padding:10px 12px;font-size:10px;line-height:1.7;margin:8px 0;color:#1f2937;}';
@@ -4237,7 +4239,7 @@ function cxExportPDF(){
 
   // ===== 2. INPUT PARAMETERS =====
   h+='<div class="sect"><h2>2. Input Parameters &amp; Configuration</h2><table>';
-  h+='<tr><th style="width:30%;">Parameter</th><th style="width:20%;">Value</th><th style="width:30%;">Parameter</th><th style="width:20%;">Value</th></tr>';
+  h+='<tr><th style="width:30%;"  scope="col">Parameter</th><th style="width:20%;"  scope="col">Value</th><th style="width:30%;"  scope="col">Parameter</th><th style="width:20%;"  scope="col">Value</th></tr>';
   var params=[['IT Load',inp.itLoad.toLocaleString()+' kW ('+mw+' MW)'],['Cooling Type',inp.coolingType.toUpperCase()+' ('+CX_COOLING[inp.coolingType].cost+'x cost mult)'],['Redundancy',inp.redundancy+' — '+rd.tier+' ('+rd.avail+')'],['Rack Density',inp.rackDensity.replace(/_/g,'/')+' (~'+CX_DENSITY[inp.rackDensity].kw+' kW/rack)'],['Building Type',inp.buildingType.replace(/_/g,' ')],['Fire Suppression',inp.fireSuppression.toUpperCase()],['UPS Type',inp.upsType.replace(/_/g,' ')],['Region',rate.name],['Generator',inp.generatorType.replace(/_/g,' ')],['Seismic Zone','Zone '+inp.seismicZone+' ('+CX_SEISMIC[inp.seismicZone].cost+'x)'],['Cx Scope',inp.cxScope.replace(/_/g,' ')],['Substation',inp.substationConfig.replace(/_/g,' ')+' ('+CX_SUBSTATION[inp.substationConfig].cost+'x)'],['BMS/DCIM',inp.bmsComplexity.replace(/_/g,' ')+' ('+CX_BMS[inp.bmsComplexity].pts+' pts)'],['Delivery Method',inp.deliveryMethod.replace(/_/g,' ')]];
   for(var pi=0;pi<params.length;pi+=2){
     h+='<tr><td><b>'+params[pi][0]+'</b></td><td>'+params[pi][1]+'</td>';
@@ -4246,17 +4248,17 @@ function cxExportPDF(){
     h+='</tr>';
   }
   h+='</table>';
-  h+='<p style="font-size:9px;color:#6b7280;margin-top:6px;">CAPEX basis: $'+res.capexPerKw.toLocaleString()+'/kW (est. total CAPEX: $'+((inp.itLoad*res.capexPerKw)/1e6).toFixed(1)+'M). '+rd.tier+' requires '+rd.scenarios+' IST failure scenarios over '+rd.istHrs+' test hours.</p>';
+  h+='<p style="font-size:9px;color:#94a3b8;margin-top:6px;">CAPEX basis: $'+res.capexPerKw.toLocaleString()+'/kW (est. total CAPEX: $'+((inp.itLoad*res.capexPerKw)/1e6).toFixed(1)+'M). '+rd.tier+' requires '+rd.scenarios+' IST failure scenarios over '+rd.istHrs+' test hours.</p>';
   h+='</div>';
 
   // ===== 3. COST BREAKDOWN TABLE =====
   h+='<div class="sect"><h2>3. Cost Breakdown by Commissioning Level</h2><table>';
-  h+='<tr><th>Level</th><th>Description</th><th>Cost</th><th>% of Total</th><th>Duration</th></tr>';
+  h+='<tr><th scope="col">Level</th><th scope="col">Description</th><th scope="col">Cost</th><th scope="col">% of Total</th><th scope="col">Duration</th></tr>';
   var lvlDescs=['Design review, Cx planning, OPR/BOD, points list, energization strategy','Factory witness testing for switchgear, transformers, generators, UPS, chillers','Static testing: insulation resistance, grounding, piping pressure, wiring verification','First energization, equipment startup, load bank testing, OEM startup, BMS P2P','Full-load system testing, power path verification, thermal performance validation','Integrated failure scenario testing: black start, gen fail, UPS bypass, 72-hr load','Punch list, training, spare parts, systems manuals, final Cx report, turnover sign-off'];
   var lvlKeys=['l0','l1','l2','l3','l4','l5','l6'];
   var lvlNames=['L0 — Design & Cx Planning','L1 — Factory Witness Testing','L2 — Installation Verification','L3 — Component Startup','L4 — Performance Testing','L5 — Integrated Systems Testing','L6 — Turnover & Closeout'];
   for(var li=0;li<7;li++){
-    h+='<tr><td><b>'+lvlNames[li]+'</b></td><td style="font-size:9px;color:#6b7280;">'+lvlDescs[li]+'</td><td>'+cxFmtFull(Math.round(res.levels[lvlKeys[li]]))+'</td><td>'+cxPct(res.levels[lvlKeys[li]],res.grandTotal)+'</td><td>'+Math.ceil(res.duration[lvlKeys[li]]/5)+' wks</td></tr>';
+    h+='<tr><td><b>'+lvlNames[li]+'</b></td><td style="font-size:9px;color:#94a3b8;">'+lvlDescs[li]+'</td><td>'+cxFmtFull(Math.round(res.levels[lvlKeys[li]]))+'</td><td>'+cxPct(res.levels[lvlKeys[li]],res.grandTotal)+'</td><td>'+Math.ceil(res.duration[lvlKeys[li]]/5)+' wks</td></tr>';
   }
   h+='<tr style="font-weight:700;background:#f0fdfa;"><td colspan="2">Total (incl. 15% contingency)</td><td>'+cxFmtFull(Math.round(res.grandTotal))+'</td><td>100%</td><td>'+res.duration.weeks+' wks</td></tr>';
   h+='</table></div>';
@@ -4359,11 +4361,11 @@ function cxExportPDF(){
   var discNames=['Electrical','Mechanical','Fire & Life Safety','Security','IT Infrastructure','Controls & BMS','Building Fabric','Project Management'];
   var discKeys=['electrical','mechanical','fire','security','it','controls','building','management'];
   var discPcts=['40%','24%','9%','4%','7%','8%','4%','4%'];
-  h+='<table><tr><th>Discipline</th><th>Est. Cost</th><th>% of Total</th><th>Scope Notes</th></tr>';
+  h+='<table><tr><th scope="col">Discipline</th><th scope="col">Est. Cost</th><th scope="col">% of Total</th><th scope="col">Scope Notes</th></tr>';
   var discNotes=['Switchgear, transformers, generators, UPS, PDU, STS, cabling, grounding','Chillers, pumps, piping, CRAC/CRAH, cooling towers'+(inp.coolingType==='dlc'||inp.coolingType==='immersion'?', CDU, manifolds, liquid loops':''),'FM-200/Novec/Inergen/water, detection, EPO, egress','Access control, CCTV, intrusion detection','Structured cabling, fiber, network, rack power','BMS/DCIM ('+CX_BMS[inp.bmsComplexity].pts+' points), EPMS, controls sequences','Structural, architectural, doors, penetration seals','Cx management, scheduling, reporting, coordination'];
   for(var di=0;di<8;di++){
     discData.push({label:discNames[di].substr(0,10),value:res.disciplines[discKeys[di]],display:cxFmt(res.disciplines[discKeys[di]])});
-    h+='<tr><td><b>'+discNames[di]+'</b></td><td>'+cxFmt(res.disciplines[discKeys[di]])+'</td><td>'+discPcts[di]+'</td><td style="font-size:9px;color:#6b7280;">'+discNotes[di]+'</td></tr>';
+    h+='<tr><td><b>'+discNames[di]+'</b></td><td>'+cxFmt(res.disciplines[discKeys[di]])+'</td><td>'+discPcts[di]+'</td><td style="font-size:9px;color:#94a3b8;">'+discNotes[di]+'</td></tr>';
   }
   h+='</table>';
   h+='<div style="margin-top:8px;">'+cxGenSvgBar(discData,700,160,discColors)+'</div>';
@@ -4373,7 +4375,7 @@ function cxExportPDF(){
   // ===== 7. EQUIPMENT SCALE =====
   h+='<div class="sect"><h2>7. Equipment Scale Summary</h2>';
   h+='<p style="font-size:10px;color:#374151;margin-bottom:6px;">Equipment quantities derived from IT load ('+mw+' MW), redundancy ('+inp.redundancy+'), cooling ('+inp.coolingType.toUpperCase()+'), and rack density ('+CX_DENSITY[inp.rackDensity].kw+' kW/rack).</p>';
-  h+='<table><tr><th>Equipment</th><th>Qty</th><th>FAT Days</th><th>Startup Days</th><th>Notes</th></tr>';
+  h+='<table><tr><th scope="col">Equipment</th><th scope="col">Qty</th><th scope="col">FAT Days</th><th scope="col">Startup Days</th><th scope="col">Notes</th></tr>';
   var eqRows=[
     ['HV/MV Switchgear',eq.switchgear,eq.switchgear*2,eq.switchgear*2,'IR, primary injection, breaker timing, protection relay'],
     ['Transformers',eq.transformers,eq.transformers*3,eq.transformers*1.5,'Turns ratio, oil analysis, heat run, tap changer'],
@@ -4388,13 +4390,13 @@ function cxExportPDF(){
     ['Fire Zones',eq.fireZones,0,eq.fireZones*1.5,'Agent integrity, detection, suppression test'],
     ['BMS Points',CX_BMS[inp.bmsComplexity].pts,0,Math.ceil(CX_BMS[inp.bmsComplexity].pts*mw/100),'Point-to-point, alarm logic, trend verification']
   ];
-  eqRows.forEach(function(r){h+='<tr><td><b>'+r[0]+'</b></td><td style="text-align:center;">'+r[1].toLocaleString()+'</td><td style="text-align:center;">'+r[2]+'</td><td style="text-align:center;">'+r[3]+'</td><td style="font-size:9px;color:#6b7280;">'+r[4]+'</td></tr>';});
+  eqRows.forEach(function(r){h+='<tr><td><b>'+r[0]+'</b></td><td style="text-align:center;">'+r[1].toLocaleString()+'</td><td style="text-align:center;">'+r[2]+'</td><td style="text-align:center;">'+r[3]+'</td><td style="font-size:9px;color:#94a3b8;">'+r[4]+'</td></tr>';});
   h+='</table></div>';
 
   // ===== 8. RESOURCE LOADING =====
   h+='<div class="sect"><h2>8. Resource Loading by Phase</h2>';
   h+='<p style="font-size:10px;color:#374151;margin-bottom:6px;">Person-days per role per commissioning level. CxA rate: '+cxFmt(rate.cxDay)+'/day, Field Tech: '+cxFmt(rate.fieldDay)+'/day, OEM: '+cxFmt(rate.oemDay)+'/day, Witness: '+cxFmt(rate.witnessDay)+'/day.</p>';
-  h+='<table><tr><th>Phase</th><th>CxA Days</th><th>Field Tech</th><th>OEM Days</th><th>Witness</th><th>Est. Cost</th></tr>';
+  h+='<table><tr><th scope="col">Phase</th><th scope="col">CxA Days</th><th scope="col">Field Tech</th><th scope="col">OEM Days</th><th scope="col">Witness</th><th scope="col">Est. Cost</th></tr>';
   var resPh=[
     {n:'L0 Design',cxa:Math.ceil(res.duration.l0*2.5),f:0,o:0,w:0,c:res.levels.l0},
     {n:'L1 FAT',cxa:Math.ceil(res.duration.l1*2),f:Math.ceil(res.duration.l1),o:0,w:Math.ceil(res.duration.l1*0.5),c:res.levels.l1},
@@ -4413,7 +4415,7 @@ function cxExportPDF(){
 
   // ===== 9. REGIONAL RATE CARD =====
   h+='<div class="sect"><h2>9. Regional Rate Card — '+rate.name+'</h2>';
-  h+='<table><tr><th>Role</th><th>Day Rate</th><th>Typical Days</th><th>Est. Total</th></tr>';
+  h+='<table><tr><th scope="col">Role</th><th scope="col">Day Rate</th><th scope="col">Typical Days</th><th scope="col">Est. Total</th></tr>';
   h+='<tr><td>CxA / Lead Engineer</td><td>'+cxFmt(rate.cxDay)+'</td><td>'+totalCxa+'</td><td>'+cxFmt(rate.cxDay*totalCxa)+'</td></tr>';
   h+='<tr><td>Field Technician</td><td>'+cxFmt(rate.fieldDay)+'</td><td>'+totalF+'</td><td>'+cxFmt(rate.fieldDay*totalF)+'</td></tr>';
   h+='<tr><td>OEM Engineer</td><td>'+cxFmt(rate.oemDay)+'</td><td>'+totalO+'</td><td>'+cxFmt(rate.oemDay*totalO)+'</td></tr>';
@@ -4421,7 +4423,7 @@ function cxExportPDF(){
   h+='<tr><td>Per Diem</td><td>'+cxFmt(rate.perDiem)+'/day</td><td>'+res.duration.total+'</td><td>'+cxFmt(rate.perDiem*res.duration.total*3)+'</td></tr>';
   h+='<tr><td>Diesel Fuel</td><td>$'+rate.diesel.toFixed(2)+'/litre</td><td colspan="2">Used for generator testing and load bank operations</td></tr>';
   h+='</table>';
-  h+='<p style="font-size:9px;color:#6b7280;margin-top:4px;">Regional multiplier: '+rate.mult.toFixed(2)+' (base: Northern Virginia = 1.00). Sources: RSMeans 2025, BSRIA regional surveys, local engineering cost data.</p>';
+  h+='<p style="font-size:9px;color:#94a3b8;margin-top:4px;">Regional multiplier: '+rate.mult.toFixed(2)+' (base: Northern Virginia = 1.00). Sources: RSMeans 2025, BSRIA regional surveys, local engineering cost data.</p>';
   h+='</div>';
 
   // ===== PRO-ONLY SECTIONS =====
@@ -4437,7 +4439,7 @@ function cxExportPDF(){
         h+='<div class="pdf-kpi-card"><div class="pdf-kpi-value" style="font-size:13px;">'+cxFmt(p[1])+'</div><div class="pdf-kpi-label">'+p[0]+'</div></div>';
       });
       h+='</div>';
-      h+='<table><tr><th>Statistic</th><th>Value</th><th>Interpretation</th></tr>';
+      h+='<table><tr><th scope="col">Statistic</th><th scope="col">Value</th><th scope="col">Interpretation</th></tr>';
       h+='<tr><td>Mean</td><td>'+cxFmt(mc.mean)+'</td><td>Expected average cost across all simulations</td></tr>';
       h+='<tr><td>Std. Deviation</td><td>'+cxFmt(mc.stdDev)+'</td><td>Cost volatility measure — '+(mc.stdDev/mc.mean<0.1?'low':'moderate')+' variability</td></tr>';
       h+='<tr><td>90% Confidence Range</td><td>'+cxFmt(mc.p5)+' – '+cxFmt(mc.p95)+'</td><td>90% probability cost falls within this range</td></tr>';
@@ -4458,7 +4460,7 @@ function cxExportPDF(){
       h+='<div class="pdf-chart-row">';
       h+='<div><div class="pdf-chart-title">Sensitivity Tornado — Top Drivers</div>'+cxGenSvgTornado(topSens,380,180,res.grandTotal)+'</div>';
       h+='<div><div class="pdf-chart-title">Sensitivity Data</div><table>';
-      h+='<tr><th>Input</th><th>Low Value</th><th>High Value</th><th>Range</th><th>% Impact</th></tr>';
+      h+='<tr><th scope="col">Input</th><th scope="col">Low Value</th><th scope="col">High Value</th><th scope="col">Range</th><th scope="col">% Impact</th></tr>';
       topSens.forEach(function(s){h+='<tr><td><b>'+s.name+'</b></td><td>'+cxFmt(s.low)+'</td><td>'+cxFmt(s.high)+'</td><td>'+cxFmt(s.range)+'</td><td>'+((s.range/res.grandTotal)*100).toFixed(1)+'%</td></tr>';});
       h+='</table></div></div>';
       h+='<div class="pdf-conclusion">Conclusion: "'+sens[0].name+'" is the top sensitivity driver with &plusmn;'+cxFmt(sens[0].range/2)+' impact ('+(sens[0].range/res.grandTotal*100).toFixed(1)+'% of total cost). '+(sens.length>1?'"'+sens[1].name+'" is second at '+(sens[1].range/res.grandTotal*100).toFixed(1)+'%. ':'')+'Focus risk mitigation efforts on the top 2-3 drivers for maximum cost certainty.</div>';
@@ -4473,7 +4475,7 @@ function cxExportPDF(){
     h+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;"><span style="font-size:28px;font-weight:800;color:'+riskColor+';">'+riskScore+'/100</span><span class="pdf-risk-badge" style="background:'+riskColor+'22;color:'+riskColor+';border:1px solid '+riskColor+';">'+riskLabel+' Risk</span></div>';
     h+='<div class="pdf-narr">'+cxGenRiskNarrative(inp,riskScore).replace(/<strong>/g,'<b>').replace(/<\/strong>/g,'</b>').replace(/<br>/g,'<br>')+'</div>';
     h+='<h3>Risk Factor Breakdown</h3><table>';
-    h+='<tr><th>Factor</th><th>Configuration</th><th>Risk Points</th><th>Rationale</th></tr>';
+    h+='<tr><th scope="col">Factor</th><th scope="col">Configuration</th><th scope="col">Risk Points</th><th scope="col">Rationale</th></tr>';
     h+='<tr><td>Base</td><td>—</td><td>20</td><td>Minimum commissioning complexity for any data center</td></tr>';
     if(inp.redundancy==='2N')h+='<tr><td>Redundancy</td><td>2N</td><td>+15</td><td>Dual independent paths double IST scenario scope</td></tr>';
     if(inp.redundancy==='2N+1')h+='<tr><td>Redundancy</td><td>2N+1</td><td>+20</td><td>System + component redundancy: maximum testing complexity</td></tr>';
@@ -4493,7 +4495,7 @@ function cxExportPDF(){
     h+='<div class="page-break"></div>';
     h+='<div class="sect"><h2>13. Multiplier Impact Analysis</h2>';
     h+='<p style="font-size:10px;color:#374151;margin-bottom:6px;">Each input parameter applies a cost and duration multiplier to the base calculation. Multipliers compound — the combined effect determines final cost.</p>';
-    h+='<table><tr><th>Parameter</th><th>Setting</th><th>Cost Mult.</th><th>Duration Mult.</th><th>Effect on Base</th></tr>';
+    h+='<table><tr><th scope="col">Parameter</th><th scope="col">Setting</th><th scope="col">Cost Mult.</th><th scope="col">Duration Mult.</th><th scope="col">Effect on Base</th></tr>';
     var mults=[
       ['Cooling',inp.coolingType.toUpperCase(),CX_COOLING[inp.coolingType].cost,CX_COOLING[inp.coolingType].dur],
       ['Redundancy',inp.redundancy,CX_REDUNDANCY[inp.redundancy].cost,CX_REDUNDANCY[inp.redundancy].dur],
@@ -4519,7 +4521,7 @@ function cxExportPDF(){
     // 14. Phase Gate Requirements
     h+='<div class="sect"><h2>14. Phase Gate Requirements</h2>';
     h+='<p style="font-size:10px;color:#374151;margin-bottom:6px;">Each gate must be formally approved before proceeding to the next level. Prerequisites and sign-off requirements per gate:</p>';
-    h+='<table><tr><th>Gate</th><th>Prerequisites</th><th>Sign-Off Required</th><th>Key Deliverables</th></tr>';
+    h+='<table><tr><th scope="col">Gate</th><th scope="col">Prerequisites</th><th scope="col">Sign-Off Required</th><th scope="col">Key Deliverables</th></tr>';
     var gates=[
       ['L0→L1','Cx Plan approved, points list complete, energization strategy signed','CxA Lead, Design Engineer, Owner Rep','Cx Plan, Points List, Energization Strategy, RFS Definition'],
       ['L1→L2','All FAT complete, no outstanding critical defects, equipment shipped','CxA Lead, Equipment Vendors','FAT reports, shipping confirmations, defect closure log'],
@@ -4535,7 +4537,7 @@ function cxExportPDF(){
     // 15. Industry Benchmark Comparison
     h+='<div class="sect"><h2>15. Industry Benchmark Comparison</h2>';
     h+='<p style="font-size:10px;color:#374151;margin-bottom:6px;">Comparison with published industry benchmarks (BSRIA BG 49:2023, Uptime Institute Annual Survey, NETA standards):</p>';
-    h+='<table><tr><th>Archetype</th><th>Typical Cx $/kW</th><th>% of CAPEX</th><th>Duration</th><th>This Project</th></tr>';
+    h+='<table><tr><th scope="col">Archetype</th><th scope="col">Typical Cx $/kW</th><th scope="col">% of CAPEX</th><th scope="col">Duration</th><th scope="col">This Project</th></tr>';
     var benchmarks=[
       ['Enterprise 2MW (N+1, Air)','$120–180','3–4%','16–24 wks'],
       ['Colocation 10MW (2N, In-Row)','$150–250','3–5%','24–36 wks'],
@@ -4556,7 +4558,7 @@ function cxExportPDF(){
     // 16. Team Composition Recommendation
     h+='<div class="sect"><h2>16. Team Composition Recommendation</h2>';
     var peakTeam=inp.itLoad>=50000?'12–20':inp.itLoad>=10000?'8–12':'5–8';
-    h+='<table><tr><th>Role</th><th>Qty</th><th>Phase Focus</th><th>Qualifications</th></tr>';
+    h+='<table><tr><th scope="col">Role</th><th scope="col">Qty</th><th scope="col">Phase Focus</th><th scope="col">Qualifications</th></tr>';
     h+='<tr><td><b>CxA Program Manager</b></td><td>1</td><td>L0–L6 (full lifecycle)</td><td>10+ years Cx experience, PMP, '+(inp.itLoad>=50000?'campus-scale':'data center')+' track record</td></tr>';
     h+='<tr><td><b>Senior CxA Engineer</b></td><td>'+(inp.itLoad>=50000?'3–4':'1–2')+'</td><td>L0–L5</td><td>NETA Level III/IV, PE preferred, '+inp.coolingType.toUpperCase()+' experience</td></tr>';
     h+='<tr><td><b>Electrical CxA</b></td><td>'+(inp.itLoad>=50000?'4–6':'2–3')+'</td><td>L1–L5</td><td>NETA certified, HV/MV switchgear, protection relay testing</td></tr>';
@@ -4565,12 +4567,12 @@ function cxExportPDF(){
     h+='<tr><td><b>IST Coordinator</b></td><td>1</td><td>L5</td><td>'+rd.tier+' IST experience, '+rd.scenarios+' scenario management</td></tr>';
     h+='<tr><td><b>Document Controller</b></td><td>1</td><td>L0–L6</td><td>Technical writing, Cx report compilation, as-built management</td></tr>';
     h+='</table>';
-    h+='<p style="font-size:9px;color:#6b7280;margin-top:4px;">Peak team size: '+peakTeam+' persons during L5 IST. Minimum team size: 3 persons during L0 planning phase.</p>';
+    h+='<p style="font-size:9px;color:#94a3b8;margin-top:4px;">Peak team size: '+peakTeam+' persons during L5 IST. Minimum team size: 3 persons during L0 planning phase.</p>';
     h+='</div>';
 
     // 17. Gantt Schedule (Tabular)
     h+='<div class="sect"><h2>17. Gantt Schedule (Tabular)</h2>';
-    h+='<table><tr><th>Phase</th><th>Start (Week)</th><th>End (Week)</th><th>Duration</th><th>Dependencies</th></tr>';
+    h+='<table><tr><th scope="col">Phase</th><th scope="col">Start (Week)</th><th scope="col">End (Week)</th><th scope="col">Duration</th><th scope="col">Dependencies</th></tr>';
     var weekOff=0;
     var ganttRows=[
       {n:'L0 — Design & Cx Planning',d:res.duration.l0,dep:'Project award'},
@@ -4590,7 +4592,7 @@ function cxExportPDF(){
     });
     h+='<tr style="font-weight:700;background:#f0fdfa;"><td>Total Program</td><td style="text-align:center;">W1</td><td style="text-align:center;">W'+res.duration.weeks+'</td><td style="text-align:center;">'+res.duration.weeks+' wks ('+res.duration.total+'d)</td><td style="font-size:9px;">Sequential L0→L6</td></tr>';
     h+='</table>';
-    h+='<p style="font-size:9px;color:#6b7280;margin-top:4px;">Note: Schedule assumes sequential execution. Parallel work streams (e.g., L1 overlapping late L0, L6 overlapping late L5) can compress total duration by 15–25% but require additional coordination resources.</p>';
+    h+='<p style="font-size:9px;color:#94a3b8;margin-top:4px;">Note: Schedule assumes sequential execution. Parallel work streams (e.g., L1 overlapping late L0, L6 overlapping late L5) can compress total duration by 15–25% but require additional coordination resources.</p>';
     h+='</div>';
 
     // 18. Recommendations (Pro)
@@ -4641,7 +4643,7 @@ function cxExportPDF(){
     // 11. Methodology (Free)
     h+='<div class="sect"><h2>11. Methodology &amp; Sources</h2>';
     h+='<p style="font-size:9.5px;color:#374151;line-height:1.6;">L0-L6 full lifecycle commissioning model (v2.0, March 2026). ASHRAE Guideline 0-2019 provides the lifecycle commissioning process backbone; L0-L6 are project-delivery levels used in practice, not ASHRAE-defined hierarchy. Base costs derived from BSRIA BG 49:2023, Uptime Institute Annual Survey, and industry benchmarks (n=50+, 2021-2026). Duration estimates per NETA ECS/ATS-2025. Regional rates combine RSMeans 2025, BSRIA, and local engineering surveys.</p>';
-    h+='<p style="font-size:9px;color:#6b7280;margin-top:6px;">For Monte Carlo simulation, sensitivity analysis, risk assessment, multiplier impact analysis, phase gate requirements, benchmark comparison, team composition, and Gantt schedule — upgrade to Pro Analysis mode.</p>';
+    h+='<p style="font-size:9px;color:#94a3b8;margin-top:6px;">For Monte Carlo simulation, sensitivity analysis, risk assessment, multiplier impact analysis, phase gate requirements, benchmark comparison, team composition, and Gantt schedule — upgrade to Pro Analysis mode.</p>';
     h+='</div>';
 
     // 12. Disclaimer (Free)
@@ -4749,9 +4751,9 @@ function cxRenderWitnessMatrix(ganttData){
     var ph=item.phase;
     if(counts[w]&&counts[w][ph]!==undefined)counts[w][ph]++;
   });
-  var html='<table style="width:100%;border-collapse:collapse;font-size:0.75rem;"><thead><tr><th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;">Type</th>';
-  ['L0','L1','L2','L3','L4','L5','L6'].forEach(function(p){html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;">'+p+'</th>';});
-  html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;">Total</th></tr></thead><tbody>';
+  var html='<table style="width:100%;border-collapse:collapse;font-size:0.75rem;"><thead><tr><th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Type</th>';
+  ['L0','L1','L2','L3','L4','L5','L6'].forEach(function(p){html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">'+p+'</th>';});
+  html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Total</th></tr></thead><tbody>';
   [{k:'H',n:'Hold Point',c:'#ef4444'},{k:'W',n:'Witness Point',c:'#f59e0b'},{k:'R',n:'Review Point',c:'#22d3ee'}].forEach(function(row){
     var total=0;
     html+='<tr><td style="padding:6px 8px;color:'+row.c+';font-weight:700;">'+row.n+'</td>';
@@ -4859,9 +4861,9 @@ function cxRenderInstruments(ganttData){
   });
   var sorted=Object.keys(instruments).sort(function(a,b){return instruments[b].count-instruments[a].count;});
   var html='<table style="width:100%;border-collapse:collapse;font-size:0.75rem;"><thead><tr>';
-  html+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;">Instrument</th>';
-  html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;">Uses</th>';
-  html+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;">Phases</th>';
+  html+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Instrument</th>';
+  html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Uses</th>';
+  html+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Phases</th>';
   html+='</tr></thead><tbody>';
   sorted.slice(0,20).forEach(function(k){
     var inst=instruments[k];
@@ -5502,7 +5504,7 @@ function cxRenderManual(){
       note('Your inputs are auto-saved in browser localStorage. When you return, your last configuration will be restored automatically.');
     }},
     {id:'input-params',title:'Input Parameters',icon:'fa-sliders',desc:'Detailed guide to all 14 configuration parameters',body:function(){
-      return '<table class="cx-manual-table"><thead><tr><th>#</th><th>Parameter</th><th>Range</th><th>Impact</th><th>Mode</th></tr></thead><tbody>'+
+      return '<table class="cx-manual-table"><thead><tr><th scope="col">#</th><th scope="col">Parameter</th><th scope="col">Range</th><th scope="col">Impact</th><th scope="col">Mode</th></tr></thead><tbody>'+
       '<tr><td>1</td><td><strong>IT Load Capacity</strong></td><td>100–100,000 kW</td><td>Primary scaling factor for all costs and durations</td><td>Free</td></tr>'+
       '<tr><td>2</td><td><strong>Cooling Type</strong></td><td>Air / In-Row / RDHX / DLC / Immersion</td><td>1.0x to 1.55x cost multiplier</td><td>Free</td></tr>'+
       '<tr><td>3</td><td><strong>Redundancy</strong></td><td>N / N+1 / 2N / 2N+1</td><td>Biggest cost driver — 2N doubles scope</td><td>Free</td></tr>'+
@@ -5521,7 +5523,7 @@ function cxRenderManual(){
       note('Parameters 9-14 require Pro mode. Free mode uses industry-standard defaults for these parameters.');
     }},
     {id:'scenarios',title:'Scenario Presets',icon:'fa-layer-group',desc:'Understanding the 8 facility archetypes',body:function(){
-      return '<table class="cx-manual-table"><thead><tr><th>Preset</th><th>IT Load</th><th>Cooling</th><th>Redundancy</th><th>Typical Cx Cost</th><th>Duration</th></tr></thead><tbody>'+
+      return '<table class="cx-manual-table"><thead><tr><th scope="col">Preset</th><th scope="col">IT Load</th><th scope="col">Cooling</th><th scope="col">Redundancy</th><th scope="col">Typical Cx Cost</th><th scope="col">Duration</th></tr></thead><tbody>'+
       '<tr><td><strong>Enterprise 2MW</strong></td><td>2,000 kW</td><td>Air (CRAC)</td><td>N+1</td><td>$120-180/kW</td><td>16-24 weeks</td></tr>'+
       '<tr><td><strong>Colo 10MW</strong></td><td>10,000 kW</td><td>In-Row</td><td>2N</td><td>$150-250/kW</td><td>24-36 weeks</td></tr>'+
       '<tr><td><strong>Hyperscale 50MW</strong></td><td>50,000 kW</td><td>DLC</td><td>2N+1</td><td>$100-200/kW</td><td>36-52 weeks</td></tr>'+
@@ -5552,7 +5554,7 @@ function cxRenderManual(){
       s(6,'Export','Use <strong>CSV</strong> to download the schedule as a spreadsheet. Use <strong>Procedures</strong> to bulk-export all mapped procedures as a single PDF document.')+
       note('Activity durations are calculated from equipment quantities, which are derived from your IT load input. Changing the IT load will update all activity durations proportionally.')+
       '<h4 style="color:#f1f5f9;margin:1rem 0 0.5rem;">Phase Color Legend</h4>'+
-      '<table class="cx-manual-table"><thead><tr><th>Color</th><th>Phase</th><th>Typical %</th></tr></thead><tbody>'+
+      '<table class="cx-manual-table"><thead><tr><th scope="col">Color</th><th scope="col">Phase</th><th scope="col">Typical %</th></tr></thead><tbody>'+
       '<tr><td style="color:#64748b;">Gray</td><td>L0 — Design &amp; Planning</td><td>8%</td></tr>'+
       '<tr><td style="color:#3b82f6;">Blue</td><td>L1 — FAT</td><td>12%</td></tr>'+
       '<tr><td style="color:#10b981;">Green</td><td>L2 — Installation</td><td>20%</td></tr>'+
@@ -5597,7 +5599,7 @@ function cxRenderManual(){
       note('All charts in the PDF use inline SVG (not Canvas) to ensure they render correctly in the print dialog across all browsers.');
     }},
     {id:'keyboard',title:'Keyboard Shortcuts',icon:'fa-keyboard',desc:'Quick navigation and actions',body:function(){
-      return '<table class="cx-manual-table"><thead><tr><th>Key</th><th>Action</th><th>Context</th></tr></thead><tbody>'+
+      return '<table class="cx-manual-table"><thead><tr><th scope="col">Key</th><th scope="col">Action</th><th scope="col">Context</th></tr></thead><tbody>'+
       '<tr><td><span class="cx-manual-kbd">Enter</span></td><td>Run calculation</td><td>When not in an input field or modal</td></tr>'+
       '<tr><td><span class="cx-manual-kbd">Esc</span></td><td>Close modal / drawer</td><td>When modal or drawer is open</td></tr>'+
       '<tr><td><span class="cx-manual-kbd">Ctrl</span>+<span class="cx-manual-kbd">P</span></td><td>Print / Save as PDF</td><td>In PDF export window</td></tr>'+
@@ -5614,7 +5616,7 @@ function cxRenderManual(){
       s(7,'Data not saving','localStorage must be enabled in your browser. Private/incognito browsing may disable localStorage. Your inputs are saved automatically on every change.');
     }},
     {id:'glossary-ext',title:'Extended Glossary',icon:'fa-book-open',desc:'Complete terminology reference (30+ terms)',body:function(){
-      return '<table class="cx-manual-table"><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody>'+
+      return '<table class="cx-manual-table"><thead><tr><th scope="col">Term</th><th scope="col">Definition</th></tr></thead><tbody>'+
       '<tr><td><strong>BOD</strong></td><td>Basis of Design — describes how the design meets the OPR</td></tr>'+
       '<tr><td><strong>BMS</strong></td><td>Building Management System — monitors and controls mechanical/electrical systems</td></tr>'+
       '<tr><td><strong>CAPEX</strong></td><td>Capital Expenditure — total facility construction cost</td></tr>'+
@@ -5728,14 +5730,14 @@ function cxRenderComparison(inp,res){
   var el=document.getElementById('cxComparisonContent');
   if(!el)return;
   var presets=['enterprise_2mw','colo_10mw','hyperscale_50mw','ai_factory_100mw','modular_5mw','fast_track'];
-  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th>Metric</th><th style="color:#22d3ee;">Your Config</th>';
+  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th scope="col">Metric</th><th style="color:#22d3ee;"  scope="col">Your Config</th>';
   var compResults=[];
   presets.forEach(function(pk){
     var s=CX_SCENARIOS[pk];
     var ci={itLoad:s.itLoad,coolingType:s.coolingType,redundancy:s.redundancy,rackDensity:s.rackDensity,buildingType:s.buildingType,fireSuppression:s.fireSuppression||'novec',upsType:s.upsType||'modular',region:inp.region,generatorType:s.generatorType||'diesel',seismicZone:s.seismicZone||'1',cxScope:s.cxScope||'new_build',substationConfig:s.substationConfig||'single_sub',bmsComplexity:s.bmsComplexity||'standard',deliveryMethod:s.deliveryMethod||'traditional'};
     var cr=cxCalcTotalCost(ci);
     compResults.push({name:pk.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}),res:cr,inp:ci});
-    html+='<th>'+pk.split('_')[0].charAt(0).toUpperCase()+pk.split('_')[0].slice(1)+'</th>';
+    html+='<th scope="col">'+pk.split('_')[0].charAt(0).toUpperCase()+pk.split('_')[0].slice(1)+'</th>';
   });
   html+='</tr></thead><tbody>';
   var rows=[
@@ -5842,7 +5844,7 @@ function cxRenderTeam(res,inp){
   ];
   var total=roles.reduce(function(s,r){return s+Math.ceil(r.count);},0);
   var html='<div style="font-size:0.78rem;margin-bottom:0.75rem;color:#94a3b8;">Recommended team: <strong style="color:#22d3ee;">'+total+' personnel</strong> (peak deployment during L3-L5)</div>';
-  html+='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th>Role</th><th>Count</th><th>Phases</th><th>Responsibility</th></tr></thead><tbody>';
+  html+='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th scope="col">Role</th><th scope="col">Count</th><th scope="col">Phases</th><th scope="col">Responsibility</th></tr></thead><tbody>';
   roles.forEach(function(r){
     html+='<tr><td><strong>'+r.role+'</strong></td><td style="text-align:center;color:#22d3ee;font-weight:600;">'+Math.ceil(r.count)+'</td><td>'+r.phase+'</td><td style="color:#94a3b8;">'+r.note+'</td></tr>';
   });
@@ -5855,7 +5857,7 @@ function cxRenderBenchmarkPanel(res,inp){
   var el=document.getElementById('cxBenchmarkContent');
   if(!el)return;
   var regions=['us_virginia','uk_london','singapore','australia_sydney','uae_dubai','japan_tokyo','india_mumbai','germany_frankfurt'];
-  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th>Region</th><th>CxA Day Rate</th><th>Est. Total Cost</th><th>Cost Index</th></tr></thead><tbody>';
+  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th scope="col">Region</th><th scope="col">CxA Day Rate</th><th scope="col">Est. Total Cost</th><th scope="col">Cost Index</th></tr></thead><tbody>';
   var baseTotal=res.grandTotal;
   regions.forEach(function(rk){
     var rate=cxGetRate(rk);

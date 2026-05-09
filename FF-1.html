@@ -1746,9 +1746,9 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Period</th>
-                                <th>Primary Shift</th>
-                                <th>What It Changed</th>
+                                <th scope="col">Period</th>
+                                <th scope="col">Primary Shift</th>
+                                <th scope="col">What It Changed</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1835,9 +1835,9 @@
                 <table class="hfx-timeline-table">
                     <thead>
                         <tr>
-                            <th>2026-2028 Shift</th>
-                            <th>Most Exposed</th>
-                            <th>Most Resilient</th>
+                            <th scope="col">2026-2028 Shift</th>
+                            <th scope="col">Most Exposed</th>
+                            <th scope="col">Most Resilient</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3470,7 +3470,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
         html += '<div class="pdf-score"><div class="pdf-score-num">' + data.readiness + '</div><div class="pdf-score-meta"><strong>Future Readiness /100</strong><br>Grade ' + band.grade + ' — ' + band.label + '<br>12M visit risk: ' + data.visitRiskPct.toFixed(1) + '% | Moat density: ' + data.moatScore + '/100 | Revenue risk: ' + money(data.monthlyRevenueRisk) + '/mo</div></div>';
 
-        html += '<h2>Input Parameters</h2><table><tr><th style="width:30%">Parameter</th><th style="width:20%">Value</th><th style="width:30%">Parameter</th><th style="width:20%">Value</th></tr>';
+        html += '<h2>Input Parameters</h2><table><tr><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th><th style="width:30%"  scope="col">Parameter</th><th style="width:20%"  scope="col">Value</th></tr>';
         html += '<tr><td>Monthly sessions</td><td>' + Math.round(inp.sessions).toLocaleString('en-US') + '</td><td>Search dependency</td><td>' + inp.searchShare + '%</td></tr>';
         html += '<tr><td>Direct share</td><td>' + inp.directShare + '%</td><td>AI-exposed share</td><td>' + inp.aiExposure + '%</td></tr>';
         html += '<tr><td>Interactive share</td><td>' + inp.interactiveShare + '%</td><td>Returning visitor rate</td><td>' + inp.returnRate + '%</td></tr>';
@@ -3489,7 +3489,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
         html += '</div>';
 
         html += '<h2>Strategic Readout</h2>';
-        html += '<table><tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr>';
+        html += '<table><tr><th scope="col">Metric</th><th scope="col">Value</th><th scope="col">Interpretation</th></tr>';
         html += '<tr><td>Search fragility</td><td>' + data.searchFragility + '/100</td><td>' + (data.searchFragility >= 70 ? 'Discovery is dangerously rented' : data.searchFragility >= 50 ? 'Meaningful top-funnel exposure' : 'Discovery risk is manageable') + '</td></tr>';
         html += '<tr><td>Owned buffer</td><td>' + data.ownedBuffer + '/100</td><td>' + (data.ownedBuffer >= 45 ? 'Owned demand is becoming structural' : data.ownedBuffer >= 30 ? 'Some protection exists' : 'Too little direct audience insulation') + '</td></tr>';
         html += '<tr><td>Platform volatility</td><td>' + data.platformVolatility + '/100</td><td>' + (data.platformVolatility >= 60 ? 'Business is overexposed to platform policy and feed shifts' : 'Platform risk exists but can be diluted') + '</td></tr>';
@@ -3498,13 +3498,13 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
         if (mc) {
             html += '<h2>Pro Scenario View</h2>';
-            html += '<table><tr><th>Scenario</th><th>12M loss</th><th>Interpretation</th></tr>';
+            html += '<table><tr><th scope="col">Scenario</th><th scope="col">12M loss</th><th scope="col">Interpretation</th></tr>';
             html += '<tr><td>Median modeled loss</td><td>-' + mc.median.toFixed(1) + '%</td><td>Expected case under current mix</td></tr>';
             html += '<tr><td>P90 modeled loss</td><td>-' + mc.p90.toFixed(1) + '%</td><td>Bad-case planning reference</td></tr>';
             html += '<tr><td>Stabilize path</td><td>-' + data.stabilizeLoss.toFixed(1) + '%</td><td>Tighten capture, structure, and retention without a full model shift</td></tr>';
             html += '<tr><td>Rebuild utility path</td><td>-' + data.rebuildLoss.toFixed(1) + '%</td><td>Best modeled outcome if the site becomes more useful, owned, and repeatable</td></tr></table>';
             if (sens && sens.length) {
-                html += '<h2>Top Levers</h2><table><tr><th>Lever</th><th>Readiness gain</th><th>Risk reduction</th></tr>';
+                html += '<h2>Top Levers</h2><table><tr><th scope="col">Lever</th><th scope="col">Readiness gain</th><th scope="col">Risk reduction</th></tr>';
                 sens.slice(0, 5).forEach(function(item) {
                     html += '<tr><td>' + item.name + '</td><td>+' + item.gain.toFixed(1) + ' pts</td><td>' + item.riskDrop.toFixed(1) + ' pts</td></tr>';
                 });

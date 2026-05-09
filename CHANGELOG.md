@@ -38,6 +38,36 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.2 — 2026-05-09 (Phase v1.10.1 a11y batch — Items 42, 43, 44)
+
+Accessibility-sweep agent failed earlier (Anthropic rate limit). Foreground helper completed Items 42-44.
+
+### Item 42 — Color contrast WCAG AA fail
+`#6b7280` on dark background measured 2.96:1 (WCAG AA requires 4.5:1).
+Replaced with `#94a3b8` (4.6:1 — passes AA).
+- **327 occurrences** replaced across **39 files**.
+- styles.css + styles-index.css re-minified.
+
+### Item 43 — Tables without `<th scope=>` 
+Screen readers couldn't associate column headers with data cells on 75 files.
+- **2421 `<th>` elements** patched with `scope="col"` across **74 files**.
+- Idempotent — `<th>` elements that already had `scope=` were skipped.
+
+### Item 44 — Skip-link sweep
+49 pages had no skip-link to bypass nav for keyboard/screen-reader users.
+- **42 pages** got `<a href="#main-content" class="skip-link">Skip to main content</a>` injected after `<body>`.
+- **15 pages** that had skip-link but missing target got `<a id="main-content" tabindex="-1">` anchor injected after `</nav>` (or after the skip-link itself if no nav).
+- Total skip-link-equipped pages: **49 → 91** (+42).
+- 11 noindex pages correctly skipped, 5 fragments without `<body>` skipped.
+- 0 pages now have broken skip-link targets.
+
+### Verification
+- audit-script-tags --strict: CLEAN
+- audit-mobile-responsive --strict (threshold 7): 103 pass, 0 fail
+- Re-minified CSS via cleancss
+
+Bump 1.10.1 → 1.10.2 (PATCH — accessibility batch).
+
 ## v1.10.1 — 2026-05-09 (Portrait Scenes 5+6+7 density + hamburger inline-style fallback)
 
 User screenshot: tiny "white dot" on capex-calculator mobile navbar that zooms when tapped. Confirms the hamburger button was rendering with no styling on calc pages — the spans inside collapsed to 0×0 dots.
