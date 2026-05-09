@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.10.8 — 2026-05-09 (Image aspect-ratio + card-fill + footer responsive)
+
+User screenshots: "ini gambarnya stretch, need keep aspect ratio, ini juga cardnya saat 100% mobile view kok cardnya ke sisi kiri tidak fill (card area og image) dan card terms dll (akhir) dan card footer navbar tidak responsive full".
+
+**Root cause** (3 issues):
+1. `.brief-hero-img` mobile patch had `object-fit: cover` + `max-height: 220px` but no defined box-height → browsers couldn't crop properly, image rendered with squashed aspect ratio.
+2. Mobile cards (`.brief-card`, `.calc-disclaimer`, `.results-card`, etc.) had inherited margin/padding from desktop rules — left-aligned with empty right gutter on narrow viewports.
+3. `<footer>` + `.footer-grid` inherited fixed-width desktop padding → not full-width on mobile.
+
+### Fix
+- **Aspect-ratio preservation**: every `.brief-hero-img` variant now declares `aspect-ratio: 1200 / 669; object-fit: cover; height: auto` — locks the rendered box to the source image ratio. CSS `aspect-ratio` is supported in all modern browsers since 2021.
+- **Card width-fill**: explicit `width: 100% !important; max-width: 100% !important; margin-left/right: 0 !important; box-sizing: border-box` on every card class (`.brief-card`, `.results-card`, `.input-section`, `.calc-disclaimer`, `.scenario-card`, `.model-card`, `.summary-card`, `.kpi-card`, `.tier-card`, `.feature-card`, `.terms-card`, `.info-card`, plus prefixed variants).
+- **Section wrappers**: `.brief-section`, `.results-section`, `.calc-section`, `.scenario-section` get full-viewport-width with consistent 1rem padding.
+- **Footer full-width**: `<footer>` + `.footer-grid` get `width: 100%; max-width: 100vw; margin: 0; box-sizing: border-box; grid-template-columns: 1fr`.
+- **Disclaimer / terms cards**: `width: calc(100% - 1rem)` + `margin: 0 0.5rem 1rem` for breathing room without left-bias.
+
+### Files changed
+- 7 calc pages: `opex/capex/roi/tco/pue/cx/carbon-footprint-calculator.html` (inline `<style>` patch).
+- `styles.css` + `styles-index.css` (global rule for non-calc pages).
+- Both stylesheets re-minified.
+- `js/rz-version.js` 1.10.7 → 1.10.8.
+
+Bump 1.10.7 → 1.10.8 (PATCH — visual responsive fix).
+
+---
+
 ## v1.9.1 — 2026-05-09 (Mobile drawer dropdown toggle — collapse + expand)
 
 User: "menu dc solution bisa expanded tapi nggak bisa di shrinked/di susutkan, saat mobile view".
