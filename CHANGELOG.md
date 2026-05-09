@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.4.1 — 2026-05-09
+- **Fix**: `.input-field` selects + inputs were rendering with white backgrounds in dark mode on opex/capex/roi/pue/carbon-footprint. Root cause: class-mismatch — HTML uses `<select class="input-field">` but the dark-mode CSS targeted page-prefixed classes (`.opex-input` / `.capex-input` etc.) that don't exist in the markup. Effectively the entire input dark-mode coverage was a no-op on 5 calc pages.
+- **Pages affected**: opex / capex / roi / pue / carbon-footprint. tco + cx were already correct (they use prefixed `.tco-input-field` + `.cx-input-field` consistently in HTML + CSS).
+- **Fix scope**: added `[data-theme="dark"] .input-field` + `.country-select` + option overrides + focus state to all 5 affected pages. Fields now render with slate (#1e293b) background, light text (#f1f5f9), and emerald focus glow.
+
 ## v1.4.0 — 2026-05-09 (Awwwards uplift — adopt linear.app + vercel.com + resend.com patterns)
 
 User: "enhance more agar tidak terlihat default claude standard theme, tapi yg keren. Cari website yg keren di website dan adopt".
