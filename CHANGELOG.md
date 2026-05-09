@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.9.1 — 2026-05-09 (Mobile drawer dropdown toggle — collapse + expand)
+
+User: "menu dc solution bisa expanded tapi nggak bisa di shrinked/di susutkan, saat mobile view".
+
+**Root cause**: my v1.8.4-v1.8.5 mobile drawer CSS forced dropdowns to be `max-height: 50vh; overflow: visible` always — i.e., dropdowns expanded permanently when drawer opened. No way to collapse them. Once "DC Solutions" sub-items were visible, they stayed visible, cluttering the drawer.
+
+### Fix
+
+**`js/rz-mobile-nav.js` (cache-bust `?v=2026-05-09c`)**:
+- Click handler intercepts taps on `.nav-dropdown > a` (dropdown trigger) inside the open drawer.
+- Toggles `.is-mobile-open` class on the parent `<li class="nav-dropdown">` instead of navigating to the link.
+- Updates `aria-expanded` for accessibility.
+
+**CSS (both stylesheets)**:
+- Default: dropdown `max-height: 0; opacity: 0; visibility: hidden` inside open drawer — COLLAPSED.
+- Active: `.nav-dropdown.is-mobile-open .dropdown-menu` → `max-height: 600px; opacity: 1` — EXPANDED.
+- 300ms cubic-bezier ease for the height + opacity transition.
+- Sub-menu gets a left mint-accent border + indented background tint for visual hierarchy.
+- Replaces the existing SVG `.dropdown-arrow` with a `::after` `+` that rotates 45° to become `×` when expanded — clearer "tap to toggle" affordance on touch devices.
+- `prefers-reduced-motion` disables transitions.
+
+Cache-bust bumped: `styles-index.min.css?v=20260509-dropdown` + `rz-mobile-nav.js?v=2026-05-09c`.
+
+Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
+
 ## v1.9.0 — 2026-05-09 (Plan v15 audit aggregate + Remotion v5 + Phase 1 critical security)
 
 User: "Continue, audit total feature, cari celah error, bug terkait functionality atau area improvement. High and medium impact at least 500 item".

@@ -7671,3 +7671,71 @@ section {
         border-radius: 2px;
     }
 }
+
+/* ==========================================================================
+   v1.9.1 — Mobile drawer dropdown toggle (collapsed by default, tap to expand)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* When drawer is open, dropdowns are COLLAPSED by default */
+    body.rz-nav-open .nav-dropdown .dropdown-menu,
+    body.rz-nav-open .nav-dropdown > .dropdown-menu {
+        max-height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        transition: max-height 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+                    opacity 0.2s ease,
+                    padding 0.3s ease;
+    }
+
+    /* When parent <li.nav-dropdown> has .is-mobile-open, EXPAND the menu */
+    body.rz-nav-open .nav-dropdown.is-mobile-open .dropdown-menu,
+    body.rz-nav-open .nav-dropdown.is-mobile-open > .dropdown-menu {
+        max-height: 600px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        padding: 0.5rem 0 0.5rem 1rem !important;
+        background: rgba(255,255,255,0.02) !important;
+        border-left: 2px solid rgba(125,221,180,0.3);
+        margin-left: 0.5rem;
+    }
+
+    /* Dropdown arrow rotates 180deg when open */
+    body.rz-nav-open .nav-dropdown > a .dropdown-arrow {
+        transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    body.rz-nav-open .nav-dropdown.is-mobile-open > a .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* Dropdown trigger gets a "tappable" indicator in drawer mode */
+    body.rz-nav-open .nav-dropdown > a {
+        position: relative;
+    }
+    body.rz-nav-open .nav-dropdown > a::after {
+        content: '+';
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: rgba(125,221,180,0.6);
+        transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    body.rz-nav-open .nav-dropdown.is-mobile-open > a::after {
+        transform: translateY(-50%) rotate(45deg);  /* + becomes × */
+    }
+    /* Hide the existing svg dropdown-arrow on mobile (using ::after instead) */
+    body.rz-nav-open .nav-dropdown > a .dropdown-arrow {
+        display: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        body.rz-nav-open .nav-dropdown .dropdown-menu,
+        body.rz-nav-open .nav-dropdown > a::after,
+        body.rz-nav-open .nav-dropdown > a .dropdown-arrow { transition: none; }
+    }
+}

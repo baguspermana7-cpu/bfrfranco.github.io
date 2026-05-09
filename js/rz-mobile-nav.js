@@ -83,11 +83,26 @@
             setOpen(!document.body.classList.contains('rz-nav-open'));
         });
 
-        // Close when an in-menu link is clicked (but not if it's a dropdown trigger)
+        // Click handler for in-menu links and dropdown triggers
         document.addEventListener('click', function(e){
             if (!document.body.classList.contains('rz-nav-open')) return;
             // Don't close if clicking the burger itself
             if (e.target.closest('.rz-nav-burger')) return;
+
+            // DROPDOWN TOGGLE: clicking a .nav-dropdown > a (with aria-haspopup or .dropdown-arrow)
+            // — toggle the .is-mobile-open class on the parent <li>, don't navigate.
+            var dropdownTrigger = e.target.closest('.nav-dropdown > a, [aria-haspopup="true"]');
+            if (dropdownTrigger) {
+                var parentLi = dropdownTrigger.closest('.nav-dropdown');
+                if (parentLi) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var isOpen = parentLi.classList.toggle('is-mobile-open');
+                    dropdownTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                    return;
+                }
+            }
+
             // Outside-click: if click is OUTSIDE the open menu AND outside the navbar, close
             var insideMenu = e.target.closest('.nav-menu, .nav-links, .cx-nav-links, .rfs-nav-links');
             var insideNavbar = e.target.closest('nav.navbar, header.navbar, nav.cx-nav, nav.rfs-navbar');
@@ -95,7 +110,8 @@
                 setOpen(false);
                 return;
             }
-            // In-menu link click — close (but not if it's a dropdown summary/expander)
+
+            // In-menu link click → close drawer (regular link nav)
             var link = e.target.closest('.nav-menu a, .nav-links a, .cx-nav-links a');
             if (link && !link.matches('.nav-dropdown > a, summary, [aria-haspopup="true"]')) {
                 setOpen(false);
