@@ -730,6 +730,99 @@
         }
         /* Ensure page content stacks above fixed particle canvas */
         #main-content, .ticker-bar, .footer, .footer-enhanced { position: relative; z-index: 1; }
+
+        /* ==========================================================================
+           v1.6.2 — Awwwards uplift on articles hub (aurora + gradient + card dark)
+           Mirror linear.app + vercel.com + resend.com patterns
+           ========================================================================== */
+
+        /* Aurora mesh on articles-hero (dark mode only) */
+        [data-theme="dark"] .articles-hero { position: relative; overflow: hidden; }
+        [data-theme="dark"] .articles-hero::before,
+        [data-theme="dark"] .articles-hero::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+        }
+        [data-theme="dark"] .articles-hero::before {
+            background:
+                radial-gradient(60% 50% at 18% 22%, rgba(96,165,250,0.18), transparent 65%),
+                radial-gradient(55% 45% at 80% 30%, rgba(125,221,180,0.14), transparent 65%),
+                radial-gradient(70% 60% at 50% 90%, rgba(167,139,250,0.10), transparent 70%);
+            filter: blur(40px);
+            animation: rzAuroraDrift 22s ease-in-out infinite alternate;
+        }
+        [data-theme="dark"] .articles-hero::after {
+            background:
+                radial-gradient(45% 35% at 88% 75%, rgba(251,191,36,0.10), transparent 65%),
+                radial-gradient(40% 30% at 12% 75%, rgba(244,114,182,0.08), transparent 65%);
+            filter: blur(50px);
+            animation: rzAuroraDrift 28s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes rzAuroraDrift {
+            0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+            50%  { transform: translate3d(2%, -1.5%, 0) scale(1.05); opacity: 1; }
+            100% { transform: translate3d(-1.5%, 1.5%, 0) scale(1.02); opacity: 0.92; }
+        }
+        [data-theme="dark"] .articles-hero > * { position: relative; z-index: 1; }
+
+        /* Gradient-shift text on H1 */
+        [data-theme="dark"] .articles-hero h1 {
+            background: linear-gradient(120deg, #f8fafc 0%, #60a5fa 35%, #7DDDB4 65%, #f8fafc 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            animation: rzNameSweep 12s ease-in-out infinite;
+        }
+        @keyframes rzNameSweep {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
+        /* Article card dark-mode override (was hardcoded #fff) */
+        [data-theme="dark"] .article-card {
+            background: rgba(30, 41, 59, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(8px);
+        }
+        [data-theme="dark"] .article-card-title { color: #f1f5f9 !important; }
+        [data-theme="dark"] .article-card-excerpt { color: #cbd5e1 !important; }
+        [data-theme="dark"] .article-card-meta { color: #94a3b8 !important; }
+
+        /* Article card shine sweep on hover */
+        [data-theme="dark"] .article-card { position: relative; overflow: hidden; }
+        [data-theme="dark"] .article-card::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.08) 55%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 2;
+        }
+        [data-theme="dark"] .article-card:hover::after { transform: translateX(100%); }
+        [data-theme="dark"] .article-card:hover {
+            border-color: transparent !important;
+            box-shadow:
+                0 0 0 1px rgba(96,165,250,0.4),
+                0 18px 40px rgba(0,0,0,0.5),
+                0 0 60px rgba(96,165,250,0.12);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            [data-theme="dark"] .articles-hero::before,
+            [data-theme="dark"] .articles-hero::after,
+            [data-theme="dark"] .articles-hero h1 { animation: none !important; }
+        }
+
+        /* Catch the .philosophy-card white-bg gap */
+        [data-theme="dark"] .philosophy-card {
+            background: rgba(30, 41, 59, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .philosophy-card h3,
+        [data-theme="dark"] .philosophy-card .philosophy-title { color: #f1f5f9; }
     </style>
 
     <link rel="prefetch" href="article-26.html">

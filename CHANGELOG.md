@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.6.2 — 2026-05-09 (articles.html hub Awwwards uplift)
+
+- **Aurora mesh hero** on `.articles-hero` (blue/mint/violet/gold/pink radial gradients drifting)
+- **Gradient-shift H1** on "Operations Engineering Journal" (slate→blue→mint→slate sweep, 12s)
+- **Article-card dark-mode override**: was `background: #fff` (hardcoded white) — now `rgba(30,41,59,0.6)` + 1px white-mix border + 8px backdrop blur. Cards finally render properly in dark mode.
+- **Article-card shine sweep on hover** + 3-layer mint-glow shadow (matches index + datacenter-solutions pattern).
+- **Philosophy-card** dark-mode override (was hardcoded white).
+- Honours `prefers-reduced-motion`.
+
 ## v1.6.1 — 2026-05-09
 - **Sitemap regenerated**: 102 indexable URLs (was 101) — `/changelog.html` now included.
 - **llms.txt regenerated**: 140 lines / 97 pages — `/changelog.html` now listed for AI search engines.
