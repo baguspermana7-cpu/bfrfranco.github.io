@@ -11,6 +11,10 @@ release sections rather than semver.
 
 ---
 
+## v1.7.2 — 2026-05-09
+- **Nav link**: added `Tools & Calculators` to index.html Insights dropdown with mint accent + NEW badge. Changelog `NEW` badge moved to Tools (more recent ship).
+- IndexNow ping for v1.7.x: 7 URLs submitted (HTTP 200).
+
 ## v1.7.1 — 2026-05-09 (public /tools.html hub page)
 
 - **NEW**: `/tools.html` (591 lines, 38 KB) — public hub page listing all 18 calculators + tools across 4 categories:
