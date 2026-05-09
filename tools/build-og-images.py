@@ -114,6 +114,66 @@ TARGETS = [
     ),
 ]
 
+# Dynamically extend TARGETS with article + compare + pillar + FF + geopolitics pages
+# Each tuple: (slug, title, subtitle, accent_color)
+import re as _re
+_ROOT = Path(__file__).resolve().parent.parent
+
+def _extract_title_and_desc(html_path):
+    """Extract <title> and meta description from a page."""
+    if not html_path.exists():
+        return None, None
+    try:
+        text = html_path.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return None, None
+    title_m = _re.search(r"<title>([^<]*)</title>", text, _re.IGNORECASE)
+    desc_m = _re.search(r'<meta\s+name=["\']description["\']\s+content=["\']([^"\']*)["\']', text, _re.IGNORECASE)
+    title = (title_m.group(1).strip() if title_m else "").split(" | ")[0].split(" — ")[0]
+    desc = (desc_m.group(1).strip() if desc_m else "").rstrip(".") + "."
+    return title or None, desc if len(desc) > 10 else None
+
+# Article pages — emerald accent
+for i in range(1, 28):
+    fname = f"article-{i}.html"
+    p = _ROOT / fname
+    if p.exists():
+        title, desc = _extract_title_and_desc(p)
+        if title and desc:
+            TARGETS.append((f"article-{i}", title[:80], desc[:160], "#10b981"))
+
+# Future Forward — violet accent
+for fname in ["FF-1.html", "FF-2.html", "FF-3.html"]:
+    p = _ROOT / fname
+    if p.exists():
+        title, desc = _extract_title_and_desc(p)
+        if title and desc:
+            slug = fname.replace(".html", "")
+            TARGETS.append((slug, title[:80], desc[:160], "#a855f7"))
+
+# Geopolitics — red accent
+for fname in ["geopolitics.html", "geopolitics-1.html", "geopolitics-2.html", "geopolitics-3.html"]:
+    p = _ROOT / fname
+    if p.exists():
+        title, desc = _extract_title_and_desc(p)
+        if title and desc:
+            slug = fname.replace(".html", "")
+            TARGETS.append((slug, title[:80], desc[:160], "#dc2626"))
+
+# Compare pages — cyan accent
+for compare_path in _ROOT.glob("compare-*.html"):
+    title, desc = _extract_title_and_desc(compare_path)
+    if title and desc:
+        slug = compare_path.stem
+        TARGETS.append((slug, title[:80], desc[:160], "#06b6d4"))
+
+# Pillar pages — gold accent
+for pillar_path in _ROOT.glob("pillar-*.html"):
+    title, desc = _extract_title_and_desc(pillar_path)
+    if title and desc:
+        slug = pillar_path.stem
+        TARGETS.append((slug, title[:80], desc[:160], "#f59e0b"))
+
 # ---------------------------------------------------------------------------
 # HTML page map: slug → filename (for --update-html)
 # ---------------------------------------------------------------------------
@@ -131,6 +191,12 @@ HTML_FILES = {
     "dc-market-tracker": "dc-market-tracker.html",
     "pln-java-grid": "pln-java-grid.html",
 }
+
+# Auto-extend HTML_FILES with the dynamic TARGETS so --update-html walks them too
+for _t in TARGETS:
+    _slug = _t[0]
+    if _slug not in HTML_FILES:
+        HTML_FILES[_slug] = f"{_slug}.html"
 
 # ---------------------------------------------------------------------------
 # Font discovery

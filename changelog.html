@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 41 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 43 shipped versions.",
         "dateModified": "2026-05-09",
         "author": {
           "@type": "Person",
@@ -73,18 +73,18 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 41,
+        "numberOfItems": 43,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.9.1 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.1"},
-        {"@type":"ListItem","position":2,"name":"v1.10.5 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.5"},
-        {"@type":"ListItem","position":3,"name":"v1.10.4 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.4"},
-        {"@type":"ListItem","position":4,"name":"v1.10.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.3"},
-        {"@type":"ListItem","position":5,"name":"v1.10.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.2"},
-        {"@type":"ListItem","position":6,"name":"v1.10.1 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.1"},
-        {"@type":"ListItem","position":7,"name":"v1.10.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.0"},
-        {"@type":"ListItem","position":8,"name":"v1.9.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.3"},
-        {"@type":"ListItem","position":9,"name":"v1.9.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.2"},
-        {"@type":"ListItem","position":10,"name":"v1.9.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.0"}
+        {"@type":"ListItem","position":2,"name":"v1.10.7 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.7"},
+        {"@type":"ListItem","position":3,"name":"v1.10.6 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.6"},
+        {"@type":"ListItem","position":4,"name":"v1.10.5 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.5"},
+        {"@type":"ListItem","position":5,"name":"v1.10.4 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.4"},
+        {"@type":"ListItem","position":6,"name":"v1.10.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.3"},
+        {"@type":"ListItem","position":7,"name":"v1.10.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.2"},
+        {"@type":"ListItem","position":8,"name":"v1.10.1 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.1"},
+        {"@type":"ListItem","position":9,"name":"v1.10.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.0"},
+        {"@type":"ListItem","position":10,"name":"v1.9.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.3"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.9.1</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">41 releases</span>
+        <span class="cl-count-badge">43 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -625,6 +625,85 @@
 </ul>
 <p>Cache-bust bumped: <code>styles-index.min.css?v=<a href="https://github.com/baguspermana7-cpu/bfrfranco.github.io/commit/20260509" class="commit-link" target="_blank" rel="noopener"><code>2026050</code></a>-dropdown</code> + <code>rz-mobile-nav.js?v=2026-05-09c</code>.</p>
 <p>Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).</p>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.10.7">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.10.7</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-09">May 09, 2026</time>
+      </div>
+      <p class="changelog-caption">Plan v18 — Final dark-mode mandate for form widgets</p>
+      <div class="changelog-body">
+        <p>User: "ini masih ada warna putih di calculator opex. astaga, saya bilang audit completely, fix all" (5th dark-mode regression flagged this session).</p>
+<h3 class="cl-subhead">Root cause analysis</h3>
+<p>The Country/Region select on opex-calculator was rendering with white background despite <code>[data-theme="dark"] .country-select { background: #1e293b !important }</code> rule existing. Browser-level quirks (especially Firefox/Linux native <code><select></code> rendering) sometimes ignore CSS background on form widgets, even with <code>appearance: none</code>.</p>
+<h3 class="cl-subhead">Fix — multi-layer dark-mode mandate (added to BOTH styles.css + styles-index.css + 7 calc page inline styles)</h3>
+<p>Layer 1 — <code>color-scheme: dark</code> on <code>[data-theme="dark"]</code> root tells browser native widgets to use dark chrome.</p>
+<p>Layer 2 — Direct rules on every form-widget tag:</p>
+<pre class="cl-code"><code>[data-theme=&quot;dark&quot;] select,
+[data-theme=&quot;dark&quot;] input:not([type=&quot;checkbox&quot;]):not([type=&quot;radio&quot;]):not([type=&quot;range&quot;]):not([type=&quot;color&quot;]),
+[data-theme=&quot;dark&quot;] textarea {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    forced-color-adjust: none;
+    -webkit-appearance: none; appearance: none;
+}
+[data-theme=&quot;dark&quot;] select option { background: #1e293b !important; color: #f1f5f9 !important; }</code></pre>
+<p>Layer 3 — Inline-style attribute selector defeats <code>style="background: white"</code> leaks:</p>
+<pre class="cl-code"><code>[data-theme=&quot;dark&quot;] [style*=&quot;background: white&quot;],
+[data-theme=&quot;dark&quot;] [style*=&quot;background:white&quot;],
+[data-theme=&quot;dark&quot;] [style*=&quot;background: #fff&quot;] {
+    background: #1e293b !important;
+}</code></pre>
+<p>Layer 4 — <code>forced-color-adjust: none</code> overrides Windows High Contrast / system theme on form widgets.</p>
+<h3 class="cl-subhead">Coverage</h3>
+<ul>
+  <li>styles.css + styles-index.css globally patched</li>
+  <li>7 calc pages got per-page mandate marker <code>/<em> v1.10.7 — final dark mode mandate </em>/</code></li>
+  <li>Cache-bust: <code>styles.min.css?v=<a href="https://github.com/baguspermana7-cpu/bfrfranco.github.io/commit/20260509" class="commit-link" target="_blank" rel="noopener"><code>2026050</code></a>-darkfinal</code> on calc pages</li>
+  <li>Cache-bust: <code>rz-mobile-nav.js?v=2026-05-09e</code> sitewide (102 pages)</li>
+</ul>
+<h3 class="cl-subhead">Lessons codified in CLAUDE.md (forthcoming)</h3>
+<ul>
+  <li>Browser <code><select></code> rendering ignores CSS background in some configurations even with <code>appearance: none</code></li>
+  <li>Fix requires <code>color-scheme: dark</code> + <code>forced-color-adjust: none</code></li>
+  <li>Include <code><option></code> element styling, not just the select</li>
+  <li>Inline style attribute selector defeats <code>style="background: white"</code> leaks</li>
+</ul>
+<p>This was the <strong>5th dark-mode regression</strong> in one session (v1.2.2 brief-card, v1.2.3 model-card, v1.4.1 input-field, v1.4.2 scenario-card, v1.10.7 select widget). Each had a different root cause but same symptom. The multi-layer mandate above defeats the entire class going forward.</p>
+<p>Bump 1.10.6 → 1.10.7.</p>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.10.6">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.10.6</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-09">May 09, 2026</time>
+      </div>
+      <p class="changelog-caption">Item 30 — per-page OG cards generated for ~50 more pages</p>
+      <div class="changelog-body">
+        <h3 class="cl-subhead">Item 30 — Extended <code>tools/build-og-images.py</code> to auto-discover pages</h3>
+<p>Added dynamic page discovery to TARGETS list:</p>
+<ul>
+  <li><strong>27 article pages</strong> (article-1 … article-27) — emerald accent</li>
+  <li><strong>3 Future Forward pages</strong> (FF-1, FF-2, FF-3) — violet accent</li>
+  <li><strong>4 geopolitics pages</strong> — red accent</li>
+  <li><strong>10 compare pages</strong> — cyan accent</li>
+  <li><strong>5 pillar pages</strong> — gold accent</li>
+</ul>
+<p>Generator extracts page title + meta description automatically per page (no hardcoding required).</p>
+<p><strong>Output</strong>: 49 new WebP cards (was 12 → now 61 in <code>assets/og/</code>). Each ~55-65 KB.</p>
+<h3 class="cl-subhead">Coverage delta</h3>
+<ul>
+  <li>Pages with their own OG card: <strong>12 → 62</strong> (+50)</li>
+  <li>Pages still using <code>profile-photo.jpg</code> fallback: 35 → 18 (-17)</li>
+  <li>Remaining 18 are mostly small fragments / legal pages that are fine with the fallback</li>
+</ul>
+<p>Future-proof: re-running <code>python3 tools/build-og-images.py --apply --update-html</code> automatically detects new article-N.html / FF-X.html files and generates cards.</p>
       </div>
     </article>
 

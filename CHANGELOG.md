@@ -38,6 +38,80 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.7 — 2026-05-09 (Plan v18 — Final dark-mode mandate for form widgets)
+
+User: "ini masih ada warna putih di calculator opex. astaga, saya bilang audit completely, fix all" (5th dark-mode regression flagged this session).
+
+### Root cause analysis
+The Country/Region select on opex-calculator was rendering with white background despite `[data-theme="dark"] .country-select { background: #1e293b !important }` rule existing. Browser-level quirks (especially Firefox/Linux native `<select>` rendering) sometimes ignore CSS background on form widgets, even with `appearance: none`.
+
+### Fix — multi-layer dark-mode mandate (added to BOTH styles.css + styles-index.css + 7 calc page inline styles)
+
+Layer 1 — `color-scheme: dark` on `[data-theme="dark"]` root tells browser native widgets to use dark chrome.
+
+Layer 2 — Direct rules on every form-widget tag:
+```css
+[data-theme="dark"] select,
+[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+[data-theme="dark"] textarea {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    forced-color-adjust: none;
+    -webkit-appearance: none; appearance: none;
+}
+[data-theme="dark"] select option { background: #1e293b !important; color: #f1f5f9 !important; }
+```
+
+Layer 3 — Inline-style attribute selector defeats `style="background: white"` leaks:
+```css
+[data-theme="dark"] [style*="background: white"],
+[data-theme="dark"] [style*="background:white"],
+[data-theme="dark"] [style*="background: #fff"] {
+    background: #1e293b !important;
+}
+```
+
+Layer 4 — `forced-color-adjust: none` overrides Windows High Contrast / system theme on form widgets.
+
+### Coverage
+- styles.css + styles-index.css globally patched
+- 7 calc pages got per-page mandate marker `/* v1.10.7 — final dark mode mandate */`
+- Cache-bust: `styles.min.css?v=20260509-darkfinal` on calc pages
+- Cache-bust: `rz-mobile-nav.js?v=2026-05-09e` sitewide (102 pages)
+
+### Lessons codified in CLAUDE.md (forthcoming)
+- Browser `<select>` rendering ignores CSS background in some configurations even with `appearance: none`
+- Fix requires `color-scheme: dark` + `forced-color-adjust: none`
+- Include `<option>` element styling, not just the select
+- Inline style attribute selector defeats `style="background: white"` leaks
+
+This was the **5th dark-mode regression** in one session (v1.2.2 brief-card, v1.2.3 model-card, v1.4.1 input-field, v1.4.2 scenario-card, v1.10.7 select widget). Each had a different root cause but same symptom. The multi-layer mandate above defeats the entire class going forward.
+
+Bump 1.10.6 → 1.10.7.
+
+## v1.10.6 — 2026-05-09 (Item 30 — per-page OG cards generated for ~50 more pages)
+
+### Item 30 — Extended `tools/build-og-images.py` to auto-discover pages
+
+Added dynamic page discovery to TARGETS list:
+- **27 article pages** (article-1 … article-27) — emerald accent
+- **3 Future Forward pages** (FF-1, FF-2, FF-3) — violet accent
+- **4 geopolitics pages** — red accent
+- **10 compare pages** — cyan accent
+- **5 pillar pages** — gold accent
+
+Generator extracts page title + meta description automatically per page (no hardcoding required).
+
+**Output**: 49 new WebP cards (was 12 → now 61 in `assets/og/`). Each ~55-65 KB.
+
+### Coverage delta
+- Pages with their own OG card: **12 → 62** (+50)
+- Pages still using `profile-photo.jpg` fallback: 35 → 18 (-17)
+- Remaining 18 are mostly small fragments / legal pages that are fine with the fallback
+
+Future-proof: re-running `python3 tools/build-og-images.py --apply --update-html` automatically detects new article-N.html / FF-X.html files and generates cards.
+
 ## v1.10.5 — 2026-05-09 (Item 32 — article-18 image WebP conversion)
 
 ### Item 32 — `assets/article-18-mid.png` 2.4 MB → 183 KB WebP

@@ -7739,3 +7739,56 @@ section {
         body.rz-nav-open .nav-dropdown > a .dropdown-arrow { transition: none; }
     }
 }
+
+/* ==========================================================================
+   v1.10.7 — Final dark-mode mandate (form widgets + inline-style override)
+   Defeats native browser <select>/<input> rendering quirks + any inline
+   style="background: white" leak. Use color-scheme + forced-color-adjust
+   to win against system theme.
+   ========================================================================== */
+
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+[data-theme="dark"] select,
+[data-theme="dark"] select.country-select,
+[data-theme="dark"] select.input-field,
+[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+[data-theme="dark"] input.input-field,
+[data-theme="dark"] textarea {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    forced-color-adjust: none;
+    color-scheme: dark;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+[data-theme="dark"] select option,
+[data-theme="dark"] datalist option {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] select:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.18) !important;
+    outline: none;
+}
+
+/* Defeat inline style="background: white" leaks (audit-detected pattern) */
+[data-theme="dark"] [style*="background: white"],
+[data-theme="dark"] [style*="background:white"],
+[data-theme="dark"] [style*="background: #fff"],
+[data-theme="dark"] [style*="background:#fff"],
+[data-theme="dark"] [style*="background-color: white"],
+[data-theme="dark"] [style*="background-color:white"] {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+}
