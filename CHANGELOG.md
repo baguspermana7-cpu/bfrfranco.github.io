@@ -11,6 +11,13 @@ release sections rather than semver.
 
 ---
 
+## v1.4.2 — 2026-05-09
+- **Proactive sweep**: ran a comprehensive `regex` audit across all 7 calc pages for any class with hardcoded white/light backgrounds lacking a `[data-theme="dark"]` override. ONE remaining gap surfaced: `.scenario-card` on `opex-calculator.html` (line 947, `background: white`).
+- **Fix**: added 5 dark-mode rules covering `.scenario-card` base + `.current` active state + scenario-name / scenario-total / scenario-diff text colours. Active scenario card now shows a soft mint gradient instead of solid white.
+- **Audit clean**: all 7 calc pages now report CLEAN on the regex audit (every class with light bg has a corresponding dark override).
+- Inline `style="background:#fffbeb"` PDF-template callouts (10 in capex, 1-2 each in other pages) are intentional cream-accent info boxes used inside print-window templates — not user-visible in dark mode and correctly left alone.
+- The capex legacy `#loginModal` (hidden `display:none`, replaced by auth.js widget) intentionally untouched.
+
 ## v1.4.1 — 2026-05-09
 - **Fix**: `.input-field` selects + inputs were rendering with white backgrounds in dark mode on opex/capex/roi/pue/carbon-footprint. Root cause: class-mismatch — HTML uses `<select class="input-field">` but the dark-mode CSS targeted page-prefixed classes (`.opex-input` / `.capex-input` etc.) that don't exist in the markup. Effectively the entire input dark-mode coverage was a no-op on 5 calc pages.
 - **Pages affected**: opex / capex / roi / pue / carbon-footprint. tco + cx were already correct (they use prefixed `.tco-input-field` + `.cx-input-field` consistently in HTML + CSS).
