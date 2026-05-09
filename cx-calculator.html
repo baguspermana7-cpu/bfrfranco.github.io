@@ -4097,7 +4097,110 @@ function cxExportPDF(){
   h+='.pdf-foot{text-align:center;border-top:2px solid #0e7490;padding-top:10px;font-size:9px;color:#94a3b8;margin-top:20px;}';
   h+='.pdf-toc{columns:2;column-gap:20px;font-size:10px;margin:8px 0;}';
   h+='.pdf-toc-item{padding:2px 0;border-bottom:1px dotted #e5e7eb;}';
-  h+='</style></head><body>';
+  h+='
+    /* v1.8.0 — mobile responsive patch */
+    /* Universal mobile fixes — apply to ≤768px viewport */
+    @media (max-width: 768px) {
+        /* Prevent horizontal scroll */
+        html, body { overflow-x: hidden; max-width: 100vw; }
+
+        /* Images responsive by default */
+        img { max-width: 100%; height: auto; display: block; }
+
+        /* Hero / brief / intro card centering */
+        .hero, .brief-section, .brief-card, .results-card, .input-section { 
+            margin-left: auto !important;
+            margin-right: auto !important;
+            max-width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        .brief-card, .results-card { padding: 1.25rem !important; }
+        .brief-hero-img { width: 100% !important; max-height: 220px; object-fit: cover; }
+
+        /* Navbar mobile-first behaviour */
+        .navbar { padding: 0.5rem 0.75rem !important; }
+        .nav-container { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0 !important; }
+        .nav-brand .nav-title { font-size: 0.95rem !important; }
+        .nav-brand .nav-subtitle { font-size: 0.65rem !important; }
+        .nav-links { display: none; }  /* mobile nav links collapse */
+        .nav-right { gap: 0.5rem !important; flex-wrap: wrap; }
+        .nav-back { padding: 6px 10px !important; font-size: 0.75rem !important; }
+
+        /* Calculator grid stacks vertically on mobile */
+        .calculator-grid, .calc-grid, .results-grid, .breakdown-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        .calculator-section, .results-section { padding: 0.5rem !important; }
+
+        /* Footer 3-column collapses */
+        .footer-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1.25rem !important;
+            padding: 1rem !important;
+        }
+        .footer-grid > div { text-align: left; }
+        .footer-grid h4 { font-size: 0.7rem; letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+        .footer-grid ul { padding: 0; }
+
+        /* Disclaimer + breakdown table responsive */
+        .calc-disclaimer { padding: 1rem !important; margin: 0 0.5rem 1rem !important; font-size: 0.78rem; }
+        .breakdown-table, .cashflow-table {
+            display: block !important;
+            overflow-x: auto !important;
+            white-space: nowrap;
+            font-size: 0.78rem;
+        }
+        .breakdown-table th, .breakdown-table td,
+        .cashflow-table th, .cashflow-table td { padding: 8px 10px !important; }
+
+        /* Mode bar wraps on mobile */
+        .mode-bar, .opex-mode-bar, .capex-mode-bar, .roi-mode-bar, .pue-mode-bar { 
+            flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.75rem !important; 
+        }
+
+        /* Buttons stack-friendly */
+        .btn, .btn-bento-primary, .btn-bento-outline, .save-scenario, .export-pdf {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.75rem 1rem !important;
+            font-size: 0.8rem !important;
+        }
+
+        /* Staffing-model card grid */
+        .staffing-models { grid-template-columns: 1fr !important; }
+
+        /* KPI cards stack */
+        .kpi-grid, .opex-kpi-grid, .capex-kpi-grid, .roi-kpi-grid, .tco-kpi-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+        }
+        .kpi-card { padding: 0.75rem !important; }
+        .kpi-value { font-size: 1.1rem !important; }
+        .kpi-label { font-size: 0.65rem !important; }
+
+        /* Chart cards full-width */
+        .chart-card, .opex-chart-card { padding: 1rem !important; }
+        .chart-card canvas, canvas[id*="chart"i] { max-width: 100% !important; height: auto !important; }
+
+        /* Hero text sizing */
+        .hero h1, h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
+        .hero p, .hero-subtitle { font-size: 0.9rem !important; }
+
+        /* Tap-target minimums */
+        button, a.btn, [role="button"] { min-height: 44px; }
+    }
+
+    /* Smaller phones: ≤480px */
+    @media (max-width: 480px) {
+        .kpi-grid, .opex-kpi-grid, .capex-kpi-grid, .roi-kpi-grid, .tco-kpi-grid {
+            grid-template-columns: 1fr !important;
+        }
+        .hero h1, h1 { font-size: 1.4rem !important; }
+    }
+
+    </style></head><body>';
 
   // ===== COVER HEADER =====
   h+='<div class="brand">RESISTANCEZERO &mdash; DATA CENTER INFRASTRUCTURE ENGINEERING</div>';

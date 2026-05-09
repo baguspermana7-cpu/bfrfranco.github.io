@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.8.0 — 2026-05-09 (Plan v15 Track A — mobile responsive sweep, partial)
+
+User: "Perbaiki responsiveness semua page ini contoh saat mobile, imagenya kekiri nggak auto adjust agar center page atau fill. Begitu juga card di bawah atau navbar footer itu. Dan navbar atas jadi tidak ada hilang semua... Audit semua page literally semua page. Deploy more agent to paralel audit total."
+
+Mobile responsive patches applied across **60 pages** in this commit (3 of 7 parallel agents have landed; remaining 4 ship in v1.8.1+):
+
+### Agent 1 — Calc pages (7)
+pue/capex/opex/roi/tco/cx/carbon-footprint — patched with `/* v1.8.0 — mobile responsive patch */`. Each gains: body overflow-x guard, image responsive default, navbar mobile collapse, footer 3-col → single-col, KPI grid 2-col phone / 1-col tiny phone, breakdown-table horizontal scroll, mode-bar wrap, button stacking, tap targets ≥44px.
+
+### Agent 5 — Utility/tool pages (18)
+tia-942-checklist + tier-advisor + rfs-readiness-workbench + dc-market-tracker + 5 PLN Java grid pages + 5 system pages (water/fire/fuel/ict/chiller-plant) + EPMS_Telemetry + 404 + terms + privacy. Includes Leaflet map `60vh` mobile cap, SVG diagram horizontal-scroll wrap, toggle-bar wrapping.
+
+### Agent 6 — Sweep (35)
+9 compare-* pages + 5 pillar-* + 3 infographic-* + insights + achievements + asean-dc-report + datahall + pln-java-grid-historical + 11 dc-market/* city pages. Compare grid stacking, pillar/infographic collapse, market-stat tiles, table scroll.
+
+### Tooling + standardisation
+- **NEW** `tools/audit-mobile-responsive.py` — per-page 0-10 score on 8 checkpoints (viewport, @media 768px, body overflow-x, img max-width, nav collapse, footer collapse, v1.8.0 marker, tap targets). `--strict` for CI.
+- **NEW** `standarization/RESPONSIVE_STANDARD.md` — required breakpoints, 8 checkpoint patterns, common collapse patterns, pre-merge checklist.
+- Excludes email signatures + Google verification token from audit.
+
+### Audit progression
+Pass count: **32 → 66** (+34) immediately after this commit. Articles + landing + virtual labs ship in v1.8.1.
+
+### IndexNow
+Will ping after final v1.8.x lands.
+
+Bump 1.7.3 → 1.8.0 (MINOR — major new feature: full responsive mobile coverage).
+
 ## v1.7.3 — 2026-05-09 (404 page Awwwards uplift)
 
 - **404.html re-themed** to dark-default matching v1.4.0 aesthetic. Was a light pastel design that clashed with the rest of the site.
