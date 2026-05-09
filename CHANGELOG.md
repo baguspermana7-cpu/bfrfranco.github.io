@@ -11,6 +11,11 @@ release sections rather than semver.
 
 ---
 
+## v1.6.1 — 2026-05-09
+- **Sitemap regenerated**: 102 indexable URLs (was 101) — `/changelog.html` now included.
+- **llms.txt regenerated**: 140 lines / 97 pages — `/changelog.html` now listed for AI search engines.
+- **3-audit pass**: audit-script-tags + audit-version-stamp + audit-seo all CLEAN post v1.6.0.
+
 ## v1.6.0 — 2026-05-09 (public-facing /changelog.html + ai-content-declaration sweep)
 
 ### Public changelog page (Linear/Vercel pattern)
