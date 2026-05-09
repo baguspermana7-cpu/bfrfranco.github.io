@@ -4385,7 +4385,7 @@ function shareLinkedIn(){window.open('https://www.linkedin.com/sharing/share-off
 function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(window.location.href)+'&text='+encodeURIComponent(document.title),'_blank')}
 function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(document.title+' '+window.location.href),'_blank')}
 function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(function(){b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(function(){b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
-function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">✓ Subscribed successfully!</p>';return false}
+/* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script>
 /* ============================================================
@@ -5073,7 +5073,7 @@ function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelec
     window.aigExportPDF = function() {
         if (!aigCheckAuth()) { aigShowLogin(); return; }
         var w = window.open('', '_blank');
-        if (!w) { alert('Please allow popups for this site to export PDF.'); return; }
+        if (!w) { (window.showToast||alert)('Please allow popups for this site to export PDF.'); return; }
 
         var inp = getInputs();
         var ops = calcOperational(inp);

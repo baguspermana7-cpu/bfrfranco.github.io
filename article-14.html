@@ -4073,7 +4073,7 @@
         window.msfExportPDF = function() {
             if (!msfCheckAuth()) { msfShowLogin(); return; }
             var w = window.open('', '_blank');
-            if (!w) { alert('Please allow popups for this site to export PDF.'); return; }
+            if (!w) { (window.showToast||alert)('Please allow popups for this site to export PDF.'); return; }
 
             var inp = getProInputs();
             var stoch = msfCalcStochastic(inp);

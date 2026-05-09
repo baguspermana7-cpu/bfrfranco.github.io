@@ -3026,7 +3026,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <!-- Hero Section -->
         <section class="hero fade-in">
             <div class="hero-badge">
@@ -3980,7 +3980,7 @@
         if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
             window._rzAuth.showModal();
         } else {
-            alert('Please sign in first.');
+            (window.showToast||alert)('Please sign in first.');
         }
     }
 
@@ -4000,7 +4000,7 @@
 
         if (!isRoot) {
             event.preventDefault();
-            alert('This module is root-only. Please sign in with a root account.');
+            (window.showToast||alert)('This module is root-only. Please sign in with a root account.');
             openLogin();
         }
     }

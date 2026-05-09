@@ -653,7 +653,7 @@
                     <div class="login-field">
                         <label for="adminLoginPassword">
                             <span>Password</span>
-                            <a href="#" class="login-forgot" onclick="alert('Contact admin to reset your password.');return false;">Forgot password?</a>
+                            <a href="#" class="login-forgot" onclick="(window.showToast||alert)('Contact admin to reset your password.');return false;">Forgot password?</a>
                         </label>
                         <div class="login-field-wrap">
                             <input type="password" id="adminLoginPassword" placeholder="Enter your password" required autocomplete="current-password">
@@ -1793,10 +1793,10 @@
     <div class="card" style="margin-top:1.5rem">
         <div class="card-title"><i class="fas fa-database" style="color:#a78bfa"></i> Data Management</div>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.5rem;">
-            <button class="btn btn-purple" onclick="alert('Mock: Database backup initiated')"><i class="fas fa-hdd"></i> Backup Data</button>
+            <button class="btn btn-purple" onclick="(window.showToast||alert)('Mock: Database backup initiated')"><i class="fas fa-hdd"></i> Backup Data</button>
             <button class="btn btn-amber" onclick="if(confirm('Reset all mock data?')){location.reload()}"><i class="fas fa-redo"></i> Reset Mock Data</button>
-            <button class="btn btn-red" onclick="alert('Mock: Cache cleared')"><i class="fas fa-broom"></i> Clear Cache</button>
-            <button class="btn btn-ghost" onclick="alert('Mock: Health check passed')"><i class="fas fa-heartbeat"></i> Health Check</button>
+            <button class="btn btn-red" onclick="(window.showToast||alert)('Mock: Cache cleared')"><i class="fas fa-broom"></i> Clear Cache</button>
+            <button class="btn btn-ghost" onclick="(window.showToast||alert)('Mock: Health check passed')"><i class="fas fa-heartbeat"></i> Health Check</button>
         </div>
     </div>
 </div>
@@ -2802,7 +2802,7 @@ function renderFeatures(){
         ${proUsers.map(u=>`<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">
             <div class="cred-avatar" style="background:#8b5cf6;width:32px;height:32px;font-size:0.6rem">${u.name.charAt(0)}</div>
             <div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.email}</div><span class="tier-badge pro" style="margin-top:4px">PRO</span></div>
-            <button class="btn btn-ghost btn-sm" onclick="alert('Override panel for ${u.email} — coming with Supabase integration')"><i class="fas fa-sliders-h"></i></button>
+            <button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)('Override panel for ${u.email} — coming with Supabase integration')"><i class="fas fa-sliders-h"></i></button>
         </div>`).join('')}
         </div>`;
 
@@ -4097,7 +4097,7 @@ function removeSub(idx){
 }
 function exportSubscribersCSV(){
     var subs=getSubscribers();
-    if(!subs.length){alert('No subscribers to export');return}
+    if(!subs.length){(window.showToast||alert)('No subscribers to export');return}
     var h='Email,Date Subscribed,Source,Status';
     var rows=subs.map(function(s){return [s.email,s.date,s.source,s.status].join(',')});
     downloadCSV([h].concat(rows).join('\n'),'rz_subscribers_'+fmtDate(new Date())+'.csv');
@@ -5162,7 +5162,7 @@ function filterUAEvents(){
 
 // ═══ CSV EXPORT ═══
 function exportUAEventsCSV(){
-    if(!uaFilteredEvents.length){alert('No events to export');return}
+    if(!uaFilteredEvents.length){(window.showToast||alert)('No events to export');return}
     var csv='Timestamp,Type,Page,IP,Country,City,Device,Browser,Screen,Language,Referrer,Session,UserAgent\n';
     uaFilteredEvents.forEach(function(e){
         csv+='"'+new Date(e.ts).toISOString()+'","'+e.type+'","'+e.page+'","'+(e.ip||'')+'","'+(e.country||'')+'","'+(e.city||'')+'","'+(e.device||'')+'","'+(e.browser||'')+'","'+(e.screen||'')+'","'+(e.lang||'')+'","'+(e.ref||'')+'","'+(e.sid||'')+'","'+(e.ua||'')+'"\n';

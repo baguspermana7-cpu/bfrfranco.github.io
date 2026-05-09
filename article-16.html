@@ -2633,17 +2633,7 @@ window.addEventListener('DOMContentLoaded', function() {
     function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(function(){b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(function(){b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
     </script>
     <script>
-    function subscribeNewsletter(e){
-      e.preventDefault();
-      var email=e.target.querySelector('input[type="email"]').value.trim();
-      if(!email)return false;
-      var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');
-      if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}
-      subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});
-      localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));
-      e.target.innerHTML='<p style="color:#10b981;font-weight:600;">✓ Subscribed successfully!</p>';
-      return false;
-    }
+    /* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
     </script>
 
 <!-- Calculator Disclaimer -->
@@ -3114,7 +3104,7 @@ function bubUpdateProPanels(){
 // ═══ PDF EXPORT ═══
 function bubExportPDF(){
     var w=window.open('','_blank');
-    if(!w){alert('Please allow popups for PDF export.');return}
+    if(!w){(window.showToast||alert)('Please allow popups for PDF export.');return}
 
     var inputs=bubGetInputs();
     var r=runBubbleModel(inputs.op,inputs.pipe,inputs.pop,inputs.absorb,inputs.precommit,inputs.spec,inputs.demandGrowth,inputs.costMW,inputs.revMW,inputs.opexRatio,inputs.wacc);

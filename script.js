@@ -1510,3 +1510,72 @@ function initMotionEffects() {
         stopAllLoops();
     });
 }
+
+// ============================================================
+// v1.9.1 — Global utility: showToast
+// Non-blocking toast replaces alert() for informational messages.
+// Usage: showToast('Message text') or showToast('msg', {duration: 5000})
+// ============================================================
+window.showToast = window.showToast || function(msg, opts) {
+    opts = opts || {};
+    var toast = document.createElement('div');
+    toast.className = 'rz-toast';
+    toast.textContent = msg;
+    Object.assign(toast.style, {
+        position: 'fixed', bottom: '20px', left: '50%',
+        transform: 'translateX(-50%)',
+        background: 'rgba(15,23,42,0.96)', color: '#f1f5f9',
+        padding: '12px 20px', borderRadius: '8px',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        zIndex: '99999',
+        fontSize: '0.9rem', fontWeight: '500',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+        opacity: '0', transition: 'opacity 0.2s',
+        maxWidth: '90vw', textAlign: 'center',
+        pointerEvents: 'none'
+    });
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() { toast.style.opacity = '1'; });
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+    }, opts.duration || 3000);
+};
+
+// ============================================================
+// v1.9.1 — Global utility: subscribeNewsletter
+// Replaces all per-page localStorage-only stubs.
+// Opens mailto: link so user can actually contact the owner.
+// Per-page inline definitions are removed; this global wins.
+// ============================================================
+window.subscribeNewsletter = window.subscribeNewsletter || function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var form = e && e.target ? e.target : null;
+    var emailInput = form ? form.querySelector('input[type="email"]') : null;
+    var email = emailInput ? (emailInput.value || '').trim() : '';
+    var statusEl = form ? form.querySelector('.nl-status, .newsletter-status') : null;
+
+    function setStatus(msg) {
+        if (statusEl) { statusEl.textContent = msg; }
+        else if (form) {
+            var p = document.createElement('p');
+            p.style.cssText = 'color:#a78bfa;font-size:0.85rem;margin-top:0.5rem;';
+            p.textContent = msg;
+            form.appendChild(p);
+        }
+    }
+
+    if (!email || !/.+@.+\..+/.test(email)) {
+        setStatus('Please enter a valid email address.');
+        return false;
+    }
+
+    var subject = encodeURIComponent('Subscribe to Resistance Zero updates');
+    var body = encodeURIComponent('Hi,\n\nPlease add me to the Resistance Zero newsletter.\n\nMy email: ' + email + '\n\nThanks!');
+    window.open('mailto:bagusdpermana7@gmail.com?subject=' + subject + '&body=' + body, '_blank');
+    if (form) {
+        form.innerHTML = '<p style="color:#a78bfa;font-weight:600;padding:1rem 0;">&#10003; Email client opened — send the message to confirm your subscription.</p>';
+    }
+    return false;
+};

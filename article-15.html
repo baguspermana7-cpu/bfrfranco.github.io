@@ -4198,7 +4198,7 @@ function copyLink(){var b=document.querySelector('.share-btn.copy'),c=b.querySel
     window.mclExportPDF = function() {
         if (!mclCheckAuth()) { mclShowLogin(); return; }
         var win = window.open('', '_blank');
-        if (!win) { alert('Please allow popups for this site to export PDF.'); return; }
+        if (!win) { (window.showToast||alert)('Please allow popups for this site to export PDF.'); return; }
 
         var inp = getInputs();
         var opex = calcOpex(inp);

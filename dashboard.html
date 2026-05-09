@@ -1363,7 +1363,7 @@
         window.handleUpgrade = function() {};
 
         window.handleManageSub = function() {
-            alert('Account settings coming soon.');
+            (window.showToast||alert)('Account settings coming soon.');
         };
 
         window.handleLoadProject = function(projectId, type) {
@@ -1379,7 +1379,7 @@
             getIdToken().then(function(token) {
                 var apiBase = window.API_BASE || '';
                 if (!apiBase || !token) {
-                    alert('Unable to delete: API not configured.');
+                    (window.showToast||alert)('Unable to delete: API not configured.');
                     return;
                 }
 
@@ -1393,10 +1393,10 @@
                     if (resp.ok) {
                         initDashboard(); /* Refresh */
                     } else {
-                        alert('Failed to delete project. Please try again.');
+                        (window.showToast||alert)('Failed to delete project. Please try again.');
                     }
                 }).catch(function() {
-                    alert('Network error. Please try again.');
+                    (window.showToast||alert)('Network error. Please try again.');
                 });
             });
         };

@@ -1196,14 +1196,7 @@
                 </span>
             </div>
             <div class="paper-actions">
-                <button class="paper-btn primary" onclick="exportToPDF()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Download PDF
-                </button>
+                <!-- v1.9.1: exportToPDF stub removed (was alert placeholder); use Print instead -->
                 <button class="paper-btn secondary" onclick="window.print()">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 6 2 18 2 18 9"/>
@@ -2518,12 +2511,7 @@
     function shareWhatsApp(){const d=getShareData();window.open(`https://wa.me/?text=${encodeURIComponent(d.title+'\n\n'+d.url)}`,'_blank')}
     function copyLink(){const b=document.querySelector('.share-btn.copy'),c=b.querySelector('.copy-icon'),k=b.querySelector('.check-icon');navigator.clipboard.writeText(window.location.href).then(()=>{b.classList.add('copied');c.style.display='none';k.style.display='block';b.setAttribute('data-tooltip','Copied!');setTimeout(()=>{b.classList.remove('copied');c.style.display='block';k.style.display='none';b.setAttribute('data-tooltip','Copy link')},2000)})}
 
-    // PDF Export
-    function exportToPDF() {
-        alert('PDF export would be implemented with a library like html2pdf.js or server-side generation. For now, use the Print function and save as PDF.');
-        window.print();
-    }
-
+    // v1.9.1: exportToPDF stub removed — button removed from DOM
     // Water Calculator
     (function() {
         const powerSlider = document.getElementById('powerSlider');
@@ -3371,7 +3359,7 @@
         window.wsExportPDF = function() {
             if (!wsCheckAuth()) { wsShowLogin(); return; }
             var w = window.open('', '_blank');
-            if (!w) { alert('Please allow pop-ups for this site to export PDF.'); return; }
+            if (!w) { (window.showToast||alert)('Please allow pop-ups for this site to export PDF.'); return; }
             w.document.write('<p style="font-family:sans-serif;text-align:center;margin-top:40vh;">Generating report...</p>');
             var inputs = getInputs();
             var costData = wsCalcWaterCost(inputs);

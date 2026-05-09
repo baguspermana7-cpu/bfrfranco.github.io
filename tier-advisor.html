@@ -1336,7 +1336,7 @@
     function exportPDF() {
         if (!isPremiumUser) { handlePremiumTab(); return; }
         var w = window.open('', '_blank');
-        if (!w) { alert('Please allow popups for PDF export.'); return; }
+        if (!w) { (window.showToast||alert)('Please allow popups for PDF export.'); return; }
         var d = new Date(), dateStr = d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
         var tier = document.getElementById('tierDisplay').textContent;
         var score = parseFloat(document.getElementById('scoreValue').textContent);

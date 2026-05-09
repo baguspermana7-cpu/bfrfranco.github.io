@@ -3100,7 +3100,7 @@
         window.exportAlarmPDF = function() {
             var d = window._alarmData; if (!d) return;
             var w = window.open('', '_blank');
-            if (!w) { alert('Please allow pop-ups for PDF export.'); return; }
+            if (!w) { (window.showToast||alert)('Please allow pop-ups for PDF export.'); return; }
             var now = new Date();
             var dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             var sc = d.isa.total; var gr = d.grade;
@@ -4499,7 +4499,7 @@ function finalizeMC(results, N) {
 </script>
 
 <script>
-function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
+/* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=20260324b"></script>
 <script src="rz-engine.js?v=2026-04-28"></script>

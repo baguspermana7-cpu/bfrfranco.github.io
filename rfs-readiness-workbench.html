@@ -2714,7 +2714,7 @@ var RfsReportEngine = {
             return;
         }
         var w = window.open('', '_blank');
-        if (!w) { alert('Please allow popups to export PDF.'); return; }
+        if (!w) { (window.showToast||alert)('Please allow popups to export PDF.'); return; }
         var html = this._wrap(this._generate(this.selectedType));
         w.document.write(html);
         w.document.close();

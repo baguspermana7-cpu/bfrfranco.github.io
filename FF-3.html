@@ -2742,7 +2742,7 @@ window.iecCalculate = window.iecCalculate || function(){};
 
 <!-- Newsletter Script -->
 <script>
-function subscribeNewsletter(e){e.preventDefault();var email=e.target.querySelector('input[type="email"]').value.trim();if(!email)return false;var subs=JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]');if(subs.find(function(s){return s.email===email})){alert('Already subscribed!');return false}subs.push({email:email,date:new Date().toISOString(),source:location.pathname.split('/').pop(),status:'active'});localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));e.target.innerHTML='<p style="color:#fff;font-weight:600;">&#10003; Subscribed successfully!</p>';return false}
+/* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=20260324b"></script>
 <script src="rz-tracker.js"></script>
@@ -4186,7 +4186,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.iecExportPDF = function() {
         if (state.mode === 'pro' && !hasProAccess()) { window.iecShowLogin(); return; }
         var w = window.open('', '_blank');
-        if (!w) { alert('Please allow popups for this site to export PDF.'); return; }
+        if (!w) { (window.showToast||alert)('Please allow popups for this site to export PDF.'); return; }
 
         var inp  = state.lastInp  || getInputs();
         var data = state.lastData || computeInferenceCost(inp);

@@ -36,6 +36,38 @@ Cache-bust bumped: `styles-index.min.css?v=20260509-dropdown` + `rz-mobile-nav.j
 
 Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
+---
+
+## v1.9.2 — 2026-05-09 (Phase 1 broken-functionality fixes — items 9-20)
+
+**Item 9+10 — `subscribeNewsletter()` unified to mailto: pattern**
+- Added global `window.subscribeNewsletter()` to `script.js`: validates email, opens `mailto:bagusdpermana7@gmail.com` with pre-filled subject + body, shows inline confirmation message. No localStorage, no fake save.
+- Removed 18 per-page inline stubs (article-1 through article-17, FF-1/2/3, geopolitics-1/2/3) that used localStorage-only fake sign-up.
+- Articles 3, 9, 10, 14, 15, 19 (which had the form but no function) now work via the global.
+
+**Item 11 — `exportToPDF()` stub removed from article-10.html**
+- Removed "Download PDF" button (was calling a stub that showed an `alert()` placeholder).
+- "Print Article" button (`window.print()`) remains as the working alternative.
+- Stub function definition also removed.
+
+**Item 12 — FF-1/2/3 modal close buttons (FALSE POSITIVE)**
+- All three close buttons (`#hfxLoginClose`, `#tgsLoginClose`, `#iecLoginClose`) already have `addEventListener('click', ...)` wired correctly inside their IIFE. No change needed.
+
+**Item 17 — article-12.html duplicate IDs (FALSE POSITIVE)**
+- `opmRegion` and `opmTier` appear only once in the DOM (line 2364, 2377). The second occurrences are inside JS comments: `// ── Region data (must match <select id="opmRegion">...)`. No duplicate IDs exist.
+
+**Item 18 — Skip-link targets added**
+- `404.html`: Added `id="main-content"` to `<div class="scene">` (the first post-nav content element).
+- `datacenter-solutions.html`: Added `id="main-content"` to `<main class="main-content">`.
+
+**Item 19 — `_rzAuth` null guards (ALREADY FIXED)**
+- `dashboard.html`, `dc-conventional.html`, `dc-market-tracker.html`, `datahallAI.html`, `datacenter-solutions.html`: all `_rzAuth.*` calls already wrapped in `if (window._rzAuth && typeof window._rzAuth.X === 'function')` guards from a prior session. No change needed.
+
+**Item 20 — `alert()` → `showToast()` across 35 files**
+- Added `window.showToast()` utility to `script.js`: non-blocking bottom toast, 3s auto-dismiss, dark glass style.
+- Replaced all `alert(msg)` calls with `(window.showToast||alert)(msg)` across 35 HTML files (~55 occurrences). Fallback to native `alert` for pages that don't load `script.js` (e.g. ltc-system-modelling-lab.html, calc pages).
+- `prompt()` and `confirm()` deferred to v1.9.1+ (need richer modal UI).
+
 ## v1.9.0 — 2026-05-09 (Plan v15 audit aggregate + Remotion v5 + Phase 1 critical security)
 
 User: "Continue, audit total feature, cari celah error, bug terkait functionality atau area improvement. High and medium impact at least 500 item".

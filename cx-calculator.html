@@ -3704,7 +3704,7 @@ function cxRenderDrawerContent(tab){
 // ============================================================
 function cxExportActivityPDF(mode){
   var proc=cxGetProcedure(cxDrawerActId);
-  if(!proc){alert('No procedure data for this activity.');return;}
+  if(!proc){(window.showToast||alert)('No procedure data for this activity.');return;}
   var actName=document.getElementById('cxDrawerTitle').textContent;
   var w=window.open('','','width=800,height=900');
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+actName+' — Cx '+mode.charAt(0).toUpperCase()+mode.slice(1)+'</title>';
@@ -4055,8 +4055,8 @@ function cxGenSvgTornado(data,w,h,baseCost){
 
 function cxExportPDF(){
   var w=window.open('','_blank');
-  if(!w){alert('Please allow pop-ups for PDF export.');return;}
-  if(!cxLastResults){alert('Please calculate first.');w.close();return;}
+  if(!w){(window.showToast||alert)('Please allow pop-ups for PDF export.');return;}
+  if(!cxLastResults){(window.showToast||alert)('Please calculate first.');w.close();return;}
   var inp=cxLastInputs,res=cxLastResults,mc=cxLastMC,sens=cxLastSens;
   var dt=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   var rate=cxGetRate(inp.region);var rd=CX_REDUNDANCY[inp.redundancy];var eq=res.equipment;

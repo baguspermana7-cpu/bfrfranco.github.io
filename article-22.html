@@ -2258,7 +2258,7 @@
 
     window.a22ExportPDF = function() {
         var w = window.open('', '_blank');
-        if (!w) { alert('Please allow popups for PDF export.'); return; }
+        if (!w) { (window.showToast||alert)('Please allow popups for PDF export.'); return; }
         a22Calculate();
         var isPro = mode === 'pro' && loggedIn;
         var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });

@@ -6946,7 +6946,7 @@
                     list.innerHTML = rows.join('');
                 }
 
-                alert(actionLabel + ' blocked by hard guardrails:\n- ' + guard.hardStops.join('\n- '));
+                (window.showToast||alert)(actionLabel + ' blocked by hard guardrails:\n- ' + guard.hardStops.join('\n- '));
                 return false;
             }
 
@@ -10992,7 +10992,7 @@
                     try {
                         var htmlContent = buildFn ? buildFn() : '';
                         if (!writePdfWindowContent(w, htmlContent)) {
-                            alert('PDF export failed: report window is closed.');
+                            (window.showToast||alert)('PDF export failed: report window is closed.');
                         }
                     } catch (err) {
                         if (w && !w.closed) {
@@ -12902,7 +12902,7 @@
                 var source = resolveModelSource(srcSel ? srcSel.value : 'live_baseline');
                 var reportOpts = resolvePdfReportOptions();
                 if (!source.ok || !source.model) {
-                    alert('PDF single export failed: invalid source model.');
+                    (window.showToast||alert)('PDF single export failed: invalid source model.');
                     return;
                 }
                 var preflightSingle = { ok: true };
@@ -12912,7 +12912,7 @@
                     preflightSingle = guarded.report || { ok: true };
                     return guarded.html;
                 })) {
-                    alert('Popup blocked. Please allow popups and retry PDF export.');
+                    (window.showToast||alert)('Popup blocked. Please allow popups and retry PDF export.');
                     return;
                 }
                 var s = document.getElementById('exportStatus');
@@ -12929,11 +12929,11 @@
                 var right = resolveModelSource(rightSel ? rightSel.value : 'live_optimized');
                 var reportOpts = resolvePdfReportOptions();
                 if (!left.ok || !right.ok || !left.model || !right.model) {
-                    alert('PDF compare export failed: invalid compare source.');
+                    (window.showToast||alert)('PDF compare export failed: invalid compare source.');
                     return;
                 }
                 if (left.key === right.key) {
-                    alert('Choose two different sources for compare PDF.');
+                    (window.showToast||alert)('Choose two different sources for compare PDF.');
                     return;
                 }
                 var preflightCompare = { ok: true };
@@ -12943,7 +12943,7 @@
                     preflightCompare = guarded.report || { ok: true };
                     return guarded.html;
                 })) {
-                    alert('Popup blocked. Please allow popups and retry PDF compare export.');
+                    (window.showToast||alert)('Popup blocked. Please allow popups and retry PDF compare export.');
                     return;
                 }
                 var s = document.getElementById('exportStatus');
@@ -14178,7 +14178,7 @@
             function saveScenarioSnapshot() {
                 var name = String(document.getElementById('scenarioName').value || '').trim();
                 if (!name) {
-                    alert('Please enter a scenario name.');
+                    (window.showToast||alert)('Please enter a scenario name.');
                     return;
                 }
                 var model = baselineModel || computeModel(gatherInputs());
@@ -15434,17 +15434,17 @@
                         var diag = document.getElementById('explorerDiag');
                         if (diag) diag.textContent = 'Deep link copied to clipboard.';
                     }).catch(function() {
-                        alert('Copy failed. Link:\n' + link);
+                        (window.showToast||alert)('Copy failed. Link:\n' + link);
                     });
                 } else {
-                    alert('Deep link:\n' + link);
+                    (window.showToast||alert)('Deep link:\n' + link);
                 }
             }
 
             function explorerExportJson() {
                 var model = explorerCurrentModel || baselineModel;
                 if (!model) {
-                    alert('Run model first before export.');
+                    (window.showToast||alert)('Run model first before export.');
                     return;
                 }
                 var constraints = gatherConstraintState();
@@ -15481,7 +15481,7 @@
             function explorerExportReport() {
                 var model = explorerCurrentModel || baselineModel;
                 if (!model) {
-                    alert('Run model first before export.');
+                    (window.showToast||alert)('Run model first before export.');
                     return;
                 }
                 var constraints = gatherConstraintState();
@@ -16004,7 +16004,7 @@
                 var input = gatherInputs();
                 var targets = gatherCalibrationTargets();
                 if (targets.metricCount < 2) {
-                    alert('Calibration needs at least 2 measured KPI targets (e.g. PUE and COP).');
+                    (window.showToast||alert)('Calibration needs at least 2 measured KPI targets (e.g. PUE and COP).');
                     return;
                 }
 
@@ -16172,7 +16172,7 @@
             document.getElementById('runPareto').addEventListener('click', runParetoFrontier);
             document.getElementById('applyParetoBest').addEventListener('click', function() {
                 if (!latestPareto.length) {
-                    alert('Generate Pareto frontier first.');
+                    (window.showToast||alert)('Generate Pareto frontier first.');
                     return;
                 }
                 var feasibleIdx = -1;
@@ -16409,7 +16409,7 @@
                     if (window._rzAuth && typeof window._rzAuth.showModal === 'function') {
                         window._rzAuth.showModal();
                     } else {
-                        alert('Login module is not ready yet.');
+                        (window.showToast||alert)('Login module is not ready yet.');
                     }
                 });
             }
