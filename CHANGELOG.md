@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.7.1 — 2026-05-09 (public /tools.html hub page)
+
+- **NEW**: `/tools.html` (591 lines, 38 KB) — public hub page listing all 18 calculators + tools across 4 categories:
+  - **Cost & Capacity Calculators** (7): PUE, CAPEX, OPEX, ROI, TCO, CX, Carbon Footprint
+  - **Compliance & Standards Tools** (4): TIA-942 Checklist, Tier Advisor, RFS Readiness, Standards LTC Lab
+  - **Market & Grid Monitors** (2): DC Market Tracker, PLN Java-Bali Grid Monitor
+  - **Operator-Grade Simulations** (2): Datahall AI BMS, DC Conventional Sim
+- **Design**: aurora mesh hero, gradient-shift "Tools & Calculators" H1, per-card accent color via `--tool-accent` CSS variable + shine-sweep on hover + 3-layer glow shadow.
+- **SEO**: full meta + Open Graph + Twitter Cards + `CollectionPage` JSON-LD with 18-item `ItemList` + `BreadcrumbList`.
+- **Navigation**: linked from `articles.html` Insights dropdown (between Changelog and All Insights).
+- **Sitemap regen**: 102 → 103 URLs (added tools.html).
+- **llms.txt regen**: 98 pages now indexable to AI search engines.
+
 ## v1.7.0 — 2026-05-09 (Remotion v3 — landscape + portrait + auto-detect, plus title polish)
 
 ### Remotion video v3 — orientation-aware
