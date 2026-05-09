@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v1.5.0 — 2026-05-09 (Awwwards uplift rolled out + global polish + article typography)
+
+User: "keep working to make keep website improved, i need you to work autonomously".
+
+Three parallel work streams shipped:
+
+### 1. v1.4.0 uplift rolled out to `datacenter-solutions.html`
+- Aurora mesh hero (emerald/blue/amber radial gradients drifting on 22s + 28s alternating animations)
+- Film grain noise overlay (sitewide via body::before, dark mode only)
+- Gradient-shift H1 (4-stop blue→emerald→gold→white sweep)
+- `.ds-strat-card` shine sweep on hover + 3-layer mint glow shadow (scoped to `:not(.is-soon)` so disabled cards aren't affected)
+- 24-span DC-engineering keyword marquee strip (Hyperscale / Edge Computing / AI Factory / Liquid Cooling / PUE 1.15 / Tier IV / OCP Compatible / ASHRAE TC 9.9 / TIA-942-C / 30 MW Cap / N+2 / Mission-Critical) at 60s loop with edge fade-out masks
+- Scroll-reveal IntersectionObserver applied to all 10 `.ds-strat-card` elements
+- Reduced-motion guards throughout
+
+### 2. Article typography uplift across 34 article-class pages
+Patched `article-1.html` … `article-26.html` + `article-27.html` + `FF-1`/`FF-2`/`FF-3` + `geopolitics`/`-1`/`-2`/`-3`. Skipped `article-9-paper.html` (print variant).
+
+Per page: gradient drop-cap on first paragraph (4.5rem, gold→emerald→blue 3-stop), inline-link gradient underline (resend.com style with hover thicken), section-header `h2::before` gold-emerald accent stripe on hover, `.rz-reveal` scroll fade-up class. Helper script preserved at `tools/apply_typography_uplift.py` (idempotent; marker-gated).
+
+### 3. Global polish (sitewide via styles.css)
+- `:root { color-scheme: dark light; }` — proper UA scrollbar theming
+- Selection color: mint `rgba(125,221,180,0.32)` on dark, emerald-tint on light
+- Sitewide custom scrollbar — gradient mint→blue thumb on dark, emerald-tint on light, Firefox `scrollbar-color` variants
+- `:focus-visible` enhanced (border-radius 4px for rounded outlines)
+
+### 4. Search-engine verification scaffolding (index.html)
+- Added comment-template tags for `google-site-verification`, `msvalidate.01`, `yandex-verification` (manual user step to populate after registering)
+- IndexNow key already verified (existing `768683436...txt`)
+- RSS feed alternate link (sitemap.xml as feed source)
+
+Bump 1.4.2 → 1.5.0 (MINOR — feature-class uplift across many pages + global polish).
+
 ## v1.4.2 — 2026-05-09
 - **Proactive sweep**: ran a comprehensive `regex` audit across all 7 calc pages for any class with hardcoded white/light backgrounds lacking a `[data-theme="dark"]` override. ONE remaining gap surfaced: `.scenario-card` on `opex-calculator.html` (line 947, `background: white`).
 - **Fix**: added 5 dark-mode rules covering `.scenario-card` base + `.current` active state + scenario-name / scenario-total / scenario-diff text colours. Active scenario card now shows a soft mint gradient instead of solid white.

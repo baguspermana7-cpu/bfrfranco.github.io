@@ -6376,7 +6376,44 @@ section {
 :focus-visible {
     outline: 2px solid var(--accent-blue, #5ba3cb);
     outline-offset: 2px;
+    border-radius: 4px;
 }
+
+/* ==========================================================================
+   v1.5.0 — Sitewide polish (selection / scrollbar / color-scheme)
+   ========================================================================== */
+:root { color-scheme: dark light; }
+
+::selection {
+    background: rgba(125, 221, 180, 0.32);
+    color: #f1f5f9;
+    text-shadow: none;
+}
+[data-theme="light"] ::selection {
+    background: rgba(16, 185, 129, 0.22);
+    color: #0f172a;
+}
+
+/* Sitewide custom scrollbar — Chromium / WebKit */
+html::-webkit-scrollbar { width: 12px; height: 12px; }
+html::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+html::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(125,221,180,0.35), rgba(59,130,246,0.35));
+    border-radius: 8px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(125,221,180,0.55), rgba(59,130,246,0.55));
+    background-clip: padding-box;
+    border: 3px solid transparent;
+}
+[data-theme="light"] html::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.04); }
+
+/* Firefox */
+html { scrollbar-width: thin; scrollbar-color: rgba(125,221,180,0.45) rgba(15,23,42,0.4); }
+[data-theme="light"] html { scrollbar-color: rgba(16,185,129,0.45) rgba(15,23,42,0.06); }
+
 .skip-link:focus {
     top: 0;
     outline: 3px solid var(--accent-gold);

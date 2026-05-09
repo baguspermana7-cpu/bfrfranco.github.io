@@ -3067,7 +3067,83 @@
         html+='table{width:100%;border-collapse:collapse;margin:8px 0;}';
         html+='h2{font-size:13px;color:#0f172a;border-bottom:2px solid #10b981;padding-bottom:4px;margin:16px 0 8px;}';
         html+='h3{font-size:12px;color:#334155;margin:12px 0 6px;}';
-        html+='@media print{.page{padding:20px 30px;}}</style></head><body><div class="page">';
+        html+='@media print{.page{padding:20px 30px;}}/* v1.5.0 — article typography uplift (Awwwards-tier polish) */
+
+/* Gradient drop-cap on first paragraph of article body */
+.article-body > p:first-of-type::first-letter,
+article > p:first-of-type::first-letter,
+.article-content > p:first-of-type::first-letter {
+    float: left;
+    font-size: 4.5rem;
+    line-height: 1;
+    font-weight: 800;
+    margin: 0.1em 0.15em 0 0;
+    background: linear-gradient(135deg, #fbbf24 0%, #10b981 50%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Scroll-reveal class — IntersectionObserver toggles .is-visible */
+.rz-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: opacity, transform;
+}
+.rz-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Subtle fade-in animation for h2 / h3 section headers as user scrolls */
+.article-body h2,
+.article-content h2,
+article h2 {
+    position: relative;
+}
+.article-body h2::before,
+.article-content h2::before,
+article h2::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 0.45em;
+    width: 4px;
+    height: 0.55em;
+    background: linear-gradient(180deg, #fbbf24, #10b981);
+    border-radius: 2px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.article-body h2:hover::before,
+.article-content h2:hover::before,
+article h2:hover::before { opacity: 1; transform: translateX(0); }
+
+/* Better inline-link underline (resend.com style) */
+.article-body a:not(.btn):not([class*="card"]),
+.article-content a:not(.btn):not([class*="card"]) {
+    background-image: linear-gradient(120deg, currentColor 0%, currentColor 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    transition: background-size 0.3s ease;
+}
+.article-body a:not(.btn):not([class*="card"]):hover,
+.article-content a:not(.btn):not([class*="card"]):hover {
+    background-size: 100% 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rz-reveal { opacity: 1 !important; transform: none !important; transition: none; }
+    .article-body h2::before { opacity: 1; transform: none; }
+}
+
+</style></head><body><div class="page">';
 
         // Header - compact single line
         html+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #10b981;padding-bottom:10px;margin-bottom:12px;">';
