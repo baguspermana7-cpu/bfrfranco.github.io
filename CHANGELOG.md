@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.4.0 — 2026-05-09 (Awwwards uplift — adopt linear.app + vercel.com + resend.com patterns)
+
+User: "enhance more agar tidak terlihat default claude standard theme, tapi yg keren. Cari website yg keren di website dan adopt".
+
+Reference sites adopted:
+- **linear.app** — animated aurora mesh hero, gradient-shift display text
+- **vercel.com** — marquee logo/keyword strip with edge fade-out masks
+- **resend.com** — card shine sweep on hover, animated conic-gradient borders
+- All effects honour `prefers-reduced-motion`. NO cursor-tracking effects (those were previously rejected).
+
+Changes:
+- **Aurora mesh hero**: `.hero::before` + `.hero::after` carry multi-stop radial gradients (mint/gold/violet/blue/pink) drifting via 22s + 28s alternating animations. GPU-accelerated transforms only.
+- **Film grain noise overlay**: `body::before` (dark mode) carries an SVG fractal-noise texture at 3.5% opacity with `mix-blend-mode: overlay`. Adds analog/cinematic depth.
+- **Gradient-shift H1**: `.bento-name` ("Bagus Dwi Permana") now uses `background-clip:text` with a 4-stop linear-gradient (slate→mint→gold→slate) and 12s sweep animation.
+- **Card shine sweep**: `.bento-card::after` carries a diagonal light streak that translates across on hover (0.9s cubic-bezier).
+- **Card hover glow**: replaces solid border with a 3-layer shadow (mint outline + dark depth + emerald aura).
+- **Engineering keyword marquee**: new `<div class="rz-marquee">` strip below the identity row, scrolls 12 keywords (Hyperscale Operations, PUE 1.25, Tier III, N+1, SAP HV/LV, SCADA·BMS, CDFOM, Ahli K3 Listrik, ISO 50001, TIA-942, 99.999%, Mission-Critical) at 60s linear loop with edge fade-out gradient masks.
+- **Scroll-reveal helper**: `.rz-reveal` class + IntersectionObserver in inline `<script>` — fade-up on 10% viewport entry. Available for retroactive application on any element.
+- **Cache bust**: `styles-index.min.css?v=20260509-uplift-v1.4`.
+
+Result: index.html now feels like a 2026 dev portfolio (linear/vercel/resend territory) instead of a generic dark theme.
+
 ## v1.3.1 — 2026-05-09
 - **Fix**: `chiller-plant.html` — was missing canonical, all OG tags, all Twitter cards (audit-seo flagged as REQUIRED-tag errors). Added full meta-tag block + ai-content-declaration. Title bumped from 24 to 60 chars to fit SEO range.
 - **Fix**: `cx-calculator.html` — added missing `og:image` + `twitter:image` (using canonical fallback `assets/profile-photo.jpg`).

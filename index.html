@@ -104,7 +104,7 @@
     </style>
 
     <!-- Index-only stylesheet — 83KB vs 121KB full, sync to prevent CLS -->
-    <link rel="stylesheet" href="styles-index.min.css?v=20260509-share-fix">
+    <link rel="stylesheet" href="styles-index.min.css?v=20260509-uplift-v1.4">
 
     <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
@@ -299,6 +299,37 @@
                     <div class="bento-photo-info">
                         <p class="bento-status-title">Data Center Engineering Professional</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- v1.4.0 — Awwwards uplift: engineering-keyword marquee strip -->
+            <div class="rz-marquee" aria-hidden="true">
+                <div class="rz-marquee-track">
+                    <span class="rz-marquee-item">Hyperscale Operations</span>
+                    <span class="rz-marquee-item">PUE 1.25</span>
+                    <span class="rz-marquee-item">Tier III Concurrent</span>
+                    <span class="rz-marquee-item">N+1 Redundancy</span>
+                    <span class="rz-marquee-item">SAP HV/LV</span>
+                    <span class="rz-marquee-item">SCADA · BMS</span>
+                    <span class="rz-marquee-item">CDFOM Certified</span>
+                    <span class="rz-marquee-item">Ahli K3 Listrik</span>
+                    <span class="rz-marquee-item">ISO 50001</span>
+                    <span class="rz-marquee-item">TIA-942 Compliant</span>
+                    <span class="rz-marquee-item">99.999% Uptime</span>
+                    <span class="rz-marquee-item">Mission-Critical</span>
+                    <!-- duplicate the set so loop is seamless -->
+                    <span class="rz-marquee-item">Hyperscale Operations</span>
+                    <span class="rz-marquee-item">PUE 1.25</span>
+                    <span class="rz-marquee-item">Tier III Concurrent</span>
+                    <span class="rz-marquee-item">N+1 Redundancy</span>
+                    <span class="rz-marquee-item">SAP HV/LV</span>
+                    <span class="rz-marquee-item">SCADA · BMS</span>
+                    <span class="rz-marquee-item">CDFOM Certified</span>
+                    <span class="rz-marquee-item">Ahli K3 Listrik</span>
+                    <span class="rz-marquee-item">ISO 50001</span>
+                    <span class="rz-marquee-item">TIA-942 Compliant</span>
+                    <span class="rz-marquee-item">99.999% Uptime</span>
+                    <span class="rz-marquee-item">Mission-Critical</span>
                 </div>
             </div>
 
@@ -2127,6 +2158,22 @@ if ('serviceWorker' in navigator) {
         if(!ticking){ window.requestAnimationFrame(checkScroll); ticking = true; }
     }, { passive:true });
     checkScroll();
+})();
+
+/* v1.4.0 — Scroll-reveal IntersectionObserver (Awwwards uplift) */
+(function(){
+    if (!('IntersectionObserver' in window)) return;
+    var els = document.querySelectorAll('.rz-reveal');
+    if (!els.length) return;
+    var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+            if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+            }
+        });
+    }, { rootMargin: '-10% 0px -10% 0px', threshold: 0.05 });
+    els.forEach(function(el){ io.observe(el); });
 })();
 </script>
 
