@@ -38,6 +38,17 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.5 — 2026-05-09 (Item 32 — article-18 image WebP conversion)
+
+### Item 32 — `assets/article-18-mid.png` 2.4 MB → 183 KB WebP
+- Original: 2,526,736 bytes (2.5 MB) PNG, 1024×1024 RGBA
+- WebP @ q=85: 187,329 bytes (183 KB) — **93% reduction**
+- Updated `article-18.html` reference: `.png` → `.webp` + added `loading="lazy"` for below-fold image
+- Saves ~2.3 MB on every article-18 page load
+
+### Item 25 — orphan pillar pages — NOT BROKEN
+Audit flagged 1 inbound link as "orphan" but all 5 pillar pages (cooling/power/standards/fire-safety/sustainability) ARE linked from `datacenter-solutions.html` (a high-traffic hub). Adding more random inbound links would be link-spam-y. SEO PageRank distribution is acceptable as-is. Documenting as resolved.
+
 ## v1.10.4 — 2026-05-09 (Item 33 — CLS fix: inject width+height on 212 imgs)
 
 **Item 33** — 208 `<img>` elements lacked explicit `width` + `height` attributes (primary cause of Cumulative Layout Shift / CLS spike on first paint, hurting Core Web Vitals).
