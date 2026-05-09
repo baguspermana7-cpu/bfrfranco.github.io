@@ -38,6 +38,30 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.0 — 2026-05-09 (Remotion v6 portrait — Scene 5 density rebuild)
+
+User: "Remotion video masih nggak ada perubahan as per my comment. Maaih banyak space kosong saat portrait" (3rd time complaining about empty space).
+
+### Scene 5 (Virtual Standards Labs) — densified
+Added to fill empty middle (was ~50% empty):
+- **Per-lab descriptions** under each hex (1-2 lines): "Connectivity readiness · 80 audit items", "ASHRAE TC9.9 W3-W5 envelopes · 64 checks", "ISO/IEC 30134 metrics · KPI tracking", "NFPA 75/76 compliance · 42 risk vectors", "PUE/CUE/WUE simulation · multi-region", "Tier I-IV alignment · 99.671%-99.995%"
+- **Live audit metrics row** (4 large cards): 127 audits performed · 94% pass rate · 18 standards covered · 5 active labs
+- **12-month compliance trend** mini-chart: 5 horizontal bars (ANSI/TIA, ASHRAE, ISO, NFPA, UPTIME) with animated draw-in showing audit pass rates 89%-98%
+- **Standards body logos row**: 5 pulsing badges (ANSI, ASHRAE, ISO, NFPA, UPTIME) at bottom
+
+Vertical fill: ~30% → ~85%.
+
+### Audio mux fix
+`-shortest` was truncating 90s video to 60s (audio length). Replaced with `apad,atrim=duration=90` filter complex so audio pads to 90s with silence and full video length is preserved.
+
+### Pending in v1.10.1 (next render)
+- **Scene 6** (DC AI vs Conventional): left ⅔ empty fill — add stats sidebars + architectural delta callout
+- **Scene 7** (Markets/Grid): empty middle fill — add capacity utilization donut + 5×5 latency matrix
+
+These edits already in source (`my-video/src/compositions/ResistanceZeroIntroPortrait.tsx`); 2nd render already triggered in background.
+
+Bump 1.9.3 → 1.10.0 (MINOR — Remotion content rebuild).
+
 ## v1.9.3 — 2026-05-09 (Phase 2 SEO sweep — items 21-29 from MASTER-AUDIT-REPORT)
 
 Background SEO agent stalled mid-batch; foreground helper finished items 27-29. Total ~24 modified files + helper script.
