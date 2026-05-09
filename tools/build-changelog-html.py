@@ -785,6 +785,29 @@ def build_html(entries):
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }}
+
+    /* v1.8.0 — mobile responsive landing patch */
+    @media (max-width: 768px) {{
+      html, body {{ overflow-x: hidden; max-width: 100vw; }}
+      img {{ max-width: 100%; height: auto; display: block; }}
+      .changelog-hero {{ padding: 4rem 1rem 2rem !important; }}
+      .changelog-hero h1 {{ font-size: clamp(1.8rem, 7vw, 2.5rem) !important; }}
+      .changelog-list {{ padding: 0 1rem 3rem !important; }}
+      .changelog-entry {{ padding: 1.25rem !important; }}
+      .filter-chips {{ gap: 0.4rem !important; padding: 0 1rem; flex-wrap: wrap; }}
+      .filter-chip {{ padding: 0.4rem 0.9rem !important; font-size: 0.75rem !important; min-height: 44px; }}
+      .navbar {{ padding: 0.5rem 0.75rem !important; }}
+      .nav-menu, .nav-links {{ display: none !important; }}
+      .footer-grid {{
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+        padding: 1rem !important;
+      }}
+      button, a.btn, [role="button"], .nav-link {{ min-height: 44px; }}
+    }}
+    @media (max-width: 480px) {{
+      .changelog-hero h1 {{ font-size: 1.4rem !important; }}
+    }}
   </style>
 </head>
 <body data-theme="dark">

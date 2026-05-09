@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.8.2 — 2026-05-09 (Plan v15 Track A complete — 100% responsive coverage)
+
+- **34 article pages** + **9 lab pages** + `future-forward.html` + `changelog.html` patched. Articles agent + virtual-labs agent stalled, so foreground helper script applied the same canonical patches.
+- **`tools/build-changelog-html.py` extended** with embedded mobile patch — every regen of `changelog.html` ships the responsive block.
+- **Audit pass count: 103 / 0 fail**. All 103 indexable pages now meet the 8-checkpoint responsive standard (threshold 7/10).
+- **Total Plan v15 Track A coverage**: 7 calc + 6 landing + 34 article + 9 lab + 18 utility + 35 sweep + 2 final-cleanup = **111 mobile patches applied** across the site.
+- IndexNow ping fired for v1.8.x: 62 URLs submitted to Bing/Yandex/Seznam.
+
 ## v1.8.1 — 2026-05-09 (Remotion v4 posters synced + Plan v15 Track B confirmed shipped)
 
 - **Remotion v4** (90 s, 9 scenes, deeper VFX) confirmed shipped in v1.8.0 commit:

@@ -6329,7 +6329,87 @@ s+=`<defs>
 <linearGradient id="laserG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(139,92,246,0)"/><stop offset="50%" stop-color="rgba(139,92,246,.8)"/><stop offset="100%" stop-color="rgba(139,92,246,0)"/></linearGradient>
 <filter id="glow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>`;
-s+=`<style>.laser{stroke:url(#laserG);stroke-width:2;stroke-dasharray:15 85;animation:laserMove 2s linear infinite;filter:url(#glow)}@keyframes laserMove{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}.linkUp{stroke:rgba(34,197,94,.4)}.linkDown{stroke:rgba(239,68,68,.6);stroke-dasharray:4 4}</style>`;
+s+=`<style>.laser{stroke:url(#laserG);stroke-width:2;stroke-dasharray:15 85;animation:laserMove 2s linear infinite;filter:url(#glow)}@keyframes laserMove{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}.linkUp{stroke:rgba(34,197,94,.4)}.linkDown{stroke:rgba(239,68,68,.6);stroke-dasharray:4 4}
+        /* v1.8.0 — mobile sim/lab responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img, picture, video, svg { max-width: 100%; height: auto; }
+            .hero, .lab-hero, .sim-hero { padding: 1rem !important; }
+            h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
+            svg { max-width: 100% !important; height: auto !important; }
+            .sld-svg, .pid-svg, .topology-svg, .architecture-svg, [data-diagram] {
+                width: 100% !important;
+                height: auto !important;
+            }
+            .diagram-container, .sim-canvas, .sld-container, .topology-container {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                max-width: 100% !important;
+            }
+            .tab-bar, .tabs, [role="tablist"] {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                gap: 0.4rem !important;
+                padding: 0.5rem !important;
+            }
+            .tab, [role="tab"], .tab-btn {
+                flex-shrink: 0 !important;
+                white-space: nowrap !important;
+                font-size: 0.78rem !important;
+                padding: 0.5rem 0.85rem !important;
+            }
+            .side-panel, .lab-sidebar, .sim-sidebar, .info-panel, .control-panel {
+                position: relative !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 1rem 0 !important;
+                border-left: 0 !important;
+                border-top: 1px solid rgba(255,255,255,0.08);
+            }
+            .lab-grid, .sim-grid, .control-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.75rem !important;
+            }
+            .cdu-hmi, .ch-hmi, .hmi-panel {
+                width: 96vw !important;
+                max-width: 100vw !important;
+                max-height: 88vh !important;
+            }
+            .metric-grid, .reference-grid, .standards-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.5rem !important;
+            }
+            table {
+                display: block !important;
+                overflow-x: auto !important;
+                white-space: nowrap;
+                font-size: 0.82rem !important;
+            }
+            th, td { padding: 8px 12px !important; }
+            .navbar, .nav-bar { padding: 0.5rem 0.75rem !important; }
+            .nav-menu, .nav-links { display: none !important; }
+            .btn, button.action, .control-btn {
+                width: 100% !important;
+                min-height: 44px;
+                justify-content: center !important;
+            }
+            .rz-restricted-card {
+                max-width: 92vw !important;
+                padding: 1.5rem !important;
+                margin: 0 1rem !important;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.25rem !important;
+                padding: 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .metric-grid, .reference-grid, .standards-grid { grid-template-columns: 1fr !important; }
+            h1 { font-size: 1.4rem !important; }
+        }
+    </style>`;
 s+=`<rect width="960" height="520" fill="var(--bg2)"/>`;
 s+=`<pattern id="netGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".3"/></pattern>`;
 s+=`<rect width="960" height="520" fill="url(#netGrid)"/>`;
