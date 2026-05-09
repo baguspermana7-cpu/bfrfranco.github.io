@@ -5832,3 +5832,116 @@ section {
 @media (prefers-reduced-motion: reduce) {
     .rz-reveal { opacity: 1 !important; transform: none !important; transition: none; }
 }
+
+/* ==========================================================================
+   v1.6.3 — Video modal CSS (was missing from styles-index.css; close button
+   was rendering as default browser button)
+   ========================================================================== */
+.video-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+}
+.video-modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: min(960px, 92vw);
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 14px;
+    overflow: visible;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    z-index: 2001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease, transform 220ms ease;
+}
+.video-modal.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+.video-modal video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+    border-radius: 14px;
+}
+
+/* X close button — sits OUTSIDE the video frame top-right so it's never
+   covered by native video controls. Larger tap target, mint accent glow,
+   smooth hover. */
+.video-modal-close {
+    position: absolute;
+    top: -52px;
+    right: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 22px;
+    line-height: 1;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    font-family: inherit;
+    padding: 0;
+}
+.video-modal-close:hover {
+    background: rgba(125, 221, 180, 0.92);
+    color: #0f172a;
+    border-color: #7DDDB4;
+    transform: rotate(90deg) scale(1.08);
+    box-shadow: 0 8px 28px rgba(125, 221, 180, 0.45), 0 0 0 4px rgba(125, 221, 180, 0.15);
+}
+.video-modal-close:focus-visible {
+    outline: 3px solid #7DDDB4;
+    outline-offset: 3px;
+}
+
+/* Portrait-orientation modal (mobile) — flips to 9:16 */
+@media (orientation: portrait) and (max-width: 768px) {
+    .video-modal {
+        aspect-ratio: 9/16;
+        width: min(420px, 88vw);
+        max-width: 88vw;
+    }
+}
+
+/* Below 560px: close button stays accessible (above the video, slightly larger) */
+@media (max-width: 560px) {
+    .video-modal { width: 94vw; }
+    .video-modal-close {
+        top: -56px;
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .video-modal-overlay,
+    .video-modal,
+    .video-modal-close { transition: none !important; }
+    .video-modal-close:hover { transform: none; }
+}

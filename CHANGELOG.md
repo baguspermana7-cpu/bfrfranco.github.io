@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.6.3 — 2026-05-09 (video modal X close button + styles-index.css fix)
+
+User: "saat video remotionnya kasi tombol x close button" (give the video an X close button).
+
+**Root cause**: same class as the v1.4.1 share-button bug — the `.video-modal-close` CSS was in `styles.css` but `index.html` loads `styles-index.min.css`. The X close button rendered as a default browser button, easy to miss against the dark video.
+
+**Fix**:
+- Copied the video-modal + overlay + close button rules into `styles-index.css`.
+- **Enhanced the close button**: 44×44 mint-bordered floating button positioned ABOVE the video frame (not overlapping native video controls), with backdrop blur, glow on hover, 90° rotate animation on hover.
+- **Tap target**: 48×48 on mobile (≤560 px width).
+- **Portrait orientation modal**: when device is portrait + ≤768 px wide, modal flips to 9:16 aspect ratio (420 px max width) — sets up for the upcoming portrait Remotion video.
+- Cache-bust: `?v=20260509-modal-fix`.
+
 ## v1.6.2 — 2026-05-09 (articles.html hub Awwwards uplift)
 
 - **Aurora mesh hero** on `.articles-hero` (blue/mint/violet/gold/pink radial gradients drifting)
