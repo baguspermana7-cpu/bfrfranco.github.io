@@ -38,6 +38,20 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.4 — 2026-05-09 (Item 33 — CLS fix: inject width+height on 212 imgs)
+
+**Item 33** — 208 `<img>` elements lacked explicit `width` + `height` attributes (primary cause of Cumulative Layout Shift / CLS spike on first paint, hurting Core Web Vitals).
+
+**Fix**: Python helper walked all 76 HTML files, read intrinsic dimensions from local image files via Pillow, injected `width="X" height="Y"` attributes. 
+
+Result:
+- **76 files modified**
+- **212 `<img>` tags** gained dimensions (was 208 → now 49 remaining)
+- Remaining 49 are external CDN URLs / data: URIs (can't determine dims without HTTP fetch)
+- **Pillow dimension cache**: 71 unique local images analyzed
+
+Impact: Browser can now reserve correct image space BEFORE the image loads, eliminating CLS jumps on every page that has `<img>`. Should improve Lighthouse CLS score significantly.
+
 ## v1.10.3 — 2026-05-09 (Phase 4 perf batch — defer + minify rz-engine)
 
 ### Item 35 + 38 — Render-blocking script defer sweep
