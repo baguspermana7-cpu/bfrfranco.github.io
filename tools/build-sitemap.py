@@ -36,6 +36,8 @@ EXCLUDE_FILES = {
     "article-9-paper.html",  # print variant with noindex
     "rz-ops-p7x3k9m.html",   # admin console
     "google1b98e0817bd5aa88.html",  # google verification
+    "changelog.html",        # noindex — changelog is internal; excluded per Item 26 (v1.9.3)
+    "404.html",              # 404 error page should never be in sitemap
 }
 
 # Priority and changefreq by path pattern

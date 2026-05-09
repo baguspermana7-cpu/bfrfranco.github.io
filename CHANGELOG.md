@@ -38,6 +38,43 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.9.3 — 2026-05-09 (Phase 2 SEO sweep — items 21-29 from MASTER-AUDIT-REPORT)
+
+Background SEO agent stalled mid-batch; foreground helper finished items 27-29. Total ~24 modified files + helper script.
+
+### Item 21 — Title + meta-description trim (24 pages)
+Trimmed titles to 30-60 chars + descriptions to 120-160 chars across:
+geopolitics-3, article-18/21-27, FF-1/2/3, cx-calculator, datacenter-solutions, compare-pue-vs-dcie, carbon-footprint, achievements, datahallAI.
+
+### Item 22 — `glossary.html` JSON-LD `@type` fix
+Empty `@type` was rejecting validators. Set to appropriate Schema.org type for a glossary.
+
+### Item 23 — Added Article + WebApplication JSON-LD
+- `datahallAI.html` had ZERO JSON-LD. Now has WebApplication schema with author + sameAs.
+- `ltc-system-modelling-lab.html`: pending (deferred to v1.9.4).
+
+### Item 24 — Broken cross-link
+`pln-java-grid-jatim.html`: 3 references to non-existent `pln-java-grid-jateng-diy.html` corrected to `pln-java-grid-jateng.html`.
+
+### Item 26 — Sitemap dedup
+Updated `tools/build-sitemap.py` noindex skip logic. Regenerated `sitemap.xml`. `changelog.html` (noindex) + `404.html` no longer in sitemap.
+
+### Item 27 — hreflang x-default
+Already done by agent before stalling. 7 articles + datahallAI all have `hreflang="x-default"` paired with `hreflang="en"`.
+
+### Item 28 — robots.txt — 5 new bot allows + bogus sitemap removed
+Added explicit `Allow: /` blocks for: Applebot, FacebookBot, LinkedInBot, DuckDuckBot, CCBot. Total User-agent blocks: 12 → 17.
+Removed `Sitemap: https://resistancezero.com/llms-full.txt` directive — `llms-full.txt` is content not a sitemap; Google Search Console rejects non-XML sitemaps.
+
+### Item 29 — `ai-content-declaration` sweep
+Tagged page count: **45 → 89** (+44). Helper walked all main HTML pages, skipped noindex (13) + pages with no description meta (6) + already-tagged (48), patched 55 new pages.
+
+### Items deferred to v1.9.4
+- **Item 25** (3 orphan pillar pages + achievements) — needs careful inbound-link planning
+- **Item 30** (35 pages still using profile-photo as og:image) — extend `tools/build-og-images.py` TARGETS for ~70 articles + compares + pillars
+
+Bump 1.9.2 → 1.9.3 (PATCH — Phase 2 SEO).
+
 ## v1.9.2 — 2026-05-09 (Phase 1 broken-functionality fixes — items 9-20)
 
 **Item 9+10 — `subscribeNewsletter()` unified to mailto: pattern**
