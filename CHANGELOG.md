@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.8.1 — 2026-05-09 (Remotion v4 posters synced + Plan v15 Track B confirmed shipped)
+
+- **Remotion v4** (90 s, 9 scenes, deeper VFX) confirmed shipped in v1.8.0 commit:
+  - `assets/resistancezero-intro.mp4` 13 MB / 10.6 → 13 MB landscape, 1920×1080
+  - `assets/resistancezero-intro-portrait.mp4` 11 MB portrait, 1080×1920
+  - 9 scenes: Electricity Awakens · DC Awakens · SLD · Calculators · **Virtual Labs** (NEW: 6 LTC standards labs in honeycomb) · **DC AI vs Conventional** (NEW: split-screen comparison) · **Market & Grid Monitors** (NEW: world map dots + PLN SLD) · **DCMOC + Finance** (NEW: 6-KPI dashboard + ROI gauge + 10-yr TCO chart) · Knowledge Graph + Finale
+  - 4 new VFX components: `glitch-transition.tsx` (RGB aberration + scan-line at 8 scene boundaries), `holographic-grid.tsx` (animated hex overlay), `kinetic-text.tsx` (spring-powered slide-in), `lens-distortion.tsx` (pincushion warp on finale)
+- **Posters synced**: agent generated `intro-poster-landscape.webp` + `intro-poster-portrait.webp` with new naming; renamed to canonical `resistancezero-intro-poster.webp` + `resistancezero-intro-portrait-poster.webp` so `index.html` modal works without further edits.
+
 ## v1.8.0 — 2026-05-09 (Plan v15 Track A — mobile responsive sweep, partial)
 
 User: "Perbaiki responsiveness semua page ini contoh saat mobile, imagenya kekiri nggak auto adjust agar center page atau fill. Begitu juga card di bawah atau navbar footer itu. Dan navbar atas jadi tidak ada hilang semua... Audit semua page literally semua page. Deploy more agent to paralel audit total."
