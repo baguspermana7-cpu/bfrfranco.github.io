@@ -38,6 +38,32 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.3 — 2026-05-09 (Phase 4 perf batch — defer + minify rz-engine)
+
+### Item 35 + 38 — Render-blocking script defer sweep
+**242 script tags** across **107 pages** gained `defer` attribute. Previously most were render-blocking.
+
+Targets and counts:
+- `auth.js`: +108 defer attributes (was 86 unsafe — now 0)
+- `rz-engine.js`: +52 defer
+- `rz-tracker.js`: +60 defer
+- `chart.js`: +22 defer
+- `rz-mobile-nav.js`: already had defer
+
+### Item 38 — `rz-engine.js` minified
+- Created `rz-engine.min.js` via terser: **41 KB → 13 KB** (-28 KB / -68%)
+- Switched 51 pages from `rz-engine.js` → `rz-engine.min.js`
+- Saves ~1.4 MB total bandwidth on first-page-loads across calc pages
+
+### Item 36 — auth.js + rz-engine "double load" — FALSE POSITIVE
+Audit flagged capex + opex calc pages with 2× auth.js loads. Investigation: the second tag is INSIDE a PDF print-window template literal string (the `<\/script>` escape gave it away). Top-level DOM has only 1 tag. Print window needs its own script tags — intentional design. No fix needed.
+
+### Verification
+- 0 auth.js script tags without defer/async
+- audit-script-tags --strict: CLEAN
+
+Bump 1.10.2 → 1.10.3 (PATCH — perf batch).
+
 ## v1.10.2 — 2026-05-09 (Phase v1.10.1 a11y batch — Items 42, 43, 44)
 
 Accessibility-sweep agent failed earlier (Anthropic rate limit). Foreground helper completed Items 42-44.
