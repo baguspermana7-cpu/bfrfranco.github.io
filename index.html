@@ -146,8 +146,9 @@
     <div class="video-modal-overlay" id="introVideoOverlay" hidden></div>
     <div class="video-modal" id="introVideoModal" role="dialog" aria-modal="true" aria-label="resistancezero intro video" hidden>
         <button class="video-modal-close" id="introVideoClose" aria-label="Close video">&#xD7;</button>
-        <video id="introVideo" preload="none" controls playsinline poster="assets/resistancezero-intro-poster.webp" width="1920" height="1080">
-            <source src="assets/resistancezero-intro.mp4" type="video/mp4">
+        <video id="introVideo" preload="none" controls playsinline width="1920" height="1080">
+            <source id="introVideoLandscape" src="assets/resistancezero-intro.mp4" type="video/mp4" media="(orientation: landscape) or (min-width: 769px)">
+            <source id="introVideoPortrait" src="assets/resistancezero-intro-portrait.mp4" type="video/mp4" media="(orientation: portrait) and (max-width: 768px)">
             Your browser doesn't support embedded video.
         </video>
     </div>
@@ -2124,6 +2125,14 @@ if ('serviceWorker' in navigator) {
         var md = document.getElementById('introVideoModal');
         var v  = document.getElementById('introVideo');
         if(!ov || !md || !v) return;
+        // Orientation auto-detect: portrait on narrow mobile
+        var isPortrait = window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches;
+        var src = isPortrait ? 'assets/resistancezero-intro-portrait.mp4' : 'assets/resistancezero-intro.mp4';
+        var poster = isPortrait ? 'assets/resistancezero-intro-portrait-poster.webp' : 'assets/resistancezero-intro-poster.webp';
+        if (!v.currentSrc || v.currentSrc.indexOf(src) === -1) { v.src = src; v.load(); }
+        v.poster = poster;
+        // Adjust modal aspect ratio for portrait
+        if (isPortrait) { md.setAttribute('data-ratio','portrait'); } else { md.removeAttribute('data-ratio'); }
         ov.hidden = md.hidden = false;
         requestAnimationFrame(function(){ ov.classList.add('visible'); md.classList.add('visible'); });
         try{ v.currentTime = 0; v.play(); }catch(_){}

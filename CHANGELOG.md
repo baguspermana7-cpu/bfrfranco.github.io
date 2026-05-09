@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.7.0 — 2026-05-09 (Remotion v3 — landscape + portrait + auto-detect, plus title polish)
+
+### Remotion video v3 — orientation-aware
+- **NEW**: `assets/resistancezero-intro-portrait.mp4` — 60s 1080×1920 portrait composition (`ResistanceZeroIntroPortrait`). For mobile users where landscape would letterbox awkwardly.
+- **UPDATED**: `assets/resistancezero-intro.mp4` — landscape (1920×1080) re-rendered with deeper VFX (higher glow strength, vignette, color grading, 12→16 frame transitions, more electricity callouts in Scene 3 SLD: ANSI relays 50/51 + 87T + 25 + 27/59 + 32 + 67, transformer Z=8% impedance, ΔT=5°C cooling annotation).
+- **NEW posters**: `resistancezero-intro-poster.webp` + `resistancezero-intro-portrait-poster.webp`.
+- **JS auto-detect**: `openIntroVideo()` now reads `window.matchMedia('(max-width: 768px) and (orientation: portrait)')` and swaps `<video src>` accordingly. Modal aspect-ratio also flips between 16:9 and 9:16.
+- **Source elements**: `<source media="...">` tags as a CSS-only fallback if JS fails.
+- File sizes: 10.6 MB landscape + 10.3 MB portrait — both within hard cap.
+
+### SEO title polish
+- **TIA-942 checklist**: 69 → 47 chars (was the persistent SEO title-length WARN).
+- **TCO calculator**: 64 → 53 chars (in SEO sweet spot 30-60 now).
+
+Bump 1.6.4 → 1.7.0 (MINOR — adds responsive video tier).
+
 ## v1.6.4 — 2026-05-09 (small polish: humans.txt + TIA-942 title + author links)
 
 - **NEW**: `/humans.txt` — web-tradition file at site root listing owner / certifications / tech stack / tooling / inspirations. Linked from index, articles, datacenter-solutions, changelog via `<link rel="author" href="/humans.txt">` on those 4 pages.
