@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.6.4 — 2026-05-09 (small polish: humans.txt + TIA-942 title + author links)
+
+- **NEW**: `/humans.txt` — web-tradition file at site root listing owner / certifications / tech stack / tooling / inspirations. Linked from index, articles, datacenter-solutions, changelog via `<link rel="author" href="/humans.txt">` on those 4 pages.
+- **Fix**: `tia-942-checklist.html` title shortened from 66 → 56 chars (now in SEO sweet spot 30-60). Was the last audit-seo title-length WARN.
+- **Polish**: `rel="author"` discoverable from search engines + curious humans inspecting source.
+
 ## v1.6.3 — 2026-05-09 (video modal X close button + styles-index.css fix)
 
 User: "saat video remotionnya kasi tombol x close button" (give the video an X close button).
