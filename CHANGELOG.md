@@ -38,6 +38,35 @@ Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
+## v1.10.1 — 2026-05-09 (Portrait Scenes 5+6+7 density + hamburger inline-style fallback)
+
+User screenshot: tiny "white dot" on capex-calculator mobile navbar that zooms when tapped. Confirms the hamburger button was rendering with no styling on calc pages — the spans inside collapsed to 0×0 dots.
+
+### Hamburger inline-style fallback (calc page fix)
+
+`js/rz-mobile-nav.js` now applies INLINE STYLES on the injected hamburger button as a defensive fallback. Inline styles win over any CSS specificity collision on calc pages (which have their own navbar styling that may not include `.rz-nav-burger` rules).
+
+Forced on every injected burger:
+- 44×44 px button with 1 px mint border + 8 px border-radius
+- 3 spans @ 20×2 px each, displayed as block flex children
+- All `!important` to win cascade
+- `position: relative; z-index: 1001` so it sits above other nav items
+
+This means the hamburger renders correctly on calc pages even if the page's CSS doesn't load `.rz-nav-burger` rules from styles.css.
+
+### Portrait video 2nd render — Scenes 5 + 6 + 7 all densified
+
+This render picks up ALL the v6 source patches:
+- **Scene 5** (Virtual Standards Labs): per-lab descriptions + 4 live audit metrics cards + 12-month compliance bar chart + 5 standards-body logos row. Vertical fill: 30% → 85%.
+- **Scene 6** (DC AI vs Conventional): added stats sidebars filling the empty left ⅔ on each half (AI/HPC metrics top, Conventional metrics bottom) + architectural delta callout at the bottom (25× density, 0.35 PUE delta, 38% energy savings).
+- **Scene 7** (Markets/Grid): added "Global Footprint" panel filling the 680 px empty middle — capacity utilization donut (Used 47% / Available 38% / Reserved 15%, total 2.4 GW) + 5×5 latency matrix (SG / TYO / LON / NV / DXB intercity ms) with color-coded heatmap.
+
+Output: 12.5 MB portrait MP4, 90s, 1080×1920.
+
+Cache-bust: `js/rz-mobile-nav.js?v=2026-05-09d`.
+
+Bump 1.10.0 → 1.10.1 (PATCH — visual regression fix + portrait completion).
+
 ## v1.10.0 — 2026-05-09 (Remotion v6 portrait — Scene 5 density rebuild)
 
 User: "Remotion video masih nggak ada perubahan as per my comment. Maaih banyak space kosong saat portrait" (3rd time complaining about empty space).

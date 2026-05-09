@@ -52,6 +52,32 @@
             burger.setAttribute('aria-expanded', 'false');
             burger.type = 'button';
             burger.innerHTML = '<span></span><span></span><span></span>';
+
+            // Inline styles as a defensive fallback — ensures rendering even if
+            // CSS doesn't load or specificity collisions happen on calc pages
+            burger.style.cssText =
+                'display:inline-flex !important;' +
+                'width:44px !important;height:44px !important;' +
+                'min-width:44px !important;min-height:44px !important;' +
+                'flex-shrink:0 !important;' +
+                'align-items:center !important;justify-content:center !important;' +
+                'flex-direction:column !important;gap:5px !important;' +
+                'padding:0 !important;margin-left:auto !important;' +
+                'background:rgba(255,255,255,0.06);' +
+                'border:1px solid rgba(255,255,255,0.18);' +
+                'border-radius:8px;' +
+                'cursor:pointer;color:#f1f5f9;' +
+                'z-index:1001;position:relative;';
+            for (var i = 0; i < burger.children.length; i++) {
+                burger.children[i].style.cssText =
+                    'display:block !important;' +
+                    'width:20px !important;height:2px !important;' +
+                    'background:currentColor !important;' +
+                    'border-radius:2px !important;' +
+                    'flex-shrink:0 !important;' +
+                    'transition:transform 0.25s,opacity 0.18s;';
+            }
+
             // Pick the best host: nav-right > nav-container > cx-nav-inner > navbar root
             var host = navbar.querySelector(
                 '.nav-right, .nav-container, .cx-nav-inner, .rfs-nav-inner, .nav-inner'

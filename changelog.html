@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 36 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 37 shipped versions.",
         "dateModified": "2026-05-09",
         "author": {
           "@type": "Person",
@@ -73,18 +73,18 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 36,
+        "numberOfItems": 37,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.9.1 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.1"},
-        {"@type":"ListItem","position":2,"name":"v1.10.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.0"},
-        {"@type":"ListItem","position":3,"name":"v1.9.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.3"},
-        {"@type":"ListItem","position":4,"name":"v1.9.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.2"},
-        {"@type":"ListItem","position":5,"name":"v1.9.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.0"},
-        {"@type":"ListItem","position":6,"name":"v1.8.5 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.5"},
-        {"@type":"ListItem","position":7,"name":"v1.8.4 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.4"},
-        {"@type":"ListItem","position":8,"name":"v1.8.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.3"},
-        {"@type":"ListItem","position":9,"name":"v1.8.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.2"},
-        {"@type":"ListItem","position":10,"name":"v1.8.1 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.1"}
+        {"@type":"ListItem","position":2,"name":"v1.10.1 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.1"},
+        {"@type":"ListItem","position":3,"name":"v1.10.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.10.0"},
+        {"@type":"ListItem","position":4,"name":"v1.9.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.3"},
+        {"@type":"ListItem","position":5,"name":"v1.9.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.2"},
+        {"@type":"ListItem","position":6,"name":"v1.9.0 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.9.0"},
+        {"@type":"ListItem","position":7,"name":"v1.8.5 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.5"},
+        {"@type":"ListItem","position":8,"name":"v1.8.4 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.4"},
+        {"@type":"ListItem","position":9,"name":"v1.8.3 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.3"},
+        {"@type":"ListItem","position":10,"name":"v1.8.2 — 2026-05-09","url":"https://resistancezero.com/changelog.html#v1.8.2"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.9.1</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">36 releases</span>
+        <span class="cl-count-badge">37 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -625,6 +625,38 @@
 </ul>
 <p>Cache-bust bumped: <code>styles-index.min.css?v=<a href="https://github.com/baguspermana7-cpu/bfrfranco.github.io/commit/20260509" class="commit-link" target="_blank" rel="noopener"><code>2026050</code></a>-dropdown</code> + <code>rz-mobile-nav.js?v=2026-05-09c</code>.</p>
 <p>Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).</p>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.10.1">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.10.1</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-09">May 09, 2026</time>
+      </div>
+      <p class="changelog-caption">Portrait Scenes 5+6+7 density + hamburger inline-style fallback</p>
+      <div class="changelog-body">
+        <p>User screenshot: tiny "white dot" on capex-calculator mobile navbar that zooms when tapped. Confirms the hamburger button was rendering with no styling on calc pages — the spans inside collapsed to 0×0 dots.</p>
+<h3 class="cl-subhead">Hamburger inline-style fallback (calc page fix)</h3>
+<p><code>js/rz-mobile-nav.js</code> now applies INLINE STYLES on the injected hamburger button as a defensive fallback. Inline styles win over any CSS specificity collision on calc pages (which have their own navbar styling that may not include <code>.rz-nav-burger</code> rules).</p>
+<p>Forced on every injected burger:</p>
+<ul>
+  <li>44×44 px button with 1 px mint border + 8 px border-radius</li>
+  <li>3 spans @ 20×2 px each, displayed as block flex children</li>
+  <li>All <code>!important</code> to win cascade</li>
+  <li><code>position: relative; z-index: 1001</code> so it sits above other nav items</li>
+</ul>
+<p>This means the hamburger renders correctly on calc pages even if the page's CSS doesn't load <code>.rz-nav-burger</code> rules from styles.css.</p>
+<h3 class="cl-subhead">Portrait video 2nd render — Scenes 5 + 6 + 7 all densified</h3>
+<p>This render picks up ALL the v6 source patches:</p>
+<ul>
+  <li><strong>Scene 5</strong> (Virtual Standards Labs): per-lab descriptions + 4 live audit metrics cards + 12-month compliance bar chart + 5 standards-body logos row. Vertical fill: 30% → 85%.</li>
+  <li><strong>Scene 6</strong> (DC AI vs Conventional): added stats sidebars filling the empty left ⅔ on each half (AI/HPC metrics top, Conventional metrics bottom) + architectural delta callout at the bottom (25× density, 0.35 PUE delta, 38% energy savings).</li>
+  <li><strong>Scene 7</strong> (Markets/Grid): added "Global Footprint" panel filling the 680 px empty middle — capacity utilization donut (Used 47% / Available 38% / Reserved 15%, total 2.4 GW) + 5×5 latency matrix (SG / TYO / LON / NV / DXB intercity ms) with color-coded heatmap.</li>
+</ul>
+<p>Output: 12.5 MB portrait MP4, 90s, 1080×1920.</p>
+<p>Cache-bust: <code>js/rz-mobile-nav.js?v=2026-05-09d</code>.</p>
+<p>Bump 1.10.0 → 1.10.1 (PATCH — visual regression fix + portrait completion).</p>
       </div>
     </article>
 
