@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.8.3 — 2026-05-09 (CLAUDE.md project instructions + service worker v8)
+
+User: "All lesson learnt utk diupdate juga di claude.md agar tidak ulangi kesalahan yg sama atau serupa".
+
+### NEW: `/CLAUDE.md` — comprehensive project instruction file
+Every lesson learned in today's 33-commit session codified in one place so future Claude sessions don't repeat the same mistakes:
+
+- **CRITICAL: 2-stylesheet architecture** — `index.html` loads `styles-index.css` only, NOT `styles.css`. 3 separate session regressions (v1.4.1 share-buttons, v1.6.3 video-modal close, others) caused by editing styles.css when index.html needed the rule.
+- **CRITICAL: `</script>` in JS strings** — must escape as `<\/script>`. Audit gate: `tools/audit-script-tags.py --strict`.
+- **Dark-mode class-name discipline** — never trust pattern-matching across pages. v1.2.2 (.brief-card un-prefixed missed), v1.2.3 (.model-card opex-only missed), v1.4.1 (.input-field vs .opex-input class-mismatch on 5 pages).
+- **Mobile responsive 8-checkpoint standard** — every page must score ≥7/10.
+- **Rejected patterns DO NOT REINTRODUCE**: dot-grid hero, rotated side cards, default purple user pill, cursor-tracking effects, visible GitHub URL, saturated emerald bento.
+- **Canonical patterns**: aurora mesh, Pixel Rise scroll cue, pastel bento palette, card shine sweep, marquee strip, OG card fallback.
+- **Required process discipline**: TaskCreate, minimal surgical changes, verify-before-claim, think-comprehensively, always-log-comments, always-update-standardization.
+- **Tooling + standardisation reference table**.
+
+### Service worker bumped: v1 → v8
+- Cache name `rz-cache-v1` → `rz-cache-v8` invalidates ALL stale caches on next visit.
+- Pre-cache extended: tools.html, changelog.html, llms.txt, humans.txt, sitemap.xml, robots.txt, key OG images, styles-index.min.css.
+- Network timeout: 2s before falling back to cache (was none — slow connections hung).
+- MP4 video files explicitly skipped from caching (too large).
+- Branded offline page (mint gradient + dark slate, matches v1.4.0 aesthetic) replaces the plain offline.
+
 ## v1.8.2 — 2026-05-09 (Plan v15 Track A complete — 100% responsive coverage)
 
 - **34 article pages** + **9 lab pages** + `future-forward.html` + `changelog.html` patched. Articles agent + virtual-labs agent stalled, so foreground helper script applied the same canonical patches.
