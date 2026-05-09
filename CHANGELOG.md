@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.5.1 — 2026-05-09 (per-page Open Graph images + IndexNow batch ping)
+
+- **Added**: 12 unique 1200×630 WebP Open Graph cards at `assets/og/<slug>.webp` (~52 KB each, 656 KB total). Pages: index, datacenter-solutions, articles, pue-calc, capex-calc, opex-calc, roi-calc, tco-calc, cx-calc, carbon-footprint, dc-market-tracker, pln-java-grid.
+- **Card design**: dark slate gradient bg + accent radial blob (per-page brand colour) + RZ wordmark top-left + 64px Ubuntu-Bold title + 26px subtitle + 22px JetBrains-Mono brand strip + 4% noise overlay + bottom 4px gold→emerald→blue gradient strip.
+- **Patched 12 HTML pages**: replaced `og:image` + `twitter:image` to point at the new per-page WebP. Added `og:image:width=1200` + `og:image:height=630` where missing. dc-market-tracker.html gained its first-ever `twitter:image`.
+- **Tooling**: new `tools/build-og-images.py` — idempotent generator (`--apply`, `--force`, `--update-html` flags). Deterministic noise (seed=42).
+- **IndexNow ping**: 36 URLs from v1.5.0 commits submitted to Bing/Yandex/Seznam (HTTP 200). Re-crawl in minutes-to-hours.
+
 ## v1.5.0 — 2026-05-09 (Awwwards uplift rolled out + global polish + article typography)
 
 User: "keep working to make keep website improved, i need you to work autonomously".
