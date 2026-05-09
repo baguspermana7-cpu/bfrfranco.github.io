@@ -11,6 +11,12 @@ release sections rather than semver.
 
 ---
 
+## v1.5.3 — 2026-05-09 (View Transitions API + brand-mark continuity)
+
+- **Added**: View Transitions API opt-in (`@view-transition { navigation: auto; }`) — supported browsers (Chrome 126+, Safari 18+, Edge) get smooth fade+slide transitions when navigating between pages on the site. Older browsers no-op gracefully.
+- **Continuity**: declared `view-transition-name: rz-brand-mark` on `.nav-logo`, `.nav-avatar`, `.footer-logo`, `#rzVersionStamp img` so the brand mark visually persists across navigation (one of the signature 2026 web feels — Apple, Vercel, Linear all use this).
+- Honours `prefers-reduced-motion`.
+
 ## v1.5.2 — 2026-05-09 (FAQ + HowTo schema for AI search ranking)
 
 - **Added FAQPage schema** (`@type: FAQPage`) to 5 calculator pages: pue / capex / opex / roi / tco. Each block has 3-4 Q&A pairs covering: how the metric is calculated, typical industry ranges, country/climate sensitivity, biggest input drivers. Surfaces in Google rich-results, Google AI Overview, ChatGPT Search, Perplexity.
