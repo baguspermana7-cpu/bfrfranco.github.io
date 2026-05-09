@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v1.9.0 — 2026-05-09 (Plan v15 audit aggregate + Remotion v5 + Phase 1 critical security)
+
+User: "Continue, audit total feature, cari celah error, bug terkait functionality atau area improvement. High and medium impact at least 500 item".
+
+### 6-agent comprehensive audit — 759 items found (target 500)
+- **Agent A (functionality)**: 157 items
+- **Agent B (a11y)**: 119 items
+- **Agent C (performance)**: 124 items
+- **Agent D (SEO)**: 111 items
+- **Agent E (mobile/consistency/security)**: 155 items
+- **Agent F (tech debt)**: 93 items
+- All 6 reports + master aggregation in `audit-reports/`.
+- Top 50 fix candidates documented in `MASTER-AUDIT-REPORT.md` with phase roadmap (v1.9.0 → v2.0.0).
+
+### Phase 1 — Critical security/privacy fixes
+- **localhost:8200 link removed** from `geopolitics.html:776` — replaced with `dc-market-tracker.html`.
+- **`target="_blank"` rel sweep**: 962 anchor tags across 96 files now have `rel="noopener noreferrer"` (was 113 unsafe — now 0).
+- **"Second Brain" broken nav link** removed from 67 pages (file path didn't exist anywhere).
+- **Underscore-em markdown emphasis disabled** in `tools/build-changelog-html.py` — was producing malformed `target="<em>blank"` because `target="_blank"` matched the underscore-em pattern. Disabled the underscore variant; `*emphasis*` still works.
+
+### Remotion v5 — fill empty space + complete DC Conventional + new VFX
+User: "Tidak hanya ini, hampir semua screen remotion videonya kurang optimal penggunaan spacenya banyak ruang kosong... dc conventional kosong... Enhance more vfx dan visual nya".
+
+**Scene 6 — DC AI vs Conventional**: Conventional bottom half now mirrors AI top half — full 3×2 rack grid with 9 thin server rows per rack, vent grilles, raised-floor scrolling stripe pattern, overhead cable tray, 2 animated CRAC units with rotating fan blades, sub-callout "Single feed · CRAC perimeter cooling", PUE 1.45 badge. AI top half gains liquid-cooling pipe particle flow + PUE 1.10 badge.
+
+**Scene 7 — Markets & Grid**: Empty middle filled with NEW "LIVE CAPACITY FLOW" animated bar chart (10 bars, sinusoidal MW values, growth arrows, per-market colors) + running stats line "Global capacity: 2.4 GW · YoY growth: 18% · Avg PUE: 1.32". PLN chain compacted.
+
+**Scene 8 — DCMOC + Finance**: Major compaction — KPI gap tightened, ROI gauge moved up (top:680→390), gauge radius 110→80. NEW NPV/IRR/Payback row ("$42.3M NPV · 22.7% IRR · 4.3 yrs"). NEW monthly OPEX trend mini line chart (12 months, gradient area). NEW live operations alert feed (3 rows with rotating active highlight).
+
+**New VFX layers**:
+- `GlitchTransition` `variant="vhs"` — 30-frame extended glitch with stronger chromatic aberration (18px), 3 VHS horizontal distortion bands (yellow/teal/magenta), tracking noise bar, stronger CRT scanlines, corner vignette intensification. Applied at major scene boundaries (frames 1558, 1888, 2218).
+- `AmbientParticles` — seeded deterministic upward-drifting particle dots with sinusoidal drift + fade. Added on scenes 6/7/8.
+
+**Output**: `assets/resistancezero-intro.mp4` 16 MB landscape · `assets/resistancezero-intro-portrait.mp4` 14 MB portrait. Both <18 MB cap.
+
+Bump 1.8.5 → 1.9.0 (MINOR — major content additions to video, audit aggregate, security batch).
+
 ## v1.8.5 — 2026-05-09 (Hamburger fix² — duplicate suppression + drawer scroll + universal navbar detection)
 
 User screenshots showed v1.8.4 regressions:

@@ -52,9 +52,11 @@ def inline_md(text):
     # Bold **text** or __text__
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
     text = re.sub(r'__(.+?)__',     r'<strong>\1</strong>', text)
-    # Italic *text* or _text_  (single, not double)
+    # Italic *text* (single, not double).
+    # Note: _underscore_ emphasis intentionally DISABLED — too many false positives
+    # in identifiers (target="_blank", snake_case, _rzAuth, etc.). Use HTML <em> directly
+    # if underscore emphasis is needed.
     text = re.sub(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)', r'<em>\1</em>', text)
-    text = re.sub(r'(?<!_)_(?!_)(.+?)(?<!_)_(?!_)',       r'<em>\1</em>', text)
     # Inline code `…`
     text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
     # Markdown links [text](url) — preserve existing HTML links
