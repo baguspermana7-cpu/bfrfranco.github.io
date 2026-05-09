@@ -20,7 +20,9 @@
     stamp.setAttribute('aria-label', 'Site version');
     stamp.innerHTML = '<img src="assets/favicon-32.png" alt="" width="20" height="20" loading="lazy">' +
                       '<span class="rz-version-label">Latest version</span>' +
-                      '<code class="rz-version-num">v' + v + '<\/code>';
+                      '<a href="changelog.html" class="rz-version-link" title="View changelog">' +
+                      '<code class="rz-version-num">v' + v + '<\/code>' +
+                      '<\/a>';
     anchor.appendChild(stamp);
   }
   if (document.readyState === 'loading') {

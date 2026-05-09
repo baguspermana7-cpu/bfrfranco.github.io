@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.6.0 — 2026-05-09 (public-facing /changelog.html + ai-content-declaration sweep)
+
+### Public changelog page (Linear/Vercel pattern)
+- **NEW**: `/changelog.html` — auto-generated from `CHANGELOG.md` source. 22 release entries rendered as backdrop-blur cards with mint-pill version badges.
+- **Filter chips**: `All / MAJOR / MINOR / PATCH` at the hero — JS toggles `[data-version-tier]` visibility.
+- **Aurora mesh hero** + gradient-shift "Changelog" headline (matches v1.4.0 pattern).
+- **Current-version badge** on the latest entry (mint pill in top-right).
+- **GitHub commit hashes** auto-linked to GitHub commit URLs (e.g., `5a0235c` → live link).
+- **Nav links added**: `index.html` + `articles.html` Insights dropdown gain a `Changelog` item.
+- **SEO meta complete**: title, description, canonical, OG card (uses `assets/og/index.webp`), Twitter, JSON-LD `WebPage` + `BreadcrumbList`, ai-content-declaration.
+- **Generator preserved** at `tools/build-changelog-html.py` — re-run on every CHANGELOG.md update.
+
+### ai-content-declaration sweep on tool pages
+Patched 6 more pages that audit-seo flagged: `tia-942-checklist.html`, `tier-advisor.html`, `water-system.html`, `fire-system.html`, `fuel-system.html`, `ict.html`. `chiller-plant.html` already had it (idempotent skip). Total tagged pages: 39 → 45.
+
+Bump 1.5.3 → 1.6.0 (MINOR — adds new public-facing page + sweep).
+
 ## v1.5.3 — 2026-05-09 (View Transitions API + brand-mark continuity)
 
 - **Added**: View Transitions API opt-in (`@view-transition { navigation: auto; }`) — supported browsers (Chrome 126+, Safari 18+, Edge) get smooth fade+slide transitions when navigating between pages on the site. Older browsers no-op gracefully.
