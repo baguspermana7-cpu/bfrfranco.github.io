@@ -119,6 +119,14 @@ Plus required:
 - v1.8.0 marker comment for idempotency: `/* v1.8.0 — mobile responsive patch */` (variants per category — see `standarization/RESPONSIVE_STANDARD.md`)
 - Floating `.share-buttons` → bottom-bar transition on mobile
 
+### CRITICAL: hamburger toggle is MANDATORY (lesson from v1.8.4)
+
+When `.nav-menu/.nav-links { display: none; }` hides the menu on mobile, you MUST also provide a hamburger toggle so users can still access navigation. v1.8.0 shipped without this and 116 pages had no mobile menu access.
+
+The toggle is provided by `js/rz-mobile-nav.js` (auto-injects a hamburger button into any `nav.navbar` / `header.navbar` / `.navbar`). Loaded on every page via `<script src="js/rz-mobile-nav.js?v=…" defer>`. CSS for `.rz-nav-burger` + `body.rz-nav-open` drawer styling lives in BOTH `styles.css` AND `styles-index.css`.
+
+DO NOT remove the hamburger script tag from any page. DO NOT remove the open-state CSS. If you change the navbar markup, ensure the hamburger script can still find the `.nav-container` or `.nav-right` host.
+
 ---
 
 ## Rejected patterns — DO NOT REINTRODUCE

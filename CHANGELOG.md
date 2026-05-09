@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.8.4 — 2026-05-09 (CRITICAL FIX: mobile hamburger nav menu)
+
+User: "Critical bug, menu tidak keluar saat di klik button menu yg hamburger button in mobile view. Please audit properly, fix comprehensive".
+
+**Root cause**: v1.8.0 mobile responsive sweep added `.nav-menu, .nav-links { display: none; }` on `≤768px` to all 116 pages — but DID NOT add a hamburger toggle button. Mobile users had ZERO way to access the navigation menu after the v1.8.0 ship.
+
+### Fix
+
+**NEW** `js/rz-mobile-nav.js` (90 LOC, idempotent):
+- Injects a hamburger button into the navbar on every page
+- Toggles `.rz-nav-open` class on `<body>` to show full-screen drawer
+- Closes on link click + Esc + outside click + resize-to-desktop
+- Locks body scroll while menu is open
+- Hamburger animates to X on open
+
+**CSS in BOTH stylesheets** (per CLAUDE.md 2-stylesheet rule — `styles.css` AND `styles-index.css`):
+- `.rz-nav-burger` button styling (44×44 mint-on-hover, 3-line icon → X morph)
+- `body.rz-nav-open .nav-menu/.nav-links` full-screen drawer override (`position:fixed; top:56px; bottom:0; flex-direction:column; backdrop-filter:blur(14px)`)
+- Backdrop overlay via `body.rz-nav-open::before`
+- Slide-in animation, `prefers-reduced-motion` honoured
+- Light + dark theme variants
+
+**Sitewide rollout**: `tools/inject-mobile-nav-script.py` injected `<script src="js/rz-mobile-nav.js" defer>` on **116 pages**, right after the existing `js/rz-version.js` script tag.
+
+**Cache-bust**: `styles-index.min.css?v=20260509-hamburger` to force browsers to refetch the new CSS.
+
+### CLAUDE.md updated
+
+Added "Mobile menu MUST have hamburger toggle" rule to prevent this regression class.
+
+Bump 1.8.3 → 1.8.4 (PATCH — critical UX fix).
+
 ## v1.8.3 — 2026-05-09 (CLAUDE.md project instructions + service worker v8)
 
 User: "All lesson learnt utk diupdate juga di claude.md agar tidak ulangi kesalahan yg sama atau serupa".

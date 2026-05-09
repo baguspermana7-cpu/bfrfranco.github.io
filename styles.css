@@ -7467,3 +7467,157 @@ section {
 [data-theme="dark"] .rz-version-num{ background: rgba(16,185,129,0.14); color:#34d399; }
 .rz-version-link{ text-decoration:none; border:none; }
 .rz-version-link:hover .rz-version-num{ opacity:0.8; }
+
+/* ==========================================================================
+   v1.8.4 — Mobile hamburger nav toggle (critical fix)
+   v1.8.0 hid .nav-menu/.nav-links on mobile but never added a toggle.
+   ========================================================================== */
+
+/* Desktop: hamburger button hidden */
+.rz-nav-burger { display: none; }
+
+@media (max-width: 768px) {
+    /* Mobile: show hamburger button */
+    .rz-nav-burger {
+        display: inline-flex !important;
+        position: relative;
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 5px;
+        padding: 0;
+        margin-left: auto;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--heading-color, #f1f5f9);
+        z-index: 1001;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    [data-theme="light"] .rz-nav-burger {
+        background: rgba(15, 23, 42, 0.04);
+        border-color: rgba(15, 23, 42, 0.10);
+        color: #0f172a;
+    }
+    .rz-nav-burger:hover {
+        background: rgba(125, 221, 180, 0.12);
+        border-color: rgba(125, 221, 180, 0.4);
+    }
+    .rz-nav-burger:focus-visible {
+        outline: 2px solid #7DDDB4;
+        outline-offset: 2px;
+    }
+    .rz-nav-burger span {
+        display: block;
+        width: 18px;
+        height: 2px;
+        background: currentColor;
+        border-radius: 2px;
+        transform-origin: center;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.18s ease;
+    }
+    /* Hamburger → X morph when menu is open */
+    .rz-nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .rz-nav-burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .rz-nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Open state: full-screen drawer drops in from top */
+    body.rz-nav-open .nav-menu,
+    body.rz-nav-open .nav-links {
+        display: flex !important;
+        position: fixed !important;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        background: rgba(15, 23, 42, 0.97);
+        backdrop-filter: saturate(180%) blur(14px);
+        -webkit-backdrop-filter: saturate(180%) blur(14px);
+        padding: 1rem 1.25rem 4rem !important;
+        gap: 0 !important;
+        z-index: 1000;
+        animation: rzMenuSlide 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+        overflow-y: auto;
+        margin: 0 !important;
+        list-style: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    [data-theme="light"] body.rz-nav-open .nav-menu,
+    [data-theme="light"] body.rz-nav-open .nav-links {
+        background: rgba(255, 255, 255, 0.97);
+        border-top-color: rgba(15, 23, 42, 0.06);
+    }
+    body.rz-nav-open .nav-menu li,
+    body.rz-nav-open .nav-links > a,
+    body.rz-nav-open .nav-menu > a {
+        width: 100%;
+        list-style: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    body.rz-nav-open .nav-menu a,
+    body.rz-nav-open .nav-links a {
+        display: block !important;
+        width: 100%;
+        padding: 1rem 0.5rem !important;
+        font-size: 1rem !important;
+        font-weight: 500;
+        min-height: 44px;
+        color: #f1f5f9 !important;
+        text-decoration: none;
+    }
+    [data-theme="light"] body.rz-nav-open .nav-menu a,
+    [data-theme="light"] body.rz-nav-open .nav-links a {
+        color: #0f172a !important;
+    }
+    body.rz-nav-open .nav-menu a:hover,
+    body.rz-nav-open .nav-links a:hover {
+        background: rgba(125, 221, 180, 0.08);
+        color: #7DDDB4 !important;
+        padding-left: 0.75rem !important;
+    }
+    /* Dropdown items inside the drawer — show inline, indent slightly */
+    body.rz-nav-open .nav-dropdown .dropdown-menu,
+    body.rz-nav-open .dropdown-menu {
+        position: static !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 0 0 1rem !important;
+        border: 0 !important;
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+
+    /* Backdrop for click-outside-to-close */
+    body.rz-nav-open::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        animation: rzMenuFadeIn 0.25s ease-out;
+    }
+
+    @keyframes rzMenuSlide {
+        from { opacity: 0; transform: translateY(-12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes rzMenuFadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        body.rz-nav-open .nav-menu,
+        body.rz-nav-open .nav-links { animation: none; }
+        body.rz-nav-open::before { animation: none; }
+        .rz-nav-burger span { transition: none; }
+    }
+}
