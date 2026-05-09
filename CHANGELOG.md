@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.5.2 — 2026-05-09 (FAQ + HowTo schema for AI search ranking)
+
+- **Added FAQPage schema** (`@type: FAQPage`) to 5 calculator pages: pue / capex / opex / roi / tco. Each block has 3-4 Q&A pairs covering: how the metric is calculated, typical industry ranges, country/climate sensitivity, biggest input drivers. Surfaces in Google rich-results, Google AI Overview, ChatGPT Search, Perplexity.
+- **Added HowTo schema** (`@type: HowTo`) to `tia-942-checklist.html` (5-step audit workflow). `tier-advisor.html` + `cx-calculator.html` already had HowTo blocks (idempotent skip).
+- Each calc page now signals 4 schema types: WebApplication + HowTo + BreadcrumbList + FAQPage — a rich signal stack for AI search engine ranking.
+- 29 JSON-LD blocks across 8 files validated cleanly (no syntax errors).
+- New tool: `tools/inject-schema-faq-howto.py` (idempotent, marker-gated).
+
 ## v1.5.1 — 2026-05-09 (per-page Open Graph images + IndexNow batch ping)
 
 - **Added**: 12 unique 1200×630 WebP Open Graph cards at `assets/og/<slug>.webp` (~52 KB each, 656 KB total). Pages: index, datacenter-solutions, articles, pue-calc, capex-calc, opex-calc, roi-calc, tco-calc, cx-calc, carbon-footprint, dc-market-tracker, pln-java-grid.
