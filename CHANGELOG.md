@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.10.16 — 2026-05-09 (a11y + SEO batch: th[scope] + ai-content-declaration)
+
+Two audit-flagged items batched.
+
+### B11-TABLES (12 remaining)
+- 12 `<th>` tags lacked `scope` attribute → screen readers couldn't infer column/row association.
+- Added `scope="col"` automatically. Audit clean (0 remaining).
+
+### D7-001 (13 remaining)
+- 13 pages were missing `<meta name="ai-content-declaration" content="human-authored">`.
+- 12 pages received the meta tag (inserted after `<meta name="description">`).
+- 1 redirect page (`future-forward-1.html`) + 1 Google Search Console verification file are legitimate exclusions (not content pages).
+
+### Pre-resolved during audit
+- A8-AUTH-01: dashboard/dc-conventional/dc-market-tracker/datahallAI all have `window._rzAuth && typeof ...` null guards.
+- A2-IMAGES-01 / A2-BADGES-01: 0 broken local image refs in articles + index/datacenter-solutions/cv.
+- C3-CHART: all chart.js script tags have `defer`.
+- C3-AUTH: all auth.js script tags have `defer`.
+- D5-001: hreflang x-default present on recent articles.
+- D6-002: Applebot/FacebookBot/LinkedInBot/DuckDuckBot/CCBot all in robots.txt.
+
+### SW
+- SW cache name auto-synced 1.10.15 → 1.10.16.
+
+Bump 1.10.15 → 1.10.16 (PATCH — a11y + SEO).
+
+---
+
 ## v1.10.15 — 2026-05-09 (Privacy — gate Google Analytics behind GDPR consent + interaction defer)
 
 Audit-flagged E10-1: Google Analytics fired before GDPR consent on multiple pages. The eager-load `<script async src="...gtag/js?id=...">` ran on every page load regardless of cookie banner state — sending pageview data before user could accept/decline.
