@@ -383,6 +383,23 @@
   // Indonesian seasonal modulation (1.00 = baseline, 1.04 = dry season +4%)
   var MONTH_FACTOR = [1.00, 1.00, 1.00, 1.01, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.01, 1.00];
 
+  // Per-fuel monthly factors (Jan=0 … Dec=11) — drives carbon intensity seasonal wave.
+  // Hydro: wet-season reservoir fill peaks Feb-Mar, troughs Aug-Sep (Java major dams).
+  // Solar: dry-season clear skies peak Jun-Aug; monsoon cloud cover depresses Jan-Feb.
+  // Gas:   swing fuel — compensates hydro drop in dry season.
+  // Coal:  baseload, minor seasonal nudge (slightly higher when hydro is low).
+  // Geo/Biomass/Diesel: near-constant (baseload / seasonal-independent dispatch).
+  var MONTHLY_FUEL_FACTORS = {
+    //              Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+    coal:       [0.97, 0.97, 0.98, 0.99, 1.01, 1.02, 1.04, 1.04, 1.03, 1.01, 0.99, 0.97],
+    gas:        [0.93, 0.92, 0.94, 0.97, 1.02, 1.05, 1.07, 1.08, 1.05, 1.00, 0.97, 0.94],
+    hydro:      [1.45, 1.55, 1.40, 1.20, 0.90, 0.72, 0.60, 0.58, 0.65, 0.85, 1.15, 1.35],
+    geothermal: [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
+    biomass:    [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
+    solar:      [0.72, 0.75, 0.83, 0.91, 1.06, 1.15, 1.22, 1.22, 1.14, 1.02, 0.88, 0.74],
+    diesel:     [0.97, 0.97, 0.98, 0.99, 1.01, 1.02, 1.03, 1.03, 1.02, 1.00, 0.99, 0.97]
+  };
+
   function carbonAt(byFuelAtTick) {
     var totalMw = 0, weighted = 0;
     for (var k in byFuelAtTick) {
@@ -450,6 +467,60 @@
     return { by_fuel: byFuel, demand: demand, carbon_intensity: carbon };
   }
 
+  // Compute per-fuel 24h daily average MW from the hourly profile.
+  var _dailyAvgByFuel = (function () {
+    var out = {};
+    FUELS.forEach(function (f) { out[f] = 0; });
+    hourly24h.forEach(function (h) {
+      FUELS.forEach(function (f) { out[f] += (h.by_fuel[f] || 0); });
+    });
+    FUELS.forEach(function (f) { out[f] = out[f] / 24; });
+    return out;
+  }());
+
+  // Build 12-month dataset applying independent per-fuel seasonal factors.
+  // This produces a realistic CI seasonal wave: wet season (Jan-Mar) lower CI
+  // from high hydro; dry season (Jul-Aug) higher CI as coal/gas fill hydro gap.
+  function buildMonthlyRange() {
+    var byFuel = {}; FUELS.forEach(function (f) { byFuel[f] = []; });
+    var demand = [], carbon = [];
+    for (var m = 0; m < 12; m++) {
+      var perFuel = {};
+      FUELS.forEach(function (f) {
+        var fac = (MONTHLY_FUEL_FACTORS[f] || [])[m] || 1.0;
+        perFuel[f] = Math.round(_dailyAvgByFuel[f] * fac);
+      });
+      var d = 0;
+      FUELS.forEach(function (f) { d += perFuel[f]; });
+      demand.push(d);
+      carbon.push(carbonAt(perFuel));
+      FUELS.forEach(function (f) { byFuel[f].push(perFuel[f]); });
+    }
+    return { by_fuel: byFuel, demand: demand, carbon_intensity: carbon };
+  }
+
+  // Build N-tick dataset for ranges shorter than 1Y (e.g. 3M) using
+  // per-fuel factors for a target seasonal period, with small tick-level noise.
+  // fuelFactors: object {fuel: baselineFactor}, noiseFn(t): small scalar noise.
+  function buildPerFuelRange(numTicks, fuelFactors, noiseFn) {
+    var byFuel = {}; FUELS.forEach(function (f) { byFuel[f] = []; });
+    var demand = [], carbon = [];
+    for (var t = 0; t < numTicks; t++) {
+      var noise = noiseFn ? noiseFn(t) : 1.0;
+      var perFuel = {};
+      FUELS.forEach(function (f) {
+        var fac = (fuelFactors[f] || 1.0) * noise;
+        perFuel[f] = Math.round(_dailyAvgByFuel[f] * fac);
+      });
+      var d = 0;
+      FUELS.forEach(function (f) { d += perFuel[f]; });
+      demand.push(d);
+      carbon.push(carbonAt(perFuel));
+      FUELS.forEach(function (f) { byFuel[f].push(perFuel[f]); });
+    }
+    return { by_fuel: byFuel, demand: demand, carbon_intensity: carbon };
+  }
+
   function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
   var range24h = (function () {
@@ -505,10 +576,16 @@
   }());
 
   var range3M = (function () {
-    var b = buildAggregateRange(13, function (t) {
-      // 13 weeks ≈ Q3 (Jul-Sep, dry season)
-      return 1.04 + 0.01 * Math.sin(t / 2);
-    }, 168);
+    // Q3 Jul-Sep dry season: average per-fuel factors for months 6/7/8, plus
+    // week-level demand noise (+/-1%) to break the flat bands.
+    var q3Fuel = {};
+    FUELS.forEach(function (f) {
+      var mf = MONTHLY_FUEL_FACTORS[f] || [];
+      q3Fuel[f] = ((mf[6] || 1) + (mf[7] || 1) + (mf[8] || 1)) / 3;
+    });
+    var b = buildPerFuelRange(13, q3Fuel, function (t) {
+      return 1.0 + 0.012 * Math.sin(t * 0.9 + 0.4);
+    });
     return {
       label: '3 months', ticks: 13, interval: 'week',
       by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,
@@ -517,7 +594,7 @@
   }());
 
   var range1Y = (function () {
-    var b = buildAggregateRange(12, function (t) { return MONTH_FACTOR[t]; }, 730);
+    var b = buildMonthlyRange();
     return {
       label: '1 year', ticks: 12, interval: 'month',
       by_fuel: b.by_fuel, demand: b.demand, carbon_intensity: b.carbon_intensity,

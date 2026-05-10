@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v1.10.18 — 2026-05-09 (Privacy — move internal design docs + session notes to _private/)
+
+Audit-flagged F10-01: 7 internal `.md` files at site root were git-tracked → publicly served by GitHub Pages.
+
+### Files moved to `_private/` (gitignored, locally preserved)
+- `OPEX_Calculator_Design.md` (13 KB) — internal calculator design
+- `OPEX_Calculator_Design_v2.md` (37 KB) — internal design v2
+- `OPEX_Detailed_Breakdown_Analysis.md` (21 KB) — internal analysis
+- `SESSION_ARTICLE13.md` (3 KB) — session notes
+- `SESSION_NOTES.md` (57 KB) — session notes
+- `chiller-mimic-professionalization-plan.md` (4 KB) — internal plan
+- `claudecode.md` (2 KB) — session notes
+
+### Action
+- `mkdir _private/` + move all 7 files into it
+- `_private/` added to `.gitignore`
+- `git rm --cached` removes from git tracking (preserves local copies)
+- ~137 KB no longer publicly accessible at site root
+
+### Kept at root (legitimate)
+- `CHANGELOG.md` — public changelog (referenced by `/changelog.html` builder)
+- `CLAUDE.md` — Claude Code project instructions (read at root)
+- `README.md` — repo readme (public OK)
+
+### SW
+- SW cache name auto-synced 1.10.17 → 1.10.18.
+
+Bump 1.10.17 → 1.10.18 (PATCH — privacy/security hygiene).
+
+---
+
 ## v1.10.17 — 2026-05-09 (a11y — skip-link injected on remaining 9 pages)
 
 Audit-flagged B12-SKIP: pages without "Skip to main content" link force keyboard-only users to tab through entire navbar before reaching content.
