@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.10.9 — 2026-05-09 (Untrack 641 MB unused DC asset folder)
+
+Audit-driven cleanup. `audit-reports/C-performance.md` flagged `assets/DC/` as 71 PNG files averaging 9-11 MB each (641 MB total). The original audit assumption (referenced from `dc-conventional.html`) was wrong — that page references `assets/DC_Conventional.jpg` (a different file). Zero HTML/JS/MD references the `assets/DC/` folder.
+
+### Action
+- Add `assets/DC/` to `.gitignore`.
+- `git rm -r --cached assets/DC/` — files preserved locally, removed from GitHub Pages deploy.
+- 71 files / 641 MB no longer ship to production.
+
+### Impact
+- GitHub Pages deploy size reduced ~641 MB.
+- No user-facing change (these assets were never linked).
+- Local copy preserved at `/home/baguspermana7/rz-work/assets/DC/` if user needs them later.
+
+Bump 1.10.8 → 1.10.9 (PATCH — repo cleanup, no code change).
+
+---
+
 ## v1.10.8 — 2026-05-09 (Image aspect-ratio + card-fill + footer responsive)
 
 User screenshots: "ini gambarnya stretch, need keep aspect ratio, ini juga cardnya saat 100% mobile view kok cardnya ke sisi kiri tidak fill (card area og image) dan card terms dll (akhir) dan card footer navbar tidak responsive full".
