@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.10.14 — 2026-05-09 (SEO — JSON-LD added to ltc-system-modelling-lab)
+
+Audit-flagged: `ltc-system-modelling-lab.html` had ZERO JSON-LD blocks. AI search engines + Google rich-results couldn't classify the page.
+
+### Action
+- Added 2 JSON-LD `<script type="application/ld+json">` blocks to `<head>`:
+  1. `WebApplication` schema (name, description, category, audience, creator, publisher).
+  2. `BreadcrumbList` schema (Home → DC Solutions → Standards Labs → System Modelling Lab).
+
+### Audit cleanup
+- E3-2 (113 target=_blank without noopener): pre-resolved — all 844 target=_blank links already have rel=noopener. The single remaining is in changelog prose (literal text in `<code>` block, not an active link).
+- D3-001 (broken jateng-diy link): pre-resolved — `pln-java-grid-jateng.html` exists and is correctly linked.
+- A1-FF-MODAL-01 (FF modal close handlers): pre-resolved — `byId('hfxLoginClose').addEventListener` wired on FF-1/2/3.
+- A2-SECONDBRAIN-01 (62 pages broken Apps/second brain link): now only 1 reference in changelog.html prose (legitimate documentation reference, not active nav).
+
+### SW
+- SW cache name auto-synced 1.10.13 → 1.10.14 via `tools/sync-sw-version.py`.
+
+Bump 1.10.13 → 1.10.14 (PATCH — SEO + audit-driven cleanup).
+
+---
+
 ## v1.10.13 — 2026-05-09 (SW cache version-aware via tools/sync-sw-version.py)
 
 `sw.js` had a hardcoded `CACHE_NAME = 'rz-cache-v8'` that drifted from the actual site version. Manual bumps were forgotten across releases — meaning users on stale caches got mismatched JS+CSS+HTML for hours.
