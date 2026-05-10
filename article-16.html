@@ -1145,7 +1145,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -1979,7 +1979,7 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Market</label><span class="calc-tooltip">?<span class="tip-text">Pre-loaded with real market data from Cushman &amp; Wakefield, Arizton, and CBRE H1 2025 reports. Select "Custom" to model a hypothetical market.</span></span></div>
-                        <select id="calcMarket" onchange="prefillMarket()">
+                        <select id="calcMarket" onchange="prefillMarket()" aria-label="Calc Market">
                             <option value="johor">Malaysia (Johor)</option>
                             <option value="indonesia">Indonesia (Greater Jakarta)</option>
                             <option value="singapore">Singapore</option>
@@ -1991,15 +1991,15 @@
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Current Operational (MW)</label><span class="calc-tooltip">?<span class="tip-text">Currently live and energized IT load capacity in the market. This is the baseline that represents proven, absorbed demand. Source: Cushman &amp; Wakefield H1 2025.</span></span></div>
-                        <input type="number" id="calcOperational" value="487" min="0" max="10000">
+                        <input type="number" id="calcOperational" value="487" min="0" max="10000" aria-label="Calc Operational">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Total Pipeline (MW)</label><span class="calc-tooltip">?<span class="tip-text">Total announced + under construction + planned capacity through 2030. Includes committed builds (with LOIs/PPAs) and speculative builds (no anchor tenants). Source: Arizton 2025-2030.</span></span></div>
-                        <input type="number" id="calcPipeline" value="5800" min="0" max="50000">
+                        <input type="number" id="calcPipeline" value="5800" min="0" max="50000" aria-label="Calc Pipeline">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Population (millions)</label><span class="calc-tooltip">?<span class="tip-text">Market population for computing pipeline-to-population ratio. Helps contextualize whether the pipeline is proportional to the addressable market or wildly excessive.</span></span></div>
-                        <input type="number" id="calcPopulation" value="3.8" min="0.1" max="2000" step="0.1">
+                        <input type="number" id="calcPopulation" value="3.8" min="0.1" max="2000" step="0.1" aria-label="Calc Population">
                     </div>
                 </div>
 
@@ -2008,19 +2008,19 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Annual Absorption Rate (MW/yr)</label><span class="calc-tooltip">?<span class="tip-text">How much new DC capacity the market actually fills per year. Based on historical take-up rates. SG: ~150 MW/yr, ID: ~300 MW/yr, Johor: ~200 MW/yr (optimistic). This is the most critical input — it determines how fast supply gets absorbed.</span></span></div>
-                        <input type="number" id="calcAbsorption" value="200" min="10" max="5000">
+                        <input type="number" id="calcAbsorption" value="200" min="10" max="5000" aria-label="Calc Absorption">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Hyperscaler Pre-Committed (%)</label><span class="calc-tooltip">?<span class="tip-text">Percentage of pipeline with signed hyperscaler LOIs, PPAs, or build-to-suit contracts. Pre-committed capacity is "safe" — it has guaranteed demand. Higher % = lower bubble risk. AWS, Google, Microsoft, and Meta are the primary hyperscaler tenants.</span></span></div>
-                        <input type="number" id="calcPrecommit" value="40" min="0" max="100">
+                        <input type="number" id="calcPrecommit" value="40" min="0" max="100" aria-label="Calc Precommit">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Speculative Build (%)</label><span class="calc-tooltip">?<span class="tip-text">Percentage of pipeline built WITHOUT anchor tenants or signed LOIs. These are carrier-neutral facilities betting that "demand will come." Speculative builds are the first casualties in a correction — they bear the most risk. Higher % = higher bubble risk.</span></span></div>
-                        <input type="number" id="calcSpec" value="35" min="0" max="100">
+                        <input type="number" id="calcSpec" value="35" min="0" max="100" aria-label="Calc Spec">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Demand Growth Rate (%/yr)</label><span class="calc-tooltip">?<span class="tip-text">Annual organic demand growth rate for data center capacity, driven by digital economy expansion, cloud adoption, and enterprise migration. SEA average: 15-20%. Used to model whether absorption will accelerate over time.</span></span></div>
-                        <input type="number" id="calcDemandGrowth" value="15" min="0" max="50">
+                        <input type="number" id="calcDemandGrowth" value="15" min="0" max="50" aria-label="Calc Demand Growth">
                     </div>
                 </div>
 
@@ -2029,19 +2029,19 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Avg Build Cost ($M/MW)</label><span class="calc-tooltip">?<span class="tip-text">Greenfield construction cost per MW of IT load. Includes land, building, MEP, commissioning. Ranges: $7-8M (VN/PH), $8-10M (ID/MY/TH), $12-15M (SG). AI-ready with liquid cooling adds 15-20%. Used to compute total capital at risk.</span></span></div>
-                        <input type="number" id="calcCostMW" value="9" min="1" max="30" step="0.5">
+                        <input type="number" id="calcCostMW" value="9" min="1" max="30" step="0.5" aria-label="Calc Cost MW">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Avg Revenue/MW/Year ($M)</label><span class="calc-tooltip">?<span class="tip-text">Annual colocation revenue per MW. Includes power pass-through, space rental, cross-connects, and managed services. SG: $2.5-3.5M, ID/MY: $1.5-2.2M, VN/TH: $1.4-2.0M. Used for break-even and payback calculations.</span></span></div>
-                        <input type="number" id="calcRevMW" value="2.0" min="0.5" max="5" step="0.1">
+                        <input type="number" id="calcRevMW" value="2.0" min="0.5" max="5" step="0.1" aria-label="Calc Rev MW">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>OPEX Ratio (%)</label><span class="calc-tooltip">?<span class="tip-text">Operating expenses as % of revenue. Includes electricity (40-55%), staff (8-12%), maintenance (5-8%), insurance, land lease, and SGA. Typical range: 55-70% for SEA operators. Used to calculate break-even occupancy and EBITDA margin.</span></span></div>
-                        <input type="number" id="calcOpexRatio" value="62" min="40" max="85">
+                        <input type="number" id="calcOpexRatio" value="62" min="40" max="85" aria-label="Calc OPEX Ratio">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Discount Rate / WACC (%)</label><span class="calc-tooltip">?<span class="tip-text">Weighted average cost of capital for NPV calculations. Reflects risk premium for the market. Infrastructure funds: 8-10%, SEA premium: 2-4% above US/EU. Higher WACC = more conservative assessment of whether the investment returns justify the risk.</span></span></div>
-                        <input type="number" id="calcWACC" value="10" min="5" max="20" step="0.5">
+                        <input type="number" id="calcWACC" value="10" min="5" max="20" step="0.5" aria-label="Calc WACC">
                     </div>
                 </div>
 
@@ -2676,8 +2676,8 @@ window.addEventListener('DOMContentLoaded', function() {
         <button class="bub-login-close" onclick="bubHideLogin()">&times;</button>
         <h3><i class="fas fa-lock" style="color:#d97706;margin-right:6px"></i> Pro Risk Intelligence</h3>
         <p>Unlock Monte Carlo simulation (10K runs), sensitivity tornado, multi-dimensional risk radar, scenario engine, and executive narrative assessment.</p>
-        <input type="email" id="bubLoginEmail" placeholder="Email address">
-        <input type="password" id="bubLoginPass" placeholder="Password">
+        <input type="email" id="bubLoginEmail" placeholder="Email address" aria-label="Email address">
+        <input type="password" id="bubLoginPass" placeholder="Password" aria-label="Password">
         <button class="bub-login-submit" onclick="bubHandleLogin()">Sign In</button>
         <div class="bub-login-error" id="bubLoginError">Invalid credentials.</div>
         <div class="bub-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>

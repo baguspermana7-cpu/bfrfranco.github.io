@@ -1161,7 +1161,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -2108,13 +2108,13 @@
 
                     <div class="control-row">
                         <span class="control-label">Facility Age (Years):</span>
-                        <input type="range" id="ageSlider" class="control-slider" min="1" max="25" value="8">
+                        <input type="range" id="ageSlider" class="control-slider" min="1" max="25" value="8" aria-label="Age Slider">
                         <span class="control-value" id="ageValue">8 yr</span>
                     </div>
 
                     <div class="control-row">
                         <span class="control-label">Debt Accumulation Rate:</span>
-                        <input type="range" id="debtSlider" class="control-slider" min="0" max="100" value="40">
+                        <input type="range" id="debtSlider" class="control-slider" min="0" max="100" value="40" aria-label="Debt Slider">
                         <span class="control-value" id="debtValue">40%</span>
                     </div>
 
@@ -2177,23 +2177,23 @@
                     <div class="calc-grid">
                         <div class="calc-input-group">
                             <label class="calc-label">Deferred Items Count <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Deferred Items Count</div><div class="tooltip-desc">Total number of maintenance items currently deferred/backlogged. Includes all criticality levels. Higher counts create compound risk — each deferred item increases failure probability of adjacent systems.</div><div class="tooltip-formula">Benchmark: &gt;50 items = elevated risk (NIST SP 800-82)</div></span></span></label>
-                            <input type="number" class="calc-input" id="calcItems" value="45" min="1" max="500">
+                            <input type="number" class="calc-input" id="calcItems" value="45" min="1" max="500" aria-label="Calc Items">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Avg Age (Months) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Average Deferral Age</div><div class="tooltip-desc">Mean number of months items have been deferred. Risk compounds non-linearly — Weibull analysis shows hazard rate increases sharply after 12 months. Items &gt;24 months enter wear-out failure zone.</div><div class="tooltip-formula">Formula: Hazard h(t) = (&beta;/&eta;)(t/&eta;)^(&beta;-1), &beta;=2.5</div></span></span></label>
-                            <input type="number" class="calc-input" id="calcAge" value="18" min="1" max="120">
+                            <input type="number" class="calc-input" id="calcAge" value="18" min="1" max="120" aria-label="Calc Age">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Facility Age (Years) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Facility Age</div><div class="tooltip-desc">Years since facility commissioning. Older facilities have higher baseline failure rates and more interdependent deferred items. The bathtub curve shifts from random to wear-out failures after 7-10 years.</div><div class="tooltip-formula">Benchmark: 0-5yr=infant, 5-15yr=useful life, &gt;15yr=wear-out</div></span></span></label>
-                            <input type="number" class="calc-input" id="calcFacilityAge" value="8" min="1" max="30">
+                            <input type="number" class="calc-input" id="calcFacilityAge" value="8" min="1" max="30" aria-label="Calc Facility Age">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Avg Remediation Cost ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Average Remediation Cost</div><div class="tooltip-desc">Mean cost to remediate a single deferred item including parts, labor, outage window, and testing. Costs escalate 12-18% per year of deferral due to part obsolescence and cascading scope.</div><div class="tooltip-formula">Benchmark: $5K-$50K typical for MEP equipment</div></span></span></label>
-                            <input type="number" class="calc-input" id="calcCost" value="15000" min="100" max="500000">
+                            <input type="number" class="calc-input" id="calcCost" value="15000" min="100" max="500000" aria-label="Calc Cost">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Annual Revenue ($) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Annual Facility Revenue</div><div class="tooltip-desc">Total annual revenue generated by or dependent on the facility. Used to calculate revenue-at-risk and SLA penalty exposure from unplanned outages caused by deferred maintenance failures.</div><div class="tooltip-formula">Benchmark: $3K-$10K per kW/year for colocation</div></span></span></label>
-                            <input type="number" class="calc-input" id="calcRevenue" value="50000000" min="1000000" max="1000000000">
+                            <input type="number" class="calc-input" id="calcRevenue" value="50000000" min="1000000" max="1000000000" aria-label="Calc Revenue">
                         </div>
                     </div>
 
@@ -2206,21 +2206,21 @@
                                     <span style="font-size: 0.8rem; color: #ef4444; font-weight: 600;">% Critical <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Items %</div><div class="tooltip-desc">Proportion of deferred items classified as Critical — single-point-of-failure equipment, life safety systems, or items with no redundancy. Critical items have 3x the failure impact multiplier.</div><div class="tooltip-formula">Benchmark: &gt;25% critical = immediate remediation program needed</div></span></span></span>
                                     <span class="slider-value" id="criticalVal">20%</span>
                                 </div>
-                                <input type="range" class="calc-slider" id="calcCritical" min="0" max="100" value="20">
+                                <input type="range" class="calc-slider" id="calcCritical" min="0" max="100" value="20" aria-label="Calc Critical">
                             </div>
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                                     <span style="font-size: 0.8rem; color: #f59e0b; font-weight: 600;">% Major <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Major Items %</div><div class="tooltip-desc">Proportion classified as Major — redundant systems with degraded backup, approaching end-of-life, or compliance-affecting. Major items have 1.5x impact multiplier. Minor items (remainder) have 1.0x multiplier.</div><div class="tooltip-formula">Benchmark: Healthy portfolio &lt;40% Major</div></span></span></span>
                                     <span class="slider-value" id="majorVal">35%</span>
                                 </div>
-                                <input type="range" class="calc-slider" id="calcMajor" min="0" max="100" value="35">
+                                <input type="range" class="calc-slider" id="calcMajor" min="0" max="100" value="35" aria-label="Calc Major">
                             </div>
                             <div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                                     <span style="font-size: 0.8rem; color: #10b981; font-weight: 600;">% Minor</span>
                                     <span class="slider-value" id="minorVal">45%</span>
                                 </div>
-                                <input type="range" class="calc-slider" id="calcMinor" min="0" max="100" value="45" disabled style="opacity:0.6;">
+                                <input type="range" class="calc-slider" id="calcMinor" min="0" max="100" value="45" disabled style="opacity:0.6;" aria-label="Calc Minor">
                             </div>
                         </div>
                     </div>
@@ -2572,8 +2572,8 @@
             <button class="login-close" onclick="debtHideLogin()">&times;</button>
             <h3 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin:0 0 0.25rem;"><i class="fas fa-microscope" style="color:#f59e0b;margin-right:8px;"></i> Pro Analysis Access</h3>
             <p style="font-size:0.82rem;color:#94a3b8;margin:0 0 1.5rem;">Unlock Monte Carlo distributions, Weibull analysis, cost modeling, capacity planner &amp; PDF export</p>
-            <input type="email" class="login-input" id="debtLoginEmail" placeholder="Email address">
-            <input type="password" class="login-input" id="debtLoginPass" placeholder="Password">
+            <input type="email" class="login-input" id="debtLoginEmail" placeholder="Email address" aria-label="Email address">
+            <input type="password" class="login-input" id="debtLoginPass" placeholder="Password" aria-label="Password">
             <button class="login-submit" onclick="debtHandleLogin()"><i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In</button>
             <div style="margin-top:1rem;font-size:0.72rem;color:#64748b;text-align:center;">
                 Demo Account: demo@resistancezero.com / demo2026

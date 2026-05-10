@@ -1214,7 +1214,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -2178,19 +2178,19 @@
         <div class="mc-controls">
             <div class="mc-control">
                 <label>Monthly PM Tasks <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monthly PM Tasks</div><div class="tooltip-desc">Total scheduled preventive maintenance work orders per month across all asset classes.</div><div class="tooltip-formula">Typical: 50-500 tasks/mo depending on facility size</div></span></span></label>
-                <input type="number" id="mc3Tasks" value="1200" min="50" max="50000">
+                <input type="number" id="mc3Tasks" value="1200" min="50" max="50000" aria-label="Mc3Tasks">
             </div>
             <div class="mc-control">
                 <label>Technicians <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Available Technicians</div><div class="tooltip-desc">Number of maintenance technicians available for PM execution. Does not include contractors or supervisors.</div></span></span></label>
-                <input type="number" id="mc3Techs" value="6" min="1" max="50">
+                <input type="number" id="mc3Techs" value="6" min="1" max="50" aria-label="Mc3Techs">
             </div>
             <div class="mc-control">
                 <label>Avg Task Duration (hrs) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Task Duration</div><div class="tooltip-desc">Baseline average PM task duration for simulation. Varies around this mean using the selected uncertainty range.</div></span></span></label>
-                <input type="number" id="mc3Duration" value="1.5" min="0.25" max="8" step="0.25">
+                <input type="number" id="mc3Duration" value="1.5" min="0.25" max="8" step="0.25" aria-label="Mc3Duration">
             </div>
             <div class="mc-control">
                 <label>Uncertainty Range <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Monte Carlo — Uncertainty</div><div class="tooltip-desc">How much simulation inputs vary around their mean. Higher uncertainty = wider confidence intervals.</div><div class="tooltip-formula">&pm;10% verified data &middot; &pm;20% typical &middot; &pm;50% rough</div></span></span></label>
-                <select id="mc3Uncertainty">
+                <select id="mc3Uncertainty" aria-label="Mc3Uncertainty">
                     <option value="0.1">&pm;10% (high confidence)</option>
                     <option value="0.2" selected>&pm;20% (typical)</option>
                     <option value="0.3">&pm;30% (uncertain)</option>
@@ -2249,7 +2249,7 @@
                                 <span class="control-label-icon friction">!</span>
                                 Workflow Friction Level
                             </div>
-                            <input type="range" id="frictionSlider" class="control-slider friction" min="0" max="100" value="65">
+                            <input type="range" id="frictionSlider" class="control-slider friction" min="0" max="100" value="65" aria-label="Friction Slider">
                             <div class="control-value">
                                 <span>Low (Streamlined)</span>
                                 <span class="current-val" id="frictionVal">65%</span>
@@ -2261,7 +2261,7 @@
                                 <span class="control-label-icon evidence">+</span>
                                 Evidence Standard Clarity
                             </div>
-                            <input type="range" id="evidenceSlider" class="control-slider evidence" min="0" max="100" value="40">
+                            <input type="range" id="evidenceSlider" class="control-slider evidence" min="0" max="100" value="40" aria-label="Evidence Slider">
                             <div class="control-value">
                                 <span>Undefined</span>
                                 <span class="current-val" id="evidenceVal">40%</span>
@@ -2329,27 +2329,27 @@
                     <div class="calc-grid">
                         <div class="calc-input-group">
                             <label class="calc-label">PM Tasks / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">PM Task Volume</div><div class="tooltip-desc">Total scheduled preventive maintenance tasks per month. Industry benchmark: 50-80 tasks per technician per month for data center facilities.</div><div class="tooltip-formula">Ref: Palmer (2006) Maintenance Planning Handbook</div></span></span></label>
-                            <input type="number" id="calcTasks" class="calc-input" value="400" min="1">
+                            <input type="number" id="calcTasks" class="calc-input" value="400" min="1" aria-label="Calc Tasks">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Available Technicians <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Available Technicians</div><div class="tooltip-desc">Number of qualified maintenance technicians available for task assignment.</div></span></span></label>
-                            <input type="number" id="calcTechs" class="calc-input" value="6" min="1">
+                            <input type="number" id="calcTechs" class="calc-input" value="6" min="1" aria-label="Calc Techs">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Current Backlog (tasks) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Current Backlog</div><div class="tooltip-desc">Outstanding PM tasks that are overdue or deferred. Growing backlog indicates insufficient capacity.</div><div class="tooltip-formula">Healthy: &lt;10% of monthly tasks</div></span></span></label>
-                            <input type="number" id="calcBacklog" class="calc-input" value="85" min="0">
+                            <input type="number" id="calcBacklog" class="calc-input" value="85" min="0" aria-label="Calc Backlog">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Avg Task Duration (hrs) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Average Task Duration</div><div class="tooltip-desc">Mean time to complete one PM task including setup, execution, and documentation. Does NOT include travel or admin overhead (those are Pro inputs).</div><div class="tooltip-formula">Typical DC PM: 0.5-3.0 hrs depending on system complexity</div></span></span></label>
-                            <input type="number" id="calcDuration" class="calc-input" value="1.5" min="0.1" step="0.1">
+                            <input type="number" id="calcDuration" class="calc-input" value="1.5" min="0.1" step="0.1" aria-label="Calc Duration">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Hours / Tech / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Hours per Tech per Month</div><div class="tooltip-desc">Available working hours per technician per month, before wrench time adjustments.</div><div class="tooltip-formula">Standard: 160-176 hrs/mo (40-44 hrs/wk)</div></span></span></label>
-                            <input type="number" id="calcHours" class="calc-input" value="160" min="1">
+                            <input type="number" id="calcHours" class="calc-input" value="160" min="1" aria-label="Calc Hours">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">CMMS Maturity Level <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">CMMS Maturity Scale</div><div class="tooltip-desc">L1 Reactive: paper/spreadsheet. L2 Scheduled: basic CMMS. L3 Managed: full CMMS with KPIs. L4 Optimized: predictive integration. L5 Autonomous: AI-driven scheduling.</div><div class="tooltip-formula">Modifier: L1=0.70, L2=0.80, L3=0.90, L4=0.97, L5=1.00</div></span></span></label>
-                            <select id="calcCMMS" class="calc-select">
+                            <select id="calcCMMS" class="calc-select" aria-label="Calc CMMS">
                                 <option value="1">Level 1 - Reactive</option>
                                 <option value="2" selected>Level 2 - Scheduled</option>
                                 <option value="3">Level 3 - Managed</option>
@@ -2359,7 +2359,7 @@
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Workflow Friction <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Workflow Friction</div><div class="tooltip-desc">Level of administrative overhead and process inefficiency that reduces productive maintenance time.</div></span></span></label>
-                            <select id="calcFriction" class="calc-select">
+                            <select id="calcFriction" class="calc-select" aria-label="Calc Friction">
                                 <option value="High">High (55% efficiency)</option>
                                 <option value="Medium" selected>Medium (70% efficiency)</option>
                                 <option value="Low">Low (85% efficiency)</option>
@@ -2367,7 +2367,7 @@
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Evidence Clarity <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Evidence Clarity</div><div class="tooltip-desc">Quality of maintenance records and documentation. Higher clarity improves audit readiness and compliance tracking.</div></span></span></label>
-                            <select id="calcEvidence" class="calc-select">
+                            <select id="calcEvidence" class="calc-select" aria-label="Calc Evidence">
                                 <option value="Unclear">Unclear (85% modifier)</option>
                                 <option value="Adequate" selected>Adequate (92% modifier)</option>
                                 <option value="Excellent">Excellent (98% modifier)</option>
@@ -2381,15 +2381,15 @@
                         <div class="calc-grid">
                             <div class="calc-input-group">
                                 <label class="calc-label">Wrench Time % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Wrench Time Percentage</div><div class="tooltip-desc">Percentage of available time technicians spend doing actual maintenance work (vs travel, admin, waiting).</div><div class="tooltip-formula">Best practice: &gt;55% &middot; Industry avg: 25-35%</div></span></span></label>
-                                <input type="number" id="calcWrench" class="calc-input" value="35" min="10" max="80">
+                                <input type="number" id="calcWrench" class="calc-input" value="35" min="10" max="80" aria-label="Calc Wrench">
                             </div>
                             <div class="calc-input-group">
                                 <label class="calc-label">Travel & Admin Overhead % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Travel & Admin Overhead</div><div class="tooltip-desc">Percentage of time lost to travel between locations, paperwork, parts procurement, and administrative tasks.</div></span></span></label>
-                                <input type="number" id="calcOverhead" class="calc-input" value="25" min="0" max="60">
+                                <input type="number" id="calcOverhead" class="calc-input" value="25" min="0" max="60" aria-label="Calc Overhead">
                             </div>
                             <div class="calc-input-group">
                                 <label class="calc-label">Task Duration Variability <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Task Duration Variability</div><div class="tooltip-desc">Coefficient of variation in task completion times. High variability makes scheduling less predictable.</div></span></span></label>
-                                <select id="calcVariability" class="calc-select">
+                                <select id="calcVariability" class="calc-select" aria-label="Calc Variability">
                                     <option value="Low">Low (CV 0.15)</option>
                                     <option value="Medium" selected>Medium (CV 0.30)</option>
                                     <option value="High">High (CV 0.50)</option>
@@ -2397,15 +2397,15 @@
                             </div>
                             <div class="calc-input-group">
                                 <label class="calc-label">Critical Asset PM % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Asset PM Coverage</div><div class="tooltip-desc">Percentage of PM tasks allocated to critical/high-priority assets. Should be prioritized.</div><div class="tooltip-formula">Target: &ge;95% completion for critical assets</div></span></span></label>
-                                <input type="number" id="calcCritical" class="calc-input" value="30" min="0" max="100">
+                                <input type="number" id="calcCritical" class="calc-input" value="30" min="0" max="100" aria-label="Calc Critical">
                             </div>
                             <div class="calc-input-group">
                                 <label class="calc-label">SLA Target % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">SLA Target</div><div class="tooltip-desc">Required PM completion rate specified in service level agreements.</div><div class="tooltip-formula">Typical: 85-95% compliance target</div></span></span></label>
-                                <input type="number" id="calcSLA" class="calc-input" value="95" min="80" max="100">
+                                <input type="number" id="calcSLA" class="calc-input" value="95" min="80" max="100" aria-label="Calc SLA">
                             </div>
                             <div class="calc-input-group">
                                 <label class="calc-label">Backlog Age (avg weeks) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Average Backlog Age</div><div class="tooltip-desc">Mean age of overdue tasks in weeks. Older backlog = higher risk of asset failure.</div></span></span></label>
-                                <input type="number" id="calcBacklogAge" class="calc-input" value="4" min="0" max="52">
+                                <input type="number" id="calcBacklogAge" class="calc-input" value="4" min="0" max="52" aria-label="Calc Backlog Age">
                             </div>
                         </div>
                     </div>
@@ -2720,11 +2720,11 @@
             </div>
             <div style="margin-bottom:1rem;">
                 <label style="display:block;font-size:.8rem;font-weight:600;color:#475569;margin-bottom:4px;">Email</label>
-                <input type="email" id="maintLoginEmail" placeholder="you@company.com" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;outline:none;transition:border .2s;background:#f1f5f9;color:#1e293b;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e2e8f0'">
+                <input type="email" id="maintLoginEmail" placeholder="you@company.com" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;outline:none;transition:border .2s;background:#f1f5f9;color:#1e293b;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e2e8f0'" aria-label="you@company.com">
             </div>
             <div style="margin-bottom:1.5rem;">
                 <label style="display:block;font-size:.8rem;font-weight:600;color:#475569;margin-bottom:4px;">Password</label>
-                <input type="password" id="maintLoginPass" placeholder="Enter password" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;outline:none;transition:border .2s;background:#f1f5f9;color:#1e293b;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')maintDoLogin()">
+                <input type="password" id="maintLoginPass" placeholder="Enter password" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;outline:none;transition:border .2s;background:#f1f5f9;color:#1e293b;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')maintDoLogin()" aria-label="Enter password">
             </div>
             <button onclick="maintDoLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Sign In</button>
             <div id="maintLoginError" style="display:none;margin-top:.75rem;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#dc2626;font-size:.8rem;text-align:center;"></div>

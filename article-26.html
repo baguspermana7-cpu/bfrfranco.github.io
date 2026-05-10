@@ -656,7 +656,7 @@
 <div class="search-modal" id="searchModal" style="display:none;">
     <div class="search-input-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
         <kbd class="search-kbd">ESC</kbd>
     </div>
     <div class="search-chips" id="searchChips">
@@ -1116,7 +1116,7 @@
         <div class="pfas-input-grid">
             <div class="pfas-input-group">
                 <label class="pfas-label">Cooling System Type <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Cooling System Type</div><div class="pfas-tt-desc">Primary server cooling method determines the type and quantity of PFAS compounds present on-site.</div><div class="pfas-tt-bench">Two-phase PFAS systems (Novec 7000, HFC-based) carry the highest regulatory exposure as of EPA MCL ruling April 2024.</div></span></span></label>
-                <select class="pfas-select" id="pfasCoolingType">
+                <select class="pfas-select" id="pfasCoolingType" aria-label="Pfas Cooling Type">
                     <option value="two-phase-pfas">Two-Phase Immersion — PFAS (Novec/HFC)</option>
                     <option value="two-phase-hfo">Two-Phase Immersion — HFO (Opteon 2P50/Galden)</option>
                     <option value="single-mineral">Single-Phase Immersion — Mineral Oil</option>
@@ -1128,7 +1128,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Fire Suppression System <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Fire Suppression</div><div class="pfas-tt-desc">FM-200 (HFC-227ea) and Novec 1230 (FK-5-1-12) both contain fluorinated compounds with significant environmental persistence.</div><div class="pfas-tt-bench">FM-200 GWP: 3,220. Novec 1230 GWP: 1. Both classified as PFAS under expanding EPA PFAS definition (2024).</div></span></span></label>
-                <select class="pfas-select" id="pfasFireSuppression">
+                <select class="pfas-select" id="pfasFireSuppression" aria-label="Pfas Fire Suppression">
                     <option value="fm200">FM-200 (HFC-227ea) — Fluorinated</option>
                     <option value="novec1230">Novec 1230 (FK-5-1-12) — Fluorinated</option>
                     <option value="inergen">Inergen / CO₂ / Nitrogen — Inert Gas</option>
@@ -1138,7 +1138,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Facility Age <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Facility Age</div><div class="pfas-tt-desc">Older facilities with two-phase PFAS systems have accumulated more maintenance vapor release events and are less likely to have vapor recovery protocols.</div><div class="pfas-tt-bench">Average two-phase immersion system operational life: 10–15 years. Most Novec 7000 installations commissioned 2015–2022.</div></span></span></label>
-                <select class="pfas-select" id="pfasFacilityAge">
+                <select class="pfas-select" id="pfasFacilityAge" aria-label="Pfas Facility Age">
                     <option value="new">Less than 3 years (commissioned 2023+)</option>
                     <option value="mid-early">3–7 years (commissioned 2017–2022)</option>
                     <option value="mid-late">7–12 years (commissioned 2012–2017)</option>
@@ -1147,7 +1147,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Distance to Nearest Water Source <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Water Proximity</div><div class="pfas-tt-desc">PFAS compounds are highly mobile in groundwater. Proximity to drinking water supplies, rivers, or residential wells determines regulatory exposure and contamination liability.</div><div class="pfas-tt-bench">EPA MCL: 4 ppt for PFOA/PFOS (effective Apr 2024). PFAS detected in water sources up to 3 km from industrial sites.</div></span></span></label>
-                <select class="pfas-select" id="pfasWaterDistance">
+                <select class="pfas-select" id="pfasWaterDistance" aria-label="Pfas Water Distance">
                     <option value="very-close">Less than 500 m — Critical proximity</option>
                     <option value="close">500 m – 2 km — High proximity</option>
                     <option value="moderate">2 – 5 km — Moderate proximity</option>
@@ -1156,7 +1156,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Average Rack Density <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Rack Density</div><div class="pfas-tt-desc">Technical justification for two-phase PFAS cooling only exists above ~100 kW/rack. Below this threshold, direct-to-chip water cooling is equivalent and PFAS-free.</div><div class="pfas-tt-bench">Uptime Institute 2025: global avg 15–25 kW/rack. 95% of capacity operates below two-phase PFAS threshold.</div></span></span></label>
-                <select class="pfas-select" id="pfasRackDensity">
+                <select class="pfas-select" id="pfasRackDensity" aria-label="Pfas Rack Density">
                     <option value="low">Less than 15 kW/rack — Typical enterprise</option>
                     <option value="medium">15–40 kW/rack — Hyperscale standard</option>
                     <option value="high">40–100 kW/rack — Dense GPU cluster</option>
@@ -1165,7 +1165,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Maintenance Frequency <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Maintenance Frequency</div><div class="pfas-tt-desc">Each planned maintenance window on a two-phase system opens the fluid bath to atmosphere, releasing PFAS vapor. This is the primary environmental release pathway — not sealed-system leaks.</div><div class="pfas-tt-bench">Est. vapor release per open event: 0.5–2% of bath volume. Semiconductor industry recovery standard: 60–80% capture efficiency.</div></span></span></label>
-                <select class="pfas-select" id="pfasMaintenanceFreq">
+                <select class="pfas-select" id="pfasMaintenanceFreq" aria-label="Pfas Maintenance Freq">
                     <option value="monthly">Monthly (12× per year)</option>
                     <option value="quarterly" selected>Quarterly (4× per year)</option>
                     <option value="semi-annual">Semi-annual (2× per year)</option>
@@ -1174,7 +1174,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Regulatory Jurisdiction <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Jurisdiction</div><div class="pfas-tt-desc">PFAS regulation varies significantly by region. California leads US states; the EU ECHA restriction is the most comprehensive globally, covering ~10,000 PFAS compounds.</div><div class="pfas-tt-bench">US Federal: EPA MCL 4ppt (Apr 2024). EU: ECHA Universal PFAS Restriction decision expected 2026. CA: DTSC SAFER Act expanding 2025.</div></span></span></label>
-                <select class="pfas-select" id="pfasJurisdiction">
+                <select class="pfas-select" id="pfasJurisdiction" aria-label="Pfas Jurisdiction">
                     <option value="us-ca">United States — California</option>
                     <option value="us-other">United States — Other State</option>
                     <option value="eu">European Union</option>
@@ -1184,7 +1184,7 @@
             </div>
             <div class="pfas-input-group">
                 <label class="pfas-label">Number of Immersion Tanks <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Tank Count</div><div class="pfas-tt-desc">Total number of two-phase immersion tanks at the facility. Each tank is an independent vapor release source during maintenance windows.</div><div class="pfas-tt-bench">Typical tank volume: 600–1,200L per unit. Enterprise deployment: 5–20 tanks. Hyperscale: 50–500+ tanks.</div></span></span></label>
-                <input class="pfas-num" type="number" id="pfasTankCount" value="10" min="1" max="1000">
+                <input class="pfas-num" type="number" id="pfasTankCount" value="10" min="1" max="1000" aria-label="Pfas Tank Count">
             </div>
         </div>
 
@@ -1231,15 +1231,15 @@
             <div class="pfas-input-grid">
                 <div class="pfas-input-group">
                     <label class="pfas-label">Fluid Volume Per Tank (Liters) <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Fluid Volume</div><div class="pfas-tt-desc">Total working fluid volume per immersion tank determines total PFAS inventory and absolute vapor release volume per maintenance event.</div><div class="pfas-tt-bench">Typical range: 400–1,500L. GRC ICEraQ: ~600L. LiquidStack: ~800–1,200L. Submer SmartPodX: ~900L.</div></span></span></label>
-                    <input class="pfas-num" type="number" id="pfasFluidVol" value="800" min="100" max="5000">
+                    <input class="pfas-num" type="number" id="pfasFluidVol" value="800" min="100" max="5000" aria-label="Pfas Fluid Vol">
                 </div>
                 <div class="pfas-input-group">
                     <label class="pfas-label">Maintenance Events Per Tank/Year <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Maintenance Events</div><div class="pfas-tt-desc">Number of times each tank is opened per year, including planned maintenance, server additions/removals, and unplanned interventions.</div><div class="pfas-tt-bench">Industry average: 4–8 events/tank/year. Each open event at 270 hPa vapor pressure releases measurable PFAS volumes.</div></span></span></label>
-                    <input class="pfas-num" type="number" id="pfasMaintEvents" value="4" min="1" max="52">
+                    <input class="pfas-num" type="number" id="pfasMaintEvents" value="4" min="1" max="52" aria-label="Pfas Maint Events">
                 </div>
                 <div class="pfas-input-group">
                     <label class="pfas-label">Vapor Recovery System <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Vapor Recovery</div><div class="pfas-tt-desc">Active vapor capture shrouds recover 60–80% of released PFAS during maintenance events, analogous to refrigerant recovery under Clean Air Act §608.</div><div class="pfas-tt-bench">Recovery units cost $15,000–$40,000/unit. ROI positive within 2 years for facilities with 20+ tanks.</div></span></span></label>
-                    <select class="pfas-select" id="pfasVaporRecovery">
+                    <select class="pfas-select" id="pfasVaporRecovery" aria-label="Pfas Vapor Recovery">
                         <option value="none">None — open venting</option>
                         <option value="partial">Partial — passive containment only</option>
                         <option value="active">Active vapor recovery (60–80% efficiency)</option>
@@ -1247,7 +1247,7 @@
                 </div>
                 <div class="pfas-input-group">
                     <label class="pfas-label">HFO Transition Plan <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Transition Timeline</div><div class="pfas-tt-desc">Mid-life fluid replacement cost: 30–45% of original cooling capex. Disposal cost: $8–$15/liter for PFAS-classified fluids at licensed incineration facilities.</div><div class="pfas-tt-bench">Cost for 100,000L replacement: $0.8M–$1.5M disposal + engineering + recommissioning.</div></span></span></label>
-                    <select class="pfas-select" id="pfasTransitionYear">
+                    <select class="pfas-select" id="pfasTransitionYear" aria-label="Pfas Transition Year">
                         <option value="none">No plan to transition</option>
                         <option value="2025">Planning 2025</option>
                         <option value="2026">Planning 2026</option>
@@ -1258,7 +1258,7 @@
                 </div>
                 <div class="pfas-input-group">
                     <label class="pfas-label">Sensitive Ecosystem Nearby <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Sensitive Ecosystem</div><div class="pfas-tt-desc">Wetlands, protected watersheds, drinking water reservoirs, or residential well fields within 5 km significantly elevate regulatory and litigation exposure.</div><div class="pfas-tt-bench">EPA Superfund PFAS enforcement has prioritized sites within 2 km of public water supplies. Class action PFAS litigation is active in 38 US states.</div></span></span></label>
-                    <select class="pfas-select" id="pfasEcosystem">
+                    <select class="pfas-select" id="pfasEcosystem" aria-label="Pfas Ecosystem">
                         <option value="no">No sensitive ecosystem identified</option>
                         <option value="yes">Yes — wetland, reservoir, or residential wells within 5 km</option>
                     </select>
@@ -1350,8 +1350,8 @@
             <button class="pfas-login-close" onclick="pfasHideLogin()">&times;</button>
             <h3><i class="fas fa-lock" style="color:#dc2626;"></i> Pro Analysis — PFAS Risk</h3>
             <p>Unlock Monte Carlo simulation, regulatory timeline 2024–2029, sensitivity tornado chart, and strategic roadmap for your facility.</p>
-            <input type="email" id="pfasLoginEmail" placeholder="Email address" autocomplete="email">
-            <input type="password" id="pfasLoginPass" placeholder="Password">
+            <input type="email" id="pfasLoginEmail" placeholder="Email address" autocomplete="email" aria-label="Email address">
+            <input type="password" id="pfasLoginPass" placeholder="Password" aria-label="Password">
             <button class="pfas-login-submit" onclick="pfasHandleLogin()">Unlock Pro Analysis</button>
             <div class="pfas-login-error" id="pfasLoginError">Invalid credentials. Please try again.</div>
             <div class="pfas-login-demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>

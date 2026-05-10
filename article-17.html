@@ -1178,7 +1178,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -2090,7 +2090,7 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Market</label><span class="calc-tooltip">?<span class="tip-text">Pre-loaded with real market data from Cushman &amp; Wakefield, Arizton, and ResearchAndMarkets. Select "Custom" to model a hypothetical market.</span></span></div>
-                        <select id="calcMarket" onchange="prefillMarket()">
+                        <select id="calcMarket" onchange="prefillMarket()" aria-label="Calc Market">
                             <option value="indonesia">Indonesia (Greater Jakarta)</option>
                             <option value="johor">Malaysia (Johor)</option>
                             <option value="singapore">Singapore</option>
@@ -2102,15 +2102,15 @@
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Current Operational (MW)</label><span class="calc-tooltip">?<span class="tip-text">Currently live, energized data center IT load capacity. This is the baseline from which demand growth is projected. Source: Cushman &amp; Wakefield H1 2025.</span></span></div>
-                        <input type="number" id="calcOperational" value="1717" min="0" max="10000">
+                        <input type="number" id="calcOperational" value="1717" min="0" max="10000" aria-label="Calc Operational">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Pipeline Capacity (MW)</label><span class="calc-tooltip">?<span class="tip-text">Total announced + under construction + planned capacity through 2030. Includes both committed (with LOIs) and speculative builds. Source: Arizton 2025-2030.</span></span></div>
-                        <input type="number" id="calcPipeline" value="4145" min="0" max="50000">
+                        <input type="number" id="calcPipeline" value="4145" min="0" max="50000" aria-label="Calc Pipeline">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Population (millions)</label><span class="calc-tooltip">?<span class="tip-text">Market population for computing per-capita demand density (watts/capita). Used to compare against mature markets like the US (12-15 W/capita) and Europe (4-6 W/capita).</span></span></div>
-                        <input type="number" id="calcPopulation" value="280" min="1" max="2000">
+                        <input type="number" id="calcPopulation" value="280" min="1" max="2000" aria-label="Calc Population">
                     </div>
                 </div>
 
@@ -2119,19 +2119,19 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Digital Economy Growth (%/yr)</label><span class="calc-tooltip">?<span class="tip-text">Annual compound growth rate of the digital economy (e-commerce, fintech, streaming, SaaS). Google/Temasek/Bain e-Conomy SEA projects 15-20% for most markets. DC demand scales ~1.5x with digital economy growth.</span></span></div>
-                        <input type="number" id="calcDigiGrowth" value="15" min="5" max="40">
+                        <input type="number" id="calcDigiGrowth" value="15" min="5" max="40" aria-label="Calc Digi Growth">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Sovereign AI Demand (MW by 2030)</label><span class="calc-tooltip">?<span class="tip-text">Government-mandated AI infrastructure + data sovereignty requirements. Includes national AI clouds, public sector digitization, and legally required local storage. This demand is NON-DISCRETIONARY &mdash; backed by law, not commercial contracts.</span></span></div>
-                        <input type="number" id="calcSovereign" value="500" min="0" max="5000">
+                        <input type="number" id="calcSovereign" value="500" min="0" max="5000" aria-label="Calc Sovereign">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>AI Inference CAGR (%)</label><span class="calc-tooltip">?<span class="tip-text">Compound annual growth rate of AI inference workloads. Deloitte projects inference will be 75% of AI compute by 2030 at 35% CAGR. Inference MUST be local (latency-sensitive), creating distributed demand across every market.</span></span></div>
-                        <input type="number" id="calcInference" value="35" min="10" max="60">
+                        <input type="number" id="calcInference" value="35" min="10" max="60" aria-label="Calc Inference">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Enterprise Cloud Migration (%)</label><span class="calc-tooltip">?<span class="tip-text">Percentage of enterprise workloads migrating to cloud/colo by 2030. SEA is at ~25% vs US 60%+. Each 10% migration drives ~15-20% of pipeline absorption. Includes banking (OJK-mandated local processing), government (SPBE), healthcare, and manufacturing.</span></span></div>
-                        <input type="number" id="calcEnterprise" value="30" min="10" max="80">
+                        <input type="number" id="calcEnterprise" value="30" min="10" max="80" aria-label="Calc Enterprise">
                     </div>
                 </div>
 
@@ -2140,19 +2140,19 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Avg Build Cost ($M/MW)</label><span class="calc-tooltip">?<span class="tip-text">Greenfield construction cost per MW of IT load. Includes land, building, MEP, commissioning. Ranges: $7-8M (Vietnam/PH), $8-10M (ID/MY/TH), $12-15M (SG). AI-ready with liquid cooling adds 15-20%.</span></span></div>
-                        <input type="number" id="calcBuildCost" value="8" min="3" max="20" step="0.5">
+                        <input type="number" id="calcBuildCost" value="8" min="3" max="20" step="0.5" aria-label="Calc Build Cost">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Avg Revenue/MW/Year ($M)</label><span class="calc-tooltip">?<span class="tip-text">Annual colocation revenue per MW of deployed IT capacity. Includes power pass-through, space, cross-connects, and managed services. SG: $2.5-3.5M, ID/MY: $1.5-2.2M, VN/TH: $1.4-2.0M. Hyperscale wholesale is 20-30% lower.</span></span></div>
-                        <input type="number" id="calcRevMW" value="1.8" min="0.5" max="5" step="0.1">
+                        <input type="number" id="calcRevMW" value="1.8" min="0.5" max="5" step="0.1" aria-label="Calc Rev MW">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>OPEX Ratio (%)</label><span class="calc-tooltip">?<span class="tip-text">Operating expenses as % of revenue. Includes electricity (40-55%), staff (8-12%), maintenance (5-8%), insurance, land lease, and SGA. Typical range: 55-70% for SEA colo operators. Lower = better margins.</span></span></div>
-                        <input type="number" id="calcOpex" value="60" min="40" max="85">
+                        <input type="number" id="calcOpex" value="60" min="40" max="85" aria-label="Calc OPEX">
                     </div>
                     <div class="calc-input-group">
                         <div class="calc-label-row"><label>Discount Rate / WACC (%)</label><span class="calc-tooltip">?<span class="tip-text">Weighted average cost of capital for NPV calculations. Reflects risk premium. Infrastructure funds typically use 8-10%. Higher WACC = more conservative valuation. SEA markets typically carry 2-4% premium over US/EU.</span></span></div>
-                        <input type="number" id="calcWACC" value="10" min="5" max="20" step="0.5">
+                        <input type="number" id="calcWACC" value="10" min="5" max="20" step="0.5" aria-label="Calc WACC">
                     </div>
                 </div>
 
@@ -2358,7 +2358,7 @@
                                         <span class="sea-slider-label">Jevons Efficiency Ratio</span>
                                         <span class="sea-slider-val" id="seaValJevons">1.5x</span>
                                     </div>
-                                    <input type="range" class="sea-range" min="0.5" max="3.0" step="0.1" value="1.5" id="seaInJevons" oninput="seaUpdateStrategic()">
+                                    <input type="range" class="sea-range" min="0.5" max="3.0" step="0.1" value="1.5" id="seaInJevons" oninput="seaUpdateStrategic()" aria-label="Sea In Jevons">
                                     <div class="sea-slider-hint">Impact of efficiency on total demand. &gt;1.0 = Jevons effect amplifies demand.</div>
                                 </div>
                                 <div class="sea-slider-group">
@@ -2366,7 +2366,7 @@
                                         <span class="sea-slider-label">Sovereign Mandate Intensity</span>
                                         <span class="sea-slider-val blue" id="seaValSovereign">7/10</span>
                                     </div>
-                                    <input type="range" class="sea-range" min="1" max="10" step="1" value="7" id="seaInSovereign" oninput="seaUpdateStrategic()">
+                                    <input type="range" class="sea-range" min="1" max="10" step="1" value="7" id="seaInSovereign" oninput="seaUpdateStrategic()" aria-label="Sea In Sovereign">
                                     <div class="sea-slider-hint">Data residency enforcement strength across ASEAN nations.</div>
                                 </div>
                                 <div class="sea-slider-group" style="margin-bottom:0">
@@ -2374,7 +2374,7 @@
                                         <span class="sea-slider-label">Hyperscale Allocation to SEA</span>
                                         <span class="sea-slider-val amber" id="seaValAlloc">8%</span>
                                     </div>
-                                    <input type="range" class="sea-range" min="2" max="20" step="0.5" value="8" id="seaInAlloc" oninput="seaUpdateStrategic()">
+                                    <input type="range" class="sea-range" min="2" max="20" step="0.5" value="8" id="seaInAlloc" oninput="seaUpdateStrategic()" aria-label="Sea In Alloc">
                                     <div class="sea-slider-hint">% of global $602B hyperscaler capex directed to Southeast Asia.</div>
                                 </div>
                                 <div class="sea-scenario-btns">
@@ -2574,8 +2574,8 @@
                     <button class="sea-login-close" onclick="seaHideLogin()">&times;</button>
                     <h3><i class="fas fa-lock" style="color:#10b981;margin-right:6px"></i> Pro Intelligence Engine</h3>
                     <p>Unlock Strategic Intelligence Engine with Jevons Divergence Curve, Scenario Architecture Radar, Cost of Inaction analysis, Monte Carlo (10K runs), sensitivity tornado, and executive narrative.</p>
-                    <input type="email" id="seaLoginEmail" placeholder="Email address">
-                    <input type="password" id="seaLoginPass" placeholder="Password">
+                    <input type="email" id="seaLoginEmail" placeholder="Email address" aria-label="Email address">
+                    <input type="password" id="seaLoginPass" placeholder="Password" aria-label="Password">
                     <button class="sea-login-submit" onclick="seaHandleLogin()">Sign In</button>
                     <div class="sea-login-error" id="seaLoginError">Invalid credentials.</div>
                     <div class="sea-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>

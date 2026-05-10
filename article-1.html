@@ -1455,7 +1455,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -2721,7 +2721,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Capacity (MW)
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">IT Capacity</div><div class="tooltip-desc">Total IT power capacity. Larger facilities (10+ MW) need higher operational maturity due to complexity, blast radius, and regulatory scrutiny.</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-capacity" onchange="calculateMaturity()">
+                                        <select class="calc-select" id="pro-capacity" onchange="calculateMaturity()" aria-label="Pro capacity">
                                             <option value="1">1 MW</option><option value="2">2 MW</option><option value="5" selected>5 MW</option><option value="10">10 MW</option><option value="20">20 MW</option><option value="50">50 MW</option><option value="100">100+ MW</option>
                                         </select>
                                     </div>
@@ -2729,7 +2729,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Facility Type
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Facility Type</div><div class="tooltip-desc"><strong>Enterprise:</strong> Single-tenant, internal IT<br><strong>Colocation:</strong> Multi-tenant, shared infrastructure<br><strong>Hyperscale:</strong> 50+ MW, cloud provider-grade<br><strong>Edge:</strong> Distributed, remote, unmanned</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-type" onchange="calculateMaturity()">
+                                        <select class="calc-select" id="pro-type" onchange="calculateMaturity()" aria-label="Pro type">
                                             <option value="enterprise">Enterprise</option><option value="colocation" selected>Colocation</option><option value="hyperscale">Hyperscale</option><option value="edge">Edge</option>
                                         </select>
                                     </div>
@@ -2737,7 +2737,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Redundancy Tier
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Uptime Tier Level</div><div class="tooltip-desc"><strong>Tier I:</strong> Basic, no redundancy (99.671%)<br><strong>Tier II:</strong> Redundant components (99.741%)<br><strong>Tier III:</strong> Concurrently maintainable (99.982%)<br><strong>Tier IV:</strong> Fault tolerant (99.995%)</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-tier" onchange="calculateMaturity()">
+                                        <select class="calc-select" id="pro-tier" onchange="calculateMaturity()" aria-label="Pro tier">
                                             <option value="1">Tier I</option><option value="2">Tier II</option><option value="3" selected>Tier III</option><option value="4">Tier IV</option>
                                         </select>
                                     </div>
@@ -2745,7 +2745,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Operating Model
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Operating Model</div><div class="tooltip-desc"><strong>In-House:</strong> All staff employed directly<br><strong>Managed Services:</strong> Outsourced to FM provider<br><strong>Hybrid:</strong> Core team in-house, specialists outsourced</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-model" onchange="calculateMaturity()">
+                                        <select class="calc-select" id="pro-model" onchange="calculateMaturity()" aria-label="Pro model">
                                             <option value="inhouse" selected>In-House</option><option value="managed">Managed Services</option><option value="hybrid">Hybrid</option>
                                         </select>
                                     </div>
@@ -2753,7 +2753,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Region
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Geographic Region</div><div class="tooltip-desc">Affects benchmark comparison. APAC, Americas, and EMEA have different regulatory environments and maturity baselines.</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-region" onchange="calculateMaturity()">
+                                        <select class="calc-select" id="pro-region" onchange="calculateMaturity()" aria-label="Pro region">
                                             <option value="apac" selected>Asia Pacific</option><option value="americas">Americas</option><option value="emea">EMEA</option>
                                         </select>
                                     </div>
@@ -3907,7 +3907,7 @@
                 `<button class="weight-preset-btn${key === 'default' ? ' active' : ''}" data-preset="${key}" onclick="applyWeightPreset('${key}')">${p.label}</button>`
             ).join('');
             grid.innerHTML = dimensions.map((d, i) =>
-                `<div class="weight-row"><div class="weight-row-label">${d.label}</div><input type="range" min="0" max="30" step="1" value="${Math.round(customWeights[i] * 100)}" id="weight-${d.id}" oninput="updateWeight(${i}, this.value)"><div class="weight-row-value" id="weight-val-${d.id}">${Math.round(customWeights[i] * 100)}%</div></div>`
+                `<div class="weight-row"><div class="weight-row-label">${d.label}</div><input type="range" min="0" max="30" step="1" value="${Math.round(customWeights[i] * 100)}" id="weight-${d.id}" oninput="updateWeight(${i}, this.value)" aria-label="Weight ${d.id}"><div class="weight-row-value" id="weight-val-${d.id}">${Math.round(customWeights[i] * 100)}%</div></div>`
             ).join('');
         }
 
@@ -3949,7 +3949,7 @@
                 return `<div class="subdim-accordion">
                     <div class="subdim-header" onclick="toggleSubDim('${d.id}')"><span class="subdim-header-label">${d.label}</span><span style="display:flex;align-items:center;gap:8px;"><span class="subdim-header-avg" id="subdim-avg-${d.id}">${parentVal.toFixed(1)}</span><i class="fas fa-chevron-down" id="subdim-chevron-${d.id}"></i></span></div>
                     <div class="subdim-body" id="subdim-body-${d.id}"><div class="subdim-body-inner">${subs.map(s =>
-                        `<div class="subdim-row"><div class="subdim-row-label" title="${s.desc}">${s.label}</div><select id="subdim-${d.id}-${s.id}" onchange="updateSubDimAvg('${d.id}')">${optionsHtml}</select></div>`
+                        `<div class="subdim-row"><div class="subdim-row-label" title="${s.desc}">${s.label}</div><select id="subdim-${d.id}-${s.id}" onchange="updateSubDimAvg('${d.id}')" aria-label="Subdim ${d.id} ${s.id}">${optionsHtml}</select></div>`
                     ).join('')}</div></div>
                 </div>`;
             }).join('');
@@ -3991,7 +3991,7 @@
             grid.innerHTML = dimensions.map(d => {
                 const current = parseInt(document.getElementById(d.el).value);
                 const opts = [1,2,3,4,5].map(v => `<option value="${v}"${v === Math.min(5, current + 1) ? ' selected' : ''}>${v}</option>`).join('');
-                return `<div class="scenario-item"><div class="scenario-item-label">${d.label}</div><select id="scenario-${d.id}" onchange="calculateMaturity()">${opts}</select></div>`;
+                return `<div class="scenario-item"><div class="scenario-item-label">${d.label}</div><select id="scenario-${d.id}" onchange="calculateMaturity()" aria-label="Scenario ${d.id}">${opts}</select></div>`;
             }).join('');
         }
 

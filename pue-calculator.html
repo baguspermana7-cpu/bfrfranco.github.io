@@ -606,11 +606,11 @@
                                 <button class="preset-btn" onclick="setITLoad(5000)">5MW Hyperscale</button>
                                 <button class="preset-btn" onclick="setITLoad(10000)">10MW+ Mega</button>
                             </div>
-                            <input type="number" id="itLoad" class="input-field" value="1000" min="50" max="100000" step="50" oninput="calculate()">
+                            <input type="number" id="itLoad" class="input-field" value="1000" min="50" max="100000" step="50" oninput="calculate()" aria-label="It Load">
                         </div>
                         <div class="input-group">
                             <label class="input-label">Rack Density <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Rack Density</div><div class="tooltip-desc">Power per rack in kW. Higher density (AI/HPC 30kW+) requires more efficient cooling. Standard enterprise is 5-8 kW/rack, high-density 15kW+, AI/HPC 30kW+.</div></div></span></label>
-                            <select id="rackDensity" class="input-field" onchange="calculate()">
+                            <select id="rackDensity" class="input-field" onchange="calculate()" aria-label="Rack Density">
                                 <option value="5">Standard (5 kW/rack)</option>
                                 <option value="8" selected>Medium (8 kW/rack)</option>
                                 <option value="15">High Density (15 kW/rack)</option>
@@ -619,7 +619,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Rack Count <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Rack Count</div><div class="tooltip-desc">Total number of racks in the facility. Auto-calculated from IT Load ÷ Rack Density, but can be manually overridden. Used to scale security and fire suppression facility loads (kW/rack × rack count).</div></div></span> <span style="font-weight:400;color:var(--text-muted);">(auto-calculated)</span></label>
-                            <input type="number" id="rackCount" class="input-field" value="125" min="1" max="10000" oninput="calculate()">
+                            <input type="number" id="rackCount" class="input-field" value="125" min="1" max="10000" oninput="calculate()" aria-label="Rack Count">
                         </div>
                     </div>
 
@@ -636,7 +636,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Type</div><div class="tooltip-desc">Cooling architecture determines the Coefficient of Performance (COP). Higher COP = less energy per kW of heat removed. CRAC (COP ~2.8) is least efficient; Immersion (COP ~25) is most efficient.</div></div></span></label>
-                            <select id="coolingType" class="input-field" onchange="calculate()">
+                            <select id="coolingType" class="input-field" onchange="calculate()" aria-label="Cooling Type">
                                 <option value="crac">CRAC — Computer Room AC (COP ~2.8)</option>
                                 <option value="crah" selected>CRAH — Computer Room Air Handler (COP ~4.0)</option>
                                 <option value="inrow">In-Row Cooling (COP ~5.0)</option>
@@ -647,7 +647,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Containment Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-box"></i> Containment</div><div class="tooltip-desc">Airflow containment prevents hot/cold air mixing, improving cooling efficiency by 10-25%. Cold-aisle containment is most common. Chimney cabinets exhaust directly to plenum.</div></div></span></label>
-                            <select id="containment" class="input-field" onchange="calculate()">
+                            <select id="containment" class="input-field" onchange="calculate()" aria-label="Containment">
                                 <option value="none">None</option>
                                 <option value="hot">Hot-Aisle Containment</option>
                                 <option value="cold" selected>Cold-Aisle Containment</option>
@@ -656,7 +656,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Climate Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-globe"></i> Climate Zone</div><div class="tooltip-desc">Ambient temperature affects cooling energy. Tropical humid zones (avg 28°C+) have highest cooling overhead. Cold climates enable free cooling for 4,000+ hours/year, significantly reducing PUE.</div></div></span></label>
-                            <select id="climateZone" class="input-field" onchange="calculate()">
+                            <select id="climateZone" class="input-field" onchange="calculate()" aria-label="Climate Zone">
                                 <option value="tropical_humid">Tropical Humid (e.g., Jakarta, Singapore)</option>
                                 <option value="tropical_dry">Tropical Dry (e.g., Dubai, Phoenix)</option>
                                 <option value="subtropical" selected>Subtropical (e.g., Hong Kong, Sydney)</option>
@@ -680,7 +680,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">UPS Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bolt"></i> UPS Type</div><div class="tooltip-desc">UPS efficiency varies by topology. Double-conversion (92-96%) is most common but least efficient. Rotary/DRUPS (95-97%) and flywheel hybrid (97-99%) minimize conversion losses.</div></div></span></label>
-                            <select id="upsType" class="input-field" onchange="calculate()">
+                            <select id="upsType" class="input-field" onchange="calculate()" aria-label="UPS Type">
                                 <option value="double" selected>Double-Conversion (Online)</option>
                                 <option value="line">Line-Interactive</option>
                                 <option value="rotary">Rotary / DRUPS</option>
@@ -690,13 +690,13 @@
                         <div class="input-group">
                             <label class="input-label">UPS Load Factor: <span id="upsLoadDisplay" style="color:var(--accent-cyan);font-family:'JetBrains Mono',monospace;">50%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-half"></i> UPS Load Factor</div><div class="tooltip-desc">Percentage of UPS rated capacity actually utilized. UPS efficiency varies with load — most units are least efficient at low loads (25-40%) and peak efficiency at 50-75%. Running at 40-60% provides optimal efficiency while maintaining headroom for growth and failover.</div></div></span></label>
                             <div class="range-wrap">
-                                <input type="range" id="upsLoadFactor" min="25" max="100" value="50" step="5" oninput="updateUpsLoad(); calculate()">
+                                <input type="range" id="upsLoadFactor" min="25" max="100" value="50" step="5" oninput="updateUpsLoad(); calculate()" aria-label="UPS Load Factor">
                                 <span class="range-value" id="upsLoadValue">50%</span>
                             </div>
                         </div>
                         <div class="input-group">
                             <label class="input-label">Redundancy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Redundancy</div><div class="tooltip-desc">Higher redundancy increases reliability but adds power overhead. N = no spare, N+1 = one spare module (+2-5%), 2N = fully mirrored (+5-10%), 2N+1 = mirrored plus spare (+8-15%).</div></div></span></label>
-                            <select id="redundancy" class="input-field" onchange="calculate()">
+                            <select id="redundancy" class="input-field" onchange="calculate()" aria-label="Redundancy">
                                 <option value="n">N (no redundancy)</option>
                                 <option value="n1" selected>N+1</option>
                                 <option value="2n">2N</option>
@@ -718,7 +718,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Lighting <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-lightbulb"></i> Lighting</div><div class="tooltip-desc">Lighting power density in W/m². Modern DCs use LED with occupancy sensors (3 W/m²). Standard fluorescent is 8 W/m². Typically 1-3% of total facility power.</div></div></span></label>
-                            <select id="lighting" class="input-field" onchange="calculate()">
+                            <select id="lighting" class="input-field" onchange="calculate()" aria-label="Lighting">
                                 <option value="3">Minimal (3 W/m²) — LED + sensors</option>
                                 <option value="8" selected>Standard (8 W/m²)</option>
                                 <option value="12">High (12 W/m²)</option>
@@ -726,7 +726,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Security Systems <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Security Systems</div><div class="tooltip-desc">Power consumed by physical security infrastructure per rack — CCTV cameras, access control readers, intrusion detection, monitoring displays, and NVR/DVR storage. Enhanced biometric systems (iris/facial recognition, man-traps) consume significantly more power. Typically 0.5-2% of total facility power.</div></div></span></label>
-                            <select id="security" class="input-field" onchange="calculate()">
+                            <select id="security" class="input-field" onchange="calculate()" aria-label="Security">
                                 <option value="0.2">Basic (0.2 kW/rack) — CCTV only</option>
                                 <option value="0.5" selected>Standard (0.5 kW/rack) — CCTV + Access</option>
                                 <option value="1.0">Enhanced (1.0 kW/rack) — Full biometric</option>
@@ -734,7 +734,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Fire Suppression <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-fire-extinguisher"></i> Fire Suppression</div><div class="tooltip-desc">Power for fire detection and suppression systems per rack. FM-200/Novec 1230 gaseous systems use minimal power (detection panels only). VESDA aspirating smoke detection adds continuous air sampling pumps. Water mist systems require pressurization pumps and valve actuators, consuming more power but providing unlimited discharge duration.</div></div></span></label>
-                            <select id="fire" class="input-field" onchange="calculate()">
+                            <select id="fire" class="input-field" onchange="calculate()" aria-label="Fire">
                                 <option value="0.1" selected>FM-200/Novec (0.1 kW/rack)</option>
                                 <option value="0.3">VESDA + FM-200 (0.3 kW/rack)</option>
                                 <option value="0.5">Water Mist (0.5 kW/rack)</option>
@@ -762,13 +762,13 @@
                         <div class="input-group">
                             <label class="input-label">Utilization: <span id="utilDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">70%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> IT Utilization</div><div class="tooltip-desc">Percentage of IT capacity actually in use. At low utilization (10-30%), PUE appears worse because fixed facility overhead is divided by less IT load. Most enterprise DCs run 50-70% utilization. Hyperscalers target 80%+ through workload management and dynamic provisioning.</div></div></span></label>
                             <div class="range-wrap">
-                                <input type="range" id="utilization" min="10" max="100" value="70" step="5" oninput="updateUtil(); calculate()">
+                                <input type="range" id="utilization" min="10" max="100" value="70" step="5" oninput="updateUtil(); calculate()" aria-label="Utilization">
                                 <span class="range-value" id="utilValue">70%</span>
                             </div>
                         </div>
                         <div class="input-group">
                             <label class="input-label">Economizer Mode <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wind"></i> Economizer Mode</div><div class="tooltip-desc">Free cooling using outside air or water when ambient conditions permit. Air-side economizers filter and introduce outside air directly (saves ~15% cooling energy). Water-side economizers use cooling towers or dry coolers to pre-cool chilled water loops (saves ~25%). Effectiveness depends heavily on climate zone — cold/temperate climates benefit most (4,000-6,000+ free-cooling hours/year).</div></div></span></label>
-                            <select id="economizer" class="input-field" onchange="calculate()">
+                            <select id="economizer" class="input-field" onchange="calculate()" aria-label="Economizer">
                                 <option value="none" selected>None</option>
                                 <option value="airside">Air-Side Economizer (-15% cooling)</option>
                                 <option value="waterside">Water-Side Economizer (-25% cooling)</option>
@@ -777,20 +777,20 @@
                         <div class="input-group">
                             <label class="input-label">ASHRAE Supply Air Temp: <span id="tempDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">20°C</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-thermometer-half"></i> Supply Air Temperature</div><div class="tooltip-desc">Cold-aisle supply air temperature per ASHRAE TC 9.9 guidelines. Recommended range: 18-27°C (A1 class). Raising from 20°C to 25°C can reduce cooling energy by 2-4% per degree through higher chiller efficiency and extended economizer hours. Google, Facebook, and Microsoft operate at 26-27°C. Below 18°C wastes energy; above 27°C increases server fan speeds.</div></div></span></label>
                             <div class="range-wrap">
-                                <input type="range" id="supplyTemp" min="18" max="27" value="20" step="0.5" oninput="updateTemp(); calculate()">
+                                <input type="range" id="supplyTemp" min="18" max="27" value="20" step="0.5" oninput="updateTemp(); calculate()" aria-label="Supply Temp">
                                 <span class="range-value" id="tempValue">20°C</span>
                             </div>
                         </div>
                         <div class="input-group">
                             <label class="input-label">Transformer Loss: <span id="txDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">1.5%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-random"></i> Transformer Loss</div><div class="tooltip-desc">Energy lost as heat during voltage transformation (typically MV→LV: 12kV→480V and 480V→208V). Standard dry-type transformers lose 1.5-2.5%. High-efficiency (DOE 2016 compliant) units achieve 0.5-1.5%. Losses are constant regardless of load, making them more impactful at lower utilization. Two transformation stages double the loss.</div></div></span></label>
                             <div class="range-wrap">
-                                <input type="range" id="transformerLoss" min="0.5" max="3" value="1.5" step="0.1" oninput="updateTx(); calculate()">
+                                <input type="range" id="transformerLoss" min="0.5" max="3" value="1.5" step="0.1" oninput="updateTx(); calculate()" aria-label="Transformer Loss">
                                 <span class="range-value" id="txValue">1.5%</span>
                             </div>
                         </div>
                         <div class="input-group">
                             <label class="input-label">PDU Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> PDU Type</div><div class="tooltip-desc">Power Distribution Unit efficiency varies by feature level. Basic PDUs (breaker panels) are ~98% efficient. Metered PDUs add monitoring with minimal overhead (98.5%). Monitored and switched PDUs (per-outlet metering + remote switching) achieve 99% through better power factor correction. Higher-tier PDUs enable granular capacity management and reduce stranded power.</div></div></span></label>
-                            <select id="pduType" class="input-field" onchange="calculate()">
+                            <select id="pduType" class="input-field" onchange="calculate()" aria-label="Pdu Type">
                                 <option value="basic">Basic (98% efficiency)</option>
                                 <option value="metered" selected>Metered (98.5%)</option>
                                 <option value="monitored">Monitored (99%)</option>
@@ -819,13 +819,13 @@
                         <div class="input-group">
                             <label class="input-label">IT Load Growth/Year: <span id="growthDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">10%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> IT Load Growth</div><div class="tooltip-desc">Annual IT load growth rate for 5-year projections. Enterprise DCs typically grow 5-15%/year. AI/ML workloads can drive 20-30%+ growth. As IT load increases, cooling and power distribution must scale proportionally. Higher utilization generally improves PUE as fixed overhead is spread across more IT load.</div></div></span></label>
                             <div class="range-wrap">
-                                <input type="range" id="loadGrowth" min="0" max="30" value="10" step="1" oninput="updateGrowth(); calculate()">
+                                <input type="range" id="loadGrowth" min="0" max="30" value="10" step="1" oninput="updateGrowth(); calculate()" aria-label="Load Growth">
                                 <span class="range-value" id="growthValue">10%</span>
                             </div>
                         </div>
                         <div class="input-group">
                             <label class="input-label">Green Grid Measurement Level <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ruler-combined"></i> Green Grid Level</div><div class="tooltip-desc">The Green Grid's PUE measurement classification defines measurement granularity and accuracy. L1 (Basic): annual utility meter readings — simplest but least accurate, masks seasonal variation. L2 (Intermediate): monthly sub-metered readings per major system — better for identifying waste. L3 (Advanced): continuous real-time monitoring at 15-min intervals — enables dynamic optimization and immediate anomaly detection.</div></div></span></label>
-                            <select id="greenGridLevel" class="input-field" onchange="calculate()">
+                            <select id="greenGridLevel" class="input-field" onchange="calculate()" aria-label="Green Grid Level">
                                 <option value="L1" selected>L1 — Annual (utility meter)</option>
                                 <option value="L2">L2 — Monthly (sub-metering)</option>
                                 <option value="L3">L3 — Continuous (real-time)</option>
@@ -833,7 +833,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">ASHRAE Class <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-temperature-high"></i> ASHRAE Class</div><div class="tooltip-desc">ASHRAE TC 9.9 thermal envelope classification for IT equipment. A1: tightest range (15-32°C), standard enterprise servers. A2: wider range (10-35°C), ruggedized equipment. A3/A4: extended ranges (5-40/45°C) for hardened IT in extreme environments. Higher classes enable free cooling in hotter climates but require equipment rated for wider temperature swings. Most enterprise equipment is A1-rated.</div></div></span></label>
-                            <select id="ashraeClass" class="input-field" onchange="calculate()">
+                            <select id="ashraeClass" class="input-field" onchange="calculate()" aria-label="Ashrae Class">
                                 <option value="A1" selected>A1 (15-32°C, 20-80% RH)</option>
                                 <option value="A2">A2 (10-35°C, 20-80% RH)</option>
                                 <option value="A3">A3 (5-40°C, 8-85% RH)</option>
@@ -842,7 +842,7 @@
                         </div>
                         <div class="input-group">
                             <label class="input-label">Energy Cost ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Energy Cost</div><div class="tooltip-desc">Blended electricity rate per kilowatt-hour including demand charges, transmission, and distribution. US average: $0.07-0.12/kWh. Europe: $0.12-0.25/kWh. Singapore: $0.15-0.20/kWh. Hyperscalers often negotiate $0.03-0.05/kWh through long-term PPAs and renewable energy contracts. Used to calculate annual energy costs and cost savings from PUE improvements.</div></div></span></label>
-                            <input type="number" id="energyCost" class="input-field" value="0.10" min="0.01" max="1.00" step="0.01" oninput="calculate()">
+                            <input type="number" id="energyCost" class="input-field" value="0.10" min="0.01" max="1.00" step="0.01" oninput="calculate()" aria-label="Energy Cost">
                         </div>
                     </div>
                 </div>
@@ -997,11 +997,11 @@
             <div style="display:flex;flex-direction:column;gap:1rem;">
                 <div>
                     <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Email</label>
-                    <input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'">
+                    <input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" aria-label="your@email.com">
                 </div>
                 <div>
                     <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')attemptLogin()">
+                    <input type="password" id="loginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')attemptLogin()" aria-label="Enter password">
                 </div>
                 <button onclick="attemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(139,92,246,0.3);">
                     <i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In

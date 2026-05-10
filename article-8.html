@@ -1252,7 +1252,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -1890,12 +1890,12 @@
 
                     <div class="control-row">
                         <span class="control-label">Drift Rate:</span>
-                        <input type="range" id="driftSlider" class="control-slider" min="0" max="100" value="45">
+                        <input type="range" id="driftSlider" class="control-slider" min="0" max="100" value="45" aria-label="Drift Slider">
                         <span class="control-value" id="driftValue">45%</span>
                     </div>
                     <div class="control-row">
                         <span class="control-label">Reporting Suppression:</span>
-                        <input type="range" id="suppressionSlider" class="control-slider" min="0" max="100" value="30">
+                        <input type="range" id="suppressionSlider" class="control-slider" min="0" max="100" value="30" aria-label="Suppression Slider">
                         <span class="control-value" id="suppressionValue">30%</span>
                     </div>
 
@@ -2091,35 +2091,35 @@
                     <div class="calc-grid">
                         <div class="calc-input-group">
                             <label class="calc-label">Near-miss Reports / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Near-Miss Reporting Rate</div><div class="tooltip-desc">Monthly count of reported near-miss events. High reporting = healthy safety culture. Suppressed reporting is the #1 precursor to catastrophic drift.</div><div class="tooltip-formula">Benchmark: 10+ reports/month = Generative culture</div></span></span></label>
-                            <input type="number" id="calcNearMiss" class="calc-input" value="3" min="0" max="100">
+                            <input type="number" id="calcNearMiss" class="calc-input" value="3" min="0" max="100" aria-label="Calc Near Miss">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Weak Signals / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Weak Signal Detection</div><div class="tooltip-desc">Number of anomalies, deviations, or early-warning signals captured per month. These are pre-incident indicators from Turner's incubation theory.</div><div class="tooltip-formula">Benchmark: 15+ signals/month = active detection</div></span></span></label>
-                            <input type="number" id="calcWeakSignals" class="calc-input" value="5" min="0" max="100">
+                            <input type="number" id="calcWeakSignals" class="calc-input" value="5" min="0" max="100" aria-label="Calc Weak Signals">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Open Audit Findings <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Open Audit Findings</div><div class="tooltip-desc">Total unresolved audit findings. High count indicates backlog accumulation and eroding compliance. Inversely scored — fewer open items = better health.</div><div class="tooltip-formula">Benchmark: &lt;5 open findings = healthy closure rate</div></span></span></label>
-                            <input type="number" id="calcAudit" class="calc-input" value="12" min="0" max="100">
+                            <input type="number" id="calcAudit" class="calc-input" value="12" min="0" max="100" aria-label="Calc Audit">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Training Hrs / Quarter <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Safety Training Investment</div><div class="tooltip-desc">Hours of safety-specific training per quarter. Includes drills, tabletops, classroom sessions, and hands-on exercises per Weick & Sutcliffe HRO principles.</div><div class="tooltip-formula">Benchmark: 20 hrs/quarter = minimum for HRO</div></span></span></label>
-                            <input type="number" id="calcTraining" class="calc-input" value="8" min="0" max="100">
+                            <input type="number" id="calcTraining" class="calc-input" value="8" min="0" max="100" aria-label="Calc Training">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Incident-Free Days <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Incident-Free Period</div><div class="tooltip-desc">Consecutive days without a recordable safety incident. Paradoxically, long incident-free periods with low safety scores indicate Rasmussen's drift-to-failure.</div><div class="tooltip-formula">Warning: &gt;365 days + low score = paradox zone</div></span></span></label>
-                            <input type="number" id="calcDays" class="calc-input" value="365" min="0" max="3650">
+                            <input type="number" id="calcDays" class="calc-input" value="365" min="0" max="3650" aria-label="Calc Days">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Mgmt Walkarounds / Month <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Management Safety Walkarounds</div><div class="tooltip-desc">Monthly frequency of leadership safety walkarounds. Direct observation by management signals commitment and detects issues missed in reports.</div><div class="tooltip-formula">Benchmark: 8/month = strong leadership engagement</div></span></span></label>
-                            <input type="number" id="calcWalks" class="calc-input" value="2" min="0" max="30">
+                            <input type="number" id="calcWalks" class="calc-input" value="2" min="0" max="30" aria-label="Calc Walks">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Hazard Action Rate % <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Hazard Action Close-Out Rate</div><div class="tooltip-desc">Percentage of identified hazards with completed corrective actions within SLA. Low rates indicate systemic inability to close the feedback loop.</div><div class="tooltip-formula">Benchmark: 85%+ = responsive safety system</div></span></span></label>
-                            <input type="number" id="calcHazard" class="calc-input" value="60" min="0" max="100">
+                            <input type="number" id="calcHazard" class="calc-input" value="60" min="0" max="100" aria-label="Calc Hazard">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Safety Meeting Frequency <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Safety Meeting Cadence</div><div class="tooltip-desc">Regularity of dedicated safety meetings. Weekly cadence enables rapid feedback loops and early signal escalation per ICAO Safety Management Manual (Doc 9859).</div><div class="tooltip-formula">Benchmark: Weekly = generative culture standard</div></span></span></label>
-                            <select id="calcMeeting" class="calc-select">
+                            <select id="calcMeeting" class="calc-select" aria-label="Calc Meeting">
                                 <option value="None">None</option>
                                 <option value="Monthly" selected>Monthly</option>
                                 <option value="Bi-weekly">Bi-weekly</option>
@@ -2285,8 +2285,8 @@
                         <button class="shi-login-close" onclick="shiHideLogin()">&times;</button>
                         <div class="shi-login-title">Sign In</div>
                         <div class="shi-login-subtitle">Access Monte Carlo simulation, sensitivity analysis, cost modeling, and comprehensive PDF reports</div>
-                        <input type="email" class="shi-login-input" id="shiLoginEmail" placeholder="Email address">
-                        <input type="password" class="shi-login-input" id="shiLoginPass" placeholder="Password">
+                        <input type="email" class="shi-login-input" id="shiLoginEmail" placeholder="Email address" aria-label="Email address">
+                        <input type="password" class="shi-login-input" id="shiLoginPass" placeholder="Password" aria-label="Password">
                         <div class="shi-login-error" id="shiLoginError">Invalid credentials</div>
                         <button class="shi-login-submit" onclick="shiDoLogin()">Sign In</button>
                         <div class="shi-login-demo">Demo Account: demo@resistancezero.com / demo2026</div>

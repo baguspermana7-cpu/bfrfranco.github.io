@@ -423,7 +423,7 @@
 </head>
 <body class="locked">
     <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="search-overlay" id="searchOverlay" style="display:none;"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off"><div class="search-results" id="searchResults"></div></div></div>
+    <div class="search-overlay" id="searchOverlay" style="display:none;"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off" aria-label="Search this page... (Esc to close)"><div class="search-results" id="searchResults"></div></div></div>
     <div class="flashcard-overlay" id="flashcardOverlay">
         <button class="fc-close" id="fcClose" aria-label="Close flashcards">&times;</button>
         <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
@@ -996,16 +996,16 @@
                 <div class="accordion-body"><div class="accordion-content">
                     <div class="inline-calc">
                         <label>Redundancy Configuration</label>
-                        <select id="availConfig">
+                        <select id="availConfig" aria-label="Avail Config">
                             <option value="n">N (No redundancy)</option>
                             <option value="n1">N+1 (One spare)</option>
                             <option value="2n" selected>2N (Fully duplicated)</option>
                             <option value="2n1">2(N+1) (Duplicated + spare)</option>
                         </select>
                         <label>Component MTBF (hours)</label>
-                        <input type="number" id="availMtbf" value="50000" min="1000" max="500000">
+                        <input type="number" id="availMtbf" value="50000" min="1000" max="500000" aria-label="Avail MTBF">
                         <label>Component MTTR (hours)</label>
-                        <input type="number" id="availMttr" value="4" min="0.5" max="168" step="0.5">
+                        <input type="number" id="availMttr" value="4" min="0.5" max="168" step="0.5" aria-label="Avail MTTR">
                         <div class="calc-result"><div class="calc-value" id="availResult">99.9999%</div><div class="calc-label">System Availability</div></div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
                             <div class="calc-result"><div class="calc-value" id="availDown" style="font-size:1rem;">0.3 min/yr</div><div class="calc-label">Annual Downtime</div></div>
@@ -1073,11 +1073,11 @@
                 <div class="accordion-body"><div class="accordion-content">
                     <div class="inline-calc">
                         <label>Revenue per Hour ($)</label>
-                        <input type="number" id="costRevenue" value="100000" min="1000" max="10000000" step="1000">
+                        <input type="number" id="costRevenue" value="100000" min="1000" max="10000000" step="1000" aria-label="Cost Revenue">
                         <label>Downtime Minutes per Year</label>
-                        <input type="number" id="costMinutes" value="26" min="1" max="10000">
+                        <input type="number" id="costMinutes" value="26" min="1" max="10000" aria-label="Cost Minutes">
                         <label>Penalty Multiplier (SLA breaches, reputation)</label>
-                        <input type="number" id="costMultiplier" value="2.5" min="1" max="10" step="0.1">
+                        <input type="number" id="costMultiplier" value="2.5" min="1" max="10" step="0.1" aria-label="Cost Multiplier">
                         <div class="calc-result"><div class="calc-value" id="costResult">$108,333</div><div class="calc-label">Estimated Annual Downtime Cost</div></div>
                     </div>
                 </div></div>

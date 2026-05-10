@@ -1240,7 +1240,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -1748,15 +1748,15 @@
                 <div class="calc-grid">
                     <div class="calc-input-group">
                         <label>Rack Density (kW) <span class="calc-tooltip">?<span class="tip-text">Average power per rack. Traditional DCs: 5-10kW. AI-native: 40-130kW. GB300 NVL72 requires 132kW per rack.</span></span></label>
-                        <input type="number" id="aifDensity" value="10" min="1" max="600" step="1">
+                        <input type="number" id="aifDensity" value="10" min="1" max="600" step="1" aria-label="Aif Density">
                     </div>
                     <div class="calc-input-group">
                         <label>Number of AI Racks <span class="calc-tooltip">?<span class="tip-text">Total GPU/AI racks to deploy. Hyperscale clusters: 1000+. Enterprise AI: 50-200. Small AI labs: 10-50.</span></span></label>
-                        <input type="number" id="aifRacks" value="100" min="10" max="5000" step="10">
+                        <input type="number" id="aifRacks" value="100" min="10" max="5000" step="10" aria-label="Aif Racks">
                     </div>
                     <div class="calc-input-group">
                         <label>Cooling Type <span class="calc-tooltip">?<span class="tip-text">Air: limited to ~30kW/rack. Direct-to-Chip (DTC): up to 200kW/rack, dominant solution. Immersion: 300kW+, PFAS regulatory risk.</span></span></label>
-                        <select id="aifCooling">
+                        <select id="aifCooling" aria-label="Aif Cooling">
                             <option value="air">Air Cooling</option>
                             <option value="dtc">Direct-to-Chip (DTC)</option>
                             <option value="immersion">Immersion Cooling</option>
@@ -1764,23 +1764,23 @@
                     </div>
                     <div class="calc-input-group">
                         <label>Current PUE <span class="calc-tooltip">?<span class="tip-text">Power Usage Effectiveness. Industry average: 1.58. Best liquid-cooled: 1.10. Google fleet: 1.09. Values below 1.1 require full liquid cooling.</span></span></label>
-                        <input type="number" id="aifPUE" value="1.5" min="1.0" max="3.0" step="0.01">
+                        <input type="number" id="aifPUE" value="1.5" min="1.0" max="3.0" step="0.01" aria-label="Aif PUE">
                     </div>
                     <div class="calc-input-group">
                         <label>Electricity Rate ($/kWh) <span class="calc-tooltip">?<span class="tip-text">Local utility rate. US average: $0.08. EU: $0.15-0.25. Indonesia: $0.07. Singapore: $0.12. Lower rates favor higher-density deployments.</span></span></label>
-                        <input type="number" id="aifElecRate" value="0.08" min="0.01" max="0.50" step="0.01">
+                        <input type="number" id="aifElecRate" value="0.08" min="0.01" max="0.50" step="0.01" aria-label="Aif Elec Rate">
                     </div>
                     <div class="calc-input-group">
                         <label>Facility Age (years) <span class="calc-tooltip">?<span class="tip-text">Older facilities face higher retrofit costs and structural limitations. Facilities over 10 years typically require significant upgrades for AI workloads.</span></span></label>
-                        <input type="number" id="aifAge" value="8" min="0" max="30" step="1">
+                        <input type="number" id="aifAge" value="8" min="0" max="30" step="1" aria-label="Aif Age">
                     </div>
                     <div class="calc-input-group">
                         <label>Floor Load (kg/m&sup2;) <span class="calc-tooltip">?<span class="tip-text">Structural capacity per square meter. Traditional: 1000 kg/m&sup2;. AI racks (3 ton): need 2500+ kg/m&sup2;. Reinforcement costs $50-150/m&sup2;.</span></span></label>
-                        <input type="number" id="aifFloorLoad" value="1000" min="300" max="5000" step="100">
+                        <input type="number" id="aifFloorLoad" value="1000" min="300" max="5000" step="100" aria-label="Aif Floor Load">
                     </div>
                     <div class="calc-input-group">
                         <label>LC Infrastructure <span class="calc-tooltip">?<span class="tip-text">Whether facility has chilled water loops, CDUs, or rear-door heat exchangers installed. Full = complete DTC or immersion ready. Partial = some piping/CDUs. None = air only.</span></span></label>
-                        <select id="aifLCInfra">
+                        <select id="aifLCInfra" aria-label="Aif LCInfra">
                             <option value="none">None (Air Only)</option>
                             <option value="partial">Partial (Some Piping/CDUs)</option>
                             <option value="full">Full (DTC/Immersion Ready)</option>
@@ -2085,8 +2085,8 @@
         <button class="aif-login-close" onclick="aifHideLogin()">&times;</button>
         <h3><i class="fas fa-lock" style="color:#60a5fa;margin-right:6px"></i> Pro Intelligence Engine</h3>
         <p>Unlock Monte Carlo simulation (10K runs), 5-Year TCO comparison, sensitivity tornado analysis, and stranded asset risk assessment with dynamic narrative.</p>
-        <input type="email" id="aifLoginEmail" placeholder="Email address">
-        <input type="password" id="aifLoginPass" placeholder="Password">
+        <input type="email" id="aifLoginEmail" placeholder="Email address" aria-label="Email address">
+        <input type="password" id="aifLoginPass" placeholder="Password" aria-label="Password">
         <button class="aif-login-submit" onclick="aifHandleLogin()">Sign In</button>
         <div class="aif-login-error" id="aifLoginError">Invalid credentials.</div>
         <div class="aif-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>

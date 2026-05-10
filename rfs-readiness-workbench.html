@@ -1096,11 +1096,11 @@ body {
                 <div class="rfs-form-grid">
                     <div class="rfs-form-group">
                         <label class="rfs-label">Program Name <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Program Name" data-desc="Unique identifier for the commissioning program. Used across all reports, exports, and gate boards to identify this project." data-ref="Tip: Use site code + phase, e.g. JKT-02-P1"></div></span></label>
-                        <input type="text" class="rfs-input" id="rfsSetupName" placeholder="e.g. JKT-02 Data Center" oninput="RfsUI.onSetupChange()">
+                        <input type="text" class="rfs-input" id="rfsSetupName" placeholder="e.g. JKT-02 Data Center" oninput="RfsUI.onSetupChange()" aria-label="e.g. JKT-02 Data Center">
                     </div>
                     <div class="rfs-form-group">
                         <label class="rfs-label">Region / Country <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Region / Country" data-desc="Affects regulatory requirements, code compliance standards, and approval cycles. Determines which building codes, electrical standards, and fire regulations apply." data-ref="Examples: IEC vs NEC, NFPA vs local fire code"></div></span></label>
-                        <select class="rfs-select" id="rfsSetupRegion" onchange="RfsUI.onSetupChange()">
+                        <select class="rfs-select" id="rfsSetupRegion" onchange="RfsUI.onSetupChange()" aria-label="Rfs Setup Region">
                             <option value="">Select region...</option>
                             <option value="SEA-ID">Southeast Asia — Indonesia</option>
                             <option value="SEA-SG">Southeast Asia — Singapore</option>
@@ -1123,7 +1123,7 @@ body {
                     </div>
                     <div class="rfs-form-group">
                         <label class="rfs-label">Customer Type <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Customer Type" data-desc="Drives overlay complexity, witness requirements, and SLA exposure. Hyperscalers require extensive customer overlays; enterprise has simpler acceptance criteria." data-ref="Affects G4-G7 witness scheduling and LD risk"></div></span></label>
-                        <select class="rfs-select" id="rfsSetupCustomerType" onchange="RfsUI.onSetupChange()">
+                        <select class="rfs-select" id="rfsSetupCustomerType" onchange="RfsUI.onSetupChange()" aria-label="Rfs Setup Customer Type">
                             <option value="">Select...</option>
                             <option value="hyperscaler">Hyperscaler (self-build)</option>
                             <option value="wholesale">Wholesale Hyperscale Tenant</option>
@@ -1135,7 +1135,7 @@ body {
                     </div>
                     <div class="rfs-form-group">
                         <label class="rfs-label">Project Phase <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Project Phase" data-desc="Current phase determines which gates are active and what requirements are relevant. Commissioning phase is the primary use case for this workbench." data-ref="Phases: Planning → Construction → Commissioning → RFS Prep → Operational"></div></span></label>
-                        <select class="rfs-select" id="rfsSetupPhase" onchange="RfsUI.onSetupChange()">
+                        <select class="rfs-select" id="rfsSetupPhase" onchange="RfsUI.onSetupChange()" aria-label="Rfs Setup Phase">
                             <option value="planning">Planning / Pre-Construction</option>
                             <option value="construction">Construction</option>
                             <option value="commissioning" selected>Commissioning</option>
@@ -1152,11 +1152,11 @@ body {
                 <div class="rfs-form-grid">
                     <div class="rfs-form-group">
                         <label class="rfs-label">IT Load (MW) <span class="rfs-tip">?<div class="rfs-tip-data" data-title="IT Load (MW)" data-desc="Total IT power demand at design capacity. Affects cooling sizing, redundancy calculations, generator capacity, and UPS runtime requirements." data-ref="Benchmark: 1-5 MW enterprise, 10-50 MW colo, 50-300+ MW hyperscale"></div></span></label>
-                        <input type="number" class="rfs-input" id="rfsSetupLoad" placeholder="e.g. 10" min="0.1" step="0.1" oninput="RfsUI.onSetupChange()">
+                        <input type="number" class="rfs-input" id="rfsSetupLoad" placeholder="e.g. 10" min="0.1" step="0.1" oninput="RfsUI.onSetupChange()" aria-label="e.g. 10">
                     </div>
                     <div class="rfs-form-group">
                         <label class="rfs-label">Redundancy Class <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Redundancy Class" data-desc="N = basic (no redundancy), N+1 = component redundancy, 2N = full path redundancy, 2N+1 = fault tolerant with extra component. Higher redundancy increases commissioning complexity." data-ref="Ref: Uptime Institute Tier I-IV classification"></div></span></label>
-                        <select class="rfs-select" id="rfsSetupRedundancy" onchange="RfsUI.onSetupChange()">
+                        <select class="rfs-select" id="rfsSetupRedundancy" onchange="RfsUI.onSetupChange()" aria-label="Rfs Setup Redundancy">
                             <option value="N">N (Basic)</option>
                             <option value="N+1" selected>N+1</option>
                             <option value="2N">2N</option>
@@ -1165,7 +1165,7 @@ body {
                     </div>
                     <div class="rfs-form-group">
                         <label class="rfs-label">Cooling Type <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Cooling Type" data-desc="Primary cooling strategy. DLC (Direct Liquid Cooling) adds commissioning complexity for liquid loops, CDUs, and manifolds. Air-cooled is simplest to commission." data-ref="AI/HPC typically requires DLC for >40 kW/rack densities"></div></span></label>
-                        <select class="rfs-select" id="rfsSetupCooling" onchange="RfsUI.onSetupChange()">
+                        <select class="rfs-select" id="rfsSetupCooling" onchange="RfsUI.onSetupChange()" aria-label="Rfs Setup Cooling">
                             <option value="air_cooled">Air-Cooled (CRAH/CRAC)</option>
                             <option value="water_cooled">Water-Cooled Chiller</option>
                             <option value="dlc_hybrid">DLC Hybrid (Air + Liquid)</option>
@@ -1175,7 +1175,7 @@ body {
                     </div>
                     <div class="rfs-form-group">
                         <label class="rfs-label">Phasing Model <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Phasing Model" data-desc="Single = all units commissioned together. Phased = sequential delivery of data halls or pods. Modular = independent pod-based commissioning with factory testing." data-ref="Phased delivery adds coordination complexity but enables earlier partial revenue"></div></span></label>
-                        <select class="rfs-select" id="rfsSetupPhasing" onchange="RfsUI.onSetupChange()">
+                        <select class="rfs-select" id="rfsSetupPhasing" onchange="RfsUI.onSetupChange()" aria-label="Rfs Setup Phasing">
                             <option value="single">Single Phase (Build-All)</option>
                             <option value="phased_2">2-Phase Delivery</option>
                             <option value="phased_3">3-Phase Delivery</option>
@@ -1326,14 +1326,14 @@ body {
             <div style="flex:1;"></div>
             <div class="rfs-search-bar" style="max-width:220px;">
                 <i class="fas fa-search"></i>
-                <input type="text" id="rfsChecklistSearch" placeholder="Search requirements..." oninput="RfsUI.filterChecklist()">
+                <input type="text" id="rfsChecklistSearch" placeholder="Search requirements..." oninput="RfsUI.filterChecklist()" aria-label="Search requirements...">
             </div>
             <button class="rfs-btn rfs-btn-sm rfs-btn-secondary" onclick="RfsUI.exportChecklistCsv()" title="Export CSV"><i class="fas fa-file-csv"></i></button>
             <button class="rfs-btn rfs-btn-sm rfs-btn-secondary" onclick="RfsUI.printChecklist()" title="Print"><i class="fas fa-print"></i></button>
         </div>
         <div class="rfs-cl-unit-select">
             <label><i class="fas fa-cube" style="margin-right:4px;"></i> Unit</label>
-            <select class="rfs-select" id="rfsChecklistUnit" onchange="RfsUI.renderGatesChecklist()"></select>
+            <select class="rfs-select" id="rfsChecklistUnit" onchange="RfsUI.renderGatesChecklist()" aria-label="Rfs Checklist Unit"></select>
         </div>
         <div class="rfs-cl-overall" id="rfsClOverall">
             <span class="rfs-cl-overall-label">Overall</span>
@@ -1367,7 +1367,7 @@ body {
     <div class="rfs-toolbar">
         <span class="rfs-toolbar-title"><i class="fas fa-vial" style="color:var(--rfs-teal);margin-right:8px;"></i>Test Packages</span>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <select class="rfs-input" id="rfsTestFilterLevel" onchange="RfsUI.renderTests()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+            <select class="rfs-input" id="rfsTestFilterLevel" onchange="RfsUI.renderTests()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Test Filter Level">
                 <option value="">All Levels</option>
                 <option value="L0">L0 — Design/Planning</option>
                 <option value="L1">L1 — FAT</option>
@@ -1377,7 +1377,7 @@ body {
                 <option value="L5">L5 — IST/Performance</option>
                 <option value="L6">L6 — Turnover</option>
             </select>
-            <select class="rfs-input" id="rfsTestFilterDiscipline" onchange="RfsUI.renderTests()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+            <select class="rfs-input" id="rfsTestFilterDiscipline" onchange="RfsUI.renderTests()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Test Filter Discipline">
                 <option value="">All Disciplines</option>
                 <option value="Electrical">Electrical</option>
                 <option value="Mechanical">Mechanical</option>
@@ -1387,7 +1387,7 @@ body {
                 <option value="Operations">Operations</option>
                 <option value="Planning">Planning/QA</option>
             </select>
-            <select class="rfs-input" id="rfsTestFilterStatus" onchange="RfsUI.renderTests()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+            <select class="rfs-input" id="rfsTestFilterStatus" onchange="RfsUI.renderTests()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Test Filter Status">
                 <option value="">All Statuses</option>
                 <option value="draft">Draft</option>
                 <option value="scheduled">Scheduled</option>
@@ -1507,7 +1507,7 @@ body {
     <div class="rfs-toolbar">
         <span class="rfs-toolbar-title"><i class="fas fa-layer-group" style="color:var(--rfs-purple);margin-right:8px;"></i>Customer Overlay</span>
         <div style="display:flex;gap:6px;">
-            <select class="rfs-input" id="rfsOverlayFilterSource" onchange="RfsUI.renderOverlay()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+            <select class="rfs-input" id="rfsOverlayFilterSource" onchange="RfsUI.renderOverlay()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Overlay Filter Source">
                 <option value="">All Sources</option>
                 <option value="A">A — Contract</option>
                 <option value="B">B — Industry Std</option>
@@ -1550,21 +1550,21 @@ body {
         <span class="rfs-toolbar-title"><i class="fas fa-clipboard-list" style="color:var(--rfs-teal);margin-right:8px;"></i>Procedures Register</span>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
             <div class="rfs-proc-filter-row">
-                <select class="rfs-input" id="rfsProcFilterType" onchange="RfsUI.renderProcedures()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+                <select class="rfs-input" id="rfsProcFilterType" onchange="RfsUI.renderProcedures()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Proc Filter Type">
                     <option value="">All Types</option>
                     <option value="MOP">MOP — Method of Procedure</option>
                     <option value="SOP-P">SOP-P — Pre/During Handover</option>
                     <option value="SOP-O">SOP-O — Ops Ready</option>
                     <option value="EOP">EOP — Emergency</option>
                 </select>
-                <select class="rfs-input" id="rfsProcFilterStatus" onchange="RfsUI.renderProcedures()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+                <select class="rfs-input" id="rfsProcFilterStatus" onchange="RfsUI.renderProcedures()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Proc Filter Status">
                     <option value="">All Status</option>
                     <option value="draft">Draft</option>
                     <option value="review">In Review</option>
                     <option value="approved">Approved</option>
                     <option value="issued">Issued</option>
                 </select>
-                <select class="rfs-input" id="rfsProcFilterGate" onchange="RfsUI.renderProcedures()" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+                <select class="rfs-input" id="rfsProcFilterGate" onchange="RfsUI.renderProcedures()" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Proc Filter Gate">
                     <option value="">All Gates</option>
                     <option value="G0">G0</option><option value="G1">G1</option>
                     <option value="G2">G2</option><option value="G3">G3</option>
@@ -1668,7 +1668,7 @@ body {
         <div style="flex:1;"></div>
         <div class="rfs-search-bar" style="max-width:280px;">
             <i class="fas fa-search"></i>
-            <input type="text" id="rfsFaqSearch" placeholder="Search FAQ..." oninput="RfsUI.filterFaq()">
+            <input type="text" id="rfsFaqSearch" placeholder="Search FAQ..." oninput="RfsUI.filterFaq()" aria-label="Search FAQ...">
         </div>
     </div>
     <div id="rfsFaqContent"></div>
@@ -1681,7 +1681,7 @@ body {
     <div class="rfs-toolbar">
         <span class="rfs-toolbar-title"><i class="fas fa-book" style="color:var(--rfs-purple);margin-right:8px;"></i>User Manual — Panduan Penggunaan</span>
         <div style="flex:1;"></div>
-        <select class="rfs-input" id="rfsManualJump" onchange="RfsUI.jumpManualSection(this.value)" style="width:auto;font-size:0.75rem;padding:4px 8px;">
+        <select class="rfs-input" id="rfsManualJump" onchange="RfsUI.jumpManualSection(this.value)" style="width:auto;font-size:0.75rem;padding:4px 8px;" aria-label="Rfs Manual Jump">
             <option value="">Jump to section...</option>
         </select>
     </div>
@@ -1718,11 +1718,11 @@ body {
         <p style="font-size:0.82rem;color:var(--rfs-text2);margin-bottom:1rem;">Unlock Tests, Overlay, advanced Forecast, and full Report exports.</p>
         <div class="rfs-form-group" style="margin-bottom:0.75rem;">
             <label class="rfs-label">Email</label>
-            <input type="email" class="rfs-input" id="rfsLoginEmail" placeholder="demo@resistancezero.com">
+            <input type="email" class="rfs-input" id="rfsLoginEmail" placeholder="demo@resistancezero.com" aria-label="demo@resistancezero.com">
         </div>
         <div class="rfs-form-group" style="margin-bottom:0.75rem;">
             <label class="rfs-label">Password</label>
-            <input type="password" class="rfs-input" id="rfsLoginPassword" placeholder="Password" onkeydown="if(event.key==='Enter')rfsAttemptLogin()">
+            <input type="password" class="rfs-input" id="rfsLoginPassword" placeholder="Password" onkeydown="if(event.key==='Enter')rfsAttemptLogin()" aria-label="Password">
         </div>
         <div id="rfsLoginError" style="display:none;color:var(--rfs-red);font-size:0.8rem;margin-bottom:0.5rem;"></div>
         <div style="display:flex;gap:8px;">
@@ -1744,10 +1744,10 @@ body {
         <div class="rfs-modal-title"><i class="fas fa-upload" style="color:var(--rfs-teal);margin-right:8px;"></i>Import Project</div>
         <div class="rfs-form-group" style="margin-bottom:1rem;">
             <label class="rfs-label">Paste JSON or select file</label>
-            <textarea class="rfs-input rfs-textarea" id="rfsImportText" rows="6" placeholder="Paste exported JSON here..."></textarea>
+            <textarea class="rfs-input rfs-textarea" id="rfsImportText" rows="6" placeholder="Paste exported JSON here..." aria-label="Paste exported JSON here..."></textarea>
         </div>
         <div style="margin-bottom:1rem;">
-            <input type="file" id="rfsImportFile" accept=".json" onchange="rfsHandleImportFile(event)" style="font-size:0.8rem;">
+            <input type="file" id="rfsImportFile" accept=".json" onchange="rfsHandleImportFile(event)" style="font-size:0.8rem;" aria-label="Rfs Import File">
         </div>
         <div style="display:flex;gap:8px;">
             <button class="rfs-btn rfs-btn-primary" onclick="RfsStore.importFromModal()"><i class="fas fa-check"></i> Import</button>
@@ -5528,9 +5528,9 @@ var RfsUI = {
     renderWhatIf: function() {
         var h = '<div style="margin:16px 0;padding:16px;background:var(--rfs-glass);border:1px solid var(--rfs-glass-border);border-radius:var(--rfs-radius);">';
         h += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:12px;"><i class="fas fa-sliders-h" style="color:var(--rfs-teal);margin-right:8px;"></i>What-If Scenario Simulator</div>';
-        h += '<div class="rfs-whatif-slider"><label>Defects Resolved (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfDefects" oninput="document.getElementById(\'rfsWifDefVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()"><span class="val" id="rfsWifDefVal">0%</span></div>';
-        h += '<div class="rfs-whatif-slider"><label>Evidence Completed (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfEvidence" oninput="document.getElementById(\'rfsWifEvVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()"><span class="val" id="rfsWifEvVal">0%</span></div>';
-        h += '<div class="rfs-whatif-slider"><label>Sign-offs Obtained (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfSignoffs" oninput="document.getElementById(\'rfsWifSoVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()"><span class="val" id="rfsWifSoVal">0%</span></div>';
+        h += '<div class="rfs-whatif-slider"><label>Defects Resolved (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfDefects" oninput="document.getElementById(\'rfsWifDefVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()" aria-label="Rfs What If Defects"><span class="val" id="rfsWifDefVal">0%</span></div>';
+        h += '<div class="rfs-whatif-slider"><label>Evidence Completed (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfEvidence" oninput="document.getElementById(\'rfsWifEvVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()" aria-label="Rfs What If Evidence"><span class="val" id="rfsWifEvVal">0%</span></div>';
+        h += '<div class="rfs-whatif-slider"><label>Sign-offs Obtained (%)</label><input type="range" min="0" max="100" value="0" id="rfsWhatIfSignoffs" oninput="document.getElementById(\'rfsWifSoVal\').textContent=this.value+\'%\';RfsUI.recalcWhatIf()" aria-label="Rfs What If Signoffs"><span class="val" id="rfsWifSoVal">0%</span></div>';
         h += '<div id="rfsWhatIfResult" style="margin-top:12px;padding:10px;background:var(--rfs-bg2);border-radius:6px;font-size:0.78rem;color:var(--rfs-text);">Adjust sliders to simulate impact on RFS date.</div>';
         h += '</div>';
         return h;

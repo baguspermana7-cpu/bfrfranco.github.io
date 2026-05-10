@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.10.10 — 2026-05-09 (a11y — aria-label sweep across all form inputs)
+
+Audit-driven fix. 659 form inputs (`<input>`, `<select>`, `<textarea>`) lacked `<label for=>` AND `aria-label` — invisible to screen readers, fails WCAG 4.1.2 Name/Role/Value.
+
+### Action
+Bulk script `tools/fix-aria-labels.py` walks every input with an `id` attribute, skips inputs that already have a linked `<label for=>` or `aria-label`, then injects `aria-label` derived from:
+1. Input's `placeholder` attribute (if present), OR
+2. Humanized version of `id` (camelCase → "Camel Case", abbreviation expansion: pue→PUE, capex→CAPEX, etc.)
+
+Skipped types: `hidden`, `submit`, `button`, `image`, `reset`.
+
+### Coverage
+- 63 pages patched, 659 aria-labels added
+- High-touch pages: rz-ops-p7x3k9m.html (52), roi-calculator.html (28), rfs-readiness-workbench.html (26), tier-advisor.html (24), pue-calculator.html (23), cx-calculator.html (22)
+- Calc pages: 22 + 19 + 23 + 16 + 28 + 22 + N (opex/capex/pue/tco/roi/cx + carbon)
+- LTC labs: 6 + 4 + 1 + 5 + 1 + 7 = 24
+
+### Audit hooks
+All audits pass after fix:
+- `audit-script-tags --strict` ✓
+- `audit-mobile-responsive --strict` 103 pass / 0 fail ✓
+
+Bump 1.10.9 → 1.10.10 (PATCH — accessibility fix).
+
+---
+
 ## v1.10.9 — 2026-05-09 (Untrack 641 MB unused DC asset folder)
 
 Audit-driven cleanup. `audit-reports/C-performance.md` flagged `assets/DC/` as 71 PNG files averaging 9-11 MB each (641 MB total). The original audit assumption (referenced from `dc-conventional.html`) was wrong — that page references `assets/DC_Conventional.jpg` (a different file). Zero HTML/JS/MD references the `assets/DC/` folder.

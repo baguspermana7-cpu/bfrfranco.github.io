@@ -651,7 +651,7 @@ a:hover{text-decoration:underline;}
       <button type="button" class="cx-toolbar-btn cx-btn-faq" onclick="cxSwitchMode('faq')"><i class="fas fa-circle-question" style="margin-right:6px;"></i>FAQ</button>
     </div>
     <div class="cx-toolbar-actions">
-      <select class="cx-currency-sel" id="cxCurrency" onchange="cxSetCurrency(this.value)" title="Display Currency">
+      <select class="cx-currency-sel" id="cxCurrency" onchange="cxSetCurrency(this.value)" title="Display Currency" aria-label="CX Currency">
         <option value="USD">USD $</option>
         <option value="EUR">EUR &euro;</option>
         <option value="GBP">GBP &pound;</option>
@@ -671,7 +671,7 @@ a:hover{text-decoration:underline;}
   <!-- Scenario Presets -->
   <div class="cx-scenario-bar">
     <label><i class="fas fa-layer-group" style="margin-right:6px;"></i>Scenario Preset:</label>
-    <select id="cxScenarioSelect">
+    <select id="cxScenarioSelect" aria-label="CX Scenario Select">
       <option value="">— Custom Configuration —</option>
       <option value="enterprise_2mw">Enterprise DC — 2MW Tier III</option>
       <option value="colo_10mw">Colocation — 10MW Tier III+</option>
@@ -690,16 +690,16 @@ a:hover{text-decoration:underline;}
     <!-- Input 1: IT Load -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-bolt" style="color:#f59e0b;"></i> IT Load Capacity <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">IT Load Capacity (kW)</div><div class="cx-tooltip-desc">Total planned IT electrical load in kilowatts. This is the primary scaling factor for all commissioning costs and durations.</div><div class="cx-tooltip-formula">Range: 100 kW (edge) to 100,000 kW (hyperscale). Typical: 2,000 kW enterprise, 50,000 kW hyperscale.</div></span></span></label>
-      <input type="range" id="cxItLoad" class="cx-input-range" min="100" max="100000" step="100" value="2000" oninput="document.getElementById('cxItLoadVal').textContent=this.value+' kW';document.getElementById('cxItLoadNum').value=this.value;">
+      <input type="range" id="cxItLoad" class="cx-input-range" min="100" max="100000" step="100" value="2000" oninput="document.getElementById('cxItLoadVal').textContent=this.value+' kW';document.getElementById('cxItLoadNum').value=this.value;" aria-label="CX It Load">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="cx-range-val" id="cxItLoadVal">2000 kW</span>
-        <input type="number" id="cxItLoadNum" class="cx-input-field" style="width:110px;text-align:right;padding:6px 8px;font-size:0.8rem;" value="2000" min="100" max="100000" step="100" oninput="document.getElementById('cxItLoad').value=this.value;document.getElementById('cxItLoadVal').textContent=this.value+' kW';">
+        <input type="number" id="cxItLoadNum" class="cx-input-field" style="width:110px;text-align:right;padding:6px 8px;font-size:0.8rem;" value="2000" min="100" max="100000" step="100" oninput="document.getElementById('cxItLoad').value=this.value;document.getElementById('cxItLoadVal').textContent=this.value+' kW';" aria-label="CX It Load Num">
       </div>
     </div>
     <!-- Input 2: Cooling Type -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-snowflake" style="color:#22d3ee;"></i> Cooling Type <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Cooling Type</div><div class="cx-tooltip-desc">Primary cooling technology. DLC and immersion add 35-55% to Cx cost due to CDU redundancy testing, liquid loop zoning, manifold pressure, and rack-level thermal acceptance.</div><div class="cx-tooltip-formula">Cost multiplier: Air=1.0x, In-Row=1.12x, RDHX=1.25x, DLC=1.45x, Immersion=1.55x</div></span></span></label>
-      <select id="cxCoolingType" class="cx-input-field">
+      <select id="cxCoolingType" class="cx-input-field" aria-label="CX Cooling Type">
         <option value="air">Raised Floor CRAC/CRAH</option>
         <option value="inrow">In-Row Precision</option>
         <option value="rdhx">Rear Door Heat Exchanger</option>
@@ -710,7 +710,7 @@ a:hover{text-decoration:underline;}
     <!-- Input 3: Redundancy -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-shield-halved" style="color:#10b981;"></i> Redundancy Level <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Redundancy Level</div><div class="cx-tooltip-desc">Power and cooling redundancy configuration. 2N doubles commissioning scope — every failure scenario must be tested for both independent paths.</div><div class="cx-tooltip-formula">N=3 IST scenarios, N+1=6, 2N=10, 2N+1=10+ scenarios. Cost: N=1.0x, 2N=2.0x, 2N+1=2.25x</div></span></span></label>
-      <select id="cxRedundancy" class="cx-input-field">
+      <select id="cxRedundancy" class="cx-input-field" aria-label="CX Redundancy">
         <option value="N">N (No Redundancy)</option>
         <option value="N+1" selected>N+1 (Component)</option>
         <option value="2N">2N (System)</option>
@@ -720,7 +720,7 @@ a:hover{text-decoration:underline;}
     <!-- Input 4: Rack Density -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-server" style="color:#8b5cf6;"></i> Rack Density <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Rack Density</div><div class="cx-tooltip-desc">Average power per rack. AI/HPC densities (50-100+ kW) require specialized liquid cooling Cx disciplines and increase thermal failure risk during IST.</div><div class="cx-tooltip-formula">Standard=5-7 kW, Medium=10-15 kW, High=20-30 kW, AI/HPC=50-100+ kW. CAPEX basis: Standard $8.5K/kW, AI/HPC $12K/kW.</div></span></span></label>
-      <select id="cxRackDensity" class="cx-input-field">
+      <select id="cxRackDensity" class="cx-input-field" aria-label="CX Rack Density">
         <option value="standard">Standard (5–7 kW/rack)</option>
         <option value="medium">Medium (10–15 kW/rack)</option>
         <option value="high">High (20–30 kW/rack)</option>
@@ -730,7 +730,7 @@ a:hover{text-decoration:underline;}
     <!-- Input 5: Building Type -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-building" style="color:#64748b;"></i> Building Type <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Building Type</div><div class="cx-tooltip-desc">Construction type affects Cx complexity. Multi-story adds 25-30% for vertical risers, structural coordination, and staged energization per floor.</div><div class="cx-tooltip-formula">Warehouse=0.80x, Modular=0.75x, Purpose-Built=1.00x, Multi-Story=1.30x</div></span></span></label>
-      <select id="cxBuildingType" class="cx-input-field">
+      <select id="cxBuildingType" class="cx-input-field" aria-label="CX Building Type">
         <option value="warehouse">Converted Warehouse</option>
         <option value="modular">Modular / Prefab</option>
         <option value="purpose" selected>Purpose-Built</option>
@@ -740,7 +740,7 @@ a:hover{text-decoration:underline;}
     <!-- Input 6: Fire Suppression -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-fire-extinguisher" style="color:#ef4444;"></i> Fire Suppression <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Fire Suppression System</div><div class="cx-tooltip-desc">Fire suppression type affects Cx scope: clean agent systems (Novec, FM-200) require integrity testing, concentration hold, and agent release testing per NFPA 2001.</div><div class="cx-tooltip-formula">FM-200=1.0x, Novec=1.05x, Inergen=1.10x, Water Mist=1.15x, Pre-Action=0.85x</div></span></span></label>
-      <select id="cxFireSuppression" class="cx-input-field">
+      <select id="cxFireSuppression" class="cx-input-field" aria-label="CX Fire Suppression">
         <option value="fm200">FM-200 (HFC-227ea)</option>
         <option value="novec" selected>Novec 1230</option>
         <option value="inergen">Inergen (IG-541)</option>
@@ -752,7 +752,7 @@ a:hover{text-decoration:underline;}
     <!-- Input 7: UPS Type -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-car-battery" style="color:#f59e0b;"></i> UPS Type <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">UPS Type</div><div class="cx-tooltip-desc">UPS topology impacts Cx cost and duration. Rotary UPS (DRUPS) requires mechanical + electrical testing. Distributed requires per-rack validation.</div><div class="cx-tooltip-formula">Standalone=1.0x, Modular=1.25x, Distributed=1.15x, Rotary DRUPS=1.40x</div></span></span></label>
-      <select id="cxUpsType" class="cx-input-field">
+      <select id="cxUpsType" class="cx-input-field" aria-label="CX UPS Type">
         <option value="standalone">Standalone (Legacy)</option>
         <option value="modular" selected>Modular (Hot-Swap)</option>
         <option value="distributed">Distributed (Rack-Mount)</option>
@@ -762,7 +762,7 @@ a:hover{text-decoration:underline;}
     <!-- Input 8: Region -->
     <div class="cx-input-group">
       <label class="cx-input-label"><i class="fas fa-globe" style="color:#3b82f6;"></i> Region <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Region</div><div class="cx-tooltip-desc">Location determines CxA day rates, field technician rates, OEM costs, per diem, and regional labor multiplier. NoVA vs Jakarta can differ by 3x.</div><div class="cx-tooltip-formula">CxA day rates: US $1,050-1,200, EU $750-1,050, Asia $350-1,000, MENA $800-850. 30 regions covered.</div></span></span></label>
-      <select id="cxRegion" class="cx-input-field">
+      <select id="cxRegion" class="cx-input-field" aria-label="CX Region">
         <optgroup label="North America">
           <option value="us_virginia" selected>Northern Virginia (Ashburn)</option>
           <option value="us_texas">Dallas-Fort Worth / San Antonio</option>
@@ -808,7 +808,7 @@ a:hover{text-decoration:underline;}
     <!-- Pro Inputs (9-14) -->
     <div class="cx-input-group cx-pro-input" id="cxProInput9">
       <label class="cx-input-label"><i class="fas fa-gas-pump" style="color:#94a3b8;"></i> Generator Type <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Generator Type</div><div class="cx-tooltip-desc">Fuel type affects load bank testing complexity, fuel system commissioning, and environmental compliance. Dual fuel requires testing both fuel paths.</div><div class="cx-tooltip-formula">Diesel=1.0x, Natural Gas=1.10x, Dual Fuel=1.25x, HVO=1.08x</div></span></span></label>
-      <select id="cxGeneratorType" class="cx-input-field">
+      <select id="cxGeneratorType" class="cx-input-field" aria-label="CX Generator Type">
         <option value="diesel" selected>Diesel</option>
         <option value="gas">Natural Gas</option>
         <option value="dualfuel">Dual Fuel</option>
@@ -817,7 +817,7 @@ a:hover{text-decoration:underline;}
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput10">
       <label class="cx-input-label"><i class="fas fa-mountain" style="color:#94a3b8;"></i> Seismic Zone <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Seismic Zone</div><div class="cx-tooltip-desc">Higher seismic zones require seismic restraint testing, vibration isolation verification, and emergency shutdown validation per IBC/ASCE 7.</div><div class="cx-tooltip-formula">Zone 0=1.0x, Zone 1=1.05x, Zone 2=1.12x, Zone 3=1.22x, Zone 4=1.35x</div></span></span></label>
-      <select id="cxSeismicZone" class="cx-input-field">
+      <select id="cxSeismicZone" class="cx-input-field" aria-label="CX Seismic Zone">
         <option value="0">Zone 0 — No Risk</option>
         <option value="1" selected>Zone 1 — Low</option>
         <option value="2">Zone 2 — Moderate</option>
@@ -827,7 +827,7 @@ a:hover{text-decoration:underline;}
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput11">
       <label class="cx-input-label"><i class="fas fa-list-check" style="color:#94a3b8;"></i> Cx Scope <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Commissioning Scope</div><div class="cx-tooltip-desc">New Build = full L0-L6. Retrofit covers modified systems only. Recommissioning validates existing systems. Continuous = ongoing monitoring Cx.</div><div class="cx-tooltip-formula">New Build=1.0x, Retrofit=0.75x, Recommission=0.55x, Continuous=0.30x</div></span></span></label>
-      <select id="cxScope" class="cx-input-field">
+      <select id="cxScope" class="cx-input-field" aria-label="CX Scope">
         <option value="new_build" selected>New Build (Full L1-L5)</option>
         <option value="retrofit">Retrofit / Upgrade</option>
         <option value="recommission">Recommissioning</option>
@@ -836,7 +836,7 @@ a:hover{text-decoration:underline;}
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput12">
       <label class="cx-input-label"><i class="fas fa-plug-circle-bolt" style="color:#94a3b8;"></i> Substation <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Substation Configuration</div><div class="cx-tooltip-desc">Ring bus adds 80-110% to Cx cost. Requires protection relay coordination testing, bus tie testing, and utility switchover scenarios across all bus sections.</div><div class="cx-tooltip-formula">Utility-Fed=0.70x, Single Sub=1.0x, Dual Sub=1.85x, Ring Bus=2.10x</div></span></span></label>
-      <select id="cxSubstation" class="cx-input-field">
+      <select id="cxSubstation" class="cx-input-field" aria-label="CX Substation">
         <option value="utility_fed">Utility-Fed (No HV)</option>
         <option value="single_sub" selected>Single Substation</option>
         <option value="dual_sub">Dual Substations</option>
@@ -845,7 +845,7 @@ a:hover{text-decoration:underline;}
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput13">
       <label class="cx-input-label"><i class="fas fa-network-wired" style="color:#94a3b8;"></i> BMS/DCIM <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">BMS/DCIM Complexity</div><div class="cx-tooltip-desc">AI-driven DCIM doubles controls Cx scope with ML model validation, predictive algorithm testing, and integration across all subsystems. Points list scales with complexity.</div><div class="cx-tooltip-formula">Basic=200 pts, Standard=500 pts, Advanced=1,200 pts, AI-Driven=2,000+ pts. Cost: Basic=0.6x, AI=2.0x</div></span></span></label>
-      <select id="cxBmsComplexity" class="cx-input-field">
+      <select id="cxBmsComplexity" class="cx-input-field" aria-label="CX Bms Complexity">
         <option value="basic">Basic BMS</option>
         <option value="standard" selected>Standard BMS + Head-End</option>
         <option value="advanced">Advanced DCIM</option>
@@ -854,7 +854,7 @@ a:hover{text-decoration:underline;}
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput14">
       <label class="cx-input-label"><i class="fas fa-truck-fast" style="color:#94a3b8;"></i> Delivery Method <span class="cx-pro-tag">PRO</span> <span class="cx-tooltip-trigger">?<span class="cx-tooltip-content"><div class="cx-tooltip-title">Delivery Method</div><div class="cx-tooltip-desc">EPC and modular pod delivery compress Cx timelines and reduce cost through factory pre-commissioning. Traditional DBB has sequential handoffs.</div><div class="cx-tooltip-formula">Traditional=1.0x, Design-Build=0.90x, EPC=0.85x, Modular/Pod=0.70x</div></span></span></label>
-      <select id="cxDeliveryMethod" class="cx-input-field">
+      <select id="cxDeliveryMethod" class="cx-input-field" aria-label="CX Delivery Method">
         <option value="traditional" selected>Traditional (DBB)</option>
         <option value="design_build">Design-Build</option>
         <option value="epc">EPC</option>
@@ -893,7 +893,7 @@ a:hover{text-decoration:underline;}
     <div class="cx-gantt-section" id="cxGanttSection">
       <h3><i class="fas fa-diagram-project" style="color:#22d3ee;margin-right:8px;"></i>Interactive Commissioning Schedule</h3>
       <div class="cx-gantt-toolbar" id="cxGanttToolbar">
-        <input type="text" id="cxGanttSearch" placeholder="Search activities..." oninput="cxFilterGantt(this.value)">
+        <input type="text" id="cxGanttSearch" placeholder="Search activities..." oninput="cxFilterGantt(this.value)" aria-label="Search activities...">
         <div class="cx-gantt-sep"></div>
         <button onclick="cxExpandAllGantt()" title="Expand All"><i class="fas fa-expand"></i> Expand</button>
         <button onclick="cxCollapseAllGantt()" title="Collapse All"><i class="fas fa-compress"></i> Collapse</button>
@@ -902,7 +902,7 @@ a:hover{text-decoration:underline;}
         <button onclick="cxGanttZoom('week')" id="cxZoomWeek" class="active" title="Week view">Week</button>
         <button onclick="cxGanttZoom('month')" id="cxZoomMonth" title="Month view">Month</button>
         <div class="cx-gantt-sep"></div>
-        <select id="cxGanttPhaseFilter" onchange="cxFilterGanttPhase(this.value)">
+        <select id="cxGanttPhaseFilter" onchange="cxFilterGanttPhase(this.value)" aria-label="CX Gantt Phase Filter">
           <option value="all">All Phases</option>
           <option value="L0">L0 — Planning</option>
           <option value="L1">L1 — FAT</option>
@@ -1161,11 +1161,11 @@ a:hover{text-decoration:underline;}
     <div style="display:flex;flex-direction:column;gap:1rem;">
       <div>
         <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Email</label>
-        <input type="email" id="cxLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'">
+        <input type="email" id="cxLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" aria-label="your@email.com">
       </div>
       <div>
         <label style="display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px;">Password</label>
-        <input type="password" id="cxLoginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')cxAttemptLogin()">
+        <input type="password" id="cxLoginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')cxAttemptLogin()" aria-label="Enter password">
       </div>
       <button onclick="cxAttemptLogin()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;"><i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In</button>
     </div>
@@ -5578,7 +5578,7 @@ function cxRenderFaq(){
   ];
   var html='<button class="cx-faq-back" onclick="cxSwitchMode(\'free\')"><i class="fas fa-arrow-left"></i> Back to Calculator</button>';
   html+='<div class="cx-faq-header"><h2><i class="fas fa-circle-question" style="color:#22d3ee;margin-right:10px;"></i>Frequently Asked Questions</h2><p>'+faqData.reduce(function(n,c){return n+c.items.length;},0)+' answers across '+faqData.length+' categories — everything you need to know about the Cx Calculator</p></div>';
-  html+='<input type="text" class="cx-faq-search" id="cxFaqSearch" placeholder="Search FAQ..." oninput="cxFilterFaq(this.value)">';
+  html+='<input type="text" class="cx-faq-search" id="cxFaqSearch" placeholder="Search FAQ..." oninput="cxFilterFaq(this.value)" aria-label="Search FAQ...">';
   html+='<div class="cx-faq-count" id="cxFaqCount"></div>';
   faqData.forEach(function(cat,ci){
     html+='<div class="cx-faq-category" data-faqcat="'+ci+'">';

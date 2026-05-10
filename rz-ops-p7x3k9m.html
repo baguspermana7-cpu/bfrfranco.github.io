@@ -665,7 +665,7 @@
                     </div>
                     <div class="login-options">
                         <label class="login-remember">
-                            <input type="checkbox" id="loginRemember" checked>
+                            <input type="checkbox" id="loginRemember" checked aria-label="Login Remember">
                             <span>Remember me</span>
                         </label>
                         <div class="login-secure"><i class="fas fa-lock"></i> 256-bit encrypted</div>
@@ -876,9 +876,9 @@
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
             <div class="card-title" style="margin:0"><i class="fas fa-user-cog" style="color:#a78bfa"></i> All Users</div>
             <div class="tbl-controls" style="margin:0">
-                <div class="tbl-search"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search email or name..." oninput="filterUsers()"></div>
-                <select class="tbl-select" id="tierFilter" onchange="filterUsers()"><option value="all">All Tiers</option><option value="pro">Pro</option><option value="free">Free</option></select>
-                <select class="tbl-select" id="statusFilter" onchange="filterUsers()"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option></select>
+                <div class="tbl-search"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search email or name..." oninput="filterUsers()" aria-label="Search email or name..."></div>
+                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="pro">Pro</option><option value="free">Free</option></select>
+                <select class="tbl-select" id="statusFilter" onchange="filterUsers()" aria-label="Status Filter"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option></select>
                 <button class="btn btn-green" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
                 <button class="btn btn-purple" onclick="openCreateModal()" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(168,85,247,0.1));border:1px solid rgba(139,92,246,0.4);color:#a78bfa;"><i class="fas fa-user-plus"></i> Create Account</button>
             </div>
@@ -955,7 +955,7 @@
             <div style="font-size:0.62rem;color:#475569;margin-top:4px"><i class="fas fa-clock" style="margin-right:3px"></i>Last updated: Feb 2026 · Sources: Synergy Q3 2025, CBRE H1 2025, JLL 2026 Outlook</div>
         </div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap">
-            <div style="position:relative"><i class="fas fa-search" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.7rem"></i><input type="text" id="dcGlobalSearch" placeholder="Search all..." style="padding:5px 8px 5px 26px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;font-family:inherit;outline:none;width:160px" oninput="dcGlobalSearchFilter(this.value)"></div>
+            <div style="position:relative"><i class="fas fa-search" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.7rem"></i><input type="text" id="dcGlobalSearch" placeholder="Search all..." style="padding:5px 8px 5px 26px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;font-family:inherit;outline:none;width:160px" oninput="dcGlobalSearchFilter(this.value)" aria-label="Search all..."></div>
             <button class="btn btn-ghost btn-sm" onclick="openDcCompareMode()" title="Compare operators"><i class="fas fa-columns"></i> Compare</button>
             <button class="btn btn-green btn-sm" onclick="exportBenchmarksCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-amber btn-sm" onclick="exportBenchJSON()" title="Export as JSON"><i class="fas fa-code"></i> JSON</button>
@@ -1014,7 +1014,7 @@
         <div class="bench-filters">
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Type:</span>
-                <select class="bench-select" id="benchOpType" onchange="filterBenchOps()">
+                <select class="bench-select" id="benchOpType" onchange="filterBenchOps()" aria-label="Bench Op Type">
                     <option value="all">All Types</option>
                     <option value="Hyperscale">Hyperscale</option>
                     <option value="Colocation">Colocation</option>
@@ -1024,7 +1024,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Region:</span>
-                <select class="bench-select" id="benchOpRegion" onchange="filterBenchOps()">
+                <select class="bench-select" id="benchOpRegion" onchange="filterBenchOps()" aria-label="Bench Op Region">
                     <option value="all">All Regions</option>
                     <option value="Americas">Americas</option>
                     <option value="EMEA">EMEA</option>
@@ -1033,7 +1033,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Search:</span>
-                <input type="text" class="bench-input" id="benchOpSearch" placeholder="Search operator..." oninput="filterBenchOps()">
+                <input type="text" class="bench-input" id="benchOpSearch" placeholder="Search operator..." oninput="filterBenchOps()" aria-label="Search operator...">
             </div>
             <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px;align-items:center">
                 <span style="font-size:0.65rem;color:#64748b" id="benchOpCount">50 operators</span>
@@ -1056,7 +1056,7 @@
         <div class="bench-filters">
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Region:</span>
-                <select class="bench-select" id="benchCountryRegion" onchange="filterBenchCountries()">
+                <select class="bench-select" id="benchCountryRegion" onchange="filterBenchCountries()" aria-label="Bench Country Region">
                     <option value="all">All Regions</option>
                     <option value="Americas">Americas</option>
                     <option value="EMEA">EMEA</option>
@@ -1065,7 +1065,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Growth:</span>
-                <select class="bench-select" id="benchCountryGrowth" onchange="filterBenchCountries()">
+                <select class="bench-select" id="benchCountryGrowth" onchange="filterBenchCountries()" aria-label="Bench Country Growth">
                     <option value="all">All</option>
                     <option value="high">High Growth (>15%)</option>
                     <option value="medium">Medium (8-15%)</option>
@@ -1074,7 +1074,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Search:</span>
-                <input type="text" class="bench-input" id="benchCountrySearch" placeholder="Search country..." oninput="filterBenchCountries()">
+                <input type="text" class="bench-input" id="benchCountrySearch" placeholder="Search country..." oninput="filterBenchCountries()" aria-label="Search country...">
             </div>
             <div class="bench-filter-group" style="margin-left:auto;display:flex;gap:4px;align-items:center">
                 <span style="font-size:0.65rem;color:#64748b" id="benchCountryCount">35 countries</span>
@@ -1091,7 +1091,7 @@
         <div class="bench-filters">
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Size:</span>
-                <select class="bench-select" id="benchFacSize" onchange="filterBenchFacilities()">
+                <select class="bench-select" id="benchFacSize" onchange="filterBenchFacilities()" aria-label="Bench Fac Size">
                     <option value="all">All Sizes</option>
                     <option value="mega">Mega (500+ MW)</option>
                     <option value="large">Large (200-500 MW)</option>
@@ -1101,13 +1101,13 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Country:</span>
-                <select class="bench-select" id="benchFacCountry" onchange="filterBenchFacilities()">
+                <select class="bench-select" id="benchFacCountry" onchange="filterBenchFacilities()" aria-label="Bench Fac Country">
                     <option value="all">All Countries</option>
                 </select>
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Year:</span>
-                <select class="bench-select" id="benchFacYear" onchange="filterBenchFacilities()">
+                <select class="bench-select" id="benchFacYear" onchange="filterBenchFacilities()" aria-label="Bench Fac Year">
                     <option value="all">All Years</option>
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
@@ -1255,7 +1255,7 @@
         <div class="bench-filters" style="margin-bottom:0.75rem">
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Layer:</span>
-                <select class="bench-select" id="mapLayerSelect" onchange="toggleMapLayer()">
+                <select class="bench-select" id="mapLayerSelect" onchange="toggleMapLayer()" aria-label="Map Layer Select">
                     <option value="all">All Layers</option>
                     <option value="facilities">Facilities (91)</option>
                     <option value="operators">Operator HQs (53)</option>
@@ -1264,7 +1264,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Type:</span>
-                <select class="bench-select" id="mapTypeFilter" onchange="filterMapMarkers()">
+                <select class="bench-select" id="mapTypeFilter" onchange="filterMapMarkers()" aria-label="Map Type Filter">
                     <option value="all">All Types</option>
                     <option value="Hyperscale">Hyperscale</option>
                     <option value="Colocation">Colocation</option>
@@ -1274,7 +1274,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Region:</span>
-                <select class="bench-select" id="mapRegionFilter" onchange="filterMapMarkers()">
+                <select class="bench-select" id="mapRegionFilter" onchange="filterMapMarkers()" aria-label="Map Region Filter">
                     <option value="all">All Regions</option>
                     <option value="Americas">Americas</option>
                     <option value="EMEA">EMEA</option>
@@ -1308,7 +1308,7 @@
         <div class="bench-filters" style="margin-bottom:0.75rem">
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Sort:</span>
-                <select class="bench-select" id="energySortSelect" onchange="sortEnergyMix()">
+                <select class="bench-select" id="energySortSelect" onchange="sortEnergyMix()" aria-label="Energy Sort Select">
                     <option value="fossil-desc">Highest Fossil %</option>
                     <option value="renewable-desc">Highest Renewable %</option>
                     <option value="alpha">Alphabetical</option>
@@ -1317,7 +1317,7 @@
             </div>
             <div class="bench-filter-group">
                 <span class="bench-filter-label">Region:</span>
-                <select class="bench-select" id="energyRegionFilter" onchange="renderEnergyMix()">
+                <select class="bench-select" id="energyRegionFilter" onchange="renderEnergyMix()" aria-label="Energy Region Filter">
                     <option value="all">All Regions</option>
                     <option value="Americas">Americas</option>
                     <option value="EMEA">EMEA</option>
@@ -1378,7 +1378,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
             <div class="card-title" style="margin:0"><i class="fas fa-stream" style="color:#60a5fa"></i> Event Timeline</div>
             <div class="tbl-controls" style="margin:0">
-                <select class="tbl-select" id="auditTypeFilter" onchange="filterAudit()"><option value="all">All Types</option><option value="login">Login</option><option value="logout">Logout</option><option value="calculation">Calculation</option><option value="pdf">PDF Export</option><option value="tier_change">Tier Change</option><option value="feature_toggle">Feature Toggle</option></select>
+                <select class="tbl-select" id="auditTypeFilter" onchange="filterAudit()" aria-label="Audit Type Filter"><option value="all">All Types</option><option value="login">Login</option><option value="logout">Logout</option><option value="calculation">Calculation</option><option value="pdf">PDF Export</option><option value="tier_change">Tier Change</option><option value="feature_toggle">Feature Toggle</option></select>
                 <button class="btn btn-green btn-sm" onclick="exportAuditCSV()"><i class="fas fa-download"></i> Export</button>
             </div>
         </div>
@@ -1396,9 +1396,9 @@
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
             <div class="card-title" style="margin:0"><i class="fas fa-envelope-open-text" style="color:#34d399"></i> Subscriber List</div>
             <div class="tbl-controls" style="margin:0;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                <input type="text" id="subSearch" placeholder="Search email..." oninput="renderSubscribers()" style="padding:0.4rem 0.75rem;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e2e8f0;font-size:0.8rem;width:180px;">
-                <select class="tbl-select" id="subSourceFilter" onchange="renderSubscribers()"><option value="all">All Sources</option></select>
-                <select class="tbl-select" id="subStatusFilter" onchange="renderSubscribers()"><option value="all">All Status</option><option value="active">Active</option><option value="unsubscribed">Unsubscribed</option></select>
+                <input type="text" id="subSearch" placeholder="Search email..." oninput="renderSubscribers()" style="padding:0.4rem 0.75rem;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e2e8f0;font-size:0.8rem;width:180px;" aria-label="Search email...">
+                <select class="tbl-select" id="subSourceFilter" onchange="renderSubscribers()" aria-label="Sub Source Filter"><option value="all">All Sources</option></select>
+                <select class="tbl-select" id="subStatusFilter" onchange="renderSubscribers()" aria-label="Sub Status Filter"><option value="all">All Status</option><option value="active">Active</option><option value="unsubscribed">Unsubscribed</option></select>
                 <button class="btn btn-green btn-sm" onclick="exportSubscribersCSV()"><i class="fas fa-download"></i> Export CSV</button>
             </div>
         </div>
@@ -1501,21 +1501,21 @@
     <!-- ═══ TRANSACTIONS TAB ═══ -->
     <div class="mayar-panel" id="mayar-transactions">
         <div class="tbl-controls">
-            <select class="tbl-select" id="mayarTxStatus" onchange="filterMayarTx()">
+            <select class="tbl-select" id="mayarTxStatus" onchange="filterMayarTx()" aria-label="Mayar Tx Status">
                 <option value="all">All Status</option>
                 <option value="paid">Paid</option>
                 <option value="unpaid">Unpaid</option>
             </select>
-            <select class="tbl-select" id="mayarTxPeriod" onchange="filterMayarTx()">
+            <select class="tbl-select" id="mayarTxPeriod" onchange="filterMayarTx()" aria-label="Mayar Tx Period">
                 <option value="">No Period Filter</option>
                 <option value="today">Today</option>
                 <option value="week">This Week</option>
                 <option value="month">This Month</option>
                 <option value="year">This Year</option>
             </select>
-            <input type="date" class="mayar-input" id="mayarTxDateFrom" style="width:auto" placeholder="From">
-            <input type="date" class="mayar-input" id="mayarTxDateTo" style="width:auto" placeholder="To">
-            <input type="text" class="mayar-input" id="mayarTxProductId" style="width:180px" placeholder="Product ID (optional)">
+            <input type="date" class="mayar-input" id="mayarTxDateFrom" style="width:auto" placeholder="From" aria-label="From">
+            <input type="date" class="mayar-input" id="mayarTxDateTo" style="width:auto" placeholder="To" aria-label="To">
+            <input type="text" class="mayar-input" id="mayarTxProductId" style="width:180px" placeholder="Product ID (optional)" aria-label="Product ID (optional)">
             <button class="btn btn-purple btn-sm" onclick="filterMayarTx()"><i class="fas fa-filter"></i> Filter</button>
             <button class="btn btn-green btn-sm" onclick="exportMayarTxCSV()"><i class="fas fa-download"></i> Export CSV</button>
         </div>
@@ -1547,7 +1547,7 @@
         <div class="tbl-controls" style="margin-bottom:1.5rem">
             <div class="tbl-search">
                 <i class="fas fa-search"></i>
-                <input type="text" id="mayarCustSearch" placeholder="Search by name or email..." style="width:320px" onkeydown="if(event.key==='Enter')searchMayarCustomer()">
+                <input type="text" id="mayarCustSearch" placeholder="Search by name or email..." style="width:320px" onkeydown="if(event.key==='Enter')searchMayarCustomer()" aria-label="Search by name or email...">
             </div>
             <button class="btn btn-purple btn-sm" onclick="searchMayarCustomer()"><i class="fas fa-search"></i> Search</button>
         </div>
@@ -1559,7 +1559,7 @@
             </div>
             <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem">
                 <button class="btn btn-green btn-sm" onclick="sendMayarPortalLinkForCust()"><i class="fas fa-paper-plane"></i> Send Portal Link</button>
-                <select class="tbl-select" id="mayarCustTxPeriod">
+                <select class="tbl-select" id="mayarCustTxPeriod" aria-label="Mayar Cust Tx Period">
                     <option value="">All Time</option>
                     <option value="today">Today</option>
                     <option value="week">This Week</option>
@@ -1587,8 +1587,8 @@
     <!-- ═══ MEMBERSHIPS TAB ═══ -->
     <div class="mayar-panel" id="mayar-membership">
         <div class="tbl-controls" style="margin-bottom:1.5rem">
-            <input type="text" class="mayar-input" id="mayarMemProductId" placeholder="Product ID *" style="width:260px">
-            <input type="text" class="mayar-input" id="mayarMemTierId" placeholder="Tier ID (optional)" style="width:220px">
+            <input type="text" class="mayar-input" id="mayarMemProductId" placeholder="Product ID *" style="width:260px" aria-label="Product ID *">
+            <input type="text" class="mayar-input" id="mayarMemTierId" placeholder="Tier ID (optional)" style="width:220px" aria-label="Tier ID (optional)">
             <button class="btn btn-purple btn-sm" onclick="loadMayarMembers()"><i class="fas fa-users"></i> Load Members</button>
         </div>
         <div class="card">
@@ -1609,16 +1609,16 @@
             <div class="card">
                 <div class="card-title"><i class="fas fa-file-invoice-dollar" style="color:#34d399"></i> Create Invoice</div>
                 <div style="display:grid;gap:10px">
-                    <div><label class="mayar-label">Customer Name *</label><input class="mayar-input" id="mayarInvName" placeholder="John Doe"></div>
-                    <div><label class="mayar-label">Email *</label><input class="mayar-input" id="mayarInvEmail" placeholder="john@example.com" type="email"></div>
-                    <div><label class="mayar-label">Mobile</label><input class="mayar-input" id="mayarInvMobile" placeholder="+628123456789"></div>
-                    <div><label class="mayar-label">Description *</label><input class="mayar-input" id="mayarInvDesc" placeholder="Pro subscription"></div>
+                    <div><label class="mayar-label">Customer Name *</label><input class="mayar-input" id="mayarInvName" placeholder="John Doe" aria-label="John Doe"></div>
+                    <div><label class="mayar-label">Email *</label><input class="mayar-input" id="mayarInvEmail" placeholder="john@example.com" type="email" aria-label="john@example.com"></div>
+                    <div><label class="mayar-label">Mobile</label><input class="mayar-input" id="mayarInvMobile" placeholder="+628123456789" aria-label="+628123456789"></div>
+                    <div><label class="mayar-label">Description *</label><input class="mayar-input" id="mayarInvDesc" placeholder="Pro subscription" aria-label="Pro subscription"></div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                        <div><label class="mayar-label">Quantity</label><input class="mayar-input" id="mayarInvQty" type="number" value="1" min="1"></div>
-                        <div><label class="mayar-label">Rate (IDR) *</label><input class="mayar-input" id="mayarInvRate" type="number" placeholder="99000"></div>
+                        <div><label class="mayar-label">Quantity</label><input class="mayar-input" id="mayarInvQty" type="number" value="1" min="1" aria-label="Mayar Inv Qty"></div>
+                        <div><label class="mayar-label">Rate (IDR) *</label><input class="mayar-input" id="mayarInvRate" type="number" placeholder="99000" aria-label="99000"></div>
                     </div>
-                    <div><label class="mayar-label">Redirect URL</label><input class="mayar-input" id="mayarInvRedirect" placeholder="https://resistancezero.com/dashboard.html"></div>
-                    <div><label class="mayar-label">Expiry (days)</label><input class="mayar-input" id="mayarInvExpiry" type="number" value="7" min="1" max="90"></div>
+                    <div><label class="mayar-label">Redirect URL</label><input class="mayar-input" id="mayarInvRedirect" placeholder="https://resistancezero.com/dashboard.html" aria-label="https://resistancezero.com/dashboard.html"></div>
+                    <div><label class="mayar-label">Expiry (days)</label><input class="mayar-input" id="mayarInvExpiry" type="number" value="7" min="1" max="90" aria-label="Mayar Inv Expiry"></div>
                     <button class="btn btn-green" onclick="submitMayarInvoice()" style="width:100%;justify-content:center"><i class="fas fa-paper-plane"></i> Create Invoice</button>
                 </div>
             </div>
@@ -1629,7 +1629,7 @@
                 <div class="card">
                     <div class="card-title"><i class="fas fa-link" style="color:#60a5fa"></i> Send Portal Link</div>
                     <div style="display:grid;gap:10px">
-                        <div><label class="mayar-label">Customer Email *</label><input class="mayar-input" id="mayarPortalEmail" placeholder="customer@example.com" type="email"></div>
+                        <div><label class="mayar-label">Customer Email *</label><input class="mayar-input" id="mayarPortalEmail" placeholder="customer@example.com" type="email" aria-label="customer@example.com"></div>
                         <button class="btn btn-purple" onclick="sendMayarPortalLink()" style="width:100%;justify-content:center"><i class="fas fa-paper-plane"></i> Send Portal Link</button>
                     </div>
                 </div>
@@ -1673,12 +1673,12 @@
         <button class="ua-period-btn" onclick="setUAPeriod('all',this)">All Time</button>
         <span style="color:#334155;margin:0 4px">|</span>
         <label>Custom:</label>
-        <input type="date" id="uaDateFrom" onchange="applyUACustomDate()">
+        <input type="date" id="uaDateFrom" onchange="applyUACustomDate()" aria-label="Ua Date From">
         <span style="color:#64748b;font-size:0.75rem">to</span>
-        <input type="date" id="uaDateTo" onchange="applyUACustomDate()">
+        <input type="date" id="uaDateTo" onchange="applyUACustomDate()" aria-label="Ua Date To">
         <span style="color:#334155;margin:0 4px">|</span>
         <label>Category:</label>
-        <select class="tbl-select" id="uaCatFilter" onchange="renderActivity()" style="min-width:140px">
+        <select class="tbl-select" id="uaCatFilter" onchange="renderActivity()" style="min-width:140px" aria-label="Ua Cat Filter">
             <option value="all">All Categories</option>
             <option value="pro_click">Pro Mode Click</option>
             <option value="demo_login">Demo Login</option>
@@ -1731,7 +1731,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem">
             <div class="card-title" style="margin:0;font-size:0.78rem"><i class="fas fa-stream" style="color:#a78bfa"></i> Event Log</div>
             <div style="display:flex;gap:0.5rem;align-items:center">
-                <div class="tbl-search"><i class="fas fa-search"></i><input id="uaEventSearch" placeholder="Search..." oninput="filterUAEvents()" style="width:160px"></div>
+                <div class="tbl-search"><i class="fas fa-search"></i><input id="uaEventSearch" placeholder="Search..." oninput="filterUAEvents()" style="width:160px" aria-label="Search..."></div>
                 <button class="btn btn-ghost btn-sm" onclick="exportUAEventsCSV()"><i class="fas fa-download"></i> CSV</button>
             </div>
         </div>
@@ -1840,11 +1840,11 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
                     <div>
                         <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Full Name *</label>
-                        <input type="text" id="createName" placeholder="John Doe" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <input type="text" id="createName" placeholder="John Doe" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="John Doe">
                     </div>
                     <div>
                         <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Role</label>
-                        <select id="createRole" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <select id="createRole" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Role">
                             <option value="User">User</option>
                             <option value="Admin">Admin</option>
                         </select>
@@ -1852,31 +1852,31 @@
                 </div>
                 <div style="margin-bottom:12px">
                     <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Email Address *</label>
-                    <input type="email" id="createEmail" placeholder="user@example.com" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                    <input type="email" id="createEmail" placeholder="user@example.com" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="user@example.com">
                 </div>
                 <div style="margin-bottom:12px">
                     <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Password *</label>
                     <div style="position:relative">
-                        <input type="password" id="createPassword" placeholder="Min 6 characters" style="width:100%;padding:10px 14px;padding-right:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <input type="password" id="createPassword" placeholder="Min 6 characters" style="width:100%;padding:10px 14px;padding-right:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Min 6 characters">
                         <button onclick="toggleCreatePw()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748b;cursor:pointer;font-size:0.85rem;padding:4px"><i class="fas fa-eye" id="createPwIcon"></i></button>
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
                     <div>
                         <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Access Tier *</label>
-                        <select id="createTier" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <select id="createTier" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Tier">
                             <option value="free" selected>Free</option>
                             <option value="pro">Pro</option>
                         </select>
                     </div>
                     <div>
                         <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Company</label>
-                        <input type="text" id="createCompany" placeholder="Optional" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                        <input type="text" id="createCompany" placeholder="Optional" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Optional">
                     </div>
                 </div>
                 <div style="margin-bottom:20px">
                     <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Country</label>
-                    <select id="createCountry" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;">
+                    <select id="createCountry" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Country">
                         <option value="Indonesia">Indonesia</option>
                         <option value="Singapore">Singapore</option>
                         <option value="Malaysia">Malaysia</option>

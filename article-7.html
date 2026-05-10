@@ -1197,7 +1197,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -2111,7 +2111,7 @@
 
                     <div class="control-row">
                         <span class="control-label">Disturbance Intensity:</span>
-                        <input type="range" id="disturbSlider" class="control-slider" min="0" max="100" value="40">
+                        <input type="range" id="disturbSlider" class="control-slider" min="0" max="100" value="40" aria-label="Disturb Slider">
                         <span class="control-value" id="disturbValue">40%</span>
                     </div>
 
@@ -2168,7 +2168,7 @@
                     <div class="calc-grid">
                         <div class="calc-input-group">
                             <label class="calc-label">Redundancy Configuration <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Redundancy Configuration</div><div class="tooltip-desc">Infrastructure redundancy level per Uptime Institute topology. N=no redundancy, N+1=one extra, 2N=full mirror, 2N+1=mirror+spare. Higher tier demands proportionally higher operational resilience.</div><div class="tooltip-formula">Benchmark: Tier III=N+1, Tier IV=2N+1</div></span></span></label>
-                            <select class="calc-select" id="calcRedundancy">
+                            <select class="calc-select" id="calcRedundancy" aria-label="Calc Redundancy">
                                 <option value="N">N (No Redundancy)</option>
                                 <option value="N+1" selected>N+1</option>
                                 <option value="2N">2N</option>
@@ -2178,7 +2178,7 @@
 
                         <div class="calc-input-group">
                             <label class="calc-label">Emergency Drill Frequency <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Emergency Drill Frequency</div><div class="tooltip-desc">How often the team practices emergency scenarios (power loss, cooling failure, fire). Monthly drills build muscle memory and expose procedural gaps. Annual or never creates dangerous competency decay.</div><div class="tooltip-formula">Benchmark: Best practice = Monthly (Uptime M&amp;O)</div></span></span></label>
-                            <select class="calc-select" id="calcDrillFreq">
+                            <select class="calc-select" id="calcDrillFreq" aria-label="Calc Drill Freq">
                                 <option value="Never">Never</option>
                                 <option value="Annual" selected>Annual</option>
                                 <option value="Quarterly">Quarterly</option>
@@ -2189,14 +2189,14 @@
                         <div class="calc-input-group">
                             <label class="calc-label">Critical Alarm Response Time (minutes) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Alarm Response Time</div><div class="tooltip-desc">Time from alarm to first operator action on critical infrastructure alerts. Includes detection, acknowledgment, and initial assessment. Sub-5 min response prevents cascade failures.</div><div class="tooltip-formula">Benchmark: Tier IV target &le;5 min, Industry avg 15 min</div></span></span></label>
                             <div class="calc-slider-container">
-                                <input type="range" class="calc-slider" id="calcResponseTime" min="1" max="60" value="15">
+                                <input type="range" class="calc-slider" id="calcResponseTime" min="1" max="60" value="15" aria-label="Calc Response Time">
                                 <span class="calc-slider-value" id="calcResponseTimeVal">15 min</span>
                             </div>
                         </div>
 
                         <div class="calc-input-group">
                             <label class="calc-label">Recovery Testing Level <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Recovery Testing Level</div><div class="tooltip-desc">Maturity of disaster recovery and failover testing program. Tests should cover full power path, cooling path, and network failover. Untested recovery plans fail 75% of the time.</div><div class="tooltip-formula">Benchmark: Best practice = Tested Quarterly (EN 50600)</div></span></span></label>
-                            <select class="calc-select" id="calcRecovery">
+                            <select class="calc-select" id="calcRecovery" aria-label="Calc Recovery">
                                 <option value="None">None</option>
                                 <option value="Documented" selected>Documented</option>
                                 <option value="Tested Annually">Tested Annually</option>
@@ -2207,14 +2207,14 @@
                         <div class="calc-input-group">
                             <label class="calc-label">Cross-Training Coverage (%) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Cross-Training Coverage</div><div class="tooltip-desc">Percentage of critical procedures where more than one team member is qualified. Single-point-of-knowledge (SPoK) creates availability risk during absences.</div><div class="tooltip-formula">Benchmark: Target &ge;60%, critical systems &ge;80%</div></span></span></label>
                             <div class="calc-slider-container">
-                                <input type="range" class="calc-slider" id="calcCrossTrain" min="0" max="100" value="30">
+                                <input type="range" class="calc-slider" id="calcCrossTrain" min="0" max="100" value="30" aria-label="Calc Cross Train">
                                 <span class="calc-slider-value" id="calcCrossTrainVal">30%</span>
                             </div>
                         </div>
 
                         <div class="calc-input-group">
                             <label class="calc-label">Documentation Currency <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Documentation Currency</div><div class="tooltip-desc">How up-to-date are SOPs, one-line diagrams, and emergency procedures. Outdated docs cause incorrect emergency actions. Real-time updated = CMMS/DCIM integrated.</div><div class="tooltip-formula">Benchmark: Best practice = Current &lt;1yr (ISO 22301)</div></span></span></label>
-                            <select class="calc-select" id="calcDocCurrency">
+                            <select class="calc-select" id="calcDocCurrency" aria-label="Calc Doc Currency">
                                 <option value="Outdated >2yr">Outdated >2yr</option>
                                 <option value="Outdated 1-2yr" selected>Outdated 1-2yr</option>
                                 <option value="Current <1yr">Current &lt;1yr</option>
@@ -2224,7 +2224,7 @@
 
                         <div class="calc-input-group">
                             <label class="calc-label">Communication Plan <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Communication Plan</div><div class="tooltip-desc">Maturity of emergency communication protocols &mdash; who to call, when, what to say. Tested plans reduce response confusion by 60%.</div><div class="tooltip-formula">Benchmark: Best practice = Tested &amp; Drilled</div></span></span></label>
-                            <select class="calc-select" id="calcCommPlan">
+                            <select class="calc-select" id="calcCommPlan" aria-label="Calc Comm Plan">
                                 <option value="None">None</option>
                                 <option value="Basic" selected>Basic</option>
                                 <option value="Detailed">Detailed</option>
@@ -2234,7 +2234,7 @@
 
                         <div class="calc-input-group">
                             <label class="calc-label">Lessons Learned Program <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Lessons Learned Program</div><div class="tooltip-desc">How post-incident findings are captured, tracked, and fed back into design and operations. Integrated programs prevent 40% of recurring incidents.</div><div class="tooltip-formula">Benchmark: Best practice = Integrated into design</div></span></span></label>
-                            <select class="calc-select" id="calcLessons">
+                            <select class="calc-select" id="calcLessons" aria-label="Calc Lessons">
                                 <option value="None">None</option>
                                 <option value="Ad-hoc" selected>Ad-hoc</option>
                                 <option value="Structured">Structured</option>
@@ -2403,8 +2403,8 @@
                             <button class="res-login-close" onclick="resHideLogin()">&times;</button>
                             <h3 style="margin:0 0 0.5rem;color:#10b981;"><i class="fas fa-crown"></i> Pro Analysis Access</h3>
                             <p style="margin:0 0 1.25rem;color:rgba(255,255,255,0.6);font-size:0.85rem;">Unlock Resilience Gap Deep Dive, Cost of Downtime, Benchmarking, and Improvement Roadmap.</p>
-                            <input type="email" id="resLoginEmail" placeholder="Email address" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;">
-                            <input type="password" id="resLoginPassword" placeholder="Password" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;">
+                            <input type="email" id="resLoginEmail" placeholder="Email address" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Email address">
+                            <input type="password" id="resLoginPassword" placeholder="Password" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Password">
                             <div id="resLoginError" style="color:#ef4444;font-size:0.8rem;margin-bottom:0.5rem;display:none;"></div>
                             <button onclick="resHandleLogin()" style="width:100%;padding:0.7rem;border:none;border-radius:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:600;cursor:pointer;font-size:0.95rem;">Sign In</button>
                             <p style="margin:0.75rem 0 0;color:rgba(255,255,255,0.4);font-size:0.75rem;text-align:center;">Demo Account: demo@resistancezero.com / demo2026</p>

@@ -662,7 +662,7 @@
                         <button class="preset-btn" onclick="setPreset('totalCapex',200)">$200M Large</button>
                         <button class="preset-btn" onclick="setPreset('totalCapex',500)">$500M Mega</button>
                     </div>
-                    <input type="number" class="input-field" id="totalCapex" value="100" min="1" max="5000" step="1" oninput="calculate()">
+                    <input type="number" class="input-field" id="totalCapex" value="100" min="1" max="5000" step="1" oninput="calculate()" aria-label="Total CAPEX">
 
                     <label class="input-label">IT Capacity (MW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Power Capacity</div><div class="tooltip-desc">Total IT power capacity available for lease or use. This determines your revenue potential. A 10MW facility at $150/kW/month generates up to $18M annually at full occupancy. AI-optimized facilities can command $200-350/kW/month.</div></div></span></label>
                     <div class="preset-bar">
@@ -671,10 +671,10 @@
                         <button class="preset-btn active" onclick="setPreset('itCapacity',10)">10MW Colo</button>
                         <button class="preset-btn" onclick="setPreset('itCapacity',50)">50MW Hyper</button>
                     </div>
-                    <input type="number" class="input-field" id="itCapacity" value="10" min="0.5" max="500" step="0.5" oninput="calculate()">
+                    <input type="number" class="input-field" id="itCapacity" value="10" min="0.5" max="500" step="0.5" oninput="calculate()" aria-label="It Capacity">
 
                     <label class="input-label">Project Lifetime (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Investment Horizon</div><div class="tooltip-desc">Total project analysis period in years. Data center buildings typically have a 20-25 year economic life. Shorter horizons (10-15 years) are common for colocation and leased facilities. IT equipment refreshes every 4-5 years within this period.</div></div></span></label>
-                    <select class="input-field" id="projectLife" onchange="calculate()">
+                    <select class="input-field" id="projectLife" onchange="calculate()" aria-label="Project Life">
                         <option value="10">10 years</option>
                         <option value="15">15 years</option>
                         <option value="20" selected>20 years</option>
@@ -682,7 +682,7 @@
                     </select>
 
                     <label class="input-label">Construction Period (months) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hard-hat"></i> Build Duration</div><div class="tooltip-desc">Time from ground-breaking to first revenue. During construction, CAPEX is deployed but no revenue is generated. Modular builds can achieve 12-18 months; traditional purpose-built facilities typically require 18-30 months.</div></div></span></label>
-                    <select class="input-field" id="constructionMonths" onchange="calculate()">
+                    <select class="input-field" id="constructionMonths" onchange="calculate()" aria-label="Construction Months">
                         <option value="12">12 months (Modular)</option>
                         <option value="18" selected>18 months (Standard)</option>
                         <option value="24">24 months (Complex)</option>
@@ -697,20 +697,20 @@
                     </div>
 
                     <label class="input-label">Revenue Model <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-store"></i> Business Model</div><div class="tooltip-desc">Colocation charges per kW/month for power and space. Wholesale offers lower rates ($100-140/kW) for large deployments. Retail commands premium pricing ($150-250/kW) for smaller, managed deployments. Hyperscale/AI can reach $200-400/kW for liquid-cooled, high-density capacity.</div></div></span></label>
-                    <select class="input-field" id="revenueModel" onchange="onRevenueModelChange();calculate()">
+                    <select class="input-field" id="revenueModel" onchange="onRevenueModelChange();calculate()" aria-label="Revenue Model">
                         <option value="wholesale">Wholesale Colo ($100-140/kW/mo)</option>
                         <option value="retail" selected>Retail Colo ($150-250/kW/mo)</option>
                         <option value="hyperscale">Hyperscale/AI ($200-400/kW/mo)</option>
                     </select>
 
                     <label class="input-label">Avg Revenue per kW/month ($) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Monthly Revenue Rate</div><div class="tooltip-desc">Average monthly revenue per kilowatt of IT capacity sold. This is the primary revenue driver. Blended rates account for different contract sizes and service levels. Industry average is $130-180/kW/month for retail colocation in developed markets.</div></div></span></label>
-                    <input type="number" class="input-field" id="revenuePerKw" value="185" min="50" max="500" step="5" oninput="calculate()">
+                    <input type="number" class="input-field" id="revenuePerKw" value="185" min="50" max="500" step="5" oninput="calculate()" aria-label="Revenue Per kW">
 
                     <label class="input-label">Annual Price Escalation: <span id="escalationVal">3</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-trend-up"></i> Annual Price Growth</div><div class="tooltip-desc">Annual percentage increase in revenue per kW. Most colocation contracts include 2-5% annual escalators. Power-pass-through models may have higher effective escalation if electricity prices rise. Negative values model price compression from competition.</div></div></span></label>
-                    <input type="range" id="escalation" min="-2" max="8" value="3" step="0.5" oninput="document.getElementById('escalationVal').textContent=this.value;calculate()">
+                    <input type="range" id="escalation" min="-2" max="8" value="3" step="0.5" oninput="document.getElementById('escalationVal').textContent=this.value;calculate()" aria-label="Escalation">
 
                     <label class="input-label">Ancillary Revenue (% of base) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-puzzle-piece"></i> Additional Services Revenue</div><div class="tooltip-desc">Revenue from cross-connects, remote hands, managed services, network services, and other value-added offerings as a percentage of base colocation revenue. Mature operators typically generate 15-25% ancillary revenue on top of base power/space charges.</div></div></span></label>
-                    <select class="input-field" id="ancillaryPct" onchange="calculate()">
+                    <select class="input-field" id="ancillaryPct" onchange="calculate()" aria-label="Ancillary Pct">
                         <option value="5">5% — Minimal services</option>
                         <option value="10">10% — Basic cross-connects</option>
                         <option value="15" selected>15% — Standard portfolio</option>
@@ -731,7 +731,7 @@
                         <button class="preset-btn" onclick="setPreset('electricityRate',0.12)">$0.12 High</button>
                         <button class="preset-btn" onclick="setPreset('electricityRate',0.20)">$0.20 Premium</button>
                     </div>
-                    <input type="number" class="input-field" id="electricityRate" value="0.08" min="0.02" max="0.40" step="0.005" oninput="calculate()">
+                    <input type="number" class="input-field" id="electricityRate" value="0.08" min="0.02" max="0.40" step="0.005" oninput="calculate()" aria-label="Electricity Rate">
 
                     <label class="input-label">PUE <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> Power Usage Effectiveness</div><div class="tooltip-desc">Ratio of total facility power to IT load. Directly impacts electricity OPEX — a PUE of 1.5 means 50% overhead power for cooling, lighting, and losses. Improving PUE from 1.5 to 1.3 on a 10MW facility saves ~$1.4M/year at $0.08/kWh.</div></div></span></label>
                     <div class="preset-bar">
@@ -740,19 +740,19 @@
                         <button class="preset-btn" onclick="setPreset('pueValue',1.58)">1.58 Avg</button>
                         <button class="preset-btn" onclick="setPreset('pueValue',1.8)">1.8 Legacy</button>
                     </div>
-                    <input type="number" class="input-field" id="pueValue" value="1.4" min="1.05" max="2.5" step="0.01" oninput="calculate()">
+                    <input type="number" class="input-field" id="pueValue" value="1.4" min="1.05" max="2.5" step="0.01" oninput="calculate()" aria-label="PUE Value">
 
                     <label class="input-label">Annual Staffing ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-users"></i> Personnel Costs</div><div class="tooltip-desc">Total annual cost for facility operations staff including engineers, technicians, security, and management. Typical staffing ratios are 1 FTE per 2-5 MW for colocation. A 10MW facility typically requires 15-25 staff at $2-4M total annual cost depending on market.</div></div></span></label>
-                    <input type="number" class="input-field" id="staffingCost" value="3" min="0.5" max="20" step="0.25" oninput="calculate()">
+                    <input type="number" class="input-field" id="staffingCost" value="3" min="0.5" max="20" step="0.25" oninput="calculate()" aria-label="Staffing Cost">
 
                     <label class="input-label">Annual Maintenance ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wrench"></i> Maintenance & Repairs</div><div class="tooltip-desc">Annual cost for preventive and corrective maintenance of MEP systems, generators, UPS, cooling, fire suppression, and building fabric. Typically 1.5-3% of MEP CAPEX per year. Includes OEM service contracts, spare parts, and third-party maintenance.</div></div></span></label>
-                    <input type="number" class="input-field" id="maintenanceCost" value="1.5" min="0.1" max="15" step="0.1" oninput="calculate()">
+                    <input type="number" class="input-field" id="maintenanceCost" value="1.5" min="0.1" max="15" step="0.1" oninput="calculate()" aria-label="Maintenance Cost">
 
                     <label class="input-label">Insurance & Other ($M/yr) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Insurance & Overhead</div><div class="tooltip-desc">Annual property insurance, liability insurance, property taxes, SGA expenses, and other overhead costs. Typically 0.5-1.5% of total asset value per year. Includes business interruption insurance, which is critical for data center operations.</div></div></span></label>
-                    <input type="number" class="input-field" id="insuranceCost" value="0.8" min="0.1" max="10" step="0.1" oninput="calculate()">
+                    <input type="number" class="input-field" id="insuranceCost" value="0.8" min="0.1" max="10" step="0.1" oninput="calculate()" aria-label="Insurance Cost">
 
                     <label class="input-label">Annual OPEX Escalation: <span id="opexEscVal">2.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-up"></i> Cost Inflation Rate</div><div class="tooltip-desc">Annual increase in operating costs driven by labor inflation, electricity price changes, and general cost escalation. Electricity costs may escalate faster (3-5%) while maintenance costs typically grow at 2-3%. This applies to all non-electricity OPEX components.</div></div></span></label>
-                    <input type="range" id="opexEscalation" min="0" max="6" value="2.5" step="0.5" oninput="document.getElementById('opexEscVal').textContent=this.value;calculate()">
+                    <input type="range" id="opexEscalation" min="0" max="6" value="2.5" step="0.5" oninput="document.getElementById('opexEscVal').textContent=this.value;calculate()" aria-label="OPEX Escalation">
                 </div>
 
                 <!-- Section 4: Occupancy Ramp -->
@@ -770,16 +770,16 @@
                     </div>
 
                     <label class="input-label">Year 1 Occupancy: <span id="occ1Val">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-door-open"></i> First Year Fill Rate</div><div class="tooltip-desc">Percentage of IT capacity occupied in the first year of operation (after construction). Pre-leased facilities may start at 40-60%. Speculative builds often start at 10-20%. This directly impacts first-year revenue and cash flow.</div></div></span></label>
-                    <input type="range" id="occYear1" min="0" max="100" value="25" step="5" oninput="document.getElementById('occ1Val').textContent=this.value;calculate()">
+                    <input type="range" id="occYear1" min="0" max="100" value="25" step="5" oninput="document.getElementById('occ1Val').textContent=this.value;calculate()" aria-label="Occ Year1">
 
                     <label class="input-label">Year 3 Occupancy: <span id="occ3Val">60</span>%</label>
-                    <input type="range" id="occYear3" min="0" max="100" value="60" step="5" oninput="document.getElementById('occ3Val').textContent=this.value;calculate()">
+                    <input type="range" id="occYear3" min="0" max="100" value="60" step="5" oninput="document.getElementById('occ3Val').textContent=this.value;calculate()" aria-label="Occ Year3">
 
                     <label class="input-label">Year 5 Occupancy: <span id="occ5Val">85</span>%</label>
-                    <input type="range" id="occYear5" min="0" max="100" value="85" step="5" oninput="document.getElementById('occ5Val').textContent=this.value;calculate()">
+                    <input type="range" id="occYear5" min="0" max="100" value="85" step="5" oninput="document.getElementById('occ5Val').textContent=this.value;calculate()" aria-label="Occ Year5">
 
                     <label class="input-label">Steady-State Occupancy: <span id="occMaxVal">92</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> Maximum Occupancy</div><div class="tooltip-desc">Peak occupancy rate the facility achieves and maintains long-term. Most operators target 85-95% rather than 100% to maintain flexibility for customer growth and churn replacement. A buffer of 5-10% accounts for stranded capacity and power density mismatches.</div></div></span></label>
-                    <input type="range" id="occMax" min="60" max="100" value="92" step="1" oninput="document.getElementById('occMaxVal').textContent=this.value;calculate()">
+                    <input type="range" id="occMax" min="60" max="100" value="92" step="1" oninput="document.getElementById('occMaxVal').textContent=this.value;calculate()" aria-label="Occ Max">
                 </div>
 
                 <!-- Section 5: Financing -->
@@ -789,7 +789,7 @@
                     </div>
 
                     <label class="input-label">Debt/Equity Split <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-balance-scale"></i> Capital Structure</div><div class="tooltip-desc">Proportion of CAPEX funded by debt vs equity. Higher leverage (70-80% debt) amplifies equity returns but increases financial risk. Data center projects typically attract 60-75% LTV (loan-to-value) from lenders due to strong, contracted cashflows.</div></div></span></label>
-                    <select class="input-field" id="debtRatio" onchange="calculate()">
+                    <select class="input-field" id="debtRatio" onchange="calculate()" aria-label="Debt Ratio">
                         <option value="0">100% Equity (No Debt)</option>
                         <option value="50">50/50 Debt/Equity</option>
                         <option value="60">60/40 Debt/Equity</option>
@@ -798,10 +798,10 @@
                     </select>
 
                     <label class="input-label">Interest Rate (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Cost of Debt</div><div class="tooltip-desc">Annual interest rate on project debt. Data center project finance typically achieves SOFR + 200-350 bps for investment-grade borrowers. Current rates range from 5-8% depending on credit quality, leverage, and market conditions.</div></div></span></label>
-                    <input type="number" class="input-field" id="interestRate" value="6" min="2" max="15" step="0.25" oninput="calculate()">
+                    <input type="number" class="input-field" id="interestRate" value="6" min="2" max="15" step="0.25" oninput="calculate()" aria-label="Interest Rate">
 
                     <label class="input-label">Loan Term (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hourglass"></i> Debt Maturity</div><div class="tooltip-desc">Duration of the loan repayment period. Longer terms reduce annual debt service but increase total interest paid. Data center project loans typically have 7-15 year terms with 20-25 year amortization schedules.</div></div></span></label>
-                    <select class="input-field" id="loanTerm" onchange="calculate()">
+                    <select class="input-field" id="loanTerm" onchange="calculate()" aria-label="Loan Term">
                         <option value="7">7 years</option>
                         <option value="10" selected>10 years</option>
                         <option value="15">15 years</option>
@@ -809,7 +809,7 @@
                     </select>
 
                     <label class="input-label">Discount Rate / WACC (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-pie"></i> Weighted Average Cost of Capital</div><div class="tooltip-desc">The rate used to discount future cashflows to present value for NPV calculation. Represents the blended cost of debt and equity capital. Typical data center WACC ranges from 7-12%. Higher discount rates produce lower NPV, reflecting higher required returns or risk.</div></div></span></label>
-                    <input type="number" class="input-field" id="discountRate" value="8" min="3" max="25" step="0.5" oninput="calculate()">
+                    <input type="number" class="input-field" id="discountRate" value="8" min="3" max="25" step="0.5" oninput="calculate()" aria-label="Discount Rate">
                 </div>
 
                 <!-- Section 6: Tax & Depreciation -->
@@ -819,24 +819,24 @@
                     </div>
 
                     <label class="input-label">Corporate Tax Rate: <span id="taxRateVal">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-landmark"></i> Effective Tax Rate</div><div class="tooltip-desc">Effective corporate income tax rate applied to operating profit. Varies by jurisdiction: US (21% federal + state), Singapore (17%), Ireland (12.5%), UAE (9%). Many data center markets offer tax incentives, holidays, or accelerated depreciation that reduce the effective rate.</div></div></span></label>
-                    <input type="range" id="taxRate" min="0" max="40" value="25" step="1" oninput="document.getElementById('taxRateVal').textContent=this.value;calculate()">
+                    <input type="range" id="taxRate" min="0" max="40" value="25" step="1" oninput="document.getElementById('taxRateVal').textContent=this.value;calculate()" aria-label="Tax Rate">
 
                     <label class="input-label">Depreciation Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> Asset Depreciation</div><div class="tooltip-desc">Method for depreciating capital assets for tax purposes. Straight-line spreads the deduction evenly. Accelerated (MACRS) front-loads deductions, improving early cash flows. Bonus depreciation allows 100% deduction in year one (available in some jurisdictions).</div></div></span></label>
-                    <select class="input-field" id="depreciationMethod" onchange="calculate()">
+                    <select class="input-field" id="depreciationMethod" onchange="calculate()" aria-label="Depreciation Method">
                         <option value="straight" selected>Straight-line (20 years)</option>
                         <option value="accelerated">Accelerated (MACRS 15yr)</option>
                         <option value="bonus">Bonus depreciation (100% Y1)</option>
                     </select>
 
                     <label class="input-label">Terminal Value Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-building"></i> Exit Valuation</div><div class="tooltip-desc">How the residual value of the asset is calculated at the end of the analysis period. Cap rate method values the asset as a multiple of final-year NOI. Book value uses remaining depreciated value. None assumes zero terminal value (conservative). Data centers typically trade at 5-8% cap rates.</div></div></span></label>
-                    <select class="input-field" id="terminalMethod" onchange="calculate()">
+                    <select class="input-field" id="terminalMethod" onchange="calculate()" aria-label="Terminal Method">
                         <option value="none">None (Conservative)</option>
                         <option value="caprate" selected>Cap Rate (NOI / Cap Rate)</option>
                         <option value="book">Book Value</option>
                     </select>
 
                     <label class="input-label">Exit Cap Rate: <span id="capRateVal">6</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Capitalization Rate</div><div class="tooltip-desc">The capitalization rate used to value the property at exit. Lower cap rates imply higher valuations. Data center cap rates have compressed from 7-9% historically to 5-7% currently due to strong institutional demand. AI-ready facilities may trade at even tighter caps.</div></div></span></label>
-                    <input type="range" id="exitCapRate" min="4" max="12" value="5.5" step="0.25" oninput="document.getElementById('capRateVal').textContent=this.value;calculate()">
+                    <input type="range" id="exitCapRate" min="4" max="12" value="5.5" step="0.25" oninput="document.getElementById('capRateVal').textContent=this.value;calculate()" aria-label="Exit Cap Rate">
                 </div>
 
             </div><!-- /input-panel -->
@@ -1000,8 +1000,8 @@
                 <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;">Sign In</h3>
                 <p style="font-size:0.85rem;color:#64748b;">Access calculators, tools, and analytical content.</p>
             </div>
-            <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
-            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;" aria-label="Email address">
+            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;" aria-label="Password">
             <button onclick="handleLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;">Sign In</button>
             <div id="loginError" style="display:none;color:#ef4444;font-size:0.8rem;text-align:center;margin-top:0.5rem;">Invalid credentials</div>
             <div style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#94a3b8;">Demo Account: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo2026</code></div>

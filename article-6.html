@@ -1214,7 +1214,7 @@
     <div class="search-modal" id="searchModal" style="display:none;">
         <div class="search-input-wrap">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
             <kbd class="search-kbd">ESC</kbd>
         </div>
         <div class="search-chips" id="searchChips">
@@ -1949,7 +1949,7 @@
 
                     <div class="control-row">
                         <span class="control-label">Design Authority Level:</span>
-                        <input type="range" id="authSlider" class="control-slider" min="0" max="100" value="30">
+                        <input type="range" id="authSlider" class="control-slider" min="0" max="100" value="30" aria-label="Auth Slider">
                         <span class="control-value" id="authValue">30%</span>
                     </div>
 
@@ -2106,35 +2106,35 @@
                     <div class="calc-grid">
                         <div class="calc-input-group">
                             <label class="calc-label">Annual Incidents <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Annual Incidents</span><span class="tooltip-desc">Total reportable incidents per year requiring root cause investigation. Includes all severity levels (P1-P4). Higher counts may indicate systemic issues rather than random failures.</span><span class="tooltip-formula">Benchmark: Tier III avg 30-50/yr (Uptime Institute 2023)</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcIncidents" value="48" min="1" max="999">
+                            <input type="number" class="calc-input" id="calcIncidents" value="48" min="1" max="999" aria-label="Calc Incidents">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">RCAs Completed <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">RCAs Completed</span><span class="tooltip-desc">Number of formal root cause analyses completed. RCA Coverage Ratio = RCAs/Incidents. Below 70% indicates investigation bottleneck or triage gaps. Each skipped RCA is a missed learning opportunity.</span><span class="tooltip-formula">Benchmark: Target &ge;80% coverage for P1-P2 incidents</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcRCAs" value="30" min="0" max="999">
+                            <input type="number" class="calc-input" id="calcRCAs" value="30" min="0" max="999" aria-label="Calc RCAs">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Recommendations per RCA <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Recommendations per RCA</span><span class="tooltip-desc">Average corrective actions identified per investigation. Too few (&lt;3) suggests shallow analysis (fixing symptoms). Too many (&gt;8) may indicate scope creep or lack of root cause isolation.</span><span class="tooltip-formula">Benchmark: 3-5 per RCA (DOE-HDBK-1208)</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcRecsPerRCA" value="4" min="1" max="20">
+                            <input type="number" class="calc-input" id="calcRecsPerRCA" value="4" min="1" max="20" aria-label="Calc Recs Per RCA">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Implementation Rate (%) <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Implementation Rate</span><span class="tooltip-desc">Percentage of RCA recommendations actually implemented within 90 days. The single most critical effectiveness metric &mdash; unimplemented findings mean repeated failures. Industry average is shockingly low at 40-50%.</span><span class="tooltip-formula">Benchmark: Target &ge;75% (Safety-II organizations achieve &gt;85%)</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcImplRate" value="45" min="0" max="100">
+                            <input type="number" class="calc-input" id="calcImplRate" value="45" min="0" max="100" aria-label="Calc Impl Rate">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Recurrence Rate (%) <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Recurrence Rate</span><span class="tooltip-desc">Percentage of incidents that are repeat occurrences of previously investigated root causes. High recurrence = RCA program producing analysis without driving change. Target &lt;15% for mature programs.</span><span class="tooltip-formula">Benchmark: &lt;15% = Mature, 15-30% = Developing, &gt;30% = Reactive</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcRecurRate" value="35" min="0" max="100">
+                            <input type="number" class="calc-input" id="calcRecurRate" value="35" min="0" max="100" aria-label="Calc Recur Rate">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Time to Close (days) <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Time to Close</span><span class="tooltip-desc">Average days from incident to RCA completion and recommendation implementation. Speed matters &mdash; Leveson's STAMP research shows corrective action effectiveness degrades 8% per week of delay.</span><span class="tooltip-formula">Benchmark: Target &lt;30 days (DOE standard), Critical &lt;14 days</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcDays" value="45" min="1" max="365">
+                            <input type="number" class="calc-input" id="calcDays" value="45" min="1" max="365" aria-label="Calc Days">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Design Authority Involvement (%) <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Design Authority Involvement</span><span class="tooltip-desc">Percentage of RCAs involving a Design Authority review. DA ensures root causes in design/specification layers are identified, not just operational symptoms. Low DA involvement correlates with 2.3x higher recurrence.</span><span class="tooltip-formula">Benchmark: Target &ge;60% for P1-P2, 100% for design-related incidents</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcDA" value="20" min="0" max="100">
+                            <input type="number" class="calc-input" id="calcDA" value="20" min="0" max="100" aria-label="Calc DA">
                         </div>
                         <div class="calc-input-group">
                             <label class="calc-label">Verification Rate (%) <span class="tooltip-trigger">?<span class="tooltip-content"><span class="tooltip-title">Verification Rate</span><span class="tooltip-desc">Percentage of implemented recommendations that are formally verified effective (post-implementation review). Without verification, organizations assume fixes work without evidence.</span><span class="tooltip-formula">Benchmark: Target &ge;70% (ISO 45001 requirement for high-risk)</span></span></span></label>
-                            <input type="number" class="calc-input" id="calcVerify" value="30" min="0" max="100">
+                            <input type="number" class="calc-input" id="calcVerify" value="30" min="0" max="100" aria-label="Calc Verify">
                         </div>
                     </div>
 
@@ -2320,8 +2320,8 @@
                         <button class="rca-login-close" onclick="rcaHideLogin()">&times;</button>
                         <h3><i class="fas fa-lock" style="color: #8b5cf6;"></i> Pro Analysis Access</h3>
                         <p>Enter your credentials to unlock advanced RCA analytics including maturity assessment, cost impact, methodology recommendations, and predictive modeling.</p>
-                        <input type="email" id="rcaLoginEmail" placeholder="Email address">
-                        <input type="password" id="rcaLoginPass" placeholder="Password">
+                        <input type="email" id="rcaLoginEmail" placeholder="Email address" aria-label="Email address">
+                        <input type="password" id="rcaLoginPass" placeholder="Password" aria-label="Password">
                         <div id="rcaLoginError" style="color: #ef4444; font-size: 0.78rem; margin-bottom: 0.5rem; display: none;"></div>
                         <button class="login-submit" onclick="rcaHandleLogin()">Sign In</button>
                         <div class="demo-hint">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>

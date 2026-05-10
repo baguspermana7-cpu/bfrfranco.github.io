@@ -431,7 +431,7 @@
 </head>
 <body class="locked">
     <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="search-overlay" id="searchOverlay" style="display:none;"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off"><div class="search-results" id="searchResults"></div></div></div>
+    <div class="search-overlay" id="searchOverlay" style="display:none;"><div class="search-box"><input class="search-input" id="searchInput" type="text" placeholder="Search this page... (Esc to close)" autocomplete="off" aria-label="Search this page... (Esc to close)"><div class="search-results" id="searchResults"></div></div></div>
     <div class="flashcard-overlay" id="flashcardOverlay">
         <button class="fc-close" id="fcClose" aria-label="Close flashcards">&times;</button>
         <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
@@ -769,8 +769,8 @@
                 <div class="accordion-body"><div class="accordion-content">
                     <p>Calculate maximum cables per conduit using the 40% fill ratio (TIA-569 / NEC Chapter 9 for 3+ cables):</p>
                     <div class="inline-calc" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-                        <div><label>Conduit Inner Diameter (mm)</label><input type="number" id="conduitDia" value="25" min="10" max="150" step="1"></div>
-                        <div><label>Cable Outer Diameter (mm)</label><input type="number" id="cableDia" value="7" min="1" max="30" step="0.5"></div>
+                        <div><label>Conduit Inner Diameter (mm)</label><input type="number" id="conduitDia" value="25" min="10" max="150" step="1" aria-label="Conduit Dia"></div>
+                        <div><label>Cable Outer Diameter (mm)</label><input type="number" id="cableDia" value="7" min="1" max="30" step="0.5" aria-label="Cable Dia"></div>
                         <div class="calc-result" style="grid-column:1/-1;">
                             <div class="calc-label">Maximum Cables (40% fill)</div>
                             <div class="calc-value" id="fillResult">5 cables</div>
@@ -1032,15 +1032,15 @@
                     <p>Calculate system availability based on redundancy configuration and component reliability:</p>
                     <div class="inline-calc">
                         <label>Redundancy Configuration</label>
-                        <select id="redConfig">
+                        <select id="redConfig" aria-label="Red Config">
                             <option value="n">N (No redundancy)</option>
                             <option value="n1" selected>N+1 (Component redundancy)</option>
                             <option value="2n">2N (System redundancy)</option>
                             <option value="2n1">2(N+1) (Full redundancy)</option>
                         </select>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-                            <div><label>Component MTBF (hours)</label><input type="number" id="redMtbf" value="50000" min="100" max="1000000" step="1000"></div>
-                            <div><label>Component MTTR (hours)</label><input type="number" id="redMttr" value="4" min="0.5" max="168" step="0.5"></div>
+                            <div><label>Component MTBF (hours)</label><input type="number" id="redMtbf" value="50000" min="100" max="1000000" step="1000" aria-label="Red MTBF"></div>
+                            <div><label>Component MTTR (hours)</label><input type="number" id="redMttr" value="4" min="0.5" max="168" step="0.5" aria-label="Red MTTR"></div>
                         </div>
                         <div class="calc-result">
                             <div class="calc-label">System Availability</div>

@@ -724,7 +724,7 @@
                             <button class="preset-btn" onclick="setPreset('itLoad',5000)">5MW Hyperscale</button>
                             <button class="preset-btn" onclick="setPreset('itLoad',10000)">10MW Mega</button>
                         </div>
-                        <input type="number" class="input-field" id="itLoad" value="1000" min="50" max="100000" step="10" oninput="calculate()">
+                        <input type="number" class="input-field" id="itLoad" value="1000" min="50" max="100000" step="10" oninput="calculate()" aria-label="It Load">
 
                         <label class="input-label">Power Usage Effectiveness (PUE) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> PUE Rating</div><div class="tooltip-desc">Ratio of total facility power to IT equipment power. A PUE of 1.0 means all energy goes to IT; 2.0 means 50% is overhead. Global average is ~1.58. Best-in-class hyperscalers achieve 1.1-1.2.</div></div></span></label>
                         <div class="preset-group">
@@ -734,7 +734,7 @@
                             <button class="preset-btn" onclick="setPreset('pueValue',1.8)">1.8 Legacy</button>
                             <button class="preset-btn" onclick="setPreset('pueValue',2.0)">2.0 Poor</button>
                         </div>
-                        <input type="number" class="input-field" id="pueValue" value="1.58" min="1.1" max="2.5" step="0.01" oninput="calculate()">
+                        <input type="number" class="input-field" id="pueValue" value="1.58" min="1.1" max="2.5" step="0.01" oninput="calculate()" aria-label="PUE Value">
                     </div>
 
                     <!-- Section 2 - Location & Grid -->
@@ -744,7 +744,7 @@
                         </div>
 
                         <label class="input-label">Country <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-map-marker-alt"></i> Data Center Location</div><div class="tooltip-desc">Select the country where your data center is located. This determines grid carbon intensity, electricity rates, and applicable carbon regulations. Each country has unique emission factors based on its energy mix.</div></div></span></label>
-                        <select class="input-field" id="countrySelect" onchange="calculate()">
+                        <select class="input-field" id="countrySelect" onchange="calculate()" aria-label="Country Select">
                             <optgroup label="APAC">
                                 <option value="ID">Indonesia</option>
                                 <option value="SG">Singapore</option>
@@ -792,10 +792,10 @@
                         </select>
 
                         <label class="input-label">Grid Carbon Intensity (kgCO&#8322;/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> Grid Emission Factor</div><div class="tooltip-desc">Carbon dioxide equivalent emitted per kilowatt-hour of grid electricity. Auto-populated based on selected country. Reflects the national energy generation mix including coal, gas, nuclear, and renewables.</div></div></span></label>
-                        <input type="number" class="input-field" id="gridIntensity" value="0.39" step="0.001" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="gridIntensity" value="0.39" step="0.001" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Grid Intensity">
 
                         <label class="input-label">Electricity Rate ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Industrial Electricity Price</div><div class="tooltip-desc">Average industrial electricity rate in USD per kWh for the selected country. Used to estimate operational costs and carbon tax impact. Auto-populated from IEA and regional utility data.</div></div></span></label>
-                        <input type="number" class="input-field" id="electricityRate" value="0.07" step="0.001" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="electricityRate" value="0.07" step="0.001" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Electricity Rate">
                     </div>
 
                     <!-- Section 3 - Cooling System -->
@@ -805,7 +805,7 @@
                         </div>
 
                         <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Technology</div><div class="tooltip-desc">Primary cooling method used in the facility. Different cooling types use different refrigerants with varying Global Warming Potential. Direct liquid cooling systems use low-GWP refrigerants like R-1234ze (GWP=7) vs traditional R-410A (GWP=2088).</div></div></span></label>
-                        <select class="input-field" id="coolingType" onchange="calculate()">
+                        <select class="input-field" id="coolingType" onchange="calculate()" aria-label="Cooling Type">
                             <option value="air_crac">Air / CRAC (R-410A)</option>
                             <option value="inrow">In-Row (R-410A)</option>
                             <option value="rdhx">RDHX (R-134a)</option>
@@ -813,13 +813,13 @@
                         </select>
 
                         <label class="input-label">Refrigerant GWP <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-thermometer-half"></i> Global Warming Potential</div><div class="tooltip-desc">Global Warming Potential of the refrigerant relative to CO2. R-410A has a GWP of 2088, meaning 1 kg leaked equals 2088 kg CO2 equivalent. Low-GWP alternatives like R-1234ze (GWP=7) dramatically reduce Scope 1 fugitive emissions.</div></div></span></label>
-                        <input type="number" class="input-field" id="gwpValue" value="2088" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="gwpValue" value="2088" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Gwp Value">
 
                         <label class="input-label">Refrigerant Charge (kg/kW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-weight-hanging"></i> Refrigerant Charge Rate</div><div class="tooltip-desc">Amount of refrigerant per kilowatt of cooling capacity. Traditional CRAC units require more refrigerant per kW than modern in-row or direct liquid systems. This factor is auto-populated based on your selected cooling type.</div></div></span></label>
-                        <input type="number" class="input-field" id="chargePerKw" value="0.35" step="0.01" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="chargePerKw" value="0.35" step="0.01" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Charge Per kW">
 
                         <label class="input-label">Annual Leak Rate (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wind"></i> Refrigerant Leak Rate</div><div class="tooltip-desc">Percentage of total refrigerant charge that leaks annually. Industry average is 5-10% for older DX systems. Well-maintained chilled water systems can achieve 2-3%. Fugitive refrigerant leaks are a major Scope 1 emission source.</div></div></span></label>
-                        <input type="number" class="input-field" id="leakRate" value="5" min="1" max="15" step="0.5" oninput="calculate()">
+                        <input type="number" class="input-field" id="leakRate" value="5" min="1" max="15" step="0.5" oninput="calculate()" aria-label="Leak Rate">
                     </div>
 
                     <!-- Section 4 - Backup Power -->
@@ -829,13 +829,13 @@
                         </div>
 
                         <label class="input-label">Generator Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-gas-pump"></i> Backup Generator Fuel</div><div class="tooltip-desc">Type of fuel used in backup generators. Standard diesel emits 2.68 kgCO2 per liter. HVO (Hydrotreated Vegetable Oil) biodiesel is a drop-in replacement that reduces emissions by ~80% with a factor of 0.54 kgCO2/L.</div></div></span></label>
-                        <select class="input-field" id="genType" onchange="calculate()">
+                        <select class="input-field" id="genType" onchange="calculate()" aria-label="Gen Type">
                             <option value="diesel">Diesel (2.68 kgCO&#8322;/L)</option>
                             <option value="hvo">HVO Biodiesel (0.54 kgCO&#8322;/L)</option>
                         </select>
 
                         <label class="input-label">Annual Generator Test Hours: <span id="genHoursVal">200</span>h <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-clock"></i> Generator Run Hours</div><div class="tooltip-desc">Total annual hours that backup generators operate, including monthly testing (typically 1-2h/month), load bank tests, and unplanned outages. More testing hours improve reliability but increase Scope 1 direct emissions from fuel combustion.</div></div></span></label>
-                        <input type="range" class="range-slider" id="genHours" min="50" max="500" value="200" step="10" oninput="document.getElementById('genHoursVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="genHours" min="50" max="500" value="200" step="10" oninput="document.getElementById('genHoursVal').textContent=this.value;calculate()" aria-label="Gen Hours">
                         <div class="range-labels"><span>50h</span><span>500h</span></div>
                     </div>
 
@@ -846,7 +846,7 @@
                         </div>
 
                         <label class="input-label">Renewable Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-solar-panel"></i> Renewable Energy Approach</div><div class="tooltip-desc">Method of procuring renewable energy. On-site solar PV provides direct generation. Solar + BESS adds battery storage for 24/7 matching. 100% PPA (Power Purchase Agreement) or Green Tariff procures certified renewable electricity from off-site wind/solar farms.</div></div></span></label>
-                        <select class="input-field" id="renewableType" onchange="calculate()">
+                        <select class="input-field" id="renewableType" onchange="calculate()" aria-label="Renewable Type">
                             <option value="none">None</option>
                             <option value="solar">On-site Solar PV</option>
                             <option value="solar_bess">Solar + BESS</option>
@@ -854,7 +854,7 @@
                         </select>
 
                         <label class="input-label">Renewable Coverage: <span id="renewablePctVal">0</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Renewable Energy Coverage</div><div class="tooltip-desc">Percentage of total facility electricity consumption offset by renewable energy sources. At 100%, all grid electricity is matched with renewable generation or certificates. This directly reduces Scope 2 market-based emissions.</div></div></span></label>
-                        <input type="range" class="range-slider" id="renewablePct" min="0" max="100" value="0" step="5" oninput="document.getElementById('renewablePctVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="renewablePct" min="0" max="100" value="0" step="5" oninput="document.getElementById('renewablePctVal').textContent=this.value;calculate()" aria-label="Renewable Pct">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
                     </div>
 
@@ -872,31 +872,31 @@
                         </div>
 
                         <label class="input-label">Facility Size (MW IT) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ruler-combined"></i> Facility IT Capacity</div><div class="tooltip-desc">Total IT power capacity in megawatts. This is linked to the IT Load value from the Operational tab and determines the building footprint, structural steel, and concrete quantities for embodied carbon calculations per EN 15978 LCA stages A1-A5.</div></div></span></label>
-                        <input type="number" class="input-field" id="facilityMW" value="1" min="0.1" max="200" step="0.1" oninput="calculate()">
+                        <input type="number" class="input-field" id="facilityMW" value="1" min="0.1" max="200" step="0.1" oninput="calculate()" aria-label="Facility MW">
 
                         <label class="input-label">Building Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-warehouse"></i> Construction Type</div><div class="tooltip-desc">The type of building construction affects embodied carbon significantly. Purpose-built data centers use optimized designs. Converted warehouses reuse existing structures (lower embodied carbon). Modular/prefab facilities are manufactured off-site with standardized components.</div></div></span></label>
-                        <select class="input-field" id="buildingType" onchange="calculate()">
+                        <select class="input-field" id="buildingType" onchange="calculate()" aria-label="Building Type">
                             <option value="purpose_built">Purpose-built</option>
                             <option value="converted">Converted warehouse</option>
                             <option value="modular">Modular / prefab</option>
                         </select>
 
                         <label class="input-label">Concrete Grade <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-cubes"></i> Concrete Specification</div><div class="tooltip-desc">Concrete grade determines embodied carbon intensity. Standard C30 emits ~150 kgCO2e per ton. High-strength C40 emits ~250 kgCO2e/ton but uses less volume. Low-carbon mixes with 50% GGBS (Ground Granulated Blast-furnace Slag) can reduce embodied carbon to ~100 kgCO2e/ton.</div></div></span></label>
-                        <select class="input-field" id="concreteGrade" onchange="calculate()">
+                        <select class="input-field" id="concreteGrade" onchange="calculate()" aria-label="Concrete Grade">
                             <option value="c30">C30 standard (150 kgCO&#8322;e/ton)</option>
                             <option value="c40">C40 high-strength (250 kgCO&#8322;e/ton)</option>
                             <option value="lowcarbon">Low-carbon 50% GGBS (100 kgCO&#8322;e/ton)</option>
                         </select>
 
                         <label class="input-label">Steel Sourcing <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-industry"></i> Structural Steel Source</div><div class="tooltip-desc">Steel production method significantly impacts embodied carbon. World average (30% recycled) emits 1850 kgCO2e/ton. Electric Arc Furnace (EAF) with 90%+ recycled content emits only 500 kgCO2e/ton. Virgin Basic Oxygen Furnace (BOF) steel emits 2200 kgCO2e/ton. Data from ICE Database v4.1.</div></div></span></label>
-                        <select class="input-field" id="steelSource" onchange="calculate()">
+                        <select class="input-field" id="steelSource" onchange="calculate()" aria-label="Steel Source">
                             <option value="world_avg">World average 30% recycled (1850 kgCO&#8322;e/ton)</option>
                             <option value="eaf">EAF recycled 90%+ (500 kgCO&#8322;e/ton)</option>
                             <option value="bof">Virgin BOF (2200 kgCO&#8322;e/ton)</option>
                         </select>
 
                         <label class="input-label">Seismic Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-mountain"></i> Seismic Design Category</div><div class="tooltip-desc">Higher seismic zones require more structural reinforcement, increasing steel and concrete quantities by 10-40%. Zone 0 has no seismic requirements. Zone 4 (very high) requires base isolation, moment frames, and additional structural mass, significantly increasing embodied carbon.</div></div></span></label>
-                        <select class="input-field" id="seismicZone" onchange="calculate()">
+                        <select class="input-field" id="seismicZone" onchange="calculate()" aria-label="Seismic Zone">
                             <option value="0">0 - None</option>
                             <option value="1">1 - Low</option>
                             <option value="2">2 - Moderate</option>
@@ -912,20 +912,20 @@
                         </div>
 
                         <label class="input-label">UPS Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-full"></i> UPS Topology</div><div class="tooltip-desc">Uninterruptible Power Supply type affects both embodied carbon (manufacturing) and operational efficiency. Modular UPS systems are lighter and can be right-sized. Standalone double-conversion UPS units are heavier with more copper and steel per kW.</div></div></span></label>
-                        <select class="input-field" id="upsTypeLCA" onchange="calculate()">
+                        <select class="input-field" id="upsTypeLCA" onchange="calculate()" aria-label="UPS Type LCA">
                             <option value="modular">Modular</option>
                             <option value="standalone">Standalone double-conversion</option>
                         </select>
 
                         <label class="input-label">Battery Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-car-battery"></i> Battery Chemistry</div><div class="tooltip-desc">Battery chemistry determines embodied carbon per kWh of storage. VRLA Lead-Acid emits 68 kgCO2e/kWh with a 5-year life. Li-ion LFP emits 62 kgCO2e/kWh with a 10-year life. Li-ion NMC emits 74 kgCO2e/kWh but offers higher energy density.</div></div></span></label>
-                        <select class="input-field" id="batteryType" onchange="calculate()">
+                        <select class="input-field" id="batteryType" onchange="calculate()" aria-label="Battery Type">
                             <option value="vrla">VRLA Lead-Acid (68 kgCO&#8322;e/kWh)</option>
                             <option value="lfp">Li-ion LFP (62 kgCO&#8322;e/kWh)</option>
                             <option value="nmc">Li-ion NMC (74 kgCO&#8322;e/kWh)</option>
                         </select>
 
                         <label class="input-label">Battery Runtime <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hourglass-half"></i> UPS Runtime Duration</div><div class="tooltip-desc">Duration the UPS battery system can support the full IT load during a power outage. Longer runtime requires more battery capacity, increasing embodied carbon. 5 minutes is typical for generator-backed sites; 15-30 minutes for sites without generators.</div></div></span></label>
-                        <select class="input-field" id="batteryRuntime" onchange="calculate()">
+                        <select class="input-field" id="batteryRuntime" onchange="calculate()" aria-label="Battery Runtime">
                             <option value="5">5 minutes</option>
                             <option value="10">10 minutes</option>
                             <option value="15">15 minutes</option>
@@ -933,7 +933,7 @@
                         </select>
 
                         <label class="input-label">Redundancy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Power Redundancy Level</div><div class="tooltip-desc">Infrastructure redundancy level per Uptime Institute tiers. N = no redundancy. N+1 = one extra unit. 2N = fully duplicated. 2N+1 = duplicated plus one extra. Higher redundancy multiplies equipment quantities and embodied carbon proportionally.</div></div></span></label>
-                        <select class="input-field" id="redundancyLCA" onchange="calculate()">
+                        <select class="input-field" id="redundancyLCA" onchange="calculate()" aria-label="Redundancy LCA">
                             <option value="N">N</option>
                             <option value="N1">N+1</option>
                             <option value="2N">2N</option>
@@ -948,7 +948,7 @@
                         </div>
 
                         <label class="input-label">Workload Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Workload Profile</div><div class="tooltip-desc">Determines the embodied carbon per server. Traditional enterprise servers emit ~1200 kgCO2e each. AI/GPU servers (e.g., NVIDIA H100) have higher embodied carbon at ~4000 kgCO2e due to complex GPU manufacturing. Newer B200+ GPUs improve to ~3500 kgCO2e per server.</div></div></span></label>
-                        <select class="input-field" id="workloadType" onchange="calculate()">
+                        <select class="input-field" id="workloadType" onchange="calculate()" aria-label="Workload Type">
                             <option value="traditional">Traditional Enterprise (1200 kgCO&#8322;e/server)</option>
                             <option value="cloud">Cloud / Hyperscale (1200 kgCO&#8322;e/server)</option>
                             <option value="ai_h100">AI / GPU H100 (4000 kgCO&#8322;e/server)</option>
@@ -956,18 +956,18 @@
                         </select>
 
                         <label class="input-label">Servers per MW <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Server Density</div><div class="tooltip-desc">Number of servers that fit in 1 MW of IT load, auto-calculated based on workload type. Traditional servers average ~5 kW each (~200/MW). AI GPU servers average ~10 kW each (~100/MW). This determines total embodied carbon from IT equipment manufacturing.</div></div></span></label>
-                        <input type="number" class="input-field" id="serversPerMW" value="200" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="serversPerMW" value="200" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Servers Per MW">
 
                         <label class="input-label">Server Refresh Cycle: <span id="serverRefreshVal">4</span> years <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-sync"></i> Server Replacement Cycle</div><div class="tooltip-desc">How often servers are replaced with new hardware. Shorter cycles increase total embodied carbon over the project lifetime. Industry standard is 3-5 years. Extending to 6-7 years reduces embodied carbon but may increase operational energy use from less efficient hardware.</div></div></span></label>
-                        <input type="range" class="range-slider" id="serverRefresh" min="3" max="7" value="4" step="1" oninput="document.getElementById('serverRefreshVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="serverRefresh" min="3" max="7" value="4" step="1" oninput="document.getElementById('serverRefreshVal').textContent=this.value;calculate()" aria-label="Server Refresh">
                         <div class="range-labels"><span>3 yr</span><span>7 yr</span></div>
 
                         <label class="input-label">Network Refresh Cycle: <span id="networkRefreshVal">5</span> years <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-network-wired"></i> Network Equipment Cycle</div><div class="tooltip-desc">Replacement cycle for switches, routers, and network infrastructure. Network gear typically has a longer useful life than servers. Embodied carbon per network device is lower than servers but the total count can be significant in large deployments.</div></div></span></label>
-                        <input type="range" class="range-slider" id="networkRefresh" min="4" max="8" value="5" step="1" oninput="document.getElementById('networkRefreshVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="networkRefresh" min="4" max="8" value="5" step="1" oninput="document.getElementById('networkRefreshVal').textContent=this.value;calculate()" aria-label="Network Refresh">
                         <div class="range-labels"><span>4 yr</span><span>8 yr</span></div>
 
                         <label class="input-label">Project Lifetime: <span id="projectLifetimeVal">20</span> years <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Facility Operational Lifetime</div><div class="tooltip-desc">Total expected operational life of the data center facility. Determines how many IT refresh cycles occur and amortizes building embodied carbon. Typical range is 15-25 years for purpose-built facilities, though some operate 30+ years with major refurbishments.</div></div></span></label>
-                        <input type="range" class="range-slider" id="projectLifetime" min="15" max="30" value="20" step="1" oninput="document.getElementById('projectLifetimeVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="projectLifetime" min="15" max="30" value="20" step="1" oninput="document.getElementById('projectLifetimeVal').textContent=this.value;calculate()" aria-label="Project Lifetime">
                         <div class="range-labels"><span>15 yr</span><span>30 yr</span></div>
                     </div>
 
@@ -978,21 +978,21 @@
                         </div>
 
                         <label class="input-label">Equipment Origin <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-map-signs"></i> Supply Chain Distance</div><div class="tooltip-desc">Average distance that major equipment (UPS, generators, cooling units, switchgear) travels from manufacturer to site. Local sourcing under 500 km has minimal transport emissions. International shipments over 5000 km can add 2-5% to total embodied carbon.</div></div></span></label>
-                        <select class="input-field" id="equipOrigin" onchange="calculate()">
+                        <select class="input-field" id="equipOrigin" onchange="calculate()" aria-label="Equip Origin">
                             <option value="local">Local &lt;500km</option>
                             <option value="regional">Regional 500-2000km</option>
                             <option value="international">International &gt;5000km</option>
                         </select>
 
                         <label class="input-label">Transport Mode <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shipping-fast"></i> Primary Transport Method</div><div class="tooltip-desc">Mode of transport for heavy equipment delivery. Truck-only is typical for local. Truck+Ship is standard for international heavy cargo (lowest per-ton-km emissions). Truck+Air is used for urgent or specialized components but has ~50x higher emissions than sea freight.</div></div></span></label>
-                        <select class="input-field" id="transportMode" onchange="calculate()">
+                        <select class="input-field" id="transportMode" onchange="calculate()" aria-label="Transport Mode">
                             <option value="truck">Truck only</option>
                             <option value="truck_ship">Truck + Ship</option>
                             <option value="truck_air">Truck + Air</option>
                         </select>
 
                         <label class="input-label">Construction Duration <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hard-hat"></i> Build Timeline</div><div class="tooltip-desc">Total construction duration from ground-breaking to commissioning. Longer construction periods mean more on-site diesel consumption (cranes, excavators, generators), worker transport emissions, and temporary facility energy use. Modular builds typically complete faster.</div></div></span></label>
-                        <select class="input-field" id="constructDuration" onchange="calculate()">
+                        <select class="input-field" id="constructDuration" onchange="calculate()" aria-label="Construct Duration">
                             <option value="12">12 months</option>
                             <option value="18">18 months</option>
                             <option value="24">24 months</option>
@@ -1007,25 +1007,25 @@
                         </div>
 
                         <label class="input-label">Decommission Plan <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wrench"></i> End-of-Life Strategy</div><div class="tooltip-desc">Approach to facility decommissioning at end of operational life. Full demolition has the highest end-of-life carbon. Partial refit preserves the shell structure. Building reuse retains the entire structure for a new purpose, earning carbon credits under LCA stage D.</div></div></span></label>
-                        <select class="input-field" id="decommPlan" onchange="calculate()">
+                        <select class="input-field" id="decommPlan" onchange="calculate()" aria-label="Decomm Plan">
                             <option value="demolition">Full demolition</option>
                             <option value="refit">Partial refit</option>
                             <option value="reuse">Building reuse</option>
                         </select>
 
                         <label class="input-label">E-waste Program <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-trash-restore"></i> IT Equipment Recycling</div><div class="tooltip-desc">E-waste recycling and recovery program for decommissioned IT equipment. Standard recycling recovers ~80% of materials. Advanced recovery reaches 90% with precious metal extraction. Circular programs achieve 95% through refurbishment, component reuse, and certified recycling partners.</div></div></span></label>
-                        <select class="input-field" id="ewaste" onchange="calculate()">
+                        <select class="input-field" id="ewaste" onchange="calculate()" aria-label="Ewaste">
                             <option value="standard">Standard recycling 80%</option>
                             <option value="advanced">Advanced recovery 90%</option>
                             <option value="circular">Circular program 95%</option>
                         </select>
 
                         <label class="input-label">Steel Recycling Rate: <span id="steelRecycleVal">92</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dumpster"></i> Structural Steel Recovery</div><div class="tooltip-desc">Percentage of structural steel recovered and recycled at end of life. Steel is highly recyclable with typical recovery rates of 85-98%. Higher rates reduce the net embodied carbon through avoided virgin production credits in LCA stage D (benefits beyond system boundary).</div></div></span></label>
-                        <input type="range" class="range-slider" id="steelRecycle" min="80" max="98" value="92" step="1" oninput="document.getElementById('steelRecycleVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="steelRecycle" min="80" max="98" value="92" step="1" oninput="document.getElementById('steelRecycleVal').textContent=this.value;calculate()" aria-label="Steel Recycle">
                         <div class="range-labels"><span>80%</span><span>98%</span></div>
 
                         <label class="input-label">Copper Recycling Rate: <span id="copperRecycleVal">85</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ring"></i> Copper Cable Recovery</div><div class="tooltip-desc">Percentage of copper from cabling, busbars, and transformers recovered at end of life. Copper recycling saves ~4 kgCO2e per kg compared to virgin production. Rates of 85-95% are achievable with dedicated cable stripping and separation processes.</div></div></span></label>
-                        <input type="range" class="range-slider" id="copperRecycle" min="80" max="95" value="85" step="1" oninput="document.getElementById('copperRecycleVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="copperRecycle" min="80" max="95" value="85" step="1" oninput="document.getElementById('copperRecycleVal').textContent=this.value;calculate()" aria-label="Copper Recycle">
                         <div class="range-labels"><span>80%</span><span>95%</span></div>
                     </div>
 
@@ -1048,20 +1048,20 @@
                         </div>
 
                         <label class="input-label">NDC Target Year <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> NDC Commitment Year</div><div class="tooltip-desc">The year by which the country pledges to achieve its Nationally Determined Contribution target under the Paris Agreement. Most countries have targets for 2030, with some extending to 2035 or 2050 for net-zero commitments.</div></div></span></label>
-                        <input type="text" class="input-field" id="ndcYear" value="2030" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="text" class="input-field" id="ndcYear" value="2030" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Ndc Year">
 
                         <label class="input-label">NDC Reduction Target <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> Emissions Reduction Pledge</div><div class="tooltip-desc">The country's pledged percentage reduction in greenhouse gas emissions compared to a baseline year (varies by country). For example, the US targets 50-52% below 2005 levels by 2030. The EU targets 55% below 1990 levels by 2030.</div></div></span></label>
-                        <input type="text" class="input-field" id="ndcTarget" value="50-52% below 2005 levels" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="text" class="input-field" id="ndcTarget" value="50-52% below 2005 levels" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Ndc Target">
 
                         <label class="input-label">Current Total Emissions (MtCO&#8322;) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-smog"></i> National GHG Emissions</div><div class="tooltip-desc">The country's total annual greenhouse gas emissions in megatons of CO2 equivalent. This provides context for the data center sector's proportional share of national emissions and helps assess sector-level carbon budget allocation.</div></div></span></label>
-                        <input type="number" class="input-field" id="totalEmissions" value="5222" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="totalEmissions" value="5222" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Total Emissions">
 
                         <label class="input-label">DC Sector Share: <span id="dcShareVal">3.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Data Center Energy Share</div><div class="tooltip-desc">Estimated percentage of national electricity consumption attributed to data centers. Globally this ranges from 1-4%, but in data center hubs like Ireland (18%), Singapore (7%), or Virginia (25%+ of local grid), the share is much higher. This determines the DC sector's fair share of the national carbon budget.</div></div></span></label>
-                        <input type="range" class="range-slider" id="dcShare" min="0.5" max="10" value="3.5" step="0.1" oninput="document.getElementById('dcShareVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="dcShare" min="0.5" max="10" value="3.5" step="0.1" oninput="document.getElementById('dcShareVal').textContent=this.value;calculate()" aria-label="DC Share">
                         <div class="range-labels"><span>0.5%</span><span>10%</span></div>
 
                         <label class="input-label">DC Sector Growth Rate: <span id="dcGrowthVal">15</span>%/yr <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-bar"></i> Annual DC Growth Rate</div><div class="tooltip-desc">Projected annual growth rate of data center capacity in the selected country. AI-driven demand is pushing growth rates to 15-30% in major markets. Higher growth means the sector's share of the carbon budget must be split among more facilities, reducing per-MW allocation.</div></div></span></label>
-                        <input type="range" class="range-slider" id="dcGrowth" min="5" max="30" value="15" step="1" oninput="document.getElementById('dcGrowthVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="dcGrowth" min="5" max="30" value="15" step="1" oninput="document.getElementById('dcGrowthVal').textContent=this.value;calculate()" aria-label="DC Growth">
                         <div class="range-labels"><span>5%/yr</span><span>30%/yr</span></div>
                     </div>
 
@@ -1072,7 +1072,7 @@
                         </div>
 
                         <label class="input-label">Budget Period <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-check"></i> Assessment Timeframe</div><div class="tooltip-desc">The time period over which the cumulative carbon budget is calculated. Shorter periods (2025-2030) align with near-term NDC targets. Longer periods (2025-2050) align with net-zero commitments. The budget methodology determines how emissions are distributed across this period.</div></div></span></label>
-                        <select class="input-field" id="budgetPeriod" onchange="calculate()">
+                        <select class="input-field" id="budgetPeriod" onchange="calculate()" aria-label="Budget Period">
                             <option value="2030">2025-2030</option>
                             <option value="2035">2025-2035</option>
                             <option value="2040">2025-2040</option>
@@ -1080,17 +1080,17 @@
                         </select>
 
                         <label class="input-label">Budget Methodology <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-sliders-h"></i> Reduction Pathway Shape</div><div class="tooltip-desc">How the carbon budget is distributed over the budget period. Linear decline reduces emissions evenly each year. Front-loaded requires steeper initial cuts (more ambitious). Back-loaded allows higher near-term emissions but requires rapid reduction later (higher cumulative risk).</div></div></span></label>
-                        <select class="input-field" id="budgetMethod" onchange="calculate()">
+                        <select class="input-field" id="budgetMethod" onchange="calculate()" aria-label="Budget Method">
                             <option value="linear">Linear decline</option>
                             <option value="front">Front-loaded reduction</option>
                             <option value="back">Back-loaded</option>
                         </select>
 
                         <label class="input-label">Cumulative DC Budget (MtCO&#8322;) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-database"></i> Sector Carbon Budget</div><div class="tooltip-desc">Total cumulative CO2 emissions allowed for the data center sector in this country over the budget period. Calculated from the national carbon budget, DC sector share, and growth projections. This is the "carbon pie" that all data centers in the country must share.</div></div></span></label>
-                        <input type="number" class="input-field" id="cumulBudget" value="--" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="cumulBudget" value="--" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Cumul Budget">
 
                         <label class="input-label">Annual Budget per MW (tCO&#8322;/MW/yr) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> Per-MW Carbon Allocation</div><div class="tooltip-desc">Your facility's fair share of the national DC sector carbon budget, expressed as tons of CO2 per MW of IT load per year. If your actual emissions exceed this budget, you are consuming more than your fair share of the national carbon budget. Values below 1000 tCO2/MW/yr typically require significant renewable energy procurement.</div></div></span></label>
-                        <input type="number" class="input-field" id="annualBudgetPerMW" value="--" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        <input type="number" class="input-field" id="annualBudgetPerMW" value="--" readonly style="background:#f1f5f9;cursor:not-allowed;" aria-label="Annual Budget Per MW">
                     </div>
 
                     <!-- Section 13 - Workload Allocation -->
@@ -1104,23 +1104,23 @@
                         </div>
 
                         <label class="input-label">AI Training: <span id="wlTrainingVal">15</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-brain"></i> AI Model Training</div><div class="tooltip-desc">Percentage of IT load dedicated to AI/ML model training workloads. Training is the most energy-intensive workload per unit of economic output but is typically a transient burst workload. Carbon allocation per MWh for training is debated due to its high societal value potential.</div></div></span></label>
-                        <input type="range" class="range-slider" id="wlTraining" min="0" max="100" value="15" step="5" oninput="document.getElementById('wlTrainingVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <input type="range" class="range-slider" id="wlTraining" min="0" max="100" value="15" step="5" oninput="document.getElementById('wlTrainingVal').textContent=this.value;updateWorkloadTotal();calculate()" aria-label="Wl Training">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
 
                         <label class="input-label">AI Inference: <span id="wlInferenceVal">20</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-robot"></i> AI Inference Serving</div><div class="tooltip-desc">Percentage of IT load for AI inference (serving predictions/responses). Inference typically uses 60-90% of AI compute but at lower per-request energy than training. Rapidly growing workload segment driven by LLM adoption, autonomous systems, and real-time AI applications.</div></div></span></label>
-                        <input type="range" class="range-slider" id="wlInference" min="0" max="100" value="20" step="5" oninput="document.getElementById('wlInferenceVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <input type="range" class="range-slider" id="wlInference" min="0" max="100" value="20" step="5" oninput="document.getElementById('wlInferenceVal').textContent=this.value;updateWorkloadTotal();calculate()" aria-label="Wl Inference">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
 
                         <label class="input-label">Cloud SaaS/IaaS: <span id="wlCloudVal">30</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-cloud"></i> Cloud Computing</div><div class="tooltip-desc">Percentage of IT load running cloud services including SaaS applications and IaaS virtual machines. Cloud workloads benefit from high utilization rates and elastic scaling, typically achieving better carbon efficiency per unit of compute than on-premises enterprise IT.</div></div></span></label>
-                        <input type="range" class="range-slider" id="wlCloud" min="0" max="100" value="30" step="5" oninput="document.getElementById('wlCloudVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <input type="range" class="range-slider" id="wlCloud" min="0" max="100" value="30" step="5" oninput="document.getElementById('wlCloudVal').textContent=this.value;updateWorkloadTotal();calculate()" aria-label="Wl Cloud">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
 
                         <label class="input-label">Enterprise IT: <span id="wlEnterpriseVal">20</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-briefcase"></i> Enterprise Applications</div><div class="tooltip-desc">Percentage of IT load for traditional enterprise workloads such as ERP, databases, email, file storage, and internal applications. These workloads often have lower server utilization rates (15-30%) compared to cloud-native applications, resulting in higher carbon per useful compute unit.</div></div></span></label>
-                        <input type="range" class="range-slider" id="wlEnterprise" min="0" max="100" value="20" step="5" oninput="document.getElementById('wlEnterpriseVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <input type="range" class="range-slider" id="wlEnterprise" min="0" max="100" value="20" step="5" oninput="document.getElementById('wlEnterpriseVal').textContent=this.value;updateWorkloadTotal();calculate()" aria-label="Wl Enterprise">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
 
                         <label class="input-label">Government / Critical: <span id="wlGovtVal">15</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-landmark"></i> Critical Infrastructure</div><div class="tooltip-desc">Percentage of IT load serving government, healthcare, defense, financial, and other critical national infrastructure. These workloads may receive preferential carbon budget allocation due to their essential nature, but they also face stricter regulatory reporting requirements.</div></div></span></label>
-                        <input type="range" class="range-slider" id="wlGovt" min="0" max="100" value="15" step="5" oninput="document.getElementById('wlGovtVal').textContent=this.value;updateWorkloadTotal();calculate()">
+                        <input type="range" class="range-slider" id="wlGovt" min="0" max="100" value="15" step="5" oninput="document.getElementById('wlGovtVal').textContent=this.value;updateWorkloadTotal();calculate()" aria-label="Wl Govt">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
 
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.75rem;border-radius:8px;font-size:0.85rem;font-weight:600;margin-top:0.5rem;" id="workloadTotalBar">
@@ -1136,11 +1136,11 @@
                         </div>
 
                         <label class="input-label">Current Renewable %: <span id="currentRenewableVal">40</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-leaf"></i> Current Renewable Procurement</div><div class="tooltip-desc">Your facility's current percentage of electricity from renewable sources (PPAs, RECs, on-site generation). This baseline is used to model the pathway to your net-zero target year and calculate the required annual increase in renewable procurement.</div></div></span></label>
-                        <input type="range" class="range-slider" id="currentRenewable" min="0" max="100" value="40" step="5" oninput="document.getElementById('currentRenewableVal').textContent=this.value;calculate()">
+                        <input type="range" class="range-slider" id="currentRenewable" min="0" max="100" value="40" step="5" oninput="document.getElementById('currentRenewableVal').textContent=this.value;calculate()" aria-label="Current Renewable">
                         <div class="range-labels"><span>0%</span><span>100%</span></div>
 
                         <label class="input-label">Target Year Net-Zero <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-crosshairs"></i> Net-Zero Target Year</div><div class="tooltip-desc">The year by which your facility aims to achieve net-zero carbon emissions. Earlier targets (2030) require aggressive renewable procurement and efficiency measures. This is compared against the national NDC timeline to assess Paris Agreement alignment.</div></div></span></label>
-                        <select class="input-field" id="netZeroYear" onchange="calculate()">
+                        <select class="input-field" id="netZeroYear" onchange="calculate()" aria-label="Net Zero Year">
                             <option value="2030">2030</option>
                             <option value="2035">2035</option>
                             <option value="2040">2040</option>
@@ -1148,7 +1148,7 @@
                         </select>
 
                         <label class="input-label">Carbon Credit Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-certificate"></i> Offsetting Approach</div><div class="tooltip-desc">Strategy for addressing residual emissions that cannot be eliminated through efficiency and renewables. Voluntary offsets (e.g., Verra VCS) are purchased on voluntary markets. Compliance credits (e.g., EU ETS allowances) are mandatory in regulated markets. Using "Both" provides regulatory coverage and voluntary leadership positioning.</div></div></span></label>
-                        <select class="input-field" id="creditStrategy" onchange="calculate()">
+                        <select class="input-field" id="creditStrategy" onchange="calculate()" aria-label="Credit Strategy">
                             <option value="none">None</option>
                             <option value="voluntary">Voluntary offsets</option>
                             <option value="compliance">Compliance credits</option>
@@ -1325,8 +1325,8 @@
                 <h3 style="font-size:1.3rem;font-weight:700;color:#1e293b;">Sign In</h3>
                 <p style="font-size:0.85rem;color:#64748b;">Access calculators, tools, and analytical content.</p>
             </div>
-            <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
-            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input type="email" id="loginEmail" placeholder="Email address" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;" aria-label="Email address">
+            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;margin-bottom:0.75rem;font-family:inherit;outline:none;box-sizing:border-box;" aria-label="Password">
             <button onclick="handleLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;">Sign In</button>
             <div id="loginError" style="display:none;color:#ef4444;font-size:0.8rem;text-align:center;margin-top:0.5rem;">Invalid credentials</div>
             <div style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#94a3b8;">Demo Account: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo@resistancezero.com</code> / <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#64748b;">demo2026</code></div>
