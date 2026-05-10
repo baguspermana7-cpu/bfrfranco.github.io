@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.10.12 — 2026-05-09 (Cache-bust normalization across 96 pages)
+
+Audit found 8+ different cache-bust strings in active use for the same files (`styles.min.css?v=20260324b`, `?v=2026-05-09e`, `?v=20260509-v1108`, `?v=20260509-share-fix`, etc.). Different bust strings = different URLs = browser caches the same file under multiple keys.
+
+### Action
+- `tools/normalize-cache-bust.py` walks every HTML file, normalizes `?v=` on script/link tags pointing to: styles.min.css, styles-index.min.css, styles.css, styles-index.css, script.min.js, script.js, auth.js, rz-engine.js.
+- All normalized to single `?v=2026-05-09-v1` token.
+- Documentation prose (changelog mentions of old bust strings) is NOT touched — script only matches actual `<script src=>` and `<link href=>` tags.
+
+### Coverage
+- 222 cache-bust strings normalized across 96 files.
+- Browser cache now uses single key per file → predictable cache invalidation on next bump.
+
+### Future
+- Next version bump should also bump the bust string (e.g., `2026-05-10-v1` for tomorrow's PATCH). Use this script to keep them in sync.
+
+Bump 1.10.11 → 1.10.12 (PATCH — cache hygiene).
+
+---
+
 ## v1.10.11 — 2026-05-09 (Performance — extract 683 KB inline JS from LTC system modelling lab)
 
 `ltc-system-modelling-lab.html` was 914 KB total with 683 KB of inline JS in a single `<script>` block — blocking initial render and forcing the entire page to re-download every time the JS changed (no caching benefit).
