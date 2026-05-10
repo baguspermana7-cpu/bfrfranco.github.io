@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.10.11 — 2026-05-09 (Performance — extract 683 KB inline JS from LTC system modelling lab)
+
+`ltc-system-modelling-lab.html` was 914 KB total with 683 KB of inline JS in a single `<script>` block — blocking initial render and forcing the entire page to re-download every time the JS changed (no caching benefit).
+
+### Action
+- `tools/extract-ltc-js.py` extracted the 699,063-byte inline IIFE → `js/ltc-system-modelling-lab.js`.
+- HTML now references it via `<script src="js/ltc-system-modelling-lab.js?v=2026-05-09" defer></script>`.
+- Trailing inline `<script>` blocks (cookie banner + root auth gate) preserved unchanged — they don't depend on the extracted IIFE.
+
+### Impact
+- HTML size: 914 KB → 215 KB (76% smaller, faster initial parse).
+- External JS now browser-cacheable (subsequent loads skip the 683 KB download).
+- `defer` attribute means JS loads in parallel with HTML parsing, executes after DOM ready.
+- Extracted JS no longer has the `</script>`-in-JS-string risk class (escape rule is for inline strings, external file is immune).
+
+Bump 1.10.10 → 1.10.11 (PATCH — perf optimization, no behavior change).
+
+---
+
 ## v1.10.10 — 2026-05-09 (a11y — aria-label sweep across all form inputs)
 
 Audit-driven fix. 659 form inputs (`<input>`, `<select>`, `<textarea>`) lacked `<label for=>` AND `aria-label` — invisible to screen readers, fails WCAG 4.1.2 Name/Role/Value.
