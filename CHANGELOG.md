@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.10.15 — 2026-05-09 (Privacy — gate Google Analytics behind GDPR consent + interaction defer)
+
+Audit-flagged E10-1: Google Analytics fired before GDPR consent on multiple pages. The eager-load `<script async src="...gtag/js?id=...">` ran on every page load regardless of cookie banner state — sending pageview data before user could accept/decline.
+
+### Action
+- `tools/gate-gtag-consent.py` (NEW): walks every HTML, replaces eager gtag pattern with the canonical consent-aware deferred pattern.
+- 63 pages migrated to the new pattern.
+
+### New pattern (consent-aware + interaction-deferred)
+1. **Default-deny**: if `rz_cookie_consent === 'declined'`, `window['ga-disable-G-GED7FX8RTV'] = true` is set BEFORE any gtag call.
+2. **Interaction-deferred**: actual GA script only loads after user scroll/click/keydown/touch (not on idle pageview).
+3. **Disable-flag respected**: even after interaction, the loader checks `ga-disable-*` and skips the network call if disabled.
+4. **gtag commands queued safely**: queued before script loads; if disabled, never reach Google.
+
+### Impact
+- GDPR compliance improved: declined users never trigger GA at all.
+- First-visit users still queue gtag commands but the network call is delayed until interaction (faster FCP, +154 KB saved on bounce).
+- Cookie banner decline handler in `sw.js`-style code already sets the disable flag, now it sticks across reloads via localStorage check.
+
+### SW
+- SW cache name auto-synced 1.10.14 → 1.10.15 via `tools/sync-sw-version.py`.
+
+Bump 1.10.14 → 1.10.15 (PATCH — privacy/compliance fix).
+
+---
+
 ## v1.10.14 — 2026-05-09 (SEO — JSON-LD added to ltc-system-modelling-lab)
 
 Audit-flagged: `ltc-system-modelling-lab.html` had ZERO JSON-LD blocks. AI search engines + Google rich-results couldn't classify the page.
