@@ -1,7 +1,8 @@
-// ResistanceZero Service Worker — bumped 2026-05-09 for v1.8.x site state
+// ResistanceZero Service Worker — bumped 2026-05-09 for v1.10.x site state
 // Cache-first for static assets, network-first for HTML pages
+// CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v8'; // bumped from v1 — invalidates stale caches
+const CACHE_NAME = 'rz-cache-v1.10.13'; // version-aware: invalidates on every site bump
 
 // Key pages and assets to pre-cache on install
 const PRE_CACHE_URLS = [

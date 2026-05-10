@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.10.13 — 2026-05-09 (SW cache version-aware via tools/sync-sw-version.py)
+
+`sw.js` had a hardcoded `CACHE_NAME = 'rz-cache-v8'` that drifted from the actual site version. Manual bumps were forgotten across releases — meaning users on stale caches got mismatched JS+CSS+HTML for hours.
+
+### Action
+- `sw.js` `CACHE_NAME` now reads `rz-cache-v1.10.13` (matches site version exactly).
+- `tools/sync-sw-version.py` (NEW): reads `js/rz-version.js`, writes the matching `CACHE_NAME` to `sw.js`. Idempotent. Run after every version bump.
+- Comment in `sw.js` notes the auto-sync requirement so future maintainers know.
+
+### Workflow update
+Per CLAUDE.md "Audit before push" section, add a step:
+```bash
+python3 tools/sync-sw-version.py    # syncs CACHE_NAME to current RZ_VERSION
+```
+
+### Impact
+- Service worker now invalidates its cache on every version bump → users always get fresh assets after a release.
+- No more stale cache after CSS/JS deploys.
+
+Bump 1.10.12 → 1.10.13 (PATCH — SW hygiene).
+
+---
+
 ## v1.10.12 — 2026-05-09 (Cache-bust normalization across 96 pages)
 
 Audit found 8+ different cache-bust strings in active use for the same files (`styles.min.css?v=20260324b`, `?v=2026-05-09e`, `?v=20260509-v1108`, `?v=20260509-share-fix`, etc.). Different bust strings = different URLs = browser caches the same file under multiple keys.
