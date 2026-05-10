@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.10.17 — 2026-05-09 (a11y — skip-link injected on remaining 9 pages)
+
+Audit-flagged B12-SKIP: pages without "Skip to main content" link force keyboard-only users to tab through entire navbar before reaching content.
+
+### Action
+- `tools/inject-skip-link.py` (NEW): walks target pages, inserts `<a class="skip-link" href="#main-content">` right after `<body>` tag.
+- Adds `id="main-content"` to first `<main>` or `<section>` if not present so the skip-link target exists.
+- Skip-link CSS already in `styles.css` + `styles-index.css` (visible-on-focus pattern, off-screen by default).
+
+### Coverage
+9 pages received skip-link (down from 49 baseline → 0 remaining):
+- dashboard, privacy, standards-ltc-lab
+- 6 LTC labs: ansi-tia / ashrae / iso / nfpa / system-modelling / uptime-tier
+
+### SW
+- SW cache name auto-synced 1.10.16 → 1.10.17.
+
+Bump 1.10.16 → 1.10.17 (PATCH — a11y).
+
+---
+
 ## v1.10.16 — 2026-05-09 (a11y + SEO batch: th[scope] + ai-content-declaration)
 
 Two audit-flagged items batched.
