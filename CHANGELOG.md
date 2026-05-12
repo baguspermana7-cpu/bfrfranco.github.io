@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.14.1 — 2026-05-13 (Spare-parts DB enriched + scalable · query tooling · Spares Engine QA fixes)
+
+### Changed — DC spare-parts database enriched (the platform foundation)
+`tools/build-spares-db.py` grew its archetype/OEM/taxonomy coverage:
+- **+110 part archetypes** (110 → **220**): Electrical +16 (UPS SNMP card, MCCB, SPD/TVSS, arc-flash relay, bus-tie breaker, RMU module, OLTC, Buchholz relay, in-rack ATS, PDU branch-monitoring strip, harmonic filter, DC-bus capacitor bank, AVR, load bank, genset coolant pump/radiator/injector, fuel level & leak sensors) · Cooling +39 (chiller oil filter / relief valve / purge, cooling-tower spray nozzle / basin heater / vibration switch / dosing pump / CIP skid, CRAC reheat / condensate, AHU heat-recovery wheel / UV-C, CRAH valve actuator, RDHx fan + cleaning kit, secondary CDU pump, CDU expansion tank / filtration / flow-control / chemistry sensor, cold-plate gasket kit, QD blanking plug, **dielectric fluid (per-litre consumable)**, immersion-tank lid seal + fluid filter, vertical-inline / split-case / sump pumps, pump coupling-spider, check / hydronic-PRV / backflow valves, flex pipe connector, spring hanger) · Fire +10 (linear-heat cable, beam smoke, UV/IR flame, duct smoke, sounder/strobe, fire-pump test header, pre-action air compressor + N₂ generator, SLC isolator module, EVAC amplifier, VESDA sampling-point filter) · Network-ICT +7 (spine chassis line card / fabric module, AOC/DAC cable, fiber pigtail / splice tray, MPO-MPO trunk + LC patch cord, PTP grandmaster clock, OOB cellular gateway, WDM mux/demux) · BMS-Controls +7 (I/O expansion module, BMS-UPS / power supply, CO₂ sensor, DP transmitter, current transducer, field-bus repeater, SCADA HMI panel PC) · Structural +5 (perforated tile with damper, blanking panel, earthing/bonding kit, wire-mesh tray + divider, trapeze hanger / isolator) · Monitoring +8 (rack temperature string, under-floor zoned leak rope, thermal imaging camera, portable PQ analyzer, UPS per-cell battery monitor, vibration sensor, ultrasonic clamp-on flow meter, transformer DGA).
+- **+17 OEMs** (85 → **102**): Stäubli, CPC/Colder (QD couplings), Goulds/ITT, KSB, Flowserve (pumps/seals), Watts Water, Apollo Valves (valves/backflow), Spraying Systems (cooling-tower nozzles), Marlo/Culligan (water treatment), Donaldson, MANN+HUMMEL (filtration), 3M Novec, Engineered Fluids (clean agent + dielectric coolants), AFL/OFS, Belden, Siemon (fiber/cabling), Marvell Technology (transceiver ICs / switch ASICs).
+- **+85 taxonomy rows** (109 → **194** l1→l2→l3 component classes).
+- Regenerated at `--scale 1`: **2,499 parts** / 8,163 failure modes / 5,830 compatibility rows / 102 OEMs / 194 taxonomy / 6 facility types. Curated browser catalog `js/spares-parts-catalog.js` → **445 parts** (~347 KB, same compact-key structure). All sanity checks pass.
+- **Scale-up demonstrated**: `tools/spares-db.sh big` (`--scale 30`) produces **74,970 parts** / 247,278 failure modes / 175,152 compatibility rows in a 137 MB SQLite — all invariants hold; `--scale 700` ≈ ~1.75M parts. (The default committed DB stays at scale 1 / ~4.5 MB; `.sqlite` + `.csv.gz` are gitignored, regeneratable.)
+
+### Added — DB query tooling
+- **`tools/query-spares-db.py`** — query/export CLI: 9 canned reports (`critical-long-lead`, `eol-exposure`, `oem-concentration`, `ai-cooling`, `blind-risks`, `printable`, `refurb`, `by-generation`, `long-lead-leaders`) + `summary` (row counts + distributions) + `--sql`/`--sql-file` for arbitrary SQL + `--csv` export + `--limit`/`--max-rows`.
+- **`tools/spares-db.sh`** — convenience wrapper: `build [SCALE]` · `big` (scale 30) · `huge` (scale 100) · `million` (scale 700) · `query <report>` · `sql "<SQL>"` · `summary` · `reports` · `stats`. Both executable.
+- `Documents/Training/spares_parts_database.md` updated (counts, OEM list, subsystem coverage).
+
+### Fixed — Spares Engine QA
+- `MODULE_RESET_DEFAULTS.ltb` had `ltb_demand_yr: '0.4'` / `ltb_discount: '0'` not matching the HTML input defaults → "↺ Reset defaults" on the Last-Time-Buy module set demand wrong + the discount rate to 0% (making the NPV stock-vs-requalify comparison always zero-benefit). Corrected to `'1.2'` / `'8'`.
+- Added a methodology/data-vintage footer note: "Models: FMECA (MIL-STD-1629A) · METRIC/VARI-METRIC (Sherbrooke/Slay) · newsvendor critical-fractile · Kraljic matrix (HBR 1983) · DMSMS lifecycle · MEIO. Catalog data vintage: 2026-Q1 · {N} curated parts · illustrative — not a substitute for a full supply-chain analysis." ({N} updates at runtime from `SPARES_CATALOG.parts.length` = 445.)
+- Confirmed (re-verified): all 21 tabs in `TAB_ORDER`, Poisson no double-count, hub-LT clamped, `normInvCDF` accurate, all `<\/script>` escaped, `catUsePart()` field IDs all match, dark mode complete, no leftover `console.log`.
+
+### Versioning
+- `js/rz-version.js` 1.14.0 → 1.14.1 (PATCH — DB enrichment + tooling + QA fixes). SW cache → `rz-cache-v1.14.1`.
+
+---
+
 ## v1.14.0 — 2026-05-12 (DC spare-parts database · Parts Catalog tab · Spares Engine code review + bug fixes · DCMOC code review)
 
 ### Added — DC spare-parts local database (the platform data foundation)

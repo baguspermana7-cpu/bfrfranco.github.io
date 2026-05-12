@@ -165,6 +165,24 @@ OEMS = [
     ("generic-elec","Generic / Third-Party Electrical","International",None,"breakers, contactors, relays, fuses, terminals, cable","generic",4,4,85.0,"PO-only","medium","Commodity electrical components — multiple interchangeable sources."),
     ("generic-fluid","Generic / Third-Party Fluid","International",None,"hoses, fittings, gauges, strainers, valves, gaskets","generic",4,3,85.0,"PO-only","low","Commodity fluid-system components — multiple interchangeable sources."),
     ("refurb-pool","Certified Refurbished / Harvested Pool","International",None,"refurbished modules harvested from decommissioned equipment","specialist",3,2,80.0,"PO-only","high","Reclaimed/refurbished parts from decommissioned DCs — circular-economy sourcing."),
+    # NEW OEMs added in enrichment pass
+    ("staubli","Stäubli","Switzerland",1909,"quick-disconnect couplings, tooling connectors, liquid cooling fittings","specialist",7,8,92.0,"PO-only, framework","low","Precision quick-disconnect couplings; dripless fluid connectors for liquid-cooling loops."),
+    ("cpc-colder","CPC / Colder Products (Dover)","United States",1978,"quick-disconnect couplings, push-to-connect fittings, manifolds","specialist",6,6,91.0,"PO-only, framework","low","Plastic & stainless quick-disconnects; push-to-connect; biopharm & DC liquid-cooling."),
+    ("goulds-itt","Goulds Pumps / ITT","United States",1848,"centrifugal pumps, vertical turbines, submersible pumps","oem-primary",7,12,90.0,"framework, PO-only","low","Goulds/ITT end-suction + split-case + vertical inline pumps for HVAC & fire service."),
+    ("ksb","KSB","Germany",1871,"centrifugal pumps, valves, pump systems","oem-primary",7,14,90.0,"framework, PO-only","low","EtaLine/Etanorm centrifugal pumps; ZETA valves; large-facility chilled-water loops."),
+    ("flowserve","Flowserve","United States",1997,"industrial pumps, valves, mechanical seals, actuators","oem-primary",7,14,89.0,"framework, PO-only","low","Durco/Mark 3 pumps; Valtek/Durcoflow control valves; mechanical seals for large CHW systems."),
+    ("watts-water","Watts Water Technologies","United States",1874,"pressure-reducing valves, backflow preventers, balancing valves, check valves","specialist",6,8,91.0,"PO-only, framework","low","PRV, BFP, balancing valves, thermostatic mixing; commercial building water systems."),
+    ("apollo-valves","Apollo Valves (Aalberts)","United States",1928,"ball valves, check valves, butterfly valves, backflow preventers","specialist",5,6,91.0,"PO-only","low","High-cycle ball valves; fire-rated valves; HVAC isolation and check valves."),
+    ("spraying-systems","Spraying Systems Co.","United States",1937,"spray nozzles, headers, cooling-tower nozzles, misting systems","specialist",4,6,90.0,"PO-only","low","Cooling-tower spray nozzles; adiabatic-cooler misting heads; clean-in-place spray headers."),
+    ("marlo-culligan","Marlo / Culligan Industrial","United States",1936,"water softeners, dealkalizers, filtration, water-treatment systems","specialist",5,8,88.0,"PO-only, framework","medium","Industrial water treatment, softening, deionization, filtration for condenser & cooling-tower loops."),
+    ("donaldson","Donaldson Company","United States",1915,"industrial filtration, air filters, liquid filters, hydraulic filters","oem-primary",8,6,91.0,"PO-only, framework","low","Torit dust collectors; liquid-line filters; hydraulic filtration; fuel/lube filters for gensets."),
+    ("mann-hummel","MANN+HUMMEL","Germany",1941,"air filters, liquid filters, fuel filters, cabin air filtration","oem-primary",7,8,90.0,"framework, PO-only","low","Engine air/oil/fuel filter elements for gensets; HVAC filters; heavy-equipment filtration OEM."),
+    ("3m-novec","3M Novec / 3M Electronic Markets","United States",1902,"Novec 1230 clean agent, Novec 7100/7200 dielectric fluids, thermal management","specialist",9,10,91.0,"framework, PO-only","high","Novec 1230 fire suppression; Novec 7100/7200 two-phase dielectric fluids for immersion cooling."),
+    ("engineered-fluids","Engineered Fluids","United States",2012,"dielectric fluids (BioNovaTek, ElectriCool), single/two-phase immersion coolants","specialist",4,8,86.0,"PO-only, framework","high","Next-gen biodegradable dielectric coolants for immersion and direct-to-chip; BioNovaTek EC-110."),
+    ("afl-ofs","AFL / OFS Fitel","United States",1984,"fiber optic cable, connectors, fusion splicers, OTDR test equipment","oem-primary",7,8,91.0,"framework, PO-only","low","AFL loose-tube/ribbon fiber; OFS specialty fiber; factory-terminated assemblies; splicing tools."),
+    ("belden","Belden","United States",1902,"structured cabling, industrial ethernet cable, signal cable, fiber","oem-primary",6,8,90.0,"PO-only, framework","low","Bonded-pair Cat6A/Cat8 copper; industrial Ethernet cable; fiber distribution."),
+    ("siemon","Siemon","United States",1903,"structured cabling, fiber, patch panels, racks, data-center cabling systems","specialist",6,10,91.0,"framework, PO-only","low","Z-MAX Cat6A; TERA copper; high-density fiber solutions; MAP ODF systems."),
+    ("marvell-tech","Marvell Technology","United States",2000,"optical transceiver ICs, PHY chips, Ethernet switch ASICs, DPUs","oem-primary",8,12,88.0,"MSA, framework","high","Marvell COLORZ-II/ALASKA C transceivers; 400G/800G PAM4 optical module chipsets; Prestera switch ASICs."),
 ]
 OEM_IDS = {o[0] for o in OEMS}
 
@@ -290,6 +308,100 @@ TAXONOMY = [
     ("Monitoring — Security","access-control","access-control reader / controller","monitoring","Card/biometric reader + door controller for secure-zone access",3,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled,edge-micro"),
     ("Monitoring — Security","video-surveillance","IP camera / NVR module","monitoring","IP surveillance camera / network-video-recorder module",2,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled,edge-micro"),
     ("Monitoring — Detection","leak-detection","spot / rope water-leak detector","monitoring","Spot or rope-style water-leak detector + panel (under-floor / CRAC pans)",4,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # NEW TAXONOMY ROWS — enrichment pass
+    # ELECTRICAL — new granular classes
+    ("Power — Distribution","switchgear","LV moulded-case circuit breaker (MCCB)","electrical","Moulded-case circuit breaker 16–1600 A for LV distribution panels",6,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled,edge-micro"),
+    ("Power — Distribution","switchgear","surge protection device (SPD/TVSS)","electrical","Surge-protective device / TVSS for LV distribution boards and racks",4,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled,edge-micro"),
+    ("Power — Distribution","switchgear","earth-fault / arc-flash relay","electrical","Earth-fault monitoring relay or arc-flash detection relay for LV panels",7,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Distribution","switchgear","bus-tie breaker","electrical","Bus-tie / bus-section circuit breaker for paralleling two main bus sections",8,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Distribution","switchgear","ring-main unit (RMU) module","electrical","SF6 / vacuum ring-main unit switchgear module for campus MV ring feeds",8,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Distribution","transformer","on-load tap changer (OLTC)","electrical","On-load tap-changer mechanism for regulating transformer output voltage",7,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Distribution","transformer","transformer protection relay (Buchholz/breather)","electrical","Buchholz relay + silica-gel breather + thermostat for oil-immersed transformer monitoring",6,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Distribution","PDU","rack automatic transfer switch (in-rack ATS)","electrical","In-rack dual-feed automatic transfer switch for single-cord servers",7,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Distribution","PDU","PDU branch-circuit monitoring strip","electrical","Per-outlet or per-branch current/energy monitoring strip inside floor/rack PDU",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Power Quality","harmonic-filter","passive / active harmonic filter","electrical","Passive LC or active harmonic filter for UPS/VFD harmonic mitigation",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — DC","dc-busway","DC-bus capacitor bank (48V/400V DC busway)","electrical","DC-bus capacitor bank module for 48V/400V DC distribution systems",6,"cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Standby Generation","diesel-generator","generator AVR (automatic voltage regulator)","mechanical","Automatic voltage regulator module for diesel genset alternator",7,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Standby Generation","diesel-generator","generator load bank (resistive)","mechanical","Resistive load bank for periodic genset load testing (portable/permanent)",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Standby Generation","diesel-generator","genset coolant pump","mechanical","Engine jacket-water centrifugal coolant pump for diesel genset",6,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Standby Generation","diesel-generator","genset radiator core","mechanical","Engine radiator / heat exchanger core for remote genset cooling",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Power — Standby Generation","diesel-generator","genset fuel injector / common-rail","mechanical","Fuel injector or common-rail assembly for diesel genset engine",6,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Standby Generation","fuel-system","fuel-level transmitter / float switch","mechanical","Tank-level transmitter or float switch for diesel day-tank / bulk-tank",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Power — Standby Generation","fuel-system","fuel-tank leak-detection sensor","mechanical","Under-tank bund / double-wall leak detector for diesel fuel tanks",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # COOLING — new granular classes
+    ("Cooling — Chilled Water","chiller","chiller oil filter / purge unit","cooling","Refrigerant-side oil filter cartridge or purge unit for centrifugal chiller",5,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Cooling — Chilled Water","chiller","chiller refrigerant relief valve","cooling","Pressure-relief valve for chiller refrigerant circuit (code-required)",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Heat Rejection","cooling-tower","cooling-tower spray nozzle / distribution header","cooling","Replacement spray nozzle or hot-water distribution header for cooling tower",3,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Cooling — Heat Rejection","cooling-tower","cooling-tower basin heater","cooling","Electric immersion heater for cooling-tower basin freeze protection",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Cooling — Heat Rejection","cooling-tower","cooling-tower vibration switch","cooling","Vibration switch / accelerometer for cooling-tower fan shaft protection",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Cooling — Heat Rejection","cooling-tower","cooling-tower water-treatment dosing pump","cooling","Chemical dosing pump / controller for cooling-tower water treatment",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Heat Rejection","dry-cooler","plate-HX cleaning-in-place (CIP) skid","cooling","CIP skid (pump + heater + chemical vessel) for plate heat exchanger cleaning",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Air","CRAC-CRAH","CRAC reheat element / condensate pump","cooling","Electric reheat element or condensate transfer pump for CRAC/CRAH unit",4,"legacy-raised-floor,enterprise-tier3,colo-wholesale"),
+    ("Cooling — Air","AHU","AHU heat-recovery wheel / UV-C lamp","cooling","Thermal wheel / enthalpy recovery wheel or UV-C germicidal lamp for AHU",4,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Air","CRAC-CRAH","perimeter CRAH valve actuator","cooling","Spring-return actuator for cooling-coil 2-way valve on perimeter CRAH",4,"legacy-raised-floor,enterprise-tier3,colo-wholesale"),
+    ("Cooling — Air","RDHx","rear-door HX fan / coil cleaning kit","cooling","Replacement fan assembly or chemical coil-cleaning kit for rear-door HX",4,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # COOLING — liquid (AI factory) deep additions
+    ("Cooling — Liquid","CDU-coolant-distribution","secondary CDU pump","cooling","Secondary or redundant coolant pump within CDU (built-in N+1 pump)",8,"ai-factory-liquid-cooled"),
+    ("Cooling — Liquid","CDU-coolant-distribution","CDU expansion tank / accumulator","cooling","Pressurized expansion tank or accumulator for CDU coolant circuit",6,"ai-factory-liquid-cooled,cloud-hyperscale"),
+    ("Cooling — Liquid","CDU-coolant-distribution","CDU filtration cartridge (5µm/50µm)","cooling","Consumable filtration cartridge (5 µm or 50 µm) for CDU coolant loop",5,"ai-factory-liquid-cooled,cloud-hyperscale"),
+    ("Cooling — Liquid","CDU-coolant-distribution","CDU flow control valve","cooling","Motorized flow-control or proportional valve inside CDU coolant circuit",6,"ai-factory-liquid-cooled,cloud-hyperscale"),
+    ("Cooling — Liquid","CDU-coolant-distribution","CDU coolant chemistry sensor","cooling","Inline pH / conductivity / turbidity sensor for CDU coolant-loop chemistry monitoring",6,"ai-factory-liquid-cooled,cloud-hyperscale"),
+    ("Cooling — Liquid","direct-to-chip-cooling","cold-plate gasket / O-ring kit","cooling","Replacement gasket and O-ring kit for GPU/CPU liquid cold plate maintenance",5,"ai-factory-liquid-cooled"),
+    ("Cooling — Liquid","cooling-manifold","manifold quick-disconnect blanking plug","cooling","Dripless blanking / dummy plug for unused manifold QD ports (server removal)",5,"ai-factory-liquid-cooled"),
+    ("Cooling — Liquid","immersion-cooling","dielectric fluid (bulk, per-litre)","cooling","Engineered dielectric immersion fluid — single-phase or two-phase (consumable replenishment)",6,"ai-factory-liquid-cooled"),
+    ("Cooling — Liquid","immersion-cooling","immersion-tank lid seal / gasket","cooling","Tank lid / cover gasket or seal kit for immersion-cooling tank enclosure",5,"ai-factory-liquid-cooled"),
+    ("Cooling — Liquid","immersion-cooling","immersion fluid filtration cartridge","cooling","Particulate / activated-carbon filter cartridge for dielectric immersion fluid polishing",5,"ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","pump","vertical inline pump (VIL)","cooling","Vertical inline centrifugal pump for chilled-water or condenser-water circuits",7,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","pump","double-suction split-case pump","cooling","Horizontally split-case double-suction centrifugal pump for large condenser-water / fire loops",7,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","pump","submersible sump pump","cooling","Submersible sump / drainage pump for mechanical room flood management",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","pump","pump coupling / flexible spider","cooling","Flexible jaw coupling / spider insert for pump-to-motor alignment (consumable)",3,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","valve","check valve (silent/spring-loaded)","cooling","Silent or spring-loaded check valve for hydronic pump discharge (no water-hammer)",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","valve","pressure relief valve (hydronic ASME)","cooling","ASME-coded pressure relief valve for hydronic system overpressure protection",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","valve","backflow preventer (RP / DC type)","cooling","Reduced-pressure or double-check backflow preventer for potable / condenser cross-connection",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","pipework","flexible pipe connector / expansion joint","cooling","Rubber or stainless flexible pipe connector / expansion joint for vibration isolation",3,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Cooling — Hydronics","pipework","pipe spring hanger / support","cooling","Variable-spring or constant-spring pipe hanger for large CHW headers",3,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # FIRE-LIFE-SAFETY — new granular classes
+    ("Fire — Detection","detection","linear heat detection cable","fire-life-safety","Analogue or digital linear-heat-detection cable for cable rooms and risers",6,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Detection","detection","beam smoke detector","fire-life-safety","Wide-area optical beam smoke detector for large open-plan spaces",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Fire — Detection","detection","flame detector (UV/IR)","fire-life-safety","UV/IR or multi-spectrum flame detector for generator rooms / fuel areas",6,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Detection","detection","duct smoke detector","fire-life-safety","In-duct sampling smoke detector for supply/return air HVAC systems",5,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Notification","notification","sounder / strobe (NAC device)","fire-life-safety","Notification appliance (horn/strobe) on notification appliance circuit",3,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled,edge-micro"),
+    ("Fire — Suppression","fire-pump","fire-pump test header / flow meter","fire-life-safety","Fire-pump test header assembly with flow measurement for annual certification",5,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Suppression","clean-agent","pre-action air compressor / nitrogen generator","fire-life-safety","Small air compressor or nitrogen generator maintaining dry-pipe/pre-action system supervisory air",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Control","fire-panel","fire-panel SLC isolator / relay module","fire-life-safety","Short-circuit isolator module or relay module on SLC signalling line circuit",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Control","fire-panel","EVAC amplifier / voice alarm module","fire-life-safety","Emergency voice / alarm communication (EVAC) amplifier or PA module in fire panel",5,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Fire — Detection","VESDA","VESDA aspirating-pipe sampling filter (consumable)","fire-life-safety","Replacement sampling-point filter element for VESDA / aspirating detection pipe",3,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # NETWORK-ICT — new granular classes
+    ("Network — Fabric","spine-leaf-switch","spine chassis line card / fabric module","network-ict","Line card or fabric/supervisor module for modular spine-chassis switch",6,"cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Network — Optics","optical-transceiver","AOC / DAC direct-attach cable","network-ict","Active optical cable (AOC) or passive direct-attach copper (DAC) for short-reach switch interconnect",3,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Network — Cabling","fiber-ODF","fiber pigtail / splice tray","network-ict","Pre-terminated fiber pigtails and splice tray cassette for ODF termination",2,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Network — Cabling","structured-cabling","MPO-MPO trunk / LC duplex patch cord","network-ict","Pre-terminated MPO-MPO trunk or LC duplex patch cord (OS2/OM4) for high-density patching",2,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Network — Timing","timing","PTP grandmaster / timing appliance","network-ict","IEEE 1588 PTP grandmaster clock or timing server for AI-factory precision time",5,"ai-factory-liquid-cooled,cloud-hyperscale"),
+    ("Network — Management","console-server","out-of-band cellular gateway","network-ict","LTE/5G out-of-band management gateway for remote site access",4,"edge-micro,enterprise-tier3,colo-wholesale"),
+    ("Network — Optics","optical-transceiver","WDM mux/demux module","network-ict","Passive CWDM/DWDM mux-demux module for fibre wavelength multiplexing",4,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # BMS-CONTROLS — new granular classes
+    ("Controls — BMS","DDC-PLC-controller","I/O expansion module (DI/DO/AI/AO)","bms-controls","Digital / analogue I/O expansion module for DDC controller or PLC rack",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Controls — BMS","DDC-PLC-controller","building controller UPS / power supply","bms-controls","Panel UPS or 24 V DC power supply for DDC/BMS controller room",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Controls — Field","sensor","CO2 / air-quality sensor","bms-controls","CO2 + TVOC air-quality sensor for generator room ventilation and occupant monitoring",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Controls — Field","sensor","differential-pressure transmitter (room/containment)","bms-controls","Room or containment differential-pressure transmitter for hot-aisle / clean-room monitoring",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Controls — Field","sensor","current transducer (sub-metering)","bms-controls","Split-core or through-hole CT for branch-circuit sub-metering",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Controls — Field","actuator","field-bus repeater (RS-485/MS-TP)","bms-controls","RS-485 / BACnet MS/TP bus repeater or segment coupler for extending control networks",3,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale"),
+    ("Controls — SCADA","SCADA-RTU","SCADA HMI panel PC","bms-controls","Panel-mount industrial HMI / SCADA workstation for electrical or cooling plant visualization",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # STRUCTURAL-CIVIL — new granular classes
+    ("Structure — White Space","raised-floor-tile","perforated floor tile with damper","structural-civil","Perforated raised-floor tile with adjustable airflow damper for floor-plenum balancing",2,"legacy-raised-floor,enterprise-tier3,colo-wholesale"),
+    ("Structure — White Space","server-rack","cabinet blanking panel (1U/2U)","structural-civil","1U or 2U rack blanking panel for airflow management in server cabinets",1,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled,edge-micro"),
+    ("Structure — White Space","server-rack","cabinet earthing / bonding kit","structural-civil","Rack earthing / bonding strip and grounding hardware kit",2,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Structure — Pathways","cable-tray","cable basket (wire mesh tray) / divider","structural-civil","Wire-mesh cable basket tray section and divider insert for pathway separation",2,"legacy-raised-floor,enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Structure — Pathways","cable-tray","trapeze hanger / spring vibration isolator","structural-civil","Trapeze hanger assembly or spring-type vibration isolation pad for equipment / pipe support",2,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    # MONITORING — new granular classes
+    ("Monitoring — DCIM","DCIM-sensor","rack temperature string (multi-point)","monitoring","Multi-point rack temperature sensor string (top/middle/bottom) for per-rack thermal profiling",3,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","DCIM-sensor","under-floor zoned leak rope","monitoring","Zoned leak-detection rope sensor for under-floor plenum or secondary-loop trench",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","DCIM-sensor","thermal imaging camera (rack hot-spot)","monitoring","Spot thermal / infrared camera for rack hot-spot detection without airflow disruption",4,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","power-meter","power-quality analyzer (portable)","monitoring","Portable power-quality analyzer for site survey / commissioning / maintenance",4,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","power-meter","UPS battery monitor (per-cell)","monitoring","Per-cell / per-module battery monitor for UPS VRLA or Li-ion state-of-health tracking",6,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","DCIM-sensor","vibration sensor (rotating equipment)","monitoring","Triaxial vibration sensor for online condition monitoring of pumps, fans, and compressors",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","DCIM-sensor","ultrasonic clamp-on flow meter","monitoring","Clamp-on ultrasonic flow meter for non-invasive pipe flow measurement on CHW / CDU loops",5,"enterprise-tier3,colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
+    ("Monitoring — DCIM","DCIM-sensor","transformer dissolved-gas analyzer (DGA)","monitoring","Online dissolved-gas analysis unit for oil-immersed transformer incipient-fault detection",7,"colo-wholesale,cloud-hyperscale,ai-factory-liquid-cooled"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -440,6 +552,107 @@ ARCHETYPES = [
     AT("access-control reader / controller", ["honeywell","generic-elec"], (6,12), (1,4), (2,6,10,16), (100,2000), (2,12), (8,40,40,200), 4, (3,6), 0, 0, 0, (0.2,3), None),
     AT("IP camera / NVR module", ["honeywell","cisco","generic-elec"], (4,8), (1,4), (2,6,10,16), (80,2500), (2,12), (8,40,40,200), 5, (2,4), 0, 0, 0, (0.2,5), None),
     AT("spot / rope water-leak detector", ["packet-power","honeywell","generic-elec"], (5,10), (1,4), (2,4,8,14), (50,1500), (2,12), (8,40,40,200), 4, (3,6), 0, 0, 0, (0.1,2), None),
+    # =====================================================================
+    # NEW ARCHETYPES — enrichment pass
+    # =====================================================================
+    # ELECTRICAL — UPS & power quality additions
+    AT("UPS communication / SNMP card", ["vertiv","schneider","eaton","generic-elec"], (8,14), (1,4), (2,4,8,14), (200,2500), (1,2), (1,4,4,16), 4, (4,7), 0, 0, 0, (0.1,0.5), None),
+    AT("LV moulded-case circuit breaker (MCCB)", ["abb","siemens","schneider","eaton","generic-elec"], (15,25), (2,8), (4,8,14,22), (300,8000), (1,4), (8,40,40,200), 5, (2,5), 1, 0, 0, (3,30), "amp"),
+    AT("surge protection device (SPD/TVSS)", ["schneider","eaton","abb","siemens","generic-elec"], (8,15), (1,4), (2,4,8,14), (100,3000), (2,20), (8,40,40,200), 5, (2,4), 0, 0, 0, (0.5,5), None),
+    AT("earth-fault / arc-flash relay", ["abb","siemens","schneider","ge-grid","generic-elec"], (12,20), (2,6), (6,10,18,28), (1000,12000), (1,2), (4,16,16,60), 3, (4,7), 0, 0, 0, (1,6), None),
+    AT("bus-tie breaker", ["abb","siemens","schneider","eaton","powell"], (15,22), (4,16), (16,22,34,52), (10000,60000), (1,1), (1,2,2,6), 2, (4,7), 1, 0, 0, (40,250), "amp"),
+    AT("ring-main unit (RMU) module", ["abb","siemens","schneider","ge-grid","hyosung"], (20,30), (8,32), (24,32,48,72), (20000,120000), (1,1), (2,4,4,10), 2, (3,6), 1, 0, 0, (200,1200), "kv"),
+    AT("on-load tap changer (OLTC)", ["abb","siemens","ge-grid","generic-mech"], (12,20), (8,40), (16,24,40,60), (8000,60000), (1,1), (1,2,2,6), 2, (4,7), 1, 0, 1, (100,600), None),
+    AT("transformer protection relay (Buchholz/breather)", ["abb","siemens","ge-grid","honeywell","generic-elec"], (8,15), (2,6), (6,10,18,28), (500,5000), (1,4), (1,4,4,16), 4, (3,6), 0, 0, 0, (0.5,5), None),
+    AT("rack automatic transfer switch (in-rack ATS)", ["asco","eaton","schneider","cyberex","vertiv"], (12,20), (2,6), (6,10,18,28), (2000,18000), (1,2), (8,40,40,200), 3, (3,6), 1, 0, 0, (4,20), "amp"),
+    AT("PDU branch-circuit monitoring strip", ["legrand","eaton-tripp-lite","vertiv","schneider","packet-power"], (8,14), (1,4), (2,4,8,14), (200,3000), (1,4), (10,60,60,300), 4, (3,6), 0, 0, 0, (0.3,3), None),
+    AT("passive / active harmonic filter", ["abb","schneider","siemens","danfoss","generic-elec"], (8,15), (4,16), (8,12,20,32), (5000,50000), (1,1), (1,4,4,16), 2, (3,6), 1, 0, 0, (60,500), "kva"),
+    AT("DC-bus capacitor bank (48V/400V DC busway)", ["schneider","eaton","abb","generic-elec"], (8,14), (2,8), (6,10,18,28), (3000,25000), (1,2), (2,8,8,30), 2, (4,7), 1, 0, 0, (20,120), "kw"),
+    # ELECTRICAL — genset additions
+    AT("generator AVR (automatic voltage regulator)", ["nidec","weg","generic-elec","caterpillar","cummins"], (8,15), (2,6), (6,10,18,28), (800,8000), (1,2), (2,6,6,24), 3, (4,7), 0, 0, 0, (1,8), None),
+    AT("generator load bank (resistive)", ["generic-mech","generic-elec","caterpillar","cummins"], (15,25), (2,8), (8,12,20,32), (5000,80000), (1,1), (1,2,2,4), 2, (2,4), 1, 0, 0, (200,3000), "kw"),
+    AT("genset coolant pump", ["caterpillar","cummins","mtu","generic-mech"], (6,12), (4,12), (6,10,18,28), (1200,12000), (1,2), (2,6,6,24), 3, (3,6), 1, 0, 0, (15,80), "kw"),
+    AT("genset radiator core", ["caterpillar","cummins","mtu","generic-mech"], (8,15), (8,32), (8,14,24,36), (3000,25000), (1,1), (2,6,6,24), 2, (3,6), 1, 0, 0, (100,600), None),
+    AT("genset fuel injector / common-rail", ["caterpillar","cummins","mtu","donaldson","generic-mech"], (5,10), (4,16), (8,14,24,36), (2000,20000), (1,4), (2,8,8,32), 3, (3,6), 1, 0, 0, (5,40), None),
+    AT("fuel-level transmitter / float switch", ["caterpillar","cummins","generic-mech","generic-fluid"], (5,10), (1,4), (2,4,8,14), (200,3000), (1,4), (2,6,6,24), 4, (3,6), 0, 0, 0, (0.2,3), None),
+    AT("fuel-tank leak-detection sensor", ["generic-elec","honeywell","generic-fluid"], (8,14), (1,4), (2,4,8,14), (200,3000), (1,4), (2,6,6,24), 4, (4,7), 0, 0, 0, (0.2,3), None),
+    # COOLING — chiller additions
+    AT("chiller oil filter / purge unit", ["carrier","trane","daikin","johnson-controls","generic-fluid"], (3,8), (2,8), (2,6,12,18), (300,5000), (1,4), (4,12,12,40), 4, (3,6), 0, 0, 1, (2,20), None),
+    AT("chiller refrigerant relief valve", ["carrier","trane","daikin","spirax-sarco","generic-fluid"], (15,25), (2,8), (4,8,14,22), (500,6000), (1,2), (2,6,6,20), 3, (3,6), 0, 0, 1, (1,8), None),
+    # COOLING — cooling tower additions
+    AT("cooling-tower spray nozzle / distribution header", ["spx-cooling","baltimore-aircoil","evapco","spraying-systems","generic-fluid"], (5,10), (2,8), (2,4,8,14), (30,800), (4,40), (8,40,40,200), 5, (2,4), 0, 0, 0, (0.1,3), None),
+    AT("cooling-tower basin heater", ["generic-elec","spx-cooling","baltimore-aircoil"], (5,10), (2,6), (2,4,8,14), (300,3000), (1,4), (2,6,6,24), 4, (2,4), 0, 0, 0, (3,20), "kw"),
+    AT("cooling-tower vibration switch", ["spx-cooling","baltimore-aircoil","honeywell","generic-elec"], (8,15), (1,4), (2,4,8,14), (200,2500), (1,4), (2,6,6,24), 4, (3,6), 0, 0, 0, (0.2,2), None),
+    AT("cooling-tower water-treatment dosing pump", ["grundfos","marlo-culligan","generic-fluid","generic-mech"], (5,10), (2,8), (4,8,14,22), (500,6000), (1,2), (1,4,4,16), 3, (3,6), 1, 0, 1, (5,30), "kw"),
+    AT("plate-HX cleaning-in-place (CIP) skid", ["alfa-laval","kelvion","xylem","generic-fluid"], (10,20), (4,16), (8,14,24,36), (5000,40000), (1,1), (1,2,2,6), 2, (2,4), 1, 0, 1, (80,400), None),
+    # COOLING — air additions
+    AT("CRAC reheat element / condensate pump", ["stulz","vertiv","schneider","generic-elec","generic-mech"], (4,8), (1,6), (2,6,12,18), (300,5000), (1,4), (4,16,16,60), 4, (3,6), 0, 0, 0, (2,15), "kw"),
+    AT("AHU heat-recovery wheel / UV-C lamp", ["munters","stulz","carrier","generic-mech"], (5,12), (4,16), (6,10,18,28), (2000,25000), (1,2), (1,4,4,16), 3, (3,6), 1, 0, 0, (20,200), None),
+    AT("perimeter CRAH valve actuator", ["belimo","danfoss","johnson-controls","generic-elec"], (8,14), (1,4), (2,4,8,14), (100,2000), (2,12), (8,40,40,200), 5, (2,5), 0, 0, 0, (0.2,3), None),
+    AT("rear-door HX fan / coil cleaning kit", ["rittal","motivair","stulz","generic-mech","generic-fluid"], (4,8), (1,6), (2,4,8,14), (100,2500), (1,8), (4,16,16,80), 4, (3,6), 0, 0, 0, (1,15), None),
+    # COOLING — liquid (AI factory) deep additions
+    AT("secondary CDU pump", ["coolit","asetek","motivair","grundfos","xylem"], (6,10), (3,12), (8,12,20,32), (4000,30000), (1,2), (2,6,6,24), 2, (3,6), 1, 0, 0, (12,70), "kw"),
+    AT("CDU expansion tank / accumulator", ["taco","bell-gossett","xylem","generic-fluid","coolit"], (10,20), (2,8), (4,8,14,22), (500,6000), (1,2), (2,6,6,24), 3, (2,5), 1, 0, 0, (5,30), None),
+    AT("CDU filtration cartridge (5µm/50µm)", ["coolit","asetek","parker","donaldson","generic-fluid"], (0.3,1), (0.5,2), (1,2,4,8), (50,600), (4,40), (10,40,40,200), 5, (2,4), 0, 0, 0, (0.2,2), None),
+    AT("CDU flow control valve", ["belimo","danfoss","coolit","spirax-sarco","generic-fluid"], (8,14), (2,8), (4,8,14,22), (500,6000), (1,4), (2,8,8,30), 3, (3,6), 0, 0, 0, (1,8), None),
+    AT("CDU coolant chemistry sensor", ["packet-power","honeywell","coolit","generic-elec"], (4,8), (1,4), (4,8,14,22), (300,4000), (1,4), (2,8,8,30), 3, (5,8), 0, 0, 0, (0.2,2), None),
+    AT("cold-plate gasket / O-ring kit", ["coolit","asetek","parker","swagelok","generic-fluid"], (1.5,4), (0.5,3), (1,2,6,10), (30,500), (4,40), (50,500,500,5000), 5, (3,6), 0, 0, 0, (0.05,0.5), None),
+    AT("manifold quick-disconnect blanking plug", ["staubli","cpc-colder","parker","coolit","generic-fluid"], (8,15), (0.5,2), (2,4,8,14), (20,400), (4,100), (100,1000,1000,10000), 5, (2,4), 0, 1, 0, (0.05,0.3), None),
+    AT("dielectric fluid (bulk, per-litre)", ["3m-novec","engineered-fluids","grc","submer","liquidstack"], (1,3), (1,4), (2,4,8,14), (20,120), (20,200), (50,500,500,5000), 4, (3,6), 0, 0, 1, (0.9,1.0), None),
+    AT("immersion-tank lid seal / gasket", ["grc","submer","liquidstack","iceotope","generic-fluid"], (3,8), (1,6), (4,8,14,22), (100,2000), (1,8), (4,20,20,80), 3, (4,7), 0, 0, 0, (0.5,8), None),
+    AT("immersion fluid filtration cartridge", ["grc","submer","3m-novec","donaldson","generic-fluid"], (0.5,2), (1,4), (2,4,8,14), (80,1000), (2,20), (4,20,20,80), 4, (3,6), 0, 0, 0, (0.3,3), None),
+    # COOLING — hydronics (deep additions)
+    AT("vertical inline pump (VIL)", ["grundfos","xylem","armstrong","wilo","ksb","goulds-itt"], (8,15), (6,24), (6,10,18,28), (3000,30000), (1,2), (2,8,8,24), 3, (3,6), 1, 0, 0, (40,250), "kw"),
+    AT("double-suction split-case pump", ["goulds-itt","xylem","flowserve","ksb","grundfos"], (10,18), (8,32), (8,14,24,36), (8000,80000), (1,1), (1,4,4,12), 2, (3,6), 1, 0, 0, (200,2000), "kw"),
+    AT("submersible sump pump", ["grundfos","xylem","franklin","generic-mech","generic-fluid"], (5,10), (2,8), (2,6,12,18), (300,5000), (1,4), (2,6,6,20), 4, (2,5), 1, 0, 0, (8,60), "kw"),
+    AT("pump coupling / flexible spider", ["generic-mech","xylem","grundfos","flowserve"], (2,6), (1,4), (1,3,6,10), (50,1000), (2,20), (4,16,16,80), 5, (2,4), 0, 0, 0, (0.2,5), None),
+    AT("check valve (silent/spring-loaded)", ["watts-water","apollo-valves","victaulic","spirax-sarco","generic-fluid"], (15,25), (2,8), (2,4,8,14), (100,3000), (1,8), (4,16,16,80), 5, (2,4), 0, 0, 0, (0.5,15), None),
+    AT("pressure relief valve (hydronic ASME)", ["spirax-sarco","watts-water","apollo-valves","generic-fluid"], (10,20), (1,4), (2,4,8,14), (80,2500), (1,8), (4,16,16,60), 5, (2,4), 0, 0, 0, (0.3,8), None),
+    AT("backflow preventer (RP / DC type)", ["watts-water","apollo-valves","victaulic","generic-fluid"], (10,20), (2,8), (2,6,12,18), (200,5000), (1,4), (2,8,8,30), 4, (2,5), 0, 0, 0, (1,20), None),
+    AT("flexible pipe connector / expansion joint", ["victaulic","generic-fluid","generic-mech"], (10,20), (2,8), (2,6,12,18), (100,3000), (2,12), (4,16,16,80), 5, (2,4), 0, 0, 0, (0.5,15), None),
+    AT("pipe spring hanger / support", ["generic-mech","nvent","generic-fluid"], (20,40), (1,4), (2,4,8,14), (30,600), (4,40), (10,80,80,400), 5, (1,3), 0, 0, 0, (0.3,8), None),
+    # FIRE-LIFE-SAFETY — new archetypes
+    AT("linear heat detection cable", ["honeywell","bosch-fire","tyco-fire","generic-elec"], (10,20), (2,8), (4,8,14,22), (200,5000), (1,4), (4,20,20,80), 3, (4,7), 0, 0, 0, (0.2,5), None),
+    AT("beam smoke detector", ["honeywell","bosch-fire","xtralis","generic-elec"], (8,15), (2,6), (4,8,14,22), (800,6000), (1,2), (4,16,16,60), 3, (4,7), 0, 0, 0, (0.5,4), None),
+    AT("flame detector (UV/IR)", ["honeywell","bosch-fire","generic-elec"], (8,14), (2,6), (4,8,14,22), (500,5000), (1,2), (2,8,8,30), 3, (4,7), 0, 0, 0, (0.5,3), None),
+    AT("duct smoke detector", ["honeywell","bosch-fire","tyco-fire","generic-elec"], (8,14), (1,4), (2,6,10,16), (100,1500), (2,12), (8,40,40,200), 4, (3,6), 0, 0, 0, (0.1,1), None),
+    AT("sounder / strobe (NAC device)", ["honeywell","bosch-fire","tyco-fire","generic-elec"], (8,14), (0.5,2), (2,6,10,16), (30,500), (4,40), (20,100,100,600), 5, (2,5), 0, 0, 0, (0.1,1), None),
+    AT("fire-pump test header / flow meter", ["pentair-fire","viking-fire","generic-fluid","generic-mech"], (15,25), (2,8), (6,10,18,28), (1000,12000), (1,1), (1,2,2,4), 2, (2,4), 0, 0, 0, (10,80), None),
+    AT("pre-action air compressor / nitrogen generator", ["generic-mech","generic-elec","pentair-fire"], (5,10), (2,8), (4,8,14,22), (1500,15000), (1,1), (1,2,2,6), 2, (3,6), 1, 0, 0, (30,200), "kw"),
+    AT("fire-panel SLC isolator / relay module", ["honeywell","bosch-fire","tyco-fire","kidde","generic-elec"], (10,18), (1,4), (4,8,14,22), (100,1200), (2,20), (8,60,60,300), 5, (3,6), 0, 0, 0, (0.05,0.5), None),
+    AT("EVAC amplifier / voice alarm module", ["honeywell","bosch-fire","generic-elec"], (8,15), (2,8), (6,10,18,28), (1000,12000), (1,2), (2,8,8,30), 3, (4,7), 0, 0, 0, (1,8), None),
+    AT("VESDA aspirating-pipe sampling filter (consumable)", ["xtralis","honeywell","bosch-fire","generic-mech"], (0.5,1.5), (0.5,2), (1,2,4,8), (10,200), (4,40), (8,40,40,200), 5, (2,4), 0, 0, 0, (0.01,0.2), None),
+    # NETWORK-ICT — new archetypes
+    AT("spine chassis line card / fabric module", ["arista","cisco","juniper","nvidia","hpe"], (8,14), (1,4), (6,12,20,32), (5000,80000), (1,2), (4,16,16,80), 2, (4,7), 1, 0, 0, (3,20), None),
+    AT("AOC / DAC direct-attach cable", ["arista","cisco","corning","afl-ofs","generic-elec"], (10,20), (0.2,1), (1,3,6,10), (30,800), (4,40), (40,200,200,2000), 5, (2,4), 0, 0, 0, (0.1,1), None),
+    AT("fiber pigtail / splice tray", ["corning","commscope","afl-ofs","panduit","leviton"], (20,40), (0.5,2), (1,3,6,10), (10,300), (4,40), (20,100,100,600), 5, (1,3), 0, 0, 0, (0.05,1), None),
+    AT("MPO-MPO trunk / LC duplex patch cord", ["corning","commscope","panduit","siemon","belden"], (20,40), (0.2,1), (1,2,4,8), (15,400), (4,100), (40,200,200,2000), 5, (1,3), 0, 0, 0, (0.05,1), None),
+    AT("PTP grandmaster / timing appliance", ["cisco","arista","honeywell","generic-elec"], (8,14), (1,4), (8,14,24,36), (3000,25000), (1,2), (2,8,8,30), 2, (4,7), 0, 0, 0, (2,10), None),
+    AT("out-of-band cellular gateway", ["cisco","generic-elec","honeywell"], (5,10), (1,4), (2,4,8,14), (200,3000), (1,4), (2,8,8,40), 4, (3,6), 0, 0, 0, (0.2,2), None),
+    AT("WDM mux/demux module", ["corning","commscope","afl-ofs","marvell-tech","generic-elec"], (15,25), (1,4), (4,8,14,22), (500,8000), (1,8), (4,20,20,100), 3, (3,6), 0, 0, 0, (0.2,3), None),
+    # BMS-CONTROLS — new archetypes
+    AT("I/O expansion module (DI/DO/AI/AO)", ["siemens","schneider","honeywell","distech","tridium","generic-elec"], (8,14), (1,4), (4,8,14,22), (200,4000), (1,4), (4,20,20,100), 4, (4,7), 0, 0, 0, (0.3,3), None),
+    AT("building controller UPS / power supply", ["vertiv","schneider","eaton","generic-elec"], (6,12), (1,4), (2,6,12,18), (200,5000), (1,4), (2,8,8,30), 4, (3,6), 1, 0, 0, (1,10), "kw"),
+    AT("CO2 / air-quality sensor", ["honeywell","distech","belimo","generic-elec"], (4,8), (0.5,2), (2,4,8,14), (80,1500), (2,20), (8,40,40,200), 5, (2,4), 0, 0, 0, (0.1,1), None),
+    AT("differential-pressure transmitter (room/containment)", ["belimo","danfoss","honeywell","generic-elec"], (6,12), (1,4), (2,4,8,14), (100,2000), (2,12), (8,40,40,200), 4, (3,6), 0, 0, 0, (0.1,2), None),
+    AT("current transducer (sub-metering)", ["schneider","camille-bauer","packet-power","generic-elec"], (8,14), (1,3), (2,4,8,14), (30,600), (4,40), (16,80,80,400), 5, (2,4), 0, 0, 0, (0.1,1), None),
+    AT("field-bus repeater (RS-485/MS-TP)", ["tridium","distech","generic-elec"], (8,14), (1,3), (2,4,8,14), (80,1200), (1,4), (4,20,20,80), 4, (3,6), 0, 0, 0, (0.1,1), None),
+    AT("SCADA HMI panel PC", ["siemens","schneider","honeywell","generic-elec"], (5,10), (2,8), (6,10,18,28), (1500,15000), (1,2), (2,8,8,30), 3, (5,8), 0, 0, 0, (2,12), None),
+    # STRUCTURAL-CIVIL — new archetypes
+    AT("perforated floor tile with damper", ["generic-mech","nvent","chatsworth"], (15,30), (0.5,2), (2,4,8,14), (60,600), (4,100), (100,1000,1000,10000), 5, (1,3), 1, 1, 0, (4,18), None),
+    AT("cabinet blanking panel (1U/2U)", ["rittal","chatsworth","panduit","nvent","generic-mech"], (20,40), (0.1,0.5), (1,2,4,8), (5,60), (8,200), (100,2000,2000,20000), 5, (1,2), 0, 1, 0, (0.1,0.5), None),
+    AT("cabinet earthing / bonding kit", ["nvent","panduit","generic-elec","generic-mech"], (20,40), (0.5,2), (1,3,6,10), (20,300), (4,40), (50,500,500,5000), 5, (1,3), 0, 0, 0, (0.3,5), None),
+    AT("cable basket (wire mesh tray) / divider", ["nvent","legrand","panduit","generic-mech"], (20,40), (0.5,2), (1,4,8,14), (20,400), (4,100), (20,200,200,2000), 5, (1,3), 0, 0, 0, (1,15), None),
+    AT("trapeze hanger / spring vibration isolator", ["nvent","generic-mech"], (20,40), (0.5,2), (2,4,8,14), (30,500), (4,40), (20,200,200,2000), 5, (1,3), 0, 0, 0, (0.5,12), None),
+    # MONITORING — new archetypes
+    AT("rack temperature string (multi-point)", ["packet-power","vertiv","schneider","generic-elec"], (5,10), (0.5,2), (1,3,6,10), (50,1000), (4,40), (20,100,100,600), 5, (2,4), 0, 0, 0, (0.1,1), None),
+    AT("under-floor zoned leak rope", ["packet-power","honeywell","generic-elec"], (5,10), (1,4), (2,4,8,14), (200,4000), (1,8), (4,20,20,100), 4, (3,6), 0, 0, 0, (0.2,5), None),
+    AT("thermal imaging camera (rack hot-spot)", ["honeywell","generic-elec"], (4,8), (1,4), (4,8,14,22), (1000,15000), (1,2), (2,8,8,30), 3, (3,6), 0, 0, 0, (0.5,5), None),
+    AT("power-quality analyzer (portable)", ["camille-bauer","schneider","abb","generic-elec"], (6,12), (1,4), (4,8,14,22), (2000,25000), (1,2), (1,4,4,16), 3, (3,6), 0, 0, 0, (2,15), None),
+    AT("UPS battery monitor (per-cell)", ["vertiv","schneider","eaton","packet-power","generic-elec"], (6,12), (1,4), (4,8,14,22), (50,1500), (2,20), (4,20,20,100), 4, (4,7), 0, 0, 0, (0.05,0.5), None),
+    AT("vibration sensor (rotating equipment)", ["packet-power","honeywell","generic-elec"], (5,10), (1,4), (2,4,8,14), (100,3000), (2,12), (4,20,20,100), 4, (3,6), 0, 0, 0, (0.1,2), None),
+    AT("ultrasonic clamp-on flow meter", ["camille-bauer","honeywell","danfoss","generic-elec"], (6,12), (1,4), (4,8,14,22), (500,8000), (1,4), (2,8,8,30), 3, (3,6), 0, 0, 0, (0.5,5), None),
+    AT("transformer dissolved-gas analyzer (DGA)", ["abb","siemens","ge-grid","honeywell","generic-elec"], (6,12), (2,8), (8,14,24,36), (3000,30000), (1,1), (1,4,4,16), 2, (5,8), 0, 0, 0, (5,30), None),
 ]
 
 # Failure-mode pools keyed loosely by subsystem family
@@ -500,19 +713,19 @@ FM_POOLS = {
 
 def fm_pool_for(subsystem: str, l3: str) -> str:
     s = (subsystem + " " + l3).lower()
-    if any(k in s for k in ["cdu","cold plate","manifold","quick-disconnect","immersion","direct-to-chip","dielectric","coolant"]):
+    if any(k in s for k in ["cdu","cold plate","manifold","quick-disconnect","immersion","direct-to-chip","dielectric","coolant","blanking plug","filtration cartridge","gasket","o-ring"]):
         return "cooling-liquid"
     if any(k in s for k in ["compressor","chiller"]):
         return "compressor"
-    if any(k in s for k in ["pump","fan","motor","gearbox","turbocharger","alternator"]):
+    if any(k in s for k in ["pump","fan","motor","gearbox","turbocharger","alternator","coupling","spider","load bank","radiator core"]):
         return "rotating"
-    if any(k in s for k in ["ups","switchgear","transformer","breaker","ats","sts","busway","pdu","battery","capacitor","relay","rectifier","igbt","power-meter"]):
+    if any(k in s for k in ["ups","switchgear","transformer","breaker","ats","sts","busway","pdu","battery","capacitor","relay","rectifier","igbt","power-meter","avr","harmonic filter","spd","tvss","rmu","oltc","bus-tie","arc-flash"]):
         return "power"
-    if any(k in s for k in ["valve","heat-exchanger","strainer","gasket","pipe","tank","fitting","hx"]):
+    if any(k in s for k in ["valve","heat-exchanger","strainer","gasket","pipe","tank","fitting","hx","expansion joint","spring hanger","backflow","nozzle header","dosing pump","cip skid","spray nozzle","sump","injector","level transmitter","float switch","leak-detection sensor","oil filter","purge","relief"]):
         return "fluid"
-    if any(k in s for k in ["vesda","sprinkler","clean-agent","fire-pump","fire-panel","suppression","deluge","detector","cylinder","nozzle"]):
+    if any(k in s for k in ["vesda","sprinkler","clean-agent","fire-pump","fire-panel","suppression","deluge","detector","cylinder","sounder","strobe","evac","aspiration","beam smoke","flame detector","duct smoke","linear heat","isolator module"]):
         return "fire"
-    if any(k in s for k in ["board","controller","plc","gateway","rtu","hmi","ldc","sensor","actuator","panel","display","transceiver","switch","module"]):
+    if any(k in s for k in ["board","controller","plc","gateway","rtu","hmi","ldc","sensor","actuator","panel","display","transceiver","switch","module","snmp","monitoring strip","i/o expansion","timing","dga","vibration sensor","flow meter","power-quality","battery monitor","temperature string","leak rope","thermal imaging","cellular gateway"]):
         return "electronic"
     return "generic"
 
@@ -607,6 +820,16 @@ def gen_model_family(rng, oem_id):
         "honeywell":["NOTIFIER","Gamewell","ComfortPoint","WEBs"],"tridium":["JACE","Niagara"],
         "arista":["7280R3","7050X4","7800R3"],"cisco":["Nexus 9000","Nexus 3000","Catalyst"],
         "corning":["EDGE8","SYSTIMAX","Pretium"],"commscope":["SYSTIMAX","Propel","HD"],
+        "staubli":["RBE","SPI","RC","KDP"],"cpc-colder":["SS","SQ","NS","PMC"],
+        "goulds-itt":["e-1510","ANSI-1511","AF","3657"],"ksb":["EtaLine","Etanorm","ZETA","Delta"],
+        "flowserve":["Durco","Mark 3","Valtek","SIHI"],"watts-water":["LF25AUB","Series 009","LFBV","Series N600"],
+        "apollo-valves":["77C-200","70-100","Serie 3000","S1C"],"spraying-systems":["UniJet","FullJet","Veejet","WhirlJet"],
+        "marlo-culligan":["Softener Series","WS4","Twin-Alt","HiFlow"],"donaldson":["Torit","P-Series","Ultra-Web","SRF"],
+        "mann-hummel":["H Series","WK","W","PU"],"3m-novec":["Novec 1230","Novec 7100","Novec 7200","Novec 649"],
+        "engineered-fluids":["BioNovaTek EC-110","ElectriCool EC-100","EC-55","EC-250"],
+        "afl-ofs":["Riser Bundle","AFL-FS","OFS TrueWave","AFL OPGW"],
+        "belden":["Bonded Pair","9697","DataTwist 350","7964E"],"siemon":["Z-MAX","TERA","MAP","HD-MAX"],
+        "marvell-tech":["COLORZ-II","ALASKA C","Prestera","Octeon"],
     }
     return rng.choice(fams.get(oem_id, ["Series " + str(rng.randint(100,9000)), "Pro", "X", "DC"]))
 
@@ -821,7 +1044,7 @@ def write_js_catalog(parts_rows):
         for r in rows[:2]:
             curated.append(r)
     rng.shuffle(curated)
-    curated = curated[:360]
+    curated = curated[:445]
     curated = sorted(curated, key=lambda r: (r[5], r[6], r[2], r[0]))
     # compact records (drop verbose notes/source_basis to keep size down)
     def rec(r):

@@ -657,6 +657,10 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   .catalog-filter-group { width: 100%; }
   .catalog-filter-select { max-width: 100%; }
 }
+/* ── METHODOLOGY NOTE ── */
+.method-note { max-width: 1100px; margin: 2rem auto 0; padding: 0.75rem 2rem; font-size: 0.72rem; color: #64748b; line-height: 1.6; text-align: center; border-top: 1px solid rgba(148,163,184,0.12); }
+[data-theme="dark"] .method-note { color: #475569; border-top-color: rgba(255,255,255,0.06); }
+@media (max-width: 768px) { .method-note { padding: 0.75rem 1rem; font-size: 0.68rem; } }
 </style>
 <script src="js/rz-version.js?v=2026-05-09" defer></script>
 <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -2616,6 +2620,13 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   </div>
 </div>
 
+<!-- Methodology note -->
+<div class="method-note" id="methodNote">
+  Models: FMECA (MIL-STD-1629A) &middot; METRIC/VARI-METRIC (Sherbrooke/Slay) &middot; newsvendor critical-fractile &middot; Kraljic matrix (HBR&nbsp;1983) &middot; DMSMS lifecycle &middot; MEIO.
+  Catalog data vintage: 2026-Q1 &middot; <span id="methodNoteCatalogCount">445</span> curated parts from a ~1,400-row database.
+  Illustrative &mdash; not a substitute for a full supply-chain analysis.
+</div>
+
 <!-- Footer -->
 <footer class="site-footer">
   <div class="footer-grid">
@@ -3026,10 +3037,10 @@ var MODULE_RESET_DEFAULTS = {
     sr_geopolitical: '6', sr_contract: 'sow', sr_spend_impact: '7'
   },
   ltb: {
-    ltb_support_yrs: '8', ltb_demand_yr: '0.4', ltb_onhand: '1',
+    ltb_support_yrs: '8', ltb_demand_yr: '1.2', ltb_onhand: '1',
     ltb_open_po: '0', ltb_unit_cost: '4500', ltb_carry_rate: '25',
     ltb_scrap_risk: '20', ltb_alt_qual_cost: '120000', ltb_alt_qual_lt: '18',
-    ltb_discount: '0', ltb_criticality: '8', ltb_qual_alternates: '0'
+    ltb_discount: '8', ltb_criticality: '8', ltb_qual_alternates: '0'
   },
   kraljic: {
     kq_supply_risk: '7', kq_spend_impact: '8', kq_criticality: '8',
@@ -5934,6 +5945,9 @@ faqData.push(
       catRenderOems(CAT);
       catRenderFacilityTypes(CAT);
       catUpdateHeader(CAT);
+      // Update methodology note with live catalog count
+      var mCount = document.getElementById('methodNoteCatalogCount');
+      if (mCount) mCount.textContent = CAT.parts.length;
       catState.initialized = true;
     }
     catApplyFilters();
