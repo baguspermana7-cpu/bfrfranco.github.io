@@ -3,12 +3,15 @@
  * Replaces ~20 local duplicates across dashboard components.
  */
 
-/** Compact number with locale grouping: 1234 → "1,234", 1500000 → "1.5M" */
+/** Compact number with locale grouping: 1234 → "1,234". Returns "N/A" if non-finite. */
 export const fmt = (n: number, dec = 0): string =>
-    new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n);
+    Number.isFinite(n)
+        ? new Intl.NumberFormat('en-US', { maximumFractionDigits: dec }).format(n)
+        : 'N/A';
 
-/** Money with compact abbreviation: 1500000 → "$1.5M", 1200 → "$1,200" */
+/** Money with compact abbreviation: 1500000 → "$1.5M", 1200 → "$1,200". Returns "N/A" if non-finite. */
 export const fmtMoney = (n: number): string => {
+    if (!Number.isFinite(n)) return 'N/A';
     const abs = Math.abs(n);
     const sign = n < 0 ? '-' : '';
     if (abs >= 1_000_000_000) return `${sign}$${(abs / 1_000_000_000).toFixed(2)}B`;
@@ -21,8 +24,9 @@ export const fmtMoney = (n: number): string => {
 export const fmtMoneyFull = (n: number): string =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
-/** Compact number without $ sign: 1500000 → "1.5M", 800 → "800" */
+/** Compact number without $ sign: 1500000 → "1.5M", 800 → "800". Returns "N/A" if non-finite. */
 export const fmtCompact = (n: number): string => {
+    if (!Number.isFinite(n)) return 'N/A';
     const abs = Math.abs(n);
     const sign = n < 0 ? '-' : '';
     if (abs >= 1_000_000_000) return `${sign}${(abs / 1_000_000_000).toFixed(2)}B`;
@@ -35,8 +39,9 @@ export const fmtCompact = (n: number): string => {
 export const fmtUnit = (n: number, unit: string): string =>
     `${fmtCompact(n)} ${unit}`;
 
-/** Percentage: fmtPct(15.3) → "15.3%", fmtPct(0.153, 1, true) → "15.3%" (if ratio) */
-export const fmtPct = (n: number, dec = 1): string => `${n.toFixed(dec)}%`;
+/** Percentage: fmtPct(15.3) → "15.3%". Returns "N/A" if non-finite. */
+export const fmtPct = (n: number, dec = 1): string =>
+    Number.isFinite(n) ? `${n.toFixed(dec)}%` : 'N/A';
 
 /** kW/MW: fmtKw(1500) → "1.5 MW", fmtKw(800) → "800 kW" */
 export const fmtKw = (n: number): string =>

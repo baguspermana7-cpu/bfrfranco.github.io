@@ -104,13 +104,13 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" /> Financial Exposure <Tooltip content="Estimated annual cost of downtime events based on expected outage minutes x $5,000/min business impact." />
+                        <DollarSign className="w-3 h-3" /> Financial Exposure <Tooltip content="Estimated annual cost of downtime events based on expected outage minutes × tier-adjusted cost per minute (Uptime Institute 2025 benchmarks)." />
                     </div>
                     <div className="text-3xl font-bold text-red-600 dark:text-red-400">
-                        ${(downtime.financialImpact / 1000).toFixed(0)}k
+                        ${Number.isFinite(downtime.financialImpact) ? (downtime.financialImpact / 1000).toFixed(0) : '—'}k
                     </div>
                     <div className="text-xs text-slate-500 mt-1">
-                        @ $5k/min × {downtime.expectedDowntimeMinutes} min/yr
+                        @ ${(downtime.costPerMinute / 1000).toFixed(1)}k/min × {downtime.expectedDowntimeMinutes} min/yr
                     </div>
                 </div>
 
@@ -301,7 +301,7 @@ export default function RiskDashboard() {
                         <div className="bg-white dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
                             <div className="text-[10px] text-slate-500 uppercase">Financial Impact</div>
                             <div className="text-xl font-bold text-red-600 dark:text-red-400">
-                                ${(downtime.financialImpact / 1000).toFixed(0)}k
+                                ${Number.isFinite(downtime.financialImpact) ? (downtime.financialImpact / 1000).toFixed(0) : '—'}k
                             </div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400">annual exposure</div>
                         </div>

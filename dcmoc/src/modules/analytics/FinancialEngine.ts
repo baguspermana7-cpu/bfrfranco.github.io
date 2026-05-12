@@ -108,7 +108,9 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
         occupancyRamp, taxRate, depreciationYears
     } = inputs;
 
-    const annualDepreciation = totalCapex / depreciationYears;
+    // Guard: prevent divide-by-zero for depreciation
+    const safeDepYears = Math.max(1, depreciationYears || 15);
+    const annualDepreciation = totalCapex / safeDepYears;
     const cashflows: YearCashflow[] = [];
     const irrCashflows: number[] = [-totalCapex]; // Year 0 = investment
 
@@ -125,7 +127,7 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
         const occupancy = occupancyRamp[y] ?? 0.95;
         const yearRevenue = revenuePerKwMonth * 12 * itLoadKw * occupancy * Math.pow(1 + escalationRate, y);
         const yearOpex = annualOpex * Math.pow(1 + opexEscalation, y);
-        const depreciation = y < depreciationYears ? annualDepreciation : 0;
+        const depreciation = y < safeDepYears ? annualDepreciation : 0;
 
         const ebitda = yearRevenue - yearOpex;
         const taxableIncome = Math.max(0, ebitda - depreciation);
@@ -182,11 +184,11 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
     // IRR
     const irr = calculateIRR(irrCashflows) * 100; // as percentage
 
-    // ROI
-    const roi = ((totalProfit - totalCapex) / totalCapex) * 100;
+    // ROI — guard against zero capex
+    const roi = totalCapex > 0 ? ((totalProfit - totalCapex) / totalCapex) * 100 : 0;
 
-    // Profitability Index
-    const pi = (npv + totalCapex) / totalCapex;
+    // Profitability Index — guard against zero capex
+    const pi = totalCapex > 0 ? (npv + totalCapex) / totalCapex : 1;
 
     // Break-even occupancy (find min occupancy where annual revenue > opex)
     const baseAnnualRevenue = revenuePerKwMonth * 12 * itLoadKw;

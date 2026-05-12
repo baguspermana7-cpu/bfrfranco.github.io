@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { COUNTRIES, CountryProfile } from '@/constants/countries';
 
-interface SimulationState {
+export interface SimulationState {
     selectedCountry: CountryProfile | null;
     inputs: {
         tierLevel: 2 | 3 | 4;

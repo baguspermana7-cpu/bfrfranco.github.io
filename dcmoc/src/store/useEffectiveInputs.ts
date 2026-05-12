@@ -7,7 +7,7 @@ import { calculateAutoHeadcount } from '@/modules/staffing/ShiftEngine';
  * Use this hook in any dashboard that depends on headcount values for consistent results.
  */
 export function useEffectiveInputs() {
-    const { inputs, selectedCountry } = useSimulationStore();
+    const inputs = useSimulationStore((s) => s.inputs);
 
     return useMemo(() => {
         if (!inputs.staffingAutoMode) return inputs;
@@ -30,5 +30,5 @@ export function useEffectiveInputs() {
             headcount_Admin: auto.headcounts['admin'],
             headcount_Janitor: auto.headcounts['janitor'],
         };
-    }, [inputs, selectedCountry]);
+    }, [inputs]);
 }

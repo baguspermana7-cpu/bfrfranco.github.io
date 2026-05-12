@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import type { SimulationState } from './simulation';
+import type { CapexStore } from './capex';
 
 // ─── TYPES ──────────────────────────────────────────────────
 export interface SavedScenario {
@@ -6,8 +8,8 @@ export interface SavedScenario {
     name: string;
     timestamp: number;
     countryId: string;
-    simInputs: Record<string, any>;
-    capexInputs: Record<string, any>;
+    simInputs: SimulationState['inputs'];
+    capexInputs: CapexStore['inputs'];
     // Computed summary for quick display
     summary: {
         monthlyOpex: number;

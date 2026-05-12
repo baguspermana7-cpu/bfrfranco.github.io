@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { CapexInput, CapexResult, calculateCapex, generateCapexNarrative } from '../lib/CapexEngine';
 
-interface CapexStore {
+export interface CapexStore {
     currentModel: 'simple' | 'advanced';
     inputs: CapexInput;
     results: CapexResult | null;

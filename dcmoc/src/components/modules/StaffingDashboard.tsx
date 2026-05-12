@@ -18,6 +18,7 @@ import { RosterVisualizer } from '@/components/visualizations/RosterVisualizer';
 import { CostWaterfall } from '@/components/visualizations/CostWaterfall';
 import { WorkOrderView } from '@/components/modules/WorkOrderView';
 import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
+import type { ReportInsight } from '@/modules/reporting/NarrativeEngine';
 
 export function StaffingDashboard() {
     const { selectedCountry, inputs, actions } = useSimulationStore();
@@ -42,7 +43,8 @@ export function StaffingDashboard() {
     const results = useMemo(() => {
         if (!selectedCountry) return null;
 
-        const roleConfigs: { role: StaffRole; qtyKey: string; is24x7: boolean; label: string }[] = [
+        type HeadcountKey = 'headcount_ShiftLead' | 'headcount_Engineer' | 'headcount_Technician' | 'headcount_Admin' | 'headcount_Janitor';
+        const roleConfigs: { role: StaffRole; qtyKey: HeadcountKey; is24x7: boolean; label: string }[] = [
             { role: 'shift-lead', qtyKey: 'headcount_ShiftLead', is24x7: true, label: 'Team Leaders' },
             { role: 'engineer', qtyKey: 'headcount_Engineer', is24x7: true, label: 'Engineers' },
             { role: 'technician', qtyKey: 'headcount_Technician', is24x7: false, label: 'Technicians' },
@@ -51,7 +53,7 @@ export function StaffingDashboard() {
         ];
 
         const staffingResults: StaffingResult[] = roleConfigs.map(cfg => {
-            const qty = (effectiveInputs as any)[cfg.qtyKey] || 1;
+            const qty = effectiveInputs[cfg.qtyKey] || 1;
             const opModel = inputs.staffingModel === 'outsourced' ? 'vendor' : inputs.staffingModel;
             return calculateStaffing(cfg.role, qty, inputs.shiftModel, selectedCountry, cfg.is24x7, undefined, undefined, opModel, inputs.hybridRatio ?? 0.5);
         });
@@ -64,7 +66,7 @@ export function StaffingDashboard() {
         const shiftComparisons = roleConfigs
             .filter(cfg => cfg.is24x7)
             .map(cfg => {
-                const qty = (inputs as any)[cfg.qtyKey] || 1;
+                const qty = inputs[cfg.qtyKey] || 1;
                 const opModel = inputs.staffingModel === 'outsourced' ? 'vendor' : inputs.staffingModel;
                 return {
                     label: cfg.label,
@@ -206,7 +208,7 @@ export function StaffingDashboard() {
                             setIsExporting(true);
                             try {
                                 const { generateStaffingPDF } = await import('@/modules/reporting/PdfGenerator');
-                                const insights = [
+                                const insights: ReportInsight[] = [
                                     { title: 'Staffing Overview', description: 'Detailed model representation.', category: 'Operational', severity: 'low', recommendation: '' }
                                 ];
                                 await generateStaffingPDF(
@@ -214,12 +216,12 @@ export function StaffingDashboard() {
                                     inputs.shiftModel as string,
                                     results.staffingResults,
                                     results.roster,
-                                    insights as any[],
+                                    insights,
                                     results.shiftComparisons
                                 );
-                            } catch (e: any) {
+                            } catch (e: unknown) {
                                 console.error('Staffing PDF export failed:', e);
-                                alert(`PDF export failed: ${e?.message || 'Unknown error'}`);
+                                alert(`PDF export failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
                             } finally {
                                 setIsExporting(false);
                             }
@@ -271,11 +273,12 @@ export function StaffingDashboard() {
                                 <label className="text-xs text-slate-500 uppercase flex items-center gap-1">{cfg.label} (Direct HC) <Tooltip content={cfg.role === 'shift-lead' ? 'Team leaders managing shift operations and handovers' : cfg.role === 'engineer' ? 'Engineers handling critical infrastructure systems' : cfg.role === 'technician' ? 'Technicians for day-shift maintenance tasks' : cfg.role === 'admin' ? 'Supervisors overseeing daily operations' : 'Facility support staff (cleaning, logistics)'} /></label>
                                 {inputs.staffingAutoMode ? (
                                     <div className="w-full text-sm bg-slate-200 dark:bg-slate-800 border border-cyan-300 dark:border-cyan-800 rounded p-1 text-slate-900 dark:text-white font-bold text-center cursor-not-allowed">
-                                        {(effectiveInputs as any)[cfg.qtyKey]}
+                                        {effectiveInputs[cfg.qtyKey]}
                                     </div>
                                 ) : (
                                     <input type="number" min="1" max="50" className="w-full text-sm bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded p-1 text-slate-900 dark:text-white"
-                                        value={(inputs as any)[cfg.qtyKey]}
+                                        value={inputs[cfg.qtyKey]}
+                                        aria-label={cfg.label}
                                         onChange={(e) => actions.setInputs({ [cfg.qtyKey]: Math.max(1, Number(e.target.value)) })} />
                                 )}
                                 <div className="text-[10px] text-slate-500 dark:text-slate-600">

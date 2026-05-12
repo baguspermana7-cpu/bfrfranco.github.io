@@ -122,8 +122,11 @@ export interface InvestmentResult {
 // ─── PMT FUNCTION ────────────────────────────────────────────
 // Standard annuity payment: debt × r / (1 - (1+r)^-n)
 function pmt(principal: number, rate: number, periods: number): number {
+    if (periods <= 0) return 0;
     if (rate === 0) return principal / periods;
-    return principal * rate / (1 - Math.pow(1 + rate, -periods));
+    const denom = 1 - Math.pow(1 + rate, -periods);
+    if (Math.abs(denom) < 1e-12) return 0; // Prevent divide-by-zero for extreme inputs
+    return principal * rate / denom;
 }
 
 // ─── MAIN CALCULATION ────────────────────────────────────────
@@ -212,8 +215,9 @@ export function calculateInvestment(inputs: InvestmentInputs): InvestmentResult 
         irrCashflows.length = exitIdx + 2;
     }
 
-    // Equity IRR
-    const equityIRR = calculateIRR(irrCashflows, 0.12) * 100;
+    // Equity IRR — guard against non-finite result
+    const rawEquityIRR = calculateIRR(irrCashflows, 0.12) * 100;
+    const equityIRR = Number.isFinite(rawEquityIRR) ? rawEquityIRR : 0;
 
     // MOIC
     const totalDistributions = leveredFCFTable

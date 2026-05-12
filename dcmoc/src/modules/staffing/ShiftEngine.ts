@@ -375,12 +375,12 @@ export const generate5YearProjection = (
         const totalAnnualCost = currentResults.reduce((acc, r) => acc + (r.monthlyCost * 12), 0);
         const totalHeadcount = currentResults.reduce((acc, r) => acc + r.headcount, 0);
 
-        const rolesMap: Record<string, { count: number; cost: number }> = {};
+        const rolesMap = {} as Record<StaffRole, { count: number; cost: number }>;
         currentResults.forEach(r => {
             rolesMap[r.role] = { count: r.headcount, cost: r.monthlyCost * 12 };
         });
 
-        projections.push({ year, totalHeadcount, totalAnnualCost, roles: rolesMap as any });
+        projections.push({ year, totalHeadcount, totalAnnualCost, roles: rolesMap });
 
         currentResults = currentResults.map(r => ({
             ...r,

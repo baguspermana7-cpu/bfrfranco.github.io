@@ -555,14 +555,14 @@ const FinancialDashboard = () => {
                                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">IRR</span><Tooltip content="Internal Rate of Return — the discount rate at which NPV equals zero. Must exceed WACC (hurdle rate) for project approval." />
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                                {result.irr.toFixed(1)}%
-                                {result.irr > finInputs.discountRate * 100
+                                {Number.isFinite(result.irr) ? `${result.irr.toFixed(1)}%` : 'N/A'}
+                                {Number.isFinite(result.irr) && (result.irr > finInputs.discountRate * 100
                                     ? <ArrowUpRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                     : <ArrowDownRight className="w-4 h-4 text-red-600 dark:text-red-400" />
-                                }
+                                )}
                             </div>
                             <div className="text-xs text-slate-500 mt-1">
-                                {result.irr > finInputs.discountRate * 100 ? 'Exceeds hurdle rate' : 'Below hurdle rate'}
+                                {Number.isFinite(result.irr) ? (result.irr > finInputs.discountRate * 100 ? 'Exceeds hurdle rate' : 'Below hurdle rate') : 'Insufficient cashflow data'}
                             </div>
                         </CardContent>
                     </Card>
@@ -583,9 +583,9 @@ const FinancialDashboard = () => {
                                 <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">ROI</span><Tooltip content="Return on Investment — total profit as percentage of initial CAPEX. PI (Profitability Index) = PV of cashflows / investment." />
                             </div>
                             <div className={`text-2xl font-bold ${result.roiPercent > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                                {result.roiPercent.toFixed(0)}%
+                                {Number.isFinite(result.roiPercent) ? `${result.roiPercent.toFixed(0)}%` : 'N/A'}
                             </div>
-                            <div className="text-xs text-slate-500 mt-1">PI: {result.profitabilityIndex.toFixed(2)}x</div>
+                            <div className="text-xs text-slate-500 mt-1">PI: {Number.isFinite(result.profitabilityIndex) ? `${result.profitabilityIndex.toFixed(2)}x` : 'N/A'}</div>
                         </CardContent>
                     </Card>
                 </div>

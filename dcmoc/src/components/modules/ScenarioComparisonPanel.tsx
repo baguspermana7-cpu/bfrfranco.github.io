@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell
 import { GitCompare, X, ArrowLeftRight } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtMoney } from '@/lib/format';
+import type { SimulationState } from '@/store/simulation';
 
 const SCENARIO_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444'];
 
@@ -53,7 +54,7 @@ export function ScenarioComparisonPanel() {
                 };
             }
 
-            const capexResult = calculateCapex(sc.capexInputs as any);
+            const capexResult = calculateCapex(sc.capexInputs);
             const simInputs = sc.simInputs;
             const itLoad = simInputs.itLoad || 2500;
             const shiftModel = simInputs.shiftModel || '8h';
@@ -137,7 +138,7 @@ export function ScenarioComparisonPanel() {
     });
 
     // Input diff: find parameters that differ
-    const inputKeys = ['tierLevel', 'shiftModel', 'staffingModel', 'coolingType', 'powerRedundancy', 'itLoad', 'maintenanceStrategy', 'maintenanceModel'];
+    const inputKeys: (keyof SimulationState['inputs'])[] = ['tierLevel', 'shiftModel', 'staffingModel', 'coolingType', 'powerRedundancy', 'itLoad', 'maintenanceStrategy', 'maintenanceModel'];
     const diffs = inputKeys.filter(key => {
         const vals = compared.map(sc => String(sc.simInputs[key] ?? ''));
         return new Set(vals).size > 1;
@@ -290,8 +291,8 @@ export function ScenarioComparisonPanel() {
                         </thead>
                         <tbody>
                             {diffs.map(key => (
-                                <tr key={key} className="border-b border-slate-100 dark:border-slate-800">
-                                    <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</td>
+                                <tr key={String(key)} className="border-b border-slate-100 dark:border-slate-800">
+                                    <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</td>
                                     {compared.map((sc, i) => {
                                         const val = sc.simInputs[key];
                                         const baseVal = compared[0].simInputs[key];
