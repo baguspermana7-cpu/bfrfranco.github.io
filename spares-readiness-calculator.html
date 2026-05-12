@@ -26,7 +26,7 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Critical Spares Engine | DC M&amp;E Spares Readiness, Sourcing &amp; Obsolescence Calculator</title>
+<title>Critical Spares Engine | DC M&amp;E Spares Readiness Calculator</title>
 <meta name="description" content="Quantify critical-spares readiness, optimal stock levels, supplier risk index, and last-time-buy economics for data-center M&amp;E equipment. FMECA criticality, METRIC/MEIO hub positioning, Kraljic sourcing strategy, DMSMS lifecycle.">
 <meta name="ai-content-declaration" content="human-authored">
 <meta name="keywords" content="critical spares calculator, FMECA criticality, newsvendor model, spare parts optimization, supplier risk index, Kraljic matrix, DMSMS, last-time-buy, data center M&amp;E spares, METRIC VARI-METRIC, spare parts management">
@@ -40,13 +40,15 @@
 <meta property="og:url" content="https://resistancezero.com/spares-readiness-calculator.html">
 <meta property="og:title" content="Critical Spares Engine — DC M&amp;E Spares Readiness &amp; Sourcing Calculator">
 <meta property="og:description" content="Quantify critical-spares readiness, optimal stock levels, supplier risk, and last-time-buy economics for data-center mechanical &amp; electrical equipment.">
-<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<meta property="og:image" content="https://resistancezero.com/assets/og/spares-readiness-calculator.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Critical Spares Engine — DC M&amp;E Spares Readiness Calculator">
 <meta name="twitter:description" content="FMECA criticality, newsvendor stock levels, supplier risk index, Kraljic strategy, DMSMS last-time-buy, Monte-Carlo for data-center M&amp;E spares.">
-<meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<meta name="twitter:image" content="https://resistancezero.com/assets/og/spares-readiness-calculator.webp">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Critical Spares Engine","applicationCategory":"UtilityApplication","description":"Quantify critical-spares readiness, optimal stock levels, supplier risk index, and last-time-buy economics for data-center M&E equipment using FMECA, METRIC/MEIO, Kraljic, and DMSMS methodologies.","url":"https://resistancezero.com/spares-readiness-calculator.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to Assess Critical Spare Parts Readiness for Data Center M&E Equipment","description":"Step-by-step methodology to quantify spare-parts readiness, optimal stock levels, supplier risk, and obsolescence exposure.","totalTime":"PT10M","tool":[{"@type":"HowToTool","name":"Critical Spares Engine Calculator"}],"step":[{"@type":"HowToStep","position":1,"name":"Score Criticality","text":"Enter failure rate, installed base, severity, detectability, and redundancy to get FMECA criticality tier (VITAL/ESSENTIAL/DESIRABLE) and stocking decision."},{"@type":"HowToStep","position":2,"name":"Check Readiness","text":"Enter on-hand inventory, PO qty, supplier commit date vs need date to get readiness % with RED/YELLOW/GREEN status and risk flags."},{"@type":"HowToStep","position":3,"name":"Optimise Stock Level","text":"Input unit cost, demand parameters, lead time, and fill-rate target to compute newsvendor Q*, safety stock, and reorder point."},{"@type":"HowToStep","position":4,"name":"Run Monte-Carlo","text":"Simulate 1,000 scenarios with variable lead time, demand, and supplier reliability to get P(stockout), expected downtime cost, and tornado chart."}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"Critical Spares Engine"}]}</script>
@@ -370,6 +372,42 @@ select.input-field { cursor: pointer; }
 input:checked + .toggle-slider { background: var(--amber); }
 input:checked + .toggle-slider:before { transform: translateX(20px); }
 
+/* Summary Dashboard strip */
+.summary-strip { max-width: 1100px; margin: 0 auto 0; padding: 0 2rem 0.5rem; }
+.summary-strip-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; }
+.summary-strip-title i { color: var(--amber); }
+.summary-kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; }
+.summary-kpi { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.65rem 0.75rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.summary-kpi::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.06) 50%,transparent 70%); transform: translateX(-100%); transition: transform 0.6s ease; }
+.summary-kpi:hover::after { transform: translateX(100%); }
+.summary-kpi:hover { border-color: var(--amber); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.summary-kpi-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
+.summary-kpi-value { font-size: 0.88rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
+.summary-kpi-module { font-size: 0.58rem; color: var(--amber-dark); font-weight: 600; margin-top: 2px; }
+[data-theme="dark"] .summary-kpi { background: rgba(30,41,59,0.7); border-color: rgba(245,158,11,0.12); }
+[data-theme="dark"] .summary-kpi:hover { border-color: var(--amber); }
+
+/* Save/Load scenario bar */
+.scenario-bar { display: flex; align-items: center; gap: 0.5rem; max-width: 1100px; margin: 0 auto 0.5rem; padding: 0 2rem; flex-wrap: wrap; }
+.scenario-bar-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+.btn-scenario { padding: 5px 12px; border: 1px solid rgba(245,158,11,0.3); background: transparent; border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.btn-scenario:hover { background: rgba(245,158,11,0.08); border-color: var(--amber); }
+.btn-scenario.danger { border-color: rgba(239,68,68,0.3); color: #ef4444; }
+.btn-scenario.danger:hover { background: rgba(239,68,68,0.06); }
+.scenario-saved-msg { font-size: 0.68rem; color: var(--status-green); font-weight: 600; opacity: 0; transition: opacity 0.5s; }
+.scenario-saved-msg.show { opacity: 1; }
+[data-theme="dark"] .btn-scenario { color: #fbbf24; }
+
+/* Cross-link bar */
+.crosslink-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+.crosslink-bar-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+.crosslink-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-radius: 50px; font-size: 0.72rem; color: var(--amber-dark); text-decoration: none; font-weight: 600; transition: all 0.2s; }
+.crosslink-pill:hover { background: rgba(245,158,11,0.12); border-color: var(--amber); transform: translateY(-1px); }
+[data-theme="dark"] .crosslink-pill { color: #fbbf24; }
+
+/* Commodity hint note */
+.commodity-hint { font-size: 0.68rem; color: var(--text-muted); font-style: italic; margin-top: 3px; line-height: 1.4; }
+
 /* v1.8.0 — mobile responsive patch */
 @media (max-width: 768px) {
   html, body { overflow-x: hidden; max-width: 100vw; }
@@ -390,6 +428,13 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   .share-buttons { bottom: 60px; top: auto; right: 10px; transform: none; flex-direction: row; }
   .share-btn { width: 34px; height: 34px; font-size: 0.78rem; }
   .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+  .summary-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .summary-strip { padding: 0 1rem 0.5rem; }
+  .scenario-bar { padding: 0 1rem; }
+  .crosslink-bar { padding: 0 1rem; }
+}
+@media (max-width: 480px) {
+  .summary-kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media print { .navbar,.hero,.cookie-banner,footer,.share-buttons { display: none !important; } .main-content { padding-top: 0 !important; } }
 </style>
@@ -480,9 +525,56 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     </div>
   </section>
 
+  <!-- Summary Dashboard strip -->
+  <div class="summary-strip" id="summaryStrip">
+    <div class="summary-strip-title"><i class="fas fa-gauge-high"></i> One-Glance Dashboard — click any card to jump to module</div>
+    <div class="summary-kpi-grid">
+      <div class="summary-kpi" onclick="switchTab('criticality')" title="Jump to Criticality module" role="button" aria-label="Go to Criticality tab">
+        <div class="summary-kpi-label">Criticality Tier</div>
+        <div class="summary-kpi-value" id="sum_tier">—</div>
+        <div class="summary-kpi-module">Module 1 · FMECA</div>
+      </div>
+      <div class="summary-kpi" onclick="switchTab('readiness')" title="Jump to Readiness module" role="button" aria-label="Go to Readiness tab">
+        <div class="summary-kpi-label">Readiness %</div>
+        <div class="summary-kpi-value" id="sum_readiness">—</div>
+        <div class="summary-kpi-module">Module 2 · Gauge</div>
+      </div>
+      <div class="summary-kpi" onclick="switchTab('stock')" title="Jump to Optimal Stock module" role="button" aria-label="Go to Optimal Stock tab">
+        <div class="summary-kpi-label">Rec. Stock Q*</div>
+        <div class="summary-kpi-value" id="sum_qstar">—</div>
+        <div class="summary-kpi-module">Module 3 · Newsvendor</div>
+      </div>
+      <div class="summary-kpi" onclick="switchTab('supplier')" title="Jump to Supplier Risk module" role="button" aria-label="Go to Supplier Risk tab">
+        <div class="summary-kpi-label">Supplier Risk</div>
+        <div class="summary-kpi-value" id="sum_supplier">—</div>
+        <div class="summary-kpi-module">Module 5 · Composite</div>
+      </div>
+      <div class="summary-kpi" onclick="switchTab('ltb')" title="Jump to Last-Time-Buy module" role="button" aria-label="Go to Last-Time-Buy tab">
+        <div class="summary-kpi-label">LTB Decision</div>
+        <div class="summary-kpi-value" id="sum_ltb">—</div>
+        <div class="summary-kpi-module">Module 6 · DMSMS</div>
+      </div>
+      <div class="summary-kpi" onclick="switchTab('montecarlo')" title="Jump to Monte-Carlo module" role="button" aria-label="Go to Monte-Carlo tab">
+        <div class="summary-kpi-label">P(Stockout)</div>
+        <div class="summary-kpi-value" id="sum_pstockout">Run →</div>
+        <div class="summary-kpi-module">Module 8 · Monte-Carlo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save / Load Scenario bar -->
+  <div class="scenario-bar">
+    <span class="scenario-bar-label"><i class="fas fa-floppy-disk"></i> Scenario:</span>
+    <button class="btn-scenario" onclick="saveScenario()" aria-label="Save current scenario to browser storage">Save</button>
+    <button class="btn-scenario" onclick="loadScenario()" aria-label="Load saved scenario from browser storage">Load</button>
+    <button class="btn-scenario" onclick="shareScenario()" aria-label="Copy shareable URL with current inputs"><i class="fas fa-link"></i> Share URL</button>
+    <button class="btn-scenario danger" onclick="resetDefaults()" aria-label="Reset all inputs to defaults">Reset</button>
+    <span class="scenario-saved-msg" id="scenarioMsg"></span>
+  </div>
+
   <!-- Tabs -->
   <div class="tabs-wrap">
-    <div class="tabs-row" role="tablist">
+    <div class="tabs-row" role="tablist" id="tabsRow">
       <button class="tab-btn active" onclick="switchTab('criticality')" role="tab" aria-selected="true" aria-controls="pane-criticality">1 · Criticality</button>
       <button class="tab-btn" onclick="switchTab('readiness')" role="tab" aria-selected="false" aria-controls="pane-readiness">2 · Readiness</button>
       <button class="tab-btn" onclick="switchTab('stock')" role="tab" aria-selected="false" aria-controls="pane-stock">3 · Optimal Stock</button>
@@ -507,31 +599,31 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
             <input type="text" id="c1_partDesc" class="input-field" value="Chiller Compressor Seal Kit" aria-label="Part Description">
           </div>
           <div class="input-group">
-            <label class="input-label" for="c1_commodity">Commodity</label>
-            <select id="c1_commodity" class="input-field" onchange="calcCriticality()" aria-label="Commodity">
-              <option value="chiller">Chiller</option>
+            <label class="input-label" for="c1_commodity">Commodity <span style="font-weight:400;color:var(--text-muted);">(auto-fills typical defaults)</span></label>
+            <select id="c1_commodity" class="input-field" onchange="applyCommodityDefaults(this.value,'criticality');calcCriticality();" aria-label="Commodity">
+              <option value="chiller">Chiller Compressor</option>
               <option value="crac">CRAC / CRAH</option>
-              <option value="ups">UPS</option>
-              <option value="switchgear">Switchgear</option>
+              <option value="ups">UPS Module / Battery</option>
+              <option value="switchgear">MV Switchgear Breaker</option>
               <option value="transformer">Transformer</option>
-              <option value="generator">Generator</option>
-              <option value="pump">Pump</option>
-              <option value="valve">Valve</option>
+              <option value="generator">Generator / Genset</option>
+              <option value="pump">Pump / Valve</option>
               <option value="hx">Heat Exchanger</option>
               <option value="cooling-tower">Cooling Tower</option>
-              <option value="bms">BMS Controller</option>
+              <option value="bms">BMS Controller Board</option>
               <option value="fuel">Fuel System</option>
               <option value="fire">Fire Suppression</option>
               <option value="other">Other</option>
             </select>
+            <div class="commodity-hint" id="c1_commodity_hint">These are typical industry defaults — adjust to your fleet's actual failure history.</div>
           </div>
           <div class="input-row">
             <div class="input-group">
-              <label class="input-label" for="c1_lambda">Annual Failure Rate λ (failures/yr)</label>
+              <label class="input-label" for="c1_lambda">Annual Failure Rate λ (failures/yr) <span style="font-weight:400;color:var(--text-muted);">= 1/MTBF_yr</span></label>
               <input type="number" id="c1_lambda" class="input-field" value="0.25" min="0.001" max="10" step="0.01" oninput="calcCriticality()" aria-label="Annual failure rate">
             </div>
             <div class="input-group">
-              <label class="input-label" for="c1_installed">Installed Base (# units)</label>
+              <label class="input-label" for="c1_installed">Installed Base (# units at this site)</label>
               <input type="number" id="c1_installed" class="input-field" value="4" min="1" max="1000" step="1" oninput="calcCriticality()" aria-label="Installed base">
             </div>
           </div>
@@ -787,11 +879,13 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         </div>
       </div>
       <details class="info-box" style="margin-top:1rem;">
-        <summary>ⓘ Newsvendor + Fill-Rate methodology</summary>
-        <p>Critical ratio: <code>CR = Cu / (Cu + Co)</code> where <code>Cu</code> = under-stock cost, <code>Co</code> = carrying cost over part life = <code>carryRate × unitCost × partLife</code>.</p>
-        <p>Newsvendor optimal Q*: inverse-normal CDF of CR applied to demand-during-lead-time distribution (Beasley-Springer-Moro rational approximation).</p>
-        <p>Safety stock: <code>SS = z(FR) × σ_LT</code> where <code>σ_LT = √(L × σ_D² + μ_D² × σ_L²)</code> (demand + lead-time variability combined).</p>
-        <p>Poisson mode (slow movers): <code>λ_LT = installedBase × annualFailureRate × (L/52)</code>; P(stockout) from Poisson CDF. Ref: <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.31.10.1247" target="_blank" rel="noopener">Sherbrooke 1985 METRIC</a>.</p>
+        <summary>ⓘ Newsvendor + Fill-Rate methodology — units &amp; formulas</summary>
+        <p><strong>Unit conversion:</strong> All inputs use annual units (μ in units/yr, σ<sub>D</sub> in units/yr, lead time L in weeks). Internally: <code>L_yr = L_wk / 52</code>; <code>σ_L_yr = σ_L_wk / 52</code>.</p>
+        <p><strong>Demand during lead time:</strong> <code>μ_LT = μ_annual × (L/52)</code> &nbsp;|&nbsp; <code>σ_LT = √((L/52)×σ_D² + μ_annual²×(σ_L/52)²)</code> — combines demand variability and lead-time variability.</p>
+        <p><strong>Critical ratio:</strong> <code>CR = C<sub>u</sub> / (C<sub>u</sub> + C<sub>o</sub>)</code> where <code>C<sub>u</sub></code> = under-stock cost per stockout event; <code>C<sub>o</sub></code> = carrying cost over part life = <code>carryRate × unitCost × partLife</code>. For critical DC spares C<sub>u</sub> ≫ C<sub>o</sub>, pushing CR close to 1 and Q* higher.</p>
+        <p><strong>Newsvendor Q*:</strong> <code>Q* = max(0, ⌈μ_LT + Φ⁻¹(CR) × σ_LT⌉)</code> where Φ⁻¹ is the inverse normal CDF (Beasley-Springer-Moro rational approximation, verified: Φ⁻¹(0.975)=1.96, Φ⁻¹(0.99)=2.326).</p>
+        <p><strong>Safety stock (fill-rate target):</strong> <code>SS = max(0, ⌈Φ⁻¹(FR) × σ_LT⌉)</code>. Reorder Point: <code>ROP = ⌈μ_LT + SS⌉</code>.</p>
+        <p><strong>Poisson mode (slow movers, demand &lt;5 units/yr):</strong> <code>λ_LT = λ_annual × (L/52)</code>; P(stockout at level S) = <code>1 − Σ_{k=0}^{S−1} e^{−λ_LT} λ_LT^k/k!</code>. Falls back to normal approx for λ_LT &gt; 200. Ref: <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.31.10.1247" target="_blank" rel="noopener">Sherbrooke 1985 METRIC</a> — newsvendor model (critical-fractile).</p>
       </details>
     </div>
 
@@ -1049,10 +1143,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         </div>
       </div>
       <details class="info-box" style="margin-top:1rem;">
-        <summary>ⓘ LTB / DMSMS methodology</summary>
-        <p>LTB quantity: <code>LTB_Q = max(0, annualDemand × supportYears × safetyFactor − onHand − openPO)</code>. Safety factor = 1.15 (15% buffer for demand uncertainty + scrap risk). Clamp to non-negative.</p>
-        <p>Option A NPV: year-by-year cash flows of (a) buying LTB stock now + carrying cost over support life + scrap value of unused units. Option B: qualification cost now + lower carrying cost once alternate is qualified. NPV uses standard DCF: <code>Σ CF_t/(1+r)^t</code>.</p>
-        <p>EOL Exposure Score: <code>(installedUnits × criticality × supportYrsRemaining) / max(1, qualifiedAlternates)</code>. Bands: &lt;50 LOW; 50–149 MEDIUM; 150–299 HIGH; ≥300 CRITICAL.</p>
+        <summary>ⓘ LTB / DMSMS methodology — formulas &amp; NPV interpretation</summary>
+        <p><strong>LTB quantity:</strong> <code>LTB_Q = max(0, ⌈annualDemand × supportYears × 1.15 − onHand − openPO⌉)</code>. Safety factor = 1.15 (15% buffer for demand uncertainty + scrap risk).</p>
+        <p><strong>NPV Option A (LTB Stock):</strong> t=0: −LTB_Q × unitCost (buy upfront). t=1…n: −carryingCost_t (average remaining inventory × carryRate × unitCost). End of life: ±scrap value (unused units × unitCost × (1 − scrapRisk) − unused × unitCost × scrapRisk).</p>
+        <p><strong>NPV Option B (Requalify):</strong> t=0: −altQualCost. t=1…n: −demandYr × unitCost × 1.20 (spot premium during qual period) or × 0.90 (qualified alternate at discount) after qualification completes.</p>
+        <p><strong>Decision rule:</strong> Both NPVs are costs (negative). <em>Higher NPV = less negative = lower total cost = better option.</em> If NPV_B &gt; NPV_A → Requalify is cheaper. Ref: DCF: <code>NPV = Σ CF_t / (1+r)^t</code>.</p>
+        <p><strong>EOL Exposure Score:</strong> <code>(installedUnits × criticality × supportYrsRemaining) / max(1, qualifiedAlternates)</code>. Bands: &lt;50 LOW; 50–149 MEDIUM; 150–299 HIGH; ≥300 CRITICAL.</p>
         <p>Ref: <a href="https://en.wikipedia.org/wiki/DMSMS" target="_blank" rel="noopener">DMSMS — Wikipedia</a>; <a href="https://drum.lib.umd.edu/items/e634adcb-3d50-49b2-a8aa-f120b65d82d0" target="_blank" rel="noopener">Lifetime buy estimations (UMD)</a>.</p>
       </details>
     </div>
@@ -1224,6 +1320,15 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       </div>
     </div>
 
+    <!-- Cross-calc links -->
+    <div class="crosslink-bar" style="margin-bottom:0.75rem;">
+      <span class="crosslink-bar-label">Continue analysis in:</span>
+      <a href="tco-calculator.html" class="crosslink-pill" id="link_tco" title="Open TCO Calculator — factors spares carrying cost into 10-yr TCO"><i class="fas fa-arrow-right"></i> TCO Calculator</a>
+      <a href="opex-calculator.html" class="crosslink-pill" id="link_opex" title="Open OPEX Calculator — feed downtime cost and MTBF inputs"><i class="fas fa-arrow-right"></i> OPEX Calculator</a>
+      <a href="roi-calculator.html" class="crosslink-pill" id="link_roi" title="Open ROI Calculator — model spares investment return"><i class="fas fa-arrow-right"></i> ROI Calculator</a>
+      <a href="tier-advisor.html" class="crosslink-pill" title="Open Tier Advisor — check redundancy design supports spares posture"><i class="fas fa-arrow-right"></i> Tier Advisor</a>
+    </div>
+
     <!-- Disclaimer -->
     <div class="calc-disclaimer">
       <div class="disc-title"><i class="fas fa-circle-info"></i> Calculator Disclaimer</div>
@@ -1331,11 +1436,20 @@ function normCDF(x) {
 }
 
 // Poisson CDF: P(X <= k) for rate lambda
+// Uses iterative computation to avoid factorial overflow.
+// Falls back to normal approximation (continuity-corrected) for lambda > 200.
 function poissonCDF(k, lambda) {
   if (lambda <= 0) return (k >= 0) ? 1 : 0;
+  // Normal approximation for large lambda (CLT: Poisson ≈ N(λ, λ))
+  if (lambda > 200) {
+    return normCDF((k + 0.5 - lambda) / Math.sqrt(lambda));
+  }
   var sum = 0;
   var term = Math.exp(-lambda);
-  if (!isFinite(term)) term = 0;
+  if (!isFinite(term)) {
+    // Underflow: use log-sum-exp approach via normal approximation
+    return normCDF((k + 0.5 - lambda) / Math.sqrt(lambda));
+  }
   for (var i = 0; i <= k; i++) {
     sum += term;
     term *= lambda / (i + 1);
@@ -1406,6 +1520,199 @@ var redColor = '#ef4444';
 var greenColor = '#10b981';
 var blueColor = '#3b82f6';
 
+/* ── DARK-MODE AWARE CHART GRID COLOUR ── */
+function chartGridColor() {
+  return document.documentElement.getAttribute('data-theme') === 'dark'
+    ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+}
+function chartTickColor() {
+  return document.documentElement.getAttribute('data-theme') === 'dark'
+    ? '#94a3b8' : '#64748b';
+}
+function chartTextColor() {
+  return document.documentElement.getAttribute('data-theme') === 'dark'
+    ? '#f1f5f9' : '#1e293b';
+}
+
+/* ── COMMODITY DEFAULT PROFILES (DC M&E realistic values) ── */
+// Fields: lambda (failures/yr), installedBase, severity, ltWeeks, ltSigma, unitCost,
+//         understockCost, mtbfYrs, hint
+var COMMODITY_DEFAULTS = {
+  chiller:      { lambda: 0.10, installedBase: 6, severity: 9, ltWeeks: 20, ltSigma: 5, unitCost: 75000, understockCost: 250000, mtbfYrs: 10, hint: 'Typical: MTBF 8-12 yr, LT 16-30 wk, $40k-120k/unit, 4-16 units/site.' },
+  crac:         { lambda: 0.14, installedBase: 8, severity: 7, ltWeeks: 12, ltSigma: 3, unitCost: 15000, understockCost: 80000,  mtbfYrs: 7,  hint: 'Typical: MTBF 6-10 yr, LT 8-16 wk, $5k-25k/unit.' },
+  ups:          { lambda: 0.18, installedBase: 4, severity: 9, ltWeeks: 18, ltSigma: 5, unitCost: 35000, understockCost: 200000, mtbfYrs: 6,  hint: 'Typical: MTBF 5-8 yr (battery), LT 12-24 wk, $15k-60k/module.' },
+  switchgear:   { lambda: 0.05, installedBase: 3, severity: 10,ltWeeks: 40, ltSigma: 10,unitCost: 50000, understockCost: 400000, mtbfYrs: 20, hint: 'Typical: MTBF 15-25 yr, LT 30-60+ wk, $20k-80k/unit. Long lead-time dominant risk.' },
+  transformer:  { lambda: 0.04, installedBase: 2, severity: 10,ltWeeks: 52, ltSigma: 12,unitCost: 200000,understockCost: 500000, mtbfYrs: 25, hint: 'Typical: MTBF 20-30 yr, LT 40-70+ wk, $100k-500k+. Highest lead-time risk category.' },
+  generator:    { lambda: 0.07, installedBase: 2, severity: 10,ltWeeks: 52, ltSigma: 14,unitCost: 500000,understockCost: 600000, mtbfYrs: 14, hint: 'Typical: MTBF 10-15 yr, LT 40-70+ wk, $200k-1M+. Critical for utility outage resilience.' },
+  pump:         { lambda: 0.10, installedBase: 8, severity: 6, ltWeeks: 12, ltSigma: 3, unitCost: 12000, understockCost: 60000,  mtbfYrs: 10, hint: 'Typical: MTBF 8-15 yr, LT 6-20 wk, $2k-30k/unit.' },
+  valve:        { lambda: 0.08, installedBase: 12,severity: 5, ltWeeks: 8,  ltSigma: 2, unitCost: 5000,  understockCost: 40000,  mtbfYrs: 12, hint: 'Typical: MTBF 8-15 yr, LT 4-12 wk, $1k-10k/unit.' },
+  hx:           { lambda: 0.06, installedBase: 4, severity: 7, ltWeeks: 14, ltSigma: 4, unitCost: 25000, understockCost: 100000, mtbfYrs: 16, hint: 'Typical: MTBF 12-20 yr, LT 10-20 wk, $10k-60k/unit.' },
+  'cooling-tower': { lambda: 0.08, installedBase: 2, severity: 8, ltWeeks: 16, ltSigma: 4, unitCost: 20000, understockCost: 120000, mtbfYrs: 12, hint: 'Typical: MTBF 8-15 yr, LT 8-20 wk, $15k-50k for key components.' },
+  bms:          { lambda: 0.12, installedBase: 4, severity: 7, ltWeeks: 8,  ltSigma: 3, unitCost: 4000,  understockCost: 50000,  mtbfYrs: 8,  hint: 'Typical: MTBF 8-12 yr but HIGH EOL risk. LT 4-12 wk, $1k-8k. DMSMS exposure significant.' },
+  fuel:         { lambda: 0.07, installedBase: 2, severity: 8, ltWeeks: 10, ltSigma: 3, unitCost: 8000,  understockCost: 80000,  mtbfYrs: 14, hint: 'Includes fuel pumps, day-tanks, transfer valves. LT 6-14 wk, $3k-20k.' },
+  fire:         { lambda: 0.04, installedBase: 4, severity: 9, ltWeeks: 10, ltSigma: 3, unitCost: 6000,  understockCost: 100000, mtbfYrs: 25, hint: 'Agent bottles / nozzle heads. DMSMS risk: Novec 7000 discontinued 2025. LT 6-14 wk.' },
+  other:        { lambda: 0.10, installedBase: 4, severity: 7, ltWeeks: 16, ltSigma: 4, unitCost: 10000, understockCost: 80000,  mtbfYrs: 10, hint: 'Adjust all values to your specific part and fleet.' }
+};
+
+// Apply commodity defaults to relevant fields across modules
+function applyCommodityDefaults(commodity, sourceModule) {
+  var d = COMMODITY_DEFAULTS[commodity];
+  if (!d) return;
+  function setIfExists(id, val) { var e = document.getElementById(id); if (e) e.value = val; }
+  // Always update criticality fields
+  setIfExists('c1_lambda', d.lambda);
+  setIfExists('c1_installed', d.installedBase);
+  setIfExists('c1_severity', d.severity);
+  // Optimal stock
+  setIfExists('s_unit_cost', d.unitCost);
+  setIfExists('s_understk_cost', d.understockCost);
+  setIfExists('s_lt_weeks', d.ltWeeks);
+  setIfExists('s_lt_sigma', d.ltSigma);
+  setIfExists('s_demand_mu', +(d.lambda * d.installedBase).toFixed(2));
+  setIfExists('s_demand_sigma', +(d.lambda * d.installedBase * 0.6).toFixed(2));
+  setIfExists('s_installed_base', d.installedBase);
+  // Readiness
+  setIfExists('r_lt_weeks', d.ltWeeks);
+  setIfExists('r_lt_sigma', d.ltSigma);
+  // LTB
+  setIfExists('ltb_unit_cost', d.unitCost);
+  setIfExists('ltb_demand_yr', +(d.lambda * d.installedBase).toFixed(2));
+  // Monte-Carlo
+  setIfExists('mc_lt_base', d.ltWeeks);
+  setIfExists('mc_lt_sigma', d.ltSigma);
+  setIfExists('mc_demand_base', +(d.lambda * d.installedBase).toFixed(2));
+  setIfExists('mc_downtime_cost', Math.round(d.understockCost / 24));
+  // Hub
+  setIfExists('h_unit_cost', d.unitCost);
+  setIfExists('h_oem_lt', d.ltWeeks);
+  // Update hint text
+  var hintEl = document.getElementById('c1_commodity_hint');
+  if (hintEl) hintEl.textContent = d.hint;
+  // Update part description placeholder if currently at default
+  var descEl = document.getElementById('c1_partDesc');
+  if (descEl && descEl.value === 'Chiller Compressor Seal Kit') {
+    var descMap = { chiller: 'Chiller Compressor Seal Kit', crac: 'CRAC Fan / Compressor Module', ups: 'UPS Battery Module', switchgear: 'MV Switchgear Circuit Breaker', transformer: 'Distribution Transformer', generator: 'Generator AVR / Control Module', pump: 'Chilled Water Pump Assembly', valve: 'Butterfly Isolation Valve', hx: 'Plate Heat Exchanger Gasket Kit', 'cooling-tower': 'Cooling Tower Fan Drive', bms: 'BMS Controller Board', fuel: 'Fuel Transfer Pump', fire: 'Fire Suppression Agent Bottle', other: 'Critical Spare Part' };
+    if (descMap[commodity]) descEl.value = descMap[commodity];
+  }
+}
+
+/* ── SUMMARY DASHBOARD UPDATER ── */
+function updateSummaryDashboard() {
+  // Tier
+  var tierEl = document.getElementById('c1_tier_badge');
+  var tier = tierEl ? tierEl.textContent.trim() : '—';
+  setText('sum_tier', tier);
+  // Readiness
+  var readEl = document.getElementById('r_pct');
+  setText('sum_readiness', readEl ? readEl.textContent : '—');
+  // Q*
+  var qstarEl = document.getElementById('s_qstar');
+  setText('sum_qstar', qstarEl ? qstarEl.textContent : '—');
+  // Supplier risk score
+  var srEl = document.getElementById('sr_score');
+  setText('sum_supplier', srEl ? srEl.textContent : '—');
+  // LTB decision
+  var ltbEl = document.getElementById('ltb_decision_badge');
+  var ltbTxt = ltbEl ? ltbEl.textContent.trim() : '—';
+  setText('sum_ltb', ltbTxt.length > 16 ? ltbTxt.substring(0,14) + '…' : ltbTxt);
+  // P(stockout) — only if MC has been run
+  var psoEl = document.getElementById('mc_pstockout');
+  if (psoEl && psoEl.textContent !== '—') setText('sum_pstockout', psoEl.textContent);
+}
+
+/* ── SAVE / LOAD SCENARIO ── */
+var SCENARIO_FIELDS = ['c1_lambda','c1_installed','c1_severity','c1_detectability',
+  'c1_redundancy','c1_alternates','c1_commodity',
+  'r_required','r_onhand','r_po_qty','r_lt_weeks','r_lt_sigma','r_planning_horizon','r_has_po','r_has_commit',
+  's_unit_cost','s_understk_cost','s_carry_rate','s_part_life','s_demand_mu','s_demand_sigma',
+  's_lt_weeks','s_lt_sigma','s_fill_rate','s_installed_base',
+  'h_sites','h_part_types','h_oem_lt','h_hub_lt','h_unit_cost','h_budget','h_demand_per_site','h_target_readiness',
+  'sr_otif','sr_capacity','sr_spend_impact','sr_contract','sr_single_source',
+  'ltb_support_yrs','ltb_demand_yr','ltb_onhand','ltb_open_po','ltb_unit_cost',
+  'ltb_carry_rate','ltb_scrap_risk','ltb_alt_qual_cost','ltb_alt_qual_lt','ltb_discount','ltb_criticality','ltb_qual_alternates',
+  'kq_supply_risk','kq_spend_impact','kq_criticality','kq_qual_suppliers','kq_commodity_kq',
+  'mc_lt_base','mc_lt_sigma','mc_demand_base','mc_demand_sigma','mc_sup_rel','mc_sup_sigma',
+  'mc_downtime_cost','mc_stock_level','mc_mttr'];
+
+function scenarioSnapshot() {
+  var snap = {};
+  SCENARIO_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) snap[id] = el.value;
+  });
+  // Range sliders
+  ['sr_financial','sr_geo_conc','sr_lt_vol','sr_geopolitical'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) snap[id] = el.value;
+  });
+  return snap;
+}
+
+function applySnapshot(snap) {
+  if (!snap) return;
+  Object.keys(snap).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.value = snap[id]; }
+  });
+  // Update range display values
+  ['sr_financial','sr_geo_conc','sr_lt_vol','sr_geopolitical'].forEach(function(id) {
+    var el = document.getElementById(id);
+    var valMap = { sr_financial: 'sr_financial_val', sr_geo_conc: 'sr_geo_val', sr_lt_vol: 'sr_ltv_val', sr_geopolitical: 'sr_geo2_val' };
+    if (el && valMap[id]) setText(valMap[id], el.value);
+  });
+}
+
+function showMsg(msg) {
+  var el = document.getElementById('scenarioMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+function saveScenario() {
+  try {
+    var snap = scenarioSnapshot();
+    localStorage.setItem('cse_scenario', JSON.stringify(snap));
+    showMsg('Saved.');
+  } catch(e) { showMsg('Error saving.'); }
+}
+
+function loadScenario() {
+  try {
+    var raw = localStorage.getItem('cse_scenario');
+    if (!raw) { showMsg('No saved scenario found.'); return; }
+    applySnapshot(JSON.parse(raw));
+    recalcAll();
+    showMsg('Loaded.');
+  } catch(e) { showMsg('Error loading.'); }
+}
+
+function shareScenario() {
+  var snap = scenarioSnapshot();
+  var hash = '#s=' + encodeURIComponent(JSON.stringify(snap));
+  var url = window.location.href.split('#')[0] + hash;
+  try {
+    navigator.clipboard.writeText(url).then(function() { showMsg('URL copied!'); }).catch(function() { prompt('Copy URL:', url); });
+  } catch(e) { prompt('Copy URL:', url); }
+}
+
+function resetDefaults() {
+  if (!confirm('Reset all inputs to defaults?')) return;
+  localStorage.removeItem('cse_scenario');
+  window.location.href = window.location.pathname;
+}
+
+function recalcAll() {
+  calcCriticality();
+  calcReadiness();
+  calcStock();
+  calcHub();
+  calcSupplierRisk();
+  calcLTB();
+  calcKraljic();
+}
+
 /* ===========================================
    MODULE 1: CRITICALITY SCORING (FMECA + RCM)
    =========================================== */
@@ -1462,15 +1769,19 @@ function calcCriticality() {
   }).join('');
   setHTML('c1_score_bars', barsHtml);
 
-  // Bar chart
+  // Bar chart — dark-mode aware grid
   getOrCreateChart('chart_criticality', 'bar', {
     labels: bars.map(function(b) { return b.label; }),
     datasets: [{ label: 'Score Driver %', data: bars.map(function(b) { return +b.val.toFixed(1); }), backgroundColor: amberColor, borderRadius: 6 }]
   }, {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true, max: 100, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 9 } } } }
+    scales: {
+      y: { beginAtZero: true, max: 100, ticks: { font: { size: 10 }, color: chartTickColor() }, grid: { color: chartGridColor() } },
+      x: { ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
   });
+  updateSummaryDashboard();
 }
 
 /* ===========================================
@@ -1544,16 +1855,18 @@ function calcReadiness() {
   }).join(''));
 
   // Donut gauge chart
+  var gapFill = document.documentElement.getAttribute('data-theme') === 'dark' ? '#334155' : '#e2e8f0';
   getOrCreateChart('chart_readiness', 'doughnut', {
     labels: ['Confirmed', 'Gap'],
     datasets: [{ data: [Math.min(100, readinessPct), Math.max(0, 100 - readinessPct)],
-      backgroundColor: [status === 'GREEN' ? greenColor : (status === 'YELLOW' ? amberColor : redColor), '#e2e8f0'],
+      backgroundColor: [status === 'GREEN' ? greenColor : (status === 'YELLOW' ? amberColor : redColor), gapFill],
       borderWidth: 0, circumference: 270, rotation: 225 }]
   }, {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ctx.label + ': ' + ctx.parsed.toFixed(1) + '%'; } } } },
     cutout: '72%'
   });
+  updateSummaryDashboard();
 }
 
 /* ===========================================
@@ -1645,8 +1958,12 @@ function calcStock() {
   }, {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return '$' + ctx.parsed.y.toLocaleString(); } } } },
-    scales: { y: { beginAtZero: true, ticks: { font: { size: 10 }, callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } } }, x: { ticks: { font: { size: 9 } } } }
+    scales: {
+      y: { beginAtZero: true, ticks: { font: { size: 10 }, color: chartTickColor(), callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } }, grid: { color: chartGridColor() } },
+      x: { ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
   });
+  updateSummaryDashboard();
 }
 
 /* ===========================================
@@ -1786,16 +2103,18 @@ function calcSupplierRisk() {
   };
   setHTML('sr_strategy', strategies[quadrant]);
 
-  // Radar chart — 7 risk dimensions
+  // Radar chart — 7 risk dimensions, dark-mode aware
   var radarVals = dims.slice(0, 7).map(function(d) { return +(d * 10).toFixed(0); });
+  var radarTickColor = chartTickColor();
   getOrCreateChart('chart_supplier', 'radar', {
     labels: srDimLabels.slice(0, 7),
     datasets: [{ label: 'Risk Score', data: radarVals, backgroundColor: 'rgba(245,158,11,0.15)', borderColor: amberColor, pointBackgroundColor: amberColor, pointRadius: 4 }]
   }, {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false } },
-    scales: { r: { min: 0, max: 100, beginAtZero: true, ticks: { font: { size: 9 }, stepSize: 20 }, pointLabels: { font: { size: 9 } } } }
+    scales: { r: { min: 0, max: 100, beginAtZero: true, ticks: { font: { size: 9 }, stepSize: 20, color: radarTickColor }, pointLabels: { font: { size: 9 }, color: radarTickColor }, grid: { color: chartGridColor() }, angleLines: { color: chartGridColor() } } }
   });
+  updateSummaryDashboard();
 }
 
 /* ===========================================
@@ -1860,9 +2179,10 @@ function calcLTB() {
   }
   var npvB = npv(discountRate, cfB);
 
+  // Both NPVs are negative (they represent costs). Higher NPV = less negative = lower cost = better option.
   var decision, decClass;
-  if (npvB < npvA) { decision = 'REQUALIFY (Option B better)'; decClass = 'status-blue'; }
-  else { decision = 'BUY LTB (Option A better)'; decClass = 'status-yellow'; }
+  if (npvB > npvA) { decision = 'REQUALIFY (Option B lower NPV cost)'; decClass = 'status-blue'; }
+  else { decision = 'BUY LTB (Option A lower NPV cost)'; decClass = 'status-yellow'; }
 
   setText('ltb_qty', ltbQty + ' units');
   setText('ltb_total', fmt$(ltbTotal));
@@ -1873,15 +2193,19 @@ function calcLTB() {
   setText('ltb_npv_a', fmt$(npvA));
   setText('ltb_npv_b', fmt$(npvB));
 
-  // Bar chart: NPV comparison
+  // Bar chart: NPV comparison — higher NPV (less negative) = lower cost = amber (better)
   getOrCreateChart('chart_ltb', 'bar', {
     labels: ['Option A: LTB Stock', 'Option B: Requalify'],
     datasets: [{ data: [npvA, npvB], backgroundColor: [npvA >= npvB ? amberColor : '#94a3b8', npvB > npvA ? amberColor : '#94a3b8'], borderRadius: 8 }]
   }, {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return '$' + ctx.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0}); } } } },
-    scales: { y: { ticks: { font: { size: 10 }, callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } } }, x: { ticks: { font: { size: 10 } } } }
+    scales: {
+      y: { ticks: { font: { size: 10 }, color: chartTickColor(), callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } }, grid: { color: chartGridColor() } },
+      x: { ticks: { font: { size: 10 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
   });
+  updateSummaryDashboard();
 }
 
 /* ===========================================
@@ -2013,14 +2337,6 @@ function runMonteCarlo() {
       var bi = Math.min(bins - 1, Math.floor(r / (100 / bins)));
       histData[bi]++;
     });
-    getOrCreateChart('chart_mc_hist', 'bar', {
-      labels: binLabels,
-      datasets: [{ label: 'Count', data: histData, backgroundColor: amberColor, borderRadius: 4 }]
-    }, {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { x: { ticks: { font: { size: 8 }, maxRotation: 45 } }, y: { beginAtZero: true, ticks: { font: { size: 9 } } } }
-    });
 
     // Tornado chart: variance contribution of each input
     function computeVariance(arr) {
@@ -2050,15 +2366,30 @@ function runMonteCarlo() {
     var corrDemand = corrCoeff(demandVariances, rAll);
     var corrRel = corrCoeff(relVariances, rAll);
 
+    getOrCreateChart('chart_mc_hist', 'bar', {
+      labels: binLabels,
+      datasets: [{ label: 'Count', data: histData, backgroundColor: amberColor, borderRadius: 4 }]
+    }, {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 8 }, color: chartTickColor(), maxRotation: 45 }, grid: { color: chartGridColor() } },
+        y: { beginAtZero: true, ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+      }
+    });
+
     getOrCreateChart('chart_mc_tornado', 'bar', {
       labels: ['Lead Time', 'Demand Variability', 'Supplier Reliability'],
       datasets: [{ label: 'Correlation with Readiness', data: [corrLT, corrDemand, corrRel].map(function(v) { return +(v * 100).toFixed(1); }), backgroundColor: [amberColor, blueColor, greenColor], borderRadius: 6 }]
     }, {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, max: 100, ticks: { font: { size: 10 }, callback: function(v) { return v + '%'; } } }, y: { ticks: { font: { size: 10 } } } }
+      scales: {
+        x: { beginAtZero: true, max: 100, ticks: { font: { size: 10 }, color: chartTickColor(), callback: function(v) { return v + '%'; } }, grid: { color: chartGridColor() } },
+        y: { ticks: { font: { size: 10 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+      }
     });
-
+    updateSummaryDashboard();
     if (btn) btn.disabled = false;
   }, 20);
 }
@@ -2082,7 +2413,10 @@ var faqData = [
   { cat: 'emerging', q: 'How can digital twins improve spare-parts planning?', a: 'A digital twin of the M&amp;E fleet ingests live sensor data (vibration, temperature, oil analysis) and maintenance history to simulate failure probabilities in real time. When a component\'s predicted reliability drops below a threshold, the twin can trigger a pre-stage order before the actual failure — turning reactive spare-demand into condition-based demand. This reduces effective demand variability (σ<sub>D</sub>) and therefore safety stock requirements. Monte-Carlo scenarios within the twin can size stock buffers with real failure-curve data.' },
   { cat: 'emerging', q: 'Can additive manufacturing (3D printing) replace traditional LTB for obsolete parts?', a: '3D printing is viable for obsolete polymer and simple metal components (brackets, housings, seal carriers, impellers) where tolerances allow. It eliminates LTB risk entirely for printable items. Limitations: not suitable for precision mechanical components (bearings, compressor internals), safety-critical electrical parts, or anything requiring OEM-certified materials. Classify parts by "printability" as part of your DMSMS programme and route printable items to an additive supply path rather than LTB.' },
   { cat: 'emerging', q: 'What is a circular economy / refurb pool strategy?', a: 'Decommissioned data center equipment contains reusable M&amp;E components — chiller compressors, UPS modules, switchgear breakers. A certified-refurb pool (with OEM or third-party reconditioning) offsets new-buy demand, reducing LTB exposure and carrying cost. Key requirements: (1) component traceability / digital product passport, (2) recertification testing protocol, (3) warranty alignment with operations team. Circular sourcing can reduce critical-spares total cost by 20–40% for mature equipment types.' },
-  { cat: 'emerging', q: 'What is a supply-chain control tower for spares management?', a: 'A control tower is a single visibility platform aggregating: PO status by part/supplier, supplier commit dates vs need dates, in-transit tracking, inventory by hub/site, risk alerts (OTIF miss, commit delay, EOL flag). The readiness gauge in this calculator IS a mini control-tower view for a single part. Enterprise-scale control towers (Kinaxis, Blue Yonder, SAP IBP) serve 100s of parts across dozens of sites with live ERP integration. The key metrics this calculator produces (readiness %, gap, risk flags) are the same KPIs a control tower surfaces at fleet scale.' }
+  { cat: 'emerging', q: 'What is a supply-chain control tower for spares management?', a: 'A control tower is a single visibility platform aggregating: PO status by part/supplier, supplier commit dates vs need dates, in-transit tracking, inventory by hub/site, risk alerts (OTIF miss, commit delay, EOL flag). The readiness gauge in this calculator IS a mini control-tower view for a single part. Enterprise-scale control towers (Kinaxis, Blue Yonder, SAP IBP) serve 100s of parts across dozens of sites with live ERP integration. The key metrics this calculator produces (readiness %, gap, risk flags) are the same KPIs a control tower surfaces at fleet scale.' },
+  { cat: 'emerging', q: 'How does predictive maintenance change spare-parts demand planning?', a: 'Condition-based monitoring (CBM) — vibration sensors, oil analysis, thermal imaging, partial-discharge detection — predicts impending failures days to weeks before they occur. This converts unpredictable reactive demand (σ<sub>D</sub> high) into foreseeable planned demand (σ<sub>D</sub> lower). The practical effect: safety stock requirements drop by 20–40% for CBM-enabled assets. This calculator\'s safety stock formula uses <code>σ_D</code> as a key input — reducing it via CBM directly lowers required stock. Input: if a high % of your fleet is on CBM, reduce σ_D by up to 50% vs the default. Ref: ISO 13379-1 (condition monitoring interpretation); IEC 60812 (FMEA, integrates with RCM).' },
+  { cat: 'lifecycle', q: 'What is Weibull life modelling and when should it replace constant failure rate?', a: 'The constant annual failure rate (λ = 1/MTBF) assumes an exponential failure distribution — valid for random, age-independent failures (electronics, infant mortality filtered out). <strong>Weibull</strong> with shape β &gt; 1 captures <em>wear-out</em> failure modes (bearing fatigue, seal degradation, winding insulation) — demand accelerates toward end of life. β &lt; 1 = infant mortality (early failures). For DC M&amp;E: most mechanical components (compressors, pumps, switchgear mechanisms) show β ≈ 1.5–3 after 10–15 years. In Weibull mode, LTB demand is front-loaded early in the support period and spikes near end-of-life — the flat 1.15 safety factor in this calculator may under-provision for β &gt; 2 wear-out scenarios. Consider increasing safetyFactor to 1.3–1.5 for end-of-life mechanical parts.' },
+  { cat: 'sourcing', q: 'What is VMI (Vendor-Managed Inventory) and when does it make sense for DC spares?', a: 'In VMI, the supplier owns and manages inventory stocked at or near your site until consumed. You eliminate the carrying cost and capital tie-up; the supplier gets demand visibility and a committed off-take. <strong>When it works for DC M&amp;E:</strong> (1) high-volume consumables (filters, belts, seals) with predictable demand — fits the supplier\'s replenishment model; (2) OEM spares hubs near hyperscale clusters where the OEM has incentive to maintain a consignment pool. <strong>When it doesn\'t work:</strong> very long lead-time capital equipment (transformers, switchgear) where the supplier cannot afford to pre-position inventory without a firm order. The carrying-cost saving from VMI can be estimated: <code>VMI saving = onHandUnits × unitCost × carryRate</code> per year — compare this to the VMI programme management cost and any premium the supplier charges for the service.' }
 ];
 
 function renderFAQ(cat) {
@@ -2103,19 +2437,43 @@ function filterFAQ(cat) {
 }
 
 /* ===========================================
-   TAB SWITCHING
+   TAB SWITCHING + KEYBOARD NAVIGATION
    =========================================== */
+var TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','faq'];
+
 function switchTab(name) {
   document.querySelectorAll('.module-pane').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
   var pane = document.getElementById('pane-' + name);
   if (pane) pane.classList.add('active');
   var btn = document.querySelector('[onclick="switchTab(\'' + name + '\')"]');
-  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected','true'); }
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected','true'); btn.focus(); }
   // Trigger calc on tab open
   var calcs = { criticality: calcCriticality, readiness: calcReadiness, stock: calcStock, hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB, kraljic: calcKraljic, faq: function(){ renderFAQ('all'); } };
   if (calcs[name]) calcs[name]();
 }
+
+// Keyboard navigation: arrow keys between tabs
+document.addEventListener('keydown', function(e) {
+  var focused = document.activeElement;
+  if (!focused || !focused.classList.contains('tab-btn')) return;
+  var current = focused.getAttribute('onclick') || '';
+  var match = current.match(/switchTab\('(\w+)'\)/);
+  if (!match) return;
+  var idx = TAB_ORDER.indexOf(match[1]);
+  if (idx < 0) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    switchTab(TAB_ORDER[(idx + 1) % TAB_ORDER.length]);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    switchTab(TAB_ORDER[(idx - 1 + TAB_ORDER.length) % TAB_ORDER.length]);
+  } else if (e.key === 'Home') {
+    e.preventDefault(); switchTab(TAB_ORDER[0]);
+  } else if (e.key === 'End') {
+    e.preventDefault(); switchTab(TAB_ORDER[TAB_ORDER.length - 1]);
+  }
+});
 
 /* ===========================================
    DARK MODE TOGGLE
@@ -2249,12 +2607,44 @@ window.addEventListener('scroll', function() {
   if (params.has('itLoad')) {
     carrierParams.push('itLoad=' + params.get('itLoad') + ' kW');
   }
+  if (params.has('commodity')) {
+    var comm = params.get('commodity').toLowerCase();
+    var commEl = document.getElementById('c1_commodity');
+    if (commEl && COMMODITY_DEFAULTS[comm]) {
+      commEl.value = comm;
+      applyCommodityDefaults(comm, 'url');
+      carrierParams.push('commodity=' + comm);
+    }
+  }
+  if (params.has('installedBase')) {
+    var ib = parseInt(params.get('installedBase'));
+    if (ib > 0) { setField('c1_installed', ib); setField('s_installed_base', ib); setField('h_sites', Math.min(ib, 50)); carrierParams.push('installedBase=' + ib); }
+  }
+  if (params.has('leadTime')) {
+    var lt = parseFloat(params.get('leadTime'));
+    if (lt > 0) { setField('r_lt_weeks', lt); setField('s_lt_weeks', lt); setField('h_oem_lt', lt); setField('mc_lt_base', lt); carrierParams.push('leadTime=' + lt + 'wk'); }
+  }
+  if (params.has('unitCost')) {
+    var uc = parseFloat(params.get('unitCost'));
+    if (uc > 0) { setField('s_unit_cost', uc); setField('h_unit_cost', uc); setField('ltb_unit_cost', uc); carrierParams.push('unitCost=$' + uc.toLocaleString()); }
+  }
+
+  // Hash-based scenario restore (from shareScenario)
+  var hash = window.location.hash;
+  if (hash.indexOf('#s=') === 0) {
+    try {
+      var snapStr = decodeURIComponent(hash.slice(3));
+      var snap = JSON.parse(snapStr);
+      applySnapshot(snap);
+      carrierParams.push('scenario restored from URL');
+    } catch(e) { /* ignore malformed hash */ }
+  }
 
   if (carrierParams.length > 0) {
     var banner = document.getElementById('carrierBanner');
     var bannerText = document.getElementById('carrierBannerText');
     if (banner && bannerText) {
-      bannerText.textContent = '← Config carried over from another calculator: ' + carrierParams.join(', ') + '. Inputs pre-filled — review before running.';
+      bannerText.textContent = '← Config carried over: ' + carrierParams.join(', ') + '. Inputs pre-filled — review before running.';
       banner.classList.add('visible');
     }
   }
@@ -2372,10 +2762,36 @@ function exportLTBPDF() {
   if (needEl) needEl.value = toDateStr(needDefault);
   if (eolEl) eolEl.value = toDateStr(eolDefault);
 
+  // Apply initial commodity defaults for chiller (default selection)
+  applyCommodityDefaults('chiller', 'init');
+
   // Run all visible module calculations
   calcCriticality();
   calcReadiness();
+  calcStock();
+  calcHub();
+  calcSupplierRisk();
+  calcLTB();
+  calcKraljic();
   renderFAQ('all');
+
+  // Wire cross-calc links with relevant state params
+  function buildCrossLink(base) {
+    var dtc = document.getElementById('mc_downtime_cost');
+    var mtbf = document.getElementById('c1_lambda');
+    var mttr = document.getElementById('mc_mttr');
+    var params = [];
+    if (dtc && dtc.value) params.push('downtimeCostPerHr=' + dtc.value);
+    if (mtbf && mtbf.value && parseFloat(mtbf.value) > 0) params.push('mtbf=' + (1/parseFloat(mtbf.value)).toFixed(1));
+    if (mttr && mttr.value) params.push('mttr=' + mttr.value);
+    return base + (params.length ? '?' + params.join('&') : '');
+  }
+  var linkTco = document.getElementById('link_tco');
+  var linkOpex = document.getElementById('link_opex');
+  var linkRoi = document.getElementById('link_roi');
+  if (linkTco) linkTco.href = buildCrossLink('tco-calculator.html');
+  if (linkOpex) linkOpex.href = buildCrossLink('opex-calculator.html');
+  if (linkRoi) linkRoi.href = buildCrossLink('roi-calculator.html');
 })();
 
 })(); // end IIFE
