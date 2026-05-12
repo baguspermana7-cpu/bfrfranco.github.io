@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.10.19 — 2026-05-12 (Bugfix — chart.js `defer` regression broke synchronous chart init)
+
+User screenshot: `rz-ops-p7x3k9m.html` (admin console "Data Center Industry Intelligence") — all chart cards empty.
+
+### Root cause
+v1.10.3 (commit `5c158f6`, "perf: defer scripts") added `defer` to the chart.js CDN script tag on 22 pages. On pages whose inline `<script>` calls `new Chart(...)` **synchronously during parsing** (not inside a `DOMContentLoaded`/`load` listener and not behind a `typeof Chart` guard), `Chart` is `undefined` at that moment because the deferred chart.js hasn't executed yet → silent throw → every chart blank.
+
+`rz-ops-p7x3k9m.html` runs `if(checkAccess()){ ...renderDashboardCharts()... }` at top level → all dashboard + benchmark charts dead. The bug shipped 2026-05-09, surfaced when the user opened the page.
+
+### Fix
+Removed `defer` from the chart.js CDN tag (restoring blocking-load behavior, so `Chart` is defined before any inline script runs) on the 7 at-risk pages — those with deferred chart.js + no load listener + no `typeof Chart` guard:
+- `rz-ops-p7x3k9m.html` (confirmed broken)
+- `article-18.html`, `article-25.html`, `article-26.html`, `article-27.html`
+- `cx-calculator.html`
+- `water-system.html`
+
+The other 14 pages with deferred chart.js keep `defer` — they wrap chart init in a load listener or `typeof Chart` guard, so they work fine.
+
+### Trade-off
+Blocking chart.js (~70 KB gzipped) costs ~100-300 ms of parse-block on those 7 pages — acceptable for correctness. Pages that already gate their chart init keep the perf win.
+
+### SW
+- SW cache name auto-synced 1.10.18 → 1.10.19.
+
+Bump 1.10.18 → 1.10.19 (PATCH — regression fix).
+
+---
+
 ## v1.10.18 — 2026-05-09 (Privacy — move internal design docs + session notes to _private/)
 
 Audit-flagged F10-01: 7 internal `.md` files at site root were git-tracked → publicly served by GitHub Pages.
