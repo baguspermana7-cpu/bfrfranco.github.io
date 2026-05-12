@@ -145,7 +145,7 @@ const CapacityDashboardMod = () => {
                     <CardContent className="pt-6">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phase Configuration <Tooltip content="Define build phases for your data center expansion. Each phase specifies IT load capacity, construction start month, and build duration." /></h3>
-                            <button onClick={addPhase} className="p-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors">
+                            <button onClick={addPhase} className="p-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors" aria-label="Add phase">
                                 <Plus className="w-4 h-4" />
                             </button>
                         </div>
@@ -159,7 +159,7 @@ const CapacityDashboardMod = () => {
                                             onChange={e => updatePhase(idx, 'label', e.target.value)}
                                         />
                                         {localPhases.length > 1 && (
-                                            <button onClick={() => removePhase(idx)} className="p-1 text-red-400 hover:text-red-500 transition-colors">
+                                            <button onClick={() => removePhase(idx)} className="p-1 text-red-400 hover:text-red-500 transition-colors" aria-label={`Remove ${phase.label}`}>
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         )}

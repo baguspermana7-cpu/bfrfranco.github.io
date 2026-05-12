@@ -5,6 +5,7 @@ import { useSimulationStore } from '@/store/simulation';
 import { useScenarioStore, SavedScenario } from '@/store/scenario';
 import { useCapexStore } from '@/store/capex';
 import { useTheme } from '@/components/providers/ThemeProvider';
+import type { LucideIcon } from 'lucide-react';
 import {
     Calculator,
     Building,
@@ -12,8 +13,6 @@ import {
     Wrench,
     ShieldAlert,
     FileText,
-    Globe,
-    Settings,
     Leaf,
     TrendingUp,
     Save,
@@ -23,14 +22,11 @@ import {
     FolderOpen,
     Sun,
     Moon,
-    Printer,
-    Monitor,
     ArrowLeft,
     Landmark,
     Target,
     Dices,
     Layers,
-    Layers as Layers3,
     GitCompare,
     Receipt,
     CloudLightning,
@@ -108,7 +104,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         localStorage.setItem('dcmoc-vintage-banner-dismissed', '1');
     };
 
-    const navItems: { label: string; icon: any; id: typeof activeTab; section?: string }[] = [
+    const navItems: { label: string; icon: LucideIcon; id: typeof activeTab; section?: string }[] = [
         { label: 'CAPEX Config', icon: Building, id: 'capex' },
         { label: 'Staff Model Config', icon: Calculator, id: 'sim' },
         { label: 'Staffing', icon: Users, id: 'staff' },
@@ -117,7 +113,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'Carbon / ESG', icon: Leaf, id: 'carbon' },
         { label: 'Financial', icon: TrendingUp, id: 'finance' },
         { label: 'Investment', icon: Landmark, id: 'invest' },
-        { label: 'Capacity Plan', icon: Layers3, id: 'capacity', section: 'planning' },
+        { label: 'Capacity Plan', icon: Layers, id: 'capacity', section: 'planning' },
         { label: 'Phased Finance', icon: Calculator, id: 'phased-finance', section: 'planning' },
         { label: 'Benchmarks', icon: Target, id: 'benchmark', section: 'analytics' },
         { label: 'Monte Carlo', icon: Dices, id: 'montecarlo', section: 'analytics' },
@@ -205,29 +201,30 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                 </div>
 
                 <div className="p-4 flex-1 overflow-y-auto">
-                    <nav className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block px-2">
+                    <nav className="space-y-1" aria-label="Main navigation">
+                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block px-2" aria-hidden="true">
                             Modules
-                        </label>
+                        </div>
                         {navItems.map((item, idx) => (
                             <React.Fragment key={item.id}>
                                 {item.section === 'planning' && navItems[idx - 1]?.section !== 'planning' && (
-                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2">
+                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2" aria-hidden="true">
                                         Capacity Planning
-                                    </label>
+                                    </div>
                                 )}
                                 {item.section === 'analytics' && navItems[idx - 1]?.section !== 'analytics' && (
-                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2">
+                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2" aria-hidden="true">
                                         Advanced Analytics
-                                    </label>
+                                    </div>
                                 )}
                                 {item.section === 'country-intel' && navItems[idx - 1]?.section !== 'country-intel' && (
-                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2">
+                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-2 block px-2" aria-hidden="true">
                                         Country Intelligence
-                                    </label>
+                                    </div>
                                 )}
                                 <button
                                     onClick={() => { actions.setActiveTab(item.id); setSidebarOpen(false); }}
+                                    aria-current={activeTab === item.id ? 'page' : undefined}
                                     className={clsx(
                                         "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                                         "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
@@ -236,7 +233,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                             : "text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
                                     )}
                                 >
-                                    <item.icon className="w-4 h-4" />
+                                    <item.icon className="w-4 h-4" aria-hidden="true" />
                                     {item.label}
                                 </button>
                             </React.Fragment>
@@ -309,6 +306,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                             onClick={logout}
                             className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-slate-400 hover:text-red-500 transition-colors"
                             title="Sign Out"
+                            aria-label="Sign out"
                         >
                             <LogOut className="w-3.5 h-3.5" />
                         </button>
@@ -372,23 +370,29 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     <div className="fixed inset-0 bg-black/20 dark:bg-black/40 z-30 backdrop-blur-sm" onClick={scenarioStore.closePanel} />
 
                     {/* Panel */}
-                    <div className="fixed right-0 top-0 h-full w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 z-40 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="scenario-panel-title"
+                        className="fixed right-0 top-0 h-full w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 z-40 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl"
+                    >
                         {/* Header */}
                         <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <h2 id="scenario-panel-title" className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <FolderOpen className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                                 Scenario Manager
                             </h2>
-                            <button onClick={scenarioStore.closePanel} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">
+                            <button onClick={scenarioStore.closePanel} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors" aria-label="Close scenario manager">
                                 <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                             </button>
                         </div>
 
                         {/* Save New */}
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
-                            <label className="text-xs text-slate-500 dark:text-slate-400 uppercase mb-2 block">Save Current Configuration</label>
+                            <label htmlFor="scenario-name-input" className="text-xs text-slate-500 dark:text-slate-400 uppercase mb-2 block">Save Current Configuration</label>
                             <div className="flex gap-2">
                                 <input
+                                    id="scenario-name-input"
                                     className="flex-1 px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                                     placeholder="Scenario name..."
                                     value={scenarioName}

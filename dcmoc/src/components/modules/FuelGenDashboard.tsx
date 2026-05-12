@@ -121,7 +121,7 @@ export default function FuelGenDashboard() {
                                                     </button>
                                                 )}
                                                 {!isEditing && (
-                                                    <button onClick={() => startEdit(param)} className="p-0.5 text-slate-400 hover:text-amber-500">
+                                                    <button onClick={() => startEdit(param)} className="p-0.5 text-slate-400 hover:text-amber-500" aria-label={`Edit ${param.label}`}>
                                                         <Pencil className="w-3 h-3" />
                                                     </button>
                                                 )}
@@ -141,10 +141,10 @@ export default function FuelGenDashboard() {
                                                     onKeyDown={e => e.key === 'Enter' && confirmEdit(param)}
                                                 />
                                                 <span className="text-[10px] text-slate-500">{param.unit}</span>
-                                                <button onClick={() => confirmEdit(param)} className="p-1 text-emerald-500 hover:text-emerald-600">
+                                                <button onClick={() => confirmEdit(param)} className="p-1 text-emerald-500 hover:text-emerald-600" aria-label="Confirm edit">
                                                     <Check className="w-3.5 h-3.5" />
                                                 </button>
-                                                <button onClick={() => setEditingKey(null)} className="p-1 text-slate-400 hover:text-slate-500">
+                                                <button onClick={() => setEditingKey(null)} className="p-1 text-slate-400 hover:text-slate-500" aria-label="Cancel edit">
                                                     <X className="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
