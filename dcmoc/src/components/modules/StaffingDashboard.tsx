@@ -90,9 +90,10 @@ export function StaffingDashboard() {
             totalHeadcount
         );
 
-        // Roster Generation
+        // Roster Generation — pass selectedCountry for accurate public holiday awareness
         const rosterPattern = inputs.shiftModel === '12h' ? '4on-3off' : '3shift-8h';
-        const roster = generateAnnualRoster(2025, rosterPattern);
+        const rosterYear = new Date().getFullYear();
+        const roster = generateAnnualRoster(rosterYear, rosterPattern, new Date(rosterYear, 0, 1), selectedCountry);
 
         return {
             staffingResults, totalHeadcount, totalMonthlyCost, totalOnShift,
@@ -102,7 +103,12 @@ export function StaffingDashboard() {
         };
     }, [selectedCountry, inputs, effectiveInputs]);
 
-    if (!selectedCountry || !results) return <div>Loading...</div>;
+    if (!selectedCountry || !results) return (
+        <div className="flex flex-col items-center justify-center py-24 text-slate-500 dark:text-slate-400 space-y-3">
+            <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+            <p className="text-sm">Loading staffing data…</p>
+        </div>
+    );
 
     return (
         <div className="space-y-6">

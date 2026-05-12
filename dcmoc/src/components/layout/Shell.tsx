@@ -43,6 +43,7 @@ import {
     LineChart,
     Activity,
     Fuel,
+    Menu,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
@@ -94,6 +95,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
     const { theme, setTheme } = useTheme();
 
     const [scenarioName, setScenarioName] = useState('');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const navItems: { label: string; icon: any; id: typeof activeTab; section?: string }[] = [
         { label: 'CAPEX Config', icon: Building, id: 'capex' },
@@ -155,8 +157,25 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
 
     return (
         <div className="min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans selection:bg-cyan-500/30 transition-colors duration-300">
+            {/* Mobile sidebar overlay */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-30 lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl flex flex-col fixed h-full z-20 transition-colors duration-300">
+            <aside
+                className={clsx(
+                    "w-64 border-r border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl flex flex-col fixed h-full z-40 transition-all duration-300",
+                    // On large screens: always visible. On small screens: slide in/out
+                    "lg:translate-x-0",
+                    sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
+                )}
+                aria-label="Sidebar navigation"
+            >
                 <div className="border-b border-slate-200 dark:border-slate-800">
                     <a
                         href="/index.html"
@@ -197,7 +216,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                     </label>
                                 )}
                                 <button
-                                    onClick={() => actions.setActiveTab(item.id)}
+                                    onClick={() => { actions.setActiveTab(item.id); setSidebarOpen(false); }}
                                     className={clsx(
                                         "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                                         "hover:bg-slate-200/50 dark:hover:bg-slate-800/50",
@@ -227,8 +246,11 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                     : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                             )}
                             title="Light Mode (Presentation)"
+                            aria-label="Switch to light mode"
+                            aria-pressed={theme === 'light'}
                         >
                             <Sun className="w-3.5 h-3.5" />
+                            <span className="sr-only">Light</span>
                         </button>
                         <button
                             onClick={() => setTheme('dark')}
@@ -239,8 +261,11 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                                     : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                             )}
                             title="Dark Mode (Standard)"
+                            aria-label="Switch to dark mode"
+                            aria-pressed={theme === 'dark'}
                         >
                             <Moon className="w-3.5 h-3.5" />
+                            <span className="sr-only">Dark</span>
                         </button>
                     </div>
 
@@ -281,11 +306,23 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 ml-64 min-h-screen relative overflow-x-hidden pt-16">
+            <main className="flex-1 lg:ml-64 min-h-screen relative overflow-x-hidden pt-16">
                 {/* Top Navbar */}
-                <header className="h-16 border-b border-slate-200/50 dark:border-slate-800/50 backdrop-blur-md fixed top-0 w-[calc(100%-16rem)] z-10 flex items-center px-8 justify-between bg-white/80 dark:bg-slate-900/80 transition-colors duration-300">
-                    <div className="text-sm breadcrumbs text-slate-500 dark:text-slate-400">
-                        <span className="text-slate-400 dark:text-slate-600">App</span> / <span className="text-slate-800 dark:text-slate-200 font-medium">{navItems.find(n => n.id === activeTab)?.label || 'Simulation'}</span>
+                <header className="h-16 border-b border-slate-200/50 dark:border-slate-800/50 backdrop-blur-md fixed top-0 left-0 right-0 lg:left-64 z-20 flex items-center px-4 lg:px-8 justify-between bg-white/80 dark:bg-slate-900/80 transition-colors duration-300">
+                    <div className="flex items-center gap-3">
+                        {/* Mobile hamburger */}
+                        <button
+                            onClick={() => setSidebarOpen(prev => !prev)}
+                            className="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            aria-label="Toggle sidebar navigation"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                        <div className="text-sm breadcrumbs text-slate-500 dark:text-slate-400">
+                            <span className="hidden sm:inline text-slate-400 dark:text-slate-600">App</span>
+                            <span className="hidden sm:inline"> / </span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium">{navItems.find(n => n.id === activeTab)?.label || 'Simulation'}</span>
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 dark:bg-emerald-500/10 rounded-full border border-emerald-500/20">
@@ -295,7 +332,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     </div>
                 </header>
 
-                <div className="p-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {children}
                 </div>
             </main>

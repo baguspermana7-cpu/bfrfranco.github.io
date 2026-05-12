@@ -420,7 +420,12 @@ export function ReportDashboard() {
 
 
 
-    if (!selectedCountry || !fullData) return <div className="p-10 text-center text-slate-400">Loading Report Engine...</div>;
+    if (!selectedCountry || !fullData) return (
+        <div className="flex flex-col items-center justify-center py-24 text-slate-500 dark:text-slate-400 space-y-3">
+            <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+            <p className="text-sm">Compiling report engine…</p>
+        </div>
+    );
 
     const pattern = SHIFT_PATTERNS[fullData.patternId];
 

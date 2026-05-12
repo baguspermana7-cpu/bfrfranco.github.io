@@ -198,7 +198,7 @@ const CarbonDashboard = () => {
                         ))}
                         <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center">vs Industry Average<Tooltip content="Comparison against industry benchmarks: average PUE ~1.58 (Uptime Institute 2024), best-in-class <1.2 for hyperscale facilities." /></span>
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center">vs Industry Average<Tooltip content="Comparison against industry benchmarks: average PUE ~1.58 (Uptime Institute 2025), best-in-class 1.08–1.12 for AI/liquid-cooled facilities." /></span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{fmt(result.industryAvgEmissions, 1)} tCO₂/yr</span>
                             </div>
                             <div className="text-xs text-slate-500">
@@ -268,7 +268,7 @@ const CarbonDashboard = () => {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <Zap className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                                PUE Benchmark Comparison<Tooltip content="Power Usage Effectiveness (PUE) = Total Facility Power / IT Equipment Power. A PUE of 1.0 means all power goes to IT. Lower is better. Industry average is ~1.58 (Uptime Institute 2024)." />
+                                PUE Benchmark Comparison<Tooltip content="Power Usage Effectiveness (PUE) = Total Facility Power / IT Equipment Power. A PUE of 1.0 means all power goes to IT. Lower is better. Industry average is ~1.58 (Uptime Institute 2025)." />
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-4">

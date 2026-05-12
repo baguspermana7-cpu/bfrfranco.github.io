@@ -47,7 +47,7 @@ const TOOLTIP_TEXTS = {
 
     // Individual metric tooltips
     metrics: {
-        pue: 'Power Usage Effectiveness \u2014 ratio of total facility power to IT equipment power. Lower is better. Industry median ~1.35 (Uptime Institute 2024).',
+        pue: 'Power Usage Effectiveness \u2014 ratio of total facility power to IT equipment power. Lower is better. Industry median ~1.50 (Uptime Institute 2025); AI/liquid-cooled best-in-class 1.08\u20131.12.',
         wue: 'Water Usage Effectiveness \u2014 liters of water consumed per kWh of IT energy. Estimated from cooling type. Lower is better.',
         energy_cost_per_kw: 'Annual electricity cost per kW of IT load, estimated at ~60% of total OPEX. Varies significantly by region.',
         staff_per_mw: 'Full-time equivalent staff per MW of IT load. Tier 4 facilities typically require 5\u201318 FTE/MW; Tier 2 requires 2.5\u201310.',
