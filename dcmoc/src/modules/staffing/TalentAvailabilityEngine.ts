@@ -83,8 +83,8 @@ export const calculateTalentAvailability = (input: TalentAvailabilityInput): Tal
     const competitionTurnoverAdj = hyperscalerPresence > 5 ? 0.04 : hyperscalerPresence > 3 ? 0.02 : 0;
     const adjustedTurnoverRate = Math.round((baseTurnover + turnoverAdj + competitionTurnoverAdj) * 100) / 100;
 
-    // Training cost
-    const certTrainingCost = 3500; // Per person for CDCP/CDCS
+    // Training cost — 2026: Uptime Institute CDCP ~$3,800-4,500; blended with on-the-job training
+    const certTrainingCost = 4200; // Per person for CDCP/CDCS (2026 rate)
     const newHiresPerYear = Math.ceil(totalFTE * adjustedTurnoverRate);
     const annualTrainingCost = Math.round(newHiresPerYear * certTrainingCost * 1.5); // 1.5x for onboarding overhead
 

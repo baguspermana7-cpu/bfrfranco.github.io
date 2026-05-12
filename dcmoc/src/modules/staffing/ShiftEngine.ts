@@ -371,7 +371,7 @@ export const generate5YearProjection = (
     let currentResults = JSON.parse(JSON.stringify(baseResults)) as StaffingResult[];
 
     for (let i = 0; i <= 5; i++) {
-        const year = 2025 + i;
+        const year = new Date().getFullYear() + i;
         const totalAnnualCost = currentResults.reduce((acc, r) => acc + (r.monthlyCost * 12), 0);
         const totalHeadcount = currentResults.reduce((acc, r) => acc + r.headcount, 0);
 

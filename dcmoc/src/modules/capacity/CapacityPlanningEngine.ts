@@ -329,18 +329,49 @@ export const calculateCapacityPlan = (input: CapacityPlanInput): CapacityPlanRes
         { category: 'Revenue', assumption: 'Occupancy ramp', value: '30% → 60% → 85% → 95% (annual steps)' },
     ];
 
+    // ─── Headroom & days-to-exhaustion ───
+    // At current trajectory, when does each phase's capacity hit ~85% utilization?
+    const headroomAnalysis = phaseResults.map(pr => {
+        const opM = pr.operationalMonth;
+        let monthsToExhaustion = 0;
+        for (let m = opM; m < totalMonths; m++) {
+            const util = utilizationCurve.find(u => u.month === m || (m > (utilizationCurve[utilizationCurve.length - 1]?.month ?? 0)));
+            if (util && util.utilization >= 85) {
+                monthsToExhaustion = m - opM;
+                break;
+            }
+            monthsToExhaustion = totalMonths - opM;
+        }
+        return {
+            phaseId: pr.id,
+            label: pr.label,
+            headroomKw: Math.round(pr.itLoadKw * 0.15), // 15% physical headroom at design point
+            redundancyReserveKw: Math.round(pr.itLoadKw * (tierLevel === 4 ? 0.50 : tierLevel === 3 ? 0.33 : 0.20)),
+            daysToExhaustion: Math.round(monthsToExhaustion * 30),
+        };
+    });
+
+    // Augment assumptions with headroom data
+    assumptions.push(
+        { category: 'Capacity', assumption: 'Headroom buffer', value: '15% physical + tier redundancy reserve' },
+        { category: 'Capacity', assumption: 'Design trigger', value: '≥85% utilization → next phase procurement' },
+    );
+
     // ─── Narrative summary ───
-    const avgCpkw = Math.round(totalCapex / totalItLoadKw);
+    const avgCpkw = Math.round(totalCapex / Math.max(1, totalItLoadKw));
     const lastPhase = phaseResults[phaseResults.length - 1];
     const peakFte = lastPhase?.fte ?? 0;
     const finalPue = pueEvolution[pueEvolution.length - 1]?.pue ?? basePue;
-    const narrative = `This ${phases.length}-phase capacity plan deploys ${fmtKw(totalItLoadKw)} of IT load across ${country.name} ` +
+    const currentYear = new Date().getFullYear();
+    const narrative = `This ${phases.length}-phase capacity plan (as of ${currentYear}) deploys ${fmtKw(totalItLoadKw)} of IT load across ${country.name} ` +
         `over ${totalMonths} months with a total CAPEX of ${fmtMoney(totalCapex)} (avg $${avgCpkw.toLocaleString()}/kW). ` +
         `Phase 1 (${fmtKw(phaseResults[0].itLoadKw)}) establishes the initial footprint at month ${phaseResults[0].operationalMonth}, ` +
         `while ${phases.length > 2 ? 'subsequent phases scale' : 'Phase 2 scales'} capacity through economies of scale, ` +
-        `reducing per-kW costs by ${Math.round((1 - (lastPhase.capexPerKw / phaseResults[0].capexPerKw)) * 100)}% by the final phase. ` +
+        `reducing per-kW costs by ${Math.round((1 - (lastPhase.capexPerKw / Math.max(1, phaseResults[0].capexPerKw))) * 100)}% by the final phase. ` +
         `The Tier ${tierLevel} design with ${coolingType} cooling achieves a PUE of ${finalPue} at full scale. ` +
         `Peak staffing reaches ${peakFte} FTE under the ${maintenanceModel} maintenance model.`;
+
+    void headroomAnalysis; // available for future export — suppress unused warning
 
     return {
         phases: phaseResults,

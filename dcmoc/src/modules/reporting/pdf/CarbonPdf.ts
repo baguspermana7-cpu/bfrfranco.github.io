@@ -120,7 +120,7 @@ export const generateCarbonPDF = async (
         head: [['Metric', 'PUE Value', 'Assessment']],
         body: [
             ['Design PUE', designPUE.toFixed(2), designPUE < 1.3 ? 'Best-in-Class' : designPUE < 1.5 ? 'Above Average' : 'Standard'],
-            ['Industry Average', industryAvg.toFixed(2), 'Uptime Institute 2024'],
+            ['Industry Average', industryAvg.toFixed(2), 'Uptime Institute 2025'],
             ['Best-in-Class', bestInClass.toFixed(2), 'Hyperscaler benchmark'],
             [{ content: `Gap vs Industry`, styles: { fontStyle: 'bold' } },
              { content: `${(industryAvg - designPUE).toFixed(2)}`, styles: { fontStyle: 'bold' } },
@@ -181,7 +181,7 @@ export const generateCarbonPDF = async (
         startY: y,
         head: [['Year', 'Emissions Target (tCO₂)', 'Reduction %', 'Strategy']],
         body: [
-            ['2025 (Current)', `${Math.round(currentEmissions)}`, '0%', 'Baseline measurement'],
+            ['2026 (Current)', `${Math.round(currentEmissions)}`, '0%', 'Baseline measurement'],
             ['2030', `${Math.round(currentEmissions * 0.55)}`, '45%', 'Green PPA + efficiency'],
             ['2040', `${Math.round(currentEmissions * 0.15)}`, '85%', 'Full renewable + carbon capture'],
             ['2050', '0', '100%', 'Net-zero achieved'],

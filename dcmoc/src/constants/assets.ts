@@ -42,22 +42,23 @@ export const ASSETS: AssetTemplate[] = [
             { id: 'gen-a', name: 'Full Load Bank Test (4 Hours)', frequency: 'Annual', category: 'Electrical', criticality: 'Statutory', standardHours: 12, requiresShutdown: true },
             { id: 'gen-bi', name: 'Vibration Analysis', frequency: 'Bi-Annual', category: 'Mechanical', criticality: 'Optimal', standardHours: 2, requiresShutdown: false },
         ],
+        // 2026 consumable costs updated (+8-15% vs 2024 on supply chain inflation)
         consumables: [
-            { name: 'Fuel Filters', baseLifeMonths: 12, costPerUnit: 150 },
-            { name: 'Air Filters', baseLifeMonths: 12, costPerUnit: 200 },
-            { name: 'Engine Oil (200L)', baseLifeMonths: 12, costPerUnit: 1200 },
-            { name: 'Coolant (50L)', baseLifeMonths: 24, costPerUnit: 350 },
-            { name: 'Oil Filters', baseLifeMonths: 6, costPerUnit: 85 }
+            { name: 'Fuel Filters', baseLifeMonths: 12, costPerUnit: 175 },
+            { name: 'Air Filters', baseLifeMonths: 12, costPerUnit: 230 },
+            { name: 'Engine Oil (200L)', baseLifeMonths: 12, costPerUnit: 1380 },
+            { name: 'Coolant (50L)', baseLifeMonths: 24, costPerUnit: 400 },
+            { name: 'Oil Filters', baseLifeMonths: 6, costPerUnit: 95 }
         ],
         criticalSpares: [
-            { name: 'AVR (Automatic Voltage Regulator)', stockPercent: 0.25, minStock: 1, costPerUnit: 8500, leadTimeWeeks: 12 },
-            { name: 'Fuel Injector Set', stockPercent: 0.10, minStock: 1, costPerUnit: 4200, leadTimeWeeks: 8 },
-            { name: 'Turbocharger Assembly', stockPercent: 0.10, minStock: 1, costPerUnit: 12000, leadTimeWeeks: 16 },
-            { name: 'Water Pump', stockPercent: 0.25, minStock: 1, costPerUnit: 2800, leadTimeWeeks: 6 },
-            { name: 'Starter Motor', stockPercent: 0.25, minStock: 1, costPerUnit: 3500, leadTimeWeeks: 8 },
-            { name: 'Gasket & Seal Kit', stockPercent: 0.50, minStock: 2, costPerUnit: 1200, leadTimeWeeks: 4 },
-            { name: 'Belt Kit (Alternator/Fan)', stockPercent: 0.50, minStock: 2, costPerUnit: 450, leadTimeWeeks: 2 },
-            { name: 'Radiator Core', stockPercent: 0.10, minStock: 1, costPerUnit: 6500, leadTimeWeeks: 12 },
+            { name: 'AVR (Automatic Voltage Regulator)', stockPercent: 0.25, minStock: 1, costPerUnit: 9500, leadTimeWeeks: 14 },
+            { name: 'Fuel Injector Set', stockPercent: 0.10, minStock: 1, costPerUnit: 4800, leadTimeWeeks: 10 },
+            { name: 'Turbocharger Assembly', stockPercent: 0.10, minStock: 1, costPerUnit: 14000, leadTimeWeeks: 18 },
+            { name: 'Water Pump', stockPercent: 0.25, minStock: 1, costPerUnit: 3200, leadTimeWeeks: 6 },
+            { name: 'Starter Motor', stockPercent: 0.25, minStock: 1, costPerUnit: 4000, leadTimeWeeks: 8 },
+            { name: 'Gasket & Seal Kit', stockPercent: 0.50, minStock: 2, costPerUnit: 1350, leadTimeWeeks: 4 },
+            { name: 'Belt Kit (Alternator/Fan)', stockPercent: 0.50, minStock: 2, costPerUnit: 500, leadTimeWeeks: 2 },
+            { name: 'Radiator Core', stockPercent: 0.10, minStock: 1, costPerUnit: 7500, leadTimeWeeks: 14 },
         ]
     },
     {

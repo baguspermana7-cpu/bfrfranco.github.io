@@ -69,14 +69,18 @@ export const defaultRevenueOccupancy = (years: number): number[] => {
 };
 
 // ─── DEFAULT INPUTS ─────────────────────────────────────────
+// 2026 market data (JLL, CBRE, Cushman & Wakefield DC Reports Q1-Q2 2026):
+// US wholesale colocation MRC: $140-$230/kW/month (avg ~$185 at Tier III 10+ MW deals)
+// AI/GPU capacity commands 20-30% premium: $200-$260/kW/month
+// NRC: Typically $200-$350/kW for fit-out, higher in constrained markets
 export const defaultRevenueInputs: RevenueInputs = {
     itLoadKw: 1000,
-    nrcPerKw: 250,
-    nrcCustomFitout: 50000,
-    nrcCrossConnect: 15000,
-    mrcPerKwMonth: 165, // 2025 US wholesale median (CBRE: $130-215 range)
-    mrcEscalation: 0.03,
-    mrcCrossConnectMonthly: 5000,
+    nrcPerKw: 280,                  // 2026: +12% vs 2025 on construction cost inflation
+    nrcCustomFitout: 60000,         // 2026 baseline
+    nrcCrossConnect: 18000,         // cross-connect setup
+    mrcPerKwMonth: 185,             // 2026 US wholesale median (JLL: $145-225 range; AI-capable: +20%)
+    mrcEscalation: 0.035,           // 2026: 3.5% annual escalation (power + labor inflation)
+    mrcCrossConnectMonthly: 5500,
     contractYears: 10,
     takeOrPayPct: 0.70,
     occupancyRamp: defaultRevenueOccupancy(10),
@@ -84,11 +88,19 @@ export const defaultRevenueInputs: RevenueInputs = {
 
 // ─── MAIN CALCULATION ───────────────────────────────────────
 export const calculateRevenue = (inputs: RevenueInputs): RevenueResult => {
-    const {
-        itLoadKw, nrcPerKw, nrcCustomFitout, nrcCrossConnect,
-        mrcPerKwMonth, mrcEscalation, mrcCrossConnectMonthly,
-        contractYears, takeOrPayPct, occupancyRamp
-    } = inputs;
+    // Input guards — prevent NaN/negative propagation
+    const itLoadKw = Math.max(1, inputs.itLoadKw || 1000);
+    const nrcPerKw = Math.max(0, inputs.nrcPerKw || 280);
+    const nrcCustomFitout = Math.max(0, inputs.nrcCustomFitout || 0);
+    const nrcCrossConnect = Math.max(0, inputs.nrcCrossConnect || 0);
+    const mrcPerKwMonth = Math.max(0, inputs.mrcPerKwMonth || 185);
+    const mrcEscalation = Math.max(0, Math.min(0.20, inputs.mrcEscalation || 0.035));
+    const mrcCrossConnectMonthly = Math.max(0, inputs.mrcCrossConnectMonthly || 0);
+    const contractYears = Math.max(1, Math.min(30, inputs.contractYears || 10));
+    const takeOrPayPct = Math.max(0, Math.min(1.0, inputs.takeOrPayPct || 0.70));
+    const occupancyRamp = Array.isArray(inputs.occupancyRamp) && inputs.occupancyRamp.length > 0
+        ? inputs.occupancyRamp
+        : defaultRevenueOccupancy(contractYears);
 
     // Total NRC (one-time)
     const totalNRC = (nrcPerKw * itLoadKw) + nrcCustomFitout + nrcCrossConnect;

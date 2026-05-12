@@ -117,13 +117,13 @@ export const generateSimulationNarrative = (
         });
     }
 
-    // Risk Logic
+    // Risk Logic (2026: Uptime Institute Tier Standard availability benchmarks)
     insights.push({
         category: 'Risk',
         severity: risk.expectedDowntimeMinutes > 50 ? 'medium' : 'low',
-        title: `Tier ${risk.tier} Reliability Projection`,
-        description: `Expected availability is ${risk.availability}%. Anticipate ~${risk.expectedDowntimeMinutes} mins of downtown/year.`,
-        recommendation: risk.tier < 3 ? 'Consider N+1 redundancy for critical paths.' : 'Maintain strict SOPs to preserve Tier rating.',
+        title: `Tier ${risk.tier} Reliability Projection (${new Date().getFullYear()})`,
+        description: `Expected availability is ${risk.availability}% (Uptime Institute Tier Standard 2025). Anticipate ~${risk.expectedDowntimeMinutes} min downtime/year.`,
+        recommendation: risk.tier < 3 ? 'Consider N+1 redundancy for critical paths to meet Tier III (99.982%) baseline.' : 'Maintain strict SOPs, DCIM monitoring, and CBM to preserve Tier rating.',
     });
 
     // Turnover

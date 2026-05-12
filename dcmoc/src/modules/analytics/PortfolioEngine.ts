@@ -62,7 +62,7 @@ export function calculatePortfolio(sites: SiteConfig[]): PortfolioResult {
             fuelHours: 48,
             fireType: 'novec',
             alarmType: 'addressable',
-            projYear: '2025',
+            projYear: '2026',
             designFee: 8,
             pmFee: 5,
             contingency: 10,

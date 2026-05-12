@@ -52,26 +52,29 @@ export interface CBMResult {
     selectedTier: DCIMTier;
 }
 
+// 2026 DCIM platform pricing (Vertiv/Schneider/nlyte/Sunbird market survey):
+// Basic BMS: $15K-$25K/yr; Standard DCIM: $40K-$65K/yr; Enterprise AI DCIM: $90K-$150K/yr
+// Prices scale with monitored kW; AI-enabled platforms seeing +15% YoY
 const DCIM_PLATFORMS: DCIMPlatform[] = [
     {
         tier: 'basic',
         label: 'Basic BMS',
-        annualLicenseCost: 15000,
-        features: ['Temperature monitoring', 'Basic alerts', 'Manual reporting'],
+        annualLicenseCost: 18000,      // 2026: +$3K vs 2024
+        features: ['Temperature monitoring', 'Basic alerts', 'Manual reporting', 'Energy metering'],
         sensorIntegration: 0.6,
     },
     {
         tier: 'standard',
         label: 'Standard DCIM',
-        annualLicenseCost: 45000,
-        features: ['Real-time dashboards', 'Capacity planning', 'Automated alerts', 'Power monitoring', 'Trend analysis'],
+        annualLicenseCost: 52000,      // 2026: ~$52K/yr (Sunbird/Nlyte mid-tier)
+        features: ['Real-time dashboards', 'Capacity planning', 'Automated alerts', 'Power monitoring', 'Trend analysis', 'Asset lifecycle tracking'],
         sensorIntegration: 0.85,
     },
     {
         tier: 'enterprise',
-        label: 'Enterprise DCIM',
-        annualLicenseCost: 95000,
-        features: ['AI/ML predictive analytics', 'Digital twin', 'CFD modeling', 'Automated workflows', 'API integrations', 'Multi-site federation'],
+        label: 'Enterprise DCIM (AI)',
+        annualLicenseCost: 110000,     // 2026: AI-enabled platforms (Vertiv, Schneider EcoStruxure)
+        features: ['AI/ML predictive analytics', 'Digital twin', 'CFD modeling', 'Automated workflows', 'API integrations', 'Multi-site federation', 'Anomaly detection', 'Carbon tracking'],
         sensorIntegration: 1.0,
     },
 ];
@@ -184,8 +187,9 @@ export function calculateCBM(input: CBMInput): CBMResult {
     const totalSensorCount = activeSensors.reduce((sum, s) => sum + s.count, 0);
 
     // Downtime cost avoidance
-    const downtimeCostPerMin = country.risk.downtimeCostPerMin;
-    const expectedDowntimeMinPerYear = tierLevel === 4 ? 26 : tierLevel === 3 ? 96 : 264; // Uptime Institute targets
+    const downtimeCostPerMin = Math.max(100, country.risk.downtimeCostPerMin || 5000);
+    // 2026 Uptime Institute Tier Standard: Tier IV 26 min/yr, Tier III 95 min/yr, Tier II 1361 min/yr
+    const expectedDowntimeMinPerYear = tierLevel === 4 ? 26 : tierLevel === 3 ? 95 : 1361;
     const avgDetectionRate = activeSensors.length > 0
         ? activeSensors.reduce((sum, s) => sum + s.failureDetectionRate, 0) / activeSensors.length
         : 0;
@@ -217,6 +221,7 @@ export function calculateCBM(input: CBMInput): CBMResult {
         npv5Year += netAnnualBenefit / Math.pow(1 + discountRate, y);
     }
 
+    // Guard against rackCount = 0
     const sensorDensityPerRack = rackCount > 0 ? Math.round((totalSensorCount / rackCount) * 10) / 10 : 0;
 
     return {

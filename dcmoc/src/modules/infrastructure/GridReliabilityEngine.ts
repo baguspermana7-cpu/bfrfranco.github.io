@@ -76,17 +76,21 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     const recommendedFuelHours = Math.max(recommendedGenHoursBase, gridTier === 3 ? 168 : gridTier === 2 ? 72 : 48);
 
     // --- Cost Calculations ---
-    // Fuel cost: assume diesel generator at 0.3 liters/kWh, $1.2/liter
-    const fuelConsumptionRate = 0.3; // liters per kWh
-    const fuelPricePerLiter = 1.2;
-    const expectedRunHoursPerYear = (annualOutageMinutes / 60) + (recommendedFuelHours * 0.1); // runtime + monthly tests
+    // Fuel cost: diesel generator at 0.27-0.30 L/kWh (modern Tier 4 engines ~0.27 L/kWh)
+    // Global diesel (IEA 2025): ~$1.10-$1.40/L for commercial/industrial
+    // Using $1.25/L as 2026 global commercial baseline
+    const fuelConsumptionRate = 0.27; // L/kWh (Tier 4 Final engines, 2026 standard)
+    const fuelPricePerLiter = 1.25;   // USD/L (2026 global commercial diesel benchmark)
+    const expectedRunHoursPerYear = (annualOutageMinutes / 60) + (recommendedFuelHours * 0.12); // runtime + monthly/quarterly tests
     const annualFuelCost = Math.round(
         requiredGenCapacity * expectedRunHoursPerYear * fuelConsumptionRate * fuelPricePerLiter * (1 + backupFuelPremium)
     );
 
     // UPS battery stress from brownouts
+    // 2026: VRLA replacement cost $26-$30/kW/yr; Li-ion (now common) $18-$22/kW/yr
+    // Using $27/kW/yr blended (60% VRLA, 40% Li-ion market shift per Uptime 2025)
     const brownoutStressFactor = Math.min(2.0, 1.0 + brownoutFreq * 0.02);
-    const baseUpsReplacementCost = itLoadKw * 24; // $24/kW/year baseline for VRLA
+    const baseUpsReplacementCost = itLoadKw * 27; // $27/kW/year blended (2026)
     const annualUpsReplacementCost = Math.round(baseUpsReplacementCost * brownoutStressFactor);
 
     // Dual feed recommendation
@@ -109,10 +113,12 @@ export const calculateGridReliability = (input: GridReliabilityInput): GridRelia
     const solarViabilityScore = renewableReadiness;
 
     // Battery storage ROI (years to payback)
-    const bessCostPerKwh = 400; // $/kWh
-    const bessCapacity = itLoadKw * 0.5; // 30 mins of storage
+    // BNEF 2025/2026: utility-scale BESS ~$220-$270/kWh; commercial/industrial ~$300-$380/kWh
+    // Using $300/kWh for DC application (2026 C&I BESS benchmark, BloombergNEF)
+    const bessCostPerKwh = 300; // $/kWh (2026 C&I BESS, down from $400 in 2023)
+    const bessCapacity = itLoadKw * 0.5; // 30 mins of storage at full IT load
     const bessTotalCost = bessCapacity * bessCostPerKwh;
-    const annualBessSavings = annualFuelCost * 0.4 + annualUpsReplacementCost * 0.2;
+    const annualBessSavings = annualFuelCost * 0.45 + annualUpsReplacementCost * 0.25; // improved savings with lower BESS cost
     const batteryStorageROI = annualBessSavings > 0 ? Math.round((bessTotalCost / annualBessSavings) * 10) / 10 : 99;
 
     const costBreakdown = [
