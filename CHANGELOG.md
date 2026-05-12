@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.15.0 — 2026-05-13 (Spares Engine UI/UX upgrade · Catalog Analytics + Fleet/Portfolio tabs · platform-layer DB · supply-chain & transport data)
+
+### Added — Spares Engine UI/UX upgrade + 2 new analytics tabs
+`spares-readiness-calculator.html` 6,263 → 7,575 lines (+1,312).
+- **UI/UX**: aurora-mesh hero (3 drifting amber/complementary radial blobs, 22/28/35 s loops, `will-change`, `prefers-reduced-motion`-guarded); amber gradient primary buttons (`#d97706→#f59e0b→#fbbf24`) + `translateY(-1px)` hover-lift + amber focus rings; card-shine `::after` sweep on result/module cards; 200 ms `pane-fadein` tab cross-fade + amber active-tab underline; JetBrains Mono for KPI figures; sticky headline sub-bar CSS; mobile "Jump to module ▾" `<select>` (3 optgroups) + collapsible input accordions; full dark-mode coverage on the new elements.
+- **"📊 Catalog Analytics" tab** (Reference group): 8 KPI cards (parts / OEMs / systems / NRND-LTB-obsolete % / blind-risk count [crit≥7 + eol≥6 + 0 alternates] / 3D-printable / refurbishable / AI-factory liquid-cooling count + avg lead time), OEM-concentration stacked-bar by subsystem (>60% top-OEM share flagged), lead-time distribution sorted by worst-case, lifecycle × DC-generation stacked bar, criticality × lead-time scatter (subsystem-colored, upper-right stocking-priority quadrant shaded), blind-risks table (top 20), opportunity panels (3D-printable / refurbishable crit≤6 / AI-factory liquid-cooling), system + DC-generation scope filter, CSV export.
+- **"🧰 Fleet / Portfolio" tab** (Analytical group): fleet builder (searchable catalog `<select>` + 3 presets — Tier-III Enterprise / AI-Factory Liquid-Cool / Legacy EOL-Exposed, each 5 realistic catalog parts), editable fleet table (per-row λ / μ_LT / σ_LT / safety stock / recommended stock / annual carrying $ / stockout-$ risk / readiness %), 6 fleet KPIs (total recommended-stock $ / weighted fleet readiness % / # critical-at-risk / total annual carrying $ / total stockout-$ risk / EOL-exposure score), 3 charts (stockout-$ Pareto bar+cumulative, EOL-exposure heatmap subsystem×DC-generation, ABC-XYZ demand-value bubble scatter with quadrant labels), fleet PDF report (`<\/script>` escaped), `localStorage` persistence (`cse_fleet`).
+- Wiring: `TAB_ORDER` + `switchTab` calcs map + `recalcAll` + `SCENARIO_FIELDS` + `scenarioSnapshot`/`applySnapshot` (serializes the fleet list as `__fleetParts`) + the jump-to-module selector all updated. Fixed a syntax error (spurious `})(); // end catalog IIFE` at EOF). Audits clean.
+
+### Added — Database platform layer (`tools/spares-db-schema.sql` + `tools/build-spares-db.py --platform`)
+6 new tables + 2 views: `sites` (12 DC facilities), `suppliers` (distinct from OEMs — OTIF / commit-accuracy / quote-turnaround / PO-ack / defect-rate / responsiveness / corrective-action-closure / financial-health / capacity-headroom / geo & geopolitical & lead-time-volatility scores / strategic-importance / review-cadence / consignment & VMI capability), `inventory_positions` (on-hand / reserved / in-transit / safety-stock-target / reorder-point / max / days-of-cover by part × location), `purchase_orders` (full lifecycle — creation/ack/commit/need-by/received dates, delivery-status [on-track/at-risk/late/delivered/blocked/cancelled], blocker, recovery-plan, owner, demand-type), `consumption_history` (actual usage events → demand forecasting), `engineering_changes` (revision / supersession / EOL-notice / LTB-window / vendor-transition with qualification cost+lead-time + mitigation status); views `v_po_at_risk` (late/at-risk/blocked POs against critical parts with slip-days) + `v_readiness_gap` (critical parts where on-hand+in-transit < safety-stock target). `build-spares-db.py --platform` populates them with synthetic operational data (`--scale 1`: 12 sites · 122 suppliers · ~1,570 inventory positions · ~250 POs · ~10k consumption events · ~470 engineering changes). The default build (no `--platform`) leaves them empty so the committed catalog/CSVs are unchanged.
+
+### Added — Supply-chain & transport reference data (`tools/spares-db-schema.sql` — always populated)
+3 new reference tables + 3 views, grounded in deep research (ICC Incoterms 2020; World Bank LPI; the 2026 DC-equipment shortage + tariff context — see `Documents/Training/spares_supply_chain_transport_research.md`):
+- **`transport_modes`** (7) — ocean-FCL / ocean-LCL / air-standard / air-express / road / rail / courier-express, each with intercontinental + intra-region transit days, a relative `cost_index` (ocean-FCL = 1.0; air-standard ~12, air-express ~25, road ~3, rail ~2, ocean-LCL ~1.6, courier ~18), a `co2_index`, capacity unit, typical use.
+- **`trade_lanes`** (13) — origin region → destination region (CN / EU / NA / SEA-Vietnam / India / Korea-Japan / MENA / LATAM / Intra-NA / Intra-EU / Intra-APAC) with ocean / air / road-rail transit days, customs-clearance days, last-mile days, and 1-10 scores for congestion / geopolitical / rate-volatility / tariff-exposure + reroute options + notes (e.g. CN-NA: 30 d ocean transit, congestion 6, geopolitical 7, tariff 8; Suez↔Cape +10-14 d; the China-transformer-dependency + Section 122/301 + copper-50% context).
+- **`country_risk`** (16) — per country: political-stability / customs-efficiency / port-infrastructure scores (1-10), LPI (~1-5), transformer-manufacturing-share % (CN ~60, US ~20, …), geopolitical-risk (1-10), tariff-regime note (e.g. China's Section 122 10% + Section 301 + copper +50% Apr-2026), notes.
+- Views: `v_lane_lead_time` (door-to-door days per lane × mode), `v_high_risk_lanes` (congestion + geopolitical + volatility composite), `v_oem_country_exposure` (parts/suppliers by country-of-origin × that country's risk → single-geography concentration).
+
+### Docs
+- `Documents/Training/spares_engine_platform.md` — the platform overview (the 5 layers, how they connect, the methodology grounding table, the v1.14→v1.16→beyond roadmap).
+- `Documents/Training/spares_supply_chain_transport_research.md` — deep-research synthesis: the 2026 DC-equipment shortage + tariff context, freight/port/lane risk, Incoterm/mode mechanics, the mitigation playbook (dual-source / "China+1" / regional hubs / consignment-VMI / component-specific safety stock / control tower / digital twin), with full citations + the design notes for the upcoming "Global Supply Chain & Transport" calculator module (Lane & Mode Planner · Supply-Chain Risk Map · Disruption Scenario Sim · Logistics Cost & Expedite Calculator — coming in v1.16).
+
+### Versioning
+- `js/rz-version.js` 1.14.1 → 1.15.0 (MINOR — new analytics tabs + UI/UX + platform-layer + supply-chain data). SW cache → `rz-cache-v1.15.0`.
+
+---
+
 ## v1.14.1 — 2026-05-13 (Spare-parts DB enriched + scalable · query tooling · Spares Engine QA fixes)
 
 ### Changed — DC spare-parts database enriched (the platform foundation)

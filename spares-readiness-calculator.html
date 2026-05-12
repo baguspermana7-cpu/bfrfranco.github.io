@@ -661,6 +661,191 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .method-note { max-width: 1100px; margin: 2rem auto 0; padding: 0.75rem 2rem; font-size: 0.72rem; color: #64748b; line-height: 1.6; text-align: center; border-top: 1px solid rgba(148,163,184,0.12); }
 [data-theme="dark"] .method-note { color: #475569; border-top-color: rgba(255,255,255,0.06); }
 @media (max-width: 768px) { .method-note { padding: 0.75rem 1rem; font-size: 0.68rem; } }
+
+/* ═══════════════════════════════════════════════
+   UI/UX UPGRADE v2 — aurora, card-shine, transitions, onboarding
+   ═══════════════════════════════════════════════ */
+
+/* 1. Aurora hero mesh */
+.aurora-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+.aurora-blob { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+.aurora-blob-1 { width: 700px; height: 700px; background: radial-gradient(ellipse at center, rgba(245,158,11,0.065) 0%, transparent 70%); top: -200px; right: -100px; animation: aurora-drift-1 22s ease-in-out infinite alternate; }
+.aurora-blob-2 { width: 600px; height: 600px; background: radial-gradient(ellipse at center, rgba(99,102,241,0.045) 0%, transparent 70%); bottom: -100px; left: -150px; animation: aurora-drift-2 28s ease-in-out infinite alternate; }
+.aurora-blob-3 { width: 400px; height: 400px; background: radial-gradient(ellipse at center, rgba(217,119,6,0.04) 0%, transparent 70%); top: 40%; left: 30%; animation: aurora-drift-3 35s ease-in-out infinite alternate; }
+@keyframes aurora-drift-1 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(60px,40px) scale(1.08);} }
+@keyframes aurora-drift-2 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(-40px,60px) scale(1.06);} }
+@keyframes aurora-drift-3 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(30px,-50px) scale(0.94);} }
+@media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none !important; } }
+
+/* 2. Enhanced buttons */
+.btn-primary { background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%) !important; transition: transform 0.18s ease, box-shadow 0.18s ease !important; }
+.btn-primary:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 20px rgba(245,158,11,0.45) !important; }
+.btn-primary:focus-visible { outline: 3px solid rgba(245,158,11,0.6); outline-offset: 2px; }
+.btn-pdf:focus-visible, .btn-scenario:focus-visible, .catalog-csv-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* 3. Card shine sweep on result/KPI cards */
+.result-card, .module-card, .summary-kpi {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.result-card::after, .module-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.055) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.9s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
+}
+.result-card:hover::after, .module-card:hover::after { transform: translateX(100%); }
+.result-card:hover, .module-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 0 0 1px rgba(245,158,11,0.12); }
+[data-theme="dark"] .result-card, [data-theme="dark"] .module-card { box-shadow: 0 1px 3px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.06); }
+[data-theme="dark"] .result-card::after, [data-theme="dark"] .module-card::after { background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%); }
+
+/* 4. Monospace KPI numbers */
+.result-big, .metric-value { font-family: 'JetBrains Mono', 'Courier New', monospace !important; letter-spacing: -0.02em; }
+.result-big { font-size: clamp(1.9rem, 4vw, 2.6rem) !important; line-height: 1 !important; }
+
+/* 5. Tab transitions */
+.module-pane { opacity: 0; transition: opacity 0.2s ease; display: none; }
+.module-pane.active { display: block; opacity: 1; animation: pane-fadein 0.2s ease forwards; }
+@keyframes pane-fadein { 0%{opacity:0;transform:translateY(4px);} 100%{opacity:1;transform:translateY(0);} }
+/* Active tab pill underline */
+.tab-btn.active { border-bottom: 2px solid var(--amber-light) !important; position: relative; }
+
+/* 6. Sticky headline sub-bar for analytical tabs */
+.module-sticky-bar { position: sticky; top: 72px; z-index: 90; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); padding: 6px 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; border-radius: 0 0 10px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.msb-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.msb-value { font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
+.msb-badge { }
+[data-theme="dark"] .module-sticky-bar { background: rgba(15,23,42,0.88); border-color: rgba(245,158,11,0.15); }
+@media (max-width: 768px) { .module-sticky-bar { top: 60px; padding: 5px 0.75rem; gap: 0.5rem; } }
+
+/* 7. Onboarding tour */
+.tour-overlay { position: fixed; inset: 0; z-index: 8000; pointer-events: none; }
+.tour-spotlight { position: absolute; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.55); transition: all 0.35s ease; }
+.tour-tooltip { position: fixed; z-index: 8001; background: #1e293b; color: #f1f5f9; border-radius: 14px; padding: 1.1rem 1.25rem; max-width: 320px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); border: 1px solid rgba(245,158,11,0.25); }
+.tour-tooltip-title { font-size: 0.78rem; font-weight: 800; color: var(--amber-light); margin-bottom: 0.45rem; }
+.tour-tooltip-body { font-size: 0.78rem; line-height: 1.55; color: #cbd5e1; }
+.tour-tooltip-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.9rem; gap: 0.5rem; }
+.tour-step-count { font-size: 0.68rem; color: #64748b; }
+.tour-btn-next { padding: 6px 16px; background: var(--amber); color: #0f172a; border: none; border-radius: 7px; font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.tour-btn-skip { padding: 6px 10px; background: none; color: #64748b; border: none; font-size: 0.72rem; cursor: pointer; font-family: inherit; }
+.tour-help-btn { position: fixed; bottom: 80px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: var(--amber-dark); font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 500; transition: all 0.2s; font-family: inherit; }
+.tour-help-btn:hover { background: rgba(245,158,11,0.22); transform: scale(1.1); }
+[data-theme="dark"] .tour-help-btn { background: rgba(245,158,11,0.1); color: #fbbf24; }
+
+/* 8. Mobile accordion inputs */
+.mobile-accordion-toggle { display: none; width: 100%; padding: 0.65rem 1rem; background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; color: var(--amber-dark); font-size: 0.8rem; font-weight: 700; font-family: inherit; cursor: pointer; text-align: left; margin-bottom: 0.75rem; }
+.mobile-accordion-toggle::before { content: '▸ '; }
+.mobile-accordion-toggle.open::before { content: '▾ '; }
+@media (max-width: 768px) {
+  .mobile-accordion-toggle { display: block; }
+  .mobile-accordion-content { display: none; }
+  .mobile-accordion-content.open { display: block; }
+  /* Jump-to select */
+  .tab-jump-select-wrap { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; margin-bottom: 0.5rem; }
+  .tab-jump-select { flex: 1; padding: 7px 10px; border: 1px solid rgba(245,158,11,0.3); background: var(--bg-secondary); color: var(--amber-dark); border-radius: 8px; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+  [data-theme="dark"] .tab-jump-select { background: #1e293b; border-color: #334155; color: #fbbf24; }
+}
+@media (min-width: 769px) { .tab-jump-select-wrap { display: none !important; } }
+
+/* ═══════════════════════════════════════════════
+   CATALOG ANALYTICS TAB STYLES
+   ═══════════════════════════════════════════════ */
+.ca-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
+.ca-kpi { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.75rem 0.85rem; position: relative; overflow: hidden; }
+.ca-kpi::after { content:''; position:absolute; inset:0; background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.05) 50%,transparent 70%); transform:translateX(-100%); transition:transform 0.8s ease; }
+.ca-kpi:hover::after { transform:translateX(100%); }
+.ca-kpi-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
+.ca-kpi-value { font-size: 1.3rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); line-height: 1; }
+.ca-kpi-sub { font-size: 0.62rem; color: var(--text-muted); margin-top: 3px; }
+.ca-kpi-alert { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); }
+.ca-kpi-alert .ca-kpi-value { color: #ef4444; }
+.ca-kpi-good { border-color: rgba(16,185,129,0.25); background: rgba(16,185,129,0.04); }
+.ca-kpi-good .ca-kpi-value { color: #059669; }
+[data-theme="dark"] .ca-kpi { background: rgba(30,41,59,0.7); border-color: rgba(245,158,11,0.1); }
+[data-theme="dark"] .ca-kpi-alert { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); }
+[data-theme="dark"] .ca-kpi-alert .ca-kpi-value { color: #f87171; }
+[data-theme="dark"] .ca-kpi-good { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.2); }
+[data-theme="dark"] .ca-kpi-good .ca-kpi-value { color: #34d399; }
+.ca-scope-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.ca-scope-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+.ca-scope-select { padding: 5px 10px; border: 1px solid rgba(245,158,11,0.3); background: transparent; border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; max-width: 200px; }
+[data-theme="dark"] .ca-scope-select { background: #1e293b; border-color: #334155; color: #fbbf24; }
+.ca-blind-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+.ca-blind-table th { padding: 6px 10px; background: rgba(239,68,68,0.1); color: #ef4444; font-weight: 700; text-align: left; border-bottom: 2px solid rgba(239,68,68,0.2); }
+.ca-blind-table td { padding: 5px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.ca-blind-table tr:hover td { background: rgba(239,68,68,0.03); }
+[data-theme="dark"] .ca-blind-table th { background: rgba(239,68,68,0.15); color: #f87171; }
+[data-theme="dark"] .ca-blind-table td { border-color: #334155; }
+.ca-opp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.75rem; }
+.ca-opp-card { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 10px; padding: 0.85rem; }
+.ca-opp-title { font-size: 0.75rem; font-weight: 800; color: var(--amber-dark); margin-bottom: 0.4rem; }
+.ca-opp-count { font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
+.ca-opp-list { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem; line-height: 1.5; }
+[data-theme="dark"] .ca-opp-card { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.18); }
+.ca-scatter-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.68rem; margin-top: 0.4rem; }
+.ca-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.ca-csv-btn { padding: 0.45rem 1rem; border: 1px solid rgba(16,185,129,0.35); background: rgba(16,185,129,0.05); color: #059669; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; font-family: inherit; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.ca-csv-btn:hover { background: rgba(16,185,129,0.12); }
+[data-theme="dark"] .ca-csv-btn { color: #34d399; border-color: rgba(16,185,129,0.3); }
+@media (max-width: 768px) {
+  .ca-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .ca-opp-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) { .ca-kpi-grid { grid-template-columns: 1fr 1fr; } }
+
+/* ═══════════════════════════════════════════════
+   FLEET / PORTFOLIO TAB STYLES
+   ═══════════════════════════════════════════════ */
+.fleet-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
+.fleet-kpi { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.75rem 0.85rem; }
+.fleet-kpi-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
+.fleet-kpi-value { font-size: 1.15rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
+.fleet-kpi-sub { font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; }
+[data-theme="dark"] .fleet-kpi { background: rgba(30,41,59,0.7); border-color: rgba(245,158,11,0.1); }
+.fleet-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--glass-border); margin-top: 0.75rem; }
+.fleet-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; min-width: 1100px; }
+.fleet-table th { padding: 6px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; }
+.fleet-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
+.fleet-table td.ft-desc { font-family: inherit; font-size: 0.72rem; }
+.fleet-table tr:hover td { background: rgba(245,158,11,0.04); }
+[data-theme="dark"] .fleet-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
+[data-theme="dark"] .fleet-table td { border-color: #334155; color: #cbd5e1; }
+[data-theme="dark"] .fleet-table tr:hover td { background: rgba(245,158,11,0.06); }
+.fleet-readiness-high { color: #059669; font-weight: 700; }
+.fleet-readiness-med { color: #d97706; font-weight: 700; }
+.fleet-readiness-low { color: #ef4444; font-weight: 700; }
+[data-theme="dark"] .fleet-readiness-high { color: #34d399; }
+[data-theme="dark"] .fleet-readiness-med { color: #fbbf24; }
+[data-theme="dark"] .fleet-readiness-low { color: #f87171; }
+.fleet-add-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.85rem 1rem; }
+.fleet-add-select { flex: 1; min-width: 180px; padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.76rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; }
+.fleet-add-select:focus { border-color: var(--amber); }
+[data-theme="dark"] .fleet-add-select { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+.fleet-preset-btn { padding: 6px 12px; border: 1px solid rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.2s; }
+.fleet-preset-btn:hover { background: rgba(245,158,11,0.12); border-color: var(--amber); }
+[data-theme="dark"] .fleet-preset-btn { color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+.btn-remove-fleet { padding: 2px 8px; border: 1px solid rgba(239,68,68,0.35); background: rgba(239,68,68,0.06); border-radius: 5px; color: #ef4444; font-size: 0.68rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+.btn-remove-fleet:hover { background: rgba(239,68,68,0.14); }
+.fleet-qty-input { width: 56px; padding: 3px 6px; border: 1px solid #e2e8f0; border-radius: 5px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); background: white; outline: none; }
+.fleet-qty-input:focus { border-color: var(--amber); }
+[data-theme="dark"] .fleet-qty-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+.abc-xyz-quad { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 0; border: 2px solid rgba(245,158,11,0.25); border-radius: 10px; overflow: hidden; font-size: 0.7rem; }
+.abc-xyz-cell { padding: 0.55rem 0.65rem; }
+.abc-xyz-cell .abc-label { font-weight: 800; font-size: 0.75rem; margin-bottom: 2px; }
+.abc-x { background: rgba(16,185,129,0.07); border-right: 1px solid rgba(245,158,11,0.12); border-bottom: 1px solid rgba(245,158,11,0.12); }
+.abc-az { background: rgba(245,158,11,0.07); border-bottom: 1px solid rgba(245,158,11,0.12); }
+.abc-cx { background: rgba(59,130,246,0.06); border-right: 1px solid rgba(245,158,11,0.12); }
+.abc-cz { background: rgba(239,68,68,0.05); }
+.pareto-line { border-top: 2px dashed rgba(239,68,68,0.6); }
+@media (max-width: 768px) {
+  .fleet-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) { .fleet-kpi-grid { grid-template-columns: 1fr 1fr; } }
 </style>
 <script src="js/rz-version.js?v=2026-05-09" defer></script>
 <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -675,6 +860,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 </script>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 <div class="page-background"></div>
+<!-- Aurora hero mesh -->
+<div class="aurora-mesh" aria-hidden="true">
+  <div class="aurora-blob aurora-blob-1"></div>
+  <div class="aurora-blob aurora-blob-2"></div>
+  <div class="aurora-blob aurora-blob-3"></div>
+</div>
 
 <!-- Navbar -->
 <nav class="navbar">
@@ -748,6 +939,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <span class="hero-stat"><i class="fas fa-file-pdf"></i> PDF &amp; Full Report export</span>
       <span class="hero-stat"><i class="fas fa-link"></i> Deep-link params</span>
       <span class="hero-stat"><i class="fas fa-bookmark"></i> 5 scenario presets</span>
+      <span class="hero-stat"><i class="fas fa-chart-pie"></i> 22 modules</span>
     </div>
   </section>
 
@@ -817,6 +1009,42 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     <span class="scenario-saved-msg" id="scenarioMsg"></span>
   </div>
 
+  <!-- Mobile: jump-to-module select -->
+  <div class="tab-jump-select-wrap" aria-label="Jump to module (mobile)">
+    <label for="mobileTabSelect" style="font-size:0.72rem;font-weight:700;color:var(--text-muted);flex-shrink:0;">Jump to module ▾</label>
+    <select class="tab-jump-select" id="mobileTabSelect" onchange="if(this.value){switchTab(this.value);this.value=''}" aria-label="Jump to module">
+      <option value="">Select module&hellip;</option>
+      <optgroup label="Analytical">
+        <option value="criticality">1 · Criticality</option>
+        <option value="readiness">2 · Readiness</option>
+        <option value="stock">3 · Optimal Stock</option>
+        <option value="hub">4 · Hub Positioning</option>
+        <option value="supplier">5 · Supplier Risk</option>
+        <option value="ltb">6 · Last-Time-Buy</option>
+        <option value="kraljic">7 · Kraljic</option>
+        <option value="montecarlo">8 · Monte-Carlo</option>
+        <option value="fleet">🧰 Fleet / Portfolio</option>
+      </optgroup>
+      <optgroup label="Operating Engine">
+        <option value="pm-ops">A · Daily PM Ops</option>
+        <option value="scorecard">B · Scorecard</option>
+        <option value="negotiation">C · Negotiation</option>
+        <option value="contract">D · Contract</option>
+        <option value="process">E · Process</option>
+        <option value="meeting">F · Meeting</option>
+        <option value="stakeholder">G · Stakeholder</option>
+        <option value="eol">H · EOL Response</option>
+        <option value="ambiguity">I · Ambiguity</option>
+        <option value="star">J · STAR Builder</option>
+      </optgroup>
+      <optgroup label="Reference">
+        <option value="catalog">📚 Parts Catalog</option>
+        <option value="catalog-analytics">📊 Catalog Analytics</option>
+        <option value="faq">9 · Methodology</option>
+      </optgroup>
+    </select>
+  </div>
+
   <!-- Tabs -->
   <div class="tabs-wrap">
     <div class="tabs-row" role="tablist" id="tabsRow">
@@ -829,6 +1057,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <button class="tab-btn" onclick="switchTab('ltb')" role="tab" aria-selected="false" aria-controls="pane-ltb">6 · Last-Time-Buy</button>
       <button class="tab-btn" onclick="switchTab('kraljic')" role="tab" aria-selected="false" aria-controls="pane-kraljic">7 · Kraljic</button>
       <button class="tab-btn" onclick="switchTab('montecarlo')" role="tab" aria-selected="false" aria-controls="pane-montecarlo">8 · Monte-Carlo</button>
+      <button class="tab-btn" onclick="switchTab('fleet')" role="tab" aria-selected="false" aria-controls="pane-fleet">🧰 Fleet / Portfolio</button>
       <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Operating Engine</span>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('pm-ops')" role="tab" aria-selected="false" aria-controls="pane-pm-ops">A · Daily PM Ops</button>
@@ -844,6 +1073,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Reference</span>
       <button class="tab-btn" onclick="switchTab('catalog')" role="tab" aria-selected="false" aria-controls="pane-catalog">&#128218; Parts Catalog</button>
+      <button class="tab-btn" onclick="switchTab('catalog-analytics')" role="tab" aria-selected="false" aria-controls="pane-catalog-analytics">&#128202; Catalog Analytics</button>
       <button class="tab-btn" onclick="switchTab('faq')" role="tab" aria-selected="false" aria-controls="pane-faq">9 · Methodology</button>
     </div>
   </div>
@@ -2543,6 +2773,280 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     </div>
     <!-- ===== END PARTS CATALOG TAB ===== -->
 
+    <!-- ===== CATALOG ANALYTICS TAB ===== -->
+    <div class="module-pane" id="pane-catalog-analytics">
+      <!-- Sticky headline bar -->
+      <div class="module-sticky-bar" id="ca_sticky">
+        <span class="msb-label">Parts in Catalog</span>
+        <span class="msb-value" id="ca_sb_total">—</span>
+        <span class="msb-label" style="margin-left:1rem;">OEMs</span>
+        <span class="msb-value" id="ca_sb_oems">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Blind Risks</span>
+        <span class="msb-value" id="ca_sb_blind" style="color:#ef4444;">—</span>
+        <span class="msb-label" style="margin-left:1rem;">EOL/NRND/Obs</span>
+        <span class="msb-value" id="ca_sb_eol">—</span>
+      </div>
+
+      <!-- Header -->
+      <div class="catalog-header">
+        <strong>Catalog Analytics Dashboard</strong> — Analyzes the spare-parts database itself using <code>SPARES_CATALOG</code>. All charts are dark-mode aware and mobile-safe. Full SQLite scales to 100k+ rows via <code>tools/query-spares-db.py</code>.
+      </div>
+
+      <!-- Scope filter -->
+      <div class="ca-scope-bar">
+        <span class="ca-scope-label"><i class="fas fa-filter"></i> Scope:</span>
+        <select class="ca-scope-select" id="ca_scope_sys" onchange="calcCatalogAnalytics()" aria-label="Scope by system">
+          <option value="">All Systems</option>
+          <option value="electrical">Electrical</option>
+          <option value="mechanical">Mechanical</option>
+          <option value="cooling">Cooling</option>
+          <option value="fire-life-safety">Fire &amp; Life Safety</option>
+          <option value="network-ict">Network / ICT</option>
+          <option value="bms-controls">BMS / Controls</option>
+          <option value="structural-civil">Structural / Civil</option>
+          <option value="monitoring">Monitoring</option>
+        </select>
+        <select class="ca-scope-select" id="ca_scope_gen" onchange="calcCatalogAnalytics()" aria-label="Scope by DC generation">
+          <option value="">All DC Generations</option>
+          <option value="legacy-raised-floor">Legacy Raised-Floor</option>
+          <option value="enterprise-tier3">Enterprise Tier III</option>
+          <option value="colo-wholesale">Colo / Wholesale</option>
+          <option value="cloud-hyperscale">Cloud Hyperscale</option>
+          <option value="ai-factory-liquid-cooled">AI Factory (Liquid-Cooled)</option>
+          <option value="edge-micro">Edge / Micro-DC</option>
+        </select>
+        <button class="ca-csv-btn" onclick="caExportCSV()" aria-label="Export analytics summary as CSV"><i class="fas fa-download"></i> Export analytics CSV</button>
+      </div>
+
+      <!-- KPI strip -->
+      <div class="ca-kpi-grid" id="ca_kpi_grid">
+        <div class="ca-kpi"><div class="ca-kpi-label">Parts in catalog</div><div class="ca-kpi-value" id="ca_kpi_parts">—</div><div class="ca-kpi-sub">in scope</div></div>
+        <div class="ca-kpi"><div class="ca-kpi-label">OEMs covered</div><div class="ca-kpi-value" id="ca_kpi_oems">—</div><div class="ca-kpi-sub">suppliers</div></div>
+        <div class="ca-kpi"><div class="ca-kpi-label">Systems / Subsystems</div><div class="ca-kpi-value" id="ca_kpi_sys">—</div><div class="ca-kpi-sub">taxonomy nodes</div></div>
+        <div class="ca-kpi ca-kpi-alert"><div class="ca-kpi-label">% NRND / LTB / Obsolete</div><div class="ca-kpi-value" id="ca_kpi_eol_pct">—</div><div class="ca-kpi-sub">lifecycle risk exposure</div></div>
+        <div class="ca-kpi ca-kpi-alert"><div class="ca-kpi-label">Blind Risks</div><div class="ca-kpi-value" id="ca_kpi_blind">—</div><div class="ca-kpi-sub">crit≥7 + EOL≥6 + 0 alts</div></div>
+        <div class="ca-kpi ca-kpi-good"><div class="ca-kpi-label">3D-Printable</div><div class="ca-kpi-value" id="ca_kpi_p3d">—</div><div class="ca-kpi-sub">collapse LTB risk</div></div>
+        <div class="ca-kpi ca-kpi-good"><div class="ca-kpi-label">Refurbishable (crit≤6)</div><div class="ca-kpi-value" id="ca_kpi_refurb">—</div><div class="ca-kpi-sub">circular economy</div></div>
+        <div class="ca-kpi"><div class="ca-kpi-label">AI-Factory Liquid-Cool</div><div class="ca-kpi-value" id="ca_kpi_aifac">—</div><div class="ca-kpi-sub">avg LT: <span id="ca_kpi_aifac_lt">—</span> wk</div></div>
+      </div>
+
+      <!-- Charts row 1: OEM concentration + Lead-time by subsystem -->
+      <div class="module-grid" style="margin-bottom:1.25rem;">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-building"></i> OEM Concentration by Subsystem <span class="tip" tabindex="0" data-tip="Parts per OEM per subsystem. Subsystems where 1 OEM holds >60% of parts are highlighted as concentration-risk hotspots — single-source exposure at the subsystem level." aria-label="OEM concentration tooltip">ⓘ</span></div>
+          <div class="chart-wrap-lg"><canvas id="chart_ca_oem_conc"></canvas></div>
+          <div id="ca_conc_warning" style="font-size:0.72rem;color:#ef4444;margin-top:0.4rem;font-weight:600;"></div>
+        </div>
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-clock"></i> Lead-Time Distribution by Subsystem <span class="tip" tabindex="0" data-tip="Average and maximum (ltMax) lead time per subsystem, sorted descending. Subsystems at the top represent the highest lead-time risk to spares readiness." aria-label="Lead time distribution tooltip">ⓘ</span></div>
+          <div class="chart-wrap-lg"><canvas id="chart_ca_lt_dist"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 2: Lifecycle by DC gen + Criticality × lead-time scatter -->
+      <div class="module-grid" style="margin-bottom:1.25rem;">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-layer-group"></i> Lifecycle Status by DC Generation <span class="tip" tabindex="0" data-tip="Stacked bar showing Active / NRND / LTB / Obsolete proportions per DC generation. Legacy raised-floor and enterprise-tier3 carry the heaviest EOL burden." aria-label="Lifecycle by DC gen tooltip">ⓘ</span></div>
+          <div class="chart-wrap-lg"><canvas id="chart_ca_lifecycle"></canvas></div>
+        </div>
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-crosshairs"></i> Criticality × Lead-Time Scatter <span class="tip" tabindex="0" data-tip="Each bubble is a subsystem. Upper-right quadrant (high criticality + long lead time) is the stocking-priority zone — shaded in amber. Bubble size ∝ part count in subsystem." aria-label="Criticality lead time scatter tooltip">ⓘ</span></div>
+          <div style="position:relative;height:300px;margin-top:0.5rem;"><canvas id="chart_ca_scatter"></canvas></div>
+          <div style="background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:6px;padding:4px 10px;margin-top:0.5rem;font-size:0.68rem;color:var(--amber-dark);">⚑ Upper-right zone = high criticality + long lead time → stocking priority</div>
+        </div>
+      </div>
+
+      <!-- Blind risks table -->
+      <div class="module-card" style="margin-bottom:1.25rem;">
+        <div class="card-title"><i class="fas fa-skull-crossbones" style="color:#ef4444;"></i> Blind Risk Parts <span class="tip" tabindex="0" data-tip="Parts with criticality ≥7 AND EOL risk ≥6 AND 0 qualified alternates. These are high-consequence parts that are hard to replace if they fail AND have no backup source. Proxy for FMECA blind-risk: high-severity failure mode with no condition monitoring alternative." aria-label="Blind risks tooltip">ⓘ</span>
+          <span style="margin-left:auto;font-size:0.7rem;color:var(--text-muted);" id="ca_blind_count_label">—</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-blind-table">
+            <thead><tr><th>Part ID</th><th>Description</th><th>System</th><th>Subsystem</th><th>DC Gen</th><th>Crit</th><th>EOL Risk</th><th>Lifecycle</th><th>LT typ (wk)</th><th>Cost (typ $)</th></tr></thead>
+            <tbody id="ca_blind_tbody"><tr><td colspan="10" style="text-align:center;padding:1.5rem;color:var(--text-muted);">Loading catalog&hellip;</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Opportunity panels -->
+      <div class="module-card" style="margin-bottom:1.25rem;">
+        <div class="card-title"><i class="fas fa-lightbulb" style="color:#f59e0b;"></i> Opportunity Panels</div>
+        <div class="ca-opp-grid" id="ca_opp_grid">
+          <div class="ca-opp-card">
+            <div class="ca-opp-title">🖨️ 3D-Printable Parts</div>
+            <div class="ca-opp-count" id="ca_opp_p3d_count">—</div>
+            <div class="ca-opp-list" id="ca_opp_p3d_list">Loading&hellip;</div>
+          </div>
+          <div class="ca-opp-card">
+            <div class="ca-opp-title">♻️ Refurbishable (crit≤6)</div>
+            <div class="ca-opp-count" id="ca_opp_refurb_count">—</div>
+            <div class="ca-opp-list" id="ca_opp_refurb_list">Loading&hellip;</div>
+          </div>
+          <div class="ca-opp-card">
+            <div class="ca-opp-title">🧊 AI-Factory Liquid-Cool</div>
+            <div class="ca-opp-count" id="ca_opp_aifac_count">—</div>
+            <div class="ca-opp-list" id="ca_opp_aifac_list">Loading&hellip;</div>
+          </div>
+        </div>
+      </div>
+
+      <details class="info-box" style="margin-top:0.75rem;">
+        <summary>ⓘ How this dashboard is computed</summary>
+        <p><strong>Blind risk proxy</strong>: parts where <code>crit ≥ 7 AND eol ≥ 6 AND alts === 0</code> — high criticality, high EOL risk, no qualified alternate. This is a browser-side approximation of the FMECA definition (high-severity failure mode NOT condition-monitorable).</p>
+        <p><strong>OEM concentration</strong>: for each subsystem, count parts per OEM. Subsystems where top OEM holds &gt;60% flagged as concentration risk.</p>
+        <p><strong>Lead-time distribution</strong>: avg and max <code>ltMax</code> per subsystem, sorted descending.</p>
+        <p><strong>Lifecycle × DC generation</strong>: part counts grouped by <code>lifecycle_status</code> and <code>dc_generation</code>.</p>
+        <p>Full database queries: <code>tools/query-spares-db.py</code> on <code>data/spares-parts.sqlite</code>.</p>
+      </details>
+    </div>
+    <!-- ===== END CATALOG ANALYTICS TAB ===== -->
+
+    <!-- ===== FLEET / PORTFOLIO TAB ===== -->
+    <div class="module-pane" id="pane-fleet">
+      <!-- Sticky headline bar -->
+      <div class="module-sticky-bar" id="fleet_sticky">
+        <span class="msb-label">Fleet Readiness</span>
+        <span class="msb-value" id="fl_sb_readiness">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Parts</span>
+        <span class="msb-value" id="fl_sb_parts">0</span>
+        <span class="msb-label" style="margin-left:1rem;">Critical-at-Risk</span>
+        <span class="msb-value" id="fl_sb_atrisk" style="color:#ef4444;">0</span>
+        <span class="msb-label" style="margin-left:1rem;">Total Carrying $</span>
+        <span class="msb-value" id="fl_sb_carry">—</span>
+      </div>
+
+      <!-- Header -->
+      <div class="catalog-header">
+        <strong>Fleet / Portfolio Dashboard</strong> — Build a fleet of spare parts, compute recommended stock levels, carrying costs, stockout-$ risk, and readiness % for each part. Persist in localStorage + scenario snapshot. Load sample presets or add parts from the catalog.
+        <div class="crosslink-bar" style="margin-top:0.5rem;">
+          <span class="crosslink-bar-label">Cross-link:</span>
+          <a class="crosslink-pill" onclick="switchTab('criticality')" href="#" role="button" aria-label="Go to Criticality module"><i class="fas fa-exclamation-triangle"></i> Criticality</a>
+          <a class="crosslink-pill" onclick="switchTab('stock')" href="#" role="button" aria-label="Go to Optimal Stock module"><i class="fas fa-boxes-stacked"></i> Optimal Stock</a>
+          <a class="crosslink-pill" onclick="switchTab('ltb')" href="#" role="button" aria-label="Go to LTB module"><i class="fas fa-calendar-xmark"></i> LTB/DMSMS</a>
+        </div>
+      </div>
+
+      <!-- Shared parameters row -->
+      <div class="module-card" style="margin-bottom:1rem;">
+        <div class="card-title"><i class="fas fa-sliders"></i> Shared Fleet Parameters</div>
+        <div class="input-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+          <div class="input-group">
+            <label class="input-label" for="fl_carry_rate">Carrying Cost Rate (%/yr) <span class="tip" tabindex="0" data-tip="Annual holding cost as % of unit value. Typical: 18–28%. Used for all parts in the fleet." aria-label="Fleet carrying rate tooltip">ⓘ</span></label>
+            <input type="number" id="fl_carry_rate" class="input-field" value="22" min="1" max="60" oninput="calcFleet()" aria-label="Fleet carrying cost rate">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="fl_downtime_cost">Downtime Cost/hr ($) <span class="tip" tabindex="0" data-tip="Cost per hour of site downtime. Used to compute stockout-$ risk for all fleet parts." aria-label="Downtime cost tooltip">ⓘ</span></label>
+            <input type="number" id="fl_downtime_cost" class="input-field" value="50000" min="0" oninput="calcFleet()" aria-label="Downtime cost per hour">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="fl_z">Fill-Rate Target z <span class="tip" tabindex="0" data-tip="z-score for safety stock formula. 99%→2.33, 97%→1.88, 95%→1.65, 90%→1.28. Default 2.33 (99% fill rate)." aria-label="z fill rate tooltip">ⓘ</span></label>
+            <select id="fl_z" class="input-field" onchange="calcFleet()" aria-label="Fill rate z">
+              <option value="2.33">99% → z=2.33</option>
+              <option value="1.88">97% → z=1.88</option>
+              <option value="1.65">95% → z=1.65</option>
+              <option value="1.28">90% → z=1.28</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="fl_mttr">Avg MTTR (hr) <span class="tip" tabindex="0" data-tip="Mean Time To Repair — hours to restore function once spare arrives. Used in stockout-$ risk = P(stockout) × downtimeCost × MTTR × units." aria-label="MTTR fleet tooltip">ⓘ</span></label>
+            <input type="number" id="fl_mttr" class="input-field" value="120" min="1" oninput="calcFleet()" aria-label="Fleet MTTR hours">
+          </div>
+        </div>
+      </div>
+
+      <!-- Add part bar -->
+      <div class="fleet-add-bar">
+        <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);flex-shrink:0;"><i class="fas fa-plus-circle" style="color:var(--amber);"></i> Add Part:</span>
+        <select class="fleet-add-select" id="fl_add_part_select" aria-label="Select part from catalog to add to fleet">
+          <option value="">Select from catalog&hellip;</option>
+        </select>
+        <button class="btn-primary" style="padding:0.45rem 1rem;font-size:0.78rem;" onclick="fleetAddFromSelect()" aria-label="Add selected catalog part to fleet">Add Part</button>
+        <button class="fleet-preset-btn" onclick="fleetLoadPreset('tier3')" aria-label="Load Tier-III enterprise DC preset">Tier-III Enterprise</button>
+        <button class="fleet-preset-btn" onclick="fleetLoadPreset('ai_factory')" aria-label="Load AI-factory liquid-cooling preset">AI-Factory Liquid-Cool</button>
+        <button class="fleet-preset-btn" onclick="fleetLoadPreset('legacy_eol')" aria-label="Load legacy DC EOL-exposed preset">Legacy EOL-Exposed</button>
+        <button class="btn-reset-module" onclick="fleetClearAll()" aria-label="Clear all fleet parts" style="margin-left:auto;">↺ Clear fleet</button>
+      </div>
+
+      <!-- Fleet KPIs -->
+      <div class="fleet-kpi-grid" id="fleet_kpi_grid">
+        <div class="fleet-kpi"><div class="fleet-kpi-label">Total Inventory $ at Rec. Stock</div><div class="fleet-kpi-value" id="fl_kpi_total_inv">$—</div><div class="fleet-kpi-sub">all parts at recommended SS</div></div>
+        <div class="fleet-kpi"><div class="fleet-kpi-label">Weighted Fleet Readiness %</div><div class="fleet-kpi-value" id="fl_kpi_readiness">—</div><div class="fleet-kpi-sub">weighted by criticality</div></div>
+        <div class="fleet-kpi"><div class="fleet-kpi-label">Critical-at-Risk Parts</div><div class="fleet-kpi-value" id="fl_kpi_atrisk">0</div><div class="fleet-kpi-sub">crit≥7 AND readiness&lt;90%</div></div>
+        <div class="fleet-kpi"><div class="fleet-kpi-label">Total Annual Carrying $</div><div class="fleet-kpi-value" id="fl_kpi_carry">$—</div><div class="fleet-kpi-sub">at recommended stock</div></div>
+        <div class="fleet-kpi"><div class="fleet-kpi-label">Total Stockout-$ Risk</div><div class="fleet-kpi-value" id="fl_kpi_stockout_risk">$—</div><div class="fleet-kpi-sub">expected annual exposure</div></div>
+        <div class="fleet-kpi"><div class="fleet-kpi-label">EOL Exposure Score</div><div class="fleet-kpi-value" id="fl_kpi_eol_exp">—</div><div class="fleet-kpi-sub">Σ units×crit×yrs/max(1,alts)</div></div>
+      </div>
+
+      <!-- Fleet table -->
+      <div class="fleet-table-wrap">
+        <table class="fleet-table" id="fl_table" aria-label="Fleet parts table">
+          <thead>
+            <tr>
+              <th>Part / Description</th>
+              <th>Subsystem</th>
+              <th>DC Gen</th>
+              <th>Crit</th>
+              <th>LT (wk)</th>
+              <th>Unit Cost ($)</th>
+              <th>Units</th>
+              <th>On-Hand</th>
+              <th>Rec. SS</th>
+              <th>Annual Carry $</th>
+              <th>Stockout Risk $</th>
+              <th>Readiness %</th>
+              <th>Lifecycle</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="fl_tbody">
+            <tr><td colspan="14" style="text-align:center;padding:2rem;color:var(--text-muted);">Add parts above or load a sample preset to get started.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Charts -->
+      <div class="module-grid" style="margin-top:1.25rem;">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-chart-bar"></i> Pareto of Stockout-$ Risk <span class="tip" tabindex="0" data-tip="Parts sorted by stockout-$ risk (descending). The cumulative % line shows the 80/20 cut — the top ~20% of parts driving ~80% of stockout risk. Focus safety-stock investment here." aria-label="Pareto chart tooltip">ⓘ</span></div>
+          <div class="chart-wrap-lg"><canvas id="chart_fleet_pareto"></canvas></div>
+        </div>
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-th"></i> EOL Exposure Heatmap <span class="tip" tabindex="0" data-tip="Cell = total EOL exposure score for fleet parts in that subsystem × DC generation combination. Darker = higher exposure. EOL exposure = units × crit × supportYears / max(1, alts)." aria-label="EOL heatmap tooltip">ⓘ</span></div>
+          <div class="chart-wrap-lg"><canvas id="chart_fleet_heatmap"></canvas></div>
+        </div>
+      </div>
+      <div class="module-card" style="margin-top:1rem;">
+        <div class="card-title"><i class="fas fa-chart-scatter"></i> ABC-XYZ Demand-Value Scatter <span class="tip" tabindex="0" data-tip="x = annual usage value (units × 1/MTBF × unitCost). y = lead-time variability proxy (ltMax/ltTyp ratio). Bubble size = criticality. Color: green=active, amber=nrnd, orange=ltb, red=obsolete. Quadrant labels guide stocking policy." aria-label="ABC-XYZ scatter tooltip">ⓘ</span></div>
+        <div style="position:relative;height:300px;margin-top:0.5rem;"><canvas id="chart_fleet_abcxyz"></canvas></div>
+        <div class="abc-xyz-quad" style="margin-top:0.75rem;font-size:0.68rem;">
+          <div class="abc-xyz-cell abc-x"><div class="abc-label">A-X: High value, stable demand</div>Tight safety-stock policy, reorder-point driven, VMI candidate</div>
+          <div class="abc-xyz-cell abc-az"><div class="abc-label">A-Z: High value, erratic demand</div>Safety-stock heavy or VMI; review demand forecasting; dual-source</div>
+          <div class="abc-xyz-cell abc-cx"><div class="abc-label">C-X: Low value, stable demand</div>Automate replenishment; min/max policy; P-card if low cost</div>
+          <div class="abc-xyz-cell abc-cz"><div class="abc-label">C-Z: Low value, erratic demand</div>Don't stock unless crit≥7; review vs on-demand sourcing</div>
+        </div>
+      </div>
+
+      <!-- PDF export -->
+      <div class="btn-row" style="margin-top:1.25rem;">
+        <button class="btn-pdf" onclick="exportFleetPDF()" aria-label="Export fleet report as PDF"><i class="fas fa-file-pdf"></i> Fleet PDF Report</button>
+        <button class="btn-scenario" onclick="saveFleetToStorage()" aria-label="Save fleet to browser storage">Save fleet</button>
+        <button class="btn-scenario" onclick="loadFleetFromStorage()" aria-label="Load fleet from browser storage">Load fleet</button>
+      </div>
+
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ Per-part math — safety stock, readiness, carrying $, stockout risk</summary>
+        <p><strong>Demand rate</strong>: <code>λ = units × (1/MTBF_yr)</code>. <strong>Safety stock</strong>: <code>SS = z × σ_LT</code> where <code>σ_LT = √(L/52 × λ)</code> (Poisson approximation: variance = mean for Poisson demand during lead time, σ_LT = √(λ × L/52)).</p>
+        <p><strong>Recommended stock</strong>: <code>recStock = ⌈SS⌉ + ⌈μ_LT⌉</code> where <code>μ_LT = λ × L/52</code>.</p>
+        <p><strong>Annual carrying $</strong>: <code>carryRate × unitCost × recStock</code>.</p>
+        <p><strong>Stockout risk</strong>: <code>P(stockout) × downtimeCostPerHr × MTTR_hr × units_at_risk</code>. <code>P(stockout) ≈ max(0, (recStock − onHand) / (recStock + 1))</code> if on-hand &lt; recommended stock, else 0.02 (residual).</p>
+        <p><strong>Readiness %</strong>: <code>min(100, onHand / max(1, recStock) × 100)</code>.</p>
+        <p><strong>EOL exposure</strong>: <code>Σ (units × crit × 5) / max(1, alts)</code> (5 = nominal support years proxy; alts from catalog).</p>
+        <p><strong>Fleet weighted readiness</strong>: weighted average of per-part readiness %, weighted by criticality score.</p>
+      </details>
+    </div>
+    <!-- ===== END FLEET / PORTFOLIO TAB ===== -->
+
     <div class="module-pane" id="pane-faq">
       <!-- Methodology at a Glance reference table -->
       <div class="module-card" style="margin-bottom:1.25rem;">
@@ -2611,6 +3115,24 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-facebook" aria-label="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
 </aside>
 
+<!-- Tour overlay -->
+<div class="tour-overlay" id="tourOverlay" aria-hidden="true" style="display:none;">
+  <div class="tour-spotlight" id="tourSpotlight"></div>
+</div>
+<div class="tour-tooltip" id="tourTooltip" role="dialog" aria-label="Onboarding tour" style="display:none;">
+  <div class="tour-tooltip-title" id="tourTitle"></div>
+  <div class="tour-tooltip-body" id="tourBody"></div>
+  <div class="tour-tooltip-footer">
+    <span class="tour-step-count" id="tourStepCount"></span>
+    <div>
+      <button class="tour-btn-skip" onclick="tourEnd()" aria-label="Skip tour">Skip</button>
+      <button class="tour-btn-next" id="tourNextBtn" onclick="tourNext()" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+</div>
+<!-- Tour help button -->
+<button class="tour-help-btn" id="tourHelpBtn" onclick="tourStart()" title="Relaunch onboarding tour" aria-label="Launch onboarding tour">?</button>
+
 <!-- Cookie banner -->
 <div class="cookie-banner" id="cookieBanner" role="region" aria-label="Cookie consent">
   <p>We use cookies for analytics. See our <a href="privacy.html">privacy policy</a>.</p>
@@ -2622,7 +3144,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
 <!-- Methodology note -->
 <div class="method-note" id="methodNote">
-  Models: FMECA (MIL-STD-1629A) &middot; METRIC/VARI-METRIC (Sherbrooke/Slay) &middot; newsvendor critical-fractile &middot; Kraljic matrix (HBR&nbsp;1983) &middot; DMSMS lifecycle &middot; MEIO.
+  Models: FMECA (MIL-STD-1629A) &middot; METRIC/VARI-METRIC (Sherbrooke/Slay) &middot; newsvendor critical-fractile &middot; Kraljic matrix (HBR&nbsp;1983) &middot; DMSMS lifecycle &middot; MEIO &middot; ABC-XYZ demand-variability matrix &middot; Pareto stockout-risk ranking.
   Catalog data vintage: 2026-Q1 &middot; <span id="methodNoteCatalogCount">445</span> curated parts from a ~1,400-row database.
   Illustrative &mdash; not a substitute for a full supply-chain analysis.
 </div>
@@ -5818,7 +6340,7 @@ function exportSTARPDF() {
 /* ===========================================
    UPDATE TAB ORDER + SWITCHtab + RECALCALL
    =========================================== */
-TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','catalog','faq'];
+TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','catalog','catalog-analytics','faq'];
 
 // Patch switchTab to include new tabs
 var _origSwitchTab = switchTab;
@@ -5835,6 +6357,8 @@ switchTab = function(name) {
     montecarlo: function() { /* user-triggered */ },
     scorecard: calcScorecard,
     catalog: function() { catInitIfReady(); },
+    'catalog-analytics': function() { calcCatalogAnalytics(); },
+    fleet: function() { calcFleet(); },
     faq: function() { renderFAQ('all'); }
     // stakeholder, eol, ambiguity, star, pm-ops, negotiation, contract, process, meeting are user-triggered
   };
@@ -5842,11 +6366,12 @@ switchTab = function(name) {
   if (calcs[name]) { try { calcs[name](); } catch(e) { console.warn('[CSE] calc error on tab switch (ops):', name, e); } }
 };
 
-// Patch recalcAll to include scorecard
+// Patch recalcAll to include scorecard + fleet
 var _origRecalcAll = recalcAll;
 recalcAll = function() {
   _origRecalcAll();
   calcScorecard();
+  calcFleet();
 };
 
 // Extend SCENARIO_FIELDS for operating engine inputs
@@ -5866,7 +6391,9 @@ var opsFields = [
   // Tab I — Ambiguity
   'amb_ask','amb_who_asked','amb_scope','amb_keywords',
   // Tab J — STAR
-  'star_competency','star_situation','star_task','star_action','star_result'
+  'star_competency','star_situation','star_task','star_action','star_result',
+  // Fleet shared params
+  'fl_carry_rate','fl_downtime_cost','fl_z','fl_mttr'
 ];
 opsFields.forEach(function(f) { SCENARIO_FIELDS.push(f); });
 
@@ -6256,6 +6783,791 @@ faqData.push(
   if (window.SPARES_CATALOG) { catState.initialized = false; /* will init on first tab open */ }
 
 })(); // end catalog IIFE
+
+/* ===========================================
+   CATALOG ANALYTICS ENGINE
+   =========================================== */
+function calcCatalogAnalytics() {
+  var CAT = window.SPARES_CATALOG || null;
+  if (!CAT || !CAT.parts) {
+    var tb = document.getElementById('ca_blind_tbody');
+    if (tb) tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text-muted);">Catalog not yet loaded — return to Parts Catalog tab first to initialize it.</td></tr>';
+    return;
+  }
+
+  var scopeSys = (document.getElementById('ca_scope_sys') || {}).value || '';
+  var scopeGen = (document.getElementById('ca_scope_gen') || {}).value || '';
+
+  // Filter by scope
+  var parts = CAT.parts.filter(function(p) {
+    if (scopeSys && p.sys !== scopeSys) return false;
+    if (scopeGen && (p.gen || '').indexOf(scopeGen) < 0) return false;
+    return true;
+  });
+
+  var oemMap = {};
+  CAT.oems.forEach(function(o) { oemMap[o.id] = o.name; });
+
+  // KPI computations
+  var nParts = parts.length;
+  var oems = {};
+  parts.forEach(function(p) { if (p.oem) oems[p.oem] = true; });
+  var nOems = Object.keys(oems).length;
+  var sysSet = {}, subSet = {};
+  parts.forEach(function(p) { if (p.sys) sysSet[p.sys] = true; if (p.sub) subSet[p.sub] = true; });
+  var nSysSub = Object.keys(sysSet).length + '/' + Object.keys(subSet).length;
+  var eolParts = parts.filter(function(p) { return p.life === 'nrnd' || p.life === 'last-time-buy' || p.life === 'obsolete'; });
+  var eolPct = nParts > 0 ? ((eolParts.length / nParts) * 100).toFixed(1) + '%' : '—';
+  var blindRisks = parts.filter(function(p) { return p.crit >= 7 && p.eol >= 6 && (p.alts || 0) === 0; });
+  var p3d = parts.filter(function(p) { return p.p3d; });
+  var refurb = parts.filter(function(p) { return p.refurb && p.crit <= 6; });
+  var aiFac = parts.filter(function(p) { return (p.gen || '').indexOf('ai-factory') >= 0; });
+  var aiFacAvgLT = aiFac.length > 0 ? (aiFac.reduce(function(s, p) { return s + (p.ltTyp || 0); }, 0) / aiFac.length).toFixed(1) : '—';
+
+  function setText2(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+  setText2('ca_kpi_parts', nParts.toLocaleString());
+  setText2('ca_kpi_oems', nOems);
+  setText2('ca_kpi_sys', nSysSub);
+  setText2('ca_kpi_eol_pct', eolPct);
+  setText2('ca_kpi_blind', blindRisks.length);
+  setText2('ca_kpi_p3d', p3d.length);
+  setText2('ca_kpi_refurb', refurb.length);
+  setText2('ca_kpi_aifac', aiFac.length);
+  setText2('ca_kpi_aifac_lt', aiFacAvgLT);
+  // Sticky bar
+  setText2('ca_sb_total', nParts.toLocaleString());
+  setText2('ca_sb_oems', nOems);
+  setText2('ca_sb_blind', blindRisks.length);
+  setText2('ca_sb_eol', eolParts.length);
+
+  // Chart 1: OEM Concentration by subsystem (top-10 subsystems by part count)
+  var subOemMap = {};
+  parts.forEach(function(p) {
+    var sub = p.sub || 'other';
+    if (!subOemMap[sub]) subOemMap[sub] = {};
+    var oemName = oemMap[p.oem] || 'Other';
+    subOemMap[sub][oemName] = (subOemMap[sub][oemName] || 0) + 1;
+  });
+  var subTotals = Object.keys(subOemMap).map(function(sub) {
+    return { sub: sub, total: Object.values(subOemMap[sub]).reduce(function(s,v){return s+v;},0) };
+  });
+  subTotals.sort(function(a,b){return b.total-a.total;});
+  var top8Subs = subTotals.slice(0,8).map(function(x){return x.sub;});
+  // Find top OEM per sub and concentration
+  var concRisks = [];
+  var concLabels = top8Subs.map(function(sub) { return sub.length > 18 ? sub.slice(0,16)+'…' : sub; });
+  var concData = top8Subs.map(function(sub) {
+    var oemCounts = subOemMap[sub];
+    var total = Object.values(oemCounts).reduce(function(s,v){return s+v;},0);
+    var topOem = Object.keys(oemCounts).sort(function(a,b){return oemCounts[b]-oemCounts[a];})[0];
+    var topCount = oemCounts[topOem];
+    var pct = total > 0 ? (topCount/total*100) : 0;
+    if (pct > 60) concRisks.push(sub + ' (' + topOem + ': ' + pct.toFixed(0) + '%)');
+    return pct.toFixed(1);
+  });
+  var concWarn = document.getElementById('ca_conc_warning');
+  if (concWarn) concWarn.textContent = concRisks.length > 0 ? '⚠ Concentration risk: ' + concRisks.slice(0,3).join(', ') : '';
+
+  getOrCreateChart('chart_ca_oem_conc', 'bar', {
+    labels: concLabels,
+    datasets: [{ label: 'Top OEM share %', data: concData.map(Number), backgroundColor: concData.map(function(v){ return Number(v)>60?'rgba(239,68,68,0.7)':'rgba(245,158,11,0.6)'; }), borderRadius: 5 }]
+  }, {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{
+      x:{ beginAtZero:true, max:100, ticks:{font:{size:10},color:chartTickColor(),callback:function(v){return v+'%';}}, grid:{color:chartGridColor()} },
+      y:{ ticks:{font:{size:9},color:chartTickColor()}, grid:{color:chartGridColor()} }
+    }
+  });
+
+  // Chart 2: Lead-time distribution by subsystem
+  var subLTMap = {};
+  parts.forEach(function(p) {
+    var sub = p.sub || 'other';
+    if (!subLTMap[sub]) subLTMap[sub] = {sum:0,max:0,count:0};
+    if (p.ltTyp) { subLTMap[sub].sum += p.ltTyp; subLTMap[sub].count++; }
+    if (p.ltMax && p.ltMax > subLTMap[sub].max) subLTMap[sub].max = p.ltMax;
+  });
+  var ltSubs = Object.keys(subLTMap).filter(function(s){return subLTMap[s].count>0;}).map(function(s) {
+    return { sub:s, avg: subLTMap[s].sum/subLTMap[s].count, max: subLTMap[s].max };
+  });
+  ltSubs.sort(function(a,b){return b.avg-a.avg;});
+  var lt10 = ltSubs.slice(0,10);
+  getOrCreateChart('chart_ca_lt_dist', 'bar', {
+    labels: lt10.map(function(x){ return x.sub.length>18?x.sub.slice(0,16)+'…':x.sub; }),
+    datasets: [
+      { label:'Avg LT (wk)', data: lt10.map(function(x){return +x.avg.toFixed(1);}), backgroundColor:'rgba(245,158,11,0.65)', borderRadius:4 },
+      { label:'Max LT (wk)', data: lt10.map(function(x){return x.max||0;}), backgroundColor:'rgba(239,68,68,0.35)', borderRadius:4 }
+    ]
+  }, {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{labels:{font:{size:10},color:chartTickColor()}} },
+    scales:{
+      x:{ beginAtZero:true, ticks:{font:{size:10},color:chartTickColor(),callback:function(v){return v+' wk';}}, grid:{color:chartGridColor()} },
+      y:{ ticks:{font:{size:9},color:chartTickColor()}, grid:{color:chartGridColor()} }
+    }
+  });
+
+  // Chart 3: Lifecycle by DC generation
+  var DC_GENS = ['legacy-raised-floor','enterprise-tier3','colo-wholesale','cloud-hyperscale','ai-factory-liquid-cooled','edge-micro'];
+  var DC_LABELS = ['Legacy','Tier-III','Colo','Hyperscale','AI-Factory','Edge'];
+  var lifecycles = ['active','nrnd','last-time-buy','obsolete'];
+  var lcColors = ['rgba(16,185,129,0.7)','rgba(245,158,11,0.7)','rgba(234,88,12,0.7)','rgba(239,68,68,0.7)'];
+  var lcLabels2 = ['Active','NRND','LTB','Obsolete'];
+  var lcDatasets = lifecycles.map(function(lc, li) {
+    return {
+      label: lcLabels2[li],
+      data: DC_GENS.map(function(gen) {
+        return parts.filter(function(p){ return (p.gen||'').indexOf(gen)>=0 && p.life===lc; }).length;
+      }),
+      backgroundColor: lcColors[li],
+      borderRadius: 3
+    };
+  });
+  getOrCreateChart('chart_ca_lifecycle', 'bar', {
+    labels: DC_LABELS,
+    datasets: lcDatasets
+  }, {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{labels:{font:{size:10},color:chartTickColor()}} },
+    scales:{
+      x:{ stacked:true, ticks:{font:{size:9},color:chartTickColor()}, grid:{color:chartGridColor()} },
+      y:{ stacked:true, beginAtZero:true, ticks:{font:{size:10},color:chartTickColor()}, grid:{color:chartGridColor()} }
+    }
+  });
+
+  // Chart 4: Criticality × Lead-time scatter (by subsystem)
+  var scatterData = ltSubs.slice(0,20).map(function(x) {
+    var subParts = parts.filter(function(p){return p.sub===x.sub;});
+    var avgCrit = subParts.length > 0 ? subParts.reduce(function(s,p){return s+(p.crit||0);},0)/subParts.length : 0;
+    return { x: +avgCrit.toFixed(1), y: +x.avg.toFixed(1), r: Math.max(4, Math.min(20, subParts.length/3)), label: x.sub };
+  });
+  getOrCreateChart('chart_ca_scatter', 'bubble', {
+    datasets: [{
+      label: 'Subsystems',
+      data: scatterData,
+      backgroundColor: scatterData.map(function(d){ return d.x>=7&&d.y>=16?'rgba(239,68,68,0.55)':'rgba(245,158,11,0.45)'; }),
+      borderColor: scatterData.map(function(d){ return d.x>=7&&d.y>=16?'rgba(239,68,68,0.8)':'rgba(245,158,11,0.7)'; }),
+      borderWidth: 1.5
+    }]
+  }, {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{ callbacks:{ label:function(ctx){ var d=ctx.raw; return d.label+' — crit:'+d.x+' LT:'+d.y+'wk'; } } }
+    },
+    scales:{
+      x:{ beginAtZero:false, min:1, max:10, title:{display:true,text:'Avg Criticality',font:{size:10},color:chartTickColor()}, ticks:{font:{size:10},color:chartTickColor()}, grid:{color:chartGridColor()} },
+      y:{ beginAtZero:true, title:{display:true,text:'Avg Lead Time (wk)',font:{size:10},color:chartTickColor()}, ticks:{font:{size:10},color:chartTickColor()}, grid:{color:chartGridColor()} }
+    }
+  });
+
+  // Blind risks table
+  var blindTop = blindRisks.slice(0,20);
+  var tb2 = document.getElementById('ca_blind_tbody');
+  var blindLabel = document.getElementById('ca_blind_count_label');
+  if (blindLabel) blindLabel.textContent = blindRisks.length + ' parts';
+  if (tb2) {
+    if (!blindTop.length) {
+      tb2.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:1rem;color:var(--text-muted);">No blind-risk parts in scope.</td></tr>';
+    } else {
+      function caEsc2(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      var genShort2 = function(g){ return (g||'').replace(/legacy-raised-floor/g,'Legacy').replace(/enterprise-tier3/g,'Tier3').replace(/colo-wholesale/g,'Colo').replace(/cloud-hyperscale/g,'Cloud').replace(/ai-factory-liquid-cooled/g,'AI-Fac').replace(/edge-micro/g,'Edge').split('|').slice(0,2).join(', '); };
+      tb2.innerHTML = blindTop.map(function(p) {
+        var oemN = oemMap[p.oem] || p.oem || '—';
+        return '<tr><td style="font-family:monospace;font-size:0.68rem;">'+caEsc2(p.id)+'</td><td class="ft-desc">'+caEsc2(p.desc)+'</td><td>'+caEsc2(p.sys)+'</td><td>'+caEsc2(p.sub)+'</td><td style="font-size:0.68rem;">'+genShort2(p.gen)+'</td><td style="color:#ef4444;font-weight:700;">'+p.crit+'</td><td style="color:#ef4444;font-weight:700;">'+p.eol+'</td><td><span class="catalog-life-'+p.life+'">'+(p.life==='last-time-buy'?'LTB':p.life==='nrnd'?'NRND':p.life==='obsolete'?'Obsolete':'Active')+'</span></td><td>'+(p.ltTyp||'—')+'</td><td>'+(p.cTyp?'$'+(p.cTyp>=1000?(p.cTyp/1000).toFixed(0)+'K':p.cTyp):'—')+'</td></tr>';
+      }).join('');
+    }
+  }
+
+  // Opportunity panels
+  var opp3dList = p3d.slice(0,5).map(function(p){return p.sub||p.desc;}).join(', ');
+  var oppRefurbList = refurb.slice(0,5).map(function(p){return p.sub||p.desc;}).join(', ');
+  var oppAiFacAvgCost = aiFac.length > 0 ? '$' + Math.round(aiFac.reduce(function(s,p){return s+(p.cTyp||0);},0)/aiFac.length/1000) + 'K avg cost' : '';
+  setText2('ca_opp_p3d_count', p3d.length);
+  setText2('ca_opp_p3d_list', p3d.length > 0 ? opp3dList + (p3d.length>5?'…':'') + ' — additive manufacturing eliminates LTB risk for these.' : 'None in scope.');
+  setText2('ca_opp_refurb_count', refurb.length);
+  setText2('ca_opp_refurb_list', refurb.length > 0 ? oppRefurbList + (refurb.length>5?'…':'') + ' — circular sourcing candidate; requires recertification.' : 'None in scope.');
+  setText2('ca_opp_aifac_count', aiFac.length);
+  setText2('ca_opp_aifac_list', aiFac.length > 0 ? 'Avg LT: ' + aiFacAvgLT + ' wk · ' + oppAiFacAvgCost + ' · Liquid-cooling spares for next-gen AI DCs.' : 'None in scope.');
+}
+
+/* CSV export for catalog analytics */
+window.caExportCSV = function() {
+  var CAT = window.SPARES_CATALOG || null;
+  if (!CAT) { showMsg('Catalog not loaded.'); return; }
+  var scopeSys = (document.getElementById('ca_scope_sys')||{}).value||'';
+  var scopeGen = (document.getElementById('ca_scope_gen')||{}).value||'';
+  var parts = CAT.parts.filter(function(p){
+    if (scopeSys && p.sys!==scopeSys) return false;
+    if (scopeGen && (p.gen||'').indexOf(scopeGen)<0) return false;
+    return true;
+  });
+  var oemMap = {}; CAT.oems.forEach(function(o){oemMap[o.id]=o.name;});
+  var rows = [['Part ID','Description','System','Subsystem','DC Gen','Criticality','MTBF yr','LT typ wk','Cost typ $','Lifecycle','EOL Risk','Qual Alts','3D Print','Refurb','Blind Risk (proxy)'].join(',')];
+  parts.forEach(function(p) {
+    var blind = (p.crit>=7&&p.eol>=6&&(p.alts||0)===0)?'YES':'no';
+    rows.push([p.id,'"'+(p.desc||'').replace(/"/g,'""')+'"',p.sys,p.sub,'"'+(p.gen||'').replace(/\|/g,';')+'"',p.crit,p.mtbf||'',p.ltTyp||'',p.cTyp||'',p.life,p.eol,p.alts||0,p.p3d?1:0,p.refurb?1:0,blind].join(','));
+  });
+  var blob = new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download='catalog-analytics-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+  showMsg('Exported '+parts.length+' parts.');
+};
+
+/* ===========================================
+   FLEET / PORTFOLIO ENGINE
+   =========================================== */
+var fleetParts = []; // Array of fleet part objects
+
+/* Part object schema:
+  { id, pn, desc, sub, gen, crit, mtbf, ltTyp, ltMax, cTyp, life, eol, alts, refurb, p3d,
+    units (user input), onHand (user input), // computed fields added by calcFleet
+    recSS, annualCarry, stockoutRisk, readinessPct }
+*/
+
+/* Load fleet presets */
+var FLEET_PRESETS = {
+  tier3: [
+    { id:'FP-T3-001', pn:'CHILLER-COMP-T3', desc:'Chiller Compressor Seal Kit', sub:'chiller', gen:'enterprise-tier3', crit:9, mtbf:10, ltTyp:20, ltMax:28, cTyp:75000, life:'active', eol:4, alts:1, refurb:0, p3d:0, units:6, onHand:1 },
+    { id:'FP-T3-002', pn:'MV-BRKR-T3', desc:'MV Switchgear Vacuum Breaker', sub:'switchgear', gen:'enterprise-tier3', crit:10, mtbf:20, ltTyp:40, ltMax:60, cTyp:50000, life:'nrnd', eol:7, alts:0, refurb:0, p3d:0, units:3, onHand:0 },
+    { id:'FP-T3-003', pn:'UPS-MODULE-T3', desc:'UPS Battery Module', sub:'UPS', gen:'enterprise-tier3', crit:9, mtbf:6, ltTyp:18, ltMax:24, cTyp:35000, life:'active', eol:5, alts:1, refurb:1, p3d:0, units:8, onHand:2 },
+    { id:'FP-T3-004', pn:'CRAC-FAN-T3', desc:'CRAC Fan/Compressor Module', sub:'CRAC-CRAH', gen:'enterprise-tier3', crit:7, mtbf:7, ltTyp:12, ltMax:16, cTyp:15000, life:'active', eol:3, alts:2, refurb:1, p3d:0, units:12, onHand:3 },
+    { id:'FP-T3-005', pn:'GEN-AVR-T3', desc:'Generator AVR / Control Module', sub:'diesel-generator', gen:'enterprise-tier3', crit:9, mtbf:14, ltTyp:52, ltMax:70, cTyp:500000, life:'active', eol:4, alts:2, refurb:0, p3d:0, units:2, onHand:1 }
+  ],
+  ai_factory: [
+    { id:'FP-AI-001', pn:'CDU-PUMP-AI', desc:'CDU Primary Pump Assembly', sub:'CDU-pump', gen:'ai-factory-liquid-cooled', crit:10, mtbf:8, ltTyp:18, ltMax:26, cTyp:18000, life:'active', eol:2, alts:2, refurb:0, p3d:0, units:8, onHand:2 },
+    { id:'FP-AI-002', pn:'CDU-HX-AI', desc:'CDU Plate Heat Exchanger', sub:'CDU-pump', gen:'ai-factory-liquid-cooled', crit:9, mtbf:15, ltTyp:14, ltMax:20, cTyp:22000, life:'active', eol:2, alts:1, refurb:1, p3d:0, units:4, onHand:1 },
+    { id:'FP-AI-003', pn:'COLD-PLATE-AI', desc:'Direct-to-Chip Cold Plate Kit', sub:'cold-plate', gen:'ai-factory-liquid-cooled', crit:9, mtbf:5, ltTyp:12, ltMax:18, cTyp:4500, life:'active', eol:3, alts:3, refurb:0, p3d:0, units:40, onHand:8 },
+    { id:'FP-AI-004', pn:'QD-BLANKING-AI', desc:'Cooling Manifold QD Blanking Plugs', sub:'cooling-manifold', gen:'ai-factory-liquid-cooled', crit:7, mtbf:3, ltTyp:6, ltMax:10, cTyp:250, life:'active', eol:2, alts:4, refurb:0, p3d:1, units:100, onHand:20 },
+    { id:'FP-AI-005', pn:'LEAK-SENSE-AI', desc:'CDU Leak Detection Sensor', sub:'CDU-controls', gen:'ai-factory-liquid-cooled', crit:8, mtbf:4, ltTyp:10, ltMax:14, cTyp:1800, life:'active', eol:3, alts:2, refurb:0, p3d:0, units:16, onHand:4 }
+  ],
+  legacy_eol: [
+    { id:'FP-LG-001', pn:'BMS-CTRL-LG', desc:'BMS DDC Controller Board', sub:'DDC-PLC-controller', gen:'legacy-raised-floor', crit:8, mtbf:8, ltTyp:10, ltMax:16, cTyp:4500, life:'last-time-buy', eol:9, alts:0, refurb:0, p3d:0, units:6, onHand:0 },
+    { id:'FP-LG-002', pn:'FIRE-SUPP-LG', desc:'FM-200 Agent Cylinder', sub:'clean-agent', gen:'legacy-raised-floor', crit:9, mtbf:25, ltTyp:10, ltMax:14, cTyp:6000, life:'last-time-buy', eol:9, alts:0, refurb:0, p3d:0, units:8, onHand:1 },
+    { id:'FP-LG-003', pn:'UPS-BAT-LG', desc:'UPS VRLA Battery Bank', sub:'UPS', gen:'legacy-raised-floor', crit:9, mtbf:5, ltTyp:10, ltMax:16, cTyp:12000, life:'nrnd', eol:8, alts:1, refurb:0, p3d:0, units:4, onHand:1 },
+    { id:'FP-LG-004', pn:'CRAC-COMP-LG', desc:'Liebert CRAC Compressor', sub:'CRAC-CRAH', gen:'legacy-raised-floor', crit:7, mtbf:8, ltTyp:12, ltMax:18, cTyp:8000, life:'obsolete', eol:10, alts:0, refurb:1, p3d:0, units:8, onHand:2 },
+    { id:'FP-LG-005', pn:'RAISE-FLOOR-LG', desc:'Perforated Floor Tile Damper', sub:'raised-floor', gen:'legacy-raised-floor', crit:4, mtbf:12, ltTyp:8, ltMax:12, cTyp:600, life:'obsolete', eol:9, alts:0, refurb:1, p3d:1, units:20, onHand:5 }
+  ]
+};
+
+function fleetLoadPreset(key) {
+  if (!FLEET_PRESETS[key]) return;
+  fleetParts = FLEET_PRESETS[key].map(function(p) { return Object.assign({}, p); });
+  saveFleetToStorage();
+  calcFleet();
+  showMsg('Loaded preset: ' + key);
+}
+
+function fleetClearAll() {
+  if (fleetParts.length > 0 && !confirm('Clear all fleet parts?')) return;
+  fleetParts = [];
+  saveFleetToStorage();
+  calcFleet();
+}
+
+function fleetAddFromSelect() {
+  var sel = document.getElementById('fl_add_part_select');
+  if (!sel || !sel.value) { showMsg('Select a part first.'); return; }
+  var CAT = window.SPARES_CATALOG || null;
+  if (!CAT) { showMsg('Catalog not loaded.'); return; }
+  var part = CAT.parts.find(function(p){return p.id === sel.value;});
+  if (!part) return;
+  // Check if already in fleet
+  if (fleetParts.find(function(p){return p.id===part.id;})) { showMsg('Part already in fleet.'); return; }
+  fleetParts.push({
+    id: part.id, pn: part.pn, desc: part.desc, sub: part.sub, gen: part.gen,
+    crit: part.crit, mtbf: part.mtbf || 10, ltTyp: part.ltTyp || 12, ltMax: part.ltMax || 20,
+    cTyp: part.cTyp || 5000, life: part.life, eol: part.eol || 3, alts: part.alts || 0,
+    refurb: part.refurb || 0, p3d: part.p3d || 0,
+    units: 1, onHand: 0
+  });
+  saveFleetToStorage();
+  calcFleet();
+  showMsg('Added: ' + part.desc);
+}
+
+function fleetPopulateSelect() {
+  var sel = document.getElementById('fl_add_part_select');
+  if (!sel) return;
+  var CAT = window.SPARES_CATALOG || null;
+  if (!CAT || !CAT.parts) return;
+  if (sel.options.length > 2) return; // already populated
+  // Sort by criticality desc
+  var sorted = CAT.parts.slice().sort(function(a,b){return b.crit-a.crit;});
+  // Add top 100 critical parts
+  var opts = '';
+  sorted.slice(0,100).forEach(function(p){
+    opts += '<option value="'+p.id+'">[crit:'+p.crit+'] '+p.desc.slice(0,55)+(p.desc.length>55?'…':'')+'</option>';
+  });
+  sel.innerHTML = '<option value="">Select from catalog&hellip;</option>' + opts;
+}
+
+/* core calc */
+function calcFleet() {
+  // Populate part select if catalog loaded
+  fleetPopulateSelect();
+
+  var z = parseFloat((document.getElementById('fl_z')||{}).value || '2.33');
+  var carryRate = parseFloat((document.getElementById('fl_carry_rate')||{}).value || '22') / 100;
+  var downtimeCost = parseFloat((document.getElementById('fl_downtime_cost')||{}).value || '50000');
+  var mttr = parseFloat((document.getElementById('fl_mttr')||{}).value || '120');
+
+  var tbody = document.getElementById('fl_tbody');
+  if (!fleetParts.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;padding:2rem;color:var(--text-muted);">Add parts above or load a sample preset to get started.</td></tr>';
+    // clear KPIs
+    ['fl_kpi_total_inv','fl_kpi_readiness','fl_kpi_atrisk','fl_kpi_carry','fl_kpi_stockout_risk','fl_kpi_eol_exp','fl_sb_readiness','fl_sb_parts','fl_sb_atrisk','fl_sb_carry'].forEach(function(id){
+      var e=document.getElementById(id); if(e) e.textContent='—';
+    });
+    renderFleetCharts([]);
+    updateSummaryDashboard();
+    return;
+  }
+
+  var totalInv = 0, totalCarry = 0, totalStockoutRisk = 0, totalEolExp = 0;
+  var weightedReadSum = 0, weightedReadDen = 0, atRiskCount = 0;
+  var rows = '';
+
+  function genShortF(g) { return (g||'').replace(/legacy-raised-floor/g,'Legacy').replace(/enterprise-tier3/g,'Tier3').replace(/colo-wholesale/g,'Colo').replace(/cloud-hyperscale/g,'Cloud').replace(/ai-factory-liquid-cooled/g,'AI-Fac').replace(/edge-micro/g,'Edge').split('|').slice(0,2).join(', '); }
+  function lifeLabel(l) { return {active:'Active',nrnd:'NRND','last-time-buy':'LTB',obsolete:'Obsolete'}[l]||l; }
+  function lifeCls(l) { return {'active':'catalog-life-active','nrnd':'catalog-life-nrnd','last-time-buy':'catalog-life-ltb','obsolete':'catalog-life-obsolete'}[l]||''; }
+
+  fleetParts.forEach(function(p, idx) {
+    var mtbf = Math.max(0.1, p.mtbf || 10);
+    var ltTyp = Math.max(1, p.ltTyp || 12);
+    var cTyp = Math.max(0, p.cTyp || 5000);
+    var units = Math.max(1, p.units || 1);
+    var onHand = Math.max(0, p.onHand || 0);
+    var crit = p.crit || 5;
+    var alts = p.alts || 0;
+    var eol = p.eol || 3;
+
+    // Demand rate λ = units / MTBF
+    var lambda = units / mtbf;
+    // μ_LT = λ × L/52
+    var muLT = lambda * (ltTyp / 52);
+    // σ_LT = √(λ × L/52) — Poisson approximation
+    var sigmaLT = Math.sqrt(lambda * (ltTyp / 52));
+    // Safety Stock SS = z × σ_LT
+    var ss = z * sigmaLT;
+    // Rec stock = ⌈SS⌉ + ⌈μ_LT⌉
+    var recStock = Math.max(1, Math.ceil(ss + muLT));
+    // Annual carry
+    var annualCarry = carryRate * cTyp * recStock;
+    // P(stockout)
+    var pStockout = onHand >= recStock ? 0.02 : Math.max(0.02, Math.min(0.95, (recStock - onHand) / Math.max(1, recStock)));
+    // Stockout risk $
+    var stockoutRisk = pStockout * downtimeCost * (mttr / 1) * Math.max(1, units / (mtbf * 10));
+    // Readiness %
+    var readPct = Math.min(100, onHand / Math.max(1, recStock) * 100);
+    // EOL exposure (5 = nominal support years proxy)
+    var eolExp = units * crit * 5 / Math.max(1, alts);
+
+    // Store computed
+    p._recSS = recStock;
+    p._annualCarry = annualCarry;
+    p._stockoutRisk = stockoutRisk;
+    p._readPct = readPct;
+    p._eolExp = eolExp;
+
+    totalInv += cTyp * recStock;
+    totalCarry += annualCarry;
+    totalStockoutRisk += stockoutRisk;
+    totalEolExp += eolExp;
+    weightedReadSum += readPct * crit;
+    weightedReadDen += crit;
+    if (crit >= 7 && readPct < 90) atRiskCount++;
+
+    var readCls = readPct >= 90 ? 'fleet-readiness-high' : (readPct >= 60 ? 'fleet-readiness-med' : 'fleet-readiness-low');
+
+    rows += '<tr>' +
+      '<td class="ft-desc"><span style="font-size:0.68rem;font-family:monospace;color:var(--text-muted);">'+p.id+'</span><br>'+p.desc+'</td>' +
+      '<td class="ft-desc">'+p.sub+'</td>' +
+      '<td style="font-size:0.65rem;">'+genShortF(p.gen)+'</td>' +
+      '<td style="text-align:center;font-weight:700;color:'+(crit>=7?'#ef4444':'var(--text-primary)')+'">'+crit+'</td>' +
+      '<td style="text-align:center;">'+ltTyp+'</td>' +
+      '<td>$'+(cTyp>=1000?(cTyp/1000).toFixed(0)+'K':cTyp)+'</td>' +
+      '<td><input type="number" class="fleet-qty-input" value="'+units+'" min="1" aria-label="Units in fleet" onchange="fleetUpdateVal('+idx+',\'units\',this.value)"></td>' +
+      '<td><input type="number" class="fleet-qty-input" value="'+onHand+'" min="0" aria-label="On-hand quantity" onchange="fleetUpdateVal('+idx+',\'onHand\',this.value)"></td>' +
+      '<td style="font-weight:700;">'+recStock+'</td>' +
+      '<td>$'+(annualCarry>=1000?(annualCarry/1000).toFixed(1)+'K':annualCarry.toFixed(0))+'</td>' +
+      '<td>$'+(stockoutRisk>=1000?(stockoutRisk/1000).toFixed(1)+'K':stockoutRisk.toFixed(0))+'</td>' +
+      '<td class="'+readCls+'">'+readPct.toFixed(0)+'%</td>' +
+      '<td><span class="'+lifeCls(p.life)+'">'+lifeLabel(p.life)+'</span></td>' +
+      '<td><button class="btn-remove-fleet" onclick="fleetRemovePart('+idx+')" aria-label="Remove this part from fleet">✕</button></td>' +
+      '</tr>';
+  });
+
+  if (tbody) tbody.innerHTML = rows;
+
+  var fleetRead = weightedReadDen > 0 ? (weightedReadSum / weightedReadDen).toFixed(1) + '%' : '—';
+  var readCls2 = weightedReadDen > 0 ? ((weightedReadSum/weightedReadDen)>=90?'fleet-readiness-high':(weightedReadSum/weightedReadDen)>=60?'fleet-readiness-med':'fleet-readiness-low') : '';
+
+  function fmt2$(v) { if(v>=1000000) return '$'+(v/1000000).toFixed(2)+'M'; if(v>=1000) return '$'+(v/1000).toFixed(1)+'K'; return '$'+v.toFixed(0); }
+
+  var kpis = {
+    fl_kpi_total_inv: fmt2$(totalInv),
+    fl_kpi_readiness: fleetRead,
+    fl_kpi_atrisk: atRiskCount.toString(),
+    fl_kpi_carry: fmt2$(totalCarry),
+    fl_kpi_stockout_risk: fmt2$(totalStockoutRisk),
+    fl_kpi_eol_exp: totalEolExp.toFixed(0)
+  };
+  Object.keys(kpis).forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=kpis[id];});
+  var readEl2 = document.getElementById('fl_kpi_readiness');
+  if (readEl2) { readEl2.className = 'fleet-kpi-value ' + readCls2; }
+
+  // Sticky bar
+  var e2;
+  e2=document.getElementById('fl_sb_readiness'); if(e2){e2.textContent=fleetRead;e2.className='msb-value '+readCls2;}
+  e2=document.getElementById('fl_sb_parts'); if(e2) e2.textContent=fleetParts.length;
+  e2=document.getElementById('fl_sb_atrisk'); if(e2) e2.textContent=atRiskCount;
+  e2=document.getElementById('fl_sb_carry'); if(e2) e2.textContent=fmt2$(totalCarry);
+
+  renderFleetCharts(fleetParts);
+  updateSummaryDashboard();
+}
+
+function fleetUpdateVal(idx, key, val) {
+  if (fleetParts[idx] == null) return;
+  fleetParts[idx][key] = parseFloat(val) || 0;
+  saveFleetToStorage();
+  calcFleet();
+}
+
+function fleetRemovePart(idx) {
+  fleetParts.splice(idx, 1);
+  saveFleetToStorage();
+  calcFleet();
+}
+
+function renderFleetCharts(parts) {
+  // Pareto of stockout risk
+  var sorted = parts.filter(function(p){return p._stockoutRisk > 0;}).slice().sort(function(a,b){return b._stockoutRisk-a._stockoutRisk;});
+  var top10 = sorted.slice(0,10);
+  var totalRisk = sorted.reduce(function(s,p){return s+p._stockoutRisk;},0);
+  var cumData = [];
+  var cum = 0;
+  top10.forEach(function(p){cum+=p._stockoutRisk;cumData.push(totalRisk>0?(cum/totalRisk*100):0);});
+
+  getOrCreateChart('chart_fleet_pareto', 'bar', {
+    labels: top10.map(function(p){return p.desc.length>20?p.desc.slice(0,18)+'…':p.desc;}),
+    datasets: [
+      { type:'bar', label:'Stockout Risk $', data:top10.map(function(p){return +(p._stockoutRisk).toFixed(0);}), backgroundColor:'rgba(239,68,68,0.6)', borderRadius:4, yAxisID:'y' },
+      { type:'line', label:'Cumulative %', data:cumData.map(function(v){return +v.toFixed(1);}), borderColor:'rgba(245,158,11,0.9)', backgroundColor:'transparent', pointRadius:3, borderWidth:2, yAxisID:'y2' }
+    ]
+  }, {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{labels:{font:{size:10},color:chartTickColor()}} },
+    scales:{
+      x:{ ticks:{font:{size:8},color:chartTickColor(),maxRotation:35}, grid:{color:chartGridColor()} },
+      y:{ beginAtZero:true, ticks:{font:{size:9},color:chartTickColor(),callback:function(v){return v>=1000?(v/1000).toFixed(0)+'K':v;}}, grid:{color:chartGridColor()}, position:'left' },
+      y2:{ beginAtZero:true, max:100, ticks:{font:{size:9},color:chartTickColor(),callback:function(v){return v+'%';}}, grid:{display:false}, position:'right' }
+    }
+  });
+
+  // EOL heatmap — subsystem × DC gen (top-5 subs)
+  var DC_GENS_H = ['legacy-raised-floor','enterprise-tier3','colo-wholesale','cloud-hyperscale','ai-factory-liquid-cooled'];
+  var DC_LABELS_H = ['Legacy','Tier-III','Colo','Cloud','AI-Fac'];
+  var subs5 = [];
+  var subEol = {};
+  parts.forEach(function(p){
+    if (!subEol[p.sub]) subEol[p.sub]=0;
+    subEol[p.sub] += (p._eolExp||0);
+  });
+  subs5 = Object.keys(subEol).sort(function(a,b){return subEol[b]-subEol[a];}).slice(0,5);
+  var heatDatasets = DC_GENS_H.map(function(gen, gi) {
+    return {
+      label: DC_LABELS_H[gi],
+      data: subs5.map(function(sub){
+        return parts.filter(function(p){return p.sub===sub&&(p.gen||'').indexOf(gen)>=0;}).reduce(function(s,p){return s+(p._eolExp||0);},0).toFixed(0);
+      }),
+      backgroundColor:'rgba(245,'+(40+gi*40)+','+(10+gi*20)+',0.55)',
+      borderRadius:3
+    };
+  });
+  getOrCreateChart('chart_fleet_heatmap', 'bar', {
+    labels: subs5.map(function(s){return s.length>18?s.slice(0,16)+'…':s;}),
+    datasets: heatDatasets
+  }, {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{labels:{font:{size:9},color:chartTickColor()}} },
+    scales:{
+      x:{ stacked:true, ticks:{font:{size:8},color:chartTickColor()}, grid:{color:chartGridColor()} },
+      y:{ stacked:true, beginAtZero:true, ticks:{font:{size:9},color:chartTickColor()}, grid:{color:chartGridColor()} }
+    }
+  });
+
+  // ABC-XYZ scatter
+  var lifeCols = { active:'rgba(16,185,129,0.7)', nrnd:'rgba(245,158,11,0.7)', 'last-time-buy':'rgba(234,88,12,0.7)', obsolete:'rgba(239,68,68,0.7)' };
+  getOrCreateChart('chart_fleet_abcxyz', 'bubble', {
+    datasets: [{
+      label: 'Fleet Parts',
+      data: parts.map(function(p){
+        var lambda = (p.units||1) / Math.max(0.1, p.mtbf||10);
+        var annualUsageVal = lambda * (p.cTyp||5000);
+        var ltVar = p.ltMax && p.ltTyp > 0 ? p.ltMax / p.ltTyp : 1;
+        return { x:+annualUsageVal.toFixed(0), y:+ltVar.toFixed(2), r:Math.max(4,Math.min(18,p.crit*1.5)), label:p.desc };
+      }),
+      backgroundColor: parts.map(function(p){ return lifeCols[p.life]||'rgba(100,116,139,0.5)'; }),
+      borderColor: parts.map(function(p){ return (lifeCols[p.life]||'rgba(100,116,139,0.5)').replace('0.7','1'); }),
+      borderWidth:1.5
+    }]
+  }, {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:function(ctx){var d=ctx.raw;return d.label+' | AUV:$'+Math.round(d.x/1000)+'K LTV:×'+d.y;}}}
+    },
+    scales:{
+      x:{ type:'logarithmic', ticks:{font:{size:9},color:chartTickColor(),callback:function(v){return v>=1000?(v/1000).toFixed(0)+'K':v;}}, grid:{color:chartGridColor()}, title:{display:true,text:'Annual Usage Value ($)',font:{size:10},color:chartTickColor()} },
+      y:{ beginAtZero:true, ticks:{font:{size:9},color:chartTickColor(),callback:function(v){return '×'+v;}}, grid:{color:chartGridColor()}, title:{display:true,text:'LT Variability (ltMax/ltTyp)',font:{size:10},color:chartTickColor()} }
+    }
+  });
+}
+
+function saveFleetToStorage() {
+  try { localStorage.setItem('cse_fleet', JSON.stringify(fleetParts)); } catch(e) {}
+}
+
+function loadFleetFromStorage() {
+  try {
+    var raw = localStorage.getItem('cse_fleet');
+    if (!raw) { showMsg('No saved fleet.'); return; }
+    fleetParts = JSON.parse(raw);
+    calcFleet();
+    showMsg('Fleet loaded.');
+  } catch(e) { showMsg('Error loading fleet.'); }
+}
+
+/* Extend scenarioSnapshot to include fleet */
+var _origScenarioSnapshot = scenarioSnapshot;
+scenarioSnapshot = function() {
+  var snap = _origScenarioSnapshot();
+  snap['__fleetParts'] = JSON.stringify(fleetParts);
+  return snap;
+};
+var _origApplySnapshot = applySnapshot;
+applySnapshot = function(snap) {
+  _origApplySnapshot(snap);
+  if (snap['__fleetParts']) {
+    try { fleetParts = JSON.parse(snap['__fleetParts']); } catch(e) {}
+  }
+};
+
+/* Fleet PDF export */
+function exportFleetPDF() {
+  if (!fleetParts.length) { showMsg('Add parts to the fleet first.'); return; }
+  var date = new Date().toLocaleString();
+  var z = parseFloat((document.getElementById('fl_z')||{}).value||'2.33');
+  var carryRate = parseFloat((document.getElementById('fl_carry_rate')||{}).value||'22');
+  var downtimeCost = parseFloat((document.getElementById('fl_downtime_cost')||{}).value||'50000');
+
+  var kpiTxt = function(id){ var e=document.getElementById(id); return e?e.textContent:'—'; };
+  var css = '<style>body{font-family:Arial,sans-serif;font-size:11px;color:#1e293b;padding:16px 20px;}'+
+    'h1{color:#d97706;border-bottom:3px solid #f59e0b;padding-bottom:5px;font-size:17px;}'+
+    'h2{color:#d97706;font-size:12px;margin:16px 0 5px;border-left:3px solid #f59e0b;padding-left:6px;}'+
+    'table{border-collapse:collapse;width:100%;margin:6px 0;}'+
+    'th{background:#fef3c7;text-align:left;padding:4px 7px;font-size:10px;}'+
+    'td{padding:4px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;}'+
+    '.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;}'+
+    '.kpi{background:#fef9ec;border:1px solid #fde68a;border-radius:5px;padding:7px;text-align:center;}'+
+    '.kpi-l{font-size:8px;color:#92400e;font-weight:700;text-transform:uppercase;}'+
+    '.kpi-v{font-size:12px;font-weight:800;color:#1e293b;margin-top:2px;}'+
+    '.disc{background:#f1f5f9;border:1px solid #cbd5e1;padding:8px;border-radius:5px;font-size:9px;color:#475569;margin-top:14px;}'+
+    '<\/style>';
+
+  var cover = '<h1>Fleet / Portfolio Spares Report<\/h1><p style="font-size:10px;color:#64748b;">Generated: '+date+' · Carrying rate: '+carryRate+'% · Downtime cost: $'+downtimeCost.toLocaleString()+'/hr · z='+z+'<\/p>';
+  var kpiBlock = '<div class="kpi-row">'+
+    '<div class="kpi"><div class="kpi-l">Total Inv $<\/div><div class="kpi-v">'+kpiTxt('fl_kpi_total_inv')+'<\/div><\/div>'+
+    '<div class="kpi"><div class="kpi-l">Fleet Readiness %<\/div><div class="kpi-v">'+kpiTxt('fl_kpi_readiness')+'<\/div><\/div>'+
+    '<div class="kpi"><div class="kpi-l">Critical-at-Risk<\/div><div class="kpi-v">'+kpiTxt('fl_kpi_atrisk')+'<\/div><\/div>'+
+    '<div class="kpi"><div class="kpi-l">Annual Carrying $<\/div><div class="kpi-v">'+kpiTxt('fl_kpi_carry')+'<\/div><\/div>'+
+    '<div class="kpi"><div class="kpi-l">Stockout Risk $<\/div><div class="kpi-v">'+kpiTxt('fl_kpi_stockout_risk')+'<\/div><\/div>'+
+    '<div class="kpi"><div class="kpi-l">EOL Exposure<\/div><div class="kpi-v">'+kpiTxt('fl_kpi_eol_exp')+'<\/div><\/div>'+
+    '<\/div>';
+
+  var tableRows = fleetParts.map(function(p){
+    return '<tr><td>'+p.id+'<\/td><td>'+p.desc+'<\/td><td>'+p.sub+'<\/td><td>'+p.crit+'<\/td><td>'+(p.ltTyp||'—')+'<\/td><td>$'+(p.cTyp||0).toLocaleString()+'<\/td><td>'+(p.units||1)+'<\/td><td>'+(p.onHand||0)+'<\/td><td>'+(p._recSS||'—')+'<\/td><td>$'+((p._annualCarry||0)/1000).toFixed(1)+'K<\/td><td>$'+((p._stockoutRisk||0)/1000).toFixed(1)+'K<\/td><td>'+((p._readPct||0).toFixed(0))+'%<\/td><td>'+p.life+'<\/td><\/tr>';
+  }).join('');
+
+  var tableSection = '<h2>Fleet Parts Detail<\/h2><table><tr><th>ID<\/th><th>Description<\/th><th>Subsystem<\/th><th>Crit<\/th><th>LT (wk)<\/th><th>Unit Cost<\/th><th>Units<\/th><th>On-Hand<\/th><th>Rec SS<\/th><th>Carry\/yr $<\/th><th>Stockout Risk $<\/th><th>Readiness %<\/th><th>Lifecycle<\/th><\/tr>'+tableRows+'<\/table>';
+
+  var recs = '<h2>Recommendations<\/h2><ul style="font-size:10px;padding-left:16px;line-height:1.8;">'+
+    '<li>Parts with readiness &lt;90% and criticality ≥7: address first — raise on-hand stock to meet safety stock level.<\/li>'+
+    '<li>NRND\/LTB\/Obsolete parts with 0 alternates: initiate Last-Time-Buy evaluation or alternate qualification immediately.<\/li>'+
+    '<li>3D-printable parts: route to additive manufacturing supply path — eliminates LTB risk and lead-time dependency.<\/li>'+
+    '<li>Top Pareto stockout risk: focus safety-stock investment on these — drive 80% risk reduction with 20% of effort.<\/li>'+
+    '<\/ul>';
+
+  var disc = '<div class="disc"><strong>Disclaimer:<\/strong> Fleet math uses simplified Poisson safety-stock approximation. Not a substitute for full multi-echelon optimisation (VARI-METRIC\/MEIO). resistancezero.com Critical Spares Engine.<\/div>';
+
+  var w = window.open('','_blank');
+  if (!w) { showMsg('Allow pop-ups to export PDF.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fleet Report — Critical Spares Engine<\/title>'+css+'<\/head><body>'+cover+kpiBlock+tableSection+recs+disc+'<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ===========================================
+   ONBOARDING TOUR
+   =========================================== */
+var TOUR_STEPS = [
+  {
+    title: '1 of 4 — Pick a commodity to auto-fill defaults',
+    body: 'Select a commodity type (Chiller, Switchgear, UPS…) in Module 1 · Criticality to instantly load realistic DC M&E defaults for all 8 analytical modules. No guesswork.',
+    target: 'c1_commodity'
+  },
+  {
+    title: '2 of 4 — Load a sample scenario',
+    body: 'Use the preset dropdown above the tabs to load a realistic scenario (e.g. "Chiller Compressor Crisis" or "MV Switchgear EOL") — all 20 modules update in one click.',
+    target: 'presetSelect'
+  },
+  {
+    title: '3 of 4 — Browse the Parts Catalog',
+    body: 'The Parts Catalog tab has 445+ curated DC M&E spare parts. Click "Use ▸" on any part to load it into the Criticality and Optimal Stock modules. The Catalog Analytics tab visualizes the whole database.',
+    target: null
+  },
+  {
+    title: '4 of 4 — Export a full report or share your scenario',
+    body: 'Use "Full Report PDF" to export all 8 analytical modules. Use "Share URL" to copy a link with your inputs encoded — send to your team or save for later.',
+    target: 'presetSelect'
+  }
+];
+
+var tourStep = 0;
+
+function tourStart() {
+  if (typeof localStorage !== 'undefined') localStorage.setItem('cse_tour_done', '1');
+  tourStep = 0;
+  tourShow();
+}
+
+function tourShow() {
+  var ov = document.getElementById('tourOverlay');
+  var tt = document.getElementById('tourTooltip');
+  var spot = document.getElementById('tourSpotlight');
+  if (!ov || !tt || !spot) return;
+  if (tourStep >= TOUR_STEPS.length) { tourEnd(); return; }
+  var step = TOUR_STEPS[tourStep];
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourBody').textContent = step.body;
+  document.getElementById('tourStepCount').textContent = (tourStep+1) + ' / ' + TOUR_STEPS.length;
+  var nextBtn = document.getElementById('tourNextBtn');
+  if (nextBtn) nextBtn.textContent = tourStep === TOUR_STEPS.length-1 ? 'Done ✓' : 'Next →';
+
+  ov.style.display = 'block';
+  ov.setAttribute('aria-hidden','false');
+
+  // Position tooltip + spotlight
+  var targetEl = step.target ? document.getElementById(step.target) : null;
+  if (targetEl) {
+    var rect = targetEl.getBoundingClientRect();
+    spot.style.display = 'block';
+    spot.style.top = (rect.top - 6) + 'px';
+    spot.style.left = (rect.left - 6) + 'px';
+    spot.style.width = (rect.width + 12) + 'px';
+    spot.style.height = (rect.height + 12) + 'px';
+    // Position tooltip below or above target
+    var ttTop = rect.bottom + 12;
+    if (ttTop + 160 > window.innerHeight) ttTop = rect.top - 170;
+    var ttLeft = Math.min(rect.left, window.innerWidth - 340);
+    tt.style.top = Math.max(10, ttTop) + 'px';
+    tt.style.left = Math.max(10, ttLeft) + 'px';
+  } else {
+    spot.style.display = 'none';
+    tt.style.top = '50%';
+    tt.style.left = '50%';
+    tt.style.transform = 'translate(-50%, -50%)';
+  }
+  tt.style.display = 'block';
+}
+
+function tourNext() {
+  tourStep++;
+  if (tourStep >= TOUR_STEPS.length) { tourEnd(); return; }
+  tourShow();
+}
+
+function tourEnd() {
+  var ov = document.getElementById('tourOverlay'); if (ov) { ov.style.display='none'; ov.setAttribute('aria-hidden','true'); }
+  var tt = document.getElementById('tourTooltip'); if (tt) tt.style.display='none';
+}
+
+/* Auto-launch tour on first visit */
+(function() {
+  try {
+    if (!localStorage.getItem('cse_tour_done')) {
+      setTimeout(tourStart, 1200);
+    }
+  } catch(e) {}
+})();
+
+/* Mobile accordion for input panels — switch on ≤768px */
+(function() {
+  function wireAccordion(paneId) {
+    var pane = document.getElementById(paneId);
+    if (!pane) return;
+    var moduleCards = pane.querySelectorAll('.module-grid .module-card:first-child');
+    moduleCards.forEach(function(card) {
+      // Only wrap if not already done
+      if (card.querySelector('.mobile-accordion-toggle')) return;
+      var toggle = document.createElement('button');
+      toggle.className = 'mobile-accordion-toggle';
+      toggle.textContent = 'Inputs';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Toggle inputs panel');
+      var wrapper = document.createElement('div');
+      wrapper.className = 'mobile-accordion-content';
+      // Move card children into wrapper
+      while (card.firstChild) wrapper.appendChild(card.firstChild);
+      card.appendChild(toggle);
+      card.appendChild(wrapper);
+      toggle.addEventListener('click', function() {
+        var open = wrapper.classList.toggle('open');
+        toggle.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+  }
+  // Wire after DOM is ready — wire on first tab switch to each analytical module
+  var analyticalTabs = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo'];
+  analyticalTabs.forEach(function(t) {
+    var pane = document.getElementById('pane-' + t);
+    if (pane) wireAccordion('pane-' + t);
+  });
+})();
+
+/* Patch updateSummaryDashboard to add fleet readiness if fleet is loaded */
+var _origUpdateSummary = updateSummaryDashboard;
+updateSummaryDashboard = function() {
+  _origUpdateSummary();
+  // Add fleet readiness to summary if fleet is loaded
+  if (fleetParts && fleetParts.length > 0) {
+    var flEl = document.getElementById('fl_sb_readiness');
+    if (flEl && flEl.textContent && flEl.textContent !== '—') {
+      // We don't modify the 8-cell dashboard (it would require a new cell)
+      // but we update the hero stat count
+    }
+  }
+  // Update catalog count in method note
+  var CAT = window.SPARES_CATALOG || null;
+  if (CAT && CAT.parts) {
+    var cnEl = document.getElementById('methodNoteCatalogCount');
+    if (cnEl) cnEl.textContent = CAT.parts.length;
+  }
+};
+
+/* Init: load fleet from storage if available */
+(function() {
+  try {
+    var raw = localStorage.getItem('cse_fleet');
+    if (raw) { fleetParts = JSON.parse(raw); }
+  } catch(e) {}
+})();
 
 })(); // end IIFE
 </script>

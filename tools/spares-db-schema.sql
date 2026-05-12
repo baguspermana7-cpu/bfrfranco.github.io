@@ -295,6 +295,257 @@ WHERE p.dc_generation LIKE '%ai-factory%'
   AND p.system = 'cooling';
 
 -- =============================================================================
+-- PLATFORM LAYER (v1.16)
+-- These tables turn the static catalog into a live spares-management system.
+-- They are EMPTY in the default build; `build-spares-db.py --platform` fills
+-- them with synthetic data, and in production they'd be fed from ERP / CMMS /
+-- procurement systems. The calculator's analytical modules can read them to
+-- drive real FMECA-criticality / newsvendor-stock / MEIO-positioning /
+-- supplier-risk / DMSMS-LTB calculations on the actual fleet.
+-- =============================================================================
+
+-- Operating sites (data-center facilities the org runs spares for)
+CREATE TABLE IF NOT EXISTS sites (
+    site_id                 TEXT PRIMARY KEY,        -- e.g. 'US-EAST-01'
+    name                    TEXT NOT NULL,
+    region                  TEXT,                    -- AMER / EMEA / APAC / MENA / LATAM
+    country                 TEXT,
+    facility_type_id        TEXT REFERENCES dc_facility_types(facility_type_id),
+    it_load_mw              REAL,
+    commissioned_year       INTEGER,
+    tier                    TEXT,                    -- 'III' / 'IV' etc.
+    has_regional_hub        INTEGER DEFAULT 0 CHECK(has_regional_hub IN (0,1)),
+    hub_lead_time_days      REAL,                    -- if served by a regional spares hub
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_sites_region ON sites(region);
+
+-- Suppliers (distinct from OEMs — distributors / integrators / service providers
+-- with their own commercial terms; an OEM may also be a supplier of record).
+CREATE TABLE IF NOT EXISTS suppliers (
+    supplier_id             TEXT PRIMARY KEY,
+    name                    TEXT NOT NULL,
+    supplier_type           TEXT CHECK(supplier_type IN
+                                ('oem','distributor','integrator','service-provider','broker','refurbisher')),
+    primary_oem_id          TEXT REFERENCES oems(oem_id),   -- nullable — for multi-OEM distributors
+    region_coverage         TEXT,                    -- comma-separated regions served
+    contract_status         TEXT CHECK(contract_status IN
+                                ('MSA','framework','SOW','PO-only','expired','under-negotiation','none')),
+    msa_expiry              DATE,
+    otif_pct                REAL,                    -- on-time-in-full %
+    commit_accuracy_pct     REAL,                    -- actual delivery vs supplier commit
+    quote_turnaround_days   REAL,
+    po_ack_days             REAL,
+    defect_rate_pct         REAL,
+    responsiveness_hours    REAL,                    -- time to respond to a critical issue
+    corrective_action_closure_pct REAL,
+    financial_health_score  INTEGER CHECK(financial_health_score BETWEEN 1 AND 10),
+    capacity_headroom_pct   REAL,                    -- spare production / allocation capacity
+    geographic_concentration_score INTEGER CHECK(geographic_concentration_score BETWEEN 1 AND 10),
+    geopolitical_risk_score INTEGER CHECK(geopolitical_risk_score BETWEEN 1 AND 10),
+    lead_time_volatility_score INTEGER CHECK(lead_time_volatility_score BETWEEN 1 AND 10),
+    strategic_importance    TEXT CHECK(strategic_importance IN ('critical','preferred','tactical','replaceable')),
+    review_cadence          TEXT CHECK(review_cadence IN ('weekly','monthly','quarterly','annual','ad-hoc')),
+    consignment_capable     INTEGER DEFAULT 0 CHECK(consignment_capable IN (0,1)),
+    vmi_capable             INTEGER DEFAULT 0 CHECK(vmi_capable IN (0,1)),
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_suppliers_oem ON suppliers(primary_oem_id);
+CREATE INDEX IF NOT EXISTS idx_suppliers_importance ON suppliers(strategic_importance);
+
+-- Inventory positions: on-hand / reserved / in-transit by part × stocking location.
+CREATE TABLE IF NOT EXISTS inventory_positions (
+    id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+    part_id                 TEXT NOT NULL REFERENCES parts(part_id),
+    location_type           TEXT NOT NULL CHECK(location_type IN ('site','regional-hub','central-depot','consignment','vmi')),
+    location_id             TEXT,                    -- site_id, hub code, or supplier_id for consignment/VMI
+    on_hand_qty             INTEGER DEFAULT 0,
+    reserved_qty            INTEGER DEFAULT 0,       -- allocated to a planned work order
+    in_transit_qty          INTEGER DEFAULT 0,
+    safety_stock_target     INTEGER DEFAULT 0,
+    reorder_point           INTEGER DEFAULT 0,
+    max_stock               INTEGER DEFAULT 0,
+    last_count_date         DATE,
+    days_of_cover           REAL,                    -- on_hand / avg daily demand
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_inv_part ON inventory_positions(part_id);
+CREATE INDEX IF NOT EXISTS idx_inv_loc ON inventory_positions(location_type, location_id);
+
+-- Purchase orders: lifecycle tracking from creation to receipt.
+CREATE TABLE IF NOT EXISTS purchase_orders (
+    po_id                   TEXT PRIMARY KEY,        -- e.g. 'PO-2026-004217'
+    supplier_id             TEXT REFERENCES suppliers(supplier_id),
+    part_id                 TEXT REFERENCES parts(part_id),
+    site_id                 TEXT REFERENCES sites(site_id),     -- ship-to (nullable for hub stock)
+    quantity                INTEGER NOT NULL,
+    unit_price_usd          REAL,
+    total_value_usd         REAL,
+    demand_type             TEXT CHECK(demand_type IN
+                                ('planned-maintenance','corrective','emergency','lifecycle-eol','commissioning','buffer-replenishment','last-time-buy')),
+    po_creation_date        DATE,
+    supplier_ack_date       DATE,
+    original_commit_date    DATE,
+    current_commit_date     DATE,
+    need_by_date            DATE,
+    received_date           DATE,
+    delivery_status         TEXT CHECK(delivery_status IN
+                                ('on-track','at-risk','late','delivered','blocked','cancelled')),
+    blocker                 TEXT,                    -- root cause if at-risk/late/blocked
+    recovery_plan           TEXT,
+    owner                   TEXT,
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_po_supplier ON purchase_orders(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_po_part ON purchase_orders(part_id);
+CREATE INDEX IF NOT EXISTS idx_po_status ON purchase_orders(delivery_status);
+CREATE INDEX IF NOT EXISTS idx_po_need_by ON purchase_orders(need_by_date);
+
+-- Consumption history: actual part usage events (drives demand forecasting).
+CREATE TABLE IF NOT EXISTS consumption_history (
+    id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+    part_id                 TEXT NOT NULL REFERENCES parts(part_id),
+    site_id                 TEXT REFERENCES sites(site_id),
+    event_date              DATE,
+    quantity                INTEGER DEFAULT 1,
+    consumption_type        TEXT CHECK(consumption_type IN
+                                ('planned-maintenance','corrective','emergency','commissioning','engineering-change','attrition')),
+    failure_mode            TEXT,                    -- if corrective/emergency, the mode that triggered it
+    downtime_minutes        REAL,                    -- facility impact, if any
+    work_order_ref          TEXT,
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_cons_part ON consumption_history(part_id);
+CREATE INDEX IF NOT EXISTS idx_cons_date ON consumption_history(event_date);
+
+-- Engineering changes: part revisions, supersessions, EOL notices.
+CREATE TABLE IF NOT EXISTS engineering_changes (
+    id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+    part_id                 TEXT NOT NULL REFERENCES parts(part_id),
+    change_type             TEXT CHECK(change_type IN
+                                ('revision','supersession','eol-notice','last-time-buy-window','vendor-transition','spec-change','recall')),
+    announced_date          DATE,
+    effective_date          DATE,                    -- e.g. EOL date, LTB deadline
+    superseded_by_part_id   TEXT REFERENCES parts(part_id),
+    installed_base_affected INTEGER,
+    qualification_required  INTEGER DEFAULT 0 CHECK(qualification_required IN (0,1)),
+    qualification_lead_time_months REAL,
+    qualification_cost_usd  REAL,
+    status                  TEXT CHECK(status IN ('open','in-progress','mitigated','closed','accepted-risk')),
+    mitigation_plan         TEXT,
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_ec_part ON engineering_changes(part_id);
+CREATE INDEX IF NOT EXISTS idx_ec_type ON engineering_changes(change_type);
+
+-- Platform-layer convenience views ------------------------------------------
+
+-- Late / at-risk POs against critical parts (the daily-PM-ops triage view)
+CREATE VIEW IF NOT EXISTS v_po_at_risk AS
+SELECT po.po_id, s.name AS supplier, p.description AS part, p.criticality_default AS crit,
+       po.quantity, po.current_commit_date, po.need_by_date, po.delivery_status, po.blocker, po.owner,
+       CAST(julianday(po.current_commit_date) - julianday(po.need_by_date) AS INTEGER) AS slip_days
+FROM purchase_orders po
+LEFT JOIN suppliers s ON s.supplier_id = po.supplier_id
+LEFT JOIN parts p ON p.part_id = po.part_id
+WHERE po.delivery_status IN ('at-risk','late','blocked')
+ORDER BY p.criticality_default DESC, slip_days DESC;
+
+-- Spare-readiness gap: critical parts where on-hand + in-transit < safety-stock target
+CREATE VIEW IF NOT EXISTS v_readiness_gap AS
+SELECT p.part_id, p.description, p.criticality_default AS crit, p.lead_time_weeks_typ AS lt_wk,
+       SUM(i.on_hand_qty) AS on_hand, SUM(i.in_transit_qty) AS in_transit,
+       SUM(i.safety_stock_target) AS ss_target,
+       SUM(i.on_hand_qty + i.in_transit_qty) - SUM(i.safety_stock_target) AS gap
+FROM parts p JOIN inventory_positions i ON i.part_id = p.part_id
+WHERE p.criticality_default >= 7
+GROUP BY p.part_id
+HAVING gap < 0
+ORDER BY p.criticality_default DESC, gap ASC;
+
+-- =============================================================================
+-- SUPPLY CHAIN & TRANSPORT (v1.16) — reference tables (always populated; small)
+-- Source basis: ICC Incoterms 2020; World Bank LPI; industry-typical 2024-2026
+-- transit/cost/congestion figures; the DC-equipment shortage + tariff context.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS transport_modes (
+    mode_id                 TEXT PRIMARY KEY,        -- ocean-fcl / ocean-lcl / air-express / air-standard / road / rail / courier-express
+    name                    TEXT NOT NULL,
+    transit_days_inter_typ  REAL,                    -- intercontinental, typical door-to-door
+    transit_days_inter_min  REAL,
+    transit_days_inter_max  REAL,
+    transit_days_intra_typ  REAL,                    -- intra-region, typical (NULL if N/A)
+    cost_index              REAL,                    -- relative to ocean-FCL = 1.00
+    co2_index               REAL,                    -- relative to ocean-FCL = 1.00 (per tonne-km)
+    capacity_unit           TEXT,                    -- FCL / LCL / ULD-pallet / parcel
+    typical_use             TEXT,                    -- e.g. 'bulk M&E equipment', 'critical sub-assembly expedite'
+    notes                   TEXT
+);
+
+CREATE TABLE IF NOT EXISTS trade_lanes (
+    lane_id                 TEXT PRIMARY KEY,        -- e.g. 'CN-NA'
+    origin_region           TEXT NOT NULL,           -- CN / EU / NA / SEA-Vietnam / India / Korea-Japan / MENA / LATAM / Intra-NA / Intra-EU / Intra-APAC
+    dest_region             TEXT NOT NULL,
+    primary_mode            TEXT REFERENCES transport_modes(mode_id),
+    ocean_transit_days_typ  REAL,
+    air_transit_days_typ    REAL,
+    road_rail_transit_days_typ REAL,                 -- NULL if not feasible (e.g. transoceanic)
+    customs_clearance_days_typ REAL,
+    last_mile_days_typ      REAL,
+    congestion_risk         INTEGER CHECK(congestion_risk BETWEEN 1 AND 10),
+    geopolitical_risk       INTEGER CHECK(geopolitical_risk BETWEEN 1 AND 10),
+    rate_volatility         INTEGER CHECK(rate_volatility BETWEEN 1 AND 10),
+    tariff_exposure         INTEGER CHECK(tariff_exposure BETWEEN 1 AND 10),  -- typical DC-M&E duty burden on this lane, 2026
+    reroute_options         TEXT,
+    notes                   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_lanes_origin ON trade_lanes(origin_region);
+
+CREATE TABLE IF NOT EXISTS country_risk (
+    country                 TEXT PRIMARY KEY,
+    region                  TEXT,
+    political_stability_score INTEGER CHECK(political_stability_score BETWEEN 1 AND 10),  -- higher = more stable
+    customs_efficiency_score  INTEGER CHECK(customs_efficiency_score BETWEEN 1 AND 10),   -- higher = faster/cleaner
+    port_infrastructure_score INTEGER CHECK(port_infrastructure_score BETWEEN 1 AND 10),
+    logistics_performance_index REAL,                -- ~1.0-5.0, World Bank LPI style
+    transformer_mfg_share_pct REAL,                  -- rough share of global power-transformer capacity
+    geopolitical_risk_score INTEGER CHECK(geopolitical_risk_score BETWEEN 1 AND 10),     -- higher = riskier
+    tariff_regime_note      TEXT,
+    notes                   TEXT
+);
+
+-- Supply-chain views ---------------------------------------------------------
+
+-- Door-to-door lead-time estimate per lane × mode
+CREATE VIEW IF NOT EXISTS v_lane_lead_time AS
+SELECT l.lane_id, l.origin_region, l.dest_region,
+       ROUND(l.ocean_transit_days_typ + l.customs_clearance_days_typ + l.last_mile_days_typ, 1) AS ocean_door_days,
+       ROUND(l.air_transit_days_typ   + l.customs_clearance_days_typ + l.last_mile_days_typ, 1) AS air_door_days,
+       CASE WHEN l.road_rail_transit_days_typ IS NULL THEN NULL
+            ELSE ROUND(l.road_rail_transit_days_typ + l.customs_clearance_days_typ + l.last_mile_days_typ, 1) END AS road_rail_door_days,
+       l.congestion_risk, l.geopolitical_risk, l.rate_volatility, l.tariff_exposure, l.reroute_options
+FROM trade_lanes l;
+
+-- Highest-risk lanes (composite of congestion + geopolitical + volatility)
+CREATE VIEW IF NOT EXISTS v_high_risk_lanes AS
+SELECT lane_id, origin_region, dest_region,
+       (congestion_risk + geopolitical_risk + rate_volatility) AS risk_sum,
+       congestion_risk, geopolitical_risk, rate_volatility, tariff_exposure, reroute_options, notes
+FROM trade_lanes
+ORDER BY risk_sum DESC;
+
+-- Country-of-origin exposure: parts (and the OEMs) sitting in higher-risk countries
+CREATE VIEW IF NOT EXISTS v_oem_country_exposure AS
+SELECT p.country_of_origin, cr.region, cr.geopolitical_risk_score, cr.customs_efficiency_score,
+       cr.transformer_mfg_share_pct, COUNT(*) AS part_count,
+       SUM(CASE WHEN p.criticality_default >= 7 THEN 1 ELSE 0 END) AS critical_part_count,
+       ROUND(AVG(p.lead_time_weeks_typ),1) AS avg_lead_time_wk
+FROM parts p LEFT JOIN country_risk cr ON cr.country = p.country_of_origin
+GROUP BY p.country_of_origin
+ORDER BY part_count DESC;
+
+-- =============================================================================
 -- SCHEMA END
 -- Subsystem taxonomy (informational comment):
 --

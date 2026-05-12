@@ -76,6 +76,56 @@ FACILITY_TYPES = [
 DC_GENS = [f[0] for f in FACILITY_TYPES]
 
 # ---------------------------------------------------------------------------
+# Supply chain & transport reference data (v1.16) — small fixed tables
+# ---------------------------------------------------------------------------
+# mode_id, name, inter_typ, inter_min, inter_max, intra_typ, cost_index, co2_index, capacity_unit, typical_use, notes
+TRANSPORT_MODES = [
+    ("ocean-fcl","Ocean — Full Container Load",35,28,50,None,1.00,1.0,"FCL (20'/40'/40'HC)","Bulk M&E equipment, large units, non-urgent replenishment","Lowest $/kg; lead time = origin port wait + transit + dest port wait + congestion; chokepoint reroutes (Suez↔Cape, Panama draft) add 7-14 d."),
+    ("ocean-lcl","Ocean — Less than Container Load",42,32,58,None,1.60,1.1,"LCL (consolidated)","Smaller spares lots that don't fill a container","Consolidation/deconsolidation delay adds ~5-12 d vs FCL; cheaper than air, slower than FCL."),
+    ("air-standard","Air Freight — Standard",10,7,16,None,12.0,18.0,"ULD / pallet","Time-sensitive spares, critical sub-assemblies, post-disruption recovery","~10-20× ocean $/kg; door-to-door ~7-14 d incl. airport handling + customs; the workhorse expedite mode."),
+    ("air-express","Air Freight — Express (next-flight-out)","5",3,9,None,25.0,22.0,"parcel / small pallet","Emergency: single critical part, AOG-style 'cannot wait' situations","Fastest cross-border; very high $/kg; for the one part that's holding up a site."),
+    ("road","Road / Trucking",None,None,None,5,3.0,4.0,"FTL / LTL / flatbed","Intra-region delivery, port→site, hub→site, oversized abnormal-load transport","Door-to-door 2-10 d intra-region; abnormal-load (large transformers) needs permits + escorts → +days; no transoceanic."),
+    ("rail","Rail / Intermodal",None,None,None,7,2.0,1.5,"container / wagon","Intra-continental bulk (e.g. EU↔EU, China↔EU via land bridge, intra-NA)","Cheaper than road, slower; transit 5-15 d intra-continent; land-bridge lanes subject to geopolitical risk."),
+    ("courier-express","Courier / Integrator Express",4,2,7,2,18.0,20.0,"parcel","Small light parts (boards, sensors, kits) needed fast across borders","DHL/FedEx/UPS-style; door-to-door 2-7 d; good for low-weight high-urgency items; not for heavy equipment."),
+]
+# trade_lanes columns (15): lane_id, origin, dest, primary_mode, ocean_d, air_d, road_rail_d, customs_d, last_mile_d, congestion(1-10), geopolitical(1-10), volatility(1-10), tariff(1-10), reroute, notes
+TRADE_LANES = [
+    ("CN-NA","CN","NA","ocean-fcl",30,9,None,4,4,6,7,7,8,"Suez/Pacific routing; Panama draft restrictions can divert to US West Coast","China makes ~60% of global power transformers; US makes ~20% of what it uses → heavy reliance; Section 122 10% + Section 301 + copper +50% (Apr-2026) tariff burden."),
+    ("CN-EU","CN","EU","ocean-fcl",32,9,18,4,3,6,6,6,7,"Suez vs Cape of Good Hope (+10-14 d); China-EU rail land-bridge (~16-20 d) as alternate","North-Europe port congestion (Rotterdam/Hamburg ~80%+ utilization) is the swing factor."),
+    ("CN-APAC","CN","Intra-APAC","ocean-fcl",10,5,8,3,2,4,4,4,4,"Short intra-Asia legs; multiple feeder options","Closest sourcing for APAC DCs; lower tariff exposure than CN→NA."),
+    ("SEA-Vietnam-NA","SEA-Vietnam","NA","ocean-fcl",33,11,None,5,4,5,5,6,5,"Pacific routing","'China+1' alternate; bonded-warehouse + pre-cleared customs protocols emerging; lower China-specific tariff exposure."),
+    ("India-NA","India","NA","ocean-fcl",35,12,None,6,4,5,6,6,5,"Suez vs Cape; Mumbai/Mundra→US East/West","'China+1' alternate; India transformer/switchgear capacity scaling; longer transit than SEA."),
+    ("India-EU","India","EU","ocean-fcl",24,11,None,5,3,6,5,5,4,"Suez vs Cape (+10-14 d)","Reasonable EU lane; congestion at North-EU ports; India capacity scaling for switchgear/transformers."),
+    ("Korea-Japan-NA","Korea-Japan","NA","ocean-fcl",18,11,None,4,3,4,4,5,4,"Pacific routing","KR/JP OEMs (Hyosung, Mitsubishi, etc.) — quality, but allocation-constrained; moderate tariff exposure."),
+    ("EU-NA","EU","NA","ocean-fcl",16,9,None,4,3,4,3,4,3,"Transatlantic; reasonably stable","EU OEMs (ABB, Siemens, etc.); shorter transit; lower geopolitical risk than Asia lanes."),
+    ("Intra-NA","Intra-NA","NA","road",None,4,5,1,2,3,2,3,2,"Road/rail within North America; abnormal-load permits for large units","Domestic sourcing / refurb pools; permits + escorts for big transformers add days; lowest geopolitical risk."),
+    ("Intra-EU","Intra-EU","EU","road",None,4,4,1,2,3,2,3,2,"Road/rail within Europe","Domestic-EU sourcing; abnormal-load rules vary by country."),
+    ("Intra-APAC-local","Intra-APAC","Intra-APAC","road",None,4,6,2,2,4,3,4,3,"Short regional legs; some borders slow at customs","Regional-hub → site within APAC; customs efficiency varies widely (SG fast, ID/IN slower)."),
+    ("MENA-EU","MENA","EU","ocean-fcl",12,8,8,4,3,5,6,5,4,"Mediterranean routing","Some MENA fabrication; Suez-adjacent → chokepoint exposure."),
+    ("LATAM-NA","LATAM","NA","ocean-fcl",14,9,12,5,3,4,4,5,3,"Gulf/Pacific routing; Panama Canal","Limited DC-M&E fabrication; mostly a destination, not a source."),
+]
+# country_risk columns (10): country, region, political_stability(1-10 high=stable), customs_efficiency(1-10), port_infra(1-10), LPI(~1-5), transformer_mfg_share_pct, geopolitical_risk(1-10 high=risky), tariff_regime_note, notes
+COUNTRY_RISK = [
+    ("China","APAC",6,6,8,3.6,60.0,7,"Section 122 10% global surcharge + Section 301 duties; copper +50% (Apr-2026 steel/Al/Cu expansion); no chip-style exemption for transformers/switchgear/cables/batteries.","~60% of global power-transformer capacity; the dominant — and most tariff-exposed — source for US DC M&E."),
+    ("United States","AMER",8,8,8,3.9,20.0,3,"Importer side of the tariffs above; FTZ / bonded-warehouse deferral available; reshoring incentives but new transformer plants take years.","Makes only ~20% of the large power transformers it uses; the biggest demand sink (AI-DC boom)."),
+    ("Germany","EMEA",8,9,9,4.2,8.0,3,"EU customs union; standard duties; no China-specific surcharge.","ABB/Siemens-tier OEMs; quality + reliability, but allocation-constrained by the global shortage."),
+    ("Ireland","EMEA",8,8,7,3.8,1.0,3,"EU customs union.","Major DC build location (demand), modest manufacturing."),
+    ("Netherlands","EMEA",8,9,9,4.3,1.0,3,"EU customs union; Rotterdam — one of the congested North-EU gateways.","Gateway port; congestion ~80%+ utilization in 2025 is the swing factor for CN-EU / India-EU lanes."),
+    ("United Kingdom","EMEA",7,8,8,3.9,1.0,4,"Post-Brexit customs; UKCA/CE marking; standard duties.","Growing AI-DC build; some fabrication; customs slightly heavier than EU-internal."),
+    ("Singapore","APAC",9,9,9,4.3,1.0,3,"Very efficient customs; free-trade-agreement network.","Regional hub; fast clearance; a good 'pre-cleared' bonded-warehouse location for APAC spares."),
+    ("Japan","APAC",8,8,8,4.2,5.0,4,"Standard duties; reliable.","Mitsubishi/Hitachi-tier transformer & switchgear OEMs; quality, allocation-constrained."),
+    ("South Korea","APAC",7,8,8,4.1,5.0,5,"Standard duties.","Hyosung/HD-Hyundai-tier; transformer/GIS capacity; geopolitical risk (regional tensions)."),
+    ("India","APAC",6,5,6,3.4,3.0,6,"Standard duties; customs slower than SG/JP; capacity scaling.","'China+1' alternate; transformer/switchgear capacity growing; longer transit + slower customs than SEA."),
+    ("Vietnam","SEA",6,6,6,3.3,1.0,5,"Standard duties; lower China-specific tariff exposure; bonded-warehouse protocols emerging.","Primary 'China+1' destination; assembly/fabrication scaling; '70/30' splits common."),
+    ("Indonesia","APAC",6,4,5,3.0,0.5,6,"Standard duties; customs notably slower; local-content rules.","Mostly a destination (DC build) not a source; slower clearance."),
+    ("Mexico","LATAM",6,6,6,3.2,1.0,5,"USMCA preferences for qualifying goods; nearshore option for US.","Nearshore 'China+1' for North America; some electrical fabrication."),
+    ("Brazil","LATAM",6,5,5,3.0,1.0,5,"High import duties + complex customs; local-content rules.","Latin-American demand hub; limited DC-M&E fabrication for export."),
+    ("Italy","EMEA",7,7,7,3.7,2.0,3,"EU customs union; Mediterranean ports.","Some transformer/switchgear OEMs; Med-port chokepoint adjacency."),
+    ("Switzerland","EMEA",9,9,8,4.0,1.0,2,"Not in EU customs union but EFTA agreements; efficient.","ABB HQ; valve/actuator specialists (Belimo); high-value low-volume."),
+]
+
+
+# ---------------------------------------------------------------------------
 # OEMs (real DC-equipment manufacturers + distributors + specialists + generic)
 # ---------------------------------------------------------------------------
 # id, name, hq, founded, commodities (short), market_position, fin_health(1-10), lead_wk, otif%, contract_models, single_source_risk, notes
@@ -961,7 +1011,172 @@ PARTS_COLS = [
     "notes","source_basis",
 ]
 
-def write_db(parts_rows, fm_rows, compat_rows):
+# ---------------------------------------------------------------------------
+# Platform layer (v1.16) — synthetic operational data (sites/suppliers/inventory/
+# POs/consumption/engineering-changes). Only populated with --platform.
+# ---------------------------------------------------------------------------
+_SITE_DEFS = [
+    ("US-EAST-01","Ashburn Campus A","AMER","United States","cloud-hyperscale",120.0,2019,"IV",1,1.0),
+    ("US-EAST-02","Northern Virginia AI Hall","AMER","United States","ai-factory-liquid-cooled",80.0,2024,"IV",1,0.5),
+    ("US-WEST-01","Hillsboro Campus","AMER","United States","cloud-hyperscale",60.0,2017,"III",0,None),
+    ("US-CENT-01","Dallas Wholesale","AMER","United States","colo-wholesale",30.0,2015,"III",0,None),
+    ("EU-IE-01","Dublin Campus","EMEA","Ireland","cloud-hyperscale",55.0,2018,"IV",1,1.0),
+    ("EU-DE-01","Frankfurt Colo","EMEA","Germany","colo-wholesale",24.0,2016,"III",0,None),
+    ("EU-NL-01","Amsterdam Enterprise","EMEA","Netherlands","enterprise-tier3",8.0,2012,"III",0,None),
+    ("EU-UK-01","London AI Hall","EMEA","United Kingdom","ai-factory-liquid-cooled",45.0,2025,"IV",1,0.5),
+    ("APAC-SG-01","Singapore Campus","APAC","Singapore","cloud-hyperscale",40.0,2018,"IV",1,1.0),
+    ("APAC-JP-01","Tokyo Colo","APAC","Japan","colo-wholesale",18.0,2019,"III",0,None),
+    ("APAC-ID-01","Jakarta Enterprise","APAC","Indonesia","enterprise-tier3",6.0,2014,"III",0,None),
+    ("LEG-01","Legacy DC (decommissioning)","AMER","United States","legacy-raised-floor",2.0,2002,"II",0,None),
+]
+_PO_BLOCKERS = ["casting delay at foundry","raw-material allocation shortfall","supplier capacity constraint","QC hold — non-conformance","logistics/customs delay","engineering change in progress","upstream chip shortage"]
+_OWNERS = ["PM-Spares","Sourcing-Lead","Procurement-Ops","Site-Engineer","Category-Mgr"]
+
+def build_platform(scale, parts_rows, oem_by_id):
+    """Return dict of table_name -> list-of-row-tuples for the platform layer."""
+    rng = random.Random(SEED + 99)
+    di = {c:i for i,c in enumerate(PARTS_COLS)}
+    sites = []
+    for sd in _SITE_DEFS:
+        sites.append((sd[0], sd[1], sd[2], sd[3], sd[4], sd[5], sd[6], sd[7], sd[8], sd[9],
+                      f"Tier {sd[6]} · {sd[4]} · {sd[5]} MW IT" + (" · served by regional spares hub" if sd[8] else "")))
+    # suppliers: OEM-of-record per OEM + a set of distributors/integrators/refurbishers
+    suppliers = []
+    for oem in oem_by_id.values():
+        oid = oem[0]
+        sid = f"SUP-{oid.upper().replace('-','')[:10]}"
+        suppliers.append((
+            sid, f"{oem[1]} (OEM-of-record)", "oem", oid, "AMER,EMEA,APAC",
+            rng.choice(["MSA","framework","MSA","PO-only"]), None,
+            round(oem[8],1), round(min(99.0, oem[8]+rng.uniform(-3,4)),1),
+            round(rng.uniform(2,8),1), round(rng.uniform(1,3),1), round(rng.uniform(0.2,2.5),2),
+            round(rng.uniform(8,36),1), round(rng.uniform(85,99),1), oem[6],
+            round(rng.uniform(5,40),1), {"low":3,"medium":6,"high":9}[oem[10]] + rng.choice([-1,0,1]),
+            {"low":3,"medium":5,"high":8}[oem[10]] + rng.choice([-1,0,1]),
+            {"low":3,"medium":5,"high":8}[oem[10]] + rng.choice([-1,0,1]),
+            rng.choice(["critical","preferred","preferred","tactical"]) if oem[5]=="oem-primary" else rng.choice(["preferred","tactical","tactical","replaceable"]),
+            rng.choice(["weekly","monthly","monthly","quarterly"]) if oem[5]=="oem-primary" else rng.choice(["monthly","quarterly","quarterly","ad-hoc"]),
+            1 if ("consignment" in (oem[9] or "")) else rng.choice([0,0,1]),
+            1 if ("consignment" in (oem[9] or "")) else rng.choice([0,0,0,1]),
+            f"{oem[5]} · single-source risk {oem[10]} · contract models: {oem[9]}",
+        ))
+    distrib_names = ["Anixter (Wesco)","Graybar","Rexel","Sonepar","Border States","WESCO","CED","Crescent Electric","ElectroMechanical Distributors","DC Spares Group","CriticalPower Parts Co.","Refurb-Critical LLC","Reclaim DC Components","Allied Reliability","Global Cooling Parts","HVAC-R Wholesale Intl.","FluidTech Distributors","FiberOne Supply","RackParts Direct","Emergency Spares 24/7"]
+    for i, nm in enumerate(distrib_names):
+        typ = "refurbisher" if ("Refurb" in nm or "Reclaim" in nm) else ("broker" if "Emergency" in nm else ("integrator" if "Reliability" in nm else "distributor"))
+        suppliers.append((
+            f"SUP-DIST{i:02d}", nm, typ, None, rng.choice(["AMER","AMER,EMEA","AMER,EMEA,APAC","APAC","EMEA"]),
+            rng.choice(["framework","PO-only","PO-only","SOW"]), None,
+            round(rng.uniform(78,97),1), round(rng.uniform(78,96),1),
+            round(rng.uniform(1,6),1), round(rng.uniform(0.5,2),1), round(rng.uniform(0.5,4),2),
+            round(rng.uniform(4,48),1), round(rng.uniform(70,98),1),
+            rng.randint(3,8), round(rng.uniform(10,60),1),
+            rng.randint(4,8), rng.randint(3,7), rng.randint(2,7),
+            rng.choice(["tactical","preferred","tactical","replaceable"]), rng.choice(["quarterly","monthly","ad-hoc","quarterly"]),
+            rng.choice([0,0,1]), rng.choice([0,0,0,1]),
+            f"{typ} · regional distributor / service partner",
+        ))
+    sup_ids = [s[0] for s in suppliers]
+    sup_oem_idx = {}
+    for s in suppliers:
+        if s[2]=="oem" and s[3]: sup_oem_idx[s[3]] = s[0]
+    # inventory positions: a fraction of parts × 1-3 locations
+    inv = []
+    site_ids = [s[0] for s in sites]
+    sample_n = max(50, int(len(parts_rows) * (0.35 if scale<=3 else 0.12)))
+    sampled = rng.sample(parts_rows, min(sample_n, len(parts_rows)))
+    for p in sampled:
+        pid = p[di["part_id"]]
+        ib_avg = max(1, (p[di["typical_installed_base_per_site_min"]] + p[di["typical_installed_base_per_site_max"]])//2)
+        crit = p[di["criticality_default"]]; mtbf = p[di["mtbf_years"]] or 10
+        ann_demand = max(0.05, ib_avg * (1.0/mtbf))
+        for _ in range(rng.choice([1,1,2,2,3])):
+            loc_type = rng.choices(["site","regional-hub","central-depot","consignment"], weights=[55,20,20,5])[0]
+            loc_id = rng.choice(site_ids) if loc_type=="site" else ("HUB-AMER" if loc_type=="regional-hub" else ("DEPOT-01" if loc_type=="central-depot" else rng.choice(sup_ids)))
+            ss = max(0, round(ann_demand * rng.uniform(0.1,1.2) + (1 if crit>=8 else 0)))
+            oh = max(0, round(ss * rng.uniform(0.2,1.6)))
+            it = rng.choice([0,0,0,1,2]) if rng.random()<0.2 else 0
+            rop = ss + max(0, round(ann_demand * (p[di["lead_time_weeks_typ"]] or 8)/52))
+            mx = max(rop+1, round(rop * rng.uniform(1.2,2.0)))
+            doc = round(oh / max(0.001, ann_demand/365), 1)
+            inv.append((pid, loc_type, loc_id, oh, rng.choice([0,0,0,1]), it, ss, rop, mx, None, doc,
+                        ("critical spare" if crit>=8 else None)))
+    # purchase orders: a fraction get open POs, some at-risk/late
+    pos = []
+    po_n = max(20, int(len(parts_rows) * (0.10 if scale<=3 else 0.03)))
+    po_parts = rng.sample(parts_rows, min(po_n, len(parts_rows)))
+    base_day = 19660  # ~2026-05 in days-since-epoch-ish (we use synthetic ISO strings instead)
+    import datetime as _dt
+    today = _dt.date(2026,5,13)
+    for i, p in enumerate(po_parts):
+        pid = p[di["part_id"]]; oid = p[di["oem_id"]]
+        sup = sup_oem_idx.get(oid) or rng.choice([s for s in sup_ids if s.startswith("SUP-DIST")])
+        qty = rng.randint(1, max(2, (p[di["typical_installed_base_per_site_max"]] or 4)//2 + 1))
+        up = round((p[di["unit_cost_usd_typ"]] or 1000) * rng.uniform(0.9,1.1))
+        ltw = p[di["lead_time_weeks_typ"]] or 8
+        created = today - _dt.timedelta(days=rng.randint(7, 240))
+        ack = created + _dt.timedelta(days=rng.randint(1, 5))
+        orig_commit = created + _dt.timedelta(weeks=ltw)
+        need_by = created + _dt.timedelta(weeks=ltw + rng.choice([-2,0,2,4,6]))
+        dtype = rng.choices(["planned-maintenance","corrective","emergency","buffer-replenishment","lifecycle-eol","last-time-buy","commissioning"], weights=[28,15,8,25,8,6,10])[0]
+        # status
+        r = rng.random()
+        if r < 0.55:
+            status="delivered"; cur_commit=orig_commit; recv=orig_commit + _dt.timedelta(days=rng.randint(-3,5)); blk=None; rec=None
+        elif r < 0.72:
+            status="on-track"; cur_commit=orig_commit; recv=None; blk=None; rec=None
+        elif r < 0.86:
+            status="at-risk"; cur_commit=orig_commit + _dt.timedelta(weeks=rng.randint(1,6)); recv=None
+            blk=rng.choice(_PO_BLOCKERS); rec="expedite + partial-shipment plan in progress"
+        elif r < 0.96:
+            status="late"; cur_commit=orig_commit + _dt.timedelta(weeks=rng.randint(2,12)); recv=None
+            blk=rng.choice(_PO_BLOCKERS); rec="escalated to supplier exec — recovery plan due"
+        else:
+            status="blocked"; cur_commit=orig_commit + _dt.timedelta(weeks=rng.randint(4,16)); recv=None
+            blk="awaiting engineering qualification of substitute"; rec="qualify alternate / consider redesign"
+        pos.append((f"PO-2026-{(4000+i):06d}", sup, pid, (rng.choice(site_ids) if rng.random()<0.7 else None),
+                    qty, up, qty*up, dtype, created.isoformat(), ack.isoformat(), orig_commit.isoformat(), cur_commit.isoformat(),
+                    need_by.isoformat(), (recv.isoformat() if recv else None), status, blk, rec, rng.choice(_OWNERS), None))
+    # consumption history: a few events per part over ~2 years
+    cons = []
+    cons_parts = parts_rows if scale<=2 else rng.sample(parts_rows, min(len(parts_rows), max(200, int(len(parts_rows)*0.3))))
+    for p in cons_parts:
+        pid = p[di["part_id"]]
+        ib_avg = max(1, (p[di["typical_installed_base_per_site_min"]] + p[di["typical_installed_base_per_site_max"]])//2)
+        mtbf = p[di["mtbf_years"]] or 10
+        n_events = min(8, max(0, int(round((ib_avg / mtbf) * 2 * rng.uniform(0.5,1.5)))))
+        # consumables (low mtbf) get more events
+        if mtbf < 2: n_events = min(8, n_events + rng.randint(1,4))
+        for _ in range(n_events):
+            d = today - _dt.timedelta(days=rng.randint(1, 730))
+            ctype = rng.choices(["planned-maintenance","corrective","emergency","commissioning","engineering-change","attrition"], weights=[40,25,8,12,5,10])[0]
+            dt_min = round(rng.uniform(0, 240) * (3 if ctype=="emergency" else 1), 1) if ctype in ("corrective","emergency") and rng.random()<0.4 else 0
+            fm = None
+            if ctype in ("corrective","emergency"):
+                pool = FM_POOLS[fm_pool_for(p[di["subsystem"]], p[di["commodity_l3"]])]
+                fm = rng.choice(pool)[0]
+            cons.append((pid, rng.choice(site_ids), d.isoformat(), rng.choice([1,1,1,2]), ctype, fm, dt_min,
+                         f"WO-{rng.randint(100000,999999)}", None))
+    # engineering changes: for NRND/LTB/obsolete parts (and a few active ones)
+    ecs = []
+    ec_candidates = [p for p in parts_rows if p[di["lifecycle_status"]] in ("nrnd","last-time-buy","obsolete")]
+    if scale > 2: ec_candidates = rng.sample(ec_candidates, min(len(ec_candidates), 400))
+    for p in ec_candidates:
+        pid = p[di["part_id"]]; life = p[di["lifecycle_status"]]
+        ctype = {"nrnd":"eol-notice","last-time-buy":"last-time-buy-window","obsolete":"supersession"}[life]
+        ann = today - _dt.timedelta(days=rng.randint(30, 540))
+        eff = ann + _dt.timedelta(days=rng.randint(60, 540))
+        ib_aff = rng.randint(p[di["typical_installed_base_per_site_min"]], max(p[di["typical_installed_base_per_site_min"]]+1, p[di["typical_installed_base_per_site_max"]]*rng.randint(2,8)))
+        qual_req = 1 if p[di["qualified_alternates_count"]]==0 and rng.random()<0.7 else rng.choice([0,1])
+        ecs.append((pid, ctype, ann.isoformat(), eff.isoformat(), None, ib_aff, qual_req,
+                    round(rng.uniform(3,18),1) if qual_req else None, round(rng.uniform(5000,150000)) if qual_req else None,
+                    rng.choice(["open","in-progress","mitigated","accepted-risk"]),
+                    "LTB + qualify alternate" if qual_req else "LTB to cover support window",
+                    f"Lifecycle: {life}; EOL risk {p[di['eol_risk']]}/10"))
+    return {"sites": sites, "suppliers": suppliers, "inventory_positions": inv,
+            "purchase_orders": pos, "consumption_history": cons, "engineering_changes": ecs}
+
+
+def write_db(parts_rows, fm_rows, compat_rows, platform=None):
     DATA_DIR.mkdir(exist_ok=True)
     if DB_PATH.exists():
         DB_PATH.unlink()
@@ -987,6 +1202,19 @@ def write_db(parts_rows, fm_rows, compat_rows):
         "INSERT INTO commodity_taxonomy(l1,l2,l3,system,description,typical_criticality,typical_dc_generations) VALUES (?,?,?,?,?,?,?)",
         [(r[0],r[1],r[2],r[3],r[4],r[5],r[6]) for r in TAXONOMY],
     )
+    # supply-chain & transport reference tables (always present)
+    cur.executemany(
+        "INSERT INTO transport_modes(mode_id,name,transit_days_inter_typ,transit_days_inter_min,transit_days_inter_max,transit_days_intra_typ,cost_index,co2_index,capacity_unit,typical_use,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        [(m[0],m[1],(float(m[2]) if m[2] is not None else None),m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10]) for m in TRANSPORT_MODES],
+    )
+    cur.executemany(
+        "INSERT INTO trade_lanes(lane_id,origin_region,dest_region,primary_mode,ocean_transit_days_typ,air_transit_days_typ,road_rail_transit_days_typ,customs_clearance_days_typ,last_mile_days_typ,congestion_risk,geopolitical_risk,rate_volatility,tariff_exposure,reroute_options,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        TRADE_LANES,
+    )
+    cur.executemany(
+        "INSERT INTO country_risk(country,region,political_stability_score,customs_efficiency_score,port_infrastructure_score,logistics_performance_index,transformer_mfg_share_pct,geopolitical_risk_score,tariff_regime_note,notes) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        COUNTRY_RISK,
+    )
     # parts
     cur.executemany(
         f"INSERT INTO parts({','.join(PARTS_COLS)}) VALUES ({','.join('?'*len(PARTS_COLS))})",
@@ -1002,6 +1230,14 @@ def write_db(parts_rows, fm_rows, compat_rows):
         "INSERT INTO compatibility(part_id,fits_facility_type_id,fits_oem_equipment,relationship,related_part_id,notes) VALUES (?,?,?,?,?,?)",
         compat_rows,
     )
+    # platform layer (optional)
+    if platform:
+        cur.executemany("INSERT INTO sites(site_id,name,region,country,facility_type_id,it_load_mw,commissioned_year,tier,has_regional_hub,hub_lead_time_days,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?)", platform["sites"])
+        cur.executemany("INSERT INTO suppliers(supplier_id,name,supplier_type,primary_oem_id,region_coverage,contract_status,msa_expiry,otif_pct,commit_accuracy_pct,quote_turnaround_days,po_ack_days,defect_rate_pct,responsiveness_hours,corrective_action_closure_pct,financial_health_score,capacity_headroom_pct,geographic_concentration_score,geopolitical_risk_score,lead_time_volatility_score,strategic_importance,review_cadence,consignment_capable,vmi_capable,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", platform["suppliers"])
+        cur.executemany("INSERT INTO inventory_positions(part_id,location_type,location_id,on_hand_qty,reserved_qty,in_transit_qty,safety_stock_target,reorder_point,max_stock,last_count_date,days_of_cover,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", platform["inventory_positions"])
+        cur.executemany("INSERT INTO purchase_orders(po_id,supplier_id,part_id,site_id,quantity,unit_price_usd,total_value_usd,demand_type,po_creation_date,supplier_ack_date,original_commit_date,current_commit_date,need_by_date,received_date,delivery_status,blocker,recovery_plan,owner,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", platform["purchase_orders"])
+        cur.executemany("INSERT INTO consumption_history(part_id,site_id,event_date,quantity,consumption_type,failure_mode,downtime_minutes,work_order_ref,notes) VALUES (?,?,?,?,?,?,?,?,?)", platform["consumption_history"])
+        cur.executemany("INSERT INTO engineering_changes(part_id,change_type,announced_date,effective_date,superseded_by_part_id,installed_base_affected,qualification_required,qualification_lead_time_months,qualification_cost_usd,status,mitigation_plan,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", platform["engineering_changes"])
     con.commit()
     con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
     con.execute("VACUUM")
@@ -1123,16 +1359,21 @@ def main():
     ap.add_argument("--scale", type=int, default=1, help="row-count multiplier (1 ≈ baseline; 5 ≈ ~5x; 20 ≈ toward millions)")
     ap.add_argument("--audit", action="store_true", help="print row counts + distributions + sanity checks")
     ap.add_argument("--no-js", action="store_true", help="skip writing js/spares-parts-catalog.js")
+    ap.add_argument("--platform", action="store_true", help="also populate the platform-layer tables (sites/suppliers/inventory/POs/consumption/engineering-changes) with synthetic operational data")
     args = ap.parse_args()
     if not SCHEMA.exists():
         sys.exit(f"[error] schema not found: {SCHEMA}")
-    print(f"Building DC spare-parts DB · scale={args.scale} · seed={SEED}")
+    print(f"Building DC spare-parts DB · scale={args.scale} · seed={SEED}" + (" · +platform layer" if args.platform else ""))
     parts_rows, fm_rows, compat_rows = build(args.scale)
-    write_db(parts_rows, fm_rows, compat_rows)
+    oem_by_id = {o[0]: o for o in OEMS}
+    plat = build_platform(args.scale, parts_rows, oem_by_id) if args.platform else None
+    write_db(parts_rows, fm_rows, compat_rows, platform=plat)
     write_csvs(parts_rows)
     db_size = DB_PATH.stat().st_size
     print(f"  → {DB_PATH}  ({db_size/1e6:.1f} MB)  ·  parts={len(parts_rows):,}  failure_modes={len(fm_rows):,}  compat={len(compat_rows):,}")
     print(f"  → data/spares-parts.csv.gz, data/spares-oems.csv, data/spares-taxonomy.csv, data/spares-facility-types.csv")
+    if plat:
+        print(f"  → platform: sites={len(plat['sites'])}  suppliers={len(plat['suppliers'])}  inventory={len(plat['inventory_positions']):,}  POs={len(plat['purchase_orders']):,}  consumption={len(plat['consumption_history']):,}  eng_changes={len(plat['engineering_changes']):,}")
     if not args.no_js:
         jp, jsz, jn = write_js_catalog(parts_rows)
         print(f"  → {jp}  ({jsz/1024:.0f} KB, {jn} curated parts)")
