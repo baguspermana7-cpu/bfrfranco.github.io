@@ -198,7 +198,7 @@ const CarbonDashboard = () => {
                         ))}
                         <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center">vs Industry Average<Tooltip content="Comparison against industry benchmarks: average PUE ~1.58 (Uptime Institute 2025), best-in-class 1.08–1.12 for AI/liquid-cooled facilities." /></span>
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center">vs Industry Average<Tooltip content="Comparison against industry benchmarks: average PUE ~1.50 (Uptime Institute 2025 Global Survey), best-in-class 1.08–1.12 for AI/liquid-cooled facilities." /></span>
                                 <span className="text-sm font-bold text-slate-900 dark:text-white">{fmt(result.industryAvgEmissions, 1)} tCO₂/yr</span>
                             </div>
                             <div className="text-xs text-slate-500">

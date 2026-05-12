@@ -351,7 +351,7 @@ export function StaffingDashboard() {
                                 <div className="text-3xl font-bold text-slate-900 dark:text-white truncate" title={fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}>
                                     {fmtMoney(results.projections.reduce((a, b) => a + b.totalAnnualCost, 0))}
                                 </div>
-                                <div className="text-xs text-slate-500 mt-1">2025-2030 Cumulative</div>
+                                <div className="text-xs text-slate-500 mt-1">{new Date().getFullYear()}–{new Date().getFullYear() + 5} Cumulative</div>
                             </div>
                         </div>
                     </div>
@@ -699,7 +699,7 @@ export function StaffingDashboard() {
             )} {/* End Org Tab */}
 
             {activeTab === 'roster' && (
-                <RosterVisualizer roster={results.roster} year={2025} shiftModel={inputs.shiftModel as '8h' | '12h'} staffingResults={results.staffingResults} />
+                <RosterVisualizer roster={results.roster} year={new Date().getFullYear()} shiftModel={inputs.shiftModel as '8h' | '12h'} staffingResults={results.staffingResults} />
             )} {/* End Roster Tab */}
 
             {activeTab === 'waterfall' && (

@@ -47,7 +47,7 @@ export function SimulationDashboard() {
     const [scenarioAQI, setScenarioAQI] = useState(inputs.aqiOverride ?? 50);
     const [scenarioTurnover, setScenarioTurnover] = useState(inputs.turnoverRate ?? 0.09);
     const [showWizard, setShowWizard] = useState(false);
-    const [simYear, setSimYear] = useState(2025);
+    const [simYear, setSimYear] = useState(new Date().getFullYear());
     const [selectedRegion, setSelectedRegion] = useState(selectedCountry?.region || 'APAC');
 
     // Simulation Trigger Logic
@@ -81,7 +81,8 @@ export function SimulationDashboard() {
         if (!selectedCountry) return null;
 
         // --- TIME LOGIC (Inflation) ---
-        const yearsElapsed = Math.max(0, simYear - 2025);
+        const BASE_YEAR = 2026;
+        const yearsElapsed = Math.max(0, simYear - BASE_YEAR);
         const inflationRate = selectedCountry.economy?.inflationRate ?? 0.03;
         const laborEscalation = selectedCountry.economy?.laborEscalation ?? 0.04;
 
@@ -288,7 +289,7 @@ export function SimulationDashboard() {
                             value={simYear}
                             onChange={(e) => setSimYear(Number(e.target.value))}
                         >
-                            {Array.from({ length: 11 }, (_, i) => 2025 + i).map(year => (
+                            {Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + i).map(year => (
                                 <option key={year} value={year}>{year}</option>
                             ))}
                         </select>

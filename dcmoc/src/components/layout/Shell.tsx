@@ -96,6 +96,17 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
 
     const [scenarioName, setScenarioName] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [vintageBannerDismissed, setVintageBannerDismissed] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('dcmoc-vintage-banner-dismissed') === '1';
+        }
+        return false;
+    });
+
+    const handleDismissVintageBanner = () => {
+        setVintageBannerDismissed(true);
+        localStorage.setItem('dcmoc-vintage-banner-dismissed', '1');
+    };
 
     const navItems: { label: string; icon: any; id: typeof activeTab; section?: string }[] = [
         { label: 'CAPEX Config', icon: Building, id: 'capex' },
@@ -332,6 +343,23 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     </div>
                 </header>
 
+                {/* Data-vintage banner */}
+                {!vintageBannerDismissed && (
+                    <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
+                        <span>
+                            <span className="font-medium text-slate-600 dark:text-slate-300">Data vintage: 2026-Q1</span>
+                            {' · '}benchmarks: Uptime Institute 2025, JLL/CBRE 2025
+                            {' · '}costs in USD
+                        </span>
+                        <button
+                            onClick={handleDismissVintageBanner}
+                            className="shrink-0 p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                            aria-label="Dismiss data vintage notice"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                )}
                 <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {children}
                 </div>
