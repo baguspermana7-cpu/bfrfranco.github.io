@@ -112,6 +112,96 @@ TARGETS = [
         "Indonesia transmission system viewer — Geographic + SLD views.",
         "#ef4444",
     ),
+    (
+        "spares-readiness-calculator",
+        "Critical Spares Engine",
+        "FMECA criticality, optimal stock, supplier risk, last-time-buy, Monte-Carlo for DC M&E spares.",
+        "#f59e0b",
+    ),
+    (
+        "chiller-plant",
+        "Chiller Plant SCADA",
+        "Operator-grade chilled-water plant mimic — chillers, pumps, CT, setpoints.",
+        "#06b6d4",
+    ),
+    (
+        "datahall",
+        "DC Conventional Simulation",
+        "Traditional data-hall architecture — racks, CRAC, raised floor, electrical SLD.",
+        "#64748b",
+    ),
+    (
+        "fire-system",
+        "Fire Suppression System",
+        "VESDA, clean-agent suppression, FACP integration — DC fire protection.",
+        "#dc2626",
+    ),
+    (
+        "fuel-system",
+        "Fuel & Generator System",
+        "Diesel storage, day tanks, transfer pumps, generator autonomy.",
+        "#f59e0b",
+    ),
+    (
+        "water-system",
+        "Water & Make-up System",
+        "Condenser-water make-up, treatment, storage, blowdown — DC water balance.",
+        "#0ea5e9",
+    ),
+    (
+        "ict",
+        "ICT Infrastructure",
+        "Structured cabling, network fabric, ODF, fiber pathways for data centers.",
+        "#8b5cf6",
+    ),
+    (
+        "EPMS_Telemetry",
+        "EPMS Telemetry",
+        "Electrical power monitoring — feeders, breakers, power quality, alarms.",
+        "#10b981",
+    ),
+    (
+        "asean-dc-report-2026",
+        "ASEAN Data Center Report 2026",
+        "Capacity, pipeline, power, and regulatory landscape across Southeast Asia.",
+        "#3b82f6",
+    ),
+    (
+        "infographic-dc-cost-breakdown",
+        "DC Cost Breakdown",
+        "Where the CAPEX & OPEX dollars go in a hyperscale data center build.",
+        "#f59e0b",
+    ),
+    (
+        "infographic-dc-sustainability",
+        "DC Sustainability",
+        "PUE, WUE, CUE, renewable matching, and carbon for modern data centers.",
+        "#22c55e",
+    ),
+    (
+        "infographic-pue-global",
+        "Global PUE Benchmarks",
+        "Power Usage Effectiveness by region, climate, and operator class.",
+        "#8b5cf6",
+    ),
+    (
+        "achievements",
+        "Achievements & Certifications",
+        "CDFOM, IOSH, Ahli K3 Listrik — DC operations leadership credentials.",
+        "#fbbf24",
+    ),
+    (
+        "insights",
+        "Insights",
+        "Field notes and analysis on data-center engineering, operations, and strategy.",
+        "#3b82f6",
+    ),
+    (
+        "glossary",
+        "Data Center Glossary",
+        "Definitions for PUE, FMECA, Kraljic, DMSMS, redundancy, tiers, and more.",
+        "#10b981",
+    ),
 ]
 
 # Dynamically extend TARGETS with article + compare + pillar + FF + geopolitics pages
