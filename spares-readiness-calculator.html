@@ -4550,7 +4550,6 @@ function calcHub() {
 
   // With hub: regional hub covers demand during hub-to-site lead time
   var demandDuringHubLT = totalFleetDemand * (hubLT / 52);
-  var demandForSites = totalFleetDemand * ((oemLT - hubLT) / 52) / sites; // per site demand window
   var safetyFactor = 1 + normInvCDF(targetReadiness) * 0.3; // z * CV
 
   // Hub stock sizing (cover demand during hub-to-site LT + safety)
@@ -6994,7 +6993,7 @@ function exportSTARPDF() {
 /* ===========================================
    UPDATE TAB ORDER + SWITCHtab + RECALCALL
    =========================================== */
-TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','catalog','catalog-analytics','faq'];
+TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
 
 // Patch switchTab to include new tabs
 var _origSwitchTab = switchTab;
@@ -7013,7 +7012,11 @@ switchTab = function(name) {
     catalog: function() { catInitIfReady(); },
     'catalog-analytics': function() { calcCatalogAnalytics(); },
     fleet: function() { calcFleet(); },
-    faq: function() { renderFAQ('all'); }
+    faq: function() { renderFAQ('all'); },
+    'sc-lane': function() { scLaneInitIfReady(); calcLanePlanner(); },
+    'sc-risk': function() { scRiskInitIfReady(); calcSCRisk(); },
+    'sc-sim': function() { scSimInitIfReady(); },
+    'sc-expedite': function() { scExpInitIfReady(); calcExpedite(); }
     // stakeholder, eol, ambiguity, star, pm-ops, negotiation, contract, process, meeting are user-triggered
   };
   // Bug 2 fix: wrap in try/catch so any calc error never blocks tab navigation
@@ -8368,8 +8371,8 @@ function calcLanePlanner() {
   // Customs efficiency adjustment (1–10; higher = faster clearance)
   var destCountryName = SC_REGION_COUNTRY[dest] || 'United States';
   var destCountry = CAT ? scFindCountry(destCountryName) : null;
-  var customsEff = destCountry ? (destCountry.customs / 10) : 0.8; // fraction: 1=best
-  var customsDays = lane ? Math.round(lane.customsD * (1 + (1 - customsEff) * 0.5)) : 5;
+  var customsEff = destCountry ? ((destCountry.customs || 8) / 10) : 0.8; // fraction: 1=best
+  var customsDays = lane ? Math.round((lane.customsD || 4) * (1 + (1 - customsEff) * 0.5)) : 5;
   var lastMileDays = lane ? (lane.lastMileD || 3) : 3;
 
   // Reroute delta
@@ -8458,8 +8461,8 @@ function calcLanePlanner() {
   // Update sticky bar
   setText('sclane_cheapest_mode', cheapest ? cheapest.name.split(' — ')[0] : '—');
   setText('sclane_fastest_mode', fastest ? fastest.name.split(' — ')[0] : '—');
-  setText('sclane_ocean_days', lane ? (lane.oceanD + customsDays + lastMileDays + rerouteDays) + ' d' : '—');
-  setText('sclane_air_days', lane ? (lane.airD + customsDays + lastMileDays) + ' d' : '—');
+  setText('sclane_ocean_days', lane ? ((lane.oceanD || 30) + customsDays + lastMileDays + rerouteDays) + ' d' : '—');
+  setText('sclane_air_days', lane ? ((lane.airD || 9) + customsDays + lastMileDays) + ' d' : '—');
 
   // Reroute panel
   var rrPanel = document.getElementById('sclane_reroute_panel');
@@ -8796,7 +8799,7 @@ function runSCSim() {
         expedite = partWeight * SC_BASE_OCEAN_FCL * 12 * tariffMultiplier; // air-standard cost
         // If air saves enough to hit need window:
         if (finalLT - airSaving <= effectiveNeedWks) {
-          onTime = true; if (onTime) onTimeCnt++; // expedite saves it
+          onTime = true; onTimeCnt++; // expedite saves it
           expedite = partWeight * SC_BASE_OCEAN_FCL * 12 * tariffMultiplier;
         } else {
           dtCost = downtimeCost * Math.max(0, finalLT - effectiveNeedWks) * 168 * 0.3; // partial downtime
@@ -8924,6 +8927,8 @@ function renderSimHistogram(lts, needWks) {
   var colors = buckets.map(function(b){ return b.max <= needWks ? 'rgba(16,185,129,0.65)' : 'rgba(239,68,68,0.65)'; });
 
   // Chart renders inside scsim_output — need a canvas; inject one if needed
+  // setHTML() above wiped the old canvas, so clear the stale chart registry entry first
+  if (charts && charts['chart_scsim_hist']) { try { charts['chart_scsim_hist'].destroy(); } catch(e) {} delete charts['chart_scsim_hist']; }
   var outEl = document.getElementById('scsim_output');
   if (outEl && !document.getElementById('chart_scsim_hist')) {
     var wrapper = document.createElement('div');
@@ -8998,7 +9003,7 @@ function calcExpedite() {
 
   // Find lane for air days
   var lane = CAT ? scFindLane(origin, dest) : null;
-  var airDays = lane ? (lane.airD + (lane.customsD || 4) + (lane.lastMileD || 3)) : 14;
+  var airDays = lane ? ((lane.airD || 9) + (lane.customsD || 4) + (lane.lastMileD || 3)) : 14;
   var airWks = airDays / 7;
 
   function fmtK2(v){ return '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(0)); }
@@ -9018,7 +9023,7 @@ function calcExpedite() {
 
   // 2. Air-express (faster, more expensive)
   var airExpCost = weight * SC_BASE_OCEAN_FCL * 25;
-  var airExpDays = lane ? (lane.airD - 3 + (lane.customsD || 4) + (lane.lastMileD || 3)) : 10;
+  var airExpDays = lane ? ((lane.airD || 9) - 3 + (lane.customsD || 4) + (lane.lastMileD || 3)) : 10;
   var airExpWks = Math.max(0.5, airExpDays / 7);
   options.push({
     label: 'Air-express (next-flight-out)', cost: airExpCost,
@@ -9123,6 +9128,8 @@ function calcExpedite() {
 
 function renderExpediteChart(options) {
   // Need a canvas in output_text — inject one after table if not present
+  // setHTML() above wiped the old canvas, so clear the stale chart registry entry first
+  if (charts && charts['chart_sc_expedite']) { try { charts['chart_sc_expedite'].destroy(); } catch(e) {} delete charts['chart_sc_expedite']; }
   var outEl = document.getElementById('scexp_output_text');
   if (outEl && !document.getElementById('chart_sc_expedite')) {
     var wrapper = document.createElement('div');
@@ -9288,14 +9295,6 @@ function copyEl(id) {
 })();
 
 /* Init: recalc SC tabs when they first become active (catalog might have loaded by then) */
-
-/* Init: load fleet from storage if available */
-(function() {
-  try {
-    var raw = localStorage.getItem('cse_fleet');
-    if (raw) { fleetParts = JSON.parse(raw); }
-  } catch(e) {}
-})();
 
 })(); // end IIFE
 </script>

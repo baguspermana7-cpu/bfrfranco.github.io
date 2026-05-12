@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.16.1 — 2026-05-13 (Spares Engine — final QA pass: 7 fixes)
+
+Comprehensive code review of the 9,302-line calculator after its ~8 build passes. 7 surgical fixes, no regressions:
+1. **`TAB_ORDER` regression (critical)** — the runtime-authoritative `TAB_ORDER` reassignment (line ~6996) was missing `'sc-lane','sc-risk','sc-sim','sc-expedite'` (the v1.16.0 agent added them only to the *first* assignment), so keyboard Arrow/Home/End navigation + the mobile jump-to-module loop skipped all 4 Supply-Chain tabs. Added them — `TAB_ORDER` now lists all 26 module panes.
+2. **Patched `switchTab` calcs map missing the 4 SC handlers (critical)** — opening a Supply-Chain tab via click/keyboard never triggered its calc on first open (stale/empty output). Added the 4 SC handlers to the patched map (they existed in the pre-patch `switchTab` but the later reassignment dropped them).
+3. **`onTimeCnt` double-increment in `runSCSim`** — the disruption-sim loop set `onTime = true` then immediately `if (onTime) onTimeCnt++` (always true) → the on-time-% was overstated. Fixed to a single increment.
+4. **Duplicate fleet-storage init** — the Fleet list was loaded from `localStorage` twice on startup (two identical IIFEs); removed the second.
+5. **Stale chart registry on `scsim_output`/`sc_expedite` re-render** — `setHTML(...)` wiped the `<canvas>` but left `charts[...]` pointing at a detached node → `getOrCreateChart` would `.destroy()` a stale object on the second run. Added explicit registry cleanup before re-injecting the canvas (both charts).
+6. **Dead variable `demandForSites` in `calcHub`** — declared, never read; removed.
+7. **NaN guards on lane fields** — added `|| 4` / `|| 9` / `|| 30` fallbacks on `customsD`/`airD`/`oceanD` in `calcLanePlanner` + `calcExpedite` so a catalog entry missing a field can't propagate `NaN`.
+
+Confirmed already-correct: all ~26 tabs render, charts re-render on hidden→visible switch, `SCENARIO_FIELDS` covers the inputs, the 5 presets round-trip, math (Poisson `lambdaLT = muAnnual × L`, Monte-Carlo Box-Muller + percentiles + `readinessRaw[]` tornado, NPV picks lower-cost, EOL exposure, supplier-risk weights, hub-LT clamp, normInvCDF), `safeGen()`, per-module reset, all `<\/script>` escaped, dark mode, mobile (104/0 responsive), `audit-script-tags --strict` CLEAN.
+
+`js/rz-version.js` 1.16.0 → 1.16.1 (PATCH). SW cache → `rz-cache-v1.16.1`.
+
+---
+
 ## v1.16.0 — 2026-05-13 (Spares Engine: Global Supply Chain & Transport module group — 4 new tabs)
 
 ### Added — "Global Supply Chain & Transport" module group (deep-research-backed)
