@@ -79,7 +79,7 @@ export const generateCapexPDF = async (
         { label: 'Green Certification', value: inputs.greenCert || 'None' },
         { label: 'Renewable Energy', value: inputs.renewableOption || 'None' },
         { label: 'Substation & Grid', value: inputs.includeFOM ? 'Include FOM' : 'Exclude FOM' },
-        { label: 'Project Year', value: inputs.projYear || '2025' },
+        { label: 'Project Year', value: inputs.projYear || String(new Date().getFullYear()) },
         { label: 'City Market', value: inputs.cityMarket !== 'none' ? inputs.cityMarket : 'Generic' },
     ]);
     col2Y = drawSettingsBox(105, col2Y, 'Soft Costs', [

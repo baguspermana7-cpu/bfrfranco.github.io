@@ -112,7 +112,7 @@ export const generateCarbonPDF = async (
     y = drawSectionTitle(doc, y, 'PUE Benchmark Analysis', '2.1', branding);
 
     const designPUE = carbonData.pueEfficiency;
-    const industryAvg = 1.58;
+    const industryAvg = 1.50; // Uptime Institute 2025 Global Survey median
     const bestInClass = 1.10;
 
     autoTable(doc, {
@@ -177,11 +177,12 @@ export const generateCarbonPDF = async (
     y = drawSectionTitle(doc, y, 'Net-Zero Emissions Target', '4', branding);
 
     const currentEmissions = carbonData.annualEmissionsTonCO2;
+    const baseYear = new Date().getFullYear();
     autoTable(doc, {
         startY: y,
         head: [['Year', 'Emissions Target (tCO₂)', 'Reduction %', 'Strategy']],
         body: [
-            ['2026 (Current)', `${Math.round(currentEmissions)}`, '0%', 'Baseline measurement'],
+            [`${baseYear} (Current)`, `${Math.round(currentEmissions)}`, '0%', 'Baseline measurement'],
             ['2030', `${Math.round(currentEmissions * 0.55)}`, '45%', 'Green PPA + efficiency'],
             ['2040', `${Math.round(currentEmissions * 0.15)}`, '85%', 'Full renewable + carbon capture'],
             ['2050', '0', '100%', 'Net-zero achieved'],

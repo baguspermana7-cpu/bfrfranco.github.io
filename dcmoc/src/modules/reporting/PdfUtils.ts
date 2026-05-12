@@ -204,15 +204,23 @@ export const drawFooter = (doc: jsPDF, pageNumber: number, branding?: BrandingCo
     const h = doc.internal.pageSize.height;
 
     doc.setDrawColor(...PDF_COLORS.slate200);
-    doc.line(MARGIN, h - 15, w - MARGIN, h - 15);
+    doc.line(MARGIN, h - 18, w - MARGIN, h - 18);
 
     doc.setFontSize(7);
     doc.setTextColor(...PDF_COLORS.slate400);
 
-    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const generatedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const appName = branding?.companyName ? branding.companyName : 'DCMOC v2.0';
-    doc.text(`Generated ${today} | ${appName} | CONFIDENTIAL`, MARGIN, h - 8);
-    doc.text(`Page ${pageNumber}`, w - MARGIN, h - 8, { align: 'right' });
+    doc.text(`Generated ${generatedDate} | ${appName} | CONFIDENTIAL`, MARGIN, h - 12);
+    doc.text(`Page ${pageNumber}`, w - MARGIN, h - 12, { align: 'right' });
+
+    // Disclaimer line
+    doc.setFontSize(6);
+    doc.setTextColor(...PDF_COLORS.slate500);
+    doc.text(
+        'Illustrative model — not a substitute for a full engineering or financial analysis. All figures in USD unless noted.',
+        MARGIN, h - 6
+    );
 };
 
 // ─── SECTION TITLE ──────────────────────────────────────────
