@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Critical Spares Engine | DC M&amp;E Spares Readiness, Sourcing &amp; Obsolescence Calculator</title>
+<meta name="description" content="Quantify critical-spares readiness, optimal stock levels, supplier risk index, and last-time-buy economics for data-center M&amp;E equipment. FMECA criticality, METRIC/MEIO hub positioning, Kraljic sourcing strategy, DMSMS lifecycle.">
+<meta name="ai-content-declaration" content="human-authored">
+<meta name="keywords" content="critical spares calculator, FMECA criticality, newsvendor model, spare parts optimization, supplier risk index, Kraljic matrix, DMSMS, last-time-buy, data center M&amp;E spares, METRIC VARI-METRIC, spare parts management">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#f59e0b">
+<link rel="canonical" href="https://resistancezero.com/spares-readiness-calculator.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/spares-readiness-calculator.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/spares-readiness-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://resistancezero.com/spares-readiness-calculator.html">
+<meta property="og:title" content="Critical Spares Engine — DC M&amp;E Spares Readiness &amp; Sourcing Calculator">
+<meta property="og:description" content="Quantify critical-spares readiness, optimal stock levels, supplier risk, and last-time-buy economics for data-center mechanical &amp; electrical equipment.">
+<meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Critical Spares Engine — DC M&amp;E Spares Readiness Calculator">
+<meta name="twitter:description" content="FMECA criticality, newsvendor stock levels, supplier risk index, Kraljic strategy, DMSMS last-time-buy, Monte-Carlo for data-center M&amp;E spares.">
+<meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Critical Spares Engine","applicationCategory":"UtilityApplication","description":"Quantify critical-spares readiness, optimal stock levels, supplier risk index, and last-time-buy economics for data-center M&E equipment using FMECA, METRIC/MEIO, Kraljic, and DMSMS methodologies.","url":"https://resistancezero.com/spares-readiness-calculator.html","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Person","name":"Bagus Dwi Permana"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to Assess Critical Spare Parts Readiness for Data Center M&E Equipment","description":"Step-by-step methodology to quantify spare-parts readiness, optimal stock levels, supplier risk, and obsolescence exposure.","totalTime":"PT10M","tool":[{"@type":"HowToTool","name":"Critical Spares Engine Calculator"}],"step":[{"@type":"HowToStep","position":1,"name":"Score Criticality","text":"Enter failure rate, installed base, severity, detectability, and redundancy to get FMECA criticality tier (VITAL/ESSENTIAL/DESIRABLE) and stocking decision."},{"@type":"HowToStep","position":2,"name":"Check Readiness","text":"Enter on-hand inventory, PO qty, supplier commit date vs need date to get readiness % with RED/YELLOW/GREEN status and risk flags."},{"@type":"HowToStep","position":3,"name":"Optimise Stock Level","text":"Input unit cost, demand parameters, lead time, and fill-rate target to compute newsvendor Q*, safety stock, and reorder point."},{"@type":"HowToStep","position":4,"name":"Run Monte-Carlo","text":"Simulate 1,000 scenarios with variable lead time, demand, and supplier reliability to get P(stockout), expected downtime cost, and tornado chart."}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"Critical Spares Engine"}]}</script>
+<link rel="icon" type="image/png" href="assets/Favicon.png">
+<link rel="apple-touch-icon" href="assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+<!-- Chart.js loaded blocking (non-deferred) per site convention to avoid sync init issues -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --amber: #f59e0b;
+  --amber-light: #fbbf24;
+  --amber-dark: #d97706;
+  --amber-deeper: #b45309;
+  --primary-gradient: linear-gradient(135deg,#d97706 0%,#f59e0b 50%,#fbbf24 100%);
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+  --glass-bg: rgba(255,255,255,0.85);
+  --glass-border: rgba(245,158,11,0.12);
+  --glass-blur: blur(20px);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
+  --status-green: #10b981;
+  --status-yellow: #f59e0b;
+  --status-red: #ef4444;
+}
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --glass-bg: rgba(30,41,59,0.85);
+  --glass-border: rgba(245,158,11,0.18);
+}
+[data-theme="dark"] .navbar { background: rgba(15,23,42,0.92); }
+[data-theme="dark"] .input-field { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+[data-theme="dark"] .input-field:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+[data-theme="dark"] .tab-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
+[data-theme="dark"] .tab-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); }
+[data-theme="dark"] .result-card, [data-theme="dark"] .module-card { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .info-box { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+[data-theme="dark"] .status-red { background: rgba(239,68,68,0.15); color: #f87171; }
+[data-theme="dark"] .status-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
+[data-theme="dark"] .status-green { background: rgba(16,185,129,0.15); color: #34d399; }
+[data-theme="dark"] .calc-disclaimer { background: #1e293b !important; border-color: #334155 !important; }
+[data-theme="dark"] .calc-disclaimer .disc-title { color: #f1f5f9 !important; }
+[data-theme="dark"] .calc-disclaimer .disc-text { color: #94a3b8 !important; }
+[data-theme="dark"] .cookie-banner { background: rgba(15,23,42,0.96); border-color: #334155; color: #f1f5f9; }
+[data-theme="dark"] .cookie-banner a { color: #fbbf24; }
+[data-theme="dark"] select option { background: #1e293b; color: #f1f5f9; }
+[data-theme="dark"] .faq-item { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .faq-item summary { color: #f1f5f9; }
+[data-theme="dark"] .faq-item[open] summary { color: var(--amber-light); }
+[data-theme="dark"] .metric-box { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.15); }
+[data-theme="dark"] .nav-user-dropdown { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .nav-dd-logout:hover { background: rgba(239,68,68,0.1); }
+[data-theme="dark"] #loginModal > div { background: #1e293b; color: #f1f5f9; }
+[data-theme="dark"] #loginModal label { color: #94a3b8; }
+[data-theme="dark"] #loginModal input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+[data-theme="dark"] .table-sm th { background: rgba(245,158,11,0.12); color: #fbbf24; }
+[data-theme="dark"] .table-sm td { border-color: #334155; }
+[data-theme="dark"] .table-sm tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+[data-theme="dark"] .carrier-banner { background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+
+/* Skip link */
+.skip-link { position: absolute; top: -40px; left: 0; background: var(--amber); color: #000; padding: 8px 16px; border-radius: 0 0 8px 0; font-weight: 700; font-size: 0.85rem; z-index: 9999; transition: top 0.2s; }
+.skip-link:focus { top: 0; }
+
+/* Page background */
+.page-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at top right, rgba(245,158,11,0.07) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom left, rgba(217,119,6,0.04) 0%, transparent 50%); }
+
+/* Navbar */
+.navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
+.nav-container { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; max-width: 1440px; margin: 0 auto; }
+.nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.nav-logo { width: 44px; height: 44px; background: var(--primary-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; color: #0f172a; box-shadow: 0 4px 12px rgba(245,158,11,0.35); letter-spacing: -0.5px; text-align: center; line-height: 1.1; }
+.nav-title { font-weight: 700; font-size: 1.0rem; color: var(--text-primary); }
+.nav-subtitle { font-size: 0.7rem; color: var(--text-muted); }
+.nav-links { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
+.nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 6px 0; transition: color 0.3s; position: relative; }
+.nav-link:hover { color: var(--amber); }
+.nav-dropdown { position: relative; }
+.nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: var(--shadow-lg); min-width: 200px; z-index: 100; padding: 6px 0; }
+.nav-dropdown:hover .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a { display: block; padding: 8px 16px; font-size: 0.83rem; color: var(--text-secondary); text-decoration: none; transition: background 0.2s,color 0.2s; }
+.nav-dropdown-menu a:hover { background: rgba(245,158,11,0.08); color: var(--amber); }
+.nav-dropdown-toggle { cursor: default; }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.nav-theme-btn { background: none; border: 1px solid var(--glass-border); border-radius: 8px; padding: 8px 10px; cursor: pointer; color: var(--text-muted); font-size: 1rem; transition: all 0.3s; }
+.nav-theme-btn:hover { color: var(--amber); border-color: var(--amber); }
+.nav-back { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--primary-gradient); border: none; border-radius: 8px; color: #0f172a; text-decoration: none; font-size: 0.82rem; font-weight: 700; transition: all 0.3s; box-shadow: 0 3px 10px rgba(245,158,11,0.3); }
+.nav-back:hover { transform: translateY(-2px); }
+.nav-auth-wrap { position: relative; }
+.nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: linear-gradient(135deg,#d97706,#f59e0b); border: none; border-radius: 8px; color: #0f172a; font-size: 0.82rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(245,158,11,0.3); white-space: nowrap; }
+.nav-login-btn:hover { transform: translateY(-1px); }
+.nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
+.nav-user-btn:hover { background: rgba(245,158,11,0.14); }
+.nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 0.7rem; font-weight: 700; }
+.nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
+.nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
+.nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
+.nav-user-dropdown.show { display: block; }
+.nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+.nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
+.nav-dd-tier-badge.pro { background: var(--primary-gradient); color: #0f172a; }
+.nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
+.nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+.nav-dd-logout:hover { background: #fef2f2; }
+
+/* Main layout */
+.main-content { position: relative; z-index: 10; padding-top: 80px; }
+.hero { padding: 2.5rem 2rem 1.5rem; text-align: center; max-width: 960px; margin: 0 auto; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; background: linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.35); border-radius: 50px; font-size: 0.78rem; color: var(--amber); font-weight: 700; margin-bottom: 1.25rem; }
+.hero h1 { font-size: clamp(1.8rem,3.5vw,2.6rem); font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.85rem; }
+.hero p { font-size: 1rem; color: var(--text-secondary); max-width: 720px; margin: 0 auto; }
+.hero-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.25rem; flex-wrap: wrap; }
+.hero-stat { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted); }
+.hero-stat i { color: var(--amber); }
+
+/* Carrier banner (deep-link from other calcs) */
+.carrier-banner { display: none; max-width: 1100px; margin: 0 auto 1rem; padding: 0.65rem 1.25rem; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; font-size: 0.82rem; color: var(--amber-dark); font-weight: 600; }
+.carrier-banner.visible { display: flex; align-items: center; gap: 8px; }
+
+/* Tabs */
+.tabs-wrap { max-width: 1100px; margin: 0 auto 0; padding: 0 2rem; }
+.tabs-row { display: flex; gap: 4px; flex-wrap: wrap; padding-bottom: 0; border-bottom: 2px solid rgba(245,158,11,0.15); }
+.tab-btn { padding: 9px 16px; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 10px 10px 0 0; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+.tab-btn:hover { color: var(--amber); border-color: rgba(245,158,11,0.3); }
+.tab-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); font-weight: 700; }
+
+/* Module container */
+.module-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem; }
+.module-pane { display: none; }
+.module-pane.active { display: block; }
+
+/* Cards & panels */
+.module-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem; }
+.module-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+.card-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.card-title i { color: var(--amber); }
+.input-group { margin-bottom: 0.9rem; }
+.input-group:last-child { margin-bottom: 0; }
+.input-label { display: flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
+.input-field { width: 100%; padding: 9px 13px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.88rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
+.input-field:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+select.input-field { cursor: pointer; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.result-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+.result-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 0.6rem; }
+.result-big { font-size: 2.2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); line-height: 1; }
+.result-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+.metric-box { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12); border-radius: 10px; padding: 0.75rem; text-align: center; }
+.metric-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.metric-value { font-size: 1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
+.metric-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin: 1rem 0; }
+.metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; margin: 1rem 0; }
+.metric-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6rem; margin: 1rem 0; }
+
+/* Status badges */
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; }
+.status-red { background: rgba(239,68,68,0.1); color: #ef4444; }
+.status-yellow { background: rgba(245,158,11,0.1); color: #d97706; }
+.status-green { background: rgba(16,185,129,0.1); color: #059669; }
+.status-blue { background: rgba(59,130,246,0.1); color: #3b82f6; }
+.tier-vital { background: rgba(239,68,68,0.1); color: #ef4444; font-weight: 800; }
+.tier-essential { background: rgba(245,158,11,0.1); color: #d97706; font-weight: 800; }
+.tier-desirable { background: rgba(16,185,129,0.1); color: #059669; font-weight: 800; }
+
+/* Info box */
+.info-box { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; padding: 0.9rem 1rem; margin-top: 0.85rem; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; }
+.info-box summary { cursor: pointer; font-weight: 700; color: var(--amber-dark); list-style: none; display: flex; align-items: center; gap: 6px; }
+.info-box summary::before { content: 'ⓘ'; }
+.info-box summary::-webkit-details-marker { display: none; }
+.info-box[open] summary::before { content: '▾'; }
+.info-box p, .info-box ul { margin-top: 0.6rem; }
+.info-box code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(245,158,11,0.1); padding: 1px 5px; border-radius: 4px; }
+
+/* Action list */
+.action-list { list-style: none; padding: 0; margin-top: 0.75rem; }
+.action-list li { display: flex; gap: 8px; padding: 5px 0; font-size: 0.78rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
+.action-list li:last-child { border-bottom: none; }
+.action-list .act-tag { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 50px; white-space: nowrap; align-self: flex-start; margin-top: 1px; }
+.act-immediate { background: rgba(239,68,68,0.1); color: #ef4444; }
+.act-week { background: rgba(245,158,11,0.1); color: #d97706; }
+.act-month { background: rgba(59,130,246,0.1); color: #3b82f6; }
+
+/* Risk flags */
+.risk-flag { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 0.77rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
+.risk-flag:last-child { border-bottom: none; }
+.risk-flag i { color: #ef4444; flex-shrink: 0; margin-top: 1px; }
+
+/* Chart containers */
+.chart-wrap { position: relative; height: 240px; margin-top: 1rem; }
+.chart-wrap-sm { position: relative; height: 180px; margin-top: 0.75rem; }
+.chart-wrap-lg { position: relative; height: 300px; margin-top: 1rem; }
+
+/* Table */
+.table-sm { width: 100%; border-collapse: collapse; font-size: 0.77rem; margin-top: 0.75rem; }
+.table-sm th { padding: 6px 10px; background: rgba(245,158,11,0.08); color: var(--amber-dark); font-weight: 700; text-align: left; }
+.table-sm td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.table-sm tr:nth-child(even) td { background: rgba(245,158,11,0.02); }
+.highlight-row td { font-weight: 700; color: var(--amber-dark); }
+
+/* Radar / bar score */
+.score-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.score-bar-label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); min-width: 120px; }
+.score-bar-bg { flex: 1; height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 4px; background: var(--amber); transition: width 0.5s ease; }
+.score-bar-val { font-size: 0.72rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 32px; text-align: right; }
+
+/* Kraljic 2x2 */
+.kraljic-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; margin: 1rem 0; border: 2px solid rgba(245,158,11,0.2); border-radius: 10px; overflow: hidden; }
+.kq-cell { padding: 0.85rem; font-size: 0.75rem; line-height: 1.4; transition: all 0.3s; }
+.kq-cell-title { font-weight: 800; font-size: 0.8rem; margin-bottom: 3px; }
+.kq-strategic { background: rgba(239,68,68,0.08); border-right: 1px solid rgba(245,158,11,0.1); border-bottom: 1px solid rgba(245,158,11,0.1); }
+.kq-bottleneck { background: rgba(245,158,11,0.08); border-bottom: 1px solid rgba(245,158,11,0.1); }
+.kq-leverage { background: rgba(59,130,246,0.07); border-right: 1px solid rgba(245,158,11,0.1); }
+.kq-noncritical { background: rgba(16,185,129,0.06); }
+.kq-active { outline: 3px solid var(--amber); outline-offset: -3px; }
+
+/* FAQ */
+.faq-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.faq-cat-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+.faq-cat-btn { padding: 5px 14px; border: 1px solid #e2e8f0; border-radius: 50px; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.faq-cat-btn:hover, .faq-cat-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); }
+.faq-item { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; }
+.faq-item summary { padding: 0.85rem 1rem; cursor: pointer; font-size: 0.84rem; font-weight: 600; color: var(--text-primary); list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '+'; font-size: 1.1rem; color: var(--amber); flex-shrink: 0; }
+.faq-item[open] summary::after { content: '−'; }
+.faq-item[open] summary { color: var(--amber-dark); }
+.faq-body { padding: 0 1rem 0.85rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.65; }
+.faq-body p { margin-bottom: 0.5rem; }
+.faq-body strong { color: var(--text-primary); }
+.faq-body a { color: var(--amber-dark); }
+.faq-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(245,158,11,0.1); padding: 1px 5px; border-radius: 4px; }
+
+/* Monte-Carlo range inputs */
+.range-wrap { display: flex; align-items: center; gap: 10px; }
+.range-wrap input[type=range] { flex: 1; accent-color: var(--amber); }
+.range-val { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; min-width: 44px; text-align: right; font-weight: 700; color: var(--amber-dark); }
+
+/* Strategy text block */
+.strategy-block { background: rgba(245,158,11,0.05); border-left: 4px solid var(--amber); border-radius: 0 10px 10px 0; padding: 0.9rem 1rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
+.strategy-block strong { color: var(--text-primary); }
+
+/* Calc disclaimer */
+.calc-disclaimer { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 12px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; }
+.disc-title { font-size: 0.78rem; font-weight: 700; color: #1e293b; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 6px; }
+.disc-text { font-size: 0.74rem; color: #475569; line-height: 1.55; }
+.disc-fine { font-size: 0.68rem; color: #64748b; margin-top: 0.4rem; }
+
+/* Cookie banner */
+.cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1rem 2rem; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -2px 16px rgba(0,0,0,0.06); font-size: 0.85rem; color: #374151; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+.cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
+.cookie-banner p { margin: 0; line-height: 1.5; }
+.cookie-banner a { color: #d97706; text-decoration: underline; }
+.cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
+.cookie-accept { padding: 0.45rem 1.2rem; background: var(--amber); color: #0f172a; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.cookie-accept:hover { background: var(--amber-dark); }
+.cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #94a3b8; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+.cookie-decline:hover { background: #f3f4f6; color: #374151; }
+
+/* Share buttons */
+.share-buttons { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 500; opacity: 0; visibility: hidden; transition: opacity 0.4s,visibility 0.4s; }
+.share-buttons.visible { opacity: 1; visibility: visible; }
+.share-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; text-decoration: none; transition: transform 0.2s,box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.share-btn:hover { transform: scale(1.12); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
+.sb-linkedin { background: #0a66c2; }
+.sb-x { background: #000; }
+.sb-whatsapp { background: #25d366; }
+.sb-instagram { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+.sb-facebook { background: #1877f2; }
+
+/* Footer */
+.site-footer { background: #0f172a; color: #94a3b8; padding: 3rem 2rem 1.5rem; margin-top: 3rem; }
+.footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 2rem; max-width: 1100px; margin: 0 auto 2rem; }
+.footer-col h4 { color: #f1f5f9; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; }
+.footer-col p { font-size: 0.8rem; line-height: 1.6; }
+.footer-col a { display: block; color: #94a3b8; text-decoration: none; font-size: 0.8rem; padding: 2px 0; transition: color 0.2s; }
+.footer-col a:hover { color: var(--amber-light); }
+.footer-bottom { max-width: 1100px; margin: 0 auto; border-top: 1px solid #1e293b; padding-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.75rem; }
+.version-stamp { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #475569; }
+
+/* PDF export button */
+.btn-pdf { padding: 0.5rem 1rem; border: 1px solid rgba(245,158,11,0.35); background: rgba(245,158,11,0.05); color: var(--amber-dark); border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; font-family: inherit; transition: all 0.25s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-pdf:hover { background: rgba(245,158,11,0.12); border-color: var(--amber); }
+.btn-primary { padding: 0.6rem 1.4rem; background: var(--primary-gradient); border: none; border-radius: 10px; color: #0f172a; font-size: 0.86rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.25s; box-shadow: 0 3px 10px rgba(245,158,11,0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(245,158,11,0.4); }
+.btn-row { display: flex; gap: 0.6rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap; }
+
+/* Toggle switch */
+.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+.toggle-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); }
+.toggle-switch { position: relative; width: 44px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; border-radius: 24px; transition: 0.3s; }
+.toggle-slider:before { position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+input:checked + .toggle-slider { background: var(--amber); }
+input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+/* v1.8.0 — mobile responsive patch */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  img { max-width: 100%; height: auto; display: block; }
+  .nav-links { display: none; }
+  .nav-dropdown-menu { display: none !important; }
+  .module-grid { grid-template-columns: 1fr; }
+  .input-row { grid-template-columns: 1fr; }
+  .metric-grid-3, .metric-grid-4 { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+  .tabs-row { gap: 2px; }
+  .tab-btn { padding: 7px 10px; font-size: 0.72rem; }
+  .module-wrap { padding: 1rem; }
+  .tabs-wrap { padding: 0 1rem; }
+  button, a.btn, [role="button"] { min-height: 44px; }
+  .hero { padding: 2rem 1rem 1rem; }
+  .hero h1 { font-size: 1.6rem; }
+  .share-buttons { bottom: 60px; top: auto; right: 10px; transform: none; flex-direction: row; }
+  .share-btn { width: 34px; height: 34px; font-size: 0.78rem; }
+  .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; }
+}
+@media print { .navbar,.hero,.cookie-banner,footer,.share-buttons { display: none !important; } .main-content { padding-top: 0 !important; } }
+</style>
+<script src="js/rz-version.js?v=2026-05-09" defer></script>
+<script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+</head>
+<body>
+<script>
+(function(){
+  var t = localStorage.getItem('theme');
+  if(t === 'dark') document.documentElement.setAttribute('data-theme','dark');
+})();
+</script>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="page-background"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo">CSE</div>
+      <div>
+        <div class="nav-title">Critical Spares Engine</div>
+        <div class="nav-subtitle">M&amp;E Spares Readiness · Sourcing · Obsolescence</div>
+      </div>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-dropdown">
+        <span class="nav-link nav-dropdown-toggle">Calculators ▾</span>
+        <div class="nav-dropdown-menu">
+          <a href="pue-calculator.html">PUE Calculator</a>
+          <a href="capex-calculator.html">CAPEX Calculator</a>
+          <a href="opex-calculator.html">OPEX Calculator</a>
+          <a href="roi-calculator.html">ROI Calculator</a>
+          <a href="tco-calculator.html">TCO Calculator</a>
+          <a href="cx-calculator.html">CX Calculator</a>
+          <a href="carbon-footprint.html">Carbon Footprint</a>
+          <a href="tier-advisor.html">Tier Advisor</a>
+          <a href="spares-readiness-calculator.html" style="color:var(--amber);font-weight:700;">Critical Spares Engine</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <span class="nav-link nav-dropdown-toggle">Markets ▾</span>
+        <div class="nav-dropdown-menu">
+          <a href="dc-market-tracker.html">Global Market Tracker</a>
+          <a href="dc-market/">City Deep-Dives</a>
+          <a href="datacenter-solutions.html">DC Solutions Hub</a>
+        </div>
+      </div>
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn"><i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
+          <div class="nav-user-avatar" id="navUserAvatar">U</div>
+          <span class="nav-user-email" id="navUserEmail"></span>
+          <i class="fas fa-chevron-down nav-user-chevron"></i>
+        </button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header">
+            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">PRO</div>
+            <div class="nav-dd-email" id="navDdEmail"></div>
+          </div>
+          <button class="nav-dd-logout" onclick="logoutPremium()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+      <button class="nav-theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+      <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main class="main-content" id="main-content">
+  <!-- Deep-link carrier banner -->
+  <div class="carrier-banner" id="carrierBanner"><i class="fas fa-link"></i> <span id="carrierBannerText">Your config carried over from another calculator.</span></div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge"><i class="fas fa-warehouse"></i> M&amp;E Spare Parts Management</div>
+    <h1>Critical Spares Engine</h1>
+    <p>Quantify spare-parts readiness, optimal stock levels, supplier risk index, and last-time-buy economics for data-center mechanical &amp; electrical equipment. Powered by FMECA, Newsvendor, METRIC/MEIO, Kraljic, and DMSMS methodologies.</p>
+    <div class="hero-stats">
+      <span class="hero-stat"><i class="fas fa-th"></i> 9 modules</span>
+      <span class="hero-stat"><i class="fas fa-chart-bar"></i> Live charts</span>
+      <span class="hero-stat"><i class="fas fa-dice"></i> Monte-Carlo</span>
+      <span class="hero-stat"><i class="fas fa-file-pdf"></i> PDF export</span>
+      <span class="hero-stat"><i class="fas fa-link"></i> Deep-link params</span>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="tabs-wrap">
+    <div class="tabs-row" role="tablist">
+      <button class="tab-btn active" onclick="switchTab('criticality')" role="tab" aria-selected="true" aria-controls="pane-criticality">1 · Criticality</button>
+      <button class="tab-btn" onclick="switchTab('readiness')" role="tab" aria-selected="false" aria-controls="pane-readiness">2 · Readiness</button>
+      <button class="tab-btn" onclick="switchTab('stock')" role="tab" aria-selected="false" aria-controls="pane-stock">3 · Optimal Stock</button>
+      <button class="tab-btn" onclick="switchTab('hub')" role="tab" aria-selected="false" aria-controls="pane-hub">4 · Hub Positioning</button>
+      <button class="tab-btn" onclick="switchTab('supplier')" role="tab" aria-selected="false" aria-controls="pane-supplier">5 · Supplier Risk</button>
+      <button class="tab-btn" onclick="switchTab('ltb')" role="tab" aria-selected="false" aria-controls="pane-ltb">6 · Last-Time-Buy</button>
+      <button class="tab-btn" onclick="switchTab('kraljic')" role="tab" aria-selected="false" aria-controls="pane-kraljic">7 · Kraljic</button>
+      <button class="tab-btn" onclick="switchTab('montecarlo')" role="tab" aria-selected="false" aria-controls="pane-montecarlo">8 · Monte-Carlo</button>
+      <button class="tab-btn" onclick="switchTab('faq')" role="tab" aria-selected="false" aria-controls="pane-faq">9 · Methodology</button>
+    </div>
+  </div>
+
+  <div class="module-wrap">
+
+    <!-- ===== MODULE 1: CRITICALITY ===== -->
+    <div class="module-pane active" id="pane-criticality">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-exclamation-triangle"></i> FMECA + RCM Criticality Inputs</div>
+          <div class="input-group">
+            <label class="input-label" for="c1_partDesc">Part Description</label>
+            <input type="text" id="c1_partDesc" class="input-field" value="Chiller Compressor Seal Kit" aria-label="Part Description">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="c1_commodity">Commodity</label>
+            <select id="c1_commodity" class="input-field" onchange="calcCriticality()" aria-label="Commodity">
+              <option value="chiller">Chiller</option>
+              <option value="crac">CRAC / CRAH</option>
+              <option value="ups">UPS</option>
+              <option value="switchgear">Switchgear</option>
+              <option value="transformer">Transformer</option>
+              <option value="generator">Generator</option>
+              <option value="pump">Pump</option>
+              <option value="valve">Valve</option>
+              <option value="hx">Heat Exchanger</option>
+              <option value="cooling-tower">Cooling Tower</option>
+              <option value="bms">BMS Controller</option>
+              <option value="fuel">Fuel System</option>
+              <option value="fire">Fire Suppression</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="c1_lambda">Annual Failure Rate λ (failures/yr)</label>
+              <input type="number" id="c1_lambda" class="input-field" value="0.25" min="0.001" max="10" step="0.01" oninput="calcCriticality()" aria-label="Annual failure rate">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="c1_installed">Installed Base (# units)</label>
+              <input type="number" id="c1_installed" class="input-field" value="4" min="1" max="1000" step="1" oninput="calcCriticality()" aria-label="Installed base">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="c1_severity">Failure-Effect Severity 1–10 (10=site outage)</label>
+              <input type="number" id="c1_severity" class="input-field" value="8" min="1" max="10" step="1" oninput="calcCriticality()" aria-label="Severity">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="c1_detectability">Detectability 1–10 (10=no warning)</label>
+              <input type="number" id="c1_detectability" class="input-field" value="6" min="1" max="10" step="1" oninput="calcCriticality()" aria-label="Detectability">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="c1_redundancy">Redundancy Buffer</label>
+              <select id="c1_redundancy" class="input-field" onchange="calcCriticality()" aria-label="Redundancy buffer">
+                <option value="n">N (no redundancy)</option>
+                <option value="n1" selected>N+1</option>
+                <option value="2n">2N (fully redundant)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="c1_alternates">Qualified Alternates (#)</label>
+              <input type="number" id="c1_alternates" class="input-field" value="1" min="0" max="20" step="1" oninput="calcCriticality()" aria-label="Qualified alternates">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportCriticalityPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">Criticality Number Cm</div>
+            <div class="result-big" id="c1_cm">—</div>
+            <div class="result-sub">FMECA-style composite score (higher = more critical)</div>
+            <div style="margin-top:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span class="status-badge" id="c1_tier_badge">—</span>
+              <span class="status-badge" id="c1_decision_badge">—</span>
+            </div>
+            <div class="metric-grid-2" style="margin-top:0.85rem;">
+              <div class="metric-box"><div class="metric-label">Risk Priority Number</div><div class="metric-value" id="c1_rpn">—</div></div>
+              <div class="metric-box"><div class="metric-label">Effective Severity</div><div class="metric-value" id="c1_eff_sev">—</div></div>
+              <div class="metric-box"><div class="metric-label">Fleet Exp. Failures/yr</div><div class="metric-value" id="c1_fleet_fail">—</div></div>
+              <div class="metric-box"><div class="metric-label">Alternates Factor</div><div class="metric-value" id="c1_alt_factor">—</div></div>
+            </div>
+            <div class="chart-wrap-sm"><canvas id="chart_criticality"></canvas></div>
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary>ⓘ How criticality is computed</summary>
+            <p>Simplified FMECA Criticality Number: <code>Cm = (S_eff/10) × (D/10) × λ × N × (oh/8760)</code> where <code>S_eff</code> is severity reduced by redundancy buffer, <code>D</code> is detectability, <code>λ</code> is annual failure rate, <code>N</code> is installed base, and <code>oh/8760</code> normalises to fraction of year (annual basis → oh=8760 → factor=1).</p>
+            <p>Risk Priority Number (RPN): <code>RPN = S_eff × D × (λ×10)</code> — analogous to FMEA RPN = Severity × Occurrence × Detection.</p>
+            <p>Tier thresholds: VITAL Cm ≥ 0.5; ESSENTIAL 0.1–0.5; DESIRABLE &lt;0.1. Decision: VITAL → STOCK + DUAL-SOURCE; ESSENTIAL → STOCK; DESIRABLE → DON'T STOCK (review).</p>
+            <p>Ref: MIL-STD-1629A FMECA; <a href="https://quality-one.com/fmeca/" target="_blank" rel="noopener">Quality-One FMECA guide</a>.</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- Score driver bars -->
+      <div class="module-card" style="margin-top:1rem;">
+        <div class="card-title"><i class="fas fa-chart-bar"></i> Score Drivers</div>
+        <div id="c1_score_bars"></div>
+      </div>
+    </div>
+
+    <!-- ===== MODULE 2: READINESS GAUGE ===== -->
+    <div class="module-pane" id="pane-readiness">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-gauge-high"></i> Spare Readiness Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="r_required">Required Qty by Need Date</label>
+              <input type="number" id="r_required" class="input-field" value="2" min="1" oninput="calcReadiness()" aria-label="Required quantity">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="r_onhand">On-Hand Inventory</label>
+              <input type="number" id="r_onhand" class="input-field" value="1" min="0" oninput="calcReadiness()" aria-label="On-hand inventory">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="r_po_qty">Open-PO Qty</label>
+              <input type="number" id="r_po_qty" class="input-field" value="1" min="0" oninput="calcReadiness()" aria-label="Open PO quantity">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="r_lt_weeks">Supplier Lead Time (weeks)</label>
+              <input type="number" id="r_lt_weeks" class="input-field" value="16" min="1" oninput="calcReadiness()" aria-label="Lead time weeks">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="r_lt_sigma">Lead-Time σ (weeks)</label>
+              <input type="number" id="r_lt_sigma" class="input-field" value="4" min="0" oninput="calcReadiness()" aria-label="Lead time sigma">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="r_planning_horizon">Planning Horizon (weeks)</label>
+              <input type="number" id="r_planning_horizon" class="input-field" value="52" min="1" oninput="calcReadiness()" aria-label="Planning horizon weeks">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="r_commit_date">Supplier Commit Date</label>
+              <input type="date" id="r_commit_date" class="input-field" oninput="calcReadiness()" aria-label="Supplier commit date">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="r_need_date">Site Need-By Date</label>
+              <input type="date" id="r_need_date" class="input-field" oninput="calcReadiness()" aria-label="Site need-by date">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="r_has_po">PO Raised?</label>
+              <select id="r_has_po" class="input-field" onchange="calcReadiness()" aria-label="PO raised">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="r_has_commit">Supplier Commit Confirmed?</label>
+              <select id="r_has_commit" class="input-field" onchange="calcReadiness()" aria-label="Supplier commit confirmed">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportReadinessPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">Readiness %</div>
+            <div class="result-big" id="r_pct">—</div>
+            <div style="margin-top:0.75rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span class="status-badge" id="r_status_badge">—</span>
+              <span id="r_slack_text" style="font-size:0.78rem;color:var(--text-muted);"></span>
+            </div>
+            <div class="chart-wrap-sm"><canvas id="chart_readiness"></canvas></div>
+            <div class="metric-grid-2" style="margin-top:0.85rem;">
+              <div class="metric-box"><div class="metric-label">Confirmed Supply</div><div class="metric-value" id="r_confirmed">—</div></div>
+              <div class="metric-box"><div class="metric-label">Gap</div><div class="metric-value" id="r_gap">—</div></div>
+              <div class="metric-box"><div class="metric-label">Date Slack (days)</div><div class="metric-value" id="r_slack_days">—</div></div>
+              <div class="metric-box"><div class="metric-label">LT / Horizon</div><div class="metric-value" id="r_lt_ratio">—</div></div>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:1rem;">
+            <div class="card-title"><i class="fas fa-flag"></i> Risk Flags</div>
+            <div id="r_flags"></div>
+          </div>
+          <div class="result-card" style="margin-top:0.75rem;">
+            <div class="card-title"><i class="fas fa-list-check"></i> Recommended Actions</div>
+            <ul class="action-list" id="r_actions"></ul>
+          </div>
+        </div>
+      </div>
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ How readiness is computed</summary>
+        <p><code>Readiness% = min(100, confirmedSupply / required × 100)</code></p>
+        <p>confirmedSupply = onHand + (PO qty if commit date ≤ need date AND commit is confirmed). If no confirmed commit, PO qty counts as 50% confidence. Status: RED if &lt;80% or commit after need; YELLOW if 80–99%; GREEN if ≥100% with slack ≥7 days.</p>
+      </details>
+    </div>
+
+    <!-- ===== MODULE 3: OPTIMAL STOCK ===== -->
+    <div class="module-pane" id="pane-stock">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-boxes-stacked"></i> Optimal Stock Level Inputs</div>
+          <div class="toggle-row">
+            <label class="toggle-label" for="s_poisson_toggle">Use Poisson mode (slow movers)</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s_poisson_toggle" onchange="calcStock()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="s_unit_cost">Unit Cost ($)</label>
+              <input type="number" id="s_unit_cost" class="input-field" value="4500" min="1" oninput="calcStock()" aria-label="Unit cost">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="s_understk_cost">Under-Stock Cost / Event ($)</label>
+              <input type="number" id="s_understk_cost" class="input-field" value="85000" min="1" oninput="calcStock()" aria-label="Under-stock cost per event">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="s_carry_rate">Carrying Cost Rate (%/yr)</label>
+              <input type="number" id="s_carry_rate" class="input-field" value="25" min="1" max="100" oninput="calcStock()" aria-label="Carrying cost rate">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="s_part_life">Part Life (years)</label>
+              <input type="number" id="s_part_life" class="input-field" value="8" min="1" max="30" oninput="calcStock()" aria-label="Part life years">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="s_demand_mu">Annual Demand Mean μ (units/yr)</label>
+              <input type="number" id="s_demand_mu" class="input-field" value="1.0" min="0.01" step="0.1" oninput="calcStock()" aria-label="Annual demand mean">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="s_demand_sigma">Annual Demand σ (units/yr)</label>
+              <input type="number" id="s_demand_sigma" class="input-field" value="0.6" min="0" step="0.1" oninput="calcStock()" aria-label="Annual demand sigma">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="s_lt_weeks">Lead Time L (weeks)</label>
+              <input type="number" id="s_lt_weeks" class="input-field" value="16" min="1" oninput="calcStock()" aria-label="Lead time">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="s_lt_sigma">Lead-Time σ_L (weeks)</label>
+              <input type="number" id="s_lt_sigma" class="input-field" value="4" min="0" oninput="calcStock()" aria-label="Lead time sigma">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="s_fill_rate">Target Fill Rate (%)</label>
+              <input type="number" id="s_fill_rate" class="input-field" value="99" min="50" max="99.99" step="0.5" oninput="calcStock()" aria-label="Target fill rate">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="s_installed_base">Installed Base (for Poisson)</label>
+              <input type="number" id="s_installed_base" class="input-field" value="4" min="1" oninput="calcStock()" aria-label="Installed base for Poisson">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportStockPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">Optimal Stock Recommendation</div>
+            <div class="metric-grid-2">
+              <div class="metric-box"><div class="metric-label">Newsvendor Q*</div><div class="metric-value" id="s_qstar">—</div></div>
+              <div class="metric-box"><div class="metric-label">Safety Stock SS</div><div class="metric-value" id="s_ss">—</div></div>
+              <div class="metric-box"><div class="metric-label">Reorder Point ROP</div><div class="metric-value" id="s_rop">—</div></div>
+              <div class="metric-box"><div class="metric-label">Critical Ratio CR</div><div class="metric-value" id="s_cr">—</div></div>
+              <div class="metric-box"><div class="metric-label">Fill Rate Achieved</div><div class="metric-value" id="s_fill_achieved">—</div></div>
+              <div class="metric-box"><div class="metric-label">Total Annual Cost</div><div class="metric-value" id="s_total_cost">—</div></div>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;" id="s_poisson_panel">
+            <div class="card-title"><i class="fas fa-table"></i> Poisson Stockout Probability</div>
+            <div id="s_poisson_table"></div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-chart-line"></i> Total Cost vs Stock Qty</div>
+            <div class="chart-wrap"><canvas id="chart_stock"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ Newsvendor + Fill-Rate methodology</summary>
+        <p>Critical ratio: <code>CR = Cu / (Cu + Co)</code> where <code>Cu</code> = under-stock cost, <code>Co</code> = carrying cost over part life = <code>carryRate × unitCost × partLife</code>.</p>
+        <p>Newsvendor optimal Q*: inverse-normal CDF of CR applied to demand-during-lead-time distribution (Beasley-Springer-Moro rational approximation).</p>
+        <p>Safety stock: <code>SS = z(FR) × σ_LT</code> where <code>σ_LT = √(L × σ_D² + μ_D² × σ_L²)</code> (demand + lead-time variability combined).</p>
+        <p>Poisson mode (slow movers): <code>λ_LT = installedBase × annualFailureRate × (L/52)</code>; P(stockout) from Poisson CDF. Ref: <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.31.10.1247" target="_blank" rel="noopener">Sherbrooke 1985 METRIC</a>.</p>
+      </details>
+    </div>
+
+    <!-- ===== MODULE 4: HUB POSITIONING ===== -->
+    <div class="module-pane" id="pane-hub">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-network-wired"></i> Multi-Site Hub Positioning Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="h_sites"># Data-Center Sites</label>
+              <input type="number" id="h_sites" class="input-field" value="4" min="1" max="50" oninput="calcHub()" aria-label="Number of sites">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="h_part_types"># Critical Part Types</label>
+              <input type="number" id="h_part_types" class="input-field" value="6" min="1" max="200" oninput="calcHub()" aria-label="Number of part types">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="h_oem_lt">OEM Lead Time (weeks)</label>
+              <input type="number" id="h_oem_lt" class="input-field" value="20" min="1" oninput="calcHub()" aria-label="OEM lead time">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="h_hub_lt">Hub-to-Site Lead Time (weeks)</label>
+              <input type="number" id="h_hub_lt" class="input-field" value="0.5" min="0.1" step="0.1" oninput="calcHub()" aria-label="Hub lead time">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="h_unit_cost">Per-Unit Cost ($)</label>
+              <input type="number" id="h_unit_cost" class="input-field" value="4500" min="1" oninput="calcHub()" aria-label="Per-unit cost">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="h_budget">Total Spares Budget ($)</label>
+              <input type="number" id="h_budget" class="input-field" value="200000" min="1" oninput="calcHub()" aria-label="Total spares budget">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="h_demand_per_site">Demand per Site (units/yr per part type)</label>
+              <input type="number" id="h_demand_per_site" class="input-field" value="0.5" min="0.01" step="0.1" oninput="calcHub()" aria-label="Demand per site">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="h_target_readiness">Target Fleet Readiness (%)</label>
+              <input type="number" id="h_target_readiness" class="input-field" value="95" min="50" max="99.9" oninput="calcHub()" aria-label="Target fleet readiness">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">Hub Positioning Recommendation</div>
+            <div class="metric-grid-3">
+              <div class="metric-box"><div class="metric-label">Central Depot</div><div class="metric-value" id="h_depot">—</div></div>
+              <div class="metric-box"><div class="metric-label">Regional Hub</div><div class="metric-value" id="h_hub">—</div></div>
+              <div class="metric-box"><div class="metric-label">At Sites</div><div class="metric-value" id="h_sites_stock">—</div></div>
+            </div>
+            <div class="metric-grid-3" style="margin-top:0.6rem;">
+              <div class="metric-box"><div class="metric-label">Fleet Readiness</div><div class="metric-value" id="h_fleet_read">—</div></div>
+              <div class="metric-box"><div class="metric-label">Hub Delta</div><div class="metric-value" id="h_hub_delta">—</div></div>
+              <div class="metric-box"><div class="metric-label">Hub Extra $</div><div class="metric-value" id="h_hub_cost">—</div></div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart_hub"></canvas></div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-lightbulb"></i> Hub Recommendation</div>
+            <div class="strategy-block" id="h_recommendation"></div>
+          </div>
+        </div>
+      </div>
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ Simplified 2-echelon MEIO / VARI-METRIC approach</summary>
+        <p>This is a transparent heuristic approximation (not a full VARI-METRIC solver). Hub units are sized to cover demand during hub-to-site lead time at the target fill rate. Site-level stock covers demand during the OEM lead time minus hub coverage. Remaining budget fills the central depot.</p>
+        <p>Fleet readiness is estimated as <code>min(100, totalStock / (demandDuringMaxLT × safetyFactor))</code>. Hub delta = readiness with hub minus readiness without hub.</p>
+        <p>Ref: <a href="https://drum.lib.umd.edu/bitstreams/b6543f42-b065-4f2c-b196-f26f5c15910c/download" target="_blank" rel="noopener">METRIC/VARI-METRIC review (UMD)</a>; <a href="https://umbrex.com/resources/frameworks/supply-chain-frameworks/multi-echelon-inventory-optimization-meio/" target="_blank" rel="noopener">MEIO framework (Umbrex)</a>.</p>
+      </details>
+    </div>
+
+    <!-- ===== MODULE 5: SUPPLIER RISK ===== -->
+    <div class="module-pane" id="pane-supplier">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-shield-halved"></i> Supplier Risk Inputs</div>
+          <div class="input-group">
+            <label class="input-label" for="sr_financial">Financial Health (1 weak – 10 strong)</label>
+            <div class="range-wrap"><input type="range" id="sr_financial" min="1" max="10" value="6" step="1" oninput="calcSupplierRisk();document.getElementById('sr_financial_val').textContent=this.value" aria-label="Financial health"><span class="range-val" id="sr_financial_val">6</span></div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sr_single_source">Single-Source Exposure</label>
+            <select id="sr_single_source" class="input-field" onchange="calcSupplierRisk()" aria-label="Single source exposure">
+              <option value="single">Yes – single source</option>
+              <option value="dual" selected>Dual source</option>
+              <option value="multi">3+ qualified sources</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sr_geo_conc">Geographic Concentration (1 diversified – 10 single-country)</label>
+            <div class="range-wrap"><input type="range" id="sr_geo_conc" min="1" max="10" value="7" step="1" oninput="calcSupplierRisk();document.getElementById('sr_geo_val').textContent=this.value" aria-label="Geographic concentration"><span class="range-val" id="sr_geo_val">7</span></div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sr_lt_vol">Lead-Time Volatility (1 stable – 10 erratic)</label>
+            <div class="range-wrap"><input type="range" id="sr_lt_vol" min="1" max="10" value="7" step="1" oninput="calcSupplierRisk();document.getElementById('sr_ltv_val').textContent=this.value" aria-label="Lead time volatility"><span class="range-val" id="sr_ltv_val">7</span></div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sr_otif">OTIF History (%)</label>
+              <input type="number" id="sr_otif" class="input-field" value="78" min="0" max="100" oninput="calcSupplierRisk()" aria-label="OTIF history">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sr_capacity">Capacity Headroom (%)</label>
+              <input type="number" id="sr_capacity" class="input-field" value="20" min="0" max="100" oninput="calcSupplierRisk()" aria-label="Capacity headroom">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sr_geopolitical">Geopolitical Risk (1 low – 10 high)</label>
+            <div class="range-wrap"><input type="range" id="sr_geopolitical" min="1" max="10" value="6" step="1" oninput="calcSupplierRisk();document.getElementById('sr_geo2_val').textContent=this.value" aria-label="Geopolitical risk"><span class="range-val" id="sr_geo2_val">6</span></div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sr_contract">Contract Status</label>
+              <select id="sr_contract" class="input-field" onchange="calcSupplierRisk()" aria-label="Contract status">
+                <option value="msa">MSA (Master Supply Agreement)</option>
+                <option value="sow" selected>SOW</option>
+                <option value="po">PO-only</option>
+                <option value="none">No contract</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sr_spend_impact">Spend / Profit Impact (1–10)</label>
+              <input type="number" id="sr_spend_impact" class="input-field" value="7" min="1" max="10" oninput="calcSupplierRisk()" aria-label="Spend impact">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">Composite Supplier Risk Score</div>
+            <div class="result-big" id="sr_score">—</div>
+            <div style="margin-top:0.75rem;display:flex;gap:10px;flex-wrap:wrap;">
+              <span class="status-badge" id="sr_band_badge">—</span>
+              <span class="status-badge" id="sr_kraljic_badge" style="background:rgba(59,130,246,0.1);color:#3b82f6;">—</span>
+            </div>
+            <div class="chart-wrap"><canvas id="chart_supplier"></canvas></div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-chess"></i> Sourcing Strategy</div>
+            <div class="strategy-block" id="sr_strategy"></div>
+          </div>
+        </div>
+      </div>
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ Composite risk score weights</summary>
+        <p>Weights: Financial Health 15%, Single-Source 20%, Geographic Concentration 12%, Lead-Time Volatility 15%, OTIF 18%, Capacity Headroom 10%, Geopolitical 10%. Contract status adjusts ±5 pts. Score 0–100. Bands: &lt;30 LOW; 30–59 MEDIUM; 60–79 HIGH; ≥80 CRITICAL.</p>
+        <p>Kraljic quadrant: supply-risk dimension = composite score / 10; spend-impact from direct input. Ref: Kraljic, P. (1983) "Purchasing must become supply management", HBR.</p>
+      </details>
+    </div>
+
+    <!-- ===== MODULE 6: LTB ===== -->
+    <div class="module-pane" id="pane-ltb">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Last-Time-Buy / DMSMS Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="ltb_eol_date">EOL Notice Date</label>
+              <input type="date" id="ltb_eol_date" class="input-field" oninput="calcLTB()" aria-label="EOL notice date">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="ltb_support_yrs">Remaining Support Years</label>
+              <input type="number" id="ltb_support_yrs" class="input-field" value="8" min="1" max="30" oninput="calcLTB()" aria-label="Remaining support years">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="ltb_demand_yr">Annual Demand (units/yr)</label>
+              <input type="number" id="ltb_demand_yr" class="input-field" value="1.2" min="0.01" step="0.1" oninput="calcLTB()" aria-label="Annual demand">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="ltb_onhand">On-Hand (units)</label>
+              <input type="number" id="ltb_onhand" class="input-field" value="2" min="0" oninput="calcLTB()" aria-label="On-hand">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="ltb_open_po">Open-PO (units)</label>
+              <input type="number" id="ltb_open_po" class="input-field" value="0" min="0" oninput="calcLTB()" aria-label="Open PO">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="ltb_unit_cost">Unit Cost ($)</label>
+              <input type="number" id="ltb_unit_cost" class="input-field" value="4500" min="1" oninput="calcLTB()" aria-label="Unit cost">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="ltb_carry_rate">Carrying Cost Rate (%/yr)</label>
+              <input type="number" id="ltb_carry_rate" class="input-field" value="22" min="1" max="100" oninput="calcLTB()" aria-label="Carrying cost rate">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="ltb_scrap_risk">Scrap Risk % (leftover wasted)</label>
+              <input type="number" id="ltb_scrap_risk" class="input-field" value="20" min="0" max="100" oninput="calcLTB()" aria-label="Scrap risk percent">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="ltb_alt_qual_cost">Alt-Part Qual Cost ($)</label>
+              <input type="number" id="ltb_alt_qual_cost" class="input-field" value="60000" min="0" oninput="calcLTB()" aria-label="Alt part qualification cost">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="ltb_alt_qual_lt">Alt-Part Qual Lead Time (months)</label>
+              <input type="number" id="ltb_alt_qual_lt" class="input-field" value="18" min="1" max="60" oninput="calcLTB()" aria-label="Alt part qualification lead time">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="ltb_discount">Discount Rate % (for NPV)</label>
+              <input type="number" id="ltb_discount" class="input-field" value="8" min="0" max="30" step="0.5" oninput="calcLTB()" aria-label="Discount rate">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="ltb_criticality">Part Criticality (1–10)</label>
+              <input type="number" id="ltb_criticality" class="input-field" value="8" min="1" max="10" oninput="calcLTB()" aria-label="Part criticality">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="ltb_qual_alternates"># Qualified Alternates (for EOL exposure score)</label>
+            <input type="number" id="ltb_qual_alternates" class="input-field" value="0" min="0" oninput="calcLTB()" aria-label="Qualified alternates">
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportLTBPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">LTB Recommendation</div>
+            <div class="metric-grid-2">
+              <div class="metric-box"><div class="metric-label">LTB Qty (units)</div><div class="metric-value" id="ltb_qty">—</div></div>
+              <div class="metric-box"><div class="metric-label">LTB Total $</div><div class="metric-value" id="ltb_total">—</div></div>
+              <div class="metric-box"><div class="metric-label">Cumulative Carry Cost</div><div class="metric-value" id="ltb_carry">—</div></div>
+              <div class="metric-box"><div class="metric-label">EOL Exposure Score</div><div class="metric-value" id="ltb_eol_score">—</div></div>
+            </div>
+            <div style="margin-top:0.85rem;display:flex;gap:10px;flex-wrap:wrap;">
+              <span class="status-badge" id="ltb_decision_badge">—</span>
+              <span class="status-badge" id="ltb_eol_band">—</span>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-chart-bar"></i> NPV: Option A (LTB Stock) vs Option B (Requalify)</div>
+            <div class="metric-grid-2">
+              <div class="metric-box"><div class="metric-label">NPV Option A (LTB)</div><div class="metric-value" id="ltb_npv_a">—</div></div>
+              <div class="metric-box"><div class="metric-label">NPV Option B (Requalify)</div><div class="metric-value" id="ltb_npv_b">—</div></div>
+            </div>
+            <div class="chart-wrap-sm"><canvas id="chart_ltb"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ LTB / DMSMS methodology</summary>
+        <p>LTB quantity: <code>LTB_Q = max(0, annualDemand × supportYears × safetyFactor − onHand − openPO)</code>. Safety factor = 1.15 (15% buffer for demand uncertainty + scrap risk). Clamp to non-negative.</p>
+        <p>Option A NPV: year-by-year cash flows of (a) buying LTB stock now + carrying cost over support life + scrap value of unused units. Option B: qualification cost now + lower carrying cost once alternate is qualified. NPV uses standard DCF: <code>Σ CF_t/(1+r)^t</code>.</p>
+        <p>EOL Exposure Score: <code>(installedUnits × criticality × supportYrsRemaining) / max(1, qualifiedAlternates)</code>. Bands: &lt;50 LOW; 50–149 MEDIUM; 150–299 HIGH; ≥300 CRITICAL.</p>
+        <p>Ref: <a href="https://en.wikipedia.org/wiki/DMSMS" target="_blank" rel="noopener">DMSMS — Wikipedia</a>; <a href="https://drum.lib.umd.edu/items/e634adcb-3d50-49b2-a8aa-f120b65d82d0" target="_blank" rel="noopener">Lifetime buy estimations (UMD)</a>.</p>
+      </details>
+    </div>
+
+    <!-- ===== MODULE 7: KRALJIC ===== -->
+    <div class="module-pane" id="pane-kraljic">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-chess-king"></i> Kraljic Matrix Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="kq_supply_risk">Supply Risk (1–10)</label>
+              <input type="number" id="kq_supply_risk" class="input-field" value="7" min="1" max="10" oninput="calcKraljic()" aria-label="Supply risk">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="kq_spend_impact">Spend / Profit Impact (1–10)</label>
+              <input type="number" id="kq_spend_impact" class="input-field" value="8" min="1" max="10" oninput="calcKraljic()" aria-label="Spend impact">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="kq_criticality">Part Criticality (1–10)</label>
+              <input type="number" id="kq_criticality" class="input-field" value="8" min="1" max="10" oninput="calcKraljic()" aria-label="Criticality">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="kq_qual_suppliers"># Qualified Suppliers</label>
+              <input type="number" id="kq_qual_suppliers" class="input-field" value="1" min="0" oninput="calcKraljic()" aria-label="Qualified suppliers">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="kq_commodity_kq">Commodity</label>
+            <select id="kq_commodity_kq" class="input-field" onchange="calcKraljic()" aria-label="Commodity">
+              <option value="chiller">Chiller</option>
+              <option value="crac">CRAC / CRAH</option>
+              <option value="ups">UPS</option>
+              <option value="switchgear" selected>Switchgear</option>
+              <option value="transformer">Transformer</option>
+              <option value="generator">Generator</option>
+              <option value="pump">Pump</option>
+              <option value="other">Other M&amp;E</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="card-title"><i class="fas fa-th-large"></i> Kraljic 2×2 Matrix</div>
+            <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--text-muted);margin-bottom:4px;padding:0 2px;">
+              <span>← Low Spend Impact</span><span>High Spend Impact →</span>
+            </div>
+            <div class="kraljic-grid" id="kq_matrix">
+              <div class="kq-cell kq-strategic" id="kq-strategic"><div class="kq-cell-title" style="color:#ef4444;">Strategic</div><div>High spend · High risk</div></div>
+              <div class="kq-cell kq-bottleneck" id="kq-bottleneck"><div class="kq-cell-title" style="color:#d97706;">Bottleneck</div><div>Low spend · High risk</div></div>
+              <div class="kq-cell kq-leverage" id="kq-leverage"><div class="kq-cell-title" style="color:#3b82f6;">Leverage</div><div>High spend · Low risk</div></div>
+              <div class="kq-cell kq-noncritical" id="kq-noncritical"><div class="kq-cell-title" style="color:#059669;">Non-Critical</div><div>Low spend · Low risk</div></div>
+            </div>
+            <div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;text-align:center;">← Low Supply Risk / High Supply Risk →</div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-road"></i> Strategy Brief</div>
+            <span class="status-badge" id="kq_quadrant_badge" style="margin-bottom:0.75rem;display:inline-flex;">—</span>
+            <div class="strategy-block" id="kq_strategy_text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODULE 8: MONTE-CARLO ===== -->
+    <div class="module-pane" id="pane-montecarlo">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-dice"></i> Monte-Carlo Scenario Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="mc_lt_base">Base Lead Time (weeks)</label>
+              <input type="number" id="mc_lt_base" class="input-field" value="16" min="1" oninput="updateMCLabels()" aria-label="Base lead time">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc_lt_sigma">Lead-Time σ (weeks)</label>
+              <input type="number" id="mc_lt_sigma" class="input-field" value="6" min="0" oninput="updateMCLabels()" aria-label="Lead time sigma">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="mc_demand_base">Annual Demand Base (units/yr)</label>
+              <input type="number" id="mc_demand_base" class="input-field" value="1.0" min="0.01" step="0.1" oninput="updateMCLabels()" aria-label="Base demand">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc_demand_sigma">Demand σ</label>
+              <input type="number" id="mc_demand_sigma" class="input-field" value="0.5" min="0" step="0.1" oninput="updateMCLabels()" aria-label="Demand sigma">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="mc_sup_rel">Supplier Reliability % (base)</label>
+              <input type="number" id="mc_sup_rel" class="input-field" value="85" min="10" max="100" oninput="updateMCLabels()" aria-label="Supplier reliability">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc_sup_sigma">Reliability σ (%)</label>
+              <input type="number" id="mc_sup_sigma" class="input-field" value="10" min="0" max="30" oninput="updateMCLabels()" aria-label="Reliability sigma">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="mc_downtime_cost">Downtime Cost ($/hr)</label>
+              <input type="number" id="mc_downtime_cost" class="input-field" value="50000" min="1" oninput="updateMCLabels()" aria-label="Downtime cost per hour">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc_stock_level">Current Stock Level (units)</label>
+              <input type="number" id="mc_stock_level" class="input-field" value="2" min="0" oninput="updateMCLabels()" aria-label="Current stock level">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="mc_mttr">MTTR when stocked-out (hrs)</label>
+              <input type="number" id="mc_mttr" class="input-field" value="168" min="1" oninput="updateMCLabels()" aria-label="MTTR when stocked out">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="mc_iterations">Iterations</label>
+              <select id="mc_iterations" class="input-field" aria-label="Monte Carlo iterations">
+                <option value="500">500</option>
+                <option value="1000" selected>1,000</option>
+                <option value="2000">2,000</option>
+                <option value="5000">5,000</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="runMonteCarlo()" id="mc_run_btn"><i class="fas fa-play"></i> Run Simulation</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">Monte-Carlo Results</div>
+            <div class="metric-grid-2" id="mc_results_grid">
+              <div class="metric-box"><div class="metric-label">P(Stockout)</div><div class="metric-value" id="mc_pstockout">—</div></div>
+              <div class="metric-box"><div class="metric-label">P10 Readiness</div><div class="metric-value" id="mc_p10">—</div></div>
+              <div class="metric-box"><div class="metric-label">P50 Readiness</div><div class="metric-value" id="mc_p50">—</div></div>
+              <div class="metric-box"><div class="metric-label">P90 Readiness</div><div class="metric-value" id="mc_p90">—</div></div>
+              <div class="metric-box"><div class="metric-label">Exp. Downtime Cost</div><div class="metric-value" id="mc_exp_down">—</div></div>
+              <div class="metric-box"><div class="metric-label">Worst-Case Cost</div><div class="metric-value" id="mc_worst">—</div></div>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-chart-bar"></i> Readiness Distribution</div>
+            <div class="chart-wrap"><canvas id="chart_mc_hist"></canvas></div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-wind"></i> Tornado Chart — Variance Drivers</div>
+            <div class="chart-wrap-sm"><canvas id="chart_mc_tornado"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODULE 9: FAQ / METHODOLOGY ===== -->
+    <div class="module-pane" id="pane-faq">
+      <div class="faq-cat-filter">
+        <button class="faq-cat-btn active" onclick="filterFAQ('all')" aria-label="Show all FAQ categories">All</button>
+        <button class="faq-cat-btn" onclick="filterFAQ('criticality')" aria-label="Criticality FAQs">Criticality</button>
+        <button class="faq-cat-btn" onclick="filterFAQ('inventory')" aria-label="Inventory FAQs">Inventory</button>
+        <button class="faq-cat-btn" onclick="filterFAQ('sourcing')" aria-label="Sourcing FAQs">Sourcing</button>
+        <button class="faq-cat-btn" onclick="filterFAQ('lifecycle')" aria-label="Lifecycle FAQs">Lifecycle</button>
+        <button class="faq-cat-btn" onclick="filterFAQ('emerging')" aria-label="Emerging processes FAQs">Emerging</button>
+      </div>
+      <div class="faq-grid" id="faq_grid">
+        <!-- FAQs rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="calc-disclaimer">
+      <div class="disc-title"><i class="fas fa-circle-info"></i> Calculator Disclaimer</div>
+      <div class="disc-text">These are illustrative models using industry-typical default parameters. <strong>They are not a substitute for a full supply-chain analysis, professional procurement advice, or certified reliability engineering.</strong> All formulas are transparent and documented; always validate outputs against your site-specific data, supplier agreements, and failure history before making procurement decisions.</div>
+      <div class="disc-fine">Methodologies: FMECA (MIL-STD-1629A), Newsvendor / Critical-Fractile, Fill-Rate Safety Stock, METRIC/VARI-METRIC (Sherbrooke 1968/Slay 1984), Kraljic Matrix (HBR 1983), DMSMS lifecycle management. Citations shown in each module's methodology notes.</div>
+    </div>
+
+  </div><!-- /module-wrap -->
+</main>
+
+<!-- Share buttons -->
+<aside class="share-buttons" id="pageShare" aria-label="Share this page">
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-linkedin" aria-label="Share on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html&text=Critical+Spares+Engine+%E2%80%94+FMECA+criticality%2C+newsvendor+stock%2C+supplier+risk%2C+LTB+economics+for+DC+M%26E+spares" target="_blank" rel="noopener" class="share-btn sb-x" aria-label="Share on X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+  <a href="https://wa.me/?text=Critical+Spares+Engine+for+DC+M%26E+spare+parts+https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-whatsapp" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+  <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="share-btn sb-instagram" aria-label="Share on Instagram"><i class="fab fa-instagram"></i></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-facebook" aria-label="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
+</aside>
+
+<!-- Cookie banner -->
+<div class="cookie-banner" id="cookieBanner" role="region" aria-label="Cookie consent">
+  <p>We use cookies for analytics. See our <a href="privacy.html">privacy policy</a>.</p>
+  <div class="cookie-actions">
+    <button class="cookie-accept" id="cookieAccept">Accept</button>
+    <button class="cookie-decline" id="cookieDecline">Decline</button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>Critical Spares Engine</h4>
+      <p>Quantify spare-parts readiness, optimal stock levels, supplier risk, and last-time-buy economics for data-center M&amp;E equipment. Part of the resistancezero.com DC engineering toolkit.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Calculators</h4>
+      <a href="pue-calculator.html">PUE Calculator</a>
+      <a href="capex-calculator.html">CAPEX Calculator</a>
+      <a href="opex-calculator.html">OPEX Calculator</a>
+      <a href="roi-calculator.html">ROI Calculator</a>
+      <a href="tco-calculator.html">TCO Calculator</a>
+      <a href="tier-advisor.html">Tier Advisor</a>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="datacenter-solutions.html">DC Solutions Hub</a>
+      <a href="glossary.html">Glossary</a>
+      <a href="articles.html">Technical Articles</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Use</a>
+      <a href="index.html">Portfolio</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Bagus Dwi Permana · resistancezero.com</span>
+    <span class="version-stamp" id="rzVersionStamp"><a href="changelog.html" style="color:#475569;text-decoration:none;">v—</a></span>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="auth.js?v=2026-05-09-v1" defer></script>
+<script src="rz-engine.min.js?v=2026-05-09-v1" defer></script>
+<script src="script.min.js?v=2026-05-09-v1" defer></script>
+
+<script>
+/* ===================================================
+   CRITICAL SPARES ENGINE — Main Calculator Script
+   spares-readiness-calculator.html
+   Methodologies: FMECA, Newsvendor, Fill-Rate Safety Stock,
+   METRIC/MEIO (simplified), Kraljic, DMSMS, Monte-Carlo
+   =================================================== */
+(function() {
+'use strict';
+
+/* ── MATH HELPERS ── */
+
+// Beasley-Springer-Moro rational approximation of the inverse normal CDF
+// Returns z such that Φ(z) = p. Valid for 0 < p < 1.
+function normInvCDF(p) {
+  if (p <= 0) return -6;
+  if (p >= 1) return 6;
+  var a = [2.50662823884, -18.61500062529, 41.39119773534, -25.44106049637];
+  var b = [-8.47351093090, 23.08336743743, -21.06224101826, 3.13082909833];
+  var c = [0.3374754822726147, 0.9761690190917186, 0.1607979714918209,
+           0.0276438810333863, 0.0038405729373609, 0.0003951896511349,
+           0.0000321767881768, 0.0000002888167364, 0.0000003960315187];
+  var y = p - 0.5;
+  if (Math.abs(y) < 0.42) {
+    var r = y * y;
+    return y * (((a[3]*r+a[2])*r+a[1])*r+a[0]) / ((((b[3]*r+b[2])*r+b[1])*r+b[0])*r+1);
+  }
+  var r = (y < 0) ? p : 1 - p;
+  r = Math.log(-Math.log(r));
+  var z = c[0]+r*(c[1]+r*(c[2]+r*(c[3]+r*(c[4]+r*(c[5]+r*(c[6]+r*(c[7]+r*c[8])))))));
+  return (y < 0) ? -z : z;
+}
+
+// Standard normal CDF (rational approximation)
+function normCDF(x) {
+  var t = 1 / (1 + 0.2316419 * Math.abs(x));
+  var poly = t * (0.319381530 + t*(-0.356563782 + t*(1.781477937 + t*(-1.821255978 + t*1.330274429))));
+  var phi = 1 - (1/Math.sqrt(2*Math.PI)) * Math.exp(-0.5*x*x) * poly;
+  return x >= 0 ? phi : 1 - phi;
+}
+
+// Poisson CDF: P(X <= k) for rate lambda
+function poissonCDF(k, lambda) {
+  if (lambda <= 0) return (k >= 0) ? 1 : 0;
+  var sum = 0;
+  var term = Math.exp(-lambda);
+  if (!isFinite(term)) term = 0;
+  for (var i = 0; i <= k; i++) {
+    sum += term;
+    term *= lambda / (i + 1);
+    if (!isFinite(term)) break;
+  }
+  return Math.min(1, sum);
+}
+
+// NPV of cash flows (array indexed from t=0)
+function npv(rate, cashflows) {
+  var total = 0;
+  for (var t = 0; t < cashflows.length; t++) {
+    total += cashflows[t] / Math.pow(1 + rate, t);
+  }
+  return total;
+}
+
+// Clamp value
+function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
+
+// Format currency
+function fmt$(n) {
+  if (!isFinite(n)) return '—';
+  var abs = Math.abs(n);
+  if (abs >= 1e6) return (n < 0 ? '-' : '') + '$' + (abs/1e6).toFixed(2) + 'M';
+  if (abs >= 1e3) return (n < 0 ? '-' : '') + '$' + (abs/1e3).toFixed(1) + 'K';
+  return (n < 0 ? '-' : '') + '$' + abs.toFixed(0);
+}
+
+function fmtN(n, dec) {
+  if (!isFinite(n)) return '—';
+  dec = dec || 0;
+  return n.toFixed(dec);
+}
+
+function getVal(id, def) {
+  var el = document.getElementById(id);
+  if (!el) return def;
+  var v = parseFloat(el.value);
+  return isFinite(v) ? v : def;
+}
+function getStr(id, def) {
+  var el = document.getElementById(id);
+  return el ? el.value : (def || '');
+}
+function setHTML(id, html) {
+  var el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+function setText(id, text) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+/* ── CHART REGISTRY ── */
+var charts = {};
+function getOrCreateChart(id, type, data, options) {
+  if (charts[id]) { charts[id].destroy(); }
+  var ctx = document.getElementById(id);
+  if (!ctx) return null;
+  charts[id] = new Chart(ctx, { type: type, data: data, options: options });
+  return charts[id];
+}
+
+var amberColor = '#f59e0b';
+var amberLight = 'rgba(245,158,11,0.2)';
+var redColor = '#ef4444';
+var greenColor = '#10b981';
+var blueColor = '#3b82f6';
+
+/* ===========================================
+   MODULE 1: CRITICALITY SCORING (FMECA + RCM)
+   =========================================== */
+function calcCriticality() {
+  var lambda = clamp(getVal('c1_lambda', 0.25), 0.001, 20);
+  var installed = clamp(getVal('c1_installed', 4), 1, 1000);
+  var severity = clamp(getVal('c1_severity', 8), 1, 10);
+  var detect = clamp(getVal('c1_detectability', 6), 1, 10);
+  var redundancy = getStr('c1_redundancy', 'n1');
+  var alternates = clamp(getVal('c1_alternates', 1), 0, 20);
+
+  // Redundancy reduces effective severity
+  var redFactor = redundancy === '2n' ? 0.4 : (redundancy === 'n1' ? 0.65 : 1.0);
+  var sEff = severity * redFactor;
+
+  // FMECA Criticality Number Cm (simplified, annualised)
+  var cm = (sEff/10) * (detect/10) * lambda * installed;
+
+  // RPN = Seff * Detectability * Occurrence(scaled)
+  var rpn = Math.round(sEff * detect * Math.min(10, lambda * 10));
+
+  // Fleet failures per year
+  var fleetFail = lambda * installed;
+
+  // Alternates factor (more alternates = lower effective supply risk)
+  var altFactor = 1 / Math.max(1, alternates);
+
+  // Tier
+  var tier, tierClass, decision, decClass;
+  if (cm >= 0.5) { tier = 'VITAL'; tierClass = 'tier-vital'; decision = 'STOCK + DUAL-SOURCE'; decClass = 'status-red'; }
+  else if (cm >= 0.1) { tier = 'ESSENTIAL'; tierClass = 'tier-essential'; decision = 'STOCK'; decClass = 'status-yellow'; }
+  else { tier = 'DESIRABLE'; tierClass = 'tier-desirable'; decision = 'DON\'T STOCK (review)'; decClass = 'status-green'; }
+
+  setText('c1_cm', fmtN(cm, 3));
+  setText('c1_rpn', rpn.toString());
+  setText('c1_eff_sev', fmtN(sEff, 1));
+  setText('c1_fleet_fail', fmtN(fleetFail, 2));
+  setText('c1_alt_factor', fmtN(altFactor, 2));
+  setHTML('c1_tier_badge', '<span class="status-badge ' + tierClass + '">' + tier + '</span>');
+  setHTML('c1_decision_badge', '<span class="status-badge ' + decClass + '">' + decision + '</span>');
+
+  // Score driver bars
+  var bars = [
+    { label: 'Failure Rate λ', val: Math.min(100, lambda * 20), raw: fmtN(lambda, 2) + '/yr' },
+    { label: 'Eff. Severity', val: (sEff/10)*100, raw: fmtN(sEff, 1) + '/10' },
+    { label: 'Detectability', val: (detect/10)*100, raw: detect + '/10' },
+    { label: 'Installed Base', val: Math.min(100, (installed/20)*100), raw: installed + ' units' },
+    { label: 'Supply Exposure', val: (1 - 1/Math.max(1, alternates+0.5))*100, raw: alternates + ' alts' }
+  ];
+  var barsHtml = bars.map(function(b) {
+    return '<div class="score-bar-row"><span class="score-bar-label">' + b.label + '</span>' +
+      '<div class="score-bar-bg"><div class="score-bar-fill" style="width:' + b.val.toFixed(0) + '%"></div></div>' +
+      '<span class="score-bar-val">' + b.raw + '</span></div>';
+  }).join('');
+  setHTML('c1_score_bars', barsHtml);
+
+  // Bar chart
+  getOrCreateChart('chart_criticality', 'bar', {
+    labels: bars.map(function(b) { return b.label; }),
+    datasets: [{ label: 'Score Driver %', data: bars.map(function(b) { return +b.val.toFixed(1); }), backgroundColor: amberColor, borderRadius: 6 }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, max: 100, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 9 } } } }
+  });
+}
+
+/* ===========================================
+   MODULE 2: SPARE READINESS GAUGE
+   =========================================== */
+function calcReadiness() {
+  var required = clamp(getVal('r_required', 2), 1, 999);
+  var onhand = clamp(getVal('r_onhand', 1), 0, 999);
+  var poQty = clamp(getVal('r_po_qty', 1), 0, 999);
+  var ltWeeks = clamp(getVal('r_lt_weeks', 16), 1, 200);
+  var ltSigma = clamp(getVal('r_lt_sigma', 4), 0, 100);
+  var planHorizon = clamp(getVal('r_planning_horizon', 52), 1, 260);
+  var hasPO = getStr('r_has_po', 'yes') === 'yes';
+  var hasCommit = getStr('r_has_commit', 'yes') === 'yes';
+
+  var commitDate = getStr('r_commit_date', '');
+  var needDate = getStr('r_need_date', '');
+  var slackDays = null;
+  var commitOnTime = true;
+  if (commitDate && needDate) {
+    var cd = new Date(commitDate), nd = new Date(needDate);
+    slackDays = Math.round((nd - cd) / 86400000);
+    commitOnTime = slackDays >= 0;
+  }
+
+  // Confirmed supply: onhand + PO (if commit on time and confirmed, else 50%)
+  var poConfidence = (hasPO && hasCommit && commitOnTime) ? 1.0 : (hasPO && !commitOnTime ? 0.3 : (hasPO ? 0.5 : 0));
+  var confirmedSupply = onhand + poQty * poConfidence;
+  var readinessPct = Math.min(100, (confirmedSupply / required) * 100);
+  var gap = Math.max(0, required - confirmedSupply);
+
+  var status, statusClass;
+  if (readinessPct < 80 || (slackDays !== null && !commitOnTime)) { status = 'RED'; statusClass = 'status-red'; }
+  else if (readinessPct < 100 || (slackDays !== null && slackDays < 7)) { status = 'YELLOW'; statusClass = 'status-yellow'; }
+  else { status = 'GREEN'; statusClass = 'status-green'; }
+
+  setText('r_pct', readinessPct.toFixed(1) + '%');
+  setHTML('r_status_badge', '<span class="status-badge ' + statusClass + '">' + status + '</span>');
+  setText('r_confirmed', fmtN(confirmedSupply, 1));
+  setText('r_gap', gap > 0 ? fmtN(gap, 1) + ' units short' : 'None');
+  setText('r_slack_days', slackDays !== null ? (slackDays + ' days') : 'N/A');
+  setText('r_lt_ratio', fmtN(ltWeeks, 0) + ' / ' + fmtN(planHorizon, 0) + ' wks');
+  var slackLabel = slackDays !== null ? (slackDays >= 0 ? slackDays + ' days slack' : Math.abs(slackDays) + ' days LATE') : '';
+  setText('r_slack_text', slackLabel);
+
+  // Risk flags
+  var flags = [];
+  if (ltWeeks > planHorizon * 0.8) flags.push({ icon: 'fa-clock', text: 'Lead time (' + ltWeeks + 'wk) exceeds 80% of planning horizon (' + planHorizon + 'wk).' });
+  if (!hasCommit) flags.push({ icon: 'fa-circle-exclamation', text: 'No confirmed supplier commit date on record.' });
+  if (!hasPO) flags.push({ icon: 'fa-circle-exclamation', text: 'PO not yet raised — supply is unconfirmed.' });
+  if (onhand < (required * 0.3)) flags.push({ icon: 'fa-triangle-exclamation', text: 'On-hand inventory below 30% of required quantity.' });
+  if (slackDays !== null && !commitOnTime) flags.push({ icon: 'fa-ban', text: 'Supplier commit date (' + commitDate + ') is AFTER site need date (' + needDate + ').' });
+  if (ltSigma > ltWeeks * 0.4) flags.push({ icon: 'fa-wave-square', text: 'Lead-time variability (σ=' + ltSigma + 'wk) is high relative to base (' + ltWeeks + 'wk).' });
+
+  setHTML('r_flags', flags.length ? flags.map(function(f) {
+    return '<div class="risk-flag"><i class="fas ' + f.icon + '"></i><span>' + f.text + '</span></div>';
+  }).join('') : '<div class="risk-flag" style="color:var(--status-green);"><i class="fas fa-check-circle" style="color:#10b981;"></i><span>No critical risk flags.</span></div>');
+
+  // Recommended actions
+  var actions = [];
+  if (!hasPO) actions.push({ tag: 'act-immediate', label: 'Immediate', text: 'Raise PO immediately — unconfirmed supply.' });
+  if (!hasCommit) actions.push({ tag: 'act-immediate', label: 'Immediate', text: 'Contact supplier and obtain a committed delivery date.' });
+  if (slackDays !== null && !commitOnTime) actions.push({ tag: 'act-immediate', label: 'Immediate', text: 'Escalate delivery date — commit is past need-by. Explore airfreight or alternate supplier.' });
+  if (readinessPct < 80) actions.push({ tag: 'act-week', label: 'This week', text: 'Resolve readiness gap of ' + gap.toFixed(1) + ' units before next review cycle.' });
+  if (ltSigma > ltWeeks * 0.3) actions.push({ tag: 'act-week', label: 'This week', text: 'Negotiate improved lead-time commitment or qualify a regional hub supplier.' });
+  if (readinessPct >= 80 && readinessPct < 100) actions.push({ tag: 'act-month', label: 'This month', text: 'Close remaining readiness gap; consider partial on-hand buffer increase.' });
+  if (actions.length === 0) actions.push({ tag: 'act-month', label: 'Routine', text: 'Readiness looks healthy. Review at next standard cycle.' });
+
+  setHTML('r_actions', actions.map(function(a) {
+    return '<li><span class="act-tag ' + a.tag + '">' + a.label + '</span><span>' + a.text + '</span></li>';
+  }).join(''));
+
+  // Donut gauge chart
+  getOrCreateChart('chart_readiness', 'doughnut', {
+    labels: ['Confirmed', 'Gap'],
+    datasets: [{ data: [Math.min(100, readinessPct), Math.max(0, 100 - readinessPct)],
+      backgroundColor: [status === 'GREEN' ? greenColor : (status === 'YELLOW' ? amberColor : redColor), '#e2e8f0'],
+      borderWidth: 0, circumference: 270, rotation: 225 }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ctx.label + ': ' + ctx.parsed.toFixed(1) + '%'; } } } },
+    cutout: '72%'
+  });
+}
+
+/* ===========================================
+   MODULE 3: OPTIMAL STOCK LEVEL
+   =========================================== */
+function calcStock() {
+  var unitCost = clamp(getVal('s_unit_cost', 4500), 1, 1e8);
+  var cu = clamp(getVal('s_understk_cost', 85000), 1, 1e10); // under-stock cost
+  var carryRate = clamp(getVal('s_carry_rate', 25), 1, 100) / 100;
+  var partLife = clamp(getVal('s_part_life', 8), 1, 30);
+  var muAnnual = clamp(getVal('s_demand_mu', 1.0), 0.01, 500);
+  var sigmaAnnual = clamp(getVal('s_demand_sigma', 0.6), 0, 100);
+  var ltWeeks = clamp(getVal('s_lt_weeks', 16), 1, 200);
+  var ltSigma = clamp(getVal('s_lt_sigma', 4), 0, 100);
+  var fillRate = clamp(getVal('s_fill_rate', 99), 50, 99.99) / 100;
+  var installedBase = clamp(getVal('s_installed_base', 4), 1, 1000);
+  var poissonMode = document.getElementById('s_poisson_toggle') && document.getElementById('s_poisson_toggle').checked;
+
+  // Lead time in years
+  var L = ltWeeks / 52;
+  var sigmaL = ltSigma / 52;
+
+  // Demand during lead time (mean and sigma)
+  var muLT = muAnnual * L;
+  var sigmaLT = Math.sqrt(L * sigmaAnnual * sigmaAnnual + muAnnual * muAnnual * sigmaL * sigmaL);
+
+  // Over-stock cost (carrying through life)
+  var co = carryRate * unitCost * partLife;
+
+  // Critical ratio
+  var cr = cu / (cu + co);
+  cr = clamp(cr, 0.001, 0.999);
+
+  // Newsvendor Q*
+  var zCR = normInvCDF(cr);
+  var qStar = Math.max(0, Math.ceil(muLT + zCR * sigmaLT));
+
+  // Safety stock for fill-rate
+  var zFR = normInvCDF(fillRate);
+  var ss = Math.max(0, Math.ceil(zFR * sigmaLT));
+
+  // Reorder point
+  var rop = Math.max(0, Math.ceil(muLT + ss));
+
+  // Fill rate achieved at Q*
+  var fillAchieved = normCDF((qStar - muLT) / Math.max(sigmaLT, 0.0001));
+
+  // Total annual cost at Q*
+  var expectedOver = Math.max(0, qStar - muLT);
+  var expectedUnder = Math.max(0, muLT - qStar);
+  var annualCost = (co / partLife) * expectedOver + cu * muAnnual * (1 - fillAchieved);
+
+  setText('s_qstar', qStar.toString() + ' units');
+  setText('s_ss', ss.toString() + ' units');
+  setText('s_rop', rop.toString() + ' units');
+  setText('s_cr', cr.toFixed(3));
+  setText('s_fill_achieved', (fillAchieved * 100).toFixed(1) + '%');
+  setText('s_total_cost', fmt$(annualCost) + '/yr');
+
+  // Poisson table
+  var poissonPanel = document.getElementById('s_poisson_panel');
+  if (poissonMode) {
+    var annualLambda = installedBase * muAnnual;
+    var lambdaLT = annualLambda * L;
+    var rows = '';
+    for (var k = 0; k <= Math.ceil(lambdaLT * 3) + 2 && k <= 10; k++) {
+      var pSO = 1 - poissonCDF(k, lambdaLT);
+      var highlight = (pSO < (1 - fillRate)) ? ' class="highlight-row"' : '';
+      rows += '<tr' + highlight + '><td>' + k + '</td><td>' + lambdaLT.toFixed(2) + '</td><td>' + (pSO * 100).toFixed(2) + '%</td><td>' + (poissonCDF(k, lambdaLT)*100).toFixed(1) + '%</td></tr>';
+    }
+    setHTML('s_poisson_table', '<table class="table-sm"><thead><tr><th>Stock Level</th><th>λ_LT</th><th>P(Stockout)</th><th>P(≤k)</th></tr></thead><tbody>' + rows + '</tbody></table>');
+    if (poissonPanel) poissonPanel.style.display = 'block';
+  } else {
+    if (poissonPanel) poissonPanel.style.display = 'none';
+  }
+
+  // Cost curve chart
+  var stockRange = [], costs = [];
+  for (var q = 0; q <= Math.max(qStar + 5, 10); q++) {
+    stockRange.push(q);
+    var pFill = normCDF((q - muLT) / Math.max(sigmaLT, 0.0001));
+    var c = (co / partLife) * Math.max(0, q - muLT) + cu * muAnnual * (1 - pFill);
+    costs.push(+c.toFixed(0));
+  }
+  var bgColors = stockRange.map(function(q) { return q === qStar ? '#ef4444' : amberColor; });
+  getOrCreateChart('chart_stock', 'bar', {
+    labels: stockRange.map(function(q) { return 'Q=' + q; }),
+    datasets: [{ label: 'Annual Cost ($)', data: costs, backgroundColor: bgColors, borderRadius: 5 }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return '$' + ctx.parsed.y.toLocaleString(); } } } },
+    scales: { y: { beginAtZero: true, ticks: { font: { size: 10 }, callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } } }, x: { ticks: { font: { size: 9 } } } }
+  });
+}
+
+/* ===========================================
+   MODULE 4: MULTI-SITE HUB POSITIONING
+   =========================================== */
+function calcHub() {
+  var sites = clamp(getVal('h_sites', 4), 1, 50);
+  var partTypes = clamp(getVal('h_part_types', 6), 1, 200);
+  var oemLT = clamp(getVal('h_oem_lt', 20), 1, 200);  // weeks
+  var hubLT = clamp(getVal('h_hub_lt', 0.5), 0.1, 50);  // weeks
+  var unitCost = clamp(getVal('h_unit_cost', 4500), 1, 1e8);
+  var budget = clamp(getVal('h_budget', 200000), 1, 1e12);
+  var demandPerSite = clamp(getVal('h_demand_per_site', 0.5), 0.01, 100); // units/yr per part type
+  var targetReadiness = clamp(getVal('h_target_readiness', 95), 50, 99.9) / 100;
+
+  // Total fleet demand per year
+  var totalFleetDemand = demandPerSite * sites * partTypes;
+
+  // Without hub: demand during OEM lead time
+  var demandDuringOEM = totalFleetDemand * (oemLT / 52);
+
+  // With hub: regional hub covers demand during hub-to-site lead time
+  var demandDuringHubLT = totalFleetDemand * (hubLT / 52);
+  var demandForSites = totalFleetDemand * ((oemLT - hubLT) / 52) / sites; // per site demand window
+  var safetyFactor = 1 + normInvCDF(targetReadiness) * 0.3; // z * CV
+
+  // Hub stock sizing (cover demand during hub-to-site LT + safety)
+  var hubStock = Math.ceil(demandDuringHubLT * safetyFactor);
+  // Per-site stock (cover demand during OEM LT minus hub coverage)
+  var perSiteStock = Math.max(1, Math.ceil(demandForSite(demandPerSite, partTypes, oemLT, hubLT) * safetyFactor));
+  var sitesTotal = perSiteStock * sites;
+
+  function demandForSite(d, pt, oemW, hubW) {
+    return d * pt * ((oemW - hubW) / 52) / sites;
+  }
+
+  // Budget allocation
+  var hubCostTotal = hubStock * unitCost;
+  var sitesCostTotal = sitesTotal * unitCost;
+  var remainingBudget = budget - hubCostTotal - sitesCostTotal;
+  var depotStock = Math.max(0, Math.floor(remainingBudget / unitCost));
+
+  var totalStock = hubStock + sitesTotal + depotStock;
+
+  // Fleet readiness estimate (no hub vs hub)
+  var noHubStock = Math.floor(budget / unitCost);
+  var readinessNoHub = Math.min(100, (noHubStock / (demandDuringOEM * safetyFactor)) * 100);
+  var readinessHub = Math.min(100, (totalStock / (demandDuringOEM * safetyFactor)) * 100);
+  var hubDelta = readinessHub - readinessNoHub;
+
+  var hubExtraCost = Math.max(0, (hubStock * unitCost) - (noHubStock * unitCost * 0.1));
+
+  setText('h_depot', depotStock + ' units');
+  setText('h_hub', hubStock + ' units');
+  setText('h_sites_stock', sitesTotal + ' units (' + perSiteStock + '/site)');
+  setText('h_fleet_read', readinessHub.toFixed(1) + '%');
+  setText('h_hub_delta', (hubDelta >= 0 ? '+' : '') + hubDelta.toFixed(1) + '%');
+  setText('h_hub_cost', fmt$(hubStock * unitCost));
+
+  var rec;
+  if (hubDelta > 10) rec = '<strong>Hub recommended:</strong> A regional hub improves fleet readiness by ' + hubDelta.toFixed(1) + '%. Hub collapses lead time from ' + oemLT + 'wk (OEM) to ' + hubLT + 'wk, reducing exposure on ' + sites + ' sites.';
+  else if (hubDelta > 3) rec = '<strong>Hub marginally beneficial:</strong> +' + hubDelta.toFixed(1) + '% readiness gain. Evaluate whether hub overhead (logistics, insurance, management) is justified for ' + sites + '-site fleet.';
+  else rec = '<strong>Hub not required at this fleet size:</strong> Readiness gain is &lt;3%. Centralise stock at depot and improve direct OEM lead times through MSA commitments.';
+  setHTML('h_recommendation', rec);
+
+  // Stacked bar chart
+  getOrCreateChart('chart_hub', 'bar', {
+    labels: ['No Hub', 'With Hub'],
+    datasets: [
+      { label: 'Depot', data: [noHubStock, depotStock], backgroundColor: blueColor, borderRadius: 4 },
+      { label: 'Hub', data: [0, hubStock], backgroundColor: amberColor, borderRadius: 4 },
+      { label: 'Sites', data: [0, sitesTotal], backgroundColor: greenColor, borderRadius: 4 }
+    ]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+    scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { font: { size: 10 } } } }
+  });
+}
+
+/* ===========================================
+   MODULE 5: SUPPLIER RISK INDEX
+   =========================================== */
+var srDimLabels = ['Financial', 'Single-Source', 'Geo Conc.', 'LT Volatility', 'OTIF (inv)', 'Capacity (inv)', 'Geopolitical', 'Contract'];
+function calcSupplierRisk() {
+  var financial = clamp(getVal('sr_financial', 6), 1, 10);
+  var singleSource = getStr('sr_single_source', 'dual');
+  var geoCon = clamp(getVal('sr_geo_conc', 7), 1, 10);
+  var ltVol = clamp(getVal('sr_lt_vol', 7), 1, 10);
+  var otif = clamp(getVal('sr_otif', 78), 0, 100);
+  var capacity = clamp(getVal('sr_capacity', 20), 0, 100);
+  var geo2 = clamp(getVal('sr_geopolitical', 6), 1, 10);
+  var contract = getStr('sr_contract', 'sow');
+  var spendImpact = clamp(getVal('sr_spend_impact', 7), 1, 10);
+
+  // Normalise each dimension to risk 0-10 (higher = more risk)
+  var finRisk = 11 - financial; // financial strength => risk = inverse
+  var ssRisk = singleSource === 'single' ? 9 : (singleSource === 'dual' ? 5 : 2);
+  var otifRisk = (100 - otif) / 10; // low OTIF = high risk
+  var capRisk = (100 - capacity) / 10; // low headroom = high risk
+  var contractRisk = contract === 'none' ? 9 : (contract === 'po' ? 6 : (contract === 'sow' ? 4 : 2));
+
+  // Weights (sum to ~100%)
+  var dims = [finRisk, ssRisk, geoCon, ltVol, otifRisk, capRisk, geo2, contractRisk];
+  var weights = [0.15, 0.20, 0.12, 0.15, 0.18, 0.10, 0.10, 0.00]; // contract handled as modifier
+  var contractAdj = contractRisk * 0.05; // contract adds 0-0.45 to risk
+
+  var score = 0;
+  for (var i = 0; i < 7; i++) score += (dims[i] / 10) * weights[i] * 100;
+  score += contractAdj * 10;
+  score = clamp(score, 0, 100);
+
+  var band, bandClass;
+  if (score < 30) { band = 'LOW RISK'; bandClass = 'status-green'; }
+  else if (score < 60) { band = 'MEDIUM RISK'; bandClass = 'status-yellow'; }
+  else if (score < 80) { band = 'HIGH RISK'; bandClass = 'status-red'; }
+  else { band = 'CRITICAL RISK'; bandClass = 'status-red'; }
+
+  // Kraljic quadrant
+  var supplyRiskDim = score / 10; // 0-10 from composite
+  var spendDim = spendImpact; // 1-10 direct input
+  var quadrant, quadrantBg;
+  if (supplyRiskDim >= 5 && spendDim >= 5) { quadrant = 'Strategic'; quadrantBg = 'rgba(239,68,68,0.12)'; }
+  else if (supplyRiskDim >= 5 && spendDim < 5) { quadrant = 'Bottleneck'; quadrantBg = 'rgba(245,158,11,0.12)'; }
+  else if (supplyRiskDim < 5 && spendDim >= 5) { quadrant = 'Leverage'; quadrantBg = 'rgba(59,130,246,0.12)'; }
+  else { quadrant = 'Non-Critical'; quadrantBg = 'rgba(16,185,129,0.10)'; }
+
+  setText('sr_score', score.toFixed(0) + ' / 100');
+  setHTML('sr_band_badge', '<span class="status-badge ' + bandClass + '">' + band + '</span>');
+  setHTML('sr_kraljic_badge', '<span class="status-badge status-blue">Kraljic: ' + quadrant + '</span>');
+
+  var strategies = {
+    'Strategic': '<strong>Objective:</strong> Long-term partnership, joint risk mitigation. <strong>Sourcing:</strong> 2 strategic partners, 1 pre-qualified alternate. <strong>Contract:</strong> MSA with EOL notice clause, indexed pricing, reserved capacity. <strong>Negotiation levers:</strong> volume commitment, tech roadmap alignment, co-investment. <strong>Risk controls:</strong> safety stock ≥ 2× MTTR demand, dual qualification, geo-diversification.',
+    'Bottleneck': '<strong>Objective:</strong> Secure supply first, cost second. <strong>Sourcing:</strong> Pre-qualify at least 1 alternate; consider in-house refurb or 3D-print for printable parts. <strong>Contract:</strong> SOW with committed lead times and allocation rights. <strong>Risk controls:</strong> buffer stock ≥ 6 months demand; DMSMS monitoring; LTB rights clause.',
+    'Leverage': '<strong>Objective:</strong> Cost reduction through volume and competition. <strong>Sourcing:</strong> 3+ qualified suppliers, competitive tender each cycle. <strong>Contract:</strong> Frame agreement with aggressive volume tiers. <strong>Negotiation levers:</strong> volume, multi-year commitment in exchange for price guarantee. <strong>Risk controls:</strong> standard safety stock; no single-source dependency.',
+    'Non-Critical': '<strong>Objective:</strong> Minimise transaction cost. <strong>Sourcing:</strong> Catalog / MRO purchasing, e-procurement, P-card. <strong>Contract:</strong> Master catalog agreement or spot buy. <strong>Risk controls:</strong> low safety stock; re-order point trigger.'
+  };
+  setHTML('sr_strategy', strategies[quadrant]);
+
+  // Radar chart — 7 risk dimensions
+  var radarVals = dims.slice(0, 7).map(function(d) { return +(d * 10).toFixed(0); });
+  getOrCreateChart('chart_supplier', 'radar', {
+    labels: srDimLabels.slice(0, 7),
+    datasets: [{ label: 'Risk Score', data: radarVals, backgroundColor: 'rgba(245,158,11,0.15)', borderColor: amberColor, pointBackgroundColor: amberColor, pointRadius: 4 }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { r: { min: 0, max: 100, beginAtZero: true, ticks: { font: { size: 9 }, stepSize: 20 }, pointLabels: { font: { size: 9 } } } }
+  });
+}
+
+/* ===========================================
+   MODULE 6: LAST-TIME-BUY / DMSMS
+   =========================================== */
+function calcLTB() {
+  var supportYrs = clamp(getVal('ltb_support_yrs', 8), 1, 30);
+  var demandYr = clamp(getVal('ltb_demand_yr', 1.2), 0.01, 500);
+  var onhand = clamp(getVal('ltb_onhand', 2), 0, 9999);
+  var openPO = clamp(getVal('ltb_open_po', 0), 0, 9999);
+  var unitCost = clamp(getVal('ltb_unit_cost', 4500), 1, 1e8);
+  var carryRate = clamp(getVal('ltb_carry_rate', 22), 1, 100) / 100;
+  var scrapRisk = clamp(getVal('ltb_scrap_risk', 20), 0, 100) / 100;
+  var altQualCost = clamp(getVal('ltb_alt_qual_cost', 60000), 0, 1e9);
+  var altQualLT = clamp(getVal('ltb_alt_qual_lt', 18), 1, 60); // months
+  var discountRate = clamp(getVal('ltb_discount', 8), 0, 30) / 100;
+  var criticality = clamp(getVal('ltb_criticality', 8), 1, 10);
+  var qualAlts = clamp(getVal('ltb_qual_alternates', 0), 0, 20);
+  var installedUnits = clamp(getVal('c1_installed', 4), 1, 1000); // carry over from module 1
+
+  var safetyFactor = 1.15;
+  var rawLTB = demandYr * supportYrs * safetyFactor - onhand - openPO;
+  var ltbQty = Math.max(0, Math.ceil(rawLTB));
+
+  var ltbTotal = ltbQty * unitCost;
+
+  // Cumulative carrying cost (avg half of LTB stock throughout life)
+  var avgInventory = ltbQty / 2;
+  var cumulativeCarry = avgInventory * unitCost * carryRate * supportYrs;
+
+  // EOL Exposure Score
+  var eolScore = (installedUnits * criticality * supportYrs) / Math.max(1, qualAlts);
+
+  var eolBand, eolClass;
+  if (eolScore < 50) { eolBand = 'LOW EOL EXPOSURE'; eolClass = 'status-green'; }
+  else if (eolScore < 150) { eolBand = 'MEDIUM EOL EXPOSURE'; eolClass = 'status-yellow'; }
+  else if (eolScore < 300) { eolBand = 'HIGH EOL EXPOSURE'; eolClass = 'status-red'; }
+  else { eolBand = 'CRITICAL EOL EXPOSURE'; eolClass = 'status-red'; }
+
+  // NPV Option A: Buy LTB stock now + carry + scrap risk
+  var cfA = [];
+  cfA.push(-ltbTotal); // t=0: buy stock
+  for (var t = 1; t <= supportYrs; t++) {
+    // Carrying cost each year (decreasing as stock depletes)
+    var avgLeft = Math.max(0, ltbQty - demandYr * t + demandYr / 2);
+    var carryThisYr = avgLeft * unitCost * carryRate;
+    cfA.push(-carryThisYr);
+  }
+  // Scrap value at end: unused units × cost × (1 - scrap risk)
+  var unusedUnits = Math.max(0, ltbQty - demandYr * supportYrs);
+  cfA[supportYrs] += unusedUnits * unitCost * (1 - scrapRisk) - unusedUnits * unitCost * scrapRisk;
+  var npvA = npv(discountRate, cfA);
+
+  // NPV Option B: Qualify alternate (cost upfront, delayed) + run alternate
+  var altQualYrs = altQualLT / 12;
+  var cfB = [];
+  cfB.push(-altQualCost); // qualification cost at t=0
+  // During qualification period: need to source from spot market at premium (20%)
+  for (var t = 0; t < supportYrs; t++) {
+    var yearCost = t < altQualYrs ? -(demandYr * unitCost * 1.20) : -(demandYr * unitCost * 0.90);
+    cfB.push(yearCost);
+  }
+  var npvB = npv(discountRate, cfB);
+
+  var decision, decClass;
+  if (npvB < npvA) { decision = 'REQUALIFY (Option B better)'; decClass = 'status-blue'; }
+  else { decision = 'BUY LTB (Option A better)'; decClass = 'status-yellow'; }
+
+  setText('ltb_qty', ltbQty + ' units');
+  setText('ltb_total', fmt$(ltbTotal));
+  setText('ltb_carry', fmt$(cumulativeCarry));
+  setText('ltb_eol_score', eolScore.toFixed(0));
+  setHTML('ltb_decision_badge', '<span class="status-badge ' + decClass + '">' + decision + '</span>');
+  setHTML('ltb_eol_band', '<span class="status-badge ' + eolClass + '">' + eolBand + '</span>');
+  setText('ltb_npv_a', fmt$(npvA));
+  setText('ltb_npv_b', fmt$(npvB));
+
+  // Bar chart: NPV comparison
+  getOrCreateChart('chart_ltb', 'bar', {
+    labels: ['Option A: LTB Stock', 'Option B: Requalify'],
+    datasets: [{ data: [npvA, npvB], backgroundColor: [npvA >= npvB ? amberColor : '#94a3b8', npvB > npvA ? amberColor : '#94a3b8'], borderRadius: 8 }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return '$' + ctx.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0}); } } } },
+    scales: { y: { ticks: { font: { size: 10 }, callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } } }, x: { ticks: { font: { size: 10 } } } }
+  });
+}
+
+/* ===========================================
+   MODULE 7: KRALJIC SOURCING STRATEGY
+   =========================================== */
+function calcKraljic() {
+  var supplyRisk = clamp(getVal('kq_supply_risk', 7), 1, 10);
+  var spendImpact = clamp(getVal('kq_spend_impact', 8), 1, 10);
+  var criticality = clamp(getVal('kq_criticality', 8), 1, 10);
+  var qualSuppliers = clamp(getVal('kq_qual_suppliers', 1), 0, 20);
+  var commodity = getStr('kq_commodity_kq', 'switchgear');
+
+  // Quadrant determination (midpoint = 5.5)
+  var highRisk = supplyRisk >= 5.5;
+  var highSpend = spendImpact >= 5.5;
+
+  var quadrant, qClass;
+  if (highRisk && highSpend) { quadrant = 'Strategic'; qClass = 'status-red'; }
+  else if (highRisk && !highSpend) { quadrant = 'Bottleneck'; qClass = 'status-yellow'; }
+  else if (!highRisk && highSpend) { quadrant = 'Leverage'; qClass = 'status-blue'; }
+  else { quadrant = 'Non-Critical'; qClass = 'status-green'; }
+
+  // Highlight active cell
+  ['strategic','bottleneck','leverage','noncritical'].forEach(function(q) {
+    var el = document.getElementById('kq-' + q);
+    if (el) el.classList.remove('kq-active');
+  });
+  var activeKey = quadrant.toLowerCase().replace('-','');
+  var activeEl = document.getElementById('kq-' + activeKey);
+  if (activeEl) activeEl.classList.add('kq-active');
+
+  setHTML('kq_quadrant_badge', '<span class="status-badge ' + qClass + '">' + quadrant + '</span>');
+
+  var strategyBriefs = {
+    'Strategic': '<strong>Objective:</strong> Long-term value creation, joint risk management, innovation access.<br><strong>Sourcing approach:</strong> Strategic partnership; 2 preferred suppliers + 1 qualified backup.<br><strong>Contract type:</strong> MSA with multi-year commitment, EOL notification clause, capacity reservation, raw-material price indexing.<br><strong>Negotiation levers:</strong> Volume commitment, technology access, co-development, shared forecasting.<br><strong>Risk mitigation:</strong> Dual source, geographic diversification, DMSMS monitoring, safety stock 3–6 months demand.<br><strong>Implementation:</strong> (1) Map supply chain to Tier-3 → (2) Joint BCP → (3) Annual strategic review → (4) Continuous alternate qualification.',
+    'Bottleneck': '<strong>Objective:</strong> Security of supply; remove single-source risk.<br><strong>Sourcing approach:</strong> Qualify at least 1 alternate (domestic/regional preferred). Explore additive manufacturing for printable parts.<br><strong>Contract type:</strong> SOW with committed lead times, allocation priority, last-time-buy rights.<br><strong>Negotiation levers:</strong> Exclusivity in exchange for capacity guarantee, technical support access.<br><strong>Risk mitigation:</strong> Safety buffer ≥ 6 months demand; activate refurb/circular supply; consider vendor-managed inventory near site.<br><strong>Implementation:</strong> (1) Identify qualified alternates → (2) Place LTB or blanket order → (3) Expedite alternate qualification to &lt;12 months.',
+    'Leverage': '<strong>Objective:</strong> Cost reduction through market competition.<br><strong>Sourcing approach:</strong> 3+ qualified suppliers; competitive tender every 12–24 months.<br><strong>Contract type:</strong> Frame agreement with volume tiers and spot-buy flexibility.<br><strong>Negotiation levers:</strong> Volume bundling across sites, multi-year price lock, rebates, preferred-pricing schedules.<br><strong>Risk mitigation:</strong> Standard safety stock; supplier performance scorecards; quarterly review.<br><strong>Implementation:</strong> (1) Consolidate volume → (2) Run RFQ/RFP → (3) Award split across 2-3 suppliers → (4) Review annually.',
+    'Non-Critical': '<strong>Objective:</strong> Minimise transaction cost and admin overhead.<br><strong>Sourcing approach:</strong> MRO / catalog buying; e-procurement; P-card for low-value items.<br><strong>Contract type:</strong> Blanket catalog agreement or spot buy.<br><strong>Negotiation levers:</strong> Consolidated catalog spend, standardisation, self-service ordering.<br><strong>Risk mitigation:</strong> Low safety stock; auto-replenishment at reorder point; no supplier dependency management required.<br><strong>Implementation:</strong> (1) Onboard to e-catalog → (2) Set reorder triggers → (3) Annual catalog price review.'
+  };
+
+  setHTML('kq_strategy_text', strategyBriefs[quadrant]);
+}
+
+/* ===========================================
+   MODULE 8: MONTE-CARLO SCENARIO
+   =========================================== */
+function updateMCLabels() { /* inputs updated, run not triggered until button press */ }
+
+// Box-Muller normal variate
+function randNorm(mu, sigma) {
+  var u1 = Math.random(), u2 = Math.random();
+  var z = Math.sqrt(-2 * Math.log(Math.max(u1, 1e-12))) * Math.cos(2 * Math.PI * u2);
+  return mu + sigma * z;
+}
+
+function runMonteCarlo() {
+  var ltBase = clamp(getVal('mc_lt_base', 16), 1, 200);
+  var ltSigma = clamp(getVal('mc_lt_sigma', 6), 0, 100);
+  var demandBase = clamp(getVal('mc_demand_base', 1.0), 0.01, 500);
+  var demandSigma = clamp(getVal('mc_demand_sigma', 0.5), 0, 100);
+  var supRelBase = clamp(getVal('mc_sup_rel', 85), 10, 100);
+  var supSigma = clamp(getVal('mc_sup_sigma', 10), 0, 30);
+  var downtimeCost = clamp(getVal('mc_downtime_cost', 50000), 1, 1e9);
+  var stockLevel = clamp(getVal('mc_stock_level', 2), 0, 100);
+  var mttr = clamp(getVal('mc_mttr', 168), 1, 8760);
+  var iterations = parseInt(getStr('mc_iterations', '1000')) || 1000;
+
+  var btn = document.getElementById('mc_run_btn');
+  if (btn) btn.disabled = true;
+
+  // Defer to avoid blocking UI
+  setTimeout(function() {
+    var readinessSamples = [], downtimeSamples = [], stockouts = 0;
+    var ltVariances = [], demandVariances = [], relVariances = [];
+
+    for (var i = 0; i < iterations; i++) {
+      var lt = Math.max(1, randNorm(ltBase, ltSigma));
+      var demand = Math.max(0, randNorm(demandBase, demandSigma));
+      var relPct = clamp(randNorm(supRelBase, supSigma), 0, 100);
+
+      // Demand during lead time
+      var demandDuringLT = demand * (lt / 52);
+      // Available supply = stockLevel * reliability factor
+      var effectiveSupply = stockLevel * (relPct / 100);
+      // Readiness
+      var readiness = Math.min(100, effectiveSupply / Math.max(demandDuringLT, 0.0001) * 100);
+      readinessSamples.push(readiness);
+
+      // Downtime cost if stockout
+      var isStockout = effectiveSupply < demandDuringLT;
+      if (isStockout) {
+        stockouts++;
+        var dwnCost = downtimeCost * mttr;
+        downtimeSamples.push(dwnCost);
+      } else {
+        downtimeSamples.push(0);
+      }
+
+      // For tornado: variance of each input
+      ltVariances.push(lt);
+      demandVariances.push(demand);
+      relVariances.push(relPct);
+    }
+
+    readinessSamples.sort(function(a, b) { return a - b; });
+    var p10 = readinessSamples[Math.floor(iterations * 0.10)];
+    var p50 = readinessSamples[Math.floor(iterations * 0.50)];
+    var p90 = readinessSamples[Math.floor(iterations * 0.90)];
+    var pStockout = stockouts / iterations;
+    var avgDowntime = downtimeSamples.reduce(function(s, v) { return s + v; }, 0) / iterations;
+    var maxDowntime = Math.max.apply(null, downtimeSamples);
+
+    setText('mc_pstockout', (pStockout * 100).toFixed(1) + '%');
+    setText('mc_p10', p10.toFixed(1) + '%');
+    setText('mc_p50', p50.toFixed(1) + '%');
+    setText('mc_p90', p90.toFixed(1) + '%');
+    setText('mc_exp_down', fmt$(avgDowntime));
+    setText('mc_worst', fmt$(maxDowntime));
+
+    // Histogram
+    var bins = 20;
+    var histData = new Array(bins).fill(0);
+    var binLabels = [];
+    for (var b = 0; b < bins; b++) {
+      var lo = b * (100 / bins), hi = (b + 1) * (100 / bins);
+      binLabels.push(lo.toFixed(0) + '–' + hi.toFixed(0) + '%');
+    }
+    readinessSamples.forEach(function(r) {
+      var bi = Math.min(bins - 1, Math.floor(r / (100 / bins)));
+      histData[bi]++;
+    });
+    getOrCreateChart('chart_mc_hist', 'bar', {
+      labels: binLabels,
+      datasets: [{ label: 'Count', data: histData, backgroundColor: amberColor, borderRadius: 4 }]
+    }, {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { font: { size: 8 }, maxRotation: 45 } }, y: { beginAtZero: true, ticks: { font: { size: 9 } } } }
+    });
+
+    // Tornado chart: variance contribution of each input
+    function computeVariance(arr) {
+      var mean = arr.reduce(function(s, v) { return s + v; }, 0) / arr.length;
+      return arr.reduce(function(s, v) { return s + (v - mean) * (v - mean); }, 0) / arr.length;
+    }
+    // Correlate each input variance with readiness variance
+    function corrCoeff(xs, ys) {
+      var n = xs.length;
+      var mx = xs.reduce(function(s,v){return s+v;},0)/n;
+      var my = ys.reduce(function(s,v){return s+v;},0)/n;
+      var num = xs.reduce(function(s,v,i){return s+(v-mx)*(ys[i]-my);},0);
+      var dx = Math.sqrt(xs.reduce(function(s,v){return s+(v-mx)*(v-mx);},0));
+      var dy = Math.sqrt(ys.reduce(function(s,v){return s+(v-my)*(v-my);},0));
+      return (dx*dy > 0) ? Math.abs(num / (dx * dy)) : 0;
+    }
+    var rAll = [];
+    for (var i2 = 0; i2 < iterations; i2++) {
+      var lt2 = Math.max(1, randNorm(ltBase, ltSigma));
+      var d2 = Math.max(0, randNorm(demandBase, demandSigma));
+      var rel2 = clamp(randNorm(supRelBase, supSigma), 0, 100);
+      var dlt2 = d2 * (lt2 / 52);
+      var eff2 = stockLevel * (rel2 / 100);
+      rAll.push(Math.min(100, eff2 / Math.max(dlt2, 0.0001) * 100));
+    }
+    var corrLT = corrCoeff(ltVariances, rAll);
+    var corrDemand = corrCoeff(demandVariances, rAll);
+    var corrRel = corrCoeff(relVariances, rAll);
+
+    getOrCreateChart('chart_mc_tornado', 'bar', {
+      labels: ['Lead Time', 'Demand Variability', 'Supplier Reliability'],
+      datasets: [{ label: 'Correlation with Readiness', data: [corrLT, corrDemand, corrRel].map(function(v) { return +(v * 100).toFixed(1); }), backgroundColor: [amberColor, blueColor, greenColor], borderRadius: 6 }]
+    }, {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, max: 100, ticks: { font: { size: 10 }, callback: function(v) { return v + '%'; } } }, y: { ticks: { font: { size: 10 } } } }
+    });
+
+    if (btn) btn.disabled = false;
+  }, 20);
+}
+
+/* ===========================================
+   MODULE 9: FAQ / METHODOLOGY
+   =========================================== */
+var faqData = [
+  { cat: 'criticality', q: 'What is FMECA and how does it drive spares decisions?', a: 'FMECA (Failure Modes, Effects and Criticality Analysis — MIL-STD-1629A) systematically identifies failure modes for each component, assesses failure effect severity, failure-mode occurrence probability, and detectability. The Criticality Number C<sub>m</sub> = β × α × λ<sub>p</sub> × t combines these into a single score. Parts with high C<sub>m</sub> in Category I/II effect (site outage, safety) must be stocked. <a href="https://quality-one.com/fmeca/" target="_blank" rel="noopener">Quality-One FMECA guide</a>.' },
+  { cat: 'criticality', q: 'What is RCM criticality ranking?', a: 'Reliability-Centered Maintenance (RCM) ranks equipment by <em>consequence × likelihood × detectability</em> of failure. A criticality matrix sorts assets into Vital / Essential / Desirable tiers. Only VITAL and high-ESSENTIAL items warrant routine on-site stocking; others are reviewed case-by-case. Redundancy (N+1, 2N) reduces effective severity for RCM scoring — a failure of a component in a fully redundant system has lower operational consequence than in a non-redundant system.' },
+  { cat: 'criticality', q: 'What are VED and ABC-XYZ analyses?', a: '<strong>VED</strong> (Vital / Essential / Desirable) is a rapid 3-bucket criticality sort used when full FMECA data is unavailable. <strong>ABC</strong> ranks by spend (A = top 10% of items driving 70% of cost). <strong>XYZ</strong> classifies by demand variability (X = stable demand, Z = erratic/intermittent). The 9-cell ABC-XYZ matrix gives a stocking policy per cell: A-X → managed safety stock; C-Z (slow movers) → Poisson model or zero-stock.' },
+  { cat: 'inventory', q: 'How does the Newsvendor / Critical-Fractile model work?', a: 'The newsvendor model finds optimal stock Q* where the critical ratio <code>CR = C<sub>u</sub> / (C<sub>u</sub> + C<sub>o</sub>)</code> equals the probability P(demand ≤ Q*). C<sub>u</sub> = under-stock cost (downtime cost × MTTR + expedite premium); C<sub>o</sub> = over-stock cost (carrying cost over part life). For critical DC spares C<sub>u</sub> ≫ C<sub>o</sub>, pushing CR close to 1 and Q* higher. The inverse normal CDF translates CR to Q* given demand distribution. Ref: <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.31.10.1247" target="_blank" rel="noopener">Sherbrooke 1985</a>.' },
+  { cat: 'inventory', q: 'What is fill-rate safety stock and how does lead-time variability factor in?', a: 'Fill-rate safety stock targets a specific service level (e.g. 99% fill rate) using <code>SS = z(FR) × σ<sub>LT</sub></code> where z is the standard normal inverse at the fill rate and <code>σ<sub>LT</sub> = √(L × σ<sub>D</sub>² + μ<sub>D</sub>² × σ<sub>L</sub>²)</code> combines demand variability during lead time and uncertainty from variable lead time itself. High lead-time variability (σ<sub>L</sub> large) can dominate — this is why DC M&amp;E lead-time reduction is the highest-leverage lever.' },
+  { cat: 'inventory', q: 'When should I use the Poisson mode instead of Normal?', a: 'Use the Poisson (or compound-Poisson) demand model when: (1) annual demand &lt; 5 units/yr per part type, (2) demand is driven by discrete failure events (λ = installed base × AFR), and (3) lead times are long relative to demand rate. The normal distribution can over-estimate P(stockout) for sparse demand. This calculator uses Poisson CDF: <code>P(stockout) = 1 − Σ<sub>k=0</sub><sup>S−1</sup> e<sup>−λ_LT</sup> λ_LT<sup>k</sup>/k!</code> for each candidate stock level S.' },
+  { cat: 'inventory', q: 'What is METRIC / VARI-METRIC and how does the hub positioning module use it?', a: 'METRIC (Multi-Echelon Technique for Recoverable Item Control, Sherbrooke 1968) minimises expected backorders across a supply network (sites → depot) for a given budget. VARI-METRIC (Slay 1984) adds variance correction bringing results to within 1% of optimal vs ~11% for base METRIC. The hub positioning module uses a transparent 2-echelon heuristic: hub stock sized to cover demand during hub-to-site LT; site stock covers demand during OEM LT minus hub coverage; remaining budget fills depot. Not a full VARI-METRIC solver. Ref: <a href="https://drum.lib.umd.edu/bitstreams/b6543f42-b065-4f2c-b196-f26f5c15900c/download" target="_blank" rel="noopener">METRIC/VARI-METRIC review</a>.' },
+  { cat: 'inventory', q: 'What is MEIO (Multi-Echelon Inventory Optimisation)?', a: 'MEIO extends METRIC/VARI-METRIC to generalised supply networks — multiple products, multiple echelons, fill-rate constraints, and budget constraints simultaneously. Commercial MEIO engines (e.g. Baxter, LLamasoft) solve large-scale problems. For data center operators with 5–20 sites and 50–200 part types, a simplified 2-echelon heuristic or constraint-based LP is usually sufficient. The value of MEIO vs single-echelon optimisation grows with number of sites and product variety. Ref: <a href="https://umbrex.com/resources/frameworks/supply-chain-frameworks/multi-echelon-inventory-optimization-meio/" target="_blank" rel="noopener">MEIO framework (Umbrex)</a>.' },
+  { cat: 'sourcing', q: 'How does the Kraljic matrix drive sourcing strategy?', a: 'Kraljic (HBR 1983) plots items on supply risk × profit/spend impact: <strong>Strategic</strong> (high-high) → partnership, dual source, joint risk planning; <strong>Bottleneck</strong> (high risk, low spend) → secure supply, buffer stock, alternate qualification; <strong>Leverage</strong> (low risk, high spend) → competitive tender, volume leverage; <strong>Non-Critical</strong> (low-low) → catalog / P-card, automate. For DC M&amp;E spares, most long-lead items (switchgear, transformers, chillers) sit in Strategic or Bottleneck, justifying strategic sourcing and safety stock investment.' },
+  { cat: 'sourcing', q: 'How is the Supplier Risk Index constructed?', a: 'Composite score (0–100) weighted across: Financial Health 15%, Single-Source Exposure 20%, Geographic Concentration 12%, Lead-Time Volatility 15%, OTIF History 18%, Capacity Headroom 10%, Geopolitical Risk 10%. Contract status adds ±adjustment. Bands: LOW &lt;30, MEDIUM 30–59, HIGH 60–79, CRITICAL ≥80. The index can feed a Supplier Corrective Action Request (SCAR) process for HIGH/CRITICAL suppliers.' },
+  { cat: 'lifecycle', q: 'What is DMSMS and when does it apply to data centers?', a: 'DMSMS (Diminishing Manufacturing Sources and Material Shortages) is the discipline of proactively monitoring component lifecycle status — Active → NRND (not recommended for new designs) → Last-Time-Buy → Obsolete. For DC M&amp;E, DMSMS applies primarily to: (1) BMS/EPMS control boards and PLCs with 5-10 yr product cycles, (2) legacy UPS modules and battery chemistries, (3) proprietary chiller control modules, (4) fire suppression agent bottles (Novec 7000 — 3M exited PFAS production 2025). Ref: <a href="https://en.wikipedia.org/wiki/DMSMS" target="_blank" rel="noopener">DMSMS Wikipedia</a>; <a href="https://luminovo.com/resources/blog/guide-electronics-component-lifecycle-obsolescence-management" target="_blank" rel="noopener">Luminovo lifecycle guide</a>.' },
+  { cat: 'lifecycle', q: 'How is the Last-Time-Buy quantity calculated?', a: 'LTB_Q = max(0, annualDemand × supportYears × safetyFactor − onHand − openPO). Safety factor = 1.15 (15% buffer for demand uncertainty and scrap risk). The NPV comparison between Option A (buy-and-carry) and Option B (qualify alternate) uses standard DCF: NPV = Σ CF<sub>t</sub>/(1+r)<sup>t</sup>. Key drivers: discount rate, carrying cost rate, scrap probability, alternate qualification cost and time. A higher scrap risk strengthens the case for Option B (requalify earlier). Ref: <a href="https://drum.lib.umd.edu/items/e634adcb-3d50-49b2-a8aa-f120b65d82d0" target="_blank" rel="noopener">Lifetime buy estimations (UMD)</a>.' },
+  { cat: 'emerging', q: 'How can digital twins improve spare-parts planning?', a: 'A digital twin of the M&amp;E fleet ingests live sensor data (vibration, temperature, oil analysis) and maintenance history to simulate failure probabilities in real time. When a component\'s predicted reliability drops below a threshold, the twin can trigger a pre-stage order before the actual failure — turning reactive spare-demand into condition-based demand. This reduces effective demand variability (σ<sub>D</sub>) and therefore safety stock requirements. Monte-Carlo scenarios within the twin can size stock buffers with real failure-curve data.' },
+  { cat: 'emerging', q: 'Can additive manufacturing (3D printing) replace traditional LTB for obsolete parts?', a: '3D printing is viable for obsolete polymer and simple metal components (brackets, housings, seal carriers, impellers) where tolerances allow. It eliminates LTB risk entirely for printable items. Limitations: not suitable for precision mechanical components (bearings, compressor internals), safety-critical electrical parts, or anything requiring OEM-certified materials. Classify parts by "printability" as part of your DMSMS programme and route printable items to an additive supply path rather than LTB.' },
+  { cat: 'emerging', q: 'What is a circular economy / refurb pool strategy?', a: 'Decommissioned data center equipment contains reusable M&amp;E components — chiller compressors, UPS modules, switchgear breakers. A certified-refurb pool (with OEM or third-party reconditioning) offsets new-buy demand, reducing LTB exposure and carrying cost. Key requirements: (1) component traceability / digital product passport, (2) recertification testing protocol, (3) warranty alignment with operations team. Circular sourcing can reduce critical-spares total cost by 20–40% for mature equipment types.' },
+  { cat: 'emerging', q: 'What is a supply-chain control tower for spares management?', a: 'A control tower is a single visibility platform aggregating: PO status by part/supplier, supplier commit dates vs need dates, in-transit tracking, inventory by hub/site, risk alerts (OTIF miss, commit delay, EOL flag). The readiness gauge in this calculator IS a mini control-tower view for a single part. Enterprise-scale control towers (Kinaxis, Blue Yonder, SAP IBP) serve 100s of parts across dozens of sites with live ERP integration. The key metrics this calculator produces (readiness %, gap, risk flags) are the same KPIs a control tower surfaces at fleet scale.' }
+];
+
+function renderFAQ(cat) {
+  var filtered = cat === 'all' ? faqData : faqData.filter(function(f) { return f.cat === cat; });
+  setHTML('faq_grid', filtered.map(function(f, i) {
+    return '<details class="faq-item" data-cat="' + f.cat + '">' +
+      '<summary>' + f.q + '</summary>' +
+      '<div class="faq-body"><p>' + f.a + '</p></div>' +
+      '</details>';
+  }).join(''));
+}
+
+function filterFAQ(cat) {
+  document.querySelectorAll('.faq-cat-btn').forEach(function(b) { b.classList.remove('active'); });
+  var active = document.querySelector('[onclick="filterFAQ(\'' + cat + '\')"]');
+  if (active) active.classList.add('active');
+  renderFAQ(cat);
+}
+
+/* ===========================================
+   TAB SWITCHING
+   =========================================== */
+function switchTab(name) {
+  document.querySelectorAll('.module-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  var pane = document.getElementById('pane-' + name);
+  if (pane) pane.classList.add('active');
+  var btn = document.querySelector('[onclick="switchTab(\'' + name + '\')"]');
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected','true'); }
+  // Trigger calc on tab open
+  var calcs = { criticality: calcCriticality, readiness: calcReadiness, stock: calcStock, hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB, kraljic: calcKraljic, faq: function(){ renderFAQ('all'); } };
+  if (calcs[name]) calcs[name]();
+}
+
+/* ===========================================
+   DARK MODE TOGGLE
+   =========================================== */
+function toggleTheme() {
+  var html = document.documentElement;
+  var isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  var icon = document.querySelector('#themeToggle i');
+  if (icon) { icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun'; }
+}
+// Set icon on load
+(function() {
+  var t = localStorage.getItem('theme');
+  var icon = document.querySelector('#themeToggle i');
+  if (icon && t === 'dark') icon.className = 'fas fa-sun';
+})();
+
+/* ===========================================
+   MOBILE NAV
+   =========================================== */
+function toggleMobileMenu() {
+  var nav = document.getElementById('navLinks');
+  if (nav) nav.classList.toggle('open');
+}
+function toggleUserDropdown() {
+  var dd = document.getElementById('navUserDropdown');
+  var btn = document.getElementById('navUserBtn');
+  if (dd) dd.classList.toggle('show');
+  if (btn) btn.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('navAuthWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    var dd = document.getElementById('navUserDropdown');
+    var btn = document.getElementById('navUserBtn');
+    if (dd) dd.classList.remove('show');
+    if (btn) btn.classList.remove('open');
+  }
+});
+
+/* ===========================================
+   SHARE BUTTONS VISIBILITY
+   =========================================== */
+window.addEventListener('scroll', function() {
+  var share = document.getElementById('pageShare');
+  if (share) { if (window.scrollY > 200) share.classList.add('visible'); else share.classList.remove('visible'); }
+}, { passive: true });
+
+/* ===========================================
+   COOKIE BANNER
+   =========================================== */
+(function() {
+  var banner = document.getElementById('cookieBanner');
+  var consent = localStorage.getItem('rz_cookie_consent');
+  if (consent && banner) banner.classList.add('hidden');
+  var acceptBtn = document.getElementById('cookieAccept');
+  var declineBtn = document.getElementById('cookieDecline');
+  if (acceptBtn) acceptBtn.addEventListener('click', function() {
+    localStorage.setItem('rz_cookie_consent', 'accepted');
+    if (banner) banner.classList.add('hidden');
+  });
+  if (declineBtn) declineBtn.addEventListener('click', function() {
+    localStorage.setItem('rz_cookie_consent', 'declined');
+    window['ga-disable-G-GED7FX8RTV'] = true;
+    if (banner) banner.classList.add('hidden');
+  });
+})();
+
+/* ===========================================
+   URL PARAM DEEP-LINK
+   /*
+    * Supported URL params (query string):
+    *   ?itLoad=         IT load in kW or MW (context, shown in banner)
+    *   ?tier=           DC tier (3 or 4) → maps redundancy to n1 / 2n
+    *   ?redundancy=     n | n1 | 2n → c1_redundancy
+    *   ?mtbf=           MTBF in years → lambda = 1/mtbf
+    *   ?mttr=           MTTR in hours → mc_mttr
+    *   ?downtimeCostPerHr=  $/hr → mc_downtime_cost + s_understk_cost default
+    *   ?country=        2-letter ISO code → regional lead-time multiplier (lookup table)
+    * Deep-link from OPEX/TCO/ROI/PUE calculator pages.
+    */
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var carrierParams = [];
+
+  // Country → lead-time multiplier + carrying cost adjustment
+  var countryLT = { US:1.0, GB:1.0, DE:1.05, FR:1.05, AU:1.15, IN:1.25, SG:1.10, ID:1.30, JP:1.10, BR:1.40, CN:0.90, MY:1.20 };
+  var countryCarry = { US:20, GB:22, DE:22, FR:22, AU:24, IN:18, SG:22, ID:20, JP:22, BR:25, CN:18, MY:20 };
+
+  function setField(id, val) { var el = document.getElementById(id); if (el && val !== null) { el.value = val; } }
+
+  if (params.has('redundancy')) {
+    var r = params.get('redundancy').toLowerCase();
+    if (['n','n1','2n'].indexOf(r) >= 0) { setField('c1_redundancy', r); carrierParams.push('redundancy=' + r); }
+  }
+  if (params.has('tier')) {
+    var tier = parseInt(params.get('tier'));
+    if (tier === 4) { setField('c1_redundancy', '2n'); carrierParams.push('tier=4'); }
+    else if (tier === 3) { setField('c1_redundancy', 'n1'); carrierParams.push('tier=3'); }
+  }
+  if (params.has('mtbf')) {
+    var mtbf = parseFloat(params.get('mtbf'));
+    if (mtbf > 0) { setField('c1_lambda', (1/mtbf).toFixed(3)); carrierParams.push('mtbf=' + mtbf); }
+  }
+  if (params.has('mttr')) {
+    var mttr = parseFloat(params.get('mttr'));
+    if (mttr > 0) { setField('mc_mttr', mttr); carrierParams.push('mttr=' + mttr); }
+  }
+  if (params.has('downtimeCostPerHr')) {
+    var dtc = parseFloat(params.get('downtimeCostPerHr'));
+    if (dtc > 0) {
+      setField('mc_downtime_cost', dtc);
+      var mttrVal = parseFloat(document.getElementById('mc_mttr') && document.getElementById('mc_mttr').value) || 168;
+      setField('s_understk_cost', Math.round(dtc * mttrVal));
+      carrierParams.push('downtime=$' + dtc.toLocaleString() + '/hr');
+    }
+  }
+  if (params.has('country')) {
+    var cc = params.get('country').toUpperCase();
+    var ltMult = countryLT[cc] || 1.0;
+    var carryAdj = countryCarry[cc] || 22;
+    var baseLT = parseFloat(document.getElementById('r_lt_weeks').value) || 16;
+    setField('r_lt_weeks', Math.round(baseLT * ltMult));
+    setField('s_lt_weeks', Math.round(baseLT * ltMult));
+    setField('s_carry_rate', carryAdj);
+    setField('ltb_carry_rate', carryAdj);
+    carrierParams.push('country=' + cc);
+  }
+  if (params.has('itLoad')) {
+    carrierParams.push('itLoad=' + params.get('itLoad') + ' kW');
+  }
+
+  if (carrierParams.length > 0) {
+    var banner = document.getElementById('carrierBanner');
+    var bannerText = document.getElementById('carrierBannerText');
+    if (banner && bannerText) {
+      bannerText.textContent = '← Config carried over from another calculator: ' + carrierParams.join(', ') + '. Inputs pre-filled — review before running.';
+      banner.classList.add('visible');
+    }
+  }
+})();
+
+/* ===========================================
+   PDF EXPORT HELPERS
+   =========================================== */
+function pdfHeader(title) {
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + title + '<\/title>' +
+    '<style>body{font-family:Arial,sans-serif;padding:20px;color:#1e293b;font-size:13px;}h1{color:#d97706;border-bottom:2px solid #f59e0b;padding-bottom:8px;}h2{color:#d97706;margin-top:20px;}table{border-collapse:collapse;width:100%;margin:10px 0;}th{background:#fef3c7;text-align:left;padding:6px 10px;}td{padding:6px 10px;border-bottom:1px solid #e2e8f0;}.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-weight:700;font-size:11px;}.red{background:#fee2e2;color:#ef4444;}.yellow{background:#fef3c7;color:#d97706;}.green{background:#dcfce7;color:#059669;}.disc{background:#f1f5f9;border:1px solid #cbd5e1;padding:12px;border-radius:8px;font-size:11px;margin-top:20px;color:#475569;}<\/style><\/head><body>';
+}
+function pdfFooter() {
+  return '<div class="disc"><strong>Disclaimer:</strong> These are illustrative models. Not a substitute for professional supply-chain analysis. resistancezero.com Critical Spares Engine — ' + new Date().toLocaleDateString() + '<\/div><\/body><\/html>';
+}
+
+function exportCriticalityPDF() {
+  var cm = document.getElementById('c1_cm').textContent;
+  var tier = document.getElementById('c1_tier_badge').textContent;
+  var dec = document.getElementById('c1_decision_badge').textContent;
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(pdfHeader('Criticality Report') +
+    '<h1>FMECA Criticality Report</h1>' +
+    '<p>Generated: ' + new Date().toLocaleString() + '<\/p>' +
+    '<h2>Result<\/h2>' +
+    '<table><tr><th>Parameter<\/th><th>Value<\/th><\/tr>' +
+    '<tr><td>Criticality Number Cm<\/td><td>' + cm + '<\/td><\/tr>' +
+    '<tr><td>VED Tier<\/td><td>' + tier + '<\/td><\/tr>' +
+    '<tr><td>Decision<\/td><td>' + dec + '<\/td><\/tr>' +
+    '<tr><td>RPN<\/td><td>' + document.getElementById('c1_rpn').textContent + '<\/td><\/tr>' +
+    '<tr><td>Fleet Failures\/yr<\/td><td>' + document.getElementById('c1_fleet_fail').textContent + '<\/td><\/tr>' +
+    '<\/table>' +
+    pdfFooter());
+  w.document.close();
+  w.print();
+}
+
+function exportReadinessPDF() {
+  var pct = document.getElementById('r_pct').textContent;
+  var status = document.getElementById('r_status_badge').textContent;
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(pdfHeader('Readiness Report') +
+    '<h1>Spare Readiness Report<\/h1>' +
+    '<p>Generated: ' + new Date().toLocaleString() + '<\/p>' +
+    '<h2>Result<\/h2>' +
+    '<table><tr><th>Parameter<\/th><th>Value<\/th><\/tr>' +
+    '<tr><td>Readiness %<\/td><td>' + pct + '<\/td><\/tr>' +
+    '<tr><td>Status<\/td><td>' + status + '<\/td><\/tr>' +
+    '<tr><td>Confirmed Supply<\/td><td>' + document.getElementById('r_confirmed').textContent + '<\/td><\/tr>' +
+    '<tr><td>Gap<\/td><td>' + document.getElementById('r_gap').textContent + '<\/td><\/tr>' +
+    '<tr><td>Date Slack<\/td><td>' + document.getElementById('r_slack_days').textContent + '<\/td><\/tr>' +
+    '<\/table>' +
+    pdfFooter());
+  w.document.close();
+  w.print();
+}
+
+function exportStockPDF() {
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(pdfHeader('Optimal Stock Report') +
+    '<h1>Optimal Stock Level Report<\/h1>' +
+    '<p>Generated: ' + new Date().toLocaleString() + '<\/p>' +
+    '<h2>Result<\/h2>' +
+    '<table><tr><th>Parameter<\/th><th>Value<\/th><\/tr>' +
+    '<tr><td>Newsvendor Q*<\/td><td>' + document.getElementById('s_qstar').textContent + '<\/td><\/tr>' +
+    '<tr><td>Safety Stock<\/td><td>' + document.getElementById('s_ss').textContent + '<\/td><\/tr>' +
+    '<tr><td>Reorder Point<\/td><td>' + document.getElementById('s_rop').textContent + '<\/td><\/tr>' +
+    '<tr><td>Critical Ratio<\/td><td>' + document.getElementById('s_cr').textContent + '<\/td><\/tr>' +
+    '<tr><td>Fill Rate Achieved<\/td><td>' + document.getElementById('s_fill_achieved').textContent + '<\/td><\/tr>' +
+    '<tr><td>Total Annual Cost<\/td><td>' + document.getElementById('s_total_cost').textContent + '<\/td><\/tr>' +
+    '<\/table>' +
+    pdfFooter());
+  w.document.close();
+  w.print();
+}
+
+function exportLTBPDF() {
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(pdfHeader('Last-Time-Buy Report') +
+    '<h1>Last-Time-Buy \/ DMSMS Report<\/h1>' +
+    '<p>Generated: ' + new Date().toLocaleString() + '<\/p>' +
+    '<h2>Result<\/h2>' +
+    '<table><tr><th>Parameter<\/th><th>Value<\/th><\/tr>' +
+    '<tr><td>Recommended LTB Qty<\/td><td>' + document.getElementById('ltb_qty').textContent + '<\/td><\/tr>' +
+    '<tr><td>LTB Total Cost<\/td><td>' + document.getElementById('ltb_total').textContent + '<\/td><\/tr>' +
+    '<tr><td>Cumulative Carry Cost<\/td><td>' + document.getElementById('ltb_carry').textContent + '<\/td><\/tr>' +
+    '<tr><td>EOL Exposure Score<\/td><td>' + document.getElementById('ltb_eol_score').textContent + '<\/td><\/tr>' +
+    '<tr><td>NPV Option A (LTB)<\/td><td>' + document.getElementById('ltb_npv_a').textContent + '<\/td><\/tr>' +
+    '<tr><td>NPV Option B (Requalify)<\/td><td>' + document.getElementById('ltb_npv_b').textContent + '<\/td><\/tr>' +
+    '<\/table>' +
+    pdfFooter());
+  w.document.close();
+  w.print();
+}
+
+/* ===========================================
+   INITIALISE
+   =========================================== */
+(function() {
+  // Set default dates
+  var today = new Date();
+  var commitDefault = new Date(today); commitDefault.setDate(today.getDate() + 112); // 16 weeks
+  var needDefault = new Date(today); needDefault.setDate(today.getDate() + 84); // 12 weeks
+  var eolDefault = new Date(today); eolDefault.setDate(today.getDate() + 30);
+
+  function toDateStr(d) { return d.toISOString().split('T')[0]; }
+  var commitEl = document.getElementById('r_commit_date');
+  var needEl = document.getElementById('r_need_date');
+  var eolEl = document.getElementById('ltb_eol_date');
+  if (commitEl) commitEl.value = toDateStr(commitDefault);
+  if (needEl) needEl.value = toDateStr(needDefault);
+  if (eolEl) eolEl.value = toDateStr(eolDefault);
+
+  // Run all visible module calculations
+  calcCriticality();
+  calcReadiness();
+  renderFAQ('all');
+})();
+
+})(); // end IIFE
+</script>
+</body>
+</html>

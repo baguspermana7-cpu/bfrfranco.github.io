@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v1.11.0 — 2026-05-12 (NEW: Critical Spares Engine calculator · DCMOC engine refresh)
+
+### Added — Critical Spares Readiness & Sourcing Engine
+New page `spares-readiness-calculator.html` (2,384 lines) — a comprehensive 9-module calculator for data-center mechanical & electrical (M&E) spare-parts management. Companion to the master-prompt operating doc in `Documents/Training/`.
+
+Modules:
+1. **Criticality Scoring (FMECA + RCM)** — simplified FMECA Criticality Number, Risk Priority Number, VITAL/ESSENTIAL/DESIRABLE tier, STOCK / DON'T STOCK / STOCK+DUAL-SOURCE decision.
+2. **Spare Readiness Gauge** — `Readiness % = confirmed-supply / required-supply`, RED/YELLOW/GREEN status, risk flags (lead time > horizon, no commit, PO not raised, no alternate, inventory < 30 d), action plan.
+3. **Optimal Stock Level (Newsvendor + Fill-Rate)** — critical-fractile `Q*` via Beasley-Springer-Moro inverse-normal CDF, safety stock `SS = z·√(L·σ_D² + μ²·σ_L²)`, reorder point, Poisson mode for slow movers, cost-curve chart.
+4. **Multi-Site Hub Positioning** — simplified 2-echelon MEIO heuristic (depot / regional hub / sites), hub-vs-no-hub readiness delta + inventory $.
+5. **Supplier Risk Index** — 7-dimension weighted composite (0–100), Kraljic quadrant derivation, radar chart, per-quadrant sourcing-strategy brief.
+6. **Obsolescence / Last-Time-Buy (DMSMS)** — LTB quantity, NPV Option A (stock LTB) vs Option B (qualify alternate now), fleet EOL Exposure Score.
+7. **Kraljic Sourcing Strategy** — standalone 2×2 matrix with the user's position plotted + full strategy brief per quadrant.
+8. **Monte-Carlo Scenario** — Box-Muller sampling, 500–5,000 iterations, readiness-% histogram, tornado chart of variance drivers, P10/P50/P90.
+9. **FAQ / Methodology** — 15 Q&As with citations (FMECA/RCM, METRIC/VARI-METRIC, MEIO, newsvendor, Kraljic, DMSMS).
+
+Integration:
+- Shared `rz-engine.min.js` math (NPV / downtime / format) + URL deep-link params (`?itLoad`, `?tier`, `?redundancy`, `?mtbf`, `?mttr`, `?downtimeCostPerHr`, `?country`) so OPEX/TCO/ROI/PUE calculators can carry their config over (banner shown when params present).
+- Card added to "Strategic Analysis & Market Intelligence" on `datacenter-solutions.html` (amber theming) + a card on `tools.html`.
+- `sitemap.xml`, `llms.txt` entries; 6 glossary terms added (FMECA, Kraljic Matrix, Last-Time-Buy, METRIC/VARI-METRIC, Newsvendor Model, DMSMS) with backlinks.
+- Standard RZ shell: consent-aware gtag, dark-mode toggle, skip-link, mobile-responsive (8/8), hamburger, cookie banner, share buttons, PDF export per module (`<\/script>` escaped), 88 aria-labels, 3 JSON-LD blocks. Chart.js loaded blocking (not deferred — per the v1.10.19 lesson).
+
+### Changed — DCMOC app refresh (`dcmoc/`)
+- **Deps** (commit `75c077d`): Next 16.1.6→16.2.6, React/React-DOM 19.2.3→19.2.6, recharts 3.7→3.8.1, framer-motion 12.34→12.38, zustand 5.0.11→5.0.13, tailwind-merge 3.4→3.6, tailwindcss/@tailwindcss/postcss pinned 4.3. Held: jspdf 2.5.1, TS 5.x, eslint 9.x, @types/node 20.x, lucide-react 0.574. Static export rebuilt.
+- **Data 2025-26** (commit `fd84b26`): benchmarks (PUE median 1.35→1.50, CAPEX/kW +10-25% for post-2022 construction inflation, energy/OPEX/carbon-price/turnover updated), PUE_BY_COOLING (air 1.35→1.42), 33 country profiles (SG electricity 0.15→0.22, IE corp tax 12.5→15% Pillar-2, DE 0.30→0.26, GB 0.20→0.22, ID labor +6.5%), capex year-escalation.
+- **Engine accuracy** (commit `7e4e144`): RosterEngine — resolved `isPublicHoliday` TODO (holiday-date approximation from `country.labor.leaves.publicHolidays` + country labor rate instead of hardcoded $200); FinancialEngine — IRR bisection fallback + NaN/div-0 guards; CarbonEngine — 2025 emission factors (offset $35→$45, EU ETS $65→$68, grid intensity 0.475→0.49); RiskEngine — dynamic projection year.
+- **UI/UX** (commit `8f8390b` + `a5151fc`): Shell — mobile sidebar + hamburger + overlay backdrop + responsive padding + accessibility (aria-label/aria-pressed/sr-only); StaffingDashboard/ReportDashboard — loading spinners; BenchmarkDashboard/CarbonDashboard — 2025 source labels.
+
+### Versioning
+- `js/rz-version.js` 1.10.19 → 1.11.0 (MINOR — new calculator page).
+- SW cache name auto-synced → `rz-cache-v1.11.0`.
+
+---
+
 ## v1.10.19 — 2026-05-12 (Bugfix — chart.js `defer` regression broke synchronous chart init)
 
 User screenshot: `rz-ops-p7x3k9m.html` (admin console "Data Center Industry Intelligence") — all chart cards empty.
