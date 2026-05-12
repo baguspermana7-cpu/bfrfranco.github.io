@@ -1,6 +1,7 @@
 'use client';
 
 import { useSimulationStore } from '@/store/simulation';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { StaffingDashboard } from '@/components/modules/StaffingDashboard';
 import { MaintenanceDashboard } from '@/components/modules/MaintenanceDashboard';
 import { ReportDashboard } from '@/components/modules/ReportDashboard';
@@ -113,7 +114,9 @@ export default function Home() {
 
   return (
     <div className="min-h-[calc(100vh-100px)]">
-      {renderContent()}
+      <ErrorBoundary>
+        {renderContent()}
+      </ErrorBoundary>
     </div>
   );
 }

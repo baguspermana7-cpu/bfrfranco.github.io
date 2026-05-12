@@ -56,7 +56,7 @@ export function ReportDashboard() {
     const { inputs: capexInputs } = useCapexStore();
     const { scenarios } = useScenarioStore();
     const [isGenerating, setIsGenerating] = useState<string | null>(null);
-    const [simYear, setSimYear] = useState(2025);
+    const [simYear, setSimYear] = useState(() => new Date().getFullYear());
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
     // B9: Scenario Comparison state
@@ -147,7 +147,7 @@ export function ReportDashboard() {
                         selectedCountry,
                         inputs.shiftModel,
                         fullData.allStaff,
-                        generateAnnualRoster(2025, inputs.shiftModel === '12h' ? '4on-4off' : '3shift-8h'),
+                        generateAnnualRoster(new Date().getFullYear(), inputs.shiftModel === '12h' ? '4on-4off' : '3shift-8h'),
                         fullData.insights,
                         undefined,
                         branding
