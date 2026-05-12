@@ -222,6 +222,7 @@ export function ScenarioComparisonPanel() {
                         Delta Analysis (vs Baseline)
                     </h3>
                 </div>
+                <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -266,6 +267,7 @@ export function ScenarioComparisonPanel() {
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
 
             {/* Input Diff */}
@@ -274,6 +276,7 @@ export function ScenarioComparisonPanel() {
                     <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Input Differences</h3>
                     </div>
+                    <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                         <thead>
                             <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -303,6 +306,7 @@ export function ScenarioComparisonPanel() {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             )}
         </div>

@@ -116,7 +116,7 @@ export default function RiskDashboard() {
 
                 <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                     <div className="text-slate-500 dark:text-slate-400 text-xs uppercase mb-1 flex items-center gap-1">
-                        <Activity className="w-3 h-3" /> Availability <Tooltip content="Expected annual uptime percentage based on tier redundancy level. Tier III >= 99.982%, Tier IV >= 99.995%." />
+                        <Activity className="w-3 h-3" /> Availability <Tooltip content="Expected annual uptime per Uptime Institute Tier Standard 2025. Tier III ≥ 99.982% (95 min/yr), Tier IV ≥ 99.99943% (26 min/yr)." />
                     </div>
                     <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{downtime.availability}%</div>
                     <div className="text-xs text-slate-500 mt-1">

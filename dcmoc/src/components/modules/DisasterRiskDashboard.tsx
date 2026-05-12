@@ -79,7 +79,7 @@ const DisasterRiskDashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                             <AlertTriangle className="w-4 h-4 text-orange-500" />
                             <span className="text-xs text-slate-500 uppercase">Risk Score</span>
-                            <Tooltip content="Composite disaster risk score (0-100). Higher = more dangerous. Weighted: seismic 30%, flood 25%, typhoon 20%, volcano 15%, tsunami 10%." />
+                            <Tooltip content="Composite disaster risk score (0-100). Higher = more dangerous. Weighted: seismic 28%, flood 22%, typhoon 18%, volcano 12%, tsunami 10%, wildfire 10%." />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">{result.compositeScore}</div>
                         <div className={`text-xs mt-1 px-2 py-0.5 rounded border w-fit ${riskColors[result.riskCategory]}`}>

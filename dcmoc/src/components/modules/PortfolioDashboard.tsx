@@ -174,13 +174,13 @@ function SiteCard({ site, index, countryOptions, onUpdate, onDuplicate, onRemove
                 </div>
                 <div className="flex gap-1">
                     {canDuplicate && (
-                        <button onClick={onDuplicate} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" title="Duplicate">
-                            <Copy className="w-3 h-3" />
+                        <button onClick={onDuplicate} aria-label="Duplicate site" className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" title="Duplicate">
+                            <Copy className="w-3 h-3" aria-hidden="true" />
                         </button>
                     )}
                     {canRemove && (
-                        <button onClick={onRemove} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-slate-400 hover:text-red-500 transition-colors" title="Remove">
-                            <Trash2 className="w-3 h-3" />
+                        <button onClick={onRemove} aria-label="Remove site" className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-slate-400 hover:text-red-500 transition-colors" title="Remove">
+                            <Trash2 className="w-3 h-3" aria-hidden="true" />
                         </button>
                     )}
                 </div>
@@ -188,7 +188,7 @@ function SiteCard({ site, index, countryOptions, onUpdate, onDuplicate, onRemove
 
             <div className="space-y-1.5 text-[10px]">
                 <SelectField label="Country" value={site.countryId} options={countryOptions.map(c => ({ value: c.id, label: c.name }))} onChange={v => onUpdate({ countryId: v })} tooltip="Geographic location affects energy costs, labor rates, carbon grid intensity, and regulatory environment." />
-                <SelectField label="Tier" value={String(site.tierLevel)} options={[{ value: '2', label: 'Tier 2' }, { value: '3', label: 'Tier 3' }, { value: '4', label: 'Tier 4' }]} onChange={v => onUpdate({ tierLevel: Number(v) as 2 | 3 | 4 })} tooltip="Uptime Institute tier classification. Higher tiers provide greater redundancy and availability (Tier 2: 99.749%, Tier 3: 99.982%, Tier 4: 99.995%)." />
+                <SelectField label="Tier" value={String(site.tierLevel)} options={[{ value: '2', label: 'Tier 2' }, { value: '3', label: 'Tier 3' }, { value: '4', label: 'Tier 4' }]} onChange={v => onUpdate({ tierLevel: Number(v) as 2 | 3 | 4 })} tooltip="Uptime Institute Tier Standard 2025. Tier 2: 99.741% (1,361 min downtime/yr), Tier 3: 99.982% (95 min/yr), Tier 4: 99.99943% (26 min/yr)." />
                 <NumberField label="IT Load (kW)" value={site.itLoad} onChange={v => onUpdate({ itLoad: v })} tooltip="Total IT power capacity for this site in kilowatts. Drives CAPEX, OPEX, staffing, and carbon calculations." />
                 <SelectField label="Cooling" value={site.coolingType} options={[{ value: 'air', label: 'Air' }, { value: 'inrow', label: 'In-Row' }, { value: 'rdhx', label: 'RDHX' }, { value: 'liquid', label: 'Liquid' }]} onChange={v => onUpdate({ coolingType: v as SiteConfig['coolingType'] })} tooltip="Cooling infrastructure type. Affects PUE, CAPEX, and energy efficiency. Liquid cooling offers lowest PUE but highest upfront cost." />
                 <SelectField label="Shift" value={site.shiftModel} options={[{ value: '8h', label: '8H Continental' }, { value: '12h', label: '12H 4on3off' }]} onChange={v => onUpdate({ shiftModel: v as '8h' | '12h' })} tooltip="Operator shift rotation model. 8H Continental uses 5 crews for 24/7 coverage; 12H 4on3off uses 4 crews with longer shifts." />
@@ -350,6 +350,7 @@ function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio
             </div>
 
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
@@ -377,6 +378,7 @@ function FinancialTab({ result }: { result: ReturnType<typeof calculatePortfolio
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     );
@@ -407,6 +409,7 @@ function StaffingTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                 </ResponsiveContainer>
             </div>
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
@@ -432,6 +435,7 @@ function StaffingTab({ result }: { result: ReturnType<typeof calculatePortfolio>
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     );
@@ -445,6 +449,7 @@ function RiskTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) 
             <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1">Risk Profile Comparison<Tooltip content="Comparison of risk-related design choices across sites including tier level, redundancy configuration, and maintenance strategy." /></h3>
             </div>
+            <div className="overflow-x-auto">
             <table className="w-full text-xs">
                 <thead>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -460,7 +465,7 @@ function RiskTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) 
                         { label: 'Power Redundancy', get: (s: SiteResult) => s.site.powerRedundancy, tooltip: 'Power distribution redundancy configuration (e.g., N+1, 2N). Higher redundancy reduces single-point-of-failure risk.' },
                         { label: 'Maint. Strategy', get: (s: SiteResult) => s.site.maintenanceStrategy, tooltip: 'Maintenance approach — reactive (break-fix), preventive (scheduled), or predictive (condition-based monitoring).' },
                         { label: 'Cooling Type', get: (s: SiteResult) => s.site.coolingType, tooltip: 'Cooling infrastructure design. Affects energy efficiency, water usage, and maximum rack density support.' },
-                        { label: 'Expected Uptime', get: (s: SiteResult) => s.site.tierLevel === 4 ? '99.995%' : s.site.tierLevel === 3 ? '99.982%' : '99.749%', tooltip: 'Target availability based on tier level. Tier 4: 26 min/yr downtime, Tier 3: 1.6 hr/yr, Tier 2: 22 hr/yr.' },
+                        { label: 'Expected Uptime', get: (s: SiteResult) => s.site.tierLevel === 4 ? '99.99943%' : s.site.tierLevel === 3 ? '99.982%' : '99.741%', tooltip: 'Target availability per Uptime Institute Tier Standard 2025. Tier 4: 26 min/yr downtime, Tier 3: 95 min/yr, Tier 2: 1,361 min/yr.' },
                     ].map(row => (
                         <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
                             <td className="px-4 py-2 font-medium text-slate-700 dark:text-slate-300"><span className="flex items-center gap-1">{row.label}<Tooltip content={row.tooltip} /></span></td>
@@ -471,6 +476,7 @@ function RiskTab({ result }: { result: ReturnType<typeof calculatePortfolio> }) 
                     ))}
                 </tbody>
             </table>
+            </div>
         </div>
     );
 }
@@ -500,6 +506,7 @@ function CarbonTab({ result }: { result: ReturnType<typeof calculatePortfolio> }
                 </ResponsiveContainer>
             </div>
             <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
@@ -526,6 +533,7 @@ function CarbonTab({ result }: { result: ReturnType<typeof calculatePortfolio> }
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     );

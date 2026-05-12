@@ -368,6 +368,7 @@ function StatisticsTab({ result }: { result: MonteCarloResult }) {
 
     return (
         <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full text-xs">
                 <thead>
                     <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30">
@@ -388,6 +389,7 @@ function StatisticsTab({ result }: { result: MonteCarloResult }) {
                     ))}
                 </tbody>
             </table>
+            </div>
         </div>
     );
 }

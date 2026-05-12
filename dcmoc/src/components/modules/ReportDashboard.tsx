@@ -640,6 +640,7 @@ export function ReportDashboard() {
                                 { label: 'PUE', a: sA.summary.pue.toFixed(2), b: sB.summary.pue.toFixed(2), delta: deltaPue, fmtDelta: Math.abs(deltaPue).toFixed(2) },
                             ];
                             return (
+                                <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -666,6 +667,7 @@ export function ReportDashboard() {
                                         ))}
                                     </tbody>
                                 </table>
+                                </div>
                             );
                         })()}
                     </div>
@@ -782,6 +784,7 @@ export function ReportDashboard() {
                     </button>
                     {(expandedSection === 'cost' || expandedSection === null) && (
                         <div className="px-6 pb-6">
+                            <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -828,6 +831,7 @@ export function ReportDashboard() {
                                     </tr>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -848,6 +852,7 @@ export function ReportDashboard() {
                     </button>
                     {(expandedSection === 'tco' || expandedSection === null) && (
                         <div className="px-6 pb-6">
+                            <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -879,6 +884,7 @@ export function ReportDashboard() {
                                     })}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
                 </div>
