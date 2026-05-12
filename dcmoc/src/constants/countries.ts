@@ -302,7 +302,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             inflationRate: 0.03, // 3%
             laborEscalation: 0.045, // 4.5%
             taxRate: 0.24,
-            electricityRate: 0.08, // ICPT surcharge increase 2024-2025
+            // 2026: Tenaga Nasional ICPT surcharges + tariff review 2024; industrial ~MYR 0.38-0.42/kWh = ~$0.08-0.09 USD
+            electricityRate: 0.09,
         },
         labor: {
             minimumWage: 340,
@@ -656,7 +657,9 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     // ─── MENA ───────────────────────────────────────────────
     AE: {
         id: 'AE', region: 'MENA', name: 'UAE', currency: 'USD', currencySymbol: '$',
-        economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.0, electricityRate: 0.08 },
+        // 2026: UAE Corp Tax 9% (since Jun 2023, free zones still 0% qualifying income)
+        // Electricity: ~$0.09/kWh for industrial (DEWA tariff band E 2025)
+        economy: { inflationRate: 0.025, laborEscalation: 0.035, taxRate: 0.09, electricityRate: 0.09 },
         labor: {
             minimumWage: 800, baseSalary_ShiftLead: 5000, baseSalary_Engineer: 4000,
             baseSalary_Technician: 2500, baseSalary_Admin: 2000, baseSalary_Janitor: 1200,
@@ -671,11 +674,11 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         taxIncentives: {
             freeTradeZones: ['JAFZA', 'DAFZA', 'Masdar City', 'ADGM'],
             taxHolidayYears: 50,
-            taxHolidayRate: 0.0,
-            incentivePrograms: ['Free Zone 0% Tax', 'Dubai Industrial Strategy', 'Abu Dhabi Investment Office'],
+            taxHolidayRate: 0.0, // Free zone qualifying income still 0%
+            incentivePrograms: ['Free Zone 0% Corp Tax (qualifying income)', 'Dubai D33 Digital Economy', 'ADIO DC incentive scheme 2025'],
             importDutyExemption: true,
             landSubsidy: true,
-            effectiveTaxRate: 0.0,
+            effectiveTaxRate: 0.0, // Free zone effective rate 0% for DC qualifying income
         },
         naturalDisaster: {
             seismicZone: 1,
@@ -1243,7 +1246,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     CO: {
         id: 'CO', region: 'LATAM', name: 'Colombia', currency: 'COP', currencySymbol: 'CO$',
-        economy: { inflationRate: 0.06, laborEscalation: 0.055, taxRate: 0.35, electricityRate: 0.08 },
+        // 2026: Colombia C&I electricity ~COP 700-900/kWh; currency depreciation pushes USD equivalent ~$0.09-0.11
+        economy: { inflationRate: 0.06, laborEscalation: 0.055, taxRate: 0.35, electricityRate: 0.10 },
         labor: {
             minimumWage: 280, baseSalary_ShiftLead: 1600, baseSalary_Engineer: 1200,
             baseSalary_Technician: 700, baseSalary_Admin: 500, baseSalary_Janitor: 300,
@@ -1439,7 +1443,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     KR: {
         id: 'KR', region: 'APAC', name: 'South Korea', currency: 'KRW', currencySymbol: '₩',
-        economy: { inflationRate: 0.025, laborEscalation: 0.035, taxRate: 0.22, electricityRate: 0.11 },
+        // 2026: KEPCO industrial tariff raised 2023-2024; now ~$0.13-0.14/kWh large industrial
+        economy: { inflationRate: 0.025, laborEscalation: 0.04, taxRate: 0.22, electricityRate: 0.135 },
         labor: {
             minimumWage: 1500, baseSalary_ShiftLead: 4000, baseSalary_Engineer: 3200,
             baseSalary_Technician: 2400, baseSalary_Admin: 2000, baseSalary_Janitor: 1500,
@@ -1504,7 +1509,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     TH: {
         id: 'TH', region: 'APAC', name: 'Thailand', currency: 'THB', currencySymbol: '฿',
-        economy: { inflationRate: 0.02, laborEscalation: 0.04, taxRate: 0.20, electricityRate: 0.08 },
+        // 2026: EGAT + MEA raised rates 2023-2024; industrial C&I ~THB 3.5-4.0/kWh = ~$0.09-0.11 USD
+        economy: { inflationRate: 0.02, laborEscalation: 0.04, taxRate: 0.20, electricityRate: 0.10 },
         labor: {
             minimumWage: 300, baseSalary_ShiftLead: 1400, baseSalary_Engineer: 1000,
             baseSalary_Technician: 600, baseSalary_Admin: 450, baseSalary_Janitor: 300,
@@ -1569,7 +1575,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     VN: {
         id: 'VN', region: 'APAC', name: 'Vietnam', currency: 'VND', currencySymbol: '₫',
-        economy: { inflationRate: 0.035, laborEscalation: 0.07, taxRate: 0.20, electricityRate: 0.07 },
+        // 2026: EVN raised industrial tariffs ~20% in 2023; current C&I ~VND 2,000-2,400/kWh = ~$0.08-0.10
+        economy: { inflationRate: 0.035, laborEscalation: 0.07, taxRate: 0.20, electricityRate: 0.09 },
         labor: {
             minimumWage: 200, baseSalary_ShiftLead: 1100, baseSalary_Engineer: 800,
             baseSalary_Technician: 450, baseSalary_Admin: 350, baseSalary_Janitor: 200,
@@ -1634,7 +1641,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     PH: {
         id: 'PH', region: 'APAC', name: 'Philippines', currency: 'PHP', currencySymbol: '₱',
-        economy: { inflationRate: 0.05, laborEscalation: 0.05, taxRate: 0.25, electricityRate: 0.10 },
+        // 2026: Philippines has among highest C&I electricity in SEA; Meralco commercial ~PHP 7.0-8.5/kWh = ~$0.12-0.15
+        economy: { inflationRate: 0.05, laborEscalation: 0.05, taxRate: 0.25, electricityRate: 0.13 },
         labor: {
             minimumWage: 250, baseSalary_ShiftLead: 1300, baseSalary_Engineer: 1000,
             baseSalary_Technician: 550, baseSalary_Admin: 400, baseSalary_Janitor: 250,
@@ -1699,7 +1707,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     TW: {
         id: 'TW', region: 'APAC', name: 'Taiwan', currency: 'TWD', currencySymbol: 'NT$',
-        economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.20, electricityRate: 0.09 },
+        // 2026: Taipower raised industrial rates 2023-2024; ~TWD 3.5-4.0/kWh = ~$0.11-0.13 USD
+        economy: { inflationRate: 0.02, laborEscalation: 0.03, taxRate: 0.20, electricityRate: 0.12 },
         labor: {
             minimumWage: 900, baseSalary_ShiftLead: 2800, baseSalary_Engineer: 2200,
             baseSalary_Technician: 1600, baseSalary_Admin: 1200, baseSalary_Janitor: 900,
@@ -2094,7 +2103,8 @@ export const COUNTRIES: Record<string, CountryProfile> = {
     },
     FR: {
         id: 'FR', region: 'EMEA', name: 'France', currency: 'EUR', currencySymbol: '€',
-        economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.25, electricityRate: 0.13 },
+        // 2026: EDF tariff bouclier ended 2024; regulated industrial tariff ~€0.14-0.17/kWh post-normalisation
+        economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.25, electricityRate: 0.15 },
         labor: {
             minimumWage: 2100, baseSalary_ShiftLead: 7000, baseSalary_Engineer: 5500,
             baseSalary_Technician: 4000, baseSalary_Admin: 3200, baseSalary_Janitor: 2300,
