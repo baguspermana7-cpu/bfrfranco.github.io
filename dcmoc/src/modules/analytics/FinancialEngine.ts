@@ -44,8 +44,13 @@ export interface FinancialResult {
     breakEvenOccupancy: number;         // Min occupancy % to break even annually
 }
 
-// ─── IRR CALCULATION (Newton-Raphson) ───────────────────────
+// ─── IRR CALCULATION (Newton-Raphson with bisection fallback) ────
 export const calculateIRR = (cashflows: number[], guess: number = 0.10, maxIter: number = 200, tolerance: number = 1e-7): number => {
+    // Guard: need at least one positive and one negative cashflow for IRR to exist
+    const hasPositive = cashflows.some(v => v > 0);
+    const hasNegative = cashflows.some(v => v < 0);
+    if (!hasPositive || !hasNegative) return 0;
+
     let rate = guess;
 
     for (let i = 0; i < maxIter; i++) {
@@ -54,6 +59,7 @@ export const calculateIRR = (cashflows: number[], guess: number = 0.10, maxIter:
 
         for (let t = 0; t < cashflows.length; t++) {
             const denom = Math.pow(1 + rate, t);
+            if (!isFinite(denom) || denom === 0) continue;
             npv += cashflows[t] / denom;
             if (t > 0) dnpv -= (t * cashflows[t]) / Math.pow(1 + rate, t + 1);
         }
@@ -61,14 +67,24 @@ export const calculateIRR = (cashflows: number[], guess: number = 0.10, maxIter:
         if (Math.abs(npv) < tolerance) return rate;
         if (Math.abs(dnpv) < 1e-12) break; // Avoid division by zero
 
-        rate = rate - npv / dnpv;
+        const newRate = rate - npv / dnpv;
 
-        // Clamp to reasonable range
-        if (rate < -0.99) rate = -0.5;
-        if (rate > 5) rate = 2;
+        // Clamp to reasonable range and check for NaN
+        if (!isFinite(newRate)) break;
+        rate = Math.max(-0.99, Math.min(5, newRate));
     }
 
-    return rate; // Best estimate
+    // Bisection fallback for robustness (slower but guaranteed to converge)
+    let lo = -0.99;
+    let hi = 5.0;
+    const npvAt = (r: number) => cashflows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + r, t), 0);
+    for (let i = 0; i < 100; i++) {
+        const mid = (lo + hi) / 2;
+        const n = npvAt(mid);
+        if (Math.abs(n) < tolerance * 100) return mid;
+        if (Math.sign(n) === Math.sign(npvAt(lo))) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
 };
 
 // ─── DEFAULT OCCUPANCY RAMP ─────────────────────────────────
@@ -174,7 +190,10 @@ export const calculateFinancials = (inputs: FinancialInputs): FinancialResult =>
 
     // Break-even occupancy (find min occupancy where annual revenue > opex)
     const baseAnnualRevenue = revenuePerKwMonth * 12 * itLoadKw;
-    const breakEvenOccupancy = Math.min(1, annualOpex / baseAnnualRevenue);
+    // Guard: avoid NaN/Infinity when revenue is zero
+    const breakEvenOccupancy = baseAnnualRevenue > 0
+        ? Math.min(1, annualOpex / baseAnnualRevenue)
+        : 1;
 
     return {
         npv,

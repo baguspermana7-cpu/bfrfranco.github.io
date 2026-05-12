@@ -172,8 +172,9 @@ export const calculateRiskScore = (risks: RiskScenario[], tierLevel: 3 | 4): Ris
 
     // 5-year projection (risk grows ~5-8% per year without mitigation)
     const growthRate = 0.06;
+    const currentYear = new Date().getFullYear();
     const fiveYearProjection = Array.from({ length: 6 }, (_, i) => ({
-        year: 2025 + i,
+        year: currentYear + i,
         score: Math.round(totalScore * Math.pow(1 + growthRate, i)),
         label: i === 0 ? 'Baseline' : `Year ${i}`
     }));

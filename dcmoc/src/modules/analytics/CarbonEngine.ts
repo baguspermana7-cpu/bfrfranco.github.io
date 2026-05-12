@@ -57,12 +57,17 @@ export interface CarbonInputs {
 }
 
 // ─── CONSTANTS ──────────────────────────────────────────────
-const CARBON_OFFSET_PRICE_USD = 35;   // $/tCO₂ (2025 voluntary market, S&P Global)
-const CARBON_TAX_RATE_USD = 65;       // $/tCO₂ (EU ETS 2025, EUR 60-65 avg)
-const DIESEL_EMISSION_FACTOR = 2.68;  // kgCO₂ per liter diesel
-const DIESEL_CONSUMPTION_RATE = 0.3;  // liters per kW per hour
-const INDUSTRY_AVG_PUE = 1.58;        // Global average PUE (Uptime Institute)
-const INDUSTRY_AVG_CARBON = 0.475;    // kgCO₂/kWh global average
+// Updated to 2025-2026 values:
+// - Voluntary carbon offset price: ~$40-55/tCO₂ (MSCI / Ecosystem Marketplace 2025)
+// - EU ETS allowance: ~EUR 55-70/tCO₂ (2025 average ~EUR 63 → ~$68)
+// - IEA global grid average: ~0.49 kgCO₂/kWh (2024 IEA Electricity Report)
+// - Uptime 2025 industry average PUE: ~1.58 (slightly rising with AI workloads)
+const CARBON_OFFSET_PRICE_USD = 45;   // $/tCO₂ (2025 voluntary market, Ecosystem Marketplace / MSCI)
+const CARBON_TAX_RATE_USD = 68;       // $/tCO₂ (EU ETS 2025-2026, EUR 63 avg → ~$68)
+const DIESEL_EMISSION_FACTOR = 2.68;  // kgCO₂ per liter diesel (DEFRA 2025 — unchanged)
+const DIESEL_CONSUMPTION_RATE = 0.3;  // liters per kW per hour (typical genset at 75% load)
+const INDUSTRY_AVG_PUE = 1.58;        // Global average PUE (Uptime Institute 2025)
+const INDUSTRY_AVG_CARBON = 0.49;     // kgCO₂/kWh global average (IEA Electricity 2024-2025)
 
 // Refrigerant GWP factors by cooling type
 const REFRIGERANT_DATA: Record<string, { chargeKgPerKw: number; leakRatePct: number; gwp: number }> = {
@@ -123,7 +128,8 @@ export const calculateCarbonFootprint = (inputs: CarbonInputs): CarbonResult => 
 
     // Benchmarks
     const industryAvgEmissions = (itLoadKw * hoursPerYear * INDUSTRY_AVG_PUE * INDUSTRY_AVG_CARBON) / 1_000;
-    const carbonIntensityPerKw = (totalEmissions * 1000) / itLoadKw; // kgCO₂/kW
+    // Guard against division by zero when itLoadKw is 0
+    const carbonIntensityPerKw = itLoadKw > 0 ? (totalEmissions * 1000) / itLoadKw : 0; // kgCO₂/kW
 
     // Efficiency rating
     const ratio = netEmissions / industryAvgEmissions;
