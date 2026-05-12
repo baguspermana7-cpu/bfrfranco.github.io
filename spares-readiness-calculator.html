@@ -465,6 +465,8 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 /* Contract checklist */
 .contract-row-flagged td { background: rgba(245,158,11,0.06); }
 [data-theme="dark"] .contract-row-flagged td { background: rgba(245,158,11,0.08); }
+[data-theme="dark"] .sh-checkbox-label { color: #cbd5e1; }
+[data-theme="dark"] input[type="checkbox"] { accent-color: var(--amber); }
 
 /* Process Improvement RACI */
 .raci-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 0.75rem; }
@@ -604,7 +606,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     <h1>Critical Spares Engine</h1>
     <p>Quantify spare-parts readiness, optimal stock levels, supplier risk index, and last-time-buy economics for data-center mechanical &amp; electrical equipment. Powered by FMECA, Newsvendor, METRIC/MEIO, Kraljic, and DMSMS methodologies.</p>
     <div class="hero-stats">
-      <span class="hero-stat"><i class="fas fa-th"></i> 9 modules</span>
+      <span class="hero-stat"><i class="fas fa-th"></i> 20 modules</span>
       <span class="hero-stat"><i class="fas fa-chart-bar"></i> Live charts</span>
       <span class="hero-stat"><i class="fas fa-dice"></i> Monte-Carlo</span>
       <span class="hero-stat"><i class="fas fa-file-pdf"></i> PDF export</span>
@@ -677,6 +679,10 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <button class="tab-btn tab-btn-ops" onclick="switchTab('contract')" role="tab" aria-selected="false" aria-controls="pane-contract">D · Contract Checklist</button>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('process')" role="tab" aria-selected="false" aria-controls="pane-process">E · Process Improvement</button>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('meeting')" role="tab" aria-selected="false" aria-controls="pane-meeting">F · Meeting Intel</button>
+      <button class="tab-btn tab-btn-ops" onclick="switchTab('stakeholder')" role="tab" aria-selected="false" aria-controls="pane-stakeholder">G · Stakeholder</button>
+      <button class="tab-btn tab-btn-ops" onclick="switchTab('eol')" role="tab" aria-selected="false" aria-controls="pane-eol">H · EOL Response</button>
+      <button class="tab-btn tab-btn-ops" onclick="switchTab('ambiguity')" role="tab" aria-selected="false" aria-controls="pane-ambiguity">I · Ambiguity Solver</button>
+      <button class="tab-btn tab-btn-ops" onclick="switchTab('star')" role="tab" aria-selected="false" aria-controls="pane-star">J · STAR Builder</button>
       <button class="tab-btn" onclick="switchTab('faq')" role="tab" aria-selected="false" aria-controls="pane-faq">9 · Methodology</button>
     </div>
   </div>
@@ -1938,6 +1944,268 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <summary>ⓘ How agendas are generated</summary>
         <p>The prep brief agenda is auto-generated from the meeting type using the canonical review cadence templates from the master sourcing engine: Supplier Operational Review → PO review, expedite, shortage, commit validation, quality, recovery; Monthly Business Review → KPI trend, cost, lead time, capacity, improvement, contract, upcoming demand; Quarterly Executive Review → strategic alignment, supply roadmap, commercial partnership, long-term capacity, risk &amp; resiliency. The notes template is a live editable structured form — click "Add row" to expand any table.</p>
       </details>
+    </div>
+
+    <!-- ===== TAB G: STAKEHOLDER & COMMUNICATION PLANNER ===== -->
+    <div class="module-pane" id="pane-stakeholder">
+      <div class="ops-intro"><strong>Stakeholder &amp; Communication Planner</strong> — Select stakeholders involved, describe the topic/situation, set urgency, and generate tailored message drafts, a stakeholder map, and an escalation path. All outputs are deterministic templates — edit before sending.</div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-users"></i> Stakeholder Selection &amp; Context</div>
+          <div class="input-group">
+            <label class="input-label" for="sh_topic">Situation / Topic <span style="font-weight:400;color:var(--text-muted);">(what you are communicating about)</span></label>
+            <textarea id="sh_topic" class="input-field" rows="3" placeholder="e.g. Chiller pump motor PO 45001234 is 15 days late; site need date May 28. Requesting recovery plan and leadership visibility." aria-label="Situation or topic to communicate"></textarea>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sh_need">What You Need From Stakeholders <span style="font-weight:400;color:var(--text-muted);">(overall ask)</span></label>
+            <input type="text" id="sh_need" class="input-field" value="Recovery plan confirmation, budget pre-approval for expedite, engineering sign-off on alternate part" aria-label="What you need from stakeholders">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sh_urgency">Urgency Level</label>
+            <select id="sh_urgency" class="input-field" aria-label="Urgency level">
+              <option value="routine">Routine — standard update, no immediate action needed</option>
+              <option value="elevated">Elevated — action needed within a week</option>
+              <option value="urgent" selected>Urgent — action needed within 24–48 hours</option>
+              <option value="critical">Critical — immediate action, possible site risk</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Stakeholders Involved <span style="font-weight:400;color:var(--text-muted);">(select all that apply)</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="ops" checked aria-label="DC Operations"> DC Operations</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="engineering" checked aria-label="Engineering"> Engineering</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="procurement" aria-label="Procurement"> Procurement</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="finance" aria-label="Finance"> Finance</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="legal" aria-label="Legal"> Legal</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="logistics" aria-label="Logistics"> Logistics</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="supplier" checked aria-label="Supplier"> Supplier</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer;"><input type="checkbox" name="sh_stk" value="leadership" checked aria-label="Leadership"> Leadership</label>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="genStakeholder()" aria-label="Generate stakeholder communication plan">Generate Plan</button>
+            <button class="btn-copy" onclick="copyOutput('sh_output_wrap')" aria-label="Copy stakeholder plan output"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn-pdf" onclick="exportStakeholderPDF()" aria-label="Export stakeholder plan as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+        <div>
+          <div id="sh_output_wrap" style="display:none;">
+            <!-- generated by JS -->
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary>ⓘ How the plan is generated</summary>
+            <p>Stakeholder map attributes (What They Care About, Communication Style) are drawn from the master PM sourcing engine Module 9 stakeholder registry. Channel and cadence are auto-derived from urgency: <strong>Critical/Urgent</strong> → phone call + written follow-up same day; <strong>Elevated</strong> → email + meeting within 48h; <strong>Routine</strong> → email/async. Message drafts are register-adjusted: executive = concise + decision-oriented; supplier = specific ask + written commitment + deadline; finance = numbers + scenario; legal = risk framing + clause intent.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB H: EOL RESPONSE PLAN ===== -->
+    <div class="module-pane" id="pane-eol">
+      <div class="ops-intro"><strong>EOL Response Plan</strong> — Enter the EOL notice details for a part or component to generate a complete response plan: options analysis, LTB quantity estimate, replacement qualification roadmap, supplier negotiation points, and stakeholder communication. Complements the Last-Time-Buy (Tab 6) NPV analysis.</div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-hourglass-end"></i> EOL Notice Inputs</div>
+          <div class="input-group">
+            <label class="input-label" for="eol_part">OEM Part Description</label>
+            <input type="text" id="eol_part" class="input-field" value="BMS Controller Board Gen-3 (legacy PLC module)" aria-label="OEM part description">
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_notice_date">EOL / Last-Order Notice Date</label>
+              <input type="date" id="eol_notice_date" class="input-field" aria-label="EOL notice date">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_criticality">Criticality (1–10)</label>
+              <input type="number" id="eol_criticality" class="input-field" value="8" min="1" max="10" step="1" aria-label="Criticality score">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_installed">Installed Units in Fleet</label>
+              <input type="number" id="eol_installed" class="input-field" value="43" min="1" step="1" aria-label="Installed units">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_sites">Sites Affected</label>
+              <input type="number" id="eol_sites" class="input-field" value="8" min="1" step="1" aria-label="Sites affected">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_support_yrs">Support Years Needed</label>
+              <input type="number" id="eol_support_yrs" class="input-field" value="7" min="1" max="30" step="1" aria-label="Support years needed">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_failure_rate">Annual Failure Rate (failures/unit/yr)</label>
+              <input type="number" id="eol_failure_rate" class="input-field" value="0.12" min="0.001" max="5" step="0.01" aria-label="Annual failure rate per unit">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_onhand">On-Hand Inventory Now</label>
+              <input type="number" id="eol_onhand" class="input-field" value="3" min="0" step="1" aria-label="On-hand inventory">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_open_po">Open-PO Qty</label>
+              <input type="number" id="eol_open_po" class="input-field" value="0" min="0" step="1" aria-label="Open PO quantity">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_unit_cost">Unit Cost ($)</label>
+              <input type="number" id="eol_unit_cost" class="input-field" value="4500" min="1" step="100" aria-label="Unit cost">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_alt_count">Qualified Alternates Available (#)</label>
+              <input type="number" id="eol_alt_count" class="input-field" value="0" min="0" max="20" step="1" aria-label="Qualified alternates available">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_alt_qual_lt">Alt Qualification Lead Time (months)</label>
+              <input type="number" id="eol_alt_qual_lt" class="input-field" value="18" min="1" max="60" step="1" aria-label="Alt qualification lead time in months">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_alt_qual_cost">Alt Qualification Cost ($)</label>
+              <input type="number" id="eol_alt_qual_cost" class="input-field" value="60000" min="0" step="1000" aria-label="Alt qualification cost">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="eol_redesign">Redesign Feasible?</label>
+              <select id="eol_redesign" class="input-field" aria-label="Redesign feasibility">
+                <option value="no" selected>No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="eol_carry_rate">Carrying Cost Rate (%/yr)</label>
+              <input type="number" id="eol_carry_rate" class="input-field" value="22" min="5" max="50" step="1" aria-label="Carrying cost rate percent per year">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="genEOLPlan()" aria-label="Generate EOL response plan">Generate Plan</button>
+            <button class="btn-copy" onclick="copyOutput('eol_output_wrap')" aria-label="Copy EOL plan output"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn-pdf" onclick="exportEOLPDF()" aria-label="Export EOL plan as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+        <div>
+          <div id="eol_output_wrap" style="display:none;">
+            <!-- generated by JS -->
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary>ⓘ How EOL quantities are computed</summary>
+            <p>LTB quantity: <code>LTB_Q = ceil(installedUnits × failureRate × supportYears × 1.20 − onHand − openPO)</code>. Safety multiplier 1.20 covers demand uncertainty and scrap risk. Fleet exposure score: <code>EOL_Score = (installedUnits × criticality × supportYears) / max(1, qualAlts)</code>.</p>
+            <p>Options viability: "Qualify Alternate" shown as viable if alternates &gt; 0 or alt-qual lead time &lt; support years. "LTB Stock" always viable as fallback. "Redesign" viable only if redesign input = Yes. "Refurb / Harvest Pool" viable if criticality ≤ 6 or installed base is large. "Do Nothing" viable only if criticality &lt; 4.</p>
+            <p>For full NPV comparison of LTB vs Requalify, open the <strong>Last-Time-Buy tab (Tab 6)</strong> with the same inputs.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB I: AMBIGUITY SOLVER ===== -->
+    <div class="module-pane" id="pane-ambiguity">
+      <div class="ops-intro"><strong>Ambiguity Solver</strong> — Turn an undefined ask into a structured work plan. Enter the vague request, who asked, and the apparent scope. The solver generates candidate interpretations, a sharpened problem statement, a hypothesis tree, clarifying questions, a data request list, a 30/60/90-day plan, and risks/assumptions.</div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-magnifying-glass-chart"></i> Ambiguous Ask Inputs</div>
+          <div class="input-group">
+            <label class="input-label" for="amb_ask">The Ambiguous Ask <span style="font-weight:400;color:var(--text-muted);">(paste what leadership / customer said)</span></label>
+            <textarea id="amb_ask" class="input-field" rows="4" placeholder='e.g. "Leadership wants me to improve spare readiness but hasn't defined the problem" — or paste the exact ask.' aria-label="The ambiguous ask from leadership or customer"></textarea>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="amb_who_asked">Who Asked</label>
+              <select id="amb_who_asked" class="input-field" aria-label="Who asked">
+                <option value="leadership" selected>Leadership / Executive</option>
+                <option value="customer">Customer / Internal Client</option>
+                <option value="engineering">Engineering</option>
+                <option value="crossfunc">Cross-functional Team</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="amb_scope">Apparent Scope</label>
+              <select id="amb_scope" class="input-field" aria-label="Apparent scope">
+                <option value="one_commodity">One Commodity</option>
+                <option value="one_region">One Region</option>
+                <option value="fleet" selected>Fleet-Wide</option>
+                <option value="unclear">Unclear / Not Defined</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="amb_keywords">Key Words or Themes in the Ask <span style="font-weight:400;color:var(--text-muted);">(comma-separated)</span></label>
+            <input type="text" id="amb_keywords" class="input-field" value="readiness, reliability, cost, lead time" placeholder="e.g. readiness, cost, supplier, EOL" aria-label="Key words in the ask">
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="genAmbiguitySolver()" aria-label="Generate ambiguity solver output">Solve It</button>
+            <button class="btn-copy" onclick="copyOutput('amb_output_wrap')" aria-label="Copy ambiguity solver output"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn-pdf" onclick="exportAmbiguityPDF()" aria-label="Export ambiguity solver output as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+        <div>
+          <div id="amb_output_wrap" style="display:none;">
+            <!-- generated by JS -->
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary>ⓘ How interpretations are generated</summary>
+            <p>The solver scans the ask for supply-chain signal words (readiness, inventory, supplier, cost, lead time, EOL, forecast, risk, process, visibility, alternate, expedite, shortage) and maps each to a candidate interpretation from the master PM sourcing engine Module 14 framework. The sharpened problem statement uses the SMART structure: what to improve, from what baseline, to what target, across what scope, by when. The 30/60/90-day plan follows the Discover → Stabilise → Systematise pattern standard for hyperscale PM roles.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB J: INTERVIEW & PERFORMANCE STORY BUILDER ===== -->
+    <div class="module-pane" id="pane-star">
+      <div class="ops-intro"><strong>Interview &amp; Performance Story Builder (STAR)</strong> — Build a structured, polished Situation–Task–Action–Result story for hyperscale Program Manager interviews or performance reviews. Enter a competency, brief situation, action, and result — the builder generates a narrative in the right register plus coaching notes and likely interview questions. This is a career-companion tool; use it for interview prep or writing self-assessments.</div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-star"></i> STAR Story Inputs</div>
+          <div class="input-group">
+            <label class="input-label" for="star_competency">Competency to Demonstrate</label>
+            <select id="star_competency" class="input-field" aria-label="Competency to demonstrate">
+              <option value="ambiguity">Driving Clarity from Ambiguity</option>
+              <option value="influence">Cross-Functional Influence</option>
+              <option value="negotiation" selected>Supplier Negotiation</option>
+              <option value="risk">Risk Management</option>
+              <option value="process">Process Improvement</option>
+              <option value="crisis">Crisis Recovery / Supplier Escalation</option>
+              <option value="strategic">Strategic Sourcing</option>
+              <option value="data">Data-Driven Decision Making</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="star_situation">Situation <span style="font-weight:400;color:var(--text-muted);">(context — what was happening, what was at stake)</span></label>
+            <textarea id="star_situation" class="input-field" rows="3" placeholder="e.g. Critical chiller pump motor supply was at risk — supplier's commit date was 15 days after site need date, 3 units on hand vs 10 forecast for 60 days, no qualified alternate." aria-label="Situation context"></textarea>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="star_task">Task <span style="font-weight:400;color:var(--text-muted);">(what you were responsible for)</span></label>
+            <textarea id="star_task" class="input-field" rows="2" placeholder="e.g. Recover supply continuity, negotiate a recovery plan with the supplier, and qualify an alternate to prevent recurrence." aria-label="Your task or responsibility"></textarea>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="star_action">Action <span style="font-weight:400;color:var(--text-muted);">(what you did — be specific about your role)</span></label>
+            <textarea id="star_action" class="input-field" rows="3" placeholder="e.g. Requested written recovery plan within 24h. Escalated to supplier VP. Identified 2 distributors with floor stock. Worked with engineering to fast-track alternate qualification. Issued daily stand-ups until resolved." aria-label="Actions you took"></textarea>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="star_result">Result <span style="font-weight:400;color:var(--text-muted);">(quantified outcome)</span></label>
+            <textarea id="star_result" class="input-field" rows="2" placeholder="e.g. Partial shipment of 5 units secured 10 days early. Site readiness restored to 100% before need date. Alternate qualified in 8 weeks. Reduced single-source exposure from 100% to 40%." aria-label="Results and outcomes"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="genSTAR()" aria-label="Generate STAR story">Build Story</button>
+            <button class="btn-copy" onclick="copyOutput('star_output_wrap')" aria-label="Copy STAR story output"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn-pdf" onclick="exportSTARPDF()" aria-label="Export STAR story as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          </div>
+        </div>
+        <div>
+          <div id="star_output_wrap" style="display:none;">
+            <!-- generated by JS -->
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary>ⓘ How the story is built</summary>
+            <p>The builder combines your inputs with competency-specific narrative scaffolding for the selected PM dimension (e.g. Supplier Negotiation → frame the constraint, name your leverage, show the process you built). The register targets hyperscale program management interviews: structured → leads with the headline result, names cross-functional stakeholders, shows the system built (not just the firefight), ends with scale/lesson. Coaching notes are generated per competency based on common interviewer scoring rubrics.</p>
+          </details>
+        </div>
+      </div>
     </div>
 
     <div class="module-pane" id="pane-faq">
@@ -3392,9 +3660,11 @@ function exportLTBPDF() {
   var commitEl = document.getElementById('r_commit_date');
   var needEl = document.getElementById('r_need_date');
   var eolEl = document.getElementById('ltb_eol_date');
+  var eolNoticeDateEl = document.getElementById('eol_notice_date');
   if (commitEl) commitEl.value = toDateStr(commitDefault);
   if (needEl) needEl.value = toDateStr(needDefault);
   if (eolEl) eolEl.value = toDateStr(eolDefault);
+  if (eolNoticeDateEl && !eolNoticeDateEl.value) eolNoticeDateEl.value = toDateStr(eolDefault);
 
   // Apply initial commodity defaults for chiller (default selection)
   applyCommodityDefaults('chiller', 'init');
@@ -4032,9 +4302,613 @@ function exportMeetingNotesPDF() {
 }
 
 /* ===========================================
+   TAB G: STAKEHOLDER & COMMUNICATION PLANNER
+   =========================================== */
+var SH_MAP = {
+  ops:        { label: 'DC Operations',    care: 'Uptime, maintenance readiness, part availability on-site',          style: 'Clear, operational, deadline-based. Lead with site impact.',          channel_routine: 'Email or shared tracker', channel_elevated: 'Email + team sync', channel_urgent: 'Instant message + email follow-up', channel_critical: 'Phone call + immediate written follow-up', cadence_routine: 'Weekly status update', cadence_elevated: 'Same-day response', cadence_urgent: 'Within 4 hours', cadence_critical: 'Immediate' },
+  engineering: { label: 'Engineering',    care: 'Technical fit, qualification status, reliability, part revision',   style: 'Evidence-based, technical detail. Cite specs, test data, alternates.', channel_routine: 'Email with attachment', channel_elevated: 'Email + review meeting', channel_urgent: 'Email flagged + calendar invite', channel_critical: 'Call + email', cadence_routine: 'Bi-weekly', cadence_elevated: 'Within 48h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' },
+  procurement: { label: 'Procurement',   care: 'PO process compliance, supplier qualification, commercial terms',   style: 'Structured commercial brief. Use numbers, SLAs, and PO reference.',  channel_routine: 'Email', channel_elevated: 'Email + brief meeting', channel_urgent: 'Email + flag in system', channel_critical: 'Call + email', cadence_routine: 'Weekly', cadence_elevated: 'Within 48h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' },
+  finance:     { label: 'Finance',        care: 'Cost, budget adherence, forecast accuracy, savings targets',        style: 'Numbers and scenarios first. State cost, options, risk of inaction.',  channel_routine: 'Email with data', channel_elevated: 'Email + meeting', channel_urgent: 'Email flagged urgent', channel_critical: 'Call + written case', cadence_routine: 'Monthly reporting cycle', cadence_elevated: 'Within 48h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' },
+  legal:       { label: 'Legal',          care: 'Contract risk, liability exposure, commercial terms legality',      style: 'Risk framing + clause intent. Flag what is open and what is needed.',  channel_routine: 'Email', channel_elevated: 'Email + review slot', channel_urgent: 'Email priority flag', channel_critical: 'Call + written brief', cadence_routine: 'Contract review cadence', cadence_elevated: 'Within 48h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' },
+  logistics:   { label: 'Logistics',      care: 'Shipment timing, customs clearance, delivery windows, freight cost', style: 'Shipment details, specific dates, carrier contacts, Incoterms.',        channel_routine: 'Email', channel_elevated: 'Email + tracking update', channel_urgent: 'Email + IM', channel_critical: 'Call + email', cadence_routine: 'Per-shipment update', cadence_elevated: 'Within 24h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' },
+  supplier:    { label: 'Supplier',       care: 'Forecast visibility, PO clarity, technical specs, commit feasibility', style: 'Specific ask, written commitment required, hard deadline. Be direct.',  channel_routine: 'Email', channel_elevated: 'Email + meeting', channel_urgent: 'Email + phone call', channel_critical: 'Phone call + written follow-up', cadence_routine: 'Weekly', cadence_elevated: 'Within 24h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' },
+  leadership:  { label: 'Leadership',     care: 'Readiness status, risk visibility, decisions needed, strategic tradeoffs', style: 'Concise, decision-oriented. State status, risk, recommendation in 3 lines.', channel_routine: 'Email summary', channel_elevated: 'Email brief', channel_urgent: 'Email + Slack/IM', channel_critical: 'Direct message or call + email', cadence_routine: 'Weekly', cadence_elevated: 'Within 24h', cadence_urgent: 'Same day', cadence_critical: 'Immediate' }
+};
+
+function _shChannelKey(urgency) {
+  if (urgency === 'critical') return 'channel_critical';
+  if (urgency === 'urgent') return 'channel_urgent';
+  if (urgency === 'elevated') return 'channel_elevated';
+  return 'channel_routine';
+}
+function _shCadenceKey(urgency) {
+  if (urgency === 'critical') return 'cadence_critical';
+  if (urgency === 'urgent') return 'cadence_urgent';
+  if (urgency === 'elevated') return 'cadence_elevated';
+  return 'cadence_routine';
+}
+
+function _shMessage(stkKey, topic, need, urgency) {
+  var s = SH_MAP[stkKey];
+  if (!s) return '';
+  var subj = urgency === 'critical' ? '[CRITICAL ACTION REQUIRED] ' : urgency === 'urgent' ? '[Urgent] ' : urgency === 'elevated' ? '[Action Needed] ' : '';
+  subj += topic.substring(0, 60) + (topic.length > 60 ? '…' : '');
+
+  var bodies = {
+    ops: 'Subject: ' + subj + '\n\nHi [DC Ops Lead],\n\nSituation: ' + topic + '\n\nWhat I need from you:\n' + need + '\n\nImpact if not resolved by [DATE]: Risk to site maintenance readiness — unable to fulfil corrective or preventive maintenance on schedule.\n\nNext step: Please confirm current site inventory and any pending maintenance window that would need this part. Reply by [TIME/DATE].\n\nThanks,\n[Your Name]',
+    engineering: 'Subject: ' + subj + '\n\nHi [Engineering Lead],\n\nContext: ' + topic + '\n\nEngineering input needed:\n' + need + '\n\nSpecifically: Can you confirm whether [alternate part / spec / revision] is technically acceptable? Please advise on qualification requirements and timeline. Evidence requested: compliance spec sheet, test data, or prior qualification record.\n\nRequired by: [DATE]\n\nThanks,\n[Your Name]',
+    procurement: 'Subject: ' + subj + '\n\nHi [Procurement Lead],\n\nSummary: ' + topic + '\n\nCommercial / process support needed:\n' + need + '\n\nPO / contract reference: [PO number or contract ref]. Please advise on process path, approval routing, or any commercial terms constraint. Target resolution: [DATE].\n\nThanks,\n[Your Name]',
+    finance: 'Subject: ' + subj + '\n\nHi [Finance Business Partner],\n\nSituation: ' + topic + '\n\nFinancial ask:\n' + need + '\n\nCost context: Estimated spend $[X]. Risk of inaction: $[Y] in downtime or expedite cost if not approved by [DATE]. Options: (A) Pre-approve $[X] now; (B) Defer — accept readiness risk. Recommend option A. Your sign-off needed by: [DATE].\n\nThanks,\n[Your Name]',
+    legal: 'Subject: ' + subj + '\n\nHi [Legal Counsel],\n\nContext: ' + topic + '\n\nLegal review needed:\n' + need + '\n\nKey concern: [specific clause or risk, e.g. EOL notice period, LTB right, warranty extension]. This affects supply continuity. Please flag any contractual risk and advise on preferred language. Target turnaround: [DATE].\n\nThanks,\n[Your Name]',
+    logistics: 'Subject: ' + subj + '\n\nHi [Logistics / Freight Lead],\n\nShipment context: ' + topic + '\n\nLogistics support needed:\n' + need + '\n\nKey dates: Ship by [DATE] to meet site need date [DATE]. Incoterms: [DDP preferred]. Please confirm freight forwarder availability, customs docs required, and any special handling. Update needed by: [DATE].\n\nThanks,\n[Your Name]',
+    supplier: 'Subject: ' + subj + '\n\nDear [Supplier Contact],\n\nWe need your immediate attention on: ' + topic + '\n\nSpecific ask:\n' + need + '\n\nPlease provide a written response confirming:\n1. Your committed action and owner name.\n2. Date of resolution.\n3. Any constraints or risks to the plan.\n\nDeadline for your written response: [DATE / TIME]. If no response is received by then, we will escalate to [executive or alternate sourcing path].\n\nBest regards,\n[Your Name]',
+    leadership: 'Subject: ' + subj + '\n\nFYI / Decision Needed:\n\nStatus: [RED / YELLOW / GREEN]\nIssue: ' + topic.substring(0, 120) + (topic.length > 120 ? '…' : '') + '\nBusiness impact: [state risk to site or cost]\nWhat I need from you: ' + need.substring(0, 80) + (need.length > 80 ? '…' : '') + '\nRecommendation: [your recommendation in one sentence]\nNext milestone: [date and what happens next]\n\n[Your Name]'
+  };
+  return bodies[stkKey] || ('To: ' + s.label + '\n\nSubject: ' + subj + '\n\nContext: ' + topic + '\n\nAsk: ' + need);
+}
+
+function genStakeholder() {
+  var topic = getStr('sh_topic', 'Spares readiness issue');
+  var need = getStr('sh_need', 'Action required');
+  var urgency = getStr('sh_urgency', 'urgent');
+  var selected = [];
+  document.querySelectorAll('[name="sh_stk"]:checked').forEach(function(el) { selected.push(el.value); });
+  if (selected.length === 0) { showMsg('Select at least one stakeholder.'); return; }
+
+  var urgencyLabel = { routine: 'ROUTINE', elevated: 'ELEVATED', urgent: 'URGENT', critical: 'CRITICAL' }[urgency] || urgency.toUpperCase();
+  var urgencyClass = { routine: 'ops-status-green', elevated: 'ops-status-yellow', urgent: 'ops-status-red', critical: 'ops-status-red' }[urgency];
+
+  // Stakeholder map table
+  var mapRows = selected.map(function(k) {
+    var s = SH_MAP[k]; if (!s) return '';
+    var ck = _shChannelKey(urgency); var cdk = _shCadenceKey(urgency);
+    return '<tr><td><strong>' + s.label + '</strong></td><td>' + s.care + '</td><td>' + s.style + '</td><td>' + s[ck] + '</td><td>' + s[cdk] + '</td></tr>';
+  }).join('');
+
+  var mapTable = '<table class="ops-table"><thead><tr><th>Stakeholder</th><th>What They Care About</th><th>Communication Style</th><th>Recommended Channel</th><th>Cadence / Deadline</th></tr></thead><tbody>' + mapRows + '</tbody></table>';
+
+  // Message drafts
+  var msgDrafts = selected.map(function(k) {
+    var s = SH_MAP[k]; if (!s) return '';
+    var msg = _shMessage(k, topic, need, urgency);
+    return '<div class="ops-output-title"><i class="fas fa-envelope"></i> Message Draft — ' + s.label + '</div><pre class="gen-text-block">' + msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '<\/pre>';
+  }).join('');
+
+  // Escalation path if urgent/critical
+  var escalation = '';
+  if (urgency === 'urgent' || urgency === 'critical') {
+    escalation = '<div class="ops-output-title"><i class="fas fa-arrow-up-right-dots"></i> Escalation Path</div>' +
+      '<pre class="gen-text-block">Trigger: Commit or response not received within [X hours] of initial outreach.\n\nLevel 1: PM to Supplier/Stakeholder direct — [NAME] — [PHONE/EMAIL] — Deadline: [DATE/TIME]\nLevel 2: PM Manager / Sourcing Lead — [NAME] — [PHONE/EMAIL] — Trigger: No Level 1 response in [4h / 24h]\nLevel 3: Executive Sponsor / VP — [NAME] — [PHONE/EMAIL] — Trigger: Level 2 not resolved in [24h / 48h]\n\nEscalation criteria:\n- Supplier commit date still after site need date after initial response\n- Recovery plan does not close the readiness gap\n- Internal action owner has not responded to two follow-ups\n- Issue is new or risk has increased since last update<\/pre>';
+  }
+
+  var statusBar = '<div class="ops-status-strip ' + urgencyClass + '">Urgency: <strong>' + urgencyLabel + '</strong> | Stakeholders: <strong>' + selected.length + '</strong> | Topic: ' + topic.substring(0, 60) + (topic.length > 60 ? '…' : '') + '</div>';
+
+  var wrap = document.getElementById('sh_output_wrap');
+  if (wrap) {
+    wrap.innerHTML = statusBar +
+      '<div class="ops-output-title"><i class="fas fa-table"></i> Stakeholder Map</div>' + mapTable +
+      '<div class="ops-output-title"><i class="fas fa-comment-dots"></i> Tailored Message Drafts</div><p style="font-size:0.77rem;color:var(--text-muted);margin-bottom:0.5rem;">Edit bracketed fields before sending.</p>' + msgDrafts +
+      escalation;
+    wrap.style.display = 'block';
+  }
+}
+
+function exportStakeholderPDF() {
+  var wrap = document.getElementById('sh_output_wrap');
+  if (!wrap || wrap.style.display === 'none') { showMsg('Generate plan first.'); return; }
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write('<!DOCTYPE html><html><head><title>Stakeholder Communication Plan<\/title>' +
+    '<style>body{font-family:Arial,sans-serif;font-size:11px;padding:20px;color:#1e293b}h2{color:#f59e0b}table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border:1px solid #cbd5e1;padding:4px 6px;text-align:left}th{background:#f1f5f9}pre{white-space:pre-wrap;font-size:10px;background:#f8fafc;padding:10px;border-left:3px solid #f59e0b;margin:4px 0}.ops-output-title{font-weight:700;margin:12px 0 4px;color:#f59e0b}.ops-status-red,.ops-status-yellow,.ops-status-green{font-weight:700;color:#d97706}<\/style>' +
+    '<\/head><body><h2>Stakeholder &amp; Communication Plan<\/h2><p>Generated: ' + new Date().toLocaleString() + '<\/p>' + wrap.innerHTML + '<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ===========================================
+   TAB H: EOL RESPONSE PLAN
+   =========================================== */
+function genEOLPlan() {
+  var part = getStr('eol_part', 'Part');
+  var criticality = clamp(getVal('eol_criticality', 8), 1, 10);
+  var installed = clamp(getVal('eol_installed', 43), 1, 5000);
+  var sites = clamp(getVal('eol_sites', 8), 1, 500);
+  var supportYrs = clamp(getVal('eol_support_yrs', 7), 1, 30);
+  var failureRate = clamp(getVal('eol_failure_rate', 0.12), 0.001, 5);
+  var onhand = clamp(getVal('eol_onhand', 3), 0, 9999);
+  var openPO = clamp(getVal('eol_open_po', 0), 0, 9999);
+  var unitCost = clamp(getVal('eol_unit_cost', 4500), 1, 1e9);
+  var altCount = clamp(getVal('eol_alt_count', 0), 0, 20);
+  var altQualLT = clamp(getVal('eol_alt_qual_lt', 18), 1, 60);
+  var altQualCost = clamp(getVal('eol_alt_qual_cost', 60000), 0, 1e9);
+  var redesign = getStr('eol_redesign', 'no') === 'yes';
+  var carryRate = clamp(getVal('eol_carry_rate', 22), 1, 100) / 100;
+
+  var noticeDate = document.getElementById('eol_notice_date') ? document.getElementById('eol_notice_date').value : '(not set)';
+
+  // LTB quantity
+  var rawLTB = installed * failureRate * supportYrs * 1.20 - onhand - openPO;
+  var ltbQty = Math.max(0, Math.ceil(rawLTB));
+  var ltbCost = ltbQty * unitCost;
+  var avgCarry = (ltbQty / 2) * unitCost * carryRate * supportYrs;
+
+  // EOL Exposure Score
+  var eolScore = (installed * criticality * supportYrs) / Math.max(1, altCount);
+  var eolBand, eolClass;
+  if (eolScore < 50)  { eolBand = 'LOW';      eolClass = 'rag-green'; }
+  else if (eolScore < 150) { eolBand = 'MEDIUM';  eolClass = 'rag-yellow'; }
+  else if (eolScore < 300) { eolBand = 'HIGH';    eolClass = 'rag-red'; }
+  else                { eolBand = 'CRITICAL'; eolClass = 'rag-red'; }
+
+  // Risk window assessment
+  var altQualYrs = altQualLT / 12;
+  var rushNeeded = altQualYrs > supportYrs;
+  var ltbViable = true; // always
+  var altViable = altCount > 0 || altQualLT <= supportYrs * 12;
+  var redesignViable = redesign;
+  var refurbViable = criticality <= 6 || installed >= 20;
+  var doNothingViable = criticality < 4;
+
+  // Impact assessment
+  var annualDemand = (installed * failureRate).toFixed(1);
+  var totalDemand = (installed * failureRate * supportYrs).toFixed(1);
+  var supplyGap = Math.max(0, installed * failureRate * supportYrs - onhand - openPO);
+
+  var summaryBlock = 'EOL SUMMARY\n' +
+    'Part: ' + part + '\n' +
+    'EOL / Last-Order Notice Date: ' + noticeDate + '\n' +
+    'Fleet Installed: ' + installed + ' units across ' + sites + ' sites\n' +
+    'Criticality: ' + criticality + ' / 10\n' +
+    'Support Window Needed: ' + supportYrs + ' years\n' +
+    'Annual Demand (installedBase × failureRate): ' + annualDemand + ' units/yr\n' +
+    'Total Forecast Demand over Support Life: ' + totalDemand + ' units\n' +
+    'Current On-Hand + Open PO: ' + (onhand + openPO) + ' units\n' +
+    'Supply Gap: ' + supplyGap.toFixed(0) + ' units\n' +
+    'EOL Exposure Score: ' + eolScore.toFixed(1) + ' — ' + eolBand + '\n' +
+    'Qualified Alternates: ' + altCount + (altCount === 0 ? ' — NONE (single-source risk)' : '');
+
+  var impactBlock = 'IMPACT ASSESSMENT\n' +
+    (supplyGap > 0 ? '⚑ Supply gap exists: ' + supplyGap.toFixed(0) + ' units needed beyond current on-hand + open PO\n' : '✓ On-hand + open PO covers forecast demand\n') +
+    (altCount === 0 ? '⚑ No qualified alternates — full single-source dependency at EOL\n' : '✓ ' + altCount + ' alternate(s) available — qualification timeline: ' + altQualLT + ' months\n') +
+    (rushNeeded ? '⚑ Alt qualification lead time (' + altQualLT + ' mo) exceeds support window (' + (supportYrs * 12).toFixed(0) + ' mo) — LTB stock required as bridge\n' : '') +
+    'Risk if no action taken: inability to perform corrective maintenance on ' + installed + ' installed units for up to ' + supportYrs + ' years.';
+
+  // Options table
+  var optRows = [
+    { opt: 'Last-Time-Buy (LTB)', viable: ltbViable, when: 'Always viable as fallback; mandatory if no alternates and criticality ≥ 7', pros: 'Guaranteed supply through life; known cost', cons: 'Capital tie-up; carrying cost; scrap risk; does not fix root cause' },
+    { opt: 'Qualify Alternate Part', viable: altViable, when: 'Viable if alt-qual lead time < support years or alternates already exist', pros: 'Eliminates single-source; sustainable long-term', cons: 'Qualification cost/time; engineering effort; may need site acceptance test' },
+    { opt: 'Redesign Subsystem', viable: redesignViable, when: 'When redesign is feasible and criticality justifies investment; best for long support windows', pros: 'Eliminates obsolescence risk; modern replacement', cons: 'High cost and time; engineering complexity; compatibility testing' },
+    { opt: 'Refurbished / Harvest Pool', viable: refurbViable, when: 'Viable if criticality ≤ 6 or large installed base with decommissioned units available', pros: 'Lower cost; immediate availability from decom units', cons: 'Quality/traceability risk; not all parts suitable; requires recertification protocol' },
+    { opt: 'Do Nothing (accept risk)', viable: doNothingViable, when: 'Only if criticality < 4 and redundancy fully covers failure; document and track', pros: 'Zero cost', cons: 'Risk of stockout; may strand maintenance; escalating risk as inventory depletes' }
+  ].filter(function(o) { return o.viable; });
+
+  var optTable = '<table class="ops-table"><thead><tr><th>Option</th><th>When to Use</th><th>Pros</th><th>Cons</th></tr></thead><tbody>' +
+    optRows.map(function(o) { return '<tr><td><strong>' + o.opt + '</strong></td><td>' + o.when + '</td><td>' + o.pros + '</td><td>' + o.cons + '</td></tr>'; }).join('') + '</tbody></table>';
+
+  // LTB block
+  var ltbBlock = 'LAST-TIME-BUY QUANTITY\n' +
+    'Formula: LTB_Q = ceil(installedUnits × failureRate × supportYears × 1.20 − onHand − openPO)\n' +
+    '= ceil(' + installed + ' × ' + failureRate + ' × ' + supportYrs + ' × 1.20 − ' + onhand + ' − ' + openPO + ')\n' +
+    '= ' + ltbQty + ' units\n\n' +
+    'LTB Total Cost: $' + ltbCost.toLocaleString() + '\n' +
+    'Estimated Carrying Cost over ' + supportYrs + ' yrs: $' + avgCarry.toLocaleString(undefined, {maximumFractionDigits: 0}) + '\n\n' +
+    '→ For NPV comparison of LTB-stock vs Qualify-Alternate, open the Last-Time-Buy tab (Tab 6) with these same inputs.';
+
+  // Qualification plan
+  var qualMonths = altQualLT;
+  var qSteps = [
+    { step: 'Engineering Review', mo: '0–1', owner: 'Engineering', dep: 'EOL notice, part specs' },
+    { step: 'Spec Comparison & Technical Evaluation', mo: '1–2', owner: 'Engineering + PM', dep: 'OEM datasheet, alternate datasheet' },
+    { step: 'Sample Procurement (3–5 units)', mo: '2–4', owner: 'PM / Procurement', dep: 'Engineering approval of alternate' },
+    { step: 'Bench Test & Lab Qualification', mo: '3–' + Math.round(qualMonths * 0.5), owner: 'Quality / Engineering', dep: 'Samples received' },
+    { step: 'Site Acceptance Test (SAT)', mo: Math.round(qualMonths * 0.5) + '–' + Math.round(qualMonths * 0.75), owner: 'DC Operations + Engineering', dep: 'Bench test passed' },
+    { step: 'Fleet Rollout Approval', mo: Math.round(qualMonths * 0.75) + '–' + qualMonths, owner: 'Engineering Lead / PM', dep: 'SAT completed + documentation' }
+  ];
+  var qualTable = '<table class="ops-table"><thead><tr><th>Step</th><th>Timeline (months)</th><th>Owner</th><th>Dependency</th></tr></thead><tbody>' +
+    qSteps.map(function(q) { return '<tr><td>' + q.step + '</td><td>' + q.mo + '</td><td>' + q.owner + '</td><td>' + q.dep + '</td></tr>'; }).join('') + '</tbody></table>';
+
+  // Supplier negotiation points
+  var suppNegPoints = 'SUPPLIER NEGOTIATION POINTS FOR EOL SITUATION\n' +
+    '1. LTB Pricing Concession — request prevailing contract price with no EOL markup; cite volume commitment\n' +
+    '2. Extended EOL Notice Commitment — negotiate 12-month notice for other EOL parts in the commodity family\n' +
+    '3. Qualification Support — request free samples (3–5 units), OEM test data, and reference designs for alternate qualification\n' +
+    '4. Documentation Handover — demand engineering drawings, schematics, BOM, and firmware for the EOL part\n' +
+    '5. Last-Call Repair Services — request 2–3 year post-EOL repair/refurb agreement for existing installed units\n' +
+    '6. Transition Support — if qualified alternate comes from a different supplier family, request cross-reference mapping and compatibility cert';
+
+  // Stakeholder communication
+  var commBlock = 'EOL STAKEHOLDER UPDATE\n' +
+    'To: [DC Operations Lead, Engineering Lead, Finance Business Partner, Leadership]\n' +
+    'Subject: EOL Notice — ' + part + ' — Response Plan Required\n\n' +
+    'Status: ' + (eolBand === 'CRITICAL' || eolBand === 'HIGH' ? 'RED' : 'YELLOW') + '\n\n' +
+    'OEM has issued EOL notice for ' + part + ' (notice date: ' + noticeDate + ').\n\n' +
+    'Fleet exposure: ' + installed + ' installed units, ' + sites + ' sites, ' + supportYrs + '-year support requirement.\n' +
+    'Supply risk: ' + supplyGap.toFixed(0) + ' units gap vs forecast demand over support life.\n' +
+    'EOL Exposure Score: ' + eolScore.toFixed(0) + ' (' + eolBand + ').\n\n' +
+    'Recommended response:\n' +
+    (rushNeeded ? '• Immediate LTB order required (qty ' + ltbQty + ', $' + ltbCost.toLocaleString() + ') — alt qualification cannot be completed in time\n' : '') +
+    (altViable ? '• Initiate alternate qualification programme — target ' + altQualLT + '-month completion\n' : '') +
+    '• Supplier negotiation in progress for documentation, pricing, and qualification support\n\n' +
+    'Decision needed: Finance pre-approval of LTB budget by [DATE]. Engineering confirmation of alternate specification by [DATE].';
+
+  var statusBar = '<div class="ops-status-strip ' + (eolBand === 'CRITICAL' || eolBand === 'HIGH' ? 'ops-status-red' : 'ops-status-yellow') + '">EOL Exposure: <strong><span class="' + eolClass + '">' + eolBand + '</span></strong> | Score: ' + eolScore.toFixed(0) + ' | LTB Qty: <strong>' + ltbQty + ' units</strong> ($' + ltbCost.toLocaleString() + ')</div>';
+
+  var wrap = document.getElementById('eol_output_wrap');
+  if (wrap) {
+    wrap.innerHTML = statusBar +
+      '<div class="ops-output-title"><i class="fas fa-file-alt"></i> EOL Summary</div><pre class="gen-text-block">' + summaryBlock + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-exclamation-triangle"></i> Impact Assessment</div><pre class="gen-text-block">' + impactBlock + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-table-list"></i> Options Analysis</div>' + optTable +
+      '<div class="ops-output-title"><i class="fas fa-calculator"></i> Last-Time-Buy Quantity</div><pre class="gen-text-block">' + ltbBlock + '<\/pre>' +
+      (altViable ? '<div class="ops-output-title"><i class="fas fa-timeline"></i> Replacement Qualification Plan</div>' + qualTable : '') +
+      '<div class="ops-output-title"><i class="fas fa-handshake"></i> Supplier Negotiation Points</div><pre class="gen-text-block">' + suppNegPoints + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-broadcast-tower"></i> Stakeholder Communication</div><pre class="gen-text-block">' + commBlock + '<\/pre>';
+    wrap.style.display = 'block';
+  }
+}
+
+function exportEOLPDF() {
+  var wrap = document.getElementById('eol_output_wrap');
+  if (!wrap || wrap.style.display === 'none') { showMsg('Generate plan first.'); return; }
+  var part = getStr('eol_part', 'Part');
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write('<!DOCTYPE html><html><head><title>EOL Response Plan — ' + part + '<\/title>' +
+    '<style>body{font-family:Arial,sans-serif;font-size:11px;padding:20px;color:#1e293b}h2{color:#f59e0b}table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border:1px solid #cbd5e1;padding:4px 6px;text-align:left}th{background:#f1f5f9}pre{white-space:pre-wrap;font-size:10px;background:#f8fafc;padding:10px;border-left:3px solid #f59e0b;margin:4px 0}.ops-output-title{font-weight:700;margin:12px 0 4px;color:#f59e0b}.rag-green{color:#16a34a;font-weight:700}.rag-yellow{color:#d97706;font-weight:700}.rag-red{color:#dc2626;font-weight:700}.ops-status-red{color:#dc2626;font-weight:700}.ops-status-yellow{color:#d97706;font-weight:700}canvas{display:none}<\/style>' +
+    '<\/head><body><h2>EOL Response Plan — ' + part + '<\/h2><p>Generated: ' + new Date().toLocaleString() + '<\/p>' + wrap.innerHTML + pdfFooter() + '<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ===========================================
+   TAB I: AMBIGUITY SOLVER
+   =========================================== */
+// Signal words → interpretation map
+var AMB_SIGNAL_MAP = {
+  'readiness':    ['Raise critical-spares fill rate to ≥95% across the scope', 'Establish a weekly readiness review cadence (demand vs supply vs PO status)', 'Build a readiness dashboard surfacing RED / YELLOW parts in real time'],
+  'inventory':    ['Close the inventory gap on top-20 critical parts by site', 'Implement a safety-stock model (newsvendor or fill-rate target) per part tier', 'Position regional hub stock to collapse effective lead time'],
+  'supplier':     ['Improve supplier OTIF from [current] to ≥95%', 'Reduce single-source exposure on critical commodities (target < 30% sole-source by spend)', 'Implement a tiered supplier review cadence (weekly / monthly / quarterly)'],
+  'cost':         ['Reduce emergency-expedite spend by instituting proactive demand planning', 'Identify top-10 cost-reduction levers across the supplier base (volume, multi-year, dual-source)', 'Build a should-cost model for top-5 critical commodities'],
+  'lead time':    ['Reduce effective lead time by pre-positioning stock at regional hubs', 'Negotiate committed lead-time SLAs into all critical supplier contracts', 'Qualify alternate suppliers to create a competitive lead-time market'],
+  'eol':          ['Build an EOL exposure register for all parts on NRND / last-time-buy status', 'Execute LTB decisions for parts where alt qualification exceeds support window', 'Establish a DMSMS monitoring process with 12-month notification from suppliers'],
+  'forecast':     ['Implement a 12-week rolling demand signal from site operations to PM team', 'Validate demand forecast against installed base and failure history quarterly', 'Reduce forecast error by integrating condition-monitoring data from CBM-enabled assets'],
+  'risk':         ['Build a risk register for critical spares: supply, lifecycle, commercial, and geopolitical dimensions', 'Prioritise top-10 risk items for active mitigation this quarter', 'Establish an escalation trigger protocol: criteria, owner, and SLA per risk level'],
+  'process':      ['Map the current-state PO lifecycle from demand approval to delivery and identify control gaps', 'Standardise supplier engagement: intake, acknowledgement, expedite, and escalation processes', 'Build standard work documents and train the team on the new processes'],
+  'visibility':   ['Deploy a PO-status dashboard: commit dates, need dates, RAG status, and open actions visible to PM and stakeholders', 'Implement a single source of truth for inventory by site, hub, and in-transit', 'Create a weekly supply-risk brief circulated to operations and leadership'],
+  'alternate':    ['Identify all sole-source critical parts and initiate dual-source qualification programmes', 'Set a target: ≤20% of critical-part spend on sole-source suppliers within 12 months', 'Fast-track qualification of pre-screened alternates for top-5 highest-risk parts'],
+  'expedite':     ['Reduce emergency-buy frequency by implementing safety stock and earlier demand signals', 'Track expedite cost monthly and present trend to leadership as a lagging readiness indicator', 'Create an expedite pre-approval process to reduce cycle time when emergencies occur'],
+  'shortage':     ['Build a shortage-risk dashboard showing parts with <30-day inventory coverage', 'Implement a shortage-alert process: auto-flag when on-hand drops below safety stock level', 'Establish a cross-functional shortage response team with defined roles and SLAs']
+};
+
+var AMB_DATA_PULL = [
+  'Historical consumption data (12–24 months) by part, site, and demand type',
+  'Installed base register: part, equipment, site, criticality, failure rate',
+  'Current inventory by site and regional hub (on-hand, reserved, in-transit)',
+  'Open PO report: part, supplier, qty, commit date, need date, status',
+  'Supplier OTIF and commit accuracy data (12 months)',
+  'Expedite spend by part and supplier (12 months)',
+  'Recent stockout or shortage incidents (root cause, frequency, cost)',
+  'Supplier lead-time actuals vs quoted (12 months)',
+  'EOL and NRND parts register',
+  'Current supplier contracts: SLA clauses, lead-time commitments, EOL notice terms'
+];
+
+function genAmbiguitySolver() {
+  var ask = getStr('amb_ask', 'Improve spare readiness').toLowerCase();
+  var whoAsked = getStr('amb_who_asked', 'leadership');
+  var scope = getStr('amb_scope', 'fleet');
+  var keywords = getStr('amb_keywords', '').toLowerCase().split(',').map(function(k) { return k.trim(); });
+
+  // Build interpretations from ask + keywords
+  var interps = [];
+  var allKeys = Object.keys(AMB_SIGNAL_MAP);
+  allKeys.forEach(function(signal) {
+    if (ask.indexOf(signal) >= 0 || keywords.some(function(kw) { return kw.indexOf(signal) >= 0 || signal.indexOf(kw) >= 0; })) {
+      AMB_SIGNAL_MAP[signal].forEach(function(i) { if (interps.indexOf(i) < 0) interps.push(i); });
+    }
+  });
+  // Fallback: always include readiness if nothing matched
+  if (interps.length < 3) {
+    AMB_SIGNAL_MAP['readiness'].forEach(function(i) { if (interps.indexOf(i) < 0) interps.push(i); });
+    AMB_SIGNAL_MAP['supplier'].forEach(function(i) { if (interps.indexOf(i) < 0) interps.push(i); });
+  }
+  if (interps.length > 6) interps = interps.slice(0, 6);
+
+  var scopeLabel = { one_commodity: 'for one commodity', one_region: 'across one region', fleet: 'fleet-wide across all sites', unclear: 'across a yet-to-be-scoped set of commodities/sites' }[scope] || scope;
+  var askerLabel = { leadership: 'Leadership', customer: 'Internal Customer', engineering: 'Engineering', crossfunc: 'Cross-Functional Team' }[whoAsked] || whoAsked;
+
+  // Problem statement
+  var sharpened = 'RECOMMENDED PROBLEM STATEMENT\n' +
+    '"Improve critical-spares readiness ' + scopeLabel + ' by closing the identified gaps in demand forecasting, supply planning, supplier performance, and inventory positioning — targeting ≥95% fill rate on VITAL/ESSENTIAL parts and a measurable reduction in emergency-expedite spend, within [timeframe to define with ' + askerLabel + ']."\n\n' +
+    'Reframe note: Before accepting the ask as-is, confirm:\n' +
+    '• What metric defines "improved readiness" in ' + askerLabel + '\'s view?\n' +
+    '• Is there a specific recent miss (stockout, expedite cost spike, maintenance delay) that triggered this?\n' +
+    '• What is the target deadline and available budget?';
+
+  // Interpretations
+  var interpsHtml = '<ol>' + interps.map(function(i) { return '<li>' + i + '</li>'; }).join('') + '</ol>';
+
+  // Hypothesis tree
+  var hypotheses = [
+    { hyp: 'Inventory Gap', sub: 'On-hand stock is insufficient to cover demand at need date', validate: 'Compare on-hand + open PO vs required by need date per site', data: 'Inventory report vs demand forecast' },
+    { hyp: 'Supplier Execution Gap', sub: 'OTIF and commit accuracy are below target, causing late deliveries', validate: 'Pull OTIF data for critical suppliers over 12 months', data: 'Supplier performance scorecard, PO aging' },
+    { hyp: 'Demand Forecast Gap', sub: 'Forecast is incomplete, inaccurate, or not shared with suppliers', validate: 'Compare forecast to actual consumption; ask if suppliers receive it', data: 'Forecast records, supplier interviews' },
+    { hyp: 'Sourcing Risk Gap', sub: 'Single-source dependency or no qualified alternates for critical parts', validate: 'Map criticality × number of qualified suppliers for top-50 parts', data: 'Supplier qualification register, AVL' },
+    { hyp: 'Lifecycle / EOL Gap', sub: 'Parts on NRND/EOL status not yet managed with LTB or alternates', validate: 'Cross-check part list vs OEM lifecycle notices', data: 'BOM with lifecycle status, DMSMS register' },
+    { hyp: 'Process / Visibility Gap', sub: 'No standard process for demand-to-delivery; PM team reacts rather than plans', validate: 'Map current-state PO lifecycle; identify steps with no SLA or owner', data: 'Process documentation (or lack thereof), escalation records' }
+  ];
+  var hypTable = '<table class="ops-table"><thead><tr><th>Root Cause Hypothesis</th><th>Sub-Cause</th><th>How to Validate</th><th>Data Needed</th></tr></thead><tbody>' +
+    hypotheses.map(function(h) { return '<tr><td><strong>' + h.hyp + '</strong></td><td>' + h.sub + '</td><td>' + h.validate + '</td><td>' + h.data + '</td></tr>'; }).join('') + '</tbody></table>';
+
+  // Clarifying questions
+  var clarQ = 'CLARIFYING QUESTIONS (send to ' + askerLabel + ')\n\n' +
+    '1. Scope: Which commodities, sites, or part families are in focus?\n' +
+    '2. Success metric: How will we know readiness has improved? (fill rate %, expedite cost $, stockout incidents?)\n' +
+    '3. Timeline: What is the target completion date for the improvement?\n' +
+    '4. Budget: Is there budget for safety stock increases, qualification programmes, or tooling?\n' +
+    '5. Trigger: Was there a specific recent miss — a stockout, late delivery, or cost spike — that prompted this request?\n' +
+    '6. Existing data: Is there a current-state baseline (readiness %, OTIF, inventory levels) already available?\n' +
+    '7. Stakeholder expectations: Who else will be reviewing progress — leadership, operations, finance?\n' +
+    '8. Dependencies: Are there engineering, procurement, or IT system constraints we need to work around?';
+
+  // Data request list
+  var dataReq = 'DATA REQUEST LIST (pull in first 2 weeks)\n\n' +
+    AMB_DATA_PULL.map(function(d, i) { return (i + 1) + '. ' + d; }).join('\n');
+
+  // 30/60/90
+  var plan9090 = '30 / 60 / 90-DAY PLAN\n\n' +
+    'PHASE 1 — DISCOVER (Days 1–30)\n' +
+    'Objective: Build a fact-based readiness baseline and stakeholder alignment.\n' +
+    'Activities:\n  • Define scope and success metrics with ' + askerLabel + '\n  • Pull data request list (10 data sources listed above)\n  • Score top-50 critical parts on criticality, supply risk, inventory coverage\n  • Map current-state PO lifecycle — identify control gaps\n  • Conduct 5 supplier interviews on OTIF root causes and forecast visibility\n' +
+    'Deliverable: Readiness baseline report + top-10 priority risk list\n\n' +
+    'PHASE 2 — STABILISE (Days 31–60)\n' +
+    'Objective: Close the most critical gaps and build core operating processes.\n' +
+    'Activities:\n  • Issue emergency POs for top-5 inventory gaps\n  • Implement weekly demand signal from DC Operations to PM team\n  • Deploy PO-status dashboard (RAG by supplier and part)\n  • Launch dual-source qualification for top-3 sole-source critical parts\n  • Negotiate committed lead-time SLAs with top-5 suppliers\n' +
+    'Deliverable: Readiness improvement report showing gap reduction; new process standard work\n\n' +
+    'PHASE 3 — SYSTEMATISE (Days 61–90)\n' +
+    'Objective: Build scalable processes that sustain improvement beyond the initial sprint.\n' +
+    'Activities:\n  • Implement supplier KPI scorecard and tiered review cadence\n  • Train team on new processes: demand intake, PO lifecycle, escalation protocol\n  • Build executive dashboard: readiness %, expedite spend trend, EOL exposure\n  • Review 30/60/90 results with leadership and agree next quarter targets\n' +
+    'Deliverable: Operating model documentation; leadership readiness review presentation';
+
+  // Risks and assumptions
+  var risks = 'RISKS AND ASSUMPTIONS\n\n' +
+    'Assumption 1: Data quality is sufficient — consumption, inventory, and PO data are available and reasonably accurate.\nRisk: If data is incomplete, discovery phase extends to 6 weeks. Mitigate by starting data clean-up immediately.\n\n' +
+    'Assumption 2: Engineering and operations will engage in validation and sign-off activities.\nRisk: If engineering bandwidth is limited, alternate qualification and spec reviews will be delayed. Escalate through ' + askerLabel + ' if needed.\n\n' +
+    'Assumption 3: Budget is available for safety stock increases and qualification programmes.\nRisk: If budget is constrained, prioritise the top-5 highest-risk parts only; defer others to next quarter.\n\n' +
+    'Assumption 4: Suppliers will engage in the process (respond to data requests, negotiate SLAs).\nRisk: Low-responsiveness suppliers require escalation to their account management team and potential dual-source trigger.\n\n' +
+    'Assumption 5: Scope is ' + scopeLabel + ' — if scope widens, timeline and resources must be re-negotiated with ' + askerLabel + '.';
+
+  var statusBar = '<div class="ops-status-strip ops-status-yellow">Ambiguity Solver — Ask from: <strong>' + askerLabel + '</strong> | Scope: <strong>' + scopeLabel + '</strong> | Interpretations: <strong>' + interps.length + '</strong></div>';
+
+  var wrap = document.getElementById('amb_output_wrap');
+  if (wrap) {
+    wrap.innerHTML = statusBar +
+      '<div class="ops-output-title"><i class="fas fa-lightbulb"></i> What This Could Mean (Candidate Interpretations)</div>' + interpsHtml +
+      '<div class="ops-output-title"><i class="fas fa-crosshairs"></i> Sharpened Problem Statement</div><pre class="gen-text-block">' + sharpened + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-sitemap"></i> Hypothesis Tree</div>' + hypTable +
+      '<div class="ops-output-title"><i class="fas fa-circle-question"></i> Clarifying Questions</div><pre class="gen-text-block">' + clarQ + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-database"></i> Data Request List</div><pre class="gen-text-block">' + dataReq + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-calendar-days"></i> 30 / 60 / 90-Day Plan</div><pre class="gen-text-block">' + plan9090 + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-shield-halved"></i> Risks &amp; Assumptions</div><pre class="gen-text-block">' + risks + '<\/pre>';
+    wrap.style.display = 'block';
+  }
+}
+
+function exportAmbiguityPDF() {
+  var wrap = document.getElementById('amb_output_wrap');
+  if (!wrap || wrap.style.display === 'none') { showMsg('Generate output first.'); return; }
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write('<!DOCTYPE html><html><head><title>Ambiguity Solver — Work Plan<\/title>' +
+    '<style>body{font-family:Arial,sans-serif;font-size:11px;padding:20px;color:#1e293b}h2{color:#f59e0b}table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border:1px solid #cbd5e1;padding:4px 6px;text-align:left}th{background:#f1f5f9}pre{white-space:pre-wrap;font-size:10px;background:#f8fafc;padding:10px;border-left:3px solid #f59e0b;margin:4px 0}ol,ul{padding-left:18px}.ops-output-title{font-weight:700;margin:12px 0 4px;color:#f59e0b}.ops-status-yellow{color:#d97706;font-weight:700}<\/style>' +
+    '<\/head><body><h2>Ambiguity Solver — Structured Work Plan<\/h2><p>Generated: ' + new Date().toLocaleString() + '<\/p>' + wrap.innerHTML + pdfFooter() + '<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ===========================================
+   TAB J: STAR STORY BUILDER
+   =========================================== */
+var STAR_COMPETENCY_MAP = {
+  ambiguity: {
+    label: 'Driving Clarity from Ambiguity',
+    scaffold: 'The core of this story is your ability to define the problem when nobody else did — show your framing process, not just the solution.',
+    questions: [
+      'Tell me about a time you turned an undefined or ambiguous ask into a clear execution plan.',
+      'Describe a situation where you had to create structure where none existed.',
+      'How do you approach a problem when you don\'t have all the information?',
+      'Walk me through how you have handled a leadership ask that lacked clear scope or success metrics.'
+    ],
+    coaching: [
+      'Lead with the ambiguity: state exactly what was undefined and why that was a problem.',
+      'Show the framework you used to structure it (hypothesis tree, clarifying questions, stakeholder map).',
+      'Quantify: how many stakeholders aligned? How long did discovery take? What was the outcome vs the undefined starting point?',
+      'End with the scalable output: the process or operating model you left behind, not just this one instance.'
+    ]
+  },
+  influence: {
+    label: 'Cross-Functional Influence',
+    scaffold: 'Show how you moved people who did not directly report to you — name the stakeholders, the resistance you overcame, and the mechanism of influence.',
+    questions: [
+      'Describe a time you had to drive alignment across teams with different priorities.',
+      'Tell me about a situation where you influenced a decision without formal authority.',
+      'How do you get engineering, finance, and operations to agree on a sourcing direction?',
+      'Give an example of a time you changed someone\'s position through data and communication.'
+    ],
+    coaching: [
+      'Name the specific stakeholders and their competing interests — this shows real cross-functional work.',
+      'Explain why they were resistant and what specifically changed their position.',
+      'Show the data or communication approach you used — emails, briefings, decision memos.',
+      'Quantify the result: decision made in X days vs Y days without your alignment work.'
+    ]
+  },
+  negotiation: {
+    label: 'Supplier Negotiation',
+    scaffold: 'Interviewers want to see that you prepared, used leverage, and achieved a commercial outcome — not just "we negotiated and got a better price."',
+    questions: [
+      'Tell me about a difficult supplier negotiation and how you prepared for it.',
+      'Describe a time a supplier wanted something that was not in your company\'s interest. How did you handle it?',
+      'How do you negotiate lead times and pricing when a supplier is a sole source?',
+      'Walk me through a supplier negotiation where your BATNA was weak.'
+    ],
+    coaching: [
+      'State your BATNA and the supplier\'s leverage clearly — don\'t hide that it was hard.',
+      'Show the preparation: should-cost analysis, market data, dual-source threat, volume commitment.',
+      'Name the specific levers you used (indexed pricing, multi-year, forecast visibility, bundled award).',
+      'Quantify the outcome: % cost reduction, lead-time improvement, SLA clause added, savings $.'
+    ]
+  },
+  risk: {
+    label: 'Risk Management',
+    scaffold: 'Show that you proactively identified the risk before it materialised (not after), built a mitigation plan, and communicated with appropriate escalation.',
+    questions: [
+      'Tell me about a supply risk you identified and mitigated before it became a crisis.',
+      'Describe the biggest supply-chain risk you have managed in your career.',
+      'How do you prioritise risks when you have multiple issues competing for attention?',
+      'Walk me through how you communicated a critical supply risk to leadership.'
+    ],
+    coaching: [
+      'Lead with: "I identified this risk [X weeks/months] before it materialised by…"',
+      'Show the scoring framework: severity, likelihood, detectability — not just intuition.',
+      'Name the escalation path and exactly how you communicated to leadership (format, content, decision asked).',
+      'Quantify the avoided cost or outcome difference vs if no action had been taken.'
+    ]
+  },
+  process: {
+    label: 'Process Improvement',
+    scaffold: 'Show the repeating problem, the root cause analysis, the process you designed, and the scalable outcome. Avoid framing this as "I fixed it once."',
+    questions: [
+      'Describe a process you designed from scratch in a supply chain context.',
+      'Tell me about a recurring problem you turned into a scalable, repeatable process.',
+      'How do you identify when a problem needs a process fix vs a one-time escalation?',
+      'Walk me through the operating cadence you built for a team or supplier programme.'
+    ],
+    coaching: [
+      'Open with evidence this was a recurring pattern, not a one-off (frequency, cost, number of incidents).',
+      'Show the root cause methodology: fishbone, 5-why, or structured hypothesis.',
+      'Detail the new process: RACI, SLA, standard work, escalation trigger.',
+      'Quantify the before/after: how many incidents per month before vs after? Cost saved? Time saved?'
+    ]
+  },
+  crisis: {
+    label: 'Crisis Recovery / Supplier Escalation',
+    scaffold: 'Demonstrate calm, structured leadership under pressure. Show the immediate actions, the stakeholder communication, and the long-term fix.',
+    questions: [
+      'Tell me about a supplier crisis you recovered from under time pressure.',
+      'Describe the most urgent supply shortage you have managed.',
+      'How do you run a supplier escalation when lead times cannot be moved?',
+      'Walk me through a situation where a critical part was unavailable and a site was at risk.'
+    ],
+    coaching: [
+      'Show your triage: what you assessed first, what you escalated immediately, what you delegated.',
+      'Name the communication cadence during the crisis: "I gave a written update every X hours."',
+      'Show the dual track: short-term firefighting AND the medium-term fix to prevent recurrence.',
+      'Quantify the recovery: days ahead of the previous commit, cost of expedite, downtime avoided.'
+    ]
+  },
+  strategic: {
+    label: 'Strategic Sourcing',
+    scaffold: 'Interviewers want to see the full sourcing lifecycle — market intelligence, strategy design, RFQ/RFP, selection, and contract — not just "we ran an RFQ."',
+    questions: [
+      'Walk me through a sourcing strategy you built for a critical commodity.',
+      'How do you approach a commodity where you are sole-sourced and need to dual-source?',
+      'Describe a Kraljic-style segmentation exercise you have run.',
+      'How do you decide when to pursue a spot buy vs a long-term master supply agreement?'
+    ],
+    coaching: [
+      'Open with the commodity context: spend, criticality, market structure, current supply risk.',
+      'Name the tools used: Kraljic segmentation, should-cost, RFQ, supplier scorecard, selection criteria.',
+      'Show the cross-functional work: engineering qualification, legal contract terms, procurement compliance.',
+      'Quantify: $ savings, lead-time reduction, number of qualified alternates added, contract term secured.'
+    ]
+  },
+  data: {
+    label: 'Data-Driven Decision Making',
+    scaffold: 'Show that you built the data infrastructure (not just used someone else\'s), identified the signal in noisy data, and made a commercial or operational decision based on it.',
+    questions: [
+      'Tell me about a time you used data to make a supply-chain decision others were making on intuition.',
+      'Describe how you built a demand forecast or supply model from scratch.',
+      'How do you approach a situation where the data you need does not yet exist?',
+      'Walk me through a data-driven recommendation you presented to leadership.'
+    ],
+    coaching: [
+      'State clearly what data did and did not exist before you started.',
+      'Show how you sourced, cleaned, and structured the data — this demonstrates PM-level analytical rigor.',
+      'Name the model or framework: safety stock formula, FMECA criticality score, Pareto of lead-time risk.',
+      'Quantify the decision quality improvement: cost avoided, readiness improvement, speed of decision.'
+    ]
+  }
+};
+
+function genSTAR() {
+  var competency = getStr('star_competency', 'negotiation');
+  var situation = getStr('star_situation', '');
+  var task = getStr('star_task', '');
+  var action = getStr('star_action', '');
+  var result = getStr('star_result', '');
+
+  if (!situation.trim() || !action.trim()) { showMsg('Please fill in at least Situation and Action fields.'); return; }
+
+  var map = STAR_COMPETENCY_MAP[competency] || STAR_COMPETENCY_MAP['negotiation'];
+
+  // STAR narrative
+  var starNarr = 'STAR STORY — ' + map.label.toUpperCase() + '\n\n' +
+    'SITUATION:\n' + (situation.trim() || '[Describe the context — what was happening, what was at stake, what made this challenging.]') + '\n\n' +
+    'TASK:\n' + (task.trim() || '[What were you personally responsible for in this situation? What was your mandate?]') + '\n\n' +
+    'ACTION:\n' + (action.trim() || '[What did you specifically do? Name your decisions, the process you built, and the cross-functional moves you made.]') + '\n\n' +
+    'RESULT:\n' + (result.trim() || '[What was the quantified outcome? Lead with the headline number, then explain the broader impact.]') + '\n\n' +
+    'SKILLS DEMONSTRATED:\n' +
+    '• ' + map.label + '\n' +
+    '• Program management: structured approach, stakeholder alignment, clear ownership\n' +
+    '• Commercial rigor: cost and risk quantified\n' +
+    '• Operational execution: from analysis to action to outcome\n' +
+    '• Communication: right message, right audience, right cadence';
+
+  // Scaffold / coaching note (specific to competency)
+  var scaffoldBlock = 'STORY SCAFFOLD NOTE (' + map.label + '):\n' + map.scaffold;
+
+  // Likely interview questions
+  var questBlock = 'LIKELY INTERVIEW QUESTIONS THIS STORY ANSWERS:\n\n' +
+    map.questions.map(function(q, i) { return (i + 1) + '. "' + q + '"'; }).join('\n');
+
+  // Coaching notes
+  var coachBlock = 'COACHING NOTES:\n\n' +
+    map.coaching.map(function(c, i) { return '• ' + c; }).join('\n') + '\n\n' +
+    'GENERAL PM INTERVIEW COACHING:\n' +
+    '• Lead with the result ("We recovered supply continuity 10 days ahead of the previous commit…") then tell the story.\n' +
+    '• Quantify everything: %, $, days, number of suppliers, parts, sites.\n' +
+    '• Name the cross-functional stakeholders — it shows you operate at enterprise scale, not just tactically.\n' +
+    '• Show the system you built or left behind, not just the firefight you won once.\n' +
+    '• End with the lesson applied at scale: "I now use this approach as our standard escalation process."\n' +
+    '• Rehearse to 2 minutes — trim to 90 seconds if the interviewer is moving fast.';
+
+  var statusBar = '<div class="ops-status-strip ops-status-yellow">STAR Builder — Competency: <strong>' + map.label + '</strong></div>';
+
+  var wrap = document.getElementById('star_output_wrap');
+  if (wrap) {
+    wrap.innerHTML = statusBar +
+      '<div class="ops-output-title"><i class="fas fa-star"></i> STAR Story</div><pre class="gen-text-block">' + starNarr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-compass-drafting"></i> Story Scaffold Note</div><pre class="gen-text-block">' + scaffoldBlock.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-circle-question"></i> Likely Interview Questions</div><pre class="gen-text-block">' + questBlock + '<\/pre>' +
+      '<div class="ops-output-title"><i class="fas fa-graduation-cap"></i> Coaching Notes</div><pre class="gen-text-block">' + coachBlock + '<\/pre>';
+    wrap.style.display = 'block';
+  }
+}
+
+function exportSTARPDF() {
+  var wrap = document.getElementById('star_output_wrap');
+  if (!wrap || wrap.style.display === 'none') { showMsg('Build story first.'); return; }
+  var competency = getStr('star_competency', 'negotiation');
+  var map = STAR_COMPETENCY_MAP[competency] || STAR_COMPETENCY_MAP['negotiation'];
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write('<!DOCTYPE html><html><head><title>STAR Story — ' + map.label + '<\/title>' +
+    '<style>body{font-family:Arial,sans-serif;font-size:11px;padding:20px;color:#1e293b}h2{color:#f59e0b}pre{white-space:pre-wrap;font-size:10px;background:#f8fafc;padding:10px;border-left:3px solid #f59e0b;margin:4px 0}.ops-output-title{font-weight:700;margin:12px 0 4px;color:#f59e0b}.ops-status-yellow{color:#d97706;font-weight:700;margin-bottom:8px;display:block}<\/style>' +
+    '<\/head><body><h2>STAR Story Builder — ' + map.label + '<\/h2><p>Generated: ' + new Date().toLocaleString() + '<\/p>' + wrap.innerHTML + pdfFooter() + '<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ===========================================
    UPDATE TAB ORDER + SWITCHtab + RECALCALL
    =========================================== */
-TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','pm-ops','scorecard','negotiation','contract','process','meeting','faq'];
+TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','faq'];
 
 // Patch switchTab to include new tabs
 var _origSwitchTab = switchTab;
@@ -4050,6 +4924,7 @@ switchTab = function(name) {
     hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB, kraljic: calcKraljic,
     scorecard: calcScorecard,
     faq: function() { renderFAQ('all'); }
+    // stakeholder, eol, ambiguity, star are user-triggered (no auto-calc on tab switch)
   };
   if (calcs[name]) calcs[name]();
 };
@@ -4068,7 +4943,17 @@ var opsFields = [
   'neg_scenario_type','neg_supplier_ask','neg_annual_spend','neg_alternates','neg_strategic_imp','neg_raw_material','neg_must_have',
   'ct_commodity','ct_region','ct_eol_months','ct_change_weeks',
   'pi_problem','pi_frequency','pi_impact',
-  'mt_meeting_name','mt_meeting_type','mt_attendees','mt_decision_needed','mt_known_risks'
+  'mt_meeting_name','mt_meeting_type','mt_attendees','mt_decision_needed','mt_known_risks',
+  // Tab G — Stakeholder
+  'sh_topic','sh_need','sh_urgency',
+  // Tab H — EOL
+  'eol_part','eol_criticality','eol_installed','eol_sites','eol_support_yrs',
+  'eol_failure_rate','eol_onhand','eol_open_po','eol_unit_cost','eol_alt_count',
+  'eol_alt_qual_lt','eol_alt_qual_cost','eol_redesign','eol_carry_rate',
+  // Tab I — Ambiguity
+  'amb_ask','amb_who_asked','amb_scope','amb_keywords',
+  // Tab J — STAR
+  'star_competency','star_situation','star_task','star_action','star_result'
 ];
 opsFields.forEach(function(f) { SCENARIO_FIELDS.push(f); });
 
@@ -4085,7 +4970,12 @@ faqData.push(
   { cat: 'operating', q: 'What drives the supplier review cadence in the Scorecard tab?', a: 'The cadence logic follows the master PM sourcing framework: Critical or Strategic suppliers with a RED overall score → Weekly review. Preferred suppliers with YELLOW or RED → Monthly. All others with GREEN performance → Quarterly. The overall RAG is determined by the worst of the four critical dimensions: OTIF, Commit Accuracy, Defect Rate, and CA Closure Rate. A single RED on any of these triggers a RED overall regardless of other metrics.' },
   { cat: 'operating', q: 'What is BATNA and how should I use it in supplier negotiations?', a: 'BATNA (Best Alternative to a Negotiated Agreement) is your walk-away position — what you will do if this negotiation fails. A strong BATNA (qualified alternates ≥2, low strategic dependency) gives you genuine leverage to push for concessions. A weak BATNA (sole-source critical part, no qualified alternate) means you must be careful not to overplay your hand — instead, prioritise dual-source qualification to improve future leverage. The Negotiation tab assesses your BATNA strength from your inputs and suggests appropriate concession strategies for your leverage level.' },
   { cat: 'operating', q: 'Which contract areas are most commonly negotiated for DC M&E spares?', a: 'Based on the master PM sourcing framework, the five highest-leverage contract clauses for DC M&E spares are: (1) EOL notice period — push for 12 months minimum to enable Last-Time-Buy decisions; (2) Lead-time commitments — cap maximum lead time per part family with a breach-triggered alternate sourcing right; (3) Warranty from installation (not shipment) — prevents the warranty clock starting in a warehouse; (4) SLA / KPI regime — OTIF, Commit Accuracy, Defect Rate written into contract with corrective action triggers; (5) Change notice (ECN) — 4-week minimum for material or design changes on critical parts.' },
-  { cat: 'operating', q: 'How do I run an effective supplier escalation using the Meeting Intel tab?', a: 'For escalation meetings, the Meeting Intel tab generates an agenda using the Escalation / War-Room template: situation brief → root cause analysis → immediate recovery plan → site impact quantification → preventive measures → escalation decision → follow-up cadence. Before the meeting, pull the latest PO aging report and supplier scorecard, confirm attendees and dial-in details, and circulate the agenda 24 hours in advance. The key principle: leave every escalation meeting with a named recovery plan (action, owner, date) — not just a discussion. Use the Notes mode to capture decisions and actions in real time.' }
+  { cat: 'operating', q: 'How do I run an effective supplier escalation using the Meeting Intel tab?', a: 'For escalation meetings, the Meeting Intel tab generates an agenda using the Escalation / War-Room template: situation brief → root cause analysis → immediate recovery plan → site impact quantification → preventive measures → escalation decision → follow-up cadence. Before the meeting, pull the latest PO aging report and supplier scorecard, confirm attendees and dial-in details, and circulate the agenda 24 hours in advance. The key principle: leave every escalation meeting with a named recovery plan (action, owner, date) — not just a discussion. Use the Notes mode to capture decisions and actions in real time.' },
+  { cat: 'operating', q: 'How do you handle an undefined "improve readiness" ask from leadership?', a: 'Use the <strong>Ambiguity Solver tab (I)</strong>. The key steps: (1) Resist the urge to immediately build something — first surface the 4–6 candidate interpretations of the ask and validate which one leadership actually means. (2) Propose a sharpened problem statement with a SMART target. (3) Send clarifying questions to the asker before burning time on the wrong hypothesis. (4) Pull the data request list in parallel so you have evidence by the time you re-engage. (5) Commit to the 30/60/90 plan only after scope and success metrics are agreed. Common mistake: jumping to "I will improve OTIF" when the real gap is inventory positioning.' },
+  { cat: 'operating', q: 'What is a good 30/60/90-day plan for improving spares readiness?', a: 'The Ambiguity Solver generates a full 30/60/90 plan but the core pattern is: <strong>Days 1–30 (Discover)</strong> — build a fact-based readiness baseline: pull inventory, PO, demand, OTIF data; score top-50 critical parts; map current-state process; align with stakeholders on scope and success metrics. <strong>Days 31–60 (Stabilise)</strong> — close the most critical gaps: emergency POs for top inventory shortfalls; deploy a PO-status dashboard; implement a weekly demand signal from operations; launch dual-source for top sole-source parts. <strong>Days 61–90 (Systematise)</strong> — build scalable processes: supplier KPI scorecard, tiered review cadence, standard work, executive dashboard. Then present results and agree next quarter targets. The key discipline: keep the plan visible and updated — do not let it become a document that gets forgotten after Day 10.' },
+  { cat: 'operating', q: 'How do you tailor a message to an executive vs a supplier?', a: 'Use the <strong>Stakeholder Planner tab (G)</strong> which auto-generates register-adjusted drafts. The key differences: <strong>Executive</strong> — lead with status (RAG) and decision needed; state the risk and recommendation in 2–3 lines; avoid process detail; close with next milestone. Format: Subject line signals urgency. <strong>Supplier</strong> — be specific and direct: name the PO, the gap, and the exact ask. Require a written response with a named owner and deadline. State the consequence of non-response explicitly (escalation, alternate sourcing). Never leave a supplier communication open-ended. <strong>Finance</strong> — lead with the $ ask and the cost of inaction (downtime risk or expedite cost if not approved). Present options A/B with clear recommendation. <strong>Engineering</strong> — lead with the technical gap (spec, revision, alternate); request a specific decision (approve alternate, confirm compatibility, sign off qualification).' },
+  { cat: 'operating', q: 'When do you do a Last-Time-Buy vs requalify an alternate vs redesign at EOL?', a: 'Use the <strong>EOL Response Plan tab (H)</strong> for the full options analysis. The decision heuristic: <strong>LTB</strong> if (a) no alternates exist and alt-qual lead time exceeds your support window — LTB is the only option to bridge the gap. <strong>Requalify Alternate</strong> if alternates are available or alt-qual lead time is within the support window — this permanently fixes the sole-source risk. <strong>Redesign</strong> if criticality is very high, the support window is long, and the engineering investment is justified — targets the root cause (dependency on an aging platform). <strong>Refurb / Harvest Pool</strong> if criticality ≤ 6 and you have decommissioned units available — lowest cost but requires certification protocol. In practice, for most hyperscale DC M&amp;E parts (BMS boards, UPS modules, legacy PLCs): start with an emergency LTB to buy time, then execute an alternate qualification in parallel. Do not do LTB as the permanent strategy for criticality ≥ 7 parts without a concurrent alternate program.' },
+  { cat: 'operating', q: 'How do you structure a STAR story for a sourcing PM role?', a: 'Use the <strong>STAR Builder tab (J)</strong>. The key structural principles for hyperscale PM interviews: (1) Lead with the <strong>result</strong> headline in your opening sentence, then tell the story chronologically. (2) Name the <strong>business context</strong> first: fleet size, criticality, sites at risk, $ at stake — interviewers need this to calibrate. (3) In the Action section, show <strong>two layers</strong>: the immediate triage (what you did in the first 24–48h) AND the medium-term fix (what you built to prevent recurrence). (4) <strong>Name stakeholders explicitly</strong> — "I worked with the Engineering Lead to fast-track qualification" shows cross-functional impact. (5) Quantify every number: OTIF %, days of lead-time reduction, $ savings, number of parts de-risked. (6) End with the <strong>scaled lesson</strong>: "I now use this as our standard escalation process" shows it was not a one-time heroic act.' }
 );
 
 // Add 'operating' filter button to FAQ pane if not already present

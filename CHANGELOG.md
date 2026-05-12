@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.13.0 — 2026-05-12 (Spares Engine: 4 more operating tabs — full 20-module engine · DCMOC pass 3)
+
+### Added — Spares Engine: the last 4 draft modules (now 20 modules / 19 tabs + Summary Dashboard)
+`spares-readiness-calculator.html` 4,107 → 4,997 lines. Completed the master-prompt draft coverage with 4 more deterministic template-generator tabs:
+- **Stakeholder & Communication Planner** (draft Module 9) — pick the 8 stakeholders involved + situation + urgency (Routine/Elevated/Urgent/Critical) → a stakeholder-map table (what they care about / communication style / recommended channel / cadence — keyed to urgency), per-stakeholder message drafts in the right register (executive = 3-line status+decision, supplier = specific ask+hard deadline+consequence, finance = cost+options, engineering = spec+decision), and a 3-level escalation ladder with trigger criteria (for Urgent/Critical).
+- **EOL Response Plan** (draft Module 11 — complements the LTB math tab) — inputs (part, notice date, installed units, sites, criticality, support years, failure rate, on-hand, open-PO, unit cost, alternates, alt-qual lead time + cost, redesign feasibility, carrying rate) → EOL summary, impact assessment (supply gap + single-source flag + rush warning), an options matrix filtered by input viability (Last-Time-Buy / Qualify Alternate / Redesign / Refurbished Pool / Do Nothing — each with Pros/Cons/When), `LTB_Q = ceil(N × λ × yrs × 1.20 − onHand − openPO)` (documented in the ⓘ box), a 6-step replacement-qualification plan with timeline, 6 supplier negotiation points, and a stakeholder-comms draft. Cross-links the dedicated LTB tab for the full NPV stock-vs-requalify comparison.
+- **Ambiguity Solver** (draft Module 14) — paste an undefined ask + who asked + apparent scope + key themes → 4-6 candidate interpretations (derived by matching the ask against a 13-signal supply-chain term map), a sharpened SMART problem statement, a 6-row hypothesis tree (Inventory / Supplier / Demand / Sourcing / Lifecycle / Process gaps — each with validation method + data needed), 8 clarifying questions tailored to the asker, a 10-item data-request list, a 30/60/90-day Discover → Stabilise → Systematise plan, and risks & assumptions.
+- **Interview & Performance Story Builder** (draft Module 15) — pick a competency (Ambiguity / Influence / Negotiation / Risk / Process / Crisis / Strategic / Data) + Situation/Task/Action/Result → a structured STAR narrative + "skills demonstrated", a competency-specific story scaffold, 3-5 likely behavioral interview questions, and coaching notes (competency-specific + 6 universal sourcing-PM interview principles). A "career companion" — clearly labeled.
+Wiring: `TAB_ORDER` 15 → 19 module tabs; `SCENARIO_FIELDS` +17 input IDs (save/load/share-URL now covers all 20 modules); all 4 use the existing `tab-btn-ops` styling, `.ops-output`/`.ops-table`/`.gen-text-block` dark-mode classes, and the per-tab PDF pattern (`<\/script>` escaped); hero stat updated "9 modules" → "20 modules"; checkbox `accent-color: var(--amber)` in dark mode. FAQ +6 Q&As under "Operating Engine" (undefined-ask handling, 30/60/90 plan, exec-vs-supplier messaging, LTB-vs-requalify-vs-redesign, STAR-story structure, supplier-escalation).
+
+### Changed — DCMOC app refresh pass 3 (`dcmoc/`)
+- **FaqDashboard** (commit `b23d44b`) — 5 new Q&As (why PUE-median ~1.5, Tier-III/IV availability with exact Uptime values, how the wildfire risk factor works, the Capacity headroom analysis, 2026 tax incentives in the Investment module) + updated existing answers (33 countries, JLL/CBRE 2025 citations, 6-factor risk matrix, exact Tier-Standard values).
+- **PDF exports** (commit `e24a4f0`) — disclaimer footer on every page of all 11 generators ("Illustrative model — not a substitute for a full engineering or financial analysis. All figures in USD unless noted."), dynamic generation dates + projection base year via `new Date().getFullYear()` (no hardcoded 2025), CarbonPdf industry-PUE 1.58 → 1.50.
+- **Dashboards** (commit `b6599b7`) — Carbon tooltip 1.58 → 1.50, Simulation/Staffing dynamic years, + a dismissible "Data vintage: 2026-Q1 · benchmarks Uptime Institute 2025, JLL/CBRE 2025 · USD" banner in the Shell (localStorage-persisted, aria-labeled dismiss).
+- Static export rebuilt + deployed (commits `4f0daa4`, `32f1b51`); `npx tsc --noEmit` clean, `npm run build` green, serves 200.
+
+### Versioning
+- `js/rz-version.js` 1.12.0 → 1.13.0 (MINOR — 4 more operating-engine component tabs).
+- SW cache name auto-synced → `rz-cache-v1.13.0`.
+
+---
+
 ## v1.12.0 — 2026-05-12 (Spares Engine expanded to a full operating engine · DCMOC pass 2 · 15 more OG cards)
 
 ### Added — Spares Engine: 6 operating-engine tabs (from the master-prompt draft)
