@@ -846,6 +846,88 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   .fleet-kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 480px) { .fleet-kpi-grid { grid-template-columns: 1fr 1fr; } }
+
+/* ═══════════════════════════════════════════════
+   SUPPLY CHAIN & TRANSPORT TAB STYLES
+   ═══════════════════════════════════════════════ */
+.sc-section-title { font-size: 0.82rem; font-weight: 800; color: var(--amber-dark); margin: 1.1rem 0 0.5rem; display: flex; align-items: center; gap: 6px; border-left: 3px solid var(--amber); padding-left: 8px; }
+.sc-mode-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 0.6rem; }
+.sc-mode-table th { padding: 6px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; }
+.sc-mode-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
+.sc-mode-table tr:nth-child(even) td { background: rgba(245,158,11,0.018); }
+.sc-row-cheapest td { background: rgba(16,185,129,0.06) !important; font-weight: 700; }
+.sc-row-fastest td { background: rgba(59,130,246,0.06) !important; font-weight: 700; }
+.sc-row-infeasible td { opacity: 0.4; }
+.sc-badge-cheapest { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; background: rgba(16,185,129,0.12); color: #059669; border-radius: 50px; font-size: 0.62rem; font-weight: 700; }
+.sc-badge-fastest { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; background: rgba(59,130,246,0.12); color: #3b82f6; border-radius: 50px; font-size: 0.62rem; font-weight: 700; }
+.sc-co2-bar { display: inline-block; height: 8px; border-radius: 4px; background: rgba(245,158,11,0.5); }
+.sc-incoterm-panel { background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.15); border-radius: 10px; padding: 0.85rem 1rem; margin-top: 0.75rem; }
+.sc-incoterm-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 0.4rem; }
+.sc-incoterm-table th { padding: 4px 8px; background: rgba(245,158,11,0.08); color: var(--amber-dark); font-weight: 700; text-align: left; }
+.sc-incoterm-table td { padding: 4px 8px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.sc-reroute-panel { background: rgba(59,130,246,0.04); border: 1px solid rgba(59,130,246,0.18); border-radius: 10px; padding: 0.85rem 1rem; margin-top: 0.75rem; font-size: 0.78rem; }
+[data-theme="dark"] .sc-mode-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
+[data-theme="dark"] .sc-mode-table td { border-color: #334155; color: #cbd5e1; }
+[data-theme="dark"] .sc-incoterm-panel { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); }
+[data-theme="dark"] .sc-reroute-panel { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.25); color: #93c5fd; }
+[data-theme="dark"] .sc-row-cheapest td { background: rgba(16,185,129,0.1) !important; }
+[data-theme="dark"] .sc-row-fastest td { background: rgba(59,130,246,0.1) !important; }
+
+/* Risk radar dimensions */
+.sc-risk-band { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 800; }
+.sc-risk-low { background: rgba(16,185,129,0.1); color: #059669; }
+.sc-risk-medium { background: rgba(245,158,11,0.1); color: #d97706; }
+.sc-risk-high { background: rgba(239,68,68,0.1); color: #ef4444; }
+.sc-risk-critical { background: rgba(239,68,68,0.18); color: #dc2626; }
+[data-theme="dark"] .sc-risk-low { background: rgba(16,185,129,0.15); color: #34d399; }
+[data-theme="dark"] .sc-risk-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+[data-theme="dark"] .sc-risk-high { background: rgba(239,68,68,0.15); color: #f87171; }
+[data-theme="dark"] .sc-risk-critical { background: rgba(239,68,68,0.2); color: #fca5a5; }
+
+.sc-mit-list { list-style: none; padding: 0; margin: 0.5rem 0; }
+.sc-mit-list li { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 0.77rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
+.sc-mit-list li:last-child { border-bottom: none; }
+.sc-effort-low { font-size: 0.63rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; background: rgba(16,185,129,0.1); color: #059669; white-space: nowrap; }
+.sc-effort-med { font-size: 0.63rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; background: rgba(245,158,11,0.1); color: #d97706; white-space: nowrap; }
+.sc-effort-high { font-size: 0.63rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; background: rgba(239,68,68,0.1); color: #ef4444; white-space: nowrap; }
+
+/* Disruption sim */
+.sc-tornado-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.sc-tornado-label { font-size: 0.71rem; font-weight: 600; color: var(--text-secondary); min-width: 140px; }
+.sc-tornado-bar-bg { flex: 1; height: 12px; background: rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden; position: relative; }
+.sc-tornado-bar-fill { height: 100%; border-radius: 6px; position: absolute; left: 0; transition: width 0.4s ease; }
+.sc-tornado-val { font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 36px; text-align: right; color: var(--amber-dark); }
+[data-theme="dark"] .sc-tornado-val { color: #fbbf24; }
+
+/* Expedite options table */
+.sc-exp-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 0.6rem; }
+.sc-exp-table th { padding: 6px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; }
+.sc-exp-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
+.sc-exp-table tr:nth-child(even) td { background: rgba(245,158,11,0.018); }
+.sc-exp-row-rec td { background: rgba(16,185,129,0.07) !important; font-weight: 700; }
+.sc-exp-closes-y { color: #059669; font-weight: 700; }
+.sc-exp-closes-n { color: #ef4444; font-weight: 700; }
+[data-theme="dark"] .sc-exp-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
+[data-theme="dark"] .sc-exp-table td { border-color: #334155; color: #cbd5e1; }
+[data-theme="dark"] .sc-exp-row-rec td { background: rgba(16,185,129,0.1) !important; }
+
+/* SC lane risk table */
+.sc-lane-risk-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 0.5rem; }
+.sc-lane-risk-table th { padding: 5px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); }
+.sc-lane-risk-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+[data-theme="dark"] .sc-lane-risk-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
+[data-theme="dark"] .sc-lane-risk-table td { border-color: #334155; }
+
+/* chart wrappers for SC tabs */
+.sc-chart-wrap { position: relative; height: 220px; margin-top: 0.75rem; }
+.sc-chart-wrap-sm { position: relative; height: 160px; margin-top: 0.5rem; }
+.sc-chart-wrap-lg { position: relative; height: 280px; margin-top: 0.75rem; }
+@media (max-width: 768px) {
+  .sc-mode-table, .sc-incoterm-table, .sc-exp-table, .sc-lane-risk-table { font-size: 0.65rem; }
+  .sc-mode-table th, .sc-exp-table th, .sc-lane-risk-table th { font-size: 0.65rem; padding: 4px 5px; }
+  .sc-mode-table td, .sc-exp-table td, .sc-lane-risk-table td { padding: 4px 5px; }
+  .sc-tornado-label { min-width: 90px; font-size: 0.65rem; }
+}
 </style>
 <script src="js/rz-version.js?v=2026-05-09" defer></script>
 <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -1042,6 +1124,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <option value="catalog-analytics">📊 Catalog Analytics</option>
         <option value="faq">9 · Methodology</option>
       </optgroup>
+      <optgroup label="Supply Chain &amp; Transport">
+        <option value="sc-lane">🚢 Lane &amp; Mode Planner</option>
+        <option value="sc-risk">🗺️ SC Risk Map</option>
+        <option value="sc-sim">🌪️ Disruption Sim</option>
+        <option value="sc-expedite">✈️ Expedite Calculator</option>
+      </optgroup>
     </select>
   </div>
 
@@ -1075,6 +1163,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <button class="tab-btn" onclick="switchTab('catalog')" role="tab" aria-selected="false" aria-controls="pane-catalog">&#128218; Parts Catalog</button>
       <button class="tab-btn" onclick="switchTab('catalog-analytics')" role="tab" aria-selected="false" aria-controls="pane-catalog-analytics">&#128202; Catalog Analytics</button>
       <button class="tab-btn" onclick="switchTab('faq')" role="tab" aria-selected="false" aria-controls="pane-faq">9 · Methodology</button>
+      <span class="tab-divider" aria-hidden="true">|</span>
+      <span class="tabs-group-label" aria-hidden="true">Supply Chain &amp; Transport</span>
+      <button class="tab-btn" onclick="switchTab('sc-lane')" role="tab" aria-selected="false" aria-controls="pane-sc-lane">🚢 Lane &amp; Mode</button>
+      <button class="tab-btn" onclick="switchTab('sc-risk')" role="tab" aria-selected="false" aria-controls="pane-sc-risk">🗺️ SC Risk Map</button>
+      <button class="tab-btn" onclick="switchTab('sc-sim')" role="tab" aria-selected="false" aria-controls="pane-sc-sim">🌪️ Disruption Sim</button>
+      <button class="tab-btn" onclick="switchTab('sc-expedite')" role="tab" aria-selected="false" aria-controls="pane-sc-expedite">✈️ Expedite Calc</button>
     </div>
   </div>
 
@@ -2899,6 +2993,52 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <p><strong>Lifecycle × DC generation</strong>: part counts grouped by <code>lifecycle_status</code> and <code>dc_generation</code>.</p>
         <p>Full database queries: <code>tools/query-spares-db.py</code> on <code>data/spares-parts.sqlite</code>.</p>
       </details>
+
+      <!-- Supply-Chain Exposure Panel (added v1.16.0) -->
+      <div class="module-card" style="margin-top:1.25rem;">
+        <div class="card-title"><i class="fas fa-globe"></i> 🌐 Supply-Chain Exposure <span class="tip" tabindex="0" data-tip="Trade lanes ranked by composite supply-chain risk (congestion + geopolitical + volatility + tariff). China transformer-dependency and 2026 tariff context highlighted." aria-label="SC exposure tooltip">ⓘ</span></div>
+        <div class="module-grid" style="margin-bottom:0.75rem;">
+          <div>
+            <div class="ca-kpi-grid" style="grid-template-columns:repeat(2,1fr);gap:0.5rem;margin-bottom:0.75rem;">
+              <div class="ca-kpi ca-kpi-alert">
+                <div class="ca-kpi-label">CN Transformer share</div>
+                <div class="ca-kpi-value">~60%</div>
+                <div class="ca-kpi-sub">global power-transformer capacity</div>
+              </div>
+              <div class="ca-kpi ca-kpi-alert">
+                <div class="ca-kpi-label">CN→NA tariff exposure</div>
+                <div class="ca-kpi-value">8/10</div>
+                <div class="ca-kpi-sub">Sec 122 + 301 + copper +50%</div>
+              </div>
+              <div class="ca-kpi">
+                <div class="ca-kpi-label">Highest-risk lane</div>
+                <div class="ca-kpi-value" id="ca_sc_toplane">—</div>
+                <div class="ca-kpi-sub">composite risk score</div>
+              </div>
+              <div class="ca-kpi">
+                <div class="ca-kpi-label">Lanes with risk &gt;7</div>
+                <div class="ca-kpi-value" id="ca_sc_highrisk_lanes">—</div>
+                <div class="ca-kpi-sub">of 13 trade lanes</div>
+              </div>
+            </div>
+            <div style="font-size:0.76rem;color:var(--text-secondary);background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:0.65rem 0.85rem;margin-bottom:0.6rem;">
+              <strong style="color:#ef4444;">⚠ 2026 Context:</strong> US imports &gt;8,000 high-power transformers from China in Jan–Oct 2025 (vs &lt;1,500 in all 2022). Section 122 10% surcharge + Section 301 + copper +50% (Apr-2026). ~30–50% of large US data centers planned for 2026 may be delayed. (<a href="https://webhosting.today/2026/04/08/up-to-half-of-us-data-centers-planned-for-2026-will-not-be-built-on-time-chinese-electrical-equipment-is-the-constraint-no-one-planned-for/" target="_blank" rel="noopener" style="color:var(--amber-dark);">webhosting.today, 2026</a>)
+            </div>
+          </div>
+          <div>
+            <div class="card-title" style="font-size:0.78rem;"><i class="fas fa-ranking-star"></i> Trade Lanes — Ranked by Composite Risk</div>
+            <table class="sc-lane-risk-table" id="ca_sc_lane_table">
+              <thead><tr><th>Lane</th><th>Congestion</th><th>Geo</th><th>Volatility</th><th>Tariff</th><th>Composite</th></tr></thead>
+              <tbody id="ca_sc_lane_tbody"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="sc-chart-wrap-sm"><canvas id="chart_ca_sc_lanes"></canvas></div>
+        <details class="info-box" style="margin-top:0.5rem;">
+          <summary>ⓘ Lane risk computation</summary>
+          <p><strong>Composite lane risk</strong> = average(congestion, geopolitical, volatility, tariff) — each on a 1–10 scale from SPARES_CATALOG.tradeLanes. Higher = riskier for DC M&E procurement on that route. Sources: Xeneta 2026 · Maersk Winter 2026 · ShipUniverse · SPARES_CATALOG research.</p>
+        </details>
+      </div>
     </div>
     <!-- ===== END CATALOG ANALYTICS TAB ===== -->
 
@@ -2976,6 +3116,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <div class="fleet-kpi"><div class="fleet-kpi-label">Total Annual Carrying $</div><div class="fleet-kpi-value" id="fl_kpi_carry">$—</div><div class="fleet-kpi-sub">at recommended stock</div></div>
         <div class="fleet-kpi"><div class="fleet-kpi-label">Total Stockout-$ Risk</div><div class="fleet-kpi-value" id="fl_kpi_stockout_risk">$—</div><div class="fleet-kpi-sub">expected annual exposure</div></div>
         <div class="fleet-kpi"><div class="fleet-kpi-label">EOL Exposure Score</div><div class="fleet-kpi-value" id="fl_kpi_eol_exp">—</div><div class="fleet-kpi-sub">Σ units×crit×yrs/max(1,alts)</div></div>
+        <div class="fleet-kpi"><div class="fleet-kpi-label">Fleet SC Risk KPI</div><div class="fleet-kpi-value" id="fl_kpi_sc_risk">—</div><div class="fleet-kpi-sub">avg supply-chain risk score (0–100)</div></div>
       </div>
 
       <!-- Fleet table -->
@@ -2996,11 +3137,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
               <th>Stockout Risk $</th>
               <th>Readiness %</th>
               <th>Lifecycle</th>
+              <th>SC Risk</th>
               <th></th>
             </tr>
           </thead>
           <tbody id="fl_tbody">
-            <tr><td colspan="14" style="text-align:center;padding:2rem;color:var(--text-muted);">Add parts above or load a sample preset to get started.</td></tr>
+            <tr><td colspan="15" style="text-align:center;padding:2rem;color:var(--text-muted);">Add parts above or load a sample preset to get started.</td></tr>
           </tbody>
         </table>
       </div>
@@ -3081,11 +3223,502 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <button class="faq-cat-btn" onclick="filterFAQ('sourcing')" aria-label="Sourcing FAQs">Sourcing</button>
         <button class="faq-cat-btn" onclick="filterFAQ('lifecycle')" aria-label="Lifecycle FAQs">Lifecycle</button>
         <button class="faq-cat-btn" onclick="filterFAQ('emerging')" aria-label="Emerging processes FAQs">Emerging</button>
+        <button class="faq-cat-btn" onclick="filterFAQ('supplychain')" aria-label="Supply Chain &amp; Transport FAQs">Supply Chain</button>
       </div>
       <div class="faq-grid" id="faq_grid">
         <!-- FAQs rendered by JS -->
       </div>
     </div>
+
+    <!-- ===== SC TAB 1: LANE & MODE PLANNER ===== -->
+    <div class="module-pane" id="pane-sc-lane">
+      <div class="module-sticky-bar">
+        <span class="msb-label">Cheapest mode</span>
+        <span class="msb-value" id="sclane_cheapest_mode">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Fastest mode</span>
+        <span class="msb-value" id="sclane_fastest_mode">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Ocean door-to-door</span>
+        <span class="msb-value" id="sclane_ocean_days">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Air door-to-door</span>
+        <span class="msb-value" id="sclane_air_days">—</span>
+      </div>
+      <div class="catalog-header">
+        <strong>🚢 Lane &amp; Mode Planner</strong> — Select origin, destination, part, Incoterm, and urgency to get a mode-comparison table (days · cost · CO₂), chokepoint reroute what-if, and Incoterm cost/risk split. Based on catalog <code>tradeLanes</code> + <code>transportModes</code> reference data.
+      </div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-sliders"></i> Lane &amp; Shipment Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sclane_origin">Origin Region <span class="tip" tabindex="0" data-tip="Where the part is manufactured or dispatched from. Maps to SPARES_CATALOG.tradeLanes origin values." aria-label="Origin tooltip">ⓘ</span></label>
+              <select id="sclane_origin" class="input-field" onchange="calcLanePlanner()" aria-label="Origin region">
+                <option value="CN">China (CN)</option>
+                <option value="SEA-Vietnam">SE Asia — Vietnam</option>
+                <option value="India">India</option>
+                <option value="Korea-Japan">Korea / Japan</option>
+                <option value="EU">Europe (EU)</option>
+                <option value="Intra-NA">Intra North America</option>
+                <option value="Intra-EU">Intra Europe</option>
+                <option value="Intra-APAC">Intra APAC</option>
+                <option value="MENA">MENA</option>
+                <option value="LATAM">Latin America</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sclane_dest">Destination DC Region <span class="tip" tabindex="0" data-tip="Where the data center site is located. Maps to the lane's dest values." aria-label="Destination tooltip">ⓘ</span></label>
+              <select id="sclane_dest" class="input-field" onchange="calcLanePlanner()" aria-label="Destination region">
+                <option value="NA">North America</option>
+                <option value="EU">Europe</option>
+                <option value="Intra-APAC">Intra APAC</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="sclane_part_select">Part (from catalog — auto-fills weight &amp; value) <span class="tip" tabindex="0" data-tip="Select a catalog part to auto-fill weight (wkg) and unit cost (cTyp). Or enter weight and value manually below." aria-label="Part select tooltip">ⓘ</span></label>
+            <select id="sclane_part_select" class="input-field" onchange="scLanePartFromCatalog()" aria-label="Select catalog part for lane planner">
+              <option value="">— Manual entry below —</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sclane_weight">Part Weight (kg) <span class="tip" tabindex="0" data-tip="Shipment gross weight in kg. Core input for freight-cost estimation: cost ≈ weight × base $/kg × mode costIndex." aria-label="Weight tooltip">ⓘ</span></label>
+              <input type="number" id="sclane_weight" class="input-field" value="250" min="0.1" step="0.1" oninput="calcLanePlanner()" aria-label="Part weight kg">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sclane_value">Part Value ($) <span class="tip" tabindex="0" data-tip="Declared customs value. Used for duty-burden estimate and to calibrate air-freight cost-justification." aria-label="Part value tooltip">ⓘ</span></label>
+              <input type="number" id="sclane_value" class="input-field" value="15000" min="0" oninput="calcLanePlanner()" aria-label="Part value">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sclane_incoterm">Incoterm (2020) <span class="tip" tabindex="0" data-tip="Incoterms 2020 rule governing cost/risk split. Multimodal-capable rules listed first (EXW, FCA, CPT, CIP, DAP, DPU, DDP). Sea-only rules (FOB, CFR, CIF) listed separately. DDP = seller bears all incl. import duties. DAP = buyer pays import duty + unloading + last mile." aria-label="Incoterm tooltip">ⓘ</span></label>
+              <select id="sclane_incoterm" class="input-field" onchange="calcLanePlanner()" aria-label="Incoterm">
+                <optgroup label="Multimodal (all modes)">
+                  <option value="DDP">DDP — Delivered Duty Paid</option>
+                  <option value="DAP" selected>DAP — Delivered At Place</option>
+                  <option value="DPU">DPU — Delivered at Place Unloaded</option>
+                  <option value="CIP">CIP — Carriage &amp; Insurance Paid</option>
+                  <option value="CPT">CPT — Carriage Paid To</option>
+                  <option value="FCA">FCA — Free Carrier</option>
+                  <option value="EXW">EXW — Ex Works</option>
+                </optgroup>
+                <optgroup label="Sea / Inland waterway only">
+                  <option value="CIF">CIF — Cost Insurance &amp; Freight</option>
+                  <option value="CFR">CFR — Cost &amp; Freight</option>
+                  <option value="FOB">FOB — Free On Board</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sclane_urgency">Shipment Urgency <span class="tip" tabindex="0" data-tip="Routine = ocean preferred; Time-sensitive = air-standard feasible; Emergency = air-express or courier." aria-label="Urgency tooltip">ⓘ</span></label>
+              <select id="sclane_urgency" class="input-field" onchange="calcLanePlanner()" aria-label="Urgency">
+                <option value="routine">Routine</option>
+                <option value="time-sensitive">Time-Sensitive</option>
+                <option value="emergency">Emergency</option>
+              </select>
+            </div>
+          </div>
+          <div class="toggle-row" style="margin-top:0.6rem;">
+            <label class="toggle-switch" aria-label="Toggle chokepoint reroute scenario">
+              <input type="checkbox" id="sclane_reroute" onchange="calcLanePlanner()">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Chokepoint reroute what-if <span class="tip" tabindex="0" data-tip="Toggle ON to simulate a Suez Canal/Panama Canal-style reroute, adding +12 days to ocean transit and recalculating the mode comparison. Ocean-only lanes affected." aria-label="Reroute tooltip">ⓘ</span></span>
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportLanePDF()" aria-label="Export lane analysis as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <button class="btn-copy" onclick="copyEl('sclane_results_text')" aria-label="Copy mode comparison to clipboard"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn-reset-module" onclick="calcLanePlanner()" aria-label="Recalculate lane planner">↺ Recalculate</button>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="card-title"><i class="fas fa-table"></i> Mode Comparison</div>
+          <div id="sclane_results_text">
+            <table class="sc-mode-table" id="sclane_mode_table">
+              <thead><tr><th>Mode</th><th>Days</th><th>Est. Freight $</th><th>CO₂ Rel.</th><th>Feasibility</th><th>Badge</th></tr></thead>
+              <tbody id="sclane_mode_tbody"><tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted);">Select inputs to compute.</td></tr></tbody>
+            </table>
+          </div>
+          <div id="sclane_reroute_panel" class="sc-reroute-panel" style="display:none;">
+            <strong>⚠ Chokepoint reroute active:</strong> +12 d ocean transit (Suez↔Cape / Panama draft restriction). <span id="sclane_reroute_note"></span>
+          </div>
+          <div class="sc-chart-wrap"><canvas id="chart_sc_lane_modes"></canvas></div>
+          <details class="info-box" style="margin-top:0.75rem;">
+            <summary>ⓘ How freight cost is estimated</summary>
+            <p><strong>Base ocean-FCL rate</strong>: $1.20/kg. Other modes scale by catalog <code>costIndex</code>: ocean-LCL ×1.6, air-standard ×12, air-express ×25, road ×3, rail ×2, courier ×18.</p>
+            <p><strong>Door-to-door days</strong> = mode transit + customsD (scaled by destination country customs-efficiency) + lastMileD. Reroute adds +12 d to ocean options.</p>
+            <p><strong>CO₂ relative bar</strong>: proportional to <code>co2Index</code> (ocean-FCL = 1.0 baseline; air-express = 22×).</p>
+            <p>Estimates are illustrative. Actual rates vary by carrier, season, volume, and congestion. Source: SPARES_CATALOG transport &amp; lane data · Incoterms 2020 (ICC).</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- Incoterm cost/risk split panel -->
+      <div class="module-card" style="margin-top:1rem;">
+        <div class="card-title"><i class="fas fa-scale-balanced"></i> Incoterm Cost &amp; Risk Split — <span id="sclane_inco_label">DAP</span></div>
+        <div id="sclane_incoterm_body">
+          <table class="sc-incoterm-table">
+            <thead><tr><th>Cost/Risk Element</th><th>Seller Bears?</th><th>Buyer Bears?</th><th>Risk Transfer Point</th></tr></thead>
+            <tbody id="sclane_inco_tbody"></tbody>
+          </table>
+          <div id="sclane_tariff_note" style="margin-top:0.6rem;font-size:0.76rem;color:var(--text-secondary);background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:0.65rem 0.85rem;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ===== END SC TAB 1 ===== -->
+
+    <!-- ===== SC TAB 2: SUPPLY-CHAIN RISK MAP ===== -->
+    <div class="module-pane" id="pane-sc-risk">
+      <div class="module-sticky-bar">
+        <span class="msb-label">SC Risk Score</span>
+        <span class="msb-value" id="scrisk_score_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Band</span>
+        <span class="msb-value" id="scrisk_band_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Top Risk</span>
+        <span class="msb-value" id="scrisk_toprisk_sb" style="font-size:0.75rem;">—</span>
+      </div>
+      <div class="catalog-header">
+        <strong>🗺️ Supply-Chain Risk Map</strong> — Composite supply-chain risk score (0–100) from 7 weighted dimensions: single-source exposure, country-of-origin risk, lane congestion/geopolitical/volatility, lead-time pressure, tariff exposure, and hub coverage. Outputs: score + band + radar + ranked mitigations.
+      </div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-sliders"></i> Risk Map Inputs</div>
+          <div class="input-group">
+            <label class="input-label" for="scrisk_part_select">Part (from catalog) <span class="tip" tabindex="0" data-tip="Select a catalog part to auto-fill OEM, criticality, lead-time, and alternates. Or enter fields manually." aria-label="Risk part tooltip">ⓘ</span></label>
+            <select id="scrisk_part_select" class="input-field" onchange="scRiskPartFromCatalog()" aria-label="Select catalog part for risk map">
+              <option value="">— Manual entry —</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scrisk_origin">Country / Origin Region <span class="tip" tabindex="0" data-tip="Part's country of manufacture. Maps to SPARES_CATALOG.countryRisk for geo risk and tariff note." aria-label="Origin country tooltip">ⓘ</span></label>
+              <select id="scrisk_origin" class="input-field" onchange="calcSCRisk()" aria-label="Origin country">
+                <option value="China">China</option>
+                <option value="Germany">Germany</option>
+                <option value="United States">United States</option>
+                <option value="Japan">Japan</option>
+                <option value="South Korea">South Korea</option>
+                <option value="India">India</option>
+                <option value="Vietnam">Vietnam</option>
+                <option value="Singapore">Singapore</option>
+                <option value="Ireland">Ireland</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Italy">Italy</option>
+                <option value="Switzerland">Switzerland</option>
+                <option value="Mexico">Mexico</option>
+                <option value="Brazil">Brazil</option>
+                <option value="Indonesia">Indonesia</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scrisk_dest">Destination DC Region <span class="tip" tabindex="0" data-tip="Where your data center is. Used to find the matching trade lane for congestion/geo/volatility/tariff scores." aria-label="Dest tooltip">ⓘ</span></label>
+              <select id="scrisk_dest" class="input-field" onchange="calcSCRisk()" aria-label="Destination region">
+                <option value="NA">North America</option>
+                <option value="EU">Europe</option>
+                <option value="Intra-APAC">APAC</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scrisk_alts">Qualified Alternates # <span class="tip" tabindex="0" data-tip="Number of qualified alternate part sources. 0 = sole-source (maximum exposure). More alternates → lower single-source dimension score." aria-label="Alternates risk tooltip">ⓘ</span></label>
+              <input type="number" id="scrisk_alts" class="input-field" value="0" min="0" max="20" oninput="calcSCRisk()" aria-label="Qualified alternates">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scrisk_crit">Part Criticality 1–10 <span class="tip" tabindex="0" data-tip="From FMECA criticality score. Higher criticality amplifies the consequence of supply disruption." aria-label="Criticality risk tooltip">ⓘ</span></label>
+              <input type="number" id="scrisk_crit" class="input-field" value="8" min="1" max="10" oninput="calcSCRisk()" aria-label="Part criticality">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scrisk_lt_typ">Typical Lead Time (weeks) <span class="tip" tabindex="0" data-tip="OEM lead time in weeks. Long lead times relative to need-window create schedule pressure." aria-label="Lead time risk tooltip">ⓘ</span></label>
+              <input type="number" id="scrisk_lt_typ" class="input-field" value="52" min="1" max="200" oninput="calcSCRisk()" aria-label="Lead time weeks">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scrisk_need_wks">Need Window (weeks) <span class="tip" tabindex="0" data-tip="How many weeks until you need the part. LT pressure = max(0, (lt - need_wks)/lt) — larger when lead time exceeds need window." aria-label="Need window tooltip">ⓘ</span></label>
+              <input type="number" id="scrisk_need_wks" class="input-field" value="26" min="1" max="200" oninput="calcSCRisk()" aria-label="Need window weeks">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scrisk_hub">Regional Hub / Consignment in place? <span class="tip" tabindex="0" data-tip="A regional spares hub or VMI/consignment arrangement near your site effectively cuts lead time to hub→site last-mile (hours/days). This mitigates lane congestion and LT-pressure risks." aria-label="Hub coverage tooltip">ⓘ</span></label>
+              <select id="scrisk_hub" class="input-field" onchange="calcSCRisk()" aria-label="Hub coverage">
+                <option value="none">None</option>
+                <option value="partial">Partial (regional hub, not consignment)</option>
+                <option value="full">Full (consignment / VMI at site or near)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scrisk_oem_otif">Supplier OTIF % <span class="tip" tabindex="0" data-tip="On-time-in-full % for this supplier. Low OTIF → higher supply-reliability risk." aria-label="OTIF tooltip">ⓘ</span></label>
+              <input type="number" id="scrisk_oem_otif" class="input-field" value="75" min="0" max="100" oninput="calcSCRisk()" aria-label="Supplier OTIF">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportRiskMapPDF()" aria-label="Export risk map as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <button class="btn-copy" onclick="copyEl('scrisk_output_text')" aria-label="Copy risk summary"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn-reset-module" onclick="resetSCRisk()" aria-label="Reset SC risk inputs">↺ Reset</button>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="card-title"><i class="fas fa-gauge-high"></i> Composite SC Risk Score</div>
+          <div id="scrisk_output_text">
+            <div class="metric-grid-2" style="margin-bottom:0.75rem;">
+              <div class="metric-box">
+                <div class="metric-label">SC Risk Score</div>
+                <div class="metric-value" id="scrisk_score" style="font-size:1.8rem;">—</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Band</div>
+                <div class="metric-value" id="scrisk_band_box">—</div>
+              </div>
+            </div>
+            <!-- Score bars per dimension -->
+            <div id="scrisk_dim_bars" style="margin-bottom:0.75rem;"></div>
+            <!-- Radar chart -->
+            <div class="sc-chart-wrap"><canvas id="chart_sc_risk_radar"></canvas></div>
+          </div>
+
+          <div class="sc-section-title"><i class="fas fa-list-check"></i> Top Risks &amp; Mitigations</div>
+          <div id="scrisk_mit_list" style="margin-bottom:0.5rem;"><ul class="sc-mit-list"><li style="color:var(--text-muted);">Configure inputs to see mitigations.</li></ul></div>
+
+          <details class="info-box" style="margin-top:0.5rem;">
+            <summary>ⓘ Score weighting methodology</summary>
+            <p><strong>Weights</strong>: Single-source 22% · Country geo-risk 15% · Lane congestion 12% · Lane geo/political 12% · LT pressure vs need-window 15% · Tariff exposure 12% · Supplier OTIF 12%. Hub coverage reduces the effective lane congestion + LT-pressure contribution by 60% (partial) or 85% (full hub/VMI).</p>
+            <p><strong>Bands</strong>: LOW &lt;25 · MEDIUM 25–50 · HIGH 50–75 · CRITICAL &gt;75.</p>
+            <p>Sources: SPARES_CATALOG.countryRisk (World Bank LPI) · tradeLanes congestion/geo/volatility/tariff · 2026 tariff research synthesis.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+    <!-- ===== END SC TAB 2 ===== -->
+
+    <!-- ===== SC TAB 3: DISRUPTION SCENARIO / RESILIENCE SIM ===== -->
+    <div class="module-pane" id="pane-sc-sim">
+      <div class="module-sticky-bar">
+        <span class="msb-label">P10 LT</span><span class="msb-value" id="scsim_p10_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">P50 LT</span><span class="msb-value" id="scsim_p50_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">P90 LT</span><span class="msb-value" id="scsim_p90_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Exp Expedite $</span><span class="msb-value" id="scsim_exp_expedite_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">% On-Time</span><span class="msb-value" id="scsim_ontime_pct_sb">—</span>
+      </div>
+      <div class="catalog-header">
+        <strong>🌪️ Disruption Scenario / Resilience Sim</strong> — Monte-Carlo simulation (≥1,000 iterations) combining lane delay variability, tariff shock, supplier-commit slip, demand spike, and chokepoint reroute. Outputs: % on-time, P10/P50/P90 of lead time and expedite cost, tornado chart, and with/without-hub + dual-source comparison.
+      </div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-sliders"></i> Simulation Inputs</div>
+          <div class="sc-section-title">Base Lane Parameters</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scsim_lt_base">Base Lead Time (weeks) <span class="tip" tabindex="0" data-tip="Expected ocean door-to-door weeks for the chosen lane. Drawn from catalog lane data or entered manually." aria-label="Base LT tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_lt_base" class="input-field" value="39" min="1" max="200" oninput="scsimPreview()" aria-label="Base lead time weeks">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scsim_lt_sigma">LT σ (weeks) <span class="tip" tabindex="0" data-tip="Standard deviation of lead time. Typical: ~20% of base LT. Drives lead-time-variability dimension." aria-label="LT sigma tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_lt_sigma" class="input-field" value="8" min="0" max="50" oninput="scsimPreview()" aria-label="Lead time sigma">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scsim_need_wks">Need Window (weeks) <span class="tip" tabindex="0" data-tip="Weeks until the part is needed at site. If effective LT exceeds this, the need-window is missed." aria-label="Need window sim tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_need_wks" class="input-field" value="52" min="1" max="200" oninput="scsimPreview()" aria-label="Need window">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scsim_downtime_cost">Downtime Cost ($/hr) <span class="tip" tabindex="0" data-tip="Cost per hour of unplanned downtime. Used to compute downtime-$ if the need window is missed and no expedite recovers it." aria-label="Downtime sim tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_downtime_cost" class="input-field" value="50000" min="0" oninput="scsimPreview()" aria-label="Downtime cost sim">
+            </div>
+          </div>
+          <div class="sc-section-title">Disruption Probabilities</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scsim_tariff_prob">Tariff shock probability (%) <span class="tip" tabindex="0" data-tip="Probability of a new tariff event in the procurement window (e.g. 15% chance a +20% duty increase is enacted)." aria-label="Tariff prob tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_tariff_prob" class="input-field" value="15" min="0" max="100" oninput="scsimPreview()" aria-label="Tariff prob">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scsim_tariff_mag">Tariff magnitude (%) <span class="tip" tabindex="0" data-tip="Duty increase magnitude if the tariff shock occurs (e.g. 25% additional). Applied as a cost multiplier to expedite cost." aria-label="Tariff mag tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_tariff_mag" class="input-field" value="25" min="0" max="200" oninput="scsimPreview()" aria-label="Tariff magnitude">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scsim_commit_prob">Supplier commit-slip probability (%) <span class="tip" tabindex="0" data-tip="Probability the supplier delays their committed date. Adds slip magnitude (weeks) to effective LT when triggered." aria-label="Commit prob tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_commit_prob" class="input-field" value="30" min="0" max="100" oninput="scsimPreview()" aria-label="Commit slip prob">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scsim_commit_slip_wks">Commit slip magnitude (weeks) <span class="tip" tabindex="0" data-tip="Expected additional weeks when a commit-slip event occurs. Typical: 4–12 weeks for DC M&E OEMs." aria-label="Commit slip mag tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_commit_slip_wks" class="input-field" value="8" min="0" max="52" oninput="scsimPreview()" aria-label="Commit slip weeks">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scsim_reroute_prob">Chokepoint reroute probability (%) <span class="tip" tabindex="0" data-tip="Probability a route disruption (Suez, Panama) forces a reroute, adding +12 days to ocean legs." aria-label="Reroute prob tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_reroute_prob" class="input-field" value="20" min="0" max="100" oninput="scsimPreview()" aria-label="Reroute prob">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scsim_demand_spike_prob">Demand spike probability (%) <span class="tip" tabindex="0" data-tip="Probability of an unplanned demand event requiring the part sooner (compresses the effective need window by the spike magnitude weeks)." aria-label="Demand spike tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_demand_spike_prob" class="input-field" value="10" min="0" max="100" oninput="scsimPreview()" aria-label="Demand spike prob">
+            </div>
+          </div>
+          <div class="sc-section-title">Resilience Toggles</div>
+          <div class="toggle-row">
+            <label class="toggle-switch"><input type="checkbox" id="scsim_hub" onchange="scsimPreview()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Regional hub available <span class="tip" tabindex="0" data-tip="Hub cuts effective LT to hub-site leg only (~1 week) when stock is at hub. Hub availability probability = 70% (hub not always stocked)." aria-label="Hub sim tooltip">ⓘ</span></span>
+          </div>
+          <div class="toggle-row">
+            <label class="toggle-switch"><input type="checkbox" id="scsim_dual" onchange="scsimPreview()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Dual-source in place <span class="tip" tabindex="0" data-tip="Dual-source halves the commit-slip probability (supplier B can supply if A slips) and reduces commit-slip magnitude by 40%." aria-label="Dual source tooltip">ⓘ</span></span>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scsim_safety_stock_wks">Safety stock buffer (weeks) <span class="tip" tabindex="0" data-tip="Additional weeks of safety stock already on-hand. This extends the effective need window by this many weeks, absorbing lead-time overruns." aria-label="Safety stock sim tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_safety_stock_wks" class="input-field" value="0" min="0" max="52" oninput="scsimPreview()" aria-label="Safety stock weeks">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scsim_part_weight">Part weight (kg) — for expedite cost <span class="tip" tabindex="0" data-tip="Gross weight used to estimate air-freight expedite cost when ocean would miss the need window." aria-label="Sim weight tooltip">ⓘ</span></label>
+              <input type="number" id="scsim_part_weight" class="input-field" value="250" min="0.1" oninput="scsimPreview()" aria-label="Part weight sim">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="runSCSim()" aria-label="Run disruption simulation">▶ Run Simulation (1,000 itr)</button>
+            <button class="btn-pdf" onclick="exportSimPDF()" aria-label="Export simulation PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button class="btn-reset-module" onclick="resetSCSim()" aria-label="Reset sim inputs">↺ Reset</button>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="card-title"><i class="fas fa-chart-simple"></i> Simulation Results</div>
+          <div id="scsim_output">
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.82rem;">Configure inputs and click <strong>▶ Run Simulation</strong>.</div>
+          </div>
+          <details class="info-box" style="margin-top:0.75rem;">
+            <summary>ⓘ Simulation methodology</summary>
+            <p><strong>Monte-Carlo (1,000 iterations)</strong>: each iteration samples (1) lead-time draw from N(lt_base, lt_sigma) using Box-Muller (same as Module 8); (2) Bernoulli tariff shock; (3) Bernoulli commit slip; (4) Bernoulli reroute (+12 d ocean = +1.7 wk); (5) Bernoulli demand spike (compresses effective need window).</p>
+            <p><strong>Recovery logic</strong>: if effective LT &gt; need window, compute air-freight expedite cost ($1.20/kg × 12 × weight × tariff_multiplier). If no expedite possible (emergency urgency), count as downtime event (downtime_cost × (LT_overrun weeks × 168 hr/wk)).</p>
+            <p><strong>Hub toggle</strong>: 70% probability in each iteration that hub stock is available (LT → 1 wk). <strong>Dual-source</strong>: commit_slip_prob /= 2, slip_mag × 0.6. <strong>Safety stock</strong>: effective_need_window += safety_stock_wks.</p>
+            <p>Tornado chart: each disruption driver is individually held at mean while varying ±1σ; variance contribution measured as range of P50 outcome. Sources: Box-Muller transform · Incoterms 2020 · SPARES_CATALOG lane data.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+    <!-- ===== END SC TAB 3 ===== -->
+
+    <!-- ===== SC TAB 4: LOGISTICS COST & EXPEDITE CALCULATOR ===== -->
+    <div class="module-pane" id="pane-sc-expedite">
+      <div class="module-sticky-bar">
+        <span class="msb-label">Gap (weeks)</span><span class="msb-value" id="scexp_gap_sb">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Rec. Option</span><span class="msb-value" id="scexp_rec_sb" style="font-size:0.75rem;">—</span>
+        <span class="msb-label" style="margin-left:1rem;">Downtime Risk $</span><span class="msb-value" id="scexp_dt_risk_sb">—</span>
+      </div>
+      <div class="catalog-header">
+        <strong>✈️ Logistics Cost &amp; Expedite Calculator</strong> — Given a readiness gap (site need-date minus supplier commit), compute and rank all recovery options (air-freight, partial shipment, alternate plant, hub pull, substitute qualification, accept downtime). Recommends the cost-minimising path that closes the gap. Links to Daily PM Ops escalation.
+      </div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-sliders"></i> Gap &amp; Part Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scexp_need_wks">Weeks until needed at site <span class="tip" tabindex="0" data-tip="How many weeks until the part must arrive at site. The gap = supplier commit - need date." aria-label="Need wks tooltip">ⓘ</span></label>
+              <input type="number" id="scexp_need_wks" class="input-field" value="8" min="1" max="200" oninput="calcExpedite()" aria-label="Weeks until needed">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scexp_commit_wks">Supplier commit (weeks out) <span class="tip" tabindex="0" data-tip="How many weeks out the supplier says the part will be ready to ship from their facility." aria-label="Commit wks tooltip">ⓘ</span></label>
+              <input type="number" id="scexp_commit_wks" class="input-field" value="16" min="1" max="200" oninput="calcExpedite()" aria-label="Supplier commit weeks">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="scexp_part_select">Part (from catalog — auto-fills weight, cost, alts) <span class="tip" tabindex="0" data-tip="Select a catalog part to auto-fill. Or enter manually below." aria-label="Expedite part tooltip">ⓘ</span></label>
+            <select id="scexp_part_select" class="input-field" onchange="scExpPartFromCatalog()" aria-label="Select catalog part expedite">
+              <option value="">— Manual entry —</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scexp_weight">Part Weight (kg) <span class="tip" tabindex="0" data-tip="Gross shipment weight. Core input for air-freight cost: cost = weight × $1.20 × 12 (air-standard)." aria-label="Exp weight tooltip">ⓘ</span></label>
+              <input type="number" id="scexp_weight" class="input-field" value="250" min="0.1" step="0.1" oninput="calcExpedite()" aria-label="Expedite weight">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scexp_unit_cost">Part Unit Cost ($) <span class="tip" tabindex="0" data-tip="Affects express-handling fee estimate and alt-plant re-source premium." aria-label="Exp cost tooltip">ⓘ</span></label>
+              <input type="number" id="scexp_unit_cost" class="input-field" value="15000" min="0" oninput="calcExpedite()" aria-label="Unit cost expedite">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scexp_alts">Qualified Alternates # <span class="tip" tabindex="0" data-tip="0 = sole-source. Enables or disables the alternate-plant and qualify-substitute options." aria-label="Alts expedite tooltip">ⓘ</span></label>
+              <input type="number" id="scexp_alts" class="input-field" value="0" min="0" max="20" oninput="calcExpedite()" aria-label="Alts expedite">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scexp_downtime_cost">Downtime Cost ($/hr) <span class="tip" tabindex="0" data-tip="Cost per hour of downtime if the gap is not closed. Drives the baseline 'accept downtime' option cost." aria-label="Downtime expedite tooltip">ⓘ</span></label>
+              <input type="number" id="scexp_downtime_cost" class="input-field" value="50000" min="0" oninput="calcExpedite()" aria-label="Downtime cost expedite">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="scexp_origin">Origin Region <span class="tip" tabindex="0" data-tip="Where the part ships from. Used to look up air transit days for the origin→dest lane." aria-label="Origin expedite tooltip">ⓘ</span></label>
+              <select id="scexp_origin" class="input-field" onchange="calcExpedite()" aria-label="Origin region expedite">
+                <option value="CN">China</option>
+                <option value="EU">Europe</option>
+                <option value="SEA-Vietnam">SE Asia</option>
+                <option value="India">India</option>
+                <option value="Korea-Japan">Korea / Japan</option>
+                <option value="Intra-NA">Intra NA</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="scexp_dest">Destination Region <span class="tip" tabindex="0" data-tip="Destination DC region." aria-label="Dest expedite tooltip">ⓘ</span></label>
+              <select id="scexp_dest" class="input-field" onchange="calcExpedite()" aria-label="Dest region expedite">
+                <option value="NA">North America</option>
+                <option value="EU">Europe</option>
+                <option value="Intra-APAC">APAC</option>
+              </select>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <label class="toggle-switch"><input type="checkbox" id="scexp_hub_avail" onchange="calcExpedite()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Regional hub / consignment stock available <span class="tip" tabindex="0" data-tip="Enables the 'Pull from hub' option — near-zero lead time. Cost = hub holding cost share (~5% of part value per month)." aria-label="Hub expedite tooltip">ⓘ</span></span>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="scexp_crit">Part Criticality 1–10 <span class="tip" tabindex="0" data-tip="Used to scale downtime risk: downtime_$ = crit/10 × downtime_cost × gap_hours." aria-label="Crit expedite tooltip">ⓘ</span></label>
+            <input type="number" id="scexp_crit" class="input-field" value="8" min="1" max="10" oninput="calcExpedite()" aria-label="Criticality expedite">
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="calcExpedite()" aria-label="Compute expedite options">▶ Compute Options</button>
+            <button class="btn-pdf" onclick="exportExpeditePDF()" aria-label="Export expedite PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button class="btn-copy" onclick="copyEl('scexp_output_text')" aria-label="Copy expedite summary"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="card-title"><i class="fas fa-ranking-star"></i> Recovery Options</div>
+          <div id="scexp_output_text">
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.82rem;">Configure inputs to see recovery options.</div>
+          </div>
+          <details class="info-box" style="margin-top:0.75rem;">
+            <summary>ⓘ Recovery option cost methodology</summary>
+            <p><strong>Air-freight (full)</strong>: weight × $1.20/kg × 12 (air-standard costIndex). Door-to-door = lane airD + customsD + lastMileD days.</p>
+            <p><strong>Air-freight (sub-assembly)</strong>: assumes 30% of weight = critical sub-assembly; air cost × 0.3; ocean for the rest.</p>
+            <p><strong>Alternate plant</strong>: requires alts &gt; 0. Re-source premium 15% of unit cost + air-freight. Lead time = air days + 2-week qualification check.</p>
+            <p><strong>Pull from hub</strong>: near-zero lead time (hub→site road ≈ 3 days). Cost = 5% × unit cost × months in hub (proxy for consignment holding fee).</p>
+            <p><strong>Qualify substitute</strong>: only if alts === 0. Cost $50K (small board/kit) to $150K (major equipment) depending on weight. Lead time 12–24 weeks.</p>
+            <p><strong>Baseline (accept downtime)</strong>: downtime_$ = crit/10 × downtime_cost × gap_hours (gap weeks × 168 hr/wk).</p>
+            <p>Sources: Incoterms 2020 · SPARES_CATALOG lane/mode data · 2026 freight rate research.</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- Cross-link to Daily PM Ops escalation -->
+      <div style="margin-top:0.75rem;" id="scexp_ops_link" style="display:none;">
+        <div class="crosslink-bar">
+          <span class="crosslink-bar-label">Generate supplier escalation:</span>
+          <a class="crosslink-pill" onclick="switchTab('pm-ops')" href="#" role="button" aria-label="Go to Daily PM Ops escalation">
+            <i class="fas fa-arrow-right"></i> Daily PM Ops — Escalation
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- ===== END SC TAB 4 ===== -->
 
     <!-- Cross-calc links -->
     <div class="crosslink-bar" style="margin-bottom:0.75rem;">
@@ -3144,8 +3777,8 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
 <!-- Methodology note -->
 <div class="method-note" id="methodNote">
-  Models: FMECA (MIL-STD-1629A) &middot; METRIC/VARI-METRIC (Sherbrooke/Slay) &middot; newsvendor critical-fractile &middot; Kraljic matrix (HBR&nbsp;1983) &middot; DMSMS lifecycle &middot; MEIO &middot; ABC-XYZ demand-variability matrix &middot; Pareto stockout-risk ranking.
-  Catalog data vintage: 2026-Q1 &middot; <span id="methodNoteCatalogCount">445</span> curated parts from a ~1,400-row database.
+  Models: FMECA (MIL-STD-1629A) &middot; METRIC/VARI-METRIC (Sherbrooke/Slay) &middot; newsvendor critical-fractile &middot; Kraljic matrix (HBR&nbsp;1983) &middot; DMSMS lifecycle &middot; MEIO &middot; ABC-XYZ demand-variability matrix &middot; Pareto stockout-risk ranking &middot; Incoterms 2020 (ICC) &middot; multi-modal freight cost indices &middot; World Bank LPI country risk.
+  Catalog data vintage: 2026-Q1 &middot; <span id="methodNoteCatalogCount">445</span> curated parts · 7 transport modes · 13 trade lanes · 16 country-risk profiles from a ~1,400-row database.
   Illustrative &mdash; not a substitute for a full supply-chain analysis.
 </div>
 
@@ -3446,7 +4079,14 @@ var SCENARIO_FIELDS = ['c1_lambda','c1_installed','c1_severity','c1_detectabilit
   'ltb_carry_rate','ltb_scrap_risk','ltb_alt_qual_cost','ltb_alt_qual_lt','ltb_discount','ltb_criticality','ltb_qual_alternates',
   'kq_supply_risk','kq_spend_impact','kq_criticality','kq_qual_suppliers','kq_commodity_kq',
   'mc_lt_base','mc_lt_sigma','mc_demand_base','mc_demand_sigma','mc_sup_rel','mc_sup_sigma',
-  'mc_downtime_cost','mc_stock_level','mc_mttr','mc_iterations'];
+  'mc_downtime_cost','mc_stock_level','mc_mttr','mc_iterations',
+  'sclane_origin','sclane_dest','sclane_weight','sclane_value','sclane_incoterm','sclane_urgency',
+  'scrisk_origin','scrisk_dest','scrisk_alts','scrisk_crit','scrisk_lt_typ','scrisk_need_wks','scrisk_hub','scrisk_oem_otif',
+  'scsim_lt_base','scsim_lt_sigma','scsim_need_wks','scsim_downtime_cost',
+  'scsim_tariff_prob','scsim_tariff_mag','scsim_commit_prob','scsim_commit_slip_wks',
+  'scsim_reroute_prob','scsim_demand_spike_prob','scsim_safety_stock_wks','scsim_part_weight',
+  'scexp_need_wks','scexp_commit_wks','scexp_weight','scexp_unit_cost','scexp_alts',
+  'scexp_downtime_cost','scexp_origin','scexp_dest','scexp_crit'];
 
 function scenarioSnapshot() {
   var snap = {};
@@ -3462,6 +4102,11 @@ function scenarioSnapshot() {
   // Checkboxes
   var pt = document.getElementById('s_poisson_toggle');
   if (pt) snap['s_poisson_toggle'] = pt.checked ? '1' : '0';
+  // SC tab checkboxes
+  ['sclane_reroute','scsim_hub','scsim_dual','scexp_hub_avail'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) snap[id] = el.checked ? '1' : '0';
+  });
   return snap;
 }
 
@@ -3475,6 +4120,11 @@ function applySnapshot(snap) {
     } else {
       el.value = snap[id];
     }
+  });
+  // SC checkboxes restore
+  ['sclane_reroute','scsim_hub','scsim_dual','scexp_hub_avail'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && snap[id] !== undefined) el.checked = snap[id] === '1';
   });
   // Update range display values
   ['sr_financial','sr_geo_conc','sr_lt_vol','sr_geopolitical'].forEach(function(id) {
@@ -4341,7 +4991,7 @@ function filterFAQ(cat) {
 /* ===========================================
    TAB SWITCHING + KEYBOARD NAVIGATION
    =========================================== */
-var TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','catalog','faq'];
+var TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','catalog','faq','sc-lane','sc-risk','sc-sim','sc-expedite'];
 
 function switchTab(name) {
   document.querySelectorAll('.module-pane').forEach(function(p) { p.classList.remove('active'); });
@@ -4356,7 +5006,11 @@ function switchTab(name) {
     hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB, kraljic: calcKraljic,
     montecarlo: function() { /* Monte-Carlo is user-triggered via Run button; no auto-calc */ },
     catalog: function() { catInitIfReady(); },
-    faq: function(){ renderFAQ('all'); }
+    faq: function(){ renderFAQ('all'); },
+    'sc-lane': function() { scLaneInitIfReady(); calcLanePlanner(); },
+    'sc-risk': function() { scRiskInitIfReady(); calcSCRisk(); },
+    'sc-sim': function() { scSimInitIfReady(); },
+    'sc-expedite': function() { scExpInitIfReady(); calcExpedite(); }
   };
   if (calcs[name]) { try { calcs[name](); } catch(e) { console.warn('[CSE] calc error on tab switch:', name, e); } }
 }
@@ -6432,6 +7086,17 @@ faqData.push(
 })();
 
 /* ===========================================
+   SUPPLY CHAIN & TRANSPORT FAQ ENTRIES
+   =========================================== */
+faqData.push(
+  { cat: 'supplychain', q: 'Why are transformer lead times 2.5–5 years in 2026?', a: '<strong>Three compounding bottlenecks</strong>: (1) <strong>Demand explosion</strong> — AI-DC hyperscale buildout surged transformer demand ~21% YoY (2024→2025), a pace manufacturers cannot match with fixed factory capacity; (2) <strong>Supply concentration</strong> — China holds ~60% of global large power-transformer capacity; the US makes only ~20% of what it consumes; building new domestic plants takes 5+ years; (3) <strong>Tariff compounding</strong> — Section 122 (10% global surcharge) + Section 301 duties + copper +50% (Apr-2026) layered on Chinese-origin transformers with no chip-style exemption. Wood Mackenzie models ~30% shortfall for US power transformers in 2025. Sources: <a href="https://www.powermag.com/transformers-in-2026-shortage-scramble-or-self-inflicted-crisis/" target="_blank" rel="noopener">POWER Magazine 2026</a> · <a href="https://webhosting.today/2026/04/08/up-to-half-of-us-data-centers-planned-for-2026-will-not-be-built-on-time-chinese-electrical-equipment-is-the-constraint-no-one-planned-for/" target="_blank" rel="noopener">webhosting.today 2026</a>.' },
+  { cat: 'supplychain', q: 'What is the China-tariff exposure on DC M&E equipment in 2026?', a: '<strong>Layered duty stack (as of April 2026)</strong>: Section 122 global surcharge 10% + Section 301 product-specific duties (typically 7.5–25% on electrical equipment) + copper expansion +50% (April-2026 extension covers transformer cores, cable conductors, buswork). Combined effective duty on a large power transformer from China can reach 30–50%+ of customs value. No chip-style exemption exists for transformers, switchgear, cables, or batteries. Mitigation levers: (1) Country-of-origin diversification (Vietnam, India, EU) — "China+1" manufacturing split; (2) Foreign-trade-zone / bonded-warehouse deferral (duty deferred until withdrawal from FTZ, not on arrival); (3) Tariff-classification review (correct HS code can reduce duty rate); (4) Incoterm choice — DDP puts the duty burden on the seller, incentivising them to optimise sourcing; DAP/FOB shifts the burden (and incentive for tariff engineering) to the buyer. Sources: <a href="https://webhosting.today/2026/04/08/up-to-half-of-us-data-centers-planned-for-2026-will-not-be-built-on-time-chinese-electrical-equipment-is-the-constraint-no-one-planned-for/" target="_blank" rel="noopener">webhosting.today 2026</a>.' },
+  { cat: 'supplychain', q: 'When do you air-freight a critical spare vs wait for ocean?', a: '<strong>Air-freight threshold heuristic</strong>: air-freight is justified when (expected downtime cost of waiting) &gt; (air-freight premium over ocean cost). Numerically: if downtime_cost_$/hr × expected_delay_hrs &gt; (air_cost − ocean_cost), air-freight wins. For DC M&E at $50,000/hr downtime and an 8-week ocean vs 2-week air difference (42 days × 24 hr = 1,008 hr gap), the downtime avoided = $50.4M — worth nearly any freight premium on a single part. <strong>Practical rules</strong>: (1) Air the <em>critical sub-assembly</em> (30% of weight, 80% of lead time) while the rest goes ocean — partial-air hybrid; (2) Use courier-express for low-weight high-criticality items (boards, sensors, kits) — door-to-door 2–4 days; (3) Reserve air-express for genuine emergencies (site-at-risk) — the premium over standard air is 2× for marginal 3–4 day gain. (4) Never air-freight preventively "just in case" for non-critical parts — the CO₂ footprint is 18–22× ocean FCL. Sources: Expedite Calculator (this page) · SPARES_CATALOG transportModes data.' },
+  { cat: 'supplychain', q: "What is a 'China+1' strategy and how does it apply to DC spares?", a: '"China+1" means maintaining a Chinese-origin primary source <em>plus</em> at least one non-China source qualified for the same part/OEM. For DC M&E: (1) <strong>Transformer / switchgear</strong> — the US and EU OEMs (ABB, Siemens, Schneider, Eaton) are the natural +1; allocation-constrained but not tariff-exposed; (2) <strong>Cables / buswork</strong> — Indian and Vietnamese manufacturers are qualifying at scale; (3) <strong>BMS/EPMS boards</strong> — Korean/Taiwanese ODMs can supply; (4) <strong>Generators / cooling</strong> — intra-NA sources available. A practical 70/30 split: 70% from established hubs (EU/NA/Japan-Korea) with 30% from lower-cost Vietnam/India with bonded-warehouse + pre-cleared customs protocols — as reported by 60%+ of large US operators in 2026 surveys. The critical gate is <em>qualification lead time</em> — plan 6–18 months for a new vendor qualification on critical DC M&E. Sources: <a href="https://www.scoperecruiting.com/blog/supply-chain-disruption-preparedness-2026" target="_blank" rel="noopener">Scoperecruiting 2026</a> · <a href="https://www.the-inspection-company.com/blogs/de-risking-your-international-supply-chain-a-2026-operational-guide" target="_blank" rel="noopener">The Inspection Company 2026</a>.' },
+  { cat: 'supplychain', q: 'How do Incoterms split the duty burden between buyer and seller?', a: '<strong>Incoterms 2020 duty-responsibility summary</strong>:<br>• <strong>DDP (Delivered Duty Paid)</strong>: seller bears <em>everything</em> including import duties and taxes. Highest protection for buyer; seller has full incentive to optimise origin/classification for lowest duty. Risk: seller may price in worst-case duty.<br>• <strong>DAP (Delivered at Place)</strong>: seller delivers to named destination; <em>buyer</em> bears import duties, unloading, last-mile. Buyer controls customs broker and classification but also absorbs tariff risk.<br>• <strong>FCA (Free Carrier)</strong>: seller handles export clearance and delivers to named carrier at seller\'s premises or named place; buyer takes over from there — buyer pays freight, import duties, everything onward.<br>• <strong>FOB / CFR / CIF (sea-only)</strong>: risk transfers at ship\'s rail / port of loading; buyer pays freight (CFR/CIF = seller pays freight but risk is FOB). Import duties in all sea-only rules = buyer.<br>For tariff-heavy routes (CN→NA): <strong>DDP shifts tariff risk to seller</strong>, which is buyer-favourable when tariff levels are uncertain; <strong>DAP gives buyer more control</strong> over FTZ/bonded-warehouse strategies. In 2026, many US importers are requesting DDP from Chinese OEMs to avoid direct tariff exposure — effectively outsourcing the tariff problem. Sources: <a href="https://www.freightos.com/freight-resources/incoterms-plain-english-freight-shipping-guide/" target="_blank" rel="noopener">Freightos Incoterms guide</a> · <a href="https://www.eurosender.com/en/incoterms/multimodal" target="_blank" rel="noopener">Eurosender multimodal Incoterms</a>.' }
+);
+
+/* ===========================================
    PARTS CATALOG ENGINE
    =========================================== */
 (function() {
@@ -7560,6 +8225,1069 @@ updateSummaryDashboard = function() {
     if (cnEl) cnEl.textContent = CAT.parts.length;
   }
 };
+
+/* Init: load fleet from storage if available */
+(function() {
+  try {
+    var raw = localStorage.getItem('cse_fleet');
+    if (raw) { fleetParts = JSON.parse(raw); }
+  } catch(e) {}
+})();
+
+/* ===========================================
+   GLOBAL SUPPLY CHAIN & TRANSPORT MODULES
+   v1.16.0 — Lane & Mode · SC Risk Map · Disruption Sim · Expedite Calc
+   =========================================== */
+
+/* ── Catalog guard helper (deferred script may not yet be loaded) ── */
+function scGetCat() { return window.SPARES_CATALOG || null; }
+
+/* ── Incoterm allocation table (Incoterms 2020 standard) ── */
+var INCOTERM_ALLOC = {
+  EXW:  { exportClearance:'Buyer',  mainCarriage:'Buyer',  importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'Ex Works — seller\'s premises (buyer bears all from pickup)' },
+  FCA:  { exportClearance:'Seller', mainCarriage:'Buyer',  importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'At named place / carrier (seller exports, buyer takes over)' },
+  CPT:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'When goods handed to first carrier (cost to dest, risk from carrier)' },
+  CIP:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'When goods handed to first carrier (seller insures to dest)' },
+  DAP:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'Named destination (buyer pays duty, unloading, last mile)' },
+  DPU:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Buyer',  unloading:'Seller', lastMile:'Buyer',  riskTransfer:'After unloading at named place (seller unloads, buyer pays duty)' },
+  DDP:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Seller', unloading:'Seller', lastMile:'Seller', riskTransfer:'Delivered to buyer\'s door — seller bears everything incl. duty' },
+  FOB:  { exportClearance:'Seller', mainCarriage:'Buyer',  importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'Port of loading (ship\'s rail) — sea-only rule' },
+  CFR:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'Port of loading (seller pays freight, risk transfers at loading) — sea-only' },
+  CIF:  { exportClearance:'Seller', mainCarriage:'Seller', importDuty:'Buyer',  unloading:'Buyer',  lastMile:'Buyer',  riskTransfer:'Port of loading (seller pays freight+insurance, risk at loading) — sea-only' }
+};
+
+/* ── Base ocean FCL rate $/kg ── */
+var SC_BASE_OCEAN_FCL = 1.20; // documented in ⓘ box
+
+/* ── Region → country mapping for customs efficiency lookup ── */
+var SC_REGION_COUNTRY = { NA:'United States', EU:'Germany', 'Intra-APAC':'Singapore', 'Intra-NA':'United States', 'Intra-EU':'Germany' };
+
+/* ── Helper: find best matching lane from catalog ── */
+function scFindLane(origin, dest) {
+  var CAT = scGetCat();
+  if (!CAT || !CAT.tradeLanes) return null;
+  // Exact match first
+  for (var i = 0; i < CAT.tradeLanes.length; i++) {
+    var l = CAT.tradeLanes[i];
+    if (l.origin === origin && l.dest === dest) return l;
+    // Intra-* fallback
+    if (l.origin === 'Intra-NA' && origin === 'Intra-NA' && dest === 'NA') return l;
+    if (l.origin === 'Intra-EU' && origin === 'Intra-EU' && dest === 'EU') return l;
+    if (l.origin === 'Intra-APAC' && origin === 'Intra-APAC' && dest === 'Intra-APAC') return l;
+  }
+  // Fuzzy: origin partial match
+  for (var j = 0; j < CAT.tradeLanes.length; j++) {
+    var ll = CAT.tradeLanes[j];
+    if (ll.origin.indexOf(origin) >= 0 && (ll.dest === dest || ll.dest.indexOf(dest) >= 0)) return ll;
+  }
+  return null;
+}
+
+/* ── Helper: find country risk ── */
+function scFindCountry(name) {
+  var CAT = scGetCat();
+  if (!CAT || !CAT.countryRisk) return null;
+  for (var i = 0; i < CAT.countryRisk.length; i++) {
+    if (CAT.countryRisk[i].country === name) return CAT.countryRisk[i];
+  }
+  return null;
+}
+
+/* ── Initialise part selects for SC tabs ── */
+function scPopulatePartSelects() {
+  var CAT = scGetCat();
+  if (!CAT || !CAT.parts) return;
+  var sorted = CAT.parts.slice().sort(function(a,b){return b.crit-a.crit;});
+  var optHtml = '<option value="">— Manual entry —</option>';
+  sorted.slice(0,120).forEach(function(p){
+    optHtml += '<option value="'+p.id+'" data-wkg="'+(p.wkg||1)+'" data-ctyp="'+(p.cTyp||5000)+'" data-alts="'+(p.alts||0)+'" data-crit="'+(p.crit||5)+'" data-lt="'+(p.ltTyp||16)+'">['+p.crit+'] '+p.desc.slice(0,55)+(p.desc.length>55?'…':'')+'</option>';
+  });
+  ['sclane_part_select','scrisk_part_select','scexp_part_select'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.options.length < 3) el.innerHTML = optHtml;
+  });
+}
+
+function scLaneInitIfReady() { scPopulatePartSelects(); }
+function scRiskInitIfReady() { scPopulatePartSelects(); }
+function scSimInitIfReady() { /* no catalog select in sim */ }
+function scExpInitIfReady() { scPopulatePartSelects(); }
+
+/* Catalog "Use ▸" → auto-fill weight and value into lane planner */
+function scLanePartFromCatalog() {
+  var sel = document.getElementById('sclane_part_select');
+  if (!sel || !sel.value) return;
+  var opt = sel.options[sel.selectedIndex];
+  var wkg = parseFloat(opt.getAttribute('data-wkg')) || 1;
+  var ctyp = parseFloat(opt.getAttribute('data-ctyp')) || 5000;
+  var wEl = document.getElementById('sclane_weight'); if(wEl) wEl.value = wkg;
+  var vEl = document.getElementById('sclane_value'); if(vEl) vEl.value = ctyp;
+  calcLanePlanner();
+}
+
+function scRiskPartFromCatalog() {
+  var sel = document.getElementById('scrisk_part_select');
+  if (!sel || !sel.value) return;
+  var opt = sel.options[sel.selectedIndex];
+  ['alts','crit','lt'].forEach(function(k){
+    var v = opt.getAttribute('data-'+k);
+    var map = {alts:'scrisk_alts',crit:'scrisk_crit',lt:'scrisk_lt_typ'};
+    var el = document.getElementById(map[k]);
+    if(el && v) el.value = v;
+  });
+  calcSCRisk();
+}
+
+function scExpPartFromCatalog() {
+  var sel = document.getElementById('scexp_part_select');
+  if (!sel || !sel.value) return;
+  var opt = sel.options[sel.selectedIndex];
+  var wEl = document.getElementById('scexp_weight'); if(wEl) wEl.value = parseFloat(opt.getAttribute('data-wkg'))||1;
+  var cEl = document.getElementById('scexp_unit_cost'); if(cEl) cEl.value = parseFloat(opt.getAttribute('data-ctyp'))||5000;
+  var aEl = document.getElementById('scexp_alts'); if(aEl) aEl.value = parseInt(opt.getAttribute('data-alts'))||0;
+  var crEl = document.getElementById('scexp_crit'); if(crEl) crEl.value = parseInt(opt.getAttribute('data-crit'))||5;
+  calcExpedite();
+}
+
+/* ══════════════════════════════════════════
+   TAB SC-1: LANE & MODE PLANNER
+   ══════════════════════════════════════════ */
+function calcLanePlanner() {
+  var CAT = scGetCat();
+  var origin = (document.getElementById('sclane_origin')||{}).value || 'CN';
+  var dest = (document.getElementById('sclane_dest')||{}).value || 'NA';
+  var weight = Math.max(0.1, parseFloat((document.getElementById('sclane_weight')||{}).value)||250);
+  var value = Math.max(0, parseFloat((document.getElementById('sclane_value')||{}).value)||15000);
+  var incoterm = (document.getElementById('sclane_incoterm')||{}).value || 'DAP';
+  var urgency = (document.getElementById('sclane_urgency')||{}).value || 'routine';
+  var reroute = document.getElementById('sclane_reroute') && document.getElementById('sclane_reroute').checked;
+
+  // Find lane
+  var lane = CAT ? scFindLane(origin, dest) : null;
+
+  // Customs efficiency adjustment (1–10; higher = faster clearance)
+  var destCountryName = SC_REGION_COUNTRY[dest] || 'United States';
+  var destCountry = CAT ? scFindCountry(destCountryName) : null;
+  var customsEff = destCountry ? (destCountry.customs / 10) : 0.8; // fraction: 1=best
+  var customsDays = lane ? Math.round(lane.customsD * (1 + (1 - customsEff) * 0.5)) : 5;
+  var lastMileDays = lane ? (lane.lastMileD || 3) : 3;
+
+  // Reroute delta
+  var rerouteDays = reroute ? 12 : 0;
+
+  // Build transport modes list
+  var MODES = CAT && CAT.transportModes ? CAT.transportModes : [];
+
+  // Mode feasibility: transoceanic lanes have no road/rail
+  var isTransoceanic = lane ? (lane.roadRailD === null) : (origin !== 'Intra-NA' && origin !== 'Intra-EU' && origin !== 'Intra-APAC');
+
+  var results = [];
+  MODES.forEach(function(m) {
+    var feasible = true;
+    var note = '';
+    var transitDays = 0;
+
+    if (m.id === 'ocean-fcl' || m.id === 'ocean-lcl') {
+      transitDays = lane ? (lane.oceanD || m.interTyp || 35) : (m.interTyp || 35);
+      if (m.id === 'ocean-lcl') transitDays += 7; // consolidation delay
+      transitDays += rerouteDays;
+      if (isTransoceanic && origin === 'Intra-NA') { feasible = false; note = 'Short intra-region — road preferred'; }
+      note = feasible ? (reroute ? '⚠ Reroute +' + rerouteDays + ' d applied' : (lane ? lane.notes.slice(0,60) + '…' : '')) : note;
+    } else if (m.id === 'air-standard' || m.id === 'air-express') {
+      transitDays = lane ? (lane.airD || m.interTyp || 10) : (m.interTyp || 10);
+      if (m.id === 'air-express') transitDays = Math.max(3, transitDays - 4);
+      if (urgency === 'routine' && m.id === 'air-express') { feasible = false; note = 'Emergency mode — not routine'; }
+      note = feasible ? 'Air transit only; no reroute risk' : note;
+    } else if (m.id === 'road') {
+      if (isTransoceanic) { feasible = false; note = 'Not feasible — transoceanic route'; }
+      else { transitDays = lane ? (lane.roadRailD || m.intraTyp || 5) : (m.intraTyp || 5); note = 'Door-to-door intra-region'; }
+    } else if (m.id === 'rail') {
+      if (isTransoceanic && origin !== 'CN') { feasible = false; note = 'Not feasible — transoceanic route'; }
+      else if (origin === 'CN' && dest === 'EU') { transitDays = lane ? (lane.roadRailD || 18) : 18; note = 'China-EU land bridge; subject to geo risk'; }
+      else if (isTransoceanic) { feasible = false; note = 'Not feasible — transoceanic route'; }
+      else { transitDays = lane ? (lane.roadRailD || m.intraTyp || 7) : (m.intraTyp || 7); note = 'Intra-continental rail'; }
+    } else if (m.id === 'courier-express') {
+      transitDays = lane ? Math.min(lane.airD || 7, m.interTyp || 4) : (m.interTyp || 4);
+      if (weight > 70) { feasible = false; note = 'Weight ' + weight + ' kg exceeds courier limit (~70 kg)'; }
+      else { note = 'Best for parts <70 kg; door-to-door 2–5 d'; }
+    }
+
+    var doorToDoorDays = feasible ? (transitDays + customsDays + lastMileDays) : 0;
+    var freightCost = feasible ? weight * SC_BASE_OCEAN_FCL * m.costIndex : 0;
+    var co2Rel = m.co2Index;
+
+    results.push({
+      id: m.id, name: m.name, feasible: feasible,
+      doorToDoorDays: doorToDoorDays, transitDays: transitDays,
+      freightCost: freightCost, co2Rel: co2Rel,
+      note: note, costIndex: m.costIndex
+    });
+  });
+
+  // Find cheapest and fastest among feasible
+  var feasibleResults = results.filter(function(r){ return r.feasible; });
+  var cheapest = null, fastest = null;
+  if (feasibleResults.length) {
+    cheapest = feasibleResults.reduce(function(a,b){ return a.freightCost < b.freightCost ? a : b; });
+    fastest = feasibleResults.reduce(function(a,b){ return a.doorToDoorDays < b.doorToDoorDays ? a : b; });
+  }
+
+  // Build table
+  var tbody = document.getElementById('sclane_mode_tbody');
+  if (tbody) {
+    if (!CAT) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">Catalog not yet loaded — switch to the Parts Catalog tab first, then return here.</td></tr>';
+    } else {
+      tbody.innerHTML = results.map(function(r) {
+        var rowCls = !r.feasible ? 'sc-row-infeasible' : (r === cheapest ? 'sc-row-cheapest' : (r === fastest ? 'sc-row-fastest' : ''));
+        var badge = !r.feasible ? '<span style="color:var(--text-muted);font-size:0.65rem;">N/A</span>' : (r === cheapest && r === fastest ? '<span class="sc-badge-cheapest">Cheapest</span><span class="sc-badge-fastest">Fastest</span>' : (r === cheapest ? '<span class="sc-badge-cheapest">Cheapest</span>' : (r === fastest ? '<span class="sc-badge-fastest">Fastest</span>' : '')));
+        var co2BarW = r.feasible ? Math.min(100, (r.co2Rel / 22) * 100) : 0;
+        var costFmt = r.feasible ? ('$' + (r.freightCost >= 1000 ? (r.freightCost/1000).toFixed(1) + 'K' : r.freightCost.toFixed(0))) : '—';
+        return '<tr class="'+rowCls+'">' +
+          '<td><strong>' + r.name + '</strong></td>' +
+          '<td>'+(r.feasible ? r.doorToDoorDays+' d <span style="font-size:0.65rem;color:var(--text-muted);">(transit '+r.transitDays+'+customs '+customsDays+'+LM '+lastMileDays+')</span>' : '—')+'</td>' +
+          '<td>'+costFmt+'</td>' +
+          '<td><div class="sc-co2-bar" style="width:'+co2BarW+'px;max-width:80px;" title="CO₂ index '+r.co2Rel+'×"></div> <span style="font-size:0.65rem;">'+r.co2Rel+'×</span></td>' +
+          '<td style="font-size:0.7rem;color:var(--text-muted);">'+r.note+'</td>' +
+          '<td>'+badge+'</td>' +
+          '</tr>';
+      }).join('');
+    }
+  }
+
+  // Update sticky bar
+  setText('sclane_cheapest_mode', cheapest ? cheapest.name.split(' — ')[0] : '—');
+  setText('sclane_fastest_mode', fastest ? fastest.name.split(' — ')[0] : '—');
+  setText('sclane_ocean_days', lane ? (lane.oceanD + customsDays + lastMileDays + rerouteDays) + ' d' : '—');
+  setText('sclane_air_days', lane ? (lane.airD + customsDays + lastMileDays) + ' d' : '—');
+
+  // Reroute panel
+  var rrPanel = document.getElementById('sclane_reroute_panel');
+  var rrNote = document.getElementById('sclane_reroute_note');
+  if (rrPanel) rrPanel.style.display = reroute ? 'block' : 'none';
+  if (rrNote && lane) rrNote.textContent = lane.reroute || '';
+
+  // Incoterm panel
+  renderIncotermPanel(incoterm, lane, destCountry);
+
+  // Mode chart
+  renderLaneModeChart(results, cheapest, fastest);
+}
+
+function renderIncotermPanel(code, lane, destCountry) {
+  setText('sclane_inco_label', code);
+  var alloc = INCOTERM_ALLOC[code] || INCOTERM_ALLOC['DAP'];
+  var tbody = document.getElementById('sclane_inco_tbody');
+  if (tbody) {
+    var rows = [
+      ['Export clearance', alloc.exportClearance],
+      ['Main carriage (freight)', alloc.mainCarriage],
+      ['Import duty & taxes', alloc.importDuty],
+      ['Unloading at destination', alloc.unloading],
+      ['Last-mile delivery', alloc.lastMile]
+    ].map(function(r) {
+      return '<tr><td>' + r[0] + '</td>' +
+        '<td>' + (r[1] === 'Seller' ? '✅ Seller' : '—') + '</td>' +
+        '<td>' + (r[1] === 'Buyer' ? '⬜ Buyer' : '—') + '</td>' +
+        '<td style="font-size:0.68rem;"></td></tr>';
+    }).join('');
+    tbody.innerHTML = rows;
+  }
+  // Risk transfer note + tariff note
+  var tariffNote = document.getElementById('sclane_tariff_note');
+  if (tariffNote) {
+    var txt = '<strong>Risk transfer:</strong> ' + alloc.riskTransfer;
+    if (lane && lane.tariff >= 6) {
+      txt += '<br><strong style="color:#ef4444;">⚠ Tariff exposure on this lane: ' + lane.tariff + '/10</strong>';
+      if (destCountry && destCountry.tariffNote) txt += ' — ' + destCountry.tariffNote.slice(0, 180) + '…';
+      else if (lane.notes) txt += ' — ' + lane.notes.slice(0, 150) + '…';
+    }
+    tariffNote.innerHTML = txt;
+  }
+}
+
+function renderLaneModeChart(results, cheapest, fastest) {
+  var feasible = results.filter(function(r){ return r.feasible; });
+  if (!feasible.length) return;
+  var labels = feasible.map(function(r){ return r.name.length > 18 ? r.name.slice(0,16)+'…' : r.name; });
+  var daysData = feasible.map(function(r){ return r.doorToDoorDays; });
+  var costData = feasible.map(function(r){ return +(r.freightCost/1000).toFixed(1); });
+  var bgColors = feasible.map(function(r){
+    if (r === cheapest && r === fastest) return 'rgba(245,158,11,0.75)';
+    if (r === cheapest) return 'rgba(16,185,129,0.7)';
+    if (r === fastest) return 'rgba(59,130,246,0.7)';
+    return 'rgba(148,163,184,0.5)';
+  });
+  getOrCreateChart('chart_sc_lane_modes', 'bar', {
+    labels: labels,
+    datasets: [
+      { label: 'Door-to-door (days)', data: daysData, backgroundColor: bgColors, borderRadius: 4, yAxisID: 'y' },
+      { type: 'line', label: 'Freight cost $K', data: costData, borderColor: 'rgba(245,158,11,0.9)', backgroundColor: 'transparent', pointRadius: 4, borderWidth: 2, yAxisID: 'y2' }
+    ]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { font: { size: 10 }, color: chartTickColor() } } },
+    scales: {
+      x: { ticks: { font: { size: 9 }, color: chartTickColor(), maxRotation: 35 }, grid: { color: chartGridColor() } },
+      y: { beginAtZero: true, ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() }, position: 'left', title: { display: true, text: 'Days', font: { size: 9 }, color: chartTickColor() } },
+      y2: { beginAtZero: true, ticks: { font: { size: 9 }, color: chartTickColor(), callback: function(v){ return '$'+v+'K'; } }, grid: { display: false }, position: 'right', title: { display: true, text: 'Freight $K', font: { size: 9 }, color: chartTickColor() } }
+    }
+  });
+}
+
+function exportLanePDF() {
+  var origin = (document.getElementById('sclane_origin')||{}).value || '—';
+  var dest = (document.getElementById('sclane_dest')||{}).value || '—';
+  var incoterm = (document.getElementById('sclane_incoterm')||{}).value || '—';
+  var weight = (document.getElementById('sclane_weight')||{}).value || '—';
+  var date = new Date().toLocaleString();
+  var tableHtml = document.getElementById('sclane_mode_table') ? document.getElementById('sclane_mode_table').outerHTML : '<p>No data</p>';
+  var css = '<style>body{font-family:Arial,sans-serif;font-size:11px;color:#1e293b;padding:16px 20px;}h1{color:#d97706;border-bottom:3px solid #f59e0b;padding-bottom:5px;font-size:17px;}table{border-collapse:collapse;width:100%;margin:6px 0;}th{background:#fef3c7;text-align:left;padding:4px 7px;font-size:10px;}td{padding:4px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;}.disc{background:#f1f5f9;border:1px solid #cbd5e1;padding:8px;border-radius:5px;font-size:9px;color:#475569;margin-top:14px;}<\/style>';
+  var cover = '<h1>Lane &amp; Mode Planner Report<\/h1><p style="font-size:10px;color:#64748b;">Generated: '+date+' · Origin: '+origin+' → Dest: '+dest+' · Incoterm: '+incoterm+' · Weight: '+weight+' kg<\/p>';
+  var disc = '<div class="disc"><strong>Disclaimer:<\/strong> Freight cost estimates illustrative (base $1.20\/kg ocean-FCL × mode costIndex). Not a substitute for carrier quotation. resistancezero.com Critical Spares Engine v1.16.0.<\/div>';
+  var w = window.open('','_blank');
+  if (!w) { showMsg('Allow pop-ups to export PDF.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Lane &amp; Mode Planner<\/title>'+css+'<\/head><body>'+cover+tableHtml+disc+'<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ══════════════════════════════════════════
+   TAB SC-2: SUPPLY-CHAIN RISK MAP
+   ══════════════════════════════════════════ */
+
+/* Dimension weights (must sum to 1.0) */
+var SC_RISK_WEIGHTS = {
+  singleSource: 0.22,
+  countryGeo:   0.15,
+  laneCongestion: 0.12,
+  laneGeo:      0.12,
+  ltPressure:   0.15,
+  tariff:       0.12,
+  otif:         0.12
+};
+
+function calcSCRisk() {
+  var CAT = scGetCat();
+  var originCountry = (document.getElementById('scrisk_origin')||{}).value || 'China';
+  var dest = (document.getElementById('scrisk_dest')||{}).value || 'NA';
+  var alts = parseInt((document.getElementById('scrisk_alts')||{}).value)||0;
+  var crit = parseInt((document.getElementById('scrisk_crit')||{}).value)||8;
+  var ltTyp = parseInt((document.getElementById('scrisk_lt_typ')||{}).value)||52;
+  var needWks = parseInt((document.getElementById('scrisk_need_wks')||{}).value)||26;
+  var hubCoverage = (document.getElementById('scrisk_hub')||{}).value || 'none';
+  var otif = parseFloat((document.getElementById('scrisk_oem_otif')||{}).value)||75;
+
+  if (!CAT) {
+    setHTML('scrisk_dim_bars', '<p style="color:var(--text-muted);font-size:0.8rem;">Catalog not yet loaded.</p>');
+    return;
+  }
+
+  // 1. Single-source dimension (0–100)
+  var ssScore = alts === 0 ? 100 : (alts === 1 ? 50 : Math.max(10, 40 - alts * 8));
+
+  // 2. Country geo risk (0–100 scaled from 1–10)
+  var countryRec = scFindCountry(originCountry);
+  var countryGeoScore = countryRec ? (countryRec.geoRisk / 10) * 100 : 60;
+
+  // 3. Lane congestion + 4. Lane geo
+  // Map origin country to region code
+  var originRegionMap = { China:'CN', Germany:'EU', 'United States':'Intra-NA', Japan:'Korea-Japan', 'South Korea':'Korea-Japan', India:'India', Vietnam:'SEA-Vietnam', Singapore:'Intra-APAC', Ireland:'EU', Netherlands:'EU', 'United Kingdom':'EU', Italy:'EU', Switzerland:'EU', Mexico:'Intra-NA', Brazil:'LATAM', Indonesia:'Intra-APAC' };
+  var originRegion = originRegionMap[originCountry] || 'CN';
+  var lane = scFindLane(originRegion, dest);
+  var congestionScore = lane ? (lane.congestion / 10) * 100 : 60;
+  var laneGeoScore = lane ? (lane.geopolitical / 10) * 100 : 60;
+  var tariffScore = lane ? (lane.tariff / 10) * 100 : 50;
+
+  // 5. LT pressure vs need-window
+  var ltPressure = ltTyp > needWks ? Math.min(100, ((ltTyp - needWks) / ltTyp) * 100 * 1.5) : Math.max(0, (1 - needWks / ltTyp) * 20);
+
+  // 6. OTIF (inverse: low OTIF = high risk)
+  var otifScore = Math.max(0, 100 - otif);
+
+  // Hub coverage mitigation
+  var hubMit = hubCoverage === 'full' ? 0.15 : (hubCoverage === 'partial' ? 0.40 : 1.0);
+
+  // Weighted composite
+  var raw = (
+    SC_RISK_WEIGHTS.singleSource  * ssScore +
+    SC_RISK_WEIGHTS.countryGeo    * countryGeoScore +
+    SC_RISK_WEIGHTS.laneCongestion * congestionScore * hubMit +
+    SC_RISK_WEIGHTS.laneGeo       * laneGeoScore +
+    SC_RISK_WEIGHTS.ltPressure    * ltPressure * hubMit +
+    SC_RISK_WEIGHTS.tariff        * tariffScore +
+    SC_RISK_WEIGHTS.otif          * otifScore
+  );
+  var score = Math.round(Math.min(100, Math.max(0, raw)));
+
+  // Band
+  var band, bandCls;
+  if (score < 25) { band = 'LOW'; bandCls = 'sc-risk-low'; }
+  else if (score < 50) { band = 'MEDIUM'; bandCls = 'sc-risk-medium'; }
+  else if (score < 75) { band = 'HIGH'; bandCls = 'sc-risk-high'; }
+  else { band = 'CRITICAL'; bandCls = 'sc-risk-critical'; }
+
+  setText('scrisk_score', score);
+  setText('scrisk_score_sb', score);
+  setHTML('scrisk_band_box', '<span class="sc-risk-band '+bandCls+'">'+band+'</span>');
+  setHTML('scrisk_band_sb', '<span class="sc-risk-band '+bandCls+'">'+band+'</span>');
+
+  // Dimension bars
+  var dims = [
+    { label: 'Single-source exposure', score: ssScore, w: SC_RISK_WEIGHTS.singleSource },
+    { label: 'Country geo-risk', score: countryGeoScore, w: SC_RISK_WEIGHTS.countryGeo },
+    { label: 'Lane congestion', score: congestionScore * hubMit, w: SC_RISK_WEIGHTS.laneCongestion },
+    { label: 'Lane geopolitical', score: laneGeoScore, w: SC_RISK_WEIGHTS.laneGeo },
+    { label: 'LT pressure vs need-window', score: ltPressure * hubMit, w: SC_RISK_WEIGHTS.ltPressure },
+    { label: 'Tariff exposure', score: tariffScore, w: SC_RISK_WEIGHTS.tariff },
+    { label: 'Supplier OTIF', score: otifScore, w: SC_RISK_WEIGHTS.otif }
+  ];
+
+  var dimHtml = dims.map(function(d) {
+    var fillColor = d.score >= 75 ? '#ef4444' : (d.score >= 50 ? '#d97706' : (d.score >= 25 ? '#f59e0b' : '#10b981'));
+    return '<div class="score-bar-row"><span class="score-bar-label">'+d.label+'</span>' +
+      '<div class="score-bar-bg"><div class="score-bar-fill" style="width:'+d.score+'%;background:'+fillColor+';"></div></div>' +
+      '<span class="score-bar-val">'+Math.round(d.score)+'</span></div>';
+  }).join('');
+  setHTML('scrisk_dim_bars', dimHtml);
+
+  // Radar chart
+  renderSCRiskRadar(dims);
+
+  // Mitigations — ranked by (100-score)*weight desc
+  var mitigations = [];
+  if (ssScore > 40) mitigations.push({ mit: 'Qualify a second source (dual-source)', effort: 'High', impact: 'Very High', score: ssScore });
+  if (ssScore > 70) mitigations.push({ mit: '"China+1" source qualification (Vietnam/India/EU)', effort: 'High', impact: 'Very High', score: ssScore - 5 });
+  if (congestionScore * hubMit > 45) mitigations.push({ mit: 'Establish regional hub / consignment stock', effort: 'Med', impact: 'High', score: congestionScore * hubMit });
+  if (hubCoverage === 'none') mitigations.push({ mit: 'VMI / consignment agreement near site', effort: 'Med', impact: 'High', score: 55 });
+  if (ltPressure > 40) mitigations.push({ mit: 'Place order now — reduce LT pressure window', effort: 'Low', impact: 'High', score: ltPressure });
+  if (tariffScore > 50) mitigations.push({ mit: 'Review Incoterm — consider DDP to shift duty to seller', effort: 'Low', impact: 'Med', score: tariffScore });
+  if (tariffScore > 50) mitigations.push({ mit: 'FTZ / bonded-warehouse deferral on import', effort: 'Med', impact: 'Med', score: tariffScore - 10 });
+  if (otifScore > 40) mitigations.push({ mit: 'Issue Supplier Corrective Action Request (SCAR)', effort: 'Low', impact: 'Med', score: otifScore });
+  if (countryGeoScore > 60) mitigations.push({ mit: 'Country-of-origin diversification', effort: 'High', impact: 'High', score: countryGeoScore });
+  if (ltTyp > 52) mitigations.push({ mit: 'Last-time-buy or strategic buffer stock', effort: 'Low', impact: 'Med', score: 60 });
+  mitigations.sort(function(a,b){ return b.score - a.score; });
+  mitigations = mitigations.slice(0, 6);
+
+  var effortMap = { Low: 'sc-effort-low', Med: 'sc-effort-med', High: 'sc-effort-high' };
+  var mitHtml = '<ul class="sc-mit-list">' + mitigations.map(function(m) {
+    return '<li><span class="'+effortMap[m.effort]+'">Effort: '+m.effort+'</span><span style="flex:1;">'+m.mit+'</span></li>';
+  }).join('') + '</ul>';
+  setHTML('scrisk_mit_list', mitHtml);
+
+  // Top risk for sticky bar
+  if (mitigations.length) setText('scrisk_toprisk_sb', mitigations[0].mit.slice(0, 40) + '…');
+}
+
+function renderSCRiskRadar(dims) {
+  getOrCreateChart('chart_sc_risk_radar', 'radar', {
+    labels: dims.map(function(d){ return d.label.length > 20 ? d.label.slice(0,18)+'…' : d.label; }),
+    datasets: [{
+      label: 'Risk Score',
+      data: dims.map(function(d){ return Math.round(d.score); }),
+      backgroundColor: 'rgba(245,158,11,0.18)',
+      borderColor: 'rgba(245,158,11,0.85)',
+      pointBackgroundColor: 'rgba(245,158,11,0.9)',
+      borderWidth: 2, pointRadius: 3
+    }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        min: 0, max: 100,
+        ticks: { font: { size: 8 }, color: chartTickColor(), stepSize: 25 },
+        grid: { color: chartGridColor() },
+        pointLabels: { font: { size: 9 }, color: chartTickColor() }
+      }
+    }
+  });
+}
+
+function resetSCRisk() {
+  ['scrisk_alts','scrisk_crit','scrisk_lt_typ','scrisk_need_wks','scrisk_oem_otif'].forEach(function(id,i){
+    var el = document.getElementById(id);
+    if (el) el.value = [0, 8, 52, 26, 75][i];
+  });
+  var hubEl = document.getElementById('scrisk_hub'); if (hubEl) hubEl.value = 'none';
+  calcSCRisk();
+}
+
+function exportRiskMapPDF() {
+  var score = (document.getElementById('scrisk_score')||{}).textContent || '—';
+  var band = (document.getElementById('scrisk_band_box')||{}).textContent || '—';
+  var date = new Date().toLocaleString();
+  var css = '<style>body{font-family:Arial,sans-serif;font-size:11px;color:#1e293b;padding:16px 20px;}h1{color:#d97706;border-bottom:3px solid #f59e0b;padding-bottom:5px;font-size:17px;}.disc{background:#f1f5f9;border:1px solid #cbd5e1;padding:8px;border-radius:5px;font-size:9px;color:#475569;margin-top:14px;}<\/style>';
+  var body = '<h1>Supply-Chain Risk Map Report<\/h1><p style="font-size:10px;color:#64748b;">Generated: '+date+'<\/p><p><strong>SC Risk Score: '+score+'\/100 — Band: '+band+'<\/strong><\/p>';
+  var mitEl = document.getElementById('scrisk_mit_list');
+  body += (mitEl ? '<h2 style="color:#d97706;font-size:12px;margin:12px 0 5px;">Recommended Mitigations<\/h2>'+mitEl.innerHTML : '');
+  body += '<div class="disc"><strong>Disclaimer:<\/strong> Composite risk score is illustrative. resistancezero.com Critical Spares Engine v1.16.0.<\/div>';
+  var w = window.open('','_blank');
+  if (!w) { showMsg('Allow pop-ups to export PDF.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SC Risk Map<\/title>'+css+'<\/head><body>'+body+'<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ══════════════════════════════════════════
+   TAB SC-3: DISRUPTION SCENARIO SIM
+   ══════════════════════════════════════════ */
+
+function scsimPreview() { /* placeholder — auto-display preview stats when inputs change */ }
+
+function runSCSim() {
+  var ltBase = parseFloat((document.getElementById('scsim_lt_base')||{}).value)||39;
+  var ltSigma = parseFloat((document.getElementById('scsim_lt_sigma')||{}).value)||8;
+  var needWks = parseFloat((document.getElementById('scsim_need_wks')||{}).value)||52;
+  var downtimeCost = parseFloat((document.getElementById('scsim_downtime_cost')||{}).value)||50000;
+  var tariffProb = parseFloat((document.getElementById('scsim_tariff_prob')||{}).value)||15;
+  var tariffMag = parseFloat((document.getElementById('scsim_tariff_mag')||{}).value)||25;
+  var commitProb = parseFloat((document.getElementById('scsim_commit_prob')||{}).value)||30;
+  var commitSlipWks = parseFloat((document.getElementById('scsim_commit_slip_wks')||{}).value)||8;
+  var rerouteProb = parseFloat((document.getElementById('scsim_reroute_prob')||{}).value)||20;
+  var demandSpikeProb = parseFloat((document.getElementById('scsim_demand_spike_prob')||{}).value)||10;
+  var hubAvail = document.getElementById('scsim_hub') && document.getElementById('scsim_hub').checked;
+  var dualSource = document.getElementById('scsim_dual') && document.getElementById('scsim_dual').checked;
+  var safetyStockWks = parseFloat((document.getElementById('scsim_safety_stock_wks')||{}).value)||0;
+  var partWeight = parseFloat((document.getElementById('scsim_part_weight')||{}).value)||250;
+
+  var N = 1000;
+  var lts = [], expediteCosts = [], downtimeCosts = [], onTimeCnt = 0;
+  var expLTs = [], downtimes = [];
+
+  // Comparison variants
+  var hubLTs = [], dualLTs = [], ssLTs = [];
+  var hubOT = 0, dualOT = 0, ssOT = 0;
+
+  // Disruption contribution tracking for tornado
+  var contributions = { ltNoise: [], tariffShock: [], commitSlip: [], reroute: [], demandSpike: [] };
+
+  for (var i = 0; i < N; i++) {
+    // Box-Muller normal sample
+    var u1 = Math.max(1e-10, Math.random()), u2 = Math.random();
+    var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    var ltSample = ltBase + ltSigma * z;
+    ltSample = Math.max(1, ltSample);
+
+    // Disruptions
+    var tariffHit = Math.random() < tariffProb / 100;
+    var tariffMultiplier = tariffHit ? (1 + tariffMag / 100) : 1;
+    var commitSlip = Math.random() < (dualSource ? commitProb / 200 : commitProb / 100);
+    var slipWks = commitSlip ? (dualSource ? commitSlipWks * 0.6 : commitSlipWks) : 0;
+    var rerouteHit = Math.random() < rerouteProb / 100;
+    var rerouteWks = rerouteHit ? 12 / 7 : 0; // 12 days ≈ 1.7 wks
+    var demandSpike = Math.random() < demandSpikeProb / 100;
+    var effectiveNeedWks = needWks + safetyStockWks - (demandSpike ? 4 : 0); // demand spike compresses window
+
+    var effLT = ltSample + slipWks + rerouteWks;
+
+    // Hub toggle: 70% chance hub has stock
+    var hubResolved = hubAvail && Math.random() < 0.70;
+    var finalLT = hubResolved ? Math.min(effLT, 1) : effLT; // hub cuts to ~1 wk
+
+    var onTime = finalLT <= effectiveNeedWks;
+    if (onTime) onTimeCnt++;
+
+    // Expedite cost if late (air freight to recover)
+    var expedite = 0, dtCost = 0;
+    if (!onTime) {
+      var lateWks = finalLT - effectiveNeedWks;
+      // Can air cut it? Air is ~2 wks; if lateWks < (finalLT - 2) we can save some time
+      var airSaving = Math.min(finalLT - 2, lateWks);
+      if (airSaving > 0) {
+        expedite = partWeight * SC_BASE_OCEAN_FCL * 12 * tariffMultiplier; // air-standard cost
+        // If air saves enough to hit need window:
+        if (finalLT - airSaving <= effectiveNeedWks) {
+          onTime = true; if (onTime) onTimeCnt++; // expedite saves it
+          expedite = partWeight * SC_BASE_OCEAN_FCL * 12 * tariffMultiplier;
+        } else {
+          dtCost = downtimeCost * Math.max(0, finalLT - effectiveNeedWks) * 168 * 0.3; // partial downtime
+        }
+      } else {
+        dtCost = downtimeCost * lateWks * 168 * 0.5;
+        expedite = partWeight * SC_BASE_OCEAN_FCL * 12 * tariffMultiplier;
+      }
+    }
+
+    lts.push(finalLT);
+    expediteCosts.push(expedite);
+    downtimeCosts.push(dtCost);
+
+    // Comparison variants
+    var hubFinalLT2 = Math.min(effLT, 1); // with hub
+    hubLTs.push(hubFinalLT2);
+    if (hubFinalLT2 <= effectiveNeedWks) hubOT++;
+
+    var dualSlip2 = Math.random() < commitProb / 200 ? commitSlipWks * 0.6 : 0;
+    var dualLT2 = ltSample + dualSlip2 + rerouteWks;
+    dualLTs.push(dualLT2);
+    if (dualLT2 <= effectiveNeedWks) dualOT++;
+
+    var ssLT2 = effLT;
+    ssLTs.push(ssLT2);
+    if (ssLT2 <= needWks + safetyStockWks + 4) ssOT++; // +4 wks extra SS contribution
+
+    // Tornado: contribution of each disruption
+    contributions.ltNoise.push(Math.abs(ltSample - ltBase));
+    contributions.tariffShock.push(tariffHit ? commitSlipWks * 0.5 : 0);
+    contributions.commitSlip.push(slipWks);
+    contributions.reroute.push(rerouteWks);
+    contributions.demandSpike.push(demandSpike ? 4 : 0);
+  }
+
+  // Sort for percentiles
+  function pct(arr, p) { var s = arr.slice().sort(function(a,b){return a-b;}); return s[Math.floor(p/100*s.length)] || 0; }
+
+  var p10 = pct(lts, 10), p50 = pct(lts, 50), p90 = pct(lts, 90);
+  var p10Exp = pct(expediteCosts, 10), p50Exp = pct(expediteCosts, 50), p90Exp = pct(expediteCosts, 90);
+  var expExp = expediteCosts.reduce(function(s,v){return s+v;},0)/N;
+  var expDt = downtimeCosts.reduce(function(s,v){return s+v;},0)/N;
+  var onTimePct = (onTimeCnt / N * 100).toFixed(1);
+
+  // Tornado contributions (mean absolute deviation)
+  function meanArr(arr){ return arr.reduce(function(s,v){return s+v;},0)/arr.length; }
+  var tornadoData = [
+    { label: 'LT noise (σ)', contrib: meanArr(contributions.ltNoise) },
+    { label: 'Supplier commit slip', contrib: meanArr(contributions.commitSlip) },
+    { label: 'Chokepoint reroute', contrib: meanArr(contributions.reroute) },
+    { label: 'Demand spike', contrib: meanArr(contributions.demandSpike) },
+    { label: 'Tariff shock', contrib: meanArr(contributions.tariffShock) }
+  ].sort(function(a,b){ return b.contrib - a.contrib; });
+
+  // Sticky bar
+  setText('scsim_p10_sb', p10.toFixed(1)+' wk');
+  setText('scsim_p50_sb', p50.toFixed(1)+' wk');
+  setText('scsim_p90_sb', p90.toFixed(1)+' wk');
+  setText('scsim_exp_expedite_sb', '$'+(expExp>=1000?(expExp/1000).toFixed(1)+'K':expExp.toFixed(0)));
+  setText('scsim_ontime_pct_sb', onTimePct+'%');
+
+  function fmtK(v){ return '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(0)); }
+
+  // Output HTML
+  var html = '<div class="metric-grid-3" style="margin-bottom:0.75rem;">' +
+    '<div class="metric-box"><div class="metric-label">P10 Lead Time</div><div class="metric-value">'+p10.toFixed(1)+' wk</div></div>' +
+    '<div class="metric-box"><div class="metric-label">P50 Lead Time</div><div class="metric-value">'+p50.toFixed(1)+' wk</div></div>' +
+    '<div class="metric-box"><div class="metric-label">P90 Lead Time</div><div class="metric-value">'+p90.toFixed(1)+' wk</div></div>' +
+    '</div>' +
+    '<div class="metric-grid-3" style="margin-bottom:0.75rem;">' +
+    '<div class="metric-box"><div class="metric-label">% On-Time</div><div class="metric-value '+(parseFloat(onTimePct)>=80?'rag-green':parseFloat(onTimePct)>=50?'rag-yellow':'rag-red')+'">'+onTimePct+'%</div></div>' +
+    '<div class="metric-box"><div class="metric-label">Expected Expedite $</div><div class="metric-value">'+fmtK(expExp)+'</div></div>' +
+    '<div class="metric-box"><div class="metric-label">Expected Downtime $</div><div class="metric-value">'+fmtK(expDt)+'</div></div>' +
+    '</div>';
+
+  // Tornado HTML
+  var maxContrib = tornadoData[0] ? tornadoData[0].contrib : 1;
+  html += '<div class="sc-section-title"><i class="fas fa-tornado"></i> Tornado — Disruption Contribution</div>';
+  html += tornadoData.map(function(t) {
+    var w = maxContrib > 0 ? (t.contrib / maxContrib * 200) : 0;
+    var fillColor = t.contrib > maxContrib * 0.5 ? '#ef4444' : (t.contrib > maxContrib * 0.25 ? '#d97706' : '#10b981');
+    return '<div class="sc-tornado-bar-row"><span class="sc-tornado-label">'+t.label+'</span>' +
+      '<div class="sc-tornado-bar-bg"><div class="sc-tornado-bar-fill" style="width:'+Math.round(w)+'px;background:'+fillColor+';"></div></div>' +
+      '<span class="sc-tornado-val">'+t.contrib.toFixed(1)+' wk</span></div>';
+  }).join('');
+
+  // Comparison
+  html += '<div class="sc-section-title"><i class="fas fa-code-compare"></i> With vs Without Comparison</div>';
+  html += '<table class="sc-mode-table"><thead><tr><th>Scenario</th><th>P50 LT (wk)</th><th>% On-Time</th><th>Delta vs Base</th></tr></thead><tbody>';
+  var baseOT = parseFloat(onTimePct);
+  var scenarios = [
+    { label: 'Base (current)', lts: lts, ot: baseOT },
+    { label: '+ Regional hub', lts: hubLTs, ot: (hubOT/N*100) },
+    { label: '+ Dual-source', lts: dualLTs, ot: (dualOT/N*100) },
+    { label: '+ 4 wk safety stock (proxy)', lts: ssLTs, ot: (ssOT/N*100) }
+  ];
+  scenarios.forEach(function(s, idx) {
+    var p50s = pct(s.lts, 50);
+    var delta = idx === 0 ? '—' : ((s.ot - baseOT).toFixed(1) + '%');
+    var deltaCls = idx === 0 ? '' : (s.ot > baseOT ? 'rag-green' : 'rag-red');
+    html += '<tr><td>'+s.label+'</td><td>'+p50s.toFixed(1)+'</td><td>'+s.ot.toFixed(1)+'%</td><td class="'+deltaCls+'">'+delta+'</td></tr>';
+  });
+  html += '</tbody></table>';
+
+  setHTML('scsim_output', html);
+
+  // Histogram chart
+  renderSimHistogram(lts, needWks + safetyStockWks);
+}
+
+function renderSimHistogram(lts, needWks) {
+  // Bin into 10 buckets
+  var minLT = Math.min.apply(null, lts), maxLT = Math.max.apply(null, lts);
+  var range = maxLT - minLT;
+  var bucketW = range / 10 || 1;
+  var buckets = [];
+  for (var b = 0; b < 10; b++) buckets.push({ min: minLT + b*bucketW, max: minLT + (b+1)*bucketW, count: 0 });
+  lts.forEach(function(v) {
+    var bi = Math.min(9, Math.floor((v - minLT) / bucketW));
+    if (bi >= 0) buckets[bi].count++;
+  });
+  var labels = buckets.map(function(b){ return b.min.toFixed(0)+'-'+b.max.toFixed(0)+'w'; });
+  var data = buckets.map(function(b){ return b.count; });
+  var colors = buckets.map(function(b){ return b.max <= needWks ? 'rgba(16,185,129,0.65)' : 'rgba(239,68,68,0.65)'; });
+
+  // Chart renders inside scsim_output — need a canvas; inject one if needed
+  var outEl = document.getElementById('scsim_output');
+  if (outEl && !document.getElementById('chart_scsim_hist')) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'sc-chart-wrap';
+    var canvas = document.createElement('canvas');
+    canvas.id = 'chart_scsim_hist';
+    wrapper.appendChild(canvas);
+    outEl.appendChild(wrapper);
+  }
+
+  getOrCreateChart('chart_scsim_hist', 'bar', {
+    labels: labels,
+    datasets: [{ label: 'Iterations', data: data, backgroundColor: colors, borderRadius: 3 }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, title: { display: true, text: 'Effective Lead-Time Distribution (green = on-time)', font: { size: 10 }, color: chartTickColor() } },
+    scales: {
+      x: { ticks: { font: { size: 8 }, color: chartTickColor(), maxRotation: 35 }, grid: { color: chartGridColor() } },
+      y: { beginAtZero: true, ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
+  });
+}
+
+function resetSCSim() {
+  var defs = { scsim_lt_base:39, scsim_lt_sigma:8, scsim_need_wks:52, scsim_downtime_cost:50000,
+    scsim_tariff_prob:15, scsim_tariff_mag:25, scsim_commit_prob:30, scsim_commit_slip_wks:8,
+    scsim_reroute_prob:20, scsim_demand_spike_prob:10, scsim_safety_stock_wks:0, scsim_part_weight:250 };
+  Object.keys(defs).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=defs[id]; });
+  var hubEl=document.getElementById('scsim_hub'); if(hubEl) hubEl.checked=false;
+  var dualEl=document.getElementById('scsim_dual'); if(dualEl) dualEl.checked=false;
+  setHTML('scsim_output', '<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.82rem;">Configure inputs and click <strong>▶ Run Simulation</strong>.</div>');
+}
+
+function exportSimPDF() {
+  var date = new Date().toLocaleString();
+  var outputEl = document.getElementById('scsim_output');
+  var outputHtml = outputEl ? outputEl.innerHTML : '<p>Run simulation first.</p>';
+  var css = '<style>body{font-family:Arial,sans-serif;font-size:11px;color:#1e293b;padding:16px 20px;}h1{color:#d97706;border-bottom:3px solid #f59e0b;padding-bottom:5px;font-size:17px;}table{border-collapse:collapse;width:100%;margin:6px 0;}th{background:#fef3c7;text-align:left;padding:4px 7px;font-size:10px;}td{padding:4px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;}.disc{background:#f1f5f9;border:1px solid #cbd5e1;padding:8px;border-radius:5px;font-size:9px;color:#475569;margin-top:14px;}<\/style>';
+  var body = '<h1>Disruption Scenario Simulation Report<\/h1><p style="font-size:10px;color:#64748b;">Generated: '+date+'<\/p>'+outputHtml;
+  body += '<div class="disc"><strong>Disclaimer:<\/strong> Monte-Carlo results are probabilistic estimates. resistancezero.com Critical Spares Engine v1.16.0.<\/div>';
+  var w = window.open('','_blank');
+  if (!w) { showMsg('Allow pop-ups to export PDF.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Disruption Sim<\/title>'+css+'<\/head><body>'+body+'<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ══════════════════════════════════════════
+   TAB SC-4: LOGISTICS COST & EXPEDITE CALCULATOR
+   ══════════════════════════════════════════ */
+function calcExpedite() {
+  var CAT = scGetCat();
+  var needWks = parseFloat((document.getElementById('scexp_need_wks')||{}).value)||8;
+  var commitWks = parseFloat((document.getElementById('scexp_commit_wks')||{}).value)||16;
+  var weight = Math.max(0.1, parseFloat((document.getElementById('scexp_weight')||{}).value)||250);
+  var unitCost = parseFloat((document.getElementById('scexp_unit_cost')||{}).value)||15000;
+  var alts = parseInt((document.getElementById('scexp_alts')||{}).value)||0;
+  var downtimeCost = parseFloat((document.getElementById('scexp_downtime_cost')||{}).value)||50000;
+  var origin = (document.getElementById('scexp_origin')||{}).value || 'CN';
+  var dest = (document.getElementById('scexp_dest')||{}).value || 'NA';
+  var hubAvail = document.getElementById('scexp_hub_avail') && document.getElementById('scexp_hub_avail').checked;
+  var crit = parseInt((document.getElementById('scexp_crit')||{}).value)||8;
+
+  var gapWks = Math.max(0, commitWks - needWks);
+  var gapDays = gapWks * 7;
+  var gapHours = gapWks * 168;
+
+  setText('scexp_gap_sb', gapWks.toFixed(1) + ' wk');
+
+  // Downtime risk (baseline)
+  var dtRisk = (crit / 10) * downtimeCost * gapHours;
+  setText('scexp_dt_risk_sb', '$' + (dtRisk >= 1000000 ? (dtRisk/1000000).toFixed(2)+'M' : (dtRisk >= 1000 ? (dtRisk/1000).toFixed(1)+'K' : dtRisk.toFixed(0))));
+
+  // Find lane for air days
+  var lane = CAT ? scFindLane(origin, dest) : null;
+  var airDays = lane ? (lane.airD + (lane.customsD || 4) + (lane.lastMileD || 3)) : 14;
+  var airWks = airDays / 7;
+
+  function fmtK2(v){ return '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(0)); }
+
+  // Build options
+  var options = [];
+
+  // 1. Full air-freight (air-standard)
+  var airCost = weight * SC_BASE_OCEAN_FCL * 12;
+  var airDaysSaved = Math.max(0, gapWks - airWks);
+  var airClosesGap = airWks <= needWks;
+  options.push({
+    label: 'Full air-freight (standard)', cost: airCost,
+    daysSaved: airDaysSaved, wksToDeliver: airWks,
+    closesGap: airClosesGap, note: 'Weight ' + weight + ' kg × $' + SC_BASE_OCEAN_FCL + ' × 12 (air-std)'
+  });
+
+  // 2. Air-express (faster, more expensive)
+  var airExpCost = weight * SC_BASE_OCEAN_FCL * 25;
+  var airExpDays = lane ? (lane.airD - 3 + (lane.customsD || 4) + (lane.lastMileD || 3)) : 10;
+  var airExpWks = Math.max(0.5, airExpDays / 7);
+  options.push({
+    label: 'Air-express (next-flight-out)', cost: airExpCost,
+    daysSaved: Math.max(0, gapWks - airExpWks), wksToDeliver: airExpWks,
+    closesGap: airExpWks <= needWks, note: 'Weight ' + weight + ' kg × $' + SC_BASE_OCEAN_FCL + ' × 25 (air-express)'
+  });
+
+  // 3. Partial air (critical sub-assembly 30%)
+  var partialAirCost = (weight * 0.3) * SC_BASE_OCEAN_FCL * 12;
+  var oceanRestCost = (weight * 0.7) * SC_BASE_OCEAN_FCL * 1;
+  var partialTotal = partialAirCost + oceanRestCost;
+  var partialWks = airWks; // sub-assy arrives by air; full unit arrives by air schedule
+  options.push({
+    label: 'Partial air (sub-assembly 30%, rest ocean)', cost: partialTotal,
+    daysSaved: Math.max(0, gapWks - partialWks), wksToDeliver: partialWks,
+    closesGap: partialWks <= needWks, note: '30% wt by air + 70% by ocean'
+  });
+
+  // 4. Alternate plant (requires alts > 0)
+  if (alts > 0) {
+    var altCost = unitCost * 0.15 + weight * SC_BASE_OCEAN_FCL * 12; // 15% re-source premium + air
+    var altWks = airWks + 2; // +2 wk qualification check
+    options.push({
+      label: 'Ship from alternate plant / source', cost: altCost,
+      daysSaved: Math.max(0, gapWks - altWks), wksToDeliver: altWks,
+      closesGap: altWks <= needWks, note: '15% re-source premium + air freight; ' + alts + ' alt(s) qualified'
+    });
+  }
+
+  // 5. Pull from hub (requires hub toggle)
+  if (hubAvail) {
+    var hubHoldMonths = 3; // proxy: 3-month consignment
+    var hubCost = unitCost * 0.05 * hubHoldMonths;
+    var hubWks = 0.5; // hub→site ~3 days
+    options.push({
+      label: 'Pull from regional hub / consignment', cost: hubCost,
+      daysSaved: gapWks, wksToDeliver: hubWks,
+      closesGap: true, note: '5% unit cost × 3 mo holding fee (consignment proxy)'
+    });
+  }
+
+  // 6. Qualify substitute (only if alts === 0)
+  if (alts === 0) {
+    var qualCost = weight > 100 ? 150000 : (weight > 10 ? 75000 : 25000);
+    var qualWks = weight > 100 ? 24 : 16; // weeks for qualification
+    options.push({
+      label: 'Qualify substitute (sole-source → new vendor)', cost: qualCost,
+      daysSaved: 0, wksToDeliver: qualWks,
+      closesGap: qualWks <= needWks, note: 'Qualification cost (est.) — resolves sole-source risk permanently'
+    });
+  }
+
+  // 7. Accept downtime (baseline)
+  options.push({
+    label: 'Accept downtime / escalate (do-nothing)', cost: dtRisk,
+    daysSaved: 0, wksToDeliver: commitWks,
+    closesGap: false, note: 'Expected downtime cost = crit/10 × $/hr × gap hours; not recommended'
+  });
+
+  // Sort by cost ascending
+  var sortedByGapFirst = options.slice().sort(function(a,b){
+    if (a.closesGap && !b.closesGap) return -1;
+    if (!a.closesGap && b.closesGap) return 1;
+    return a.cost - b.cost;
+  });
+
+  // Find recommendation
+  var rec = sortedByGapFirst.find ? sortedByGapFirst.find(function(o){ return o.closesGap; }) : null;
+  if (!rec) rec = sortedByGapFirst[0]; // best partial if nothing closes it
+
+  setText('scexp_rec_sb', rec ? rec.label.slice(0, 35) + '…' : '—');
+
+  // Table
+  var tableRows = sortedByGapFirst.map(function(o) {
+    var rowCls = o === rec ? 'sc-exp-row-rec' : '';
+    var closesCls = o.closesGap ? 'sc-exp-closes-y' : 'sc-exp-closes-n';
+    return '<tr class="'+rowCls+'">' +
+      '<td>'+(o === rec ? '⭐ ' : '') + o.label + '</td>' +
+      '<td>'+fmtK2(o.cost)+'</td>' +
+      '<td>'+o.wksToDeliver.toFixed(1)+' wk</td>' +
+      '<td class="'+closesCls+'">'+(o.closesGap ? '✅ Yes' : '❌ No')+'</td>' +
+      '<td style="font-size:0.67rem;color:var(--text-muted);">'+o.note+'</td>' +
+      '</tr>';
+  }).join('');
+
+  var noClose = !sortedByGapFirst.some(function(o){ return o.closesGap; });
+  var recNote = noClose ?
+    '<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:0.7rem;margin-top:0.6rem;font-size:0.78rem;color:#ef4444;"><strong>⚠ No option closes the gap.</strong> Recommend: escalate to supplier exec for commit acceleration + accept residual downtime risk. Least-bad partial: ' + (rec ? rec.label : 'accept downtime') + ' (saves ' + (rec ? rec.daysSaved.toFixed(1) : '0') + ' wk at ' + (rec ? fmtK2(rec.cost) : '—') + ').</div>' :
+    '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:0.7rem;margin-top:0.6rem;font-size:0.78rem;"><strong>⭐ Recommended: ' + (rec ? rec.label : '—') + '</strong> — closes the gap at ' + (rec ? fmtK2(rec.cost) : '—') + ' (delivers in ' + (rec ? rec.wksToDeliver.toFixed(1) : '—') + ' wk vs need ' + needWks.toFixed(1) + ' wk). ' + (rec ? rec.note : '') + '</div>';
+
+  var outputHtml = '<table class="sc-exp-table"><thead><tr><th>Option</th><th>Cost</th><th>Delivers in</th><th>Closes Gap?</th><th>Notes</th></tr></thead><tbody>' + tableRows + '</tbody></table>' + recNote;
+
+  setHTML('scexp_output_text', outputHtml);
+
+  // Bar chart
+  renderExpediteChart(sortedByGapFirst.slice(0,6));
+
+  // Show ops crosslink
+  var opsLink = document.getElementById('scexp_ops_link');
+  if (opsLink) opsLink.style.display = gapWks > 0 ? 'block' : 'none';
+}
+
+function renderExpediteChart(options) {
+  // Need a canvas in output_text — inject one after table if not present
+  var outEl = document.getElementById('scexp_output_text');
+  if (outEl && !document.getElementById('chart_sc_expedite')) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'sc-chart-wrap';
+    var canvas = document.createElement('canvas');
+    canvas.id = 'chart_sc_expedite';
+    wrapper.appendChild(canvas);
+    outEl.appendChild(wrapper);
+  }
+  var labels = options.map(function(o){ return o.label.length>20?o.label.slice(0,18)+'…':o.label; });
+  var costs = options.map(function(o){ return +(o.cost/1000).toFixed(1); });
+  var bgColors = options.map(function(o){ return o.closesGap ? 'rgba(16,185,129,0.65)' : 'rgba(239,68,68,0.5)'; });
+  getOrCreateChart('chart_sc_expedite', 'bar', {
+    labels: labels,
+    datasets: [{ label: 'Option Cost $K', data: costs, backgroundColor: bgColors, borderRadius: 4 }]
+  }, {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, title: { display: true, text: 'Recovery option cost (green = closes gap)', font: { size: 10 }, color: chartTickColor() } },
+    scales: {
+      x: { beginAtZero: true, ticks: { font: { size: 9 }, color: chartTickColor(), callback: function(v){ return '$'+v+'K'; } }, grid: { color: chartGridColor() } },
+      y: { ticks: { font: { size: 8 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
+  });
+}
+
+function exportExpeditePDF() {
+  var date = new Date().toLocaleString();
+  var outEl = document.getElementById('scexp_output_text');
+  var outHtml = outEl ? outEl.innerHTML : '<p>Compute options first.</p>';
+  var css = '<style>body{font-family:Arial,sans-serif;font-size:11px;color:#1e293b;padding:16px 20px;}h1{color:#d97706;border-bottom:3px solid #f59e0b;padding-bottom:5px;font-size:17px;}table{border-collapse:collapse;width:100%;margin:6px 0;}th{background:#fef3c7;text-align:left;padding:4px 7px;font-size:10px;}td{padding:4px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;}.disc{background:#f1f5f9;border:1px solid #cbd5e1;padding:8px;border-radius:5px;font-size:9px;color:#475569;margin-top:14px;}<\/style>';
+  var body = '<h1>Logistics Cost &amp; Expedite Report<\/h1><p style="font-size:10px;color:#64748b;">Generated: '+date+'<\/p>'+outHtml;
+  body += '<div class="disc"><strong>Disclaimer:<\/strong> Expedite costs illustrative. resistancezero.com Critical Spares Engine v1.16.0.<\/div>';
+  var w = window.open('','_blank');
+  if (!w) { showMsg('Allow pop-ups to export PDF.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Expedite Report<\/title>'+css+'<\/head><body>'+body+'<\/body><\/html>');
+  w.document.close(); w.print();
+}
+
+/* ══════════════════════════════════════════
+   CATALOG ANALYTICS — SC EXPOSURE PANEL
+   ══════════════════════════════════════════ */
+function renderCASCLanePanel() {
+  var CAT = scGetCat();
+  if (!CAT || !CAT.tradeLanes) return;
+  var lanes = CAT.tradeLanes.slice().map(function(l) {
+    return {
+      id: l.id,
+      origin: l.origin, dest: l.dest,
+      composite: ((l.congestion + l.geopolitical + l.volatility + l.tariff) / 4)
+    };
+  }).sort(function(a,b){ return b.composite - a.composite; });
+
+  var highRisk = lanes.filter(function(l){ return l.composite >= 7; });
+  setText('ca_sc_toplane', lanes[0] ? lanes[0].id + ' (' + lanes[0].composite.toFixed(1) + ')' : '—');
+  setText('ca_sc_highrisk_lanes', highRisk.length);
+
+  // Table
+  var tbody = document.getElementById('ca_sc_lane_tbody');
+  if (tbody) {
+    tbody.innerHTML = lanes.map(function(l) {
+      var rawLane = CAT.tradeLanes.filter(function(r){ return r.id === l.id; })[0];
+      var riskCls = l.composite >= 7 ? 'style="color:#ef4444;font-weight:700;"' : (l.composite >= 5 ? 'style="color:#d97706;font-weight:700;"' : '');
+      return '<tr><td><strong>'+l.id+'</strong><br><span style="font-size:0.65rem;color:var(--text-muted);">'+l.origin+' → '+l.dest+'</span></td>' +
+        '<td>'+(rawLane?rawLane.congestion:'—')+'</td>' +
+        '<td>'+(rawLane?rawLane.geopolitical:'—')+'</td>' +
+        '<td>'+(rawLane?rawLane.volatility:'—')+'</td>' +
+        '<td>'+(rawLane?rawLane.tariff:'—')+'</td>' +
+        '<td '+riskCls+'>'+l.composite.toFixed(1)+'</td></tr>';
+    }).join('');
+  }
+
+  // Chart
+  getOrCreateChart('chart_ca_sc_lanes', 'bar', {
+    labels: lanes.map(function(l){ return l.id; }),
+    datasets: [{
+      label: 'Composite SC Risk (avg cong/geo/vol/tariff)',
+      data: lanes.map(function(l){ return +l.composite.toFixed(1); }),
+      backgroundColor: lanes.map(function(l){ return l.composite >= 7 ? 'rgba(239,68,68,0.65)' : (l.composite >= 5 ? 'rgba(245,158,11,0.6)' : 'rgba(16,185,129,0.55)'); }),
+      borderRadius: 4
+    }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { font: { size: 8 }, color: chartTickColor(), maxRotation: 40 }, grid: { color: chartGridColor() } },
+      y: { min: 0, max: 10, ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   FLEET SC RISK COLUMN
+   ══════════════════════════════════════════ */
+function fleetComputeSCRisk(p) {
+  // Quick composite: single-source (0 alts → high) + crit scale + LT scale
+  var ssScore = (p.alts === 0) ? 100 : Math.max(10, 60 - (p.alts||0) * 15);
+  var ltScore = Math.min(100, ((p.ltTyp || 16) / 52) * 80);
+  var critScale = ((p.crit || 5) / 10);
+  var raw = (ssScore * 0.45 + ltScore * 0.35) * critScale + 10;
+  return Math.round(Math.min(100, Math.max(0, raw)));
+}
+
+function fleetSCRiskCls(score) {
+  if (score >= 75) return 'sc-risk-critical';
+  if (score >= 50) return 'sc-risk-high';
+  if (score >= 25) return 'sc-risk-medium';
+  return 'sc-risk-low';
+}
+
+/* Patch calcFleet to add SC risk column */
+var _origCalcFleet = calcFleet;
+calcFleet = function() {
+  _origCalcFleet();
+  // Patch each row to add SC risk cell
+  var tbody = document.getElementById('fl_tbody');
+  if (!tbody) return;
+  var rows = tbody.querySelectorAll('tr');
+  var totalSCRisk = 0, validCount = 0;
+  fleetParts.forEach(function(p, idx) {
+    var row = rows[idx];
+    if (!row) return;
+    var score = fleetComputeSCRisk(p);
+    totalSCRisk += score;
+    validCount++;
+    // Insert SC risk cell before the last (remove) cell
+    var cells = row.querySelectorAll('td');
+    var lastCell = cells[cells.length - 1];
+    if (lastCell && !row.querySelector('.fl-sc-risk-cell')) {
+      var td = document.createElement('td');
+      td.className = 'fl-sc-risk-cell';
+      td.innerHTML = '<span class="sc-risk-band '+fleetSCRiskCls(score)+'" style="padding:1px 6px;font-size:0.65rem;">'+score+'</span>';
+      row.insertBefore(td, lastCell);
+    }
+  });
+  // Fleet-level SC risk KPI
+  var kpiEl = document.getElementById('fl_kpi_sc_risk');
+  if (kpiEl) kpiEl.textContent = validCount > 0 ? (totalSCRisk / validCount).toFixed(0) : '—';
+};
+
+/* Patch catInitIfReady to also render SC lane panel */
+var _origCatInit = window.catInitIfReady;
+window.catInitIfReady = function() {
+  if (_origCatInit) _origCatInit();
+  // Render SC exposure panel if catalog available
+  try { renderCASCLanePanel(); } catch(e) { console.warn('[CSE] SC lane panel error:', e); }
+};
+
+/* copyEl helper — copies inner text of element by id */
+function copyEl(id) {
+  var el = document.getElementById(id);
+  var txt = el ? (el.textContent || el.innerText || '') : '';
+  try {
+    navigator.clipboard.writeText(txt).then(function(){ showMsg('Copied!'); }).catch(function(){ prompt('Copy:', txt); });
+  } catch(e) { prompt('Copy:', txt); }
+}
+
+/* Init SC part selects when catalog loads (if already loaded) */
+(function() {
+  if (scGetCat()) {
+    scPopulatePartSelects();
+    renderCASCLanePanel();
+  }
+})();
+
+/* Init: recalc SC tabs when they first become active (catalog might have loaded by then) */
 
 /* Init: load fleet from storage if available */
 (function() {

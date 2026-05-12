@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.16.0 — 2026-05-13 (Spares Engine: Global Supply Chain & Transport module group — 4 new tabs)
+
+### Added — "Global Supply Chain & Transport" module group (deep-research-backed)
+`spares-readiness-calculator.html` 7,575 → 9,303 lines (+1,728). Four new tabs driven by `SPARES_CATALOG.transportModes` (7), `.tradeLanes` (13), `.countryRisk` (16) — grounded in the 2026 DC-equipment-shortage research (`Documents/Training/spares_supply_chain_transport_research.md`):
+- **🚢 Lane & Mode Planner** — origin region → destination DC region + part (weight/value from catalog) + Incoterm + urgency → a mode-comparison table (ocean-FCL/LCL · air-standard/express · road · rail · courier — door-to-door days = mode transit + customs + last-mile, freight cost ≈ weight × base-$/kg × cost-index, CO₂ relative), cheapest-feasible vs fastest-feasible highlighted, a chokepoint-reroute what-if (+10-14 d for Suez↔Cape-style), the Incoterm 2020 cost/risk split (who pays export-clearance / main-carriage / import-duty / unloading / last-mile, where risk transfers) + the lane's tariff-exposure note (e.g. China's Section 122 10% + Section 301 + copper +50%), and a days-vs-$ trade-off chart. PDF + ⓘ box documenting the cost/day method.
+- **🗺️ Supply-Chain Risk Map** — a part (or the saved fleet) + origin + need-window + hub/consignment/VMI toggles → a composite **0-100 supply-chain risk score** weighted across single-source exposure (scaled by # alternates), country-of-origin risk (`countryRisk.geoRisk`), lane congestion + geopolitical + rate-volatility, lead-time-vs-need-window pressure, tariff exposure, supplier OTIF/financial-health proxy, regional-hub coverage → band (LOW/MEDIUM/HIGH/CRITICAL), a radar of the dimensions, a ranked top-risks list, and recommended mitigations (dual-source / "China+1" / regional hub / consignment-VMI / last-time-buy / Incoterm change / FTZ-bonded-warehouse deferral / qualify substitute) each tagged effort × impact and ordered by impact-per-effort. Fleet mode → a per-part SC-risk table + fleet composite. PDF.
+- **🌪️ Disruption Scenario / Resilience Sim** — Monte-Carlo (≥1000 iterations, Box-Muller) over lane delay + σ, tariff-shock probability + magnitude, supplier-commit-slip probability + weeks, demand-spike probability + %, chokepoint-reroute probability → distribution of "% of critical-spares need met on time", P10/P50/P90 of (effective lead time, expedite-$, downtime-$), expected expedite-$ + downtime-$, a tornado of which disruption drives the most variance, and a **with-vs-without comparison** (regional hub / dual-source / +X weeks safety stock — Δ on-time-% and Δ expected-$). PDF + ⓘ box.
+- **✈️ Logistics Cost & Expedite Calculator** — site need-date vs supplier commit (the gap) + part weight/value + lane + downtime $/hr → a costed recovery-options menu: air-freight the critical sub-assembly + ocean the rest · full air-freight (standard or express) · partial shipment · ship from alternate plant (if alternates) · pull from regional hub/consignment/VMI (if a hub toggle) · qualify substitute (if no alternates) · accept downtime/escalate (the baseline) — each with $ + days-saved + closes-the-gap?, recommends the cost-minimizing path that closes the gap (or, if none does, "no option closes it — escalate to supplier exec + accept residual downtime; here's the least-bad partial"), a cost-vs-days-saved chart, and a "→ generate the supplier escalation email" link to the Daily-PM-Ops tab. PDF.
+
+### Changed — light touches
+- **Catalog Analytics** tab: an "🌐 Supply-chain exposure" panel — `tradeLanes` ranked by composite risk (congestion + geopolitical + volatility + tariff) + the China-transformer-dependency / 2026-tariff context.
+- **Fleet / Portfolio** tab: a "SC Risk" column per part (quick composite from the Risk Map logic) + a fleet-level supply-chain-risk KPI (table colspan 14→15).
+- **Methodology footer note**: added "Incoterms 2020 · multi-modal freight · World Bank LPI".
+- **FAQ** tab: +5 Q&As under a new "Supply Chain" filter (why transformer lead times are 2.5-5 yr in 2026 · the China-tariff exposure on DC M&E · when to air-freight a spare vs wait · what a "China+1" strategy is · how Incoterms split the duty burden) with citations.
+- **`js/spares-parts-catalog.js`** regenerated to expose `transportModes`/`tradeLanes`/`countryRisk` in `window.SPARES_CATALOG` (358 KB, 445 curated parts — structure otherwise unchanged); `tools/build-spares-db.py`'s `write_js_catalog` updated accordingly.
+- **`Documents/Training/pm2_spares_sourcing_data_center_engine_prompt.md`** gained Appendix D — Global Supply Chain & Transport (the 2026 reality, transport-mode/Incoterm mechanics, the emergency-logistics recovery options, the mitigation playbook, the quantitative-companion cross-reference).
+
+### Wiring / verification
+`TAB_ORDER` + `switchTab` calcs map + keyboard nav + mobile jump-to-module selector + `SCENARIO_FIELDS` + `scenarioSnapshot`/`applySnapshot` all updated for the 4 new tabs. IIFE closes exactly once; no duplicate fleet init (uses the `_origCalcFleet`/`_origCatInit` patch pattern). `node --check` OK, `audit-script-tags --strict` CLEAN, `audit-mobile-responsive --strict` 104/0, catalog file intact (445/7/13/16).
+
+### Versioning
+- `js/rz-version.js` 1.15.0 → 1.16.0 (MINOR — new module group). SW cache → `rz-cache-v1.16.0`.
+
+---
+
 ## v1.15.0 — 2026-05-13 (Spares Engine UI/UX upgrade · Catalog Analytics + Fleet/Portfolio tabs · platform-layer DB · supply-chain & transport data)
 
 ### Added — Spares Engine UI/UX upgrade + 2 new analytics tabs
