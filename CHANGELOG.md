@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v1.14.0 — 2026-05-12 (DC spare-parts database · Parts Catalog tab · Spares Engine code review + bug fixes · DCMOC code review)
+
+### Added — DC spare-parts local database (the platform data foundation)
+- **`tools/spares-db-schema.sql`** — SQLite DDL: 6 tables (`dc_facility_types` · `oems` · `commodity_taxonomy` · `parts` (40+ columns) · `compatibility` · `failure_modes`) + 4 convenience views (`v_critical_long_lead`, `v_eol_exposure`, `v_oem_concentration`, `v_ai_factory_cooling`).
+- **`tools/build-spares-db.py`** — stdlib-only generator: ~110 realistic part archetypes covering every system (electrical / mechanical / cooling / fire-life-safety / network-ICT / BMS-controls / structural-civil / monitoring) across all 6 DC generations (legacy-raised-floor → enterprise-tier3 → colo-wholesale → cloud-hyperscale → ai-factory-liquid-cooled → edge-micro), ~85 real OEMs (Vertiv, Schneider/APC, Eaton, ABB, Siemens, Caterpillar, Cummins, Carrier, Trane, Daikin, JCI/York, STULZ, Munters, Rittal, ASCO, Russelectric, Camfil, Xtralis-VESDA, Honeywell, Tyco Fire, Kidde, Tridium, Belimo, Danfoss, Grundfos, Xylem, Alfa Laval, Kelvion, Güntner, BAC, CoolIT, Asetek, Boyd, Motivair, ZutaCore, Iceotope, GRC, LiquidStack, Submer, nVent, Chatsworth, Panduit, CommScope, Corning, NVIDIA/Arista/Cisco, GE Vernova, Hyosung, Powell, + generic/refurb pools), FMECA-style attribute ranges (MTBF / MTTR / lead-time / cost / criticality / EOL risk), DMSMS-biased lifecycle status, 2-5 failure modes per part, 1-4 compatibility relationships. `--scale N` (linear — `--scale 50` ≈ ~70k parts, `--scale 700` ≈ ~1M), `--audit`, `--no-js`. Seeded/reproducible.
+- Generated at `--scale 1`: **1,404 parts** · 4,589 failure modes · 3,282 compatibility rows · 85 OEMs · 109 taxonomy entries · 6 facility types. All sanity checks pass.
+- **`data/spares-parts.sqlite`** (≈2.7 MB) + **`data/spares-parts.csv.gz`** — gitignored (regeneratable). **`data/spares-oems.csv`** / **`spares-taxonomy.csv`** / **`spares-facility-types.csv`** — committed. **`js/spares-parts-catalog.js`** — curated 264 KB subset (`window.SPARES_CATALOG` = 360 representative parts + 85 OEMs + 109 taxonomy + 6 facility types) for the in-browser calculator. `.gitignore` updated.
+- Docs: `Documents/Training/spares_parts_database.md` (schema, sample queries, regen instructions, how it feeds the calculator, platform roadmap). Master-prompt doc `pm2_spares_sourcing_data_center_engine_prompt.md` gained Appendices A (methodologies referenced — FMECA/RCM/METRIC/Kraljic/DMSMS with formulas), B (calculator cross-reference), C (citations).
+
+### Added — Parts Catalog tab in the calculator
+`spares-readiness-calculator.html` 5,639 → **6,249 lines, 21 modules**. New "📚 Parts Catalog — Browse & Search" tab (Reference group): filter by system / DC generation / lifecycle / OEM / criticality ≥ / lead-time ≤ / free-text (150 ms debounce); sortable 13-column results table (capped at 150 visible, "showing X of Y" count) color-coded by lifecycle (active=green / nrnd=yellow / ltb=orange / obsolete=red) and EOL risk; **"Use ▸" per row** loads that part's attributes into the Criticality / Readiness / Optimal-Stock / LTB / Hub / Monte-Carlo modules + matches the commodity dropdown + shows a "Loaded from catalog: …" banner + `recalcAll()`; an **OEMs sub-view** (85-row table — name / HQ / market position / financial health / lead time / OTIF / single-source-risk color-coded / contract models); a **DC facility-types sub-view** (6 cards — era / IT-load range / PUE / cooling & power architecture / rack density / key equipment); **CSV export** of the filtered set; a light commodity-defaults hook ("{n} catalog parts — browse →"). Loads `js/spares-parts-catalog.js?v=2026-05-12`; ~115 lines of new dark-mode-aware CSS + mobile breakpoints.
+
+### Fixed — Spares Engine bug-fix follow-up + code review (5,470 → 6,249 lines)
+- **Share-button overlap (your report)** — the floating 5-circle column was `position: fixed; z-index: 500` and on mobile sat at `bottom: 60px` of the viewport, intercepting taps on the "2·Readiness"/"3·Optimal Stock" tab buttons → fixed: `#pageShare.share-buttons { display: none !important; }` on `≤768px` (footer has share/contact links).
+- **Tab navigation hardened** — `try/catch` around every calc/gen call in `switchTab()` / `recalcAll()` / on-input handlers / preset apply; `montecarlo` added to the auto-run map; `safeGen()` wrapper on all 9 operating-tab generators (catches uncaught exceptions, surfaces via `showMsg()` instead of silently failing).
+- **134 per-input tooltips (your report)** — ⓘ tooltip on every parameter across all 21 tabs — what it means + typical range + how it's used; lightweight `data-tip` + CSS popup, dark-mode-aware, keyboard-accessible (hover desktop / tap mobile + Enter/Space/Escape).
+- **Criticality NaN cards (your screenshot)** — RPN / Effective Severity / Fleet Exp. Failures/yr / Alternates Factor were showing `NaN%`; fixed to compute proper values with correct units (RPN integer; Eff. Severity `X.X/10`; Fleet Failures `X.XX/yr`; Alternates `×X.XX`) + `Number.isFinite()` guards on every metric card site-wide + `'—'` fallback.
+- **Poisson double-count (Module 3)** — `annualLambda = installedBase × muAnnual` multiplied by installed base twice when `muAnnual` already is the fleet demand → 4× overestimate of stockout probability; fixed to `lambdaLT = muAnnual × L`.
+- **Meaningless Monte-Carlo tornado correlations (Module 8)** — tornado correlated arrays from independent simulation runs (different seeds) → random noise; fixed by capturing `readinessRaw[]` (insertion-order, before sorting) and using it for all three tornado correlations (also eliminated a duplicate simulation run).
+- Dead code removed (`hubExtraCost`); hub-LT clamped `< oemLT`; scenario snapshot gaps closed (`mc_iterations`, checkboxes, `s_poisson_toggle`).
+- **Enhancements**: 3 new Module-3 outputs (days of cover at Q*, annual carrying $ at Q*, expected stockouts/yr) — in both the per-module and full-report PDFs; per-module "↺ Reset defaults" buttons on all 8 analytical modules; chart axis unit labels (`%` on criticality, `u` on hub).
+
+### Changed — DCMOC app code review (`dcmoc/`)
+- **Type-safety + numerical guards** (commit `98c963c`): typed nav `LucideIcon`; exported `SimulationState`/`CapexStore` interfaces + `HeadcountKey` union → eliminated all `as any` casts; `useEffectiveInputs` subscribes to `s.inputs` only (perf); `Number.isFinite()` guards on all 4 `format.ts` formatters; depreciation/PMT/ROI/PI/IRR div-0 + NaN guards in FinancialEngine/InvestmentEngine.
+- **Error boundary + dead code** (commit `f5392af`): new `ErrorBoundary.tsx` (class component, friendly fallback + retry) wrapping the dashboard area in `page.tsx` — a crashing dashboard no longer blanks the whole app; ReportDashboard hardcoded `2025` → `new Date().getFullYear()`.
+- **a11y + perf** (commit `57bcd4a`): Tooltip wrapped in a `<button>` (keyboard-accessible) + `role="tooltip"` / `aria-describedby` / `aria-hidden`; ExportPDFButton `aria-label` + `aria-busy`; Shell nav `aria-label` / `aria-current` / decorative-icon `aria-hidden` / scenario panel `role="dialog" aria-modal aria-labelledby`; CapacityDashboard/FuelGenDashboard icon-only buttons `aria-label`.
+- Static export rebuilt (commit `8ec3bac`); `tsc --noEmit` clean.
+
+### Versioning
+- `js/rz-version.js` 1.13.0 → 1.14.0 (MINOR — new database + new calculator tab + new tooling).
+- SW cache name auto-synced → `rz-cache-v1.14.0`.
+
+---
+
 ## v1.13.0 — 2026-05-12 (Spares Engine: 4 more operating tabs — full 20-module engine · DCMOC pass 3)
 
 ### Added — Spares Engine: the last 4 draft modules (now 20 modules / 19 tabs + Summary Dashboard)
