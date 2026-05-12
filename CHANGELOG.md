@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v1.12.0 — 2026-05-12 (Spares Engine expanded to a full operating engine · DCMOC pass 2 · 15 more OG cards)
+
+### Added — Spares Engine: 6 operating-engine tabs (from the master-prompt draft)
+`spares-readiness-calculator.html` grew 2,384 → 4,107 lines. Beyond the 9 quantitative modules (v1.11.0), it now has 6 deterministic, copy-ready **template generators** that turn the day-to-day Program Manager workflow into structured outputs:
+1. **Daily PM Operating System** — input today's situation (# late POs, supplier-not-confirmed count, critical shortages, severity sliders, free-text site/finance asks) → derives RED/YELLOW/GREEN situation status, a P1/P2/P3 priority stack, critical-follow-ups table, decision log, and an end-of-day status-email draft. Decision logic per the draft (critical spare + need-date <30 d → ≥High; supplier commit > need date → At Risk/Red; no alternate + critical → bump risk).
+2. **Supplier Scorecard & Review Cadence** — input 8 metrics (OTIF / commit accuracy / quote turnaround / PO ack / defect rate / responsiveness / cost vs benchmark / corrective-action closure) + strategic importance → RAG scorecard, derived review cadence (Weekly Operational / Monthly Business / Quarterly Executive) with the matching agenda template, radar chart.
+3. **Negotiation & Commercial Strategy** — input scenario (price increase / lead-time / capacity / payment-term), supplier ask, spend, # alternates, raw-material-driven? → leverage assessment (0–7 scoring), BATNA & walk-away, a counterproposal template per scenario, concession strategy table, talk track, common-levers reference.
+4. **Contract / SOW Requirements Checklist** — toggles (lead-time committed? forecast binding? capacity reserved? EOL notice months? LTB rights? change-notice timeline? consignment/VMI?) → a 15-area requirements table (Scope / Pricing / Lead Time / Forecast / Capacity / Delivery / Warranty / Quality / Documentation / EOL Notice / Last-Time-Buy / Change Notice / SLA / Inventory / Termination) with proposed-language concepts, flagged rows, and an open legal/procurement questions list.
+5. **Process Improvement Builder** — describe a recurring problem + frequency + per-incident impact + affected stakeholders → problem statement with annualised impact, root-cause checklist, a future-state process keyed to the ticked causes, RACI matrix, KPI table, 30/60/90-day rollout plan.
+6. **Meeting Intelligence** — Prep mode (meeting name/type/attendees/decision/risks → prep brief with the canonical agenda per meeting type) + Notes mode (structured decisions/actions/risks/open-questions/next-meeting template with add-row buttons).
+Each tab: copy-to-clipboard + per-tab PDF export (`<\/script>` escaped), aria-labels, dark-mode-themed tables/cards, mobile-safe. 35 new input IDs added to the save/load scenario. FAQ 19 → 24 (+5 operating-engine Q&As) with a new "Operating Engine" filter button.
+
+### Changed — Spares Engine v1.11.1 refinements (math fixes + UX)
+- **Poisson CDF overflow bug**: `e^{-λ}=0` underflow for λ > ~200 made `P(stockout)` return 0 for any stock level → added a normal-approximation fallback (CLT, continuity-corrected).
+- **Inverted NPV decision bug** in Last-Time-Buy: both options' NPVs are negative (costs); the code picked the *more-negative* NPV → recommended the *more expensive* path. Flipped + corrected chart highlight + documented the direction rule in the ⓘ box.
+- Verified correct (no change): Beasley-Springer-Moro inverse-normal CDF (Φ⁻¹ values check out), safety-stock unit conversions (annual μ/σ × L/52), newsvendor Q*, NPV DCF, LTB qty (safetyFactor 1.15 documented).
+- Added: 14-commodity defaults table (MTBF / lead time / unit cost / installed base / under-stock cost) with cross-module auto-fill; a 6-card Summary Dashboard (clickable KPIs); save / load / share-URL / reset scenario (localStorage + `#s=` hash of inputs); keyboard tab navigation (arrows / Home / End + aria-selected); dark-mode-aware chart colors across all charts; cross-link pills → TCO/OPEX/ROI/Tier-Advisor (carries `downtimeCostPerHr/mtbf/mttr` forward); new URL params (`?commodity/installedBase/leadTime/unitCost`); mobile KPI-grid breakpoints; title trimmed 84 → 59 chars.
+
+### Changed — DCMOC app refresh pass 2 (`dcmoc/`)
+- **16 engines** (commit `aa04a17`): AssetLifecycle (2025 T&T replacement costs ×20 assets), CBM (DCIM pricing $18K/$52K/$110K, Tier-III 95 min downtime, floor guard on $/min), MaintenanceStrategy ($50/hr labor, 6.5× US emergency multiplier, sensor-capex bumps), GridReliability (BESS $300/kWh BNEF-2026, Tier-4-Final diesel 0.27 L/kWh, $1.25/L), FuelGen ($18K/gen annual maintenance), DisasterRisk (added **wildfire as 6th risk factor** region-scored + re-weighted composite 28/22/18/12/10/10 + insurance tier thresholds + annualLossProbability /1250), DowntimeCalculator (Tier-IV 99.99943%, tier-specific default $/min $2.5K/$8K/$12K), TaxIncentive (IRA 20% bonus depreciation 2026 phase-down + 30%+10%-domestic solar ITC + state incentives table), Revenue ($185/kW/mo MRC, $280/kW NRC, 3.5% escalation + input guards), CapacityPlanning (headroom analysis fields + dynamic year + safe-division guards), Shift/Narrative/Portfolio/TalentAvailability (dynamic year + 2025-source refs + Uptime CDCP 2026 $4,200 cert cost), CarbonPdf (2025/2026 source years), assets.ts (gen-set spares +15-20% for 2026).
+- **Data** (commit `cc258b4`): 6 more electricity-rate updates (VN/PH/MY/TH/CO/FR) + UAE corp-tax 9% correction; all 33 countries `lastUpdated: 2026-Q1`.
+- **Dashboards** (commit `852111c`): `overflow-x-auto` wrappers on 12 tables across MonteCarlo/Portfolio/ScenarioComparison/Report dashboards, aria-labels on duplicate/remove icon buttons, corrected tier-availability values (99.741% / 99.99943%) + 2025-source tooltips on Portfolio/Risk/DisasterRisk dashboards.
+- Static export rebuilt + deployed (commit `92b7ba1`); `npx tsc --noEmit` clean, `npm run build` green.
+
+### Added — SEO: 15 more per-page OG cards (commit `4f7d934`, F18-01)
+Generated 1200×630 WebP OG cards (~52-56 KB each) + patched og:image/twitter:image for: spares-readiness-calculator, chiller-plant, datahall, fire/fuel/water-system, ict, EPMS_Telemetry, asean-dc-report-2026, infographic-dc-cost-breakdown/-sustainability/-pue-global, achievements, insights, glossary. Only 4 utility pages now use the profile-photo fallback (404/dashboard/privacy/terms). `tools/build-og-images.py` TARGETS extended. (B2-001 double-`<h1>` audit flag confirmed a false positive — the 2nd `<h1>` on 41 pages is inside PDF print-window JS template strings, not the rendered DOM.)
+
+### Changed — SEO: title-length trims (commit `63e7d51`, D1)
+Trimmed 10 over-long page titles (>80 chars) to <70 (article-20/21/22, cx-calculator, future-forward, article-4, ltc-system-modelling-lab, article-18, insights, pillar-sustainability) — kept descriptive. The 66-79-char titles left as-is.
+
+### Versioning
+- `js/rz-version.js` 1.11.0 → 1.12.0 (MINOR — new operating-engine component group).
+- SW cache name auto-synced → `rz-cache-v1.12.0`.
+
+---
+
 ## v1.11.0 — 2026-05-12 (NEW: Critical Spares Engine calculator · DCMOC engine refresh)
 
 ### Added — Critical Spares Readiness & Sourcing Engine
