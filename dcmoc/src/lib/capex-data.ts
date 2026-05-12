@@ -91,13 +91,15 @@ export const cityData: Record<string, { perW: number; region: string; label: str
     manchester: { perW: 10.80, region: 'europe', label: 'Manchester', source: 'Est. UK' },
 };
 
+// Escalation from 2025 baseline; 2026 already absorbs ~5% supply/labor cost increase
+// Sources: T&T 2025 Global Construction Index, JLL Market Outlook 2026
 export const yearEscalation: Record<string, { mult: number; note: string }> = {
-    '2025': { mult: 1.000, note: 'Baseline (current data)' },
-    '2026': { mult: 1.060, note: '+6.0% — JLL forecast' },
-    '2027': { mult: 1.115, note: '+5.2% — T&T trend' },
-    '2028': { mult: 1.165, note: '+4.5% — supply normalization' },
-    '2029': { mult: 1.210, note: '+3.9% — market stabilization' },
-    '2030': { mult: 1.250, note: '+3.3% — historical average' }
+    '2025': { mult: 1.000, note: 'Baseline (T&T / C&W 2025 data)' },
+    '2026': { mult: 1.050, note: '+5.0% — AI-driven switchgear/copper demand premium' },
+    '2027': { mult: 1.100, note: '+4.8% — T&T 2026 trend, supply normalising' },
+    '2028': { mult: 1.148, note: '+4.3% — partial supply chain normalization' },
+    '2029': { mult: 1.190, note: '+3.7% — approaching long-run average' },
+    '2030': { mult: 1.228, note: '+3.2% — historical average construction escalation' }
 };
 
 export const substationCosts: Record<string, { base: number; label: string }> = {

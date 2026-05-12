@@ -114,10 +114,11 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         currency: 'USD',
         currencySymbol: '$',
         economy: {
-            inflationRate: 0.035,
-            laborEscalation: 0.05,
+            // 2026: BPS CPI ~3.2%; minimum wage (UMP) +6.5% 2026; PLN tariff stable at ~Rp1400-1600/kWh (~$0.085-0.10)
+            inflationRate: 0.032,
+            laborEscalation: 0.065,
             taxRate: 0.22,
-            electricityRate: 0.08,
+            electricityRate: 0.09,
         },
         labor: {
             minimumWage: 350,
@@ -198,7 +199,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     SG: {
         id: 'SG',
@@ -207,10 +208,11 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         currency: 'SGD',
         currencySymbol: 'S$',
         economy: {
-            inflationRate: 0.025,
+            // 2026: EMA regulated tariff ~S$0.35/kWh (~US$0.26/kWh); corporate tax held at 17%
+            inflationRate: 0.022,
             laborEscalation: 0.04,
             taxRate: 0.17,
-            electricityRate: 0.15,
+            electricityRate: 0.22, // Significant increase 2023-2026 post-gas price normalisation
         },
         labor: {
             minimumWage: 1400,
@@ -288,7 +290,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 30000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     MY: {
         id: 'MY',
@@ -378,7 +380,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     US: {
         id: 'US',
@@ -387,10 +389,11 @@ export const COUNTRIES: Record<string, CountryProfile> = {
         currency: 'USD',
         currencySymbol: '$',
         economy: {
-            inflationRate: 0.03, // 3%
-            laborEscalation: 0.035, // 3.5%
+            // 2026: CPI trending ~2.5-3%; C&I electricity ~$0.13-0.14/kWh (EIA 2026); CHIPS Act driving DC labor premium
+            inflationRate: 0.027,
+            laborEscalation: 0.04, // DC/tech wage growth elevated by AI boom
             taxRate: 0.21,
-            electricityRate: 0.12,
+            electricityRate: 0.13,
         },
         labor: {
             minimumWage: 2000,
@@ -468,7 +471,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 100000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     JP: {
         id: 'JP',
@@ -558,7 +561,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     AU: {
         id: 'AU',
@@ -648,7 +651,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 80000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     // ─── MENA ───────────────────────────────────────────────
     AE: {
@@ -714,7 +717,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 100000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     SA: {
         id: 'SA', region: 'MENA', name: 'Saudi Arabia', currency: 'SAR', currencySymbol: '﷼',
@@ -779,7 +782,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 100000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     QA: {
         id: 'QA', region: 'MENA', name: 'Qatar', currency: 'QAR', currencySymbol: 'QR',
@@ -844,7 +847,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 80000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     // ─── AFRICA ─────────────────────────────────────────────
     ZA: {
@@ -910,7 +913,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     NG: {
         id: 'NG', region: 'AFR', name: 'Nigeria', currency: 'USD', currencySymbol: '$',
@@ -975,7 +978,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 40000,
             fuelQualityRating: 'low',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     KE: {
         id: 'KE', region: 'AFR', name: 'Kenya', currency: 'KES', currencySymbol: 'KSh',
@@ -1040,7 +1043,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 40000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     // ─── LATIN AMERICA ──────────────────────────────────────
     BR: {
@@ -1106,7 +1109,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     CL: {
         id: 'CL', region: 'LATAM', name: 'Chile', currency: 'CLP', currencySymbol: 'CL$',
@@ -1171,7 +1174,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     MX: {
         id: 'MX', region: 'LATAM', name: 'Mexico', currency: 'MXN', currencySymbol: 'MX$',
@@ -1236,7 +1239,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     CO: {
         id: 'CO', region: 'LATAM', name: 'Colombia', currency: 'COP', currencySymbol: 'CO$',
@@ -1301,7 +1304,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 40000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     // ─── EXPANDED APAC ──────────────────────────────────────
     IN: {
@@ -1367,7 +1370,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     CN: {
         id: 'CN', region: 'APAC', name: 'China', currency: 'CNY', currencySymbol: '¥',
@@ -1432,7 +1435,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 80000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     KR: {
         id: 'KR', region: 'APAC', name: 'South Korea', currency: 'KRW', currencySymbol: '₩',
@@ -1497,7 +1500,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     TH: {
         id: 'TH', region: 'APAC', name: 'Thailand', currency: 'THB', currencySymbol: '฿',
@@ -1562,7 +1565,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     VN: {
         id: 'VN', region: 'APAC', name: 'Vietnam', currency: 'VND', currencySymbol: '₫',
@@ -1627,7 +1630,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 40000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     PH: {
         id: 'PH', region: 'APAC', name: 'Philippines', currency: 'PHP', currencySymbol: '₱',
@@ -1692,7 +1695,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 40000,
             fuelQualityRating: 'moderate',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     TW: {
         id: 'TW', region: 'APAC', name: 'Taiwan', currency: 'TWD', currencySymbol: 'NT$',
@@ -1757,7 +1760,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     NZ: {
         id: 'NZ', region: 'APAC', name: 'New Zealand', currency: 'NZD', currencySymbol: 'NZ$',
@@ -1822,12 +1825,13 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 40000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     // ─── EXPANDED EMEA ──────────────────────────────────────
     GB: {
         id: 'GB', region: 'EMEA', name: 'United Kingdom', currency: 'GBP', currencySymbol: '£',
-        economy: { inflationRate: 0.03, laborEscalation: 0.035, taxRate: 0.25, electricityRate: 0.20 },
+        // 2026: UK C&I electricity ~£0.18-0.22/kWh; corp tax held at 25%; wage growth moderating
+        economy: { inflationRate: 0.027, laborEscalation: 0.035, taxRate: 0.25, electricityRate: 0.22 },
         labor: {
             minimumWage: 2200, baseSalary_ShiftLead: 8000, baseSalary_Engineer: 6500,
             baseSalary_Technician: 4500, baseSalary_Admin: 3500, baseSalary_Janitor: 2500,
@@ -1888,11 +1892,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     DE: {
         id: 'DE', region: 'EMEA', name: 'Germany', currency: 'EUR', currencySymbol: '€',
-        economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.2975, electricityRate: 0.30 },
+        // 2026: German C&I electricity still ~€0.22-0.28/kWh; slight moderation from 2022 peak
+        economy: { inflationRate: 0.023, laborEscalation: 0.03, taxRate: 0.2975, electricityRate: 0.26 },
         labor: {
             minimumWage: 2400, baseSalary_ShiftLead: 8500, baseSalary_Engineer: 7000,
             baseSalary_Technician: 5000, baseSalary_Admin: 4000, baseSalary_Janitor: 2800,
@@ -1953,11 +1958,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     NL: {
         id: 'NL', region: 'EMEA', name: 'Netherlands', currency: 'EUR', currencySymbol: '€',
-        economy: { inflationRate: 0.025, laborEscalation: 0.03, taxRate: 0.2575, electricityRate: 0.22 },
+        // 2026: Dutch electricity C&I ~€0.18-0.22/kWh; AMS land moratorium easing slightly
+        economy: { inflationRate: 0.023, laborEscalation: 0.03, taxRate: 0.2575, electricityRate: 0.20 },
         labor: {
             minimumWage: 2200, baseSalary_ShiftLead: 7500, baseSalary_Engineer: 6000,
             baseSalary_Technician: 4500, baseSalary_Admin: 3500, baseSalary_Janitor: 2500,
@@ -2018,11 +2024,12 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     IE: {
         id: 'IE', region: 'EMEA', name: 'Ireland', currency: 'EUR', currencySymbol: '€',
-        economy: { inflationRate: 0.025, laborEscalation: 0.035, taxRate: 0.125, electricityRate: 0.20 },
+        // 2026: Ireland electricity among highest in EU; large DC density straining grid; corporate tax 15% (pillar-2 compliant)
+        economy: { inflationRate: 0.024, laborEscalation: 0.04, taxRate: 0.15, electricityRate: 0.24 },
         labor: {
             minimumWage: 2400, baseSalary_ShiftLead: 7800, baseSalary_Engineer: 6500,
             baseSalary_Technician: 4800, baseSalary_Admin: 3800, baseSalary_Janitor: 2800,
@@ -2083,7 +2090,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     FR: {
         id: 'FR', region: 'EMEA', name: 'France', currency: 'EUR', currencySymbol: '€',
@@ -2148,7 +2155,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 60000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     SE: {
         id: 'SE', region: 'EMEA', name: 'Sweden', currency: 'SEK', currencySymbol: 'kr',
@@ -2213,7 +2220,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
     PL: {
         id: 'PL', region: 'EMEA', name: 'Poland', currency: 'PLN', currencySymbol: 'zł',
@@ -2278,7 +2285,7 @@ export const COUNTRIES: Record<string, CountryProfile> = {
             storageLimitLiters: 50000,
             fuelQualityRating: 'high',
         },
-        lastUpdated: '2025-Q1',
+        lastUpdated: '2026-Q1',
     },
 
     PT: {
