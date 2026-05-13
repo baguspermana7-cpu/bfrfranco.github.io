@@ -1940,7 +1940,23 @@
         calcTimer = setTimeout(calculate, 150);
     }
 
-    // ═══ INIT ═══
+
+    // v1.17.2 STABILIZATION: expose inline-onclick handlers on window
+    try {
+      window.attemptLogin       = attemptLogin;
+      window.closeLoginModal    = closeLoginModal;
+      window.debouncedCalculate = debouncedCalculate;
+      window.exportPDF          = exportPDF;
+      window.handlePremiumTab   = handlePremiumTab;
+      window.logoutPremium      = logoutPremium;
+      window.resetDefaults      = resetDefaults;
+      window.setMode            = setMode;
+      window.setPreset          = setPreset;
+      window.toggleMobileMenu   = toggleMobileMenu;
+      window.toggleTheme        = toggleTheme;
+      window.toggleUserDropdown = toggleUserDropdown;
+    } catch(e) { if(window.console)console.warn('v1.17.2 export block error:',e); }
+        // ═══ INIT ═══
     var chartJsReady = typeof Chart !== 'undefined';
     function onChartsReady() {
         chartJsReady = true;

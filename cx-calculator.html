@@ -6129,7 +6129,7 @@ function cxRenderGanttStats(ganttData){
       if(it.children)walk(it.children);
     });
   }
-  walk(ganttData);
+  walk(ganttData.items);
   var pct=total>0?Math.round((mapped/total)*100):0;
   var html='<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.78rem;color:#94a3b8;">';
   html+='<span><strong style="color:#22d3ee;">'+total+'</strong> activities</span>';
@@ -6293,6 +6293,36 @@ cxScrollBtn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;heig
 document.body.appendChild(cxScrollBtn);
 cxScrollBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
 window.addEventListener('scroll',function(){cxScrollBtn.style.display=window.scrollY>300?'flex':'none';});
+
+
+// v1.17.2 STABILIZATION: expose inline-onclick handlers on window
+try {
+  window.cxAttemptLogin        = cxAttemptLogin;
+  window.cxCalculate           = cxCalculate;
+  window.cxCloseDrawer         = cxCloseDrawer;
+  window.cxCloseModal          = cxCloseModal;
+  window.cxCollapseAllGantt    = cxCollapseAllGantt;
+  window.cxDrawerTab           = cxDrawerTab;
+  window.cxExpandAllGantt      = cxExpandAllGantt;
+  window.cxExportActivityPDF   = cxExportActivityPDF;
+  window.cxExportBulkProcedures= cxExportBulkProcedures;
+  window.cxExportGanttCSV      = cxExportGanttCSV;
+  window.cxExportPDF           = cxExportPDF;
+  window.cxFilterFaq           = cxFilterFaq;
+  window.cxFilterGantt         = cxFilterGantt;
+  window.cxFilterGanttPhase    = cxFilterGanttPhase;
+  window.cxGanttZoom           = cxGanttZoom;
+  window.cxHandlePremium       = cxHandlePremium;
+  window.cxLoadScenario        = cxLoadScenario;
+  window.cxOpenDrawer          = cxOpenDrawer;
+  window.cxReset               = cxReset;
+  window.cxScrollToChapter     = cxScrollToChapter;
+  window.cxSetCurrency         = cxSetCurrency;
+  window.cxShareConfig         = cxShareConfig;
+  window.cxSwitchMode          = cxSwitchMode;
+  window.cxToggleGantt         = cxToggleGantt;
+  window.toggleCalcTheme       = toggleCalcTheme;
+} catch(e) { if(window.console)console.warn('v1.17.2 export block error:',e); }
 
 // --- THEME TOGGLE ---
 function toggleCalcTheme() {

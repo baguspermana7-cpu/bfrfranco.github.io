@@ -1685,7 +1685,25 @@
         });
     }
 
-    // ═══ INIT ═══
+
+    // v1.17.2 STABILIZATION: expose inline-onclick handlers on window
+    // Functions are declared in a bare script block and are globally accessible,
+    // but we expose them explicitly for static auditors and future-proofing.
+    try {
+      window.attemptLogin       = attemptLogin;
+      window.closeLoginModal    = closeLoginModal;
+      window.exportPDF          = exportPDF;
+      window.handlePremiumTab   = handlePremiumTab;
+      window.logoutPremium      = logoutPremium;
+      window.onCheck            = onCheck;
+      window.resetChecklist     = resetChecklist;
+      window.setDcType          = setDcType;
+      window.setMode            = setMode;
+      window.setTier            = setTier;
+      window.toggleCat          = toggleCat;
+      window.toggleUserDropdown = toggleUserDropdown;
+    } catch(e) { if(window.console)console.warn('v1.17.2 export block error:',e); }
+        // ═══ INIT ═══
     document.addEventListener('DOMContentLoaded', function() {
         renderChecklist();
         calculate();
