@@ -197,7 +197,8 @@ window.RZ_FEATURE_FLAGS = {
   },
 
   /* ── DataHall AI ──────────────────────────────────────────────────────── */
-  'datahallAI': {
+  /* ── DatahallAI (BMS simulation, lowercase kebab canonical key) ───────── */
+  'datahall-ai': {
     'pro-views':               { free: false, demo: false, pro: true  },
     'pdf-export':              { free: false, demo: false, pro: true  },
     'pdf-watermark-removed':   { free: false, demo: false, pro: true  },
@@ -214,6 +215,49 @@ window.RZ_FEATURE_FLAGS = {
     'advanced-analytics':      { free: false, demo: false, pro: true  },
     'full-dashboard':          { free: false, demo: false, pro: true  },
     'scenario-save':           { free: false, demo: false, pro: true  }
+  },
+
+  /* ── v1.18.1 reconciliation: add 4 pages from Agent B's fallback set ──── */
+
+  /* ── DCMOC (Next.js subapp at /dcmoc/) ─────────────────────────────────── */
+  'dcmoc': {
+    'advanced-mode':           { free: false, demo: true,  pro: true  },
+    'pdf-export':              { free: false, demo: true,  pro: true  },
+    'pdf-watermark-removed':   { free: false, demo: false, pro: true  },
+    'scenario-save':           { free: false, demo: true,  pro: true  },
+    'sensitivity-sliders':     { free: false, demo: false, pro: true  },
+    'strategic-planning':      { free: false, demo: false, pro: true  },
+    'scenario-comparison':     { free: false, demo: true,  pro: true  },
+    'tooltips':                { free: true,  demo: true,  pro: true  }
+  },
+
+  /* ── Finance Terminal (admin subapp) ───────────────────────────────────── */
+  'finance-terminal': {
+    'advanced-mode':           { free: false, demo: true,  pro: true  },
+    'pdf-export':              { free: false, demo: true,  pro: true  },
+    'api-access':              { free: false, demo: false, pro: true  },
+    'live-quotes':             { free: false, demo: true,  pro: true  },
+    'portfolio-save':          { free: false, demo: false, pro: true  },
+    'tooltips':                { free: true,  demo: true,  pro: true  }
+  },
+
+  /* ── PLN Java-Bali Grid (overview + 4 province sub-pages) ─────────────── */
+  'pln-java-grid': {
+    'sld-view':                { free: true,  demo: true,  pro: true  },
+    'map-view':                { free: true,  demo: true,  pro: true  },
+    'historical-data':         { free: false, demo: true,  pro: true  },
+    'province-overlay':        { free: false, demo: true,  pro: true  },
+    'pdf-export':              { free: false, demo: true,  pro: true  },
+    'csv-export':              { free: false, demo: false, pro: true  },
+    'tooltips':                { free: true,  demo: true,  pro: true  }
+  },
+
+  /* ── Tools hub (consolidated tool index page) ──────────────────────────── */
+  'tools': {
+    'advanced-mode':           { free: false, demo: true,  pro: true  },
+    'pdf-export':              { free: false, demo: true,  pro: true  },
+    'pro-tools-access':        { free: false, demo: false, pro: true  },
+    'tooltips':                { free: true,  demo: true,  pro: true  }
   }
 
 };
