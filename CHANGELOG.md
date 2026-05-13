@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.17.1 — 2026-05-13 (Spares Engine — stabilization #3: dead Generate buttons)
+
+User reported "Generate Proposal" button (and 8 sibling generators) silently dead on Operating-Engine tabs after v1.17.0 ship.
+
+Root cause: inline handler pattern is `onclick="safeGen(genX)"` — it requires BOTH `safeGen` AND `genX` (the function REFERENCE passed as arg) to be on `window`. v1.16.2 exposed `safeGen` but missed the 9 generators. The v1.16.2 audit tool only checked direct call targets (`onclick="X("`), not identifiers passed as arguments.
+
+1. **9 `gen*` functions exposed on window** — `genPMOps`, `genNegotiation`, `genContract`, `genProcessImprovement`, `genMeetingPrep`, `genStakeholder`, `genEOLPlan`, `genAmbiguitySolver`, `genSTAR` — all added to the export block in `spares-readiness-calculator.html` near line 9620.
+2. **`tools/audit-onclick-handlers.py` tightened** — `extract_handlers()` now walks the entire event-handler expression (`onclick="Y(X, Z)"`) and reports EVERY identifier, not just the call target. Skips JS built-ins.
+
+Probe SUMMARY (live URL after push): consoleErrors=0, pageErrors=0, all 65+ inline-event handlers exposed.
+
+---
+
 ## v1.17.0 — 2026-05-13 (Spares Engine — MEIO optimizer)
 
 ### Added
