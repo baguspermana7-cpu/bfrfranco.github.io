@@ -3,6 +3,8 @@ import puppeteer from 'puppeteer';
 
 const PAGE_URL = `http://localhost:8081/tier-advisor.html?nc=${Date.now()}`;
 
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 (async () => {
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -25,7 +27,8 @@ const PAGE_URL = `http://localhost:8081/tier-advisor.html?nc=${Date.now()}`;
     }
   });
 
-  await page.goto('http://localhost:8081/tier-advisor.html', { waitUntil: 'networkidle2' });
+  // Set premium session on first load
+  await page.goto('http://localhost:8081/tier-advisor.html', { waitUntil: 'networkidle2', timeout: 30000 });
   await page.evaluate(() => {
     localStorage.setItem('rz_premium_session', JSON.stringify({
       email: 'bagus@resistancezero.com',
@@ -34,8 +37,12 @@ const PAGE_URL = `http://localhost:8081/tier-advisor.html?nc=${Date.now()}`;
       role: 'root'
     }));
   });
-  await page.goto(PAGE_URL, { waitUntil: 'networkidle2' });
 
+  // Reload with premium session active
+  await page.goto(PAGE_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+  await sleep(500);
+
+  // 1. Enumerate all inline event handler attributes
   const handlers = await page.evaluate(() => {
     const attrs = ['onclick','oninput','onchange','onkeyup','onfocus','onblur'];
     const results = [];
@@ -48,47 +55,61 @@ const PAGE_URL = `http://localhost:8081/tier-advisor.html?nc=${Date.now()}`;
     return results;
   });
 
+  // 2. Extract unique function names from handler values
   const fnNames = new Set();
   handlers.forEach(h => {
     const match = h.value.match(/^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/);
     if (match) fnNames.add(match[1]);
   });
 
+  // 3. Check window accessibility for each function
   const missingFns = await page.evaluate((names) => {
     return names.filter(name => typeof window[name] !== 'function');
   }, [...fnNames]);
 
+  // 4. Test button clicks for ReferenceError (careful - no waitForTimeout which is deprecated)
   const buttonsBroken = [];
-  const buttons = await page.$$('button');
-  for (const btn of buttons) {
+  const buttonHandles = await page.$$('button');
+  for (const btn of buttonHandles) {
     const prevErrors = pageErrors.length;
     try {
       await btn.click();
-      await page.waitForTimeout(100);
+      await sleep(150);
     } catch (e) {}
     if (pageErrors.length > prevErrors) {
-      const label = await btn.evaluate(el => el.textContent.trim().slice(0, 60));
-      buttonsBroken.push(label);
+      try {
+        const label = await btn.evaluate(el => el.textContent.trim().slice(0, 60));
+        buttonsBroken.push(label);
+      } catch(e) {}
     }
   }
 
+  // 5. Check Pro session is present
   const proUnlockOk = await page.evaluate(() => {
-    const session = localStorage.getItem('rz_premium_session');
-    if (!session) return false;
-    return true;
+    return !!localStorage.getItem('rz_premium_session');
   });
 
-  await page.setViewport({ width: 375, height: 667 });
-  await page.reload({ waitUntil: 'networkidle2' });
-  const mobileBurgerVisible = await page.evaluate(() => {
+  // 6. Mobile viewport check (fresh page to avoid frame detachment)
+  const mobilePage = await browser.newPage();
+  await mobilePage.setViewport({ width: 375, height: 667 });
+  await mobilePage.evaluate(() => {
+    localStorage.setItem('rz_premium_session', JSON.stringify({
+      email: 'bagus@resistancezero.com', expires: '2099-12-31T00:00:00Z', tier: 'pro', role: 'root'
+    }));
+  });
+  await mobilePage.goto(`http://localhost:8081/tier-advisor.html?nc2=${Date.now()}`, { waitUntil: 'networkidle2', timeout: 30000 });
+  await sleep(500);
+
+  const mobileBurgerVisible = await mobilePage.evaluate(() => {
     const burger = document.querySelector('.rz-nav-burger, .hamburger, .mobile-menu-btn, .nav-burger');
     if (!burger) return false;
     const style = window.getComputedStyle(burger);
     return style.display !== 'none' && style.visibility !== 'hidden';
   });
-  const mobileBackLinkPresent = await page.evaluate(() => {
+  const mobileBackLinkPresent = await mobilePage.evaluate(() => {
     return !!document.querySelector('.nav-back, a[href="index.html"], a[href="/"]');
   });
+  await mobilePage.close();
 
   const issues = [];
   if (missingFns.length > 0) issues.push(`Missing window exports: ${missingFns.join(', ')}`);
