@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.18.5 — 2026-05-14 (index.html — replace tacky marquee with lean credentials band)
+
+User: "running text ini jelek sekali, kurang lean, kurang professional look. norak"
+
+The engineering-keyword marquee at `index.html:423-454` was a 60s linear infinite
+scroll with mint diamond bullets (`◆`), 3rem gap, 24 duplicated items, gradient
+overlay background, dual borders, and edge-fade-out masks — every decoration
+working against signal density.
+
+Replaced with `.rz-cred-band`: static, dense, editorial credit line.
+- JetBrains Mono 10.5px (engineering numerics font)
+- Uppercase, `letter-spacing: 0.08em` (half the prior 0.16em → denser)
+- Pipe `|` separator (replaces `◆` diamond)
+- One hairline top border (no bottom, no gradient, no fade masks)
+- 12 unique items (no duplication, no animation)
+- Left label `CERTIFICATIONS · STANDARDS · OUTCOMES` in muted signal-amber
+- Mobile: horizontal-scroll on overflow, scrollbar chrome hidden
+- Hover state: signal-amber colour shift, editorial accent
+
+Files: `index.html` (markup swap), `styles-index.css:5759-5820` (CSS swap),
+`js/rz-version.js` → 1.18.5, sw.js auto-synced.
+
+Out of scope (separate tickets):
+- Other pages with `.rz-marquee` references — `articles.html` / `glossary.html`
+  / `datacenter-solutions.html` keep their patterns until separately flagged.
+- The historical `changelog.html` v1.4.0 entry referencing the marquee — stays
+  as historical record.
+
+---
+
 ## v1.18.2 — 2026-05-14 (output card tooltips — 52 metric-box + 8 summary-kpi)
 
 User complaint (verbatim): "Banyak parameter input:output atau variable itu g ada tooltip"

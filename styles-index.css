@@ -5756,66 +5756,70 @@ section {
 }
 
 /* -- Marquee strip below hero — engineering keywords (vercel pattern) -- */
-.rz-marquee {
+/* v1.18.5 — Lean editorial credentials band (replaces .rz-marquee per user "norak").
+   Static. Dense. JetBrains Mono numerics. Pipe separator. No animation.
+   No diamond bullets. Single hairline top border. Mobile: horizontal scroll, no scrollbar chrome. */
+.rz-cred-band {
     position: relative;
-    overflow: hidden;
     margin: 0 auto 2.5rem;
-    padding: 0.9rem 0;
+    padding: 0.75rem 0;
     border-top: 1px solid rgba(255,255,255,0.06);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    background: linear-gradient(90deg, rgba(15,23,42,0) 0%, rgba(15,23,42,0.4) 50%, rgba(15,23,42,0) 100%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
     z-index: 5;
 }
-.rz-marquee-track {
-    display: flex;
-    gap: 3rem;
-    width: max-content;
-    animation: rzMarquee 60s linear infinite;
-    will-change: transform;
-}
-.rz-marquee-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.16em;
+.rz-cred-band::-webkit-scrollbar { display: none; }
+.rz-cred-label {
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(241,245,249,0.55);
+    color: rgba(255,170,0,0.42);
+    padding-right: 0.85rem;
+    border-right: 1px solid rgba(255,255,255,0.08);
     white-space: nowrap;
 }
-.rz-marquee-item::before {
-    content: '◆';
-    color: rgba(125,221,180,0.55);
-    font-size: 0.6rem;
+.rz-cred-track {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    flex-wrap: nowrap;
 }
-[data-theme="light"] .rz-marquee {
-    background: linear-gradient(90deg, transparent 0%, rgba(15,23,42,0.04) 50%, transparent 100%);
-    border-top-color: rgba(15,23,42,0.06);
-    border-bottom-color: rgba(15,23,42,0.06);
+.rz-cred-item {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(241,245,249,0.42);
+    white-space: nowrap;
+    padding: 0 0.8rem;
+    transition: color 0.18s ease;
 }
-[data-theme="light"] .rz-marquee-item { color: rgba(15,23,42,0.55); }
-@keyframes rzMarquee {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+.rz-cred-item:hover, .rz-cred-item:focus { color: rgba(255,170,0,0.85); }
+.rz-cred-item:not(:last-child)::after {
+    content: '|';
+    color: rgba(255,255,255,0.12);
+    padding-left: 0.8rem;
+    font-weight: 300;
 }
-@media (prefers-reduced-motion: reduce) {
-    .rz-marquee-track { animation: none; }
+[data-theme="light"] .rz-cred-band { border-top-color: rgba(15,23,42,0.08); }
+[data-theme="light"] .rz-cred-label { color: rgba(217,119,6,0.55); border-right-color: rgba(15,23,42,0.1); }
+[data-theme="light"] .rz-cred-item { color: rgba(15,23,42,0.5); }
+[data-theme="light"] .rz-cred-item:not(:last-child)::after { color: rgba(15,23,42,0.18); }
+@media (max-width: 768px) {
+    .rz-cred-band { padding: 0.6rem 0.75rem 0.6rem 1rem; }
+    .rz-cred-label { font-size: 0.58rem; padding-right: 0.65rem; }
+    .rz-cred-item { font-size: 0.62rem; padding: 0 0.65rem; }
 }
-
-/* Edge fade-out masks on the marquee */
-.rz-marquee::before,
-.rz-marquee::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 80px;
-    pointer-events: none;
-    z-index: 2;
-}
-.rz-marquee::before { left: 0; background: linear-gradient(90deg, var(--body-bg, #0f172a) 0%, transparent 100%); }
-.rz-marquee::after  { right: 0; background: linear-gradient(90deg, transparent 0%, var(--body-bg, #0f172a) 100%); }
 
 /* -- Scroll-reveal class — IntersectionObserver toggles .is-visible -- */
 .rz-reveal {
