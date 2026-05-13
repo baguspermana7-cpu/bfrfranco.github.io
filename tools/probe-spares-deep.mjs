@@ -26,10 +26,11 @@ function ok(label) { /* silent */ }
 const handlerCheck = await page.evaluate(() => {
   const els = document.querySelectorAll('[onclick]');
   const names = new Set();
+  const JS_KEYWORDS = new Set(['if','for','while','return','typeof','new','this','event','console','window','document','setTimeout','localStorage','sessionStorage','alert','confirm','prompt']);
   els.forEach(el => {
     const code = el.getAttribute('onclick') || '';
-    const m = code.match(/^[\s;]*([a-zA-Z_$][\w$]*)\s*\(/);
-    if (m) names.add(m[1]);
+    const m = code.match(/^[\s;(]*([a-zA-Z_$][\w$]*)\s*\(/);
+    if (m && !JS_KEYWORDS.has(m[1])) names.add(m[1]);
   });
   const result = {};
   for (const n of names) {

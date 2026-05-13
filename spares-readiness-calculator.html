@@ -471,10 +471,18 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .ops-radar-wrap { position: relative; height: 260px; margin-top: 1rem; }
 
 /* Leverages list */
-.leverage-list { list-style: none; padding: 0; margin: 0.5rem 0; }
+/* v1.17.2 — leverage levers must wrap; original .leverage-list rendered 12 long pills in a flat row causing horizontal overflow that pushed the input pane off-screen on the left */
+.leverage-list { list-style: none; padding: 0; margin: 0.5rem 0; display: flex; flex-wrap: wrap; gap: 6px; max-width: 100%; }
 .leverage-list li { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 0.78rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
 .leverage-list li:last-child { border-bottom: none; }
-.lev-tag { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 50px; white-space: nowrap; align-self: flex-start; margin-top: 1px; }
+.lev-tag { font-size: 0.65rem; font-weight: 700; padding: 3px 9px; border-radius: 50px; white-space: nowrap; align-self: flex-start; margin-top: 1px; display: inline-block; }
+/* v1.17.2 — guarantee no module-pane content overflows the viewport */
+.module-pane { max-width: 100%; }
+.module-pane.active { display: block; max-width: 100%; overflow-x: hidden; }
+.ops-output { max-width: 100%; overflow-x: auto; }
+.gen-text-block { max-width: 100%; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }
+.ops-table { table-layout: auto; }
+.ops-table-wrap { overflow-x: auto; max-width: 100%; }
 .lev-strong { background: rgba(16,185,129,0.1); color: #059669; }
 .lev-moderate { background: rgba(245,158,11,0.1); color: #d97706; }
 .lev-weak { background: rgba(239,68,68,0.1); color: #ef4444; }
@@ -713,7 +721,9 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .module-pane.active { display: block; opacity: 1; animation: pane-fadein 0.2s ease forwards; }
 @keyframes pane-fadein { 0%{opacity:0;transform:translateY(4px);} 100%{opacity:1;transform:translateY(0);} }
 /* Active tab pill underline */
-.tab-btn.active { border-bottom: 2px solid var(--amber-light) !important; position: relative; }
+/* v1.17.2 — active tab MUST be visibly amber-filled (user complaint: "tidak ada indicative sedang active"). Previous rule was underline-only which stole the cascade from the line-203 fill. Now: amber fill + bolder + underline accent via ::after. */
+.tab-btn.active { background: var(--amber) !important; color: #0f172a !important; border-color: var(--amber) !important; font-weight: 700 !important; position: relative; }
+.tab-btn.active::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: -4px; height: 2px; background: var(--amber-light); border-radius: 2px; }
 
 /* 6. Sticky headline sub-bar for analytical tabs */
 .module-sticky-bar { position: sticky; top: 72px; z-index: 90; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); padding: 6px 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; border-radius: 0 0 10px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
@@ -984,7 +994,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       </div>
       <a href="glossary.html" class="nav-link">Glossary</a>
       <div class="nav-auth-wrap" id="navAuthWrap">
-        <button class="nav-login-btn" id="navLoginBtn"><i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span></button>
+        <button class="nav-login-btn" id="navLoginBtn" onclick="if(window._rzAuth)_rzAuth.showModal();else console.warn('[CSE] auth.js not loaded');" aria-label="Login or sign up"><i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span></button>
         <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
           <div class="nav-user-avatar" id="navUserAvatar">U</div>
           <span class="nav-user-email" id="navUserEmail"></span>
@@ -6360,7 +6370,87 @@ function genNegotiation() {
     'Scope expansion (new part families)', 'Shared tooling investment'
   ];
 
-  var outHtml = '<div class="ops-status-strip ' + (leverageScore >= 5 ? 'ops-status-green' : leverageScore >= 3 ? 'ops-status-yellow' : 'ops-status-red') + '">Leverage: <strong>' + leverageLabel + '</strong> (Score ' + leverageScore + '/7) | Scenario: <strong>' + scenarioType.replace(/_/g, ' ').toUpperCase() + '</strong></div>' +
+  // v1.17.2 — deeper analytics (user feedback: "level detail sangat kurang"):
+  // ZOPA (Zone Of Possible Agreement), Walk-Away point, Decision Matrix, Risk Register, Role Allocation, Communication Cadence
+  var sellerFloor, buyerCeiling, openingAnchor, targetClose, walkAway;
+  if (scenarioType === 'price_reduction') {
+    sellerFloor = annualSpend * 0.92;
+    buyerCeiling = annualSpend * 0.97;
+    openingAnchor = annualSpend * 0.85;
+    targetClose = annualSpend * 0.93;
+    walkAway = annualSpend * 0.98;
+  } else if (scenarioType === 'lead_time') {
+    sellerFloor = annualSpend;
+    buyerCeiling = annualSpend * 1.03;
+    openingAnchor = annualSpend * 0.95;
+    targetClose = annualSpend * 1.00;
+    walkAway = annualSpend * 1.06;
+  } else {
+    sellerFloor = annualSpend * 0.95;
+    buyerCeiling = annualSpend * 1.02;
+    openingAnchor = annualSpend * 0.90;
+    targetClose = annualSpend * 0.97;
+    walkAway = annualSpend * 1.05;
+  }
+  var zopaRange = buyerCeiling - sellerFloor;
+  var zopaExists = zopaRange > 0;
+
+  // Decision matrix: weighted scoring across 5 criteria for 3 typical paths
+  var decisionMatrix = [
+    { path: 'Accept supplier ask (status quo)', cost: 1, speed: 5, risk: 4, leverage: 1, relationship: 5, weighted: 0 },
+    { path: 'Counter via concession trade (recommended)', cost: 4, speed: 4, risk: 3, leverage: 4, relationship: 4, weighted: 0 },
+    { path: 'Walk-away + dual-source qualification', cost: 5, speed: 1, risk: 2, leverage: 5, relationship: 2, weighted: 0 }
+  ];
+  // Weights: cost 0.30, speed 0.15, risk 0.20, leverage 0.20, relationship 0.15
+  decisionMatrix.forEach(function(d){ d.weighted = (d.cost*0.30 + d.speed*0.15 + d.risk*0.20 + d.leverage*0.20 + d.relationship*0.15).toFixed(2); });
+  decisionMatrix.sort(function(a,b){ return b.weighted - a.weighted; });
+
+  // Risk register
+  var riskRegister = [
+    { risk: 'Supplier walks; emergency expedite required', prob: alternates >= 2 ? 'Low' : 'Medium', impact: 'High', mitigation: 'Pre-qualified alternate ready; ≥4 wk safety stock' },
+    { risk: 'Price increase compounded by raw-material escalator', prob: rawMaterialLinked ? 'High' : 'Low', impact: 'Medium', mitigation: 'Index-linked clause with quarterly true-up + cap' },
+    { risk: 'Supplier inserts hidden surcharges post-contract', prob: 'Medium', impact: 'Medium', mitigation: 'All-in TCO clause; line-itemise every fee in SOW' },
+    { risk: 'Lead-time slip during qualification of alternate', prob: alternates === 0 ? 'High' : 'Low', impact: 'High', mitigation: 'Phased ramp; existing supplier 80% / alternate 20% start' },
+    { risk: 'Quality regression on volume award', prob: 'Low', impact: 'High', mitigation: 'Quarterly QBR + scorecard + audit rights' }
+  ];
+
+  // Role allocation
+  var roleAllocation = [
+    { role: 'Lead Negotiator', who: 'Procurement Manager', task: 'Own talk track, anchor delivery, concession trades' },
+    { role: 'Technical SME', who: 'Engineering Lead', task: 'Validate specs, walk-away criteria, alternate fitness' },
+    { role: 'Finance Sponsor', who: 'Finance Director', task: 'Approve walk-away budget, sign-off on TCO model' },
+    { role: 'Legal Counsel', who: 'In-house / external', task: 'Review contract clauses, force majeure, IP, indemnity' },
+    { role: 'Observer / Recorder', who: 'Procurement Analyst', task: 'Capture commitments, post-meeting minutes, action log' }
+  ];
+
+  // Communication cadence (post-meeting)
+  var commCadence = [
+    { hour: 'T+0', action: 'Verbal confirmation of agreed items in meeting' },
+    { hour: 'T+24h', action: 'Written summary email to supplier with action list' },
+    { hour: 'T+72h', action: 'Internal stakeholder update + decision-matrix re-score' },
+    { hour: 'T+1wk', action: 'Draft contract amendment OR walk-away kickoff memo' },
+    { hour: 'T+2wk', action: 'Signed amendment OR alternate qualification commenced' }
+  ];
+
+  // Cause-Effect chain (negotiation outcome lever pulls)
+  var causeEffect = [
+    { lever: 'Anchor low (-15%)', primaryEffect: 'Sets ceiling at our preferred range', secondaryEffect: 'Risks supplier walking if seen as bad-faith' },
+    { lever: 'Concession trade (give B, get A)', primaryEffect: 'Demonstrates collaborative intent', secondaryEffect: 'Locks us into B; B must be lower-cost than A' },
+    { lever: 'Reveal alternate quotes', primaryEffect: 'Hard leverage; forces price match', secondaryEffect: 'Burns trust if used early; reserve for endgame' },
+    { lever: 'Multi-year commit', primaryEffect: 'Buys 8-12% price reduction', secondaryEffect: 'Reduces flexibility for tech-refresh + alternate qualification' },
+    { lever: 'Walk-away (real)', primaryEffect: 'Forces supplier to call us back', secondaryEffect: 'Only viable if alternate is pre-qualified; otherwise self-inflicted wound' }
+  ];
+
+  var outHtml = '<div class="ops-status-strip ' + (leverageScore >= 5 ? 'ops-status-green' : leverageScore >= 3 ? 'ops-status-yellow' : 'ops-status-red') + '">Leverage: <strong>' + leverageLabel + '</strong> (Score ' + leverageScore + '/7) | Scenario: <strong>' + scenarioType.replace(/_/g, ' ').toUpperCase() + '</strong> | ZOPA: <strong>' + (zopaExists ? 'EXISTS' : 'NONE') + '</strong></div>' +
+    '<div class="ops-output-title">ZOPA &amp; Walk-Away Analysis</div>' +
+    '<div class="ops-output-wrap"><table class="ops-table"><thead><tr><th>Parameter</th><th>Value</th><th>Logic</th></tr></thead><tbody>' +
+    '<tr><td>Seller floor (supplier minimum)</td><td>' + fmtUSD(sellerFloor) + '</td><td>Cost-plus margin · raw-material indexed</td></tr>' +
+    '<tr><td>Opening anchor (our first ask)</td><td>' + fmtUSD(openingAnchor) + '</td><td>10–15% below current spend; benchmarked</td></tr>' +
+    '<tr><td>Target close (realistic outcome)</td><td>' + fmtUSD(targetClose) + '</td><td>Within ZOPA, leaves both sides whole</td></tr>' +
+    '<tr><td>Buyer ceiling (our max)</td><td>' + fmtUSD(buyerCeiling) + '</td><td>Above this triggers BATNA evaluation</td></tr>' +
+    '<tr><td>Walk-away (BATNA trigger)</td><td>' + fmtUSD(walkAway) + '</td><td>BATNA invoked; alternate engaged</td></tr>' +
+    '<tr><td>ZOPA range</td><td>' + fmtUSD(Math.abs(zopaRange)) + ' ' + (zopaExists ? '✓' : '✗') + '</td><td>' + (zopaExists ? 'Negotiable; deal possible' : 'No overlap; redesign offer or walk') + '</td></tr>' +
+    '</tbody></table></div>' +
     '<div class="ops-output-title">BATNA Assessment</div>' +
     '<div class="ops-output"><p><strong>Strength: ' + batnaStrength + '</strong></p><ul>' + batnaOptions.map(function(b) { return '<li>' + b + '</li>'; }).join('') + '</ul></div>' +
     '<div class="ops-output-title">Counterproposal Template</div>' +
@@ -6370,6 +6460,26 @@ function genNegotiation() {
     concessions.map(function(c) { return '<tr><td>' + c.give + '</td><td>' + c.get + '</td><td>' + c.priority + '</td></tr>'; }).join('') + '</tbody></table>' +
     '<div class="ops-output-title">Talk Track</div>' +
     '<pre class="gen-text-block">' + talkTrack + '<\/pre>' +
+    '<div class="ops-output-title">Decision Matrix (weighted scoring, 5 criteria)</div>' +
+    '<div class="ops-output-wrap"><table class="ops-table"><thead><tr><th>Path</th><th>Cost</th><th>Speed</th><th>Risk</th><th>Leverage</th><th>Relationship</th><th>Weighted</th></tr></thead><tbody>' +
+    decisionMatrix.map(function(d, i){ return '<tr' + (i===0?' style="background:rgba(245,158,11,0.08);font-weight:700;"':'') + '><td>' + d.path + (i===0?' ← recommended':'') + '</td><td>' + d.cost + '</td><td>' + d.speed + '</td><td>' + d.risk + '</td><td>' + d.leverage + '</td><td>' + d.relationship + '</td><td><strong>' + d.weighted + '</strong></td></tr>'; }).join('') +
+    '</tbody></table><p style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;">Weights: cost 0.30 · speed 0.15 · risk 0.20 · leverage 0.20 · relationship 0.15. Scoring 1–5 (5 = best).</p></div>' +
+    '<div class="ops-output-title">Risk Register</div>' +
+    '<div class="ops-output-wrap"><table class="ops-table"><thead><tr><th>Risk</th><th>Probability</th><th>Impact</th><th>Mitigation</th></tr></thead><tbody>' +
+    riskRegister.map(function(r){ var probClass = r.prob === 'High' ? 'rag-red' : r.prob === 'Medium' ? 'rag-yellow' : 'rag-green'; var impClass = r.impact === 'High' ? 'rag-red' : r.impact === 'Medium' ? 'rag-yellow' : 'rag-green'; return '<tr><td>' + r.risk + '</td><td class="' + probClass + '">' + r.prob + '</td><td class="' + impClass + '">' + r.impact + '</td><td>' + r.mitigation + '</td></tr>'; }).join('') +
+    '</tbody></table></div>' +
+    '<div class="ops-output-title">Role Allocation</div>' +
+    '<div class="ops-output-wrap"><table class="ops-table"><thead><tr><th>Role</th><th>Who</th><th>Task</th></tr></thead><tbody>' +
+    roleAllocation.map(function(r){ return '<tr><td><strong>' + r.role + '</strong></td><td>' + r.who + '</td><td>' + r.task + '</td></tr>'; }).join('') +
+    '</tbody></table></div>' +
+    '<div class="ops-output-title">Cause-Effect Lever Map</div>' +
+    '<div class="ops-output-wrap"><table class="ops-table"><thead><tr><th>Lever</th><th>Primary Effect (+)</th><th>Secondary Effect (−)</th></tr></thead><tbody>' +
+    causeEffect.map(function(c){ return '<tr><td><strong>' + c.lever + '</strong></td><td>' + c.primaryEffect + '</td><td style="color:var(--text-muted);">' + c.secondaryEffect + '</td></tr>'; }).join('') +
+    '</tbody></table></div>' +
+    '<div class="ops-output-title">Communication Cadence (post-meeting)</div>' +
+    '<div class="ops-output-wrap"><table class="ops-table"><thead><tr><th>Time</th><th>Action</th></tr></thead><tbody>' +
+    commCadence.map(function(c){ return '<tr><td><strong>' + c.hour + '</strong></td><td>' + c.action + '</td></tr>'; }).join('') +
+    '</tbody></table></div>' +
     '<div class="ops-output-title">Available Levers</div>' +
     '<div class="leverage-list">' + leversList.map(function(l) { return '<span class="lev-tag ' + leverageClass + '">' + l + '</span>'; }).join('') + '</div>';
 

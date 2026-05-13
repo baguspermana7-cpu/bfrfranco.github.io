@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v1.18.0-prep — 2026-05-13 (Brand & design system foundation)
+
+User-mandated work to escape "AI design slop" and establish identifiable brand character. Foundational artefacts created — visual changes to come in v1.18.x releases.
+
+- **NEW** `~/.claude/agents/uiux-reviewer.md` — local Claude Code agent with impeccable design eye. Enforces anti-pattern list (dot-grid noise, default Tailwind palettes, Anthropic-purple, saturated-emerald-everywhere, glassmorphism, neumorphism, cursor-3D-tilt, lifestyle stock photos, etc.). MUST BE USED on every UI commit going forward.
+- **NEW** `documentation/design.md` — comprehensive brand & design system manifest (target 2,500-3,500 lines). Covers: brand essence, visual character (industrial-instrumentation aesthetic), 30+ anti-patterns, typography (IBM Plex Sans + JetBrains Mono), color tokens (signal-amber `#FFAA00`, oscilloscope green `#00FF88`, fault-red `#FF3030`, instrument-cyan `#00DDFF`), layout patterns, kinetic patterns, iconography, component library map, 7 page archetypes with ASCII wireframes, PDF export design, accessibility (WCAG 2.2 AA), mobile responsiveness, 5-year roadmap (2026-2031), decision log. Authored async via sonnet agent.
+- **NEW** `~/.claude/projects/-home-baguspermana7/memory/feedback_always_document_everything.md` — codified user mandate: every code/content change MUST update CHANGELOG + standardization + relevant docs in the same commit. No exceptions.
+
+Next: v1.17.2 site-wide calc-page stabilization sweep (3 parallel agents per page-risk slice).
+
+---
+
+## v1.17.2 — 2026-05-13 (Spares Engine — basic-features sweep + Negotiation enhancement)
+
+User reported across multiple screenshots that "basic feature selalu bermasalah" (basic features always broken). Specific complaints + fixes:
+
+- **Login button dead** on spares-readiness-calculator.html. Root cause: `auth.js` detects inline `.nav-login-btn` and skips its own injection, but the inline button had no click handler. Fix: added `onclick="if(window._rzAuth)_rzAuth.showModal();"`. Pattern now codified in `feedback_basic_feature_discipline.md`.
+- **Active tab indicator invisible** ("tidak ada indicative sedang active bisa ada warna kuning"). Root cause: line-724 CSS rule `.tab-btn.active { border-bottom: 2px solid var(--amber-light) !important; }` was the cascade winner because it came last + used `!important`, but it only set the underline (no background fill). The line-203 amber-fill rule was overridden. Fix: rule now uses filled amber background + amber border + 700 weight + `::after` underline accent, all with `!important` to lock the cascade.
+- **Negotiation tab horizontal overflow** — `.leverage-list` rendered 12 long pills with `white-space:nowrap` in a flat row, expanding the pane beyond viewport. Fix: `flex-wrap: wrap` on the list + `max-width:100%; overflow-x:hidden` on `.module-pane.active`.
+- **Negotiation output too thin** ("level detail ini sangat2 kurang") — added ZOPA / Walk-Away table, weighted Decision Matrix (3 paths × 5 criteria), Risk Register (5 risks with prob/impact RAG), Role Allocation (5 roles), Cause-Effect Lever Map (5 levers + primary/secondary effects), Communication Cadence (5 time-buckets). Roughly tripled analytical depth.
+- **Loading placeholders stuck** ("loading2nya nggak berhenti") — diagnosed 9 Loading placeholders; resolution pattern documented in standardization. Implementation continues into v1.17.3 per orchestration.
+
+Documentation discipline established this session (per user mandate "ingat di memory anda"):
+- `feedback_always_document_everything.md` — every change touches CHANGELOG + standardization + relevant docs.
+- `feedback_log_every_user_comment.md` — every user comment logged into changelog/standardization/memory before moving on.
+- `feedback_basic_feature_discipline.md` — 8-rule pre-commit checklist preventing Login / Tab / Tooltip / Mobile-burger / inline-handler / Loading-resolution regressions.
+
+Probe SUMMARY (live URL after push): all 27 tabs OK, all handlers exposed, login button reaches `_rzAuth.showModal()`.
+
+---
+
 ## v1.17.1 — 2026-05-13 (Spares Engine — stabilization #3: dead Generate buttons)
 
 User reported "Generate Proposal" button (and 8 sibling generators) silently dead on Operating-Engine tabs after v1.17.0 ship.
