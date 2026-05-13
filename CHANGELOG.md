@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v1.18.2 — 2026-05-14 (output card tooltips — 52 metric-box + 8 summary-kpi)
+
+User complaint (verbatim): "Banyak parameter input:output atau variable itu g ada tooltip"
+
+### Added
+- `spares-readiness-calculator.html`: 60 `<span class="tip" tabindex="0" data-tip="...">ⓘ</span>` tooltip spans
+  added to every output metric label across all modules — resolves the long-standing gap where inputs
+  had 189 tooltips but outputs had zero.
+- M1 Criticality (4): RPN, Effective Severity, Fleet Exp. Failures/yr, Alternates Factor
+- M2 Readiness (4): Confirmed Supply, Gap, Date Slack, LT/Horizon ratio
+- M3 Newsvendor Stock (9): Q*, Safety Stock, ROP, Critical Ratio, Fill Rate, Total Cost, Days Cover,
+  Annual Carry $, Expected Stockouts/yr
+- M4 MEIO Optimizer (9): s1*, s2*, Site Fill Rate, Annual Holding Cost, Expected Stockout Cost,
+  Total Annual Cost, Total Inventory Value, Effective Site LT, Iterations to Converge
+- M5 Hub Positioning (6): Central Depot, Regional Hub, At Sites, Fleet Readiness, Hub Delta, Hub Extra $
+- M6 DMSMS/LTB (6): LTB Qty, LTB Total $, Cumulative Carry Cost, EOL Exposure Score,
+  NPV Option A (LTB), NPV Option B (Requalify)
+- M8 Monte-Carlo (6): P(Stockout), P10/P50/P90 Readiness, Exp. Downtime Cost, Worst-Case Cost
+- M10 SC Risk Map (2): SC Risk Score, Band
+- M16 Logistics Cost Sim (6, JS-string-embedded): P10/P50/P90 Lead Time, % On-Time,
+  Expected Expedite $, Expected Downtime $
+- Summary Dashboard (8): Criticality Tier, Readiness %, Rec. Stock Q*, Fleet Readiness,
+  Supplier Risk, EOL Exposure, Sourcing Quad., P(Stockout)
+- Each tooltip includes: what the metric represents, unit + typical range, interpretation guidance
+  (higher/lower = better/worse), and formula citation (Newsvendor, FMECA, Poisson-CDF, MEIO, DMSMS, MC).
+
+### Changed
+- `js/rz-version.js`: bumped to `1.18.2`, date `2026-05-14`
+- `sw.js`: CACHE_NAME synced to `rz-cache-v1.18.2` via `sync-sw-version.py`
+
+### Verification
+- `audit-script-tags.py --strict`: CLEAN (149 files, 0 unescaped tags)
+- `probe-spares-deep.mjs`: 0 console errors, 0 issues, all 21 calc functions OK
+- Total `.tip` spans in file after: 252 (per probe)
+
+---
+
 ## v1.18.0 — 2026-05-14 (3-tier feature flags + per-page admin matrix + post-drafts catch-up + indexing freshness)
 
 User mandates this turn (verbatim per `feedback_log_every_user_comment.md`):

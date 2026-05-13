@@ -1213,42 +1213,42 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     <div class="summary-strip-title"><i class="fas fa-gauge-high"></i> One-Glance Dashboard — click any card to jump to module</div>
     <div class="summary-kpi-grid-8">
       <div class="summary-kpi" onclick="switchTab('criticality')" title="Jump to Criticality module" role="button" aria-label="Go to Criticality tab">
-        <div class="summary-kpi-label">Criticality Tier</div>
+        <div class="summary-kpi-label">Criticality Tier <span class="tip" tabindex="0" data-tip="FMECA criticality tier for this part. VITAL = stockout causes immediate downtime. ESSENTIAL = impacts mission. DESIRABLE = nice-to-have. Drives stock policy and supplier priority. See M1 Criticality." aria-label="Criticality Tier tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_tier">—</div>
         <div class="summary-kpi-module">M1 · FMECA</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('readiness')" title="Jump to Readiness module" role="button" aria-label="Go to Readiness tab">
-        <div class="summary-kpi-label">Readiness %</div>
+        <div class="summary-kpi-label">Readiness % <span class="tip" tabindex="0" data-tip="Supply readiness percentage for the planning horizon. 100% = all demand covered by confirmed supply. Below 80% = significant gap requiring immediate procurement action. See M2 Readiness." aria-label="Readiness % tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_readiness">—</div>
         <div class="summary-kpi-module">M2 · Gauge</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('stock')" title="Jump to Optimal Stock module" role="button" aria-label="Go to Optimal Stock tab">
-        <div class="summary-kpi-label">Rec. Stock Q*</div>
+        <div class="summary-kpi-label">Rec. Stock Q* <span class="tip" tabindex="0" data-tip="Recommended stocking level from the Newsvendor critical-fractile model. Unit: units. This is the Q* that minimises total cost of over- and under-stocking. See M3 Optimal Stock." aria-label="Recommended Stock Q* tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_qstar">—</div>
         <div class="summary-kpi-module">M3 · Newsvendor</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('hub')" title="Jump to Hub Positioning module" role="button" aria-label="Go to Hub Positioning tab">
-        <div class="summary-kpi-label">Fleet Readiness</div>
+        <div class="summary-kpi-label">Fleet Readiness <span class="tip" tabindex="0" data-tip="Percentage of fleet assets serviceable within MTTR given current hub stock allocation. Target above 95% for critical DC parts. Driven by hub and site stock levels. See M4 Hub/MEIO." aria-label="Fleet Readiness tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_hub_read">—</div>
         <div class="summary-kpi-module">M4 · MEIO/Hub</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('supplier')" title="Jump to Supplier Risk module" role="button" aria-label="Go to Supplier Risk tab">
-        <div class="summary-kpi-label">Supplier Risk</div>
+        <div class="summary-kpi-label">Supplier Risk <span class="tip" tabindex="0" data-tip="Composite supplier risk rating (Low/Medium/High/Critical). Derived from OTIF%, financial stability, single-source exposure, and CA closure rate. Drives strategic sourcing action. See M5 Supplier Risk." aria-label="Supplier Risk tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_supplier">—</div>
         <div class="summary-kpi-module">M5 · Composite</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('ltb')" title="Jump to Last-Time-Buy module" role="button" aria-label="Go to Last-Time-Buy tab">
-        <div class="summary-kpi-label">EOL Exposure</div>
+        <div class="summary-kpi-label">EOL Exposure <span class="tip" tabindex="0" data-tip="End-of-Life exposure band (Low/Medium/High/Critical) based on DMSMS score. Reflects criticality, years to EOL, and alternate availability. Critical band means LTB or requalification required urgently. See M6 DMSMS." aria-label="EOL Exposure tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_ltb">—</div>
         <div class="summary-kpi-module">M6 · DMSMS</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('kraljic')" title="Jump to Kraljic module" role="button" aria-label="Go to Kraljic tab">
-        <div class="summary-kpi-label">Sourcing Quad.</div>
+        <div class="summary-kpi-label">Sourcing Quad. <span class="tip" tabindex="0" data-tip="Kraljic sourcing quadrant: Strategic / Leverage / Bottleneck / Non-critical. Determined by supply risk vs. spend impact. Strategic = partnership; Bottleneck = secure supply; Leverage = competitive bidding. See M7 Kraljic." aria-label="Sourcing Quadrant tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_kraljic">—</div>
         <div class="summary-kpi-module">M7 · Kraljic</div>
       </div>
       <div class="summary-kpi" onclick="switchTab('montecarlo')" title="Jump to Monte-Carlo module" role="button" aria-label="Go to Monte-Carlo tab">
-        <div class="summary-kpi-label">P(Stockout)</div>
+        <div class="summary-kpi-label">P(Stockout) <span class="tip" tabindex="0" data-tip="Monte-Carlo simulated probability of stockout during the planning horizon. Unit: %. Target below 5% for VITAL parts. Run the M8 Monte-Carlo simulation to populate this value." aria-label="P(Stockout) tooltip">ⓘ</span></div>
         <div class="summary-kpi-value" id="sum_pstockout">Run →</div>
         <div class="summary-kpi-module">M8 · Monte-Carlo</div>
       </div>
@@ -1451,10 +1451,10 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
               <span class="status-badge" id="c1_decision_badge">—</span>
             </div>
             <div class="metric-grid-2" style="margin-top:0.85rem;">
-              <div class="metric-box"><div class="metric-label">Risk Priority Number</div><div class="metric-value" id="c1_rpn">—</div></div>
-              <div class="metric-box"><div class="metric-label">Effective Severity</div><div class="metric-value" id="c1_eff_sev">—</div></div>
-              <div class="metric-box"><div class="metric-label">Fleet Exp. Failures/yr</div><div class="metric-value" id="c1_fleet_fail">—</div></div>
-              <div class="metric-box"><div class="metric-label">Alternates Factor</div><div class="metric-value" id="c1_alt_factor">—</div></div>
+              <div class="metric-box"><div class="metric-label">Risk Priority Number <span class="tip" tabindex="0" data-tip="FMECA composite score. RPN = S_eff x Detectability x (lambda x 10), capped at 1000. Range 1-1000. Above 100 flags VITAL stocking decision. Higher = higher risk priority. See methodology: FMEA RPN." aria-label="Risk Priority Number tooltip">ⓘ</span></div><div class="metric-value" id="c1_rpn">—</div></div>
+              <div class="metric-box"><div class="metric-label">Effective Severity <span class="tip" tabindex="0" data-tip="Raw severity score reduced by redundancy buffer. Scale 1-10. S_eff = max(1, S - redundancy_adj). Lower redundancy = S_eff approaches raw severity. Drives RPN and criticality tier. See methodology: FMECA Cm formula." aria-label="Effective Severity tooltip">ⓘ</span></div><div class="metric-value" id="c1_eff_sev">—</div></div>
+              <div class="metric-box"><div class="metric-label">Fleet Exp. Failures/yr <span class="tip" tabindex="0" data-tip="Expected annual failures across the installed base. Formula: lambda x N (fleet size). Unit: failures/yr. Range typically 0.01-10. Higher = more demand pressure on stock. See methodology: FMECA Cm." aria-label="Fleet Expected Failures per year tooltip">ⓘ</span></div><div class="metric-value" id="c1_fleet_fail">—</div></div>
+              <div class="metric-box"><div class="metric-label">Alternates Factor <span class="tip" tabindex="0" data-tip="Penalty multiplier when qualified alternates are scarce. Factor = 1 / max(1, num_alternates). Range 0.25-1.0; 1.0 = single-source. Applied to criticality score. Fewer alternates = higher exposure. See methodology: FMECA." aria-label="Alternates Factor tooltip">ⓘ</span></div><div class="metric-value" id="c1_alt_factor">—</div></div>
             </div>
             <div class="chart-wrap-sm"><canvas id="chart_criticality"></canvas></div>
           </div>
@@ -1567,10 +1567,10 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
             </div>
             <div class="chart-wrap-sm"><canvas id="chart_readiness"></canvas></div>
             <div class="metric-grid-2" style="margin-top:0.85rem;">
-              <div class="metric-box"><div class="metric-label">Confirmed Supply</div><div class="metric-value" id="r_confirmed">—</div></div>
-              <div class="metric-box"><div class="metric-label">Gap</div><div class="metric-value" id="r_gap">—</div></div>
-              <div class="metric-box"><div class="metric-label">Date Slack (days)</div><div class="metric-value" id="r_slack_days">—</div></div>
-              <div class="metric-box"><div class="metric-label">LT / Horizon</div><div class="metric-value" id="r_lt_ratio">—</div></div>
+              <div class="metric-box"><div class="metric-label">Confirmed Supply <span class="tip" tabindex="0" data-tip="Units reliably available within the planning horizon (on-hand + confirmed POs due before need date). Unit: units. Must meet or exceed demand. If below demand, Gap > 0 triggers a readiness flag. See methodology: Readiness gauge." aria-label="Confirmed Supply tooltip">ⓘ</span></div><div class="metric-value" id="r_confirmed">—</div></div>
+              <div class="metric-box"><div class="metric-label">Gap <span class="tip" tabindex="0" data-tip="Shortfall between demand and confirmed supply. Gap = max(0, demand - confirmed_supply). Unit: units. Gap > 0 = stock action required immediately. Gap = 0 = no shortfall in current horizon. See methodology: Readiness gauge." aria-label="Readiness Gap tooltip">ⓘ</span></div><div class="metric-value" id="r_gap">—</div></div>
+              <div class="metric-box"><div class="metric-label">Date Slack (days) <span class="tip" tabindex="0" data-tip="Buffer in calendar days between today and the latest safe-order date. Positive = still time to order. Zero or negative = order now or accept stockout risk. Slack = need_date - (today + lead_time). See methodology: Readiness gauge." aria-label="Date Slack tooltip">ⓘ</span></div><div class="metric-value" id="r_slack_days">—</div></div>
+              <div class="metric-box"><div class="metric-label">LT / Horizon <span class="tip" tabindex="0" data-tip="Ratio of supplier lead time to planning horizon. Range 0-1+. Ratio above 0.8 means lead time consumes most of the planning window, leaving no room for delays. Ratio above 1.0 = stockout risk even if ordered today. See methodology: Readiness." aria-label="Lead Time to Horizon ratio tooltip">ⓘ</span></div><div class="metric-value" id="r_lt_ratio">—</div></div>
             </div>
           </div>
           <div class="result-card" style="margin-top:1rem;">
@@ -1677,15 +1677,15 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div class="result-card">
             <div class="result-title">Optimal Stock Recommendation</div>
             <div class="metric-grid-2">
-              <div class="metric-box"><div class="metric-label">Newsvendor Q*</div><div class="metric-value" id="s_qstar">—</div></div>
-              <div class="metric-box"><div class="metric-label">Safety Stock SS</div><div class="metric-value" id="s_ss">—</div></div>
-              <div class="metric-box"><div class="metric-label">Reorder Point ROP</div><div class="metric-value" id="s_rop">—</div></div>
-              <div class="metric-box"><div class="metric-label">Critical Ratio CR</div><div class="metric-value" id="s_cr">—</div></div>
-              <div class="metric-box"><div class="metric-label">Fill Rate Achieved</div><div class="metric-value" id="s_fill_achieved">—</div></div>
-              <div class="metric-box"><div class="metric-label">Total Annual Cost</div><div class="metric-value" id="s_total_cost">—</div></div>
-              <div class="metric-box"><div class="metric-label">Days of Cover at Q*</div><div class="metric-value" id="s_days_cover">—</div></div>
-              <div class="metric-box"><div class="metric-label">Annual Carrying $ at Q*</div><div class="metric-value" id="s_annual_carry">—</div></div>
-              <div class="metric-box"><div class="metric-label">Expected Stockouts/yr</div><div class="metric-value" id="s_exp_stockouts">—</div></div>
+              <div class="metric-box"><div class="metric-label">Newsvendor Q* <span class="tip" tabindex="0" data-tip="Optimal order quantity from the Newsvendor critical-fractile model. Q* = F_inv(CR) over Poisson demand. Unit: units. Higher Cu or lower Co shifts Q* upward. This is the recommended stocking level to minimise total cost. See methodology: Newsvendor critical fractile." aria-label="Newsvendor Q* tooltip">ⓘ</span></div><div class="metric-value" id="s_qstar">—</div></div>
+              <div class="metric-box"><div class="metric-label">Safety Stock SS <span class="tip" tabindex="0" data-tip="Buffer stock above average demand to absorb demand and lead-time variability. SS = z x sigma_demand. Unit: units. Typical range 0-5 for low-demand spare parts. Higher service-level z increases SS. See methodology: SS formula." aria-label="Safety Stock tooltip">ⓘ</span></div><div class="metric-value" id="s_ss">—</div></div>
+              <div class="metric-box"><div class="metric-label">Reorder Point ROP <span class="tip" tabindex="0" data-tip="Stock level at which a replenishment order should be triggered. ROP = (lambda x lead_time_yr x 365) + SS. Unit: units. Falling below ROP without ordering risks stockout before resupply. See methodology: ROP formula." aria-label="Reorder Point tooltip">ⓘ</span></div><div class="metric-value" id="s_rop">—</div></div>
+              <div class="metric-box"><div class="metric-label">Critical Ratio CR <span class="tip" tabindex="0" data-tip="Newsvendor critical fractile. CR = Cu / (Cu + Co). Range 0-1. High CR (near 1) favours over-stocking to avoid costly stockouts. Drives Q* selection. CR above 0.9 typically means VITAL classification. See methodology: critical ratio." aria-label="Critical Ratio tooltip">ⓘ</span></div><div class="metric-value" id="s_cr">—</div></div>
+              <div class="metric-box"><div class="metric-label">Fill Rate Achieved <span class="tip" tabindex="0" data-tip="Fraction of demand events fulfilled immediately from stock at Q* level. Unit: %. Typical target 90-99% for VITAL parts. Computed via Poisson-CDF at Q*. Higher Q* improves fill rate but increases carrying cost. See methodology: Poisson-CDF." aria-label="Fill Rate Achieved tooltip">ⓘ</span></div><div class="metric-value" id="s_fill_achieved">—</div></div>
+              <div class="metric-box"><div class="metric-label">Total Annual Cost <span class="tip" tabindex="0" data-tip="Sum of annual carrying cost and expected stockout cost at Q*. Unit: $. Minimised at Q* by the Newsvendor model. Lower is better, but reducing Q* increases expected stockout cost. Tracks trade-off between over- and under-stocking. See methodology: total cost formula." aria-label="Total Annual Cost tooltip">ⓘ</span></div><div class="metric-value" id="s_total_cost">—</div></div>
+              <div class="metric-box"><div class="metric-label">Days of Cover at Q* <span class="tip" tabindex="0" data-tip="How many days Q* units cover at the current failure rate. Days = (Q* / lambda) x 365. Unit: days. Typical range 180-730 days for slow-moving spares. Lower than lead time means stockout risk before resupply." aria-label="Days of Cover tooltip">ⓘ</span></div><div class="metric-value" id="s_days_cover">—</div></div>
+              <div class="metric-box"><div class="metric-label">Annual Carrying $ at Q* <span class="tip" tabindex="0" data-tip="Annual cost to hold Q* units in inventory. Carry$ = Q* x unit_cost x carry_rate. Unit: $. Typical carry rate 18-25% of unit cost per year (capital, storage, insurance, obsolescence). Lower Q* reduces this but raises stockout exposure." aria-label="Annual Carrying Cost tooltip">ⓘ</span></div><div class="metric-value" id="s_annual_carry">—</div></div>
+              <div class="metric-box"><div class="metric-label">Expected Stockouts/yr <span class="tip" tabindex="0" data-tip="Mean number of demand events per year not met from stock at Q*. Unit: events/yr. Computed via Poisson loss function. Target less than 0.1 for VITAL parts. Above 0.5 indicates Q* is too low for the current demand rate." aria-label="Expected Stockouts per year tooltip">ⓘ</span></div><div class="metric-value" id="s_exp_stockouts">—</div></div>
             </div>
           </div>
           <div class="result-card" style="margin-top:0.85rem;" id="s_poisson_panel">
@@ -1788,15 +1788,15 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div class="result-card">
             <div class="result-title">MEIO Optimal Allocation</div>
             <div class="metric-grid-2">
-              <div class="metric-box"><div class="metric-label">Regional Stock s&#8321;*</div><div class="metric-value" id="meio_s1_star">—</div></div>
-              <div class="metric-box"><div class="metric-label">Site Stock s&#8322;*</div><div class="metric-value" id="meio_s2_star">—</div></div>
-              <div class="metric-box"><div class="metric-label">Site Fill Rate</div><div class="metric-value" id="meio_fill_achieved">—</div></div>
-              <div class="metric-box"><div class="metric-label">Annual Holding Cost</div><div class="metric-value" id="meio_annual_hold">—</div></div>
-              <div class="metric-box"><div class="metric-label">Expected Stockout Cost</div><div class="metric-value" id="meio_annual_stockout">—</div></div>
-              <div class="metric-box"><div class="metric-label">Total Annual Cost</div><div class="metric-value" id="meio_total_cost">—</div></div>
-              <div class="metric-box"><div class="metric-label">Total Inventory Value</div><div class="metric-value" id="meio_inventory_value">—</div></div>
-              <div class="metric-box"><div class="metric-label">Effective Site LT (days)</div><div class="metric-value" id="meio_lt_eff">—</div></div>
-              <div class="metric-box"><div class="metric-label">Iterations to Converge</div><div class="metric-value" id="meio_iterations">—</div></div>
+              <div class="metric-box"><div class="metric-label">Regional Stock s&#8321;* <span class="tip" tabindex="0" data-tip="Optimal echelon-1 stock at the regional hub. Computed by MEIO iterative optimisation to minimise total network cost while achieving target fill rate across all sites. Unit: units. Lower s1* indicates sites carry more locally. See methodology: MEIO two-echelon." aria-label="Regional Stock s1 star tooltip">ⓘ</span></div><div class="metric-value" id="meio_s1_star">—</div></div>
+              <div class="metric-box"><div class="metric-label">Site Stock s&#8322;* <span class="tip" tabindex="0" data-tip="Optimal echelon-2 stock held at each individual site. Derived from MEIO to balance local fill rate vs. hub response time. Unit: units per site. Higher s2* means sites are more self-sufficient; lower relies more on hub replenishment. See methodology: MEIO." aria-label="Site Stock s2 star tooltip">ⓘ</span></div><div class="metric-value" id="meio_s2_star">—</div></div>
+              <div class="metric-box"><div class="metric-label">Site Fill Rate <span class="tip" tabindex="0" data-tip="Fraction of site-level demand events met immediately from site stock (s2*) or within hub replenishment time. Unit: %. Target typically 90-99% for critical DC parts. Computed via Poisson-CDF at s2*. See methodology: Poisson-CDF site fill." aria-label="Site Fill Rate tooltip">ⓘ</span></div><div class="metric-value" id="meio_fill_achieved">—</div></div>
+              <div class="metric-box"><div class="metric-label">Annual Holding Cost <span class="tip" tabindex="0" data-tip="Total network holding cost per year for s1* + (s2* x num_sites) units. Hold$ = total_units x unit_cost x carry_rate. Unit: $. Increasing fill-rate target raises this. Optimiser minimises this subject to fill constraint. See methodology: MEIO cost." aria-label="Annual Holding Cost tooltip">ⓘ</span></div><div class="metric-value" id="meio_annual_hold">—</div></div>
+              <div class="metric-box"><div class="metric-label">Expected Stockout Cost <span class="tip" tabindex="0" data-tip="Annual expected cost of demand events not met from network stock. Stockout$ = expected_events x under_stock_cost. Unit: $. Decreases as s1* and s2* increase. Total cost = holding + stockout cost; MEIO finds the minimum. See methodology: MEIO cost." aria-label="Expected Stockout Cost tooltip">ⓘ</span></div><div class="metric-value" id="meio_annual_stockout">—</div></div>
+              <div class="metric-box"><div class="metric-label">Total Annual Cost <span class="tip" tabindex="0" data-tip="Sum of network-wide annual holding cost and expected stockout cost at optimal (s1*, s2*). Unit: $. This is the objective function minimised by the MEIO solver. Lower than single-echelon holding because hub stock is pooled. See methodology: MEIO total cost." aria-label="MEIO Total Annual Cost tooltip">ⓘ</span></div><div class="metric-value" id="meio_total_cost">—</div></div>
+              <div class="metric-box"><div class="metric-label">Total Inventory Value <span class="tip" tabindex="0" data-tip="Dollar value of all units held across the network at optimal stocking levels. Value = (s1* + s2* x sites) x unit_cost. Unit: $. Benchmarks capital committed to this part network-wide. Lower unit_cost parts with high criticality still need this tracked. See methodology: MEIO." aria-label="Total Inventory Value tooltip">ⓘ</span></div><div class="metric-value" id="meio_inventory_value">—</div></div>
+              <div class="metric-box"><div class="metric-label">Effective Site LT (days) <span class="tip" tabindex="0" data-tip="Combined lead time a site experiences: local replenishment from hub plus hub replenishment from depot. Eff_LT = site_to_hub_lt + hub_to_depot_lt when hub is out. Unit: days. Longer effective LT increases s2* requirement. See methodology: MEIO echelon LT." aria-label="Effective Site Lead Time tooltip">ⓘ</span></div><div class="metric-value" id="meio_lt_eff">—</div></div>
+              <div class="metric-box"><div class="metric-label">Iterations to Converge <span class="tip" tabindex="0" data-tip="Number of solver iterations before MEIO cost function converged. Range typically 3-30. High counts (above 50) indicate a complex demand or cost surface. Informational only — does not affect the result quality. See methodology: MEIO solver." aria-label="MEIO Iterations tooltip">ⓘ</span></div><div class="metric-value" id="meio_iterations">—</div></div>
             </div>
           </div>
           <div class="result-card" style="margin-top:0.85rem;">
@@ -1887,14 +1887,14 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div class="result-card">
             <div class="result-title">Hub Positioning Recommendation</div>
             <div class="metric-grid-3">
-              <div class="metric-box"><div class="metric-label">Central Depot</div><div class="metric-value" id="h_depot">—</div></div>
-              <div class="metric-box"><div class="metric-label">Regional Hub</div><div class="metric-value" id="h_hub">—</div></div>
-              <div class="metric-box"><div class="metric-label">At Sites</div><div class="metric-value" id="h_sites_stock">—</div></div>
+              <div class="metric-box"><div class="metric-label">Central Depot <span class="tip" tabindex="0" data-tip="Recommended units to hold at the central depot (echelon 1). Acts as buffer and emergency backstop for all regional hubs. Unit: units. Lower depot stock is safe only when regional hubs are well-stocked. See methodology: MEIO Hub positioning." aria-label="Central Depot stock tooltip">ⓘ</span></div><div class="metric-value" id="h_depot">—</div></div>
+              <div class="metric-box"><div class="metric-label">Regional Hub <span class="tip" tabindex="0" data-tip="Recommended units at the regional hub (echelon 2). Pooled across sites served by this hub to reduce total inventory vs. holding independently at each site. Unit: units. Drives response time to site failures. See methodology: MEIO Hub positioning." aria-label="Regional Hub stock tooltip">ⓘ</span></div><div class="metric-value" id="h_hub">—</div></div>
+              <div class="metric-box"><div class="metric-label">At Sites <span class="tip" tabindex="0" data-tip="Recommended units held locally at each site (echelon 3). Site stock enables immediate response without waiting for hub. Unit: units per site. Higher criticality or longer hub-to-site transit warrants more site stock. See methodology: MEIO Hub." aria-label="At Sites stock tooltip">ⓘ</span></div><div class="metric-value" id="h_sites_stock">—</div></div>
             </div>
             <div class="metric-grid-3" style="margin-top:0.6rem;">
-              <div class="metric-box"><div class="metric-label">Fleet Readiness</div><div class="metric-value" id="h_fleet_read">—</div></div>
-              <div class="metric-box"><div class="metric-label">Hub Delta</div><div class="metric-value" id="h_hub_delta">—</div></div>
-              <div class="metric-box"><div class="metric-label">Hub Extra $</div><div class="metric-value" id="h_hub_cost">—</div></div>
+              <div class="metric-box"><div class="metric-label">Fleet Readiness <span class="tip" tabindex="0" data-tip="Percentage of fleet assets that could be returned to service within MTTR given current hub stock allocation. Unit: %. Target above 95% for VITAL parts. Low fleet readiness triggers hub rebalancing recommendation. See methodology: Hub readiness calc." aria-label="Fleet Readiness tooltip">ⓘ</span></div><div class="metric-value" id="h_fleet_read">—</div></div>
+              <div class="metric-box"><div class="metric-label">Hub Delta <span class="tip" tabindex="0" data-tip="Difference in fleet readiness between hub strategy and no-hub (all-site-stock) baseline. Unit: percentage points. Positive delta = hub adds readiness. Negative delta is rare and indicates hub transit time exceeds benefit. See methodology: Hub delta." aria-label="Hub Delta tooltip">ⓘ</span></div><div class="metric-value" id="h_hub_delta">—</div></div>
+              <div class="metric-box"><div class="metric-label">Hub Extra $ <span class="tip" tabindex="0" data-tip="Additional annual cost of operating the hub strategy vs. storing all stock at sites. Includes hub holding cost minus site holding cost savings from pooling. Unit: $. Positive = hub costs more but improves readiness. Compare to downtime cost saved." aria-label="Hub Extra Cost tooltip">ⓘ</span></div><div class="metric-value" id="h_hub_cost">—</div></div>
             </div>
             <div class="chart-wrap"><canvas id="chart_hub"></canvas></div>
           </div>
@@ -2106,10 +2106,10 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div class="result-card">
             <div class="result-title">LTB Recommendation</div>
             <div class="metric-grid-2">
-              <div class="metric-box"><div class="metric-label">LTB Qty (units)</div><div class="metric-value" id="ltb_qty">—</div></div>
-              <div class="metric-box"><div class="metric-label">LTB Total $</div><div class="metric-value" id="ltb_total">—</div></div>
-              <div class="metric-box"><div class="metric-label">Cumulative Carry Cost</div><div class="metric-value" id="ltb_carry">—</div></div>
-              <div class="metric-box"><div class="metric-label">EOL Exposure Score</div><div class="metric-value" id="ltb_eol_score">—</div></div>
+              <div class="metric-box"><div class="metric-label">LTB Qty (units) <span class="tip" tabindex="0" data-tip="Recommended Last-Time-Buy quantity. Formula: lambda x remaining_service_yrs + safety_buffer, rounded up. Unit: units. Undershooting forces costly emergency sourcing; overshooting increases carry cost and obsolescence risk. See methodology: DMSMS LTB sizing." aria-label="LTB Quantity tooltip">ⓘ</span></div><div class="metric-value" id="ltb_qty">—</div></div>
+              <div class="metric-box"><div class="metric-label">LTB Total $ <span class="tip" tabindex="0" data-tip="Total upfront procurement cost for the recommended LTB quantity. LTB$ = ltb_qty x unit_cost. Unit: $. This is the capital committed at time of LTB. Compare to NPV Option A to assess net benefit vs. carrying risk. See methodology: DMSMS cost." aria-label="LTB Total Cost tooltip">ⓘ</span></div><div class="metric-value" id="ltb_total">—</div></div>
+              <div class="metric-box"><div class="metric-label">Cumulative Carry Cost <span class="tip" tabindex="0" data-tip="Total holding cost accumulated over the remaining service life for the LTB quantity. Carry = ltb_total x carry_rate x avg_hold_yrs. Unit: $. Major LTB cost driver alongside obsolescence risk. Included in NPV Option A calculation. See methodology: DMSMS NPV." aria-label="Cumulative Carrying Cost tooltip">ⓘ</span></div><div class="metric-value" id="ltb_carry">—</div></div>
+              <div class="metric-box"><div class="metric-label">EOL Exposure Score <span class="tip" tabindex="0" data-tip="Composite DMSMS exposure index. Score = criticality x years_to_eol x (1 / max(1, alternates)). Range 0-100. Above 50 = high urgency to act. Drives the EOL band (Low/Medium/High/Critical). See methodology: DMSMS exposure score." aria-label="EOL Exposure Score tooltip">ⓘ</span></div><div class="metric-value" id="ltb_eol_score">—</div></div>
             </div>
             <div style="margin-top:0.85rem;display:flex;gap:10px;flex-wrap:wrap;">
               <span class="status-badge" id="ltb_decision_badge">—</span>
@@ -2119,8 +2119,8 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div class="result-card" style="margin-top:0.85rem;">
             <div class="card-title"><i class="fas fa-chart-bar"></i> NPV: Option A (LTB Stock) vs Option B (Requalify)</div>
             <div class="metric-grid-2">
-              <div class="metric-box"><div class="metric-label">NPV Option A (LTB)</div><div class="metric-value" id="ltb_npv_a">—</div></div>
-              <div class="metric-box"><div class="metric-label">NPV Option B (Requalify)</div><div class="metric-value" id="ltb_npv_b">—</div></div>
+              <div class="metric-box"><div class="metric-label">NPV Option A (LTB) <span class="tip" tabindex="0" data-tip="Net present value of the Last-Time-Buy strategy: upfront LTB cost + cumulative carry cost + residual, discounted to today. Unit: $ (negative = net outflow). Lower (less negative) vs Option B = LTB is the better financial choice. See methodology: DMSMS NPV comparison." aria-label="NPV Option A LTB tooltip">ⓘ</span></div><div class="metric-value" id="ltb_npv_a">—</div></div>
+              <div class="metric-box"><div class="metric-label">NPV Option B (Requalify) <span class="tip" tabindex="0" data-tip="NPV of requalifying an alternate supplier or part: requalification cost + ongoing procurement cost over service life, discounted. Unit: $. If NPV B is lower (less negative) than NPV A, requalification is financially preferable. See methodology: DMSMS NPV." aria-label="NPV Option B Requalify tooltip">ⓘ</span></div><div class="metric-value" id="ltb_npv_b">—</div></div>
             </div>
             <div class="chart-wrap-sm"><canvas id="chart_ltb"></canvas></div>
           </div>
@@ -2303,12 +2303,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div class="result-card">
             <div class="result-title">Monte-Carlo Results</div>
             <div class="metric-grid-2" id="mc_results_grid">
-              <div class="metric-box"><div class="metric-label">P(Stockout)</div><div class="metric-value" id="mc_pstockout">—</div></div>
-              <div class="metric-box"><div class="metric-label">P10 Readiness</div><div class="metric-value" id="mc_p10">—</div></div>
-              <div class="metric-box"><div class="metric-label">P50 Readiness</div><div class="metric-value" id="mc_p50">—</div></div>
-              <div class="metric-box"><div class="metric-label">P90 Readiness</div><div class="metric-value" id="mc_p90">—</div></div>
-              <div class="metric-box"><div class="metric-label">Exp. Downtime Cost</div><div class="metric-value" id="mc_exp_down">—</div></div>
-              <div class="metric-box"><div class="metric-label">Worst-Case Cost</div><div class="metric-value" id="mc_worst">—</div></div>
+              <div class="metric-box"><div class="metric-label">P(Stockout) <span class="tip" tabindex="0" data-tip="Simulated probability that demand exceeds stock during the planning horizon across 10,000 Monte-Carlo trials. Unit: %. Target below 5% for VITAL parts. Accounts for demand variability, lead-time jitter, and supplier reliability uncertainty. See methodology: MC simulation." aria-label="Probability of Stockout tooltip">ⓘ</span></div><div class="metric-value" id="mc_pstockout">—</div></div>
+              <div class="metric-box"><div class="metric-label">P10 Readiness <span class="tip" tabindex="0" data-tip="10th-percentile readiness score across all MC trials. Unit: %. The pessimistic scenario — 90% of simulations perform better than this. Low P10 (below 70%) indicates high tail risk even with adequate average stock. See methodology: MC percentile output." aria-label="P10 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p10">—</div></div>
+              <div class="metric-box"><div class="metric-label">P50 Readiness <span class="tip" tabindex="0" data-tip="Median readiness score across all MC trials. Unit: %. This is the most-likely outcome. Should exceed 90% for VITAL parts. Compare P50 vs P10 to gauge volatility. See methodology: MC percentile output." aria-label="P50 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p50">—</div></div>
+              <div class="metric-box"><div class="metric-label">P90 Readiness <span class="tip" tabindex="0" data-tip="90th-percentile readiness score across all MC trials. Unit: %. The optimistic scenario — only 10% of simulations beat this. Wide gap between P10 and P90 indicates high uncertainty. Target P90 above 98% for VITAL parts. See methodology: MC percentile." aria-label="P90 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p90">—</div></div>
+              <div class="metric-box"><div class="metric-label">Exp. Downtime Cost <span class="tip" tabindex="0" data-tip="Expected annual downtime cost averaged across all MC trials. ExpDT = mean(stockout_events x downtime_cost_per_hr x MTTR). Unit: $. Key input for ROI of increasing stock level. Multiply by years to assess NPV of stocking investment. See methodology: MC cost." aria-label="Expected Downtime Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_exp_down">—</div></div>
+              <div class="metric-box"><div class="metric-label">Worst-Case Cost <span class="tip" tabindex="0" data-tip="95th-percentile downtime cost across all MC trials. Unit: $. Represents a plausible bad year rather than the absolute extreme. Use for risk reserve or insurance sizing. Significantly higher than Exp. Cost indicates fat-tail demand risk. See methodology: MC P95 cost." aria-label="Worst Case Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_worst">—</div></div>
             </div>
           </div>
           <div class="result-card" style="margin-top:0.85rem;">
@@ -3889,11 +3889,11 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           <div id="scrisk_output_text">
             <div class="metric-grid-2" style="margin-bottom:0.75rem;">
               <div class="metric-box">
-                <div class="metric-label">SC Risk Score</div>
+                <div class="metric-label">SC Risk Score <span class="tip" tabindex="0" data-tip="Composite supply-chain risk score (0-100). Weighted sum across 6 dimensions: geopolitical, supplier concentration, lead-time volatility, quality, financial stability, and single-source exposure. Above 70 = High risk; above 85 = Critical. See methodology: SC risk composite." aria-label="SC Risk Score tooltip">ⓘ</span></div>
                 <div class="metric-value" id="scrisk_score" style="font-size:1.8rem;">—</div>
               </div>
               <div class="metric-box">
-                <div class="metric-label">Band</div>
+                <div class="metric-label">Band <span class="tip" tabindex="0" data-tip="Risk classification derived from SC Risk Score. Low (0-40) = routine monitoring. Medium (41-70) = dual-source and buffer stock review. High (71-85) = immediate mitigation plan. Critical (86-100) = escalate to procurement leadership. See methodology: risk banding." aria-label="SC Risk Band tooltip">ⓘ</span></div>
                 <div class="metric-value" id="scrisk_band_box">—</div>
               </div>
             </div>
@@ -9616,14 +9616,14 @@ function runSCSim() {
 
   // Output HTML
   var html = '<div class="metric-grid-3" style="margin-bottom:0.75rem;">' +
-    '<div class="metric-box"><div class="metric-label">P10 Lead Time</div><div class="metric-value">'+p10.toFixed(1)+' wk</div></div>' +
-    '<div class="metric-box"><div class="metric-label">P50 Lead Time</div><div class="metric-value">'+p50.toFixed(1)+' wk</div></div>' +
-    '<div class="metric-box"><div class="metric-label">P90 Lead Time</div><div class="metric-value">'+p90.toFixed(1)+' wk</div></div>' +
+    '<div class="metric-box"><div class="metric-label">P10 Lead Time <span class="tip" tabindex="0" data-tip="10th-percentile simulated lead time across disruption scenarios. Unit: weeks. Optimistic bound — 90% of scenarios are slower. Wide P10-P90 spread indicates high lead-time volatility. See methodology: Disruption Sim." aria-label="P10 Lead Time tooltip">ⓘ</span></div><div class="metric-value">'+p10.toFixed(1)+' wk</div></div>' +
+    '<div class="metric-box"><div class="metric-label">P50 Lead Time <span class="tip" tabindex="0" data-tip="Median simulated lead time. Unit: weeks. Most-likely delivery window under current disruption scenario. Use this as baseline for ROP and safety stock calculations. See methodology: Disruption Sim." aria-label="P50 Lead Time tooltip">ⓘ</span></div><div class="metric-value">'+p50.toFixed(1)+' wk</div></div>' +
+    '<div class="metric-box"><div class="metric-label">P90 Lead Time <span class="tip" tabindex="0" data-tip="90th-percentile simulated lead time. Unit: weeks. Pessimistic scenario — only 10% of runs are slower. Use P90 for conservative safety-stock sizing when part is VITAL. See methodology: Disruption Sim." aria-label="P90 Lead Time tooltip">ⓘ</span></div><div class="metric-value">'+p90.toFixed(1)+' wk</div></div>' +
     '</div>' +
     '<div class="metric-grid-3" style="margin-bottom:0.75rem;">' +
-    '<div class="metric-box"><div class="metric-label">% On-Time</div><div class="metric-value '+(parseFloat(onTimePct)>=80?'rag-green':parseFloat(onTimePct)>=50?'rag-yellow':'rag-red')+'">'+onTimePct+'%</div></div>' +
-    '<div class="metric-box"><div class="metric-label">Expected Expedite $</div><div class="metric-value">'+fmtK(expExp)+'</div></div>' +
-    '<div class="metric-box"><div class="metric-label">Expected Downtime $</div><div class="metric-value">'+fmtK(expDt)+'</div></div>' +
+    '<div class="metric-box"><div class="metric-label">% On-Time <span class="tip" tabindex="0" data-tip="Percentage of simulated lanes that deliver within the contracted lead time. Unit: %. Target above 80% (green). 50-80% = amber, below 50% = red. Reflects combined effect of carrier reliability and disruption frequency. See methodology: Disruption Sim." aria-label="On-Time Percent tooltip">ⓘ</span></div><div class="metric-value '+(parseFloat(onTimePct)>=80?'rag-green':parseFloat(onTimePct)>=50?'rag-yellow':'rag-red')+'">'+onTimePct+'%</div></div>' +
+    '<div class="metric-box"><div class="metric-label">Expected Expedite $ <span class="tip" tabindex="0" data-tip="Mean annual expedite cost across simulated scenarios. Unit: $. Incurred when standard lead time is exceeded and air-freight or courier is used. High expedite cost signals a lane or supplier needing structural fix. See methodology: Logistics Cost sim." aria-label="Expected Expedite Cost tooltip">ⓘ</span></div><div class="metric-value">'+fmtK(expExp)+'</div></div>' +
+    '<div class="metric-box"><div class="metric-label">Expected Downtime $ <span class="tip" tabindex="0" data-tip="Mean annual downtime cost when late delivery causes a parts stockout. ExpDT = P(late) x P(stockout|late) x downtime_cost_per_hr x MTTR. Unit: $. Drives the ROI case for improving lane reliability or increasing buffer stock. See methodology: Logistics Cost sim." aria-label="Expected Downtime Cost tooltip">ⓘ</span></div><div class="metric-value">'+fmtK(expDt)+'</div></div>' +
     '</div>';
 
   // Tornado HTML

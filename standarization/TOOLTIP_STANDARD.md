@@ -479,3 +479,39 @@ When this workflow is skipped, terms exist only in scattered article tooltips an
 - `article prompt/ARTICLE_CREATION_PROMPT.md` checklist 9.7 enforces this on new articles.
 - `LEGAL_COMPLIANCE_STANDARD.md` Section 5 covers per-table source disclaimers (separate concern).
 - `CHANGELOG.md` tracks glossary additions per release.
+
+---
+
+## Output Card Tooltip Coverage (v1.18.2, 2026-05-14)
+
+**Rule (added 2026-05-14):** Every calculator output card — `metric-box` and `summary-kpi` — MUST carry
+a `<span class="tip" tabindex="0" data-tip="..." aria-label="...">ⓘ</span>` on its label, exactly as input labels do.
+
+### Pattern
+
+```html
+<div class="metric-box">
+  <div class="metric-label">Metric Name <span class="tip" tabindex="0" data-tip="What it means. Unit + typical range. Higher = ... / Lower = .... Formula: ..." aria-label="Metric Name tooltip">ⓘ</span></div>
+  <div class="metric-value" id="module_metric">—</div>
+</div>
+```
+
+### Tooltip content requirements (per output metric)
+
+1. One sentence describing what the metric represents.
+2. Unit and typical range (e.g., "Unit: %. Range 70-99% for VITAL parts.").
+3. Interpretation guidance ("Higher = higher risk", "Lower = better").
+4. Formula citation (1-2 words, e.g., "See methodology: Newsvendor critical fractile").
+
+### Coverage target
+
+| Page | Inputs with tip | Outputs with tip | Notes |
+|------|----------------|-----------------|-------|
+| `spares-readiness-calculator.html` | 189+ | 60 (v1.18.2) | 52 metric-box + 8 summary-kpi |
+
+### Background
+
+User complaint resolved in v1.18.2: "Banyak parameter input:output atau variable itu g ada tooltip"
+(many input/output parameters lack tooltips). Inputs had 189 tooltips; outputs had zero.
+v1.18.2 closes that gap across all 8 modules (Criticality, Readiness, Stock, MEIO, Hub,
+LTB/DMSMS, Monte-Carlo, SC Risk) plus Summary Dashboard and Logistics Cost Simulator.
