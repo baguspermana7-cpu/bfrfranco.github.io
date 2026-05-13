@@ -18,9 +18,12 @@
     }
 
     var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+    var DEMO_EMAILS = ['demo@resistancezero.com'];
     function detectRole(email) {
         var e = String(email || '').toLowerCase().trim();
-        return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+        if (ROOT_EMAILS.indexOf(e) !== -1) return 'root';
+        if (DEMO_EMAILS.indexOf(e) !== -1) return 'demo';
+        return 'pro';
     }
     function isRootEmail(email) {
         return ROOT_EMAILS.indexOf(String(email || '').toLowerCase().trim()) !== -1;
@@ -558,7 +561,31 @@
             if (dropdown) dropdown.classList.toggle('show');
         },
 
-        getSession: getSession
+        getSession: getSession,
+
+        /**
+         * Resolve the current user's feature tier: 'free' | 'demo' | 'pro'.
+         * Used by rz-feature-flags.js as the canonical tier source.
+         * Pass an explicit session object to check a specific session instead
+         * of reading from localStorage.
+         *
+         * Tier mapping:
+         *   ROOT_EMAILS  → 'pro'   (root accounts have full pro access)
+         *   DEMO_EMAILS  → 'demo'
+         *   any other authenticated session → 'pro'
+         *   no session or expired → 'free'
+         *
+         * @param {object} [session] — optional override; defaults to getSession()
+         * @returns {'free'|'demo'|'pro'}
+         */
+        getTier: function (session) {
+            session = session || getSession();
+            if (!session || !session.email) return 'free';
+            var email = String(session.email).toLowerCase();
+            if (ROOT_EMAILS.indexOf(email) !== -1) return 'pro';
+            if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
+            return 'pro';
+        }
     };
 
     /* Close dropdown on outside click */

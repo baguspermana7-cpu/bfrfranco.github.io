@@ -666,3 +666,84 @@ This means:
 
 *Document maintained by the ResistanceZero development team.*
 *For questions, refer to `C:\Users\User\.claude\projects\C--Users-User\memory\pro-mode-checklist.md`*
+
+---
+
+## 13. v1.18.0 Update — 3-Tier Model + Feature Flag System
+
+> **Introduced**: v1.18.0 (2026-05-14)
+> **Status of prior sections**: Sections 1–12 above describe the **legacy
+> 2-tier model** (free vs. authenticated-pro). They are kept for historical
+> reference and apply to existing article pages (article-1 through article-27)
+> that have not yet been migrated. **Do not use the 2-tier pattern for new
+> work.**
+
+### 13.1 What Changed
+
+The 2-tier system (`isPremiumUser: true/false`) has been superseded by a
+3-tier feature flag model:
+
+| Tier   | Who | Legacy equivalent |
+|--------|-----|------------------|
+| `free` | Unauthenticated | `isPremiumUser = false` |
+| `demo` | `demo@resistancezero.com` | (no equivalent — was treated as pro) |
+| `pro`  | All other authenticated sessions | `isPremiumUser = true` |
+
+The demo tier now maps to an intermediate capability set: more than free,
+but without full pro features (no PDF watermark removal, no 10K Monte Carlo,
+no manual PDF, no MEIO optimizer, no parts-catalog export, etc.).
+
+### 13.2 New Files
+
+- **`js/rz-feature-flags.js`** — canonical schema (`window.RZ_FEATURE_FLAGS`)
+  covering all 14 gated pages + `window._rzFeatures` runtime helper API.
+- **`standarization/FEATURE_FLAGS_STANDARD.md`** — full specification for
+  the flag system (this document points there for all new work).
+
+### 13.3 auth.js Changes
+
+Two additions to `auth.js` as of v1.18.0:
+
+1. `var DEMO_EMAILS = ['demo@resistancezero.com']` — after `ROOT_EMAILS`.
+2. `_rzAuth.getTier(session?)` — public method returning `'free'`,
+   `'demo'`, or `'pro'`. Called automatically by `_rzFeatures.getTier()`.
+3. `detectRole()` updated to return `'demo'` for demo emails (was `'pro'`).
+
+### 13.4 Using the New System
+
+For all NEW features and pages, replace the `isPremiumUser` pattern with the
+feature flag helper. See `FEATURE_FLAGS_STANDARD.md` Section 5 for the full
+migration path.
+
+```js
+// Load (after auth.js in page HTML):
+// <script src="js/rz-feature-flags.js?v=20260514"></script>
+
+// Check a feature:
+if (window._rzFeatures && _rzFeatures.has('pue-calculator', 'pdf-export')) {
+  exportPDF();
+}
+
+// Get current tier:
+var tier = _rzFeatures.getTier(); // 'free' | 'demo' | 'pro'
+```
+
+### 13.5 Deprecation Notice for 2-Tier Pattern
+
+The following patterns from Sections 1–12 are **deprecated for new code**:
+
+| Deprecated | Replacement |
+|------------|-------------|
+| `var isPremiumUser = false` + session check | `_rzFeatures.getTier() !== 'free'` |
+| `if (isPremiumUser) { exportPDF(); }` | `if (_rzFeatures.has(page, 'pdf-export'))` |
+| `session.tier === 'pro'` direct comparison | `_rzFeatures.getTier() === 'pro'` |
+| Inline `JSON.parse(localStorage.getItem('rz_premium_session'))` | `_rzAuth.getSession()` |
+
+Existing article pages (1–27) that use the legacy 2-tier pattern may remain
+as-is until a dedicated migration sprint. Do not mix the two patterns in a
+single page.
+
+### 13.6 Reference
+
+Full specification, worked examples, anti-patterns, and admin console
+integration: **`standarization/FEATURE_FLAGS_STANDARD.md`**.
