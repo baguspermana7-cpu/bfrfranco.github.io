@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v1.18.0 — 2026-05-14 (3-tier feature flags + per-page admin matrix + post-drafts catch-up + indexing freshness)
+
+User mandates this turn (verbatim per `feedback_log_every_user_comment.md`):
+
+1. "agar saya tidak bolak2 balik request... di rz-ops admin. dan jangan hanya 2 free dan pro tapi buat 3. free (tanpa login apapun), demo (login account demo) dan pro root (pakai account bagus@xxx atau admin@xx) jadi saya lebih mudah atur di kondisi tertentu saya bisa disable atau enable per specific feature."
+2. "padahal saya sudah minta ke memory anda jika setelah/sedang membuat suatu apps/calculator atau article atau apapun itu selalu buat folder as per nama nya dan draftkan md file untuk post draft di medium, x, linkedin, mastodon dsbnya seperti yang lain"
+3. "termasuk ini /home/baguspermana7/rz-work/standarization/Indexing gconsole/top-urls-request-indexing.txt ini juga tidak diupdate, cek di standarization folder itu harus selalu diupdate."
+
+### Shipped (4 commits)
+
+- **`18b56ea` Phase A — Feature flag foundation**
+  - NEW `js/rz-feature-flags.js` (315 lines): `window.RZ_FEATURE_FLAGS` schema for 14 page-keys × 6-13 flags each with `{free, demo, pro}` booleans; `window._rzFeatures = { getTier, has, listFeatures, listPages }`
+  - `auth.js` (+27 lines): `DEMO_EMAILS`, `detectRole` returns 3 tiers, `_rzAuth.getTier()` exposed
+  - NEW `standarization/FEATURE_FLAGS_STANDARD.md` (599 lines)
+  - `standarization/PRO_MODE_STANDARDIZATION.md` (+80 lines, section 13)
+
+- **`8e58e2c` Phase B — Admin console refactor**
+  - `rz-ops-p7x3k9m.html` (+218 lines): per-page sub-nav (14 pages), 3-tier toggle columns (FREE | DEMO | PRO), `localStorage.rz_admin_features_by_page`, `rz-features-changed` event, apply-preset dropdown, per-page reset
+
+- **`764cd82` Phase C — Post-draft catch-up**
+  - 30 new MD files across 6 new folders (Spares, PLN Java-Bali family ×5, plus confirmed coverage of TCO/CAPEX/OPEX/PUE/Tier Advisor/TIA-942/RFS)
+
+- **`731a992` Phase H — Indexing freshness**
+  - NEW `tools/build-indexing-list.py`; regenerated `standarization/Indexing gconsole/top-urls-request-indexing.txt` from 37 URLs (Feb 2026) → 102 URLs (May 2026)
+
+### 5 discipline mandates codified to memory this session
+- `feedback_always_document_everything.md`
+- `feedback_log_every_user_comment.md`
+- `feedback_basic_feature_discipline.md` (8-rule pre-commit gate)
+- `feedback_post_draft_mandate.md`
+- `feedback_standarization_freshness.md`
+
+### Brand foundation
+- `documentation/design.md` (2,374 lines, 15 H2 + 8 appendices — anti-AI-design-slop brand system)
+- NEW `~/.claude/agents/uiux-reviewer.md` (impeccable design eye agent)
+
+### Reconciliation follow-up
+Agent A's `RZ_FEATURE_FLAGS` (14 pages) and Agent B's `RZ_FEATURE_FLAGS_FALLBACK` (14 pages) have asymmetric sets. Union of both = 18 pages. Plan v1.18.1: align both schemas to the same 18-page set.
+
+---
+
 ## v1.17.3 — 2026-05-13 (Spares Engine — workflow visibility + Stakeholder strategic refactor)
 
 User context: "tidak perlu ada tailored message draft itu tidak penting, yang penting strategicnya bagaimana bisa come up" + "belum ada alur, flowchart, cards, jadi melihat engine spares-readiness-calculator.html jadi membingungkan alurnya" + "di awal2 kasih high level summary context"
