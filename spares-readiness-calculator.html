@@ -4990,29 +4990,12 @@ function filterFAQ(cat) {
 /* ===========================================
    TAB SWITCHING + KEYBOARD NAVIGATION
    =========================================== */
-var TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','catalog','faq','sc-lane','sc-risk','sc-sim','sc-expedite'];
-
-function switchTab(name) {
-  document.querySelectorAll('.module-pane').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
-  var pane = document.getElementById('pane-' + name);
-  if (pane) pane.classList.add('active');
-  var btn = document.querySelector('[onclick="switchTab(\'' + name + '\')"]');
-  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected','true'); btn.focus(); }
-  // Trigger calc on tab open — wrapped in try/catch so tab switch never throws (Bug 2 fix)
-  var calcs = {
-    criticality: calcCriticality, readiness: calcReadiness, stock: calcStock,
-    hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB, kraljic: calcKraljic,
-    montecarlo: function() { /* Monte-Carlo is user-triggered via Run button; no auto-calc */ },
-    catalog: function() { catInitIfReady(); },
-    faq: function(){ renderFAQ('all'); },
-    'sc-lane': function() { scLaneInitIfReady(); calcLanePlanner(); },
-    'sc-risk': function() { scRiskInitIfReady(); calcSCRisk(); },
-    'sc-sim': function() { scSimInitIfReady(); },
-    'sc-expedite': function() { scExpInitIfReady(); calcExpedite(); }
-  };
-  if (calcs[name]) { try { calcs[name](); } catch(e) { console.warn('[CSE] calc error on tab switch:', name, e); } }
-}
+// v1.16.2: dead 14-item TAB_ORDER and dead switchTab removed; authoritative 26-item
+// versions live below at "UPDATE TAB ORDER + SWITCHtab + RECALCALL".
+// TAB_ORDER is declared there; var hoisting initialises it as undefined here until
+// the assignment executes — that is fine because no code between here and the
+// assignment runs before the IIFE finishes setting up.
+var TAB_ORDER; // placeholder — assigned to full 26-item array further below
 
 // Keyboard navigation: arrow keys between tabs
 document.addEventListener('keydown', function(e) {
@@ -6992,12 +6975,13 @@ function exportSTARPDF() {
 
 /* ===========================================
    UPDATE TAB ORDER + SWITCHtab + RECALCALL
+   v1.16.2: promoted to primary declaration (replaces dead 14-item placeholder above)
    =========================================== */
 TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
 
-// Patch switchTab to include new tabs
-var _origSwitchTab = switchTab;
-switchTab = function(name) {
+// v1.16.2: authoritative switchTab — replaces the dead stub declared above.
+// _origSwitchTab reference removed (was captured but never called in this body).
+function switchTab(name) {
   document.querySelectorAll('.module-pane').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
   var pane = document.getElementById('pane-' + name);
@@ -7021,7 +7005,7 @@ switchTab = function(name) {
   };
   // Bug 2 fix: wrap in try/catch so any calc error never blocks tab navigation
   if (calcs[name]) { try { calcs[name](); } catch(e) { console.warn('[CSE] calc error on tab switch (ops):', name, e); } }
-};
+}
 
 // Patch recalcAll to include scorecard + fleet
 var _origRecalcAll = recalcAll;
@@ -9295,6 +9279,83 @@ function copyEl(id) {
 })();
 
 /* Init: recalc SC tabs when they first become active (catalog might have loaded by then) */
+
+/* ===========================================
+   v1.16.2 STABILIZATION: expose inline-onclick handlers on window
+   All functions below are defined inside this IIFE and were previously
+   unreachable from inline onclick handlers in global scope.
+   =========================================== */
+try {
+  // Tab navigation
+  window.switchTab     = switchTab;
+  // Tour
+  window.tourStart     = (typeof tourStart     !== 'undefined') ? tourStart     : null;
+  window.tourNext      = (typeof tourNext      !== 'undefined') ? tourNext      : null;
+  window.tourEnd       = (typeof tourEnd       !== 'undefined') ? tourEnd       : null;
+  // Theme + nav
+  window.toggleTheme        = toggleTheme;
+  window.toggleMobileMenu   = toggleMobileMenu;
+  window.toggleUserDropdown = toggleUserDropdown;
+  // Scenario management
+  window.saveScenario   = saveScenario;
+  window.loadScenario   = loadScenario;
+  window.shareScenario  = shareScenario;
+  window.resetDefaults  = resetDefaults;
+  window.resetModule    = resetModule;
+  window.recalcAll      = recalcAll;
+  window.safeGen        = safeGen;
+  // Core calculators
+  window.calcCriticality  = calcCriticality;
+  // Export PDF handlers
+  window.exportCriticalityPDF  = exportCriticalityPDF;
+  window.exportReadinessPDF    = exportReadinessPDF;
+  window.exportStockPDF        = exportStockPDF;
+  window.exportLTBPDF          = exportLTBPDF;
+  window.exportFullReportPDF   = exportFullReportPDF;
+  window.exportPDF             = exportFullReportPDF; // alias for probe
+  window.exportOpsPDF          = exportOpsPDF;
+  window.exportScorecardPDF    = exportScorecardPDF;
+  window.exportNegotiationPDF  = exportNegotiationPDF;
+  window.exportContractPDF     = exportContractPDF;
+  window.exportProcessPDF      = exportProcessPDF;
+  window.exportMeetingPrepPDF  = exportMeetingPrepPDF;
+  window.exportMeetingNotesPDF = exportMeetingNotesPDF;
+  window.exportStakeholderPDF  = exportStakeholderPDF;
+  window.exportEOLPDF          = exportEOLPDF;
+  window.exportAmbiguityPDF    = exportAmbiguityPDF;
+  window.exportSTARPDF         = exportSTARPDF;
+  window.exportFleetPDF        = exportFleetPDF;
+  window.exportLanePDF         = exportLanePDF;
+  window.exportRiskMapPDF      = exportRiskMapPDF;
+  window.exportSimPDF          = exportSimPDF;
+  window.exportExpeditePDF     = exportExpeditePDF;
+  // Calc handlers
+  window.calcLanePlanner  = calcLanePlanner;
+  window.calcExpedite     = calcExpedite;
+  window.runMonteCarlo    = runMonteCarlo;
+  window.runSCSim         = runSCSim;
+  window.resetSCRisk      = resetSCRisk;
+  window.resetSCSim       = resetSCSim;
+  // FAQ
+  window.filterFAQ = filterFAQ;
+  // Fleet
+  window.fleetLoadPreset      = fleetLoadPreset;
+  window.fleetClearAll        = fleetClearAll;
+  window.fleetAddFromSelect   = fleetAddFromSelect;
+  window.fleetRemovePart      = fleetRemovePart;
+  window.saveFleetToStorage   = saveFleetToStorage;
+  window.loadFleetFromStorage = loadFleetFromStorage;
+  // Operating engine / meeting
+  window.addMeetingRow     = addMeetingRow;
+  window.switchMeetingMode = switchMeetingMode;
+  window.copyOutput        = copyOutput;
+  window.copyEl            = copyEl;
+  // Auth stub — logout is handled by window._rzAuth.logout() in auth.js;
+  // this stub prevents ReferenceError from the legacy nav button.
+  window.logoutPremium = function() {
+    try { if (window._rzAuth) window._rzAuth.logout(); } catch(e) {}
+  };
+} catch(e) { console.warn('[CSE] v1.16.2 window export error:', e); }
 
 })(); // end IIFE
 </script>

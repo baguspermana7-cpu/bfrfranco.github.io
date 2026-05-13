@@ -303,7 +303,9 @@ function initScrollAnimations() {
    Metric Counter Animation
    ========================================== */
 function initMetricCounters() {
-    const metricValues = document.querySelectorAll('.metric-value');
+    // v1.16.2: skip elements that have no data-target — calc-page KPI cards use
+    // .metric-value class but are written by the calculator engine, not this counter.
+    const metricValues = document.querySelectorAll('.metric-value[data-target]');
 
     const observerOptions = {
         root: null,

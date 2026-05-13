@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.16.2 — 2026-05-13 (Spares Engine — stabilization: dead handlers, NaN cards)
+
+Runtime-verified stabilization of the 9,302-line calculator (Puppeteer probe green):
+
+1. **All 59 inline onclick handlers exposed on window (critical)** — every function used in `onclick="X(...)"` was defined inside the main IIFE and unreachable from global scope, causing `ReferenceError` on every user interaction. Added a `window.X = X` export block before `})(); // end IIFE`. All 26 tabs now switch correctly.
+2. **NaN% on 4 criticality KPI cards (critical)** — `script.min.js` `initMetricCounters()` selected ALL `.metric-value` elements via `querySelectorAll('.metric-value')` and wrote `NaN%` to any card lacking a `data-target` attribute (the calc engine's KPI cards). Fixed by changing the selector to `.metric-value[data-target]` so the counter animation only targets landing/article page stats. Rebuilt `script.min.js`.
+3. **Dead `switchTab` + `TAB_ORDER` (cleanup)** — removed the 14-item `TAB_ORDER` and the stub `switchTab` function (declared at the top of the tab-switching section but immediately overridden by the 26-item version 2000+ lines later). Promoted the authoritative declarations with proper `var` / `function` syntax.
+4. **`logoutPremium` stub** — the nav dropdown had `onclick="logoutPremium()"` with no definition anywhere; added a safe stub that delegates to `window._rzAuth.logout()`.
+5. **`tools/audit-onclick-handlers.py`** — new CI tool that enumerates inline `onclick` handler names and verifies each has a `window.X =` exposure. Exits 1 in `--strict` mode if any are missing. Passes clean on v1.16.2.
+
+Probe SUMMARY (node tools/probe-spares.mjs): consoleErrors=0, pageErrors=0, tabsFailed=0, cardNaN=[], all windowExposure="function".
+
+---
+
 ## v1.16.1 — 2026-05-13 (Spares Engine — final QA pass: 7 fixes)
 
 Comprehensive code review of the 9,302-line calculator after its ~8 build passes. 7 surgical fixes, no regressions:
