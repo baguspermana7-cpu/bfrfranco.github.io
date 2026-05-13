@@ -2369,6 +2369,183 @@ Standarization files MUST NOT contradict design.md. If they do, design.md takes 
 
 ---
 
+## Appendix G: Design Change Version Discipline
+
+Design changes — unlike bug fixes or new content — affect the entire visual consistency of the site. This appendix specifies how design changes are versioned and communicated.
+
+### Classification of design changes
+
+| Change type | Version bump | Example |
+|-------------|-------------|---------|
+| Token value change (single token) | PATCH | Adjust `--rz-accent-signal` from `#FFAA00` to `#FFB000` |
+| New token added | PATCH | Add `--rz-accent-signal-light` for light mode |
+| Component pattern change (one component) | PATCH | Change `.rz-card` border-radius from 4px to 6px |
+| New component added | MINOR | Add `.rz-instrument-panel` layout pattern |
+| New page archetype | MINOR | Add slide-deck archetype (Section 10.6) |
+| Breaking layout / IA change | MAJOR | Sitewide navbar restructure |
+| New anti-pattern codified | PATCH | Document and enforce a new rejection |
+| Design system document update (no visual change) | PATCH | Add a new appendix, expand explanatory prose |
+
+"Breaking" in the MAJOR context means: a change that would cause a previously-compliant component to look incorrect without a corresponding code update. Token renames are MAJOR if they require find-replace across all pages.
+
+### Design change documentation workflow
+
+When a design decision changes:
+
+1. Update Section 15 (Decision Log) with the change, the rationale, the alternative considered, and the date
+2. If the change involves a token value: update Appendix B (CSS Token Reference) with the new hex and the contrast ratio recalculation
+3. If the change involves a component pattern: update Section 9 (Component Library Map) with the new design delta and acceptance criteria
+4. If the change introduces or removes an anti-pattern: update Section 3 (Anti-Patterns)
+5. Update the tactical standarization file if one exists for the changed component
+6. Bump the site version per the table above
+7. Append a `## v{version}` entry to `CHANGELOG.md` that explicitly mentions "design system update" if the change is visible in the UI
+
+### Design drift prevention
+
+The most common cause of design drift is implementing a new page under time pressure without referencing this document. The following habit prevents it:
+
+Before building any new component or page, open `documentation/design.md` and locate:
+- The relevant page archetype (Section 10)
+- The component library entry (Section 9) if the component already exists
+- The applicable anti-patterns (Section 3) for the type of content being built
+- The implementation checklist (Appendix A)
+
+This is not a bureaucratic process — it takes less than 3 minutes to scan the relevant sections. The cost of not doing it is a component that requires a design cleanup pass in a future session.
+
+---
+
 *End of document. Version 1.0 — 2026-05-13.*
 *Next review: when MINOR version reaches 2.0.0 or on 2027-01-01, whichever comes first.*
 *Tactical implementation rules: `../standarization/` directory.*
+
+---
+
+## Appendix H: Quick Reference Card
+
+A condensed single-page reference for the most-used design decisions. Use this when building new components under time pressure.
+
+### Palette at a glance
+
+```
+Background base      #0a0e1a   Deep slate
+Background elevated  #111827   Card surface
+Background overlay   #1c2333   Modal / dropdown
+Background inset     #080c16   Input / code block
+
+Text primary         #E8EDF5   Body copy
+Text secondary       #A0AEC0   Support text
+Text muted           #64748B   Captions, timestamps
+
+Signal amber         #FFAA00   Primary / CTA / active state
+Oscilloscope green   #00FF88   Success / data / positive metric
+Fault red            #FF3030   Error / alarm / critical
+Instrument cyan      #00DDFF   Informational / secondary data
+Muted mint           #7DDDB4   Auth pill only -- NOT primary accent
+```
+
+### Typography at a glance
+
+```
+Headings:  IBM Plex Sans  700/600  (H1 64px down to H4 20px)
+Body:      IBM Plex Sans  400      16px / 1.55 line-height / 70ch max-width
+Numerics:  JetBrains Mono 400      tabular-nums slashed-zero (all data values)
+Captions:  JetBrains Mono 400      11px UPPERCASE 0.18em letter-spacing
+```
+
+### Line weights at a glance
+
+```
+1.4 px  Tier 1 -- primary structure, major card borders, section dividers
+1.0 px  Tier 2 -- card hairlines, tab borders, modal frames
+0.6 px  Tier 3 -- table hairlines, input field borders, legend rules
+0.5 px  Tier 4 -- footnote rules, caption separators
+```
+
+### Border-radius at a glance
+
+```
+4px   All cards, modals, buttons, input fields
+0px   Tab strip active indicator, progress bars, hairline dividers
+```
+
+### Animation timing at a glance
+
+```
+150-200 ms   Color / border state transition     ease-out
+220-280 ms   Component enter (blur-fade/slide)   cubic-bezier(0.2,0,0,1.0)
+180 ms       Component exit                      cubic-bezier(0.4,0,1,1)
+500 ms       Smooth scroll anchor                cubic-bezier(0.65,0,0.35,1)
+2400 ms      SLD laser-flow loop -- 150 kV       linear, infinite
+3200 ms      SLD laser-flow loop -- 70 kV        linear, infinite
+4000 ms      SLD laser-flow loop -- 20 kV        linear, infinite
+22-28 s      Aurora mesh hero drift              ease-in-out, infinite (landing only)
+```
+
+### Voltage-tier strokes at a glance
+
+```
+500 kV   #FFD700  1.6px
+275 kV   #FF8C00  1.4px
+150 kV   #FFAA00  1.0px  (laser-flow animates from here and above)
+ 70 kV   #00DDFF  0.7px
+ 20 kV   #7DDDB4  0.6px
+inferred  same color at opacity: 0.35
+```
+
+### Touch targets at a glance
+
+```
+44 x 44 px   Minimum for all interactive elements (WCAG 2.5.5 / Apple HIG)
+48 px height  Mobile bottom-bar share buttons
+```
+
+### Breakpoints at a glance
+
+```
+320px   xs  iPhone SE minimum
+375px   sm  iPhone 12/13/14  << PRIMARY MOBILE TARGET
+414px   md  iPhone Plus / large Android
+768px   lg  iPad portrait / tablet (hamburger threshold)
+1024px  xl  iPad landscape / small laptop
+1280px  2xl Standard laptop  << PRIMARY DESKTOP TARGET
+1680px  3xl Wide desktop / external monitor (dashboard max-width)
+```
+
+### Five most-violated rules -- check these first
+
+Before submitting any component for design review:
+
+1. No hardcoded hex in CSS -- every color must use var(--rz-*); grep '#[0-9a-fA-F]' to verify
+2. No box-shadow on resting card state -- shadow only on .active or :focus-visible
+3. No gradient on buttons -- solid --rz-accent-signal fill or 1px border only
+4. No outline: none without providing an equivalent visible focus state (2px amber outline)
+5. No emoji in article body, calculator UI, or navigation
+
+### Cross-reference index
+
+| Topic | Section / Appendix |
+|-------|--------------------|
+| Accepted color values | Section 5 + Appendix B |
+| Anti-patterns list | Section 3 |
+| ARIA requirements | Section 12 |
+| ASCII wireframes | Section 10 |
+| Breakpoints | Section 13 |
+| Component status and delta | Section 9 |
+| CSS class names | Appendix E |
+| Decision history | Section 15 |
+| Design quality gate | Section 2 |
+| File naming conventions | Appendix E |
+| Font loading HTML | Section 4 |
+| Icon families and sizing | Section 8 |
+| Implementation checklist | Appendix A |
+| Line weights | Section 2 + Section 6 |
+| Motion durations | Section 7 |
+| PDF export design | Section 11 |
+| Roadmap 2026-2031 | Section 14 |
+| Standarization relationship | Appendix F |
+| Standards references | Appendix C |
+| Token reference (alphabetical) | Appendix B |
+| Typographic specimens | Appendix D |
+| Version discipline for design | Appendix G |
+| Voltage-tier color mapping | Section 5 |
+
