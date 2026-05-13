@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v1.17.3 — 2026-05-13 (Spares Engine — workflow visibility + Stakeholder strategic refactor)
+
+User context: "tidak perlu ada tailored message draft itu tidak penting, yang penting strategicnya bagaimana bisa come up" + "belum ada alur, flowchart, cards, jadi melihat engine spares-readiness-calculator.html jadi membingungkan alurnya" + "di awal2 kasih high level summary context"
+
+### Phase G — Stakeholder strategic refactor
+- **Removed** Tailored Message Drafts section from `genStakeholder()` output — replaced with 4 strategic outputs.
+- **Added** Influence &times; Impact 2&times;2 matrix (Manage Closely / Keep Satisfied / Keep Informed / Monitor) computed per stakeholder from their role and urgency level.
+- **Added** Strategic Narrative Arc table (3-act per stakeholder: Act 1 current belief, Act 2 pivot, Act 3 commitment + First-Step Trigger).
+- **Added** Coalition-Building Sequence (5-step alignment path: Anchor → Validate → Brief → Decide → Reinforce).
+- **Added** Strategy Heuristics card (8 Cialdini-based influence principles adapted for DC procurement context).
+- **Changed** button label from "Generate Plan" to "Build Strategy"; updated placeholder and ops-intro text to reflect strategic focus.
+
+### Phase H — Per-module flow cards
+- **Added** `<div class="module-flow-card">` to all 9 analytical modules (criticality, readiness, stock, meio, hub, supplier, ltb, kraljic, montecarlo) showing Inputs → Computation → Outputs → Connects-To data flow.
+
+### Phase I — Top-of-page workflow flowchart
+- **Added** `<details class="workflow-flowchart-wrap">` collapsible SVG flowchart (viewBox 1200×440) showing all 27 modules across 4 column groups: ANALYTICAL / OPERATING ENGINE / SUPPLY CHAIN / REFERENCE. Module labels are clickable (`onclick="switchTab(...)"`) with tier-1 amber flow lines and tier-2 dashed cross-connections. Respects `prefers-reduced-motion`.
+
+### Phase J — Per-pane high-level summary cards
+- **Added** `<div class="module-summary-card">` to all 9 analytical modules + catalog module. Each card has Q (what problem this solves) / A (method) / Output (what you get) / Use-when (trigger conditions).
+
+### CSS additions
+- `.module-summary-card`, `.module-flow-card`, `.module-flow-col`, `.module-flow-arrow` — per-module workflow visualization.
+- `.workflow-flowchart-wrap`, `.workflow-flowchart-summary`, `.workflow-svg` — top-of-page flowchart.
+- `.influence-matrix`, `.influence-quad`, `.iq-manage/.iq-satisfy/.iq-inform/.iq-monitor` — 2×2 matrix grid for Stakeholder output.
+- All rules include `[data-theme="dark"]` overrides and `@media (max-width: 768px)` responsive behaviour.
+
+---
+
 ## v1.18.0-prep — 2026-05-13 (Brand & design system foundation)
 
 User-mandated work to escape "AI design slop" and establish identifiable brand character. Foundational artefacts created — visual changes to come in v1.18.x releases.
@@ -39,6 +68,16 @@ Documentation discipline established this session (per user mandate "ingat di me
 - `feedback_basic_feature_discipline.md` — 8-rule pre-commit checklist preventing Login / Tab / Tooltip / Mobile-burger / inline-handler / Loading-resolution regressions.
 
 Probe SUMMARY (live URL after push): all 27 tabs OK, all handlers exposed, login button reaches `_rzAuth.showModal()`.
+
+### Calc-page stabilization sweep: Phase 1 (tia-942-checklist, tier-advisor, cx-calculator)
+
+Root cause identified: the v1.8.0 mobile-responsive patch tool injected a raw multi-line CSS block directly into JS `html += '...'` string literals inside PDF export functions. This created a JS syntax error (`Invalid or unexpected token`) that silently killed every function declaration in the script block, making all inline `onclick=` handlers throw `ReferenceError`.
+
+- **tia-942-checklist.html** — Fixed CSS injection (line 1513: `html += '` → template literal); added 12 window exports (attemptLogin, closeLoginModal, exportPDF, handlePremiumTab, logoutPremium, onCheck, resetChecklist, setDcType, setMode, setTier, toggleCat, toggleUserDropdown). Probe: 0 errors, 0 missing, burger+back-link OK.
+- **tier-advisor.html** — Fixed CSS injection (line 1570); added 12 window exports (attemptLogin, closeLoginModal, debouncedCalculate, exportPDF, handlePremiumTab, logoutPremium, resetDefaults, setMode, setPreset, toggleMobileMenu, toggleTheme, toggleUserDropdown). Probe: 0 errors, 0 missing, burger+back-link OK.
+- **cx-calculator.html** — Fixed CSS injection (line 4125); fixed `walk(ganttData)` → `walk(ganttData.items)` bug in `cxRenderGanttStats` (Calculate button threw `items.forEach is not a function`); added 25 window exports. Probe: 0 errors, 0 missing, burger+back-link OK.
+- Three Puppeteer probes created: `tools/probe-calc-tia942.mjs`, `tools/probe-calc-tieradvisor.mjs`, `tools/probe-calc-cx.mjs`.
+- `audit-script-tags.py --strict`: CLEAN (149 files). `audit-onclick-handlers.py --strict`: CLEAN on all 3 pages.
 
 ---
 

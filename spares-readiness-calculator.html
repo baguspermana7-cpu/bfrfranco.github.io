@@ -487,6 +487,93 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .lev-moderate { background: rgba(245,158,11,0.1); color: #d97706; }
 .lev-weak { background: rgba(239,68,68,0.1); color: #ef4444; }
 
+/* v1.17.3 — per-module workflow visualization */
+.module-summary-card {
+  background: var(--glass-bg);
+  border-left: 4px solid var(--amber);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.module-summary-card .q { color: var(--amber-dark); font-weight: 700; display: block; margin-bottom: 0.3rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.module-summary-card .a { color: var(--text-primary); margin-bottom: 0.4rem; }
+.module-summary-card .output { color: var(--text-secondary); font-size: 0.78rem; }
+.module-summary-card .use-when { color: var(--text-muted); font-size: 0.76rem; font-style: italic; margin-top: 0.4rem; }
+[data-theme="dark"] .module-summary-card { background: rgba(245,158,11,0.05); }
+
+.module-flow-card {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 0.5rem;
+  align-items: stretch;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.25rem 0;
+  background: rgba(245,158,11,0.04);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 12px;
+  font-size: 0.74rem;
+}
+.module-flow-col h4 { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--amber-dark); margin: 0 0 0.5rem; }
+.module-flow-col ul { list-style: none; padding: 0; margin: 0; }
+.module-flow-col li { padding: 2px 0; color: var(--text-secondary); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.72rem; }
+.module-flow-col li a { color: var(--amber); cursor: pointer; text-decoration: none; }
+.module-flow-col li a:hover { text-decoration: underline; }
+.module-flow-arrow { display: flex; align-items: center; justify-content: center; color: var(--amber); font-weight: 700; font-size: 1rem; }
+[data-theme="dark"] .module-flow-card { background: rgba(245,158,11,0.06); }
+@media (max-width: 768px) {
+  .module-flow-card { grid-template-columns: 1fr; gap: 0.25rem; padding: 0.85rem; }
+  .module-flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+}
+
+.workflow-flowchart-wrap {
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+}
+.workflow-flowchart-summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  padding: 0.25rem 0;
+  list-style: none;
+}
+.workflow-flowchart-summary::-webkit-details-marker { display: none; }
+.workflow-flowchart-summary i { color: var(--amber); margin-right: 0.4rem; }
+.workflow-flowchart { margin-top: 1rem; overflow-x: auto; }
+.workflow-svg { width: 100%; height: auto; min-width: 700px; max-width: 1200px; }
+.workflow-svg text { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.workflow-svg text.module-label { cursor: pointer; fill: var(--text-secondary, #64748b); font-size: 11px; }
+.workflow-svg text.module-label:hover { fill: var(--amber, #f59e0b); }
+.workflow-svg .group-header { font-size: 13px; font-weight: 700; fill: var(--amber-dark, #d97706); letter-spacing: 0.1em; }
+.workflow-svg .flow-line-tier1 { stroke: var(--amber, #f59e0b); stroke-width: 1.4; fill: none; }
+.workflow-svg .flow-line-tier2 { stroke: var(--text-muted, #94a3b8); stroke-width: 1; stroke-dasharray: 4 3; fill: none; opacity: 0.5; }
+.workflow-svg .group-box { fill: rgba(245,158,11,0.04); stroke: rgba(245,158,11,0.25); stroke-width: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .workflow-svg .flow-line-tier1, .workflow-svg .flow-line-tier2 { animation: none; }
+}
+
+/* v1.17.3 — Influence × Impact 2×2 matrix grid */
+.influence-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.75rem 0; }
+.influence-quad { border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.74rem; }
+.influence-quad .quad-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; display: block; }
+.influence-quad .quad-names { color: var(--text-secondary); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.71rem; }
+.iq-manage { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); }
+.iq-manage .quad-label { color: var(--amber-dark); }
+.iq-satisfy { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); }
+.iq-satisfy .quad-label { color: #059669; }
+.iq-inform { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); }
+.iq-inform .quad-label { color: #2563eb; }
+.iq-monitor { background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.25); }
+.iq-monitor .quad-label { color: var(--text-muted); }
+[data-theme="dark"] .iq-manage { background: rgba(245,158,11,0.10); }
+[data-theme="dark"] .iq-satisfy { background: rgba(16,185,129,0.07); }
+[data-theme="dark"] .iq-inform { background: rgba(59,130,246,0.07); }
+[data-theme="dark"] .iq-monitor { background: rgba(148,163,184,0.05); }
+
 /* Contract checklist */
 .contract-row-flagged td { background: rgba(245,158,11,0.06); }
 [data-theme="dark"] .contract-row-flagged td { background: rgba(245,158,11,0.08); }
@@ -1035,6 +1122,92 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     </div>
   </section>
 
+  <!-- Workflow flowchart (v1.17.3) -->
+  <div style="max-width:1100px;margin:0 auto;padding:0 2rem;">
+  <details class="workflow-flowchart-wrap" open>
+    <summary class="workflow-flowchart-summary">
+      <i class="fas fa-project-diagram"></i> <strong>Workflow Overview</strong>
+      <span style="color:var(--text-muted);font-weight:400;"> &mdash; how the 27 modules connect (analytical &rarr; operating engine &rarr; supply chain &rarr; reference)</span>
+    </summary>
+    <div class="workflow-flowchart">
+      <svg viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg" class="workflow-svg" role="img" aria-label="Spares Engine workflow diagram showing 4 module groups and their connections">
+        <!-- Group boxes -->
+        <rect class="group-box" x="10" y="40" width="260" height="380" rx="10"/>
+        <rect class="group-box" x="290" y="40" width="280" height="380" rx="10"/>
+        <rect class="group-box" x="590" y="40" width="280" height="380" rx="10"/>
+        <rect class="group-box" x="890" y="40" width="300" height="380" rx="10"/>
+
+        <!-- Group headers -->
+        <text class="group-header" x="24" y="68">ANALYTICAL</text>
+        <text class="group-header" x="304" y="68">OPERATING ENGINE</text>
+        <text class="group-header" x="604" y="68">SUPPLY CHAIN</text>
+        <text class="group-header" x="904" y="68">REFERENCE</text>
+
+        <!-- ANALYTICAL module labels (M1–M8) -->
+        <text class="module-label" x="28" y="96" onclick="switchTab('criticality')">M1 · Criticality FMECA</text>
+        <text class="module-label" x="28" y="120" onclick="switchTab('readiness')">M2 · Readiness Gauge</text>
+        <text class="module-label" x="28" y="144" onclick="switchTab('stock')">M3 · Optimal Stock Q*</text>
+        <text class="module-label" x="28" y="168" onclick="switchTab('meio')">M4 · MEIO 2-Echelon</text>
+        <text class="module-label" x="28" y="192" onclick="switchTab('hub')">M4b · Hub Positioning</text>
+        <text class="module-label" x="28" y="216" onclick="switchTab('supplier')">M5 · Supplier Risk</text>
+        <text class="module-label" x="28" y="240" onclick="switchTab('ltb')">M6 · LTB / DMSMS</text>
+        <text class="module-label" x="28" y="264" onclick="switchTab('kraljic')">M7 · Kraljic Matrix</text>
+        <text class="module-label" x="28" y="288" onclick="switchTab('montecarlo')">M8 · Monte-Carlo</text>
+        <text class="module-label" x="28" y="312" onclick="switchTab('sensitivity')">M9 · Sensitivity Surfaces</text>
+        <text class="module-label" x="28" y="336" onclick="switchTab('projection')">M10 · 5-Yr Projection</text>
+        <text class="module-label" x="28" y="360" onclick="switchTab('metric')">M11 · MEIO Optimizer</text>
+
+        <!-- Tier-1 flow arrow: Analytical → Operating Engine -->
+        <path class="flow-line-tier1" d="M272,220 L288,220"/>
+        <polygon points="285,216 292,220 285,224" fill="var(--amber,#f59e0b)"/>
+
+        <!-- OPERATING ENGINE module labels -->
+        <text class="module-label" x="304" y="96" onclick="switchTab('pm_ops')">OE-A · Daily PM Ops</text>
+        <text class="module-label" x="304" y="120" onclick="switchTab('scorecard')">OE-B · Supplier Scorecard</text>
+        <text class="module-label" x="304" y="144" onclick="switchTab('negotiation')">OE-C · Negotiation Strategy</text>
+        <text class="module-label" x="304" y="168" onclick="switchTab('contract')">OE-D · Contract Checklist</text>
+        <text class="module-label" x="304" y="192" onclick="switchTab('process')">OE-E · Process Improvement</text>
+        <text class="module-label" x="304" y="216" onclick="switchTab('meeting')">OE-F · Meeting Intelligence</text>
+        <text class="module-label" x="304" y="240" onclick="switchTab('stakeholder')">OE-G · Stakeholder Strategy</text>
+        <text class="module-label" x="304" y="264" onclick="switchTab('eol_plan')">OE-H · EOL Response Plan</text>
+        <text class="module-label" x="304" y="288" onclick="switchTab('ambiguity')">OE-I · Ambiguity Solver</text>
+        <text class="module-label" x="304" y="312" onclick="switchTab('star')">OE-J · STAR Story Builder</text>
+
+        <!-- Tier-1 flow arrow: Operating Engine → Supply Chain -->
+        <path class="flow-line-tier1" d="M572,220 L588,220"/>
+        <polygon points="585,216 592,220 585,224" fill="var(--amber,#f59e0b)"/>
+
+        <!-- SUPPLY CHAIN module labels -->
+        <text class="module-label" x="604" y="96" onclick="switchTab('lane')">SC-1 · Lane &amp; Mode Planner</text>
+        <text class="module-label" x="604" y="120" onclick="switchTab('risk-map')">SC-2 · Supply-Chain Risk Map</text>
+        <text class="module-label" x="604" y="144" onclick="switchTab('disruption')">SC-3 · Disruption Scenario</text>
+        <text class="module-label" x="604" y="168" onclick="switchTab('logistics-cost')">SC-4 · Logistics Cost &amp; Expedite</text>
+
+        <!-- Tier-1 flow arrow: Supply Chain → Reference -->
+        <path class="flow-line-tier1" d="M872,200 L888,200"/>
+        <polygon points="885,196 892,200 885,204" fill="var(--amber,#f59e0b)"/>
+
+        <!-- REFERENCE module labels -->
+        <text class="module-label" x="904" y="96" onclick="switchTab('catalog')">REF-1 · Parts Catalog</text>
+        <text class="module-label" x="904" y="120" onclick="switchTab('catalog-analytics')">REF-2 · Catalog Analytics</text>
+        <text class="module-label" x="904" y="144" onclick="switchTab('fleet')">REF-3 · Fleet &amp; Portfolio</text>
+
+        <!-- Tier-2 cross-connections (dashed) -->
+        <!-- M1 → M2 -->
+        <path class="flow-line-tier2" d="M140,96 C140,105 140,110 140,120"/>
+        <!-- M3 → M4 -->
+        <path class="flow-line-tier2" d="M140,144 C140,153 140,158 140,168"/>
+        <!-- M5 → M7 -->
+        <path class="flow-line-tier2" d="M140,216 C140,230 140,250 140,264"/>
+        <!-- M6 → M7 -->
+        <path class="flow-line-tier2" d="M160,240 C160,250 160,258 160,264"/>
+        <!-- REF-1 back to M1 (catalog loads into analytical) -->
+        <path class="flow-line-tier2" d="M960,96 C990,88 1030,75 1040,60 C1050,48 30,55 26,88"/>
+      </svg>
+    </div>
+  </details>
+  </div>
+
   <!-- Summary Dashboard strip -->
   <div class="summary-strip" id="summaryStrip">
     <div class="summary-strip-title"><i class="fas fa-gauge-high"></i> One-Glance Dashboard — click any card to jump to module</div>
@@ -1187,6 +1360,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 1: CRITICALITY ===== -->
     <div class="module-pane active" id="pane-criticality">
+      <div class="module-summary-card">
+        <span class="q">Q: Which spares are so critical that a stockout causes downtime?</span>
+        <div class="a">FMECA-style scoring of failure-impact &times; frequency &times; detection difficulty across your installed fleet.</div>
+        <div class="output">Output: Criticality tier (VITAL / ESSENTIAL / DESIRABLE) + Risk Priority Number (RPN) + fleet expected failures per year.</div>
+        <div class="use-when"><strong>Use when:</strong> deciding stocking policy, assigning supplier criticality tier, prioritising CBM inspection frequency, or justifying capital allocation.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>&lambda; failure rate</li><li>Severity (1–10)</li><li>Detectability (1–10)</li><li>Installed base</li><li>Redundancy</li><li>Qualified alternates</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>RPN = sev &times; det &times; (&lambda;&times;10)</li><li>Eff. severity w/ redundancy</li><li>Fleet failures/yr = &lambda; &times; n</li><li>Marginal-utility tier</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Criticality tier</li><li>RPN score</li><li>Fleet exp. failures/yr</li><li>Stocking decision</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('readiness')">M2 Readiness</a></li><li><a onclick="switchTab('stock')">M3 Optimal Stock</a></li><li><a onclick="switchTab('ltb')">M6 LTB / EOL</a></li><li><a onclick="switchTab('kraljic')">M7 Kraljic</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-exclamation-triangle"></i> FMECA + RCM Criticality Inputs</div>
@@ -1289,6 +1477,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 2: READINESS GAUGE ===== -->
     <div class="module-pane" id="pane-readiness">
+      <div class="module-summary-card">
+        <span class="q">Q: Will the part arrive at the site before it is needed?</span>
+        <div class="a">Calculates confirmed supply coverage against required quantity, weighted by PO confidence, and flags date-slack risks.</div>
+        <div class="output">Output: Readiness % (RED / YELLOW / GREEN) + date slack (days) + supply confidence score + risk flags + priority actions.</div>
+        <div class="use-when"><strong>Use when:</strong> tracking an active PO, preparing for a maintenance window, generating a weekly readiness report, or escalating a late supplier commit.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Required qty</li><li>On-hand inventory</li><li>Open PO qty + conf.</li><li>Lead time &amp; &sigma;</li><li>Commit / need date</li><li>Planning horizon</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>Confirmed supply = OH + PO &times; conf</li><li>Readiness % = confirmed &divide; required</li><li>Date slack = need &minus; commit</li><li>LT / horizon ratio</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Readiness % + RAG</li><li>Date slack (days)</li><li>Risk flag list</li><li>Recommended actions</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('criticality')">M1 Criticality</a></li><li><a onclick="switchTab('stock')">M3 Optimal Stock</a></li><li><a onclick="switchTab('supplier')">M5 Supplier Risk</a></li><li><a onclick="switchTab('montecarlo')">M8 Monte-Carlo</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-gauge-high"></i> Spare Readiness Inputs</div>
@@ -1389,6 +1592,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 3: OPTIMAL STOCK ===== -->
     <div class="module-pane" id="pane-stock">
+      <div class="module-summary-card">
+        <span class="q">Q: How many units should I hold in stock to balance over-stocking cost vs stockout risk?</span>
+        <div class="a">Newsvendor / critical-ratio model with optional Poisson mode for slow-moving parts — finds Q* that minimises total annual cost.</div>
+        <div class="output">Output: Optimal stock Q*, critical ratio CR, total annual cost curve, under-stock vs over-stock cost breakdown.</div>
+        <div class="use-when"><strong>Use when:</strong> setting safety stock policy, reviewing annual stocking levels, justifying a budget increase for spares, or evaluating Poisson vs Normal demand models.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Unit cost ($)</li><li>Under-stock cost/event</li><li>Annual demand &mu;</li><li>Demand &sigma;</li><li>Carrying rate (%)</li><li>Poisson toggle</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>CR = Cu &divide; (Cu + Co)</li><li>Q* = &Phi;&sup1;(CR) if Normal</li><li>Q* = Poisson inverse CDF</li><li>Annual cost per Q</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Optimal Q*</li><li>Critical ratio CR</li><li>Total annual cost</li><li>Cost breakdown chart</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('criticality')">M1 Criticality</a></li><li><a onclick="switchTab('meio')">M4 MEIO</a></li><li><a onclick="switchTab('hub')">M4b Hub</a></li><li><a onclick="switchTab('montecarlo')">M8 Monte-Carlo</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-boxes-stacked"></i> Optimal Stock Level Inputs</div>
@@ -1496,6 +1714,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 4: MEIO OPTIMIZER ===== -->
     <div class="module-pane" id="pane-meio">
+      <div class="module-summary-card">
+        <span class="q">Q: Should I stock parts at each site, or pool them at a regional warehouse?</span>
+        <div class="a">Multi-Echelon Inventory Optimisation (MEIO) compares site-level vs regional-pool total stock requirement using Poisson demand aggregation across sites.</div>
+        <div class="output">Output: Site-level stock (per site &times; n sites) vs regional-pool stock, pooling savings (units + $), fleet P(no stockout), recommended echelon structure.</div>
+        <div class="use-when"><strong>Use when:</strong> designing a hub-and-spoke spares network, evaluating whether to open a regional warehouse, or justifying consolidation of slow-moving critical parts.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Site demand rate &lambda;</li><li># sites served</li><li>Vendor &rarr; regional LT</li><li>Regional &rarr; site LT</li><li>Target service level</li><li>Unit cost + carry rate</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>Regional &lambda; = n &times; &lambda;</li><li>Poisson inv CDF per echelon</li><li>Site stock vs pool stock</li><li>Pooling savings</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Site vs pool Q</li><li>Units &amp; $ saved</li><li>Fleet P(no stockout)</li><li>Echelon recommendation</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('stock')">M3 Optimal Stock</a></li><li><a onclick="switchTab('hub')">M4b Hub Positioning</a></li><li><a onclick="switchTab('supplier')">M5 Supplier Risk</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-layer-group"></i> MEIO 2-Echelon Inputs</div>
@@ -1587,6 +1820,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 5: HUB POSITIONING ===== -->
     <div class="module-pane" id="pane-hub">
+      <div class="module-summary-card">
+        <span class="q">Q: Where should a shared regional hub be located, and how much does it reduce effective lead time?</span>
+        <div class="a">Models the hub benefit as OEM lead time vs hub-to-site transit time, and quantifies fleet-wide readiness improvement and inventory cost reduction.</div>
+        <div class="output">Output: Hub ROI (%), effective LT reduction, fleet readiness with/without hub, annual inventory savings, breakeven sites.</div>
+        <div class="use-when"><strong>Use when:</strong> evaluating a new regional DC or logistics hub, presenting a business case for hub investment, or benchmarking hub LT vs direct OEM procurement.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li># DC sites</li><li># critical part types</li><li>OEM lead time (wks)</li><li>Hub-to-site LT (wks)</li><li>Annual demand / site</li><li>Unit cost + carry rate</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>LT reduction = OEM &minus; hub-to-site</li><li>Safety stock &Delta; per site</li><li>Fleet inventory savings</li><li>Hub ROI = savings &divide; cost</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Hub ROI %</li><li>Effective LT reduction</li><li>Fleet readiness &Delta;</li><li>Breakeven sites</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('meio')">M4 MEIO</a></li><li><a onclick="switchTab('supplier')">M5 Supplier Risk</a></li><li><a onclick="switchTab('montecarlo')">M8 Monte-Carlo</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-network-wired"></i> Multi-Site Hub Positioning Inputs</div>
@@ -1669,6 +1917,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 5: SUPPLIER RISK ===== -->
     <div class="module-pane" id="pane-supplier">
+      <div class="module-summary-card">
+        <span class="q">Q: How exposed is my supply chain to a single-supplier failure or disruption?</span>
+        <div class="a">Composite weighted risk score across 8 dimensions: financial health, single-source exposure, geographic concentration, lead time, on-time delivery, quality, capacity, and ESG.</div>
+        <div class="output">Output: Composite supplier risk score + RAG band + per-dimension radar + recommended mitigations + annual disruption exposure ($).</div>
+        <div class="use-when"><strong>Use when:</strong> qualifying a new supplier, reviewing an existing supplier's risk tier, preparing a sourcing strategy brief, or building a business case for dual-sourcing.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Financial health (1–10)</li><li>Single/dual/multi source</li><li>Geographic conc. (1–10)</li><li>Lead time variability</li><li>OTD %, quality score</li><li>Capacity reserve %</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>Weighted composite score</li><li>Per-dimension scoring</li><li>Disruption exposure $</li><li>Radar chart data</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Composite risk score</li><li>RAG tier</li><li>Radar chart</li><li>Mitigation actions</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('criticality')">M1 Criticality</a></li><li><a onclick="switchTab('kraljic')">M7 Kraljic</a></li><li><a onclick="switchTab('ltb')">M6 LTB / EOL</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-shield-halved"></i> Supplier Risk Inputs</div>
@@ -1751,6 +2014,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 6: LTB ===== -->
     <div class="module-pane" id="pane-ltb">
+      <div class="module-summary-card">
+        <span class="q">Q: How many units should I buy before EOL / DMSMS notice expires, and is it worth it vs qualifying an alternate?</span>
+        <div class="a">NPV-based LTB quantity optimiser with carrying cost model, comparing Last-Time-Buy stock vs alternate qualification investment over the support window.</div>
+        <div class="output">Output: LTB recommended quantity + total LTB cost + carry cost + NPV break-even analysis + EOL exposure band.</div>
+        <div class="use-when"><strong>Use when:</strong> an OEM issues an EOL or NRND notice, deciding whether to commit to a large last-time-buy, or building the business case for an alternate qualification program.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>EOL notice date</li><li>Remaining support years</li><li>Annual demand (units/yr)</li><li>On-hand + open PO</li><li>Unit cost + carry rate</li><li>Alternate options</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>LTB_Q = demand &times; yrs &times; 1.15</li><li>Carrying cost (avg &times; rate)</li><li>Alt-qual NPV</li><li>EOL exposure score</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>LTB recommended Q</li><li>LTB total cost</li><li>NPV comparison</li><li>EOL exposure band</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('criticality')">M1 Criticality</a></li><li><a onclick="switchTab('supplier')">M5 Supplier Risk</a></li><li><a onclick="switchTab('kraljic')">M7 Kraljic</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Last-Time-Buy / DMSMS Inputs</div>
@@ -1861,6 +2139,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 7: KRALJIC ===== -->
     <div class="module-pane" id="pane-kraljic">
+      <div class="module-summary-card">
+        <span class="q">Q: What sourcing strategy should I apply to this commodity — strategic partnership, leverage, or routine management?</span>
+        <div class="a">Positions the commodity in the Kraljic 2&times;2 matrix (supply risk &times; spend/profit impact) and generates a tailored sourcing strategy brief.</div>
+        <div class="output">Output: Kraljic quadrant (Strategic / Leverage / Bottleneck / Non-Critical) + sourcing strategy brief + negotiation posture + relationship model.</div>
+        <div class="use-when"><strong>Use when:</strong> setting annual category strategy, preparing for supplier negotiations, reviewing commodity portfolio prioritisation, or onboarding a new supplier relationship.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Supply risk (1–10)</li><li>Spend / profit impact</li><li>Part criticality</li><li>Contract value ($)</li><li>Supplier market share</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>Quadrant = f(risk, impact)</li><li>Strategy archetype lookup</li><li>Negotiation posture</li><li>Relationship model</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>Kraljic quadrant</li><li>Sourcing strategy brief</li><li>Negotiation posture</li><li>KPIs to track</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('supplier')">M5 Supplier Risk</a></li><li><a onclick="switchTab('ltb')">M6 LTB / EOL</a></li><li><a onclick="switchTab('montecarlo')">M8 Monte-Carlo</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-chess-king"></i> Kraljic Matrix Inputs</div>
@@ -1927,6 +2220,21 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== MODULE 8: MONTE-CARLO ===== -->
     <div class="module-pane" id="pane-montecarlo">
+      <div class="module-summary-card">
+        <span class="q">Q: Given realistic uncertainty in lead time and demand, what is the true probability of a stockout?</span>
+        <div class="a">Runs 10,000 stochastic iterations drawing lead time and demand from fitted distributions, outputting a P(stockout) distribution and a tornado chart of key risk drivers.</div>
+        <div class="output">Output: P(stockout) at current stock level + P10/P50/P90 readiness range + tornado chart of top risk drivers + recommended stock to hit target service level.</div>
+        <div class="use-when"><strong>Use when:</strong> presenting risk to leadership, stress-testing a proposed stock level under uncertainty, or identifying the single highest-leverage improvement (LT reduction, demand smoothing, stock increase).</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Base LT + &sigma; (weeks)</li><li>Annual demand + &sigma;</li><li>Current stock on-hand</li><li>Simulation runs (n)</li><li>Target service level</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Computation</h4><ul><li>10,000 LT + demand draws</li><li>Demand-during-LT per iter</li><li>Stockout if demand &gt; stock</li><li>P10 / P50 / P90 readiness</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Outputs</h4><ul><li>P(stockout) %</li><li>Readiness P10/P50/P90</li><li>Tornado chart</li><li>Rec. stock for target SL</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('readiness')">M2 Readiness</a></li><li><a onclick="switchTab('stock')">M3 Optimal Stock</a></li><li><a onclick="switchTab('hub')">M4b Hub</a></li><li><a onclick="switchTab('supplier')">M5 Supplier Risk</a></li></ul></div>
+      </div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-dice"></i> Monte-Carlo Scenario Inputs</div>
@@ -2563,7 +2871,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== TAB G: STAKEHOLDER & COMMUNICATION PLANNER ===== -->
     <div class="module-pane" id="pane-stakeholder">
-      <div class="ops-intro"><strong>Stakeholder &amp; Communication Planner</strong> — Select stakeholders involved, describe the topic/situation, set urgency, and generate tailored message drafts, a stakeholder map, and an escalation path. All outputs are deterministic templates — edit before sending.</div>
+      <div class="ops-intro"><strong>Stakeholder &amp; Communication Planner</strong> — Select stakeholders involved, describe the topic/situation, set urgency, and build a stakeholder influence strategy: Influence &times; Impact map, narrative arcs, coalition sequence, and strategic heuristics. All outputs are deterministic templates — edit before using.</div>
       <div class="module-grid">
         <div class="module-card">
           <div class="card-title"><i class="fas fa-users"></i> Stakeholder Selection &amp; Context</div>
@@ -2598,13 +2906,13 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
             </div>
           </div>
           <div class="btn-row">
-            <button class="btn-primary" onclick="safeGen(genStakeholder)" aria-label="Generate stakeholder communication plan">Generate Plan</button>
+            <button class="btn-primary" onclick="safeGen(genStakeholder)" aria-label="Build stakeholder influence strategy">Build Strategy</button>
             <button class="btn-copy" onclick="copyOutput('sh_output_wrap')" aria-label="Copy stakeholder plan output"><i class="fas fa-copy"></i> Copy</button>
             <button class="btn-pdf" onclick="exportStakeholderPDF()" aria-label="Export stakeholder plan as PDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
           </div>
         </div>
         <div>
-          <div class="ops-placeholder" id="sh_ph"><i class="fas fa-play-circle" style="font-size:2rem;opacity:0.35;display:block;margin-bottom:0.75rem;"></i><strong>Click "Generate Plan"</strong> to build tailored message drafts for each stakeholder, a stakeholder map, escalation path, and communication cadence recommendations.</div>
+          <div class="ops-placeholder" id="sh_ph"><i class="fas fa-play-circle" style="font-size:2rem;opacity:0.35;display:block;margin-bottom:0.75rem;"></i><strong>Click "Build Strategy"</strong> to develop your stakeholder influence approach: Influence &times; Impact map &middot; Narrative arcs &middot; Coalition sequence &middot; Strategy heuristics.</div>
           <div id="sh_output_wrap" style="display:none;">
             <!-- generated by JS -->
           </div>
@@ -2829,6 +3137,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     <!-- ===== PARTS CATALOG TAB ===== -->
     <div class="module-pane" id="pane-catalog">
+      <div class="module-summary-card">
+        <span class="q">Q: What are the standard DC M&amp;E spare parts for my facility generation and equipment tier?</span>
+        <div class="a">Curated seed catalog of 360+ data-center M&amp;E spare parts across 6 DC generations (legacy raised-floor through AI-factory liquid-cooled) — with OEM, taxonomy, criticality, lead time, and unit cost data.</div>
+        <div class="output">Output: Filtered and sortable parts list; use &ldquo;Use&rdquo; button to load any part directly into the analytical modules above for immediate analysis.</div>
+        <div class="use-when"><strong>Use when:</strong> starting a new facility spares review, benchmarking your current parts list, finding typical lead times and unit costs, or loading a reference part into the criticality or stock modules.</div>
+      </div>
       <!-- Loaded-from-catalog banner -->
       <div class="catalog-loaded-banner" id="cat_loaded_banner" role="status" aria-live="polite"></div>
 
@@ -6824,13 +7138,86 @@ function genStakeholder() {
       '<pre class="gen-text-block">Trigger: Commit or response not received within [X hours] of initial outreach.\n\nLevel 1: PM to Supplier/Stakeholder direct — [NAME] — [PHONE/EMAIL] — Deadline: [DATE/TIME]\nLevel 2: PM Manager / Sourcing Lead — [NAME] — [PHONE/EMAIL] — Trigger: No Level 1 response in [4h / 24h]\nLevel 3: Executive Sponsor / VP — [NAME] — [PHONE/EMAIL] — Trigger: Level 2 not resolved in [24h / 48h]\n\nEscalation criteria:\n- Supplier commit date still after site need date after initial response\n- Recovery plan does not close the readiness gap\n- Internal action owner has not responded to two follow-ups\n- Issue is new or risk has increased since last update<\/pre>';
   }
 
+  // Influence × Impact 2×2 Matrix
+  var SH_INFLUENCE = { leadership: 'HIGH', finance: 'HIGH', engineering: 'HIGH', ops: 'HIGH', procurement: 'MED', supplier: 'MED', legal: 'MED', logistics: 'LOW' };
+  var highImpactUrgencies = ['critical', 'urgent'];
+  var allHighImpact = (highImpactUrgencies.indexOf(urgency) !== -1);
+  var directAffected = { ops: true, supplier: true, procurement: true };
+  var quads = { manage: [], satisfy: [], inform: [], monitor: [] };
+  selected.forEach(function(k) {
+    var s = SH_MAP[k]; if (!s) return;
+    var inf = SH_INFLUENCE[k] || 'MED';
+    var imp = allHighImpact ? 'HIGH' : (directAffected[k] ? 'HIGH' : 'LOW');
+    var infHigh = (inf === 'HIGH');
+    var impHigh = (imp === 'HIGH');
+    if (infHigh && impHigh) quads.manage.push(s.label);
+    else if (infHigh && !impHigh) quads.satisfy.push(s.label);
+    else if (!infHigh && impHigh) quads.inform.push(s.label);
+    else quads.monitor.push(s.label);
+  });
+  var matrixHtml = '<div class="ops-output-title"><i class="fas fa-th"></i> Influence &times; Impact Matrix</div>' +
+    '<p style="font-size:0.74rem;color:var(--text-muted);margin:0 0 0.5rem;">Axes: Influence = ability to unlock decisions or resources; Impact = how directly the situation affects them.</p>' +
+    '<div class="influence-matrix">' +
+    '<div class="influence-quad iq-satisfy"><span class="quad-label">Keep Satisfied &mdash; High Influence / Low Impact</span><div class="quad-names">' + (quads.satisfy.length ? quads.satisfy.join('<br>') : '<em style="opacity:0.5">none</em>') + '</div></div>' +
+    '<div class="influence-quad iq-manage"><span class="quad-label">Manage Closely &mdash; High Influence / High Impact</span><div class="quad-names">' + (quads.manage.length ? quads.manage.join('<br>') : '<em style="opacity:0.5">none</em>') + '</div></div>' +
+    '<div class="influence-quad iq-monitor"><span class="quad-label">Monitor &mdash; Low Influence / Low Impact</span><div class="quad-names">' + (quads.monitor.length ? quads.monitor.join('<br>') : '<em style="opacity:0.5">none</em>') + '</div></div>' +
+    '<div class="influence-quad iq-inform"><span class="quad-label">Keep Informed &mdash; Low Influence / High Impact</span><div class="quad-names">' + (quads.inform.length ? quads.inform.join('<br>') : '<em style="opacity:0.5">none</em>') + '</div></div>' +
+    '</div>';
+
+  // Strategic Narrative Arc table
+  var SH_ACT1 = { ops: 'Part availability is a scheduler problem, not a PM problem', engineering: 'The current spec is the right spec; qualification risk is low', finance: 'Spares budget is contingency, not a recurring operational cost', leadership: 'Supply chain team has visibility and a plan', procurement: 'PO process is on track, standard timeline applies', supplier: 'Current commit date is achievable', legal: 'Contract terms are adequate for this situation', logistics: 'Standard freight route and timeline is sufficient' };
+  var SH_ACT2 = { ops: (urgency === 'routine' ? 'An upcoming PM window depends on parts not yet confirmed' : 'A live maintenance window is at risk due to parts not on-site'), engineering: (urgency === 'critical' || urgency === 'urgent' ? 'Waiting on full qualification blocks the recovery timeline' : 'Technical approval is the current critical path'), finance: 'The cost of inaction (downtime + expedite premium) exceeds the pre-approval ask', leadership: (urgency === 'critical' ? 'Escalation is required: supplier recovery plan does not close the gap' : 'A decision or resource unlock is needed to maintain readiness'), procurement: 'A non-standard path (expedite / emergency sourcing) requires your process support', supplier: 'The current commit date creates a readiness gap at the site', legal: 'An open commercial or contractual point is blocking recovery or commitment', logistics: 'Standard freight will miss the site need date — expedited mode required' };
+  var SH_ACT3 = { ops: 'Confirm site inventory, accept handoff of PM scheduling risk, align on need date', engineering: 'Approve interim use / conditional qualification with documented risk acceptance', finance: 'Pre-approve expedite or emergency PO within 24–48 hours', leadership: 'Provide decision, resource, or escalation authority to unblock recovery', procurement: 'Open emergency sourcing path or approve deviation from standard process', supplier: 'Commit to a revised date that closes the gap, in writing, within 24 hours', legal: 'Provide a risk opinion or approve commercial terms to allow the transaction to proceed', logistics: 'Confirm expedited freight booking and customs clearance plan by EOD' };
+  var SH_TRIGGER = { ops: 'PM window date confirmed → schedule call', engineering: 'Alternate spec submitted → review slot opened', finance: 'Cost scenario sent → approval in-meeting', leadership: 'Status brief circulated → decision in next sync', procurement: 'Emergency PR raised → fast-track approval initiated', supplier: 'Recovery plan requested in writing → written response received', legal: 'Contract clause extracted → review meeting booked', logistics: 'Ship window confirmed → booking placed' };
+  var arcRows = selected.map(function(k) {
+    var s = SH_MAP[k]; if (!s) return '';
+    return '<tr><td><strong>' + s.label + '</strong></td><td style="font-size:0.72rem;">' + (SH_ACT1[k] || 'Current belief not yet defined') + '</td><td style="font-size:0.72rem;">' + (SH_ACT2[k] || 'Pivot point depends on urgency') + '</td><td style="font-size:0.72rem;">' + (SH_ACT3[k] || 'Commitment aligned to topic') + '</td><td style="font-size:0.72rem;">' + (SH_TRIGGER[k] || 'First artefact sent') + '</td></tr>';
+  }).join('');
+  var arcTable = '<div class="ops-output-title"><i class="fas fa-film"></i> Strategic Narrative Arc</div>' +
+    '<p style="font-size:0.74rem;color:var(--text-muted);margin:0 0 0.5rem;">3-act influence plan: shift each stakeholder from their current belief to the commitment you need.</p>' +
+    '<table class="ops-table"><thead><tr><th>Stakeholder</th><th>Act 1 — Current Belief</th><th>Act 2 — Pivot Moment</th><th>Act 3 — Target Commitment</th><th>First-Step Trigger</th></tr></thead><tbody>' + arcRows + '</tbody></table>';
+
+  // Coalition-Building Sequence
+  var highInfluence = selected.filter(function(k) { return (SH_INFLUENCE[k] === 'HIGH'); });
+  var top4 = highInfluence.slice(0, 4);
+  while (top4.length < 1) top4.push(selected[0] || 'PM');
+  var coalSteps = [
+    { step: 'Anchor', label: 'Build foundation with most-influential ally', owner: (SH_MAP[top4[0]] || {label: top4[0]}).label },
+    { step: 'Validate', label: 'Technical SME confirms feasibility privately', owner: (SH_MAP['engineering'] && selected.indexOf('engineering') !== -1) ? 'Engineering' : ((SH_MAP[top4[1 % top4.length]] || {label: top4[1 % top4.length]}).label) },
+    { step: 'Brief', label: '1:1 with each high-influence stakeholder before the group', owner: top4.map(function(k){ return (SH_MAP[k]||{label:k}).label; }).join(', ') },
+    { step: 'Decide', label: 'Convening meeting to secure commitment', owner: (SH_MAP['leadership'] && selected.indexOf('leadership') !== -1) ? 'Leadership' : ((SH_MAP[top4[0]] || {label: top4[0]}).label) },
+    { step: 'Reinforce', label: 'Post-decision communication + accountability follow-up', owner: 'PM (you)' }
+  ];
+  var coalHtml = '<div class="ops-output-title"><i class="fas fa-people-arrows"></i> Coalition-Building Sequence</div>' +
+    '<p style="font-size:0.74rem;color:var(--text-muted);margin:0 0 0.5rem;">5-step alignment path for high-influence stakeholders — sequence matters.</p>' +
+    '<ol style="margin:0;padding-left:1.2rem;">' +
+    coalSteps.map(function(c, i) {
+      return '<li style="padding:5px 0;font-size:0.78rem;color:var(--text-secondary);"><strong style="color:var(--amber-dark);">' + c.step + '</strong> — ' + c.label + ' <span style="font-family:\'JetBrains Mono\',monospace;font-size:0.7rem;color:var(--text-muted);">owner: ' + c.owner + '</span></li>';
+    }).join('') + '</ol>';
+
+  // Strategy Heuristics card
+  var heuristics = [
+    { name: 'Reciprocity', tip: 'Give useful data (inventory gap, cost model) before asking for a decision — people reciprocate information and effort.' },
+    { name: 'Commitment & Consistency', tip: 'Get a small public commitment first ("You agree the timeline is at risk?") — stakeholders then stay consistent with the larger ask.' },
+    { name: 'Authority', tip: 'Lead with credentials: cite the FMECA score, OEM EOL notice, or site SLA to establish technical authority before the commercial ask.' },
+    { name: 'Social Proof', tip: 'Reference how peer DC operators or other sites handled the same scenario — reduces perceived risk of the commitment.' },
+    { name: 'Scarcity', tip: 'Quantify the closing window: "Last order date is [DATE] — after that, lead time doubles." Real scarcity converts urgency to action.' },
+    { name: 'Liking', tip: 'Frame the ask as a shared problem, not an escalation — "We need this solved together" beats "I need you to fix this."' },
+    { name: 'Loss Aversion', tip: 'Frame in terms of what is lost by inaction (downtime cost, SLA penalty) not just what is gained — losses motivate twice as strongly as equivalent gains.' },
+    { name: 'Anchor Low', tip: 'Open negotiation with a concrete number (LTB quantity, expedite cost, timeline) — the first number anchors all subsequent discussion.' }
+  ];
+  var heurHtml = '<div class="ops-output-title"><i class="fas fa-brain"></i> Strategy Heuristics</div>' +
+    '<p style="font-size:0.74rem;color:var(--text-muted);margin:0 0 0.5rem;">Cialdini-based influence principles adapted for DC procurement context.</p>' +
+    '<table class="ops-table"><thead><tr><th style="width:24%">Principle</th><th>Procurement Application</th></tr></thead><tbody>' +
+    heuristics.map(function(h) { return '<tr><td><strong>' + h.name + '</strong></td><td style="font-size:0.74rem;">' + h.tip + '</td></tr>'; }).join('') + '</tbody></table>';
+
   var statusBar = '<div class="ops-status-strip ' + urgencyClass + '">Urgency: <strong>' + urgencyLabel + '</strong> | Stakeholders: <strong>' + selected.length + '</strong> | Topic: ' + topic.substring(0, 60) + (topic.length > 60 ? '…' : '') + '</div>';
 
   var wrap = document.getElementById('sh_output_wrap');
   if (wrap) {
     wrap.innerHTML = statusBar +
       '<div class="ops-output-title"><i class="fas fa-table"></i> Stakeholder Map</div>' + mapTable +
-      '<div class="ops-output-title"><i class="fas fa-comment-dots"></i> Tailored Message Drafts</div><p style="font-size:0.77rem;color:var(--text-muted);margin-bottom:0.5rem;">Edit bracketed fields before sending.</p>' + msgDrafts +
+      matrixHtml + arcTable + coalHtml + heurHtml +
       escalation;
     wrap.style.display = 'block';
     var ph = document.getElementById('sh_ph'); if (ph) ph.style.display = 'none';

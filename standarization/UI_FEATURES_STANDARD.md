@@ -1583,3 +1583,159 @@ Pre-merge checklist for new calc pages:
 3. Visually verify NO unstyled card backgrounds
 4. Confirm chart legibility
 5. `grep -c '\[data-theme="dark"\]' new-calc.html` should be ≥30
+
+
+---
+
+### Calc-page stabilization checklist (mandate 2026-05-13, v1.17.2)
+
+Every calculator page MUST pass these checks before release. This pattern was codified after the site-wide v1.8.0 mobile-responsive tool injection broke 3+ calc pages by embedding raw multi-line CSS into JS string literals inside PDF export functions.
+
+#### 1. Window-expose every inline handler function
+
+All functions referenced in `onclick=`, `oninput=`, `onchange=`, `onkeyup=`, `onfocus=`, `onblur=` attributes MUST be explicitly exposed as `window.X = X`.
+
+Even though bare `<script>` block declarations are technically global in non-strict ES5, the explicit `window.X = X` block:
+- Satisfies `tools/audit-onclick-handlers.py --strict`
+- Protects against future wrapping in IIFEs or module rewrites
+- Makes the handler dependency graph explicit
+
+Pattern (add just before `// ═══ INIT ═══` or just before the closing `</script>`):
+
+```js
+// v1.17.2 STABILIZATION: expose inline-onclick handlers on window
+try {
+  window.myFunction   = myFunction;
+  window.anotherFn    = anotherFn;
+  // ... all functions referenced in inline handlers ...
+} catch(e) { if(window.console)console.warn('window export error:',e); }
+```
+
+#### 2. PDF export strings must NOT contain raw multi-line CSS
+
+When building `html += '...'` strings for PDF print-windows (`window.open`), never let a site-wide tool inject multi-line CSS into the middle of a JS string literal. The symptom is `Invalid or unexpected token` that kills every function below.
+
+Fix: use template literals (backtick) for the CSS block:
+```js
+html += `
+  /* styles */
+  @media ... { ... }
+</style></head><body>`;
+```
+
+Run `tools/audit-script-tags.py --strict` before every push.
+
+#### 3. Verify auth/premium state on page init
+
+The page MUST read `localStorage.getItem('rz_premium_session')` at DOMContentLoaded and set its local `isPremiumUser` / `cxIsPremium` state variable. Do not rely solely on deferred `auth.js` events for initial state — the page may render before `auth.js` fires its `rz-auth-change` event.
+
+Pattern:
+```js
+(function checkSession() {
+  var session = localStorage.getItem('rz_premium_session');
+  if (session) {
+    try {
+      var data = JSON.parse(session);
+      var exp = typeof data.expires === 'string' ? new Date(data.expires).getTime() : data.expires;
+      if (exp > Date.now()) { isPremiumUser = true; activatePremiumUI(); return; }
+    } catch(e) {}
+  }
+})();
+```
+
+#### 4. Mobile burger and back-link
+
+Every calc page MUST have:
+- `<script src="js/rz-mobile-nav.js?v=..." defer></script>` near `</body>` — this auto-injects the `.rz-nav-burger` button
+- A back-link to `index.html` in the navbar (class `.nav-back` or `.cx-nav-back` etc.)
+
+Check with: `audit-mobile-responsive.py --strict`
+
+#### 5. Puppeteer probe contract
+
+For each new calc page, create `tools/probe-calc-<key>.mjs` that:
+1. Sets premium session in localStorage before page load
+2. Enumerates all inline handler attributes and checks `typeof window[fn] === 'function'`
+3. Clicks every button and verifies no `ReferenceError` fires
+4. Checks mobile viewport (375px) for burger visibility and back-link presence
+5. Exits 0 only when `issues: []`
+
+Re-run the probe after EVERY fix and include the JSON SUMMARY in the commit message or PR body.
+
+---
+
+## Module workflow visualization pattern (v1.17.3)
+
+Introduced in `spares-readiness-calculator.html` v1.17.3. Canonical way to express analytical engine alur (flow) so users understand what each module does before interacting with it.
+
+### Three-layer structure (all three required for analytical modules)
+
+#### Layer 1 — Module Summary Card
+
+```html
+<div class="module-summary-card">
+  <span class="q">Q: [What problem does this module solve — one sentence, max 15 words]</span>
+  <div class="a">[Method/model used — one sentence]</div>
+  <div class="output">Output: [What the user gets — list key outputs]</div>
+  <div class="use-when"><strong>Use when:</strong> [Trigger conditions — 2–4 concrete scenarios]</div>
+</div>
+```
+
+Placement: FIRST child inside the `.module-pane`, before everything else.
+
+CSS: `.module-summary-card` — amber left border, glass background, `[data-theme="dark"]` override required.
+
+Purpose: answers "should I use this module right now?" before the user has to scan inputs and outputs.
+
+#### Layer 2 — Module Flow Card
+
+```html
+<div class="module-flow-card">
+  <div class="module-flow-col"><h4>Inputs</h4><ul>...</ul></div>
+  <div class="module-flow-arrow">&rarr;</div>
+  <div class="module-flow-col"><h4>Computation</h4><ul>...</ul></div>
+  <div class="module-flow-arrow">&rarr;</div>
+  <div class="module-flow-col"><h4>Outputs</h4><ul>...</ul></div>
+  <div class="module-flow-arrow">&rarr;</div>
+  <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('id')">Mx Name</a></li></ul></div>
+</div>
+```
+
+Placement: After module-summary-card, before `.ops-intro` or `.module-grid`.
+
+CSS: `.module-flow-card` — 7-column grid (1fr auto 1fr auto 1fr auto 1fr), amber border, JetBrains Mono font for list items. Mobile: stacks to 1 column with 90° rotated arrows.
+
+Rules:
+- Inputs list: only include actual input fields present in the module (match IDs in the DOM).
+- Computation list: include the key formula or algorithm name (e.g. `CR = Cu ÷ (Cu + Co)`).
+- Outputs list: match the result cards/outputs that genX() actually renders.
+- Connects-To list: only link to modules that genuinely receive data from or feed data to this one.
+
+#### Layer 3 — Top-of-page Workflow Flowchart
+
+A `<details>` collapsible card at the very top of the main content area (before the One-Glance Dashboard) showing all modules across 4 logical groups:
+
+| Group | Contents |
+|---|---|
+| ANALYTICAL | M1–M11+ quantitative models |
+| OPERATING ENGINE | OE-A through OE-J deterministic generators |
+| SUPPLY CHAIN | SC-1 through SC-4 logistics modules |
+| REFERENCE | Catalog, analytics, fleet views |
+
+SVG rules:
+- `viewBox="0 0 1200 440"`, `min-width: 700px`, responsive via `width: 100%`.
+- `font-family: 'JetBrains Mono', ui-monospace, monospace` on all text.
+- Tier-1 lines (main flow): class `flow-line-tier1`, stroke `var(--amber)`, `stroke-width: 1.4`.
+- Tier-2 lines (cross-connections): class `flow-line-tier2`, `stroke-dasharray: 4 3`, opacity 0.5.
+- Group boxes: class `group-box`, fill `rgba(245,158,11,0.04)`.
+- Module labels: class `module-label`, `onclick="switchTab('id')"` — must be valid tab IDs from TAB_ORDER.
+- `@media (prefers-reduced-motion: reduce)` must suppress any animation on flow lines.
+- Add `role="img"` + `aria-label` to the `<svg>` element.
+
+### Anti-patterns to avoid
+
+- Do NOT list inputs that don't exist as actual DOM input elements in the module.
+- Do NOT create connections in "Connects To" between modules that have no real data relationship.
+- Do NOT use generic placeholder content ("input 1", "output A") — every item must be specific.
+- Do NOT make the flow card wider than the module pane (use `max-width: 100%; overflow-x: auto` as fallback).
+- Do NOT animate flow lines without honouring `prefers-reduced-motion`.
