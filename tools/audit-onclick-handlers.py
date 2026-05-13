@@ -14,9 +14,27 @@ import sys
 import os
 
 def extract_handlers(html):
-    """Return sorted unique function names from inline onclick attributes."""
-    pattern = re.compile(r'''onclick=["']([a-zA-Z_][a-zA-Z0-9_]*)\(''')
-    return sorted(set(pattern.findall(html)))
+    """Return sorted unique function names from inline event handlers.
+    v1.16.3: cover ALL inline event attributes (not just onclick) — oninput, onchange,
+    onkeyup, onfocus, onblur, onsubmit, etc. — because v1.16.2 only checked onclick
+    and let 19 input-bound calc handlers slip through unexposed."""
+    events = ('onclick','oninput','onchange','onkeyup','onkeydown','onfocus','onblur',
+              'onsubmit','onmouseover','onmouseout','ondblclick')
+    names = set()
+    for ev in events:
+        # Standard form: ev="fname(...)" or ev='fname(...)'
+        for m in re.finditer(rf'''{ev}=["']([^"']+)["']''', html):
+            code = m.group(1)
+            # Function names called inside the expression (may be multi-call: "a();b()")
+            for n in re.finditer(r'(?:^|[\s;,(])([a-zA-Z_$][\w$]*)\s*\(', code):
+                names.add(n.group(1))
+    # Skip JS built-ins / DOM API surface
+    BUILTINS = {'if','for','while','return','function','typeof','new','document','window',
+                'setTimeout','setInterval','parseInt','parseFloat','Math','Array','Object',
+                'JSON','console','localStorage','sessionStorage','event','this','alert',
+                'confirm','prompt','encodeURIComponent','decodeURIComponent','Number','String',
+                'Boolean','Date','RegExp','Promise','Error'}
+    return sorted(names - BUILTINS)
 
 def check_window_exposure(html, name):
     """Return True if window.NAME is assigned anywhere in the file."""

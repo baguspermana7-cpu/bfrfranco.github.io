@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.16.3 — 2026-05-13 (Spares Engine — stabilization sweep 2: per-module calc handlers)
+
+User reported "still many errors" after v1.16.2. Re-probed comprehensively with a deeper Puppeteer audit covering ALL inline event attributes (not just `onclick`). v1.16.2 only audited `onclick` and missed 19 functions called via `oninput=` / `onchange=` on input elements across 10 modules.
+
+1. **19 more handlers exposed on window** — every input-bound recalc function across the Readiness, Stock, Hub, Supplier-Risk, LTB, Kraljic, Fleet, Scorecard, SC-Risk, Catalog-Analytics, Commodity-Defaults, Preset, MC-labels, Fleet-update, and SC-part-from-catalog handlers. Pattern: `window.X = (typeof X !== 'undefined') ? X : null;` for forward-compat in case any are deprecated later.
+2. **`tools/audit-onclick-handlers.py` updated** — now extracts handler names from ALL inline event attributes: `onclick`, `oninput`, `onchange`, `onkeyup`, `onkeydown`, `onfocus`, `onblur`, `onsubmit`, `onmouseover`, `onmouseout`, `ondblclick`. Skips JS built-ins (`if`, `for`, `Math`, etc.) via blocklist. Strict mode for CI.
+3. **`tools/audit-all-handlers.mjs`** — companion Puppeteer-driven cross-check that loads the live page and reports any handler typeof !== 'function' on `window`.
+4. **Deep probe coverage expanded** — `tools/probe-spares-deep.mjs` now exercises Save/Load/Share, 15 calc functions across all module groups, tour Start → Next×2 → Skip, 189 tooltip elements, and mobile viewport at 375×667.
+
+Probe SUMMARY (live URL): consoleErrors=0, pageErrors=0, tabsFailed=0, all 80 inline-event handlers exposed.
+
 ## v1.16.2 — 2026-05-13 (Spares Engine — stabilization: dead handlers, NaN cards)
 
 Runtime-verified stabilization of the 9,302-line calculator (Puppeteer probe green):
