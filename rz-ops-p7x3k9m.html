@@ -146,6 +146,30 @@
         .feat-name i{width:16px;color:#64748b;font-size:0.78rem}
         .feat-name .fdesc{font-size:0.68rem;color:#64748b;font-weight:400}
         .feat-cell{display:flex;justify-content:center}
+        /* ═══ FEATURE FLAGS v2 — per-page 3-tier matrix ═══ */
+        .features-layout{display:grid;grid-template-columns:180px 1fr;gap:1rem;min-height:320px}
+        .features-subnav{display:flex;flex-direction:column;gap:4px;border-right:1px solid #1f2937;padding-right:0.75rem}
+        .page-tab{padding:8px 14px;margin:2px 0;border:1px solid #334155;background:transparent;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:0.75rem;font-family:'JetBrains Mono',monospace;text-align:left;transition:all 0.15s}
+        .page-tab:hover{background:rgba(139,92,246,0.08);color:#e2e8f0;border-color:#4b5563}
+        .page-tab.active{background:#fbbf24;color:#0f172a;border-color:#fbbf24;font-weight:700}
+        .features-main{display:flex;flex-direction:column;gap:0.75rem}
+        .features-main-header{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap}
+        .feature-matrix-table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        .feature-matrix-table th{padding:10px;text-align:center;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;border-bottom:2px solid #334155}
+        .feature-matrix-table th:first-child{text-align:left}
+        .feature-matrix-table td{padding:8px 10px;border-bottom:1px solid rgba(51,65,85,0.4)}
+        .feature-matrix-table td:first-child{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#cbd5e1}
+        .feature-matrix-table tr:last-child td{border-bottom:none}
+        .feature-matrix-table tr:hover td{background:rgba(51,65,85,0.15)}
+        .default-cell{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#64748b}
+        .toggle-switch{position:relative;width:38px;height:20px;flex-shrink:0;display:inline-block}
+        .toggle-switch input{opacity:0;width:0;height:0}
+        .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#334155;transition:0.25s;border-radius:20px}
+        .toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#94a3b8;transition:0.25s;border-radius:50%}
+        .toggle-switch input:checked+.toggle-slider{background:#7c3aed}
+        .toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px);background:#fff}
+        .matrix-td-center{text-align:center}
+        @media(max-width:768px){.features-layout{grid-template-columns:1fr}.features-subnav{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid #1f2937;padding-right:0;padding-bottom:0.5rem;margin-bottom:0.25rem}}
 
         /* ═══ CREDENTIALS ═══ */
         .cred-row{display:grid;grid-template-columns:40px 1.2fr 1.5fr 1fr 0.8fr 100px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.8rem}
@@ -628,6 +652,7 @@
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -925,15 +950,55 @@
 <!-- ══════════════════════════════════════ FEATURES ══════════════════════════════════════ -->
 <div class="section" id="sec-features">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Feature Flags</h1><p>Toggle calculator features per subscription tier in real-time</p></div>
+        <div><h1>Feature Flags</h1><p>Per-page 3-tier feature matrix — FREE | DEMO | PRO. Changes persist immediately.</p></div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0">
             <button class="btn btn-green btn-sm" onclick="exportFeaturesCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-purple btn-sm" onclick="openReport('features')"><i class="fas fa-file-alt"></i> Report</button>
         </div>
     </div>
+    <!-- Per-page 3-tier matrix (v1.18.0) -->
     <div class="card">
-        <div class="card-title"><i class="fas fa-sliders-h" style="color:#22d3ee"></i> Tier-Level Feature Matrix</div>
-        <p style="font-size:0.78rem;color:#64748b;margin-bottom:1.25rem;">Toggle features ON/OFF per tier. Changes apply immediately to all users of that tier on their next page load.</p>
+        <div class="card-title"><i class="fas fa-sliders-h" style="color:#22d3ee"></i> Per-Page Tier-Level Feature Matrix</div>
+        <p style="font-size:0.78rem;color:#64748b;margin-bottom:1.25rem;">Select a page from the left panel. Toggle features per tier. Overrides saved to <code style="font-size:0.7rem;color:#a78bfa">rz_admin_features_by_page</code>. Open calc tabs receive an <code style="font-size:0.7rem;color:#a78bfa">rz-features-changed</code> event.</p>
+        <div class="features-layout">
+            <div class="features-subnav" id="featurePagesSubnav">
+                <span style="font-size:0.65rem;color:#475569;padding:4px 2px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Loading pages...</span>
+            </div>
+            <div class="features-main">
+                <div class="features-main-header">
+                    <span id="featureMatrixTitle" style="font-size:0.85rem;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace"></span>
+                    <div style="display:flex;gap:0.5rem;align-items:center">
+                        <select id="featurePresetSelect" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;padding:4px 8px;font-family:inherit;cursor:pointer;outline:none" onchange="applyFeaturePreset(this.value)" aria-label="Apply feature preset">
+                            <option value="">Apply preset...</option>
+                            <option value="all_free">All tiers enabled</option>
+                            <option value="pro_only">Pro only (free + demo off)</option>
+                            <option value="demo_up">Demo + Pro enabled</option>
+                            <option value="all_off">All tiers off</option>
+                        </select>
+                        <button class="btn btn-ghost btn-sm" onclick="resetFeaturePage(window._selectedFeaturePage || '')"><i class="fas fa-undo"></i> Reset to defaults</button>
+                    </div>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="feature-matrix-table" id="featureMatrixTableWrap">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>FREE</th>
+                                <th>DEMO</th>
+                                <th>PRO</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody id="featureMatrixBody">
+                            <tr><td colspan="5" style="text-align:center;color:#475569;padding:2rem;font-size:0.75rem">Loading feature flags...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Legacy flat matrix (v1 compat — kept for Per-User Overrides + Experimental sections) -->
+    <div class="card" style="margin-top:1.5rem;display:none" id="legacyFeatCard">
         <div class="feat-grid" id="featureMatrix"></div>
     </div>
     <div class="card" style="margin-top:1.5rem">
@@ -2781,45 +2846,161 @@ function deleteManualAccount(email){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// FEATURE FLAGS
+// FEATURE FLAGS v2 — per-page 3-tier matrix
 // ═══════════════════════════════════════════════════════════════
-function renderFeatures(){
-    const keys=Object.keys(featureFlags);
-    let html=`<div class="feat-row header"><span>Feature</span><span style="text-align:center">Free</span><span style="text-align:center">Pro</span></div>`;
-    keys.forEach(k=>{
-        const f=featureFlags[k];
-        html+=`<div class="feat-row">
-            <div class="feat-name"><i class="fas ${f.icon}"></i><div>${f.label}<br><span class="fdesc">${f.desc}</span></div></div>
-            <div class="feat-cell"><label class="toggle"><input type="checkbox" ${f.free?'checked':''} onchange="toggleFeature('${k}','free',this.checked)"><span class="slider"></span></label></div>
-            <div class="feat-cell"><label class="toggle"><input type="checkbox" ${f.pro?'checked':''} onchange="toggleFeature('${k}','pro',this.checked)"><span class="slider"></span></label></div>
-        </div>`;
-    });
-    document.getElementById('featureMatrix').innerHTML=html;
 
-    // User overrides
-    const proUsers=allUsers.filter(u=>u.tier==='pro').slice(0,8);
-    document.getElementById('userOverrides').innerHTML=`
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem">
-        ${proUsers.map(u=>`<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">
-            <div class="cred-avatar" style="background:#8b5cf6;width:32px;height:32px;font-size:0.6rem">${u.name.charAt(0)}</div>
-            <div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.email}</div><span class="tier-badge pro" style="margin-top:4px">PRO</span></div>
-            <button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)('Override panel for ${u.email} — coming with Supabase integration')"><i class="fas fa-sliders-h"></i></button>
-        </div>`).join('')}
-        </div>`;
+// Fallback schema used when rz-feature-flags.js has not yet loaded
+var RZ_FEATURE_FLAGS_FALLBACK = {
+    'pue-calculator':       {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},comparison_view:{label:'Scenario Comparison',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'capex-calculator':     {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},comparison_view:{label:'Scenario Comparison',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'opex-calculator':      {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},comparison_view:{label:'Scenario Comparison',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'roi-calculator':       {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},comparison_view:{label:'Scenario Comparison',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'tco-calculator':       {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},comparison_view:{label:'Scenario Comparison',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'dcmoc':                {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},comparison_view:{label:'Scenario Comparison',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'spares-readiness-calculator':{advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},save_scenario:{label:'Save Scenario',free:false,demo:false,pro:true},catalog_browse:{label:'Parts Catalog Browse',free:true,demo:true,pro:true},supply_chain:{label:'Supply Chain Module',free:false,demo:true,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'finance-terminal':     {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},api_access:{label:'API Access',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'cx-calculator':        {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'rfs-readiness-workbench':{advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'dc-conventional':      {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'datahall-ai':          {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'pln-java-grid':        {advanced_mode:{label:'Advanced Mode',free:true,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}},
+    'tools':                {advanced_mode:{label:'Advanced Mode',free:false,demo:true,pro:true},pdf_export:{label:'PDF Export',free:false,demo:false,pro:true},tooltips:{label:'Tooltips',free:true,demo:true,pro:true}}
+};
 
-    // Experimental
-    document.getElementById('experimentalFeatures').innerHTML=`
-        <div style="display:grid;gap:0.75rem">
-            ${[{k:'dark_mode',l:'Dark Mode',d:'Dark theme for all calculator pages',s:featureFlags.dark_mode?.pro||false},{k:'multi_scenario',l:'Multi-Scenario Compare',d:'Compare 3+ scenarios side-by-side',s:featureFlags.multi_scenario?.pro||false}].map(x=>`
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#0f172a;border:1px solid #334155;border-radius:10px">
-                <div><div style="font-size:0.85rem;font-weight:600;color:#e2e8f0">${x.l}</div><div style="font-size:0.72rem;color:#64748b">${x.d}</div></div>
-                <div style="display:flex;align-items:center;gap:8px"><span style="font-size:0.68rem;color:${x.s?'#34d399':'#f87171'};font-weight:600">${x.s?'ENABLED':'DISABLED'}</span><label class="toggle"><input type="checkbox" ${x.s?'checked':''} onchange="toggleExperimental('${x.k}',this.checked)"><span class="slider"></span></label></div>
-            </div>`).join('')}
-        </div>`;
+window._selectedFeaturePage = '';
+
+function _getFeatureSchema() {
+    return (window.RZ_FEATURE_FLAGS && Object.keys(window.RZ_FEATURE_FLAGS).length > 0)
+        ? window.RZ_FEATURE_FLAGS
+        : RZ_FEATURE_FLAGS_FALLBACK;
 }
 
-function toggleFeature(key,tier,val){featureFlags[key][tier]=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags))}
-function toggleExperimental(key,val){if(featureFlags[key]){featureFlags[key].free=val;featureFlags[key].pro=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags));renderFeatures()}}
+function renderFeatures() {
+    var schema = _getFeatureSchema();
+    var pageKeys = Object.keys(schema);
+    var subnav = pageKeys.map(function(pk) {
+        return '<button class="page-tab" onclick="selectFeaturePage(\'' + pk + '\')" id="ptab-' + pk.replace(/[^a-z0-9]/g, '-') + '">' + pk + '<\/button>';
+    }).join('');
+    document.getElementById('featurePagesSubnav').innerHTML = subnav;
+    // Select first page by default
+    selectFeaturePage(pageKeys[0]);
+
+    // User overrides
+    var proUsers = allUsers.filter(function(u){return u.tier==='pro';}).slice(0,8);
+    document.getElementById('userOverrides').innerHTML =
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem">' +
+        proUsers.map(function(u) {
+            return '<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">' +
+                '<div class="cred-avatar" style="background:#8b5cf6;width:32px;height:32px;font-size:0.6rem">' + u.name.charAt(0) + '<\/div>' +
+                '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + u.email + '<\/div><span class="tier-badge pro" style="margin-top:4px">PRO<\/span><\/div>' +
+                '<button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)(\'Override panel for ' + u.email + ' — coming with Supabase integration\')"><i class="fas fa-sliders-h"><\/i><\/button>' +
+                '<\/div>';
+        }).join('') + '<\/div>';
+
+    // Experimental — use legacy featureFlags for backward compat
+    var expItems = [
+        {k:'dark_mode',l:'Dark Mode',d:'Dark theme for all calculator pages',s:featureFlags.dark_mode&&featureFlags.dark_mode.pro||false},
+        {k:'multi_scenario',l:'Multi-Scenario Compare',d:'Compare 3+ scenarios side-by-side',s:featureFlags.multi_scenario&&featureFlags.multi_scenario.pro||false}
+    ];
+    document.getElementById('experimentalFeatures').innerHTML =
+        '<div style="display:grid;gap:0.75rem">' +
+        expItems.map(function(x) {
+            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#0f172a;border:1px solid #334155;border-radius:10px">' +
+                '<div><div style="font-size:0.85rem;font-weight:600;color:#e2e8f0">' + x.l + '<\/div><div style="font-size:0.72rem;color:#64748b">' + x.d + '<\/div><\/div>' +
+                '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:0.68rem;color:' + (x.s?'#34d399':'#f87171') + ';font-weight:600">' + (x.s?'ENABLED':'DISABLED') + '<\/span>' +
+                '<label class="toggle"><input type="checkbox" ' + (x.s?'checked':'') + ' onchange="toggleExperimental(\'' + x.k + '\',this.checked)"><span class="slider"><\/span><\/label><\/div>' +
+                '<\/div>';
+        }).join('') + '<\/div>';
+}
+
+window.selectFeaturePage = function(pageKey) {
+    var schema = _getFeatureSchema();
+    var spec = schema[pageKey];
+    if (!spec) return;
+    window._selectedFeaturePage = pageKey;
+
+    // Update active tab styling
+    var allTabs = document.querySelectorAll('.page-tab');
+    for (var i = 0; i < allTabs.length; i++) {
+        allTabs[i].classList.toggle('active', allTabs[i].textContent === pageKey);
+    }
+
+    document.getElementById('featureMatrixTitle').textContent = pageKey;
+
+    var overrides = {};
+    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
+    var pageOverrides = overrides[pageKey] || {};
+
+    var rows = Object.keys(spec).map(function(fk) {
+        var defs = spec[fk];
+        var ov = pageOverrides[fk] || {};
+        function tierToggle(tier) {
+            var current = (typeof ov[tier] === 'boolean') ? ov[tier] : defs[tier];
+            return '<label class="toggle-switch"><input type="checkbox" ' + (current ? 'checked' : '') +
+                   ' onchange="toggleFeatureFlag(\'' + pageKey + '\',\'' + fk + '\',\'' + tier + '\',this.checked)"><span class="toggle-slider"><\/span><\/label>';
+        }
+        var hasOverride = (typeof ov.free === 'boolean' || typeof ov.demo === 'boolean' || typeof ov.pro === 'boolean');
+        var label = (defs.label || fk) + (hasOverride ? ' <span style="color:#fbbf24;font-size:0.6rem">*<\/span>' : '');
+        return '<tr>' +
+            '<td>' + label + '<\/td>' +
+            '<td class="matrix-td-center">' + tierToggle('free') + '<\/td>' +
+            '<td class="matrix-td-center">' + tierToggle('demo') + '<\/td>' +
+            '<td class="matrix-td-center">' + tierToggle('pro') + '<\/td>' +
+            '<td><span class="default-cell">F:' + (defs.free ? 'Y' : 'N') + ' D:' + (defs.demo ? 'Y' : 'N') + ' P:' + (defs.pro ? 'Y' : 'N') + '<\/span><\/td>' +
+            '<\/tr>';
+    }).join('');
+    document.getElementById('featureMatrixBody').innerHTML = rows || '<tr><td colspan="5" style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">No features defined for this page.<\/td><\/tr>';
+
+    // Reset preset select
+    var sel = document.getElementById('featurePresetSelect');
+    if (sel) sel.value = '';
+};
+
+window.toggleFeatureFlag = function(pageKey, featureKey, tier, value) {
+    var overrides = {};
+    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
+    overrides[pageKey] = overrides[pageKey] || {};
+    overrides[pageKey][featureKey] = overrides[pageKey][featureKey] || {};
+    overrides[pageKey][featureKey][tier] = !!value;
+    localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
+    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch(_) {}
+};
+
+window.resetFeaturePage = function(pageKey) {
+    if (!pageKey) return;
+    if (!confirm('Reset ' + pageKey + ' to defaults?')) return;
+    var overrides = {};
+    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
+    delete overrides[pageKey];
+    localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
+    selectFeaturePage(pageKey);
+    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch(_) {}
+};
+
+window.applyFeaturePreset = function(preset) {
+    var pageKey = window._selectedFeaturePage;
+    if (!pageKey || !preset) return;
+    var schema = _getFeatureSchema();
+    var spec = schema[pageKey];
+    if (!spec) return;
+    var overrides = {};
+    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
+    overrides[pageKey] = overrides[pageKey] || {};
+    Object.keys(spec).forEach(function(fk) {
+        overrides[pageKey][fk] = overrides[pageKey][fk] || {};
+        if (preset === 'all_free')   { overrides[pageKey][fk].free = true;  overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true; }
+        if (preset === 'pro_only')   { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = true; }
+        if (preset === 'demo_up')    { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true; }
+        if (preset === 'all_off')    { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = false; }
+    });
+    localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
+    selectFeaturePage(pageKey);
+    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch(_) {}
+};
+
+// Legacy flat-flag helpers (kept for backward compat — rz_admin_features key unchanged)
+function toggleFeature(key,tier,val){featureFlags[key][tier]=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags));}
+function toggleExperimental(key,val){if(featureFlags[key]){featureFlags[key].free=val;featureFlags[key].pro=val;localStorage.setItem('rz_admin_features',JSON.stringify(featureFlags));renderFeatures();}}
 
 // ═══════════════════════════════════════════════════════════════
 // BENCHMARKS — Global DC Intelligence Database
