@@ -1140,11 +1140,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <button class="tab-btn active" onclick="switchTab('criticality')" role="tab" aria-selected="true" aria-controls="pane-criticality">1 · Criticality</button>
       <button class="tab-btn" onclick="switchTab('readiness')" role="tab" aria-selected="false" aria-controls="pane-readiness">2 · Readiness</button>
       <button class="tab-btn" onclick="switchTab('stock')" role="tab" aria-selected="false" aria-controls="pane-stock">3 · Optimal Stock</button>
-      <button class="tab-btn" onclick="switchTab('hub')" role="tab" aria-selected="false" aria-controls="pane-hub">4 · Hub Positioning</button>
-      <button class="tab-btn" onclick="switchTab('supplier')" role="tab" aria-selected="false" aria-controls="pane-supplier">5 · Supplier Risk</button>
-      <button class="tab-btn" onclick="switchTab('ltb')" role="tab" aria-selected="false" aria-controls="pane-ltb">6 · Last-Time-Buy</button>
-      <button class="tab-btn" onclick="switchTab('kraljic')" role="tab" aria-selected="false" aria-controls="pane-kraljic">7 · Kraljic</button>
-      <button class="tab-btn" onclick="switchTab('montecarlo')" role="tab" aria-selected="false" aria-controls="pane-montecarlo">8 · Monte-Carlo</button>
+      <button class="tab-btn" onclick="switchTab('meio')" role="tab" aria-selected="false" aria-controls="pane-meio">4 · MEIO Optimizer</button>
+      <button class="tab-btn" onclick="switchTab('hub')" role="tab" aria-selected="false" aria-controls="pane-hub">5 · Hub Positioning</button>
+      <button class="tab-btn" onclick="switchTab('supplier')" role="tab" aria-selected="false" aria-controls="pane-supplier">6 · Supplier Risk</button>
+      <button class="tab-btn" onclick="switchTab('ltb')" role="tab" aria-selected="false" aria-controls="pane-ltb">7 · Last-Time-Buy</button>
+      <button class="tab-btn" onclick="switchTab('kraljic')" role="tab" aria-selected="false" aria-controls="pane-kraljic">8 · Kraljic</button>
+      <button class="tab-btn" onclick="switchTab('montecarlo')" role="tab" aria-selected="false" aria-controls="pane-montecarlo">9 · Monte-Carlo</button>
       <button class="tab-btn" onclick="switchTab('fleet')" role="tab" aria-selected="false" aria-controls="pane-fleet">🧰 Fleet / Portfolio</button>
       <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Operating Engine</span>
@@ -1478,9 +1479,103 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <p><strong>Safety stock (fill-rate target):</strong> <code>SS = max(0, ⌈Φ⁻¹(FR) × σ_LT⌉)</code>. Reorder Point: <code>ROP = ⌈μ_LT + SS⌉</code>.</p>
         <p><strong>Poisson mode (slow movers, demand &lt;5 units/yr):</strong> <code>λ_LT = λ_annual × (L/52)</code>; P(stockout at level S) = <code>1 − Σ_{k=0}^{S−1} e^{−λ_LT} λ_LT^k/k!</code>. Falls back to normal approx for λ_LT &gt; 200. Ref: <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.31.10.1247" target="_blank" rel="noopener">Sherbrooke 1985 METRIC</a> — newsvendor model (critical-fractile).</p>
       </details>
+      <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <a class="crosslink-pill" onclick="switchTab('meio')" href="#" role="button" aria-label="Go to MEIO Optimizer module"><i class="fas fa-layer-group"></i> MEIO Optimizer</a>
+      </div>
     </div>
 
-    <!-- ===== MODULE 4: HUB POSITIONING ===== -->
+    <!-- ===== MODULE 4: MEIO OPTIMIZER ===== -->
+    <div class="module-pane" id="pane-meio">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-layer-group"></i> MEIO 2-Echelon Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="meio_demand_lambda">Site demand rate &lambda; (units/yr) <span class="tip" tabindex="0" data-tip="Failure-driven annual demand per site. Used as Poisson mean for site stockout calc." aria-label="Site demand rate tooltip">ⓘ</span></label>
+              <input type="number" id="meio_demand_lambda" class="input-field" value="0.8" min="0.01" step="0.1" oninput="calcMEIO()" aria-label="Site demand rate lambda">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="meio_n_sites">Number of sites served <span class="tip" tabindex="0" data-tip="How many sites share the regional warehouse pool. Total regional &lambda; = sites &times; &lambda;." aria-label="Number of sites tooltip">ⓘ</span></label>
+              <input type="number" id="meio_n_sites" class="input-field" value="3" min="1" max="50" oninput="calcMEIO()" aria-label="Number of sites">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="meio_lt_vendor">Vendor &rarr; Regional LT (weeks) <span class="tip" tabindex="0" data-tip="Lead time from OEM/distributor to regional warehouse." aria-label="Vendor to regional lead time tooltip">ⓘ</span></label>
+              <input type="number" id="meio_lt_vendor" class="input-field" value="20" min="1" max="200" oninput="calcMEIO()" aria-label="Vendor to regional lead time weeks">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="meio_lt_regional">Regional &rarr; Site LT (days) <span class="tip" tabindex="0" data-tip="Internal logistics time once regional has the part. Express courier / dedicated van." aria-label="Regional to site lead time tooltip">ⓘ</span></label>
+              <input type="number" id="meio_lt_regional" class="input-field" value="2" min="0.5" step="0.5" oninput="calcMEIO()" aria-label="Regional to site lead time days">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="meio_unit_cost">Unit cost ($) <span class="tip" tabindex="0" data-tip="Replacement cost per unit." aria-label="Unit cost tooltip">ⓘ</span></label>
+              <input type="number" id="meio_unit_cost" class="input-field" value="4500" min="1" oninput="calcMEIO()" aria-label="Unit cost">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="meio_holding_pct">Annual holding cost (%/yr) <span class="tip" tabindex="0" data-tip="% of unit cost per year for carrying inventory. Same as Optimal Stock module." aria-label="Holding cost rate tooltip">ⓘ</span></label>
+              <input type="number" id="meio_holding_pct" class="input-field" value="25" min="1" max="100" oninput="calcMEIO()" aria-label="Annual holding cost percent">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="meio_backorder_cost">Backorder cost / event ($) <span class="tip" tabindex="0" data-tip="Cost of one stockout (downtime + emergency expedite)." aria-label="Backorder cost tooltip">ⓘ</span></label>
+              <input type="number" id="meio_backorder_cost" class="input-field" value="85000" min="1" oninput="calcMEIO()" aria-label="Backorder cost per event">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="meio_service_target">Target site fill rate (%) <span class="tip" tabindex="0" data-tip="Probability that a demand event is met from site stock without backorder." aria-label="Service target tooltip">ⓘ</span></label>
+              <input type="number" id="meio_service_target" class="input-field" value="98" min="50" max="99.99" step="0.5" oninput="calcMEIO()" aria-label="Target site fill rate">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="meio_budget">Annual budget cap ($ optional) <span class="tip" tabindex="0" data-tip="If &gt;0, stop adding stock when annual holding cost reaches this. If 0, run until service target met." aria-label="Budget cap tooltip">ⓘ</span></label>
+              <input type="number" id="meio_budget" class="input-field" value="0" min="0" oninput="calcMEIO()" aria-label="Annual budget cap">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-pdf" onclick="exportMEIOPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <button class="btn-reset-module" onclick="resetModule('meio')" aria-label="Reset MEIO inputs to defaults">&#8635; Reset defaults</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="result-card">
+            <div class="result-title">MEIO Optimal Allocation</div>
+            <div class="metric-grid-2">
+              <div class="metric-box"><div class="metric-label">Regional Stock s&#8321;*</div><div class="metric-value" id="meio_s1_star">—</div></div>
+              <div class="metric-box"><div class="metric-label">Site Stock s&#8322;*</div><div class="metric-value" id="meio_s2_star">—</div></div>
+              <div class="metric-box"><div class="metric-label">Site Fill Rate</div><div class="metric-value" id="meio_fill_achieved">—</div></div>
+              <div class="metric-box"><div class="metric-label">Annual Holding Cost</div><div class="metric-value" id="meio_annual_hold">—</div></div>
+              <div class="metric-box"><div class="metric-label">Expected Stockout Cost</div><div class="metric-value" id="meio_annual_stockout">—</div></div>
+              <div class="metric-box"><div class="metric-label">Total Annual Cost</div><div class="metric-value" id="meio_total_cost">—</div></div>
+              <div class="metric-box"><div class="metric-label">Total Inventory Value</div><div class="metric-value" id="meio_inventory_value">—</div></div>
+              <div class="metric-box"><div class="metric-label">Effective Site LT (days)</div><div class="metric-value" id="meio_lt_eff">—</div></div>
+              <div class="metric-box"><div class="metric-label">Iterations to Converge</div><div class="metric-value" id="meio_iterations">—</div></div>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-chart-line"></i> Cost vs Fill-Rate Trade-off Frontier</div>
+            <div class="chart-wrap"><canvas id="chart_meio"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <details class="info-box" style="margin-top:1rem;">
+        <summary>ⓘ 2-Echelon METRIC marginal-analysis methodology</summary>
+        <p><strong>Model:</strong> 2-echelon METRIC (Sherbrooke 1968) — Regional Warehouse (echelon 1, replenished from vendor) &rarr; Site Stock (echelon 2, replenished from regional). Optimises the split of stock between echelons given a service-level target and optional budget cap.</p>
+        <p><strong>VARI-METRIC effective LT:</strong> <code>LT_eff = LT_regional + B&#8321;(s&#8321;) / (n &times; &lambda;)</code> where <code>B&#8321;(s&#8321;)</code> = expected backorders at regional (Little&rsquo;s Law). Backorder expansion: <code>B(s,&lambda;) = &lambda;(1 &minus; P(X&le;s&minus;1)) &minus; s(1 &minus; P(X&le;s))</code> (Poisson closed form; normal approx for &lambda; &gt; 200). Ref: <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.22.3.332" target="_blank" rel="noopener">Graves 1985 VARI-METRIC</a>.</p>
+        <p><strong>Marginal analysis pick rule:</strong> At each iteration, add one unit to the echelon with the higher marginal fill-rate gain per dollar of holding cost. Stop when target fill rate is achieved or budget is exhausted. Ref: <a href="https://pubsonline.informs.org/doi/10.1287/opre.16.1.122" target="_blank" rel="noopener">Sherbrooke 1968 METRIC</a> &mdash; Fox &amp; Landi 1971 marginal analysis.</p>
+        <p><strong>Site fill rate:</strong> <code>P(Poisson(&lambda; &times; LT_eff) &le; s&#8322;)</code> — probability a demand event is satisfied from site stock without waiting for regional replenishment.</p>
+      </details>
+      <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <a class="crosslink-pill" onclick="switchTab('stock')" href="#" role="button" aria-label="Go to Optimal Stock module"><i class="fas fa-boxes-stacked"></i> Optimal Stock</a>
+        <a class="crosslink-pill" onclick="switchTab('hub')" href="#" role="button" aria-label="Go to Hub Positioning module"><i class="fas fa-network-wired"></i> Hub Positioning</a>
+      </div>
+    </div>
+
+    <!-- ===== MODULE 5: HUB POSITIONING ===== -->
     <div class="module-pane" id="pane-hub">
       <div class="module-grid">
         <div class="module-card">
@@ -1557,6 +1652,9 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
         <p>Fleet readiness is estimated as <code>min(100, totalStock / (demandDuringMaxLT × safetyFactor))</code>. Hub delta = readiness with hub minus readiness without hub.</p>
         <p>Ref: <a href="https://drum.lib.umd.edu/bitstreams/b6543f42-b065-4f2c-b196-f26f5c15910c/download" target="_blank" rel="noopener">METRIC/VARI-METRIC review (UMD)</a>; <a href="https://umbrex.com/resources/frameworks/supply-chain-frameworks/multi-echelon-inventory-optimization-meio/" target="_blank" rel="noopener">MEIO framework (Umbrex)</a>.</p>
       </details>
+      <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <a class="crosslink-pill" onclick="switchTab('meio')" href="#" role="button" aria-label="Go to MEIO Optimizer module"><i class="fas fa-layer-group"></i> MEIO Optimizer</a>
+      </div>
     </div>
 
     <!-- ===== MODULE 5: SUPPLIER RISK ===== -->
@@ -4199,6 +4297,11 @@ var MODULE_RESET_DEFAULTS = {
     s_part_life: '8', s_demand_mu: '1.0', s_demand_sigma: '0.6',
     s_lt_weeks: '16', s_lt_sigma: '4', s_fill_rate: '99', s_installed_base: '4'
   },
+  meio: {
+    meio_demand_lambda: '0.8', meio_n_sites: '3', meio_lt_vendor: '20', meio_lt_regional: '2',
+    meio_unit_cost: '4500', meio_holding_pct: '25', meio_backorder_cost: '85000',
+    meio_service_target: '98', meio_budget: '0'
+  },
   hub: {
     h_sites: '4', h_part_types: '6', h_oem_lt: '20', h_hub_lt: '0.5',
     h_unit_cost: '4500', h_budget: '200000', h_demand_per_site: '0.5', h_target_readiness: '95'
@@ -4226,7 +4329,7 @@ var MODULE_RESET_DEFAULTS = {
 };
 var MODULE_RECALC = {
   criticality: calcCriticality, readiness: calcReadiness, stock: calcStock,
-  hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB,
+  meio: calcMEIO, hub: calcHub, supplier: calcSupplierRisk, ltb: calcLTB,
   kraljic: calcKraljic, montecarlo: null
 };
 // Range inputs that also update display spans
@@ -4258,7 +4361,7 @@ function resetModule(moduleKey) {
 
 function recalcAll() {
   // Bug 2 fix: wrap each calc so one failure doesn't block the rest
-  var fns = [calcCriticality, calcReadiness, calcStock, calcHub, calcSupplierRisk, calcLTB, calcKraljic, updateSummaryDashboard];
+  var fns = [calcCriticality, calcReadiness, calcStock, calcMEIO, calcHub, calcSupplierRisk, calcLTB, calcKraljic, updateSummaryDashboard];
   fns.forEach(function(fn) { try { fn(); } catch(e) { console.warn('[CSE] recalcAll error in', fn.name || '?', e); } });
 }
 
@@ -4530,7 +4633,173 @@ function calcStock() {
 }
 
 /* ===========================================
-   MODULE 4: MULTI-SITE HUB POSITIONING
+   MODULE 4: MEIO — 2-ECHELON MARGINAL ANALYSIS
+   (METRIC / VARI-METRIC, Sherbrooke 1968)
+   =========================================== */
+
+// Poisson expected backorders at stock level s given mean demand lambda
+// B(s, lambda) = lambda*(1-CDF(s-1,lambda)) - s*(1-CDF(s,lambda))
+// Normal approx when lambda > 200
+function poissonBackorders(lambda, s) {
+  if (lambda <= 0) return 0;
+  if (lambda > 200) {
+    var mu = lambda, sigma = Math.sqrt(lambda);
+    var z = (s - mu) / sigma;
+    // E[max(X-s,0)] = sigma*phi(z) - (s-mu)*(1-Phi(z)) where X~N(mu,sigma^2)
+    var phi = Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+    var Phi = normCDF(z);
+    return Math.max(0, sigma * phi - (s - mu) * (1 - Phi));
+  }
+  var cdfSm1 = s > 0 ? poissonCDF(s - 1, lambda) : 0;
+  var cdfS   = poissonCDF(s, lambda);
+  return Math.max(0, lambda * (1 - cdfSm1) - s * (1 - cdfS));
+}
+
+function calcMEIO() {
+  var lambda     = clamp(getVal('meio_demand_lambda', 0.8), 0.01, 500);
+  var nSites     = clamp(getVal('meio_n_sites', 3), 1, 50);
+  var ltVendorWk = clamp(getVal('meio_lt_vendor', 20), 1, 200);
+  var ltRegDays  = clamp(getVal('meio_lt_regional', 2), 0.5, 365);
+  var unitCost   = clamp(getVal('meio_unit_cost', 4500), 1, 1e8);
+  var holdPct    = clamp(getVal('meio_holding_pct', 25), 1, 100) / 100;
+  var boCost     = clamp(getVal('meio_backorder_cost', 85000), 1, 1e10);
+  var svcTarget  = clamp(getVal('meio_service_target', 98), 50, 99.99) / 100;
+  var budget     = clamp(getVal('meio_budget', 0), 0, 1e12);
+
+  var costPerUnitPerYear = unitCost * holdPct;
+  var ltVendorYr = ltVendorWk / 52;
+  var ltRegYr    = ltRegDays / 365;
+
+  // Regional echelon: demand during vendor LT (Poisson mean)
+  // Total regional demand = nSites * lambda
+  var lambdaRegional = nSites * lambda * ltVendorYr;
+
+  // Marginal analysis: start s1=0, s2=0, iterate
+  var s1 = 0, s2 = 0;
+  var iters = 0;
+  var maxIter = 200;
+
+  // Track frontier: array of {cost, fill} points
+  var frontier = [];
+
+  // Helper: compute site fill rate given current s1, s2
+  function siteFill(sv1, sv2) {
+    var bo1 = poissonBackorders(lambdaRegional, sv1);
+    var effLT = ltRegYr + (lambda > 0 ? bo1 / (nSites * lambda) : 0);
+    effLT = Math.max(ltRegYr, effLT); // never less than base
+    var lambdaSite = lambda * effLT;
+    return poissonCDF(sv2, lambdaSite);
+  }
+
+  var currentFill = siteFill(s1, s2);
+  var annualHold = (s1 + s2) * costPerUnitPerYear;
+
+  // Record starting point
+  frontier.push({ cost: annualHold, fill: currentFill * 100 });
+
+  while (iters < maxIter) {
+    if (currentFill >= svcTarget) break;
+    if (budget > 0 && annualHold >= budget) break;
+
+    // Marginal value for adding to s1 (regional)
+    var fillWithS1 = siteFill(s1 + 1, s2);
+    var marginalS1 = (fillWithS1 - currentFill) / costPerUnitPerYear;
+
+    // Marginal value for adding to s2 (site)
+    var fillWithS2 = siteFill(s1, s2 + 1);
+    var marginalS2 = (fillWithS2 - currentFill) / costPerUnitPerYear;
+
+    // Pick echelon with higher marginal value
+    if (marginalS1 >= marginalS2) {
+      s1 += 1;
+    } else {
+      s2 += 1;
+    }
+
+    currentFill = siteFill(s1, s2);
+    annualHold = (s1 + s2) * costPerUnitPerYear;
+    iters += 1;
+    frontier.push({ cost: annualHold, fill: currentFill * 100 });
+  }
+
+  // Final metrics
+  var bo1Final = poissonBackorders(lambdaRegional, s1);
+  var effLTFinal = ltRegYr + (lambda > 0 ? bo1Final / (nSites * lambda) : 0);
+  effLTFinal = Math.max(ltRegYr, effLTFinal);
+
+  // Expected annual stockout cost: lambda per site * nSites * P(stockout) * boCost
+  var pStockout = Math.max(0, 1 - currentFill);
+  var annualStockoutCost = lambda * nSites * pStockout * boCost;
+  var totalAnnualCost = annualHold + annualStockoutCost;
+  var inventoryValue = (s1 + s2) * unitCost;
+
+  setText('meio_s1_star', s1.toString() + ' units');
+  setText('meio_s2_star', s2.toString() + ' units');
+  setText('meio_fill_achieved', (currentFill * 100).toFixed(2) + '%');
+  setText('meio_annual_hold', fmt$(annualHold) + '/yr');
+  setText('meio_annual_stockout', fmt$(annualStockoutCost) + '/yr');
+  setText('meio_total_cost', fmt$(totalAnnualCost) + '/yr');
+  setText('meio_inventory_value', fmt$(inventoryValue));
+  setText('meio_lt_eff', (effLTFinal * 365).toFixed(1) + ' days');
+  setText('meio_iterations', iters.toString());
+
+  // Trade-off frontier chart
+  var chartCosts = frontier.map(function(p) { return +p.cost.toFixed(0); });
+  var chartFills = frontier.map(function(p) { return +p.fill.toFixed(2); });
+  var optIdx = frontier.length - 1;
+  var ptColors = frontier.map(function(_, i) { return i === optIdx ? '#ef4444' : 'rgba(245,158,11,0.55)'; });
+  var ptRadii  = frontier.map(function(_, i) { return i === optIdx ? 6 : 3; });
+
+  getOrCreateChart('chart_meio', 'scatter', {
+    datasets: [{
+      label: 'Frontier',
+      data: frontier.map(function(p) { return { x: +p.cost.toFixed(0), y: +p.fill.toFixed(2) }; }),
+      backgroundColor: ptColors,
+      pointRadius: ptRadii,
+      showLine: true,
+      borderColor: 'rgba(245,158,11,0.4)',
+      borderWidth: 1.5,
+      fill: false
+    }]
+  }, {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: function(ctx) { return 'Cost: $' + ctx.parsed.x.toLocaleString() + '  Fill: ' + ctx.parsed.y.toFixed(2) + '%'; } } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Annual Holding Cost ($)', font: { size: 10 }, color: chartTickColor() }, ticks: { font: { size: 9 }, color: chartTickColor(), callback: function(v) { return '$' + (v/1000).toFixed(0) + 'K'; } }, grid: { color: chartGridColor() } },
+      y: { title: { display: true, text: 'Site Fill Rate (%)', font: { size: 10 }, color: chartTickColor() }, ticks: { font: { size: 9 }, color: chartTickColor() }, grid: { color: chartGridColor() } }
+    }
+  });
+  updateSummaryDashboard();
+}
+
+function exportMEIOPDF() {
+  var w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(pdfHeader('MEIO Optimizer Report') +
+    '<h1>2-Echelon MEIO Optimizer Report<\/h1>' +
+    '<p>Generated: ' + new Date().toLocaleString() + '<\/p>' +
+    '<h2>Result<\/h2>' +
+    '<table><tr><th>Parameter<\/th><th>Value<\/th><\/tr>' +
+    '<tr><td>Regional Stock s&#8321;*<\/td><td>' + document.getElementById('meio_s1_star').textContent + '<\/td><\/tr>' +
+    '<tr><td>Site Stock s&#8322;*<\/td><td>' + document.getElementById('meio_s2_star').textContent + '<\/td><\/tr>' +
+    '<tr><td>Site Fill Rate<\/td><td>' + document.getElementById('meio_fill_achieved').textContent + '<\/td><\/tr>' +
+    '<tr><td>Annual Holding Cost<\/td><td>' + document.getElementById('meio_annual_hold').textContent + '<\/td><\/tr>' +
+    '<tr><td>Expected Stockout Cost<\/td><td>' + document.getElementById('meio_annual_stockout').textContent + '<\/td><\/tr>' +
+    '<tr><td>Total Annual Cost<\/td><td>' + document.getElementById('meio_total_cost').textContent + '<\/td><\/tr>' +
+    '<tr><td>Total Inventory Value<\/td><td>' + document.getElementById('meio_inventory_value').textContent + '<\/td><\/tr>' +
+    '<tr><td>Effective Site LT (days)<\/td><td>' + document.getElementById('meio_lt_eff').textContent + '<\/td><\/tr>' +
+    '<tr><td>Iterations to Converge<\/td><td>' + document.getElementById('meio_iterations').textContent + '<\/td><\/tr>' +
+    '<\/table>' +
+    pdfFooter());
+  w.document.close();
+  w.print();
+}
+
+/* ===========================================
+   MODULE 5: MULTI-SITE HUB POSITIONING
    =========================================== */
 function calcHub() {
   var sites = clamp(getVal('h_sites', 4), 1, 50);
@@ -6977,7 +7246,7 @@ function exportSTARPDF() {
    UPDATE TAB ORDER + SWITCHtab + RECALCALL
    v1.16.2: promoted to primary declaration (replaces dead 14-item placeholder above)
    =========================================== */
-TAB_ORDER = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
+TAB_ORDER = ['criticality','readiness','stock','meio','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
 
 // v1.16.2: authoritative switchTab — replaces the dead stub declared above.
 // _origSwitchTab reference removed (was captured but never called in this body).
@@ -9310,6 +9579,7 @@ try {
   window.exportCriticalityPDF  = exportCriticalityPDF;
   window.exportReadinessPDF    = exportReadinessPDF;
   window.exportStockPDF        = exportStockPDF;
+  window.exportMEIOPDF         = exportMEIOPDF;
   window.exportLTBPDF          = exportLTBPDF;
   window.exportFullReportPDF   = exportFullReportPDF;
   window.exportPDF             = exportFullReportPDF; // alias for probe
@@ -9358,6 +9628,7 @@ try {
   // v1.16.3 — per-module calc functions + catalog handlers used by oninput/onchange handlers
   window.calcReadiness         = (typeof calcReadiness         !== 'undefined') ? calcReadiness         : null;
   window.calcStock             = (typeof calcStock             !== 'undefined') ? calcStock             : null;
+  window.calcMEIO              = (typeof calcMEIO              !== 'undefined') ? calcMEIO              : null;
   window.calcHub               = (typeof calcHub               !== 'undefined') ? calcHub               : null;
   window.calcSupplierRisk      = (typeof calcSupplierRisk      !== 'undefined') ? calcSupplierRisk      : null;
   window.calcLTB               = (typeof calcLTB               !== 'undefined') ? calcLTB               : null;

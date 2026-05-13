@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.17.0 — 2026-05-13 (Spares Engine — MEIO optimizer)
+
+### Added
+- New tab "4 · MEIO Optimizer" (`pane-meio`) in the Analytical group, inserted between Optimal Stock and Hub Positioning.
+- `calcMEIO()`: 2-echelon METRIC marginal-analysis solver (Sherbrooke 1968 + VARI-METRIC effective-LT expansion, Graves 1985). Iteratively allocates stock units between Regional Warehouse (s1*) and Site (s2*) to minimise total annual cost given a target fill rate and optional budget cap.
+- `poissonBackorders(lambda, s)`: Poisson expected-backorder helper used by VARI-METRIC echelon-1 backorder expansion. Normal approximation kicks in for lambda > 200.
+- `exportMEIOPDF()`: minimal print-window PDF report for MEIO results.
+- Crosslink pills in pane-stock (→ MEIO) and pane-hub (→ MEIO).
+- TAB_ORDER updated to 27 entries; probe TAB_NAMES updated accordingly.
+
 ## v1.16.3 — 2026-05-13 (Spares Engine — stabilization sweep 2: per-module calc handlers)
 
 User reported "still many errors" after v1.16.2. Re-probed comprehensively with a deeper Puppeteer audit covering ALL inline event attributes (not just `onclick`). v1.16.2 only audited `onclick` and missed 19 functions called via `oninput=` / `onchange=` on input elements across 10 modules.

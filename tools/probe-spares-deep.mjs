@@ -6,7 +6,7 @@ import puppeteer from 'puppeteer';
 import { writeFileSync } from 'fs';
 
 const URL = process.env.PROBE_URL || `http://localhost:8081/spares-readiness-calculator.html?nc=${Date.now()}`;
-const TAB_NAMES = ['criticality','readiness','stock','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
+const TAB_NAMES = ['criticality','readiness','stock','meio','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
 
 const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'] });
 const page = await browser.newPage();
@@ -171,7 +171,7 @@ try {
 } catch(e) { fail('scenario', e.message); }
 
 // === 6. Exercise every module's calc function (if window-exposed) ===
-const calcsToTry = ['calcCriticality','calcReadiness','calcStock','calcSupplierRisk','calcLTB','calcKraljic','calcLanePlanner','calcExpedite','runMonteCarlo','runSCSim','calcHub','calcFleet','calcScorecard','calcSCRisk','calcCatalogAnalytics'];
+const calcsToTry = ['calcCriticality','calcReadiness','calcStock','calcMEIO','calcSupplierRisk','calcLTB','calcKraljic','calcLanePlanner','calcExpedite','runMonteCarlo','runSCSim','calcHub','calcFleet','calcScorecard','calcSCRisk','calcCatalogAnalytics'];
 for (const fn of calcsToTry) {
   const r = await page.evaluate(name => {
     if (typeof window[name] !== 'function') return 'missing';
