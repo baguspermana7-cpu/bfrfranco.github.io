@@ -31,7 +31,7 @@ export interface SimulationState {
         // Capacity planning phases
         capacityPhases: { id: string; label: string; itLoadKw: number; startMonth: number; buildMonths: number; occupancyRamp: number[] }[];
     };
-    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen';
+    activeTab: 'sim' | 'staff' | 'maint' | 'risk' | 'report' | 'capex' | 'carbon' | 'finance' | 'invest' | 'benchmark' | 'montecarlo' | 'portfolio' | 'faq' | 'capacity' | 'phased-finance' | 'tax' | 'disaster' | 'grid' | 'talent' | 'compliance' | 'asset-lifecycle' | 'cbm' | 'fuel-gen' | 'strategic';
     isLoading: boolean;
     actions: {
         setLoading: (loading: boolean) => void;

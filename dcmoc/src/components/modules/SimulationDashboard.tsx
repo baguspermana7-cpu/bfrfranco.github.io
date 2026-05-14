@@ -202,10 +202,10 @@ export function SimulationDashboard() {
     return (
         <>
             {showWizard && <ConfigWizard onComplete={() => setShowWizard(false)} />}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-140px)]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:h-[calc(100vh-140px)]">
 
                 {/* LEFT PANEL: CONTROLS */}
-                <div className="lg:col-span-4 bg-slate-100 dark:bg-slate-900/50 border-r border-slate-300 dark:border-slate-800 p-6 overflow-y-auto">
+                <div className="lg:col-span-4 bg-slate-100 dark:bg-slate-900/50 border-b lg:border-b-0 lg:border-r border-slate-300 dark:border-slate-800 p-4 lg:p-6 overflow-y-auto">
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <Activity className="w-5 h-5 text-cyan-400" />
@@ -389,10 +389,10 @@ export function SimulationDashboard() {
                 </div>
 
                 {/* RIGHT PANEL: VISUALIZATION */}
-                <div className="lg:col-span-8 p-8 overflow-y-auto">
+                <div className="lg:col-span-8 p-4 lg:p-8 overflow-y-auto">
 
                     {/* --- KPI CARDS ROW --- */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         {/* Internal Staff Cost */}
                         <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none flex flex-col justify-between">
                             <div className="flex justify-between items-start mb-2">
@@ -582,19 +582,96 @@ export function SimulationDashboard() {
 
                         <div className="mt-4">
                             <div className="text-[9px] text-slate-500 font-bold uppercase mb-2">Power Chain Efficiency</div>
-                            <div className="flex items-center text-[10px] font-mono gap-1">
-                                <div className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded w-24 text-center">Grid → 98%</div>
+                            <div className="flex flex-wrap items-center text-[10px] font-mono gap-1">
+                                <div className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded w-24 text-center">Grid 98%</div>
                                 <div className="text-slate-400">→</div>
-                                <div className="bg-blue-500/20 text-blue-700 dark:text-blue-400 px-2 py-1 rounded w-24 text-center">UPS → 94%</div>
+                                <div className="bg-blue-500/20 text-blue-700 dark:text-blue-400 px-2 py-1 rounded w-24 text-center">UPS 94%</div>
                                 <div className="text-slate-400">→</div>
-                                <div className="bg-purple-500/20 text-purple-700 dark:text-purple-400 px-2 py-1 rounded w-24 text-center">PDU → 97%</div>
+                                <div className="bg-purple-500/20 text-purple-700 dark:text-purple-400 px-2 py-1 rounded w-24 text-center">PDU 97%</div>
                                 <div className="text-slate-400">→</div>
-                                <div className="bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 px-2 py-1 rounded w-24 text-center">IT Load ✓</div>
+                                <div className="bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 px-2 py-1 rounded w-24 text-center">IT Load OK</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            {/* Cause-Effect Lever Map */}
+            <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mt-6">
+                <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                    <ArrowRight className="w-4 h-4 text-cyan-500" />
+                    Cause-Effect Lever Map
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">How each input parameter ripples through to cost and risk outputs</p>
+                <div className="space-y-3">
+                    {[
+                        {
+                            lever: 'Rack Density 10kW to 20kW',
+                            effect: 'Floor space requirement halved, but cooling delta-T compression adds ~18% to PUE',
+                            impact: 'high',
+                            direction: 'mixed',
+                        },
+                        {
+                            lever: 'Tier III to Tier IV redundancy',
+                            effect: 'CAPEX increases ~$2.5M/MW (full 2N active systems), uptime moves from 99.982% to 99.99943% — only worthwhile if downtime cost exceeds ~$500K/yr',
+                            impact: 'high',
+                            direction: 'cost-up',
+                        },
+                        {
+                            lever: 'AQI 50 to 150 (Moderate to Unhealthy)',
+                            effect: 'Filter replacement frequency doubles (3mo to 1.5mo), hazard pay activates (+15% labor), cooling coil fouling adds maintenance cycles',
+                            impact: 'medium',
+                            direction: 'cost-up',
+                        },
+                        {
+                            lever: 'Turnover rate 10% to 25%',
+                            effect: 'Hidden monthly loss triples (recruitment, onboarding, ramp-up productivity gap). A single FTE replacement costs 1.5x annual salary',
+                            impact: 'high',
+                            direction: 'cost-up',
+                        },
+                        {
+                            lever: '8-Hour (3 Shift) to 12-Hour (2 Shift)',
+                            effect: 'Headcount reduces by ~25% but per-person overtime exposure increases. In Indonesia, requires long-shift permit or triggers 14hr/week OT at 2x rate',
+                            impact: 'medium',
+                            direction: 'mixed',
+                        },
+                        {
+                            lever: 'In-house to Vendor maintenance model',
+                            effect: 'Specialist expertise on-demand but 35% cost premium on all labor. For complex M&E systems, vendor SLAs can reduce MTTR by 40%',
+                            impact: 'medium',
+                            direction: 'cost-up',
+                        },
+                        {
+                            lever: 'Air cooling to Direct Liquid Cooling',
+                            effect: 'PUE drops from ~1.50 to ~1.15, saving ~$X/yr in energy. CAPEX premium of $200-500K per MW for liquid distribution. Break-even typically 3-5 years at $0.10/kWh',
+                            impact: 'high',
+                            direction: 'mixed',
+                        },
+                    ].map((row, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                            <div className={`shrink-0 w-2 h-2 rounded-full mt-1.5 ${
+                                row.direction === 'cost-up' ? 'bg-rose-400' :
+                                row.direction === 'mixed' ? 'bg-amber-400' : 'bg-emerald-400'
+                            }`} />
+                            <div className="flex-1 min-w-0">
+                                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-0.5">{row.lever}</div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{row.effect}</div>
+                            </div>
+                            <div className={`shrink-0 text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                                row.impact === 'high' ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400' :
+                                'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                            }`}>
+                                {row.impact}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="mt-3 flex items-center gap-4 text-[10px] text-slate-500">
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Increases cost</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" /> Mixed (cost + benefit)</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" /> Reduces cost</span>
+                </div>
+            </div>
+
             {/* Environmental Impact */}
             <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-xl p-6 mt-6">
                 <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">

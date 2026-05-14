@@ -26,6 +26,7 @@ import AssetLifecycleDashboard from '@/components/modules/AssetLifecycleDashboar
 import CBMDashboard from '@/components/modules/CBMDashboard';
 import FuelGenDashboard from '@/components/modules/FuelGenDashboard';
 import { ScenarioComparisonPanel } from '@/components/modules/ScenarioComparisonPanel';
+import StrategicPlanningDashboard from '@/components/modules/StrategicPlanningDashboard';
 import { useScenarioStore } from '@/store/scenario';
 import { Wrench, ShieldAlert, FileText, Calculator, Activity } from 'lucide-react';
 
@@ -85,6 +86,8 @@ export default function Home() {
         return <FuelGenDashboard />;
       case 'faq':
         return <FaqDashboard />;
+      case 'strategic':
+        return <StrategicPlanningDashboard />;
       default: // 'sim'
         return (
           <div className="text-center space-y-4 max-w-2xl mx-auto pt-20">

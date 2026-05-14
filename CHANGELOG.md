@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v1.18.12 — 2026-05-14 (dcmoc — mobile scroll + strategic planning + FAQ + cause-effect)
+
+### Added (DCMOC)
+- **Mobile horizontal scroll fix** — `CapexDashboard` and `SimulationDashboard` now
+  use `flex-col lg:flex-row` + responsive padding so parameter cards scroll vertically
+  on narrow viewports instead of overflowing. KPI grid changed from hard `grid-cols-4`
+  to `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`. Power Chain row uses `flex-wrap`.
+- **Strategic Planning module** (`StrategicPlanningDashboard.tsx`) — three sub-modes:
+  - *Feasibility*: land area + grid capacity + climate zone → buildable IT MW, effective
+    PUE with climate penalty, grid headroom %, annual energy cost estimate
+  - *Acquisition*: target ask price vs. 3 market comparables → bid floor/ceiling,
+    cap rate, simple payback, acquisition signal (buy / negotiate / walk away)
+  - *Expansion*: current footprint + demand growth % → demand timeline, 80%-utilization
+    trigger year, phased CAPEX schedule, grid reservation deadlines
+- **Cause-Effect Lever Map** in `SimulationDashboard` — 7 annotated input-to-output
+  chains (rack density, tier upgrade, AQI escalation, turnover, shift model, maintenance
+  model, cooling strategy) with impact level and cost-direction legend
+- **Floating FAQ / Manual button** in `Shell.tsx` — fixed bottom-right button visible
+  on all tabs except FAQ itself, collapses to icon-only on mobile
+- **Strategic Planning FAQ entries** — 10 new Q&A pairs in the FAQ module covering
+  feasibility calculation methodology, acquisition bid range derivation, grid reservation
+  lead time, expansion trigger logic, climate PUE penalty, and PPA assessment workflow
+- **FAQ quick-start guide** — 4-card grid at the top of FaqDashboard explaining the
+  recommended workflow for investment analysis, strategic planning, and scenario comparison
+- **Version bump** `js/rz-version.js` → v1.18.12 · SW cache key synced
+
+### User feedback addressed
+- "DCmoc itu saat mobile tdk bisa scroll samping" — fixed via flex direction + responsive
+  column grids on all major dashboard panels
+- "enhance more agar bener2 powerfull complete utk investment" — Strategic Planning
+  module now covers land feasibility, acquisition due diligence, and expansion scheduling
+- "analitycnya sangat kurang" — Cause-Effect Lever Map added to Simulation dashboard
+- "ada flow2nya dan penjelasan cause effect" — lever map with 7 annotated chains
+- "kasih button utk ke arah faq/manual guidance" — floating FAQ button in Shell
+- "bisa dipakai utk strategic planning accuisition atau bahkan feasibility saat mau
+  amankan land atau power di suatu area" — dedicated Strategic Planning module
+
+---
+
 ## v1.18.10 — 2026-05-14 (achievements — concept refinement)
 
 ### Changed

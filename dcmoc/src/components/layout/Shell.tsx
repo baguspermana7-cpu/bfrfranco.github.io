@@ -40,6 +40,7 @@ import {
     Activity,
     Fuel,
     Menu,
+    MapPin,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getPUE } from '@/constants/pue';
@@ -125,6 +126,7 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
         { label: 'Compliance', icon: ClipboardCheck, id: 'compliance', section: 'country-intel' },
         { label: 'Asset Lifecycle', icon: LineChart, id: 'asset-lifecycle', section: 'planning' },
         { label: 'CBM / DCIM', icon: Activity, id: 'cbm', section: 'planning' },
+        { label: 'Strategic Planning', icon: MapPin, id: 'strategic', section: 'planning' },
         { label: 'Fuel & Generator', icon: Fuel, id: 'fuel-gen' },
         { label: 'Report', icon: FileText, id: 'report' },
     ];
@@ -362,6 +364,19 @@ function ShellContent({ children, user }: { children: React.ReactNode; user: { e
                     {children}
                 </div>
             </main>
+
+            {/* Floating FAQ / Manual button */}
+            {activeTab !== 'faq' && (
+                <button
+                    onClick={() => actions.setActiveTab('faq')}
+                    className="fixed bottom-6 right-6 z-30 flex items-center gap-2 px-3 py-2.5 bg-slate-800 dark:bg-slate-700 border border-slate-600 dark:border-slate-500 text-slate-200 rounded-full shadow-xl hover:bg-cyan-700 dark:hover:bg-cyan-700 transition-colors text-xs font-medium"
+                    title="Open FAQ / Manual"
+                    aria-label="Open FAQ and manual"
+                >
+                    <HelpCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">FAQ / Manual</span>
+                </button>
+            )}
 
             {/* Scenario Slide-out Panel */}
             {scenarioStore.isPanelOpen && (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import { HelpCircle, ChevronDown, ChevronRight, BookOpen, Target, TrendingUp, BarChart3, FileText } from 'lucide-react';
 import clsx from 'clsx';
 
 interface FaqItem {
@@ -89,9 +89,21 @@ const FAQ_DATA: FaqItem[] = [
     // ── Portfolio ────────────────────────────────────────────────
     { category: 'Portfolio', q: 'How does multi-site comparison work?', a: 'The Portfolio module lets you configure up to 6 data center sites with different countries, tiers, IT loads, and cooling types. It generates side-by-side comparisons of CAPEX, OPEX, staffing cost, PUE, and risk scores — plus a radar chart for visual benchmarking across sites.' },
     { category: 'Portfolio', q: 'What is portfolio diversification scoring?', a: 'A metric measuring geographic and operational diversity across your data center portfolio. Higher diversification reduces concentration risk — spreading sites across multiple countries/regions protects against localized disruptions (natural disasters, political instability, grid failures).' },
+
+    // ── Strategic Planning ───────────────────────────────────────
+    { category: 'Strategic Planning', q: 'What is the Strategic Planning module?', a: 'A decision-support tool with three modes: Feasibility (land + grid to buildable IT load), Acquisition (site bid range and ROI horizon), and Expansion (multi-phase growth scheduling). Use it before committing to option agreements, during due diligence, or when planning capacity growth.' },
+    { category: 'Strategic Planning', q: 'How does the Feasibility Mode work?', a: 'Input land area (m²), grid capacity (MW), climate zone, and target PUE. The engine computes: (1) buildable IT load from land (hall floor = 40% of land at 500W/m² IT density), (2) grid-constrained IT load (grid MW / effective PUE), (3) the binding constraint (land or grid), and (4) grid headroom remaining after full build-out. Climate zone applies a PUE penalty ranging from 0% (polar) to +12% (tropical).' },
+    { category: 'Strategic Planning', q: 'How is buildable IT load calculated in Feasibility Mode?', a: 'Hall floor area = total land × 40% (remainder used for cooling yards, substation setback, access roads, green buffer). IT density assumption is 500W/m² (conservative mixed-use). Buildable IT kW = hall floor m² × 500W. Grid-constrained IT MW = grid MW / effective PUE. Final IT capacity is min(land-limited, grid-limited).' },
+    { category: 'Strategic Planning', q: 'How do I model a land acquisition for a greenfield site?', a: 'Use Feasibility Mode first: enter the land parcel size and utility quote to confirm the site can deliver the target IT capacity. Then switch to Acquisition Mode: enter the seller ask price per MW and three recent market comparables to get a fair value range, bid floor, bid ceiling, and ROI horizon. If the ask is within the ceiling, proceed to due diligence.' },
+    { category: 'Strategic Planning', q: 'How is the Acquisition bid range calculated?', a: 'Fair value = average of the three comparable transactions. Bid floor = 88% of fair value (aggressive). Ceiling = fair value × risk multiplier (1.0x–1.5x, reflecting site-specific risk: seismic zone, grid reliability, permitting risk). Cap rate = estimated annual NOI / total investment. Simple payback = total investment / annual NOI, assuming $150/kW-month colocation revenue at 5 MW.' },
+    { category: 'Strategic Planning', q: 'What is the 80% utilization trigger in Expansion Mode?', a: 'Industry standard: when a facility reaches 80% of committed capacity, lead time to break ground on the next phase must begin immediately. Given typical construction timelines of 18-24 months and grid reservation requirements of 12-24 months ahead, the 80% trigger gives a 6-month buffer to avoid SLA violations. DC MOC calculates which year in the demand timeline crosses this threshold and flags it as the recommended action date.' },
+    { category: 'Strategic Planning', q: 'How does grid reservation lead time affect expansion planning?', a: 'Most grid operators require formal capacity reservation 12-24 months before energization. The Expansion module subtracts this lead time from the phase start year to show when the grid application must be filed. Failing to reserve early risks delaying the phase by 1-2 years, which can cause SLA breaches if demand growth is faster than expected.' },
+    { category: 'Strategic Planning', q: 'What CAPEX per MW should I use for expansion phases?', a: 'Default is pulled from your active CAPEX Config module. You can override it in Expansion Mode. Typical ranges (2025-2026): emerging markets $4-6M/MW, developed markets $7-10M/MW, AI-ready (liquid cooled, high density) $12-18M/MW. The CAPEX module provides a more granular estimate based on your specific configuration.' },
+    { category: 'Strategic Planning', q: 'Can I use Strategic Planning for a power purchase agreement (PPA) assessment?', a: 'Yes. Use Feasibility Mode to confirm the site power envelope, then use the Acquisition Mode to assess the PPA rate per MW against market comparables. The ROI output reflects the cost of energy procurement relative to colocation revenue. For RE100 compliance modeling, use the Carbon/ESG module in combination.' },
+    { category: 'Strategic Planning', q: 'How does climate zone affect PUE and what is the impact on operating cost?', a: 'PUE climate penalty: polar +0%, temperate +3%, continental +5%, arid +8%, tropical +12% above your target PUE. For example, a 1.40 target PUE in a tropical climate becomes 1.52 effective PUE. At 10MW IT load and $0.10/kWh, each 0.10 PUE increase adds ~$876K/year in energy cost. Climate zone is the single largest uncontrollable driver of long-term OPEX for data centers in Southeast Asia and the Middle East.' },
 ];
 
-const CATEGORIES = ['General', 'Financial', 'Infrastructure', 'Staffing', 'Analytics', 'Capacity', 'Risk', 'ESG & Carbon', 'Maintenance', 'Compliance', 'Investment', 'Portfolio'];
+const CATEGORIES = ['General', 'Financial', 'Infrastructure', 'Staffing', 'Analytics', 'Capacity', 'Risk', 'ESG & Carbon', 'Maintenance', 'Compliance', 'Investment', 'Portfolio', 'Strategic Planning'];
 
 export function FaqDashboard() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -112,8 +124,23 @@ export function FaqDashboard() {
                 </p>
             </div>
 
+            {/* Quick-start guide */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {[
+                    { icon: <BookOpen className="w-4 h-4 text-cyan-500" />, title: 'Start Here', desc: 'Set country in CAPEX Config, then open Scenario Model to set IT load and shift pattern. All modules sync automatically.' },
+                    { icon: <Target className="w-4 h-4 text-indigo-500" />, title: 'Investment Workflow', desc: 'CAPEX Config → Financial → Investment → Monte Carlo. Generates NPV, IRR, DSCR, and P10/P90 confidence intervals.' },
+                    { icon: <TrendingUp className="w-4 h-4 text-violet-500" />, title: 'Strategic Planning', desc: 'Use Strategic Planning module for land feasibility, site acquisition due diligence, or multi-phase expansion scheduling.' },
+                    { icon: <BarChart3 className="w-4 h-4 text-emerald-500" />, title: 'Scenario Comparison', desc: 'Save configurations as named scenarios, then select 2+ to compare side-by-side in the Scenario Manager panel.' },
+                ].map(item => (
+                    <div key={item.title} className="p-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl">
+                        <div className="flex items-center gap-2 mb-2">{item.icon}<span className="text-xs font-bold text-slate-700 dark:text-slate-300">{item.title}</span></div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+                    </div>
+                ))}
+            </div>
+
             {/* Category Filter */}
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap overflow-x-auto pb-1">
                 <button
                     onClick={() => setActiveCategory('all')}
                     className={clsx(

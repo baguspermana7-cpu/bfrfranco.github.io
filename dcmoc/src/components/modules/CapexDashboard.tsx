@@ -71,9 +71,9 @@ const CapexDashboard = () => {
 
     const { total, metrics, timeline, costs } = results;
     return (
-        <div className="flex h-full gap-6 p-6 bg-slate-50 dark:bg-slate-900 overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full gap-6 p-4 lg:p-6 bg-slate-50 dark:bg-slate-900 lg:overflow-hidden">
             {/* LEFT PANEL: Inputs */}
-            <div className="w-[420px] flex-shrink-0 flex flex-col gap-4 overflow-y-auto pr-2 pb-20">
+            <div className="w-full lg:w-[420px] flex-shrink-0 flex flex-col gap-4 overflow-y-auto pr-0 lg:pr-2 pb-6 lg:pb-20">
                 {/* Header with PDF Export */}
                 <Card>
                     <CardHeader className="pb-3 flex flex-row items-center justify-between">
@@ -517,9 +517,9 @@ const CapexDashboard = () => {
             </div>
 
             {/* RIGHT PANEL: Results */}
-            <div className="flex-1 flex flex-col gap-4 overflow-y-auto pb-20">
+            <div className="flex-1 flex flex-col gap-4 overflow-y-auto pb-6 lg:pb-20">
                 {/* KPI Cards Row 1 */}
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <Card className="bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/30 dark:to-slate-800 border-indigo-100 dark:border-indigo-800">
                         <CardContent className="pt-4">
                             <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400 flex items-center gap-1">Total CAPEX <Tooltip content="Total project capital expenditure including building, MEP, IT infrastructure, and contingency." /></div>
