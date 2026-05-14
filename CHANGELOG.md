@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v1.18.10 — 2026-05-14 (achievements — concept refinement)
+
+### Changed
+- `achievements.html`: Full concept refinement following user feedback ("Ini membingungkan —
+  coba konsepnya di sempurnakan"). Key changes:
+  - **Hero**: Added explicit "How badges are earned" explainer panel — always visible,
+    describes the automatic tracking mechanic and localStorage-only storage.
+  - **Hero subtitle**: Level description is appended to the static explainer so the
+    subtitle is never ambiguous about what the page does.
+  - **Progress panel**: Restructured to show `X / N badges unlocked — Y%` in
+    JetBrains Mono, with three instrument-chip stat tiles (Pages / Calcs used / Articles read).
+  - **CTA strip**: Added new row between hero and badges with direct links to Articles,
+    Calculators, and Home — gives users an obvious path to earn badges.
+  - **Badge cards**: `desc` field replaced with `criterion` — each card now shows the
+    exact unlock condition in plain language (e.g., "Visit **10 different pages**").
+    Per-card progress bars now show both count and percentage.
+  - **Category headers**: Added `catDesc` field — each category section now has a
+    one-line explanation of what qualifies (e.g., "Awarded for reading articles to the bottom.").
+  - **FAQ section**: Added 6-item FAQ covering: how to earn, data privacy, partial
+    progress bars, reset, script-blocking, and level meanings.
+  - **Design system compliance**: Switched from Inter + purple `#8b5cf6` to IBM Plex
+    Sans + JetBrains Mono + signal amber `#FFAA00`. Dark SCADA-instrumentation aesthetic
+    per `documentation/design.md`. Removed glassmorphism, heavy radial glows.
+  - **Reset button**: Moved to labelled "danger zone" row with explanatory copy.
+  - `window.achReset` exposed for onclick safety compliance.
+- `js/rz-version.js`: Bumped 1.18.7 → 1.18.10 (1.18.8 reserved for stale-doc stamps; 1.18.9 consumed by hook auto-bump).
+- `sw.js`: Cache name synced via `sync-sw-version.py`.
+- **Output card tooltips (parity with spares v1.18.2)**: Added `.tip` pattern output tooltips to 5 of 7 calc pages (PUE 4 tooltips, ROI 8, TCO 8, CX 4, Carbon 8). CAPEX and OPEX were already covered by existing tooltip patterns.
+
+---
+
 ## v1.18.7 — 2026-05-14 (Spares — Loading placeholders resolve + 4s timeout fallback)
 
 User: "loading2nya nggak berhenti" (from earlier marathon — items showing "Loading…" forever).
