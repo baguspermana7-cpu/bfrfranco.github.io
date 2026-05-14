@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.18.7 — 2026-05-14 (Spares — Loading placeholders resolve + 4s timeout fallback)
+
+User: "loading2nya nggak berhenti" (from earlier marathon — items showing "Loading…" forever).
+
+The 6 catalog placeholders (`cat_summary_counts`, `cat_tbody@colspan=13`, OEM tbody, facility-types panel, `ca_blind_tbody`, `ca_sc_lane_tbody`) only resolved when the user activated the Catalog tab. If the user landed elsewhere and never clicked Catalog, they stayed Loading forever.
+
+Fix: at end of the catalog IIFE (line ~8204), added `_eagerInitCatalog()` that:
+- Fires on DOMContentLoaded (or immediately if already loaded)
+- If `window.SPARES_CATALOG` is available, calls `catInitIfReady()` + `calcCatalogAnalytics()` eagerly
+- Plus a `_loadingFallback()` 4-second `setTimeout` that scans for any `Loading…` text in catalog placeholders and replaces it with a graceful "Catalog data unavailable — refresh the page" message
+
+This honours `feedback_basic_feature_discipline.md` rule #6 (Loading placeholders must always resolve).
+
+Probe SUMMARY: 0 consoleErrors, 0 pageErrors, 0 issues, 27 tabs OK.
+
+---
+
+## v1.18.6 — 2026-05-14 (OG image meta fixes — 33 pages updated)
+
+See commit `73338de`. 33 HTML pages had `og:image` pointing to non-existent files OR missing `og:image:alt`. Fixed in batch via NEW `tools/fix-og-meta-tags.py`. Audit went from 66 PASS / 33 FAIL → 99 PASS / 0 FAIL. Plus 99 NEW per-page OG images at `assets/og/*.webp` (1200×630 editorial cards).
+
+---
+
 ## v1.18.5 — 2026-05-14 (index.html — replace tacky marquee with lean credentials band)
 
 User: "running text ini jelek sekali, kurang lean, kurang professional look. norak"

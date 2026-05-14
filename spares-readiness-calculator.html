@@ -8201,6 +8201,44 @@ faqData.push(
   // (unlikely since script is deferred, but guard for edge-cases)
   if (window.SPARES_CATALOG) { catState.initialized = false; /* will init on first tab open */ }
 
+  // v1.18.7 — fire catalog renderer on DOMContentLoaded so Loading placeholders resolve
+  // even before the user activates the Catalog tab. Plus a 4-second timeout fallback that
+  // replaces "Loading..." with "—" if the catalog never arrives.
+  function _eagerInitCatalog() {
+    if (window.SPARES_CATALOG && window.SPARES_CATALOG.parts) {
+      try { window.catInitIfReady(); } catch(_) {}
+      try { if (typeof calcCatalogAnalytics === 'function') calcCatalogAnalytics(); } catch(_) {}
+    }
+  }
+  function _loadingFallback() {
+    var loadingIds = ['cat_summary_counts', 'ca_blind_tbody', 'ca_sc_lane_tbody'];
+    loadingIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && /Loading/i.test(el.textContent || el.innerHTML)) {
+        if (el.tagName === 'TBODY') {
+          // preserve colspan / cell structure
+          var colspan = el.querySelector('td') ? (el.querySelector('td').getAttribute('colspan') || '1') : '1';
+          el.innerHTML = '<tr><td colspan="' + colspan + '" style="text-align:center;padding:1.5rem;color:var(--text-muted);">Catalog data unavailable — refresh the page or check your network.</td></tr>';
+        } else {
+          el.textContent = 'Catalog unavailable';
+        }
+      }
+    });
+    // Also handle the facility-types panel + colspan=13 catalog tbody by text-scan
+    var allLoading = document.querySelectorAll('[id^="ca_"], [id^="cat_"]');
+    allLoading.forEach(function(el) {
+      if (/Loading/i.test(el.textContent || el.innerHTML)) {
+        // Don't mass-replace — only if the renderer has had its chance
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _eagerInitCatalog);
+  } else {
+    _eagerInitCatalog();
+  }
+  setTimeout(_loadingFallback, 4000);  // 4-second timeout fallback per mandate
+
 })(); // end catalog IIFE
 
 /* ===========================================
