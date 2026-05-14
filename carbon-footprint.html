@@ -324,6 +324,17 @@
         .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
         .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
 
+        /* ── Output card tooltips ── */
+        .tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: rgba(34,197,94,0.15); color: #22c55e; font-size: 0.65rem; font-weight: 700; cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 3px; border: 1px solid rgba(34,197,94,0.3); transition: background 0.2s; user-select: none; }
+        .tip:hover, .tip:focus, .tip.tip-open { background: #22c55e; color: #fff; outline: none; }
+        .tip::after { content: attr(data-tip); display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #f1f5f9; font-size: 0.72rem; font-weight: 400; line-height: 1.55; padding: 8px 10px; border-radius: 8px; width: 270px; max-width: 85vw; white-space: normal; z-index: 9000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; border: 1px solid rgba(34,197,94,0.25); }
+        .tip::before { content: ''; display: none; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #1e293b; z-index: 9001; pointer-events: none; }
+        .tip:hover::after, .tip:focus::after, .tip.tip-open::after { display: block; }
+        .tip:hover::before, .tip:focus::before, .tip.tip-open::before { display: block; }
+        [data-theme="dark"] .tip { background: rgba(34,197,94,0.12); color: #4ade80; border-color: rgba(34,197,94,0.25); }
+        [data-theme="dark"] .tip:hover, [data-theme="dark"] .tip:focus, [data-theme="dark"] .tip.tip-open { background: #22c55e; color: #fff; }
+        @media (max-width: 768px) { .tip::after { width: 220px; font-size: 0.70rem; } }
+
         /* ═══ TAB BAR ═══ */
         .cf-tab-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
         .cf-tab-btn { flex: 1; padding: 0.6rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; background: transparent; color: #64748b; }
@@ -1189,14 +1200,14 @@
                         </div>
                     </div>
                     <div class="metric-grid" id="metricGrid">
-                        <div class="metric-box"><div class="metric-value" id="metScope1">--</div><div class="metric-label">Scope 1</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metScope2">--</div><div class="metric-label">Scope 2</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metScope3">--</div><div class="metric-label">Scope 3</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metIntensity">--</div><div class="metric-label">kgCO&#8322;/kWh IT</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metOffset">--</div><div class="metric-label">Offset Cost</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metTax">--</div><div class="metric-label">Carbon Tax</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metEnergy">--</div><div class="metric-label">Annual MWh</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metRating">--</div><div class="metric-label">Efficiency</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metScope1">--</div><div class="metric-label">Scope 1 <span class="tip" tabindex="0" data-tip="Direct GHG emissions from sources owned or controlled by the facility. Includes on-site diesel generator combustion and fugitive refrigerant leaks. Measured in metric tonnes CO2 equivalent (tCO2e) per year per GHG Protocol." aria-label="Scope 1 tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metScope2">--</div><div class="metric-label">Scope 2 <span class="tip" tabindex="0" data-tip="Indirect emissions from purchased grid electricity. Calculated as Annual MWh x Grid Carbon Intensity (kgCO2/kWh). Market-based accounting allows renewable PPAs and green tariffs to reduce this to near-zero. Location-based uses average grid factor." aria-label="Scope 2 tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metScope3">--</div><div class="metric-label">Scope 3 <span class="tip" tabindex="0" data-tip="Value-chain emissions not directly controlled by the facility. Includes embodied carbon in construction materials, IT equipment manufacturing, staff commuting, and waste. Scope 3 often represents 70-90% of a data center's full lifecycle footprint." aria-label="Scope 3 tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metIntensity">--</div><div class="metric-label">kgCO&#8322;/kWh IT <span class="tip" tabindex="0" data-tip="Carbon intensity normalized to IT energy delivered. Formula: (Scope 1 + Scope 2) / Annual IT MWh. Industry benchmark: below 0.1 kgCO2/kWh IT is excellent; above 0.4 indicates high-carbon grid or poor PUE. Enables cross-site comparison regardless of size." aria-label="Carbon intensity tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metOffset">--</div><div class="metric-label">Offset Cost <span class="tip" tabindex="0" data-tip="Estimated annual cost to purchase carbon offsets for residual emissions after renewable energy coverage. Based on voluntary carbon market price (typically $5-50/tCO2e). Offsets should be verified (Gold Standard, Verra VCS) to count toward net-zero targets." aria-label="Offset Cost tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metTax">--</div><div class="metric-label">Carbon Tax <span class="tip" tabindex="0" data-tip="Annual carbon price liability based on the jurisdiction's mandatory carbon pricing mechanism. Applies to Scope 1 and applicable Scope 2 emissions. EU ETS price currently $60-80/tCO2e; Singapore $25/tCO2e; many regions have no mandatory carbon price yet." aria-label="Carbon Tax tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metEnergy">--</div><div class="metric-label">Annual MWh <span class="tip" tabindex="0" data-tip="Total facility energy consumption in megawatt-hours per year. Formula: IT Load (kW) x PUE x 8,760 hours. This is the primary driver of Scope 2 emissions and electricity cost. At PUE 1.4, a 1 MW IT load consumes ~12,264 MWh/year." aria-label="Annual MWh tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metRating">--</div><div class="metric-label">Efficiency <span class="tip" tabindex="0" data-tip="Overall carbon efficiency rating from A+ (best) to E (worst), combining PUE, renewable coverage, grid intensity, and operational carbon intensity. A+ requires PUE below 1.3, 80%+ renewable coverage, and carbon intensity under 0.05 kgCO2/kWh IT." aria-label="Efficiency rating tooltip">ⓘ</span></div></div>
                     </div>
                 </div>
                 <!-- Scope Breakdown Chart -->

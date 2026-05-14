@@ -319,6 +319,17 @@
         .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
         .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
 
+        /* ── Output card tooltips ── */
+        .tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: rgba(59,130,246,0.15); color: #3b82f6; font-size: 0.65rem; font-weight: 700; cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 3px; border: 1px solid rgba(59,130,246,0.3); transition: background 0.2s; user-select: none; }
+        .tip:hover, .tip:focus, .tip.tip-open { background: #3b82f6; color: #fff; outline: none; }
+        .tip::after { content: attr(data-tip); display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #f1f5f9; font-size: 0.72rem; font-weight: 400; line-height: 1.55; padding: 8px 10px; border-radius: 8px; width: 270px; max-width: 85vw; white-space: normal; z-index: 9000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; border: 1px solid rgba(59,130,246,0.25); }
+        .tip::before { content: ''; display: none; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #1e293b; z-index: 9001; pointer-events: none; }
+        .tip:hover::after, .tip:focus::after, .tip.tip-open::after { display: block; }
+        .tip:hover::before, .tip:focus::before, .tip.tip-open::before { display: block; }
+        [data-theme="dark"] .tip { background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.25); }
+        [data-theme="dark"] .tip:hover, [data-theme="dark"] .tip:focus, [data-theme="dark"] .tip.tip-open { background: #3b82f6; color: #fff; }
+        @media (max-width: 768px) { .tip::after { width: 220px; font-size: 0.70rem; } }
+
         /* ═══ TOOLBAR ═══ */
         .roi-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 auto; max-width: 1400px; padding: 0 2rem 1.25rem; flex-wrap: wrap; }
         .roi-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
@@ -870,14 +881,14 @@
                         </div>
                     </div>
                     <div class="metric-grid" id="metricGrid">
-                        <div class="metric-box"><div class="metric-value" id="metIRR">--</div><div class="metric-label">IRR</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metPayback">--</div><div class="metric-label">Payback (yrs)</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metPI">--</div><div class="metric-label">Profitability Index</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metROIC">--</div><div class="metric-label">ROIC</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metRevenue">--</div><div class="metric-label">Peak Revenue</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metNOI">--</div><div class="metric-label">Peak NOI</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metYield">--</div><div class="metric-label">Yield on Cost</div></div>
-                        <div class="metric-box"><div class="metric-value" id="metTerminal">--</div><div class="metric-label">Terminal Value</div></div>
+                        <div class="metric-box"><div class="metric-value" id="metIRR">--</div><div class="metric-label">IRR <span class="tip" tabindex="0" data-tip="Internal Rate of Return — the discount rate at which NPV equals zero. Above your cost of capital means the project creates value. DC projects typically target IRR of 12-20%. Formula: solve NPV(IRR)=0 over the cashflow series." aria-label="IRR tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metPayback">--</div><div class="metric-label">Payback (yrs) <span class="tip" tabindex="0" data-tip="Simple payback period: years until cumulative net cashflow turns positive. Does not account for time value of money. Typical DC payback is 6-12 years. Shorter payback reduces investment risk and exposure to technology obsolescence." aria-label="Payback tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metPI">--</div><div class="metric-label">Profitability Index <span class="tip" tabindex="0" data-tip="Ratio of NPV to initial investment (PI = 1 + NPV / CAPEX). PI above 1.0 signals value creation. Used to rank competing projects when capital is constrained. PI of 1.25 means every $1 invested returns $1.25 in present value." aria-label="Profitability Index tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metROIC">--</div><div class="metric-label">ROIC <span class="tip" tabindex="0" data-tip="Return on Invested Capital — peak-year NOI divided by total capital invested including CAPEX. Measures operational efficiency of deployed capital. A ROIC above WACC confirms the project earns above its cost of capital." aria-label="ROIC tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metRevenue">--</div><div class="metric-label">Peak Revenue <span class="tip" tabindex="0" data-tip="Maximum annual gross revenue at full stabilized occupancy. Equals IT capacity (kW) x utilization rate x colocation price per kW per month x 12. Drives the ceiling on NOI and terminal value." aria-label="Peak Revenue tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metNOI">--</div><div class="metric-label">Peak NOI <span class="tip" tabindex="0" data-tip="Net Operating Income at stabilization — peak revenue minus total annual OPEX (energy, staffing, maintenance, insurance). Excludes debt service and depreciation. NOI is the primary driver of asset valuation using cap rate pricing." aria-label="Peak NOI tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metYield">--</div><div class="metric-label">Yield on Cost <span class="tip" tabindex="0" data-tip="Stabilized NOI divided by total project cost (CAPEX). Shows the unleveraged yield the project produces on cost. A yield-on-cost spread of 150-300 bps above the prevailing cap rate indicates a value-creation development margin." aria-label="Yield on Cost tooltip">ⓘ</span></div></div>
+                        <div class="metric-box"><div class="metric-value" id="metTerminal">--</div><div class="metric-label">Terminal Value <span class="tip" tabindex="0" data-tip="Estimated sale value of the asset at the end of the hold period. Calculated as stabilized NOI divided by the exit cap rate. Terminal value often represents 50-70% of total project return in DC investments held 10+ years." aria-label="Terminal Value tooltip">ⓘ</span></div></div>
                     </div>
                 </div>
                 <!-- Cashflow Chart -->

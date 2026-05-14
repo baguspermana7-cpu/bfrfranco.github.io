@@ -850,6 +850,15 @@
             letter-spacing: 0.5px;
         }
 
+        /* ── Output card tooltips ── */
+        .tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: rgba(99,102,241,0.15); color: #818cf8; font-size: 0.65rem; font-weight: 700; cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 3px; border: 1px solid rgba(99,102,241,0.3); transition: background 0.2s; user-select: none; }
+        .tip:hover, .tip:focus, .tip.tip-open { background: #818cf8; color: #fff; outline: none; }
+        .tip::after { content: attr(data-tip); display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #f1f5f9; font-size: 0.72rem; font-weight: 400; line-height: 1.55; padding: 8px 10px; border-radius: 8px; width: 270px; max-width: 85vw; white-space: normal; z-index: 9000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; border: 1px solid rgba(99,102,241,0.25); }
+        .tip::before { content: ''; display: none; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #1e293b; z-index: 9001; pointer-events: none; }
+        .tip:hover::after, .tip:focus::after, .tip.tip-open::after { display: block; }
+        .tip:hover::before, .tip:focus::before, .tip.tip-open::before { display: block; }
+        @media (max-width: 768px) { .tip::after { width: 220px; font-size: 0.70rem; } }
+
         .tco-kpi-value {
             font-size: 1.2rem;
             font-weight: 700;
@@ -2593,42 +2602,42 @@
                     <!-- KPI Cards -->
                     <div class="tco-kpi-grid" id="tcoKpiGrid">
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Build TCO</div>
+                            <div class="tco-kpi-label">Build TCO <span class="tip" tabindex="0" data-tip="Total Cost of Ownership for building your own data center over the analysis period. Includes CAPEX (land, construction, M&amp;E) plus all annual OPEX (energy, staff, maintenance). Higher upfront but lower per-kW cost at scale." aria-label="Build TCO tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-build" id="kpiBuildTco">--</div>
                             <div class="tco-kpi-sub" id="kpiBuildSub"></div>
                         </div>
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Colo TCO</div>
+                            <div class="tco-kpi-label">Colo TCO <span class="tip" tabindex="0" data-tip="Total cost of colocating in a third-party facility over the period. Includes monthly rack/cage fees, cross-connect charges, remote hands, and power charges. No CAPEX — cost scales with committed power draw in kW." aria-label="Colo TCO tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-colo" id="kpiColoTco">--</div>
                             <div class="tco-kpi-sub" id="kpiColoSub"></div>
                         </div>
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Cloud TCO</div>
+                            <div class="tco-kpi-label">Cloud TCO <span class="tip" tabindex="0" data-tip="Total cloud infrastructure cost over the period. Based on on-demand or reserved instance pricing per kW of compute equivalent. Typically highest at scale but offers maximum flexibility and no CAPEX commitment." aria-label="Cloud TCO tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-cloud" id="kpiCloudTco">--</div>
                             <div class="tco-kpi-sub" id="kpiCloudSub"></div>
                         </div>
                         <div class="tco-kpi-card tco-best" id="kpiBestCard">
-                            <div class="tco-kpi-label">Best Option</div>
+                            <div class="tco-kpi-label">Best Option <span class="tip" tabindex="0" data-tip="The deployment model with the lowest total cost of ownership over the selected analysis period. Winner is highlighted in green. Compare all three options to understand where crossover points occur at different scales and time horizons." aria-label="Best Option tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-winner" id="kpiBestOption">--</div>
                             <div class="tco-kpi-sub" id="kpiBestSub"></div>
                         </div>
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Build CAPEX</div>
+                            <div class="tco-kpi-label">Build CAPEX <span class="tip" tabindex="0" data-tip="One-time capital expenditure to construct and commission the owned facility. Includes site acquisition, civil works, M&amp;E systems, IT infrastructure, and project management. Amortized over the asset useful life in financial models." aria-label="Build CAPEX tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-capex" id="kpiBuildCapex">--</div>
                             <div class="tco-kpi-sub">Initial investment</div>
                         </div>
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Yr 1 OPEX (Build)</div>
+                            <div class="tco-kpi-label">Yr 1 OPEX (Build) <span class="tip" tabindex="0" data-tip="First-year annual operating expenditure for the owned facility. Includes energy costs (IT + overhead), staffing, preventive maintenance contracts, insurance, and property tax. Grows each year with the escalation rate." aria-label="Year 1 OPEX tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-opex" id="kpiAnnualOpex">--</div>
                             <div class="tco-kpi-sub">Annual operating cost</div>
                         </div>
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Cost per kW</div>
+                            <div class="tco-kpi-label">Cost per kW <span class="tip" tabindex="0" data-tip="Effective all-in cost per kW of IT capacity for the best-option deployment model. Calculated as total TCO divided by IT load (kW) divided by years. Industry benchmark: $150-500/kW/yr for owned; $300-600 for colo; $500-1200+ for cloud." aria-label="Cost per kW tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-perkw" id="kpiCostPerKw">--</div>
                             <div class="tco-kpi-sub" id="kpiCostPerKwSub">Best option effective</div>
                         </div>
                         <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Breakeven Year</div>
+                            <div class="tco-kpi-label">Breakeven Year <span class="tip" tabindex="0" data-tip="The year at which cumulative Build TCO equals cumulative Colo TCO. Before this year, colo is cheaper (no CAPEX). After this year, owning becomes cheaper due to lower per-kW OPEX at scale. Typical DC breakeven is years 4-8." aria-label="Breakeven Year tooltip">ⓘ</span></div>
                             <div class="tco-kpi-value tco-breakeven" id="kpiBreakeven">--</div>
                             <div class="tco-kpi-sub">Build vs. Colo crossover</div>
                         </div>
