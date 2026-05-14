@@ -1330,7 +1330,9 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
       <button class="tab-btn" onclick="switchTab('ltb')" role="tab" aria-selected="false" aria-controls="pane-ltb">7 · Last-Time-Buy</button>
       <button class="tab-btn" onclick="switchTab('kraljic')" role="tab" aria-selected="false" aria-controls="pane-kraljic">8 · Kraljic</button>
       <button class="tab-btn" onclick="switchTab('montecarlo')" role="tab" aria-selected="false" aria-controls="pane-montecarlo">9 · Monte-Carlo</button>
-      <button class="tab-btn" onclick="switchTab('fleet')" role="tab" aria-selected="false" aria-controls="pane-fleet">🧰 Fleet / Portfolio</button>
+      <button class="tab-btn" onclick="switchTab('sensitivity')" role="tab" aria-selected="false" aria-controls="pane-sensitivity">10 · Sensitivity</button>
+      <button class="tab-btn" onclick="switchTab('projection')" role="tab" aria-selected="false" aria-controls="pane-projection">11 · 5-Yr Spend Projection</button>
+      <button class="tab-btn" onclick="switchTab('fleet')" role="tab" aria-selected="false" aria-controls="pane-fleet">Fleet / Portfolio</button>
       <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Operating Engine</span>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('pm-ops')" role="tab" aria-selected="false" aria-controls="pane-pm-ops">A · Daily PM Ops</button>
@@ -2320,6 +2322,224 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
             <div class="card-title"><i class="fas fa-wind"></i> Tornado Chart — Variance Drivers</div>
             <div class="chart-wrap-sm"><canvas id="chart_mc_tornado"></canvas></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODULE 9: SENSITIVITY SURFACES ===== -->
+    <div class="module-pane" id="pane-sensitivity">
+      <div class="module-summary-card">
+        <span class="q">Q: Which input drives the most variation in fill rate?</span>
+        <div class="a">2D sensitivity sweep across 2 axes — sweeps any two inputs over a configurable range and renders a viridis heatmap of the chosen metric across the full N&times;N grid.</div>
+        <div class="output">Output: Heatmap (N&times;N grid, viridis ramp) + most-sensitive axis + metric range across grid + coordinates of the extremum cell.</div>
+        <div class="use-when"><strong>Use when:</strong> justifying which lever to pull first (reduce lead time vs. increase stock vs. switch supplier), preparing sensitivity slides for leadership, or stress-testing a stocking decision against input uncertainty.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>X-axis variable</li><li>Y-axis variable</li><li>Target metric</li><li>Resolution (N)</li><li>X/Y range multipliers</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Sweep</h4><ul><li>N&times;N grid of (x,y) pairs</li><li>Each cell: recompute metric using current module values + overridden (x,y)</li><li>Identify max/min cell</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Heatmap</h4><ul><li>Viridis colour ramp</li><li>Cell labels (monospace)</li><li>Axis labels from variable names</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('stock')">M3 Optimal Stock</a></li><li><a onclick="switchTab('meio')">M4 MEIO</a></li><li><a onclick="switchTab('criticality')">M1 Criticality</a></li></ul></div>
+      </div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-th"></i> Sensitivity Sweep Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sens_var_x">X-Axis Variable <span class="tip" tabindex="0" data-tip="Variable assigned to the horizontal axis of the heatmap. Swept from (current value × X-min multiplier) to (current value × X-max multiplier) in N steps. Current values are read from the corresponding module inputs." aria-label="X-axis variable tooltip">ⓘ</span></label>
+              <select id="sens_var_x" class="input-field" onchange="calcSensitivity()" aria-label="X-axis variable">
+                <option value="lambda" selected>lambda — failure rate (/yr)</option>
+                <option value="lead_time">lead_time — lead time (weeks)</option>
+                <option value="demand">demand — annual demand (units/yr)</option>
+                <option value="severity">severity — FMECA severity (1-10)</option>
+                <option value="alternates">alternates — qualified alternates (#)</option>
+                <option value="holding_pct">holding_pct — carrying cost rate (%)</option>
+                <option value="unit_cost">unit_cost — unit cost ($)</option>
+                <option value="backorder_cost">backorder_cost — under-stock cost/event ($)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sens_var_y">Y-Axis Variable <span class="tip" tabindex="0" data-tip="Variable assigned to the vertical axis of the heatmap. Should differ from X-axis variable. Swept from (current value × Y-min multiplier) to (current value × Y-max multiplier) in N steps." aria-label="Y-axis variable tooltip">ⓘ</span></label>
+              <select id="sens_var_y" class="input-field" onchange="calcSensitivity()" aria-label="Y-axis variable">
+                <option value="lambda">lambda — failure rate (/yr)</option>
+                <option value="lead_time" selected>lead_time — lead time (weeks)</option>
+                <option value="demand">demand — annual demand (units/yr)</option>
+                <option value="severity">severity — FMECA severity (1-10)</option>
+                <option value="alternates">alternates — qualified alternates (#)</option>
+                <option value="holding_pct">holding_pct — carrying cost rate (%)</option>
+                <option value="unit_cost">unit_cost — unit cost ($)</option>
+                <option value="backorder_cost">backorder_cost — under-stock cost/event ($)</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sens_metric">Output Metric <span class="tip" tabindex="0" data-tip="The quantity computed at each (x,y) grid cell. Fill rate = 1 minus P(stockout) at optimal Q*. Total cost = annual holding + stockout cost. RPN = severity × detectability × (lambda×10), capped at 1000. P(stockout) = Poisson CDF at current stock level. Optimal qty = Newsvendor Q*. Expected backorders = MEIO Poisson backorder formula." aria-label="Output metric tooltip">ⓘ</span></label>
+              <select id="sens_metric" class="input-field" onchange="calcSensitivity()" aria-label="Output metric">
+                <option value="fill_rate" selected>fill_rate — achieved fill rate (%)</option>
+                <option value="total_cost">total_cost — annual total cost ($)</option>
+                <option value="rpn">rpn — Risk Priority Number</option>
+                <option value="p_stockout">p_stockout — P(stockout) %</option>
+                <option value="optimal_qty">optimal_qty — newsvendor Q* (units)</option>
+                <option value="expected_backorders">expected_backorders — expected backorders (units)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sens_resolution">Grid Resolution (N) <span class="tip" tabindex="0" data-tip="Number of steps per axis. A 7×7 grid has 49 cells; a 9×9 grid has 81. Higher resolution gives smoother gradients but takes longer to render. 7 is the recommended default for interactive use." aria-label="Resolution tooltip">ⓘ</span></label>
+              <select id="sens_resolution" class="input-field" onchange="calcSensitivity()" aria-label="Grid resolution">
+                <option value="5">5 × 5</option>
+                <option value="7" selected>7 × 7</option>
+                <option value="9">9 × 9</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sens_x_min_mult">X-Axis Min Multiplier <span class="tip" tabindex="0" data-tip="The X-axis sweep starts at (current value × this multiplier). Default 0.5 means the axis starts at 50% of the current input value. Must be less than X-max multiplier." aria-label="X min multiplier tooltip">ⓘ</span></label>
+              <input type="number" id="sens_x_min_mult" class="input-field" value="0.5" min="0.1" max="0.99" step="0.05" oninput="calcSensitivity()" aria-label="X-axis min multiplier">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sens_x_max_mult">X-Axis Max Multiplier <span class="tip" tabindex="0" data-tip="The X-axis sweep ends at (current value × this multiplier). Default 1.5 means the axis ends at 150% of the current input value. Must be greater than X-min multiplier." aria-label="X max multiplier tooltip">ⓘ</span></label>
+              <input type="number" id="sens_x_max_mult" class="input-field" value="1.5" min="1.01" max="10" step="0.1" oninput="calcSensitivity()" aria-label="X-axis max multiplier">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="sens_y_min_mult">Y-Axis Min Multiplier <span class="tip" tabindex="0" data-tip="The Y-axis sweep starts at (current value × this multiplier). Default 0.5 = 50% of current value." aria-label="Y min multiplier tooltip">ⓘ</span></label>
+              <input type="number" id="sens_y_min_mult" class="input-field" value="0.5" min="0.1" max="0.99" step="0.05" oninput="calcSensitivity()" aria-label="Y-axis min multiplier">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="sens_y_max_mult">Y-Axis Max Multiplier <span class="tip" tabindex="0" data-tip="The Y-axis sweep ends at (current value × this multiplier). Default 1.5 = 150% of current value." aria-label="Y max multiplier tooltip">ⓘ</span></label>
+              <input type="number" id="sens_y_max_mult" class="input-field" value="1.5" min="1.01" max="10" step="0.1" oninput="calcSensitivity()" aria-label="Y-axis max multiplier">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="calcSensitivity()"><i class="fas fa-th"></i> Run Sweep</button>
+            <button class="btn-reset-module" onclick="resetModule('sensitivity')" aria-label="Reset Sensitivity inputs to defaults">&#8634; Reset defaults</button>
+          </div>
+        </div>
+        <div>
+          <div class="result-card">
+            <div class="result-title">Sensitivity Results</div>
+            <div class="metric-grid-2">
+              <div class="metric-box"><div class="metric-label">Most Sensitive Variable <span class="tip" tabindex="0" data-tip="The axis (X or Y variable) whose sweep produces the larger range of the output metric. Computed as max(range_across_x_axis, range_across_y_axis). The axis with greater spread is the highest-leverage input to target for improvement." aria-label="Most sensitive variable tooltip">ⓘ</span></div><div class="metric-value" id="sens_most_sensitive_var">—</div></div>
+              <div class="metric-box"><div class="metric-label">Range Across Grid <span class="tip" tabindex="0" data-tip="Difference between the maximum and minimum metric value across the full N×N grid. Wider range = higher overall sensitivity to the two selected variables. Unit matches the output metric (% for fill rate, $ for cost, unitless for RPN)." aria-label="Range across grid tooltip">ⓘ</span></div><div class="metric-value" id="sens_metric_range">—</div></div>
+              <div class="metric-box"><div class="metric-label">X at Extremum <span class="tip" tabindex="0" data-tip="Value of the X-axis variable at the grid cell that produces the maximum metric. For fill rate this is the (lambda, lead_time) combination that maximises fill rate — typically the lowest lambda and shortest lead time in the sweep range." aria-label="X at extremum tooltip">ⓘ</span></div><div class="metric-value" id="sens_extremum_x">—</div></div>
+              <div class="metric-box"><div class="metric-label">Y at Extremum <span class="tip" tabindex="0" data-tip="Value of the Y-axis variable at the grid cell that produces the maximum metric. Together with X at Extremum, this identifies the optimal operating point within the sweep range." aria-label="Y at extremum tooltip">ⓘ</span></div><div class="metric-value" id="sens_extremum_y">—</div></div>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-palette"></i> Sensitivity Heatmap</div>
+            <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 0.5rem;">Viridis colour ramp: dark purple = low metric value, yellow-green = high. Each cell shows the computed metric value.</p>
+            <canvas id="chart_sensitivity" width="500" height="400" style="max-width:100%;display:block;"></canvas>
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary><strong>Methodology — Sensitivity Sweep Algorithm</strong></summary>
+            <p>For each of the N&times;N grid cells the sweep algorithm: (1) reads current values from the corresponding module inputs (Criticality M1, Stock M3), (2) overrides the X-variable with <code>x_base &times; lerp(x_min_mult, x_max_mult, i/(N-1))</code> and similarly for Y, (3) recomputes the chosen metric using the same formulas as the live modules, and (4) normalises the result for colour mapping.</p>
+            <p><strong>Viridis ramp</strong>: perceptually uniform, colour-blind safe. Implemented as a 5-stop linear interpolation through the canonical Viridis control points: #440154 (0%), #31688e (25%), #35b779 (50%), #90d743 (75%), #fde725 (100%).</p>
+            <p><strong>Most sensitive axis</strong>: computed as the variable whose marginal range (max metric along that axis minus min metric along that axis, averaged across the perpendicular axis) is larger. This is a first-order sensitivity index analogous to a one-at-a-time (OAT) sensitivity analysis.</p>
+            <p><strong>Metric formulas</strong>: use the same logic as M1 Criticality (RPN), M3 Optimal Stock (fill rate, total cost, optimal qty), and M4 MEIO (expected backorders, P(stockout)). No new math is introduced.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODULE 10: 5-YEAR SPEND PROJECTION ===== -->
+    <div class="module-pane" id="pane-projection">
+      <div class="module-summary-card">
+        <span class="q">Q: How much will the fleet spend on critical spares over the next 5 years?</span>
+        <div class="a">Cash-flow forecast across 8 commodity classes — projects annual replacement and maintenance spend as installed base grows, failure rates drift, and unit costs inflate.</div>
+        <div class="output">Output: Year-by-year stacked area chart (8 commodity classes) + data table (Year | each class | Total | Cumulative) + 4 KPI summary cards.</div>
+        <div class="use-when"><strong>Use when:</strong> building a multi-year capital budget for spares, presenting a business case for a strategic stockpile, or benchmarking planned spend against industry ratios.</div>
+      </div>
+      <div class="module-flow-card">
+        <div class="module-flow-col"><h4>Inputs</h4><ul><li>Installed base (MW)</li><li>Fleet growth %/yr</li><li>Failure rate drift</li><li>Cost inflation %/yr</li><li>Maintenance ratio</li><li>Horizon (3/5/7/10 yr)</li><li>Commodity mix profile</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Year-by-Year Projection</h4><ul><li>install_base × (1+growth)^Y</li><li>failure_rate × (1+drift)^Y</li><li>unit_cost × (1+inflation)^Y</li><li>8 commodity classes</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Stacked Area Chart</h4><ul><li>8 series (Chart.js)</li><li>Y = $/yr</li><li>X = year index</li><li>Data table below</li></ul></div>
+        <div class="module-flow-arrow">&rarr;</div>
+        <div class="module-flow-col"><h4>Connects To</h4><ul><li><a onclick="switchTab('criticality')">M1 Criticality</a></li><li><a onclick="switchTab('stock')">M3 Optimal Stock</a></li><li><a onclick="switchTab('ltb')">M6 LTB</a></li></ul></div>
+      </div>
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="card-title"><i class="fas fa-chart-area"></i> Projection Inputs</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="proj_install_base_mw">Installed Base (MW) <span class="tip" tabindex="0" data-tip="Total IT load in megawatts at Year 0. Used to scale commodity failure events per year. Typical hyperscale: 100-500 MW. Enterprise DC: 5-30 MW. All commodity failure rates are expressed per MW per year." aria-label="Installed base MW tooltip">ⓘ</span></label>
+              <input type="number" id="proj_install_base_mw" class="input-field" value="100" min="1" max="10000" oninput="calcProjection()" aria-label="Installed base MW">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="proj_growth_pct">Fleet Growth (%/yr) <span class="tip" tabindex="0" data-tip="Annual percentage growth in installed IT capacity. Drives how quickly the installed base (and thus failure event volume) scales. Compound growth: base × (1+growth/100)^Year. Typical hyperscale expansion: 10-25%/yr." aria-label="Fleet growth tooltip">ⓘ</span></label>
+              <input type="number" id="proj_growth_pct" class="input-field" value="12" min="0" max="200" step="0.5" oninput="calcProjection()" aria-label="Fleet growth percent per year">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="proj_failure_rate_growth">Failure Rate Drift (%/yr) <span class="tip" tabindex="0" data-tip="Annual increase in failure rates due to equipment ageing. As installed equipment ages, failure rates drift upward from their Day-1 values. Typical: 2-5%/yr for M&E equipment past the first 3-5 years. Applied as a compound multiplier." aria-label="Failure rate drift tooltip">ⓘ</span></label>
+              <input type="number" id="proj_failure_rate_growth" class="input-field" value="3" min="0" max="50" step="0.5" oninput="calcProjection()" aria-label="Failure rate drift percent per year">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="proj_cost_inflation">Cost Inflation (%/yr) <span class="tip" tabindex="0" data-tip="Annual unit-cost inflation for spare parts. Combines general CPI inflation with supply-chain premiums and OEM price escalation. Typical: 3-8%/yr for DC M&E parts. Applied as a compound multiplier to all unit costs." aria-label="Cost inflation tooltip">ⓘ</span></label>
+              <input type="number" id="proj_cost_inflation" class="input-field" value="5" min="0" max="50" step="0.5" oninput="calcProjection()" aria-label="Cost inflation percent per year">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" for="proj_maintenance_ratio">Maintenance Ratio (%) <span class="tip" tabindex="0" data-tip="Planned preventive maintenance spend as a percentage of replacement/corrective spare spend. Includes consumables, filters, belts, sensors, and labour-bundled items not captured in the 8 commodity classes. Typical: 25-45% of replacement spend." aria-label="Maintenance ratio tooltip">ⓘ</span></label>
+              <input type="number" id="proj_maintenance_ratio" class="input-field" value="35" min="0" max="200" step="1" oninput="calcProjection()" aria-label="Maintenance ratio percent">
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="proj_horizon_years">Forecast Horizon (years) <span class="tip" tabindex="0" data-tip="Number of years to project. Year 0 = current year baseline. The chart and table will show Year 0 through Year N. Longer horizons amplify compounding effects of growth and inflation." aria-label="Forecast horizon tooltip">ⓘ</span></label>
+              <select id="proj_horizon_years" class="input-field" onchange="calcProjection()" aria-label="Forecast horizon years">
+                <option value="3">3 years</option>
+                <option value="5" selected>5 years</option>
+                <option value="7">7 years</option>
+                <option value="10">10 years</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="proj_commodity_mix">Commodity Mix Profile <span class="tip" tabindex="0" data-tip="Determines how total spend is distributed across the 8 commodity classes. Balanced = typical mixed DC. Chiller-heavy = cooling-dominant facility (chilled-water plant). Electrical-heavy = power-dominant (large UPS/transformer fleet). IT-heavy = high-density compute with large network infrastructure." aria-label="Commodity mix profile tooltip">ⓘ</span></label>
+            <select id="proj_commodity_mix" class="input-field" onchange="calcProjection()" aria-label="Commodity mix profile">
+              <option value="balanced" selected>Balanced (typical mixed DC)</option>
+              <option value="chiller-heavy">Chiller-Heavy (cooling-dominant)</option>
+              <option value="electrical-heavy">Electrical-Heavy (power-dominant)</option>
+              <option value="IT-heavy">IT-Heavy (high-density compute)</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="calcProjection()"><i class="fas fa-chart-area"></i> Generate Projection</button>
+            <button class="btn-reset-module" onclick="resetModule('projection')" aria-label="Reset Projection inputs to defaults">&#8634; Reset defaults</button>
+          </div>
+        </div>
+        <div>
+          <div class="result-card">
+            <div class="result-title">5-Year Spend Summary</div>
+            <div class="metric-grid-2">
+              <div class="metric-box"><div class="metric-label">Total Spend (Horizon) <span class="tip" tabindex="0" data-tip="Sum of all annual spend (replacement + maintenance) across the full forecast horizon for all 8 commodity classes. Unit: $. This is the undiscounted cumulative spend number to use in CAPEX budget requests." aria-label="Total spend horizon tooltip">ⓘ</span></div><div class="metric-value" id="proj_5yr_total">—</div></div>
+              <div class="metric-box"><div class="metric-label">Year-N Annual Spend <span class="tip" tabindex="0" data-tip="Projected total annual spend in the final year of the horizon. Shows the run-rate you will need to budget for by the end of the planning period. Driven by compounding growth, failure rate drift, and cost inflation." aria-label="Year N annual spend tooltip">ⓘ</span></div><div class="metric-value" id="proj_year_5">—</div></div>
+              <div class="metric-box"><div class="metric-label">Growth vs Year 0 <span class="tip" tabindex="0" data-tip="Percentage increase in annual spend from Year 0 baseline to the final year. Combines fleet growth, failure rate drift, and cost inflation compounding effects. Useful for presenting the budget escalation story." aria-label="Growth vs year 0 tooltip">ⓘ</span></div><div class="metric-value" id="proj_growth_vs_y0">—</div></div>
+              <div class="metric-box"><div class="metric-label">Largest Commodity Class <span class="tip" tabindex="0" data-tip="The commodity class that accounts for the highest cumulative spend across the full horizon. Identifies where procurement focus and strategic supplier relationships deliver the most value." aria-label="Largest commodity class tooltip">ⓘ</span></div><div class="metric-value" id="proj_largest_commodity">—</div></div>
+            </div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;">
+            <div class="card-title"><i class="fas fa-chart-area"></i> Annual Spend by Commodity Class</div>
+            <div class="chart-wrap"><canvas id="chart_projection"></canvas></div>
+          </div>
+          <div class="result-card" style="margin-top:0.85rem;overflow-x:auto;">
+            <div class="card-title"><i class="fas fa-table"></i> Year-by-Year Spend Table</div>
+            <div id="proj_table_wrap"></div>
+          </div>
+          <details class="info-box" style="margin-top:0.85rem;">
+            <summary><strong>Methodology — 5-Year Spend Projection</strong></summary>
+            <p>For each year Y (0 to horizon): <code>install_base_Y = base &times; (1+growth/100)^Y</code>; <code>failure_rate_mult_Y = (1+drift/100)^Y</code>; <code>cost_mult_Y = (1+inflation/100)^Y</code>.</p>
+            <p>For each commodity class c: <code>replacement_Y_c = failureRate_c &times; install_base_Y &times; share_c &times; unitCost_c &times; cost_mult_Y &times; failure_rate_mult_Y</code>.</p>
+            <p><code>maintenance_Y = replacement_Y &times; maintenance_ratio/100</code>. Total annual spend: <code>total_Y = replacement_Y + maintenance_Y</code>.</p>
+            <p><strong>8 commodity classes</strong> (failure rates per MW/yr, unit costs at Year 0): Chillers (0.15/MW, $45K), Transformers &amp; Switchgear (0.08/MW, $28K), UPS Systems (0.20/MW, $22K), PDU &amp; Floor Distribution (0.25/MW, $8K), Network (0.40/MW, $4.5K), Mechanical (0.45/MW, $3.5K), Sensors &amp; Controls (0.55/MW, $1.2K), Consumables (2.5/MW, $500).</p>
+          </details>
         </div>
       </div>
     </div>
@@ -7744,7 +7964,7 @@ function exportSTARPDF() {
    UPDATE TAB ORDER + SWITCHtab + RECALCALL
    v1.16.2: promoted to primary declaration (replaces dead 14-item placeholder above)
    =========================================== */
-TAB_ORDER = ['criticality','readiness','stock','meio','hub','supplier','ltb','kraljic','montecarlo','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
+TAB_ORDER = ['criticality','readiness','stock','meio','hub','supplier','ltb','kraljic','montecarlo','sensitivity','projection','fleet','pm-ops','scorecard','negotiation','contract','process','meeting','stakeholder','eol','ambiguity','star','sc-lane','sc-risk','sc-sim','sc-expedite','catalog','catalog-analytics','faq'];
 
 // v1.16.2: authoritative switchTab — replaces the dead stub declared above.
 // _origSwitchTab reference removed (was captured but never called in this body).
@@ -10083,10 +10303,384 @@ function copyEl(id) {
   }
 })();
 
+/* ===========================================
+   MODULE 9: SENSITIVITY SURFACES
+   2D sweep of any two inputs vs a chosen metric.
+   Uses existing formulas from M1 Criticality, M3 Stock, M4 MEIO.
+   =========================================== */
+function calcSensitivity() {
+  var varX    = getStr('sens_var_x', 'lambda');
+  var varY    = getStr('sens_var_y', 'lead_time');
+  var metric  = getStr('sens_metric', 'fill_rate');
+  var N       = Math.round(clamp(getVal('sens_resolution', 7), 5, 9));
+  var xMinM   = clamp(getVal('sens_x_min_mult', 0.5), 0.05, 0.99);
+  var xMaxM   = clamp(getVal('sens_x_max_mult', 1.5), 1.01, 20);
+  var yMinM   = clamp(getVal('sens_y_min_mult', 0.5), 0.05, 0.99);
+  var yMaxM   = clamp(getVal('sens_y_max_mult', 1.5), 1.01, 20);
+
+  // Read current "base" values from existing module inputs
+  function baseVal(v) {
+    switch (v) {
+      case 'lambda':        return clamp(getVal('c1_lambda', 0.25), 0.001, 20);
+      case 'lead_time':     return clamp(getVal('s_lt_weeks', 16), 1, 200);
+      case 'demand':        return clamp(getVal('s_demand_mu', 1.0), 0.01, 500);
+      case 'severity':      return clamp(getVal('c1_severity', 8), 1, 10);
+      case 'alternates':    return clamp(getVal('c1_alternates', 1), 0, 20);
+      case 'holding_pct':   return clamp(getVal('s_carry_rate', 25), 1, 100);
+      case 'unit_cost':     return clamp(getVal('s_unit_cost', 4500), 1, 1e8);
+      case 'backorder_cost':return clamp(getVal('s_understk_cost', 85000), 1, 1e10);
+      default: return 1;
+    }
+  }
+
+  var bX = baseVal(varX);
+  var bY = baseVal(varY);
+  // Build axis value arrays
+  var xVals = [], yVals = [];
+  for (var i = 0; i < N; i++) {
+    xVals.push(bX * (xMinM + (xMaxM - xMinM) * i / (N - 1)));
+    yVals.push(bY * (yMinM + (yMaxM - yMinM) * i / (N - 1)));
+  }
+
+  // Snapshot current module values (unchanging during sweep)
+  var snap = {
+    lambda:         clamp(getVal('c1_lambda', 0.25), 0.001, 20),
+    lead_time:      clamp(getVal('s_lt_weeks', 16), 1, 200),
+    demand:         clamp(getVal('s_demand_mu', 1.0), 0.01, 500),
+    severity:       clamp(getVal('c1_severity', 8), 1, 10),
+    detectability:  clamp(getVal('c1_detectability', 6), 1, 10),
+    alternates:     clamp(getVal('c1_alternates', 1), 0, 20),
+    holding_pct:    clamp(getVal('s_carry_rate', 25), 1, 100),
+    unit_cost:      clamp(getVal('s_unit_cost', 4500), 1, 1e8),
+    backorder_cost: clamp(getVal('s_understk_cost', 85000), 1, 1e10),
+    demand_sigma:   clamp(getVal('s_demand_sigma', 0.6), 0, 100),
+    part_life:      clamp(getVal('s_part_life', 8), 1, 30),
+    stock_level:    clamp(getVal('mc_stock_level', 2), 0, 1000)
+  };
+
+  function applyOverride(s, vName, val) {
+    var o = {};
+    for (var k in s) { o[k] = s[k]; }
+    o[vName] = val;
+    return o;
+  }
+
+  function computeMetric(s, metricName) {
+    var lambda     = s.lambda;
+    var ltWeeks    = s.lead_time;
+    var muAnnual   = s.demand;
+    var severity   = s.severity;
+    var detectability = s.detectability;
+    var alternates = s.alternates;
+    var carryRate  = s.holding_pct / 100;
+    var unitCost   = s.unit_cost;
+    var cu         = s.backorder_cost;
+    var sigmaAnnual= s.demand_sigma;
+    var partLife   = s.part_life;
+    var stockLevel = s.stock_level;
+
+    var L          = ltWeeks / 52;
+    var sigmaL     = clamp(getVal('s_lt_sigma', 4), 0, 100) / 52;
+    var muLT       = muAnnual * L;
+    var sigmaLT    = Math.sqrt(L * sigmaAnnual * sigmaAnnual + muAnnual * muAnnual * sigmaL * sigmaL);
+    if (sigmaLT < 0.001) sigmaLT = 0.001;
+
+    var co         = carryRate * unitCost * partLife;
+    var cr         = clamp(cu / (cu + co), 0.001, 0.999);
+    var zCR        = normInvCDF(cr);
+    var qStar      = Math.max(0, Math.ceil(muLT + zCR * sigmaLT));
+    var fillAchieved = normCDF((qStar - muLT) / sigmaLT);
+    var lambdaLT   = muAnnual * L;
+
+    switch (metricName) {
+      case 'fill_rate':
+        return fillAchieved * 100;
+      case 'total_cost':
+        var expectedOver  = Math.max(0, qStar - muLT);
+        var annualCost    = (co / partLife) * expectedOver + cu * muAnnual * (1 - fillAchieved);
+        return annualCost;
+      case 'rpn':
+        var effSev = Math.min(10, severity);
+        return Math.min(1000, effSev * detectability * Math.min(10, lambda * 10));
+      case 'p_stockout':
+        return (1 - poissonCDF(stockLevel, lambdaLT)) * 100;
+      case 'optimal_qty':
+        return qStar;
+      case 'expected_backorders':
+        return poissonBackorders(lambdaLT, stockLevel);
+      default:
+        return 0;
+    }
+  }
+
+  // Build N×N grid
+  var grid = [];
+  var minVal = Infinity, maxVal = -Infinity;
+  var maxR = 0, maxC = 0;
+  for (var r = 0; r < N; r++) {
+    grid[r] = [];
+    for (var c = 0; c < N; c++) {
+      var ov = applyOverride(snap, varX, xVals[c]);
+      ov = applyOverride(ov, varY, yVals[r]);
+      var val = computeMetric(ov, metric);
+      if (!isFinite(val)) val = 0;
+      grid[r][c] = val;
+      if (val < minVal) minVal = val;
+      if (val > maxVal) { maxVal = val; maxR = r; maxC = c; }
+    }
+  }
+  var totalRange = maxVal - minVal;
+
+  // Determine most sensitive axis (OAT: vary one axis, hold other at mid)
+  var midIdx = Math.floor(N / 2);
+  var xSpread = 0, ySpread = 0;
+  for (var i = 0; i < N; i++) {
+    xSpread = Math.max(xSpread, Math.abs(grid[midIdx][i] - grid[midIdx][midIdx]));
+    ySpread = Math.max(ySpread, Math.abs(grid[i][midIdx] - grid[midIdx][midIdx]));
+  }
+  var mostSensitive = xSpread >= ySpread ? varX : varY;
+
+  // Format helper
+  function fmtMetricVal(v) {
+    if (!isFinite(v)) return '—';
+    if (metric === 'fill_rate' || metric === 'p_stockout') return v.toFixed(1) + '%';
+    if (metric === 'total_cost') return fmt$(v);
+    if (metric === 'optimal_qty' || metric === 'expected_backorders') return v.toFixed(2) + ' u';
+    return v.toFixed(2);
+  }
+
+  // Viridis ramp: 5-stop canonical control points
+  var VIRIDIS = [
+    [68,  1, 84],
+    [49, 104,142],
+    [53, 183,121],
+    [144,215, 67],
+    [253,231, 37]
+  ];
+  function viridisColor(t) {
+    t = Math.max(0, Math.min(1, t));
+    var seg = t * 4;
+    var i = Math.min(3, Math.floor(seg));
+    var f = seg - i;
+    var r = Math.round(VIRIDIS[i][0] + f * (VIRIDIS[i+1][0] - VIRIDIS[i][0]));
+    var g = Math.round(VIRIDIS[i][1] + f * (VIRIDIS[i+1][1] - VIRIDIS[i][1]));
+    var b = Math.round(VIRIDIS[i][2] + f * (VIRIDIS[i+1][2] - VIRIDIS[i][2]));
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  // Render heatmap to canvas via Canvas 2D API
+  var canvas = document.getElementById('chart_sensitivity');
+  if (!canvas) return;
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var PAD_LEFT = 58, PAD_TOP = 28, PAD_RIGHT = 12, PAD_BOT = 58;
+  var totalW = canvas.width, totalH = canvas.height;
+  var plotW = totalW - PAD_LEFT - PAD_RIGHT;
+  var plotH = totalH - PAD_TOP - PAD_BOT;
+  var cellW = plotW / N, cellH = plotH / N;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, totalW, totalH);
+
+  for (var r2 = 0; r2 < N; r2++) {
+    for (var c2 = 0; c2 < N; c2++) {
+      var t = totalRange > 0 ? (grid[r2][c2] - minVal) / totalRange : 0.5;
+      var px = PAD_LEFT + c2 * cellW;
+      var py = PAD_TOP  + r2 * cellH;
+      ctx.fillStyle = viridisColor(t);
+      ctx.fillRect(px, py, cellW - 1, cellH - 1);
+      // Cell label
+      var labelTxt = fmtMetricVal(grid[r2][c2]);
+      var brightness = t;
+      ctx.fillStyle = brightness > 0.6 ? '#111' : '#fff';
+      ctx.font = '600 9px "JetBrains Mono",monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(labelTxt, px + cellW / 2 - 0.5, py + cellH / 2);
+    }
+  }
+
+  // Axis labels
+  ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+  ctx.font = '10px Inter,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (var i2 = 0; i2 < N; i2++) {
+    ctx.fillText(xVals[i2].toFixed(2), PAD_LEFT + i2 * cellW + cellW / 2, PAD_TOP + plotH + 4);
+  }
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (var j2 = 0; j2 < N; j2++) {
+    ctx.fillText(yVals[j2].toFixed(2), PAD_LEFT - 4, PAD_TOP + j2 * cellH + cellH / 2);
+  }
+  // Axis name labels
+  ctx.font = '700 10px Inter,sans-serif';
+  ctx.fillStyle = isDark ? '#f1f5f9' : '#1e293b';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(varX, PAD_LEFT + plotW / 2, PAD_TOP + plotH + 18);
+  ctx.save();
+  ctx.translate(12, PAD_TOP + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textBaseline = 'top';
+  ctx.fillText(varY, 0, 0);
+  ctx.restore();
+
+  // Populate output cards
+  var rangeStr = fmtMetricVal(totalRange);
+  setText('sens_most_sensitive_var', mostSensitive.replace(/_/g,' '));
+  setText('sens_metric_range', rangeStr);
+  setText('sens_extremum_x', xVals[maxC].toFixed(3));
+  setText('sens_extremum_y', yVals[maxR].toFixed(3));
+}
+window.calcSensitivity = calcSensitivity;
+
+/* ===========================================
+   MODULE 10: 5-YEAR SPEND PROJECTION
+   Year-by-year fleet spend across 8 commodity classes.
+   =========================================== */
+var PROJ_COMMODITIES = [
+  { key:'chillers',         label:'Chillers',                failureRate:0.15, unitCost:45000,
+    share:{ balanced:0.18, 'chiller-heavy':0.30, 'electrical-heavy':0.09, 'IT-heavy':0.09 } },
+  { key:'transformers',     label:'Transformers / Switchgear',failureRate:0.08, unitCost:28000,
+    share:{ balanced:0.15, 'chiller-heavy':0.10, 'electrical-heavy':0.25, 'IT-heavy':0.12 } },
+  { key:'ups',              label:'UPS Systems',              failureRate:0.20, unitCost:22000,
+    share:{ balanced:0.14, 'chiller-heavy':0.10, 'electrical-heavy':0.18, 'IT-heavy':0.13 } },
+  { key:'pdu',              label:'PDU / Floor Distribution', failureRate:0.25, unitCost:8000,
+    share:{ balanced:0.10, 'chiller-heavy':0.07, 'electrical-heavy':0.14, 'IT-heavy':0.11 } },
+  { key:'network',          label:'Network',                  failureRate:0.40, unitCost:4500,
+    share:{ balanced:0.12, 'chiller-heavy':0.08, 'electrical-heavy':0.08, 'IT-heavy':0.20 } },
+  { key:'mechanical',       label:'Mechanical',               failureRate:0.45, unitCost:3500,
+    share:{ balanced:0.13, 'chiller-heavy':0.18, 'electrical-heavy':0.10, 'IT-heavy':0.09 } },
+  { key:'sensors_controls', label:'Sensors / Controls',       failureRate:0.55, unitCost:1200,
+    share:{ balanced:0.10, 'chiller-heavy':0.09, 'electrical-heavy':0.10, 'IT-heavy':0.12 } },
+  { key:'consumables',      label:'Consumables',              failureRate:2.50, unitCost:500,
+    share:{ balanced:0.08, 'chiller-heavy':0.08, 'electrical-heavy':0.06, 'IT-heavy':0.14 } }
+];
+
+function calcProjection() {
+  var baseMW      = clamp(getVal('proj_install_base_mw', 100), 1, 100000);
+  var growthPct   = clamp(getVal('proj_growth_pct', 12), 0, 500) / 100;
+  var driftPct    = clamp(getVal('proj_failure_rate_growth', 3), 0, 200) / 100;
+  var inflPct     = clamp(getVal('proj_cost_inflation', 5), 0, 200) / 100;
+  var maintRatio  = clamp(getVal('proj_maintenance_ratio', 35), 0, 500) / 100;
+  var horizon     = Math.round(clamp(getVal('proj_horizon_years', 5), 1, 20));
+  var profile     = getStr('proj_commodity_mix', 'balanced');
+
+  // Build year-by-year data
+  var years = [];
+  for (var y = 0; y <= horizon; y++) years.push(y);
+
+  var commodityTotals = {}; // key -> cumulative
+  PROJ_COMMODITIES.forEach(function(c) { commodityTotals[c.key] = 0; });
+
+  var yearData = years.map(function(y) {
+    var ibY          = baseMW  * Math.pow(1 + growthPct, y);
+    var frMult       = Math.pow(1 + driftPct,  y);
+    var costMult     = Math.pow(1 + inflPct,    y);
+    var replacementY = 0;
+    var perClass     = {};
+    PROJ_COMMODITIES.forEach(function(c) {
+      var share = (c.share[profile] !== undefined) ? c.share[profile] : c.share['balanced'];
+      var classSpend = c.failureRate * ibY * share * c.unitCost * costMult * frMult;
+      perClass[c.key]= classSpend;
+      replacementY  += classSpend;
+    });
+    var maintenanceY = replacementY * maintRatio;
+    var totalY       = replacementY + maintenanceY;
+    PROJ_COMMODITIES.forEach(function(c) { commodityTotals[c.key] += perClass[c.key]; });
+    return { y: y, total: totalY, replacement: replacementY, maintenance: maintenanceY, perClass: perClass };
+  });
+
+  // KPI summary cards
+  var cumTotal = yearData.reduce(function(s, d) { return s + d.total; }, 0);
+  var yr0  = yearData[0].total;
+  var yrN  = yearData[yearData.length - 1].total;
+  var growthRatio = yr0 > 0 ? ((yrN / yr0 - 1) * 100) : 0;
+
+  // Largest commodity by cumulative spend
+  var largestKey = 'chillers', largestVal = 0;
+  PROJ_COMMODITIES.forEach(function(c) {
+    if (commodityTotals[c.key] > largestVal) {
+      largestVal = commodityTotals[c.key];
+      largestKey = c.label;
+    }
+  });
+
+  setText('proj_5yr_total', fmt$(cumTotal));
+  setText('proj_year_5',    fmt$(yrN) + '/yr');
+  setText('proj_growth_vs_y0', growthRatio.toFixed(1) + '%');
+  setText('proj_largest_commodity', largestKey);
+
+  // Stacked area chart (Chart.js, 8 series)
+  var PALETTE = ['#440154','#31688e','#35b779','#90d743','#fde725','#f59e0b','#ef4444','#06b6d4'];
+  var datasets = PROJ_COMMODITIES.map(function(c, idx) {
+    return {
+      label:           c.label,
+      data:            yearData.map(function(d) { return Math.round(d.perClass[c.key]); }),
+      backgroundColor: PALETTE[idx] + 'bb',
+      borderColor:     PALETTE[idx],
+      borderWidth:     1,
+      fill:            true,
+      tension:         0.35
+    };
+  });
+  // Add maintenance as a ninth series
+  datasets.push({
+    label:           'Maintenance (PM)',
+    data:            yearData.map(function(d) { return Math.round(d.maintenance); }),
+    backgroundColor: 'rgba(100,116,139,0.35)',
+    borderColor:     '#64748b',
+    borderWidth:     1,
+    fill:            true,
+    tension:         0.35
+  });
+
+  getOrCreateChart('chart_projection', 'line', {
+    labels: yearData.map(function(d) { return 'Year ' + d.y; }),
+    datasets: datasets
+  }, {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { size: 9 }, color: chartTickColor(), boxWidth: 12 } },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) { return ctx.dataset.label + ': ' + fmt$(ctx.parsed.y); }
+        }
+      }
+    },
+    scales: {
+      x: { stacked: true, ticks: { font: { size: 10 }, color: chartTickColor() }, grid: { color: chartGridColor() } },
+      y: { stacked: true, beginAtZero: true, ticks: { font: { size: 10 }, color: chartTickColor(), callback: function(v) { return fmt$(v); } }, grid: { color: chartGridColor() } }
+    }
+  });
+
+  // Data table
+  var hdrs = '<th>Year</th>' + PROJ_COMMODITIES.map(function(c) { return '<th>' + c.label.replace(' / ',' /​') + '</th>'; }).join('') + '<th>Total</th><th>Cumulative</th>';
+  var cumAcc = 0;
+  var rows = yearData.map(function(d) {
+    cumAcc += d.total;
+    var cells = PROJ_COMMODITIES.map(function(c) {
+      return '<td>' + fmt$(d.perClass[c.key]) + '</td>';
+    }).join('');
+    return '<tr><td><strong>Y' + d.y + '</strong></td>' + cells + '<td><strong>' + fmt$(d.total) + '</strong></td><td>' + fmt$(cumAcc) + '</td></tr>';
+  }).join('');
+  setHTML('proj_table_wrap',
+    '<table class="table-sm" style="min-width:900px;font-size:0.68rem;">' +
+    '<thead><tr>' + hdrs + '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>'
+  );
+}
+window.calcProjection = calcProjection;
+
 /* Init: recalc SC tabs when they first become active (catalog might have loaded by then) */
 
 /* ===========================================
    v1.16.2 STABILIZATION: expose inline-onclick handlers on window
+   All functions below are defined inside this IIFE and were previously
+   unreachable from inline onclick handlers in global scope.
+   ===========================================
    All functions below are defined inside this IIFE and were previously
    unreachable from inline onclick handlers in global scope.
    =========================================== */
@@ -10173,6 +10767,8 @@ try {
   window.calcScorecard         = (typeof calcScorecard         !== 'undefined') ? calcScorecard         : null;
   window.calcSCRisk            = (typeof calcSCRisk            !== 'undefined') ? calcSCRisk            : null;
   window.calcCatalogAnalytics  = (typeof calcCatalogAnalytics  !== 'undefined') ? calcCatalogAnalytics  : null;
+  window.calcSensitivity       = (typeof calcSensitivity       !== 'undefined') ? calcSensitivity       : null;
+  window.calcProjection        = (typeof calcProjection        !== 'undefined') ? calcProjection        : null;
   window.applyCommodityDefaults = (typeof applyCommodityDefaults !== 'undefined') ? applyCommodityDefaults : null;
   window.loadPreset            = (typeof loadPreset            !== 'undefined') ? loadPreset            : null;
   window.updateMCLabels        = (typeof updateMCLabels        !== 'undefined') ? updateMCLabels        : null;

@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.18.13 — 2026-05-14 (spares — Sensitivity Surfaces tab, Phase 2 of 3)
+
+### Added (Spares Readiness Calculator)
+- **Sensitivity Surfaces tab (10 · Sensitivity)** — 2D sweep of any two inputs
+  vs. a chosen output metric; renders a viridis heatmap via Canvas 2D API
+  (N x N grid, N = 5/7/9). Eight sweep variables: lambda, lead_time, demand,
+  severity, alternates, holding_pct, unit_cost, backorder_cost. Six output
+  metrics: fill_rate, total_cost, rpn, p_stockout, optimal_qty,
+  expected_backorders. All metric formulas reuse existing M1/M3/M4 math.
+- **Four output cards with tooltips**: Most Sensitive Variable (OAT spread
+  comparison), Range Across Grid (max minus min across full sweep), X at
+  Extremum, Y at Extremum.
+- **Viridis colour ramp** (dark purple = low, yellow-green = high) with
+  per-cell monospace value labels; colour-blind safe, perceptually uniform.
+- Tab button at position 10 in Analytical group; TAB_ORDER updated (29 tabs
+  total). SVG module map already referenced this tab (pre-existing entries).
+- Version bump js/rz-version.js 1.18.12 -> 1.18.13; SW cache key synced.
+- Post-draft folder created: Article/Post Draft/Sensitivity Surfaces/
+
+### User feedback addressed
+- "itu masih ada 2 open" (from prior session) — this is the first of the two
+  remaining analytical tabs from the v1.17 plan.
+
+---
+
 ## v1.18.12 — 2026-05-14 (dcmoc — mobile scroll + strategic planning + FAQ + cause-effect)
 
 ### Added (DCMOC)
