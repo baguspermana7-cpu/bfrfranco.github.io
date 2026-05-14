@@ -1739,3 +1739,48 @@ SVG rules:
 - Do NOT use generic placeholder content ("input 1", "output A") — every item must be specific.
 - Do NOT make the flow card wider than the module pane (use `max-width: 100%; overflow-x: auto` as fallback).
 - Do NOT animate flow lines without honouring `prefers-reduced-motion`.
+
+---
+
+## Sensitivity Surfaces pattern (v1.18.13)
+
+Canvas 2D heatmap for 2D sweep of any two inputs vs a chosen metric.
+
+**When to use**: any calculator module where understanding which of two inputs drives the most output variation is a primary user question. Replaces table-of-tables approaches with a perceptually uniform colour surface.
+
+**Implementation rules**:
+- Use Canvas 2D API directly — Chart.js does not support native heatmap; don't add a plugin.
+- Colour ramp: viridis 5-stop linear interpolation through canonical control points: `#440154` (0%) `#31688e` (25%) `#35b779` (50%) `#90d743` (75%) `#fde725` (100%). Function signature: `viridisColor(t)` where t in [0,1].
+- Canvas element: fixed `width="500" height="400"` with `max-width:100%;display:block;`.
+- Padding: PAD_LEFT=58, PAD_TOP=28, PAD_RIGHT=12, PAD_BOT=58 for axis labels.
+- Cell labels: 9px JetBrains Mono, dark text when brightness > 0.6, white otherwise.
+- Axis labels: current variable value to 2 decimal places; axis name in 10px Inter bold.
+- "Most sensitive variable": OAT index — compare max spread of each axis holding the other at mid-index.
+- 4 output cards mandatory: Most Sensitive Variable, Range Across Grid, X at Extremum, Y at Extremum.
+- All output cards must have `.tip[data-tip]` tooltips per v1.18.2 standard.
+- `calcSensitivity()` must be window-exposed.
+- Resolution select: 5/7/9 only. Default 7.
+- Sweep variables must map to existing DOM input IDs — do not invent new inputs.
+- Metric formulas must reuse existing module functions — do not introduce new math.
+
+---
+
+## Projection chart pattern (v1.18.14)
+
+Stacked area chart (Chart.js line type with fill:true) for multi-year spend projections across commodity classes.
+
+**When to use**: any calculator where cumulative or year-by-year spend across multiple categories over a planning horizon is a core output.
+
+**Implementation rules**:
+- Chart.js type: `'line'` with `fill: true` and `stack: undefined` (let Chart.js manage stacking via the stacked scale option: `scales.y.stacked: true`).
+- Colours: use viridis-adjacent palette array across 8 categories, plus a muted slate (`rgba(100,116,139,0.35)`) for maintenance/overhead overlays.
+- Include a `tension: 0.35` on all datasets for smooth curves.
+- Tooltip callback: `fmt$(ctx.parsed.y)` — always format currency with the site's `fmt$()` helper.
+- Legend: `position: 'bottom'`, `font.size: 9`, `boxWidth: 12` — compact to fit within module card.
+- Data table below chart: Year | each commodity | Total | Cumulative. Use `overflow-x: auto` wrapper with `min-width: 900px` table. Font size 0.68rem.
+- Compound growth formulas: `base * (1+rate)^Y` — NEVER linear interpolation.
+- Commodity mix shares must sum to 1.0 per profile — verify arithmetic before shipping.
+- `calcProjection()` must be window-exposed.
+- 4 output KPI cards mandatory: Total Spend (Horizon), Year-N Annual Spend, Growth vs Year 0, Largest Commodity Class.
+- All output cards must have `.tip[data-tip]` tooltips per v1.18.2 standard.
+- Methodology details in `<details class="info-box">` block documenting compounding formulas.

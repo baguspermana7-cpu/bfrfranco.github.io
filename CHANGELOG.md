@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.18.14 — 2026-05-14 (spares — 5-Year Spend Projection tab, Phase 3 of 3)
+
+### Added (Spares Readiness Calculator)
+- **5-Year Spend Projection tab (11 · 5-Yr Spend Projection)** — year-by-year
+  cash-flow forecast across 8 commodity classes: Chillers, Transformers /
+  Switchgear, UPS Systems, PDU / Floor Distribution, Network, Mechanical,
+  Sensors / Controls, Consumables. Failure rates and unit costs are industry-
+  calibrated defaults (e.g., Chillers: 0.15 failures/MW/yr, $45K/unit).
+- 4 commodity mix profiles (balanced / chiller-heavy / electrical-heavy /
+  IT-heavy) with shares summing to 1.0 per profile; all verified.
+- 7 inputs with tooltips: installed base (MW), fleet growth %/yr, failure
+  rate drift %/yr, cost inflation %/yr, maintenance ratio %, horizon (3/5/7/10
+  yr), commodity mix profile.
+- 4 output KPI cards with tooltips: Total Spend (Horizon), Year-N Annual
+  Spend, Growth vs Year 0, Largest Commodity Class.
+- Stacked area chart via Chart.js (type:'line', fill:true, 9 series including
+  PM maintenance) with viridis-adjacent colour palette.
+- Year-by-year data table (Year | each class | Total | Cumulative) with
+  overflow-x scroll.
+- Methodology details block documenting compounding formulas.
+- Version bump js/rz-version.js 1.18.13 -> 1.18.14; SW cache key synced.
+- Post-draft folder created: Article/Post Draft/5-Year Spares Spend Projection/
+
+### User feedback addressed
+- "itu masih ada 2 open" (from prior session) — this closes the second and
+  final open analytical tab from the v1.17 plan (Phase 3 of 3). v1.17 plan
+  fully implemented.
+
+---
+
 ## v1.18.13 — 2026-05-14 (spares — Sensitivity Surfaces tab, Phase 2 of 3)
 
 ### Added (Spares Readiness Calculator)
