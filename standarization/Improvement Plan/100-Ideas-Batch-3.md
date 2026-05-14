@@ -1,5 +1,13 @@
 # 100 Elite "Best of the Best" Ideas — Batch 3 (Ideas 101–200)
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `HISTORICAL`
+> 
+> See 50-Ideas-Batch-1.md note. Active backlog now lives in TaskCreate tasks + CHANGELOG planned section.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > **Created**: 2026-02-23
 > **Purpose**: Quantum leap beyond Batches 1–2. Every idea is hyper-specific to ResistanceZero's moat, locked to 2026 cutting-edge trends, competitively defensible, revenue-generating, and compounding.
 > **Numbering**: Continues from Batch 2 (ideas 51–100). Zero overlap with Batches 1–2.

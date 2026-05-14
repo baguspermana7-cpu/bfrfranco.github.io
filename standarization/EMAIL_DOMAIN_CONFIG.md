@@ -1,5 +1,13 @@
 # Email & Domain Configuration — ResistanceZero
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `CURRENT`
+> 
+> DNS + email config stable. v1.18.x did not change. ROOT_EMAILS + DEMO_EMAILS list in auth.js cross-references this.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > **Version**: 1.0 | **Updated**: 2026-03-20
 
 ---

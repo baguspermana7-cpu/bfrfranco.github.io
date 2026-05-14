@@ -1,5 +1,13 @@
 # ResistanceZero Website Improvement Ideas — Batch 1
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `HISTORICAL`
+> 
+> Idea inventory from Feb 2026. Many items shipped (calc pages, spares engine, PLN grid, design.md, 3-tier feature flags). Treat as historical brainstorm, not active backlog.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > 50 ideas covering content expansion, interactive tools, UI/UX, SEO, performance, and community building.
 
 ---

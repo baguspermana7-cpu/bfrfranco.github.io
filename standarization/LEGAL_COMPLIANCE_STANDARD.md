@@ -1,5 +1,13 @@
 # Legal & Compliance Standard — ResistanceZero
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `CURRENT`
+> 
+> Privacy + terms patterns still apply. v1.18.x did not change legal posture. Refresh deferred until a real policy change.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > **Version**: 1.0 | **Updated**: 2026-02-25
 > **Applies to**: All HTML pages in rz-work root + legal pages
 

@@ -1,4 +1,12 @@
 # DataHall AI Dashboard Standard
+
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `NEEDS-REVIEW`
+> 
+> datahallAI page renamed to datahall-ai canonical key in v1.18.1 feature-flag schema. References to "datahallAI.html" still valid (filename unchanged) but feature-flag page-key is now "datahall-ai". Update Section 1 references when actively editing the page.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
 > Patterns, conventions, and lessons learned for `datahallAI.html`
 
 Last updated: 2026-03-01 (Phase 5/6 update)

@@ -1,5 +1,13 @@
 # Prompt: Enhance datacenter-solutions.html Landing Page
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `CURRENT`
+> 
+> Prompt template still valid. Recent index.html refresh (v1.18.5 lean credentials band) does not invalidate the prompt pattern.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 Read and implement all 6 changes below on `/home/baguspermana7/rz-work/datacenter-solutions.html`.
 
 ## Constraints (MUST follow)

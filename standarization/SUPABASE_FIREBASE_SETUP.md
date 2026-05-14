@@ -1,5 +1,13 @@
 # Supabase & Firebase Setup Guide
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `SUPERSEDED`
+> 
+> Site uses GitHub Pages + Cloudflare + auth.js (localStorage sessions), not Supabase/Firebase. Doc kept as historical record. See AUTH_STANDARD.md + FEATURE_FLAGS_STANDARD.md for current auth model.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > ResistanceZero SaaS Infrastructure Documentation
 > Last updated: 2026-02-17
 

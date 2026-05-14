@@ -1,5 +1,13 @@
 # Content Taxonomy Standard — ResistanceZero
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `NEEDS-REVIEW`
+> 
+> Site has added Spares Engine, PLN Java-Bali family (5 pages), ASEAN DC Report, achievements page since this doc was written. Taxonomy categories may need new entries. Defer to next content-strategy sweep.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > **Version**: 1.0 | **Created**: 2026-03-23
 
 ---

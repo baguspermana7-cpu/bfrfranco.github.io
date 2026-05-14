@@ -1,5 +1,13 @@
 # ResistanceZero Website Improvement Ideas — Batch 2
 
+<!-- v1.18.8-freshness-stamp -->
+> **Last reviewed: 2026-05-14** · Status: `HISTORICAL`
+> 
+> See 50-Ideas-Batch-1.md note.
+> 
+> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+
+
 > 50 fresh ideas covering data visualization, industry firsts, AI integration, gamification, partnerships, monetization, mobile experience, social proof, automation, and developer experience.
 
 ---
