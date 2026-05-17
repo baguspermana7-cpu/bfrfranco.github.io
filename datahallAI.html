@@ -470,6 +470,61 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 .root-actions{margin-top:1rem;display:flex;gap:.5rem;justify-content:center}
 .root-actions button{background:#10b981;color:#0f172a;border:none;padding:.5rem 1.2rem;border-radius:8px;font-weight:600;cursor:pointer}
 .root-actions a{padding:.5rem 1.2rem;border-radius:8px;border:1px solid rgba(148,163,184,.3);color:#94a3b8;text-decoration:none;font-size:.85rem}
+/* ============================================================================
+ * v1.20.3 — Track 4 Stage 9: Basis-of-Design + Calculation-Audit drawer (P3)
+ * ----------------------------------------------------------------------------
+ * Right-side slide-in drawer. Reuses the v1.20.2 DHModal conventions so the
+ * SAME shared controller manages scrim, focus-trap, Esc, focus-return and
+ * role="dialog" (DHModal watches `.show`; `[class$="-hdr"]` sticky header;
+ * `[class$="-close"]` close button). Industrial-HMI language: JetBrains Mono,
+ * dark palette, low-saturation borders — NOT a marketing card (doc-13 §1).
+ * prefers-reduced-motion disables the slide transform. Responsive ≤390px.
+ * ==========================================================================*/
+.dh-bod-trig{font-family:'JetBrains Mono';font-size:9px;font-weight:600;letter-spacing:.03em;padding:5px 9px;min-height:32px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.28);border-radius:4px;color:#a78bfa;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.dh-bod-trig:hover{background:rgba(139,92,246,.15);color:#c4b5fd}
+.dh-bod-trig:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+[data-theme="light"] .dh-bod-trig{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.32);color:#7c3aed}
+.dh-bod{position:fixed;top:0;right:0;z-index:200;display:none;width:560px;max-width:94vw;height:100vh;overflow-y:auto;background:linear-gradient(180deg,#0a1628,#050c18);border-left:1px solid rgba(139,92,246,.38);box-shadow:-10px 0 40px rgba(0,0,0,.6);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.dh-bod.show{display:block;transform:translateX(0)}
+[data-theme="light"] .dh-bod{background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-left-color:rgba(139,92,246,.5)}
+.dh-bod-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:linear-gradient(90deg,rgba(139,92,246,.14),rgba(88,80,190,.08));border-bottom:1px solid rgba(139,92,246,.22)}
+.dh-bod-hdr h4{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:#a78bfa;margin:0}
+.dh-bod-hdr .mode{font-family:'JetBrains Mono';font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:#a78bfa}
+[data-theme="light"] .dh-bod-hdr{background:linear-gradient(90deg,rgba(139,92,246,.1),rgba(88,80,190,.06))}
+[data-theme="light"] .dh-bod-hdr h4{color:#7c3aed}
+.dh-bod-close{background:none;border:1px solid var(--bd2);border-radius:4px;color:var(--t2);cursor:pointer;font-size:18px;width:32px;height:32px;min-width:32px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.dh-bod-close:hover{background:rgba(255,255,255,.08);color:var(--t1)}
+.dh-bod-body{padding:12px 14px 40px}
+.dh-bod-adv{display:flex;gap:8px;align-items:flex-start;font-family:'JetBrains Mono';font-size:9.5px;line-height:1.55;color:var(--o);background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.28);border-left:3px solid var(--o);border-radius:5px;padding:8px 10px;margin-bottom:12px}
+.dh-bod-adv b{color:var(--o)}
+[data-theme="light"] .dh-bod-adv{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.4)}
+.dh-bod-sec{margin-bottom:10px;border:1px solid var(--bd);border-radius:5px;background:var(--bg2);overflow:hidden}
+.dh-bod-sec>summary{font-family:'JetBrains Mono';font-size:10px;font-weight:600;color:var(--t1);padding:8px 10px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;user-select:none}
+.dh-bod-sec>summary::-webkit-details-marker{display:none}
+.dh-bod-sec>summary:focus-visible{outline:2px solid var(--p);outline-offset:-2px}
+.dh-bod-sec>summary .ic{color:#a78bfa;font-size:10px;transition:transform .2s}
+.dh-bod-sec[open]>summary .ic{transform:rotate(90deg)}
+.dh-bod-sec>summary .tag{margin-left:auto;font-size:8px;font-weight:500;color:var(--t3);letter-spacing:.04em}
+.dh-bod-secbody{padding:2px 10px 10px}
+.dh-bod-tbl{width:100%;border-collapse:collapse;font-family:'JetBrains Mono';font-size:9px}
+.dh-bod-tbl td{padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+[data-theme="light"] .dh-bod-tbl td{border-bottom-color:rgba(0,0,0,.05)}
+.dh-bod-tbl td:first-child{color:var(--t3);width:42%}
+.dh-bod-tbl td:last-child{color:var(--t1);text-align:right;font-weight:500}
+.dh-bod-tbl td.src{color:var(--t3);font-weight:400;font-size:8px;text-align:left;font-style:italic}
+.dh-bod-au{border:1px solid var(--bd);border-radius:5px;background:rgba(255,255,255,.012);padding:7px 9px;margin-bottom:7px}
+.dh-bod-au .ttl{font-family:'JetBrains Mono';font-size:9.5px;font-weight:600;color:var(--c);margin-bottom:4px}
+.dh-bod-au .stp{font-family:'JetBrains Mono';font-size:9px;color:var(--t2);line-height:1.6;word-break:break-word}
+.dh-bod-au .stp .op{color:var(--t3)}
+.dh-bod-au .res{font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:var(--g);margin-top:3px}
+.dh-bod-au .ref{font-family:'JetBrains Mono';font-size:8px;color:var(--t3);font-style:italic;margin-top:3px}
+.dh-bod-src a{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--c);padding:5px 6px;min-height:32px;border:1px solid var(--bd);border-radius:4px;margin-bottom:5px;transition:.2s;text-decoration:none}
+.dh-bod-src a:hover{background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.3)}
+.dh-bod-src a .ex{margin-left:auto;color:var(--t3);font-size:8px}
+.dh-bod-foot{font-family:'JetBrains Mono';font-size:8px;color:var(--t3);line-height:1.5;border-top:1px solid var(--bd);padding-top:8px;margin-top:6px}
+@media(prefers-reduced-motion:reduce){.dh-bod{transition:none}}
+@media(max-width:600px){.dh-bod{width:100vw;max-width:100vw}.dh-bod-tbl td:first-child{width:50%}}
+@media(max-width:390px){.dh-bod-body{padding:10px 10px 36px}.dh-bod-hdr h4{font-size:11px}.dh-bod-tbl,.dh-bod-au .stp{font-size:8.5px}}
 </style>    <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- v1.20.0: LOCKED basis-of-design engine — single source of truth for every
@@ -504,7 +559,7 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <a href="datacenter-solutions.html" class="bbtn" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25);color:var(--g)">&#8592; DC Solutions</a>
 <h1>AI Data Hall Operations<span class="chip">DH-01 | GB200 NVL72 | Live Telemetry</span></h1>
 </div>
-<div class="hdr-r"><button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
+<div class="hdr-r"><button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" title="Open Basis of Design &amp; Calculation Audit"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
 </header>
 <nav class="tabs" id="tabs">
 <button class="on" data-t="dash">DC Dashboard</button>
@@ -738,6 +793,14 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="cdu-hmi" id="cduHmi">
 <div class="cdu-hmi-hdr"><h4 id="cduHmiTitle">CDU-01 HMI</h4><span class="mode" id="cduHmiMode">Online</span><button class="cdu-hmi-close" onclick="$('cduHmi').classList.remove('show')">&times;</button></div>
 <div class="cdu-hmi-body"><svg id="cduHmiSvg" viewBox="0 0 720 440" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg></div>
+</div>
+<!-- v1.20.3 Stage 9: Basis-of-Design + Calculation-Audit drawer (spec P3).
+     Body populated live from window.DATAHALL_CALC by the IIFE near </body> —
+     no hardcoded engine numbers. -hdr/-close/.show classes let the shared
+     DHModal controller manage scrim/focus-trap/Esc/focus-return. -->
+<div class="dh-bod" id="bodDrawer" aria-hidden="true">
+<div class="dh-bod-hdr"><h4 id="bodDrawerTitle">Basis of Design &amp; Calculation Audit</h4><span class="mode" id="bodDrawerMode">Locked baseline</span><button class="dh-bod-close" id="bodDrawerClose" type="button" aria-label="Close Basis of Design dialog">&times;</button></div>
+<div class="dh-bod-body" id="bodDrawerBody"></div>
 </div>
 <div class="rack-modal" id="rackModal">
 <div class="rack-modal-hdr"><h4 id="rackModalTitle">Component Detail</h4><span class="mode" id="rackModalType">Block Diagram</span><button class="rack-modal-close" id="rackModalClose">&times;</button></div>
@@ -10340,7 +10403,8 @@ var MODALS=[
   {panel:'crahHmi',title:'crahHmiTitle'},
   {panel:'corrHmi',title:'corrHmiTitle'},
   {panel:'batHmi',title:'batHmiTitle'},
-  {panel:'sldMimic',title:'sldMimicTitle'}
+  {panel:'sldMimic',title:'sldMimicTitle'},
+  {panel:'bodDrawer',title:'bodDrawerTitle'}   /* v1.20.3 Stage 9 — P3 drawer */
 ];
 var scrim=d.createElement('div');
 scrim.className='dh-scrim';
@@ -10585,6 +10649,270 @@ function injectModalSummary(panel){
 setInterval(function(){
   for(var i=0;i<bars.length;i++){ if(bars[i].offsetParent!==null)paint(bars[i]); }
 },4000);
+})();
+</script>
+<script>
+/* ============================================================================
+ * v1.20.3 — Track 4 Stage 9: Basis-of-Design + Calculation-Audit drawer (P3)
+ * ----------------------------------------------------------------------------
+ * Spec: 11-implementation-backlog.md "P3 — Documentation and Trust"
+ *       (basis-of-design drawer + calc-audit panel + simulated-values warning
+ *        + vendor source links). Worked formulas mirror
+ *        21-calculation-worked-examples.md with LIVE engine numbers.
+ *
+ * Every displayed number is read at render time from window.DATAHALL_CALC
+ * (the LOCKED engine). NOTHING is hardcoded that the engine already exposes —
+ * drawer text and engine output can never diverge.
+ *
+ * The drawer reuses the v1.20.2 DHModal conventions: toggling `.show` on
+ * #bodDrawer is observed by the shared controller, which supplies the scrim,
+ * role="dialog"+aria-modal, focus-trap, Escape, and focus-return. This IIFE
+ * only builds content and wires the open/close triggers.
+ *
+ * ES5-safe, zero-build, isolated IIFE. HTML is assembled into element
+ * .innerHTML (DOM content) — no <style>/<script> literals (CSS/JS-in-string
+ * rule N/A: this emits markup into a div, exactly like the page's other
+ * render() helpers).
+ * ==========================================================================*/
+(function(){
+'use strict';
+var d=document;
+function gid(x){return d.getElementById(x);}
+var drawer=gid('bodDrawer'), body=gid('bodDrawerBody'),
+    trig=gid('bodTrig'), closeBtn=gid('bodDrawerClose'),
+    modeEl=gid('bodDrawerMode');
+if(!drawer||!body){return;}
+
+var CALC=(typeof window!=='undefined'&&window.DATAHALL_CALC)?window.DATAHALL_CALC:null;
+var MODEL=(typeof window!=='undefined'&&window.DATAHALL_MODEL)?window.DATAHALL_MODEL:null;
+
+/* Number formatting helpers (display only — never alters engine values). */
+function r(x,dp){ return CALC?CALC.round(x,dp==null?2:dp):x; }
+function grp(n){
+  /* thousands separators, ES5-safe */
+  var s=(''+n).split('.'); var i=s[0];
+  i=i.replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return s.length>1?i+'.'+s[1]:i;
+}
+function kw(x,dp){ return grp(r(x,dp==null?0:dp))+' kW'; }
+function esc(s){
+  return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildContent(){
+  if(!CALC||!MODEL){
+    body.innerHTML='<div class="dh-bod-adv"><span aria-hidden="true">&#9888;</span>'+
+      '<div>The calculation engine (<b>window.DATAHALL_CALC</b>) is not available, '+
+      'so the basis cannot be shown live. Reload the page.</div></div>';
+    return;
+  }
+  var st=CALC.lockedState();
+  var pb=CALC.pueBasis();                       /* honest bottom-up 5-part PUE */
+  var m=MODEL;
+  var sc=m.locked;                              /* Scenario A — adopted/locked */
+  var eq=m.equipment;
+  var w=m.cooling.water;
+  var vol=CALC.dataHallVolume();
+  var H='';
+
+  /* -- 1. Simulated-values advisory (spec P3 item 3, non-alarmist) --------- */
+  H+='<div class="dh-bod-adv" role="note">'+
+     '<span aria-hidden="true">&#9432;</span>'+
+     '<div>Live telemetry on this dashboard is <b>modelled / simulated</b> from the '+
+     'locked basis of design below &mdash; it is not a feed from a physical BMS. '+
+     'Steady-state values are engine-derived; small fluctuations are bounded sensor '+
+     'jitter for realism only. Every number here traces to a formula or a cited '+
+     'source. For estimation and education, not for procurement or safety decisions.</div></div>';
+
+  /* helper to build a <details> section */
+  function sec(id,title,tag,inner,open){
+    return '<details class="dh-bod-sec"'+(open?' open':'')+' id="'+id+'">'+
+      '<summary><span class="ic" aria-hidden="true">&#9656;</span>'+esc(title)+
+      '<span class="tag">'+esc(tag)+'</span></summary>'+
+      '<div class="dh-bod-secbody">'+inner+'</div></details>';
+  }
+  function row(k,v,src){
+    return '<tr><td>'+esc(k)+'</td><td>'+v+'</td></tr>'+
+      (src?'<tr><td colspan="2" class="src">'+esc(src)+'</td></tr>':'');
+  }
+  function tbl(rows){ return '<table class="dh-bod-tbl"><tbody>'+rows+'</tbody></table>'; }
+
+  /* -- 2. Compute basis --------------------------------------------------- */
+  var compute=tbl(
+    row('Facility', m.facility.halls+' data halls','BASELINE-DECISION.md')+
+    row('Per hall', m.facility.nvl72PerHall+' × GB200 NVL72 domains','BASELINE-DECISION.md')+
+    row('Per NVL72', m.facility.gpuPerNVL72+' Blackwell GPU + '+m.facility.cpuPerNVL72+' Grace CPU','00-overview-audit.md Source Sanity')+
+    row('Physical racks / hall', m.facility.racksPerHall+' ('+m.facility.racksPerNVL72+' racks = 1 NVL72)','21-worked-examples.md Ex1')+
+    row('Adopted load', grp(sc.kwPerNVL72)+' kW per NVL72 pair (NOT per rack)','BASELINE-DECISION.md (locked)')+
+    row('Per physical rack', grp(sc.kwPerRack)+' kW','derived: '+sc.kwPerNVL72+' ÷ '+m.facility.racksPerNVL72)+
+    row('IT load / hall', kw(st.itPerHall_kW), m.facility.nvl72PerHall+' × '+sc.kwPerNVL72+' kW — 21-worked-examples.md Ex1')+
+    row('IT load / facility', kw(st.itPerFacility_kW), m.facility.halls+' × hall — BASELINE-DECISION.md')+
+    row('GPUs / hall · facility', grp(m.facility.gpuPerHall)+' · '+grp(m.facility.gpuPerFacility),'BASELINE-DECISION.md')
+  );
+  H+=sec('bodSecCompute','Compute basis','GB200 NVL72',compute,true);
+
+  /* -- 3. Electrical basis ------------------------------------------------ */
+  var elec=tbl(
+    row('LV distribution', m.electrical.voltageLL+' V, PF '+m.electrical.powerFactor,'21-worked-examples.md Ex3')+
+    row('UPS', eq.ups.model+' — '+grp(eq.ups.ratingKW)+' kW/feed, '+eq.ups.topology,'17-correction-table.md Scenario A')+
+    row('UPS loading', r(st.upsLoadingPct,1)+'% (IT ÷ UPS rating)','21-worked-examples.md Ex2')+
+    row('Transformer', eq.transformer.model+' — '+eq.transformer.ratingMVA+' MVA/feed','17-correction-table.md Scenario A')+
+    row('Transformer loading', r(st.transformerLoadingPct,1)+'% (kVA ÷ rating)','21-worked-examples.md Ex4')+
+    row('Required current', grp(r(st.requiredCurrent_A,0))+' A @ '+m.electrical.voltageLL+' V','21-worked-examples.md Ex3')+
+    row('Busway', 'selected '+grp(eq.busway.selectedRatingA)+' A ('+grp(eq.busway.undersizedRatingA)+' A undersized)','21-worked-examples.md Ex3')+
+    row('Generator', eq.generator.model+' — '+eq.generator.ratingKW_low/1000+'–'+eq.generator.ratingKW_high/1000+' MW (NOT 8 MW)','00-overview-audit.md Source Sanity / BASELINE-DECISION.md')
+  );
+  H+=sec('bodSecElec','Electrical basis','2N A/B',elec,false);
+
+  /* -- 4. Cooling basis --------------------------------------------------- */
+  var cool=tbl(
+    row('Liquid capture', (m.cooling.liquidCaptureRatio*100)+'% of IT heat','BASELINE-DECISION.md')+
+    row('Liquid heat / hall', kw(st.liquidHeat_kW), 'IT × '+(m.cooling.liquidCaptureRatio*100)+'% — 21-worked-examples.md Ex5')+
+    row('Air (residual) heat', kw(st.airHeat_kW), 'IT × '+(100-m.cooling.liquidCaptureRatio*100)+'% — 21-worked-examples.md Ex5')+
+    row('TCS supply / return', m.cooling.tcsSupplyC+' / '+m.cooling.tcsReturnC+' °C (ΔT '+m.cooling.tcsDeltaT_K+' K)','BASELINE-DECISION.md')+
+    row('TCS flow total', grp(r(st.tcsFlowTotal_LPM,0))+' LPM','21-worked-examples.md Ex6 (basis: '+st.tcsFlowBasis+')')+
+    row('TCS flow / rack', r(st.tcsFlowPerRack_LPM,1)+' LPM','total ÷ '+m.facility.racksPerHall+' racks')+
+    row('CDU', eq.cdu.model+' — '+st.cduRunningCount+' running','21-worked-examples.md Ex7 (ceil liquid ÷ '+eq.cdu.ratingKW+' kW)')+
+    row('Chiller', eq.chiller.model+' — nameplate COP '+eq.chiller.nameplateCOP,'21-worked-examples.md Ex9 (nameplate, NOT solved)')+
+    row('CRAH residual', st.crahActive+' active × '+r(st.crahPerUnit_kW,0)+' kW, '+r(st.crahFlowPerUnit_m3h,1)+' m³/h ea','21-worked-examples.md Ex8 (ΔT '+eq.crah.chwDeltaT_K+' K)')
+  );
+  H+=sec('bodSecCool','Cooling basis','85% DLC',cool,false);
+
+  /* -- 5. Fire / Safety basis -------------------------------------------- */
+  var fire=tbl(
+    row('Data-hall geometry', m.geometry.lengthM+' × '+m.geometry.widthM+' × '+m.geometry.heightM+' m','21-worked-examples.md Ex10')+
+    row('Protected volume', grp(vol)+' m³','L × W × H — 21-worked-examples.md Ex10')+
+    row('Agent quantity', 'design validation required','21-worked-examples.md Ex10 / 12-deep-dive §11')+
+    row('Compliance status', 'preliminary — not as-built','12-deep-dive.md §11 (no AHJ calc shown)')
+  );
+  H+=sec('bodSecFire','Fire / Safety basis','preliminary',
+    fire+'<div class="dh-bod-foot">Fire-agent capacity cannot be inferred from cylinder count alone. '+
+    'It requires design/min concentration, agent density, temperature &amp; altitude correction, '+
+    'hold-time and nozzle hydraulic calculation against the governing code (12-deep-dive.md §11). '+
+    'This dashboard shows system <i>status</i> only, never a compliance claim.</div>',false);
+
+  /* -- 6. Assumptions ----------------------------------------------------- */
+  var assum=tbl(
+    row('Scenario', 'A — '+esc(sc.label),'BASELINE-DECISION.md (locked 2026-05-17)')+
+    row('Water properties', 'ρ '+w.rhoKgPerL+' kg/L, Cp '+w.cpKjPerKgK+' kJ/kg·K','21-worked-examples.md Ex6')+
+    row('PUE COP source', esc(pb.copSource),'21-worked-examples.md Ex9')+
+    row('PUE design band', m.pueDesignBand.min+' – '+m.pueDesignBand.max+' (a target, not a guarantee)','BASELINE-DECISION.md')+
+    row('Reported PUE', r(pb.pue,2)+' (honest bottom-up, stated even if outside band)','21-worked-examples.md Ex9')+
+    row('Determinism', 'no Math.random in the engine — same input → same output','datahall-calculations.js')+
+    row('Scenario B (variant)', '132 kW per rack → '+grp(m.scenarios.B.itPerHall_kW)+' kW/hall (exposed for labelling, NOT adopted)','17-correction-table.md Scenario B')
+  );
+  H+=sec('bodSecAssum','Assumptions','locked',assum,false);
+
+  /* -- 7. Formula / engine version --------------------------------------- */
+  var rzv=(typeof window!=='undefined'&&window.RZ_VERSION)?window.RZ_VERSION:'—';
+  var ver=tbl(
+    row('Engine model', 'js/datahall-model.js','spec '+esc(m.specVersion))+
+    row('Engine calc', 'js/datahall-calculations.js','00-overview-audit.md Core Calculation Engine')+
+    row('Authority', esc(m.authority),'')+
+    row('Acceptance test', 'tools/test-datahall-calc.mjs — 57/57 doc-21 examples','21-worked-examples.md')+
+    row('Site version', esc(rzv),'js/rz-version.js')
+  );
+  H+=sec('bodSecVer','Formula / engine version','traceable',ver,false);
+
+  /* -- 8. Calculation Audit (formula -> substituted -> result) ------------ */
+  /* Mirrors 21-calculation-worked-examples.md with the LIVE engine numbers.  */
+  function au(title,formula,subst,result,ref){
+    return '<div class="dh-bod-au">'+
+      '<div class="ttl">'+esc(title)+'</div>'+
+      '<div class="stp"><span class="op">formula:</span> '+esc(formula)+'<br>'+
+      '<span class="op">substituted:</span> '+esc(subst)+'</div>'+
+      '<div class="res">= '+esc(result)+'</div>'+
+      '<div class="ref">'+esc(ref)+'</div></div>';
+  }
+  var auHtml='';
+  /* Ex1 — IT Load */
+  auHtml+=au('IT Load (per hall)',
+    'IT = NVL72_count × kW_per_NVL72',
+    m.facility.nvl72PerHall+' × '+sc.kwPerNVL72+' kW',
+    kw(st.itPerHall_kW),
+    '21-worked-examples.md Example 1');
+  /* Ex5 — Liquid load */
+  auHtml+=au('Liquid Load',
+    'liquid = IT × capture_ratio',
+    grp(st.itPerHall_kW)+' kW × '+m.cooling.liquidCaptureRatio,
+    kw(st.liquidHeat_kW,1),
+    '21-worked-examples.md Example 5');
+  /* Ex6 — TCS flow */
+  auHtml+=au('TCS Flow (total)',
+    'LPM = Q × 60 / (ρ × Cp × ΔT)',
+    grp(r(st.liquidHeat_kW,1))+' × 60 / ('+w.rhoKgPerL+' × '+w.cpKjPerKgK+' × '+m.cooling.tcsDeltaT_K+')',
+    grp(r(st.tcsFlowTotal_LPM,0))+' LPM ('+r(st.tcsFlowPerRack_LPM,1)+' LPM/rack)',
+    '21-worked-examples.md Example 6 — basis: liquid captured heat');
+  /* Ex3 — Busway current */
+  auHtml+=au('Required Current',
+    'I = kW × 1000 / (√3 × V_LL × PF)',
+    grp(st.itPerHall_kW)+' × 1000 / ('+m.electrical.specSqrt3+' × '+m.electrical.voltageLL+' × '+m.electrical.powerFactor+')',
+    grp(r(st.requiredCurrent_A,0))+' A',
+    '21-worked-examples.md Example 3');
+  /* Ex7 — CDU running count */
+  auHtml+=au('CDU Running Count',
+    'CDU = ceil(liquid_heat / CDU_rating)',
+    'ceil('+grp(r(st.liquidHeat_kW,1))+' / '+eq.cdu.ratingKW+')',
+    st.cduRunningCount+' running',
+    '21-worked-examples.md Example 7');
+  /* Ex9 — PUE with the 5-part basis, honest ~1.30 (NOT fudged) */
+  auHtml+=au('PUE — bottom-up, 5-part basis',
+    'PUE = (IT + chiller + pumps + fans + CDU-pumps + CRAH-fans + UPS/dist + aux) / IT',
+    'IT '+kw(pb.it_kW)+' · chiller '+kw(pb.chillerInput_kW,1)+' (heat '+kw(pb.coolingHeat_kW)+' ÷ COP '+eq.chiller.nameplateCOP+') · '+
+      'pumps '+kw(pb.pumps_kW)+' · fans '+kw(pb.fans_kW)+' · CDU-pumps '+kw(pb.cduPumps_kW)+' · '+
+      'CRAH-fans '+kw(pb.crahFans_kW)+' · UPS/dist '+kw(pb.upsDistLoss_kW)+' · aux '+kw(pb.aux_kW)+
+      ' → facility '+kw(pb.facility_kW,1),
+    r(pb.pue,2)+'  (≈1.30 — honest for chiller-based liquid cooling, NOT a fudged 1.08)',
+    '21-worked-examples.md Example 9 — 5-part basis: IT '+kw(pb.basis.IT_kW)+
+      ' · cooling '+kw(pb.basis.cooling_kW,1)+' · UPS+dist '+kw(pb.basis.upsLoss_distLoss_kW)+
+      ' · aux '+kw(pb.basis.aux_kW));
+  H+=sec('bodSecAudit','Calculation Audit — formula → values → result','live engine',auHtml,true);
+
+  /* -- 9. Source links (vendor specs) ------------------------------------- */
+  function lnk(t,u){
+    return '<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+
+      '<span aria-hidden="true">&#128279;</span>'+esc(t)+
+      '<span class="ex" aria-hidden="true">&#8599;</span></a>';
+  }
+  var src='<div class="dh-bod-src">'+
+    lnk('NVIDIA GB200 NVL72 — 72 GPU / 36 Grace CPU','https://www.nvidia.com/en-us/data-center/gb200-nvl72/')+
+    lnk('Vertiv CoolChip CDU — 121 kW class','https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu-100kw/')+
+    lnk('Caterpillar 3516E — 2,500–2,750 ekW','https://www.cat.com/en_US/products/new/power-systems/electric-power/diesel-generator-sets/117341.html')+
+    lnk('Carrier 19DV — 1,231–4,044 kW chiller','https://www.carrier.com/us/en/commercial/chillers/19dv/')+
+    '</div>';
+  H+=sec('bodSecSrc','Source links (vendor specs)','external',src,false);
+
+  body.innerHTML=H;
+}
+
+/* Build once now (engine is loaded synchronously in <head>); rebuild on open
+ * so the audit reflects the latest engine-derived steady state. */
+try{ buildContent(); }catch(e){
+  body.innerHTML='<div class="dh-bod-adv"><span aria-hidden="true">&#9888;</span>'+
+    '<div>Failed to build the basis-of-design content.</div></div>';
+}
+
+function openDrawer(){
+  try{ buildContent(); }catch(e){}
+  drawer.setAttribute('aria-hidden','false');
+  drawer.classList.add('show');           /* DHModal observes this -> scrim/focus-trap/Esc */
+}
+function closeDrawer(){
+  drawer.classList.remove('show');        /* DHModal handles focus-return */
+  drawer.setAttribute('aria-hidden','true');
+}
+if(trig){
+  trig.addEventListener('click',openDrawer);
+}
+if(closeBtn){
+  closeBtn.addEventListener('click',closeDrawer);
+}
+/* Keep aria-hidden honest if anything else toggles .show (e.g. scrim click,
+ * Esc, or the DHModal backdrop) — mirror the class onto the attribute. */
+var amo=new MutationObserver(function(){
+  drawer.setAttribute('aria-hidden', drawer.classList.contains('show')?'false':'true');
+});
+amo.observe(drawer,{attributes:true,attributeFilter:['class']});
 })();
 </script>
 

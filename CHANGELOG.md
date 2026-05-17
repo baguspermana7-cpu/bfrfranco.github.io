@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v1.20.3 — 2026-05-17 (datahallAI — Basis-of-Design + Calc-Audit drawer; Track 4 build sequence COMPLETE)
+
+Spec P3 "Documentation and Trust" (`00`/`11`) — closes the 24-doc build sequence.
+
+### Added — operator trust / traceability drawer
+- `#bodDrawer` slide-in reusing the v1.20.2 `DHModal` shell (scrim,
+  `role="dialog"`, `aria-modal`, focus-trap, Esc, focus-return), triggered
+  from the page header on every in-scope view (never inside `#p-dash`).
+- **Basis-of-Design**: Compute · Electrical · Cooling · Fire/Safety ·
+  Assumptions · Formula/engine version — every number read **live** from
+  `window.DATAHALL_MODEL`/`DATAHALL_CALC` (never hardcoded; cannot diverge).
+- **Calculation-Audit**: 6 cards `formula → substituted → result` (IT load,
+  liquid, TCS flow, required current, CDU count, and **PUE bottom-up with
+  the full 5-part `pueBasis()` breakdown** — honest ≈1.30, "not a fudged
+  1.08"), mirroring `21-calculation-worked-examples.md`.
+- Non-alarmist "values simulated/modelled from locked baseline" advisory;
+  Scenario-B surfaced as labelled non-adopted variant (doc-21 Ex1); 4 vendor
+  source links (`rel="noopener"`).
+- Verified independently: `audit-js-syntax`/`mobile-responsive --strict`
+  CLEAN; engine 57/57; headless 1440px+390px 0 pageerror/0 console, drawer
+  shows engine-live 3,564 kW / PUE 1.30 / basis, 0px overflow; DC-dashboard
+  panel + `updateDashKPI` BYTE-IDENTICAL; engine files untouched.
+
+### Track 4 status
+Spec build sequence (model → calc engine → bind dashboard/cooling/electrical
+→ colour/alarm → modal → SVG routing → basis-of-design) **COMPLETE**; DC
+dashboard tab excluded throughout per owner instruction. Final acceptance
+review vs `18-qa-acceptance-criteria.md` follows.
+
 ## v1.20.2 — 2026-05-17 (datahallAI — colour/alarm semantics + accessible modal)
 
 Track 4 Stage 6 + Stage 7 of the datahallAI revision (spec under
