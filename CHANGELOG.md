@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.20.4 — 2026-05-17 (datahallAI — legal notice no longer blocks operational area)
+
+From the owner's visual review + `18-qa-acceptance-criteria.md` ("Legal
+notice is not blocking operational area"; "first read on every page is
+status, not decoration") and `00-overview-audit.md` ("Legal notice consumes
+high-value vertical space and repeats across pages").
+
+### Changed
+- The top-of-`<main>` 3-paragraph Legal Notice block (pushed the alarm
+  strip / KPIs / diagrams down on every tab) is now a **collapsed native
+  `<details>`** — a single thin summary line ("⚠ Legal & methodology
+  notice … View details"), full text one click away, zero JS, keyboard-
+  accessible, Terms/Privacy links preserved. Operational status is now the
+  first read on every panel (verified desktop 1440px + mobile 390px).
+- Surgical: the `<details>` sits above all `.pn` panels (page chrome) — the
+  excluded DC-dashboard panel + engine files remain BYTE-IDENTICAL;
+  `audit-js-syntax`/`mobile-responsive --strict` CLEAN; engine test 57/57.
+
 ## v1.20.3 — 2026-05-17 (datahallAI — Basis-of-Design + Calc-Audit drawer; Track 4 build sequence COMPLETE)
 
 Spec P3 "Documentation and Trust" (`00`/`11`) — closes the 24-doc build sequence.
