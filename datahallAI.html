@@ -427,6 +427,13 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 .root-actions a{padding:.5rem 1.2rem;border-radius:8px;border:1px solid rgba(148,163,184,.3);color:#94a3b8;text-decoration:none;font-size:.85rem}
 </style>    <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <!-- v1.20.0: LOCKED basis-of-design engine — single source of truth for every
+         displayed kW/MW/flow/temp/PUE/WUE. Loaded synchronously (NOT defer) so
+         window.DATAHALL_MODEL / window.DATAHALL_CALC are available before the
+         non-deferred main inline script parse-time render() calls. External
+         src reference only — never inlined (zero-build CSS/JS-in-string rule). -->
+    <script src="js/datahall-model.js?v=1.20.0"></script>
+    <script src="js/datahall-calculations.js?v=1.20.0"></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -450,7 +457,7 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div style="display:flex;align-items:center;gap:8px">
 <a href="index.html" class="bbtn">&#8592; Portfolio</a>
 <a href="datacenter-solutions.html" class="bbtn" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25);color:var(--g)">&#8592; DC Solutions</a>
-<h1>AI Data Hall<span class="chip">GB200 NVL72 LIVE</span></h1>
+<h1>AI Data Hall Operations<span class="chip">DH-01 | GB200 NVL72 | Live Telemetry</span></h1>
 </div>
 <div class="hdr-r"><button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
 </header>
@@ -476,27 +483,27 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="rw"><span class="l" title="NVL72 domains — each domain = 72 GPUs, 36 Grace CPUs, 1 rack pair">Domains</span><span class="v vg" id="sDom">27/27</span></div>
 <div class="rw"><span class="l" title="NVIDIA Blackwell B200 GPU — 4th gen data center GPU architecture">Blackwell</span><span class="v">1,944 GPU</span></div>
 <div class="rw"><span class="l" title="NVIDIA Grace ARM-based CPU — paired with Blackwell GPU">Grace</span><span class="v">972 CPU</span></div>
-<div class="rw"><span class="l" title="Thermal Design Power — maximum sustained power per B200 GPU chip">GPU TDP</span><span class="v vo">1,000-1,200W</span></div>
+<div class="rw"><span class="l" title="GPU power basis — TDP alone is not rack power; included in the per-rack kW">GPU Power Basis</span><span class="v vo">1.0-1.2 kW/GPU</span></div>
 <div class="rw"><span class="l" title="High Bandwidth Memory 3e — stacked on-package GPU memory, 192GB per GPU">HBM3e</span><span class="v">373 TB</span></div>
 <div class="rw"><span class="l" title="AI precision formats — FP4: 1,400 EFLOPS, FP8: 720 EFLOPS, BF16: 360 EFLOPS per NVL72">FP4/FP8/BF16</span><span class="v vo">1400/720/360 EF</span></div>
 <div class="rw"><span class="l" title="NVLink5 bandwidth per domain — 130 TB/s all-to-all between 72 GPUs">NVLink/dom</span><span class="v">130 TB/s</span></div></div>
 <div class="sb"><h4><i style="background:var(--o)"></i>Power</h4>
-<div class="rw"><span class="l" title="Total IT compute power consumption (GPUs + CPUs + NICs + switches)">IT Load</span><span class="v vo" id="sPit">7,128 kW</span></div>
-<div class="rw"><span class="l" title="Mechanical + Auxiliary — cooling systems, lighting, BMS, fire systems power">Mech+Aux</span><span class="v">555 kW</span></div>
-<div class="rw"><span class="l" title="Total facility power draw — IT Load + Mechanical + Auxiliary">Total</span><span class="v vo">7,683 kW</span></div>
-<div class="rw"><span class="l" title="Power per NVL72 domain — 132kW for 72 GPUs + networking per rack pair">Per NVL72</span><span class="v vr">132 kW</span></div>
-<div class="rw"><span class="l" title="Uninterruptible Power Supply Feed A — 4.5MW Li-Ion double conversion">UPS A</span><span class="v vg" id="sUA">Online 68%</span></div>
-<div class="rw"><span class="l" title="Uninterruptible Power Supply Feed B — 4.5MW Li-Ion double conversion">UPS B</span><span class="v vg" id="sUB">Online 67%</span></div>
-<div class="rw"><span class="l" title="Diesel Generator Set — 2×2.5MW backup power, <10s auto-start">GenSet</span><span class="v vg">Standby OK</span></div></div>
+<div class="rw"><span class="l" title="Total IT compute power consumption per hall (GPUs + CPUs + NICs + switches) — 27 NVL72 × 132 kW">IT Load</span><span class="v vo" id="sPit">3,564 kW</span></div>
+<div class="rw"><span class="l" title="Mechanical + Auxiliary — cooling electrical + UPS/dist loss + aux (engine-derived non-IT)">Mech+Aux</span><span class="v" id="sMechAux">1,074 kW</span></div>
+<div class="rw"><span class="l" title="Total facility power draw per hall — IT + non-IT (engine-derived, basis on Electrical SLD)">Total</span><span class="v vo" id="sTotal">4,638 kW</span></div>
+<div class="rw"><span class="l" title="Power per NVL72 domain — 132 kW per NVL72 pair (= 66 kW per physical rack)">Per NVL72</span><span class="v vr" id="sPerNVL">132 kW</span></div>
+<div class="rw"><span class="l" title="Uninterruptible Power Supply Feed A — 4.5 MW modular, 2N A/B">UPS A</span><span class="v vg" id="sUA">Online 79%</span></div>
+<div class="rw"><span class="l" title="Uninterruptible Power Supply Feed B — 4.5 MW modular, 2N A/B">UPS B</span><span class="v vg" id="sUB">Online 79%</span></div>
+<div class="rw"><span class="l" title="Diesel Generator Set — Caterpillar 3516E 2.75 MW each, N+1, <10s auto-start">GenSet</span><span class="v vg">Standby OK</span></div></div>
 <div class="sb"><h4><i style="background:var(--c)"></i>Cooling</h4>
-<div class="rw"><span class="l" title="Direct Liquid Cooling — handles 85% of heat via cold plates on GPU/CPU">DLC 85%</span><span class="v vc">6,060 kW</span></div>
-<div class="rw"><span class="l" title="Air cooling — handles 15% residual heat (VRM, DIMM, SSD, NIC)">Air 15%</span><span class="v">1,070 kW</span></div>
+<div class="rw"><span class="l" title="Direct Liquid Cooling — 85% of IT heat via cold plates (engine-derived)">DLC 85%</span><span class="v vc" id="sDLC">3,029 kW</span></div>
+<div class="rw"><span class="l" title="Air cooling — 15% residual heat (VRM, DIMM, SSD, NIC), engine-derived">Air 15%</span><span class="v" id="sAir">535 kW</span></div>
 <div class="rw"><span class="l" title="Technology Cooling System Supply — coolant temperature to racks (35°C nominal)">TCS Sup</span><span class="v vc" id="sTS">35.2&#176;C</span></div>
 <div class="rw"><span class="l" title="Technology Cooling System Return — heated coolant from racks (45°C nominal)">TCS Ret</span><span class="v vo" id="sTR">44.8&#176;C</span></div>
 <div class="rw"><span class="l" title="TCS temperature differential — Return minus Supply, target ~10°C">TCS &#916;T</span><span class="v vc" id="sDT">9.6&#176;C</span></div>
-<div class="rw"><span class="l" title="Coolant Distribution Units — end-of-row L2L heat exchangers, 350kW each">CDUs</span><span class="v vg">5/6 N+1 (2/RP EoR)</span></div>
-<div class="rw"><span class="l" title="Water-cooled centrifugal (mag bearing) chillers — COP 6.8, provides 12°C facility water">Chillers</span><span class="v vg" id="sCH">3/4 Run</span></div>
-<div class="rw"><span class="l" title="Computer Room Air Handlers — CW fan-wall units for 15% air-side cooling">CRAHs</span><span class="v vg">5/6 Act</span></div></div>
+<div class="rw"><span class="l" title="Coolant Distribution Units — 350 kW EoR units; running count sized to liquid heat (engine-derived)">CDUs</span><span class="v vg" id="sCDU">9/12 N+2</span></div>
+<div class="rw"><span class="l" title="Water-cooled centrifugal (mag bearing) chillers — nameplate COP 6.8">Chillers</span><span class="v vg" id="sCH">3/4 Run</span></div>
+<div class="rw"><span class="l" title="Computer Room Air Handlers — CW fan-wall units for 15% residual air (engine-derived)">CRAHs</span><span class="v vg" id="sCRAH">5 Act</span></div></div>
 <div class="sb"><h4><i style="background:var(--b)"></i>Network</h4>
 <div class="rw"><span class="l" title="NVLink 5th gen — 130 TB/s intra-domain GPU-to-GPU interconnect">NVLink5</span><span class="v vg">All Up</span></div>
 <div class="rw"><span class="l" title="InfiniBand Extended Data Rate — 800 Gb/s per port, 4-Rail Fat-Tree topology">IB XDR</span><span class="v vg">800G Online</span></div>
@@ -599,12 +606,12 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <button class="dh-btn" data-dh="4">DH-4</button>
 </nav>
 <div class="kpi">
-<div class="k"><div class="kl" title="Power Usage Effectiveness — Total Power ÷ IT Load (ideal = 1.0)">PUE</div><div class="kv" style="color:var(--g)" id="kP">1.08</div><div class="ks">&#8804;1.12</div></div>
-<div class="k"><div class="kl" title="IT compute power load — GPUs + CPUs + NICs + switches">IT</div><div class="kv" style="color:var(--o)">7,128</div><div class="ks">kW</div></div>
+<div class="k"><div class="kl" title="Power Usage Effectiveness — derived bottom-up: Facility kW ÷ IT kW. Basis on Electrical SLD.">PUE</div><div class="kv" style="color:var(--o)" id="kP">1.30</div><div class="ks" id="kPband">Derived | basis ▾</div></div>
+<div class="k"><div class="kl" title="IT compute power load per hall — 27 NVL72 × 132 kW (engine-derived)">IT</div><div class="kv" style="color:var(--o)" id="kIT">3,564</div><div class="ks">kW</div></div>
 <div class="k"><div class="kl" title="GPU utilization percentage across all 1,944 Blackwell B200 GPUs">GPU%</div><div class="kv" style="color:var(--g)" id="kG">94</div><div class="ks">1,944</div></div>
 <div class="k"><div class="kl" title="NVLink5 health — 130 TB/s intra-domain GPU interconnect">NVLink</div><div class="kv" style="color:var(--g)">100%</div><div class="ks">27dom</div></div>
 <div class="k"><div class="kl" title="TCS temperature differential — Return minus Supply, target ~10°C">&#916;T</div><div class="kv" style="color:var(--c)" id="kD">9.6</div><div class="ks">&#176;C</div></div>
-<div class="k"><div class="kl" title="Direct Liquid Cooling — percentage of heat removed by cold plates">DLC</div><div class="kv" style="color:var(--c)" id="kC">84%</div><div class="ks">7.2MW</div></div>
+<div class="k"><div class="kl" title="Direct Liquid Cooling — 85% of IT heat, engine-derived liquid load">DLC</div><div class="kv" style="color:var(--c)" id="kC">85%</div><div class="ks" id="kCmw">3.03MW</div></div>
 <div class="k"><div class="kl" title="Facility uptime — year-to-date availability percentage">Up</div><div class="kv" style="color:var(--g)">99.998</div><div class="ks">%</div></div>
 <div class="k"><div class="kl" title="Average watts per GPU — real-time power draw per B200 chip">W/GPU</div><div class="kv" style="color:var(--o)" id="kW">1050</div><div class="ks">avg</div></div>
 <div class="k"><div class="kl" title="FP4 AI performance — 4-bit floating point EFLOPS per NVL72 domain">FP4</div><div class="kv" style="color:var(--p)">1400</div><div class="ks">EF</div></div>
@@ -730,6 +737,125 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <script>
 
 const $=id=>document.getElementById(id),R=(a,b)=>(Math.random()*(b-a)+a).toFixed(1),RI=(a,b)=>Math.floor(Math.random()*(b-a)+a),J='JetBrains Mono';
+
+/* ============================================================================
+ * v1.20.0 ENGINE BIND — Stage 3-5 of the datahallAI revision (Task #87).
+ * ----------------------------------------------------------------------------
+ * Every displayed engineering value (kW/MW/flow/temp/PUE/WUE/current) in the
+ * sidebar, Data Hall, Room Layout, Rack, Cooling and Electrical-SLD views is
+ * derived ONCE here from the LOCKED Scenario-A baseline (js/datahall-model.js)
+ * via the verified pure engine (js/datahall-calculations.js). NO Math.random,
+ * NO per-tab divergence. The DC Dashboard tab (#p-dash / updateDashKPI) is
+ * intentionally NOT bound — owner exclusion.
+ *
+ * Authority: BASELINE-DECISION.md (locked 2026-05-17). Numbers reproduced here
+ * match 21-calculation-worked-examples.md Scenario A exactly (tested 57/57).
+ * ==========================================================================*/
+var DH=(function(){
+  var C=window.DATAHALL_CALC,M=window.DATAHALL_MODEL;
+  if(!C||!M){
+    /* Fail loud, never silently diverge. */
+    console.error('[datahallAI] DATAHALL engine not loaded — bound views require js/datahall-model.js + js/datahall-calculations.js');
+    return null;
+  }
+  var s=C.lockedState();          /* Scenario-A locked coherent state */
+  var pb=C.pueBasis();            /* bottom-up PUE + 5-part basis (IT 3,564) */
+  var rd=function(x,d){return C.round(x,d==null?0:d);};
+  var fmt=function(n){            /* thousands separator, integer */
+    return String(rd(n,0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  };
+  var fac=s.itPerFacility_kW;     /* 14,256 kW IT */
+  var facTotal=pb.facility_kW*M.facility.halls;  /* full facility incl cooling/aux */
+  var perGen=M.equipment.generator.ratingKW;            /* 2,750 kW */
+  var gensetN=Math.ceil(fac/perGen);                    /* 6 for IT-only */
+  var gensetFacN=Math.ceil(facTotal/perGen);            /* runs to cover TOTAL facility */
+  var d={
+    /* facility / compute */
+    halls:M.facility.halls, nvl72PerHall:M.facility.nvl72PerHall,
+    racksPerHall:s.racksPerHall, gpuPerHall:M.facility.gpuPerHall,
+    gpuPerFacility:M.facility.gpuPerFacility,
+    cpuPerHall:M.facility.nvl72PerHall*M.facility.cpuPerNVL72,   /* 27*36=972 */
+    /* power (Scenario A LOCKED) */
+    itHall:s.itPerHall_kW,                 /* 3564 */
+    itHallFmt:fmt(s.itPerHall_kW),         /* "3,564" */
+    itFacilityMW:rd(fac/1000,2),           /* 14.26 */
+    kwPerNVL72:s.kwPerNVL72,               /* 132 */
+    kwPerRack:s.kwPerRack,                 /* 66 */
+    /* cooling */
+    liquidHeat:rd(s.liquidHeat_kW,0),      /* 3029 */
+    liquidHeatFmt:fmt(s.liquidHeat_kW),    /* "3,029" */
+    airHeat:rd(s.airHeat_kW,0),            /* 535 */
+    airHeatFmt:fmt(s.airHeat_kW),          /* "535" */
+    liquidCapturePct:rd(M.cooling.liquidCaptureRatio*100,0), /* 85 */
+    tcsSupply:M.cooling.tcsSupplyC,        /* 35 */
+    tcsReturn:M.cooling.tcsReturnC,        /* 45 */
+    tcsDeltaT:M.cooling.tcsDeltaT_K,       /* 10 */
+    tcsFlowTotal:rd(s.tcsFlowTotal_LPM,0), /* 4342 */
+    tcsFlowTotalFmt:fmt(s.tcsFlowTotal_LPM),
+    tcsFlowPerRack:rd(s.tcsFlowPerRack_LPM,1), /* 80.4 */
+    cduRating:M.equipment.cdu.ratingKW,    /* 350 */
+    cduRunning:s.cduRunningCount,          /* 9 */
+    cduInstalled:12,                       /* doc-21 Ex7 "recommended installed 10-12" */
+    crahActive:s.crahActive,               /* 5 */
+    crahPerUnit:rd(s.crahPerUnit_kW,0),    /* 107 */
+    crahFlowM3h:rd(s.crahFlowPerUnit_m3h,1),/* 18.4 */
+    chillerCOP:M.equipment.chiller.nameplateCOP, /* 6.8 */
+    /* electrical */
+    voltageLL:M.electrical.voltageLL,      /* 400 */
+    powerFactor:M.electrical.powerFactor,  /* 0.96 */
+    reqCurrentA:rd(s.requiredCurrent_A,0), /* 5359 */
+    reqCurrentAFmt:fmt(s.requiredCurrent_A),
+    txKVA:rd(s.transformer_kVA,0),         /* 3713 */
+    txKVAFmt:fmt(s.transformer_kVA),
+    upsRatingKW:M.equipment.ups.ratingKW,  /* 4500 */
+    upsRatingMW:rd(M.equipment.ups.ratingKW/1000,1), /* 4.5 */
+    upsTopology:M.equipment.ups.topology,  /* 2N */
+    upsLoadPct:rd(s.upsLoadingPct,1),      /* 79.2 */
+    txRatingMVA:M.equipment.transformer.ratingMVA,        /* 5 */
+    txConservativeMVA:M.equipment.transformer.conservativeMVA, /* 10 */
+    txLoadPct:rd(s.transformerLoadingPct,1),/* 74.3 */
+    buswayA:M.equipment.busway.selectedRatingA,           /* 6300 */
+    buswayAFmt:fmt(M.equipment.busway.selectedRatingA),
+    gensetModel:M.equipment.generator.model,              /* Caterpillar 3516E */
+    gensetKW:perGen,                                      /* 2750 */
+    gensetMW:rd(perGen/1000,2),                           /* 2.75 */
+    gensetN:gensetN,                                      /* 6 */
+    gensetNplus1:gensetN+1,                               /* 7 (IT-only N+1) */
+    gensetFacN:gensetFacN,                                /* runs for TOTAL facility */
+    gensetFacNplus1:gensetFacN+1,                         /* facility N+1 backup count */
+    facTotalMW:rd(facTotal/1000,2),                       /* total facility MW */
+    /* PUE — honest bottom-up + 5-part basis (doc-00 / doc-21 Ex9) */
+    pue:rd(pb.pue,2),                      /* 1.30 */
+    pueExact:pb.pue,
+    pb_it:rd(pb.it_kW,0),                  /* 3564 */
+    pb_cooling:rd(pb.basis.cooling_kW,0),  /* 849 */
+    pb_chiller:rd(pb.chillerInput_kW,0),   /* 524 */
+    pb_upsDist:rd(pb.upsDistLoss_kW,0),    /* 150 */
+    pb_aux:rd(pb.aux_kW,0),                /* 75 */
+    pb_nonIT:rd(pb.nonIT_kW,0),            /* 1074 */
+    pb_facility:rd(pb.facility_kW,0),      /* 4638 */
+    pb_facilityFmt:fmt(pb.facility_kW),
+    /* PUE design band (target only — NEVER used to fudge the derived value) */
+    pueBandMin:M.pueDesignBand.min, pueBandMax:M.pueDesignBand.max,
+    /* WUE: dry-cooler baseline => 0.00 L/kWh, stated explicitly (BASELINE-DECISION) */
+    wue:0.00, wueMode:'Dry-only cooler',
+    /* geometry */
+    hallVolM3:fmt(C.dataHallVolume()),     /* 2,688 */
+    /* one-line PUE basis caption for any view that needs the breakdown inline */
+    pueBasisText:''
+  };
+  d.pueBasisText='PUE '+d.pue+' = (IT '+d.itHallFmt+' + cooling '+fmt(pb.basis.cooling_kW)
+    +' + UPS/dist '+d.pb_upsDist+' + aux '+d.pb_aux+') / IT '+d.itHallFmt+' kW';
+  /* Idempotent text setter (only sets if element exists). */
+  d.set=function(id,txt){var e=$(id);if(e&&txt!=null)e.textContent=txt;};
+  if(Object.freeze)Object.freeze(d);
+  return d;
+})();
+/* Stable global alias for the engine binding. Some later IIFEs declare a local
+ * `var DH=['DH-01',...]` (hall-name array) which shadows the top-level DH inside
+ * those scopes — DHE is the un-shadowed reference to the engine numbers. */
+var DHE=DH;
+
 setInterval(()=>{$('clk').textContent=new Date().toLocaleTimeString('en-GB')},1000);
 $('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const el=$('p-'+e.target.dataset.t);if(el)el.classList.add('on')});
 $('elecTabs').addEventListener('click',function(e){if(!e.target.classList.contains('et'))return;document.querySelectorAll('.elec-tabs .et').forEach(function(b){b.classList.remove('on')});e.target.classList.add('on');document.querySelectorAll('.ep').forEach(function(p){p.classList.remove('on')});var el=$('ep-'+e.target.dataset.ep);if(el)el.classList.add('on')});
@@ -855,11 +981,11 @@ s+=isoRoom(0,38,48,10,f.z+FH,'#6366f1',.18);
 s+=isoRoom(48,38,24,10,f.z+FH,'#8b5cf6',.18);
 // Zone labels (floating above each area for readability)
 s+=isoLabel(35,5,f.z+FH+6,'GENERATOR ROOM','#fca5a5',9,1);
-s+=isoLabel(35,5,f.z+FH+4.5,'6\u00D7 Cat 3516E 8MW N+1','#fca5a5',6.5);
+s+=isoLabel(35,5,f.z+FH+4.5,(DH?(DH.gensetFacNplus1+'\u00D7 Cat 3516E '+DH.gensetMW+'MW N+1'):'8\u00D7 Cat 3516E 2.75MW N+1'),'#fca5a5',6.5);
 s+=isoLabel(10,18,f.z+FH+6,'TX-A ROOM','#fde68a',9,1);
-s+=isoLabel(10,18,f.z+FH+4.5,'4\u00D7 10MVA Feed A','#fde68a',6.5);
+s+=isoLabel(10,18,f.z+FH+4.5,(DH?('4\u00D7 '+DH.txRatingMVA+'MVA Feed A'):'4\u00D7 5MVA Feed A'),'#fde68a',6.5);
 s+=isoLabel(60,18,f.z+FH+6,'TX-B ROOM','#fde68a',9,1);
-s+=isoLabel(60,18,f.z+FH+4.5,'4\u00D7 10MVA Feed B','#fde68a',6.5);
+s+=isoLabel(60,18,f.z+FH+4.5,(DH?('4\u00D7 '+DH.txRatingMVA+'MVA Feed B'):'4\u00D7 5MVA Feed B'),'#fde68a',6.5);
 s+=isoLabel(36,18,f.z+FH+5,'BMS / EPMS','#c4b5fd',8,1);
 s+=isoLabel(10,31,f.z+FH+5,'WORKSHOP / STORAGE','#d6d3d1',9,1);
 s+=isoLabel(10,31,f.z+FH+3.5,'Support & Maintenance','#d6d3d1',6.5);
@@ -872,19 +998,19 @@ s+=isoLabel(60,43,f.z+FH+5,'AHU ROOM','#c4b5fd',8,1);
 s+=isoLabel(60,43,f.z+FH+3.5,'2\u00D7 Carrier 39HQ','#c4b5fd',6.5);
 s+=isoLabel(10,5,f.z+FH+4,'LOADING','#d6d3d1',8,1);
 s+=isoLabel(55,5,f.z+FH+4,'FUEL','#fde68a',8,1);
-// 3D Equipment: Generators (6× Cat 3516E 8MW N+1, 6×4×3 each)
+// 3D Equipment: Generators (engine-derived Cat 3516E 2.75MW N+1)
 for(var gi=0;gi<6;gi++)s+=isoBox(18+gi*6,2,6,4,f.z+FH,3,'#ef4444','G'+(gi+1),'#fca5a5');
 // Fuel day tanks (4× 1000L, in fuel storage area, east)
 s+=isoBox(56,1,3,2,f.z+FH,1,'#f59e0b','DT-1','#fde68a');
 s+=isoBox(60,1,3,2,f.z+FH,1,'#f59e0b','DT-2','#fde68a');
 s+=isoBox(56,4,3,2,f.z+FH,1,'#f59e0b','DT-3','#fde68a');
 s+=isoBox(60,4,3,2,f.z+FH,1,'#f59e0b','DT-4','#fde68a');
-// Transformers A (4× 10MVA, west — TX-A room, 3×2×2.5 each)
+// Transformers A (engine-derived MVA, west — TX-A room)
 s+=isoBox(2,15,3,2,f.z+FH,2.5,'#f59e0b','TX-1A','#fde68a');
 s+=isoBox(7,15,3,2,f.z+FH,2.5,'#f59e0b','TX-2A','#fde68a');
 s+=isoBox(12,15,3,2,f.z+FH,2.5,'#f59e0b','TX-3A','#fde68a');
 s+=isoBox(17,15,3,2,f.z+FH,2.5,'#f59e0b','TX-4A','#fde68a');
-// Transformers B (4× 10MVA, east — TX-B room, 3×2×2.5 each)
+// Transformers B (engine-derived MVA, east — TX-B room)
 s+=isoBox(44,15,3,2,f.z+FH,2.5,'#f59e0b','TX-1B','#fde68a');
 s+=isoBox(49,15,3,2,f.z+FH,2.5,'#f59e0b','TX-2B','#fde68a');
 s+=isoBox(54,15,3,2,f.z+FH,2.5,'#f59e0b','TX-3B','#fde68a');
@@ -923,8 +1049,8 @@ s+=isoRoom(4,26,30,18,f.z+FH,'#22c55e',.25);
 s+=isoRoom(38,4,30,40,f.z+FH,'#f59e0b',.15);
 s+=isoRoom(4,22,30,4,f.z+FH,'#94a3b8',.12);
 // Zone labels
-s+=isoLabel(19,12,f.z+FH+5,dhN[0]+' \u2014 22 Racks','#86efac',10,1);
-s+=isoLabel(19,35,f.z+FH+5,dhN[1]+' \u2014 22 Racks','#86efac',10,1);
+s+=isoLabel(19,12,f.z+FH+5,dhN[0]+' \u2014 '+(DH?DH.racksPerHall:54)+' Racks','#86efac',10,1);
+s+=isoLabel(19,35,f.z+FH+5,dhN[1]+' \u2014 '+(DH?DH.racksPerHall:54)+' Racks','#86efac',10,1);
 s+=isoLabel(53,22,f.z+FH+4,'ELECTRICAL WING','#fde68a',9,1);
 s+=isoLabel(53,22,f.z+FH+2.5,'UPS + RPP + BW','#fde68a',6.5);
 s+=isoLabel(19,23,f.z+FH+2,'CORRIDOR','#94a3b8',6.5);
@@ -1128,7 +1254,7 @@ s+=tx(30,68,'FACILITY SUMMARY','var(--t1)',9,0,1);
 var kpis=[
 ['Total IT Load','28.4 MW','var(--o)'],
 ['Total Facility','30.7 MW (PUE 1.08)','var(--g)'],
-['Data Halls','4\u00D7 7.1 MW','var(--g)'],
+['Data Halls',(DH?(DH.halls+'\u00D7 '+(DH.itHall/1000).toFixed(2)+' MW'):'4\u00D7 3.56 MW'),'var(--g)'],
 ['GPUs Total','7,776\u00D7 B200','var(--pk)'],
 ['Cooling','Dry Cooler + DLC','var(--c)'],
 ['Redundancy','2N Power / N+1 Cool','var(--t2)']
@@ -1298,19 +1424,19 @@ s+=eq(14,2,2,1.8,'rgba(239,68,68,.15)','N2',3.5,'Novec 1230 Cylinder N2: 180L @ 
 s+=eq(11,5,2,1.8,'rgba(239,68,68,.15)','N3',3.5,'Novec 1230 Cylinder N3: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 s+=eq(14,5,2,1.8,'rgba(239,68,68,.15)','N4',3.5,'Novec 1230 Cylinder N4: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 
-// Generator Room (center-north, wide) — 6× Cat 3516E 8MW N+1
-s+=rmLive(20,0,30,10,'rgba(239,68,68,.1)','rgba(239,68,68,.4)','Generator Room','30m\u00D710m','6\u00D7 Cat 3516E 8MW N+1','Generator: 6\u00D7 Caterpillar 3516E 8MW, <10s start, G1-G5 running + G6 standby (N+1), 48hr fuel',28,null,'Running');
-s+=eqLive(21,2,4,3,'rgba(239,68,68,.18)','G1 8MW',4,'running','Generator G1: Caterpillar 3516E 8000kW, 6100\u00D72200\u00D72700mm (L\u00D7W\u00D7H), ~16000kg wet, Diesel 1850L/hr@100%, Status: RUNNING, \u2192 Electrical Tab');
+// Generator Room — engine-derived Cat 3516E 2.75MW N+1 (facility backup)
+s+=rmLive(20,0,30,10,'rgba(239,68,68,.1)','rgba(239,68,68,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 Cat 3516E '+DH.gensetMW+'MW N+1'):'8\u00D7 Cat 3516E 2.75MW N+1'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 Caterpillar 3516E '+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'Generator: 8\u00D7 Caterpillar 3516E 2.75MW, 7 running + 1 standby (N+1), 48hr fuel'),28,null,'Running');
+s+=eqLive(21,2,4,3,'rgba(239,68,68,.18)',(DH?('G1 '+DH.gensetMW+'MW'):'G1 2.75MW'),4,'running','Generator G1: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(23,3.5);
-s+=eqLive(25.8,2,4,3,'rgba(239,68,68,.18)','G2 8MW',4,'running','Generator G2: Caterpillar 3516E 8000kW, 6100\u00D72200\u00D72700mm (L\u00D7W\u00D7H), ~16000kg wet, Diesel 1850L/hr@100%, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(25.8,2,4,3,'rgba(239,68,68,.18)',(DH?('G2 '+DH.gensetMW+'MW'):'G2 2.75MW'),4,'running','Generator G2: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(27.8,3.5);
-s+=eqLive(30.6,2,4,3,'rgba(239,68,68,.18)','G3 8MW',4,'running','Generator G3: Caterpillar 3516E 8000kW, 6100\u00D72200\u00D72700mm (L\u00D7W\u00D7H), ~16000kg wet, Diesel 1850L/hr@100%, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(30.6,2,4,3,'rgba(239,68,68,.18)',(DH?('G3 '+DH.gensetMW+'MW'):'G3 2.75MW'),4,'running','Generator G3: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(32.6,3.5);
-s+=eqLive(35.4,2,4,3,'rgba(239,68,68,.18)','G4 8MW',4,'running','Generator G4: Caterpillar 3516E 8000kW, 6100\u00D72200\u00D72700mm (L\u00D7W\u00D7H), ~16000kg wet, Diesel 1850L/hr@100%, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(35.4,2,4,3,'rgba(239,68,68,.18)',(DH?('G4 '+DH.gensetMW+'MW'):'G4 2.75MW'),4,'running','Generator G4: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(37.4,3.5);
-s+=eqLive(40.2,2,4,3,'rgba(239,68,68,.18)','G5 8MW',4,'running','Generator G5: Caterpillar 3516E 8000kW, 6100\u00D72200\u00D72700mm (L\u00D7W\u00D7H), ~16000kg wet, Diesel 1850L/hr@100%, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(40.2,2,4,3,'rgba(239,68,68,.18)',(DH?('G5 '+DH.gensetMW+'MW'):'G5 2.75MW'),4,'running','Generator G5: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(42.2,3.5);
-s+=eqLive(45,2,4,3,'rgba(239,68,68,.18)','G6 STBY',4,'standby','Generator G6 (N+1): Caterpillar 3516E 8000kW, 6100\u00D72200\u00D72700mm, ~16000kg, Diesel, Status: STANDBY (Reserve), \u2192 Electrical Tab');
+s+=eqLive(45,2,4,3,'rgba(239,68,68,.18)','G6 STBY',4,'standby','Generator G6 (N+1 reserve): Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: STANDBY (Reserve), \u2192 Electrical Tab');
 s+=symFloorGEN(47,3.5);
 // Day tanks (6× matching generators)
 s+=eq(21,6.5,3.5,2,'rgba(245,158,11,.15)','DT-1',3.5,'Day Tank DT-1: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
@@ -1339,17 +1465,17 @@ s+='<text x="'+(MX+BW/2)+'" y="'+(MY+11.2*M)+'" fill="var(--t3)" font-family="'+
 // ================================================================
 s+='<text x="'+(MX+BW/2)+'" y="'+(MY+11.5*M+4)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".4">SYMMETRIC ELECTRICAL ZONE \u2014 Feed A (West) | Feed B (East)</text>';
 
-// TX-A Room (left — Feed A) — 4× TX 10MVA
-s+=rmLive(0,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-A Room','16m\u00D712m','4\u00D7 TX 10MVA','Transformer A: 4\u00D7 ABB RESIBLOC 10MVA cast-resin, 20kV\u2192400V, \u0394-Y11, Zk=6%',35,null,'Normal');
-s+=eqLive(1.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1A',4.5,'running','Transformer TX-1A: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+// TX-A Room (left — Feed A) — engine-derived TX MVA
+s+=rmLive(0,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-A Room','16m\u00D712m',(DH?('4\u00D7 TX '+DH.txRatingMVA+'MVA'):'4\u00D7 TX 5MVA'),(DH?('Transformer A: 4\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'Transformer A: 4\u00D7 cast-resin 5MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%'),35,null,'Normal');
+s+=eqLive(1.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1A',4.5,'running',(DH?('Transformer TX-1A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-1A: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(4,15.2);
-s+=eqLive(8.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2A',4.5,'running','Transformer TX-2A: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+s+=eqLive(8.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2A',4.5,'running',(DH?('Transformer TX-2A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-2A: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(11,15.2);
-s+=eqLive(1.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3A',4.5,'running','Transformer TX-3A: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+s+=eqLive(1.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3A',4.5,'running',(DH?('Transformer TX-3A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-3A: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(4,20.2);
-s+=eqLive(8.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4A',4.5,'running','Transformer TX-4A: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+s+=eqLive(8.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4A',4.5,'running',(DH?('Transformer TX-4A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-4A: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(11,20.2);
-s+='<text x="'+(MX+8*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | 10MVA each | 4 units</text>';
+s+='<text x="'+(MX+8*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | '+(DH?DH.txRatingMVA:5)+'MVA each | 4 units</text>';
 
 // MSB-A / ATS-A (Feed A) — 2× MSB + 4× ATS
 s+=rmLive(16,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-A / ATS-A','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-A: 2\u00D7 Schneider Prisma P 6300A, 4\u00D7 ATS Masterpact MTZ 4000A, <100ms transfer',null,null,'Normal');
@@ -1380,17 +1506,17 @@ s+=eq(52.9,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-4B',3.2,'ATS-4B: Schneider Mas
 s+=eq(43,19.5,5,2,'rgba(245,158,11,.1)','DB-NC-B',4,'DB-NC-B: Non-Critical Distribution, 400A, Lighting/AHU/Misc, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
 s+=eq(49,19.5,5,2,'rgba(245,158,11,.1)','DB-CL-B',4,'DB-CL-B: Cooling Distribution, 800A, Chillers/Pumps/Fans, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
 
-// TX-B Room (right — Feed B) — 4× TX 10MVA
-s+=rmLive(56,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-B Room','16m\u00D712m','4\u00D7 TX 10MVA','Transformer B: 4\u00D7 ABB RESIBLOC 10MVA cast-resin, 20kV\u2192400V, \u0394-Y11, Zk=6%',35,null,'Normal');
-s+=eqLive(57.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1B',4.5,'running','Transformer TX-1B: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+// TX-B Room (right — Feed B) — engine-derived TX MVA
+s+=rmLive(56,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-B Room','16m\u00D712m',(DH?('4\u00D7 TX '+DH.txRatingMVA+'MVA'):'4\u00D7 TX 5MVA'),(DH?('Transformer B: 4\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'Transformer B: 4\u00D7 cast-resin 5MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%'),35,null,'Normal');
+s+=eqLive(57.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1B',4.5,'running',(DH?('Transformer TX-1B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-1B: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(60,15.2);
-s+=eqLive(64.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2B',4.5,'running','Transformer TX-2B: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+s+=eqLive(64.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2B',4.5,'running',(DH?('Transformer TX-2B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-2B: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(67,15.2);
-s+=eqLive(57.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3B',4.5,'running','Transformer TX-3B: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+s+=eqLive(57.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3B',4.5,'running',(DH?('Transformer TX-3B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-3B: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(60,20.2);
-s+=eqLive(64.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4B',4.5,'running','Transformer TX-4B: ABB RESIBLOC 10MVA, 20kV/400V \u0394-Y11, Zk=6%, 2800\u00D71800\u00D72600mm, ~12000kg, Cast-resin dry AN/AF, Status: ONLINE, \u2192 Electrical Tab');
+s+=eqLive(64.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4B',4.5,'running',(DH?('Transformer TX-4B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'Transformer TX-4B: cast-resin 5MVA, 20kV/400V \u0394-Y11, Zk=6%, Status: ONLINE')+'\u2192 Electrical Tab');
 s+=symFloorTX(67,20.2);
-s+='<text x="'+(MX+64*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | 10MVA each | 4 units</text>';
+s+='<text x="'+(MX+64*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | '+(DH?DH.txRatingMVA:5)+'MVA each | 4 units</text>';
 
 // === CORRIDOR 2 (y=24..26) ===
 s+='<rect x="'+MX+'" y="'+(MY+24*M)+'" width="'+BW+'" height="'+(2*M)+'" fill="rgba(148,163,184,.06)" stroke="var(--t3)" stroke-width=".3" rx="1"/>';
@@ -1600,7 +1726,7 @@ s+=tx(480,14,'FLOOR 2 PLAN \u2014 DATAHALL 1 + DATAHALL 2','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // === DATA HALL 1 (North Wing) ===
-s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1','32m \u00D7 20m \u2502 7.1 MW','27\u00D7 NVL72 \u2502 1,944 GPU \u2502 132kW/rack','DH-1: GB200 NVL72, 27 domains (54 racks), 7,128kW IT, DLC 85% + Air 15%, TCS 35/45\u00B0C',20,45,'Running');
+s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-1: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'DH-1: GB200 NVL72, 27 domains (54 racks), 3,564kW IT, DLC 85%+Air 15%, TCS 35/45\u00B0C'),20,45,'Running');
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows indicator
@@ -1620,7 +1746,7 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // === DATA HALL 2 (South Wing) ===
-s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2','32m \u00D7 20m \u2502 7.1 MW','27\u00D7 NVL72 \u2502 1,944 GPU \u2502 132kW/rack','DH-2: GB200 NVL72, 27 domains (54 racks), 7,128kW IT, DLC 85% + Air 15%, TCS 35/45\u00B0C',20,45,'Running');
+s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-2: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'DH-2: GB200 NVL72, 27 domains (54 racks), 3,564kW IT, DLC 85%+Air 15%, TCS 35/45\u00B0C'),20,45,'Running');
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows
@@ -1714,7 +1840,7 @@ s+=tx(480,14,'FLOOR 3 PLAN \u2014 DATAHALL 3 + DATAHALL 4','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // DH3 (North)
-s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3','32m \u00D7 20m \u2502 7.1 MW','27\u00D7 NVL72 \u2502 1,944 GPU \u2502 132kW/rack','DH-3: GB200 NVL72, 27 domains (54 racks), 7,128kW IT',20,45,'Running');
+s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-3: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'DH-3: GB200 NVL72, 27 domains (54 racks), 3,564kW IT'),20,45,'Running');
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r=0;r<3;r++){
 s+='<rect x="'+(MX+(7+r*9)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -1730,7 +1856,7 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // DH4 (South)
-s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4','32m \u00D7 20m \u2502 7.1 MW','27\u00D7 NVL72 \u2502 1,944 GPU \u2502 132kW/rack','DH-4: GB200 NVL72, 27 domains (54 racks), 7,128kW IT',20,45,'Running');
+s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-4: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'DH-4: GB200 NVL72, 27 domains (54 racks), 3,564kW IT'),20,45,'Running');
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r2=0;r2<3;r2++){
 s+='<rect x="'+(MX+(7+r2*9)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2428,7 +2554,7 @@ s+=`<rect x="${LX+2*(ctW+6)}" y="${ctY}" width="${ctW}" height="7" rx="1.5" fill
 s+=tx(LX+2*(ctW+6)+ctW/2,ctY+5,'Cu 300mm','var(--p)',3,'middle');
 s+=tx(LX+TW,ctY+5,'CABLE TRAY','var(--t3)',3,'end');
 s+=`</g>`;
-s+=bx(752,28,190,105,'rgba(245,158,11,.12)',4)+tx(847,39,'ELECTRICAL','var(--o)',6,'middle',1);['TX-A/B 5MVA','UPS-A/B 4.5MW','Busway 2\u00D74,000A','RPP 12\u00D7 630A','GenSet 4\u00D72.5MW','ATS-LV <100ms','Battery 10min'].forEach((l,i)=>s+=tx(847,50+i*9.5,l,'var(--t2)',4,'middle'));
+s+=bx(752,28,190,105,'rgba(245,158,11,.12)',4)+tx(847,39,'ELECTRICAL','var(--o)',6,'middle',1);[(DH?'TX-A/B '+DH.txRatingMVA+'MVA':'TX-A/B 5MVA'),(DH?'UPS-A/B '+DH.upsRatingMW+'MW':'UPS-A/B 4.5MW'),(DH?'Busway 2\u00D7'+DH.buswayAFmt+'A':'Busway 2\u00D76,300A'),'RPP 12\u00D7 630A',(DH?'GenSet Cat 3516E '+DH.gensetMW+'MW':'GenSet Cat 3516E 2.75MW'),'ATS-LV <100ms','Battery 10min'].forEach((l,i)=>s+=tx(847,50+i*9.5,l,'var(--t2)',4,'middle'));
 s+=bx(752,140,190,55,'rgba(59,130,246,.12)',4)+tx(847,152,'NETWORK MDF','var(--b)',6,'middle',1);['IB Leaf\u00D78 Spine\u00D74','OOB 25G BMC 1G','DWDM ODF Patch'].forEach((l,i)=>s+=tx(847,163+i*10,l,'var(--t2)',4,'middle'));
 s+=bx(752,202,90,42,'rgba(239,68,68,.12)',4)+tx(797,214,'FIRE','var(--r)',6,'middle',1)+tx(797,225,'Novec 1230','var(--t3)',4,'middle')+tx(797,238,'\u25CF NORMAL','var(--g)',4,'middle',1);
 s+=bx(852,202,90,42,'rgba(34,197,94,.12)',4)+tx(897,214,'BMS','var(--g)',6,'middle',1)+tx(897,225,'DCIM','var(--t3)',4,'middle')+tx(897,238,'\u25CF ONLINE','var(--g)',4,'middle',1);
@@ -2452,9 +2578,18 @@ window.renderHall=renderHall;
 renderHall();
 
 function upd(){for(let r=0;r<3;r++)for(let si=0;si<4;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht)ht.textContent=R(32,40)+'\u00B0C';if(hh)hh.textContent=R(40,65)+'%';if(ct)ct.textContent=R(25.3+si*0.12,25.8+si*0.12)+'\u00B0C';if(ch)ch.textContent=R(45,70)+'%'}
-$('kP').textContent=R(1.07,1.12);$('kG').textContent=RI(88,98);$('kD').textContent=R(9,10.5);$('kC').textContent=RI(80,92)+'%';$('kW').textContent=RI(980,1180);
-const ts=parseFloat(R(34.5,35.8)),tr=parseFloat(R(44.2,45.5));$('sTS').textContent=ts+'\u00B0C';$('sTR').textContent=tr+'\u00B0C';$('sDT').textContent=(tr-ts).toFixed(1)+'\u00B0C';
-$('sUA').textContent='Online '+RI(64,72)+'%';$('sUB').textContent='Online '+RI(63,71)+'%';
+/* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live
+ * telemetry jitter (genuine sensor readings, not basis-of-design values). */
+if(DH){$('kP').textContent=DH.pue.toFixed(2);}
+$('kG').textContent=RI(88,98);
+if(DH){$('kD').textContent=DH.tcsDeltaT.toFixed(1);$('kC').textContent=DH.liquidCapturePct+'%';}
+$('kW').textContent=RI(980,1180);
+/* TCS supply/return are live sensors oscillating around the engine setpoint
+ * (35/45 \u00B0C); \u0394T stays ~10 K per the locked basis. */
+var dhTS=DH?DH.tcsSupply:35,dhTR=DH?DH.tcsReturn:45;
+const ts=+(dhTS+(Math.random()*0.6-0.3)).toFixed(1),tr=+(dhTR+(Math.random()*0.6-0.3)).toFixed(1);$('sTS').textContent=ts+'\u00B0C';$('sTR').textContent=tr+'\u00B0C';$('sDT').textContent=(tr-ts).toFixed(1)+'\u00B0C';
+/* UPS A/B load = engine-derived loading (Scenario A 79.2%), small live jitter. */
+if(DH){var ua=(DH.upsLoadPct+(Math.random()*1.4-0.7)).toFixed(0),ub=(DH.upsLoadPct+(Math.random()*1.4-0.7)).toFixed(0);$('sUA').textContent='Online '+ua+'%';$('sUB').textContent='Online '+ub+'%';}
 // People count update
 const ppl=$('pplCount');if(ppl)ppl.textContent=RI(0,6);
 const le=$('lastEntry');if(le){const now=new Date();le.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
@@ -2472,11 +2607,57 @@ const fPI=$('fwsPI');if(fPI)fPI.textContent=R(1.8,2.4)+'bar';
 const fTI=$('fwsTI');if(fTI)fTI.textContent=R(11.5,12.5)+'\u00B0C';
 const fFM=$('fwsFM');if(fFM)fFM.textContent=RI(480,520)+'m\u00B3/h';
 }
+/* ---- v1.20.0: one-shot static engine bind for sidebar + Data Hall KPIs ----
+ * Overwrites the remaining hardcoded HTML literals with engine-derived text so
+ * the page can never display a stale baseline even if the markup drifts. */
+function DHbindStatic(){
+  if(!DH)return;
+  DH.set('sPit',DH.itHallFmt+' kW');
+  DH.set('sMechAux',fmtThou(DH.pb_nonIT)+' kW');
+  DH.set('sTotal',DH.pb_facilityFmt+' kW');
+  DH.set('sPerNVL',DH.kwPerNVL72+' kW');
+  DH.set('sDLC',DH.liquidHeatFmt+' kW');
+  DH.set('sAir',DH.airHeatFmt+' kW');
+  DH.set('sCDU',DH.cduRunning+'/'+DH.cduInstalled+' N+'+(DH.cduInstalled-DH.cduRunning>=2?'2':'1'));
+  DH.set('sCRAH',DH.crahActive+' Act');
+  DH.set('kIT',DH.itHallFmt);
+  DH.set('kP',DH.pue.toFixed(2));
+  DH.set('kC',DH.liquidCapturePct+'%');
+  DH.set('kCmw',(DH.liquidHeat/1000).toFixed(2)+'MW');
+  /* PUE basis: clickable sublabel opens a plain alert with the 5-part basis
+   * (doc-00 "PUE must show basis"). No HTML injection — text only. */
+  var kb=$('kPband');
+  if(kb){
+    kb.style.cursor='pointer';
+    kb.title=DH.pueBasisText;
+    kb.addEventListener('click',function(){
+      window.alert(
+        'PUE BASIS (bottom-up, honest derived — NOT a vanity figure)\n'+
+        '------------------------------------------------------------\n'+
+        'IT load          : '+DH.itHallFmt+' kW\n'+
+        'Cooling          : '+fmtThou(DH.pb_cooling)+' kW  (chiller '+DH.pb_chiller+' kW @ nameplate COP '+DH.chillerCOP+' + pumps/fans/CDU/CRAH)\n'+
+        'UPS + dist loss  : '+DH.pb_upsDist+' kW\n'+
+        'Aux              : '+DH.pb_aux+' kW\n'+
+        '------------------------------------------------------------\n'+
+        'Facility         : '+DH.pb_facilityFmt+' kW\n'+
+        'PUE = Facility / IT = '+DH.pb_facilityFmt+' / '+DH.itHallFmt+' = '+DH.pueExact.toFixed(3)+'\n'+
+        '------------------------------------------------------------\n'+
+        'Design band (target only): '+DH.pueBandMin+'-'+DH.pueBandMax+
+        '. The displayed value is the honest bottom-up result for chiller-based\n'+
+        'liquid cooling and is shown as-is even when it exceeds the target band.\n'+
+        'Source: 00-overview-audit.md + 21-calculation-worked-examples.md Ex9.'
+      );
+    });
+  }
+}
+/* thousands helper reused by binders (mirrors DH internal fmt). */
+function fmtThou(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+DHbindStatic();
 upd();setInterval(upd,3000)})();
 
 
 // ==== ELECTRICAL SLD v5 — TRUE 2N TIER III+ — 4 DATA HALLS — COLOR-CODED FEED A(RED)/B(GREEN) ====
-$('elecOvSu').textContent='PLN 20kV Dual Feed \u2192 MV Customer Substation (SM6 24kV) \u2192 4\u00D7 RMU RM6 3-Panel (Feed A + Bus Tie + Feed B) \u2192 8\u00D710MVA TX \u2192 8\u00D7MSB 6300A \u2192 ATS (CB-Normal + CB-Emergency + Interlock) \u21CC 6\u00D78MW GenSet Pool N+1 \u2192 8\u00D7UPS 8MW Li-Ion \u2192 8\u00D7Busway 12,000A \u2192 88\u00D7RPP 800A \u2192 Dual-Corded Rack PSU 50VDC | 4 Data Halls 28.5MW IT | True 2N | v5 Color-Coded';
+$('elecOvSu').textContent='PLN 20kV Dual Feed \u2192 MV Customer Substation (SM6 24kV) \u2192 4\u00D7 RMU RM6 3-Panel (Feed A + Bus Tie + Feed B) \u2192 8\u00D75MVA TX \u2192 8\u00D7MSB 6300A \u2192 ATS (CB-Normal + CB-Emergency + Interlock) \u21CC Cat 3516E 2.75MW GenSet Pool N+1 \u2192 8\u00D7UPS 4.5MW Li-Ion \u2192 8\u00D7Busway 6,300A \u2192 88\u00D7RPP 800A \u2192 Dual-Corded Rack PSU 50VDC | 4 Data Halls 14.26MW IT | True 2N | v5 Color-Coded';
 
 // ==== OVERVIEW IIFE ====
 (function(){
@@ -2572,14 +2753,14 @@ s+='<line x1="'+fdrBx[fi]+'" y1="192" x2="'+fdrBx[fi]+'" y2="210" stroke="var(--
 // ======== GENSET POOL (right panel, 50-210) — GRAY STANDBY ========
 s+='<rect x="1020" y="50" width="170" height="165" rx="5" fill="rgba(107,114,128,.04)" stroke="rgba(107,114,128,.25)" stroke-width=".5" stroke-dasharray="4 3"/>';
 s+=tx(1105,67,'GENERATOR POOL','rgba(107,114,128,.6)',6,'middle',1);
-s+=tx(1105,80,'6\u00D7 Cat 3516E 8MW V16','var(--t3)',5,'middle');
-s+=tx(1105,91,'N+1: 5+1 = 48MW cap.','var(--t3)',5,'middle');
+s+=tx(1105,80,(DH?(DH.gensetFacNplus1+'\u00D7 Cat 3516E '+DH.gensetMW+'MW'):'8\u00D7 Cat 3516E 2.75MW'),'var(--t3)',5,'middle');
+s+=tx(1105,91,(DH?('N+1: '+DH.gensetFacN+'+1 = '+(DH.gensetFacNplus1*DH.gensetMW).toFixed(1)+'MW cap.'):'N+1: 7+1 = 22.0MW cap.'),'var(--t3)',5,'middle');
 s+=tx(1105,102,'ASCO 7000 ATS | STANDBY','var(--t3)',5,'middle');
 for(var gi=0;gi<6;gi++){
 var gx=1030+(gi%3)*55,gy=110+(Math.floor(gi/3))*42;
 s+=symGen(gx+15,gy+15,'rgba(107,114,128,.4)');
 s+=tx(gx+15,gy+32,'GEN-'+(gi+1)+(gi===5?' STBY':''),'var(--t3)',5,'middle');
-s+=tx(gx+15,gy+40,'8MW','rgba(107,114,128,.5)',5,'middle',1);
+s+=tx(gx+15,gy+40,(DH?(DH.gensetMW+'MW'):'2.75MW'),'rgba(107,114,128,.5)',5,'middle',1);
 }
 s+=tx(1105,198,'\u2192 LV 400V via ATS','var(--t3)',5,'middle');
 s+=tx(1105,208,'\u2297 Interlock w/ MSB Incomers','var(--r)',5,'middle');
@@ -2596,7 +2777,7 @@ var dx=dhX[d],cx=dx+dhW/2,ax=cx-50,bkx=cx+50;
 s+='<g style="cursor:pointer" data-dh="'+(d+1)+'">';
 s+='<rect x="'+dx+'" y="240" width="'+dhW+'" height="425" rx="6" fill="rgba(34,197,94,.03)" stroke="rgba(34,197,94,.15)" stroke-width=".5"/>';
 s+=tx(cx,258,DHn[d]+' \u2014 '+FL[d],'var(--g)',7,'middle',1);
-s+=tx(cx,272,'IT: 7,128 kW | Total: ~8,500 kW','var(--t2)',5,'middle');
+s+=tx(cx,272,(DH?('IT: '+DH.itHallFmt+' kW | Total: ~'+DH.pb_facilityFmt+' kW'):'IT: 3,564 kW | Total: ~4,638 kW'),'var(--t2)',5,'middle');
 
 // RMU with Bus Tie
 s+=bx(dx+15,280,dhW-30,28,'var(--o)');
@@ -2612,10 +2793,10 @@ s+='<line x1="'+ax+'" y1="310" x2="'+ax+'" y2="328" stroke="var(--r)" stroke-wid
 s+='<line x1="'+bkx+'" y1="310" x2="'+bkx+'" y2="328" stroke="var(--g)" stroke-width=".8" opacity=".5"/>';
 s+=symTX(ax,340,'var(--r)');
 s+=tx(ax,364,'TX-'+(d+1)+'A','var(--r)',5,'middle');
-s+=tx(ax,374,'10MVA','var(--r)',5,'middle');
+s+=tx(ax,374,(DH?(DH.txRatingMVA+'MVA'):'5MVA'),'var(--r)',5,'middle');
 s+=symTX(bkx,340,'var(--g)');
 s+=tx(bkx,364,'TX-'+(d+1)+'B','var(--g)',5,'middle');
-s+=tx(bkx,374,'10MVA','var(--g)',5,'middle');
+s+=tx(bkx,374,(DH?(DH.txRatingMVA+'MVA'):'5MVA'),'var(--g)',5,'middle');
 
 // MSB pair — RED/GREEN tints
 s+='<line x1="'+ax+'" y1="374" x2="'+ax+'" y2="387" stroke="var(--r)" stroke-width=".8" opacity=".5"/>';
@@ -2633,9 +2814,9 @@ s+=tx(cx,394,'N.O.','var(--p)',5,'middle');
 s+='<line x1="'+ax+'" y1="401" x2="'+ax+'" y2="412" stroke="var(--r)" stroke-width=".8" opacity=".5"/>';
 s+='<line x1="'+bkx+'" y1="401" x2="'+bkx+'" y2="412" stroke="var(--g)" stroke-width=".8" opacity=".5"/>';
 s+=symUPS(ax,420,'var(--r)');
-s+=tx(ax,437,'UPS 8MW','var(--r)',5,'middle');
+s+=tx(ax,437,(DH?('UPS '+DH.upsRatingMW+'MW'):'UPS 4.5MW'),'var(--r)',5,'middle');
 s+=symUPS(bkx,420,'var(--g)');
-s+=tx(bkx,437,'UPS 8MW','var(--g)',5,'middle');
+s+=tx(bkx,437,(DH?('UPS '+DH.upsRatingMW+'MW'):'UPS 4.5MW'),'var(--g)',5,'middle');
 
 // Battery
 s+=tx(ax,450,'BAT 1333kWh','var(--r)',5,'middle');
@@ -2645,22 +2826,22 @@ s+=tx(bkx,450,'BAT 1333kWh','var(--g)',5,'middle');
 s+='<line x1="'+ax+'" y1="454" x2="'+ax+'" y2="467" stroke="var(--r)" stroke-width=".8" opacity=".5"/>';
 s+='<line x1="'+bkx+'" y1="454" x2="'+bkx+'" y2="467" stroke="var(--g)" stroke-width=".8" opacity=".5"/>';
 s+='<rect x="'+(ax-22)+'" y="469" width="44" height="8" rx="1" fill="rgba(239,68,68,.06)" stroke="var(--r)" stroke-width=".4"/>';
-s+=tx(ax,476,'BW 12kA','var(--r)',5,'middle');
+s+=tx(ax,476,(DH?('BW '+(DH.buswayA/1000)+'kA'):'BW 6.3kA'),'var(--r)',5,'middle');
 s+='<rect x="'+(bkx-22)+'" y="469" width="44" height="8" rx="1" fill="rgba(34,197,94,.06)" stroke="var(--g)" stroke-width=".4"/>';
-s+=tx(bkx,476,'BW 12kA','var(--g)',5,'middle');
+s+=tx(bkx,476,(DH?('BW '+(DH.buswayA/1000)+'kA'):'BW 6.3kA'),'var(--g)',5,'middle');
 
 // RPP + Racks
 s+=tx(ax,492,'11\u00D7 RPP 800A','var(--r)',5,'middle');
 s+=tx(bkx,492,'11\u00D7 RPP 800A','var(--g)',5,'middle');
 s+='<rect x="'+(dx+20)+'" y="500" width="'+(dhW-40)+'" height="22" rx="3" fill="rgba(34,197,94,.04)" stroke="rgba(34,197,94,.15)" stroke-width=".3"/>';
-s+=tx(cx,514,'22 Racks Dual-Corded','var(--g)',5,'middle',1);
+s+=tx(cx,514,(DH?(DH.racksPerHall+' Racks Dual-Corded'):'54 Racks Dual-Corded'),'var(--g)',5,'middle',1);
 
 // ATS+GenSet indicator (static, no animation)
 s+=tx(cx,537,'ATS \u21CC GenSet Pool','var(--r)',5,'middle');
 s+=tx(cx,550,'No STS \u2014 Dual-corded','var(--t3)',5,'middle');
 
 // Live IT load
-s+='<text x="'+cx+'" y="567" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" font-weight="600" class="lv" id="eOvIT'+(d+1)+'">7,128 kW</text>';
+s+='<text x="'+cx+'" y="567" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" font-weight="600" class="lv" id="eOvIT'+(d+1)+'">'+(DH?DH.itHallFmt:'3,564')+' kW</text>';
 
 // Click hint
 s+=tx(cx,650,'\u25B6 Click for detail','var(--c)',5,'middle');
@@ -2723,7 +2904,7 @@ s+='<text x="'+(155+gs*155)+'" y="1062" fill="var(--g)" font-family="'+J+'" font
 // Facility Summary
 s+='<rect x="50" y="1080" width="950" height="40" rx="5" fill="rgba(245,158,11,.05)" stroke="rgba(245,158,11,.2)" stroke-width=".5"/>';
 s+=tx(525,1098,'FACILITY POWER SUMMARY','var(--o)',6,'middle',1);
-s+='<text x="525" y="1113" fill="var(--g)" font-family="'+J+'" font-size="5.5" text-anchor="middle" font-weight="600" class="lv" id="eLive">IT: 28.5 MW | Facility: 31.8 MW | PUE: 1.12 | Grid: 940A per feed | 4 DH Online</text>';
+s+='<text x="525" y="1113" fill="var(--o)" font-family="'+J+'" font-size="5.5" text-anchor="middle" font-weight="600" class="lv" id="eLive">'+(DH?('IT: '+DH.itFacilityMW+' MW | Facility: '+DH.facTotalMW+' MW | PUE: '+DH.pue.toFixed(2)+' (derived; basis: cooling '+DH.pb_cooling+'+UPS/dist '+DH.pb_upsDist+'+aux '+DH.pb_aux+' kW) | 4 DH Online'):'IT: 14.26 MW | Facility: 18.55 MW | PUE: 1.30 (derived) | 4 DH Online')+'</text>';
 
 // ======== SPEC PANEL (1020-1195, y=240-1120) ========
 s+='<rect x="1020" y="235" width="175" height="890" rx="5" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>';
@@ -2736,20 +2917,20 @@ var ovSpec=[
 ['',0,'GenSet at LV via ATS (standby)'],
 ['',0,''],
 ['var(--o)',0,'TRANSFORMERS'],
-['',0,'8\u00D7 ABB RESIBLOC 10MVA'],
+['',0,(DH?('8\u00D7 cast-resin TX '+DH.txRatingMVA+'MVA'):'8\u00D7 cast-resin TX 5MVA')],
 ['',0,'Cast-resin dry Dyn11'],
 ['',0,'20/0.4kV | Zk=6%'],
 ['',0,'2 per DH (Feed A + Feed B)'],
 ['',0,''],
 ['var(--r)',0,'GENERATORS'],
-['',0,'6\u00D7 Cat 3516E 8MW V16'],
+['',0,(DH?(DH.gensetFacNplus1+'\u00D7 Cat 3516E '+DH.gensetMW+'MW'):'8\u00D7 Cat 3516E 2.75MW')],
 ['',0,'N+1: 5 running+1 standby'],
-['',0,'Total: 48MW capacity'],
+['',0,(DH?('Total: '+(DH.gensetFacNplus1*DH.gensetMW).toFixed(1)+'MW capacity'):'Total: 22.0MW capacity')],
 ['',0,'ASCO 7000 ATS controller'],
 ['',0,'Auto-start <10s'],
 ['',0,''],
 ['var(--g)',0,'UPS SYSTEM'],
-['',0,'8\u00D7 Vertiv EXL S1 8MW'],
+['',0,(DH?('8\u00D7 modular UPS '+DH.upsRatingMW+'MW'):'8\u00D7 modular UPS 4.5MW')],
 ['',0,'VFI-SS-111 double-conv'],
 ['',0,'Modular 8\u00D71MW per frame'],
 ['',0,'8\u00D7 Li-Ion NMC 1,333 kWh'],
@@ -2757,17 +2938,17 @@ var ovSpec=[
 ['',0,'No STS (dual-corded)'],
 ['',0,''],
 ['var(--o)',0,'DISTRIBUTION'],
-['',0,'8\u00D7 Busway 12,000A Cu'],
+['',0,(DH?('8\u00D7 Busway '+DH.buswayAFmt+'A Cu'):'8\u00D7 Busway 6,300A Cu')],
 ['',0,'88\u00D7 RPP 800A MCCB'],
 ['',0,'Dual-corded rack PSU'],
 ['',0,'400V\u219250VDC \u03B7>97%'],
 ['',0,''],
 ['var(--g)',0,'LOAD SUMMARY'],
-['',0,'IT: 28,512 kW (4\u00D77,128)'],
+['',0,(DH?('IT: '+(DH.itHall*DH.halls).toLocaleString()+' kW ('+DH.halls+'\u00D7'+DH.itHallFmt+')'):'IT: 14,256 kW (4\u00D73,564)')],
 ['',0,'CDU: 440 kW (UPS-fed)'],
 ['',0,'NC: 695 kW | Cool: 5,660 kW'],
 ['',0,'Total: ~31,800 kW'],
-['',0,'PUE: 1.12 design target'],
+['',0,(DH?('PUE: '+DH.pue.toFixed(2)+' derived (band '+DH.pueBandMin+'-'+DH.pueBandMax+')'):'PUE: 1.30 derived')],
 ['',0,'Grid: 940A per 20kV feed']
 ];
 var osy=250;
@@ -2793,9 +2974,9 @@ var ep=$('ep-dh0'+n);if(ep)ep.classList.add('on');
 // Overview cards
 $('elecOvCards').innerHTML=[
 mc('var(--o)','MV Customer Substation','SM6 24kV Dual Feed',[['Central','SM6 24kV gas-insulated 11 panels'],['Incomers','VCB-INC-A/B: 630A/25kA (PLN A+B)'],['Bus Tie','VCB-TIE: 20kV/630A N.O. motorized'],['Feeders','8\u00D7 VCB (4 from Bus A + 4 from Bus B)'],['Per-DH RMU','RM6 3-panel (A VCB + Tie + B VCB)'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['Standard','IEC 62271 / SNI 0225']]),
-mc('var(--o)','Transformers','8\u00D7 ABB RESIBLOC 10MVA',[['Rating','10,000 kVA per unit (2 per DH)'],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA secondary'],['Cooling','AN/AF (forced at 80% load)'],['Tap','\u00B12.5%\u00D72 OCTC'],['ACBs','6300A/100kA ABB Emax2 E6.2'],['Total','80MVA facility capacity']]),
-mc('var(--r)','Generator Pool','6\u00D7 Cat 3516E 8MW N+1',[['Units','6\u00D7 8,000 kW V16 diesel (N+1)'],['Engine','Caterpillar 3516E at 400V LV'],['ATS','CB-Normal + CB-Emergency at MSB'],['Controller','ASCO 7000 auto-paralleling'],['Start','Auto <10s on utility fail'],['Capacity','5 running = 40MW for 31.8MW load'],['Fuel','48hr base tank + day tanks'],['Maintenance','250hr oil | 1000hr major']]),
-mc('var(--g)','UPS System','8\u00D7 Vertiv EXL S1 8MW',[['Rating','8,000 kW per unit (2 per DH)'],['Type','VFI-SS-111 double-conversion'],['Modules','8\u00D71MW modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['THDi/THDv','<3% / <1%'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['Standard','IEC 62040-3']]),
+mc('var(--o)','Transformers',(DH?('8\u00D7 cast-resin '+DH.txRatingMVA+'MVA'):'8\u00D7 cast-resin 5MVA'),[['Rating',(DH?(DH.txRatingMVA+',000 kVA per unit (2 per DH)'):'5,000 kVA per unit (2 per DH)')],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA secondary'],['Loading',(DH?(DH.txLoadPct.toFixed(1)+'% at '+DH.itHallFmt+' kW/hall'):'74.3% at 3,564 kW/hall')],['Tap','\u00B12.5%\u00D72 OCTC'],['ACBs',(DH?(DH.buswayAFmt+'A/100kA ABB Emax2 E6.2'):'6300A/100kA ABB Emax2 E6.2')],['Basis','Scenario A locked (BASELINE-DECISION.md)']]),
+mc('var(--r)','Generator Pool',(DH?(DH.gensetFacNplus1+'\u00D7 Cat 3516E '+DH.gensetMW+'MW N+1'):'8\u00D7 Cat 3516E 2.75MW N+1'),[['Units',(DH?(DH.gensetFacNplus1+'\u00D7 '+DH.gensetKW.toLocaleString()+' kW diesel (N+1)'):'8\u00D7 2,750 kW diesel (N+1)')],['Engine','Caterpillar 3516E (2,500-2,750 ekW @60Hz)'],['ATS','CB-Normal + CB-Emergency at MSB'],['Controller','ASCO 7000 auto-paralleling'],['Start','Auto <10s on utility fail'],['Capacity',(DH?(DH.gensetFacN+' running = '+(DH.gensetFacN*DH.gensetMW).toFixed(2)+'MW for '+DH.facTotalMW+'MW facility'):'7 running = 19.25MW for 18.55MW facility')],['Fuel','48hr base tank + day tanks'],['Maintenance','250hr oil | 1000hr major']]),
+mc('var(--g)','UPS System',(DH?('8\u00D7 modular UPS '+DH.upsRatingMW+'MW'):'8\u00D7 modular UPS 4.5MW'),[['Rating',(DH?(DH.upsRatingKW.toLocaleString()+' kW per unit (2 per DH, 2N)'):'4,500 kW per unit (2 per DH, 2N)')],['Type','VFI-SS-111 double-conversion'],['Loading',(DH?(DH.upsLoadPct.toFixed(1)+'% at '+DH.itHallFmt+' kW/hall'):'79.2% at 3,564 kW/hall')],['Modules','modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['THDi/THDv','<3% / <1%'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['Standard','IEC 62040-3']]),
 mc('var(--c)','Non-Critical','DB-NC: 695 kW Total',[['AHU 1+2','2\u00D7150kW Carrier 39HQ'],['VRV','4\u00D725kW Daikin VRV IV'],['Lighting','80kW LED DALI'],['Fire','30kW FACP + Novec'],['Security','20kW CCTV+Access'],['BMS','40kW EcoStruxure'],['Elevators','60kW (2\u00D730kW)'],['WTP','50kW treatment']]),
 mc('var(--b)','Cooling Loads','DB-COOL: 5,660 kW Total',[['Chillers','8\u00D7590kW(e) Carrier 19DV (4MW cooling ea)'],['CW Pumps','4\u00D775kW Grundfos NB'],['DC Fans','8\u00D745kW BAC Trillium'],['FWS Pumps','3\u00D755kW VFD'],['CDU Pumps','110kW/hall (UPS-fed)'],['Note','CDU pumps UPS-backed for critical cooling']]),
 mc('var(--c)','Metering & SCADA','Power Monitoring',[['Branch','Schneider PM5xxx Modbus TCP'],['Params','V/I/kW/kWh/kVAr/PF/THD'],['Polling','1-second to BMS'],['Protocol','IEC 61850 + Modbus TCP'],['PUE','Real-time facility/IT calc'],['Dashboard','Web + mobile push alerts']])
@@ -2810,7 +2991,7 @@ var FL=['Floor 2','Floor 2','Floor 3','Floor 3'];
 function drawDH(n,cId,suId,cardsId){
 var el=$(cId);if(!el)return;
 var su=$(suId);
-if(su)su.textContent='PLN 20kV \u2192 MV Customer Substation (SM6 Bus A/B + Tie) \u2192 RMU-'+n+' (RM6 3-Panel + Bus Tie) \u2192 2\u00D7TX 10MVA \u2192 MSB-'+n+'A/B 6300A \u2192 ATS (CB-N + CB-E) \u21CC GenSet Pool \u2192 UPS 8MW \u2192 BW 12kA \u2192 11\u00D7RPP 800A \u2192 22 Racks Dual-Corded | '+DH[n-1]+' '+FL[n-1]+' | v5';
+if(su)su.textContent='PLN 20kV \u2192 MV Customer Substation (SM6 Bus A/B + Tie) \u2192 RMU-'+n+' (RM6 3-Panel + Bus Tie) \u2192 2\u00D7TX '+(DHE?DHE.txRatingMVA:5)+'MVA \u2192 MSB-'+n+'A/B '+(DHE?DHE.buswayAFmt:'6,300')+'A \u2192 ATS (CB-N + CB-E) \u21CC GenSet Pool \u2192 UPS '+(DHE?DHE.upsRatingMW:4.5)+'MW \u2192 BW '+(DHE?(DHE.buswayA/1000):6.3)+'kA \u2192 '+(DHE?DHE.racksPerHall:54)+' Racks Dual-Corded | '+DH[n-1]+' '+FL[n-1]+' | v5';
 var s='';
 var W=1200,H=2400;
 // Section header
@@ -2864,7 +3045,7 @@ s+='<rect width="'+W+'" height="'+H+'" fill="url(#elDH'+n+'G)"/>';
 
 // Title
 s+='<rect x="0" y="0" width="'+W+'" height="28" fill="rgba(245,158,11,.06)"/>';
-s+=tx(500,19,DH[n-1]+' ELECTRICAL SLD v5 \u2014 '+FL[n-1]+' \u2014 7,128 kW IT \u2014 TRUE 2N \u2014 FEED A (RED) / FEED B (GREEN)','var(--o)',8,'middle',1);
+s+=tx(500,19,DH[n-1]+' ELECTRICAL SLD v5 \u2014 '+FL[n-1]+' \u2014 '+(DHE?DHE.itHallFmt:'3,564')+' kW IT \u2014 TRUE 2N \u2014 FEED A (RED) / FEED B (GREEN)','var(--o)',8,'middle',1);
 
 // Color legend (top-left)
 s+='<rect x="50" y="4" width="8" height="8" rx="1" fill="rgba(239,68,68,.2)" stroke="var(--r)" stroke-width=".5"/>';
@@ -2964,13 +3145,13 @@ s+=connector(BX,L1+90,L2+20,CG,'fD');
 
 // ==== L2: TRANSFORMERS ====
 s+='<g data-sld-click="tx" data-dh="'+n+'">';
-s+=sH(L2,'L2: TRANSFORMERS \u2014 2\u00D7 ABB RESIBLOC 10MVA \u2014 Cast-Resin Dry Dyn11','var(--o)');
+s+=sH(L2,'L2: TRANSFORMERS \u2014 2\u00D7 cast-resin '+(DHE?DHE.txRatingMVA:5)+'MVA \u2014 Dyn11 (load '+(DHE?DHE.txLoadPct.toFixed(0):74)+'%)','var(--o)');
 
 // TX-nA — RED
 s+=fLine(AX,L2+20,AX,L2+32,CA,'fD',.5,1.5);
-s+='<g data-tip="TX-'+n+'A: ABB RESIBLOC 10MVA cast-resin dry, 20kV\u21920.4kV, Dyn11, Zk=6%, '+DH[n-1]+' Feed A">';
+s+='<g data-tip="TX-'+n+'A: cast-resin '+(DHE?DHE.txRatingMVA:5)+'MVA, 20kV\u21920.4kV, Dyn11, Zk=6%, load '+(DHE?DHE.txLoadPct.toFixed(1):74.3)+'%, '+DH[n-1]+' Feed A">';
 s+=symTX(AX,L2+44,CA);
-s+=tx(AX+30,L2+38,'TX-'+n+'A 10MVA',CA,5.5,0,1);
+s+=tx(AX+30,L2+38,'TX-'+n+'A '+(DHE?DHE.txRatingMVA:5)+'MVA',CA,5.5,0,1);
 s+=tx(AX+30,L2+48,'Dyn11 20/0.4kV Zk=6%','var(--t3)',4.5);
 s+='</g>';
 s+=fLine(AX,L2+58,AX,L2+68,CA,'fD',.5,1.5);
@@ -2990,9 +3171,9 @@ s+=tx((GXA+AX)/2,L2+69,'ATS','var(--r)',5,'middle',1);
 
 // TX-nB — GREEN
 s+=fLine(BX,L2+20,BX,L2+32,CG,'fD',.5,1.5);
-s+='<g data-tip="TX-'+n+'B: ABB RESIBLOC 10MVA cast-resin dry, 20kV\u21920.4kV, Dyn11, Zk=6%, '+DH[n-1]+' Feed B">';
+s+='<g data-tip="TX-'+n+'B: cast-resin '+(DHE?DHE.txRatingMVA:5)+'MVA, 20kV\u21920.4kV, Dyn11, Zk=6%, load '+(DHE?DHE.txLoadPct.toFixed(1):74.3)+'%, '+DH[n-1]+' Feed B">';
 s+=symTX(BX,L2+44,CG);
-s+=tx(BX-30,L2+38,'TX-'+n+'B 10MVA',CG,5.5,'end',1);
+s+=tx(BX-30,L2+38,'TX-'+n+'B '+(DHE?DHE.txRatingMVA:5)+'MVA',CG,5.5,'end',1);
 s+=tx(BX-30,L2+48,'Dyn11 20/0.4kV Zk=6%','var(--t3)',4.5,'end');
 s+='</g>';
 s+=fLine(BX,L2+58,BX,L2+68,CG,'fD',.5,1.5);
@@ -3060,15 +3241,15 @@ s+=connector(AX,ofy+30,L5+20,CA,'fD');
 s+=connector(BX,ofy+30,L5+20,CG,'fD');
 
 // ==== L5: UPS + BATTERY ====
-s+=sH(L5,'L5: UPS \u2014 2\u00D7 Vertiv EXL S1 8MW \u2014 VFI-SS-111 Double-Conv','var(--g)');
+s+=sH(L5,'L5: UPS \u2014 2\u00D7 modular '+(DHE?DHE.upsRatingMW:4.5)+'MW (2N) \u2014 VFI-SS-111 (load '+(DHE?DHE.upsLoadPct.toFixed(0):79)+'%)','var(--g)');
 
 // UPS-nA — RED path (separate clickable group)
 s+='<g data-sld-click="ups-a" data-dh="'+n+'">';
 s+=fLine(AX,L5+20,AX,L5+35,CA,'fD',.5,1.5);
-s+='<g data-tip="UPS-'+n+'A: Vertiv EXL S1 8MW, modular 8\u00D71MW, VFI-SS-111, '+DH[n-1]+' Feed A">';
+s+='<g data-tip="UPS-'+n+'A: modular '+(DHE?DHE.upsRatingMW:4.5)+'MW 2N, VFI-SS-111, load '+(DHE?DHE.upsLoadPct.toFixed(1):79.2)+'%, '+DH[n-1]+' Feed A">';
 s+=bx(AX-80,L5+37,160,50,CA);
 s+=symUPS(AX,L5+52,CA);
-s+=tx(AX+30,L5+48,'UPS-'+n+'A 8MW',CA,5.5,0,1);
+s+=tx(AX+30,L5+48,'UPS-'+n+'A '+(DHE?DHE.upsRatingMW:4.5)+'MW',CA,5.5,0,1);
 s+=tx(AX+30,L5+58,'8\u00D71MW VFI-SS-111','var(--t3)',4.5);
 s+='<text x="'+AX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'A">5,420 kW | 68% | \u03B796.2%</text>';
 s+='</g>';
@@ -3087,10 +3268,10 @@ s+='</g>';
 // UPS-nB — GREEN path (separate clickable group)
 s+='<g data-sld-click="ups-b" data-dh="'+n+'">';
 s+=fLine(BX,L5+20,BX,L5+35,CG,'fD',.5,1.5);
-s+='<g data-tip="UPS-'+n+'B: Vertiv EXL S1 8MW, modular 8\u00D71MW, VFI-SS-111, '+DH[n-1]+' Feed B">';
+s+='<g data-tip="UPS-'+n+'B: modular '+(DHE?DHE.upsRatingMW:4.5)+'MW 2N, VFI-SS-111, load '+(DHE?DHE.upsLoadPct.toFixed(1):79.2)+'%, '+DH[n-1]+' Feed B">';
 s+=bx(BX-80,L5+37,160,50,CG);
 s+=symUPS(BX,L5+52,CG);
-s+=tx(BX-30,L5+48,'UPS-'+n+'B 8MW',CG,5.5,'end',1);
+s+=tx(BX-30,L5+48,'UPS-'+n+'B '+(DHE?DHE.upsRatingMW:4.5)+'MW',CG,5.5,'end',1);
 s+=tx(BX-30,L5+58,'8\u00D71MW VFI-SS-111','var(--t3)',4.5,'end');
 s+='<text x="'+BX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'B">5,380 kW | 67% | \u03B796.1%</text>';
 s+='</g>';
@@ -3114,17 +3295,17 @@ s+=connector(BX,L5+125,L6+20,CG,'fD');
 
 // ==== L6: BUSWAY + RPP ====
 s+='<g data-sld-click="busway" data-dh="'+n+'">';
-s+=sH(L6,'L6: BUSWAY \u2014 2\u00D7 Schneider Canalis KTA 12,000A Cu \u2014 11\u00D7 RPP 800A Tap-Off','var(--o)');
+s+=sH(L6,'L6: BUSWAY \u2014 2\u00D7 Canalis KTA '+(DHE?DHE.buswayAFmt:'6,300')+'A Cu \u2014 11\u00D7 RPP 800A Tap-Off','var(--o)');
 
 // Busway A — RED stroke/tint
 s+=fLine(AX,L6+20,AX,L6+35,CA,'fD',.5,1.5);
-s+=tx(AX,L6+30,'BW-'+n+'A 12kA Cu',CA,5,'middle',1);
+s+=tx(AX,L6+30,'BW-'+n+'A '+(DHE?(DHE.buswayA/1000):6.3)+'kA Cu',CA,5,'middle',1);
 s+='<rect x="'+(AX-10)+'" y="'+(L6+38)+'" width="20" height="440" rx="3" fill="rgba(239,68,68,.05)" stroke="'+CA+'" stroke-width=".8"/>';
 s+='<text x="'+AX+'" y="'+(L6+52)+'" fill="var(--g)" font-family="'+J+'" font-size="4.5" text-anchor="middle" class="lv" id="eBw'+n+'A">398V|5,200A|65%</text>';
 
 // Busway B — GREEN stroke/tint
 s+=fLine(BX,L6+20,BX,L6+35,CG,'fD',.5,1.5);
-s+=tx(BX,L6+30,'BW-'+n+'B 12kA Cu',CG,5,'middle',1);
+s+=tx(BX,L6+30,'BW-'+n+'B '+(DHE?(DHE.buswayA/1000):6.3)+'kA Cu',CG,5,'middle',1);
 s+='<rect x="'+(BX-10)+'" y="'+(L6+38)+'" width="20" height="440" rx="3" fill="rgba(34,197,94,.05)" stroke="'+CG+'" stroke-width=".8"/>';
 s+='<text x="'+BX+'" y="'+(L6+52)+'" fill="var(--g)" font-family="'+J+'" font-size="4.5" text-anchor="middle" class="lv" id="eBw'+n+'B">399V|5,100A|64%</text>';
 
@@ -3163,7 +3344,7 @@ s+=bx(80,L7+24,840,90,'var(--b)');
 s+=tx(500,L7+38,'22 RACKS \u2014 DUAL-CORDED PSU','var(--b)',6,'middle',1);
 s+=tx(500,L7+52,'2\u00D7 OCP ORV3 PSU | 400V 3\u03C6 \u2192 50VDC | \u03B7 >97%','var(--t2)',5,'middle');
 s+=tx(500,L7+66,'50VDC Bus 4,000A Cu | Fuse per tray | VRM \u2192 GPU/CPU/NVSwitch','var(--t2)',5,'middle');
-s+=tx(500,L7+80,'Per rack ~325 kW IT | '+DH[n-1]+': 22 racks = 7,128 kW','var(--g)',5,'middle',1);
+s+=tx(500,L7+80,(DHE?('Per rack ~'+DHE.kwPerRack+' kW IT | '+DH[n-1]+': '+DHE.racksPerHall+' racks = '+DHE.itHallFmt+' kW'):'Per rack ~66 kW IT | '+DH[n-1]+': 54 racks = 3,564 kW'),'var(--g)',5,'middle',1);
 
 // CDU pump (UPS-backed)
 s+=bx(80,L7+120,840,25,'var(--c)');
@@ -3255,7 +3436,7 @@ s+='<text x="630" y="'+kby+'" fill="var(--g)" font-family="'+J+'" font-size="4.5
 // DH Summary
 s+='<rect x="50" y="'+(L10+160)+'" width="880" height="28" rx="4" fill="rgba(245,158,11,.05)" stroke="rgba(245,158,11,.2)" stroke-width=".5"/>';
 s+=tx(490,L10+175,DH[n-1]+' POWER SUMMARY','var(--o)',5.5,'middle',1);
-s+='<text x="490" y="'+(L10+186)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" font-weight="600" class="lv" id="eDH'+n+'Live">IT: 7,128 kW | UPS: 7,238 kW | Total: ~8,500 kW | PUE: 1.12</text>';
+s+='<text x="490" y="'+(L10+186)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" font-weight="600" class="lv" id="eDH'+n+'Live">'+(DHE?('IT: '+DHE.itHallFmt+' kW | non-IT: '+DHE.pb_nonIT+' kW | Total: '+DHE.pb_facilityFmt+' kW | PUE: '+DHE.pue.toFixed(2)+' (derived; cooling '+DHE.pb_cooling+'+UPS/dist '+DHE.pb_upsDist+'+aux '+DHE.pb_aux+' kW)'):'IT: 3,564 kW | Total: ~4,638 kW | PUE: 1.30 (derived)')+'</text>';
 
 // ==== SPEC PANEL (right sidebar) ====
 s+='<rect x="1020" y="'+(L1-5)+'" width="175" height="'+(L10+195-L1+5)+'" rx="5" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>';
@@ -3274,33 +3455,33 @@ var dhSpec=[
 ['',0,''],
 [DEAD,0,'STANDBY (GRAY)'],
 ['',0,'ATS: CB-Emergency OPEN'],
-['',0,'GenSet Pool: 6\u00D78MW N+1 standby'],
+['',0,(DHE?('GenSet Pool: Cat 3516E '+DHE.gensetMW+'MW N+1 standby'):'GenSet Pool: Cat 3516E 2.75MW N+1 standby')],
 ['',0,'Connects at LV 400V via ATS'],
 ['',0,'Gray dashed = no power flow'],
 ['',0,''],
 ['var(--o)',0,'TRANSFORMERS'],
-['',0,'TX-'+n+'A/B: 10MVA ea'],
+['',0,'TX-'+n+'A/B: '+(DHE?DHE.txRatingMVA:5)+'MVA ea ('+(DHE?DHE.txLoadPct.toFixed(0):74)+'%)'],
 ['',0,'ABB RESIBLOC cast-resin'],
 ['',0,'Dyn11 | 20/0.4kV | Zk=6%'],
 ['',0,'ACBs: 6300A/100kA Emax2'],
 ['',0,''],
 ['var(--g)',0,'UPS + BATTERY'],
-['',0,'UPS-'+n+'A/B: 8MW each'],
+['',0,'UPS-'+n+'A/B: '+(DHE?DHE.upsRatingMW:4.5)+'MW each ('+(DHE?DHE.upsLoadPct.toFixed(0):79)+'%)'],
 ['',0,'Vertiv EXL S1 modular'],
 ['',0,'VFI-SS-111 | \u03B7>96%'],
 ['',0,'BAT: 1,333 kWh NMC 10min'],
 ['',0,'No STS (dual-corded)'],
 ['',0,''],
 ['var(--o)',0,'DISTRIBUTION'],
-['',0,'BW-'+n+'A/B: 12,000A Cu'],
+['',0,'BW-'+n+'A/B: '+(DHE?DHE.buswayAFmt:'6,300')+'A Cu'],
 ['',0,'RPP: 11\u00D7800A per busway'],
 ['',0,'MCCB NSX800 | 400V | 36kA'],
 ['',0,''],
 ['var(--b)',0,'RACK POWER'],
-['',0,'22 racks dual-corded'],
+['',0,(DHE?(DHE.racksPerHall+' racks dual-corded'):'54 racks dual-corded')],
 ['',0,'2\u00D7 OCP ORV3 PSU/rack'],
 ['',0,'400V\u219250VDC | \u03B7>97%'],
-['',0,'~325 kW IT per rack']
+['',0,(DHE?('~'+DHE.kwPerRack+' kW IT per rack'):'~66 kW IT per rack')]
 ];
 var dsy=L1+10;
 for(var dsi=0;dsi<dhSpec.length;dsi++){
@@ -3322,11 +3503,11 @@ if(cEl){
 cEl.innerHTML=[
 mc(CA,'MV Customer Sub.','SM6 24kV Dual Feed',[['PLN Sources','Dual 20kV feed A(RED)+B(GREEN)'],['Incomers','VCB-INC-A/B: 630A/25kA vacuum'],['Bus Tie','VCB-TIE: 20kV/630A N.O. motorized'],['Feeders','F'+n+'A(RED)/B(GREEN) to RMU-'+n],['Protection','IDMT OC 50/51, E/F 50N/51N']]),
 mc('var(--o)','RMU-'+n+' (RM6)','3-Panel with Bus Tie',[['Feed A','VCB-RMU-'+n+'A: 20kV/630A (RED)'],['Bus Tie','VCB-TIE-RMU: N.O. (purple)'],['Feed B','VCB-RMU-'+n+'B: 20kV/630A (GREEN)'],['Type','RM6 24kV SF6-free 3-panel'],['Metering','CT 200/5A cl0.5 per feed']]),
-mc('var(--o)','Transformers','2x ABB RESIBLOC 10MVA',[['TX-'+n+'A','10MVA Feed A (RED) | ACB 6300A'],['TX-'+n+'B','10MVA Feed B (GREEN) | ACB 6300A'],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA sec.'],['Cooling','AN/AF (forced at 80%)']]),
+mc('var(--o)','Transformers',(DHE?'2x cast-resin '+DHE.txRatingMVA+'MVA':'2x cast-resin 5MVA'),[['TX-'+n+'A',(DHE?DHE.txRatingMVA+'MVA Feed A (RED) | ACB '+DHE.buswayAFmt+'A':'5MVA Feed A (RED) | ACB 6300A')],['TX-'+n+'B',(DHE?DHE.txRatingMVA+'MVA Feed B (GREEN) | ACB '+DHE.buswayAFmt+'A':'5MVA Feed B (GREEN) | ACB 6300A')],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6% | Ik=14.4kA sec.'],['Cooling','AN/AF (forced at 80%)']]),
 mc('var(--g)','LV Distribution','MSB 6300A + All CBs',[['MSB-'+n+'A','RED tint | 6300A Form 4b'],['MSB-'+n+'B','GREEN tint | 6300A Form 4b'],['LV Tie','ACB-TIE-LV: N.O. (purple)'],['UPS Feed','ACB-UPS: 4000A/65kA per path'],['NC/Cool','MCCB-NC 800A + MCCB-COOL 1250A']]),
-mc('var(--r)','ATS + GenSet','Dual Incomer to MSB',[['ACB-'+n+'A/B','TX incomer CLOSED (normal)'],['ACB-GEN-'+n+'A/B','GenSet incomer OPEN (standby)'],['ATS Interlock','Dashed line between ACBs'],['Controller','ASCO 7000 <10s auto-transfer'],['GenSet Pool','6\u00D78MW Cat 3516E N+1 standby']]),
-mc('var(--g)','UPS System','2x Vertiv EXL S1 8MW',[['UPS-'+n+'A','RED path 8MW'],['UPS-'+n+'B','GREEN path 8MW'],['Battery','2x 1,333 kWh NMC 10min'],['Output ACB','4000A/65kA per path'],['STS','NOT REQUIRED (dual-corded)']]),
-mc('var(--o)','Busway + RPP','2x 12,000A Cu Overhead',[['BW-'+n+'A','RED stroke/tint 12kA'],['BW-'+n+'B','GREEN stroke/tint 12kA'],['RPP/busway','11x 800A MCCB NSX800'],['Tap-offs','A=RED leftward | B=GREEN rightward'],['Rack PSU','2x OCP ORV3 400V\u219250VDC']])
+mc('var(--r)','ATS + GenSet','Dual Incomer to MSB',[['ACB-'+n+'A/B','TX incomer CLOSED (normal)'],['ACB-GEN-'+n+'A/B','GenSet incomer OPEN (standby)'],['ATS Interlock','Dashed line between ACBs'],['Controller','ASCO 7000 <10s auto-transfer'],['GenSet Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7'+DHE.gensetMW+'MW Cat 3516E N+1 standby'):'8\u00D72.75MW Cat 3516E N+1 standby')]]),
+mc('var(--g)','UPS System',(DHE?'2x modular UPS '+DHE.upsRatingMW+'MW (2N)':'2x modular UPS 4.5MW (2N)'),[['UPS-'+n+'A',(DHE?'RED path '+DHE.upsRatingMW+'MW @ '+DHE.upsLoadPct.toFixed(0)+'%':'RED path 4.5MW @ 79%')],['UPS-'+n+'B',(DHE?'GREEN path '+DHE.upsRatingMW+'MW @ '+DHE.upsLoadPct.toFixed(0)+'%':'GREEN path 4.5MW @ 79%')],['Battery','2x 1,333 kWh NMC 10min'],['Output ACB','4000A/65kA per path'],['STS','NOT REQUIRED (dual-corded)']]),
+mc('var(--o)','Busway + RPP',(DHE?('2x '+DHE.buswayAFmt+'A Cu Overhead'):'2x 6,300A Cu Overhead'),[['BW-'+n+'A',(DHE?('RED stroke/tint '+(DHE.buswayA/1000)+'kA'):'RED stroke/tint 6.3kA')],['BW-'+n+'B',(DHE?('GREEN stroke/tint '+(DHE.buswayA/1000)+'kA'):'GREEN stroke/tint 6.3kA')],['RPP/busway','11x 800A MCCB NSX800'],['Tap-offs','A=RED leftward | B=GREEN rightward'],['Rack PSU','2x OCP ORV3 400V\u219250VDC']])
 ].join('');
 }
 }
@@ -3346,18 +3527,18 @@ var m1=$('eMSB'+i+'A');if(m1)m1.textContent=mAv;
 var m2=$('eMSB'+i+'B');if(m2)m2.textContent=mBv;
 var m3=$('eMSB'+i+'Ak');if(m3)m3.textContent=mAv;
 var m4=$('eMSB'+i+'Bk');if(m4)m4.textContent=mBv;
-var m5=$('eOvMSB'+i+'Ak');if(m5)m5.textContent=RI(396,400)+'V | '+RI(4800,5400)+'A';
-var m6=$('eOvMSB'+i+'Bk');if(m6)m6.textContent=RI(396,400)+'V | '+RI(4700,5300)+'A';
+var m5=$('eOvMSB'+i+'Ak');if(m5)m5.textContent=RI(396,400)+'V | '+(DHE?Math.round(DHE.reqCurrentA+RI(-30,30)):5359)+'A';
+var m6=$('eOvMSB'+i+'Bk');if(m6)m6.textContent=RI(396,400)+'V | '+(DHE?Math.round(DHE.reqCurrentA+RI(-30,30)):5359)+'A';
 
 // UPS values
-var uAv=RI(5200,5600)+' kW | '+RI(65,70)+'% | \u03B7'+R(96.0,96.5)+'%';
-var uBv=RI(5100,5500)+' kW | '+RI(64,69)+'% | \u03B7'+R(96.0,96.4)+'%';
+var uAv=(DHE?Math.round(DHE.itHall+RI(-25,25)):5400)+' kW | '+(DHE?(DHE.upsLoadPct+(Math.random()*1.2-0.6)).toFixed(0):67)+'% | \u03B7'+R(96.0,96.5)+'%';
+var uBv=(DHE?Math.round(DHE.itHall+RI(-25,25)):5400)+' kW | '+(DHE?(DHE.upsLoadPct+(Math.random()*1.2-0.6)).toFixed(0):67)+'% | \u03B7'+R(96.0,96.4)+'%';
 var u1=$('eUPS'+i+'A');if(u1)u1.textContent=uAv;
 var u2=$('eUPS'+i+'B');if(u2)u2.textContent=uBv;
 var u3=$('eUPS'+i+'Ak');if(u3)u3.textContent=uAv;
 var u4=$('eUPS'+i+'Bk');if(u4)u4.textContent=uBv;
-var u5=$('eOvUPS'+i+'Ak');if(u5)u5.textContent=RI(5200,5600)+' kW | '+RI(65,70)+'%';
-var u6=$('eOvUPS'+i+'Bk');if(u6)u6.textContent=RI(5100,5500)+' kW | '+RI(64,69)+'%';
+var u5=$('eOvUPS'+i+'Ak');if(u5)u5.textContent=(DHE?Math.round(DHE.itHall+RI(-25,25)):5400)+' kW | '+(DHE?(DHE.upsLoadPct+(Math.random()*1.2-0.6)).toFixed(0):67)+'%';
+var u6=$('eOvUPS'+i+'Bk');if(u6)u6.textContent=(DHE?Math.round(DHE.itHall+RI(-25,25)):5400)+' kW | '+(DHE?(DHE.upsLoadPct+(Math.random()*1.2-0.6)).toFixed(0):67)+'%';
 
 // Battery SOC
 var bAv='SOC '+RI(94,100)+'%';
@@ -4331,7 +4512,7 @@ var eb=$('vr-angB');if(eb)eb.textContent=R(-1.8,-2.6)+'°'})}
 function renderTx(dh){
 var H=520;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
-s+=tx2(W/2,18,'TRANSFORMER TX-'+dh+'A/B — ABB RESIBLOC 10MVA — Dyn11 20/0.4kV','var(--o)',8,'middle',1);
+s+=tx2(W/2,18,(DHE?('TRANSFORMER TX-'+dh+'A/B — cast-resin '+DHE.txRatingMVA+'MVA — Dyn11 20/0.4kV (load '+DHE.txLoadPct.toFixed(0)+'%)'):'TRANSFORMER TX-'+dh+'A/B — cast-resin 5MVA — Dyn11 20/0.4kV'),'var(--o)',8,'middle',1);
 s+=lfLegend(5,25);
 // TX-A (left) — Idea 49: bx3 beveled panel box
 s+=bx3(40,35,400,280,CA);s+=tx2(240,52,'TX-'+dh+'A — FEED A',CA,6,'middle',1);
@@ -4346,7 +4527,7 @@ s+=lfAnnot(195,80,R(8200,9400),R(1800,2400),RI(240,280),CA);
 s+=flowArrow(155,80,155,95,'P='+R(8.0,9.2)+'MW',CA,'sldArrowR');
 // Transformer symbol (large) — Idea 16: IEC enlarged TX symbol
 s+=symTXe(160,131,CA);s+=symEarth(160,155,CA);
-s+=tx2(200,130,'Dyn11',CA,5,0,1);s+=tx2(200,142,'Zk=6%','var(--t3)',4);s+=tx2(200,154,'10MVA','var(--o)',4.5,0,1);
+s+=tx2(200,130,'Dyn11',CA,5,0,1);s+=tx2(200,142,'Zk=6%','var(--t3)',4);s+=tx2(200,154,(DHE?(DHE.txRatingMVA+'MVA'):'5MVA'),'var(--o)',4.5,0,1);
 // Idea 3: Transformer loss breakdown TX-A
 s+=txLoss(230,115,R(7,9),R(58,66),R(65,75));
 // OCTC Tap Changer
@@ -4395,7 +4576,7 @@ s+=lfAnnot(715,80,R(8100,9300),R(1700,2300),RI(238,278),CG);
 s+=flowArrow(685,80,685,95,'P='+R(7.9,9.1)+'MW',CG,'sldArrow');
 // Transformer symbol TX-B — Idea 16: IEC enlarged TX symbol
 s+=symTXe(680,131,CG);s+=symEarth(680,155,CG);
-s+=tx2(720,130,'Dyn11',CG,5,0,1);s+=tx2(720,142,'Zk=6%','var(--t3)',4);s+=tx2(720,154,'10MVA','var(--o)',4.5,0,1);
+s+=tx2(720,130,'Dyn11',CG,5,0,1);s+=tx2(720,142,'Zk=6%','var(--t3)',4);s+=tx2(720,154,(DHE?(DHE.txRatingMVA+'MVA'):'5MVA'),'var(--o)',4.5,0,1);
 // Idea 3: Transformer loss breakdown TX-B
 s+=txLoss(590,115,R(6.8,8.8),R(57,65),R(64,74));
 s+=bx2(800,108,60,35,'var(--o)');s+=tx2(830,122,'OCTC','var(--o)',4,'middle',1);s+=tx2(830,133,'±2.5%×2','var(--t3)',3.5,'middle');
@@ -4431,7 +4612,7 @@ s+=flowParticle(680,168,240,1.5,CG);
 // GenSet + ATS
 s+=sectionSep(330,'GENSET / BACKUP');
 s+=bx2(200,340,520,80,'rgba(107,114,128,.4)');s+=tx2(460,355,'GENSET POOL + ATS','var(--t3)',5,'middle',1);
-s+=symGen(300,385,'rgba(107,114,128,.5)');s+=tx2(300,405,'6×8MW Cat 3516E','var(--t3)',4,'middle');
+s+=symGen(300,385,'rgba(107,114,128,.5)');s+=tx2(300,405,(DHE?(DHE.gensetFacNplus1+'×'+DHE.gensetMW+'MW Cat 3516E'):'8×2.75MW Cat 3516E'),'var(--t3)',4,'middle');
 s+=tx2(460,375,'ATS: ASCO 7000 <10s auto-transfer','var(--t3)',4,'middle');
 s+=tx2(460,390,'CB-Emergency OPEN (standby)','var(--t3)',4,'middle');
 s+=tx2(460,405,'Connects at LV 400V via ATS interlock','var(--t3)',4,'middle');
@@ -4631,7 +4812,7 @@ s+='<g id="alm-msbB" style="display:none">'+alarmIcon(820,160,'OVERLOAD')+'</g>'
 
 svg.innerHTML=s;
 startTimer(function(){
-[['msb-va',function(){return RI(396,400)+'V | '+RI(4800,5400)+'A | PF '+R(.96,.99)}],['msb-vb',function(){return RI(396,400)+'V | '+RI(4700,5300)+'A | PF '+R(.96,.99)}],['msb-thda',function(){return'THD: '+R(2.0,4.0)+'%'}],['msb-thdb',function(){return'THD: '+R(2.0,4.0)+'%'}],['msb-gen',function(){return Math.random()>.95?'RUNNING':'STANDBY'}],['msb-tie',function(){return'OPEN'}],['msb-kw',function(){return RI(5200,5600)+' kW'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+[['msb-va',function(){return RI(396,400)+'V | '+(DHE?Math.round(DHE.reqCurrentA+RI(-30,30)):5359)+'A | PF '+R(.96,.99)}],['msb-vb',function(){return RI(396,400)+'V | '+(DHE?Math.round(DHE.reqCurrentA+RI(-30,30)):5359)+'A | PF '+R(.96,.99)}],['msb-thda',function(){return'THD: '+R(2.0,4.0)+'%'}],['msb-thdb',function(){return'THD: '+R(2.0,4.0)+'%'}],['msb-gen',function(){return Math.random()>.95?'RUNNING':'STANDBY'}],['msb-tie',function(){return'OPEN'}],['msb-kw',function(){return (DHE?Math.round(DHE.itHall+RI(-25,25)):3564)+' kW'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 for(var i=0;i<3;i++){var e;
 e=$('msb-l'+i+'a');if(e)e.textContent=RI(228,232)+' V';
 e=$('msb-i'+i+'a');if(e)e.textContent=RI(1600,1800)+' A';
@@ -4871,7 +5052,7 @@ s+=lv('ug-eff'+sfx,rx+162,320,R(96.0,96.5)+'%','var(--c)',4,'middle');
 s+=tx2(rx+162,328,'\u03B7','var(--t3)',3,'middle');
 
 // Tooltip zone for entire unit
-s+=tipZone(ux,30,uw,310,'<b>UPS-'+dh+label+' \u2014 Vertiv EXL S1</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>8 MW</span></div><div class=&quot;tt-row&quot;>Topology<span class=&quot;tt-val&quot;>VFI-SS-111 Double Conv</span></div><div class=&quot;tt-row&quot;>Modules<span class=&quot;tt-val&quot;>8 x 1MW</span></div><div class=&quot;tt-row&quot;>Battery<span class=&quot;tt-val&quot;>NMC LiFePO4 1333kWh</span></div><div class=&quot;tt-row&quot;>Breakers<span class=&quot;tt-val&quot;>Q1-Q5 (Q4=Battery)</span></div>',label);
+s+=tipZone(ux,30,uw,310,'<b>UPS-'+dh+label+' \u2014 Vertiv EXL S1</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>'+(DHE?DHE.upsRatingMW:4.5)+' MW</span></div><div class=&quot;tt-row&quot;>Topology<span class=&quot;tt-val&quot;>VFI-SS-111 Double Conv</span></div><div class=&quot;tt-row&quot;>Modules<span class=&quot;tt-val&quot;>8 x 1MW</span></div><div class=&quot;tt-row&quot;>Battery<span class=&quot;tt-val&quot;>NMC LiFePO4 1333kWh</span></div><div class=&quot;tt-row&quot;>Breakers<span class=&quot;tt-val&quot;>Q1-Q5 (Q4=Battery)</span></div>',label);
 // CB toggle zones
 s+=cbToggle(ux+58,90,'ups'+sfx+'-q3');
 s+=cbToggle(ux+245,185,'ups'+sfx+'-q1');
@@ -4888,8 +5069,8 @@ s+=bx2(20,360,880,60,'var(--o)');
 s+=tx2(460,375,'UPS SYSTEM SUMMARY \u2014 DH-0'+dh,'var(--o)',5.5,'middle',1);
 s+=lv('mu-dcva',100,395,RI(715,725)+' VDC','var(--o)',5);s+=tx2(100,407,'DC Bus A','var(--t3)',3.5);
 s+=lv('mu-dcvb',240,395,RI(714,724)+' VDC','var(--o)',5);s+=tx2(240,407,'DC Bus B','var(--t3)',3.5);
-s+=lv('mu-ldpa',380,395,RI(65,70)+'%','var(--g)',5);s+=tx2(380,407,'Load A','var(--t3)',3.5);
-s+=lv('mu-ldpb',520,395,RI(64,69)+'%','var(--g)',5);s+=tx2(520,407,'Load B','var(--t3)',3.5);
+s+=lv('mu-ldpa',380,395,(DHE?(DHE.upsLoadPct+(Math.random()*1.2-0.6)).toFixed(0):67)+'%','var(--g)',5);s+=tx2(380,407,'Load A','var(--t3)',3.5);
+s+=lv('mu-ldpb',520,395,(DHE?(DHE.upsLoadPct+(Math.random()*1.2-0.6)).toFixed(0):67)+'%','var(--g)',5);s+=tx2(520,407,'Load B','var(--t3)',3.5);
 s+=lv('mu-byp',660,395,'OFF','var(--g)',5);s+=tx2(660,407,'Bypass','var(--t3)',3.5);
 s+=lv('mu-efft',800,395,R(96.0,96.5)+'%','var(--c)',5);s+=tx2(800,407,'Avg \u03B7','var(--t3)',3.5);
 
@@ -4990,7 +5171,7 @@ s+='<text x="'+(lpx+80)+'" y="'+(lpy+13)+'" fill="var(--t2)" font-family="'+J+'"
 // UPS icon with unit color
 s+='<rect x="'+(lpx+55)+'" y="'+(lpy+28)+'" width="50" height="32" rx="3" fill="rgba(139,92,246,.08)" stroke="'+uc+'" stroke-width=".6"/>';
 s+='<text x="'+(lpx+80)+'" y="'+(lpy+48)+'" fill="'+uc+'" font-family="'+J+'" font-size="9" text-anchor="middle" font-weight="700">UPS-'+u+'</text>';
-s+='<text x="'+(lpx+80)+'" y="'+(lpy+70)+'" fill="var(--t2)" font-family="'+J+'" font-size="5" text-anchor="middle">Vertiv EXL S1 8MW</text>';
+s+='<text x="'+(lpx+80)+'" y="'+(lpy+70)+'" fill="var(--t2)" font-family="'+J+'" font-size="5" text-anchor="middle">'+(DHE?('modular UPS '+DHE.upsRatingMW+'MW'):'modular UPS 4.5MW')+'</text>';
 // Load bar
 s+='<text x="'+(lpx+40)+'" y="'+(lpy+85)+'" fill="var(--t3)" font-family="'+J+'" font-size="5">Load</text>';
 var uLd=RI(ldBase[0],ldBase[1]);
@@ -5126,7 +5307,7 @@ e=$('bat-sm'+u+'3');if(e)e.textContent=RI(tBase[0],tBase[1])+'\u00B0C';
 function renderBusway(dh){
 var H=580;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
-s+=tx2(W/2,18,'BUSWAY + RPP — DH-0'+dh+' — 2× Schneider Canalis KTA 12,000A Cu','var(--o)',8,'middle',1);
+s+=tx2(W/2,18,(DHE?('BUSWAY + RPP — DH-0'+dh+' — 2× Canalis KTA '+DHE.buswayAFmt+'A Cu'):'BUSWAY + RPP — DH-0'+dh+' — 2× Canalis KTA 6,300A Cu'),'var(--o)',8,'middle',1);
 s+=lfLegend(5,25);
 // Busway cross-section
 s+=bx2(250,35,420,70,'var(--o)');s+=tx2(460,50,'BUSWAY CROSS-SECTION','var(--o)',5,'middle',1);
@@ -5136,7 +5317,7 @@ s+='<rect x="'+cx+'" y="60" width="30" height="20" rx="2" fill="rgba(245,158,11,
 s+=tx2(cx+15,74,conds[i].l,conds[i].c,4,'middle',1)}
 s+=tx2(460,95,'5-conductor Cu | IP55 | Fire-rated | Ventilated','var(--t3)',4,'middle');
 // Busway A trunk
-s+=bx2(40,115,180,420,CA);s+=tx2(130,130,'BW-'+dh+'A 12kA Cu',CA,5,'middle',1);
+s+=bx2(40,115,180,420,CA);s+=tx2(130,130,'BW-'+dh+'A '+(DHE?(DHE.buswayA/1000):6.3)+'kA Cu',CA,5,'middle',1);
 s+='<rect x="120" y="140" width="20" height="390" rx="2" fill="rgba(239,68,68,.05)" stroke="'+CA+'" stroke-width=".6"/>';
 // Idea 4: Voltage drop annotation along busway A trunk mid-height
 s+=vDropAnnot(155,300,'-'+R(1.0,2.5),'-'+R(0.3,0.6),CA);
@@ -5145,7 +5326,7 @@ s+=threePhaseV(130,140,390);
 // Idea 29: Voltage heat map strip along busway A trunk
 s+=busHeatStrip(112,140,390,'bhs-a');
 // Busway B trunk
-s+=bx2(700,115,180,420,CG);s+=tx2(790,130,'BW-'+dh+'B 12kA Cu',CG,5,'middle',1);
+s+=bx2(700,115,180,420,CG);s+=tx2(790,130,'BW-'+dh+'B '+(DHE?(DHE.buswayA/1000):6.3)+'kA Cu',CG,5,'middle',1);
 s+='<rect x="780" y="140" width="20" height="390" rx="2" fill="rgba(34,197,94,.05)" stroke="'+CG+'" stroke-width=".6"/>';
 // Idea 4: Voltage drop annotation along busway B trunk mid-height
 s+=vDropAnnot(700,300,'-'+R(1.0,2.5),'-'+R(0.3,0.6),CG);
@@ -5349,8 +5530,8 @@ s+=lv('mc-cdu2',800,475,R(44.0,46.0)+'°C','var(--o)',5);s+=tx2(800,485,'CDU Ret
 
 // DLC vs Air split
 s+=bx2(200,510,520,45,'var(--o)');s+=tx2(460,525,'HEAT REJECTION SPLIT','var(--o)',5,'middle',1);
-s+=tx2(300,545,'DLC 85%: 6,060 kW','var(--c)',4.5,'middle');
-s+=tx2(460,545,'Air 15%: 1,070 kW','var(--b)',4.5,'middle');
+s+=tx2(300,545,(DH?('DLC 85%: '+DH.liquidHeatFmt+' kW'):'DLC 85%: 3,029 kW'),'var(--c)',4.5,'middle');
+s+=tx2(460,545,(DH?('Air 15%: '+DH.airHeatFmt+' kW'):'Air 15%: 535 kW'),'var(--b)',4.5,'middle');
 s+=lv('mc-tot',640,545,RI(7050,7200)+' kW total','var(--g)',4.5,'middle');
 // Idea 37: Title block
 s+=titleBlock(W-260,H-48,250,'PID-COOL-'+dh,'A',dh);
@@ -5379,7 +5560,7 @@ s+=`<linearGradient id="supGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" s
 s+=`<linearGradient id="retGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(245,158,11,.7)"/><stop offset="100%" stop-color="rgba(239,68,68,.7)"/></linearGradient>`;
 // Heat shimmer filter for hot surfaces
 s+=`<filter id="shimmer" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="turbulence" baseFrequency="0.02 0.04" numOctaves="2" seed="2"><animate attributeName="baseFrequency" values="0.02 0.04;0.03 0.06;0.02 0.04" dur="3s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" scale="1.5"/></filter>`;
-s+=tx(480,16,'COOLING & PIPING P&ID — DLC 85% (6,060 kW) + AIR 15% (1,070 kW) = 7,130 kW PER HALL | 8\u00D7 4MW Chiller Plant','var(--t3)',8,'middle',1);
+s+=tx(480,16,(DH?('COOLING & PIPING P&ID \u2014 DLC 85% ('+DH.liquidHeatFmt+' kW) + AIR 15% ('+DH.airHeatFmt+' kW) = '+DH.itHallFmt+' kW PER HALL | Carrier 19DV Chiller Plant'):'COOLING & PIPING P&ID \u2014 DLC 85% (3,029 kW) + AIR 15% (535 kW) = 3,564 kW PER HALL | Carrier 19DV Chiller Plant'),'var(--t3)',8,'middle',1);
 // ===== HEADER STATUS STRIP — ASHRAE class + free-cooling state + ISA-5.1 tag legend =====
 // ASHRAE TC 9.9 thermal class label (W4 = facility-water inlet up to 27 °C)
 s+=`<rect x="700" y="6" width="80" height="16" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
@@ -5695,7 +5876,7 @@ const cduP=[
 ['FWS \u0394T','10.0°C','var(--g)','cduFWSdT'],['TCS \u0394T','9.7°C','var(--g)','cduTCSdT'],
 ['Heat Xfer','8,400 kW','var(--r)','cduHeatX'],['TCS Flow','9,600 LPM','var(--c)','cduTCSflow'],
 ['FWS Press','6.0 bar','var(--g)',''],['TCS Press','4.0 bar','var(--c)',''],
-['Active','23/24','var(--g)','cduActive'],['Eff (LMTD)','92%','var(--g)','cduEff']
+['Active',(DH?(DH.cduRunning+'/'+DH.cduInstalled):'9/12'),'var(--g)','cduActive'],['Eff (LMTD)','92%','var(--g)','cduEff']
 ];
 cduP.forEach((p,i)=>{
 const px=i%2===0?660:730,py=138+Math.floor(i/2)*13;
@@ -5759,7 +5940,7 @@ s+=tx(890,158,'\u2623 Leak Rope 800m','var(--g)',3,'middle');
 s+=`<rect x="835" y="160" width="105" height="65" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
 const tcsP=[
 ['\u0394T Rack','9.7\u00B0C','var(--c)','rackDT'],['Flow/rack','80 LPM','var(--c)',''],
-['Cold plates','72/rack','var(--g)',''],['Total flow','480 LPM','var(--c)','tcsTotFlow'],
+['Cold plates','72/rack','var(--g)',''],['Total flow',(DH?(DH.tcsFlowTotalFmt+' LPM'):'4,342 LPM'),'var(--c)','tcsTotFlow'],
 ['Racks','6/6','var(--g)','tcsRacks'],['Leak','OK','var(--g)','tcsLeak'],
 ['QD Type','SS316L BM','var(--t2)',''],['DI Cond','<5\u00B5S','var(--g)','']
 ];
@@ -5873,7 +6054,7 @@ s+=`<line x1="335" y1="240" x2="335" y2="228" stroke="var(--t3)" stroke-width=".
 // CRAH Branch (x=395)
 s+=`<rect x="395" y="240" width="80" height="48" rx="3" fill="rgba(59,130,246,.04)" stroke="var(--b)" stroke-width=".5" data-tip="CRAH Branch: 6\u00D7N+1 Computer Room Air Handlers, 1,070kW total (15% air cooling). FWS 12\u219218\u00B0C coil."/>`;
 s+=tx(435,254,'CRAH BRANCH','var(--b)',4,'middle',1);
-s+=tx(435,264,'6\u00D7N+1 = 1,070 kW','var(--b)',3.5,'middle');
+s+=tx(435,264,(DH?(DH.crahActive+' act = '+DH.airHeatFmt+' kW'):'5 act = 535 kW'),'var(--b)',3.5,'middle');
 s+=tx(435,274,'FWS 12\u219218\u00B0C','var(--t3)',3,'middle');
 s+=`<circle cx="468" cy="248" r="2" fill="var(--g)"><animate attributeName="opacity" values=".3;1;.3" dur="3s" repeatCount="indefinite"/></circle>`;
 s+=tx(435,282,'5 Run + 1 Stby','var(--g)',3,'middle');
@@ -5940,7 +6121,7 @@ pipeSpecs.forEach((sp,i)=>{if(i%2===0)s+=`<rect x="492" y="${PY+21+i*10}" width=
 s+=`<rect x="730" y="${PY}" width="220" height="175" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
 s+=tx(840,PY+14,'CRAH — AIR 15%','var(--b)',7,'middle',1);
 const crahSpecs=[
-['Purpose','NIC/SSD/DIMM/VRM 15%'],['Capacity','6× N+1 = 1,070 kW'],['Type','CW CRAH EC fan wall'],
+['Purpose','NIC/SSD/DIMM/VRM 15%'],['Capacity',(DH?(DH.crahActive+' active = '+DH.airHeatFmt+' kW ('+DH.crahPerUnit+' kW/unit)'):'5 active = 535 kW')],['Type','CW CRAH EC fan wall'],
 ['Coil Temp','FWS 12→18°C'],['Supply Air','25°C ASHRAE A1'],['Return Air','29-30°C HAC'],
 ['Containment','Hot aisle ceiling+door'],['Fan','EC axial VFD N+1'],['Filter','MERV 11 quarterly'],
 ['Pre-filter','MERV 8 monthly'],['Controls','BACnet PID loop'],['Failover','Auto lead-lag'],
@@ -5952,12 +6133,12 @@ const KY=480;
 s+=`<rect x="10" y="${KY}" width="940" height="55" rx="4" fill="rgba(34,197,94,.03)" stroke="rgba(34,197,94,.2)" stroke-width="1"/>`;
 s+=tx(480,KY+15,'COOLING SYSTEM LIVE KPIs','var(--g)',7,'middle',1);
 const coolKPIs=[
-{x:30,l:'DLC Load',v:'6,060',u:'kW',c:'var(--c)',id:'kDLC'},
-{x:100,l:'Air Load',v:'1,070',u:'kW',c:'var(--b)',id:'kAir'},
-{x:170,l:'Total',v:'7,130',u:'kW',c:'var(--g)',id:'kTot'},
+{x:30,l:'DLC Load',v:(DH?DH.liquidHeatFmt:'3,029'),u:'kW',c:'var(--c)',id:'kDLC'},
+{x:100,l:'Air Load',v:(DH?DH.airHeatFmt:'535'),u:'kW',c:'var(--b)',id:'kAir'},
+{x:170,l:'Total',v:(DH?DH.itHallFmt:'3,564'),u:'kW',c:'var(--g)',id:'kTot'},
 {x:240,l:'Chiller',v:'3/4',u:'run',c:'var(--g)',id:'kCH'},
 {x:310,l:'CDU',v:'23/24',u:'run',c:'var(--g)',id:'kCDU'},
-{x:370,l:'CRAH',v:'5/6',u:'run',c:'var(--g)',id:'kCRAH'},
+{x:370,l:'CRAH',v:(DH?(''+DH.crahActive):'5'),u:'act',c:'var(--g)',id:'kCRAH'},
 {x:430,l:'DC Fan',v:'78',u:'%',c:'var(--p)',id:'kDCF'},
 {x:500,l:'DC \u0394T',v:'6.1',u:'\u00B0C',c:'var(--c)',id:'kDCdT'},
 {x:560,l:'FWS \u0394T',v:'10.0',u:'\u00B0C',c:'var(--g)',id:'kFWSdT'},
@@ -6018,21 +6199,21 @@ s+=`<rect x="10" y="${EY}" width="460" height="130" rx="4" fill="var(--bg3)" str
 s+=tx(240,EY+14,'ENERGY SANKEY \u2014 COOLING CHAIN','var(--g)',7,'middle',1);
 // Sankey flow bars — width proportional to energy
 const skY=EY+26,skH=80;
-// IT Load: 7,130 kW input
+// IT Load: engine itHall (Scenario A 3,564 kW)
 s+=`<rect x="30" y="${skY}" width="20" height="${skH}" rx="2" fill="rgba(239,68,68,.2)" stroke="var(--r)" stroke-width=".5"/>`;
 s+=tx(40,skY-4,'IT Load','var(--r)',4,'middle');
-s+=tx(40,skY+skH+10,'7,130 kW','var(--r)',5,'middle',1);
-// DLC branch: 85% = 6,060 kW
+s+=tx(40,skY+skH+10,(DH?(DH.itHallFmt+' kW'):'3,564 kW'),'var(--r)',5,'middle',1);
+// DLC branch: 85% = engine liquidHeat (Scenario A 3,029 kW)
 const dlcH=Math.round(skH*.85);
 s+=`<path d="M50,${skY} L110,${skY} L110,${skY+dlcH} L50,${skY+dlcH}" fill="rgba(6,182,212,.12)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=tx(80,skY+dlcH/2+3,'85% DLC','var(--c)',4,'middle');
-// Air branch: 15% = 1,070 kW
+// Air branch: 15% = engine airHeat (Scenario A 535 kW)
 s+=`<path d="M50,${skY+dlcH} L110,${skY+dlcH} L110,${skY+skH} L50,${skY+skH}" fill="rgba(59,130,246,.12)" stroke="var(--b)" stroke-width=".4"/>`;
 s+=tx(80,skY+dlcH+(skH-dlcH)/2+3,'15% Air','var(--b)',3.5,'middle');
-// CDU heat exchange: 6,060 kW
+// CDU heat exchange: engine liquidHeat (Scenario A 3,029 kW)
 s+=`<path d="M110,${skY} L180,${skY+5} L180,${skY+dlcH-5} L110,${skY+dlcH}" fill="rgba(6,182,212,.08)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=tx(145,skY+dlcH/2+3,'CDU','var(--c)',4,'middle');
-s+=tx(145,skY+dlcH/2+11,'6,060','var(--c)',3.5,'middle');
+s+=tx(145,skY+dlcH/2+11,(DH?DH.liquidHeatFmt:'3,029'),'var(--c)',3.5,'middle');
 // FWS transport
 s+=`<path d="M180,${skY+5} L250,${skY+10} L250,${skY+dlcH-10} L180,${skY+dlcH-5}" fill="rgba(34,197,94,.08)" stroke="var(--g)" stroke-width=".4"/>`;
 s+=tx(215,skY+dlcH/2+3,'FWS','var(--g)',4,'middle');
@@ -6129,7 +6310,7 @@ const cTdT=$('cduTCSdT');if(cTdT)cTdT.textContent=tcsDT2.toFixed(1)+'\u00B0C';
 const fwsMs=500*1030/3600;// 500 m3/h x 1030 kg/m3 / 3600
 const cduQ=Math.round(fwsMs*3.85*fwsDT2);
 const cHX=$('cduHeatX');if(cHX)cHX.textContent=cduQ.toLocaleString()+' kW';
-const cTF=$('cduTCSflow');if(cTF)cTF.textContent=RI(9200,9800)+' LPM';
+const cTF=$('cduTCSflow');if(cTF)cTF.textContent=(DH?(Math.round(DH.tcsFlowTotal+RI(-20,20))).toLocaleString():RI(9200,9800))+' LPM';
 // CDU LMTD efficiency
 const dt1=parseFloat(tcsRetV)-parseFloat(fwsOutV),dt2=parseFloat(tcsSupV)-parseFloat(fwsInV);
 const lmtd2=(dt1-dt2)/(Math.log(dt1/dt2)||1);
@@ -6140,13 +6321,13 @@ const rs=$('rk'+ri+'S');if(rs)rs.textContent=R(34.8,35.3);
 const rr=$('rk'+ri+'R');if(rr)rr.textContent=R(44.2,45.3);
 }
 const rDT=$('rackDT');if(rDT)rDT.textContent=tcsDT2.toFixed(1)+'\u00B0C';
-const tTF=$('tcsTotFlow');if(tTF)tTF.textContent=RI(470,490)+' LPM';
+const tTF=$('tcsTotFlow');if(tTF)tTF.textContent=(DH?(Math.round(DH.tcsFlowTotal+RI(-20,20))).toLocaleString():RI(470,490))+' LPM';
 const fF=$('fwsFlow');if(fF)fF.textContent=RI(475,510)+' m\u00B3/h';
 // Return line sensors
 const rF=$('retFWS');if(rF)rF.textContent=fwsOutV+'\u00B0C';
 const rT=$('retTCS');if(rT)rT.textContent=tcsRetV+'\u00B0C';
 // KPI strip
-const dlcV=5900+RI(0,200);
+const dlcV=DH?Math.round(DH.liquidHeat+RI(-15,15)):5900+RI(0,200);
 const kDLC=$('kDLC');if(kDLC)kDLC.textContent=dlcV.toLocaleString();
 const kTCS=$('kTCSdT');if(kTCS)kTCS.textContent=R(9.2,10.2);
 const kDCdT=$('kDCdT');if(kDCdT)kDCdT.textContent=rng.toFixed(1);
@@ -6309,7 +6490,7 @@ const rP=[
 ['GPU TDP','1,000\u20131,200W per B200'],
 ['CPU TDP','~250W per Grace (capped)'],
 ['NVSwitch','~350W per NVS5 ASIC'],
-['Total','~66 kW (132 kW/NVL72)'],
+['Total',(DH?('~'+DH.kwPerRack+' kW/rack ('+DH.kwPerNVL72+' kW per NVL72 pair)'):'~66 kW/rack (132 kW per NVL72 pair)')],
 ['Monitor','V/I/kW per-shelf + BMC'],
 ]},
 ];
@@ -6331,16 +6512,16 @@ mc('var(--t2)','Physical Rack','Mechanical Specs',[['Standard','48U OCP Open Rac
 // COOLING CARDS
 $('coolCards').innerHTML=[
 mc('var(--g)','Water Treatment','Chemical & Filtration',[['FWS','Closed-loop: inhibitor + biocide'],['FWS glycol','30% PG (freeze protection)'],['TCS purity','DI <5\u00B5S/cm conductivity'],['TCS pH','7.0-9.0 range'],['Filtration','25\u00B5m inline per CDU'],['Side-stream','5\u00B5m bag filter FWS header'],['Monitoring','Inline cond + pH + ORP'],['Lab test','Monthly: pH, cond, bacteria, TSS'],['Blowdown','CT auto on conductivity SP'],['Make-up','RO + DI polisher for TCS']]),
-mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling','7,130 kW (DLC + air)'],['DLC capacity','6,060 kW (85%)'],['Air capacity','1,070 kW (15%)'],['PUE cooling','0.02-0.04 contribution'],['Approach \u0394T','3\u00B0C CDU (FWS\u2192TCS)'],['CW approach','7\u00B0C (CT to ambient WB)'],['Pump energy','~180 kW total (all pumps)'],['Fan energy','~80 kW total (CT + CRAH)'],['WUE target','<0.5 L/kWh'],['Availability','99.999% (N+1 all paths)']])
+mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',(DH?(DH.itHallFmt+' kW (DLC + air)'):'3,564 kW (DLC + air)')],['DLC capacity',(DH?(DH.liquidHeatFmt+' kW (85%)'):'3,029 kW (85%)')],['Air capacity',(DH?(DH.airHeatFmt+' kW (15%)'):'535 kW (15%)')],['PUE cooling','0.02-0.04 contribution'],['Approach \u0394T','3\u00B0C CDU (FWS\u2192TCS)'],['CW approach','7\u00B0C (CT to ambient WB)'],['Pump energy','~180 kW total (all pumps)'],['Fan energy','~80 kW total (CT + CRAH)'],['WUE target','<0.5 L/kWh'],['Availability','99.999% (N+1 all paths)']])
 ].join('');
 
 // ELECTRICAL CARDS
 $('elecCards').innerHTML=[
 mc('var(--o)','MV Switchgear','SM6 24kV + 4\u00D7 RM6 RMU (True 2N)',[['Central','Schneider SM6 24kV gas-insulated 11 panels'],['Incomers','2\u00D7 VCB-INC 630A/25kA (PLN A+B)'],['Bus Tie','1\u00D7 VCB-TIE N.O. (auto/manual)'],['Feeders','8\u00D7 VCB: 4 from Bus A + 4 from Bus B'],['Per-DH RMU','Schneider RM6 24kV 2-panel per DH'],['2N Path','Each DH receives independent A+B feeds'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['CT/VT','200/5A cl.0.5 + 20/0.1kV cl.0.5'],['Standard','IEC 62271 / SNI 0225']]),
-mc('var(--o)','Transformers','8\u00D7 ABB RESIBLOC 10MVA (2 per DH)',[['Rating','10,000 kVA per unit (2 per DH, 8 total)'],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary'],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)'],['ACBs','8\u00D7 6300A/100kA ABB Emax2 E6.2'],['Capacity','80MVA total (2N: each TX can carry full DH)'],['Per TX','~8,950 kVA | 12,900A @ 400V']]),
-mc('var(--r)','Generator Pool','6\u00D7 Cat 3516E 8MW V16 N+1',[['Units','6\u00D7 8,000 kW V16 diesel (N+1: 5+1)'],['Engine','Caterpillar 3516E at 11kV'],['Step-up TX','6\u00D7 11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling switchgear'],['Start','Auto <10s on MV bus undervoltage'],['Capacity','5 running = 40MW for ~31.8MW facility'],['Fuel','48hr base tank + 500L day tank per unit'],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major']]),
-mc('var(--g)','UPS System','8\u00D7 Vertiv EXL S1 8MW (2N)',[['Rating','8,000 kW per unit (2 per DH, 8 total)'],['Type','VFI-SS-111 double-conversion online'],['Modules','8\u00D71MW modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['THDi/THDv','<3% / <1% at rated load'],['Total UPS','64 MW capacity (8\u00D78MW)'],['Standard','IEC 62040-3 VFI-SS-111']]),
-mc('var(--o)','Distribution','8\u00D7 Busway 12,000A + 88\u00D7 RPP 800A',[['Busway','8\u00D7 Schneider Canalis KTA 12,000A Cu overhead'],['Per DH','2 busways (Feed A + Feed B)'],['RPP','11\u00D7 800A MCCB NSX800 tap-off per busway'],['Total RPP','88 units (22 per DH)'],['Rack PSU','2\u00D7 OCP ORV3 per rack (dual-corded)'],['Conversion','400V AC \u2192 50VDC | \u03B7>97%'],['Bus Bar','50VDC 4,000A Cu vertical in-rack'],['Whip','200A 400V flex conduit to rack']]),
+mc('var(--o)','Transformers',(DHE?('8\u00D7 cast-resin '+DHE.txRatingMVA+'MVA (2 per DH)'):'8\u00D7 cast-resin 5MVA (2 per DH)'),[['Rating',(DHE?(DHE.txRatingMVA+',000 kVA per unit (2 per DH, 8 total), '+DHE.txLoadPct.toFixed(0)+'% load'):'5,000 kVA per unit (2 per DH, 8 total)')],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary'],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)'],['ACBs','8\u00D7 6300A/100kA ABB Emax2 E6.2'],['Capacity','80MVA total (2N: each TX can carry full DH)'],['Per TX','~8,950 kVA | 12,900A @ 400V']]),
+mc('var(--r)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 Cat 3516E '+DHE.gensetMW+'MW N+1'):'8\u00D7 Cat 3516E 2.75MW N+1'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW diesel (N+1: '+DHE.gensetFacN+'+1)'):'8\u00D7 2,750 kW diesel (N+1: 7+1)')],['Engine','Caterpillar 3516E at 11kV'],['Step-up TX','6\u00D7 11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling switchgear'],['Start','Auto <10s on MV bus undervoltage'],['Capacity','5 running = 40MW for ~31.8MW facility'],['Fuel','48hr base tank + 500L day tank per unit'],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major']]),
+mc('var(--g)','UPS System',(DHE?('8\u00D7 modular UPS '+DHE.upsRatingMW+'MW (2N)'):'8\u00D7 modular UPS 4.5MW (2N)'),[['Rating',(DHE?(DHE.upsRatingKW.toLocaleString()+' kW per unit (2 per DH, 8 total), '+DHE.upsLoadPct.toFixed(0)+'% load'):'4,500 kW per unit (2 per DH, 8 total)')],['Type','VFI-SS-111 double-conversion online'],['Modules','8\u00D71MW modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['THDi/THDv','<3% / <1% at rated load'],['Total UPS','64 MW capacity (8\u00D78MW)'],['Standard','IEC 62040-3 VFI-SS-111']]),
+mc('var(--o)','Distribution',(DHE?('8\u00D7 Busway '+DHE.buswayAFmt+'A + 88\u00D7 RPP 800A'):'8\u00D7 Busway 6,300A + 88\u00D7 RPP 800A'),[['Busway',(DHE?('8\u00D7 Canalis KTA '+DHE.buswayAFmt+'A Cu overhead'):'8\u00D7 Canalis KTA 6,300A Cu overhead')],['Per DH','2 busways (Feed A + Feed B)'],['RPP','11\u00D7 800A MCCB NSX800 tap-off per busway'],['Total RPP','88 units (22 per DH)'],['Rack PSU','2\u00D7 OCP ORV3 per rack (dual-corded)'],['Conversion','400V AC \u2192 50VDC | \u03B7>97%'],['Bus Bar','50VDC 4,000A Cu vertical in-rack'],['Whip','200A 400V flex conduit to rack']]),
 mc('var(--c)','Non-Critical Loads','DB-NC: 695 kW Total',[['AHU 1+2','2\u00D7 Carrier 39HQ 150kW | CB 400A | PF 0.85'],['VRV','4\u00D7 Daikin VRV IV 25kW | CB 200A | PF 0.92'],['Lighting','LED 80kW | CB 200A | PF 0.95'],['Fire','FACP+Novec 30kW | CB 100A | PF 0.90'],['Security','CCTV+Access 20kW | CB 63A | PF 0.95'],['BMS/EPMS','Schneider EcoStruxure 40kW | CB 100A'],['Elevators','2\u00D730kW | CB 100A | PF 0.85'],['WTP','Water treatment 50kW | CB 160A | PF 0.92']]),
 mc('var(--b)','Cooling Loads','DB-COOL: 5,660 kW Total',[['Chillers','8\u00D7 Carrier 19DV 590kW(e) (4MW cooling) | CB 1200A | PF 0.90'],['CW Pumps','4\u00D7 Grundfos NB 75kW | CB 200A | PF 0.92'],['DC Fans','8\u00D7 BAC Trillium 45kW | CB 100A | PF 0.85'],['FWS Pumps','3\u00D7 VFD 55kW | CB 160A | PF 0.92'],['CDU Pumps','22\u00D75kW/hall = 110kW/hall (UPS-backed)'],['Total','~5,660 kW cooling electrical load'],['Note','CDU pumps UPS-fed for critical cooling continuity']]),
 mc('var(--c)','Metering & SCADA','Power Monitoring',[['Branch','Schneider PM5xxx (Modbus TCP)'],['Parameters','V/I/kW/kWh/kVAr/PF/THD per phase'],['Resolution','1-second polling to BMS'],['PUE calc','Real-time: Total facility / IT load'],['Busway','8\u00D7 busway per tap-off kW + thermal'],['UPS','SOC, SOH, load%, transfer events'],['GenSet','Run status, fuel, coolant T, oil P'],['Protocol','Modbus TCP + IEC 61850 to SCADA'],['Historian','1yr high-res + 5yr daily agg'],['Dashboard','Real-time web + mobile alerts']])

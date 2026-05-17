@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v1.20.0 — 2026-05-17 (datahallAI — central calc engine + page-wide bind, Stage 1/3–5 of 9)
+
+User: *"revisi yang major, datahallAI.html, kecuali yang DC dashboard …
+analisa dan sempurnakan"* — executing the owner's 24-doc spec at
+`Documents/screenshot bms rz/dc ai/review/`.
+
+### Added — single source-of-truth engine (Stage 1)
+- **`js/datahall-model.js`** — deep-frozen `window.DATAHALL_MODEL`: the LOCKED
+  basis-of-design (4 halls × 27 NVL72 × **132 kW/NVL72** → 3,564 kW IT/hall,
+  ~14.26 MW facility; 66 kW/NVL36-rack; 85% liquid capture; 35/45 °C TCS
+  ΔT10K; spec-corrected equipment — Cat 3516E ≤2.75 MW, not 8 MW). Every
+  constant carries a `// source:` citation. Exposes a Scenario-B variant for
+  UI labelling.
+- **`js/datahall-calculations.js`** — pure `window.DATAHALL_CALC`: every
+  `00-overview-audit.md` formula (PUE = Facility/IT, WUE, CUE, hydronic Q/flow,
+  3-phase current, battery, etc.); deterministic, no `Math.random`,
+  `pueBasis()` returns the 5-part breakdown.
+- **`tools/test-datahall-calc.mjs`** — Node `vm`-sandboxed; reproduces every
+  real `21-calculation-worked-examples.md` figure (Scenario A+B). **57/57
+  pass, exit 0.**
+
+### Changed — datahallAI.html bound to the engine (Stages 3–5)
+- Sidebar, Data Hall, Room Layout, Rack, Cooling/CDU/TCS/CRAH and
+  Electrical-SLD views now render engine-derived values — one consistent
+  model, no per-tab divergence, no `Math.random` feeding any basis-of-design
+  number. Engine loaded via plain `<script src>` (zero-build; never inlined).
+- Corrected per `17-basis-of-design-correction-table.md` /
+  `21-calculation-worked-examples.md`: IT/hall 7,128→**3,564 kW**; genset
+  "Cat 3516E 8 MW"→**2.75 MW**; UPS 8 MW→**4.5 MW @ 79.2%**; TX→**5 MVA @
+  74.3%**; busway 12 kA→**6,300 A**; DLC 6,060→**3,029 kW** / air
+  1,070→**535 kW**; CDU 5/6→**9/12 N+2**; racks 22→**54**, 132 kW/rack→**66
+  kW/rack** (NVL72/rack interpretation disambiguated). Copy per
+  `19-specific-copy-replacements.md`.
+- **PUE shown honestly**: the bottom-up derived value (**≈1.30** at nameplate
+  COP 6.8) **with its IT/cooling/UPS-dist/aux basis**, per doc-00 "PUE must
+  show basis" and doc-21 Ex9 — the vanity 1.08/1.12 is gone and was NOT
+  fudged to hit the 1.12–1.25 design band (that requires a
+  physically-justified economizer factor the spec does not quantify).
+- **DC dashboard tab deliberately untouched** per the owner's exclusion
+  (`#p-dash` / `updateDashKPI` / `dcCallouts` zones verified out of scope).
+- Verified: `audit-js-syntax --strict` CLEAN, engine test 57/57, headless
+  datahallAI 0 SyntaxError / 0 console errors, engine globals defined.
+
+### Remaining (Track 4, v1.20.x): colour/alarm semantics, modal rebuild,
+**SVG orthogonal line-routing accuracy** + **mobile responsiveness**,
+basis-of-design drawer (per `13`/`14`/`18`/`22`/`23`).
+
 ## v1.19.1 — 2026-05-17 (skip-link sr-only consistency + default DAY mode site-wide)
 
 User: *"ini kenapa ada link tulisan skip to main content. ini masih tidak
