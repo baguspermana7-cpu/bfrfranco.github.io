@@ -11,6 +11,71 @@ release sections rather than semver.
 
 ---
 
+## v1.19.0 — 2026-05-17 (EMERGENCY — site-wide JS syntax catastrophe repaired + credentials strip removed)
+
+User: *"masih aja ada calculator yang error … saya bilang cek audit total semua dan
+test semua. ini tidak bisa di pakai calculator dan fitur free dan pro juga no
+respond. cek semuanya"*, *"check all ALL calculator"*, *"login button no function
+no respond export pdf. waduh. ini semuanya pada error"*, *"rfs-readiness-workbench
+dan menunya pada error, no respond"*.
+
+### Fixed — CRITICAL (production was serving ~33 broken pages)
+- **Site-wide `SyntaxError: Invalid or unexpected token` on 33 pages** — 4 calculators
+  (`tco`, `roi`, `pue`, `carbon-footprint`), ~23 articles (`article-2..27`),
+  `FF-1/2/3`, `geopolitics-3`, `dc-market-tracker`, `rfs-readiness-workbench`. A single
+  syntax error voids the **entire** `<script>`, so the calculator engine, free/pro
+  buttons, login, Export PDF and nav menus were all dead.
+- **Root cause (git-confirmed):** three marker-gated patch tools
+  (`5ac5fe3` v1.5.0 "article typography uplift", `1906426` legal "Cookie Consent
+  Banner", `a1e0abb`/`f460741` v1.8.x "mobile responsive patch") each matched a
+  `</style>` / `</body></html>` that was actually *inside a JS string literal* in a
+  PDF/print builder and spliced raw CSS/HTML there, clobbering the string's closing
+  tail → unterminated string literal. The newer articles (`article-20..27`) carried
+  **three stacked injections** in one builder.
+- **Repair:** every restored line is taken **verbatim from git history** (the exact
+  pre-injection `-` line of the qualifying hunk). 27 pages repaired by the new
+  idempotent `tools/fix-css-in-js-injection.py` (dry-run + per-block `node --check`
+  self-verify, auto-reverts rather than half-fix); the 6 triple-stacked articles
+  repaired by a git-exact region-collapse. **0 heuristic guesses.**
+- **Verification:** `tools/audit-js-syntax.py --strict` CLEAN (103 files); browser
+  ground-truth (`tools/probe-all-pageerrors.mjs`) = 0 `SyntaxError` on all 33; all 9
+  calc probes `pageErrors:0`, `handlersMissing:[]`, `proUnlock:true`.
+
+### Changed — mobile CSS moved to the correct place
+- The reverted injections had been *falsely* satisfying
+  `tools/audit-mobile-responsive.py` because that grep counted the dead CSS
+  that lived **inside the JS strings** (never rendered). After the revert,
+  the 33 pages legitimately needed the mobile-responsive CSS in a real
+  `<head><style>`. New **`tools/inject-mobile-responsive.py`** adds one
+  idempotent canonical `<style id="rz-mobile-v18">` block before the
+  document's first (structural) `</head>` — satisfying every checkpoint
+  (media-768, body overflow-x, img max-width, nav/footer collapse, v1.8.0
+  marker, 44 px tap targets) where it actually applies. All 33 now score
+  ≥7/10; `audit-mobile-responsive.py --strict` PASS.
+
+### Added — durable regression gate
+- **`tools/audit-js-syntax.py`** — `node --check`s every executable inline `<script>`
+  (skips JSON-LD / importmap / speculationrules / templates; excludes the generated
+  `changelog.html`). This catches the unterminated-string class that
+  `audit-script-tags.py` structurally cannot. Now a **mandatory pre-push gate**.
+- **`tools/fix-css-in-js-injection.py`**, **`tools/probe-all-pageerrors.mjs`** — the
+  git-verified repair tool and the browser-truth backstop probe.
+
+### Removed
+- **`.rz-cred-band`** — the static "CERTIFICATIONS · STANDARDS · OUTCOMES" credentials
+  strip below the bento hero on `index.html`. This was the v1.18.5 lean-editorial
+  replacement for the older `.rz-marquee`; the user now wants no credentials strip at
+  all between the bento grid and the career timeline.
+  - Removed the `<div class="rz-cred-band">` markup block from `index.html`
+    (label + 12 credential items).
+  - Removed the full `.rz-cred-band` / `.rz-cred-label` / `.rz-cred-track` /
+    `.rz-cred-item` rule group (incl. light-theme + ≤768px overrides) from
+    `styles-index.css`; re-minified to `styles-index.min.css`
+    (`?v=2026-05-17-v1` cache-bust bump).
+  - `styles.css` confirmed clean (the band was index-only per the 2-stylesheet
+    architecture — never duplicated there).
+  - Stale `/* v1.18.5 … */` inline comment in `index.html` `<style>` updated.
+
 ## v1.18.14 — 2026-05-14 (spares — 5-Year Spend Projection tab, Phase 3 of 3)
 
 ### Added (Spares Readiness Calculator)

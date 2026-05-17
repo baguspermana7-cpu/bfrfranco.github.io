@@ -36,6 +36,7 @@ window.RZ_VERSION_CODENAME = 'Pixel Rise';
 **Audit before push**:
 ```bash
 python3 tools/audit-script-tags.py --strict        # </script> in JS strings
+python3 tools/audit-js-syntax.py --strict          # unterminated strings / CSS-in-JS (v1.19.0)
 python3 tools/audit-version-stamp.py --strict      # version stamp on all pages
 python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD

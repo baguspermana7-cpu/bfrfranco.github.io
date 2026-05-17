@@ -216,6 +216,35 @@ correctly skipped.
 
 ---
 
+## CRITICAL LESSON — never let a patch tool splice CSS by tag-matching (v1.19.0, 2026-05-17)
+
+The v1.5.0 / v1.8.x mobile + typography patch tools located their injection
+point by **string-matching `</style>` / `</head>` / `</body>`** in the raw
+HTML. On ~33 pages those tags also appear *inside a JS string literal* in a
+PDF/print builder (`html += '<style>…</style></head><body>'`). The tools
+spliced their multi-line CSS there, clobbering the string terminator →
+`SyntaxError: Invalid or unexpected token` → the **entire `<script>` died**
+(calculator engine, free/pro, login, Export PDF, menus). It went undetected
+because `audit-script-tags.py` only finds `</script>` in strings, and
+`audit-mobile-responsive.py` *counted the dead in-string CSS as a pass*.
+
+**Rules going forward**
+
+1. A CSS/HTML patch tool MUST insert into a real `<head><style>` (or linked
+   stylesheet), located by DOM/structure — never by a bare tag string match
+   that can land inside a JS string literal.
+2. The canonical mobile block ships via **`tools/inject-mobile-responsive.py`**
+   as one idempotent `<style id="rz-mobile-v18">` before the document's first
+   (structural) `</head>`. Re-run it (idempotent) instead of hand-editing.
+3. **`tools/audit-js-syntax.py --strict`** is now a mandatory pre-push gate
+   (it `node --check`s every executable inline `<script>`). A green
+   `audit-mobile-responsive` is meaningless if `audit-js-syntax` is red.
+4. Every restored line in a regression repair must come **verbatim from git
+   history** (`tools/fix-css-in-js-injection.py`), never a heuristic guess;
+   skip + flag for manual review rather than half-fix.
+
+---
+
 ## References
 
 - Apple Human Interface Guidelines (44pt tap target)
