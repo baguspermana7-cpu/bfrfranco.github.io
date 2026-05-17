@@ -11,6 +11,67 @@ release sections rather than semver.
 
 ---
 
+## v1.20.2 — 2026-05-17 (datahallAI — colour/alarm semantics + accessible modal)
+
+Track 4 Stage 6 + Stage 7 of the datahallAI revision (spec under
+`Documents/screenshot bms rz/dc ai/review/`). The DC dashboard tab
+(`#p-dash` / `updateDashKPI` / `dcCallouts`) and the calculation engine
+(`js/datahall-*.js`) are byte-identical vs prior HEAD (SHA-verified).
+
+### Changed — strict colour semantics (per `13-uiux-justification`, `00-overview-audit` P1)
+- **Red is now reserved for alarm / trip / fire / critical / leak / safety
+  only.** ~190 non-alarm red tokens recoloured to the correct doc-13
+  category:
+  - **Electrical Feed A / MV utility / PLN incomer / TX-A / MSB-A / busway /
+    generator / ATS** → **blue** (`CA` var + `bus()`/`hB()`/tint helpers +
+    SLD-mimic `sldArrowR`/`mvGrad` + room-layout genset room/G1-G6/ATS
+    boxes). doc-13: *"Electrical Feed A: blue, Not red"*. Legend/title copy
+    "FEED A (RED)" → "FEED A (BLUE)".
+  - **Cooling return / hot-aisle / condenser / HP-gas / IT-load heat /
+    ambient / fluid-in / return-air** (CDU, chiller, dry-cooler, CRAH,
+    In-Rack CDU HMIs + cooling P&ID + hot-aisle containment + `retGrad`/
+    `hotG`) → **amber/orange**. doc-13: *"Cooling return: orange/brown"*.
+  - **Arc-flash / PPE / protection-compliance** → **amber** (doc-13:
+    warning, not alarm). **Warning `!` marker / LINK-WARN** → amber.
+  - **North compass arrows / gate barriers / lightning-rod grid /
+    dimension-leader lines / power-loss labels / BMS-arch headers** →
+    **neutral gray** (decoration, not status).
+  - **Phase L1 conductor** → magenta (`--pk`); **`.vr` value class** →
+    neutral; **10 modal close buttons** → neutral + enlarged (doc-10).
+- Genuine red KEPT: fire/EPO/leak/smoke/heat-detector/suppression symbols,
+  PRV/PSV/relief-valve safety, severity-scale critical ends, alarm
+  thresholds — exactly the doc-13-sanctioned categories.
+
+### Added — alarm-first top strip (per `00-overview-audit` P1, `22-alarm-cause-effect-matrix`)
+- `DHAlarm`: a **rule-based** alarm model. Alarm STATE is the deterministic
+  result of doc-22 threshold rules (rack inlet >27/>30 °C, CDU margin
+  <15/<5 %, UPS load >80/>95 %, TCS ΔT >13/>15 K, stale points) evaluated
+  against engine-derived steady-state values + controlled sensor jitter —
+  never `Math.random` for alarm presence.
+- `STATE | Critical | Warning | Maintenance | Comms | Stale | Last update`
+  strip rendered on every in-scope page panel (8 tabs; **NOT** the excluded
+  DC dashboard). Normal state is quiet; CRITICAL pulses (honours
+  `prefers-reduced-motion`).
+
+### Added — one shared accessible modal controller (per `10-modal-accessibility-maintainability`)
+- `DHModal`: a single backdrop **scrim** + **focus trap** + **Escape close**
+  + **focus-return-to-trigger** + `role="dialog"` + `aria-modal="true"` +
+  `aria-labelledby`, decorating all 10 equipment/detail modals
+  (`cduHmi`/`rackModal`/`chHmi`/`ctHmiModal`/`eqHmi`/`irCduHmi`/`crahHmi`/
+  `corrHmi`/`batHmi`/`sldMimic`) via a `MutationObserver` on `.show` —
+  zero rewrites of per-modal render code, all data bindings preserved.
+- **Summary-first**: sticky header + injected per-modal alarm summary line
+  above the deep SVG body. SVG `<g>` triggers (un-focusable in Chrome)
+  degrade focus-return to the owning tab `<button>` so focus is never lost
+  to `<body>`.
+
+### Verified
+- `audit-js-syntax.py --strict` CLEAN · `audit-mobile-responsive.py
+  --strict` 104/0 · `test-datahall-calc.mjs` 57/57 · headless puppeteer
+  (1440 + 390 px) 0 pageerror/console-error, 0 horizontal overflow at
+  390 px, full modal a11y assertions PASS · DC-dashboard + engine
+  byte-identical vs HEAD (SHA match).
+
 ## v1.20.1 — 2026-05-17 (datahallAI — SVG line-routing accuracy + responsive)
 
 User: *"Accuracy gambar dan garis dan pastikan responsive. Ini yg selalu
