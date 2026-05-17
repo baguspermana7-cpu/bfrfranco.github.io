@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v1.20.1 — 2026-05-17 (datahallAI — SVG line-routing accuracy + responsive)
+
+User: *"Accuracy gambar dan garis dan pastikan responsive. Ini yg selalu
+fail"* — diagram/line-routing accuracy + true mobile responsiveness.
+
+### Fixed — diagram line-routing accuracy (per `14-line-routing-and-diagram-accuracy.md`)
+- **`netSvg`** (Network Fabric): spine→leaf (32) + domain→leaf (27) link
+  fans were crossing the SPINE/LEAF/DOMAIN band titles. Titles relocated to
+  link-free zones + given opaque P&ID label-mask rects so the bundled fan
+  terminates at the label edge (doc-14 §3/§6/rule-7). Live bindings
+  (`sp0bw`/`lf0bw`/`dom0nvl`) + `data-tip` preserved.
+- **`coolSvg`** (Cooling P&ID): dry-cooler fan/exhaust paths intruded into
+  the header band over the RUNNING / DRY COOLER ARRAY labels — units moved
+  down so equipment clears the section header (doc-14 §3/rule-4).
+- **`bldgSvg`** (isometric room/building): added opaque text-break chips
+  behind floating iso labels for scan-speed legibility (doc-14 §3 / doc-13 §4).
+
+### Fixed — diagram responsiveness
+- `preserveAspectRatio="xMidYMid meet"` added to all 21 diagram/HMI SVGs
+  that lacked it (23/24 now; the 1 remaining is a decorative chevron icon,
+  not a diagram). Every diagram scales uniformly inside its container.
+- Headless-verified desktop **1440px** and mobile **390px**: 0 `pageerror`,
+  0 console errors, **0 px horizontal overflow**, 0 visible SVG without a
+  `viewBox`, 0 line/text overlaps remaining (baseline had bldg×38, cool×2,
+  net×4).
+
+### Discipline
+- Conservative, spec-justified scope: full link-bundling deferred (would
+  risk live-update bindings) — title-clearing + quiet low-opacity fan is the
+  regression-safe doc-14-compliant fix. DC dashboard tab + `js/datahall-*.js`
+  byte-identical (verified). `audit-js-syntax`/`mobile-responsive` `--strict`
+  CLEAN; engine test 57/57.
+
 ## v1.20.0 — 2026-05-17 (datahallAI — central calc engine + page-wide bind, Stage 1/3–5 of 9)
 
 User: *"revisi yang major, datahallAI.html, kecuali yang DC dashboard …
