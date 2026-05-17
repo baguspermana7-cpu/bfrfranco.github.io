@@ -1573,9 +1573,27 @@ Every calc page MUST have `[data-theme="dark"]` overrides for at least:
 Reference: `tco-calculator.html` (49+ dark-mode rules, canonical pattern).
 
 Pages that have NO built-in theme toggle must add:
-1. Inline theme-init `<script>` after `rz-version.js` (reads `localStorage.getItem('theme')||'dark'`)
+1. Inline theme-init `<script>` after `rz-version.js`. **Default theme is
+   DAY/light (v1.19.1, 2026-05-17 — supersedes the 2026-04-04 dark-default
+   decision, per explicit user instruction "default day mode jangan dark
+   mode").** First visit, with no saved preference, MUST render light:
+   use `localStorage.getItem('theme')||'light'` (or the page's key, e.g.
+   `rz_theme`) — **never** `||'dark'` and **never** follow
+   `prefers-color-scheme` as the default. Only the user's explicit toggle
+   (persisted to localStorage) may select dark.
 2. A `.nav-theme-btn` button in the navbar calling `toggleCalcTheme()`
 3. A `toggleCalcTheme()` JS function in the main script block
+
+### Accessibility skip-link (canonical, v1.19.1)
+
+Every page carries `<a class="skip-link" href="#main-content">Skip to main
+content</a>` right after `<body>`, and its target element must have a single
+valid `id="main-content"`. The sr-only-until-focus CSS lives in
+`styles.css`/`styles-index.css`; pages that load **neither** global
+stylesheet MUST carry the canonical rule locally via
+`tools/inject-skiplink-style.py` (idempotent `<style id="rz-skiplink-v1">`,
+byte-identical to `styles.css`). Never ship a page-specific skip-link
+variant — one canonical pattern site-wide.
 
 Pre-merge checklist for new calc pages:
 1. Toggle dark mode in browser

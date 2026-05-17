@@ -11,6 +11,49 @@ release sections rather than semver.
 
 ---
 
+## v1.19.1 — 2026-05-17 (skip-link sr-only consistency + default DAY mode site-wide)
+
+User: *"ini kenapa ada link tulisan skip to main content. ini masih tidak
+konsisten"*, *"website ini buat defaultnya day mode jangan dark mode … saat
+buka pertama itu semua pagenya normal mode bukan dark mode"*, *"ingat di
+memory utk selalu tulis di changelog, standarization docs dll"*.
+
+### Fixed — skip-link rendered visible on 36 standalone pages
+- `tools/inject-skip-link.py` had added `<a class="skip-link">` to 101 pages,
+  but ~36 standalone pages (calculators, virtual labs, PLN grid, datahall,
+  workbench, dc-conventional, …) load **neither** `styles.css` nor
+  `styles-index.css`, so the link had no sr-only CSS and rendered as a plain
+  visible blue link top-left.
+- New **`tools/inject-skiplink-style.py`** injects ONE idempotent
+  `<style id="rz-skiplink-v1">` — **byte-identical to the canonical rule in
+  `styles.css`** (consistency is the point) — before each page's first
+  structural `</head>`. Browser-verified `getBoundingClientRect().bottom<=0`
+  (hidden) until focus on every spot-check.
+- `rfs-readiness-workbench.html`: removed a duplicate page-specific
+  `.rfs-skip-link` and fixed an invalid double `id` on `<main>`
+  (`id="rfsMain" id="main-content"` → `id="main-content"`) so the canonical
+  skip-link target resolves. Now consistent with every other page.
+
+### Changed — default theme is now DAY (light), not dark/OS
+- Flipped every *default-fallback* (never toggles or saved-theme apply) to
+  `'light'` across **35 files** + `script.js`: `script.js` `getPreferredTheme`
+  no longer follows `prefers-color-scheme`; inline FOUC scripts
+  (`getItem('theme')||'dark'`, `getItem('rz_theme')||'dark'`,
+  `}catch{…'dark'}`, `s||(prefersDark.matches?'dark':'light')`,
+  `return prefersDark.matches?'dark':'light'`), the 6 PLN-grid `bindTheme`
+  IIFE defaults, and the rfs OS-dark default. `script.min.js` rebuilt
+  (terser). Supersedes the 2026-04-04 "dark default" decision per explicit
+  user instruction.
+- Verified headless (cleared localStorage → first load): **light on all 12
+  representative pages** across every pattern; toggle + reload-persist pass
+  on 11/12. *Known minor pre-existing limitation:* `pln-java-grid.html`
+  (heavy Leaflet overview) saves `rz_theme` correctly but a page-specific
+  actor doesn't re-apply dark on reload — orthogonal to the day-mode default
+  (which works there); its 5 sibling PLN pages persist correctly.
+
+### Added
+- `tools/inject-skiplink-style.py` (canonical sr-only skip-link injector).
+
 ## v1.19.0 — 2026-05-17 (EMERGENCY — site-wide JS syntax catastrophe repaired + credentials strip removed)
 
 User: *"masih aja ada calculator yang error … saya bilang cek audit total semua dan

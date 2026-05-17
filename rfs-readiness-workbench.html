@@ -1027,12 +1027,14 @@ body {
   button, a.btn, [role="button"] { min-height: 44px; }
 }
 </style>
+<style id="rz-skiplink-v1">
+.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
+.skip-link:focus{top:0}
+[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-<!-- Skip to content -->
-<a href="#rfsMain" class="rfs-skip-link" style="position:absolute;top:-40px;left:0;background:var(--rfs-teal);color:#fff;padding:8px 16px;z-index:9999;font-size:0.85rem;transition:top 0.3s;"
-   onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Skip to main content</a>
 <!-- NAVBAR -->
 <nav class="rfs-navbar" id="rfsNavbar">
     <div class="rfs-nav-container">
@@ -1117,7 +1119,7 @@ body {
 <div class="rfs-breadcrumb" id="rfsBreadcrumb"><span onclick="RfsUI.switchTab('setup')">RFS Workbench</span><span class="sep">/</span><span>Setup</span></div>
 
 <!-- MAIN APP -->
-<main class="rfs-main" id="rfsMain" id="main-content">
+<main class="rfs-main" id="main-content">
 
 <!-- ══════════════════════════════════════════ -->
 <!-- SECTION: SETUP                            -->
@@ -6028,7 +6030,7 @@ function rfsHandleImportFile(e) {
 // ══════════════════════════════════════════
 (function initDarkMode() {
     var saved = localStorage.getItem('rfs_theme');
-    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme:dark)').matches)) {
+    if (saved === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
     }
     document.getElementById('rfsThemeToggle').addEventListener('click', function() {

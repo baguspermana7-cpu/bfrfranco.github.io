@@ -85,7 +85,7 @@ function initDarkMode() {
         if (savedTheme) {
             return savedTheme;
         }
-        return prefersDarkScheme.matches ? 'dark' : 'light';
+        return 'light';
     }
 
     // Apply theme
