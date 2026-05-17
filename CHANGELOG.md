@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.20.5 — 2026-05-17 (datahallAI — desktop diagram legibility)
+
+doc-00 "text too small for operator use" + doc-13 §4 typography minimum +
+doc-18 "Text readable at 100% zoom" / "Detail/spec panels are collapsible" /
+"Sidebar does not compete with main diagram".
+
+### Changed (datahallAI.html only)
+- **Collapsible desktop sidebar** (`@media(min-width:1025px)`, default open
+  so first paint is unchanged) — reclaims 180px so diagrams scale ~+14.5%
+  when collapsed (doc-18 sidebar/main-diagram).
+- **Collapsible per-diagram spec panels** — 10 `.gr` spec-card grids wrapped
+  in native `<details open>` (default open = non-regressive); operator can
+  collapse to give the diagram the viewport (doc-18 collapsible spec panels).
+- **Minimum legible font floor** — idempotent **desktop-only** (≥1025px)
+  post-render IIFE raises only sub-floor SVG `<text>` toward a per-diagram
+  tuned floor (x/y/geometry untouched, original cached in `data-fs0`,
+  strict mobile no-op). Applied to net/fire/bms/rack/elecOv/elecDH1-4 —
+  9 diagrams improved (net & fire median +~50%, e.g. fire 5.81→8.72 px).
+  **Deliberately NOT applied to hSvg/coolSvg/bldgSvg**: any lift there
+  introduced line/text overlap, so per the no-regression rule those keep
+  only the safe sidebar/spec-panel gains (honest trade-off, not a miss).
+- Verified independently: `audit-js-syntax`/`mobile-responsive --strict`
+  CLEAN; engine 57/57; desktop 1440 + mobile 390 → 0 pageerror/console,
+  0 px overflow, **mobile byte-no-op** (desktop text larger than mobile,
+  proving desktop-scoped); 0 overlap regression vs HEAD baseline; visually
+  confirmed (net/fire markedly more readable, cool unchanged); DC-dashboard
+  panel + `updateDashKPI` + `dcCallouts` + engine files BYTE-IDENTICAL.
+
 ## v1.20.4 — 2026-05-17 (datahallAI — legal notice no longer blocks operational area)
 
 From the owner's visual review + `18-qa-acceptance-criteria.md` ("Legal

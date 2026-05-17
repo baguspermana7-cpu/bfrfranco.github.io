@@ -84,6 +84,22 @@
 .rw{display:flex;justify-content:space-between;padding:2px 0;font-size:9px;line-height:1.4}.rw .l{color:var(--t3)}.rw .v{font-family:'JetBrains Mono';font-size:9px;font-weight:500}
 .vg{color:var(--g)}.vo{color:var(--o)}.vr{color:var(--t1)}/* v1.20.2 Stage 6: was alarm-red; non-alarm values use neutral, red reserved for alarms */.vc{color:var(--c)}.vb{color:var(--b)}.vp{color:var(--p)}
 .mn{flex:1;overflow:auto;padding:4px}.pn{display:none}.pn.on{display:block}
+/* v1.20.5 Lever A (doc-18 "Sidebar does not compete with main diagram"):
+   desktop-only collapsible sidebar so the main diagram reclaims 180px of
+   viewport width -> every width-bound SVG scales up uniformly (no geometry
+   change). Default state is uncollapsed -> #p-dash unchanged at load. The
+   collapse rule is gated >=1025px so it never interferes with the existing
+   <=1024px full-width sidebar stack (mobile rules untouched). */
+.dh-sidetog{display:none}
+@media(min-width:1025px){
+  .dh-sidetog{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:auto;padding:0;border:1px solid var(--bd2);border-radius:4px;background:var(--bg3);color:var(--t2);cursor:pointer;font-family:'JetBrains Mono';font-size:11px;line-height:1;flex:none}
+  .dh-sidetog:hover{color:var(--t1);background:var(--bg2)}
+  .wrap.side-collapsed .side{width:0;min-width:0;padding:0;border-right:0;overflow:hidden;opacity:0}
+  .wrap.side-collapsed .dh-sidereopen{display:flex}
+  .dh-sidereopen{display:none;position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:6;width:16px;height:54px;align-items:center;justify-content:center;border:1px solid var(--bd2);border-left:0;border-radius:0 6px 6px 0;background:var(--bg3);color:var(--t2);cursor:pointer;font-family:'JetBrains Mono';font-size:11px;writing-mode:vertical-rl}
+  .dh-sidereopen:hover{color:var(--t1);background:var(--bg2)}
+  .wrap{position:relative}
+}
 .svg-zw{position:relative}.svg-zi{overflow:auto;cursor:grab;max-height:calc(100vh - 160px)}
 .svg-zi:active{cursor:grabbing}
 .svg-zi svg{display:block}
@@ -103,6 +119,18 @@
 .k .kv{font-family:'JetBrains Mono';font-size:10px;font-weight:700;margin-top:0;line-height:1.2}
 .k .ks{font-size:8px;color:var(--t3)}
 .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:4px;margin-bottom:4px}
+/* v1.20.5 Lever B (doc-18 "Detail/spec panels are collapsible"): the dense
+   per-diagram spec/detail card grids are wrapped in a native <details>.
+   Default `open` keeps the current visual state (non-regressive) while
+   letting the operator collapse them so the diagram owns the viewport. */
+.dh-specwrap{margin-bottom:4px}
+.dh-specwrap>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono';font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding:3px 6px;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;user-select:none}
+.dh-specwrap>summary::-webkit-details-marker{display:none}
+.dh-specwrap>summary:hover{color:var(--t1)}
+.dh-specwrap>summary .dh-spec-cv{margin-left:auto;font-size:8px;color:var(--t3);transition:transform .15s}
+.dh-specwrap[open]>summary{margin-bottom:4px}
+.dh-specwrap[open]>summary .dh-spec-cv{transform:rotate(90deg)}
+.dh-specwrap>.gr{margin-bottom:0}
 .cd{background:var(--bg2);border:1px solid var(--bd);border-radius:4px;padding:5px 6px}
 .cd h4{font-size:9px;font-weight:600;margin-bottom:0;display:flex;align-items:center;gap:3px}
 .cd h4 b{width:3px;height:3px;border-radius:50%;display:inline-block}
@@ -573,10 +601,14 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <button data-t="bms">BMS</button>
 </nav>
 <div class="wrap">
+<button type="button" class="dh-sidereopen" id="sideReopen" aria-label="Show sidebar" title="Show sidebar">&#9656;</button>
 <aside class="side">
-<div class="dh-head">
+<div class="dh-head" style="display:flex;align-items:flex-start;gap:6px">
+<div style="flex:1;min-width:0">
 <div id="dhName" style="font-size:14px;font-weight:700;color:#c4b5fd;font-family:Space Grotesk">Datahall-1</div>
 <div id="dhLoc" style="font-size:9px;color:var(--t3);margin-top:2px">Floor 2 · South Wing</div>
+</div>
+<button type="button" class="dh-sidetog" id="sideTog" aria-label="Collapse sidebar to widen diagram" title="Collapse sidebar to widen diagram">&#9666;</button>
 </div>
 <div class="sb"><h4><i style="background:var(--g)"></i>Compute</h4>
 <div class="rw"><span class="l" title="NVIDIA GB200 NVL36×2 — 2 racks form one NVL72 domain">Platform</span><span class="v vg">GB200 NVL36&#215;2</span></div>
@@ -736,11 +768,11 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="pn" id="p-rack">
 <div class="bx"><h3>Rack Architecture</h3><div class="su" id="rackSu"></div>
 <svg id="rackSvg" viewBox="0 0 960 470" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="rackC"></g></svg></div>
-<div class="gr" id="rackCards"></div></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="rackCards"></div></details></div>
 <div class="pn" id="p-cool">
 <div class="bx"><h3>Cooling & Piping P&ID</h3><div class="su" id="coolSu"></div>
 <svg id="coolSvg" viewBox="0 0 960 980" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="coolC"></g></svg></div>
-<div class="gr" id="coolCards"></div></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="coolCards"></div></details></div>
 <div class="pn" id="p-elec">
 <div class="elec-tabs" id="elecTabs">
 <button class="et on" data-ep="overview">Overview</button>
@@ -752,41 +784,41 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="ep on" id="ep-overview">
 <div class="bx"><h3>Facility Electrical SLD</h3><div class="su" id="elecOvSu"></div>
 <svg id="elecOvSvg" viewBox="0 0 1200 1600" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecOvC"></g></svg></div>
-<div class="gr" id="elecOvCards"></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="elecOvCards"></div></details>
 </div>
 <div class="ep" id="ep-dh01">
 <div class="bx"><h3>DH-01 Electrical SLD</h3><div class="su" id="elecDH1Su"></div>
 <svg id="elecDH1Svg" viewBox="0 0 1200 2400" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH1C"></g></svg></div>
-<div class="gr" id="elecDH1Cards"></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="elecDH1Cards"></div></details>
 </div>
 <div class="ep" id="ep-dh02">
 <div class="bx"><h3>DH-02 Electrical SLD</h3><div class="su" id="elecDH2Su"></div>
 <svg id="elecDH2Svg" viewBox="0 0 1200 2400" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH2C"></g></svg></div>
-<div class="gr" id="elecDH2Cards"></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="elecDH2Cards"></div></details>
 </div>
 <div class="ep" id="ep-dh03">
 <div class="bx"><h3>DH-03 Electrical SLD</h3><div class="su" id="elecDH3Su"></div>
 <svg id="elecDH3Svg" viewBox="0 0 1200 2400" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH3C"></g></svg></div>
-<div class="gr" id="elecDH3Cards"></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="elecDH3Cards"></div></details>
 </div>
 <div class="ep" id="ep-dh04">
 <div class="bx"><h3>DH-04 Electrical SLD</h3><div class="su" id="elecDH4Su"></div>
 <svg id="elecDH4Svg" viewBox="0 0 1200 2400" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecDH4C"></g></svg></div>
-<div class="gr" id="elecDH4Cards"></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="elecDH4Cards"></div></details>
 </div>
 <div class="gr" id="elecCards"></div></div>
 <div class="pn" id="p-net">
 <div class="bx"><h3>Network Fabric Topology</h3><div class="su" id="netSu"></div>
 <svg id="netSvg" viewBox="0 0 960 520" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="netC"></g></svg></div>
-<div class="gr" id="netCards"></div></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="netCards"></div></details></div>
 <div class="pn" id="p-fire">
 <div class="bx"><h3>Fire Detection & Suppression P&ID</h3><div class="su" id="fireSu"></div>
 <svg id="fireSvg" viewBox="0 0 960 580" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="fireC"></g></svg></div>
-<div class="gr" id="fireCards"></div></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="fireCards"></div></details></div>
 <div class="pn" id="p-bms">
 <div class="bx"><h3>BMS/DCIM Architecture</h3><div class="su" id="bmsSu"></div>
 <svg id="bmsSvg" viewBox="0 0 960 480" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="bmsC"></g></svg></div>
-<div class="gr" id="bmsCards"></div></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="bmsCards"></div></details></div>
 
     </main>
 
@@ -969,6 +1001,24 @@ var DHE=DH;
 setInterval(()=>{$('clk').textContent=new Date().toLocaleTimeString('en-GB')},1000);
 $('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const el=$('p-'+e.target.dataset.t);if(el)el.classList.add('on')});
 $('elecTabs').addEventListener('click',function(e){if(!e.target.classList.contains('et'))return;document.querySelectorAll('.elec-tabs .et').forEach(function(b){b.classList.remove('on')});e.target.classList.add('on');document.querySelectorAll('.ep').forEach(function(p){p.classList.remove('on')});var el=$('ep-'+e.target.dataset.ep);if(el)el.classList.add('on')});
+/* v1.20.5 Lever A — desktop sidebar collapse (doc-18). Additive only; default
+   is uncollapsed so first paint (incl. #p-dash) is unchanged. User choice is
+   remembered. CSS gates the visual effect to >=1025px. */
+(function(){
+  var wrap=document.querySelector('.wrap'),tog=$('sideTog'),reo=$('sideReopen');
+  if(!wrap||!tog)return;
+  function apply(c){
+    wrap.classList.toggle('side-collapsed',!!c);
+    tog.innerHTML=c?'&#9656;':'&#9666;';
+    tog.setAttribute('aria-label',c?'Show sidebar':'Collapse sidebar to widen diagram');
+    tog.title=tog.getAttribute('aria-label');
+  }
+  function set(c){try{localStorage.setItem('dhSideCollapsed',c?'1':'0');}catch(e){}apply(c);}
+  var saved=null;try{saved=localStorage.getItem('dhSideCollapsed');}catch(e){}
+  if(saved==='1')apply(true);
+  tog.addEventListener('click',function(){set(!wrap.classList.contains('side-collapsed'));});
+  if(reo)reo.addEventListener('click',function(){set(false);});
+})();
 function tx(x,y,t,c,s,a,w){return`<text x="${x}" y="${y}" fill="${c||'var(--t2)'}" font-family="${J}" font-size="${s||6}" ${a?`text-anchor="${a}"`:''} ${w?'font-weight="600"':''}>${t}</text>`}
 function bx(x,y,w,h,c,r){return`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r||3}" fill="rgba(255,255,255,.015)" stroke="${c}" stroke-width=".7"/>`}
 function fl(x1,y1,x2,y2,c,cls,op,sw){return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${sw||2}" class="${cls}" opacity="${op||.5}"/>`}
@@ -10267,6 +10317,116 @@ else if(dist<lastDist-12&&si>0){si--;applyZoom();lastDist=dist}
 },{passive:false});
 inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 });
+})();
+
+/* ====================================================================
+ * v1.20.5 Lever C — minimum legible font floor (doc-13 §4 "Technical
+ * label minimum 10-11 px equivalent at 100% zoom"; doc-00 "Text is too
+ * small for operator use"; doc-18 "Text readable at 100% browser zoom").
+ * --------------------------------------------------------------------
+ * The diagrams already fill 100% of the available container width
+ * (measured), so they cannot be widened further without the collapsible
+ * sidebar (Lever A). The residual legibility deficit is the small SVG
+ * font tiers themselves. This pass raises ONLY the smallest <text>
+ * glyphs toward a per-diagram floor, with a hard cap so a micro-label
+ * is never blown up enough to collide with a neighbour. Geometry,
+ * x/y anchors, lines and equipment bodies are untouched — only the
+ * font-size attribute of under-floor text is increased. Idempotent
+ * (original size cached in data-fs0) so it is safe to re-run on every
+ * re-render / zoom / resize. Per-diagram FLOOR/CAP were tuned so the
+ * post-render line/text + text/text overlap count never exceeds the
+ * pre-change baseline for that diagram (verified headless).
+ * ==================================================================== */
+(function(){
+  var IDS=['bldgSvg','floorSvg','hSvg','rackSvg','coolSvg','elecOvSvg','elecDH1Svg','elecDH2Svg','elecDH3Svg','elecDH4Svg','netSvg','fireSvg','bmsSvg'];
+  /* Target effective on-screen px floor per diagram. Dense SLD/P&ID
+     sheets keep a lower floor + tighter cap (label pitch is small);
+     roomier diagrams get the full doc-13 11px target. */
+  /* Per-diagram floor + cap were tuned headlessly: each is the most
+     legible (floor,cap) pair whose post-render overlap count stays <=
+     the pre-change baseline for that exact diagram. hSvg/coolSvg/bldgSvg
+     could NOT take any lift without a new overlap, so their floor is set
+     below their smallest author glyph -> the pass is a verified no-op for
+     them (Lever A + B gains kept, font bump correctly NOT applied). */
+  var FLOOR={bldgSvg:1,floorSvg:1,hSvg:1,rackSvg:11,coolSvg:1,elecOvSvg:11,elecDH1Svg:7,elecDH2Svg:7,elecDH3Svg:7,elecDH4Svg:7,netSvg:11,fireSvg:11,bmsSvg:9};
+  /* Hard multiplier ceiling — never enlarge a single label by more than
+     this, so sub-floor micro-text gets a partial (collision-safe) lift
+     rather than a full one. */
+  var CAP={bldgSvg:1.12,floorSvg:1.12,hSvg:1.12,rackSvg:1.12,coolSvg:1.12,elecOvSvg:1.12,elecDH1Svg:1.2,elecDH2Svg:1.2,elecDH3Svg:1.2,elecDH4Svg:1.2,netSvg:1.5,fireSvg:1.5,bmsSvg:1.3};
+  var DEF_FLOOR=11,DEF_CAP=1.2;
+  function fitScale(svg){
+    var vb=(svg.getAttribute('viewBox')||'').split(/\s+/).map(Number);
+    var r=svg.getBoundingClientRect();
+    if(!vb[2]||!vb[3]||!r.width||!r.height)return 0;
+    return Math.min(r.width/vb[2],r.height/vb[3]);
+  }
+  function apply(svg){
+    if(!svg)return;
+    var fs=fitScale(svg);if(!fs||fs<=0)return;
+    var floor=FLOOR[svg.id]||DEF_FLOOR,cap=CAP[svg.id]||DEF_CAP;
+    var texts=svg.getElementsByTagName('text'),i,t,o,cur,want,mult;
+    for(i=0;i<texts.length;i++){
+      t=texts[i];
+      o=t.getAttribute('data-fs0');
+      if(o==null){
+        /* cache the ORIGINAL author font-size once */
+        o=t.getAttribute('font-size');
+        if(o==null){
+          try{o=parseFloat(getComputedStyle(t).fontSize)/fs;}catch(e){o=null;}
+        }
+        if(o==null||isNaN(parseFloat(o)))continue;
+        o=parseFloat(o);
+        t.setAttribute('data-fs0',o);
+      }else{o=parseFloat(o);}
+      if(!o||isNaN(o))continue;
+      cur=o*fs;                       /* effective px at author size */
+      if(cur>=floor){                 /* already legible -> restore author size */
+        if(t.getAttribute('font-size')!=String(o))t.setAttribute('font-size',o);
+        continue;
+      }
+      mult=floor/cur;
+      if(mult>cap)mult=cap;
+      want=+(o*mult).toFixed(3);
+      if(t.getAttribute('font-size')!=String(want))t.setAttribute('font-size',want);
+    }
+  }
+  /* Desktop-only (>=1025px) — the floor/cap were tuned at desktop
+     fitScale. On the narrow mobile canvas the same floor implies a much
+     larger multiplier (smaller fitScale) which would collide on the
+     cramped layout, so the pass is a strict no-op there and every diagram
+     renders byte-for-byte as before on mobile (mobile rules untouched,
+     0-overflow preserved). This also matches the task scope: desktop
+     diagram legibility only. */
+  function deskOK(){return (window.innerWidth||document.documentElement.clientWidth||0)>=1025;}
+  function applyAll(){
+    if(!deskOK()){
+      /* ensure any prior desktop bump is reverted if the user shrinks
+         the window across the breakpoint */
+      for(var k=0;k<IDS.length;k++){
+        var s=document.getElementById(IDS[k]);if(!s)continue;
+        var tx=s.getElementsByTagName('text');
+        for(var j=0;j<tx.length;j++){var o0=tx[j].getAttribute('data-fs0');if(o0!=null&&tx[j].getAttribute('font-size')!=o0)tx[j].setAttribute('font-size',o0);}
+      }
+      return;
+    }
+    for(var i=0;i<IDS.length;i++)apply(document.getElementById(IDS[i]));
+  }
+  window.__dhFontFloor=applyAll;
+  var raf=null;
+  function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=null;applyAll();});}
+  /* Re-apply when a diagram re-renders (innerHTML replaced) or when its
+     rendered size changes (zoom button, sidebar collapse, viewport). */
+  IDS.forEach(function(id){
+    var svg=document.getElementById(id);if(!svg)return;
+    try{new MutationObserver(schedule).observe(svg,{childList:true,subtree:true});}catch(e){}
+    if(typeof ResizeObserver==='function'){try{new ResizeObserver(schedule).observe(svg);}catch(e){}}
+  });
+  window.addEventListener('resize',schedule);
+  document.addEventListener('click',function(e){
+    if(e.target&&(e.target.closest('.tabs')||e.target.closest('.elec-tabs')||e.target.closest('.svg-zb')||e.target.id==='sideTog'||e.target.id==='sideReopen'))schedule();
+  },true);
+  /* initial pass after first render settles */
+  setTimeout(applyAll,300);setTimeout(applyAll,1200);
 })();
 
 </script><script src="auth.js?v=2026-05-09-v1" defer></script>
