@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v1.20.7 — 2026-05-18 (datahallAI — 3 doc-18 conformance gaps fixed)
+
+Read-only per-screen conformance audit vs `18-qa-acceptance-criteria.md`
+found the in-scope redesign substantially passing; 3 concrete fixable gaps
+(DC-dashboard divergences out-of-scope by design; subjective items left for
+owner sign-off).
+
+### Fixed
+- **GAP-1 (P1) netSvg link/label hairball** (doc-07 / doc-18 "no line
+  crosses text"): per-domain fabric lasers now hover-gated (`.laser{opacity:0}`
+  default; bright on `.netDom`/`.netSL` hover) over an explicit ≤0.2
+  quiet-lane base. Full-opacity line-vs-text bbox overlap on netSvg
+  **46 → 0** in default state (desktop+mobile); SPINE-4/LEAF-8/DOMAINS-27
+  + all `data-tip`/live IDs intact.
+- **GAP-2 (P2) Room Layout north arrow** (doc-03): `bldgSvg` decorative
+  compass-rose replaced with the page's industrial thin-stroke N-arrow,
+  top-right clear of equipment — consistent with the 4 floor views.
+- **GAP-3 (P2) BMS protocol/spec drawer** (doc-09 / doc-18 BMS): the
+  Modbus/BACnet/OPC-UA/SNMP spec block moved out of the main ops view into a
+  collapsed native `<details>` (data preserved, expands on click). Fixed a
+  real `.gr{display:grid}` UA-override with one scoped rule
+  `.dh-specwrap:not([open])>.gr{display:none}` (only affects collapsed
+  drawers; the 8 authored-`open` panels verified unaffected).
+- Verified independently: audit-js-syntax/mobile-responsive --strict CLEAN;
+  engine 57/57; desktop 1440 + mobile 390 → 0 pageerror/0 console/0px
+  overflow; per-diagram overlap table no-regression elsewhere; other
+  `<details open>` spec panels still visible; DC-dashboard panel +
+  `updateDashKPI` + `dcCallouts` + engine files BYTE-IDENTICAL.
+
 ## v1.20.6 — 2026-05-18 (datahallAI — Cooling P&ID header collision fixed)
 
 From owner dark-mode screenshot review: the Cooling & Piping P&ID title

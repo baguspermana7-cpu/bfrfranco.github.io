@@ -131,6 +131,10 @@
 .dh-specwrap[open]>summary{margin-bottom:4px}
 .dh-specwrap[open]>summary .dh-spec-cv{transform:rotate(90deg)}
 .dh-specwrap>.gr{margin-bottom:0}
+/* doc-09/doc-18: a collapsed spec drawer must actually remove its protocol/
+   spec tables from the main ops view. `.gr{display:grid}` is an author rule
+   that overrides the UA `details:not([open])>*` hide, so close it explicitly. */
+.dh-specwrap:not([open])>.gr{display:none}
 .cd{background:var(--bg2);border:1px solid var(--bd);border-radius:4px;padding:5px 6px}
 .cd h4{font-size:9px;font-weight:600;margin-bottom:0;display:flex;align-items:center;gap:3px}
 .cd h4 b{width:3px;height:3px;border-radius:50%;display:inline-block}
@@ -818,7 +822,7 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
 <div class="pn" id="p-bms">
 <div class="bx"><h3>BMS/DCIM Architecture</h3><div class="su" id="bmsSu"></div>
 <svg id="bmsSvg" viewBox="0 0 960 480" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="bmsC"></g></svg></div>
-<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="bmsCards"></div></details></div>
+<details class="dh-specwrap"><summary>Protocol &amp; specification tables (Modbus / BACnet / OPC-UA / SNMP)<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="bmsCards"></div></details></div>
 
     </main>
 
@@ -1386,15 +1390,13 @@ s+='<text x="'+(iX(15,24)+8)+'" y="'+iY(15,24,bdz)+'" fill="#f59e0b" font-family
 s+='<text x="'+(iX(57,24)+8)+'" y="'+iY(57,24,bdz)+'" fill="#f59e0b" font-family="'+J+'" font-size="5" font-weight="700">BD</text>';
 }
 
-// Compass rose (top-right)
-s+='<g transform="translate(1130,80)">';
-s+='<circle cx="0" cy="0" r="22" fill="none" stroke="var(--bd2)" stroke-width=".5"/>';
-s+='<polygon points="0,-20 4,-6 -4,-6" fill="var(--t3)" opacity=".6"/>';
-s+='<polygon points="0,20 4,6 -4,6" fill="var(--t3)" opacity=".3"/>';
-s+=tx(0,-26,'N','var(--t3)',8,'middle',1);
-s+=tx(0,32,'S','var(--t3)',6,'middle');
-s+=tx(-28,3,'W','var(--t3)',6,'middle');
-s+=tx(28,3,'E','var(--t3)',6,'middle');
+// North arrow (top-right) — doc-03: north arrow consistent with the
+// detailed floor views. Industrial-instrumentation style: thin muted
+// stroke, single N-arrow glyph. Corner clear of KPI panel/title/legend.
+s+='<g transform="translate(1150,70)">';
+s+='<line x1="0" y1="13" x2="0" y2="-10" stroke="var(--t3)" stroke-width="1" opacity=".55"/>';
+s+='<polygon points="0,-16 6,2 -6,2" fill="var(--t3)" opacity=".6"/>';
+s+=tx(0,-20,'N','var(--t3)',9,'middle',1);
 s+='</g>';
 
 // Legend strip at bottom
@@ -6701,6 +6703,12 @@ s+=`<defs>
 <filter id="glow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>`;
 s+=`<style>.laser{stroke:url(#laserG);stroke-width:2;stroke-dasharray:15 85;animation:laserMove 2s linear infinite;filter:url(#glow)}@keyframes laserMove{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}.linkUp{stroke:rgba(34,197,94,.4)}.linkDown{stroke:rgba(239,68,68,.6);stroke-dasharray:4 4}
+        /* doc-07: bundled links stay a quiet lane; show exact individual links only when a domain/switch is selected (hover). Default = hidden so no full-opacity stroke crosses any DOM-n/util label. */
+        .laser{opacity:0;transition:opacity .12s}
+        .netDom:hover .laser{opacity:1}
+        .netDom:hover .domBox{stroke:var(--c);stroke-width:1.4}
+        .netSLzone:hover ~ .netSL .laser{opacity:1}
+        .netSL:hover .laser{opacity:1}
         /* v1.8.0 — mobile sim/lab responsive patch */
         @media (max-width: 768px) {
             html, body { overflow-x: hidden; max-width: 100vw; }
@@ -6811,16 +6819,26 @@ s+=`<rect x="${lf.x}" y="125" width="88" height="28" rx="3" fill="rgba(59,130,24
 s+=tx(lf.x+44,136,lf.id,'var(--b)',5,'middle',1);
 s+=`<text x="${lf.x+44}" y="148" fill="var(--g)" font-family="${J}" font-size="4" text-anchor="middle" id="lf${li}bw">756 Gb/s</text>`;
 s+='</g>'});
-// Spine-Leaf connections with laser effect
+// Spine-Leaf connections — doc-07: quiet bundled lane by default; bright
+// individual lasers reveal only when the spine/leaf band is hovered.
+// Base quiet links (opacity .15) are the always-on bundled lane.
 spines.forEach((sp,si)=>{
 leaves.forEach((lf,li)=>{
 const x1=sp.x+40,y1=83,x2=lf.x+44,y2=125;
 const linkId='sl'+si+''+li;
-// Base link
-s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(139,92,246,.15)" stroke-width=".6" id="${linkId}"/>`;
-// Laser overlay (animated)
+// Quiet bundled lane: explicit low stroke-opacity (.15 ≤ 0.2) marks this
+// as the sanctioned quiet lane (not a full-opacity hairball stroke).
+s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--p)" stroke-opacity=".15" stroke-width=".6" id="${linkId}"/>`;
+});});
+// invisible hover target over the spine↔leaf band (sibling of .netSL group)
+s+=`<rect class="netSLzone" x="50" y="38" width="860" height="120" fill="transparent"/>`;
+s+=`<g class="netSL">`;
+spines.forEach((sp,si)=>{
+leaves.forEach((lf,li)=>{
+const x1=sp.x+40,y1=83,x2=lf.x+44,y2=125;
 s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="laser" style="animation-delay:${(si*8+li)*0.06}s"/>`;
 });});
+s+=`</g>`;
 // NVL72 DOMAIN LAYER with live stats
 s+=`<rect x="10" y="170" width="940" height="175" rx="4" fill="rgba(34,197,94,.05)" stroke="rgba(34,197,94,.2)" stroke-width="1"/>`;
 s+=`<rect x="232" y="178" width="496" height="13" rx="2" fill="var(--bg)" stroke="rgba(34,197,94,.25)" stroke-width=".4"/>`;
@@ -6831,16 +6849,18 @@ for(let d=0;d<27;d++){domRows[Math.floor(d/9)].push(d+1)}
 domRows.forEach((row,ri)=>{
 row.forEach((dom,di)=>{
 const x=25+di*103,y=198+ri*48;
-s+=`<g data-tip="NVL72 Domain DOM-${dom}: 72 GPUs (2 racks), 130 TB/s NVLink5 bisection, 18\u00D7NVSwitch5, full-mesh all-to-all, 132kW total">`;
-s+=`<rect x="${x}" y="${y}" width="95" height="40" rx="3" fill="rgba(34,197,94,.1)" stroke="rgba(34,197,94,.35)" stroke-width=".6" class="rg"/>`;
-s+=tx(x+48,y+11,'DOM-'+dom,'var(--g)',5.5,'middle',1);
-s+=`<text x="${x+48}" y="${y+23}" fill="var(--c)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}nvl">128 TB/s</text>`;
-s+=`<text x="${x+48}" y="${y+33}" fill="var(--o)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}util">87%</text>`;s+='</g>';
-// Connect to leaf with animated data flow
+// Connect to leaf \u2014 quiet base line always on (bundled lane, opacity .12).
 const lfIdx=di%8;
 const lfX=leaves[lfIdx].x+44;
-s+=`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" stroke="rgba(59,130,246,.12)" stroke-width=".5"/>`;
+s+=`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" stroke="var(--b)" stroke-opacity=".12" stroke-width=".5"/>`;
+// doc-07: bright individual link shown ONLY when this domain is selected/hovered.
+s+=`<g class="netDom" data-tip="NVL72 Domain DOM-${dom}: 72 GPUs (2 racks), 130 TB/s NVLink5 bisection, 18\u00D7NVSwitch5, full-mesh all-to-all, 132kW total">`;
+s+=`<rect x="${x}" y="${y}" width="95" height="40" rx="3" fill="rgba(34,197,94,.1)" stroke="rgba(34,197,94,.35)" stroke-width=".6" class="rg domBox"/>`;
+s+=tx(x+48,y+11,'DOM-'+dom,'var(--g)',5.5,'middle',1);
+s+=`<text x="${x+48}" y="${y+23}" fill="var(--c)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}nvl">128 TB/s</text>`;
+s+=`<text x="${x+48}" y="${y+33}" fill="var(--o)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}util">87%</text>`;
 s+=`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" class="laser" style="animation-delay:${(dom*0.1)}s;stroke-width:1"/>`;
+s+='</g>';
 });});
 // NVLink Detail Panel with live values
 s+=`<rect x="10" y="355" width="310" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
