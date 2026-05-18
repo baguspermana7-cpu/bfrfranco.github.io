@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.20.6 — 2026-05-18 (datahallAI — Cooling P&ID header collision fixed)
+
+From owner dark-mode screenshot review: the Cooling & Piping P&ID title
+(~109 chars, font-8, centred at x=480 in a 960-wide viewBox) overran into
+the top-right status-badge strip at x=700 — "…Carrier 19DV Chiller Plant"
+bled over the ASHRAE W4 / FREE-COOL ENG / ISA-5.1 TAGS badges (read as
+garbled "ISO-5.1 TARG 1.16"). doc-14 "no line/text crosses unrelated
+element".
+
+### Fixed
+- Removed the redundant " | Carrier 19DV Chiller Plant" title tail (already
+  shown by the CHILLER PLANT section header + CHILLER PLANT SPECS panel).
+  Title now ends "= 3,564 kW PER HALL"; geometric verify: title right edge
+  viewBox x≈674 vs ASHRAE badge x≈728 → 54px clear gap, overlap=false.
+  No information loss; engine-bound numbers unchanged.
+- Verified: audit-js-syntax --strict CLEAN; engine test 57/57; engine files
+  untouched; visually confirmed (dark mode) header now clean.
+
 ## v1.20.5 — 2026-05-17 (datahallAI — desktop diagram legibility)
 
 doc-00 "text too small for operator use" + doc-13 §4 typography minimum +
