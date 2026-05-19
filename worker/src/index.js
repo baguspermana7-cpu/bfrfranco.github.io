@@ -1,3 +1,5 @@
+import { handleFx } from './handlers.js';
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -30,7 +32,7 @@ function handleHealth() {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env, ctx) {
     try {
       const { method } = request;
       const { pathname } = new URL(request.url);
@@ -38,6 +40,15 @@ export default {
       if (method === 'OPTIONS') return handleOptions();
 
       if (pathname === '/health') return handleHealth();
+
+      if (pathname === '/fx') {
+        try {
+          const { data, cached } = await handleFx(env);
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'fx: ' + String(e) });
+        }
+      }
 
       return json(null, { status: 404, error: 'not found' });
     } catch (e) {

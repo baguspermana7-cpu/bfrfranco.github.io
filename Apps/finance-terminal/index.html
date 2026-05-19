@@ -1585,6 +1585,14 @@ function renderEarningsHistory(){
    SECTION 12: TAB 3 - FOREX
    ═══════════════════════════════════════════════════════════════ */
 async function loadForex(){
+  if(CFG.V2){
+    try{
+      const d=await gw('/fx');
+      S.fxBase=d.rates||{};
+      renderFxGrid(); renderConverter(); loadFxChart(); loadCrossMatrix();
+      return;
+    }catch(e){ $('fxPairsGrid').innerHTML='<div class="empty" style="grid-column:1/-1"><p>Error loading forex data (gw)</p></div>'; return; }
+  }
   try{
     const data=await fk('/latest',{from:'USD'});
     S.fxBase=data.rates||{};
