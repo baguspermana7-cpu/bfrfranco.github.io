@@ -3189,20 +3189,81 @@ renderScreenerFilters=function(){
   }
 };
 
+// B-007 fix #1 (active-state): preset buttons never got an active class
+// on click. _scrActivatePreset highlights the clicked preset and
+// deactivates siblings, reusing the app's existing .active + btn-p/btn-o
+// toggle convention (see setScreenerMode / setWlMode). Pure UI fix —
+// safe in both flag states.
+function _scrActivatePreset(el){
+  if(!el)return;
+  document.querySelectorAll('#presetBar .btn').forEach(b=>{
+    const on=b===el;
+    b.classList.toggle('active',on);
+    b.classList.toggle('btn-p',on);
+    b.classList.toggle('btn-o',!on);
+  });
+}
 // Override presets to add more
 const _origRenderPresets=renderPresets;
 renderPresets=function(){
   if(S.scrMode==='crypto'){
-    $('presetBar').innerHTML=['Top 50','DeFi','Gainers 24h','Losers 24h'].map(p=>`<button class="btn btn-o btn-sm" onclick="runCryptoPreset('${p}')">${p}</button>`).join('');
+    $('presetBar').innerHTML=['Top 50','DeFi','Gainers 24h','Losers 24h'].map(p=>`<button class="btn btn-o btn-sm" data-preset="${p}" onclick="_scrActivatePreset(this);runCryptoPreset('${p}')">${p}</button>`).join('');
   }else{
     const presets=['Large Cap','Mega Cap','Value (P/E<15)','High Dividend','Growth','Small Cap','High Volume','Tech Giants','Big Movers'];
-    $('presetBar').innerHTML=presets.map(p=>`<button class="btn btn-o btn-sm" onclick="runStockPreset('${p}')">${p}</button>`).join('');
+    $('presetBar').innerHTML=presets.map(p=>`<button class="btn btn-o btn-sm" data-preset="${p}" onclick="_scrActivatePreset(this);runStockPreset('${p}')">${p}</button>`).join('');
   }
 };
 
+// B-007 fix #2 (no results): under CFG.V2 the screener runs through the
+// key-free gateway /screener (curated universe + live enrichment) and
+// renders into the EXISTING results table via renderScreenerResults().
+// Shows a skeleton while loading; on empty → "No matches"; on gw
+// failure → "Screener unavailable — Retry". Never silent-empty.
+async function runStockScreenV2(){
+  const tb=$('screenerTable').querySelector('tbody');
+  const th=$('screenerTable').querySelector('thead');
+  th.innerHTML='';
+  tb.innerHTML='<tr><td colspan="5"><div class="skel" style="height:120px"></div></td></tr>';
+  $('screenerCount').textContent='...';
+  const params={};
+  if(window._scrPreset)params.preset=window._scrPreset;
+  const minMcap=parseFloat($('scrMinMcap')?.value);if(minMcap>0)params.minMcap=minMcap;
+  const maxPe=parseFloat($('scrMaxPe')?.value);if(maxPe>0)params.maxPe=maxPe;
+  const sector=$('scrSector')?.value||'';if(sector)params.sector=sector;
+  const minDiv=parseFloat($('scrMinDiv')?.value);if(minDiv>0)params.minDiv=minDiv;
+  const dayChg=$('scrDayChg')?.value||'';if(dayChg)params.dayChange=dayChg;
+  try{
+    const rows=await gw('/screener',params);
+    S.scrResults=(Array.isArray(rows)?rows:[]).map(r=>({
+      sym:r.sym,name:r.name||r.sym,price:r.price,chg:r.chgPct,
+      mcap:r.marketCap,pe:r.pe,vol:0,sector:r.sector||'',divYield:r.divYield
+    }));
+    S.scrPage=1;
+    $('screenerCount').textContent=S.scrResults.length;
+    if(!S.scrResults.length){
+      th.innerHTML='';
+      tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-filter"></i><p>No matches — adjust filters or pick another preset</p></div></td></tr>';
+      return;
+    }
+    renderScreenerResults();
+  }catch(e){
+    $('screenerCount').textContent='0';
+    th.innerHTML='';
+    tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Screener unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();runStockScreen()">Retry</a></p></div></td></tr>';
+  }
+}
 // Enhanced stock screener with more filters
 const _origRunStockScreen=runStockScreen;
 runStockScreen=async function(){
+  if(CFG.V2){
+    // Manual "Screen" click → filters only, no preset. Clear any
+    // active preset highlight + forwarded preset name.
+    window._scrPreset='';
+    document.querySelectorAll('#presetBar .btn').forEach(b=>{
+      b.classList.remove('active');b.classList.remove('btn-p');b.classList.add('btn-o');
+    });
+    return runStockScreenV2();
+  }
   if(!S.fhKey){alert('Enter Finnhub API key first');return}
   const minMcap=parseFloat($('scrMinMcap')?.value)||0;
   const maxPe=parseFloat($('scrMaxPe')?.value)||Infinity;
@@ -3252,6 +3313,17 @@ runStockScreen=async function(){
 // Enhanced presets
 const _origRunStockPreset=runStockPreset;
 runStockPreset=async function(name){
+  if(CFG.V2){
+    // Forward authoritative preset semantics to the gateway (presets
+    // like Tech Giants / Big Movers don't reduce to the few inputs).
+    window._scrPreset=name;
+    if($('scrMinMcap'))$('scrMinMcap').value='';
+    if($('scrMaxPe'))$('scrMaxPe').value='';
+    if($('scrSector'))$('scrSector').value='';
+    if($('scrMinDiv'))$('scrMinDiv').value='';
+    if($('scrDayChg'))$('scrDayChg').value='';
+    return runStockScreenV2();
+  }
   // Reset filters
   if($('scrMinMcap'))$('scrMinMcap').value='';
   if($('scrMaxPe'))$('scrMaxPe').value='';

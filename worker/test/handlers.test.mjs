@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures } from '../src/handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -801,6 +801,120 @@ test('Test R: handleFutures all sources fail with stale cache → stale:true', a
     assert.equal(result.stale, true, 'should return stale:true');
     assert.equal(result.cached, true);
     assert.deepEqual(result.data, staleData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleScreener tests (Task 1.6) — fixes B-007.
+   Curated static fundamentals universe filtered by preset/criteria,
+   then live price/chg enriched via handleQuotes (Yahoo v7 stub).
+   ═══════════════════════════════════════════════════════════════ */
+
+// Yahoo v7 quote stub that answers ANY requested symbols with a
+// deterministic numeric quote so handleQuotes resolves the whole batch.
+function yahooScreenerStub() {
+  return async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com') && u.includes('/v7/finance/quote')) {
+      const symParam = new URL(u).searchParams.get('symbols') || '';
+      const syms = symParam.split(',').filter(Boolean);
+      const result = syms.map((sym, i) => ({
+        symbol: sym,
+        regularMarketPrice: 100 + i,
+        regularMarketChange: i % 2 === 0 ? 1.1 : -0.9,
+        regularMarketChangePercent: i % 2 === 0 ? 0.55 : -0.42,
+        regularMarketPreviousClose: 100 + i - (i % 2 === 0 ? 1.1 : -0.9),
+      }));
+      return { ok: true, json: async () => JSON.parse(JSON.stringify({ quoteResponse: { result, error: null } })) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+}
+
+// Test S: preset 'High Dividend' → every returned row has divYield>=3 and
+// a numeric live price (enriched via handleQuotes), result is cached.
+test("Test S: preset 'High Dividend' → all rows divYield>=3, numeric price, cached", async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = yahooScreenerStub();
+
+  try {
+    const result = await handleScreener({ FT_KV: kv }, { preset: 'High Dividend' });
+    assert.equal(Array.isArray(result.data), true, 'data should be array');
+    assert.ok(result.data.length > 0, 'High Dividend should return at least one row');
+    assert.equal(result.cached, false, 'first call not cached');
+
+    for (const row of result.data) {
+      assert.equal(typeof row.sym, 'string');
+      assert.equal(typeof row.name, 'string');
+      assert.ok(row.name.length > 0, row.sym + ' must have a name');
+      assert.equal(typeof row.sector, 'string');
+      assert.equal(typeof row.divYield, 'number');
+      assert.ok(row.divYield >= 3, row.sym + ' divYield must be >= 3, got ' + row.divYield);
+      assert.equal(typeof row.price, 'number', row.sym + ' price should be numeric (enriched)');
+      assert.equal(typeof row.chgPct, 'number', row.sym + ' chgPct should be numeric (enriched)');
+      assert.equal(typeof row.marketCap, 'number');
+    }
+
+    // Cached under a stable key derived from params.
+    let cachedKey = null;
+    for (const k of kv.store.keys()) if (k.startsWith('screener:')) cachedKey = k;
+    assert.ok(cachedKey != null, 'result should be cached under a screener:* key');
+
+    // Second call hits fresh cache → cached:true, no fetch.
+    let fetchCalled = false;
+    globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+    const again = await handleScreener({ FT_KV: kv }, { preset: 'High Dividend' });
+    assert.equal(fetchCalled, false, 'fresh cache hit must not call fetch');
+    assert.equal(again.cached, true);
+    assert.deepEqual(again.data, result.data);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test T: explicit filter maxPe=15 → every returned row has pe<=15
+// (rows with null pe are excluded when a maxPe constraint is active).
+test('Test T: filter maxPe=15 → all rows pe<=15', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = yahooScreenerStub();
+
+  try {
+    const result = await handleScreener({ FT_KV: kv }, { maxPe: 15 });
+    assert.equal(Array.isArray(result.data), true);
+    assert.ok(result.data.length > 0, 'maxPe=15 should still match well-known value names');
+    for (const row of result.data) {
+      assert.equal(typeof row.pe, 'number', row.sym + ' pe should be numeric when maxPe filter active');
+      assert.ok(row.pe <= 15, row.sym + ' pe must be <= 15, got ' + row.pe);
+      assert.equal(typeof row.price, 'number');
+    }
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test U: fresh cache pre-populated → handleScreener returns cached:true
+// WITHOUT calling fetch (no quote enrichment refetch).
+test('Test U: fresh screener cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  // First call populates cache for these exact params.
+  const params = { sector: 'Technology' };
+  globalThis.fetch = yahooScreenerStub();
+  const first = await handleScreener({ FT_KV: kv }, params);
+  assert.equal(first.cached, false);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleScreener({ FT_KV: kv }, { sector: 'Technology' });
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, first.data);
   } finally {
     globalThis.fetch = origFetch;
   }

@@ -4,6 +4,7 @@ import { fetchYahooQuotes, fetchYahooCandles } from './sources/yahoo.js';
 import { fetchStooqQuotes, fetchStooqCandles } from './sources/stooq.js';
 import { fetchFinnhubQuotes } from './sources/finnhub.js';
 import { fetchNews } from './sources/news.js';
+import { SCREENER_UNIVERSE } from './data/screener-universe.js';
 
 const FX_CACHE_KEY = 'fx:USD';
 const FX_TTL_MS = 60_000;
@@ -380,6 +381,190 @@ export async function handleFutures(env) {
     const { data } = await handleQuotes(env, FUTURES_SYMS);
     return shapeRows(data, FUTURES_NAMES);
   });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Task 1.6 — /screener (fixes B-007)
+
+   Key-free curated static fundamentals universe (SCREENER_UNIVERSE)
+   filtered by preset + explicit criteria, then enriched with LIVE
+   price/chg via handleQuotes (no new fetch code). Final shaped result
+   is cached 5 min with stale-on-error (live prices must not go 24h
+   stale). Deep per-row reasoning is Phase 2 — out of scope here.
+   ═══════════════════════════════════════════════════════════════ */
+
+const SCREENER_TTL_MS = 300_000; // 5 min
+const SCREENER_MAX_ROWS = 40;    // cap before live enrichment
+
+/**
+ * Sector alias map — the client dropdown sends Yahoo-style sector
+ * names; the curated universe uses GICS/SPDR-style names. Normalise
+ * both sides to a lowercase canonical token so a Sector filter works
+ * regardless of which vocabulary the caller used.
+ */
+const SECTOR_ALIASES = {
+  'technology': 'technology',
+  'health care': 'healthcare',
+  'healthcare': 'healthcare',
+  'financials': 'financials',
+  'financial services': 'financials',
+  'consumer discretionary': 'consumer discretionary',
+  'consumer cyclical': 'consumer discretionary',
+  'industrials': 'industrials',
+  'communication services': 'communication services',
+  'consumer staples': 'consumer staples',
+  'consumer defensive': 'consumer staples',
+  'energy': 'energy',
+  'materials': 'materials',
+  'basic materials': 'materials',
+  'real estate': 'real estate',
+  'utilities': 'utilities',
+};
+
+function canonSector(s) {
+  const k = String(s || '').trim().toLowerCase();
+  return SECTOR_ALIASES[k] || k;
+}
+
+/**
+ * Preset semantics. Mirrors CFG.PRESETS in the client plus the four
+ * extended presets the enhanced screener UI exposes. A preset returns
+ * a predicate over a universe row PLUS an optional `needsLive` flag
+ * (Big Movers filters on enriched chgPct, applied post-enrichment).
+ */
+const SCREENER_PRESETS = {
+  'Large Cap':       { test: r => r.marketCap >= 10e9 },
+  'Mega Cap':        { test: r => r.marketCap >= 200e9 },
+  'Value (P/E<15)':  { test: r => r.pe != null && r.pe <= 15 && r.marketCap >= 2e9 },
+  'Small Cap':       { test: r => r.marketCap >= 300e6 && r.marketCap <= 20e9 },
+  'High Volume':     { test: r => r.avgVol >= 5e6 },
+  'High Dividend':   { test: r => r.divYield >= 3 },
+  'Growth':          { test: r => r.pe != null && r.pe >= 25 && r.marketCap >= 10e9 },
+  'Tech Giants':     { test: r => canonSector(r.sector) === 'technology' && r.marketCap >= 200e9 },
+  'Big Movers':      { test: () => true, needsLive: true },
+};
+
+/**
+ * stableScreenerKey(params) — order-independent cache key.
+ * Same filter set → same key regardless of property order / blanks.
+ */
+function stableScreenerKey(params) {
+  const norm = {
+    preset: String(params.preset || ''),
+    minMcap: Number(params.minMcap) || 0,
+    maxPe: Number(params.maxPe) || 0,
+    sector: canonSector(params.sector || ''),
+    minDiv: Number(params.minDiv) || 0,
+    dayChange: String(params.dayChange || ''),
+  };
+  return 'screener:' + Object.keys(norm).sort().map(k => k + '=' + norm[k]).join('&');
+}
+
+/**
+ * handleScreener(env, params) — curated-universe stock screener.
+ *
+ * params: { preset?, minMcap?, maxPe?, sector?, minDiv?, dayChange? }
+ *
+ * 1. Start from SCREENER_UNIVERSE (static, key-free).
+ * 2. Apply preset semantics (if any).
+ * 3. Intersect with explicit filters (minMcap / maxPe / sector / minDiv).
+ * 4. Cap to SCREENER_MAX_ROWS, enrich with live price/chg via handleQuotes.
+ * 5. Apply Big Movers / dayChange filter on the LIVE chgPct.
+ *
+ * Returns: { data: Row[], cached, stale? }
+ *   Row = { sym, name, sector, marketCap, pe, divYield, price, chgPct }
+ */
+export async function handleScreener(env, params = {}) {
+  const cacheKey = stableScreenerKey(params);
+
+  const fresh = await getCached(env.FT_KV, cacheKey, SCREENER_TTL_MS);
+  if (fresh && !fresh.stale) {
+    return { data: fresh.data, cached: true };
+  }
+
+  try {
+    const data = await buildScreener(env, params);
+    await setCached(env.FT_KV, cacheKey, data);
+    return { data, cached: false };
+  } catch (err) {
+    const stale = await getCached(env.FT_KV, cacheKey, SCREENER_TTL_MS, { allowStale: true });
+    if (stale) {
+      return { data: stale.data, cached: true, stale: true };
+    }
+    throw err;
+  }
+}
+
+async function buildScreener(env, params) {
+  const minMcap = Number(params.minMcap) || 0;
+  const maxPe = Number(params.maxPe) || 0;
+  const sector = canonSector(params.sector || '');
+  const minDiv = Number(params.minDiv) || 0;
+  const dayChange = String(params.dayChange || '');
+
+  const preset = params.preset ? SCREENER_PRESETS[params.preset] : null;
+  const presetTest = preset ? preset.test : null;
+  const needsLive = (preset && preset.needsLive) || dayChange === 'big' ||
+    dayChange === 'up' || dayChange === 'down';
+
+  // Static-fundamentals pass (preset ∩ explicit filters).
+  const filtered = SCREENER_UNIVERSE.filter(r => {
+    if (presetTest && !presetTest(r)) return false;
+    if (minMcap && r.marketCap < minMcap) return false;
+    if (maxPe) {
+      if (r.pe == null || r.pe > maxPe) return false;
+    }
+    if (sector && canonSector(r.sector) !== sector) return false;
+    if (minDiv && r.divYield < minDiv) return false;
+    return true;
+  });
+
+  // Largest first, cap before live enrichment.
+  const capped = filtered
+    .slice()
+    .sort((a, b) => b.marketCap - a.marketCap)
+    .slice(0, SCREENER_MAX_ROWS);
+
+  if (capped.length === 0) return [];
+
+  // Live enrichment via the existing quote layer (NO new fetch code).
+  let quoteBySym = new Map();
+  try {
+    const { data: quotes } = await handleQuotes(env, capped.map(r => r.sym));
+    quoteBySym = new Map((quotes || []).map(q => [q.sym, q]));
+  } catch (e) {
+    // If enrichment hard-fails, surface so the cache/stale path can run.
+    throw new Error('quote enrichment failed: ' + (e.message || String(e)));
+  }
+
+  let rows = capped.map(r => {
+    const q = quoteBySym.get(r.sym);
+    return {
+      sym: r.sym,
+      name: r.name,
+      sector: r.sector,
+      marketCap: r.marketCap,
+      pe: r.pe,
+      divYield: r.divYield,
+      price: q ? q.price : null,
+      chgPct: q ? q.chgPct : null,
+    };
+  });
+
+  // Live-change filters (Big Movers / explicit dayChange) post-enrichment.
+  if (needsLive) {
+    rows = rows.filter(r => {
+      if (r.chgPct == null) return false;
+      if (params.preset === 'Big Movers' || dayChange === 'big') {
+        return Math.abs(r.chgPct) >= 3;
+      }
+      if (dayChange === 'up') return r.chgPct > 0;
+      if (dayChange === 'down') return r.chgPct < 0;
+      return true;
+    });
+  }
+
+  return rows;
 }
 
 export async function handleFx(env) {

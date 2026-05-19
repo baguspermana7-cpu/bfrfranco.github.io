@@ -1,4 +1,4 @@
-import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures } from './handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -104,6 +104,23 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'futures: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/screener') {
+        const p = (new URL(request.url)).searchParams;
+        try {
+          const { data, cached } = await handleScreener(env, {
+            preset: p.get('preset'),
+            minMcap: +p.get('minMcap') || 0,
+            maxPe: +p.get('maxPe') || 0,
+            sector: p.get('sector') || '',
+            minDiv: +p.get('minDiv') || 0,
+            dayChange: p.get('dayChange') || '',
+          });
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'screener: ' + String(e) });
         }
       }
 
