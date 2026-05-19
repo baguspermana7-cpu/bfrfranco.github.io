@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.21.1 — 2026-05-18 (R-013: Second Brain wired into Insights dropdown)
+
+User: *"page second brain saya … ada wiki, obsidian dan graphify kok tidak
+ada menunya … hilang di dropdown insight. fix it"*. The second-brain app
+(`Apps/second brain/index.html` — the Knowledge-Graph / "Graphify" hub that
+internally surfaces the Wiki link + Obsidian-vault node) was built but
+**never linked from the site nav** (git-confirmed; not a regression).
+
+### Added
+- A truthful **"Second Brain"** `<li>` (purple `#a78bfa`) inserted before
+  "All Insights" in the Insights dropdown on **all 62 pages** that carry it,
+  consistently, per `CONTENT_LINKAGE_PLAYBOOK`. Links to the one real
+  servable entry `Apps/second%20brain/index.html` (resolves 200). Wiki /
+  Obsidian / Graphify are facets WITHIN that app — only `index.html` is a
+  servable page (the vault dir has no index, the wiki target is raw `.md`),
+  so 3 separate links would have been fabricated URLs; one correct entry is
+  the honest fix. Idempotent.
+- Verified: link present + resolves; `audit-js-syntax`/`mobile-responsive
+  --strict` CLEAN.
+
 ## v1.21.0 — 2026-05-18 (P0: site-wide light-mode regression recovery + B-001 changelog generator fix)
 
 User: *"what have you done, ini cardsnya tidak terlihat … tulisannya tidak
