@@ -202,8 +202,8 @@ crons = ["* * * * *"]
 
 - [ ] **Step 1:** User deploys Worker: `cd worker && npx wrangler deploy`; set production `CFG.GW` default to the deployed URL.
 - [ ] **Step 2:** Default `rz_ft_v2` to ON (flip the flag default in client) ONLY after `tools/probe-finance-terminal.mjs` and `tools/probe-all-pageerrors.mjs` are green against the deployed Worker.
-- [ ] **Step 3:** Per-ship discipline: tracker B-002..B-012 → SOLVED(version, commit); `CHANGELOG.md` entry + `python3 tools/build-changelog-html.py --apply`; bump `js/rz-version.js` (MINOR — feature) + `sw.js`; run `audit-js-syntax/script-tags/mobile-responsive/version-stamp --strict`; walk `standarization/CONTENT_LINKAGE_PLAYBOOK.md` §1–§4; record the Worker-backend architecture change in `rz-work/CLAUDE.md` + a memory entry.
-- [ ] **Step 4:** `tools/probe-all-pageerrors.mjs rz-ops-p7x3k9m.html` + finance-terminal probe green → commit `chore(ft): v1.21.0 — Phase 1 flag flip, Worker gateway live`.
+- [ ] **Step 3:** Per-ship discipline: tracker B-002..B-012 → SOLVED(version, commit); `CHANGELOG.md` entry + `python3 tools/build-changelog-html.py --apply`; **bump `js/rz-version.js` to the next free MINOR at MERGE time** (⚠️ VERSION COORDINATION: a parallel session owns v1.21.0–v1.22.x for light-mode / datahallAI / BMS Tracks — do NOT reuse 1.21.0. At merge, read `js/rz-version.js` on `main` and pick the next free MINOR above what has shipped, e.g. v1.23.0) + `sw.js`; run `audit-js-syntax/script-tags/mobile-responsive/version-stamp --strict`; walk `standarization/CONTENT_LINKAGE_PLAYBOOK.md` §1–§4; record the Worker-backend architecture change in `CLAUDE.md` + a memory entry.
+- [ ] **Step 4:** `tools/probe-all-pageerrors.mjs rz-ops-p7x3k9m.html` + finance-terminal probe green → commit `chore(ft): v1.<next-free-minor>.0 — Phase 1 flag flip, Worker gateway live` (version resolved at merge, NOT hardcoded).
 
 ---
 
