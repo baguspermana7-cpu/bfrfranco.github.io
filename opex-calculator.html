@@ -1435,6 +1435,66 @@ html:not([data-theme="dark"]) .breakdown-table strong,
 html:not([data-theme="dark"]) .staffing-table th { color:#475569 !important; }
 html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !important; }
 </style>
+<style id="b016-mobile-overflow-fix">
+/* B-016 mobile overflow fix — eliminate 390px horizontal scroll.
+   Root cause: at <=1024px .calculator-container collapses to a single
+   `1fr` track, but `1fr` == minmax(auto,1fr) whose min-content floor
+   is set by non-shrinkable descendants (.charts-grid 1fr 1fr, action
+   toolbar, summary cards), inflating the track to ~670px while its
+   container stays 390px. Switching to minmax(0,1fr) + min-width:0
+   removes the floor so the column fits. Scoped <=768px so desktop
+   (>=1025px) two-column layout is untouched. */
+@media (max-width: 768px) {
+    .calculator-container {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    .input-panel,
+    .results-panel,
+    .summary-card,
+    #opexActionToolbar,
+    .charts-grid,
+    .chart-card,
+    .breakdown-card,
+    .scenario-section,
+    .input-section {
+        min-width: 0;
+        max-width: 100%;
+    }
+    #opexActionToolbar {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    .charts-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    .input-panel input,
+    .input-panel select,
+    .input-panel textarea,
+    .country-select,
+    #countrySelect {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    /* .breakdown-table is display:table width:100% — its cell content
+       gives it a ~620px min-content that a table box cannot shrink
+       below, forcing its .breakdown-card (and the page) wide. Make the
+       table a block scroll-area on mobile so it scrolls horizontally
+       inside the card instead of expanding the document. */
+    .breakdown-card {
+        overflow-x: auto;
+    }
+    .breakdown-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .breakdown-table thead,
+    .breakdown-table tbody,
+    .breakdown-table tr {
+        width: 100%;
+    }
+}
+</style>
 </head>
 <body>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>

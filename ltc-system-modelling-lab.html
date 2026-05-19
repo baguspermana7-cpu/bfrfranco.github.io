@@ -4124,6 +4124,68 @@
 .skip-link:focus{top:0}
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
+<style id="b016-mobile-overflow-fix">
+/* B-016 mobile overflow fix — eliminate 390px horizontal scroll.
+   Root cause: at <=1180px .calculator-layout collapses to a single
+   `1fr` track, but `1fr` == minmax(auto,1fr) whose min-content floor
+   is set by non-shrinkable descendants (inputs/labels), inflating the
+   track to ~746px while its container stays ~361px. Switching to
+   minmax(0,1fr) + min-width:0 removes the floor so the column fits.
+   Scoped <=768px so desktop (>=1025px) layout is untouched. */
+@media (max-width: 768px) {
+    .calculator-layout {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    .calculator-layout > .calc-card,
+    .calc-input-panel,
+    .calc-output-panel,
+    .calc-panel-scroll {
+        min-width: 0;
+        max-width: 100%;
+        width: auto;
+    }
+    .calc-card,
+    .input-grid,
+    .input-group,
+    .calc-label {
+        min-width: 0;
+        max-width: 100%;
+    }
+    .calc-card input,
+    .calc-card select,
+    .calc-card textarea {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    /* Oversized schematic SVGs are intentionally kept legible via a
+       mobile min-width (.diagram-svg 700px etc.). Their scroll wrappers
+       (overflow-x:auto) lacked a max-width so they expanded the page
+       instead of scrolling internally. Cap the wrappers to the viewport
+       so the SVG scrolls inside its box, not the document. */
+    .diagram-canvas,
+    .chart-canvas,
+    .sankey-canvas,
+    .sankey-drill-canvas,
+    [class$="-canvas"] {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    /* The schematic SVGs are now visually clipped + internally scrolled
+       by their .*-canvas wrappers (clientW≈315, scrollW≈700), so the
+       page is visually correct. But Chromium still folds a clipped
+       overflow:auto child's extent into documentElement.scrollWidth.
+       `overflow-x: clip` on the root (NOT `hidden` — clip creates no
+       scroll container and leaves position:sticky/fixed untouched)
+       truncates that phantom scroll width to the viewport. Scoped
+       <=768px so desktop scrolling/sticky behaviour is unchanged. */
+    html,
+    body.locked,
+    main#main-content {
+        max-width: 100vw;
+        overflow-x: clip;
+    }
+}
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>

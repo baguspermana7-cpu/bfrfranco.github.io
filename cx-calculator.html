@@ -641,6 +641,42 @@ a:hover{text-decoration:underline;}
 .skip-link:focus{top:0}
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
+<style id="b016-mobile-overflow-fix">
+/* B-016 mobile overflow fix — eliminate 390px horizontal scroll.
+   Root cause: the closed off-canvas .cx-drawer uses `right:-520px`
+   on a position:fixed box (width 500px / max 90vw), so its layout
+   box extends ~520px past the right viewport edge and that distance
+   is counted in document scrollWidth even though it is visually
+   off-screen. At <=768px we anchor the closed drawer at right:0 and
+   slide it out via transform:translateX (transforms do NOT enlarge
+   the scrollable area), so closed = no overflow, open = visible.
+   Open/close still toggled by the existing `.open` class. Also drop
+   the min-content floor on the scenario <select> and clip the shared
+   auth dropdown. Scoped <=768px — desktop drawer animation untouched. */
+@media (max-width: 768px) {
+    .cx-drawer {
+        right: 0;
+        max-width: 92vw;
+        transform: translateX(105%);
+        transition: transform 0.3s ease;
+    }
+    .cx-drawer.open {
+        right: 0;
+        transform: translateX(0);
+    }
+    .cx-scenario-bar {
+        flex-wrap: wrap;
+    }
+    .cx-scenario-bar select,
+    #cxScenarioSelect {
+        min-width: 0;
+        max-width: 100%;
+    }
+    .rz-user-dropdown {
+        max-width: calc(100vw - 24px);
+    }
+}
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>

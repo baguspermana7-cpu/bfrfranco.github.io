@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.22.6 — 2026-05-18 (B-016 part 2: 390px horizontal-overflow fixed — B-016 COMPLETE)
+
+### Fixed (CSS-only, additive, one idempotent `<style id="b016-mobile-overflow-fix">` per page, ≤768px-scoped)
+- **ltc-system-modelling-lab.html** 371px→**0px**: `.calculator-layout`
+  `grid-template-columns:minmax(0,1fr)` (removes the min-content floor);
+  panels/grids/labels `min-width:0;max-width:100%`; oversized schematic
+  SVGs `max-width:100%;overflow-x:auto`; `overflow-x:clip` on html/body to
+  drop the clipped-child phantom width (no scroll container / sticky impact).
+- **opex-calculator.html** 296px→**0px**: container + toolbar + charts-grid
+  single-column; panels/cards `min-width:0;max-width:100%`; `.breakdown-table`
+  `display:block;overflow-x:auto`.
+- **cx-calculator.html** 216px→**0px**: off-canvas `.cx-drawer` switched
+  `right:-520px` → `transform:translateX(105%)` (closed) / `translateX(0)`
+  (open) so the off-screen box no longer inflates scrollWidth; scenario bar
+  wraps; shared auth dropdown clipped to viewport. Drawer open/close intact.
+- capex-calculator already measured 0px — correctly untouched.
+- Independently verified: all 3 = 0px @390 **and** @1440 (desktop layout
+  unchanged, panels still multi-column), 0 pageerror, cx drawer toggles;
+  dark/light unaffected; 4 `--strict` gates all 0.
+
+### B-016 — COMPLETE
+Part 1 (v1.22.5): ltc lab external-JS SyntaxError fixed git-authoritatively
++ `audit-js-syntax.py` hardened to scan external `js/*.js`. Part 2 (this):
+390px overflow on ltc/opex/cx fixed. Both verified.
+
 ## v1.22.5 — 2026-05-18 (B-016 part 1: ltc lab external-JS SyntaxError fixed + audit hardened)
 
 ### Fixed
