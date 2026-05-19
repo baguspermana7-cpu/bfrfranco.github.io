@@ -2372,7 +2372,39 @@ const SECTOR_ETFS=[
   {sym:'XLU',name:'Utilities',color:'#94a3b8'}
 ];
 
+/* v2 gate — fetch /sectors from gateway, render the SAME table + bar +
+   pie charts as the Finnhub path. Skeleton while loading; non-blocking
+   retry affordance on failure (gw has an 8s timeout). */
+async function loadSectorsV2(){
+  const tb=$('sectorTable').querySelector('tbody');
+  tb.innerHTML='<tr><td colspan="5"><div class="skel" style="height:120px"></div></td></tr>';
+  try{
+    const rows=await gw('/sectors');
+    if(!Array.isArray(rows)||!rows.length)throw new Error('empty /sectors response');
+    // Merge gateway names with the local palette (color) by symbol.
+    const byColor={};SECTOR_ETFS.forEach(s=>{byColor[s.sym]=s.color});
+    const data=rows.map(r=>({sym:r.sym,name:r.name,color:byColor[r.sym]||'#94a3b8',c:r.price||0,dp:r.chgPct||0,d:r.chg||0,v:0}));
+    const cc=chartColors();destroyChart('sector');
+    data.sort((a,b)=>b.dp-a.dp);
+    S.charts.sector=new Chart($('sectorChart'),{
+      type:'bar',
+      data:{labels:data.map(d=>d.name),datasets:[{label:'Day Change %',data:data.map(d=>d.dp),backgroundColor:data.map(d=>d.dp>=0?'rgba(52,211,153,.7)':'rgba(248,113,113,.7)'),borderRadius:6}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
+    });
+    tb.innerHTML=data.map(d=>`<tr><td class="fw7 c-t1">${d.name}</td><td class="mono c-t4">${d.sym}</td><td class="txt-r mono c-t1">$${fmtP(d.c)}</td><td class="txt-r fw6" style="color:${chgColor(d.dp)}">${d.dp>0?'+':''}${fmtP(d.dp)}%</td><td class="txt-r mono c-t4">${d.v?fmt(d.v):'--'}</td></tr>`).join('');
+    destroyChart('secPie');
+    const weights=data.map(d=>d.c>0?d.c:1);
+    S.charts.secPie=new Chart($('sectorPie'),{
+      type:'doughnut',
+      data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
+    });
+  }catch(e){
+    tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadSectorsV2()">Retry</a></p></div></td></tr>';
+  }
+}
 async function loadSectors(){
+  if(CFG.V2)return loadSectorsV2();
   if(!S.fhKey){$('sectorTable').querySelector('tbody').innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-key"></i><p>Enter API key</p></div></td></tr>';return}
   const quotes=await batchQuotes(SECTOR_ETFS.map(s=>s.sym));
   const data=SECTOR_ETFS.map(sec=>{const q=quotes[sec.sym];return{...sec,c:q?.c||0,dp:q?.dp||0,d:q?.d||0,v:q?.v||0}});
@@ -2399,7 +2431,51 @@ async function loadSectors(){
 /* ═══════════════════════════════════════════════════════════════
    SECTION 19: TAB - ECONOMY
    ═══════════════════════════════════════════════════════════════ */
+/* v2 gate — fetch /economy from gateway: treasury ETF proxies +
+   USD currency pairs. Renders the SAME econKpis grid, yieldTable,
+   yieldChart and econFxTable as the Finnhub path. Skeleton + retry.
+   (loadEconCalendar + loadYieldCurve keep their existing paths.) */
+async function loadEconomyV2(){
+  const yt=$('yieldTable').querySelector('tbody');
+  const ft=$('econFxTable').querySelector('tbody');
+  $('econKpis').innerHTML='<div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div>';
+  yt.innerHTML='<tr><td colspan="4"><div class="skel" style="height:80px"></div></td></tr>';
+  ft.innerHTML='<tr><td colspan="3"><div class="skel" style="height:80px"></div></td></tr>';
+  loadEconCalendar();
+  try{
+    const d=await gw('/economy');
+    const yields=(d&&Array.isArray(d.yields))?d.yields:[];
+    const currencies=(d&&Array.isArray(d.currencies))?d.currencies:[];
+    if(!yields.length&&!currencies.length)throw new Error('empty /economy response');
+    // KPIs — first 4 yield proxies.
+    $('econKpis').innerHTML=yields.slice(0,4).map(y=>
+      `<div class="kpi"><div class="kpi-icon" style="background:var(--accbg);color:var(--acc2)"><i class="fas fa-landmark"></i></div><div class="kpi-label">${y.name}</div><div class="kpi-val">$${fmtP(y.price)}</div><div class="kpi-sub ${chgClass(y.chgPct)}">${y.chgPct>0?'+':''}${fmtP(y.chgPct)}%</div></div>`
+    ).join('')||'<div class="empty" style="grid-column:1/-1"><p>No bond data available</p></div>';
+    // Yield table.
+    yt.innerHTML=yields.map(y=>
+      `<tr><td class="fw7 c-t1">${y.name}</td><td class="mono c-t4">${y.sym}</td><td class="txt-r mono c-t1">$${fmtP(y.price)}</td><td class="txt-r fw6" style="color:${chgColor(y.chgPct)}">${y.chgPct>0?'+':''}${fmtP(y.chgPct)}%</td></tr>`
+    ).join('')||'<tr><td colspan="4" class="c-t4">No data</td></tr>';
+    // Yield bar chart (reuses the existing yieldChart canvas + style).
+    const cc=chartColors();destroyChart('yield');
+    if(yields.length){
+      S.charts.yield=new Chart($('yieldChart'),{
+        type:'bar',data:{labels:yields.map(y=>y.sym),datasets:[{label:'Day %',data:yields.map(y=>y.chgPct||0),backgroundColor:yields.map(y=>(y.chgPct||0)>=0?'rgba(96,165,250,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:cc.text}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%'}}}}
+      });
+    }
+    // Currency table.
+    ft.innerHTML=currencies.map(c=>{
+      const cur=c.pair.split('/')[1]||c.pair;
+      return`<tr><td class="fw7 c-t1">${cur}</td><td class="txt-r mono c-t1">${fmtP(c.rate,4)}</td><td class="txt-r mono c-t4">${fmtP(c.inverse,4)}</td></tr>`;
+    }).join('')||'<tr><td colspan="3" class="c-t4">No data</td></tr>';
+  }catch(e){
+    yt.innerHTML='<tr><td colspan="4"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadEconomyV2()">Retry</a></p></div></td></tr>';
+    ft.innerHTML='<tr><td colspan="3" class="c-t4">Unavailable</td></tr>';
+    $('econKpis').innerHTML='<div class="empty" style="grid-column:1/-1"><p>Economy data unavailable</p></div>';
+  }
+}
 async function loadEconomy(){
+  if(CFG.V2)return loadEconomyV2();
   loadYields();
   loadEconFx();
   loadEconCalendar();
@@ -2716,7 +2792,53 @@ const FUTURES_PROXIES=[
   {name:'Euro FX (6E)',sym:'FXE',icon:'fa-euro-sign'},
   {name:'VIX (VX)',sym:'VIXY',icon:'fa-bolt'}
 ];
+/* v2 gate — fetch /futures from gateway, render the SAME KPI cards +
+   table + performance bar chart. The line chart (loadFuturesChart)
+   keeps its existing CORS-proxied Yahoo path (not the broken Finnhub
+   path, so it already works). Skeleton + retry on failure. */
+async function loadFuturesV2(){
+  const tb=$('futuresTable').querySelector('tbody');
+  $('futuresKpis').innerHTML='<div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div><div class="skel" style="height:90px"></div>';
+  tb.innerHTML='<tr><td colspan="5"><div class="skel" style="height:120px"></div></td></tr>';
+  try{
+    const rows=await gw('/futures');
+    if(!Array.isArray(rows)||!rows.length)throw new Error('empty /futures response');
+    const icons={};FUTURES_PROXIES.forEach(f=>{icons[f.sym]=f.icon});
+    const bySym={};rows.forEach(r=>{bySym[r.sym]={c:r.price||0,dp:r.chgPct||0,d:r.chg||0}});
+    const list=rows.map(r=>({sym:r.sym,name:r.name,icon:icons[r.sym]||'fa-rocket'}));
+    // KPIs — top 4 (fall back to first 4 returned if a preferred sym is missing).
+    const pref=['SPY','QQQ','USO','GLD'].filter(s=>bySym[s]);
+    const topSyms=(pref.length?pref:list.slice(0,4).map(f=>f.sym));
+    $('futuresKpis').innerHTML=topSyms.map(sym=>{
+      const f=list.find(p=>p.sym===sym)||{name:sym,icon:'fa-rocket'};const q=bySym[sym]||{};
+      return`<div class="kpi" style="cursor:pointer" onclick="S.futSym='${sym}';loadFuturesChart(S.futTf)"><div class="kpi-icon" style="background:var(--accbg);color:var(--acc2)"><i class="fas ${f.icon}"></i></div><div class="kpi-label">${f.name}</div><div class="kpi-val">$${fmtP(q.c||0)}</div><div class="kpi-sub ${chgClass(q.dp)}">${q.dp>0?'+':''}${fmtP(q.dp||0)}%</div></div>`;
+    }).join('');
+    tb.innerHTML=list.map(f=>{
+      const q=bySym[f.sym]||{};
+      return`<tr style="cursor:pointer" onclick="S.futSym='${f.sym}';loadFuturesChart(S.futTf)">
+      <td class="fw7 c-t1"><i class="fas ${f.icon} c-t4" style="margin-right:6px"></i>${f.name}</td>
+      <td class="mono c-t4">${f.sym}</td>
+      <td class="txt-r mono fw6 c-t1">$${fmtP(q.c||0)}</td>
+      <td class="txt-r fw6" style="color:${chgColor(q.dp)}">${q.dp>0?'+':''}${fmtP(q.dp||0)}%</td>
+      <td class="txt-r mono c-t4">--</td>
+    </tr>`;}).join('');
+    const perf=list.map(f=>({name:f.name.split('(')[0].trim(),dp:bySym[f.sym]?.dp||0})).sort((a,b)=>b.dp-a.dp);
+    const cc=chartColors();
+    destroyChart('futuresPerf');
+    S.charts.futuresPerf=new Chart($('futuresPerfChart'),{
+      type:'bar',data:{labels:perf.map(p=>p.name),datasets:[{data:perf.map(p=>p.dp),backgroundColor:perf.map(p=>p.dp>=0?'rgba(52,211,153,.6)':'rgba(248,113,113,.6)'),borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>=0?'+':'')+fmtP(ctx.raw)+'%'}}},
+        scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:9}}}}}
+    });
+    if(!S.futSym)S.futSym=topSyms[0]||'SPY';
+    loadFuturesChart('M');
+  }catch(e){
+    tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadFuturesV2()">Retry</a></p></div></td></tr>';
+    $('futuresKpis').innerHTML='<div class="empty" style="grid-column:1/-1"><p>Futures data unavailable</p></div>';
+  }
+}
 async function loadFutures(){
+  if(CFG.V2)return loadFuturesV2();
   const quotes=await batchQuotes(FUTURES_PROXIES.map(f=>f.sym));
   // KPIs - top 4
   const topSyms=['SPY','QQQ','USO','GLD'];

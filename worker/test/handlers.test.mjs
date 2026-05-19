@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx, handleQuotes, handleCandles, handleNews } from '../src/handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -599,6 +599,208 @@ test('Test M: fresh news cache hit → cached:true, no fetch', async () => {
     assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
     assert.equal(result.cached, true);
     assert.deepEqual(result.data, cachedData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleSectors / handleEconomy / handleFutures tests (Task 1.5)
+   Fixes B-009 / B-010 / B-011 — ETF-proxy aggregations that
+   delegate INTERNALLY to handleQuotes / handleFx (no new fetch).
+   ═══════════════════════════════════════════════════════════════ */
+
+// Generic Yahoo v7 quote-batch builder: every requested symbol gets a
+// deterministic numeric quote so handleQuotes resolves the whole batch.
+function yahooQuoteBatch(symbols) {
+  const result = symbols.map((sym, i) => ({
+    symbol: sym,
+    regularMarketPrice: 100 + i,
+    regularMarketChange: i % 2 === 0 ? 1.1 : -0.9,
+    regularMarketChangePercent: i % 2 === 0 ? 0.55 : -0.42,
+    regularMarketPreviousClose: 100 + i - (i % 2 === 0 ? 1.1 : -0.9),
+  }));
+  return JSON.stringify({ quoteResponse: { result, error: null } });
+}
+
+// Stub fetch that answers Yahoo quote requests for any syms in the URL.
+function yahooQuoteStub() {
+  return async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com') && u.includes('/v7/finance/quote')) {
+      const symParam = new URL(u).searchParams.get('symbols') || '';
+      const syms = symParam.split(',').filter(Boolean);
+      return { ok: true, json: async () => JSON.parse(yahooQuoteBatch(syms)) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+}
+
+const SECTOR_SYMS = ['XLK','XLV','XLF','XLY','XLI','XLC','XLP','XLE','XLB','XLRE','XLU'];
+
+// Test N: handleSectors → 11 SPDR rows, each with sym/name/price/chg/chgPct, cached.
+test('Test N: handleSectors → 11 SPDR ETF rows with names + numeric fields, cached', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = yahooQuoteStub();
+
+  try {
+    const result = await handleSectors({ FT_KV: kv });
+    assert.equal(Array.isArray(result.data), true, 'data should be array');
+    assert.equal(result.data.length, 11, 'should have 11 SPDR sector ETFs');
+    assert.equal(result.cached, false, 'first call not cached');
+
+    const seen = new Set();
+    for (const row of result.data) {
+      assert.equal(typeof row.sym, 'string');
+      assert.equal(typeof row.name, 'string');
+      assert.ok(row.name.length > 0, row.sym + ' must have a non-empty name');
+      assert.equal(typeof row.price, 'number');
+      assert.equal(typeof row.chg, 'number');
+      assert.equal(typeof row.chgPct, 'number');
+      seen.add(row.sym);
+    }
+    for (const s of SECTOR_SYMS) {
+      assert.ok(seen.has(s), 'sector list must include ' + s);
+    }
+    const xlk = result.data.find(r => r.sym === 'XLK');
+    assert.equal(xlk.name, 'Technology', 'XLK → Technology name map');
+
+    assert.ok(kv.store.get('sectors') != null, 'sectors should be cached in KV');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test O: handleSectors fresh cache hit → cached:true WITHOUT calling fetch.
+test('Test O: handleSectors fresh cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  const cachedData = SECTOR_SYMS.map(s => ({ sym: s, name: s, price: 1, chg: 0, chgPct: 0 }));
+  await setCached(kv, 'sectors', cachedData);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleSectors({ FT_KV: kv });
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, cachedData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test P: handleEconomy → { yields:length5, currencies:length6 } numeric rates+inverse.
+test('Test P: handleEconomy → 5 treasury yields + 6 currency pairs with numeric rate+inverse', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com') && u.includes('/v7/finance/quote')) {
+      const symParam = new URL(u).searchParams.get('symbols') || '';
+      const syms = symParam.split(',').filter(Boolean);
+      return { ok: true, json: async () => JSON.parse(yahooQuoteBatch(syms)) };
+    }
+    if (u.includes('frankfurter.app')) {
+      // Frankfurter latest?from=USD shape: { base, date, rates:{...} }
+      return {
+        ok: true,
+        json: async () => ({
+          amount: 1, base: 'USD', date: '2026-05-19',
+          rates: { EUR: 0.92, GBP: 0.78, JPY: 149.5, CHF: 0.88, AUD: 1.52, CAD: 1.37 },
+        }),
+      };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleEconomy({ FT_KV: kv });
+    assert.ok(result.data && typeof result.data === 'object', 'data should be an object');
+    assert.equal(Array.isArray(result.data.yields), true, 'yields should be array');
+    assert.equal(result.data.yields.length, 5, '5 treasury ETF proxies');
+    assert.equal(Array.isArray(result.data.currencies), true, 'currencies should be array');
+    assert.equal(result.data.currencies.length, 6, '6 USD currency pairs');
+
+    const ySyms = new Set(result.data.yields.map(y => y.sym));
+    for (const s of ['SHY','IEI','IEF','TLT','TIP']) {
+      assert.ok(ySyms.has(s), 'yields must include ' + s);
+    }
+    for (const y of result.data.yields) {
+      assert.equal(typeof y.name, 'string');
+      assert.ok(y.name.length > 0);
+      assert.equal(typeof y.price, 'number');
+      assert.equal(typeof y.chg, 'number');
+      assert.equal(typeof y.chgPct, 'number');
+    }
+
+    for (const c of result.data.currencies) {
+      assert.ok(/^USD\//.test(c.pair), 'pair should be USD/<cur>, got ' + c.pair);
+      assert.equal(typeof c.rate, 'number');
+      assert.equal(typeof c.inverse, 'number');
+      assert.ok(Math.abs(c.inverse - 1 / c.rate) < 1e-9, 'inverse must equal 1/rate');
+    }
+    const eur = result.data.currencies.find(c => c.pair === 'USD/EUR');
+    assert.equal(eur.rate, 0.92);
+
+    assert.ok(kv.store.get('economy') != null, 'economy should be cached in KV');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test Q: handleFutures → 9 futures-proxy ETF rows with names + numeric fields.
+test('Test Q: handleFutures → 9 ETF-proxy rows with names + numeric fields, cached', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = yahooQuoteStub();
+
+  try {
+    const result = await handleFutures({ FT_KV: kv });
+    assert.equal(Array.isArray(result.data), true);
+    assert.equal(result.data.length, 9, 'should have 9 futures-proxy ETFs');
+    assert.equal(result.cached, false);
+
+    const seen = new Set();
+    for (const row of result.data) {
+      assert.equal(typeof row.sym, 'string');
+      assert.equal(typeof row.name, 'string');
+      assert.ok(row.name.length > 0, row.sym + ' must have a name');
+      assert.equal(typeof row.price, 'number');
+      assert.equal(typeof row.chg, 'number');
+      assert.equal(typeof row.chgPct, 'number');
+      seen.add(row.sym);
+    }
+    for (const s of ['SPY','QQQ','DIA','IWM','GLD','SLV','USO','UNG','DBA']) {
+      assert.ok(seen.has(s), 'futures list must include ' + s);
+    }
+    const spy = result.data.find(r => r.sym === 'SPY');
+    assert.ok(/S&P/.test(spy.name), 'SPY name should reference S&P');
+
+    assert.ok(kv.store.get('futures') != null, 'futures should be cached in KV');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test R: handleFutures all sources fail BUT stale cache exists → stale:true.
+test('Test R: handleFutures all sources fail with stale cache → stale:true', async () => {
+  const kv = fakeKV();
+  const staleData = [{ sym: 'SPY', name: 'S&P 500 (ES)', price: 1, chg: 0, chgPct: 0 }];
+  const oldTs = Date.now() - 120_000; // expired at 60s TTL
+  kv.store.set('futures', JSON.stringify({ d: staleData, t: oldTs }));
+
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('network unavailable'); };
+
+  try {
+    const result = await handleFutures({ FT_KV: kv });
+    assert.equal(result.stale, true, 'should return stale:true');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, staleData);
   } finally {
     globalThis.fetch = origFetch;
   }

@@ -1,4 +1,4 @@
-import { handleFx, handleQuotes, handleCandles, handleNews } from './handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -77,6 +77,33 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'news: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/sectors') {
+        try {
+          const { data, cached } = await handleSectors(env);
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'sectors: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/economy') {
+        try {
+          const { data, cached } = await handleEconomy(env);
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'economy: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/futures') {
+        try {
+          const { data, cached } = await handleFutures(env);
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'futures: ' + String(e) });
         }
       }
 

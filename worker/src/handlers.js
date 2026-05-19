@@ -241,6 +241,147 @@ export async function handleNews(env, topic) {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Task 1.5 — /sectors /economy /futures (fixes B-009/B-010/B-011)
+
+   These are ETF-proxy quote aggregations. They delegate INTERNALLY
+   to handleQuotes (and handleFx for /economy) — no new fetch logic.
+   A thin top-level cache wrapper holds the SHAPED result so a fully
+   failed live fetch can still serve a stale shaped payload.
+   ═══════════════════════════════════════════════════════════════ */
+
+const AGG_TTL_MS = 60_000;
+
+// 11 SPDR sector ETFs — sym → display name.
+const SECTOR_NAMES = {
+  XLK: 'Technology',
+  XLV: 'Health Care',
+  XLF: 'Financials',
+  XLY: 'Consumer Disc.',
+  XLI: 'Industrials',
+  XLC: 'Comm. Services',
+  XLP: 'Consumer Staples',
+  XLE: 'Energy',
+  XLB: 'Materials',
+  XLRE: 'Real Estate',
+  XLU: 'Utilities',
+};
+const SECTOR_SYMS = Object.keys(SECTOR_NAMES);
+
+// Treasury ETF proxies (yield curve) — sym → label.
+const YIELD_NAMES = {
+  SHY: '1-3 Year Treasury',
+  IEI: '3-7 Year Treasury',
+  IEF: '7-10 Year Treasury',
+  TLT: '20+ Year Treasury',
+  TIP: 'TIPS (Inflation)',
+};
+const YIELD_SYMS = Object.keys(YIELD_NAMES);
+
+// Currencies to surface for /economy (USD base, via handleFx).
+const ECON_CURRENCIES = ['EUR', 'GBP', 'JPY', 'CHF', 'AUD', 'CAD'];
+
+// Futures ETF proxies — sym → display name.
+const FUTURES_NAMES = {
+  SPY: 'S&P 500 (ES)',
+  QQQ: 'Nasdaq 100 (NQ)',
+  DIA: 'Dow Jones (YM)',
+  IWM: 'Russell 2000 (RTY)',
+  GLD: 'Gold (GC)',
+  SLV: 'Silver (SI)',
+  USO: 'Crude Oil (CL)',
+  UNG: 'Natural Gas (NG)',
+  DBA: 'Agriculture (DBA)',
+};
+const FUTURES_SYMS = Object.keys(FUTURES_NAMES);
+
+/**
+ * shapeRows(quotes, nameMap) — { sym, name, price, chg, chgPct } per symbol,
+ * dropping any symbol the quote layer could not resolve.
+ */
+function shapeRows(quotes, nameMap) {
+  const bySym = new Map((quotes || []).map(q => [q.sym, q]));
+  const out = [];
+  for (const sym of Object.keys(nameMap)) {
+    const q = bySym.get(sym);
+    if (!q) continue;
+    out.push({
+      sym,
+      name: nameMap[sym],
+      price: q.price,
+      chg: q.chg,
+      chgPct: q.chgPct,
+    });
+  }
+  return out;
+}
+
+/**
+ * aggViaCache(env, cacheKey, builder)
+ *   Fresh shaped cache → cached:true. Else build (delegating to
+ *   handleQuotes/handleFx), cache the shaped result, return cached:false.
+ *   On any builder failure, serve a stale shaped payload if present.
+ */
+async function aggViaCache(env, cacheKey, builder) {
+  const fresh = await getCached(env.FT_KV, cacheKey, AGG_TTL_MS);
+  if (fresh && !fresh.stale) {
+    return { data: fresh.data, cached: true };
+  }
+  try {
+    const data = await builder();
+    await setCached(env.FT_KV, cacheKey, data);
+    return { data, cached: false };
+  } catch (err) {
+    const stale = await getCached(env.FT_KV, cacheKey, AGG_TTL_MS, { allowStale: true });
+    if (stale) {
+      return { data: stale.data, cached: true, stale: true };
+    }
+    throw err;
+  }
+}
+
+/**
+ * handleSectors(env) — 11 SPDR sector-ETF rows.
+ * Returns: { data: [{sym,name,price,chg,chgPct}], cached, stale? }
+ */
+export async function handleSectors(env) {
+  return aggViaCache(env, 'sectors', async () => {
+    const { data } = await handleQuotes(env, SECTOR_SYMS);
+    return shapeRows(data, SECTOR_NAMES);
+  });
+}
+
+/**
+ * handleEconomy(env) — treasury ETF proxies + USD currency pairs.
+ * Returns: { data: { yields:[{sym,name,price,chg,chgPct}],
+ *                     currencies:[{pair,rate,inverse}] }, cached, stale? }
+ */
+export async function handleEconomy(env) {
+  return aggViaCache(env, 'economy', async () => {
+    const [{ data: quotes }, { data: fx }] = await Promise.all([
+      handleQuotes(env, YIELD_SYMS),
+      handleFx(env),
+    ]);
+    const yields = shapeRows(quotes, YIELD_NAMES);
+    const rates = (fx && fx.rates) || {};
+    const currencies = ECON_CURRENCIES
+      .filter(c => typeof rates[c] === 'number')
+      .map(c => ({ pair: 'USD/' + c, rate: rates[c], inverse: 1 / rates[c] }));
+    return { yields, currencies };
+  });
+}
+
+/**
+ * handleFutures(env) — 9 futures-proxy ETF rows.
+ * Returns: { data: [{sym,name,price,chg,chgPct}], cached, stale? }
+ */
+export async function handleFutures(env) {
+  return aggViaCache(env, 'futures', async () => {
+    const { data } = await handleQuotes(env, FUTURES_SYMS);
+    return shapeRows(data, FUTURES_NAMES);
+  });
+}
+
 export async function handleFx(env) {
   // Check fresh cache first
   const fresh = await getCached(env.FT_KV, FX_CACHE_KEY, FX_TTL_MS);
