@@ -1802,10 +1802,72 @@ async function loadCrossMatrix(){
    SECTION 13: TAB 4 - CRYPTO
    ═══════════════════════════════════════════════════════════════ */
 async function loadCrypto(){
+  if(CFG.V2)return loadCryptoV2();
   loadCryptoKpis();
   loadCryptoTable();
   loadTrending();
   loadDominance();
+}
+
+/* v2 gate — source crypto markets+global from the gateway (cached +
+   quota-safe) instead of hitting CoinGecko directly. Renders the SAME
+   KPI cards + table from data.coins/data.global; Market Dominance is
+   rendered as bars (B-005: the old canvas chart rendered empty).
+   Trending keeps its existing direct CoinGecko call (not part of the
+   /crypto payload; that endpoint is CORS-open and works today).
+   Skeleton while loading; non-blocking retry on failure (gw 8s
+   timeout — no infinite spinner). */
+async function loadCryptoV2(){
+  loadTrending();
+  $('cryptoKpis').innerHTML='<div class="skel" style="height:100px"></div><div class="skel" style="height:100px"></div><div class="skel" style="height:100px"></div><div class="skel" style="height:100px"></div>';
+  const tb=$('cryptoTable').querySelector('tbody');
+  tb.innerHTML='<tr><td colspan="9"><div class="skel" style="height:120px"></div></td></tr>';
+  try{
+    const d=await gw('/crypto');
+    const g=(d&&d.global)||{};
+    const coins=(d&&d.coins)||[];
+    S.cryptoGlobal=g;
+    $('cryptoKpis').innerHTML=`
+    <div class="kpi"><div class="kpi-icon" style="background:var(--accbg);color:var(--acc2)"><i class="fas fa-globe"></i></div><div class="kpi-label">Total Market Cap</div><div class="kpi-val">$${fmt(g.total_market_cap?.usd||0)}</div><div class="kpi-sub ${chgClass(g.market_cap_change_percentage_24h_usd)}">${fmtP(g.market_cap_change_percentage_24h_usd)}%</div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:var(--grnbg);color:var(--grn)"><i class="fas fa-exchange-alt"></i></div><div class="kpi-label">24h Volume</div><div class="kpi-val">$${fmt(g.total_volume?.usd||0)}</div><div class="kpi-sub flat">${fmt(g.active_cryptocurrencies||0,0)} coins</div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:var(--ambbg);color:var(--amb)"><i class="fab fa-bitcoin"></i></div><div class="kpi-label">BTC Dominance</div><div class="kpi-val">${fmtP(g.market_cap_percentage?.btc||0,1)}%</div><div class="kpi-sub flat">ETH ${fmtP(g.market_cap_percentage?.eth||0,1)}%</div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:var(--blubg);color:var(--blu)"><i class="fas fa-coins"></i></div><div class="kpi-label">Markets</div><div class="kpi-val">${fmt(g.markets||0,0)}</div><div class="kpi-sub flat">${fmt(g.active_cryptocurrencies||0,0)} active</div></div>`;
+    S.cryptoList=coins;
+    if(coins.length){renderCryptoTable();}
+    else{tb.innerHTML='<tr><td colspan="9"><div class="empty"><p>No crypto data</p></div></td></tr>';}
+    renderDominanceCards(g);
+  }catch(e){
+    $('cryptoKpis').innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadCryptoV2()">Retry</a></p></div>';
+    tb.innerHTML='<tr><td colspan="9"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadCryptoV2()">Retry</a></p></div></td></tr>';
+  }
+}
+
+/* B-005 fix — render Market Dominance as horizontal bars instead of
+   the (empty-rendering) doughnut canvas. Reuses the sibling Trending
+   card's exact row pattern (flex + bottom border + c-t1/c-t4/mono)
+   and the same dominance colour swatches the old chart used — no new
+   palette. If market_cap_percentage is missing, the card is hidden
+   gracefully (no empty shell). */
+function renderDominanceCards(g){
+  // First call: canvas still present → find + tag its card with a
+  // stable id so subsequent retries/refreshes can re-target it.
+  let card=$('domCard');
+  if(!card){const cvs=$('dominanceChart');card=cvs&&cvs.closest('.card');if(card)card.id='domCard';}
+  if(!card)return;
+  const pcts=(g&&g.market_cap_percentage)||null;
+  const entries=pcts?Object.entries(pcts).filter(e=>typeof e[1]==='number').sort((a,b)=>b[1]-a[1]).slice(0,6):[];
+  if(!entries.length){card.style.display='none';return;}
+  card.style.display='';
+  const colors=['#f7931a','#627eea','#34d399','#f87171','#60a5fa','#fbbf24'];
+  const max=entries[0][1]||1;
+  card.innerHTML='<div class="card-title"><i class="fas fa-chart-pie"></i>Market Dominance</div>'+
+    entries.map((e,i)=>{
+      const sym=e[0].toUpperCase(),pct=e[1],w=Math.max(2,(pct/max)*100);
+      return`<div style="display:flex;align-items:center;gap:8px;padding:.4rem 0;border-bottom:1px solid var(--bd2);font-size:.78rem">
+        <span class="fw7 c-t1" style="width:48px">${sym}</span>
+        <div style="flex:1;height:8px;background:var(--bd2);border-radius:50px;overflow:hidden"><div style="height:100%;width:${w}%;background:${colors[i%colors.length]};border-radius:50px"></div></div>
+        <span class="c-t4 mono" style="width:52px;text-align:right">${fmtP(pct,1)}%</span>
+      </div>`}).join('');
 }
 
 async function loadCryptoKpis(){

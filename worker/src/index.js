@@ -1,4 +1,4 @@
-import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener } from './handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -104,6 +104,15 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'futures: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/crypto') {
+        try {
+          const { data, cached } = await handleCrypto(env);
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'crypto: ' + String(e) });
         }
       }
 

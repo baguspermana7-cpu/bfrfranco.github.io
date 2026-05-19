@@ -4,6 +4,7 @@ import { fetchYahooQuotes, fetchYahooCandles } from './sources/yahoo.js';
 import { fetchStooqQuotes, fetchStooqCandles } from './sources/stooq.js';
 import { fetchFinnhubQuotes } from './sources/finnhub.js';
 import { fetchNews } from './sources/news.js';
+import { fetchCoinGeckoMarkets, fetchCoinGeckoGlobal } from './sources/coingecko.js';
 import { SCREENER_UNIVERSE } from './data/screener-universe.js';
 
 const FX_CACHE_KEY = 'fx:USD';
@@ -235,6 +236,56 @@ export async function handleNews(env, topic) {
     return { data, cached: false };
   } catch (fetchErr) {
     const stale = await getCached(env.FT_KV, cacheKey, NEWS_TTL_MS, { allowStale: true });
+    if (stale) {
+      return { data: stale.data, cached: true, stale: true };
+    }
+    throw fetchErr;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Task 1.7 — /crypto (fixes B-005)
+
+   CoinGecko markets + global proxied through the Worker so the
+   crypto tab is cached + quota-safe (CoinGecko free tier is rate
+   limited). User-visible behaviour is identical — the client renders
+   the same markup from data.coins / data.global. 2-min TTL (crypto
+   moves fast but free CoinGecko quota must be conserved).
+   ═══════════════════════════════════════════════════════════════ */
+
+const CRYPTO_CACHE_KEY = 'crypto';
+const CRYPTO_TTL_MS = 120_000; // 2 min
+
+/**
+ * handleCrypto(env) — CoinGecko markets + global with KV cache +
+ * stale-on-error fallback.
+ *
+ * Returns: { data: { coins: [...], global: {...} }, cached, stale? }
+ *   - Fresh cache hit  : { data, cached: true }
+ *   - Live fetch       : { data, cached: false }
+ *   - All fail + stale : { data, cached: true, stale: true }
+ *   - All fail + none  : throws
+ *
+ * coins   — CoinGecko /coins/markets array, passed through as-is.
+ * global  — CoinGecko /global inner `data` object (has
+ *           market_cap_percentage — the Market Dominance source).
+ */
+export async function handleCrypto(env) {
+  const fresh = await getCached(env.FT_KV, CRYPTO_CACHE_KEY, CRYPTO_TTL_MS);
+  if (fresh && !fresh.stale) {
+    return { data: fresh.data, cached: true };
+  }
+
+  try {
+    const [coins, global] = await Promise.all([
+      fetchCoinGeckoMarkets(),
+      fetchCoinGeckoGlobal(),
+    ]);
+    const data = { coins, global };
+    await setCached(env.FT_KV, CRYPTO_CACHE_KEY, data);
+    return { data, cached: false };
+  } catch (fetchErr) {
+    const stale = await getCached(env.FT_KV, CRYPTO_CACHE_KEY, CRYPTO_TTL_MS, { allowStale: true });
     if (stale) {
       return { data: stale.data, cached: true, stale: true };
     }

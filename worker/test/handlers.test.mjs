@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener } from '../src/handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -915,6 +915,132 @@ test('Test U: fresh screener cache hit → cached:true, no fetch', async () => {
     assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
     assert.equal(result.cached, true);
     assert.deepEqual(result.data, first.data);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleCrypto tests (Task 1.7) — fixes B-005.
+   CoinGecko markets + global proxied through the Worker (2 min cache,
+   stale-on-error, quota-safe). Shape: { coins:[...], global:{...} }.
+   ═══════════════════════════════════════════════════════════════ */
+
+// CoinGecko markets array stub (subset of real fields the client uses).
+function cgMarketsResponse() {
+  return [
+    {
+      id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', image: 'x',
+      current_price: 67000, market_cap: 1.3e12, market_cap_rank: 1,
+      total_volume: 3e10,
+      price_change_percentage_1h_in_currency: 0.12,
+      price_change_percentage_24h_in_currency: 1.4,
+      price_change_percentage_7d_in_currency: -2.1,
+      sparkline_in_7d: { price: [66000, 66500, 67000] },
+    },
+    {
+      id: 'ethereum', symbol: 'eth', name: 'Ethereum', image: 'y',
+      current_price: 3500, market_cap: 4.2e11, market_cap_rank: 2,
+      total_volume: 1.5e10,
+      price_change_percentage_1h_in_currency: -0.05,
+      price_change_percentage_24h_in_currency: 0.9,
+      price_change_percentage_7d_in_currency: 3.3,
+      sparkline_in_7d: { price: [3400, 3450, 3500] },
+    },
+  ];
+}
+
+// CoinGecko /global stub. market_cap_percentage is the Market Dominance source.
+function cgGlobalResponse() {
+  return {
+    data: {
+      active_cryptocurrencies: 12000,
+      markets: 900,
+      total_market_cap: { usd: 2.4e12 },
+      total_volume: { usd: 9e10 },
+      market_cap_change_percentage_24h_usd: 1.1,
+      market_cap_percentage: {
+        btc: 52.1, eth: 17.3, usdt: 4.2, bnb: 3.1, sol: 2.4, xrp: 1.8, ada: 1.2,
+      },
+    },
+  };
+}
+
+function cgCryptoStub() {
+  return async (url) => {
+    const u = String(url);
+    if (u.includes('api.coingecko.com') && u.includes('/coins/markets')) {
+      return { ok: true, json: async () => JSON.parse(JSON.stringify(cgMarketsResponse())) };
+    }
+    if (u.includes('api.coingecko.com') && u.includes('/global')) {
+      return { ok: true, json: async () => JSON.parse(JSON.stringify(cgGlobalResponse())) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+}
+
+// Test V: markets + global stubbed → handleCrypto returns
+// { coins:[len>0], global:{ market_cap_percentage:{ btc,... } } } and caches it.
+test('Test V: handleCrypto returns coins+global, caches under crypto key', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = cgCryptoStub();
+
+  try {
+    const result = await handleCrypto({ FT_KV: kv });
+    assert.equal(result.cached, false, 'first call not cached');
+    assert.equal(Array.isArray(result.data.coins), true, 'coins should be an array');
+    assert.ok(result.data.coins.length > 0, 'coins should be non-empty');
+    assert.equal(result.data.coins[0].id, 'bitcoin', 'markets array passed through as-is');
+    assert.equal(typeof result.data.global, 'object', 'global should be an object');
+    assert.equal(typeof result.data.global.market_cap_percentage, 'object',
+      'global.market_cap_percentage must be present (Market Dominance source)');
+    assert.equal(typeof result.data.global.market_cap_percentage.btc, 'number',
+      'btc dominance must be a number');
+
+    const raw = kv.store.get('crypto');
+    assert.ok(raw != null, 'result should be cached under the "crypto" key');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test W: fresh cache pre-populated → handleCrypto returns cached:true
+// WITHOUT calling fetch (no CoinGecko refetch — quota-safe).
+test('Test W: fresh crypto cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  const cachedData = { coins: [{ id: 'bitcoin' }], global: { market_cap_percentage: { btc: 50 } } };
+  await setCached(kv, 'crypto', cachedData);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleCrypto({ FT_KV: kv });
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, cachedData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test X: markets fetch throws BUT a stale cache exists → stale served.
+test('Test X: crypto fetch fails with stale cache → returns stale:true', async () => {
+  const kv = fakeKV();
+  const staleData = { coins: [{ id: 'ethereum' }], global: { market_cap_percentage: { eth: 18 } } };
+  const oldTs = Date.now() - 300_000; // 5 min ago → expired at 2 min TTL
+  kv.store.set('crypto', JSON.stringify({ d: staleData, t: oldTs }));
+
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('coingecko unavailable'); };
+
+  try {
+    const result = await handleCrypto({ FT_KV: kv });
+    assert.equal(result.stale, true, 'should return stale:true');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, staleData, 'should return the stale payload');
   } finally {
     globalThis.fetch = origFetch;
   }
