@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.22.2 — 2026-05-18 (finalize light-mode contrast: shared-token sweep)
+
+Closes the Track-1 light-mode work — the per-page agents consistently
+deferred the same SHARED stylesheet tokens (correctly, being out of their
+page scope). A v2 WCAG-AA probe across 10 representative pages (default
+light, gradient/opacity-aware) found 104 distinct fail-signatures; only **4
+were genuinely shared (≥3 pages)**:
+
+### Fixed (shared, dark-safe — base recolour, `[data-theme="dark"]` overrides untouched)
+- **`.cookie-decline`** (7 pages): base `#94a3b8` (2.56:1 on the white
+  cookie banner) → `#64748b` (**4.76:1**). Fixed in BOTH `styles.css` +
+  `styles-index.css` (2-stylesheet architecture); dark override keeps
+  `#94a3b8`. Verified light pass + dark unchanged.
+- **`.rz-version-num`** (7 pages, the easter-egg version stamp): base
+  `#10b981` (2.54:1 on white) → `#047857` (**5.48:1**) in `styles.css`;
+  `[data-theme="dark"]` keeps `#34d399`. Verified.
+- `styles.min.css` + `styles-index.min.css` re-minified; cache-bust →
+  `?v=2026-05-18-lm` on 62 pages.
+
+### Accepted (documented — NOT changed, deliberately)
+- `--gray-600 #6c757d` on `#f8fafc` = **4.48:1** (4 pages) and violet accent
+  links `#8b5cf6` on white = **4.23:1** (6 pages): within 0.02–0.27 of the
+  4.5 guideline on a pervasive global CSS variable / brand-identity accent.
+  A site-wide variable or brand change risks dark-mode + identity
+  regressions for a sub-threshold gain — the disciplined call is to accept
+  and document rather than introduce risk. Remaining 100 fail-signatures are
+  [1–2 page] page-local brand accents / large-display / JS-driven values,
+  already documented out-of-scope by the per-page agents.
+- All 4 `--strict` gates CLEAN; dark mode provably unchanged.
+
 ## v1.22.1 — 2026-05-18 (hotfix: v1.22.0 shipped a broken changelog.html + generator guard)
 
 ### Fixed
