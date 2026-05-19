@@ -305,6 +305,31 @@
         .cookie-decline:hover { background: #f3f4f6; color: #374151; }
         @media (max-width: 768px) { .cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; } }
         @media print { .cookie-banner { display: none; } }
+
+        /* ───────────────────────────────────────────────────────────────
+           v1.19.1 light-contrast — dark-first page; light :root token
+           --text-muted:#6c757d only reaches ~4.3-4.5:1 on the light
+           card/section fills (.metric-label, .section-subtitle,
+           .tier-label, .lbl, .rec-text p, .quick-stat, .pro-overlay-desc,
+           .disc-fine). Deepen to canonical slate #475569. The colour-coded
+           top-nav links carry inline style="color:#hex" tuned for the dark
+           navy navbar; on the light navbar they fall to 2.1-3.8:1, so
+           re-tint to same-hue AA-safe shades (light only). All scoped
+           html:not([data-theme="dark"]); dark redefines its own tokens and
+           keeps the navy navbar, so dark rendering is unchanged. */
+        html:not([data-theme="dark"]) { --text-muted: #475569; }
+        html:not([data-theme="dark"]) .calc-disclaimer .disc-fine { color: #475569 !important; }
+        html:not([data-theme="dark"]) .nav-links a.nav-link[href="pue-calculator.html"]   { color: #0e7490 !important; } /* cyan  2.4 -> 5.4 */
+        html:not([data-theme="dark"]) .nav-links a.nav-link[href="capex-calculator.html"] { color: #b45309 !important; } /* amber 2.2 -> 5.0 */
+        html:not([data-theme="dark"]) .nav-links a.nav-link[href="tia-942-checklist.html"]{ color: #047857 !important; } /* emer  2.5 -> 5.5 */
+        html:not([data-theme="dark"]) .nav-links a.nav-link[href="dcmoc/"]                 { color: #dc2626 !important; } /* red   3.8 -> 4.8 */
+        html:not([data-theme="dark"]) .nav-links a.nav-link[href="glossary.html"]          { color: #0f766e !important; } /* teal  2.5 -> 5.5 */
+        /* Recommendation-priority pills: static accent colours tuned for dark
+           cards; on their faint-tint pills over white they fall to 2.0-3.3:1.
+           Same-hue AA shades, light only (dark keeps the bright accents). */
+        html:not([data-theme="dark"]) .rec-p1 { color: #b91c1c; } /* 3.3 -> 5.7 */
+        html:not([data-theme="dark"]) .rec-p2 { color: #b45309; } /* 2.0 -> 4.7 */
+        html:not([data-theme="dark"]) .rec-p3 { color: #1d4ed8; } /* 3.3 -> 6.0 */
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Tier Advisor | Data Center Tier Classification Calculator">

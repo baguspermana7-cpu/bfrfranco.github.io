@@ -41,6 +41,17 @@ def version_tier(version_str):
 # ── Inline Markdown → HTML ─────────────────────────────────────────────────────
 def inline_md(text):
     """Convert minimal Markdown inline syntax to HTML."""
+    # B-001 fix: pull inline-code spans out FIRST and html-escape their
+    # content, so backticked HTML in CHANGELOG (e.g. `<script src>`, `<li>`,
+    # `<style id=...>`) can never emit a live tag into changelog.html (the
+    # easter-egg page) and code stays literal (correct Markdown semantics).
+    _code_spans = []
+
+    def _stash_code(m):
+        _code_spans.append(html_mod.escape(m.group(1)))
+        return '\x00C%d\x00' % (len(_code_spans) - 1)
+
+    text = re.sub(r'`([^`]+)`', _stash_code, text)
     # Auto-link 40-char hex commit hashes (before other replacements)
     text = re.sub(
         r'\b([0-9a-f]{7,40})\b',
@@ -57,8 +68,7 @@ def inline_md(text):
     # in identifiers (target="_blank", snake_case, _rzAuth, etc.). Use HTML <em> directly
     # if underscore emphasis is needed.
     text = re.sub(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)', r'<em>\1</em>', text)
-    # Inline code `…`
-    text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
+    # (Inline code spans were stashed+escaped at the top — B-001 fix)
     # Markdown links [text](url) — preserve existing HTML links
     text = re.sub(
         r'\[([^\]]+)\]\((https?://[^\)]+)\)',
@@ -69,6 +79,12 @@ def inline_md(text):
     text = re.sub(
         r'(?<!href=")(?<!href=\')(https?://[^\s<>"\']+)',
         r'<a href="\1" target="_blank" rel="noopener">\1</a>',
+        text
+    )
+    # B-001: restore the stashed, html-escaped inline-code spans
+    text = re.sub(
+        r'\x00C(\d+)\x00',
+        lambda m: '<code>%s</code>' % _code_spans[int(m.group(1))],
         text
     )
     return text

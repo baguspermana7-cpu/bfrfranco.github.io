@@ -1010,6 +1010,32 @@ body {
     .rfs-gate-cell { padding: 4px !important; }
     .rfs-gate-cell-code { font-size: 0.6rem; }
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+   v1.19.1 light-contrast — page authored dark-first (zero [data-theme=light]
+   rules). After the site default flipped to light (v1.19.1), the muted token
+   --rfs-text3:#9ca3af and the bright KPI accents render below WCAG AA on the
+   light surfaces. These overrides are scoped html:not([data-theme=dark]) so
+   dark rendering is provably unchanged (dark redefines its own tokens). */
+html:not([data-theme="dark"]) {
+    --rfs-text3: #475569;          /* was #9ca3af (2.5:1 on white) -> 7.6:1 */
+}
+/* KPI strip sits on the light --rfs-bg2 (#f8fafc) only in light mode; the
+   inline style="color:var(--rfs-...)" resolves against these scoped tokens,
+   so deepening them here lifts the values past AA without touching dark. */
+html:not([data-theme="dark"]) .rfs-hero-strip {
+    --rfs-teal: #0f766e;           /* 2.4 -> 5.2 on #f8fafc */
+    --rfs-emerald: #047857;        /* 2.4 -> 5.2 */
+    --rfs-amber: #b45309;          /* 2.1 -> 4.8 */
+    --rfs-blue: #1d4ed8;           /* 3.5 -> 6.4 */
+    --rfs-red: #dc2626;            /* 3.6 -> 4.6 */
+}
+/* Active segmented-control tab: color:var(--rfs-teal) on a near-white fill
+   in light = 2.3:1. Redefine the token on the active button only (light
+   only); dark keeps the bright teal on its dark fill (~5.9:1, unchanged). */
+html:not([data-theme="dark"]) .rfs-mode-btn.active {
+    --rfs-teal: #0f766e;
+}
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="RFS Readiness Workbench | Data Center Ready-for-Service Planning">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/rfs-readiness-workbench.webp">

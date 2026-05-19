@@ -1803,6 +1803,18 @@
             .metric-grid, .reference-grid, .standards-grid { grid-template-columns: 1fr !important; }
             h1 { font-size: 1.4rem !important; }
         }
+
+        /* ───────────────────────────────────────────────────────────────
+           v1.19.1 light-contrast — dark-first page (40 [data-theme="dark"]
+           rules, zero light rules). The light :root palette is correct
+           except --text-muted:#64748b, which renders ~4.0-4.3:1 on the
+           light card/KPI fills (.kpi-label and card body copy). Deepen it
+           to the site-canonical slate #475569 (>=6:1 on every light
+           surface here). Scoped html:not([data-theme="dark"]) so dark,
+           which redefines --text-muted itself, is unchanged. */
+        html:not([data-theme="dark"]) {
+            --text-muted: #475569;
+        }
     </style>
     <!-- Structured Data - BreadcrumbList -->
     <script type="application/ld+json">

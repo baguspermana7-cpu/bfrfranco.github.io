@@ -4053,6 +4053,20 @@
                 gap: 0.55rem;
             }
         }
+
+        /* ───────────────────────────────────────────────────────────────
+           v1.19.1 light-contrast — page was authored dark-first (96
+           [data-theme="dark"] rules, zero light rules). The :root light
+           palette is sound EXCEPT --text-muted:#64748b, which only reaches
+           ~3.0-4.3:1 on the translucent card/panel fills used across the
+           workspace (labels, .kpi-label, .k, .tag, .label, .mode-state,
+           h5 stage headers). Deepen the muted token to the site-canonical
+           slate #475569 (>=5.4:1 on every light surface here). Scoped
+           html:not([data-theme="dark"]) so dark redefines its own --text-
+           muted untouched. */
+        html:not([data-theme="dark"]) {
+            --text-muted: #475569;
+        }
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>

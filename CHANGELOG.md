@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v1.21.0 — 2026-05-18 (P0: site-wide light-mode regression recovery + B-001 changelog generator fix)
+
+User: *"what have you done, ini cardsnya tidak terlihat … tulisannya tidak
+terlihat"* — the v1.19.1 default-light flip broke 35 dark-first pages
+(`[data-theme="dark"]` rules, zero `[data-theme="light"]`) → invisible/low
+contrast in the now-default light theme.
+
+### Fixed — light-mode contrast (B-013) across 25 pages
+- **articles.html**: card meta authored `#9ca3af` (2.54:1 on white) →
+  light-scoped `#64748b` (4.6:1). Philosophy cards verified white/readable
+  (4.76:1) — the screenshotted defect.
+- **article-23..27, FF-1/2/3, geopolitics-1/2/3**: accent text 600→700
+  same-hue shades, inline-coloured cells → classed, muted `#94a3b8/#9ca3af`
+  → `#64748b/#475569`, all light-scoped (`html:not([data-theme="dark"])`);
+  dark verified unchanged/improved.
+- **7 calculators** (capex/opex/roi/tco/pue/carbon-footprint/spares):
+  idempotent `<style id="rz-lightfix-v1">` before structural `</head>`,
+  light-scoped AA-700 accent remap; dark byte-identical; cx-calculator
+  correctly excluded (hardcoded always-dark, no light mode).
+- **5 labs** (ltc-system-modelling-lab/standards-ltc-lab/tier-advisor/
+  rfs-readiness-workbench/dashboard): light-only `--text-muted: #475569`,
+  nav-link/priority-pill AA remap, footer-heading light fix.
+- All edits CSS-only, `html:not([data-theme="dark"])`-scoped, idempotent
+  (`v1.19.1 light-contrast` markers); dark mode provably unchanged; 4
+  `--strict` gates CLEAN.
+
+### Fixed — B-001 (changelog.html generator)
+- `tools/build-changelog-html.py` `inline_md()` now extracts inline-code
+  spans FIRST and `html.escape`s them, so backticked HTML in CHANGELOG
+  (`` `<script src>` ``, `` `<li>` ``, `` `<style id=…>` ``) can no longer
+  emit a live tag into changelog.html (the easter-egg page). Verified:
+  0 raw literal tags, browser `syntaxErr=0`, 89 entries render. SOLVED.
+
+### Out of scope (flagged, pre-existing — not v1.19.1/this-work)
+- ltc-system-modelling-lab external-JS `Invalid or unexpected token` +
+  ltc/capex/opex/cx 390px horizontal overflow + shared `auth.js`/`styles.css`
+  widget contrast — pre-existing, tracked, not regressions from this change.
+
 ## v1.20.8 — 2026-05-18 (insights freshness + changelog easter-egg-only + linkage playbook)
 
 User: *"insights.html sama sekali tidak update dan tidak align"* ·

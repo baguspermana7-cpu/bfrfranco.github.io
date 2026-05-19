@@ -465,8 +465,14 @@
         }
         .confidence-low {
             background: #f1f5f9;
-            color: #64748b;
+            color: #475569;
         }
+        /* v1.19.1 light-contrast: lighter accents need a darker shade only in light mode (dark bg keeps the vivid tint) */
+        html:not([data-theme="dark"]) .confidence-high { color: #047857; }
+        html:not([data-theme="dark"]) .confidence-medium { color: #b45309; }
+        html:not([data-theme="dark"]) .sector-brief .sector-num strong { color: #047857; }
+        .gp-figcap { color: #64748b; }
+        [data-theme="dark"] .gp-figcap { color: #94a3b8; }
 
         /* Data Table */
         .data-table-container {
@@ -620,7 +626,7 @@
         .toc-item-number { font-size: 0.65rem; margin-bottom: 0.1rem; }
         .toc-item-title { font-size: 0.8rem; }
         .toc-item { border-left-color: #059669; }
-        .toc-item-number { color: #059669; }
+        .toc-item-number { color: #047857; }
         [data-theme="dark"] .toc-title { color: #34d399; }
         [data-theme="dark"] .toc-item { border-left-color: rgba(52,211,153,0.3); }
         [data-theme="dark"] .toc-item:hover {
@@ -1120,7 +1126,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
                          alt="The $50 Trillion Economic Shift - Visualization of interconnected growth sectors from AI to clean energy reshaping global GDP 2026-2036"
                          style="width: 100%; max-width: 1000px; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); border: 1px solid #334155;"
                          loading="lazy" width="2816" height="1536">
-                    <figcaption style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem; font-style: italic;">
+                    <figcaption class="gp-figcap" style="margin-top: 1rem; font-size: 0.9rem; font-style: italic;">
                         Eight interconnected sectors driving the next decade of global economic transformation
                     </figcaption>
                 </figure>
