@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx } from '../src/handlers.js';
+import { handleFx, handleQuotes } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -100,6 +100,133 @@ test('Test C: all sources fail with stale cache → returns stale:true', async (
     assert.equal(result.stale, true, 'should return stale:true');
     assert.deepEqual(result.data, staleData, 'should return stale data');
     assert.equal(result.cached, true);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleQuotes tests (Task 1.2)
+   ═══════════════════════════════════════════════════════════════ */
+
+// Helper: build a Yahoo Finance v7 quote API response
+function yahooQuoteResponse(symbols) {
+  const result = symbols.map(sym => ({
+    symbol: sym,
+    regularMarketPrice: sym === 'SPY' ? 520.12 : 440.55,
+    regularMarketChange: sym === 'SPY' ? 2.34 : -1.20,
+    regularMarketChangePercent: sym === 'SPY' ? 0.45 : -0.27,
+    regularMarketPreviousClose: sym === 'SPY' ? 517.78 : 441.75,
+  }));
+  return JSON.stringify({ quoteResponse: { result, error: null } });
+}
+
+// Helper: build a Stooq CSV response for one symbol
+function stooqCsvResponse(sym, close) {
+  // Format: Symbol,Date,Time,Open,High,Low,Close,Volume
+  return `Symbol,Date,Time,Open,High,Low,Close,Volume\n${sym.toLowerCase()}.us,2026-05-19,16:00:00,${close - 1},${close + 2},${close - 2},${close},12345678\n`;
+}
+
+// Test D: Yahoo stub returns 2 symbols → handleQuotes returns array len 2 with numeric fields + caches in KV
+test('Test D: Yahoo returns 2 symbols → handleQuotes returns numeric array + caches', async () => {
+  const kv = fakeKV();
+  const syms = ['SPY', 'QQQ'];
+  const origFetch = globalThis.fetch;
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com')) {
+      return { ok: true, json: async () => JSON.parse(yahooQuoteResponse(syms)) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleQuotes({ FT_KV: kv }, syms);
+    assert.equal(Array.isArray(result.data), true, 'data should be array');
+    assert.equal(result.data.length, 2, 'should have 2 entries');
+    assert.equal(result.cached, false, 'first fetch should not be cached');
+
+    // Verify numeric fields (not strings)
+    for (const q of result.data) {
+      assert.equal(typeof q.sym, 'string', 'sym should be string');
+      assert.equal(typeof q.price, 'number', 'price should be number');
+      assert.equal(typeof q.chg, 'number', 'chg should be number');
+      assert.equal(typeof q.chgPct, 'number', 'chgPct should be number');
+      assert.equal(typeof q.prevClose, 'number', 'prevClose should be number');
+    }
+
+    // Verify SPY values
+    const spy = result.data.find(q => q.sym === 'SPY');
+    assert.ok(spy, 'SPY should be in result');
+    assert.equal(spy.price, 520.12);
+    assert.equal(spy.chg, 2.34);
+
+    // Verify KV was populated
+    const cacheKey = 'q:SPY,QQQ';
+    const raw = kv.store.get(cacheKey);
+    assert.ok(raw != null, 'quotes should be cached in KV');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test E: Yahoo throws, Stooq CSV stub returns → fallback works for both symbols
+test('Test E: Yahoo fails → Stooq CSV fallback resolves symbols', async () => {
+  const kv = fakeKV();
+  const syms = ['SPY', 'QQQ'];
+  const origFetch = globalThis.fetch;
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com')) {
+      throw new Error('Yahoo unavailable');
+    }
+    if (u.includes('stooq.com')) {
+      // Detect which symbol from URL (spy.us or qqq.us)
+      const isSpy = u.includes('spy.us');
+      const close = isSpy ? 519.00 : 438.00;
+      const sym = isSpy ? 'spy' : 'qqq';
+      return { ok: true, text: async () => stooqCsvResponse(sym, close) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleQuotes({ FT_KV: kv }, syms);
+    assert.equal(Array.isArray(result.data), true, 'data should be array');
+    assert.ok(result.data.length >= 1, 'at least one symbol should resolve via Stooq');
+    assert.equal(result.cached, false);
+
+    // Prices should be numeric
+    for (const q of result.data) {
+      assert.equal(typeof q.price, 'number');
+    }
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test F: fresh cache hit → handleQuotes returns cached:true WITHOUT calling fetch
+test('Test F: fresh cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  const syms = ['SPY', 'QQQ'];
+  const cachedData = [
+    { sym: 'SPY', price: 520.0, chg: 1.5, chgPct: 0.29, prevClose: 518.5 },
+    { sym: 'QQQ', price: 440.0, chg: -0.5, chgPct: -0.11, prevClose: 440.5 },
+  ];
+  // Pre-populate cache with fresh timestamp
+  await setCached(kv, 'q:SPY,QQQ', cachedData);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleQuotes({ FT_KV: kv }, syms);
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, cachedData);
   } finally {
     globalThis.fetch = origFetch;
   }

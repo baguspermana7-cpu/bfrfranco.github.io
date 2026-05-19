@@ -1,4 +1,4 @@
-import { handleFx } from './handlers.js';
+import { handleFx, handleQuotes } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -47,6 +47,16 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'fx: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/q') {
+        const syms = (new URL(request.url)).searchParams.get('syms');
+        try {
+          const { data, cached } = await handleQuotes(env, (syms || '').split(',').filter(Boolean));
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'q: ' + String(e) });
         }
       }
 

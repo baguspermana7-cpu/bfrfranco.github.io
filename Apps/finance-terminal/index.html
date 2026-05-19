@@ -895,7 +895,13 @@ async function loadTickerTape(batchQ){
 async function loadOverview(){
   updateMarketStatus();
   $('lastUpdated').textContent='Updating...';
-  // Pre-warm ALL tab symbols in one parallel batch
+
+  // V2: fetch INDICES quotes from gateway concurrently; wires ticker + KPIs
+  if(CFG.V2){
+    loadOverviewIndicesV2();
+  }
+
+  // Non-V2 path (and shared async widgets) — flag-off byte-identical
   const allSyms=[...CFG.INDICES,
     ...SECTOR_ETFS.map(s=>s.sym),
     ...COMMODITIES.map(c=>c.sym),
@@ -922,6 +928,51 @@ async function loadOverview(){
   loadOverviewDominance();
   loadOverviewNews();
   loadOverviewEarnings();
+}
+
+/* v2 gate — fetch INDICES from gateway, render ticker + KPI cards.
+   Shows skeleton while loading; on failure renders a non-blocking retry link.
+   Translates gateway shape {sym,price,chg,chgPct,prevClose}
+   → Finnhub-compatible {c,d,dp} so existing render helpers work unchanged. */
+async function loadOverviewIndicesV2(){
+  const el=$('overviewKpis');
+  // Show skeleton immediately (matches existing HTML default skeleton markup)
+  if(el&&!el.querySelector('.kpi'))el.innerHTML='<div class="skel" style="height:100px"></div><div class="skel" style="height:100px"></div><div class="skel" style="height:100px"></div><div class="skel" style="height:100px"></div>';
+  try{
+    const q=await gw('/q',{syms:CFG.INDICES.join(',')});
+    if(!Array.isArray(q)||q.length===0)throw new Error('empty /q response');
+    // Build bySym map; translate to Finnhub-compatible shape for reuse with existing helpers
+    const bySym={};
+    q.forEach(function(item){bySym[item.sym]={c:item.price,d:item.chg,dp:item.chgPct,pc:item.prevClose};});
+    // Merge into shared batch cache so other renders (heatmap, world kpis) can use it
+    S._batchQ=Object.assign({},S._batchQ||{},bySym);
+    // Re-render ticker tape with gateway data for INDICES, keeping any existing non-index entries
+    loadTickerTapeV2(bySym);
+    // Re-render top-level KPI card (S&P 500 overview)
+    renderOverviewKpis(S._batchQ);
+  }catch(e){
+    // Non-fatal: show small retry affordance, NOT an infinite spinner
+    if(el)el.innerHTML+='<div style="grid-column:1/-1;font-size:.7rem;color:var(--t4);padding:.5rem 0">Gateway indices unavailable. <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadOverviewIndicesV2()">Retry</a></div>';
+  }
+}
+
+/* Render ticker tape using gateway batch data (V2 only).
+   Reuses the exact same HTML template as loadTickerTape. */
+function loadTickerTapeV2(bySym){
+  const tape=$('tickerTape');
+  const quotes=[];
+  for(const sym of CFG.INDICES){
+    const q=bySym[sym];
+    if(q)quotes.push({sym,name:CFG.IDX_NAMES[sym]||sym,c:q.c,d:q.d,dp:q.dp});
+  }
+  if(!quotes.length)return;
+  let html='';
+  quotes.forEach(function(q){
+    const cls=chgClass(q.dp||q.d||0);
+    html+='<span class="tape-item"><span class="tape-sym">'+( q.name||q.sym)+'</span><span class="tape-price">'+fmtP(q.c,q.c>100?2:4)+'</span><span class="tape-chg '+cls+'">'+(q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':'')+'</span></span>';
+  });
+  tape.innerHTML=html+html;
+  S.indices=quotes.reduce(function(a,q){a[q.sym]=q;return a},{});
 }
 
 function renderCommodityKpis(batchQ){
