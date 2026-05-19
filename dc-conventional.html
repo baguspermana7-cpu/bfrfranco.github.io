@@ -359,6 +359,47 @@ a { color: inherit; text-decoration: none; }
     margin-top: 2px;
 }
 
+/* --- ALARM STRIP (operator-first, top of information hierarchy) ---
+ * Mirrors datahall.html canonical strip, restyled to the conventional
+ * grounded slate/graphite palette. Red is reserved for alarm severity
+ * only — never decoration. Counts are engine-derived (CONV_CALC),
+ * never Math.random, deterministic on reload. */
+.alarm-strip {
+    display: flex; align-items: stretch; gap: 1px; flex-shrink: 0;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+}
+.as-state { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); }
+.as-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--accent-green); }
+.as-state.normal .as-dot { background: var(--accent-green); }
+.as-state.warn   .as-dot { background: var(--accent-orange); }
+.as-state.alarm  .as-dot { background: var(--accent-red); animation: as-blink 1s steps(1) infinite; }
+.as-state .as-state-txt { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: var(--accent-green); }
+.as-state.normal .as-state-txt { color: var(--accent-green); }
+.as-state.warn   .as-state-txt { color: var(--accent-orange); }
+.as-state.alarm  .as-state-txt { color: var(--accent-red); }
+.as-cell {
+    background: var(--bg-card); padding: 6px 14px;
+    display: flex; flex-direction: column; gap: 1px; min-width: 90px;
+}
+.as-cell .as-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); font-weight: 700; }
+.as-cell .as-val { font-size: 14px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.as-val.v-crit { color: var(--accent-red); }
+.as-val.v-warn { color: var(--accent-orange); }
+.as-val.v-ok   { color: var(--accent-green); }
+.as-val.v-maint{ color: var(--accent-cyan); }
+.as-val.v-zero { color: var(--text-muted); }
+.as-spacer { flex: 1; background: var(--bg-card); min-width: 8px; }
+.as-scenario {
+    display: flex; align-items: center; gap: 6px; padding: 6px 16px;
+    background: var(--bg-card); font-size: 11px; color: var(--text-secondary);
+}
+.as-chip {
+    padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    background: rgba(6,182,212,0.12); color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.35);
+}
+@keyframes as-blink { 50% { opacity: 0.25; } }
+
 /* Dashboard Image Container - Fit to screen */
 .dashboard-visual {
     flex: 1;
@@ -519,6 +560,11 @@ a { color: inherit; text-decoration: none; }
     .nav-menu-item { padding: 14px 10px; min-height: 44px; }
     .nav-menu-item .icon { width: 28px; height: 28px; }
 
+    .alarm-strip { flex-wrap: wrap; }
+    .as-cell { min-width: 33%; }
+    .as-spacer { display: none; }
+    .as-scenario { width: 100%; flex-wrap: wrap; }
+
     .callout { padding: 8px 12px; min-width: 70px; }
     .callout-label { font-size: 10px; }
     .callout-value { font-size: 14px; }
@@ -542,6 +588,10 @@ a { color: inherit; text-decoration: none; }
     .kpi-label { font-size: 10px; }
     .kpi-value { font-size: 16px; }
     .kpi-unit { font-size: 10px; }
+
+    .alarm-strip { flex-wrap: wrap; }
+    .as-cell { min-width: 50%; }
+    .as-state { width: 100%; }
 
     .nav-sidebar { padding: 8px; gap: 4px; }
     .nav-menu-item {
@@ -622,6 +672,15 @@ a { color: inherit; text-decoration: none; }
 [data-theme="light"] .kpi-card:hover { background: #f8fafc; }
 [data-theme="light"] .kpi-label { color: var(--text-muted); }
 [data-theme="light"] .kpi-unit { color: var(--text-muted); }
+
+/* Alarm Strip */
+[data-theme="light"] .alarm-strip { background: var(--border); border-color: var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+[data-theme="light"] .as-state,
+[data-theme="light"] .as-cell,
+[data-theme="light"] .as-spacer,
+[data-theme="light"] .as-scenario { background: #ffffff; }
+[data-theme="light"] .as-cell .as-lbl { color: var(--text-muted); }
+[data-theme="light"] .as-scenario { color: var(--text-secondary); }
 
 /* Scrollbar */
 [data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--border-light); }
@@ -888,6 +947,47 @@ a { color: inherit; text-decoration: none; }
 
     <!-- Main Content -->
     <main class="content-area" id="main-content">
+        <!-- ALARM STRIP — operator-first, top of information hierarchy.
+             Mirrors datahall.html canonical strip. Counts derived from
+             window.CONV_CALC.snapshot (deterministic, no Math.random). -->
+        <div class="alarm-strip" id="alarmStrip" role="status" aria-live="polite" aria-label="System alarm status">
+            <div class="as-state normal" id="as-state">
+                <div class="as-dot"></div>
+                <div class="as-state-txt" id="as-state-txt">NORMAL</div>
+            </div>
+            <div class="as-cell">
+                <div class="as-lbl">Critical</div>
+                <div class="as-val v-zero" id="as-crit">0</div>
+            </div>
+            <div class="as-cell">
+                <div class="as-lbl">Warning</div>
+                <div class="as-val v-zero" id="as-warn">0</div>
+            </div>
+            <div class="as-cell">
+                <div class="as-lbl">Maint / Bypass</div>
+                <div class="as-val v-zero" id="as-maint">0</div>
+            </div>
+            <div class="as-cell">
+                <div class="as-lbl">Comms</div>
+                <div class="as-val v-ok" id="as-comms">OK</div>
+            </div>
+            <div class="as-cell">
+                <div class="as-lbl">Stale</div>
+                <div class="as-val v-zero" id="as-stale">0</div>
+            </div>
+            <div class="as-cell">
+                <div class="as-lbl">Last Update</div>
+                <div class="as-val" id="as-update" style="color:var(--text-secondary)">--</div>
+            </div>
+            <div class="as-spacer"></div>
+            <div class="as-scenario">
+                <span>Data Quality</span>
+                <span class="as-chip" id="as-dq">GOOD</span>
+                <span>Scenario</span>
+                <span class="as-chip" id="as-scn">Simulated</span>
+            </div>
+        </div>
+
         <div class="legal-disclaimer-wrap" aria-label="Legal Disclaimer">
             <div class="calc-disclaimer">
                 <p class="disc-title"><span aria-hidden="true">&#9888;</span> Legal Notice</p>
@@ -1074,10 +1174,17 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <script>
-// Clock
-setInterval(() => {
-    document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB');
-}, 1000);
+// Clock + alarm-strip Last Update (display-only timestamp, no data drift —
+// the scenario basis is frozen so engineering values never change).
+function rzTick() {
+    var ts = new Date().toLocaleTimeString('en-GB');
+    var ck = document.getElementById('clock');
+    if (ck) ck.textContent = ts;
+    var up = document.getElementById('as-update');
+    if (up) up.textContent = ts;
+}
+rzTick();
+setInterval(rzTick, 1000);
 
 // Engine-true data binding.
 // All derived KPIs come from window.CONV_CALC (js/conv-engine.js) — the single
@@ -1088,6 +1195,81 @@ function setText(id, value) {
     var el = document.getElementById(id);
     if (el) el.textContent = value;
 }
+
+/* --- Alarm strip (operator-first) --------------------------------------
+ * Deterministic, threshold-driven evaluation of the SAME frozen scenario
+ * the rest of the page reads (window.CONV_CALC.snapshot). No Math.random:
+ * counts are identical on every reload. Thresholds per
+ * conv/review/09-engineering-basis-and-calculations.md + doc-12 acceptance:
+ *   - PUE > target 1.5  -> warning (efficiency excursion)
+ *   - Cooling redundancy: chillers_running - 1 must still cover -> N+1; if a
+ *     standby chiller exists it is counted as Maintenance/Bypass spare.
+ *   - Avg temp outside ASHRAE A1 recommended 18-27 C -> warn (>27/<18),
+ *     crit at >32 C. Avg RH outside 20-80% -> warn.
+ *   - Fuel autonomy < 24 h -> warn, < 12 h -> crit (resilience floor).
+ *   - Comms: engine snapshot present + version string -> OK, else FAULT.
+ *   - Stale: snapshot age vs the page's own load time. The scenario is a
+ *     frozen basis so it never drifts -> 0 stale points (engine-true). */
+function paintAlarmStrip(s) {
+    if (!s) return;
+    var crit = 0, warn = 0;
+
+    // Efficiency excursion (PUE vs target 1.5)
+    if (s.site.pue > 1.5) warn++;
+
+    // Cooling N+1 redundancy: running minus worst-unit trip must still cover.
+    var chRun = s.cooling.chillers_running;
+    var chTot = s.cooling.chillers_total;
+    if (chRun <= 1) crit++;            // no spare capacity at all
+    // Maintenance/Bypass = chillers held in standby (spares not online).
+    var maint = Math.max(0, chTot - chRun);
+
+    // Environment band (ASHRAE A1 recommended 18-27 C, 20-80% RH).
+    var t = s.environment.avg_temp_c;
+    var rh = s.environment.avg_rh_pct;
+    if (t > 32) crit++; else if (t > 27 || t < 18) warn++;
+    if (rh > 80 || rh < 20) warn++;
+
+    // Fuel resilience floor.
+    var au = s.fuel.autonomy_hr;
+    if (au < 12) crit++; else if (au < 24) warn++;
+
+    // Comms health: engine bound + versioned snapshot.
+    var commsOk = !!(s.meta && s.meta.version);
+    // Stale points: frozen single-basis scenario never drifts -> none.
+    var stale = 0;
+
+    function setVal(id, n, kind) {
+        var e = document.getElementById(id);
+        if (!e) return;
+        e.textContent = n;
+        e.className = 'as-val ' + (n > 0 ? ('v-' + kind) : 'v-zero');
+    }
+    setVal('as-crit', crit, 'crit');
+    setVal('as-warn', warn, 'warn');
+    setVal('as-maint', maint, 'maint');
+    setVal('as-stale', stale, 'warn');
+
+    var c = document.getElementById('as-comms');
+    if (c) {
+        c.textContent = commsOk ? 'OK' : 'FAULT';
+        c.className = 'as-val ' + (commsOk ? 'v-ok' : 'v-crit');
+    }
+
+    var dq = document.getElementById('as-dq');
+    if (dq) dq.textContent = s.meta.data_quality;
+    var scn = document.getElementById('as-scn');
+    if (scn) scn.textContent = s.meta.scenario;
+
+    var st = document.getElementById('as-state');
+    var stt = document.getElementById('as-state-txt');
+    if (st && stt) {
+        if (crit > 0) { st.className = 'as-state alarm'; stt.textContent = 'ALARM'; }
+        else if (warn > 0) { st.className = 'as-state warn'; stt.textContent = 'WARNING'; }
+        else { st.className = 'as-state normal'; stt.textContent = 'NORMAL'; }
+    }
+}
+
 function updateData() {
     if (!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
     var s = window.CONV_CALC.snapshot;
@@ -1131,6 +1313,9 @@ function updateData() {
     setText('sTempAvg', temp + '°C');
     setText('sRhAvg', rh + '%');
     setText('sFuelMain', fuel + '%');
+
+    // Operator-first alarm strip — same snapshot, deterministic counts.
+    paintAlarmStrip(s);
 }
 
 updateData();

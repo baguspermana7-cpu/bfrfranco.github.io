@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.22.4 — 2026-05-18 (B-015 Stage 9 finalize: dc-conventional alarm strip — conventional suite COMPLETE)
+
+Stage-9 consolidated QA across all 7 redesigned conv pages found one
+consistency gap: `dc-conventional` (the Stage-1 engine-bind page) lacked the
+operator-first top alarm strip the other 6 received (doc-12 "Top status bar
+shows active alarms, data quality, last update"). (The probe-flagged "ict
+neon" was a false positive — the word "scanline" inside a documentation
+comment, not a rendered element; dismissed via source inspection.)
+
+### Added
+- **dc-conventional.html**: operator-first `.alarm-strip #alarmStrip`
+  (role=status, aria-live) as first child of `<main>`, mirroring the
+  verified datahall pattern — state pill + Critical/Warning/Maint·Bypass/
+  Comms/Stale/Last-Update + Data-Quality + Scenario, painted from
+  `window.CONV_CALC.snapshot` on the existing 5 s `updateData()` cadence
+  (deterministic, threshold-driven per documented PUE/cooling-redundancy/
+  ASHRAE-band/fuel-autonomy rules — no `Math.random`). Light + dark coverage;
+  responsive wrap; red bound strictly to alarm severity.
+- Independently re-verified: strip present & first-child-of-main, engine-
+  bound (NORMAL/0/0/1/OK/0, stable on reload), 0 pageerror, 0px overflow
+  @390+1440; all 4 `--strict` gates + conv-calc test pass; EPMS_Telemetry /
+  js/conv-engine.js / version files untouched.
+
+### B-015 status — Conventional BMS suite COMPLETE
+Stage 1 engine+dc-conventional (v1.22.0) · Stage 2 EPMS audit (exemplar,
+untouched) · Stages 3-8 datahall/chiller-plant/fire/fuel/water/ict bind+
+de-slop (v1.22.3) · Stage 9 dc-conventional alarm strip (this). All 7 pages:
+single `js/conv-engine.js` basis, deterministic, top alarm strip, grounded
+slate/graphite palette matching the EPMS_Telemetry exemplar, red=alarm-only,
+0 neon (rendered), 0 pageerror, 0px overflow. conv/review doc-12 acceptance
+substantially met.
+
 ## v1.22.3 — 2026-05-18 (B-015 Stages 3-8: 6 conventional BMS pages bound + de-slopped)
 
 Conventional BMS suite redesign per the owner conv/review 14-doc spec.
