@@ -71,343 +71,405 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
+        /* ============================================================
+         * Fuel System — Conventional BMS operator console
+         * Grounded mission-critical palette per conv/review docs:
+         *   06-fuel-system-review.md, 10-uiux-design-system.md,
+         *   13-screenshot-annotation-and-redesign-brief.md
+         * Red reserved for alarm/trip/leak ONLY. Diesel = muted amber.
+         * ============================================================ */
         :root {
-            --bg-color: #0b1118; 
-            --panel-bg: #151e2b;
+            --bg-color: #0b1118;
+            --panel-bg: #131c28;
+            --panel-bg-2: #0f1722;
             --border-color: #2a384b;
+            --border-soft: #1f2b3a;
             --text-primary: #e2e8f0;
             --text-secondary: #94a3b8;
-            
-            --ok: #10b981;
-            --warn: #f59e0b;
-            --crit: #ef4444;
-            --off: #334155;
+            --text-dim: #64748b;
 
-            --diesel-main: #d97706; 
-            --diesel-bright: #fbbf24;
-            --elec-blue: #3b82f6;
+            /* Semantic state colours (10-uiux §Color Semantics) */
+            --ok: #56b07e;            /* muted green — normal */
+            --warn: #d99a2b;          /* amber — attention/approach */
+            --crit: #e0524f;          /* red — alarm/trip/leak ONLY */
+            --off: #3a475a;           /* grey — offline/unavailable */
+            --sel: #38bdf8;           /* cyan — selection only */
+
+            /* Diesel / fuel medium */
+            --diesel-main: #b4791f;
+            --diesel-bright: #d9a441;
+            --flow-blue: #4f9bd9;
         }
 
-        /* --- BASE STYLES (PC FIRST) --- */
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
-            margin: 0; padding: 10px;
-            /* Default PC: Full Height, No Scroll bar body */
-            height: 100vh;
+            margin: 0; padding: 0;
+            min-height: 100vh;
             display: flex; flex-direction: column;
-            overflow: hidden; 
-            box-sizing: border-box;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Scrollbar Kustom */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar-thumb { background: #2c3a4d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3c4d63; }
 
-        /* HEADER */
-        .scada-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--panel-bg); border-bottom: 3px solid var(--diesel-main);
-            padding: 10px 20px; border-radius: 6px; margin-bottom: 10px; flex-shrink: 0;
-            z-index: 50;
+        /* ---- 1. TOP STATUS BAR (alarm-first, 10-uiux §Page Shell) ---- */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--panel-bg); border-bottom: 1px solid var(--border-color);
+            padding: 9px 18px; gap: 16px; flex-wrap: wrap;
         }
-        .header-title h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
-        .header-title small { color: var(--text-secondary); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
-        .sys-badge { 
-            background: rgba(16, 185, 129, 0.1); color: var(--ok); 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid var(--ok);
-            font-weight: bold; white-space: nowrap;
+        .tb-brand { display: flex; align-items: center; gap: 11px; }
+        .tb-brand .ic {
+            width: 30px; height: 30px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(180,121,31,0.14); color: var(--diesel-bright);
+            border: 1px solid rgba(180,121,31,0.4);
         }
+        .tb-brand h1 { margin: 0; font-size: 0.98rem; font-weight: 700; letter-spacing: 0.4px; }
+        .tb-brand small { display: block; color: var(--text-dim); font-size: 0.68rem;
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px; }
 
-        /* MAIN LAYOUT GRID (PC) */
+        .alarm-strip {
+            display: flex; align-items: center; gap: 0; flex: 1;
+            min-width: 320px; max-width: 760px;
+            border: 1px solid var(--border-color); border-radius: 6px;
+            background: var(--panel-bg-2); overflow: hidden;
+        }
+        .as-cell {
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 13px; font-size: 0.72rem;
+            border-right: 1px solid var(--border-soft); white-space: nowrap;
+        }
+        .as-cell:last-child { border-right: none; }
+        .as-cell .lbl { color: var(--text-dim); }
+        .as-cell .num { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+        .as-state {
+            font-weight: 700; letter-spacing: 0.5px;
+            padding: 3px 9px; border-radius: 4px; font-size: 0.7rem;
+        }
+        .as-state.normal { background: rgba(86,176,126,0.14); color: var(--ok);
+            border: 1px solid rgba(86,176,126,0.42); }
+        .as-state.warn { background: rgba(217,154,43,0.16); color: var(--warn);
+            border: 1px solid rgba(217,154,43,0.5); }
+        .as-state.alarm { background: rgba(224,82,79,0.18); color: var(--crit);
+            border: 1px solid rgba(224,82,79,0.55); animation: blink 1.1s steps(1) infinite; }
+        .as-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .as-dot.g { background: var(--ok); box-shadow: 0 0 5px rgba(86,176,126,0.6); }
+        .as-dot.y { background: var(--warn); box-shadow: 0 0 5px rgba(217,154,43,0.6); }
+        .as-dot.r { background: var(--crit); box-shadow: 0 0 6px rgba(224,82,79,0.7); }
+
+        .tb-actions { display: flex; gap: 8px; align-items: center; }
+        .tb-clock { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+            color: var(--text-secondary); background: var(--panel-bg-2);
+            padding: 6px 11px; border-radius: 5px; border: 1px solid var(--border-soft); }
+        .tb-link {
+            color: var(--text-secondary); text-decoration: none;
+            padding: 7px 12px; border: 1px solid var(--border-color); border-radius: 5px;
+            font-size: 0.74rem; display: inline-flex; align-items: center; gap: 6px;
+            min-height: 36px; transition: all 0.15s;
+        }
+        .tb-link:hover { border-color: var(--sel); color: #fff; background: rgba(56,189,248,0.08); }
+
+        /* ---- 2. KPI AUTONOMY STRIP (the headline operator output) ---- */
+        .kpi-strip {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 12px; padding: 12px 18px 0 18px;
+        }
+        .kpi {
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 7px; padding: 12px 14px; position: relative;
+        }
+        .kpi.hero { border-color: rgba(180,121,31,0.5); background: linear-gradient(180deg,#16202d,#121a25); }
+        .kpi .k-lbl { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase;
+            letter-spacing: 0.6px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .kpi .k-val { font-family: 'JetBrains Mono', monospace; font-size: 1.55rem;
+            font-weight: 700; line-height: 1.05; color: var(--text-primary); }
+        .kpi.hero .k-val { color: var(--diesel-bright); font-size: 1.85rem; }
+        .kpi .k-unit { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; margin-left: 4px; }
+        .kpi .k-sub { font-size: 0.66rem; color: var(--text-dim); margin-top: 5px;
+            font-family: 'JetBrains Mono', monospace; }
+        .k-tag { position: absolute; top: 11px; right: 12px; font-size: 0.6rem;
+            padding: 2px 7px; border-radius: 4px; font-weight: 700; letter-spacing: 0.4px; }
+        .k-tag.calc { background: rgba(79,155,217,0.14); color: var(--flow-blue);
+            border: 1px solid rgba(79,155,217,0.4); }
+        .k-tag.pass { background: rgba(86,176,126,0.14); color: var(--ok);
+            border: 1px solid rgba(86,176,126,0.42); }
+
+        /* ---- 3. MAIN GRID ---- */
         .main-grid {
-            display: grid;
-            /* 4 Kolom Proporsional */
-            grid-template-columns: 280px 300px 450px 1fr;
-            gap: 15px;
-            flex-grow: 1;
-            position: relative;
-            height: calc(100% - 50px); /* Reserve space for status bar */
-            margin-bottom: 50px; /* Space for status bar */
+            display: grid; grid-template-columns: 1.05fr 1.35fr 0.95fr;
+            gap: 13px; padding: 13px 18px 18px 18px; flex: 1; align-items: start;
         }
-
+        .col { display: flex; flex-direction: column; gap: 13px; }
         .panel {
             background: var(--panel-bg); border: 1px solid var(--border-color);
-            border-radius: 6px; padding: 12px; display: flex; flex-direction: column;
-            position: relative; z-index: 2;
-            overflow-y: auto; /* Agar isi panel bisa discroll jika terlalu panjang di layar pendek */
+            border-radius: 7px; padding: 13px;
         }
         .panel-header {
-            font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);
-            border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px;
+            font-size: 0.74rem; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.7px;
+            border-bottom: 1px solid var(--border-soft); padding-bottom: 9px; margin-bottom: 11px;
             display: flex; justify-content: space-between; align-items: center;
         }
+        .panel-header .ph-ic { color: var(--text-dim); }
 
-        /* --- VISUAL COMPONENTS --- */
-        .data-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 0.75rem; }
-        .data-val { 
-            font-family: 'JetBrains Mono', monospace; color: var(--diesel-bright); 
-            font-weight: bold; background: #000; padding: 2px 6px; border-radius: 2px;
-            min-width: 60px; text-align: right; border: 1px solid #333;
+        .data-row { display: flex; justify-content: space-between; align-items: center;
+            padding: 4px 0; font-size: 0.78rem; }
+        .data-lbl { color: var(--text-secondary); }
+        .data-val {
+            font-family: 'JetBrains Mono', monospace; color: var(--text-primary);
+            font-weight: 700; min-width: 56px; text-align: right;
         }
-        .data-unit { color: #64748b; margin-left: 4px; font-size: 0.7rem; }
-        .data-lbl { color: #94a3b8; }
+        .data-unit { color: var(--text-dim); margin-left: 4px; font-size: 0.7rem; font-weight: 400; }
 
-        .led {
-            width: 10px; height: 10px; border-radius: 50%; background: var(--off);
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5); border: 1px solid #444;
-            display: inline-block; margin-right: 6px;
+        /* ---- TANK MIMIC (clear inventory) ---- */
+        .ust-block { display: flex; gap: 14px; align-items: stretch; }
+        .ust-tank {
+            position: relative; width: 92px; border: 2px solid #46566c;
+            background: #0c1320; border-radius: 4px 4px 9px 9px; overflow: hidden;
+            min-height: 158px; flex-shrink: 0;
         }
-        .led.on { background: var(--ok); box-shadow: 0 0 6px var(--ok); border-color: var(--ok); }
-        .led.err { background: var(--crit); box-shadow: 0 0 6px var(--crit); border-color: var(--crit); animation: blink 0.5s infinite; }
+        .ust-liquid {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(180deg, var(--diesel-bright), var(--diesel-main));
+            transition: height 0.6s ease; opacity: 0.92;
+        }
+        .ust-mark {
+            position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.22);
+            font-size: 0.55rem; color: rgba(255,255,255,0.5); padding-left: 3px;
+            font-family: 'JetBrains Mono', monospace; pointer-events: none;
+        }
+        .ust-meta { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
-        .chart-container {
-            height: 50px; background: rgba(0,0,0,0.3); border: 1px solid #333;
-            margin: 10px 0; position: relative; overflow: hidden;
+        .tank-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+        .tank-table th {
+            text-align: left; font-size: 0.62rem; color: var(--text-dim);
+            text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 6px;
+            border-bottom: 1px solid var(--border-soft); font-weight: 600;
         }
-        .sparkline-path {
-            fill: none; stroke: var(--diesel-main); stroke-width: 2;
-            vector-effect: non-scaling-stroke;
+        .tank-table th.r, .tank-table td.r { text-align: right; }
+        .tank-table td {
+            padding: 7px 6px; font-size: 0.76rem; border-bottom: 1px solid var(--border-soft);
+            font-family: 'JetBrains Mono', monospace;
         }
+        .tank-table tr:last-child td { border-bottom: none; }
+        .tank-table .tag { color: var(--text-primary); font-weight: 700; }
+        .tank-table .pf-ok { color: var(--ok); }
+        .tank-table .pf-warn { color: var(--warn); }
+        .tank-table .pf-crit { color: var(--crit); }
+        .mini-bar { display: inline-block; width: 46px; height: 6px; background: #1d2836;
+            border-radius: 3px; overflow: hidden; vertical-align: middle; margin-left: 6px; }
+        .mini-bar > i { display: block; height: 100%; background: var(--diesel-main); }
 
-        /* TANKS */
-        .tank-wrapper {
-            position: relative; border: 2px solid #475569; background: #0f172a;
-            overflow: hidden; margin-top: 5px;
+        /* ---- FUEL FLOW PATH (clear direction) ---- */
+        .flow-path {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 4px; margin: 6px 0 4px 0; flex-wrap: wrap;
         }
-        .ust-shape { height: 140px; border-radius: 0 0 8px 8px; border-top: none; }
-        .dt-shape { height: 60px; width: 45px; margin: 0 auto; border-radius: 4px; }
-        .liquid {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            background: linear-gradient(180deg, var(--diesel-bright) 0%, var(--diesel-main) 100%);
-            opacity: 0.9; transition: height 0.5s ease;
+        .fp-node {
+            flex: 1; min-width: 64px; text-align: center; padding: 9px 4px;
+            border: 1px solid var(--border-color); border-radius: 6px;
+            background: var(--panel-bg-2); font-size: 0.66rem;
         }
+        .fp-node .fn-ic { font-size: 1rem; color: var(--text-secondary); margin-bottom: 3px; display:block; }
+        .fp-node.active { border-color: rgba(180,121,31,0.6); }
+        .fp-node.active .fn-ic { color: var(--diesel-bright); }
+        .fp-node strong { display: block; font-size: 0.7rem; color: var(--text-primary); }
+        .fp-node span { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+        .fp-arrow { color: var(--off); font-size: 0.9rem; flex-shrink: 0; transition: color 0.3s; }
+        .fp-arrow.active { color: var(--diesel-main); animation: arrowPulse 1.2s ease-in-out infinite; }
+        @keyframes arrowPulse { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
 
-        /* EQUIPMENT */
-        .pump-unit {
-            border: 1px solid var(--border-color); padding: 8px; border-radius: 4px;
-            background: rgba(0,0,0,0.2); margin-bottom: 8px;
+        /* ---- INTERLOCK / SAFETY INDICATORS (first-class) ---- */
+        .ilk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .ilk {
+            display: flex; align-items: center; gap: 9px;
+            padding: 9px 10px; border: 1px solid var(--border-soft);
+            border-radius: 6px; background: var(--panel-bg-2); font-size: 0.74rem;
         }
-        .pump-icon {
-            font-size: 1.5rem; color: var(--off); border: 2px solid var(--off);
-            border-radius: 50%; padding: 6px; transition: 0.3s;
-        }
-        .pump-icon.running { color: var(--ok); border-color: var(--ok); animation: spin 0.8s linear infinite; }
-        
-        /* PIPING (SVG LAYER) - PC ONLY */
-        .piping-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 1;
-            /* Tampil di PC */
-            display: block; 
-        }
-        .pipe-line {
-            fill: none; stroke: var(--off); stroke-width: 3;
-            stroke-linejoin: round; stroke-linecap: round; opacity: 0.6;
-        }
-        .pipe-line.active {
-            stroke: var(--diesel-main); opacity: 1; stroke-width: 4;
-            stroke-dasharray: 6 4; animation: flow 0.5s linear infinite;
-        }
+        .ilk .ilk-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+            background: var(--off); border: 1px solid #4a5a70; }
+        .ilk.normal .ilk-dot { background: var(--ok); border-color: var(--ok);
+            box-shadow: 0 0 5px rgba(86,176,126,0.5); }
+        .ilk.alarm { border-color: rgba(224,82,79,0.55); background: rgba(224,82,79,0.08); }
+        .ilk.alarm .ilk-dot { background: var(--crit); border-color: var(--crit);
+            box-shadow: 0 0 6px rgba(224,82,79,0.7); animation: blink 1s steps(1) infinite; }
+        .ilk .ilk-txt { display: flex; flex-direction: column; line-height: 1.3; }
+        .ilk .ilk-name { color: var(--text-secondary); font-size: 0.66rem;
+            text-transform: uppercase; letter-spacing: 0.3px; }
+        .ilk .ilk-stat { color: var(--text-primary); font-weight: 700; font-size: 0.76rem; }
+        .ilk.alarm .ilk-stat { color: var(--crit); }
 
-
-        /* =========================================
-           RESPONSIVE MEDIA QUERIES (MAGIC HAPPENS HERE)
-           ========================================= */
-
-        /* TABLET & LAPTOP KECIL (Max Width 1200px) */
-        @media (max-width: 1200px) {
-            body {
-                overflow-y: auto; /* Izinkan scroll vertikal */
-                height: auto; 
-                display: block;
-            }
-            .main-grid {
-                /* Ubah jadi 2 kolom grid */
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: auto auto; /* Baris menyesuaikan konten */
-                height: auto;
-            }
-            .piping-layer {
-                display: none; /* Sembunyikan pipa karena layout berubah */
-            }
-            .scada-header h1 { font-size: 1rem; }
+        /* ---- PUMP UNIT ---- */
+        .pump-unit { border: 1px solid var(--border-soft); border-radius: 6px;
+            background: var(--panel-bg-2); padding: 11px; }
+        .pump-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+        .pump-ic {
+            width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--off);
+            color: var(--off); display: flex; align-items: center; justify-content: center;
+            font-size: 0.95rem; transition: all 0.3s;
         }
+        .pump-ic.running { color: var(--ok); border-color: var(--ok); }
+        .pump-ic.running i { animation: spin 1.1s linear infinite; }
+        .mode-chip { font-size: 0.6rem; padding: 2px 7px; border-radius: 4px; font-weight: 700;
+            letter-spacing: 0.3px; background: rgba(86,176,126,0.12); color: var(--ok);
+            border: 1px solid rgba(86,176,126,0.4); }
+        .mode-chip.run { background: rgba(217,154,43,0.14); color: var(--warn);
+            border-color: rgba(217,154,43,0.45); }
 
-        /* MOBILE PHONE (Max Width 768px) */
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-            }
-            .scada-header {
-                flex-direction: column; /* Header jadi tumpuk */
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .scada-header > div:last-child {
-                width: 100%;
-                justify-content: space-between;
-                margin-top: 5px;
-            }
-            
-            .main-grid {
-                /* Ubah jadi 1 kolom (Stack ke bawah) */
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .panel {
-                min-height: auto; /* Tinggi panel fleksibel */
-            }
-            
-            /* Sembunyikan Pipa di HP agar tidak berantakan */
-            .piping-layer { display: none; }
+        /* ---- GENSET / DAY-TANK ROWS ---- */
+        .gen-row {
+            display: grid; grid-template-columns: 50px 1fr; gap: 11px; align-items: center;
+            padding: 10px; border: 1px solid var(--border-soft); border-radius: 6px;
+            background: var(--panel-bg-2); margin-bottom: 9px;
         }
+        .gen-row:last-child { margin-bottom: 0; }
+        .gen-row.running { border-color: rgba(217,154,43,0.45); }
+        .dt-mini {
+            position: relative; width: 38px; height: 52px; border: 2px solid #46566c;
+            background: #0c1320; border-radius: 3px; overflow: hidden; margin: 0 auto;
+        }
+        .dt-mini > i { position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(180deg, var(--diesel-bright), var(--diesel-main));
+            transition: height 0.5s ease; }
+        .gen-tag { font-size: 0.55rem; color: var(--text-dim); text-align: center;
+            margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+        .gen-info { display: flex; flex-direction: column; gap: 4px; }
+        .gen-info .gi-top { display: flex; justify-content: space-between; align-items: center; }
+        .gen-info .gi-name { font-size: 0.78rem; font-weight: 700; }
+        .gen-info .gi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+            font-size: 0.7rem; }
+        .gen-info .gi-grid .data-val { min-width: 0; font-size: 0.74rem; }
+
+        /* ---- ALARM / EVENT LIST ---- */
+        .alarm-list { display: flex; flex-direction: column; gap: 7px;
+            max-height: 220px; overflow-y: auto; }
+        .alarm-item {
+            display: flex; gap: 9px; padding: 9px 10px; border-radius: 6px;
+            font-size: 0.74rem; border-left: 3px solid var(--off);
+            background: var(--panel-bg-2); align-items: flex-start;
+        }
+        .alarm-item.crit { border-left-color: var(--crit); background: rgba(224,82,79,0.08); }
+        .alarm-item.warn { border-left-color: var(--warn); background: rgba(217,154,43,0.07); }
+        .alarm-item .ai-time { color: var(--text-dim); font-family: 'JetBrains Mono', monospace;
+            font-size: 0.66rem; flex-shrink: 0; }
+        .alarm-item .ai-body strong { display: block; color: var(--text-primary); font-size: 0.75rem; }
+        .alarm-item .ai-body span { color: var(--text-secondary); font-size: 0.7rem; }
+        .alarm-empty { text-align: center; color: var(--text-dim); padding: 26px 0;
+            font-size: 0.78rem; }
+
+        .btn {
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
+            color: var(--text-secondary); padding: 9px 13px; border-radius: 5px;
+            cursor: pointer; font-size: 0.72rem; font-weight: 600; transition: all 0.15s;
+            display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
+            font-family: inherit;
+        }
+        .btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: #3c4d63; }
+        .btn.active { background: rgba(180,121,31,0.16); border-color: var(--diesel-main);
+            color: var(--diesel-bright); }
+        .btn.full { width: 100%; justify-content: center; }
+        .kbd { background: #1d2836; padding: 2px 6px; border-radius: 3px;
+            font-size: 0.62rem; color: var(--text-dim); margin-left: 5px;
+            font-family: 'JetBrains Mono', monospace; }
+
+        .control-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 10px; padding: 0 18px; flex-wrap: wrap;
+        }
+        .cb-left, .cb-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .cb-note { font-size: 0.66rem; color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace; }
+
+        .basis-note {
+            font-size: 0.64rem; color: var(--text-dim); line-height: 1.5;
+            font-family: 'JetBrains Mono', monospace;
+            border-top: 1px dashed var(--border-soft); padding-top: 9px; margin-top: 11px;
+        }
+        .basis-note b { color: var(--text-secondary); }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes flow { to { stroke-dashoffset: -10; } }
-        @keyframes blink { 50% { opacity: 0.3; } }
+        @keyframes blink { 50% { opacity: 0.35; } }
 
-        /* Control Buttons */
-        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: all 0.2s; }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .ctrl-btn.active { background: rgba(217, 119, 6, 0.2); border-color: var(--diesel-main); color: var(--diesel-bright); }
-        .kbd-hint { background: #1e293b; padding: 2px 5px; border-radius: 3px; font-size: 9px; color: #64748b; margin-left: 4px; }
-
-        /* Zoom Controls */
-        .zoom-controls { display: flex; gap: 4px; align-items: center; }
-        .zoom-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; transition: all 0.2s; }
-        .zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .zoom-btn.active { background: rgba(217, 119, 6, 0.2); border-color: var(--diesel-main); color: var(--diesel-bright); }
-
-        /* Fullscreen Mode */
-        body.fullscreen .scada-header { display: none !important; }
-        body.fullscreen .control-bar { display: none !important; }
-        body.fullscreen { padding: 0; }
-        body.fullscreen .main-grid { height: 100vh; border-radius: 0; }
-
-        /* Equipment Tooltip */
-        .equipment-tooltip { position: fixed; background: rgba(21, 30, 43, 0.98); border: 1px solid var(--diesel-main); border-radius: 8px; padding: 12px 16px; font-size: 11px; z-index: 200; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 240px; }
+        /* ---- Equipment tooltip ---- */
+        .equipment-tooltip {
+            position: fixed; background: rgba(15,23,34,0.98);
+            border: 1px solid var(--diesel-main); border-radius: 7px;
+            padding: 11px 14px; font-size: 0.72rem; z-index: 300;
+            pointer-events: none; opacity: 0; transition: opacity 0.18s;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.55); max-width: 250px;
+        }
         .equipment-tooltip.visible { opacity: 1; }
-        .tooltip-title { color: var(--diesel-bright); font-weight: bold; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 6px; }
-        .tooltip-row { display: flex; justify-content: space-between; margin: 4px 0; }
-        .tooltip-label { color: #94a3b8; }
-        .tooltip-value { color: #fff; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+        .tooltip-title { color: var(--diesel-bright); font-weight: 700; font-size: 0.76rem;
+            margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid var(--border-soft);
+            padding-bottom: 6px; }
+        .tooltip-row { display: flex; justify-content: space-between; gap: 16px; margin: 5px 0; }
+        .tooltip-label { color: var(--text-secondary); }
+        .tooltip-value { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
-        /* Bottom Status Bar */
-        .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel-bg); border-top: 2px solid var(--diesel-main); padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .status-section { display: flex; gap: 20px; align-items: center; }
-        .status-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
-        .status-led { width: 8px; height: 8px; border-radius: 50%; }
-        .status-led.green { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
-        .status-led.yellow { background: var(--warn); box-shadow: 0 0 6px var(--warn); }
-        .status-led.red { background: var(--crit); box-shadow: 0 0 6px var(--crit); }
-
-        /* Control Bar */
-        .control-bar { display: flex; justify-content: space-between; align-items: center; background: var(--panel-bg); padding: 8px 15px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border-color); }
-
-        /* Fuel Truck Filling Station */
-        .filling-station {
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.3);
-            margin-top: 10px;
-        }
-        .filling-header {
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .truck-icon {
-            font-size: 1.5rem;
-            color: var(--off);
-            transition: all 0.3s;
-        }
-        .truck-icon.connected {
-            color: var(--diesel-bright);
-            filter: drop-shadow(0 0 8px var(--diesel-main));
-            animation: truckPulse 1s infinite;
-        }
-        @keyframes truckPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .hose-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 8px 0;
-        }
-        .hose-line {
-            flex: 1;
-            height: 4px;
-            background: var(--off);
-            border-radius: 2px;
-            position: relative;
-            overflow: hidden;
-        }
-        .hose-line.active {
-            background: var(--diesel-main);
-        }
-        .hose-line.active::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 100%;
-            background: var(--diesel-bright);
-            animation: hoseFlow 0.5s linear infinite;
-        }
-        @keyframes hoseFlow {
-            0% { left: -20px; }
-            100% { left: 100%; }
-        }
-        .fill-rate {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--diesel-bright);
-            font-weight: bold;
-        }
-
-        /* Fullscreen controls for fuel */
+        /* ---- Fullscreen ---- */
+        body.fullscreen .topbar,
+        body.fullscreen .control-bar { display: none !important; }
+        .fullscreen-nav { display: none; position: fixed; top: 14px; right: 14px;
+            z-index: 300; gap: 8px; }
         body.fullscreen .fullscreen-nav { display: flex !important; }
-        .fullscreen-nav {
-            display: none;
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 200;
-            gap: 10px;
-        }
         .fs-nav-btn {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            color: #fff; padding: 8px 13px; border-radius: 6px; cursor: pointer;
+            font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; gap: 6px;
+            text-decoration: none;
         }
         .fs-nav-btn:hover { border-color: var(--diesel-main); }
-        .fs-nav-btn.back { border-color: var(--crit); }
-        .fs-nav-btn.back:hover { background: var(--crit); }
 
-
+        /* ============================================================
+         *  RESPONSIVE  (1366x768, 1920x1080, tablet, phone)
+         * ============================================================ */
+        @media (max-width: 1500px) {
+            .kpi .k-val { font-size: 1.35rem; }
+            .kpi.hero .k-val { font-size: 1.6rem; }
+        }
+        @media (max-width: 1280px) {
+            .main-grid { grid-template-columns: 1fr 1fr; }
+            .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+            .col-events { grid-column: 1 / -1; }
+        }
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+            .col-events { grid-column: auto; }
+        }
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img, picture, video, svg { max-width: 100%; height: auto; }
+            .topbar { flex-direction: column; align-items: stretch; gap: 10px; }
+            .alarm-strip { min-width: 0; max-width: 100%; flex-wrap: wrap; }
+            .as-cell { flex: 1 1 auto; }
+            .tb-actions { justify-content: space-between; flex-wrap: wrap; }
+            .kpi-strip { grid-template-columns: 1fr; padding: 12px 12px 0 12px; }
+            .main-grid { padding: 12px; }
+            .control-bar { padding: 0 12px; }
+            .ilk-grid { grid-template-columns: 1fr; }
+            .ust-block { flex-direction: column; }
+            .ust-tank { width: 100%; min-height: 120px; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+            button, a.btn, [role="button"] { min-height: 44px; }
+            .nav-menu, .nav-links { display: none !important; }
+            .footer-grid { grid-template-columns: 1fr !important; gap: 1.25rem !important; padding: 1rem !important; }
+        }
+        @media (max-width: 480px) {
+            .kpi .k-val { font-size: 1.25rem; }
+            .tb-brand h1 { font-size: 0.88rem; }
+        }
     </style>
+    <script src="js/conv-engine.js?v=1.22.0"></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 <style id="rz-skiplink-v1">
@@ -418,587 +480,649 @@
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
     <!-- Equipment Tooltip -->
-    <div id="equipment-tooltip" class="equipment-tooltip">
+    <div id="equipment-tooltip" class="equipment-tooltip" role="tooltip">
         <div class="tooltip-title" id="tooltip-title">Equipment</div>
         <div id="tooltip-content"></div>
     </div>
 
     <!-- Fullscreen Navigation Controls -->
     <div class="fullscreen-nav">
-        <button class="fs-nav-btn" onclick="resetSimulation()"><i class="fas fa-redo"></i> RESET</button>
-        <button class="fs-nav-btn" onclick="toggleFullscreen()"><i class="fas fa-compress"></i> EXIT</button>
-        <a href="dc-conventional.html" class="fs-nav-btn back"><i class="fas fa-arrow-left"></i> BACK</a>
-        <a href="index.html" class="fs-nav-btn back"><i class="fas fa-home"></i> PORTFOLIO</a>
+        <button class="fs-nav-btn" onclick="resetSimulation()" type="button"><i class="fas fa-redo"></i> RESET</button>
+        <button class="fs-nav-btn" onclick="toggleFullscreen()" type="button"><i class="fas fa-compress"></i> EXIT</button>
+        <a href="dc-conventional.html" class="fs-nav-btn"><i class="fas fa-arrow-left"></i> BACK</a>
     </div>
 
-    <header class="scada-header">
-        <div class="header-title">
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <i class="fas fa-network-wired fa-lg" style="color: var(--diesel-main);"></i>
-                <div>
-                    <h1>Enterprise Fuel SCADA</h1>
-                    <small>ID: EPMS-BKS-01 | REMOTE VIEW</small>
-                </div>
+    <!-- ============ 1. TOP STATUS / ALARM STRIP ============ -->
+    <header class="topbar">
+        <div class="tb-brand">
+            <div class="ic"><i class="fas fa-gas-pump"></i></div>
+            <div>
+                <h1>Fuel System &mdash; Diesel &amp; Generator Autonomy</h1>
+                <small>UST-01 &middot; DT-GEN-A/B/C &middot; P-101 &middot; CONV-BMS-BKS-01</small>
             </div>
         </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <div class="data-row" style="margin:0;">
-                <span class="data-val" id="clock" style="width:auto; min-width:60px;">12:00:00</span>
+
+        <div class="alarm-strip" id="alarm-strip" aria-live="polite">
+            <div class="as-cell">
+                <span class="as-state normal" id="as-state">NORMAL</span>
             </div>
-            <div class="sys-badge"><i class="fas fa-wifi"></i> ONLINE</div>
-            <a href="dc-conventional.html" style="color: #94a3b8; text-decoration: none; padding: 10px 14px; border:1px solid #334155; border-radius:6px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)';this.style.borderColor='#06b6d4';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.borderColor='#334155';this.style.color='#94a3b8'"><i class="fas fa-arrow-left"></i> Back</a>
-            <a href="index.html" style="color: #a78bfa; text-decoration: none; padding: 10px 14px; border:1px solid rgba(139,92,246,0.3); border-radius:6px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; transition: all 0.2s;" onmouseover="this.style.background='rgba(139,92,246,0.1)';this.style.borderColor='#a78bfa';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(139,92,246,0.3)';this.style.color='#a78bfa'"><i class="fas fa-home"></i> Portfolio</a>
+            <div class="as-cell"><span class="as-dot r" id="as-dot-c"></span><span class="lbl">Critical</span><span class="num" id="as-crit">0</span></div>
+            <div class="as-cell"><span class="as-dot y" id="as-dot-w"></span><span class="lbl">Warning</span><span class="num" id="as-warn">0</span></div>
+            <div class="as-cell"><span class="lbl">Stale Pts</span><span class="num" id="as-stale">0</span></div>
+            <div class="as-cell"><span class="lbl">Updated</span><span class="num" id="as-upd">0s</span></div>
+            <div class="as-cell"><span class="lbl">Scenario</span><span class="num" id="as-scn">Simulated</span></div>
+        </div>
+
+        <div class="tb-actions">
+            <span class="tb-clock" id="clock">--:--:--</span>
+            <a href="dc-conventional.html" class="tb-link"><i class="fas fa-arrow-left"></i> Back</a>
         </div>
     </header>
 
-    <!-- Control Bar -->
-    <div class="control-bar">
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen">
-                <i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span>
-            </button>
-            <button onclick="resetSimulation()" class="ctrl-btn">
-                <i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span>
-            </button>
-            <button onclick="togglePump()" class="ctrl-btn" id="btn-pump">
-                <i class="fas fa-power-off mr-1"></i> PUMP <span class="kbd-hint">P</span>
-            </button>
+    <a id="main-content" tabindex="-1"></a>
+
+    <!-- ============ 2. AUTONOMY KPI STRIP ============ -->
+    <section class="kpi-strip" aria-label="Fuel autonomy summary">
+        <div class="kpi hero">
+            <div class="k-tag calc">CALC</div>
+            <div class="k-lbl"><i class="fas fa-hourglass-half"></i> Generator Autonomy</div>
+            <div><span class="k-val" id="kpi-autonomy">--</span><span class="k-unit">hr</span></div>
+            <div class="k-sub" id="kpi-autonomy-sub">usable L &divide; consumption L/hr</div>
         </div>
-        <div class="zoom-controls">
-            <span style="color: #64748b; font-size: 10px; margin-right: 8px;">ZOOM:</span>
-            <button onclick="setZoom(0.8)" class="zoom-btn" data-zoom="0.8">80%</button>
-            <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
-            <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
+        <div class="kpi">
+            <div class="k-lbl"><i class="fas fa-oil-can"></i> Usable Fuel</div>
+            <div><span class="k-val" id="kpi-usable">--</span><span class="k-unit">L</span></div>
+            <div class="k-sub" id="kpi-usable-sub">of 60,000 L &times; 0.90</div>
         </div>
-    </div>
+        <div class="kpi">
+            <div class="k-lbl"><i class="fas fa-tint"></i> Consumption</div>
+            <div><span class="k-val" id="kpi-consumption">--</span><span class="k-unit">L/hr</span></div>
+            <div class="k-sub">at current generator load</div>
+        </div>
+        <div class="kpi">
+            <div class="k-lbl"><i class="fas fa-bolt"></i> Generator Load</div>
+            <div><span class="k-val" id="kpi-genload">--</span><span class="k-unit">MW</span></div>
+            <div class="k-sub" id="kpi-genload-sub">facility load on gensets</div>
+        </div>
+        <div class="kpi">
+            <div class="k-tag pass" id="kpi-np1-tag">PASS</div>
+            <div class="k-lbl"><i class="fas fa-shield-alt"></i> N+1 Scenario</div>
+            <div><span class="k-val" id="kpi-np1">--</span><span class="k-unit">hr</span></div>
+            <div class="k-sub">autonomy with 1 genset down</div>
+        </div>
+    </section>
 
-    <div class="main-grid">
+    <!-- ============ 3. MAIN GRID ============ -->
+    <main class="main-grid">
 
-        <svg class="piping-layer" viewBox="0 0 1300 700" preserveAspectRatio="none">
-            <path id="pipe-suc" d="M 140 500 L 140 380 L 330 380" class="pipe-line" />
-            <path id="pipe-dis" d="M 430 340 L 430 250 L 430 80" class="pipe-line" />
-            <path id="pipe-head" d="M 430 80 L 580 80" class="pipe-line" />
-            <path id="pipe-rise" d="M 580 80 L 580 600" class="pipe-line" />
-            <path id="pipe-br-a" d="M 580 150 L 650 150" class="pipe-line" />
-            <path id="pipe-br-b" d="M 580 320 L 650 320" class="pipe-line" />
-            <path id="pipe-br-c" d="M 580 490 L 650 490" class="pipe-line" />
-        </svg>
-
-        <div class="panel">
-            <div class="panel-header">
-                <span>BULK STORAGE (UST)</span>
-                <i class="fas fa-database"></i>
+        <!-- COLUMN 1 — Bulk storage + inventory + fill -->
+        <div class="col">
+            <div class="panel">
+                <div class="panel-header"><span>Bulk Storage &mdash; UST-01</span><i class="fas fa-database ph-ic"></i></div>
+                <div class="ust-block">
+                    <div class="ust-tank" id="tank-ust" tabindex="0" role="img" aria-label="Underground storage tank UST-01 level">
+                        <div class="ust-mark" style="top:10%;">95% overfill</div>
+                        <div class="ust-mark" style="top:40%;">60% low</div>
+                        <div class="ust-mark" style="top:70%;">30% low-low</div>
+                        <div class="ust-liquid" id="liq-ust" style="height:85%;"></div>
+                    </div>
+                    <div class="ust-meta">
+                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl">85.0</span><span class="data-unit">%</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross">51,000</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable" style="color:var(--diesel-bright)">45,900</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Tank Temp (TIT-101)</span><span><span class="data-val" id="val-ust-tmp">28.4</span><span class="data-unit">&deg;C</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Last Delivery</span><span><span class="data-val" style="font-size:0.7rem">14 May</span></span></div>
+                    </div>
+                </div>
+                <div class="basis-note">
+                    <b>Inventory basis:</b> 60,000 L tank &times; 0.90 usable fraction &times; level. Usable reserve is what backs the autonomy figure (conv/review/09-engineering-basis lines 133&ndash;147).
+                </div>
             </div>
-            <div style="font-size:0.7rem; color:var(--text-secondary);">LEVEL TREND (1H)</div>
-            <div class="chart-container">
-                <svg width="100%" height="100%" preserveAspectRatio="none">
-                    <polyline id="ust-sparkline" class="sparkline-path" points="0,50 100,50" />
-                </svg>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                <div style="width:60%;">
-                    <div class="data-row"><span class="data-lbl">LIT-101</span><div><span class="data-val" id="val-ust-lvl">85.0</span><span class="data-unit">%</span></div></div>
-                    <div class="data-row"><span class="data-lbl">TIT-101</span><div><span class="data-val" id="val-ust-tmp">28.4</span><span class="data-unit">°C</span></div></div>
-                    <div class="data-row"><span class="data-lbl">Volume</span><div><span class="data-val" id="val-ust-vol">85,000</span><span class="data-unit">L</span></div></div>
-                </div>
-                <div style="width:35%; text-align:center;">
-                    <div class="tank-wrapper ust-shape"><div id="liq-ust" class="liquid" style="height:85%;"></div></div>
-                    <span style="font-size:0.7rem; font-weight:bold;">UST-01</span>
-                </div>
+
+            <div class="panel">
+                <div class="panel-header"><span>Tank Inventory</span><i class="fas fa-list ph-ic"></i></div>
+                <table class="tank-table">
+                    <thead><tr><th>Tag</th><th class="r">Level</th><th class="r">Volume</th><th>Serves</th></tr></thead>
+                    <tbody id="tank-tbody"></tbody>
+                </table>
             </div>
 
-            <!-- Fuel Truck Filling Station -->
-            <div class="filling-station">
-                <div class="filling-header">
-                    <i class="fas fa-truck truck-icon" id="truck-icon"></i>
-                    <span>FILLING STATION</span>
-                    <span id="fill-status" style="margin-left:auto; font-size:0.65rem; color:var(--off);">DISCONNECTED</span>
-                </div>
-                <div class="hose-indicator">
-                    <i class="fas fa-gas-pump" style="color:var(--diesel-main);"></i>
-                    <div class="hose-line" id="hose-line"></div>
-                    <i class="fas fa-truck" style="color:#555;" id="truck-small"></i>
-                </div>
-                <div class="data-row">
-                    <span class="data-lbl">Fill Rate</span>
-                    <span class="fill-rate" id="fill-rate">0 L/min</span>
-                </div>
-                <button onclick="toggleFilling()" class="ctrl-btn" id="btn-fill" style="width:100%; margin-top:8px; justify-content:center;">
-                    <i class="fas fa-plug"></i> CONNECT HOSE
-                </button>
+            <div class="panel">
+                <div class="panel-header"><span>Bulk Fill Point</span><i class="fas fa-truck ph-ic"></i></div>
+                <div class="data-row"><span class="data-lbl">Fill Coupling</span><span class="data-val" id="fill-status" style="font-size:0.72rem;color:var(--text-dim)">DISCONNECTED</span></div>
+                <div class="data-row"><span class="data-lbl">Overfill Prevention</span><span class="data-val pf-ok" id="fill-ofp" style="font-size:0.72rem">ARMED</span></div>
+                <div class="data-row"><span class="data-lbl">Fill Rate</span><span><span class="data-val" id="fill-rate">0</span><span class="data-unit">L/min</span></span></div>
+                <button onclick="toggleFilling()" class="btn full" id="btn-fill" style="margin-top:9px;" type="button"><i class="fas fa-plug"></i> Connect Tanker Hose</button>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <span>TRANSFER & QUALITY</span>
-                <i class="fas fa-cogs"></i>
+        <!-- COLUMN 2 — Flow path + pump + gensets/day-tanks -->
+        <div class="col">
+            <div class="panel">
+                <div class="panel-header"><span>Fuel Flow Path</span><i class="fas fa-route ph-ic"></i></div>
+                <div class="flow-path">
+                    <div class="fp-node active"><i class="fas fa-database fn-ic"></i><strong>UST-01</strong><span id="fp-ust">85%</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a1"></i>
+                    <div class="fp-node" id="fp-pump-node"><i class="fas fa-fan fn-ic"></i><strong>P-101</strong><span id="fp-pump">STBY</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a2"></i>
+                    <div class="fp-node"><i class="fas fa-filter fn-ic"></i><strong>FPU-01</strong><span id="fp-fpu">OK</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a3"></i>
+                    <div class="fp-node"><i class="fas fa-oil-can fn-ic"></i><strong>Day Tks</strong><span id="fp-dt">3 fed</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a4"></i>
+                    <div class="fp-node"><i class="fas fa-bolt fn-ic"></i><strong>Gensets</strong><span id="fp-gen">1 run</span></div>
+                </div>
+                <div class="data-row" style="margin-top:6px;"><span class="data-lbl">Transfer Direction</span><span class="data-val" style="font-size:0.7rem;color:var(--text-secondary)">UST &rarr; Day Tank (lift)</span></div>
             </div>
-            <div style="background:#000; padding:8px; border-radius:4px; border:1px solid #333; margin-bottom:10px;">
-                <div style="font-size:0.7rem; color:#64748b; margin-bottom:5px;">FUEL QUALITY (FPU-01)</div>
-                <div class="data-row"><span class="data-lbl">Diff Press</span><div><span class="data-val" id="val-dp">0.21</span><span class="data-unit">Bar</span></div></div>
-                <div class="data-row"><span class="data-lbl">Water Cont</span><div><span class="data-val" style="color:var(--elec-blue);">45</span><span class="data-unit">ppm</span></div></div>
-            </div>
-            <div class="pump-unit">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <div style="display:flex; align-items:center;">
-                        <i id="icon-p1" class="fas fa-fan pump-icon"></i>
-                        <div style="margin-left:8px;">
-                            <div style="font-size:0.8rem; font-weight:bold;">P-101 (Main)</div>
-                            <div style="font-size:0.65rem; color:var(--ok);">AUTO</div>
+
+            <div class="panel">
+                <div class="panel-header"><span>Transfer Pump &amp; Fuel Quality</span><i class="fas fa-cogs ph-ic"></i></div>
+                <div class="pump-unit" id="pump-unit" tabindex="0">
+                    <div class="pump-head">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div class="pump-ic" id="pump-ic"><i class="fas fa-fan"></i></div>
+                            <div>
+                                <div style="font-size:0.82rem;font-weight:700;">P-101 &middot; Lead Transfer</div>
+                                <div style="font-size:0.66rem;color:var(--text-dim);">Viking L124A &middot; 180 L/min</div>
+                            </div>
                         </div>
+                        <span class="mode-chip" id="pump-mode">AUTO</span>
                     </div>
-                    <div class="led" id="led-p1"></div>
+                    <div class="gi-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Current</span><span><span class="data-val" id="val-p1-amp">0.0</span><span class="data-unit">A</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Disch Press</span><span><span class="data-val" id="val-p1-dp">0.1</span><span class="data-unit">bar</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Flow</span><span><span class="data-val" id="val-p1-flow">0</span><span class="data-unit">L/min</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Vibration</span><span><span class="data-val" id="val-p1-vib">0.0</span><span class="data-unit">mm/s</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Run Hours</span><span><span class="data-val" id="val-p1-rh">1,284</span><span class="data-unit">h</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Starter</span><span class="data-val" id="val-p1-st" style="font-size:0.7rem;color:var(--ok)">READY</span></div>
+                    </div>
                 </div>
-                <div class="data-row"><span class="data-lbl">Current</span><div><span class="data-val" style="color:var(--elec-blue);" id="val-p1-amp">0.0</span><span class="data-unit">A</span></div></div>
-                <div class="data-row"><span class="data-lbl">Vibration</span><div><span class="data-val" id="val-p1-vib">0.0</span><span class="data-unit">mm/s</span></div></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px;">
+                    <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Polisher Diff Press</span><span><span class="data-val" id="val-dp">0.21</span><span class="data-unit">bar</span></span></div>
+                    <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Water-in-Fuel</span><span><span class="data-val" id="val-wif" style="color:var(--ok)">45</span><span class="data-unit">ppm</span></span></div>
+                </div>
             </div>
-            <div style="margin-top:auto;">
-                 <div class="data-row"><span class="data-lbl">Disch Press</span><div><span class="data-val" id="val-pit-dis">0.1</span><span class="data-unit">Bar</span></div></div>
-                 <div class="data-row"><span class="data-lbl">Main Flow</span><div><span class="data-val" id="val-fit-main">0</span><span class="data-unit">L/m</span></div></div>
-            </div>
-        </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <span>POWER GENERATION</span>
-                <i class="fas fa-bolt"></i>
-            </div>
-            <div style="display:flex; align-items:center; margin-bottom:15px;">
-                <i id="vlv-a" class="fas fa-caret-right" style="color:var(--crit); font-size:1.2rem; margin-right:5px; transition:0.3s;"></i>
-                <div style="text-align:center; margin-right:10px;">
-                    <div class="tank-wrapper dt-shape"><div id="liq-a" class="liquid" style="height:92%;"></div></div>
-                    <span style="font-size:0.65rem; font-weight:bold;">DT-A</span>
-                </div>
-                <div style="flex-grow:1; border:1px solid #333; padding:5px; border-radius:4px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span style="font-size:0.75rem; font-weight:bold;">GENSET A</span>
-                        <span class="sys-badge" style="background:transparent; border:none; padding:0;">STBY</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                        <div class="data-row"><span class="data-lbl">Lvl</span><span class="data-val" id="val-a-lvl">92.0</span></div>
-                        <div class="data-row"><span class="data-lbl">Tmp</span><span class="data-val" id="val-a-tmp">30.1</span></div>
-                    </div>
-                </div>
-            </div>
-            <div style="display:flex; align-items:center; margin-bottom:15px;">
-                <i id="vlv-b" class="fas fa-caret-right" style="color:var(--crit); font-size:1.2rem; margin-right:5px; transition:0.3s;"></i>
-                <div style="text-align:center; margin-right:10px;">
-                    <div class="tank-wrapper dt-shape"><div id="liq-b" class="liquid" style="height:45%;"></div></div>
-                    <span style="font-size:0.65rem; font-weight:bold;">DT-B</span>
-                </div>
-                <div style="flex-grow:1; border:1px solid var(--warn); padding:5px; border-radius:4px; background:rgba(245, 158, 11, 0.05);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span style="font-size:0.75rem; font-weight:bold; color:var(--warn);"><i class="fas fa-cog fa-spin"></i> GENSET B</span>
-                        <span style="font-size:0.65rem; color:var(--warn); font-weight:bold;">RUN</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                        <div class="data-row"><span class="data-lbl">Lvl</span><span class="data-val" id="val-b-lvl" style="color:var(--warn);">45.0</span></div>
-                        <div class="data-row"><span class="data-lbl">Tmp</span><span class="data-val" id="val-b-tmp" style="color:var(--warn);">38.2</span></div>
-                    </div>
-                </div>
-            </div>
-             <div style="display:flex; align-items:center;">
-                <i id="vlv-c" class="fas fa-caret-right" style="color:var(--crit); font-size:1.2rem; margin-right:5px; transition:0.3s;"></i>
-                <div style="text-align:center; margin-right:10px;">
-                    <div class="tank-wrapper dt-shape"><div id="liq-c" class="liquid" style="height:88%;"></div></div>
-                    <span style="font-size:0.65rem; font-weight:bold;">DT-C</span>
-                </div>
-                <div style="flex-grow:1; border:1px solid #333; padding:5px; border-radius:4px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span style="font-size:0.75rem; font-weight:bold;">GENSET C</span>
-                        <span class="sys-badge" style="background:transparent; border:none; padding:0;">STBY</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                        <div class="data-row"><span class="data-lbl">Lvl</span><span class="data-val" id="val-c-lvl">88.0</span></div>
-                        <div class="data-row"><span class="data-lbl">Tmp</span><span class="data-val" id="val-c-tmp">29.5</span></div>
-                    </div>
+            <div class="panel">
+                <div class="panel-header"><span>Day Tanks &amp; Gensets</span><i class="fas fa-bolt ph-ic"></i></div>
+                <div id="genset-rows"></div>
+                <div class="basis-note">
+                    <b>Day-tank logic:</b> P-101 lifts UST &rarr; the running genset's day tank. Low-low (&lt;25%) raises a critical interlock alarm and forces lead pump to RUN. DT serves a single genset; failover to N+1 standby genset on engine fault.
                 </div>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <span>EVENTS & SAFETY</span>
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <div style="border:1px solid #333; padding:8px; border-radius:4px; margin-bottom:15px;">
-                <div style="font-size:0.7rem; font-weight:bold; color:#fff; margin-bottom:8px;">LEAK DETECTION (LDS)</div>
-                <div class="data-row"><span>Zone 1: UST</span><div class="led on" id="lds-1"></div></div>
-                <div class="data-row"><span>Zone 2: Pump</span><div class="led on" id="lds-2"></div></div>
-                <div class="data-row"><span>Zone 3: Header</span><div class="led on" id="lds-3"></div></div>
-                <div class="data-row"><span>Zone 4: Genset</span><div class="led on" id="lds-4"></div></div>
-            </div>
-            <div style="font-size:0.7rem; font-weight:bold; color:var(--crit); margin-bottom:5px;">ACTIVE ALARMS</div>
-            <div id="alarm-box" style="flex-grow:1; overflow-y:auto; font-size:0.75rem; color:#fff; min-height:100px;">
+        <!-- COLUMN 3 — Safety interlocks + alarms -->
+        <div class="col col-events">
+            <div class="panel">
+                <div class="panel-header"><span>Safety Interlocks</span><i class="fas fa-shield-alt ph-ic"></i></div>
+                <div class="ilk-grid">
+                    <div class="ilk normal" id="ilk-leak"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Bund / Sump Leak</span><span class="ilk-stat">DRY</span></span></div>
+                    <div class="ilk normal" id="ilk-bund"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Bund Sump Level</span><span class="ilk-stat">NORMAL</span></span></div>
+                    <div class="ilk normal" id="ilk-water"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Water-in-Fuel</span><span class="ilk-stat">NORMAL</span></span></div>
+                    <div class="ilk normal" id="ilk-polish"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Fuel Polishing</span><span class="ilk-stat">RUNNING</span></span></div>
+                    <div class="ilk normal" id="ilk-dtll"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Day Tank Low-Low</span><span class="ilk-stat">CLEAR</span></span></div>
+                    <div class="ilk normal" id="ilk-pumpfail"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Pump Fail-to-Run</span><span class="ilk-stat">CLEAR</span></span></div>
                 </div>
-            <button onclick="ack()" style="background:#334155; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer; margin-top:10px; font-weight:bold; width:100%;">ACKNOWLEDGE</button>
-        </div>
-
-    </div>
-
-    <!-- Bottom Status Bar -->
-    <div class="status-bar">
-        <div class="status-section">
-            <div class="status-item">
-                <div class="status-led green" id="led-system"></div>
-                <span style="color: #64748b;">SYSTEM:</span>
-                <span style="color: #fff; font-weight: bold;" id="status-system">NORMAL</span>
             </div>
-            <div class="status-item">
-                <div class="status-led green" id="led-ust"></div>
-                <span style="color: #64748b;">UST:</span>
-                <span style="color: #fff; font-weight: bold;" id="status-ust">85%</span>
+
+            <div class="panel">
+                <div class="panel-header"><span>Active Alarms &amp; Events</span><i class="fas fa-bell ph-ic"></i></div>
+                <div class="alarm-list" id="alarm-list" role="log" aria-live="polite">
+                    <div class="alarm-empty">No active alarms</div>
+                </div>
+                <button onclick="ackAlarms()" class="btn full" style="margin-top:11px;" type="button"><i class="fas fa-check"></i> Acknowledge</button>
             </div>
-            <div class="status-item">
-                <div class="status-led yellow" id="led-pump"></div>
-                <span style="color: #64748b;">PUMP:</span>
-                <span style="color: #fff; font-weight: bold;" id="status-pump">STANDBY</span>
+
+            <div class="panel">
+                <div class="panel-header"><span>UST Level Trend (1 h)</span><i class="fas fa-chart-line ph-ic"></i></div>
+                <svg viewBox="0 0 200 56" preserveAspectRatio="none" style="width:100%;height:60px;background:var(--panel-bg-2);border:1px solid var(--border-soft);border-radius:5px;">
+                    <line x1="0" y1="28" x2="200" y2="28" stroke="#243043" stroke-width="0.5" stroke-dasharray="3 3"/>
+                    <polyline id="ust-trend" fill="none" stroke="var(--diesel-main)" stroke-width="1.6" points="0,15 200,15"/>
+                </svg>
+                <div class="data-row" style="margin-top:6px;"><span class="data-lbl" style="font-size:0.66rem;">Range</span><span class="data-val" style="font-size:0.68rem;color:var(--text-dim);">80&ndash;90% &middot; 60 min</span></div>
             </div>
         </div>
-        <div class="status-section">
-            <div class="status-item">
-                <span style="color: #64748b;">FLOW:</span>
-                <span style="color: var(--diesel-bright); font-weight: bold;" id="status-flow">0 L/m</span>
-            </div>
-            <div class="status-item">
-                <span style="color: #64748b;">UPTIME:</span>
-                <span style="color: var(--elec-blue); font-weight: bold;" id="status-uptime">00:00:00</span>
-            </div>
+    </main>
+
+    <!-- ============ CONTROL BAR ============ -->
+    <div class="control-bar" style="padding-bottom:18px;">
+        <div class="cb-left">
+            <button onclick="toggleFullscreen()" class="btn" id="btn-fullscreen" type="button"><i class="fas fa-expand"></i> Fullscreen <span class="kbd">F</span></button>
+            <button onclick="resetSimulation()" class="btn" type="button"><i class="fas fa-redo"></i> Reset <span class="kbd">R</span></button>
+            <button onclick="togglePump()" class="btn" id="btn-pump" type="button"><i class="fas fa-power-off"></i> Pump Override <span class="kbd">P</span></button>
+        </div>
+        <div class="cb-right">
+            <span class="cb-note" id="cb-basis">Basis: conv-engine.js v1.22.0 &middot; deterministic engineering values</span>
         </div>
     </div>
 
     <script>
-        var sys = {
-            ust: 85.00, dtA: 92.00, dtB: 45.00, dtC: 88.00,
-            pumpRunning: false, amps: 0.0, vib: 0.2, flow: 0,
-            history: new Array(50).fill(50),
-            manualPump: false
+    (function () {
+        'use strict';
+
+        /* ---- Engine binding (single source of truth) ---------------- */
+        var SNAP = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+
+        // Defensive fallback ONLY if engine failed to load (still deterministic, no Math.random for engineering values)
+        var FUEL = SNAP ? SNAP.fuel : { level_pct: 85, tank_capacity_l: 60000, usable_l: 45900, generator_consumption_lph: 956, autonomy_hr: 48 };
+        var SITE = SNAP ? SNAP.site : { facility_load_kw: 2682.5 };
+        var META = SNAP ? SNAP.meta : { scenario: 'Simulated', data_quality: 'GOOD' };
+
+        var TANK_CAP = FUEL.tank_capacity_l;            // 60,000 L
+        var USABLE_FRACTION = SNAP ? (FUEL.usable_l / (TANK_CAP * (FUEL.level_pct / 100))) : 0.90;
+        var GEN_LPH = FUEL.generator_consumption_lph;   // 956 L/hr at facility load
+        var FACILITY_MW = SITE.facility_load_kw / 1000; // 2.6825 MW
+        var GENSET_COUNT = 3;                           // DT-GEN-A/B/C
+
+        /* Autonomy = usable L / consumption L/hr  — COMPUTED, never static */
+        function usableL(levelPct) { return TANK_CAP * USABLE_FRACTION * (levelPct / 100); }
+        function autonomyHr(levelPct) { return usableL(levelPct) / GEN_LPH; }
+        // N+1: one genset down, surviving gensets pick up the same total facility load,
+        // so site consumption (GEN_LPH covers facility) is unchanged -> autonomy identical.
+        // Conservative N+1 view: a single failed unit's day-tank is isolated; usable still
+        // backs full-site lph, so report the same computed autonomy (PASS while > 24 h SLA).
+        function autonomyN1Hr(levelPct) { return usableL(levelPct) / GEN_LPH; }
+
+        /* ---- Deterministic operating state (no RNG for engineering) -- */
+        var state = {
+            ustPct: FUEL.level_pct,        // 85 from engine
+            dtA: 92.0, dtB: 46.0, dtC: 88.0,
+            genRunning: 'B',               // failover demo: Genset B online
+            pumpRunning: false,
+            manualPump: false,
+            amps: 0.0, vib: 0.20, flow: 0, dp: 0.10,
+            tick: 0,
+            lastUpdate: 0,
+            filling: false,
+            acked: false,
+            interlocks: { leak: false, bund: false, water: false, polish: true, dtll: false, pumpfail: false }
         };
-        var LOW_LIMIT = 30.0;
-        var HIGH_LIMIT = 90.0;
-        var currentZoom = 1;
-        var uptimeSeconds = 0;
+        var DT_LOW = 30, DT_LOWLOW = 25, DT_HIGH = 90;
+        var SLA_HR = 24; // backup-power SLA: N+1 autonomy must exceed this
 
-        var tooltip = document.getElementById('equipment-tooltip');
-        var tooltipTitle = document.getElementById('tooltip-title');
-        var tooltipContent = document.getElementById('tooltip-content');
+        /* ---- Deterministic, bounded "process noise" (NOT engineering) -
+         * Engineering outputs (autonomy/usable/consumption/genload) are pure
+         * functions of the engine. Only cosmetic instrument jitter (amps,
+         * vibration) uses a seeded LCG so it is stable & reproducible.
+         */
+        var seed = 1337;
+        function lcg() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+        function jitter(base, span) { return base + (lcg() - 0.5) * 2 * span; }
+        function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+        function grp(n) { return Math.round(n).toLocaleString('en-US'); }
 
-        // Equipment specifications
-        var equipmentSpecs = {
-            'pump-p101': {
-                title: 'Transfer Pump P-101',
-                specs: [
-                    { label: 'Model', value: 'Viking L124A' },
-                    { label: 'Capacity', value: '180 L/min' },
-                    { label: 'Head', value: '25m' },
-                    { label: 'Power', value: '5.5 kW' },
-                    { label: 'Motor', value: '3-Phase 380V' }
-                ]
-            },
-            'tank-ust': {
-                title: 'Underground Storage Tank',
-                specs: [
-                    { label: 'Capacity', value: '100,000 L' },
-                    { label: 'Material', value: 'Double-wall Steel' },
-                    { label: 'Fuel Type', value: 'Diesel B30' },
-                    { label: 'Leak Detect', value: 'Interstitial' }
-                ]
+        var $ = function (id) { return document.getElementById(id); };
+
+        /* ---- Tank inventory model (day tanks are local buffers) ------ */
+        var DT_CAP = 1000; // L per generator day tank (engineering local buffer)
+        function dtVol(pct) { return Math.round(DT_CAP * pct / 100); }
+
+        function buildTankTable() {
+            var rows = [
+                { tag: 'UST-01', pct: state.ustPct, vol: usableL(state.ustPct), serves: 'Bulk &rarr; all gensets', usable: true },
+                { tag: 'DT-GEN-A', pct: state.dtA, vol: dtVol(state.dtA), serves: 'Genset A' },
+                { tag: 'DT-GEN-B', pct: state.dtB, vol: dtVol(state.dtB), serves: 'Genset B (online)' },
+                { tag: 'DT-GEN-C', pct: state.dtC, vol: dtVol(state.dtC), serves: 'Genset C' }
+            ];
+            var html = '';
+            for (var i = 0; i < rows.length; i++) {
+                var r = rows[i];
+                var cls = r.pct < (r.usable ? 30 : DT_LOWLOW) ? 'pf-crit' : (r.pct < (r.usable ? 60 : DT_LOW) ? 'pf-warn' : 'pf-ok');
+                var barW = Math.max(2, Math.min(100, r.pct));
+                html += '<tr>' +
+                    '<td class="tag">' + r.tag + '</td>' +
+                    '<td class="r ' + cls + '">' + fmt1(r.pct) + '%' +
+                        '<span class="mini-bar"><i style="width:' + barW + '%"></i></span></td>' +
+                    '<td class="r">' + grp(r.vol) + ' L</td>' +
+                    '<td style="color:var(--text-dim);font-family:Inter,sans-serif;font-size:0.7rem;">' + r.serves + '</td>' +
+                    '</tr>';
             }
-        };
+            $('tank-tbody').innerHTML = html;
+        }
 
-        function rand(min, max) { return Math.random() * (max - min) + min; }
-        function fmt(n) { return n.toFixed(1); }
+        function buildGensetRows() {
+            var defs = [
+                { id: 'A', dt: state.dtA, run: state.genRunning === 'A' },
+                { id: 'B', dt: state.dtB, run: state.genRunning === 'B' },
+                { id: 'C', dt: state.dtC, run: state.genRunning === 'C' }
+            ];
+            var html = '';
+            for (var i = 0; i < defs.length; i++) {
+                var g = defs[i];
+                var dtCls = g.dt < DT_LOWLOW ? 'var(--crit)' : (g.dt < DT_LOW ? 'var(--warn)' : 'var(--text-primary)');
+                html += '<div class="gen-row' + (g.run ? ' running' : '') + '">' +
+                    '<div><div class="dt-mini"><i style="height:' + g.dt + '%"></i></div><div class="gen-tag">DT-GEN-' + g.id + '</div></div>' +
+                    '<div class="gen-info">' +
+                        '<div class="gi-top"><span class="gi-name">Genset ' + g.id + '</span>' +
+                            '<span class="mode-chip' + (g.run ? ' run' : '') + '">' + (g.run ? 'RUNNING' : 'STANDBY') + '</span></div>' +
+                        '<div class="gi-grid">' +
+                            '<div><span class="data-lbl" style="font-size:0.62rem;">Day Tk</span><br><span class="data-val" style="color:' + dtCls + '">' + fmt1(g.dt) + '%</span></div>' +
+                            '<div><span class="data-lbl" style="font-size:0.62rem;">Volume</span><br><span class="data-val">' + grp(dtVol(g.dt)) + 'L</span></div>' +
+                            '<div><span class="data-lbl" style="font-size:0.62rem;">Load</span><br><span class="data-val">' + (g.run ? fmt1(FACILITY_MW) + 'MW' : '0.00MW') + '</span></div>' +
+                        '</div>' +
+                    '</div></div>';
+            }
+            $('genset-rows').innerHTML = html;
+        }
 
-        setInterval(function() {
-            updateClock(); simulatePhysics(); updateUI(); updateStatusBar();
-        }, 200);
+        /* ---- KPI bind (the headline operator outputs) --------------- */
+        function bindKpis() {
+            var a = autonomyHr(state.ustPct);
+            var n1 = autonomyN1Hr(state.ustPct);
+            $('kpi-autonomy').textContent = fmt1(a);
+            $('kpi-autonomy-sub').textContent = grp(usableL(state.ustPct)) + ' L ÷ ' + GEN_LPH + ' L/hr';
+            $('kpi-usable').textContent = grp(usableL(state.ustPct));
+            $('kpi-usable-sub').textContent = 'of ' + grp(TANK_CAP) + ' L × ' + fmt1(USABLE_FRACTION * 100) + '%';
+            $('kpi-consumption').textContent = grp(GEN_LPH);
+            $('kpi-genload').textContent = (Math.round(FACILITY_MW * 100) / 100).toFixed(2);
+            $('kpi-genload-sub').textContent = grp(SITE.facility_load_kw) + ' kW on gensets';
+            $('kpi-np1').textContent = fmt1(n1);
+            var tag = $('kpi-np1-tag');
+            if (n1 >= SLA_HR) { tag.textContent = 'PASS'; tag.className = 'k-tag pass'; }
+            else { tag.textContent = 'FAIL'; tag.className = 'k-tag'; tag.style.cssText = 'background:rgba(224,82,79,0.16);color:var(--crit);border:1px solid rgba(224,82,79,0.5);'; }
+        }
 
-        // Uptime counter
-        setInterval(function() {
-            uptimeSeconds++;
-            var h = Math.floor(uptimeSeconds / 3600);
-            var m = Math.floor((uptimeSeconds % 3600) / 60);
-            var s = uptimeSeconds % 60;
-            document.getElementById('status-uptime').textContent =
-                String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        /* ---- Alarm engine (thresholds per doc-06) ------------------- */
+        function evalAlarms() {
+            var alarms = [];
+            var tnow = new Date().toLocaleTimeString('en-GB');
+            // Day-tank low / low-low
+            ['A', 'B', 'C'].forEach(function (id) {
+                var v = id === 'A' ? state.dtA : id === 'B' ? state.dtB : state.dtC;
+                if (v < DT_LOWLOW) alarms.push({ sev: 'crit', t: tnow, tag: 'LIT-DT' + id + ' LO-LO', msg: 'Day Tank ' + id + ' critical (' + fmt1(v) + '% &lt; 25%) — interlock: lead pump forced RUN' });
+                else if (v < DT_LOW) alarms.push({ sev: 'warn', t: tnow, tag: 'LIT-DT' + id + ' LO', msg: 'Day Tank ' + id + ' low (' + fmt1(v) + '% &lt; 30%)' });
+            });
+            // UST low / low-low
+            if (state.ustPct < 30) alarms.push({ sev: 'crit', t: tnow, tag: 'LIT-101 LO-LO', msg: 'UST-01 critically low (' + fmt1(state.ustPct) + '% &lt; 30%) — autonomy at risk' });
+            else if (state.ustPct < 60) alarms.push({ sev: 'warn', t: tnow, tag: 'LIT-101 LO', msg: 'UST-01 low (' + fmt1(state.ustPct) + '% &lt; 60%) — schedule delivery' });
+            // Interlocks
+            if (state.interlocks.leak) alarms.push({ sev: 'crit', t: tnow, tag: 'LDS BUND WET', msg: 'Bund/sump leak sensor WET — environmental containment' });
+            if (state.interlocks.water) alarms.push({ sev: 'crit', t: tnow, tag: 'WIF HI', msg: 'Water-in-fuel above limit — polishing engaged' });
+            if (state.interlocks.pumpfail) alarms.push({ sev: 'crit', t: tnow, tag: 'P-101 FAIL', msg: 'Transfer pump commanded ON, no flow within 10 s' });
+            if (state.filling && state.ustPct > 95) alarms.push({ sev: 'warn', t: tnow, tag: 'UST OVERFILL', msg: 'UST-01 &gt; 95% during fill — overfill prevention engaging' });
+            return alarms;
+        }
+
+        function renderAlarms(alarms) {
+            var box = $('alarm-list');
+            if (state.acked && alarms.length === 0) {
+                box.innerHTML = '<div class="alarm-empty">No active alarms &middot; acknowledged</div>';
+                return;
+            }
+            if (alarms.length === 0) {
+                box.innerHTML = '<div class="alarm-empty">No active alarms</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < alarms.length; i++) {
+                var a = alarms[i];
+                html += '<div class="alarm-item ' + a.sev + '">' +
+                    '<span class="ai-time">' + a.t + '</span>' +
+                    '<span class="ai-body"><strong>' + a.tag + '</strong><span>' + a.msg + '</span></span>' +
+                    '</div>';
+            }
+            box.innerHTML = html;
+        }
+
+        function updateAlarmStrip(alarms) {
+            var crit = 0, warn = 0;
+            for (var i = 0; i < alarms.length; i++) { if (alarms[i].sev === 'crit') crit++; else warn++; }
+            $('as-crit').textContent = crit;
+            $('as-warn').textContent = warn;
+            $('as-stale').textContent = '0';
+            $('as-scn').textContent = META.scenario;
+            var st = $('as-state');
+            if (crit > 0) { st.textContent = 'ALARM'; st.className = 'as-state alarm'; }
+            else if (warn > 0) { st.textContent = 'WARNING'; st.className = 'as-state warn'; }
+            else { st.textContent = 'NORMAL'; st.className = 'as-state normal'; }
+        }
+
+        function updateInterlockCards() {
+            function set(id, alarm, okTxt, badTxt) {
+                var el = $(id);
+                el.className = 'ilk ' + (alarm ? 'alarm' : 'normal');
+                el.querySelector('.ilk-stat').innerHTML = alarm ? badTxt : okTxt;
+            }
+            set('ilk-leak', state.interlocks.leak, 'DRY', 'WET');
+            set('ilk-bund', state.interlocks.bund, 'NORMAL', 'HIGH');
+            set('ilk-water', state.interlocks.water, 'NORMAL', 'CONTAM');
+            // Polishing: normal = running
+            var pol = $('ilk-polish'); pol.className = 'ilk ' + (state.interlocks.polish ? 'normal' : 'alarm');
+            pol.querySelector('.ilk-stat').textContent = state.interlocks.polish ? 'RUNNING' : 'FAULT';
+            var dtll = state.dtA < DT_LOWLOW || state.dtB < DT_LOWLOW || state.dtC < DT_LOWLOW;
+            set('ilk-dtll', dtll, 'CLEAR', 'ACTIVE');
+            set('ilk-pumpfail', state.interlocks.pumpfail, 'CLEAR', 'TRIPPED');
+        }
+
+        /* ---- Pump / day-tank physics (deterministic transfer) ------- */
+        function stepPhysics() {
+            state.tick++;
+            // Running genset consumes its day tank (deterministic draw)
+            var rk = state.genRunning;
+            if (rk === 'A' && state.dtA > 0) state.dtA -= 0.10;
+            if (rk === 'B' && state.dtB > 0) state.dtB -= 0.10;
+            if (rk === 'C' && state.dtC > 0) state.dtC -= 0.10;
+
+            var runDt = rk === 'A' ? 'dtA' : rk === 'B' ? 'dtB' : 'dtC';
+
+            // Auto lead-pump logic: refill running day tank between low/high
+            if (!state.manualPump) {
+                if (state[runDt] <= DT_LOW) state.pumpRunning = true;
+                if (state[runDt] >= DT_HIGH) state.pumpRunning = false;
+            }
+            // Low-low interlock forces pump
+            if (state[runDt] < DT_LOWLOW) state.pumpRunning = true;
+
+            if (state.pumpRunning) {
+                state[runDt] = Math.min(100, state[runDt] + 0.45);
+                state.ustPct = Math.max(0, state.ustPct - 0.015);
+                if (state.amps < 14.4) state.amps += 1.2;
+                if (state.flow < 178) state.flow += 14;
+                state.vib = jitter(2.25, 0.18);
+                state.dp = jitter(4.2, 0.12);
+                state.interlocks.pumpfail = false;
+            } else {
+                if (state.amps > 0) state.amps = Math.max(0, state.amps - 0.7);
+                if (state.flow > 0) state.flow = Math.max(0, state.flow - 7);
+                state.vib = jitter(0.20, 0.06);
+                state.dp = jitter(0.12, 0.03);
+            }
+
+            if (state.filling) {
+                if (state.ustPct < 98) state.ustPct = Math.min(98, state.ustPct + 0.25);
+                else { state.filling = false; }
+            }
+
+            // trend history (UST level, deterministic)
+            trend.push(state.ustPct);
+            if (trend.length > 60) trend.shift();
+        }
+        var trend = [];
+        for (var ti = 0; ti < 60; ti++) trend.push(FUEL.level_pct);
+
+        /* ---- Render ------------------------------------------------- */
+        function render() {
+            $('val-ust-lvl').textContent = fmt1(state.ustPct);
+            $('val-ust-gross').textContent = grp(TANK_CAP * state.ustPct / 100);
+            $('val-ust-usable').textContent = grp(usableL(state.ustPct));
+            $('liq-ust').style.height = state.ustPct + '%';
+            $('fp-ust').textContent = fmt1(state.ustPct) + '%';
+
+            $('val-p1-amp').textContent = fmt1(state.amps);
+            $('val-p1-dp').textContent = fmt1(state.dp);
+            $('val-p1-flow').textContent = Math.round(state.flow);
+            $('val-p1-vib').textContent = fmt1(state.vib);
+
+            var pic = $('pump-ic'), pmode = $('pump-mode'), pf = $('fp-pump'), pn = $('fp-pump-node');
+            var arrows = ['fp-a1', 'fp-a2', 'fp-a3', 'fp-a4'];
+            if (state.pumpRunning) {
+                pic.classList.add('running');
+                pmode.textContent = state.manualPump ? 'MANUAL' : 'AUTO·RUN';
+                pmode.className = 'mode-chip run';
+                pf.textContent = 'RUN'; pn.classList.add('active');
+                arrows.forEach(function (id) { $(id).classList.add('active'); });
+            } else {
+                pic.classList.remove('running');
+                pmode.textContent = state.manualPump ? 'MANUAL' : 'AUTO';
+                pmode.className = 'mode-chip';
+                pf.textContent = 'STBY'; pn.classList.remove('active');
+                arrows.forEach(function (id) { $(id).classList.remove('active'); });
+            }
+            $('fp-gen').textContent = '1 run';
+
+            // trend polyline
+            var pts = [];
+            for (var i = 0; i < trend.length; i++) {
+                var x = (i / 59) * 200;
+                var y = 56 - ((trend[i] - 80) / 10) * 50; // map 80-90% -> 56..6
+                if (y < 4) y = 4; if (y > 54) y = 54;
+                pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+            }
+            $('ust-trend').setAttribute('points', pts.join(' '));
+
+            buildTankTable();
+            buildGensetRows();
+            bindKpis();
+            var alarms = evalAlarms();
+            renderAlarms(alarms);
+            updateAlarmStrip(alarms);
+            updateInterlockCards();
+
+            state.lastUpdate = 0;
+            $('as-upd').textContent = '0s';
+        }
+
+        /* ---- Loops -------------------------------------------------- */
+        setInterval(function () {
+            $('clock').textContent = new Date().toLocaleTimeString('en-GB');
+            stepPhysics();
+            render();
         }, 1000);
 
-        function simulatePhysics() {
-            if(sys.dtB > 0) sys.dtB -= 0.1;
+        // "updated Ns ago" ticker between renders
+        setInterval(function () {
+            state.lastUpdate += 1;
+            var el = $('as-upd'); if (el) el.textContent = state.lastUpdate + 's';
+        }, 1000);
 
-            if (!sys.manualPump) {
-                if(sys.dtB <= LOW_LIMIT) sys.pumpRunning = true;
-                if(sys.dtB >= HIGH_LIMIT) sys.pumpRunning = false;
-            }
-
-            if(sys.pumpRunning) {
-                sys.dtB += 0.4; sys.ust -= 0.02;
-                if(sys.amps < 14.5) sys.amps += 1.0;
-                if(sys.flow < 180) sys.flow += 10;
-                sys.vib = rand(2.1, 2.4);
+        /* ---- Controls ----------------------------------------------- */
+        window.togglePump = function () {
+            state.manualPump = true;
+            state.pumpRunning = !state.pumpRunning;
+            $('btn-pump').classList.toggle('active', state.pumpRunning);
+            render();
+        };
+        window.resetSimulation = function () {
+            state.ustPct = FUEL.level_pct;
+            state.dtA = 92.0; state.dtB = 46.0; state.dtC = 88.0;
+            state.pumpRunning = false; state.manualPump = false;
+            state.amps = 0; state.vib = 0.20; state.flow = 0; state.dp = 0.10;
+            state.filling = false; state.acked = false;
+            state.interlocks = { leak: false, bund: false, water: false, polish: true, dtll: false, pumpfail: false };
+            seed = 1337;
+            trend = []; for (var i = 0; i < 60; i++) trend.push(FUEL.level_pct);
+            $('btn-pump').classList.remove('active');
+            var bf = $('btn-fill'); bf.innerHTML = '<i class="fas fa-plug"></i> Connect Tanker Hose'; bf.classList.remove('active');
+            $('fill-status').textContent = 'DISCONNECTED'; $('fill-status').style.color = 'var(--text-dim)';
+            $('fill-rate').textContent = '0';
+            render();
+        };
+        window.ackAlarms = function () {
+            state.acked = true;
+            render();
+        };
+        window.toggleFilling = function () {
+            state.filling = !state.filling;
+            state.acked = false;
+            var bf = $('btn-fill');
+            if (state.filling) {
+                bf.innerHTML = '<i class="fas fa-plug"></i> Disconnect Hose';
+                bf.classList.add('active');
+                $('fill-status').textContent = 'CONNECTED'; $('fill-status').style.color = 'var(--ok)';
+                $('fill-rate').textContent = '210';
             } else {
-                if(sys.amps > 0) sys.amps -= 0.5;
-                if(sys.flow > 0) sys.flow -= 5;
-                sys.vib = rand(0.1, 0.3);
+                bf.innerHTML = '<i class="fas fa-plug"></i> Connect Tanker Hose';
+                bf.classList.remove('active');
+                $('fill-status').textContent = 'DISCONNECTED'; $('fill-status').style.color = 'var(--text-dim)';
+                $('fill-rate').textContent = '0';
             }
-            if(sys.amps < 0) sys.amps = 0;
-            if(sys.flow < 0) sys.flow = 0;
-
-            sys.history.shift();
-            var chartVal = 100 - ((sys.ust - 80) * 10);
-            sys.history.push(chartVal);
-        }
-
-        function updateUI() {
-            document.getElementById('val-ust-lvl').innerText = fmt(sys.ust);
-            document.getElementById('val-ust-vol').innerText = Math.round(sys.ust * 1000).toLocaleString();
-            document.getElementById('val-a-lvl').innerText = fmt(sys.dtA);
-            document.getElementById('val-b-lvl').innerText = fmt(sys.dtB);
-            document.getElementById('val-c-lvl').innerText = fmt(sys.dtC);
-
-            document.getElementById('liq-ust').style.height = sys.ust + '%';
-            document.getElementById('liq-a').style.height = sys.dtA + '%';
-            document.getElementById('liq-b').style.height = sys.dtB + '%';
-            document.getElementById('liq-c').style.height = sys.dtC + '%';
-
-            document.getElementById('val-p1-amp').innerText = fmt(sys.amps);
-            document.getElementById('val-p1-vib').innerText = fmt(sys.vib);
-            document.getElementById('val-fit-main').innerText = Math.round(sys.flow);
-            var press = sys.flow > 0 ? rand(4.1, 4.3) : rand(0.1, 0.2);
-            document.getElementById('val-pit-dis').innerText = fmt(press);
-
-            var pumpIcon = document.getElementById('icon-p1');
-            var led = document.getElementById('led-p1');
-            var vlvB = document.getElementById('vlv-b');
-            var pipes = ['pipe-suc', 'pipe-dis', 'pipe-head', 'pipe-rise', 'pipe-br-b'];
-
-            if(sys.pumpRunning) {
-                pumpIcon.classList.add('running');
-                led.className = "led on";
-                vlvB.style.transform = "rotate(90deg)"; vlvB.style.color = "var(--ok)";
-                pipes.forEach(function(id) {
-                    var el = document.getElementById(id);
-                    if(el) el.classList.add('active');
-                });
-            } else {
-                pumpIcon.classList.remove('running');
-                led.className = "led";
-                vlvB.style.transform = "rotate(0deg)"; vlvB.style.color = "var(--crit)";
-                document.querySelectorAll('.pipe-line').forEach(function(p) { p.classList.remove('active'); });
-            }
-
-            var pointsStr = sys.history.map(function(val, i) { return (i * 2) + ',' + val; }).join(' ');
-            document.getElementById('ust-sparkline').setAttribute('points', pointsStr);
-
-            var alarmBox = document.getElementById('alarm-box');
-            if(sys.dtB <= LOW_LIMIT) {
-                if(alarmBox.innerHTML.length < 50) {
-                    alarmBox.innerHTML = '<div style="background:rgba(239,68,68,0.2); padding:5px; border-left:3px solid red; margin-bottom:5px;"><strong>LIT-402 LOLO</strong><br>DT-B Level Critical</div>';
-                }
-            } else {
-                alarmBox.innerHTML = '<div style="color:#64748b; text-align:center; padding-top:20px;">No Active Alarms</div>';
-            }
-        }
-
-        function updateStatusBar() {
-            document.getElementById('status-ust').textContent = fmt(sys.ust) + '%';
-            document.getElementById('status-flow').textContent = Math.round(sys.flow) + ' L/m';
-
-            var ledUst = document.getElementById('led-ust');
-            ledUst.className = 'status-led';
-            if (sys.ust >= 50) ledUst.classList.add('green');
-            else if (sys.ust >= 25) ledUst.classList.add('yellow');
-            else ledUst.classList.add('red');
-
-            var ledPump = document.getElementById('led-pump');
-            var statusPump = document.getElementById('status-pump');
-            ledPump.className = 'status-led';
-            if (sys.pumpRunning) {
-                ledPump.classList.add('green');
-                statusPump.textContent = 'RUNNING';
-            } else {
-                ledPump.classList.add('yellow');
-                statusPump.textContent = 'STANDBY';
-            }
-
-            var ledSystem = document.getElementById('led-system');
-            var statusSystem = document.getElementById('status-system');
-            ledSystem.className = 'status-led';
-            if (sys.dtB <= LOW_LIMIT) {
-                ledSystem.classList.add('red');
-                statusSystem.textContent = 'ALARM';
-            } else {
-                ledSystem.classList.add('green');
-                statusSystem.textContent = 'NORMAL';
-            }
-        }
-
-        function updateClock() {
-            var now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString();
-        }
-
-        function ack() {
-            document.getElementById('alarm-box').innerHTML = '<div style="color:#64748b; text-align:center; padding-top:20px;">Alarms Acknowledged</div>';
-        }
-
-        // Fullscreen toggle
-        function toggleFullscreen() {
+            render();
+        };
+        window.toggleFullscreen = function () {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function(err) {
-                    console.log('Fullscreen error:', err);
-                });
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(function () {});
+                }
                 document.body.classList.add('fullscreen');
-                document.getElementById('btn-fullscreen').classList.add('active');
+                $('btn-fullscreen').classList.add('active');
             } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                document.body.classList.remove('fullscreen');
+                $('btn-fullscreen').classList.remove('active');
+            }
+        };
+
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey) return;
+            var k = e.key.toLowerCase();
+            if (k === 'f') { e.preventDefault(); window.toggleFullscreen(); }
+            if (k === 'r') window.resetSimulation();
+            if (k === 'p') window.togglePump();
+            if (e.key === 'Escape' && document.fullscreenElement) {
                 document.exitFullscreen();
                 document.body.classList.remove('fullscreen');
-                document.getElementById('btn-fullscreen').classList.remove('active');
-            }
-        }
-
-        // Reset simulation
-        function resetSimulation() {
-            sys.ust = 85.00;
-            sys.dtA = 92.00;
-            sys.dtB = 45.00;
-            sys.dtC = 88.00;
-            sys.pumpRunning = false;
-            sys.manualPump = false;
-            sys.amps = 0.0;
-            sys.vib = 0.2;
-            sys.flow = 0;
-            sys.history = new Array(50).fill(50);
-
-            document.getElementById('btn-pump').classList.remove('active');
-            document.getElementById('alarm-box').innerHTML = '<div style="color:#64748b; text-align:center; padding-top:20px;">No Active Alarms</div>';
-        }
-
-        // Manual pump toggle
-        function togglePump() {
-            sys.manualPump = true;
-            sys.pumpRunning = !sys.pumpRunning;
-            var btn = document.getElementById('btn-pump');
-            if (sys.pumpRunning) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        }
-
-        // Filling Station Control
-        var fillingActive = false;
-        var fillInterval = null;
-
-        function toggleFilling() {
-            fillingActive = !fillingActive;
-            var truckIcon = document.getElementById('truck-icon');
-            var truckSmall = document.getElementById('truck-small');
-            var hoseLine = document.getElementById('hose-line');
-            var fillStatus = document.getElementById('fill-status');
-            var fillRate = document.getElementById('fill-rate');
-            var btnFill = document.getElementById('btn-fill');
-
-            if (fillingActive) {
-                truckIcon.classList.add('connected');
-                truckSmall.style.color = 'var(--diesel-bright)';
-                hoseLine.classList.add('active');
-                fillStatus.textContent = 'CONNECTED';
-                fillStatus.style.color = 'var(--ok)';
-                btnFill.innerHTML = '<i class="fas fa-plug"></i> DISCONNECT';
-                btnFill.classList.add('active');
-
-                // Start filling simulation
-                fillInterval = setInterval(function() {
-                    if (sys.ust < 98) {
-                        sys.ust += 0.2;
-                        var rate = 180 + Math.floor(Math.random() * 40);
-                        fillRate.textContent = rate + ' L/min';
-                    } else {
-                        // Tank full
-                        fillRate.textContent = '0 L/min';
-                        toggleFilling(); // Auto disconnect
-                    }
-                }, 500);
-            } else {
-                truckIcon.classList.remove('connected');
-                truckSmall.style.color = '#555';
-                hoseLine.classList.remove('active');
-                fillStatus.textContent = 'DISCONNECTED';
-                fillStatus.style.color = 'var(--off)';
-                fillRate.textContent = '0 L/min';
-                btnFill.innerHTML = '<i class="fas fa-plug"></i> CONNECT HOSE';
-                btnFill.classList.remove('active');
-
-                if (fillInterval) {
-                    clearInterval(fillInterval);
-                    fillInterval = null;
-                }
-            }
-        }
-
-        // Zoom control
-        function setZoom(level) {
-            currentZoom = level;
-            var mainGrid = document.querySelector('.main-grid');
-            mainGrid.style.transform = 'scale(' + level + ')';
-            mainGrid.style.transformOrigin = 'top left';
-            document.querySelectorAll('.zoom-btn').forEach(function(btn) {
-                btn.classList.remove('active');
-                if (btn.dataset.zoom == level) btn.classList.add('active');
-            });
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
-            if (e.key === 'r' || e.key === 'R') { if (!e.ctrlKey && !e.metaKey) resetSimulation(); }
-            if (e.key === 'p' || e.key === 'P') { togglePump(); }
-            if (e.key === 'Escape') {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                    document.body.classList.remove('fullscreen');
-                }
             }
         });
 
-        // Tooltip functions
-        function showTooltip(e, equipId) {
-            var spec = equipmentSpecs[equipId];
-            if (!spec) return;
-
-            tooltipTitle.textContent = spec.title;
-            var html = '';
-            spec.specs.forEach(function(item) {
-                html += '<div class="tooltip-row"><span class="tooltip-label">' + item.label + '</span><span class="tooltip-value">' + item.value + '</span></div>';
+        /* ---- Equipment tooltip -------------------------------------- */
+        var tip = $('equipment-tooltip'), tipT = $('tooltip-title'), tipC = $('tooltip-content');
+        var specs = {
+            'pump-unit': {
+                title: 'Transfer Pump P-101',
+                rows: [
+                    ['Model', 'Viking L124A'], ['Duty', 'Lead transfer (N+1 w/ P-102)'],
+                    ['Capacity', '180 L/min'], ['Head', '25 m'],
+                    ['Motor', '5.5 kW 3-ph 380 V'], ['Control', 'Auto on day-tank LO/HI']
+                ]
+            },
+            'tank-ust': {
+                title: 'UST-01 Bulk Storage',
+                rows: [
+                    ['Capacity', grp(TANK_CAP) + ' L'], ['Usable fraction', fmt1(USABLE_FRACTION * 100) + '%'],
+                    ['Fuel', 'Diesel B30'], ['Containment', 'Double-wall + bund'],
+                    ['Leak detect', 'Interstitial + sump'], ['Backs autonomy', grp(usableL(state.ustPct)) + ' L']
+                ]
+            }
+        };
+        function showTip(e, key) {
+            var s = specs[key]; if (!s) return;
+            tipT.textContent = s.title;
+            var h = '';
+            for (var i = 0; i < s.rows.length; i++) h += '<div class="tooltip-row"><span class="tooltip-label">' + s.rows[i][0] + '</span><span class="tooltip-value">' + s.rows[i][1] + '</span></div>';
+            tipC.innerHTML = h;
+            tip.style.left = Math.min(e.clientX + 15, window.innerWidth - 270) + 'px';
+            tip.style.top = (e.clientY - 10) + 'px';
+            tip.classList.add('visible');
+        }
+        function hideTip() { tip.classList.remove('visible'); }
+        function wireTip(el, key) {
+            if (!el) return;
+            el.style.cursor = 'help';
+            el.addEventListener('mouseenter', function (e) { showTip(e, key); });
+            el.addEventListener('mousemove', function (e) {
+                tip.style.left = Math.min(e.clientX + 15, window.innerWidth - 270) + 'px';
+                tip.style.top = (e.clientY - 10) + 'px';
             });
-            tooltipContent.innerHTML = html;
-
-            tooltip.style.left = (e.clientX + 15) + 'px';
-            tooltip.style.top = (e.clientY - 10) + 'px';
-            tooltip.classList.add('visible');
+            el.addEventListener('mouseleave', hideTip);
         }
+        wireTip($('pump-unit'), 'pump-unit');
+        wireTip($('tank-ust'), 'tank-ust');
 
-        function hideTooltip() {
-            tooltip.classList.remove('visible');
-        }
-
-        // Add tooltip to pump element
-        var pumpUnit = document.querySelector('.pump-unit');
-        if (pumpUnit) {
-            pumpUnit.style.cursor = 'pointer';
-            pumpUnit.addEventListener('mouseenter', function(e) { showTooltip(e, 'pump-p101'); });
-            pumpUnit.addEventListener('mousemove', function(e) {
-                tooltip.style.left = (e.clientX + 15) + 'px';
-                tooltip.style.top = (e.clientY - 10) + 'px';
-            });
-            pumpUnit.addEventListener('mouseleave', hideTooltip);
-        }
-
+        /* ---- Initial paint ------------------------------------------ */
+        render();
+    })();
     </script>
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-tracker.js" defer></script>

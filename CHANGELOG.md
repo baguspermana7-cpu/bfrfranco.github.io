@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.22.3 — 2026-05-18 (B-015 Stages 3-8: 6 conventional BMS pages bound + de-slopped)
+
+Conventional BMS suite redesign per the owner conv/review 14-doc spec.
+Stage 1 (engine + dc-conventional) shipped v1.22.0; EPMS_Telemetry is the
+owner-OK exemplar (audited Stage 2, byte-untouched). This ships Stages 3-8:
+6 pages each bound to the single scenario engine and de-slopped to the
+grounded SCADA standard, via 6 parallel agents — every claim independently
+re-verified by the orchestrator (audits + headless 1440/390 + git scope).
+
+### Changed (each page = external `js/conv-engine.js` + de-slop, one-file diffs)
+- **datahall.html**: rack field SUM == engine IT 1.850 MW exactly (deterministic,
+  was random); hall-balance band; heatmap modes; 0 neon; alarm-first.
+- **chiller-plant.html**: CHWS/CHWR engine-locked 7.2/14.8 °C (was drifting
+  19→18.7 via PRNG); the ~19/23 °C readings correctly relabelled SEC/condenser
+  loop (doc-04 critical fix — verified no CHWS/CHWR sits on a 19/23 value);
+  pipe-label↔tee collisions 10→0.
+- **fire-system.html**: red reserved for alarm/trip/fire/leak only (0 red on
+  normal); dangerous one-click TRIGGER-FIRE → gated 2-step SIMULATION panel;
+  explicit cause-&-effect matrix.
+- **fuel-system.html**: autonomy computed (usable ÷ consumption = 48.0 hr,
+  was static); tank inventory + interlock indicators; flow-path direction.
+- **water-system.html**: WUE computed (37 L/min ÷ IT energy = 1.20 L/kWh,
+  was static); scope split + WUE-vs-all-flow reconciliation; equipment tags.
+- **ict.html**: BMS/OT air-gapped segment separated; per-link
+  capacity/util/latency/status; neon + CRT scanline removed.
+- All: top alarm strip, grounded slate/graphite palette matching the
+  EPMS_Telemetry exemplar, deterministic engine values (no `Math.random` for
+  engineering/alarm state), 0 pageerror, 0px overflow @390, readable
+  1366/1920. EPMS_Telemetry / js/conv-engine.js / version files untouched.
+- Gates verified by explicit exit-code: audit-js-syntax / script-tags /
+  version-stamp / mobile-responsive `--strict` all 0; conv-calc test pass.
+
 ## v1.22.2 — 2026-05-18 (finalize light-mode contrast: shared-token sweep)
 
 Closes the Track-1 light-mode work — the per-page agents consistently

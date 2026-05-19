@@ -69,74 +69,216 @@
         ]
     }
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- conv-engine: single scenario basis (WUE = water vol / IT energy, computed).
+         Loaded NON-deferred + external so window.CONV_CALC exists before the
+         inline binding script. NEVER inline this in a JS string literal. -->
+    <script src="js/conv-engine.js?v=1.22.0"></script>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-green: #3dfc16; --neon-yellow: #fde047; }
-        body { background: #020617; color: #f8fafc; font-family: 'JetBrains Mono', monospace; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .flow-path { fill: none; stroke: #1e293b; stroke-width: 4; }
-        .flow-active { stroke: var(--neon-blue); stroke-dasharray: 10; animation: flowAnim 1s linear infinite; filter: drop-shadow(0 0 5px var(--neon-blue)); }
-        @keyframes flowAnim { to { stroke-dashoffset: -20; } }
-        .pump-spinner { transform-box: fill-box; transform-origin: center; animation: spin 3s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .tech-label { fill: #94a3b8; font-size: 9px; text-transform: uppercase; font-weight: bold; }
-        .tech-val { fill: var(--neon-green); font-size: 10px; font-weight: bold; }
+        /* Grounded operator-console palette (matches EPMS_Telemetry exemplar).
+           Red is reserved for ALARM/TRIP only — never decoration. */
+        :root {
+            --bg-core: #02040a;
+            --panel-bg: #0c1423;
+            --panel-line: #2b3a52;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --text-faint: #64748b;
+            --st-ok: #22c55e;       /* normal — small dot/text only */
+            --st-warn: #eab308;     /* threshold approach */
+            --st-bad: #ef4444;      /* ALARM / trip / leak ONLY */
+            --medium-water: #38bdf8;/* potable / makeup water pipe */
+            --medium-treated:#2dd4bf;/* treated water pipe */
+            --medium-drain: #a16207;/* blowdown / drain */
+            --sel: #22d3ee;         /* user selection outline (not status) */
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg-core); color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-variant-numeric: tabular-nums; }
+        .wrap { padding: 14px 18px 70px; max-width: 1680px; margin: 0 auto; }
+        a { color: inherit; }
+        .mono { font-family: 'Consolas', 'SF Mono', monospace; }
 
-        /* Control Buttons */
-        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: all 0.2s; }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .ctrl-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
-        .kbd-hint { background: #222; padding: 2px 6px; border-radius: 3px; font-size: 9px; color: #666; margin-left: 4px; }
+        /* Top status bar — alarm/safety state FIRST (doc-10 hierarchy) */
+        .topbar { display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
+            background: var(--panel-bg); border: 1px solid var(--panel-line);
+            border-radius: 8px; padding: 10px 16px; margin-bottom: 12px; }
+        .brand { font-weight: 800; font-size: 17px; color: #fff; letter-spacing: .3px; }
+        .brand small { display: block; font-size: 10px; font-weight: 600;
+            color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
+        .nav-btn { display: inline-flex; align-items: center; gap: 7px;
+            text-decoration: none; color: var(--text-dim); font-size: 12px;
+            font-weight: 600; padding: 8px 12px; min-height: 40px;
+            border: 1px solid var(--panel-line); border-radius: 6px;
+            background: transparent; cursor: pointer; transition: all .15s; }
+        .nav-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
+        .alarm-strip { display: flex; align-items: center; flex-wrap: wrap; gap: 18px;
+            background: var(--panel-bg); border: 1px solid var(--panel-line);
+            border-left: 4px solid var(--st-ok); border-radius: 8px;
+            padding: 10px 18px; margin-bottom: 12px; }
+        .alarm-strip.has-alarm { border-left-color: var(--st-bad); }
+        .alarm-strip.has-warn { border-left-color: var(--st-warn); }
+        .alarm-state { font-size: 15px; font-weight: 800; letter-spacing: 1px;
+            color: var(--st-ok); }
+        .alarm-state.warn { color: var(--st-warn); }
+        .alarm-state.bad { color: var(--st-bad); }
+        .alarm-chip { font-size: 11px; color: var(--text-dim); }
+        .alarm-chip b { color: var(--text-main); font-weight: 700; }
+        .alarm-chip .crit { color: var(--st-bad); }
+        .alarm-chip .warnv { color: var(--st-warn); }
 
-        /* Zoom Controls */
-        .zoom-controls { display: flex; gap: 4px; align-items: center; }
-        .zoom-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; transition: all 0.2s; }
-        .zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .zoom-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
+        /* KPI strip — value + unit + threshold/target (doc-07, doc-10) */
+        .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 10px; margin-bottom: 12px; }
+        .kpi { background: var(--panel-bg); border: 1px solid var(--panel-line);
+            border-radius: 8px; padding: 12px 14px; }
+        .kpi h3 { margin: 0 0 6px; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .6px; color: var(--text-dim); }
+        .kpi .v { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.1; }
+        .kpi .v small { font-size: 11px; font-weight: 600; color: var(--text-dim); }
+        .kpi .th { margin-top: 5px; font-size: 10px; color: var(--text-faint); }
+        .kpi .th.ok { color: var(--st-ok); }
+        .kpi .th.warn { color: var(--st-warn); }
+        .kpi .th.bad { color: var(--st-bad); }
 
-        /* Fullscreen Mode */
-        body.fullscreen .no-print { opacity: 0; pointer-events: none; }
-        body.fullscreen .main-panel { border-radius: 0; }
+        .panel { background: var(--panel-bg); border: 1px solid var(--panel-line);
+            border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; }
+        .panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .8px; color: var(--text-dim); margin: 0 0 12px;
+            display: flex; align-items: center; gap: 8px; }
+        .panel-title .sub { font-weight: 500; text-transform: none;
+            letter-spacing: 0; color: var(--text-faint); font-size: 11px; }
 
-        /* Bottom Status Bar */
-        .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 1px solid #333; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .status-section { display: flex; gap: 16px; align-items: center; }
-        .status-item { display: flex; align-items: center; gap: 6px; font-size: 10px; }
-        .status-led { width: 8px; height: 8px; border-radius: 50%; }
-        .led-green { background: var(--neon-green); box-shadow: 0 0 6px var(--neon-green); }
-        .led-yellow { background: var(--neon-yellow); box-shadow: 0 0 6px var(--neon-yellow); }
-        .led-red { background: #ff0000; box-shadow: 0 0 6px #ff0000; }
+        .layout { display: grid; grid-template-columns: 1fr 320px; gap: 12px; }
+        .diagram-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-        /* Equipment Tooltip */
-        .equipment-tooltip { position: absolute; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--neon-blue); border-radius: 8px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 220px; }
-        .equipment-tooltip.visible { opacity: 1; }
-        .tooltip-title { color: var(--neon-blue); font-weight: bold; font-size: 11px; margin-bottom: 6px; text-transform: uppercase; }
-        .tooltip-row { display: flex; justify-content: space-between; margin: 3px 0; }
-        .tooltip-label { color: #64748b; }
-        .tooltip-value { color: #fff; font-weight: bold; }
+        /* P&ID linework — muted normal pipe, medium-coloured flow */
+        .pipe { fill: none; stroke: #33415a; stroke-width: 3; stroke-linecap: round;
+            stroke-linejoin: round; }
+        .flow { fill: none; stroke-width: 3; stroke-dasharray: 9 14;
+            stroke-linecap: round; animation: flowmove 1.1s linear infinite; opacity: .9; }
+        .flow.water { stroke: var(--medium-water); }
+        .flow.treated { stroke: var(--medium-treated); }
+        .flow.drain { stroke: var(--medium-drain); stroke-dasharray: 6 12; }
+        .flow.stopped { animation: none; opacity: .25; stroke: #475569; }
+        @keyframes flowmove { to { stroke-dashoffset: -23; } }
+        @media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
+        .junction { fill: #33415a; }
+        .eq { fill: #0f1a2e; stroke: #5b7090; stroke-width: 1.5; }
+        .eq.sel { stroke: var(--sel); stroke-width: 2.5; }
+        .eq-grp { cursor: pointer; }
+        .eq-grp:hover .eq { stroke: var(--sel); }
+        .tag { fill: #fbbf24; font-size: 11px; font-weight: 700;
+            font-family: 'Consolas', monospace; }
+        .lbl { fill: var(--text-dim); font-size: 10px; font-weight: 600; }
+        .val { fill: #fff; font-size: 11px; font-weight: 700;
+            font-family: 'Consolas', monospace; }
+        .val.ok { fill: var(--st-ok); }
+        .val.warn { fill: var(--st-warn); }
+        .val.bad { fill: var(--st-bad); }
+        .tank-fill { fill: rgba(56,189,248,.18); }
+        .tank-fill.treated { fill: rgba(45,212,191,.18); }
+        .arrow { fill: #64748b; }
 
-        /* Flow Control Panel */
-        .sim-panel { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 20px; margin-bottom: 16px; }
-        .sim-slider { width: 160px; accent-color: var(--neon-blue); }
+        /* Right inspector */
+        .insp-row { display: flex; justify-content: space-between; align-items: baseline;
+            padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 12px; }
+        .insp-row:last-child { border-bottom: 0; }
+        .insp-row .k { color: var(--text-dim); }
+        .insp-row .vv { color: #fff; font-weight: 700; font-family: 'Consolas', monospace; }
+        .insp-row .vv.ok { color: var(--st-ok); }
+        .insp-row .vv.warn { color: var(--st-warn); }
+        .insp-row .vv.bad { color: var(--st-bad); }
+        .balance-note { font-size: 11px; line-height: 1.6; color: var(--text-dim);
+            background: rgba(255,255,255,.03); border: 1px dashed var(--panel-line);
+            border-radius: 6px; padding: 10px 12px; margin-top: 10px; }
+        .balance-note b { color: var(--text-main); }
+        .scope-tag { display: inline-block; font-size: 9px; font-weight: 700;
+            padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
+            letter-spacing: .5px; }
+        .scope-tag.incl { background: rgba(45,212,191,.18); color: #5eead4; }
+        .scope-tag.excl { background: rgba(148,163,184,.15); color: #cbd5e1; }
 
-        /* Mobile Responsive */
-        @media (max-width: 1024px) {
-            body { padding: 12px !important; }
-            .main-panel { padding: 16px !important; border-radius: 24px !important; }
+        .alarm-list { list-style: none; margin: 0; padding: 0; }
+        .alarm-list li { display: flex; gap: 9px; align-items: flex-start;
+            font-size: 11px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+        .alarm-list li:last-child { border-bottom: 0; }
+        .sev { flex: 0 0 auto; font-size: 9px; font-weight: 800; padding: 2px 6px;
+            border-radius: 3px; text-transform: uppercase; }
+        .sev.ok { background: rgba(34,197,94,.18); color: #4ade80; }
+        .sev.warn { background: rgba(234,179,8,.18); color: #facc15; }
+        .sev.bad { background: rgba(239,68,68,.2); color: #f87171; }
+        .alarm-list .msg { color: var(--text-dim); }
+        .alarm-list .msg b { color: var(--text-main); }
+
+        /* Controls — explicit state (doc-10 controls) */
+        .ctrl-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .btn { display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(255,255,255,.05); border: 1px solid var(--panel-line);
+            color: var(--text-dim); padding: 8px 14px; min-height: 40px;
+            border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700;
+            transition: all .15s; }
+        .btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+        .btn.active { border-color: var(--sel); color: var(--sel);
+            background: rgba(34,211,238,.12); }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .btn.sim-on { border-color: var(--st-warn); color: var(--st-warn);
+            background: rgba(234,179,8,.12); }
+        .zoom-btn { background: rgba(255,255,255,.05); border: 1px solid var(--panel-line);
+            color: var(--text-dim); padding: 7px 11px; min-height: 40px;
+            border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;
+            transition: all .15s; }
+        .zoom-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+        .zoom-btn.active { border-color: var(--sel); color: var(--sel);
+            background: rgba(34,211,238,.12); }
+
+        .chart-card { background: var(--panel-bg); border: 1px solid var(--panel-line);
+            border-radius: 8px; padding: 14px 16px; }
+
+        /* Bottom status bar */
+        .status-bar { position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(8,14,26,.97); border-top: 1px solid var(--panel-line);
+            padding: 8px 18px; display: flex; gap: 22px; align-items: center;
+            flex-wrap: wrap; z-index: 50; backdrop-filter: blur(8px); }
+        .status-item { display: flex; align-items: center; gap: 7px; font-size: 11px; }
+        .status-led { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+        .led-ok { background: var(--st-ok); box-shadow: 0 0 5px var(--st-ok); }
+        .led-warn { background: var(--st-warn); box-shadow: 0 0 5px var(--st-warn); }
+        .led-bad { background: var(--st-bad); box-shadow: 0 0 5px var(--st-bad); }
+        .status-item .k { color: var(--text-faint); }
+        .status-item .vv { color: #fff; font-weight: 700; font-family: 'Consolas', monospace; }
+        .status-spacer { flex: 1; }
+
+        body.fullscreen .no-print { display: none; }
+
+        @media print { .no-print, .status-bar { display: none !important; } }
+
+        /* v1.8.0 — mobile dashboard responsive patch */
+        @media (max-width: 1100px) {
+            .layout { grid-template-columns: 1fr; }
+            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 768px) {
-            body { padding: 10px !important; }
-            .main-panel { padding: 12px !important; border-radius: 16px !important; overflow-x: auto !important; }
-            .status-bar { flex-direction: column; gap: 6px; padding: 6px 12px; }
-            .status-section { flex-wrap: wrap; gap: 8px; }
-            .sim-slider { width: 120px; }
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img, picture, video, svg { max-width: 100%; height: auto; }
+            .wrap { padding: 10px 10px 90px; }
+            h1, .brand { font-size: 15px !important; }
+            svg.pid { min-width: 760px; }
+            .diagram-wrap { overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch; max-width: 100% !important; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+            .kpi .v { font-size: 19px; }
+            .status-bar { gap: 12px; padding: 8px 10px; }
+            .topbar, .alarm-strip { padding: 10px 12px; }
+            button, a.btn, [role="button"], .nav-btn, .btn, .zoom-btn { min-height: 44px; }
+            .nav-menu, .nav-links { display: none !important; }
+            .footer-grid { grid-template-columns: 1fr !important; gap: 1.25rem !important;
+                padding: 1rem !important; }
         }
         @media (max-width: 480px) {
-            .sim-slider { width: 80px; }
+            .kpi-grid { grid-template-columns: 1fr !important; }
         }
-
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -146,436 +288,661 @@
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
 </head>
-<body class="p-6">
+<body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="wrap">
+
+    <!-- Top status bar: nav + brand -->
+    <div class="topbar no-print">
+        <a href="dc-conventional.html" class="nav-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back
+        </a>
+        <a href="index.html" class="nav-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Portfolio
+        </a>
+        <div class="brand">Water Treatment &amp; Service<small>Conventional BMS &middot; Facility Operations</small></div>
+        <div class="status-spacer"></div>
+        <div class="ctrl-row">
+            <span style="font-size:10px;color:var(--text-faint);font-weight:600;">ZOOM</span>
+            <button class="zoom-btn" onclick="setZoom(0.75)" id="z-75">75%</button>
+            <button class="zoom-btn active" onclick="setZoom(1)" id="z-100">100%</button>
+            <button class="zoom-btn" onclick="setZoom(1.25)" id="z-125">125%</button>
+            <button class="zoom-btn" onclick="toggleFullscreen()" id="btn-fullscreen">Fullscreen</button>
+            <button class="zoom-btn" onclick="window.print()">Export PDF</button>
+        </div>
+    </div>
+
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
-    <div class="flex flex-wrap justify-between items-center mb-4 gap-3 no-print">
-        <div>
-            <h1 class="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 uppercase tracking-tighter">
-                Water Treatment Room
-            </h1>
-            <p class="text-[10px] text-slate-500 font-mono">FACILITY MANAGEMENT DASHBOARD | CDFOM CERTIFIED</p>
+    <!-- Alarm / safety state FIRST (doc-10 information hierarchy) -->
+    <div class="alarm-strip" id="alarmStrip">
+        <span class="alarm-state" id="alarmState">NORMAL</span>
+        <span class="alarm-chip"><b class="crit" id="cntCrit">0</b> Critical</span>
+        <span class="alarm-chip"><b class="warnv" id="cntWarn">0</b> Warning</span>
+        <span class="alarm-chip"><b id="cntStale">0</b> Stale Points</span>
+        <span class="alarm-chip">Last Update <b id="lastUpdate">--:--:--</b></span>
+        <span class="alarm-chip">Scenario <b id="scenarioName">Simulated</b></span>
+        <span class="alarm-chip">Data Quality <b id="dataQuality">GOOD</b></span>
+    </div>
+
+    <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards") -->
+    <div class="kpi-grid">
+        <div class="kpi">
+            <h3>Instant WUE</h3>
+            <div class="v"><span id="kWue">1.20</span> <small>L/kWh</small></div>
+            <div class="th" id="kWueTh">Target &le; 1.30 &middot; computed</div>
         </div>
-        <div class="flex flex-wrap gap-2">
-            <a href="dc-conventional.html" class="glass px-4 py-3 rounded-xl text-sm font-bold text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition flex items-center gap-2" style="min-height:44px; border: 1px solid rgba(6,182,212,0.3);">
-                <i class="fas fa-arrow-left"></i> ← Back
-            </a>
-            <a href="index.html" class="glass px-4 py-3 rounded-xl text-sm font-bold text-purple-400 hover:text-white hover:bg-purple-500/20 transition flex items-center gap-2" style="min-height:44px; border: 1px solid rgba(139,92,246,0.3);">
-                <i class="fas fa-home"></i> Portfolio
-            </a>
-            <button onclick="resetSimulation()" class="ctrl-btn"><i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span></button>
-            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen"><i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span></button>
-            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2 rounded-xl transition">
-                <i class="fas fa-file-pdf mr-2"></i> EXPORT
-            </button>
+        <div class="kpi">
+            <h3>Cooling Makeup Flow</h3>
+            <div class="v"><span id="kMakeup">37.0</span> <small>L/min</small></div>
+            <div class="th" id="kMakeupTh">Normal 30&ndash;55 &middot; WUE-incl</div>
+        </div>
+        <div class="kpi">
+            <h3>Total Treatment Flow</h3>
+            <div class="v"><span id="kTotal">45.0</span> <small>L/min</small></div>
+            <div class="th" id="kTotalTh">Makeup + domestic</div>
+        </div>
+        <div class="kpi">
+            <h3>Filter DP</h3>
+            <div class="v"><span id="kDp">0.40</span> <small>bar</small></div>
+            <div class="th" id="kDpTh">Backwash &gt; 0.80</div>
+        </div>
+        <div class="kpi">
+            <h3>Treated TDS</h3>
+            <div class="v"><span id="kTds">140</span> <small>ppm</small></div>
+            <div class="th" id="kTdsTh">Limit &lt; 500</div>
         </div>
     </div>
 
-    <!-- Control Bar -->
-    <div class="flex flex-wrap justify-between items-center mb-4 gap-3 no-print">
-        <div class="flex flex-wrap gap-2 items-center">
-            <button onclick="toggleSimulation()" class="ctrl-btn" id="btn-sim">
-                <i class="fas fa-play mr-1" id="sim-icon"></i> <span id="sim-text">START SIM</span> <span class="kbd-hint">S</span>
-            </button>
-            <button onclick="triggerBackwash()" class="ctrl-btn" style="border-color: #3b82f6; color: #3b82f6;">
-                <i class="fas fa-sync mr-1"></i> BACKWASH <span class="kbd-hint">B</span>
-            </button>
-        </div>
-        <div class="zoom-controls">
-            <span class="text-slate-500 text-[10px] mr-2">ZOOM:</span>
-            <button onclick="setZoom(0.5)" class="zoom-btn" data-zoom="0.5">50%</button>
-            <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75">75%</button>
-            <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
-            <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
-            <button onclick="fitToScreen()" class="zoom-btn"><i class="fas fa-compress-arrows-alt"></i> FIT</button>
-        </div>
-    </div>
+    <div class="layout">
+        <!-- Process flow (P&ID) -->
+        <div class="panel">
+            <div class="panel-title">
+                Water Treatment Process Flow
+                <span class="sub">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
+            </div>
+            <div class="diagram-wrap">
+            <svg class="pid" id="water-svg" viewBox="0 0 1180 460" width="100%"
+                 preserveAspectRatio="xMidYMid meet" role="img"
+                 aria-label="Water treatment process and instrumentation diagram"
+                 style="transition:transform .25s; transform-origin:top left;">
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
-        <div class="glass p-3 rounded-2xl border-l-4 border-cyan-500">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase">WUE Index</h3>
-            <p class="text-xl font-black text-cyan-400">1.28 <small class="text-[10px]">L/kWh</small></p>
-        </div>
-        <div class="glass p-3 rounded-2xl border-l-4 border-emerald-500">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase">OPEX / m³</h3>
-            <p class="text-xl font-black text-emerald-400">Rp 4.150</p>
-        </div>
-        <div class="glass p-3 rounded-2xl border-l-4 border-green-500">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase">Spec. Power (SEC)</h3>
-            <p class="text-xl font-black text-green-400">0.42 <small class="text-[10px]">kWh/m³</small></p>
-        </div>
-        <div class="glass p-3 rounded-2xl border-l-4 border-blue-500">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase">Yield</h3>
-            <p class="text-xl font-black text-blue-400">1.284 <small class="text-[10px]">m³</small></p>
-        </div>
-        <div class="glass p-3 rounded-2xl border-l-4 border-green-400 text-center">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase">Status</h3>
-            <p class="text-xs font-bold text-emerald-400 mt-2 tracking-widest">OPTIMAL</p>
-        </div>
-    </div>
+                <!-- ===== Pipes (muted base) ===== -->
+                <!-- Mains in -> raw tank -->
+                <path class="pipe" d="M40 90 H150"/>
+                <!-- Raw tank -> filter -->
+                <path class="pipe" d="M250 130 H300"/>
+                <!-- Filter -> booster pump -->
+                <path class="pipe" d="M400 130 H470"/>
+                <!-- Pump -> dosing tee -> UV -->
+                <path class="pipe" d="M540 130 H660"/>
+                <!-- UV -> treated header tee -->
+                <path class="pipe" d="M760 130 H850 V210"/>
+                <!-- Treated header split: -> domestic tank -->
+                <path class="pipe" d="M850 210 H760 V250"/>
+                <!-- Treated header -> cooling makeup -->
+                <path class="pipe" d="M850 210 V300 H980"/>
+                <!-- Domestic tank -> service header -->
+                <path class="pipe" d="M760 360 H700"/>
+                <!-- Filter backwash -> drain -->
+                <path class="pipe" d="M350 180 V250 H260"/>
+                <!-- Cooling tower blowdown -> drain -->
+                <path class="pipe" d="M1075 360 V410 H40"/>
 
-    <div class="glass main-panel rounded-[40px] p-8 relative border border-slate-800 shadow-2xl mb-4 overflow-hidden">
-        <!-- Equipment Tooltip -->
-        <div id="equipment-tooltip" class="equipment-tooltip">
-            <div class="tooltip-title" id="tooltip-title">Equipment</div>
-            <div id="tooltip-content"></div>
-        </div>
+                <!-- ===== Animated flow (medium-coloured) ===== -->
+                <path class="flow water" id="f-in"     d="M40 90 H150"/>
+                <path class="flow water" id="f-raw"    d="M250 130 H300"/>
+                <path class="flow water" id="f-filt"   d="M400 130 H470"/>
+                <path class="flow treated" id="f-pump" d="M540 130 H660"/>
+                <path class="flow treated" id="f-uv"   d="M760 130 H850 V210"/>
+                <path class="flow treated" id="f-dom"  d="M850 210 H760 V250"/>
+                <path class="flow treated" id="f-mk"   d="M850 210 V300 H980"/>
+                <path class="flow treated" id="f-svc"  d="M760 360 H700"/>
+                <path class="flow drain stopped" id="f-bw" d="M350 180 V250 H260"/>
+                <path class="flow drain" id="f-bd"     d="M1075 360 V410 H40"/>
 
-        <svg id="water-svg" viewBox="0 0 1400 480" class="w-full h-full" style="transition: transform 0.3s;">
-            <path d="M 0 450 L 120 450 L 120 150 L 250 150 L 250 180" class="flow-path flow-active" />
-            <path d="M 300 330 L 300 420 L 450 420" class="flow-path flow-active" />
-            <path d="M 510 420 L 580 420 L 580 320" class="flow-path flow-active" />
-            <path d="M 640 280 L 720 280 L 720 230" class="flow-path flow-active" />
-            <path d="M 780 190 L 880 190 L 880 220" class="flow-path flow-active" />
-            <path d="M 930 350 L 1050 350" class="flow-path flow-active" /> 
-            <path d="M 1110 350 L 1180 350" class="flow-path flow-active" /> 
-            <path d="M 1280 350 L 1400 350" class="flow-path flow-active" /> 
+                <!-- junctions / tees -->
+                <circle class="junction" cx="850" cy="210" r="4"/>
+                <circle class="junction" cx="660" cy="130" r="4"/>
+                <circle class="junction" cx="350" cy="130" r="4"/>
 
-            <g transform="translate(80, 380)">
-                <rect width="80" height="90" rx="5" fill="#0f172a" stroke="#334155" />
-                <text x="40" y="-10" text-anchor="middle" class="tech-label">Tenant Meter</text>
-                <text x="5" y="25" class="tech-val">F1: 45.2 m³/h</text>
-                <text x="5" y="45" class="tech-val">TDS: 145 ppm</text>
-                <text x="5" y="65" class="tech-val">PRESS: 2.1 bar</text>
-            </g>
+                <!-- flow arrows -->
+                <polygon class="arrow" points="148,86 158,90 148,94"/>
+                <polygon class="arrow" points="468,126 478,130 468,134"/>
+                <polygon class="arrow" points="978,296 988,300 978,304"/>
+                <polygon class="arrow" points="262,254 252,250 262,246"/>
 
-            <g transform="translate(250, 180)">
-                <rect width="100" height="150" rx="2" fill="#0f172a" stroke="#475569" stroke-width="2" />
-                <rect width="96" height="118" x="2" y="30" fill="rgba(0, 242, 255, 0.2)" />
-                <text x="50" y="-10" text-anchor="middle" class="tech-label">Raw Tank (SS316)</text>
-                <text x="50" y="85" text-anchor="middle" class="text-xl font-black fill-white">82%</text>
-                <text x="5" y="165" class="tech-label">Temp: 28.4°C</text>
-            </g>
-
-            <g transform="translate(480, 420)">
-                <circle r="30" fill="#020617" stroke="#3dfc16" stroke-width="2" />
-                <g class="pump-spinner">
-                    <line x1="-15" y1="0" x2="15" y2="0" stroke="#3dfc16" stroke-width="3" />
-                    <line x1="0" y1="-15" x2="0" y2="15" stroke="#3dfc16" stroke-width="3" />
+                <!-- ===== Equipment ===== -->
+                <!-- Mains supply / meter -->
+                <g class="eq-grp" data-eq="meter">
+                    <rect class="eq" x="40" y="50" width="90" height="78" rx="4"/>
+                    <text class="tag" x="46" y="42">FM-101</text>
+                    <text class="lbl" x="46" y="70">Mains / Meter</text>
+                    <text class="val" id="m-mains" x="46" y="90">45.0 L/min</text>
+                    <text class="val" id="m-mains-p" x="46" y="108">2.1 bar</text>
                 </g>
-                <text x="40" y="-15" class="tech-label">PB-01: ACTIVE</text>
-                <text x="40" y="0" class="tech-val">SEC: 0.42 kWh/m³</text>
-                <text x="40" y="15" class="tech-val">12.8A | 2950 RPM</text>
-                <text x="40" y="30" class="tech-val">VIB: 0.45 mm/s</text>
-            </g>
 
-            <g transform="translate(550, 240)">
-                <rect width="60" height="80" rx="4" fill="#1e293b" stroke="#3b82f6" />
-                <text x="30" y="-10" text-anchor="middle" class="tech-label">Auto Backwash</text>
-                <text x="5" y="45" class="tech-val">dP: 0.12 Bar</text>
-            </g>
-            <g transform="translate(720, 150)">
-                <rect width="60" height="80" rx="4" fill="#1e293b" stroke="#3b82f6" />
-                <text x="30" y="-10" text-anchor="middle" class="tech-label">Carbon Filter</text>
-                <text x="5" y="45" class="tech-val">pH: 7.2</text>
-            </g>
-            <g transform="translate(850, 180)">
-                <circle r="12" fill="#854d0e" stroke="#eab308" class="animate-pulse" />
-                <text x="15" y="-5" class="tech-label">Cl2 Doser</text>
-                <text x="15" y="10" class="tech-val">0.85 L/h</text>
-            </g>
+                <!-- Raw water tank -->
+                <g class="eq-grp" data-eq="rawtank">
+                    <rect class="eq" x="150" y="60" width="100" height="150" rx="3"/>
+                    <rect class="tank-fill" id="rawFill" x="153" y="115" width="94" height="92"/>
+                    <text class="tag" x="156" y="52">TK-101</text>
+                    <text class="lbl" x="156" y="230">Raw Tank 25 m&sup3;</text>
+                    <text class="val" id="m-raw-pct" x="190" y="145" style="font-size:17px;">82%</text>
+                    <text class="val" id="m-raw-vol" x="166" y="165">20.5 m&sup3;</text>
+                </g>
 
-            <g transform="translate(880, 220)">
-                <rect width="100" height="150" rx="2" fill="#0f172a" stroke="#475569" stroke-width="2" />
-                <rect width="96" height="128" x="2" y="20" fill="rgba(61, 252, 22, 0.2)" />
-                <text x="50" y="-10" text-anchor="middle" class="tech-label">Domestic (SS304)</text>
-                <text x="50" y="85" text-anchor="middle" class="text-xl font-black fill-white">88%</text>
-                <text x="5" y="165" class="tech-label">ORP: 650 mV</text>
-            </g>
+                <!-- Multimedia / carbon filter -->
+                <g class="eq-grp" data-eq="filter">
+                    <rect class="eq" x="300" y="80" width="100" height="100" rx="3"/>
+                    <text class="tag" x="306" y="72">FLT-201</text>
+                    <text class="lbl" x="306" y="105">Media Filter</text>
+                    <text class="val" id="m-flt-in" x="306" y="125">In 2.4 bar</text>
+                    <text class="val" id="m-flt-out" x="306" y="143">Out 2.0 bar</text>
+                    <text class="val" id="m-flt-dp" x="306" y="161">DP 0.40 bar</text>
+                </g>
 
-            <g transform="translate(1050, 310)">
-                <rect width="60" height="90" rx="30" fill="#1e293b" stroke="#0ea5e9" stroke-width="2" />
-                <text x="30" y="-10" text-anchor="middle" class="tech-label">300L Vessel</text>
-                <text x="10" y="50" class="tech-val">P: 4.2 bar</text>
-            </g>
-            <g transform="translate(1180, 330)">
-                <rect width="100" height="40" rx="20" fill="rgba(188, 19, 254, 0.2)" stroke="#bc13fe" stroke-width="2" class="animate-pulse" />
-                <text x="50" y="-10" text-anchor="middle" class="tech-label">UV Sterilizer</text>
-                <text x="50" y="25" text-anchor="middle" class="tech-val">INT: 99.8%</text>
-            </g>
-        </svg>
-    </div>
+                <!-- Backwash valve -->
+                <g class="eq-grp" data-eq="backwash">
+                    <rect class="eq" x="220" y="232" width="40" height="36" rx="3"/>
+                    <text class="tag" x="200" y="290">XV-202</text>
+                    <text class="lbl" x="200" y="308" id="m-bw-st">Backwash INHIBIT</text>
+                </g>
 
-    <!-- Flow Control Panel -->
-    <div class="sim-panel glass no-print">
-        <div class="flex items-center gap-6 flex-wrap">
-            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                <i class="fas fa-sliders-h mr-1"></i> Flow Control
+                <!-- Booster pump -->
+                <g class="eq-grp" data-eq="pump">
+                    <circle class="eq" cx="505" cy="130" r="35"/>
+                    <path id="pumpVane" d="M505 105 V155 M480 130 H530"
+                          stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
+                    <text class="tag" x="475" y="80">P-301</text>
+                    <text class="lbl" x="552" y="118">Booster Pump</text>
+                    <text class="val ok" id="m-pump-st" x="552" y="136">RUNNING</text>
+                    <text class="val" id="m-pump-kw" x="552" y="154">7.5 kW</text>
+                </g>
+
+                <!-- Cl2 dosing -->
+                <g class="eq-grp" data-eq="dosing">
+                    <rect class="eq" x="630" y="92" width="60" height="76" rx="3"/>
+                    <text class="tag" x="636" y="84">DOS-302</text>
+                    <text class="lbl" x="636" y="120">Cl&#8322; Dose</text>
+                    <text class="val" id="m-cl2" x="636" y="140">0.85 L/h</text>
+                    <text class="val" id="m-cl2-res" x="636" y="158">0.6 ppm</text>
+                </g>
+
+                <!-- UV steriliser -->
+                <g class="eq-grp" data-eq="uv">
+                    <rect class="eq" x="660" y="105" width="100" height="50" rx="6"/>
+                    <text class="tag" x="666" y="97">UV-401</text>
+                    <text class="lbl" x="666" y="128">UV Steriliser</text>
+                    <text class="val ok" id="m-uv" x="666" y="146">99.8% INT</text>
+                </g>
+
+                <!-- Treated / domestic tank -->
+                <g class="eq-grp" data-eq="domtank">
+                    <rect class="eq" x="760" y="250" width="100" height="150" rx="3"/>
+                    <rect class="tank-fill treated" id="domFill" x="763" y="290" width="94" height="107"/>
+                    <text class="tag" x="766" y="242">TK-402</text>
+                    <text class="lbl" x="766" y="420">Domestic Tank 30 m&sup3;</text>
+                    <text class="val" id="m-dom-pct" x="800" y="320" style="font-size:17px;">88%</text>
+                    <text class="val" id="m-dom-vol" x="776" y="340">26.4 m&sup3;</text>
+                </g>
+
+                <!-- Cooling makeup point (link to chiller plant) -->
+                <g class="eq-grp" data-eq="makeup">
+                    <rect class="eq" x="980" y="270" width="120" height="90" rx="3"/>
+                    <text class="tag" x="986" y="262">CT-MK</text>
+                    <text class="lbl" x="986" y="295">Cooling Tower</text>
+                    <text class="lbl" x="986" y="311">Makeup</text>
+                    <text class="val treated" id="m-mk" x="986" y="331">37.0 L/min</text>
+                    <text class="val" id="m-mk-bd" x="986" y="349">BD 9.2 L/min</text>
+                </g>
+
+                <!-- Service / domestic header label -->
+                <g>
+                    <text class="lbl" x="610" y="356">Domestic /</text>
+                    <text class="lbl" x="610" y="372">Service</text>
+                    <text class="val" id="m-svc" x="610" y="392">8.0 L/min</text>
+                </g>
+
+                <!-- Drain / blowdown label -->
+                <text class="lbl" x="430" y="404">Blowdown &amp; Backwash &rarr; Drain</text>
+            </svg>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] text-slate-500 font-bold">INLET</span>
-                <input type="range" min="0" max="100" value="75" class="sim-slider" id="inlet-slider" oninput="updateInletFlow(this.value)" aria-label="Inlet slider">
-                <span class="text-[10px] text-cyan-400 font-bold" id="inlet-val">75%</span>
+
+            <!-- Demo / simulation controls (state-explicit per doc-10) -->
+            <div class="ctrl-row no-print" style="margin-top:14px;">
+                <button class="btn" id="btn-sim" onclick="toggleSimulation()">Simulation Mode: OFF</button>
+                <button class="btn" id="btn-bw" onclick="triggerBackwash()" style="border-color:var(--medium-water);color:#7dd3fc;">Simulate Backwash Cycle</button>
+                <button class="btn" id="btn-reset" onclick="resetSimulation()">Reset View</button>
+                <span style="font-size:10px;color:var(--text-faint);">Engineering values are deterministic (engine basis) — sim animates trend only.</span>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] text-slate-500 font-bold">PUMP</span>
-                <input type="range" min="0" max="100" value="80" class="sim-slider" id="pump-slider" oninput="updatePumpSpeed(this.value)" aria-label="Pump slider">
-                <span class="text-[10px] text-green-400 font-bold" id="pump-val">80%</span>
+        </div>
+
+        <!-- Right inspector: WUE balance + scope + alarms -->
+        <div>
+            <div class="panel">
+                <div class="panel-title">WUE Reconciliation</div>
+                <div class="insp-row"><span class="k">IT Load</span><span class="vv" id="iIt">1,850 kW</span></div>
+                <div class="insp-row"><span class="k">IT Energy (1 h)</span><span class="vv" id="iItE">1,850 kWh</span></div>
+                <div class="insp-row"><span class="k">WUE-incl water (1 h)</span><span class="vv" id="iWaterHr">2,220 L</span></div>
+                <div class="insp-row"><span class="k">Instant WUE</span><span class="vv ok" id="iWue">1.20 L/kWh</span></div>
+                <div class="insp-row"><span class="k">24 h WUE</span><span class="vv ok" id="iWue24">1.18 L/kWh</span></div>
+                <div class="balance-note" id="balanceNote">
+                    WUE = WUE-included water volume &divide; IT energy
+                    (computed from <b>conv-engine</b>, not static).
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Water Scope Split</div>
+                <div class="insp-row">
+                    <span class="k">Cooling makeup <span class="scope-tag incl">WUE</span></span>
+                    <span class="vv" id="iScMk">37.0 L/min</span>
+                </div>
+                <div class="insp-row" style="padding-left:14px;">
+                    <span class="k">&boxur; Evaporation</span><span class="vv" id="iScEv">27.6 L/min</span>
+                </div>
+                <div class="insp-row" style="padding-left:14px;">
+                    <span class="k">&boxur; Blowdown</span><span class="vv" id="iScBd">9.2 L/min</span>
+                </div>
+                <div class="insp-row" style="padding-left:14px;">
+                    <span class="k">&boxur; Drift</span><span class="vv" id="iScDr">0.18 L/min</span>
+                </div>
+                <div class="insp-row">
+                    <span class="k">Domestic / process <span class="scope-tag excl">EXCL</span></span>
+                    <span class="vv" id="iScDom">8.0 L/min</span>
+                </div>
+                <div class="insp-row">
+                    <span class="k"><b>Total treatment</b></span>
+                    <span class="vv" id="iScTot">45.0 L/min</span>
+                </div>
+                <div class="balance-note">
+                    Total treatment <b id="iWhyTot">45.0</b> L/min &minus; domestic
+                    <b id="iWhyDom">8.0</b> L/min = WUE-included makeup
+                    <b id="iWhyMk">37.0</b> L/min &rarr; reconciles dashboard
+                    WUE <b>1.20</b> vs all-flow <b id="iWhyAll">1.46</b> L/kWh.
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Active Alarms &amp; Status</div>
+                <ul class="alarm-list" id="alarmList">
+                    <li><span class="sev ok">OK</span><span class="msg"><b>Raw Tank TK-101</b> &mdash; 82% / 20.5 m&sup3; (low &lt; 30%)</span></li>
+                    <li><span class="sev ok">OK</span><span class="msg"><b>Domestic Tank TK-402</b> &mdash; 88% / 26.4 m&sup3; (low &lt; 40%)</span></li>
+                    <li><span class="sev ok">OK</span><span class="msg"><b>Filter FLT-201</b> &mdash; DP 0.40 bar (backwash &gt; 0.80)</span></li>
+                    <li><span class="sev ok">OK</span><span class="msg"><b>Treated TDS</b> &mdash; 140 ppm (limit &lt; 500)</span></li>
+                    <li><span class="sev ok">OK</span><span class="msg"><b>UV-401</b> &mdash; 99.8% intensity, lamp healthy</span></li>
+                    <li><span class="sev ok">OK</span><span class="msg"><b>Dosing DOS-302</b> &mdash; cmd ON, run feedback OK</span></li>
+                </ul>
             </div>
         </div>
     </div>
 
-    <div class="glass p-6 rounded-[32px] border border-slate-800 shadow-xl" style="margin-bottom: 60px;">
-        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">
-            <i class="fas fa-chart-line mr-2"></i> System Pressure & Flow Trend (24h)
-        </h3>
-        <canvas id="pressureTrend" height="80"></canvas>
+    <!-- Bottom trend strip -->
+    <div class="chart-card" style="margin-bottom:14px;">
+        <div class="panel-title">Filter DP &amp; Cooling Makeup Flow — 24 h Trend
+            <span class="sub">— thresholds shown; current marker right edge</span>
+        </div>
+        <canvas id="pressureTrend" height="78"></canvas>
     </div>
 
-    <!-- Bottom Status Bar -->
+    </div><!-- /wrap -->
+
+    <!-- Bottom status bar -->
     <div class="status-bar no-print">
-        <div class="status-section">
-            <div class="status-item">
-                <div class="status-led led-green" id="led-system"></div>
-                <span class="text-slate-400">SYSTEM:</span>
-                <span class="text-white font-bold" id="status-system">OPTIMAL</span>
-            </div>
-            <div class="status-item">
-                <div class="status-led led-green" id="led-tank"></div>
-                <span class="text-slate-400">RAW TANK:</span>
-                <span class="text-white font-bold" id="status-tank">82%</span>
-            </div>
-            <div class="status-item">
-                <div class="status-led led-green" id="led-pump"></div>
-                <span class="text-slate-400">PUMP:</span>
-                <span class="text-white font-bold" id="status-pump">RUNNING</span>
-            </div>
+        <div class="status-item">
+            <div class="status-led led-ok" id="led-system"></div>
+            <span class="k">SYSTEM</span><span class="vv" id="status-system">NORMAL</span>
         </div>
-        <div class="status-section">
-            <div class="status-item">
-                <span class="text-slate-500">FLOW:</span>
-                <span class="text-cyan-400 font-bold" id="status-flow">45.2 m³/h</span>
-            </div>
-            <div class="status-item">
-                <span class="text-slate-500">UPTIME:</span>
-                <span class="text-cyan-400 font-bold" id="status-uptime">00:00:00</span>
-            </div>
-            <div class="status-item">
-                <span class="text-slate-500">LAST UPDATE:</span>
-                <span class="text-slate-300" id="status-time">--:--:--</span>
-            </div>
+        <div class="status-item">
+            <div class="status-led led-ok" id="led-tank"></div>
+            <span class="k">RAW TANK</span><span class="vv" id="status-tank">82%</span>
+        </div>
+        <div class="status-item">
+            <div class="status-led led-ok" id="led-pump"></div>
+            <span class="k">PUMP P-301</span><span class="vv" id="status-pump">RUNNING</span>
+        </div>
+        <div class="status-item">
+            <span class="k">MAKEUP</span><span class="vv" id="status-flow">37.0 L/min</span>
+        </div>
+        <div class="status-item">
+            <span class="k">WUE</span><span class="vv" id="status-wue">1.20 L/kWh</span>
+        </div>
+        <div class="status-spacer"></div>
+        <div class="status-item">
+            <span class="k">UPTIME</span><span class="vv" id="status-uptime">00:00:00</span>
+        </div>
+        <div class="status-item">
+            <span class="k">UPDATED</span><span class="vv" id="status-time">--:--:--</span>
         </div>
     </div>
 
     <script>
-        // Chart initialization
-        var ctx = document.getElementById('pressureTrend').getContext('2d');
-        var pressureChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: 24}, function(_, i) { return i + ':00'; }),
-                datasets: [{
-                    label: 'Pressure (Bar)',
-                    data: [4.1, 4.2, 4.1, 4.0, 4.2, 4.3, 4.5, 4.4, 4.2, 4.2, 4.3, 4.4, 4.5, 4.6, 4.5, 4.3, 4.2, 4.1, 4.2, 4.3, 4.4, 4.3, 4.2, 4.1],
-                    borderColor: '#00f2ff',
-                    backgroundColor: 'rgba(0, 242, 255, 0.1)',
-                    fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: '#475569', size: 9 } },
-                    y: { grid: { color: '#1e293b' }, ticks: { color: '#475569', size: 9 } }
+        // ===================================================================
+        // Water Treatment — engine-bound bindings.
+        // ALL engineering values come from window.CONV_CALC (js/conv-engine.js):
+        // the single conventional-BMS scenario basis. WUE is COMPUTED as
+        // (WUE-included water volume / IT energy), never a static literal.
+        // NO Math.random for any engineering number — deterministic, stable on
+        // reload. Math.random is only used for the cosmetic trend ripple while
+        // Simulation Mode is ON (clearly labelled, not an engineering value).
+        // ===================================================================
+        (function () {
+            'use strict';
+
+            // ---- Pull the frozen scenario snapshot --------------------------
+            var S = (window.CONV_CALC && window.CONV_CALC.snapshot) || null;
+
+            // Deterministic water-balance basis (doc-07 lines 116-124,
+            // doc-13 lines 336-358). Cooling makeup is anchored to the engine's
+            // WUE-derived flow (the canonical WUE numerator); evaporation /
+            // blowdown / drift split uses a typical cooling-tower COC = 4.
+            var COC = 4;                       // cycles of concentration (typical)
+            var DOMESTIC_LPM = 8.0;            // WUE-excluded domestic/process (doc-13 line 357)
+
+            var itLoadKw    = S ? S.site.it_load_kw : 1850;
+            var wueEngine   = S ? S.environment.wue_l_per_kwh : 1.20;
+            var makeupLpm   = S ? S.water.flow_lpm_for_wue : 37.0;   // computed numerator
+            var heatRejKw   = S ? S.cooling.heat_rejection_kw : 1927.1;
+
+            var driftLpm    = 0.005 * makeupLpm;
+            var evapPlusBd  = makeupLpm - driftLpm;
+            var evapLpm     = evapPlusBd * (COC - 1) / COC;
+            var blowdownLpm = evapPlusBd / COC;
+            var totalLpm    = makeupLpm + DOMESTIC_LPM;
+
+            // WUE computed (not the literal): water volume / IT energy.
+            var wueComputed = window.CONV_CALC
+                ? window.CONV_CALC.wueFromFlowLpm(makeupLpm)   // = (makeup*60)/itLoad
+                : (makeupLpm * 60) / itLoadKw;
+            var wueAllFlow  = window.CONV_CALC
+                ? window.CONV_CALC.wueFromFlowLpm(totalLpm)
+                : (totalLpm * 60) / itLoadKw;
+            // 24h WUE: deterministic slight improvement vs instant (rolling avg
+            // runs marginally lower than the spot value) — doc-13 line 349.
+            var wue24 = wueComputed - 0.02;
+
+            // Static treatment-quality basis (no PRNG; plausible operating point)
+            var rawPct = 82, rawVol = (rawPct / 100) * 25;          // TK-101 25 m3
+            var domPct = 88, domVol = (domPct / 100) * 30;          // TK-402 30 m3
+            var filterDp = 0.40, tds = 140, cl2 = 0.85, cl2Res = 0.6, uvInt = 99.8;
+            var pumpKw = 7.5;
+
+            function f1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+            function f2(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+            function set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+            function nfmt(n) { return Math.round(n).toLocaleString('en-US'); }
+
+            // ---- Threshold evaluation (doc-07 §"Alarm Rules") --------------
+            function evalThresholds() {
+                var crit = 0, warn = 0;
+                if (rawPct < 30) crit++; else if (rawPct < 40) warn++;
+                if (domPct < 40) crit++; else if (domPct < 50) warn++;
+                if (filterDp > 0.80) crit++; else if (filterDp > 0.65) warn++;
+                if (tds > 500) crit++; else if (tds > 350) warn++;
+                if (uvInt < 70) crit++; else if (uvInt < 85) warn++;
+                if (makeupLpm < 30 || makeupLpm > 55) warn++;
+                if (wueComputed > 1.30) warn++;
+                return { crit: crit, warn: warn };
+            }
+
+            // ---- Render once (deterministic) ------------------------------
+            function render() {
+                // KPI strip
+                set('kWue', f2(wueComputed));
+                set('kWueTh', 'Target ≤ 1.30 · computed = (' + nfmt(makeupLpm * 60) + ' L/h) ÷ ' + nfmt(itLoadKw) + ' kW');
+                set('kMakeup', f1(makeupLpm));
+                set('kTotal', f1(totalLpm));
+                set('kDp', f2(filterDp));
+                set('kTds', Math.round(tds));
+
+                var th = evalThresholds();
+                document.getElementById('kWueTh').className = 'th ' + (wueComputed > 1.30 ? 'warn' : 'ok');
+                document.getElementById('kMakeupTh').className = 'th ' + ((makeupLpm < 30 || makeupLpm > 55) ? 'warn' : 'ok');
+                document.getElementById('kDpTh').className = 'th ' + (filterDp > 0.80 ? 'bad' : (filterDp > 0.65 ? 'warn' : 'ok'));
+                document.getElementById('kTdsTh').className = 'th ' + (tds > 500 ? 'bad' : (tds > 350 ? 'warn' : 'ok'));
+
+                // Alarm strip
+                var state = th.crit > 0 ? 'ALARM' : (th.warn > 0 ? 'WARNING' : 'NORMAL');
+                set('alarmState', state);
+                set('cntCrit', th.crit);
+                set('cntWarn', th.warn);
+                set('cntStale', 0);
+                set('scenarioName', S ? S.meta.scenario : 'Simulated');
+                set('dataQuality', S ? S.meta.data_quality : 'GOOD');
+                var strip = document.getElementById('alarmStrip');
+                var st = document.getElementById('alarmState');
+                strip.className = 'alarm-strip' + (th.crit ? ' has-alarm' : (th.warn ? ' has-warn' : ''));
+                st.className = 'alarm-state' + (th.crit ? ' bad' : (th.warn ? ' warn' : ''));
+
+                // SVG equipment values
+                set('m-mains', f1(totalLpm) + ' L/min');
+                set('m-mains-p', '2.1 bar');
+                set('m-raw-pct', rawPct + '%');
+                set('m-raw-vol', f1(rawVol) + ' m³');
+                set('m-flt-in', 'In 2.4 bar');
+                set('m-flt-out', 'Out ' + f1(2.4 - filterDp) + ' bar');
+                set('m-flt-dp', 'DP ' + f2(filterDp) + ' bar');
+                set('m-pump-st', 'RUNNING');
+                set('m-pump-kw', pumpKw + ' kW');
+                set('m-cl2', cl2 + ' L/h');
+                set('m-cl2-res', cl2Res + ' ppm');
+                set('m-uv', uvInt + '% INT');
+                set('m-dom-pct', domPct + '%');
+                set('m-dom-vol', f1(domVol) + ' m³');
+                set('m-mk', f1(makeupLpm) + ' L/min');
+                set('m-mk-bd', 'BD ' + f1(blowdownLpm) + ' L/min');
+                set('m-svc', f1(DOMESTIC_LPM) + ' L/min');
+
+                // Tank fill heights (SVG): TK-101 rect y=60 h=150 (3..207 usable)
+                var rawF = document.getElementById('rawFill');
+                if (rawF) { var rh = 147 * (rawPct / 100); rawF.setAttribute('y', 207 - rh); rawF.setAttribute('height', rh); }
+                var domF = document.getElementById('domFill');
+                if (domF) { var dh = 147 * (domPct / 100); domF.setAttribute('y', 397 - dh); domF.setAttribute('height', dh); }
+
+                // Right inspector — WUE reconciliation
+                set('iIt', nfmt(itLoadKw) + ' kW');
+                set('iItE', nfmt(itLoadKw) + ' kWh');
+                set('iWaterHr', nfmt(makeupLpm * 60) + ' L');
+                set('iWue', f2(wueComputed) + ' L/kWh');
+                set('iWue24', f2(wue24) + ' L/kWh');
+                document.getElementById('iWue').className = 'vv ' + (wueComputed > 1.30 ? 'warn' : 'ok');
+
+                // Scope split
+                set('iScMk', f1(makeupLpm) + ' L/min');
+                set('iScEv', f1(evapLpm) + ' L/min');
+                set('iScBd', f1(blowdownLpm) + ' L/min');
+                set('iScDr', f2(driftLpm) + ' L/min');
+                set('iScDom', f1(DOMESTIC_LPM) + ' L/min');
+                set('iScTot', f1(totalLpm) + ' L/min');
+                set('iWhyTot', f1(totalLpm));
+                set('iWhyDom', f1(DOMESTIC_LPM));
+                set('iWhyMk', f1(makeupLpm));
+                set('iWhyAll', f2(wueAllFlow));
+
+                // Alarm list (live state vs threshold)
+                renderAlarmList(th);
+
+                // Bottom status bar
+                set('status-tank', rawPct + '%');
+                set('status-pump', 'RUNNING');
+                set('status-flow', f1(makeupLpm) + ' L/min');
+                set('status-wue', f2(wueComputed) + ' L/kWh');
+                set('status-system', state);
+                var ledSys = document.getElementById('led-system');
+                ledSys.className = 'status-led ' + (th.crit ? 'led-bad' : (th.warn ? 'led-warn' : 'led-ok'));
+            }
+
+            function alarmRow(sev, label, detail) {
+                return '<li><span class="sev ' + sev + '">' +
+                    (sev === 'bad' ? 'ALARM' : sev === 'warn' ? 'WARN' : 'OK') +
+                    '</span><span class="msg"><b>' + label + '</b> &mdash; ' + detail + '</span></li>';
+            }
+            function renderAlarmList() {
+                var rows = '';
+                rows += alarmRow(rawPct < 30 ? 'bad' : rawPct < 40 ? 'warn' : 'ok',
+                    'Raw Tank TK-101', rawPct + '% / ' + f1(rawVol) + ' m³ (low &lt; 30%)');
+                rows += alarmRow(domPct < 40 ? 'bad' : domPct < 50 ? 'warn' : 'ok',
+                    'Domestic Tank TK-402', domPct + '% / ' + f1(domVol) + ' m³ (low &lt; 40%)');
+                rows += alarmRow(filterDp > 0.80 ? 'bad' : filterDp > 0.65 ? 'warn' : 'ok',
+                    'Filter FLT-201', 'DP ' + f2(filterDp) + ' bar (backwash &gt; 0.80)');
+                rows += alarmRow(tds > 500 ? 'bad' : tds > 350 ? 'warn' : 'ok',
+                    'Treated TDS', Math.round(tds) + ' ppm (limit &lt; 500)');
+                rows += alarmRow(uvInt < 70 ? 'bad' : uvInt < 85 ? 'warn' : 'ok',
+                    'UV-401', uvInt + '% intensity, lamp healthy');
+                rows += alarmRow('ok', 'Dosing DOS-302', 'cmd ON, run feedback OK');
+                document.getElementById('alarmList').innerHTML = rows;
+            }
+
+            render();
+
+            // ---- Chart: Filter DP + makeup flow, with threshold bands -----
+            var chart = null;
+            var cnv = document.getElementById('pressureTrend');
+            if (cnv && window.Chart) {
+                var labels = [], dpSeed = [], mkSeed = [];
+                for (var i = 0; i < 24; i++) {
+                    labels.push(((i) < 10 ? '0' : '') + i + ':00');
+                    // deterministic gentle daily shape (no PRNG)
+                    dpSeed.push(0.38 + 0.06 * Math.sin(i / 24 * Math.PI * 2) + (i > 18 ? 0.03 : 0));
+                    mkSeed.push(makeupLpm + 3 * Math.sin((i + 3) / 24 * Math.PI * 2));
                 }
-            }
-        });
-
-        // State variables
-        var waterSvg = document.getElementById('water-svg');
-        var tooltip = document.getElementById('equipment-tooltip');
-        var tooltipTitle = document.getElementById('tooltip-title');
-        var tooltipContent = document.getElementById('tooltip-content');
-        var currentZoom = 1;
-        var simRunning = false;
-        var simInterval = null;
-        var uptimeSeconds = 0;
-        var inletFlow = 75;
-        var pumpSpeed = 80;
-
-        // Equipment specifications
-        var equipmentSpecs = {
-            'pump-pb01': {
-                title: 'Booster Pump PB-01',
-                specs: [
-                    { label: 'Model', value: 'Grundfos CR 45-3' },
-                    { label: 'Flow Rate', value: '45 m³/h' },
-                    { label: 'Head', value: '35m' },
-                    { label: 'Power', value: '7.5 kW' },
-                    { label: 'SEC', value: '0.42 kWh/m³' }
-                ]
-            }
-        };
-
-        // Zoom functions
-        function setZoom(level) {
-            currentZoom = level;
-            waterSvg.style.transform = 'scale(' + level + ')';
-            waterSvg.style.transformOrigin = 'center center';
-            document.querySelectorAll('.zoom-btn').forEach(function(btn) {
-                btn.classList.remove('active');
-                if (btn.dataset.zoom == level) btn.classList.add('active');
-            });
-        }
-
-        function fitToScreen() {
-            setZoom(1);
-            document.querySelectorAll('.zoom-btn').forEach(function(btn) { btn.classList.remove('active'); });
-        }
-
-        // Fullscreen toggle
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function(err) {
-                    console.log('Fullscreen error:', err);
+                chart = new Chart(cnv.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Filter DP (bar)', yAxisID: 'yDp', data: dpSeed,
+                              borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.08)',
+                              fill: true, tension: .35, borderWidth: 2, pointRadius: 0 },
+                            { label: 'Cooling Makeup (L/min)', yAxisID: 'yMk', data: mkSeed,
+                              borderColor: '#2dd4bf', backgroundColor: 'transparent',
+                              tension: .35, borderWidth: 2, pointRadius: 0 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+                            tooltip: { enabled: true }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
+                            yDp: { position: 'left', min: 0, max: 1.0,
+                                title: { display: true, text: 'DP (bar)', color: '#38bdf8', font: { size: 10 } },
+                                grid: { color: 'rgba(148,163,184,.12)' },
+                                ticks: { color: '#64748b', font: { size: 9 } } },
+                            yMk: { position: 'right', min: 25, max: 60,
+                                title: { display: true, text: 'Makeup (L/min)', color: '#2dd4bf', font: { size: 10 } },
+                                grid: { drawOnChartArea: false },
+                                ticks: { color: '#64748b', font: { size: 9 } } }
+                        }
+                    }
                 });
-                document.body.classList.add('fullscreen');
-                document.getElementById('btn-fullscreen').classList.add('active');
-            } else {
-                document.exitFullscreen();
-                document.body.classList.remove('fullscreen');
-                document.getElementById('btn-fullscreen').classList.remove('active');
             }
-        }
 
-        // Simulation control
-        function toggleSimulation() {
-            simRunning = !simRunning;
-            var btn = document.getElementById('btn-sim');
-            var icon = document.getElementById('sim-icon');
-            var text = document.getElementById('sim-text');
+            // ---- Controls (explicit state) --------------------------------
+            var simOn = false, simTimer = null, uptimeSec = 0, zoom = 1;
+            var svg = document.getElementById('water-svg');
 
-            if (simRunning) {
-                btn.classList.add('active');
-                icon.className = 'fas fa-pause mr-1';
-                text.textContent = 'PAUSE';
-                startSimulation();
-            } else {
-                btn.classList.remove('active');
-                icon.className = 'fas fa-play mr-1';
-                text.textContent = 'START SIM';
-                if (simInterval) { clearInterval(simInterval); simInterval = null; }
-            }
-        }
+            window.setZoom = function (z) {
+                zoom = z;
+                if (svg) svg.style.transform = 'scale(' + z + ')';
+                ['z-75', 'z-100', 'z-125'].forEach(function (id) {
+                    var b = document.getElementById(id); if (b) b.classList.remove('active');
+                });
+                var map = { 0.75: 'z-75', 1: 'z-100', 1.25: 'z-125' };
+                var act = document.getElementById(map[z]); if (act) act.classList.add('active');
+            };
 
-        function startSimulation() {
-            simInterval = setInterval(function() {
-                // Simulate varying values
-                var flowVariation = 45 + (Math.random() * 5 - 2.5) * (inletFlow / 75);
-                var tdsVariation = 140 + Math.floor(Math.random() * 10);
-
-                document.getElementById('status-flow').textContent = flowVariation.toFixed(1) + ' m³/h';
-
-                // Update chart with new data point
-                if (pressureChart.data.datasets[0].data.length > 24) {
-                    pressureChart.data.datasets[0].data.shift();
+            window.toggleFullscreen = function () {
+                var b = document.getElementById('btn-fullscreen');
+                if (!document.fullscreenElement) {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen()['catch'](function () {});
+                    }
+                    document.body.classList.add('fullscreen');
+                    if (b) b.classList.add('active');
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    document.body.classList.remove('fullscreen');
+                    if (b) b.classList.remove('active');
                 }
-                pressureChart.data.datasets[0].data.push(4.0 + Math.random() * 0.6);
-                pressureChart.update('none');
-            }, 2000);
-        }
+            };
 
-        function updateInletFlow(val) {
-            inletFlow = parseInt(val);
-            document.getElementById('inlet-val').textContent = val + '%';
-        }
+            window.toggleSimulation = function () {
+                simOn = !simOn;
+                var b = document.getElementById('btn-sim');
+                if (simOn) {
+                    b.textContent = 'Simulation Mode: ON';
+                    b.classList.add('sim-on');
+                    simTimer = setInterval(function () {
+                        if (!chart) return;
+                        // cosmetic trend ripple ONLY (not an engineering value)
+                        var d0 = chart.data.datasets[0].data;
+                        var d1 = chart.data.datasets[1].data;
+                        d0.shift(); d0.push(0.40 + (Math.random() * 0.06 - 0.03));
+                        d1.shift(); d1.push(makeupLpm + (Math.random() * 4 - 2));
+                        chart.update('none');
+                    }, 2500);
+                } else {
+                    b.textContent = 'Simulation Mode: OFF';
+                    b.classList.remove('sim-on');
+                    if (simTimer) { clearInterval(simTimer); simTimer = null; }
+                }
+            };
 
-        function updatePumpSpeed(val) {
-            pumpSpeed = parseInt(val);
-            document.getElementById('pump-val').textContent = val + '%';
-        }
-
-        function triggerBackwash() {
-            var autoBackwash = document.querySelector('[transform="translate(550, 240)"]');
-            if (autoBackwash) {
-                autoBackwash.querySelector('rect').style.stroke = '#fde047';
-                autoBackwash.querySelector('rect').style.filter = 'drop-shadow(0 0 10px #fde047)';
-                document.getElementById('status-system').textContent = 'BACKWASH';
-                document.getElementById('led-system').className = 'status-led led-yellow';
-
-                setTimeout(function() {
-                    autoBackwash.querySelector('rect').style.stroke = '#3b82f6';
-                    autoBackwash.querySelector('rect').style.filter = '';
-                    document.getElementById('status-system').textContent = 'OPTIMAL';
-                    document.getElementById('led-system').className = 'status-led led-green';
+            window.triggerBackwash = function () {
+                var bw = document.getElementById('f-bw');
+                var btn = document.getElementById('btn-bw');
+                if (!bw) return;
+                bw.classList.remove('stopped');
+                set('m-bw-st', 'Backwash ACTIVE');
+                if (btn) { btn.disabled = true; btn.textContent = 'Backwash Running…'; }
+                setTimeout(function () {
+                    bw.classList.add('stopped');
+                    set('m-bw-st', 'Backwash INHIBIT');
+                    if (btn) { btn.disabled = false; btn.textContent = 'Simulate Backwash Cycle'; }
                 }, 5000);
-            }
-        }
+            };
 
-        function resetSimulation() {
-            if (simInterval) { clearInterval(simInterval); simInterval = null; }
-            simRunning = false;
+            window.resetSimulation = function () {
+                if (simTimer) { clearInterval(simTimer); simTimer = null; }
+                simOn = false;
+                var b = document.getElementById('btn-sim');
+                if (b) { b.textContent = 'Simulation Mode: OFF'; b.classList.remove('sim-on'); }
+                window.setZoom(1);
+                render();
+            };
 
-            var btn = document.getElementById('btn-sim');
-            var icon = document.getElementById('sim-icon');
-            var text = document.getElementById('sim-text');
-            btn.classList.remove('active');
-            icon.className = 'fas fa-play mr-1';
-            text.textContent = 'START SIM';
+            // ---- Clock / uptime (UI only, not engineering) ----------------
+            function pad(n) { return (n < 10 ? '0' : '') + n; }
+            setInterval(function () {
+                uptimeSec++;
+                var h = Math.floor(uptimeSec / 3600);
+                var m = Math.floor((uptimeSec % 3600) / 60);
+                var s = uptimeSec % 60;
+                set('status-uptime', pad(h) + ':' + pad(m) + ':' + pad(s));
+                var now = new Date();
+                var t = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+                set('status-time', t);
+                set('lastUpdate', t);
+            }, 1000);
 
-            document.getElementById('inlet-slider').value = 75;
-            document.getElementById('pump-slider').value = 80;
-            document.getElementById('inlet-val').textContent = '75%';
-            document.getElementById('pump-val').textContent = '80%';
-            inletFlow = 75;
-            pumpSpeed = 80;
-
-            document.getElementById('status-system').textContent = 'OPTIMAL';
-            document.getElementById('led-system').className = 'status-led led-green';
-            document.getElementById('status-flow').textContent = '45.2 m³/h';
-        }
-
-        // Uptime counter
-        setInterval(function() {
-            uptimeSeconds++;
-            var h = Math.floor(uptimeSeconds / 3600);
-            var m = Math.floor((uptimeSeconds % 3600) / 60);
-            var s = uptimeSeconds % 60;
-            document.getElementById('status-uptime').textContent =
-                String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-            document.getElementById('status-time').textContent = new Date().toLocaleTimeString('id-ID');
-        }, 1000);
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
-            if (e.key === 'r' || e.key === 'R') { if (!e.ctrlKey && !e.metaKey) resetSimulation(); }
-            if (e.key === 's' || e.key === 'S') { if (!e.ctrlKey && !e.metaKey) { e.preventDefault(); toggleSimulation(); } }
-            if (e.key === 'b' || e.key === 'B') { triggerBackwash(); }
-            if (e.key === 'Escape') {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
+            // ---- Keyboard shortcuts ---------------------------------------
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'F11') { e.preventDefault(); window.toggleFullscreen(); }
+                if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) window.resetSimulation();
+                if ((e.key === 's' || e.key === 'S') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); window.toggleSimulation(); }
+                if (e.key === 'b' || e.key === 'B') window.triggerBackwash();
+                if (e.key === 'Escape' && document.fullscreenElement) {
+                    if (document.exitFullscreen) document.exitFullscreen();
                     document.body.classList.remove('fullscreen');
                 }
-            }
-            if (e.key === '1') setZoom(0.5);
-            if (e.key === '2') setZoom(0.75);
-            if (e.key === '3') setZoom(1);
-            if (e.key === '4') setZoom(1.2);
-        });
-
-        // Tooltip functionality
-        function showTooltip(e, equipId) {
-            var spec = equipmentSpecs[equipId];
-            if (!spec) return;
-
-            tooltipTitle.textContent = spec.title;
-            var html = '';
-            spec.specs.forEach(function(item) {
-                html += '<div class="tooltip-row"><span class="tooltip-label">' + item.label + '</span><span class="tooltip-value">' + item.value + '</span></div>';
             });
-            tooltipContent.innerHTML = html;
-
-            tooltip.style.left = (e.clientX + 15) + 'px';
-            tooltip.style.top = (e.clientY - 10) + 'px';
-            tooltip.classList.add('visible');
-        }
-
-        function hideTooltip() {
-            tooltip.classList.remove('visible');
-        }
-
+        }());
     </script>
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-tracker.js" defer></script>

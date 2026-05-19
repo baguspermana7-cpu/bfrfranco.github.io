@@ -71,1000 +71,991 @@
     </script>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&family=Roboto:wght@400;500;700&family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-    /* --- CORE VARIABLES --- */
+    /* ============================================================================
+     * ICT / Network Operations Console — grounded BMS operations palette.
+     * De-slopped per conv/review/08-ict-network-review.md, 10-uiux-design-system.md,
+     * 13-screenshot-annotation-and-redesign-brief.md. Matches EPMS_Telemetry.html
+     * NOC / command-center look (slate/graphite, reserved alarm colours, no neon,
+     * no CRT scanline). All engineering/capacity values bind to window.CONV_CALC.
+     * ========================================================================== */
     :root {
-        --bg-deep: #020203;
-        --bg-panel: rgba(10, 12, 16, 0.95);
-        --border-color: #1f2533;
-        
-        --neon-cyan: #00f3ff;
-        --neon-green: #00ff41;
-        --neon-red: #ff003c;
-        --neon-amber: #ffb300;
-        --neon-purple: #bd00ff;
-        
-        --grid-pattern: rgba(0, 243, 255, 0.03);
+        --bg-core: #02040a;
+        --panel-bg: rgba(12, 20, 35, 0.95);
+        --panel-2: rgba(255, 255, 255, 0.03);
+        --text-main: #e2e8f0;
+        --text-dim: #94a3b8;
+        --text-mute: #64748b;
+        --line: #334155;
+        --line-soft: #1e293b;
+
+        /* Status semantics (per doc-10 colour table — used by MEANING, not decoration) */
+        --st-ok: #22c55e;     /* normal */
+        --st-warn: #eab308;   /* attention / threshold approach */
+        --st-bad: #ef4444;    /* active critical alarm only */
+        --st-off: #475569;    /* offline / not energized */
+        --st-sel: #38bdf8;    /* user selection (not process state) */
+        --st-stby: #0ea5e9;   /* standby / backup ready */
     }
 
-    /* --- GLOBAL RESET --- */
-    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-    body { 
-        height: 100vh; width: 100vw; overflow: hidden; display: flex; 
-        background-color: var(--bg-deep); 
-        background-image: 
-            linear-gradient(var(--grid-pattern) 1px, transparent 1px),
-            linear-gradient(90deg, var(--grid-pattern) 1px, transparent 1px);
-        background-size: 30px 30px;
-        color: #c0c5ce;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+        background: var(--bg-core);
+        color: var(--text-main);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
     }
+    .num { font-family: 'Consolas', 'Share Tech Mono', monospace; font-variant-numeric: tabular-nums; }
 
-    /* --- CRT SCANLINE EFFECT (The "Vibe") --- */
-    body::after {
-        content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        z-index: 9999; background-size: 100% 2px, 3px 100%; pointer-events: none;
-    }
+    .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
+    .skip-link:focus{top:0}
 
-    /* --- SIDEBAR --- */
-    .sidebar {
-        width: 65px; background: #050608; border-right: 1px solid #1f2533;
-        display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100;
+    /* ---- Shell ------------------------------------------------------------- */
+    .shell { display: flex; flex-direction: column; height: 100vh; }
+
+    .topbar {
+        height: 50px; flex: 0 0 50px; background: var(--panel-bg);
+        border-bottom: 1px solid var(--line);
+        display: flex; align-items: center; padding: 0 16px; gap: 12px;
     }
-    .brand-icon {
-        width: 42px; height: 42px; background: linear-gradient(135deg, #00f3ff, #0066ff);
-        border-radius: 6px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center;
-        font-weight: 800; color: #000; font-family: 'Chakra Petch'; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); font-size: 11px; cursor: pointer;
+    .top-link {
+        display: flex; align-items: center; gap: 6px; text-decoration: none;
+        color: var(--text-dim); font-size: 12px; padding: 6px 12px;
+        border: 1px solid var(--line); border-radius: 4px; transition: all .15s;
+        min-height: 32px;
     }
+    .top-link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .top-link svg { width: 15px; height: 15px; }
+    .brand { font-weight: 700; font-size: 16px; color: #fff; letter-spacing: .5px; }
+    .brand .sub { color: var(--text-dim); font-weight: 500; font-size: 12px; }
+    .top-spacer { flex: 1; }
+    .meta-chip {
+        font-size: 11px; color: var(--text-dim); padding: 5px 10px;
+        background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .meta-chip b { color: #fff; font-weight: 600; }
+    .top-btn {
+        background: rgba(56,189,248,0.12); border: 1px solid var(--st-sel);
+        color: var(--st-sel); padding: 6px 12px; border-radius: 4px; cursor: pointer;
+        font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+        transition: all .15s; min-height: 32px; font-family: inherit;
+    }
+    .top-btn:hover { background: rgba(56,189,248,0.22); color: #7dd3fc; }
+    .top-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .top-btn svg { width: 14px; height: 14px; }
+
+    /* ---- Top alarm strip (information hierarchy #1) ------------------------ */
+    .alarm-strip {
+        height: 38px; flex: 0 0 38px; display: flex; align-items: center;
+        gap: 14px; padding: 0 16px; font-size: 12px;
+        background: rgba(34,197,94,0.07); border-bottom: 1px solid var(--line);
+        transition: background .2s;
+    }
+    .alarm-strip.has-warn { background: rgba(234,179,8,0.09); }
+    .alarm-strip.has-crit { background: rgba(239,68,68,0.10); }
+    .alarm-state {
+        font-weight: 700; letter-spacing: .5px; color: var(--st-ok);
+        display: flex; align-items: center; gap: 7px;
+    }
+    .alarm-strip.has-warn .alarm-state { color: var(--st-warn); }
+    .alarm-strip.has-crit .alarm-state { color: var(--st-bad); }
+    .alarm-state .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
+    .alarm-seg { color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+    .alarm-seg b { color: #fff; font-weight: 600; }
+    .alarm-seg.crit b { color: var(--st-bad); }
+    .alarm-seg.warn b { color: var(--st-warn); }
+    .alarm-sep { width: 1px; height: 16px; background: var(--line); }
+    .alarm-strip .right { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+
+    /* ---- Body: nav | canvas | inspector ----------------------------------- */
+    .body-row { flex: 1; display: flex; min-height: 0; }
+
+    .nav-rail {
+        width: 210px; flex: 0 0 210px; background: var(--panel-bg);
+        border-right: 1px solid var(--line); display: flex; flex-direction: column;
+        padding: 12px 10px; gap: 4px; overflow-y: auto;
+    }
+    .nav-title { font-size: 10px; text-transform: uppercase; color: var(--text-mute); font-weight: 700; letter-spacing: .7px; padding: 8px 8px 4px; }
     .nav-item {
-        width: 45px; height: 45px; margin-bottom: 15px; border-radius: 6px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; color: #555; font-size: 9px; font-weight: bold; font-family: 'Segoe UI'; border: 1px solid transparent;
+        display: flex; align-items: center; gap: 9px; padding: 9px 10px;
+        border-radius: 5px; cursor: pointer; color: var(--text-dim);
+        font-size: 12.5px; border: 1px solid transparent; transition: all .12s;
+        min-height: 40px;
     }
-    .nav-item svg { width: 22px; height: 22px; margin-bottom: 3px; }
-    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-    .nav-item.active { background: rgba(0, 243, 255, 0.05); color: var(--neon-cyan); border: 1px solid rgba(0, 243, 255, 0.2); box-shadow: 0 0 10px rgba(0,243,255,0.1); }
-    
-    .nav-back { margin-top: auto; margin-bottom: 20px; color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
-    .nav-back:hover { background: var(--neon-red); color: #000; box-shadow: 0 0 10px var(--neon-red); }
-
-    /* --- VIEW CONTAINER --- */
-    .main-view { flex: 1; position: relative; overflow: hidden; }
-    .page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
-    .page.active { display: flex; }
-
-    /* ================================================================================= */
-    /* === VIEW 1: NOC DASHBOARD (MAXIMUM DENSITY - DARK SCI-FI) === */
-    /* ================================================================================= */
-    #view-noc { font-family: 'Rajdhani', sans-serif; }
-
-    /* Header */
-    .noc-header { 
-        height: 45px; background: #08090b; border-bottom: 1px solid var(--neon-cyan); 
-        display: flex; align-items: center; justify-content: space-between; padding: 0 15px; 
-        box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); z-index: 10;
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item.active { background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.3); color: #fff; }
+    .nav-item .nled { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; }
+    .nled.ok { background: var(--st-ok); }
+    .nled.warn { background: var(--st-warn); }
+    .nled.bad { background: var(--st-bad); box-shadow: 0 0 5px var(--st-bad); }
+    .nled.off { background: var(--st-off); }
+    .nav-item .nlabel { flex: 1; }
+    .nav-item .ncount {
+        font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 700;
+        background: var(--line-soft); color: var(--text-dim);
     }
-    .noc-brand { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 2px; text-shadow: 0 0 8px var(--neon-cyan); font-family: 'Chakra Petch'; }
-    .noc-top-stat { display: flex; gap: 15px; font-family: 'Share Tech Mono'; font-size: 11px; align-items: center; color: #888; }
-    .noc-pill { padding: 4px 10px; border: 1px solid #222; background: #0f1116; display: flex; align-items: center; gap: 6px; border-radius: 4px; }
-    .btn-exit {
-        background: var(--neon-cyan); color: #000; border: none; padding: 10px 18px; font-weight: 800; cursor: pointer;
-        font-family: 'Chakra Petch'; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%); transition: 0.2s;
-        min-height: 40px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center;
+    .nav-item .ncount.crit { background: rgba(239,68,68,0.2); color: var(--st-bad); }
+    .nav-item .ncount.warn { background: rgba(234,179,8,0.2); color: var(--st-warn); }
+    .nav-sep { height: 1px; background: var(--line); margin: 8px 4px; }
+    .nav-back {
+        margin-top: auto; color: var(--text-dim); text-decoration: none;
+        display: flex; align-items: center; gap: 9px; padding: 9px 10px;
+        border-radius: 5px; font-size: 12.5px; border: 1px solid var(--line);
+        min-height: 40px;
     }
-    .btn-exit:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+    .nav-back:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item svg, .nav-back svg { width: 16px; height: 16px; flex: 0 0 16px; }
 
-    /* Control Buttons */
-    .ctrl-btn {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid #333;
-        color: #888;
-        padding: 5px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 10px;
-        font-family: 'Share Tech Mono';
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        transition: all 0.2s;
+    /* ---- Canvas ------------------------------------------------------------ */
+    .canvas { flex: 1; overflow-y: auto; padding: 14px; min-width: 0; }
+    .seg-head {
+        display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px;
     }
-    .ctrl-btn:hover {
-        background: rgba(255,255,255,0.1);
-        color: #fff;
-        border-color: var(--neon-cyan);
+    .seg-head h2 { font-size: 15px; color: #fff; font-weight: 700; }
+    .seg-head .seg-desc { font-size: 11.5px; color: var(--text-dim); }
+
+    /* Service-health strip */
+    .svc-strip {
+        display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
     }
-    .ctrl-btn.active {
-        background: rgba(0, 243, 255, 0.1);
-        border-color: var(--neon-cyan);
-        color: var(--neon-cyan);
+    .svc-pill {
+        display: flex; align-items: center; gap: 7px; padding: 7px 11px;
+        background: var(--panel-2); border: 1px solid var(--line);
+        border-left-width: 3px; border-radius: 4px; font-size: 12px;
     }
-    .ctrl-btn svg { width: 14px; height: 14px; }
+    .svc-pill.ok    { border-left-color: var(--st-ok); }
+    .svc-pill.warn  { border-left-color: var(--st-warn); }
+    .svc-pill.bad   { border-left-color: var(--st-bad); }
+    .svc-pill.stby  { border-left-color: var(--st-stby); }
+    .svc-pill .sname { color: var(--text-dim); }
+    .svc-pill .sval { font-weight: 700; font-family: 'Consolas', monospace; }
+    .svc-pill.ok .sval { color: var(--st-ok); }
+    .svc-pill.warn .sval { color: var(--st-warn); }
+    .svc-pill.bad .sval { color: var(--st-bad); }
+    .svc-pill.stby .sval { color: var(--st-stby); }
 
-    /* Keyboard Shortcut Hints */
-    .kbd {
-        background: #222;
-        border: 1px solid #444;
-        padding: 1px 4px;
-        border-radius: 2px;
-        font-size: 8px;
-        color: #666;
-        margin-left: 4px;
+    .panel {
+        background: var(--panel-bg); border: 1px solid var(--line);
+        border-radius: 6px; margin-bottom: 14px;
     }
-
-    /* Fullscreen Mode */
-    body.fullscreen .sidebar { display: none; }
-    body.fullscreen .main-view { width: 100vw; }
-    body.fullscreen .noc-header { border-radius: 0; }
-
-    /* Grid Layout */
-    .noc-grid { 
-        flex: 1; padding: 8px; display: grid; gap: 6px; overflow-y: auto;
-        grid-template-columns: 240px 1fr 1fr 300px; 
-        grid-template-rows: 80px 280px 200px 1fr 30px; 
+    .panel-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 9px 14px; border-bottom: 1px solid var(--line);
+        font-size: 11px; text-transform: uppercase; letter-spacing: .8px;
+        color: var(--text-dim); font-weight: 700;
     }
-    
-    /* Widgets */
-    .noc-widget { 
-        background: var(--bg-panel); border: 1px solid var(--border-color); position: relative; 
-        display: flex; flex-direction: column; overflow: hidden; 
+    .panel-head .ph-meta { font-size: 10px; color: var(--text-mute); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .panel-body { padding: 12px 14px; }
+
+    /* Capacity summary cards */
+    .cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+    .cap-card {
+        background: var(--panel-2); border: 1px solid var(--line-soft);
+        border-radius: 5px; padding: 10px 12px;
     }
-    .noc-widget-head { 
-        background: rgba(0, 243, 255, 0.03); padding: 4px 10px; font-size: 10px; font-weight: 700; 
-        color: var(--neon-cyan); border-bottom: 1px solid var(--border-color); display: flex; 
-        justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 1px; font-family: 'Chakra Petch'; 
+    .cap-card .cv { font-size: 20px; font-weight: 700; color: #fff; font-family: 'Consolas', monospace; }
+    .cap-card .cv small { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+    .cap-card .cl { font-size: 10.5px; color: var(--text-mute); text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
+    .cap-card .cnote { font-size: 10px; color: var(--text-dim); margin-top: 5px; }
+    .cap-card.ok { border-left: 3px solid var(--st-ok); }
+    .cap-card.warn { border-left: 3px solid var(--st-warn); }
+
+    /* Link table */
+    .lt-wrap { overflow-x: auto; }
+    table.lt { width: 100%; border-collapse: collapse; font-size: 12px; }
+    table.lt th {
+        text-align: left; color: var(--text-mute); font-weight: 700;
+        text-transform: uppercase; font-size: 10px; letter-spacing: .5px;
+        padding: 8px 10px; border-bottom: 1px solid var(--line);
+        white-space: nowrap;
     }
-    .noc-widget-body { flex: 1; padding: 6px; position: relative; overflow: hidden; }
-    
-    /* HUD Corner Accents */
-    .noc-widget::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
-    .noc-widget::after { content: ""; position: absolute; bottom: 0; right: 0; width: 6px; height: 6px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
-    
-    /* Utils */
-    .col-2 { grid-column: span 2; } .col-3 { grid-column: span 3; } .row-2 { grid-row: span 2; } .no-pad { padding: 0; }
-    .text-val { font-family: 'Share Tech Mono'; font-weight: bold; font-size: 24px; color: #fff; }
-    .text-lbl { font-size: 9px; color: #545b66; text-transform: uppercase; font-family: 'Chakra Petch'; font-weight: bold; }
-    .blink-green { animation: blink 1s infinite; color: var(--neon-green); }
-    .blink-red { animation: blink 0.5s infinite; color: var(--neon-red); }
-    @keyframes blink { 50% { opacity: 0.3; } }
-
-    /* Map & Radar */
-    .map-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 5px #000); }
-    .map-path { fill: #13151a; stroke: #2a2f3a; stroke-width: 0.5; }
-    .map-path:hover { fill: #1a2634; stroke: var(--neon-cyan); }
-    .threat-line { fill: none; stroke: var(--neon-red); stroke-width: 1; stroke-dasharray: 5; animation: dash 1s linear infinite; }
-    .radar-circle { fill: none; stroke: var(--neon-green); stroke-width: 1; opacity: 0; animation: radar 3s infinite; }
-    .packet { r: 2; fill: #fff; animation: travel 3s linear infinite; }
-    @keyframes dash { to { stroke-dashoffset: -20; } }
-    @keyframes radar { 0% { r: 0; opacity: 1; } 100% { r: 50; opacity: 0; } }
-    @keyframes travel { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
-
-    /* Charts - Enhanced */
-    .chart-cvs { width: 100%; height: 100%; }
-    .chart-glow { filter: drop-shadow(0 0 8px var(--neon-cyan)); }
-
-    /* Enhanced Widget Styles */
-    .live-indicator { display: inline-block; width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; animation: pulse 1s infinite; margin-right: 5px; }
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
-
-    /* Network Stats Grid */
-    .net-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-    .net-stat-item { background: rgba(0,0,0,0.3); padding: 6px; text-align: center; border-left: 2px solid var(--neon-cyan); }
-    .net-stat-val { font-family: 'Share Tech Mono'; font-size: 16px; color: #fff; }
-    .net-stat-lbl { font-size: 8px; color: #555; text-transform: uppercase; }
-
-    /* Progress Bars */
-    .progress-bar { height: 6px; background: #111; border-radius: 3px; overflow: hidden; margin: 4px 0; }
-    .progress-fill { height: 100%; transition: width 0.5s ease; }
-    .progress-fill.cpu { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green)); box-shadow: 0 0 8px var(--neon-cyan); }
-    .progress-fill.mem { background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)); box-shadow: 0 0 8px var(--neon-purple); }
-    .progress-fill.disk { background: linear-gradient(90deg, var(--neon-amber), var(--neon-green)); box-shadow: 0 0 8px var(--neon-amber); }
-    .progress-fill.net { background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan)); box-shadow: 0 0 8px var(--neon-green); }
-
-    /* Resource Monitor Widget */
-    .resource-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .resource-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-    .resource-info { flex: 1; }
-    .resource-name { font-size: 9px; color: #666; text-transform: uppercase; }
-    .resource-val { font-family: 'Share Tech Mono'; font-size: 11px; color: #fff; float: right; }
-
-    /* Network Interface Widget */
-    .nic-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #222; }
-    .nic-name { font-size: 9px; color: #888; }
-    .nic-status { font-size: 8px; padding: 2px 6px; border-radius: 2px; }
-    .nic-up { background: rgba(0,255,65,0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
-    .nic-down { background: rgba(255,0,60,0.2); color: var(--neon-red); border: 1px solid var(--neon-red); }
-    .nic-speed { font-family: 'Share Tech Mono'; font-size: 9px; color: var(--neon-cyan); }
-
-    /* Ping Monitor */
-    .ping-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
-    .ping-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .ping-dot.ok { background: var(--neon-green); box-shadow: 0 0 4px var(--neon-green); }
-    .ping-dot.warn { background: var(--neon-amber); box-shadow: 0 0 4px var(--neon-amber); }
-    .ping-dot.err { background: var(--neon-red); box-shadow: 0 0 4px var(--neon-red); animation: blink 0.5s infinite; }
-    .ping-host { font-size: 9px; color: #888; flex: 1; }
-    .ping-val { font-family: 'Share Tech Mono'; font-size: 9px; color: var(--neon-cyan); }
-
-    /* Enhanced Charts */
-    .chart-gradient { position: relative; }
-    .chart-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, transparent, rgba(0,243,255,0.1)); pointer-events: none; }
-
-    /* Complex Widgets */
-    .rack-stack { display: flex; flex-direction: column-reverse; height: 100%; gap: 1px; background: #000; overflow-y: auto; }
-    .u-slot { height: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; font-family: 'Share Tech Mono'; font-size: 8px; color: #444; border-bottom: 1px solid #111; }
-    .u-slot.on { background: #0f131a; color: #bbb; border-left: 2px solid var(--neon-cyan); }
-    .u-slot.err { background: #220a0a; border-left: 2px solid var(--neon-red); color: var(--neon-red); }
-    
-    .cctv-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; height: 100%; }
-    .cam { background: #000; border: 1px solid #222; position: relative; overflow: hidden; }
-    .cam-ov { position: absolute; top: 3px; left: 3px; color: #fff; font-size: 8px; font-family: 'Share Tech Mono'; z-index: 2; background: rgba(0,0,0,0.5); padding: 1px 3px; }
-    
-    .raid-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; height: 100%; padding: 5px; }
-    .raid-block { background: #1a1a1a; border: 1px solid #333; }
-    .raid-block.ok { background: var(--neon-green); box-shadow: 0 0 2px var(--neon-green); }
-    .raid-block.bad { background: var(--neon-red); animation: blink 0.5s infinite; }
-    .raid-block.read { background: var(--neon-cyan); }
-
-    .spectrum { display: flex; align-items: flex-end; gap: 1px; height: 100%; }
-    .spec-bar { flex: 1; background: var(--neon-cyan); opacity: 0.6; transition: height 0.1s; }
-
-    .dense-table { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono'; font-size: 9px; }
-    .dense-table th { text-align: left; color: #555; border-bottom: 1px solid #333; padding: 4px; }
-    .dense-table td { border-bottom: 1px solid #222; padding: 4px; color: #aaa; }
-    .dense-table tr:hover td { background: #111; color: #fff; }
-
-    /* ========================================================================== */
-    /* === VIEW 2: PRTG DASHBOARD (100% IMAGE REPLICA) === */
-    /* ========================================================================== */
-    #view-prtg {
-        background-color: #ffffff; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-y: auto;
+    table.lt td {
+        padding: 9px 10px; border-bottom: 1px solid var(--line-soft);
+        color: var(--text-main); white-space: nowrap;
     }
-    .prtg-header-bar { background: #f0f0f0; border-bottom: 1px solid #ccc; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .prtg-title { font-size: 18px; color: #003366; font-weight: bold; }
-    
-    .prtg-layout { display: grid; grid-template-columns: 1fr 1fr 1fr; height: calc(100% - 50px); position: relative; }
-    .prtg-col { padding: 20px; border-right: 2px solid #003366; display: flex; flex-direction: column; gap: 20px; }
-    .prtg-col:last-child { border-right: none; }
-    .prtg-h2 { font-size: 22px; color: #003366; font-weight: 700; text-align: center; margin-bottom: 10px; }
+    table.lt td.num, table.lt th.num { font-family: 'Consolas', monospace; font-variant-numeric: tabular-nums; }
+    table.lt tr.linkrow { cursor: pointer; transition: background .12s; }
+    table.lt tr.linkrow:hover td { background: rgba(255,255,255,0.04); }
+    table.lt tr.linkrow.sel td { background: rgba(56,189,248,0.1); }
+    .tag { font-family: 'Consolas', monospace; color: #cbd5e1; }
+    .util-cell { display: flex; align-items: center; gap: 8px; min-width: 110px; }
+    .util-bar { flex: 1; height: 6px; background: var(--line-soft); border-radius: 3px; overflow: hidden; min-width: 50px; }
+    .util-fill { height: 100%; border-radius: 3px; }
+    .util-fill.ok { background: var(--st-ok); }
+    .util-fill.warn { background: var(--st-warn); }
+    .util-fill.bad { background: var(--st-bad); }
+    .util-pct { width: 42px; text-align: right; font-family: 'Consolas', monospace; }
+    .stat-tag {
+        font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 3px;
+        display: inline-block;
+    }
+    .stat-tag.up    { background: rgba(34,197,94,0.16); color: var(--st-ok); }
+    .stat-tag.stby  { background: rgba(14,165,233,0.16); color: var(--st-stby); }
+    .stat-tag.warn  { background: rgba(234,179,8,0.16); color: var(--st-warn); }
+    .stat-tag.down  { background: rgba(239,68,68,0.16); color: var(--st-bad); }
+    .redun { font-size: 11px; color: var(--text-dim); }
+    .redun b { color: var(--st-ok); }
+    .redun.deg b { color: var(--st-warn); }
 
-    /* PRTG Components */
-    .prtg-chart-box { border: 1px solid #ccc; background: #fdfdfd; padding: 5px; height: 130px; position: relative; }
-    .prtg-chart-label { font-size: 11px; color: #444; position: absolute; top: 5px; left: 5px; font-weight: bold; }
-    .prtg-status-row { display: flex; align-items: center; justify-content: space-between; }
-    .prtg-label-left { font-size: 13px; color: #555; width: 40%; font-weight: 500; }
-    .prtg-box-ok { background: #9abf36; color: #fff; font-weight: bold; text-align: center; padding: 10px 0; width: 55%; font-size: 13px; box-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-    .prtg-box-ok span { font-size: 11px; font-weight: normal; display: block; }
+    /* PRTG-style monitoring panel (operationalised) */
+    .mon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .mon-card { background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 5px; padding: 10px 12px; text-align: center; }
+    .mon-card .mv { font-size: 22px; font-weight: 700; font-family: 'Consolas', monospace; }
+    .mon-card .ml { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
+    .mon-card.ok .mv { color: var(--st-ok); }
+    .mon-card.warn .mv { color: var(--st-warn); }
+    .mon-card.bad .mv { color: var(--st-bad); }
+    .mon-card.neutral .mv { color: #fff; }
 
-    .sunburst-wrapper { width: 220px; height: 220px; margin: 0 auto; position: relative; }
-    .infra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-    .infra-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .infra-icon { width: 40px; height: 40px; background: #bbb; mask-size: contain; -webkit-mask-size: contain; background-color: #666; margin-bottom: 5px; }
-    .infra-name { font-size: 12px; font-weight: bold; color: #333; margin-bottom: 2px; }
-    .infra-badges { display: flex; gap: 1px; }
-    .ib { font-size: 9px; color: white; padding: 1px 3px; font-weight: bold; min-width: 15px; text-align: center; border:1px solid #fff; }
-    .ib-red { background: #d71920; } .ib-yel { background: #ffcc00; color: black; } .ib-grn { background: #9abf36; } .ib-blu { background: #0070c0; } .ib-gry { background: #aaa; }
+    /* ---- Right inspector --------------------------------------------------- */
+    .inspector {
+        width: 340px; flex: 0 0 340px; background: var(--panel-bg);
+        border-left: 1px solid var(--line); overflow-y: auto; padding: 14px;
+    }
+    .insp-title { font-size: 12px; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: .7px; margin-bottom: 4px; }
+    .insp-sub { font-size: 11px; color: var(--text-mute); margin-bottom: 12px; }
+    .insp-block { background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 12px; margin-bottom: 12px; }
+    .insp-block h4 { font-size: 11px; text-transform: uppercase; color: var(--text-dim); letter-spacing: .5px; margin-bottom: 9px; font-weight: 700; }
+    .kv { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--line-soft); }
+    .kv:last-child { border-bottom: none; }
+    .kv .k { color: var(--text-dim); }
+    .kv .v { color: #fff; font-family: 'Consolas', monospace; font-weight: 600; }
+    .kv .v.ok { color: var(--st-ok); } .kv .v.warn { color: var(--st-warn); } .kv .v.bad { color: var(--st-bad); }
 
-    .host-table { width: 100%; border-collapse: collapse; font-size: 10px; font-family: 'Segoe UI', sans-serif; }
-    .host-table td { padding: 4px; border: 1px solid #ddd; background: #fff; vertical-align: middle; }
-    .check { color: #9abf36; font-weight: bold; font-size: 14px; margin-right: 3px; }
+    /* Alarm list */
+    .alm {
+        border: 1px solid var(--line); border-left-width: 3px; border-radius: 4px;
+        padding: 9px 11px; margin-bottom: 8px; background: var(--panel-2);
+    }
+    .alm.crit { border-left-color: var(--st-bad); }
+    .alm.warn { border-left-color: var(--st-warn); }
+    .alm.sim  { border-left-color: var(--st-sel); border-left-style: dashed; }
+    .alm-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .alm-sev { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 3px; text-transform: uppercase; }
+    .alm.crit .alm-sev { background: rgba(239,68,68,0.18); color: var(--st-bad); }
+    .alm.warn .alm-sev { background: rgba(234,179,8,0.18); color: var(--st-warn); }
+    .alm.sim  .alm-sev { background: rgba(56,189,248,0.18); color: var(--st-sel); }
+    .alm-time { font-size: 10px; color: var(--text-mute); font-family: 'Consolas', monospace; }
+    .alm-dev { font-size: 12px; color: #fff; font-weight: 600; font-family: 'Consolas', monospace; }
+    .alm-msg { font-size: 11.5px; color: var(--text-dim); margin: 3px 0; line-height: 1.4; }
+    .alm-foot { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-mute); margin-top: 4px; }
+    .alm-impact { color: var(--text-dim); }
+    .alm-ack { font-weight: 700; }
+    .alm-ack.no { color: var(--st-warn); } .alm-ack.yes { color: var(--st-ok); }
+    .no-alarms { text-align: center; color: var(--text-mute); font-size: 12px; padding: 18px 0; }
 
-    .service-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #ccc; padding-bottom: 10px; margin-bottom: 10px; }
-    .service-info { font-size: 11px; line-height: 1.4; color: #333; }
-    .gauge-mini { width: 40px; height: 40px; border: 4px solid #9abf36; border-radius: 50%; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-45deg); }
-    .treemap { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-bottom: 20px; }
-    .tm-box { height: 80px; color: white; padding: 5px; font-size: 10px; font-weight: bold; position: relative; }
-    .tm-grn { background: #9abf36; } .tm-red { background: #e05d5d; }
-    .traffic-row { display: flex; justify-content: space-around; text-align: center; margin-top: 20px; }
-    .tl-container { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    .tl-body { background: #eee; padding: 5px; border-radius: 20px; border:1px solid #ccc; }
-    .tl-light { width: 25px; height: 25px; border-radius: 50%; background: #ccc; margin: 2px 0; border:1px solid #bbb; }
-    .tl-light.on { background: #9abf36; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); border-color:#88b800; }
-    .tl-label { font-size: 11px; color: #555; font-weight: bold; }
+    .calc-note {
+        font-size: 10.5px; color: var(--text-mute); line-height: 1.5;
+        background: rgba(0,0,0,0.25); border: 1px solid var(--line-soft);
+        border-radius: 4px; padding: 9px 11px; margin-top: 10px;
+    }
+    .calc-note b { color: var(--text-dim); }
 
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-        .sidebar { width: 50px; padding: 8px 4px; }
-        .nav-item { width: 40px; height: 40px; font-size: 7px; }
-        .nav-item svg { width: 18px; height: 18px; }
-        .brand-icon { width: 35px; height: 35px; font-size: 10px; }
-        .noc-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    /* ---- Bottom status bar ------------------------------------------------- */
+    .status-bar {
+        height: 42px; flex: 0 0 42px; background: var(--panel-bg);
+        border-top: 1px solid var(--line); display: flex; align-items: center;
+        padding: 0 14px; gap: 8px;
+    }
+    .sb-box {
+        background: var(--panel-2); border: 1px solid var(--line);
+        padding: 4px 11px; border-radius: 4px; display: flex; align-items: center; gap: 8px;
+    }
+    .sb-box.ok { border-left: 3px solid var(--st-ok); }
+    .sb-box.warn { border-left: 3px solid var(--st-warn); }
+    .sb-box.bad { border-left: 3px solid var(--st-bad); }
+    .sb-lbl { font-size: 9px; color: var(--text-mute); text-transform: uppercase; font-weight: 700; letter-spacing: .5px; }
+    .sb-val { font-family: 'Consolas', monospace; font-size: 12px; font-weight: 700; color: #fff; }
+    .sb-val.ok { color: var(--st-ok); } .sb-val.warn { color: var(--st-warn); } .sb-val.bad { color: var(--st-bad); }
+    .sb-spacer { flex: 1; }
+    .sb-clock { font-family: 'Consolas', monospace; font-size: 11px; color: var(--text-mute); padding: 4px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 4px; }
+
+    /* ---- Responsive (1366x768, 1920x1080, tablet, phone) ------------------- */
+    @media (max-width: 1500px) {
+        .nav-rail { width: 180px; flex-basis: 180px; }
+        .inspector { width: 300px; flex-basis: 300px; }
+    }
+    @media (max-width: 1200px) {
+        .inspector { display: none; }
+    }
+    @media (max-width: 900px) {
+        .nav-rail { width: 64px; flex-basis: 64px; padding: 10px 6px; }
+        .nav-title, .nav-item .nlabel, .nav-item .ncount, .nav-back span { display: none; }
+        .nav-item, .nav-back { justify-content: center; }
     }
     @media (max-width: 768px) {
-        body { flex-direction: column; }
-        .sidebar {
-            width: 100%; height: auto; flex-direction: row;
-            justify-content: flex-start; padding: 8px; gap: 8px;
-            border-right: none; border-bottom: 1px solid var(--neon-cyan);
+        html, body { overflow-x: hidden; max-width: 100vw; }
+        img, picture, video, svg { max-width: 100%; height: auto; }
+        body { overflow-y: auto; }
+        .shell { height: auto; min-height: 100vh; }
+        .topbar { flex-wrap: wrap; height: auto; padding: 8px; gap: 8px; }
+        .alarm-strip { flex-wrap: wrap; height: auto; padding: 8px; gap: 8px 12px; }
+        .alarm-strip .right { margin-left: 0; width: 100%; flex-wrap: wrap; }
+        .body-row { flex-direction: column; }
+        .nav-rail {
+            width: 100%; flex-basis: auto; flex-direction: row; flex-wrap: wrap;
+            border-right: none; border-bottom: 1px solid var(--line);
         }
-        .nav-item { width: 50px; height: 44px; margin: 0; }
-        .nav-back { margin-top: 0; margin-left: auto; margin-bottom: 0; }
-        .brand-icon { margin: 0; }
-        .noc-header { flex-direction: column; gap: 8px; padding: 10px; }
-        .noc-brand { font-size: 16px; }
-        .noc-top-stat { flex-wrap: wrap; gap: 6px; }
-        .btn-exit { padding: 8px 14px; font-size: 10px; }
-        .noc-grid { grid-template-columns: 1fr; gap: 6px; padding: 10px; }
+        .nav-rail .nav-title { display: none; }
+        .nav-item .nlabel, .nav-back span { display: inline; }
+        .nav-item, .nav-back { flex: 1 1 auto; min-width: 130px; min-height: 44px; }
+        .nav-sep { display: none; }
+        .nav-back { margin-top: 0; }
+        .canvas { overflow-y: visible; padding: 10px; }
+        .inspector { display: block; width: 100%; flex-basis: auto; border-left: none; border-top: 1px solid var(--line); }
+        .status-bar { flex-wrap: wrap; height: auto; padding: 8px; }
+        table.lt { font-size: 11px; }
+        th, td { padding: 7px 8px !important; }
+        button, a.top-link, a.nav-back, [role="button"] { min-height: 44px; }
+        .nav-menu, .nav-links { display: none !important; }
+        .footer-grid { grid-template-columns: 1fr !important; gap: 1.25rem !important; padding: 1rem !important; }
     }
     @media (max-width: 480px) {
-        .nav-item { width: 44px; height: 40px; font-size: 6px; }
-        .nav-item svg { width: 16px; height: 16px; }
-        .noc-pill { font-size: 9px; padding: 3px 8px; }
-        .ctrl-btn { padding: 6px 8px; font-size: 10px; }
+        .cap-grid, .mon-grid { grid-template-columns: 1fr 1fr; }
+        .brand { font-size: 14px; }
     }
-
-
+    @media print {
+        body { background: #fff !important; color: #000; }
+        .topbar, .nav-rail, .inspector, .status-bar, .cookie-banner { display: none !important; }
+    }
 </style>
+    <script src="js/conv-engine.js?v=1.22.0"></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
-<style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
-.skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
-</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
-    <div class="sidebar">
-        <a href="index.html" class="brand-icon">IMS</a>
-        <div class="nav-item active" onclick="switchView('noc', this)" title="NOC Dashboard">
-            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg> NOC
+    <div class="shell">
+        <!-- Topbar -->
+        <div class="topbar">
+            <a href="dc-conventional.html" class="top-link" title="Back to Conventional DC dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back
+            </a>
+            <a href="index.html" class="top-link" title="Exit to portfolio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                Portfolio
+            </a>
+            <div class="brand">ICT Network Operations <span class="sub">— BKS01 Conventional DC</span></div>
+            <div class="top-spacer"></div>
+            <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis">IT 1.85 MW</b></div>
+            <div class="meta-chip">Quality <b id="m-quality">GOOD</b></div>
+            <button class="top-btn" id="btn-print" onclick="window.print()" title="Print this view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+                Print
+            </button>
+            <button class="top-btn" id="btn-export" disabled title="CSV export unavailable in this demo build">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export (n/a)
+            </button>
         </div>
-        <div class="nav-item" onclick="switchView('prtg', this)" title="PRTG Monitor">
-            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> PRTG
-        </div>
-        <a href="dc-conventional.html" class="nav-item nav-back" title="Back to Dashboard">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> BACK
-        </a>
-        <a href="index.html" class="nav-item nav-back" title="Exit to Portfolio">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> EXIT
-        </a>
-    </div>
 
-    <div class="main-view">
-
-        <div id="view-noc" class="page active">
-            <header class="noc-header">
-                <div class="noc-brand">BKS01 <span style="color:var(--neon-cyan)">COMMAND CENTER</span></div>
-                <div class="noc-top-stat">
-                    <div class="noc-pill"><span class="blink-green">●</span> SYSTEM ONLINE</div>
-                    <div class="noc-pill">DEFCON 3</div>
-                    <div class="noc-pill" id="noc-clock">00:00:00</div>
-                    <button class="ctrl-btn" onclick="refreshData()" title="Refresh Data">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        <span class="kbd">R</span>
-                    </button>
-                    <button class="ctrl-btn" id="btn-fullscreen" onclick="toggleFullscreen()" title="Fullscreen Mode">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-                        <span class="kbd">F11</span>
-                    </button>
-                    <a href="index.html" class="btn-exit">BACK TO PORTFOLIO</a>
-                </div>
-            </header>
-
-            <div class="noc-grid">
-                <div class="noc-widget row-2">
-                    <div class="noc-widget-head">RACK A-01 [PHYSICAL]</div>
-                    <div class="noc-widget-body no-pad">
-                        <div class="rack-stack" id="rack-view"></div>
-                    </div>
-                </div>
-
-                <div class="noc-widget">
-                    <div class="noc-widget-head">UPS LOAD</div>
-                    <div class="noc-widget-body" style="display:flex; justify-content:space-around; align-items:center;">
-                        <svg viewBox="0 0 36 36" width="50" height="50"><path d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" fill="none" stroke="#222" stroke-width="3"/><path stroke-dasharray="60, 100" d="M18 2 a 16 16 0 0 1 0 32" fill="none" stroke="#00ff41" stroke-width="3"/><text x="18" y="22" fill="#fff" font-size="8" text-anchor="middle">UPS A</text></svg>
-                        <svg viewBox="0 0 36 36" width="50" height="50"><path d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" fill="none" stroke="#222" stroke-width="3"/><path stroke-dasharray="45, 100" d="M18 2 a 16 16 0 0 1 0 32" fill="none" stroke="#00f3ff" stroke-width="3"/><text x="18" y="22" fill="#fff" font-size="8" text-anchor="middle">UPS B</text></svg>
-                    </div>
-                </div>
-                <div class="noc-widget">
-                    <div class="noc-widget-head">ENVIRONMENT</div>
-                    <div class="noc-widget-body" style="display:grid; grid-template-columns:1fr 1fr; gap:2px;">
-                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="color:var(--neon-cyan); font-size:14px;">19°C</div><div class="text-lbl">COLD</div></div>
-                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="color:var(--neon-amber); font-size:14px;">27°C</div><div class="text-lbl">HOT</div></div>
-                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="color:var(--neon-green); font-size:14px;">42%</div><div class="text-lbl">HUM</div></div>
-                        <div style="background:#111; padding:4px; text-align:center;"><div class="text-val" style="font-size:14px;">OK</div><div class="text-lbl">LEAK</div></div>
-                    </div>
-                </div>
-
-                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>HEALTH</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" id="val-health" style="font-size:28px; color:var(--neon-green)">98%</div><div class="text-lbl">OPTIMAL</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">ALERTS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val blink-red" id="val-alerts" style="font-size:28px;">3</div><div class="text-lbl">CRITICAL</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>TRAFFIC</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" id="val-traffic" style="color:var(--neon-cyan); font-size:28px;">14.2 G</div><div class="text-lbl">AGGREGATE</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">BLOCKS</div><div class="noc-widget-body" style="text-align:center;"><div class="text-val" id="val-blocks" style="color:var(--neon-amber); font-size:28px;">2.4k</div><div class="text-lbl">PER SEC</div></div></div>
-
-                <div class="noc-widget col-2 row-2">
-                    <div class="noc-widget-head">WAN TOPOLOGY <span style="color:var(--neon-green)">● CONNECTED</span></div>
-                    <div class="noc-widget-body no-pad" style="background:#080a0f;">
-                        <svg class="map-svg" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
-                            <path d="M40,50 L90,60 L110,110 L100,150 L70,130 L40,80 Z" fill="#1a1d26" stroke="#333"/> <path d="M110,170 L260,180 L280,190 L250,200 L120,190 Z" fill="#1a1d26" stroke="#333"/> <path d="M170,60 L230,60 L250,90 L230,130 L190,130 Z" fill="#1a1d26" stroke="#333"/> <path d="M270,80 L290,80 L300,110 L320,100 L310,140 L280,130 Z" fill="#1a1d26" stroke="#333"/> <path d="M390,100 L490,110 L500,150 L410,140 Z" fill="#1a1d26" stroke="#333"/> <path d="M290,180 L320,185 L310,195 L290,190 Z" fill="#1a1d26" stroke="#333"/> <line x1="140" y1="180" x2="240" y2="185" stroke="#00f3ff" stroke-width="2"/>
-                            <text x="180" y="175" fill="#aaa" font-family="Share Tech Mono" font-size="8">12ms</text>
-                            
-                            <line x1="240" y1="185" x2="290" y2="130" stroke="#00f3ff" stroke-width="1" stroke-dasharray="2"/>
-                            <line x1="240" y1="185" x2="420" y2="130" stroke="#00f3ff" stroke-width="1" stroke-dasharray="2"/>
-
-                            <circle cx="140" cy="180" r="3" fill="#00f3ff"/>
-                            <circle cx="140" cy="180" r="8" class="radar-circle" style="animation-delay: 0.5s;"/>
-                            <text x="140" y="165" fill="#00f3ff" font-size="9" font-weight="bold" text-anchor="middle" font-family="Chakra Petch">BKS01</text>
-
-                            <circle cx="240" cy="185" r="4" fill="#00ff41"/>
-                            <circle cx="240" cy="185" r="10" class="radar-circle"/>
-                            <text x="240" y="200" fill="#00ff41" font-size="10" font-weight="bold" text-anchor="middle" font-family="Chakra Petch">SBY01</text>
-                            
-                            <circle cx="290" cy="130" r="3" fill="#ffb300"/>
-                            <text x="305" y="125" fill="#ffb300" font-size="8" text-anchor="middle" font-family="Share Tech Mono">MKS</text>
-                            
-                            <circle cx="420" cy="130" r="2" fill="#888"/>
-                            <text x="420" y="120" fill="#888" font-size="8" text-anchor="middle" font-family="Share Tech Mono">PAP</text>
-
-                            <circle r="2" fill="#fff"><animateMotion dur="2s" repeatCount="indefinite" path="M140,180 L240,185" /></circle>
-                            <circle r="2" fill="#fff"><animateMotion dur="3s" repeatCount="indefinite" path="M290,130 L240,185" /></circle>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>THROUGHPUT <span style="color:#555; font-size:8px;">Gbps</span></div><div class="noc-widget-body" style="position:relative;"><canvas id="noc-chart-1" class="chart-cvs chart-glow"></canvas><div style="position:absolute; bottom:5px; right:5px; font-size:18px; color:var(--neon-cyan); font-family:'Share Tech Mono';" id="tp-live">14.2</div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head"><span class="live-indicator"></span>DB LATENCY <span style="color:#555; font-size:8px;">ms</span></div><div class="noc-widget-body" style="position:relative;"><canvas id="noc-chart-2" class="chart-cvs"></canvas><div style="position:absolute; bottom:5px; right:5px; font-size:18px; color:var(--neon-amber); font-family:'Share Tech Mono';" id="db-live">2.4</div></div></div>
-                
-                <div class="noc-widget"><div class="noc-widget-head">RAID STATUS</div><div class="noc-widget-body no-pad"><div class="raid-grid" id="raid-view"></div></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">SPECTRUM</div><div class="noc-widget-body no-pad"><div class="spectrum" id="spectrum-view"></div></div></div>
-                <div class="noc-widget" style="grid-row:4/6"><div class="noc-widget-head">SYSLOG</div><div class="noc-widget-body no-pad" style="background:#000"><div id="noc-syslog" style="padding:5px; font-family:'Share Tech Mono'; font-size:9px; color:#aaa; overflow:hidden; display:flex; flex-direction:column-reverse; height:100%;"></div></div></div>
-
-                <!-- Resource Monitor Widget -->
-                <div class="noc-widget">
-                    <div class="noc-widget-head"><span class="live-indicator"></span>RESOURCES</div>
-                    <div class="noc-widget-body">
-                        <div class="resource-item">
-                            <div class="resource-icon" style="color:var(--neon-cyan);">⚡</div>
-                            <div class="resource-info">
-                                <div class="resource-name">CPU <span class="resource-val" id="res-cpu">67%</span></div>
-                                <div class="progress-bar"><div class="progress-fill cpu" id="bar-cpu" style="width:67%"></div></div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="color:var(--neon-purple);">◉</div>
-                            <div class="resource-info">
-                                <div class="resource-name">MEM <span class="resource-val" id="res-mem">82%</span></div>
-                                <div class="progress-bar"><div class="progress-fill mem" id="bar-mem" style="width:82%"></div></div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="color:var(--neon-amber);">▣</div>
-                            <div class="resource-info">
-                                <div class="resource-name">DISK <span class="resource-val" id="res-disk">54%</span></div>
-                                <div class="progress-bar"><div class="progress-fill disk" id="bar-disk" style="width:54%"></div></div>
-                            </div>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-icon" style="color:var(--neon-green);">↔</div>
-                            <div class="resource-info">
-                                <div class="resource-name">NET <span class="resource-val" id="res-net">45%</span></div>
-                                <div class="progress-bar"><div class="progress-fill net" id="bar-net" style="width:45%"></div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Network Interface Widget -->
-                <div class="noc-widget">
-                    <div class="noc-widget-head">INTERFACES</div>
-                    <div class="noc-widget-body" style="padding:4px;">
-                        <div class="nic-item"><span class="nic-name">eth0 (WAN)</span><span class="nic-speed" id="nic-eth0">1.2 Gbps</span><span class="nic-status nic-up">UP</span></div>
-                        <div class="nic-item"><span class="nic-name">eth1 (LAN)</span><span class="nic-speed" id="nic-eth1">845 Mbps</span><span class="nic-status nic-up">UP</span></div>
-                        <div class="nic-item"><span class="nic-name">bond0 (HA)</span><span class="nic-speed" id="nic-bond0">2.1 Gbps</span><span class="nic-status nic-up">UP</span></div>
-                        <div class="nic-item"><span class="nic-name">vlan100</span><span class="nic-speed">--</span><span class="nic-status nic-down">DOWN</span></div>
-                    </div>
-                </div>
-
-                <!-- Ping Monitor Widget -->
-                <div class="noc-widget">
-                    <div class="noc-widget-head"><span class="live-indicator"></span>PING MONITOR</div>
-                    <div class="noc-widget-body" style="padding:4px;">
-                        <div class="ping-row"><div class="ping-dot ok" id="ping-gw"></div><span class="ping-host">Gateway</span><span class="ping-val" id="ping-gw-val">1ms</span></div>
-                        <div class="ping-row"><div class="ping-dot ok" id="ping-dns"></div><span class="ping-host">DNS (8.8.8.8)</span><span class="ping-val" id="ping-dns-val">12ms</span></div>
-                        <div class="ping-row"><div class="ping-dot ok" id="ping-dc"></div><span class="ping-host">DC-PRIMARY</span><span class="ping-val" id="ping-dc-val">3ms</span></div>
-                        <div class="ping-row"><div class="ping-dot warn" id="ping-bkp"></div><span class="ping-host">BACKUP-SRV</span><span class="ping-val" id="ping-bkp-val">45ms</span></div>
-                    </div>
-                </div>
-
-                <div class="noc-widget"><div class="noc-widget-head">NETFLOW</div><div class="noc-widget-body no-pad"><table class="dense-table" id="netflow-table"><tr><th scope="col">SRC</th><th scope="col">DST</th><th scope="col">VOL</th><th scope="col">PROTO</th></tr><tr><td>10.5.1.2</td><td>192.168.1.5</td><td id="nf-vol1">5.2G</td><td>TCP</td></tr><tr><td>172.16.0.4</td><td>8.8.8.8</td><td id="nf-vol2">2.1G</td><td>UDP</td></tr><tr><td>10.0.0.15</td><td>10.0.0.1</td><td id="nf-vol3">892M</td><td>ICMP</td></tr></table></div></div>
-                <div class="noc-widget"><div class="noc-widget-head">BACKUP</div><div class="noc-widget-body"><div style="font-size:8px;">VM_DAILY <span style="float:right;color:var(--neon-green);" id="bkp-vm">100%</span></div><div class="progress-bar"><div class="progress-fill cpu" id="bar-bkp-vm" style="width:100%"></div></div><div style="font-size:8px; margin-top:5px;">DB_LOGS <span style="float:right;color:var(--neon-cyan);" id="bkp-db">65%</span></div><div class="progress-bar"><div class="progress-fill mem" id="bar-bkp-db" style="width:65%"></div></div><div style="font-size:8px; margin-top:5px;">CONFIG <span style="float:right;color:var(--neon-amber);" id="bkp-cfg">32%</span></div><div class="progress-bar"><div class="progress-fill disk" id="bar-bkp-cfg" style="width:32%"></div></div></div></div>
-            </div>
-            <div style="grid-column:1/-1; background:#08090b; border-top:1px solid #333; height:30px; display:flex; align-items:center; overflow:hidden;">
-                <div class="marquee" style="white-space:nowrap; animation: scroll 20s linear infinite; font-family:'Share Tech Mono'; color:var(--neon-amber); font-size:11px;">⚠ CRITICAL: RACK A-04 TEMP HIGH [32C] /// SYSTEM BACKUP STARTED /// VPN GATEWAY: 84% LOAD /// UNAUTHORIZED ACCESS ATTEMPT FIREWALL-01</div>
+        <!-- Top alarm strip (information hierarchy #1) -->
+        <div class="alarm-strip" id="alarmStrip">
+            <div class="alarm-state"><span class="dot"></span><span id="as-state">NORMAL</span></div>
+            <span class="alarm-sep"></span>
+            <div class="alarm-seg crit"><b id="as-crit">0</b> Critical</div>
+            <div class="alarm-seg warn"><b id="as-warn">0</b> Warning</div>
+            <div class="alarm-seg"><b id="as-stale">0</b> Stale Points</div>
+            <div class="right">
+                <div class="alarm-seg">Last Update <b id="as-updated">0s</b></div>
+                <span class="alarm-sep"></span>
+                <div class="alarm-seg">Scenario <b id="as-scenario">Simulated</b></div>
             </div>
         </div>
 
-        <div id="view-prtg" class="page">
-            <div class="prtg-header-bar">
-                <div class="prtg-title">BKS01 PRTG Monitor</div>
-                <a href="index.html" style="background:#004b87; color:white; padding:5px 15px; border-radius:3px; font-size:12px; font-weight:bold; font-family: 'Segoe UI';">BACK TO PORTFOLIO</a>
-            </div>
-            <div class="prtg-layout">
-                <div class="prtg-col">
-                    <h2 class="prtg-h2">Building Facilities</h2>
-                    <div class="prtg-chart-box">
-                        <span class="prtg-chart-label">Temperature - Air Conditioning System/ 10 Hours</span>
-                        <canvas id="prtg-chart-1" class="chart-cvs"></canvas>
-                        <div style="position:absolute; top:25px; right:5px; font-size:9px; color:#555;">Max: 76.54 °F</div>
-                        <div style="position:absolute; bottom:5px; right:5px; font-size:9px; color:#555;">Min: 75.02 °F</div>
-                    </div>
-                    <div class="prtg-chart-box">
-                        <span class="prtg-chart-label">Humidity / 10 Hours</span>
-                        <canvas id="prtg-chart-2" class="chart-cvs"></canvas>
-                        <div style="position:absolute; bottom:5px; left:5px; font-size:9px; color:#555;">Min: 25.40 %</div>
-                        <div style="position:absolute; top:25px; right:5px; font-size:9px; color:#555;">Max: 27.60 %</div>
-                    </div>
-                    <div class="prtg-status-row"><div class="prtg-label-left">Access Management System</div><div class="prtg-box-ok">Digital IO <span>OK</span></div></div>
-                    <div class="prtg-status-row"><div class="prtg-label-left">Security-cameras System</div><div class="prtg-box-ok">Surveillance <span>OK</span></div></div>
-                    <div class="prtg-status-row"><div class="prtg-label-left">Electric System</div><div class="prtg-box-ok">Uptime <span>OK</span></div></div>
+        <!-- Body -->
+        <div class="body-row">
+            <!-- Network-segment navigation -->
+            <nav class="nav-rail" aria-label="Network segments">
+                <div class="nav-title">Network Segments</div>
+                <div class="nav-item active" id="nav-it" onclick="selectSegment('it', this)">
+                    <span class="nled ok"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                    <span class="nlabel">IT / Data Fabric</span>
+                    <span class="ncount" id="cnt-it">0</span>
+                </div>
+                <div class="nav-item" id="nav-bms" onclick="selectSegment('bms', this)">
+                    <span class="nled ok"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+                    <span class="nlabel">BMS / OT Network</span>
+                    <span class="ncount" id="cnt-bms">0</span>
+                </div>
+                <div class="nav-item" id="nav-sec" onclick="selectSegment('sec', this)">
+                    <span class="nled ok"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span class="nlabel">Security Systems</span>
+                    <span class="ncount" id="cnt-sec">0</span>
+                </div>
+                <div class="nav-item" id="nav-mgmt" onclick="selectSegment('mgmt', this)">
+                    <span class="nled ok"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6c.1-.3.1-.7.1-1z"/></svg>
+                    <span class="nlabel">Management / OOB</span>
+                    <span class="ncount" id="cnt-mgmt">0</span>
+                </div>
+                <div class="nav-item" id="nav-wan" onclick="selectSegment('wan', this)">
+                    <span class="nled ok"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20z"/></svg>
+                    <span class="nlabel">WAN / DC Interconnect</span>
+                    <span class="ncount" id="cnt-wan">0</span>
+                </div>
+                <div class="nav-sep"></div>
+                <div class="nav-item" id="nav-mon" onclick="selectSegment('mon', this)">
+                    <span class="nled ok"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+                    <span class="nlabel">Monitoring (PRTG)</span>
+                    <span class="ncount" id="cnt-mon">0</span>
+                </div>
+                <a href="dc-conventional.html" class="nav-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Dashboard</span></a>
+            </nav>
+
+            <!-- Canvas -->
+            <main class="canvas" id="canvas" aria-live="polite"></main>
+
+            <!-- Right inspector (selected segment / alarms) -->
+            <aside class="inspector">
+                <div class="insp-title" id="insp-title">IT / Data Fabric</div>
+                <div class="insp-sub" id="insp-sub">Select a link row for detail</div>
+
+                <div class="insp-block" id="insp-detail"></div>
+
+                <div class="insp-block">
+                    <h4>Active Network Alarms</h4>
+                    <div id="alarm-list"></div>
                 </div>
 
-                <div class="prtg-col">
-                    <h2 class="prtg-h2">IT Infrastructure</h2>
-                    <div class="sunburst-wrapper">
-                        <svg viewBox="0 0 200 200" width="220" height="220">
-                            <path d="M100,100 L100,10 A90,90 0 1,1 10,100 Z" fill="#9abf36" stroke="#fff" stroke-width="1.5"/>
-                            <path d="M100,100 L100,40 A60,60 0 0,1 140,140 Z" fill="#d71920" stroke="#fff"/>
-                            <path d="M100,100 L140,140 A60,60 0 0,1 60,140 Z" fill="#ffcc00" stroke="#fff"/>
-                            <path d="M100,100 L60,140 A60,60 0 0,1 100,40 Z" fill="#9abf36" stroke="#fff"/>
-                            <circle cx="100" cy="100" r="30" fill="white"/>
-                            <text x="100" y="103" text-anchor="middle" font-size="9" font-weight="bold">Playground</text>
-                        </svg>
-                    </div>
-                    <div class="infra-grid">
-                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/server.png'); background:#666;"></div><div class="infra-name">Server</div><div class="infra-badges"><span class="ib ib-yel">2</span><span class="ib ib-grn">98</span></div></div>
-                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/database.png'); background:#666;"></div><div class="infra-name">Storage</div><div class="infra-badges"><span class="ib ib-red">7</span><span class="ib ib-yel">6</span><span class="ib ib-grn">144</span><span class="ib ib-blu">36</span><span class="ib ib-gry">?</span></div></div>
-                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/cloud.png'); background:#666;"></div><div class="infra-name">Virtual Hosting</div><div class="infra-badges"><span class="ib ib-yel">9</span><span class="ib ib-grn">134</span><span class="ib ib-blu">7</span></div></div>
-                        <div class="infra-item"><div class="infra-icon" style="-webkit-mask-image: url('https://img.icons8.com/material-filled/48/000000/workstation.png'); background:#666;"></div><div class="infra-name">Network</div><div class="infra-badges"><span class="ib ib-yel">5</span><span class="ib ib-grn">134</span><span class="ib ib-blu">3</span><span class="ib ib-gry">10</span></div></div>
-                    </div>
-                    <div style="font-weight:bold; font-size:11px; margin-bottom:5px;">Host (WBEM)</div>
-                    <table class="host-table">
-                        <tr style="background:#eee;"><td colspan="4" style="font-weight:bold;">Fan</td></tr>
-                        <tr><td><span class="check">✔</span> Ping 1msec</td><td><span class="check">✔</span> Fan1 3,240 RPM</td><td><span class="check">✔</span> Fan2 3,240 RPM</td><td><span class="check">✔</span> Fan8 3,120 RPM</td></tr>
-                        <tr style="background:#eee;"><td colspan="4" style="font-weight:bold;">Power Supply</td></tr>
-                        <tr><td><span class="check">✔</span> Ping 0msec</td><td><span class="check">✔</span> PS1 400mA</td><td><span class="check">✔</span> PS1 232V</td><td><span class="check">✔</span> PS2 200mA</td></tr>
-                    </table>
-                </div>
-
-                <div class="prtg-col">
-                    <h2 class="prtg-h2">Services & Apps</h2>
-                    <div style="font-size:10px; font-weight:bold;">Services:</div>
-                    <div class="service-item"><div class="service-info"><span class="check">✔</span> Terminal Services<br><span style="color:#9abf36">OK</span><br>Total Sessions: 8</div><div class="gauge-mini"></div></div>
-                    <div class="service-item"><div class="service-info"><span class="check">✔</span> Print Spooler<br><span style="color:#9abf36">OK</span><br>Exec: 139 msec</div><div class="gauge-mini"></div></div>
-                    <div class="treemap">
-                        <div class="tm-box tm-grn" style="height:100px;">MS SQL 2016</div>
-                        <div class="tm-box tm-grn" style="height:100px;">IIS</div>
-                        <div class="tm-box tm-red" style="height:60px;">POP3</div>
-                        <div class="tm-box tm-red" style="height:60px;">SMTP</div>
-                        <div class="tm-box tm-grn" style="grid-column: span 2; height:30px;">IMAP</div>
-                    </div>
-                    <div style="text-align:right;"><div style="font-size:10px;">Backup System</div><div style="font-size:9px;">XenServer VM <span class="ib ib-grn">2</span></div></div>
-                    <div class="traffic-row">
-                        <div class="tl-container"><div class="tl-label">File</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
-                        <div class="tl-container"><div class="tl-label">WWW</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
-                        <div class="tl-container"><div class="tl-label">eCom</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
-                        <div class="tl-container"><div class="tl-label">E-Mail</div><div class="tl-body"><div class="tl-light"></div><div class="tl-light"></div><div class="tl-light on"></div></div></div>
-                    </div>
-                    <div style="text-align:right; margin-top:20px;"><div style="font-size:10px;">Cloud Services</div><span class="ib ib-yel">2</span><span class="ib ib-grn">36</span><span class="ib ib-blu">1</span><span class="ib ib-gry">2</span></div>
-                </div>
-            </div>
+                <div class="calc-note" id="calc-note"></div>
+            </aside>
         </div>
 
+        <!-- Bottom status bar -->
+        <div class="status-bar">
+            <div class="sb-box ok" id="sb-sys">
+                <div><div class="sb-lbl">Fabric</div><div class="sb-val ok" id="sb-sys-v">OPERATIONAL</div></div>
+            </div>
+            <div class="sb-box">
+                <div><div class="sb-lbl">Aggregate Traffic</div><div class="sb-val" id="sb-traffic">--</div></div>
+            </div>
+            <div class="sb-box">
+                <div><div class="sb-lbl">Core Util</div><div class="sb-val" id="sb-util">--</div></div>
+            </div>
+            <div class="sb-box">
+                <div><div class="sb-lbl">Links Up</div><div class="sb-val" id="sb-links">--</div></div>
+            </div>
+            <div class="sb-box" id="sb-almbox">
+                <div><div class="sb-lbl">Net Alarms</div><div class="sb-val ok" id="sb-alarms">0</div></div>
+            </div>
+            <div class="sb-spacer"></div>
+            <div class="sb-clock" id="sb-clock">--:--:--</div>
+        </div>
     </div>
 
     <script>
-        // VIEW SWITCHING
-        function switchView(id, btn) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('view-'+id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            btn.classList.add('active');
-        }
+    /* ============================================================================
+     * ICT Network Operations Console — logic
+     * All engineering / capacity values DERIVE from window.CONV_CALC.snapshot
+     * (single basis: IT 1.85 MW, PUE 1.45, ~231 active racks @ 8 kW/rack).
+     * No Math.random for engineering values — every link metric is a deterministic
+     * function of the basis or a fixed authored constant, stable across reloads.
+     * Refs: 08-ict-network-review.md, 10-uiux-design-system.md,
+     *       13-screenshot-annotation-and-redesign-brief.md
+     * ========================================================================== */
+    (function () {
+        'use strict';
 
-        // NOC RACK
-        const rack = document.getElementById('rack-view');
-        for(let i=1; i<=42; i++){
-            let d = document.createElement('div');
-            let cls='on'; let txt=`SVR-ESX-${i}`;
-            if(i>38) { cls=''; txt='---'; } if(i==15) { cls='err'; txt='RAID-FL'; }
-            d.className=`u-slot ${cls}`;
-            d.innerHTML=`<span>U${i}</span><span>${txt}</span>`;
-            rack.appendChild(d);
-        }
-        
-        // RAID GRID
-        const raid = document.getElementById('raid-view');
-        for(let i=0; i<100; i++){
-            let d = document.createElement('div');
-            d.className = 'raid-block ok';
-            raid.appendChild(d);
-        }
-        setInterval(()=>{
-            let blocks = document.querySelectorAll('.raid-block');
-            blocks[Math.floor(Math.random()*blocks.length)].className = 'raid-block read';
-            setTimeout(()=>{ blocks.forEach(b=>b.className='raid-block ok') }, 200);
-        }, 300);
+        /* ---- Engine binding (single basis) --------------------------------- */
+        var SNAP = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
 
-        // SPECTRUM
-        const spec = document.getElementById('spectrum-view');
-        for(let i=0; i<30; i++){
-            let b = document.createElement('div');
-            b.className = 'spec-bar';
-            spec.appendChild(b);
-        }
-        setInterval(()=>{
-            document.querySelectorAll('.spec-bar').forEach(b => b.style.height = Math.random()*100 + "%");
-        }, 100);
+        // Defensive fallback (engine must load first; this only guards a hard 404)
+        var IT_KW   = SNAP ? SNAP.site.it_load_kw : 1850;
+        var FAC_KW  = SNAP ? SNAP.site.facility_load_kw : 2682.5;
+        var RACKS   = SNAP ? SNAP.racks.at_8kw : 231;          // active racks @ 8 kW/rack
+        var SCN     = SNAP ? SNAP.meta.scenario : 'Simulated';
+        var DQ      = SNAP ? SNAP.meta.data_quality : 'GOOD';
 
-        // CLOCK
-        setInterval(() => document.getElementById('noc-clock').innerText = new Date().toLocaleTimeString('en-GB'), 1000);
+        /* Derived network capacity, tied to the rack/IT basis (deterministic):
+         *  - IT/data fabric north-south offered load scales with IT power.
+         *    Empirical DC heuristic ~7.7 Mbps per IT kW of steady mixed workload
+         *    -> 1850 kW * 0.00768 = 14.2 Gbps offered on a 40 G core uplink pair.
+         *  - One Top-of-Rack access switch per ~12 active racks.
+         *  - BMS/OT poll gateways = one per monitored facility subsystem (6:
+         *    EPMS, Chiller, Datahall, Fire, Fuel, Water).
+         */
+        var GBPS_PER_KW   = 0.00768;
+        var CORE_OFFERED  = round1(IT_KW * GBPS_PER_KW);        // ~14.2 Gbps
+        var CORE_CAPACITY = 40;                                 // 2x 40G LAG, authored
+        var CORE_UTIL     = round1((CORE_OFFERED / CORE_CAPACITY) * 100); // ~35.5%
+        var TOR_COUNT     = Math.ceil(RACKS / 12);              // ~20 access switches
+        var BMS_GATEWAYS  = 6;
 
-        // SYSLOG
-        const logs = ["Port Eth0/1 UP", "BGP Peer Est.", "Auth Success: admin", "Backup Started", "SNMP Timeout", "User Logout", "Config Saved"];
-        setInterval(() => {
-            let l = document.getElementById('noc-syslog');
-            let d = document.createElement('div');
-            d.innerHTML = `> ${logs[Math.floor(Math.random()*logs.length)]}`;
-            l.prepend(d);
-            if(l.children.length > 8) l.lastChild.remove();
-        }, 1500);
-        
-        // CANVAS CHART ENGINE WITH AXIS & INTERPOLATION
-        function initChart(id, color, type='line') {
-            const cvs = document.getElementById(id);
-            if(!cvs) return;
-            cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
-            const ctx = cvs.getContext('2d');
-            let data = new Array(20).fill(50);
-            let targetData = new Array(20).fill(50);
+        function round1(n) { return Math.round(n * 10) / 10; }
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-            // Data Update
-            setInterval(() => {
-                targetData.shift();
-                targetData.push(Math.random()*60 + 20);
-                data.shift();
-                data.push(data[data.length-1]);
-            }, 2000);
+        /* ---- Link model (per doc-08 "Link Model") --------------------------
+         * Capacity/traffic are deterministic: IT segment scales from the basis;
+         * other segments use fixed engineering constants. status/redundancy are
+         * authored. NO random — values identical on every reload.
+         */
+        var SEGMENTS = {
+            it: {
+                title: 'IT / Data Fabric',
+                desc: 'Customer + east-west compute fabric. Capacity scales from the IT power basis.',
+                services: [
+                    { n: 'Core Switching (SW-CORE-A/B)', s: 'ok',   v: 'Active/Active' },
+                    { n: 'Spine-Leaf Fabric',            s: 'ok',   v: TOR_COUNT + ' ToR UP' },
+                    { n: 'Customer L3 Edge',             s: 'ok',   v: 'BGP Estab' },
+                    { n: 'DDoS Scrubbing',               s: 'ok',   v: 'Armed' }
+                ],
+                caps: [
+                    { v: CORE_OFFERED, u: 'Gbps', l: 'Aggregate Offered', note: 'IT ' + (IT_KW/1000).toFixed(2) + ' MW x ' + GBPS_PER_KW + ' Gbps/kW', cls: 'ok' },
+                    { v: CORE_CAPACITY, u: 'Gbps', l: 'Core Uplink Cap', note: '2 x 40G LAG (SW-CORE-A/B)', cls: 'ok' },
+                    { v: CORE_UTIL, u: '%', l: 'Core Utilization', note: 'warn >80% per alarm rule', cls: CORE_UTIL > 80 ? 'warn' : 'ok' },
+                    { v: TOR_COUNT, u: '', l: 'Access Switches', note: RACKS + ' racks / 12 per ToR', cls: 'ok' }
+                ],
+                links: [
+                    ['RTR-BKS01 → SW-CORE-A', 'Primary',  40, CORE_OFFERED, 2.4, 0.01, 0.4, 'up',  'N+1 redundant'],
+                    ['RTR-BKS01 → SW-CORE-B', 'Backup',   40, 0,            2.5, 0.00, 0.4, 'stby','Hot standby LAG'],
+                    ['SW-CORE-A ↔ Spine-1',   'Primary',  100, round1(CORE_OFFERED * 1.8), 0.3, 0.00, 0.1, 'up', 'ECMP 4-way'],
+                    ['SW-CORE-A → Cust-Edge', 'Primary',  10,  round1(CORE_OFFERED * 0.55), 1.2, 0.02, 0.3, 'up', 'BGP dual-homed'],
+                    ['Cust-Edge → ISP-2',     'Backup',   10,  0,            6.1, 0.00, 0.5, 'stby','Failover ready']
+                ]
+            },
+            bms: {
+                title: 'BMS / OT Network',
+                desc: 'Air-gapped facility control network — SEPARATE from IT. Carries EPMS/cooling/fire/fuel/water gateways.',
+                services: [
+                    { n: 'BMS Polling (BMS-GW-01)', s: 'ok', v: 'Poll OK' },
+                    { n: 'EPMS Gateway',            s: 'ok', v: 'Online' },
+                    { n: 'Fire Panel Gateway',      s: 'ok', v: 'Online' },
+                    { n: 'Chiller / Datahall BACnet',s: 'ok', v: 'Online' },
+                    { n: 'NTP / PTP Time Sync',     s: 'ok', v: 'Locked' }
+                ],
+                caps: [
+                    { v: BMS_GATEWAYS, u: '', l: 'OT Gateways', note: 'EPMS, Chiller, Datahall, Fire, Fuel, Water', cls: 'ok' },
+                    { v: 1, u: 'Gbps', l: 'OT Trunk Cap', note: 'Isolated VLAN, no IT route', cls: 'ok' },
+                    { v: 4.2, u: '%', l: 'OT Trunk Util', note: 'Modbus/BACnet polling only', cls: 'ok' },
+                    { v: 0.9, u: 's', l: 'Poll Freshness', note: 'warn if stale telemetry >60s', cls: 'ok' }
+                ],
+                links: [
+                    ['BMS-GW-01 → EPMS-GW',     'Primary', 1, 0.018, 1.1, 0.00, 0.2, 'up',  'Single-path (OT)'],
+                    ['BMS-GW-01 → CHILLER-GW',  'Primary', 1, 0.012, 1.3, 0.00, 0.2, 'up',  'Single-path (OT)'],
+                    ['BMS-GW-01 → DATAHALL-GW', 'Primary', 1, 0.021, 1.0, 0.00, 0.2, 'up',  'Single-path (OT)'],
+                    ['BMS-GW-01 → FIRE-GW',     'Primary', 1, 0.004, 0.9, 0.00, 0.2, 'up',  'Supervised (life-safety)'],
+                    ['BMS-GW-01 → FUEL-GW',     'Primary', 1, 0.003, 1.4, 0.00, 0.2, 'up',  'Single-path (OT)'],
+                    ['BMS-GW-01 → WATER-GW',    'Primary', 1, 0.005, 1.5, 0.00, 0.2, 'up',  'Single-path (OT)']
+                ]
+            },
+            sec: {
+                title: 'Security Systems Network',
+                desc: 'CCTV, access control, intrusion — isolated from IT and OT.',
+                services: [
+                    { n: 'CCTV / NVR',          s: 'ok',   v: '64 cam UP' },
+                    { n: 'Access Control',      s: 'ok',   v: 'Doors OK' },
+                    { n: 'Intrusion Detection', s: 'ok',   v: 'Armed' },
+                    { n: 'VMS Recording',       s: 'warn', v: '14d retention' }
+                ],
+                caps: [
+                    { v: 64, u: '', l: 'CCTV Cameras', note: 'all streaming', cls: 'ok' },
+                    { v: 10, u: 'Gbps', l: 'Camera Trunk Cap', note: 'dedicated VLAN', cls: 'ok' },
+                    { v: 28, u: '%', l: 'Trunk Util', note: 'H.265 streams', cls: 'ok' },
+                    { v: 14, u: 'd', l: 'VMS Retention', note: 'warn: target 30d', cls: 'warn' }
+                ],
+                links: [
+                    ['NVR-01 → SW-SEC-A',  'Primary', 10, 2.8, 0.6, 0.00, 0.2, 'up',  'Dedicated VLAN'],
+                    ['ACS-01 → SW-SEC-A',  'Primary', 1,  0.04,0.5, 0.00, 0.2, 'up',  'Door controllers'],
+                    ['SW-SEC-A → SOC-Link','Primary', 1,  0.12,8.5, 0.01, 0.6, 'up',  'Off-site SOC feed']
+                ]
+            },
+            mgmt: {
+                title: 'Management / Out-of-Band',
+                desc: 'OOB / iLO / console-server plane for infrastructure administration.',
+                services: [
+                    { n: 'OOB Switch (SW-MGMT-A)', s: 'ok', v: 'Online' },
+                    { n: 'Console Server',          s: 'ok', v: '32 ports' },
+                    { n: 'iLO / IPMI Fabric',       s: 'ok', v: 'Reachable' },
+                    { n: 'Jump Host',               s: 'ok', v: 'MFA enforced' }
+                ],
+                caps: [
+                    { v: 32, u: '', l: 'OOB Ports', note: 'console + iLO', cls: 'ok' },
+                    { v: 1, u: 'Gbps', l: 'OOB Trunk Cap', note: 'isolated', cls: 'ok' },
+                    { v: 2.1, u: '%', l: 'OOB Util', note: 'admin only', cls: 'ok' },
+                    { v: 100, u: '%', l: 'iLO Reach', note: 'all hosts', cls: 'ok' }
+                ],
+                links: [
+                    ['SW-MGMT-A → Jump-Host', 'Primary', 1, 0.02, 0.8, 0.00, 0.2, 'up',  'MFA gateway'],
+                    ['SW-MGMT-A → iLO-Fabric','Primary', 1, 0.05, 0.6, 0.00, 0.2, 'up',  'All host BMCs'],
+                    ['SW-MGMT-B → Jump-Host', 'Backup',  1, 0,    0.9, 0.00, 0.2, 'stby','Standby OOB']
+                ]
+            },
+            wan: {
+                title: 'WAN / DC Interconnect',
+                desc: 'Inter-DC and internet transit. Primary UP, backup STANDBY.',
+                services: [
+                    { n: 'WAN Primary (ISP-1)', s: 'ok',   v: 'BGP UP' },
+                    { n: 'WAN Backup (ISP-2)',  s: 'stby', v: 'Standby' },
+                    { n: 'DCI BKS01↔SBY01', s: 'ok',   v: 'Lambda UP' },
+                    { n: 'NTP Sync (Stratum-1)',s: 'ok',   v: 'Locked' }
+                ],
+                caps: [
+                    { v: round1(CORE_OFFERED * 0.6), u: 'Gbps', l: 'WAN Egress', note: 'subset of fabric offered', cls: 'ok' },
+                    { v: 20, u: 'Gbps', l: 'Transit Cap', note: 'ISP-1 + DCI', cls: 'ok' },
+                    { v: round1((CORE_OFFERED * 0.6 / 20) * 100), u: '%', l: 'Transit Util', note: 'warn >80%', cls: 'ok' },
+                    { v: 2.4, u: 'ms', l: 'BKS01↔SBY01', note: 'inter-DC RTT', cls: 'ok' }
+                ],
+                links: [
+                    ['ISP-1 → RTR-BKS01',     'Primary', 10, round1(CORE_OFFERED * 0.4), 5.8, 0.01, 0.6, 'up',  'BGP dual-homed'],
+                    ['ISP-2 → RTR-BKS01',     'Backup',  10, 0,                          6.4, 0.00, 0.7, 'stby','AS-path prepend'],
+                    ['DCI BKS01 → SBY01',     'Primary', 10, round1(CORE_OFFERED * 0.2), 2.4, 0.01, 0.3, 'up',  'Protected lambda'],
+                    ['DCI BKS01 → MKS (3rd)', 'Backup',  1,  0,                          14.0,0.00, 0.9, 'stby','Tertiary path']
+                ]
+            },
+            mon: {
+                title: 'Monitoring (PRTG-style)',
+                desc: 'Infrastructure monitoring server health — sensors, probes, scan freshness.',
+                services: [
+                    { n: 'Monitoring Server',  s: 'ok',   v: 'Healthy' },
+                    { n: 'Remote Probe BKS01', s: 'ok',   v: 'Connected' },
+                    { n: 'Remote Probe SBY01', s: 'ok',   v: 'Connected' },
+                    { n: 'Notification Engine',s: 'ok',   v: 'Active' }
+                ],
+                mon: [
+                    { v: 0, l: 'Sensors Down', cls: 'ok' },
+                    { v: 2, l: 'Sensors Warning', cls: 'warn' },
+                    { v: 1, l: 'Stale Sensors', cls: 'warn' },
+                    { v: 2, l: 'Last Scan (s)', cls: 'ok' },
+                    { v: 2, l: 'Probes Online', cls: 'ok' },
+                    { v: 99.7, l: 'Server Health %', cls: 'ok' }
+                ]
+            }
+        };
 
-            // Animation Loop
-            function animate() {
-                // Interpolate
-                for(let i=0; i<data.length; i++) data[i] += (targetData[i] - data[i]) * 0.05;
+        /* ---- Active alarms (per doc-08: device/service/symptom/started/impact/ack)
+         * Authored, no random. Default scenario is healthy → only low-severity items.
+         */
+        var ALARMS = {
+            sec: [{
+                sev: 'warn', dev: 'VMS-01', svc: 'Security / CCTV',
+                msg: 'Video retention 14 d below 30 d policy target.',
+                started: '02:11', impact: 'No live monitoring loss', ack: false
+            }],
+            wan: [{
+                sev: 'warn', dev: 'DCI BKS01→MKS', svc: 'WAN / OT-impacting',
+                msg: 'Tertiary inter-DC path in standby; N+1 only (no N+2).',
+                started: '06:48', impact: 'Reduced WAN redundancy', ack: true
+            }],
+            mon: [{
+                sev: 'warn', dev: 'Probe-Sensors', svc: 'Monitoring',
+                msg: '2 sensors WARNING, 1 sensor stale (>60 s) — UPS-B input bank.',
+                started: '07:02', impact: 'Telemetry quality degraded', ack: false
+            }]
+        };
 
-                const w = cvs.width, h = cvs.height;
-                ctx.clearRect(0,0,w,h);
-                
-                // Grid & Labels
-                if(type === 'prtg') {
-                    ctx.fillStyle = "#fcfcfc"; ctx.fillRect(0,0,w,h);
-                    ctx.strokeStyle="#e0e0e0"; ctx.lineWidth=1;
-                    ctx.beginPath();
-                    for(let i=0; i<w; i+=30) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
-                    for(let i=0; i<h; i+=30) { ctx.moveTo(0,i); ctx.lineTo(w,i); }
-                    ctx.stroke();
-                } else {
-                    ctx.strokeStyle="#222"; ctx.lineWidth=1;
-                    ctx.beginPath();
-                    ctx.moveTo(30, h-20); ctx.lineTo(w, h-20);
-                    ctx.moveTo(30, 0); ctx.lineTo(30, h-20);
-                    ctx.stroke();
-                    ctx.fillStyle = "#555"; ctx.font = "9px monospace";
-                    ctx.fillText("100", 5, 10); ctx.fillText("50", 10, h/2); ctx.fillText("0", 15, h-20);
+        function allAlarms() {
+            var out = [];
+            for (var k in ALARMS) {
+                if (ALARMS.hasOwnProperty(k)) {
+                    for (var i = 0; i < ALARMS[k].length; i++) {
+                        var a = {}; for (var p in ALARMS[k][i]) a[p] = ALARMS[k][i][p];
+                        a.seg = k; out.push(a);
+                    }
                 }
+            }
+            return out;
+        }
 
-                // Line
-                ctx.beginPath();
-                ctx.strokeStyle = color;
-                ctx.lineWidth = type==='prtg' ? 1.5 : 2;
-                
-                const step = (w - (type==='prtg'?0:30)) / (data.length-1);
-                const startX = type==='prtg' ? 0 : 30;
-                const bottomY = type==='prtg' ? h : h-20;
+        /* ---- Rendering ----------------------------------------------------- */
+        var current = 'it';
 
-                data.forEach((v, i) => {
-                    const x = startX + i*step;
-                    const y = bottomY - (v/100 * (type==='prtg'?h:h-20));
-                    if(i==0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        function utilClass(p) { return p > 80 ? 'bad' : (p > 60 ? 'warn' : 'ok'); }
+
+        function renderSegment(key) {
+            var seg = SEGMENTS[key];
+            var html = '';
+            html += '<div class="seg-head"><h2>' + seg.title + '</h2>'
+                  + '<span class="seg-desc">' + seg.desc + '</span></div>';
+
+            // Service health strip
+            html += '<div class="svc-strip">';
+            for (var i = 0; i < seg.services.length; i++) {
+                var sv = seg.services[i];
+                html += '<div class="svc-pill ' + sv.s + '"><span class="sname">'
+                      + sv.n + '</span><span class="sval">' + sv.v + '</span></div>';
+            }
+            html += '</div>';
+
+            if (key === 'mon') {
+                // Operationalised PRTG panel
+                html += '<div class="panel"><div class="panel-head">Monitoring Server Health'
+                      + '<span class="ph-meta">PRTG-style probe view</span></div>'
+                      + '<div class="panel-body"><div class="mon-grid">';
+                for (var m = 0; m < seg.mon.length; m++) {
+                    var mc = seg.mon[m];
+                    html += '<div class="mon-card ' + mc.cls + '"><div class="mv">'
+                          + mc.v + '</div><div class="ml">' + mc.l + '</div></div>';
+                }
+                html += '</div></div></div>';
+                html += '<div class="calc-note">Sensor states are authored monitoring '
+                      + 'states (not random). Stale-sensor count feeds the top alarm '
+                      + 'strip "Stale Points" counter. <b>Rule:</b> warn if stale '
+                      + 'telemetry &gt; 60 s.</div>';
+            } else {
+                // Capacity summary cards
+                html += '<div class="panel"><div class="panel-head">Capacity Summary'
+                      + '<span class="ph-meta">derived from single basis</span></div>'
+                      + '<div class="panel-body"><div class="cap-grid">';
+                for (var c = 0; c < seg.caps.length; c++) {
+                    var cc = seg.caps[c];
+                    html += '<div class="cap-card ' + cc.cls + '"><div class="cv">'
+                          + cc.v + (cc.u ? ' <small>' + cc.u + '</small>' : '')
+                          + '</div><div class="cl">' + cc.l + '</div>'
+                          + '<div class="cnote">' + cc.note + '</div></div>';
+                }
+                html += '</div></div></div>';
+
+                // Per-link table (doc-08 acceptance: capacity/util/latency/status)
+                html += '<div class="panel"><div class="panel-head">Links &mdash; Capacity / Utilization / Latency / Loss / Status'
+                      + '<span class="ph-meta">click a row for detail</span></div>'
+                      + '<div class="panel-body"><div class="lt-wrap"><table class="lt"><thead><tr>'
+                      + '<th>Link (tag)</th><th>Role</th><th class="num">Cap (Gbps)</th>'
+                      + '<th class="num">Traffic</th><th>Utilization</th><th class="num">Lat (ms)</th>'
+                      + '<th class="num">Loss %</th><th class="num">Jitter</th><th>Status</th>'
+                      + '<th>Redundancy</th></tr></thead><tbody>';
+                for (var L = 0; L < seg.links.length; L++) {
+                    var lk = seg.links[L];
+                    var cap = lk[2], traf = lk[3], lat = lk[4], loss = lk[5], jit = lk[6], st = lk[7];
+                    var up = (st === 'up');
+                    var util = up && cap > 0 ? round1((traf / cap) * 100) : 0;
+                    var uc = utilClass(util);
+                    var stLabel = st === 'up' ? 'UP' : (st === 'stby' ? 'STANDBY' : (st === 'warn' ? 'WARN' : 'DOWN'));
+                    html += '<tr class="linkrow" data-seg="' + key + '" data-i="' + L + '">'
+                          + '<td class="tag">' + lk[0] + '</td>'
+                          + '<td>' + lk[1] + '</td>'
+                          + '<td class="num">' + cap + '</td>'
+                          + '<td class="num">' + (up ? traf.toFixed(2) : '—') + '</td>'
+                          + '<td><div class="util-cell">'
+                          +   '<div class="util-bar"><div class="util-fill ' + uc + '" style="width:' + (up ? Math.min(100, util) : 0) + '%"></div></div>'
+                          +   '<span class="util-pct">' + (up ? util + '%' : '—') + '</span></div></td>'
+                          + '<td class="num">' + lat.toFixed(1) + '</td>'
+                          + '<td class="num">' + loss.toFixed(2) + '</td>'
+                          + '<td class="num">' + jit.toFixed(1) + '</td>'
+                          + '<td><span class="stat-tag ' + st + '">' + stLabel + '</span></td>'
+                          + '<td class="redun"><b>' + lk[8] + '</b></td></tr>';
+                }
+                html += '</tbody></table></div></div></div>';
+            }
+
+            document.getElementById('canvas').innerHTML = html;
+
+            // Wire row selection
+            var rows = document.querySelectorAll('#canvas tr.linkrow');
+            for (var r = 0; r < rows.length; r++) {
+                rows[r].addEventListener('click', function () {
+                    var rs = document.querySelectorAll('#canvas tr.linkrow');
+                    for (var x = 0; x < rs.length; x++) rs[x].classList.remove('sel');
+                    this.classList.add('sel');
+                    showLinkDetail(this.getAttribute('data-seg'), parseInt(this.getAttribute('data-i'), 10));
                 });
-                ctx.stroke();
-
-                // Area Fill
-                ctx.lineTo(w, bottomY); ctx.lineTo(startX, bottomY);
-                ctx.fillStyle = type==='prtg' ? "rgba(0,75,135,0.1)" : color + "33";
-                ctx.fill();
-                
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        // INIT
-        setTimeout(() => {
-            initChart('noc-chart-1', '#00f3ff');
-            initChart('noc-chart-2', '#ffb300');
-            initChart('prtg-chart-1', '#004b87', 'prtg');
-            initChart('prtg-chart-2', '#004b87', 'prtg');
-        }, 500);
-
-        // =============================================
-        // FULLSCREEN & KEYBOARD SHORTCUTS
-        // =============================================
-        function toggleFullscreen() {
-            var elem = document.documentElement;
-            var btn = document.getElementById('btn-fullscreen');
-            if (!document.fullscreenElement) {
-                if (elem.requestFullscreen) elem.requestFullscreen();
-                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-                document.body.classList.add('fullscreen');
-                btn.classList.add('active');
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                else if (document.msExitFullscreen) document.msExitFullscreen();
-                document.body.classList.remove('fullscreen');
-                btn.classList.remove('active');
             }
         }
 
-        function refreshData() {
-            // Simulate data refresh with visual feedback
-            var pills = document.querySelectorAll('.noc-pill');
-            pills.forEach(function(p) {
-                p.style.borderColor = 'var(--neon-cyan)';
-                setTimeout(function() { p.style.borderColor = '#222'; }, 300);
-            });
-            // Re-trigger some animations
-            var raidBlocks = document.querySelectorAll('.raid-block');
-            raidBlocks.forEach(function(b, i) {
-                setTimeout(function() {
-                    b.className = 'raid-block read';
-                    setTimeout(function() { b.className = 'raid-block ok'; }, 100);
-                }, i * 10);
-            });
+        function showLinkDetail(segKey, idx) {
+            var seg = SEGMENTS[segKey];
+            var d = document.getElementById('insp-detail');
+            if (!seg.links || !seg.links[idx]) { d.innerHTML = ''; return; }
+            var lk = seg.links[idx];
+            var cap = lk[2], traf = lk[3], lat = lk[4], loss = lk[5], jit = lk[6], st = lk[7];
+            var up = (st === 'up');
+            var util = up && cap > 0 ? round1((traf / cap) * 100) : 0;
+            var uc = util > 80 ? 'bad' : (util > 60 ? 'warn' : 'ok');
+            var stCls = st === 'up' ? 'ok' : (st === 'stby' ? '' : 'warn');
+            document.getElementById('insp-title').textContent = seg.title;
+            document.getElementById('insp-sub').textContent = lk[0];
+            d.innerHTML =
+                '<h4>Link Detail</h4>'
+              + kv('Tag', lk[0]) + kv('Role', lk[1])
+              + kv('Capacity', cap + ' Gbps')
+              + kv('Traffic', up ? traf.toFixed(2) + ' Gbps' : 'standby')
+              + kv('Utilization', (up ? util + ' %' : '—'), uc)
+              + kv('Latency', lat.toFixed(1) + ' ms')
+              + kv('Packet Loss', loss.toFixed(2) + ' %')
+              + kv('Jitter', jit.toFixed(1) + ' ms')
+              + kv('Status', st.toUpperCase(), stCls)
+              + kv('Redundancy', lk[8])
+              + kv('Source', 'Calculated (basis)')
+              + kv('Last Update', uptime() + ' ago');
         }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // F11 - Fullscreen
-            if (e.key === 'F11') {
-                e.preventDefault();
-                toggleFullscreen();
+        function kv(k, v, cls) {
+            return '<div class="kv"><span class="k">' + k + '</span><span class="v'
+                 + (cls ? ' ' + cls : '') + '">' + v + '</span></div>';
+        }
+
+        function renderAlarmList() {
+            var list = allAlarms();
+            var box = document.getElementById('alarm-list');
+            if (!list.length) { box.innerHTML = '<div class="no-alarms">No active network alarms</div>'; return; }
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var a = list[i];
+                html += '<div class="alm ' + a.sev + '">'
+                      + '<div class="alm-top"><span class="alm-sev">' + a.sev + '</span>'
+                      + '<span class="alm-time">' + a.started + '</span></div>'
+                      + '<div class="alm-dev">' + a.dev + ' · ' + a.svc + '</div>'
+                      + '<div class="alm-msg">' + a.msg + '</div>'
+                      + '<div class="alm-foot"><span class="alm-impact">Impact: '
+                      + a.impact + '</span><span class="alm-ack '
+                      + (a.ack ? 'yes">ACK' : 'no">UNACK') + '</span></div></div>';
             }
-            // R - Refresh
-            if (e.key === 'r' || e.key === 'R') {
-                if (!e.ctrlKey && !e.metaKey) {
-                    refreshData();
+            box.innerHTML = html;
+        }
+
+        function updateNavCounts() {
+            for (var k in SEGMENTS) {
+                if (!SEGMENTS.hasOwnProperty(k)) continue;
+                var el = document.getElementById('cnt-' + k);
+                var led = document.querySelector('#nav-' + k + ' .nled');
+                if (!el) continue;
+                var crit = 0, warn = 0;
+                if (ALARMS[k]) {
+                    for (var i = 0; i < ALARMS[k].length; i++) {
+                        if (ALARMS[k][i].sev === 'crit') crit++;
+                        else if (ALARMS[k][i].sev === 'warn') warn++;
+                    }
                 }
+                var total = crit + warn;
+                el.textContent = total;
+                el.className = 'ncount' + (crit ? ' crit' : (warn ? ' warn' : ''));
+                if (led) led.className = 'nled ' + (crit ? 'bad' : (warn ? 'warn' : 'ok'));
             }
-            // Escape - Exit fullscreen
-            if (e.key === 'Escape' && document.fullscreenElement) {
-                document.body.classList.remove('fullscreen');
-                document.getElementById('btn-fullscreen').classList.remove('active');
-            }
-            // 1 - Switch to NOC view
-            if (e.key === '1') {
-                switchView('noc', document.querySelector('.nav-item'));
-            }
-            // 2 - Switch to PRTG view
-            if (e.key === '2') {
-                var prtgNav = document.querySelectorAll('.nav-item')[1];
-                switchView('prtg', prtgNav);
-            }
-        });
+        }
 
-        // Handle fullscreen change event
-        document.addEventListener('fullscreenchange', function() {
-            if (!document.fullscreenElement) {
-                document.body.classList.remove('fullscreen');
-                document.getElementById('btn-fullscreen').classList.remove('active');
+        function updateAlarmStrip() {
+            var list = allAlarms();
+            var crit = 0, warn = 0;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].sev === 'crit') crit++;
+                else if (list[i].sev === 'warn') warn++;
             }
-        });
+            // Stale points: from monitoring segment authored "Stale Sensors"
+            var stale = 1;
+            document.getElementById('as-crit').textContent = crit;
+            document.getElementById('as-warn').textContent = warn;
+            document.getElementById('as-stale').textContent = stale;
+            document.getElementById('as-scenario').textContent = SCN;
+            var strip = document.getElementById('alarmStrip');
+            var state = document.getElementById('as-state');
+            strip.className = 'alarm-strip' + (crit ? ' has-crit' : (warn ? ' has-warn' : ''));
+            state.textContent = crit ? 'CRITICAL' : (warn ? 'ATTENTION' : 'NORMAL');
 
-        // =============================================
-        // LIVE DATA UPDATES
-        // =============================================
-        var liveData = {
-            health: 98,
-            traffic: 14.2,
-            blocks: 2400,
-            throughput: 14.2,
-            latency: 2.4
+            // Bottom status bar
+            document.getElementById('sb-alarms').textContent = crit + warn;
+            document.getElementById('sb-alarms').className = 'sb-val ' + (crit ? 'bad' : (warn ? 'warn' : 'ok'));
+            var almBox = document.getElementById('sb-almbox');
+            almBox.className = 'sb-box ' + (crit ? 'bad' : (warn ? 'warn' : 'ok'));
+        }
+
+        function renderBottomBar() {
+            document.getElementById('sb-traffic').textContent = CORE_OFFERED.toFixed(1) + ' Gbps';
+            var sbU = document.getElementById('sb-util');
+            sbU.textContent = CORE_UTIL.toFixed(1) + ' %';
+            sbU.className = 'sb-val ' + (CORE_UTIL > 80 ? 'bad' : (CORE_UTIL > 60 ? 'warn' : 'ok'));
+            // Count UP links across IT/data fabric segments
+            var upN = 0, totN = 0;
+            ['it', 'bms', 'sec', 'mgmt', 'wan'].forEach(function (k) {
+                var lks = SEGMENTS[k].links || [];
+                for (var i = 0; i < lks.length; i++) {
+                    totN++;
+                    if (lks[i][7] === 'up') upN++;
+                }
+            });
+            document.getElementById('sb-links').textContent = upN + ' / ' + totN;
+        }
+
+        function setBasisChips() {
+            document.getElementById('m-basis').textContent = 'IT ' + (IT_KW / 1000).toFixed(2) + ' MW';
+            document.getElementById('m-quality').textContent = DQ;
+            var note = document.getElementById('calc-note');
+            note.innerHTML =
+                '<b>Engineering basis (conv-engine.js):</b> IT load '
+              + IT_KW + ' kW, facility ' + FAC_KW.toFixed(1) + ' kW (PUE 1.45), '
+              + RACKS + ' active racks @ 8 kW/rack. '
+              + 'IT fabric aggregate offered = ' + IT_KW + ' kW &times; '
+              + GBPS_PER_KW + ' Gbps/kW = <b>' + CORE_OFFERED.toFixed(1)
+              + ' Gbps</b> on a ' + CORE_CAPACITY + ' Gbps core ('
+              + CORE_UTIL.toFixed(1) + '% util). Access switches = ceil('
+              + RACKS + '/12) = ' + TOR_COUNT + '. All deterministic &mdash; '
+              + 'identical on reload, no random for engineering values.';
+        }
+
+        /* ---- Selection ----------------------------------------------------- */
+        window.selectSegment = function (key, el) {
+            current = key;
+            var items = document.querySelectorAll('.nav-item');
+            for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+            if (el) el.classList.add('active');
+            renderSegment(key);
+            document.getElementById('insp-title').textContent = SEGMENTS[key].title;
+            document.getElementById('insp-sub').textContent = 'Select a link row for detail';
+            document.getElementById('insp-detail').innerHTML =
+                '<h4>Segment</h4>'
+              + kv('Network', SEGMENTS[key].title)
+              + kv('Isolation', key === 'bms' ? 'Air-gapped from IT'
+                    : (key === 'it' ? 'Customer + compute' : 'Dedicated VLAN'))
+              + kv('Scenario', SCN)
+              + kv('Data Quality', DQ, DQ === 'GOOD' ? 'ok' : 'warn');
         };
 
-        setInterval(function() {
-            // Simulate live data changes
-            liveData.health = Math.min(100, Math.max(90, liveData.health + (Math.random() - 0.5) * 2));
-            liveData.traffic = Math.max(8, Math.min(20, liveData.traffic + (Math.random() - 0.5) * 0.5));
-            liveData.blocks = Math.max(1800, Math.min(3200, liveData.blocks + Math.floor((Math.random() - 0.5) * 200)));
-            liveData.throughput = liveData.traffic + (Math.random() - 0.5) * 0.3;
-            liveData.latency = Math.max(1, Math.min(5, liveData.latency + (Math.random() - 0.5) * 0.3));
+        /* ---- Clock + "last update" (time display only, NOT engineering) ---- */
+        var t0 = Date.now();
+        function uptime() {
+            var s = Math.floor((Date.now() - t0) / 1000);
+            if (s < 60) return s + 's';
+            var m = Math.floor(s / 60);
+            return m + 'm ' + (s % 60) + 's';
+        }
+        function tick() {
+            var d = new Date();
+            document.getElementById('sb-clock').textContent =
+                pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+            document.getElementById('as-updated').textContent = uptime();
+        }
 
-            // Update UI
-            document.getElementById('val-health').textContent = Math.round(liveData.health) + '%';
-            document.getElementById('val-traffic').textContent = liveData.traffic.toFixed(1) + ' G';
-            document.getElementById('val-blocks').textContent = (liveData.blocks / 1000).toFixed(1) + 'k';
-            document.getElementById('tp-live').textContent = liveData.throughput.toFixed(1);
-            document.getElementById('db-live').textContent = liveData.latency.toFixed(1);
-        }, 2000);
+        /* ---- Init ---------------------------------------------------------- */
+        function init() {
+            setBasisChips();
+            updateNavCounts();
+            updateAlarmStrip();
+            renderBottomBar();
+            renderSegment('it');
+            window.selectSegment('it', document.getElementById('nav-it'));
+            renderAlarmList();
+            tick();
+            setInterval(tick, 1000);
+        }
 
-        // =============================================
-        // RESOURCE MONITOR LIVE DATA
-        // =============================================
-        var resourceData = {
-            cpu: 67,
-            mem: 82,
-            disk: 54,
-            net: 45
-        };
-
-        setInterval(function() {
-            // Simulate resource fluctuations
-            resourceData.cpu = Math.min(95, Math.max(30, resourceData.cpu + (Math.random() - 0.5) * 10));
-            resourceData.mem = Math.min(95, Math.max(60, resourceData.mem + (Math.random() - 0.5) * 5));
-            resourceData.disk = Math.min(80, Math.max(40, resourceData.disk + (Math.random() - 0.5) * 2));
-            resourceData.net = Math.min(90, Math.max(20, resourceData.net + (Math.random() - 0.5) * 15));
-
-            // Update UI
-            document.getElementById('res-cpu').textContent = Math.round(resourceData.cpu) + '%';
-            document.getElementById('res-mem').textContent = Math.round(resourceData.mem) + '%';
-            document.getElementById('res-disk').textContent = Math.round(resourceData.disk) + '%';
-            document.getElementById('res-net').textContent = Math.round(resourceData.net) + '%';
-
-            document.getElementById('bar-cpu').style.width = resourceData.cpu + '%';
-            document.getElementById('bar-mem').style.width = resourceData.mem + '%';
-            document.getElementById('bar-disk').style.width = resourceData.disk + '%';
-            document.getElementById('bar-net').style.width = resourceData.net + '%';
-        }, 1500);
-
-        // =============================================
-        // NETWORK INTERFACE LIVE DATA
-        // =============================================
-        setInterval(function() {
-            var eth0 = (1.0 + Math.random() * 0.5).toFixed(1) + ' Gbps';
-            var eth1 = Math.floor(700 + Math.random() * 300) + ' Mbps';
-            var bond0 = (1.8 + Math.random() * 0.5).toFixed(1) + ' Gbps';
-
-            document.getElementById('nic-eth0').textContent = eth0;
-            document.getElementById('nic-eth1').textContent = eth1;
-            document.getElementById('nic-bond0').textContent = bond0;
-        }, 2000);
-
-        // =============================================
-        // PING MONITOR LIVE DATA
-        // =============================================
-        setInterval(function() {
-            var gw = Math.floor(1 + Math.random() * 2);
-            var dns = Math.floor(10 + Math.random() * 8);
-            var dc = Math.floor(2 + Math.random() * 3);
-            var bkp = Math.floor(30 + Math.random() * 40);
-
-            document.getElementById('ping-gw-val').textContent = gw + 'ms';
-            document.getElementById('ping-dns-val').textContent = dns + 'ms';
-            document.getElementById('ping-dc-val').textContent = dc + 'ms';
-            document.getElementById('ping-bkp-val').textContent = bkp + 'ms';
-
-            // Update ping status dots
-            var bkpDot = document.getElementById('ping-bkp');
-            if (bkp > 50) {
-                bkpDot.className = 'ping-dot warn';
-            } else if (bkp > 100) {
-                bkpDot.className = 'ping-dot err';
-            } else {
-                bkpDot.className = 'ping-dot ok';
-            }
-        }, 1000);
-
-        // =============================================
-        // NETFLOW LIVE DATA
-        // =============================================
-        setInterval(function() {
-            var vol1 = (4.5 + Math.random() * 1.5).toFixed(1) + 'G';
-            var vol2 = (1.8 + Math.random() * 0.8).toFixed(1) + 'G';
-            var vol3 = Math.floor(700 + Math.random() * 400) + 'M';
-
-            document.getElementById('nf-vol1').textContent = vol1;
-            document.getElementById('nf-vol2').textContent = vol2;
-            document.getElementById('nf-vol3').textContent = vol3;
-        }, 3000);
-
-        // =============================================
-        // BACKUP PROGRESS LIVE DATA
-        // =============================================
-        var backupData = { vm: 100, db: 65, cfg: 32 };
-
-        setInterval(function() {
-            // Simulate backup progress
-            if (backupData.db < 100) backupData.db += Math.random() * 2;
-            if (backupData.cfg < 100) backupData.cfg += Math.random() * 3;
-            if (backupData.db >= 100) backupData.db = 100;
-            if (backupData.cfg >= 100) backupData.cfg = 100;
-
-            document.getElementById('bkp-db').textContent = Math.round(backupData.db) + '%';
-            document.getElementById('bkp-cfg').textContent = Math.round(backupData.cfg) + '%';
-            document.getElementById('bar-bkp-db').style.width = backupData.db + '%';
-            document.getElementById('bar-bkp-cfg').style.width = backupData.cfg + '%';
-
-            // Reset when complete
-            if (backupData.db >= 100 && backupData.cfg >= 100) {
-                setTimeout(function() {
-                    backupData.db = 0;
-                    backupData.cfg = 0;
-                }, 5000);
-            }
-        }, 1000);
-
-        // =============================================
-        // PRTG LIVE DATA UPDATES
-        // =============================================
-        var prtgData = {
-            temp: 76.0,
-            humidity: 26.5,
-            sessions: 8,
-            execTime: 139
-        };
-
-        setInterval(function() {
-            prtgData.temp = 75 + Math.random() * 2;
-            prtgData.humidity = 25 + Math.random() * 3;
-            prtgData.sessions = Math.floor(5 + Math.random() * 8);
-            prtgData.execTime = Math.floor(120 + Math.random() * 40);
-
-            // Update PRTG UI elements
-            var tempMax = document.querySelector('.prtg-chart-box:first-child div[style*="top:25px"]');
-            var tempMin = document.querySelector('.prtg-chart-box:first-child div[style*="bottom:5px"]');
-            if (tempMax) tempMax.textContent = 'Max: ' + (prtgData.temp + 0.5).toFixed(2) + ' °F';
-            if (tempMin) tempMin.textContent = 'Min: ' + (prtgData.temp - 1).toFixed(2) + ' °F';
-
-            // Update sessions
-            var sessionsEl = document.querySelector('.service-info');
-            if (sessionsEl) {
-                var html = sessionsEl.innerHTML;
-                html = html.replace(/Total Sessions: \d+/, 'Total Sessions: ' + prtgData.sessions);
-                sessionsEl.innerHTML = html;
-            }
-
-            // Update exec time
-            var execEls = document.querySelectorAll('.service-info');
-            if (execEls[1]) {
-                var html = execEls[1].innerHTML;
-                html = html.replace(/Exec: \d+ msec/, 'Exec: ' + prtgData.execTime + ' msec');
-                execEls[1].innerHTML = html;
-            }
-        }, 3000);
-
-        // =============================================
-        // ENVIRONMENT LIVE DATA
-        // =============================================
-        setInterval(function() {
-            var coldTemp = 18 + Math.random() * 3;
-            var hotTemp = 25 + Math.random() * 4;
-            var humidity = 40 + Math.random() * 8;
-
-            var envCells = document.querySelectorAll('.noc-widget-body[style*="grid-template-columns"] .text-val');
-            if (envCells.length >= 3) {
-                envCells[0].textContent = Math.round(coldTemp) + '°C';
-                envCells[1].textContent = Math.round(hotTemp) + '°C';
-                envCells[2].textContent = Math.round(humidity) + '%';
-            }
-        }, 4000);
-
-
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
     </script>
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 <style id="rz-cookie-banner-style">
-.cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:10002;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:1rem 2rem;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.08);box-shadow:0 -2px 16px rgba(0,0,0,0.06);font-size:0.85rem;color:#374151;transform:translateY(0);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);}
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:10002;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:1rem 2rem;background:rgba(15,23,42,0.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(148,163,184,0.2);box-shadow:0 -2px 16px rgba(0,0,0,0.4);font-size:0.85rem;color:#cbd5e1;transform:translateY(0);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);}
 .cookie-banner.hidden{transform:translateY(100%);pointer-events:none;}
 .cookie-banner p{margin:0;line-height:1.5;}
-.cookie-banner a{color:#2563eb;text-decoration:underline;}
+.cookie-banner a{color:#60a5fa;text-decoration:underline;}
 .cookie-banner-actions{display:flex;gap:0.5rem;}
 .cookie-btn{padding:0.45rem 0.95rem;border-radius:8px;border:1px solid transparent;cursor:pointer;font-size:0.82rem;font-weight:600;}
 .cookie-btn.accept{background:#2563eb;color:#fff;}
-.cookie-btn.decline{background:transparent;color:#374151;border-color:rgba(0,0,0,0.2);}
-[data-theme="dark"] .cookie-banner{background:rgba(15,23,42,0.92);color:#cbd5e1;border-top-color:rgba(148,163,184,0.2);}
-[data-theme="dark"] .cookie-btn.decline{color:#cbd5e1;border-color:rgba(148,163,184,0.35);}
+.cookie-btn.decline{background:transparent;color:#cbd5e1;border-color:rgba(148,163,184,0.35);}
 @media (max-width:768px){.cookie-banner{flex-direction:column;gap:0.75rem;text-align:center;padding:1rem;}}
 @media print{.cookie-banner{display:none;}}
 
@@ -1072,47 +1063,7 @@
 @media (max-width: 768px) {
     html, body { overflow-x: hidden; max-width: 100vw; }
     img, picture, video, svg { max-width: 100%; height: auto; }
-
-    /* Hero / page header */
     h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
-    .hero, .page-hero { padding: 1.5rem 1rem !important; }
-    .hero p, .hero-subtitle { font-size: 0.9rem !important; }
-
-    /* Map containers (Leaflet) */
-    .map-container, #map, [id*="leaflet" i], [id*="dmtLeafletMap"], #pjg-map {
-        height: 60vh !important;
-        max-height: 480px !important;
-        width: 100% !important;
-        border-radius: 12px !important;
-    }
-
-    /* SVG diagrams full width */
-    svg { max-width: 100% !important; height: auto !important; }
-    .sld-svg, .pid-svg, .topology-svg, [data-diagram] { width: 100% !important; }
-    .pjg-svg-wrap, .pjg-sld-container, .diagram-wrap {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-        max-width: 100% !important;
-    }
-
-    /* Province pages — toggle bar wraps */
-    .pjg-toggle-bar, .pjg-display-toggles, .pjg-voltage-toggles {
-        flex-wrap: wrap !important;
-        gap: 0.4rem !important;
-        padding: 0.5rem !important;
-    }
-    .pjg-toggle, .pjg-toggle-btn { font-size: 0.7rem !important; padding: 0.3rem 0.6rem !important; }
-
-    /* Stat tiles stack 2-col, then 1-col on tiny phones */
-    .stat-tiles, .pjg-stat-grid, .stats-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.5rem !important;
-    }
-    .stat-tile, .pjg-stat-tile { padding: 0.75rem !important; }
-    .stat-value { font-size: 1.1rem !important; }
-    .stat-label { font-size: 0.65rem !important; }
-
-    /* Tables horizontal-scroll */
     table {
         display: block !important;
         overflow-x: auto !important;
@@ -1120,67 +1071,16 @@
         font-size: 0.8rem !important;
     }
     th, td { padding: 8px 12px !important; }
-
-    /* Checklist items */
-    .checklist-item, .compliance-item {
-        padding: 0.75rem !important;
-        font-size: 0.88rem !important;
-    }
-
-    /* DC market tracker city cards */
-    .dmt-city-grid, .city-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-    }
-    .dmt-city-card, .city-card { padding: 1rem !important; }
-
-    /* Side panels collapse below content */
-    .side-panel, .info-sidebar, .filter-sidebar {
-        width: 100% !important;
-        max-width: 100% !important;
-        position: relative !important;
-        margin: 1rem 0 !important;
-    }
-
-    /* Navbar */
-    .navbar, .nav-bar { padding: 0.5rem 0.75rem !important; }
     .nav-menu, .nav-links { display: none !important; }
-    .nav-back { padding: 6px 10px !important; }
-
-    /* Footer */
     .footer-grid {
         grid-template-columns: 1fr !important;
         gap: 1.25rem !important;
         padding: 1rem !important;
     }
-
-    /* Legal pages — text sizing */
-    .legal-content, .terms-content, .privacy-content {
-        padding: 1rem !important;
-        font-size: 0.92rem !important;
-        max-width: 100% !important;
-    }
-    .legal-content h2, .terms-content h2, .privacy-content h2 { font-size: 1.2rem !important; }
-
-    /* 404 popular-links */
-    .popular-links { gap: 6px !important; padding: 0 1rem !important; }
-    .popular-links a { font-size: 0.7rem !important; padding: 5px 12px !important; }
-    .character { width: 180px !important; }
-    .big-404 { font-size: clamp(7rem, 30vw, 14rem) !important; }
-
-    /* Tap targets */
-    button, a.btn, [role="button"], .nav-link { min-height: 44px; }
-
-    /* Buttons stack */
-    .btn-row, .button-row, .actions {
-        flex-direction: column !important;
-        gap: 0.5rem !important;
-    }
-    .btn-row .btn, .button-row .btn, .actions .btn { width: 100% !important; }
+    button, a.btn, [role="button"] { min-height: 44px; }
 }
 
 @media (max-width: 480px) {
-    .stat-tiles, .pjg-stat-grid, .stats-grid { grid-template-columns: 1fr !important; }
     h1 { font-size: 1.4rem !important; }
 }
 

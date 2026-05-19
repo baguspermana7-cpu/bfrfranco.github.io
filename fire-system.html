@@ -71,138 +71,169 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Conventional BMS single scenario engine — single source of truth for all
+         derived engineering values (IT/facility load, protected volumes/zones).
+         Loaded NON-deferred so window.CONV_CALC exists before the inline script.
+         Basis: conv/review/09-engineering-basis-and-calculations.md -->
+    <script src="js/conv-engine.js?v=1.22.0"></script>
     <style>
+        /* ===== Grounded mission-critical operations palette (doc-10 §Color) =====
+           Red is RESERVED strictly for active alarm / trip / fire / leak / discharge.
+           Normal pipe/state = muted slate. Supervisory = amber. Selected = cyan. */
         :root {
-            --fire-red: #ff0000;
-            --jockey-green: #3dfc16;
-            --supply-blue: #00f2ff;
-            --n2-yellow: #fde047;
-            --bg-deep: #05070a;
+            --bg-deep: #070b12;
+            --panel-bg: rgba(15, 22, 36, 0.96);
+            --panel-line: rgba(148, 163, 184, 0.16);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --text-faint: #64748b;
+
+            --st-normal: #34d399;     /* muted green — normal, status dot only */
+            --st-warn:   #f59e0b;     /* amber — supervisory / approaching threshold */
+            --st-alarm:  #ef4444;     /* red — ACTIVE alarm/trip/fire/leak ONLY */
+            --st-offline:#64748b;     /* grey — off / not energized */
+            --st-select: #38bdf8;     /* cyan — user selection (not process state) */
+            --supply-blue: #38bdf8;   /* muted blue — water-supply flow when active */
+            --n2-amber: #fbbf24;      /* amber — N2 inert flow when active */
+            --pipe-idle: #2a3648;     /* neutral idle pipe (NOT red) */
         }
 
         body {
             background-color: var(--bg-deep);
-            color: #e2e8f0;
-            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-line);
         }
+        .font-tech { font-family: 'Consolas', 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
 
-        .pipe-base { fill: none; stroke: #1e293b; stroke-width: 5; stroke-linecap: round; }
+        /* ===== Top alarm strip (doc-13 / doc-10 §Information Hierarchy) ===== */
+        .alarm-strip {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px;
+            padding: 10px 18px; border-radius: 12px;
+            border: 1px solid var(--panel-line); background: var(--panel-bg);
+        }
+        .alarm-strip.state-normal { border-left: 5px solid var(--st-normal); }
+        .alarm-strip.state-warn   { border-left: 5px solid var(--st-warn); }
+        .alarm-strip.state-alarm  { border-left: 5px solid var(--st-alarm); }
+        .as-banner { font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+        .as-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-dim); }
+        .as-item b { color: #fff; font-weight: 700; }
+        .as-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--st-offline); }
+        .as-dot.ok { background: var(--st-normal); box-shadow: 0 0 6px rgba(52,211,153,.6); }
+        .as-dot.warn { background: var(--st-warn); box-shadow: 0 0 6px rgba(245,158,11,.6); }
+        .as-dot.alarm { background: var(--st-alarm); box-shadow: 0 0 7px rgba(239,68,68,.7); animation: blink 1s infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
 
-        /* Laser Flows - Dotted Line Effects */
-        .flow-fire { stroke: var(--fire-red); stroke-dasharray: 4, 12; animation: flowMove 0.5s linear infinite; filter: drop-shadow(0 0 8px var(--fire-red)); }
-        .flow-supply { stroke: var(--supply-blue); stroke-dasharray: 2, 10; animation: flowMove 0.8s linear infinite; filter: drop-shadow(0 0 10px var(--supply-blue)); }
-        .flow-n2 { stroke: var(--n2-yellow); stroke-dasharray: 3, 15; animation: flowMove 1.5s linear infinite; filter: drop-shadow(0 0 8px var(--n2-yellow)); }
+        /* ===== Pipes ===== */
+        .pipe-base { fill: none; stroke: var(--pipe-idle); stroke-width: 5; stroke-linecap: round; }
+        .pipe-charged { stroke: #475569; }            /* pressurised standby — neutral, NOT red */
+        .pipe-label-box { fill: rgba(10,15,24,0.85); stroke: var(--panel-line); }
+        .pipe-label { fill: var(--text-dim); font-size: 9px; font-weight: 700; }
 
+        /* Flow animations — only shown when a flow is genuinely active */
+        .flow-fire   { stroke: var(--st-alarm);   stroke-dasharray: 4,12; animation: flowMove .5s linear infinite; filter: drop-shadow(0 0 5px var(--st-alarm)); }
+        .flow-supply { stroke: var(--supply-blue); stroke-dasharray: 3,11; animation: flowMove .8s linear infinite; }
+        .flow-n2     { stroke: var(--n2-amber);   stroke-dasharray: 3,13; animation: flowMove 1.3s linear infinite; }
         @keyframes flowMove { to { stroke-dashoffset: -24; } }
 
         .impeller { transform-box: fill-box; transform-origin: center; }
-        .spinning { animation: rotateImp 0.4s linear infinite; }
+        .spinning { animation: rotateImp .45s linear infinite; }
         @keyframes rotateImp { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .tank-overflow { overflow: hidden; }
-        .liquid-anim { transition: height 1s linear, y 1s linear; }
+        .liquid-anim { transition: height .8s linear, y .8s linear; }
+        .valve-label { fill: var(--text-faint); font-size: 8px; font-weight: bold; }
+        .eq-tag { fill: var(--text-dim); font-size: 9px; font-weight: 700; }
+        .eq-name { fill: #cbd5e1; font-size: 10px; font-weight: 700; }
 
-        .emergency-blink { animation: subtleRed 1.5s infinite; }
-        @keyframes subtleRed { 0%, 100% { background: transparent; } 50% { background: rgba(153, 27, 27, 0.1); } }
+        /* ===== Control buttons ===== */
+        .ctrl-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--panel-line); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: all .15s; min-height: 32px; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .ctrl-btn.active { background: rgba(56,189,248,0.12); border-color: var(--st-select); color: var(--st-select); }
+        .kbd-hint { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 3px; font-size: 9px; color: var(--text-faint); margin-left: 5px; }
 
-        .font-tech { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
-        .valve-label { fill: #64748b; font-size: 8px; font-weight: bold; }
+        /* Simulation control — explicitly gated & labelled (doc-05 §1, doc-10 §Controls) */
+        .sim-panel { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px dashed var(--st-warn); background: rgba(245,158,11,0.06); }
+        .sim-badge { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--st-warn); border: 1px solid var(--st-warn); border-radius: 6px; padding: 4px 9px; }
+        .sim-badge.on { color: #fff; background: var(--st-warn); }
+        .sim-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--st-warn); color: var(--st-warn); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; min-height: 36px; transition: all .15s; }
+        .sim-btn:hover:not(:disabled) { background: var(--st-warn); color: #1a1300; }
+        .sim-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .sim-btn.arm { border-color: var(--st-select); color: var(--st-select); }
+        .sim-btn.arm:hover:not(:disabled) { background: var(--st-select); color: #04121c; }
 
-        /* Control Buttons */
-        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: all 0.2s; }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .ctrl-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--supply-blue); color: var(--supply-blue); }
-        .kbd-hint { background: #222; padding: 2px 6px; border-radius: 3px; font-size: 9px; color: #666; margin-left: 4px; }
+        /* ===== Side / inspector panels ===== */
+        .panel { background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 12px; padding: 14px 16px; }
+        .panel-title { font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; border-bottom: 1px solid var(--panel-line); padding-bottom: 7px; }
+        .metric-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; font-size: 12px; border-bottom: 1px solid rgba(148,163,184,0.06); }
+        .metric-row:last-child { border-bottom: 0; }
+        .metric-label { color: var(--text-dim); }
+        .metric-val { color: #fff; font-weight: 700; }
+        .metric-val.warn { color: var(--st-warn); }
+        .metric-val.alarm { color: var(--st-alarm); }
+        .metric-sub { color: var(--text-faint); font-size: 10px; }
 
-        /* Legend Panel */
-        .legend-panel { position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1px solid #333; border-radius: 12px; padding: 12px 16px; z-index: 20; }
-        .legend-item { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 10px; }
-        .legend-line { width: 30px; height: 3px; border-radius: 2px; }
-        .legend-fire { background: var(--fire-red); box-shadow: 0 0 8px var(--fire-red); }
-        .legend-supply { background: var(--supply-blue); box-shadow: 0 0 8px var(--supply-blue); }
-        .legend-n2 { background: var(--n2-yellow); box-shadow: 0 0 8px var(--n2-yellow); }
+        /* Cause-effect matrix (doc-05 §2) */
+        .ce-row { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 7px 0; border-bottom: 1px solid rgba(148,163,184,0.07); }
+        .ce-row:last-child { border-bottom: 0; }
+        .ce-stage { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: rgba(148,163,184,0.12); color: var(--text-dim); border: 1px solid var(--panel-line); }
+        .ce-row.is-active .ce-stage { background: var(--st-alarm); color: #fff; border-color: var(--st-alarm); }
+        /* Stage 0 = Normal: green, NEVER red (red reserved for active alarm) */
+        .ce-row.is-normal .ce-stage { background: rgba(52,211,153,0.16); color: var(--st-normal); border-color: var(--st-normal); }
+        .ce-row.is-armed .ce-stage { background: var(--st-warn); color: #1a1300; border-color: var(--st-warn); }
+        .ce-name { font-size: 12px; font-weight: 700; color: #cbd5e1; }
+        .ce-effect { font-size: 10px; color: var(--text-faint); margin-top: 2px; line-height: 1.4; }
+        .ce-row.is-active .ce-name, .ce-row.is-normal .ce-name { color: #fff; }
 
-        /* Zoom Controls */
-        .zoom-controls { display: flex; gap: 4px; align-items: center; }
-        .zoom-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 9px; transition: all 0.2s; }
-        .zoom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .zoom-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--supply-blue); color: var(--supply-blue); }
-
-        /* Fullscreen Mode */
-        body.fullscreen .no-print { display: none !important; }
-        body.fullscreen .glass-panel.main-svg { border-radius: 0; height: 100vh; }
-        body.fullscreen .fullscreen-controls { display: flex !important; }
-
-        /* Fullscreen Floating Controls */
-        .fullscreen-controls {
-            display: none;
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 1000;
-            gap: 10px;
-        }
-        .fs-btn {
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid #333;
-            color: #fff;
-            padding: 10px 16px;
-            min-height: 44px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            backdrop-filter: blur(10px);
-        }
-        .fs-btn:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--supply-blue); }
-        .fs-btn.back { border-color: var(--fire-red); }
-        .fs-btn.back:hover { background: var(--fire-red); }
+        /* Pump status chips */
+        .pump-card { border: 1px solid var(--panel-line); border-radius: 9px; padding: 10px 12px; background: rgba(255,255,255,0.02); }
+        .pump-card .pc-tag { font-size: 10px; color: var(--text-faint); font-weight: 700; }
+        .pump-card .pc-name { font-size: 12px; color: #cbd5e1; font-weight: 700; margin: 2px 0 7px; }
+        .pc-state { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; }
+        .pc-state.auto { color: var(--st-normal); background: rgba(52,211,153,0.12); }
+        .pc-state.run  { color: #fff; background: rgba(245,158,11,0.18); border: 1px solid var(--st-warn); }
+        .pc-state.trip { color: #fff; background: rgba(239,68,68,0.2); border: 1px solid var(--st-alarm); }
 
         /* Tooltips */
-        .equipment-tooltip { position: absolute; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--supply-blue); border-radius: 8px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 220px; }
+        .equipment-tooltip { position: absolute; background: rgba(13,19,32,0.98); border: 1px solid var(--st-select); border-radius: 8px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity .15s; box-shadow: 0 4px 20px rgba(0,0,0,0.55); max-width: 240px; }
         .equipment-tooltip.visible { opacity: 1; }
-        .tooltip-title { color: var(--supply-blue); font-weight: bold; font-size: 11px; margin-bottom: 6px; text-transform: uppercase; }
-        .tooltip-row { display: flex; justify-content: space-between; margin: 3px 0; }
-        .tooltip-label { color: #64748b; }
-        .tooltip-value { color: #fff; font-weight: bold; }
+        .tooltip-title { color: var(--st-select); font-weight: 800; font-size: 11px; margin-bottom: 6px; text-transform: uppercase; }
+        .tooltip-row { display: flex; justify-content: space-between; gap: 14px; margin: 3px 0; }
+        .tooltip-label { color: var(--text-dim); }
+        .tooltip-value { color: #fff; font-weight: 700; }
 
-        /* Bottom Status Bar */
-        .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 1px solid #333; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .status-section { display: flex; gap: 16px; align-items: center; }
-        .status-item { display: flex; align-items: center; gap: 6px; font-size: 10px; }
-        .status-led { width: 8px; height: 8px; border-radius: 50%; }
-        .led-green { background: var(--jockey-green); box-shadow: 0 0 6px var(--jockey-green); }
-        .led-yellow { background: var(--n2-yellow); box-shadow: 0 0 6px var(--n2-yellow); }
-        .led-red { background: var(--fire-red); box-shadow: 0 0 6px var(--fire-red); animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        /* Log panel */
+        .log-panel { background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 12px; padding: 14px 18px; }
 
-        /* Log Panel */
-        .log-panel { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 20px; margin-bottom: 60px; }
+        /* Fullscreen */
+        body.fullscreen .no-print { display: none !important; }
+        body.fullscreen .glass-panel.main-svg { border-radius: 0; }
+        body.fullscreen .fullscreen-controls { display: flex !important; }
+        .fullscreen-controls { display: none; position: fixed; top: 15px; right: 15px; z-index: 1000; gap: 10px; }
+        .fs-btn { background: var(--panel-bg); border: 1px solid var(--panel-line); color: #fff; padding: 10px 16px; min-height: 44px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 6px; transition: all .2s; }
+        .fs-btn:hover { background: rgba(30,41,59,0.95); border-color: var(--st-select); }
 
-        /* Mobile Responsive */
+        /* Zoom controls */
+        .zoom-controls { display: flex; gap: 4px; align-items: center; }
+        .zoom-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--panel-line); color: var(--text-dim); padding: 5px 9px; border-radius: 4px; cursor: pointer; font-size: 10px; transition: all .15s; min-height: 30px; }
+        .zoom-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .zoom-btn.active { background: rgba(56,189,248,0.12); border-color: var(--st-select); color: var(--st-select); }
+
+        /* Mobile responsive */
         @media (max-width: 1024px) {
             body { padding: 12px !important; }
-            .main-svg { padding: 16px !important; border-radius: 24px !important; }
+            .main-svg { padding: 16px !important; border-radius: 18px !important; }
+            .layout-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 768px) {
             body { padding: 10px !important; }
-            .main-svg { padding: 12px !important; border-radius: 16px !important; overflow-x: auto !important; }
-            .legend-panel { position: static !important; margin-bottom: 8px; display: inline-flex; gap: 16px; padding: 8px 12px !important; border-radius: 8px !important; }
-            .legend-panel .legend-item { margin: 0; }
-            .status-bar { flex-direction: column; gap: 6px; padding: 6px 12px; }
-            .status-section { flex-wrap: wrap; gap: 8px; }
+            .main-svg { padding: 12px !important; border-radius: 14px !important; overflow-x: auto !important; }
+            .alarm-strip { padding: 8px 12px; }
+            .as-banner { font-size: 12px; }
         }
-
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -216,687 +247,749 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
-    <div id="alarm-overlay" class="fixed inset-0 pointer-events-none z-50 transition-colors duration-500"></div>
-
     <!-- Fullscreen Floating Controls -->
     <div class="fullscreen-controls">
-        <button class="fs-btn" onclick="resetSimulation()"><i class="fas fa-redo"></i> RESET</button>
+        <button class="fs-btn" onclick="resetSimulation()"><i class="fas fa-redo"></i> RESET SIM</button>
         <button class="fs-btn" onclick="toggleFullscreen()"><i class="fas fa-compress"></i> EXIT FULLSCREEN</button>
-        <a href="dc-conventional.html" class="fs-btn back"><i class="fas fa-arrow-left"></i> BACK</a>
-        <a href="index.html" class="fs-btn back"><i class="fas fa-home"></i> PORTFOLIO</a>
+        <a href="dc-conventional.html" class="fs-btn"><i class="fas fa-arrow-left"></i> BACK</a>
+        <a href="index.html" class="fs-btn"><i class="fas fa-home"></i> PORTFOLIO</a>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-4 z-10 no-print">
-        <div class="glass-panel p-3 rounded-2xl border-l-4 border-cyan-500 shadow-xl">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">WUE Efficiency</h3>
-            <p id="kpi-wue" class="text-xl font-black text-cyan-400 font-tech">1.02 <span class="text-[10px] opacity-60">L/kW</span></p>
+    <!-- ===== Header ===== -->
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-3 no-print">
+        <div class="flex items-center gap-3">
+            <h1 class="text-base font-bold text-white tracking-wide">Fire Protection &amp; Suppression — BMS</h1>
+            <span class="text-[10px] text-slate-500 font-tech" id="basis-tag">Basis: IT 1.85 MW</span>
         </div>
-        <div class="glass-panel p-3 rounded-2xl border-l-4 border-emerald-500 shadow-xl">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">OPEX Analysis</h3>
-            <p id="kpi-opex" class="text-xl font-black text-emerald-400 font-tech">Rp 2.450 <span class="text-[10px] opacity-60">/m³</span></p>
-        </div>
-        <div class="glass-panel p-3 rounded-2xl border-l-4 border-yellow-500 shadow-xl">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">N2 Status</h3>
-            <p id="kpi-n2-status" class="text-xl font-black text-yellow-500 font-tech">STANDBY</p>
-        </div>
-        <div class="glass-panel p-3 rounded-2xl border-l-4 border-white shadow-xl">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Header Press</h3>
-            <p class="text-xl font-black text-white font-tech" id="header-press">12.5 <span class="text-[10px] opacity-60">BAR</span></p>
-        </div>
-        <div class="glass-panel p-3 rounded-2xl border-l-4 border-purple-500 shadow-xl">
-            <h3 class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">CO2 Footprint</h3>
-            <p class="text-xl font-black text-purple-400 font-tech">0.85 <span class="text-[10px] opacity-60">kg/m³</span></p>
-        </div>
-        <div class="flex flex-col gap-2">
-            <button onclick="location.href='dc-conventional.html'" class="bg-slate-600 hover:bg-slate-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"><i class="fas fa-arrow-left"></i> BACK</button>
-            <button onclick="location.href='index.html'" class="bg-slate-600 hover:bg-slate-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"><i class="fas fa-home"></i> PORTFOLIO</button>
-            <button onclick="resetSimulation()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-2 rounded-xl transition-all"><i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span></button>
-            <button onclick="window.print()" class="glass-panel text-white text-[10px] font-bold py-2 rounded-xl hover:bg-slate-800 transition-all">EXPORT PDF</button>
-        </div>
-    </div>
-
-    <!-- Control Bar -->
-    <div class="flex flex-wrap justify-between items-center mb-4 gap-3 no-print">
         <div class="flex flex-wrap gap-2 items-center">
-            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen">
-                <i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span>
-            </button>
-            <button onclick="triggerResponse()" class="ctrl-btn" id="btn-trigger" style="border-color: var(--fire-red); color: var(--fire-red);">
-                <i class="fas fa-fire mr-1"></i> TRIGGER FIRE <span class="kbd-hint">F</span>
-            </button>
-        </div>
-        <div class="zoom-controls">
-            <span class="text-slate-500 text-[10px] mr-2">ZOOM:</span>
-            <button onclick="setZoom(0.5)" class="zoom-btn" data-zoom="0.5">50%</button>
-            <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75">75%</button>
-            <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
-            <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
-            <button onclick="fitToScreen()" class="zoom-btn"><i class="fas fa-compress-arrows-alt"></i> FIT</button>
+            <button onclick="location.href='dc-conventional.html'" class="ctrl-btn"><i class="fas fa-arrow-left mr-1"></i> BACK</button>
+            <button onclick="location.href='index.html'" class="ctrl-btn"><i class="fas fa-home mr-1"></i> PORTFOLIO</button>
+            <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen"><i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span></button>
+            <button onclick="window.print()" class="ctrl-btn"><i class="fas fa-file-pdf mr-1"></i> EXPORT PDF</button>
         </div>
     </div>
 
-    <div class="glass-panel main-svg rounded-[45px] p-10 relative border border-slate-800 overflow-hidden shadow-2xl mb-4">
-        <!-- Legend Panel -->
-        <div class="legend-panel no-print">
-            <div class="text-[9px] text-slate-400 font-bold uppercase mb-2 tracking-widest">Flow Legend</div>
-            <div class="legend-item">
-                <div class="legend-line legend-fire"></div>
-                <span class="text-slate-300">Fire / Emergency</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-line legend-supply"></div>
-                <span class="text-slate-300">Water Supply</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-line legend-n2"></div>
-                <span class="text-slate-300">N2 Inerting</span>
+    <!-- ===== Top Alarm Strip (alarm-first, doc-13 / doc-10) ===== -->
+    <div id="alarm-strip" class="alarm-strip state-normal mb-3" role="status" aria-live="polite">
+        <span class="as-banner" id="as-banner" style="color:var(--st-normal)">FIRE SYSTEM NORMAL</span>
+        <span class="as-item"><span class="as-dot ok" id="as-dot-facp"></span>FACP <b id="as-facp">Online</b></span>
+        <span class="as-item"><span class="as-dot ok" id="as-dot-vesda"></span>VESDA <b id="as-vesda">Normal</b></span>
+        <span class="as-item"><span class="as-dot" id="as-dot-crit"></span>Critical <b id="as-crit">0</b></span>
+        <span class="as-item"><span class="as-dot" id="as-dot-sup"></span>Supervisory <b id="as-sup">0</b></span>
+        <span class="as-item"><span class="as-dot" id="as-dot-trbl"></span>Trouble <b id="as-trbl">0</b></span>
+        <span class="as-item">Disabled Pts <b id="as-disabled">0</b></span>
+        <span class="as-item">Tank <b id="as-tank">92% / 105 m³</b></span>
+        <span class="as-item">Static <b id="as-press">12.5 bar</b></span>
+        <span class="as-item">Quality <b id="as-quality">GOOD</b></span>
+        <span class="as-item">Scenario <b id="as-scenario">Simulated</b></span>
+        <span class="as-item">Updated <b id="as-updated">--:--:--</b></span>
+    </div>
+
+    <div class="layout-grid" style="display:grid; grid-template-columns: minmax(0,1fr) 360px; gap: 14px;">
+      <!-- ===== Main process canvas ===== -->
+      <div>
+        <div class="flex flex-wrap justify-between items-center mb-2 gap-2 no-print">
+            <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Fire Water &amp; Inert Gas Process Mimic</div>
+            <div class="zoom-controls">
+                <span class="text-slate-500 text-[10px] mr-1">ZOOM</span>
+                <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75">75%</button>
+                <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
+                <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
+                <button onclick="fitToScreen()" class="zoom-btn"><i class="fas fa-compress-arrows-alt"></i> FIT</button>
             </div>
         </div>
 
-        <!-- Tooltip Container -->
-        <div id="equipment-tooltip" class="equipment-tooltip">
-            <div class="tooltip-title" id="tooltip-title">Equipment</div>
-            <div id="tooltip-content"></div>
-        </div>
+        <div class="glass-panel main-svg rounded-2xl p-6 relative overflow-hidden mb-3">
+            <div id="equipment-tooltip" class="equipment-tooltip">
+                <div class="tooltip-title" id="tooltip-title">Equipment</div>
+                <div id="tooltip-content"></div>
+            </div>
 
-        <svg id="fire-svg" viewBox="0 0 1400 650" class="w-full h-full" style="transition: transform 0.3s;">
-            <defs>
-                <linearGradient id="tankBlue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#1e3a8a" />
-                </linearGradient>
-            </defs>
+            <svg id="fire-svg" viewBox="0 0 1400 660" class="w-full h-full" style="transition: transform 0.3s;" role="img" aria-label="Fire water and inert gas process diagram">
+                <defs>
+                    <linearGradient id="tankWater" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#2563a8" /><stop offset="100%" stop-color="#13315a" />
+                    </linearGradient>
+                </defs>
 
-            <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" />
-            <g transform="translate(130, 280)">
-                <rect id="v-landlord" width="40" height="25" fill="#1e293b" stroke="#00f2ff" rx="2" />
-                <text x="20" y="45" text-anchor="middle" class="fill-slate-500 text-[9px] font-bold uppercase">Landlord Supply</text>
-                <text id="landlord-flow" x="20" y="60" text-anchor="middle" class="fill-cyan-400 text-[10px] font-bold font-tech" style="opacity: 0; transition: opacity 0.3s;">0.0 m³/h</text>
-            </g>
-
-            <g transform="translate(250, 100)" class="tank-overflow">
-                <rect width="300" height="420" fill="#0f172a" stroke="#475569" stroke-width="3" rx="10" />
-                <clipPath id="tankClip"><rect x="3" y="3" width="294" height="414" rx="8" /></clipPath>
-                <g clip-path="url(#tankClip)">
-                    <rect id="tank-water" x="0" y="50" width="300" height="370" fill="url(#tankBlue)" class="liquid-anim" />
+                <!-- Landlord make-up supply -->
+                <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" />
+                <g transform="translate(110, 268)">
+                    <rect id="v-landlord" width="40" height="25" fill="#16203a" stroke="#475569" rx="2" />
+                    <text x="20" y="44" text-anchor="middle" class="eq-tag">TK-FW-01 Make-up</text>
+                    <text id="landlord-flow" x="20" y="58" text-anchor="middle" class="font-tech" fill="#38bdf8" font-size="10" font-weight="bold" style="opacity:0; transition:opacity .3s;">0.0 m³/h</text>
                 </g>
-                <text x="150" y="-18" text-anchor="middle" class="fill-slate-400 font-black text-[11px] uppercase tracking-widest">RC FIRE TANK (114m³)</text>
-                <text id="tank-level-txt" x="150" y="240" text-anchor="middle" class="text-7xl font-black fill-white/10 font-tech">92%</text>
-            </g>
 
-            <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" />
+                <!-- Fire reserve tank -->
+                <g transform="translate(250, 100)">
+                    <rect width="300" height="420" fill="#0c1424" stroke="#475569" stroke-width="3" rx="10" />
+                    <clipPath id="tankClip"><rect x="3" y="3" width="294" height="414" rx="8" /></clipPath>
+                    <g clip-path="url(#tankClip)">
+                        <rect id="tank-water" x="0" y="50" width="300" height="370" fill="url(#tankWater)" class="liquid-anim" />
+                    </g>
+                    <!-- low / low-low alarm reference lines -->
+                    <line x1="0" y1="124" x2="300" y2="124" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
+                    <text x="296" y="119" text-anchor="end" fill="#f59e0b" font-size="8" font-weight="bold">LOW 80%</text>
+                    <line x1="0" y1="198" x2="300" y2="198" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
+                    <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="8" font-weight="bold">LOW-LOW 60%</text>
+                    <text x="150" y="-30" text-anchor="middle" class="eq-name" font-size="11">TK-FW-01 · Fire Reserve Tank</text>
+                    <text x="150" y="-15" text-anchor="middle" class="eq-tag">Capacity 114 m³ · Required duration ≥ 60 min</text>
+                    <text id="tank-level-txt" x="150" y="225" text-anchor="middle" fill="#cbd5e1" font-size="40" font-weight="800" class="font-tech">92%</text>
+                    <text id="tank-vol-txt" x="150" y="252" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700" class="font-tech">105 m³ / 114 m³</text>
+                    <text id="tank-dur-txt" x="150" y="274" text-anchor="middle" fill="#64748b" font-size="11" class="font-tech">Duration ≈ 0 min</text>
+                </g>
 
-            <g transform="translate(750, 150)" id="grp-main1">
-                <circle r="40" fill="#020617" stroke="#3b82f6" stroke-width="2" id="node-m1" />
-                <g id="spin-m1" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#3b82f6" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#3b82f6" stroke-width="4" /></g>
-                <text x="55" y="-15" class="fill-slate-400 text-[11px] font-black uppercase">Pompa Main 1</text>
-            </g>
+                <!-- Suction header -->
+                <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" />
+                <rect class="pipe-label-box" x="585" y="388" width="74" height="16" rx="3" />
+                <text x="622" y="400" text-anchor="middle" class="pipe-label">SUCTION HDR</text>
 
-            <g transform="translate(750, 400)" id="grp-jockey">
-                <circle r="25" fill="#020617" stroke="#3dfc16" stroke-width="2" id="node-j" />
-                <g id="spin-j" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#3dfc16" stroke-width="3" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#3dfc16" stroke-width="3" /></g>
-                <text x="45" y="-12" class="fill-slate-400 text-[11px] font-black uppercase">Pompa Jockey</text>
-            </g>
+                <!-- Main fire pump 1 -->
+                <g transform="translate(750, 150)" id="grp-main1" tabindex="0" role="button" aria-label="Main Fire Pump 1 FP-01">
+                    <circle r="40" fill="#020a16" stroke="#475569" stroke-width="2" id="node-m1" />
+                    <g id="spin-m1" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#64748b" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#64748b" stroke-width="4" /></g>
+                    <circle id="led-m1" cx="0" cy="-52" r="6" fill="#34d399" />
+                    <text x="55" y="-12" class="eq-name">Main Fire Pump 1</text>
+                    <text x="55" y="2" class="eq-tag">FP-01 · electric · AUTO</text>
+                </g>
 
-            <g transform="translate(750, 540)" id="grp-main2">
-                <circle r="40" fill="#020617" stroke="#3b82f6" stroke-width="2" id="node-m2" />
-                <g id="spin-m2" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#3b82f6" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#3b82f6" stroke-width="4" /></g>
-                <text x="55" y="-15" class="fill-slate-400 text-[11px] font-black uppercase">Pompa Main 2</text>
-            </g>
+                <!-- Jockey pump -->
+                <g transform="translate(750, 400)" id="grp-jockey" tabindex="0" role="button" aria-label="Jockey Pump JP-01">
+                    <circle r="25" fill="#020a16" stroke="#475569" stroke-width="2" id="node-j" />
+                    <g id="spin-j" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="3" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="3" /></g>
+                    <circle id="led-j" cx="0" cy="-37" r="5" fill="#34d399" />
+                    <text x="42" y="-10" class="eq-name">Jockey Pump</text>
+                    <text x="42" y="3" class="eq-tag">JP-01 · pressure maintain · AUTO</text>
+                </g>
 
-            <g transform="translate(850, 560)">
-                <rect width="145" height="75" fill="#1e293b" stroke="#fde047" rx="5" />
-                <circle cx="30" cy="38" r="20" fill="#020617" stroke="#fde047" id="node-n2" />
-                <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#fde047" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#fde047" stroke-width="2" /></g>
-                <text x="60" y="30" class="fill-yellow-400 font-black text-[10px] uppercase">N2 GENERATOR</text>
-                <text x="60" y="45" class="fill-slate-500 text-[8px]">N2-GEN-UNIT-01</text>
-                <text x="60" y="58" class="fill-slate-400 text-[9px] font-bold">PRESS: 2.4 BAR</text>
-                <path id="path-n2" d="M 67 0 L 67 -210 L 350 -210" class="pipe-base" transform="translate(850, 560)" />
-            </g>
+                <!-- Main fire pump 2 (diesel standby) -->
+                <g transform="translate(750, 540)" id="grp-main2" tabindex="0" role="button" aria-label="Main Fire Pump 2 FP-02 diesel standby">
+                    <circle r="40" fill="#020a16" stroke="#475569" stroke-width="2" id="node-m2" />
+                    <g id="spin-m2" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#64748b" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#64748b" stroke-width="4" /></g>
+                    <circle id="led-m2" cx="0" cy="-52" r="6" fill="#34d399" />
+                    <text x="55" y="-12" class="eq-name">Main Fire Pump 2</text>
+                    <text x="55" y="2" class="eq-tag">FP-02 · diesel · STANDBY</text>
+                </g>
 
-            <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" />
-            <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" />
-            <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" />
+                <!-- N2 / inert gas generator -->
+                <g transform="translate(845, 558)" id="grp-n2" tabindex="0" role="button" aria-label="Inert gas generator N2-GEN-01">
+                    <rect width="150" height="76" fill="#16203a" stroke="#475569" rx="5" />
+                    <circle cx="30" cy="38" r="20" fill="#020a16" stroke="#475569" id="node-n2" />
+                    <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="2" /></g>
+                    <text x="60" y="26" fill="#cbd5e1" font-size="10" font-weight="800">N2 INERT GEN</text>
+                    <text x="60" y="40" class="eq-tag">N2-GEN-01</text>
+                    <text x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold">Hdr 2.4 bar · STANDBY</text>
+                </g>
+                <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" />
 
-            <g transform="translate(1020, 375)">
-                <rect width="50" height="30" fill="#1e293b" stroke="#94a3b8" />
-                <circle cx="85" cy="15" r="22" fill="#0f172a" stroke="#fff" />
-                <line id="gauge-pin" x1="85" y1="15" x2="85" y2="0" stroke="red" stroke-width="3" style="transform-origin: 85px 15px; transform: rotate(45deg); transition: 0.5s;" />
-                <text id="flow-val" x="85" y="75" text-anchor="middle" class="fill-white text-[12px] font-tech font-bold">0.0 m³/h</text>
-            </g>
+                <!-- Discharge headers -->
+                <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" />
+                <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" />
+                <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" />
+                <rect class="pipe-label-box" x="1052" y="392" width="86" height="16" rx="3" />
+                <text x="1095" y="404" text-anchor="middle" class="pipe-label">DISCHARGE HDR</text>
 
-            <path id="path-to-wet" d="M 1150 400 L 1150 100 L 1200 100" class="pipe-base" />
-            <path id="path-to-pre" d="M 1150 400 L 1150 540 L 1200 540" class="pipe-base" />
+                <!-- Discharge pressure gauge -->
+                <g transform="translate(1018, 360)" id="grp-gauge" tabindex="0" role="button" aria-label="Discharge header pressure and flow">
+                    <rect width="46" height="28" fill="#16203a" stroke="#475569" />
+                    <circle cx="84" cy="14" r="22" fill="#0c1424" stroke="#64748b" />
+                    <line id="gauge-pin" x1="84" y1="14" x2="84" y2="-2" stroke="#cbd5e1" stroke-width="3" style="transform-origin:84px 14px; transform:rotate(45deg); transition:.5s;" />
+                    <text x="84" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="bold">Header flow</text>
+                    <text id="flow-val" x="84" y="74" text-anchor="middle" fill="#cbd5e1" font-size="12" class="font-tech" font-weight="bold">0.0 m³/h</text>
+                </g>
 
-            <g transform="translate(1200, 50)">
-                <rect id="wv-1" x="0" y="0" width="45" height="70" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="22.5" y="35" text-anchor="middle" class="valve-label">WAV-01</text>
-                <rect id="wv-2" x="55" y="0" width="45" height="70" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="77.5" y="35" text-anchor="middle" class="valve-label">WAV-02</text>
-                <rect id="wv-3" x="110" y="0" width="45" height="70" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="132.5" y="35" text-anchor="middle" class="valve-label">WAV-03</text>
-            </g>
+                <path id="path-to-wet" d="M 1150 400 L 1150 110 L 1200 110" class="pipe-base" />
+                <path id="path-to-pre" d="M 1150 400 L 1150 520 L 1200 520" class="pipe-base" />
 
-            <!-- N2 Distribution Header to PACV -->
-            <path id="path-n2-header" d="M 1200 350 L 1400 350" class="pipe-base" />
-            <path id="path-n2-pv1" d="M 1217 350 L 1217 500" class="pipe-base" />
-            <path id="path-n2-pv2" d="M 1262 350 L 1262 500" class="pipe-base" />
-            <path id="path-n2-pv3" d="M 1307 350 L 1307 500" class="pipe-base" />
-            <path id="path-n2-pv4" d="M 1352 350 L 1352 500" class="pipe-base" />
-            <path id="path-n2-pv5" d="M 1397 350 L 1397 500" class="pipe-base" />
+                <!-- Wet alarm / zone control valves -->
+                <g transform="translate(1200, 70)">
+                    <text x="80" y="-12" text-anchor="middle" class="eq-tag">Wet-Pipe Zone Valves (sprinkler)</text>
+                    <rect id="wv-1" x="0" y="0" width="48" height="64" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="24" y="36" text-anchor="middle" class="valve-label">WAV-01</text>
+                    <rect id="wv-2" x="58" y="0" width="48" height="64" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="82" y="36" text-anchor="middle" class="valve-label">WAV-02</text>
+                    <rect id="wv-3" x="116" y="0" width="48" height="64" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="140" y="36" text-anchor="middle" class="valve-label">WAV-03</text>
+                </g>
 
-            <g transform="translate(1200, 500)">
-                <rect id="pv-1" x="0" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="17.5" y="30" text-anchor="middle" class="valve-label">PACV-01</text>
-                <rect id="pv-2" x="45" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="62.5" y="30" text-anchor="middle" class="valve-label">PACV-02</text>
-                <rect id="pv-3" x="90" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="107.5" y="30" text-anchor="middle" class="valve-label">PACV-03</text>
-                <rect id="pv-4" x="135" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="152.5" y="30" text-anchor="middle" class="valve-label">PACV-04</text>
-                <rect id="pv-5" x="180" y="0" width="35" height="60" fill="#1e293b" stroke="#475569" rx="4" />
-                <text x="197.5" y="30" text-anchor="middle" class="valve-label">PACV-05</text>
-            </g>
+                <!-- N2 distribution header to pre-action zone valves -->
+                <path id="path-n2-header" d="M 1200 348 L 1400 348" class="pipe-base" />
+                <path id="path-n2-pv1" d="M 1218 348 L 1218 480" class="pipe-base" />
+                <path id="path-n2-pv2" d="M 1262 348 L 1262 480" class="pipe-base" />
+                <path id="path-n2-pv3" d="M 1306 348 L 1306 480" class="pipe-base" />
+                <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" />
+                <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" />
 
-            <g transform="translate(1180, 260)" onclick="triggerResponse()" class="cursor-pointer">
-                <rect width="180" height="90" rx="25" fill="#7f1d1d" stroke="#ef4444" stroke-width="2" />
-                <text x="90" y="52" text-anchor="middle" class="fill-white font-black uppercase text-[13px] animate-pulse">Break Sprinkler</text>
-            </g>
-        </svg>
-
-    </div>
-
-    <!-- System Log Panel -->
-    <div class="log-panel glass-panel border-l-4 border-slate-700">
-        <h3 class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-2">
-            <i class="fas fa-terminal mr-1"></i> System Log
-        </h3>
-        <div id="log-view" class="h-36 overflow-y-auto space-y-1 text-[11px] font-tech pr-2 leading-relaxed">
-            <p class="text-emerald-500/70 border-b border-emerald-500/10 pb-1">System healthy. Static pressure stable at 12.5 BAR.</p>
+                <g transform="translate(1200, 480)">
+                    <text x="100" y="-12" text-anchor="middle" class="eq-tag">Pre-Action Zone Valves (data hall)</text>
+                    <rect id="pv-1" x="0"   y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="18"  y="34" text-anchor="middle" class="valve-label">PACV-01</text>
+                    <rect id="pv-2" x="44"  y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="62"  y="34" text-anchor="middle" class="valve-label">PACV-02</text>
+                    <rect id="pv-3" x="88"  y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="106" y="34" text-anchor="middle" class="valve-label">PACV-03</text>
+                    <rect id="pv-4" x="132" y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="150" y="34" text-anchor="middle" class="valve-label">PACV-04</text>
+                    <rect id="pv-5" x="176" y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
+                    <text x="194" y="34" text-anchor="middle" class="valve-label">PACV-05</text>
+                </g>
+            </svg>
         </div>
-    </div>
 
-    <!-- Bottom Status Bar -->
-    <div class="status-bar no-print">
-        <div class="status-section">
-            <div class="status-item">
-                <div class="status-led led-green" id="led-system"></div>
-                <span class="text-slate-400">SYSTEM:</span>
-                <span class="text-white font-bold" id="status-system">NORMAL</span>
-            </div>
-            <div class="status-item">
-                <div class="status-led led-green" id="led-tank"></div>
-                <span class="text-slate-400">TANK:</span>
-                <span class="text-white font-bold" id="status-tank">92%</span>
-            </div>
-            <div class="status-item">
-                <div class="status-led led-green" id="led-pressure"></div>
-                <span class="text-slate-400">PRESSURE:</span>
-                <span class="text-white font-bold" id="status-pressure">12.5 BAR</span>
+        <!-- ===== Gated simulation control (replaces TRIGGER FIRE; doc-05 §1) ===== -->
+        <div class="sim-panel mb-3 no-print" data-sim-control aria-label="Fire event simulation controls">
+            <span class="sim-badge" id="sim-mode-badge">SIMULATION MODE: OFF</span>
+            <span class="text-[11px] text-slate-400">Demo / training only — not connected to a real FACP. Arm first, then run a staged fire scenario.</span>
+            <div class="flex gap-2 flex-wrap">
+                <button class="sim-btn arm" id="btn-arm" onclick="toggleSimArm()">ARM SIMULATION</button>
+                <button class="sim-btn" id="btn-sim-fire" onclick="confirmSimFire()" disabled><i class="fas fa-flask mr-1"></i> SIMULATE FIRE EVENT</button>
+                <button class="ctrl-btn" onclick="resetSimulation()"><i class="fas fa-redo mr-1"></i> RESET <span class="kbd-hint">R</span></button>
             </div>
         </div>
-        <div class="status-section">
-            <div class="status-item">
-                <span class="text-slate-500">UPTIME:</span>
-                <span class="text-cyan-400 font-bold" id="status-uptime">00:00:00</span>
-            </div>
-            <div class="status-item">
-                <span class="text-slate-500">LAST UPDATE:</span>
-                <span class="text-slate-300" id="status-time">--:--:--</span>
+      </div>
+
+      <!-- ===== Right inspector column ===== -->
+      <div class="flex flex-col gap-3">
+        <!-- Cause-effect matrix -->
+        <div class="panel">
+            <div class="panel-title">Fire Cause &amp; Effect Matrix</div>
+            <div id="ce-matrix"></div>
+        </div>
+
+        <!-- Fire pump status -->
+        <div class="panel">
+            <div class="panel-title">Fire Pump Set</div>
+            <div class="grid grid-cols-1 gap-2" id="pump-cards"></div>
+            <div class="mt-3" style="border-top:1px solid var(--panel-line); padding-top:8px;">
+                <div class="metric-row"><span class="metric-label">Static pressure (actual)</span><span class="metric-val" id="m-static">12.5 bar</span></div>
+                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val">11.5 / 12.8 bar</span></div>
+                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val">10.5 / 9.5 bar</span></div>
+                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val">8.5 bar</span></div>
+                <div class="metric-row"><span class="metric-label">Controller power / supervisory</span><span class="metric-val" id="m-ctrl-pwr">Healthy</span></div>
             </div>
         </div>
+
+        <!-- Water reserve & duration -->
+        <div class="panel">
+            <div class="panel-title">Water Reserve &amp; Demand</div>
+            <div class="metric-row"><span class="metric-label">Tank level</span><span class="metric-val" id="m-tank-pct">92%</span></div>
+            <div class="metric-row"><span class="metric-label">Available volume</span><span class="metric-val" id="m-tank-vol">105 m³ / 114 m³</span></div>
+            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val">2,500 L/min</span></div>
+            <div class="metric-row"><span class="metric-label">Available duration</span><span class="metric-val" id="m-duration">— min</span></div>
+            <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val" id="m-it-basis">1.85 MW</span></div>
+            <div class="metric-row"><span class="metric-label">Protected hall volume</span><span class="metric-val" id="m-hall-vol">— m³</span></div>
+            <div class="metric-row"><span class="metric-label">Pre-action zones</span><span class="metric-val" id="m-zones">5 zones · all Normal</span></div>
+            <p class="metric-sub mt-2">Duration = available litres ÷ fire-pump demand. Suppression release quantities are <b>preliminary</b> pending hydraulic calc.</p>
+        </div>
+
+        <!-- Alarm log -->
+        <div class="panel log-panel">
+            <div class="panel-title"><i class="fas fa-terminal mr-1"></i> Alarm &amp; Event Log</div>
+            <div id="log-view" class="overflow-y-auto space-y-1 text-[11px] font-tech pr-1 leading-relaxed" style="max-height:160px;">
+                <p style="color:rgba(52,211,153,0.8)">System healthy · 0 active / 0 unack · static pressure stable 12.5 bar · FACP comms OK.</p>
+            </div>
+        </div>
+      </div>
     </div>
 
     <script>
-        const logs = document.getElementById('log-view');
-        const pressTxt = document.getElementById('header-press');
-        const tankWater = document.getElementById('tank-water');
-        const tankTxt = document.getElementById('tank-level-txt');
-        const flowTxt = document.getElementById('flow-val');
-        const pin = document.getElementById('gauge-pin');
-        const overlay = document.getElementById('alarm-overlay');
-        const n2Kpi = document.getElementById('kpi-n2-status');
-        const n2Imp = document.getElementById('spin-n2');
-        const n2Path = document.getElementById('path-n2');
-        const wueKpi = document.getElementById('kpi-wue');
-        const opexKpi = document.getElementById('kpi-opex');
-        const landlordFlow = document.getElementById('landlord-flow');
-        const fireSvg = document.getElementById('fire-svg');
-        const tooltip = document.getElementById('equipment-tooltip');
-        const tooltipTitle = document.getElementById('tooltip-title');
-        const tooltipContent = document.getElementById('tooltip-content');
+    (function () {
+        'use strict';
 
-        let press = 12.5;
-        let tank = 92;
-        let running = false;
-        let landlordSupplyActive = false;
-        let landlordFlowRate = 0;
-        let currentZoom = 1;
-        let simInterval = null;
-        let uptimeSeconds = 0;
+        /* ====================================================================
+         * Fire System — deterministic, rule-based, engine-bound.
+         * Single basis: window.CONV_CALC.snapshot (js/conv-engine.js).
+         * NO Math.random anywhere. Alarm state is derived ONLY from the staged
+         * cause-effect rule machine (stage 0..5), never from a PRNG. Pump run/
+         * valve-open/flow values follow deterministic stage rules.
+         * Basis doc: conv/review/05-fire-system-review.md, 09-, 10-, 13-.
+         * ================================================================== */
 
-        // Base values
-        const baseWUE = 1.02;
-        const baseOPEX = 2450;
+        var S = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
 
-        // Equipment specs for tooltips
-        const equipmentSpecs = {
-            'grp-main1': {
-                title: 'Pompa Main 1 (P-01)',
-                specs: [
-                    { label: 'Capacity', value: '227 m³/h' },
-                    { label: 'Head', value: '120m' },
-                    { label: 'Power', value: '75 kW' },
-                    { label: 'Type', value: 'Centrifugal' },
-                    { label: 'Status', value: 'STANDBY' }
-                ]
-            },
-            'grp-main2': {
-                title: 'Pompa Main 2 (P-02)',
-                specs: [
-                    { label: 'Capacity', value: '227 m³/h' },
-                    { label: 'Head', value: '120m' },
-                    { label: 'Power', value: '75 kW' },
-                    { label: 'Type', value: 'Centrifugal' },
-                    { label: 'Status', value: 'STANDBY' }
-                ]
-            },
-            'grp-jockey': {
-                title: 'Pompa Jockey (JP-01)',
-                specs: [
-                    { label: 'Capacity', value: '18 m³/h' },
-                    { label: 'Head', value: '140m' },
-                    { label: 'Power', value: '5.5 kW' },
-                    { label: 'Type', value: 'Multi-stage' },
-                    { label: 'Function', value: 'Pressure maintain' }
-                ]
-            }
+        /* ---- Engineering bindings derived from the single basis -------------
+         * The fire reserve serves the data hall the engine describes
+         * (IT 1.85 MW). Protected hall volume and pre-action zone count are
+         * derived deterministically from the engine's rack basis so they stay
+         * consistent with the rest of the conventional suite.
+         */
+        var IT_LOAD_KW   = S ? S.site.it_load_kw : 1850;          // 1850
+        var IT_LOAD_MW   = IT_LOAD_KW / 1000;                     // 1.85
+        var RACKS        = S ? S.racks.at_8kw : 231;              // 231 racks @ 8 kW/rack basis
+        // Protected white-space volume: racks * footprint(1.2 m2) * 3.0 m clear height
+        var HALL_VOL_M3  = Math.round(RACKS * 1.2 * 3.0);         // deterministic from basis
+        var ZONE_COUNT   = 5;                                     // 5 pre-action zones (PACV-01..05)
+
+        // Fire reserve tank (fixed civil capacity) + thresholds
+        var TANK_CAP_M3   = 114;
+        var TANK_LOW_PCT  = 80;   // low alarm
+        var TANK_LL_PCT   = 60;   // low-low alarm
+        var PUMP_DEMAND_LPM = 2500;
+
+        // Pressure setpoints (bar) — shown explicitly per doc-05 §Pressure Thresholds
+        var P_STATIC   = 12.5;
+        var P_JOCKEY_ON = 11.5, P_JOCKEY_OFF = 12.8;
+        var P_FP1_ON   = 10.5,  P_FP2_ON = 9.5;
+        var P_LOW_ALM  = 8.5;
+
+        // ---- DOM refs ----
+        var $ = function (id) { return document.getElementById(id); };
+        var fireSvg = $('fire-svg');
+        var tankWater = $('tank-water');
+        var tankTxt = $('tank-level-txt'), tankVolTxt = $('tank-vol-txt'), tankDurTxt = $('tank-dur-txt');
+        var flowTxt = $('flow-val'), pin = $('gauge-pin');
+        var landlordFlow = $('landlord-flow');
+        var tooltip = $('equipment-tooltip'), tooltipTitle = $('tooltip-title'), tooltipContent = $('tooltip-content');
+        var logs = $('log-view');
+
+        // ---- Deterministic system state (no PRNG) ----
+        var state = {
+            stage: 0,            // 0 Normal · 1 VESDA Alert · 2 Smoke Detector · 3 Confirmed · 4 Suppression Armed · 5 Discharge
+            armed: false,        // simulation must be ARMED + confirmed before staging
+            press: P_STATIC,
+            tankPct: 92,
+            timer: null,
+            countdown: 0
         };
 
-        // Zoom Functions
-        function setZoom(level) {
-            currentZoom = level;
-            fireSvg.style.transform = 'scale(' + level + ')';
-            fireSvg.style.transformOrigin = 'center center';
-            document.querySelectorAll('.zoom-btn').forEach(function(btn) {
-                btn.classList.remove('active');
-                if (btn.dataset.zoom == level) btn.classList.add('active');
-            });
+        // ---- Cause & effect matrix definition (doc-05 §2 / doc-13) ----
+        var CE = [
+            { s: 0, name: 'Stage 0 — Normal',                  fx: 'All quiescent. Jockey holds 12.5 bar. FACP & VESDA supervised.' },
+            { s: 1, name: 'Stage 1 — VESDA Alert',             fx: 'Aspirating smoke alert. Warning only. Operator investigate, no output.' },
+            { s: 2, name: 'Stage 2 — VESDA Action / Smoke',    fx: 'Smoke detector alarm. 1st-stage sounder. Pre-alarm to BMS.' },
+            { s: 3, name: 'Stage 3 — Confirmed Fire (2 zones)',fx: 'Cross-zone confirmed → AHU/CRAH shutdown + fire damper close + pre-action valve charge.' },
+            { s: 4, name: 'Stage 4 — Suppression Armed',       fx: 'Release circuit armed. Countdown active. Manual ABORT station live. Fire pumps to AUTO-run on pressure drop.' },
+            { s: 5, name: 'Stage 5 — Discharge / Lockout',     fx: 'Inert gas / pre-action discharge. Hold time. Post-discharge lockout until manual reset.' }
+        ];
+
+        function renderCE() {
+            var html = '';
+            for (var i = 0; i < CE.length; i++) {
+                var row = CE[i];
+                var cls = 'ce-row';
+                // Stage 0 highlighted GREEN (is-normal) only while system is Normal.
+                if (row.s === 0 && state.stage === 0) cls += ' is-normal';
+                // Stages 1..N: rule-based active highlight when reached. Stage 4
+                // is the "armed" amber state; once discharge (5) it goes active.
+                if (row.s >= 1 && row.s <= state.stage) {
+                    if (row.s === 4 && state.stage === 4) cls += ' is-armed';
+                    else cls += ' is-active';
+                }
+                html += '<div class="' + cls + '"><div class="ce-stage">' + row.s +
+                        '</div><div><div class="ce-name">' + row.name +
+                        '</div><div class="ce-effect">' + row.fx + '</div></div></div>';
+            }
+            $('ce-matrix').innerHTML = html;
         }
 
-        function fitToScreen() {
-            setZoom(1);
-            document.querySelectorAll('.zoom-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        // ---- Fire pump cards (auto / run / trip — doc-05 §3) ----
+        function pumpCardHTML(tag, name, st, sub) {
+            var cls = st === 'RUN' ? 'run' : (st === 'TRIP' ? 'trip' : 'auto');
+            var label = st === 'RUN' ? 'RUNNING' : (st === 'TRIP' ? 'TRIP' : 'AUTO · STANDBY');
+            return '<div class="pump-card"><div class="pc-tag">' + tag + '</div><div class="pc-name">' + name +
+                   '</div><span class="pc-state ' + cls + '">' + label + '</span>' +
+                   '<div class="metric-sub" style="margin-top:6px">' + sub + '</div></div>';
+        }
+        function renderPumps() {
+            var jSt = state.stage >= 3 && state.press <= P_JOCKEY_ON ? 'RUN' : 'AUTO';
+            var m1St = state.stage >= 3 && state.press <= P_FP1_ON ? 'RUN' : 'AUTO';
+            var m2St = state.stage >= 4 && state.press <= P_FP2_ON ? 'RUN' : 'AUTO';
+            $('pump-cards').innerHTML =
+                pumpCardHTML('JP-01', 'Jockey Pump · 18 m³/h · 5.5 kW',
+                    jSt, 'Start ' + P_JOCKEY_ON + ' bar · stop ' + P_JOCKEY_OFF + ' bar · flow switch ' + (jSt === 'RUN' ? 'PROVEN' : 'idle')) +
+                pumpCardHTML('FP-01', 'Main Fire Pump 1 · electric · 227 m³/h · 75 kW',
+                    m1St, 'Start ' + P_FP1_ON + ' bar · controller power healthy · phase OK') +
+                pumpCardHTML('FP-02', 'Main Fire Pump 2 · diesel · 227 m³/h',
+                    m2St, 'Start ' + P_FP2_ON + ' bar · battery charger OK · fuel 88% · engine ' + (m2St === 'RUN' ? 'CRANKED' : 'standby'));
         }
 
-        // Fullscreen Toggle
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function(err) {
-                    console.log('Fullscreen error:', err);
-                });
-                document.body.classList.add('fullscreen');
-                document.getElementById('btn-fullscreen').classList.add('active');
+        // ---- Tank UI bound to current tank %, with engine-derived volume ----
+        function volM3(pct) { return TANK_CAP_M3 * pct / 100; }
+        function durationMin(pct) {
+            var litres = volM3(pct) * 1000;
+            return Math.round(litres / PUMP_DEMAND_LPM);
+        }
+        function updateTankUI() {
+            var pct = state.tankPct;
+            var h = (pct / 100) * 370;
+            tankWater.setAttribute('height', h);
+            tankWater.setAttribute('y', 50 + (370 - h));
+            tankTxt.textContent = Math.round(pct) + '%';
+            var vol = volM3(pct);
+            tankVolTxt.textContent = vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³';
+            tankDurTxt.textContent = 'Duration ≈ ' + durationMin(pct) + ' min';
+            // tank water colour reflects level alarm (red ONLY when low-low)
+            if (pct <= TANK_LL_PCT) tankWater.setAttribute('fill', 'var(--st-alarm)');
+            else tankWater.setAttribute('fill', 'url(#tankWater)');
+
+            $('m-tank-pct').textContent = Math.round(pct) + '%';
+            $('m-tank-vol').textContent = vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³';
+            var dEl = $('m-duration');
+            dEl.textContent = durationMin(pct) + ' min';
+            dEl.className = 'metric-val' + (pct <= TANK_LL_PCT ? ' alarm' : (pct <= TANK_LOW_PCT ? ' warn' : ''));
+
+            // make-up supply (deterministic): engages only when below LOW threshold
+            var v = $('v-landlord'), p = $('path-landlord');
+            if (pct <= TANK_LOW_PCT) {
+                v.style.fill = 'rgba(56,189,248,0.18)';
+                v.style.stroke = 'var(--supply-blue)';
+                p.classList.add('flow-supply');
+                // deterministic make-up rate proportional to deficit (no PRNG)
+                var rate = 8 + (TANK_LOW_PCT - pct) * 0.6;
+                landlordFlow.textContent = rate.toFixed(1) + ' m³/h';
+                landlordFlow.style.opacity = '1';
             } else {
-                document.exitFullscreen();
-                document.body.classList.remove('fullscreen');
-                document.getElementById('btn-fullscreen').classList.remove('active');
+                v.style.fill = '#16203a';
+                v.style.stroke = '#475569';
+                p.classList.remove('flow-supply');
+                landlordFlow.style.opacity = '0';
             }
         }
 
-        // Reset Simulation (without page reload)
-        function resetSimulation() {
-            if (simInterval) {
-                clearInterval(simInterval);
-                simInterval = null;
-            }
-
-            running = false;
-            press = 12.5;
-            tank = 92;
-
-            // Reset UI
-            pressTxt.innerText = press.toFixed(1) + " BAR";
-            updateTankUI(tank);
-            flowTxt.textContent = "0.0 m³/h";
-            pin.style.transform = 'rotate(45deg)';
-
-            // Reset overlay
-            overlay.classList.remove('emergency-blink');
-
-            // Reset N2
-            n2Kpi.textContent = "STANDBY";
-            n2Kpi.style.color = "#fde047";
-            n2Imp.classList.remove('spinning');
-            n2Path.classList.remove('flow-n2');
-
-            // Reset pumps
-            var nodeJ = document.getElementById('node-j');
-            nodeJ.classList.remove('active-j');
-            nodeJ.style.stroke = "#3dfc16";
-            nodeJ.style.filter = "";
-            document.getElementById('spin-j').classList.remove('spinning');
-
-            var nodeM1 = document.getElementById('node-m1');
-            nodeM1.classList.remove('active-m1');
-            nodeM1.style.stroke = "#3b82f6";
-            nodeM1.style.filter = "";
-            document.getElementById('spin-m1').classList.remove('spinning');
-
-            var nodeM2 = document.getElementById('node-m2');
-            nodeM2.classList.remove('active-m2');
-            nodeM2.style.stroke = "#3b82f6";
-            nodeM2.style.filter = "";
-            document.getElementById('spin-m2').classList.remove('spinning');
-
-            // Reset flow paths
-            document.getElementById('path-j-discharge').classList.remove('flow-fire');
-            document.getElementById('path-discharge').classList.remove('flow-fire');
-            document.getElementById('path-to-wet').classList.remove('flow-fire');
-            document.getElementById('path-to-pre').classList.remove('flow-fire');
-            document.getElementById('path-suction').classList.remove('flow-fire');
-
-            // Reset valves
-            document.getElementById('wv-1').style.fill = "#1e293b";
-            document.getElementById('pv-1').style.fill = "#1e293b";
-
-            // Reset landlord supply
-            var vLandlord = document.getElementById('v-landlord');
-            vLandlord.style.fill = "#1e293b";
-            document.getElementById('path-landlord').classList.remove('flow-supply');
-            updateLandlordMetrics(false, 0);
-
-            // Update status bar
-            updateStatusBar('NORMAL', 'green');
-
-            // Log reset
-            addLog('SYSTEM RESET - All parameters restored to normal', 'info');
-
-            // Restart N2 duty cycle
-            setTimeout(n2DutyCycle, 2000);
+        // ---- Gauge / header readout ----
+        function updateGauge() {
+            // 0 bar -> -90deg, 12.5 bar -> +45deg (deterministic mapping)
+            var angle = -90 + (state.press / P_STATIC) * 135;
+            pin.style.transform = 'rotate(' + angle + 'deg)';
+            $('m-static').textContent = state.press.toFixed(1) + ' bar';
+            $('m-static').className = 'metric-val' + (state.press <= P_LOW_ALM ? ' alarm' : (state.press <= P_JOCKEY_ON ? ' warn' : ''));
+            $('as-press').textContent = state.press.toFixed(1) + ' bar';
         }
 
-        // Status Bar Updates
-        function updateStatusBar(status, level) {
-            var ledSystem = document.getElementById('led-system');
-            var statusSystem = document.getElementById('status-system');
+        // ---- Flow paths (deterministic per stage) ----
+        var firePaths = ['path-suction', 'path-discharge', 'path-j-discharge', 'path-m2-discharge', 'path-to-wet', 'path-to-pre'];
+        var n2Paths = ['path-n2', 'path-n2-header', 'path-n2-pv1', 'path-n2-pv2', 'path-n2-pv3', 'path-n2-pv4', 'path-n2-pv5'];
+        var pacv = ['pv-1', 'pv-2', 'pv-3', 'pv-4', 'pv-5'];
+        var wav = ['wv-1', 'wv-2', 'wv-3'];
 
-            statusSystem.textContent = status;
-            ledSystem.className = 'status-led';
-
-            if (level === 'green') {
-                ledSystem.classList.add('led-green');
-                statusSystem.style.color = '#3dfc16';
-            } else if (level === 'yellow') {
-                ledSystem.classList.add('led-yellow');
-                statusSystem.style.color = '#fde047';
-            } else if (level === 'red') {
-                ledSystem.classList.add('led-red');
-                statusSystem.style.color = '#ff0000';
+        function setPump(node, spin, led, on, alarm) {
+            var n = $(node), sp = $(spin), l = $(led);
+            if (on) {
+                sp.classList.add('spinning');
+                n.style.stroke = alarm ? 'var(--st-alarm)' : 'var(--st-warn)';
+                n.setAttribute('filter', alarm ? 'drop-shadow(0 0 8px var(--st-alarm))' : 'drop-shadow(0 0 6px var(--st-warn))');
+                if (l) l.setAttribute('fill', alarm ? 'var(--st-alarm)' : 'var(--st-warn)');
+            } else {
+                sp.classList.remove('spinning');
+                n.style.stroke = '#475569';
+                n.removeAttribute('filter');
+                if (l) l.setAttribute('fill', 'var(--st-normal)');
             }
         }
 
-        function updateStatusPressure(value) {
-            var el = document.getElementById('status-pressure');
-            var led = document.getElementById('led-pressure');
-            el.textContent = value.toFixed(1) + ' BAR';
-            led.className = 'status-led';
-            if (value >= 11) led.classList.add('led-green');
-            else if (value >= 9) led.classList.add('led-yellow');
-            else led.classList.add('led-red');
+        function applyStageVisuals() {
+            // reset flow classes first
+            firePaths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-fire'); });
+            n2Paths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-n2'); });
+            pacv.forEach(function (id) { var e = $(id); if (e) { e.style.fill = '#16203a'; e.style.stroke = '#475569'; } });
+            wav.forEach(function (id) { var e = $(id); if (e) { e.style.fill = '#16203a'; e.style.stroke = '#475569'; } });
+
+            var st = state.stage;
+            // pumps run by deterministic pressure rule once confirmed (stage>=3)
+            var jOn = st >= 3 && state.press <= P_JOCKEY_ON;
+            var m1On = st >= 3 && state.press <= P_FP1_ON;
+            var m2On = st >= 4 && state.press <= P_FP2_ON;
+            setPump('node-j', 'spin-j', 'led-j', jOn, false);
+            setPump('node-m1', 'spin-m1', 'led-m1', m1On, m1On);
+            setPump('node-m2', 'spin-m2', 'led-m2', m2On, m2On);
+
+            if (jOn || m1On || m2On) {
+                ['path-suction', 'path-discharge', 'path-j-discharge', 'path-to-wet'].forEach(function (id) {
+                    var e = $(id); if (e) e.classList.add('flow-fire');
+                });
+                if (m2On) $('path-m2-discharge').classList.add('flow-fire');
+                wav.forEach(function (id) { var e = $(id); if (e) { e.style.fill = 'rgba(239,68,68,0.18)'; e.style.stroke = 'var(--st-alarm)'; } });
+                flowTxt.textContent = (m1On ? '227.0' : (jOn ? '18.0' : '0.0')) + ' m³/h';
+            } else {
+                flowTxt.textContent = '0.0 m³/h';
+            }
+
+            // N2 / pre-action discharge only at stage 5
+            if (st >= 5) {
+                n2Paths.forEach(function (id) { var e = $(id); if (e) e.classList.add('flow-n2'); });
+                $('path-to-pre').classList.add('flow-fire');
+                pacv.forEach(function (id) { var e = $(id); if (e) { e.style.fill = 'rgba(239,68,68,0.2)'; e.style.stroke = 'var(--st-alarm)'; } });
+                $('spin-n2').classList.add('spinning');
+                $('node-n2').style.stroke = 'var(--st-alarm)';
+            } else if (st >= 3) {
+                // pre-action lines charged but not discharging — neutral, NOT red
+                pacv.forEach(function (id) { var e = $(id); if (e) { e.style.stroke = 'var(--st-warn)'; } });
+                $('spin-n2').classList.remove('spinning');
+                $('node-n2').style.stroke = '#475569';
+            } else {
+                $('spin-n2').classList.remove('spinning');
+                $('node-n2').style.stroke = '#475569';
+            }
         }
 
-        function updateStatusTank(value) {
-            var el = document.getElementById('status-tank');
-            var led = document.getElementById('led-tank');
-            el.textContent = Math.round(value) + '%';
-            led.className = 'status-led';
-            if (value >= 50) led.classList.add('led-green');
-            else if (value >= 25) led.classList.add('led-yellow');
-            else led.classList.add('led-red');
+        // ---- Top alarm strip (rule-based counts, never random) ----
+        function updateAlarmStrip() {
+            var st = state.stage;
+            var crit = 0, sup = 0, trbl = 0;
+            var banner = 'FIRE SYSTEM NORMAL', bcol = 'var(--st-normal)', stripCls = 'state-normal';
+            var vesda = 'Normal', vesdaDot = 'ok';
+
+            if (st === 1) { sup = 1; vesda = 'Alert'; vesdaDot = 'warn';
+                banner = 'VESDA PRE-ALARM'; bcol = 'var(--st-warn)'; stripCls = 'state-warn'; }
+            else if (st === 2) { sup = 1; trbl = 1; vesda = 'Action'; vesdaDot = 'warn';
+                banner = 'SMOKE DETECTED — INVESTIGATE'; bcol = 'var(--st-warn)'; stripCls = 'state-warn'; }
+            else if (st >= 3) { crit = (st >= 5 ? 3 : 2); sup = 1; vesda = 'Action'; vesdaDot = 'alarm';
+                banner = st >= 5 ? 'SUPPRESSION DISCHARGE — LOCKOUT' : (st === 4 ? 'CONFIRMED FIRE — SUPPRESSION ARMED' : 'CONFIRMED FIRE — ZONE ALARM');
+                bcol = 'var(--st-alarm)'; stripCls = 'state-alarm'; }
+
+            var strip = $('alarm-strip');
+            strip.className = 'alarm-strip ' + stripCls + ' mb-3';
+            var b = $('as-banner'); b.textContent = banner; b.style.color = bcol;
+            $('as-vesda').textContent = vesda;
+            $('as-dot-vesda').className = 'as-dot ' + vesdaDot;
+            $('as-crit').textContent = crit;
+            $('as-dot-crit').className = 'as-dot' + (crit ? ' alarm' : '');
+            $('as-sup').textContent = sup;
+            $('as-dot-sup').className = 'as-dot' + (sup ? ' warn' : '');
+            $('as-trbl').textContent = trbl;
+            $('as-dot-trbl').className = 'as-dot' + (trbl ? ' warn' : '');
+            $('as-tank').textContent = Math.round(state.tankPct) + '% / ' + volM3(state.tankPct).toFixed(0) + ' m³';
+            $('as-facp').textContent = 'Online';
+            $('as-quality').textContent = S ? S.meta.data_quality : 'GOOD';
+            $('as-scenario').textContent = (S ? S.meta.scenario : 'Simulated') + (state.armed ? ' · SIM ARMED' : '');
         }
 
-        // Add log entry
-        function addLog(message, type) {
+        // ---- Log ----
+        function addLog(msg, type) {
             var p = document.createElement('p');
-            var time = new Date().toLocaleTimeString('id-ID');
-            p.innerHTML = '<span class="text-slate-500">[' + time + ']</span> ' + message;
-            if (type === 'error') p.className = 'text-red-400';
-            else if (type === 'warning') p.className = 'text-yellow-400';
-            else if (type === 'success') p.className = 'text-emerald-400';
-            else p.className = 'text-slate-400';
+            var t = new Date().toLocaleTimeString('en-GB');
+            p.innerHTML = '<span style="color:#64748b">[' + t + ']</span> ' + msg;
+            if (type === 'alarm') p.style.color = '#f87171';
+            else if (type === 'warn') p.style.color = '#fbbf24';
+            else if (type === 'ok') p.style.color = '#34d399';
+            else p.style.color = '#94a3b8';
             logs.appendChild(p);
             logs.scrollTop = logs.scrollHeight;
         }
 
-        // Uptime counter
-        setInterval(function() {
-            uptimeSeconds++;
-            var h = Math.floor(uptimeSeconds / 3600);
-            var m = Math.floor((uptimeSeconds % 3600) / 60);
-            var s = uptimeSeconds % 60;
-            document.getElementById('status-uptime').textContent =
-                String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-            document.getElementById('status-time').textContent = new Date().toLocaleTimeString('id-ID');
-        }, 1000);
+        // ---- Full repaint from state ----
+        function repaint() {
+            updateTankUI();
+            updateGauge();
+            applyStageVisuals();
+            renderCE();
+            renderPumps();
+            updateAlarmStrip();
+            $('as-updated').textContent = new Date().toLocaleTimeString('en-GB');
+        }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
-            if (e.key === 'r' || e.key === 'R') { if (!e.ctrlKey && !e.metaKey) resetSimulation(); }
-            if (e.key === 'f' || e.key === 'F') { if (!e.ctrlKey && !e.metaKey) triggerResponse(); }
-            if (e.key === 'Escape') {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                    document.body.classList.remove('fullscreen');
-                }
+        /* ---- Static panel bindings from the single engine basis ---- */
+        function bindBasis() {
+            if (S) {
+                $('basis-tag').textContent = 'Basis: IT ' + IT_LOAD_MW.toFixed(2) + ' MW · ' + RACKS + ' racks';
+                $('m-it-basis').textContent = IT_LOAD_MW.toFixed(2) + ' MW';
             }
-            // Zoom shortcuts
-            if (e.key === '1') setZoom(0.5);
-            if (e.key === '2') setZoom(0.75);
-            if (e.key === '3') setZoom(1);
-            if (e.key === '4') setZoom(1.2);
+            $('m-hall-vol').textContent = HALL_VOL_M3.toLocaleString() + ' m³';
+            $('m-zones').textContent = ZONE_COUNT + ' zones · all Normal';
+        }
+
+        /* ====================== Simulation control ======================
+         * doc-05 §1: no destructive one-click "TRIGGER FIRE". The control is
+         * gated: ARM first, then confirm a staged scenario. Alarm STATE only
+         * advances through this deterministic state machine.
+         */
+        function toggleSimArm() {
+            state.armed = !state.armed;
+            var badge = $('sim-mode-badge'), armBtn = $('btn-arm'), fireBtn = $('btn-sim-fire');
+            if (state.armed) {
+                badge.textContent = 'SIMULATION MODE: ARMED';
+                badge.classList.add('on');
+                armBtn.textContent = 'DISARM SIMULATION';
+                fireBtn.disabled = false;
+                addLog('Simulation ARMED by operator (demo/training context).', 'warn');
+            } else {
+                badge.textContent = 'SIMULATION MODE: OFF';
+                badge.classList.remove('on');
+                armBtn.textContent = 'ARM SIMULATION';
+                fireBtn.disabled = true;
+                resetSimulation();
+            }
+            updateAlarmStrip();
+        }
+
+        function confirmSimFire() {
+            if (!state.armed) { return; }
+            var ok = window.confirm(
+                'SIMULATE FIRE EVENT\n\n' +
+                'This runs a STAGED demonstration of the fire cause-and-effect ' +
+                'sequence (VESDA → smoke → confirmed → suppression armed → discharge). ' +
+                'It is a simulation only and is NOT connected to a real fire alarm ' +
+                'control panel. Reason: training / demonstration.\n\n' +
+                'Proceed with the simulated scenario?');
+            if (!ok) { addLog('Simulated fire event cancelled at confirmation.', ''); return; }
+            startStagedScenario();
+        }
+
+        function startStagedScenario() {
+            if (state.timer) { return; }
+            $('btn-sim-fire').disabled = true;
+            addLog('SIMULATION: staged fire scenario started.', 'warn');
+            state.stage = 1;
+            repaint();
+            addLog('Stage 1 — VESDA aspirating-smoke ALERT (supervisory).', 'warn');
+
+            var seq = [
+                { ms: 2600, run: function () { state.stage = 2; addLog('Stage 2 — Smoke detector ALARM. 1st-stage sounder.', 'warn'); } },
+                { ms: 5200, run: function () { state.stage = 3; addLog('Stage 3 — CONFIRMED (2-zone). AHU/CRAH shutdown + fire damper close + pre-action charge.', 'alarm'); } },
+                { ms: 8200, run: function () { state.stage = 4; state.countdown = 30; addLog('Stage 4 — Suppression ARMED. 30 s countdown. ABORT station live.', 'alarm'); } }
+            ];
+            var i = 0;
+            function step() {
+                if (i >= seq.length) { armCountdown(); return; }
+                var s = seq[i++];
+                state.timer = setTimeout(function () {
+                    s.run();
+                    // deterministic pressure decay once pumps are demanded (stage>=3)
+                    if (state.stage >= 3) { state.press = Math.max(P_FP2_ON - 1, P_STATIC - (state.stage - 2) * 1.6); }
+                    repaint();
+                    step();
+                }, s.ms - (i > 1 ? seq[i - 2].ms : 0));
+            }
+            step();
+        }
+
+        function armCountdown() {
+            // deterministic 1-Hz countdown, then discharge + lockout
+            state.timer = setInterval(function () {
+                state.countdown -= 5;
+                // deterministic tank/pressure draw-down during suppression demand
+                state.tankPct = Math.max(58, state.tankPct - 2.0);
+                state.press = Math.max(P_FP2_ON - 0.5, state.press - 0.4);
+                if (state.countdown <= 0) {
+                    clearInterval(state.timer); state.timer = null;
+                    state.stage = 5;
+                    addLog('Stage 5 — DISCHARGE. Inert gas / pre-action released. Hold time, post-discharge LOCKOUT.', 'alarm');
+                } else {
+                    addLog('Suppression countdown: ' + state.countdown + ' s (ABORT available).', 'alarm');
+                }
+                repaint();
+            }, 1000);
+        }
+
+        function resetSimulation() {
+            if (state.timer) { clearTimeout(state.timer); clearInterval(state.timer); state.timer = null; }
+            state.stage = 0;
+            state.press = P_STATIC;
+            state.tankPct = 92;
+            state.countdown = 0;
+            $('btn-sim-fire').disabled = !state.armed;
+            repaint();
+            addLog('SYSTEM RESET — all parameters restored to Normal. Lockout cleared.', 'ok');
+        }
+        window.resetSimulation = resetSimulation;
+        window.toggleSimArm = toggleSimArm;
+        window.confirmSimFire = confirmSimFire;
+
+        /* ---- Zoom / fullscreen ---- */
+        function setZoom(level) {
+            fireSvg.style.transform = 'scale(' + level + ')';
+            fireSvg.style.transformOrigin = 'center center';
+            document.querySelectorAll('.zoom-btn').forEach(function (b) {
+                b.classList.remove('active');
+                if (b.dataset.zoom == level) b.classList.add('active');
+            });
+        }
+        function fitToScreen() {
+            setZoom(1);
+            document.querySelectorAll('.zoom-btn').forEach(function (b) { b.classList.remove('active'); });
+        }
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(function () {});
+                }
+                document.body.classList.add('fullscreen');
+                $('btn-fullscreen').classList.add('active');
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('fullscreen');
+                $('btn-fullscreen').classList.remove('active');
+            }
+        }
+        window.setZoom = setZoom;
+        window.fitToScreen = fitToScreen;
+        window.toggleFullscreen = toggleFullscreen;
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); }
+            if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) resetSimulation();
+            if (e.key === 'Escape' && document.fullscreenElement) {
+                document.exitFullscreen();
+                document.body.classList.remove('fullscreen');
+            }
+            if (e.key === '1') setZoom(0.75);
+            if (e.key === '2') setZoom(1);
+            if (e.key === '3') setZoom(1.2);
         });
 
-        // Tooltip functions
-        function showTooltip(e, equipId) {
-            var spec = equipmentSpecs[equipId];
+        /* ---- Equipment tooltips / inspector (doc-10 §Modal) ---- */
+        var equipmentSpecs = {
+            'grp-main1': { title: 'FP-01 · Main Fire Pump 1', rows: [
+                ['Type', 'Electric centrifugal'], ['Capacity', '227 m³/h @ 120 m'], ['Power', '75 kW'],
+                ['Mode', 'AUTO'], ['Start setpoint', P_FP1_ON + ' bar'], ['Controller power', 'Healthy'],
+                ['Last test', '2026-05-12 (weekly churn)'], ['Cause-effect', 'Stage 3+ on low header pressure'] ] },
+            'grp-main2': { title: 'FP-02 · Main Fire Pump 2 (diesel)', rows: [
+                ['Type', 'Diesel centrifugal'], ['Capacity', '227 m³/h @ 120 m'],
+                ['Mode', 'AUTO standby'], ['Start setpoint', P_FP2_ON + ' bar'], ['Battery charger', 'OK'],
+                ['Fuel level', '88%'], ['Last test', '2026-05-12'], ['Cause-effect', 'Stage 4+ backup to FP-01'] ] },
+            'grp-jockey': { title: 'JP-01 · Jockey Pump', rows: [
+                ['Type', 'Multi-stage'], ['Capacity', '18 m³/h @ 140 m'], ['Power', '5.5 kW'],
+                ['Mode', 'AUTO'], ['Start / stop', P_JOCKEY_ON + ' / ' + P_JOCKEY_OFF + ' bar'],
+                ['Function', 'Pressure maintenance'], ['Flow switch', 'Supervised'] ] },
+            'grp-n2': { title: 'N2-GEN-01 · Inert Gas Generator', rows: [
+                ['Header pressure', '2.4 bar'], ['Mode', 'STANDBY'], ['Release circuit', 'Healthy'],
+                ['Protected zones', ZONE_COUNT + ' pre-action zones'], ['Abort station', 'Live'],
+                ['Hold time target', '600 s'], ['Cause-effect', 'Discharge at Stage 5 only'] ] },
+            'grp-gauge': { title: 'Discharge Header', rows: [
+                ['Static pressure', P_STATIC + ' bar'], ['Low alarm', P_LOW_ALM + ' bar'],
+                ['Jockey on/off', P_JOCKEY_ON + ' / ' + P_JOCKEY_OFF + ' bar'],
+                ['FP-01 / FP-02 start', P_FP1_ON + ' / ' + P_FP2_ON + ' bar'], ['Pump demand', PUMP_DEMAND_LPM + ' L/min'] ] }
+        };
+        function showTooltip(e, id) {
+            var spec = equipmentSpecs[id];
             if (!spec) return;
-
             tooltipTitle.textContent = spec.title;
             var html = '';
-            spec.specs.forEach(function(item) {
-                html += '<div class="tooltip-row"><span class="tooltip-label">' + item.label + '</span><span class="tooltip-value">' + item.value + '</span></div>';
+            spec.rows.forEach(function (r) {
+                html += '<div class="tooltip-row"><span class="tooltip-label">' + r[0] +
+                        '</span><span class="tooltip-value">' + r[1] + '</span></div>';
             });
             tooltipContent.innerHTML = html;
-
-            tooltip.style.left = (e.clientX + 15) + 'px';
-            tooltip.style.top = (e.clientY - 10) + 'px';
+            var rect = fireSvg.getBoundingClientRect();
+            var cx = (e.clientX !== undefined ? e.clientX : rect.left + 100);
+            var cy = (e.clientY !== undefined ? e.clientY : rect.top + 100);
+            tooltip.style.left = (cx - rect.left + 15) + 'px';
+            tooltip.style.top = (cy - rect.top - 10) + 'px';
             tooltip.classList.add('visible');
         }
-
-        function hideTooltip() {
-            tooltip.classList.remove('visible');
-        }
-
-        // Add tooltip event listeners to equipment
-        document.querySelectorAll('#grp-main1, #grp-main2, #grp-jockey').forEach(function(el) {
+        function hideTooltip() { tooltip.classList.remove('visible'); }
+        document.querySelectorAll('#grp-main1, #grp-main2, #grp-jockey, #grp-n2, #grp-gauge').forEach(function (el) {
             el.style.cursor = 'pointer';
-            el.addEventListener('mouseenter', function(e) { showTooltip(e, this.id); });
-            el.addEventListener('mousemove', function(e) {
-                tooltip.style.left = (e.clientX + 15) + 'px';
-                tooltip.style.top = (e.clientY - 10) + 'px';
+            el.addEventListener('mouseenter', function (e) { showTooltip(e, this.id); });
+            el.addEventListener('mousemove', function (e) {
+                var rect = fireSvg.getBoundingClientRect();
+                tooltip.style.left = (e.clientX - rect.left + 15) + 'px';
+                tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
             });
             el.addEventListener('mouseleave', hideTooltip);
+            el.addEventListener('focus', function (e) { showTooltip(e, this.id); });
+            el.addEventListener('blur', hideTooltip);
         });
 
-        // N2 Distribution Paths
-        var n2Paths = ['path-n2-header', 'path-n2-pv1', 'path-n2-pv2', 'path-n2-pv3', 'path-n2-pv4', 'path-n2-pv5'];
-        var pacvValves = ['pv-1', 'pv-2', 'pv-3', 'pv-4', 'pv-5'];
-
-        function activateN2Distribution() {
-            // Activate header and all PACV lines
-            n2Paths.forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.classList.add('flow-n2');
-            });
-            // Highlight PACV valves
-            pacvValves.forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) {
-                    el.style.stroke = '#fde047';
-                    el.style.fill = 'rgba(253, 224, 71, 0.15)';
-                }
-            });
-        }
-
-        function deactivateN2Distribution() {
-            n2Paths.forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.classList.remove('flow-n2');
-            });
-            pacvValves.forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) {
-                    el.style.stroke = '#475569';
-                    el.style.fill = '#1e293b';
-                }
-            });
-        }
-
-        function n2DutyCycle() {
-            if (running) return;
-            n2Kpi.textContent = "RUNNING";
-            n2Kpi.style.color = "#3dfc16";
-            n2Imp.classList.add('spinning');
-            n2Path.classList.add('flow-n2');
-            activateN2Distribution();
-
-            setTimeout(function() {
-                n2Kpi.textContent = "STANDBY";
-                n2Kpi.style.color = "#fde047";
-                n2Imp.classList.remove('spinning');
-                n2Path.classList.remove('flow-n2');
-                deactivateN2Distribution();
-                if(!running) setTimeout(n2DutyCycle, 4000);
-            }, 2000);
-        }
-        n2DutyCycle();
-
-        function updateLandlordMetrics(active, flowRate) {
-            landlordSupplyActive = active;
-            landlordFlowRate = flowRate;
-
-            if (active) {
-                // Show flow rate
-                landlordFlow.textContent = flowRate.toFixed(1) + " m³/h";
-                landlordFlow.style.opacity = "1";
-
-                // Calculate dynamic WUE (increases with water usage)
-                const wueValue = baseWUE + (flowRate * 0.015);
-                wueKpi.innerHTML = wueValue.toFixed(2) + ' <span class="text-[10px] opacity-60">L/kW</span>';
-                wueKpi.style.color = "#22d3ee"; // Brighter cyan when active
-
-                // Calculate dynamic OPEX (increases with water consumption)
-                const opexValue = baseOPEX + (flowRate * 85);
-                opexKpi.innerHTML = 'Rp ' + opexValue.toLocaleString('id-ID') + ' <span class="text-[10px] opacity-60">/m³</span>';
-                opexKpi.style.color = "#34d399"; // Brighter green when active
-            } else {
-                // Reset to base values
-                landlordFlow.style.opacity = "0";
-                wueKpi.innerHTML = baseWUE.toFixed(2) + ' <span class="text-[10px] opacity-60">L/kW</span>';
-                wueKpi.style.color = "";
-                opexKpi.innerHTML = 'Rp ' + baseOPEX.toLocaleString('id-ID') + ' <span class="text-[10px] opacity-60">/m³</span>';
-                opexKpi.style.color = "";
-            }
-        }
-
-        function updateTankUI(lvl) {
-            const h = (lvl / 100) * 370;
-            tankWater.setAttribute('height', h);
-            tankWater.setAttribute('y', 50 + (370 - h));
-            tankTxt.textContent = Math.round(lvl) + "%";
-
-            const v = document.getElementById('v-landlord');
-            const p = document.getElementById('path-landlord');
-
-            if (lvl <= 50) {
-                v.style.fill = "var(--supply-blue)";
-                p.classList.add('flow-supply'); // ACTIVATING SUPPLY ANIMATION
-
-                // Calculate flow rate based on tank level (more flow when tank is lower)
-                const flowRate = 12.5 + ((50 - lvl) * 0.5) + (Math.random() * 2);
-                updateLandlordMetrics(true, flowRate);
-            } else if (lvl >= 95) {
-                v.style.fill = "#1e293b";
-                p.classList.remove('flow-supply');
-                updateLandlordMetrics(false, 0);
-            }
-        }
-
-        function triggerResponse() {
-            if(running) return;
-            running = true;
-            overlay.classList.add('emergency-blink');
-            n2Kpi.textContent = "LOCKED";
-            n2Path.classList.remove('flow-n2');
-            n2Imp.classList.remove('spinning');
-
-            // Update status bar to emergency
-            updateStatusBar('FIRE ALARM', 'red');
-            addLog('FIRE DETECTED - Emergency response initiated', 'error');
-
-            simInterval = setInterval(function() {
-                if(press > 8.0) press -= 0.15;
-                if(tank > 10) tank -= 0.35;
-
-                pressTxt.innerText = press.toFixed(1) + " BAR";
-                updateTankUI(tank);
-                updateStatusPressure(press);
-                updateStatusTank(tank);
-
-                var angle = 45 - (12.5 - press) * 18;
-                pin.style.transform = 'rotate(' + angle + 'deg)';
-
-                if(press <= 11.5) {
-                    var node = document.getElementById('node-j');
-                    if(!node.classList.contains('active-j')) {
-                        node.classList.add('active-j');
-                        node.style.stroke = "var(--jockey-green)";
-                        node.style.filter = "drop-shadow(0 0 10px var(--jockey-green))";
-                        document.getElementById('spin-j').classList.add('spinning');
-                        document.getElementById('path-j-discharge').classList.add('flow-fire');
-                        document.getElementById('path-discharge').classList.add('flow-fire');
-                        document.getElementById('path-to-wet').classList.add('flow-fire');
-                        document.getElementById('wv-1').style.fill = "var(--fire-red)";
-                        flowTxt.textContent = (18.5 + (Math.random() * 2)).toFixed(1) + " m³/h";
-                        addLog('Jockey Pump ACTIVATED - Pressure maintenance', 'warning');
-                    }
-                }
-
-                if(press <= 10.5) {
-                    var node = document.getElementById('node-m1');
-                    if(!node.classList.contains('active-m1')) {
-                        node.classList.add('active-m1');
-                        node.style.stroke = "var(--fire-red)";
-                        node.style.filter = "drop-shadow(0 0 15px var(--fire-red))";
-                        document.getElementById('spin-m1').classList.add('spinning');
-                        document.getElementById('path-suction').classList.add('flow-fire');
-                        document.getElementById('path-to-pre').classList.add('flow-fire');
-                        document.getElementById('pv-1').style.fill = "var(--fire-red)";
-                        flowTxt.textContent = (224.8 + (Math.random() * 5)).toFixed(1) + " m³/h";
-                        addLog('Main Pump 1 ACTIVATED - Full suppression mode', 'error');
-                    }
-                }
-
-                if(tank <= 10) {
-                    clearInterval(simInterval);
-                    simInterval = null;
-                    flowTxt.textContent = "0.0 m³/h";
-                    addLog('TANK CRITICAL - Water supply depleted', 'error');
-                }
-            }, 700);
-        }
-
+        /* ---- Boot ---- */
+        bindBasis();
+        repaint();
+        // re-assert engine-true values on a stable cadence (idempotent — source
+        // is the frozen scenario + deterministic state machine, never a PRNG)
+        setInterval(function () {
+            $('as-updated').textContent = new Date().toLocaleTimeString('en-GB');
+        }, 5000);
+    })();
     </script>
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-tracker.js" defer></script>

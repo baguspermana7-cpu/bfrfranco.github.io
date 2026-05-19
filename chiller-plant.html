@@ -38,6 +38,7 @@
   --muted:#8fa0b4;
   --chws:#628cb7;
   --chwr:#5da095;
+  --sec:#8a7fa8;
   --run:#38b56d;
   --ok:#8ea0b6;
   --warn:#c08f46;
@@ -62,6 +63,31 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
   gap:10px;
   padding:8px 12px;
 }
+.alarm-strip{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px 18px;
+  min-height:36px;
+  padding:7px 14px;
+  border:1px solid var(--bd);
+  border-left:4px solid #4d6a55;
+  border-radius:8px;
+  background:#16202c;
+  font-family:"JetBrains Mono",monospace;
+  font-size:11px;
+  color:#c4d0de;
+}
+.alarm-strip.warn{border-left-color:var(--warn);background:#1d2026}
+.alarm-strip.alarm{border-left-color:var(--alarm);background:#221a1c}
+.as-state{display:inline-flex;align-items:center;gap:7px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#cdd9e6}
+.as-dot{width:9px;height:9px;border-radius:50%;background:#5fae7c}
+.alarm-strip.warn .as-dot{background:var(--warn)}
+.alarm-strip.alarm .as-dot{background:var(--alarm)}
+.as-seg{color:#9db0c7;white-space:nowrap}
+.as-seg#asChw{color:#bcd0e2}
+.as-meta{margin-left:auto;color:#7f93ab}
+@media (max-width:760px){.alarm-strip{gap:5px 12px;font-size:10px}.as-meta{margin-left:0}}
 .bar-left .title{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .bar-left .sub{margin-top:4px;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--muted)}
 .bar-right{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center}
@@ -100,6 +126,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .legend span{border:1px solid #495b73;border-radius:6px;background:#1a2534;padding:3px 8px;font-family:"JetBrains Mono",monospace;font-size:9px;color:#cdd8e6}
 .legend .chws{border-color:rgba(111,142,168,.6);color:#b2c4d6}
 .legend .chwr{border-color:rgba(110,163,153,.6);color:#b8d7d1}
+.legend .sec{border-color:rgba(138,127,168,.6);color:#c5bcd9}
 .legend .run{border-color:rgba(56,181,109,.6);color:#9de0ba}
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
@@ -166,11 +193,15 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .panel-alarm{stroke:var(--alarm)}
 .field-box{fill:#213044;stroke:#60738d;stroke-width:1}
 .pipe{fill:none;stroke:#697b92;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
-.flow{fill:none;stroke-width:2.4;stroke-dasharray:8 7;animation:flow 6s linear infinite;stroke-linecap:round}
+/* Normal flow is MUTED (doc-04 §"Alarm Color Hierarchy" / doc-10): bright
+   animation is reserved for alarm/trip so a real alarm keeps its emphasis. */
+.flow{fill:none;stroke-width:2;stroke-dasharray:7 8;animation:flow 9s linear infinite;stroke-linecap:round;opacity:.5}
 .flow.chws{stroke:var(--chws)}
-.flow.chwr{stroke:var(--chwr);animation-direction:reverse;animation-duration:6.3s}
-.flow.broken{stroke:var(--alarm)!important;stroke-dasharray:7 7;animation-duration:1.3s!important}
-@keyframes comp-pulse{0%,100%{filter:none}50%{filter:drop-shadow(0 0 4px rgba(56,181,109,.3))}}
+.flow.chwr{stroke:var(--chwr);animation-direction:reverse;animation-duration:9.4s}
+.flow.sec-sup{stroke:var(--sec)}
+.flow.sec-ret{stroke:var(--sec);animation-direction:reverse;animation-duration:9.4s}
+.flow.broken{stroke:var(--alarm)!important;stroke-dasharray:7 7;animation-duration:1.3s!important;opacity:1}
+@keyframes comp-pulse{0%,100%{opacity:1}50%{opacity:.78}}
 @keyframes fan-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-110}}
 .pump{fill:#1f2d3f;stroke:#6a7d97;stroke-width:1.2}
@@ -180,7 +211,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .comp-off{fill:#56667d;stroke:#6f8095;stroke-width:1}
 .branch{fill:#1f2b3d;stroke:#5d708a;stroke-width:1}
 .tee{fill:url(#gShell);stroke:#8097b0;stroke-width:1.2}
-.status-run{fill:var(--run);stroke:rgba(56,181,109,.45);stroke-width:1;filter:drop-shadow(0 0 3px rgba(56,181,109,.4))}
+.status-run{fill:var(--run);stroke:rgba(56,181,109,.5);stroke-width:1.2}
 .status-stdby{fill:#7b8ca3;stroke:#5f6f84;stroke-width:1}
 .ref-cycle{fill:none;stroke:var(--ref);stroke-width:1.4;stroke-dasharray:5 3}
 .ref-cycle.off{stroke:#6e6460;opacity:.6}
@@ -406,7 +437,15 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     }
     </script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
-    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>    <meta property="og:image:alt" content="Chiller Plant SCADA HMI v4 — Industrial P&ID Mimic | Resistance Zero">
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <!-- Conventional BMS single scenario engine — single source of truth for the
+         canonical chilled-water basis (CHWS 7.2 / CHWR 14.8 °C, ΔT 7.6, flow ≈58 L/s)
+         and plant cooling load (engine heat rejection). Loaded NON-deferred so
+         window.CONV_CALC exists before the inline SCADA script runs.
+         Basis: conv/review/09-engineering-basis-and-calculations.md ;
+         CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
+    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <meta property="og:image:alt" content="Chiller Plant SCADA HMI v4 — Industrial P&ID Mimic | Resistance Zero">
 
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
@@ -421,7 +460,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
   <header class="bar">
     <div class="bar-left">
       <div class="title">CHILLER PLANT SCADA HMI</div>
-      <div class="sub">ISA-style industrial P&amp;ID • continuous pipe routing • click CH module for diagnostics popup</div>
+      <div class="sub">ISA-style industrial P&amp;ID • primary CHW header engine-bound • click CH module for diagnostics</div>
     </div>
     <div class="bar-right">
       <a class="btn" href="dc-conventional.html">Back</a>
@@ -432,15 +471,26 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     </div>
   </header>
 
+  <!-- Top alarm strip — operator-first: state, counts, redundancy, basis (doc-10/13) -->
+  <div class="alarm-strip" id="alarmStrip">
+    <div class="as-state" id="asState"><span class="as-dot" id="asDot"></span><span id="asLevel">NORMAL</span></div>
+    <div class="as-seg" id="asCounts">0 Critical • 0 Warning</div>
+    <div class="as-seg" id="asRedund">Loops 4/4 • N+1</div>
+    <div class="as-seg" id="asChw">CHWS 7.2°C • CHWR 14.8°C • ΔT 7.6 • 58 L/s</div>
+    <div class="as-seg" id="asLoad">Cooling Demand 1.93 MW</div>
+    <div class="as-seg as-meta" id="asMeta">Scenario: Simulated • Updated 0s</div>
+  </div>
+
   <div class="stage">
     <section class="pid-panel">
       <div class="legend">
-        <span class="chws">CHWS Supply</span>
-        <span class="chwr">CHWR Return</span>
-        <span class="run">RUN = Green</span>
-        <span>Standby = Grey</span>
+        <span class="chws">Primary CHWS 7.2°C</span>
+        <span class="chwr">Primary CHWR 14.8°C</span>
+        <span class="sec">Secondary / Condenser loop</span>
+        <span class="run">Run</span>
+        <span>Standby</span>
         <span class="warn">Warning</span>
-        <span class="alarm">Alarm</span>
+        <span class="alarm">Alarm / Trip</span>
       </div>
       <svg id="pidSvg" viewBox="0 0 2300 1400" aria-label="Chiller P&ID mimic"></svg>
       <div class="status-strip">
@@ -458,10 +508,12 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <aside class="side">
       <div class="side-body">
         <div class="card">
-          <h4>Header KPI</h4>
-          <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">19.1 C</div></div>
-          <div class="kv"><div class="k">CHWR</div><div class="v" id="kChwr">22.6 C</div></div>
-          <div class="kv"><div class="k">Header Flow</div><div class="v" id="kFlow">72.0 L/s</div></div>
+          <h4>Primary CHW Header <span style="float:right;font-weight:400;color:#7f93ab">engine-bound</span></h4>
+          <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">7.2 C</div></div>
+          <div class="kv"><div class="k">CHWR</div><div class="v" id="kChwr">14.8 C</div></div>
+          <div class="kv"><div class="k">ΔT</div><div class="v" id="kDt">7.6 C</div></div>
+          <div class="kv"><div class="k">CHW Flow</div><div class="v" id="kFlow">58.2 L/s</div></div>
+          <div class="kv"><div class="k">Cooling Demand</div><div class="v" id="kCool">1.93 MW</div></div>
           <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">86 kPa</div></div>
         </div>
 
@@ -569,9 +621,43 @@ const conv = {
 
 const ui = { sim:true, maint:false, unit:"si", selected:1, forced:new Set(), scenario:"custom", startTs:Date.now(), ambient:35.0 };
 
+/* --- Canonical CHW basis from the single scenario engine ---------------------
+ * window.CONV_CALC.snapshot is the single source of truth (js/conv-engine.js).
+ * The PRIMARY chilled-water header that feeds the building / AHU load is the
+ * canonical CHW loop: CHWS 7.2 °C, CHWR 14.8 °C, ΔT 7.6, flow ≈58 L/s. These
+ * are bound directly to the engine and are DETERMINISTIC (stable on reload —
+ * no Math.random touches engine-derived engineering values). The per-chiller
+ * water circuits shown in the P&ID are the SECONDARY / CONDENSER side of the
+ * air-cooled chillers (~18-23 °C) and are deliberately NOT labelled CHWS/CHWR.
+ * CHW-relabel decision: conv/review/04-chiller-plant-review.md (Recommended
+ * Decision → Option A) ; basis: conv/review/09-engineering-basis-and-calculations.md
+ */
+function engineSnap(){
+  return (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+}
+function chwBasis(){
+  var s = engineSnap();
+  if(s && s.cooling){
+    return {
+      chws: s.cooling.chws_c,                 // 7.2
+      chwr: s.cooling.chwr_c,                 // 14.8
+      dt: s.cooling.chw_delta_t,              // 7.6
+      flow: r1(s.cooling.flow_lps),           // ≈58.2 L/s
+      coolingKw: s.cooling.heat_rejection_kw, // ≈1927 kW (IT + UPS loss)
+      scenario: (s.meta && s.meta.scenario) || "Simulated"
+    };
+  }
+  // Defensive fallback only if engine failed to load — keep basis self-consistent.
+  return { chws:7.2, chwr:14.8, dt:7.6, flow:58.2, coolingKw:1927.1, scenario:"Simulated" };
+}
+const CHW = chwBasis();
+
 const st = {
   sp:{ chws:18.8, dp:90, flow:18.0 },
-  header:{ chws:19.1, chwr:22.6, flow:0, dp:86 },
+  // header = PRIMARY chilled-water loop (engine-bound, deterministic).
+  header:{ chws:CHW.chws, chwr:CHW.chwr, flow:CHW.flow, dp:86, dt:CHW.dt, coolingKw:CHW.coolingKw },
+  // loops = SECONDARY / CONDENSER-side circuits of the 4 air-cooled chillers
+  // (t1 = secondary supply, t2 = secondary return — NOT CHWS/CHWR).
   loops:[
     {id:1, flow:19.1, dp1:97, dp2:73, t1:19.2, t2:22.4, pumpA:true, spdA:85, spdB:0, comps:[1,1,1]},
     {id:2, flow:19.1, dp1:87, dp2:68, t1:18.4, t2:23.3, pumpA:false,spdA:0, spdB:57, comps:[1,0,1]},
@@ -673,9 +759,10 @@ function copGauge(cx,cy,radius,value,max){
   const large=pct>0.5?1:0;
   const color=value>=4?"#38b56d":(value>=2.5?"#c08f46":"#c25a5a");
   // Background arc first, then colored progress arc on top
+  // Flat gauge — no decorative glow layer (doc-10 §"Cards And Panels": no
+  // glowing borders / decorative gradients in operational panels).
   return `<path d="M${cx-radius},${cy} A${radius},${radius} 0 0 1 ${cx+radius},${cy}" fill="none" stroke="#2e3e52" stroke-width="4" stroke-linecap="round" />
-    <path d="M${x1},${y1} A${radius},${radius} 0 ${large} 1 ${x2},${y2}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" />
-    <path d="M${x1},${y1} A${radius},${radius} 0 ${large} 1 ${x2},${y2}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" filter="url(#fGlow)" />`;
+    <path d="M${x1},${y1} A${radius},${radius} 0 ${large} 1 ${x2},${y2}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" />`;
 }
 
 function checkValve(x,y,dir){
@@ -871,9 +958,9 @@ function loopSvg(loop, pos){
     ${text(ins.x+14,y+176,"unit",`COMP ${m.compKw} kW \u2022 OIL ${m.oil} C`)}
 
     <rect x="${x+w-118}" y="${supY-12}" width="96" height="20" rx="6" class="field-box" />
-    ${text(x+w-108,supY+3,"unit","CHWS OUT")}
+    ${text(x+w-108,supY+3,"unit","SEC OUT")}
     <rect x="${x+w-118}" y="${retY-12}" width="96" height="20" rx="6" class="field-box" />
-    ${text(x+w-108,retY+3,"unit","CHWR IN")}
+    ${text(x+w-108,retY+3,"unit","SEC IN")}
     <circle cx="${portX}" cy="${supY}" r="7" class="tee" />
     <circle cx="${portX}" cy="${retY}" r="7" class="tee" />
 
@@ -901,10 +988,14 @@ function drawPid(){
   const VW = 2300, VH = 1400;
   const PZ_X = 36, PZ_Y = 100, PZ_W = 1280;
   const LOOP_X = 50, LOOP_W = 1060, LOOP_H = 240, LOOP_GAP = 40;
-  const HDR_CHWS_Y = 148, HDR_CHWR_Y = 228;
-  const HDR_X1 = 1100, HDR_X2 = 1290;
-  const BRANCH_START = 1130, BRANCH_SPACING = 28;
-  const SUP_X = 1340, SUP_W = 940;
+  const HDR_CHWS_Y = 148, HDR_CHWR_Y = 256;
+  const HDR_X1 = 1096;
+  // Reserved label lane = HDR_X1 .. LABEL_LANE_END contains NO branch tees.
+  // 154px wide — fits a short 2-line tag with ≥8px clearance from first tee.
+  const LABEL_LANE_END = 1250;
+  const BRANCH_START = 1276, BRANCH_SPACING = 30;
+  const HDR_X2 = 1276 + 3*30 + 30;            // 1396 — clears the last branch tee
+  const SUP_X = 1520, SUP_W = 760;            // ends at 2280 (viewBox 2300)
   const CX = SUP_X + 16, CW = SUP_W - 32;
 
   const pos = st.loops.map((_,i)=>({ x:LOOP_X, y:170+i*(LOOP_H+LOOP_GAP), w:LOOP_W }));
@@ -929,7 +1020,7 @@ function drawPid(){
       <circle cx="${bxS}" cy="${HDR_CHWS_Y}" r="7" class="tee" />
       <circle cx="${bxS}" cy="${supY}" r="7" class="tee" />
       ${flowArrow(bxS, HDR_CHWS_Y+18, "down", "supply")}
-      ${i===0?`<text x="${bxS-16}" y="${HDR_CHWS_Y+32}" class="pipe-label">DN100</text>`:''}
+      ${i===0?`<text x="${bxS+16}" y="${HDR_CHWS_Y+30}" class="pipe-label" text-anchor="start">DN100</text>`:''}
 
       <line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="pipe" />
       <line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="${fr}" />
@@ -958,7 +1049,18 @@ function drawPid(){
   const plantCop = totalKw > 0 ? r1(totalTons * 3.517 / totalKw) : 0;
   const kwPerRt = totalKw > 0 ? r1(totalKw / Math.max(totalTons, 0.1)) : 0;
   const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
-  const redundancy = loopsOnline >= 3 ? "N+1" : (loopsOnline >= 2 ? "N" : "DEGRADED");
+  // Plant capacity context — engine-derived (deterministic). Cooling demand =
+  // engine heat rejection; per-chiller rating sized so N chillers cover demand
+  // with one as N+1 spare. Source: 04-chiller-plant-review.md "Plant Capacity Panel".
+  const _es = engineSnap();
+  const chRun = _es ? _es.cooling.chillers_running : 2;
+  const chTot = _es ? _es.cooling.chillers_total : 3;
+  const coolDemandKw = st.header.coolingKw;
+  // Per-chiller rating: demand met by chRun units at ~85% loading.
+  const chRatingKw = Math.round((coolDemandKw / chRun) / 0.85 / 50) * 50;
+  const availKw = chRatingKw * chTot;
+  const nPlus1MarginKw = availKw - coolDemandKw;
+  const redundancy = (availKw - chRatingKw) >= coolDemandKw ? "N+1" : (availKw >= coolDemandKw ? "N" : "DEGRADED");
   const redColor = redundancy==="N+1"?"#38b56d":(redundancy==="N"?"#c08f46":"#c25a5a");
 
   const alarmBg = st.alarm.level==="ALARM"?"rgba(194,90,90,.15)":(st.alarm.level==="WARNING"?"rgba(192,143,70,.12)":"rgba(56,181,109,.08)");
@@ -1013,26 +1115,33 @@ function drawPid(){
 
     <line x1="${PZ_X+PZ_W+8}" y1="${PZ_Y+4}" x2="${PZ_X+PZ_W+8}" y2="${VH-140}" class="sup-divider" stroke-dasharray="6 4" />
 
-    <!-- Building Load symbol at header ends (item 47: larger) -->
-    <rect x="${HDR_X2+6}" y="${HDR_CHWS_Y-40}" width="100" height="${HDR_CHWR_Y-HDR_CHWS_Y+80}" rx="8" fill="rgba(98,140,183,.08)" stroke="rgba(98,140,183,.4)" stroke-width="1.2" stroke-dasharray="4 3" />
-    ${text(HDR_X2+16, HDR_CHWS_Y-20, "label", "BUILDING")}
-    ${text(HDR_X2+16, HDR_CHWS_Y-4, "label", "AHU LOAD")}
-    ${flowArrow(HDR_X2+6, HDR_CHWS_Y, "right", "supply")}
-    ${flowArrow(HDR_X2+6, HDR_CHWR_Y, "left", "return")}
+    <!-- PRIMARY chilled-water distribution header (engine-bound: CHWS 7.2 /
+         CHWR 14.8 °C). Building / AHU load is the served conventional CRAH
+         plant. Label boxes sit in a RESERVED LANE (HDR_X1..LABEL_LANE_END)
+         containing NO branch tees — orthogonal routing, ≥8px clearance. -->
+    <rect x="${HDR_X2+10}" y="${HDR_CHWS_Y-44}" width="106" height="${HDR_CHWR_Y-HDR_CHWS_Y+88}" rx="8" fill="rgba(98,140,183,.08)" stroke="rgba(98,140,183,.4)" stroke-width="1.2" stroke-dasharray="4 3" />
+    ${text(HDR_X2+22, HDR_CHWS_Y-22, "label", "BUILDING")}
+    ${text(HDR_X2+22, HDR_CHWS_Y-6, "label", "AHU / CRAH")}
+    ${text(HDR_X2+22, (HDR_CHWS_Y+HDR_CHWR_Y)/2+4, "unit", `${r1(st.header.coolingKw/1000)} MW`)}
+    ${flowArrow(HDR_X2+8, HDR_CHWS_Y, "right", "supply")}
+    ${flowArrow(HDR_X2+8, HDR_CHWR_Y, "left", "return")}
 
+    <!-- CHWS supply header pipe (label box bounded inside reserved lane;
+         text is short so its bbox never reaches the first branch tee). -->
     <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="pipe" />
     <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="flow chws" />
-    <rect x="${HDR_X1}" y="${HDR_CHWS_Y-22}" width="180" height="20" rx="6" fill="rgba(98,140,183,.12)" stroke="rgba(98,140,183,.4)" />
-    ${text(HDR_X1+8,HDR_CHWS_Y-8,"hdr-pipe-label supply","CHWS SUPPLY HEADER")}
-    ${flowArrow(HDR_X1+195, HDR_CHWS_Y, "right", "supply")}
-    ${text(HDR_X2-40, HDR_CHWS_Y-8, "pipe-label", "DN200")}
+    <rect x="${HDR_X1}" y="${HDR_CHWS_Y-42}" width="138" height="32" rx="6" fill="rgba(98,140,183,.14)" stroke="rgba(98,140,183,.45)" />
+    ${text(HDR_X1+8,HDR_CHWS_Y-28,"hdr-pipe-label supply","PRIMARY CHWS")}
+    ${text(HDR_X1+8,HDR_CHWS_Y-15,"hdr-pipe-label supply",`${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`)}
+    ${flowArrow(LABEL_LANE_END+6, HDR_CHWS_Y, "right", "supply")}
 
+    <!-- CHWR return header pipe -->
     <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />
     <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="flow chwr" />
-    <rect x="${HDR_X1}" y="${HDR_CHWR_Y+4}" width="180" height="20" rx="6" fill="rgba(93,160,149,.12)" stroke="rgba(93,160,149,.4)" />
-    ${text(HDR_X1+8,HDR_CHWR_Y+18,"hdr-pipe-label return","CHWR RETURN HEADER")}
-    ${flowArrow(HDR_X1+195, HDR_CHWR_Y, "left", "return")}
-    ${text(HDR_X2-40, HDR_CHWR_Y+18, "pipe-label", "DN200")}
+    <rect x="${HDR_X1}" y="${HDR_CHWR_Y+10}" width="138" height="32" rx="6" fill="rgba(93,160,149,.14)" stroke="rgba(93,160,149,.45)" />
+    ${text(HDR_X1+8,HDR_CHWR_Y+24,"hdr-pipe-label return","PRIMARY CHWR")}
+    ${text(HDR_X1+8,HDR_CHWR_Y+37,"hdr-pipe-label return",`${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} ΔT ${ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt)}`)}
+    ${flowArrow(LABEL_LANE_END+6, HDR_CHWR_Y, "left", "return")}
 
     <!-- Row 1: Flow, DP, Delta-T -->
     <rect x="${CX}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
@@ -1054,23 +1163,22 @@ function drawPid(){
     <rect x="${CX+C3W*2+20}" y="${R1Y}" width="${CW-C3W*2-20}" height="104" rx="8" class="sup-card" />
     <rect x="${CX+C3W*2+20}" y="${R1Y}" width="${CW-C3W*2-20}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX+C3W*2+20}" y1="${R1Y+22}" x2="${CX+CW}" y2="${R1Y+22}" class="sup-divider" />
-    ${text(CX+C3W*2+32,R1Y+16,"sup-title","DELTA-T")}
+    ${text(CX+C3W*2+32,R1Y+16,"sup-title","PRIMARY CHW \u0394-T")}
     ${text(CX+C3W*2+32,R1Y+56,"sup-val",`${deltaT} ${deltaTU}`)}
     ${sparkline(CX+C3W*2+32, R1Y+66, CW-C3W*2-52, 24, st.spark.dt, "#ad8f63")}
-    ${text(CX+C3W*2+32,R1Y+96,"sup-unit-sm","CHWR \u2212 CHWS")}
+    ${text(CX+C3W*2+32,R1Y+96,"sup-unit-sm","CHWR \u2212 CHWS (engine)")}
 
     <!-- Row 2: Temperatures, Efficiency -->
     <rect x="${CX}" y="${R2Y}" width="${C2W}" height="104" rx="8" class="sup-card" />
     <rect x="${CX}" y="${R2Y}" width="${C2W}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX}" y1="${R2Y+22}" x2="${CX+C2W}" y2="${R2Y+22}" class="sup-divider" />
-    ${text(CX+12,R2Y+16,"sup-title","HEADER TEMPERATURES")}
+    ${text(CX+12,R2Y+16,"sup-title","PRIMARY CHW HEADER (ENGINE)")}
     ${text(CX+12,R2Y+52,"label","CHWS")}
     ${text(CX+56,R2Y+52,"sup-val",hChws)}
-    ${(()=>{const dev=st.header.chws-st.sp.chws; if(Math.abs(dev)>0.5){const c=dev>0?"#c25a5a":"#628cb7"; const arrow=dev>0?"\u25B2":"\u25BC"; return `<text x="${CX+150}" y="${R2Y+52}" fill="${c}" class="value">${arrow}${r1(Math.abs(dev))}</text>`} return ''})()}
     ${text(CX+180,R2Y+52,"label","CHWR")}
     ${text(CX+224,R2Y+52,"sup-val",hChwr)}
-    ${text(CX+12,R2Y+76,"sup-unit-sm",`SP: ${conv.t(st.sp.chws,ui.unit)}${conv.tu(ui.unit)}  \u2022  DP SP: ${conv.p(st.sp.dp,ui.unit)} ${conv.pu(ui.unit)}`)}
-    ${text(CX+12,R2Y+92,"sup-unit-sm",`Dev: ${r1(st.header.chws-st.sp.chws)}${conv.tu(ui.unit)}`)}
+    ${text(CX+12,R2Y+76,"sup-unit-sm",`Flow ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}  \u2022  Cooling ${r1(st.header.coolingKw/1000)} MW`)}
+    ${text(CX+12,R2Y+92,"sup-unit-sm",`Basis: IT 1.85 MW \u00D7 PUE \u2022 deterministic`)}
 
     <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="104" rx="8" class="sup-card" />
     <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="22" rx="8" class="sup-card-hdr" />
@@ -1091,14 +1199,16 @@ function drawPid(){
     <rect x="${CX}" y="${R3Y}" width="${CW}" height="86" rx="8" fill="${alarmBg}" stroke="${alarmBd}" stroke-width="1.2" />
     <rect x="${CX}" y="${R3Y}" width="${CW}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX}" y1="${R3Y+22}" x2="${CX+CW}" y2="${R3Y+22}" class="sup-divider" />
-    ${text(CX+12,R3Y+16,"sup-title","PLANT STATUS")}
+    ${text(CX+12,R3Y+16,"sup-title","PLANT CAPACITY & STATUS")}
     <circle cx="${CX+20}" cy="${R3Y+48}" r="6" fill="${alarmCol}" />
     ${text(CX+34,R3Y+52,"value",st.alarm.level)}
-    ${text(CX+170,R3Y+52,"label",`Loops Online: ${loopsOnline}/4`)}
-    ${text(CX+370,R3Y+52,"label",`Ack: ${ackTxt}`)}
+    ${text(CX+150,R3Y+52,"label",`Chillers ${chRun}/${chTot}`)}
+    ${text(CX+300,R3Y+52,"label",`Demand ${r1(coolDemandKw/1000)} MW`)}
+    ${text(CX+480,R3Y+52,"label",`Avail ${r1(availKw/1000)} MW`)}
+    ${text(CX+660,R3Y+52,"label",`N+1 Margin ${r1(nPlus1MarginKw/1000)} MW`)}
     <rect x="${CX+CW-100}" y="${R3Y+38}" width="80" height="22" rx="5" fill="none" stroke="${redColor}" />
     ${text(CX+CW-88,R3Y+53,"value",redundancy)}
-    ${text(CX+12,R3Y+74,"sup-unit-sm",`First-out: ${firstOut}  \u2022  Forced: ${forced}`)}
+    ${text(CX+12,R3Y+74,"sup-unit-sm",`First-out: ${firstOut}  \u2022  Loops online ${loopsOnline}/4  \u2022  Ack: ${ackTxt}  \u2022  Forced: ${forced}`)}
 
     <!-- Row 4: Loop Summary Table -->
     <rect x="${CX}" y="${R4Y}" width="${CW}" height="152" rx="8" class="sup-card" />
@@ -1107,8 +1217,8 @@ function drawPid(){
     ${text(CX+12,R4Y+16,"sup-title","LOOP SUMMARY TABLE")}
     ${text(CX+16,R4Y+42,"zone-label","LOOP")}
     ${text(CX+100,R4Y+42,"zone-label","FLOW")}
-    ${text(CX+240,R4Y+42,"zone-label","CHWS")}
-    ${text(CX+360,R4Y+42,"zone-label","CHWR")}
+    ${text(CX+240,R4Y+42,"zone-label","SEC-S")}
+    ${text(CX+360,R4Y+42,"zone-label","SEC-R")}
     ${text(CX+470,R4Y+42,"zone-label","DP AVG")}
     ${text(CX+580,R4Y+42,"zone-label","PUMP")}
     ${text(CX+640,R4Y+42,"zone-label","dT")}
@@ -1170,15 +1280,37 @@ function drawPid(){
 
 
 function renderKpi(){
+  // Primary CHW header — engine-true (deterministic, stable on reload).
   $("kChws").textContent = `${conv.t(st.header.chws,ui.unit)} ${conv.tu(ui.unit)}`;
   $("kChwr").textContent = `${conv.t(st.header.chwr,ui.unit)} ${conv.tu(ui.unit)}`;
+  $("kDt").textContent = `${ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt)} ${conv.tu(ui.unit)}`;
   $("kFlow").textContent = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
+  $("kCool").textContent = `${r1(st.header.coolingKw/1000)} MW`;
   $("kDp").textContent = `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}`;
 
   $("spChwsTxt").textContent = `${conv.t(st.sp.chws,ui.unit)}${conv.tu(ui.unit)}`;
   $("spDpTxt").textContent = `${conv.p(st.sp.dp,ui.unit)} ${conv.pu(ui.unit)}`;
   $("spFlowTxt").textContent = `${conv.f(st.sp.flow,ui.unit)} ${conv.fu(ui.unit)}`;
   $("unitLbl").textContent = ui.unit.toUpperCase();
+}
+
+function renderAlarmStrip(){
+  const strip = $("alarmStrip");
+  const lvl = st.alarm.level;
+  strip.className = "alarm-strip" + (lvl==="ALARM"?" alarm":(lvl==="WARNING"?" warn":""));
+  const nCrit = st.alarm.issues.filter(i=>i.level==="ALARM").length;
+  const nWarn = st.alarm.issues.filter(i=>i.level==="WARNING").length;
+  $("asLevel").textContent = lvl;
+  $("asCounts").textContent = `${nCrit} Critical • ${nWarn} Warning`;
+  const online = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
+  const red = online >= 3 ? "N+1" : (online >= 2 ? "N" : "DEGRADED");
+  $("asRedund").textContent = `Loops ${online}/4 • ${red}`;
+  // Primary CHW basis — engine-true figures (doc-04 acceptance criteria).
+  const dtTxt = ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt);
+  $("asChw").textContent = `CHWS ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} • CHWR ${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} • ΔT ${dtTxt} • ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
+  $("asLoad").textContent = `Cooling Demand ${r1(st.header.coolingKw/1000)} MW`;
+  const upS = Math.floor((Date.now()-ui.startTs)/1000);
+  $("asMeta").textContent = `Scenario: ${CHW.scenario} • Updated ${upS%60}s`;
 }
 
 function renderStatus(){
@@ -1265,8 +1397,9 @@ function renderModal(loopId){
   `;
 
   const kv = [
-    ["Supply Temp (T1)", `${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`],
-    ["Return Temp (T2)", `${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`],
+    ["Secondary Supply (T1)", `${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`],
+    ["Secondary Return (T2)", `${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`],
+    ["Primary CHWS / CHWR", `${conv.t(st.header.chws,ui.unit)} / ${conv.t(st.header.chwr,ui.unit)} ${conv.tu(ui.unit)} (engine)`],
     ["MFM1 Flow", `${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`],
     ["DPS1", `${conv.p(lp.dp1,ui.unit)} ${conv.pu(ui.unit)}`],
     ["DPS2", `${conv.p(lp.dp2,ui.unit)} ${conv.pu(ui.unit)}`],
@@ -1372,16 +1505,23 @@ function stepProcess(){
     }
   });
 
-  st.header.flow = r1(st.loops.reduce((s,l)=>s+l.flow,0));
+  // PRIMARY CHW header is engine-bound and DETERMINISTIC — re-assert canonical
+  // basis every tick (never overwrite with secondary-loop averages or PRNG).
+  const B = chwBasis();
+  st.header.chws = B.chws;       // 7.2 °C  (engine-true, stable on reload)
+  st.header.chwr = B.chwr;       // 14.8 °C
+  st.header.dt = B.dt;           // 7.6 K
+  st.header.flow = B.flow;       // ≈58 L/s = coolingKw / (4.186·ΔT)
+  st.header.coolingKw = B.coolingKw;
+  // Header DP is a hydraulic reading (not an engine engineering value) — it may
+  // track the secondary-side pump duty for realism, but stays a plant DP figure.
   st.header.dp = Math.round(st.loops.reduce((s,l)=>s+(l.dp1+l.dp2)/2,0)/st.loops.length);
-  st.header.chws = r1(st.loops.reduce((s,l)=>s+l.t1,0)/st.loops.length + r(-0.1,0.1));
-  st.header.chwr = r1(st.loops.reduce((s,l)=>s+l.t2,0)/st.loops.length + r(-0.1,0.1));
 
-  // Ambient temp drift
+  // Ambient temp drift (condenser-side environment, not an engine value)
   ui.ambient = r1(clamp(ui.ambient + r(-0.15, 0.15), 28, 42));
 
-  // Record sparkline data (max 30 points)
-  const dt = r1(st.header.chwr - st.header.chws);
+  // Record sparkline data (max 30 points) — COP/RT from engine-true header.
+  const dt = st.header.dt;
   const tkw = st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0);
   const trt = r1(st.header.flow * dt * 4.186 / 3.517);
   const cop = tkw > 0 ? r1(trt * 3.517 / tkw) : 0;
@@ -1398,6 +1538,7 @@ let staticDrawn = false;
 function renderAll(){
   alarmStep();
   renderKpi();
+  renderAlarmStrip();
   drawPid();
   renderStatus();
   renderHistory();
@@ -1479,14 +1620,17 @@ function bind(){
     $("pidSvg").style.transformOrigin = "top left";
   }, {passive:false});
 
-  // Hover highlight on loop panels
+  // Hover = cyan SELECTION outline (doc-10 color semantics: selection is a
+  // cyan outline, not a glow — glow is reserved for critical only).
   $("pidSvg").addEventListener("mouseover", e=>{
     const g = e.target.closest("[data-loop-id]");
-    if(g) g.querySelector(".panel")?.setAttribute("filter","url(#fGlow)");
+    const p = g && g.querySelector(".panel");
+    if(p){ p.style.stroke = "#4fb6c9"; p.style.strokeWidth = "2.4"; }
   });
   $("pidSvg").addEventListener("mouseout", e=>{
     const g = e.target.closest("[data-loop-id]");
-    if(g) g.querySelector(".panel")?.removeAttribute("filter");
+    const p = g && g.querySelector(".panel");
+    if(p){ p.style.stroke = ""; p.style.strokeWidth = ""; }
   });
 }
 
