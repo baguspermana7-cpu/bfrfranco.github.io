@@ -126,6 +126,28 @@ def audit() -> list[tuple[str, int, int, str]]:
             if err:
                 start_line = html.count("\n", 0, m.start()) + 1
                 failures.append((fname, block_idx, start_line, err))
+
+    # B-016 hardening: also node --check every shipped EXTERNAL js/*.js.
+    # The inline-block scan above structurally cannot see external `<script
+    # src>` files — that gap silently shipped a broken 699 KB extracted lab
+    # bundle. node --check each one directly.
+    js_dir = os.path.join(ROOT, "js")
+    if os.path.isdir(js_dir):
+        for jf in sorted(f for f in os.listdir(js_dir)
+                         if f.endswith(".js")):
+            jp = os.path.join(js_dir, jf)
+            try:
+                res = subprocess.run(["node", "--check", jp],
+                                     capture_output=True, text=True,
+                                     timeout=30)
+            except subprocess.TimeoutExpired:
+                failures.append(("js/" + jf, 0, 0, "node --check timed out"))
+                continue
+            if res.returncode != 0:
+                line = next((ln.strip() for ln in res.stderr.splitlines()
+                             if "SyntaxError" in ln),
+                            "external js parse failed")
+                failures.append(("js/" + jf, 0, 0, line))
     return failures
 
 

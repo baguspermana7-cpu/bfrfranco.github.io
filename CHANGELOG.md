@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.22.5 — 2026-05-18 (B-016 part 1: ltc lab external-JS SyntaxError fixed + audit hardened)
+
+### Fixed
+- **`js/ltc-system-modelling-lab.js`** (699 KB extracted IIFE) threw
+  `SyntaxError: Invalid or unexpected token` at line 5386 — the v1.8.2
+  responsive patch (commit a1e0abb) had injected its raw
+  `/* v1.8.0 — mobile sim/lab responsive patch */ @media(max-width:768px){…}`
+  block INTO a JS print-document string (clobbering the
+  `'</style></head><body><div class="r-wrap">' + innerHtml +` line), then
+  commit 17a5bf4 extracted the already-broken inline IIFE to this external
+  file — so the **entire lab was non-functional in-browser**. Collapsed the
+  81-line injected region back to the **git-authoritative original line**
+  (from the a1e0abb `-` hunk; 0 heuristic guesses). `node --check` exit 0;
+  browser: 0 pageerror, lab renders (117 interactive elements). Script
+  cache-bust `?v=2026-05-09` → `?v=2026-05-18`.
+- **`tools/audit-js-syntax.py` hardened**: now also `node --check`s every
+  shipped external `js/*.js` — the inline-block-only scan structurally
+  could not see external `<script src>` files, the exact gap that let this
+  broken 699 KB bundle ship silently. Verified CLEAN (103 HTML + all js/).
+
+### Still open (B-016 part 2)
+- `ltc-system-modelling-lab` / `capex` / `opex` / `cx` pre-existing
+  ~210–371 px horizontal overflow @390 px (responsive layout, NOT a JS
+  regression) — addressed next.
+
 ## v1.22.4 — 2026-05-18 (B-015 Stage 9 finalize: dc-conventional alarm strip — conventional suite COMPLETE)
 
 Stage-9 consolidated QA across all 7 redesigned conv pages found one
