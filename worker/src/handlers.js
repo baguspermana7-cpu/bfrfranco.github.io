@@ -3,6 +3,7 @@ import { fetchFx } from './sources/fx.js';
 import { fetchYahooQuotes, fetchYahooCandles } from './sources/yahoo.js';
 import { fetchStooqQuotes, fetchStooqCandles } from './sources/stooq.js';
 import { fetchFinnhubQuotes } from './sources/finnhub.js';
+import { fetchNews } from './sources/news.js';
 
 const FX_CACHE_KEY = 'fx:USD';
 const FX_TTL_MS = 60_000;
@@ -10,6 +11,8 @@ const FX_TTL_MS = 60_000;
 const QUOTES_TTL_MS = 60_000;
 
 const CANDLES_TTL_MS = 600_000; // 10 min
+
+const NEWS_TTL_MS = 600_000; // 10 min
 
 /**
  * Timeframe → { yahooRange, rows } map.
@@ -195,6 +198,47 @@ async function fetchCandlesWithFallback(symbol, yahooRange, rows) {
   }
 
   throw new Error('all candle sources failed: ' + errors.join(' | '));
+}
+
+/**
+ * handleNews(env, topic) — market news with KV cache + stale-on-error.
+ *
+ * topic: free-text query (e.g. 'market'). Defaults to 'market'.
+ *
+ * Source fallback order (in news.js):
+ *   1. GDELT doc/doc   (free, no key — reliable from datacenter IPs)
+ *   2. Yahoo RSS       (free, no key — XML regex-parsed)
+ *   3. Finnhub general (only if env.FINNHUB_KEY)
+ *
+ * Returns: { data: NewsItem[], cached, stale? }
+ *   NewsItem = { title, url, src, ts (epoch ms), summary } — newest first
+ *   - Fresh cache hit  : { data, cached: true }
+ *   - Live fetch       : { data, cached: false }
+ *   - All fail + stale : { data, cached: true, stale: true }
+ *   - All fail + none  : throws
+ */
+export async function handleNews(env, topic) {
+  const t = String(topic || '').trim() || 'market';
+  const cacheKey = 'news:' + t;
+
+  // Fresh cache first
+  const fresh = await getCached(env.FT_KV, cacheKey, NEWS_TTL_MS);
+  if (fresh && !fresh.stale) {
+    return { data: fresh.data, cached: true };
+  }
+
+  // Live sources with fallback
+  try {
+    const data = await fetchNews(t, env);
+    await setCached(env.FT_KV, cacheKey, data);
+    return { data, cached: false };
+  } catch (fetchErr) {
+    const stale = await getCached(env.FT_KV, cacheKey, NEWS_TTL_MS, { allowStale: true });
+    if (stale) {
+      return { data: stale.data, cached: true, stale: true };
+    }
+    throw fetchErr;
+  }
 }
 
 export async function handleFx(env) {

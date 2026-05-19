@@ -2166,8 +2166,30 @@ function setNewsMode(mode){
 
 async function loadNews(){loadNewsFeed()}
 
+function renderNewsItems(el,list){
+  el.innerHTML=list.map(a=>`
+    <div class="news-item">
+      ${a.image?`<img src="${a.image}" alt="" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:'<div class="news-icon"><i class="fas fa-newspaper"></i></div>'}
+      <div class="news-body">
+        <div class="news-title"><a href="${a.url}" target="_blank" rel="noopener">${esc(a.headline||'')}</a></div>
+        <div style="font-size:.72rem;color:var(--t3);margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(a.summary||'')}</div>
+        <div class="news-meta"><span class="news-source">${esc(a.source||'')}</span><span>${fmtD(a.datetime)}</span></div>
+      </div>
+    </div>`).join('');
+}
+
 async function loadNewsFeed(){
   const el=$('newsFeed');
+  if(CFG.V2){
+    el.innerHTML='<div class="news-item"><div class="news-icon"><i class="fas fa-newspaper"></i></div><div class="news-body"><div class="loading-text"><span class="spinner"></span>Loading news...</div></div></div>'.repeat(4);
+    try{
+      const articles=await gw('/news',{topic:'market'});
+      if(!articles||!articles.length){el.innerHTML='<div class="empty"><i class="fas fa-newspaper"></i><p>News unavailable</p><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="loadNewsFeed()">Retry</button></div>';return}
+      S.news=articles.slice(0,30).map(n=>({headline:n.title,url:n.url,source:n.src,summary:n.summary,datetime:Math.round((n.ts||Date.now())/1000)}));
+      renderNewsItems(el,S.news);
+    }catch(e){el.innerHTML='<div class="empty"><i class="fas fa-newspaper"></i><p>News unavailable</p><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="loadNewsFeed()">Retry</button></div>'}
+    return;
+  }
   if(!S.fhKey){el.innerHTML='<div class="empty"><i class="fas fa-key"></i><p>Enter API key for news</p></div>';return}
   try{
     const articles=await fh('/news',{category:'general',minId:0});

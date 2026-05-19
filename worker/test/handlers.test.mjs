@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx, handleQuotes, handleCandles } from '../src/handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -440,6 +440,162 @@ test('Test I: fresh candle cache hit → cached:true, no fetch', async () => {
 
   try {
     const result = await handleCandles({ FT_KV: kv }, 'GLD', '3M');
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, cachedData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleNews tests (Task 1.4) — fixes B-008
+   Contract: data = [{ title, url, src, ts, summary }]
+   ts = epoch ms, newest-first, ~20 items, dedup by url.
+   ═══════════════════════════════════════════════════════════════ */
+
+// Helper: build a GDELT doc/doc ArtList JSON response.
+//   articles[] = { title, url, domain, seendate, ... }
+function gdeltResponse(articles) {
+  return JSON.stringify({ articles });
+}
+
+// Helper: build a Yahoo Finance RSS 2.0 XML feed string.
+function yahooRss(items) {
+  const body = items.map(it =>
+    '<item>' +
+    `<title>${it.title}</title>` +
+    `<link>${it.link}</link>` +
+    `<pubDate>${it.pubDate}</pubDate>` +
+    `<description>${it.desc || ''}</description>` +
+    '</item>'
+  ).join('');
+  return '<?xml version="1.0"?><rss version="2.0"><channel>' +
+    '<title>Yahoo Finance</title>' + body + '</channel></rss>';
+}
+
+// Test K: GDELT stub → handleNews returns mapped array, newest-first, cached.
+test('Test K: GDELT → handleNews mapped array, newest-first, cached', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+
+  // seendate is GDELT format YYYYMMDDTHHMMSSZ. Provide out-of-order; expect newest first.
+  const articles = [
+    { title: 'Older market story', url: 'https://a.example/older', domain: 'a.example', seendate: '20260518T120000Z' },
+    { title: 'Newest market story', url: 'https://b.example/newest', domain: 'b.example', seendate: '20260519T090000Z' },
+    { title: 'Middle market story', url: 'https://c.example/mid', domain: 'c.example', seendate: '20260519T010000Z' },
+    // Duplicate URL of "newest" — must be deduped.
+    { title: 'Dup of newest', url: 'https://b.example/newest', domain: 'b.example', seendate: '20260519T093000Z' },
+  ];
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('api.gdeltproject.org')) {
+      return { ok: true, json: async () => JSON.parse(gdeltResponse(articles)) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleNews({ FT_KV: kv }, 'market');
+    assert.equal(result.cached, false, 'first fetch not cached');
+    assert.equal(Array.isArray(result.data), true, 'data should be array');
+    assert.equal(result.data.length, 3, 'duplicate url deduped → 3 unique');
+
+    // Shape: { title, url, src, ts, summary }
+    for (const n of result.data) {
+      assert.equal(typeof n.title, 'string');
+      assert.equal(typeof n.url, 'string');
+      assert.equal(typeof n.src, 'string');
+      assert.equal(typeof n.ts, 'number');
+      assert.ok(n.ts > 1e12 && n.ts < 2e12, 'ts should be epoch MS, got ' + n.ts);
+      assert.equal(typeof n.summary, 'string');
+    }
+
+    // Newest first
+    assert.equal(result.data[0].title, 'Newest market story');
+    assert.equal(result.data[0].src, 'b.example');
+    let prev = Infinity;
+    for (const n of result.data) {
+      assert.ok(n.ts <= prev, 'must be sorted newest-first (descending ts)');
+      prev = n.ts;
+    }
+
+    // KV populated under news:market
+    const raw = kv.store.get('news:market');
+    assert.ok(raw != null, 'news should be cached in KV under news:market');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test L: GDELT throws → Yahoo RSS XML fallback parsed; entities decoded.
+test('Test L: GDELT fails → Yahoo RSS parsed, entities decoded', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+
+  const items = [
+    {
+      title: 'Stocks rally as Tech &amp; Energy lead &lt;gains&gt;',
+      link: 'https://finance.yahoo.com/news/rally-123.html',
+      pubDate: 'Mon, 19 May 2026 09:00:00 +0000',
+      desc: 'Markets up on &quot;strong&quot; data',
+    },
+    {
+      title: 'Bonds slip',
+      link: 'https://finance.yahoo.com/news/bonds-456.html',
+      pubDate: 'Mon, 19 May 2026 08:00:00 +0000',
+      desc: 'Yields rise &amp; prices fall',
+    },
+  ];
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('api.gdeltproject.org')) {
+      throw new Error('GDELT unavailable');
+    }
+    if (u.includes('finance.yahoo.com') || u.includes('feeds.finance.yahoo.com')) {
+      return { ok: true, text: async () => yahooRss(items) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleNews({ FT_KV: kv }, 'market');
+    assert.equal(result.cached, false);
+    assert.equal(Array.isArray(result.data), true);
+    assert.equal(result.data.length, 2, 'two RSS items parsed');
+
+    const first = result.data[0];
+    // Entities decoded (&amp; → &, &lt; → <, &gt; → >)
+    assert.equal(first.title, 'Stocks rally as Tech & Energy lead <gains>');
+    assert.equal(first.url, 'https://finance.yahoo.com/news/rally-123.html');
+    assert.equal(first.summary, 'Markets up on "strong" data');
+    assert.ok(first.src && typeof first.src === 'string', 'src derived from link domain');
+    assert.equal(typeof first.ts, 'number');
+    assert.ok(first.ts > 1e12 && first.ts < 2e12, 'ts epoch ms');
+
+    // Newest-first ordering preserved
+    assert.ok(result.data[0].ts >= result.data[1].ts, 'newest first');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test M: fresh cache hit → handleNews returns cached:true WITHOUT calling fetch.
+test('Test M: fresh news cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  const cachedData = [
+    { title: 'Cached story', url: 'https://x.example/1', src: 'x.example', ts: 1779000000000, summary: 'cached' },
+  ];
+  await setCached(kv, 'news:market', cachedData);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleNews({ FT_KV: kv }, 'market');
     assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
     assert.equal(result.cached, true);
     assert.deepEqual(result.data, cachedData);

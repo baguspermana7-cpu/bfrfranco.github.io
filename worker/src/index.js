@@ -1,4 +1,4 @@
-import { handleFx, handleQuotes, handleCandles } from './handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -67,6 +67,16 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'candles: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/news') {
+        const t = (new URL(request.url)).searchParams.get('topic');
+        try {
+          const { data, cached } = await handleNews(env, t || 'market');
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'news: ' + String(e) });
         }
       }
 
