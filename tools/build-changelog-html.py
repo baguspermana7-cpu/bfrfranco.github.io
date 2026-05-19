@@ -1005,6 +1005,24 @@ def main():
 
     html_out = build_html(entries)
 
+    # B-001 defense-in-depth: a CHANGELOG code-span split across md lines (or
+    # any stray backtick) leaves a raw "`<" in body text → the browser
+    # tokenizer treats it as a live tag and breaks changelog.html (the
+    # easter-egg page). Fail the build LOUDLY rather than ship it silently.
+    danger = re.findall(r'`<\s*(?:script|style|li|details|div|a|img|iframe)\b',
+                         html_out, re.IGNORECASE)
+    if danger:
+        bad = [ln for ln in html_out.splitlines()
+               if re.search(r'`<\s*(?:script|style|li|details|div|a|img'
+                            r'|iframe)\b', ln, re.IGNORECASE)]
+        print('BUILD FAILED — raw "`<tag" leaked into changelog.html '
+              '(a CHANGELOG.md code-span is split across lines or has an '
+              'unbalanced backtick — keep each `...` span on ONE line):',
+              file=sys.stderr)
+        for ln in bad[:8]:
+            print('  ' + ln.strip()[:140], file=sys.stderr)
+        sys.exit(1)
+
     if apply:
         with open(OUTPUT, 'w', encoding='utf-8') as fh:
             fh.write(html_out)

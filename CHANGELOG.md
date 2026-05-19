@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.22.1 — 2026-05-18 (hotfix: v1.22.0 shipped a broken changelog.html + generator guard)
+
+### Fixed
+- The v1.22.0 CHANGELOG entry had an inline code span split across two
+  markdown source lines. `inline_md()` matches per line, so the span never
+  closed and a raw `&lt;script` leaked into changelog.html (the easter-egg
+  page) — `audit-script-tags --strict` flagged it CRITICAL but a faulty
+  `&&` shell chain let v1.22.0 push anyway (process failure, acknowledged).
+  Rephrased the offending entry; code spans kept single-line.
+- **Defense-in-depth**: `tools/build-changelog-html.py` now self-checks its
+  generated output and `sys.exit(1)` (build fails loudly) if a raw
+  backtick-tag pattern leaks — a malformed CHANGELOG can no longer silently
+  ship a broken changelog.html.
+- Verified: build exit 0, `audit-script-tags`/`audit-js-syntax --strict`
+  CLEAN, 0 raw backtick-tags in changelog.html.
+
 ## v1.22.0 — 2026-05-18 (B-015 Stage 1: Conventional BMS scenario engine + dc-conventional bind)
 
 User: *"dc-conventional.html garisnya tabrakan dan gambar2nya seperti
@@ -29,8 +45,8 @@ byte-untouched).
   Definition-of-Done identities + doc-09 worked examples. **22/22 pass.**
 
 ### Changed
-- **dc-conventional.html** bound to the engine via `<script src="js/conv-
-  engine.js">` (external, not inlined): dashboard KPIs/callouts now read
+- **dc-conventional.html** bound to the engine via an external
+  `<script src>` (not inlined): dashboard KPIs/callouts now read
   `window.CONV_CALC.snapshot` (was `Math.random()`). Total = IT×PUE = **2,683
   kW** shown exactly; Non-IT = Facility−IT; CHW single basis 7.2/14.8 °C
   (conflict resolved per doc-00/09, condenser loop relabel deferred).
