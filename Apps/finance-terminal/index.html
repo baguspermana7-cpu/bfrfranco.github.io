@@ -621,7 +621,9 @@ const CFG={
     'Small Cap':{minMcap:300e6,maxMcap:2e9},
     'High Volume':{minVol:5e6},
     'Mega Cap':{minMcap:200e9}
-  }
+  },
+  GW:(typeof localStorage!=='undefined' && localStorage.getItem('rz_ft_gw')) || 'https://rz-finance-gateway.PLACEHOLDER.workers.dev',
+  V2:(typeof localStorage!=='undefined' && localStorage.getItem('rz_ft_v2')==='1'),
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -685,6 +687,16 @@ function fetchWithTimeout(url,ms){
   const ctrl=new AbortController();
   const tid=setTimeout(()=>ctrl.abort(),ms);
   return fetch(url,{signal:ctrl.signal}).finally(()=>clearTimeout(tid));
+}
+/* v2 gateway helper — only used when CFG.V2 is on (feature-flagged rollout) */
+async function gw(path,params){
+  let u=CFG.GW+path;
+  if(params){const q=new URLSearchParams(params).toString();if(q)u+=(path.indexOf('?')>=0?'&':'?')+q;}
+  const r=await fetchWithTimeout(u,8000);
+  if(!r.ok)throw new Error('GW '+r.status);
+  const j=await r.json();
+  if(!j||j.ok!==true)throw new Error(j&&j.error?('GW '+j.error):'GW bad envelope');
+  return j.data;
 }
 const CORS_PROXIES=[
   url=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
