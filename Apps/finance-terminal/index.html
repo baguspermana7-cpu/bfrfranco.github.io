@@ -438,7 +438,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="panel" id="panel-crypto">
 <div class="kpi-grid" id="cryptoKpis"></div>
 <div class="g23">
-<div class="card"><div class="card-title"><i class="fab fa-bitcoin"></i>Top Cryptocurrencies</div>
+<div class="card"><div class="card-title"><i class="fab fa-bitcoin"></i>Top Cryptocurrencies<div class="inp-icon" style="margin-left:auto"><i class="fas fa-search"></i><input class="inp" id="cryptoFilter" placeholder="Filter..." style="width:160px;font-weight:400;text-transform:none;letter-spacing:0"></div></div>
 <div class="tbl-wrap"><table class="dtbl" id="cryptoTable"><thead><tr><th>Rank</th><th>Name</th><th class="txt-r">Price</th><th class="txt-r">1h</th><th class="txt-r">24h</th><th class="txt-r">7d</th><th class="txt-r">Market Cap</th><th class="txt-r">Volume 24h</th><th>7d Chart</th></tr></thead><tbody></tbody></table></div>
 <div class="paging" id="cryptoPaging"></div>
 </div>
@@ -476,7 +476,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 </div>
 <div class="preset-bar" id="presetBar"></div>
 <div class="filters" id="screenerFilters"></div>
-<div class="card"><div class="card-title"><i class="fas fa-list"></i>Results <span id="screenerCount" class="badge badge-b" style="margin-left:8px">0</span></div>
+<div class="card"><div class="card-title"><i class="fas fa-list"></i>Results <span id="screenerCount" class="badge badge-b" style="margin-left:8px">0</span><div class="inp-icon" style="margin-left:auto"><i class="fas fa-search"></i><input class="inp" id="screenerFilter" placeholder="Filter..." style="width:160px;font-weight:400;text-transform:none;letter-spacing:0"></div></div>
 <div class="tbl-wrap"><table class="dtbl" id="screenerTable"><thead></thead><tbody></tbody></table></div>
 <div class="paging" id="screenerPaging"></div>
 <div style="margin-top:.75rem"><button class="btn btn-o btn-sm" onclick="exportScreenerCSV()"><i class="fas fa-download"></i>Export CSV</button></div>
@@ -552,7 +552,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="panel" id="panel-sectors">
 <div class="card"><div class="card-title"><i class="fas fa-chart-bar"></i>Sector Performance</div><div style="height:350px"><canvas id="sectorChart"></canvas></div></div>
 <div class="g2" style="margin-top:1rem">
-<div class="card"><div class="card-title"><i class="fas fa-table"></i>Sector Details</div><div class="tbl-wrap"><table class="dtbl" id="sectorTable"><thead><tr><th>Sector</th><th>ETF</th><th class="txt-r">Price</th><th class="txt-r">Day %</th><th class="txt-r">Vol</th></tr></thead><tbody></tbody></table></div></div>
+<div class="card"><div class="card-title"><i class="fas fa-table"></i>Sector Details<div class="inp-icon" style="margin-left:auto"><i class="fas fa-search"></i><input class="inp" id="sectorFilter" placeholder="Filter..." style="width:140px;font-weight:400;text-transform:none;letter-spacing:0"></div></div><div class="tbl-wrap"><table class="dtbl" id="sectorTable"><thead><tr><th>Sector</th><th>ETF</th><th class="txt-r">Price</th><th class="txt-r">Day %</th><th class="txt-r">Vol</th></tr></thead><tbody></tbody></table></div></div>
 <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i>Sector Weights</div><div style="height:300px"><canvas id="sectorPie"></canvas></div></div>
 </div>
 </div>
@@ -573,7 +573,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="panel" id="panel-futures">
 <div class="kpi-grid" id="futuresKpis"></div>
 <div class="g23" style="margin-top:1rem">
-<div class="card"><div class="card-title"><i class="fas fa-table"></i>Futures Proxies (via ETFs)</div>
+<div class="card"><div class="card-title"><i class="fas fa-table"></i>Futures Proxies (via ETFs)<div class="inp-icon" style="margin-left:auto"><i class="fas fa-search"></i><input class="inp" id="futuresFilter" placeholder="Filter..." style="width:160px;font-weight:400;text-transform:none;letter-spacing:0"></div></div>
 <div class="tbl-wrap"><table class="dtbl" id="futuresTable"><thead><tr><th>Contract</th><th>ETF Proxy</th><th class="txt-r">Price</th><th class="txt-r">Change %</th><th class="txt-r">Volume</th></tr></thead><tbody></tbody></table></div>
 </div>
 <div>
@@ -791,6 +791,91 @@ function chgClass(v){return v>0?'up':v<0?'down':'flat'}
 function chgIcon(v){return v>0?'<i class="fas fa-caret-up"></i>':v<0?'<i class="fas fa-caret-down"></i>':''}
 function chgColor(v){return v>0?'var(--grn)':v<0?'var(--red)':'var(--t4)'}
 function destroyChart(key){if(S.charts[key]){S.charts[key].destroy();delete S.charts[key]}}
+
+/* ── B-004: reusable sortable + filterable data tables (V2-gated) ──
+   The pure comparator below is duplicated verbatim from
+   Apps/finance-terminal/_table-sort.mjs (the static page can't import a
+   module without a build step). KEEP IDENTICAL — unit tests in
+   _table-sort.test.mjs guard the .mjs copy. */
+/* B-004: keep identical to _table-sort.mjs */
+function parseCell(str){
+  if(str==null)return NaN;
+  var s=String(str).replace(/[$,%\s]/g,'');
+  if(s===''||s==='-'||s==='+')return NaN;
+  if(!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(s))return NaN;
+  var n=parseFloat(s);
+  return Number.isFinite(n)?n:NaN;
+}
+/* B-004: keep identical to _table-sort.mjs */
+function cmpCells(a,b,dir){
+  var na=parseCell(a),nb=parseCell(b),r;
+  if(Number.isFinite(na)&&Number.isFinite(nb)){r=na-nb;}
+  else{r=String(a==null?'':a).localeCompare(String(b==null?'':b),undefined,{sensitivity:'accent'});}
+  var out=dir==='desc'?-r:r;
+  return out===0?0:out;
+}
+/* Make a .dtbl sortable: one delegated thead handler. Single-click any
+   th sorts by its column; the Name column also responds to dblclick
+   (the user-reported B-004 symptom). Repeat activation toggles
+   asc/desc; reuses the existing th.sorted-asc / th.sorted-desc CSS
+   arrows. tbody.append(...rows) MOVES the existing nodes so row click
+   handlers survive. Idempotent via table.dataset.sortable. */
+function makeSortable(table,opts){
+  if(!table||table.dataset.sortable==='1')return;
+  table.dataset.sortable='1';
+  opts=opts||{};
+  var sortBy=function(idx,th){
+    var tb=table.tBodies[0];if(!tb)return;
+    var rows=Array.prototype.slice.call(tb.rows).filter(function(r){return r.cells&&r.cells.length>idx;});
+    if(rows.length<2)return;
+    var asc=table._sortCol!==idx?true:!table._sortAsc;
+    table._sortCol=idx;table._sortAsc=asc;
+    var dir=asc?'asc':'desc';
+    rows.sort(function(x,y){return cmpCells(x.cells[idx].textContent.trim(),y.cells[idx].textContent.trim(),dir);});
+    tb.append.apply(tb,rows);
+    var ths=table.tHead?table.tHead.rows[0].cells:[];
+    for(var i=0;i<ths.length;i++){ths[i].classList.remove('sorted-asc','sorted-desc');}
+    if(th)th.classList.add(asc?'sorted-asc':'sorted-desc');
+  };
+  table.tHead&&table.tHead.addEventListener('click',function(e){
+    var th=e.target.closest&&e.target.closest('th');
+    if(!th||!table.tHead.contains(th))return;
+    sortBy(th.cellIndex,th);
+  });
+  table.tHead&&table.tHead.addEventListener('dblclick',function(e){
+    var th=e.target.closest&&e.target.closest('th');
+    if(!th||!table.tHead.contains(th))return;
+    var nameSel=opts.nameSelector||'Name';
+    if((th.textContent||'').trim().toLowerCase()===String(nameSel).toLowerCase())sortBy(th.cellIndex,th);
+  });
+}
+/* Wire a text input to live-filter a .dtbl: hide tbody rows whose
+   textContent doesn't contain the (case-insensitive) query. Empty
+   query → all rows visible. */
+function attachFilter(input,table){
+  if(!input||!table||input.dataset.filterBound==='1')return;
+  input.dataset.filterBound='1';
+  input.addEventListener('input',function(){
+    var q=(input.value||'').trim().toLowerCase();
+    var tb=table.tBodies[0];if(!tb)return;
+    var rows=tb.rows;
+    for(var i=0;i<rows.length;i++){
+      var r=rows[i];
+      r.style.display=(!q||(r.textContent||'').toLowerCase().indexOf(q)>=0)?'':'none';
+    }
+  });
+}
+/* V2-only post-render hook: make a table sortable and (if present)
+   bind its sibling filter input. id = table element id; filterId =
+   optional filter <input> id. Safe to call repeatedly (idempotent
+   guards above). */
+function wireTable(id,filterId){
+  if(!CFG.V2)return;
+  var t=$(id);if(!t)return;
+  makeSortable(t,{nameSelector:'Name'});
+  if(filterId){var inp=$(filterId);if(inp)attachFilter(inp,t);}
+}
+
 /* TradingView lightweight-charts renderer (V2 only). Candlestick + volume +
    SMA20 + crosshair, dark/light theme matching the app. Instances tracked on
    S._lwc[containerId] so re-renders cleanly .remove() the prior chart.
@@ -1929,6 +2014,7 @@ function renderCryptoTable(){
   // Pagination
   const totalPages=Math.ceil(S.cryptoList.length/perPage);
   $('cryptoPaging').innerHTML=Array.from({length:totalPages},(_, i)=>`<button class="pg-btn${i+1===S.cryptoPage?' active':''}" onclick="S.cryptoPage=${i+1};renderCryptoTable()">${i+1}</button>`).join('');
+  wireTable('cryptoTable','cryptoFilter'); // B-004 (V2-gated, idempotent)
 }
 
 async function loadTrending(){
@@ -2076,6 +2162,7 @@ function renderScreenerResults(){
   </tr>`).join('');
   const totalPages=Math.ceil(S.scrResults.length/perPage);
   $('screenerPaging').innerHTML=Array.from({length:totalPages},(_,i)=>`<button class="pg-btn${i+1===S.scrPage?' active':''}" onclick="S.scrPage=${i+1};renderScreenerResults()">${i+1}</button>`).join('');
+  wireTable('screenerTable','screenerFilter'); // B-004 (V2-gated, idempotent)
 }
 
 function exportScreenerCSV(){
@@ -2461,6 +2548,7 @@ async function loadSectorsV2(){
       data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
     });
+    wireTable('sectorTable','sectorFilter'); // B-004 (V2-gated, idempotent)
   }catch(e){
     tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadSectorsV2()">Retry</a></p></div></td></tr>';
   }
@@ -2893,6 +2981,7 @@ async function loadFuturesV2(){
         scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:9}}}}}
     });
     if(!S.futSym)S.futSym=topSyms[0]||'SPY';
+    wireTable('futuresTable','futuresFilter'); // B-004 (V2-gated, idempotent)
     loadFuturesChart('M');
   }catch(e){
     tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadFuturesV2()">Retry</a></p></div></td></tr>';
