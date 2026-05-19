@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v1.20.8 — 2026-05-18 (insights freshness + changelog easter-egg-only + linkage playbook)
+
+User: *"insights.html sama sekali tidak update dan tidak align"* ·
+*"changelog … tidak usah ada menunya … muncul klw klik version … easter egg"* ·
+*"jika ada keterkaitan begini … anda harus ingat di document & memory …
+playbook dan handoff."*
+
+### Fixed
+- **insights.html alignment**: `.categories-grid` was `max-width:1000px` +
+  auto-fit → only 2 columns, orphaning the 3rd "Future Forward" card.
+  Now `repeat(3,1fr)` max-width 1200 (3-up desktop, 2-up ≤1024, 1-up ≤768)
+  — all 3 category cards align in one row.
+- **insights.html stale "Latest Publications"**: feed stopped at article-13
+  while articles 14–27 existed. Replaced with the 8 newest (27→20) using
+  REAL `datePublished` + titles + correct `feed-category`.
+- **search-index.json**: `article-27` was missing (in sitemap, absent from
+  search) — added (id 45, newest-first position). Caught by the new playbook.
+
+### Changed
+- **Changelog is now easter-egg-only**: removed the `<li>…Changelog NEW</li>`
+  nav-menu item from `index.html` / `articles.html` / `tools.html`. The
+  footer version stamp (`script.js injectVersionStamp()` → `changelog.html`,
+  and standalone pages' `<span class="version-stamp">`) is the sole path —
+  intact & verified.
+
+### Added — durable handoff
+- **`standarization/CONTENT_LINKAGE_PLAYBOOK.md`** — the "when X changes,
+  also update Y" checklist (article → insights/articles/series/glossary/
+  sitemap/search-index/llms/post-drafts; tool → tools/dc-solutions/rz-ops;
+  every change → version+changelog+sw+gates+memory; invariants). Wired into
+  `CLAUDE.md` (Standardisation-docs + Process-discipline) + memory
+  (`feedback_content_linkage_playbook.md`, MEMORY.md). Read at START & END
+  of every content/feature task; a stale cross-ref is a failure even on a
+  green build.
+
 ## v1.20.7 — 2026-05-18 (datahallAI — 3 doc-18 conformance gaps fixed)
 
 Read-only per-screen conformance audit vs `18-qa-acceptance-criteria.md`

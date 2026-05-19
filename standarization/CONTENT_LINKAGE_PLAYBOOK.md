@@ -1,0 +1,78 @@
+# Content Linkage Playbook & Handoff
+
+> **Mandate (user, 2026-05-18):** *"jika ada keterkaitan begini, tidak hanya
+> ini, tapi untuk semuanya — anda harus ingat di suatu document (changelog /
+> standarization) dan di memory. Anggap ini playbook dan handoff agar tidak
+> terlewat jika ada article atau improvement baru."*
+>
+> Root cause this prevents: `insights.html` "Latest Publications" was stale
+> at article-13 while articles 14–27 existed — a cross-page linkage was
+> missed because no checklist enforced it.
+
+**Read this at the START and the END of any content/feature task.** If you
+add or change anything in the left column, you MUST update everything in the
+right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
+
+---
+
+## 1. New / updated ARTICLE (`article-N.html`, geopolitics, FF series)
+
+| Touch | Update (same commit) |
+|---|---|
+| `insights.html` | "Latest Publications" feed — prepend newest with **real** `datePublished` (read from the article's JSON-LD/meta — never fabricate dates), real `<title>`, correct `feed-category` (`engineering` / `global` / `future-forward`). Keep ~8 most-recent. |
+| `articles.html` | Article index/grid card + count. |
+| Series landing | `future-forward.html` (FF-n) or `geopolitics.html` (geopolitics-n) — add the entry + update series counts/stats (no `0 / New` placeholders). |
+| `glossary.html` | ≥5 new terms with backlinks (existing glossary mandate — `TOOLTIP_STANDARD.md`). |
+| `sitemap.xml` | `python3 tools/build-sitemap.py --apply`. |
+| `search-index.json` | Add the page entry. |
+| `llms.txt` / `llms-full.txt` | `python3 tools/build-llms-txt.py --apply` + `build-llms-full.py --apply`. |
+| `standarization/Indexing gconsole/top-urls-request-indexing.txt` | Add the new URL. |
+| Related-articles | Cross-link from 2–3 sibling articles. |
+| `Article/Post Draft/<Name>/` | 5 platform MDs (x, linkedin, mastodon, medium, facebook) — `feedback_post_draft_mandate`. |
+
+## 2. New / updated CALCULATOR or TOOL
+
+| Touch | Update |
+|---|---|
+| `tools.html`, `datacenter-solutions.html` | Add the tool card. |
+| `insights.html` | "Reports & Trackers" card if analytical. |
+| `rz-ops-p7x3k9m.html` | 3-tier feature-flag row (`rz-feature-flags.js`). |
+| sitemap / search-index / llms / top-urls | As §1. |
+| `standarization/UI_FEATURES_STANDARD.md` | Document the new pattern. |
+| Post Draft folder | 5 platform MDs. |
+
+## 3. EVERY shipped change (always — no exceptions)
+
+1. `js/rz-version.js` — bump semver **and** `RZ_VERSION_DATE` (today's date).
+2. `CHANGELOG.md` — entry quoting the user's request; then
+   `python3 tools/build-changelog-html.py --apply`.
+3. `python3 tools/sync-sw-version.py`.
+4. Pre-push gates ALL green: `audit-script-tags.py --strict`,
+   `audit-js-syntax.py --strict`, `audit-version-stamp.py --strict`,
+   `audit-mobile-responsive.py --strict`.
+5. Update the relevant `standarization/*.md` doc.
+6. Update memory: the session file + `MEMORY.md` one-line index.
+7. `git push origin main`, then
+   `python3 tools/indexnow-submit.py --since HEAD~1`.
+
+## 4. Cross-page invariants (must always hold)
+
+- **Changelog is easter-egg-only**: reachable ONLY via the footer version
+  stamp (`script.js injectVersionStamp()` → `changelog.html`; standalone
+  pages use `<span class="version-stamp"><a href="changelog.html">`). It is
+  **never** a nav-menu `<li>` item. (Removed from index/articles/tools nav
+  2026-05-18 v1.20.8.)
+- Default theme = **DAY/light** (v1.19.1); only an explicit toggle picks dark.
+- Diagram/SVG: `viewBox` + `preserveAspectRatio`, 0 px overflow @390px,
+  0 line/text overlap.
+- DC-dashboard tab in `datahallAI.html` is excluded from the redesign —
+  keep byte-identical unless the owner un-excludes it.
+- Sub-agent claims are NEVER trusted unverified — re-run gates + browser +
+  byte-diff yourself.
+
+## 5. Handoff
+
+This file + `~/.claude/.../memory/` is the handoff. A new session/agent
+picking up content or feature work reads §1–§4 first. When a linkage class
+not listed here is discovered, ADD it here in the same change (this doc is
+itself under the §3 "every change" rule).

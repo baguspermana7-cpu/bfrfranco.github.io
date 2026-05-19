@@ -280,10 +280,16 @@ Reference these BEFORE adding new patterns. Update them WHEN shipping a new patt
 - `standarization/SEO_OPTIMIZATION_STANDARD.md` — meta, canonical, OG, JSON-LD, AI search optimisation
 - `standarization/AUTH_STANDARD.md` — login modal, auth widget injection
 - `standarization/PDF_EXPORT_STANDARD.md` — PDF print-window templates + `<\/script>` escape rule
+- **`standarization/CONTENT_LINKAGE_PLAYBOOK.md` — READ AT START & END of any content/feature task.** The "when X changes, also update Y" handoff (new article → insights feed + articles index + series page + glossary + sitemap + search-index + llms + post-drafts; new tool → tools/dc-solutions/rz-ops; every change → version+changelog+sw+gates+memory). Changelog is easter-egg-only (version stamp), never a nav item.
 
 ---
 
 ## Process discipline
+
+> **Cross-linkage handoff:** before starting AND before shipping any content
+> or feature task, walk `standarization/CONTENT_LINKAGE_PLAYBOOK.md` §1–§4.
+> A green build with a stale cross-reference (e.g. insights feed missing new
+> articles, search-index missing a page) is still a failure.
 
 ### Use TaskCreate for multi-step work
 
