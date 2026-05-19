@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#8b5cf6;--acc2:#a78bfa;--accbg:rgba(139,92,246,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -791,6 +791,59 @@ function chgClass(v){return v>0?'up':v<0?'down':'flat'}
 function chgIcon(v){return v>0?'<i class="fas fa-caret-up"></i>':v<0?'<i class="fas fa-caret-down"></i>':''}
 function chgColor(v){return v>0?'var(--grn)':v<0?'var(--red)':'var(--t4)'}
 function destroyChart(key){if(S.charts[key]){S.charts[key].destroy();delete S.charts[key]}}
+/* TradingView lightweight-charts renderer (V2 only). Candlestick + volume +
+   SMA20 + crosshair, dark/light theme matching the app. Instances tracked on
+   S._lwc[containerId] so re-renders cleanly .remove() the prior chart.
+   Returns true on success, false if the lib is unavailable (caller falls
+   back to the existing Chart.js path — never throws). */
+function renderCandles(containerId,candles,opts){
+  opts=opts||{};
+  if(typeof LightweightCharts==='undefined')return false;
+  const el=$(containerId);
+  if(!el)return false;
+  S._lwc=S._lwc||{};
+  // Remove any prior chart in this container.
+  if(S._lwc[containerId]){try{S._lwc[containerId].ro&&S._lwc[containerId].ro.disconnect()}catch(e){}try{S._lwc[containerId].chart.remove()}catch(e){}delete S._lwc[containerId]}
+  el.innerHTML='';
+  const rows=(candles||[]).filter(k=>k&&isFinite(k.t)&&isFinite(k.c)).sort((a,b)=>a.t-b.t);
+  if(!rows.length){el.innerHTML='<div class="loading-text" style="padding:2rem;text-align:center;color:var(--t4)">No chart data available</div>';return true}
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  const chart=LightweightCharts.createChart(el,{
+    width:el.clientWidth||el.parentElement.clientWidth||600,height:opts.height||320,
+    layout:{background:{type:'solid',color:dark?'#0f172a':'#f8fafc'},textColor:dark?'#94a3b8':'#64748b',fontSize:11,fontFamily:'Inter,sans-serif'},
+    grid:{vertLines:{color:dark?'rgba(51,65,85,.3)':'rgba(203,213,225,.4)'},horzLines:{color:dark?'rgba(51,65,85,.3)':'rgba(203,213,225,.4)'}},
+    rightPriceScale:{borderColor:dark?'#334155':'#e2e8f0',scaleMargins:{top:0.1,bottom:0.25}},
+    timeScale:{borderColor:dark?'#334155':'#e2e8f0',timeVisible:false,secondsVisible:false},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{labelBackgroundColor:dark?'#8b5cf6':'#7c3aed'},horzLine:{labelBackgroundColor:dark?'#8b5cf6':'#7c3aed'}},
+    handleScroll:{vertTouchDrag:false}
+  });
+  const candleSeries=chart.addCandlestickSeries({upColor:'#22c55e',downColor:'#ef4444',borderUpColor:'#22c55e',borderDownColor:'#ef4444',wickUpColor:'#4ade80',wickDownColor:'#f87171'});
+  candleSeries.setData(rows.map(k=>({time:k.t,open:k.o,high:k.h,low:k.l,close:k.c})));
+  // Volume histogram on its own price scale.
+  const volSeries=chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'});
+  chart.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
+  volSeries.setData(rows.map((k,i)=>({time:k.t,value:k.v||0,color:i>0&&k.c>=rows[i-1].c?'rgba(52,211,153,.35)':'rgba(248,113,113,.35)'})));
+  // SMA(20) from closes.
+  if(rows.length>=20){
+    const sma=calcSMA(rows.map(k=>k.c),20);
+    const smaSeries=chart.addLineSeries({color:'#fbbf24',lineWidth:1,priceLineVisible:false,lastValueVisible:false});
+    smaSeries.setData(rows.map((k,i)=>sma[i]!=null?{time:k.t,value:sma[i]}:null).filter(Boolean));
+  }
+  chart.timeScale().fitContent();
+  // Crosshair OHLC legend.
+  if(opts.infoId){
+    const info=$(opts.infoId);
+    if(info)chart.subscribeCrosshairMove(p=>{
+      if(!p.time||!p.seriesData||!p.seriesData.size){info.textContent='';return}
+      const d=p.seriesData.get(candleSeries);
+      if(d&&d.open!=null)info.textContent='O:'+fmtP(d.open)+' H:'+fmtP(d.high)+' L:'+fmtP(d.low)+' C:'+fmtP(d.close);
+    });
+  }
+  const ro=new ResizeObserver(()=>{if(el.clientWidth>0)chart.applyOptions({width:el.clientWidth})});
+  ro.observe(el);
+  S._lwc[containerId]={chart,ro};
+  return true;
+}
 function chartColors(){const dark=document.documentElement.getAttribute('data-theme')!=='light';return{grid:dark?'rgba(51,65,85,.3)':'rgba(203,213,225,.5)',text:dark?'#94a3b8':'#64748b',line:dark?'#8b5cf6':'#7c3aed',fill:dark?'rgba(139,92,246,.15)':'rgba(139,92,246,.08)',green:'#34d399',red:'#f87171',blue:'#60a5fa',amber:'#fbbf24',cyan:'#22d3ee'}}
 function updStatus(ok){const dot=$('statusDot'),txt=$('statusText');if(ok){dot.classList.add('live');txt.textContent='Live'}else{dot.classList.remove('live');txt.textContent='Offline'}}
 function updTime(){$('hdrClock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Asia/Jakarta'})+' WIB'}
@@ -2218,7 +2271,34 @@ function initCmdTfBar(){
   $('cmdTfBar').innerHTML=tfs.map(t=>`<button class="tf-btn${t===S.cmdTf?' active':''}" onclick="S.cmdTf='${t}';loadCmdChart()">${t}</button>`).join('');
 }
 
+/* V2: route the Commodity chart through the gateway /candles endpoint and
+   render with lightweight-charts (candlestick+volume+SMA20). Flag-off path
+   below is byte-identical to the original Chart.js implementation. */
+async function loadCmdChartV2(){
+  document.querySelectorAll('#cmdTfBar .tf-btn').forEach(b=>b.classList.toggle('active',b.textContent===S.cmdTf));
+  const cv=$('cmdChart');if(!cv)return;
+  const host=cv.parentElement;
+  // Reversibly hand the chart area to a sized <div> (lib needs a div, not a canvas).
+  cv.style.display='none';
+  let lwc=$('cmdChart-lwc');
+  if(!lwc){lwc=document.createElement('div');lwc.id='cmdChart-lwc';lwc.style.cssText='width:100%;height:320px';host.appendChild(lwc);}
+  lwc.style.display='';
+  lwc.innerHTML='<div class="loading-text" style="padding:2rem;text-align:center;color:var(--t4)"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try{
+    const data=await gw('/candles',{sym:S.cmdSym,tf:S.cmdTf});
+    if(!renderCandles('cmdChart-lwc',data&&data.candles,{height:320})){
+      // Lib unavailable → restore canvas and fall back to the Chart.js path.
+      lwc.style.display='none';cv.style.display='';return loadCmdChartLegacy();
+    }
+  }catch(e){
+    lwc.innerHTML='<div class="loading-text" style="padding:2rem;text-align:center;color:var(--t4)">Chart unavailable. <button class="btn btn-o btn-sm" onclick="loadCmdChart()">Retry</button></div>';
+  }
+}
 async function loadCmdChart(){
+  if(CFG.V2)return loadCmdChartV2();
+  return loadCmdChartLegacy();
+}
+async function loadCmdChartLegacy(){
   const rangeMap={'1W':'5d','1M':'1mo','3M':'3mo','6M':'6mo','1Y':'1y'};
   const range=rangeMap[S.cmdTf]||'3mo';
   const interval=S.cmdTf==='1W'?'15m':'1d';

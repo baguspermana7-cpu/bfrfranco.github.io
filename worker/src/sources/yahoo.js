@@ -41,3 +41,57 @@ export async function fetchYahooQuotes(syms) {
       ...(q.shortName ? { name: q.shortName } : {}),
     }));
 }
+
+/**
+ * fetchYahooCandles(sym, range)
+ *   sym   — uppercase symbol (e.g. 'GLD')
+ *   range — Yahoo range token (e.g. '1mo','3mo','6mo','1y') — see RANGE_MAP below
+ *
+ *   Endpoint: https://query1.finance.yahoo.com/v8/finance/chart/<sym>?interval=1d&range=<range>
+ *   Response: chart.result[0] = { timestamp:[...], indicators:{ quote:[{ open,high,low,close,volume }] } }
+ *
+ *   Returns an array of { t, o, h, l, c, v } where t is UNIX SECONDS, sorted
+ *   time-ascending, with any row whose timestamp/close is non-finite dropped.
+ *   Throws if the fetch fails (Yahoo 429s from datacenter IPs are expected —
+ *   the handler falls through to Stooq).
+ */
+export async function fetchYahooCandles(sym, range) {
+  if (!sym) throw new Error('yahoo: candles requires a symbol');
+
+  const url =
+    'https://query1.finance.yahoo.com/v8/finance/chart/' +
+    encodeURIComponent(sym) +
+    '?interval=1d&range=' + encodeURIComponent(range || '3mo');
+
+  const j = await fetchJSON(url, TIMEOUT_MS);
+
+  const r = j?.chart?.result?.[0];
+  const ts = r?.timestamp;
+  const q = r?.indicators?.quote?.[0];
+  if (!Array.isArray(ts) || !q) throw new Error('yahoo: unexpected chart shape');
+
+  const o = q.open || [], h = q.high || [], l = q.low || [], c = q.close || [], v = q.volume || [];
+
+  const candles = [];
+  for (let i = 0; i < ts.length; i++) {
+    const t = Number(ts[i]);
+    // Drop rows with no timestamp or no close (Yahoo emits nulls on holidays).
+    // Guard against null/undefined explicitly — Number(null) === 0 is finite.
+    if (!Number.isFinite(t) || ts[i] == null) continue;
+    if (c[i] == null) continue;
+    const close = Number(c[i]);
+    if (!Number.isFinite(close)) continue;
+    candles.push({
+      t,
+      o: Number.isFinite(Number(o[i])) ? Number(o[i]) : close,
+      h: Number.isFinite(Number(h[i])) ? Number(h[i]) : close,
+      l: Number.isFinite(Number(l[i])) ? Number(l[i]) : close,
+      c: close,
+      v: Number.isFinite(Number(v[i])) ? Number(v[i]) : 0,
+    });
+  }
+
+  if (candles.length === 0) throw new Error('yahoo: no valid candles for ' + sym);
+  candles.sort((a, b) => a.t - b.t);
+  return candles;
+}

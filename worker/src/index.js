@@ -1,4 +1,4 @@
-import { handleFx, handleQuotes } from './handlers.js';
+import { handleFx, handleQuotes, handleCandles } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -57,6 +57,16 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'q: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/candles') {
+        const p = (new URL(request.url)).searchParams;
+        try {
+          const { data, cached } = await handleCandles(env, p.get('sym'), p.get('tf') || '3M');
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'candles: ' + String(e) });
         }
       }
 

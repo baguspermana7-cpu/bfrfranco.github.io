@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx, handleQuotes } from '../src/handlers.js';
+import { handleFx, handleQuotes, handleCandles } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -241,6 +241,205 @@ test('Test F: fresh cache hit → cached:true, no fetch', async () => {
 
   try {
     const result = await handleQuotes({ FT_KV: kv }, syms);
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, cachedData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleCandles tests (Task 1.3)
+   ═══════════════════════════════════════════════════════════════ */
+
+// Helper: build a Yahoo Finance v8 chart API response.
+// chart.result[0] = { timestamp:[...], indicators:{ quote:[{ open,high,low,close,volume }] } }
+function yahooChartResponse(rows) {
+  // rows: array of { t (epoch seconds), o,h,l,c,v } — some fields may be null
+  return JSON.stringify({
+    chart: {
+      result: [{
+        meta: { symbol: 'GLD' },
+        timestamp: rows.map(r => r.t),
+        indicators: {
+          quote: [{
+            open: rows.map(r => r.o),
+            high: rows.map(r => r.h),
+            low: rows.map(r => r.l),
+            close: rows.map(r => r.c),
+            volume: rows.map(r => r.v),
+          }],
+        },
+      }],
+      error: null,
+    },
+  });
+}
+
+// Helper: build a Stooq daily-history CSV (oldest → newest)
+//   https://stooq.com/q/d/l/?s=<sym>.us&i=d
+//   Columns: Date,Open,High,Low,Close,Volume
+function stooqDailyCsv(rows) {
+  // rows: array of { date:'YYYY-MM-DD', o,h,l,c,v }
+  return 'Date,Open,High,Low,Close,Volume\n' +
+    rows.map(r => `${r.date},${r.o},${r.h},${r.l},${r.c},${r.v}`).join('\n') + '\n';
+}
+
+// Test G: Yahoo chart stub → handleCandles returns ascending seconds, nulls dropped, cached
+test('Test G: Yahoo chart → handleCandles ascending seconds, nulls dropped, cached', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+
+  // 3 valid rows + 1 row with a null close (must be dropped)
+  const rows = [
+    { t: 1714521600, o: 200, h: 205, l: 199, c: 204, v: 1000 },
+    { t: 1714608000, o: 204, h: 208, l: 203, c: 207, v: 1200 },
+    { t: 1714694400, o: 207, h: 207, l: 200, c: null, v: 900 }, // dropped (null close)
+    { t: 1714780800, o: 206, h: 210, l: 205, c: 209, v: 1100 },
+  ];
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com') && u.includes('/v8/finance/chart/')) {
+      return { ok: true, json: async () => JSON.parse(yahooChartResponse(rows)) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleCandles({ FT_KV: kv }, 'GLD', '3M');
+    assert.equal(result.cached, false, 'first fetch not cached');
+    assert.equal(result.data.sym, 'GLD');
+    assert.equal(result.data.tf, '3M');
+    assert.equal(Array.isArray(result.data.candles), true, 'candles is array');
+    assert.equal(result.data.candles.length, 3, 'null-close row dropped');
+
+    // Ascending by time, t in UNIX seconds (10-digit-ish), OHLCV numeric
+    let prev = 0;
+    for (const k of result.data.candles) {
+      assert.equal(typeof k.t, 'number');
+      assert.ok(k.t > 1e9 && k.t < 2e9, 't should be UNIX seconds, got ' + k.t);
+      assert.ok(k.t > prev, 'candles must be time-ascending');
+      prev = k.t;
+      for (const f of ['o', 'h', 'l', 'c', 'v']) {
+        assert.equal(typeof k[f], 'number', f + ' should be number');
+      }
+    }
+    assert.equal(result.data.candles[0].c, 204);
+
+    // KV populated under candle:GLD:3M
+    const raw = kv.store.get('candle:GLD:3M');
+    assert.ok(raw != null, 'candles should be cached in KV');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test H: Yahoo throws → Stooq daily CSV fallback produces candles
+test('Test H: Yahoo fails → Stooq daily CSV fallback yields candles', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+
+  const csvRows = [
+    { date: '2026-05-14', o: 200, h: 203, l: 199, c: 202, v: 5000 },
+    { date: '2026-05-15', o: 202, h: 206, l: 201, c: 205, v: 5200 },
+    { date: 'N/D',        o: 'N/D', h: 'N/D', l: 'N/D', c: 'N/D', v: 'N/D' }, // junk row dropped
+    { date: '2026-05-18', o: 205, h: 208, l: 204, c: 207, v: 4800 },
+  ];
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com')) {
+      throw new Error('Yahoo 429 (datacenter IP)');
+    }
+    if (u.includes('stooq.com') && u.includes('/q/d/l/')) {
+      return { ok: true, text: async () => stooqDailyCsv(csvRows) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleCandles({ FT_KV: kv }, 'GLD', '1M');
+    assert.equal(result.cached, false);
+    assert.equal(result.data.sym, 'GLD');
+    assert.equal(result.data.tf, '1M');
+    assert.equal(result.data.candles.length, 3, 'N/D row dropped, 3 valid rows');
+
+    let prev = 0;
+    for (const k of result.data.candles) {
+      assert.ok(k.t > 1e9 && k.t < 2e9, 't should be UNIX seconds');
+      assert.ok(k.t > prev, 'time-ascending');
+      prev = k.t;
+      assert.equal(typeof k.c, 'number');
+    }
+    assert.equal(result.data.candles[0].c, 202);
+    assert.equal(result.data.candles[2].c, 207);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test J: Yahoo 429 + Stooq daily-history apikey-gated → key-free single-row
+// quote CSV supplies a minimal 1-candle series (chart still renders).
+test('Test J: Yahoo 429 + Stooq daily gated → key-free quote candle', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+
+  // The real apikey-instructions body Stooq serves for gated daily history.
+  const gatedBody = 'Get your apikey:\n\n1. Open https://stooq.com/q/d/?s=gld.us&get_apikey\n';
+  // The key-free single-row quote CSV (works from datacenter IPs).
+  const quoteCsv =
+    'Symbol,Date,Time,Open,High,Low,Close,Volume,Prev\n' +
+    'GLD.US,2026-05-18,22:00:23,419.82,420.93,416.06,418.43,5628254,417.29\n';
+
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com')) {
+      throw new Error('HTTP 429 (datacenter IP)');
+    }
+    if (u.includes('stooq.com') && u.includes('/q/d/l/')) {
+      return { ok: true, text: async () => gatedBody };           // gated → no CSV
+    }
+    if (u.includes('stooq.com') && u.includes('/q/l/') && u.includes('f=sd2t2ohlcvp')) {
+      return { ok: true, text: async () => quoteCsv };             // key-free quote
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleCandles({ FT_KV: kv }, 'GLD', '3M');
+    assert.equal(result.cached, false);
+    assert.equal(result.data.sym, 'GLD');
+    assert.equal(result.data.candles.length, 1, 'minimal 1-candle series');
+    const k = result.data.candles[0];
+    assert.ok(k.t > 1e9 && k.t < 2e9, 't should be UNIX seconds');
+    assert.equal(k.o, 419.82);
+    assert.equal(k.c, 418.43);
+    assert.equal(k.v, 5628254);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test I: fresh cache hit → handleCandles returns cached:true WITHOUT calling fetch
+test('Test I: fresh candle cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  const cachedData = {
+    sym: 'GLD', tf: '3M',
+    candles: [
+      { t: 1714521600, o: 200, h: 205, l: 199, c: 204, v: 1000 },
+      { t: 1714608000, o: 204, h: 208, l: 203, c: 207, v: 1200 },
+    ],
+  };
+  await setCached(kv, 'candle:GLD:3M', cachedData);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleCandles({ FT_KV: kv }, 'GLD', '3M');
     assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
     assert.equal(result.cached, true);
     assert.deepEqual(result.data, cachedData);

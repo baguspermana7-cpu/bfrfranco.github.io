@@ -167,3 +167,102 @@ export async function fetchStooqQuotes(syms) {
     .filter(r => r.status === 'fulfilled')
     .map(r => r.value);
 }
+
+/**
+ * parseCandleHistory(text, maxRows)
+ *   Parses the Stooq daily-history CSV (oldest → newest):
+ *     Columns: Date,Open,High,Low,Close,Volume
+ *   Skips the header and any row whose Date can't be parsed to epoch or whose
+ *   Close is not a finite positive number (handles 'N/D' rows, blank lines,
+ *   trailing newline, or a non-CSV apikey-instructions body). Returns the last
+ *   `maxRows` valid candles, time-ascending, with t in UNIX SECONDS.
+ */
+function parseCandleHistory(text, maxRows) {
+  const lines = String(text).trim().split('\n');
+  const out = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const cols = line.split(',');
+    // Date,Open,High,Low,Close,Volume
+    const tsec = Math.floor(Date.parse(String(cols[0]).trim() + 'T00:00:00Z') / 1000);
+    const close = num(cols[4]);
+    if (!isFinite(tsec) || !isFinite(close) || close <= 0) continue;
+    const open = num(cols[1]), high = num(cols[2]), low = num(cols[3]), vol = num(cols[5]);
+    out.push({
+      t: tsec,
+      o: isFinite(open) && open > 0 ? open : close,
+      h: isFinite(high) && high > 0 ? high : close,
+      l: isFinite(low) && low > 0 ? low : close,
+      c: close,
+      v: isFinite(vol) && vol >= 0 ? vol : 0,
+    });
+  }
+
+  if (out.length === 0) return [];
+  out.sort((a, b) => a.t - b.t);
+  return maxRows && out.length > maxRows ? out.slice(out.length - maxRows) : out;
+}
+
+/**
+ * parseQuoteCandle(text, sym)
+ *   Builds a single { t,o,h,l,c,v } candle from the key-free single-row quote
+ *   CSV (the same endpoint quotes use, proven to work from datacenter IPs):
+ *     https://stooq.com/q/l/?s=<sym>.us&f=sd2t2ohlcvp&h&e=csv
+ *   Columns: Symbol,Date,Time,Open,High,Low,Close,Volume,Prev
+ *   Used as a last-resort 1-point series when daily history is apikey-gated
+ *   from the egress IP — guarantees the chart can render today's bar instead
+ *   of nothing. Returns [] if unparseable.
+ */
+function parseQuoteCandle(text) {
+  const lines = String(text).trim().split('\n');
+  const data = lines[1];
+  if (!data) return [];
+  const cols = data.split(',');
+  // Symbol,Date,Time,Open,High,Low,Close,Volume,Prev
+  const tsec = Math.floor(Date.parse(String(cols[1]).trim() + 'T00:00:00Z') / 1000);
+  const close = num(cols[6]);
+  if (!isFinite(tsec) || !isFinite(close) || close <= 0) return [];
+  const open = num(cols[3]), high = num(cols[4]), low = num(cols[5]), vol = num(cols[7]);
+  return [{
+    t: tsec,
+    o: isFinite(open) && open > 0 ? open : close,
+    h: isFinite(high) && high > 0 ? high : close,
+    l: isFinite(low) && low > 0 ? low : close,
+    c: close,
+    v: isFinite(vol) && vol >= 0 ? vol : 0,
+  }];
+}
+
+/**
+ * fetchStooqCandles(sym, maxRows)
+ *   1. Daily-history CSV (preferred, full series, key-free where reachable):
+ *        https://stooq.com/q/d/l/?s=<sym.lower>.us&i=d
+ *      As of 2026 this endpoint is apikey-gated from some egress IPs and
+ *      returns an instructions body instead of CSV — parseCandleHistory
+ *      treats that as no-data so we fall through cleanly.
+ *   2. Single-row quote CSV (key-free, works from datacenter IPs) → a
+ *      1-candle series for today, so the chart still renders.
+ *   Returns an array of { t, o, h, l, c, v } (t = UNIX seconds), last
+ *   `maxRows` rows. Throws only if BOTH paths yield nothing.
+ */
+export async function fetchStooqCandles(sym, maxRows) {
+  if (!sym) throw new Error('stooq: candles requires a symbol');
+  const slug = sym.toLowerCase() + '.us';
+
+  // 1) Full daily history — preferred where reachable without an apikey.
+  try {
+    const text = await fetchText(`https://stooq.com/q/d/l/?s=${slug}&i=d`, TIMEOUT_MS);
+    const candles = parseCandleHistory(text, maxRows);
+    if (candles.length > 0) return candles;
+  } catch { /* gated/blocked — fall through to key-free quote */ }
+
+  // 2) Key-free single-row quote → minimal 1-candle series (last resort).
+  const qText = await fetchText(
+    `https://stooq.com/q/l/?s=${slug}&f=sd2t2ohlcvp&h&e=csv`, TIMEOUT_MS);
+  const one = parseQuoteCandle(qText);
+  if (one.length > 0) return one;
+
+  throw new Error('stooq: no parseable candle data for ' + sym);
+}
