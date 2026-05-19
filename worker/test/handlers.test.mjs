@@ -121,10 +121,13 @@ function yahooQuoteResponse(symbols) {
   return JSON.stringify({ quoteResponse: { result, error: null } });
 }
 
-// Helper: build a Stooq CSV response for one symbol
-function stooqCsvResponse(sym, close) {
-  // Format: Symbol,Date,Time,Open,High,Low,Close,Volume
-  return `Symbol,Date,Time,Open,High,Low,Close,Volume\n${sym.toLowerCase()}.us,2026-05-19,16:00:00,${close - 1},${close + 2},${close - 2},${close},12345678\n`;
+// Helper: build a Stooq single-row quote CSV WITH the Prev (prior-close)
+// field — this is the real production primary path:
+//   https://stooq.com/q/l/?s=<sym>.us&f=sd2t2ohlcvp&h&e=csv
+// Columns: Symbol,Date,Time,Open,High,Low,Close,Volume,Prev
+function stooqQuoteWithPrevResponse(sym, prevClose, lastClose) {
+  return 'Symbol,Date,Time,Open,High,Low,Close,Volume,Prev\n' +
+    `${sym.toUpperCase()}.US,2026-05-18,22:00:24,${lastClose - 1},${lastClose + 2},${lastClose - 2},${lastClose},47843865,${prevClose}\n`;
 }
 
 // Test D: Yahoo stub returns 2 symbols → handleQuotes returns array len 2 with numeric fields + caches in KV
@@ -182,12 +185,15 @@ test('Test E: Yahoo fails → Stooq CSV fallback resolves symbols', async () => 
     if (u.includes('query1.finance.yahoo.com')) {
       throw new Error('Yahoo unavailable');
     }
-    if (u.includes('stooq.com')) {
-      // Detect which symbol from URL (spy.us or qqq.us)
+    if (u.includes('stooq.com') && u.includes('f=sd2t2ohlcvp')) {
+      // Primary Stooq path: single-row quote WITH Prev field.
+      // Detect which symbol from URL (spy.us or qqq.us).
       const isSpy = u.includes('spy.us');
-      const close = isSpy ? 519.00 : 438.00;
+      // SPY: prevClose 515 → last 520 (+0.97%). QQQ: prevClose 441.75 → last 438 (-0.85%)
       const sym = isSpy ? 'spy' : 'qqq';
-      return { ok: true, text: async () => stooqCsvResponse(sym, close) };
+      const prevClose = isSpy ? 515.00 : 441.75;
+      const lastClose = isSpy ? 520.00 : 438.00;
+      return { ok: true, text: async () => stooqQuoteWithPrevResponse(sym, prevClose, lastClose) };
     }
     throw new Error('unexpected fetch: ' + u);
   };
@@ -195,13 +201,24 @@ test('Test E: Yahoo fails → Stooq CSV fallback resolves symbols', async () => 
   try {
     const result = await handleQuotes({ FT_KV: kv }, syms);
     assert.equal(Array.isArray(result.data), true, 'data should be array');
-    assert.ok(result.data.length >= 1, 'at least one symbol should resolve via Stooq');
+    assert.equal(result.data.length, 2, 'both symbols should resolve via Stooq');
     assert.equal(result.cached, false);
 
-    // Prices should be numeric
+    // Prices numeric AND chgPct must be a real non-zero number (Stooq self-sufficient)
     for (const q of result.data) {
       assert.equal(typeof q.price, 'number');
+      assert.equal(typeof q.chgPct, 'number');
+      assert.notEqual(q.chgPct, 0, q.sym + ' chgPct must NOT be 0 from Stooq Prev field');
+      assert.ok(q.prevClose > 0, q.sym + ' prevClose should be > 0');
     }
+
+    const spy = result.data.find(q => q.sym === 'SPY');
+    assert.equal(spy.price, 520.0);
+    assert.equal(spy.prevClose, 515.0);
+    assert.ok(Math.abs(spy.chgPct - ((520 - 515) / 515 * 100)) < 1e-9, 'SPY chgPct correct');
+
+    const qqq = result.data.find(q => q.sym === 'QQQ');
+    assert.ok(qqq.chgPct < 0, 'QQQ chgPct should be negative');
   } finally {
     globalThis.fetch = origFetch;
   }
