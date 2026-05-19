@@ -512,51 +512,95 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
  * dark palette, low-saturation borders — NOT a marketing card (doc-13 §1).
  * prefers-reduced-motion disables the slide transform. Responsive ≤390px.
  * ==========================================================================*/
-.dh-bod-trig{font-family:'JetBrains Mono';font-size:9px;font-weight:600;letter-spacing:.03em;padding:5px 9px;min-height:32px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.28);border-radius:4px;color:#a78bfa;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-.dh-bod-trig:hover{background:rgba(139,92,246,.15);color:#c4b5fd}
-.dh-bod-trig:focus-visible{outline:2px solid var(--p);outline-offset:2px}
-[data-theme="light"] .dh-bod-trig{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.32);color:#7c3aed}
-.dh-bod{position:fixed;top:0;right:0;z-index:200;display:none;width:560px;max-width:94vw;height:100vh;overflow-y:auto;background:linear-gradient(180deg,#0a1628,#050c18);border-left:1px solid rgba(139,92,246,.38);box-shadow:-10px 0 40px rgba(0,0,0,.6);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+/* v1.21.2 — instrument-grade re-skin (de-AI-slop). Mostly-solid graphite
+ * surfaces, ONE restrained accent = signal amber (ISA-18.2 caution, the
+ * page's --o), ≤10% transparency only on hairline borders/dividers, NO
+ * backdrop-filter, NO translucent navy/purple glass. Reads as an engineering
+ * document panel (documentation/design.md §2 instrument-HMI language).
+ * Drawer raised above the global nav burger (z 1002 > 1001); burger is hidden
+ * while the drawer is open; sticky header with safe-area so the "Locked
+ * baseline" badge + close-X are never obscured. Responsive ≤390/768. */
+.dh-bod-trig{font-family:'JetBrains Mono';font-size:9px;font-weight:600;letter-spacing:.03em;padding:5px 9px;min-height:32px;background:#1c2333;border:1px solid #2a3148;border-radius:4px;color:#f0b24a;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.dh-bod-trig:hover{background:#232b3d;border-color:#f59e0b;color:#f59e0b}
+.dh-bod-trig:focus-visible{outline:2px solid #f59e0b;outline-offset:2px}
+[data-theme="light"] .dh-bod-trig{background:#eef1f5;border-color:#cbd5e1;color:#b45309}
+[data-theme="light"] .dh-bod-trig:hover{background:#e6eaf0;border-color:#b45309;color:#92400e}
+/* Drawer raised ABOVE the global nav burger (burger = z 1001). */
+.dh-bod{position:fixed;top:0;right:0;z-index:1002;display:none;width:560px;max-width:94vw;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#11151f;border-left:1px solid #2a3148;box-shadow:-8px 0 28px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1)}
 .dh-bod.show{display:block;transform:translateX(0)}
-[data-theme="light"] .dh-bod{background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-left-color:rgba(139,92,246,.5)}
-.dh-bod-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:linear-gradient(90deg,rgba(139,92,246,.14),rgba(88,80,190,.08));border-bottom:1px solid rgba(139,92,246,.22)}
-.dh-bod-hdr h4{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:#a78bfa;margin:0}
-.dh-bod-hdr .mode{font-family:'JetBrains Mono';font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:#a78bfa}
-[data-theme="light"] .dh-bod-hdr{background:linear-gradient(90deg,rgba(139,92,246,.1),rgba(88,80,190,.06))}
-[data-theme="light"] .dh-bod-hdr h4{color:#7c3aed}
-.dh-bod-close{background:none;border:1px solid var(--bd2);border-radius:4px;color:var(--t2);cursor:pointer;font-size:18px;width:32px;height:32px;min-width:32px;display:flex;align-items:center;justify-content:center;transition:.2s}
-.dh-bod-close:hover{background:rgba(255,255,255,.08);color:var(--t1)}
+[data-theme="light"] .dh-bod{background:#f4f6f9;border-left-color:#cbd5e1;box-shadow:-8px 0 28px rgba(15,23,42,.16)}
+/* Hide the global hamburger while the drawer is open so it can never sit on
+ * top of the header controls (belt-and-braces with the z-index above). */
+body.dh-bod-open .rz-nav-burger{display:none!important}
+/* Sticky header: stays visible on scroll; safe-area top offset so the badge
+ * + close-X are never clipped under a notch or the burger zone. */
+.dh-bod-hdr{position:sticky;top:0;z-index:4;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:calc(11px + env(safe-area-inset-top,0px)) 14px 11px;background:#171d29;border-bottom:2px solid #f59e0b}
+.dh-bod-hdr h4{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:#e8edf5;margin:0;flex:1 1 auto;min-width:0}
+.dh-bod-hdr .mode{font-family:'JetBrains Mono';font-size:9px;font-weight:600;padding:3px 8px;border-radius:3px;background:#3a2c0c;border:1px solid #6b4e12;color:#f0b24a;white-space:nowrap}
+.dh-bod-hdr .dh-bod-pdf{font-family:'JetBrains Mono';font-size:9px;font-weight:600;letter-spacing:.02em;padding:0 10px;height:32px;min-height:32px;display:inline-flex;align-items:center;gap:5px;border-radius:4px;background:#f59e0b;border:1px solid #f59e0b;color:#0a0e1a;cursor:pointer;transition:.15s;white-space:nowrap}
+.dh-bod-hdr .dh-bod-pdf:hover{background:#ffb733;border-color:#ffb733}
+.dh-bod-hdr .dh-bod-pdf:focus-visible{outline:2px solid #fff;outline-offset:2px}
+[data-theme="light"] .dh-bod-hdr{background:#e9edf2;border-bottom-color:#b45309}
+[data-theme="light"] .dh-bod-hdr h4{color:#1e293b}
+[data-theme="light"] .dh-bod-hdr .mode{background:#fdf0d8;border-color:#e0b873;color:#92400e}
+[data-theme="light"] .dh-bod-hdr .dh-bod-pdf{background:#b45309;border-color:#b45309;color:#fff}
+[data-theme="light"] .dh-bod-hdr .dh-bod-pdf:hover{background:#92400e;border-color:#92400e}
+.dh-bod-close{background:#1c2333;border:1px solid #2a3148;border-radius:4px;color:#a0aec0;cursor:pointer;font-size:18px;width:32px;height:32px;min-width:32px;display:flex;align-items:center;justify-content:center;transition:.15s;flex:0 0 auto}
+.dh-bod-close:hover{background:#262f43;border-color:#f59e0b;color:#f59e0b}
+.dh-bod-close:focus-visible{outline:2px solid #f59e0b;outline-offset:2px}
+[data-theme="light"] .dh-bod-close{background:#eef1f5;border-color:#cbd5e1;color:#475569}
+[data-theme="light"] .dh-bod-close:hover{background:#e2e8f0;border-color:#b45309;color:#92400e}
 .dh-bod-body{padding:12px 14px 40px}
-.dh-bod-adv{display:flex;gap:8px;align-items:flex-start;font-family:'JetBrains Mono';font-size:9.5px;line-height:1.55;color:var(--o);background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.28);border-left:3px solid var(--o);border-radius:5px;padding:8px 10px;margin-bottom:12px}
-.dh-bod-adv b{color:var(--o)}
-[data-theme="light"] .dh-bod-adv{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.4)}
-.dh-bod-sec{margin-bottom:10px;border:1px solid var(--bd);border-radius:5px;background:var(--bg2);overflow:hidden}
-.dh-bod-sec>summary{font-family:'JetBrains Mono';font-size:10px;font-weight:600;color:var(--t1);padding:8px 10px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;user-select:none}
+.dh-bod-adv{display:flex;gap:8px;align-items:flex-start;font-family:'JetBrains Mono';font-size:9.5px;line-height:1.55;color:#cdb27a;background:#1d1a12;border:1px solid #4a3a16;border-left:3px solid #f59e0b;border-radius:4px;padding:8px 10px;margin-bottom:12px}
+.dh-bod-adv b{color:#f0b24a}
+[data-theme="light"] .dh-bod-adv{color:#7a5a12;background:#fbf3e2;border-color:#e6cf9e;border-left-color:#b45309}
+[data-theme="light"] .dh-bod-adv b{color:#92400e}
+.dh-bod-sec{margin-bottom:9px;border:1px solid #232a3a;border-radius:4px;background:#0f1420;overflow:hidden}
+[data-theme="light"] .dh-bod-sec{border-color:#dbe2ea;background:#fbfcfd}
+.dh-bod-sec>summary{font-family:'JetBrains Mono';font-size:10px;font-weight:600;color:#e8edf5;padding:8px 10px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;user-select:none;background:#141925}
+[data-theme="light"] .dh-bod-sec>summary{color:#1e293b;background:#eef2f6}
 .dh-bod-sec>summary::-webkit-details-marker{display:none}
-.dh-bod-sec>summary:focus-visible{outline:2px solid var(--p);outline-offset:-2px}
-.dh-bod-sec>summary .ic{color:#a78bfa;font-size:10px;transition:transform .2s}
+.dh-bod-sec>summary:hover{background:#181e2c}
+[data-theme="light"] .dh-bod-sec>summary:hover{background:#e6ebf1}
+.dh-bod-sec>summary:focus-visible{outline:2px solid #f59e0b;outline-offset:-2px}
+.dh-bod-sec>summary .ic{color:#f0b24a;font-size:10px;transition:transform .2s}
+[data-theme="light"] .dh-bod-sec>summary .ic{color:#b45309}
 .dh-bod-sec[open]>summary .ic{transform:rotate(90deg)}
-.dh-bod-sec>summary .tag{margin-left:auto;font-size:8px;font-weight:500;color:var(--t3);letter-spacing:.04em}
-.dh-bod-secbody{padding:2px 10px 10px}
+.dh-bod-sec[open]>summary{border-bottom:1px solid #232a3a}
+[data-theme="light"] .dh-bod-sec[open]>summary{border-bottom-color:#dbe2ea}
+.dh-bod-sec>summary .tag{margin-left:auto;font-size:8px;font-weight:600;color:#64748b;letter-spacing:.04em}
+.dh-bod-secbody{padding:4px 10px 10px}
 .dh-bod-tbl{width:100%;border-collapse:collapse;font-family:'JetBrains Mono';font-size:9px}
-.dh-bod-tbl td{padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
-[data-theme="light"] .dh-bod-tbl td{border-bottom-color:rgba(0,0,0,.05)}
-.dh-bod-tbl td:first-child{color:var(--t3);width:42%}
-.dh-bod-tbl td:last-child{color:var(--t1);text-align:right;font-weight:500}
-.dh-bod-tbl td.src{color:var(--t3);font-weight:400;font-size:8px;text-align:left;font-style:italic}
-.dh-bod-au{border:1px solid var(--bd);border-radius:5px;background:rgba(255,255,255,.012);padding:7px 9px;margin-bottom:7px}
-.dh-bod-au .ttl{font-family:'JetBrains Mono';font-size:9.5px;font-weight:600;color:var(--c);margin-bottom:4px}
-.dh-bod-au .stp{font-family:'JetBrains Mono';font-size:9px;color:var(--t2);line-height:1.6;word-break:break-word}
-.dh-bod-au .stp .op{color:var(--t3)}
-.dh-bod-au .res{font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:var(--g);margin-top:3px}
-.dh-bod-au .ref{font-family:'JetBrains Mono';font-size:8px;color:var(--t3);font-style:italic;margin-top:3px}
-.dh-bod-src a{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--c);padding:5px 6px;min-height:32px;border:1px solid var(--bd);border-radius:4px;margin-bottom:5px;transition:.2s;text-decoration:none}
-.dh-bod-src a:hover{background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.3)}
-.dh-bod-src a .ex{margin-left:auto;color:var(--t3);font-size:8px}
-.dh-bod-foot{font-family:'JetBrains Mono';font-size:8px;color:var(--t3);line-height:1.5;border-top:1px solid var(--bd);padding-top:8px;margin-top:6px}
+.dh-bod-tbl td{padding:3px 4px;border-bottom:1px solid #1c2230;vertical-align:top}
+[data-theme="light"] .dh-bod-tbl td{border-bottom-color:#e2e8f0}
+.dh-bod-tbl td:first-child{color:#8b919c;width:42%}
+[data-theme="light"] .dh-bod-tbl td:first-child{color:#64748b}
+.dh-bod-tbl td:last-child{color:#e2e5ea;text-align:right;font-weight:500}
+[data-theme="light"] .dh-bod-tbl td:last-child{color:#1e293b}
+.dh-bod-tbl td.src{color:#5a6070;font-weight:400;font-size:8px;text-align:left;font-style:italic}
+[data-theme="light"] .dh-bod-tbl td.src{color:#94a3b8}
+.dh-bod-au{border:1px solid #232a3a;border-left:3px solid #f59e0b;border-radius:4px;background:#0f1420;padding:7px 9px;margin-bottom:7px}
+[data-theme="light"] .dh-bod-au{border-color:#dbe2ea;border-left-color:#b45309;background:#fbfcfd}
+.dh-bod-au .ttl{font-family:'JetBrains Mono';font-size:9.5px;font-weight:700;color:#e8edf5;margin-bottom:4px}
+[data-theme="light"] .dh-bod-au .ttl{color:#1e293b}
+.dh-bod-au .stp{font-family:'JetBrains Mono';font-size:9px;color:#a0aec0;line-height:1.6;word-break:break-word}
+[data-theme="light"] .dh-bod-au .stp{color:#475569}
+.dh-bod-au .stp .op{color:#f0b24a;font-weight:600}
+[data-theme="light"] .dh-bod-au .stp .op{color:#b45309}
+.dh-bod-au .res{font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:#f59e0b;margin-top:3px}
+[data-theme="light"] .dh-bod-au .res{color:#92400e}
+.dh-bod-au .ref{font-family:'JetBrains Mono';font-size:8px;color:#64748b;font-style:italic;margin-top:3px}
+.dh-bod-src a{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono';font-size:9px;color:#cbd5e1;background:#141925;padding:6px 8px;min-height:32px;border:1px solid #232a3a;border-radius:4px;margin-bottom:5px;transition:.15s;text-decoration:none}
+.dh-bod-src a:hover{background:#181e2c;border-color:#f59e0b;color:#f0b24a}
+[data-theme="light"] .dh-bod-src a{color:#334155;background:#eef2f6;border-color:#dbe2ea}
+[data-theme="light"] .dh-bod-src a:hover{background:#e6ebf1;border-color:#b45309;color:#92400e}
+.dh-bod-src a .ex{margin-left:auto;color:#64748b;font-size:8px}
+.dh-bod-foot{font-family:'JetBrains Mono';font-size:8px;color:#64748b;line-height:1.5;border-top:1px solid #232a3a;padding-top:8px;margin-top:6px}
+[data-theme="light"] .dh-bod-foot{color:#94a3b8;border-top-color:#dbe2ea}
 @media(prefers-reduced-motion:reduce){.dh-bod{transition:none}}
 @media(max-width:600px){.dh-bod{width:100vw;max-width:100vw}.dh-bod-tbl td:first-child{width:50%}}
-@media(max-width:390px){.dh-bod-body{padding:10px 10px 36px}.dh-bod-hdr h4{font-size:11px}.dh-bod-tbl,.dh-bod-au .stp{font-size:8.5px}}
+@media(max-width:480px){.dh-bod-hdr{flex-wrap:wrap}.dh-bod-hdr h4{flex:1 1 100%;order:1}.dh-bod-hdr .mode{order:2}.dh-bod-hdr .dh-bod-pdf{order:3;margin-left:auto}.dh-bod-hdr .dh-bod-close{order:4}}
+@media(max-width:390px){.dh-bod-body{padding:10px 10px 36px}.dh-bod-hdr h4{font-size:11px}.dh-bod-hdr .mode,.dh-bod-hdr .dh-bod-pdf{font-size:8.5px}.dh-bod-tbl,.dh-bod-au .stp{font-size:8.5px}}
 </style>    <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- v1.20.0: LOCKED basis-of-design engine — single source of truth for every
@@ -837,7 +881,7 @@ body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-sele
      no hardcoded engine numbers. -hdr/-close/.show classes let the shared
      DHModal controller manage scrim/focus-trap/Esc/focus-return. -->
 <div class="dh-bod" id="bodDrawer" aria-hidden="true">
-<div class="dh-bod-hdr"><h4 id="bodDrawerTitle">Basis of Design &amp; Calculation Audit</h4><span class="mode" id="bodDrawerMode">Locked baseline</span><button class="dh-bod-close" id="bodDrawerClose" type="button" aria-label="Close Basis of Design dialog">&times;</button></div>
+<div class="dh-bod-hdr"><h4 id="bodDrawerTitle">Basis of Design &amp; Calculation Audit</h4><span class="mode" id="bodDrawerMode">Locked baseline</span><button class="dh-bod-pdf" id="bodDrawerPdf" type="button" title="Export the full Basis-of-Design document as a printable PDF"><span aria-hidden="true">&#8615;</span> Export PDF</button><button class="dh-bod-close" id="bodDrawerClose" type="button" aria-label="Close Basis of Design dialog">&times;</button></div>
 <div class="dh-bod-body" id="bodDrawerBody"></div>
 </div>
 <div class="rack-modal" id="rackModal">
@@ -1120,7 +1164,7 @@ s+='<pattern id="bGrid" width="20" height="20" patternUnits="userSpaceOnUse"><pa
 s+='<rect width="1200" height="850" fill="url(#bGrid)"/>';
 // Title
 s+=tx(600,22,'BUILDING OVERVIEW \u2014 4-STORY AI DATA CENTER','var(--t1)',13,'middle',1);
-s+=tx(600,40,'72m \u00D7 48m \u00D7 4 Levels \u2502 13,824 m\u00B2 Total \u2502 4\u00D7 GB200 NVL72 Data Halls \u2502 28.4 MW IT','var(--t3)',8,'middle');
+s+=tx(600,40,'72m \u00D7 48m \u00D7 4 Levels \u2502 13,824 m\u00B2 Total \u2502 '+(DHE?DHE.halls:4)+'\u00D7 GB200 NVL72 Data Halls \u2502 '+(DHE?DHE.itFacilityMW:14.26)+' MW IT','var(--t3)',8,'middle');
 
 // Ground plane / shadow
 s+='<polygon points="'+isoTop(-3,-3,BW+6,BD+6,-2)+'" fill="rgba(0,0,0,.12)" filter="url(#bSh)"/>';
@@ -1418,10 +1462,10 @@ lx2+=185;
 s+='<rect x="20" y="50" width="280" height="115" rx="5" fill="rgba(255,255,255,.03)" stroke="var(--bd)" stroke-width=".5"/>';
 s+=tx(30,68,'FACILITY SUMMARY','var(--t1)',9,0,1);
 var kpis=[
-['Total IT Load','28.4 MW','var(--o)'],
-['Total Facility','30.7 MW (PUE 1.08)','var(--g)'],
+['Total IT Load',(DHE?DHE.itFacilityMW+' MW':'14.26 MW'),'var(--o)'],
+['Total Facility',(DHE?(DHE.facTotalMW+' MW (PUE '+DHE.pue+')'):'18.55 MW (PUE 1.30)'),'var(--g)'],
 ['Data Halls',(DH?(DH.halls+'\u00D7 '+(DH.itHall/1000).toFixed(2)+' MW'):'4\u00D7 3.56 MW'),'var(--g)'],
-['GPUs Total','7,776\u00D7 B200','var(--pk)'],
+['GPUs Total',(DHE?DHE.gpuPerFacility.toLocaleString()+'\u00D7 B200':'7,776\u00D7 B200'),'var(--pk)'],
 ['Cooling','Dry Cooler + DLC','var(--c)'],
 ['Redundancy','2N Power / N+1 Cool','var(--t2)']
 ];
@@ -1976,7 +2020,7 @@ s+=dim(-3,26,-3,46,'20m');
 // KPI strip
 var KY=MY+49.5*M;
 s+='<rect x="'+MX+'" y="'+KY+'" width="'+(72*M)+'" height="22" rx="3" fill="rgba(34,197,94,.04)" stroke="rgba(34,197,94,.15)" stroke-width=".5"/>';
-var fkpis=[{l:'IT Load',v:'14.3 MW',c:'var(--o)'},{l:'Racks',v:'108 (54\u00D72)',c:'var(--g)'},{l:'GPUs',v:'3,888',c:'var(--pk)'},{l:'DLC',v:'85%',c:'var(--c)'},{l:'PUE',v:'1.08',c:'var(--g)'},{l:'Cooling',v:'Dry Cooler+CDU',c:'var(--c)'}];
+var fkpis=[{l:'IT Load',v:(DHE?((DHE.itHall*2/1000).toFixed(2)+' MW'):'7.13 MW'),c:'var(--o)'},{l:'Racks',v:(DHE?((DHE.racksPerHall*2)+' ('+DHE.racksPerHall+'\u00D72)'):'108 (54\u00D72)'),c:'var(--g)'},{l:'GPUs',v:(DHE?(DHE.gpuPerHall*2).toLocaleString():'3,888'),c:'var(--pk)'},{l:'DLC',v:(DHE?DHE.liquidCapturePct+'%':'85%'),c:'var(--c)'},{l:'PUE',v:(DHE?DHE.pue:'1.30'),c:'var(--g)'},{l:'Cooling',v:'Dry Cooler+CDU',c:'var(--c)'}];
 var fkx=MX+20;
 fkpis.forEach(function(k){
 s+='<text x="'+fkx+'" y="'+(KY+9)+'" fill="var(--t3)" font-family="'+J+'" font-size="6">'+k.l+'</text>';
@@ -2217,7 +2261,7 @@ s+='</g>';
 // Equipment schedule at bottom
 var ESY=MY+48.5*M;
 s+='<rect x="'+MX+'" y="'+ESY+'" width="'+(72*M)+'" height="25" rx="3" fill="rgba(6,182,212,.04)" stroke="rgba(6,182,212,.15)" stroke-width=".5"/>';
-var rk2=[{l:'Chillers',v:'8\u00D74MW',c:'var(--c)'},{l:'Dry Coolers',v:'8\u00D7 BAC',c:'var(--g)'},{l:'CW Pumps',v:'4\u00D7 VFD',c:'var(--pk)'},{l:'AHU',v:'2\u00D7 Carrier',c:'var(--b)'},{l:'VRV',v:'4\u00D7 Daikin',c:'var(--o)'},{l:'Total Rej.',v:'30.7 MW',c:'var(--o)'}];
+var rk2=[{l:'Chillers',v:'8\u00D74MW',c:'var(--c)'},{l:'Dry Coolers',v:'8\u00D7 BAC',c:'var(--g)'},{l:'CW Pumps',v:'4\u00D7 VFD',c:'var(--pk)'},{l:'AHU',v:'2\u00D7 Carrier',c:'var(--b)'},{l:'VRV',v:'4\u00D7 Daikin',c:'var(--o)'},{l:'Total Rej.',v:(DHE?DHE.facTotalMW+' MW':'18.55 MW'),c:'var(--o)'}];
 var rkx=MX+20;
 rk2.forEach(function(k){
 s+='<text x="'+rkx+'" y="'+(ESY+9)+'" fill="var(--t3)" font-family="'+J+'" font-size="6">'+k.l+'</text>';
@@ -2840,7 +2884,7 @@ s+='<rect width="'+W+'" height="'+H+'" fill="url(#elOvG)"/>';
 
 // Title (0-28)
 s+='<rect x="0" y="0" width="'+W+'" height="28" fill="rgba(245,158,11,.06)"/>';
-s+=tx(600,19,'FACILITY ELECTRICAL SLD v5 \u2014 4 DATA HALLS \u2014 28.5 MW IT \u2014 TRUE 2N \u2014 FEED A (BLUE) / FEED B (GREEN)','var(--o)',8,'middle',1);
+s+=tx(600,19,'FACILITY ELECTRICAL SLD v5 \u2014 '+(DH?DH.halls:4)+' DATA HALLS \u2014 '+(DH?DH.itFacilityMW:14.26)+' MW IT \u2014 TRUE 2N \u2014 FEED A (BLUE) / FEED B (GREEN)','var(--o)',8,'middle',1);
 // ===== STANDARDS / PROTECTION HEADER STRIP (IEC 60617 / IEEE C37.2 / Arc-flash / Earthing) =====
 // IEC 60617 symbol set (graphical symbols for diagrams)
 s+='<rect x="900" y="4" width="70" height="20" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>';
@@ -11090,11 +11134,424 @@ if(closeBtn){
   closeBtn.addEventListener('click',closeDrawer);
 }
 /* Keep aria-hidden honest if anything else toggles .show (e.g. scrim click,
- * Esc, or the DHModal backdrop) — mirror the class onto the attribute. */
+ * Esc, or the DHModal backdrop) — mirror the class onto the attribute, and
+ * hide the global nav burger while the drawer is visible. The drawer already
+ * sits ABOVE the burger (z 1002 > 1001) so it is never obscured; this also
+ * removes the burger entirely so it cannot peek through. rz-mobile-nav.js
+ * injects the burger with an INLINE `display:inline-flex !important` that no
+ * stylesheet rule can override, so the inline style is toggled directly and
+ * restored on close (no mutation of unrelated state). */
+var burgerHidden=null;
+function setBurgerHidden(hide){
+  var bg=(typeof window!=='undefined'&&window.__rzNavBurger)?window.__rzNavBurger
+        :d.querySelector('.rz-nav-burger');
+  if(!bg||!bg.style)return;
+  if(hide){
+    if(burgerHidden===null)burgerHidden=bg.style.getPropertyValue('display');
+    bg.style.setProperty('display','none','important');
+  }else if(burgerHidden!==null){
+    if(burgerHidden)bg.style.setProperty('display',burgerHidden);
+    else bg.style.removeProperty('display');
+    burgerHidden=null;
+  }
+}
 var amo=new MutationObserver(function(){
-  drawer.setAttribute('aria-hidden', drawer.classList.contains('show')?'false':'true');
+  var open=drawer.classList.contains('show');
+  drawer.setAttribute('aria-hidden', open?'false':'true');
+  if(d.body)d.body.classList.toggle('dh-bod-open',open);
+  setBurgerHidden(open);
 });
 amo.observe(drawer,{attributes:true,attributeFilter:['class']});
+
+/* ==========================================================================
+ * v1.21.2 — Export PDF → full engineering Basis-of-Design document.
+ * Opens a print-window using the site's established HTML-to-print pattern.
+ * EVERY number is read live from window.DATAHALL_CALC / DATAHALL_MODEL —
+ * nothing hardcoded that the engine exposes. The template is assembled with
+ * string concatenation; the single closing-script token is escaped as
+ * <\/script> per standarization/PDF_EXPORT_STANDARD.md (the 33-page rule).
+ * ========================================================================*/
+var pdfBtn=gid('bodDrawerPdf');
+function pdfNum(x,dp){ return CALC?grp(CALC.round(x,dp==null?0:dp)):x; }
+function buildBodPdfHtml(){
+  if(!CALC||!MODEL){ return null; }
+  var st=CALC.lockedState();
+  var pb=CALC.pueBasis();
+  var m=MODEL, sc=m.locked, eq=m.equipment, w=m.cooling.water;
+  var vol=CALC.dataHallVolume();
+  var rzv=(typeof window!=='undefined'&&window.RZ_VERSION)?window.RZ_VERSION:'1.21.2';
+  var rzd=(typeof window!=='undefined'&&window.RZ_VERSION_DATE)?window.RZ_VERSION_DATE:'';
+  var now=new Date();
+  var dateStr=now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2)+'-'+('0'+now.getDate()).slice(-2);
+  var facIT=st.itPerFacility_kW;
+  var facTotal=pb.facility_kW*m.facility.halls;
+  /* small builders ----------------------------------------------------- */
+  function E(s){ return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function R(rows){
+    var o='';
+    for(var i=0;i<rows.length;i++){
+      o+='<tr><td>'+E(rows[i][0])+'</td><td class="v">'+rows[i][1]+'</td><td class="src">'+E(rows[i][2]||'')+'</td></tr>';
+    }
+    return '<table class="t"><thead><tr><th>Parameter</th><th class="v">Value</th><th class="src">Basis / source</th></tr></thead><tbody>'+o+'</tbody></table>';
+  }
+  var tblN=0, figN=0;
+  function TC(title,sub){ tblN++; return '<p class="cap">Table '+tblN+'. '+E(title)+(sub?' — '+E(sub):'')+'</p>'; }
+  function FC(title){ figN++; return '<p class="cap">Figure '+figN+'. '+E(title)+'</p>'; }
+  function WK(title,formula,subst,result,ref){
+    return '<div class="wk"><div class="wt">'+E(title)+'</div>'+
+      '<div class="wf"><span class="lab">Formula</span> <code>'+E(formula)+'</code></div>'+
+      '<div class="wf"><span class="lab">Substituted</span> <code>'+E(subst)+'</code></div>'+
+      '<div class="wr">= '+E(result)+'</div>'+
+      '<div class="wref">'+E(ref)+'</div></div>';
+  }
+  /* reuse the page's own inline SVG figures (SLD + room layout) ---------- */
+  function grabSVG(hostId){
+    var h=d.getElementById(hostId);
+    if(!h)return '';
+    var svg=h.querySelector('svg');
+    if(!svg)return '';
+    try{
+      var c=svg.cloneNode(true);
+      c.removeAttribute('style');
+      c.setAttribute('width','100%');
+      c.setAttribute('preserveAspectRatio','xMidYMid meet');
+      return c.outerHTML;
+    }catch(e){ return ''; }
+  }
+  var sldSVG=grabSVG('elecSvg')||grabSVG('sldHost')||grabSVG('p-elec');
+  var roomSVG=grabSVG('bC')||grabSVG('overSvg')||grabSVG('p-over');
+
+  /* ---- document body sections --------------------------------------- */
+  var revRows=[
+    ['Rev','Date','Description','Status'].join('|')
+  ];
+  var revHTML='<table class="t"><thead><tr><th>Rev</th><th>Date</th><th>Description</th><th>Status</th></tr></thead><tbody>'+
+    '<tr><td>A</td><td>2026-05-17</td><td>Baseline locked (BASELINE-DECISION.md)</td><td>Locked</td></tr>'+
+    '<tr><td>B</td><td>'+E(rzd||dateStr)+'</td><td>Document re-issued from live engine (site '+E(rzv)+')</td><td>Issued</td></tr>'+
+    '</tbody></table>';
+
+  var H='';
+  /* Title page */
+  H+='<section class="page title"><div class="tp">'+
+     '<div class="tp-k">ENGINEERING DOCUMENT — BASIS OF DESIGN</div>'+
+     '<h1>AI Data Hall — Basis of Design</h1>'+
+     '<h2>GB200 NVL72 Liquid-Cooled Data Centre · '+m.facility.halls+' Data Halls</h2>'+
+     '<table class="tp-meta">'+
+     '<tr><td>Document</td><td>BoD / Calculation Basis</td></tr>'+
+     '<tr><td>Project</td><td>DH-01 — AI Data Hall Operations</td></tr>'+
+     '<tr><td>Scenario</td><td>A — '+E(sc.label)+' (LOCKED)</td></tr>'+
+     '<tr><td>Engine</td><td>js/datahall-model.js + js/datahall-calculations.js</td></tr>'+
+     '<tr><td>Acceptance</td><td>tools/test-datahall-calc.mjs — 57/57 doc-21 worked examples</td></tr>'+
+     '<tr><td>Authority</td><td>'+E(m.authority)+'</td></tr>'+
+     '<tr><td>Site version</td><td>'+E(rzv)+(rzd?' ('+E(rzd)+')':'')+'</td></tr>'+
+     '<tr><td>Issued</td><td>'+E(dateStr)+'</td></tr>'+
+     '</table>'+
+     '<p class="tp-dis">For estimation and education. Modelled / simulated from the locked basis below — not a feed from a physical BMS, not for procurement or life-safety decisions. Every number traces to a formula or a cited source.</p>'+
+     '</div></section>';
+  /* Revision history */
+  H+='<section class="page"><h3>1. Revision History</h3>'+TC('Revision history')+revHTML+
+     '<h3>2. Design Philosophy</h3>'+
+     '<p>This facility is a liquid-cooled AI training hall built around the NVIDIA GB200 NVL72 rack-scale domain. The design adopts a single LOCKED operating case (Scenario A: '+sc.kwPerNVL72+' kW per NVL72 pair) so that every displayed power, flow, current and energy figure is derived deterministically from one immutable basis — there is no per-tab divergence and no back-solved constant. Cooling is direct-to-chip liquid (DLC) capturing '+(m.cooling.liquidCaptureRatio*100)+'% of IT heat, with the residual '+(100-m.cooling.liquidCaptureRatio*100)+'% removed by air. Power is distributed 2N A/B. The reported PUE is an honest bottom-up figure (~'+CALC.round(pb.pue,2)+') built from a five-part basis using the chiller NAMEPLATE COP ('+eq.chiller.nameplateCOP+') — it is deliberately NOT calibrated to a marketing 1.08.</p>'+
+     '<p>The design priorities, in order: (1) thermal sufficiency for sustained rack power; (2) electrical resilience (2N, generator-backed); (3) honest, auditable energy accounting; (4) life-safety compliance posture. Where a value cannot be honestly inferred (e.g. fire-agent quantity) the document states the limitation rather than presenting a false number.</p>'+
+     '</section>';
+
+  /* Discipline section helper */
+  function disc(no,name,intro,assumRows,formulas,worked,tabsTitle,tabsRows){
+    var s='<section class="page"><h3>'+no+'. '+E(name)+'</h3>';
+    s+='<p>'+intro+'</p>';
+    s+='<h4>'+no+'.1 Assumptions</h4>'+TC(name+' — assumptions & inputs')+R(assumRows);
+    s+='<h4>'+no+'.2 Governing formulae</h4><ul class="fl">';
+    for(var i=0;i<formulas.length;i++)s+='<li><code>'+E(formulas[i])+'</code></li>';
+    s+='</ul>';
+    s+='<h4>'+no+'.3 Worked calculations (live engine)</h4>'+worked;
+    if(tabsRows&&tabsRows.length){ s+='<h4>'+no+'.4 '+E(tabsTitle)+'</h4>'+TC(tabsTitle)+R(tabsRows); }
+    s+='</section>';
+    return s;
+  }
+
+  /* 3. Compute */
+  H+=disc('3','Compute',
+    'Compute load is the product of the NVL72 domain count per hall and the locked per-domain power. The facility comprises '+m.facility.halls+' identical halls.',
+    [
+      ['Data halls',m.facility.halls,'BASELINE-DECISION.md'],
+      ['NVL72 per hall',m.facility.nvl72PerHall,'BASELINE-DECISION.md'],
+      ['GPU / NVL72',m.facility.gpuPerNVL72+' Blackwell','BASELINE-DECISION.md'],
+      ['Grace CPU / NVL72',m.facility.cpuPerNVL72,'BASELINE-DECISION.md'],
+      ['Physical racks / hall',m.facility.racksPerHall+' ('+m.facility.racksPerNVL72+'/NVL72)','21-worked-examples.md Ex1'],
+      ['Adopted load',grp(sc.kwPerNVL72)+' kW / NVL72 pair','BASELINE-DECISION.md (locked)'],
+      ['Per physical rack',grp(sc.kwPerRack)+' kW','derived '+sc.kwPerNVL72+' ÷ '+m.facility.racksPerNVL72],
+      ['IT load / hall',pdfNum(st.itPerHall_kW)+' kW','21-worked-examples.md Ex1'],
+      ['IT load / facility',pdfNum(facIT)+' kW','× '+m.facility.halls+' halls'],
+      ['GPUs / facility',grp(m.facility.gpuPerFacility),'BASELINE-DECISION.md']
+    ],
+    ['IT_hall = NVL72_count × kW_per_NVL72','IT_facility = IT_hall × halls','racks_hall = NVL72_count × racks_per_NVL72'],
+    WK('IT load (per hall)','IT = NVL72 × kW_NVL72',m.facility.nvl72PerHall+' × '+sc.kwPerNVL72+' kW',pdfNum(st.itPerHall_kW)+' kW','21-worked-examples.md Example 1')+
+    WK('IT load (facility)','IT_fac = IT_hall × halls',pdfNum(st.itPerHall_kW)+' × '+m.facility.halls,pdfNum(facIT)+' kW','BASELINE-DECISION.md'),
+    'Compute equipment schedule',
+    [
+      ['NVL72 domains (facility)',m.facility.nvl72PerHall*m.facility.halls,'derived'],
+      ['Blackwell GPU (facility)',grp(m.facility.gpuPerFacility),'27×72×'+m.facility.halls],
+      ['Grace CPU (facility)',grp(m.facility.nvl72PerHall*m.facility.cpuPerNVL72*m.facility.halls),'27×36×'+m.facility.halls]
+    ]);
+
+  /* 4. Electrical */
+  H+=disc('4','Electrical',
+    'LV reticulation is '+m.electrical.voltageLL+' V three-phase at PF '+m.electrical.powerFactor+', fed 2N from A/B transformer + UPS trains with diesel generator back-up. Current and loading are derived from the locked IT load.',
+    [
+      ['LV distribution',m.electrical.voltageLL+' V, PF '+m.electrical.powerFactor,'21-worked-examples.md Ex3'],
+      ['UPS',eq.ups.model+' — '+grp(eq.ups.ratingKW)+' kW/feed','17-correction-table.md Scenario A'],
+      ['UPS loading',CALC.round(st.upsLoadingPct,1)+' %','IT ÷ UPS rating'],
+      ['Transformer',eq.transformer.model+' — '+eq.transformer.ratingMVA+' MVA/feed','17-correction-table.md Scenario A'],
+      ['Transformer loading',CALC.round(st.transformerLoadingPct,1)+' %','kVA ÷ rating'],
+      ['Required current',pdfNum(st.requiredCurrent_A)+' A','21-worked-examples.md Ex3'],
+      ['Busway',grp(eq.busway.selectedRatingA)+' A (vs '+grp(eq.busway.undersizedRatingA)+' A undersized)','21-worked-examples.md Ex3'],
+      ['Generator',eq.generator.model+' — '+(eq.generator.ratingKW_low/1000)+'–'+(eq.generator.ratingKW_high/1000)+' MW','00-overview-audit.md Source Sanity']
+    ],
+    ['I = kW × 1000 / (√3 × V_LL × PF)','kVA = kW / PF','3φ_kW = √3 × V_LL × I × PF / 1000','loading% = actual / rated × 100'],
+    WK('Required current (per hall)','I = kW×1000 / (√3 × V × PF)',pdfNum(st.itPerHall_kW)+' × 1000 / ('+m.electrical.specSqrt3+' × '+m.electrical.voltageLL+' × '+m.electrical.powerFactor+')',pdfNum(st.requiredCurrent_A)+' A','21-worked-examples.md Example 3')+
+    WK('Transformer apparent power','kVA = kW / PF',pdfNum(st.itPerHall_kW)+' / '+m.electrical.powerFactor,pdfNum(st.transformer_kVA)+' kVA  ('+CALC.round(st.transformerLoadingPct,1)+'% of '+eq.transformer.ratingMVA+' MVA)','21-worked-examples.md Example 4')+
+    WK('UPS loading','load% = IT / UPS_rating × 100',pdfNum(st.itPerHall_kW)+' / '+grp(eq.ups.ratingKW)+' × 100',CALC.round(st.upsLoadingPct,1)+' %','21-worked-examples.md Example 2'),
+    'Electrical equipment schedule',
+    [
+      ['UPS feeds (2N)','A + B @ '+grp(eq.ups.ratingKW)+' kW','17-correction-table.md A'],
+      ['Transformers',eq.transformer.ratingMVA+' MVA cast-resin','17-correction-table.md A'],
+      ['Generator rating',eq.generator.ratingKW+' kW (ekW)','00-overview-audit.md Source Sanity'],
+      ['Selected busway',grp(eq.busway.selectedRatingA)+' A','21-worked-examples.md Ex3']
+    ]);
+
+  /* 5. Cooling */
+  H+=disc('5','Cooling',
+    'Direct-to-chip liquid cooling captures '+(m.cooling.liquidCaptureRatio*100)+'% of IT heat into the TCS loop ('+m.cooling.tcsSupplyC+'/'+m.cooling.tcsReturnC+' °C, ΔT '+m.cooling.tcsDeltaT_K+' K); residual air heat is handled by CRAH. CDU running count and flows are derived from the captured liquid heat — the UI explicitly states this basis (doc-21 Ex6).',
+    [
+      ['Liquid capture',(m.cooling.liquidCaptureRatio*100)+' % of IT','BASELINE-DECISION.md'],
+      ['Liquid heat / hall',pdfNum(st.liquidHeat_kW)+' kW','IT × '+(m.cooling.liquidCaptureRatio*100)+'%'],
+      ['Air (residual) heat',pdfNum(st.airHeat_kW)+' kW','IT × '+(100-m.cooling.liquidCaptureRatio*100)+'%'],
+      ['TCS supply / return',m.cooling.tcsSupplyC+' / '+m.cooling.tcsReturnC+' °C (ΔT '+m.cooling.tcsDeltaT_K+' K)','BASELINE-DECISION.md'],
+      ['TCS flow total',pdfNum(st.tcsFlowTotal_LPM)+' LPM','21-worked-examples.md Ex6'],
+      ['TCS flow / rack',CALC.round(st.tcsFlowPerRack_LPM,1)+' LPM','total ÷ '+m.facility.racksPerHall+' racks'],
+      ['CDU',eq.cdu.model+' — '+st.cduRunningCount+' running','21-worked-examples.md Ex7'],
+      ['Chiller',eq.chiller.model+' — nameplate COP '+eq.chiller.nameplateCOP,'21-worked-examples.md Ex9'],
+      ['CRAH residual',st.crahActive+' active × '+CALC.round(st.crahPerUnit_kW,0)+' kW','21-worked-examples.md Ex8']
+    ],
+    ['liquid = IT × capture_ratio','air = IT × (1 − capture_ratio)','LPM = Q × 60 / (ρ × Cp × ΔT)','CDU = ceil(liquid / CDU_rating)','FWS m³/h = Q × 3600 / (ρ × Cp × ΔT)'],
+    WK('Liquid captured heat','liquid = IT × capture',pdfNum(st.itPerHall_kW)+' × '+m.cooling.liquidCaptureRatio,pdfNum(st.liquidHeat_kW,1)+' kW','21-worked-examples.md Example 5')+
+    WK('TCS flow (total)','LPM = Q×60 / (ρ×Cp×ΔT)',pdfNum(st.liquidHeat_kW,1)+' × 60 / ('+w.rhoKgPerL+' × '+w.cpKjPerKgK+' × '+m.cooling.tcsDeltaT_K+')',pdfNum(st.tcsFlowTotal_LPM)+' LPM ('+CALC.round(st.tcsFlowPerRack_LPM,1)+' /rack)','21-worked-examples.md Example 6')+
+    WK('CDU running count','CDU = ceil(liquid / rating)','ceil('+pdfNum(st.liquidHeat_kW,1)+' / '+eq.cdu.ratingKW+')',st.cduRunningCount+' running','21-worked-examples.md Example 7')+
+    WK('CRAH residual per unit','per = air / active_CRAH',pdfNum(st.airHeat_kW,1)+' / '+st.crahActive,CALC.round(st.crahPerUnit_kW,1)+' kW, '+CALC.round(st.crahFlowPerUnit_m3h,1)+' m³/h','21-worked-examples.md Example 8'),
+    'Cooling equipment schedule',
+    [
+      ['CDU running / installed',st.cduRunningCount+' / 12','doc-21 Ex7'],
+      ['Chiller nameplate COP',eq.chiller.nameplateCOP,'doc-21 Ex9'],
+      ['Active CRAH',st.crahActive,'doc-21 Ex8'],
+      ['Water ρ / Cp',w.rhoKgPerL+' kg/L / '+w.cpKjPerKgK+' kJ/kg·K','doc-21 Ex6']
+    ]);
+
+  /* 6. Fire / Safety */
+  H+='<section class="page"><h3>6. Fire / Safety</h3>'+
+     '<p>The data hall is a clean-agent protected volume. The protected volume is derived geometrically; the agent quantity is NOT presented because it requires design/minimum concentration, agent density, temperature/altitude correction, hold-time and nozzle hydraulic calculation against the governing code (NFPA 2001 / 12-deep-dive §11). This document states the limitation rather than a false number.</p>'+
+     '<h4>6.1 Assumptions</h4>'+TC('Fire / safety — geometry & posture')+R([
+       ['Data-hall geometry',m.geometry.lengthM+' × '+m.geometry.widthM+' × '+m.geometry.heightM+' m','21-worked-examples.md Ex10'],
+       ['Protected volume',pdfNum(vol)+' m³','L × W × H'],
+       ['Agent quantity','design validation required','NFPA 2001 / 12-deep-dive §11'],
+       ['Detection','VESDA aspirating + zoned','NFPA 75'],
+       ['Compliance status','preliminary — not as-built','12-deep-dive §11']
+     ])+
+     '<h4>6.2 Governing formula</h4><ul class="fl"><li><code>V = L × W × H</code></li></ul>'+
+     '<h4>6.3 Worked calculation</h4>'+
+     WK('Protected volume','V = L × W × H',m.geometry.lengthM+' × '+m.geometry.widthM+' × '+m.geometry.heightM,pdfNum(vol)+' m³','21-worked-examples.md Example 10')+
+     '<p class="lim">Limitation: fire-agent capacity cannot be inferred from cylinder count or volume alone. This figure supports system status display only — never a compliance claim.</p>'+
+     '</section>';
+
+  /* 7. Network */
+  H+='<section class="page"><h3>7. Network</h3>'+
+     '<p>Intra-domain GPU fabric is NVLink (5th gen); inter-domain/scale-out is InfiniBand XDR in a fat-tree. A 25 GbE out-of-band/BMC network carries management and telemetry. Network and storage power are included inside the locked per-NVL72 figure (the basis treats the NVL72 domain as the atomic load unit), so no separate additive network kW is double-counted.</p>'+
+     '<h4>7.1 Assumptions</h4>'+TC('Network — fabric')+R([
+       ['Intra-domain','NVLink 5 — 130 TB/s','NVIDIA GB200 NVL72'],
+       ['Scale-out','InfiniBand XDR 800 Gb/s','design'],
+       ['Management','25 GbE OOB / BMC','design'],
+       ['Power accounting','inside per-NVL72 '+sc.kwPerNVL72+' kW','BASELINE-DECISION.md']
+     ])+
+     '<h4>7.2 Governing formula</h4><ul class="fl"><li><code>IT_load = Σ rack_kW + network_kW + storage_kW  (network/storage folded into NVL72 unit)</code></li></ul>'+
+     '<p>Per the engine (datahall-calculations.js itLoad), network and storage are additive terms; in this basis they are already inside the locked NVL72 unit power, so the additive terms are zero and the IT total is '+pdfNum(st.itPerHall_kW)+' kW/hall without double counting.</p>'+
+     '</section>';
+
+  /* 8. BMS / Energy */
+  H+='<section class="page"><h3>8. BMS / Energy &amp; PUE</h3>'+
+     '<p>The BMS/DCIM aggregates field instrumentation through a redundant ring to redundant servers. The energy basis is the honest bottom-up PUE: facility power is the IT load plus a five-part non-IT basis (cooling, UPS+distribution loss, auxiliary). The chiller input uses the NAMEPLATE COP ('+eq.chiller.nameplateCOP+') from doc-21 Example 9 — it is never solved to hit a target.</p>'+
+     '<h4>8.1 PUE five-part basis (live)</h4>'+TC('PUE bottom-up five-part basis','per hall')+R([
+       ['IT',pdfNum(pb.it_kW)+' kW','locked Scenario A'],
+       ['Chiller input',pdfNum(pb.chillerInput_kW,1)+' kW','heat '+pdfNum(pb.coolingHeat_kW)+' ÷ COP '+eq.chiller.nameplateCOP],
+       ['Pumps',pdfNum(pb.pumps_kW,1)+' kW','doc-21 Ex9 scaled'],
+       ['Fans',pdfNum(pb.fans_kW,1)+' kW','doc-21 Ex9 scaled'],
+       ['CDU pumps',pdfNum(pb.cduPumps_kW,1)+' kW','doc-21 Ex9 scaled'],
+       ['CRAH fans',pdfNum(pb.crahFans_kW,1)+' kW','doc-21 Ex9 scaled'],
+       ['UPS + distribution loss',pdfNum(pb.upsDistLoss_kW,1)+' kW','doc-21 Ex9 scaled'],
+       ['Auxiliary',pdfNum(pb.aux_kW,1)+' kW','doc-21 Ex9 scaled'],
+       ['Non-IT total',pdfNum(pb.nonIT_kW,1)+' kW','Σ above'],
+       ['Facility',pdfNum(pb.facility_kW,1)+' kW','IT + non-IT'],
+       ['PUE',CALC.round(pb.pue,2),'Facility ÷ IT — honest, NOT 1.08'],
+       ['Design band (target only)',m.pueDesignBand.min+' – '+m.pueDesignBand.max,'BASELINE-DECISION.md']
+     ])+
+     '<h4>8.2 Worked calculation</h4>'+
+     WK('PUE — bottom-up 5-part basis','PUE = (IT + cooling + UPS/dist + aux) / IT',
+       'IT '+pdfNum(pb.it_kW)+' · cooling '+pdfNum(pb.basis.cooling_kW,1)+' · UPS/dist '+pdfNum(pb.basis.upsLoss_distLoss_kW,1)+' · aux '+pdfNum(pb.basis.aux_kW,1)+' → facility '+pdfNum(pb.facility_kW,1),
+       CALC.round(pb.pue,2)+'  (≈1.30 — honest for chiller-based liquid cooling, NOT a fudged 1.08)',
+       '21-worked-examples.md Example 9 — nameplate COP '+eq.chiller.nameplateCOP+', NOT calibrated')+
+     '<h4>8.3 Facility energy roll-up</h4>'+TC('Facility roll-up','all '+m.facility.halls+' halls')+R([
+       ['IT (facility)',pdfNum(facIT)+' kW','× '+m.facility.halls],
+       ['Facility power (incl. cooling/aux)',pdfNum(facTotal)+' kW','pb.facility × '+m.facility.halls],
+       ['Facility IT',CALC.round(facIT/1000,2)+' MW','derived'],
+       ['Facility total',CALC.round(facTotal/1000,2)+' MW','derived']
+     ])+
+     '</section>';
+
+  /* 9. Figures (reuse page SVGs) */
+  if(sldSVG||roomSVG){
+    H+='<section class="page"><h3>9. Figures</h3>';
+    if(sldSVG){ H+='<div class="fig">'+sldSVG+'</div>'+FC('Facility electrical single-line diagram (2N A/B)'); }
+    if(roomSVG){ H+='<div class="fig">'+roomSVG+'</div>'+FC('Building / room layout — '+m.facility.halls+' GB200 NVL72 data halls'); }
+    H+='</section>';
+  }
+
+  /* 10. References */
+  H+='<section class="page"><h3>'+(sldSVG||roomSVG?'10':'9')+'. References</h3><ol class="refs">'+
+     '<li>NVIDIA GB200 NVL72 — 72 Blackwell GPU / 36 Grace CPU rack-scale domain. nvidia.com/en-us/data-center/gb200-nvl72/</li>'+
+     '<li>Vertiv CoolChip CDU (≈121 kW class) — high-density liquid cooling distribution unit.</li>'+
+     '<li>Caterpillar 3516E — 2,500–2,750 ekW diesel generator set (NOT 8 MW).</li>'+
+     '<li>Carrier 19DV — 1,231–4,044 kW water-cooled centrifugal chiller.</li>'+
+     '<li>ASHRAE TC9.9 — Thermal Guidelines for Data Processing Environments / liquid cooling.</li>'+
+     '<li>Uptime Institute — Tier topology &amp; PUE methodology.</li>'+
+     '<li>NFPA 75 — Standard for the Fire Protection of Information Technology Equipment.</li>'+
+     '<li>NFPA 2001 — Standard on Clean Agent Fire Extinguishing Systems.</li>'+
+     '</ol>'+
+     '<h3>Assumptions &amp; Limitations</h3><ul class="lims">'+
+     '<li>Values are modelled/simulated from the locked basis — not a physical BMS feed.</li>'+
+     '<li>PUE is reported honestly (~'+CALC.round(pb.pue,2)+') even though it sits above the '+m.pueDesignBand.min+'–'+m.pueDesignBand.max+' design target band; the band is a target, never used to fudge the derived value.</li>'+
+     '<li>Fire-agent quantity is intentionally not stated — it requires a code hydraulic calculation against an AHJ.</li>'+
+     '<li>The chiller COP is the manufacturer nameplate ('+eq.chiller.nameplateCOP+'); the engine never back-solves it to a target PUE.</li>'+
+     '<li>Engine is deterministic — no Math.random; same input → same output (verified 57/57 doc-21 examples).</li>'+
+     '</ul></section>';
+
+  /* Appendices */
+  H+='<section class="page"><h3>Appendix A — Formula Registry</h3><ul class="fl">'+
+     '<li><code>IT_load_kW = Σ rack_kW + network_kW + storage_kW</code></li>'+
+     '<li><code>NVL72_kW = racks_per_NVL72 × NVL36_rack_kW</code></li>'+
+     '<li><code>Facility_kW = IT + cooling_elec + UPS_loss + dist_loss + aux</code></li>'+
+     '<li><code>PUE = Facility_kW / IT_kW</code></li>'+
+     '<li><code>WUE = annual_site_water_L / annual_IT_kWh</code></li>'+
+     '<li><code>CUE = annual_CO2_kg / annual_IT_kWh</code></li>'+
+     '<li><code>Liquid_heat = IT × capture_ratio ; Air_heat = IT × (1 − capture_ratio)</code></li>'+
+     '<li><code>Hydronic_flow_LPM = Q × 60 / (ρ × Cp × ΔT)</code></li>'+
+     '<li><code>FWS_flow_m3h = Q × 3600 / (ρ × Cp × ΔT)</code></li>'+
+     '<li><code>Chiller_input = cooling_kW / COP_nameplate</code></li>'+
+     '<li><code>Required_current_A = kW × 1000 / (√3 × V_LL × PF)</code></li>'+
+     '<li><code>kVA = kW / PF</code></li>'+
+     '<li><code>CDU_running = ceil(liquid_heat / CDU_rating)</code></li>'+
+     '<li><code>Volume = L × W × H</code></li>'+
+     '</ul>'+
+     '<h3>Appendix B — Unit Conventions</h3>'+R([
+       ['Power','kW (loads), MW (facility roll-up)','—'],
+       ['Flow (liquid)','LPM (TCS), m³/h (CRAH FWS)','—'],
+       ['Temperature','°C; ΔT in K','—'],
+       ['Current','A at '+m.electrical.voltageLL+' V, PF '+m.electrical.powerFactor,'—'],
+       ['Energy ratio','PUE / WUE / CUE dimensionless or L·kWh⁻¹','—'],
+       ['√3 (spec)',m.electrical.specSqrt3+' (worked-example convention)','21-worked-examples.md Ex3']
+     ])+
+     '<h3>Appendix C — Glossary</h3>'+R([
+       ['NVL72','NVIDIA rack-scale domain — 72 Blackwell GPU + 36 Grace CPU','—'],
+       ['DLC','Direct liquid cooling (to-chip cold plate)','—'],
+       ['TCS','Technology Cooling System (liquid loop to racks)','—'],
+       ['CDU','Coolant Distribution Unit (L2L heat exchanger)','—'],
+       ['CRAH','Computer Room Air Handler (residual air heat)','—'],
+       ['PUE','Power Usage Effectiveness = Facility ÷ IT','—'],
+       ['COP','Coefficient of Performance (chiller, nameplate)','—'],
+       ['2N','Fully redundant A/B electrical topology','—'],
+       ['Scenario A','LOCKED adopted case — '+sc.kwPerNVL72+' kW/NVL72','BASELINE-DECISION.md'],
+       ['Scenario B','Exposed-only aggressive variant ('+grp(m.scenarios.B.itPerHall_kW)+' kW/hall) — NOT adopted','17-correction-table.md']
+     ])+
+     '</section>';
+
+  /* ---- print stylesheet (separate <style> in the print doc) ---------- */
+  var CSS='*{margin:0;padding:0;box-sizing:border-box}'+
+    'html,body{font-family:Georgia,"Times New Roman",serif;color:#1a1a1a;background:#fff;font-size:11px;line-height:1.5}'+
+    'body{counter-reset:pg}'+
+    '.page{position:relative;padding:0 2mm;page-break-after:always;min-height:0}'+
+    '.page:last-child{page-break-after:auto}'+
+    'h1{font-size:26px;line-height:1.2;margin:0 0 6px;color:#0a0e1a}'+
+    'h2{font-size:15px;font-weight:600;color:#444;margin:0 0 18px}'+
+    'h3{font-size:16px;color:#0a0e1a;border-bottom:2px solid #b45309;padding-bottom:5px;margin:0 0 12px;page-break-after:avoid}'+
+    'h4{font-size:12px;color:#92400e;margin:14px 0 6px;page-break-after:avoid}'+
+    'p{margin:0 0 9px;text-align:justify}'+
+    '.cap{font-size:9px;font-style:italic;color:#555;margin:4px 0 12px;text-align:left}'+
+    'table.t{width:100%;border-collapse:collapse;margin:0 0 8px;font-size:10px;page-break-inside:avoid}'+
+    'table.t,table.tp-meta{font-family:"Courier New",monospace}'+
+    'table.t th{background:#0a0e1a;color:#fff;text-align:left;padding:5px 7px;font-weight:600}'+
+    'table.t th.v,table.t td.v{text-align:right}'+
+    'table.t td{padding:4px 7px;border-bottom:1px solid #ddd;vertical-align:top}'+
+    'table.t td.src{color:#777;font-size:8.5px;font-style:italic}'+
+    'table.t tr:nth-child(even) td{background:#f6f6f4}'+
+    'table.t td.v{font-weight:700;color:#92400e}'+
+    'ul.fl{margin:0 0 10px 16px}ul.fl li{margin:3px 0;list-style:square}'+
+    'code{font-family:"Courier New",monospace;font-size:10px;background:#f0f0ee;padding:1px 4px;border-radius:2px}'+
+    '.wk{border:1px solid #ccc;border-left:3px solid #b45309;border-radius:3px;padding:7px 9px;margin:0 0 8px;background:#fafaf8;page-break-inside:avoid}'+
+    '.wt{font-weight:700;font-size:11px;margin-bottom:4px;color:#0a0e1a}'+
+    '.wf{font-size:10px;margin:2px 0}'+
+    '.wf .lab{display:inline-block;width:78px;color:#92400e;font-weight:600;font-family:Georgia,serif}'+
+    '.wr{font-family:"Courier New",monospace;font-weight:700;color:#7a2f00;margin:4px 0 2px;font-size:11px}'+
+    '.wref{font-size:8.5px;color:#777;font-style:italic}'+
+    '.lim,.tp-dis{font-size:9.5px;color:#666;font-style:italic;border-left:3px solid #b45309;padding:6px 9px;background:#fbf3e2;margin:8px 0}'+
+    'ol.refs{margin:0 0 12px 18px}ol.refs li{margin:4px 0}'+
+    'ul.lims{margin:0 0 12px 16px}ul.lims li{margin:4px 0;list-style:square}'+
+    '.title{display:flex;align-items:center;justify-content:center;text-align:center}'+
+    '.tp{max-width:140mm}'+
+    '.tp-k{font-family:"Courier New",monospace;font-size:10px;letter-spacing:2px;color:#b45309;margin-bottom:14px}'+
+    '.tp-meta{width:100%;border-collapse:collapse;margin:18px 0;font-size:10.5px;text-align:left}'+
+    '.tp-meta td{padding:5px 8px;border-bottom:1px solid #ddd}'+
+    '.tp-meta td:first-child{color:#777;width:34%}'+
+    '.tp-dis{margin-top:20px;text-align:left}'+
+    '.fig{border:1px solid #ccc;padding:8px;margin:0 0 4px;page-break-inside:avoid;background:#fff}'+
+    '.fig svg{max-width:100%;height:auto;max-height:170mm}'+
+    /* Native CSS paged-media running header/footer + page numbers via @page
+     * margin boxes — collision-free (unlike position:fixed), Chrome-supported.
+     * String() guards keep the content static; the page counter increments
+     * automatically. A4, generous margin band so content never touches the
+     * running marginalia. */
+    '@page{size:A4;margin:18mm 14mm 16mm;'+
+      'font-family:"Courier New",monospace;font-size:8px;color:#999;'+
+      '@top-left{content:"AI Data Hall — Basis of Design";color:#999}'+
+      '@top-right{content:"Scenario A (LOCKED) · site '+E(rzv)+'";color:#999}'+
+      '@bottom-left{content:"'+E(m.authority)+'";color:#999}'+
+      '@bottom-center{content:"Page " counter(page) " of " counter(pages);color:#999}'+
+      '@bottom-right{content:"Issued '+E(dateStr)+' · resistancezero.com";color:#999}}'+
+    '@page:first{@top-left{content:""}@top-right{content:""}}'+
+    '@media print{.page{page-break-after:always}.wk,table.t,.fig,tr{page-break-inside:avoid}h3,h4{page-break-after:avoid}table.t thead{display:table-header-group}}';
+
+  var head='<\/style></head>';
+  var bodyOpen='<body>';
+  var docHTML='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
+    '<title>AI Data Hall — Basis of Design ('+E(dateStr)+')</title><style>'+
+    CSS+head+bodyOpen+H+'</body></html>';
+  return docHTML;
+}
+function exportBodPdf(){
+  var html=buildBodPdfHtml();
+  if(!html){
+    try{ window.alert('The calculation engine is not available — reload the page and retry.'); }catch(e){}
+    return;
+  }
+  var win;
+  try{ win=window.open('','_blank'); }catch(e){ win=null; }
+  if(!win){
+    try{ window.alert('Pop-up blocked — allow pop-ups for this site to export the Basis-of-Design PDF.'); }catch(e){}
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function(){ try{ win.print(); }catch(e){} },600);
+}
+if(pdfBtn){ pdfBtn.addEventListener('click',exportBodPdf); }
 })();
 </script>
 

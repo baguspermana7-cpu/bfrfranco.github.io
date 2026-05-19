@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.21.2 — 2026-05-18 (B-014: datahallAI Basis-of-Design drawer — overlap + re-skin + Export-PDF + value audit)
+
+User (plan mode, in detail): *"basis of design ini pada tertutup dengan
+button2 nggak proper responsivenessnya, dan jangan selalu ai design slop
+transparant biru-abu2 … kasih tombol export pdf … basis of design pastikan
+ada reference, calculation … jika ada value parameter tidak valid validkan."*
+
+### Fixed (datahallAI.html only — DC-dash + engine byte-identical)
+- **Overlap/responsive**: `.dh-bod` raised to `z-index:1002` (above the
+  global nav burger 1001) + burger hidden while drawer open; header sticky
+  with safe-area top padding, flex-wraps ≤480px; ≤94vw / full-width ≤600px.
+  Header + close-X fully visible & reachable at 1440/768/390 px, 0px
+  overflow, Esc closes.
+- **De-AI-slop re-skin**: replaced transparent navy/purple glassmorphism +
+  backdrop-filter with mostly-solid graphite surfaces + ONE restrained
+  signal-amber accent (ISA-18.2), correct LIGHT (`#f4f6f9`/`#b45309`) +
+  DARK (`#11151f`/`#171d29`) variants per `documentation/design.md`.
+- **Export PDF**: solid amber button → print-window (escaped `<\/script>`,
+  audit-clean) generating a 14-page A4 engineering Basis-of-Design: title +
+  revision history + design philosophy + per-discipline sections (Compute/
+  Electrical/Cooling/Fire-Safety/Network/BMS) = assumptions → formulae →
+  worked calcs LIVE from `DATAHALL_CALC`/`DATAHALL_MODEL` (honest PUE ≈1.30
+  + 5-part basis, "NOT a fudged 1.08") + figures + references (NVIDIA GB200
+  NVL72/Vertiv CoolChip/Cat 3516E/Carrier 19DV/ASHRAE/Uptime/NFPA) +
+  appendices; `@page A4`, running header/footer, page numbers.
+- **Value audit**: 6 stray legacy values (28.4/28.5 MW IT, PUE 1.08, 7,776×
+  B200) → engine-derived Scenario-A baseline. Remaining 1.08/28.5 confined
+  to excluded `#p-dash`, dead code, or the intentional honest-vs-fudged BoD
+  contrast. `node tools/test-datahall-calc.mjs` 57/57.
+
 ## v1.21.1 — 2026-05-18 (R-013: Second Brain wired into Insights dropdown)
 
 User: *"page second brain saya … ada wiki, obsidian dan graphify kok tidak
