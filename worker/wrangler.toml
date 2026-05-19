@@ -3,3 +3,10 @@ main = "src/index.js"
 compatibility_date = "2026-05-01"
 
 kv_namespaces = [{ binding = "FT_KV", id = "PLACEHOLDER_REPLACE_VIA_SETUP_MD" }]
+
+# Task 1.9 — cron pre-warm (fixes B-003). Every 2 min keeps the hottest
+# caches hot so a cold tab open hits warm KV (sub-5s). 2-min cadence stays
+# within free-tier cron limits and does NOT burn the free upstream quotas
+# (each handler is KV-TTL-gated, so a tick is a no-op while caches are fresh).
+[triggers]
+crons = ["*/2 * * * *"]

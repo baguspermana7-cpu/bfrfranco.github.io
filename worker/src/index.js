@@ -31,6 +31,32 @@ function handleHealth() {
   return json({ status: 'ok', name: 'rz-finance-gateway' });
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Task 1.9 — cron pre-warm + stale hardening (fixes B-003)
+
+   prewarm(env) warms the hottest caches in parallel. Each source is
+   failure-isolated via Promise.allSettled so ONE failing upstream
+   never aborts the others and a cron tick NEVER throws. Each handler
+   is already KV-TTL-gated AND stale-on-error, so a tick is a cheap
+   no-op while caches are fresh (free upstream quota is preserved).
+
+   Symbols mirror the client CFG.INDICES quote batch so the Overview
+   tab opens against a warm `q:SPY,QQQ,DIA,IWM,GLD,TLT,USO,VGK` key.
+   ═══════════════════════════════════════════════════════════════ */
+
+const PREWARM_INDEX_SYMS = ['SPY', 'QQQ', 'DIA', 'IWM', 'GLD', 'TLT', 'USO', 'VGK'];
+
+export async function prewarm(env) {
+  return Promise.allSettled([
+    handleFx(env),
+    handleQuotes(env, PREWARM_INDEX_SYMS),
+    handleNews(env, 'market'),
+    handleCrypto(env),
+    handleSectors(env),
+    handleFutures(env),
+  ]);
+}
+
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -137,5 +163,12 @@ export default {
     } catch (e) {
       return json(null, { status: 500, error: String(e) });
     }
+  },
+
+  // Task 1.9 — cron handler (wrangler.toml [triggers] crons = */2 * * * *).
+  // Fans the warm-up out via prewarm() inside ctx.waitUntil so the tick
+  // never blocks/throws (Promise.allSettled isolates per-source failures).
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(prewarm(env));
   },
 };
