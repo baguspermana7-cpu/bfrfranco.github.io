@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.22.0 — 2026-05-18 (B-015 Stage 1: Conventional BMS scenario engine + dc-conventional bind)
+
+User: *"dc-conventional.html garisnya tabrakan dan gambar2nya seperti
+coret2an newbie … kecuali EPMS_Telemetry sudah ok … review dan
+sempurnakan"* (per the owner 14-doc `conv/review` spec). Stage 1 of a
+multi-stage suite redesign; EPMS_Telemetry.html is the OK exemplar (left
+byte-untouched).
+
+### Added
+- **`js/conv-engine.js`** — deep-frozen `window.CONV_MODEL` single scenario
+  basis + pure `window.CONV_CALC` per conv/review doc-00 Engineering Data
+  Contract (it_design 2.0 MW, it_load 1.85 MW, PUE 1.45 → facility 2.6825
+  MW, non-IT, EPMS, cooling/CHW flow, WUE, fuel autonomy). Every constant
+  `// source:`-cited; NO `Math.random`; Node-interop shim.
+- **`tools/test-conv-calc.mjs`** — vm-sandboxed; reproduces the doc-00
+  Definition-of-Done identities + doc-09 worked examples. **22/22 pass.**
+
+### Changed
+- **dc-conventional.html** bound to the engine via `<script src="js/conv-
+  engine.js">` (external, not inlined): dashboard KPIs/callouts now read
+  `window.CONV_CALC.snapshot` (was `Math.random()`). Total = IT×PUE = **2,683
+  kW** shown exactly; Non-IT = Facility−IT; CHW single basis 7.2/14.8 °C
+  (conflict resolved per doc-00/09, condenser loop relabel deferred).
+  Stable across reloads (not random). 0 pageerror, 0px overflow @390.
+- EPMS_Telemetry.html + the 6 sibling conv pages BYTE-UNTOUCHED.
+  Remaining per-page bind/de-slop = Stages 2–9 (tracked B-015).
+- Gates: `audit-js-syntax`/`script-tags` `--strict` CLEAN.
+
 ## v1.21.2 — 2026-05-18 (B-014: datahallAI Basis-of-Design drawer — overlap + re-skin + Export-PDF + value audit)
 
 User (plan mode, in detail): *"basis of design ini pada tertutup dengan

@@ -804,6 +804,11 @@ a { color: inherit; text-decoration: none; }
     </script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <!-- Conventional BMS single scenario engine — single source of truth for
+         all derived KPIs (IT/facility/non-IT load, PUE, CHW, fuel, WUE, carbon).
+         Loaded NON-deferred so window.CONV_CALC exists before the inline
+         dashboard script runs. Basis: conv/review/09-engineering-basis-and-calculations.md -->
+    <script src="js/conv-engine.js?v=1.22.0"></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -1074,53 +1079,63 @@ setInterval(() => {
     document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB');
 }, 1000);
 
-// Live data simulation
+// Engine-true data binding.
+// All derived KPIs come from window.CONV_CALC (js/conv-engine.js) — the single
+// scenario basis per conv/review/09-engineering-basis-and-calculations.md.
+// NO Math.random: numbers are stable on reload and internally consistent
+// (Total = IT x PUE exactly; Non-IT = Facility - IT).
+function setText(id, value) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
 function updateData() {
-    const rand = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
-    const rand1 = (min, max) => (Math.random() * (max - min) + min).toFixed(1);
-    const randInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
+    if (!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
+    var s = window.CONV_CALC.snapshot;
 
-    const pue = rand1(1.42, 1.48);
-    const wue = rand(1.15, 1.28);
-    const carbon = rand(0.38, 0.45);
-    const temp = rand1(21.5, 23.5);
-    const rh = randInt(45, 52);
-    const chwSup = rand1(6.8, 7.8);
-    const chwRet = rand1(14.2, 15.5);
-    const fuel = randInt(82, 88);
-    const itLoad = randInt(1820, 1880);
+    var pue = s.site.pue.toFixed(2);                       // 1.45
+    var wue = s.environment.wue_l_per_kwh.toFixed(2);      // 1.20
+    var carbon = s.environment.carbon_kg_per_facility_kwh.toFixed(2); // 0.42
+    var temp = s.environment.avg_temp_c.toFixed(1);        // 22.4
+    var rh = Math.round(s.environment.avg_rh_pct);         // 48
+    var chwSup = s.cooling.chws_c.toFixed(1);              // 7.2
+    var chwRet = s.cooling.chwr_c.toFixed(1);              // 14.8
+    var fuel = Math.round(s.fuel.level_pct);               // 85
+    var itLoadKw = Math.round(s.site.it_load_kw);          // 1850
+    var facilityKw = Math.round(s.site.facility_load_kw);  // 2683 (= 1850 x 1.45)
 
-    // Update KPI Strip
-    document.getElementById('kpiPue').textContent = pue;
-    document.getElementById('kpiWue').textContent = wue;
-    document.getElementById('kpiCarbon').textContent = carbon;
-    document.getElementById('kpiIt').textContent = itLoad.toLocaleString();
-    document.getElementById('kpiTemp').textContent = temp;
+    // KPI Strip
+    setText('kpiPue', pue);
+    setText('kpiWue', wue);
+    setText('kpiCarbon', carbon);
+    setText('kpiIt', itLoadKw.toLocaleString());
+    setText('kpiTemp', temp);
 
-    // Update Callouts
-    document.getElementById('cPue').textContent = pue;
-    document.getElementById('cWue').textContent = wue;
-    document.getElementById('cCarbon').textContent = carbon;
-    document.getElementById('cIt').textContent = (itLoad/1000).toFixed(2) + ' MW';
-    document.getElementById('cChw').textContent = chwSup + '°C';
-    document.getElementById('cTemp').textContent = temp + '°C';
-    document.getElementById('cFuel').textContent = fuel + '%';
-    document.getElementById('cRh').textContent = rh + '%';
+    // Photo Callouts
+    setText('cPue', pue);
+    setText('cWue', wue);
+    setText('cCarbon', carbon);
+    setText('cIt', (itLoadKw / 1000).toFixed(2) + ' MW');
+    setText('cChw', chwSup + '°C');
+    setText('cTemp', temp + '°C');
+    setText('cFuel', fuel + '%');
+    setText('cRh', rh + '%');
 
-    // Update Stats Panel
-    document.getElementById('sPue').textContent = pue;
-    document.getElementById('sWue').textContent = wue + ' L/kWh';
-    document.getElementById('sCue').textContent = carbon + ' kg/kWh';
-    document.getElementById('sTotalLoad').textContent = Math.round(itLoad * parseFloat(pue)).toLocaleString() + ' kW';
-    document.getElementById('sItLoad').textContent = itLoad.toLocaleString() + ' kW';
-    document.getElementById('sChwSup').textContent = chwSup + '°C';
-    document.getElementById('sChwRet').textContent = chwRet + '°C';
-    document.getElementById('sTempAvg').textContent = temp + '°C';
-    document.getElementById('sRhAvg').textContent = rh + '%';
-    document.getElementById('sFuelMain').textContent = fuel + '%';
+    // Right Stats Panel — Total = IT x PUE shown exactly
+    setText('sPue', pue);
+    setText('sWue', wue + ' L/kWh');
+    setText('sCue', carbon + ' kg/kWh');
+    setText('sTotalLoad', facilityKw.toLocaleString() + ' kW');
+    setText('sItLoad', itLoadKw.toLocaleString() + ' kW');
+    setText('sChwSup', chwSup + '°C');
+    setText('sChwRet', chwRet + '°C');
+    setText('sTempAvg', temp + '°C');
+    setText('sRhAvg', rh + '%');
+    setText('sFuelMain', fuel + '%');
 }
 
 updateData();
+// Re-assert engine-true values on the existing cadence (idempotent, stable —
+// no drift because the source is the frozen scenario, not a PRNG).
 setInterval(updateData, 5000);
 
 // Theme Toggle
