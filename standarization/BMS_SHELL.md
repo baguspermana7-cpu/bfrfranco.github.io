@@ -19,6 +19,14 @@ consistency. Doc-14 §1 fix #1 applied: facility-image callouts demoted
 demoted items preserved in the right stats-panel (no data lost). Theme
 flip + top-status-strip migration deferred.
 
+**v1.23.3 (2026-05-22)** — `fuel-system.html` adopted. Library loaded.
+Doc-14 §6 fix applied: Generator Autonomy KPI promoted to visual hero —
+`.kpi-strip` grid `repeat(5, 1fr)` → `2fr 1fr 1fr 1fr 1fr` so the hero
+spans 2 cols, hero value font-size `1.85rem` → `2.85rem` (~54% larger)
+with amber-gold tint + inset border. Responsive: hero spans 3 cols on
+≤1280 px. Engine binding (`window.CONV_CALC` → `kpi-autonomy` = 48 hr)
+unchanged.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

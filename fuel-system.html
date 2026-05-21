@@ -178,21 +178,31 @@
         }
         .tb-link:hover { border-color: var(--sel); color: #fff; background: rgba(56,189,248,0.08); }
 
-        /* ---- 2. KPI AUTONOMY STRIP (the headline operator output) ---- */
+        /* ---- 2. KPI AUTONOMY STRIP (the headline operator output) ----
+           v1.23.3 doc-14 §6: "Make autonomy the largest result, not hidden in
+           a panel." Hero card now spans 2 columns and gets a much larger
+           value font + amber-gold tint so it visually dominates the strip. */
         .kpi-strip {
-            display: grid; grid-template-columns: repeat(5, 1fr);
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
             gap: 12px; padding: 12px 18px 0 18px;
         }
         .kpi {
             background: var(--panel-bg); border: 1px solid var(--border-color);
             border-radius: 7px; padding: 12px 14px; position: relative;
         }
-        .kpi.hero { border-color: rgba(180,121,31,0.5); background: linear-gradient(180deg,#16202d,#121a25); }
+        .kpi.hero {
+            border-color: rgba(180,121,31,0.6);
+            background: linear-gradient(180deg,#1a2230,#101822);
+            box-shadow: inset 0 0 0 1px rgba(212,164,73,0.08);
+        }
         .kpi .k-lbl { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase;
             letter-spacing: 0.6px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .kpi.hero .k-lbl { font-size: 0.78rem; color: var(--diesel-main); letter-spacing: 0.7px; }
         .kpi .k-val { font-family: 'JetBrains Mono', monospace; font-size: 1.55rem;
             font-weight: 700; line-height: 1.05; color: var(--text-primary); }
-        .kpi.hero .k-val { color: var(--diesel-bright); font-size: 1.85rem; }
+        .kpi.hero .k-val { color: var(--diesel-bright); font-size: 2.85rem; font-weight: 800; letter-spacing: -0.02em; }
+        .kpi.hero .k-unit { font-size: 1rem; color: var(--diesel-bright); opacity: 0.85; }
+        .kpi.hero .k-sub { font-size: 0.72rem; color: var(--text-secondary); margin-top: 10px; }
         .kpi .k-unit { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; margin-left: 4px; }
         .kpi .k-sub { font-size: 0.66rem; color: var(--text-dim); margin-top: 5px;
             font-family: 'JetBrains Mono', monospace; }
@@ -434,7 +444,14 @@
          * ============================================================ */
         @media (max-width: 1500px) {
             .kpi .k-val { font-size: 1.35rem; }
-            .kpi.hero .k-val { font-size: 1.6rem; }
+            .kpi.hero .k-val { font-size: 2.35rem; }
+        }
+        @media (max-width: 1280px) {
+            /* Hero falls back to equal-column at smaller widths so the layout doesn't break.
+               Sub-1500 still keeps the hero pop via the bigger value font. */
+            .kpi-strip { grid-template-columns: repeat(3, 1fr) !important; }
+            .kpi.hero { grid-column: span 3; }
+            .kpi.hero .k-val { font-size: 2.5rem; }
         }
         @media (max-width: 1280px) {
             .main-grid { grid-template-columns: 1fr 1fr; }
@@ -470,6 +487,11 @@
         }
     </style>
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
+         Loaded for cross-page consistency; body does NOT carry rz-bms-shell
+         class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §6. -->
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.3">
+    <script src="js/rz-bms-shell.js?v=1.23.3" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 <style id="rz-skiplink-v1">

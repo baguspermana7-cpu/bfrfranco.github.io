@@ -11,6 +11,52 @@ release sections rather than semver.
 
 ---
 
+## v1.23.3 — 2026-05-22 (BMS Shell adoption #3 — `fuel-system.html`, autonomy promoted to visual hero per doc-14 §6)
+
+Third adoption ship. Surgical and additive — preserves engine binding,
+existing alarm strip, P&ID layout, all 5 KPIs. The only visible change is
+the Generator Autonomy KPI now visually dominates the strip per doc-14 §6
+fix ("Make autonomy the largest result, not hidden in a panel").
+
+### Changed (fuel-system.html only)
+- **KPI strip layout** — `.kpi-strip` grid changed `repeat(5, 1fr)` →
+  `2fr 1fr 1fr 1fr 1fr` so the Generator Autonomy hero card is twice as wide
+  as the other 4 cards.
+- **Hero KPI styling amplified**:
+  - `.kpi.hero .k-val` font-size `1.85rem` → **2.85rem** (~54% larger).
+  - `.kpi.hero .k-val` weight `700` → **800**; letter-spacing tightened.
+  - `.kpi.hero .k-lbl` upsized to `0.78rem` + amber tint (`var(--diesel-main)`).
+  - `.kpi.hero .k-unit` upsized to `1rem` with amber-bright color.
+  - Hero card gets a subtle inset gold border via `box-shadow` for extra weight.
+- **Responsive** — hero card spans 3 columns (full width) on ≤1280 px and
+  ≤900 px breakpoints; falls back to single-column on ≤768 px. Mobile font
+  scaling proportional (2.5 / 2.35 / default rem).
+
+### Added (loaded but not yet applied to body scope)
+- **BMS Shell library** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
+  with `?v=1.23.3` cache-bust for cross-page consistency. `body` does NOT carry
+  `class="rz-bms-shell"` this ship — page palette preserved.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` byte-identical to HEAD; 22/22 conv + 57/57 datahall
+  tests pass.
+- Engine binding chain (`window.CONV_CALC.snapshot` → `kpi-autonomy` /
+  `kpi-usable` / `kpi-consumption` / `kpi-genload` / `kpi-np1`) unchanged.
+- UST-01 tank + Tank Inventory + Bulk Fill Point panels + all instrument
+  bubbles (LIT-101, TIT-101, etc.) untouched.
+
+### Verified
+- 4 strict audit gates CLEAN.
+- 22/22 conv + 57/57 datahall tests pass.
+- Headless puppeteer @ 1440: KPI grid columns measured 2× wider for hero
+  vs others; hero `.k-val` computed font-size > 40 px (was 26 px); engine
+  autonomy reads 48 hr from `CONV_CALC`. Zero pageErrors.
+
+### Standarization updated
+- `standarization/BMS_SHELL.md` v1.23.3 status entry added.
+
+---
+
 ## v1.23.2 — 2026-05-22 (BMS Shell adoption #2 — `dc-conventional.html`, static facility-image callouts demoted per doc-14 §1)
 
 Second adoption ship. Surgical and additive — preserves the page's existing
