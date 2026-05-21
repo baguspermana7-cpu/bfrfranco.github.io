@@ -92,11 +92,13 @@
             return String(href).toLowerCase().split('#')[0].split('?')[0];
         }
     }
+    /* DC pages (dcmoc, datahallai, dc-conventional) were converted from the
+       hard-block ROOT_ONLY_PATHS list to the 4-tier feature-flag matrix.
+       They are now gated by enforceTierFeatureAccess() + the `page-access`
+       feature on each page entry in rz-feature-flags.js. /dc-market and
+       /dc-market-tracker.html remain root-only (out of educator scope). */
     var ROOT_ONLY_PATHS = [
-        '/dcmoc',
         '/dc-market',
-        '/datahallai.html',
-        '/dc-conventional.html',
         '/dc-market-tracker.html'
     ];
     function isRootOnlyHref(href) {
@@ -633,6 +635,68 @@
             if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
             if (EDUCATOR_EMAILS.indexOf(email) !== -1) return 'pro';
             return 'pro';
+        },
+
+        getRoleFromSession: getRoleFromSession,
+
+        /**
+         * Tier-gated page access via the rz-feature-flags.js matrix.
+         *
+         * Resolves the current session's effective tier and consults the
+         * `page-access` feature on the given page entry. Root sessions
+         * short-circuit to allowed. On denial, swaps the page body for the
+         * existing "Restricted Access" UX and shows the login/upgrade modal
+         * (same copy/flow as the legacy requireRoot gate).
+         *
+         * Used by datahallAI.html, dc-conventional.html, and dcmoc/index.html
+         * to replace the previous hard ROOT_ONLY_PATHS block with a 4-tier
+         * matrix-driven gate that educator + pro users pass.
+         *
+         * @param {string} pageKey — rz-feature-flags page key (e.g. 'datahall-ai')
+         * @returns {boolean} true when access is allowed; false when denied
+         */
+        enforceTierFeatureAccess: function (pageKey) {
+            var session = getSession();
+            var role = getRoleFromSession(session);
+            if (role === 'root') return true;
+
+            var allowed = false;
+            try {
+                if (window._rzFeatures && typeof window._rzFeatures.canAccess === 'function') {
+                    allowed = !!window._rzFeatures.canAccess(pageKey, 'page-access');
+                } else if (window.RZ_FEATURE_FLAGS && typeof window.RZ_FEATURE_FLAGS.canAccess === 'function') {
+                    allowed = !!window.RZ_FEATURE_FLAGS.canAccess(pageKey, 'page-access');
+                } else if (window._rzFeatures && typeof window._rzFeatures.has === 'function') {
+                    allowed = !!window._rzFeatures.has(pageKey, 'page-access');
+                }
+            } catch (e) { allowed = false; }
+
+            if (allowed) {
+                if (typeof document !== 'undefined' && document.body) {
+                    document.body.classList.remove('locked');
+                }
+                return true;
+            }
+
+            if (typeof document !== 'undefined' && document.body) {
+                document.body.classList.add('locked');
+            }
+            var message = session
+                ? 'Pro or Educator access required for this module.'
+                : 'Please sign in with a Pro or Educator account to access this module.';
+            if (typeof this.showRootGatePrompt === 'function') {
+                this.showRootGatePrompt(message);
+            } else if (typeof this.showModal === 'function') {
+                this.showModal();
+                var err = (typeof document !== 'undefined')
+                    ? document.getElementById('rzModalError')
+                    : null;
+                if (err) {
+                    err.textContent = message;
+                    err.classList.add('show');
+                }
+            }
+            return false;
         }
     };
 

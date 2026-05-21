@@ -10521,10 +10521,13 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 <script src="rz-engine.min.js?v=2026-04-28" defer></script>
 <script>
 (function(){
-    /* Root-only gate. Robust: prefers _rzAuth.isRootSession (auth.js) but falls
-       back to direct localStorage read so the gate works even if auth.js is
-       slow / fails / runs after this IIFE (the prior race-condition bug). */
+    /* Tier-feature gate. Replaces the legacy ROOT_ONLY hard block with the
+       4-tier matrix in rz-feature-flags.js (`datahall-ai` page-access).
+       Pro + Educator + Root pass; Demo + Free see the upgrade modal.
+       Robust against auth.js / feature-flags-js load order: falls back to a
+       direct localStorage read when the helpers are not yet available. */
     var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+    var DEMO_EMAILS = ['demo@resistancezero.com'];
     function readSessionDirect(){
         try {
             var raw = localStorage.getItem('rz_premium_session');
@@ -10535,15 +10538,26 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
             return s;
         } catch(e){ return null; }
     }
-    function isRootDirect(){
+    function tierDirect(){
         var s = readSessionDirect();
-        return !!(s && ROOT_EMAILS.indexOf(String(s.email).toLowerCase()) !== -1);
+        if (!s) return 'free';
+        var email = String(s.email).toLowerCase();
+        if (s.role === 'root' || ROOT_EMAILS.indexOf(email) !== -1) return 'root';
+        if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
+        return 'pro';
+    }
+    function allowedDirect(){
+        var t = tierDirect();
+        return t === 'root' || t === 'pro';
     }
     function applyGate(){
-        var ok = (window._rzAuth && typeof window._rzAuth.isRootSession === 'function')
-                    ? window._rzAuth.isRootSession()
-                    : isRootDirect();
-        document.body.classList.toggle('locked', !ok);
+        var ok;
+        if (window._rzAuth && typeof window._rzAuth.enforceTierFeatureAccess === 'function') {
+            ok = window._rzAuth.enforceTierFeatureAccess('datahall-ai');
+        } else {
+            ok = allowedDirect();
+            document.body.classList.toggle('locked', !ok);
+        }
     }
     var b = document.getElementById('rootLoginBtn');
     if (b) b.addEventListener('click', function(){
