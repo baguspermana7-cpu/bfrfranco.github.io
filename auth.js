@@ -19,10 +19,56 @@
 
     var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
     var DEMO_EMAILS = ['demo@resistancezero.com'];
+    var EDUCATOR_SEED_EMAILS = ['educator@resistancezero.com'];
+    /**
+     * Load the educator allowlist: seed entries merged with any extras stored
+     * by the admin panel under localStorage key 'rz_admin_educators' (JSON
+     * array of email strings). Tolerant of corrupt/missing JSON: returns the
+     * seed list on any parse error.
+     * @returns {string[]} deduped, lowercased, trimmed emails
+     */
+    function loadEducatorEmails() {
+        var out = [];
+        var seen = {};
+        function push(raw) {
+            if (raw == null) return;
+            var s = String(raw).toLowerCase().trim();
+            if (!s || seen[s]) return;
+            seen[s] = 1;
+            out.push(s);
+        }
+        for (var i = 0; i < EDUCATOR_SEED_EMAILS.length; i++) {
+            push(EDUCATOR_SEED_EMAILS[i]);
+        }
+        try {
+            if (typeof localStorage !== 'undefined') {
+                var raw = localStorage.getItem('rz_admin_educators');
+                if (raw) {
+                    var extras = JSON.parse(raw);
+                    if (extras && extras.length) {
+                        for (var j = 0; j < extras.length; j++) push(extras[j]);
+                    }
+                }
+            }
+        } catch (e) { /* corrupt JSON or storage unavailable — ignore */ }
+        return out;
+    }
+    var EDUCATOR_EMAILS = loadEducatorEmails();
+    if (typeof window !== 'undefined' && window.addEventListener) {
+        window.addEventListener('storage', function (e) {
+            if (!e || e.key === 'rz_admin_educators' || e.key === null) {
+                EDUCATOR_EMAILS = loadEducatorEmails();
+            }
+        });
+        window.addEventListener('rz-educators-changed', function () {
+            EDUCATOR_EMAILS = loadEducatorEmails();
+        });
+    }
     function detectRole(email) {
         var e = String(email || '').toLowerCase().trim();
         if (ROOT_EMAILS.indexOf(e) !== -1) return 'root';
         if (DEMO_EMAILS.indexOf(e) !== -1) return 'demo';
+        if (EDUCATOR_EMAILS.indexOf(e) !== -1) return 'educator';
         return 'pro';
     }
     function isRootEmail(email) {
@@ -123,9 +169,10 @@
 
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
-        { email: 'demo@resistancezero.com',  password: 'demo2026',        tier: 'pro', role: 'pro' },
-        { email: 'bagus@resistancezero.com',  password: 'RZ@Premium2026!', tier: 'pro', role: 'root' },
-        { email: 'admin@resistancezero.com',  password: 'RZ@Premium2026!', tier: 'pro', role: 'root' }
+        { email: 'demo@resistancezero.com',     password: 'demo2026',        tier: 'pro',      role: 'pro' },
+        { email: 'educator@resistancezero.com', password: 'educator2026',    tier: 'educator', role: 'educator' },
+        { email: 'bagus@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' },
+        { email: 'admin@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' }
     ];
 
     /* Also check manually-created accounts stored in localStorage by admin */
@@ -584,6 +631,7 @@
             var email = String(session.email).toLowerCase();
             if (ROOT_EMAILS.indexOf(email) !== -1) return 'pro';
             if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
+            if (EDUCATOR_EMAILS.indexOf(email) !== -1) return 'educator';
             return 'pro';
         }
     };
