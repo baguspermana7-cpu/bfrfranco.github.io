@@ -274,6 +274,49 @@ window.RZ_FEATURE_FLAGS = {
     'pdf-export':              { free: false, demo: true,  pro: true, root: true  },
     'pro-tools-access':        { free: false, demo: false, pro: true, root: true  },
     'tooltips':                { free: true,  demo: true,  pro: true, root: true  }
+  },
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     Task 3-bis (educator-tier expansion). The 8 entries below extend the
+     matrix-driven page-access gate to the remaining LTC modules + the
+     standards-ltc-lab hub. `page-access` defaults are identical: pro +
+     educator (consumes pro) + root pass; free + demo see the upgrade modal.
+     `datacenter-solutions` is a free-tier HUB page — the page-access entry
+     here is only consulted by the standards-ltc-lab card click handler, NOT
+     to gate the page itself (the page stays public).
+     ──────────────────────────────────────────────────────────────────────── */
+
+  'datacenter-solutions': {
+    /* HUB page stays public — entry exists for completeness only. */
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+
+  'standards-ltc-lab': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  'ltc-system-modelling-lab': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  'ltc-ashrae': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  'ltc-uptime': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  'ltc-ansi-tia': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  'ltc-iso-energy': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  'ltc-nfpa': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
   }
 
 };

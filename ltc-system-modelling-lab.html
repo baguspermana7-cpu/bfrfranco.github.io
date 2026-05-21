@@ -5610,13 +5610,13 @@
     <div class="root-gate" id="rootGate" aria-live="polite">
         <div class="root-gate-card">
             <div class="lock"><i class="fas fa-lock"></i></div>
-            <h2>Root Access Required</h2>
-            <p>This page is restricted. Sign in with a root account to open the standards and liquid-to-chip lab.</p>
+            <h2>Pro or Educator access required</h2>
+            <p>This module requires a Pro or Educator account. Sign in with one to continue, or contact us for access.</p>
             <div class="root-gate-actions">
-                <button class="login" id="rootLoginBtn" type="button">Sign In as Root</button>
+                <button class="login" id="rootLoginBtn" type="button">Sign In</button>
                 <a class="back" href="datacenter-solutions.html">Back</a>
             </div>
-            <p class="root-gate-note">Sign in with your authorized root account to continue.</p>
+            <p class="root-gate-note">Pro and Educator accounts both unlock this module.</p>
         </div>
     </div>
 
@@ -5634,37 +5634,24 @@
     <script src="rz-tracker.js" defer></script>
 
     <script>
-        (function rootAccessGate() {
-            var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
-
-            function detectRole(email) {
-                var e = String(email || '').toLowerCase().trim();
-                return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
-            }
-
-            function getSession() {
-                try {
-                    var raw = localStorage.getItem('rz_premium_session');
-                    if (!raw) return null;
-                    var data = JSON.parse(raw);
-                    if (data.expires && new Date(data.expires) < new Date()) {
-                        localStorage.removeItem('rz_premium_session');
-                        return null;
-                    }
-                    if (!data.role) data.role = detectRole(data.email);
-                    return data;
-                } catch (e) {
-                    return null;
-                }
-            }
-
-            function isRoot(session) {
-                return !!(session && String(session.role || '').toLowerCase() === 'root');
-            }
-
+        (function tierFeatureGate() {
+            /* Task 3-bis (educator-tier): replaces the legacy root-only gate
+               with the 4-tier matrix in rz-feature-flags.js. Pro + Educator
+               + Root pass; Demo + Free see the upgrade modal. */
             function applyGate() {
-                var session = getSession();
-                document.body.classList.toggle('locked', !isRoot(session));
+                if (window._rzAuth && typeof window._rzAuth.enforceTierFeatureAccess === 'function') {
+                    window._rzAuth.enforceTierFeatureAccess('ltc-system-modelling-lab');
+                } else {
+                    try {
+                        var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+                        var t = s && s.tier;
+                        var r = s && s.role;
+                        var passes = !!s && (t === 'pro' || t === 'root' || r === 'root' || r === 'pro' || r === 'educator');
+                        document.body.classList.toggle('locked', !passes);
+                    } catch (e) {
+                        document.body.classList.add('locked');
+                    }
+                }
             }
 
             var loginBtn = document.getElementById('rootLoginBtn');
@@ -5679,11 +5666,14 @@
             }
 
             window.addEventListener('rz-auth-change', function() {
-                applyGate();
+                setTimeout(applyGate, 50);
             });
+            window.addEventListener('storage', function(e){ if (e.key === 'rz_premium_session') applyGate(); });
 
+            applyGate();
             setTimeout(applyGate, 60);
             setTimeout(applyGate, 550);
+            setTimeout(applyGate, 1600);
         })();
 
         (function cookieBanner() {

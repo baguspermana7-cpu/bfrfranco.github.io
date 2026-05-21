@@ -1441,7 +1441,7 @@
     </div>
 
     <div id="tooltipFloat" class="tooltip-float"></div>
-    <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#10b981;margin-right:0.3rem;"></i> Root Access Required</h2><p>This deep-dive module is restricted to root-level accounts. Please authenticate with a root account to access the full content.</p><div class="root-actions"><button id="rootLoginBtn">Authenticate</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
+    <div class="root-gate"><div class="root-card"><h2><i class="fas fa-lock" style="color:#10b981;margin-right:0.3rem;"></i> Pro or Educator access required</h2><p>This module requires a Pro or Educator account. Sign in with one to continue, or contact us for access.</p><div class="root-actions"><button id="rootLoginBtn">Sign In</button><a href="standards-ltc-lab.html">Back to Lab</a></div></div></div>
     <div class="cookie-banner hidden" id="cookieBanner"><p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p><div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div></div>
 
     <script src="auth.js?v=2026-05-09-v1" defer></script>
@@ -1459,15 +1459,24 @@
     /* ===== Hamburger ===== */
     (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
 
-    /* ===== Root Access Gate ===== */
+    /* ===== Tier-Feature Gate (Task 3-bis educator-tier) ===== */
     (function(){
-        var RE=['admin@resistancezero.com','bagus@resistancezero.com'];
-        function dr(e){return RE.indexOf(String(e||'').toLowerCase().trim())!==-1?'root':'pro';}
-        function gs(){try{var r=localStorage.getItem('rz_premium_session');if(!r)return null;var d=JSON.parse(r);if(d.expires&&new Date(d.expires)<new Date()){localStorage.removeItem('rz_premium_session');return null;}if(!d.role)d.role=dr(d.email);return d;}catch(e){return null;}}
-        function ir(s){return!!(s&&String(s.role||'').toLowerCase()==='root');}
-        function ag(){document.body.classList.toggle('locked',!ir(gs()));}
+        function ag(){
+            if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){
+                window._rzAuth.enforceTierFeatureAccess('ltc-iso-energy');
+            }else{
+                try{
+                    var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
+                    var t=s&&s.tier,r=s&&s.role;
+                    var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');
+                    document.body.classList.toggle('locked',!passes);
+                }catch(e){document.body.classList.add('locked');}
+            }
+        }
         var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});
-        window.addEventListener('rz-auth-change',ag);setTimeout(ag,60);setTimeout(ag,550);
+        window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});
+        window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});
+        ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);
     })();
 
     /* ===== Cookie Banner ===== */

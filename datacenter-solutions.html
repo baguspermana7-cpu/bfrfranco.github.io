@@ -4118,23 +4118,33 @@
         }
     }
 
+    /* Task 3-bis (educator-tier): datacenter-solutions is a free-tier HUB
+       page — only the standards-ltc-lab card is tier-gated. We delegate the
+       per-card gate to the same matrix used by the target page so educator +
+       pro pass through; free + demo see the upgrade modal. Navigation is
+       allowed when access is granted; on denial, navigation is cancelled
+       and enforceTierFeatureAccess shows the appropriate prompt. */
     function handleRootCardClick(event) {
-        var session = getSession();
-        var isRoot = session && String(session.role || '').toLowerCase() === 'root';
-
-        if (isRoot) {
+        if (window._rzAuth && typeof window._rzAuth.enforceTierFeatureAccess === 'function') {
+            var allowed = window._rzAuth.enforceTierFeatureAccess('standards-ltc-lab');
+            if (!allowed) {
+                event.preventDefault();
+            }
             return;
         }
-
-        if (!session) {
+        /* Fallback for the no-auth-js path: read session directly and gate
+           on the same pro/educator/root rule the matrix encodes. */
+        try {
+            var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            var t = s && s.tier;
+            var r = s && s.role;
+            var passes = !!s && (t === 'pro' || t === 'root' || r === 'root' || r === 'pro' || r === 'educator');
+            if (!passes) {
+                event.preventDefault();
+                openLogin();
+            }
+        } catch (e) {
             event.preventDefault();
-            openLogin();
-            return;
-        }
-
-        if (!isRoot) {
-            event.preventDefault();
-            (window.showToast||alert)('This module is root-only. Please sign in with a root account.');
             openLogin();
         }
     }
