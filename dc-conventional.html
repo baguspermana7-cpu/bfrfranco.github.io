@@ -868,6 +868,12 @@ a { color: inherit; text-decoration: none; }
          Loaded NON-deferred so window.CONV_CALC exists before the inline
          dashboard script runs. Basis: conv/review/09-engineering-basis-and-calculations.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
+         Loaded for cross-page consistency; body does NOT carry rz-bms-shell class
+         this ship (preserves page palette). Selective component adoption in
+         later ships. Spec: standarization/BMS_SHELL.md ; conv/review/14 §1. -->
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.2">
+    <script src="js/rz-bms-shell.js?v=1.23.2" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -1045,20 +1051,18 @@ a { color: inherit; text-decoration: none; }
         <div class="dashboard-visual">
             <img src="assets/DC_Conventional.jpg" alt="Conventional Data Center" loading="lazy" width="1200" height="654">
 
-            <!-- Top Row Callouts -->
+            <!-- v1.23.2 (doc-14 §1): Static / non-operational callouts demoted to the
+                 right stats-panel ('Move static callouts away from image. Keep only
+                 operational callouts: PUE, IT Load, CHW/TCS, Fuel autonomy, Active
+                 alarm, Outdoor condition'). Active alarm is the top alarm-strip.
+                 Demoted (Uptime, UPS 2N OK, Chiller 2/3, Fire Normal, Network Online,
+                 VESDA Normal, CRAHs 12/14, WUE, Carbon) all preserved in stats-panel
+                 below — no data lost. -->
+
+            <!-- Operational callouts kept on the facility image -->
             <div class="callout cyan" style="top: 3%; left: 2%;">
                 <div class="callout-label">PUE</div>
                 <div class="callout-value" id="cPue">1.45</div>
-            </div>
-
-            <div class="callout blue" style="top: 3%; left: 14%;">
-                <div class="callout-label">WUE</div>
-                <div class="callout-value" id="cWue">1.20</div>
-            </div>
-
-            <div class="callout green" style="top: 3%; left: 26%;">
-                <div class="callout-label">Carbon</div>
-                <div class="callout-value" id="cCarbon">0.42</div>
             </div>
 
             <div class="callout orange" style="top: 3%; right: 26%;">
@@ -1066,60 +1070,23 @@ a { color: inherit; text-decoration: none; }
                 <div class="callout-value" id="cIt">1.85 MW</div>
             </div>
 
-            <div class="callout cyan" style="top: 3%; right: 14%;">
+            <div class="callout cyan" style="top: 3%; right: 2%;">
                 <div class="callout-label">CHW</div>
                 <div class="callout-value" id="cChw">7.2°C</div>
             </div>
 
-            <div class="callout green" style="top: 3%; right: 2%;">
-                <div class="callout-label">Uptime</div>
-                <div class="callout-value">99.98%</div>
-            </div>
-
-            <!-- Side Callouts -->
-            <div class="callout blue" style="top: 30%; left: 2%;">
-                <div class="callout-label">UPS</div>
-                <div class="callout-value">2N OK</div>
-            </div>
-
-            <div class="callout cyan" style="top: 50%; left: 2%;">
-                <div class="callout-label">Chiller</div>
-                <div class="callout-value">2/3 Run</div>
-            </div>
-
-            <div class="callout green" style="top: 70%; left: 2%;">
-                <div class="callout-label">Fire</div>
-                <div class="callout-value">Normal</div>
-            </div>
-
-            <div class="callout green" style="top: 30%; right: 2%;">
+            <div class="callout green" style="top: 40%; right: 2%;">
                 <div class="callout-label">Temp</div>
                 <div class="callout-value" id="cTemp">22.4°C</div>
             </div>
 
-            <div class="callout purple" style="top: 50%; right: 2%;">
+            <div class="callout purple" style="top: 60%; right: 2%;">
                 <div class="callout-label">Fuel</div>
                 <div class="callout-value" id="cFuel">85%</div>
             </div>
 
-            <div class="callout green" style="top: 70%; right: 2%;">
-                <div class="callout-label">Network</div>
-                <div class="callout-value">Online</div>
-            </div>
-
-            <!-- Bottom Row Callouts -->
-            <div class="callout green" style="bottom: 3%; left: 20%;">
-                <div class="callout-label">VESDA</div>
-                <div class="callout-value">Normal</div>
-            </div>
-
-            <div class="callout cyan" style="bottom: 3%; left: 45%;">
-                <div class="callout-label">CRAHs</div>
-                <div class="callout-value">12/14</div>
-            </div>
-
             <div class="callout blue" style="bottom: 3%; right: 20%;">
-                <div class="callout-label">RH</div>
+                <div class="callout-label">RH (outdoor)</div>
                 <div class="callout-value" id="cRh">48%</div>
             </div>
         </div>
@@ -1147,8 +1114,17 @@ a { color: inherit; text-decoration: none; }
             <div class="stats-title"><span class="dot" style="background: var(--accent-cyan)"></span> Cooling</div>
             <div class="stat-row"><span class="stat-label">CH-1</span><span class="stat-value green">Run 85%</span></div>
             <div class="stat-row"><span class="stat-label">CH-2</span><span class="stat-value green">Run 78%</span></div>
+            <div class="stat-row"><span class="stat-label">Chillers</span><span class="stat-value cyan">2 / 3</span></div>
+            <div class="stat-row"><span class="stat-label">CRAHs</span><span class="stat-value cyan">12 / 14</span></div>
             <div class="stat-row"><span class="stat-label">CHW Sup</span><span class="stat-value cyan" id="sChwSup">7.2°C</span></div>
             <div class="stat-row"><span class="stat-label">CHW Ret</span><span class="stat-value orange" id="sChwRet">14.8°C</span></div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-title"><span class="dot" style="background: var(--accent-blue)"></span> Network &amp; Reliability</div>
+            <div class="stat-row"><span class="stat-label">Network</span><span class="stat-value green">Online</span></div>
+            <div class="stat-row"><span class="stat-label">UPS Topology</span><span class="stat-value green">2N OK</span></div>
+            <div class="stat-row"><span class="stat-label">Uptime YTD</span><span class="stat-value green">99.98%</span></div>
         </div>
 
         <div class="stats-section">

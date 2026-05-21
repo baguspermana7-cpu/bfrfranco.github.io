@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v1.23.2 — 2026-05-22 (BMS Shell adoption #2 — `dc-conventional.html`, static facility-image callouts demoted per doc-14 §1)
+
+Second adoption ship. Surgical and additive — preserves the page's existing
+theme, alarm strip, KPI strip, engine binding to `conv-engine.js`, and right
+stats-panel. The only visible change is the facility image becomes calmer:
+17 callouts → 6 operational ones per doc-14 §1 fix #1 ("Move static callouts
+like general labels away from image. Keep only operational callouts: PUE, IT
+Load, CHW/TCS, Fuel autonomy, Active alarm, Outdoor condition if cooling
+relevant"). Theme flip + top-status-strip migration deferred to a later ship.
+
+### Changed (dc-conventional.html only)
+- **Facility-image callouts demoted 17 → 6** per doc-14 §1 fix #1. Kept on
+  the image (operational + cooling-relevant + autonomy):
+  - `PUE`, `IT Load`, `CHW`, `Temp`, `Fuel`, `RH (outdoor)`.
+  - Active alarm count remains in the top alarm strip.
+  Demoted to the right stats-panel (zero data lost — every demoted item
+  already had or now has a row in the panel):
+  - `WUE` and `Carbon (CUE)` (already in Efficiency section).
+  - `UPS 2N OK` (added to new Network & Reliability section).
+  - `Chiller 2/3` (now in Cooling section as `Chillers 2 / 3`).
+  - `Fire Normal` + `VESDA Normal` (already in Safety section).
+  - `Network Online` (added to new Network & Reliability section).
+  - `CRAHs 12/14` (added to Cooling section).
+  - `Uptime 99.98%` (added to new Network & Reliability section).
+- **Right stats-panel** gained a new "Network & Reliability" section
+  consolidating UPS topology / Network / Uptime YTD.
+
+### Added (loaded but not yet applied to body scope)
+- **BMS Shell library** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
+  with `?v=1.23.2` cache-bust for cross-page consistency. `body` does NOT carry
+  `class="rz-bms-shell"` this ship — page's existing typography + palette
+  preserved.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` — byte-identical to HEAD. 22/22 tests pass.
+- Existing alarm-strip (state/critical/warning/maint/comms/stale/last
+  update/scenario chips) — engine-bound, deterministic.
+- Existing KPI strip (PUE/WUE/Carbon/IT/Uptime/Temp/Chillers/Alarms).
+- Existing right stats-panel sections (Efficiency / Power / Cooling /
+  Environment / Safety / Fuel) — additive change only.
+
+### Verified
+- 4 strict audit gates CLEAN.
+- 57/57 datahall + 22/22 conv engine tests pass.
+- Headless puppeteer @ 1440: callout count 6 (was 17), all 6 operational,
+  right stats-panel has 7 sections (was 6), Network & Reliability section
+  present with UPS/Network/Uptime rows, engine-bound KPIs unchanged
+  (PUE 1.45 / IT 1,850 / Temp 22.4), zero pageErrors.
+
+---
+
 ## v1.23.1 — 2026-05-22 (BMS Shell adoption #1 — `chiller-plant.html`, the doc's visual benchmark)
 
 First adoption ship of the BMS Shell foundation. Surgical and additive — the page's

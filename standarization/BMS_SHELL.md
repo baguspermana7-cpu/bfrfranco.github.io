@@ -2,8 +2,22 @@
 
 ## Status
 
-**v1.23.0 (2026-05-22)** — Foundation only. Library files shipped, **no
-pages migrated yet**. Per-page adoption ships start at v1.23.1.
+**v1.23.0 (2026-05-22)** — Foundation only. Library files shipped, no
+pages migrated yet.
+
+**v1.23.1 (2026-05-22)** — `chiller-plant.html` adopted. Right-side
+`.rz-bms-inspector` populated on every `[data-loop-id]` click via
+`RZBMSShell.inspector.select()`; deep-detail modal preserved alongside.
+View Mode toolbar (Overview/Performance/Maintenance) — UI scaffold;
+section show/hide rules deferred. `body` has no `rz-bms-shell` class —
+page palette intact.
+
+**v1.23.2 (2026-05-22)** — `dc-conventional.html` adopted. Library
+loaded (`css/rz-bms-shell.css` + `js/rz-bms-shell.js`) for cross-page
+consistency. Doc-14 §1 fix #1 applied: facility-image callouts demoted
+17 → 6 operational (PUE / IT / CHW / Temp / Fuel / RH outdoor); all
+demoted items preserved in the right stats-panel (no data lost). Theme
+flip + top-status-strip migration deferred.
 
 ## Spec sources
 
