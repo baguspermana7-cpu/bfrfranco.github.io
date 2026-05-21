@@ -76,6 +76,11 @@
          Loaded NON-deferred so window.CONV_CALC exists before the inline script.
          Basis: conv/review/09-engineering-basis-and-calculations.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
+         Loaded for cross-page consistency; body does NOT carry rz-bms-shell
+         class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §5. -->
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.5">
+    <script src="js/rz-bms-shell.js?v=1.23.5" defer></script>
     <style>
         /* ===== Grounded mission-critical operations palette (doc-10 §Color) =====
            Red is RESERVED strictly for active alarm / trip / fire / leak / discharge.
@@ -283,6 +288,19 @@
         <span class="as-item">Quality <b id="as-quality">GOOD</b></span>
         <span class="as-item">Scenario <b id="as-scenario">Simulated</b></span>
         <span class="as-item">Updated <b id="as-updated">--:--:--</b></span>
+    </div>
+
+    <!-- ===== v1.23.5 doc-14 §5: Fire-stages legend — visible reference of the 6-stage progression.
+         Active stage is highlighted by setFireStageChip() whenever the simulation state changes.
+         Calm by default (no red glow); only the active chip in stage 3+ gets the red treatment. -->
+    <div id="fire-stages-legend" class="fire-stages-legend mb-3" aria-label="Fire alarm stage progression legend" role="group" style="display:flex;flex-wrap:wrap;gap:6px;font-family:'JetBrains Mono','Inter',sans-serif;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;padding:8px 10px;background:rgba(15,23,42,0.55);border:1px solid rgba(71,85,105,0.35);border-radius:6px;">
+        <span data-stage="0" class="fs-chip is-active" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.55);background:rgba(71,85,105,0.18);color:var(--st-normal,#22c55e);font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>0 · Normal</span>
+        <span data-stage="1" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>1 · VESDA Alert</span>
+        <span data-stage="2" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>2 · Smoke / Pre-alarm</span>
+        <span data-stage="3" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>3 · Confirmed</span>
+        <span data-stage="4" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>4 · Pre-action Armed</span>
+        <span data-stage="5" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>5 · Suppression Release</span>
+        <span data-stage="6" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>6 · Discharged / Lockout</span>
     </div>
 
     <div class="layout-grid" style="display:grid; grid-template-columns: minmax(0,1fr) 360px; gap: 14px;">
@@ -722,6 +740,39 @@
             }
         }
 
+        // ---- v1.23.5 Fire-stages legend (doc-14 §5) ----
+        function setFireStageChip(st) {
+            var chips = document.querySelectorAll('#fire-stages-legend .fs-chip');
+            if (!chips || !chips.length) return;
+            chips.forEach(function (c) {
+                var s = parseInt(c.getAttribute('data-stage'), 10);
+                var active = (s === st);
+                c.classList.toggle('is-active', active);
+                // Calm by default; loud only when an abnormal stage is active.
+                if (active) {
+                    if (st === 0) {
+                        c.style.color = 'var(--st-normal, #22c55e)';
+                        c.style.background = 'rgba(34,197,94,0.12)';
+                        c.style.borderColor = 'rgba(34,197,94,0.45)';
+                    } else if (st === 1 || st === 2) {
+                        c.style.color = 'var(--st-warn, #eab308)';
+                        c.style.background = 'rgba(234,179,8,0.15)';
+                        c.style.borderColor = 'rgba(234,179,8,0.5)';
+                    } else {
+                        c.style.color = 'var(--st-alarm, #ef4444)';
+                        c.style.background = 'rgba(239,68,68,0.18)';
+                        c.style.borderColor = 'rgba(239,68,68,0.55)';
+                    }
+                    c.style.fontWeight = '800';
+                } else {
+                    c.style.color = '#94a3b8';
+                    c.style.background = 'rgba(15,23,42,0.4)';
+                    c.style.borderColor = 'rgba(71,85,105,0.4)';
+                    c.style.fontWeight = '600';
+                }
+            });
+        }
+
         // ---- Top alarm strip (rule-based counts, never random) ----
         function updateAlarmStrip() {
             var st = state.stage;
@@ -740,6 +791,8 @@
             var strip = $('alarm-strip');
             strip.className = 'alarm-strip ' + stripCls + ' mb-3';
             var b = $('as-banner'); b.textContent = banner; b.style.color = bcol;
+            // v1.23.5 doc-14 §5: highlight active chip in the fire-stages legend.
+            setFireStageChip(st);
             $('as-vesda').textContent = vesda;
             $('as-dot-vesda').className = 'as-dot ' + vesdaDot;
             $('as-crit').textContent = crit;

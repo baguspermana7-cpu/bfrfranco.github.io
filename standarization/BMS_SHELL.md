@@ -34,6 +34,14 @@ Doc-14 §7 fix applied: Instant WUE promoted to visual hero — `.kpi-grid`
 hero spans 3 cols on ≤1280 px. Engine binding (`window.CONV_CALC` →
 `#kWue` = 1.20 L/kWh) unchanged.
 
+**v1.23.5 (2026-05-22)** — `fire-system.html` adopted. Library loaded.
+Doc-14 §5 fix applied: fire-stages legend chip row (7 chips, 0 Normal
+→ 6 Discharged/Lockout) inserted between top alarm strip and main grid.
+`setFireStageChip()` hooks into `updateAlarmStrip()` to highlight the
+active chip dynamically (green ≤0 / amber 1–2 / red 3–6 — calm normal,
+loud abnormal, doc-14 §5: "Use red only during active alarm/discharge").
+State-machine transitions (`state.stage`) unchanged.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

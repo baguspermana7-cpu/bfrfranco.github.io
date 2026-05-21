@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v1.23.5 — 2026-05-22 (BMS Shell adoption #5 — `fire-system.html`, fire-stages legend + shell library)
+
+Fifth adoption ship. Surgical and additive — preserves alarm strip,
+cause-effect matrix, P&ID, simulation gate, all state-machine logic.
+Adds a visible fire-stages legend per doc-14 §5 so operators see the
+6-stage progression at a glance, with the active stage highlighted
+dynamically from `state.stage`.
+
+### Added (fire-system.html only)
+- **Fire-stages legend** — new `#fire-stages-legend` chip row inserted
+  between the top alarm strip and the main layout grid. 7 chips:
+  `0 Normal / 1 VESDA Alert / 2 Smoke·Pre-alarm / 3 Confirmed /
+  4 Pre-action Armed / 5 Suppression Release / 6 Discharged·Lockout`.
+  Calm by default; only the active chip in stage 3+ gets the red
+  treatment (doc-14 §5: "Use red only during active alarm/discharge").
+- **`setFireStageChip(stage)`** — called from `updateAlarmStrip()` on
+  every state transition. Highlights the active chip with state-correct
+  color (green ≤0 / amber 1–2 / red 3–6).
+- **BMS Shell library** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js`
+  with `?v=1.23.5` cache-bust. `body` does not carry `rz-bms-shell`
+  class — page palette preserved.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
+- Existing alarm strip (line 273+) with FACP/VESDA/Critical/Supervisory/
+  Trouble/Tank/Pressure/Quality/Scenario chips — engine-bound and
+  state-machine-driven.
+- Cause-effect matrix + simulation gate + ARM/SIMULATE/RESET buttons.
+- All 6-stage simulation logic (`state.stage` transitions at lines 850–895).
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.23.5 status entry added.
+
+---
+
 ## v1.23.4 — 2026-05-22 (BMS Shell adoption #4 — `water-system.html`, Instant WUE promoted to visual hero per doc-14 §7)
 
 Fourth adoption ship. Same pattern as v1.23.3 — surgical and additive,
