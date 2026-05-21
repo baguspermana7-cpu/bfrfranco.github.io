@@ -170,7 +170,7 @@
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
         { email: 'demo@resistancezero.com',     password: 'demo2026',        tier: 'pro',      role: 'pro' },
-        { email: 'educator@resistancezero.com', password: 'educator2026',    tier: 'educator', role: 'educator' },
+        { email: 'educator@resistancezero.com', password: 'educator2026',    tier: 'pro',      role: 'educator' },
         { email: 'bagus@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' },
         { email: 'admin@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' }
     ];
@@ -631,7 +631,7 @@
             var email = String(session.email).toLowerCase();
             if (ROOT_EMAILS.indexOf(email) !== -1) return 'pro';
             if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
-            if (EDUCATOR_EMAILS.indexOf(email) !== -1) return 'educator';
+            if (EDUCATOR_EMAILS.indexOf(email) !== -1) return 'pro';
             return 'pro';
         }
     };
