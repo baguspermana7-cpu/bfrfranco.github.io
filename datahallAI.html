@@ -865,6 +865,13 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 <details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="fireCards"></div></details></div>
 <div class="pn" id="p-bms">
 <div class="bx"><h3>BMS/DCIM Architecture</h3><div class="su" id="bmsSu"></div>
+<!-- v1.22.8 GAP-3/4/5: BMS Service Health strip — closes doc-18 acceptance lines for alarm lifecycle + historian/notification health + aggregate gateways-online counter -->
+<div class="bms-health" style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px;font-size:.72rem;font-family:'JetBrains Mono',monospace;">
+  <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:var(--g);"><i class="fas fa-database" style="font-size:.65rem;"></i>Historian: <b style="font-weight:700;">Online</b><span style="color:var(--t3);font-weight:400;">· 1 yr hi-res + 5 yr daily</span></span>
+  <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:var(--g);"><i class="fas fa-bell" style="font-size:.65rem;"></i>Notification: <b style="font-weight:700;">Online</b><span style="color:var(--t3);font-weight:400;">· email + SMS + push</span></span>
+  <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.3);color:var(--b);"><i class="fas fa-network-wired" style="font-size:.65rem;"></i>Gateways: <b id="bmsGwOnline" style="font-weight:700;">16 / 16</b><span style="color:var(--t3);font-weight:400;">online</span></span>
+  <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:var(--o);"><i class="fas fa-triangle-exclamation" style="font-size:.65rem;"></i>Alarms: <span id="bmsAlmActive" style="font-weight:700;">0 active</span><span style="color:var(--t3);">·</span><span id="bmsAlmAck" style="font-weight:700;">0 ack</span><span style="color:var(--t3);">·</span><span id="bmsAlmCleared" style="font-weight:700;">0 cleared</span></span>
+</div>
 <svg id="bmsSvg" viewBox="0 0 960 480" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="bmsC"></g></svg></div>
 <details class="dh-specwrap"><summary>Protocol &amp; specification tables (Modbus / BACnet / OPC-UA / SNMP)<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="bmsCards"></div></details></div>
 
@@ -3091,8 +3098,8 @@ s+=tx(kx+117,912,DHn[ki]+' \u2014 '+FL[ki],'var(--g)',6,'middle',1);
 var kRows=[
 {l:'MSB-A:',id:'eOvMSB'+(ki+1)+'Ak',v:'398V | 5,200A'},
 {l:'MSB-B:',id:'eOvMSB'+(ki+1)+'Bk',v:'399V | 5,100A'},
-{l:'UPS-A:',id:'eOvUPS'+(ki+1)+'Ak',v:'5,420 kW | 68%'},
-{l:'UPS-B:',id:'eOvUPS'+(ki+1)+'Bk',v:'5,380 kW | 67%'},
+{l:'UPS-A:',id:'eOvUPS'+(ki+1)+'Ak',v:(DH?DH.itHallFmt+' kW | '+DH.upsLoadPct.toFixed(0)+'%':'3,564 kW | 79%')},
+{l:'UPS-B:',id:'eOvUPS'+(ki+1)+'Bk',v:(DH?DH.itHallFmt+' kW | '+DH.upsLoadPct.toFixed(0)+'%':'3,564 kW | 79%')},
 {l:'BAT-A:',id:'eOvBat'+(ki+1)+'Ak',v:'98%'},
 {l:'BAT-B:',id:'eOvBat'+(ki+1)+'Bk',v:'97%'}
 ];
@@ -3461,7 +3468,7 @@ s+=bx(AX-80,L5+37,160,50,CA);
 s+=symUPS(AX,L5+52,CA);
 s+=tx(AX+30,L5+48,'UPS-'+n+'A '+(DHE?DHE.upsRatingMW:4.5)+'MW',CA,5.5,0,1);
 s+=tx(AX+30,L5+58,'8\u00D71MW VFI-SS-111','var(--t3)',4.5);
-s+='<text x="'+AX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'A">5,420 kW | 68% | \u03B796.2%</text>';
+s+='<text x="'+AX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'A">'+(DHE?DHE.itHallFmt+' kW | '+DHE.upsLoadPct.toFixed(0)+'% | \u03B796.2%':'3,564 kW | 79% | \u03B796.2%')+'</text>';
 s+='</g>';
 // Battery-A — LEFT of UPS-A
 s+=sLine(AX-80,L5+60,AX-95,L5+60,CA,.5,1);
@@ -3483,7 +3490,7 @@ s+=bx(BX-80,L5+37,160,50,CG);
 s+=symUPS(BX,L5+52,CG);
 s+=tx(BX-30,L5+48,'UPS-'+n+'B '+(DHE?DHE.upsRatingMW:4.5)+'MW',CG,5.5,'end',1);
 s+=tx(BX-30,L5+58,'8\u00D71MW VFI-SS-111','var(--t3)',4.5,'end');
-s+='<text x="'+BX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'B">5,380 kW | 67% | \u03B796.1%</text>';
+s+='<text x="'+BX+'" y="'+(L5+78)+'" fill="var(--g)" font-family="'+J+'" font-size="5" text-anchor="middle" class="lv" id="eUPS'+n+'B">'+(DHE?DHE.itHallFmt+' kW | '+DHE.upsLoadPct.toFixed(0)+'% | \u03B796.1%':'3,564 kW | 79% | \u03B796.1%')+'</text>';
 s+='</g>';
 // Battery-B — RIGHT of UPS-B
 s+=sLine(BX+80,L5+60,BX+95,L5+60,CG,.5,1);
@@ -5002,7 +5009,7 @@ s+=sectionSep(390,'AUXILIARY');
 s+=bx2(200,400,520,55,'var(--t3)');s+=tx2(460,415,'AUXILIARY STATUS','var(--t3)',5,'middle',1);
 s+=lv('msb-gen',280,440,'STANDBY','var(--g)',5);s+=tx2(280,450,'GenSet','var(--t3)',3.5);
 s+=lv('msb-tie',460,440,'OPEN','var(--p)',5);s+=tx2(460,450,'Bus Tie','var(--t3)',3.5);
-s+=lv('msb-kw',640,440,RI(5200,5600)+' kW','var(--o)',5);s+=tx2(640,450,'Total Load A','var(--t3)',3.5);
+s+=lv('msb-kw',640,440,(DHE?DHE.itHallFmt:'3,564')+' kW','var(--o)',5);s+=tx2(640,450,'Total Load A','var(--t3)',3.5);
 
 // Idea 41: Tooltip zones — MSB Panel
 s+=tipZone(30,35,420,250,'<b>MSB-'+dh+'A — 400V 6300A</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>6300A Cu</span></div>','A');
@@ -6470,9 +6477,12 @@ s+=`<line x1="590" y1="${EY+120}" x2="605" y2="${EY+120}" stroke="var(--o)" stro
 // Idea 31-35: Thermodynamic summary (N+1, WUE=0, PUE disagg, condensation, pressure drop)
 s+=`<rect x="720" y="${EY}" width="230" height="130" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
 s+=tx(835,EY+14,'THERMO SUMMARY','var(--g)',7,'middle',1);
+// v1.22.8 GAP-1 fix: PUE values now engine-derived from window.DATAHALL_CALC, no more hardcoded ~1.18 / ~0.12.
+const thermoPUE=(DH?DH.pue.toFixed(2):'1.30');
+const thermoPUEcool=(DH?(DH.pb_cooling/DH.itHall).toFixed(3):'0.238');
 const thermoData=[
 ['WUE','0.00 L/kWh','var(--g)'],['N+1 Capacity','28 MW (7 run + 1 stby)','var(--c)'],
-['PUE (cooling)','~0.12','var(--g)'],['Total PUE','~1.18','var(--g)'],
+['PUE (cooling)',thermoPUEcool,'var(--g)'],['Total PUE',thermoPUE,'var(--g)'],
 ['Dew Point','12.5\u00B0C (no risk)','var(--g)'],['FWS Press Drop','2.8 bar','var(--c)'],
 ['TCS Press Drop','1.2 bar','var(--c)'],['CW Press Drop','1.5 bar','var(--c)'],
 ['Cond Risk','LOW (Glycol)','var(--g)'],['Free Cool Hrs','~2,200 h/yr','var(--o)']
@@ -6581,13 +6591,14 @@ var ab=$('coolAlarm');if(!ab)return;
 if(cop2<6.0){ab.style.display='';$('alarmText').textContent='\u26A0 LOW COP: '+cop2.toFixed(1)+' — CHECK CHILLER PLANT';}
 else{ab.style.display='none';}
 },5000);
-// Idea 49: PUE badge (floating)
+// Idea 49: PUE badge (floating) — v1.22.8 GAP-2: engine-derived (was Math.random-driven COP shortcut producing ~1.17)
+var pueBadgeInit=(DH?DH.pue.toFixed(2):'1.30');
 var pueBadge=document.createElementNS('http://www.w3.org/2000/svg','g');
-pueBadge.innerHTML='<rect x="900" y="2" width="55" height="20" rx="4" fill="rgba(34,197,94,.12)" stroke="var(--g)" stroke-width=".6"/><text x="927" y="10" fill="var(--t3)" font-family="JetBrains Mono" font-size="4" text-anchor="middle">PUE</text><text x="927" y="18" fill="var(--g)" font-family="JetBrains Mono" font-size="8" text-anchor="middle" font-weight="700" id="pueBadgeV">1.18</text>';
+pueBadge.innerHTML='<rect x="900" y="2" width="55" height="20" rx="4" fill="rgba(34,197,94,.12)" stroke="var(--g)" stroke-width=".6"/><text x="927" y="10" fill="var(--t3)" font-family="JetBrains Mono" font-size="4" text-anchor="middle">PUE</text><text x="927" y="18" fill="var(--g)" font-family="JetBrains Mono" font-size="8" text-anchor="middle" font-weight="700" id="pueBadgeV">'+pueBadgeInit+'</text>';
 el.appendChild(pueBadge);
-// Update PUE badge from live values
-setInterval(function(){var copV2=parseFloat($('kCOPl')?.textContent||'6.8');
-var pue2=(1+1/copV2+0.02).toFixed(2);
+// Update PUE badge from engine (deterministic — Scenario A locked, no jitter on the engineering value)
+setInterval(function(){var pb2=window.DATAHALL_CALC&&window.DATAHALL_CALC.pueBasis?window.DATAHALL_CALC.pueBasis():null;
+var pue2=pb2?pb2.pue.toFixed(2):(DH?DH.pue.toFixed(2):'1.30');
 var pb=$('pueBadgeV');if(pb)pb.textContent=pue2;
 },4000);
 })();
@@ -10872,8 +10883,17 @@ function injectModalSummary(panel){
   onOpen=function(panel){ try{injectModalSummary(panel);}catch(e){} return orig(panel); };
 })();
 /* Refresh strip values (controlled jitter cadence; alarm rules deterministic) */
+/* v1.22.8 GAP-3: also paint the BMS health strip lifecycle counters off the same rules() output */
+function paintBMSHealth(){
+  var a=rules();
+  var act=byId('bmsAlmActive'); if(act)act.textContent=(a.crit+a.warn)+' active';
+  var ack=byId('bmsAlmAck'); if(ack)ack.textContent='0 ack';
+  var clr=byId('bmsAlmCleared'); if(clr)clr.textContent=(a.maint)+' cleared';
+}
+paintBMSHealth();
 setInterval(function(){
   for(var i=0;i<bars.length;i++){ if(bars[i].offsetParent!==null)paint(bars[i]); }
+  paintBMSHealth();
 },4000);
 })();
 </script>

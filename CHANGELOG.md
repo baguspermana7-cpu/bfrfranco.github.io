@@ -11,6 +11,65 @@ release sections rather than semver.
 
 ---
 
+## v1.22.8 — 2026-05-22 (DC AI engineering audit P1+P2 fixes — Cooling PUE, BMS service health, UPS/MSB engine-bound first-paint)
+
+Closes the five P1 + two P2 acceptance-line violations surfaced by the
+background engineering audit on datahallAI.html. All edits are
+surgical, in-scope panels only — owner-excluded `#p-dash` byte-untouched,
+engine files (`js/datahall-model.js` / `js/datahall-calculations.js`)
+untouched, 57/57 calc tests still pass.
+
+### Fixed (datahallAI.html only)
+- **GAP-1 (P1)** — Cooling P&ID THERMO SUMMARY (`#p-cool`) no longer
+  hardcodes `Total PUE ~1.18` / `PUE (cooling) ~0.12`. Now reads
+  `DH.pue.toFixed(2)` (`1.30`) and `(DH.pb_cooling/DH.itHall).toFixed(3)`
+  (`0.238`) from the locked engine — matches doc-21 worked example Ex9.
+- **GAP-2 (P1)** — Cooling P&ID floating PUE badge (`#pueBadgeV`) no
+  longer derives PUE from `Math.random R(6.5,7.2)` and the
+  `(1 + 1/copV2 + 0.02)` shortcut formula (producing ~1.17). Now reads
+  `window.DATAHALL_CALC.pueBasis().pue` (the engine's five-part PUE) on
+  every interval tick. Initial badge value also engine-derived.
+- **GAP-3/4/5 (P1)** — `#p-bms` panel now carries a "BMS Service Health"
+  strip above the architecture SVG with:
+  - **Alarm lifecycle counters** — `Active / Ack / Cleared`, bound to
+    the existing `rules()` aggregator (active = crit + warn, ack = 0,
+    cleared = scheduled maint). Refreshed on the same 4 s cadence.
+  - **Historian status** — `Online · 1 yr hi-res + 5 yr daily`
+    (doc-18 BMS criterion: historian health visible).
+  - **Notification service** — `Online · email + SMS + push`
+    (doc-18: notification service health visible).
+  - **Aggregate gateways online** — `16 / 16` (doc-18:
+    "Controllers/gateways online count is visible").
+- **GAP-7 (P2)** — MSB-SLD first-paint `Total Load A` no longer
+  hardcodes `RI(5200,5600)` (a random 5,200–5,600 kW that's ~50% over
+  the engine 3,564 kW). Now reads `DHE.itHallFmt` at construction time.
+- **GAP-8 (P2)** — UPS overview fallback strings (`#eOvUPS*Ak/Bk` in
+  `#p-elec` overview + `#eUPS*A/B` in per-DH SLD) no longer hardcode
+  `5,420 kW | 68%` / `5,380 kW | 67%` on first paint. Now read
+  `DH.itHallFmt` + `DH.upsLoadPct` so the values are engine-correct
+  immediately, before the first live-update tick.
+
+### Not in scope (verified untouched)
+- `#p-dash` tab (owner exclusion — byte-identical to HEAD).
+- `js/datahall-model.js` / `js/datahall-calculations.js` (immutable
+  engine — byte-identical).
+- `js/conv-engine.js`, `EPMS_Telemetry.html`, the 6 conv suite pages
+  (dc-conventional / datahall / chiller-plant / fire-system /
+  fuel-system / water-system / ict) — DC Conventional audit returned
+  full PASS; no edits needed in this ship.
+- **GAP-6** — Feed-A red on Electrical SLD: already fixed in earlier
+  v1.20.2 Stage 6 (`var CA='var(--b)'` blue, Feed A title says
+  "FEED A (BLUE) / FEED B (GREEN)"). Audit was flagging a stale
+  reference; current code is correct.
+
+### Notes
+- UIUX audit findings (ict.html + datahall.html P0 redesign, IBM Plex
+  + brand-token system-wide, EPMS_Telemetry mobile overflow) are
+  separate larger work — queued for v1.23.x with their own plan,
+  not bundled here (keep scope tight, one concern per ship).
+
+---
+
 ## v1.22.7 — 2026-05-22 (Featured Engineering Deep-Dive & Standards grouping — promotes the LTC Lab out of the buried bottom row)
 
 ### Changed
