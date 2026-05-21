@@ -1,0 +1,529 @@
+/* ============================================================================
+ * rz-bms-shell.css — Shared BMS/DCIM operations-console shell (v1.23.0)
+ * ----------------------------------------------------------------------------
+ * Foundation for the DC Conventional suite (8 pages) and the DC AI cockpit.
+ *
+ * Spec sources:
+ *   - Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md
+ *   - Documents/screenshot bms rz/dc ai/review/24-uiux-re-review-2026-05-22-best-design.md
+ *
+ * Design principle (calm normal / loud abnormal):
+ *   - Normal state is quiet — low chroma, no glow.
+ *   - Warning / alarm states dominate the eye.
+ *   - Selected object uses a single bright outline (no filled block).
+ *   - Red is reserved for trip / fire / leak / EPO — never for "Feed A" etc.
+ *   - Every numeric value gets tabular-nums + an explicit unit.
+ *
+ * Scope:
+ *   - This file declares ONLY the shared shell components (tokens, status
+ *     strip, left nav, inspector, KPI card, alarm row, layer toggles,
+ *     typography helpers). Page-specific styling stays on the page.
+ *   - Pages opt in by `<link rel="stylesheet" href="css/rz-bms-shell.css?v=...">`
+ *     and root-class `<body class="rz-bms-shell">`. The shell is OFF on pages
+ *     that don't carry that class — zero side-effects on the rest of the site.
+ * ==========================================================================*/
+
+/* ---------------------------------------------------------------------------
+ * 1) Design tokens — dark operations palette (from conv/review/14 §1).
+ *    Tokens prefixed `--rz-bms-` so they don't collide with page-local vars.
+ * ---------------------------------------------------------------------------*/
+:root {
+  /* Surfaces */
+  --rz-bms-bg:           #0b1118;
+  --rz-bms-panel:        #121a24;
+  --rz-bms-panel-raised: #182232;
+  --rz-bms-border:       #293648;
+  --rz-bms-border-faint: rgba(41, 54, 72, 0.55);
+  --rz-bms-scrim:        rgba(11, 17, 24, 0.72);
+
+  /* Text */
+  --rz-bms-text:         #e7edf5;
+  --rz-bms-text-dim:     #9aa8bb;
+  --rz-bms-text-muted:   #66758a;
+
+  /* Semantic state */
+  --rz-bms-normal:       #55b878;
+  --rz-bms-warn:         #dca33a;
+  --rz-bms-critical:     #d94c4c;
+  --rz-bms-trouble:      #b56fff;
+  --rz-bms-stale:        #66758a;
+  --rz-bms-maint:        #6aa1ff;
+  --rz-bms-selected:     #50c8ff;
+
+  /* Discipline (subsystem hues — neutral, NEVER alarm semantic) */
+  --rz-bms-electrical:   #f0b84a;
+  --rz-bms-cooling:      #4ca8c7;
+  --rz-bms-water:        #4ca8c7;
+  --rz-bms-fuel:         #c58a2a;
+  --rz-bms-network:      #7aa2ff;
+  --rz-bms-fire:         #d94c4c;
+  --rz-bms-safety:       #d94c4c;
+
+  /* Status chip backgrounds (low-chroma at rest, vivid on exception) */
+  --rz-bms-bg-normal:    rgba(85, 184, 120, 0.10);
+  --rz-bms-bg-warn:      rgba(220, 163, 58, 0.12);
+  --rz-bms-bg-critical:  rgba(217, 76, 76, 0.15);
+  --rz-bms-bg-trouble:   rgba(181, 111, 255, 0.12);
+  --rz-bms-bg-stale:     rgba(102, 117, 138, 0.12);
+  --rz-bms-bg-maint:     rgba(106, 161, 255, 0.10);
+  --rz-bms-bg-selected:  rgba(80, 200, 255, 0.10);
+
+  /* Typography */
+  --rz-bms-font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --rz-bms-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Type scale — operations values larger, engineering annotations smaller */
+  --rz-bms-fs-xs:   10px;
+  --rz-bms-fs-sm:   11px;
+  --rz-bms-fs-base: 13px;
+  --rz-bms-fs-md:   15px;
+  --rz-bms-fs-lg:   18px;
+  --rz-bms-fs-xl:   24px;
+  --rz-bms-fs-2xl:  32px;
+
+  /* Line-heights */
+  --rz-bms-lh-tight: 1.15;
+  --rz-bms-lh-base:  1.45;
+
+  /* Radii + spacing */
+  --rz-bms-r-sm:   4px;
+  --rz-bms-r-md:   6px;
+  --rz-bms-r-lg:   10px;
+  --rz-bms-sp-1:   4px;
+  --rz-bms-sp-2:   8px;
+  --rz-bms-sp-3:   12px;
+  --rz-bms-sp-4:   16px;
+  --rz-bms-sp-5:   20px;
+  --rz-bms-sp-6:   24px;
+
+  /* Shadows — flat by default, raise only on selection / modal */
+  --rz-bms-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --rz-bms-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
+
+  /* Motion */
+  --rz-bms-tx-fast:   120ms ease;
+  --rz-bms-tx-base:   180ms ease;
+  --rz-bms-tx-slow:   260ms ease;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2) Scoped root — only pages that opt-in get the shell.
+ * ---------------------------------------------------------------------------*/
+body.rz-bms-shell {
+  background: var(--rz-bms-bg);
+  color: var(--rz-bms-text);
+  font-family: var(--rz-bms-font-sans);
+  font-size: var(--rz-bms-fs-base);
+  line-height: var(--rz-bms-lh-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every numeric value in a shell page is tabular by default. Override via
+   `.rz-bms-num-prop` for proportional figures where needed (rare). */
+body.rz-bms-shell .rz-bms-num,
+body.rz-bms-shell .rz-bms-kpi-val,
+body.rz-bms-shell .rz-bms-status-strip [data-numeric],
+body.rz-bms-shell .rz-bms-alarm-row [data-numeric] {
+  font-family: var(--rz-bms-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3) Top status strip — first read every page (`spec §1 Status Strip`).
+ *    State | Active alarms | Data quality | Last update | Current constraint
+ * ---------------------------------------------------------------------------*/
+.rz-bms-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rz-bms-sp-3);
+  padding: var(--rz-bms-sp-2) var(--rz-bms-sp-4);
+  background: var(--rz-bms-panel-raised);
+  border-bottom: 1px solid var(--rz-bms-border);
+  font-size: var(--rz-bms-fs-sm);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.rz-bms-status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rz-bms-sp-1);
+  white-space: nowrap;
+}
+.rz-bms-status-cell + .rz-bms-status-cell::before {
+  content: '';
+  width: 1px;
+  height: 14px;
+  margin-right: var(--rz-bms-sp-2);
+  background: var(--rz-bms-border-faint);
+}
+.rz-bms-status-label {
+  color: var(--rz-bms-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: var(--rz-bms-fs-xs);
+}
+.rz-bms-status-value {
+  color: var(--rz-bms-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.rz-bms-status-value.is-good     { color: var(--rz-bms-normal); }
+.rz-bms-status-value.is-warn     { color: var(--rz-bms-warn); }
+.rz-bms-status-value.is-critical { color: var(--rz-bms-critical); }
+.rz-bms-status-value.is-stale    { color: var(--rz-bms-stale); }
+
+/* Pill chip — used inline for state, role, data-mode, etc. */
+.rz-bms-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rz-bms-sp-1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--rz-bms-fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
+}
+.rz-bms-chip.is-normal    { background: var(--rz-bms-bg-normal);    color: var(--rz-bms-normal);    border-color: rgba(85, 184, 120, 0.35); }
+.rz-bms-chip.is-warn      { background: var(--rz-bms-bg-warn);      color: var(--rz-bms-warn);      border-color: rgba(220, 163, 58, 0.40); }
+.rz-bms-chip.is-critical  { background: var(--rz-bms-bg-critical);  color: var(--rz-bms-critical);  border-color: rgba(217, 76, 76, 0.45); }
+.rz-bms-chip.is-trouble   { background: var(--rz-bms-bg-trouble);   color: var(--rz-bms-trouble);   border-color: rgba(181, 111, 255, 0.40); }
+.rz-bms-chip.is-stale     { background: var(--rz-bms-bg-stale);     color: var(--rz-bms-stale);     border-color: rgba(102, 117, 138, 0.40); }
+.rz-bms-chip.is-maint     { background: var(--rz-bms-bg-maint);     color: var(--rz-bms-maint);     border-color: rgba(106, 161, 255, 0.40); }
+.rz-bms-chip.is-simulated { background: rgba(80, 200, 255, 0.08);   color: var(--rz-bms-selected);  border-color: rgba(80, 200, 255, 0.40); }
+
+/* Status dot — tiny circle ahead of a nav item, KPI label, etc. */
+.rz-bms-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block;
+  background: var(--rz-bms-stale);
+  vertical-align: 1px;
+}
+.rz-bms-dot.is-normal   { background: var(--rz-bms-normal); }
+.rz-bms-dot.is-warn     { background: var(--rz-bms-warn);  box-shadow: 0 0 0 3px rgba(220, 163, 58, 0.18); }
+.rz-bms-dot.is-critical { background: var(--rz-bms-critical); box-shadow: 0 0 0 3px rgba(217, 76, 76, 0.22); animation: rzBmsPulse 1.6s ease-in-out infinite; }
+.rz-bms-dot.is-stale    { background: var(--rz-bms-stale); }
+
+@keyframes rzBmsPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(217, 76, 76, 0.22); }
+  50%      { box-shadow: 0 0 0 6px rgba(217, 76, 76, 0.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rz-bms-dot.is-critical { animation: none; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 4) Left nav — subsystem list with status dot + alarm badge.
+ * ---------------------------------------------------------------------------*/
+.rz-bms-nav {
+  display: flex;
+  flex-direction: column;
+  background: var(--rz-bms-panel);
+  border-right: 1px solid var(--rz-bms-border);
+  padding: var(--rz-bms-sp-3) var(--rz-bms-sp-2);
+  min-width: 200px;
+  max-width: 240px;
+  font-size: var(--rz-bms-fs-sm);
+}
+.rz-bms-nav-section {
+  color: var(--rz-bms-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--rz-bms-fs-xs);
+  padding: var(--rz-bms-sp-3) var(--rz-bms-sp-2) var(--rz-bms-sp-1);
+}
+.rz-bms-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rz-bms-sp-2);
+  padding: var(--rz-bms-sp-2) var(--rz-bms-sp-2);
+  color: var(--rz-bms-text-dim);
+  text-decoration: none;
+  border-radius: var(--rz-bms-r-sm);
+  border-left: 2px solid transparent;
+  transition: background var(--rz-bms-tx-fast), color var(--rz-bms-tx-fast);
+}
+.rz-bms-nav-item:hover {
+  background: var(--rz-bms-panel-raised);
+  color: var(--rz-bms-text);
+}
+.rz-bms-nav-item.is-active {
+  background: var(--rz-bms-panel-raised);
+  color: var(--rz-bms-text);
+  border-left-color: var(--rz-bms-selected);
+}
+.rz-bms-nav-label { flex: 1; min-width: 0; }
+.rz-bms-nav-badge {
+  display: inline-flex; align-items: center;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: var(--rz-bms-fs-xs);
+  font-weight: 700;
+  background: var(--rz-bms-bg-warn);
+  color: var(--rz-bms-warn);
+  font-variant-numeric: tabular-nums;
+}
+.rz-bms-nav-badge.is-critical { background: var(--rz-bms-bg-critical); color: var(--rz-bms-critical); }
+.rz-bms-nav-badge.is-normal   { display: none; } /* hide zero/normal badges entirely */
+
+/* ---------------------------------------------------------------------------
+ * 5) Right inspector — selected-object detail (`spec §3 Inspector`).
+ *    Pages mount the inspector at .rz-bms-inspector and the controller
+ *    swaps content on click.
+ * ---------------------------------------------------------------------------*/
+.rz-bms-inspector {
+  width: 320px;
+  background: var(--rz-bms-panel);
+  border-left: 1px solid var(--rz-bms-border);
+  padding: var(--rz-bms-sp-4);
+  overflow-y: auto;
+  font-size: var(--rz-bms-fs-sm);
+}
+.rz-bms-inspector-empty {
+  color: var(--rz-bms-text-muted);
+  font-style: italic;
+  padding: var(--rz-bms-sp-4) 0;
+  text-align: center;
+}
+.rz-bms-inspector-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rz-bms-sp-2);
+  padding-bottom: var(--rz-bms-sp-3);
+  border-bottom: 1px solid var(--rz-bms-border-faint);
+  margin-bottom: var(--rz-bms-sp-3);
+}
+.rz-bms-inspector-title {
+  font-size: var(--rz-bms-fs-md);
+  font-weight: 700;
+  color: var(--rz-bms-text);
+  margin: 0;
+}
+.rz-bms-inspector-section {
+  margin: var(--rz-bms-sp-4) 0;
+}
+.rz-bms-inspector-section-title {
+  font-size: var(--rz-bms-fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rz-bms-text-muted);
+  margin: 0 0 var(--rz-bms-sp-2) 0;
+}
+.rz-bms-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rz-bms-sp-3);
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--rz-bms-border-faint);
+}
+.rz-bms-kv:last-child { border-bottom: 0; }
+.rz-bms-kv-key { color: var(--rz-bms-text-muted); }
+.rz-bms-kv-val { color: var(--rz-bms-text); font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------------------
+ * 6) KPI card (`spec §2 KPI Cards`).
+ *    Anatomy: label + value + unit + target + trend + source.
+ * ---------------------------------------------------------------------------*/
+.rz-bms-kpi {
+  background: var(--rz-bms-panel-raised);
+  border: 1px solid var(--rz-bms-border-faint);
+  border-radius: var(--rz-bms-r-md);
+  padding: var(--rz-bms-sp-3) var(--rz-bms-sp-4);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-row-gap: var(--rz-bms-sp-1);
+}
+.rz-bms-kpi.is-warn     { border-color: rgba(220, 163, 58, 0.45); }
+.rz-bms-kpi.is-critical { border-color: rgba(217, 76, 76, 0.50); }
+.rz-bms-kpi-label {
+  grid-column: 1 / 2;
+  color: var(--rz-bms-text-muted);
+  font-size: var(--rz-bms-fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.rz-bms-kpi-source {
+  grid-column: 2 / 3;
+  align-self: start;
+  justify-self: end;
+  font-size: var(--rz-bms-fs-xs);
+  color: var(--rz-bms-text-muted);
+}
+.rz-bms-kpi-val {
+  grid-column: 1 / 2;
+  font-size: var(--rz-bms-fs-xl);
+  font-weight: 700;
+  color: var(--rz-bms-text);
+  line-height: var(--rz-bms-lh-tight);
+}
+.rz-bms-kpi-unit {
+  color: var(--rz-bms-text-dim);
+  font-size: var(--rz-bms-fs-md);
+  margin-left: 4px;
+}
+.rz-bms-kpi-target {
+  grid-column: 1 / -1;
+  color: var(--rz-bms-text-muted);
+  font-size: var(--rz-bms-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+.rz-bms-kpi-trend {
+  grid-column: 2 / 3;
+  align-self: end;
+  justify-self: end;
+  font-size: var(--rz-bms-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+.rz-bms-kpi-trend.is-up   { color: var(--rz-bms-warn); }
+.rz-bms-kpi-trend.is-down { color: var(--rz-bms-normal); }
+.rz-bms-kpi-trend.is-flat { color: var(--rz-bms-text-muted); }
+
+/* ---------------------------------------------------------------------------
+ * 7) Alarm row (`spec §3 Shared Alarm Row`).
+ *    severity | time | source | message | state | ack | action
+ * ---------------------------------------------------------------------------*/
+.rz-bms-alarm-row {
+  display: grid;
+  grid-template-columns: 78px 86px 110px 1fr 80px 70px;
+  gap: var(--rz-bms-sp-3);
+  align-items: center;
+  padding: var(--rz-bms-sp-2) var(--rz-bms-sp-3);
+  border-bottom: 1px solid var(--rz-bms-border-faint);
+  font-size: var(--rz-bms-fs-sm);
+}
+.rz-bms-alarm-row:last-child { border-bottom: 0; }
+.rz-bms-alarm-sev { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: var(--rz-bms-fs-xs); }
+.rz-bms-alarm-sev.is-critical { color: var(--rz-bms-critical); }
+.rz-bms-alarm-sev.is-warn     { color: var(--rz-bms-warn); }
+.rz-bms-alarm-sev.is-trouble  { color: var(--rz-bms-trouble); }
+.rz-bms-alarm-sev.is-stale    { color: var(--rz-bms-stale); }
+.rz-bms-alarm-time   { font-family: var(--rz-bms-font-mono); color: var(--rz-bms-text-muted); font-variant-numeric: tabular-nums; }
+.rz-bms-alarm-source { color: var(--rz-bms-text-dim); }
+.rz-bms-alarm-msg    { color: var(--rz-bms-text); }
+.rz-bms-alarm-state  { font-weight: 700; }
+.rz-bms-alarm-ack {
+  font: inherit;
+  padding: 4px 8px;
+  border-radius: var(--rz-bms-r-sm);
+  border: 1px solid var(--rz-bms-border);
+  background: transparent;
+  color: var(--rz-bms-text-dim);
+  cursor: pointer;
+}
+.rz-bms-alarm-ack:hover { background: var(--rz-bms-panel-raised); color: var(--rz-bms-text); }
+.rz-bms-alarm-ack:focus-visible { outline: 2px solid var(--rz-bms-selected); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------------
+ * 8) Layer toggles — for diagrams (room layout / cooling / SLD / network).
+ *    `.rz-bms-layer-toolbar` hosts toggle buttons; one button per layer.
+ * ---------------------------------------------------------------------------*/
+.rz-bms-layer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rz-bms-sp-1);
+  padding: var(--rz-bms-sp-2);
+  background: var(--rz-bms-panel-raised);
+  border: 1px solid var(--rz-bms-border-faint);
+  border-radius: var(--rz-bms-r-md);
+  font-size: var(--rz-bms-fs-xs);
+}
+.rz-bms-layer-btn {
+  font: inherit;
+  padding: 4px 10px;
+  border-radius: var(--rz-bms-r-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--rz-bms-text-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  transition: color var(--rz-bms-tx-fast), background var(--rz-bms-tx-fast), border-color var(--rz-bms-tx-fast);
+}
+.rz-bms-layer-btn:hover { color: var(--rz-bms-text); background: rgba(255,255,255,0.04); }
+.rz-bms-layer-btn[aria-pressed="true"] {
+  color: var(--rz-bms-selected);
+  border-color: var(--rz-bms-selected);
+  background: var(--rz-bms-bg-selected);
+}
+.rz-bms-layer-btn:focus-visible { outline: 2px solid var(--rz-bms-selected); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------------
+ * 9) Bottom event/trend strip.
+ * ---------------------------------------------------------------------------*/
+.rz-bms-events {
+  background: var(--rz-bms-panel);
+  border-top: 1px solid var(--rz-bms-border);
+  padding: var(--rz-bms-sp-3) var(--rz-bms-sp-4);
+  font-size: var(--rz-bms-fs-sm);
+}
+.rz-bms-events-title {
+  font-size: var(--rz-bms-fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rz-bms-text-muted);
+  margin: 0 0 var(--rz-bms-sp-2) 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 10) Utility helpers.
+ * ---------------------------------------------------------------------------*/
+body.rz-bms-shell .rz-bms-muted    { color: var(--rz-bms-text-muted); }
+body.rz-bms-shell .rz-bms-dim      { color: var(--rz-bms-text-dim); }
+body.rz-bms-shell .rz-bms-unit     { color: var(--rz-bms-text-dim); font-size: 0.85em; font-weight: 400; }
+body.rz-bms-shell .rz-bms-divider  { border-top: 1px solid var(--rz-bms-border-faint); margin: var(--rz-bms-sp-3) 0; }
+body.rz-bms-shell .rz-bms-mono     { font-family: var(--rz-bms-font-mono); font-variant-numeric: tabular-nums; }
+
+/* Visually hide but keep accessible (for screen readers) */
+body.rz-bms-shell .rz-bms-sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* Skip link for keyboard users — every shell page should have one. */
+body.rz-bms-shell .rz-bms-skip {
+  position: absolute; top: -40px; left: 8px;
+  background: var(--rz-bms-selected); color: var(--rz-bms-bg);
+  padding: 8px 14px; border-radius: var(--rz-bms-r-sm);
+  font-weight: 700; z-index: 10000;
+  transition: top var(--rz-bms-tx-fast);
+}
+body.rz-bms-shell .rz-bms-skip:focus { top: 8px; }
+
+/* ---------------------------------------------------------------------------
+ * 11) Responsive: collapse left nav under 900 px; collapse inspector under 1180.
+ * ---------------------------------------------------------------------------*/
+@media (max-width: 1180px) {
+  .rz-bms-inspector {
+    width: 100%;
+    max-width: 100%;
+    border-left: 0;
+    border-top: 1px solid var(--rz-bms-border);
+  }
+}
+@media (max-width: 900px) {
+  .rz-bms-nav {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--rz-bms-border);
+    padding: var(--rz-bms-sp-2);
+  }
+  .rz-bms-nav-section { display: none; }
+  .rz-bms-alarm-row {
+    grid-template-columns: 64px 1fr;
+    grid-row-gap: 2px;
+  }
+  .rz-bms-alarm-row > * { grid-column: 2 / 3; }
+  .rz-bms-alarm-row > .rz-bms-alarm-sev { grid-column: 1 / 2; grid-row: 1 / span 5; }
+}

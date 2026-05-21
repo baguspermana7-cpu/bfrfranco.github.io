@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v1.23.0 — 2026-05-22 (BMS Shell foundation — shared dark-operations console library, no page migrations yet)
+
+Foundation ship for the conv-suite unification + DC AI cockpit pass (owner-approved direction per
+`Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` and `…dc ai/review/24-uiux-re-review-2026-05-22-best-design.md`).
+Library only — no pages migrated yet. Per-page adoption ships start at v1.23.1
+(chiller-plant first, the doc's visual benchmark).
+
+### Added
+- **`css/rz-bms-shell.css`** — dark operations design system in 11 sections:
+  tokens (`#0b1118` bg → `#e7edf5` text + `#55b878 #dca33a #d94c4c #50c8ff`
+  semantics + subsystem hues), top status strip, left subsystem nav with status
+  dots + alarm badges, right object-inspector, KPI card anatomy
+  (label/value/unit/target/trend/source), shared alarm row, layer-toggle
+  toolbar, bottom event strip, chip + dot primitives, responsive collapse
+  (≤1180 stacks inspector / ≤900 collapses nav / ≤390 stacks everything).
+  Opt-in only — scoped under `body.rz-bms-shell` so it has zero side-effect on
+  pages that don't carry the class.
+- **`js/rz-bms-shell.js`** — vanilla ES5 controller with public API:
+  `RZBMSShell.init / setStatus / layerToggle / inspector.select / inspector.clear /
+  attachClickToInspector / alarmBadge`. ARIA-aware (`role="status"`+`aria-live`
+  on status strip, `aria-pressed` on layer toggles, keyboard activation on
+  click-to-inspect). Engine preservation: never reads or writes engine state;
+  pages remain responsible for feeding engine-derived values.
+- **`standarization/BMS_SHELL.md`** — adoption guide + token reference +
+  component catalog + migration order (v1.23.1 chiller-plant → v1.23.3 fuel/
+  water/fire → v1.24.0 EPMS/datahall/ict → v1.24.x datahallAI cockpit pass →
+  v1.25.0 polish).
+
+### Decisions captured
+- **Theme strategy**: dark operations everywhere (DC Conv dashboard flips dark
+  too — no light↔dark jolt between dashboard and subsystems).
+- **EPMS_Telemetry exemplar designation revoked** for this design pass per
+  owner. Migrates onto shared shell alongside the other 7 conv pages.
+- **DC Dashboard tab `#p-dash`** in `datahallAI.html` remains owner-excluded —
+  every adoption ship must keep it byte-identical to HEAD.
+- **Migration order**: DC Conv unification first (v1.23.x), then datahallAI
+  cockpit pass (v1.24.x). Per owner.
+
+### Verified
+- 4 strict audit gates CLEAN.
+- 57/57 datahall + 22/22 conv engine tests still pass (engine files untouched).
+- `node --check` on `js/rz-bms-shell.js`: parses clean.
+- No existing pages reference the new files yet — zero rendered-DOM change on
+  the live site.
+
+---
+
 ## v1.22.8 — 2026-05-22 (DC AI engineering audit P1+P2 fixes — Cooling PUE, BMS service health, UPS/MSB engine-bound first-paint)
 
 Closes the five P1 + two P2 acceptance-line violations surfaced by the
