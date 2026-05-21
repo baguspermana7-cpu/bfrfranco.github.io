@@ -74,6 +74,11 @@
          Loaded NON-deferred + external so window.CONV_CALC exists before the
          inline binding script. NEVER inline this in a JS string literal. -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
+         Loaded for cross-page consistency; body does NOT carry rz-bms-shell
+         class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §7. -->
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.4">
+    <script src="js/rz-bms-shell.js?v=1.23.4" defer></script>
     <style>
         /* Grounded operator-console palette (matches EPMS_Telemetry exemplar).
            Red is reserved for ALARM/TRIP only — never decoration. */
@@ -129,10 +134,29 @@
         .alarm-chip .warnv { color: var(--st-warn); }
 
         /* KPI strip — value + unit + threshold/target (doc-07, doc-10) */
-        .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr);
+        /* v1.23.4 doc-14 §7: "Keep top KPIs, but visually rank: WUE / cooling makeup /
+           treatment / filter DP / TDS." WUE is the headline (it's the page's reason for
+           existing per conv/review/09); hero gets 2x width + 50% bigger value font + the
+           treated-water teal accent. */
+        .kpi-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
             gap: 10px; margin-bottom: 12px; }
         .kpi { background: var(--panel-bg); border: 1px solid var(--panel-line);
             border-radius: 8px; padding: 12px 14px; }
+        .kpi.hero {
+            border-color: rgba(45,212,191,0.45);
+            background: linear-gradient(180deg, #0e1a2c, #0a1322);
+            box-shadow: inset 0 0 0 1px rgba(45,212,191,0.08);
+        }
+        .kpi.hero h3 { font-size: 11px; color: var(--medium-treated); letter-spacing: 0.7px; }
+        .kpi.hero .v { font-size: 36px; color: #fff; }
+        .kpi.hero .v small { font-size: 14px; }
+        .kpi.hero .th { margin-top: 8px; font-size: 11px; }
+        @media (max-width: 1280px) {
+            .kpi-grid { grid-template-columns: repeat(3, 1fr) !important; }
+            .kpi.hero { grid-column: span 3; }
+            .kpi.hero .v { font-size: 32px; }
+        }
+
         .kpi h3 { margin: 0 0 6px; font-size: 10px; font-weight: 700;
             text-transform: uppercase; letter-spacing: .6px; color: var(--text-dim); }
         .kpi .v { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.1; }
@@ -327,9 +351,10 @@
         <span class="alarm-chip">Data Quality <b id="dataQuality">GOOD</b></span>
     </div>
 
-    <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards") -->
+    <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards")
+         v1.23.4 doc-14 §7: WUE is the visual hero (page-purpose KPI). -->
     <div class="kpi-grid">
-        <div class="kpi">
+        <div class="kpi hero">
             <h3>Instant WUE</h3>
             <div class="v"><span id="kWue">1.20</span> <small>L/kWh</small></div>
             <div class="th" id="kWueTh">Target &le; 1.30 &middot; computed</div>

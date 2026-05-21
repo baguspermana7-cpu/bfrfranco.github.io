@@ -27,6 +27,13 @@ with amber-gold tint + inset border. Responsive: hero spans 3 cols on
 ≤1280 px. Engine binding (`window.CONV_CALC` → `kpi-autonomy` = 48 hr)
 unchanged.
 
+**v1.23.4 (2026-05-22)** — `water-system.html` adopted. Library loaded.
+Doc-14 §7 fix applied: Instant WUE promoted to visual hero — `.kpi-grid`
+`repeat(5, 1fr)` → `2fr 1fr 1fr 1fr 1fr`, hero value font 24 → 36 px
+(+50%) with teal accent (`#2dd4bf` treated-water medium). Responsive:
+hero spans 3 cols on ≤1280 px. Engine binding (`window.CONV_CALC` →
+`#kWue` = 1.20 L/kWh) unchanged.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

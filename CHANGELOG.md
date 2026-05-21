@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v1.23.4 — 2026-05-22 (BMS Shell adoption #4 — `water-system.html`, Instant WUE promoted to visual hero per doc-14 §7)
+
+Fourth adoption ship. Same pattern as v1.23.3 — surgical and additive,
+engine binding intact. Instant WUE is the page-purpose KPI (per
+conv/review/09), so it gets the hero treatment in the strip.
+
+### Changed (water-system.html only)
+- **`.kpi-grid`** layout changed `repeat(5, 1fr)` → `2fr 1fr 1fr 1fr 1fr`
+  so the Instant WUE card spans 2 columns.
+- **`.kpi.hero`** new rules: teal-tinted border (treated-water medium
+  `#2dd4bf` at 45% alpha), inset glow box-shadow, gradient bg.
+  - `.kpi.hero h3` upsized to 11 px with teal accent.
+  - `.kpi.hero .v` upsized 24 → **36 px** (50% larger).
+  - `.kpi.hero .v small` upsized to 14 px.
+  - `.kpi.hero .th` upsized to 11 px.
+- **Responsive** — hero spans 3 cols on ≤1280 px (full width of the
+  3-col fallback grid); value font 32 px on that breakpoint.
+- WUE card given `class="kpi hero"` so the new styles apply.
+
+### Added (loaded but not yet applied to body scope)
+- BMS Shell library — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` with
+  `?v=1.23.4` cache-bust.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
+- WUE engine binding (`#kWue` ← `CONV_CALC` 1.20 L/kWh) unchanged.
+- All other KPIs (Makeup / Treatment / Filter DP / TDS) unchanged.
+- Process flow diagram + reconciliation panel untouched.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.23.4 status entry added.
+
+---
+
 ## v1.23.3 — 2026-05-22 (BMS Shell adoption #3 — `fuel-system.html`, autonomy promoted to visual hero per doc-14 §6)
 
 Third adoption ship. Surgical and additive — preserves engine binding,
