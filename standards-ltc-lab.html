@@ -316,6 +316,124 @@
             line-height: 1.6;
         }
 
+        /* v1.22.7 — Main-module hero (lifted LTC Lab card) */
+        .standards-hero {
+            display: block;
+            position: relative;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem 1.6rem 1.4rem;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .standards-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d97706, #f59e0b, #22d3ee, #67e8f9);
+            border-radius: 20px 20px 0 0;
+        }
+        .standards-hero:hover {
+            transform: translateY(-3px);
+            border-color: rgba(34, 211, 238, 0.55);
+            box-shadow: 0 12px 32px rgba(34, 211, 238, 0.18), 0 4px 12px rgba(245, 158, 11, 0.12);
+        }
+        [data-theme="dark"] .standards-hero {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(34, 211, 238, 0.08), rgba(15, 23, 42, 0.55));
+            border-color: rgba(34, 211, 238, 0.25);
+        }
+        .standards-hero-top {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.85rem;
+        }
+        .standards-hero-icon {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(8, 145, 178, 0.35), rgba(34, 211, 238, 0.18));
+            color: #22d3ee;
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            font-size: 1.6rem;
+            box-shadow: 0 4px 14px rgba(34, 211, 238, 0.22);
+        }
+        .standards-hero-titlewrap { flex: 1; min-width: 0; }
+        .standards-hero-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            margin: 0 0 0.2rem 0;
+            color: var(--text-primary);
+            line-height: 1.25;
+        }
+        .standards-hero-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .standards-hero-desc {
+            font-size: 0.88rem;
+            line-height: 1.65;
+            color: var(--text-secondary);
+            margin: 0 0 0.9rem 0;
+        }
+        .standards-hero-feats {
+            list-style: none;
+            padding: 0.75rem 0 0.95rem 0;
+            margin: 0 0 0.75rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            gap: 0.45rem;
+        }
+        .standards-hero-feats li {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-size: 0.83rem;
+            color: var(--text-primary);
+        }
+        .standards-hero-feats li i {
+            font-size: 0.7rem;
+            color: #22d3ee;
+            width: 14px;
+            text-align: center;
+        }
+        .standards-hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 9px 22px;
+            border-radius: 10px;
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #0891b2, #22d3ee, #67e8f9);
+            box-shadow: 0 3px 12px rgba(34, 211, 238, 0.28);
+            letter-spacing: 0.02em;
+        }
+        .standards-hero:hover .standards-hero-cta {
+            filter: brightness(1.1);
+            box-shadow: 0 5px 18px rgba(34, 211, 238, 0.38);
+        }
+        @media (max-width: 600px) {
+            .standards-hero { padding: 1.15rem 1.1rem 1.2rem; }
+            .standards-hero-top { flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+            .standards-hero-icon { width: 48px; height: 48px; min-width: 48px; font-size: 1.35rem; }
+            .standards-hero-title { font-size: 1.05rem; }
+        }
+
         .standards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -1912,10 +2030,36 @@
             </div>
         </section>
 
+        <!-- v1.22.7: Main-module hero card — lifted out of the 6-sibling grid so the LTC Lab no longer reads as "one of six" -->
+        <section class="section" id="main-module" aria-labelledby="main-module-heading">
+            <div class="section-header" style="margin-bottom:0.75rem;">
+                <span style="display:inline-block;font-size:0.7rem;font-weight:800;letter-spacing:0.18em;color:#d97706;text-transform:uppercase;margin-bottom:0.25rem;">Main Module</span>
+                <h2 id="main-module-heading" style="margin:0;">Liquid-to-Chip Engineering Lab</h2>
+                <p>Gateway to cross-domain deep-dive modules — standards-aware sizing, control surfaces, and operations workbench.</p>
+            </div>
+            <a href="ltc-system-modelling-lab.html" class="standards-hero" aria-label="Open Liquid-to-Chip System Modelling Lab">
+                <div class="standards-hero-top">
+                    <div class="standards-hero-icon"><i class="fas fa-diagram-project"></i></div>
+                    <div class="standards-hero-titlewrap">
+                        <h3 class="standards-hero-title">Liquid-to-Chip System Modelling Lab</h3>
+                        <p class="standards-hero-subtitle">CDU · Manifold · Chip-Stack · Acceptance · Operations</p>
+                    </div>
+                </div>
+                <p class="standards-hero-desc">Not limited to one topic or isolated subsystem. Structured to link standards, cooling, power, safety, and operations in one model — with sensitivity surfaces, transient response, and lab journals persisted client-side.</p>
+                <ul class="standards-hero-feats">
+                    <li><i class="fas fa-circle-dot"></i> End-to-end CDU + manifold + chip-stack sizing</li>
+                    <li><i class="fas fa-circle-dot"></i> Standards-linked acceptance + sensitivity surfaces</li>
+                    <li><i class="fas fa-circle-dot"></i> Operating envelopes + transient response</li>
+                    <li><i class="fas fa-circle-dot"></i> Lab journals + scenarios persisted client-side</li>
+                </ul>
+                <span class="standards-hero-cta">Open Module Map <i class="fas fa-arrow-right"></i></span>
+            </a>
+        </section>
+
         <section class="section" id="standards">
             <div class="section-header">
                 <h2>Standards Deep-Dive Coverage</h2>
-                <p>Coverage is structured as engineering controls, acceptance criteria, and evidence checkpoints for design and operations.</p>
+                <p>Five standards-engine deep-dives interconnect with the Liquid-to-Chip Engineering Lab above. Coverage is structured as engineering controls, acceptance criteria, and evidence checkpoints for design and operations.</p>
             </div>
             <div class="standards-grid">
                 <a href="ltc-ashrae-thermal-control.html" class="standard-card standard-card-link" aria-label="Open ASHRAE deep-dive module">
@@ -1966,16 +2110,6 @@
                         <li>Failure containment and service continuity focus.</li>
                     </ul>
                     <span class="open-link">Open Deep-Dive <i class="fas fa-arrow-right"></i></span>
-                </a>
-
-                <a href="ltc-system-modelling-lab.html" class="standard-card standard-card-link" aria-label="Open Interconnected Deep-Dive Modules">
-                    <h3><i class="fas fa-diagram-project" style="background:#d97706"></i>Liquid-to-Chip Engineering Lab</h3>
-                    <ul>
-                        <li>Gateway to cross-domain deep-dive modules.</li>
-                        <li>Not limited to one topic or isolated subsystem.</li>
-                        <li>Structured to link standards, cooling, power, safety, and operations.</li>
-                    </ul>
-                    <span class="open-link">Open Module Map <i class="fas fa-arrow-right"></i></span>
                 </a>
             </div>
         </section>

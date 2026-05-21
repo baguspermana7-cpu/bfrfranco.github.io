@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.22.7 — 2026-05-22 (Featured Engineering Deep-Dive & Standards grouping — promotes the LTC Lab out of the buried bottom row)
+
+### Changed
+- **datacenter-solutions.html** — new "Engineering Deep-Dive & Standards" featured section inserted directly above "Strategic Analysis & Market Intelligence" with two cards using the same `.ds-strat-card` bento pattern (gradient top-border, large icon, badge, feature bullets, gradient CTA):
+  - **Card 1** — Standards + Liquid-to-Chip Lab (amber gold theme, ROOT lock badge, links to standards-ltc-lab.html, keeps `id="rootStandardsCard"` + `.root-only-card` class so the existing amber-tinted lock styling carries over).
+  - **Card 2** — Liquid-to-Chip System Modelling Lab (cyan teal theme, links to ltc-system-modelling-lab.html).
+- **standards-ltc-lab.html** — lifted the "Liquid-to-Chip Engineering Lab" card out of the 6-sibling Standards Deep-Dive grid into a dedicated "Main Module" hero section above the standards grid; new self-contained `.standards-hero` CSS block (gradient top-border, 56 px icon, feature bullets, cyan CTA) with light + dark coverage + small-screen responsive collapse.
+
+### Removed
+- **datacenter-solutions.html** — buried duplicate `ds-tool-row#rootStandardsCard` row in the "Engineering & Compliance Tools" list (it lived just under "Pillar: Sustainability"). The LTC Lab entry-point is now featured up-page only — no duplication.
+- **standards-ltc-lab.html** — the LTC Lab card removed from the 6-card `.standards-grid` (5 standards-engine cards remain: ASHRAE / ANSI-TIA / ISO / NFPA / Uptime).
+
+### Notes
+- Reuses `.ds-strategic-grid` / `.ds-strat-card` / `.ds-strat-card::before` / `.ds-strat-icon` / `.ds-strat-title` / `.ds-strat-subtitle` / `.ds-strat-desc` / `.ds-strat-features` / `.ds-strat-cta` from the existing Strategic Analysis section — no new global stylesheet rules; the page's existing light + dark coverage applies automatically.
+- Auth gating unchanged: `standards-ltc-lab.html` is not in `auth.js` `ROOT_ONLY_PATHS`; the lock chip stays decorative (signals "root-only territory").
+- DC AI + DC Conventional pages untouched in this ship (under independent background-agent audit). Engineering-audit P1s (datahallAI Cooling P&ID `~1.18` / `~0.12` hardcodes + Math.random PUE badge, BMS lifecycle gaps, Feed-A red, MSB/UPS first-paint values) queued for v1.22.8.
+
+---
+
 ## v1.22.6 — 2026-05-18 (B-016 part 2: 390px horizontal-overflow fixed — B-016 COMPLETE)
 
 ### Fixed (CSS-only, additive, one idempotent `<style id="b016-mobile-overflow-fix">` per page, ≤768px-scoped)
