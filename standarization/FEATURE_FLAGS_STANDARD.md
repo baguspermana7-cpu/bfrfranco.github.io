@@ -595,5 +595,101 @@ add the listener when a page uses `_rzFeatures.has()`.
 
 ---
 
+## 12. v1.22.x Update — 4-tier matrix + educator role
+
+> Added 2026-05-22 by the educator-tier migration. Supersedes §2 (3-tier
+> definitions) and §3 (schema) for newly added flags. Existing 3-column
+> flags continue to work; legacy entries lacking a `root` field fall back
+> to `root: true` (root keeps full access by default).
+
+### 12.1 Tier ladder (4 columns)
+
+```
+free  →  demo  →  pro  →  root
+```
+
+The matrix grew a 4th column `root` so admin/root-only modules can be
+declared in the schema instead of via the legacy `ROOT_ONLY_PATHS` hard
+block. Every `page-feature` record SHOULD now carry all four booleans:
+
+```js
+'datahall-ai': {
+  'page-access':         { free: false, demo: false, pro: true, root: true }
+}
+```
+
+### 12.2 Tier definitions (expanded)
+
+| Tier   | Who gets it | Example accounts |
+|--------|-------------|------------------|
+| `free` | Unauthenticated visitors | (anonymous) |
+| `demo` | Demo / showcase accounts | `demo@resistancezero.com` |
+| `pro`  | Paid accounts and educator accounts | manual accounts, `educator@resistancezero.com` |
+| `root` | Admin accounts | `bagus@`, `admin@` |
+
+Educator users (role = `educator`) consume the **PRO** column. There is no
+separate "educator" matrix column — only a separate role label used for
+badging and admin-console filtering. Pro and educator are
+indistinguishable to feature-flag resolution.
+
+### 12.3 `page-access` feature convention
+
+A page-feature record named `'page-access'` is the canonical key for
+page-level access gates (i.e. "should the body render or should the
+restricted-access overlay show"). The DC suites and LTC labs use this
+key to convert the legacy `ROOT_ONLY_PATHS` hard block into a
+matrix-driven gate.
+
+```js
+// Page bootstrap:
+if (!window._rzAuth.enforceTierFeatureAccess('datahall-ai')) {
+    return; // body has been swapped for the restricted-access UX
+}
+```
+
+`enforceTierFeatureAccess(pageKey)` is implemented in `auth.js`. It:
+
+1. Short-circuits to `true` when `getRoleFromSession() === 'root'`.
+2. Otherwise consults `_rzFeatures.has(pageKey, 'page-access')`.
+3. On denial, locks the page body and re-uses the existing "Restricted
+   Access" prompt + login modal.
+
+### 12.4 Resolution semantics — educator → pro
+
+`_rzFeatures.getTier()` checks `_rzAuth.getRoleFromSession()` first. If
+the role is `'root'`, it returns `'root'`. Otherwise it returns whatever
+`_rzAuth.getTier()` returns — and `_rzAuth.getTier()` already maps
+educator emails to `'pro'`. There is therefore no place in the runtime
+that resolves to a literal `'educator'` tier value.
+
+```js
+// auth.js excerpt:
+getTier: function (session) {
+  session = session || getSession();
+  if (!session || !session.email) return 'free';
+  var email = String(session.email).toLowerCase();
+  if (ROOT_EMAILS.indexOf(email)     !== -1) return 'pro';
+  if (DEMO_EMAILS.indexOf(email)     !== -1) return 'demo';
+  if (EDUCATOR_EMAILS.indexOf(email) !== -1) return 'pro'; /* educator → pro */
+  return 'pro';
+}
+```
+
+### 12.5 Back-compat for missing `root` column
+
+If a cached page-feature record (e.g. an admin override stored in
+`rz_admin_features_by_page` before v1.22.x) lacks the `root` field, the
+runtime treats root as **allowed**:
+
+```js
+/* Back-compat: override missing root column but tier is root → allow. */
+if (tier === 'root') return true;
+```
+
+Admin console UI (rz-ops) should write all four columns for every new
+override to keep this fallback unused.
+
+---
+
 *Document maintained by the ResistanceZero development team.*
 *Update this file whenever adding new page keys, feature keys, or tier rules.*

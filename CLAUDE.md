@@ -101,6 +101,51 @@ This bug previously killed every interactive feature on 5 calc pages (commits `a
 
 ---
 
+## Auth tiers (v1.22.x, educator-tier migration)
+
+The auth model is a 4-tier matrix with a 5-role overlay. Session schema is
+unchanged (`{email, tier, expires, role?}` in `rz_premium_session`).
+
+**Tier ladder** (4 columns in `rz-feature-flags.js`):
+
+```
+free  →  demo  →  pro  →  root
+```
+
+**Role ladder** (orthogonal label on the session):
+
+```
+free  →  demo  →  pro  →  educator  →  root
+```
+
+Educator users have `session.tier === 'pro'` (educator is a ROLE, not a
+tier) AND `session.role === 'educator'`. They consume the PRO column for
+feature-flag access but are blocked from the rz-ops admin panel just like
+plain pro users. Existing `session.tier === 'pro'` checks across article
+pages remain correct because educator already satisfies them.
+
+**Helpers** (in `auth.js`):
+
+- `window._rzAuth.getTier(session?)` → `'free' | 'demo' | 'pro'` (root emails return `'pro'`)
+- `window._rzAuth.getRoleFromSession(session)` → `'' | 'pro' | 'demo' | 'educator' | 'root'`
+- `window._rzAuth.enforceTierFeatureAccess(pageKey)` — page-level gate that consults the `page-access` feature on the page entry. DC AI, DC Conventional, DCMOC, and all LTC labs were converted from the legacy `ROOT_ONLY_PATHS` hard block to this matrix-driven pattern. `/dc-market-tracker.html` remains root-only via the residual `ROOT_ONLY_PATHS` list.
+
+**EDUCATOR badge** (header dropdown pill, post-login): instrument-cyan,
+NOT purple. Tokens: `background: rgba(8,145,178,0.18); color: #67e8f9;`.
+CSS rule is mirrored in BOTH `styles.css` AND `styles-index.css` per the
+2-stylesheet architecture rule above.
+
+**Educator allowlist** seed is hardcoded in `auth.js`
+(`EDUCATOR_SEED_EMAILS`); admin overrides live in
+`localStorage.rz_admin_educators` and fire a `rz-educators-changed` event
+when written by the rz-ops admin panel.
+
+Full spec: `standarization/AUTH_STANDARD.md` (§Auth tiers),
+`standarization/PRO_MODE_STANDARDIZATION.md` (§14),
+`standarization/FEATURE_FLAGS_STANDARD.md` (§12).
+
+---
+
 ## Mobile responsive standard (mandate from Plan v15, v1.8.0+)
 
 Every public HTML page MUST score ≥7/10 on `tools/audit-mobile-responsive.py`. Required checkpoints:

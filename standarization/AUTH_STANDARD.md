@@ -303,3 +303,111 @@ function activatePremiumUI() {
 3. `activatePremiumUI()` changes button appearance only — never rebinds onclick
 4. Every calculator page MUST dispatch `rz-auth-change` on login AND logout
 5. Every calculator page MUST listen for `rz-auth-change` to sync with cross-page auth
+
+---
+
+## Auth tiers (4-tier matrix, educator-tier expansion 2026-05-22)
+
+> Added by Tasks 1–7 of the educator-tier migration. Supersedes the
+> single-tier `"pro"`-only model documented above. The session schema is
+> unchanged — only the resolver semantics and the feature-flag matrix
+> expanded. Existing inline `session.tier === 'pro'` checks across the
+> codebase remain correct because educator users ALSO have `tier === 'pro'`
+> (educator is a ROLE, not a separate tier).
+
+### Tier ladder (4 levels — feature-flag matrix columns)
+
+```
+free  →  demo  →  pro  →  root
+```
+
+- **`free`** — unauthenticated visitor. Site pages reachable, calc free-tier
+  features only.
+- **`demo`** — `demo@resistancezero.com` and similar showcase accounts.
+  Unlocks demo-gated features per matrix; cannot reach DC suites.
+- **`pro`** — paid Pro accounts and educator accounts (educator users
+  consume the PRO column). Full calculator pro features, DC AI, DC
+  Conventional, DCMOC, LTC labs.
+- **`root`** — admin accounts (`bagus@`, `admin@`). PRO column access plus
+  rz-ops admin panel and root-only modules (currently
+  `/dc-market-tracker.html`).
+
+### Role ladder (5 roles — orthogonal to tier)
+
+```
+free  →  demo  →  pro  →  educator  →  root
+```
+
+- Role is attached to the session record (`session.role`) or detected from
+  email via `detectRole(email)` in `auth.js`.
+- **`educator`** sits between `pro` and `root` for badging/policy purposes
+  but resolves to the PRO column for feature-flag access (educator gets
+  pro-tier feature access **and** rz-ops admin-panel access is blocked
+  the same as for pro).
+- Root remains the only role that passes rz-ops gates and the root-only
+  page list.
+
+### Helper API additions
+
+```js
+window._rzAuth.getTier(session?)         // 'free' | 'demo' | 'pro'
+window._rzAuth.getRoleFromSession(session) // '' | 'demo' | 'pro' | 'educator' | 'root'
+window._rzAuth.enforceTierFeatureAccess(pageKey)
+  // Page-level gate driven by rz-feature-flags.js.
+  // Resolves session → tier → consults `page-access` feature on pageKey.
+  // Root short-circuits to true. On denial, locks the page body + shows
+  // the existing "Restricted Access" UX. Used by datahallAI.html,
+  // dc-conventional.html, dcmoc/index.html, and the LTC labs.
+```
+
+### `page-access` feature convention
+
+Each `rz-feature-flags.js` page entry MAY define a feature named
+`page-access` (booleans for each of the four tiers). `enforceTierFeatureAccess(pageKey)`
+consults this single key to decide whether the body renders or the
+restricted-access overlay shows. This pattern replaced the legacy
+`ROOT_ONLY_PATHS` hard block for DC AI, DC Conventional, DCMOC, and all
+LTC labs.
+
+```js
+// rz-feature-flags.js excerpt — DC pages converted to matrix gates:
+'datahall-ai': {
+  'page-access':         { free: false, demo: false, pro: true, root: true },
+  /* …other features… */
+},
+```
+
+### Educator allowlist storage
+
+The set of educator emails has two sources:
+
+1. **Seed list** — hardcoded in `auth.js` (`EDUCATOR_SEED_EMAILS`,
+   currently `['educator@resistancezero.com']`).
+2. **Admin overrides** — `localStorage.rz_admin_educators`, a JSON array of
+   email strings managed by the rz-ops admin panel.
+
+Both lists are unioned by `loadEducatorEmails()`. The rz-ops admin panel
+dispatches a `rz-educators-changed` CustomEvent + emits a `storage` event
+after writing the override; `auth.js` re-reads the allowlist on either.
+
+```js
+// rz-ops adds an educator
+var raw = localStorage.getItem('rz_admin_educators');
+var list = raw ? JSON.parse(raw) : [];
+list.push('partner-edu@university.edu');
+localStorage.setItem('rz_admin_educators', JSON.stringify(list));
+window.dispatchEvent(new CustomEvent('rz-educators-changed'));
+```
+
+### Badge convention (header dropdown)
+
+The post-login header pill (`#rzDdBadge`) reflects the user's role:
+
+| Role | Label | Background | Foreground |
+|------|-------|------------|------------|
+| `educator` | `EDUCATOR` | `rgba(8, 145, 178, 0.18)` (instrument-cyan) | `#67e8f9` |
+| `pro` / `root` / others | tier `.toUpperCase()` | gradient purple | white |
+| anonymous | hidden | — | — |
+
+CSS rule (`.rz-dd-badge.educator`) is mirrored in **both** `styles.css`
+**and** `styles-index.css` per the 2-stylesheet architecture rule.

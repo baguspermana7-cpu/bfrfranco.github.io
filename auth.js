@@ -263,6 +263,8 @@
             '.rz-dd-badge{padding:3px 10px;border-radius:6px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}',
             '.rz-dd-badge.pro{background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:#fff;}',
             '.rz-dd-badge.free{background:rgba(100,116,139,0.2);color:#94a3b8;}',
+            /* Educator role (tier=pro, role=educator) — instrument-cyan, matches rz-ops admin UI. NOT purple. */
+            '.rz-dd-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9;}',
             '.rz-dd-email{font-size:0.78rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
             '.rz-dd-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;border-radius:8px;background:rgba(239,68,68,0.1);color:#f87171;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:all 0.2s;}',
             '.rz-dd-logout:hover{background:rgba(239,68,68,0.2);}',
@@ -482,9 +484,18 @@
             if (emailEl) emailEl.textContent = session.email.split('@')[0];
             if (ddEmail) ddEmail.textContent = session.email;
             if (ddBadge) {
+                /* Educator role (tier=pro, role=educator) gets a distinct cyan
+                   EDUCATOR badge to match the rz-ops admin UI palette. Other
+                   roles fall back to the legacy tier-driven label. */
+                var role = getRoleFromSession(session);
                 var tier = session.tier || 'pro';
-                ddBadge.textContent = tier.toUpperCase();
-                ddBadge.className = 'rz-dd-badge ' + (tier === 'pro' ? 'pro' : 'free');
+                if (role === 'educator') {
+                    ddBadge.textContent = 'EDUCATOR';
+                    ddBadge.className = 'rz-dd-badge educator';
+                } else {
+                    ddBadge.textContent = tier.toUpperCase();
+                    ddBadge.className = 'rz-dd-badge ' + (tier === 'pro' ? 'pro' : 'free');
+                }
             }
         } else {
             loginBtn.style.display = 'inline-flex';

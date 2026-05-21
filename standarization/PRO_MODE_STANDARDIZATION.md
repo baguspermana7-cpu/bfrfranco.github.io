@@ -747,3 +747,84 @@ single page.
 
 Full specification, worked examples, anti-patterns, and admin console
 integration: **`standarization/FEATURE_FLAGS_STANDARD.md`**.
+
+---
+
+## 14. v1.22.x Update — Educator tier (4-tier matrix)
+
+> Added 2026-05-22. Extends the v1.18.0 3-tier model with a fourth column
+> (`root`) and introduces `educator` as a ROLE that consumes the pro
+> column. The session schema is unchanged; existing `tier === 'pro'`
+> branches in article pages remain correct because educator users have
+> `session.tier === 'pro'`.
+
+### 14.1 Capability matrix
+
+| Capability | free | demo | educator | pro | root |
+|---|---|---|---|---|---|
+| Site pages (calc / articles / labs) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Demo-gated features (per matrix)    | ✗ | ✓ | ✓ | ✓ | ✓ |
+| Pro-gated features (PDF, advanced)  | ✗ | ✗ | ✓ | ✓ | ✓ |
+| DC AI / DC Conventional / DCMOC     | ✗ | ✗ | ✓ | ✓ | ✓ |
+| LTC standards labs                  | ✗ | ✗ | ✓ | ✓ | ✓ |
+| rz-ops admin panel                  | ✗ | ✗ | ✗ | ✗ | ✓ |
+
+Educator users get the full pro feature set but remain blocked from the
+rz-ops admin panel (same as plain pro).
+
+### 14.2 Educator role detection
+
+`auth.js` resolves the role via `detectRole(email)`:
+
+```js
+if (ROOT_EMAILS.indexOf(e)     !== -1) return 'root';
+if (DEMO_EMAILS.indexOf(e)     !== -1) return 'demo';
+if (EDUCATOR_EMAILS.indexOf(e) !== -1) return 'educator';
+return 'pro';
+```
+
+`EDUCATOR_EMAILS` is built from the hardcoded seed
+(`educator@resistancezero.com`) unioned with the admin-managed
+`localStorage.rz_admin_educators` JSON list.
+
+### 14.3 EDUCATOR badge (header dropdown)
+
+Use **instrument-cyan**, explicitly NOT the Anthropic-default purple used
+for the regular PRO pill:
+
+| Token | Value |
+|-------|-------|
+| Background | `rgba(8, 145, 178, 0.18)` |
+| Foreground (text) | `#67e8f9` |
+| Background hex base | `#0891b2` |
+| Label | `EDUCATOR` (uppercase) |
+
+Implementation lives in `auth.js` (inline injection) and is **mirrored**
+in both `styles.css` AND `styles-index.css` per the 2-stylesheet rule.
+`firebase-auth.js` also renders the same cyan pill when the backend
+returns `session.role === 'educator'`.
+
+### 14.4 Page-level access — `page-access` feature convention
+
+Every page that was previously hard-gated by `ROOT_ONLY_PATHS` (DC AI, DC
+Conventional, DCMOC) and every LTC lab now has a `page-access` boolean
+column in `rz-feature-flags.js`. Call:
+
+```js
+// In page bootstrap, before render-heavy work:
+if (!window._rzAuth.enforceTierFeatureAccess('datahall-ai')) {
+    return; // body has been swapped for the restricted-access UX
+}
+```
+
+The educator + pro + root columns are `true` for these pages; demo and
+free see the restricted-access overlay.
+
+### 14.5 Where the badge is NOT rendered
+
+- The rz-ops admin panel users list shows `EDUCATOR` on a per-row basis
+  (cyan chip) — but **NOT** in the per-tier count tiles (those still bucket
+  educator users under pro because their tier IS pro).
+- Inline article modals are unchanged — educator users see the standard
+  "Pro Active" badge inside the modal, but the GLOBAL header pill shows
+  EDUCATOR (cyan) per §14.3.

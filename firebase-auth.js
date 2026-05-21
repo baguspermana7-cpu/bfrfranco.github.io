@@ -312,9 +312,18 @@
       if (emailEl) emailEl.textContent = session.display_name || session.email.split('@')[0];
       if (ddEmail) ddEmail.textContent = session.email;
       if (ddBadge) {
+        /* Educator role (tier=pro, role=educator) gets a distinct cyan EDUCATOR
+           badge to match the rz-ops admin UI palette. Other roles fall back
+           to the legacy tier-driven label. */
+        var role = session.role || '';
         var tier = session.tier || 'pro';
-        ddBadge.textContent = tier.toUpperCase();
-        ddBadge.className = 'rz-dd-badge ' + (tier === 'pro' ? 'pro' : 'free');
+        if (role === 'educator') {
+          ddBadge.textContent = 'EDUCATOR';
+          ddBadge.className = 'rz-dd-badge educator';
+        } else {
+          ddBadge.textContent = tier.toUpperCase();
+          ddBadge.className = 'rz-dd-badge ' + (tier === 'pro' ? 'pro' : 'free');
+        }
       }
     } else {
       loginBtn.style.display = 'inline-flex';
