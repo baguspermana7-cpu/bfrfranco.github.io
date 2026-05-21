@@ -445,6 +445,12 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
+         Page-scoped (no body.rz-bms-shell class) so it adds the inspector + mode toggle
+         additively without overriding chiller-plant's own typography/palette.
+         Spec: standarization/BMS_SHELL.md ; conv/review/14 §4 ; -->
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.1">
+    <script src="js/rz-bms-shell.js?v=1.23.1" defer></script>
     <meta property="og:image:alt" content="Chiller Plant SCADA HMI v4 — Industrial P&ID Mimic | Resistance Zero">
 
 <style id="rz-skiplink-v1">
@@ -507,6 +513,22 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 
     <aside class="side">
       <div class="side-body">
+        <!-- v1.23.1 BMS Shell adoption — mode toggle (Overview/Performance/Maintenance) per doc-14 §4. -->
+        <div class="card" style="padding:10px 12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+            <h4 style="margin:0;font-size:.78rem;">View Mode</h4>
+            <span style="font-size:.62rem;color:#7f93ab;letter-spacing:.06em;text-transform:uppercase;">doc-14 §4</span>
+          </div>
+          <div id="chillerModeToolbar" role="group" aria-label="Chiller plant view mode"></div>
+        </div>
+
+        <!-- v1.23.1 BMS Shell adoption — Selected Equipment Inspector per doc-14 §4 fix #4
+             "Put selected loop detail in right inspector instead of making every loop equally detailed".
+             Populated by RZBMSShell.inspector.select() on P&ID click; coexists with the deep-detail modal. -->
+        <div class="card" style="padding:0;background:var(--rz-bms-panel,#121a24);border-color:var(--rz-bms-border,#293648);">
+          <div class="rz-bms-inspector" id="chillerInspector" aria-label="Selected equipment inspector" style="width:100%;max-width:100%;border-left:0;padding:14px 14px 10px;"></div>
+        </div>
+
         <div class="card">
           <h4>Primary CHW Header <span style="float:right;font-weight:400;color:#7f93ab">engine-bound</span></h4>
           <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">7.2 C</div></div>
@@ -1591,7 +1613,11 @@ function bind(){
   $("pidSvg").addEventListener("click", e=>{
     const g = e.target.closest("[data-loop-id]");
     if(!g) return;
-    openModal(Number(g.getAttribute("data-loop-id")));
+    const id = Number(g.getAttribute("data-loop-id"));
+    openModal(id);
+    // v1.23.1 BMS Shell adoption — also feed the right-side inspector with
+    // a quick-summary payload (modal remains the deep-detail view).
+    if(window.RZBMSShell && typeof updateLoopInspector === "function") updateLoopInspector(id);
   });
 
   $("mClose").addEventListener("click", closeModal);
@@ -1634,10 +1660,88 @@ function bind(){
   });
 }
 
+/* ============================================================================
+ * v1.23.1 BMS Shell adoption (read-only addition — does not touch engine
+ * state or existing modal flow). Builds the loop-summary payload from `st`
+ * and `ui`, hands it to RZBMSShell.inspector. Mode toggle is UI scaffold for
+ * v1.23.2; sections gain a [data-bms-mode] hook now but stay visible.
+ * ==========================================================================*/
+function loopInspectorPayload(id){
+  if(typeof st === "undefined" || !st || !Array.isArray(st.loops)) return null;
+  const lp = st.loops[id-1];
+  if(!lp) return null;
+  const ev = (typeof evalLoop === "function") ? evalLoop(lp) : {level:"NORMAL"};
+  const compsOn = (lp.comps||[]).reduce((a,b)=>a+b,0);
+  const dutyA = !!lp.pumpA;
+  const trip  = !!(ui && ui.forced && ui.forced.has && ui.forced.has(id));
+  const sevMap = {NORMAL:"is-normal", WARNING:"is-warn", ALARM:"is-critical", TRIP:"is-critical"};
+  const sev    = sevMap[ev.level] || "is-normal";
+  return {
+    title: "CH-" + String(id).padStart(2,"0"),
+    statusChip: {label: (trip ? "TRIP" : ev.level || "NORMAL"), state: trip ? "is-critical" : sev},
+    critical: [
+      {k:"Primary CHWS",  v:(st.header && st.header.chws != null) ? st.header.chws.toFixed(1) : "7.2",  unit:"°C"},
+      {k:"Primary CHWR",  v:(st.header && st.header.chwr != null) ? st.header.chwr.toFixed(1) : "14.8", unit:"°C"},
+      {k:"Primary ΔT",    v:(st.header && st.header.dt   != null) ? st.header.dt.toFixed(1)   : "7.6",  unit:"°C"},
+      {k:"Loop Flow",     v:(lp.flow != null ? lp.flow.toFixed(1) : "—"), unit:"L/s"},
+      {k:"Sec Supply T1", v:(lp.t1 != null ? lp.t1.toFixed(1) : "—"), unit:"°C"},
+      {k:"Sec Return T2", v:(lp.t2 != null ? lp.t2.toFixed(1) : "—"), unit:"°C"},
+      {k:"Compressors",   v:compsOn + " / 3"},
+      {k:"Duty Pump",     v:(dutyA ? "A (duty)" : "B (duty)")},
+      {k:"Pump Speed",    v:Math.round(dutyA ? lp.spdA : lp.spdB), unit:"%"},
+      {k:"DP Avg",        v:(ev.dpAvg != null ? ev.dpAvg.toFixed(0) : Math.round(((lp.dp1||0)+(lp.dp2||0))/2)), unit:"kPa"}
+    ],
+    thresholds: [
+      {k:"Primary CHWS", v:"Locked 7.2 °C (engine)"},
+      {k:"Loop ΔT",      v:"Warn outside 6.0–9.0 °C"},
+      {k:"Loop Flow",    v:"Disconnect < 1.5 L/s"}
+    ],
+    trend: "Loop flow, DP, secondary T1/T2, pump speed, compressor staging — last 15 min trail",
+    alarms: (ev.level && ev.level !== "NORMAL")
+      ? [{sev:(ev.level === "WARNING" ? "warn" : "critical"), msg:(ev.msg || ev.level) + " — CH-" + String(id).padStart(2,"0")}]
+      : [],
+    interlocks: [
+      (trip ? "Loop forced trip (manual fault test)" : "Auto / interlocks OK"),
+      (ui && ui.maint ? "Plant MAINT mode armed" : "Plant in SIM / run mode")
+    ],
+    maintenance: "Run-hours rotation governed by duty toggle every shift",
+    source: "Simulated · conv-engine.js Scenario A locked · click again for deep modal"
+  };
+}
+
+function updateLoopInspector(id){
+  if(!window.RZBMSShell || !window.RZBMSShell.inspector) return;
+  const host = document.getElementById("chillerInspector");
+  if(!host) return;
+  window.RZBMSShell.inspector.select(host, loopInspectorPayload(id));
+}
+
+function initBmsShellShim(){
+  if(!window.RZBMSShell) return;
+  /* Mode toolbar — buttons visible now, view-mode toggle wired via [data-bms-mode] on body.
+     Section show/hide rules ship in v1.23.2 once visual baseline confirmed. */
+  const toolbar = document.getElementById("chillerModeToolbar");
+  if(toolbar){
+    window.RZBMSShell.layerToggle(toolbar, [
+      {id:"overview",    label:"Overview",    pressed:true},
+      {id:"performance", label:"Performance"},
+      {id:"maintenance", label:"Maintenance"}
+    ], function(active){
+      document.body.setAttribute("data-bms-mode", active[active.length-1] || "overview");
+    });
+  }
+  /* Default inspector content — placeholder until first selection. */
+  const host = document.getElementById("chillerInspector");
+  if(host) window.RZBMSShell.inspector.clear(host);
+}
+
 function init(){
   syncToggles();
   renderAll();
   bind();
+  /* Wait for the deferred BMS Shell script to finish loading before init. */
+  if(window.RZBMSShell) initBmsShellShim();
+  else window.addEventListener("load", initBmsShellShim, {once:true});
   setInterval(()=>{ stepProcess(); renderAll(); }, 1200);
 }
 

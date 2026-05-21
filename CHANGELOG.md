@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v1.23.1 — 2026-05-22 (BMS Shell adoption #1 — `chiller-plant.html`, the doc's visual benchmark)
+
+First adoption ship of the BMS Shell foundation. Surgical and additive — the page's
+existing dark SCADA visual identity is preserved (doc-14 §4: "Keep this page as the
+visual benchmark, but simplify hierarchy"). Engine binding to `conv-engine.js` (CHWS 7.2 /
+CHWR 14.8 / ΔT 7.6 / 58 L/s) untouched; deep-detail modal flow untouched; 22/22 conv
+engine tests still pass.
+
+### Added (chiller-plant.html only)
+- **Shell library loaded** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
+  with `?v=1.23.1` cache-bust. NOT applied to `<body>` scope to preserve the page's
+  own typography/palette; only standalone component classes used.
+- **Right-side Selected-Equipment Inspector** (doc-14 §4 #4: "Put selected loop
+  detail in right inspector instead of making every loop equally detailed").
+  New `.rz-bms-inspector#chillerInspector` panel at the top of the existing
+  `<aside class="side">`. Populated by `RZBMSShell.inspector.select()` whenever the
+  user clicks a `[data-loop-id]` group in the P&ID SVG. Payload includes:
+  CH-NN title, status chip (NORMAL/WARN/ALARM/TRIP), critical values (CHWS/CHWR/
+  ΔT/Flow/Comps/Duty/Pump speed) from `st.loops[id-1]` + `ui.metrics[id-1]`,
+  thresholds, trend hint, alarm summary, interlocks, maintenance note, source
+  badge.
+- **View Mode toolbar** — Overview / Performance / Maintenance buttons (doc-14 §4
+  "Best Design Detail: three modes"). UI scaffold in this ship; toggle sets
+  `body[data-bms-mode]`. Section show/hide rules ship in v1.23.2 once the visual
+  baseline is confirmed.
+- **`updateLoopInspector(id)`** + **`loopInspectorPayload(id)`** helpers — read-only
+  on engine state. Hooked into the existing `pidSvg` click handler (which still
+  opens the deep-detail modal — inspector + modal coexist).
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` — byte-identical to HEAD. 22/22 tests pass.
+- Existing `.alarm-strip` with engine-bound CHW values (`asChw` shows 7.2/14.8/7.6/58).
+- Deep-detail modal flow (click loop → `openModal(id)` still fires alongside the
+  inspector update).
+- P&ID SVG content + ISA tag scheme (`CH-NN`, `CHWP-NNA/B`, `FT/DPS/TT` bubbles)
+  unchanged.
+- `body` element has NO `class="rz-bms-shell"` so the existing page typography +
+  background palette stays exactly as before.
+
+### Verified
+- 4 strict audit gates CLEAN.
+- 57/57 datahall + 22/22 conv engine tests pass.
+- Headless puppeteer: page loads zero errors, inspector renders on click with
+  engine-bound values, mode toolbar mounts 3 buttons with aria-pressed wiring,
+  CHWS still reads 7.2°C from `conv-engine.js`.
+
+---
+
 ## v1.23.0 — 2026-05-22 (BMS Shell foundation — shared dark-operations console library, no page migrations yet)
 
 Foundation ship for the conv-suite unification + DC AI cockpit pass (owner-approved direction per
