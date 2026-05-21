@@ -115,6 +115,9 @@
         .tier-badge{display:inline-flex;padding:3px 10px;border-radius:50px;font-size:0.62rem;font-weight:700;letter-spacing:0.5px}
         .tier-badge.pro{background:rgba(139,92,246,0.2);color:#a78bfa}
         .tier-badge.free{background:rgba(100,116,139,0.2);color:#94a3b8}
+        .tier-badge.demo{background:rgba(245,158,11,0.18);color:#fbbf24}
+        .tier-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9}
+        .tier-badge.root{background:rgba(239,68,68,0.18);color:#fca5a5}
         .status-dot{display:inline-flex;align-items:center;gap:6px}
         .status-dot::before{content:'';width:7px;height:7px;border-radius:50%}
         .status-dot.active::before{background:#34d399}
@@ -788,7 +791,7 @@
                 <div class="sidebar-avatar" id="sidebarAvatar">B</div>
                 <div class="sidebar-user-info">
                     <div class="sidebar-user-name" id="sidebarName">Admin</div>
-                    <div class="sidebar-user-role">Super Admin</div>
+                    <div class="sidebar-user-role" id="sidebarRole">Super Admin</div>
                 </div>
                 <button class="sidebar-logout" onclick="adminLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
             </div>
@@ -903,7 +906,7 @@
             <div class="card-title" style="margin:0"><i class="fas fa-user-cog" style="color:#a78bfa"></i> All Users</div>
             <div class="tbl-controls" style="margin:0">
                 <div class="tbl-search"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search email or name..." oninput="filterUsers()" aria-label="Search email or name..."></div>
-                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="pro">Pro</option><option value="free">Free</option></select>
+                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="pro">Pro</option><option value="free">Free</option><option value="demo">Demo</option><option value="educator">Educator</option><option value="root">Root</option></select>
                 <select class="tbl-select" id="statusFilter" onchange="filterUsers()" aria-label="Status Filter"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option></select>
                 <button class="btn btn-green" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
                 <button class="btn btn-purple" onclick="openCreateModal()" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(168,85,247,0.1));border:1px solid rgba(139,92,246,0.4);color:#a78bfa;"><i class="fas fa-user-plus"></i> Create Account</button>
@@ -950,7 +953,7 @@
 <!-- ══════════════════════════════════════ FEATURES ══════════════════════════════════════ -->
 <div class="section" id="sec-features">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Feature Flags</h1><p>Per-page 3-tier feature matrix — FREE | DEMO | PRO. Changes persist immediately.</p></div>
+        <div><h1>Feature Flags</h1><p>Per-page 4-tier feature matrix — FREE | DEMO | PRO | ROOT. Changes persist immediately.</p></div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0">
             <button class="btn btn-green btn-sm" onclick="exportFeaturesCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-purple btn-sm" onclick="openReport('features')"><i class="fas fa-file-alt"></i> Report</button>
@@ -970,7 +973,10 @@
                     <div style="display:flex;gap:0.5rem;align-items:center">
                         <select id="featurePresetSelect" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;padding:4px 8px;font-family:inherit;cursor:pointer;outline:none" onchange="applyFeaturePreset(this.value)" aria-label="Apply feature preset">
                             <option value="">Apply preset...</option>
-                            <option value="all_free">All tiers enabled</option>
+                            <option value="all_free">All tiers on</option>
+                            <option value="all_demo+">Demo + Pro + Root</option>
+                            <option value="all_pro+">Pro + Root</option>
+                            <option value="all_root_only">Root only</option>
                             <option value="pro_only">Pro only (free + demo off)</option>
                             <option value="demo_up">Demo + Pro enabled</option>
                             <option value="all_off">All tiers off</option>
@@ -986,11 +992,12 @@
                                 <th>FREE</th>
                                 <th>DEMO</th>
                                 <th>PRO</th>
+                                <th>ROOT</th>
                                 <th>Default</th>
                             </tr>
                         </thead>
                         <tbody id="featureMatrixBody">
-                            <tr><td colspan="5" style="text-align:center;color:#475569;padding:2rem;font-size:0.75rem">Loading feature flags...</td></tr>
+                            <tr><td colspan="6" style="text-align:center;color:#475569;padding:2rem;font-size:0.75rem">Loading feature flags...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1985,6 +1992,26 @@
 const ADMIN_EMAILS = ['bagus@resistancezero.com','admin@resistancezero.com'];
 let adminEmail = '';
 
+function _sidebarRoleLabel(role,tier){
+    var r=(role||'').toLowerCase();
+    if(r==='root') return 'Super Admin';
+    if(r==='educator') return 'Educator';
+    if(r==='pro') return 'Pro Member';
+    if(r==='demo') return 'Demo Account';
+    if(r==='free') return 'Free Tier';
+    /* Fallback by tier when role missing */
+    var t=(tier||'').toLowerCase();
+    if(t==='root') return 'Super Admin';
+    if(t==='pro') return 'Pro Member';
+    if(t==='demo') return 'Demo Account';
+    if(t==='free') return 'Free Tier';
+    return 'Super Admin';
+}
+function _applySidebarRole(role,tier){
+    var el=document.getElementById('sidebarRole');
+    if(el) el.textContent=_sidebarRoleLabel(role,tier);
+}
+
 function checkAccess(){
     const s = localStorage.getItem('rz_premium_session');
     if(!s){showLogin();return false}
@@ -1996,6 +2023,7 @@ function checkAccess(){
         adminEmail=d.email;
         document.getElementById('sidebarAvatar').textContent=d.email.charAt(0).toUpperCase();
         document.getElementById('sidebarName').textContent=d.email.split('@')[0];
+        _applySidebarRole(d.role,d.tier);
         return true;
     }catch(e){showLogin();return false}
 }
@@ -2071,6 +2099,7 @@ function handleAdminLogin(e){
     adminEmail=email;
     document.getElementById('sidebarAvatar').textContent=email.charAt(0).toUpperCase();
     document.getElementById('sidebarName').textContent=email.split('@')[0];
+    _applySidebarRole('root','pro');
 
     // Init dashboard
     allUsers=generateUsers();
@@ -2308,7 +2337,15 @@ function filterUsers(){
     const sf=document.getElementById('statusFilter').value;
     filteredUsers=allUsers.filter(u=>{
         if(q&&!u.email.toLowerCase().includes(q)&&!u.name.toLowerCase().includes(q))return false;
-        if(tf!=='all'&&u.tier!==tf)return false;
+        if(tf!=='all'){
+            if(tf==='educator'){
+                if(!(u.role && u.role.toLowerCase()==='educator'))return false;
+            } else if(tf==='root'){
+                if(!(u.role && (u.role.toLowerCase()==='owner'||u.role.toLowerCase()==='admin')))return false;
+            } else if(u.tier!==tf){
+                return false;
+            }
+        }
         if(sf!=='all'&&u.status!==sf)return false;
         return true;
     });
@@ -2320,15 +2357,19 @@ function goPage(p){currentPage=p;renderTable()}
 
 function renderTable(){
     const s=(currentPage-1)*PAGE_SIZE,e=s+PAGE_SIZE,pg=filteredUsers.slice(s,e);
-    document.getElementById('userTbody').innerHTML=pg.map(u=>`<tr>
+    document.getElementById('userTbody').innerHTML=pg.map(u=>{
+        var badgeCls = (u.role && u.role.toLowerCase()==='educator') ? 'educator' : u.tier;
+        var badgeTxt = (u.role && u.role.toLowerCase()==='educator') ? 'EDUCATOR' : (u.tier||'').toUpperCase();
+        return `<tr>
         <td style="font-weight:500">${u.name}</td>
         <td><span style="font-size:0.75rem">${u.email}</span></td>
-        <td><span class="tier-badge ${u.tier}">${u.tier.toUpperCase()}</span></td>
+        <td><span class="tier-badge ${badgeCls}">${badgeTxt}</span></td>
         <td><span class="status-dot ${u.status}">${u.status.charAt(0).toUpperCase()+u.status.slice(1)}</span></td>
         <td>${u.registered}</td><td>${u.lastLogin}</td><td>${u.usage}</td>
         <td>${u.lastPayment||'<span style="color:#475569">—</span>'}</td>
         <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-ghost btn-sm" onclick="changeTier('${u.id}')"><i class="fas fa-exchange-alt"></i></button></td>
-    </tr>`).join('');
+    </tr>`;
+    }).join('');
     const tot=filteredUsers.length,tp=Math.ceil(tot/PAGE_SIZE);
     document.getElementById('pgInfo').textContent=`Showing ${s+1}-${Math.min(e,tot)} of ${tot}`;
     let btns='';for(let p=1;p<=tp;p++)btns+=`<button class="pg-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
@@ -2387,10 +2428,32 @@ function exportRevenueCSV(){
 }
 
 function exportFeaturesCSV(){
-    var csv='Feature,Label,Description,Free Tier,Pro Tier\n';
-    Object.keys(featureFlags).forEach(k=>{
+    /* 4-tier per-page matrix export with overrides resolved */
+    var schema = (typeof _getFeatureSchema === 'function') ? _getFeatureSchema() : (window.RZ_FEATURE_FLAGS || {});
+    var overrides = {};
+    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
+    var csv='Page,Feature,Label,Free,Demo,Pro,Root,Overridden\n';
+    Object.keys(schema).forEach(function(pageKey){
+        var spec=schema[pageKey]; if(!spec) return;
+        var po=overrides[pageKey]||{};
+        Object.keys(spec).forEach(function(fk){
+            var defs=spec[fk]; var ov=po[fk]||{};
+            var defRoot=(typeof defs.root==='boolean')?defs.root:true;
+            var free=(typeof ov.free==='boolean')?ov.free:!!defs.free;
+            var demo=(typeof ov.demo==='boolean')?ov.demo:!!defs.demo;
+            var pro =(typeof ov.pro ==='boolean')?ov.pro :!!defs.pro;
+            var root=(typeof ov.root==='boolean')?ov.root:defRoot;
+            var overridden=(typeof ov.free==='boolean'||typeof ov.demo==='boolean'||typeof ov.pro==='boolean'||typeof ov.root==='boolean');
+            var label=(defs.label||fk).replace(/"/g,'""');
+            csv+='"'+pageKey+'","'+fk+'","'+label+'",'+free+','+demo+','+pro+','+root+','+overridden+'\n';
+        });
+    });
+    /* Legacy flat-flag export — keep last rows for backward compat */
+    csv+='\nLegacy Flat Flags\n';
+    csv+='Feature,Label,Description,Free Tier,Pro Tier\n';
+    Object.keys(featureFlags).forEach(function(k){
         var f=featureFlags[k];
-        csv+='"'+k+'","'+f.label+'","'+f.desc+'",'+f.free+','+f.pro+'\n';
+        csv+='"'+k+'","'+(f.label||'')+'","'+(f.desc||'')+'",'+!!f.free+','+!!f.pro+'\n';
     });
     downloadCSV(csv,'rz_features_'+fmtDate(new Date())+'.csv');
 }
@@ -2937,21 +3000,25 @@ window.selectFeaturePage = function(pageKey) {
         var defs = spec[fk];
         var ov = pageOverrides[fk] || {};
         function tierToggle(tier) {
-            var current = (typeof ov[tier] === 'boolean') ? ov[tier] : defs[tier];
+            /* ROOT defaults to true unless schema explicitly says otherwise — keeps Super Admin always-on semantics */
+            var schemaVal = (tier === 'root' && typeof defs.root !== 'boolean') ? true : defs[tier];
+            var current = (typeof ov[tier] === 'boolean') ? ov[tier] : schemaVal;
             return '<label class="toggle-switch"><input type="checkbox" ' + (current ? 'checked' : '') +
                    ' onchange="toggleFeatureFlag(\'' + pageKey + '\',\'' + fk + '\',\'' + tier + '\',this.checked)"><span class="toggle-slider"><\/span><\/label>';
         }
-        var hasOverride = (typeof ov.free === 'boolean' || typeof ov.demo === 'boolean' || typeof ov.pro === 'boolean');
+        var hasOverride = (typeof ov.free === 'boolean' || typeof ov.demo === 'boolean' || typeof ov.pro === 'boolean' || typeof ov.root === 'boolean');
         var label = (defs.label || fk) + (hasOverride ? ' <span style="color:#fbbf24;font-size:0.6rem">*<\/span>' : '');
+        var defRoot = (typeof defs.root === 'boolean') ? defs.root : true;
         return '<tr>' +
             '<td>' + label + '<\/td>' +
             '<td class="matrix-td-center">' + tierToggle('free') + '<\/td>' +
             '<td class="matrix-td-center">' + tierToggle('demo') + '<\/td>' +
             '<td class="matrix-td-center">' + tierToggle('pro') + '<\/td>' +
-            '<td><span class="default-cell">F:' + (defs.free ? 'Y' : 'N') + ' D:' + (defs.demo ? 'Y' : 'N') + ' P:' + (defs.pro ? 'Y' : 'N') + '<\/span><\/td>' +
+            '<td class="matrix-td-center">' + tierToggle('root') + '<\/td>' +
+            '<td><span class="default-cell">F:' + (defs.free ? 'Y' : 'N') + ' D:' + (defs.demo ? 'Y' : 'N') + ' P:' + (defs.pro ? 'Y' : 'N') + ' R:' + (defRoot ? 'Y' : 'N') + '<\/span><\/td>' +
             '<\/tr>';
     }).join('');
-    document.getElementById('featureMatrixBody').innerHTML = rows || '<tr><td colspan="5" style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">No features defined for this page.<\/td><\/tr>';
+    document.getElementById('featureMatrixBody').innerHTML = rows || '<tr><td colspan="6" style="text-align:center;color:#475569;padding:1.5rem;font-size:0.75rem">No features defined for this page.<\/td><\/tr>';
 
     // Reset preset select
     var sel = document.getElementById('featurePresetSelect');
@@ -2990,10 +3057,13 @@ window.applyFeaturePreset = function(preset) {
     overrides[pageKey] = overrides[pageKey] || {};
     Object.keys(spec).forEach(function(fk) {
         overrides[pageKey][fk] = overrides[pageKey][fk] || {};
-        if (preset === 'all_free')   { overrides[pageKey][fk].free = true;  overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true; }
-        if (preset === 'pro_only')   { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = true; }
-        if (preset === 'demo_up')    { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true; }
-        if (preset === 'all_off')    { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = false; }
+        if (preset === 'all_free')      { overrides[pageKey][fk].free = true;  overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
+        if (preset === 'all_demo+')     { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
+        if (preset === 'all_pro+')      { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
+        if (preset === 'all_root_only') { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = false; overrides[pageKey][fk].root = true;  }
+        if (preset === 'pro_only')      { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
+        if (preset === 'demo_up')       { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
+        if (preset === 'all_off')       { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = false; overrides[pageKey][fk].root = false; }
     });
     localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
     selectFeaturePage(pageKey);
