@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v1.29.0 — 2026-05-22 (R-015 Phase 4 admin UI + login-modal stale-cache rescue + sw network-first for critical assets)
+
+### Phase 4 admin UI shipping (flag-gated)
+
+R-015 Phase 4 — `rz-ops-p7x3k9m.html` gains full admin UI for the new
+auth backend, all behind `localStorage.rz_auth_v2 === '1'`:
+
+- **User Management** extended: Add User modal, row actions
+  Edit/Reset-Password/Disable/Delete, status badges (active/disabled).
+- **NEW Tier Manager** sidebar section: per-tier cards (label, priority,
+  color, isSystem lock), per-tier feature-defaults editor consulting
+  `/admin/pages`, Create / Edit / Delete tier flows.
+- **Audit Log viewer** extended with Server (worker-backed) / Client
+  (legacy localStorage) source toggle + actor email filter.
+- All admin requests include `X-CSRF-Token` from `__rzAuth.getCsrf()`.
+- New CSS prefix `.rz-admin-v2-*` to isolate from existing UI.
+- E2E Puppeteer probe `tools/probe-rz-ops-admin.mjs` covers full
+  Add/Edit/Delete/Tier-CRUD/Audit flow (14/14 PASS, including 403 path
+  for non-root sessions).
+
+### Login-modal stale-cache rescue (fixes user-reported "Invalid email
+or password" after deploying educator account)
+
+User reports of "still can't login" after v1.26+ deploys traced to
+service-worker caching of pre-educator `auth.js`. The new SW (v1.28.0+)
+correctly invalidates old caches on activation, but EXISTING visitors
+remained on the previous SW until next install/activate cycle.
+
+- **`sw.js` network-first for critical auth files** —
+  `/auth.js`, `/auth.min.js`, `/js/rz-version.js`, `/js/rz-feature-flags.js`
+  always fetched from network first when online (cache fallback only on
+  offline). Prevents stale-cache traps even when the visitor's SW is one
+  version behind.
+- **Login-modal recovery link** — "Try fresh reload" inline link on
+  "Invalid email or password" now unregisters service workers, clears
+  caches, wipes auth localStorage, and reloads. Applied to both
+  AUTH_V2 and legacy catch branches so it's reachable on either auth path.
+
+### Verification
+
+- `worker-auth/`: tests still 94/94 PASS.
+- `tools/probe-rz-ops-admin.mjs` 14/14 PASS.
+- audit-js-syntax / audit-script-tags / audit-mobile-responsive
+  / audit-version-stamp — all `--strict` CLEAN.
+
+---
+
 ## v1.28.0 — 2026-05-22 (R-015 Phase 3 — client auth.js refactor, flag-gated rz_auth_v2)
 
 `auth.js` now talks to `rz-auth-gateway` when `localStorage.rz_auth_v2 === '1'`.

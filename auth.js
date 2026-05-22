@@ -735,7 +735,9 @@
                         /* Network / parse failure — Worker unreachable. */
                         msg = 'Auth service unavailable — please retry.';
                     }
-                    errorEl.textContent = msg;
+                    /* v1.29.0 — append stale-cache rescue link */
+                    errorEl.innerHTML = msg + ' ' +
+                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#a78bfa;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
                     errorEl.classList.add('show');
                 });
                 return;
@@ -743,7 +745,12 @@
 
             var user = findUser(email, password);
             if (!user) {
-                if (errorEl) { errorEl.textContent = 'Invalid email or password.'; errorEl.classList.add('show'); }
+                /* v1.29.0 — same stale-cache rescue link on legacy path */
+                if (errorEl) {
+                    errorEl.innerHTML = 'Invalid email or password. ' +
+                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#a78bfa;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
+                    errorEl.classList.add('show');
+                }
                 return;
             }
 
