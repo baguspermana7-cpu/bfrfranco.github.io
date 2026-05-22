@@ -165,6 +165,12 @@ CSS `body[data-bms-mode="X"] [data-bms-mode-hide~="X"]{display:none}`
 pattern. Operator Controls hidden in Overview; Alarm History visible
 only in Maintenance.
 
+**v1.25.3 (2026-05-22)** — datahallAI mobile order fix per owner
+report: `.mn { order:1 }` + `.side { order:2 }` inside
+`@media(max-width:1024px)` so on mobile the main SCADA content
+(alarm strip + KPI strip + tabs + facility image) leads, with the
+left telemetry spine dropping below. Desktop layout unchanged.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

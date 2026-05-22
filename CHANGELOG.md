@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.25.3 — 2026-05-22 (datahallAI mobile order fix — main SCADA leads, sidebar telemetry spine drops below)
+
+Owner-reported regression (image attached, mobile view of
+`/datahallAI.html`): the left telemetry sidebar (Safety + Alarms +
+other sections) was rendering above the SCADA tabs / KPI strip /
+facility image on mobile because `.wrap { flex-direction: column }`
+stacks DOM order, and the sidebar comes first in DOM.
+
+### Changed (datahallAI.html only — one CSS block)
+- `@media (max-width: 1024px)` gets two new rules:
+  - `.mn { order: 1 }` — main SCADA content leads.
+  - `.side { order: 2 }` — sidebar drops below.
+- `.side` max-height raised 200 → 240 px + `overflow-y: auto` so the
+  longer sidebar stays scrollable when stacked.
+
+### Preserved (verified untouched)
+- Desktop layout (≥1025 px) unchanged.
+- `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical.
+  57/57 datahall + 22/22 conv tests pass.
+- `#p-dash` + `updateDashKPI()` + `dcCallouts` byte-identical.
+- All 9 tab panels + alarm strip + BoD drawer.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.25.3 entry added.
+
+---
+
 ## v1.25.2 — 2026-05-22 (chiller-plant mode-rules — finishes v1.23.1 deferred work per doc-14 §4)
 
 Fourteenth ship. Completes the v1.23.1 deferred scaffold: the

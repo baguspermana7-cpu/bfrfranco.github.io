@@ -168,7 +168,10 @@ svg text{user-select:none}
 /* Responsive - Comprehensive Mobile Support */
 @media(max-width:1024px){
     .wrap{flex-direction:column;height:auto}
-    .side{width:100%;min-width:100%;max-height:200px;font-size:9px}
+    /* v1.25.3 — owner request: main SCADA/BMS content must lead on mobile;
+       sidebar telemetry spine drops BELOW so the operator sees alarms+tabs+image first. */
+    .mn{order:1}
+    .side{order:2;width:100%;min-width:100%;max-height:240px;font-size:9px;overflow-y:auto}
     .sb h4{font-size:9px}
     .rw{font-size:8px}.rw .v{font-size:8px}
     .gr{grid-template-columns:repeat(2,1fr)}
