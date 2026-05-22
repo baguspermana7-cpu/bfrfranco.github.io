@@ -11,6 +11,59 @@ release sections rather than semver.
 
 ---
 
+## v1.28.0 — 2026-05-22 (R-015 Phase 3 — client auth.js refactor, flag-gated rz_auth_v2)
+
+`auth.js` now talks to `rz-auth-gateway` when `localStorage.rz_auth_v2 === '1'`.
+Flag default OFF — when off, behavior byte-identical to the hardcoded
+`VALID_USERS` mock (no regression for any existing user).
+
+### What landed (all behind `AUTH_V2` flag)
+
+- **`auth.js`** (+197 lines) — additive:
+  - `AUTH_V2` + `AUTH_GW` config block (reads `localStorage.rz_auth_v2` + `rz_auth_gw`)
+  - `gw(path, opts)` — fetch helper with credentials:include + CSRF header
+  - `loginV2(email, password)` — POST /auth/login (cookie set by Worker)
+  - `logoutV2()` — POST /auth/logout + clear local mirror
+  - `hydrateSessionFromWorker()` — GET /auth/me on page load
+  - Login modal + logout button + initial-load hydrate all guard `if (AUTH_V2)`
+  - `__rzAuth.getCsrf()` public helper (Phase 4 admin UI consumes)
+- **`auth.min.js`** rebuilt with terser (`--reserve loginV2,logoutV2,hydrateSessionFromWorker,gw`)
+- **`worker-auth/test/client-auth-shape.test.mjs`** — 5 new tests pinning the Worker contract from the client's perspective (cookie shape, expiresAt seconds vs ms, CSRF lifecycle)
+- **`worker-auth/SETUP.md` §7** — per-browser activation guide
+
+### Activation (per-browser opt-in)
+
+After Worker is deployed:
+```js
+localStorage.setItem('rz_auth_v2', '1');
+localStorage.setItem('rz_auth_gw', 'https://<worker-url>.workers.dev');
+location.reload();
+```
+
+When the worker is stable across user testing, a future release will flip
+`AUTH_V2` default to `true` in `auth.js`.
+
+### Safety
+
+- Worker unreachable when flag ON → explicit "Auth service unavailable —
+  retry" UX rather than silent fallback to mock (per plan §6 threat model;
+  silent fallback would mask real outages and let admin actions vanish).
+- Hardcoded `VALID_USERS` array UNCHANGED — flag-off fallback still works.
+  Removal scheduled for a future MAJOR after ≥1 stable release of v2.
+
+### NOT in this commit (Phase 4+)
+
+- rz-ops Tier Manager UI + user CRUD UI — Phase 4
+- E2E probe + reviews + flag-default flip + ship — Phase 5
+
+### Tests
+
+`worker-auth/`: **94/94 pass** (was 89, +5 client-shape).
+`node --check` on auth.js + auth.min.js OK.
+`audit-js-syntax --strict` + `audit-script-tags --strict` CLEAN.
+
+---
+
 ## v1.27.2 — 2026-05-22 (R-015 Phase 2 — admin CRUD endpoints on rz-auth-gateway)
 
 Infrastructure-only ship (no user-visible behavior change on the static
