@@ -2,7 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v1.26.0'; // version-aware: invalidates on every site bump
+const CACHE_NAME = 'rz-cache-v1.27.0'; // version-aware: invalidates on every site bump
 
 // Key pages and assets to pre-cache on install
 const PRE_CACHE_URLS = [

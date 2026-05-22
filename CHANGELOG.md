@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v1.27.0 — 2026-05-22 (Finance Terminal Phase 1 — Cloudflare Worker data gateway shipped behind rz_ft_v2 flag)
+
+R-001..R-005 + B-002..B-012 — Finance Terminal (embedded as iframe in
+`rz-ops-p7x3k9m.html`) gains a Cloudflare Worker (`rz-finance-gateway`)
+that fixes every broken tab. **Feature-flagged: OFF by default. No
+behavior change for any user until `localStorage.rz_ft_v2 === '1'`
+is set OR the flag default is flipped in a future release.**
+
+### What landed (all under flag)
+
+- **`worker/`** — new Cloudflare Worker scaffold + endpoints:
+  - `/health`, `/fx` (Frankfurter→exchangerate.host→open.er-api),
+  - `/q` (Yahoo→Stooq→Finnhub quotes; Stooq `Prev`-field for real chg%),
+  - `/candles` (Yahoo→Stooq daily; TradingView lightweight-charts ready),
+  - `/news` (GDELT→Yahoo RSS→Finnhub),
+  - `/sectors` `/economy` `/futures` (ETF-proxy aggregations),
+  - `/screener` (curated 124-entry universe + live-quote enrichment),
+  - `/crypto` (CoinGecko + Market Dominance),
+  - `/fx-history` (Frankfurter timeseries for FX chart line),
+  - `scheduled()` cron (every 2 min) pre-warms hot caches → sub-5s loads.
+  - KV cache + stale-on-error on every endpoint. 38/38 unit tests.
+- **`Apps/finance-terminal/index.html`** — additive: `CFG.GW` + `CFG.V2`
+  flag + `gw()` helper + V2 branches in every tab loader that route data
+  through the gateway. Flag-OFF path BYTE-IDENTICAL to before.
+  - Candlestick + volume + SMA20 charts via lightweight-charts CDN.
+  - Sortable + filterable tables (Name dbl-click toggles direction).
+  - Market Dominance cards populated.
+  - Screener active-state + results render fixed.
+- **`tools/probe-finance-terminal.mjs`** — Puppeteer E2E (9 tabs, 0
+  pageerrors) verified locally against `wrangler dev` + `python3 -m http.server`.
+
+### Activation (NOT done in this commit; documented for follow-up)
+
+The flag default remains OFF until:
+1. Owner provisions Cloudflare Worker (`worker/SETUP.md`): `wrangler login`
+   → `wrangler kv namespace create FT_KV` → `wrangler secret put FINNHUB_KEY`
+   → `wrangler deploy`.
+2. Owner flips `CFG.V2` default to true in `Apps/finance-terminal/index.html`
+   and bumps to v1.28.x.
+3. Users with `localStorage.rz_ft_v2 = '1'` can activate per-browser now.
+
+Until that ships, this commit is a no-op for end users.
+
+### Threat model
+
+API keys (Finnhub) live in Worker secrets, never in the static client.
+KV reads are stale-on-error so a Cloudflare/upstream outage degrades to
+last-good cached data rather than a broken tab.
+
+---
+
 ## v1.26.0 — 2026-05-22 (Educator role + 4-tier matrix; DC AI/DC Conv/DCMOC + 8 LTC labs converted from hard root-only to matrix-gated)
 
 R-014 — introduces a new **educator** role that grants Pro-tier feature access
