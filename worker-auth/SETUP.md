@@ -47,16 +47,87 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 The secret is stored **only** in Cloudflare's secret store. It is never
 committed to the repo and never returned to the browser.
 
-## 4. Set the bootstrap root emails (Phase 1 prerequisite)
+## 4. Set the bootstrap seed token (Phase 1 prerequisite)
 
-Used **once** by the Phase 1 `/admin/__seed` endpoint to mint the first
-root user(s). After seeding, the endpoint self-disables (it refuses to run
-when KV already contains user records — see plan §6).
+Used **once** by the Phase 1 `POST /admin/__seed` endpoint as a pre-shared
+secret on the query string. After a successful seed run, the endpoint
+self-disables — it refuses to run when KV already contains the
+`config/seeded` marker (see plan §6).
 
 ```bash
-npx wrangler secret put BOOTSTRAP_ROOT_EMAILS
-# paste: bagus@resistancezero.com,admin@resistancezero.com
+openssl rand -base64 32   # copy the output
+npx wrangler secret put BOOTSTRAP_SEED_TOKEN
+# paste the value when prompted
 ```
+
+This is intentionally a different secret from `ADMIN_SESSION_SECRET`:
+mixing the session HMAC pepper with a single-use bootstrap token would
+require you to choose between rotating the pepper (which kills all
+sessions) and re-running the seed (which the gateway no longer permits).
+Separate concerns, separate secrets.
+
+## 4b. Bootstrap seed migration (one-time)
+
+This call mints the first users (admin/root, demo, educator, pro, etc.)
+and the system tiers (free / demo / educator / pro / root). It is the
+ONLY time the server accepts user records over the wire.
+
+After it succeeds, the endpoint writes `config/seeded` to KV and refuses
+all further calls — even with a valid token. Future user creation goes
+through the admin CRUD endpoints (Phase 2).
+
+### Body shape
+
+```json
+{
+  "users": [
+    { "email": "bagus@resistancezero.com", "password": "...",      "tier": "root",     "role": "root" },
+    { "email": "demo@resistancezero.com",  "password": "demo2026", "tier": "demo",     "role": "user" },
+    { "email": "educator@resistancezero.com", "password": "...",   "tier": "educator", "role": "user" },
+    { "email": "pro@resistancezero.com",   "password": "...",      "tier": "pro",      "role": "user" }
+  ],
+  "tiers": [
+    { "name": "free",     "label": "Free",     "priority": 10, "color": "#94a3b8", "defaultFeatures": {} },
+    { "name": "demo",     "label": "Demo",     "priority": 20, "color": "#a78bfa", "defaultFeatures": {} },
+    { "name": "educator", "label": "Educator", "priority": 25, "color": "#10b981", "defaultFeatures": {} },
+    { "name": "pro",      "label": "Pro",      "priority": 30, "color": "#8b5cf6", "defaultFeatures": {} },
+    { "name": "root",     "label": "Root",     "priority": 99, "color": "#ef4444", "defaultFeatures": {} }
+  ]
+}
+```
+
+### Curl
+
+```bash
+TOKEN=$(grep BOOTSTRAP_SEED_TOKEN .dev.vars | cut -d= -f2-)   # local dev
+# (in production, paste the value you just `wrangler secret put`-ed)
+curl -i -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://resistancezero.com' \
+  --data @seed-body.json \
+  "https://rz-auth-gateway.<account>.workers.dev/admin/__seed?token=$TOKEN"
+```
+
+Expected response (200):
+
+```json
+{ "ok": true, "data": { "seeded": { "users": 4, "tiers": 5 } }, "error": null, "ts": ... }
+```
+
+Subsequent calls return 403. The seed audit-log entry **never** records
+the plaintext passwords — only the count of records written.
+
+### Local development
+
+`worker-auth/.dev.vars` (NEVER committed — listed in `.gitignore`):
+
+```
+ADMIN_SESSION_SECRET=dev-secret-for-local-only
+BOOTSTRAP_SEED_TOKEN=dev-token-for-local-only
+```
+
+Then `npx wrangler dev --port 8788` and the curl above against
+`http://127.0.0.1:8788/admin/__seed?token=dev-token-for-local-only`.
 
 ## 5. (Phase 1, later) Deploy
 
