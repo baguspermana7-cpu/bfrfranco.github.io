@@ -384,6 +384,15 @@ window._rzFeatures = (function () {
   function has(pageKey, featureKey) {
     var tier = getTier();
 
+    /* Root inviolable invariant for page-level access:
+       page-access for root is non-overridable. Admin overrides may
+       still narrow root for individual feature flags (e.g. an admin
+       might disable a beta feature for root testing), but they MUST
+       NOT lock root out of a page entirely. This prevents accidental
+       lockout from the admin panel writing root:false into the
+       page-access override. */
+    if (tier === 'root' && featureKey === 'page-access') return true;
+
     /* Check admin overrides first */
     try {
       var overrides = JSON.parse(

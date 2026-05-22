@@ -48,9 +48,18 @@
   var firebaseReady = false;
   var firebaseAuth = null;
   var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
+  var DEMO_EMAILS = ['demo@resistancezero.com'];
+  /* Fallback educator allowlist. The localStorage merge with
+     rz_admin_educators lives in auth.js — firebase-auth.js only needs
+     the seed list so the role label resolves correctly when this file
+     is the sole auth source. */
+  var EDUCATOR_SEED_EMAILS = ['educator@resistancezero.com'];
   function detectRole(email) {
     var e = String(email || '').toLowerCase().trim();
-    return ROOT_EMAILS.indexOf(e) !== -1 ? 'root' : 'pro';
+    if (ROOT_EMAILS.indexOf(e) !== -1) return 'root';
+    if (DEMO_EMAILS.indexOf(e) !== -1) return 'demo';
+    if (EDUCATOR_SEED_EMAILS.indexOf(e) !== -1) return 'educator';
+    return 'pro';
   }
 
   /* ─── Demo fallback (when Firebase not configured) ─── */

@@ -373,8 +373,17 @@
             if (emailEl) emailEl.textContent = email.split('@')[0];
             if (ddEmail) ddEmail.textContent = email;
             if (ddBadge) {
-                ddBadge.textContent = tier.toUpperCase();
-                ddBadge.className = 'rz-dd-badge ' + tier;
+                /* Educator role (tier=pro, role=educator) gets a distinct cyan
+                   EDUCATOR badge to match the rz-ops admin UI palette. Other
+                   roles fall back to the legacy tier-driven label. */
+                var role = (s.role || (_entitlements ? _entitlements.role : '')) || '';
+                if (role === 'educator') {
+                    ddBadge.textContent = 'EDUCATOR';
+                    ddBadge.className = 'rz-dd-badge educator';
+                } else {
+                    ddBadge.textContent = tier.toUpperCase();
+                    ddBadge.className = 'rz-dd-badge ' + tier;
+                }
             }
             // Show upgrade button for free users
             if (ddUpgrade) {

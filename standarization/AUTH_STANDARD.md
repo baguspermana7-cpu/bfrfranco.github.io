@@ -55,7 +55,8 @@
 |-------|----------|------|------|--------|
 | `bagus@resistancezero.com` | `RZ@Premium2026!` | pro | root | Hardcoded in auth.js + all pages |
 | `admin@resistancezero.com` | `RZ@Premium2026!` | pro | root | Hardcoded in auth.js + all pages |
-| `demo@resistancezero.com` | `demo2026` | pro | pro | Hardcoded in auth.js + all pages |
+| `educator@resistancezero.com` | `educator2026` | pro | educator | Hardcoded in auth.js + `rz_admin_educators` (admin-managed allowlist) |
+| `demo@resistancezero.com` | `demo2026` | demo | demo | Hardcoded in auth.js + all pages |
 | *(manual accounts)* | *(varies)* | *(varies)* | pro | `rz_manual_accounts` localStorage |
 
 **Root** = full pro access + rz-ops admin console. **Pro** = calculator pro features only (no rz-ops access).

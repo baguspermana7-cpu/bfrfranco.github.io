@@ -55,8 +55,11 @@
     }
     var EDUCATOR_EMAILS = loadEducatorEmails();
     if (typeof window !== 'undefined' && window.addEventListener) {
+        /* Cross-tab sync: only rebuild when the educator allowlist key
+           specifically changes. A full localStorage.clear() (e.key === null)
+           is handled by page reload elsewhere — no need to rebuild here. */
         window.addEventListener('storage', function (e) {
-            if (!e || e.key === 'rz_admin_educators' || e.key === null) {
+            if (e && e.key === 'rz_admin_educators') {
                 EDUCATOR_EMAILS = loadEducatorEmails();
             }
         });
@@ -171,7 +174,7 @@
 
     /* ───────── Valid Users ───────── */
     var VALID_USERS = [
-        { email: 'demo@resistancezero.com',     password: 'demo2026',        tier: 'pro',      role: 'pro' },
+        { email: 'demo@resistancezero.com',     password: 'demo2026',        tier: 'demo',     role: 'demo' },
         { email: 'educator@resistancezero.com', password: 'educator2026',    tier: 'pro',      role: 'educator' },
         { email: 'bagus@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' },
         { email: 'admin@resistancezero.com',    password: 'RZ@Premium2026!', tier: 'pro',      role: 'root' }
@@ -636,7 +639,10 @@
          *   no session or expired → 'free'
          *
          * @param {object} [session] — optional override; defaults to getSession()
-         * @returns {'free'|'demo'|'pro'}
+         * @returns {'free'|'demo'|'pro'} canonical tier from email + session.
+         *   Note: root accounts return 'pro' from this helper (root detection is
+         *   handled separately via getRoleFromSession). The page-side resolver
+         *   in rz-feature-flags.js returns 'root' when the role IS root.
          */
         getTier: function (session) {
             session = session || getSession();

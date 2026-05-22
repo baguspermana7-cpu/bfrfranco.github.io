@@ -2358,8 +2358,20 @@ function goPage(p){currentPage=p;renderTable()}
 function renderTable(){
     const s=(currentPage-1)*PAGE_SIZE,e=s+PAGE_SIZE,pg=filteredUsers.slice(s,e);
     document.getElementById('userTbody').innerHTML=pg.map(u=>{
-        var badgeCls = (u.role && u.role.toLowerCase()==='educator') ? 'educator' : u.tier;
-        var badgeTxt = (u.role && u.role.toLowerCase()==='educator') ? 'EDUCATOR' : (u.tier||'').toUpperCase();
+        var roleLc = (u.role||'').toLowerCase();
+        var badgeCls = (roleLc==='educator') ? 'educator' : u.tier;
+        var badgeTxt = (roleLc==='educator') ? 'EDUCATOR' : (u.tier||'').toUpperCase();
+        /* Educator promote/demote action — hidden for root rows.
+           Promote: any non-educator/non-root → educator.
+           Demote: educator → demo. */
+        var eduBtn = '';
+        if (roleLc === 'root') {
+            eduBtn = '';
+        } else if (roleLc === 'educator') {
+            eduBtn = ' <button class="btn btn-ghost btn-sm" onclick="demoteEducator(\''+u.id+'\')" title="Demote to Demo"><i class="fas fa-graduation-cap" style="color:#f87171"></i></button>';
+        } else {
+            eduBtn = ' <button class="btn btn-ghost btn-sm" onclick="promoteEducator(\''+u.id+'\')" title="Promote to Educator"><i class="fas fa-graduation-cap" style="color:#67e8f9"></i></button>';
+        }
         return `<tr>
         <td style="font-weight:500">${u.name}</td>
         <td><span style="font-size:0.75rem">${u.email}</span></td>
@@ -2367,7 +2379,7 @@ function renderTable(){
         <td><span class="status-dot ${u.status}">${u.status.charAt(0).toUpperCase()+u.status.slice(1)}</span></td>
         <td>${u.registered}</td><td>${u.lastLogin}</td><td>${u.usage}</td>
         <td>${u.lastPayment||'<span style="color:#475569">—</span>'}</td>
-        <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-ghost btn-sm" onclick="changeTier('${u.id}')"><i class="fas fa-exchange-alt"></i></button></td>
+        <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-ghost btn-sm" onclick="changeTier('${u.id}')"><i class="fas fa-exchange-alt"></i></button>${eduBtn}</td>
     </tr>`;
     }).join('');
     const tot=filteredUsers.length,tp=Math.ceil(tot/PAGE_SIZE);
@@ -2395,6 +2407,50 @@ function changeTier(id){
     renderKPIs();
     renderCredentials();
     renderAudit();
+}
+
+/* Educator allowlist mutators — read/write the localStorage array consumed
+   by auth.js loadEducatorEmails(). Fire 'rz-educators-changed' so the
+   same-tab auth widget refreshes immediately; the 'storage' event covers
+   other tabs. */
+function getEducatorAllowlist(){
+    try{
+        var raw=localStorage.getItem('rz_admin_educators');
+        var arr=raw?JSON.parse(raw):[];
+        return Array.isArray(arr)?arr:[];
+    }catch(e){return []}
+}
+function saveEducatorAllowlist(arr){
+    var dedup={},out=[];
+    for(var i=0;i<arr.length;i++){
+        var s=String(arr[i]||'').toLowerCase().trim();
+        if(!s||dedup[s])continue;
+        dedup[s]=1;out.push(s);
+    }
+    localStorage.setItem('rz_admin_educators',JSON.stringify(out));
+    try{window.dispatchEvent(new CustomEvent('rz-educators-changed'))}catch(e){}
+}
+function promoteEducator(id){
+    var u=allUsers.find(x=>x.id===id);if(!u)return;
+    if((u.role||'').toLowerCase()==='root')return;
+    if(!confirm('Promote '+u.email+' to EDUCATOR?'))return;
+    var list=getEducatorAllowlist();
+    list.push(u.email.toLowerCase());
+    saveEducatorAllowlist(list);
+    u.role='educator';
+    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Promoted '+u.email+' to EDUCATOR'});
+    filterUsers();renderKPIs();renderCredentials();renderAudit();
+}
+function demoteEducator(id){
+    var u=allUsers.find(x=>x.id===id);if(!u)return;
+    if((u.role||'').toLowerCase()!=='educator')return;
+    if(!confirm('Demote '+u.email+' from EDUCATOR to DEMO?'))return;
+    var list=getEducatorAllowlist().filter(function(e){return e!==u.email.toLowerCase()});
+    saveEducatorAllowlist(list);
+    u.role='demo';
+    u.tier='demo';
+    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Demoted '+u.email+' from EDUCATOR to DEMO'});
+    filterUsers();renderKPIs();renderCredentials();renderAudit();
 }
 
 function exportCSV(){
