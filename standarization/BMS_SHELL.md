@@ -159,6 +159,12 @@ the 8 in-scope panels (`#p-over` / `#p-hall` / `#p-rack` / `#p-cool` /
 "Primary read:" hint surfacing the operator's first-read question per
 panel. `#p-dash` excluded; engine files + tests byte-identical.
 
+**v1.25.2 (2026-05-22)** — chiller-plant view-mode show/hide rules
+(finishes v1.23.1 deferred work per doc-14 §4). Radio-style toolbar +
+CSS `body[data-bms-mode="X"] [data-bms-mode-hide~="X"]{display:none}`
+pattern. Operator Controls hidden in Overview; Alarm History visible
+only in Maintenance.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

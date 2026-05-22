@@ -449,8 +449,15 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
          Page-scoped (no body.rz-bms-shell class) so it adds the inspector + mode toggle
          additively without overriding chiller-plant's own typography/palette.
          Spec: standarization/BMS_SHELL.md ; conv/review/14 §4 ; -->
-    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.1">
-    <script src="js/rz-bms-shell.js?v=1.23.1" defer></script>
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.25.2">
+    <script src="js/rz-bms-shell.js?v=1.25.2" defer></script>
+    <!-- v1.25.2 doc-14 §4 mode show/hide rules — Overview = clean view (no tuning controls),
+         Performance = system metrics visible, Maintenance = alarms + history visible. -->
+    <style id="rz-bms-mode-rules-v1252">
+        body[data-bms-mode="overview"] [data-bms-mode-hide~="overview"]       { display: none !important; }
+        body[data-bms-mode="performance"] [data-bms-mode-hide~="performance"] { display: none !important; }
+        body[data-bms-mode="maintenance"] [data-bms-mode-hide~="maintenance"] { display: none !important; }
+    </style>
     <meta property="og:image:alt" content="Chiller Plant SCADA HMI v4 — Industrial P&ID Mimic | Resistance Zero">
 
 <style id="rz-skiplink-v1">
@@ -539,7 +546,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
           <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">86 kPa</div></div>
         </div>
 
-        <div class="card">
+        <div class="card" data-bms-mode-hide="overview">
           <h4>Operator Controls</h4>
           <div class="controls">
             <div class="field">
@@ -594,7 +601,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
           <div class="meta" id="ackMeta">Ack: N/A</div>
         </div>
 
-        <div class="card">
+        <div class="card" data-bms-mode-hide="overview performance">
           <h4>Alarm History</h4>
           <div class="hist" id="hist"></div>
         </div>
@@ -1718,17 +1725,32 @@ function updateLoopInspector(id){
 
 function initBmsShellShim(){
   if(!window.RZBMSShell) return;
-  /* Mode toolbar — buttons visible now, view-mode toggle wired via [data-bms-mode] on body.
-     Section show/hide rules ship in v1.23.2 once visual baseline confirmed. */
+  /* v1.25.2 — radio-style mode toolbar (single mode active at a time). The shell's
+     multi-select layerToggle is used as the visual builder; this shim then enforces
+     mutual exclusion + sets body[data-bms-mode] to the actually-pressed button so
+     the CSS show/hide rules align. */
   const toolbar = document.getElementById("chillerModeToolbar");
   if(toolbar){
     window.RZBMSShell.layerToggle(toolbar, [
       {id:"overview",    label:"Overview",    pressed:true},
       {id:"performance", label:"Performance"},
       {id:"maintenance", label:"Maintenance"}
-    ], function(active){
-      document.body.setAttribute("data-bms-mode", active[active.length-1] || "overview");
+    ], function(){ /* multi-select callback ignored; radio handler below */ });
+    /* Enforce radio behaviour on click: only one button stays pressed. */
+    const btns = toolbar.querySelectorAll(".rz-bms-layer-btn");
+    function applyRadio(target){
+      btns.forEach(function(b){
+        const on = (b === target);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      document.body.setAttribute("data-bms-mode", target.getAttribute("data-layer") || "overview");
+    }
+    btns.forEach(function(b){
+      b.addEventListener("click", function(){ applyRadio(b); }, true);
     });
+    /* Initialize at Overview (matches doc-14 §4 default: clean view). */
+    const defBtn = toolbar.querySelector('[data-layer="overview"]');
+    if(defBtn) applyRadio(defBtn);
   }
   /* Default inspector content — placeholder until first selection. */
   const host = document.getElementById("chillerInspector");

@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v1.25.2 — 2026-05-22 (chiller-plant mode-rules — finishes v1.23.1 deferred work per doc-14 §4)
+
+Fourteenth ship. Completes the v1.23.1 deferred scaffold: the
+Overview / Performance / Maintenance toolbar now drives actual section
+show/hide via CSS, and behaves as a radio (one mode active at a time).
+
+### Changed (chiller-plant.html only)
+- **Radio-style mode toolbar** — `initBmsShellShim()` now enforces
+  single-mode selection via direct click listeners. The shell's
+  multi-select `layerToggle` builds the buttons; the shim manages
+  mutual exclusion and sets `body[data-bms-mode]` to the actually
+  pressed button. Default = `overview`.
+- **CSS show/hide rules** — new `<style id="rz-bms-mode-rules-v1252">`:
+  ```
+  body[data-bms-mode="overview"]    [data-bms-mode-hide~="overview"]    { display:none }
+  body[data-bms-mode="performance"] [data-bms-mode-hide~="performance"] { display:none }
+  body[data-bms-mode="maintenance"] [data-bms-mode-hide~="maintenance"] { display:none }
+  ```
+- **Operator Controls card** tagged `data-bms-mode-hide="overview"`
+  (clean default view per doc-14 §4: "Overview hides most tuning
+  controls"). Visible in Performance + Maintenance.
+- **Alarm History card** tagged `data-bms-mode-hide="overview performance"`
+  (visible only in Maintenance per doc-14 §4: "Maintenance shows run
+  hours, duty rotation, alarms").
+- Cache-bust query for shell tags bumped `?v=1.23.1` → `?v=1.25.2`.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` byte-identical. 22/22 conv + 57/57 datahall tests pass.
+- P&ID SVG, alarm strip, Primary CHW Header card, Selected-Equipment
+  Inspector, Alarm Summary card, deep-modal flow.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.25.2 entry added.
+
+---
+
 ## v1.25.1 — 2026-05-22 (datahallAI cockpit fix #8 — per-tab primary-read hint per doc-24)
 
 Thirteenth adoption ship. Adds the doc-24 §8 "tab-level primary question"
