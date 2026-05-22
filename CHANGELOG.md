@@ -11,6 +11,48 @@ release sections rather than semver.
 
 ---
 
+## v1.25.0 — 2026-05-22 (BMS Shell phase milestone — adoption status table + rules of engagement + deferred-work queue)
+
+Phase-closing polish ship. No code changes to any page; locks in the
+v1.23 → v1.24 BMS Shell adoption milestone with proper documentation
+handoff. Standardization-only.
+
+### Changed (`standarization/BMS_SHELL.md` only)
+- Added **Adoption Status Table** at the top: 9 rows (1 foundation + 8
+  conv + 1 AI cockpit), columns for ship version, library loaded,
+  body-scope, doc-14/24 fixes applied, engine binding integrity.
+- Added **Adoption Rules of Engagement** — 5 locked-in rules from this
+  phase (engine preservation non-negotiable, owner exclusions hold, no
+  global body-scope flip, surgical/additive, full per-ship discipline).
+- Added **Deferred Work Queue** — 10+ items from doc-14/doc-24 that go
+  beyond the surgical/additive scope of this phase; each requires
+  explicit owner go-ahead before further ships. Includes the
+  DEFERRED-OWNER-EXCLUDED note on doc-24 fix #7 (Seismic / Wind / Floor
+  callouts live inside `dcCallouts` on owner-excluded `#p-dash`).
+- v1.25.0 status entry added.
+
+### Phase summary (v1.23.0 → v1.24.4)
+11 commits in 14 ships:
+`dbfec30` (v1.23.0 foundation) → `414d19c` (v1.23.1 chiller-plant
+inspector) → `6a79479` (v1.23.2 dc-conventional callouts demoted) →
+`9a033fc` (v1.23.3 fuel autonomy hero) → `7423bad` (v1.23.4 water WUE
+hero) → `a9abfe1` (v1.23.5 fire-stages legend) → `e611707` (v1.24.0
+EPMS engine-bound) → `e1980e1` (v1.24.1 datahall ops rollup) →
+`87090fe` (v1.24.2 ict BMS-OT health) → `5bed229` (v1.24.3 datahallAI
+library load) → `4217d20` (v1.24.4 datahallAI data-mode chip).
+
+### Preserved (verified untouched, every ship)
+- `js/conv-engine.js`, `js/datahall-model.js`,
+  `js/datahall-calculations.js` byte-identical to pre-v1.23.0 HEAD.
+- 22/22 conv + 57/57 datahall engine tests pass on every commit.
+- `#p-dash` tab + `updateDashKPI()` + `dcCallouts` byte-identical
+  (owner exclusion held).
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+---
+
 ## v1.24.4 — 2026-05-22 (datahallAI cockpit fix #1 — compact `Data Mode: Simulated` chip per doc-24)
 
 Tenth adoption ship. First specific cockpit fix on datahallAI per doc-24:

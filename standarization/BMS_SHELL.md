@@ -1,5 +1,76 @@
 # BMS Shell — Shared Operations-Console Standard (v1.23.0+)
 
+## Adoption status table (closing v1.23 → v1.24 phase, 2026-05-22)
+
+| Page | Adoption ship | Shell library loaded | `body.rz-bms-shell` | Doc-14/24 fixes applied | Engine binding |
+|---|---|---|---|---|---|
+| (foundation) | v1.23.0 | — (library itself) | — | — | — |
+| `chiller-plant.html` | v1.23.1 | ✅ | ❌ | Right inspector + mode toolbar (doc-14 §4) | `conv-engine.js` (preserved) |
+| `dc-conventional.html` | v1.23.2 | ✅ | ❌ | Facility callouts 17→6 (doc-14 §1) | `conv-engine.js` (preserved) |
+| `fuel-system.html` | v1.23.3 | ✅ | ❌ | Autonomy hero (doc-14 §6) | `conv-engine.js` (preserved) |
+| `water-system.html` | v1.23.4 | ✅ | ❌ | WUE hero (doc-14 §7) | `conv-engine.js` (preserved) |
+| `fire-system.html` | v1.23.5 | ✅ | ❌ | Fire-stages legend + active-chip color (doc-14 §5) | `conv-engine.js` (preserved) |
+| `EPMS_Telemetry.html` | v1.24.0 | ✅ | ❌ | Engine status strip + line-status legend (doc-14 §2) | `conv-engine.js` (newly added) |
+| `datahall.html` | v1.24.1 | ✅ | ❌ | Ops rollup + 5-mode selector (doc-14 §3) | `conv-engine.js` (preserved) |
+| `ict.html` | v1.24.2 | ✅ | ❌ | ICT Ops strip + 5 OT-gateway chips (doc-14 §8) | `conv-engine.js` (preserved) |
+| `datahallAI.html` | v1.24.3 + v1.24.4 | ✅ | ❌ | Data Mode chip in legal summary (doc-24 #1) | `datahall-model.js` + `datahall-calculations.js` (preserved); `#p-dash` byte-identical |
+
+All 8 conv pages + 1 AI cockpit shipped onto the BMS Shell library
+between v1.23.0 and v1.24.4 — 11 commits in total (`dbfec30`, `414d19c`,
+`6a79479`, `9a033fc`, `7423bad`, `a9abfe1`, `e611707`, `e1980e1`,
+`87090fe`, `5bed229`, `4217d20`). Every ship surgical and additive;
+engine files + `#p-dash` byte-identical to HEAD throughout.
+
+## Adoption rules of engagement (locked-in from this phase)
+
+1. **Engine preservation is non-negotiable** — `js/conv-engine.js`,
+   `js/datahall-model.js`, `js/datahall-calculations.js` byte-identical
+   on every commit. 22/22 conv + 57/57 datahall tests must pass.
+2. **Owner exclusions hold** — `#p-dash` panel + `updateDashKPI()` +
+   `dcCallouts` array in `datahallAI.html` must stay byte-identical. If
+   a doc-24 fix targets one of these, mark **DEFERRED-OWNER-EXCLUDED**.
+3. **No global body-scope flip** unless explicitly approved per-page —
+   the shell's `body.rz-bms-shell` rules would override existing
+   typography + palette. So far no page has flipped; only individual
+   component classes (`.rz-bms-inspector`, `.rz-bms-layer-toolbar`,
+   `.rz-bms-chip`, etc.) are used standalone.
+4. **Surgical and additive** — preserve existing alarm strips, KPI
+   strips, P&ID diagrams, modal flows, sidebars, engine bindings.
+   Insert above/below, not in place of.
+5. **Every ship**: bump `js/rz-version.js` (PATCH or MINOR per
+   VERSIONING_STANDARD.md), append `CHANGELOG.md` entry, run all 4
+   strict audit gates, sync `sw.js`, rebuild `changelog.html`, push,
+   IndexNow, update tracker, update this status table.
+
+## Deferred work (queued for owner go-ahead before further ships)
+
+These are larger redesign-grade fixes from doc-24/doc-14 that go beyond
+surgical/additive scope:
+
+- **doc-24 #2** — Reduce datahallAI left sidebar to operational summary
+  by default; engineering basis collapsible.
+- **doc-24 #4** — Quiet normal states across the cockpit (broad
+  desaturation work).
+- **doc-24 #5** — Convert all-green data-hall/network blocks into
+  heatmap/outlier views (per-tab render-tree restructuring).
+- **doc-24 #6** — Right object-inspector consistency across all 9 tabs
+  (would mean adding shell inspector to each panel + click resolvers).
+- **doc-24 #7** — Demote Seismic / Wind / Floor structural callouts
+  from `dcCallouts` on `#p-dash`. **DEFERRED-OWNER-EXCLUDED**.
+- **doc-24 #8** — Per-tab primary question hint in panel headers.
+- **doc-24 #9** — Layer toggles on Room Layout / Cooling / Electrical
+  SLD / Network / BMS diagrams.
+- **doc-24 #10** — Make selected-object workflow consistent across all
+  in-scope panels.
+- **doc-14 §4 v1.23.2 deferred** — chiller-plant view-mode `body[data-bms-mode]`
+  show/hide section rules (currently UI scaffold only).
+- **doc-14 §7 v1.23.4 deferred** — water-system threshold bands on WUE
+  + filter DP; consistent ISA tags TK-101 / FLT-201 etc.
+- **doc-14 §1 deferred** — `dc-conventional.html` dark-operations theme
+  flip (the doc's "dark everywhere" direction — owner approved, but
+  requires comprehensive CSS rework over the existing light/dark token
+  system).
+
 ## Status
 
 **v1.23.0 (2026-05-22)** — Foundation only. Library files shipped, no
@@ -76,6 +147,11 @@ fixes ship v1.24.4+. `body` has no `rz-bms-shell` class; engine files +
 (cyan accent, BMS Shell `is-simulated` style). Doc-24 fix #7 (Seismic /
 Wind / Floor structural callouts) deferred — those entries live inside
 the owner-excluded `dcCallouts` array on `#p-dash`.
+
+**v1.25.0 (2026-05-22)** — Phase-closing polish + documentation ship.
+Adoption status table + rules of engagement + deferred-work queue
+captured at the top of this spec. No code changes to any page; locks
+in the v1.23 → v1.24 milestone for handoff.
 
 ## Spec sources
 
