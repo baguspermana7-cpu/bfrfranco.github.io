@@ -11,6 +11,51 @@ release sections rather than semver.
 
 ---
 
+## v1.29.1 — 2026-05-22 (Cockpit SVG mobile readability + EcoStruxure-grade solid panels + kill rotating-triangle pump animation)
+
+Owner-reported (mobile screenshot) — three concrete issues fixed plus a
+queued engineering-value audit doc shipped. (Was authored as v1.25.4
+locally; renumbered v1.29.1 after rebase onto remote v1.29.0.)
+
+### Fixed
+- **Rotating-triangle pump animation removed** (owner: "ngapain segitiganya
+  muter, jadi terkesan bug"). The ISA pump-symbol triangle no longer
+  rotates 360° forever. Green fill stays as the ON indicator (standard
+  SCADA pattern). `datahallAI.html` `.pmp` rule line 167 + same fix added
+  to `chiller-plant.html` for any future pmp use.
+- **Cooling P&ID equipment-block opacity bumped from glassy to solid**
+  (owner: "agak solid seperti EcoStruxure"). Block backgrounds bumped
+  rgba alpha `.03/.04 → .25`; header tints `.06 → .35`; strokes `.20 →
+  .55`. Targets the 6 major shells visible in the screenshot: CW Pump
+  Station + CW Pump Group + Chiller Plant + FWS Pump Station + CDU Array
+  + TCS+Racks (datahallAI cooling IIFE).
+- **Cockpit SVG mobile responsive sizing fixed** (owner: "kotak2 tumpang
+  tindih, hitung based on aspect ratio responsive"). On `≤1024 px` the
+  panel wrappers gain `overflow-x:auto` + the SVGs gain `min-width:720 px`;
+  on `≤600 px` `min-width:640 px`. Industry-standard SCADA approach:
+  diagrams keep their design width and the user pans horizontally
+  instead of squishing everything into 390 px. `#p-dash` excluded via
+  `.pn:not(#p-dash) .bx svg` selector.
+- Same responsive treatment added to `chiller-plant.html` `#pidSvg`
+  (min-width 1200 px @≤1024 / 960 px @≤600 + `.pid-panel{overflow-x:auto}`).
+
+### Added
+- **`documentation/engineering-value-audit-v1.md`** — captures the
+  broader engineering-value review.
+
+### Preserved
+- `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical.
+  57/57 datahall + 22/22 conv engine tests pass.
+- `#p-dash` + `updateDashKPI()` + `dcCallouts` byte-identical.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.29.1 entry; `documentation/engineering-value-audit-v1.md` NEW.
+
+---
+
 ## v1.29.0 — 2026-05-22 (R-015 Phase 4 admin UI + login-modal stale-cache rescue + sw network-first for critical assets)
 
 ### Phase 4 admin UI shipping (flag-gated)

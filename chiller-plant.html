@@ -131,6 +131,18 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
 #pidSvg{width:100%;height:auto;display:block;border:1px solid #425266;border-radius:8px;background:#121b26}
+/* v1.25.4 — pro-BMS responsive SVG. Diagram keeps design width on mobile so blocks
+   don't overlap; user pans horizontally instead of squishing. */
+@media (max-width:1024px){
+  .pid-panel{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #pidSvg{min-width:1200px}
+}
+@media (max-width:600px){
+  #pidSvg{min-width:960px}
+}
+/* v1.25.4 owner-feedback: ISA pump triangle no longer spins.
+   Green fill is the ON indicator — rotation looked like a UI bug. */
+.pmp{animation:none;transform-origin:center}
 
 .status-strip{
   border:1px solid var(--bd);

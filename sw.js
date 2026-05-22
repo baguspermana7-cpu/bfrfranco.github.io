@@ -2,17 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v1.29.0'; // version-aware: invalidates on every site bump
-
-// v1.29.0 — Critical auth/config files that MUST be fetched fresh when online.
-// Cached only as offline fallback. Rescues users stranded on a stale SW
-// that's serving pre-educator auth.js after a deploy.
-const NETWORK_FIRST_PATHS = [
-  '/auth.js',
-  '/auth.min.js',
-  '/js/rz-version.js',
-  '/js/rz-feature-flags.js'
-];
+const CACHE_NAME = 'rz-cache-v1.29.1'; // version-aware: invalidates on every site bump
 
 // Key pages and assets to pre-cache on install
 const PRE_CACHE_URLS = [
@@ -81,13 +71,6 @@ self.addEventListener('fetch', (event) => {
   // Skip Remotion video files (large, network-only)
   if (url.pathname.endsWith('.mp4')) return;
 
-  // v1.29.0 — Critical auth/config files: network-first with cache fallback.
-  // Ensures stranded users on a stale SW still get fresh auth.js on next load.
-  if (isNetworkFirst(url.pathname)) {
-    event.respondWith(networkFirstCriticalAsset(request));
-    return;
-  }
-
   // HTML pages: network-first with timeout (content stays fresh)
   if (request.headers.get('accept')?.includes('text/html') ||
       url.pathname.endsWith('.html') ||
@@ -100,33 +83,6 @@ self.addEventListener('fetch', (event) => {
   // Static assets (CSS, JS, images, fonts): cache-first
   event.respondWith(cacheFirst(request));
 });
-
-// v1.29.0 — match exact pathnames in NETWORK_FIRST_PATHS
-function isNetworkFirst(pathname) {
-  for (var i = 0; i < NETWORK_FIRST_PATHS.length; i++) {
-    if (pathname === NETWORK_FIRST_PATHS[i]) return true;
-  }
-  return false;
-}
-
-// v1.29.0 — Network-first for critical auth/config files. Updates cache
-// on success; falls back to cache only on network failure.
-function networkFirstCriticalAsset(request) {
-  return fetch(request).then(function (resp) {
-    if (resp && resp.ok) {
-      var copy = resp.clone();
-      caches.open(CACHE_NAME).then(function (c) {
-        c.put(request, copy);
-      }).catch(function () {});
-    }
-    return resp;
-  }).catch(function () {
-    return caches.match(request).then(function (cached) {
-      if (cached) return cached;
-      return new Response('', { status: 408, statusText: 'Request Timeout' });
-    });
-  });
-}
 
 // Network-first with timeout: try network for NETWORK_TIMEOUT_MS, fall back to cache
 async function networkFirstWithTimeout(request) {

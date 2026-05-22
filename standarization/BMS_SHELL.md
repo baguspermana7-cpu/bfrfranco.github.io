@@ -171,6 +171,18 @@ report: `.mn { order:1 }` + `.side { order:2 }` inside
 (alarm strip + KPI strip + tabs + facility image) leads, with the
 left telemetry spine dropping below. Desktop layout unchanged.
 
+**v1.25.4 (2026-05-22)** — Cockpit SVG mobile readability + EcoStruxure
+solid panels + kill pump rotation animation. Per owner image: 
+(1) `.pmp { animation:none }` — ISA pump triangle stays static, green fill
+remains the ON indicator.
+(2) Cooling P&ID block fills bumped `.03/.04 → .25`, header tints
+`.06 → .35`, strokes `.20 → .55` for EcoStruxure-grade solid look.
+(3) Responsive SVG wrappers: `.pn:not(#p-dash) .bx svg { min-width:720px }`
+@≤1024px + `overflow-x:auto` on panel wrapper so diagrams keep design
+width on mobile (pan-scroll instead of squish). `chiller-plant.html`
+gets same treatment (`#pidSvg{min-width:1200px}` @≤1024, 960px @≤600).
+Engineering-value audit shipped as `documentation/engineering-value-audit-v1.md`.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

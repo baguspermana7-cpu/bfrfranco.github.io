@@ -164,8 +164,21 @@ svg text{user-select:none}
 @keyframes sh{0%{opacity:.02}50%{opacity:.07}100%{opacity:.02}}.sh{animation:sh 2.5s ease infinite}
 @keyframes ep{0%,100%{opacity:.4}50%{opacity:.9}}svg .ep{animation:ep 1.5s ease infinite}
 @keyframes lv{0%,100%{fill-opacity:.6}50%{fill-opacity:1}}.lv{animation:lv 2s ease infinite}
-@keyframes pmp{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.pmp{animation:pmp 2s linear infinite;transform-origin:center}
+/* v1.25.4 owner-feedback: ISA pump triangle no longer spins. Green fill is the ON indicator — rotation looked like a UI bug. */
+.pmp{animation:none;transform-origin:center}
 /* Responsive - Comprehensive Mobile Support */
+/* v1.25.4 — pro-BMS responsive SVG container. Diagrams keep their design width on small
+   viewports; user pans horizontally instead of squishing. Excludes owner-locked #p-dash. */
+@media(max-width:1024px){
+    .pn:not(#p-dash) .bx,
+    .ep .bx { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .pn:not(#p-dash) .bx svg,
+    .ep .bx svg { min-width:720px; }
+}
+@media(max-width:600px){
+    .pn:not(#p-dash) .bx svg,
+    .ep .bx svg { min-width:640px; }
+}
 @media(max-width:1024px){
     .wrap{flex-direction:column;height:auto}
     /* v1.25.3 — owner request: main SCADA/BMS content must lead on mobile;
@@ -5806,9 +5819,9 @@ s+=`<rect x="866" y="6" width="84" height="16" rx="3" fill="rgba(167,139,250,.08
 s+=tx(908,13,'ISA-5.1 TAGS','var(--p)',4.2,'middle',1);
 s+=tx(908,19,'TT/PT/FT/AT/BTU','var(--p)',2.8,'middle');
 // ===== OUTDOOR / DRY COOLER ARRAY SECTION =====
-s+=`<rect x="10" y="28" width="180" height="210" rx="4" fill="rgba(139,92,246,.03)" stroke="rgba(139,92,246,.2)" stroke-width="1"/>`;
+s+=`<rect x="10" y="28" width="180" height="210" rx="4" fill="rgba(139,92,246,.25)" stroke="rgba(139,92,246,.55)" stroke-width="1"/>`;
 // Gradient header band
-s+=`<rect x="11" y="29" width="178" height="18" rx="3" fill="rgba(139,92,246,.06)"/>`;
+s+=`<rect x="11" y="29" width="178" height="18" rx="3" fill="rgba(139,92,246,.35)"/>`;
 s+=`<circle cx="22" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(30,41,'RUNNING','var(--g)',3.5);
 s+=tx(100,42,'DRY COOLER ARRAY','var(--p)',7,'middle',1);
@@ -5859,8 +5872,8 @@ s+=tx(192,83,'DN300','var(--t3)',3,'middle');
 s+=tx(192,100,'600 m\u00B3/h','var(--p)',3,'middle');
 // ===== CW PUMP STATION =====
 s+=`<g class="cw-pump-click" style="cursor:pointer">`;
-s+=`<rect x="195" y="28" width="100" height="210" rx="4" fill="rgba(139,92,246,.04)" stroke="rgba(139,92,246,.35)" stroke-width="1"/>`;
-s+=`<rect x="196" y="29" width="98" height="18" rx="3" fill="rgba(139,92,246,.06)"/>`;
+s+=`<rect x="195" y="28" width="100" height="210" rx="4" fill="rgba(139,92,246,.25)" stroke="rgba(139,92,246,.55)" stroke-width="1"/>`;
+s+=`<rect x="196" y="29" width="98" height="18" rx="3" fill="rgba(139,92,246,.35)"/>`;
 s+=`<circle cx="205" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(213,41,'2/3 RUN','var(--g)',3.5);
 s+=tx(245,42,'CW PUMP STATION','var(--p)',6,'middle',1);
@@ -5912,8 +5925,8 @@ s+=`<line x1="295" y1="95" x2="305" y2="95" stroke="var(--p)" stroke-width="2.5"
 s+=tx(300,88,'4.5 bar','var(--p)',3.5,'middle');
 s+=tx(300,102,'DN300 CW 30%PG','var(--t3)',3,'middle');
 // ===== CHILLER PLANT (FWS circuit = cyan) =====
-s+=`<rect x="305" y="28" width="215" height="210" rx="4" fill="rgba(6,182,212,.03)" stroke="rgba(6,182,212,.2)" stroke-width="1"/>`;
-s+=`<rect x="306" y="29" width="213" height="18" rx="3" fill="rgba(6,182,212,.06)"/>`;
+s+=`<rect x="305" y="28" width="215" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1"/>`;
+s+=`<rect x="306" y="29" width="213" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="316" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(324,41,'7/8 RUN','var(--g)',3.5);
 s+=tx(412,42,'CHILLER PLANT \u2014 7\u00D7 4MW + 1\u00D7 STBY','var(--c)',7,'middle',1);
@@ -5987,8 +6000,8 @@ s+=tx(522,83,'FWS 12\u00B0C','var(--c)',3.5,'middle');
 s+=tx(522,98,'DN250 CS Insulated','var(--t3)',3,'middle');
 // ===== FWS PUMP STATION (FWS circuit = cyan) =====
 s+=`<g class="fws-pump-click" style="cursor:pointer">`;
-s+=`<rect x="525" y="28" width="120" height="210" rx="4" fill="rgba(6,182,212,.04)" stroke="rgba(6,182,212,.35)" stroke-width="1"/>`;
-s+=`<rect x="526" y="29" width="118" height="18" rx="3" fill="rgba(6,182,212,.06)"/>`;
+s+=`<rect x="525" y="28" width="120" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1"/>`;
+s+=`<rect x="526" y="29" width="118" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="536" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(544,41,'2/3 RUN','var(--g)',3.5);
 s+=tx(585,42,'FWS PUMP STATION','var(--c)',6,'middle',1);
@@ -6052,8 +6065,8 @@ s+=`<line x1="645" y1="88" x2="655" y2="88" stroke="var(--c)" stroke-width="2.5"
 s+=tx(650,81,'6 bar','var(--c)',3.5,'middle');
 s+=tx(650,98,'DN250 FWS','var(--t3)',3,'middle');
 // ===== CDU SECTION (Enhanced) =====
-s+=`<rect x="650" y="28" width="150" height="210" rx="4" fill="rgba(6,182,212,.03)" stroke="rgba(6,182,212,.2)" stroke-width="1" data-tip="CDU Array: 24 units (N+1), 350kW rated / ~265kW actual per CDU. SS316L plate counter-flow HX. Primary: FWS 12\u219222\u00B0C (30% PG glycol). Secondary: TCS 35\u219245\u00B0C (DI water <5\u00B5S). Flow: ~400 L/min TCS per unit. Click any CDU cell for HMI."/>`;
-s+=`<rect x="651" y="29" width="148" height="18" rx="3" fill="rgba(6,182,212,.06)"/>`;
+s+=`<rect x="650" y="28" width="150" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1" data-tip="CDU Array: 24 units (N+1), 350kW rated / ~265kW actual per CDU. SS316L plate counter-flow HX. Primary: FWS 12\u219222\u00B0C (30% PG glycol). Secondary: TCS 35\u219245\u00B0C (DI water <5\u00B5S). Flow: ~400 L/min TCS per unit. Click any CDU cell for HMI."/>`;
+s+=`<rect x="651" y="29" width="148" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="661" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(669,41,'23/24','var(--g)',3.5);
 s+=tx(725,42,'CDU ARRAY \u2014 24\u00D7 (N+1)','var(--c)',6,'middle',1);
@@ -6119,8 +6132,8 @@ s+=`<line x1="800" y1="88" x2="825" y2="88" stroke="var(--pk)" stroke-width="2" 
 s+=tx(812,81,'4 bar','var(--pk)',4,'middle');
 // ===== TCS TO RACKS (Enhanced) =====
 s+=`<g class="tcs-click" style="cursor:pointer">`;
-s+=`<rect x="825" y="28" width="125" height="210" rx="4" fill="rgba(236,72,153,.03)" stroke="rgba(236,72,153,.2)" stroke-width="1"/>`;
-s+=`<rect x="826" y="29" width="123" height="18" rx="3" fill="rgba(236,72,153,.06)"/>`;
+s+=`<rect x="825" y="28" width="125" height="210" rx="4" fill="rgba(236,72,153,.25)" stroke="rgba(236,72,153,.55)" stroke-width="1"/>`;
+s+=`<rect x="826" y="29" width="123" height="18" rx="3" fill="rgba(236,72,153,.35)"/>`;
 s+=`<circle cx="836" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(844,41,'ALL OK','var(--g)',3.5);
 s+=`<g data-tip="TCS to Rack Cold Plates: DI water <5\u00B5S/cm pH 7-9 via DN150 SS316L manifold. 72 Cu microchannel cold plates per rack, 80 LPM each. Blind-mate QD couplings per rack. Click for detail."><text x="887" y="42" fill="var(--pk)" font-family="${J}" font-size="6" text-anchor="middle" font-weight="600">TCS\u2192RACKS</text></g>`;
