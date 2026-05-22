@@ -51,6 +51,14 @@ line-status legend (Energized / Standby / Open / Alarm/Trip /
 Maintenance Bypass) above the SVG. All existing one-line + topbar
 content untouched.
 
+**v1.24.1 (2026-05-22)** — `datahall.html` adopted. Library loaded.
+Doc-14 §3 fixes: operations rollup (`#dh-ops-rollup`) right after the
+alarm strip showing Hall NORMAL · Rack Load 1.85 MW · Cooling Margin
+18% · PUE 1.45 · Power Density 9.3 kW/rack (engine-bound) + view-mode
+selector (`#dh-mode-toolbar` via `RZBMSShell.layerToggle`) with 5 modes
+(Power/Temperature/Cooling Margin/Space/Alarms) that sets
+`body[data-dh-mode]`. Per-mode render rules deferred.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

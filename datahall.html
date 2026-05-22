@@ -379,6 +379,11 @@
          Plain external script in <head>, BEFORE the page's inline script.
          Never inline this into a JS string literal. -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
+         Loaded for cross-page consistency; body does NOT carry rz-bms-shell
+         class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §3. -->
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.24.1">
+    <script src="js/rz-bms-shell.js?v=1.24.1" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 <style id="rz-skiplink-v1">
@@ -454,6 +459,60 @@
             <span class="as-chip" id="as-scn">Simulated</span>
         </div>
     </div>
+
+    <!-- v1.24.1 doc-14 §3: Operations Rollup — engineering summary first read after alarms.
+         Rack Load · Cooling Margin · PUE · Power Density (engine-bound to CONV_CALC.snapshot). -->
+    <div id="dh-ops-rollup" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(12,20,35,0.65);border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','Inter',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
+        <span style="color:#64748b;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Operations Rollup</span>
+        <span>Hall <b id="dh-hall-state" style="color:#22c55e;">NORMAL</b></span>
+        <span>Rack Load <b id="dh-rack-load" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+        <span>Cooling Margin <b id="dh-cooling-margin" style="color:#22c55e;">18</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
+        <span>PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
+        <span>Power Density <b id="dh-pd" style="color:#fff;">9.3</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
+        <span style="flex:1"></span>
+        <span style="color:#94a3b8;font-size:11px;">Mode toggles below — operator surface</span>
+    </div>
+
+    <!-- v1.24.1 doc-14 §3: View Mode selector (Power / Temperature / Cooling Margin / Space / Alarms).
+         Visual scaffold; sets body[data-dh-mode] for future per-mode render rules. -->
+    <div id="dh-mode-toolbar" role="group" aria-label="Data hall view mode selector" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 14px;background:rgba(10,19,34,0.6);border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','Inter',sans-serif;font-size:10px;letter-spacing:.06em;text-transform:uppercase;">
+        <span style="color:#64748b;font-weight:700;margin-right:4px;">View Mode:</span>
+    </div>
+
+    <script>
+    /* v1.24.1 doc-14 §3 — bind ops rollup to engine + mount the mode selector via the shell. */
+    (function(){
+        function bindRollup(){
+            if(!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
+            var s = window.CONV_CALC.snapshot;
+            var it = (s.site && s.site.it_kw != null) ? (s.site.it_kw / 1000).toFixed(2) : '1.85';
+            var pue = (s.site && s.site.pue != null) ? s.site.pue.toFixed(2) : '1.45';
+            var racks = (s.datahall && s.datahall.racks_total) || 200;
+            var pd = ((s.site && s.site.it_kw) || 1850) / racks;
+            var el;
+            el = document.getElementById('dh-rack-load'); if(el) el.textContent = it;
+            el = document.getElementById('dh-pue');       if(el) el.textContent = pue;
+            el = document.getElementById('dh-pd');        if(el) el.textContent = pd.toFixed(1);
+        }
+        function mountModes(){
+            var host = document.getElementById('dh-mode-toolbar');
+            if(!host || !window.RZBMSShell || !window.RZBMSShell.layerToggle) return;
+            window.RZBMSShell.layerToggle(host, [
+                {id:'power',         label:'Power', pressed:true},
+                {id:'temperature',   label:'Temperature'},
+                {id:'cooling-margin',label:'Cooling Margin'},
+                {id:'space',         label:'Space'},
+                {id:'alarms',        label:'Alarms'}
+            ], function(active){
+                document.body.setAttribute('data-dh-mode', active[active.length-1] || 'power');
+            });
+        }
+        function init(){ bindRollup(); mountModes(); }
+        if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+        else init();
+        window.addEventListener('load', mountModes, {once:true});
+    })();
+    </script>
 
     <div class="main-grid">
 

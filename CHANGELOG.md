@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v1.24.1 — 2026-05-22 (BMS Shell adoption #7 — `datahall.html`, operations rollup + view-mode selector per doc-14 §3)
+
+Seventh adoption ship. Surgical and additive — preserves the existing
+alarm strip, sidebar, main rack grid, modal, and engine binding. Adds the
+two doc-14 §3 elements that were missing: an engineering rollup right
+after the alarm strip + a view-mode selector chip row.
+
+### Added (datahall.html only)
+- **Operations Rollup** (`#dh-ops-rollup`) — second status strip after the
+  existing alarm strip: `Hall NORMAL · Rack Load 1.85 MW · Cooling Margin
+  18% · PUE 1.45 · Power Density 9.3 kW/rack`. Live-bound to
+  `window.CONV_CALC.snapshot`.
+- **View Mode toolbar** (`#dh-mode-toolbar`) — `RZBMSShell.layerToggle`
+  with 5 modes: Power / Temperature / Cooling Margin / Space / Alarms.
+  Toggle sets `body[data-dh-mode]`; per-mode render rules ship later.
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.1` +
+  `js/rz-bms-shell.js?v=1.24.1`.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
+- Existing alarm strip (state/critical/warning/maint/comms/last-update/
+  data-quality/scenario chips) — engine-bound.
+- Sidebar (Chiller Plant Feed / CRAH air-side), main rack grid, modal,
+  log panel — all unchanged.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.24.1 status entry added.
+
+---
+
 ## v1.24.0 — 2026-05-22 (BMS Shell adoption #6 — `EPMS_Telemetry.html`, engine-bound top status strip + line-status legend per doc-14 §2)
 
 Sixth adoption ship; first of the v1.24.x phase. EPMS_Telemetry's
