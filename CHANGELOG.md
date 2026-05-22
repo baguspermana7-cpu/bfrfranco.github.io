@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v1.27.1 — 2026-05-22 (R-015 Phase 0+1 — rz-auth-gateway Worker scaffold + login/seed endpoints)
+
+Infrastructure-only ship (no user-visible behavior change on the static
+site). Lands the foundation for R-015 "self-service user management" —
+the long-term replacement for the hardcoded `VALID_USERS` array in
+`auth.js`.
+
+### What landed
+
+- **`worker-auth/`** — new Cloudflare Worker (`rz-auth-gateway`) with
+  PBKDF2 password hashing, HMAC-signed sessions, login rate-limit,
+  audit log.
+- **Endpoints (Phase 1):** `POST /auth/login`, `POST /auth/logout`,
+  `GET /auth/me`, `GET /auth/features`, `GET /auth/tiers/public`,
+  `POST /admin/__seed` (one-time bootstrap migration, self-disables).
+- **39/39 unit tests** (5 endpoint suites + crypto + health/CORS).
+- **`worker-auth/SETUP.md`** — owner-step provisioning guide.
+- **`docs/plans/2026-05-22-user-mgmt-self-service.md`** — full R-015 plan.
+
+### NOT in this commit (Phase 2+ follow-ups)
+
+- Admin CRUD endpoints — Phase 2
+- Client `auth.js` refactor — Phase 3
+- rz-ops UI integration — Phase 4
+- E2E probe + reviews + ship — Phase 5
+
+The static site keeps using the existing client-side mock auth until
+Phase 3 lands.
+
+---
+
 ## v1.27.0 — 2026-05-22 (Finance Terminal Phase 1 — Cloudflare Worker data gateway shipped behind rz_ft_v2 flag)
 
 R-001..R-005 + B-002..B-012 — Finance Terminal (embedded as iframe in
