@@ -42,6 +42,15 @@ active chip dynamically (green ≤0 / amber 1–2 / red 3–6 — calm normal,
 loud abnormal, doc-14 §5: "Use red only during active alarm/discharge").
 State-machine transitions (`state.stage`) unchanged.
 
+**v1.24.0 (2026-05-22)** — `EPMS_Telemetry.html` adopted (exemplar
+designation revoked by owner). `conv-engine.js` now loaded —
+Facility/IT/PUE values match dashboard. Doc-14 §2 fixes: engineering
+status strip ("EPMS NORMAL · Facility 2.68 MW · IT 1.85 MW · PUE 1.45 ·
+Utility OK · UPS A/B Online · Gen Standby · Trips 0") + visible
+line-status legend (Energized / Standby / Open / Alarm/Trip /
+Maintenance Bypass) above the SVG. All existing one-line + topbar
+content untouched.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

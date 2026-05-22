@@ -356,6 +356,12 @@
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
+         non-deferred so window.CONV_CALC exists when the status strip renders.
+         Spec: conv/review/14 §2 ; standarization/BMS_SHELL.md -->
+    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.24.0">
+    <script src="js/rz-bms-shell.js?v=1.24.0" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -365,6 +371,51 @@
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
+
+<!-- v1.24.0 doc-14 §2: Top engineering status strip (engine-bound) + visible line-status legend.
+     Sits ABOVE the SVG so it's the first read every time the page loads. -->
+<div id="epms-status-strip" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;background:#0c1423;border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','Inter',sans-serif;font-size:12px;color:#e2e8f0;font-variant-numeric:tabular-nums;">
+    <span style="font-weight:800;letter-spacing:.08em;color:#22c55e;text-transform:uppercase;">EPMS NORMAL</span>
+    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" style="color:#fff;">2.68</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">IT Load <b id="epms-it" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">PUE <b id="epms-pue" style="color:#fff;">1.45</b></span>
+    <span style="color:#94a3b8;">Utility <b style="color:#22c55e;">OK</b></span>
+    <span style="color:#94a3b8;">UPS A/B <b style="color:#22c55e;">Online</b></span>
+    <span style="color:#94a3b8;">Gen <b style="color:#94a3b8;">Standby</b></span>
+    <span style="color:#94a3b8;">Trips <b style="color:#22c55e;">0</b></span>
+    <span style="flex:1"></span>
+    <span style="color:#94a3b8;font-size:11px;">Data <b style="color:#22c55e;">GOOD</b></span>
+    <span style="color:#94a3b8;font-size:11px;">Scenario <b style="color:#22d3ee;">Simulated</b></span>
+</div>
+
+<!-- v1.24.0 doc-14 §2: Visible legend for line/breaker state (operator-facing, no doc lookup needed). -->
+<div id="epms-legend" aria-label="EPMS line and breaker status legend" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:6px 14px;background:#0a1322;border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','Inter',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">
+    <span style="font-weight:700;color:#64748b;">LINE STATUS:</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#22c55e;"></span><span style="color:#22c55e;font-weight:700;">Energized</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#94a3b8;border-top:1px dashed #94a3b8;"></span><span style="color:#94a3b8;font-weight:700;">Standby</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:1px;background:#475569;"></span><span style="color:#94a3b8;font-weight:700;">Open</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#ef4444;"></span><span style="color:#ef4444;font-weight:700;">Alarm / Trip</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#eab308;"></span><span style="color:#eab308;font-weight:700;">Maintenance Bypass</span></span>
+</div>
+
+<script>
+/* v1.24.0: bind the EPMS top status strip to conv-engine.js so the values
+   never diverge from the dashboard. Idempotent; safe to re-run. */
+(function(){
+    function bindEpmsStatus(){
+        if(!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
+        var s = window.CONV_CALC.snapshot;
+        var fac = (s.site && s.site.facility_kw != null) ? (s.site.facility_kw / 1000).toFixed(2) : '2.68';
+        var it  = (s.site && s.site.it_kw       != null) ? (s.site.it_kw / 1000).toFixed(2)       : '1.85';
+        var pue = (s.site && s.site.pue         != null) ? s.site.pue.toFixed(2)                 : '1.45';
+        var fEl = document.getElementById('epms-fac'); if(fEl) fEl.textContent = fac;
+        var iEl = document.getElementById('epms-it');  if(iEl) iEl.textContent = it;
+        var pEl = document.getElementById('epms-pue'); if(pEl) pEl.textContent = pue;
+    }
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindEpmsStatus);
+    else bindEpmsStatus();
+})();
+</script>
 
 <svg id="viewport" viewBox="0 0 3600 2600">
     <defs>

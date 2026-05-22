@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v1.24.0 — 2026-05-22 (BMS Shell adoption #6 — `EPMS_Telemetry.html`, engine-bound top status strip + line-status legend per doc-14 §2)
+
+Sixth adoption ship; first of the v1.24.x phase. EPMS_Telemetry's
+"byte-untouched exemplar" designation was revoked by the owner for this
+design pass; the page now joins the engine + shared shell. All existing
+SVG one-line content, topbar, zoom controls, and export functionality
+preserved — strictly additive insertions above the SVG.
+
+### Added (EPMS_Telemetry.html only)
+- **Engine integration** — `js/conv-engine.js?v=1.22.0` loaded
+  non-deferred so `window.CONV_CALC` exists before the binder runs. EPMS
+  is no longer engine-disconnected; Facility Load / IT Load / PUE values
+  match the dashboard exactly.
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.0` +
+  `js/rz-bms-shell.js?v=1.24.0`. Loaded for cross-page consistency; body
+  does not carry `rz-bms-shell` class this ship.
+- **Engineering status strip** (doc-14 §2 top strip spec) — new
+  `#epms-status-strip` above the SVG: "EPMS NORMAL · Facility Load
+  2.68 MW · IT Load 1.85 MW · PUE 1.45 · Utility OK · UPS A/B Online ·
+  Gen Standby · Trips 0 · Data GOOD · Scenario Simulated". Live-bound to
+  `window.CONV_CALC.snapshot` via inline IIFE.
+- **Line-status legend** (doc-14 §2 visible legend spec) — new
+  `#epms-legend` chip row below the status strip: Energized (green) /
+  Standby (dashed gray) / Open (thin slate) / Alarm/Trip (red) /
+  Maintenance Bypass (amber). Operator-facing.
+
+### Preserved (verified untouched)
+- All SVG content (`#viewport`, defs, scene, l-wires, l-flow, l-devices,
+  l-breakers, l-tele).
+- Topbar with Back / Portfolio / zoom controls / export dropdown.
+- `js/conv-engine.js` byte-identical (newly referenced by this page).
+  22/22 conv + 57/57 datahall tests pass.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.24.0 status entry added.
+
+---
+
 ## v1.23.5 — 2026-05-22 (BMS Shell adoption #5 — `fire-system.html`, fire-stages legend + shell library)
 
 Fifth adoption ship. Surgical and additive — preserves alarm strip,
