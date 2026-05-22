@@ -1045,3 +1045,28 @@ test('Test X: crypto fetch fails with stale cache → returns stale:true', async
     globalThis.fetch = origFetch;
   }
 });
+
+// --- handleFxHistory --------------------------------------------------------
+test('Y1: handleFxHistory — Frankfurter timeseries returns sorted points + caches', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (!String(url).includes('frankfurter.app/')) throw new Error('unexpected url');
+    return new Response(JSON.stringify({
+      amount: 1, base: 'USD', start_date: '2026-04-22', end_date: '2026-05-22',
+      rates: { '2026-05-22': { EUR: 0.9 }, '2026-05-21': { EUR: 0.92 }, '2026-05-20': { EUR: 0.91 } }
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  try {
+    const { handleFxHistory } = await import('../src/handlers.js');
+    const r = await handleFxHistory({ FT_KV: kv }, 'USD', 'EUR', 30);
+    assert.equal(r.cached, false);
+    assert.equal(r.data.from, 'USD');
+    assert.equal(r.data.to, 'EUR');
+    assert.equal(r.data.days, 30);
+    assert.equal(r.data.points.length, 3);
+    assert.equal(r.data.points[0].d, '2026-05-20'); // ascending
+    assert.equal(typeof r.data.points[0].v, 'number');
+    assert.ok(kv.store.has('fxh:USD-EUR-30'), 'cache key set');
+  } finally { globalThis.fetch = origFetch; }
+});

@@ -54,6 +54,34 @@ async function fromExchangerateHost() {
 
 const SOURCES = [fromFrankfurter, fromOpenErApi, fromExchangerateHost];
 
+/**
+ * Frankfurter timeseries: /<start>..<end>?from=&to=
+ * Response: { amount, base, start_date, end_date, rates:{'YYYY-MM-DD':{TO:rate}} }
+ * Returns compact contract: { from, to, days, points:[{d,v}] } ascending by date.
+ */
+export async function fetchFxHistory(from, to, days) {
+  const d = Math.max(1, Math.min(730, +days || 30));
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - d);
+  const sf = start.toISOString().slice(0, 10);
+  const ef = end.toISOString().slice(0, 10);
+  const url = `https://api.frankfurter.app/${sf}..${ef}?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+  const r = await withTimeout(url);
+  if (!r.ok) throw new Error('frankfurter-history non-ok: ' + r.status);
+  const j = await r.json();
+  if (!j || typeof j.rates !== 'object') throw new Error('frankfurter-history bad shape');
+  const points = Object.keys(j.rates)
+    .sort()
+    .map(date => {
+      const row = j.rates[date];
+      const v = row && typeof row[to] === 'number' ? row[to] : null;
+      return v == null ? null : { d: date, v };
+    })
+    .filter(Boolean);
+  return { from, to, days: d, points };
+}
+
 export async function fetchFx() {
   const errors = [];
   for (const source of SOURCES) {

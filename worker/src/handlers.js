@@ -1,5 +1,5 @@
 import { getCached, setCached } from './cache.js';
-import { fetchFx } from './sources/fx.js';
+import { fetchFx, fetchFxHistory } from './sources/fx.js';
 import { fetchYahooQuotes, fetchYahooCandles } from './sources/yahoo.js';
 import { fetchStooqQuotes, fetchStooqCandles } from './sources/stooq.js';
 import { fetchFinnhubQuotes } from './sources/finnhub.js';
@@ -9,6 +9,7 @@ import { SCREENER_UNIVERSE } from './data/screener-universe.js';
 
 const FX_CACHE_KEY = 'fx:USD';
 const FX_TTL_MS = 60_000;
+const FXH_TTL_MS = 1_800_000; // 30 min — historical FX chart need not be fresher
 
 const QUOTES_TTL_MS = 60_000;
 
@@ -636,6 +637,30 @@ export async function handleFx(env) {
     if (stale) {
       return { data: stale.data, cached: true, stale: true };
     }
+    throw fetchErr;
+  }
+}
+
+/**
+ * handleFxHistory(env, from, to, days) — FX timeseries with KV cache + stale.
+ * Returns: { data:{from,to,days,points:[{d,v}]}, cached, stale? }
+ */
+export async function handleFxHistory(env, from, to, days) {
+  const f = String(from || 'USD').toUpperCase();
+  const t = String(to || 'EUR').toUpperCase();
+  const d = Math.max(1, Math.min(730, +days || 30));
+  const key = `fxh:${f}-${t}-${d}`;
+  const fresh = await getCached(env.FT_KV, key, FXH_TTL_MS);
+  if (fresh && !fresh.stale) {
+    return { data: fresh.data, cached: true };
+  }
+  try {
+    const data = await fetchFxHistory(f, t, d);
+    await setCached(env.FT_KV, key, data);
+    return { data, cached: false };
+  } catch (fetchErr) {
+    const stale = await getCached(env.FT_KV, key, FXH_TTL_MS, { allowStale: true });
+    if (stale) return { data: stale.data, cached: true, stale: true };
     throw fetchErr;
   }
 }

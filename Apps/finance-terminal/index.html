@@ -1819,9 +1819,24 @@ async function loadFxChart(){
   const [from,to]=S.fxPair.split('/');
   const tfMap={'1W':7,'1M':30,'3M':90,'1Y':365};
   const days=tfMap[S.fxTf]||30;
+  initFxTfBar();
+  if(CFG.V2){
+    try{
+      const d=await gw('/fx-history',{from,to,days});
+      const labels=d.points.map(p=>{const dt=new Date(p.d);return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});});
+      const values=d.points.map(p=>p.v);
+      const cc=chartColors();
+      destroyChart('fx');
+      S.charts.fx=new Chart($('fxChart'),{
+        type:'line',
+        data:{labels,datasets:[{label:S.fxPair,data:values,borderColor:cc.green,backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>S.fxPair+': '+ctx.raw.toFixed(4)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:10}}}}}
+      });
+    }catch(e){}
+    return;
+  }
   const end=new Date();const start=new Date();start.setDate(start.getDate()-days);
   const sf=start.toISOString().split('T')[0],ef=end.toISOString().split('T')[0];
-  initFxTfBar();
   try{
     const data=await fk('/'+sf+'..'+ef,{from,to});
     const rates=data.rates||{};

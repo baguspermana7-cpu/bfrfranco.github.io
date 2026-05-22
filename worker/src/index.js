@@ -1,4 +1,4 @@
-import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto } from './handlers.js';
+import { handleFx, handleFxHistory, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -49,6 +49,7 @@ const PREWARM_INDEX_SYMS = ['SPY', 'QQQ', 'DIA', 'IWM', 'GLD', 'TLT', 'USO', 'VG
 export async function prewarm(env) {
   return Promise.allSettled([
     handleFx(env),
+    handleFxHistory(env, 'USD', 'EUR', 30),
     handleQuotes(env, PREWARM_INDEX_SYMS),
     handleNews(env, 'market'),
     handleCrypto(env),
@@ -73,6 +74,16 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'fx: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/fx-history') {
+        const p = new URL(request.url).searchParams;
+        try {
+          const { data, cached } = await handleFxHistory(env, p.get('from') || 'USD', p.get('to') || 'EUR', +p.get('days') || 30);
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'fx-history: ' + String(e) });
         }
       }
 
