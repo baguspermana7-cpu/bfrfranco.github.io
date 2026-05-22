@@ -11,6 +11,68 @@ release sections rather than semver.
 
 ---
 
+## v1.26.0 — 2026-05-22 (Educator role + 4-tier matrix; DC AI/DC Conv/DCMOC + 8 LTC labs converted from hard root-only to matrix-gated)
+
+R-014 — introduces a new **educator** role that grants Pro-tier feature access
+without admin-panel access. Educators see a cyan EDUCATOR badge (instrument-cyan
+tokens, NOT Anthropic purple). Admin can promote/demote any user to/from
+educator from the rz-ops User Management section.
+
+### What landed
+
+- **`auth.js`** — `EDUCATOR_EMAILS` allowlist (seed `educator@resistancezero.com`
+  + merged with `localStorage.rz_admin_educators` admin-managed list).
+  `detectRole` + `getTier` + session helpers extended for educator. New helper
+  `__rzAuth.enforceTierFeatureAccess(pageKey)` replaces the hardcoded
+  `ROOT_ONLY_PATHS` block for 11 in-scope pages. `auth.min.js` rebuilt (terser).
+- **`js/rz-feature-flags.js`** — 4-tier matrix (FREE | DEMO | PRO | ROOT —
+  ROOT now explicit, not a bypass). New `page-access` feature convention used
+  by `enforceTierFeatureAccess`. Resolver respects per-page admin overrides
+  stored in `rz_admin_features_by_page`. Root-inviolable guard on `page-access`.
+- **11 pages converted** from hardcoded `Root Access Required` gate to
+  `enforceTierFeatureAccess(pageKey)`: `datahallAI.html`, `dc-conventional.html`,
+  `dcmoc/index.html`, `datacenter-solutions.html` (card-click delegate),
+  `standards-ltc-lab.html`, `ltc-system-modelling-lab.html`,
+  `ltc-ashrae-thermal-control.html`, `ltc-uptime-tier-alignment.html`,
+  `ltc-ansi-tia-topology-readiness.html`, `ltc-iso-energy-governance.html`,
+  `ltc-nfpa-fire-risk.html`. Modal copy switched from "Root Access Required"
+  to "Pro or Educator access required". `/dc-market-tracker.html` remains
+  root-only by design.
+- **`rz-ops-p7x3k9m.html`** — User Management: cyan EDUCATOR badge, tier filter
+  adds educator/demo/root options, sidebar role label role-aware, row actions
+  **Promote → Educator / Demote → Demo** (writes `rz_admin_educators` +
+  dispatches `rz-educators-changed` + audit log `tier_change`). Feature Flags
+  matrix gains explicit **ROOT column** (4-col table) + bulk presets
+  `all_demo+`, `all_pro+`, `all_root_only`. CSV export updated.
+- **Demo seed alignment** — `demo@resistancezero.com` now `tier: 'demo'` (was
+  inconsistent `tier:'pro'`). Resolves a latent UI badge bug and removes a
+  brief unlock window on 6 LTC inline fallbacks that the security review
+  flagged.
+- **`firebase-auth.js`** + **`supabase-auth.js`** — educator-aware badge
+  handlers + `detectRole` ensures the EDUCATOR badge renders cyan everywhere,
+  not just under `auth.js`.
+- **Standardisation docs** — `AUTH_STANDARD.md`, `PRO_MODE_STANDARDIZATION.md`,
+  `FEATURE_FLAGS_STANDARD.md`, `CLAUDE.md` all updated with the 4-tier matrix
+  + educator role tables + `page-access` convention + `enforceTierFeatureAccess`
+  reference.
+
+### Verification
+
+- `tools/probe-educator-access.mjs` (new): Puppeteer E2E covering 5 sessions ×
+  13 pages = **65/65 PASS, 0 pageerrors** against a local server.
+- Audit gates: `audit-js-syntax --strict`, `audit-script-tags --strict`,
+  `audit-version-stamp --strict`, `audit-mobile-responsive --strict` — all GREEN.
+- Code review + security review subagent passes; findings addressed.
+
+### Threat model note
+
+Client-side auth is still a mock (passwords live in `auth.js` source). The full
+server-side replacement (Cloudflare Worker `rz-auth-gateway` + KV + PBKDF2)
+is tracked separately as R-015 (Phase 0 + Phase 1 already shipped on the
+`user-mgmt-self-service` branch, awaiting merge).
+
+---
+
 ## v1.25.3 — 2026-05-22 (datahallAI mobile order fix — main SCADA leads, sidebar telemetry spine drops below)
 
 Owner-reported regression (image attached, mobile view of
