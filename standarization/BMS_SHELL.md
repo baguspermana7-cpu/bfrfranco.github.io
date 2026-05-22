@@ -66,6 +66,11 @@ OK · Cameras OK · Access Control OK) + BMS/OT gateway health chip row
 all Online). Page now answers "can operations still see and control the
 facility?" — doc-14 §8 primary question.
 
+**v1.24.3 (2026-05-22)** — `datahallAI.html` shell library load (no
+component adoption). 10k-line flagship cockpit page — incremental cockpit
+fixes ship v1.24.4+. `body` has no `rz-bms-shell` class; engine files +
+`#p-dash` owner-excluded panel byte-identical.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

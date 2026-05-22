@@ -11,6 +11,46 @@ release sections rather than semver.
 
 ---
 
+## v1.24.3 — 2026-05-22 (BMS Shell adoption #9 — `datahallAI.html` cross-page consistency, no component adoption yet)
+
+Ninth adoption ship. Datahall AI is the 10,000+ line flagship cockpit
+page with rich existing engine binding (`js/datahall-model.js` +
+`js/datahall-calculations.js` deep-frozen Scenario-A), alarm strip,
+sidebar telemetry spine, BoD drawer, 9 tab panels. For this ship we
+only LOAD the BMS Shell library — no component adoption — so future
+cockpit-pass ships (v1.24.4+) can pick up doc-24's specific fixes
+incrementally without bundling them with library availability.
+
+### Added (datahallAI.html only)
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.3` +
+  `js/rz-bms-shell.js?v=1.24.3`. `body` does NOT carry
+  `class="rz-bms-shell"` — the existing 10k-line render tree, palette,
+  and DC-dashboard owner-excluded `#p-dash` are byte-identical.
+
+### Preserved (verified untouched)
+- `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical
+  to HEAD. 57/57 datahall + 22/22 conv engine tests pass.
+- `#p-dash` tab + `updateDashKPI()` + `dcCallouts` byte-identical.
+- All 9 tab panels (`#p-over`, `#p-hall`, `#p-rack`, `#p-cool`,
+  `#p-elec`, `#p-net`, `#p-fire`, `#p-bms`, plus `#p-dash` excluded)
+  + alarm strip + BoD drawer + sidebar telemetry spine.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Next ships in v1.24.x cockpit pass (doc-24)
+v1.24.4 — demote structural/static basis callouts (Seismic Zone 4 / Wind
+12m/s / Floor 3.5t/m2) from live image to Basis-of-Design drawer (doc-24
+fix #7). v1.24.5 — compact "Data Mode: Simulated" chip replacing the
+full-width legal strip (doc-24 fix #1). v1.24.6+ — quiet normal states /
+right inspector consistency / layer toggles on diagrams (doc-24 fixes
+#4, #6, #9). Each ship surgical and additive.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.24.3 entry added.
+
+---
+
 ## v1.24.2 — 2026-05-22 (BMS Shell adoption #8 — `ict.html`, ICT-as-BMS-operations summary + OT gateway health per doc-14 §8)
 
 Eighth adoption ship. Surgical and additive. ICT page reframed as a BMS
