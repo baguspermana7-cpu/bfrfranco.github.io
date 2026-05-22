@@ -266,16 +266,75 @@ curl -s -b cookies.txt -H "Origin: $ORIGIN" \
 | delete system tier | 403 | `cannot delete system tier` |
 | hard-delete root user | 403 | `cannot hard-delete root user` |
 
-## 6. (Phase 1, later) Deploy
+## 6. Deploy
 
 ```bash
 npx wrangler deploy
 ```
 
 Note the deployed URL (e.g. `https://rz-auth-gateway.<account>.workers.dev`).
-The client (`auth.js`) will be pointed at this URL in plan Task 3, gated by
-the `__RZ_AUTH_BACKEND` feature flag so the existing client mock remains
-available as a one-release escape hatch.
+The client (`auth.js`) is pointed at this URL via the `AUTH_V2` flag —
+see §7 below.
+
+## 7. Client activation (Phase 3)
+
+`auth.js` ships with a feature flag (`AUTH_V2`) that routes login,
+logout, and session-hydrate through this Worker instead of the legacy
+hardcoded `VALID_USERS` array. The flag defaults to **OFF** so existing
+pages remain byte-identical until the Worker is stable in production.
+
+### 7.1 Per-browser opt-in (testing)
+
+After the Worker is deployed (step 6), open the site, hit DevTools
+console on any page that loads `auth.js`, and run:
+
+```js
+localStorage.setItem('rz_auth_v2', '1');
+localStorage.setItem('rz_auth_gw', 'https://rz-auth-gateway.<account>.workers.dev');
+location.reload();
+```
+
+Login from that browser now flows through `/auth/login`. The Worker
+sets an `HttpOnly; SameSite=Strict; Path=/` `rz_sess` cookie and
+returns `{email, role, tier, csrf, expiresAt}`. `auth.js` stores a
+UI-only mirror in `localStorage.rz_premium_session` (with `v2: true`
+marker) and the CSRF token in `localStorage.rz_auth_csrf` for the
+Phase 4 rz-ops admin panel.
+
+To revert a browser to the legacy hardcoded auth:
+
+```js
+localStorage.removeItem('rz_auth_v2');
+localStorage.removeItem('rz_auth_gw');
+localStorage.removeItem('rz_auth_csrf');
+location.reload();
+```
+
+### 7.2 Failure-mode UX
+
+When `AUTH_V2` is on and the Worker is unreachable, the login modal
+shows **"Auth service unavailable — please retry."** rather than
+silently falling back to `VALID_USERS`. This is intentional (plan §6
+threat model): an admin who *thinks* they're saving changes against
+the Worker but is actually mutating a static mock would be a serious
+correctness footgun.
+
+### 7.3 Flipping the default for everyone
+
+Once the Worker has been stable across user testing for ≥1 release,
+edit `auth.js`:
+
+```js
+var __RZ_AUTH_BACKEND = 'worker'; // was: 'mock'
+var AUTH_V2 = true;               // was: false
+```
+
+— and rebuild `auth.min.js` (`npx terser auth.js -o auth.min.js
+--compress --mangle reserved=['loginV2','logoutV2','hydrateSessionFromWorker','gw']
+--keep-fnames`). Ship as a MINOR bump.
+
+A future MAJOR can then delete the `VALID_USERS` array and the legacy
+`findUser()` path entirely.
 
 ## Security notes (read this)
 

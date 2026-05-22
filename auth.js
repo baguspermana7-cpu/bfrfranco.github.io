@@ -17,6 +17,124 @@
         document.head.appendChild(fa);
     }
 
+    /* ───────── R-015 Phase 3: rz-auth-gateway feature flag ─────────
+       AUTH_V2 (localStorage.rz_auth_v2 === '1') routes login/logout/hydrate
+       through the Cloudflare Worker auth gateway instead of the hardcoded
+       VALID_USERS array below. Default OFF — Worker isn't deployed in
+       production yet. Per-browser opt-in is documented in
+       worker-auth/SETUP.md §7. Rollout state described in __RZ_AUTH_BACKEND.
+
+       Flag-OFF path MUST be byte-identical to the legacy hardcoded auth so
+       that existing pages continue to work unchanged. */
+    var __RZ_AUTH_BACKEND = 'mock'; /* 'mock' (current) | 'worker' (post-rollout default) */
+    var AUTH_V2 = false;
+    var AUTH_GW = '';
+    try {
+        if (typeof localStorage !== 'undefined') {
+            AUTH_V2 = localStorage.getItem('rz_auth_v2') === '1';
+            AUTH_GW = localStorage.getItem('rz_auth_gw') || '';
+        }
+    } catch (e) { /* localStorage unavailable (private mode, SSR) — flag stays off */ }
+    /* AUTH_V2 fallback URL — overridable via localStorage.rz_auth_gw. */
+    if (AUTH_V2 && !AUTH_GW) AUTH_GW = 'https://rz-auth-gateway.PLACEHOLDER.workers.dev';
+
+    /**
+     * Internal fetch helper for the Worker gateway. Always sends cookies,
+     * always JSON, parses the standard {ok, data, error} envelope. Throws
+     * on non-ok responses with `err.status` set so callers can branch.
+     */
+    function gw(path, opts) {
+        opts = opts || {};
+        var url = AUTH_GW + path;
+        var fopts = {
+            method: opts.method || 'GET',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+        };
+        if (opts.csrf) fopts.headers['X-CSRF-Token'] = opts.csrf;
+        if (opts.body) fopts.body = JSON.stringify(opts.body);
+        return fetch(url, fopts).then(function (r) {
+            return r.json().then(function (j) {
+                if (!j || j.ok !== true) {
+                    var err = new Error((j && j.error) || ('gw ' + r.status));
+                    err.status = r.status;
+                    throw err;
+                }
+                return j.data;
+            });
+        });
+    }
+
+    /**
+     * Worker-backed login: POSTs to /auth/login. On success the Worker sets
+     * the HttpOnly rz_sess cookie; we store a UI-only mirror of {email, role,
+     * tier, expires} in localStorage so getSession() / updateAuthUI() keep
+     * working without a per-render network round-trip. csrf is kept in a
+     * separate localStorage key for the rz-ops admin UI (Phase 4).
+     */
+    function loginV2(email, password) {
+        return gw('/auth/login', { method: 'POST', body: { email: email, password: password } })
+            .then(function (data) {
+                try {
+                    localStorage.setItem('rz_auth_csrf', data.csrf || '');
+                    localStorage.setItem('rz_premium_session', JSON.stringify({
+                        email: data.email,
+                        role: data.role,
+                        tier: data.tier,
+                        expires: (data.expiresAt || 0) * 1000,
+                        v2: true
+                    }));
+                } catch (e) { /* storage full / unavailable */ }
+                return data;
+            });
+    }
+
+    /**
+     * Worker-backed logout: POSTs to /auth/logout with the saved CSRF. We
+     * always clear the local mirror even if the revoke call fails so the UI
+     * never falsely shows a logged-in state after the user clicks logout.
+     */
+    function logoutV2() {
+        var csrf = '';
+        try { csrf = localStorage.getItem('rz_auth_csrf') || ''; } catch (e) {}
+        return gw('/auth/logout', { method: 'POST', csrf: csrf })
+            .catch(function () { /* revoke best-effort */ })
+            .then(function () {
+                try {
+                    localStorage.removeItem('rz_premium_session');
+                    localStorage.removeItem('rz_auth_csrf');
+                } catch (e) {}
+            });
+    }
+
+    /**
+     * Page-load hydration: GET /auth/me to refresh the local mirror. The
+     * Worker is the source of truth — if the cookie expired server-side we
+     * clear the local mirror so the login button shows. Runs once at init.
+     */
+    function hydrateSessionFromWorker() {
+        return gw('/auth/me')
+            .then(function (data) {
+                try {
+                    localStorage.setItem('rz_premium_session', JSON.stringify({
+                        email: data.email,
+                        role: data.role,
+                        tier: data.tier,
+                        expires: (data.expiresAt || 0) * 1000,
+                        v2: true
+                    }));
+                } catch (e) {}
+                return data;
+            })
+            .catch(function () {
+                try {
+                    localStorage.removeItem('rz_premium_session');
+                    localStorage.removeItem('rz_auth_csrf');
+                } catch (e2) {}
+                return null;
+            });
+    }
+
     var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
     var DEMO_EMAILS = ['demo@resistancezero.com'];
     var EDUCATOR_SEED_EMAILS = ['educator@resistancezero.com'];
@@ -579,6 +697,50 @@
                 return;
             }
 
+            /* Phase 3: Worker-backed login when feature flag is on. The
+               worker is the source of truth; we keep a UI-only mirror in
+               localStorage so render code (badge, dropdown) keeps working
+               without a per-render network call. On Worker failure we
+               surface the error explicitly — NO silent fallback to the
+               hardcoded VALID_USERS array (plan §6 threat model). */
+            if (AUTH_V2) {
+                loginV2(email, password).then(function (data) {
+                    if (formEl) formEl.style.display = 'none';
+                    if (tierLabel) tierLabel.textContent = 'Access Activated';
+                    if (successEl) successEl.classList.add('show');
+                    updateAuthUI();
+                    window.dispatchEvent(new CustomEvent('rz-auth-change', {
+                        detail: {
+                            email: data.email,
+                            tier: data.tier,
+                            role: data.role || detectRole(data.email),
+                            action: 'login'
+                        }
+                    }));
+                    setTimeout(function () {
+                        window._rzAuth.hideModal();
+                        var path = window.location.pathname.toLowerCase();
+                        if (path.indexOf('capex-calculator') !== -1 || path.indexOf('opex-calculator') !== -1) {
+                            window.location.reload();
+                        }
+                    }, 1500);
+                }).catch(function (err) {
+                    if (!errorEl) return;
+                    var msg = 'Invalid email or password.';
+                    if (err && err.status === 403) {
+                        msg = 'Account disabled. Contact support.';
+                    } else if (err && err.status === 429) {
+                        msg = 'Too many attempts. Try again in a few minutes.';
+                    } else if (!err || !err.status) {
+                        /* Network / parse failure — Worker unreachable. */
+                        msg = 'Auth service unavailable — please retry.';
+                    }
+                    errorEl.textContent = msg;
+                    errorEl.classList.add('show');
+                });
+                return;
+            }
+
             var user = findUser(email, password);
             if (!user) {
                 if (errorEl) { errorEl.textContent = 'Invalid email or password.'; errorEl.classList.add('show'); }
@@ -607,6 +769,22 @@
         },
 
         logout: function () {
+            /* Phase 3: revoke the Worker session before clearing UI state.
+               logoutV2() never rejects — it always proceeds to clear the
+               local mirror even if the revoke call fails. */
+            if (AUTH_V2) {
+                logoutV2().then(function () {
+                    updateAuthUI();
+                    var dropdown = document.getElementById('rzUserDropdown');
+                    if (dropdown) dropdown.classList.remove('show');
+                    window.dispatchEvent(new CustomEvent('rz-auth-change', { detail: { action: 'logout' } }));
+                    var path = window.location.pathname.toLowerCase();
+                    if (path.indexOf('capex-calculator') !== -1 || path.indexOf('opex-calculator') !== -1) {
+                        window.location.reload();
+                    }
+                });
+                return;
+            }
             clearSession();
             updateAuthUI();
             var dropdown = document.getElementById('rzUserDropdown');
@@ -625,6 +803,15 @@
         },
 
         getSession: getSession,
+
+        /**
+         * Read the saved CSRF token (set by loginV2 on success). Used by the
+         * Phase 4 rz-ops admin UI to populate X-CSRF-Token on state-changing
+         * Worker calls. Returns '' when no V2 session is active.
+         */
+        getCsrf: function () {
+            try { return localStorage.getItem('rz_auth_csrf') || ''; } catch (e) { return ''; }
+        },
 
         /**
          * Resolve the current user's feature tier: 'free' | 'demo' | 'pro'.
@@ -738,6 +925,16 @@
         injectLoginModal();
         updateAuthUI();
         updateRootOnlyLinksUI();
+        /* Phase 3: when flag is on, refresh the local mirror from the
+           Worker once per page-load. hydrateSessionFromWorker() resolves
+           with null on failure and clears the mirror — we re-render after
+           that so the login button correctly appears. */
+        if (AUTH_V2) {
+            hydrateSessionFromWorker().then(function () {
+                updateAuthUI();
+                updateRootOnlyLinksUI();
+            });
+        }
     }
 
     if (document.readyState === 'loading') {
