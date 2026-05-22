@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v1.24.2 — 2026-05-22 (BMS Shell adoption #8 — `ict.html`, ICT-as-BMS-operations summary + OT gateway health per doc-14 §8)
+
+Eighth adoption ship. Surgical and additive. ICT page reframed as a BMS
+operations view (answers "can operations still see and control the
+facility?", not just "is the IT network online?"). All existing alarm
+strip, nav rail, network segment views, capacity tables, alerts panel,
+and engineering notes preserved.
+
+### Added (ict.html only)
+- **ICT Ops summary strip** (`#ict-ops-strip`) — second status strip
+  after the existing alarm strip: `ICT Ops · WAN OK · BMS Fabric OK ·
+  Cameras OK · Access Control OK`. Includes the doc-14 §8 framing
+  question.
+- **BMS/OT gateway health row** (`#ict-otgw`) — 5 chips: EPMS / Chiller /
+  Fire Panel / Access·CCTV / Historian — all Online by default
+  (deterministic / engine-aligned). Calm normal green.
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.2` +
+  `js/rz-bms-shell.js?v=1.24.2`. Cross-page consistency only; body has
+  no `rz-bms-shell` class.
+
+### Preserved (verified untouched)
+- `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
+- Existing alarm strip, top topbar (Back / Portfolio / Basis / Print /
+  Export), network segment nav (IT / BMS / Access·CCTV / WAN), capacity
+  tables, active alerts, engineering notes.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.24.2 entry added.
+
+---
+
 ## v1.24.1 — 2026-05-22 (BMS Shell adoption #7 — `datahall.html`, operations rollup + view-mode selector per doc-14 §3)
 
 Seventh adoption ship. Surgical and additive — preserves the existing

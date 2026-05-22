@@ -59,6 +59,13 @@ selector (`#dh-mode-toolbar` via `RZBMSShell.layerToggle`) with 5 modes
 (Power/Temperature/Cooling Margin/Space/Alarms) that sets
 `body[data-dh-mode]`. Per-mode render rules deferred.
 
+**v1.24.2 (2026-05-22)** — `ict.html` adopted. Library loaded. Doc-14
+§8 fixes: ICT Ops summary strip (`#ict-ops-strip`: WAN OK · BMS Fabric
+OK · Cameras OK · Access Control OK) + BMS/OT gateway health chip row
+(`#ict-otgw`: EPMS · Chiller · Fire Panel · Access·CCTV · Historian —
+all Online). Page now answers "can operations still see and control the
+facility?" — doc-14 §8 primary question.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).
