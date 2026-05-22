@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v1.27.2 — 2026-05-22 (R-015 Phase 2 — admin CRUD endpoints on rz-auth-gateway)
+
+Infrastructure-only ship (no user-visible behavior change on the static
+site). Adds 11 admin endpoints to `rz-auth-gateway`, gating every state
+change behind `role === 'root'` + `X-CSRF-Token` + audit-log.
+
+### What landed
+
+- **`worker-auth/src/handlers/admin.js`** (NEW, 618 lines) — 11 handlers:
+  - `GET /admin/users` (paginated list, sanitized — no hash/salt exposed)
+  - `POST /admin/users` (create with PBKDF2 hash, validates uniqueness + tier + role)
+  - `PATCH /admin/users/:email` (tier/role/status/featureOverrides; 404 + audit before/after)
+  - `POST /admin/users/:email/reset-password` (new salt+hash; best-effort revoke existing sessions)
+  - `DELETE /admin/users/:email` (soft-disable; `?hard=1` removes; root hard-delete blocked)
+  - `GET /admin/tiers` (sorted by priority, full feature matrix)
+  - `POST /admin/tiers` (slug + color hex + uniqueness validation; `isSystem:false`)
+  - `PATCH /admin/tiers/:name` (label/color/priority/defaultFeatures; system-tier rules)
+  - `DELETE /admin/tiers/:name` (rejects system; rejects when ≥1 user attached)
+  - `GET /admin/pages` (23-entry static page-key registry for matrix UI)
+  - `GET /admin/audit` (chronological log, filter by actor/action/date range)
+- **`worker-auth/src/data/page-keys.js`** (NEW) — static page registry (DC AI,
+  DC Conv, DCMOC, 8 LTC labs, calculators, etc.)
+- **`worker-auth/src/middleware.js`** — `requireAdmin()`, `requireCsrf()`,
+  timing-safe string compare.
+- **`worker-auth/SETUP.md` §5** — shell walkthrough for admin operations
+  before Phase 4 UI lands.
+- **TDD**: 50 new admin tests across 5 suites. **89/89 total pass.**
+
+### NOT in this commit
+
+- Phase 3: client `auth.js` refactor to call `/auth/login` (next)
+- Phase 4: rz-ops Tier Manager UI + user CRUD UI
+- Phase 5: E2E probe + reviews + ship
+
+Static site unaffected — `auth.js` still uses hardcoded `VALID_USERS`.
+
+---
+
 ## v1.27.1 — 2026-05-22 (R-015 Phase 0+1 — rz-auth-gateway Worker scaffold + login/seed endpoints)
 
 Infrastructure-only ship (no user-visible behavior change on the static
