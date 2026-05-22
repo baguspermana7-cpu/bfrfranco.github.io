@@ -153,6 +153,12 @@ Adoption status table + rules of engagement + deferred-work queue
 captured at the top of this spec. No code changes to any page; locks
 in the v1.23 → v1.24 milestone for handoff.
 
+**v1.25.1 (2026-05-22)** — datahallAI cockpit fix #8 (doc-24): each of
+the 8 in-scope panels (`#p-over` / `#p-hall` / `#p-rack` / `#p-cool` /
+`#p-elec` / `#p-net` / `#p-fire` / `#p-bms`) gained an italic single-line
+"Primary read:" hint surfacing the operator's first-read question per
+panel. `#p-dash` excluded; engine files + tests byte-identical.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

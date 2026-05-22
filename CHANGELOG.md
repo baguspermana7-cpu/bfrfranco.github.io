@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v1.25.1 — 2026-05-22 (datahallAI cockpit fix #8 — per-tab primary-read hint per doc-24)
+
+Thirteenth adoption ship. Adds the doc-24 §8 "tab-level primary question"
+hint to each of the 8 in-scope panels on `datahallAI.html`. One italic
+single-line hint per panel; surgical, additive, zero engine impact.
+
+### Changed (datahallAI.html only — 8 in-scope panels)
+- **`#p-over`** Building Overview: *Primary read: where is the alarm and where do I click next?*
+- **`#p-hall`** Data Hall: *Primary read: where are the outliers — thermal, power, cooling margin?*
+- **`#p-rack`** Rack Architecture: *Primary read: how is an NVL72 built — and what is the current risk on the selected rack?*
+- **`#p-cool`** Cooling & Piping P&ID: *Primary read: where is the heat going — and what is the cooling constraint right now?*
+- **`#p-elec`** Facility Electrical SLD (Overview sub-tab): *Primary read: what is energized, what is loaded, what is at risk of trip?*
+- **`#p-net`** Network Fabric: *Primary read: what is the fabric health — congestion, packet loss, degraded redundancy?*
+- **`#p-fire`** Fire Detection & Suppression: *Primary read: what is the current protection state — and what is bypassed?*
+- **`#p-bms`** BMS/DCIM Architecture: *Primary read: is the monitoring system itself trustworthy?*
+
+### Preserved (verified untouched)
+- `#p-dash` tab + `updateDashKPI()` + `dcCallouts` byte-identical (owner exclusion held — no primary-read hint on the excluded dashboard).
+- `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical. 57/57 datahall + 22/22 conv engine tests pass.
+- All SVG diagrams, KPI strips, alarm strip, sidebar telemetry spine, BoD drawer.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.25.1 entry added.
+
+---
+
 ## v1.25.0 — 2026-05-22 (BMS Shell phase milestone — adoption status table + rules of engagement + deferred-work queue)
 
 Phase-closing polish ship. No code changes to any page; locks in the
