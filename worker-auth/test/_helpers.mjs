@@ -80,3 +80,105 @@ export function extractSessionCookie(setCookieHeader) {
   const m = /(?:^|;\s*|,\s*)rz_sess=([^;,\s]+)/.exec(setCookieHeader);
   return m ? m[1] : null;
 }
+
+/**
+ * Seed a user record into KV. Hashes the password with PBKDF2 so login
+ * works end-to-end. Returns the stored record.
+ */
+export async function seedUser(env, {
+  email,
+  password,
+  tier = 'pro',
+  role = 'user',
+  status = 'active',
+  featureOverrides = {},
+}) {
+  const { hashPassword, newSalt, b64encode, PBKDF2_ITERS } =
+    await import('../src/lib/crypto.js');
+  const salt = newSalt();
+  const passwordHash = await hashPassword(password, salt);
+  const tsNow = Math.floor(Date.now() / 1000);
+  const rec = {
+    email,
+    passwordHash,
+    salt: b64encode(salt),
+    iters: PBKDF2_ITERS,
+    tier,
+    role,
+    status,
+    featureOverrides,
+    createdAt: tsNow,
+    createdBy: 'test',
+    updatedAt: tsNow,
+  };
+  await env.RZ_AUTH_KV.put(`users/${email}`, JSON.stringify(rec));
+  return rec;
+}
+
+/**
+ * Seed a tier record into KV.
+ */
+export async function seedTier(env, {
+  name,
+  label,
+  priority,
+  color = '#94a3b8',
+  defaultFeatures = {},
+  isSystem = true,
+}) {
+  const rec = { name, label, priority, color, defaultFeatures, isSystem };
+  await env.RZ_AUTH_KV.put(`tiers/${name}`, JSON.stringify(rec));
+  return rec;
+}
+
+/**
+ * Log a user in via the public /auth/login endpoint, returning the cookie +
+ * CSRF token so admin tests can issue authenticated state-changing calls.
+ */
+export async function loginAs(worker, env, email, password) {
+  const login = await call(worker, 'POST', '/auth/login',
+    { env, body: { email, password } });
+  if (login.res.status !== 200) {
+    throw new Error(`loginAs(${email}) failed: ${login.res.status} ${JSON.stringify(login.body)}`);
+  }
+  const token = extractSessionCookie(login.res.headers.get('Set-Cookie'));
+  const csrf = login.body.data.csrf;
+  return { cookie: `rz_sess=${token}`, csrf, token };
+}
+
+/**
+ * Convenience: seed system tiers covering free/demo/pro/educator/root in the
+ * same shape Phase 1 seed migration produces.
+ */
+export async function seedSystemTiers(env) {
+  await seedTier(env, { name: 'free', label: 'Free', priority: 10, color: '#94a3b8' });
+  await seedTier(env, { name: 'demo', label: 'Demo', priority: 20, color: '#a78bfa' });
+  await seedTier(env, { name: 'educator', label: 'Educator', priority: 25, color: '#10b981' });
+  await seedTier(env, { name: 'pro', label: 'Pro', priority: 30, color: '#8b5cf6' });
+  await seedTier(env, { name: 'root', label: 'Root', priority: 99, color: '#ef4444' });
+}
+
+/**
+ * Pass CSRF token in calls via { csrf } shortcut.
+ */
+export async function adminCall(worker, method, pathname, opts = {}) {
+  const headers = {};
+  if (opts.csrf) headers['X-CSRF-Token'] = opts.csrf;
+  // Bridge: layer onto existing call() by injecting through a Request
+  // synth path. We re-implement here so the CSRF header survives.
+  const url = `https://gateway.example${pathname}`;
+  const init = { method, headers: { 'Origin': opts.origin || ORIGIN, ...headers } };
+  if (opts.cookie) init.headers['Cookie'] = opts.cookie;
+  if (opts.ip !== null) init.headers['cf-connecting-ip'] = opts.ip || '203.0.113.7';
+  if (opts.body != null) {
+    init.headers['Content-Type'] = 'application/json';
+    init.body = typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body);
+  }
+  const req = new Request(url, init);
+  const env = opts.env || makeEnv();
+  const res = await worker.fetch(req, env, {});
+  let parsed = null;
+  const text = await res.text();
+  if (text) { try { parsed = JSON.parse(text); } catch { parsed = text; } }
+  return { res, body: parsed };
+}

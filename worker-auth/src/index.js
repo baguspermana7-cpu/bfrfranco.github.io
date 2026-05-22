@@ -49,6 +49,7 @@ import {
   getSessionCookieToken,
   COOKIE_NAME,
 } from './middleware.js';
+import { handleAdminRoute } from './handlers/admin.js';
 
 const ALLOWED_ORIGINS = new Set([
   'https://resistancezero.com',
@@ -92,6 +93,20 @@ function handlePreflight(origin) {
     return new Response(null, { status: 403 });
   }
   return new Response(null, { status: 204, headers });
+}
+
+/**
+ * Decorate an existing Response (typically from a sub-handler that doesn't
+ * know about CORS) with the per-request allowlist headers. Re-wraps the
+ * response body so we don't mutate the original headers map (which on the
+ * Workers runtime is read-only after construction).
+ */
+function withCors(res, origin) {
+  const cors = corsHeadersFor(origin);
+  if (!Object.keys(cors).length) return res;
+  const headers = new Headers(res.headers);
+  for (const [k, v] of Object.entries(cors)) headers.set(k, v);
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
 }
 
 function handleHealth(origin) {
@@ -431,6 +446,14 @@ export default {
       }
       if (method === 'POST' && pathname === '/admin/__seed') {
         return handleSeed(request, env, origin);
+      }
+
+      // All other /admin/* routes go through the Phase 2 CRUD handler. We
+      // decorate its Response with CORS headers here so admin.js stays
+      // origin-agnostic (one source of truth for the allowlist).
+      if (pathname.startsWith('/admin/')) {
+        const adminRes = await handleAdminRoute(request, env, _ctx, new URL(request.url));
+        return withCors(adminRes, origin);
       }
 
       return json(null, { status: 404, error: 'not found', origin });

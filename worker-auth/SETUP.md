@@ -129,7 +129,144 @@ BOOTSTRAP_SEED_TOKEN=dev-token-for-local-only
 Then `npx wrangler dev --port 8788` and the curl above against
 `http://127.0.0.1:8788/admin/__seed?token=dev-token-for-local-only`.
 
-## 5. (Phase 1, later) Deploy
+## 5. Shell-based admin operations (Phase 2)
+
+Until the rz-ops admin UI ships (Phase 4), all user / tier / audit management
+runs through `curl` against the live Worker. Every admin endpoint requires
+`session.role === 'root'`; state-changing methods also require an
+`X-CSRF-Token` header that matches the per-session CSRF token issued at
+login. The session cookie is `HttpOnly`, so you MUST use `-c/-b cookies.txt`
+to round-trip it — copy-pasting a cookie value into a curl flag won't work
+once Secure is enforced.
+
+> Replace `BASE` with the deployed URL (production) or
+> `http://127.0.0.1:8788` (local `wrangler dev`).
+
+### 5.1 Login + save cookie + CSRF
+
+```bash
+BASE="https://rz-auth-gateway.<account>.workers.dev"
+ORIGIN="https://resistancezero.com"
+
+# Login (saves rz_sess cookie to ./cookies.txt, captures CSRF from response).
+curl -i -c cookies.txt \
+  -H "Origin: $ORIGIN" \
+  -H 'Content-Type: application/json' \
+  --data '{"email":"bagus@resistancezero.com","password":"<YOUR_PW>"}' \
+  "$BASE/auth/login" > login.out
+
+CSRF=$(grep -oE '"csrf":"[^"]+"' login.out | head -1 | cut -d'"' -f4)
+echo "CSRF=$CSRF"
+
+# Sanity check — should return {email, role:'root', tier:'root', expiresAt}.
+curl -s -b cookies.txt -H "Origin: $ORIGIN" "$BASE/auth/me" | jq .
+```
+
+### 5.2 List users (GET — no CSRF needed)
+
+```bash
+curl -s -b cookies.txt -H "Origin: $ORIGIN" "$BASE/admin/users" | jq .
+# Filter by substring:
+curl -s -b cookies.txt -H "Origin: $ORIGIN" "$BASE/admin/users?q=educator" | jq .
+```
+
+### 5.3 Create a user
+
+```bash
+curl -s -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" -H 'Content-Type: application/json' \
+  --data '{"email":"new-educator@resistancezero.com","password":"changeme2026",
+           "tier":"pro","role":"educator"}' \
+  "$BASE/admin/users" | jq .
+```
+
+### 5.4 Update tier / role / status
+
+```bash
+curl -s -X PATCH -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" -H 'Content-Type: application/json' \
+  --data '{"tier":"pro","role":"pro"}' \
+  "$BASE/admin/users/new-educator@resistancezero.com" | jq .
+```
+
+### 5.5 Reset password (admin override)
+
+```bash
+curl -s -X POST -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" -H 'Content-Type: application/json' \
+  --data '{"password":"replacement-pw"}' \
+  "$BASE/admin/users/new-educator@resistancezero.com/reset-password" | jq .
+```
+
+> The plaintext password NEVER appears in the audit log. Pass it to the
+> user out-of-band.
+
+### 5.6 Soft-disable vs hard-delete
+
+```bash
+# Soft-disable (default — sets status:disabled, revokes active sessions).
+curl -s -X DELETE -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" \
+  "$BASE/admin/users/new-educator@resistancezero.com" | jq .
+
+# Hard delete (removes the KV record). Blocked on root users.
+curl -s -X DELETE -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" \
+  "$BASE/admin/users/new-educator@resistancezero.com?hard=1" | jq .
+```
+
+### 5.7 Tier CRUD
+
+```bash
+# List (includes defaultFeatures + isSystem).
+curl -s -b cookies.txt -H "Origin: $ORIGIN" "$BASE/admin/tiers" | jq .
+
+# Create a non-system tier.
+curl -s -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" -H 'Content-Type: application/json' \
+  --data '{"name":"beta","label":"Beta","priority":40,"color":"#22d3ee",
+           "defaultFeatures":{"finance-terminal":true}}' \
+  "$BASE/admin/tiers" | jq .
+
+# Update one field. System tiers reject priority < 10.
+curl -s -X PATCH -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" -H 'Content-Type: application/json' \
+  --data '{"label":"Beta Access"}' \
+  "$BASE/admin/tiers/beta" | jq .
+
+# Delete (rejected on system tiers + tiers with users still attached).
+curl -s -X DELETE -b cookies.txt \
+  -H "Origin: $ORIGIN" -H "X-CSRF-Token: $CSRF" \
+  "$BASE/admin/tiers/beta" | jq .
+```
+
+### 5.8 Page-key registry + audit log
+
+```bash
+# Static registry the rz-ops feature-matrix UI consumes (Phase 4).
+curl -s -b cookies.txt -H "Origin: $ORIGIN" "$BASE/admin/pages" | jq .
+
+# Audit log — filter by actor / action / time range.
+curl -s -b cookies.txt -H "Origin: $ORIGIN" \
+  "$BASE/admin/audit?actor=bagus@resistancezero.com&limit=20" | jq .
+curl -s -b cookies.txt -H "Origin: $ORIGIN" \
+  "$BASE/admin/audit?action=user.create" | jq .
+```
+
+### 5.9 Failure modes (expected status codes)
+
+| Condition | Status | `error` |
+|---|---|---|
+| no `rz_sess` cookie or expired | 401 | `not authenticated` |
+| logged in but `role !== 'root'` | 403 | `admin only` |
+| missing / wrong `X-CSRF-Token` on POST/PATCH/DELETE | 403 | `csrf failed` |
+| duplicate email on create | 409 | `email exists` |
+| tier name collision | 409 | `tier exists` |
+| delete tier with users still attached | 409 | `cannot delete: N user(s) still attached` |
+| delete system tier | 403 | `cannot delete system tier` |
+| hard-delete root user | 403 | `cannot hard-delete root user` |
+
+## 6. (Phase 1, later) Deploy
 
 ```bash
 npx wrangler deploy

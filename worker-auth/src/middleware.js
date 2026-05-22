@@ -81,4 +81,61 @@ export function getSessionCookieToken(request) {
   return parseCookie(request.headers.get('Cookie'), COOKIE_NAME);
 }
 
+/**
+ * Compose `requireSession` + role check. Throws `{status, message}` so the
+ * caller can map directly to the JSON envelope without re-deriving the
+ * status code:
+ *   - 401 not authenticated → no/invalid/expired cookie
+ *   - 403 admin only        → session present but role !== 'root'
+ *
+ * Returns `{session, token}` on success.
+ */
+export async function requireAdmin(request, env) {
+  let session, token;
+  try {
+    ({ session, token } = await requireSession(request, env));
+  } catch {
+    throw { status: 401, message: 'not authenticated' };
+  }
+  if (session.role !== 'root') {
+    throw { status: 403, message: 'admin only' };
+  }
+  return { session, token };
+}
+
+/**
+ * Verify the X-CSRF-Token header against the per-session CSRF token issued
+ * at login time (double-submit pattern). Throws `{status, message}` so the
+ * caller maps it onto the standard envelope:
+ *   - 403 csrf failed → header missing, malformed, or non-matching
+ *
+ * Constant-time compare to keep the failure mode timing-uniform.
+ */
+export function requireCsrf(request, session) {
+  const headerToken = request.headers.get('X-CSRF-Token');
+  if (!headerToken || typeof headerToken !== 'string') {
+    throw { status: 403, message: 'csrf failed' };
+  }
+  if (typeof session.csrf !== 'string' || session.csrf.length === 0) {
+    throw { status: 403, message: 'csrf failed' };
+  }
+  if (!timingSafeEqualStr(headerToken, session.csrf)) {
+    throw { status: 403, message: 'csrf failed' };
+  }
+}
+
+/**
+ * Constant-time string compare — header equality check that doesn't leak the
+ * matched-prefix length via timing.
+ */
+function timingSafeEqualStr(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 export { COOKIE_NAME };
