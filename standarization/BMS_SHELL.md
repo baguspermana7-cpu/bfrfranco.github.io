@@ -71,6 +71,12 @@ component adoption). 10k-line flagship cockpit page — incremental cockpit
 fixes ship v1.24.4+. `body` has no `rz-bms-shell` class; engine files +
 `#p-dash` owner-excluded panel byte-identical.
 
+**v1.24.4 (2026-05-22)** — datahallAI cockpit fix #1: legal disclaimer
+`<summary>` now carries a compact `Data Mode: Simulated` chip in-line
+(cyan accent, BMS Shell `is-simulated` style). Doc-24 fix #7 (Seismic /
+Wind / Floor structural callouts) deferred — those entries live inside
+the owner-excluded `dcCallouts` array on `#p-dash`.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).

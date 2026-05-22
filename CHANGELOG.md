@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v1.24.4 — 2026-05-22 (datahallAI cockpit fix #1 — compact `Data Mode: Simulated` chip per doc-24)
+
+Tenth adoption ship. First specific cockpit fix on datahallAI per doc-24:
+the legal/methodology notice now carries a compact `Data Mode: Simulated`
+chip in the same line. Operators can scan data-mode in a glance without
+expanding the legal notice. No new rows, no layout disruption, no
+component swap — strictly inline addition.
+
+### Note on doc-24 fix #7 (Seismic / Wind / Floor callouts)
+That fix targets entries inside `dcCallouts` on `#p-dash`, which is
+**owner-excluded** (byte-identical to HEAD across every adoption ship).
+Recorded as DEFERRED-OWNER-EXCLUDED in the tracker; skipping unless the
+owner lifts the exclusion explicitly.
+
+### Changed (datahallAI.html only)
+- **Legal disclaimer `<summary>`** — converted to a flex row carrying:
+  - **[NEW]** `Data Mode: Simulated` chip (cyan accent, mono font,
+    8-px text — matches BMS Shell `is-simulated` chip styling).
+  - The existing `⚠ Legal & methodology notice` text + `View details`
+    link (unchanged).
+  The collapsed `<details>` element + the expanded body text + all
+  links to terms / privacy remain identical.
+
+### Preserved (verified untouched)
+- `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical.
+  57/57 datahall + 22/22 conv engine tests pass.
+- `#p-dash` tab + `updateDashKPI()` + `dcCallouts` byte-identical.
+- All 9 tab panels + alarm strip + BoD drawer + sidebar telemetry spine.
+
+### Verified
+- 4 strict audit gates CLEAN.
+
+### Standardization updated
+- `standarization/BMS_SHELL.md` v1.24.4 entry added.
+
+---
+
 ## v1.24.3 — 2026-05-22 (BMS Shell adoption #9 — `datahallAI.html` cross-page consistency, no component adoption yet)
 
 Ninth adoption ship. Datahall AI is the 10,000+ line flagship cockpit
