@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v1.33.0 — 2026-05-24 (Network Visualization Hub — Phase 0 scaffolding: engine + audit + reference Modbus RTU timbre)
+
+MINOR ship: first code lands for the Network Visualization Hub. Per plan
+v2.3, the engine + audio + palette + reference topic module + discipline
+audit are scaffolded so the anti-monotony gate is operational from line 1.
+
+### Added
+
+- **`js/network-anim/palette.js`** (49 lines) — sole color source. 6 tokens
+  (`instrument-cyan`, `signal-amber`, `oscilloscope-green`, `fault-red`,
+  `wire-default`, `canvas-bg`). Throws on unknown token. Frozen at module load.
+- **`js/network-anim/audio.js`** (155 lines) — Web Audio synth, 8 canonical
+  events (`tick`, `byte`, `ack`, `error`, `complete`, `handshake`,
+  `streamChunk`, `tokenIssue`). Gesture-gated context. Mute-default.
+  `compose(eventName, timbre, role, state)` implements the v2.3 composition
+  order: defaults &lt; topic timbre &lt; perRole &lt; perState &lt; tempo
+  (top &times; state multiplicative). Clamps freq to [400, 3000] Hz, byte
+  duration to [6, 25] ms, hard cap 250 ms decay on all events.
+- **`js/network-anim/engine.js`** (109 lines) — RAF lifecycle + emit
+  composer. `create(topicInstance, opts)` returns an engine handle.
+  `emit(eventName, ctx)` composes via `audio.compose()` and dispatches
+  SFX + optional signal callbacks. Throws if topic instance is missing
+  `timbre` (loud-fail at integration time, not user-test time).
+- **`js/network-anim/topics/modbus-rtu.js`** (130 lines) — reference topic
+  module. Full `_timbre` per Appendix E row 1 (square-sweep 1200&rarr;1600 Hz
+  byte, sensor-circle slave, plc-rectangle master, serial-thin 0.7 px wire,
+  square 8&times;8 cyan chip, modem-v21 register, perRole master/slave
+  &plusmn;200 Hz, perState error LOCKED to 1.0&times;). `init()` returns
+  contract-shaped instance (play / pause / seek / setParams / getNormalized
+  / destroy + timbre). Phase 0 stub for animation logic; full implementation
+  lands in Phase 1.
+- **`tools/audit-network-anim.py`** (491 lines) — discipline gate covering
+  palette, banned CSS, timbre presence + enums, variation budget bounds,
+  pairwise-within-lane anti-monotony, `perState.error` lock. `--strict`
+  exits 1 on any HIGH/CRITICAL.
+
+### Status
+
+Audit: **CLEAN** — 1 topic audited (Modbus RTU reference), 0 findings.
+File sizes well within budget (engine ~12 KB unminified vs 60 KB minified
+cap; per-topic 5.5 KB vs 15 KB cap).
+
+This is the foundation. Subsequent Phase 0 ships add `renderer.js` + `vfx.js`,
+the `network-visualization-hub.html` + `network-compare.html` scaffolds,
+Knowledge Labs card on `datacenter-solutions.html`, sitemap / search-index /
+llms.txt / OG entries, and the live Modbus RTU topic page end-to-end.
+
+### Changed
+
+- `js/rz-version.js` &mdash; bumped to v1.33.0 (MINOR; first Hub code)
+- `sw.js` &mdash; cache name `rz-cache-v1.33.0`
+
+### Cross-references
+
+`docs/plans/2026-05-24-network-visualization-hub-v2.md` §§5.1, 5.2, 5.3,
+5.4, 5.6 + Appendix E + §15 Phase 0 DoD &middot;
+`standarization/KNOWLEDGE_LABS_STANDARD.md`
+
+---
+
 ## v1.32.10 — 2026-05-24 (Network Hub plan v2.3 — anti-monotony timbre layer + v2.2 review fixes)
 
 PATCH doc-only ship: plan revision, no site code touched.
