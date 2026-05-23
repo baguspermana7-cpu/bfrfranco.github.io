@@ -1,8 +1,18 @@
-# DC Solutions — Network Visualization Hub
+# DC Solutions — Network Visualization Hub  ⚠️ SUPERSEDED
+
+> **THIS PLAN IS SUPERSEDED.** See **`2026-05-24-network-visualization-hub-v2.md`** for the active specification.
+>
+> Reviewer verdicts on this v1: **code-reviewer = REWORK** (1 CRITICAL on ES module syntax incompatible with zero-build site), **uiux-reviewer = APPROVE_WITH_NOTES** (7 HIGH design adjustments). v2 folds in all 1 CRITICAL + 12 HIGH + 11 MEDIUM findings.
+>
+> v1 is kept for historical traceability. Do NOT implement from this document.
+
+---
+
+# DC Solutions — Network Visualization Hub (v1, superseded)
 
 - **Date:** 2026-05-23
 - **Mode:** PLAN ONLY (no code until owner approves)
-- **Status:** Concept design + technical plan; awaiting owner review (code-reviewer + uiux-reviewer agents will run on this doc before any implementation).
+- **Status:** **SUPERSEDED by v2** (2026-05-24). v2 is the active specification.
 - **Trigger:** Owner request to add a "network stuff" hub to DC Solutions covering CompTIA-aligned communication protocols (Modbus RTU/485, Modbus TCP, BACnet, OPC-UA, etc.) and software topics (MCP, API, OAuth 2.0, JWT, mTLS, GraphQL, etc.) — each topic with an animated visualization, parameter input panels, and a compare/grid mode. SFX + VFX expected. Reference video supplied by owner.
 
 ---

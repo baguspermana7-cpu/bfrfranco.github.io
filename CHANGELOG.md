@@ -11,6 +11,63 @@ release sections rather than semver.
 
 ---
 
+## v1.32.7 — 2026-05-24 (Network Visualization Hub plan v2 — reviewer-vetted, ready for Phase 0 sign-off)
+
+PATCH doc-only ship: plan rewrite, no site code touched. Builds on the
+v1.32.5 doc-propagation pass.
+
+### Added
+
+- **`docs/plans/2026-05-24-network-visualization-hub-v2.md`** &mdash;
+  full rewrite of the Network Visualization Hub specification.
+  - All 1 CRITICAL + 12 HIGH + 11 MEDIUM findings from the v1 review
+    cycle (code-reviewer + uiux-reviewer) folded in.
+  - Module loading: IIFE/namespace pattern (`window.RZNetAnim.<topic>`)
+    matching the zero-build site convention; no ES `export`.
+  - Topic count reconciled to **25** (Lane A 5 + B 9 + C 3 + D 4 + E 4)
+    after splitting REST/GraphQL/gRPC and adding EtherCAT.
+  - Audio: 8 canonical events (added `handshake`, `stream-chunk`,
+    `token-issue`); `error` = 2 px red bezel flash (not screen shake);
+    `complete` = single sine 1.5 kHz 80 ms (not perfect-fifth).
+  - VFX: "Byte chip" (renamed from "Byte glow"); packet trail capped at
+    2 segments with alpha ramp; ACK ring shortened from 1 s to 600 ms.
+  - Performance budget restated: engine &le;60 KB total + per-topic
+    &le;15 KB lazy-loaded + drawCalls &le;200 per frame per panel.
+  - Determinism rule for `seek(frame)` with `Math.round(x) + 0.5`
+    pixel-snap mandate for stroked paths.
+  - Compare-mode cross-protocol semantic mapping (Appendix B) with
+    display rules for null fields (em-dash, never `0`).
+  - A11y: 2 px signal-amber focus indicator + 2 px offset; glyph-paired
+    colours (&check; &times; &darr; &warning;); ARIA live region on
+    scrubber announcing semantic phase transitions, not bare frame nums.
+  - Knowledge Labs section placement (not 7th Cost Calculator card).
+  - Per-phase CONTENT_LINKAGE_PLAYBOOK + sw.js bump in DoD.
+- Multi-agent review re-run on v2: **code-reviewer = APPROVE_WITH_CHANGES**
+  (2 new HIGH findings folded in: `defer` race condition fixed by
+  end-of-`<body>` script ordering, topic count reconciled). **uiux-reviewer
+  = APPROVE** (all 12 v1 findings resolved; 3 LOW recommendations folded
+  into Phase 0 DoD).
+
+### Changed
+
+- `docs/plans/2026-05-23-network-visualization-hub.md` &mdash; banner
+  added marking it SUPERSEDED by v2; kept as historical artefact.
+- `js/rz-version.js` &mdash; bumped to v1.32.7 (PATCH; doc-only).
+- `sw.js` &mdash; cache name bumped to `rz-cache-v1.32.7`.
+
+### Status
+
+Plan v2 is ready for owner sign-off on 4 remaining gating questions
+(Q1: IIFE pattern · Q2: public tier · Q3: 25-topic split · Q4: Phase 1
+seed set). Phase 0 implementation begins after sign-off.
+
+### Cross-references
+
+`KNOWLEDGE_LABS_STANDARD.md` &middot; `POST_DRAFT_STANDARD.md` &middot;
+`KNOWLEDGE_BASE_STANDARD.md` &middot; `CONTENT_LINKAGE_PLAYBOOK.md`
+
+---
+
 ## v1.32.5 — 2026-05-24 (Documentation propagation pass — post-draft folders, knowledge-base standard, AI Maintenance §9 wired with worldwide FMECA dataset)
 
 > Note: v1.32.1 through v1.32.4 are reserved for the parallel session's
