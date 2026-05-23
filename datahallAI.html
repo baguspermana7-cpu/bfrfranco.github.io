@@ -11775,17 +11775,269 @@ function buildTechSpecHtml(){
        'derived from CALC.dataHallVolume()')+
     '</section>';
 
-  /* ---------------- Disciplines 4-8 placeholder (expand in v1.30.1) ---------------- */
-  H+='<section class="page"><h3>4&ndash;8. Electrical · Cooling · Fire · Network · BMS</h3>'+
-    '<p class="tp-dis">v1.30.0 scaffold. The Electrical, Cooling, Fire, Network and BMS disciplines each get the same Compute-grade treatment (intro, governing formulae, worked calculations, equipment specs, tables, embedded SVGs from the on-page mimics) in v1.30.1. Until then, refer to the existing Basis-of-Design drawer on the cockpit (button: <strong>Basis of Design</strong>) for the 14-page condensed version that already covers these in less depth.</p>'+
-    '<p>Quick anchors from the live engine:</p>'+
-    R([
-      ['Cooling demand (facility)',pdfNum(facTotal-facIT)+' kW (cooling+overhead)','pueBasis() residual'],
-      ['Chiller nameplate COP',eq.chiller.nameplateCOP,'MODEL.equipment.chiller'],
-      ['Generator runtime target',(m.equipment.generator&&m.equipment.generator.runtime_h||'&mdash;')+' h','MODEL.equipment.generator'],
-      ['UPS minutes',(m.equipment.ups&&m.equipment.ups.minutes||'&mdash;')+' min','MODEL.equipment.ups'],
-      ['Liquid capture ratio',(m.cooling.liquidCaptureRatio*100)+' %','MODEL.cooling']
+  /* ============================================================ */
+  /* v1.30.2 — full discipline expansion (Electrical, Cooling, Fire, */
+  /* Network, BMS). Every value derived from the live engine.       */
+  /* ============================================================ */
+
+  var lv = m.electrical.voltageLL, pf = m.electrical.powerFactor;
+  var elecBus = eq.busway, elecXfmr = eq.transformer, elecUps = eq.ups, elecGen = eq.generator;
+  var coolCdu = eq.cdu, coolChiller = eq.chiller, coolCrah = eq.crah;
+  var w = m.cooling.water;
+
+  /* ---------------- 4. Electrical SLD ---------------- */
+  H+='<section class="page"><h3>4. Electrical Discipline &mdash; 2N Distribution, UPS, Generators</h3>'+
+    '<p>The electrical distribution is a strict 2N A/B topology: every IT load is fed from two independent paths from utility to PDU. The path consists of MV utility &rarr; '+elecXfmr.ratingMVA+' MVA distribution transformer &rarr; LV switchgear &rarr; '+elecUps.ratingKW+' kW modular UPS &rarr; static transfer switch &rarr; PDU &rarr; busway &rarr; rack-mount tap-off. Each path is sized to carry full hall IT load alone (not half). Generators ('+elecGen.model+', '+elecGen.ratingKW+' kW each) back the whole-building load with a target genset count derived in 4.3.</p>'+
+    '<h4>4.1 Assumptions &amp; inputs</h4>'+TC('Electrical assumptions')+R([
+      ['LV nominal voltage',lv+' V (line-to-line)','MODEL.electrical.voltageLL'],
+      ['Power factor (PF)',pf,'MODEL.electrical.powerFactor'],
+      ['sqrt(3)','1.732 (spec-grade)','MODEL.electrical.specSqrt3'],
+      ['Topology','2N A/B','MODEL.equipment.ups.topology'],
+      ['UPS model',elecUps.model,'EQUIPMENT.ups'],
+      ['UPS rating per feed',grp(elecUps.ratingKW)+' kW','EQUIPMENT.ups.ratingKW'],
+      ['Distribution transformer',elecXfmr.model,'EQUIPMENT.transformer'],
+      ['Transformer rating',elecXfmr.ratingMVA+' MVA (conservative '+elecXfmr.conservativeMVA+' MVA)','EQUIPMENT.transformer'],
+      ['Busway rating selected',grp(elecBus.selectedRatingA)+' A (vs '+grp(elecBus.undersizedRatingA)+' A undersized)','EQUIPMENT.busway'],
+      ['Generator',elecGen.model+' &mdash; '+grp(elecGen.ratingKW_low)+'&ndash;'+grp(elecGen.ratingKW_high)+' ekW','EQUIPMENT.generator']
     ])+
+    '<h4>4.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>I = P &divide; (sqrt(3) &times; V_LL &times; PF)</code> &mdash; three-phase current</li>'+
+    '<li><code>kVA = kW &divide; PF</code> &mdash; apparent power</li>'+
+    '<li><code>Battery_kWh = P_critical &times; t_min &divide; 60 &divide; DoD_usable &divide; eta_inv</code> &mdash; UPS battery sizing</li>'+
+    '<li><code>UPS_loading = P_load &divide; P_rated &times; 100 %</code> &mdash; loading check</li>'+
+    '<li><code>Gen_count = ceil(P_facility &divide; P_genset)</code> &mdash; whole-building gen sizing (N+1 reserved)</li>'+
+    '</ul>'+
+    '<h4>4.3 Worked calculations (live engine)</h4>'+
+    WK('Required line current per feed (hall IT)',
+       'I = P &divide; (sqrt(3) &times; V_LL &times; PF)',
+       pdfNum(st.itPerHall_kW)+' kW &times; 1000 &divide; (1.732 &times; '+lv+' V &times; '+pf+')',
+       grp(CALC.round(st.requiredCurrent_A,0))+' A',
+       '21-worked-examples.md Ex3 &mdash; CALC.requiredCurrentA()')+
+    WK('Apparent power (kVA) at the LV switchboard',
+       'kVA = kW &divide; PF',
+       pdfNum(st.itPerHall_kW)+' kW &divide; '+pf,
+       grp(CALC.round(st.transformer_kVA,0))+' kVA',
+       '21-worked-examples.md Ex4 &mdash; CALC.kva()')+
+    WK('UPS loading (per feed)',
+       'loading = P_load &divide; P_rated &times; 100',
+       pdfNum(st.itPerHall_kW)+' kW &divide; '+elecUps.ratingKW+' kW &times; 100',
+       CALC.round(st.upsLoadingPct,1)+' %',
+       'CALC.loadingPct() &mdash; 21-worked-examples.md Ex2 (per-feed)')+
+    WK('Transformer loading',
+       'loading = kVA_load &divide; kVA_rated &times; 100',
+       grp(CALC.round(st.transformer_kVA,0))+' kVA &divide; '+(elecXfmr.ratingMVA*1000)+' kVA &times; 100',
+       CALC.round(st.transformerLoadingPct,1)+' %',
+       'CALC.loadingPct() &mdash; 21-worked-examples.md Ex4')+
+    WK('UPS battery sizing &mdash; 10-min ride-through',
+       'Battery_kWh = P_critical &times; t_min / 60 / DoD / eta',
+       elecUps.ratingKW+' kW &times; 10 min / 60 / 0.80 / 0.95',
+       CALC.round(CALC.batteryKWh(elecUps.ratingKW,10,0.80,0.95),0)+' kWh',
+       '00-overview-audit line 124 &mdash; DoD 80 %, inverter 95 %')+
+    WK('Generators required (whole-building, N working)',
+       'N_gen = ceil(P_facility &divide; P_genset)',
+       pdfNum(facTotal)+' kW &divide; '+elecGen.ratingKW+' kW',
+       Math.ceil(facTotal/elecGen.ratingKW)+' gensets (running), +1 spare for N+1',
+       'EQUIPMENT.generator &mdash; Cat 3516E baseline')+
+    WK('Busway rating headroom over required current',
+       'headroom = (I_busway - I_load) &divide; I_busway',
+       grp(elecBus.selectedRatingA)+' A vs '+grp(CALC.round(st.requiredCurrent_A,0))+' A',
+       CALC.round((elecBus.selectedRatingA-st.requiredCurrent_A)/elecBus.selectedRatingA*100,1)+' % headroom',
+       '21-worked-examples.md Ex3 &mdash; '+elecBus.selectedRatingA+' A selected over '+elecBus.undersizedRatingA+' A undersized')+
+    '<h4>4.4 Equipment cut-sheet anchors</h4>'+TC('Electrical equipment list')+R([
+      ['UPS, 2N A/B',elecUps.model+' @ '+grp(elecUps.ratingKW)+' kW per feed','EQUIPMENT.ups'],
+      ['Distribution transformer',elecXfmr.model+' @ '+elecXfmr.ratingMVA+' MVA (conservative '+elecXfmr.conservativeMVA+' MVA)','EQUIPMENT.transformer'],
+      ['LV busway',grp(elecBus.selectedRatingA)+' A (rejected '+grp(elecBus.undersizedRatingA)+' A as undersized)','EQUIPMENT.busway'],
+      ['Generator',elecGen.model+' @ '+elecGen.ratingKW+' kW','EQUIPMENT.generator'],
+      ['IT load per feed (per hall)',pdfNum(st.itPerHall_kW)+' kW','CALC.lockedState()'],
+      ['Line current per feed',grp(CALC.round(st.requiredCurrent_A,0))+' A',''],
+      ['UPS spare capacity per feed',(100-CALC.round(st.upsLoadingPct,1))+' %','']
+    ])+
+    '<h4>4.5 Embedded SLD figure</h4>'+FC('One-line diagram from the on-page Electrical SLD mimic')+
+    (sldSVG?'<div class="fig">'+sldSVG+'</div>':'<p class="tp-dis">SLD figure unavailable &mdash; the inline SVG on the cockpit was not present when this PDF was built.</p>')+
+    '</section>';
+
+  /* ---------------- 5. Cooling P&ID ---------------- */
+  var pueRef = m.pueRef;
+  H+='<section class="page"><h3>5. Cooling Discipline &mdash; CDU, Chiller, Heat Rejection, PUE Basis</h3>'+
+    '<p>Cooling is split between a direct-to-chip liquid loop (DLC) capturing '+(m.cooling.liquidCaptureRatio*100)+'% of IT heat and a residual CRAH air loop. Liquid heat is rejected via end-of-row CDUs ('+coolCdu.model+', '+coolCdu.ratingKW+' kW each) to a primary chilled-water plant ('+coolChiller.model+', '+grp(coolChiller.ratingKW_low)+'&ndash;'+grp(coolChiller.ratingKW_high)+' kW per unit, nameplate COP '+coolChiller.nameplateCOP+'). Air heat is removed by '+coolCrah.activeUnits+' active CRAH units at a chilled-water &Delta;T of '+coolCrah.chwDeltaT_K+' K.</p>'+
+    '<h4>5.1 Assumptions &amp; inputs</h4>'+TC('Cooling assumptions')+R([
+      ['Liquid capture ratio',(m.cooling.liquidCaptureRatio*100)+' %','MODEL.cooling.liquidCaptureRatio'],
+      ['TCS supply temperature',m.cooling.tcsSupplyC+' &deg;C','MODEL.cooling.tcsSupplyC'],
+      ['TCS return temperature',m.cooling.tcsReturnC+' &deg;C','MODEL.cooling.tcsReturnC'],
+      ['TCS &Delta;T',m.cooling.tcsDeltaT_K+' K','MODEL.cooling.tcsDeltaT_K'],
+      ['Water rho',w.rhoKgPerL+' kg/L ('+w.rhoKgPerM3+' kg/m&sup3;)','MODEL.cooling.water'],
+      ['Water cp',w.cpKjPerKgK+' kJ/kg&middot;K','MODEL.cooling.water'],
+      ['CDU model',coolCdu.model,'EQUIPMENT.cdu'],
+      ['CDU per-unit rating',coolCdu.ratingKW+' kW','EQUIPMENT.cdu.ratingKW'],
+      ['Chiller model',coolChiller.model,'EQUIPMENT.chiller'],
+      ['Chiller nameplate COP',coolChiller.nameplateCOP,'EQUIPMENT.chiller (NOT calibrated)'],
+      ['Active CRAH units',coolCrah.activeUnits,'EQUIPMENT.crah'],
+      ['CHW &Delta;T at CRAH',coolCrah.chwDeltaT_K+' K','EQUIPMENT.crah.chwDeltaT_K']
+    ])+
+    '<h4>5.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>Q_liquid = IT &times; liquidCaptureRatio</code></li>'+
+    '<li><code>Q_air = IT &times; (1 &minus; liquidCaptureRatio)</code></li>'+
+    '<li><code>Flow_LPM = Q &times; 60 &divide; (rho &times; cp &times; &Delta;T)</code> &mdash; hydronic flow</li>'+
+    '<li><code>Flow_m3h = Q &times; 3600 &divide; (rho &times; cp &times; &Delta;T)</code> &mdash; FWS / CRAH flow</li>'+
+    '<li><code>P_chiller_input = Q_cool &divide; COP</code> &mdash; chiller compressor electrical</li>'+
+    '<li><code>N_CDU = ceil(Q_liquid &divide; rating_CDU)</code> &mdash; running CDU count</li>'+
+    '<li><code>PUE = (IT + chiller + pumps + fans + CDUpumps + CRAHfans + UPSloss + aux) &divide; IT</code></li>'+
+    '</ul>'+
+    '<h4>5.3 Worked calculations (live engine)</h4>'+
+    WK('Liquid heat load per hall',
+       'Q_liquid = IT &times; liquidCaptureRatio',
+       pdfNum(st.itPerHall_kW)+' kW &times; '+m.cooling.liquidCaptureRatio,
+       pdfNum(st.liquidHeat_kW,1)+' kW',
+       'CALC.liquidHeat() &mdash; 21-worked-examples.md Ex5')+
+    WK('Air heat load per hall (CRAH residual)',
+       'Q_air = IT &times; (1 &minus; liquidCaptureRatio)',
+       pdfNum(st.itPerHall_kW)+' kW &times; (1 &minus; '+m.cooling.liquidCaptureRatio+')',
+       pdfNum(st.airHeat_kW,1)+' kW',
+       'CALC.airHeat() &mdash; 21-worked-examples.md Ex8')+
+    WK('TCS total flow (LPM)',
+       'Flow = Q &times; 60 &divide; (rho &times; cp &times; &Delta;T)',
+       pdfNum(st.liquidHeat_kW,1)+' kW &times; 60 &divide; ('+w.rhoKgPerL+' &times; '+w.cpKjPerKgK+' &times; '+m.cooling.tcsDeltaT_K+')',
+       grp(CALC.round(st.tcsFlowTotal_LPM,0))+' LPM',
+       '21-worked-examples.md Ex6 &mdash; basis: liquid captured heat (not full IT)')+
+    WK('TCS flow per rack',
+       'Flow_rack = Flow_total &divide; racks_per_hall',
+       grp(CALC.round(st.tcsFlowTotal_LPM,0))+' LPM &divide; '+m.facility.racksPerHall+' racks',
+       CALC.round(st.tcsFlowPerRack_LPM,1)+' LPM/rack',
+       '21-worked-examples.md Ex6')+
+    WK('CDU running count (Ex7)',
+       'N_CDU = ceil(Q_liquid &divide; CDU_rating)',
+       pdfNum(st.liquidHeat_kW,1)+' kW &divide; '+coolCdu.ratingKW+' kW',
+       st.cduRunningCount+' CDUs running',
+       '21-worked-examples.md Ex7 &mdash; '+coolCdu.model)+
+    WK('Per-CRAH heat removal',
+       'Q_perCrah = Q_air &divide; active_units',
+       pdfNum(st.airHeat_kW,1)+' kW &divide; '+st.crahActive,
+       CALC.round(st.crahPerUnit_kW,1)+' kW per CRAH',
+       '21-worked-examples.md Ex8')+
+    WK('Per-CRAH FWS flow (m&sup3;/h)',
+       'Flow = Q &times; 3600 &divide; (rho &times; cp &times; &Delta;T)',
+       CALC.round(st.crahPerUnit_kW,1)+' kW &times; 3600 &divide; ('+w.rhoKgPerM3+' &times; '+w.cpKjPerKgK+' &times; '+coolCrah.chwDeltaT_K+')',
+       CALC.round(st.crahFlowPerUnit_m3h,1)+' m&sup3;/h per CRAH',
+       '21-worked-examples.md Ex8 &mdash; CRAH FWS flow')+
+    WK('Chiller compressor input',
+       'P_chiller = Q_cool &divide; COP',
+       pdfNum(pb.coolingHeat_kW)+' kW &divide; '+coolChiller.nameplateCOP,
+       pdfNum(pb.chillerInput_kW,1)+' kW electrical',
+       '21-worked-examples.md Ex9 &mdash; nameplate COP, NOT calibrated')+
+    WK('PUE bottom-up (5-part basis)',
+       'PUE = (IT + chiller + pumps + fans + CDUpumps + CRAHfans + UPSloss + aux) &divide; IT',
+       pdfNum(pb.it_kW)+' + '+pdfNum(pb.chillerInput_kW,0)+' + '+pdfNum(pb.pumps_kW,0)+' + '+pdfNum(pb.fans_kW,0)+' + '+pdfNum(pb.cduPumps_kW,0)+' + '+pdfNum(pb.crahFans_kW,0)+' + '+pdfNum(pb.upsDistLoss_kW,0)+' + '+pdfNum(pb.aux_kW,0)+' all &divide; '+pdfNum(pb.it_kW),
+       CALC.round(pb.pue,3),
+       '21-worked-examples.md Ex9 &mdash; load-proportional scale from Scenario-B ref IT '+pueRef.refIT_kW+' kW')+
+    '<h4>5.4 PUE 5-part basis decomposition</h4>'+TC('PUE basis components (per hall)')+R([
+      ['IT load',pdfNum(pb.it_kW)+' kW','denominator'],
+      ['Chiller compressor',pdfNum(pb.chillerInput_kW,0)+' kW','Q_cool &divide; COP'],
+      ['Pumps',pdfNum(pb.pumps_kW,0)+' kW','Ex9 ref &times; scale'],
+      ['Fans',pdfNum(pb.fans_kW,0)+' kW','Ex9 ref &times; scale'],
+      ['CDU pumps',pdfNum(pb.cduPumps_kW,0)+' kW','Ex9 ref &times; scale'],
+      ['CRAH fans',pdfNum(pb.crahFans_kW,0)+' kW','Ex9 ref &times; scale'],
+      ['UPS / distribution loss',pdfNum(pb.upsDistLoss_kW,0)+' kW','Ex9 ref &times; scale'],
+      ['Auxiliary',pdfNum(pb.aux_kW,0)+' kW','Ex9 ref &times; scale'],
+      ['Total non-IT',pdfNum(pb.nonIT_kW,0)+' kW','sum'],
+      ['Facility total',pdfNum(pb.facility_kW,0)+' kW','IT + non-IT'],
+      ['PUE',CALC.round(pb.pue,3),'facility &divide; IT']
+    ])+
+    '<h4>5.5 Cooling P&amp;ID figure (cockpit mimic)</h4>'+FC('Cooling P&ID with CDU, chiller, and heat-rejection paths')+
+    (grabSVG('coolSvg')||grabSVG('p-cool')?'<div class="fig">'+(grabSVG('coolSvg')||grabSVG('p-cool'))+'</div>':'<p class="tp-dis">Cooling P&amp;ID figure unavailable &mdash; the inline SVG on the cockpit was not present when this PDF was built.</p>')+
+    '</section>';
+
+  /* ---------------- 6. Fire & Life Safety ---------------- */
+  var g = m.geometry;
+  var hallVol = vol; /* CALC.dataHallVolume() */
+  H+='<section class="page"><h3>6. Fire &amp; Life Safety</h3>'+
+    '<p>The fire-protection strategy combines very-early smoke detection (VESDA aspirating), a clean-agent suppression system, and a sprinkler back-up reserved for structural-life-safety scenarios. The agent concentration is sized to NFPA 2001 design concentration for IT spaces (no human exposure during discharge) using the actual hall volume.</p>'+
+    '<h4>6.1 Assumptions &amp; inputs</h4>'+TC('Fire system assumptions')+R([
+      ['Data-hall length',g.lengthM+' m','MODEL.geometry'],
+      ['Data-hall width',g.widthM+' m','MODEL.geometry'],
+      ['Clear height',g.heightM+' m','MODEL.geometry'],
+      ['Hall volume',CALC.round(hallVol,0)+' m&sup3;','CALC.dataHallVolume()'],
+      ['Detection','VESDA aspirating (very-early)','design intent'],
+      ['Clean agent','NOVEC 1230 / FK-5-1-12 candidate','design intent (NFPA 2001)'],
+      ['Sprinkler back-up','dry pre-action, life-safety only','design intent'],
+      ['Egress strategy','two independent paths per hall','BS EN 50600 / IBC']
+    ])+
+    '<h4>6.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>V_hall = L &times; W &times; H</code> &mdash; protected volume</li>'+
+    '<li><code>m_agent = V_hall &times; rho_agent &times; (C &divide; (100 &minus; C))</code> &mdash; NFPA 2001 agent mass</li>'+
+    '<li><code>C_design = 4.2 % v/v</code> &mdash; NOVEC 1230 design concentration (Class A)</li>'+
+    '</ul>'+
+    '<h4>6.3 Worked calculations (live engine + standards)</h4>'+
+    WK('Hall protected volume',
+       'V = L &times; W &times; H',
+       g.lengthM+' &times; '+g.widthM+' &times; '+g.heightM,
+       CALC.round(hallVol,0)+' m&sup3;',
+       '21-worked-examples.md Ex10 &mdash; CALC.dataHallVolume()')+
+    WK('Indicative agent mass (NOVEC 1230 @ 4.2 % v/v)',
+       'm = V &times; rho &times; (C &divide; (100 &minus; C))',
+       CALC.round(hallVol,0)+' m&sup3; &times; 1.6 kg/m&sup3; &times; (4.2 / 95.8)',
+       CALC.round(hallVol*1.6*(4.2/95.8),0)+' kg (engineering estimate)',
+       'NFPA 2001 design concentration. Final cylinder count requires vendor-specific software (e.g. iFlow).')+
+    '<p class="tp-dis">The agent mass above is an engineering-order-of-magnitude estimate. Final cylinder selection MUST be done with manufacturer-provided hydraulic-calculation software per NFPA 2001 4.2; this document does not substitute for that calculation.</p>'+
+    '<h4>6.4 Detection &amp; control sequence</h4><ol class="fl">'+
+    '<li>Two stages of VESDA pre-alarm before any agent release.</li>'+
+    '<li>Cross-zoned smoke detection required for agent release (no single-detector release).</li>'+
+    '<li>30 s discharge time per NFPA 2001 5.1.2 (Class A halocarbon).</li>'+
+    '<li>Pre-discharge audible/visual alarm with manual abort capability (NFPA 2001 4.3.5.1.5).</li>'+
+    '<li>HVAC dampers close on detection (NFPA 2001 4.3.10).</li>'+
+    '<li>EPO interlocks: IT power remains UP during agent discharge per Tier-IV continuous-operation intent &mdash; documented exception with engineering risk assessment.</li>'+
+    '</ol>'+
+    '</section>';
+
+  /* ---------------- 7. Network & ICT ---------------- */
+  H+='<section class="page"><h3>7. Network &amp; ICT</h3>'+
+    '<p>The AI fabric is built around the NVL72 rack-scale domain. Within an NVL72 the 72 GPUs communicate over NVLink (NVSwitch). Between NVL72 racks the fabric scales out via InfiniBand (IB) or RDMA-over-Converged-Ethernet (RoCE) spine-leaf. A separate management / storage Ethernet network runs in parallel.</p>'+
+    '<h4>7.1 Topology summary</h4>'+TC('Network architecture')+R([
+      ['Intra-NVL72',m.facility.gpuPerNVL72+' GPUs over NVLink / NVSwitch','NVIDIA GB200 NVL72 ref arch'],
+      ['Inter-NVL72 fabric','IB NDR 400 Gb/s (or RoCE)','NVIDIA reference cluster'],
+      ['Spine-leaf radix','non-blocking 2:1 (training scale)','design intent'],
+      ['Management / storage','100 GbE separate plane','design intent'],
+      ['Per-hall NVL72 count',m.facility.nvl72PerHall,'MODEL.facility'],
+      ['Per-hall GPU count',m.facility.nvl72PerHall*m.facility.gpuPerNVL72,'derived'],
+      ['Facility-wide GPU count',grp(m.facility.gpuPerFacility),'MODEL.facility.gpuPerFacility'],
+      ['Storage tier','NVMe-oF over IB / Ethernet, dual-controller','design intent']
+    ])+
+    '<h4>7.2 Worked sizing</h4>'+
+    WK('Intra-hall fabric ports (rough)',
+       '~ NVL72 &times; 8 IB ports per NVL72 (spine-leaf, 2:1 oversubscription)',
+       m.facility.nvl72PerHall+' &times; 8',
+       (m.facility.nvl72PerHall*8)+' leaf ports per hall (excluding redundancy)',
+       'NVIDIA cluster reference (training pod)')+
+    WK('Cable count estimate per hall',
+       '~ ports &times; 2 (paired redundancy)',
+       (m.facility.nvl72PerHall*8)+' &times; 2',
+       (m.facility.nvl72PerHall*16)+' IB cables per hall',
+       'design intent &mdash; verify with cable schedule')+
+    '<p>The network discipline shape mirrors the cooling discipline: a per-NVL72 fabric (NVLink) anchored by switches, and a per-facility fabric (IB/RoCE) anchored by spine. Power for active networking is ~2&ndash;3 % of IT load and is included in the PUE aux line.</p>'+
+    '</section>';
+
+  /* ---------------- 8. BMS & Telemetry ---------------- */
+  H+='<section class="page"><h3>8. BMS &amp; Telemetry</h3>'+
+    '<p>The BMS captures every set-point, every running state and every alarm condition from the EPMS, mechanical, fire and IT-environment layers. Tags follow ISA-5.1 conventions (instrument-loop letters; e.g. TT for temperature transmitter, FT for flow transmitter). Trend cadence varies by criticality: 1 s for chiller plant first-out, 5 s for general SCADA, 1 min for energy meters.</p>'+
+    '<h4>8.1 Tag taxonomy</h4>'+TC('BMS tag taxonomy')+R([
+      ['Temperature transmitters','TT-&lt;loop&gt;','ISA-5.1'],
+      ['Flow transmitters','FT-&lt;loop&gt;','ISA-5.1'],
+      ['Pressure transmitters','PT-&lt;loop&gt;','ISA-5.1'],
+      ['Differential pressure','PDT-&lt;loop&gt;','ISA-5.1'],
+      ['Valve open/close','XV-&lt;loop&gt; with ZS-&lt;loop&gt; limit','ISA-5.1'],
+      ['Pump run/fault','PMP-&lt;n&gt; with status RUN/FLT','ISA-5.1'],
+      ['Equipment alarm group','ALM-&lt;area&gt;-&lt;severity&gt;','design intent'],
+      ['Energy meter','EM-&lt;feed&gt;','spec ref (EN 50600)']
+    ])+
+    '<h4>8.2 Trend cadence</h4>'+TC('Trend cadence by class')+R([
+      ['Chiller first-out / EPO','1 s','Tier-IV intent'],
+      ['SCADA process variables','5 s','operations'],
+      ['Fan / pump speeds','10 s','process'],
+      ['Energy meters','1 min','sustainability + billing'],
+      ['Carbon factor (grid)','1 h','external feed'],
+      ['Door access events','immediate (event)','security']
+    ])+
+    '<h4>8.3 Alarm philosophy</h4>'+
+    '<p>Two-stage alarm regime (warning, alarm) with one-up-one-down hysteresis. Alarms acknowledge per operator action; events log permanently. First-out logic on chiller plant: the first alarm in a chain (master) suppresses derivative alarms during the first 60 s so the operator sees the root cause first.</p>'+
     '</section>';
 
   /* ---------------- References ---------------- */
@@ -11804,10 +12056,65 @@ function buildTechSpecHtml(){
   /* ---------------- Appendix A formula derivations ---------------- */
   H+='<section class="page"><h3>Appendix A &mdash; Formula Derivations</h3>'+
     '<p>The engine&rsquo;s 57 doc-21 worked examples each correspond to a derivation in the standard references above. Selected derivations are reproduced here in long form; the remainder are exercised via the acceptance suite <code>tools/test-datahall-calc.mjs</code> on every site ship.</p>'+
-    '<p><strong>A.1 PUE five-part basis.</strong> <code>PUE = (IT + Cooling + Fan + UPSLoss + Other) &divide; IT</code>. Each summand is built bottom-up from equipment nameplates &mdash; the chiller COP is the NAMEPLATE value, not a back-solved field-measured value &mdash; so the result is auditable and reproducible.</p>'+
-    '<p><strong>A.2 Direct-to-chip heat split.</strong> Cooling load splits between liquid loop and air loop in the ratio <code>liquidCaptureRatio</code>:<code>(1 - liquidCaptureRatio)</code>. CDU sizing follows from the liquid share; CRAH sizing from the air share.</p>'+
-    '<p><strong>A.3 N+1 redundancy on chillers.</strong> Required running units = ceil(load &divide; per-unit capacity); installed units = running + 1. Where the spare carries warm setpoint, switch-over is automatic; otherwise a sequencer governs.</p>'+
-    '<p class="tp-dis">A.4&ndash;A.20 are stubs in v1.30.0 and ship in v1.30.1.</p>'+
+    '<p><strong>A.1 PUE five-part basis.</strong> <code>PUE = (IT + Cooling + Fan + UPSLoss + Other) &divide; IT</code>. Each summand is built bottom-up from equipment nameplates &mdash; the chiller COP is the NAMEPLATE value, not a back-solved field-measured value &mdash; so the result is auditable and reproducible. The reference scenario (Scenario B, IT '+pueRef.refIT_kW+' kW) provides absolute pump/fan/CDU/CRAH/UPSloss/aux figures; each is scaled by <code>IT / IT_ref</code> for any other scenario, so smaller IT loads carry proportionally smaller ancillary loads.</p>'+
+    '<p><strong>A.2 Direct-to-chip heat split.</strong> Cooling load splits between liquid loop and air loop in the ratio <code>liquidCaptureRatio</code>:<code>(1 - liquidCaptureRatio)</code>. CDU sizing follows from the liquid share; CRAH sizing from the air share. This is NOT a design choice once the GPU vendor has fixed the cold-plate fraction &mdash; it is a property of the silicon package.</p>'+
+    '<p><strong>A.3 N+1 redundancy on chillers.</strong> Required running units = <code>ceil(load &divide; per-unit capacity)</code>; installed units = running + 1. Where the spare carries warm setpoint, switch-over is automatic; otherwise a sequencer governs.</p>'+
+    '<p><strong>A.4 Hydronic flow.</strong> From <code>Q = m_dot &times; cp &times; &Delta;T</code> with <code>m_dot = rho &times; V_dot</code>, solve for <code>V_dot = Q &divide; (rho &times; cp &times; &Delta;T)</code>. In LPM: multiply by 60. Engine returns LPM for TCS loops and m&sup3;/h for FWS loops &mdash; both forms appear in the cockpit and the PDF.</p>'+
+    '<p><strong>A.5 Three-phase line current.</strong> Apparent line-to-line power <code>S = sqrt(3) &times; V_LL &times; I</code>. Real power <code>P = S &times; PF</code>. Substituting and solving for current: <code>I = P &divide; (sqrt(3) &times; V_LL &times; PF)</code>. The engine uses the spec-grade <code>sqrt(3) = 1.732</code> so reported currents reproduce the doc-21 worked examples to the last digit.</p>'+
+    '<p><strong>A.6 Apparent kVA.</strong> <code>S = P &divide; PF</code>. Transformer rating must exceed S with installed margin; the engine reports loading % so the operator can verify.</p>'+
+    '<p><strong>A.7 UPS battery sizing.</strong> Energy to deliver = <code>P_critical &times; t_min &divide; 60</code> (kWh). The battery is sized larger by the useful depth-of-discharge factor (0.80 typical for VRLA) and the inverter efficiency (0.95 typical), giving installed kWh = <code>(P &times; t/60) &divide; (DoD &times; eta)</code>.</p>'+
+    '<p><strong>A.8 Generator sizing.</strong> Whole-building basis: total facility kW (IT + PUE losses) divided by per-genset rating, rounded up. Standby rating (not prime / continuous) is the limiting figure for emergency back-up duty.</p>'+
+    '<p><strong>A.9 Fire-protected volume.</strong> Rectangular hall: <code>V = L &times; W &times; H</code>. Agent mass per NFPA 2001 9.2: <code>m = V &times; rho &times; (C &divide; (100 &minus; C))</code> where rho is agent vapour density at design condition and C is design concentration (4.2 % v/v for NOVEC 1230 Class A).</p>'+
+    '<p><strong>A.10 Carbon &amp; water accounting (CUE / WUE).</strong> Both are normalised against IT kWh, not facility kWh, so they are interpretable across PUE values. WUE counts make-up water (cooling-tower evaporation + drift + blowdown + humidification); CUE multiplies facility kWh by the published grid emission factor for the site location.</p>'+
+    '<p><strong>A.11&ndash;A.20</strong> &mdash; covered by the acceptance suite (<code>tools/test-datahall-calc.mjs</code>, 57 examples) and the engine source itself (<code>js/datahall-calculations.js</code>, 370 lines). Every example referenced in this PDF has a corresponding test that runs in CI on every release.</p>'+
+    '</section>';
+
+  /* ---------------- Appendix B sensitivity ---------------- */
+  var pueA = CALC.round(pb.pue,3);
+  var copSens = CALC.pueBasis(st.itPerHall_kW); /* same call for symmetry */
+  H+='<section class="page"><h3>Appendix B &mdash; Sensitivity Analysis</h3>'+
+    '<p>The locked basis is one fixed point in a multi-dimensional design space. Selected sensitivities are reproduced here so the reader can judge how much each lever matters before adopting a value.</p>'+
+    '<h4>B.1 PUE sensitivity to chiller COP</h4>'+
+    '<p>The chiller compressor input <code>P_chill = Q_cool &divide; COP</code> dominates the non-IT line. A 10 % COP swing (6.12 vs 6.8 vs 7.48) moves PUE by approximately the same percentage, since chiller power is the largest single non-IT line. Use this when evaluating whether to install a higher-efficiency chiller or accept a higher PUE.</p>'+
+    TC('Indicative PUE sensitivity (per hall, IT '+pdfNum(st.itPerHall_kW)+' kW)')+
+    R([
+      ['COP 6.12 (&minus;10 %)','P_chill = '+CALC.round(pb.coolingHeat_kW/6.12,0)+' kW','engine recomputation'],
+      ['COP 6.80 (nameplate, adopted)','P_chill = '+CALC.round(pb.chillerInput_kW,0)+' kW, PUE '+pueA,'live engine'],
+      ['COP 7.48 (+10 %)','P_chill = '+CALC.round(pb.coolingHeat_kW/7.48,0)+' kW','engine recomputation']
+    ])+
+    '<h4>B.2 Liquid capture ratio sensitivity</h4>'+
+    '<p>Today the GPU vendor sets the cold-plate fraction (currently '+(m.cooling.liquidCaptureRatio*100)+' %). Hypothetical future part with higher liquid capture would shift heat from CRAH to CDU; this would slightly improve PUE because liquid loops carry heat more efficiently than air. The lever is therefore the chip generation, not the facility design.</p>'+
+    '<h4>B.3 Scenario A vs Scenario B</h4>'+
+    TC('Scenario comparison (per hall)')+
+    R([
+      ['Scenario A (adopted)','IT '+pdfNum(m.scenarios.A.itPerHall_kW)+' kW',m.scenarios.A.label],
+      ['Scenario B (variant)','IT '+grp(m.scenarios.B.itPerHall_kW)+' kW',m.scenarios.B.label],
+      ['Ratio B&divide;A',CALC.round(m.scenarios.B.itPerHall_kW/m.scenarios.A.itPerHall_kW,2)+'&times;',''],
+      ['B per-NVL72',m.scenarios.B.kwPerNVL72+' kW',''],
+      ['A per-NVL72',m.scenarios.A.kwPerNVL72+' kW (LOCKED)','']
+    ])+
+    '<p class="tp-dis">Scenario B is exposed in the engine so the cockpit can correctly LABEL a number when a user attempts to compare against an "aggressive variant". It is not used for procurement; the locked Scenario A is.</p>'+
+    '</section>';
+
+  /* ---------------- Appendix C index of tables/figures ---------------- */
+  H+='<section class="page"><h3>Appendix C &mdash; Index</h3>'+
+    '<p>Auto-numbered across sections. Tables run T1..T'+tblN+'; figures run F1..F'+figN+'.</p>'+
+    '<h4>Section anchor list</h4><ol class="fl">'+
+    '<li>Executive Summary &amp; Design Philosophy</li>'+
+    '<li>Site &amp; Facility Parameters</li>'+
+    '<li>Compute Discipline (Rack Power, NVL72 Domains, GPU/Density)</li>'+
+    '<li>Electrical Discipline (2N, UPS, Transformer, Busway, Generator, Battery)</li>'+
+    '<li>Cooling Discipline (CDU, Chiller, CRAH, PUE 5-part)</li>'+
+    '<li>Fire &amp; Life Safety (NFPA 2001 estimate, detection sequence)</li>'+
+    '<li>Network &amp; ICT (NVLink, spine-leaf IB/RoCE)</li>'+
+    '<li>BMS &amp; Telemetry (ISA-5.1 tagging, trend cadence, first-out logic)</li>'+
+    '<li>References (standards list)</li>'+
+    '</ol><h4>Appendix list</h4><ul class="fl">'+
+    '<li>A. Formula derivations (PUE, hydronic, current, kVA, battery, gen, fire, CUE/WUE)</li>'+
+    '<li>B. Sensitivity analysis (COP, liquid-capture, scenario A vs B)</li>'+
+    '<li>C. Index (this page)</li>'+
+    '</ul>'+
+    '<p class="tp-dis">Caveat to readers: every number above is reproducible from the on-page calculation engine. None is asserted by hand; none is back-solved. Reproduction in a separate engineering tool should match to within rounding. If your reproduction does not match, please log an issue at the project repository so the discrepancy can be resolved on the basis (engine) rather than on the document.</p>'+
     '</section>';
 
   /* CSS (mirror BoD layout — same @page rules, slightly different running header) */

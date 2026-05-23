@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v1.31.2 — 2026-05-23 (DC AI Tech Spec PDF — full discipline expansion: Electrical, Cooling, Fire, Network, BMS + appendices B + C)
+
+v1.30.1 shipped the scaffold and the Compute discipline. This ship
+expands the DC AI Tech Spec PDF (`datahallAI.html` &rarr; Generate Design)
+to the full discipline coverage: Electrical (2N, UPS, transformer,
+busway, generator, battery), Cooling (CDU + chiller + CRAH + PUE 5-part
+basis decomposed), Fire &amp; Life Safety (NFPA 2001 indicative agent
+mass, detection sequence), Network &amp; ICT (NVLink, spine-leaf
+IB/RoCE), BMS (ISA-5.1 tag taxonomy, trend cadence, first-out logic).
+
+### Added (DC AI Tech Spec PDF only)
+- **Section 4 &mdash; Electrical Discipline**: ~7 worked calculations
+  (line current, kVA, UPS loading, transformer loading, UPS battery,
+  generator count, busway headroom) all derived from
+  `CALC.lockedState()` + `CALC.batteryKWh()`. Equipment cut-sheet anchor
+  table. Embedded SLD figure.
+- **Section 5 &mdash; Cooling Discipline**: ~8 worked calculations
+  (liquid/air heat split, TCS total &amp; per-rack flow, CDU running
+  count, per-CRAH heat &amp; FWS flow, chiller compressor input, PUE
+  bottom-up). Full 8-line PUE 5-part basis decomposition table.
+  Embedded Cooling P&amp;ID figure.
+- **Section 6 &mdash; Fire &amp; Life Safety**: indicative NOVEC 1230
+  agent-mass estimate per NFPA 2001 design-concentration formula
+  (with the caveat that final cylinder count needs vendor
+  hydraulic-calc software). Detection &amp; control sequence in 6
+  numbered steps.
+- **Section 7 &mdash; Network &amp; ICT**: topology summary table.
+  Two worked sizing calculations (leaf port count, cable count).
+- **Section 8 &mdash; BMS &amp; Telemetry**: ISA-5.1 tag taxonomy
+  table, trend cadence by class, alarm philosophy paragraph.
+- **Appendix A &mdash; Formula Derivations**: expanded A.1&ndash;A.10.
+- **Appendix B &mdash; Sensitivity Analysis**: PUE vs chiller COP
+  (&plusmn;10 %), liquid-capture framing, Scenario A vs B side table.
+- **Appendix C &mdash; Index**: auto-numbered table/figure list.
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- `#p-dash` + `dcCallouts` byte-identical (owner exclusion).
+- `dc-conventional.html` Tech Spec stays at v1.30.1 scaffold &mdash;
+  full discipline expansion ships in v1.31.3.
+
+### Coordination note
+Authored locally as v1.30.2. Parallel cf-worker session shipped v1.31.0
+(FT analytics) and v1.31.1 (DC Solutions placeholder card) mid-push;
+this release lands as v1.31.2 atop their work.
+
+---
+
 ## v1.31.1 — 2026-05-23 (DC Solutions — AI Engineering Maintenance placeholder card)
 
 Added a 6th card to the **Cost Calculators** section on `datacenter-solutions.html`
@@ -78,6 +126,8 @@ indicator table + rationale + related news, flag-gated under `CFG.V2`.
 
 Not active on production — `rz_ft_v2` flag still required + Worker
 still pending deploy (`worker/SETUP.md`).
+
+---
 
 ## v1.30.1 — 2026-05-23 (Generate Design Tech Spec PDF + FAQ on DC AI and Conventional DC cockpits — Phase 2 scaffold)
 
