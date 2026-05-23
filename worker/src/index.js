@@ -1,4 +1,4 @@
-import { handleFx, handleFxHistory, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto } from './handlers.js';
+import { handleFx, handleFxHistory, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto, handleAnalyze } from './handlers.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -55,6 +55,9 @@ export async function prewarm(env) {
     handleCrypto(env),
     handleSectors(env),
     handleFutures(env),
+    handleAnalyze(env, 'SPY', '3M'),
+    handleAnalyze(env, 'QQQ', '3M'),
+    handleAnalyze(env, 'GLD', '3M'),
   ]);
 }
 
@@ -150,6 +153,16 @@ export default {
           return json(data, { cached: !!cached });
         } catch (e) {
           return json(null, { status: 502, error: 'crypto: ' + String(e) });
+        }
+      }
+
+      if (pathname === '/analyze') {
+        const p = new URL(request.url).searchParams;
+        try {
+          const { data, cached } = await handleAnalyze(env, p.get('sym') || 'SPY', p.get('tf') || '3M');
+          return json(data, { cached: !!cached });
+        } catch (e) {
+          return json(null, { status: 502, error: 'analyze: ' + String(e) });
         }
       }
 

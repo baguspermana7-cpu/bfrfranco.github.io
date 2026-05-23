@@ -6,6 +6,8 @@ import { fetchFinnhubQuotes } from './sources/finnhub.js';
 import { fetchNews } from './sources/news.js';
 import { fetchCoinGeckoMarkets, fetchCoinGeckoGlobal } from './sources/coingecko.js';
 import { SCREENER_UNIVERSE } from './data/screener-universe.js';
+import { sma, ema, rsi as rsiSeries, macd as macdSeries, bollinger as bollingerSeries, atr as atrSeries, stoch as stochSeries } from './lib/ta.js';
+import { computeSignals, computeGauge, buildRationale } from './lib/gauge.js';
 
 const FX_CACHE_KEY = 'fx:USD';
 const FX_TTL_MS = 60_000;
@@ -639,6 +641,182 @@ export async function handleFx(env) {
     }
     throw fetchErr;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FT Phase 2 Task A — /analyze (TA + composite gauge + prediction)
+
+   Pure-math layer in lib/ta.js + lib/gauge.js. This handler only
+   wires the layers together:
+     1. Pull OHLCV via the existing handleCandles fallback chain.
+     2. Compute the full indicator vector at the LAST bar.
+     3. Derive qualitative signals + composite 0..100 gauge + a short
+        ensemble prediction with a transparent rationale.
+     4. KV-cache 60s + stale-on-error (same pattern as siblings).
+
+   This is a derived signal — never a forecast. Rationale always
+   ends with an honesty caveat (see lib/gauge.js buildRationale).
+   ═══════════════════════════════════════════════════════════════ */
+
+const ANALYZE_TTL_MS = 60_000; // 1 min — recomputed each fetch but cached briefly
+
+/**
+ * handleAnalyze(env, sym, tf) — TA + gauge + prediction over candles.
+ *
+ * tf ∈ {1W,1M,3M,6M,1Y} (default 3M, normalized in handleCandles).
+ *
+ * Returns: { data, cached, stale? } with the full contract:
+ *   data = { sym, tf, asOf, price, chgPct, indicators, signals,
+ *            gauge, prediction }
+ *
+ *   - Fresh cache hit  : { data, cached: true }
+ *   - Live build       : { data, cached: false }
+ *   - All fail + stale : { data, cached: true, stale: true }
+ *   - All fail + none  : throws
+ */
+export async function handleAnalyze(env, sym, tf) {
+  const symbol = String(sym || '').trim().toUpperCase();
+  if (!symbol) throw new Error('handleAnalyze: sym is required');
+
+  const timeframe = TF_MAP[tf] ? tf : '3M';
+  const cacheKey = 'analyze:' + symbol + ':' + timeframe;
+
+  // Fresh cache first.
+  const fresh = await getCached(env.FT_KV, cacheKey, ANALYZE_TTL_MS);
+  if (fresh && !fresh.stale) {
+    return { data: fresh.data, cached: true };
+  }
+
+  // Live build (delegates to handleCandles for OHLCV).
+  try {
+    const data = await buildAnalyze(env, symbol, timeframe);
+    await setCached(env.FT_KV, cacheKey, data);
+    return { data, cached: false };
+  } catch (err) {
+    const stale = await getCached(env.FT_KV, cacheKey, ANALYZE_TTL_MS, { allowStale: true });
+    if (stale) {
+      return { data: stale.data, cached: true, stale: true };
+    }
+    throw err;
+  }
+}
+
+async function buildAnalyze(env, sym, tf) {
+  // Pull candles via the existing fallback chain. This subhandler is
+  // already KV-cached + stale-aware so we never double-fetch.
+  const { data: candleData } = await handleCandles(env, sym, tf);
+  const candles = (candleData && candleData.candles) || [];
+  if (candles.length === 0) {
+    throw new Error('analyze: no candles for ' + sym + ' ' + tf);
+  }
+
+  const closes = candles.map(k => k.c);
+  const highs = candles.map(k => k.h);
+  const lows = candles.map(k => k.l);
+  const n = closes.length;
+  const lastIdx = n - 1;
+  const price = closes[lastIdx];
+  const prevClose = n >= 2 ? closes[lastIdx - 1] : price;
+  const chgPct = prevClose ? ((price - prevClose) / prevClose) * 100 : 0;
+
+  // Indicator series — only the LAST-bar values are returned in the contract.
+  const rsiSer = rsiSeries(closes, 14);
+  const macdRes = macdSeries(closes, 12, 26, 9);
+  const sma20Ser = sma(closes, 20);
+  const sma50Ser = sma(closes, 50);
+  const sma200Ser = sma(closes, 200);
+  const ema20Ser = ema(closes, 20);
+  const ema50Ser = ema(closes, 50);
+  const bollRes = bollingerSeries(closes, 20, 2);
+  const atrSer = atrSeries(highs, lows, closes, 14);
+  const stochRes = stochSeries(highs, lows, closes, 14, 3);
+
+  // Helper: pick the last finite value, else fall back to price/0.
+  function lastFinite(arr, fallback) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      if (typeof arr[i] === 'number' && Number.isFinite(arr[i])) return arr[i];
+    }
+    return fallback;
+  }
+
+  const middleLast = lastFinite(bollRes.middle, price);
+  const upperLast = lastFinite(bollRes.upper, price);
+  const lowerLast = lastFinite(bollRes.lower, price);
+  const bandwidth = middleLast ? (upperLast - lowerLast) / middleLast : 0;
+
+  const indicators = {
+    rsi14: round2(lastFinite(rsiSer, 50)),
+    macd: {
+      macd: round4(lastFinite(macdRes.macdLine, 0)),
+      signal: round4(lastFinite(macdRes.signalLine, 0)),
+      histogram: round4(lastFinite(macdRes.histogram, 0)),
+    },
+    sma20: round2(lastFinite(sma20Ser, price)),
+    sma50: round2(lastFinite(sma50Ser, price)),
+    sma200: round2(lastFinite(sma200Ser, price)),
+    ema20: round2(lastFinite(ema20Ser, price)),
+    ema50: round2(lastFinite(ema50Ser, price)),
+    bollinger: {
+      upper: round2(upperLast),
+      middle: round2(middleLast),
+      lower: round2(lowerLast),
+      bandwidth: round4(bandwidth),
+    },
+    atr14: round2(lastFinite(atrSer, 0)),
+    stoch: {
+      k: round2(lastFinite(stochRes.k, 50)),
+      d: round2(lastFinite(stochRes.d, 50)),
+    },
+  };
+
+  const signals = computeSignals(indicators, price);
+  const gauge = computeGauge(signals, indicators);
+  const rationale = buildRationale(signals, indicators, price);
+
+  // Ensemble prediction — direction mapped off the gauge band; confidence
+  // off the deviation from neutral; horizon picked off the timeframe.
+  // Honest label 'ensemble' — NOT a guaranteed forecast.
+  const dev = Math.abs(gauge.score - 50) / 50; // 0..1
+  let direction;
+  if (gauge.score >= 55) direction = 'up';
+  else if (gauge.score <= 45) direction = 'down';
+  else direction = 'sideways';
+  // Confidence: blend gauge deviation with bollinger bandwidth proxy
+  // (more volatility → lower confidence). Clamped to [0.1, 0.9] so we
+  // never read as a certainty.
+  const volPenalty = Math.min(0.3, Math.max(0, indicators.bollinger.bandwidth || 0));
+  const confidence = Math.round(Math.max(0.1, Math.min(0.9, dev - volPenalty * 0.5)) * 100) / 100;
+  const horizon = (tf === '1W' || tf === '1M') ? '1w' : '1m';
+
+  const prediction = {
+    direction,
+    confidence,
+    horizon,
+    rationale,
+    method: 'ensemble',
+  };
+
+  return {
+    sym,
+    tf,
+    asOf: Date.now(),
+    price: round2(price),
+    chgPct: round2(chgPct),
+    indicators,
+    signals,
+    gauge,
+    prediction,
+  };
+}
+
+function round2(n) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return 0;
+  return Math.round(n * 100) / 100;
+}
+
+function round4(n) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return 0;
+  return Math.round(n * 10000) / 10000;
 }
 
 /**

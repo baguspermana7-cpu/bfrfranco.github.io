@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto } from '../src/handlers.js';
+import { handleFx, handleQuotes, handleCandles, handleNews, handleSectors, handleEconomy, handleFutures, handleScreener, handleCrypto, handleAnalyze } from '../src/handlers.js';
 import { setCached } from '../src/cache.js';
 
 function fakeKV() {
@@ -1041,6 +1041,186 @@ test('Test X: crypto fetch fails with stale cache → returns stale:true', async
     assert.equal(result.stale, true, 'should return stale:true');
     assert.equal(result.cached, true);
     assert.deepEqual(result.data, staleData, 'should return the stale payload');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   handleAnalyze tests (FT Phase 2 Task A) — /analyze endpoint.
+   Indicators + signals + gauge + ensemble prediction. Uses internal
+   handleCandles via the same Yahoo stub pattern.
+   ═══════════════════════════════════════════════════════════════ */
+
+// Helper: synthetic OHLCV with a clear uptrend so indicators settle.
+// 80 bars long → enough for ema26/macd signal to be defined.
+function syntheticUptrendYahoo() {
+  const rows = [];
+  const startT = 1714521600; // epoch seconds anchor
+  for (let i = 0; i < 80; i++) {
+    const base = 100 + i * 0.5 + Math.sin(i / 4) * 1.5;
+    rows.push({
+      t: startT + i * 86400,
+      o: base - 0.2,
+      h: base + 1.0,
+      l: base - 1.0,
+      c: base,
+      v: 1_000_000 + i * 1000,
+    });
+  }
+  return JSON.stringify({
+    chart: {
+      result: [{
+        meta: { symbol: 'TEST' },
+        timestamp: rows.map(r => r.t),
+        indicators: { quote: [{
+          open: rows.map(r => r.o),
+          high: rows.map(r => r.h),
+          low: rows.map(r => r.l),
+          close: rows.map(r => r.c),
+          volume: rows.map(r => r.v),
+        }] },
+      }],
+      error: null,
+    },
+  });
+}
+
+// Test AN1: full contract — handleAnalyze returns sym/tf/asOf/price/indicators/signals/gauge/prediction.
+test('Test AN1: handleAnalyze returns full contract — indicators + gauge + prediction', async () => {
+  const kv = fakeKV();
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('query1.finance.yahoo.com') && u.includes('/v8/finance/chart/')) {
+      return { ok: true, json: async () => JSON.parse(syntheticUptrendYahoo()) };
+    }
+    if (u.includes('query1.finance.yahoo.com') && u.includes('/v7/finance/quote')) {
+      // Optional quote enrichment — return one quote.
+      return { ok: true, json: async () => ({
+        quoteResponse: {
+          result: [{ symbol: 'TEST', regularMarketPrice: 140.0, regularMarketChange: 0.5, regularMarketChangePercent: 0.36, regularMarketPreviousClose: 139.5 }],
+          error: null,
+        },
+      }) };
+    }
+    throw new Error('unexpected fetch: ' + u);
+  };
+
+  try {
+    const result = await handleAnalyze({ FT_KV: kv }, 'TEST', '3M');
+    assert.equal(result.cached, false, 'first call not cached');
+    const d = result.data;
+    assert.equal(d.sym, 'TEST');
+    assert.equal(d.tf, '3M');
+    assert.equal(typeof d.asOf, 'number');
+    assert.equal(typeof d.price, 'number');
+    assert.equal(typeof d.chgPct, 'number');
+
+    // Indicators — every field numeric (no NaN/null).
+    assert.equal(typeof d.indicators.rsi14, 'number');
+    assert.ok(!Number.isNaN(d.indicators.rsi14), 'rsi14 must not be NaN');
+    assert.equal(typeof d.indicators.macd.macd, 'number');
+    assert.equal(typeof d.indicators.macd.signal, 'number');
+    assert.equal(typeof d.indicators.macd.histogram, 'number');
+    assert.equal(typeof d.indicators.sma20, 'number');
+    assert.equal(typeof d.indicators.sma50, 'number');
+    assert.equal(typeof d.indicators.sma200, 'number');
+    assert.equal(typeof d.indicators.ema20, 'number');
+    assert.equal(typeof d.indicators.ema50, 'number');
+    assert.equal(typeof d.indicators.bollinger.upper, 'number');
+    assert.equal(typeof d.indicators.bollinger.middle, 'number');
+    assert.equal(typeof d.indicators.bollinger.lower, 'number');
+    assert.equal(typeof d.indicators.bollinger.bandwidth, 'number');
+    assert.equal(typeof d.indicators.atr14, 'number');
+    assert.equal(typeof d.indicators.stoch.k, 'number');
+    assert.equal(typeof d.indicators.stoch.d, 'number');
+
+    // Signals — labels from canonical sets.
+    assert.ok(['bullish', 'bearish', 'neutral'].includes(d.signals.trend));
+    assert.ok(['overbought', 'oversold', 'neutral'].includes(d.signals.momentum));
+    assert.ok(['expanding', 'contracting', 'stable'].includes(d.signals.volatility));
+    assert.ok(['golden', 'death', 'none'].includes(d.signals.ma_cross));
+
+    // Gauge.
+    assert.equal(typeof d.gauge.score, 'number');
+    assert.ok(d.gauge.score >= 0 && d.gauge.score <= 100, 'gauge.score in [0,100]');
+    assert.equal(typeof d.gauge.label, 'string');
+    assert.ok(d.gauge.label.length > 0);
+    assert.equal(typeof d.gauge.components, 'object');
+
+    // Prediction.
+    assert.ok(['up', 'down', 'sideways'].includes(d.prediction.direction));
+    assert.equal(typeof d.prediction.confidence, 'number');
+    assert.ok(d.prediction.confidence >= 0 && d.prediction.confidence <= 1, 'confidence in [0,1]');
+    assert.ok(['1w', '1m'].includes(d.prediction.horizon));
+    assert.equal(d.prediction.method, 'ensemble');
+    assert.ok(Array.isArray(d.prediction.rationale));
+    assert.ok(d.prediction.rationale.length >= 1 && d.prediction.rationale.length <= 5);
+
+    // KV populated under analyze:TEST:3M.
+    const raw = kv.store.get('analyze:TEST:3M');
+    assert.ok(raw != null, 'analyze should be cached in KV');
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test AN2: fresh cache hit → cached:true WITHOUT recomputing.
+test('Test AN2: fresh analyze cache hit → cached:true, no fetch', async () => {
+  const kv = fakeKV();
+  const cachedData = {
+    sym: 'TEST', tf: '3M', asOf: 1779000000000, price: 105, chgPct: 0.3,
+    indicators: {
+      rsi14: 60,
+      macd: { macd: 0.2, signal: 0.1, histogram: 0.1 },
+      sma20: 102, sma50: 100, sma200: 95,
+      ema20: 102, ema50: 100,
+      bollinger: { upper: 110, middle: 102, lower: 94, bandwidth: 0.16 },
+      atr14: 2,
+      stoch: { k: 60, d: 55 },
+    },
+    signals: { trend: 'bullish', momentum: 'neutral', volatility: 'stable', ma_cross: 'golden' },
+    gauge: { score: 65, label: 'Bullish', components: { trend: 70, momentum: 50, volatility: 50, macross: 80, rsi: 50 } },
+    prediction: { direction: 'up', confidence: 0.6, horizon: '1m', rationale: ['x'], method: 'ensemble' },
+  };
+  await setCached(kv, 'analyze:TEST:3M', cachedData);
+
+  let fetchCalled = false;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { fetchCalled = true; return { ok: false }; };
+
+  try {
+    const result = await handleAnalyze({ FT_KV: kv }, 'TEST', '3M');
+    assert.equal(fetchCalled, false, 'fetch must not be called on fresh cache hit');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, cachedData);
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+});
+
+// Test AN3: stale-on-error pattern.
+test('Test AN3: handleAnalyze all sources fail with stale cache → stale:true', async () => {
+  const kv = fakeKV();
+  const staleData = {
+    sym: 'TEST', tf: '3M', asOf: 1779000000000, price: 100, chgPct: 0,
+    indicators: { rsi14: 50, macd: { macd: 0, signal: 0, histogram: 0 }, sma20: 100, sma50: 100, sma200: 100, ema20: 100, ema50: 100, bollinger: { upper: 105, middle: 100, lower: 95, bandwidth: 0.1 }, atr14: 1, stoch: { k: 50, d: 50 } },
+    signals: { trend: 'neutral', momentum: 'neutral', volatility: 'stable', ma_cross: 'none' },
+    gauge: { score: 50, label: 'Neutral', components: { trend: 50, momentum: 50, volatility: 50, macross: 50, rsi: 50 } },
+    prediction: { direction: 'sideways', confidence: 0.5, horizon: '1m', rationale: ['x'], method: 'ensemble' },
+  };
+  const oldTs = Date.now() - 120_000; // expired at 60s TTL
+  kv.store.set('analyze:TEST:3M', JSON.stringify({ d: staleData, t: oldTs }));
+
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('network unavailable'); };
+
+  try {
+    const result = await handleAnalyze({ FT_KV: kv }, 'TEST', '3M');
+    assert.equal(result.stale, true, 'should return stale:true');
+    assert.equal(result.cached, true);
+    assert.deepEqual(result.data, staleData);
   } finally {
     globalThis.fetch = origFetch;
   }
