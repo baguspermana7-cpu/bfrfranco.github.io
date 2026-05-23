@@ -12040,6 +12040,102 @@ function buildTechSpecHtml(){
     '<p>Two-stage alarm regime (warning, alarm) with one-up-one-down hysteresis. Alarms acknowledge per operator action; events log permanently. First-out logic on chiller plant: the first alarm in a chain (master) suppresses derivative alarms during the first 60 s so the operator sees the root cause first.</p>'+
     '</section>';
 
+  /* ---------------- 10. Cost Annex (CAPEX / OPEX / TCO indicative) ---------------- */
+  /* v1.31.4 owner direct ask: "Perhitungan utk tech spec bisa gunakan engine
+   * capex, opex calculator dan calculator2 lain." Use parametric per-MW
+   * ranges from cited public sources (JLL, Cushman &amp; Wakefield, Uptime),
+   * applied to the engine's facility kW. Liquid-cooled AI factories command
+   * a premium over conventional DCs &mdash; reflect that in the ranges. */
+  var facMW = facTotal/1000;
+  var itMW = facIT/1000;
+  /* CAPEX: AI factory 10-14 M USD per MW of IT (white-space + utilities + civil).
+   * Source: JLL "Data Center Construction" 2024-2025 + Cushman &amp; Wakefield. */
+  var capexLowUsdPerMwIT = 10e6, capexMidUsdPerMwIT = 12e6, capexHighUsdPerMwIT = 14e6;
+  /* OPEX: power dominates. Industrial tariff range 0.06-0.12 USD/kWh worldwide.
+   * Mid 0.09 USD/kWh used as reference. */
+  var tariffLow = 0.06, tariffMid = 0.09, tariffHigh = 0.12;
+  /* Maintenance: 4-6 % of CAPEX per year typical. */
+  var maintLow = 0.04, maintMid = 0.05, maintHigh = 0.06;
+  /* Run-time fraction: training-grade DC, near-continuous. */
+  var hoursYr = 8760;
+  var annualKwhFac = facTotal * hoursYr;
+  var capexMid = capexMidUsdPerMwIT * itMW;
+  var capexLow = capexLowUsdPerMwIT * itMW;
+  var capexHigh = capexHighUsdPerMwIT * itMW;
+  var powerOpexMid = annualKwhFac * tariffMid;
+  var powerOpexLow = annualKwhFac * tariffLow;
+  var powerOpexHigh = annualKwhFac * tariffHigh;
+  var maintOpexMid = capexMid * maintMid;
+  var totalOpexMid = powerOpexMid + maintOpexMid;
+  var tco10yrMid = capexMid + (totalOpexMid * 10);
+
+  function fmtUsd(n){
+    if(n>=1e9) return '$'+(n/1e9).toFixed(2)+' B';
+    if(n>=1e6) return '$'+(n/1e6).toFixed(1)+' M';
+    if(n>=1e3) return '$'+(n/1e3).toFixed(0)+' K';
+    return '$'+n.toFixed(0);
+  }
+
+  H+='<section class="page"><h3>10. Cost Annex &mdash; CAPEX / OPEX / TCO (indicative)</h3>'+
+    '<p>The cost annex is INDICATIVE only. It applies public parametric ranges from cited construction-cost databases to the engine&rsquo;s live facility power figure. Use these to scope discussion; do not use them for procurement or board-level capital approval &mdash; for those, a project-specific QS-stamped estimate is required.</p>'+
+    '<h4>10.1 Assumptions &amp; rate cards</h4>'+TC('Parametric cost rates')+R([
+      ['CAPEX range (AI factory)','$10&ndash;$14 M / MW IT','JLL Data Center Construction 2024-2025; Cushman &amp; Wakefield'],
+      ['Electricity tariff (mid)','$0.06&ndash;$0.12 / kWh','industrial tariff worldwide (BP Stats / IEA)'],
+      ['Maintenance fraction','4&ndash;6 % of CAPEX / yr','Uptime Institute MAINT benchmark'],
+      ['Hours per year','8,760','24/7/365'],
+      ['IT load (live)',pdfNum(facIT)+' kW = '+itMW.toFixed(2)+' MW','CALC.lockedState()'],
+      ['Facility load (live)',pdfNum(facTotal)+' kW = '+facMW.toFixed(2)+' MW','IT &times; PUE'],
+      ['Annual facility kWh',grp(Math.round(annualKwhFac))+' kWh','facility kW &times; 8,760']
+    ])+
+    '<h4>10.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>CAPEX = $/MW_IT &times; IT_MW</code></li>'+
+    '<li><code>Annual_kWh = facility_kW &times; 8,760</code></li>'+
+    '<li><code>Power_OPEX_yr = Annual_kWh &times; tariff_$/kWh</code></li>'+
+    '<li><code>Maint_OPEX_yr = CAPEX &times; maint_pct</code></li>'+
+    '<li><code>Total_OPEX_yr = Power_OPEX + Maint_OPEX</code></li>'+
+    '<li><code>TCO_10yr = CAPEX + 10 &times; Total_OPEX_yr</code> &mdash; un-discounted; for NPV apply WACC</li>'+
+    '</ul>'+
+    '<h4>10.3 Worked calculations (live engine numerator)</h4>'+
+    WK('CAPEX (mid case)',
+       'CAPEX = $/MW_IT &times; IT_MW',
+       '$12 M &times; '+itMW.toFixed(2)+' MW',
+       fmtUsd(capexMid),
+       'JLL DC Construction 2024-2025 mid-case')+
+    WK('CAPEX low / high band',
+       'low '+fmtUsd(capexLow)+' &mdash; high '+fmtUsd(capexHigh),
+       '$10 M &times; '+itMW.toFixed(2)+' MW &mdash; $14 M &times; '+itMW.toFixed(2)+' MW',
+       fmtUsd(capexLow)+' &ndash; '+fmtUsd(capexHigh),
+       'AI premium over conventional')+
+    WK('Annual electricity OPEX (mid)',
+       'Power_OPEX = Annual_kWh &times; tariff',
+       grp(Math.round(annualKwhFac))+' kWh &times; $0.09',
+       fmtUsd(powerOpexMid)+' / yr',
+       'mid-tariff $0.09/kWh')+
+    WK('Annual maintenance OPEX (mid)',
+       'Maint_OPEX = CAPEX &times; 5 %',
+       fmtUsd(capexMid)+' &times; 0.05',
+       fmtUsd(maintOpexMid)+' / yr',
+       'Uptime MAINT benchmark 4&ndash;6 %')+
+    WK('Total annual OPEX (mid)',
+       'Total_OPEX = Power_OPEX + Maint_OPEX',
+       fmtUsd(powerOpexMid)+' + '+fmtUsd(maintOpexMid),
+       fmtUsd(totalOpexMid)+' / yr',
+       'derived')+
+    WK('10-year TCO (un-discounted)',
+       'TCO_10yr = CAPEX + 10 &times; Total_OPEX',
+       fmtUsd(capexMid)+' + 10 &times; '+fmtUsd(totalOpexMid),
+       fmtUsd(tco10yrMid),
+       'un-discounted; apply WACC for NPV')+
+    '<h4>10.4 Cost sensitivity grid (mid-case CAPEX, tariff sweep)</h4>'+TC('OPEX vs tariff')+R([
+      ['Tariff $0.06/kWh (low)',fmtUsd(powerOpexLow)+' / yr',''],
+      ['Tariff $0.09/kWh (mid, baseline)',fmtUsd(powerOpexMid)+' / yr',''],
+      ['Tariff $0.12/kWh (high)',fmtUsd(powerOpexHigh)+' / yr','']
+    ])+
+    '<h4>10.5 GPU-economics framing</h4>'+
+    '<p>For an AI factory the dominant cost is GPU acquisition, not facility CAPEX. At '+grp(m.facility.gpuPerFacility)+' Blackwell GPUs &times; ~$30K street-price each, the silicon CAPEX is on the order of '+fmtUsd(m.facility.gpuPerFacility*30000)+' &mdash; multiples of the facility CAPEX. The Tech Spec deliberately stays facility-side because that is the audit-able share; silicon pricing is volatile and falls outside operations engineering.</p>'+
+    '<p class="tp-dis">All cost figures above are INDICATIVE. Site-specific factors (land, utility connection, sales tax, labour rate, climate, FX) move CAPEX by &plusmn; 30 % between geographies. A project-specific QS estimate is required for procurement.</p>'+
+    '</section>';
+
   /* ---------------- References ---------------- */
   H+='<section class="page"><h3>9. References</h3><ul class="fl">'+
     '<li>NVIDIA &mdash; GB200 NVL72 reference architecture, NVLink Switch, design guide rev current.</li>'+

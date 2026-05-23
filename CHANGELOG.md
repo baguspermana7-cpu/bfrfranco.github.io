@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v1.31.4 — 2026-05-23 (Tech Spec PDF — Section 10 Cost Annex on both DC AI and DC Conv)
+
+Owner direct ask: "Perhitungan utk tech spec bisa gunakan engine capex,
+opex calculator dan calculator2 lain." Rather than coupling each Tech
+Spec to the page-local capex/opex calculator IIFEs (cross-page,
+brittle), each Tech Spec now carries its own Section 10 Cost Annex
+that applies cited public parametric ranges to the engine&rsquo;s live
+facility kW figure. Self-contained, engine-derived, reproducible.
+
+### Added (both Tech Spec PDFs)
+- **Section 10 &mdash; Cost Annex** with 5 worked calculations: CAPEX,
+  annual power OPEX, annual maintenance OPEX, total annual OPEX,
+  10-year TCO (un-discounted). All values rounded with the
+  per-page `fmtUsd()` helper. Sensitivity grid (tariff sweep
+  $0.06/$0.09/$0.12 per kWh).
+- DC AI uses AI-factory CAPEX band ($10&ndash;$14 M / MW IT) with a
+  GPU-economics framing noting silicon CAPEX (Blackwell &times;
+  facility GPU count) typically dwarfs facility CAPEX by a multiple.
+- DC Conventional uses enterprise CAPEX band ($7&ndash;$11 M / MW IT)
+  with a "conventional vs AI factory" comparison paragraph.
+
+### Sources (cited in tables)
+- JLL Data Center Construction 2024-2025 (CAPEX bands)
+- Cushman &amp; Wakefield Data Center Report (CAPEX corroboration)
+- BP Statistical Review / IEA (industrial electricity tariffs)
+- Uptime Institute MAINT benchmark (maintenance %)
+
+### Notes
+- Indicative only. Disclaimer in 10.5 / banner: site-specific factors
+  (land, utility connection, sales tax, labour, climate, FX) move
+  CAPEX by &plusmn; 30 % between geographies.
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+
+---
+
 ## v1.31.3 — 2026-05-23 (DC Conventional Tech Spec PDF — full discipline expansion: Cooling, Water, Fire, Fuel, ICT/EPMS/BMS, Carbon + appendices B + C)
 
 v1.30.1 shipped the scaffold + Power discipline. This ship expands the

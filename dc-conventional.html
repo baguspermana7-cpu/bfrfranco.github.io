@@ -1805,6 +1805,88 @@ function buildTechSpecHtml(){
     '<p>Net-zero strategy options include PPAs (power-purchase agreements with renewable generation), on-site solar/storage, and demand-response. Each is evaluated against grid emission factor and capital cost; CUE on its own does not specify which approach to take.</p>'+
     '</section>';
 
+  /* ----- 10. Cost Annex (CAPEX / OPEX / TCO indicative) -----
+     v1.31.4 owner direct ask: use parametric per-MW ranges from cited
+     public sources, applied to the engine's facility kW. Conventional
+     enterprise DCs run lower than AI factories. */
+  var facMW = facKw/1000;
+  var itMW = itKw/1000;
+  var capexLowUsdPerMwIT = 7e6, capexMidUsdPerMwIT = 9e6, capexHighUsdPerMwIT = 11e6;
+  var tariffLow = 0.06, tariffMid = 0.09, tariffHigh = 0.12;
+  var maintLow = 0.04, maintMid = 0.05, maintHigh = 0.06;
+  var hoursYr = 8760;
+  var annualKwhFac = facKw * hoursYr;
+  var capexMid = capexMidUsdPerMwIT * itMW;
+  var capexLow = capexLowUsdPerMwIT * itMW;
+  var capexHigh = capexHighUsdPerMwIT * itMW;
+  var powerOpexMid = annualKwhFac * tariffMid;
+  var powerOpexLow = annualKwhFac * tariffLow;
+  var powerOpexHigh = annualKwhFac * tariffHigh;
+  var maintOpexMid = capexMid * maintMid;
+  var totalOpexMid = powerOpexMid + maintOpexMid;
+  var tco10yrMid = capexMid + (totalOpexMid * 10);
+
+  function fmtUsd(n){
+    if(n>=1e9) return '$'+(n/1e9).toFixed(2)+' B';
+    if(n>=1e6) return '$'+(n/1e6).toFixed(1)+' M';
+    if(n>=1e3) return '$'+(n/1e3).toFixed(0)+' K';
+    return '$'+n.toFixed(0);
+  }
+
+  H+='<section class="page"><h3>10. Cost Annex &mdash; CAPEX / OPEX / TCO (indicative)</h3>'+
+    '<p>The cost annex is INDICATIVE only. It applies public parametric ranges from cited construction-cost databases to the engine&rsquo;s live facility power figure. Use these to scope discussion; do not use them for procurement or board-level capital approval.</p>'+
+    '<h4>10.1 Assumptions &amp; rate cards</h4>'+TC('Parametric cost rates &mdash; conventional enterprise DC')+R([
+      ['CAPEX range (enterprise DC)','$7&ndash;$11 M / MW IT','JLL Data Center Construction 2024-2025'],
+      ['Electricity tariff (mid)','$0.06&ndash;$0.12 / kWh','industrial tariff worldwide (BP Stats / IEA)'],
+      ['Maintenance fraction','4&ndash;6 % of CAPEX / yr','Uptime Institute MAINT benchmark'],
+      ['Hours per year','8,760','24/7/365'],
+      ['IT load (live)',grp(Math.round(itKw))+' kW = '+itMW.toFixed(2)+' MW','snapshot.site.it_load_kw'],
+      ['Facility load (live)',grp(Math.round(facKw))+' kW = '+facMW.toFixed(2)+' MW','IT &times; PUE'],
+      ['Annual facility kWh',grp(Math.round(annualKwhFac))+' kWh','facility kW &times; 8,760']
+    ])+
+    '<h4>10.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>CAPEX = $/MW_IT &times; IT_MW</code></li>'+
+    '<li><code>Annual_kWh = facility_kW &times; 8,760</code></li>'+
+    '<li><code>Power_OPEX_yr = Annual_kWh &times; tariff_$/kWh</code></li>'+
+    '<li><code>Maint_OPEX_yr = CAPEX &times; maint_pct</code></li>'+
+    '<li><code>TCO_10yr = CAPEX + 10 &times; (Power_OPEX + Maint_OPEX)</code></li>'+
+    '</ul>'+
+    '<h4>10.3 Worked calculations (live engine numerator)</h4>'+
+    WK('CAPEX (mid case, enterprise)',
+       'CAPEX = $/MW_IT &times; IT_MW',
+       '$9 M &times; '+itMW.toFixed(2)+' MW',
+       fmtUsd(capexMid),
+       'JLL DC Construction 2024-2025 mid-case')+
+    WK('Annual electricity OPEX (mid)',
+       'Power_OPEX = Annual_kWh &times; tariff',
+       grp(Math.round(annualKwhFac))+' kWh &times; $0.09',
+       fmtUsd(powerOpexMid)+' / yr',
+       'mid-tariff $0.09/kWh')+
+    WK('Annual maintenance OPEX (mid)',
+       'Maint_OPEX = CAPEX &times; 5 %',
+       fmtUsd(capexMid)+' &times; 0.05',
+       fmtUsd(maintOpexMid)+' / yr',
+       'Uptime MAINT benchmark')+
+    WK('Total annual OPEX',
+       'Total_OPEX = Power_OPEX + Maint_OPEX',
+       fmtUsd(powerOpexMid)+' + '+fmtUsd(maintOpexMid),
+       fmtUsd(totalOpexMid)+' / yr',
+       'derived')+
+    WK('10-year TCO (un-discounted)',
+       'TCO_10yr = CAPEX + 10 &times; Total_OPEX',
+       fmtUsd(capexMid)+' + 10 &times; '+fmtUsd(totalOpexMid),
+       fmtUsd(tco10yrMid),
+       'un-discounted; apply WACC for NPV')+
+    '<h4>10.4 OPEX sensitivity (tariff sweep)</h4>'+TC('OPEX vs tariff')+R([
+      ['Tariff $0.06/kWh (low)',fmtUsd(powerOpexLow)+' / yr',''],
+      ['Tariff $0.09/kWh (mid)',fmtUsd(powerOpexMid)+' / yr',''],
+      ['Tariff $0.12/kWh (high)',fmtUsd(powerOpexHigh)+' / yr','']
+    ])+
+    '<h4>10.5 Conventional vs AI factory</h4>'+
+    '<p>An equivalent-MW AI factory commands a CAPEX premium (typically $10&ndash;$14 M / MW IT vs $7&ndash;$11 M for a conventional enterprise DC) because of liquid cooling infrastructure, higher rack density, and the network fabric required for distributed training. The conventional CAPEX baseline here reflects an air-cooled Tier-III intent enterprise DC; for AI-grade compare against the DC AI Tech Spec.</p>'+
+    '<p class="tp-dis">All cost figures above are INDICATIVE. Site-specific factors (land, utility connection, sales tax, labour rate, climate, FX) move CAPEX by &plusmn; 30 % between geographies.</p>'+
+    '</section>';
+
   /* References */
   H+='<section class="page"><h3>9. References</h3><ul class="fl">'+
     '<li>ASHRAE TC 9.9 &mdash; <em>Thermal Guidelines for Data Processing Environments</em>, 5th ed.</li>'+
