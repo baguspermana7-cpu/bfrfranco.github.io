@@ -11,6 +11,70 @@ release sections rather than semver.
 
 ---
 
+## v1.32.10 — 2026-05-24 (Network Hub plan v2.3 — anti-monotony timbre layer + v2.2 review fixes)
+
+PATCH doc-only ship: plan revision, no site code touched.
+
+### Added to `docs/plans/2026-05-24-network-visualization-hub-v2.md`
+
+- **§5.6 timbre profile** (anti-monotony layer) — every topic module returns
+  `timbre` on its `init()` instance. Engine composes canonical event params
+  in explicit order: defaults &lt; topic timbre &lt; perRole &lt; perState &lt;
+  tempo; clamps freq to [400, 3000] Hz, duration to [6, 25] ms post-composition.
+- **Appendix E** — 25-row per-protocol timbre table with distinctive trait,
+  register character, byte waveform/freq/duration, chip shape, wire style,
+  node icons, tempo. Anti-monotony rule: &le;2 shared fields with any other
+  topic in the same lane.
+
+### Changed (v2.2 &rarr; v2.3 from review cycle)
+
+- Module contract: `timbre` exposed on the `init()` returned instance
+  (explicit data-flow), NOT via global namespace side-channel.
+- Variation budget tightened: freq floor 400 Hz (was 200), tempo
+  envelope [0.7&times;, 1.7&times;] (was [0.5&times;, 2.0&times;]),
+  `scroll` chip renamed `long-rect`.
+- `perState.error.tempoMultiplier` LOCKED to 1.0&times; (no slow-on-error
+  &mdash; HMI convention, not stage music).
+- Simultaneous multi-tone banned (only sequential frequency steps allowed;
+  prevents accidental perfect-interval musicality).
+- 5 new timbre fields added: `errorSignature`, `encryption`,
+  `latencyClass`, `completeFreq`, `compareDegrade`.
+- Pixel-snap mandate extended to chip positions (was strokes only).
+  Determinism tolerance now element-relative.
+- Flow-stage tint exception formally sanctioned: amber permitted for
+  transient pre-issuance stages in auth flows (OAuth auth-code chip);
+  terminal/steady chip returns to cyan.
+- Anti-monotony gate wording corrected: pairwise-within-lane (any pair),
+  NOT pairwise-against-reference. Tempo binned ("slow" / "medium" / "fast")
+  for the equality check.
+- 10 Appendix E rows tightened: OPC-UA (drop pulse), EtherNet/IP (marker
+  stripe not text), EtherCAT (1.7&times; not 2.0&times;), SNMP (0.7&times;),
+  IPv4-vs-IPv6 (sequential not dual-tone), DHCP-DNS (monotonic ascending),
+  IPMI-Redfish (sideband-dashed wire not amber chip), OAuth (flow-stage
+  tint sanctioned), GraphQL (`long-rect` + 3-chip-shape cap), MCP
+  (industrial register held &mdash; "soft + warm + agentic" removed).
+
+### Changed
+
+- `js/rz-version.js` &mdash; bumped to v1.32.10 (skipped 1.32.8/9 taken
+  by parallel session's accuracy phase 3 + Puppeteer probes).
+- `sw.js` &mdash; cache name bumped to `rz-cache-v1.32.10`.
+
+### Review verdicts on v2.2 (before v2.3 fixes)
+
+- code-reviewer: APPROVE_WITH_CHANGES (3 HIGH + 5 MEDIUM) &mdash; all
+  folded into v2.3.
+- uiux-reviewer: APPROVE_WITH_NOTES (4 rows need adjust + 5 missing
+  timbre fields) &mdash; all folded into v2.3.
+
+### Status
+
+Plan v2.3 ready for owner sign-off on Q1&ndash;Q4. Phase 0 implementation
+begins after sign-off + final reviewer pass on the live Modbus RTU
+reference page.
+
+---
+
 ## v1.32.7 — 2026-05-24 (Network Visualization Hub plan v2 — reviewer-vetted, ready for Phase 0 sign-off)
 
 PATCH doc-only ship: plan rewrite, no site code touched. Builds on the
