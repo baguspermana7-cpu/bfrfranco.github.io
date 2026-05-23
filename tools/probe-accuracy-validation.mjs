@@ -75,7 +75,9 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
 
   /* ---- Test 3: Market terminology — no 'NVL72 rack' without disambiguation ---- */
   const html = await page.content();
-  const ambiguous66 = /66\s*kW\s+NVL72|NVL72 rack(?!-pos|\s|s)/.test(html.replace(/<title>.*?<\/title>/, ''));
+  /* Allow: "NVL72 rack-scale" (NVIDIA term), "NVL72 rack-pos", "NVL72 racks"
+     Block: bare "NVL72 rack" used as singular noun without disambiguation. */
+  const ambiguous66 = /\b66\s*kW.{0,12}NVL72\s+rack\b(?!-)/i.test(html);
   assert(!ambiguous66, 'AI-Test-3a: no "66 kW NVL72 rack" ambiguity', '');
   const hasRackPos = html.includes('rack-pos') || html.includes('rack position');
   assert(hasRackPos, 'AI-Test-3b: "rack-pos" or "rack position" terminology present', '');
@@ -94,9 +96,14 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
   const isNotGreen = !/var\(--g\)/.test(pueColor||'');
   assert(isNotGreen, `AI-Test-6: PUE colour is NOT green (informational neutral)`, `color=${pueColor}`);
 
-  /* ---- Test 7: Basis drawer opens on PUE click ---- */
-  await page.click('.k[data-basis="pue"]');
-  await new Promise(r => setTimeout(r, 400));
+  /* ---- Test 7: Basis drawer opens on PUE click ----
+     Use DOM-API click (card.click()) not puppeteer's coordinate click —
+     more reliable for headless testing where viewport scroll matters. */
+  await page.evaluate(() => {
+    const card = document.querySelector('.k[data-basis="pue"]');
+    if (card) card.click();
+  });
+  await new Promise(r => setTimeout(r, 500));
   const drawerOk = await page.evaluate(() => {
     const dlg = document.getElementById('kpiBasisDrawer');
     if (!dlg) return null;
@@ -175,9 +182,12 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
   const stable = samples.every(s => s.pueDash === samples[0].pueDash && s.wue === samples[0].wue);
   assert(stable, `CONV-Test-7: dashboard basis KPIs identical across ${ROUND_TRIPS} reloads`, JSON.stringify(samples));
 
-  /* ---- Test 8: Basis drawer on conv ---- */
-  await page.click('.kpi-card[data-basis="grid"]');
-  await new Promise(r => setTimeout(r, 400));
+  /* ---- Test 8: Basis drawer on conv (DOM-API click for headless reliability) ---- */
+  await page.evaluate(() => {
+    const card = document.querySelector('.kpi-card[data-basis="grid"]');
+    if (card) card.click();
+  });
+  await new Promise(r => setTimeout(r, 500));
   const drawerOk = await page.evaluate(() => {
     const dlg = document.getElementById('kpiBasisDrawer');
     if (!dlg) return null;

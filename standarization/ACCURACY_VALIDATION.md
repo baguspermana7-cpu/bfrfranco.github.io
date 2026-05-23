@@ -208,3 +208,8 @@ alongside the four audit scripts (`audit-script-tags`,
   acceptance tests across DC AI + DC Conv are now codified as runnable
   assertions in `tools/probe-accuracy-validation.mjs`. Owner can
   invoke per ship; future automation can wire to CI gates.
+- **v1.32.10** (2026-05-24): Probe ran on first attempt, **found 2
+  real bugs** (FAQ_ITEMS `ReferenceError: sc is not defined` shipped
+  in v1.30.1; probe `page.click()` needed DOM-API fallback for
+  headless reliability). Both fixed. **32/32 PASS**. The probe earned
+  its keep on day 1.

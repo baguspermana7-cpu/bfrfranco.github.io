@@ -12469,19 +12469,35 @@ var genBtn=gid('genDesignTrig');
 if(genBtn){ genBtn.addEventListener('click',exportTechSpecPdf); }
 
 /* ---------------- FAQ dialog ---------------- */
-var FAQ_ITEMS=[
+/* v1.32.10 — FAQ_ITEMS moved inside openFaqDialog() to fix ReferenceError on
+ * page-load. Previously the array referenced sc/pueVal/eq/m/grp at top level,
+ * which threw because those are scoped inside buildTechSpecHtml(). Moved here
+ * + rebound via window.DATAHALL_MODEL + window.DATAHALL_CALC so refs are
+ * resolved when the FAQ opens, not when the page parses. */
+function openFaqDialog(){
+  var ex=d.getElementById('rzFaqDialog'); if(ex){ ex.style.display='flex'; return; }
+  /* Build FAQ items at open-time when DATAHALL_MODEL + DATAHALL_CALC are available. */
+  var M=window.DATAHALL_MODEL, C=window.DATAHALL_CALC;
+  var sc=(M&&M.locked)||{kwPerNVL72:132};
+  var pb=(C&&C.pueBasis)?C.pueBasis():{pue:1.30};
+  var pueVal=(C&&C.round)?C.round(pb.pue,2):1.30;
+  var eqC=(M&&M.equipment&&M.equipment.chiller)||{nameplateCOP:6.8};
+  var f=(M&&M.facility)||{halls:4,nvl72PerHall:27,racksPerNVL72:2,racksPerHall:54,gpuPerNVL72:72,gpuPerFacility:7776};
+  var cool=(M&&M.cooling)||{liquidCaptureRatio:0.85,tcsSupplyC:35};
+  function gNum(n){return (''+n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+  var FAQ_ITEMS=[
   ['What does the "Generate Design" button produce?',
    'A multi-page Tech Specification PDF. Every number comes from the on-page calculation engine (DATAHALL_CALC + DATAHALL_MODEL), so the document reflects the LOCKED Scenario A (' + sc.kwPerNVL72 + ' kW per NVL72 pair). v1.30.0 ships ~60 pages (Cover, TOC, Exec Summary, Compute discipline, References, Appendix A). v1.30.1 expands to full ~220 pages covering Electrical SLD, Cooling P&ID, Fire/Safety, Network and BMS.'],
   ['Is the "Basis of Design" button different from "Generate Design"?',
    'Yes. The Basis of Design opens a focused 14-page summary suitable for stakeholder review. The Tech Spec is a deep engineering document with worked formulae, equipment specs and references intended for design-review or hand-off to an engineer-of-record.'],
   ['Why is the PUE ' + pueVal + ' and not the often-quoted 1.08?',
-   'Because the engine uses the chiller NAMEPLATE COP (' + eq.chiller.nameplateCOP + ') and a five-part PUE basis (IT + Cooling + Fan + UPSLoss + Other), all bottom-up. Marketing PUEs are usually back-solved against an annualised energy total &mdash; we deliberately do not do that.'],
+   'Because the engine uses the chiller NAMEPLATE COP (' + eqC.nameplateCOP + ') and a five-part PUE basis (IT + Cooling + Fan + UPSLoss + Other), all bottom-up. Marketing PUEs are usually back-solved against an annualised energy total &mdash; we deliberately do not do that.'],
   ['How many racks and GPUs does this facility have?',
-   '' + m.facility.halls + ' halls &times; ' + m.facility.nvl72PerHall + ' NVL72 per hall &times; ' + m.facility.racksPerNVL72 + ' racks per NVL72 = ' + (m.facility.halls*m.facility.racksPerHall) + ' physical racks. GPUs total ' + grp(m.facility.gpuPerFacility) + ' Blackwell (' + m.facility.gpuPerNVL72 + ' per NVL72).'],
+   '' + f.halls + ' halls &times; ' + f.nvl72PerHall + ' NVL72 per hall &times; ' + f.racksPerNVL72 + ' racks per NVL72 = ' + (f.halls*f.racksPerHall) + ' physical racks. GPUs total ' + gNum(f.gpuPerFacility) + ' Blackwell (' + f.gpuPerNVL72 + ' per NVL72).'],
   ['Is the data here live BMS telemetry?',
    'No. Every value is modelled / simulated from the locked basis. The page is engineered to look like an operations console so the design conversation can stay in one place, but it is not a feed from a physical facility. See the amber callout at the top of the Basis of Design drawer.'],
   ['What is "direct-to-chip" (DLC) and how is the cooling split?',
-   'DLC routes a coolant loop directly to the GPU cold-plate, removing ' + (m.cooling.liquidCaptureRatio*100) + '% of IT heat at high return temperature (' + (m.cooling.chws_c||'&mdash;') + '&deg;C supply). The residual ' + (100-m.cooling.liquidCaptureRatio*100) + '% is removed by CRAH/CRAC air handlers, sized smaller because of the DLC load shedding.'],
+   'DLC routes a coolant loop directly to the GPU cold-plate, removing ' + (cool.liquidCaptureRatio*100) + '% of IT heat at high return temperature (' + (cool.tcsSupplyC||'&mdash;') + '&deg;C supply). The residual ' + (100-cool.liquidCaptureRatio*100) + '% is removed by CRAH/CRAC air handlers, sized smaller because of the DLC load shedding.'],
   ['How are these numbers verified?',
    'The engine ships with 57 doc-21 worked examples in tools/test-datahall-calc.mjs. Every site release runs them in CI; a regression fails the build. The Tech Spec PDF is built from the same engine that the on-page mimics use, so a passing test suite means the PDF&rsquo;s arithmetic is reproducible.'],
   ['Can I change the scenario and see numbers update?',
@@ -12490,9 +12506,7 @@ var FAQ_ITEMS=[
    'NVIDIA GB200 NVL72 reference architecture for compute, ASHRAE TC 9.9 for thermal envelopes, NFPA 75/76 for fire, Uptime Institute Tier Standard for resilience topology, IEC 60364 + IEEE 1100 + BS 7671 for power, BS EN 50600 for data-centre facility infrastructure. Full list in section 9 of the Tech Spec PDF.'],
   ['Why is this educational and not procurement-grade?',
    'Two reasons. First, this is a public reference design &mdash; not project-specific. Second, real procurement needs a stamped issued-for-construction package from an engineer of record. The Tech Spec PDF is shaped like such a package because that shape teaches; it does not replace it.']
-];
-function openFaqDialog(){
-  var ex=d.getElementById('rzFaqDialog'); if(ex){ ex.style.display='flex'; return; }
+  ];
   var dlg=d.createElement('div'); dlg.id='rzFaqDialog'; dlg.setAttribute('role','dialog');
   dlg.setAttribute('aria-modal','true'); dlg.setAttribute('aria-labelledby','rzFaqTitle');
   dlg.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.78);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
