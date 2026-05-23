@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.31.1 — 2026-05-23 (DC Solutions — AI Engineering Maintenance placeholder card)
+
+Added a 6th card to the **Cost Calculators** section on `datacenter-solutions.html`
+alongside CAPEX / OPEX / DC MOC / Cx / RFS Readiness:
+
+- **AI Engineering Maintenance** — placeholder; concept brief pending owner.
+- Icon `fa-screwdriver-wrench`, tone `#60a5fa` blue-400 on `rgba(96,165,250,0.18)` —
+  distinct from the 5 existing colors; NOT Anthropic-purple.
+- Badge: `COMING SOON` with hourglass icon (mirrors existing `.ds-badge-pro` shape).
+- `href="#"` + `aria-disabled="true"` + onclick toast "Coming soon. Concept brief in progress."
+- Tool count bumped `5 tools` → `6 tools` in section header.
+
+Placeholder only. The actual page lands once owner provides the concept brief
+(AI-assisted maintenance scheduling, predictive failure, asset-lifecycle ops).
+
+(Shipped in commit `a5e305b` as the card-only change; this commit completes the
+v1.31.1 metadata: version + sw cache + changelog.)
+
+---
+
 ## v1.31.0 — 2026-05-23 (FT Phase 2 Task B — client analytics panel + buy/sell gauge widget per tab)
 
 R-002/R-003/R-008 client-side surfacing of v1.30.0's `/analyze` data.
