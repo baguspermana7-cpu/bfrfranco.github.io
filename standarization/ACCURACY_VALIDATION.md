@@ -167,12 +167,16 @@ suite. Run as headless Puppeteer probes once v1.32.3 lands them.
   + CONV-ACC-01/02/04/08. Dashboard randomisation stripped; CUE
   denominator clarified; Tech Spec corrected. (Authored as v1.32.0;
   parallel session shipped its own v1.32.0 mid-push.)
-- **v1.32.2** (2026-05-24): Terminology + UPS 2N + CHW reconciliation —
+- **v1.32.6** (2026-05-24): Terminology + UPS 2N + CHW reconciliation —
   AI-ACC-04/09/10 + CONV-ACC-03/05/06/09. NVL72 rack → rack-pos labels;
   UPS rows show normal-vs-failover; chiller-plant adds CHW flow
-  reconciliation card.
-- **v1.32.3** (planned): Basis drawers per Rule 6 — every top KPI opens
-  a formula / inputs / output / scope / denominator / source / mode /
-  timestamp drawer.
-- **v1.32.4** (planned): Puppeteer probes for the acceptance tests
+  reconciliation card. (Authored as v1.32.2; renumbered after parallel
+  session's v1.32.5 doc-propagation patch.)
+- **v1.32.8** (2026-05-24): Basis drawers per Rule 6 SHIPPED. Every top
+  KPI on both cockpit dashboards (8 DC AI + 7 DC Conv = 15 total) opens
+  a drawer with formula / inputs / output / scope / denominator /
+  source / data-mode / last-update. Closes the reviewer's "Required
+  KPI Display Contract" finding. (Authored as v1.32.7; renumbered after
+  parallel session's v1.32.7 Network Hub plan v2.)
+- **v1.32.9** (planned): Puppeteer probes for the acceptance tests
   above, gated in CI.

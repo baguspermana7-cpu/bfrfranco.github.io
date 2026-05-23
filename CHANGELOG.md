@@ -160,6 +160,65 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.32.8 — 2026-05-24 (KPI Basis Drawers — ACCURACY_VALIDATION Rule 6, both cockpits)
+
+Phase 3 of the team-review accuracy work. v1.32.1 fixed critical bugs;
+v1.32.6 swept terminology + UPS 2N + CHW reconciliation; v1.32.8 closes
+the reviewer's "Required KPI Display Contract" by making every top-strip
+KPI clickable to open a basis drawer with formula / inputs / output /
+scope / denominator / source / data-mode / last-update.
+
+(Authored locally as v1.32.7. Parallel session shipped v1.32.7 with the
+Network Visualization Hub plan v2 mid-push; this lands as v1.32.8.)
+
+### Added (both cockpits)
+- **DC AI dashboard (`datahallAI.html`)** — 8 KPI cards now clickable
+  (PUE / WUE / CUE / IT Load / GPUs / NVL72 / Uptime / Alarms). Each
+  opens a drawer with the full basis contract per
+  `ACCURACY_VALIDATION.md` Rule 6.
+- **DC Conv dashboard (`dc-conventional.html`)** — 7 KPI cards
+  clickable (PUE / WUE / Grid factor / IT Load / Uptime / Temp /
+  Chillers). Same drawer pattern.
+
+### Drawer contents (per KPI)
+- **Title** + **Data mode chip** (DERIVED / BOD LOCKED / SIM SENSOR /
+  DESIGN PLACEHOLDER) in header.
+- **Formula** — the exact governing equation, monospace.
+- **Inputs** — table of input values pulled live from
+  `DATAHALL_CALC` / `CONV_CALC`.
+- **Output** — the computed value, green highlight.
+- **Scope** + **Denominator** — side-by-side; closes the reviewer's
+  CONV-ACC-01 / AI-ACC-03 denominator-ambiguity concern.
+- **Source object** — exact engine-method or model field name,
+  monospace purple (e.g. `DATAHALL_CALC.pueBasis()`).
+- **Last update** — timestamp + "deterministic" note (per Rule 2 the
+  engine snapshot does not drift).
+- **Engineering note** — amber-left-bar callout explaining
+  non-obvious context (e.g. "Chiller COP is NAMEPLATE, not
+  back-solved"; "Grid factor is NOT CUE — CUE_IT = grid × PUE").
+
+### UX
+- Click OR keyboard (Enter / Space) on focused card opens drawer.
+- Escape, backdrop-click, or × button closes.
+- `aria-modal=true` + `aria-labelledby` on the dialog.
+- Each card has `tabindex=0` + `role=button` + descriptive
+  `aria-label` for keyboard / screen-reader.
+
+### Reviewer findings closed by this ship
+- AI-ACC docs §"Required KPI Display Contract" — basis drawer per KPI
+  with `label / value / unit / basis / source / scope / state /
+  last update`. Done across all 15 top-strip KPIs across both
+  cockpits.
+- CONV-ACC docs §"Add KPI Basis Drawer" — same.
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`,
+  `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
+- v1.32.8 — Puppeteer probes for the reviewer's 7 + 8 acceptance
+  tests, gated in CI.
+
+---
+
 ## v1.32.6 — 2026-05-24 (Accuracy review terminology + UPS 2N + CHW flow reconciliation — review docs 26 / 16 phase 2)
 
 Phase 2 of the team-review accuracy work. v1.32.1 fixed the 8 critical

@@ -1005,39 +1005,39 @@ a { color: inherit; text-decoration: none; }
             </div>
         </div>
 
-        <!-- KPI Strip -->
+        <!-- KPI Strip — v1.32.7: each card clickable for basis drawer (Rule 6) -->
         <div class="kpi-strip">
-            <div class="kpi-card">
+            <div class="kpi-card" data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer">
                 <div class="kpi-label">PUE</div>
                 <div class="kpi-value" style="color: var(--accent-cyan)" id="kpiPue">1.45</div>
                 <div class="kpi-unit">Target ≤1.5</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" data-basis="wue" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer">
                 <div class="kpi-label">WUE</div>
                 <div class="kpi-value" style="color: var(--accent-blue)" id="kpiWue">1.20</div>
                 <div class="kpi-unit">L/kWh</div>
             </div>
-            <div class="kpi-card" title="Grid emission factor (facility-kWh denominator) per ISO/IEC 30134-8. CUE_IT = this × PUE = 0.61 kgCO₂/kWh IT — see side panel.">
+            <div class="kpi-card" data-basis="grid" tabindex="0" role="button" aria-label="Grid factor — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Grid factor</div>
                 <div class="kpi-value" style="color: var(--accent-green)" id="kpiCarbon">0.42</div>
                 <div class="kpi-unit">kgCO₂/kWh facility</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" data-basis="it" tabindex="0" role="button" aria-label="IT Load — click for basis" style="cursor:pointer">
                 <div class="kpi-label">IT Load</div>
                 <div class="kpi-value" style="color: var(--accent-orange)" id="kpiIt">1,850</div>
                 <div class="kpi-unit">kW</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" data-basis="uptime" tabindex="0" role="button" aria-label="Uptime — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Uptime</div>
                 <div class="kpi-value" style="color: var(--accent-green)">99.98</div>
                 <div class="kpi-unit">% YTD</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" data-basis="temp" tabindex="0" role="button" aria-label="Temperature — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Temp</div>
                 <div class="kpi-value" style="color: var(--accent-green)" id="kpiTemp">22.4</div>
                 <div class="kpi-unit">°C Avg</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" data-basis="chillers" tabindex="0" role="button" aria-label="Chillers — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Chillers</div>
                 <div class="kpi-value" style="color: var(--accent-cyan)">2/3</div>
                 <div class="kpi-unit">Running</div>
@@ -2096,6 +2096,168 @@ function openFaqDialog(){
 }
 var faqBtn=gid('faqTrigConv');
 if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
+
+/* =========================================================================
+ * v1.32.7 — KPI Basis Drawer (ACCURACY_VALIDATION.md Rule 6). DC Conv version.
+ * Click any top-strip KPI to see formula, inputs, output, scope, denominator,
+ * source, data mode, last update. All values live from CONV_CALC.snapshot.
+ * =======================================================================*/
+function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)+' '+t.toLocaleTimeString('en-GB');}
+function basisFor(id){
+  var s=snap();if(!s)return null;
+  var dict={
+    pue:{
+      title:'PUE — Power Usage Effectiveness',
+      formula:'PUE = Facility kW / IT kW',
+      inputs:[
+        ['IT load',grp(Math.round(s.site.it_load_kw))+' kW'],
+        ['Facility load',grp(Math.round(s.site.facility_load_kw))+' kW'],
+        ['Non-IT (cooling + UPS loss + aux)',grp(Math.round(s.site.non_it_load_kw))+' kW'],
+        ['UPS efficiency assumed','96 %']
+      ],
+      output:s.site.pue.toFixed(2)+' (BOD locked)',
+      scope:'Facility-wide',
+      denominator:'IT kW',
+      source:'CONV_CALC.snapshot.site.pue',
+      mode:'BOD LOCKED',
+      note:'Conventional enterprise DC. Target ≤1.5 reflects air-cooled tropical climate without seasonal economisation. 1.20-class PUE requires free-cooling and is not achievable here.'
+    },
+    wue:{
+      title:'WUE — Water Usage Effectiveness',
+      formula:'WUE = L water / IT kWh',
+      inputs:[
+        ['WUE-included scope','cooling-tower make-up only'],
+        ['IT load',grp(Math.round(s.site.it_load_kw))+' kW'],
+        ['Instant equivalent flow',s.water.flow_lpm_for_wue.toFixed(1)+' L/min'],
+        ['Excluded','domestic / process water']
+      ],
+      output:s.environment.wue_l_per_kwh.toFixed(2)+' L/kWh IT',
+      scope:'Cooling-tower make-up (Green Grid WP #35)',
+      denominator:'IT kWh',
+      source:'CONV_CALC.snapshot.environment.wue_l_per_kwh',
+      mode:'BOD LOCKED',
+      note:'Annual equivalent: WUE × IT × 8,760 hr = '+(s.environment.wue_l_per_kwh*s.site.it_load_kw*8760/1e6).toFixed(1)+' ML/yr at constant load.'
+    },
+    grid:{
+      title:'Grid Factor (Carbon Intensity)',
+      formula:'kgCO₂ / facility kWh (regional grid emission factor)',
+      inputs:[
+        ['Grid emission factor (regional)',s.environment.carbon_kg_per_facility_kwh.toFixed(2)+' kgCO₂/kWh facility'],
+        ['Note','This is NOT CUE. Standard CUE uses IT-kWh denominator.']
+      ],
+      output:s.environment.carbon_kg_per_facility_kwh.toFixed(2)+' kgCO₂/kWh facility',
+      scope:'Facility-wide',
+      denominator:'facility kWh (NOT IT kWh)',
+      source:'CONV_CALC.snapshot.environment.carbon_kg_per_facility_kwh',
+      mode:'DERIVED',
+      note:'For ISO/IEC 30134-8 CUE: CUE_IT = grid_factor × PUE = '+(s.environment.carbon_kg_per_facility_kwh*s.site.pue).toFixed(2)+' kgCO₂/kWh IT. See side-panel CUE_IT tile.'
+    },
+    it:{
+      title:'IT Load',
+      formula:'IT = site.it_load_kw (BOD basis)',
+      inputs:[
+        ['Design capacity',grp(s.site.it_design_kw)+' kW'],
+        ['Current load',grp(Math.round(s.site.it_load_kw))+' kW'],
+        ['Utilisation',(s.site.it_load_kw/s.site.it_design_kw*100).toFixed(1)+' %']
+      ],
+      output:grp(Math.round(s.site.it_load_kw))+' kW ('+(s.site.it_load_kw/1000).toFixed(2)+' MW)',
+      scope:'Whole facility',
+      denominator:'kW',
+      source:'CONV_CALC.snapshot.site.it_load_kw',
+      mode:'BOD LOCKED',
+      note:'Current 1,850 kW out of 2,000 kW design = 92.5 % utilisation. Average density at 8 kW/rack ≈ '+s.racks.at_8kw+' rack-equivalents.'
+    },
+    uptime:{
+      title:'Uptime (YTD)',
+      formula:'(8760 hr − downtime hr) / 8760 × 100',
+      inputs:[
+        ['Tier-III intent','99.982 % (≤1.6 hr/yr)'],
+        ['Tier-IV intent','99.995 % (≤26 min/yr)'],
+        ['Reported YTD','99.98 % (placeholder)']
+      ],
+      output:'99.98 % YTD',
+      scope:'Facility-wide',
+      denominator:'hours per year',
+      source:'design placeholder — not yet bound to event log',
+      mode:'DESIGN PLACEHOLDER',
+      note:'A live BMS would compute this from logged downtime events. The 99.98 % shown is illustrative of Tier-III intent.'
+    },
+    temp:{
+      title:'Cold-Aisle Temperature (Avg)',
+      formula:'avg(TT-* in cold aisles)',
+      inputs:[
+        ['Setpoint',s.environment.avg_temp_c.toFixed(1)+' °C'],
+        ['ASHRAE TC 9.9 recommended','18–27 °C (Class A1)']
+      ],
+      output:s.environment.avg_temp_c.toFixed(1)+' °C',
+      scope:'Cold aisles, all racks',
+      denominator:'°C',
+      source:'CONV_CALC.snapshot.environment.avg_temp_c',
+      mode:'SIM SENSOR',
+      note:'Simulated cold-aisle setpoint in the ASHRAE A1 recommended band. A live BMS would aggregate cold-aisle TT-* readings.'
+    },
+    chillers:{
+      title:'Chillers Running',
+      formula:'count(running) / count(installed)',
+      inputs:[
+        ['Running',s.cooling.chillers_running],
+        ['Installed total',s.cooling.chillers_total],
+        ['N+1 spare',s.cooling.chillers_total-s.cooling.chillers_running]
+      ],
+      output:s.cooling.chillers_running+'/'+s.cooling.chillers_total,
+      scope:'Primary chiller plant',
+      denominator:'count',
+      source:'CONV_CALC.snapshot.cooling.chillers_running',
+      mode:'BOD LOCKED',
+      note:'N+1 redundancy: 2 carry the cooling load (~1,927 kW heat rejection); 1 idles as spare. Sequencer rotates lead duty on schedule.'
+    }
+  };
+  return dict[id]||null;
+}
+function showBasisDrawer(id){
+  var b=basisFor(id);if(!b)return;
+  var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
+  var ov=d.createElement('div');
+  ov.id='kpiBasisDrawer';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','kbdTitle');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.82);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
+  var box=d.createElement('div');
+  box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:Inter,sans-serif;';
+  var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2b3a52;">'+
+    '<h3 id="kbdTitle" style="margin:0;font-size:14px;color:#67e8f9;letter-spacing:.05em;text-transform:uppercase;">'+b.title+'</h3>'+
+    '<span style="font-size:10px;background:rgba(56,189,248,.12);color:#67e8f9;padding:3px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);letter-spacing:.06em;">'+b.mode+'</span>'+
+    '<button id="kbdCloseConv" type="button" aria-label="Close" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:14px;">×</button>'+
+    '</div>';
+  var body='<div style="padding:14px 18px 18px;overflow-y:auto;font-size:12.5px;line-height:1.55;">';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Formula</span><div style="font-family:JetBrains Mono,monospace;background:#162033;border:1px solid #2b3a52;border-radius:6px;padding:8px 11px;margin-top:4px;color:#fbbf24;font-size:12px;">'+b.formula+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Inputs</span><table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;">';
+  for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
+  body+='</table></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;background:#0a7d28;color:#fff;border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';
+  body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
+  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Scope</span><div style="color:#dbe5f0;margin-top:3px;">'+b.scope+'</div></div>';
+  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Denominator</span><div style="color:#dbe5f0;margin-top:3px;font-family:JetBrains Mono,monospace;">'+b.denominator+'</div></div>';
+  body+='</div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Source object</span><div style="font-family:JetBrains Mono,monospace;color:#a78bfa;margin-top:3px;font-size:12px;">'+b.source+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Last update</span><div style="font-family:JetBrains Mono,monospace;color:#dbe5f0;margin-top:3px;font-size:12px;">'+nowStamp()+' (engine snapshot — deterministic)</div></div>';
+  if(b.note){body+='<div style="border-left:3px solid #fbbf24;padding:8px 11px;background:rgba(245,158,11,.06);color:#fde68a;font-size:12px;line-height:1.5;">'+b.note+'</div>';}
+  body+='</div>';
+  box.innerHTML=hdr+body;
+  ov.appendChild(box);
+  d.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();}});
+  d.getElementById('kbdCloseConv').addEventListener('click',function(){ov.remove();});
+  d.addEventListener('keydown',function esc(e){if(e.key==='Escape'){ov.remove();d.removeEventListener('keydown',esc);}});
+}
+d.addEventListener('click',function(e){
+  var card=e.target.closest('.kpi-card[data-basis]');
+  if(card){showBasisDrawer(card.getAttribute('data-basis'));}
+});
+d.addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key===' '){
+    var card=e.target.closest('.kpi-card[data-basis]');
+    if(card){e.preventDefault();showBasisDrawer(card.getAttribute('data-basis'));}
+  }
+});
 })();
 </script>
 

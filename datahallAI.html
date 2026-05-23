@@ -755,16 +755,16 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 </div>
 
 <div class="pn on" id="p-dash">
-<!-- KPI Strip at Top -->
+<!-- KPI Strip at Top — v1.32.7: each card clickable for basis drawer (Rule 6) -->
 <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:6px">
-<div class="k"><div class="kl" title="Power Usage Effectiveness — Facility kW ÷ IT kW. Engine-derived bottom-up (5-part PUE basis, chiller nameplate COP 6.8). Source: DATAHALL_CALC.pueBasis()">PUE</div><div class="kv" style="color:var(--c)" id="dkPue">1.30</div><div class="ks">Derived | Target ≤1.12</div></div>
-<div class="k"><div class="kl" title="Water Usage Effectiveness — dry-only cooler baseline per BASELINE-DECISION.md (no evaporative make-up modelled). Source: DATAHALL_MODEL.cooling">WUE</div><div class="kv" style="color:var(--t2)" id="dkWue">0.00</div><div class="ks">L/kWh · Dry-only</div></div>
-<div class="k"><div class="kl" title="Carbon Usage Effectiveness — CUE_IT = grid factor 0.69 (PLN Java 2025) × PUE 1.30. ISO/IEC 30134-8 IT-energy denominator. Source: DATAHALL_CALC.pueBasis().pue × grid factor">CUE</div><div class="kv" style="color:var(--p)" id="dkCue">0.90</div><div class="ks">kgCO₂/kWh IT</div></div>
-<div class="k"><div class="kl" title="Facility IT load — Scenario A locked: 4 halls × 27 NVL72 domains × 132 kW = 14,256 kW. Source: DATAHALL_CALC.lockedState().itPerFacility_kW">IT Load</div><div class="kv" style="color:var(--o)" id="dkIt">14.26</div><div class="ks">MW · Scenario A locked</div></div>
-<div class="k"><div class="kl" title="NVIDIA Blackwell B200 GPUs — total count across all halls">GPUs</div><div class="kv" style="color:var(--g)" id="dkGpu">7,776</div><div class="ks">Blackwell</div></div>
-<div class="k"><div class="kl" title="NVL72 domains — each domain = 72 GPUs with 130 TB/s NVLink5 interconnect">NVL72</div><div class="kv" style="color:var(--pk)" id="dkDom">108</div><div class="ks">Domains</div></div>
-<div class="k"><div class="kl" title="Facility uptime percentage — year-to-date availability">Uptime</div><div class="kv" style="color:var(--g)">99.99</div><div class="ks">% YTD</div></div>
-<div class="k"><div class="kl" title="Active alarm count — critical and warning events requiring attention">Alarms</div><div class="kv" style="color:var(--g)" id="dkAlm">0</div><div class="ks">Active</div></div>
+<div class="k" data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">PUE</div><div class="kv" style="color:var(--c)" id="dkPue">1.30</div><div class="ks">Derived | Target ≤1.12</div></div>
+<div class="k" data-basis="wue" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">WUE</div><div class="kv" style="color:var(--t2)" id="dkWue">0.00</div><div class="ks">L/kWh · Dry-only</div></div>
+<div class="k" data-basis="cue" tabindex="0" role="button" aria-label="CUE_IT — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">CUE</div><div class="kv" style="color:var(--p)" id="dkCue">0.90</div><div class="ks">kgCO₂/kWh IT</div></div>
+<div class="k" data-basis="it" tabindex="0" role="button" aria-label="IT Load — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">IT Load</div><div class="kv" style="color:var(--o)" id="dkIt">14.26</div><div class="ks">MW · Scenario A locked</div></div>
+<div class="k" data-basis="gpu" tabindex="0" role="button" aria-label="GPUs — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">GPUs</div><div class="kv" style="color:var(--g)" id="dkGpu">7,776</div><div class="ks">Blackwell</div></div>
+<div class="k" data-basis="dom" tabindex="0" role="button" aria-label="NVL72 domains — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">NVL72</div><div class="kv" style="color:var(--pk)" id="dkDom">108</div><div class="ks">Domains</div></div>
+<div class="k" data-basis="uptime" tabindex="0" role="button" aria-label="Uptime — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">Uptime</div><div class="kv" style="color:var(--g)">99.99</div><div class="ks">% YTD</div></div>
+<div class="k" data-basis="alarms" tabindex="0" role="button" aria-label="Alarms — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">Alarms</div><div class="kv" style="color:var(--g)" id="dkAlm">0</div><div class="ks">Active</div></div>
 </div>
 <!-- Main Dashboard Area -->
 <div style="display:grid;grid-template-columns:1fr 280px;gap:6px;height:calc(100% - 80px)">
@@ -7399,6 +7399,190 @@ if(el('dcWind'))el('dcWind').textContent=RI(8,15)+'m/s';
 }
 updateDashKPI();
 setInterval(updateDashKPI,4000);
+
+/* =========================================================================
+ * v1.32.7 — KPI Basis Drawer (ACCURACY_VALIDATION.md Rule 6).
+ * Click any top-strip KPI to see formula, inputs, output, scope, denominator,
+ * source object, data mode, last update. Engine-bound; no hardcoded math.
+ * =======================================================================*/
+(function(){
+var d=document;
+function el(tag,attrs,html){var e=d.createElement(tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);if(html!=null)e.innerHTML=html;return e;}
+function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)+' '+t.toLocaleTimeString('en-GB');}
+function basisFor(id){
+  var D=window.DHE;
+  if(!D) return null;
+  var dict={
+    pue:{
+      title:'PUE — Power Usage Effectiveness',
+      formula:'PUE = (IT + cooling + UPS_dist_loss + aux) / IT',
+      inputs:[
+        ['IT (per hall)',D.pb_it+' kW'],
+        ['Cooling (chiller + pumps + fans + CDU + CRAH)',D.pb_cooling+' kW'],
+        ['Chiller compressor (Q/COP, COP '+D.chillerCOP+')',D.pb_chiller+' kW'],
+        ['UPS + distribution loss',D.pb_upsDist+' kW'],
+        ['Auxiliary',D.pb_aux+' kW'],
+        ['Non-IT subtotal',D.pb_nonIT+' kW'],
+        ['Facility (IT + non-IT)',D.pb_facilityFmt+' kW']
+      ],
+      output:D.pue.toFixed(2)+' (derived)',
+      scope:'Per hall — Scenario A locked',
+      denominator:'IT kW',
+      source:'DATAHALL_CALC.pueBasis()',
+      mode:'DERIVED',
+      note:'Chiller COP is the NAMEPLATE value, not back-solved. Marketing target ≤1.12 is shown separately as TARGET, never as result.'
+    },
+    wue:{
+      title:'WUE — Water Usage Effectiveness',
+      formula:'WUE = L water / IT kWh',
+      inputs:[
+        ['Cooling mode','Dry-only cooler baseline'],
+        ['Evaporative make-up',D.wue+' L (model carries 0)'],
+        ['Domestic / process water','Excluded from WUE scope']
+      ],
+      output:D.wue.toFixed(2)+' L/kWh',
+      scope:'Cooling makeup only (Green Grid WP #35)',
+      denominator:'IT kWh',
+      source:'DATAHALL_MODEL.cooling',
+      mode:'BOD LOCKED',
+      note:'Dry-only baseline per BASELINE-DECISION.md. If hybrid/adiabatic cooling were adopted, this rebinds to the make-up flow meter.'
+    },
+    cue:{
+      title:'CUE_IT — Carbon Usage Effectiveness',
+      formula:'CUE_IT = grid_factor × PUE  (ISO/IEC 30134-8)',
+      inputs:[
+        ['Grid emission factor','0.69 kgCO₂/kWh facility (PLN Java 2025)'],
+        ['PUE',D.pue.toFixed(2)+' (engine derived)']
+      ],
+      output:(0.69*D.pue).toFixed(2)+' kgCO₂/kWh IT',
+      scope:'Facility-wide',
+      denominator:'IT kWh',
+      source:'DATAHALL_CALC.pueBasis().pue × grid factor',
+      mode:'DERIVED',
+      note:'Grid factor varies by region and year as the grid decarbonises. PPAs and renewable offsets reduce the effective factor on a net-annual basis.'
+    },
+    it:{
+      title:'IT Load (Facility)',
+      formula:'IT = halls × NVL72/hall × kW/NVL72',
+      inputs:[
+        ['Halls',D.halls],
+        ['NVL72 domains per hall',D.nvl72PerHall],
+        ['kW per NVL72 domain (Scenario A)',D.kwPerNVL72+' kW'],
+        ['IT per hall',D.itHallFmt+' kW']
+      ],
+      output:D.itFacilityMW.toFixed(2)+' MW',
+      scope:'Whole facility — Scenario A locked',
+      denominator:'kW (sum)',
+      source:'DATAHALL_CALC.lockedState().itPerFacility_kW',
+      mode:'BOD LOCKED',
+      note:'Scenario A: 132 kW per NVL72 domain (logical), split across 2 physical rack-positions @ 66 kW each. Scenario B (132 kW per physical rack) is exposed in the engine for labelling but NOT adopted.'
+    },
+    gpu:{
+      title:'GPUs (Facility)',
+      formula:'GPUs = halls × NVL72/hall × GPUs/NVL72',
+      inputs:[
+        ['Halls',D.halls],
+        ['NVL72 domains per hall',D.nvl72PerHall],
+        ['GPUs per NVL72 (Blackwell)','72']
+      ],
+      output:D.gpuPerFacility.toLocaleString()+' GPU',
+      scope:'Whole facility',
+      denominator:'GPU count',
+      source:'DATAHALL_MODEL.facility.gpuPerFacility',
+      mode:'BOD LOCKED',
+      note:'NVIDIA GB200 NVL72 reference architecture: 72 GPUs per NVL72 domain (18 compute trays × 4 GPUs).'
+    },
+    dom:{
+      title:'NVL72 Domains (Facility)',
+      formula:'Domains = halls × NVL72/hall',
+      inputs:[
+        ['Halls',D.halls],
+        ['NVL72 per hall',D.nvl72PerHall]
+      ],
+      output:(D.halls*D.nvl72PerHall)+' NVL72 domains',
+      scope:'Whole facility',
+      denominator:'count',
+      source:'DATAHALL_MODEL.facility',
+      mode:'BOD LOCKED',
+      note:'One NVL72 domain = one logical 72-GPU NVLink fabric. Engineered as 2 physical rack-positions per domain (weight ~1,360 kg, cable mgmt + serviceability).'
+    },
+    uptime:{
+      title:'Uptime (YTD)',
+      formula:'Uptime % = (8760 hr − downtime hr) / 8760 × 100',
+      inputs:[
+        ['Target (Tier-IV)','99.995 % (≤26 min/yr)'],
+        ['Reported YTD','99.99 % (placeholder)']
+      ],
+      output:'99.99 % YTD',
+      scope:'Facility-wide',
+      denominator:'hours per year',
+      source:'design placeholder — not yet bound to event log',
+      mode:'DESIGN PLACEHOLDER',
+      note:'A real BMS would bind this to logged outage events. The 99.99 % shown is illustrative of Tier-IV intent.'
+    },
+    alarms:{
+      title:'Active Alarms',
+      formula:'count(events where severity ≥ WARNING and state = ACTIVE)',
+      inputs:[
+        ['Critical alarms','0 (engine state)'],
+        ['Warning alarms','0 (engine state)'],
+        ['Maintenance flags','0 (engine state)']
+      ],
+      output:'0 active',
+      scope:'Whole facility',
+      denominator:'count',
+      source:'design placeholder — no alarm engine bound',
+      mode:'DESIGN PLACEHOLDER',
+      note:'Live BMS would bind to an event-source-of-truth (e.g. SCADA OPC UA event log). The simulated value is 0 (NORMAL state).'
+    }
+  };
+  return dict[id]||null;
+}
+function showBasisDrawer(id){
+  var b=basisFor(id);if(!b)return;
+  var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
+  var ov=el('div',{id:'kpiBasisDrawer',role:'dialog','aria-modal':'true','aria-labelledby':'kbdTitle'});
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.82);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
+  var box=el('div');
+  box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:Inter,sans-serif;';
+  var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2b3a52;">'+
+    '<h3 id="kbdTitle" style="margin:0;font-size:14px;color:#67e8f9;letter-spacing:.05em;text-transform:uppercase;">'+b.title+'</h3>'+
+    '<span style="font-size:10px;background:rgba(56,189,248,.12);color:#67e8f9;padding:3px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);letter-spacing:.06em;">'+b.mode+'</span>'+
+    '<button id="kbdClose" type="button" aria-label="Close" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:14px;">×</button>'+
+    '</div>';
+  var body='<div style="padding:14px 18px 18px;overflow-y:auto;font-size:12.5px;line-height:1.55;">';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Formula</span><div style="font-family:JetBrains Mono,monospace;background:#162033;border:1px solid #2b3a52;border-radius:6px;padding:8px 11px;margin-top:4px;color:#fbbf24;font-size:12px;">'+b.formula+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Inputs</span><table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;">';
+  for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
+  body+='</table></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;background:#0a7d28;color:#fff;border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';
+  body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
+  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Scope</span><div style="color:#dbe5f0;margin-top:3px;">'+b.scope+'</div></div>';
+  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Denominator</span><div style="color:#dbe5f0;margin-top:3px;font-family:JetBrains Mono,monospace;">'+b.denominator+'</div></div>';
+  body+='</div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Source object</span><div style="font-family:JetBrains Mono,monospace;color:#a78bfa;margin-top:3px;font-size:12px;">'+b.source+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Last update</span><div style="font-family:JetBrains Mono,monospace;color:#dbe5f0;margin-top:3px;font-size:12px;">'+nowStamp()+' (deterministic; engine snapshot does not drift)</div></div>';
+  if(b.note){body+='<div style="border-left:3px solid #fbbf24;padding:8px 11px;background:rgba(245,158,11,.06);color:#fde68a;font-size:12px;line-height:1.5;">'+b.note+'</div>';}
+  body+='</div>';
+  box.innerHTML=hdr+body;
+  ov.appendChild(box);
+  d.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();}});
+  d.getElementById('kbdClose').addEventListener('click',function(){ov.remove();});
+  d.addEventListener('keydown',function esc(e){if(e.key==='Escape'){ov.remove();d.removeEventListener('keydown',esc);}});
+}
+/* Delegated click on the KPI strip */
+d.addEventListener('click',function(e){
+  var card=e.target.closest('.k[data-basis]');
+  if(card){showBasisDrawer(card.getAttribute('data-basis'));}
+});
+d.addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key===' '){
+    var card=e.target.closest('.k[data-basis]');
+    if(card){e.preventDefault();showBasisDrawer(card.getAttribute('data-basis'));}
+  }
+});
+})();
 })();
 
 // dashC LIVE METRICS panel — v1.32.0 engine-bound (AI-ACC-01/02/03/07 doc-26).
