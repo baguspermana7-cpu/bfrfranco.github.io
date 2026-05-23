@@ -103,6 +103,68 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.32.6 — 2026-05-24 (Accuracy review terminology + UPS 2N + CHW flow reconciliation — review docs 26 / 16 phase 2)
+
+Phase 2 of the team-review accuracy work. v1.32.1 fixed the 8 critical
+bugs (random KPIs, denominator mislabels, arithmetic errors). v1.32.2
+addresses the remaining medium-priority findings: terminology, UPS 2N
+loading nuance, CHW flow reconciliation. Engine files byte-identical;
+57/57 + 22/22 tests pass.
+
+### DC AI (datahallAI.html)
+- **AI-ACC-04 swept**: "kW/rack" → "kW/rack-pos (2/NVL72)" across the 4
+  DATAHALL room labels (SVG `rmLive` blocks) + "Per rack ~66 kW" →
+  "Per rack-pos ~66 kW IT (2/NVL72 footprint)" on the Electrical SLD
+  hall-spec captions. Engine keeps the 2-rack-footprint basis (real-world
+  AI deployments split NVL72 across two 600 mm racks for weight ~1,360
+  kg + cabling + serviceability). Only the UI labels rename so a
+  reviewer doesn't confuse 66 kW with NVIDIA's NVL72 rack-scale spec.
+- **AI-ACC-09 fixed**: UPS A/B row `Online 79%` (was ambiguous about
+  whether 79% is normal or failover loading) → `40% nrm / 79% fail`.
+  Normal-sharing percentage = engine.upsLoadPct ÷ 2. Failover (one-side
+  carries protected load) = engine.upsLoadPct. Tooltip explains both.
+  JS removed the small live jitter; values now deterministic per
+  `ACCURACY_VALIDATION.md` Rule 2.
+- AI-ACC-10 — chiller "12/16" already labelled "design placeholder"
+  with tooltip basis chip in v1.32.1; no further change.
+
+### DC Conv (dc-conventional.html + chiller-plant.html)
+- **CONV-ACC-05 fixed**: UPS A `72%` / B `68%` (decorative greens, no
+  failover info) → `46% nrm / 92% fail`. Normal-sharing = (it_load ÷ 2)
+  ÷ 2 MW rated. Failover = it_load ÷ 2 MW rated. Bound via
+  `snapshot.electrical.ups_module_kw`.
+- **CONV-ACC-03 fixed**: chiller-plant adds new "CHW Flow Reconciliation"
+  card showing design flow (IT-load basis, 58.2 L/s) vs sanity flow
+  (heat-rejection basis IT+UPS, 60.6 L/s) vs Δ (+4.1 %). Pumps sized to
+  the larger figure; chiller-plant ΔT setpoint references the design
+  value. Surfaces the doc-09 design choice so it no longer reads as a
+  hidden mismatch.
+- CONV-ACC-06 — Tech Spec Appendix B already lists 3 densities with
+  explicit `kW/rack` labels (v1.31.3). Confirmed; no further change.
+- CONV-ACC-09 — data-mode chips already present on every cockpit page
+  (ict.html · water-system.html · fire-system.html · chiller-plant.html ·
+  dc-conventional.html · datahall.html · fuel-system.html · EPMS).
+  Audited and confirmed engine-bound across all 8 pages. No further
+  change.
+
+### Critical pushback held (carried from v1.32.1)
+- Engine 2-rack-footprint basis retained — labels changed, not the
+  arithmetic. Defensible against reviewer's "align to NVIDIA's 120 kW"
+  framing.
+- CUE_IT binding to PLN Java grid 0.69 kgCO₂/kWh retained as the
+  citation-grade option (vs reviewer's "Not calculated" fallback).
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`,
+  `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
+- v1.32.3 — basis drawers per ACCURACY_VALIDATION.md Rule 6 (every top
+  KPI opens a formula/inputs/output/scope/denominator/source/mode/
+  timestamp drawer).
+- v1.32.7 — Puppeteer probes for the reviewer's 7 DC AI + 8 DC Conv
+  acceptance tests, gated in CI.
+
+---
+
 ## v1.32.1 — 2026-05-24 (Critical accuracy fixes per team review docs 26 + 16 — owner exclusion lifted)
 
 Owner directive 2026-05-23: "review comment team saya, dan sempurnakan, dan

@@ -163,10 +163,16 @@ suite. Run as headless Puppeteer probes once v1.32.3 lands them.
 
 ## Implementation history
 
-- **v1.32.0** (2026-05-24): Critical fixes shipped — AI-ACC-01/02/05/06/07
+- **v1.32.1** (2026-05-24): Critical fixes shipped — AI-ACC-01/02/05/06/07/08
   + CONV-ACC-01/02/04/08. Dashboard randomisation stripped; CUE
-  denominator clarified; Tech Spec corrected.
-- **v1.32.1** (planned): Terminology + label sweep — AI-ACC-03/04/08/09/10
-  + CONV-ACC-03/05/06/09.
-- **v1.32.2** (planned): Basis drawers per Rule 6.
-- **v1.32.3** (planned): Puppeteer probes for the acceptance tests above.
+  denominator clarified; Tech Spec corrected. (Authored as v1.32.0;
+  parallel session shipped its own v1.32.0 mid-push.)
+- **v1.32.2** (2026-05-24): Terminology + UPS 2N + CHW reconciliation —
+  AI-ACC-04/09/10 + CONV-ACC-03/05/06/09. NVL72 rack → rack-pos labels;
+  UPS rows show normal-vs-failover; chiller-plant adds CHW flow
+  reconciliation card.
+- **v1.32.3** (planned): Basis drawers per Rule 6 — every top KPI opens
+  a formula / inputs / output / scope / denominator / source / mode /
+  timestamp drawer.
+- **v1.32.4** (planned): Puppeteer probes for the acceptance tests
+  above, gated in CI.

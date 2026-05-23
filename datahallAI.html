@@ -695,8 +695,8 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 <div class="rw"><span class="l" title="Mechanical + Auxiliary — cooling electrical + UPS/dist loss + aux (engine-derived non-IT)">Mech+Aux</span><span class="v" id="sMechAux">1,074 kW</span></div>
 <div class="rw"><span class="l" title="Total facility power draw per hall — IT + non-IT (engine-derived, basis on Electrical SLD)">Total</span><span class="v vo" id="sTotal">4,638 kW</span></div>
 <div class="rw"><span class="l" title="Power per NVL72 domain — 132 kW per NVL72 pair (= 66 kW per physical rack)">Per NVL72</span><span class="v vr" id="sPerNVL">132 kW</span></div>
-<div class="rw"><span class="l" title="Uninterruptible Power Supply Feed A — 4.5 MW modular, 2N A/B">UPS A</span><span class="v vg" id="sUA">Online 79%</span></div>
-<div class="rw"><span class="l" title="Uninterruptible Power Supply Feed B — 4.5 MW modular, 2N A/B">UPS B</span><span class="v vg" id="sUB">Online 79%</span></div>
+<div class="rw"><span class="l" title="UPS Feed A — 4.5 MW modular, 2N A/B. Normal sharing: 50/50 load split across A+B (each carries ~40% of rated). Failover: one side picks up full protected load (~79% of rated).">UPS A</span><span class="v vg" id="sUA">40% nrm / 79% fail</span></div>
+<div class="rw"><span class="l" title="UPS Feed B — 4.5 MW modular, 2N A/B. Normal sharing: 50/50 load split across A+B (each carries ~40% of rated). Failover: one side picks up full protected load (~79% of rated).">UPS B</span><span class="v vg" id="sUB">40% nrm / 79% fail</span></div>
 <div class="rw"><span class="l" title="Diesel Generator Set — Caterpillar 3516E 2.75 MW each, N+1, <10s auto-start">GenSet</span><span class="v vg">Standby OK</span></div></div>
 <div class="sb"><h4><i style="background:var(--c)"></i>Cooling</h4>
 <div class="rw"><span class="l" title="Direct Liquid Cooling — 85% of IT heat via cold plates (engine-derived)">DLC 85%</span><span class="v vc" id="sDLC">3,029 kW</span></div>
@@ -1969,7 +1969,7 @@ s+=tx(480,14,'FLOOR 2 PLAN \u2014 DATAHALL 1 + DATAHALL 2','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // === DATA HALL 1 (North Wing) ===
-s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-1: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'DH-1: GB200 NVL72, 27 domains (54 racks), 3,564kW IT, DLC 85%+Air 15%, TCS 35/45\u00B0C'),20,45,'Running');
+s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack-pos (2/NVL72)'),(DH?('DH-1: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'DH-1: GB200 NVL72, 27 domains (54 racks), 3,564kW IT, DLC 85%+Air 15%, TCS 35/45\u00B0C'),20,45,'Running');
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows indicator
@@ -1989,7 +1989,7 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // === DATA HALL 2 (South Wing) ===
-s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-2: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'DH-2: GB200 NVL72, 27 domains (54 racks), 3,564kW IT, DLC 85%+Air 15%, TCS 35/45\u00B0C'),20,45,'Running');
+s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack-pos (2/NVL72)'),(DH?('DH-2: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'DH-2: GB200 NVL72, 27 domains (54 racks), 3,564kW IT, DLC 85%+Air 15%, TCS 35/45\u00B0C'),20,45,'Running');
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows
@@ -2083,7 +2083,7 @@ s+=tx(480,14,'FLOOR 3 PLAN \u2014 DATAHALL 3 + DATAHALL 4','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // DH3 (North)
-s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-3: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'DH-3: GB200 NVL72, 27 domains (54 racks), 3,564kW IT'),20,45,'Running');
+s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack-pos (2/NVL72)'),(DH?('DH-3: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'DH-3: GB200 NVL72, 27 domains (54 racks), 3,564kW IT'),20,45,'Running');
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r=0;r<3;r++){
 s+='<rect x="'+(MX+(7+r*9)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2099,7 +2099,7 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // DH4 (South)
-s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack'),(DH?('DH-4: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'DH-4: GB200 NVL72, 27 domains (54 racks), 3,564kW IT'),20,45,'Running');
+s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'32m \u00D7 20m \u2502 3.56 MW'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'27\u00D7 NVL72 \u2502 1,944 GPU \u2502 66kW/rack-pos (2/NVL72)'),(DH?('DH-4: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'DH-4: GB200 NVL72, 27 domains (54 racks), 3,564kW IT'),20,45,'Running');
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r2=0;r2<3;r2++){
 s+='<rect x="'+(MX+(7+r2*9)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2831,8 +2831,11 @@ $('kW').textContent=RI(980,1180);
  * (35/45 \u00B0C); \u0394T stays ~10 K per the locked basis. */
 var dhTS=DH?DH.tcsSupply:35,dhTR=DH?DH.tcsReturn:45;
 const ts=+(dhTS+(Math.random()*0.6-0.3)).toFixed(1),tr=+(dhTR+(Math.random()*0.6-0.3)).toFixed(1);$('sTS').textContent=ts+'\u00B0C';$('sTR').textContent=tr+'\u00B0C';$('sDT').textContent=(tr-ts).toFixed(1)+'\u00B0C';
-/* UPS A/B load = engine-derived loading (Scenario A 79.2%), small live jitter. */
-if(DH){var ua=(DH.upsLoadPct+(Math.random()*1.4-0.7)).toFixed(0),ub=(DH.upsLoadPct+(Math.random()*1.4-0.7)).toFixed(0);$('sUA').textContent='Online '+ua+'%';$('sUB').textContent='Online '+ub+'%';}
+/* v1.32.2 (AI-ACC-09) — UPS A/B engine-derived: normal sharing = upsLoadPct/2,
+   failover = upsLoadPct. No jitter on basis values — deterministic. */
+if(DH){var nrm=(DH.upsLoadPct/2).toFixed(0),fail=DH.upsLoadPct.toFixed(0);
+$('sUA').textContent=nrm+'% nrm / '+fail+'% fail';
+$('sUB').textContent=nrm+'% nrm / '+fail+'% fail';}
 // People count update
 const ppl=$('pplCount');if(ppl)ppl.textContent=RI(0,6);
 const le=$('lastEntry');if(le){const now=new Date();le.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
@@ -3587,7 +3590,7 @@ s+=bx(80,L7+24,840,90,'var(--b)');
 s+=tx(500,L7+38,'22 RACKS \u2014 DUAL-CORDED PSU','var(--b)',6,'middle',1);
 s+=tx(500,L7+52,'2\u00D7 OCP ORV3 PSU | 400V 3\u03C6 \u2192 50VDC | \u03B7 >97%','var(--t2)',5,'middle');
 s+=tx(500,L7+66,'50VDC Bus 4,000A Cu | Fuse per tray | VRM \u2192 GPU/CPU/NVSwitch','var(--t2)',5,'middle');
-s+=tx(500,L7+80,(DHE?('Per rack ~'+DHE.kwPerRack+' kW IT | '+DH[n-1]+': '+DHE.racksPerHall+' racks = '+DHE.itHallFmt+' kW'):'Per rack ~66 kW IT | '+DH[n-1]+': 54 racks = 3,564 kW'),'var(--g)',5,'middle',1);
+s+=tx(500,L7+80,(DHE?('Per rack-pos ~'+DHE.kwPerRack+' kW IT (2/NVL72 footprint) | '+DH[n-1]+': '+DHE.racksPerHall+' rack-pos / '+DHE.nvl72PerHall+' NVL72 = '+DHE.itHallFmt+' kW'):'Per rack-pos ~66 kW IT (2/NVL72 footprint) | '+DH[n-1]+': 54 rack-pos / 27 NVL72 = 3,564 kW'),'var(--g)',5,'middle',1);
 
 // CDU pump (UPS-backed)
 s+=bx(80,L7+120,840,25,'var(--c)');
@@ -3724,7 +3727,7 @@ var dhSpec=[
 ['',0,(DHE?(DHE.racksPerHall+' racks dual-corded'):'54 racks dual-corded')],
 ['',0,'2\u00D7 OCP ORV3 PSU/rack'],
 ['',0,'400V\u219250VDC | \u03B7>97%'],
-['',0,(DHE?('~'+DHE.kwPerRack+' kW IT per rack'):'~66 kW IT per rack')]
+['',0,(DHE?('~'+DHE.kwPerRack+' kW IT per rack-pos (2/NVL72 footprint)'):'~66 kW IT per rack-pos (2/NVL72)')]
 ];
 var dsy=L1+10;
 for(var dsi=0;dsi<dhSpec.length;dsi++){
@@ -6737,7 +6740,7 @@ const rP=[
 ['GPU TDP','1,000\u20131,200W per B200'],
 ['CPU TDP','~250W per Grace (capped)'],
 ['NVSwitch','~350W per NVS5 ASIC'],
-['Total',(DH?('~'+DH.kwPerRack+' kW/rack ('+DH.kwPerNVL72+' kW per NVL72 pair)'):'~66 kW/rack (132 kW per NVL72 pair)')],
+['Total',(DH?('~'+DH.kwPerRack+' kW/rack-pos ('+DH.kwPerNVL72+' kW per NVL72 domain ÷ 2 rack-pos footprint)'):'~66 kW/rack-pos (132 kW per NVL72 ÷ 2)')],
 ['Monitor','V/I/kW per-shelf + BMC'],
 ]},
 ];

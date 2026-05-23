@@ -564,9 +564,21 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
           <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">7.2 C</div></div>
           <div class="kv"><div class="k">CHWR</div><div class="v" id="kChwr">14.8 C</div></div>
           <div class="kv"><div class="k">ΔT</div><div class="v" id="kDt">7.6 C</div></div>
-          <div class="kv"><div class="k">CHW Flow</div><div class="v" id="kFlow">58.2 L/s</div></div>
+          <div class="kv" title="Design flow basis: IT load 1,850 kW (canonical doc-09 substitution). Engine: 1,850 / (4.186 × 7.6) = 58.1 L/s."><div class="k">CHW Flow</div><div class="v" id="kFlow">58.2 L/s</div></div>
           <div class="kv"><div class="k">Cooling Demand</div><div class="v" id="kCool">1.93 MW</div></div>
           <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">86 kPa</div></div>
+        </div>
+
+        <!-- v1.32.2 (CONV-ACC-03) — Design vs sanity flow reconciliation: doc-09
+             uses IT load (1,850 kW) for canonical 58.1 L/s; a heat-rejection
+             sanity (IT + UPS loss = 1,927 kW) gives 60.6 L/s. Surface the
+             4.1 % gap so it does not read as a hidden mismatch. -->
+        <div class="card">
+          <h4>CHW Flow Reconciliation <span style="float:right;font-weight:400;color:#7f93ab">engine</span></h4>
+          <div class="kv" title="Engine basis flow uses IT load (canonical doc-09)"><div class="k">Design (IT load)</div><div class="v" id="kFlowIt">58.2 L/s</div></div>
+          <div class="kv" title="Sanity check using full heat-rejection (IT + UPS loss)"><div class="k">Sanity (heat rej)</div><div class="v" id="kFlowHr">60.6 L/s</div></div>
+          <div class="kv" title="Gap absorbed by pump sizing margin"><div class="k">Δ (sanity − design)</div><div class="v" id="kFlowGap">+4.1 %</div></div>
+          <div class="meta">Pumps sized to the larger flow; chiller-plant ΔT setpoint references the design value.</div>
         </div>
 
         <div class="card" data-bms-mode-hide="overview">

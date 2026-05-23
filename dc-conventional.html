@@ -1121,8 +1121,14 @@ a { color: inherit; text-decoration: none; }
             <div class="stats-title"><span class="dot" style="background: var(--accent-orange)"></span> Power</div>
             <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value orange" id="sTotalLoad">2,683 kW</span></div>
             <div class="stat-row"><span class="stat-label">IT Load</span><span class="stat-value orange" id="sItLoad">1,850 kW</span></div>
-            <div class="stat-row"><span class="stat-label">UPS A</span><span class="stat-value green">72%</span></div>
-            <div class="stat-row"><span class="stat-label">UPS B</span><span class="stat-value green">68%</span></div>
+            <div class="stat-row" title="UPS Feed A 2N. Normal sharing: 50/50 (~46% of 2 MW rated). Failover: surviving path carries full protected 1,850 kW (~92% of rated). Source: snapshot.electrical.ups_module_kw">
+                <span class="stat-label">UPS A</span>
+                <span class="stat-value green" id="sUpsA">46% nrm / 92% fail</span>
+            </div>
+            <div class="stat-row" title="UPS Feed B 2N. Normal sharing: 50/50 (~46% of 2 MW rated). Failover: surviving path carries full protected 1,850 kW (~92% of rated).">
+                <span class="stat-label">UPS B</span>
+                <span class="stat-value green" id="sUpsB">46% nrm / 92% fail</span>
+            </div>
         </div>
 
         <div class="stats-section">
@@ -1303,6 +1309,13 @@ function updateData() {
     // add CUE_IT (IT-kWh denominator) per ISO/IEC 30134-8.
     setText('sCue', carbon + ' kg/kWh facility');
     setText('sCueIt', (s.environment.carbon_kg_per_facility_kwh * s.site.pue).toFixed(2) + ' kg/kWh IT');
+    // v1.32.2 (CONV-ACC-05) UPS 2N normal-sharing + failover loading.
+    // UPS per-module rated 2 MW (each); normal=load/2/rated, failover=load/rated.
+    var upsRatedPerModuleKw = 2000;
+    var nrmPct = Math.round((s.site.it_load_kw / 2) / upsRatedPerModuleKw * 100);
+    var failPct = Math.round(s.site.it_load_kw / upsRatedPerModuleKw * 100);
+    setText('sUpsA', nrmPct + '% nrm / ' + failPct + '% fail');
+    setText('sUpsB', nrmPct + '% nrm / ' + failPct + '% fail');
     setText('sTotalLoad', facilityKw.toLocaleString() + ' kW');
     setText('sItLoad', itLoadKw.toLocaleString() + ' kW');
     setText('sChwSup', chwSup + '°C');
