@@ -183,6 +183,42 @@ width on mobile (pan-scroll instead of squish). `chiller-plant.html`
 gets same treatment (`#pidSvg{min-width:1200px}` @≤1024, 960px @≤600).
 Engineering-value audit shipped as `documentation/engineering-value-audit-v1.md`.
 
+**v1.32.0 (2026-05-24)** — Critical accuracy fixes per team review docs
+`Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md`
++ `.../conv/review/16-accuracy-validation-and-correction-list.md`.
+Owner exclusion on `#p-dash` / `updateDashKPI()` / `dcCallouts` LIFTED
+for this work. Engine files remain byte-identical.
+
+DC AI (datahallAI.html):
+(1) **AI-ACC-01/02/03/07**: removed `Math.random()` from PUE / WUE /
+CUE / IT / per-hall / totals. Dashboard now reads PUE 1.30, IT 14.26
+MW, WUE 0.00 (dry-only), CUE_IT 0.90 (PLN Java grid 0.69 × PUE) —
+all engine-derived, deterministic. Sensor-class jitter (TCS sensors,
+outdoor weather, people count) retained per reviewer allowance.
+(2) **AI-ACC-05**: CDU `96/96 N+1` → `36/48 fac · 9/12 hall` from
+`DHE.cduRunning × halls`.
+(3) **AI-ACC-06**: generator string `"5 running = 40MW for ~31.8MW"`
+→ engine-bound `gensetFacN × gensetMW` (7 running = 19.25 MW for
+18.55 MW facility, Scenario A locked).
+(4) **AI-ACC-08**: PUE colour swapped from green (false-OK) to cyan
+(informational neutral); target ≤1.12 listed as separate basis chip.
+
+DC Conv (dc-conventional.html + chiller-plant.html):
+(5) **CONV-ACC-01/08**: `CUE 0.42 kg/kWh` relabelled `Grid factor
+0.42 kgCO₂/kWh facility`. New tile `CUE_IT 0.61 kgCO₂/kWh IT` (per
+ISO/IEC 30134-8, grid × PUE).
+(6) **CONV-ACC-02**: chiller-plant `CHWS SP 18.8C` → `Secondary loop
+SP 18.8C`. Primary CHWS 7.2 °C label preserved upstream.
+(7) **CONV-ACC-04**: fuel autonomy `48 hrs` → `48 hrs · bulk-tank @
+site load` to disambiguate scope.
+(8) **CONV-ACC-08 (Tech Spec)**: Appendix A.3, A.9, Section 9 in the
+Tech Spec PDF rewritten to distinguish grid factor (facility-kWh
+denominator) from CUE_IT (ISO/IEC 30134-8 IT-kWh denominator).
+Section 1 headline table now lists both rows.
+
+New standardisation: `standarization/ACCURACY_VALIDATION.md` codifies
+the 6 rules + acceptance tests from this review.
+
 **v1.29.3 (2026-05-23)** — Phase 1 mobile fixes (owner round of 3 screenshots).
 (1) **datahall.html view-mode toolbar wired** — the top 5-button selector
 (POWER / TEMPERATURE / COOLING MARGIN / SPACE / ALARMS) was visual-only in

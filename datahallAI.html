@@ -757,10 +757,10 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 <div class="pn on" id="p-dash">
 <!-- KPI Strip at Top -->
 <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:6px">
-<div class="k"><div class="kl" title="Power Usage Effectiveness — Total Facility Power ÷ IT Load (ideal = 1.0)">PUE</div><div class="kv" style="color:var(--g)" id="dkPue">1.08</div><div class="ks">Target ≤1.12</div></div>
-<div class="k"><div class="kl" title="Water Usage Effectiveness — liters of water consumed per kWh of IT load">WUE</div><div class="kv" style="color:var(--c)" id="dkWue">0.42</div><div class="ks">L/kWh</div></div>
-<div class="k"><div class="kl" title="Carbon Usage Effectiveness — kg CO₂ emitted per kWh of IT load">CUE</div><div class="kv" style="color:var(--p)" id="dkCue">0.38</div><div class="ks">kgCO₂/kWh</div></div>
-<div class="k"><div class="kl" title="Total IT compute power consumption across all 4 halls">IT Load</div><div class="kv" style="color:var(--o)" id="dkIt">28.5</div><div class="ks">MW (4 Halls)</div></div>
+<div class="k"><div class="kl" title="Power Usage Effectiveness — Facility kW ÷ IT kW. Engine-derived bottom-up (5-part PUE basis, chiller nameplate COP 6.8). Source: DATAHALL_CALC.pueBasis()">PUE</div><div class="kv" style="color:var(--c)" id="dkPue">1.30</div><div class="ks">Derived | Target ≤1.12</div></div>
+<div class="k"><div class="kl" title="Water Usage Effectiveness — dry-only cooler baseline per BASELINE-DECISION.md (no evaporative make-up modelled). Source: DATAHALL_MODEL.cooling">WUE</div><div class="kv" style="color:var(--t2)" id="dkWue">0.00</div><div class="ks">L/kWh · Dry-only</div></div>
+<div class="k"><div class="kl" title="Carbon Usage Effectiveness — CUE_IT = grid factor 0.69 (PLN Java 2025) × PUE 1.30. ISO/IEC 30134-8 IT-energy denominator. Source: DATAHALL_CALC.pueBasis().pue × grid factor">CUE</div><div class="kv" style="color:var(--p)" id="dkCue">0.90</div><div class="ks">kgCO₂/kWh IT</div></div>
+<div class="k"><div class="kl" title="Facility IT load — Scenario A locked: 4 halls × 27 NVL72 domains × 132 kW = 14,256 kW. Source: DATAHALL_CALC.lockedState().itPerFacility_kW">IT Load</div><div class="kv" style="color:var(--o)" id="dkIt">14.26</div><div class="ks">MW · Scenario A locked</div></div>
 <div class="k"><div class="kl" title="NVIDIA Blackwell B200 GPUs — total count across all halls">GPUs</div><div class="kv" style="color:var(--g)" id="dkGpu">7,776</div><div class="ks">Blackwell</div></div>
 <div class="k"><div class="kl" title="NVL72 domains — each domain = 72 GPUs with 130 TB/s NVLink5 interconnect">NVL72</div><div class="kv" style="color:var(--pk)" id="dkDom">108</div><div class="ks">Domains</div></div>
 <div class="k"><div class="kl" title="Facility uptime percentage — year-to-date availability">Uptime</div><div class="kv" style="color:var(--g)">99.99</div><div class="ks">% YTD</div></div>
@@ -784,8 +784,8 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 <div class="cd"><h4><b style="background:var(--c)"></b>Cooling</h4><table>
 <tr><td title="Technology Cooling System Supply — coolant to racks (35°C nominal)">TCS Sup</td><td style="color:var(--c)" id="dkTcs">35.2°C</td></tr>
 <tr><td title="Technology Cooling System Return — heated coolant from racks (45°C nominal)">TCS Ret</td><td style="color:var(--o)" id="dkTcr">44.8°C</td></tr>
-<tr><td title="Coolant Distribution Units — end-of-row L2L heat exchangers, 350kW each">CDUs</td><td style="color:var(--g)">96/96 N+1</td></tr>
-<tr><td title="Water-cooled centrifugal (mag bearing) chillers — COP 6.8, provides 12°C facility water">Chillers</td><td style="color:var(--g)">12/16 Run</td></tr>
+<tr><td title="Coolant Distribution Units — end-of-row L2L heat exchangers, 350 kW each. Engine: ceil(3,029 kW liquid heat ÷ 350) = 9 running per hall, 12 installed per hall (N+3). 4 halls → 36 running / 48 installed.">CDUs</td><td style="color:var(--g)" id="dkCdu">36/48 fac · 9/12 hall</td></tr>
+<tr><td title="Water-cooled centrifugal (mag bearing) chillers — Carrier 19DV, nameplate COP 6.8. Count is design placeholder — not yet bound to engine.">Chillers</td><td style="color:var(--g)">12/16 Run · design</td></tr>
 </table></div>
 <div class="cd"><h4><b style="background:var(--b)"></b>Network</h4><table>
 <tr><td title="NVLink 5th gen — 130 TB/s intra-domain GPU interconnect">NVLink5</td><td style="color:var(--g)">All Up</td></tr>
@@ -6766,7 +6766,7 @@ mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',
 $('elecCards').innerHTML=[
 mc('var(--o)','MV Switchgear','SM6 24kV + 4\u00D7 RM6 RMU (True 2N)',[['Central','Schneider SM6 24kV gas-insulated 11 panels'],['Incomers','2\u00D7 VCB-INC 630A/25kA (PLN A+B)'],['Bus Tie','1\u00D7 VCB-TIE N.O. (auto/manual)'],['Feeders','8\u00D7 VCB: 4 from Bus A + 4 from Bus B'],['Per-DH RMU','Schneider RM6 24kV 2-panel per DH'],['2N Path','Each DH receives independent A+B feeds'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['CT/VT','200/5A cl.0.5 + 20/0.1kV cl.0.5'],['Standard','IEC 62271 / SNI 0225']]),
 mc('var(--o)','Transformers',(DHE?('8\u00D7 cast-resin '+DHE.txRatingMVA+'MVA (2 per DH)'):'8\u00D7 cast-resin 5MVA (2 per DH)'),[['Rating',(DHE?(DHE.txRatingMVA+',000 kVA per unit (2 per DH, 8 total), '+DHE.txLoadPct.toFixed(0)+'% load'):'5,000 kVA per unit (2 per DH, 8 total)')],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary'],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)'],['ACBs','8\u00D7 6300A/100kA ABB Emax2 E6.2'],['Capacity','80MVA total (2N: each TX can carry full DH)'],['Per TX','~8,950 kVA | 12,900A @ 400V']]),
-mc('var(--b)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 Cat 3516E '+DHE.gensetMW+'MW N+1'):'8\u00D7 Cat 3516E 2.75MW N+1'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW diesel (N+1: '+DHE.gensetFacN+'+1)'):'8\u00D7 2,750 kW diesel (N+1: 7+1)')],['Engine','Caterpillar 3516E at 11kV'],['Step-up TX','6\u00D7 11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling switchgear'],['Start','Auto <10s on MV bus undervoltage'],['Capacity','5 running = 40MW for ~31.8MW facility'],['Fuel','48hr base tank + 500L day tank per unit'],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major']]),
+mc('var(--b)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 Cat 3516E '+DHE.gensetMW+'MW N+1'):'8\u00D7 Cat 3516E 2.75MW N+1'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW diesel (N+1: '+DHE.gensetFacN+'+1)'):'8\u00D7 2,750 kW diesel (N+1: 7+1)')],['Engine','Caterpillar 3516E at 11kV'],['Step-up TX','6\u00D7 11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling switchgear'],['Start','Auto <10s on MV bus undervoltage'],['Capacity',(DHE?(DHE.gensetFacN+' running = '+(DHE.gensetFacN*DHE.gensetMW).toFixed(2)+'MW for '+DHE.facTotalMW+'MW facility (Scenario A locked)'):'7 running = 19.25MW for 18.55MW facility')],['Fuel','48hr base tank + 500L day tank per unit'],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major']]),
 mc('var(--g)','UPS System',(DHE?('8\u00D7 modular UPS '+DHE.upsRatingMW+'MW (2N)'):'8\u00D7 modular UPS 4.5MW (2N)'),[['Rating',(DHE?(DHE.upsRatingKW.toLocaleString()+' kW per unit (2 per DH, 8 total), '+DHE.upsLoadPct.toFixed(0)+'% load'):'4,500 kW per unit (2 per DH, 8 total)')],['Type','VFI-SS-111 double-conversion online'],['Modules','8\u00D71MW modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['THDi/THDv','<3% / <1% at rated load'],['Total UPS','64 MW capacity (8\u00D78MW)'],['Standard','IEC 62040-3 VFI-SS-111']]),
 mc('var(--o)','Distribution',(DHE?('8\u00D7 Busway '+DHE.buswayAFmt+'A + 88\u00D7 RPP 800A'):'8\u00D7 Busway 6,300A + 88\u00D7 RPP 800A'),[['Busway',(DHE?('8\u00D7 Canalis KTA '+DHE.buswayAFmt+'A Cu overhead'):'8\u00D7 Canalis KTA 6,300A Cu overhead')],['Per DH','2 busways (Feed A + Feed B)'],['RPP','11\u00D7 800A MCCB NSX800 tap-off per busway'],['Total RPP','88 units (22 per DH)'],['Rack PSU','2\u00D7 OCP ORV3 per rack (dual-corded)'],['Conversion','400V AC \u2192 50VDC | \u03B7>97%'],['Bus Bar','50VDC 4,000A Cu vertical in-rack'],['Whip','200A 400V flex conduit to rack']]),
 mc('var(--c)','Non-Critical Loads','DB-NC: 695 kW Total',[['AHU 1+2','2\u00D7 Carrier 39HQ 150kW | CB 400A | PF 0.85'],['VRV','4\u00D7 Daikin VRV IV 25kW | CB 200A | PF 0.92'],['Lighting','LED 80kW | CB 200A | PF 0.95'],['Fire','FACP+Novec 30kW | CB 100A | PF 0.90'],['Security','CCTV+Access 20kW | CB 63A | PF 0.95'],['BMS/EPMS','Schneider EcoStruxure 40kW | CB 100A'],['Elevators','2\u00D730kW | CB 100A | PF 0.85'],['WTP','Water treatment 50kW | CB 160A | PF 0.92']]),
@@ -7328,18 +7328,19 @@ leakS.textContent='CLEAR';leakS.style.fill='var(--g)';
 },3000);
 })();
 // DC DASHBOARD — 4× DATA HALLS with DC Image + Callouts
-if($('dashSu'))$('dashSu').textContent='4× AI Data Halls | 28.5 MW IT | 7,776 GPU | PUE 1.08 | WUE 0.42 L/kWh | CUE 0.38 kgCO₂/kWh';
+// v1.32.0 — subtitle + callouts now engine-bound (AI-ACC-01/02/03 per accuracy review doc-26).
+if($('dashSu'))$('dashSu').textContent=(DHE?('4× AI Data Halls | '+DHE.itFacilityMW.toFixed(2)+' MW IT (Scenario A locked) | '+DHE.gpuPerFacility.toLocaleString()+' GPU | PUE '+DHE.pue.toFixed(2)+' derived | WUE 0.00 dry-only | CUE_IT 0.90 (PLN Java × PUE)'):'4× AI Data Halls | 14.26 MW IT | 7,776 GPU | PUE 1.30 | WUE 0.00 L/kWh | CUE_IT 0.90 kgCO₂/kWh');
 (function(){
-// DC Image Callouts - READABLE SIZES
+// DC Image Callouts - READABLE SIZES — values engine-bound (AI-ACC-01/02/03)
 const callEl=$('dcCallouts');
 if(callEl){
 const callouts=[
-{x:'2%',y:'3%',l:'PUE',v:'1.08',c:'var(--g)',id:'dcPUE'},
-{x:'2%',y:'16%',l:'WUE',v:'0.42',c:'var(--c)',id:'dcWUE'},
-{x:'2%',y:'29%',l:'CUE',v:'0.38',c:'var(--p)',id:'dcCUE'},
-{x:'2%',y:'42%',l:'IT Load',v:'28.5MW',c:'var(--o)',id:'dcIT'},
-{x:'75%',y:'3%',l:'GPUs',v:'7,776',c:'var(--g)',id:'dcGPU'},
-{x:'75%',y:'16%',l:'NVL72',v:'108',c:'var(--pk)',id:'dcDom'},
+{x:'2%',y:'3%',l:'PUE',v:(DHE?DHE.pue.toFixed(2):'1.30'),c:'var(--c)',id:'dcPUE'},
+{x:'2%',y:'16%',l:'WUE',v:'0.00',c:'var(--t2)',id:'dcWUE'},
+{x:'2%',y:'29%',l:'CUE_IT',v:(DHE?(0.69*DHE.pue).toFixed(2):'0.90'),c:'var(--p)',id:'dcCUE'},
+{x:'2%',y:'42%',l:'IT Load',v:(DHE?DHE.itFacilityMW.toFixed(2)+'MW':'14.26MW'),c:'var(--o)',id:'dcIT'},
+{x:'75%',y:'3%',l:'GPUs',v:(DHE?DHE.gpuPerFacility.toLocaleString():'7,776'),c:'var(--g)',id:'dcGPU'},
+{x:'75%',y:'16%',l:'NVL72',v:(DHE?(DHE.halls*DHE.nvl72PerHall):'108')+' dom',c:'var(--pk)',id:'dcDom'},
 {x:'75%',y:'29%',l:'Outdoor',v:'32°C',c:'var(--o)',id:'dcOut'},
 {x:'75%',y:'42%',l:'Humidity',v:'75%',c:'var(--c)',id:'dcRH'},
 {x:'2%',y:'82%',l:'Seismic',v:'Zone 4',c:'var(--r)'},
@@ -7357,22 +7358,38 @@ ch+=`<div style="position:absolute;left:${c.x};top:${c.y};background:rgba(5,8,16
 callEl.innerHTML=ch;
 }
 // Dashboard KPI Updates
+// v1.32.0 — accuracy binding per Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md
+// AI-ACC-01/02/03/07: basis KPIs (PUE/WUE/CUE/IT) MUST be deterministic and engine-derived.
+// Sensor-class jitter (TCS sensors, people count, outdoor weather, alarm count) stays
+// random per reviewer's explicit allowance (doc-26 §AI-ACC-07 "Allowed behavior").
 function updateDashKPI(){
-const pue=R(1.06,1.10),wue=R(0.40,0.45),cue=R(0.36,0.40);
 const el=id=>$(id);
-if(el('dkPue'))el('dkPue').textContent=pue;
-if(el('dkWue'))el('dkWue').textContent=wue;
-if(el('dkCue'))el('dkCue').textContent=cue;
-if(el('dkIt'))el('dkIt').textContent=R(27.8,29.2);
+/* --- BASIS / DERIVED (deterministic, engine-bound) --- */
+var PUE=(DHE?DHE.pue.toFixed(2):'1.30');
+var IT_MW=(DHE?DHE.itFacilityMW.toFixed(2):'14.26');
+/* WUE: dry-only baseline per BASELINE-DECISION.md — engine reports 0.00. */
+var WUE='0.00';
+/* CUE: grid factor (PLN Java 0.69 kgCO2/kWh, 2025 published) × PUE → CUE_IT.
+   Hardcoded grid factor is cited; CUE_IT recomputes from engine PUE. */
+var GRID_KG_PER_KWH=0.69;
+var CUE_IT=(DHE?(GRID_KG_PER_KWH*DHE.pue).toFixed(2):'0.90');
+if(el('dkPue'))el('dkPue').textContent=PUE;
+if(el('dkWue'))el('dkWue').textContent=WUE;
+if(el('dkCue'))el('dkCue').textContent=CUE_IT;
+if(el('dkIt'))el('dkIt').textContent=IT_MW;
+/* --- SENSOR-CLASS JITTER (random allowed) --- */
 if(el('dkTcs'))el('dkTcs').textContent=R(34.5,35.8)+'°C';
 if(el('dkTcr'))el('dkTcr').textContent=R(44.2,45.5)+'°C';
 if(el('dkPpl'))el('dkPpl').textContent=RI(0,8)+' Inside';
 if(el('dkEntry')){const now=new Date();el('dkEntry').textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
-if(el('dkAlm'))el('dkAlm').textContent=RI(0,2);
-// Update image callouts
-if(el('dcPUE'))el('dcPUE').textContent=pue;
-if(el('dcWUE'))el('dcWUE').textContent=wue;
-if(el('dcCUE'))el('dcCUE').textContent=cue;
+if(el('dkAlm'))el('dkAlm').textContent='0';  /* deterministic: alarm count is not a sensor jitter — must match engine state */
+if(el('dkCdu')&&DHE)el('dkCdu').textContent=(DHE.cduRunning*DHE.halls)+'/'+(DHE.cduInstalled*DHE.halls)+' fac · '+DHE.cduRunning+'/'+DHE.cduInstalled+' hall';
+/* --- DC IMAGE CALLOUTS (engine-bound) --- */
+if(el('dcPUE'))el('dcPUE').textContent=PUE;
+if(el('dcWUE'))el('dcWUE').textContent=WUE;
+if(el('dcCUE'))el('dcCUE').textContent=CUE_IT;
+if(el('dcIT'))el('dcIT').textContent=IT_MW+'MW';
+/* outdoor weather is real-world sensor noise → random OK */
 if(el('dcOut'))el('dcOut').textContent=RI(30,35)+'°C';
 if(el('dcRH'))el('dcRH').textContent=RI(65,80)+'%';
 if(el('dcWind'))el('dcWind').textContent=RI(8,15)+'m/s';
@@ -7381,11 +7398,14 @@ updateDashKPI();
 setInterval(updateDashKPI,4000);
 })();
 
-// Legacy code compatibility - keep dashC empty
+// dashC LIVE METRICS panel — v1.32.0 engine-bound (AI-ACC-01/02/03/07 doc-26).
+// Per-hall + facility values come from DHE so totals reconcile to dashboard strip.
 (function(){const el=$('dashC');if(!el)return;
-const H={it:7128,cool:7130,pue:1.08,gpu:1944,dom:27};
-const F={halls:4,it:H.it*4,cool:H.cool*4,total:H.it*4*H.pue,gpu:H.gpu*4,dom:H.dom*4};
-const WUE=0.42,CUE=0.38,annualHrs=8760;
+const _h_it=(DHE?DHE.itHall:3564), _h_cool=Math.round((DHE?DHE.pb_nonIT:1074)+0), _h_pue=(DHE?DHE.pue:1.30), _h_gpu=(DHE?(DHE.gpuPerHall||1944):1944), _h_dom=(DHE?DHE.nvl72PerHall:27);
+const H={it:_h_it,cool:_h_cool,pue:_h_pue,gpu:_h_gpu,dom:_h_dom};
+const F={halls:(DHE?DHE.halls:4),it:H.it*(DHE?DHE.halls:4),cool:H.cool*(DHE?DHE.halls:4),total:(DHE?DHE.pb_facility*DHE.halls:18552),gpu:(DHE?DHE.gpuPerFacility:7776),dom:H.dom*(DHE?DHE.halls:4)};
+// Sustainability: WUE = 0 dry-only baseline; CUE_IT = PLN Java grid 0.69 × PUE
+const WUE=0.00,CUE=Math.round(0.69*_h_pue*100)/100,annualHrs=8760;
 const waterAnnual=F.it*annualHrs*WUE/1000000;
 const carbonAnnual=F.total*annualHrs*CUE/1000;
 s+=`<rect width="400" height="420" fill="var(--bg2)"/>`;
@@ -7398,18 +7418,21 @@ s+=`<rect x="${hx}" y="${hy}" width="193" height="58" rx="3" fill="var(--bg3)" s
 s+=tx(hx+97,hy+12,'HALL-'+h.id,'var(--g)',7,'middle',1);
 s+=`<rect x="${hx+62}" y="${hy+15}" width="70" height="10" rx="2" fill="rgba(34,197,94,.15)" stroke="var(--g)" stroke-width=".3"/>`;
 s+=tx(hx+97,hy+22,'OPERATIONAL','var(--g)',4,'middle');
-s+=tx(hx+8,hy+36,'IT:','var(--t3)',4.5);s+=`<text x="${hx+38}" y="${hy+36}" fill="var(--o)" font-family="${J}" font-size="5.5" id="dH${i}IT">7,128kW</text>`;
-s+=tx(hx+100,hy+36,'PUE:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+36}" fill="var(--g)" font-family="${J}" font-size="5.5" id="dH${i}PUE">1.08</text>`;
-s+=tx(hx+8,hy+48,'GPU:','var(--t3)',4.5);s+=`<text x="${hx+38}" y="${hy+48}" fill="var(--g)" font-family="${J}" font-size="5.5">1,944</text>`;
-s+=tx(hx+100,hy+48,'ΔT:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+48}" fill="var(--c)" font-family="${J}" font-size="5.5" id="dH${i}DT">9.6°C</text>`;
+s+=tx(hx+8,hy+36,'IT:','var(--t3)',4.5);s+=`<text x="${hx+38}" y="${hy+36}" fill="var(--o)" font-family="${J}" font-size="5.5" id="dH${i}IT">${H.it.toLocaleString()}kW</text>`;
+s+=tx(hx+100,hy+36,'PUE:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+36}" fill="var(--c)" font-family="${J}" font-size="5.5" id="dH${i}PUE">${H.pue.toFixed(2)}</text>`;
+s+=tx(hx+8,hy+48,'GPU:','var(--t3)',4.5);s+=`<text x="${hx+38}" y="${hy+48}" fill="var(--g)" font-family="${J}" font-size="5.5">${H.gpu.toLocaleString()}</text>`;
+s+=tx(hx+100,hy+48,'ΔT:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+48}" fill="var(--c)" font-family="${J}" font-size="5.5" id="dH${i}DT">${(DHE?DHE.tcsDeltaT:10).toFixed(1)}°C</text>`;
 });
 // Totals section - COMPACT
 s+=`<rect x="5" y="148" width="390" height="50" rx="3" fill="rgba(245,158,11,.03)" stroke="rgba(245,158,11,.2)" stroke-width=".8"/>`;
 s+=tx(200,160,'CAMPUS TOTALS','var(--o)',6,'middle',1);
 const tots=[
-{l:'IT',v:'28.5MW',c:'var(--o)',id:'dTotIT'},{l:'Fac',v:'30.8MW',c:'var(--o)',id:'dTotFac'},
-{l:'GPU',v:'7,776',c:'var(--g)'},{l:'NVL72',v:'108',c:'var(--pk)'},
-{l:'PUE',v:'1.08',c:'var(--g)',id:'dTotPUE'},{l:'Up',v:'99.99%',c:'var(--g)'}
+{l:'IT',v:(DHE?DHE.itFacilityMW.toFixed(2)+'MW':'14.26MW'),c:'var(--o)',id:'dTotIT'},
+{l:'Fac',v:(DHE?DHE.facTotalMW.toFixed(2)+'MW':'18.55MW'),c:'var(--o)',id:'dTotFac'},
+{l:'GPU',v:F.gpu.toLocaleString(),c:'var(--g)'},
+{l:'NVL72',v:F.dom+' dom',c:'var(--pk)'},
+{l:'PUE',v:H.pue.toFixed(2),c:'var(--c)',id:'dTotPUE'},
+{l:'Up',v:'99.99%',c:'var(--g)'}
 ];
 tots.forEach((t,i)=>{
 const tx2=12+i*65,ty=180;
@@ -7420,9 +7443,9 @@ s+=`<text x="${tx2+40}" y="${ty}" fill="${t.c}" font-family="${J}" font-size="5"
 s+=`<rect x="5" y="202" width="192" height="68" rx="3" fill="rgba(6,182,212,.03)" stroke="rgba(6,182,212,.2)" stroke-width=".8"/>`;
 s+=tx(100,214,'SUSTAINABILITY','var(--c)',5.5,'middle',1);
 const sust=[
-{l:'WUE',v:'0.42',c:'var(--c)',id:'dWUE'},{l:'H₂O/yr',v:Math.round(waterAnnual)+'ML',c:'var(--c)'},
-{l:'CUE',v:'0.38',c:'var(--p)',id:'dCUE'},{l:'CO₂/yr',v:Math.round(carbonAnnual/1000)+'kt',c:'var(--p)'},
-{l:'Green',v:'45%',c:'var(--g)'},{l:'Grid',v:'0.70',c:'var(--t2)'}
+{l:'WUE',v:'0.00',c:'var(--t2)',id:'dWUE'},{l:'H₂O/yr',v:'0 ML · dry',c:'var(--t2)'},
+{l:'CUE_IT',v:CUE.toFixed(2),c:'var(--p)',id:'dCUE'},{l:'CO₂/yr',v:Math.round(carbonAnnual/1000)+'kt',c:'var(--p)'},
+{l:'Grid',v:'0.69 PLN',c:'var(--t2)'},{l:'PUE',v:H.pue.toFixed(2),c:'var(--c)'}
 ];
 sust.forEach((su,i)=>{
 const sx=12+(i%3)*62,sy=228+Math.floor(i/3)*18;
@@ -7443,11 +7466,16 @@ s+=`<text x="${ox+48}" y="${oy}" fill="${od.c}" font-family="${J}" font-size="5"
 // Power + Cooling in one row
 s+=`<rect x="5" y="274" width="192" height="65" rx="3" fill="rgba(245,158,11,.03)" stroke="rgba(245,158,11,.2)" stroke-width=".8"/>`;
 s+=tx(100,286,'POWER','var(--o)',5.5,'middle',1);
-const pwr=[['UPS','36MW'],['Gen','10MW'],['Sub','2×40MVA'],['2N','N+1']];
+const pwr=[
+['UPS',(DHE?(DHE.upsRatingMW.toFixed(1)+'MW×8'):'4.5MW×8')],
+['Gen',(DHE?(DHE.gensetFacNplus1+'×'+DHE.gensetMW+'MW'):'8×2.75MW')],
+['Sub',(DHE?('2×'+(DHE.txRatingMVA*2)+'MVA'):'2×10MVA')],
+['2N','N+1']
+];
 pwr.forEach((p,i)=>{const px=12+(i%2)*95,py=300+Math.floor(i/2)*16;s+=tx(px,py,p[0]+':','var(--t3)',4);s+=`<text x="${px+55}" y="${py}" fill="var(--g)" font-family="${J}" font-size="5" text-anchor="end">${p[1]}</text>`;});
 s+=`<rect x="203" y="274" width="192" height="65" rx="3" fill="rgba(6,182,212,.03)" stroke="rgba(6,182,212,.2)" stroke-width=".8"/>`;
 s+=tx(300,286,'COOLING','var(--c)',5.5,'middle',1);
-const cool=[['DLC','24MW'],['Air','4MW'],['CH','16×2.5'],['CDU','96']];
+const cool=[['DLC',(DHE?(DHE.liquidHeatFmt+'kW/h'):'3,029kW/h')],['Air',(DHE?(DHE.airHeatFmt+'kW/h'):'535kW/h')],['CH','12/16 dsn'],['CDU',(DHE?((DHE.cduRunning*DHE.halls)+'/'+(DHE.cduInstalled*DHE.halls)):'36/48')]];
 cool.forEach((c,i)=>{const cx=210+(i%2)*95,cy=300+Math.floor(i/2)*16;s+=tx(cx,cy,c[0]+':','var(--t3)',4);s+=`<text x="${cx+55}" y="${cy}" fill="var(--c)" font-family="${J}" font-size="5" text-anchor="end">${c[1]}</text>`;});
 // System status - compact
 s+=`<rect x="5" y="343" width="390" height="72" rx="3" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
@@ -7463,29 +7491,18 @@ s+=tx(ax,ay,a.l+':','var(--t3)',4);
 s+=`<text x="${ax+42}" y="${ay}" fill="${a.c}" font-family="${J}" font-size="4.5" font-weight="600">${a.v}</text>`;
 });
 el.innerHTML=s;
-// Live updates - COMPACT
+// v1.32.0 — basis KPI live updates removed. Only outdoor weather (real-world
+// sensor noise) jitters. Per reviewer doc-26 §AI-ACC-07: "Reload page 20 times.
+// PUE, WUE, CUE, IT load, facility load, rack count, CDU count, genset count
+// must be identical unless user changes scenario."
 setInterval(()=>{
-// DC Callouts (shorter format)
-const dcP=$('dcPUE');if(dcP)dcP.textContent=R(1.06,1.10);
-const dcW=$('dcWUE');if(dcW)dcW.textContent=R(0.40,0.45);
-const dcC=$('dcCUE');if(dcC)dcC.textContent=R(0.36,0.40);
-const dcI=$('dcIT');if(dcI)dcI.textContent=R(28.0,28.6)+'MW';
-const dcO=$('dcOut');if(dcO)dcO.textContent=RI(30,35)+'°C';
-const dcR=$('dcRH');if(dcR)dcR.textContent=RI(65,85)+'%';
-const dcWi=$('dcWind');if(dcWi)dcWi.textContent=RI(5,15)+'m/s';
-// Hall metrics (compact)
-for(let i=0;i<4;i++){
-const hI=$('dH'+i+'IT');if(hI)hI.textContent=(7000+RI(0,200))+'kW';
-const hP=$('dH'+i+'PUE');if(hP)hP.textContent=R(1.06,1.10);
-const hD=$('dH'+i+'DT');if(hD)hD.textContent=R(9.2,10.2)+'°C';
-}
-// Totals (compact)
-const tI=$('dTotIT');if(tI)tI.textContent=R(28.0,28.6)+'MW';
-const tP=$('dTotPUE');if(tP)tP.textContent=R(1.06,1.10);
-// Outdoor
+// Outdoor weather only — legitimate sensor noise
 const oT=$('dOutT');if(oT)oT.textContent=RI(30,35)+'°C';
 const oH=$('dOutH');if(oH)oH.textContent=RI(65,85)+'%';
 const oW=$('dOutW');if(oW)oW.textContent=RI(5,15)+'m/s';
+const dcO=$('dcOut');if(dcO)dcO.textContent=RI(30,35)+'°C';
+const dcR=$('dcRH');if(dcR)dcR.textContent=RI(65,85)+'%';
+const dcWi=$('dcWind');if(dcWi)dcWi.textContent=RI(5,15)+'m/s';
 },5000);
 })();
 // Dashboard Cards (moved to right panel, keeping for compatibility)
@@ -12161,7 +12178,7 @@ function buildTechSpecHtml(){
     '<p><strong>A.7 UPS battery sizing.</strong> Energy to deliver = <code>P_critical &times; t_min &divide; 60</code> (kWh). The battery is sized larger by the useful depth-of-discharge factor (0.80 typical for VRLA) and the inverter efficiency (0.95 typical), giving installed kWh = <code>(P &times; t/60) &divide; (DoD &times; eta)</code>.</p>'+
     '<p><strong>A.8 Generator sizing.</strong> Whole-building basis: total facility kW (IT + PUE losses) divided by per-genset rating, rounded up. Standby rating (not prime / continuous) is the limiting figure for emergency back-up duty.</p>'+
     '<p><strong>A.9 Fire-protected volume.</strong> Rectangular hall: <code>V = L &times; W &times; H</code>. Agent mass per NFPA 2001 9.2: <code>m = V &times; rho &times; (C &divide; (100 &minus; C))</code> where rho is agent vapour density at design condition and C is design concentration (4.2 % v/v for NOVEC 1230 Class A).</p>'+
-    '<p><strong>A.10 Carbon &amp; water accounting (CUE / WUE).</strong> Both are normalised against IT kWh, not facility kWh, so they are interpretable across PUE values. WUE counts make-up water (cooling-tower evaporation + drift + blowdown + humidification); CUE multiplies facility kWh by the published grid emission factor for the site location.</p>'+
+    '<p><strong>A.10 Carbon &amp; water accounting (CUE / WUE) &mdash; explicit denominators.</strong> Per ISO/IEC 30134-8 and the Green Grid WUE white paper, both metrics use an IT-kWh denominator: <code>CUE = kgCO&#8322; &divide; kWh_IT</code> and <code>WUE = L_water &divide; kWh_IT</code>. The site uses a regional grid emission factor (e.g. PLN Java 2025 &asymp; 0.69 kgCO&#8322;/kWh facility) and computes <code>CUE_IT = grid_factor &times; PUE</code>. For Scenario A: <code>CUE_IT = 0.69 &times; '+pueA+' = '+(0.69*pueA).toFixed(2)+' kgCO&#8322;/kWh IT</code>. WUE counts make-up water (cooling-tower evaporation + drift + blowdown + humidification); the AI factory adopted basis here is dry-only, so WUE = 0 by design. Never display a grid factor with a facility-kWh denominator under a CUE label without the denominator being explicit.</p>'+
     '<p><strong>A.11&ndash;A.20</strong> &mdash; covered by the acceptance suite (<code>tools/test-datahall-calc.mjs</code>, 57 examples) and the engine source itself (<code>js/datahall-calculations.js</code>, 370 lines). Every example referenced in this PDF has a corresponding test that runs in CI on every release.</p>'+
     '</section>';
 

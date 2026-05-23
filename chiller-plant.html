@@ -589,7 +589,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
               </select>
             </div>
             <div class="field">
-              <label>CHWS SP <span id="spChwsTxt">18.8C</span></label>
+              <label title="Secondary load-loop supply setpoint (CRAH/AHU side, 18-23 °C band). NOT the primary CHWS, which is locked at 7.2 °C upstream of the chillers.">Secondary loop SP <span id="spChwsTxt">18.8C</span></label>
               <input id="spChws" type="range" min="16" max="22" step="0.1" value="18.8" aria-label="Sp Chws" />
             </div>
             <div class="field">
@@ -1306,7 +1306,7 @@ function drawPid(){
     <rect x="${CX}" y="${R5Y}" width="${C2W}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX}" y1="${R5Y+22}" x2="${CX+C2W}" y2="${R5Y+22}" class="sup-divider" />
     ${text(CX+12,R5Y+16,"sup-title","ACTIVE SETPOINTS")}
-    ${text(CX+12,R5Y+48,"metric-row",`CHWS SP: ${conv.t(st.sp.chws,ui.unit)}${conv.tu(ui.unit)}  \u2022  DP SP: ${conv.p(st.sp.dp,ui.unit)} ${conv.pu(ui.unit)}`)}
+    ${text(CX+12,R5Y+48,"metric-row",`Sec-loop SP: ${conv.t(st.sp.chws,ui.unit)}${conv.tu(ui.unit)}  \u2022  DP SP: ${conv.p(st.sp.dp,ui.unit)} ${conv.pu(ui.unit)}`)}
     ${text(CX+12,R5Y+68,"metric-row",`Flow SP: ${conv.f(st.sp.flow,ui.unit)} ${conv.fu(ui.unit)}  \u2022  Scenario: ${ui.scenario.toUpperCase()}`)}
 
     <rect x="${CX+C2W+10}" y="${R5Y}" width="${CW-C2W-10}" height="86" rx="8" class="sup-card" />

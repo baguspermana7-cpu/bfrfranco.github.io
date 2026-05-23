@@ -11,6 +11,75 @@ release sections rather than semver.
 
 ---
 
+## v1.32.1 — 2026-05-24 (Critical accuracy fixes per team review docs 26 + 16 — owner exclusion lifted)
+
+Owner directive 2026-05-23: "review comment team saya, dan sempurnakan, dan
+implementasikan. saya tidak mau anda hanya agrreeing aja. plan mode. harus
+kritis." Two team review docs delivered: `Documents/screenshot bms rz/dc ai/
+review/26-accuracy-validation-and-correction-list.md` (10 DC AI findings)
++ `.../conv/review/16-accuracy-validation-and-correction-list.md` (9 DC
+Conv findings). Critical assessment captured in
+[memory/project_rz_accuracy_review_2026-05-23.md].
+
+**Owner exclusion change**: `#p-dash` panel + `updateDashKPI()` +
+`dcCallouts` byte-identical mandate (locked since BMS Shell adoption,
+v1.23.x → v1.31.x) is **LIFTED** for the accuracy-binding work. Engine
+files (`js/datahall-model.js`, `datahall-calculations.js`,
+`js/conv-engine.js`) remain byte-identical.
+
+### DC AI — datahallAI.html
+- **AI-ACC-01 fixed**: dashboard IT load 28.5 MW → 14.26 MW (Scenario A).
+- **AI-ACC-02 fixed**: PUE 1.08 → 1.30 derived (engine bottom-up). Colour
+  swapped green → cyan (informational neutral) per `ACCURACY_VALIDATION.md` Rule 4.
+- **AI-ACC-03 fixed**: WUE 0.42 random → 0.00 dry-only baseline. CUE
+  0.38 random → CUE_IT 0.90 kgCO₂/kWh IT (PLN Java grid 0.69 × PUE 1.30
+  per ISO/IEC 30134-8).
+- **AI-ACC-05 fixed**: CDU 96/96 N+1 (33.6 MW overspec) → 36/48 fac · 9/12 hall.
+- **AI-ACC-06 fixed**: "5 running = 40 MW" arithmetic error → 7 running
+  = 19.25 MW for 18.55 MW facility via DHE.gensetFacN × DHE.gensetMW.
+- **AI-ACC-07 fixed**: `Math.random()` removed from PUE / WUE / CUE / IT /
+  per-hall / totals. Sensor jitter (outdoor weather only) retained per
+  reviewer allowance. Reload-20× test: basis KPIs identical.
+- **AI-ACC-08 fixed**: colour grammar updated.
+
+### DC Conv — dc-conventional.html + chiller-plant.html
+- **CONV-ACC-01 fixed**: dashboard `Carbon 0.42` → `Grid factor 0.42
+  kgCO₂/kWh facility`; side panel adds CUE_IT 0.61 kg/kWh IT tile.
+- **CONV-ACC-02 fixed**: `CHWS SP 18.8C` → `Secondary loop SP 18.8C`;
+  primary CHWS 7.2 °C label preserved.
+- **CONV-ACC-04 fixed**: fuel autonomy `48 hrs` → `48 hrs · bulk-tank @
+  site load`.
+- **CONV-ACC-08 fixed**: Tech Spec PDF Appendix A.3, A.9, Section 9,
+  Section 1 headline table all distinguish grid factor (facility-kWh)
+  from CUE_IT (ISO/IEC 30134-8 IT-kWh). DC AI Appendix A.10 similarly
+  tightened.
+
+### Standardisation
+- New `standarization/ACCURACY_VALIDATION.md` (6 rules + 7 DC AI + 8 DC
+  Conv acceptance tests).
+- `standarization/BMS_SHELL.md` adoption table + owner-exclusion-lift record.
+
+### Critical pushback (not blindly agreeing)
+- AI-ACC-04 terminology: kept engine 2-rack footprint basis (real-world
+  AI deployments split NVL72 across 2 racks for weight / cabling /
+  serviceability). Only relabel UI in v1.32.2.
+- AI-ACC-03 CUE: chose to bind PLN Java grid factor + derive CUE_IT (vs
+  reviewer's "Not calculated" recommendation). Cited, defensible.
+- Reviewer's Display Contract (basis drawer per KPI): deferred to v1.32.3.
+
+### Coordination note
+Authored locally as v1.32.0. Parallel session shipped v1.32.0 (AI
+Engineering Maintenance concept page) before push; this lands as
+v1.32.1 atop their work.
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- v1.32.2 — terminology + label sweep (AI-ACC-04/09/10, CONV-ACC-03/05/06/09).
+- v1.32.3 — basis drawers per Rule 6.
+- v1.32.4 — Puppeteer probes for acceptance tests.
+
+---
+
 ## v1.32.0 — 2026-05-23 (AI Engineering Maintenance — concept page; FMECA + KG + ML + NLP synthesis)
 
 R-016 — `ai-engineering-maintenance.html` (1,441 lines) ships the

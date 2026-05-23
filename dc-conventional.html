@@ -1017,10 +1017,10 @@ a { color: inherit; text-decoration: none; }
                 <div class="kpi-value" style="color: var(--accent-blue)" id="kpiWue">1.20</div>
                 <div class="kpi-unit">L/kWh</div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Carbon</div>
+            <div class="kpi-card" title="Grid emission factor (facility-kWh denominator) per ISO/IEC 30134-8. CUE_IT = this × PUE = 0.61 kgCO₂/kWh IT — see side panel.">
+                <div class="kpi-label">Grid factor</div>
                 <div class="kpi-value" style="color: var(--accent-green)" id="kpiCarbon">0.42</div>
-                <div class="kpi-unit">kgCO₂/kWh</div>
+                <div class="kpi-unit">kgCO₂/kWh facility</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">IT Load</div>
@@ -1099,9 +1099,22 @@ a { color: inherit; text-decoration: none; }
     <aside class="stats-panel">
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-cyan)"></span> Efficiency</div>
-            <div class="stat-row"><span class="stat-label">PUE</span><span class="stat-value cyan" id="sPue">1.45</span></div>
-            <div class="stat-row"><span class="stat-label">WUE</span><span class="stat-value blue" id="sWue">1.20 L/kWh</span></div>
-            <div class="stat-row"><span class="stat-label">CUE</span><span class="stat-value green" id="sCue">0.42 kg/kWh</span></div>
+            <div class="stat-row" title="Power Usage Effectiveness — facility kW / IT kW. Engine-derived.">
+                <span class="stat-label">PUE</span>
+                <span class="stat-value cyan" id="sPue">1.45</span>
+            </div>
+            <div class="stat-row" title="Water Usage Effectiveness — L of make-up water per IT kWh. Cooling-tower scope only; domestic/process water excluded.">
+                <span class="stat-label">WUE</span>
+                <span class="stat-value blue" id="sWue">1.20 L/kWh</span>
+            </div>
+            <div class="stat-row" title="Grid emission factor with facility-kWh denominator. ISO/IEC 30134-8 CUE uses IT-kWh; see CUE_IT below.">
+                <span class="stat-label">Grid factor</span>
+                <span class="stat-value green" id="sCue">0.42 kg/kWh facility</span>
+            </div>
+            <div class="stat-row" title="CUE per ISO/IEC 30134-8: grid factor × PUE = 0.42 × 1.45 = 0.609 kg/kWh IT energy.">
+                <span class="stat-label">CUE_IT</span>
+                <span class="stat-value green" id="sCueIt">0.61 kg/kWh IT</span>
+            </div>
         </div>
 
         <div class="stats-section">
@@ -1146,7 +1159,10 @@ a { color: inherit; text-decoration: none; }
             <div class="stats-title"><span class="dot" style="background: var(--accent-purple)"></span> Fuel</div>
             <div class="stat-row"><span class="stat-label">Main</span><span class="stat-value green" id="sFuelMain">85%</span></div>
             <div class="stat-row"><span class="stat-label">Day Tank</span><span class="stat-value green">92%</span></div>
-            <div class="stat-row"><span class="stat-label">Autonomy</span><span class="stat-value cyan">48 hrs</span></div>
+            <div class="stat-row" title="Bulk-tank autonomy at current site load. 45,900 L usable ÷ 956 L/hr (site total) = 48 hrs. Per-genset day-tank inventory is separate buffer.">
+                <span class="stat-label">Autonomy</span>
+                <span class="stat-value cyan">48 hrs · bulk-tank @ site load</span>
+            </div>
         </div>
     </aside>
 </div>
@@ -1283,7 +1299,10 @@ function updateData() {
     // Right Stats Panel — Total = IT x PUE shown exactly
     setText('sPue', pue);
     setText('sWue', wue + ' L/kWh');
-    setText('sCue', carbon + ' kg/kWh');
+    // v1.32.0 — CONV-ACC-01: rename to "Grid factor" (facility-kWh denominator);
+    // add CUE_IT (IT-kWh denominator) per ISO/IEC 30134-8.
+    setText('sCue', carbon + ' kg/kWh facility');
+    setText('sCueIt', (s.environment.carbon_kg_per_facility_kwh * s.site.pue).toFixed(2) + ' kg/kWh IT');
     setText('sTotalLoad', facilityKw.toLocaleString() + ' kW');
     setText('sItLoad', itLoadKw.toLocaleString() + ' kW');
     setText('sChwSup', chwSup + '°C');
@@ -1544,7 +1563,8 @@ function buildTechSpecHtml(){
       ['Facility total power',grp(Math.round(facKw))+' kW','site.facility_load_kw'],
       ['PUE (engine)',pue.toFixed(3),'site.pue (bottom-up)'],
       ['WUE',wue.toFixed(2)+' L/kWh','environment.wue_l_per_kwh'],
-      ['Carbon intensity',cue.toFixed(2)+' kg/kWh','environment.carbon_kg_per_facility_kwh'],
+      ['Grid factor',cue.toFixed(2)+' kgCO₂/kWh facility','environment.carbon_kg_per_facility_kwh'],
+      ['CUE_IT (ISO/IEC 30134-8)',(cue*pue).toFixed(2)+' kgCO₂/kWh IT','grid factor × PUE'],
       ['CHW supply / return',chws.toFixed(1)+' / '+chwr.toFixed(1)+' &deg;C','cooling.chws_c / chwr_c'],
       ['Rack count (data hall)',grp(racks),'datahall.racks_total'],
       ['Per-rack power',rackKW.toFixed(2)+' kW','it_load_kw &divide; racks_total']
@@ -1790,7 +1810,7 @@ function buildTechSpecHtml(){
 
   /* 9. Carbon & Sustainability (additional discipline for the conv side) */
   H+='<section class="page"><h3>9. Carbon &amp; Sustainability</h3>'+
-    '<p>Carbon Usage Effectiveness (CUE) is reported against facility kWh (numerator: emitted kg CO&#8322;e; denominator: facility kWh, not IT kWh). The locked basis here is '+cue.toFixed(2)+' kg/kWh, giving an instant emission rate of '+grp(Math.round(carbonKgHr))+' kg CO&#8322;e/hr.</p>'+
+    '<p>The engine carries a GRID emission factor with a facility-kWh denominator ('+cue.toFixed(2)+' kgCO&#8322;/kWh facility). Per ISO/IEC 30134-8, the standard CUE uses an IT-kWh denominator: <code>CUE_IT = grid_factor &times; PUE = '+cue.toFixed(2)+' &times; '+pue.toFixed(2)+' = '+(cue*pue).toFixed(2)+' kgCO&#8322;/kWh IT</code>. Both values describe the same emissions; only the denominator differs. Instant emission rate at facility load: '+grp(Math.round(carbonKgHr))+' kgCO&#8322;e/hr.</p>'+
     '<h4>9.1 Worked calculation</h4>'+
     WK('Instant carbon emissions',
        'kg/hr = facility_kW &times; grid_factor',
@@ -1905,13 +1925,13 @@ function buildTechSpecHtml(){
     '<p>The engine&rsquo;s 22 Definition-of-Done identities (run by <code>tools/test-conv-calc.mjs</code> on every release) underpin the worked examples above. Selected derivations are reproduced here in long form; the remainder are exercised via the acceptance suite on every site ship.</p>'+
     '<p><strong>A.1 PUE basis.</strong> <code>PUE = P_facility &divide; P_IT</code>. The numerator is the SUM of metered facility consumption (UPS input + chiller plant + CRAH fans + lights/ancillaries + auxiliary). The denominator is the metered IT output (UPS output). This is the standard Green Grid definition; nothing is back-solved.</p>'+
     '<p><strong>A.2 WUE.</strong> <code>WUE = L_water &divide; kWh_IT</code>. Water consumption includes cooling-tower make-up, evaporation loss, and humidity control. Reported in litres per IT kWh.</p>'+
-    '<p><strong>A.3 Carbon intensity.</strong> <code>CUE = kg_CO2 &divide; kWh_facility</code>. Uses the grid emission factor for the site location; renewables PPAs offset against this number on a net-annual basis.</p>'+
+    '<p><strong>A.3 Carbon intensity &mdash; grid factor vs CUE.</strong> The engine carries <code>carbon_kg_per_facility_kwh = 0.42</code> &mdash; this is the GRID emission factor with a FACILITY-kWh denominator, not the standard CUE. Per ISO/IEC 30134-8, <code>CUE = kg_CO2 &divide; kWh_IT</code> (IT-kWh denominator). For this site: <code>CUE_IT = grid_factor &times; PUE = 0.42 &times; '+pue.toFixed(2)+' = '+(s.environment.carbon_kg_per_facility_kwh*pue).toFixed(2)+' kgCO&#8322;/kWh IT</code>. Both numbers are valid; only their denominators differ. The UI uses the &ldquo;Grid factor&rdquo; label for 0.42 and a separate &ldquo;CUE_IT&rdquo; tile for the IT-basis. Renewables PPAs offset against the grid factor on a net-annual basis.</p>'+
     '<p><strong>A.4 CHW &Delta;T.</strong> <code>&Delta;T = CHWR &minus; CHWS</code>. Selected by chiller-plant design intent; typically 5&ndash;7 K for an air-cooled DC. Larger &Delta;T reduces pump energy at fixed cooling load but tightens cold-aisle setpoint.</p>'+
     '<p><strong>A.5 UPS losses at stated efficiency.</strong> Input power is higher than output by the inverse-efficiency factor: <code>P_in = P_out &divide; eta</code> &rarr; <code>P_loss = P_out &times; (1/eta &minus; 1)</code>. At eta = 0.96, the loss is 4.17 % of IT load.</p>'+
     '<p><strong>A.6 Heat-rejection sizing.</strong> The chiller must reject IT heat PLUS UPS losses (since UPS losses are dissipated in the UPS room which is air-conditioned). Hence <code>Q_heatRej = IT + UPS_loss</code>. The 1,850&ndash;1,950 kW cooling band in doc-09 is sized from this sum.</p>'+
     '<p><strong>A.7 CHW flow.</strong> From <code>Q = m_dot &times; cp &times; &Delta;T</code> and <code>m_dot = rho &times; V_dot</code>, solving for L/s: <code>V_dot = Q &divide; (cp &times; &Delta;T)</code> (water cp = 4.186 kJ/(kg&middot;K), rho = 1 kg/L). At Q = IT load (canonical doc-09 substitution) and &Delta;T = 7.6 K, V = 58.1 L/s for 1,850 kW IT.</p>'+
     '<p><strong>A.8 Fuel autonomy.</strong> <code>V_usable = V_tank &times; f_usable &times; (level / 100)</code> then <code>autonomy = V_usable &divide; LPH</code>. The 90 % usable fraction accounts for the pump-suction reserve below which the lift pump loses prime.</p>'+
-    '<p><strong>A.9 Carbon intensity (CUE).</strong> Reported kg/hr from <code>facility_kW &times; grid_factor</code>. Annualised: &times; 8,760 hr/yr. Site emission factor comes from the regional grid operator and changes year over year as the grid decarbonises.</p>'+
+    '<p><strong>A.9 Carbon emissions &mdash; instant + annualised.</strong> Reported kg/hr from <code>facility_kW &times; grid_factor</code>; annualised: &times; 8,760 hr/yr. The grid factor used here ('+cue.toFixed(2)+' kgCO&#8322;/kWh facility) comes from the regional grid operator and shifts year over year as the grid decarbonises. For ISO/IEC 30134-8 CUE, see A.3.</p>'+
     '<p><strong>A.10 EPMS metering tolerance.</strong> Real-world meter accuracy is &plusmn; 1&ndash;2 % per IEC 62053. The engine carries a &plusmn; '+s.electrical.metering_tolerance_pct+' % tolerance so the dashboard does not flag every legitimate measurement drift as an EPMS-vs-engine mismatch.</p>'+
     '</section>';
 
