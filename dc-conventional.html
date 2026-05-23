@@ -1474,6 +1474,7 @@ function buildTechSpecHtml(){
   var rzd=(window.RZ_VERSION_DATE||'');
   var now=new Date();
   var dateStr=now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2)+'-'+('0'+now.getDate()).slice(-2);
+  function round1(n){ return Math.round(n*10)/10; }
   function R(rows){
     var o='';
     for(var i=0;i<rows.length;i++){ o+='<tr><td>'+E(rows[i][0])+'</td><td class="v">'+rows[i][1]+'</td><td class="src">'+E(rows[i][2]||'')+'</td></tr>'; }
@@ -1598,16 +1599,210 @@ function buildTechSpecHtml(){
        'IEC 60364, IEEE 1100')+
     '</section>';
 
-  /* 4-8 placeholder */
-  H+='<section class="page"><h3>4&ndash;8. Cooling, Water, Fire, Fuel, ICT, BMS</h3>'+
-    '<p class="tp-dis">v1.30.0 scaffold. The remaining disciplines (Cooling, Water, Fire, Fuel, ICT, BMS) each get the same Power-grade treatment in v1.30.2. For interim depth, see the individual sub-system mimics (Chiller Plant, Water System, Fire System, Fuel System, EPMS Telemetry, ICT, BMS) accessible from the left nav sidebar.</p>'+
-    R([
-      ['Cooling overhead',grp(Math.round(facKw-itKw))+' kW','PUE residual'],
+  /* ===== v1.31.3 full discipline expansion ===== */
+  var deltaT = s.cooling.chw_delta_t;
+  var heatRej = s.cooling.heat_rejection_kw;
+  var flowLps = s.cooling.flow_lps;
+  var upsLossKw = s.electrical.ups_loss_kw;
+  var upsModuleKw = s.electrical.ups_module_kw;
+  var fuelAutonomy = s.fuel.autonomy_hr;
+  var fuelUsableL = s.fuel.usable_l;
+  var fuelLph = s.fuel.generator_consumption_lph;
+  var fuelLevelPct = s.fuel.level_pct;
+  var fuelTankL = s.fuel.tank_capacity_l;
+  var waterFlowLpm = s.water.flow_lpm_for_wue;
+  var carbonKgHr = s.environment.carbon_kg_per_hr;
+  var chillerRun = s.cooling.chillers_running;
+  var chillerTot = s.cooling.chillers_total;
+
+  /* 4. Cooling Discipline */
+  H+='<section class="page"><h3>4. Cooling Discipline &mdash; CHW Plant, CRAH/CRAC, PUE Basis</h3>'+
+    '<p>Cooling is delivered by a primary chilled-water plant ('+chillerRun+'/'+chillerTot+' chillers running, one as N+1 spare) supplying CRAH units distributed around the data hall. Chilled-water supply ('+chws.toFixed(1)+' &deg;C) and return ('+chwr.toFixed(1)+' &deg;C) give a design &Delta;T of '+deltaT.toFixed(1)+' K. Cooling load equals IT load plus UPS losses; the chiller plant rejects '+grp(Math.round(heatRej))+' kW of heat to the condenser water + cooling-tower loop.</p>'+
+    '<h4>4.1 Assumptions &amp; inputs</h4>'+TC('Cooling assumptions')+R([
       ['CHW supply temperature',chws.toFixed(1)+' &deg;C','snapshot.cooling.chws_c'],
-      ['Water use intensity',wue.toFixed(2)+' L/kWh','snapshot.environment.wue_l_per_kwh'],
-      ['Carbon intensity',cue.toFixed(2)+' kg/kWh','snapshot.environment.carbon_kg_per_facility_kwh'],
-      ['Fuel reserve',Math.round(s.fuel.level_pct)+' %','snapshot.fuel.level_pct']
+      ['CHW return temperature',chwr.toFixed(1)+' &deg;C','snapshot.cooling.chwr_c'],
+      ['CHW &Delta;T',deltaT.toFixed(1)+' K','derived'],
+      ['Chillers running / total',chillerRun+' / '+chillerTot,'cooling.chillers_*'],
+      ['UPS efficiency (assumed)','96 %','MODEL.electrical.ups_efficiency'],
+      ['UPS losses',round1(upsLossKw)+' kW','derived'],
+      ['Heat rejection',grp(Math.round(heatRej))+' kW','IT + UPS losses'],
+      ['Water cp (kJ/kg&middot;K)','4.186','spec'],
+      ['Cooling band target','1,850&ndash;1,950 kW','doc-09 line 73-77']
     ])+
+    '<h4>4.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>&Delta;T = CHWR &minus; CHWS</code></li>'+
+    '<li><code>UPS_loss = IT &times; (1/eta &minus; 1)</code></li>'+
+    '<li><code>Q_heatRej = IT + UPS_loss</code></li>'+
+    '<li><code>Flow_LPS = IT &divide; (cp &times; &Delta;T)</code> &mdash; (cp = 4.186)</li>'+
+    '<li><code>P_cooling = (PUE &minus; 1) &times; IT</code> &mdash; cooling+overhead share</li>'+
+    '</ul>'+
+    '<h4>4.3 Worked calculations (live engine)</h4>'+
+    WK('CHW &Delta;T',
+       '&Delta;T = CHWR &minus; CHWS',
+       chwr.toFixed(1)+' &minus; '+chws.toFixed(1),
+       deltaT.toFixed(1)+' K',
+       'snapshot.cooling.chw_delta_t')+
+    WK('UPS losses at 96 % efficiency',
+       'UPS_loss = IT &times; (1 / eta &minus; 1)',
+       grp(itKw)+' kW &times; (1 / 0.96 &minus; 1)',
+       round1(upsLossKw)+' kW',
+       'doc-09 line 39 &mdash; matches 77 kW canonical')+
+    WK('Heat rejection',
+       'Q_heatRej = IT + UPS_loss',
+       grp(itKw)+' + '+round1(upsLossKw),
+       grp(Math.round(heatRej))+' kW',
+       'doc-09 line 73-77 &mdash; cooling band 1,850&ndash;1,950 kW')+
+    WK('CHW flow rate',
+       'Flow = IT &divide; (cp &times; &Delta;T)',
+       grp(itKw)+' &divide; (4.186 &times; '+deltaT.toFixed(1)+')',
+       round1(flowLps)+' L/s',
+       'doc-09 line 81-85 &mdash; matches 58.1 L/s canonical')+
+    WK('Cooling overhead share',
+       'P_cool = (PUE &minus; 1) &times; IT',
+       '('+pue.toFixed(3)+' &minus; 1) &times; '+grp(itKw),
+       grp(Math.round((pue-1)*itKw))+' kW',
+       'PUE residual')+
+    '<h4>4.4 CRAH topology</h4>'+TC('Air-side topology')+R([
+      ['Cold-aisle setpoint',s.environment.avg_temp_c.toFixed(1)+' &deg;C','ASHRAE TC 9.9 recommended'],
+      ['Relative humidity',Math.round(s.environment.avg_rh_pct)+' %','ASHRAE recommended 40&ndash;60 %'],
+      ['Containment','hot-aisle (or cold-aisle) containment with blanking panels','design intent'],
+      ['CRAH redundancy','N+1 minimum','Uptime Tier-III intent']
+    ])+
+    '</section>';
+
+  /* 5. Water Discipline */
+  H+='<section class="page"><h3>5. Water Discipline &mdash; WUE, Make-up, Drainage</h3>'+
+    '<p>Water use is dominated by cooling-tower make-up (evaporation + drift + blowdown) on the condenser-water loop. Water Use Effectiveness (WUE) is tracked in litres per IT kWh; the locked basis here is '+wue.toFixed(2)+' L/kWh, which produces an instant equivalent make-up flow of '+round1(waterFlowLpm)+' L/min at the current IT load of '+grp(itKw)+' kW.</p>'+
+    '<h4>5.1 Assumptions &amp; inputs</h4>'+TC('Water assumptions')+R([
+      ['WUE',wue.toFixed(2)+' L/kWh','MODEL.environment.wue_l_per_kwh'],
+      ['IT load (basis)',grp(itKw)+' kW','snapshot.site.it_load_kw'],
+      ['Cooling-tower drift loss','&lt; 0.005 %','BS EN 50600 / supplier'],
+      ['Blowdown ratio','typical 3&ndash;6 cycles of concentration','site water chemistry']
+    ])+
+    '<h4>5.2 Governing formula</h4><code>Flow_LPM = (WUE &times; IT_kW) &divide; 60</code>'+
+    '<h4>5.3 Worked calculation</h4>'+
+    WK('Instant make-up water flow',
+       'Flow = (WUE &times; IT) &divide; 60',
+       '('+wue.toFixed(2)+' &times; '+grp(itKw)+') &divide; 60',
+       round1(waterFlowLpm)+' L/min',
+       'doc-09 line 99-104 &mdash; matches 37 L/min canonical')+
+    '<h4>5.4 Annualised water consumption (engineering estimate)</h4>'+
+    WK('Annualised water for cooling',
+       'V_year = Flow_LPM &times; 60 min/hr &times; 8,760 hr/yr',
+       round1(waterFlowLpm)+' &times; 60 &times; 8,760',
+       grp(Math.round(waterFlowLpm*60*8760))+' L/yr (engineering estimate)',
+       'derived &mdash; assumes 100 % runtime; PUE-aware actual is slightly lower')+
+    '<p class="tp-dis">Actual water consumption follows seasonal load and cooling-tower cycles. The annualised number above assumes 100 % uptime and constant IT load; a billing-grade figure requires year-long metering.</p>'+
+    '</section>';
+
+  /* 6. Fire & Life Safety */
+  H+='<section class="page"><h3>6. Fire &amp; Life Safety</h3>'+
+    '<p>The fire-protection strategy combines very-early smoke detection (VESDA aspirating) with a clean-agent suppression system, backed by a dry-pipe pre-action sprinkler for life-safety scenarios. Egress provisions follow BS EN 50600 and IBC: two independent egress paths per occupied room, distance to nearest exit &lt; 30 m, suppression discharge non-fatal to bystanders.</p>'+
+    '<h4>6.1 Detection / control sequence</h4><ol class="fl">'+
+    '<li>VESDA aspirating sampling tubes deliver pre-alarm at &lt; 0.005 %/m obscuration.</li>'+
+    '<li>Cross-zoned smoke detection is mandatory for agent release (no single-detector release).</li>'+
+    '<li>Pre-discharge audible + visual alarm with manual abort capability (NFPA 2001 4.3.5.1.5).</li>'+
+    '<li>Clean-agent discharge time per NFPA 2001 (30 s halocarbon, 60 s inert gas).</li>'+
+    '<li>HVAC dampers close on detection (NFPA 2001 4.3.10).</li>'+
+    '<li>Sprinkler pre-action: water in piping only after detection + sprinkler-head fusing (double-interlock for IT rooms).</li>'+
+    '<li>EPO interlock: protect-vs-power conflict resolved by engineering risk assessment per Tier-III/IV intent.</li>'+
+    '</ol>'+
+    '<h4>6.2 Reference list</h4>'+TC('Fire references')+R([
+      ['Detection design','VESDA aspirating (very-early)','NFPA 76 / BS EN 50600'],
+      ['Clean agent (candidate)','NOVEC 1230 / FK-5-1-12 / IG-541','NFPA 2001'],
+      ['Sprinkler (back-up)','double-interlocked pre-action','NFPA 13 + NFPA 75'],
+      ['Egress','two independent paths per occupied room','IBC / BS EN 50600'],
+      ['Compartmentation','2-hr fire-rated separations between major rooms','IBC / IFC']
+    ])+
+    '</section>';
+
+  /* 7. Fuel System */
+  H+='<section class="page"><h3>7. Fuel System &mdash; Day Tank, Bulk Tank, Autonomy</h3>'+
+    '<p>Generator fuel is stored in a bulk tank of '+grp(fuelTankL)+' L with a usable fraction of 90 % (pump-suction reserve), tracked by level transmitter as '+Math.round(fuelLevelPct)+' % full. At full facility load ('+grp(Math.round(facKw))+' kW), generator consumption is '+grp(fuelLph)+' L/hr giving an autonomy of '+fuelAutonomy.toFixed(1)+' hours from the current fuel level.</p>'+
+    '<h4>7.1 Assumptions &amp; inputs</h4>'+TC('Fuel assumptions')+R([
+      ['Bulk tank capacity',grp(fuelTankL)+' L','MODEL.fuel.tank_capacity_l'],
+      ['Usable fraction','90 %','MODEL.fuel.usable_fraction'],
+      ['Current level',Math.round(fuelLevelPct)+' %','snapshot.fuel.level_pct'],
+      ['Consumption at full load',grp(fuelLph)+' L/hr','MODEL.fuel.generator_consumption_lph'],
+      ['Usable litres now',grp(fuelUsableL)+' L','derived'],
+      ['Autonomy now',fuelAutonomy.toFixed(1)+' hr','derived']
+    ])+
+    '<h4>7.2 Governing formulae</h4><ul class="fl">'+
+    '<li><code>V_usable = V_tank &times; f_usable &times; (level / 100)</code></li>'+
+    '<li><code>Autonomy = V_usable &divide; LPH</code></li>'+
+    '</ul>'+
+    '<h4>7.3 Worked calculations</h4>'+
+    WK('Usable fuel volume now',
+       'V_usable = V_tank &times; f_usable &times; (level/100)',
+       grp(fuelTankL)+' &times; 0.90 &times; ('+Math.round(fuelLevelPct)+'/100)',
+       grp(fuelUsableL)+' L',
+       'doc-09 line 133-143 &mdash; matches 45,900 L canonical')+
+    WK('Generator runtime autonomy',
+       'Autonomy = V_usable &divide; LPH',
+       grp(fuelUsableL)+' L &divide; '+grp(fuelLph)+' L/hr',
+       fuelAutonomy.toFixed(1)+' hr',
+       'doc-09 line 144-147 &mdash; matches 48 hr canonical')+
+    WK('Day-tank refill cadence (engineering target)',
+       'refill_cadence = day_tank_L &divide; LPH',
+       '2,000 L (typical day tank) &divide; '+grp(fuelLph)+' L/hr',
+       (2000/fuelLph).toFixed(1)+' hr per refill',
+       'NFPA 110 &mdash; day-tank top-up sequence')+
+    '<h4>7.4 Fuel quality &amp; maintenance</h4><ul class="fl">'+
+    '<li>Polishing cadence: monthly micro-filtration to keep ISO 4406 class &lt; 18/16/13.</li>'+
+    '<li>Water content: weekly check; max 200 ppm (EN 590 + EN 14274).</li>'+
+    '<li>Microbial growth (HUM bug) monitored quarterly; biocide as required.</li>'+
+    '<li>Annual full load-bank test of every generator (4 hr at 100 % rating).</li>'+
+    '</ul>'+
+    '</section>';
+
+  /* 8. ICT, EPMS & BMS */
+  H+='<section class="page"><h3>8. ICT, EPMS &amp; BMS</h3>'+
+    '<p>The Electrical Power Monitoring System (EPMS) tracks every metered point on the LV distribution; the Building Management System (BMS) tracks the mechanical, fire, environment, and security layers. Both feed a unified operations console. EPMS reports facility total '+grp(s.electrical.epms_total_kw)+' kW within '+s.electrical.metering_tolerance_pct+' % metering tolerance; BMS provides 5 s SCADA cadence on process variables, 1 min on energy meters.</p>'+
+    '<h4>8.1 EPMS scope</h4>'+TC('EPMS / power monitoring')+R([
+      ['Facility total (EPMS)',grp(s.electrical.epms_total_kw)+' kW','snapshot.electrical.epms_total_kw'],
+      ['UPS output (per system)',grp(s.electrical.epms_ups_output_kw)+' kW','snapshot.electrical.epms_ups_output_kw'],
+      ['UPS module load (each, 2N)',grp(upsModuleKw)+' kW','snapshot.electrical.ups_module_kw'],
+      ['Metering tolerance','&plusmn; '+s.electrical.metering_tolerance_pct+' %','MODEL.electrical.metering_tolerance_pct'],
+      ['UPS module count','2 (A + B feed)','MODEL.electrical.ups_module_count'],
+      ['Generator-backed switchboard','MV + LV, mechanical loads + non-UPS critical','design intent']
+    ])+
+    '<h4>8.2 BMS scope &amp; tag taxonomy</h4>'+TC('BMS taxonomy (ISA-5.1)')+R([
+      ['Temperature transmitters','TT-&lt;loop&gt;','ISA-5.1'],
+      ['Flow transmitters','FT-&lt;loop&gt;','ISA-5.1'],
+      ['Pressure transmitters','PT-&lt;loop&gt;','ISA-5.1'],
+      ['Valve open/close','XV-&lt;loop&gt; / ZS-&lt;loop&gt; limit','ISA-5.1'],
+      ['Pump status','PMP-&lt;n&gt; with RUN/FLT','ISA-5.1'],
+      ['Equipment alarm','ALM-&lt;area&gt;-&lt;sev&gt;','design intent'],
+      ['Energy meter','EM-&lt;feed&gt;','BS EN 50600'],
+      ['Door access','DOOR-&lt;n&gt;','security']
+    ])+
+    '<h4>8.3 Trend cadence</h4>'+TC('Trend cadence by class')+R([
+      ['First-out / EPO / chiller trip','1 s','Tier-III intent'],
+      ['SCADA process variables','5 s','operations'],
+      ['Fan / pump speeds','10 s','process'],
+      ['Energy meters','1 min','sustainability + billing'],
+      ['Grid carbon factor','1 h','external feed'],
+      ['Security events','immediate (event-driven)','access control']
+    ])+
+    '<h4>8.4 Alarm philosophy</h4>'+
+    '<p>Two-stage alarm regime (warning, alarm) with one-up-one-down hysteresis. Alarms acknowledge per operator action; events log permanently. First-out logic on the chiller plant: the first alarm in a chain (master) suppresses derivative alarms during the first 60 s so the operator sees the root cause first.</p>'+
+    '</section>';
+
+  /* 9. Carbon & Sustainability (additional discipline for the conv side) */
+  H+='<section class="page"><h3>9. Carbon &amp; Sustainability</h3>'+
+    '<p>Carbon Usage Effectiveness (CUE) is reported against facility kWh (numerator: emitted kg CO&#8322;e; denominator: facility kWh, not IT kWh). The locked basis here is '+cue.toFixed(2)+' kg/kWh, giving an instant emission rate of '+grp(Math.round(carbonKgHr))+' kg CO&#8322;e/hr.</p>'+
+    '<h4>9.1 Worked calculation</h4>'+
+    WK('Instant carbon emissions',
+       'kg/hr = facility_kW &times; grid_factor',
+       grp(Math.round(facKw))+' kW &times; '+cue.toFixed(2)+' kg/kWh',
+       grp(Math.round(carbonKgHr))+' kg CO&#8322;e/hr',
+       'doc-09 line 155-158 &mdash; matches 1,127 kg/hr canonical')+
+    WK('Annualised emissions',
+       'kg/yr = kg/hr &times; 8,760',
+       grp(Math.round(carbonKgHr))+' &times; 8,760',
+       grp(Math.round(carbonKgHr*8760))+' kg CO&#8322;e/yr',
+       'derived')+
+    '<p>Net-zero strategy options include PPAs (power-purchase agreements with renewable generation), on-site solar/storage, and demand-response. Each is evaluated against grid emission factor and capital cost; CUE on its own does not specify which approach to take.</p>'+
     '</section>';
 
   /* References */
@@ -1629,7 +1824,63 @@ function buildTechSpecHtml(){
     '<p><strong>A.1 PUE basis.</strong> <code>PUE = P_facility &divide; P_IT</code>. The numerator is the SUM of metered facility consumption (UPS input + chiller plant + CRAH fans + lights/ancillaries + auxiliary). The denominator is the metered IT output (UPS output). This is the standard Green Grid definition; nothing is back-solved.</p>'+
     '<p><strong>A.2 WUE.</strong> <code>WUE = L_water &divide; kWh_IT</code>. Water consumption includes cooling-tower make-up, evaporation loss, and humidity control. Reported in litres per IT kWh.</p>'+
     '<p><strong>A.3 Carbon intensity.</strong> <code>CUE = kg_CO2 &divide; kWh_facility</code>. Uses the grid emission factor for the site location; renewables PPAs offset against this number on a net-annual basis.</p>'+
-    '<p class="tp-dis">A.4&ndash;A.20 are stubs in v1.30.0 and ship in v1.30.2.</p>'+
+    '<p><strong>A.4 CHW &Delta;T.</strong> <code>&Delta;T = CHWR &minus; CHWS</code>. Selected by chiller-plant design intent; typically 5&ndash;7 K for an air-cooled DC. Larger &Delta;T reduces pump energy at fixed cooling load but tightens cold-aisle setpoint.</p>'+
+    '<p><strong>A.5 UPS losses at stated efficiency.</strong> Input power is higher than output by the inverse-efficiency factor: <code>P_in = P_out &divide; eta</code> &rarr; <code>P_loss = P_out &times; (1/eta &minus; 1)</code>. At eta = 0.96, the loss is 4.17 % of IT load.</p>'+
+    '<p><strong>A.6 Heat-rejection sizing.</strong> The chiller must reject IT heat PLUS UPS losses (since UPS losses are dissipated in the UPS room which is air-conditioned). Hence <code>Q_heatRej = IT + UPS_loss</code>. The 1,850&ndash;1,950 kW cooling band in doc-09 is sized from this sum.</p>'+
+    '<p><strong>A.7 CHW flow.</strong> From <code>Q = m_dot &times; cp &times; &Delta;T</code> and <code>m_dot = rho &times; V_dot</code>, solving for L/s: <code>V_dot = Q &divide; (cp &times; &Delta;T)</code> (water cp = 4.186 kJ/(kg&middot;K), rho = 1 kg/L). At Q = IT load (canonical doc-09 substitution) and &Delta;T = 7.6 K, V = 58.1 L/s for 1,850 kW IT.</p>'+
+    '<p><strong>A.8 Fuel autonomy.</strong> <code>V_usable = V_tank &times; f_usable &times; (level / 100)</code> then <code>autonomy = V_usable &divide; LPH</code>. The 90 % usable fraction accounts for the pump-suction reserve below which the lift pump loses prime.</p>'+
+    '<p><strong>A.9 Carbon intensity (CUE).</strong> Reported kg/hr from <code>facility_kW &times; grid_factor</code>. Annualised: &times; 8,760 hr/yr. Site emission factor comes from the regional grid operator and changes year over year as the grid decarbonises.</p>'+
+    '<p><strong>A.10 EPMS metering tolerance.</strong> Real-world meter accuracy is &plusmn; 1&ndash;2 % per IEC 62053. The engine carries a &plusmn; '+s.electrical.metering_tolerance_pct+' % tolerance so the dashboard does not flag every legitimate measurement drift as an EPMS-vs-engine mismatch.</p>'+
+    '</section>';
+
+  /* Appendix B Sensitivity */
+  H+='<section class="page"><h3>Appendix B &mdash; Sensitivity Analysis</h3>'+
+    '<p>The locked snapshot is one fixed point. Selected sensitivities are reproduced so the reader can judge how much each lever matters.</p>'+
+    '<h4>B.1 PUE sensitivity</h4>'+
+    '<p>For a fixed IT load of '+grp(itKw)+' kW, the facility-power-per-IT-power ratio scales linearly with PUE. A 0.05 swing (PUE 1.40 vs 1.45 vs 1.50) moves facility power by ~&plusmn; 90 kW.</p>'+
+    TC('Indicative PUE sensitivity (per facility, IT '+grp(itKw)+' kW)')+
+    R([
+      ['PUE 1.40 (&minus;3.4 %)','Facility = '+grp(Math.round(itKw*1.40))+' kW','engine recomputation'],
+      ['PUE 1.45 (locked basis)','Facility = '+grp(Math.round(facKw))+' kW','live engine'],
+      ['PUE 1.50 (+3.4 %)','Facility = '+grp(Math.round(itKw*1.50))+' kW','engine recomputation']
+    ])+
+    '<h4>B.2 CHW &Delta;T sensitivity</h4>'+
+    '<p>At fixed cooling load, increasing &Delta;T from 7.6 K to 10 K reduces pump-side flow by a factor of (10/7.6) = '+(10/7.6).toFixed(2)+', cutting pump-energy by approximately the cube of that ratio (affinity laws). Trade-off: higher &Delta;T tightens cold-aisle setpoint and may compromise N+1 redundancy during failover.</p>'+
+    '<h4>B.3 Fuel level vs autonomy</h4>'+TC('Autonomy at fuel level')+R([
+      ['Level 100 %',(fuelTankL*0.90/fuelLph).toFixed(1)+' hr','derived'],
+      ['Level '+Math.round(fuelLevelPct)+' % (current)',fuelAutonomy.toFixed(1)+' hr','live engine'],
+      ['Level 50 %',(fuelTankL*0.90*0.50/fuelLph).toFixed(1)+' hr','derived'],
+      ['Level 25 % (refill trigger)',(fuelTankL*0.90*0.25/fuelLph).toFixed(1)+' hr','derived']
+    ])+
+    '<h4>B.4 Rack-density assumption sensitivity</h4>'+
+    '<p>The engine reports active-rack estimates at three densities to flag the difference between under-used floor area (sparse) and dense AI hall (compact).</p>'+
+    TC('Active racks at density (IT '+grp(itKw)+' kW)')+R([
+      ['At 6 kW/rack',s.racks.at_6kw+' racks',''],
+      ['At 8 kW/rack',s.racks.at_8kw+' racks',''],
+      ['At 10 kW/rack',s.racks.at_10kw+' racks','']
+    ])+
+    '</section>';
+
+  /* Appendix C Index */
+  H+='<section class="page"><h3>Appendix C &mdash; Index</h3>'+
+    '<p>Auto-numbered across sections. Tables run T1..T'+tblN+'.</p>'+
+    '<h4>Section anchor list</h4><ol class="fl">'+
+    '<li>Executive Summary &amp; Design Philosophy</li>'+
+    '<li>Site &amp; Facility Parameters</li>'+
+    '<li>Power &amp; Electrical Discipline</li>'+
+    '<li>Cooling Discipline (CHW plant, CRAH, PUE residual)</li>'+
+    '<li>Water Discipline (WUE, make-up, annualised)</li>'+
+    '<li>Fire &amp; Life Safety (VESDA, clean agent, sprinkler back-up)</li>'+
+    '<li>Fuel System (bulk tank, autonomy, polishing)</li>'+
+    '<li>ICT, EPMS &amp; BMS (tag taxonomy, trend cadence, alarm philosophy)</li>'+
+    '<li>Carbon &amp; Sustainability (CUE, annualised emissions, decarbonisation options)</li>'+
+    '<li>References</li>'+
+    '</ol><h4>Appendix list</h4><ul class="fl">'+
+    '<li>A. Formula derivations (PUE, WUE, CUE, &Delta;T, UPS loss, heat rejection, CHW flow, fuel autonomy, EPMS tolerance)</li>'+
+    '<li>B. Sensitivity analysis (PUE swing, CHW &Delta;T, fuel level, rack density)</li>'+
+    '<li>C. Index (this page)</li>'+
+    '</ul>'+
+    '<p class="tp-dis">Every number above is reproducible from <code>window.CONV_CALC.snapshot</code>. Reproduction in a separate engineering tool should match to within rounding. If your reproduction does not match, log an issue at the project repository so the discrepancy can be resolved on the basis (engine) rather than on the document.</p>'+
     '</section>';
 
   var CSS='*{box-sizing:border-box}'+

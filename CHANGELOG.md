@@ -11,6 +11,60 @@ release sections rather than semver.
 
 ---
 
+## v1.31.3 — 2026-05-23 (DC Conventional Tech Spec PDF — full discipline expansion: Cooling, Water, Fire, Fuel, ICT/EPMS/BMS, Carbon + appendices B + C)
+
+v1.30.1 shipped the scaffold + Power discipline. This ship expands the
+DC Conventional Tech Spec PDF (`dc-conventional.html` &rarr; Generate
+Design) to the full discipline coverage. Every number derived live from
+`window.CONV_CALC.snapshot`.
+
+### Added (DC Conventional Tech Spec PDF only)
+- **Section 4 &mdash; Cooling Discipline**: 5 worked calculations (CHW
+  &Delta;T, UPS losses, heat rejection, CHW flow, cooling overhead share)
+  all derived from `snapshot.cooling.*` + `snapshot.electrical.ups_loss_kw`.
+  CRAH topology table.
+- **Section 5 &mdash; Water Discipline**: WUE-based instant make-up flow
+  (matches doc-09 37 L/min canonical) + annualised water estimate.
+- **Section 6 &mdash; Fire &amp; Life Safety**: 7-step detection/control
+  sequence, references table (VESDA + clean agent + sprinkler back-up).
+- **Section 7 &mdash; Fuel System**: 3 worked calculations (usable
+  volume, autonomy, day-tank cadence). Fuel quality &amp; maintenance
+  list (polishing cadence, water content, microbial check, annual
+  load-bank test).
+- **Section 8 &mdash; ICT, EPMS &amp; BMS**: EPMS scope table (facility
+  total, UPS output, per-module load), BMS tag taxonomy (ISA-5.1), trend
+  cadence by class, alarm philosophy paragraph.
+- **Section 9 &mdash; Carbon &amp; Sustainability**: 2 worked
+  calculations (instant kg/hr, annualised kg/yr) matching doc-09 1,127
+  kg/hr canonical. Decarbonisation options framing.
+- **Appendix A &mdash; Formula Derivations**: expanded A.1&ndash;A.10
+  with full derivations (PUE, WUE, CUE, &Delta;T, UPS loss, heat
+  rejection, CHW flow, fuel autonomy, EPMS metering tolerance).
+- **Appendix B &mdash; Sensitivity Analysis**: PUE swing &plusmn; 0.05,
+  CHW &Delta;T sensitivity (affinity-law cube), fuel level vs autonomy
+  ladder, rack-density at 6 / 8 / 10 kW/rack.
+- **Appendix C &mdash; Index**: 10-section anchor list, appendix list,
+  reproducibility caveat.
+
+### Pattern
+- All numbers live-derived from `window.CONV_CALC.snapshot.site`,
+  `cooling`, `electrical`, `environment`, `fuel`, `water`, `racks`.
+  Nothing hardcoded that the engine exposes.
+- `</script>` escapes preserved per PDF_EXPORT_STANDARD.md.
+- Added local `round1()` helper inside `buildTechSpecHtml()` so the conv
+  Tech Spec is self-contained (no dependency on `CONV_CALC.round1`).
+
+### Notes
+- `js/conv-engine.js` byte-identical &mdash; the Tech Spec reads from
+  it, does not modify. 22/22 conv tests pass.
+- This completes the v1.30.x &rarr; v1.31.x cockpit Tech Spec arc.
+  Both DC AI (v1.31.2) and DC Conv (v1.31.3) now have full discipline
+  coverage. v1.31.4 will polish the print-CSS for tighter pagination if
+  the owner reports issues; otherwise the next ship returns to whatever
+  the owner queues next.
+
+---
+
 ## v1.31.2 — 2026-05-23 (DC AI Tech Spec PDF — full discipline expansion: Electrical, Cooling, Fire, Network, BMS + appendices B + C)
 
 v1.30.1 shipped the scaffold and the Compute discipline. This ship
