@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 138 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 139 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,18 +73,18 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 138,
+        "numberOfItems": 139,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.32.7 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.7"},
         {"@type":"ListItem","position":2,"name":"v1.32.5 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.5"},
-        {"@type":"ListItem","position":3,"name":"v1.32.8 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.8"},
-        {"@type":"ListItem","position":4,"name":"v1.32.6 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.6"},
-        {"@type":"ListItem","position":5,"name":"v1.32.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.1"},
-        {"@type":"ListItem","position":6,"name":"v1.32.0 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.32.0"},
-        {"@type":"ListItem","position":7,"name":"v1.31.4 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.4"},
-        {"@type":"ListItem","position":8,"name":"v1.31.3 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.3"},
-        {"@type":"ListItem","position":9,"name":"v1.31.2 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.2"},
-        {"@type":"ListItem","position":10,"name":"v1.31.1 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.1"}
+        {"@type":"ListItem","position":3,"name":"v1.32.9 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.9"},
+        {"@type":"ListItem","position":4,"name":"v1.32.8 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.8"},
+        {"@type":"ListItem","position":5,"name":"v1.32.6 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.6"},
+        {"@type":"ListItem","position":6,"name":"v1.32.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.1"},
+        {"@type":"ListItem","position":7,"name":"v1.32.0 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.32.0"},
+        {"@type":"ListItem","position":8,"name":"v1.31.4 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.4"},
+        {"@type":"ListItem","position":9,"name":"v1.31.3 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.3"},
+        {"@type":"ListItem","position":10,"name":"v1.31.2 — 2026-05-23","url":"https://resistancezero.com/changelog.html#v1.31.2"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.32.7</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">138 releases</span>
+        <span class="cl-count-badge">139 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -802,6 +802,96 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.32.9">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.32.9</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-24">May 24, 2026</time>
+      </div>
+      <p class="changelog-caption">Accuracy Puppeteer probes — 15 reviewer acceptance tests codified</p>
+      <div class="changelog-body">
+        <p>Phase 4 / final piece of the team-review accuracy work. The reviewer's</p>
+<p>7 DC AI + 8 DC Conv acceptance tests from</p>
+<p><code>Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md</code></p>
+<ul>
+  <li><code>.../conv/review/16-accuracy-validation-and-correction-list.md</code> are</li>
+</ul>
+<p>now codified as a runnable probe:</p>
+<p><code>tools/probe-accuracy-validation.mjs</code>.</p>
+<h3 class="cl-subhead">Added</h3>
+<ul>
+  <li><strong><code>tools/probe-accuracy-validation.mjs</code></strong> — headless Chrome</li>
+</ul>
+<p>(Puppeteer) probe. Runtime ~25–35 s. Exit code 0 = PASS, 1 = FAIL.</p>
+<p>Two modes:</p>
+<ul>
+  <li class="cl-sub-item">HTTP (recommended): <code>python3 -m http.server 8081 &amp;</code> then</li>
+</ul>
+<p><code>node tools/probe-accuracy-validation.mjs</code>.</p>
+<ul>
+  <li class="cl-sub-item">File (no server): <code>RZ_BASE=file node tools/probe-accuracy-validation.mjs</code>.</li>
+</ul>
+<h3 class="cl-subhead">Covered tests</h3>
+<p><strong>DC AI</strong> (<code>datahallAI.html</code>):</p>
+<ul>
+  <li>AI-Test-1a–1f: PUE = 1.30, WUE = 0.00, CUE_IT = 0.90, IT = 14.26 MW,</li>
+</ul>
+<p>GPUs = 7,776, NVL72 = 108 domains.</p>
+<ul>
+  <li>AI-Test-2: basis KPIs identical across N reloads.</li>
+  <li>AI-Test-3a/b: terminology — no "NVL72 rack" ambiguity; "rack-pos"</li>
+</ul>
+<p>present.</p>
+<ul>
+  <li>AI-Test-4: CDU 36/48 facility.</li>
+  <li>AI-Test-5: no "5 running = 40 MW" arithmetic error.</li>
+  <li>AI-Test-6: PUE colour is NOT green (informational neutral).</li>
+  <li>AI-Test-7a–7g: basis drawer carries formula / inputs / output /</li>
+</ul>
+<p>scope / source / last-update / data-mode chip.</p>
+<p><strong>DC Conv</strong> (<code>dc-conventional.html</code>):</p>
+<ul>
+  <li>CONV-Test-1a/b: "Grid factor" label present; no bare "CUE 0.42"</li>
+</ul>
+<p>mislabel.</p>
+<ul>
+  <li>CONV-Test-2a: no "CHWS SP 18.8" without secondary-loop label.</li>
+  <li>CONV-Test-3a/b: PUE = 1.45 on dashboard + side panel.</li>
+  <li>CONV-Test-4: WUE = 1.20 L/kWh IT.</li>
+  <li>CONV-Test-5: fuel autonomy labelled "bulk-tank @ site load".</li>
+  <li>CONV-Test-6: UPS A shows normal + failover percentages.</li>
+  <li>CONV-Test-7: dashboard basis KPIs identical across N reloads.</li>
+  <li>CONV-Test-8a–8d: Grid-factor drawer shows Formula / Source /</li>
+</ul>
+<p>data-mode chip / CUE_IT relationship.</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Probe documented in <code>standarization/ACCURACY_VALIDATION.md</code></li>
+</ul>
+<p>§"Acceptance tests (CI-gateable)" with run commands.</p>
+<ul>
+  <li>ROUND_TRIPS defaults to 3 (vs reviewer's 20× spec) for fast probe</li>
+</ul>
+<p>cycle; raise via env if needed.</p>
+<ul>
+  <li>Engine files (<code>datahall-model.js</code>, <code>datahall-calculations.js</code>,</li>
+</ul>
+<p><code>conv-engine.js</code>) byte-identical. 57/57 + 22/22 tests pass.</p>
+<h3 class="cl-subhead">Status: team review (docs 26 + 16) now CLOSED</h3>
+<div class="cl-table-wrap"><table class="cl-table">
+<tr><th>Phase</th><th>Ships</th><th>What</th></tr>
+<tr><td>Phase 1</td><td>v1.32.1</td><td>8 critical bugs fixed (AI-ACC-01/02/03/05/06/07/08 + CONV-ACC-01/02/04/08)</td></tr>
+<tr><td>Phase 2</td><td>v1.32.6</td><td>Terminology + UPS 2N + CHW reconciliation (AI-ACC-04/09 + CONV-ACC-03/05)</td></tr>
+<tr><td>Phase 3</td><td>v1.32.8</td><td>Basis drawers on every top KPI (Rule 6 — display contract)</td></tr>
+<tr><td>Phase 4</td><td>v1.32.9</td><td>Puppeteer probes for all 15 acceptance tests</td></tr>
+</table></div>
+<p>All 19 reviewer findings closed; 1 standardisation doc shipped</p>
+<p>(<code>ACCURACY_VALIDATION.md</code>); BMS_SHELL.md adoption table updated;</p>
+<p>memory propagated (<code>feedback_handoff_mandate.md</code> +</p>
+<p><code>project_rz_accuracy_review_2026-05-23.md</code>).</p>
       </div>
     </article>
 

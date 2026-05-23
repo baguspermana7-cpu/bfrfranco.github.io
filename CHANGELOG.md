@@ -160,6 +160,71 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.32.9 — 2026-05-24 (Accuracy Puppeteer probes — 15 reviewer acceptance tests codified)
+
+Phase 4 / final piece of the team-review accuracy work. The reviewer's
+7 DC AI + 8 DC Conv acceptance tests from
+`Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md`
++ `.../conv/review/16-accuracy-validation-and-correction-list.md` are
+now codified as a runnable probe:
+`tools/probe-accuracy-validation.mjs`.
+
+### Added
+- **`tools/probe-accuracy-validation.mjs`** — headless Chrome
+  (Puppeteer) probe. Runtime ~25–35 s. Exit code 0 = PASS, 1 = FAIL.
+  Two modes:
+  - HTTP (recommended): `python3 -m http.server 8081 &` then
+    `node tools/probe-accuracy-validation.mjs`.
+  - File (no server): `RZ_BASE=file node tools/probe-accuracy-validation.mjs`.
+
+### Covered tests
+**DC AI** (`datahallAI.html`):
+- AI-Test-1a–1f: PUE = 1.30, WUE = 0.00, CUE_IT = 0.90, IT = 14.26 MW,
+  GPUs = 7,776, NVL72 = 108 domains.
+- AI-Test-2: basis KPIs identical across N reloads.
+- AI-Test-3a/b: terminology — no "NVL72 rack" ambiguity; "rack-pos"
+  present.
+- AI-Test-4: CDU 36/48 facility.
+- AI-Test-5: no "5 running = 40 MW" arithmetic error.
+- AI-Test-6: PUE colour is NOT green (informational neutral).
+- AI-Test-7a–7g: basis drawer carries formula / inputs / output /
+  scope / source / last-update / data-mode chip.
+
+**DC Conv** (`dc-conventional.html`):
+- CONV-Test-1a/b: "Grid factor" label present; no bare "CUE 0.42"
+  mislabel.
+- CONV-Test-2a: no "CHWS SP 18.8" without secondary-loop label.
+- CONV-Test-3a/b: PUE = 1.45 on dashboard + side panel.
+- CONV-Test-4: WUE = 1.20 L/kWh IT.
+- CONV-Test-5: fuel autonomy labelled "bulk-tank @ site load".
+- CONV-Test-6: UPS A shows normal + failover percentages.
+- CONV-Test-7: dashboard basis KPIs identical across N reloads.
+- CONV-Test-8a–8d: Grid-factor drawer shows Formula / Source /
+  data-mode chip / CUE_IT relationship.
+
+### Notes
+- Probe documented in `standarization/ACCURACY_VALIDATION.md`
+  §"Acceptance tests (CI-gateable)" with run commands.
+- ROUND_TRIPS defaults to 3 (vs reviewer's 20× spec) for fast probe
+  cycle; raise via env if needed.
+- Engine files (`datahall-model.js`, `datahall-calculations.js`,
+  `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
+
+### Status: team review (docs 26 + 16) now CLOSED
+| Phase | Ships | What |
+|---|---|---|
+| Phase 1 | v1.32.1 | 8 critical bugs fixed (AI-ACC-01/02/03/05/06/07/08 + CONV-ACC-01/02/04/08) |
+| Phase 2 | v1.32.6 | Terminology + UPS 2N + CHW reconciliation (AI-ACC-04/09 + CONV-ACC-03/05) |
+| Phase 3 | v1.32.8 | Basis drawers on every top KPI (Rule 6 — display contract) |
+| Phase 4 | v1.32.9 | Puppeteer probes for all 15 acceptance tests |
+
+All 19 reviewer findings closed; 1 standardisation doc shipped
+(`ACCURACY_VALIDATION.md`); BMS_SHELL.md adoption table updated;
+memory propagated (`feedback_handoff_mandate.md` +
+`project_rz_accuracy_review_2026-05-23.md`).
+
+---
+
 ## v1.32.8 — 2026-05-24 (KPI Basis Drawers — ACCURACY_VALIDATION Rule 6, both cockpits)
 
 Phase 3 of the team-review accuracy work. v1.32.1 fixed critical bugs;

@@ -115,7 +115,33 @@ denominator, source object, data-mode, last update.
 ## Acceptance tests (CI-gateable)
 
 These are the reviewer's acceptance tests adopted as the validation
-suite. Run as headless Puppeteer probes once v1.32.3 lands them.
+suite. **Shipped as headless Puppeteer probes in v1.32.9**:
+`tools/probe-accuracy-validation.mjs`.
+
+```bash
+# 1. Spin a local server (one-time per session):
+python3 -m http.server 8081
+
+# 2. Run the probe (~30 s, headless Chrome via Puppeteer):
+node tools/probe-accuracy-validation.mjs
+
+# OR — no server needed, slower:
+RZ_BASE=file node tools/probe-accuracy-validation.mjs
+```
+
+Exit code 0 on PASS, 1 on FAIL. The probe covers:
+
+- DC AI: tests 1a–1f (headline consistency), 2 (reload determinism),
+  3a–3b (terminology), 4 (CDU count), 5 (generator arithmetic),
+  6 (colour grammar), 7a–7g (basis drawer contract).
+- DC Conv: tests 1a–1b (carbon denominator), 2a (chiller loop label),
+  3a–3b (PUE reconciliation), 4 (WUE reconciliation), 5 (fuel
+  autonomy scope), 6 (UPS 2N normal+failover), 7 (reload
+  determinism), 8a–8d (basis drawer).
+
+Approximate runtime: 25–35 s headless. Adopt as a per-ship gate
+alongside the four audit scripts (`audit-script-tags`,
+`audit-js-syntax`, `audit-version-stamp`, `audit-mobile-responsive`).
 
 ### DC AI
 
@@ -178,5 +204,7 @@ suite. Run as headless Puppeteer probes once v1.32.3 lands them.
   source / data-mode / last-update. Closes the reviewer's "Required
   KPI Display Contract" finding. (Authored as v1.32.7; renumbered after
   parallel session's v1.32.7 Network Hub plan v2.)
-- **v1.32.9** (planned): Puppeteer probes for the acceptance tests
-  above, gated in CI.
+- **v1.32.9** (2026-05-24): Puppeteer probes SHIPPED. The 15 reviewer
+  acceptance tests across DC AI + DC Conv are now codified as runnable
+  assertions in `tools/probe-accuracy-validation.mjs`. Owner can
+  invoke per ship; future automation can wire to CI gates.
