@@ -132,13 +132,24 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
 #pidSvg{width:100%;height:auto;display:block;border:1px solid #425266;border-radius:8px;background:#121b26}
 /* v1.25.4 — pro-BMS responsive SVG. Diagram keeps design width on mobile so blocks
-   don't overlap; user pans horizontally instead of squishing. */
-@media (max-width:1024px){
+   don't overlap; user pans horizontally instead of squishing.
+   v1.29.3 — Plant Capacity / Loop Summary / Drawing Info panels live at x=1520–2280 (viewBox 2300).
+   Bump min-width so right-edge panels stop bleeding off — owner image 2 "ini pada keluar2". */
+@media (max-width:1280px){
   .pid-panel{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  #pidSvg{min-width:1200px}
+  #pidSvg{min-width:2300px}
 }
-@media (max-width:600px){
-  #pidSvg{min-width:960px}
+@media (max-width:1024px){
+  #pidSvg{min-width:2300px}
+  /* Status strip is rendered DOM, not SVG — keep it inside the pid-panel scroll
+     so the chips don't wrap into the SVG and force a second horizontal scrollbar. */
+  .status-strip{flex-wrap:wrap;align-items:flex-start;min-width:0}
+  .status-left{flex-wrap:wrap;min-width:0}
+  .status-right{justify-content:flex-start;flex-wrap:wrap}
+  .s-msg{white-space:normal;max-width:100%}
+}
+@media (max-width:760px){
+  #pidSvg{min-width:1600px}  /* compromise: half-design for thumb-pan reachability */
 }
 /* v1.25.4 owner-feedback: ISA pump triangle no longer spins.
    Green fill is the ON indicator — rotation looked like a UI bug. */

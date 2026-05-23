@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v1.29.3 — 2026-05-23 (BMS cockpit Phase 1 mobile fixes — wired datahall view-mode toolbar + chiller right-edge overflow + water-system process-flow overlap)
+
+Three small surgical mobile fixes owner asked for in this round of screenshots,
+plus prep for Phase 2 (Generate Design Tech Spec PDF + FAQ on DC AI / DC Conv,
+shipping in v1.30.0).
+
+### Fixed
+- **datahall.html view-mode toolbar now drives the rack heatmap.** Owner image 1:
+  "Toggle atau pilihan apa ini yg saya lingkari nggak tahu fungsinya di pencet2
+  g ada fungsi." The 5-button top toolbar (POWER / TEMPERATURE / COOLING MARGIN
+  / SPACE / ALARMS) was a visual scaffold in v1.24.1 — only `body[data-dh-mode]`
+  was set, no render path. Now: radio-style toggle delegates to the existing
+  `window.setMode()`, paints the rack floor, syncs the centre `.mode-bar`
+  buttons. A new `cooling-margin` mode tints racks by ASHRAE A1 27 °C high
+  margin (>5°C green / 3–5 muted green / 1–3 amber / <1 deep amber / over =
+  red). Legend updates per-mode.
+- **chiller-plant.html right-edge panels stop bleeding off mobile viewport.**
+  Owner image 2: "Ini pada keluar2." Plant Capacity / Loop Summary / Drawing
+  Info panels live at x=1520–2280 in viewBox 2300. v1.25.4 only set
+  `min-width:1200px` so half the right edge was off the rendered SVG. Bumped to
+  `min-width:2300px` at `≤1280px` and split into two breakpoints (`≤760px`
+  drops to 1600 for thumb-pan reachability). Status-strip chips wrap properly
+  and no longer push a second horizontal scrollbar.
+- **water-system.html process-flow labels no longer stack.** Owner image 3:
+  "Ini juga saling bertumpuk2." viewBox 0 0 1180 460 was squished to 760px
+  min-width on mobile, collapsing DOS-302 / P-301 / TK-402 / CT-MK labels onto
+  each other. Bumped to `min-width:1180px` at `≤1024px` and `≤768px` so labels
+  stay at design coordinates and the user pans horizontally. Equipment-block
+  fill bumped from `#0f1a2e` thin to `#14213a` opaque slate per the v1.25.4
+  EcoStruxure-grade solid-panel mandate owner approved earlier.
+
+### Notes
+- Engine files (`js/datahall-model.js`, `js/datahall-calculations.js`,
+  `js/conv-engine.js`) byte-identical. 57/57 + 22/22 engine tests pass.
+- `#p-dash` panel + `updateDashKPI()` + `dcCallouts` byte-identical (owner exclusion).
+- BMS Shell adoption table in `standarization/BMS_SHELL.md` updated.
+
+---
+
 ## v1.29.2 — 2026-05-22 (Restore sw.js NETWORK_FIRST_PATHS for auth files — accidentally removed in v1.29.1)
 
 Hot-fix: v1.29.1's BMS-cockpit ship (`c4bc870`) had collateral edits to

@@ -189,7 +189,10 @@
         @keyframes flowmove { to { stroke-dashoffset: -23; } }
         @media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
         .junction { fill: #33415a; }
-        .eq { fill: #0f1a2e; stroke: #5b7090; stroke-width: 1.5; }
+        /* v1.29.3 — EcoStruxure-grade solid panel treatment: bump fill from .04 alpha
+           wash up to an opaque dark slate so equipment blocks read as discrete cells.
+           Owner: "agak solid seperti tampilan BMS pada umumnya di platform professional". */
+        .eq { fill: #14213a; stroke: #6c84a8; stroke-width: 1.5; }
         .eq.sel { stroke: var(--sel); stroke-width: 2.5; }
         .eq-grp { cursor: pointer; }
         .eq-grp:hover .eq { stroke: var(--sel); }
@@ -283,12 +286,21 @@
             .layout { grid-template-columns: 1fr; }
             .kpi-grid { grid-template-columns: repeat(3, 1fr); }
         }
+        @media (max-width: 1024px) {
+            /* v1.29.3 — EcoStruxure-grade responsive treatment.
+               Process-flow viewBox is 0 0 1180 460; min-width=1180 keeps labels at
+               design positions on mobile so DOS-302 / P-301 / TK-402 / CT-MK stop
+               overlapping. Owner image 3 "ini juga saling bertumpuk2". */
+            svg.pid { min-width: 1180px; }
+            .diagram-wrap { overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch; max-width: 100% !important; }
+        }
         @media (max-width: 768px) {
             html, body { overflow-x: hidden; max-width: 100vw; }
-            img, picture, video, svg { max-width: 100%; height: auto; }
+            img, picture, video { max-width: 100%; height: auto; }
             .wrap { padding: 10px 10px 90px; }
             h1, .brand { font-size: 15px !important; }
-            svg.pid { min-width: 760px; }
+            svg.pid { min-width: 1180px; }
             .diagram-wrap { overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch; max-width: 100% !important; }
             .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }

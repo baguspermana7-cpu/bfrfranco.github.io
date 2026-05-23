@@ -497,6 +497,12 @@
         function mountModes(){
             var host = document.getElementById('dh-mode-toolbar');
             if(!host || !window.RZBMSShell || !window.RZBMSShell.layerToggle) return;
+            /* v1.29.3 — radio-style: each click overrides previous and delegates to window.setMode()
+               so the toolbar now drives the rack heatmap (was visual-only in v1.24.1). */
+            var TOOLBAR_TO_MODE = {
+                'power':'power', 'temperature':'temp', 'cooling-margin':'cooling-margin',
+                'space':'space', 'alarms':'alarms'
+            };
             window.RZBMSShell.layerToggle(host, [
                 {id:'power',         label:'Power', pressed:true},
                 {id:'temperature',   label:'Temperature'},
@@ -504,7 +510,17 @@
                 {id:'space',         label:'Space'},
                 {id:'alarms',        label:'Alarms'}
             ], function(active){
-                document.body.setAttribute('data-dh-mode', active[active.length-1] || 'power');
+                /* radio shim: keep only last pressed */
+                var last = active[active.length-1] || 'power';
+                var btns = host.querySelectorAll('button[data-bms-layer]');
+                for (var i=0; i<btns.length; i++){
+                    var on = btns[i].getAttribute('data-bms-layer') === last;
+                    btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+                    btns[i].classList.toggle('on', on);
+                }
+                document.body.setAttribute('data-dh-mode', last);
+                var sm = TOOLBAR_TO_MODE[last] || 'power';
+                if (typeof window.setMode === 'function') window.setMode(sm);
             });
         }
         function init(){ bindRollup(); mountModes(); }
@@ -576,6 +592,7 @@
             <div class="mode-bar">
                 <button class="mode-btn active" data-mode="power"  onclick="setMode('power')">Power Density</button>
                 <button class="mode-btn"        data-mode="temp"   onclick="setMode('temp')">Cold-Aisle Temp</button>
+                <button class="mode-btn"        data-mode="cooling-margin" onclick="setMode('cooling-margin')">Cooling Margin</button>
                 <button class="mode-btn"        data-mode="alarms" onclick="setMode('alarms')">Alarms</button>
                 <button class="mode-btn"        data-mode="space"  onclick="setMode('space')">Space</button>
                 <div class="legend" id="legend"></div>
@@ -948,6 +965,11 @@
                     ['#2f5e46', '<22°C'], ['#3f6f4e', '22–25'],
                     ['#7a5a1f', '25–27'], ['#9a5026', '27–30'], ['#9a342f', '>30°C']
                 ];
+            } else if (mode === 'cooling-margin') {
+                items = [
+                    ['#2f5e46', '>5°C margin'], ['#3f6f4e', '3–5°C'],
+                    ['#7a5a1f', '1–3°C'], ['#9a5026', '<1°C'], ['#9a342f', 'over (ASHRAE A1 27°C)']
+                ];
             } else if (mode === 'alarms') {
                 items = [['#1b2436', 'Normal'], ['#7a5a1f', 'Warning'], ['#9a342f', 'Critical']];
             } else {
@@ -961,6 +983,17 @@
         function rackFill(rk, zone) {
             if (currentMode === 'space') return rk.occupied ? '#2f5e46' : '#1b2436';
             if (currentMode === 'temp')  return rk.occupied ? tempFill(zone.coldAisleC) : '#1b2436';
+            if (currentMode === 'cooling-margin') {
+                /* v1.29.3: tint by cold-aisle margin to ASHRAE A1 recommended high (27°C).
+                   margin = 27 - coldAisleC. >5°C ok, 3-5 tight, 1-3 warn, ≤1 crit, <0 over. */
+                if (!rk.occupied) return '#1b2436';
+                var m = 27 - zone.coldAisleC;
+                if (m > 5)  return '#2f5e46';
+                if (m > 3)  return '#3f6f4e';
+                if (m > 1)  return '#7a5a1f';
+                if (m > 0)  return '#9a5026';
+                return '#9a342f';
+            }
             if (currentMode === 'alarms') {
                 if (!rk.occupied) return '#1b2436';
                 if (rk.util > 0.95) return '#9a342f';
@@ -1130,6 +1163,16 @@
             for (var i = 0; i < btns.length; i++) {
                 btns[i].classList.toggle('active', btns[i].getAttribute('data-mode') === mode);
             }
+            /* v1.29.3 — also sync the top toolbar pressed state */
+            var MODE_TO_TOOLBAR = { 'power':'power', 'temp':'temperature', 'cooling-margin':'cooling-margin', 'space':'space', 'alarms':'alarms' };
+            var tbId = MODE_TO_TOOLBAR[mode] || 'power';
+            var tbBtns = document.querySelectorAll('#dh-mode-toolbar button[data-bms-layer]');
+            for (var j = 0; j < tbBtns.length; j++) {
+                var on = tbBtns[j].getAttribute('data-bms-layer') === tbId;
+                tbBtns[j].setAttribute('aria-pressed', on ? 'true' : 'false');
+                tbBtns[j].classList.toggle('on', on);
+            }
+            document.body.setAttribute('data-dh-mode', tbId);
             repaintRacks();
         };
 

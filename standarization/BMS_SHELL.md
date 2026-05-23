@@ -183,6 +183,21 @@ width on mobile (pan-scroll instead of squish). `chiller-plant.html`
 gets same treatment (`#pidSvg{min-width:1200px}` @≤1024, 960px @≤600).
 Engineering-value audit shipped as `documentation/engineering-value-audit-v1.md`.
 
+**v1.29.3 (2026-05-23)** — Phase 1 mobile fixes (owner round of 3 screenshots).
+(1) **datahall.html view-mode toolbar wired** — the top 5-button selector
+(POWER / TEMPERATURE / COOLING MARGIN / SPACE / ALARMS) was visual-only in
+v1.24.1. Now radio-style toggle delegates to `window.setMode()`, paints the
+rack heatmap, syncs the centre `.mode-bar`. New `cooling-margin` mode tints
+racks by ASHRAE A1 27 °C high-limit margin.
+(2) **chiller-plant.html right-edge overflow fixed** — v1.25.4 set
+`min-width:1200px` but Plant Capacity / Loop Summary / Drawing Info live at
+viewBox x=1520–2280 (design 2300). Bumped to `min-width:2300px` @≤1280px
+and split breakpoints. Status-strip chips wrap properly @≤1024.
+(3) **water-system.html process-flow no longer overlaps** — same
+EcoStruxure responsive pattern. viewBox 0 0 1180 460, `min-width:1180px`
+@≤1024 + 768. `.eq` fill bumped from `#0f1a2e` thin to `#14213a` opaque
+slate so equipment blocks read as discrete cells.
+
 ## Spec sources
 
 - `Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` (651 lines, full doc spec for DC Conventional unification).
