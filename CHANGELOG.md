@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.30.0 — 2026-05-23 (FT Phase 2 Task A — /analyze endpoint: TA indicators + composite buy/sell gauge + ensemble prediction)
+
+R-002 + R-003 + R-004 foundation. Worker `/analyze?sym=&tf=` returns
+TA indicators (RSI, MACD, SMA, EMA, Bollinger, ATR, Stoch) + signal
+labels (trend / momentum / volatility / ma_cross) + composite buy/sell
+gauge (0-100 score, 7-band label, weighted 35/25/20/15/5) + ensemble
+prediction with transparent rationale (≤5 entries, ending with
+"Informational only — not a forecast").
+
+Pure-math `worker/src/lib/{ta,gauge}.js`. KV cached 60s + stale-on-error.
+24 new tests, **62/62 pass total**. Added to cron prewarm so popular
+symbols stay hot. Client UI integration + alerts delivery + Finnhub
+webhook are remaining Phase 2 sub-tasks.
+
+Not active on production — `rz_ft_v2` flag still required + Worker
+still pending deploy (`worker/SETUP.md`).
+
+---
+
 ## v1.29.3 — 2026-05-23 (BMS cockpit Phase 1 mobile fixes — wired datahall view-mode toolbar + chiller right-edge overflow + water-system process-flow overlap)
 
 Three small surgical mobile fixes owner asked for in this round of screenshots,
