@@ -1365,6 +1365,75 @@
             </div>
         </section>
 
+        <!-- ════════════════════════════════════════ SECTION 9 — KNOWLEDGE BASE SEED (2026-05-23) ════════════════════════════════════════ -->
+        <section class="section" id="sec-knowledge-base" data-nav-id="sec-knowledge-base">
+            <h2><i class="fas fa-database"></i> Knowledge Base &mdash; Worldwide FMECA Seed Dataset (2026-05-23)</h2>
+            <p class="intro">
+                The Lin &amp; Ompusunggu architecture is unopinionated about <i>which</i> failure modes it
+                ingests. The graph is only as useful as its seed data. To take the concept beyond a
+                rotating-machinery prototype, we commissioned a parallel research run for worldwide
+                industrial-asset failure-mode data scoped to the data-center estate. Output dropped
+                into <code>docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md</code>
+                plus eight CSV seed files ready for Neo4j ingestion.
+            </p>
+
+            <div class="metric-grid" style="margin-top:1rem;">
+                <div class="metric"><div class="m-val">20</div><div class="m-lbl">Asset families covered (electrical &middot; cooling &middot; controls &middot; fire/life-safety &middot; mechanical/civil)</div></div>
+                <div class="metric"><div class="m-val">109</div><div class="m-lbl">Fault modes documented (avg ~5 per family)</div></div>
+                <div class="metric"><div class="m-val">834</div><div class="m-lbl">KG-ready rows across 8 CSV seed files</div></div>
+                <div class="metric"><div class="m-val">46</div><div class="m-lbl">Primary citations (CIGRE, IEEE 493, ASHRAE TC 9.9, NFPA, NETA, OREDA 7e, NPRD-2016, FMD-2016)</div></div>
+            </div>
+
+            <h3 style="margin-top:1.6rem;">Headline findings</h3>
+            <ul style="margin-top:0.4rem;">
+                <li><b>54% of major DC outages are power-related</b> (Uptime Institute 2024 / 2025); 13% cooling; 12% network; ~40% involve human error somewhere in the chain. The graph weights human-error mechanism nodes (<code>M-HUM-001/002/003</code>) accordingly.</li>
+                <li><b>Liquid cooling has &lt;10 s ride-through</b> if the coolant pump fails, vs minutes for air. Severity scoring on pump-failure fault <code>F11.2</code> is one tier hotter than the equivalent CRAH failure &mdash; a structural change to the FMECA, not a tweak.</li>
+                <li><b>VRLA Arrhenius</b>: battery life halves for every <b>8.3 &deg;C</b> above 25 &deg;C ambient. A parameterised mechanism node, not a static FMECA cell &mdash; the engine evaluates it against actual battery-room temperature in real time.</li>
+                <li><b>Highest RPN in the dataset = 200</b>: diesel microbial contamination (<code>F19.1</code>). Slow to detect, devastating when it hits backup power. Top preventive-action target for any site running extended-runtime fuel storage.</li>
+            </ul>
+
+            <h3 style="margin-top:1.6rem;">Confidence tiers</h3>
+            <p>Every fault row carries a <code>confidence_tier</code> column (<code>high</code> / <code>medium</code> / <code>thin</code>). Engine treatment:</p>
+            <ul>
+                <li><b>High</b> &mdash; transformers, switchgear, UPS static, generators, VRLA, chillers, pumps, cooling towers. Auto-action allowed within RPN thresholds.</li>
+                <li><b>Medium</b> &mdash; Li-ion, CRAH/CRAC, valves/actuators, sensors, VFDs, PLCs, fuel storage. Queue for human review.</li>
+                <li><b>Thin</b> &mdash; liquid cooling (DLC + immersion), busway, magnetic-bearing chillers, flywheel UPS. Surfaced in UI; vendor outreach required. Outreach plan handed off in <code>docs/handoff/2026-05-23-fmeca-vendor-outreach.md</code>.</li>
+            </ul>
+
+            <h3 style="margin-top:1.6rem;">CSV seed inventory</h3>
+            <table class="kb-table" style="width:100%;border-collapse:collapse;margin-top:0.4rem;font-size:0.86rem;">
+                <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.12);"><th style="text-align:left;padding:0.4rem 0.6rem;">File</th><th style="text-align:right;padding:0.4rem 0.6rem;">Rows</th><th style="text-align:left;padding:0.4rem 0.6rem;">Maps to KG node / edge</th></tr></thead>
+                <tbody>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">components.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">144</td><td style="padding:0.3rem 0.6rem;">Component nodes</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">faults.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">109</td><td style="padding:0.3rem 0.6rem;">Fault nodes (1 per row)</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">failures.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">109</td><td style="padding:0.3rem 0.6rem;">Failure-state edges</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">actions.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">138</td><td style="padding:0.3rem 0.6rem;">Corrective + preventive action nodes</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">mechanisms.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">99</td><td style="padding:0.3rem 0.6rem;">Physical degradation mechanism nodes</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">effects.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">42</td><td style="padding:0.3rem 0.6rem;">Effect-of-failure rows (local / system / business)</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">steps.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">76</td><td style="padding:0.3rem 0.6rem;">Procedure-step nodes (tool &middot; skill &middot; duration &middot; safety)</td></tr>
+                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">sod_rpn.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">109</td><td style="padding:0.3rem 0.6rem;">Severity / Occurrence / Detectability + RPN values</td></tr>
+                </tbody>
+            </table>
+
+            <details style="margin-top:1.4rem;">
+                <summary><b>Gap #13 &mdash; Liquid-cooling fault-mode telemetry below industry benchmark</b> (new, surfaced by this dataset)</summary>
+                <div style="padding:0.6rem 0 0.4rem 0;">
+                    Liquid-cooling and immersion-cooling primary sources thin out to ASHRAE TC 9.9 + OCP + one ASME paper.
+                    Magnetic-bearing chillers and flywheel UPS depend largely on vendor-stated MTBF rather than independently audited data.
+                    Mitigation: a vendor-outreach handoff doc has been scheduled (Vertiv, CoolIT, Asetek, Boyd for liquid;
+                    Starline / Universal Electric for busway; Trane / York / Daikin for magnetic-bearing chillers; Piller / Hitec /
+                    Active Power for flywheel UPS). NDA-backed telemetry requests in flight.
+                </div>
+            </details>
+
+            <p class="intro" style="margin-top:1.4rem;">
+                <i class="fas fa-arrow-up-right-from-square"></i> Full report:
+                <a href="docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md">docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md</a>
+                &middot; CSV seed files in <a href="docs/research/csv/">docs/research/csv/</a>
+                &middot; Standard: <a href="standarization/KNOWLEDGE_BASE_STANDARD.md">KNOWLEDGE_BASE_STANDARD.md</a>
+            </p>
+        </section>
+
         <footer>
             <div class="citation-block">
                 <b>Citation.</b> Lin, H. &amp; Ompusunggu, A. P. (2026). Intelligent Advisor System for Prescriptive

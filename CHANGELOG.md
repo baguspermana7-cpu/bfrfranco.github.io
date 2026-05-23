@@ -11,6 +11,98 @@ release sections rather than semver.
 
 ---
 
+## v1.32.5 — 2026-05-24 (Documentation propagation pass — post-draft folders, knowledge-base standard, AI Maintenance §9 wired with worldwide FMECA dataset)
+
+> Note: v1.32.1 through v1.32.4 are reserved for the parallel session's
+> accuracy-validation roadmap (DC AI + DC Conv 2026-05-23 review).
+> This doc-propagation patch takes v1.32.5 to leave that window intact.
+
+PATCH ship: documentation + content only, no engine math touched. Triggered
+by the handoff mandate (locked 2026-05-23) requiring every comment, review
+note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
++ handoff docs.
+
+### Added
+
+- **`standarization/POST_DRAFT_STANDARD.md`** &mdash; codifies the
+  `Article/Post Draft/<slug>/` per-page draft-folder mandate, with
+  per-platform char limits (LinkedIn 3000 / Mastodon 500 / X 280 /
+  Facebook 2000 / Medium SEO title 74), required-file matrix by page
+  type, and voice rules (engineer-to-engineer, no "I'm excited to share").
+- **`standarization/KNOWLEDGE_BASE_STANDARD.md`** &mdash; codifies the
+  `docs/research/YYYY-MM-DD-<topic>.md` + `csv/` layout, frontmatter
+  requirements, CSV schema (UTF-8, snake_case, `source_ref`,
+  `confidence_tier`), refresh cadence, and site-integration checklist.
+  Reference example: the 2026-05-23 FMECA dataset.
+- **`standarization/KNOWLEDGE_LABS_STANDARD.md`** &mdash; codifies the NEW
+  "Knowledge Labs &mdash; Standards, Networks, Protocols" section on
+  `datacenter-solutions.html`. Replaces the earlier (rejected) plan to
+  add a 7th card to Cost Calculators, which would have tripped the
+  6-grid SaaS-pattern anti-pattern (design.md §3 #11).
+- **`ai-engineering-maintenance.html` Section 9** &mdash; new "Knowledge
+  Base &mdash; Worldwide FMECA Seed Dataset" section surfacing the
+  research deliverable: 20 asset families, 109 fault modes, 834
+  KG-ready rows, 46 primary citations (CIGRE, IEEE 493, ASHRAE TC 9.9,
+  NFPA, NETA, OREDA 7e, NPRD-2016, FMD-2016). Headline findings
+  (54% outages power-related, &lt;10s liquid-cooling ride-through,
+  VRLA Arrhenius, RPN=200 diesel microbial). Confidence-tier
+  breakdown. CSV inventory table. NEW Gap #13 &mdash; Liquid-cooling
+  fault-mode telemetry below industry benchmark.
+- **`docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md`**
+  &mdash; ~58 KB markdown report from the worldwide research run.
+- **`docs/research/csv/`** &mdash; 8 CSV seed files (components 144 rows;
+  faults 109; failures 109; actions 138; mechanisms 99; effects 42;
+  steps 76; sod_rpn 109 &mdash; 834 KG-ready rows total).
+- **`docs/handoff/2026-05-23-fmeca-vendor-outreach.md`** &mdash; outreach
+  playbook for 14 vendors across 4 thin-data gaps (Vertiv, CoolIT,
+  Asetek, Boyd for liquid cooling; Starline / Schneider / Eaton /
+  Siemens for busway; Trane / York / Daikin for magnetic-bearing
+  chillers; Piller / Hitec / Active Power for flywheel UPS).
+- **`docs/handoff/2026-05-24-doc-propagation-pass.md`** &mdash; full
+  handoff state for the next session.
+- **`docs/plans/2026-05-23-network-visualization-hub.md`** &mdash; plan v1
+  for the upcoming Knowledge Labs / Network Visualization Hub (22 topic
+  pages, 5 lanes, animation engine using Canvas 2D + Web Audio API).
+  Multi-agent reviewed by code-reviewer + uiux-reviewer. Verdicts:
+  REWORK (1 CRITICAL on module-loading pattern) + APPROVE_WITH_NOTES
+  (7 HIGH design adjustments). Plan v2 rewrite deferred to next session.
+- **`Article/Post Draft/AI Maintenance/`** &mdash; 11 draft files
+  (LinkedIn long-form, Medium long-form, 3 X posts, 3 Mastodon posts,
+  Facebook conversational, Quora answer, TikTok 60s script).
+- **`Article/Post Draft/BMS Cockpit/`** &mdash; 4 draft files covering
+  the 11-page cockpit cluster.
+- **`Article/Post Draft/LTC Lab/`** &mdash; 4 draft files covering
+  `standards-ltc-lab.html` + 6 sub-pages.
+- **`Article/Post Draft/CX Calculator/`** &mdash; 3 draft files.
+- **`Article/Post Draft/Pillar Pages/`** &mdash; 3 draft files for the
+  5 pillar pages.
+
+### Changed
+
+- `js/rz-version.js` &mdash; bumped to v1.32.5 (PATCH; doc-only).
+- `sw.js` &mdash; cache name bumped to `rz-cache-v1.32.5` so the prior
+  cache invalidates and users pick up the new Section 9.
+
+### Discipline mandates codified in this ship
+
+- **Post-draft folder discipline**: every public HTML page that ships
+  MUST have an `Article/Post Draft/<slug>/` folder in the same commit
+  or session.
+- **Knowledge-base layout**: research deliverables follow
+  `docs/research/YYYY-MM-DD-<topic>.md` + `csv/` layout with frontmatter
+  + confidence tiers + citation discipline.
+- **Knowledge Labs section IA**: NOT a 7th card on Cost Calculators;
+  a new section above Simulations.
+
+### Not in this ship (deferred)
+
+- Network Hub plan v2 rewrite (incorporating CRITICAL + HIGH review findings).
+- `Spares Readiness Calculator/` draft refresh (engine evolved v1.11&rarr;v1.16; existing drafts stale).
+- Articles 23&ndash;27 draft-folder content sweep.
+- `CONTENT_LINKAGE_PLAYBOOK.md` update to include the post-draft step.
+
+---
+
 ## v1.32.1 — 2026-05-24 (Critical accuracy fixes per team review docs 26 + 16 — owner exclusion lifted)
 
 Owner directive 2026-05-23: "review comment team saya, dan sempurnakan, dan
@@ -77,7 +169,6 @@ v1.32.1 atop their work.
 - v1.32.2 — terminology + label sweep (AI-ACC-04/09/10, CONV-ACC-03/05/06/09).
 - v1.32.3 — basis drawers per Rule 6.
 - v1.32.4 — Puppeteer probes for acceptance tests.
-
 ---
 
 ## v1.32.0 — 2026-05-23 (AI Engineering Maintenance — concept page; FMECA + KG + ML + NLP synthesis)
