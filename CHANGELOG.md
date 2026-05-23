@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v1.29.2 — 2026-05-22 (Restore sw.js NETWORK_FIRST_PATHS for auth files — accidentally removed in v1.29.1)
+
+Hot-fix: v1.29.1's BMS-cockpit ship (`c4bc870`) had collateral edits to
+`sw.js` that removed the v1.29.0 critical-asset network-first logic
+(`NETWORK_FIRST_PATHS`, `isNetworkFirst()`, `networkFirstCriticalAsset()`).
+Without those, `/auth.js` falls back to cache-first → users on stale SW
+can re-hit the "Invalid email or password" stale-cache trap that
+v1.29.0 was shipped specifically to prevent.
+
+### What landed
+
+- `sw.js`: restored `NETWORK_FIRST_PATHS = ['/auth.js', '/auth.min.js',
+  '/js/rz-version.js', '/js/rz-feature-flags.js']` + `isNetworkFirst()` +
+  `networkFirstCriticalAsset()` helpers + fetch-handler dispatch line.
+- Cache bump `rz-cache-v1.29.1` → `rz-cache-v1.29.2` so existing service
+  workers re-install with the network-first logic in place.
+
+### Why this matters
+
+Phase 4 admin UI + Phase 3 client refactor + Phase 1 educator role all
+depend on visitors getting the LATEST `auth.js` after a deploy. Without
+NETWORK_FIRST_PATHS, a stale SW can serve `auth.js` from `rz-cache-v1.28.0`
+or earlier indefinitely, breaking login for anyone who'd visited before
+the deploy. The "Try fresh reload" rescue link in the login modal
+(also v1.29.0) is the last-line UX recovery; this commit restores the
+silent-recovery primary path.
+
+### Coordination note
+
+The v1.29.1 commit was authored on a checkout that branched before
+v1.29.0 shipped (their local was at v1.25.3). On rebase/merge, the
+sw.js edits there resolved against an older shape. Both branches are
+now in sync at v1.29.2.
+
+---
+
 ## v1.29.1 — 2026-05-22 (Cockpit SVG mobile readability + EcoStruxure-grade solid panels + kill rotating-triangle pump animation)
 
 Owner-reported (mobile screenshot) — three concrete issues fixed plus a
