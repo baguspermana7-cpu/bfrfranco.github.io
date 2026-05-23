@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>AI Engineering Maintenance — Concept | ResistanceZero</title>
+    <meta name="description" content="Prescriptive maintenance advisor concept: FMECA + Neo4j knowledge graph + Random Forest ML + NLP. Synthesizes Lin & Ompusunggu (2026) with 12 gaps + roadmap.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="prescriptive maintenance, FMECA, knowledge graph, Neo4j, random forest, predictive maintenance, root cause analysis, RPN, IEC 60812, RUL, Cox-PH, anomaly detection, SHAP, conformal prediction, CMMS, spares, edge AI">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://resistancezero.com/ai-engineering-maintenance.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/ai-engineering-maintenance.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/ai-engineering-maintenance.html">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/ai-engineering-maintenance.html">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="og:title" content="AI Engineering Maintenance — Intelligent Advisor System Concept">
+    <meta property="og:description" content="FMECA + Knowledge Graph + ML + NLP advisor system: synthesis of Lin & Ompusunggu (2026), with 12 engineering gaps, proposed enhancements, and a 5-phase build roadmap.">
+    <meta property="og:image" content="https://resistancezero.com/assets/og/ai-engineering-maintenance.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="AI Engineering Maintenance — Concept Brief">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI Engineering Maintenance — Concept Brief">
+    <meta name="twitter:description" content="Prescriptive-maintenance advisor concept: FMECA + Neo4j + RF + NLP, with 12 gaps and enhancements.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/og/ai-engineering-maintenance.webp">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AI Engineering Maintenance — Intelligent Advisor System Concept",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "Any",
+      "url": "https://resistancezero.com/ai-engineering-maintenance.html",
+      "description": "Concept brief for a prescriptive maintenance advisor system synthesizing FMECA, Neo4j knowledge graph, Random Forest ML, and rule-based NLP. Based on Lin & Ompusunggu (2026), with 12 engineering gaps and proposed enhancements.",
+      "author": {"@type":"Person","name":"Bagus Dwi Permana","sameAs":"https://www.linkedin.com/in/bagus-dwi-permana-ba90b092"},
+      "citation": "Lin, H. & Ompusunggu, A. P. (2026). Intelligent Advisor System for Prescriptive Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning. Artificial Intelligence for Engineering. https://doi.org/10.1049/aie2.70019"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},
+        {"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},
+        {"@type":"ListItem","position":3,"name":"AI Engineering Maintenance"}
+      ]
+    }
+    </script>
+
+    <script src="js/rz-version.js?v=2026-05-23" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+
+    <style>
+        :root {
+            --bg: #0b1324;
+            --bg-solid: #0b1324;
+            --panel: rgba(15,23,42,0.84);
+            --panel-inner: rgba(15,23,42,0.6);
+            --panel-hover: rgba(15,23,42,0.82);
+            --text: #e2e8f0;
+            --text-strong: #f1f5f9;
+            --text-body: #cbd5e1;
+            --muted: #94a3b8;
+            --line: rgba(148,163,184,0.24);
+            --line-soft: rgba(148,163,184,0.14);
+
+            /* Instrument tokens — NO Anthropic-purple */
+            --cyan: #00DDFF;
+            --cyan-dim: rgba(0,221,255,0.5);
+            --amber: #FFAA00;
+            --amber-dim: rgba(255,170,0,0.5);
+            --green: #00FF88;
+            --green-dim: rgba(0,255,136,0.5);
+            --red: #FF3030;
+            --red-dim: rgba(255,48,48,0.5);
+
+            --shadow: rgba(2,6,23,0.45);
+            --shadow-deep: rgba(2,6,23,0.55);
+            --kv-bg: rgba(15,23,42,0.5);
+            --grad-top: rgba(0,221,255,0.10);
+            --grad-bot: rgba(255,170,0,0.08);
+            --pill-bg: rgba(0,221,255,0.14);
+            --pill-border: rgba(0,221,255,0.40);
+            --pill-color: #67e8f9;
+            --pill-amber-bg: rgba(255,170,0,0.14);
+            --pill-amber-border: rgba(255,170,0,0.40);
+            --pill-amber-color: #fcd34d;
+            --pill-green-bg: rgba(0,255,136,0.14);
+            --pill-green-border: rgba(0,255,136,0.40);
+            --pill-green-color: #86efac;
+            --pill-red-bg: rgba(255,48,48,0.14);
+            --pill-red-border: rgba(255,48,48,0.40);
+            --pill-red-color: #fca5a5;
+            --svg-bg: rgba(15,23,42,0.7);
+        }
+        [data-theme="light"] {
+            --bg: #f1f5f9; --bg-solid: #f1f5f9;
+            --panel: rgba(255,255,255,0.94);
+            --panel-inner: rgba(241,245,249,0.85);
+            --panel-hover: rgba(226,232,240,0.7);
+            --text: #1e293b; --text-strong: #0f172a; --text-body: #334155; --muted: #475569;
+            --line: rgba(100,116,139,0.24); --line-soft: rgba(100,116,139,0.12);
+            --cyan: #0891b2; --cyan-dim: rgba(8,145,178,0.5);
+            --amber: #b45309; --amber-dim: rgba(180,83,9,0.5);
+            --green: #047857; --green-dim: rgba(4,120,87,0.5);
+            --red: #b91c1c; --red-dim: rgba(185,28,28,0.5);
+            --shadow: rgba(100,116,139,0.12); --shadow-deep: rgba(100,116,139,0.2);
+            --kv-bg: rgba(241,245,249,0.85);
+            --grad-top: rgba(8,145,178,0.07); --grad-bot: rgba(180,83,9,0.05);
+            --pill-bg: rgba(8,145,178,0.10); --pill-border: rgba(8,145,178,0.4); --pill-color: #155e75;
+            --pill-amber-bg: rgba(180,83,9,0.10); --pill-amber-border: rgba(180,83,9,0.4); --pill-amber-color: #92400e;
+            --pill-green-bg: rgba(4,120,87,0.10); --pill-green-border: rgba(4,120,87,0.4); --pill-green-color: #14532d;
+            --pill-red-bg: rgba(185,28,28,0.10); --pill-red-border: rgba(185,28,28,0.4); --pill-red-color: #7f1d1d;
+            --svg-bg: rgba(241,245,249,0.85);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { overflow-x: hidden; max-width: 100vw; }
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at top right, var(--grad-top), transparent 45%),
+                        radial-gradient(ellipse at bottom left, var(--grad-bot), transparent 52%),
+                        var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        img, picture, video, svg { max-width: 100%; height: auto; display: block; }
+
+        /* Navbar (canonical pattern from LTC pages) */
+        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11,19,36,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
+        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 56px; gap: 0.5rem; }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
+        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+        .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
+        .nav-link { padding: 0.45rem 0.65rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-dropdown { position: relative; }
+        .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
+        .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
+        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-solid); border: 1px solid var(--line); min-width: 180px; border-radius: 10px; box-shadow: 0 10px 40px var(--shadow-deep); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s, visibility 0.2s; z-index: 1001; padding: 8px 0; }
+        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
+        .dropdown-menu li { list-style: none; padding: 0; }
+        .dropdown-menu a { display: block; padding: 0.45rem 1rem; color: var(--text-body); text-decoration: none; font-size: 0.8rem; transition: background 0.15s; }
+        .dropdown-menu a:hover { background: rgba(148,163,184,0.1); }
+        .theme-toggle { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(148,163,184,0.1); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .theme-toggle:hover { background: rgba(148,163,184,0.2); transform: scale(1.05); }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle .sun-icon { color: var(--amber); display: none; }
+        .theme-toggle .moon-icon { color: var(--muted); display: block; }
+        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle { background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
+        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 8px; border-radius: 8px; }
+        .hamburger:hover { background: rgba(148,163,184,0.1); }
+        .bar { width: 22px; height: 2.5px; background: var(--muted); border-radius: 3px; transition: all 0.3s; }
+        @media (max-width: 900px) {
+            .nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--bg-solid); border-bottom: 1px solid var(--line); flex-direction: column; padding: 0.5rem; gap: 0; box-shadow: 0 8px 20px var(--shadow); }
+            .nav-menu.active { display: flex; }
+            .hamburger { display: flex; }
+            .dropdown-menu { position: static; transform: none; box-shadow: none; border: none; padding-left: 1rem; }
+        }
+
+        /* Layout */
+        .wrap { max-width: 1180px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: background 0.2s; }
+        .back:hover { background: rgba(148,163,184,0.1); }
+        .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.32rem 0.7rem; border-radius: 999px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-color); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+        .pill-amber { border-color: var(--pill-amber-border); background: var(--pill-amber-bg); color: var(--pill-amber-color); }
+        .pill-green { border-color: var(--pill-green-border); background: var(--pill-green-bg); color: var(--pill-green-color); }
+        .pill-red { border-color: var(--pill-red-border); background: var(--pill-red-bg); color: var(--pill-red-color); }
+
+        /* Hero */
+        .hero { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 12px 28px var(--shadow); padding: 1.4rem 1.3rem; margin-bottom: 1.1rem; }
+        .hero h1 { font-size: clamp(1.4rem, 3vw, 2rem); margin: 0.5rem 0 0.5rem; line-height: 1.25; color: var(--text-strong); letter-spacing: -0.01em; }
+        .hero .subtitle { color: var(--text-body); line-height: 1.6; font-size: 0.96rem; max-width: 880px; margin-bottom: 0.8rem; }
+        .hero .cite { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); padding: 0.55rem 0.7rem; background: var(--kv-bg); border-left: 3px solid var(--cyan); border-radius: 4px; max-width: 880px; }
+        .hero .cite a { color: var(--cyan); text-decoration: none; }
+        .hero .cite a:hover { text-decoration: underline; }
+
+        /* Concept summary tiles */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.65rem; margin-top: 1rem; }
+        .sum-tile { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inner); padding: 0.7rem 0.85rem; }
+        .sum-tile .num { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.1em; font-weight: 700; }
+        .sum-tile .ttl { font-size: 0.92rem; font-weight: 700; color: var(--text-strong); margin: 0.2rem 0 0.3rem; }
+        .sum-tile .dsc { font-size: 0.78rem; color: var(--text-body); line-height: 1.5; }
+        .sum-tile.amber .num { color: var(--amber); }
+        .sum-tile.green .num { color: var(--green); }
+        .sum-tile.red .num { color: var(--red); }
+
+        /* Section nav */
+        .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.55rem; background: rgba(11,19,36,0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        [data-theme="light"] .section-nav { background: rgba(255,255,255,0.94); }
+        .nav-pill { flex-shrink: 0; padding: 0.36rem 0.7rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .nav-pill:hover { color: var(--text); background: rgba(148,163,184,0.1); }
+        .nav-pill.active { color: var(--pill-color); background: var(--pill-bg); border-color: var(--pill-border); }
+
+        /* Section */
+        .section { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 10px 24px var(--shadow); padding: 1.2rem 1.2rem; margin-bottom: 1rem; }
+        .section h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-strong); }
+        .section h2 i { color: var(--cyan); font-size: 0.95rem; }
+        .section .intro { color: var(--text-body); font-size: 0.88rem; line-height: 1.7; margin-bottom: 0.9rem; }
+
+        /* Module 2x2 grid */
+        .modules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+        @media (max-width: 760px) { .modules-grid { grid-template-columns: 1fr; } }
+        .module-card { border: 1px solid var(--line); border-radius: 12px; background: var(--panel-inner); padding: 0.95rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .module-card .mc-head { display: flex; align-items: center; gap: 0.5rem; }
+        .module-card .mc-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--amber); background: var(--pill-amber-bg); border: 1px solid var(--pill-amber-border); border-radius: 6px; padding: 0.15rem 0.45rem; font-weight: 700; }
+        .module-card .mc-name { font-size: 1rem; font-weight: 700; color: var(--text-strong); }
+        .module-card .mc-role { font-size: 0.82rem; color: var(--cyan); font-family: 'JetBrains Mono', monospace; margin-top: -0.1rem; }
+        .module-card .mc-body { font-size: 0.82rem; color: var(--text-body); line-height: 1.55; }
+        .module-card .mc-meta { display: grid; grid-template-columns: 80px 1fr; gap: 0.35rem 0.6rem; font-size: 0.76rem; padding-top: 0.5rem; border-top: 1px dashed var(--line-soft); }
+        .module-card .mc-meta dt { color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+        .module-card .mc-meta dd { color: var(--text-body); }
+        .module-card .mc-svg { background: var(--svg-bg); border: 1px solid var(--line-soft); border-radius: 8px; padding: 0.4rem; margin-top: 0.45rem; }
+        .module-card .mc-svg svg { width: 100%; height: auto; }
+
+        /* Mode comparison cards */
+        .modes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+        @media (max-width: 760px) { .modes-grid { grid-template-columns: 1fr; } }
+        .mode-card { border: 1px solid var(--line); border-radius: 12px; background: var(--panel-inner); padding: 0.95rem; display: flex; flex-direction: column; gap: 0.6rem; }
+        .mode-card.cyan { border-color: var(--cyan-dim); }
+        .mode-card.amber { border-color: var(--amber-dim); }
+        .mode-card .mode-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; padding: 0.2rem 0.55rem; border-radius: 4px; }
+        .mode-card.cyan .mode-tag { color: var(--cyan); background: var(--pill-bg); border: 1px solid var(--pill-border); }
+        .mode-card.amber .mode-tag { color: var(--amber); background: var(--pill-amber-bg); border: 1px solid var(--pill-amber-border); }
+        .mode-card .mode-title { font-size: 1.05rem; font-weight: 700; color: var(--text-strong); }
+        .mode-card .mode-sub { font-size: 0.82rem; color: var(--text-body); line-height: 1.55; }
+        .mode-card .mode-svg { background: var(--svg-bg); border: 1px solid var(--line-soft); border-radius: 8px; padding: 0.5rem; }
+        .mode-card .mode-svg svg { width: 100%; height: auto; }
+        .mode-card .qa { background: var(--kv-bg); border-radius: 8px; padding: 0.55rem 0.7rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 1.6; }
+        .mode-card .qa .q { color: var(--cyan); }
+        .mode-card.amber .qa .q { color: var(--amber); }
+        .mode-card .qa .a { color: var(--text-body); margin-top: 0.3rem; }
+        .mode-card .pros { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; font-size: 0.76rem; }
+        .mode-card .pros .strong, .mode-card .pros .weak { padding: 0.45rem 0.55rem; border-radius: 6px; line-height: 1.5; }
+        .mode-card .pros .strong { background: rgba(0,255,136,0.08); border-left: 2px solid var(--green); color: var(--text-body); }
+        .mode-card .pros .weak { background: rgba(255,48,48,0.08); border-left: 2px solid var(--red); color: var(--text-body); }
+        .mode-card .pros b { color: var(--text-strong); font-weight: 700; display: block; margin-bottom: 0.2rem; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; }
+
+        /* Case study numbers */
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.55rem; margin-bottom: 0.85rem; }
+        .kpi { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inner); padding: 0.65rem 0.8rem; }
+        .kpi .kl { font-family: 'JetBrains Mono', monospace; font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .kpi .kv { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text-strong); margin-top: 0.2rem; }
+        .kpi .ks { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+        .kpi.cyan .kv { color: var(--cyan); }
+        .kpi.amber .kv { color: var(--amber); }
+        .kpi.green .kv { color: var(--green); }
+        .kpi.red .kv { color: var(--red); }
+
+        /* Data table */
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; border: 1px solid var(--line); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .data-table th { background: var(--pill-bg); color: var(--pill-color); text-align: left; padding: 0.55rem 0.75rem; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--line); }
+        .data-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line-soft); color: var(--text-body); }
+        .data-table tr:hover td { background: rgba(148,163,184,0.06); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table .num { font-family: 'JetBrains Mono', monospace; text-align: right; }
+        .data-table .hl { color: var(--text-strong); font-weight: 700; }
+        .data-table .weak { color: var(--red); font-weight: 700; }
+        .data-table .best { color: var(--green); font-weight: 700; }
+
+        /* Gap accordions */
+        .gap { margin-bottom: 0.55rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-inner); }
+        .gap > summary { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.85rem; cursor: pointer; user-select: none; font-size: 0.9rem; font-weight: 600; color: var(--text-strong); list-style: none; }
+        .gap > summary::-webkit-details-marker { display: none; }
+        .gap > summary:hover { background: var(--panel-hover); }
+        .gap > summary .gap-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: var(--pill-amber-bg); color: var(--pill-amber-color); font-size: 0.78rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--pill-amber-border); flex-shrink: 0; }
+        .gap > summary .gap-chev { margin-left: auto; font-size: 0.75rem; color: var(--muted); transition: transform 0.25s; }
+        .gap[open] > summary .gap-chev { transform: rotate(180deg); }
+        .gap-body { padding: 0.2rem 0.95rem 0.9rem; border-top: 1px dashed var(--line-soft); }
+        .gap-body .row { display: grid; grid-template-columns: 100px 1fr; gap: 0.6rem 0.8rem; font-size: 0.84rem; padding: 0.55rem 0; border-bottom: 1px dashed var(--line-soft); }
+        .gap-body .row:last-child { border-bottom: none; }
+        .gap-body .row dt { font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 0.1rem; }
+        .gap-body .row dd { color: var(--text-body); line-height: 1.6; }
+        .gap-body .row.gap-tag dd { color: var(--red); }
+        .gap-body .row.gap-why dd { color: var(--text-strong); }
+        .gap-body .row.gap-enh dd { color: var(--green); }
+        .gap-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: var(--kv-bg); border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--cyan); }
+
+        /* Roadmap phases */
+        .phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.7rem; }
+        .phase { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inner); padding: 0.85rem 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .phase .ph-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--amber); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+        .phase .ph-title { font-size: 0.95rem; font-weight: 700; color: var(--text-strong); line-height: 1.3; }
+        .phase ul { list-style: none; font-size: 0.78rem; color: var(--text-body); line-height: 1.55; }
+        .phase ul li { padding-left: 1rem; position: relative; margin-bottom: 0.18rem; }
+        .phase ul li:before { content: ''; position: absolute; left: 0.2rem; top: 0.5rem; width: 4px; height: 4px; border-radius: 50%; background: var(--cyan); }
+        .phase .ph-complex { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); padding-top: 0.35rem; border-top: 1px dashed var(--line-soft); margin-top: auto; }
+        .phase .ph-complex b { color: var(--amber); }
+
+        /* Open questions */
+        .questions { display: grid; gap: 0.55rem; }
+        .question { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inner); padding: 0.65rem 0.85rem; display: flex; gap: 0.7rem; align-items: flex-start; }
+        .question .q-num { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--cyan); font-weight: 700; min-width: 1.4rem; padding-top: 0.05rem; }
+        .question .q-body { font-size: 0.86rem; color: var(--text-body); line-height: 1.55; }
+        .question .q-body b { color: var(--text-strong); }
+
+        /* Big diagram */
+        .big-diagram { background: var(--svg-bg); border: 1px solid var(--line); border-radius: 12px; padding: 0.85rem 0.85rem 0.55rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .big-diagram svg { width: 100%; height: auto; min-width: 720px; display: block; }
+        @media (max-width: 760px) { .big-diagram svg { min-width: 720px; } }
+        .legend { display: flex; flex-wrap: wrap; gap: 0.55rem; padding: 0.55rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 0.32rem; padding: 0.18rem 0.55rem; border-radius: 5px; border: 1px solid var(--line); background: var(--kv-bg); }
+        .legend i { width: 9px; height: 9px; display: inline-block; border-radius: 2px; }
+
+        /* Footer */
+        footer { margin-top: 1.5rem; padding: 1rem 0.6rem 0.6rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.78rem; line-height: 1.65; text-align: center; }
+        footer .citation-block { background: var(--kv-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.85rem; margin-bottom: 0.8rem; max-width: 880px; margin-left: auto; margin-right: auto; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--text-body); }
+        footer .citation-block a { color: var(--cyan); text-decoration: none; }
+        footer .citation-block a:hover { text-decoration: underline; }
+        footer .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 0.5rem 0; text-align: left; max-width: 880px; margin: 0 auto 1rem; }
+        footer .footer-grid h4 { font-size: 0.78rem; color: var(--text-strong); margin-bottom: 0.35rem; }
+        footer .footer-grid a { display: block; color: var(--muted); text-decoration: none; font-size: 0.76rem; padding: 0.15rem 0; }
+        footer .footer-grid a:hover { color: var(--cyan); }
+        footer .ver { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 0.55rem; }
+
+        /* Locked gate */
+        .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.74); padding: 1rem; backdrop-filter: blur(6px); }
+        body.locked .root-gate { display: flex; }
+        body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
+        .root-card { max-width: 430px; width: 100%; background: #0f172a; border: 1px solid rgba(0,221,255,0.40); border-radius: 14px; padding: 1.2rem 1.1rem; text-align: center; box-shadow: 0 18px 36px var(--shadow-deep); }
+        [data-theme="light"] .root-card { background: #fff; border-color: rgba(8,145,178,0.4); }
+        [data-theme="light"] .root-gate { background: rgba(241,245,249,0.8); }
+        .root-card h2 { font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text-strong); }
+        .root-card p { font-size: 0.86rem; color: var(--text-body); line-height: 1.6; }
+        .root-actions { margin-top: 0.85rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+        .root-actions button, .root-actions a { border-radius: 9px; padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--line); text-decoration: none; cursor: pointer; color: var(--text); font-family: inherit; }
+        .root-actions button { background: var(--cyan); color: #0f172a; border: none; }
+
+        /* Skip link */
+        .skip-link { position: absolute; top: -50px; left: 0; background: #1e3a5f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: 600; font-size: 0.9rem; z-index: 10000; border-radius: 0 0 8px 0; transition: top 0.2s ease; }
+        .skip-link:focus { top: 0; }
+        [data-theme="light"] .skip-link { background: #0e7490; color: #fff; }
+
+        /* SVG diagram styles — thin instrument lines, no glow */
+        .d-bg { fill: var(--svg-bg); }
+        .d-block { fill: rgba(15,23,42,0.65); stroke: var(--line); stroke-width: 1; }
+        .d-block-cyan { fill: rgba(0,221,255,0.07); stroke: var(--cyan); stroke-width: 1.2; }
+        .d-block-amber { fill: rgba(255,170,0,0.07); stroke: var(--amber); stroke-width: 1.2; }
+        .d-block-green { fill: rgba(0,255,136,0.07); stroke: var(--green); stroke-width: 1.0; }
+        .d-block-red { fill: rgba(255,48,48,0.07); stroke: var(--red); stroke-width: 1.0; }
+        [data-theme="light"] .d-block { fill: rgba(255,255,255,0.85); stroke: rgba(100,116,139,0.36); }
+        .d-line { fill: none; stroke: var(--line); stroke-width: 0.8; }
+        .d-line-cyan { fill: none; stroke: var(--cyan); stroke-width: 1.0; }
+        .d-line-amber { fill: none; stroke: var(--amber); stroke-width: 1.0; }
+        .d-line-green { fill: none; stroke: var(--green); stroke-width: 0.9; }
+        .d-line-feedback { fill: none; stroke: var(--green); stroke-width: 0.9; stroke-dasharray: 4 3; }
+        .d-line-dim { fill: none; stroke: var(--line); stroke-width: 0.6; stroke-dasharray: 3 3; }
+        .d-text { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; fill: var(--text-strong); }
+        .d-text-sm { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--muted); }
+        .d-text-cyan { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: var(--cyan); }
+        .d-text-amber { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: var(--amber); }
+        .d-text-green { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: var(--green); }
+        .d-text-section { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; fill: var(--muted); text-transform: uppercase; }
+
+        /* Cookie banner */
+        .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.7rem 1rem; background: rgba(15,23,42,0.95); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.78rem; }
+        .cookie-banner.hidden { display: none; }
+        .cookie-banner a { color: var(--cyan); }
+        .cookie-actions button { padding: 0.4rem 0.7rem; border-radius: 6px; border: 1px solid var(--line); background: rgba(148,163,184,0.1); color: var(--text); font-size: 0.78rem; cursor: pointer; font-family: inherit; margin-left: 0.35rem; }
+        .cookie-banner .cookie-accept { background: var(--cyan); color: #0f172a; border: none; }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            img { max-width: 100%; height: auto; display: block; }
+            .nav-menu, .nav-links { display: none; }
+            .navbar { padding: 0.5rem 0.75rem; }
+            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+            button, a.btn, [role="button"] { min-height: 44px; }
+            .section { padding: 1rem 0.85rem; }
+            .hero { padding: 1.05rem 0.9rem; }
+            h1 { font-size: 1.4rem !important; }
+            .modules-grid, .modes-grid, .phase-grid { grid-template-columns: 1fr !important; gap: 0.65rem; }
+            .summary-grid { grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+            .gap-body .row { grid-template-columns: 1fr; gap: 0.2rem; }
+            .gap-body .row dt { padding-top: 0; }
+            .table-wrap { overflow-x: auto; }
+            .data-table { font-size: 0.78rem; }
+            .data-table th, .data-table td { padding: 0.4rem 0.55rem; }
+            .big-diagram { padding: 0.5rem; }
+            .big-diagram svg { min-width: 720px; }
+            .mode-card .pros { grid-template-columns: 1fr; }
+            footer .footer-grid { grid-template-columns: 1fr; }
+            .root-card { max-width: 92vw; padding: 1.25rem 1rem; margin: 0 1rem; }
+        }
+        @media (max-width: 480px) {
+            .summary-grid { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+        }
+        @media print {
+            .navbar, .section-nav, .root-gate, .cookie-banner, .topbar { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+            body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; }
+            .section, .hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
+            .gap { break-inside: avoid; }
+            * { color: #000 !important; }
+        }
+    </style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li role="menuitem"><a href="datacenter-solutions.html" style="color:var(--cyan);font-weight:600;">DC Solutions Hub</a></li>
+                    <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                    <li role="menuitem"><a href="datahallAI.html">DC AI/HPC</a></li>
+                    <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
+                    <li role="menuitem"><a href="spares-readiness-calculator.html">Spares Readiness</a></li>
+                </ul>
+            </li>
+            <li class="nav-dropdown">
+                <a href="articles.html" class="nav-link">Insights <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu">
+                    <li><a href="articles.html" style="color:var(--cyan);font-weight:600;">Engineering Journal</a></li>
+                    <li><a href="geopolitics.html">Global Analysis</a></li>
+                    <li><a href="future-forward.html">Future Forward</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    </div></nav>
+
+    <div class="wrap">
+        <div class="topbar">
+            <a class="back" href="datacenter-solutions.html"><i class="fas fa-arrow-left"></i> Back to DC Solutions</a>
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                <span class="pill"><i class="fas fa-crown"></i> Pro Module</span>
+                <span class="pill-amber pill"><i class="fas fa-file-alt"></i> Concept Brief</span>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════ HERO ════════════════════════════════════════ -->
+        <section class="hero" id="main-content">
+            <span class="pill"><i class="fas fa-microchip"></i> Prescriptive Maintenance · FMECA + KG + ML + NLP</span>
+            <h1>AI Engineering Maintenance — Intelligent Advisor System Concept</h1>
+            <p class="subtitle">
+                A concept-and-design brief for a prescriptive maintenance advisor that fuses <b>FMECA documentation</b>
+                (IEC 60812), a <b>Neo4j knowledge graph</b>, a <b>Random Forest + PCA</b> diagnostic classifier, and a
+                <b>rule-based NLP layer</b> (Aho-Corasick) into a single closed-loop advisor for engineered assets.
+                Two operator interaction modes: ask in natural language (<b>By API</b>), or upload sensor data and let
+                the engine diagnose (<b>By Engine</b>). This page synthesizes the paper, surfaces 12 engineering gaps,
+                and proposes concrete enhancements with a phased build roadmap.
+            </p>
+            <p class="cite">
+                Source paper: <b>Lin, H. &amp; Ompusunggu, A. P. (2026)</b>. <i>Intelligent Advisor System for
+                Prescriptive Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning.</i>
+                Artificial Intelligence for Engineering (Wiley / IET). DOI:
+                <a href="https://doi.org/10.1049/aie2.70019" target="_blank" rel="noopener">10.1049/aie2.70019</a>.
+                Case-study dataset (Cranfield): <a href="https://doi.org/10.17862/cranfield.rd.5097649" target="_blank" rel="noopener">10.17862/cranfield.rd.5097649</a>.
+            </p>
+
+            <div class="summary-grid">
+                <div class="sum-tile"><div class="num">MODULE 1</div><div class="ttl">FMECA Documentation</div><div class="dsc">IEC 60812 tabular failure analysis. Components, Faults, Failures, Actions, Mechanisms, Effects, Steps, SOD&middot;RPN.</div></div>
+                <div class="sum-tile amber"><div class="num">MODULE 2</div><div class="ttl">FMECA Knowledge Graph</div><div class="dsc">Neo4j graph: 10 node types &middot; 12 relationship types. Cypher-queryable single source of truth for asset reasoning.</div></div>
+                <div class="sum-tile green"><div class="num">MODULE 3</div><div class="ttl">Maintenance Analytics (ML)</div><div class="dsc">Random Forest + PCA over 26 statistical features from position-error + motor-current signals. Bayesian-tuned.</div></div>
+                <div class="sum-tile"><div class="num">MODULE 4</div><div class="ttl">NLP Layer</div><div class="dsc">Rule + dictionary based: Aho-Corasick word segmentation, NER to FMECA entity classes, Cypher template selection.</div></div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION NAV ════════════════════════════════════════ -->
+        <nav class="section-nav" id="sectionNav">
+            <a class="nav-pill active" href="#sec-arch">Architecture</a>
+            <a class="nav-pill" href="#sec-modules">4 Modules</a>
+            <a class="nav-pill" href="#sec-modes">2 Modes</a>
+            <a class="nav-pill" href="#sec-case">Case Study</a>
+            <a class="nav-pill" href="#sec-gaps">Gaps &amp; Enhancements</a>
+            <a class="nav-pill" href="#sec-enhanced">Enhanced Engine</a>
+            <a class="nav-pill" href="#sec-roadmap">Roadmap</a>
+            <a class="nav-pill" href="#sec-questions">Open Questions</a>
+        </nav>
+
+        <!-- ════════════════════════════════════════ SECTION 1 — BLOCK DIAGRAM ════════════════════════════════════════ -->
+        <section class="section" id="sec-arch" data-nav-id="sec-arch">
+            <h2><i class="fas fa-sitemap"></i> Architecture &mdash; The Paper's Baseline System</h2>
+            <p class="intro">
+                The advisor system has four cooperating modules. <b>FMECA</b> is the source-of-truth documentation; the
+                <b>Knowledge Graph</b> turns the tabular FMECA into a queryable Neo4j instance; the <b>Maintenance
+                Analytics</b> module diagnoses faults from raw sensor data; and the <b>NLP layer</b> translates
+                human questions into Cypher queries. The same Cypher-template tail is reused by both interaction modes,
+                which keeps the answer surface deterministic.
+            </p>
+
+            <div class="big-diagram" role="img" aria-label="Block diagram of the paper's baseline architecture">
+                <svg viewBox="0 0 1100 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"/>
+                        </marker>
+                        <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#00DDFF"/>
+                        </marker>
+                        <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#FFAA00"/>
+                        </marker>
+                        <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#00FF88"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Section labels -->
+                    <text class="d-text-section" x="20" y="30">A. Sources</text>
+                    <text class="d-text-section" x="295" y="30">B. Knowledge Layer</text>
+                    <text class="d-text-section" x="565" y="30">C. Inference</text>
+                    <text class="d-text-section" x="820" y="30">D. Advisor I/O</text>
+
+                    <!-- Vertical separators -->
+                    <line class="d-line-dim" x1="275" y1="50" x2="275" y2="520"/>
+                    <line class="d-line-dim" x1="545" y1="50" x2="545" y2="520"/>
+                    <line class="d-line-dim" x1="800" y1="50" x2="800" y2="520"/>
+
+                    <!-- A. Sources -->
+                    <rect class="d-block" x="20" y="60" width="240" height="62" rx="6"/>
+                    <text class="d-text" x="32" y="80">Design Knowledge</text>
+                    <text class="d-text-sm" x="32" y="96">Degradation mechanisms</text>
+                    <text class="d-text-sm" x="32" y="110">Failure modes &middot; criticality</text>
+
+                    <rect class="d-block-amber" x="20" y="140" width="240" height="62" rx="6"/>
+                    <text class="d-text" x="32" y="160">FMECA Tabular</text>
+                    <text class="d-text-sm" x="32" y="176">IEC 60812 worksheet</text>
+                    <text class="d-text-sm" x="32" y="190">Components, Faults, Failures...</text>
+
+                    <rect class="d-block-cyan" x="20" y="220" width="240" height="62" rx="6"/>
+                    <text class="d-text" x="32" y="240">Sensor Stream</text>
+                    <text class="d-text-sm" x="32" y="256">Position-error + Motor-current</text>
+                    <text class="d-text-sm" x="32" y="270">25 Hz &middot; 16 s motion cycles</text>
+
+                    <rect class="d-block" x="20" y="300" width="240" height="62" rx="6"/>
+                    <text class="d-text" x="32" y="320">Operator Question</text>
+                    <text class="d-text-sm" x="32" y="336">"What is the cause of</text>
+                    <text class="d-text-sm" x="32" y="350">spalling?"</text>
+
+                    <rect class="d-block" x="20" y="380" width="240" height="62" rx="6"/>
+                    <text class="d-text" x="32" y="400">CMMS Work Order</text>
+                    <text class="d-text-sm" x="32" y="416">External link (paper: abstract)</text>
+                    <text class="d-text-sm" x="32" y="430">Used for prescriptive output</text>
+
+                    <!-- B. Knowledge Layer -->
+                    <rect class="d-block-amber" x="295" y="120" width="235" height="80" rx="6"/>
+                    <text class="d-text" x="307" y="143">FMECA Knowledge Graph</text>
+                    <text class="d-text-amber" x="307" y="160">Neo4j &middot; Cypher</text>
+                    <text class="d-text-sm" x="307" y="176">10 node types &middot; 12 relationships</text>
+                    <text class="d-text-sm" x="307" y="190">HAS_FAULTS &middot; LEADS_TO &middot; HAS_RPN</text>
+
+                    <rect class="d-block-cyan" x="295" y="240" width="235" height="62" rx="6"/>
+                    <text class="d-text" x="307" y="260">FMECA -&gt; KG Translator</text>
+                    <text class="d-text-sm" x="307" y="276">Schema mapper + Cypher loader</text>
+                    <text class="d-text-sm" x="307" y="290">Static at design time</text>
+
+                    <rect class="d-block" x="295" y="320" width="235" height="62" rx="6"/>
+                    <text class="d-text" x="307" y="340">Cypher Template Library</text>
+                    <text class="d-text-sm" x="307" y="356">Question class -&gt; Cypher</text>
+                    <text class="d-text-sm" x="307" y="370">Re-used by both modes</text>
+
+                    <!-- C. Inference -->
+                    <rect class="d-block-cyan" x="565" y="220" width="225" height="80" rx="6"/>
+                    <text class="d-text" x="577" y="243">Maintenance Analytics</text>
+                    <text class="d-text-cyan" x="577" y="260">Random Forest + PCA</text>
+                    <text class="d-text-sm" x="577" y="276">26 stat features &middot; Bayesian opt</text>
+                    <text class="d-text-sm" x="577" y="290">51 trees &middot; 7 PCA components</text>
+
+                    <rect class="d-block" x="565" y="320" width="225" height="62" rx="6"/>
+                    <text class="d-text" x="577" y="340">NLP Layer</text>
+                    <text class="d-text-sm" x="577" y="356">Aho-Corasick &middot; NER &middot; question</text>
+                    <text class="d-text-sm" x="577" y="370">classification -&gt; Cypher selector</text>
+
+                    <rect class="d-block-amber" x="565" y="120" width="225" height="80" rx="6"/>
+                    <text class="d-text" x="577" y="143">Predicted Fault Label</text>
+                    <text class="d-text-amber" x="577" y="160">Normal | Backlash | Spalling</text>
+                    <text class="d-text-amber" x="577" y="174">| Lack-of-lubrication</text>
+                    <text class="d-text-sm" x="577" y="190">Macro F1 = 84.84%</text>
+
+                    <!-- D. Advisor I/O -->
+                    <rect class="d-block-green" x="820" y="120" width="260" height="120" rx="6"/>
+                    <text class="d-text" x="833" y="143">Advisor Response</text>
+                    <text class="d-text-green" x="833" y="160">Root cause &middot; Mechanism</text>
+                    <text class="d-text-sm" x="833" y="176">Components implicated</text>
+                    <text class="d-text-sm" x="833" y="190">Prescribed Actions &amp; Steps</text>
+                    <text class="d-text-sm" x="833" y="204">RPN tuple (Severity / Occur. /</text>
+                    <text class="d-text-sm" x="833" y="218">Detection)</text>
+                    <text class="d-text-sm" x="833" y="232">Failure description &middot; effects</text>
+
+                    <rect class="d-block" x="820" y="260" width="260" height="60" rx="6"/>
+                    <text class="d-text" x="833" y="280">Mode A &middot; By API (Natural Lang.)</text>
+                    <text class="d-text-cyan" x="833" y="296">User -&gt; NLP -&gt; Cypher -&gt; KG -&gt; Reply</text>
+                    <text class="d-text-sm" x="833" y="310">Deterministic, explainable</text>
+
+                    <rect class="d-block" x="820" y="340" width="260" height="60" rx="6"/>
+                    <text class="d-text" x="833" y="360">Mode B &middot; By Engine (Sensor)</text>
+                    <text class="d-text-amber" x="833" y="376">Data -&gt; RF -&gt; Label -&gt; KG -&gt; Reply</text>
+                    <text class="d-text-sm" x="833" y="390">Data-driven, no framing needed</text>
+
+                    <!-- Connectors -->
+                    <!-- Design + FMECA -> KG Translator -->
+                    <path class="d-line-amber" d="M260,91 Q280,91 285,180 H295" marker-end="url(#arr-amber)"/>
+                    <path class="d-line-amber" d="M260,171 H295" marker-end="url(#arr-amber)"/>
+                    <!-- Translator -> KG -->
+                    <path class="d-line-amber" d="M412,240 V200" marker-end="url(#arr-amber)"/>
+                    <!-- KG <-> Cypher templates -->
+                    <path class="d-line-amber" d="M412,320 V200" marker-end="url(#arr-amber)" marker-start="url(#arr-amber)"/>
+                    <!-- Sensor -> Analytics -->
+                    <path class="d-line-cyan" d="M260,251 Q400,251 565,260" marker-end="url(#arr-cyan)"/>
+                    <!-- Analytics -> Predicted label -->
+                    <path class="d-line-cyan" d="M677,220 V200" marker-end="url(#arr-cyan)"/>
+                    <!-- Operator question -> NLP -->
+                    <path class="d-line-cyan" d="M260,331 Q450,331 565,351" marker-end="url(#arr-cyan)"/>
+                    <!-- NLP -> Cypher templates (backward) -->
+                    <path class="d-line-cyan" d="M565,351 H530" marker-end="url(#arr-cyan)"/>
+                    <!-- Predicted label -> Cypher templates -->
+                    <path class="d-line-amber" d="M677,200 Q677,300 530,351" marker-end="url(#arr-amber)"/>
+                    <!-- KG -> Advisor Response -->
+                    <path class="d-line-green" d="M530,160 H820" marker-end="url(#arr-green)"/>
+                    <!-- Cypher templates -> Advisor Response (results stream) -->
+                    <path class="d-line-green" d="M530,351 Q700,351 820,200" marker-end="url(#arr-green)"/>
+                    <!-- Advisor -> Mode A / Mode B labels -->
+                    <path class="d-line-cyan" d="M950,240 V260" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-amber" d="M950,240 V340" marker-end="url(#arr-amber)"/>
+                    <!-- CMMS link -->
+                    <path class="d-line-dim" d="M260,411 Q650,411 1000,400" marker-end="url(#arr)"/>
+                    <text class="d-text-sm" x="540" y="430">CMMS hook (paper: described abstractly, not closed-loop)</text>
+                </svg>
+            </div>
+            <div class="legend">
+                <span><i style="background:var(--amber);"></i> Knowledge / FMECA path</span>
+                <span><i style="background:var(--cyan);"></i> Data / NLP path</span>
+                <span><i style="background:var(--green);"></i> Reply / Advisor output</span>
+                <span><i style="background:var(--line);"></i> External integration (abstract in paper)</span>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 2 — 4 MODULES ════════════════════════════════════════ -->
+        <section class="section" id="sec-modules" data-nav-id="sec-modules">
+            <h2><i class="fas fa-cubes"></i> The Four Modules</h2>
+            <p class="intro">
+                Each module has a distinct role, a clear input contract, a clear output contract, and a specific
+                tech-stack pick. The cards below name each one, with a sub-flowchart showing its internal pipeline.
+            </p>
+
+            <div class="modules-grid">
+                <!-- Module 1 -->
+                <div class="module-card">
+                    <div class="mc-head">
+                        <span class="mc-num">M1</span>
+                        <div>
+                            <div class="mc-name">FMECA Documentation</div>
+                            <div class="mc-role">IEC 60812 tabular</div>
+                        </div>
+                    </div>
+                    <div class="mc-body">
+                        Failure Mode, Effects &amp; Criticality Analysis. The source-of-truth worksheet built from
+                        design knowledge and operational degradation mechanisms. Defines the canonical entities the
+                        rest of the system reasons over.
+                    </div>
+                    <dl class="mc-meta">
+                        <dt>Input</dt><dd>Design specs, expert interviews, historical failure reports</dd>
+                        <dt>Output</dt><dd>Tabular FMECA worksheet (Components, Faults, Failures, Mechanisms, Effects, Actions, Steps, SOD&middot;RPN)</dd>
+                        <dt>Tech</dt><dd>IEC 60812 standard &middot; Excel / structured CSV</dd>
+                    </dl>
+                    <div class="mc-svg">
+                        <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+                            <rect class="d-block" x="10" y="20" width="100" height="36" rx="5"/><text class="d-text" x="20" y="42">Asset Design</text>
+                            <rect class="d-block" x="10" y="75" width="100" height="36" rx="5"/><text class="d-text" x="20" y="97">Field History</text>
+                            <rect class="d-block-amber" x="160" y="48" width="120" height="40" rx="5"/><text class="d-text" x="172" y="73">FMECA Workshop</text>
+                            <rect class="d-block-amber" x="335" y="48" width="155" height="40" rx="5"/><text class="d-text" x="347" y="65">IEC 60812 Worksheet</text><text class="d-text-amber" x="347" y="80">RPN = S &times; O &times; D</text>
+                            <path class="d-line-amber" d="M110,38 H160" marker-end="url(#arr-amber)"/>
+                            <path class="d-line-amber" d="M110,93 Q135,93 160,68" marker-end="url(#arr-amber)"/>
+                            <path class="d-line-amber" d="M280,68 H335" marker-end="url(#arr-amber)"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Module 2 -->
+                <div class="module-card">
+                    <div class="mc-head">
+                        <span class="mc-num">M2</span>
+                        <div>
+                            <div class="mc-name">FMECA Knowledge Graph</div>
+                            <div class="mc-role">Neo4j &middot; Cypher</div>
+                        </div>
+                    </div>
+                    <div class="mc-body">
+                        Converts the tabular FMECA into a graph: <b>10 node types</b> linked by <b>12 relationship
+                        types</b> &mdash; <code style="font-family:monospace;color:var(--amber);">HAS_COMPONENTS, HAS_FAULTS, LEADS_TO, HAS_MECHANISM, HAS_RPN, HAS_STEPS,
+                        HAS_ACTIONS_OF_FAILURES</code> and similar. Queryable via Cypher templates from both modes.
+                    </div>
+                    <dl class="mc-meta">
+                        <dt>Input</dt><dd>FMECA worksheet (M1 output)</dd>
+                        <dt>Output</dt><dd>Live Neo4j graph; Cypher response sets</dd>
+                        <dt>Tech</dt><dd>Neo4j 4.x &middot; py2neo or Cypher driver &middot; schema mapper script</dd>
+                        <dt>Case</dt><dd>12 components, 23 faults, 20 failures, 34 actions, 35 mechanisms, 32 effects, 11 SOD&middot;RPN tuples</dd>
+                    </dl>
+                    <div class="mc-svg">
+                        <svg viewBox="0 0 500 140" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="60" cy="40" r="20" class="d-block-amber"/><text class="d-text" x="46" y="44">Comp</text>
+                            <circle cx="160" cy="35" r="20" class="d-block-amber"/><text class="d-text" x="146" y="39">Fault</text>
+                            <circle cx="260" cy="50" r="20" class="d-block-amber"/><text class="d-text" x="246" y="54">Fail</text>
+                            <circle cx="360" cy="35" r="20" class="d-block-amber"/><text class="d-text" x="346" y="39">Effect</text>
+                            <circle cx="160" cy="100" r="20" class="d-block-amber"/><text class="d-text" x="142" y="104">Mech</text>
+                            <circle cx="260" cy="110" r="20" class="d-block-amber"/><text class="d-text" x="244" y="114">Action</text>
+                            <circle cx="360" cy="100" r="20" class="d-block-amber"/><text class="d-text" x="346" y="104">Steps</text>
+                            <circle cx="440" cy="65" r="20" class="d-block-amber"/><text class="d-text" x="426" y="69">RPN</text>
+                            <line class="d-line-amber" x1="80" y1="40" x2="140" y2="35"/>
+                            <line class="d-line-amber" x1="180" y1="35" x2="240" y2="50"/>
+                            <line class="d-line-amber" x1="280" y1="50" x2="340" y2="35"/>
+                            <line class="d-line-amber" x1="160" y1="55" x2="160" y2="80"/>
+                            <line class="d-line-amber" x1="180" y1="100" x2="240" y2="110"/>
+                            <line class="d-line-amber" x1="280" y1="110" x2="340" y2="100"/>
+                            <line class="d-line-amber" x1="280" y1="50" x2="420" y2="65"/>
+                            <line class="d-line-amber" x1="380" y1="35" x2="430" y2="55"/>
+                            <text class="d-text-sm" x="10" y="135">12 relationship types &middot; Cypher queryable</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Module 3 -->
+                <div class="module-card">
+                    <div class="mc-head">
+                        <span class="mc-num">M3</span>
+                        <div>
+                            <div class="mc-name">Maintenance Analytics (ML)</div>
+                            <div class="mc-role">Random Forest + PCA</div>
+                        </div>
+                    </div>
+                    <div class="mc-body">
+                        From raw sensor windows, extracts <b>26 statistical features</b> (overshoot OVy/OVz, peak
+                        values Py/Pz, peak locations, mean steady-state S_z, &sigma;_z, RMS_y/z, skewness SK_y/z,
+                        crest factor C_y/z, max-peak-near-max-speed Ps_z). PCA reduces dimensionality; RF classifies.
+                        Bayesian optimisation tunes hyperparameters.
+                    </div>
+                    <dl class="mc-meta">
+                        <dt>Input</dt><dd>Position-error + motor-current sensor stream, 25 Hz, 16-s windows</dd>
+                        <dt>Output</dt><dd>Fault-class label (Normal / Backlash / Spalling / Lack-of-lubrication)</dd>
+                        <dt>Tech</dt><dd>scikit-learn RandomForestClassifier &middot; PCA &middot; scikit-optimize / Optuna</dd>
+                        <dt>Optimal</dt><dd>51 trees &middot; 7 PCA components &middot; 80/20 train/test split</dd>
+                    </dl>
+                    <div class="mc-svg">
+                        <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+                            <rect class="d-block-cyan" x="10" y="40" width="80" height="40" rx="5"/><text class="d-text" x="22" y="65">Sensors</text>
+                            <rect class="d-block" x="115" y="40" width="100" height="40" rx="5"/><text class="d-text" x="125" y="58">26 Features</text><text class="d-text-sm" x="125" y="73">OV, RMS, SK, C ...</text>
+                            <rect class="d-block-cyan" x="240" y="40" width="80" height="40" rx="5"/><text class="d-text" x="252" y="60">PCA</text><text class="d-text-sm" x="252" y="73">7 comp.</text>
+                            <rect class="d-block-cyan" x="345" y="40" width="80" height="40" rx="5"/><text class="d-text" x="357" y="60">RF (51)</text><text class="d-text-sm" x="357" y="73">Bayesian opt</text>
+                            <rect class="d-block-amber" x="445" y="40" width="50" height="40" rx="5"/><text class="d-text-amber" x="453" y="65">Label</text>
+                            <path class="d-line-cyan" d="M90,60 H115" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M215,60 H240" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M320,60 H345" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-amber" d="M425,60 H445" marker-end="url(#arr-amber)"/>
+                            <text class="d-text-sm" x="10" y="110">Macro F1 = 84.84% &middot; Precision 85.00% &middot; Recall 84.76%</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Module 4 -->
+                <div class="module-card">
+                    <div class="mc-head">
+                        <span class="mc-num">M4</span>
+                        <div>
+                            <div class="mc-name">NLP Layer</div>
+                            <div class="mc-role">Aho-Corasick &middot; rule-based</div>
+                        </div>
+                    </div>
+                    <div class="mc-body">
+                        Three-stage rule-based NLP: (a) word segmentation; (b) Named Entity Recognition (NER) maps
+                        words to FMECA entity classes &mdash; <i>Action / Component / Effect / Failure / Fault /
+                        Mechanism</i>; (c) question classification picks a Cypher template, runs it, formats the
+                        answer. Deterministic, explainable, no hallucination.
+                    </div>
+                    <dl class="mc-meta">
+                        <dt>Input</dt><dd>Operator question in natural language</dd>
+                        <dt>Output</dt><dd>Cypher query &middot; result set &middot; templated answer</dd>
+                        <dt>Tech</dt><dd>Python pyahocorasick &middot; dictionary built from FMECA entities &middot; lookup-table classifier</dd>
+                    </dl>
+                    <div class="mc-svg">
+                        <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+                            <rect class="d-block" x="10" y="40" width="100" height="40" rx="5"/><text class="d-text" x="20" y="58">Question</text><text class="d-text-sm" x="20" y="73">"what causes...?"</text>
+                            <rect class="d-block-cyan" x="135" y="40" width="90" height="40" rx="5"/><text class="d-text" x="147" y="58">Word seg.</text><text class="d-text-sm" x="147" y="73">Aho-Corasick</text>
+                            <rect class="d-block-cyan" x="250" y="40" width="80" height="40" rx="5"/><text class="d-text" x="262" y="60">NER</text><text class="d-text-sm" x="262" y="73">Entity class</text>
+                            <rect class="d-block-cyan" x="355" y="40" width="90" height="40" rx="5"/><text class="d-text" x="367" y="58">Question</text><text class="d-text-sm" x="367" y="73">classifier</text>
+                            <rect class="d-block-amber" x="190" y="95" width="170" height="30" rx="5"/><text class="d-text-amber" x="202" y="115">Cypher template selected</text>
+                            <path class="d-line-cyan" d="M110,60 H135" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M225,60 H250" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M330,60 H355" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-amber" d="M400,80 Q400,95 360,108" marker-end="url(#arr-amber)"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 3 — TWO MODES ════════════════════════════════════════ -->
+        <section class="section" id="sec-modes" data-nav-id="sec-modes">
+            <h2><i class="fas fa-arrows-left-right"></i> Two Interaction Modes</h2>
+            <p class="intro">
+                The user reaches the advisor through one of two entry points. <b>Mode A</b> is for the engineer who
+                knows what to ask; <b>Mode B</b> is for the technician with raw data but no diagnosis. Both modes
+                terminate at the same Cypher-template tail, so the answer surface is consistent &mdash; the upstream
+                arrival path is the only thing that changes.
+            </p>
+
+            <div class="modes-grid">
+                <!-- Mode A -->
+                <div class="mode-card cyan">
+                    <div>
+                        <span class="mode-tag">Mode A &middot; By API</span>
+                    </div>
+                    <div class="mode-title">Natural-Language Query Path</div>
+                    <div class="mode-sub">
+                        Operator types a question. NLP segments, classifies, picks a Cypher template, runs it on the
+                        FMECA-KG, and returns a templated answer. Bounded to the paper's predefined Cypher templates.
+                    </div>
+                    <div class="mode-svg">
+                        <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+                            <rect class="d-block" x="10" y="20" width="100" height="40" rx="5"/><text class="d-text" x="20" y="38">Operator</text><text class="d-text-sm" x="20" y="53">types question</text>
+                            <rect class="d-block-cyan" x="140" y="20" width="100" height="40" rx="5"/><text class="d-text" x="152" y="38">Word seg.</text><text class="d-text-sm" x="152" y="53">Aho-Corasick</text>
+                            <rect class="d-block-cyan" x="270" y="20" width="100" height="40" rx="5"/><text class="d-text" x="282" y="40">NER</text>
+                            <rect class="d-block-cyan" x="400" y="20" width="90" height="40" rx="5"/><text class="d-text" x="412" y="38">Q. class</text><text class="d-text-sm" x="412" y="53">tpl. selector</text>
+                            <rect class="d-block-amber" x="270" y="95" width="220" height="40" rx="5"/><text class="d-text" x="282" y="113">Cypher run on FMECA-KG</text><text class="d-text-amber" x="282" y="128">Neo4j</text>
+                            <rect class="d-block-green" x="10" y="95" width="240" height="40" rx="5"/><text class="d-text" x="22" y="113">Formatted answer to operator</text><text class="d-text-green" x="22" y="128">root cause + actions + steps</text>
+                            <rect class="d-block" x="60" y="170" width="380" height="38" rx="5"/><text class="d-text" x="74" y="195">Strength: deterministic, explainable, traceable</text>
+                            <path class="d-line-cyan" d="M110,40 H140" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M240,40 H270" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M370,40 H400" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-amber" d="M445,60 Q445,80 400,95" marker-end="url(#arr-amber)"/>
+                            <path class="d-line-green" d="M270,115 H250" marker-end="url(#arr-green)"/>
+                        </svg>
+                    </div>
+                    <div class="qa">
+                        <div class="q">Q: "what is the cause of spalling?"</div>
+                        <div class="a">
+                            A: "Spalling has descriptions: <i>Surface defects cause irregular movement and increased
+                            wear</i>. May arise from components: <b>nuts, screws, balls, bearings</b>. Mechanisms:
+                            surface fatigue, contact-stress concentration. Prescribed actions: replace contaminated
+                            grease, inspect raceway, schedule bearing overhaul. RPN tuple = (S, O, D)."
+                        </div>
+                    </div>
+                    <div class="pros">
+                        <div class="strong"><b>Strength</b>Explainable. Same query always returns the same answer. No hallucination.</div>
+                        <div class="weak"><b>Weakness</b>Bounded to predefined Cypher templates. Cannot handle open-ended or unseen phrasings.</div>
+                    </div>
+                </div>
+
+                <!-- Mode B -->
+                <div class="mode-card amber">
+                    <div>
+                        <span class="mode-tag">Mode B &middot; By Engine Algorithms</span>
+                    </div>
+                    <div class="mode-title">Sensor-Upload Diagnostic Path</div>
+                    <div class="mode-sub">
+                        Operator uploads raw measurement data (paper's CLI: <code style="color:var(--amber);background:var(--kv-bg);padding:0 4px;border-radius:3px;">predict ./dataset/output_3</code>).
+                        PCA + RF classify the fault. Predicted label feeds the same Cypher tail as Mode A &mdash;
+                        same answer surface, different arrival path.
+                    </div>
+                    <div class="mode-svg">
+                        <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+                            <rect class="d-block" x="10" y="20" width="100" height="40" rx="5"/><text class="d-text" x="20" y="38">Operator</text><text class="d-text-sm" x="20" y="53">uploads data</text>
+                            <rect class="d-block-cyan" x="140" y="20" width="100" height="40" rx="5"/><text class="d-text" x="152" y="38">Feature ext.</text><text class="d-text-sm" x="152" y="53">26 stats</text>
+                            <rect class="d-block-cyan" x="270" y="20" width="90" height="40" rx="5"/><text class="d-text" x="282" y="40">PCA (7)</text>
+                            <rect class="d-block-cyan" x="390" y="20" width="100" height="40" rx="5"/><text class="d-text" x="402" y="38">RF (51)</text><text class="d-text-sm" x="402" y="53">vote &amp; class</text>
+                            <rect class="d-block-amber" x="270" y="95" width="220" height="40" rx="5"/><text class="d-text" x="282" y="113">Cypher run on FMECA-KG</text><text class="d-text-amber" x="282" y="128">label -&gt; root cause</text>
+                            <rect class="d-block-green" x="10" y="95" width="240" height="40" rx="5"/><text class="d-text" x="22" y="113">Formatted answer to operator</text><text class="d-text-green" x="22" y="128">label + cause + actions + steps</text>
+                            <rect class="d-block" x="60" y="170" width="380" height="38" rx="5"/><text class="d-text" x="74" y="195">Strength: data-driven, no human framing</text>
+                            <path class="d-line-cyan" d="M110,40 H140" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M240,40 H270" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-cyan" d="M360,40 H390" marker-end="url(#arr-cyan)"/>
+                            <path class="d-line-amber" d="M440,60 Q440,80 400,95" marker-end="url(#arr-amber)"/>
+                            <path class="d-line-green" d="M270,115 H250" marker-end="url(#arr-green)"/>
+                        </svg>
+                    </div>
+                    <div class="qa">
+                        <div class="q">Upload: <code style="background:var(--kv-bg);padding:0 4px;border-radius:3px;">predict ./dataset/output_3</code> (label = Backlashneg40)</div>
+                        <div class="a">
+                            A: "All 10 motion cycles classified as <b>Backlash</b>. Linked components: <b>bearings,
+                            nuts, balls, screws</b>. Failure descriptions and effects attached. Corrective actions:
+                            check pre-load, re-shim, replace nut if wear exceeds tolerance. Steps:
+                            <i>1. de-energise; 2. lock-out; 3. dismantle...</i>"
+                        </div>
+                    </div>
+                    <div class="pros">
+                        <div class="strong"><b>Strength</b>Catches faults from raw signal anomalies. No expert framing required.</div>
+                        <div class="weak"><b>Weakness</b>Bounded to 4 known classes. Cannot detect novel failure modes &mdash; will force-fit.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 4 — CASE STUDY ════════════════════════════════════════ -->
+        <section class="section" id="sec-case" data-nav-id="sec-case">
+            <h2><i class="fas fa-flask"></i> Case-Study Numbers &mdash; What the Paper Actually Reports</h2>
+            <p class="intro">
+                Asset under test: a single linear actuator (Cranfield dataset). Four fault states &times; three loads
+                &times; 50 motion cycles = <b>600 events</b>. Results below are quoted verbatim from the paper &mdash;
+                no fabricated numbers, no averaged-up restatements.
+            </p>
+
+            <div class="kpi-row">
+                <div class="kpi cyan"><div class="kl">Faults</div><div class="kv">4</div><div class="ks">Normal, Backlash, Spalling, Lack-of-lubrication</div></div>
+                <div class="kpi cyan"><div class="kl">Loads</div><div class="kv">3</div><div class="ks">20 kg, 40 kg, -40 kg</div></div>
+                <div class="kpi cyan"><div class="kl">Total events</div><div class="kv">600</div><div class="ks">12 conditions &times; 50 cycles</div></div>
+                <div class="kpi cyan"><div class="kl">Sample rate</div><div class="kv">25 Hz</div><div class="ks">16-second motion cycles</div></div>
+                <div class="kpi amber"><div class="kl">Macro F1</div><div class="kv">84.84%</div><div class="ks">overall, after Bayesian opt</div></div>
+                <div class="kpi amber"><div class="kl">Precision / Recall</div><div class="kv">85.00 / 84.76</div><div class="ks">%</div></div>
+                <div class="kpi amber"><div class="kl">RF trees</div><div class="kv">51</div><div class="ks">optimum</div></div>
+                <div class="kpi amber"><div class="kl">PCA components</div><div class="kv">7</div><div class="ks">optimum</div></div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Fault class</th><th>Per-fault F1</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td class="hl">Lack-of-lubrication</td><td class="num best">97.12%</td><td>Best performance &mdash; all events correctly classified across the 3 loads</td></tr>
+                        <tr><td class="hl">Backlash</td><td class="num">83.50%</td><td>Solid; backlash signal has distinct overshoot/undershoot signature</td></tr>
+                        <tr><td class="hl">Normal</td><td class="num">80.77%</td><td>Some leakage with weak Spalling cases (early-stage degradation overlaps)</td></tr>
+                        <tr><td class="hl">Spalling</td><td class="num weak">77.98%</td><td>Weakest &mdash; early-stage surface defects share signal characteristics with normal/backlash; this is the documented model weakness</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem;">
+                <i class="fas fa-info-circle"></i> The 77.98% Spalling F1 is the canonical opportunity for enhancement
+                (see Gap #10 below). Spalling is also the most economically valuable diagnosis &mdash; catching it
+                early prevents secondary damage to nuts, balls, and screws.
+            </p>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 5 — GAPS & ENHANCEMENTS ════════════════════════════════════════ -->
+        <section class="section" id="sec-gaps" data-nav-id="sec-gaps">
+            <h2><i class="fas fa-magnifying-glass"></i> Gaps &amp; Proposed Enhancements</h2>
+            <p class="intro">
+                Twelve concrete gaps surfaced from a critical read of the paper. Each is paired with a proposed
+                enhancement that names the algorithm or library, not just the wishful direction. Open any gap below.
+            </p>
+
+            <details class="gap">
+                <summary><span class="gap-num">01</span> Single-asset case study &mdash; no fleet generalization <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>The paper validates on <b>one linear actuator</b>. No discussion of how the KG, ML, or NLP behave across asset families (pumps, chillers, switchgear, gensets) or across multiple sites.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>Engineering operations rarely have one asset. A fleet has thousands. Transfer learning, cross-asset reasoning, and federated training are required for operational value.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Build an <b>ontology-driven KG</b> with asset taxonomies (parent: <code>RotatingMachine</code>, children: <code>Pump</code>, <code>Compressor</code>, <code>Motor</code>; FMECA inherits through the hierarchy). Layer <b>federated learning</b> (FedAvg or FedProx) on the RF model so multiple sites contribute gradients without sharing raw sensor data.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">02</span> Static FMECA &mdash; no operational feedback loop <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>The KG is frozen at design time. Field failures, novel fault patterns, and lessons learned from completed work orders never propagate back into the FMECA or the KG.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>The most valuable knowledge in an engineering operation is what the technicians learn doing the job. A static FMECA wastes it. The advisor stays as smart as the day it was commissioned.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Close the loop with an <b>experience-capture pipeline</b>: when a CMMS work order is closed, an NER pass over the completion notes extracts (action, observed-fault, observed-mechanism) triples and proposes a KG diff. A reliability engineer reviews and accepts in a lightweight admin UI. Auditable, reversible, traceable.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">03</span> No CMMS integration &mdash; prescription stops at advice <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>Paper mentions CMMS work orders abstractly. Advisor output is a text answer &mdash; not an action in the maintenance system. No bi-directional sync.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>True "prescriptive" maintenance requires the prescription to land in a planner's queue, with parts reserved, technicians assigned, and an estimated MTTR. Otherwise it's just decision support.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Bi-directional <b>CMMS hook</b> via REST or webhook (IBM Maximo, SAP PM, Infor EAM, Fiix, UpKeep). On advisor output: auto-create WO with prescribed steps, BOM, MTTR estimate, criticality from RPN. On WO completion: capture outcome back into the KG via Gap #02's experience-capture pipeline.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">04</span> PCA opacity &mdash; loss of feature interpretability <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>PCA collapses the 26 engineering-meaningful features (RMS, skewness, crest factor, overshoot...) into 7 abstract components. A technician cannot tell <i>which signal feature</i> drove a classification.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>Maintenance staff need explainable diagnoses. "The RF says backlash" is not actionable; "the RF says backlash because overshoot OVy is 3&sigma; above baseline" is.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Complement PCA with <b>SHAP</b> (TreeSHAP for RF, very fast) or built-in Gini-importance ranking, computed on the <i>original 26 features</i> in parallel. Surface the top-3 driving features per prediction in the advisor UI. Optional: keep PCA only for visualization, run RF on raw features for production scoring.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">05</span> No anomaly detection &mdash; novel faults are force-fit <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>RF only chooses among the 4 known classes. Any unseen fault mode (e.g. a sudden seal failure) gets force-classified into the nearest known label, silently and confidently wrong.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>"Unknown unknowns" are the most expensive failures. A diagnostic system that lies confidently in their presence destroys operator trust.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Add an <b>anomaly pre-filter</b>: Isolation Forest or One-Class SVM trained only on Normal data. Score on every new cycle. If anomaly-score &gt; threshold AND RF confidence &lt; threshold &rArr; flag "anomalous but unrecognised" and route to a reliability engineer (human-in-the-loop) instead of force-fitting.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">06</span> No Remaining Useful Life &mdash; diagnostic, not prognostic <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>The system diagnoses <i>what</i> is failing, not <i>when</i>. RUL prediction is absent. "True" prescriptive maintenance must be time-aware so the planner can schedule before fault, not after.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>Without RUL, the advisor can only react. With RUL, the advisor can schedule the work order to land 2 weeks before predicted failure, with parts in the cage and a technician booked.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Add a <b>survival-analysis regressor</b> (Cox Proportional Hazards or DeepSurv) <b>or</b> a <b>recurrent RUL regressor</b> (LSTM/GRU over the feature time-series). Train on degradation paths in the dataset. Output a posterior over RUL with quantile bands, not a single number.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">07</span> No vendor / spare-parts / cost integration <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>Prescription stops at "do action X" + "follow steps Y". No link to part availability, vendor catalog, lead-time, or cost. The planner has to do all of that lookup separately.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>If the prescribed action requires a bearing the warehouse doesn't carry with a 12-week lead time, the advisor's recommendation is operationally useless.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Link the FMECA-KG to the existing <a href="spares-readiness-calculator.html" style="color:var(--cyan);">Spares Readiness Calculator</a> spare-parts catalog. KG nodes get <code>HAS_SPARE_PART</code> edges into <code>SPARES_CATALOG</code> entries with availability, lead-time, cost, and supplier. Advisor output becomes: <i>"replace bearing X &mdash; in stock at Bekasi warehouse, $420, 0-day lead time"</i>.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">08</span> No edge / offline mode &mdash; cloud-only assumption <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>Architecture assumes cloud Neo4j + cloud ML inference. Industrial sites often have intermittent connectivity, data-sovereignty constraints (data must not leave the plant), and latency requirements that exclude a cloud round-trip.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>Petrochemical, defence, and primary-industry sites won't deploy a cloud-only advisor. Many DC operations sites have the same constraint.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Distill the RF to a <b>quantized ONNX / tflite</b> model runnable on a Raspberry Pi 5 or Jetson Nano gateway. Replace Neo4j with <b>SQLite + recursive CTEs</b> or an embedded graph store (TerminusDB-embedded). Sync deltas to cloud KG when connectivity returns. Same Cypher template surface, two backends.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">09</span> Rule-based NLP fragility &mdash; can't handle unseen vocabulary <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>Aho-Corasick is a literal-string matcher. If a technician types "lube starvation" instead of "lack of lubrication", or "pitting" instead of "spalling", the NLP fails silently.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>Field vocabulary varies by region, language, vendor, and seniority. A diagnostic system that needs the operator to use exact dictionary terms won't survive contact with reality.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Add a <b>small-LLM rewrite stage</b> (Phi-3 mini, Gemma-2B, or Mistral-7B-Instruct quantized) that paraphrases the user's input into canonical FMECA vocabulary, <b>but gate by Cypher-template generation</b>: the LLM never produces free-form output. It only emits a structured Cypher template ID + entity slots, which the deterministic backend executes. No hallucination because the answer surface stays templated.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">10</span> Spalling early-stage misclassification (F1 = 77.98%) <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>The paper's documented weakest class. Early-stage spalling has signal characteristics overlapping normal and backlash; the 26 time-domain stats miss the fault-mechanism-specific harmonic content.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>Spalling is the most expensive failure mode to miss &mdash; it cascades. Early detection saves the raceway, the balls, the seal, and possibly the entire bearing.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Add <b>wavelet-domain features</b>: Continuous Wavelet Transform energy at bearing-fault-mechanism-specific frequencies (BPFO, BPFI, BSF, FTF computed from geometry + speed). Optionally pre-train a <b>self-supervised contrastive encoder</b> (SimCLR-style) on unlabeled motion cycles before RF, so embeddings cluster spalling cases tighter even at early-stage. Expected lift: spalling F1 from 77.98% to &gt;88%.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">11</span> No multi-fault concurrency &mdash; single-label assumption <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>RF emits exactly one class per cycle. Real degraded assets often have <i>multiple concurrent</i> failure modes &mdash; e.g. spalling combined with lack-of-lubrication &mdash; that the current model collapses to whichever has the higher vote share.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>If a bearing is both spalling AND lubrication-starved, prescribing only "re-grease" while ignoring spalling will accelerate the spalling. Single-label diagnosis can prescribe a partially correct, partially harmful action.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Convert to <b>multi-label RF</b> via one-vs-rest binary RFs per class with sigmoid-thresholded outputs; or migrate to a <b>multi-head neural classifier</b> (shared encoder, per-class sigmoid heads). KG response template then aggregates multiple <code>HAS_FAULTS</code> matches into a combined advisory.</dd></dl>
+                </div>
+            </details>
+
+            <details class="gap">
+                <summary><span class="gap-num">12</span> No uncertainty quantification &mdash; raw vote share, not calibrated <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <div class="gap-body">
+                    <dl class="row gap-tag"><dt>Gap</dt><dd>RF outputs vote share, which is correlated with confidence but not calibrated. There is no statistical guarantee on the prediction; no prediction interval.</dd></dl>
+                    <dl class="row gap-why"><dt>Why it matters</dt><dd>A reliability engineer needs to know <i>how confident</i> the advisor is before authorising an unplanned shutdown. "85% probable backlash" is not the same as "95% confident the true class is in {backlash, lack-of-lubrication}".</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Apply <b>temperature scaling</b> on validation set for vote-share calibration, then layer <b>conformal prediction</b> (Mondrian conformal for per-class coverage) to emit <i>prediction sets</i> with a guaranteed marginal coverage (e.g. 95%). Advisor UI shows: "Likely Backlash; 95% confidence set = {Backlash, Lack-of-lubrication}".</dd></dl>
+                </div>
+            </details>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 6 — ENHANCED ARCHITECTURE ════════════════════════════════════════ -->
+        <section class="section" id="sec-enhanced" data-nav-id="sec-enhanced">
+            <h2><i class="fas fa-diagram-project"></i> Proposed Enhanced Engine Architecture</h2>
+            <p class="intro">
+                The diagram below incorporates the 12 enhancements into a single architecture. Green dashed lines are
+                the <b>feedback / experience-capture</b> loops. Red blocks are <b>safety nets</b> (anomaly detection,
+                uncertainty quantification). Amber blocks are <b>knowledge surfaces</b>. Cyan blocks are <b>inference</b>.
+            </p>
+
+            <div class="big-diagram" role="img" aria-label="Enhanced architecture diagram">
+                <svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                    <!-- Section bands -->
+                    <text class="d-text-section" x="20" y="30">A. Ingest</text>
+                    <text class="d-text-section" x="265" y="30">B. Inference Stack</text>
+                    <text class="d-text-section" x="635" y="30">C. Knowledge + Linkage</text>
+                    <text class="d-text-section" x="940" y="30">D. Operator + CMMS</text>
+                    <line class="d-line-dim" x1="245" y1="50" x2="245" y2="600"/>
+                    <line class="d-line-dim" x1="615" y1="50" x2="615" y2="600"/>
+                    <line class="d-line-dim" x1="915" y1="50" x2="915" y2="600"/>
+
+                    <!-- A. Ingest -->
+                    <rect class="d-block-cyan" x="20" y="60" width="210" height="48" rx="5"/>
+                    <text class="d-text" x="30" y="80">Sensor Stream</text>
+                    <text class="d-text-sm" x="30" y="95">Position-error + motor-current</text>
+
+                    <rect class="d-block-cyan" x="20" y="120" width="210" height="48" rx="5"/>
+                    <text class="d-text" x="30" y="140">Wavelet Features (CWT)</text>
+                    <text class="d-text-sm" x="30" y="155">Gap#10 &middot; BPFO/BPFI/BSF/FTF</text>
+
+                    <rect class="d-block-cyan" x="20" y="180" width="210" height="48" rx="5"/>
+                    <text class="d-text" x="30" y="200">Time-domain 26 features</text>
+                    <text class="d-text-sm" x="30" y="215">OV, RMS, SK, crest, peak loc.</text>
+
+                    <rect class="d-block" x="20" y="240" width="210" height="48" rx="5"/>
+                    <text class="d-text" x="30" y="260">Operator Question (NL)</text>
+                    <text class="d-text-sm" x="30" y="275">Free-form text input</text>
+
+                    <rect class="d-block-amber" x="20" y="300" width="210" height="60" rx="5"/>
+                    <text class="d-text" x="30" y="320">Field Notes / WO Close</text>
+                    <text class="d-text-amber" x="30" y="337">Gap#02 experience capture</text>
+                    <text class="d-text-sm" x="30" y="352">Tech notes -&gt; KG diff proposal</text>
+
+                    <rect class="d-block" x="20" y="380" width="210" height="60" rx="5"/>
+                    <text class="d-text" x="30" y="400">Multi-Site Gradients</text>
+                    <text class="d-text-sm" x="30" y="416">Gap#01 federated learning</text>
+                    <text class="d-text-sm" x="30" y="430">FedAvg over site shards</text>
+
+                    <rect class="d-block" x="20" y="460" width="210" height="60" rx="5"/>
+                    <text class="d-text" x="30" y="480">Edge Gateway</text>
+                    <text class="d-text-sm" x="30" y="496">Gap#08 &middot; Pi5 / Jetson Nano</text>
+                    <text class="d-text-sm" x="30" y="510">ONNX RF + SQLite KG fallback</text>
+
+                    <!-- B. Inference Stack -->
+                    <rect class="d-block-red" x="265" y="60" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="80">Anomaly Pre-filter</text>
+                    <text class="d-text" x="277" y="98" style="fill:var(--red);">Gap#05 &middot; Isolation Forest / OC-SVM</text>
+                    <text class="d-text-sm" x="277" y="112">High anomaly + low RF conf -&gt; human-in-the-loop route</text>
+
+                    <rect class="d-block-cyan" x="265" y="135" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="155">Random Forest + Multi-Label Head</text>
+                    <text class="d-text-cyan" x="277" y="172">Gap#11 one-vs-rest binary RFs</text>
+                    <text class="d-text-sm" x="277" y="186">Optional contrastive pre-train (SimCLR) Gap#10</text>
+
+                    <rect class="d-block-cyan" x="265" y="210" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="230">SHAP Explainer</text>
+                    <text class="d-text-cyan" x="277" y="247">Gap#04 TreeSHAP on raw 26 features</text>
+                    <text class="d-text-sm" x="277" y="261">Top-3 driving features surfaced</text>
+
+                    <rect class="d-block-red" x="265" y="285" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="305">Conformal Prediction</text>
+                    <text class="d-text" x="277" y="322" style="fill:var(--red);">Gap#12 temperature scaling + Mondrian</text>
+                    <text class="d-text-sm" x="277" y="336">Prediction set at 95% marginal coverage</text>
+
+                    <rect class="d-block-cyan" x="265" y="360" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="380">RUL Regressor</text>
+                    <text class="d-text-cyan" x="277" y="397">Gap#06 &middot; Cox-PH or LSTM</text>
+                    <text class="d-text-sm" x="277" y="411">Posterior over remaining useful life</text>
+
+                    <rect class="d-block-cyan" x="265" y="435" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="455">LLM Rewrite (gated)</text>
+                    <text class="d-text-cyan" x="277" y="472">Gap#09 Phi-3 / Gemma-2B paraphrase</text>
+                    <text class="d-text-sm" x="277" y="486">Output = Cypher template ID + slot fillers only</text>
+
+                    <rect class="d-block" x="265" y="510" width="335" height="60" rx="5"/>
+                    <text class="d-text" x="277" y="530">NLP layer (Aho-Corasick fallback)</text>
+                    <text class="d-text-sm" x="277" y="547">Baseline deterministic path retained</text>
+                    <text class="d-text-sm" x="277" y="561">Used when LLM unavailable / on edge</text>
+
+                    <!-- C. Knowledge + Linkage -->
+                    <rect class="d-block-amber" x="635" y="60" width="265" height="80" rx="5"/>
+                    <text class="d-text" x="647" y="83">Ontology-Driven KG</text>
+                    <text class="d-text-amber" x="647" y="100">Gap#01 &middot; asset taxonomies</text>
+                    <text class="d-text-sm" x="647" y="116">Pump / Compressor / Motor inherit FMECA</text>
+                    <text class="d-text-sm" x="647" y="131">Neo4j primary &middot; SQLite-graph edge fallback</text>
+
+                    <rect class="d-block-amber" x="635" y="155" width="265" height="60" rx="5"/>
+                    <text class="d-text" x="647" y="175">Cypher Template Library</text>
+                    <text class="d-text-amber" x="647" y="192">Versioned, audited templates</text>
+                    <text class="d-text-sm" x="647" y="206">Mode A &amp; Mode B share this surface</text>
+
+                    <rect class="d-block-amber" x="635" y="230" width="265" height="80" rx="5"/>
+                    <text class="d-text" x="647" y="253">Experience-Capture Pipeline</text>
+                    <text class="d-text-amber" x="647" y="270">Gap#02 &middot; KG diff proposals</text>
+                    <text class="d-text-sm" x="647" y="286">NER over WO close notes</text>
+                    <text class="d-text-sm" x="647" y="301">Engineer review UI &middot; auditable diff</text>
+
+                    <rect class="d-block" x="635" y="325" width="265" height="80" rx="5"/>
+                    <text class="d-text" x="647" y="348">Spares Catalog Link</text>
+                    <text class="d-text" x="647" y="365" style="fill:var(--cyan);">Gap#07 HAS_SPARE_PART edges</text>
+                    <text class="d-text-sm" x="647" y="380">Availability &middot; lead-time &middot; cost</text>
+                    <text class="d-text-sm" x="647" y="395">Reuses Spares Readiness Calc</text>
+
+                    <rect class="d-block-amber" x="635" y="420" width="265" height="80" rx="5"/>
+                    <text class="d-text" x="647" y="443">FMECA Source-of-Truth</text>
+                    <text class="d-text-sm" x="647" y="460">IEC 60812 worksheet</text>
+                    <text class="d-text-sm" x="647" y="475">Versioned, signed, exportable</text>
+                    <text class="d-text-sm" x="647" y="490">Templates inherit from ontology</text>
+
+                    <rect class="d-block" x="635" y="515" width="265" height="60" rx="5"/>
+                    <text class="d-text" x="647" y="535">Provenance Ledger</text>
+                    <text class="d-text-sm" x="647" y="552">Every KG mutation signed + timestamped</text>
+                    <text class="d-text-sm" x="647" y="566">For audit / regulator / safety case</text>
+
+                    <!-- D. Operator + CMMS -->
+                    <rect class="d-block-green" x="940" y="60" width="245" height="100" rx="5"/>
+                    <text class="d-text" x="952" y="83">Advisor UI</text>
+                    <text class="d-text-green" x="952" y="100">Multi-label diagnosis</text>
+                    <text class="d-text-sm" x="952" y="115">+ SHAP feature driver</text>
+                    <text class="d-text-sm" x="952" y="130">+ RUL distribution</text>
+                    <text class="d-text-sm" x="952" y="145">+ Conformal interval</text>
+                    <text class="d-text-sm" x="952" y="155">+ Parts/lead-time/cost</text>
+
+                    <rect class="d-block-green" x="940" y="180" width="245" height="80" rx="5"/>
+                    <text class="d-text" x="952" y="200">CMMS Hook (bi-directional)</text>
+                    <text class="d-text-green" x="952" y="217">Gap#03 &middot; WO auto-create</text>
+                    <text class="d-text-sm" x="952" y="232">Steps, BOM, MTTR, RPN crit.</text>
+                    <text class="d-text-sm" x="952" y="247">WO close -&gt; experience capture</text>
+
+                    <rect class="d-block-red" x="940" y="280" width="245" height="70" rx="5"/>
+                    <text class="d-text" x="952" y="300">Human-in-the-Loop Queue</text>
+                    <text class="d-text" x="952" y="317" style="fill:var(--red);">For anomalies + low-confidence</text>
+                    <text class="d-text-sm" x="952" y="332">Reliability engineer triages</text>
+
+                    <rect class="d-block-green" x="940" y="370" width="245" height="70" rx="5"/>
+                    <text class="d-text" x="952" y="390">Planner Dashboard</text>
+                    <text class="d-text-green" x="952" y="407">Forecast + RUL-driven schedule</text>
+                    <text class="d-text-sm" x="952" y="422">Replaces reactive WO triage</text>
+
+                    <rect class="d-block" x="940" y="460" width="245" height="70" rx="5"/>
+                    <text class="d-text" x="952" y="480">Audit / Safety Case Export</text>
+                    <text class="d-text-sm" x="952" y="497">Provenance ledger -&gt; PDF / CSV</text>
+                    <text class="d-text-sm" x="952" y="512">For regulator, insurer, IEC 61508</text>
+
+                    <!-- Flow connectors -->
+                    <!-- Ingest -> Inference -->
+                    <path class="d-line-cyan" d="M230,84 H265" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M230,144 Q250,144 265,150" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M230,204 Q250,204 265,165" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line" d="M230,264 Q250,264 265,470" marker-end="url(#arr)"/>
+                    <path class="d-line-feedback" d="M230,330 H635 V270" marker-end="url(#arr-green)"/>
+                    <path class="d-line-feedback" d="M230,410 Q240,410 245,420 V155 H265" marker-end="url(#arr-green)"/>
+                    <!-- Edge gateway box link to inference -->
+                    <path class="d-line-dim" d="M230,490 Q250,490 265,260" marker-end="url(#arr)"/>
+
+                    <!-- Inference -> Knowledge -->
+                    <path class="d-line-cyan" d="M600,90 Q615,90 635,100" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M600,165 Q615,165 635,175" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M600,240 Q615,240 635,180" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M600,315 Q615,315 635,180" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M600,390 Q615,390 635,360" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M600,465 H635" marker-end="url(#arr-cyan)"/>
+                    <path class="d-line-cyan" d="M600,540 Q615,540 635,200" marker-end="url(#arr-cyan)"/>
+
+                    <!-- Knowledge -> Operator -->
+                    <path class="d-line-green" d="M900,100 H940" marker-end="url(#arr-green)"/>
+                    <path class="d-line-green" d="M900,260 Q920,260 940,200" marker-end="url(#arr-green)"/>
+                    <path class="d-line-green" d="M900,365 Q920,365 940,400" marker-end="url(#arr-green)"/>
+                    <path class="d-line-green" d="M900,545 H940 V490" marker-end="url(#arr-green)"/>
+                    <!-- Anomaly -> HITL -->
+                    <path class="d-line-feedback" d="M600,90 Q800,90 800,315 H940" marker-end="url(#arr-green)"/>
+
+                    <!-- Feedback loops -->
+                    <path class="d-line-feedback" d="M1062,230 V550 Q1062,580 600,580 Q400,580 230,540" marker-end="url(#arr-green)"/>
+                    <text class="d-text-sm" x="650" y="595" style="fill:var(--green);">CMMS-close -&gt; experience-capture (Gap #02 / #03)</text>
+
+                    <!-- FMECA inheritance arrow -->
+                    <path class="d-line-amber" d="M767,420 V215" marker-end="url(#arr-amber)"/>
+                </svg>
+            </div>
+            <div class="legend">
+                <span><i style="background:var(--cyan);"></i> Inference stack</span>
+                <span><i style="background:var(--amber);"></i> Knowledge surface</span>
+                <span><i style="background:var(--green);"></i> Output / feedback (dashed = closed-loop)</span>
+                <span><i style="background:var(--red);"></i> Safety net (anomaly / uncertainty)</span>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 7 — ROADMAP ════════════════════════════════════════ -->
+        <section class="section" id="sec-roadmap" data-nav-id="sec-roadmap">
+            <h2><i class="fas fa-route"></i> Phased Build Roadmap</h2>
+            <p class="intro">
+                Five phases. Phase 1 reproduces the paper's baseline; Phases 2-5 add the 12 enhancements in dependency
+                order. Phase complexity is rated by effort, not difficulty &mdash; the actual hard part is the
+                cross-functional sign-off, not the code.
+            </p>
+
+            <div class="phase-grid">
+                <div class="phase">
+                    <span class="ph-tag">Phase 1 &middot; MVP</span>
+                    <div class="ph-title">Paper Baseline</div>
+                    <ul>
+                        <li>FMECA worksheet for 1 asset</li>
+                        <li>Neo4j KG (10 node types)</li>
+                        <li>26-feature extraction + PCA + RF</li>
+                        <li>Aho-Corasick NLP</li>
+                        <li>CLI for Mode A &amp; Mode B</li>
+                        <li>Replicates 84.84% F1</li>
+                    </ul>
+                    <div class="ph-complex">Effort: <b>4-6 weeks</b> &middot; 1 ML eng + 1 reliability eng</div>
+                </div>
+
+                <div class="phase">
+                    <span class="ph-tag">Phase 2 &middot; Close the loop</span>
+                    <div class="ph-title">CMMS + Spares + SHAP</div>
+                    <ul>
+                        <li>Gap #03 &mdash; bi-directional CMMS hook</li>
+                        <li>Gap #07 &mdash; Spares Catalog edges</li>
+                        <li>Gap #04 &mdash; SHAP explainer in UI</li>
+                        <li>Web UI replaces CLI</li>
+                        <li>Auth tiering integration (Pro+)</li>
+                    </ul>
+                    <div class="ph-complex">Effort: <b>6-8 weeks</b> &middot; +1 full-stack eng</div>
+                </div>
+
+                <div class="phase">
+                    <span class="ph-tag">Phase 3 &middot; Safety nets</span>
+                    <div class="ph-title">Anomaly + RUL + Uncertainty</div>
+                    <ul>
+                        <li>Gap #05 &mdash; Isolation Forest pre-filter</li>
+                        <li>Gap #06 &mdash; RUL regressor (Cox-PH or LSTM)</li>
+                        <li>Gap #12 &mdash; conformal prediction</li>
+                        <li>Human-in-the-loop queue UI</li>
+                        <li>Calibration test rig</li>
+                    </ul>
+                    <div class="ph-complex">Effort: <b>8-10 weeks</b> &middot; +1 ML eng</div>
+                </div>
+
+                <div class="phase">
+                    <span class="ph-tag">Phase 4 &middot; Lift the ceiling</span>
+                    <div class="ph-title">LLM NLP + Multi-Label + Ontology</div>
+                    <ul>
+                        <li>Gap #09 &mdash; gated small-LLM rewrite</li>
+                        <li>Gap #11 &mdash; multi-label RF</li>
+                        <li>Gap #01 &mdash; ontology-driven KG</li>
+                        <li>Gap #10 &mdash; wavelet features</li>
+                        <li>Gap #02 &mdash; experience-capture</li>
+                    </ul>
+                    <div class="ph-complex">Effort: <b>10-14 weeks</b> &middot; cross-functional</div>
+                </div>
+
+                <div class="phase">
+                    <span class="ph-tag">Phase 5 &middot; Field-ready</span>
+                    <div class="ph-title">Edge + Federated</div>
+                    <ul>
+                        <li>Gap #08 &mdash; ONNX edge model</li>
+                        <li>Gap #08 &mdash; SQLite-graph fallback</li>
+                        <li>Gap #01 &mdash; FedAvg across sites</li>
+                        <li>Provenance ledger + audit export</li>
+                        <li>Pilot site deployment</li>
+                    </ul>
+                    <div class="ph-complex">Effort: <b>12+ weeks</b> &middot; field eng + DevOps</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════ SECTION 8 — OPEN QUESTIONS ════════════════════════════════════════ -->
+        <section class="section" id="sec-questions" data-nav-id="sec-questions">
+            <h2><i class="fas fa-circle-question"></i> Open Questions for the Owner</h2>
+            <p class="intro">
+                Eight questions to answer before we can scope an MVP. Each one shifts the architecture materially.
+            </p>
+
+            <div class="questions">
+                <div class="question"><div class="q-num">Q1</div><div class="q-body"><b>Target asset class?</b> The paper validates on a linear actuator. Are we targeting <i>data-center rotating machines</i> (chillers, CRAH fans, gensets, UPS rotating mass), <i>electrical assets</i> (switchgear, transformers, breakers), or <i>industrial process equipment</i>? Each implies a different FMECA seed and sensor topology.</div></div>
+                <div class="question"><div class="q-num">Q2</div><div class="q-body"><b>What sensor streams are available today?</b> Vibration accelerometers? Motor-current signature analysis (MCSA)? BMS analog points (temp, pressure, position)? Acoustic emission? The 26-feature spec only fits if the data look like the paper's. List what's available now vs what would need to be retrofitted.</div></div>
+                <div class="question"><div class="q-num">Q3</div><div class="q-body"><b>Do we have existing FMECA documents?</b> A live operations site usually has either nothing, a vendor-supplied OEM FMECA, or an in-house spreadsheet. Whichever it is &mdash; that's our M1 seed. If nothing exists, Phase 1 starts with an FMECA workshop, not code.</div></div>
+                <div class="question"><div class="q-num">Q4</div><div class="q-body"><b>Which CMMS, if any?</b> Maximo, SAP PM, Infor EAM, Fiix, UpKeep, or an Excel sheet? This decides the Gap #03 integration shape: REST API hook, ETL batch sync, or webhook listener.</div></div>
+                <div class="question"><div class="q-num">Q5</div><div class="q-body"><b>Deploy target?</b> Pure cloud (Neo4j Aura + sklearn on Vercel/Render)? Edge (Pi5/Jetson per asset)? Hybrid (edge inference + cloud KG)? The choice drives Gap #08 priority and the model-distillation budget.</div></div>
+                <div class="question"><div class="q-num">Q6</div><div class="q-body"><b>Labeling capacity?</b> Who labels the historical sensor data into fault classes &mdash; a reliability engineer with hours per week, or do we need self-supervised pre-training because labels are scarce? If labels are scarce, Gap #10's contrastive pre-training jumps to Phase 2.</div></div>
+                <div class="question"><div class="q-num">Q7</div><div class="q-body"><b>Success metric?</b> Macro F1 like the paper? Mean-time-to-detect (MTTD)? Avoided unplanned downtime (hours/year)? Avoided cost? The metric drives the loss function, the validation rig, and the cost-justification story.</div></div>
+                <div class="question"><div class="q-num">Q8</div><div class="q-body"><b>Regulatory / safety case scope?</b> Is the advisor advisory-only (no closed-loop control) or does it actuate anything (auto-shutdown, auto-throttle)? If actuating, Gap #12 conformal prediction + Gap #05 anomaly net become safety-critical, not optional. IEC 61508 / 62443 may apply.</div></div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="citation-block">
+                <b>Citation.</b> Lin, H. &amp; Ompusunggu, A. P. (2026). Intelligent Advisor System for Prescriptive
+                Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning.
+                <i>Artificial Intelligence for Engineering</i>. Wiley / IET.
+                DOI: <a href="https://doi.org/10.1049/aie2.70019" target="_blank" rel="noopener">10.1049/aie2.70019</a>.<br>
+                <b>Dataset.</b> Cranfield University Linear Actuator Degradation:
+                <a href="https://doi.org/10.17862/cranfield.rd.5097649" target="_blank" rel="noopener">10.17862/cranfield.rd.5097649</a>.
+            </div>
+            <div class="footer-grid">
+                <div>
+                    <h4>Related</h4>
+                    <a href="datacenter-solutions.html">DC Solutions Hub</a>
+                    <a href="spares-readiness-calculator.html">Spares Readiness Calculator</a>
+                    <a href="datahallAI.html">AI Data Hall Dashboard</a>
+                    <a href="chiller-plant.html">Chiller Plant SCADA</a>
+                </div>
+                <div>
+                    <h4>Legal</h4>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="index.html#contact">Contact</a>
+                </div>
+                <div>
+                    <h4>Site</h4>
+                    <a href="index.html">Home</a>
+                    <a href="articles.html">Engineering Journal</a>
+                    <a href="changelog.html">Changelog</a>
+                </div>
+            </div>
+            <div class="ver" id="versionStamp">&middot; ResistanceZero &middot; v?.?.? &middot;</div>
+            <p style="margin-top:0.4rem;font-size:0.72rem;">
+                This is a concept-and-design document. No fabricated numbers. Reported metrics quoted verbatim from the
+                source paper. Architecture proposals are advisory.
+            </p>
+        </footer>
+    </div>
+
+    <!-- Locked / page-access gate -->
+    <div class="root-gate">
+        <div class="root-card">
+            <h2><i class="fas fa-lock" style="color:var(--cyan);margin-right:0.3rem;"></i> Pro or Educator access required</h2>
+            <p>This concept brief is for Pro and Educator accounts. Sign in to continue, or return to the DC Solutions hub.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn">Sign In</button>
+                <a href="datacenter-solutions.html">Back to DC Solutions</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie banner -->
+    <div class="cookie-banner hidden" id="cookieBanner">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button id="cookieDecline">Decline</button></div>
+    </div>
+
+    <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
+    <script src="auth.js?v=2026-05-09-v1" defer></script>
+    <script>
+    /* Theme toggle */
+    (function(){var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');function g(){var s=localStorage.getItem('theme');return s||'dark';}function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(g());if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});})();
+    /* Hamburger nav */
+    (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
+    /* Page-access tier gate */
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('ai-engineering-maintenance');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var t=s&&s.tier,r=s&&s.role;var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    /* Cookie banner */
+    (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
+    /* Section nav scroll-spy */
+    (function(){var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');if(!secs.length)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});secs.forEach(function(s){obs.observe(s);});pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-110;window.scrollTo({top:y,behavior:'smooth'});}});});})();
+    /* Version stamp */
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    </script>
+</body>
+</html>

@@ -317,6 +317,11 @@ window.RZ_FEATURE_FLAGS = {
 
   'ltc-nfpa': {
     'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  /* ── AI Engineering Maintenance (concept brief — Lin & Ompusunggu 2026) ── */
+  'ai-engineering-maintenance': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
   }
 
 };
