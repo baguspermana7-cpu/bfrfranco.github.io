@@ -280,9 +280,38 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 .modal-close{float:right;background:none;border:none;color:var(--t4);font-size:1.1rem;cursor:pointer}
 .modal-close:hover{color:var(--red)}
 
+/* FT Phase 2 Task B — ANALYTICS PANEL (gauge + signals + indicators + rationale + news) */
+.rz-ap-panel{display:grid;grid-template-columns:2fr 1fr;gap:1.25rem}
+.rz-ap-left{display:flex;flex-direction:column;gap:1rem}
+.rz-ap-right{display:flex;flex-direction:column;gap:.75rem}
+.rz-ap-right h4{font-size:.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin:0 0 .25rem}
+.rz-ap-gauge{display:flex;justify-content:center;align-items:center;padding:.25rem 0}
+.rz-ap-gauge svg{width:100%;max-width:320px;height:auto}
+.rz-ap-gauge-svg .rz-ap-gauge-score{font-size:14px;font-weight:800;font-family:var(--mono)}
+.rz-ap-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.rz-ap-chip{display:inline-flex;align-items:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:3px 9px;border-radius:50px;background:rgba(148,163,184,.15);color:var(--t3);border:1px solid var(--bd2)}
+.rz-ap-chip.ok{background:var(--grnbg);color:var(--grn);border-color:rgba(52,211,153,.25)}
+.rz-ap-chip.bad{background:var(--redbg);color:var(--red);border-color:rgba(248,113,113,.25)}
+.rz-ap-chip.warn{background:var(--ambbg);color:var(--amb);border-color:rgba(251,191,36,.25)}
+.rz-ap-chip.info{background:rgba(34,211,238,.15);color:var(--cyn);border-color:rgba(34,211,238,.25)}
+.rz-ap-rationale{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.4rem}
+.rz-ap-rationale li{font-size:.78rem;line-height:1.45;color:var(--t2);padding:6px 10px;background:var(--bg3);border-left:2px solid var(--bd);border-radius:4px}
+.rz-ap-rationale li.caveat{color:var(--t4);font-style:italic;border-left-color:var(--t4);background:transparent}
+.rz-ap-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.rz-ap-ind{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--rx);font-size:.72rem}
+.rz-ap-ind span:first-child{color:var(--t4);font-weight:600}
+.rz-ap-ind span:last-child{color:var(--t1);font-weight:700}
+.rz-ap-news{display:flex;flex-direction:column;gap:.3rem;margin-top:.5rem}
+.rz-ap-news a{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd2);font-size:.72rem;color:var(--t2);text-decoration:none}
+.rz-ap-news a:last-child{border-bottom:none}
+.rz-ap-news a:hover span:first-child{text-decoration:underline;color:var(--acc2)}
+.rz-ap-news a span:first-child{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rz-ap-news a span:last-child{flex-shrink:0;font-size:.62rem;color:var(--t4)}
+@media(max-width:900px){.rz-ap-panel{grid-template-columns:1fr}}
+
 /* RESPONSIVE */
 @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}#commodityKpis{grid-template-columns:repeat(3,1fr)!important}.g2,.g3,.g23,.g32{grid-template-columns:1fr}.heatmap{grid-template-columns:repeat(3,1fr)}.port-summary{grid-template-columns:1fr}}
-@media(max-width:768px){.kpi-grid{grid-template-columns:1fr}.heatmap{grid-template-columns:repeat(2,1fr)}.tabs{padding:0 .5rem}.tab{padding:.5rem .8rem;font-size:.72rem}.hdr{padding:.5rem 1rem}.panel{padding:1rem}.stock-hero{flex-direction:column}.stock-meta{flex-direction:column;gap:.5rem}.filters{flex-direction:column}}
+@media(max-width:768px){.kpi-grid{grid-template-columns:1fr}.heatmap{grid-template-columns:repeat(2,1fr)}.tabs{padding:0 .5rem}.tab{padding:.5rem .8rem;font-size:.72rem}.hdr{padding:.5rem 1rem}.panel{padding:1rem}.stock-hero{flex-direction:column}.stock-meta{flex-direction:column;gap:.5rem}.filters{flex-direction:column}.rz-ap-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -411,6 +440,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="card"><div class="card-title"><i class="fas fa-newspaper"></i>Company News</div><div id="stockNews"><div class="c-t4" style="font-size:.75rem">Loading...</div></div></div>
 </div>
 <div class="card" style="margin-top:1rem"><div class="card-title"><i class="fas fa-chart-line"></i>Earnings History</div><div id="stockEarnings"></div></div>
+<!-- FT Phase 2 Task B — analytics panel (V2-gated; populated by loadAnalyticsPanel) -->
+<div class="card" id="stockAnalyticsPanel" style="margin-top:1rem;display:none"></div>
 <div class="compare-panel">
 <div class="card-title"><i class="fas fa-balance-scale"></i>Compare Stocks</div>
 <div style="display:flex;gap:8px;margin-bottom:8px"><input class="inp" id="compareInput" placeholder="Add symbol to compare..." style="width:160px" onkeydown="if(event.key==='Enter')addCompareStock()"><button class="btn btn-g btn-sm" onclick="addCompareStock()"><i class="fas fa-plus"></i></button></div>
@@ -432,6 +463,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 </div>
 </div>
 <div class="card" style="margin-top:1rem"><div class="card-title"><i class="fas fa-table"></i>Cross Rates Matrix</div><div class="tbl-wrap"><table class="dtbl" id="crossTable"></table></div></div>
+<!-- FT Phase 2 Task B — analytics panel (V2-gated; populated by loadAnalyticsPanel) -->
+<div class="card" id="fxAnalyticsPanel" style="margin-top:1rem;display:none"></div>
 </div>
 
 <!-- TAB 4: CRYPTO -->
@@ -447,6 +480,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i>Market Dominance</div><canvas id="dominanceChart" height="200"></canvas></div>
 </div>
 </div>
+<!-- FT Phase 2 Task B — analytics panel (V2-gated; populated by loadAnalyticsPanel) -->
+<div class="card" id="cryptoAnalyticsPanel" style="margin-top:1rem;display:none"></div>
 </div>
 
 <!-- CRYPTO DETAIL OVERLAY -->
@@ -546,6 +581,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="card" style="margin-top:1rem"><div class="card-title"><i class="fas fa-chart-bar"></i>Performance Comparison</div><div style="height:220px"><canvas id="cmdCompare"></canvas></div></div>
 </div>
 </div>
+<!-- FT Phase 2 Task B — analytics panel (V2-gated; populated by loadAnalyticsPanel) -->
+<div class="card" id="cmdAnalyticsPanel" style="margin-top:1rem;display:none"></div>
 </div>
 
 <!-- TAB: SECTORS -->
@@ -698,6 +735,114 @@ async function gw(path,params){
   if(!j||j.ok!==true)throw new Error(j&&j.error?('GW '+j.error):'GW bad envelope');
   return j.data;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FT Phase 2 Task B — ANALYTICS PANEL (gauge + signals + indicators + rationale + news)
+   All renderers are flag-gated at the loader; renderers themselves are
+   safe to call (no side effects on global state). Inline SVG semicircle
+   gauge — no external lib.
+   ═══════════════════════════════════════════════════════════════ */
+function renderGaugeSvg(score,label){
+  var s=Math.max(0,Math.min(100,+score||0));
+  var angle=(s/100)*180;
+  var r=40;
+  var t=(180-angle)*Math.PI/180;
+  var endX=50+r*Math.cos(t);
+  var endY=50-r*Math.sin(t);
+  // 7-band color: red <30 / amber 30-45 / grey 45-55 / mint 55-70 / green >70
+  var color=s<30?'#ef4444':s<45?'#fbbf24':s<55?'#94a3b8':s<70?'#7DDDB4':'#10b981';
+  return '<svg viewBox="0 0 100 60" class="rz-ap-gauge-svg" aria-label="Buy/Sell gauge">'+
+    '<path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="rgba(148,163,184,.15)" stroke-width="6" stroke-linecap="round" />'+
+    '<path d="M10 50 A40 40 0 0 1 '+endX.toFixed(2)+' '+endY.toFixed(2)+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-linecap="round" />'+
+    '<text x="50" y="42" text-anchor="middle" class="rz-ap-gauge-score" fill="'+color+'">'+s.toFixed(0)+'</text>'+
+    '<text x="50" y="55" text-anchor="middle" fill="#94a3b8" font-size="6" font-weight="600" letter-spacing="0.5">'+esc(String(label||'').toUpperCase())+'</text>'+
+    '<\/svg>';
+}
+function signalChipClass(value){
+  var v=String(value||'').toLowerCase();
+  if(v==='bullish'||v==='expanding'||v==='golden')return 'rz-ap-chip ok';
+  if(v==='bearish'||v==='death')return 'rz-ap-chip bad';
+  if(v==='overbought')return 'rz-ap-chip warn';
+  if(v==='oversold')return 'rz-ap-chip info';
+  return 'rz-ap-chip';
+}
+function fmtInd(v,decimals){
+  if(v==null||(typeof v==='number'&&!isFinite(v))||isNaN(v))return '—';
+  var d=decimals==null?2:decimals;
+  return Number(v).toFixed(d);
+}
+function renderAnalyticsPanel(containerId,analyze,news){
+  var el=document.getElementById(containerId);
+  if(!el)return;
+  if(!analyze){el.innerHTML='<div class="empty"><p>Analytics unavailable<\/p><\/div>';return;}
+  var ind=analyze.indicators||{};
+  var sig=analyze.signals||{};
+  var g=analyze.gauge||{};
+  var p=analyze.prediction||{};
+  var macd=ind.macd||{};
+  var boll=ind.bollinger||{};
+  var stoch=ind.stoch||{};
+  var newsHtml='';
+  if(news&&news.length){
+    newsHtml='<div class="rz-ap-news"><h4>Related News<\/h4>'+
+      news.slice(0,3).map(function(n){
+        var d=n.ts?new Date(n.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+        var href=esc(n.url||'#');
+        var title=esc(n.title||'');
+        return '<a href="'+href+'" target="_blank" rel="noopener"><span>'+title+'<\/span><span class="mono">'+d+'<\/span><\/a>';
+      }).join('')+'<\/div>';
+  }
+  var rationale=(p.rationale||[]);
+  var rationaleHtml=rationale.length?
+    '<ul class="rz-ap-rationale">'+rationale.map(function(r,i){
+      var cls=(i===rationale.length-1)?' class="caveat"':'';
+      return '<li'+cls+'>'+esc(String(r))+'<\/li>';
+    }).join('')+'<\/ul>':'';
+  el.innerHTML=
+    '<div class="card-title"><i class="fas fa-chart-line"><\/i>Analytics — Buy/Sell Score<\/div>'+
+    '<div class="rz-ap-panel">'+
+      '<div class="rz-ap-left">'+
+        '<div class="rz-ap-gauge">'+renderGaugeSvg(g.score,g.label)+'<\/div>'+
+        '<div class="rz-ap-chips">'+
+          '<span class="'+signalChipClass(sig.trend)+'">Trend: '+esc(sig.trend||'—')+'<\/span>'+
+          '<span class="'+signalChipClass(sig.momentum)+'">Mom: '+esc(sig.momentum||'—')+'<\/span>'+
+          '<span class="'+signalChipClass(sig.volatility)+'">Vol: '+esc(sig.volatility||'—')+'<\/span>'+
+          '<span class="'+signalChipClass(sig.ma_cross)+'">MA: '+esc(sig.ma_cross||'—')+'<\/span>'+
+        '<\/div>'+
+        rationaleHtml+
+      '<\/div>'+
+      '<div class="rz-ap-right">'+
+        '<h4>Indicators<\/h4>'+
+        '<div class="rz-ap-grid">'+
+          '<div class="rz-ap-ind"><span>RSI(14)<\/span><span class="mono">'+fmtInd(ind.rsi14,1)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>MACD<\/span><span class="mono">'+fmtInd(macd.macd,2)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>SMA 20<\/span><span class="mono">'+fmtInd(ind.sma20)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>SMA 50<\/span><span class="mono">'+fmtInd(ind.sma50)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>SMA 200<\/span><span class="mono">'+fmtInd(ind.sma200)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>EMA 20<\/span><span class="mono">'+fmtInd(ind.ema20)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>BB Upper<\/span><span class="mono">'+fmtInd(boll.upper)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>BB Lower<\/span><span class="mono">'+fmtInd(boll.lower)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>ATR(14)<\/span><span class="mono">'+fmtInd(ind.atr14)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>Stoch K<\/span><span class="mono">'+fmtInd(stoch.k,1)+'<\/span><\/div>'+
+        '<\/div>'+
+        newsHtml+
+      '<\/div>'+
+    '<\/div>';
+}
+async function loadAnalyticsPanel(containerId,sym,tf){
+  if(!CFG.V2||!sym)return;
+  var el=document.getElementById(containerId);
+  if(el)el.innerHTML='<div class="empty"><p><span class="spinner"><\/span>Loading analytics…<\/p><\/div>';
+  try{
+    var analyze=await gw('/analyze',{sym:sym,tf:tf||'3M'});
+    var news=[];
+    try{news=await gw('/news',{topic:sym});}catch(_){}
+    renderAnalyticsPanel(containerId,analyze,news);
+  }catch(e){
+    if(el)el.innerHTML='<div class="empty"><p>Analytics unavailable — <a href="#" onclick="event.preventDefault();loadAnalyticsPanel(\''+containerId+'\',\''+sym+'\',\''+(tf||'3M')+'\')">retry<\/a><\/p><\/div>';
+  }
+}
+
 const CORS_PROXIES=[
   url=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
   url=>`https://corsproxy.io/?url=${encodeURIComponent(url)}`,
@@ -1332,6 +1477,11 @@ async function selectStock(sym){
   // Small delay to ensure canvas is visible before chart render
   await sleep(100);
   loadStockChart('M');
+  // FT Phase 2 Task B — analytics panel (non-blocking; flag-gated inside loader)
+  if(CFG.V2&&S.curStock){
+    const ap=$('stockAnalyticsPanel');if(ap)ap.style.display='';
+    loadAnalyticsPanel('stockAnalyticsPanel',S.curStock,S.stockTf||'3M');
+  }
 }
 
 function renderStockHero(){
@@ -1833,6 +1983,10 @@ async function loadFxChart(){
         options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>S.fxPair+': '+ctx.raw.toFixed(4)}}},scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,maxTicksLimit:8,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,font:{size:10}}}}}
       });
     }catch(e){}
+    // FT Phase 2 Task B — analytics panel for FX (Yahoo FX symbol format: e.g. EURUSD=X)
+    const fxSym=S.fxPair.replace('/','')+'=X';
+    const ap=$('fxAnalyticsPanel');if(ap)ap.style.display='';
+    loadAnalyticsPanel('fxAnalyticsPanel',fxSym,S.fxTf||'3M');
     return;
   }
   const end=new Date();const start=new Date();start.setDate(start.getDate()-days);
@@ -1936,6 +2090,9 @@ async function loadCryptoV2(){
     if(coins.length){renderCryptoTable();}
     else{tb.innerHTML='<tr><td colspan="9"><div class="empty"><p>No crypto data</p></div></td></tr>';}
     renderDominanceCards(g);
+    // FT Phase 2 Task B — default analytics panel = BTC-USD (Yahoo symbol)
+    const ap=$('cryptoAnalyticsPanel');if(ap)ap.style.display='';
+    loadAnalyticsPanel('cryptoAnalyticsPanel','BTC-USD','3M');
   }catch(e){
     $('cryptoKpis').innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadCryptoV2()">Retry</a></p></div>';
     tb.innerHTML='<tr><td colspan="9"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadCryptoV2()">Retry</a></p></div></td></tr>';
@@ -2505,6 +2662,9 @@ async function loadCmdChartV2(){
   }catch(e){
     lwc.innerHTML='<div class="loading-text" style="padding:2rem;text-align:center;color:var(--t4)">Chart unavailable. <button class="btn btn-o btn-sm" onclick="loadCmdChart()">Retry</button></div>';
   }
+  // FT Phase 2 Task B — analytics panel (non-blocking; flag-gated inside loader)
+  const ap=$('cmdAnalyticsPanel');if(ap)ap.style.display='';
+  loadAnalyticsPanel('cmdAnalyticsPanel',S.cmdSym,S.cmdTf);
 }
 async function loadCmdChart(){
   if(CFG.V2)return loadCmdChartV2();
@@ -2847,6 +3007,12 @@ async function openCryptoDetail(coinId){
       <div class="c-t1 fw6 mono" id="ccResult" style="font-size:1.1rem">= $${fmtP(curPrice)}</div>
     </div>`;
     S._ccPrice=curPrice;S._ccSym=(coin.symbol||'').toUpperCase();
+    // FT Phase 2 Task B — refresh analytics panel for the selected coin
+    if(CFG.V2&&coin.symbol){
+      const cs=(coin.symbol||'').toUpperCase()+'-USD';
+      const ap=$('cryptoAnalyticsPanel');if(ap)ap.style.display='';
+      loadAnalyticsPanel('cryptoAnalyticsPanel',cs,'3M');
+    }
     // Market stats
     $('cryptoDetailStats').innerHTML=`<div class="g3" style="font-size:.78rem">${[
       {l:'24h High',v:'$'+fmtP(md.high_24h?.usd||0),c:'c-grn'},
