@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v1.31.0 — 2026-05-23 (FT Phase 2 Task B — client analytics panel + buy/sell gauge widget per tab)
+
+R-002/R-003/R-008 client-side surfacing of v1.30.0's `/analyze` data.
+Per-tab **Analytics Panel** rendering buy/sell gauge + signal chips +
+indicator table + rationale + related news, flag-gated under `CFG.V2`.
+
+### What landed (all behind `localStorage.rz_ft_v2 === '1'`)
+
+- **`renderGaugeSvg(score, label)`** — inline SVG semicircle, 7-band
+  color (red < 30 / amber 30-45 / grey 45-55 / mint 55-70 / green ≥ 70).
+  Reuses existing palette tokens — no Anthropic-purple, no new gradient.
+- **`renderAnalyticsPanel(containerId, analyze, news)`** — composes
+  gauge + trend/momentum/volatility/MA chips + 10-row indicator table
+  (RSI, MACD, SMA20/50/200, EMA20, Bollinger ±, ATR, Stoch K) + 5-line
+  rationale list (last line muted italic = "informational only" caveat)
+  + top-3 related news from `/news?topic=<sym>`.
+- **`loadAnalyticsPanel(containerId, sym, tf)`** — async fetch + render,
+  graceful "Analytics unavailable — retry" on Worker failure.
+- **Wired into 4 tabs:**
+  - **Commodities** (`#cmdAnalyticsPanel`, after the chart card,
+    sym=`S.cmdSym`, tf=`S.cmdTf`).
+  - **Crypto** (`#cryptoAnalyticsPanel`, sym=`<COIN>-USD`, tf 3M).
+  - **Stocks** (`#stockAnalyticsPanel`, sym=`S.curStock`).
+  - **FX** (`#fxAnalyticsPanel`, sym=`<PAIR>=X` Yahoo format).
+- Mobile responsive (panel collapses to single column < 900px;
+  indicator grid `1fr` ≤ 768px).
+- All `</script>` inside template strings properly escaped.
+
+### Verification
+
+- audit-js-syntax / audit-script-tags / audit-mobile-responsive — all
+  `--strict` CLEAN.
+- Live Puppeteer smoke: Commodities panel rendered for GLD/3M (3273
+  chars HTML; gauge + chips + indicators + rationale + news all present).
+- Crypto + FX tabs show graceful "Analytics unavailable" on dev
+  datacenter IP (Yahoo 429 for BTC-USD / EURUSD=X) — same upstream
+  constraint as v1.30.0; expected to resolve on Cloudflare edge in
+  production.
+
+### NOT in this commit (remaining Phase 2 sub-tasks)
+
+- C — Telegram alert push (Worker Cron evaluates server-side)
+- D — Email alerts via Resend free tier
+- E — `/finnhub-webhook` receiver
+
+Not active on production — `rz_ft_v2` flag still required + Worker
+still pending deploy (`worker/SETUP.md`).
+
 ## v1.30.1 — 2026-05-23 (Generate Design Tech Spec PDF + FAQ on DC AI and Conventional DC cockpits — Phase 2 scaffold)
 
 Owner brief: "kasih tombol download Tech Spec PDF atur aja nama tombol itu
