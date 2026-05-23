@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v1.32.0 — 2026-05-23 (AI Engineering Maintenance — concept page; FMECA + KG + ML + NLP synthesis)
+
+R-016 — `ai-engineering-maintenance.html` (1,441 lines) ships the
+**concept-and-design document** for the prescriptive-maintenance engine,
+synthesised from Lin & Ompusunggu (2026), *Artificial Intelligence for
+Engineering*, https://doi.org/10.1049/aie2.70019.
+
+### What landed
+
+- Standalone HTML, gated by `enforceTierFeatureAccess('ai-engineering-maintenance')`
+  via the 4-tier matrix (Pro + Educator + Root pass).
+- 8 sections (concept summary · 4-module block diagram · per-module cards ·
+  two interaction modes side-by-side · case-study numbers (Macro F1 84.84%,
+  spalling 77.98% weakest) · 12 engineering gaps + enhancements (`<details>`
+  accordions) · enhanced-architecture big SVG · 5-phase build roadmap ·
+  open questions for owner).
+- 12 SVG diagrams drawn in brand industrial-instrumentation style
+  (thin 0.6-1.4 px lines, instrument-cyan + signal-amber; NO Anthropic-purple).
+- DC Solutions card wired: `COMING SOON` → `PRO`; opens cleanly.
+- Site integration: sitemap, search-index, llms.txt, feature-flags.
+- All audit gates green; mobile-responsive 10/10.
+
+### Not built yet
+
+The actual maintenance engine. This is concept + roadmap; build phases
+1-5 await owner sign-off on scope + asset inventory + CMMS choice.
+
+---
+
 ## v1.31.4 — 2026-05-23 (Tech Spec PDF — Section 10 Cost Annex on both DC AI and DC Conv)
 
 Owner direct ask: "Perhitungan utk tech spec bisa gunakan engine capex,
