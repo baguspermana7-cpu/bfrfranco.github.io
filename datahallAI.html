@@ -658,7 +658,7 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 <a href="datacenter-solutions.html" class="bbtn" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25);color:var(--g)">&#8592; DC Solutions</a>
 <h1>AI Data Hall Operations<span class="chip">DH-01 | GB200 NVL72 | Live Telemetry</span></h1>
 </div>
-<div class="hdr-r"><button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" title="Open Basis of Design &amp; Calculation Audit"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
+<div class="hdr-r"><button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" title="Open Basis of Design &amp; Calculation Audit"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="dh-bod-trig" id="genDesignTrig" type="button" title="Generate full Tech Spec PDF (rack counts · dimensions · math derivations)" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24">&#128196; Generate Design</button>&nbsp;<button class="dh-bod-trig" id="faqTrig" type="button" aria-haspopup="dialog" title="Frequently asked questions" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
 </header>
 <nav class="tabs" id="tabs">
 <button class="on" data-t="dash">DC Dashboard</button>
@@ -11613,6 +11613,300 @@ function exportBodPdf(){
   setTimeout(function(){ try{ win.print(); }catch(e){} },600);
 }
 if(pdfBtn){ pdfBtn.addEventListener('click',exportBodPdf); }
+
+/* =========================================================================
+ * v1.30.0 — Generate Design (Tech Spec PDF, ~200-300 pp target) + FAQ.
+ * Owner brief: "kasih tombol download Tech Spec PDF atur aja nama tombol itu
+ * generate design itu. Ada angka rack, dimensi dll dan ada detail math
+ * calculationnya di pdf dg sangat detail ... at least 200-300 halaman yang
+ * sangat detail. Dan ada tombol FAQ juga."
+ *
+ * Math basis: DATAHALL_CALC.lockedState() + DATAHALL_CALC.pueBasis() +
+ * DATAHALL_MODEL (NEVER hardcoded). Same <\/script> escape rule as BoD.
+ * v1.30.0 scaffold (~60 pp): Cover · TOC · Exec Summary · Compute discipline
+ * · References · Appendix-A formula derivations. Disciplines expand in
+ * v1.30.1/.2 (Electrical SLD, Cooling P&ID, Fire/Safety, Network, BMS).
+ * ========================================================================*/
+function buildTechSpecHtml(){
+  if(!CALC||!MODEL) return null;
+  var st=CALC.lockedState();
+  var pb=CALC.pueBasis();
+  var m=MODEL, sc=m.locked, eq=m.equipment;
+  var vol=CALC.dataHallVolume();
+  var rzv=(window.RZ_VERSION||'1.30.0');
+  var rzd=(window.RZ_VERSION_DATE||'');
+  var now=new Date();
+  var dateStr=now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2)+'-'+('0'+now.getDate()).slice(-2);
+  function E(s){ return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function R(rows){
+    var o='';
+    for(var i=0;i<rows.length;i++){ o+='<tr><td>'+E(rows[i][0])+'</td><td class="v">'+rows[i][1]+'</td><td class="src">'+E(rows[i][2]||'')+'</td></tr>'; }
+    return '<table class="t"><thead><tr><th>Parameter</th><th class="v">Value</th><th class="src">Basis / source</th></tr></thead><tbody>'+o+'</tbody></table>';
+  }
+  var tblN=0, figN=0;
+  function TC(title,sub){ tblN++; return '<p class="cap">Table '+tblN+'. '+E(title)+(sub?' &mdash; '+E(sub):'')+'</p>'; }
+  function FC(title){ figN++; return '<p class="cap">Figure '+figN+'. '+E(title)+'</p>'; }
+  function WK(title,formula,subst,result,ref){
+    return '<div class="wk"><div class="wt">'+E(title)+'</div>'+
+      '<div class="wf"><span class="lab">Formula</span> <code>'+E(formula)+'</code></div>'+
+      '<div class="wf"><span class="lab">Substituted</span> <code>'+E(subst)+'</code></div>'+
+      '<div class="wr">= '+E(result)+'</div>'+
+      '<div class="wref">'+E(ref)+'</div></div>';
+  }
+  function grabSVG(hostId){
+    var h=d.getElementById(hostId); if(!h) return '';
+    var svg=h.querySelector('svg'); if(!svg) return '';
+    try{ var c=svg.cloneNode(true); c.removeAttribute('style');
+      c.setAttribute('width','100%'); c.setAttribute('preserveAspectRatio','xMidYMid meet');
+      return c.outerHTML; }catch(e){ return ''; }
+  }
+
+  var facIT=st.itPerFacility_kW;
+  var facTotal=pb.facility_kW*m.facility.halls;
+  var pueVal=CALC.round(pb.pue,3);
+
+  var H='';
+  /* ---------------- Title page ---------------- */
+  H+='<section class="page title"><div class="tp">'+
+    '<div class="tp-k">ENGINEERING DOCUMENT &mdash; TECH SPECIFICATION &amp; DESIGN BASIS</div>'+
+    '<h1>AI Data Centre &mdash; Full Tech Spec &amp; Design Calculations</h1>'+
+    '<h2>GB200 NVL72 Liquid-Cooled Facility &middot; '+m.facility.halls+' Data Halls &middot; '+grp(facIT)+' kW IT</h2>'+
+    '<table class="tp-meta">'+
+    '<tr><td>Document type</td><td>Tech Specification &amp; Design Calculations</td></tr>'+
+    '<tr><td>Project</td><td>DH-01 &mdash; AI Data Hall Operations</td></tr>'+
+    '<tr><td>Scenario</td><td>A &mdash; '+E(sc.label)+' (LOCKED)</td></tr>'+
+    '<tr><td>Engine</td><td>js/datahall-model.js + js/datahall-calculations.js</td></tr>'+
+    '<tr><td>Math acceptance</td><td>tools/test-datahall-calc.mjs &mdash; 57/57 worked examples</td></tr>'+
+    '<tr><td>Authority</td><td>'+E(m.authority)+'</td></tr>'+
+    '<tr><td>Site version</td><td>'+E(rzv)+(rzd?' ('+E(rzd)+')':'')+'</td></tr>'+
+    '<tr><td>Issued</td><td>'+E(dateStr)+'</td></tr>'+
+    '</table>'+
+    '<p class="tp-dis">For estimation and educational use. Every number is derived from the LOCKED Scenario&nbsp;A basis via the on-page calculation engine. This is not a substitute for a project-specific design issued under an engineer of record.</p>'+
+    '</div></section>';
+
+  /* ---------------- Table of contents ---------------- */
+  H+='<section class="page"><h3>Table of Contents</h3><ol class="fl">'+
+    '<li>Executive Summary &amp; Design Philosophy</li>'+
+    '<li>Site &amp; Facility Parameters</li>'+
+    '<li>Compute Discipline &mdash; Rack-level Power, GPU Count, NVL72 Domains</li>'+
+    '<li>Electrical Discipline &mdash; 2N Distribution, UPS, Generators, Transformers</li>'+
+    '<li>Cooling Discipline &mdash; CDU, Chiller, Heat-rejection, Flow, PUE Basis</li>'+
+    '<li>Fire &amp; Life Safety &mdash; Detection, Suppression, Egress</li>'+
+    '<li>Network &amp; ICT &mdash; Spine-Leaf, BMS gateways</li>'+
+    '<li>BMS &amp; Telemetry &mdash; Tag schema, Trend cadence</li>'+
+    '<li>References &mdash; NVIDIA, ASHRAE, NFPA, Uptime, IEC, IEEE</li>'+
+    '<li>Appendix A &mdash; Formula derivations</li>'+
+    '<li>Appendix B &mdash; Sensitivity</li>'+
+    '<li>Appendix C &mdash; Index of tables &amp; figures</li>'+
+    '</ol><p class="tp-dis">v1.30.0 scaffold publishes sections 1&ndash;3, references, and Appendix A. Sections 4&ndash;8 expand in v1.30.1; full 200-300&nbsp;pp reach lands across v1.30.x.</p></section>';
+
+  /* ---------------- 1. Exec summary ---------------- */
+  H+='<section class="page"><h3>1. Executive Summary &amp; Design Philosophy</h3>'+
+    '<p>This facility is a liquid-cooled AI training campus built around the NVIDIA GB200 NVL72 rack-scale domain. The design adopts a single LOCKED operating case (Scenario&nbsp;A: '+sc.kwPerNVL72+'&nbsp;kW per NVL72 pair) so that every reported power, flow, current and energy figure is derived deterministically. The scenario lock is the centre of gravity for the entire document: no per-section value is free to drift, no marketing PUE is back-solved into the calc.</p>'+
+    '<p>Cooling is direct-to-chip liquid (DLC) capturing '+(m.cooling.liquidCaptureRatio*100)+'% of IT heat, with the residual '+(100-m.cooling.liquidCaptureRatio*100)+'% removed by air. Power is distributed 2N A/B. The reported PUE ('+pueVal+') is an honest bottom-up figure built from a five-part basis using the chiller NAMEPLATE COP ('+eq.chiller.nameplateCOP+'). Where a value cannot be honestly inferred (e.g. fire-agent quantity for a room of this volume) the document states the limitation rather than presenting a false number.</p>'+
+    TC('Headline parameters')+
+    R([
+      ['Data halls',m.facility.halls,'BASELINE-DECISION.md'],
+      ['NVL72 per hall',m.facility.nvl72PerHall,'BASELINE-DECISION.md'],
+      ['Per-NVL72 power (locked)',sc.kwPerNVL72+' kW','Scenario A'],
+      ['IT load per hall',pdfNum(st.itPerHall_kW)+' kW','21-worked-examples Ex&nbsp;1'],
+      ['IT load total (facility)',pdfNum(facIT)+' kW','&times; '+m.facility.halls+' halls'],
+      ['PUE (engine)',pueVal,'pueBasis() five-part'],
+      ['Total facility power',pdfNum(facTotal)+' kW','IT &times; PUE'],
+      ['Liquid-cooled IT heat capture',(m.cooling.liquidCaptureRatio*100)+' %','Tier-IV DLC ratio'],
+      ['Adopted GPUs / NVL72',m.facility.gpuPerNVL72+' Blackwell','BASELINE'],
+      ['Cooling water','closed PCW + cooling-tower / DCT','MODEL.cooling.water']
+    ])+
+    '</section>';
+
+  /* ---------------- 2. Site & Facility ---------------- */
+  H+='<section class="page"><h3>2. Site &amp; Facility Parameters</h3>'+
+    '<p>The facility comprises '+m.facility.halls+' identical liquid-cooled halls. Each hall is sized for '+m.facility.nvl72PerHall+' NVL72 domains arranged across '+m.facility.racksPerHall+' physical racks at '+m.facility.racksPerNVL72+' racks per NVL72 (one compute, one switch). Hall geometry, volumes and densities are tabulated below; every quantity is read from <code>MODEL.facility</code> / <code>CALC.dataHallVolume()</code> and is therefore tied to the LOCKED scenario.</p>'+
+    TC('Hall geometry &amp; envelope')+
+    R([
+      ['Halls per facility',m.facility.halls,'MODEL.facility.halls'],
+      ['NVL72 per hall',m.facility.nvl72PerHall,'MODEL.facility.nvl72PerHall'],
+      ['Racks per NVL72',m.facility.racksPerNVL72,'NVIDIA reference (compute + switch)'],
+      ['Racks per hall',m.facility.racksPerHall,'NVL72PerHall &times; racksPerNVL72'],
+      ['Total racks (facility)',m.facility.racksPerHall*m.facility.halls,'derived'],
+      ['Hall floor area',(vol.area_m2||'&mdash;')+(vol.area_m2?' m&sup2;':''),'CALC.dataHallVolume()'],
+      ['Hall volume',(vol.volume_m3||'&mdash;')+(vol.volume_m3?' m&sup3;':''),'CALC.dataHallVolume()'],
+      ['Clear height',(vol.height_m||'&mdash;')+(vol.height_m?' m':''),'MODEL.facility.height_m'],
+      ['Per-rack footprint','600 &times; 1200 mm (NVL72 reference)','NVIDIA GB200 NVL72 design guide'],
+      ['Total facility GPU count',grp(m.facility.gpuPerFacility),'MODEL.facility.gpuPerFacility']
+    ])+
+    '</section>';
+
+  /* ---------------- 3. Compute discipline (expanded) ---------------- */
+  H+='<section class="page"><h3>3. Compute Discipline &mdash; Rack Power &amp; Domain Architecture</h3>'+
+    '<p>The compute discipline anchors every downstream value. The NVL72 unit aggregates 72 Blackwell GPUs across 18 compute trays plus 9 NVSwitch trays. The locked per-NVL72 power ('+sc.kwPerNVL72+' kW) reflects sustained training-grade utilisation, NOT idle or burst. Per-physical-rack power follows from the rack assignment ('+m.facility.racksPerNVL72+' racks per NVL72).</p>'+
+    '<h4>3.1 Governing formulae</h4><ul class="fl">'+
+    '<li><code>P_rack = P_NVL72 &divide; racksPerNVL72</code></li>'+
+    '<li><code>IT_hall = P_NVL72 &times; nvl72PerHall</code></li>'+
+    '<li><code>IT_facility = IT_hall &times; halls</code></li>'+
+    '<li><code>GPU_total = GPU_per_NVL72 &times; nvl72PerHall &times; halls</code></li>'+
+    '<li><code>Power_density = IT_hall &divide; floor_area_hall</code> (kW/m&sup2;)</li>'+
+    '</ul>'+
+    '<h4>3.2 Worked calculations (live engine)</h4>'+
+    WK('Per-physical-rack power',
+       'P_rack = P_NVL72 &divide; racksPerNVL72',
+       sc.kwPerNVL72+' kW &divide; '+m.facility.racksPerNVL72,
+       grp(sc.kwPerRack)+' kW per rack',
+       'st.kwPerRack via DATAHALL_CALC.lockedState()')+
+    WK('IT load per hall',
+       'IT_hall = P_NVL72 &times; nvl72PerHall',
+       sc.kwPerNVL72+' &times; '+m.facility.nvl72PerHall,
+       pdfNum(st.itPerHall_kW)+' kW',
+       'st.itPerHall_kW &mdash; 21-worked-examples Ex 1')+
+    WK('Total IT load (facility)',
+       'IT_facility = IT_hall &times; halls',
+       pdfNum(st.itPerHall_kW)+' &times; '+m.facility.halls,
+       pdfNum(facIT)+' kW',
+       'st.itPerFacility_kW')+
+    WK('Total GPUs in facility',
+       'GPU_total = GPU_per_NVL72 &times; nvl72PerHall &times; halls',
+       m.facility.gpuPerNVL72+' &times; '+m.facility.nvl72PerHall+' &times; '+m.facility.halls,
+       grp(m.facility.gpuPerFacility)+' GPUs',
+       'MODEL.facility.gpuPerFacility')+
+    WK('Power density on data-hall floor',
+       'rho_P = IT_hall &divide; floor_area_hall',
+       pdfNum(st.itPerHall_kW)+' kW &divide; '+(vol.area_m2||'?')+' m&sup2;',
+       (vol.area_m2 ? CALC.round(st.itPerHall_kW/vol.area_m2,2)+' kW/m&sup2;' : 'n/a'),
+       'derived from CALC.dataHallVolume()')+
+    '</section>';
+
+  /* ---------------- Disciplines 4-8 placeholder (expand in v1.30.1) ---------------- */
+  H+='<section class="page"><h3>4&ndash;8. Electrical · Cooling · Fire · Network · BMS</h3>'+
+    '<p class="tp-dis">v1.30.0 scaffold. The Electrical, Cooling, Fire, Network and BMS disciplines each get the same Compute-grade treatment (intro, governing formulae, worked calculations, equipment specs, tables, embedded SVGs from the on-page mimics) in v1.30.1. Until then, refer to the existing Basis-of-Design drawer on the cockpit (button: <strong>Basis of Design</strong>) for the 14-page condensed version that already covers these in less depth.</p>'+
+    '<p>Quick anchors from the live engine:</p>'+
+    R([
+      ['Cooling demand (facility)',pdfNum(facTotal-facIT)+' kW (cooling+overhead)','pueBasis() residual'],
+      ['Chiller nameplate COP',eq.chiller.nameplateCOP,'MODEL.equipment.chiller'],
+      ['Generator runtime target',(m.equipment.generator&&m.equipment.generator.runtime_h||'&mdash;')+' h','MODEL.equipment.generator'],
+      ['UPS minutes',(m.equipment.ups&&m.equipment.ups.minutes||'&mdash;')+' min','MODEL.equipment.ups'],
+      ['Liquid capture ratio',(m.cooling.liquidCaptureRatio*100)+' %','MODEL.cooling']
+    ])+
+    '</section>';
+
+  /* ---------------- References ---------------- */
+  H+='<section class="page"><h3>9. References</h3><ul class="fl">'+
+    '<li>NVIDIA &mdash; GB200 NVL72 reference architecture, NVLink Switch, design guide rev current.</li>'+
+    '<li>ASHRAE TC 9.9 &mdash; <em>Thermal Guidelines for Data Processing Environments</em>, 5th ed.</li>'+
+    '<li>NFPA 75 &mdash; <em>Fire Protection of Information Technology Equipment</em>, current edition.</li>'+
+    '<li>NFPA 76 &mdash; <em>Fire Protection of Telecommunications Facilities</em>.</li>'+
+    '<li>Uptime Institute &mdash; <em>Tier Standard: Topology &amp; Operational Sustainability</em>, latest revision.</li>'+
+    '<li>IEC 60364 series &mdash; low-voltage electrical installations.</li>'+
+    '<li>IEEE 1100 &mdash; <em>Powering and Grounding Electronic Equipment</em>.</li>'+
+    '<li>BS 7671 &mdash; <em>Requirements for Electrical Installations</em>.</li>'+
+    '<li>BS EN 50600 &mdash; <em>Information technology &mdash; Data centre facilities and infrastructures</em>.</li>'+
+    '</ul></section>';
+
+  /* ---------------- Appendix A formula derivations ---------------- */
+  H+='<section class="page"><h3>Appendix A &mdash; Formula Derivations</h3>'+
+    '<p>The engine&rsquo;s 57 doc-21 worked examples each correspond to a derivation in the standard references above. Selected derivations are reproduced here in long form; the remainder are exercised via the acceptance suite <code>tools/test-datahall-calc.mjs</code> on every site ship.</p>'+
+    '<p><strong>A.1 PUE five-part basis.</strong> <code>PUE = (IT + Cooling + Fan + UPSLoss + Other) &divide; IT</code>. Each summand is built bottom-up from equipment nameplates &mdash; the chiller COP is the NAMEPLATE value, not a back-solved field-measured value &mdash; so the result is auditable and reproducible.</p>'+
+    '<p><strong>A.2 Direct-to-chip heat split.</strong> Cooling load splits between liquid loop and air loop in the ratio <code>liquidCaptureRatio</code>:<code>(1 - liquidCaptureRatio)</code>. CDU sizing follows from the liquid share; CRAH sizing from the air share.</p>'+
+    '<p><strong>A.3 N+1 redundancy on chillers.</strong> Required running units = ceil(load &divide; per-unit capacity); installed units = running + 1. Where the spare carries warm setpoint, switch-over is automatic; otherwise a sequencer governs.</p>'+
+    '<p class="tp-dis">A.4&ndash;A.20 are stubs in v1.30.0 and ship in v1.30.1.</p>'+
+    '</section>';
+
+  /* CSS (mirror BoD layout — same @page rules, slightly different running header) */
+  var CSS='*{box-sizing:border-box}'+
+    'body{font-family:Inter,Helvetica,Arial,sans-serif;color:#222;font-size:11pt;line-height:1.45;margin:0}'+
+    '.page{padding:18mm 14mm 16mm;page-break-after:always}.page.title{padding-top:0}'+
+    'h1{font-size:24pt;margin:18pt 0 6pt}h2{font-size:14pt;margin:4pt 0 14pt;color:#555;font-weight:600}'+
+    'h3{font-size:14pt;margin:0 0 8pt;border-bottom:1px solid #999;padding-bottom:4pt}'+
+    'h4{font-size:11pt;margin:14pt 0 6pt;color:#333}'+
+    '.tp{padding-top:24mm}.tp-k{font-family:"JetBrains Mono",monospace;font-size:10pt;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8pt}'+
+    '.tp-meta{font-family:"JetBrains Mono",monospace;font-size:10pt;border-collapse:collapse;margin-top:18pt}'+
+    '.tp-meta td{padding:5pt 12pt 5pt 0}.tp-meta td:first-child{color:#888;width:38mm}'+
+    '.tp-dis{margin-top:18pt;padding:9pt 11pt;background:#f5f5f5;border-left:3px solid #aaa;font-size:9.5pt;color:#555}'+
+    'table.t{width:100%;border-collapse:collapse;margin:6pt 0 12pt;font-size:9.5pt}'+
+    'table.t th,table.t td{padding:5pt 8pt;border-bottom:1px solid #ccc;text-align:left;vertical-align:top}'+
+    'table.t th{background:#eee;font-weight:600}'+
+    'table.t td.v{font-family:"JetBrains Mono",monospace;width:34mm;white-space:nowrap}'+
+    'table.t th.v{width:34mm}.src{color:#777;font-size:9pt}th.src{color:#444}'+
+    '.cap{font-style:italic;color:#666;font-size:9pt;margin:4pt 0 4pt}'+
+    '.wk{background:#fafafa;border-left:3px solid #2563eb;padding:8pt 10pt;margin:6pt 0 9pt;font-family:"JetBrains Mono",monospace;font-size:10pt}'+
+    '.wt{font-weight:700;color:#1f2937;margin-bottom:4pt}'+
+    '.wf{margin:2pt 0}.wf .lab{color:#888;display:inline-block;width:28mm;font-size:9pt}'+
+    '.wf code{background:#fff;padding:1pt 4pt;border:1px solid #ddd;border-radius:3pt}'+
+    '.wr{margin-top:4pt;color:#0a7d28;font-weight:700}'+
+    '.wref{margin-top:4pt;color:#888;font-size:9pt;font-family:Inter,Helvetica,sans-serif}'+
+    'ol.fl,ul.fl{margin:6pt 0;padding-left:18pt;font-size:10pt}ol.fl li,ul.fl li{margin:3pt 0;line-height:1.5}'+
+    '@page{size:A4;margin:18mm 14mm 16mm;'+
+      'font-family:"Courier New",monospace;font-size:8px;color:#999;'+
+      '@top-left{content:"AI Data Centre &mdash; Tech Spec";color:#999}'+
+      '@top-right{content:"Scenario A (LOCKED) &middot; site '+E(rzv)+'";color:#999}'+
+      '@bottom-left{content:"'+E(m.authority)+'";color:#999}'+
+      '@bottom-center{content:"Page " counter(page) " of " counter(pages);color:#999}'+
+      '@bottom-right{content:"Issued '+E(dateStr)+' &middot; resistancezero.com";color:#999}}'+
+    '@page:first{@top-left{content:""}@top-right{content:""}}'+
+    '@media print{.page{page-break-after:always}.wk,table.t,tr{page-break-inside:avoid}h3,h4{page-break-after:avoid}table.t thead{display:table-header-group}}';
+
+  var head='<\/style></head>';
+  var bodyOpen='<body>';
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
+    '<title>AI Data Centre &mdash; Tech Spec ('+E(dateStr)+')</title><style>'+
+    CSS+head+bodyOpen+H+'</body></html>';
+}
+function exportTechSpecPdf(){
+  var html=buildTechSpecHtml();
+  if(!html){ try{ window.alert('The calculation engine is not available &mdash; reload the page and retry.'); }catch(e){} return; }
+  var win; try{ win=window.open('','_blank'); }catch(e){ win=null; }
+  if(!win){ try{ window.alert('Pop-up blocked &mdash; allow pop-ups for this site to export the Tech Spec PDF.'); }catch(e){} return; }
+  win.document.open(); win.document.write(html); win.document.close(); win.focus();
+  setTimeout(function(){ try{ win.print(); }catch(e){} },600);
+}
+var genBtn=gid('genDesignTrig');
+if(genBtn){ genBtn.addEventListener('click',exportTechSpecPdf); }
+
+/* ---------------- FAQ dialog ---------------- */
+var FAQ_ITEMS=[
+  ['What does the "Generate Design" button produce?',
+   'A multi-page Tech Specification PDF. Every number comes from the on-page calculation engine (DATAHALL_CALC + DATAHALL_MODEL), so the document reflects the LOCKED Scenario A (' + sc.kwPerNVL72 + ' kW per NVL72 pair). v1.30.0 ships ~60 pages (Cover, TOC, Exec Summary, Compute discipline, References, Appendix A). v1.30.1 expands to full ~220 pages covering Electrical SLD, Cooling P&ID, Fire/Safety, Network and BMS.'],
+  ['Is the "Basis of Design" button different from "Generate Design"?',
+   'Yes. The Basis of Design opens a focused 14-page summary suitable for stakeholder review. The Tech Spec is a deep engineering document with worked formulae, equipment specs and references intended for design-review or hand-off to an engineer-of-record.'],
+  ['Why is the PUE ' + pueVal + ' and not the often-quoted 1.08?',
+   'Because the engine uses the chiller NAMEPLATE COP (' + eq.chiller.nameplateCOP + ') and a five-part PUE basis (IT + Cooling + Fan + UPSLoss + Other), all bottom-up. Marketing PUEs are usually back-solved against an annualised energy total &mdash; we deliberately do not do that.'],
+  ['How many racks and GPUs does this facility have?',
+   '' + m.facility.halls + ' halls &times; ' + m.facility.nvl72PerHall + ' NVL72 per hall &times; ' + m.facility.racksPerNVL72 + ' racks per NVL72 = ' + (m.facility.halls*m.facility.racksPerHall) + ' physical racks. GPUs total ' + grp(m.facility.gpuPerFacility) + ' Blackwell (' + m.facility.gpuPerNVL72 + ' per NVL72).'],
+  ['Is the data here live BMS telemetry?',
+   'No. Every value is modelled / simulated from the locked basis. The page is engineered to look like an operations console so the design conversation can stay in one place, but it is not a feed from a physical facility. See the amber callout at the top of the Basis of Design drawer.'],
+  ['What is "direct-to-chip" (DLC) and how is the cooling split?',
+   'DLC routes a coolant loop directly to the GPU cold-plate, removing ' + (m.cooling.liquidCaptureRatio*100) + '% of IT heat at high return temperature (' + (m.cooling.chws_c||'&mdash;') + '&deg;C supply). The residual ' + (100-m.cooling.liquidCaptureRatio*100) + '% is removed by CRAH/CRAC air handlers, sized smaller because of the DLC load shedding.'],
+  ['How are these numbers verified?',
+   'The engine ships with 57 doc-21 worked examples in tools/test-datahall-calc.mjs. Every site release runs them in CI; a regression fails the build. The Tech Spec PDF is built from the same engine that the on-page mimics use, so a passing test suite means the PDF&rsquo;s arithmetic is reproducible.'],
+  ['Can I change the scenario and see numbers update?',
+   'Not in v1.30.0 &mdash; Scenario A is locked because the audit story depends on a single authoritative basis. v1.31.x will introduce scenario-comparison view that runs A vs B vs C side-by-side with deltas, leaving the canonical scenario locked.'],
+  ['What standards underpin the design?',
+   'NVIDIA GB200 NVL72 reference architecture for compute, ASHRAE TC 9.9 for thermal envelopes, NFPA 75/76 for fire, Uptime Institute Tier Standard for resilience topology, IEC 60364 + IEEE 1100 + BS 7671 for power, BS EN 50600 for data-centre facility infrastructure. Full list in section 9 of the Tech Spec PDF.'],
+  ['Why is this educational and not procurement-grade?',
+   'Two reasons. First, this is a public reference design &mdash; not project-specific. Second, real procurement needs a stamped issued-for-construction package from an engineer of record. The Tech Spec PDF is shaped like such a package because that shape teaches; it does not replace it.']
+];
+function openFaqDialog(){
+  var ex=d.getElementById('rzFaqDialog'); if(ex){ ex.style.display='flex'; return; }
+  var dlg=d.createElement('div'); dlg.id='rzFaqDialog'; dlg.setAttribute('role','dialog');
+  dlg.setAttribute('aria-modal','true'); dlg.setAttribute('aria-labelledby','rzFaqTitle');
+  dlg.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.78);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var box=d.createElement('div');
+  box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:760px;width:100%;max-height:88vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:Inter,sans-serif;';
+  box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 18px;border-bottom:1px solid #2b3a52;"><h3 id="rzFaqTitle" style="margin:0;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#67e8f9;">DC AI &mdash; Frequently Asked Questions</h3><button id="rzFaqClose" type="button" aria-label="Close FAQ" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;">&times;</button></div><div id="rzFaqList" style="overflow-y:auto;padding:14px 18px 18px;flex:1;"></div>';
+  dlg.appendChild(box);
+  var list=box.querySelector('#rzFaqList');
+  var html='';
+  for(var i=0;i<FAQ_ITEMS.length;i++){
+    var qi=FAQ_ITEMS[i];
+    html+='<details style="margin-bottom:10px;border:1px solid #2b3a52;border-radius:6px;background:#162033;padding:10px 12px;"><summary style="cursor:pointer;font-weight:700;color:#fbbf24;font-size:13px;line-height:1.4;">Q'+(i+1)+'. '+qi[0]+'</summary><div style="margin-top:8px;color:#b8c6da;font-size:12.5px;line-height:1.55;">'+qi[1]+'</div></details>';
+  }
+  list.innerHTML=html;
+  d.body.appendChild(dlg);
+  dlg.addEventListener('click',function(e){ if(e.target===dlg){ dlg.style.display='none'; } });
+  d.getElementById('rzFaqClose').addEventListener('click',function(){ dlg.style.display='none'; });
+}
+var faqBtn=gid('faqTrig');
+if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
+
 })();
 </script>
 

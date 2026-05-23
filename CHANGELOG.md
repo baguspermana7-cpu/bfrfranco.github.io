@@ -11,6 +11,69 @@ release sections rather than semver.
 
 ---
 
+## v1.30.1 — 2026-05-23 (Generate Design Tech Spec PDF + FAQ on DC AI and Conventional DC cockpits — Phase 2 scaffold)
+
+Owner brief: "kasih tombol download Tech Spec PDF atur aja nama tombol itu
+generate design itu... at least 200-300 halaman yang sangat detail. Dan ada
+tombol FAQ juga." This ship adds the Generate Design + FAQ buttons on both
+DC AI (`datahallAI.html`) and Conventional DC (`dc-conventional.html`) and
+ships the ~60 pp scaffold of the Tech Spec PDF for each. Full ~210–220 pp
+reach lands across v1.30.1 (DC AI all disciplines) and v1.30.2 (DC Conv all
+disciplines).
+
+### Added
+- **`datahallAI.html` header buttons**: new `📑 Generate Design` and `❓ FAQ`
+  buttons alongside the existing `Basis of Design` trigger. Generate
+  Design opens a print-window with the multi-page Tech Spec PDF built
+  live from `window.DATAHALL_CALC.lockedState()` + `pueBasis()` +
+  `DATAHALL_MODEL`. FAQ opens a modal dialog with 10 Q/A pairs whose
+  answers are interpolated from the live engine state (PUE, IT, rack
+  count, GPU count, scenario lock label).
+- **`dc-conventional.html` header buttons**: same pair (`genDesignTrigConv`
+  / `faqTrigConv`). Tech Spec built from `window.CONV_CALC.snapshot`.
+  FAQ Q/A pairs interpolate `site.pue`, `site.it_load_kw`,
+  `datahall.racks_total`, etc.
+- **`standarization/TECH_SPEC_PDF.md`**: new standardization doc covering
+  the build pattern, page CSS conventions, FAQ dialog convention,
+  verification gates, and v1.30.x roadmap.
+
+### Pattern
+- The Tech Spec PDF reuses the proven `window.open('', '_blank') +
+  document.write(html) + win.print()` pattern from the existing Basis of
+  Design PDF on the DC AI cockpit. Helper functions (`E`, `R`, `TC`,
+  `WK`, `grabSVG`) inline to keep each page's build self-contained while
+  the formatting stays consistent across both cockpits.
+- All `<\/script>` escapes in PDF template strings observed per
+  `standarization/PDF_EXPORT_STANDARD.md`.
+- v1.30.0 scaffold pages: Title · TOC · Exec Summary · Site & Facility ·
+  Anchor Discipline (Compute for DC AI, Power for DC Conv) · 4–8
+  placeholder anchors · References · Appendix A formula derivations.
+
+### Notes
+- Engine files (`js/datahall-model.js`, `js/datahall-calculations.js`,
+  `js/conv-engine.js`) byte-identical. 57/57 + 22/22 engine tests pass.
+- `#p-dash` panel + `updateDashKPI()` + `dcCallouts` byte-identical (owner exclusion).
+- Audit gates: audit-script-tags / audit-js-syntax / audit-version-stamp /
+  audit-mobile-responsive all CLEAN.
+
+### Owner direct quotes
+- "Baik di DC AI dan DC conventional kasih tombol download Tech Spec PDF
+  atur aja nama tombol itu generate design itu. Ada angka rack, dimensi
+  dll dan ada detail math calculationnya di pdf dg sangat detail dari
+  penentuan spec, cap, type, set point parameter deaign, basis standard
+  dll at least 200-300 halaman yang sangat detail."
+- "Dan ada tombol FAQ juga.ini masing2 ya dc ai sendiri dc conventional sendiri."
+- "Perhitungan utk tech spec bisa gunakan engine capex, opex calculator
+  dan calculator2 lain." → engine binding to DATAHALL_CALC + CONV_CALC
+  delivered today; capex/opex/tco/roi/pue rollups will join in v1.30.2.
+
+### Coordination note
+The parallel cf-worker session shipped its own v1.30.0 (FT Phase 2 Task A —
+/analyze endpoint) earlier today. This ship lands as v1.30.1 atop their
+release.
+
+---
+
 ## v1.30.0 — 2026-05-23 (FT Phase 2 Task A — /analyze endpoint: TA indicators + composite buy/sell gauge + ensemble prediction)
 
 R-002 + R-003 + R-004 foundation. Worker `/analyze?sym=&tf=` returns

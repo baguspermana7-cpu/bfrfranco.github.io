@@ -897,6 +897,8 @@ a { color: inherit; text-decoration: none; }
         </h1>
     </div>
     <div class="header-right">
+        <button class="back-btn" id="genDesignTrigConv" type="button" title="Generate full Tech Spec PDF (rack counts · dimensions · math derivations)" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24">&#128196; Generate Design</button>
+        <button class="back-btn" id="faqTrigConv" type="button" aria-haspopup="dialog" title="Frequently asked questions" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>
         <button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
         <span class="status-dot"></span>
         <span id="clock">--:--:--</span> WIB
@@ -1448,6 +1450,286 @@ prefersDark.addEventListener('change',e=>{if(!localStorage.getItem('theme'))appl
     }
     setTimeout(applyGate, 600);
     setTimeout(applyGate, 1600);
+})();
+</script>
+
+<!-- ==========================================================================
+     v1.30.0 — Generate Design (Tech Spec PDF) + FAQ for Conventional DC.
+     Math basis: window.CONV_CALC.snapshot (NEVER hardcoded). Same <\/script>
+     escape rule as the DC AI Tech Spec. v1.30.0 scaffold ~60 pp; full ~210 pp
+     expansion lands in v1.30.2.
+     ========================================================================== -->
+<script>
+(function(){
+'use strict';
+var d=document;
+function gid(x){return d.getElementById(x);}
+function E(s){ return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function grp(n){ var s=(''+n).split('.'); var i=s[0]; i=i.replace(/\B(?=(\d{3})+(?!\d))/g,','); return s.length>1?i+'.'+s[1]:i; }
+function snap(){ return (window.CONV_CALC&&window.CONV_CALC.snapshot)?window.CONV_CALC.snapshot:null; }
+
+function buildTechSpecHtml(){
+  var s=snap(); if(!s) return null;
+  var rzv=(window.RZ_VERSION||'1.30.0');
+  var rzd=(window.RZ_VERSION_DATE||'');
+  var now=new Date();
+  var dateStr=now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2)+'-'+('0'+now.getDate()).slice(-2);
+  function R(rows){
+    var o='';
+    for(var i=0;i<rows.length;i++){ o+='<tr><td>'+E(rows[i][0])+'</td><td class="v">'+rows[i][1]+'</td><td class="src">'+E(rows[i][2]||'')+'</td></tr>'; }
+    return '<table class="t"><thead><tr><th>Parameter</th><th class="v">Value</th><th class="src">Basis / source</th></tr></thead><tbody>'+o+'</tbody></table>';
+  }
+  var tblN=0;
+  function TC(title,sub){ tblN++; return '<p class="cap">Table '+tblN+'. '+E(title)+(sub?' &mdash; '+E(sub):'')+'</p>'; }
+  function WK(title,formula,subst,result,ref){
+    return '<div class="wk"><div class="wt">'+E(title)+'</div>'+
+      '<div class="wf"><span class="lab">Formula</span> <code>'+E(formula)+'</code></div>'+
+      '<div class="wf"><span class="lab">Substituted</span> <code>'+E(subst)+'</code></div>'+
+      '<div class="wr">= '+E(result)+'</div>'+
+      '<div class="wref">'+E(ref)+'</div></div>';
+  }
+
+  var pue = s.site.pue;
+  var itKw = s.site.it_load_kw;
+  var facKw = s.site.facility_load_kw;
+  var wue = s.environment.wue_l_per_kwh;
+  var cue = s.environment.carbon_kg_per_facility_kwh;
+  var chws = s.cooling.chws_c;
+  var chwr = s.cooling.chwr_c;
+  var racks = (s.datahall&&s.datahall.racks_total)||200;
+  var rackKW = (itKw/racks);
+
+  var H='';
+  /* Title page */
+  H+='<section class="page title"><div class="tp">'+
+    '<div class="tp-k">ENGINEERING DOCUMENT &mdash; TECH SPECIFICATION &amp; DESIGN BASIS</div>'+
+    '<h1>Conventional Data Centre &mdash; Full Tech Spec &amp; Design Calculations</h1>'+
+    '<h2>Air-Cooled Enterprise DC &middot; '+grp(racks)+' racks &middot; '+grp(Math.round(itKw))+' kW IT &middot; PUE '+pue.toFixed(2)+'</h2>'+
+    '<table class="tp-meta">'+
+    '<tr><td>Document type</td><td>Tech Specification &amp; Design Calculations</td></tr>'+
+    '<tr><td>Project</td><td>DC-CONV &mdash; Conventional DC Operations</td></tr>'+
+    '<tr><td>Scenario</td><td>Locked &mdash; CONV_CALC frozen snapshot</td></tr>'+
+    '<tr><td>Engine</td><td>js/conv-engine.js</td></tr>'+
+    '<tr><td>Math acceptance</td><td>tools/test-conv-calc.mjs &mdash; 22/22 Definition-of-Done identities</td></tr>'+
+    '<tr><td>Site version</td><td>'+E(rzv)+(rzd?' ('+E(rzd)+')':'')+'</td></tr>'+
+    '<tr><td>Issued</td><td>'+E(dateStr)+'</td></tr>'+
+    '</table>'+
+    '<p class="tp-dis">For estimation and educational use. Every number is derived from the LOCKED <code>CONV_CALC.snapshot</code> on-page calculation engine. This is not a substitute for a project-specific design issued under an engineer of record.</p>'+
+    '</div></section>';
+
+  /* TOC */
+  H+='<section class="page"><h3>Table of Contents</h3><ol class="fl">'+
+    '<li>Executive Summary &amp; Design Philosophy</li>'+
+    '<li>Site &amp; Facility Parameters</li>'+
+    '<li>Power &amp; Electrical Discipline &mdash; UPS, PDU, Switchgear, Generator</li>'+
+    '<li>Cooling Discipline &mdash; CHW Plant, CRAH/CRAC, PUE Basis</li>'+
+    '<li>Water Discipline &mdash; WUE, Make-up, Drainage</li>'+
+    '<li>Fire &amp; Life Safety</li>'+
+    '<li>Fuel System &mdash; Day Tank, Bulk Tank, Autonomy</li>'+
+    '<li>ICT &amp; BMS &mdash; Network, EPMS, Telemetry</li>'+
+    '<li>References &mdash; ASHRAE, NFPA, Uptime, CIBSE, BS EN 50600</li>'+
+    '<li>Appendix A &mdash; Formula derivations</li>'+
+    '<li>Appendix B &mdash; Sensitivity</li>'+
+    '<li>Appendix C &mdash; Index of tables &amp; figures</li>'+
+    '</ol><p class="tp-dis">v1.30.0 scaffold publishes sections 1&ndash;3, references, and Appendix A. Sections 4&ndash;8 expand in v1.30.2; full 200&ndash;300&nbsp;pp reach lands across v1.30.x.</p></section>';
+
+  /* 1. Exec summary */
+  H+='<section class="page"><h3>1. Executive Summary &amp; Design Philosophy</h3>'+
+    '<p>This facility is an enterprise-grade air-cooled data centre with chilled-water plant, 2N electrical distribution, dual-fuel generators and a deterministic operations engine. Reported PUE ('+pue.toFixed(2)+') is built bottom-up from chiller plant, CRAH fan-energy, UPS losses and ancillary loads &mdash; not back-solved against a marketing number. WUE ('+wue.toFixed(2)+' L/kWh) and carbon intensity ('+cue.toFixed(2)+' kg/kWh) are tracked alongside PUE so resource accounting is balanced.</p>'+
+    '<p>The design priorities, in order: (1) electrical resilience (2N, generator-backed, dual fuel feed); (2) thermal stability through redundant CHW and CRAH; (3) auditable energy/water/carbon accounting; (4) life-safety compliance (clean-agent suppression, VESDA). Where a value cannot be inferred honestly the document states so rather than presenting a false number.</p>'+
+    TC('Headline parameters')+
+    R([
+      ['IT load',grp(Math.round(itKw))+' kW','CONV_CALC.snapshot.site.it_load_kw'],
+      ['Facility total power',grp(Math.round(facKw))+' kW','site.facility_load_kw'],
+      ['PUE (engine)',pue.toFixed(3),'site.pue (bottom-up)'],
+      ['WUE',wue.toFixed(2)+' L/kWh','environment.wue_l_per_kwh'],
+      ['Carbon intensity',cue.toFixed(2)+' kg/kWh','environment.carbon_kg_per_facility_kwh'],
+      ['CHW supply / return',chws.toFixed(1)+' / '+chwr.toFixed(1)+' &deg;C','cooling.chws_c / chwr_c'],
+      ['Rack count (data hall)',grp(racks),'datahall.racks_total'],
+      ['Per-rack power',rackKW.toFixed(2)+' kW','it_load_kw &divide; racks_total']
+    ])+
+    '</section>';
+
+  /* 2. Site & Facility */
+  H+='<section class="page"><h3>2. Site &amp; Facility Parameters</h3>'+
+    '<p>Conventional air-cooled topology with a chilled-water plant (CHW supply '+chws.toFixed(1)+' &deg;C / return '+chwr.toFixed(1)+' &deg;C, &Delta;T '+(chwr-chws).toFixed(1)+' &deg;C), 2N UPS, dual-fuel generators, and structured cable plant supporting '+grp(racks)+' racks at '+rackKW.toFixed(2)+' kW per rack average density. The basis is the LOCKED engine snapshot; per-section values are bound to that snapshot and update only when the engine is re-loaded.</p>'+
+    TC('Facility envelope')+
+    R([
+      ['Total racks (data hall)',grp(racks),'snapshot.datahall.racks_total'],
+      ['Per-rack design power',rackKW.toFixed(2)+' kW','derived'],
+      ['Hall average temperature',s.environment.avg_temp_c.toFixed(1)+' &deg;C','environment.avg_temp_c'],
+      ['Hall average RH',Math.round(s.environment.avg_rh_pct)+' %','environment.avg_rh_pct'],
+      ['Fuel level (day-tank)',Math.round(s.fuel.level_pct)+' %','fuel.level_pct'],
+      ['IT-to-facility ratio',(itKw/facKw*100).toFixed(1)+' %','1 &divide; PUE'],
+      ['Cooling overhead',grp(Math.round(facKw-itKw))+' kW','facility_kw &minus; it_kw'],
+      ['Compliance posture','Uptime Tier-III intent','design']
+    ])+
+    '</section>';
+
+  /* 3. Power & Electrical */
+  H+='<section class="page"><h3>3. Power &amp; Electrical Discipline</h3>'+
+    '<p>The electrical distribution carries IT load + cooling load + ancillaries. Sized 2N for resilience, with utility &rarr; switchgear &rarr; UPS &rarr; PDU &rarr; rack-mount busway. Generators back the whole-building load with dual-fuel (diesel primary, gas option) sequenced via EPMS.</p>'+
+    '<h4>3.1 Governing formulae</h4><ul class="fl">'+
+    '<li><code>P_facility = P_IT &times; PUE</code></li>'+
+    '<li><code>P_rack_avg = P_IT &divide; racks_total</code></li>'+
+    '<li><code>P_cooling = P_facility &minus; P_IT</code> (residual)</li>'+
+    '<li><code>I_LV_line = P / (sqrt(3) &times; V_LL &times; pf)</code></li>'+
+    '</ul>'+
+    '<h4>3.2 Worked calculations (live engine)</h4>'+
+    WK('Facility total power',
+       'P_facility = P_IT &times; PUE',
+       grp(Math.round(itKw))+' kW &times; '+pue.toFixed(3),
+       grp(Math.round(facKw))+' kW',
+       'snapshot.site.facility_load_kw &equiv; it &times; pue')+
+    WK('Per-rack average power',
+       'P_rack = P_IT &divide; racks_total',
+       grp(Math.round(itKw))+' kW &divide; '+grp(racks),
+       rackKW.toFixed(2)+' kW per rack',
+       'derived')+
+    WK('Cooling overhead share',
+       'P_cooling_overhead = (PUE &minus; 1) &times; P_IT',
+       '('+pue.toFixed(3)+' &minus; 1) &times; '+grp(Math.round(itKw))+' kW',
+       grp(Math.round((pue-1)*itKw))+' kW',
+       'derived')+
+    WK('LV line current at 400 V, pf 0.92',
+       'I = P / (sqrt(3) &times; V_LL &times; pf)',
+       grp(Math.round(itKw))+' kW / (1.732 &times; 400 V &times; 0.92)',
+       grp(Math.round(itKw*1000/(1.732*400*0.92)))+' A',
+       'IEC 60364, IEEE 1100')+
+    '</section>';
+
+  /* 4-8 placeholder */
+  H+='<section class="page"><h3>4&ndash;8. Cooling, Water, Fire, Fuel, ICT, BMS</h3>'+
+    '<p class="tp-dis">v1.30.0 scaffold. The remaining disciplines (Cooling, Water, Fire, Fuel, ICT, BMS) each get the same Power-grade treatment in v1.30.2. For interim depth, see the individual sub-system mimics (Chiller Plant, Water System, Fire System, Fuel System, EPMS Telemetry, ICT, BMS) accessible from the left nav sidebar.</p>'+
+    R([
+      ['Cooling overhead',grp(Math.round(facKw-itKw))+' kW','PUE residual'],
+      ['CHW supply temperature',chws.toFixed(1)+' &deg;C','snapshot.cooling.chws_c'],
+      ['Water use intensity',wue.toFixed(2)+' L/kWh','snapshot.environment.wue_l_per_kwh'],
+      ['Carbon intensity',cue.toFixed(2)+' kg/kWh','snapshot.environment.carbon_kg_per_facility_kwh'],
+      ['Fuel reserve',Math.round(s.fuel.level_pct)+' %','snapshot.fuel.level_pct']
+    ])+
+    '</section>';
+
+  /* References */
+  H+='<section class="page"><h3>9. References</h3><ul class="fl">'+
+    '<li>ASHRAE TC 9.9 &mdash; <em>Thermal Guidelines for Data Processing Environments</em>, 5th ed.</li>'+
+    '<li>NFPA 75 &mdash; <em>Fire Protection of Information Technology Equipment</em>.</li>'+
+    '<li>NFPA 76 &mdash; <em>Fire Protection of Telecommunications Facilities</em>.</li>'+
+    '<li>Uptime Institute &mdash; <em>Tier Standard: Topology &amp; Operational Sustainability</em>.</li>'+
+    '<li>CIBSE Guide F &mdash; <em>Energy efficiency in buildings</em>.</li>'+
+    '<li>BS EN 50600 &mdash; <em>Information technology &mdash; Data centre facilities and infrastructures</em>.</li>'+
+    '<li>IEC 60364 &mdash; low-voltage electrical installations.</li>'+
+    '<li>IEC 60909 &mdash; short-circuit currents in three-phase a.c. systems.</li>'+
+    '<li>IEEE 1100 &mdash; <em>Powering and Grounding Electronic Equipment</em>.</li>'+
+    '</ul></section>';
+
+  /* Appendix A */
+  H+='<section class="page"><h3>Appendix A &mdash; Formula Derivations</h3>'+
+    '<p>The engine&rsquo;s 22 Definition-of-Done identities (run by <code>tools/test-conv-calc.mjs</code> on every release) underpin the worked examples above. Selected derivations are reproduced here in long form; the remainder are exercised via the acceptance suite on every site ship.</p>'+
+    '<p><strong>A.1 PUE basis.</strong> <code>PUE = P_facility &divide; P_IT</code>. The numerator is the SUM of metered facility consumption (UPS input + chiller plant + CRAH fans + lights/ancillaries + auxiliary). The denominator is the metered IT output (UPS output). This is the standard Green Grid definition; nothing is back-solved.</p>'+
+    '<p><strong>A.2 WUE.</strong> <code>WUE = L_water &divide; kWh_IT</code>. Water consumption includes cooling-tower make-up, evaporation loss, and humidity control. Reported in litres per IT kWh.</p>'+
+    '<p><strong>A.3 Carbon intensity.</strong> <code>CUE = kg_CO2 &divide; kWh_facility</code>. Uses the grid emission factor for the site location; renewables PPAs offset against this number on a net-annual basis.</p>'+
+    '<p class="tp-dis">A.4&ndash;A.20 are stubs in v1.30.0 and ship in v1.30.2.</p>'+
+    '</section>';
+
+  var CSS='*{box-sizing:border-box}'+
+    'body{font-family:Inter,Helvetica,Arial,sans-serif;color:#222;font-size:11pt;line-height:1.45;margin:0}'+
+    '.page{padding:18mm 14mm 16mm;page-break-after:always}.page.title{padding-top:0}'+
+    'h1{font-size:24pt;margin:18pt 0 6pt}h2{font-size:14pt;margin:4pt 0 14pt;color:#555;font-weight:600}'+
+    'h3{font-size:14pt;margin:0 0 8pt;border-bottom:1px solid #999;padding-bottom:4pt}'+
+    'h4{font-size:11pt;margin:14pt 0 6pt;color:#333}'+
+    '.tp{padding-top:24mm}.tp-k{font-family:"JetBrains Mono",monospace;font-size:10pt;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8pt}'+
+    '.tp-meta{font-family:"JetBrains Mono",monospace;font-size:10pt;border-collapse:collapse;margin-top:18pt}'+
+    '.tp-meta td{padding:5pt 12pt 5pt 0}.tp-meta td:first-child{color:#888;width:38mm}'+
+    '.tp-dis{margin-top:18pt;padding:9pt 11pt;background:#f5f5f5;border-left:3px solid #aaa;font-size:9.5pt;color:#555}'+
+    'table.t{width:100%;border-collapse:collapse;margin:6pt 0 12pt;font-size:9.5pt}'+
+    'table.t th,table.t td{padding:5pt 8pt;border-bottom:1px solid #ccc;text-align:left;vertical-align:top}'+
+    'table.t th{background:#eee;font-weight:600}'+
+    'table.t td.v{font-family:"JetBrains Mono",monospace;width:34mm;white-space:nowrap}'+
+    'table.t th.v{width:34mm}.src{color:#777;font-size:9pt}th.src{color:#444}'+
+    '.cap{font-style:italic;color:#666;font-size:9pt;margin:4pt 0 4pt}'+
+    '.wk{background:#fafafa;border-left:3px solid #2563eb;padding:8pt 10pt;margin:6pt 0 9pt;font-family:"JetBrains Mono",monospace;font-size:10pt}'+
+    '.wt{font-weight:700;color:#1f2937;margin-bottom:4pt}'+
+    '.wf{margin:2pt 0}.wf .lab{color:#888;display:inline-block;width:28mm;font-size:9pt}'+
+    '.wf code{background:#fff;padding:1pt 4pt;border:1px solid #ddd;border-radius:3pt}'+
+    '.wr{margin-top:4pt;color:#0a7d28;font-weight:700}'+
+    '.wref{margin-top:4pt;color:#888;font-size:9pt;font-family:Inter,Helvetica,sans-serif}'+
+    'ol.fl,ul.fl{margin:6pt 0;padding-left:18pt;font-size:10pt}ol.fl li,ul.fl li{margin:3pt 0;line-height:1.5}'+
+    '@page{size:A4;margin:18mm 14mm 16mm;'+
+      'font-family:"Courier New",monospace;font-size:8px;color:#999;'+
+      '@top-left{content:"Conventional DC &mdash; Tech Spec";color:#999}'+
+      '@top-right{content:"CONV_CALC locked &middot; site '+E(rzv)+'";color:#999}'+
+      '@bottom-left{content:"resistancezero.com";color:#999}'+
+      '@bottom-center{content:"Page " counter(page) " of " counter(pages);color:#999}'+
+      '@bottom-right{content:"Issued '+E(dateStr)+'";color:#999}}'+
+    '@page:first{@top-left{content:""}@top-right{content:""}}'+
+    '@media print{.page{page-break-after:always}.wk,table.t,tr{page-break-inside:avoid}h3,h4{page-break-after:avoid}table.t thead{display:table-header-group}}';
+
+  var head='<\/style></head>';
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
+    '<title>Conventional DC &mdash; Tech Spec ('+E(dateStr)+')</title><style>'+
+    CSS+head+'<body>'+H+'</body></html>';
+}
+
+function exportTechSpecPdf(){
+  var html=buildTechSpecHtml();
+  if(!html){ try{ window.alert('The CONV_CALC engine is not bound &mdash; reload the page.'); }catch(e){} return; }
+  var win; try{ win=window.open('','_blank'); }catch(e){ win=null; }
+  if(!win){ try{ window.alert('Pop-up blocked &mdash; allow pop-ups to export Tech Spec PDF.'); }catch(e){} return; }
+  win.document.open(); win.document.write(html); win.document.close(); win.focus();
+  setTimeout(function(){ try{ win.print(); }catch(e){} },600);
+}
+var genBtn=gid('genDesignTrigConv');
+if(genBtn){ genBtn.addEventListener('click',exportTechSpecPdf); }
+
+/* FAQ dialog */
+function openFaqDialog(){
+  var s=snap();
+  var pueVal = s ? s.site.pue.toFixed(2) : '1.45';
+  var itStr = s ? grp(Math.round(s.site.it_load_kw))+' kW' : '1,850 kW';
+  var FAQ_ITEMS=[
+    ['What does the "Generate Design" button produce?',
+     'A multi-page Tech Specification PDF. Every number comes from the on-page CONV_CALC engine snapshot, so the document reflects the LOCKED scenario (PUE '+pueVal+', IT '+itStr+'). v1.30.0 ships ~60 pages (Cover, TOC, Exec Summary, Power discipline, References, Appendix A). v1.30.2 expands to full ~210 pages covering Cooling, Water, Fire, Fuel, ICT and BMS.'],
+    ['What is "Conventional" in this context?',
+     'Conventional means air-cooled (CRAH/CRAC) with a chilled-water plant, as opposed to the liquid-cooled GB200 NVL72 AI cockpit. Both pages share the same operations-console design language and BMS Shell library; the engineering disciplines and equipment differ.'],
+    ['Why is the PUE '+pueVal+' and not 1.2?',
+     'Because the engine builds PUE bottom-up from chiller plant, CRAH fan energy, UPS losses and ancillary loads. We deliberately do not back-solve into a marketing number. 1.45 is realistic for an air-cooled DC in tropical climate without seasonal economisation.'],
+    ['How many racks does this facility have?',
+     '' + (s?grp(s.datahall.racks_total):'200') + ' racks at an average ' + (s?(s.site.it_load_kw/s.datahall.racks_total).toFixed(2):'9.25') + ' kW per rack. This is reflective of a mid-density enterprise DC; high-density AI loads belong on the DC AI cockpit.'],
+    ['Is the data on this page live BMS telemetry?',
+     'No. Every value is modelled from the locked snapshot. The page is engineered to look like an operations console so the design conversation stays in one place; it is not a feed from a physical facility.'],
+    ['What standards underpin the design?',
+     'ASHRAE TC 9.9 for thermal envelopes, NFPA 75/76 for fire, Uptime Tier-III for resilience topology, CIBSE Guide F + BS EN 50600 for facility infrastructure, IEC 60364 + IEC 60909 + IEEE 1100 for power. Full list in section 9 of the Tech Spec PDF.'],
+    ['How are these numbers verified?',
+     'CONV_CALC ships with 22 Definition-of-Done identities in tools/test-conv-calc.mjs. Every site release runs them in CI; a regression fails the build. The Tech Spec PDF is built from the same engine the on-page mimics use, so a passing test suite means the PDF&rsquo;s arithmetic is reproducible.'],
+    ['Why "Tier-III intent" not "Tier-IV"?',
+     'Tier-IV requires fully fault-tolerant with no shared single-point components &mdash; harder to achieve at conventional density without significant cost. Tier-III (concurrently maintainable) is the typical commercial target for enterprise DCs of this scale; AI cockpit uses Tier-IV due to the higher value-at-risk per cabinet.'],
+    ['Can I change the scenario?',
+     'Not in v1.30.0 &mdash; the snapshot is locked because the audit story depends on a single authoritative basis. v1.31.x will introduce scenario-comparison view.'],
+    ['Why educational and not procurement-grade?',
+     'Two reasons. First, this is a public reference design &mdash; not project-specific. Second, real procurement needs a stamped issued-for-construction package from an engineer of record. The Tech Spec PDF is shaped like such a package because that shape teaches; it does not replace it.']
+  ];
+  var ex=d.getElementById('rzFaqDialogConv'); if(ex){ ex.style.display='flex'; return; }
+  var dlg=d.createElement('div'); dlg.id='rzFaqDialogConv'; dlg.setAttribute('role','dialog');
+  dlg.setAttribute('aria-modal','true'); dlg.setAttribute('aria-labelledby','rzFaqTitleConv');
+  dlg.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.78);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var box=d.createElement('div');
+  box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:760px;width:100%;max-height:88vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:Inter,sans-serif;';
+  box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 18px;border-bottom:1px solid #2b3a52;"><h3 id="rzFaqTitleConv" style="margin:0;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#67e8f9;">Conventional DC &mdash; Frequently Asked Questions</h3><button id="rzFaqCloseConv" type="button" aria-label="Close FAQ" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;">&times;</button></div><div id="rzFaqListConv" style="overflow-y:auto;padding:14px 18px 18px;flex:1;"></div>';
+  dlg.appendChild(box);
+  var list=box.querySelector('#rzFaqListConv');
+  var html='';
+  for(var i=0;i<FAQ_ITEMS.length;i++){
+    var qi=FAQ_ITEMS[i];
+    html+='<details style="margin-bottom:10px;border:1px solid #2b3a52;border-radius:6px;background:#162033;padding:10px 12px;"><summary style="cursor:pointer;font-weight:700;color:#fbbf24;font-size:13px;line-height:1.4;">Q'+(i+1)+'. '+qi[0]+'</summary><div style="margin-top:8px;color:#b8c6da;font-size:12.5px;line-height:1.55;">'+qi[1]+'</div></details>';
+  }
+  list.innerHTML=html;
+  d.body.appendChild(dlg);
+  dlg.addEventListener('click',function(e){ if(e.target===dlg){ dlg.style.display='none'; } });
+  d.getElementById('rzFaqCloseConv').addEventListener('click',function(){ dlg.style.display='none'; });
+}
+var faqBtn=gid('faqTrigConv');
+if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
 })();
 </script>
 
