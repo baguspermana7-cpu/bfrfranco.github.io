@@ -803,6 +803,37 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.40.3 — 2026-05-25 (Second Brain Wiki link broken — relative-path fix)
+
+Owner reported: clicking the "Wiki" button on the Second Brain page
+(`/Apps/second brain/index.html`) returned 404. The wiki link was
+relative (`standarization/repos/REPO_INSTALL_PLAN.md`) which the
+browser resolved to `/Apps/second brain/standarization/repos/...` &mdash;
+that path does not exist. The actual file lives at site root
+`/standarization/repos/REPO_INSTALL_PLAN.md`.
+
+### Fixed
+- `Apps/second brain/index.html` line 414 &mdash; navbar "Wiki" button
+  link: `standarization/repos/...` &rarr; `../../standarization/repos/...`
+- `Apps/second brain/index.html` line 767 &mdash; wiki node graph entry
+  in the `N[]` (nodes) array: same path correction.
+
+Both links now resolve to `http://&lt;host&gt;/standarization/repos/REPO_INSTALL_PLAN.md`.
+Verified via headless Chrome: browser-resolved href matches the file's
+actual location (HTTP 200).
+
+### Why this happened
+The Second Brain page lives in a sub-directory (`/Apps/second brain/`),
+but the repo wiki sits at site root. Relative links without `../../`
+prefix resolve into the wrong scope. Browser link resolution is
+strict; the fix is a one-line path-prefix change.
+
+### Notes
+- No engine impact. Probe 75/75 PASS.
+- ship-gate 8/8 PASS.
+
+---
+
 ## v1.40.2 — 2026-05-25 (Tech Spec PDF — Section 7 Network + Section 2 Site/Structural; 338 KB → 353 KB; ~80-90 pages)
 
 (Authored locally as v1.39.4. Parallel session shipped v1.40.0 AI
