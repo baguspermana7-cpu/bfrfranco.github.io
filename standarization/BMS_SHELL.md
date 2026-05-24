@@ -419,3 +419,19 @@ The shell is **presentation only**. It does NOT touch any engine values. Pages r
 EPMS_Telemetry.html was designated "byte-untouched exemplar" through v1.22.x. The owner has revoked that designation for the BMS Shell adoption pass (per the new doc-14 review). It now migrates onto the shared shell alongside the other 7 conv pages.
 
 The DC Dashboard tab `#p-dash` inside `datahallAI.html` **remains** owner-excluded. Adoption ships must continue to leave that panel byte-identical to HEAD.
+
+## v1.41.x cockpit refinement pass (2026-05-24)
+
+Seven-ship sweep closing batched owner feedback on the cockpit family. All ships engine-locked (`datahall-model.js` + `datahall-calculations.js` + `conv-engine.js` byte-identical; 57/57 + 22/22 + 75/75 probe tests pass on every push):
+
+| Ship | Version | Commit | Page(s) | Scope |
+|---|---|---|---|---|
+| 1 | v1.41.0 | (earlier) | `all-in-one-dashboard.html` (NEW) + `geopolitics.html` | All-In-One Dashboard catalogue page; geopolitics link fix |
+| 2 | v1.41.1 | `1695ea0` | `datahallAI.html` | STP modal full process flow (drainage→sump→bio-septic→MBBR→clarifier→sand-filter→AC-filter→UV→reclaim→irrigation) + MMR/TELECOM room added to Room Layout |
+| 3 | v1.41.2 | `732ea2f` | `datahallAI.html`, `dc-conventional.html` | Water-quality Tech Spec — DC AI dry-only (7 new §) + DC Conv cooling-tower (9 new §) |
+| 4 | v1.41.3 | `4f598bd` | `datahallAI.html` | Chillers relocated from Roof to Ground Floor (CW Distribution Manifold replaces Chiller Plant on roof; Chiller Plant Hall added to GF replacing Workshop B); Cooling P&ID label clarity (prefix temp badges, separate pump-station pressure/flow labels) |
+| 5 | v1.41.4 | `403560f` | `datahall.html` | CRAH popover replaces modal (no main-screen disable); inline SAT on CRAH cells; per-cell rack ID + per-mode value (kW/°C/margin/%/IT); cold-aisle normalised to 22.0±0.3°C; excursion simulator (random zone+CRAH 10-15s every 2min) |
+| 6 | v1.41.5 | `7d5acb9` | `water-system.html` | UV-401 / DOS-302 label overlap fixed; TK-402 Z-shape pipe routing → straight drop; CT-MK retag to MK-501 "Make-up Water System" |
+| 7 | v1.41.6 | `5e9c054` | `ict.html` | Security HMI widgets: CCTV 16-cell mosaic with rec dot + 24h availability sparkline; Access Doors list (12 doors with LOCKED/UNLOCKED pills); Intrusion Zones SVG donut + 10-zone list. SEGMENTS.sec data expanded (services 4→8, caps 4→8, links 3→9) |
+
+Owner-excluded `#p-dash` + `updateDashKPI()` + `dcCallouts` remain byte-identical throughout the sweep. Parallel `ai-engineering-maintenance.html` work (separate session) was stashed before each push and popped after to avoid bundle contamination.
