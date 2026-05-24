@@ -11,6 +11,125 @@ release sections rather than semver.
 
 ---
 
+## v1.40.0 — 2026-05-25 (AI Maintenance — Tier-1+Tier-2 review fixes: CSV provenance + advisory-only + concept-banner + roadmap split)
+
+MINOR ship: post-production-review on `ai-engineering-maintenance.html`.
+Reviewer's 2026-05-24 finding split into 3 tiers; **Tier 1 + Tier 2 fixed
+here; Tier 3 captured as future-work roadmap** (see `docs/plans/`).
+
+Reviewer's Addendum A "Industrial Build Blueprint" (11 production screens
++ multi-tenant RBAC + edge gateways + CMMS connectors + IEC/ISO compliance)
+is explicitly **out of scope** for this portfolio site and tracked at
+`docs/plans/2026-05-25-ai-maintenance-product-roadmap.md` as a separate
+multi-year initiative. The concept page is now honestly labeled and
+correctly links there.
+
+### Tier 1 — Real bugs / content lies fixed
+
+- **`docs/research/csv/*.csv`** &mdash; **all 8 CSVs** gained `confidence_tier`,
+  `source_ref`, `effective_date`, `last_verified_by`, `license_class`
+  columns per `KNOWLEDGE_BASE_STANDARD.md`. Page previously claimed
+  "Every fault row carries a `confidence_tier` column" but the CSVs
+  didn't have it &mdash; **that's now true.** Tiers auto-inferred from
+  existing `source` strings using the standards-body / industry-press /
+  vendor mapping:
+  - `high` (43.8%): IEEE, IEC, ISO, ASHRAE, CIGRE, NETA, NFPA, NPRD-2016,
+    OREDA, IEEE 493, CIGRE TB-* etc.
+  - `medium` (5.8%): Hydraulic Institute, CTI, OCP, EPA/OSHA standards,
+    journal articles, vendor application notes
+  - `thin` (50.4%): single-vendor / manufacturer / OEM / unattributed
+- **`failures.csv` + `steps.csv`** &mdash; added `source` column (previously
+  absent); inherit from parent fault / action.
+- **Referential integrity fix**: 3 step rows referenced action
+  `A-14.1-P-1` which didn't exist in `actions.csv` (only `A-14.1-P` did).
+  Re-pointed to `A-14.1-P`. **0 orphan FKs across all 826 data rows
+  post-transform** (verified via cross-CSV grep).
+- **Row count corrected**: page claimed "834 KG-ready rows"; actual data
+  rows = **826** (834 = lines including 8 headers). Page now says
+  `826 KG-ready data rows across 8 CSV seed files (834 lines incl. headers)`.
+- **"Auto-action allowed" wording removed** &mdash; was unsafe industrial
+  framing. Now reads: *"Eligible for draft work-order generation; human
+  approval required before any operational action. AI is advisory only;
+  physical control remains in SIS / protection relays / BMS engineered
+  sequences."* IEC 61508 alignment.
+- **Concept-page banner** at top of hero: explicit "this is a concept-
+  and-design document, not a production product" framing, with link to
+  the product roadmap doc.
+- **Knowledge Base section added to sticky section-nav** (was orphaned).
+- **27 Font Awesome decorative icons** got `aria-hidden="true"`.
+- **`.rz-demo-hint` hidden on this Pro-only page** (page-scoped CSS) so
+  the demo credential isn't advertised when `page-access: { demo: false }`.
+
+### Tier 2 — Honesty + provenance work
+
+- All CSVs now machine-checkable for confidence-tier discipline.
+- Provenance fields (`source_ref`, `effective_date`, `last_verified_by`,
+  `license_class`) enable downstream KG ingestion governance.
+- Concept page now distinguishes RPN as "ranking only" from
+  probability-equivalent loss math (the production roadmap doc lays out
+  Weibull / calibrated probability / expected-loss for future work).
+- Each confidence tier's engine treatment now describes *who* approves
+  (human / reliability engineer / vendor outreach), not "auto-action".
+
+### Added
+
+- **`docs/plans/2026-05-25-ai-maintenance-product-roadmap.md`** &mdash;
+  faithful capture of the reviewer's 3,092-line industrial-product
+  blueprint as **future-work roadmap**. 13 sections: north star, RBAC,
+  11-screen product surface, cloud/edge architecture, calculation
+  engine, knowledge governance, safety + cybersecurity (IEC 61508 /
+  62443 / ISA-95), build phases A&ndash;H, vertical-slice pilot, standards
+  anchor (cite-don't-claim-compliance), explicit out-of-scope-for-RZ
+  carve-out, production acceptance bar (20 items), acknowledgements.
+- **Memory: `feedback_concept_vs_product_scope.md`** &mdash; codifies the
+  "don't conflate concept-page critique with production-app critique"
+  rule so future reviewers proposing similar scope-creep can be politely
+  refused with reference to this pattern.
+
+### What was REFUSED (and why)
+
+The 2026-05-24 review proposed building:
+- 11 production screens (Command Center, Triage Queue, Diagnostic Case
+  Detail, Planner Board, Technician Mobile Workbench, etc.)
+- 20+ microservices (Auth/Tenant, Asset Registry, Sensor Ingest, Feature
+  Extraction, Model Inference, Calibration, Anomaly, RUL, KG, Advisor,
+  Recommendation, CMMS, Spares, WO, Review, Audit, Model Registry, KG
+  Release Registry, Edge Sync, Notification, Reporting)
+- Multi-tenant industrial SaaS with 9-role enterprise RBAC
+- Edge gateways with signed OTA + OPC UA / BACnet/SC integration
+- Compliance audits against IEC 60812 / 61508 / 62443, ISO 14224 / 55001,
+  NIST AI RMF / SSDF, ISA-95 / ISA-101
+- React/Vue/Svelte frontend stack adoption
+
+This is **enterprise industrial-SaaS scope** &mdash; multi-year, multi-engineer,
+multi-million-dollar. The resistancezero.com portfolio site is a single-
+developer zero-build static GitHub Pages deployment. Building these
+inside the portfolio site would be scope-explosion of 2&ndash;3 orders of
+magnitude. The roadmap doc captures all of it as **valid future-product
+vision**; it does not become next-week code. See
+`feedback_concept_vs_product_scope.md` memory for the principle.
+
+### Status
+
+- audit-script-tags.py --strict CLEAN (176 files)
+- audit-js-syntax.py --strict CLEAN (106 files)
+- RPN integrity: 109/109 rows match `S * O * D` (unchanged)
+- Referential integrity: 0 orphan FKs across all 826 rows (was 3)
+- Concept page lies removed; banner honest; roadmap linked
+
+### Bumped
+
+- `js/rz-version.js` → v1.40.0 (MINOR; concept-page honesty pass)
+- `sw.js` → `rz-cache-v1.40.0`
+
+### Cross-references
+
+`docs/plans/2026-05-25-ai-maintenance-product-roadmap.md` &middot;
+`standarization/KNOWLEDGE_BASE_STANDARD.md` &middot;
+`docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md`
+
+---
+
 ## v1.38.0 — 2026-05-24 (Network Hub Phase 2 — Lane B fully complete: +DNP3 +PROFINET +EtherNet/IP +EtherCAT +BACnet MS/TP)
 
 MINOR ship: Phase 2 Lane B complete. **All 9 Lane B topics live**.

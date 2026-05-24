@@ -208,6 +208,11 @@
         .sum-tile.green .num { color: var(--green); }
         .sum-tile.red .num { color: var(--red); }
 
+        /* v1.40.0 — Pro-only page: hide demo-credential hint in the global auth modal.
+           Demo accounts cannot pass page-access:{demo:false}; advertising the credential
+           creates a UX trap (modal says "use demo", page then refuses). Page-scoped only. */
+        .rz-demo-hint { display: none !important; }
+
         /* Section nav */
         .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.55rem; background: rgba(11,19,36,0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
         .section-nav::-webkit-scrollbar { display: none; }
@@ -457,16 +462,21 @@
 
     <div class="wrap">
         <div class="topbar">
-            <a class="back" href="datacenter-solutions.html"><i class="fas fa-arrow-left"></i> Back to DC Solutions</a>
+            <a class="back" href="datacenter-solutions.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to DC Solutions</a>
             <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-                <span class="pill"><i class="fas fa-crown"></i> Pro Module</span>
-                <span class="pill-amber pill"><i class="fas fa-file-alt"></i> Concept Brief</span>
+                <span class="pill"><i class="fas fa-crown" aria-hidden="true"></i> Pro Module</span>
+                <span class="pill-amber pill"><i class="fas fa-file-alt" aria-hidden="true"></i> Concept Brief</span>
             </div>
         </div>
 
         <!-- ════════════════════════════════════════ HERO ════════════════════════════════════════ -->
         <section class="hero" id="main-content">
-            <span class="pill"><i class="fas fa-microchip"></i> Prescriptive Maintenance · FMECA + KG + ML + NLP</span>
+            <!-- v1.40.0 — Honest framing banner (per 2026-05-24 production review) -->
+            <div style="margin-bottom:1.2rem;padding:0.9rem 1.1rem;border:1px solid rgba(255,170,0,0.45);border-radius:8px;background:rgba(255,170,0,0.08);font-size:0.86rem;line-height:1.5;">
+                <strong style="color:var(--amber);"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> This is a concept-and-design document, not a production product.</strong>
+                It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench &mdash; 11 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in <a href="docs/plans/2026-05-25-ai-maintenance-product-roadmap.md" style="color:var(--amber);">docs/plans/2026-05-25-ai-maintenance-product-roadmap.md</a>. AI is <strong>advisory-only by default</strong>; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508).
+            </div>
+            <span class="pill"><i class="fas fa-microchip" aria-hidden="true"></i> Prescriptive Maintenance · FMECA + KG + ML + NLP</span>
             <h1>AI Engineering Maintenance — Intelligent Advisor System Concept</h1>
             <p class="subtitle">
                 A concept-and-design brief for a prescriptive maintenance advisor that fuses <b>FMECA documentation</b>
@@ -502,11 +512,12 @@
             <a class="nav-pill" href="#sec-enhanced">Enhanced Engine</a>
             <a class="nav-pill" href="#sec-roadmap">Roadmap</a>
             <a class="nav-pill" href="#sec-questions">Open Questions</a>
+            <a class="nav-pill" href="#sec-knowledge-base">Knowledge Base</a>
         </nav>
 
         <!-- ════════════════════════════════════════ SECTION 1 — BLOCK DIAGRAM ════════════════════════════════════════ -->
         <section class="section" id="sec-arch" data-nav-id="sec-arch">
-            <h2><i class="fas fa-sitemap"></i> Architecture &mdash; The Paper's Baseline System</h2>
+            <h2><i class="fas fa-sitemap" aria-hidden="true"></i> Architecture &mdash; The Paper's Baseline System</h2>
             <p class="intro">
                 The advisor system has four cooperating modules. <b>FMECA</b> is the source-of-truth documentation; the
                 <b>Knowledge Graph</b> turns the tabular FMECA into a queryable Neo4j instance; the <b>Maintenance
@@ -664,7 +675,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 2 — 4 MODULES ════════════════════════════════════════ -->
         <section class="section" id="sec-modules" data-nav-id="sec-modules">
-            <h2><i class="fas fa-cubes"></i> The Four Modules</h2>
+            <h2><i class="fas fa-cubes" aria-hidden="true"></i> The Four Modules</h2>
             <p class="intro">
                 Each module has a distinct role, a clear input contract, a clear output contract, and a specific
                 tech-stack pick. The cards below name each one, with a sub-flowchart showing its internal pipeline.
@@ -822,7 +833,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 3 — TWO MODES ════════════════════════════════════════ -->
         <section class="section" id="sec-modes" data-nav-id="sec-modes">
-            <h2><i class="fas fa-arrows-left-right"></i> Two Interaction Modes</h2>
+            <h2><i class="fas fa-arrows-left-right" aria-hidden="true"></i> Two Interaction Modes</h2>
             <p class="intro">
                 The user reaches the advisor through one of two entry points. <b>Mode A</b> is for the engineer who
                 knows what to ask; <b>Mode B</b> is for the technician with raw data but no diagnosis. Both modes
@@ -918,7 +929,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 4 — CASE STUDY ════════════════════════════════════════ -->
         <section class="section" id="sec-case" data-nav-id="sec-case">
-            <h2><i class="fas fa-flask"></i> Case-Study Numbers &mdash; What the Paper Actually Reports</h2>
+            <h2><i class="fas fa-flask" aria-hidden="true"></i> Case-Study Numbers &mdash; What the Paper Actually Reports</h2>
             <p class="intro">
                 Asset under test: a single linear actuator (Cranfield dataset). Four fault states &times; three loads
                 &times; 50 motion cycles = <b>600 events</b>. Results below are quoted verbatim from the paper &mdash;
@@ -948,7 +959,7 @@
                 </table>
             </div>
             <p style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem;">
-                <i class="fas fa-info-circle"></i> The 77.98% Spalling F1 is the canonical opportunity for enhancement
+                <i class="fas fa-info-circle" aria-hidden="true"></i> The 77.98% Spalling F1 is the canonical opportunity for enhancement
                 (see Gap #10 below). Spalling is also the most economically valuable diagnosis &mdash; catching it
                 early prevents secondary damage to nuts, balls, and screws.
             </p>
@@ -956,14 +967,14 @@
 
         <!-- ════════════════════════════════════════ SECTION 5 — GAPS & ENHANCEMENTS ════════════════════════════════════════ -->
         <section class="section" id="sec-gaps" data-nav-id="sec-gaps">
-            <h2><i class="fas fa-magnifying-glass"></i> Gaps &amp; Proposed Enhancements</h2>
+            <h2><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Gaps &amp; Proposed Enhancements</h2>
             <p class="intro">
                 Twelve concrete gaps surfaced from a critical read of the paper. Each is paired with a proposed
                 enhancement that names the algorithm or library, not just the wishful direction. Open any gap below.
             </p>
 
             <details class="gap">
-                <summary><span class="gap-num">01</span> Single-asset case study &mdash; no fleet generalization <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">01</span> Single-asset case study &mdash; no fleet generalization <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The paper validates on <b>one linear actuator</b>. No discussion of how the KG, ML, or NLP behave across asset families (pumps, chillers, switchgear, gensets) or across multiple sites.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Engineering operations rarely have one asset. A fleet has thousands. Transfer learning, cross-asset reasoning, and federated training are required for operational value.</dd></dl>
@@ -972,7 +983,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">02</span> Static FMECA &mdash; no operational feedback loop <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">02</span> Static FMECA &mdash; no operational feedback loop <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The KG is frozen at design time. Field failures, novel fault patterns, and lessons learned from completed work orders never propagate back into the FMECA or the KG.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>The most valuable knowledge in an engineering operation is what the technicians learn doing the job. A static FMECA wastes it. The advisor stays as smart as the day it was commissioned.</dd></dl>
@@ -981,7 +992,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">03</span> No CMMS integration &mdash; prescription stops at advice <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">03</span> No CMMS integration &mdash; prescription stops at advice <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Paper mentions CMMS work orders abstractly. Advisor output is a text answer &mdash; not an action in the maintenance system. No bi-directional sync.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>True "prescriptive" maintenance requires the prescription to land in a planner's queue, with parts reserved, technicians assigned, and an estimated MTTR. Otherwise it's just decision support.</dd></dl>
@@ -990,7 +1001,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">04</span> PCA opacity &mdash; loss of feature interpretability <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">04</span> PCA opacity &mdash; loss of feature interpretability <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>PCA collapses the 26 engineering-meaningful features (RMS, skewness, crest factor, overshoot...) into 7 abstract components. A technician cannot tell <i>which signal feature</i> drove a classification.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Maintenance staff need explainable diagnoses. "The RF says backlash" is not actionable; "the RF says backlash because overshoot OVy is 3&sigma; above baseline" is.</dd></dl>
@@ -999,7 +1010,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">05</span> No anomaly detection &mdash; novel faults are force-fit <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">05</span> No anomaly detection &mdash; novel faults are force-fit <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>RF only chooses among the 4 known classes. Any unseen fault mode (e.g. a sudden seal failure) gets force-classified into the nearest known label, silently and confidently wrong.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>"Unknown unknowns" are the most expensive failures. A diagnostic system that lies confidently in their presence destroys operator trust.</dd></dl>
@@ -1008,7 +1019,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">06</span> No Remaining Useful Life &mdash; diagnostic, not prognostic <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">06</span> No Remaining Useful Life &mdash; diagnostic, not prognostic <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The system diagnoses <i>what</i> is failing, not <i>when</i>. RUL prediction is absent. "True" prescriptive maintenance must be time-aware so the planner can schedule before fault, not after.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Without RUL, the advisor can only react. With RUL, the advisor can schedule the work order to land 2 weeks before predicted failure, with parts in the cage and a technician booked.</dd></dl>
@@ -1017,7 +1028,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">07</span> No vendor / spare-parts / cost integration <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">07</span> No vendor / spare-parts / cost integration <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Prescription stops at "do action X" + "follow steps Y". No link to part availability, vendor catalog, lead-time, or cost. The planner has to do all of that lookup separately.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>If the prescribed action requires a bearing the warehouse doesn't carry with a 12-week lead time, the advisor's recommendation is operationally useless.</dd></dl>
@@ -1026,7 +1037,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">08</span> No edge / offline mode &mdash; cloud-only assumption <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">08</span> No edge / offline mode &mdash; cloud-only assumption <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Architecture assumes cloud Neo4j + cloud ML inference. Industrial sites often have intermittent connectivity, data-sovereignty constraints (data must not leave the plant), and latency requirements that exclude a cloud round-trip.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Petrochemical, defence, and primary-industry sites won't deploy a cloud-only advisor. Many DC operations sites have the same constraint.</dd></dl>
@@ -1035,7 +1046,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">09</span> Rule-based NLP fragility &mdash; can't handle unseen vocabulary <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">09</span> Rule-based NLP fragility &mdash; can't handle unseen vocabulary <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Aho-Corasick is a literal-string matcher. If a technician types "lube starvation" instead of "lack of lubrication", or "pitting" instead of "spalling", the NLP fails silently.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Field vocabulary varies by region, language, vendor, and seniority. A diagnostic system that needs the operator to use exact dictionary terms won't survive contact with reality.</dd></dl>
@@ -1044,7 +1055,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">10</span> Spalling early-stage misclassification (F1 = 77.98%) <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">10</span> Spalling early-stage misclassification (F1 = 77.98%) <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The paper's documented weakest class. Early-stage spalling has signal characteristics overlapping normal and backlash; the 26 time-domain stats miss the fault-mechanism-specific harmonic content.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Spalling is the most expensive failure mode to miss &mdash; it cascades. Early detection saves the raceway, the balls, the seal, and possibly the entire bearing.</dd></dl>
@@ -1053,7 +1064,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">11</span> No multi-fault concurrency &mdash; single-label assumption <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">11</span> No multi-fault concurrency &mdash; single-label assumption <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>RF emits exactly one class per cycle. Real degraded assets often have <i>multiple concurrent</i> failure modes &mdash; e.g. spalling combined with lack-of-lubrication &mdash; that the current model collapses to whichever has the higher vote share.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>If a bearing is both spalling AND lubrication-starved, prescribing only "re-grease" while ignoring spalling will accelerate the spalling. Single-label diagnosis can prescribe a partially correct, partially harmful action.</dd></dl>
@@ -1062,7 +1073,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">12</span> No uncertainty quantification &mdash; raw vote share, not calibrated <span class="gap-chev"><i class="fas fa-chevron-down"></i></span></summary>
+                <summary><span class="gap-num">12</span> No uncertainty quantification &mdash; raw vote share, not calibrated <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>RF outputs vote share, which is correlated with confidence but not calibrated. There is no statistical guarantee on the prediction; no prediction interval.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>A reliability engineer needs to know <i>how confident</i> the advisor is before authorising an unplanned shutdown. "85% probable backlash" is not the same as "95% confident the true class is in {backlash, lack-of-lubrication}".</dd></dl>
@@ -1073,7 +1084,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 6 — ENHANCED ARCHITECTURE ════════════════════════════════════════ -->
         <section class="section" id="sec-enhanced" data-nav-id="sec-enhanced">
-            <h2><i class="fas fa-diagram-project"></i> Proposed Enhanced Engine Architecture</h2>
+            <h2><i class="fas fa-diagram-project" aria-hidden="true"></i> Proposed Enhanced Engine Architecture</h2>
             <p class="intro">
                 The diagram below incorporates the 12 enhancements into a single architecture. Green dashed lines are
                 the <b>feedback / experience-capture</b> loops. Red blocks are <b>safety nets</b> (anomaly detection,
@@ -1270,7 +1281,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 7 — ROADMAP ════════════════════════════════════════ -->
         <section class="section" id="sec-roadmap" data-nav-id="sec-roadmap">
-            <h2><i class="fas fa-route"></i> Phased Build Roadmap</h2>
+            <h2><i class="fas fa-route" aria-hidden="true"></i> Phased Build Roadmap</h2>
             <p class="intro">
                 Five phases. Phase 1 reproduces the paper's baseline; Phases 2-5 add the 12 enhancements in dependency
                 order. Phase complexity is rated by effort, not difficulty &mdash; the actual hard part is the
@@ -1348,7 +1359,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 8 — OPEN QUESTIONS ════════════════════════════════════════ -->
         <section class="section" id="sec-questions" data-nav-id="sec-questions">
-            <h2><i class="fas fa-circle-question"></i> Open Questions for the Owner</h2>
+            <h2><i class="fas fa-circle-question" aria-hidden="true"></i> Open Questions for the Owner</h2>
             <p class="intro">
                 Eight questions to answer before we can scope an MVP. Each one shifts the architecture materially.
             </p>
@@ -1367,7 +1378,7 @@
 
         <!-- ════════════════════════════════════════ SECTION 9 — KNOWLEDGE BASE SEED (2026-05-23) ════════════════════════════════════════ -->
         <section class="section" id="sec-knowledge-base" data-nav-id="sec-knowledge-base">
-            <h2><i class="fas fa-database"></i> Knowledge Base &mdash; Worldwide FMECA Seed Dataset (2026-05-23)</h2>
+            <h2><i class="fas fa-database" aria-hidden="true"></i> Knowledge Base &mdash; Worldwide FMECA Seed Dataset (2026-05-23)</h2>
             <p class="intro">
                 The Lin &amp; Ompusunggu architecture is unopinionated about <i>which</i> failure modes it
                 ingests. The graph is only as useful as its seed data. To take the concept beyond a
@@ -1380,7 +1391,7 @@
             <div class="metric-grid" style="margin-top:1rem;">
                 <div class="metric"><div class="m-val">20</div><div class="m-lbl">Asset families covered (electrical &middot; cooling &middot; controls &middot; fire/life-safety &middot; mechanical/civil)</div></div>
                 <div class="metric"><div class="m-val">109</div><div class="m-lbl">Fault modes documented (avg ~5 per family)</div></div>
-                <div class="metric"><div class="m-val">834</div><div class="m-lbl">KG-ready rows across 8 CSV seed files</div></div>
+                <div class="metric"><div class="m-val">826</div><div class="m-lbl">KG-ready data rows across 8 CSV seed files (834 lines incl. headers)</div></div>
                 <div class="metric"><div class="m-val">46</div><div class="m-lbl">Primary citations (CIGRE, IEEE 493, ASHRAE TC 9.9, NFPA, NETA, OREDA 7e, NPRD-2016, FMD-2016)</div></div>
             </div>
 
@@ -1393,11 +1404,11 @@
             </ul>
 
             <h3 style="margin-top:1.6rem;">Confidence tiers</h3>
-            <p>Every fault row carries a <code>confidence_tier</code> column (<code>high</code> / <code>medium</code> / <code>thin</code>). Engine treatment:</p>
+            <p>Every fault row carries a <code>confidence_tier</code> column (<code>high</code> / <code>medium</code> / <code>thin</code>). <strong>Default stance is advisory-only.</strong> Confidence tiers gate the engine's <em>recommendation routing</em>, not autonomous action. Engine treatment:</p>
             <ul>
-                <li><b>High</b> &mdash; transformers, switchgear, UPS static, generators, VRLA, chillers, pumps, cooling towers. Auto-action allowed within RPN thresholds.</li>
-                <li><b>Medium</b> &mdash; Li-ion, CRAH/CRAC, valves/actuators, sensors, VFDs, PLCs, fuel storage. Queue for human review.</li>
-                <li><b>Thin</b> &mdash; liquid cooling (DLC + immersion), busway, magnetic-bearing chillers, flywheel UPS. Surfaced in UI; vendor outreach required. Outreach plan handed off in <code>docs/handoff/2026-05-23-fmeca-vendor-outreach.md</code>.</li>
+                <li><b>High</b> &mdash; standards-body / peer-reviewed / canonical databook sources (IEEE, IEC, ISO, ASHRAE, CIGRE, NETA, NFPA, OREDA, NPRD-2016, IEEE 493). Eligible for draft work-order generation; <strong>human approval required</strong> before any operational action. AI is advisory only; physical control remains in SIS / protection relays / BMS engineered sequences.</li>
+                <li><b>Medium</b> &mdash; industry consortium / professional publication / trade-body source (Li-ion datasheets, CRAH/CRAC vendor application notes, Hydraulic Institute, CTI, OCP). Recommendation generated; <strong>reliability-engineer review required</strong> before draft work-order.</li>
+                <li><b>Thin</b> &mdash; single vendor / manufacturer / OEM / unattributed (liquid cooling DLC + immersion, busway, magnetic-bearing chillers, flywheel UPS). Surfaced in UI; no auto draft work-order; vendor outreach required. Outreach plan in <code>docs/handoff/2026-05-23-fmeca-vendor-outreach.md</code>.</li>
             </ul>
 
             <h3 style="margin-top:1.6rem;">CSV seed inventory</h3>
@@ -1427,7 +1438,7 @@
             </details>
 
             <p class="intro" style="margin-top:1.4rem;">
-                <i class="fas fa-arrow-up-right-from-square"></i> Full report:
+                <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Full report:
                 <a href="docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md">docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md</a>
                 &middot; CSV seed files in <a href="docs/research/csv/">docs/research/csv/</a>
                 &middot; Standard: <a href="standarization/KNOWLEDGE_BASE_STANDARD.md">KNOWLEDGE_BASE_STANDARD.md</a>
@@ -1475,7 +1486,7 @@
     <!-- Locked / page-access gate -->
     <div class="root-gate">
         <div class="root-card">
-            <h2><i class="fas fa-lock" style="color:var(--cyan);margin-right:0.3rem;"></i> Pro or Educator access required</h2>
+            <h2><i class="fas fa-lock" aria-hidden="true" style="color:var(--cyan);margin-right:0.3rem;"></i> Pro or Educator access required</h2>
             <p>This concept brief is for Pro and Educator accounts. Sign in to continue, or return to the DC Solutions hub.</p>
             <div class="root-actions">
                 <button id="rootLoginBtn">Sign In</button>
