@@ -11,6 +11,87 @@ release sections rather than semver.
 
 ---
 
+## v1.41.4 — 2026-05-24 (datahall.html — CRAH popover + inline labels + cold-aisle normalisation + excursion simulator)
+
+MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
+
+### Fixed / Added
+
+- **CRAH popover replaces full-screen modal** (owner: "ini mdal a01 jangan
+  mendisable main screen, tapi dibaut semacam tootip gitu"). Old behaviour:
+  click CRAH cell → opens `unitModal` with `.modal-overlay` covering entire
+  screen + blur backdrop. New behaviour: click CRAH cell → opens floating
+  `.crah-pop` positioned next to the clicked cell. Main screen stays fully
+  interactive. Click outside or press Esc to close.
+  - New `.crah-pop` CSS: `position:absolute`, min-width 240, max-width 280,
+    fade-in 160 ms, RUN/STBY state pill in cyan/amber.
+  - Grid: 8 rows × 2 cols (status / SAT / RAT / fan / valve / duty / CHWS-R /
+    redundancy / source).
+  - Outside-click + Esc handlers wired.
+  - Legacy `unitModal` kept for any non-CRAH inspector use.
+
+- **Inline SAT values on CRAH cells** (owner: "enahce ui dan kasih SAT value
+  di A01 dstnya"). Each CRAH cell now shows tag + SAT (`17.0°C` / `OFF`)
+  inline; previously the SAT was only visible in tooltip.
+
+- **Per-cell rack labels (ID + per-mode value)** (owner: "tetap di kotak2
+  itu kasih ID rack based on row dan ada temp per masing kotakan saat menu
+  temperature dll. dan saat power juga ada kw nya ganti").
+  Each rack cell now renders two-line content:
+  - Line 1 (`.rk-id`, 7.5px bold): rack tag without prefix (e.g. `AL01`).
+  - Line 2 (`.rk-val`, 7.5px regular): per-mode value
+    - Power mode: `8.4 kW`
+    - Temperature mode: `22.0°C`
+    - Cooling-margin mode: `5.0°C` (margin to ASHRAE 27 °C)
+    - Alarms mode: `78%` (rack utilisation)
+    - Space mode: `IT` / `spare`
+  `repaintRacks()` rewrites `innerHTML` per mode change.
+
+- **Cold-aisle normalisation to ~22°C uniform** (owner: "temp aisle rack kok
+  beda2 harusnya hampir sama, for sake of standard and normal operation").
+  Previous behaviour: each zone's `coldAisleC` was derived from
+  `SUPPLY_C + zHeat / (rho*cp*airflow)` which yielded different values per
+  zone based on rack-loading variance. New behaviour: normal state is
+  pinned to 22.0 ± 0.3 °C across all rows (deterministic seed per row), so
+  the page baseline matches ASHRAE A1 recommended low. Each zone retains
+  the original physics-derived value as `baseTempC` for restore-after-
+  excursion. Hot-spot indicator now genuinely indicates anomalies, not
+  load skew.
+
+- **Excursion simulator** (owner: "klw mau dibuat simulasi awalnya normal
+  mungkn dibuat aja salah satu rack atau row sebentar aja 10-15 detik per
+  2 menit, random position, pastikan align dengan parameter DAHU (A01-A20,
+  random)"). Every 2 min (first event 30 s after load), the simulator
+  picks a random zone z ∈ {0..9} + random CRAH n ∈ {1..20} and sets that
+  zone's `coldAisleC` to a value 27.5-30.0 °C for 10-15 s. During the
+  excursion:
+  - Zone's racks pulse red (animation `rk-pulse`).
+  - Affected CRAH cell gets red outline ring (`.cc-affected`).
+  - Red banner appears top-centre with zone / CRAH / temp / countdown.
+  - Event logged with `warn` severity in the SCADA log.
+  After expiry: zone returns to `baseTempC`, banner hides, CRAH ring
+  clears, recovery logged.
+
+### Engines locked
+
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
+  byte-identical. 57/57 + 22/22 tests pass.
+
+### Changed
+
+- `js/rz-version.js` &rarr; v1.41.4.
+- `sw.js` cache version &rarr; `rz-cache-v1.41.4`.
+
+### Files touched
+
+- `datahall.html` — new CSS rules (.rack inline content + .crah-pop + .crah-cell
+  .cc-sat + .excursion-banner + animations); new DOM (popover + banner);
+  rewritten `__inspectCrah` + outside-click/Esc handlers; new `dhRand` +
+  `fireExcursion` simulator; updated `repaintRacks`, `renderFloor` rail(),
+  zone-build with `baseTempC` + `excursionUntil` fields.
+
+---
+
 ## v1.41.3 — 2026-05-24 (Building Overview chiller relocation + Cooling P&ID label clarity)
 
 PATCH ship: closes two owner architectural-correctness complaints.

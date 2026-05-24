@@ -285,12 +285,59 @@
         .zone-racks { flex: 1; display: grid; grid-template-rows: repeat(10, 1fr); gap: 2px; padding: 3px; min-height: 0; }
         .rack {
             border-radius: 1px; cursor: pointer; position: relative;
-            border: 1px solid transparent; transition: outline .1s;
+            border: 1px solid transparent; transition: outline .1s, background .3s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 8px; line-height: 1.1; color: rgba(255,255,255,0.85);
+            text-align: center; padding: 1px; overflow: hidden;
         }
         .rack:hover { outline: 1px solid #fff; outline-offset: -1px; z-index: 5; }
         .rack.sel { outline: 2px solid var(--sel); outline-offset: -1px; z-index: 6; }
+        .rack .rk-id { font-weight: 700; font-size: 7.5px; letter-spacing: -0.2px; opacity: 0.92; }
+        .rack .rk-val { font-size: 7.5px; opacity: 0.78; margin-top: 1px; font-variant-numeric: tabular-nums; }
+        .rack.excursion { animation: rk-pulse 0.9s ease-in-out infinite; }
+        @keyframes rk-pulse {
+            0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,80,80,0.0); }
+            50% { box-shadow: inset 0 0 0 2px rgba(255,80,80,0.85); }
+        }
         /* Rack fill set inline by JS from utilization tier — no neon */
         .zone-foot { font-size: 9px; color: var(--txt-faint); text-align: center; padding: 2px; border-top: 1px solid var(--border-soft); white-space: nowrap; }
+
+        /* --- CRAH POPOVER (v1.41.4 — replaces full-screen modal for CRAH details) --- */
+        .crah-pop {
+            position: absolute; z-index: 950; display: none;
+            background: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 5px; padding: 10px 12px; font-size: 11px; color: #fff;
+            min-width: 240px; max-width: 280px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+        }
+        .crah-pop.open { display: block; animation: cp-fade 0.16s ease-out; }
+        @keyframes cp-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        .crah-pop .cp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-soft); }
+        .crah-pop .cp-title { font-weight: 700; font-size: 12px; color: var(--sel); }
+        .crah-pop .cp-state { font-size: 9.5px; padding: 1px 6px; border-radius: 8px; font-weight: 700; }
+        .crah-pop .cp-state.run { background: rgba(34,197,94,0.18); color: #22c55e; }
+        .crah-pop .cp-state.stby { background: rgba(245,158,11,0.18); color: #f59e0b; }
+        .crah-pop .cp-close { position: absolute; top: 6px; right: 8px; cursor: pointer; color: var(--txt-dim); font-size: 14px; line-height: 1; }
+        .crah-pop .cp-close:hover { color: #fff; }
+        .crah-pop .cp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 11px; }
+        .crah-pop .cp-grid .cp-k { color: var(--txt-dim); }
+        .crah-pop .cp-grid .cp-v { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+
+        /* --- CRAH CELL inline SAT (v1.41.4) --- */
+        .crah-cell { position: relative; }
+        .crah-cell .cc-sat { display: block; font-size: 7.5px; font-weight: 600; opacity: 0.78; margin-top: 1px; font-variant-numeric: tabular-nums; }
+        .crah-cell.cc-affected { box-shadow: 0 0 0 1.5px rgba(255,80,80,0.85); }
+
+        /* --- EXCURSION BANNER (v1.41.4 simulator) --- */
+        .excursion-banner {
+            position: fixed; top: 56px; left: 50%; transform: translateX(-50%);
+            background: rgba(154,52,47,0.96); color: #fff; padding: 6px 18px;
+            border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+            box-shadow: 0 8px 22px rgba(154,52,47,0.4); z-index: 940; display: none;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .excursion-banner.on { display: block; animation: eb-flash 0.6s ease-in-out infinite alternate; }
+        @keyframes eb-flash { from { opacity: 0.85; } to { opacity: 1; } }
 
         /* --- TOOLTIP --- */
         #tooltip {
@@ -397,7 +444,20 @@
 
     <div id="tooltip"></div>
 
-    <!-- Equipment inspector modal -->
+    <!-- v1.41.4 — Excursion simulator banner -->
+    <div class="excursion-banner" id="excursionBanner" role="status" aria-live="polite"></div>
+
+    <!-- v1.41.4 — Floating CRAH popover (replaces modal — does NOT disable main screen) -->
+    <div class="crah-pop" id="crahPop" role="dialog" aria-modal="false" aria-labelledby="cp-title">
+      <span class="cp-close" onclick="window.__closeCrahPop()" role="button" tabindex="0" aria-label="Close">&times;</span>
+      <div class="cp-head">
+        <span class="cp-title" id="cp-title">CRAH-A01</span>
+        <span class="cp-state" id="cp-state">RUN</span>
+      </div>
+      <div class="cp-grid" id="cp-grid"></div>
+    </div>
+
+    <!-- Equipment inspector modal (kept for any non-CRAH inspector use) -->
     <div class="modal-overlay" id="unitModal">
         <div class="modal-box">
             <span class="close-modal" onclick="closeModal()" role="button" tabindex="0" aria-label="Close">&times;</span>
@@ -778,11 +838,19 @@
             // design airflow per zone (m3/s): sized for AVG zone heat @ dT 11C
             var designZoneHeat = (SITE_IT_KW / ZONES);
             var airflow = designZoneHeat / (AIR_RHO_CP * 11);
-            var coldAisleC = SUPPLY_C + zHeat / (AIR_RHO_CP * airflow);
-            coldAisleC = Math.round(coldAisleC * 10) / 10;
+            // v1.41.4 — Cold-aisle NORMALIZATION (ASHRAE recommended band, all zones ~22°C in normal state).
+            // The physics-derived value is still computed but used only as the excursion ceiling.
+            // Normal state: uniform 22.0°C ± 0.3°C tiny variance (sensor noise simulation).
+            var physicsTempC = SUPPLY_C + zHeat / (AIR_RHO_CP * airflow);
+            var baseTempC = 22.0 + ((z * 7919) % 7 - 3) * 0.1;  // deterministic ±0.3°C per row
+            var coldAisleC = Math.round(baseTempC * 10) / 10;
             zones.push({
                 z: z, heat: Math.round(zHeat * 10) / 10, occ: zOcc, racks: zRacks,
-                maxUtil: zMaxUtil, coldAisleC: coldAisleC, airflow: Math.round(airflow * 100) / 100
+                maxUtil: zMaxUtil,
+                coldAisleC: coldAisleC,         // current displayed temp (excursion-mutable)
+                baseTempC: coldAisleC,           // stable normal-state baseline (for restore)
+                excursionUntil: 0,               // ms epoch — when > now, this zone is excursing
+                airflow: Math.round(airflow * 100) / 100
             });
         }
 
@@ -1006,14 +1074,18 @@
 
         function renderFloor() {
             // CRAH rails: north = CRAH 1..10, south = CRAH 11..20
+            // v1.41.4 — inline SAT value per cell; click opens floating popover (not modal)
             function rail(start, end) {
                 var h = '';
                 for (var n = start; n <= end; n++) {
                     var u = crahUnits[n - 1];
                     var cls = u.running ? '' : 'stby';
-                    h += '<div class="crah-cell ' + cls + '" onclick="window.__inspectCrah(' + u.n + ')" ' +
-                        'title="' + u.tag + ' — ' + u.state + '">' +
-                        '<span class="cc-dot"></span>' + u.tag.replace('CRAH-', '') + '</div>';
+                    var satTxt = u.running ? u.sat.toFixed(1) + '°C' : 'OFF';
+                    h += '<div class="crah-cell ' + cls + '" data-crah="' + u.n + '" ' +
+                        'onclick="window.__inspectCrah(' + u.n + ', event)" ' +
+                        'title="' + u.tag + ' — ' + u.state + ' — SAT ' + (u.running ? u.sat.toFixed(1) + '°C' : 'off') + '">' +
+                        '<span class="cc-dot"></span>' + u.tag.replace('CRAH-', '') +
+                        '<span class="cc-sat">' + satTxt + '</span></div>';
                 }
                 return h;
             }
@@ -1052,12 +1124,28 @@
         }
 
         function repaintRacks() {
+            // v1.41.4 — per-mode inline labels (rack ID + value), excursion ring
             for (var z = 0; z < ZONES; z++) {
                 var zn = zones[z];
                 for (var rr = 0; rr < RACKS_PER_ZONE; rr++) {
                     var gi = z * RACKS_PER_ZONE + rr;
                     var el = document.querySelector('.rack[data-idx="' + gi + '"]');
-                    if (el) el.style.background = rackFill(racks[gi], zn);
+                    if (!el) continue;
+                    var rk = racks[gi];
+                    el.style.background = rackFill(rk, zn);
+                    var idShort = rackTag(gi).replace('R-', '');  // e.g. AL01
+                    var valTxt = '';
+                    if (rk.occupied) {
+                        if (currentMode === 'power') valTxt = rk.kw.toFixed(1) + ' kW';
+                        else if (currentMode === 'temp') valTxt = zn.coldAisleC.toFixed(1) + '°C';
+                        else if (currentMode === 'cooling-margin') valTxt = (27 - zn.coldAisleC).toFixed(1) + '°C';
+                        else if (currentMode === 'alarms') valTxt = Math.round(rk.util * 100) + '%';
+                        else valTxt = 'IT';
+                    } else {
+                        valTxt = currentMode === 'space' ? 'spare' : '—';
+                    }
+                    el.innerHTML = '<span class="rk-id">' + idShort + '</span><span class="rk-val">' + valTxt + '</span>';
+                    el.classList.toggle('excursion', !!(zn.excursionUntil && zn.excursionUntil > Date.now()));
                 }
             }
             legendFor(currentMode);
@@ -1126,29 +1214,56 @@
                 '</span><span class="v num">' + v + '</span></div>';
         }
 
-        /* --- Equipment modal (CRAH) -------------------------------------- */
-        window.__inspectCrah = function (n) {
+        /* --- CRAH popover (v1.41.4 — floating, does NOT disable main screen) ---- */
+        function cprow(k, v) {
+            return '<div class="cp-k">' + k + '</div><div class="cp-v num">' + v + '</div>';
+        }
+        window.__inspectCrah = function (n, ev) {
             var u = crahUnits[n - 1];
-            document.getElementById('m-title').textContent = u.tag;
-            document.getElementById('m-sub').textContent =
-                'Computer Room Air Handler · chilled-water · Hall A';
-            document.getElementById('m-grid').innerHTML =
-                mrow('Status / Mode', u.running ? 'RUNNING · Auto' : 'STANDBY · Auto') +
-                mrow('Supply air', u.running ? u.sat.toFixed(1) + ' °C' : '—') +
-                mrow('Return air', u.running ? u.rat.toFixed(1) + ' °C' : '—') +
-                mrow('Fan speed', u.running ? u.fan + ' %' : '0 %') +
-                mrow('CHW valve', u.running ? u.valve + ' %' : '0 %') +
-                mrow('Cooling duty', u.running ? u.capKw + ' kW' : '0 kW') +
-                mrow('CHWS / CHWR', S.cooling.chws_c.toFixed(1) + ' / ' + S.cooling.chwr_c.toFixed(1) + ' °C') +
-                mrow('Redundancy', N1_PASS ? 'N+1 satisfied' : 'N+1 NOT satisfied') +
-                mrow('Active alarms', u.running ? '0' : '0 (standby spare)');
-            document.getElementById('m-source').innerHTML =
-                mrow('Data source', 'Calculated (conv-engine)') +
-                mrow('Basis doc', S.meta.basis_doc.split('/').pop()) +
-                mrow('Scenario', S.meta.scenario) +
-                mrow('Quality', S.meta.data_quality);
-            document.getElementById('unitModal').style.display = 'flex';
+            var pop = document.getElementById('crahPop');
+            document.getElementById('cp-title').textContent = u.tag;
+            var stEl = document.getElementById('cp-state');
+            stEl.textContent = u.state;
+            stEl.className = 'cp-state ' + (u.running ? 'run' : 'stby');
+            document.getElementById('cp-grid').innerHTML =
+                cprow('Supply air', u.running ? u.sat.toFixed(1) + ' °C' : '—') +
+                cprow('Return air', u.running ? u.rat.toFixed(1) + ' °C' : '—') +
+                cprow('Fan speed', u.running ? u.fan + ' %' : '0 %') +
+                cprow('CHW valve', u.running ? u.valve + ' %' : '0 %') +
+                cprow('Cooling duty', u.running ? u.capKw + ' kW' : '0 kW') +
+                cprow('CHWS / CHWR', S.cooling.chws_c.toFixed(1) + ' / ' + S.cooling.chwr_c.toFixed(1) + ' °C') +
+                cprow('Redundancy', N1_PASS ? 'N+1 ✓' : 'N+1 ✗') +
+                cprow('Source', S.meta.scenario + ' · ' + S.meta.data_quality);
+            // Position next to the clicked cell
+            var cell = ev && ev.currentTarget ? ev.currentTarget : document.querySelector('[data-crah="' + n + '"]');
+            if (cell) {
+                var rect = cell.getBoundingClientRect();
+                var docX = rect.left + window.scrollX;
+                var docY = rect.bottom + window.scrollY + 4;
+                var popW = 260;
+                if (docX + popW > window.innerWidth + window.scrollX - 8) {
+                    docX = window.innerWidth + window.scrollX - popW - 8;
+                }
+                pop.style.left = docX + 'px';
+                pop.style.top = docY + 'px';
+            }
+            pop.classList.add('open');
+            if (ev) ev.stopPropagation();
         };
+        window.__closeCrahPop = function () { document.getElementById('crahPop').classList.remove('open'); };
+        // Click anywhere outside popover or CRAH cell closes it
+        document.addEventListener('click', function (e) {
+            var pop = document.getElementById('crahPop');
+            if (!pop.classList.contains('open')) return;
+            if (pop.contains(e.target) || e.target.closest('.crah-cell')) return;
+            window.__closeCrahPop();
+        });
+        // Esc also closes
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') window.__closeCrahPop();
+        });
+
+        /* --- Legacy equipment modal (kept for non-CRAH use) --------------- */
         function mrow(k, v) {
             return '<div class="m-k">' + k + '</div><div class="m-v num">' + v + '</div>';
         }
@@ -1156,6 +1271,49 @@
         document.getElementById('unitModal').addEventListener('click', function (e) {
             if (e.target === this) window.closeModal();
         });
+
+        /* --- Excursion simulator (v1.41.4) --------------------------------
+         * Every 2 min, pick a random zone (row) + CRAH. For 10-15 s the zone's
+         * cold-aisle temp jumps to 27-30°C and the corresponding CRAH cell + all
+         * racks in the row flash red. Then it normalises back to baseline.
+         */
+        var excursionState = null;  // { zoneZ, crahN, expiresAt }
+        function dhRand(min, max) { return Math.random() * (max - min) + min; }
+        function dhRandInt(min, max) { return Math.floor(dhRand(min, max + 1)); }
+        function fireExcursion() {
+            if (excursionState) return;  // already excursing
+            var zoneZ = dhRandInt(0, ZONES - 1);
+            var crahN = dhRandInt(1, CRAH_TOTAL);
+            var durMs = dhRandInt(10000, 15000);
+            var excursTemp = Math.round(dhRand(27.5, 30.0) * 10) / 10;
+            var endAt = Date.now() + durMs;
+            zones[zoneZ].coldAisleC = excursTemp;
+            zones[zoneZ].excursionUntil = endAt;
+            excursionState = { zoneZ: zoneZ, crahN: crahN, expiresAt: endAt };
+            // Update banner
+            var banner = document.getElementById('excursionBanner');
+            banner.textContent = '⚠ EXCURSION SIMULATED — ' + zoneAisleTag(zoneZ) + ' (Row ' + String.fromCharCode(65 + zoneZ) + ') · CRAH-A' + (crahN < 10 ? '0' + crahN : crahN) + ' affected · cold-aisle ' + excursTemp.toFixed(1) + '°C (target 22°C) · ' + Math.round(durMs/1000) + 's';
+            banner.classList.add('on');
+            // Mark CRAH cell affected
+            var crahCell = document.querySelector('.crah-cell[data-crah="' + crahN + '"]');
+            if (crahCell) crahCell.classList.add('cc-affected');
+            log('Excursion event: ' + zoneAisleTag(zoneZ) + ' rose to ' + excursTemp.toFixed(1) + '°C — CRAH-A' + (crahN < 10 ? '0' + crahN : crahN) + ' under-cooling.', 'warn');
+            repaintRacks();
+            paintEnvironment();
+            // Auto-clear
+            setTimeout(function () {
+                zones[zoneZ].coldAisleC = zones[zoneZ].baseTempC;
+                zones[zoneZ].excursionUntil = 0;
+                banner.classList.remove('on');
+                if (crahCell) crahCell.classList.remove('cc-affected');
+                log('Excursion cleared: ' + zoneAisleTag(zoneZ) + ' returned to baseline ' + zones[zoneZ].baseTempC.toFixed(1) + '°C.', 'info');
+                excursionState = null;
+                repaintRacks();
+                paintEnvironment();
+            }, durMs);
+        }
+        // Fire first excursion 30 s after load, then every 2 min
+        setTimeout(function () { fireExcursion(); setInterval(fireExcursion, 120000); }, 30000);
 
         /* --- Heatmap mode toggle ----------------------------------------- */
         window.setMode = function (mode) {
