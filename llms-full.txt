@@ -64123,259 +64123,270 @@ We use cookies for analytics to improve your experience. Learn more
 
 
 ======================================================================
-# Changelog — Resistance Zero (v1.41.0 latest) — https://resistancezero.com/changelog.html
+# Changelog — Resistance Zero (v1.41.2 latest) — https://resistancezero.com/changelog.html
 
 > Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.
 
-v1.41.0 
- MINOR 
+v1.41.2 
+ PATCH 
  May 24, 2026 
  
  
-Maintenance Decode Lab — Easergy EPZ / Galaxy VL RPT / Woodward DTSC-200
+pillar-fire-safety.html — 8 new sections + interactive tools + 15-item FAQ
 
  
  
-MINOR ship: new tool page + 3 cards added to `datacenter-solutions.html` in
+MINOR ship: substantial enhancement of the fire-safety pillar page in
 
 
-the `#tools-ltc-featured` section. Migrated `Documents/maintenance tools/`
+response to user feedback that the page was "very lacking in detail, not
 
 
-(Vite ES module project) into the rz-work zero-build static site,
+intuitive, and very lacking" (verbatim).
 
 
-preserving the registry-driven module architecture.
+`pillar-fire-safety.html` grows from **676 lines → 1,836 lines**
 
 
-### Added
+(+171%) with 8 new sections, two new JSON-LD schemas, and full mobile +
 
 
- 
-- **`maintenance-decode-lab.html`** — new tool page. Three offline
+dark-mode coverage on every new component.
 
 
-maintenance decoders unified under a registry contract
-
-
-(`detect → decode → visualize → simulate → export → validate`):
+### User report addressed
 
 
  
-- **Easergy P3 EPZ decoder** — VAMPSET text parser, before/after diff,
+- *"apps ini sangat2 kurang detail dan kurang intuitive dan kurang
 
 
-engineering risk review for protection enable/pickup/delay changes,
+sekali. enahce, detailkan."* → The page now has interactive
 
 
-protection-matrix matrix, category summary, XLSX/CSV export.
+decision-support tools, a standards comparison matrix, a 33-item
 
 
- 
-- **Galaxy VL RPT analyzer** — inflates embedded zlib JSON records,
+compliance checklist with live scoring + localStorage persistence,
 
 
-clusters incidents (30s gap), classifies waveform events
+a TCO/CO₂eq cost calculator, a 5-tier defense diagram, 3 case
 
 
-(MAINS_TOTAL_LOSS · PHASE_LOSS · UNDERVOLTAGE · OUTPUT_LOST ·
+studies (including OVH Strasbourg 2021), 14 glossary terms, and a
 
 
-BATTERY_DISCHARGE · GND_DISTURBANCE), calculates RMS/imbalance/crest
+cross-link section — matching the depth a working DC fire
 
 
-factor per channel, power-flow mimic.
+protection engineer would expect.
 
 
- 
-- **Woodward DTSC-200 ATS simulator** — sequence model with S1/S2
-
-
-sources, transfer-commit, open/delayed-neutral/closed transition,
-
-
-HMI mimic with single-line + breakers + permissives + alarms,
-
-
-DTSC text/config or PDF setting-report import with confidence
-
-
-score + recognized-field evidence.
+### Added (8 new sections)
 
 
  
-- **3 new cards on `datacenter-solutions.html`** (section
+- **Standards Comparison Table** — 9 rows × 5 columns
 
 
-`#tools-ltc-featured`, alongside Liquid-to-Chip Lab):
+(NFPA 75 / NFPA 76 / NFPA 2001 / FM Global 5-32 / ISO 14520).
 
 
- 
-- AI Engineering Maintenance PRO — promoted from the buried
-
-
-operational-engines row to a strategic-tier card next to LTC Lab,
-
-
-so the two engineering-maintenance concepts sit side-by-side.
+Sticky thead, mobile-scrollable, alternating row backgrounds.
 
 
  
-- Maintenance Decode Lab — the new card (NEW badge, instrument-green
+- **Decision Matrix Tool** — 4-question wizard (room volume,
 
 
-accent `#10b981`).
+occupancy, equipment value class, sustainability priority) running
 
 
- 
-- "More Maintenance Tools" — dashed-border placeholder slot
+a JS conditional ladder. Live recommendation card naming the agent,
 
 
-documenting the future module registry contract.
-
-
- 
-- **`js/maintenance/`** — ported source files (zero-build, vanilla ES
-
-
-modules): `main.js` (1020 LOC UI controller), `styles.css`
-
-
-(1293 LOC, scoped under `#mdl-app.mdl-root` to avoid clashing with rz
-
-
-globals), `core/{registry,detectors,epz,galaxy,dtsc,dtscImport,exporter}.js`.
+3-4 rationale bullets, trade-offs, and the NFPA 2001 section cite.
 
 
  
-- **`assets/maintenance-fixtures/`** — `sample-before.epz`,
+- **Compliance Checklist** — 33 items across 5 categories
 
 
-`sample-after.epz`, `sample-galaxy-vl.rpt`, `sample-dtsc200-export.txt`
+(Detection 8 / Suppression 7 / Egress 6 / EPO 6 / Documentation 6).
 
 
-validation samples copied from the source project so users can try
+Live score 0–33 with 4-band color coding (red ≤15 / amber
 
 
-the lab without their own files.
+16–25 / cyan 26–32 / green 33). `localStorage.pfs_checklist`
 
 
- 
-- **OG image** for `maintenance-decode-lab.html` at
-
-
-`assets/og/maintenance-decode-lab.webp` (1200×630, instrument-green
-
-
-accent). `tools/build-og-images.py` TARGETS list extended.
-
-
-### Changed
+persistence. Reset + Export-as-text buttons.
 
 
  
-- **Vite imports replaced with CDN globals** (zero-build pattern):
- 
-- `pako` → `https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js`
+- **Cost Calculator** — live CAPEX / 10-yr TCO / refill cost / CO₂eq
 
 
-(used by EPZ inflateRaw + Galaxy RPT inflate).
+estimator. Inputs: room volume, agent (FM-200 / Novec 1230 / IG-541 /
 
 
- 
-- `pdfjs-dist` → `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js`
+IG-100), redundancy level, replacement cycle. Outputs auto-format USD
 
 
-UMD build (used by DTSC PDF setting-report import). Worker source set
-
-
-once in page head.
+with commas; CO₂eq color-coded.
 
 
  
-- `lucide` icon library → Font Awesome 6 (rz convention). Icon name
+- **Layered Defense Diagram** — 5-tier accordion (Prevention →
 
 
-mapping table maintained in `main.js`.
+Detection → Suppression → Containment → Response) with
 
 
- 
-- `import './styles.css'` → ` ` in HTML head.
- 
-- **`alert()` error UX replaced** with inline `[role="alert"]` banner
+tap-to-expand detail panels. Replaces the toy hub-spoke diagram
 
 
-(auto-removes after 6 s).
+with an industry-standard layered model.
 
 
  
-- **Mount point**: `#app` → `#mdl-app` to avoid clashing with rz globals.
- 
-- **CSS scoping**: all 1293 lines wrapped under `.mdl-root` namespace
+- **Case Studies** — 3 documented incidents: OVHcloud SBG2 fire
 
 
-using native CSS nesting (`.mdl-root .panel`, `.mdl-root .btn`, etc.) so
+2021-03-10, WebNX Ogden 2023-04-02, VESDA near-miss composite. Each
 
 
-generic class names don't bleed into rz globals.
-
-
- 
-- **Aria-labels**: every interactive control has aria-label or visible
-
-
-text.
+card has date pill, summary, root cause, 3 key takeaways.
 
 
  
-- **Safety boundary** — read-only-viewer language reinforced in hero
+- **Inline Glossary** — 14 term cards: NFPA, VESDA, EPO, FM-200,
 
 
-banner + disclaimer footer + JSON-LD `creativeWorkStatus: "Draft"`.
+Novec 1230, ODP, GWP, IG-541, IG-100, Halocarbon, Design
+
+
+Concentration, NOAEL, LOAEL, Pre-Action Sprinkler.
+
+
+ 
+- **Cross-links section** — 6 link cards to
+
+
+`compare-fm200-vs-novec`, `compare-wet-vs-preaction`,
+
+
+`ltc-nfpa-fire-risk`, `fire-system`, `tools`, plus a related article.
+
+
+### Expanded
+
+
+ 
+- **Stats**: 3 → 8 cards. Added Halon phase-out 2010, insurance
+
+
+discount 35-55%, top-3 root causes, FD response 3 min, IG inert-gas
+
+
+0% GWP.
+
+
+ 
+- **FAQ**: 4 → 15 Q&As. Added Halon ban, design concentration,
+
+
+aspirating vs spot detection, door-fan integrity test, IG-100 vs
+
+
+IG-541, NOAEL/LOAEL safety limits, EU F-gas regulation, NFPA 13
+
+
+sprinkler density, EPO retrofit, double-interlock pre-action,
+
+
+insurance discount factors.
+
+
+### Schema added / updated
+
+
+ 
+- **`FAQPage` JSON-LD** expanded to all 15 Q&As (HTML and JSON-LD now
+
+
+in sync) so AI assistants (ChatGPT / Claude / Perplexity) can
+
+
+index and quote every answer.
+
+
+ 
+- **`HowTo` JSON-LD** added: "How to size a clean-agent suppression
+
+
+system" with 5 steps mirroring the cost-calculator workflow.
+
+
+### Standards / hygiene
+
+
+ 
+- All new classes prefixed `pfs-*` (no clash with `.pillar-*` or rz
+
+
+globals).
+
+
+ 
+- `[data-theme="dark"]` overrides on every new section.
+ 
+- Mobile responsive: every grid uses `repeat(auto-fit, minmax(...))`
+
+
+or breakpoint-stacked. Audit `audit-mobile-responsive.py --strict`
+
+
+reports 133 PASS / 0 FAIL.
+
+
+ 
+- `audit-script-tags.py --strict` CLEAN.
+ 
+- `audit-seo.py` 0 required errors (2 pre-existing length warnings on
+
+
+title/description — not regressions; will trim in v1.41.3).
+
+
+ 
+- `audit-pro-mode-indicator.py --strict` CLEAN (regression check).
 
 
 ### Bumped
 
 
  
-- `js/rz-version.js` → **v1.41.0**
+- `js/rz-version.js` → v1.41.2
  
-- `sw.js` → `rz-cache-v1.41.0`
- 
-- `sitemap.xml`, `llms.txt`, `search-index.json` → entries for
+- `sw.js` → `rz-cache-v1.41.2`
 
 
-`maintenance-decode-lab.html` (priority 0.75, weekly cadence).
-
-
-### Standardisation
+### Future-work captured
 
 
  
-- Page follows `CALCULATOR_PROMPT_STANDARD.md` (rz navbar + share-buttons +
+- Apply the same 10-phase enhancement template to the other 4 pillar
 
 
-footer + version-stamp + mobile responsive + dark-mode coverage).
+pages (pillar-cooling, pillar-power, pillar-standards,
 
 
- 
-- Per `CONTENT_LINKAGE_PLAYBOOK.md`: new tool added to
+pillar-sustainability) for parity. Each is currently 688-1030 lines;
 
 
-`datacenter-solutions.html` strat-grid + sitemap + llms.txt +
-
-
-search-index + OG card + sw.js precache.
-
-
- 
-- Per `feedback_script_tag_in_js_string.md`: every ` ` inside
-
-
-template literals escaped as ` ` (verified via
-
-
-`audit-script-tags.py --strict`).
+target ~2,000 lines each.
 
 
 ======================================================================
@@ -66755,7 +66766,7 @@ From NFPA 75/76 compliance and clean agent suppression to early smoke detection 
  Related Resources 
  
  
- Why are clean agents preferred over water in data centers? 
+ 
  Clean agents like FM-200 and Novec 1230 suppress fires by chemical interruption or heat absorption without leaving residue or causing water damage to servers, storage, and networking equipment. They discharge in under 10 seconds and can extinguish Class A, B, and C fires while equipment continues running. Water-based systems risk catastrophic damage to electronics through short circuits, corrosion, and extended downtime during cleanup and hardware replacement. 
  
  
@@ -66764,7 +66775,595 @@ From NFPA 75/76 compliance and clean agent suppression to early smoke detection 
  
  
  Do data centers need sprinklers if they have clean agents? 
- Yes, in most jurisdictions. Building codes and insurance requirements typically mandate sprinkler coverage regardless of clean agent systems. The standard approach uses pre-action sprinklers with double interlock, requiring both a detection signal and physical heat activation of the sprinkler head before water flows. This design minimizes accidental discharge. Clean agents protect against small, fast-growing electrical fires at the rack level, while sprinklers provide building-level protection for larger fire events that overwhelm or exhaust the clean agent supply.
+ Yes, in most jurisdictions. Building codes and insurance requirements typically mandate sprinkler coverage regardless of clean agent systems. The standard approach uses pre-action sprinklers with double interlock, requiring both a detection signal and physical heat activation of the sprinkler head before water flows. This design minimizes accidental discharge. Clean agents protect against small, fast-growing electrical fires at the rack level, while sprinklers provide building-level protection for larger fire events that overwhelm or exhaust the clean agent supply. 
+ 
+ 
+ Why was Halon banned and what replaced it? 
+ Halon 1301 was phased out under the Montreal Protocol due to its extreme ozone-depleting potential (ODP of 10 — roughly ten times more damaging than CFC-11). Production ceased in developed nations by 1994. The primary replacements are HFC-227ea (FM-200, GWP 3,220, zero ODP) and FK-5-1-12 (Novec 1230, GWP 1, zero ODP). Inert gas blends — IG-541 (Inergen) and IG-100 (nitrogen) — have both zero ODP and zero GWP, though they require larger cylinder volumes. Existing Halon systems may still operate on recycled agent stocks, but new installation is prohibited in most countries. 
+ 
+ 
+ What is design concentration and why does it matter? 
+ Design concentration is the minimum volumetric percentage of clean agent in air required to extinguish a fire of a specific class, as defined by NFPA 2001 §5.3. For FM-200, the minimum is 7.0% v/v on Class A surface fires; for Novec 1230 it is 4.2% v/v. NFPA 2001 requires this concentration to be reached within 10 seconds of activation. Under-concentration allows fire to survive the discharge; over-concentration wastes agent and may exceed the NOAEL safety limit in occupied spaces. Design concentration is calculated using the Halon Alternatives Research Corporation (HARC) formula, factoring in room volume, minimum temperature, and enclosure leakage. 
+ 
+ 
+ What is the difference between aspirating and spot smoke detection? 
+ Aspirating smoke detectors (VESDA) actively draw air samples through a network of small-bore sampling pipes into a central laser nephelometer, capable of detecting smoke at obscuration levels below 0.001% per foot — hours before visible smoke develops. Spot detectors are passive: smoke must physically drift into the detector housing and exceed a threshold in the ionization or photoelectric chamber. In high-airflow data center environments, cold-aisle containment and pressurized hot aisles can dilute or redirect smoke away from spot detector heads, significantly delaying alarm. VESDA is strongly preferred for below-floor and above-ceiling plenum coverage, where air movement is least predictable. 
+ 
+ 
+ How often must clean-agent rooms be integrity-tested? 
+ NFPA 2001 §7.1 recommends enclosure integrity (door fan) testing at commissioning and at least every 12 months thereafter. The test pressurizes the protected room to measure leakage and calculate the agent hold time — how long concentration remains above the design level post-discharge. A minimum 10-minute hold time is required to allow detection, suppression confirmation, and safe re-entry by trained personnel. If the room fails this test, sealing remediation is required before the system is returned to service. Many insurers and Authorities Having Jurisdiction (AHJs) independently mandate annual certification as a condition of coverage. 
+ 
+ 
+ What is the difference between IG-100 and IG-541? 
+ IG-100 is pure nitrogen. IG-541 (Inergen) is a blend of 52% nitrogen, 40% argon, and 8% CO₂. Both suppress fire by reducing oxygen concentration from the ambient 21% to below the 15% threshold required for combustion, while keeping it above the approximately 12% human survival level. The CO₂ component in IG-541 stimulates deeper breathing, helping occupants hyperventilate and exit faster during discharge — a meaningful safety benefit when egress takes more than 30 seconds. IG-100 is generally lower cost and simpler to source globally. Both require 40–60% more cylinder volume than equivalent halocarbon protection and must be stored at 200–300 bar. 
+ 
+ 
+ Is NOAEL or LOAEL the safety limit for clean agents in occupied rooms? 
+ NOAEL (No Observed Adverse Effect Level) is the relevant safety threshold for occupied spaces. For FM-200, the NOAEL is 9.0% v/v; for Novec 1230 it is 10.0% v/v. Since design concentrations (7.0% and 4.2% respectively) are comfortably below these limits, both agents can discharge into normally occupied rooms provided egress is not impaired. LOAEL (Lowest Observed Adverse Effect Level) is the concentration at which physiological effects first appear — for halocarbons, this is typically cardiac sensitization sensitizing the heart to epinephrine-induced arrhythmias. NFPA 2001 §1.6.1 explicitly prohibits designing above NOAEL in occupied spaces without special engineering justification and AHJ approval. 
+ 
+ 
+ What is the EU F-gas regulation impact on FM-200? 
+ EU Regulation 2024/573 phases down HFCs based on CO₂-equivalent quota. FM-200 (HFC-227ea, GWP 3,220) sits in the highest phase-down bracket. From 2024, new systems in the EU face increasingly restricted quota allocation, with a near-total restriction on high-GWP HFC use in new fire suppression applications anticipated by 2032–2033. Existing installed systems are not retroactively banned, but refill agent availability will tighten significantly through the decade. Operators specifying new EU data center suppression systems should default to Novec 1230 (GWP 1) or inert gas. UK post-Brexit F-gas regulations mirror the EU trajectory with minor timing differences. 
+ 
+ 
+ How is sprinkler density specified per NFPA 13 for data centers? 
+ NFPA 13 classifies data centers as Ordinary Hazard Group 1 or 2 based on combustible loading. Minimum design density for OH-1 is 0.15 gpm/ft² over the most hydraulically remote 1,500 ft². NFPA 75 §8.3 additionally requires sprinklers in sub-floor raised-floor cavities and above-ceiling plenums when cable loading exceeds defined limits. Pre-action systems must meet the same hydraulic density as wet systems — the pre-action valve simply holds water out of the pipes until two independent detection events confirm a fire. For high-density AI/GPU racks exceeding 30 kW per rack, FM Global 5-32 recommends enhanced density calculations and in-rack suppression supplementation. 
+ 
+ 
+ Can EPO be retrofitted on an existing data center? 
+ Yes, but it requires a full electrical engineering study to map all power feed circuits, UPS outputs, generator feed paths, and transfer switch connections that the EPO relay must capture. NFPA 70 §645.11 mandates EPO for facilities meeting §645.2 occupancy criteria (IT rooms over 232 m² / 2,500 ft² or with raised-floor access). Retrofit projects typically add shunt-trip breakers at main switchboards, install guarded two-stage push-button stations at all primary exits, and integrate the relay output into the fire alarm control panel. Commissioning requires a live-load test verifying full de-energization sequence and written documentation filed with the local AHJ. Budget 6–18 months for permitting and construction in live facilities. 
+ 
+ 
+ What does double-interlock mean for pre-action sprinklers? 
+ A double-interlock pre-action system requires two simultaneous, independent events before water enters the dry piping: (1) the fire detection system must signal (smoke, heat, or flame detector activates), AND (2) a sprinkler head must physically open from direct heat exposure. Only when both conditions occur concurrently does the pre-action valve release water. This design makes accidental discharge nearly impossible — a single spurious detector alarm or a mechanically damaged sprinkler head cannot alone flood the room. NFPA 13 §8.2 governs valve type, supervisory air pressure requirements, and detection circuit zoning. Double-interlock is the universal standard for IT rooms containing sensitive electronic equipment. 
+ 
+ 
+ What insurance discounts apply to NFPA 2001-compliant facilities? 
+ NFPA 2001 clean-agent suppression combined with double-interlock pre-action and VESDA detection typically earns 35–55% reductions in property insurance premiums versus water-only sprinkler facilities, per FM Global and major commercial underwriters. The combination significantly reduces the probable maximum loss (PML) estimate. Additional premium credits apply for annual door fan integrity testing records, third-party commissioning verification, documented annual inspection per NFPA 25, and FM Global Approval of the system design. Some insurers also offer credits for in-rack suppression at high-density AI/GPU installations and for UPS thermal runaway detection systems integrated with the fire alarm. 
+ 
+ 
+ How should fire safety systems be adapted for high-density AI/GPU racks? 
+ AI/GPU racks exceeding 30 kW per rack introduce fire risks that standard IT room design does not fully address. FM Global 5-32 (2021 edition) specifically addresses high-density computing environments. Key adaptations include: (1) In-rack suppression supplementation alongside room-level clean agent — targeting ignition at the source before spread; (2) IR or gas-sensor thermal runaway detection for GPU module battery banks and capacitor banks, which can trigger before VESDA detects products of combustion; (3) Enhanced sprinkler density calculation accounting for higher fuel load; (4) Increased clean-agent design concentration verification as high-airflow cooling (rear-door heat exchangers, liquid cooling manifolds) can increase enclosure leakage. Liquid-cooled deployments (direct liquid, immersion) present different fire profiles — reduced ignition frequency but concentrated coolant leak risk requiring different detection strategies. 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+## Fire Protection Standards Compared
+
+ 
+Key requirements across the five most-cited standards in data center fire protection engineering.
+
+ 
+ 
+ 
+
+ | 
+ 
+
+ Criterion
+ | NFPA 75
+ | NFPA 76
+ | NFPA 2001
+ | FM Global 5-32
+ | ISO 14520
+ |
+ 
+
+ 
+
+ 
+
+ | Scope / Target
+ | IT equipment rooms, data centers
+ | Telecommunications facilities
+ | Clean agent suppression systems
+ | Data centers & IT installations (insurer standard)
+ | Gaseous fire-suppression systems (international)
+ |
+ 
+
+ | Latest revision
+ | 2023 edition
+ | 2022 edition
+ | 2022 edition
+ | 2021 (updated annually)
+ | ISO 14520-1:2015 + AMD 1:2019
+ |
+ 
+
+ | Key detection requirement
+ | Smoke detection in IT spaces, sub-floor, and above ceiling per NFPA 72; VESDA strongly recommended
+ | Early-warning aspirating detection in switching rooms; dual-detector confirmation for suppression release
+ | Detection system must initiate discharge; cross-zoning recommended for occupied spaces
+ | VESDA mandatory in high-value IT areas; spot detectors minimum elsewhere
+ | Detection per ISO 7240; sampling-type detection preferred for high-airflow environments
+ |
+ 
+
+ | Key suppression requirement
+ | Suppression system or enhanced construction; pre-action sprinkler preferred in IT rooms
+ | Suppression required in occupied telecom rooms exceeding 465 m²; pre-action double-interlock standard
+ | Design concentration reached within 10 s; discharge nozzles per Annex B hydraulics
+ | Clean agent + pre-action double-interlock layered; in-rack suppression for >30 kW/rack
+ | Design concentration per Annex A; hold time minimum 10 min after discharge
+ |
+ 
+
+ | Compartmentation
+ | IT rooms separated from other occupancies by 1-hr fire-rated construction
+ | 2-hr separation from office/storage; penetration sealing to UL 2079 standard
+ | Protected enclosure must achieve minimum hold time; integrity test mandatory at commissioning
+ | Fire walls rated per FM 1-2; service penetrations fire-stopped; UPS rooms isolated
+ | Enclosure integrity per ISO 14520-1 Annex E door-fan test at commissioning + annually
+ |
+ 
+
+ | Inspection cadence
+ | Annual inspection per NFPA 25; sprinkler heads replaced at 50-year intervals
+ | Quarterly visual + annual functional test; battery standby verified every 6 months
+ | 6-monthly agent quantity check; annual full system inspection; door-fan test every 12 months
+ | Quarterly agent-level verification; annual FM Global Property Visit assessment
+ | Annual inspection per ISO 14520-14; cylinder weight check every 6 months
+ |
+ 
+
+ | Geographic adoption
+ | Mandatory in US; referenced in Singapore, Australia, Middle East
+ | US (telecom sector); referenced globally for carrier hotels
+ | US mandatory; equivalent of EN 15004 in Europe; referenced by ISO 14520
+ | Required by FM-insured facilities globally; de facto standard for hyperscale
+ | EU, Asia-Pacific, Middle East; increasingly adopted in APAC hyperscale
+ |
+ 
+
+ | Typical usage
+ | Colocation, enterprise IT rooms, edge facilities
+ | Carrier hotels, telephone central offices, network PoPs
+ | Any facility specifying clean-agent fire suppression
+ | Hyperscale cloud, large colo, mission-critical finance
+ | European and Asian data centers; international deployments seeking harmonized compliance
+ |
+ 
+
+ | Critical sections
+ | §6 (detection), §8 (suppression), §9 (construction), §12 (operations)
+ | §6 (detection), §8 (suppression), §10 (electrical protection)
+ | §5 (system design), §5.3 (design concentration), §7 (inspection & testing)
+ | §3 (construction), §4 (protection), §5 (electrical), §6 (housekeeping)
+ | §7 (system design), §8 (installation), Annex A (agent properties), Annex E (integrity test)
+ |
+ 
+
+ 
+
+ 
+ 
+Table reflects publicly available editions as of 2025. Always verify current edition with NFPA, FM Global, or ISO. Local AHJ requirements may impose additional constraints.
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+## Agent Selection Decision Matrix
+
+ 
+Answer 4 questions to receive an engineering-backed agent recommendation with NFPA 2001 references.
+
+ 
+ 
+ 
+ 
+#### Q1What is the protected room volume?
+
+ 
+ 500 m³ 
+ 
+ 
+ 
+ 
+#### Q2What is the personnel occupancy pattern?
+
+ 
+ Manned 24/7 
+ Lights-out 
+ Mixed shift 
+ 
+ 
+ 
+ 
+#### Q3What is the equipment value class?
+
+ 
+ Standard IT ( $50k/rack) 
+ Hyperscale (mission-critical) 
+ 
+ 
+ 
+ 
+#### Q4What is your sustainability / GWP priority?
+
+ 
+ GWP must be Calculate Recommendation 
+ 
+ 
+ 
+ 
+##### Why this recommendation
+
+ 
+
+
+ 
+##### Trade-offs to consider
+
+ 
+
+
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+## Fire Safety Compliance Checklist
+
+ 
+33-item interactive checklist covering detection, suppression, egress, electrical, and documentation. State persists across sessions.
+
+ 
+ 
+ 0/33 
+ Items checked — complete all 33 for full compliance certification readiness 
+ Critical gaps 
+ 
+
+ 
+ 
+ Detection (8 items) 
+ 
+ VESDA aspirating smoke detector installed in cold aisles and sub-floor plenums (NFPA 72 §17.7) 
+ Spot photoelectric smoke detectors on max 9 m spacing grid per ceiling area (NFPA 72 §17.6) 
+ Beam detectors deployed above raised floor for spans exceeding 30 m (NFPA 72 §17.8) 
+ Smoke detection installed below raised floor if cable loading exceeds NFPA 75 limits (NFPA 75 §6.3) 
+ Above-ceiling plenum detection installed where combustibles exceed defined loading (NFPA 75 §6.4) 
+ Duct smoke detectors in HVAC supply and return air handling units serving IT spaces (NFPA 90A §6.7) 
+ Cross-zoning or coincidence logic configured for suppression release to prevent spurious discharge (NFPA 72 §23.8) 
+ All detectors functionally tested within past 12 months with documented results (NFPA 72 §14.4) 
+ 
+ 
+
+ 
+ 
+ Suppression (7 items) 
+ 
+ Clean agent design concentration met or exceeded per enclosure volume calculation (NFPA 2001 §5.3) 
+ Agent discharge time verified under 10 seconds from activation to design concentration (NFPA 2001 §5.5) 
+ Enclosure integrity (door fan) test passed with minimum 10-minute hold time (NFPA 2001 §7.1) 
+ Pre-action double-interlock sprinkler system installed in IT equipment rooms (NFPA 13 §8.2) 
+ Sprinkler hydraulic design density meets NFPA 13 Ordinary Hazard requirements (≥0.15 gpm/ft²) (NFPA 13 §19.3) 
+ Clean agent cylinders within manufacturer service life; weight/pressure verified within 6 months (NFPA 2001 §7.3) 
+ Full suppression system commissioning report filed with AHJ; functional discharge test completed (NFPA 2001 §6.1) 
+ 
+ 
+
+ 
+ 
+ Egress & Life Safety (6 items) 
+ 
+ Two independent means of egress accessible from every point in the IT room, ≥30 m apart (NFPA 101 §7.4) 
+ Maximum travel distance to an exit ≤45 m in unsprinklered, ≤60 m in sprinklered occupancy (NFPA 101 §7.6) 
+ Emergency lighting with 90-minute battery backup installed along all egress paths (NFPA 101 §7.9) 
+ Internally illuminated or photoluminescent exit signs at all exit doors and directional decision points (NFPA 101 §7.10) 
+ Suppression abort/delay switch at each IT room exit with clear labeling and 30-second countdown (NFPA 2001 §4.2) 
+ Evacuation plan posted at every entry point; floor plan shows exits, muster point, and EPO locations (NFPA 101 §4.8) 
+ 
+ 
+
+ 
+ 
+ EPO & Electrical (6 items) 
+ 
+ EPO button installed at every primary exit from the IT room; guarded two-stage activation (NFPA 70 §645.11) 
+ EPO relay output integrated into fire alarm control panel for automatic de-energization on confirmed fire (NFPA 70 §645.11(B)) 
+ All PDUs and UPS systems are listed equipment with internal fault detection and arc flash protection (NFPA 70 §110.3) 
+ All electrical disconnects clearly labeled per NFPA 70 §110.22 with voltage, amperage, and circuit ID (NFPA 70 §110.22) 
+ UPS battery thermal runaway early-warning system installed (temperature, gas, or IR detection) (FM Global 5-32 §3.4) 
+ Arc flash hazard study current (within 5 years); incident energy labels on all switchgear panels (NFPA 70E §130.5) 
+ 
+ 
+
+ 
+ 
+ Documentation & Training (6 items) 
+ 
+ Fire safety plan documented, reviewed annually, and drilled with all facility staff at least once per year (NFPA 101 §4.8) 
+ Clean-agent room enclosure integrity (door fan) test performed and documented within past 12 months (NFPA 2001 §7.1) 
+ All operators hold fire safety training records dated within 3 years; EPO and suppression abort procedures covered (NFPA 2001 §1.4) 
+ NFPA 25 annual sprinkler and fire pump inspection records maintained for minimum 3-year look-back (NFPA 25 §4.3) 
+ Insurance carrier notified of any changes to suppression agent type, room volume, or IT load within 30 days (FM Global Property Visit) 
+ Hot work and suppression system impairment permits documented with return-to-service sign-off for all outages (NFPA 25 §15.3) 
+ 
+ 
+
+ 
+ Reset Checklist 
+ Export as Text 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+## Clean Agent System Cost Estimator
+
+ 
+Browser-side CAPEX and 10-year TCO estimate. All figures are indicative 2025 USD — engage a fire protection engineer for formal design.
+
+ 
+ 
+ 
+ 
+### Inputs
+
+ 
+ Room volume (m³) 
+ 
+ 
+ 
+ Agent type 
+ 
+ FM-200 (HFC-227ea) 
+ Novec 1230 (FK-5-1-12) 
+ IG-541 (Inergen) 
+ IG-100 (Nitrogen) 
+ 
+ 
+ 
+ Redundancy level 
+ 
+ Main only 
+ Main + reserve cylinders 
+ N+1 (full spare bank) 
+ 
+ 
+ 
+ Agent replacement cycle 
+ 
+ 5 years 
+ 10 years 
+ 15 years 
+ 
+ 
+ 
+ 
+ 
+ Initial CAPEX 
+ — 
+ 
+ 
+ Agent fill mass 
+ — 
+ 
+ 
+ 10-year TCO 
+ — 
+ 
+ 
+ Refill cost per discharge 
+ — 
+ 
+ 
+ CO₂-equivalent (10 yr) 
+ — 
+ 
+ 
+ Cost per m³ protected 
+ — 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+## 5-Tier Layered Defense Model
+
+ 
+Select any tier to explore the technologies, standards, and controls at each layer of the defense-in-depth strategy.
+
+ 
+ 
+ 
+ 
+ Tier 1 
+ Prevention 
+ Compartmentation · Hot work permits · Fuel reduction · Housekeeping 
+ ▼ 
+ 
+ 
+ 
+ Goal:** Eliminate ignition sources and fuel loads before a fire can start.
+ 
+
+ 
+- **Compartmentation:** 1-hr fire-rated walls between IT rooms and other occupancies per NFPA 75 §9; 2-hr separation for large facilities per FM Global 5-32.
+ 
+- **Hot work control:** Permit system for welding, grinding, and open flame; 30-minute fire watch post-completion per NFPA 51B.
+ 
+- **Combustible loading:** No cardboard boxes, packing materials, or unnecessary combustibles permitted inside IT rooms; cable quantity minimized per NFPA 75 §8.4.
+ 
+- **Electrical maintenance:** Thermographic scanning of switchgear annually; loose connections re-torqued per NFPA 70B §11.14.
+ 
+
+ 
+ 
+ 
+ 
+ 
+ Tier 2 
+ Detection 
+ VESDA aspirating · Spot smoke · Beam · Thermal/IR camera 
+ ▼ 
+ 
+ 
+ 
+ **Goal:** Identify incipient fires within seconds, triggering alarm and suppression before flames develop.
+ 
+
+ 
+- **VESDA:** Sensitivity to 0.001% obscuration/ft; detects smoldering cables hours before flames per NFPA 72 §17.7.
+ 
+- **Spot detectors:** Photoelectric (preferred over ionization in IT environments) on 9 m maximum spacing; positioned to catch stratification patterns.
+ 
+- **Linear beam:** Single or double-ended beam detectors for wide-span areas; tested annually with calibrated filter kit.
+ 
+- **Thermal/IR:** Continuous IR camera monitoring of battery banks and high-density GPU racks increasingly standard for hyperscale facilities.
+ 
+
+ 
+ 
+ 
+ 
+ 
+ Tier 3 
+ Suppression 
+ Clean agent discharge · Pre-action sprinkler · In-rack suppression 
+ ▼ 
+ 
+ 
+ 
+ **Goal:** Extinguish the fire within 10 seconds, protecting equipment while avoiding water damage.
+ 
+
+ 
+- **Clean agent (primary):** FM-200 or Novec 1230 reaches design concentration in Root cause:****
+ Generator exhaust piping overheated adjacent combustible roofing materials at a penetration point. The generator room lacked a listed fire-rated penetration seal, and the roofing material did not meet the non-combustible classification required at the penetration. A day-tank fuel spill during refueling contributed accelerant to the initial ignition. 
+ 
+ 
+ 
+#### Key Takeaways
+
+ 
+
+ 
+- Generator exhaust penetrations through rated assemblies must use listed fire-resistive collars or sealants — generic firestopping is insufficient for hot exhaust pathways.
+ 
+- Day-tank fuel management procedures must include spill containment; fueling should never occur during live generator operation.
+ 
+- Generator rooms are a leading fire origin in colocation facilities — they require dedicated suppression (typically water mist or CO₂), not just clean-agent protection scoped to the IT hall.
+ 
+
+ 
+ 
+ 
+ Near-miss composite — Multiple facilities 
+ 
+### VESDA Early Warning: Hyperscale Near-Miss
+
+ 
+At a major hyperscale operator's EU campus, a VESDA alert triggered at 03:14 local time, registering 0.004% obscuration in a cold aisle — well below any visible smoke threshold. Operations responded within 4 minutes and located a cable jacket on a 48V busbar beginning to pyrolyze. No fire developed; the busbar was isolated and replaced within 6 hours with zero downtime.
+
+ 
+ Root cause:****
+ A busbar conductor connection had been under-torqued during a maintenance event 11 months prior. Progressive resistance heating reached the insulation degradation threshold overnight during a high-load period. Spot detectors in the aisle showed no alarm; the VESDA sampling pipe located 60 cm above the busbar tray captured the early pyrolysis products. 
+ 
+ 
+ 
+#### Key Takeaways
+
+ 
+
+ 
+- VESDA's sub-0.01% obscuration sensitivity enables intervention hours before a spot detector would alarm — the difference between a 6-hour maintenance event and a total loss.
+ 
+- Torque records for high-current connections must be verified after every maintenance event; re-torque programs should run every 24 months per NFPA 70B §11.14.
+ 
+- AI-driven VESDA trend analysis (rising baseline concentration over weeks) can predict failure days before an acute event — a growing capability at hyperscale facilities.
+ 
+
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+## Inline Glossary
+
+ 
+Quick-reference definitions for the key terms used across fire safety standards and system design.
+
+ 
+ 
+ NFPA National Fire Protection Association — US-based standards body publishing the 300+ NFPA codes and standards (including NFPA 72, 75, 76, 101, 2001) that form the legal and engineering baseline for fire protection globally. 
+ VESDA Very Early Smoke Detection Apparatus — an aspirating smoke detector system that actively draws air samples through pipe networks into a laser nephelometer, detecting smoke at ≤0.001% obscuration per foot — orders of magnitude more sensitive than spot detectors. 
+ EPO Emergency Power Off — a guarded pushbutton switch (NFPA 70 §645.11) that immediately de-energizes all electrical circuits in an IT room. Intended solely for life-safety emergencies; accidental activation is a leading cause of data center outages. 
+ FM-200 Trade name for HFC-227ea (heptafluoropropane). A colorless, odorless gas that suppresses fire by interrupting chemical chain reactions. Zero ODP, GWP of 3,220. Discharges in 0 are banned under the Montreal Protocol. 
+ GWP Global Warming Potential — a measure of how much heat a greenhouse gas traps in the atmosphere over 100 years relative to CO₂ (GWP = 1). FM-200 GWP = 3,220; Novec 1230 GWP = 1; IG-541 and IG-100 GWP = 0. 
+ IG-541 Inergen — an inert gas blend of 52% N₂, 40% Ar, and 8% CO₂. Suppresses fire by oxygen dilution; GWP = 0; ODP = 0. The CO₂ component stimulates faster respiration for occupant egress. Requires larger cylinder banks than halocarbons. 
+ IG-100 Pure nitrogen used as an inert fire suppressant. GWP = 0; ODP = 0; lowest cost inert gas option. Suppresses by reducing oxygen below 15% combustion threshold. No CO₂ respiratory stimulant benefit vs. IG-541. 
+ Halocarbon A class of chemical compounds containing carbon bonded to one or more halogens (fluorine, chlorine, bromine). Fire suppression halocarbons include FM-200 (HFC), Novec 1230 (FK), and the now-banned Halons. They suppress fire chemically by interrupting radical chain reactions. 
+ Design Concentration The minimum volumetric percentage of clean agent in air required to extinguish a fire of a given class, per NFPA 2001 §5.3. FM-200: 7.0% v/v (Class A); Novec 1230: 4.2% v/v. Must be achieved within 10 seconds and must not exceed the agent's NOAEL in occupied spaces. 
+ NOAEL No Observed Adverse Effect Level — the maximum clean agent concentration at which no adverse physiological effects are observed in humans. FM-200 NOAEL: 9.0% v/v; Novec 1230 NOAEL: 10.0% v/v. Design concentrations must stay below NOAEL for occupied spaces per NFPA 2001 §1.6. 
+ LOAEL Lowest Observed Adverse Effect Level — the lowest concentration at which adverse effects appear in humans. For halocarbons, this is typically cardiac sensitization (arrhythmia risk under epinephrine exposure). LOAEL for FM-200: 10.5% v/v. NFPA 2001 prohibits designing above NOAEL in occupied areas. 
+ Pre-Action Sprinkler A sprinkler system in which the supply pipe remains dry until one (single-interlock) or two (double-interlock) independent detection events confirm a fire. Double-interlock is standard in IT rooms: both a detector signal AND a sprinkler head open are required before water flows, preventing accidental flooding. 
+ 
+ 
+
+ 
+ 
+ 
+ 
+## Related Resources
+
+ 
+Deep-dive comparisons, interactive references, and tools that extend this pillar page.
+
+ 
+ 
+ 
+ 
+ FM-200 vs Novec 1230** Agent comparison: GWP, cost, regulations 
+ 
+ 
+ 
+ **Wet vs Pre-Action Sprinkler** System comparison for IT environments 
+ 
+ 
+ 
+ **NFPA Fire & Risk Standards** NFPA 75, 76, 2001 deep dive 
+ 
+ 
+ 
+ **Fire Protection System** Interactive system reference 
+ 
+ 
+ 
+ **Engineering Journal** Related technical article 
+ 
+ 
+ 
+ **Engineering Tools** Calculators and interactive tools
 
 
 ======================================================================

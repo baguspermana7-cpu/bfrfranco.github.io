@@ -11,6 +11,105 @@ release sections rather than semver.
 
 ---
 
+## v1.41.2 — 2026-05-24 (pillar-fire-safety.html — 8 new sections + interactive tools + 15-item FAQ)
+
+MINOR ship: substantial enhancement of the fire-safety pillar page in
+response to user feedback that the page was "very lacking in detail, not
+intuitive, and very lacking" (verbatim).
+
+`pillar-fire-safety.html` grows from **676 lines &rarr; 1,836 lines**
+(+171%) with 8 new sections, two new JSON-LD schemas, and full mobile +
+dark-mode coverage on every new component.
+
+### User report addressed
+
+- *"apps ini sangat2 kurang detail dan kurang intuitive dan kurang
+  sekali. enahce, detailkan."* &rarr; The page now has interactive
+  decision-support tools, a standards comparison matrix, a 33-item
+  compliance checklist with live scoring + localStorage persistence,
+  a TCO/CO&#8322;eq cost calculator, a 5-tier defense diagram, 3 case
+  studies (including OVH Strasbourg 2021), 14 glossary terms, and a
+  cross-link section &mdash; matching the depth a working DC fire
+  protection engineer would expect.
+
+### Added (8 new sections)
+
+1. **Standards Comparison Table** &mdash; 9 rows &times; 5 columns
+   (NFPA 75 / NFPA 76 / NFPA 2001 / FM Global 5-32 / ISO 14520).
+   Sticky thead, mobile-scrollable, alternating row backgrounds.
+2. **Decision Matrix Tool** &mdash; 4-question wizard (room volume,
+   occupancy, equipment value class, sustainability priority) running
+   a JS conditional ladder. Live recommendation card naming the agent,
+   3-4 rationale bullets, trade-offs, and the NFPA 2001 section cite.
+3. **Compliance Checklist** &mdash; 33 items across 5 categories
+   (Detection 8 / Suppression 7 / Egress 6 / EPO 6 / Documentation 6).
+   Live score 0&ndash;33 with 4-band color coding (red &le;15 / amber
+   16&ndash;25 / cyan 26&ndash;32 / green 33). `localStorage.pfs_checklist`
+   persistence. Reset + Export-as-text buttons.
+4. **Cost Calculator** &mdash; live CAPEX / 10-yr TCO / refill cost / CO&#8322;eq
+   estimator. Inputs: room volume, agent (FM-200 / Novec 1230 / IG-541 /
+   IG-100), redundancy level, replacement cycle. Outputs auto-format USD
+   with commas; CO&#8322;eq color-coded.
+5. **Layered Defense Diagram** &mdash; 5-tier accordion (Prevention &rarr;
+   Detection &rarr; Suppression &rarr; Containment &rarr; Response) with
+   tap-to-expand detail panels. Replaces the toy hub-spoke diagram
+   with an industry-standard layered model.
+6. **Case Studies** &mdash; 3 documented incidents: OVHcloud SBG2 fire
+   2021-03-10, WebNX Ogden 2023-04-02, VESDA near-miss composite. Each
+   card has date pill, summary, root cause, 3 key takeaways.
+7. **Inline Glossary** &mdash; 14 term cards: NFPA, VESDA, EPO, FM-200,
+   Novec 1230, ODP, GWP, IG-541, IG-100, Halocarbon, Design
+   Concentration, NOAEL, LOAEL, Pre-Action Sprinkler.
+8. **Cross-links section** &mdash; 6 link cards to
+   `compare-fm200-vs-novec`, `compare-wet-vs-preaction`,
+   `ltc-nfpa-fire-risk`, `fire-system`, `tools`, plus a related article.
+
+### Expanded
+
+- **Stats**: 3 &rarr; 8 cards. Added Halon phase-out 2010, insurance
+  discount 35-55%, top-3 root causes, FD response 3 min, IG inert-gas
+  0% GWP.
+- **FAQ**: 4 &rarr; 15 Q&As. Added Halon ban, design concentration,
+  aspirating vs spot detection, door-fan integrity test, IG-100 vs
+  IG-541, NOAEL/LOAEL safety limits, EU F-gas regulation, NFPA 13
+  sprinkler density, EPO retrofit, double-interlock pre-action,
+  insurance discount factors.
+
+### Schema added / updated
+
+- **`FAQPage` JSON-LD** expanded to all 15 Q&As (HTML and JSON-LD now
+  in sync) so AI assistants (ChatGPT / Claude / Perplexity) can
+  index and quote every answer.
+- **`HowTo` JSON-LD** added: "How to size a clean-agent suppression
+  system" with 5 steps mirroring the cost-calculator workflow.
+
+### Standards / hygiene
+
+- All new classes prefixed `pfs-*` (no clash with `.pillar-*` or rz
+  globals).
+- `[data-theme="dark"]` overrides on every new section.
+- Mobile responsive: every grid uses `repeat(auto-fit, minmax(...))`
+  or breakpoint-stacked. Audit `audit-mobile-responsive.py --strict`
+  reports 133 PASS / 0 FAIL.
+- `audit-script-tags.py --strict` CLEAN.
+- `audit-seo.py` 0 required errors (2 pre-existing length warnings on
+  title/description &mdash; not regressions; will trim in v1.41.3).
+- `audit-pro-mode-indicator.py --strict` CLEAN (regression check).
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.2
+- `sw.js` &rarr; `rz-cache-v1.41.2`
+
+### Future-work captured
+
+- Apply the same 10-phase enhancement template to the other 4 pillar
+  pages (pillar-cooling, pillar-power, pillar-standards,
+  pillar-sustainability) for parity. Each is currently 688-1030 lines;
+  target ~2,000 lines each.
+
+---
+
 ## v1.41.1 — 2026-05-24 (Mode-btn dark-mode fix + SEO hardening + Knowledge Labs de-dupe)
 
 PATCH ship: post-v1.41.0 user reports + comprehensive SEO audit.
