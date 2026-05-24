@@ -284,6 +284,44 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.33.2 — 2026-05-24 (Basis drawers extended to datahall.html ops-rollup — Rule 6 site-wide)
+
+ACCURACY_VALIDATION Rule 6 originally landed on the two cockpit
+dashboards (DC AI + DC Conv) in v1.32.8. This ship extends the same
+pattern to `datahall.html`'s operations-rollup top-strip so the
+data-hall SCADA page also satisfies the display contract.
+
+### Added (datahall.html)
+- Five ops-rollup KPIs are now click-to-open basis drawers:
+  Hall State / Rack Load / Cooling Margin / PUE / Power Density.
+- Each opens with formula / inputs / output / scope / denominator /
+  source / data-mode / last-update + engineering note.
+- Engine-bound via `window.CONV_CALC.snapshot` (no hardcoded math).
+- Dotted-underline visual hint that the KPI is interactive.
+- Keyboard accessible (`tabindex=0` + Enter/Space).
+
+### Probe extended
+- `tools/probe-accuracy-validation.mjs` now covers all 5 datahall
+  ops-rollup drawers. **37/37 PASS** (was 32, +5 new tests).
+- Continues to run via `python3 -m http.server 8081 &` +
+  `node tools/probe-accuracy-validation.mjs` OR
+  `RZ_BASE=file node tools/probe-accuracy-validation.mjs`.
+
+### Roadmap (remaining cockpit pages)
+Same Rule 6 pattern can be extended to the other 5 cockpit pages
+(chiller-plant, water-system, fire-system, fuel-system, ict,
+EPMS_Telemetry). Lower priority because those pages display values
+inline in the SVG mimic rather than in a top-strip KPI cluster.
+Defer until owner requests OR until a reviewer flags an opaque KPI on
+one of those pages.
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- datahall.html data-mode = `'Simulated' / 'GOOD'` chips already
+  present from earlier work; the basis drawer is additive.
+
+---
+
 ## v1.33.1 — 2026-05-24 (Probe-validated bugfix — FAQ ReferenceError + probe robustness; 32/32 pass)
 
 (Authored locally as v1.32.10. Parallel session shipped v1.32.10 Network

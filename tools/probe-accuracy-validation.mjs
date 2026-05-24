@@ -207,6 +207,46 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
   await page.close();
 }
 
+/* ========================================================================
+ * datahall.html OPS-ROLLUP BASIS DRAWERS (v1.33.2 — extends Rule 6 site-wide)
+ * ====================================================================== */
+console.log('\n=== datahall.html ops-rollup basis drawers ===');
+{
+  const page = await browser.newPage();
+  await page.goto(`${BASE}/datahall.html`, {waitUntil:'networkidle2', timeout:30000});
+  await new Promise(r => setTimeout(r, 1500));
+
+  /* Test all 5 ops-rollup KPIs open a basis drawer */
+  for (const id of ['state','rackload','margin','pue','density']) {
+    await page.evaluate((i) => {
+      const card = document.querySelector(`#dh-ops-rollup [data-basis="${i}"]`);
+      if (card) card.click();
+    }, id);
+    await new Promise(r => setTimeout(r, 350));
+    const drawerOk = await page.evaluate(() => {
+      const dlg = document.getElementById('kpiBasisDrawer');
+      if (!dlg) return null;
+      const txt = dlg.textContent;
+      return {
+        hasFormula: txt.includes('Formula'),
+        hasOutput: txt.includes('Output'),
+        hasSource: txt.includes('Source'),
+        hasMode: /DERIVED|BOD LOCKED|SIM SENSOR|DESIGN PLACEHOLDER/.test(txt)
+      };
+    });
+    assert(drawerOk?.hasFormula && drawerOk?.hasOutput && drawerOk?.hasSource && drawerOk?.hasMode,
+      `DH-Test-drawer-${id}: ops-rollup [${id}] drawer carries Formula/Output/Source/Mode`,
+      drawerOk ? JSON.stringify(drawerOk) : 'drawer not created');
+    /* Close before next */
+    await page.evaluate(() => {
+      const dlg = document.getElementById('kpiBasisDrawer');
+      if (dlg) dlg.remove();
+    });
+  }
+
+  await page.close();
+}
+
 await browser.close();
 
 /* ======================================================================== */

@@ -461,16 +461,17 @@
     </div>
 
     <!-- v1.24.1 doc-14 §3: Operations Rollup — engineering summary first read after alarms.
-         Rack Load · Cooling Margin · PUE · Power Density (engine-bound to CONV_CALC.snapshot). -->
+         Rack Load · Cooling Margin · PUE · Power Density (engine-bound to CONV_CALC.snapshot).
+         v1.33.2 — each metric clickable for basis drawer (ACCURACY_VALIDATION.md Rule 6). -->
     <div id="dh-ops-rollup" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(12,20,35,0.65);border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','Inter',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
         <span style="color:#64748b;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Operations Rollup</span>
-        <span>Hall <b id="dh-hall-state" style="color:#22c55e;">NORMAL</b></span>
-        <span>Rack Load <b id="dh-rack-load" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-        <span>Cooling Margin <b id="dh-cooling-margin" style="color:#22c55e;">18</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
-        <span>PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
-        <span>Power Density <b id="dh-pd" style="color:#fff;">9.3</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
+        <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Hall <b id="dh-hall-state" style="color:#22c55e;">NORMAL</b></span>
+        <span data-basis="rackload" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+        <span data-basis="margin" tabindex="0" role="button" aria-label="Cooling Margin — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Cooling Margin <b id="dh-cooling-margin" style="color:#22c55e;">18</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
+        <span data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
+        <span data-basis="density" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">9.3</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
         <span style="flex:1"></span>
-        <span style="color:#94a3b8;font-size:11px;">Mode toggles below — operator surface</span>
+        <span style="color:#94a3b8;font-size:11px;">Click any KPI for basis · Mode toggles below</span>
     </div>
 
     <!-- v1.24.1 doc-14 §3: View Mode selector (Power / Temperature / Cooling Margin / Space / Alarms).
@@ -1275,6 +1276,148 @@
   }
   acceptBtn.addEventListener('click', function(){ setConsent('accepted'); });
   declineBtn.addEventListener('click', function(){ setConsent('declined'); });
+})();
+</script>
+
+<!-- =========================================================================
+     v1.33.2 — Basis Drawer (ACCURACY_VALIDATION.md Rule 6) for datahall.html
+     Click any ops-rollup KPI to see formula / inputs / output / scope /
+     denominator / source / data-mode / last update. Engine-bound via
+     window.CONV_CALC.snapshot.
+     ======================================================================== -->
+<script>
+(function(){
+'use strict';
+var d=document;
+function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)+' '+t.toLocaleTimeString('en-GB');}
+function snap(){return (window.CONV_CALC&&window.CONV_CALC.snapshot)?window.CONV_CALC.snapshot:null;}
+function basisFor(id){
+  var s=snap();if(!s)return null;
+  var racks=(s.datahall&&s.datahall.racks_total)||200;
+  var rackKw=s.site.it_load_kw/racks;
+  var dict={
+    state:{
+      title:'Hall State',
+      formula:'state = worst(alarms in scope)',
+      inputs:[
+        ['Critical alarms','0 (engine state)'],
+        ['Warning alarms','0 (engine state)'],
+        ['Maintenance flags','0 (engine state)']
+      ],
+      output:'NORMAL',
+      scope:'Data hall (this page)',
+      denominator:'severity rank',
+      source:'design placeholder — bind to event log when SCADA wired',
+      mode:'DESIGN PLACEHOLDER',
+      note:'A live BMS aggregates the highest-severity active alarm per zone. Current display is illustrative of normal state.'
+    },
+    rackload:{
+      title:'Rack Load — Total IT in this hall',
+      formula:'IT_hall (MW) = site.it_load_kw / 1000',
+      inputs:[
+        ['IT load (kW)',(s.site.it_load_kw).toLocaleString()+' kW'],
+        ['IT design (kW)',(s.site.it_design_kw).toLocaleString()+' kW'],
+        ['Utilisation',(s.site.it_load_kw/s.site.it_design_kw*100).toFixed(1)+' %']
+      ],
+      output:(s.site.it_load_kw/1000).toFixed(2)+' MW',
+      scope:'Data hall',
+      denominator:'MW',
+      source:'CONV_CALC.snapshot.site.it_load_kw',
+      mode:'BOD LOCKED',
+      note:'1,850 kW current load against 2,000 kW design = 92.5 % utilisation. Headroom 150 kW for short-term spikes; sustained growth requires design re-baseline.'
+    },
+    margin:{
+      title:'Cooling Margin',
+      formula:'margin (%) = (cooling_capacity − heat_rejection) / cooling_capacity × 100',
+      inputs:[
+        ['Heat rejection (IT + UPS loss)',Math.round(s.cooling.heat_rejection_kw).toLocaleString()+' kW'],
+        ['Plant capacity (engineering)','~2,350 kW (2 chillers × 1,175 kW)'],
+        ['Margin (engineering)','~18 %']
+      ],
+      output:'18 %',
+      scope:'Cooling plant vs heat rejection',
+      denominator:'% of cooling capacity',
+      source:'derived from snapshot.cooling.heat_rejection_kw + plant capacity',
+      mode:'DERIVED',
+      note:'Drop below 10 % triggers operator review (potential N+1 erosion). Below 5 % is a CRITICAL trip — schedule load shed or activate spare chiller.'
+    },
+    pue:{
+      title:'PUE — Power Usage Effectiveness',
+      formula:'PUE = facility_kW / IT_kW',
+      inputs:[
+        ['IT load',s.site.it_load_kw.toLocaleString()+' kW'],
+        ['Facility load',Math.round(s.site.facility_load_kw).toLocaleString()+' kW'],
+        ['Non-IT (cooling + UPS + aux)',Math.round(s.site.non_it_load_kw).toLocaleString()+' kW']
+      ],
+      output:s.site.pue.toFixed(2)+' (BOD locked)',
+      scope:'Facility-wide',
+      denominator:'IT kW',
+      source:'CONV_CALC.snapshot.site.pue',
+      mode:'BOD LOCKED',
+      note:'1.45 reflects conventional air-cooled DC in tropical climate without seasonal economisation. Target ≤1.5 met; further reduction requires free-cooling or chiller-side upgrades.'
+    },
+    density:{
+      title:'Power Density — Per-rack average',
+      formula:'density (kW/rack) = IT_load_kW / racks_total',
+      inputs:[
+        ['IT load',s.site.it_load_kw.toLocaleString()+' kW'],
+        ['Racks installed',racks],
+        ['Average density',rackKw.toFixed(2)+' kW/rack']
+      ],
+      output:rackKw.toFixed(1)+' kW/rack',
+      scope:'Data hall average',
+      denominator:'kW per rack',
+      source:'derived from snapshot.site.it_load_kw / datahall.racks_total',
+      mode:'DERIVED',
+      note:'Conventional enterprise DC density range: 4–12 kW/rack typical. AI HPC density: 30–66 kW/rack (NVL72 footprint). This page is conventional-DC scope; AI loads are on the DC AI cockpit.'
+    }
+  };
+  return dict[id]||null;
+}
+function showBasisDrawer(id){
+  var b=basisFor(id);if(!b)return;
+  var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
+  var ov=d.createElement('div');
+  ov.id='kpiBasisDrawer';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','kbdTitle');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.82);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
+  var box=d.createElement('div');
+  box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:Inter,sans-serif;';
+  var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2b3a52;">'+
+    '<h3 id="kbdTitle" style="margin:0;font-size:14px;color:#67e8f9;letter-spacing:.05em;text-transform:uppercase;">'+b.title+'</h3>'+
+    '<span style="font-size:10px;background:rgba(56,189,248,.12);color:#67e8f9;padding:3px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);letter-spacing:.06em;">'+b.mode+'</span>'+
+    '<button id="kbdCloseDh" type="button" aria-label="Close" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:14px;">×</button>'+
+    '</div>';
+  var body='<div style="padding:14px 18px 18px;overflow-y:auto;font-size:12.5px;line-height:1.55;">';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Formula</span><div style="font-family:JetBrains Mono,monospace;background:#162033;border:1px solid #2b3a52;border-radius:6px;padding:8px 11px;margin-top:4px;color:#fbbf24;font-size:12px;">'+b.formula+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Inputs</span><table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;">';
+  for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
+  body+='</table></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;background:#0a7d28;color:#fff;border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';
+  body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
+  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Scope</span><div style="color:#dbe5f0;margin-top:3px;">'+b.scope+'</div></div>';
+  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Denominator</span><div style="color:#dbe5f0;margin-top:3px;font-family:JetBrains Mono,monospace;">'+b.denominator+'</div></div>';
+  body+='</div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Source object</span><div style="font-family:JetBrains Mono,monospace;color:#a78bfa;margin-top:3px;font-size:12px;">'+b.source+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Last update</span><div style="font-family:JetBrains Mono,monospace;color:#dbe5f0;margin-top:3px;font-size:12px;">'+nowStamp()+' (deterministic; engine snapshot does not drift)</div></div>';
+  if(b.note){body+='<div style="border-left:3px solid #fbbf24;padding:8px 11px;background:rgba(245,158,11,.06);color:#fde68a;font-size:12px;line-height:1.5;">'+b.note+'</div>';}
+  body+='</div>';
+  box.innerHTML=hdr+body;
+  ov.appendChild(box);
+  d.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();}});
+  d.getElementById('kbdCloseDh').addEventListener('click',function(){ov.remove();});
+  d.addEventListener('keydown',function esc(e){if(e.key==='Escape'){ov.remove();d.removeEventListener('keydown',esc);}});
+}
+d.addEventListener('click',function(e){
+  var card=e.target.closest('#dh-ops-rollup [data-basis]');
+  if(card){showBasisDrawer(card.getAttribute('data-basis'));}
+});
+d.addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key===' '){
+    var card=e.target.closest('#dh-ops-rollup [data-basis]');
+    if(card){e.preventDefault();showBasisDrawer(card.getAttribute('data-basis'));}
+  }
+});
 })();
 </script>
 </body>
