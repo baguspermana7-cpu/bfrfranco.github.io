@@ -104,6 +104,168 @@
   }
   </script>
 
+  <!-- v1.41.1 — FAQPage JSON-LD (mirrors the in-app FAQ tab so AI assistants can index Q&A) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Maintenance Decode Lab?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An offline-first, browser-side decoder and simulator for field maintenance files. Three modules: Schneider Easergy P3 EPZ relay setting decoder, Schneider Galaxy VL RPT UPS waveform analyzer, and Woodward DTSC-200 ATS transfer-sequence simulator. Files are never uploaded — all decoding happens locally in the browser."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does this replace vendor software?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. This tool is read-only and intended for offline decode, visualization, evidence export, and simulation only. Writing settings back to relay, UPS, ATS, generator, breaker, or PLC equipment remains the responsibility of official vendor software, qualified personnel, and site procedures."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which file formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Easergy P3 EPZ files (EPC header + raw deflate VAMPSET payload), Schneider Galaxy VL RPT exports (embedded zlib-compressed JSON records), and Woodward DTSC-200 setting reports (text/config exports + text-based PDF reports). Binary/proprietary DTSC exports are accepted for inspection only until reverse-mapped against a known-good sample corpus."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate is the DTSC-200 PDF import?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Accurate for text-extractable PDFs and text/config exports, because each field is stored alongside its source line and confidence score. Scanned-image PDFs require OCR before parsing. Binary/proprietary exports remain inspection-only until 2-3 known-good samples plus accompanying screenshots/PDFs are used to build a validated format map."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does the Galaxy VL RPT analyzer detect?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Incident classification across 6 categories: MAINS_TOTAL_LOSS, MAINS_PHASE_LOSS, MAINS_UNDERVOLTAGE, OUTPUT_LOST/DEGRADED, BATTERY_DISCHARGE/LOW/OFFLINE, GND_DISTURBANCE. Also calculates RMS per phase, output regulation vs 230 V, output/current imbalance percent, battery DC-bus symmetry, current crest factor, and renders a power-flow mimic (mains → rectifier → DC bus → inverter → load)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What ATS scenarios can the DTSC-200 simulator run?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Utility-fail-then-return, utility-fail-only, and momentary-dip-restore. Supports open, delayed-neutral, and closed-transition transfer types, with configurable transfer-commit, S1 outage delay, S2 start/stable timers, neutral timer, S1 return-stable delay, transfer delays in both directions, and S2 cooldown. Renders an HMI mimic with single-line diagram, breaker positions, permissives, and active-requirement progress."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my file uploaded anywhere?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Every parser runs as a browser-side ES module. The file is read via the File API into an ArrayBuffer that never leaves your machine. The page makes no XHR/fetch calls with the file contents. This is verifiable: the JS source is unminified and human-readable at /js/maintenance/."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is the platform scalable to new equipment families?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Each equipment type follows a registry contract: detect(file) → vendor/model/format confidence; decode(file) → normalized domain records; visualize(records) → tables/mimic/chart/inspector; simulate(settings) → state machine when applicable; export(records) → Excel sheets + audit notes; validate(fixtures) → repeatable parser checks. New modules (breaker trip units, generator controllers, PLC ladder logic, Modbus captures) plug in by adding a registry entry and implementing the contract."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- v1.41.1 — HowTo JSON-LD for the EPZ decode workflow (helps AI assistants surface step-by-step answers) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to decode a Schneider Easergy P3 EPZ relay setting file offline",
+    "description": "Decode an Easergy P3 EPZ setting file in the browser without opening Schneider eSetup Easergy Pro, with optional before/after diff for engineering risk review.",
+    "totalTime": "PT2M",
+    "tool": [
+      { "@type": "HowToTool", "name": "Modern web browser (Chrome, Firefox, Safari, Edge)" },
+      { "@type": "HowToTool", "name": "Easergy P3 .epz setting file" }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Open the Maintenance Decode Lab",
+        "text": "Open https://resistancezero.com/maintenance-decode-lab.html in any modern browser. The lab loads as a single-page app; no install or signup required."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Switch to the Relay EPZ tab",
+        "text": "Click the Relay EPZ tab in the left navigation. The Easergy P3 EPZ decoder appears with two drop zones (Before / After) and an empty diff counter."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Drop the .epz file into the Before zone",
+        "text": "Drag the baseline .epz file onto the Before EPZ drop zone (or click it and pick the file). The lab decompresses the EPC header + raw deflate payload, parses the VAMPSET groups/parameters, separates settings from runtime/volatile rows, and indexes by category."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Optional — drop the After file to enable diff",
+        "text": "Drop the revised .epz file onto the After EPZ drop zone. The lab computes a parameter-level diff (added, removed, changed) and runs an engineering-risk classifier flagging disabled protections, reduced pickup/delay, and changed communication settings."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Export Excel evidence",
+        "text": "Click Export Excel. The lab writes a multi-sheet XLSX workbook (Summary, Risk Review, Category Summary, Protection Matrix, Diff, Configuration, Groups Index) entirely in-browser using a dependency-light OpenXML writer."
+      }
+    ]
+  }
+  </script>
+
+  <!-- v1.41.1 — SoftwareApplication enhancement schema (featureList, screenshot, requirements) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Maintenance Decode Lab",
+    "applicationCategory": "EngineeringApplication",
+    "applicationSubCategory": "MaintenanceManagement",
+    "operatingSystem": "Browser (Chromium, Firefox, Safari, Edge)",
+    "softwareVersion": "1.41.1",
+    "datePublished": "2026-05-24",
+    "softwareRequirements": "Modern web browser with ES module support and pako/PDF.js loaded from jsDelivr CDN.",
+    "permissions": "No network upload; reads files locally via FileReader API.",
+    "screenshot": "https://resistancezero.com/assets/og/maintenance-decode-lab.webp",
+    "featureList": [
+      "Schneider Easergy P3 EPZ relay setting decoder with VAMPSET parser",
+      "Before/after EPZ diff with engineering risk review and protection matrix",
+      "Schneider Galaxy VL RPT UPS waveform analyzer with incident classification",
+      "Power-flow mimic for Galaxy VL: mains → rectifier → DC bus → inverter → load",
+      "Woodward DTSC-200 ATS transfer-sequence simulator with HMI mimic",
+      "DTSC-200 text/PDF setting-report import with confidence scoring",
+      "XLSX and CSV export for evidence and handover documentation",
+      "Read-only safety boundary — no write-back to equipment",
+      "100% offline browser-side decoding — files never uploaded",
+      "Registry-driven module contract: detect → decode → visualize → simulate → export → validate"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Person",
+      "name": "Bagus Dwi Permana",
+      "url": "https://resistancezero.com/"
+    },
+    "license": "https://resistancezero.com/legal-terms.html"
+  }
+  </script>
+
   <!-- Theme (no FOUC) — default light -->
   <script>
     (function(){

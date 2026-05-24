@@ -11,6 +11,117 @@ release sections rather than semver.
 
 ---
 
+## v1.41.1 — 2026-05-24 (Mode-btn dark-mode fix + SEO hardening + Knowledge Labs de-dupe)
+
+PATCH ship: post-v1.41.0 user reports + comprehensive SEO audit.
+
+### User reports addressed
+
+- **"Indicator pro klw aktif atau yang free nggak keluar"** &mdash; on
+  `FF-2.html` (DC Talent Gap Analyzer), the Free / Pro mode buttons had no
+  visible active state in dark mode. **Root cause**: the dark-mode
+  `[data-theme="dark"] .tgs-mode-btn { ... }` override has the same CSS
+  specificity as the base `.tgs-mode-btn.active` rule. When specificity
+  ties, the later rule wins &mdash; and the dark override appears hundreds
+  of lines after the active rule, **silently killing the active gradient**.
+  This is a recurring class of bug. Audit now ships to prevent recurrence.
+- **"Kok jelek ini cards menunya network vis... LTC lab itu kan sudah ada di
+  bagian cards Engineering Deep-Dive & Standards jadinya double2"** &mdash;
+  Knowledge Labs section had three text-row entries, two of which duplicated
+  the v1.41.0 strat-cards in `#tools-ltc-featured` (LTC Labs + AI
+  Engineering Maintenance). Network Visualization Hub also used the plain
+  text-row style instead of the polished strat-card style.
+
+### Fixed
+
+- **Dark-mode `.mode-btn.active` companion added** &mdash; FF-1.html
+  (Habitat fix series), FF-2.html (Talent Gap Analyzer),
+  geopolitics-3.html. Each page now has
+  `[data-theme="dark"] .<prefix>-mode-btn.active` with the gradient,
+  border, and box-shadow re-applied so the active state is visible.
+- **Knowledge Labs de-duplicated** &mdash; "LTC Labs &mdash; Standards Hub"
+  and "AI Engineering Maintenance" tool-rows removed from
+  `#knowledge-labs` and `.operational-engines` sections in
+  `datacenter-solutions.html`. They live as strat-cards in
+  `#tools-ltc-featured` (added in v1.41.0). No info lost; redundancy
+  eliminated.
+- **Network Visualization Hub upgraded to strat-card** &mdash; was a plain
+  text-row, now a full strat-card with icon, title, subtitle, descriptive
+  body, 4-item feature list, and CTA &mdash; matching LTC Lab + Maintenance
+  Decode Lab card style. Instrument-cyan `#00DDFF` accent.
+- **SEO: 10 ERRORS &rarr; 0** &mdash; `network-compare.html` and
+  `network-visualization-hub.html` were missing Open Graph + Twitter Card
+  meta tags entirely. Both now have og:title, og:description, og:url,
+  og:type, og:image (1200&times;630), og:image:width, og:image:height +
+  twitter:card, twitter:title, twitter:description, twitter:image.
+- **maintenance-decode-lab.html title + description shortened** &mdash;
+  title 90 &rarr; 35 chars, description 188 &rarr; 156 chars (both within
+  Google's display thresholds).
+
+### Added
+
+- **`tools/audit-pro-mode-indicator.py` (NEW)** &mdash; machine-checkable
+  audit for the Pro/Free mode-bar discipline. Detects:
+  - Missing base `.mode-btn` CSS rule when HTML buttons present.
+  - Missing `.mode-btn.active` CSS rule when buttons exist (unless an
+    inline-style JS toggle is detected via `btn.style.background = ...`).
+  - **Missing `[data-theme="dark"] .mode-btn.active` companion** when a
+    `[data-theme="dark"] .mode-btn` base override exists &mdash; the bug
+    that prompted this audit.
+  - HTML markup invariants: ≥2 mode-btn elements, exactly 1 with `active`
+    class at page load.
+
+  Smart enough to skip `html:not([data-theme="dark"])` (light-mode rules)
+  via `:not(...)` stripping, and to skip pages using inline-style JS
+  toggles (capex/opex/cx pattern).
+
+  **Caught 3 pages on first run** (FF-1, FF-2, geopolitics-3) &mdash; all
+  fixed in this ship. Now runs CLEAN. **Will run in CI as a mandatory pre-
+  push gate per `feedback_standards_need_audits.md`.**
+
+- **AI-search JSON-LD on `maintenance-decode-lab.html`**:
+  - **FAQPage** with 8 Q&As mirrored from the in-app FAQ tab so
+    ChatGPT/Claude/Perplexity can quote the answers when users ask about
+    EPZ decoding, RPT analysis, DTSC simulator, scope/safety boundary,
+    file-upload privacy, scalability.
+  - **HowTo** for the EPZ decode workflow (5 steps: open lab, switch tab,
+    drop Before file, optional After diff, export Excel) &mdash; AI
+    assistants surface HowTo answers in step-by-step format.
+  - **SoftwareApplication enhancement** with `featureList` (10 items),
+    `screenshot`, `softwareVersion`, `softwareRequirements`, `permissions`,
+    `applicationSubCategory`, `license` &mdash; richer schema signals than
+    the base WebApplication.
+
+- **`feedback_standards_need_audits.md` memory entry** &mdash; codifies the
+  meta-rule that every standard MUST ship with a machine-checkable auditor.
+
+### Changed
+
+- **`standarization/PRO_MODE_STANDARDIZATION.md`** bumped to v2.2.
+  Documents the dark-mode `.active` companion rule and the meta-rule
+  ("standards without audits drift").
+- **`llms-full.txt` regenerated** &mdash; was missing all
+  maintenance-decode-lab content. Now 73,706 lines / 2.0 MB / 103 pages
+  including the new tool page so AI assistants can quote from it.
+- `js/rz-version.js` &rarr; v1.41.1
+- `sw.js` &rarr; `rz-cache-v1.41.1`
+
+### Audit results post-ship
+
+- `audit-pro-mode-indicator.py --strict` &rarr; **CLEAN (0 errors)**
+- `audit-seo.py` &rarr; **0 required-tag errors** (was 10)
+- `audit-script-tags.py --strict` &rarr; **CLEAN**
+- `audit-js-syntax.py --strict` &rarr; **CLEAN**
+- `audit-mobile-responsive.py --strict` &rarr; **133/133 PASS**
+
+### Deferred to v1.41.2
+
+- **`pillar-fire-safety.html` enhancement** &mdash; user reported the page
+  lacks detail, isn't intuitive, and needs depth. Captured as
+  v1.41.2 plan in next session.
+
+---
+
 ## v1.41.0 — 2026-05-24 (Maintenance Decode Lab — Easergy EPZ / Galaxy VL RPT / Woodward DTSC-200)
 
 MINOR ship: new tool page + 3 cards added to `datacenter-solutions.html` in

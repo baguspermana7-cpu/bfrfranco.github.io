@@ -1,6 +1,6 @@
 # ResistanceZero Pro Enhancement Mode — Standardization Guide
 
-> **Version**: 2.1 | **Last Updated**: 2026-02-23 | **Status**: Active
+> **Version**: 2.2 | **Last Updated**: 2026-05-24 | **Status**: Active
 > **Applies to**: All article pages with interactive calculators (articles 1–27)
 >
 > **See also**: [`CALC_ENGINE_PLAN.md`](./CALC_ENGINE_PLAN.md) &mdash; the login
@@ -8,6 +8,29 @@
 > scheduled for extraction into the shared `calc-engine.js` (Phase 1 of the
 > consolidation roadmap). Future articles should design Pro panels with the
 > shared engine API in mind to minimise migration cost when the engine ships.
+
+---
+
+## ⚠️ v2.2 — Mandatory dark-mode `.active` companion (v1.41.1 lesson)
+
+**Rule**: When a page defines `[data-theme="dark"] .<prefix>-mode-btn { ... }`,
+it MUST also define `[data-theme="dark"] .<prefix>-mode-btn.active { ... }`.
+
+**Why**: The dark-mode base override has the same CSS specificity as the
+`.<prefix>-mode-btn.active` rule (both = `0,2,0`). When specificity ties, the
+LATER rule wins. Dark-mode overrides usually appear hundreds of lines after
+the base `.active` rule, so they **silently kill the active gradient** in
+dark mode — the user sees both Free and Pro buttons looking identical and
+can't tell which mode is on.
+
+**Enforcement**: `tools/audit-pro-mode-indicator.py --strict` runs on every
+push. It detects this pattern and exits non-zero. **CI gate added 2026-05-24
+as part of v1.41.1.**
+
+**Standards meta-rule**: Every standard documented here MUST ship with a
+machine-checkable auditor in `tools/audit-*.py`. Standards without audits
+drift; this section was authored after a user reported the bug *despite the
+PRO_MODE rule existing for 18 months*. Documentation alone is not enough.
 
 ---
 
