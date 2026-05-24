@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v1.41.5 — 2026-05-24 (water-system.html — UV-401 / DOS-302 label overlap + TK-402 dual-pipe + CT-MK rename)
+
+PATCH ship: closes three water-system.html owner complaints in one pass.
+
+### Fixed
+
+- **UV-401 / DOS-302 label overlap** (owner: "ini uv ster dan DOS itu masih
+  saling tumpang tindi"). UV-401 rect previously sat at x=660-760 directly
+  over DOS-302's right edge (x=630-690), so the UV-401 tag at (666, 97) fell
+  inside DOS-302's box. UV-401 rect relocated to x=700-760 (width reduced
+  100→60), tag x=706, labels tightened to fit the narrower box. DOS-302 stays
+  where it is; the two boxes no longer overlap horizontally.
+
+- **TK-402 dual-pipe routing** (owner: "ini juga kok ada 2 piping masuk ke
+  TK-402"). Original treated header → TK-402 path used a Z-shape
+  (`M850 210 H760 V250`) which visually appeared as two separate pipes
+  entering the tank top. Replaced with a straight drop
+  (`M850 210 V250`) so a single clean pipe enters the tank from the tee.
+  Animated flow path (`#f-dom`) updated to match.
+
+- **CT-MK rename to MK-501 Make-up Water System** (owner: "DAN DI CT-MK,
+  KAN TIDAK ADA PAKAI COOLING TOWER. cukup tuliskan aja make up water
+  system"). The DC AI baseline is dry-only (BASELINE-DECISION.md, no
+  evaporative cooling tower); the CT-MK / "Cooling Tower" label was
+  inconsistent with that design.
+  - Tag: `CT-MK` → `MK-501`.
+  - Labels: `Cooling Tower` + `Makeup` → `Make-up Water` + `System`.
+  - Comment "Cooling tower blowdown -> drain" → "Make-up system blowdown
+    / discharge -> drain".
+
+### Engines locked
+
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
+  byte-identical. 57/57 + 22/22 tests pass.
+
+### Changed
+
+- `js/rz-version.js` &rarr; v1.41.5.
+- `sw.js` cache version &rarr; `rz-cache-v1.41.5`.
+
+### Files touched
+
+- `water-system.html` — UV-401 rect + label coords; treated header pipe
+  routing (.pipe + .flow); makeup section tag + labels + comment.
+
+---
+
 ## v1.41.4 — 2026-05-24 (datahall.html — CRAH popover + inline labels + cold-aisle normalisation + excursion simulator)
 
 MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.

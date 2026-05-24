@@ -417,15 +417,15 @@
                 <path class="pipe" d="M540 130 H660"/>
                 <!-- UV -> treated header tee -->
                 <path class="pipe" d="M760 130 H850 V210"/>
-                <!-- Treated header split: -> domestic tank -->
-                <path class="pipe" d="M850 210 H760 V250"/>
+                <!-- Treated header split: -> domestic tank (v1.41.5 — straight down, no Z-routing that visually appeared as 2 pipes) -->
+                <path class="pipe" d="M850 210 V250"/>
                 <!-- Treated header -> cooling makeup -->
                 <path class="pipe" d="M850 210 V300 H980"/>
                 <!-- Domestic tank -> service header -->
                 <path class="pipe" d="M760 360 H700"/>
                 <!-- Filter backwash -> drain -->
                 <path class="pipe" d="M350 180 V250 H260"/>
-                <!-- Cooling tower blowdown -> drain -->
+                <!-- Make-up system blowdown / discharge -> drain (v1.41.5) -->
                 <path class="pipe" d="M1075 360 V410 H40"/>
 
                 <!-- ===== Animated flow (medium-coloured) ===== -->
@@ -434,7 +434,7 @@
                 <path class="flow water" id="f-filt"   d="M400 130 H470"/>
                 <path class="flow treated" id="f-pump" d="M540 130 H660"/>
                 <path class="flow treated" id="f-uv"   d="M760 130 H850 V210"/>
-                <path class="flow treated" id="f-dom"  d="M850 210 H760 V250"/>
+                <path class="flow treated" id="f-dom"  d="M850 210 V250"/>
                 <path class="flow treated" id="f-mk"   d="M850 210 V300 H980"/>
                 <path class="flow treated" id="f-svc"  d="M760 360 H700"/>
                 <path class="flow drain stopped" id="f-bw" d="M350 180 V250 H260"/>
@@ -508,12 +508,12 @@
                     <text class="val" id="m-cl2-res" x="636" y="158">0.6 ppm</text>
                 </g>
 
-                <!-- UV steriliser -->
+                <!-- UV steriliser (v1.41.5 — relocated past DOS-302 rect to fix label overlap) -->
                 <g class="eq-grp" data-eq="uv">
-                    <rect class="eq" x="660" y="105" width="100" height="50" rx="6"/>
-                    <text class="tag" x="666" y="97">UV-401</text>
-                    <text class="lbl" x="666" y="128">UV Steriliser</text>
-                    <text class="val ok" id="m-uv" x="666" y="146">99.8% INT</text>
+                    <rect class="eq" x="700" y="105" width="60" height="50" rx="6"/>
+                    <text class="tag" x="706" y="97">UV-401</text>
+                    <text class="lbl" x="706" y="125">UV Steril.</text>
+                    <text class="val ok" id="m-uv" x="706" y="146">99.8%</text>
                 </g>
 
                 <!-- Treated / domestic tank -->
@@ -526,12 +526,12 @@
                     <text class="val" id="m-dom-vol" x="776" y="340">26.4 m&sup3;</text>
                 </g>
 
-                <!-- Cooling makeup point (link to chiller plant) -->
+                <!-- Make-up Water System (v1.41.5 — renamed from "Cooling Tower" per dry-only design; no evaporative tower in this baseline) -->
                 <g class="eq-grp" data-eq="makeup">
                     <rect class="eq" x="980" y="270" width="120" height="90" rx="3"/>
-                    <text class="tag" x="986" y="262">CT-MK</text>
-                    <text class="lbl" x="986" y="295">Cooling Tower</text>
-                    <text class="lbl" x="986" y="311">Makeup</text>
+                    <text class="tag" x="986" y="262">MK-501</text>
+                    <text class="lbl" x="986" y="295">Make-up Water</text>
+                    <text class="lbl" x="986" y="311">System</text>
                     <text class="val treated" id="m-mk" x="986" y="331">37.0 L/min</text>
                     <text class="val" id="m-mk-bd" x="986" y="349">BD 9.2 L/min</text>
                 </g>
