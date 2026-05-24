@@ -325,7 +325,13 @@ window.RZ_FEATURE_FLAGS = {
   },
 
   /* ── Network Visualization Hub topics (Phase 0+; public tier) ── */
+  'network-visualization-hub': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
   'network-modbus-rtu': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-modbus-tcp': {
     'page-access':             { free: true,  demo: true,  pro: true, root: true  }
   }
 

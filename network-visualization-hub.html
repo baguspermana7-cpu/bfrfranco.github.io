@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Visualization Hub · ResistanceZero</title>
+<meta name="description" content="25 animated, parameter-driven labs for industrial + IT communication protocols. Modbus · BACnet · OPC-UA · TLS · OAuth · gRPC · MCP. Oscilloscope-grade industrial register.">
+<meta name="theme-color" content="#0F172A">
+<link rel="canonical" href="https://resistancezero.com/network-visualization-hub.html">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="styles.min.css?v=20260524">
+<style>
+  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --wire:#475569; --canvas-bg:#0F172A; }
+  .nh-hero { padding:3rem 1.5rem 1rem; max-width:1100px; margin:0 auto; }
+  .nh-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.8rem,3.5vw,2.4rem); margin:0 0 0.6rem; letter-spacing:-0.01em; }
+  .nh-hero p.lede { font-size:1.05rem; max-width:760px; }
+  .nh-meta { display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:1rem; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem; color:var(--wire); }
+  .nh-meta b { color:var(--cyan); font-weight:600; }
+  .nh-section { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+  .nh-lane { margin-top:2rem; border-top:0.8px solid rgba(0,221,255,0.18); padding-top:1rem; }
+  .nh-lane h2 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.1rem; margin:0 0 0.4rem; display:flex; align-items:baseline; gap:0.6rem; }
+  .nh-lane h2 .lane-tag { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.7rem; color:var(--cyan); letter-spacing:0.06em; text-transform:uppercase; padding:0.15rem 0.5rem; border:0.8px solid var(--cyan); border-radius:2px; }
+  .nh-lane .lane-desc { color:var(--wire); margin:0.3rem 0 0.8rem; font-size:0.92rem; }
+  .nh-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0.7rem; }
+  .nh-card { display:block; padding:0.9rem 1rem; border:1px solid var(--wire); border-radius:4px; text-decoration:none; color:inherit; transition:border-color 120ms ease; }
+  .nh-card:hover, .nh-card:focus-visible { border-color:var(--cyan); outline:2px solid var(--amber); outline-offset:2px; }
+  .nh-card .nh-card-title { display:flex; align-items:center; gap:0.5rem; font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:0.98rem; font-weight:600; margin-bottom:0.2rem; }
+  .nh-card .nh-card-desc { font-size:0.82rem; color:var(--wire); line-height:1.4; }
+  .nh-card .nh-status { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.65rem; letter-spacing:0.06em; padding:0.1rem 0.4rem; border-radius:2px; text-transform:uppercase; }
+  .nh-status.live { color:var(--green); border:0.8px solid var(--green); }
+  .nh-status.phase1 { color:var(--cyan); border:0.8px solid var(--cyan); }
+  .nh-status.coming { color:var(--wire); border:0.8px solid var(--wire); }
+  .nh-card.disabled { pointer-events:none; opacity:0.55; }
+  .nh-compare-cta { margin-top:2rem; padding:1.2rem 1.5rem; border:0.8px solid var(--cyan); border-radius:4px; background:rgba(0,221,255,0.04); text-align:center; }
+  .nh-compare-cta h3 { margin:0 0 0.5rem; font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.05rem; color:var(--cyan); }
+  .nh-compare-cta p { margin:0; color:var(--wire); font-size:0.88rem; }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="logo" aria-label="ResistanceZero home">ResistanceZero</a>
+    <nav class="nav-right" aria-label="primary">
+      <a href="datacenter-solutions.html#knowledge-labs">Knowledge Labs</a>
+      <a href="tools.html">Tools</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="nh-hero">
+    <h1>Network Visualization Hub</h1>
+    <p class="lede">25 animated, parameter-driven labs for industrial &amp; IT communication protocols &mdash; from Modbus RTU on RS-485 to MCP tool-calls between AI agents. Oscilloscope-grade industrial register; not consumer techno music video.</p>
+    <div class="nh-meta">
+      <span><b>FREE</b> public-tier</span>
+      <span><b>5 lanes</b> · 25 topics</span>
+      <span><b>CompTIA</b> Net+ N10-009 + Sec+ SY0-701 aligned</span>
+      <span><b>Canvas 2D + Web Audio</b> · zero framework</span>
+    </div>
+  </section>
+
+  <section class="nh-section">
+
+    <!-- Lane B — Industrial OT (Phase 0/1 live) -->
+    <div class="nh-lane">
+      <h2>Industrial OT <span class="lane-tag">Lane B · 9 topics</span></h2>
+      <p class="lane-desc">Field protocols that move bytes between PLCs, RTUs, BMS controllers, chillers, and sensors. The protocols that run your building when nobody's looking.</p>
+      <div class="nh-grid">
+
+        <a class="nh-card" href="network/industrial-ot/modbus-rtu.html">
+          <div class="nh-card-title">Modbus RTU <span class="nh-status live">LIVE</span></div>
+          <div class="nh-card-desc">Serial master/slave over RS-485 · square-sweep 1200→1600 Hz · square chips on thin wire · 1979</div>
+        </a>
+
+        <a class="nh-card" href="network/industrial-ot/modbus-tcp.html">
+          <div class="nh-card-title">Modbus TCP <span class="nh-status live">LIVE</span></div>
+          <div class="nh-card-desc">MBAP-header byte exchange over Ethernet · sine 1.3 kHz · rect chips · MBAP overhead visibly larger</div>
+        </a>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">BACnet MS/TP <span class="nh-status phase1">PHASE 1</span></div>
+          <div class="nh-card-desc">Building automation over RS-485 · rounded sine · hex chips on bus-trunk</div>
+        </span>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">BACnet/IP <span class="nh-status phase1">PHASE 1</span></div>
+          <div class="nh-card-desc">BACnet over UDP/IP · triangle waveform · hex chips · BVLC tunnel scan-line</div>
+        </span>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">OPC-UA <span class="nh-status phase1">PHASE 1</span></div>
+          <div class="nh-card-desc">Industrial PLC structured binary · sine-sweep · layered chips · broker-diamond + sensor + server nodes</div>
+        </span>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">DNP3 <span class="nh-status coming">PHASE 2</span></div>
+          <div class="nh-card-desc">Telemetry SCADA · sine-sweep 600→900 Hz · unsolicited responses</div>
+        </span>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">PROFINET <span class="nh-status coming">PHASE 2</span></div>
+          <div class="nh-card-desc">Real-time industrial Ethernet · sync line shows cyclic timing</div>
+        </span>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">EtherNet/IP <span class="nh-status coming">PHASE 2</span></div>
+          <div class="nh-card-desc">CIP over Ethernet · sawtooth · marker-stripe chip head</div>
+        </span>
+
+        <span class="nh-card disabled">
+          <div class="nh-card-title">EtherCAT <span class="nh-status coming">PHASE 2</span></div>
+          <div class="nh-card-desc">Distributed clocks, telegram passes through nodes on-the-fly</div>
+        </span>
+
+      </div>
+    </div>
+
+    <!-- Lane A — Foundations -->
+    <div class="nh-lane">
+      <h2>Foundations <span class="lane-tag">Lane A · 5 topics</span></h2>
+      <p class="lane-desc">The conceptual scaffolding every networking engineer needs but most CompTIA courses gloss past.</p>
+      <div class="nh-grid">
+        <span class="nh-card disabled"><div class="nh-card-title">OSI / TCP-IP models <span class="nh-status coming">PHASE 3</span></div><div class="nh-card-desc">Byte ascends layer-stack visually · didactic 0.7× tempo</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">IPv4 vs IPv6 <span class="nh-status coming">PHASE 3</span></div><div class="nh-card-desc">Sequential dual-stage tones · 32-bit chip vs 128-bit chip side-by-side</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">Subnetting / CIDR <span class="nh-status coming">PHASE 3</span></div><div class="nh-card-desc">Subnet boundary line visualises CIDR prefix on wire</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">TCP handshake <span class="nh-status coming">PHASE 3</span></div><div class="nh-card-desc">SYN / SYN-ACK / ACK render as 3 distinct chip shapes</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">DHCP / DNS <span class="nh-status coming">PHASE 3</span></div><div class="nh-card-desc">DORA 4-stage monotonic ascending pitch · envelope chip · broadcast fan node</div></span>
+      </div>
+    </div>
+
+    <!-- Lane C — DC Management -->
+    <div class="nh-lane">
+      <h2>DC Management <span class="lane-tag">Lane C · 3 topics</span></h2>
+      <p class="lane-desc">Operator-side monitoring, telemetry, and management plane protocols.</p>
+      <div class="nh-grid">
+        <span class="nh-card disabled"><div class="nh-card-title">SNMP <span class="nh-status coming">PHASE 6</span></div><div class="nh-card-desc">Polled monitoring · cadence visible as metronome on wire</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">IPMI / Redfish <span class="nh-status coming">PHASE 6</span></div><div class="nh-card-desc">Out-of-band management · sideband-dashed wire style</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">syslog <span class="nh-status coming">PHASE 6</span></div><div class="nh-card-desc">Append-only stream · long-rect chip · click-train SFX</div></span>
+      </div>
+    </div>
+
+    <!-- Lane D — Security -->
+    <div class="nh-lane">
+      <h2>Security <span class="lane-tag">Lane D · 4 topics</span></h2>
+      <p class="lane-desc">Cryptographic ceremonies and secure transport. The handshakes that wrap modern traffic.</p>
+      <div class="nh-grid">
+        <span class="nh-card disabled"><div class="nh-card-title">TLS handshake <span class="nh-status coming">PHASE 4</span></div><div class="nh-card-desc">4-stage frequency sweep · scan-line shroud builds progressively · client/server/CA</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">OAuth 2.0 / JWT <span class="nh-status coming">PHASE 4</span></div><div class="nh-card-desc">4-actor dance · amber→cyan flow-stage tint on token issuance</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">mTLS <span class="nh-status coming">PHASE 4</span></div><div class="nh-card-desc">Bilateral TLS · handshake echoes both ways · both nodes cert-badged</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">WireGuard <span class="nh-status coming">PHASE 4</span></div><div class="nh-card-desc">Minimalist crypto · no separate handshake (pre-keyed peers) · mesh tunnel</div></span>
+      </div>
+    </div>
+
+    <!-- Lane E — APIs + Agents -->
+    <div class="nh-lane">
+      <h2>APIs + Agents <span class="lane-tag">Lane E · 4 topics</span></h2>
+      <p class="lane-desc">HTTP-family protocols and the new AI-agent transports.</p>
+      <div class="nh-grid">
+        <span class="nh-card disabled"><div class="nh-card-title">REST API <span class="nh-status coming">PHASE 5</span></div><div class="nh-card-desc">Envelope chip · header + body distinction · gap visible between request and response</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">GraphQL <span class="nh-status coming">PHASE 5</span></div><div class="nh-card-desc">One outbound long-rect query · multiple inbound chips (capped 3 shape classes)</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">gRPC <span class="nh-status coming">PHASE 5</span></div><div class="nh-card-desc">HTTP/2 multiplex · 4-lane wire · simultaneous stream chips</div></span>
+        <span class="nh-card disabled"><div class="nh-card-title">MCP tool-call <span class="nh-status coming">PHASE 5</span></div><div class="nh-card-desc">3-actor RPC over MCP transport · mesh-tunnel wire · industrial register held</div></span>
+      </div>
+    </div>
+
+    <div class="nh-compare-cta">
+      <h3>Compare mode <span class="nh-status coming" style="margin-left:0.5rem;">PHASE 0+</span></h3>
+      <p>4-panel side-by-side comparison with synced timeline scrubber and Appendix-B instrument-chip-strip diff overlay &mdash; ships when ≥3 topics are live in any lane.</p>
+    </div>
+
+  </section>
+
+  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);text-align:center;">
+    <span id="versionStamp">· ResistanceZero · v?.?.? ·</span><br>
+    <span style="margin-top:0.4rem;display:inline-block;">Plan: <a href="docs/plans/2026-05-24-network-visualization-hub-v2.md" style="color:var(--cyan);">v2.3</a> &middot; Standard: <a href="standarization/KNOWLEDGE_LABS_STANDARD.md" style="color:var(--cyan);">KNOWLEDGE_LABS_STANDARD.md</a></span>
+  </footer>
+
+</main>
+
+<script src="js/rz-version.js?v=20260524"></script>
+<script>
+(function () {
+  var el = document.getElementById('versionStamp');
+  if (!el) return;
+  var v = window.RZ_VERSION || '1.x.x';
+  el.textContent = '· ResistanceZero · v' + v + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·';
+})();
+</script>
+
+</body>
+</html>

@@ -11,6 +11,74 @@ release sections rather than semver.
 
 ---
 
+## v1.35.0 — 2026-05-24 (Network Hub — Modbus TCP topic + hub landing page; anti-monotony gate proven at scale)
+
+MINOR ship: second live topic + landing page. The anti-monotony audit now
+runs across 2 Lane B topics (Modbus RTU + Modbus TCP) and passes — 0
+shared timbre fields. Hub landing organises all 25 topics across 5 lanes
+with status badges (LIVE / PHASE 1 / PHASE 2-6).
+
+### Added
+
+- **`network/industrial-ot/modbus-tcp.html`** — live Phase-1 topic page.
+  - MBAP-header byte exchange over Ethernet
+  - 4 parameter controls (link speed select + TCP RTT + payload + line noise)
+  - Distinctive trait: MBAP header chip rendered at 16×8 vs payload chip at 12×6 (overhead made visible)
+  - 4 engineering-pitfall accordions (transaction ID reuse, port 502 firewall, keepalive mismatch, unit ID gateway routing)
+  - 4 primary citations (Modbus Org TCP/IP Implementation Guide V1.0b, RFC 793, IANA, Net+ N10-009)
+- **`js/network-anim/topics/modbus-tcp.js`** (~220 lines) — Strategy-A
+  deterministic frame logic. Distinctive timbre per Appendix E row 2:
+  - waveform: **sine** (vs RTU's square-sweep)
+  - chip: **rect 12×6** (vs RTU's square 8×8)
+  - wire: **ethernet 1.0 px** (vs RTU's serial-thin 0.7 px)
+  - master: **server-rack** (vs RTU's plc-rectangle)
+  - tempo: **1.5× fast** (vs RTU's 1.0× medium)
+  - **0 shared fields with Modbus RTU** &mdash; anti-monotony gate passes by wide margin
+- **`network-visualization-hub.html`** &mdash; hub landing page covering all
+  25 topics across 5 lanes (Industrial OT 9 + Foundations 5 + DC Management 3
+  + Security 4 + APIs+Agents 4). Status badges per card:
+  **LIVE** (Modbus RTU + Modbus TCP) / **PHASE 1** (BACnet MS/TP, BACnet/IP,
+  OPC-UA) / **PHASE 2-6** (remaining 18 topics). Compare-mode CTA placeholder
+  &mdash; ships when ≥3 topics live in any lane.
+- **`js/rz-feature-flags.js`** &mdash; entries for `network-visualization-hub`
+  + `network-modbus-tcp` (public-tier).
+- **`sitemap.xml`** + **`llms.txt`** &mdash; entries for hub landing +
+  Modbus TCP topic page.
+
+### Changed
+
+- `datacenter-solutions.html` Knowledge Labs section &mdash; Network Hub
+  card now links to the hub landing (was: direct to Modbus RTU page).
+  Description updated to reflect 2 live topics.
+
+### Status
+
+`tools/audit-network-anim.py` &mdash; CLEAN, **2 topics audited, 0 findings**.
+Anti-monotony gate verified at pairwise-within-lane: Modbus RTU vs Modbus
+TCP share 0 fields among (waveform, chip shape, wire style, master icon,
+tempo-bin). Future Lane B topics must hit the same bar.
+
+`tools/audit-script-tags.py --strict` &mdash; CLEAN (152 files).
+`tools/audit-js-syntax.py --strict` &mdash; CLEAN (105 files).
+
+### Next Phase 1 work
+
+- BACnet/IP topic (planned: triangle waveform, hex chip, ethernet wire,
+  controller-square master, medium tempo, BVLC scan-line shroud trait)
+- OPC-UA topic (planned: sine-sweep waveform, layered chip, ethernet wire,
+  broker-diamond master, medium tempo, security-shroud progressive)
+- `network-compare.html` scaffold (unlocks once 3 Lane B topics are live)
+- Determinism test harness
+- OG images at `assets/og/network-{hub,modbus-rtu,modbus-tcp}.webp`
+- Post-draft folders per POST_DRAFT_STANDARD
+
+### Changed
+
+- `js/rz-version.js` &mdash; v1.35.0 (MINOR; second live Hub topic + landing)
+- `sw.js` &mdash; cache `rz-cache-v1.35.0`
+
+---
+
 ## v1.34.0 — 2026-05-24 (Network Visualization Hub — first live topic page: Modbus RTU + Knowledge Labs section)
 
 MINOR ship: first user-facing page lands on the Network Hub. Modbus RTU
