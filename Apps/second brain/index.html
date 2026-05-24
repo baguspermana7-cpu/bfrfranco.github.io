@@ -676,7 +676,7 @@ const RAW=[
 
   /* ─ REPORTS ─ */
   {id:'asean',  label:'ASEAN DC Report 2026',group:'reports',url:'asean-dc-report-2026.html',          desc:'SEA DC market: SG 850MW, ID 350MW, MY/TH expansion. CBRE 2025.',tags:['asean','market'],path:'rz-work/asean-dc-report-2026.html'},
-  {id:'dhall',  label:'DataHall AI',          group:'reports',url:'datahallAI.html',                   desc:'AI-ready DC platform overview. NVLink 1800 GB/s, 3 tiers.',tags:['ai','gpu'],path:'rz-work/datahallAI.html'},
+  {id:'dhall',  label:'DataHall AI',          group:'reports',url:'datahallAI.html',                   desc:'AI cockpit. v1.41.x: chillers relocated GF (water-cooled + dry-cooler hybrid), STP modal with full reuse-to-irrigation flow, MMR/TELECOM room, water-quality Tech Spec §5.11-5.17. Engine-locked.',tags:['ai','gpu','cockpit'],path:'rz-work/datahallAI.html'},
   {id:'ipue',   label:'PUE Infographic',      group:'reports',url:'infographic-pue-global.html',       desc:'Global PUE forecast 1.40→1.55 across 12 locations. IRENA 2024.',tags:['pue','forecast'],path:'rz-work/infographic-pue-global.html'},
   {id:'isust',  label:'DC Sustainability',    group:'reports',url:'infographic-dc-sustainability.html',desc:'DC power 350→620 TWh, AWS 100% renewable. IEA 2025.',tags:['sustainability'],path:'rz-work/infographic-dc-sustainability.html'},
   {id:'icost',  label:'DC Cost Breakdown',    group:'reports',url:'infographic-dc-cost-breakdown.html',desc:'Cost breakdown: Tier IV 2(N+1), AI rack 40-132kW.',tags:['cost','tier'],path:'rz-work/infographic-dc-cost-breakdown.html'},
@@ -719,7 +719,12 @@ const RAW=[
   {id:'sch',   label:'Chiller Plant',      group:'standards',url:'chiller-plant.html',              desc:'Chiller plant SCADA and cooling overview.',tags:['chiller','scada'],path:'rz-work/chiller-plant.html'},
   {id:'sfr',   label:'Fire System',        group:'standards',url:'fire-system.html',                desc:'DC fire suppression system documentation.',tags:['fire'],path:'rz-work/fire-system.html'},
   {id:'sfu',   label:'Fuel System',        group:'standards',url:'fuel-system.html',                desc:'Generator fuel management and day tank system.',tags:['fuel'],path:'rz-work/fuel-system.html'},
-  {id:'swt',   label:'Water System',       group:'standards',url:'water-system.html',               desc:'Cooling water treatment and distribution.',tags:['water'],path:'rz-work/water-system.html'},
+  {id:'swt',   label:'Water System',       group:'standards',url:'water-system.html',               desc:'Water treatment + distribution. v1.41.5: MK-501 retag (was CT-MK Cooling Tower), TK-402 dual-pipe routing fixed, UV-401/DOS-302 label overlap fixed.',tags:['water','p-and-id'],path:'rz-work/water-system.html'},
+  /* v1.41.x — Cockpit family additions (DC Conv operations dashboards) */
+  {id:'s-dh',  label:'DC Conv Datahall Ops',group:'standards',url:'datahall.html',                   desc:'DC Conv data hall SCADA. v1.41.4: CRAH popover (no main-screen disable), inline rack ID+per-mode values, cold-aisle normalised to 22°C, excursion simulator 10-15s every 2min.',tags:['datahall','crah','scada'],path:'rz-work/datahall.html'},
+  {id:'s-ict', label:'ICT Network Console', group:'standards',url:'ict.html',                        desc:'DC Conv ICT network ops console. v1.41.6: Security HMI widgets (CCTV 16-cell mosaic + Access Doors list + Intrusion donut), SEGMENTS.sec data 4→8/4→8/3→9.',tags:['ict','cctv','security','hmi'],path:'rz-work/ict.html'},
+  {id:'s-epms',label:'EPMS Telemetry',      group:'standards',url:'EPMS_Telemetry.html',             desc:'EPMS one-line + telemetry cockpit. Conv-engine bound.',tags:['epms','electrical'],path:'rz-work/EPMS_Telemetry.html'},
+  {id:'aiod',  label:'All-In-One Dashboard',group:'standards',url:'all-in-one-dashboard.html',       desc:'v1.41.0: Self-hosted Glance dashboard showcase. 8 module catalogue (RSS/weather/stocks/calendar/news/monitoring/youtube/custom), Docker quickstart, sample YAML, alternative-tools comparison.',tags:['dashboard','glance','self-hosted'],path:'rz-work/all-in-one-dashboard.html'},
   /* LTC lab series */
   {id:'ltc1',  label:'LTC: TIA Topology',  group:'standards',url:'ltc-ansi-tia-topology-readiness.html', desc:'ANSI/TIA topology readiness assessment lab.',tags:['ltc','tia'],path:'rz-work/ltc-ansi-tia-topology-readiness.html'},
   {id:'ltc2',  label:'LTC: ASHRAE Thermal',group:'standards',url:'ltc-ashrae-thermal-control.html',      desc:'ASHRAE thermal control lab module.',tags:['ltc','ashrae'],path:'rz-work/ltc-ashrae-thermal-control.html'},
@@ -795,6 +800,13 @@ const E=[
   /* apps */
   ['asb','afin'],['asb','dcmoc'],['dcmoc','dash'],['ademo','adca'],
   ['dcsol','sdcv'],['dcsol','sch'],['dcsol','sfr'],['dcsol','sfu'],['dcsol','swt'],
+  /* v1.41.x cockpit family wiring */
+  ['sdcv','s-dh'],['sdcv','s-ict'],['sdcv','s-epms'],['sdcv','sch'],['sdcv','swt'],['sdcv','sfr'],['sdcv','sfu'],
+  ['s-dh','sch'],['s-dh','swt'],['s-dh','s-epms'],
+  ['s-ict','s-dh'],['s-ict','s-epms'],
+  ['dhall','swt'],['dhall','sch'],['dhall','sdcv'],
+  ['geo','aiod'],['idx','aiod'],['aiod','dash'],
+  ['mdh','dhall'],['mch','sch'],
   ['stia','stier'],['sltc','sltcr'],
   /* LTC labs → hub */
   ['sltc','ltc1'],['sltc','ltc2'],['sltc','ltc3'],['sltc','ltc4'],['sltc','ltc5'],
