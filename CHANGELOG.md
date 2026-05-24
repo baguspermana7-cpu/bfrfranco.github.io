@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v1.37.0 — 2026-05-24 (Network Hub — determinism harness + post-draft folders + CONTENT_LINKAGE §2.5)
+
+MINOR ship: completes the v2.3 Phase 0 DoD inner loop. Anti-monotony +
+determinism + post-draft + content-linkage all operational.
+
+### Added
+
+- `tools/test-network-anim-determinism.py` (~210 lines) — Strategy-A
+  determinism harness with Node + static modes. **12 / 12 PASS** across
+  4 topics.
+- `Article/Post Draft/Network Hub/` + 4 topic folders (Modbus RTU /
+  Modbus TCP / BACnet IP / OPC-UA), each with linkedin + x-post-1 +
+  mastodon-1. 15 post-draft files total per POST_DRAFT_STANDARD.
+- `standarization/CONTENT_LINKAGE_PLAYBOOK.md` §2.5 — Knowledge Labs
+  topic page deliverable checklist.
+
+### Status
+
+- audit-network-anim.py CLEAN (4 topics, 0 findings)
+- test-network-anim-determinism.py --static 12/12 PASS
+- audit-script-tags --strict CLEAN
+- audit-js-syntax --strict CLEAN
+
+### Deferred to next session
+
+- OG images for network pages (tool doesn't scan subdirectories)
+- Live screen-reader walkthrough validation
+- Phase 2 Lane B (DNP3, PROFINET, EtherNet/IP, EtherCAT, BACnet MS/TP)
+- Spares Readiness post-draft refresh
+
+### Changed
+
+- js/rz-version.js → 1.37.0
+- sw.js → rz-cache-v1.37.0
+
+---
+
 ## v1.36.0 — 2026-05-24 (Network Hub — Lane B complete: +BACnet/IP +OPC-UA +Compare scaffold)
 
 MINOR ship: Lane B (Industrial OT) Phase 1 complete with 4 live topics

@@ -41,6 +41,23 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | `standarization/UI_FEATURES_STANDARD.md` | Document the new pattern. |
 | Post Draft folder | 5 platform MDs. |
 
+## 2.5 NEW KNOWLEDGE LABS topic page (Network Hub / standards lab / concept page)
+
+> Added v1.36.x — per `KNOWLEDGE_LABS_STANDARD.md` (2026-05-24) and
+> `POST_DRAFT_STANDARD.md` (2026-05-24).
+
+| Touch | Update |
+|---|---|
+| `datacenter-solutions.html` Knowledge Labs section | Add or update the card. |
+| `network-visualization-hub.html` (for Network Hub topics) | Flip the card status from `PHASE X` → `LIVE`. |
+| `js/network-anim/topics/<slug>.js` (Network Hub only) | Topic module with `_timbre` per Appendix E. |
+| `js/network-anim/topics/<slug>.js` audit | `python3 tools/audit-network-anim.py --strict` MUST pass (palette / banned-CSS / timbre fields / variation budget / pairwise-within-lane anti-monotony). |
+| `tools/test-network-anim-determinism.py` | Must pass for Network Hub topics (`seek(N) ≡ reset() + seek(N)`). |
+| `js/rz-feature-flags.js` | `network-<slug>` `page-access` entry (public-tier default). |
+| `sitemap.xml`, `llms.txt` | Manual entry (sitemap builder doesn't scan subdirectories yet). |
+| OG image | `python3 tools/build-og-images.py --apply` (use `--force` for regeneration). |
+| `Article/Post Draft/<Topic Name>/` | At minimum: `linkedin.md`, `x-post-1.md`, `mastodon-1.md`. |
+
 ## 3. EVERY shipped change (always — no exceptions)
 
 1. `js/rz-version.js` — bump semver **and** `RZ_VERSION_DATE` (today's date).
