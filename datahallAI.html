@@ -1182,10 +1182,10 @@ var FH=6; // floor slab height
 var GAP=18; // gap between floors
 var Z_GF=0, Z_F2=FH+GAP, Z_F3=(FH+GAP)*2, Z_RF=(FH+GAP)*3;
 var floors=[
-{z:Z_GF,label:'GROUND FLOOR',sub:'MEP · Infrastructure · Support',color:'#f59e0b',key:'gf'},
+{z:Z_GF,label:'GROUND FLOOR',sub:'MEP · Chillers · Generators · WTP',color:'#f59e0b',key:'gf'},
 {z:Z_F2,label:'FLOOR 2',sub:'Datahall 1 + Datahall 2',color:'#22c55e',key:'f2'},
 {z:Z_F3,label:'FLOOR 3',sub:'Datahall 3 + Datahall 4',color:'#22c55e',key:'f3'},
-{z:Z_RF,label:'ROOF',sub:'Mechanical · Chillers · AHU',color:'#06b6d4',key:'roof'}
+{z:Z_RF,label:'ROOF',sub:'Heat Rejection · Dry Coolers · AHU',color:'#06b6d4',key:'roof'}
 ];
 
 function renderOverview(){
@@ -1650,7 +1650,7 @@ s+='<defs><pattern id="gfGrid" width="'+M+'" height="'+M+'" patternUnits="userSp
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+BW+'" height="'+BH+'" fill="url(#gfGrid)"/>';
 
 // Title
-s+=tx(MX+BW/2,-72,'GROUND FLOOR PLAN \u2014 MEP & INFRASTRUCTURE','var(--t1)',11,'middle',1);
+s+=tx(MX+BW/2,-72,'GROUND FLOOR PLAN \u2014 MEP, CHILLER PLANT & INFRASTRUCTURE','var(--t1)',11,'middle',1);
 s+=tx(MX+BW/2,-56,'Engineering-Based Symmetric A/B Power Path Layout','var(--t3)',7,'middle');
 
 // Building outline
@@ -1801,14 +1801,19 @@ s+=eq(36,28,4,3,'rgba(59,130,246,.1)','Prayer',4,'Prayer/Quiet Room: 4\u00D73m, 
 s+=eq(31,32,4,3,'rgba(148,163,184,.1)','Lockers',4,'Locker Area: 20 personal lockers, changing bench, mirror');
 s+=eq(36,32,4,3,'rgba(239,68,68,.1)','First Aid',3.5,'First Aid Station: AED, burn kit, eye wash, stretcher, emergency shower');
 
-// Workshop/Storage B (East)
-s+=rm(42,26,24,10,'rgba(148,163,184,.1)','rgba(148,163,184,.4)','Workshop B / Staging','24m\u00D710m','Staging + Heavy Equip','Workshop/Storage B: Equipment staging area, heavy maintenance, forklift access');
-s+=eq(43,28,4,3,'rgba(148,163,184,.12)','Staging',4,'Staging Area: 4\u00D73m clear space, 5T floor load, forklift accessible, equipment commissioning');
-s+=eq(48,28,4,3,'rgba(148,163,184,.12)','Welding',4,'Welding Bay: Partitioned, extraction fan, MIG/TIG welder, bench grinder, fire blanket');
-s+=eq(54,28,4,3,'rgba(148,163,184,.12)','H-Shelf',4,'Heavy Shelving: 3000\u00D7800\u00D72500mm, 1000kg/shelf, generator parts, chiller components');
-s+=eq(60,28,4,3,'rgba(148,163,184,.12)','Crane',4,'Overhead Hoist: 2T SWL, 6m span, electric chain, for compressor/pump handling');
-s+=eq(43,32,10,3,'rgba(148,163,184,.1)','Pipe/Cable Laydown',3.5,'Pipe & Cable Laydown: 10\u00D73m clear area, pipe racks, cable drums, conduit storage');
-s+=eq(54,32,10,3,'rgba(148,163,184,.1)','Equip Staging',3.5,'Equipment Staging: 10\u00D73m, incoming inspection, packaging disposal, asset tagging');
+// Chiller Plant Hall (East) \u2014 8\u00D7 water-cooled centrifugal chillers + CW risers up to roof manifold
+s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m','8\u00D7 Carrier 19XR 4MW','Chiller Plant Hall: 8\u00D7 Carrier 19XR water-cooled centrifugal chillers, 4MW each, COP 6.8, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running');
+// 8 chillers in 2 rows of 4 (compact footprint 2.8m \u00D7 4m each \u2014 actual 19XR Frame 70-74 has 5x2.5m footprint, packed)
+for(var chx=0;chx<4;chx++){
+s+=eqLive(43+chx*5.5,27,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chx+1),4.2,'running','Chiller CH-'+(chx+1)+': Carrier 19XR water-cooled centrifugal, 4MW @ COP 6.8, R-1234ze(E), mag bearing, oil-free. Evap LWT 12\u00B0C, CW Out 38\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
+}
+for(var chy=0;chy<3;chy++){
+s+=eqLive(43+chy*5.5,31.5,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chy+5),4.2,'running','Chiller CH-'+(chy+5)+': Carrier 19XR water-cooled centrifugal, 4MW @ COP 6.8, R-1234ze(E), mag bearing, oil-free. Evap LWT 12\u00B0C, CW Out 38\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
+}
+// CH-8 standby (N+1)
+s+=eqLive(43+3*5.5,31.5,4.5,3.5,'rgba(6,182,212,.12)','CH-8 STB',4,'standby','Chiller CH-8 (N+1 standby): Carrier 19XR water-cooled centrifugal, 4MW reserve. Status: STANDBY. \u2192 Cooling Tab');
+// CW supply + return risers indicator (rising to roof)
+s+='<text x="'+(MX+54*M)+'" y="'+(MY+35.7*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle" opacity=".75">\u2191 CW Supply/Return Risers to Roof Dry-Cooler Array (DN500, 30% PG)</text>';
 
 // Stairwell B
 s+=stair(66,26,6,10);
@@ -2174,25 +2179,30 @@ s+='<rect width="960" height="620" fill="var(--bg2)"/>';
 s+='<defs><pattern id="rfGrid" width="'+M+'" height="'+M+'" patternUnits="userSpaceOnUse"><path d="M'+M+' 0L0 0 0 '+M+'" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".2"/></pattern></defs>';
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="url(#rfGrid)"/>';
 
-s+=tx(480,14,'ROOF PLAN \u2014 MECHANICAL EQUIPMENT','var(--t1)',10,'middle',1);
+s+=tx(480,14,'ROOF PLAN \u2014 HEAT REJECTION & DRY COOLERS','var(--t1)',10,'middle',1);
+s+=tx(480,26,'Chillers housed on Ground Floor (Chiller Plant Hall) \u2014 only heat-rejection equipment lives on roof','var(--t3)',4.5,'middle');
 
 // Building outline
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
-// === Chiller Plant (NW quadrant) ===
-s+=rm(2,1,28,19,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','CHILLER PLANT','28m \u00D7 19m','8\u00D7 Carrier 19XR 4MW (5.5\u00D75.2m)','Chiller: 8\u00D7 Carrier 19XR Frame 70-74, 4MW each, 5032\u00D75194\u00D72470mm, COP 6.8, R-1234ze(E), mag bearing');
-// Individual chillers (8× 4MW, 2 rows of 4) — realistic 5.5×5m footprint
-s+=eq(4,3,5.5,5,'rgba(6,182,212,.2)','CH-1',4.5);
-s+=eq(10,3,5.5,5,'rgba(6,182,212,.2)','CH-2',4.5);
-s+=eq(16,3,5.5,5,'rgba(6,182,212,.2)','CH-3',4.5);
-s+=eq(22,3,5.5,5,'rgba(6,182,212,.2)','CH-4',4.5);
-s+=eq(4,12,5.5,5,'rgba(6,182,212,.2)','CH-5',4.5);
-s+=eq(10,12,5.5,5,'rgba(6,182,212,.2)','CH-6',4.5);
-s+=eq(16,12,5.5,5,'rgba(6,182,212,.2)','CH-7',4.5);
-s+=eq(22,12,5.5,5,'rgba(6,182,212,.2)','CH-8 STB',4);
-// Headers
-s+='<line x1="'+(MX+4*M)+'" y1="'+(MY+11*M)+'" x2="'+(MX+24*M)+'" y2="'+(MY+11*M)+'" stroke="rgba(6,182,212,.4)" stroke-width="2"/>';
-s+='<text x="'+(MX+14*M)+'" y="'+(MY+10.5*M)+'" fill="rgba(6,182,212,.5)" font-family="'+J+'" font-size="5" text-anchor="middle">CW Supply/Return Headers</text>';
+// === CW Riser & Distribution Manifold (NW quadrant) \u2014 Chillers moved to Ground Floor ===
+s+=rm(2,1,28,19,'rgba(139,92,246,.12)','rgba(139,92,246,.45)','CW DISTRIBUTION MANIFOLD','28m \u00D7 19m','Risers from Chiller Plant (GF)','CW Distribution Manifold: Supply/Return risers from 8\u00D7 4MW chillers housed on Ground Floor up to dry-cooler array. DN500 carbon-steel insulated, 30% PG glycol, ~600 m\u00B3/h per chiller line.');
+// 8 supply + return riser pairs (correspond to the 8 chillers on Ground Floor)
+for(var ri=0;ri<8;ri++){
+var rix=4+ri*3,riy=6;
+s+='<rect x="'+(MX+rix*M)+'" y="'+(MY+riy*M)+'" width="'+(M*1)+'" height="'+(M*4)+'" rx="1" fill="rgba(6,182,212,.18)" stroke="var(--c)" stroke-width=".6"/>';
+s+='<text x="'+(MX+(rix+0.5)*M)+'" y="'+(MY+(riy+5.2)*M)+'" fill="var(--c)" font-family="'+J+'" font-size="3" text-anchor="middle">S-'+(ri+1)+'</text>';
+s+='<rect x="'+(MX+(rix+1.3)*M)+'" y="'+(MY+riy*M)+'" width="'+(M*1)+'" height="'+(M*4)+'" rx="1" fill="rgba(245,158,11,.18)" stroke="var(--o)" stroke-width=".6"/>';
+s+='<text x="'+(MX+(rix+1.8)*M)+'" y="'+(MY+(riy+5.2)*M)+'" fill="var(--o)" font-family="'+J+'" font-size="3" text-anchor="middle">R-'+(ri+1)+'</text>';
+}
+// Manifold cross-headers (supply + return)
+s+='<line x1="'+(MX+4*M)+'" y1="'+(MY+12*M)+'" x2="'+(MX+28*M)+'" y2="'+(MY+12*M)+'" stroke="var(--c)" stroke-width="2.5" opacity=".7"/>';
+s+='<line x1="'+(MX+4*M)+'" y1="'+(MY+14.5*M)+'" x2="'+(MX+28*M)+'" y2="'+(MY+14.5*M)+'" stroke="var(--o)" stroke-width="2.5" opacity=".7"/>';
+s+='<text x="'+(MX+16*M)+'" y="'+(MY+11.5*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle">CW SUPPLY HEADER DN500</text>';
+s+='<text x="'+(MX+16*M)+'" y="'+(MY+14*M)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" text-anchor="middle">CW RETURN HEADER DN500</text>';
+// Engineering callout
+s+='<rect x="'+(MX+4*M)+'" y="'+(MY+16*M)+'" width="'+(24*M)+'" height="'+(3*M)+'" rx="1.5" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.25)" stroke-width=".4" stroke-dasharray="3 2"/>';
+s+='<text x="'+(MX+16*M)+'" y="'+(MY+18*M)+'" fill="var(--o)" font-family="'+J+'" font-size="3.8" text-anchor="middle" opacity=".85">⚠ Chillers (8× 4MW Carrier 19XR water-cooled) located in Chiller Plant Hall on Ground Floor</text>';
 
 // === Dry Cooler Array (NE quadrant) ===
 s+=rm(32,2,38,16,'rgba(34,197,94,.1)','rgba(34,197,94,.4)','DRY COOLER ARRAY','38m \u00D7 16m','8\u00D7 BAC TrilliumSeries\u2122 Adiabatic','Dry Cooler: 8\u00D7 BAC Trillium adiabatic, closed-loop glycol, WUE 0.00, zero water evap');
@@ -2291,7 +2301,7 @@ s+=stair(0,40,4,6);
 s+='<text x="'+(MX+2*M)+'" y="'+(MY+40.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Stair B</text>';
 
 // Dimensions
-s+=dim(2,-1.5,30,-1.5,'28m (Chiller Plant)');
+s+=dim(2,-1.5,30,-1.5,'28m (CW Manifold)');
 s+=dim(32,-1.5,70,-1.5,'38m (Dry Coolers)');
 s+=dim(-3,1,-3,20,'19m');
 
@@ -2304,7 +2314,7 @@ s+='</g>';
 // Equipment schedule at bottom
 var ESY=MY+48.5*M;
 s+='<rect x="'+MX+'" y="'+ESY+'" width="'+(72*M)+'" height="25" rx="3" fill="rgba(6,182,212,.04)" stroke="rgba(6,182,212,.15)" stroke-width=".5"/>';
-var rk2=[{l:'Chillers',v:'8\u00D74MW',c:'var(--c)'},{l:'Dry Coolers',v:'8\u00D7 BAC',c:'var(--g)'},{l:'CW Pumps',v:'4\u00D7 VFD',c:'var(--pk)'},{l:'AHU',v:'2\u00D7 Carrier',c:'var(--b)'},{l:'VRV',v:'4\u00D7 Daikin',c:'var(--o)'},{l:'Total Rej.',v:(DHE?DHE.facTotalMW+' MW':'18.55 MW'),c:'var(--o)'}];
+var rk2=[{l:'CW Risers',v:'8 pairs DN500',c:'var(--p)'},{l:'Dry Coolers',v:'8\u00D7 BAC',c:'var(--g)'},{l:'CW Pumps',v:'4\u00D7 VFD',c:'var(--pk)'},{l:'AHU',v:'2\u00D7 Carrier',c:'var(--b)'},{l:'VRV',v:'4\u00D7 Daikin',c:'var(--o)'},{l:'Total Rej.',v:(DHE?DHE.facTotalMW+' MW':'18.55 MW'),c:'var(--o)'}];
 var rkx=MX+20;
 rk2.forEach(function(k){
 s+='<text x="'+rkx+'" y="'+(ESY+9)+'" fill="var(--t3)" font-family="'+J+'" font-size="6">'+k.l+'</text>';
@@ -2320,7 +2330,7 @@ el.innerHTML=s;
 // ============================
 renderOverview();
 
-var floorNames={gf:'Ground Floor — MEP & Infrastructure',f2:'Floor 2 — Datahall 1 + Datahall 2',f3:'Floor 3 — Datahall 3 + Datahall 4',roof:'Roof — Mechanical Equipment'};
+var floorNames={gf:'Ground Floor — MEP & Chiller Plant',f2:'Floor 2 — Datahall 1 + Datahall 2',f3:'Floor 3 — Datahall 3 + Datahall 4',roof:'Roof — Heat Rejection (Dry Coolers + AHU)'};
 
 // Click on isometric floor → show detail
 $('bldgSvg').addEventListener('click',function(e){
@@ -6066,17 +6076,17 @@ s+=`<line x1="200" y1="77" x2="200" y2="149" stroke="var(--p)" stroke-width="1.5
 s+=tx(197,172,'DN300','var(--t3)',3,'end');
 // Discharge header
 s+=`<line x1="290" y1="77" x2="290" y2="149" stroke="var(--p)" stroke-width="1.5" opacity=".4"/>`;
-// Pressure gauge symbol at discharge
-s+=symSensor(280,170,'var(--o)','P');
-s+=tx(280,180,'4.5 bar','var(--p)',3.5,'middle');
+// Pressure gauge symbol at discharge (separated layout v1.41.3 — was overlapping)
+s+=symSensor(285,193,'var(--o)','P');
+s+=tx(285,203,'4.5 bar','var(--p)',3.4,'middle');
 // Flow meter at discharge
-s+=symSensor(270,170,'var(--p)','F');
-s+=tx(270,180,'600','var(--p)',3.5,'middle');
+s+=symSensor(265,193,'var(--p)','F');
+s+=tx(265,203,'600 m³/h','var(--p)',3.4,'middle');
 s+=`</g>`;
 // Flow to chillers
 s+=`<line x1="295" y1="95" x2="305" y2="95" stroke="var(--p)" stroke-width="2.5" class="fR"/>`;
-s+=tx(300,88,'4.5 bar','var(--p)',3.5,'middle');
-s+=tx(300,102,'DN300 CW 30%PG','var(--t3)',3,'middle');
+s+=tx(300,84,'CW@4.5 bar','var(--p)',3.2,'middle');
+s+=tx(300,105,'DN300 30% PG','var(--t3)',3,'middle');
 // ===== CHILLER PLANT (FWS circuit = cyan) =====
 s+=`<rect x="305" y="28" width="215" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1"/>`;
 s+=`<rect x="306" y="29" width="213" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
@@ -6202,12 +6212,12 @@ s+=tx(627,146,'85%','var(--c)',3,'middle');
 s+=`<rect x="622" y="150" width="18" height="12" rx="1" fill="rgba(107,114,128,.06)" stroke="var(--t3)" stroke-width=".4"/>`;
 s+=tx(631,158,'Y','var(--t3)',4,'middle');
 s+=tx(631,165,'Str','var(--t3)',3,'middle');
-// Flow meter + pressure
-s+=symSensor(610,178,'var(--c)','F');
-s+=`<text x="618" y="182" fill="var(--c)" font-family="${J}" font-size="4" id="fwsFlow">${RI(475,510)}</text>`;
-s+=tx(636,182,'m\u00B3/h','var(--t3)',3);
-s+=symSensor(584,178,'var(--o)','P');
-s+=tx(584,188,'6 bar','var(--c)',3,'middle');
+// Flow meter + pressure (separated layout v1.41.3)
+s+=symSensor(610,195,'var(--c)','F');
+s+=`<text x="618" y="199" fill="var(--c)" font-family="${J}" font-size="3.8" id="fwsFlow">${RI(475,510)}</text>`;
+s+=tx(636,199,'m\u00B3/h','var(--t3)',2.8);
+s+=symSensor(584,195,'var(--o)','P');
+s+=tx(584,205,'6 bar','var(--c)',3,'middle');
 // Expansion tank indicator
 s+=`<rect x="530" y="155" width="28" height="22" rx="2" fill="rgba(6,182,212,.06)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=tx(544,164,'EXP','var(--c)',3.5,'middle');
@@ -6215,8 +6225,8 @@ s+=tx(544,173,RI(78,88)+'%','var(--c)',4,'middle');
 s+=`</g>`;
 // Flow to CDUs (FWS circuit = cyan)
 s+=`<line x1="645" y1="88" x2="655" y2="88" stroke="var(--c)" stroke-width="2.5" class="fR"/>`;
-s+=tx(650,81,'6 bar','var(--c)',3.5,'middle');
-s+=tx(650,98,'DN250 FWS','var(--t3)',3,'middle');
+s+=tx(650,79,'FWS@6 bar','var(--c)',3.2,'middle');
+s+=tx(650,102,'DN250','var(--t3)',3,'middle');
 // ===== CDU SECTION (Enhanced) =====
 s+=`<rect x="650" y="28" width="150" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1" data-tip="CDU Array: 24 units (N+1), 350kW rated / ~265kW actual per CDU. SS316L plate counter-flow HX. Primary: FWS 12\u219222\u00B0C (30% PG glycol). Secondary: TCS 35\u219245\u00B0C (DI water <5\u00B5S). Flow: ~400 L/min TCS per unit. Click any CDU cell for HMI."/>`;
 s+=`<rect x="651" y="29" width="148" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
@@ -6361,13 +6371,16 @@ s+=tx(585,RY+10,'DN250 CS insulated','var(--t3)',3,'middle');
 s+=`<line x1="305" y1="${RY}" x2="190" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
 s+=tx(245,RY-5,'CW Return 38\u00B0C','var(--o)',4,'middle');
 s+=tx(245,RY+10,'DN300 CS','var(--t3)',3,'middle');
-// Temperature indicator badges on return lines
-s+=`<rect x="645" y="${RY-7}" width="30" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
-s+=`<text x="660" y="${RY}" fill="var(--o)" font-family="${J}" font-size="4" text-anchor="middle" font-weight="600" id="retFWS">22.0\u00B0C</text>`;
-s+=`<rect x="795" y="${RY-7}" width="30" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
-s+=`<text x="810" y="${RY}" fill="var(--o)" font-family="${J}" font-size="4" text-anchor="middle" font-weight="600" id="retTCS">45.0\u00B0C</text>`;
-s+=`<rect x="385" y="${RY-7}" width="30" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
-s+=`<text x="400" y="${RY}" fill="var(--o)" font-family="${J}" font-size="4" text-anchor="middle" font-weight="600">35.2\u00B0C</text>`;
+// Temperature indicator badges on return lines (with prefix labels for clarity \u2014 v1.41.3)
+// FWS Return (CDU back to chiller)
+s+=`<rect x="640" y="${RY-7}" width="42" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
+s+=`<text x="661" y="${RY}" fill="var(--o)" font-family="${J}" font-size="3.6" text-anchor="middle" font-weight="600"><tspan fill="var(--t3)" font-weight="400">FWS-Ret </tspan><tspan id="retFWS">22.0\u00B0C</tspan></text>`;
+// TCS Return (rack back to CDU)
+s+=`<rect x="787" y="${RY-7}" width="42" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
+s+=`<text x="808" y="${RY}" fill="var(--o)" font-family="${J}" font-size="3.6" text-anchor="middle" font-weight="600"><tspan fill="var(--t3)" font-weight="400">TCS-Ret </tspan><tspan id="retTCS">45.0\u00B0C</tspan></text>`;
+// CW Return (chiller back to dry cooler)
+s+=`<rect x="375" y="${RY-7}" width="50" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
+s+=`<text x="400" y="${RY}" fill="var(--o)" font-family="${J}" font-size="3.6" text-anchor="middle" font-weight="600"><tspan fill="var(--t3)" font-weight="400">CW-Mid </tspan>35.2\u00B0C</text>`;
 // Flow direction arrows on supply lines
 const arrowPts=(x,y,d)=>`<polygon points="${x+d*4},${y-3} ${x+d*8},${y} ${x+d*4},${y+3}" fill="var(--c)" opacity=".5"/>`;
 s+=arrowPts(250,90,1);s+=arrowPts(460,90,1);s+=arrowPts(620,90,1);s+=arrowPts(760,90,1);

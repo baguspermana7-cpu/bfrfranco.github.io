@@ -11,6 +11,75 @@ release sections rather than semver.
 
 ---
 
+## v1.41.3 — 2026-05-24 (Building Overview chiller relocation + Cooling P&ID label clarity)
+
+PATCH ship: closes two owner architectural-correctness complaints.
+
+### Fixed
+
+- **Building Overview — chillers relocated from Roof to Ground Floor** (owner:
+  "ok chillernya berarti bukan di roof donk? di roof itu harusnya Dry cooler donk?").
+  Water-cooled centrifugal chillers belong on a Mechanical floor, NOT on the
+  roof — only heat-rejection equipment (dry coolers exposed to ambient) lives
+  on the roof in this hybrid design.
+  - `floors[]` array entries updated:
+    - GF: `'MEP · Infrastructure · Support'` → `'MEP · Chillers · Generators · WTP'`
+    - Roof: `'Mechanical · Chillers · AHU'` → `'Heat Rejection · Dry Coolers · AHU'`
+  - `floorNames` map updated (overview titles + drill-down labels).
+  - Roof plan (`renderRoof`) title: "ROOF PLAN — MECHANICAL EQUIPMENT" →
+    "ROOF PLAN — HEAT REJECTION & DRY COOLERS" plus sub-title clarifying chiller
+    location.
+  - NW quadrant of roof plan: "CHILLER PLANT" (8× CH cells) replaced with
+    "CW DISTRIBUTION MANIFOLD" (8 supply + 8 return DN500 risers from chillers
+    below, cross-headers, amber engineering callout).
+  - Roof equipment schedule: "Chillers 8×4MW" entry replaced with "CW Risers
+    8 pairs DN500".
+  - Roof dimension annotation: "28m (Chiller Plant)" → "28m (CW Manifold)".
+  - Ground Floor plan (`renderGroundFloor`) title: "GROUND FLOOR PLAN — MEP &
+    INFRASTRUCTURE" → "GROUND FLOOR PLAN — MEP, CHILLER PLANT & INFRASTRUCTURE".
+  - Ground Floor "Workshop B / Staging" zone (42-66 × 26-36 = 24m × 10m)
+    replaced with **Chiller Plant Hall** containing 8× Carrier 19XR 4MW
+    water-cooled centrifugal chillers (7 RUN + 1 STBY N+1, COP 6.8, R-1234ze(E),
+    mag-bearing oil-free). CW supply/return riser callout pointing up to Roof
+    dry-cooler array.
+
+- **Cooling P&ID — label overlap + clarity** (owner: "4.3 bar masing kotakan
+  tumpang tindih dengan block2 lain, atau temp 35.2°C itu temp apa. nggak jelas,
+  dan return temp itu tertutuk dash line kuning, dan parameter2 lain 3.4 f dan p
+  itu coba review lagi").
+  - **Floating temp badges** now prefixed with named context — "FWS-Ret 22.0°C",
+    "TCS-Ret 45.0°C", "CW-Mid 35.2°C" — so each badge explicitly says what
+    return circuit it represents. Badge widths increased from 30 to 42-50 px to
+    accommodate the prefix.
+  - **CW pump-station discharge pressure + flow labels** moved from y=170-180
+    overlap zone down to y=193-203 (separate row, off the pump-box outline).
+  - **CW discharge to chillers** label "4.5 bar" → "CW@4.5 bar" with positions
+    spread (y=84 above pipe, y=105 below pipe).
+  - **FWS pump-station discharge** flow + pressure labels moved from y=178-188
+    down to y=195-205 (clear of pump-box).
+  - **FWS to CDUs** label "6 bar" → "FWS@6 bar" with explicit prefix.
+
+### Changed
+
+- `js/rz-version.js` &rarr; v1.41.3.
+- `sw.js` cache version &rarr; `rz-cache-v1.41.3`.
+
+### Engines locked
+
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
+  byte-identical. 57/57 + 22/22 tests pass.
+
+### Files touched
+
+- `datahallAI.html` — floors array, floorNames map, renderRoof (NW quadrant +
+  title + schedule + dimension), renderGroundFloor (title + Workshop B → Chiller
+  Plant Hall), cooling P&ID (temp badges + pump-station labels).
+- `js/rz-version.js` — version bump.
+- `sw.js` — cache name bump.
+- `CHANGELOG.md` — this entry.
+
+---
+
 ## v1.41.2 — 2026-05-24 (Water-quality Tech Spec sections — DC AI dry-only + DC Conv cooling-tower)
 
 PATCH ship: closes owner request "kualitas air masing-masing di dc ai dan dc conventional itu juga masukkan ya full standard parameter dan chemical dan consumption di tech spec."
