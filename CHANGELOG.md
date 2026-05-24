@@ -651,6 +651,80 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.39.2 — 2026-05-24 (Tech Spec PDF content depth expansion — Phase B; +51 KB content, ~55-65 estimated pages)
+
+Phase B of the v1.39.x Tech Spec depth + visibility plan. v1.39.1 fixed
+the SVG-renders-as-black bug. This ship expands content depth toward
+the owner's "200-300 halaman" ask. PDF HTML: 264 KB → 315 KB (+51 KB
+new content, +19 %). Estimated printed pages: ~25 → ~55-65.
+
+Honest reach assessment: still short of the 200-300 page target.
+Continuing in v1.39.3 if owner wants more depth.
+
+### Added (DC AI Tech Spec PDF only)
+- **Appendix D &mdash; FMECA per equipment class** (~6-8 pages):
+  Failure Mode, Effects &amp; Criticality Analysis per IEC 60812 for
+  UPS (8 modes), Transformer (6 modes), Generator (7 modes),
+  Chiller (7 modes), CDU (6 modes). S &times; O &times; D = RPN scoring.
+  Top-5 priority-mitigate items summary.
+- **Appendix E &mdash; Commissioning &amp; Maintenance Checklists**
+  (~5-6 pages): Lv-1 through Lv-5 commissioning per ASHRAE Guideline
+  0 for electrical / cooling / fire systems. PM cadence table per
+  IEEE 902 + NETA MTS.
+- **Appendix F &mdash; Standards Excerpts** (~4-5 pages): clause-level
+  citations from NFPA 75 §5.2 / §7.3.1 / §8.1 / §9.4, NFPA 2001
+  §1.5 / §5.1.2 / §9.2 / §9.4, ASHRAE TC 9.9 Class A1 + W4 + L4,
+  Uptime Tier IV (concurrent maintainability + continuous cooling),
+  IEC 60364-4-41 / 5-52, IEEE 1100 Ch 8-10, NVIDIA NVL72 reference.
+- **Section 3.4 &mdash; Per-NVL72 Power Matrix (per hall)** (~2 pages):
+  27-row enumeration of all NVL72 domains in Hall A with rack-position
+  IDs, kW per domain, kW per rack-position. Same matrix applies to
+  Halls B/C/D.
+- **Section 3.5 &mdash; GPU Thermal Envelope** (~1 page): per-GPU power
+  allocation breakdown (78 % GPUs / 5 % CPUs / 10 % NVSwitch / 7 %
+  manifolds &amp; losses).
+- **Section 3.6 &mdash; Per-Rack-Position Cable + Breaker Schedule
+  preview** (~2 pages): 12-row sample with cable size, breaker, feed
+  per rack-position. Full 54-row schedule out of scope (cable-schedule
+  tool).
+- **Section 8.4 &mdash; BMS Point Catalog** (~6-8 pages): 90+ point
+  baseline inventory across ELEC (26), MECH (31), FIRE (8), SECU (4),
+  ENV (5), NET (5), DERIVED (10) disciplines.
+- **Section 8.5 &mdash; Alarm Matrix per Equipment Class** (~2 pages):
+  16 threshold rows with two-stage warning / alarm levels.
+- **Section 8.6 &mdash; BMS Architecture Summary** (~1 page): ISA-95
+  L0&ndash;L5 hierarchy, protocol stack (BACnet/IP, Modbus TCP,
+  IEC 61850, OPC-UA, MQTT), PTP time sync, IEC 62443 cyber zoning.
+- **Section 10.6 &mdash; Per-Component CAPEX Breakdown** (~1 page):
+  mechanical 32 % / electrical 28 % / fit-out 12 % / shell 10 % /
+  fire 5 % / network 6 % / soft costs 7 %.
+- **Section 10.7 &mdash; NPV with WACC Sensitivity** (~1 page): 10-yr
+  OPEX discounted at 5 % / 8 % / 12 % WACC.
+- **Section 10.8 &mdash; Multi-horizon TCO** (~1 page): 5 / 10 / 15 /
+  20-yr undiscounted TCO with per-MW-IT-yr lifecycle cost.
+- **Section 10.9 &mdash; OPEX Benchmarks** (~1 page): industry per-MW-IT
+  benchmarks for enterprise / hyperscale / AI factory with this
+  facility's self-check.
+
+### Appendix C index updated
+Added D, E, F to the appendix list. Section anchor list also adds
+"10. Cost Annex" which was missing previously.
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`)
+  byte-identical. All cost factors + standards excerpts are NEW
+  authored content (not engine-derived) but use cited public sources.
+- Probe 75/75 PASS &mdash; all existing assertions still hold.
+- DC Conv Tech Spec parallel expansion deferred (owner asked for DC AI
+  focus; DC Conv currently at v1.31.3 scaffold ~30 pages).
+- Realistic next expansion targets (v1.39.3 if owner wants more):
+  Section 4 electrical (per-feeder cable schedule full, IEC 60909
+  short-circuit, IEEE 519 harmonics), Section 5 cooling (per-CDU duty
+  table, per-CRAH duty table, COP sensitivity sweep), Section 7
+  network (full IB cable schedule).
+
+---
+
 ## v1.39.1 — 2026-05-24 (SVG visibility fix in Tech Spec + BoD PDFs; mobile patch on 16 more Network Hub pages)
 
 Owner reported (screenshot 2026-05-24, page 10 of 25 in Tech Spec PDF):
