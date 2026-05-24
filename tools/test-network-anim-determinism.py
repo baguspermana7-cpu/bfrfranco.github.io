@@ -60,6 +60,29 @@ TOPIC_FIXTURES = {
         "decode_args": "1000",
         "frames_to_test": [0, 1, 16, 100, 200, 500, 1000, 2000],
     },
+    # v1.39.1 — extended to all 25 live topics (static mode covers them via regex check;
+    # node mode requires per-topic decode_args matching each module's signature).
+    "dnp3":              {"module_global": "dnp3",            "params": {}, "decode_args": "true", "frames_to_test": [0, 30, 100, 500]},
+    "profinet":          {"module_global": "profinet",        "params": {}, "decode_args": "4",    "frames_to_test": [0, 6, 36, 100]},
+    "ethernet-ip":       {"module_global": "ethernetIp",      "params": {}, "decode_args": "8",    "frames_to_test": [0, 50, 200, 600]},
+    "ethercat":          {"module_global": "ethercat",        "params": {}, "decode_args": "4",    "frames_to_test": [0, 16, 32, 64]},
+    "bacnet-mstp":       {"module_global": "bacnetMstp",      "params": {}, "decode_args": "8",    "frames_to_test": [0, 36, 132, 500]},
+    "osi-tcp-ip-models": {"module_global": "osiTcpIpModels",  "params": {}, "decode_args": "",     "frames_to_test": [0, 30, 100, 400]},
+    "ipv4-vs-ipv6":      {"module_global": "ipv4VsIpv6",      "params": {}, "decode_args": "",     "frames_to_test": [0, 30, 60, 120]},
+    "subnetting-cidr":   {"module_global": "subnettingCidr",  "params": {}, "decode_args": "24",   "frames_to_test": [0, 30, 60, 120]},
+    "tcp-handshake":     {"module_global": "tcpHandshake",    "params": {}, "decode_args": "",     "frames_to_test": [0, 50, 100, 150]},
+    "dhcp-dns":          {"module_global": "dhcpDns",         "params": {}, "decode_args": "",     "frames_to_test": [0, 50, 100, 250]},
+    "tls-handshake":     {"module_global": "tlsHandshake",    "params": {}, "decode_args": "",     "frames_to_test": [0, 60, 180, 300]},
+    "oauth-jwt":         {"module_global": "oauthJwt",        "params": {}, "decode_args": "",     "frames_to_test": [0, 35, 140, 210]},
+    "mtls":              {"module_global": "mtls",            "params": {}, "decode_args": "",     "frames_to_test": [0, 50, 200, 310]},
+    "wireguard":         {"module_global": "wireguard",       "params": {}, "decode_args": "",     "frames_to_test": [0, 24, 96, 144]},
+    "rest-api":          {"module_global": "restApi",         "params": {}, "decode_args": "256",  "frames_to_test": [0, 60, 90, 180]},
+    "graphql":           {"module_global": "graphql",         "params": {}, "decode_args": "",     "frames_to_test": [0, 60, 105, 165]},
+    "grpc":              {"module_global": "grpc",            "params": {}, "decode_args": "",     "frames_to_test": [0, 25, 75, 100]},
+    "mcp-tool-call":     {"module_global": "mcpToolCall",     "params": {}, "decode_args": "",     "frames_to_test": [0, 40, 80, 160]},
+    "snmp":              {"module_global": "snmp",            "params": {}, "decode_args": "",     "frames_to_test": [0, 30, 60, 120]},
+    "ipmi-redfish":      {"module_global": "ipmiRedfish",     "params": {}, "decode_args": "",     "frames_to_test": [0, 50, 70, 160]},
+    "syslog":            {"module_global": "syslog",          "params": {}, "decode_args": "",     "frames_to_test": [0, 35, 70, 140]},
 }
 
 
@@ -187,7 +210,10 @@ def run_static_inspect(slug: str) -> List[TestResult]:
     decode_body = decode_block_match.group(1)
     forbidden = ["_params", "lastByteIdxEmitted", "startTs", "running", "rafId",
                  "ackTriggeredThisCycle", "lastPushIdx"]
-    leaked = [v for v in forbidden if re.search(r"\b" + re.escape(v) + r"\b", decode_body)]
+    # v1.39.1 — strip string literals to avoid false positives on protocol-name
+    # tokens like 'data-frame' (contains 'frame' substring).
+    decode_body_no_strings = re.sub(r"'[^']*'|\"[^\"]*\"", "''", decode_body)
+    leaked = [v for v in forbidden if re.search(r"\b" + re.escape(v) + r"\b", decode_body_no_strings)]
     if leaked:
         results.append(TestResult(
             slug, "static-purity", False,
@@ -212,7 +238,9 @@ def run_static_inspect(slug: str) -> List[TestResult]:
                          content, re.DOTALL)
     if bp_match:
         bp_body = bp_match.group(1)
-        if re.search(r"\b(_params|frame|running)\b", bp_body):
+        # v1.39.1 — same string-literal stripping for the bytePosition check
+        bp_body_no_strings = re.sub(r"'[^']*'|\"[^\"]*\"", "''", bp_body)
+        if re.search(r"\b(_params|frame|running)\b", bp_body_no_strings):
             results.append(TestResult(slug, "static-bytePos-purity", False,
                                       "bytePosition closes over stateful vars"))
         else:

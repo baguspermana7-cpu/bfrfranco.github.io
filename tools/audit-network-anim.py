@@ -161,8 +161,12 @@ def extract_timbre(content: str, slug: str, file_str: str) -> TimbreSummary:
     """
     Static-extract the fields the anti-monotony gate compares.
     Topic modules use plain-object syntax inside an IIFE; regex is sufficient.
+
+    v1.39.1: strip /* */ block + // line comments before extraction so
+    commented-out prior values don't poison anti-monotony pairwise checks.
     """
     t = TimbreSummary(slug=slug, file=file_str)
+    content = _strip_comments(content)
 
     # byte.waveform — first 'waveform' value in the file inside a `byte:` block
     m = re.search(r"byte\s*:\s*\{[^}]*?waveform\s*:\s*['\"]([^'\"]+)['\"]", content, re.DOTALL)
