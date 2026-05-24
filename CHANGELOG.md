@@ -518,6 +518,81 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.36.2 — 2026-05-24 (Tech Spec PDF probe coverage; probe caught CRITICAL silent bug — DC AI Generate Design returned empty PDF since v1.31.2; 60/60 pass)
+
+The probe was extended to capture and verify the Generate Design Tech
+Spec PDF output on both cockpits. On first run it caught a **critical
+silent bug** that had been in production for ~24 hours: the DC AI
+Generate Design button was producing an EMPTY popup because the v1.31.2
+expansion referenced `sldSVG` inside `buildTechSpecHtml()` but the
+variable was only declared in `buildBodPdfHtml()`. Different functions,
+different scopes — silent `ReferenceError` swallowed by the print-window
+flow.
+
+### Bug found (CRITICAL — user-facing)
+- **Symptom**: DC AI cockpit → click "📑 Generate Design" → popup
+  opens but is BLANK. No error visible to user.
+- **Console error** (only visible with dev-tools open):
+  `ReferenceError: sldSVG is not defined`
+- **Root cause**: v1.31.2 added `(sldSVG ? '<div...' : 'figure
+  unavailable')` to Section 4 (Electrical Discipline) of the Tech Spec
+  PDF without declaring `sldSVG` in the `buildTechSpecHtml()` scope.
+  The variable existed in `buildBodPdfHtml()` (a separate function)
+  so the developer's mental model was right, but the JS scope wasn't.
+- **Fix**: declare `var sldSVG=grabSVG('elecSvg')||grabSVG('sldHost')
+  ||grabSVG('p-elec');` at the top of `buildTechSpecHtml()`, parallel
+  to its declaration in `buildBodPdfHtml()`.
+- **Impact window**: shipped in v1.31.2 (2026-05-23) → fixed v1.36.2
+  (2026-05-24). All users who clicked Generate Design on DC AI in
+  that window got an empty PDF.
+- **DC Conv was unaffected** — `buildTechSpecHtml()` on
+  `dc-conventional.html` doesn't reference any SVG figures, so the
+  bug was DC-AI-only.
+
+### Probe added
+- **TS-AI-1 through TS-AI-10** (10 assertions) — DC AI Tech Spec PDF:
+  - returns non-trivial HTML (~264 KB)
+  - title carries facility name
+  - cites Scenario A locked
+  - has cover / TOC / executive-summary structure
+  - carries engine value 14.26 MW (IT)
+  - carries 132 kW per NVL72 basis
+  - carries GPU count 7,776
+  - references standards (ASHRAE/NFPA/NVIDIA)
+  - includes Cost Annex (Section 10)
+  - includes Appendix A formula derivations
+- **TS-CONV-1 through TS-CONV-10** (10 assertions) — DC Conv Tech Spec
+  PDF: facility name, IT 1,850 kW, PUE 1.45, Grid factor terminology,
+  CUE_IT 0.61, CHW flow 58.2 L/s, fuel 45,900 L, Cost Annex,
+  ISO/IEC 30134 citation.
+
+### Probe technique
+Override `window.open` before clicking the button; intercept
+`document.write` to capture the HTML; assert against the captured
+string. Works in headless without needing a real browser window.
+
+### Result
+**60/60 PASS** (was 40; +20 Tech Spec PDF tests). ship-gate runner
+updated to report "60/60" in its label.
+
+### Accuracy-arc bug count to date
+The probe has now caught 4 real bugs that would otherwise have shipped:
+1. v1.32.10 — FAQ_ITEMS ReferenceError on page load (since v1.30.1)
+2. v1.32.10 — page.click() coordinate-fail in headless (probe itself)
+3. v1.32.10 — Test-3a regex too strict on NVL72-rack-scale
+4. **v1.36.2 — DC AI Generate Design empty PDF (since v1.31.2,
+   user-facing for ~24 hr)**
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`,
+  `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
+- Bug #4 is the most consequential of the 4 — a user-facing feature
+  that LOOKED to work (button clicked, popup opened) but produced
+  zero output. Without the probe this would have stayed broken until
+  a user reported it.
+
+---
+
 ## v1.36.1 — 2026-05-24 (Probe wired into per-ship gate sequence + ship-gate.sh runner + mobile-responsive patch on 6 Network Hub pages)
 
 (Authored locally as v1.35.2 with 3 mobile patches. Parallel session

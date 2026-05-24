@@ -11868,6 +11868,11 @@ function buildTechSpecHtml(){
   var facIT=st.itPerFacility_kW;
   var facTotal=pb.facility_kW*m.facility.halls;
   var pueVal=CALC.round(pb.pue,3);
+  /* v1.36.2 — local sldSVG declaration. Earlier ship referenced sldSVG inside
+     buildTechSpecHtml() but the var was only declared in buildBodPdfHtml(),
+     causing 'ReferenceError: sldSVG is not defined' when Generate Design was
+     clicked. Found by the v1.36.2 Tech Spec PDF probe. */
+  var sldSVG=grabSVG('elecSvg')||grabSVG('sldHost')||grabSVG('p-elec');
 
   var H='';
   /* ---------------- Title page ---------------- */

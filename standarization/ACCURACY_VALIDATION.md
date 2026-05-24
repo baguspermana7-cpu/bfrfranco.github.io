@@ -224,3 +224,12 @@ alongside the four audit scripts (`audit-script-tags`,
   = datahall "1.85 MW". The reviewer's chief concern — "deeper tabs
   can be correct while the first screen tells a different story" —
   is now demonstrably ruled out for these metrics. **40/40 PASS**.
+- **v1.36.1** (2026-05-24): Probe wired into per-ship gate
+  sequence (`tools/ship-gate.sh`). Mobile patch on 6 Network Hub
+  pages. Gate runner caught defects across sessions.
+- **v1.36.2** (2026-05-24): Tech Spec PDF probe coverage added.
+  Caught **CRITICAL silent bug**: DC AI Generate Design returned
+  EMPTY PDF since v1.31.2 (~24 hr in production) because
+  `buildTechSpecHtml()` referenced `sldSVG` declared only in
+  `buildBodPdfHtml()` scope. Fixed by local var declaration. **60/60
+  PASS** (was 40; +20 Tech Spec assertions).

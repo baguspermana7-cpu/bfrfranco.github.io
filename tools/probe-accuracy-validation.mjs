@@ -208,6 +208,69 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
 }
 
 /* ========================================================================
+ * TECH SPEC PDF GENERATION (v1.36.2 — Generate Design button verification).
+ * Intercept window.open + document.write to capture the print-window HTML;
+ * assert it carries the engine-bound values + section headers. Catches
+ * silent engine-binding regressions on a feature shipped in v1.30.1.
+ * ====================================================================== */
+console.log('\n=== Generate Design Tech Spec PDF probes ===');
+{
+  async function captureTechSpec(url, triggerSel) {
+    const page = await browser.newPage();
+    await page.goto(`${BASE}/${url}`, {waitUntil:'domcontentloaded', timeout:30000});
+    await new Promise(r => setTimeout(r, 1500));
+    /* Intercept window.open + .document.write before clicking */
+    await page.evaluate(() => {
+      window.__capturedTechSpec = null;
+      window.open = function() {
+        const fakeDoc = { contents:'', open(){this.contents=''}, write(s){this.contents += s;}, close(){window.__capturedTechSpec = this.contents;} };
+        return { document: fakeDoc, focus(){}, print(){} };
+      };
+    });
+    await page.evaluate((sel) => {
+      const btn = document.querySelector(sel);
+      if (btn) btn.click();
+    }, triggerSel);
+    await new Promise(r => setTimeout(r, 800));
+    const html = await page.evaluate(() => window.__capturedTechSpec);
+    await page.close();
+    return html;
+  }
+
+  /* --- DC AI Generate Design --- */
+  const dcAiPdf = await captureTechSpec('datahallAI.html', '#genDesignTrig');
+  const okAi = dcAiPdf && dcAiPdf.length > 5000;
+  assert(okAi, `TS-AI-1: Generate Design returns non-trivial HTML (~${dcAiPdf?.length||0} chars)`, '');
+  if (okAi) {
+    assert(/AI Data Centre|AI Data Hall/i.test(dcAiPdf), 'TS-AI-2: PDF title carries facility name', '');
+    assert(/Scenario\s*A/i.test(dcAiPdf), 'TS-AI-3: PDF cites Scenario A locked', '');
+    assert(/Cover|Table of Contents|Executive Summary/i.test(dcAiPdf), 'TS-AI-4: PDF has cover / TOC / executive-summary structure', '');
+    assert(/14[.,]?2[56]/.test(dcAiPdf), 'TS-AI-5: PDF carries engine value 14.26 MW (IT facility)', '');
+    assert(/132\s*kW.*NVL72|NVL72.*132/i.test(dcAiPdf), 'TS-AI-6: PDF carries 132 kW per NVL72 basis', '');
+    assert(/7[,.]?776/.test(dcAiPdf), 'TS-AI-7: PDF carries GPU count 7,776', '');
+    assert(/ASHRAE|NFPA|NVIDIA/i.test(dcAiPdf), 'TS-AI-8: PDF references standards (ASHRAE/NFPA/NVIDIA)', '');
+    assert(/Cost Annex|CAPEX|OPEX/i.test(dcAiPdf), 'TS-AI-9: PDF includes Cost Annex (Section 10)', '');
+    assert(/Appendix A|Formula Derivations/i.test(dcAiPdf), 'TS-AI-10: PDF includes Appendix A formula derivations', '');
+  }
+
+  /* --- DC Conv Generate Design --- */
+  const dcConvPdf = await captureTechSpec('dc-conventional.html', '#genDesignTrigConv');
+  const okConv = dcConvPdf && dcConvPdf.length > 5000;
+  assert(okConv, `TS-CONV-1: Generate Design returns non-trivial HTML (~${dcConvPdf?.length||0} chars)`, '');
+  if (okConv) {
+    assert(/Conventional Data Centre/i.test(dcConvPdf), 'TS-CONV-2: PDF title carries facility name', '');
+    assert(/1[,.]?850/.test(dcConvPdf), 'TS-CONV-3: PDF carries engine value 1,850 kW (IT)', '');
+    assert(/1\.45/.test(dcConvPdf), 'TS-CONV-4: PDF carries PUE 1.45', '');
+    assert(/Grid factor|grid_factor/i.test(dcConvPdf), 'TS-CONV-5: PDF uses "Grid factor" terminology (not CUE alone)', '');
+    assert(/0\.6[01]\s*kg/i.test(dcConvPdf), 'TS-CONV-6: PDF derives CUE_IT 0.61 kg/kWh IT', '');
+    assert(/58[.,]?[12]/.test(dcConvPdf), 'TS-CONV-7: PDF carries CHW flow 58.2 L/s', '');
+    assert(/45[,.]?900/.test(dcConvPdf), 'TS-CONV-8: PDF carries fuel usable 45,900 L', '');
+    assert(/CAPEX|OPEX|TCO/i.test(dcConvPdf), 'TS-CONV-9: PDF includes Cost Annex', '');
+    assert(/ISO\/IEC 30134/i.test(dcConvPdf), 'TS-CONV-10: PDF cites ISO/IEC 30134 (CUE standard)', '');
+  }
+}
+
+/* ========================================================================
  * CROSS-PAGE HEADLINE CONSISTENCY (v1.33.3 — reviewer's Rule 1 "one source
  * of truth" verified across all pages that display the metric). Conv-engine
  * pages share CONV_CALC.snapshot, so PUE/WUE/IT must reconcile identically.
