@@ -555,6 +555,45 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.37.1 — 2026-05-24 (Basis of Design PDF probe coverage; 67/67 pass)
+
+(Authored locally as v1.36.3. Parallel session shipped v1.37.0 Network
+Hub determinism harness mid-push; this lands as v1.37.1.)
+
+Mirror of v1.36.2's Tech Spec PDF probe — the older "Basis of Design"
+button on DC AI is a separate code path (`#bodTrig` →
+`#bodDrawerPdf` → `buildBodPdfHtml()`, scoped in a different IIFE
+from `buildTechSpecHtml()`). Given v1.36.2 found a silent failure on
+the newer button, the older one needed the same mechanical
+verification.
+
+### Added
+- **BoD-AI-1 through BoD-AI-7** (7 assertions): BoD Export PDF
+  produces non-trivial HTML (~209 KB) with cited title, engine
+  values (14.26 MW or 3,564 kW IT), PUE 1.30, 132 kW per NVL72,
+  Scenario A label, chiller nameplate COP 6.8.
+- Probe flow: click `#bodTrig` to open the drawer (lazy-builds the
+  PDF button binding), wait, then click `#bodDrawerPdf` and capture
+  the print-window output.
+
+### Result
+- BoD PDF was HEALTHY — no silent bug. The probe assertions all
+  pass. But this is now mechanically verified rather than assumed.
+- **67/67 PASS** (was 60; +7 BoD assertions).
+- `tools/ship-gate.sh` label updated.
+
+### Why this matters
+v1.36.2 demonstrated that "the developer thinks it works" is not the
+same as "it actually produces output." Both PDF buttons are now
+covered by the probe; future regressions on either are caught before
+push.
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`,
+  `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
+
+---
+
 ## v1.36.2 — 2026-05-24 (Tech Spec PDF probe coverage; probe caught CRITICAL silent bug — DC AI Generate Design returned empty PDF since v1.31.2; 60/60 pass)
 
 The probe was extended to capture and verify the Generate Design Tech

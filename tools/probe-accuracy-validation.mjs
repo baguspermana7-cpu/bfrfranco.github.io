@@ -253,6 +253,44 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
     assert(/Appendix A|Formula Derivations/i.test(dcAiPdf), 'TS-AI-10: PDF includes Appendix A formula derivations', '');
   }
 
+  /* --- DC AI Basis of Design (older PDF, separate code path) ---
+     Flow: click #bodTrig to open the in-page drawer, wait for it to
+     render, then click #bodDrawerPdf inside the drawer. */
+  const bodPage = await browser.newPage();
+  await bodPage.goto(`${BASE}/datahallAI.html`, {waitUntil:'domcontentloaded', timeout:30000});
+  await new Promise(r => setTimeout(r, 1500));
+  await bodPage.evaluate(() => {
+    window.__capturedBod = null;
+    window.open = function() {
+      const fakeDoc = { contents:'', open(){this.contents=''}, write(s){this.contents += s}, close(){window.__capturedBod = this.contents} };
+      return { document: fakeDoc, focus(){}, print(){} };
+    };
+  });
+  /* Open BoD drawer first (it lazy-builds content + binds the PDF button) */
+  await bodPage.evaluate(() => {
+    const btn = document.getElementById('bodTrig');
+    if (btn) btn.click();
+  });
+  await new Promise(r => setTimeout(r, 600));
+  await bodPage.evaluate(() => {
+    const btn = document.getElementById('bodDrawerPdf');
+    if (btn) btn.click();
+  });
+  await new Promise(r => setTimeout(r, 800));
+  const bodPdf = await bodPage.evaluate(() => window.__capturedBod);
+  await bodPage.close();
+
+  const okBod = bodPdf && bodPdf.length > 5000;
+  assert(okBod, `BoD-AI-1: BoD Export PDF returns non-trivial HTML (~${bodPdf?.length||0} chars)`, '');
+  if (okBod) {
+    assert(/Basis of Design|BoD/i.test(bodPdf), 'BoD-AI-2: PDF title cites "Basis of Design"', '');
+    assert(/14[.,]?2[56]|3[.,]?564/.test(bodPdf), 'BoD-AI-3: PDF carries engine values (14.26 MW or 3,564 kW)', '');
+    assert(/1\.30|PUE.*1\.3/.test(bodPdf), 'BoD-AI-4: PDF carries PUE 1.30', '');
+    assert(/132\s*kW/i.test(bodPdf), 'BoD-AI-5: PDF carries 132 kW per NVL72 basis', '');
+    assert(/Scenario\s*A/i.test(bodPdf), 'BoD-AI-6: PDF cites Scenario A locked', '');
+    assert(/COP\s*6\.8|COP.*=.*6\.8/.test(bodPdf), 'BoD-AI-7: PDF cites chiller nameplate COP 6.8', '');
+  }
+
   /* --- DC Conv Generate Design --- */
   const dcConvPdf = await captureTechSpec('dc-conventional.html', '#genDesignTrigConv');
   const okConv = dcConvPdf && dcConvPdf.length > 5000;

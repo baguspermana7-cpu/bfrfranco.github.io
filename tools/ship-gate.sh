@@ -54,7 +54,7 @@ fi
 
 # 8: optional accuracy probe
 if [ "${1:-}" = "--probe" ]; then
-  gate "probe-accuracy-validation — 60/60 (reviewer + drawers + cross-page + Tech Spec PDF)" \
+  gate "probe-accuracy-validation — 67/67 (reviewer + drawers + cross-page + Tech Spec PDF + BoD PDF)" \
     bash -c "RZ_BASE=file timeout 120 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
 fi
 

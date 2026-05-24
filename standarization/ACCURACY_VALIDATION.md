@@ -233,3 +233,8 @@ alongside the four audit scripts (`audit-script-tags`,
   `buildTechSpecHtml()` referenced `sldSVG` declared only in
   `buildBodPdfHtml()` scope. Fixed by local var declaration. **60/60
   PASS** (was 40; +20 Tech Spec assertions).
+- **v1.36.3** (2026-05-24): BoD Export PDF probe coverage added —
+  separate code path from Generate Design (`#bodTrig` →
+  `#bodDrawerPdf` → `buildBodPdfHtml()` in different IIFE). PDF was
+  healthy on first run; now mechanically verified. **67/67 PASS**
+  (was 60; +7 BoD assertions).
