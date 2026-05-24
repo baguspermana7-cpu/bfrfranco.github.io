@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All-In-One Dashboard · Self-Hosted (Glance) · ResistanceZero</title>
+<meta name="description" content="Self-hosted minimalist dashboard for engineers — RSS feeds, weather, stocks, calendars, and global news in a single unified view. Powered by Glance. Zero-framework, Docker one-line, YAML-configured.">
+<meta name="theme-color" content="#0F172A">
+<link rel="canonical" href="https://resistancezero.com/all-in-one-dashboard.html">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="styles.min.css?v=20260524">
+<script src="js/rz-version.js?v=2026-05-24" defer></script>
+<script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+
+<style>
+:root {
+  --aio-cyan: #06b6d4;
+  --aio-amber: #f59e0b;
+  --aio-mint: #7DDDB4;
+  --aio-line: #475569;
+  --aio-bg-card: rgba(255,255,255,0.02);
+  --aio-bg-tile: rgba(15,23,42,0.5);
+}
+[data-theme="light"] {
+  --aio-bg-card: #ffffff;
+  --aio-bg-tile: #f8fafc;
+}
+
+.aio-hero {
+  padding: 4rem 1.5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+.aio-hero .badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--aio-cyan);
+  border: 0.8px solid var(--aio-cyan);
+  background: rgba(6,182,212,0.06);
+  padding: 0.25rem 0.7rem;
+  border-radius: 99px;
+  margin-bottom: 1rem;
+}
+.aio-hero .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--aio-mint); box-shadow: 0 0 6px var(--aio-mint); }
+.aio-hero h1 {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin: 0 0 0.8rem;
+  letter-spacing: -0.01em;
+}
+.aio-hero p.lede {
+  font-size: 1.1rem;
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.6;
+}
+.aio-meta {
+  display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--aio-line);
+  margin-top: 0.8rem;
+}
+.aio-meta b { color: var(--aio-cyan); font-weight: 600; }
+
+.aio-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+.aio-section h2 {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1.4rem;
+  margin: 2.5rem 0 0.5rem;
+  display: flex; align-items: baseline; gap: 0.6rem;
+  border-bottom: 0.8px solid rgba(6,182,212,0.18);
+  padding-bottom: 0.5rem;
+}
+.aio-section h2 .h2tag {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--aio-cyan);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.aio-section p { line-height: 1.65; margin: 0.8rem 0; }
+.aio-section ul { line-height: 1.7; padding-left: 1.4rem; }
+.aio-section ul li { margin: 0.35rem 0; }
+.aio-section code { font-family: 'JetBrains Mono', ui-monospace, monospace; background: rgba(6,182,212,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+
+.aio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 1rem;
+}
+.aio-tile {
+  border: 0.8px solid var(--aio-line);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  background: var(--aio-bg-tile);
+  transition: border-color 150ms ease;
+}
+.aio-tile:hover { border-color: var(--aio-cyan); }
+.aio-tile .ico {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--aio-cyan);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.aio-tile h3 {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1rem;
+  margin: 0 0 0.4rem;
+}
+.aio-tile p { font-size: 0.88rem; color: var(--text-secondary, #64748b); line-height: 1.5; margin: 0; }
+
+.aio-quickstart {
+  background: var(--aio-bg-tile);
+  border: 0.8px solid var(--aio-line);
+  border-radius: 8px;
+  padding: 1.2rem 1.4rem;
+  margin: 1.2rem 0;
+}
+.aio-quickstart h3 { margin: 0 0 0.6rem; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 1.05rem; color: var(--aio-cyan); }
+.aio-quickstart pre {
+  background: rgba(15,23,42,0.85);
+  color: #e0e7ff;
+  padding: 1rem 1.2rem;
+  border-radius: 6px;
+  border: 0.8px solid rgba(6,182,212,0.25);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  overflow-x: auto;
+  margin: 0.6rem 0 0.4rem;
+}
+.aio-quickstart p { font-size: 0.9rem; color: var(--text-secondary, #64748b); margin: 0.3rem 0 0; }
+
+.aio-cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--aio-cyan);
+  border: 0.8px solid var(--aio-cyan);
+  background: rgba(6,182,212,0.06);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  transition: background 150ms ease;
+}
+.aio-cta:hover { background: rgba(6,182,212,0.12); }
+
+.aio-demo {
+  background: rgba(245,158,11,0.06);
+  border: 0.8px dashed var(--aio-amber);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary, #64748b);
+}
+.aio-demo b { color: var(--aio-amber); }
+
+.aio-foot {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--aio-line);
+  font-size: 0.85rem;
+}
+
+/* v1.8.0 — mobile responsive patch (per RESPONSIVE_STANDARD.md) */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  img, picture, video, svg { max-width: 100%; height: auto; display: block; }
+  .nav-menu, .nav-links { display: none !important; }
+  .footer-grid { grid-template-columns: 1fr !important; gap: 1.25rem !important; padding: 1rem !important; }
+  button, a.btn, [role="button"] { min-height: 44px; }
+  .aio-grid { grid-template-columns: 1fr; }
+  .aio-meta { gap: 0.8rem; font-size: 0.7rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="logo" aria-label="ResistanceZero home">ResistanceZero</a>
+    <nav class="nav-right" aria-label="primary">
+      <a href="geopolitics.html">Geopolitics</a>
+      <a href="tools.html">Tools</a>
+      <a href="datacenter-solutions.html">DC Solutions</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="aio-hero">
+    <span class="badge"><span class="dot"></span>Self-Hosted · Zero Framework</span>
+    <h1>All-In-One Dashboard</h1>
+    <p class="lede">A minimalist self-hosted dashboard for engineers &mdash; RSS feeds, weather, stocks, calendars, and global news in a single unified view. Powered by <a href="https://github.com/glanceapp/glance" target="_blank" rel="noopener" style="color:var(--aio-cyan);font-weight:600;">Glance</a> (MIT-licensed, single Go binary).</p>
+    <div class="aio-meta">
+      <span><b>Self-hosted</b> · own your data</span>
+      <span><b>YAML</b> · zero-framework config</span>
+      <span><b>Docker</b> · one-line deploy</span>
+      <span><b>Dark mode</b> · engineer-native</span>
+    </div>
+  </section>
+
+  <section class="aio-section">
+
+    <h2>What is Glance? <span class="h2tag">background</span></h2>
+    <p><a href="https://github.com/glanceapp/glance" target="_blank" rel="noopener" style="color:var(--aio-cyan);font-weight:600;">Glance</a> is an open-source self-hosted dashboard that aggregates feeds, widgets, and integrations into one page. Written in Go, packaged as a single binary or Docker image. No accounts, no telemetry, no SaaS lock-in. The reference deployment runs in under 50 MB RAM, serves the dashboard at sub-100 ms TTFB, and is configured entirely through a single YAML file.</p>
+    <p>For the engineer who keeps 27 tabs open every morning (vendor RSS, Hacker News, weather, calendar, stock ticker, monitoring) &mdash; Glance compresses all of it into one URL.</p>
+
+    <h2>Why for engineers? <span class="h2tag">design</span></h2>
+    <div class="aio-grid">
+      <div class="aio-tile">
+        <div class="ico">tab compression</div>
+        <h3>One URL, not 27 tabs</h3>
+        <p>RSS, weather, stocks, calendar, news, system status &mdash; aggregated into one dense view. Saves ~20 min of morning tab-cycling.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">no SaaS</div>
+        <h3>Own your data</h3>
+        <p>Runs on your VPS, NAS, Raspberry Pi, or laptop. No cloud account, no analytics calls, no breach risk.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">YAML, not JS</div>
+        <h3>Config &gt; framework</h3>
+        <p>Edit a YAML file; restart container; done. No npm install, no webpack, no docker-compose for a 12-service stack.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">dark by default</div>
+        <h3>Engineer aesthetic</h3>
+        <p>Oscilloscope-grade dark theme, monospace data columns, thin-line typography. Looks like an HMI, not a consumer dashboard.</p>
+      </div>
+    </div>
+
+    <h2>Module catalogue <span class="h2tag">8 built-in widgets</span></h2>
+    <div class="aio-grid">
+      <div class="aio-tile">
+        <div class="ico">RSS</div>
+        <h3>RSS Feeds</h3>
+        <p>Aggregate engineering blogs (NVIDIA, Cloudflare, Vercel), vendor advisories (CVE feeds, security bulletins), and industry sources. Auto-deduplicates by URL hash.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">weather</div>
+        <h3>Weather</h3>
+        <p>Powered by <code>open-meteo.com</code> &mdash; no API key. Current + 7-day forecast for any lat/lon. Plays nicely with self-host privacy stance.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">stocks</div>
+        <h3>Stocks / Indices</h3>
+        <p>Live quote tickers via Yahoo Finance fallback (or via the optional ResistanceZero CF Worker once live). Watchlist YAML config: list symbols, see deltas + spark-lines.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">calendar</div>
+        <h3>Calendar</h3>
+        <p>ICS-feed-based. Subscribe to your Google Cal / Outlook / iCloud Cal via the public ICS link. Read-only; no OAuth complexity.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">news</div>
+        <h3>News Headlines</h3>
+        <p>Hacker News, BBC, Reuters, regional news. RSS-driven; same dedup + freshness logic as the RSS widget but pinned to a "Top News" zone.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">monitoring</div>
+        <h3>System Status</h3>
+        <p>Uptime Kuma, Prometheus, Grafana, or custom HTTP-check endpoints. Shows OK/degraded/down chips for your own infrastructure.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">videos</div>
+        <h3>YouTube Subscriptions</h3>
+        <p>RSS-based YouTube channel feed. New uploads + thumbnails, no Google account login required, no recommendation algorithm.</p>
+      </div>
+      <div class="aio-tile">
+        <div class="ico">custom</div>
+        <h3>Custom Widget</h3>
+        <p>HTML/JS escape hatch. Drop in any custom widget &mdash; e.g. live cf-worker data, custom Prometheus query result, your own home-automation feed.</p>
+      </div>
+    </div>
+
+    <h2>Quickstart <span class="h2tag">deploy in 60 seconds</span></h2>
+    <div class="aio-quickstart">
+      <h3>Docker (recommended)</h3>
+      <pre>$ mkdir glance && cd glance
+$ wget https://raw.githubusercontent.com/glanceapp/glance/main/docs/glance.yml
+$ docker run -d \
+    --name glance \
+    -p 8080:8080 \
+    -v $(pwd)/glance.yml:/app/glance.yml \
+    -v $(pwd)/assets:/app/assets \
+    --restart unless-stopped \
+    glanceapp/glance
+
+# Edit glance.yml to customise widgets, then:
+$ docker restart glance</pre>
+      <p>Open <code>http://localhost:8080</code>. That's it. No registration, no signin, no cloud account.</p>
+    </div>
+
+    <div class="aio-quickstart">
+      <h3>Docker Compose (recommended for production)</h3>
+      <pre>services:
+  glance:
+    image: glanceapp/glance
+    container_name: glance
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./glance.yml:/app/glance.yml
+      - ./assets:/app/assets
+    restart: unless-stopped
+    # Optional: reverse-proxy via Caddy or Traefik for HTTPS</pre>
+      <p>Add a <code>traefik.enable=true</code> label if you're behind Traefik; or wrap with Caddy/nginx for TLS.</p>
+    </div>
+
+    <h2>Sample configuration <span class="h2tag">YAML</span></h2>
+    <div class="aio-quickstart">
+      <pre>pages:
+  - name: Morning
+    columns:
+      - size: small
+        widgets:
+          - type: weather
+            location: Jakarta, Indonesia
+            units: metric
+          - type: calendar
+            first-day-of-week: monday
+      - size: full
+        widgets:
+          - type: hacker-news
+            limit: 15
+          - type: rss
+            title: Engineering
+            limit: 10
+            feeds:
+              - url: https://blog.cloudflare.com/rss/
+              - url: https://stratechery.com/feed/
+              - url: https://blog.vercel.com/rss.xml
+      - size: small
+        widgets:
+          - type: stocks
+            stocks:
+              - symbol: NVDA
+                name: NVIDIA
+              - symbol: ASML
+                name: ASML
+              - symbol: TSM
+                name: TSMC
+              - symbol: ^GSPC
+                name: S&amp;P 500</pre>
+      <p>Three columns &mdash; left: weather + calendar; middle: HN + engineering RSS; right: stocks. Restart Glance and reload the page.</p>
+    </div>
+
+    <h2>Live demo <span class="h2tag">coming soon</span></h2>
+    <div class="aio-demo">
+      <b>Live demo placeholder.</b> A working <code>localhost:8080</code> demo will be wired here once the ResistanceZero CF Worker (the same one powering the in-flight Finance Terminal &mdash; flag <code>rz_ft_v2</code>) is production-ready. The demo will run a publicly cached Glance instance configured with engineering RSS feeds, Jakarta weather, headline indices, Hacker News, and the resistancezero status page.
+    </div>
+
+    <h2>Why this instead of alternatives? <span class="h2tag">trade-offs</span></h2>
+    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.92rem;">
+      <thead>
+        <tr style="background:rgba(6,182,212,0.06);">
+          <th style="text-align:left;padding:0.6rem 0.8rem;border-bottom:0.8px solid var(--aio-cyan);">Alternative</th>
+          <th style="text-align:left;padding:0.6rem 0.8rem;border-bottom:0.8px solid var(--aio-cyan);">Where it's better</th>
+          <th style="text-align:left;padding:0.6rem 0.8rem;border-bottom:0.8px solid var(--aio-cyan);">Where Glance wins</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);"><b>Home Assistant</b></td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Real device control + automation</td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Faster to set up; pure dashboard; no learning curve</td></tr>
+        <tr><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);"><b>Notion homepage</b></td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Better notes + docs; rich content</td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Self-hosted; faster load; engineer-aesthetic; no SaaS lock-in</td></tr>
+        <tr><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);"><b>Browser start-page</b></td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Zero install; ad-supported</td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Single source for own data; YAML-config; no ads + no tracking</td></tr>
+        <tr><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);"><b>Grafana</b></td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">Time-series + alerting</td><td style="padding:0.5rem 0.8rem;border-bottom:0.4px solid var(--aio-line);">RSS + news + lifestyle widgets; lighter footprint</td></tr>
+        <tr><td style="padding:0.5rem 0.8rem;"><b>Heimdall / Dashy</b></td><td style="padding:0.5rem 0.8rem;">App-launcher focus</td><td style="padding:0.5rem 0.8rem;">Better at content aggregation; lighter JS</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Resources <span class="h2tag">links</span></h2>
+    <p>
+      <a class="aio-cta" href="https://github.com/glanceapp/glance" target="_blank" rel="noopener">↗ Glance on GitHub</a>
+      <a class="aio-cta" href="https://github.com/glanceapp/glance/blob/main/docs/configuration.md" target="_blank" rel="noopener">↗ YAML config docs</a>
+      <a class="aio-cta" href="https://github.com/glanceapp/glance/tree/main/docs" target="_blank" rel="noopener">↗ Widget docs</a>
+      <a class="aio-cta" href="geopolitics.html">← Back to Geopolitics</a>
+    </p>
+
+  </section>
+
+  <footer class="aio-foot">
+    <p>Glance is licensed under the MIT License. ResistanceZero showcases the project as a recommended self-host pattern for engineers; this page is informational, not affiliated with the Glance project.</p>
+  </footer>
+
+</main>
+
+<script src="auth.js?v=2026-05-09-v1" defer></script>
+</body>
+</html>

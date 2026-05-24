@@ -803,6 +803,36 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.41.0 — 2026-05-25 (All-In-One Dashboard page + geopolitics.html link fix)
+
+Ship 1 of 7 in the v1.41.x batch (owner approved 7 stacked plans).
+
+Owner reported: geopolitics.html "All-In-One Dashboard" card linked to
+`dc-market-tracker.html` (wrong page). No dedicated page existed for
+the Glance dashboard the card describes.
+
+### Added
+- **`all-in-one-dashboard.html`** (NEW, ~350 lines) — informational
+  showcase + quickstart page for the Glance self-hosted dashboard.
+  Sections: hero/badge, what-is-Glance, why-for-engineers (4 tiles),
+  module catalogue (8 widget tiles), Docker + Docker Compose
+  quickstart with copy-pastable snippets, sample YAML configuration,
+  live-demo placeholder, alternative-comparison table (Home Assistant,
+  Notion, browser start-page, Grafana, Heimdall/Dashy), resource
+  links. Engineer-aesthetic dark theme by default; v1.8.0 mobile
+  patch included.
+
+### Fixed
+- `geopolitics.html` line 794: card link
+  `dc-market-tracker.html` → `all-in-one-dashboard.html`
+
+### Notes
+- New page added; brand tokens follow `documentation/design.md`
+  (instrument-cyan accent, IBM Plex Sans + JetBrains Mono, thin lines).
+- Engine files byte-identical. Ship-gate gates clean.
+
+---
+
 ## v1.40.5 — 2026-05-25 (Second Brain Hierarchical view fix — `sortMethod: hubsize` for cyclic knowledge graph)
 
 Owner reported: Hierarchical view on `/Apps/second brain/index.html`
