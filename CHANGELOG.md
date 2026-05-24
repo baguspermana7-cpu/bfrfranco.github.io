@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v1.40.1 — 2026-05-25 (OG images for 27 Network Hub pages + login form wrap + Spares draft refresh)
+
+PATCH ship: closes 3 deferred items from v1.40.0 + Network Hub backlog.
+
+### Added
+
+- **27 OG images** at `assets/og/network-*.webp` (1200&times;630 WebP).
+  Hub landing + compare scaffold + 25 per-topic cards.
+  `tools/build-og-images.py` TARGETS list extended with 27 entries; accent
+  locked to `instrument-cyan` `#00DDFF` per Knowledge Labs section.
+- Spares Readiness x-post-2.md.
+- Spares Readiness LinkedIn draft **refreshed** to reflect v1.16 engine
+  (was written at v1.11; engine grew from single calculator to 25-tab
+  operating engine).
+
+### Changed
+
+- **`auth.js`** — login inputs wrapped in `<form>` with `onsubmit`
+  preventDefault → `doLogin()`. Enter key now submits; autocomplete +
+  `required` attrs work; `for` on labels; submit button is `type="submit"`;
+  `aria-hidden` on decorative modal shield icon. Site-wide fix.
+- `js/rz-version.js` &rarr; v1.40.1
+- `sw.js` &rarr; `rz-cache-v1.40.1`
+
+### Deferred (future sessions)
+
+- Network Hub tempo system (25 topic-module refactor)
+- Live screen-reader walkthrough
+- MTBF / numeric-field normalisation
+- Mobile nav drawer tuning
+
+---
+
 ## v1.40.0 — 2026-05-25 (AI Maintenance — Tier-1+Tier-2 review fixes: CSV provenance + advisory-only + concept-banner + roadmap split)
 
 MINOR ship: post-production-review on `ai-engineering-maintenance.html`.

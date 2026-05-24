@@ -470,14 +470,17 @@
             '<div class="rz-modal">' +
                 '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()" aria-label="Close login dialog">&times;</button>' +
                 '<div id="rzModalForm">' +
-                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;"></i>Sign In</h3>' +
+                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;" aria-hidden="true"></i>Sign In</h3>' +
                     '<p class="rz-modal-sub">Access calculators, tools, and analytical content.</p>' +
                     '<div class="rz-error" id="rzModalError">Invalid email or password.</div>' +
-                    '<label>Email</label>' +
-                    '<input type="email" id="rzModalEmail" placeholder="your@email.com" autocomplete="email">' +
-                    '<label>Password</label>' +
-                    '<input type="password" id="rzModalPassword" placeholder="Enter password" autocomplete="current-password">' +
-                    '<button class="rz-submit-btn" id="rzModalSubmit" onclick="window._rzAuth.doLogin()">Sign In</button>' +
+                    /* v1.40.1 — wrapped in <form> so Enter submits + autocomplete + browser warns on insecure context */
+                    '<form id="rzModalFormEl" onsubmit="event.preventDefault();window._rzAuth.doLogin();return false;" novalidate>' +
+                    '<label for="rzModalEmail">Email</label>' +
+                    '<input type="email" id="rzModalEmail" name="email" placeholder="your@email.com" autocomplete="email" required>' +
+                    '<label for="rzModalPassword">Password</label>' +
+                    '<input type="password" id="rzModalPassword" name="password" placeholder="Enter password" autocomplete="current-password" required>' +
+                    '<button type="submit" class="rz-submit-btn" id="rzModalSubmit">Sign In</button>' +
+                    '</form>' +
                     '<div style="text-align:center;margin-top:12px;font-size:0.68rem;color:#475569;line-height:1.5;">' +
                         'By signing in, you agree to our <a href="terms.html" style="color:#8b5cf6;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#8b5cf6;text-decoration:none;">Privacy Policy</a>' +
                     '</div>' +
