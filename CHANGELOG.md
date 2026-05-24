@@ -11,6 +11,85 @@ release sections rather than semver.
 
 ---
 
+## v1.34.0 — 2026-05-24 (Network Visualization Hub — first live topic page: Modbus RTU + Knowledge Labs section)
+
+MINOR ship: first user-facing page lands on the Network Hub. Modbus RTU
+animation is live with deterministic Strategy-A frame logic, parameter
+panel (baud / parity / stop bits / function code / payload / line noise),
+SFX integration (mute-default), and screen-reader-friendly ARIA live
+region announcing protocol phase transitions.
+
+### Added
+
+- **`network/industrial-ot/modbus-rtu.html`** — live Phase-0 topic page.
+  - 800&times;320 px Canvas 2D animation showing master&rarr;slave request
+    + turnaround silent interval + slave&rarr;master response + ACK ring
+  - 6 parameter controls (baud rate select + parity + stop bits + function
+    code + payload slider with numeric twin + line noise slider with twin)
+  - Mute toggle (audio default off; gesture-gated context unlock on Play)
+  - ARIA live region announces phase transitions ("Phase: master
+    transmitting", "Phase: ACK received") for screen-reader users
+  - 4 engineering-pitfall accordions (silent-interval violation,
+    termination resistors, ground loops, driver fan-out)
+  - 4 primary references (Modbus Org spec V1.02, TIA-485-A,
+    CompTIA Net+ N10-009 §2.1, NEMA ICS 1.1)
+- **`js/network-anim/renderer.js`** (290 lines) &mdash; Canvas 2D primitives:
+  `drawWire` / `drawChip` (8 shapes) / `drawNode` (12 icon types) /
+  `drawACKRing` (600 ms two-phase + centred &check;) / `drawCollisionX` /
+  `drawDropArrow` / `drawScanlineShroud`. Pixel-snap mandate enforced:
+  `Math.round(x) + 0.5` on strokes, `Math.round(originX)` on chip origins.
+  Every function returns drawCalls so engine can enforce &le;200/frame/panel.
+- **`js/network-anim/vfx.js`** (105 lines) &mdash; trail FIFO store (cap 2
+  segments, alpha ramp 0.35 &rarr; 0.12), ACK ring lifecycle store (600 ms),
+  retransmission echo (amber dashed-arrow 0.6 px 50% opacity), compare-mode
+  degradation guard reading `timbre.compareDegrade` priority list.
+- **`datacenter-solutions.html`** &mdash; new **Knowledge Labs &mdash;
+  Standards, Networks, Protocols** section per `KNOWLEDGE_LABS_STANDARD.md`.
+  3 cards: Network Visualization Hub (FREE, instrument-cyan accent),
+  LTC Labs (PRO, oscilloscope-green accent), AI Engineering Maintenance
+  (PRO, blue-400 accent). NOT a 7th card on Cost Calculators &mdash; per
+  the v2 plan, a new section preserves IA legibility.
+- **`js/rz-feature-flags.js`** &mdash; `network-modbus-rtu` page-access
+  entry: public-tier (free / demo / pro / root all pass).
+- **`sitemap.xml`** + **`llms.txt`** &mdash; entries for the new Modbus
+  RTU topic page.
+
+### Changed
+
+- `js/network-anim/topics/modbus-rtu.js` &mdash; promoted from Phase 0
+  stub to live Strategy-A frame logic. `decodeFrame(f, baud, payload)`
+  is a pure function returning `{phase, byteIndex, byteProgress, role,
+  totalFrames}`. `bytePosition(decoded)` is the rendering input. Master
+  byte left&rarr;right; slave byte right&rarr;left; turnaround silent
+  interval rendered as amber label. ACK ring triggers once per cycle.
+  Per-role visual companion: slave chips drawn at alpha 0.85
+  (companion to the audio &minus;200 Hz freq shift).
+- `tools/audit-network-anim.py` &mdash; banned-CSS check now strips both
+  `/* ... */` block comments and `//` line comments before pattern matching
+  (prevents false positives on comments that *name* banned patterns).
+- `js/rz-version.js` &mdash; bumped to v1.34.0 (MINOR; first live Hub page)
+- `sw.js` &mdash; cache name `rz-cache-v1.34.0`
+
+### Status
+
+`tools/audit-network-anim.py` &mdash; CLEAN (1 topic, 0 findings).
+`tools/audit-script-tags.py --strict` &mdash; CLEAN (150 files).
+`tools/audit-js-syntax.py --strict` &mdash; CLEAN (104 files).
+
+### Next Phase 0 work (deferred)
+
+- `network-visualization-hub.html` landing page (currently the Knowledge
+  Labs card links directly to the Modbus RTU topic; landing comes when
+  Phase 1 ships 3 more topics).
+- `network-compare.html` scaffold + Appendix-B-driven instrument chip strip.
+- `tools/test-network-anim-determinism.py` &mdash; `seek(N)` ≡
+  `reset() + seek(N)` harness with element-relative tolerance.
+- OG image at `assets/og/network-modbus-rtu.webp`.
+- Post-draft folder `Article/Post Draft/Network Hub/`.
+- search-index entry for the Modbus RTU page.
+
+---
+
 ## v1.33.0 — 2026-05-24 (Network Visualization Hub — Phase 0 scaffolding: engine + audit + reference Modbus RTU timbre)
 
 MINOR ship: first code lands for the Network Visualization Hub. Per plan

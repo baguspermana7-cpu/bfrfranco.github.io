@@ -322,6 +322,11 @@ window.RZ_FEATURE_FLAGS = {
   /* ── AI Engineering Maintenance (concept brief — Lin & Ompusunggu 2026) ── */
   'ai-engineering-maintenance': {
     'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
+  /* ── Network Visualization Hub topics (Phase 0+; public tier) ── */
+  'network-modbus-rtu': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
   }
 
 };

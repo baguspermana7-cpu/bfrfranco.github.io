@@ -224,19 +224,64 @@ def audit_palette_discipline(path: Path) -> List[Finding]:
     return findings
 
 
+def _strip_comments(text: str) -> str:
+    """Strip /* ... */ block comments and // line comments from JS source."""
+    # Block comments (non-greedy)
+    no_block = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
+    # Line comments
+    no_line = re.sub(r"//.*", "", no_block)
+    return no_line
+
+
 def audit_banned_css(path: Path) -> List[Finding]:
-    """Forbid banned CSS-in-JS patterns inside vfx.js (or topic VFX usage)."""
+    """Forbid banned CSS-in-JS patterns inside vfx.js (or topic VFX usage).
+    Skips both block /* ... */ and line // comments so the audit doesn't
+    flag the comment that *names* the banned patterns."""
     findings: List[Finding] = []
     file_str = str(path.relative_to(REPO_ROOT))
     try:
-        lines = _read(path).splitlines()
+        text = _read(path)
     except OSError:
         return findings
 
-    for i, line in enumerate(lines, start=1):
-        stripped = re.sub(r"//.*$", "", line)
+    # Map of original line offsets after stripping
+    stripped_text = _strip_comments(text)
+    # Track line numbers via the original text. We do a per-line check after
+    # stripping comments by re-aligning: split into lines and strip each.
+    in_block_comment = False
+    for i, line in enumerate(text.splitlines(), start=1):
+        # Compute "code only" portion of this line, accounting for multi-line
+        # block-comment state.
+        idx = 0
+        code_chars = []
+        while idx < len(line):
+            if in_block_comment:
+                end = line.find("*/", idx)
+                if end == -1:
+                    idx = len(line)
+                else:
+                    idx = end + 2
+                    in_block_comment = False
+            else:
+                start_block = line.find("/*", idx)
+                start_line = line.find("//", idx)
+                if start_block == -1 and start_line == -1:
+                    code_chars.append(line[idx:])
+                    idx = len(line)
+                elif start_line != -1 and (start_block == -1 or start_line < start_block):
+                    code_chars.append(line[idx:start_line])
+                    idx = len(line)
+                else:
+                    code_chars.append(line[idx:start_block])
+                    end = line.find("*/", start_block + 2)
+                    if end == -1:
+                        in_block_comment = True
+                        idx = len(line)
+                    else:
+                        idx = end + 2
+        code = "".join(code_chars)
         for pattern, label in BANNED_CSS_PATTERNS:
-            if re.search(pattern, stripped, re.IGNORECASE):
+            if re.search(pattern, code, re.IGNORECASE):
                 findings.append(Finding(
                     "HIGH",
                     file_str,

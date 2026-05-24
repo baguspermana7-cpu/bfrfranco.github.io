@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modbus RTU · Network Hub · ResistanceZero</title>
+<meta name="description" content="Interactive animated visualisation of Modbus RTU serial protocol — master/slave byte exchange, parameter-driven, oscilloscope-grade. CompTIA Network+ adjacent.">
+<meta name="theme-color" content="#0F172A">
+<link rel="canonical" href="https://resistancezero.com/network/industrial-ot/modbus-rtu.html">
+<link rel="icon" href="../../assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="../../styles.min.css?v=20260524">
+<style>
+  :root {
+    --cyan: #00DDFF;
+    --amber: #FFAA00;
+    --green: #00FF88;
+    --red: #FF3030;
+    --wire: #475569;
+    --canvas-bg: #0F172A;
+  }
+  .net-hero {
+    padding: 3rem 1.5rem 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .net-hero h1 {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .net-hero .chip-meta {
+    display: inline-flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.8rem;
+  }
+  .net-chip {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.5rem;
+    border: 0.8px solid var(--wire);
+    color: var(--cyan);
+    background: rgba(0, 221, 255, 0.04);
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .net-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  .net-section h2 {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 1.2rem;
+    margin: 0 0 0.8rem;
+    letter-spacing: -0.005em;
+  }
+  .anim-cluster {
+    border: 1px solid var(--wire);
+    border-radius: 4px;
+    background: var(--canvas-bg);
+    padding: 0;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .anim-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    border-bottom: 0.8px solid rgba(255, 255, 255, 0.08);
+    background: #0a1220;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.78rem;
+  }
+  .anim-controls button {
+    font-family: inherit;
+    font-size: 0.78rem;
+    background: transparent;
+    color: var(--cyan);
+    border: 0.8px solid var(--wire);
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .anim-controls button:hover,
+  .anim-controls button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-color: var(--cyan); }
+  .anim-controls .mute-state { color: var(--wire); }
+  .anim-controls .mute-state.on { color: var(--green); }
+  #animCanvas {
+    display: block;
+    width: 100%;
+    height: 320px;
+    background: var(--canvas-bg);
+  }
+  .param-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem 1.2rem;
+    margin-top: 1rem;
+  }
+  .param-grid label {
+    display: block;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--wire);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+  .param-grid select,
+  .param-grid input[type=number] {
+    width: 100%;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+    border: 0.8px solid var(--wire);
+    background: transparent;
+    color: inherit;
+    border-radius: 2px;
+  }
+  .param-grid input[type=range] { width: 100%; }
+  .param-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .param-row input[type=number] { width: 80px; }
+  details.net-accord {
+    border: 0.8px solid var(--wire);
+    border-radius: 4px;
+    margin: 0.6rem 0;
+    padding: 0.7rem 1rem;
+  }
+  details.net-accord > summary {
+    cursor: pointer;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--cyan);
+  }
+  details.net-accord[open] > summary { margin-bottom: 0.6rem; }
+  [data-theme="dark"] .net-section { color: #e2e8f0; }
+  [data-theme="dark"] .anim-controls { background: #0a1220; }
+  .live-region {
+    position: absolute; left: -9999px;
+    width: 1px; height: 1px; overflow: hidden;
+  }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-container">
+    <a href="../../index.html" class="logo" aria-label="ResistanceZero home">ResistanceZero</a>
+    <nav class="nav-right" aria-label="primary">
+      <a href="../../datacenter-solutions.html#knowledge-labs">Knowledge Labs</a>
+      <a href="../../tools.html">Tools</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="net-hero">
+    <div class="chip-meta">
+      <span class="net-chip">Net+ N10-009 §2.1</span>
+      <span class="net-chip">Lane B · Industrial OT</span>
+      <span class="net-chip">FREE</span>
+    </div>
+    <h1>Modbus RTU — serial master/slave byte exchange</h1>
+    <p>Modbus RTU is the 1979 serial protocol that still moves bytes between PLCs, RTUs, and field sensors in every data-center BMS you've touched. This page renders the wire-level byte exchange so you can see what a request frame, turnaround silent interval, and response frame look like at 9600 baud — and what changes when you push the baud rate, payload, or line noise.</p>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-animation">
+    <h2 id="sec-animation">Animation</h2>
+
+    <div class="anim-cluster">
+      <div class="anim-controls" role="toolbar" aria-label="Animation controls">
+        <button type="button" id="playBtn" aria-label="Play animation">▶ Play</button>
+        <button type="button" id="pauseBtn" aria-label="Pause animation">❚❚ Pause</button>
+        <button type="button" id="muteBtn" aria-label="Toggle audio">SFX <span class="mute-state" id="muteState">muted</span></button>
+        <span style="margin-left:auto;color:var(--wire);" id="frameLabel">frame 0</span>
+      </div>
+      <canvas id="animCanvas" width="800" height="320" aria-label="Modbus RTU byte exchange animation"></canvas>
+    </div>
+
+    <div class="param-grid" aria-label="Modbus RTU parameters">
+      <div>
+        <label for="paramBaud">Baud rate</label>
+        <select id="paramBaud">
+          <option value="9600" selected>9600</option>
+          <option value="19200">19200</option>
+          <option value="38400">38400</option>
+          <option value="57600">57600</option>
+          <option value="115200">115200</option>
+        </select>
+      </div>
+      <div>
+        <label for="paramParity">Parity</label>
+        <select id="paramParity">
+          <option value="none">none</option>
+          <option value="even" selected>even</option>
+          <option value="odd">odd</option>
+        </select>
+      </div>
+      <div>
+        <label for="paramStop">Stop bits</label>
+        <select id="paramStop">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+        </select>
+      </div>
+      <div>
+        <label for="paramFc">Function code</label>
+        <select id="paramFc">
+          <option value="1">01 — read coils</option>
+          <option value="2">02 — read discrete inputs</option>
+          <option value="3" selected>03 — read holding regs</option>
+          <option value="4">04 — read input regs</option>
+          <option value="5">05 — write single coil</option>
+          <option value="6">06 — write single reg</option>
+          <option value="15">15 — write multiple coils</option>
+          <option value="16">16 — write multiple regs</option>
+        </select>
+      </div>
+      <div>
+        <label for="paramPayload">Payload bytes</label>
+        <div class="param-row">
+          <input type="range" id="paramPayload" min="1" max="125" value="8" step="1">
+          <input type="number" id="paramPayloadNum" min="1" max="125" value="8" step="1">
+        </div>
+      </div>
+      <div>
+        <label for="paramNoise">Line noise %</label>
+        <div class="param-row">
+          <input type="range" id="paramNoise" min="0" max="30" value="0" step="1">
+          <input type="number" id="paramNoiseNum" min="0" max="30" value="0" step="1">
+        </div>
+      </div>
+    </div>
+
+    <div id="scrubberLive" class="live-region" aria-live="polite"></div>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-pitfalls">
+    <h2 id="sec-pitfalls">Engineering pitfalls</h2>
+
+    <details class="net-accord">
+      <summary>Silent-interval violation breaks frame alignment</summary>
+      <p>If your master polls faster than 3.5 character times between frames, slaves can't tell where one frame ends and the next begins. At 9600 baud, one character time = 1/960 s ≈ 1.04 ms; 3.5 char times ≈ 3.65 ms. Many PLC defaults sit at 1 ms polling and silently miss responses.</p>
+    </details>
+
+    <details class="net-accord">
+      <summary>Termination resistor missing → reflections corrupt CRC</summary>
+      <p>RS-485 needs 120 Ω termination at both ends of the bus. Skip it and the wave reflects, the CRC fails, and you'll watch your reliability counter climb without ever seeing a hardware fault. The page's <em>line noise</em> slider simulates this — push to 5% and watch frames start to die.</p>
+    </details>
+
+    <details class="net-accord">
+      <summary>Ground loop between master and slave</summary>
+      <p>Modbus RTU runs differential, but the signal ground still matters. A 1 V common-mode shift between master and slave grounds will throw bytes into the noise floor. Always tie signal grounds across the bus; never rely on chassis-to-chassis paths.</p>
+    </details>
+
+    <details class="net-accord">
+      <summary>Driver fan-out limit (32 nodes per segment)</summary>
+      <p>Standard RS-485 transceivers drive 32 unit loads. Past 32 devices, drop the bias voltage and frames get truncated. Modern 1/4-load and 1/8-load chips raise this to 128 or 256 — verify your transceiver datasheet before exceeding 32.</p>
+    </details>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-related">
+    <h2 id="sec-related">Related</h2>
+    <ul>
+      <li><a href="../../datacenter-solutions.html#knowledge-labs">Knowledge Labs (hub)</a></li>
+      <li><a href="../../ai-engineering-maintenance.html">AI Engineering Maintenance — concept page</a></li>
+      <li><a href="../../spares-readiness-calculator.html">Spares Readiness Calculator</a></li>
+    </ul>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-refs">
+    <h2 id="sec-refs">References</h2>
+    <details class="net-accord">
+      <summary>Primary sources</summary>
+      <ul>
+        <li>Modbus Organization, <em>MODBUS over Serial Line — Specification and Implementation Guide V1.02</em> (2006).</li>
+        <li>TIA-485-A, <em>Electrical Characteristics of Generators and Receivers for Use in Balanced Digital Multipoint Systems</em>.</li>
+        <li>CompTIA Network+ N10-009 Exam Objectives, §2.1 (Common Networking Cables, Protocols, and Use Cases).</li>
+        <li>NEMA ICS 1.1, <em>Safety Guidelines for Programmable Logic Controllers</em>.</li>
+      </ul>
+    </details>
+  </section>
+
+  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);">
+    <span id="versionStamp">· ResistanceZero · v?.?.? ·</span>
+  </footer>
+
+</main>
+
+<!-- ───── Network Anim engine (load order: palette → audio → renderer → vfx → engine → topic → bootstrap) ───── -->
+<script src="../../js/network-anim/palette.js?v=20260524"></script>
+<script src="../../js/network-anim/audio.js?v=20260524"></script>
+<script src="../../js/network-anim/renderer.js?v=20260524"></script>
+<script src="../../js/network-anim/vfx.js?v=20260524"></script>
+<script src="../../js/network-anim/engine.js?v=20260524"></script>
+<script src="../../js/network-anim/topics/modbus-rtu.js?v=20260524"></script>
+
+<script src="../../js/rz-version.js?v=20260524"></script>
+
+<script>
+/* Bootstrap — wire engine + topic + UI controls */
+(function () {
+  'use strict';
+  var canvas = document.getElementById('animCanvas');
+  if (!canvas) return;
+
+  // Track current phase for ARIA milestone announcements
+  var lastAnnouncedPhase = '';
+  var liveRegion = document.getElementById('scrubberLive');
+  var frameLabel = document.getElementById('frameLabel');
+
+  var signals = {
+    onSFX: function (eventName, spec, ctx) {
+      // Phase milestone announcements via ARIA live region
+      if (ctx && ctx.role && eventName === 'byte') {
+        var phaseTag = ctx.role + '-byte';
+        if (phaseTag !== lastAnnouncedPhase) {
+          lastAnnouncedPhase = phaseTag;
+          if (liveRegion) liveRegion.textContent = 'Phase: ' + ctx.role + ' transmitting';
+        }
+      } else if (eventName === 'ack') {
+        if (liveRegion) liveRegion.textContent = 'Phase: ACK received, transaction complete';
+        lastAnnouncedPhase = 'ack';
+      }
+    },
+    onError:    function () { if (liveRegion) liveRegion.textContent = 'Phase: error'; },
+    onComplete: function () { if (liveRegion) liveRegion.textContent = 'Phase: complete'; }
+  };
+
+  var instance = window.RZNetAnim.modbusRtu.init(canvas, {}, signals);
+  var engine = window.RZNetAnim.engine.create(instance, { signals: signals });
+
+  // ─ Play/pause/mute controls
+  document.getElementById('playBtn').addEventListener('click', function () {
+    window.RZNetAnim.audio.init();   // unlock audio context with gesture
+    instance.play();
+  });
+  document.getElementById('pauseBtn').addEventListener('click', function () { instance.pause(); });
+
+  var muted = true;
+  var muteState = document.getElementById('muteState');
+  document.getElementById('muteBtn').addEventListener('click', function () {
+    muted = !muted;
+    window.RZNetAnim.audio.setMuted(muted);
+    muteState.textContent = muted ? 'muted' : 'on';
+    muteState.classList.toggle('on', !muted);
+  });
+
+  // ─ Parameter wiring
+  function readParams() {
+    return {
+      baudRate:     parseInt(document.getElementById('paramBaud').value, 10),
+      parity:       document.getElementById('paramParity').value,
+      stopBits:     parseInt(document.getElementById('paramStop').value, 10),
+      fcCode:       parseInt(document.getElementById('paramFc').value, 10),
+      payloadBytes: parseInt(document.getElementById('paramPayload').value, 10),
+      lineNoise:    parseInt(document.getElementById('paramNoise').value, 10)
+    };
+  }
+  function pushParams() { instance.setParams(readParams()); }
+  ['paramBaud', 'paramParity', 'paramStop', 'paramFc'].forEach(function (id) {
+    document.getElementById(id).addEventListener('change', pushParams);
+  });
+  // Slider + numeric input twin
+  function bindTwin(rangeId, numId) {
+    var r = document.getElementById(rangeId), n = document.getElementById(numId);
+    r.addEventListener('input', function () { n.value = r.value; pushParams(); });
+    n.addEventListener('input', function () { r.value = n.value; pushParams(); });
+  }
+  bindTwin('paramPayload', 'paramPayloadNum');
+  bindTwin('paramNoise', 'paramNoiseNum');
+
+  // ─ Per-frame UI tick
+  function uiTick() {
+    var fc = engine._debugFrameCount();
+    if (frameLabel) frameLabel.textContent = 'frame ' + fc;
+    requestAnimationFrame(uiTick);
+  }
+  uiTick();
+
+  // ─ Version stamp
+  (function () {
+    var el = document.getElementById('versionStamp');
+    if (!el) return;
+    var v = window.RZ_VERSION || '1.x.x';
+    el.textContent = '· ResistanceZero · v' + v + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·';
+  })();
+})();
+</script>
+
+</body>
+</html>
