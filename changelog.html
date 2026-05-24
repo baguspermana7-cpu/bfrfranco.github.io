@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 147 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 148 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 147,
+        "numberOfItems": 148,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.36.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.36.0"},
         {"@type":"ListItem","position":2,"name":"v1.35.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.35.0"},
@@ -82,9 +82,9 @@
         {"@type":"ListItem","position":5,"name":"v1.32.10 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.10"},
         {"@type":"ListItem","position":6,"name":"v1.32.7 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.7"},
         {"@type":"ListItem","position":7,"name":"v1.32.5 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.5"},
-        {"@type":"ListItem","position":8,"name":"v1.35.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.35.1"},
-        {"@type":"ListItem","position":9,"name":"v1.33.2 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.2"},
-        {"@type":"ListItem","position":10,"name":"v1.33.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.1"}
+        {"@type":"ListItem","position":8,"name":"v1.36.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.36.1"},
+        {"@type":"ListItem","position":9,"name":"v1.35.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.35.1"},
+        {"@type":"ListItem","position":10,"name":"v1.33.2 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.2"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.36.0</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">147 releases</span>
+        <span class="cl-count-badge">148 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1248,6 +1248,85 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.36.1">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.36.1</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-24">May 24, 2026</time>
+      </div>
+      <p class="changelog-caption">Probe wired into per-ship gate sequence + ship-gate.sh runner + mobile-responsive patch on 6 Network Hub pages</p>
+      <div class="changelog-body">
+        <p>(Authored locally as v1.35.2 with 3 mobile patches. Parallel session</p>
+<p>shipped v1.36.0 with 3 more new pages mid-push; this lands as v1.36.1</p>
+<p>with mobile patch on all 6.)</p>
+<p>The probe has been a runnable harness since v1.32.9 but invocation was</p>
+<p>voluntary. This ship makes it a first-class per-ship gate by adding it</p>
+<p>to <code>CLAUDE.md</code>'s standard sequence, providing a single-command runner</p>
+<p>(<code>tools/ship-gate.sh</code>), and updating the tooling reference table.</p>
+<h3 class="cl-subhead">Added</h3>
+<ul>
+  <li><strong><code>tools/ship-gate.sh</code></strong> — single-command runner for the full</li>
+</ul>
+<p>per-ship gate sequence. 7 default gates (4 audit + 2 engine tests +</p>
+<p>1 engine-files-byte-identical guard) + optional 8th gate</p>
+<p>(<code>--probe</code> to run <code>probe-accuracy-validation.mjs</code>).</p>
+<p>Exit code 0 = green, 1 = a gate failed. Wirable to a pre-push</p>
+<p>git hook:</p>
+<p>```bash</p>
+<p>echo 'bash tools/ship-gate.sh --probe' > .git/hooks/pre-push</p>
+<p>chmod +x .git/hooks/pre-push</p>
+<p>```</p>
+<ul>
+  <li><strong><code>CLAUDE.md</code> updates</strong>:</li>
+  <li class="cl-sub-item">New "Engine + accuracy tests" block in §"Audit before push" with</li>
+</ul>
+<p>the three engine/probe commands.</p>
+<ul>
+  <li class="cl-sub-item">Tooling-reference table gains 3 rows (<code>test-datahall-calc.mjs</code>,</li>
+</ul>
+<p><code>test-conv-calc.mjs</code>, <code>probe-accuracy-validation.mjs</code>).</p>
+<ul>
+  <li class="cl-sub-item">Standardisation-docs list gains 3 entries</li>
+</ul>
+<p>(<code>ACCURACY_VALIDATION.md</code>, <code>BMS_SHELL.md</code>, <code>TECH_SPEC_PDF.md</code>)</p>
+<p>with the per-doc "READ BEFORE" guidance.</p>
+<h3 class="cl-subhead">Mobile-responsive patch (incidental fix surfaced by the new gate)</h3>
+<p>Running <code>ship-gate.sh</code> for the first time flagged pages from the</p>
+<p>parallel session's v1.34.0/v1.35.0/v1.36.0 Network Hub work as failing</p>
+<p><code>audit-mobile-responsive --strict</code> (score 2/10, missing all 7</p>
+<p>checkpoints). Standard v1.8.0 mobile patch added to 6 pages:</p>
+<ul>
+  <li><code>network-visualization-hub.html</code></li>
+  <li><code>network-compare.html</code></li>
+  <li><code>network/industrial-ot/modbus-rtu.html</code></li>
+  <li><code>network/industrial-ot/modbus-tcp.html</code></li>
+  <li><code>network/industrial-ot/bacnet-ip.html</code></li>
+  <li><code>network/industrial-ot/opc-ua.html</code></li>
+</ul>
+<p>All six now pass at score 9/10. Mobile-responsive audit total:</p>
+<p>111 pass / 0 fail (was 105 pass / 6 fail).</p>
+<h3 class="cl-subhead">What this proves</h3>
+<p>The gate-script is doing exactly what it should: surfacing defects</p>
+<p>across sessions before they ship to production. The 3 Network Hub</p>
+<p>pages would have stayed un-responsive indefinitely without the gate;</p>
+<p>they're now patched as part of normal ship discipline.</p>
+<h3 class="cl-subhead">Result</h3>
+<p><strong>8/8 gates PASS</strong> (<code>ship-gate.sh --probe</code>). Probe still **40/40</p>
+<p>PASS**.</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Engine files byte-identical. 57/57 + 22/22 tests pass.</li>
+  <li>Owner can run <code>bash tools/ship-gate.sh</code> (skip probe, fast ~5 s)</li>
+</ul>
+<p>or <code>bash tools/ship-gate.sh --probe</code> (full ~60 s including probe).</p>
+<ul>
+  <li>Future ships should run the gate before push. If a gate is</li>
+</ul>
+<p>expected to fail (e.g. intentional engine change), document the</p>
+<p>exception in the commit message.</p>
       </div>
     </article>
 

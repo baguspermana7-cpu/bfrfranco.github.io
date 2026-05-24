@@ -518,6 +518,72 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.36.1 — 2026-05-24 (Probe wired into per-ship gate sequence + ship-gate.sh runner + mobile-responsive patch on 6 Network Hub pages)
+
+(Authored locally as v1.35.2 with 3 mobile patches. Parallel session
+shipped v1.36.0 with 3 more new pages mid-push; this lands as v1.36.1
+with mobile patch on all 6.)
+
+The probe has been a runnable harness since v1.32.9 but invocation was
+voluntary. This ship makes it a first-class per-ship gate by adding it
+to `CLAUDE.md`'s standard sequence, providing a single-command runner
+(`tools/ship-gate.sh`), and updating the tooling reference table.
+
+### Added
+- **`tools/ship-gate.sh`** — single-command runner for the full
+  per-ship gate sequence. 7 default gates (4 audit + 2 engine tests +
+  1 engine-files-byte-identical guard) + optional 8th gate
+  (`--probe` to run `probe-accuracy-validation.mjs`).
+  Exit code 0 = green, 1 = a gate failed. Wirable to a pre-push
+  git hook:
+  ```bash
+  echo 'bash tools/ship-gate.sh --probe' > .git/hooks/pre-push
+  chmod +x .git/hooks/pre-push
+  ```
+- **`CLAUDE.md` updates**:
+  - New "Engine + accuracy tests" block in §"Audit before push" with
+    the three engine/probe commands.
+  - Tooling-reference table gains 3 rows (`test-datahall-calc.mjs`,
+    `test-conv-calc.mjs`, `probe-accuracy-validation.mjs`).
+  - Standardisation-docs list gains 3 entries
+    (`ACCURACY_VALIDATION.md`, `BMS_SHELL.md`, `TECH_SPEC_PDF.md`)
+    with the per-doc "READ BEFORE" guidance.
+
+### Mobile-responsive patch (incidental fix surfaced by the new gate)
+Running `ship-gate.sh` for the first time flagged pages from the
+parallel session's v1.34.0/v1.35.0/v1.36.0 Network Hub work as failing
+`audit-mobile-responsive --strict` (score 2/10, missing all 7
+checkpoints). Standard v1.8.0 mobile patch added to 6 pages:
+- `network-visualization-hub.html`
+- `network-compare.html`
+- `network/industrial-ot/modbus-rtu.html`
+- `network/industrial-ot/modbus-tcp.html`
+- `network/industrial-ot/bacnet-ip.html`
+- `network/industrial-ot/opc-ua.html`
+
+All six now pass at score 9/10. Mobile-responsive audit total:
+111 pass / 0 fail (was 105 pass / 6 fail).
+
+### What this proves
+The gate-script is doing exactly what it should: surfacing defects
+across sessions before they ship to production. The 3 Network Hub
+pages would have stayed un-responsive indefinitely without the gate;
+they're now patched as part of normal ship discipline.
+
+### Result
+**8/8 gates PASS** (`ship-gate.sh --probe`). Probe still **40/40
+PASS**.
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- Owner can run `bash tools/ship-gate.sh` (skip probe, fast ~5 s)
+  or `bash tools/ship-gate.sh --probe` (full ~60 s including probe).
+- Future ships should run the gate before push. If a gate is
+  expected to fail (e.g. intentional engine change), document the
+  exception in the commit message.
+
+---
+
 ## v1.35.1 — 2026-05-24 (Cross-page headline consistency probe — Rule 1 verified site-wide; 40/40 pass)
 
 (Authored locally as v1.33.3. Parallel session shipped v1.34.0 + v1.35.0

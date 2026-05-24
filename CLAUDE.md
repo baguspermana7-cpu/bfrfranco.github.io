@@ -42,6 +42,17 @@ python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD
 ```
 
+**Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):
+```bash
+node tools/test-datahall-calc.mjs                  # 57/57 doc-21 worked examples
+node tools/test-conv-calc.mjs                      # 22/22 conv DoD identities
+RZ_BASE=file node tools/probe-accuracy-validation.mjs   # 40/40 reviewer acceptance tests
+```
+
+The probe is the verification harness for `Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md` + `Documents/screenshot bms rz/conv/review/16-accuracy-validation-and-correction-list.md`. It covers per-page assertions on `datahallAI.html`, `dc-conventional.html`, `datahall.html` + cross-page consistency (PUE/WUE/IT reconciles across all displaying pages). See `standarization/ACCURACY_VALIDATION.md` for the 6 rules + 23 acceptance tests it enforces.
+
+If the probe fails, do NOT push. Investigate the failure — the probe was authored specifically to catch the bugs the reviewer flagged, and it caught two real ones (FAQ ReferenceError + dashboard random KPIs) on its first run.
+
 **After push**: `python3 tools/indexnow-submit.py --since HEAD~1` pings Bing/Yandex/Seznam.
 
 ---
@@ -312,6 +323,9 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/insert-version-script.py` | walk pages and inject `<script src="js/rz-version.js">` |
 | `tools/indexnow-submit.py` | POST changed URLs to Bing/Yandex IndexNow |
 | `tools/inject-schema-faq-howto.py` | add FAQ/HowTo JSON-LD to calc/tool pages |
+| `tools/test-datahall-calc.mjs` | DC AI engine — 57/57 doc-21 worked examples |
+| `tools/test-conv-calc.mjs` | DC Conv engine — 22/22 DoD identities |
+| `tools/probe-accuracy-validation.mjs` | Reviewer's 23 acceptance tests + cross-page Rule-1 consistency — 40/40 PASS at v1.35.1 (see standarization/ACCURACY_VALIDATION.md) |
 
 ---
 
@@ -326,6 +340,9 @@ Reference these BEFORE adding new patterns. Update them WHEN shipping a new patt
 - `standarization/AUTH_STANDARD.md` — login modal, auth widget injection
 - `standarization/PDF_EXPORT_STANDARD.md` — PDF print-window templates + `<\/script>` escape rule
 - **`standarization/CONTENT_LINKAGE_PLAYBOOK.md` — READ AT START & END of any content/feature task.** The "when X changes, also update Y" handoff (new article → insights feed + articles index + series page + glossary + sitemap + search-index + llms + post-drafts; new tool → tools/dc-solutions/rz-ops; every change → version+changelog+sw+gates+memory). Changelog is easter-egg-only (version stamp), never a nav item.
+- **`standarization/ACCURACY_VALIDATION.md` — READ BEFORE touching cockpit pages** (DC AI / DC Conv / datahall / chiller-plant / water-system / fire-system / fuel-system / ict / EPMS). 6 rules (one source of truth · no Math.random on basis KPIs · explicit denominator on every metric · marketing target ≠ derived value · terminology must match engineering basis · basis chip on every critical KPI) + 23 acceptance tests codified in `tools/probe-accuracy-validation.mjs`. Owner-exclusion on `#p-dash` / `updateDashKPI()` / `dcCallouts` was LIFTED 2026-05-23 — those zones are now under the same accuracy gates as the rest. Source review docs: `Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md` + `.../conv/review/16-accuracy-validation-and-correction-list.md`.
+- **`standarization/BMS_SHELL.md`** — shared cockpit foundation library; adoption status across 9 pages.
+- **`standarization/TECH_SPEC_PDF.md`** — Generate Design + FAQ buttons + Tech Spec PDF build pattern (datahallAI + dc-conventional).
 
 ---
 
