@@ -309,6 +309,62 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
 }
 
 /* ========================================================================
+ * FAQ DIALOG PROBES (v1.37.2 — regression-guard the FAQ_ITEMS ReferenceError
+ * that v1.32.10 fixed. Click FAQ button, verify dialog opens with expected
+ * Q/A count and no console errors.) The FAQ used to throw on page-parse for
+ * ~3 weeks (v1.30.1 → v1.32.10) because FAQ_ITEMS referenced out-of-scope
+ * vars at the IIFE top level. The fix moved the array inside openFaqDialog
+ * with defensive lookups — this probe ensures that fix doesn't silently
+ * regress.
+ * ====================================================================== */
+console.log('\n=== FAQ dialog probes ===');
+{
+  async function checkFaq(url, triggerSel, dialogSel, expectedMinQs) {
+    const page = await browser.newPage();
+    const errs = [];
+    page.on('pageerror', e => errs.push(String(e)));
+    await page.goto(`${BASE}/${url}`, {waitUntil:'domcontentloaded', timeout:30000});
+    await new Promise(r => setTimeout(r, 1500));
+    /* No page errors should have surfaced from the FAQ_ITEMS init */
+    const initErrs = errs.filter(s => /sc is not defined|FAQ_ITEMS/.test(s));
+    await page.evaluate((sel) => {
+      const btn = document.querySelector(sel);
+      if (btn) btn.click();
+    }, triggerSel);
+    await new Promise(r => setTimeout(r, 500));
+    const dlg = await page.evaluate((dlgSel) => {
+      const d = document.querySelector(dlgSel);
+      if (!d) return null;
+      const txt = d.textContent;
+      const detailsCount = d.querySelectorAll('details').length;
+      return {
+        present: true,
+        detailsCount,
+        hasInformational: /informational only|simulated|not a forecast/i.test(txt) || /not a feed from a physical/i.test(txt),
+        chars: txt.length
+      };
+    }, dialogSel);
+    const clickErrs = errs.filter(s => !/ipapi|CORS|fetch/i.test(s));
+    await page.close();
+    return {dlg, initErrs, clickErrs};
+  }
+
+  /* DC AI FAQ */
+  const ai = await checkFaq('datahallAI.html', '#faqTrig', '#rzFaqDialog', 10);
+  assert(ai.initErrs.length === 0, 'FAQ-AI-1: no page-error from FAQ_ITEMS init (regression-guard v1.32.10)', ai.initErrs.join(' | '));
+  assert(ai.dlg?.present, 'FAQ-AI-2: FAQ dialog opens on click', '');
+  assert((ai.dlg?.detailsCount||0) >= 10, `FAQ-AI-3: dialog has ≥10 Q/A pairs (got ${ai.dlg?.detailsCount})`, '');
+  assert(ai.clickErrs.length === 0, 'FAQ-AI-4: no JS error from clicking FAQ', ai.clickErrs.join(' | '));
+
+  /* DC Conv FAQ */
+  const conv = await checkFaq('dc-conventional.html', '#faqTrigConv', '#rzFaqDialogConv', 10);
+  assert(conv.initErrs.length === 0, 'FAQ-CONV-1: no page-error from FAQ init', conv.initErrs.join(' | '));
+  assert(conv.dlg?.present, 'FAQ-CONV-2: FAQ dialog opens on click', '');
+  assert((conv.dlg?.detailsCount||0) >= 10, `FAQ-CONV-3: dialog has ≥10 Q/A pairs (got ${conv.dlg?.detailsCount})`, '');
+  assert(conv.clickErrs.length === 0, 'FAQ-CONV-4: no JS error from clicking FAQ', conv.clickErrs.join(' | '));
+}
+
+/* ========================================================================
  * CROSS-PAGE HEADLINE CONSISTENCY (v1.33.3 — reviewer's Rule 1 "one source
  * of truth" verified across all pages that display the metric). Conv-engine
  * pages share CONV_CALC.snapshot, so PUE/WUE/IT must reconcile identically.

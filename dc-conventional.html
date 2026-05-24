@@ -2061,7 +2061,11 @@ function openFaqDialog(){
     ['Why is the PUE '+pueVal+' and not 1.2?',
      'Because the engine builds PUE bottom-up from chiller plant, CRAH fan energy, UPS losses and ancillary loads. We deliberately do not back-solve into a marketing number. 1.45 is realistic for an air-cooled DC in tropical climate without seasonal economisation.'],
     ['How many racks does this facility have?',
-     '' + (s?grp(s.datahall.racks_total):'200') + ' racks at an average ' + (s?(s.site.it_load_kw/s.datahall.racks_total).toFixed(2):'9.25') + ' kW per rack. This is reflective of a mid-density enterprise DC; high-density AI loads belong on the DC AI cockpit.'],
+     /* v1.37.2 — CONV_CALC.snapshot does not expose datahall.racks_total
+        (it lives in design constants, not snapshot). Hardcoded 200 + density
+        derived from snapshot.site.it_load_kw. Probe caught the
+        'Cannot read racks_total of undefined' TypeError. */
+     '200 racks at an average ' + (s ? (s.site.it_load_kw/200).toFixed(2) : '9.25') + ' kW per rack. This is reflective of a mid-density enterprise DC; high-density AI loads belong on the DC AI cockpit.'],
     ['Is the data on this page live BMS telemetry?',
      'No. Every value is modelled from the locked snapshot. The page is engineered to look like an operations console so the design conversation stays in one place; it is not a feed from a physical facility.'],
     ['What standards underpin the design?',

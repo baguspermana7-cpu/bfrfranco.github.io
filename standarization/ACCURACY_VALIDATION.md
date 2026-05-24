@@ -233,8 +233,12 @@ alongside the four audit scripts (`audit-script-tags`,
   `buildTechSpecHtml()` referenced `sldSVG` declared only in
   `buildBodPdfHtml()` scope. Fixed by local var declaration. **60/60
   PASS** (was 40; +20 Tech Spec assertions).
-- **v1.36.3** (2026-05-24): BoD Export PDF probe coverage added —
-  separate code path from Generate Design (`#bodTrig` →
-  `#bodDrawerPdf` → `buildBodPdfHtml()` in different IIFE). PDF was
-  healthy on first run; now mechanically verified. **67/67 PASS**
-  (was 60; +7 BoD assertions).
+- **v1.37.1** (2026-05-24): BoD Export PDF probe coverage added —
+  separate code path from Generate Design. PDF was healthy on first
+  run; now mechanically verified. **67/67 PASS** (was 60; +7 BoD).
+  (Authored as v1.36.3; renumbered after parallel v1.37.0 Network Hub.)
+- **v1.37.2** (2026-05-24): FAQ dialog probe coverage. Caught
+  **bug #5**: DC Conv FAQ button TypeError (`s.datahall.racks_total`
+  undefined — `CONV_CALC.snapshot` has no `datahall` key). Fixed
+  by hardcoding 200 racks design constant with defensive guard.
+  **75/75 PASS** (was 67; +8 FAQ assertions).

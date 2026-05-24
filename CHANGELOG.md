@@ -555,6 +555,62 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.37.2 — 2026-05-24 (FAQ dialog probe coverage; caught DC Conv FAQ TypeError; 75/75 pass)
+
+The probe was extended to cover the FAQ dialog on both cockpits. On
+first run it caught **another silent bug** — DC Conv FAQ button threw
+`TypeError: Cannot read properties of undefined (reading 'racks_total')`
+when clicked. Bug #5 caught by the probe in 24 hours.
+
+### Bug found (user-facing — FAQ dialog crashed before opening)
+- **Symptom**: DC Conv cockpit → click "❓ FAQ" button → dialog
+  fails to open. No visible error.
+- **Console error**: `TypeError: Cannot read properties of undefined
+  (reading 'racks_total')` at the FAQ_ITEMS array initialisation
+  (FAQ entry "How many racks does this facility have?").
+- **Root cause**: `dc-conventional.html` line 2064 referenced
+  `s.datahall.racks_total` but `CONV_CALC.snapshot` has no
+  `datahall` key — racks_total is in design constants, not the
+  snapshot. The `s ?` guard only checked if the snapshot existed,
+  not whether the `datahall` sub-object existed.
+- **Fix**: hardcode 200 racks (the conv design constant) and derive
+  average density from `s.site.it_load_kw / 200` with the same
+  defensive guard pattern used elsewhere.
+- **Impact window**: shipped in v1.30.1 (2026-05-23) → fixed v1.37.2
+  (2026-05-24). All users who clicked the FAQ on DC Conv between
+  ship and fix saw a broken modal.
+
+### Probe added (regression-guard)
+- **FAQ-AI-1 to FAQ-AI-4**: DC AI FAQ — no page-error from
+  FAQ_ITEMS init (guards against v1.32.10 ReferenceError regression),
+  dialog opens on click, ≥10 Q/A pairs, no JS error on click.
+- **FAQ-CONV-1 to FAQ-CONV-4**: same 4 assertions on DC Conv FAQ.
+
+### Result
+**75/75 PASS** (was 67; +8 FAQ assertions).
+
+### Accuracy-arc bug count
+The probe has now caught 5 real bugs:
+1. v1.32.10 — FAQ_ITEMS ReferenceError on page load (since v1.30.1)
+2. v1.32.10 — probe page.click() coordinate-fail (probe robustness)
+3. v1.32.10 — Test-3a regex too strict
+4. v1.36.2 — **DC AI Generate Design empty PDF for ~24 hr in prod**
+5. v1.37.2 — **DC Conv FAQ TypeError for ~24 hr in prod (this ship)**
+
+Bugs #4 and #5 are both **user-facing silent failures** on features
+that LOOKED to work. Both shipped in v1.30.1 (the Generate Design +
+FAQ scaffold release) and stayed broken until the probe caught them
+the next day.
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- `tools/ship-gate.sh` label updated to reflect 75-test count.
+- Same pattern as DC AI FAQ_ITEMS scope-bug — different mechanism,
+  same root cause class (referencing names that don't exist where
+  the developer thought they did).
+
+---
+
 ## v1.37.1 — 2026-05-24 (Basis of Design PDF probe coverage; 67/67 pass)
 
 (Authored locally as v1.36.3. Parallel session shipped v1.37.0 Network
