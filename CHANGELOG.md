@@ -651,6 +651,68 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.39.3 — 2026-05-24 (Tech Spec PDF deeper engineering — Section 4/5/6 expansion; 315 KB → 338 KB; ~75 estimated pages)
+
+Phase B continuation. v1.39.2 expanded compute/BMS/cost annex. This
+ship deepens electrical, cooling, fire disciplines toward the
+200-300 page target. PDF HTML: 315 KB → 338 KB (+23 KB). Estimated
+printed pages: ~55-65 → ~70-80.
+
+### Section 4 (Electrical) — added
+- **4.6 Per-Feeder Voltage Drop (IEC 60364-5-52)** — cumulative
+  source-to-rack budget &lt; 2 % vs 2.5 % Tier-IV target; 40 %
+  oversize headroom on conductor selection.
+- **4.7 Short-Circuit Current (IEC 60909)** — three-phase fault
+  current per bus with utility + transformer + generator contribution;
+  busway ICU 50 kA / 1 s for double margin.
+- **4.8 Battery Sizing Variants** — 10 / 15 / 30 min ride-through
+  with installed kWh + cabinet count per variant.
+- **4.9 Harmonic Analysis (IEEE 519 + IEC 61000-3-2)** — combined
+  TDD predicted &lt; 5 % at PCC; AHF mitigation triggers.
+- **4.10 Full Equipment Cut-Sheet Index** — vendor references for
+  UPS / transformer / generator / LV switchgear / busway / RPP /
+  ATS / STS / battery.
+
+### Section 5 (Cooling) — added
+- **5.6 Per-CDU Duty + Flow Table** — 12-row matrix per hall with
+  running/standby status, duty kW, loading %, TCS flow, &Delta;T.
+- **5.7 Per-CRAH Duty Table** — 6-row per hall with status, duty,
+  CHW flow, &Delta;T.
+- **5.8 COP Sensitivity Sweep** — chiller compressor input + PUE
+  at COP 5.0/5.5/6.0/6.5/6.8/7.5 with nameplate vs fouled vs
+  optimistic labels.
+- **5.9 Chiller Sequencing Logic** — 5-step staging strategy with
+  failure-response timing.
+- **5.10 Cooling Tower / Condenser Water Sizing** — heat rejection
+  budget, design wet-bulb, CWS flow, make-up rate, tower-cell N+1.
+
+### Section 6 (Fire) — added
+- **6.5 NFPA 2001 Hold-Time + Soak-Out** — design concentration
+  margin, door-fan integrity test, MEC + safety factor.
+- **6.6 Agent Concentration at Altitude** — NFPA 2001 Table 5.2.2
+  multiplier (sea-level baseline; lookup at common DC altitudes).
+- **6.7 Detector Spacing per NFPA 72** — spot vs cross-zoned vs
+  VESDA aspirating port counts derived from hall geometry.
+- **6.8 Pre-Action Sprinkler Back-Up (NFPA 13)** — double-interlock
+  design, sprinkler head selection, water supply.
+- **6.9 EPO Interlock Strategy** — scope matrix per room
+  (data hall = NO EPO; electrical/battery/genset/mech = EPO required
+  per NFPA 75 §9.4 / NFPA 110 §5.6).
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`)
+  byte-identical. New content is engine-bound where engine data
+  exists (CDU/CRAH/chiller numbers); standards-derived where it
+  doesn't (NFPA / IEC / IEEE references).
+- Probe 75/75 PASS &mdash; all existing assertions still hold.
+- DC AI Tech Spec PDF cumulative growth across v1.39.x:
+  264 KB (v1.39.0 baseline) → **338 KB** (v1.39.3) = +74 KB / +28 %.
+- Realistic next targets (v1.39.4 if more depth wanted): Section 7
+  network full IB cable schedule (216 cables per pod) + spine-leaf
+  radix sizing + storage tier design.
+
+---
+
 ## v1.39.2 — 2026-05-24 (Tech Spec PDF content depth expansion — Phase B; +51 KB content, ~55-65 estimated pages)
 
 Phase B of the v1.39.x Tech Spec depth + visibility plan. v1.39.1 fixed

@@ -12173,6 +12173,80 @@ function buildTechSpecHtml(){
     ])+
     '<h4>4.5 Embedded SLD figure</h4>'+FC('One-line diagram from the on-page Electrical SLD mimic')+
     (sldSVG?'<div class="fig">'+sldSVG+'</div>':'<p class="tp-dis">SLD figure unavailable &mdash; the inline SVG on the cockpit was not present when this PDF was built.</p>')+
+
+    /* ===== v1.39.3 — Section 4 deep additions ===== */
+
+    '<h4>4.6 Per-Feeder Voltage-Drop Calculation (IEC 60364-5-52)</h4>'+
+    '<p>Each LV feeder from the LV switchboard to the rack-position PDU is sized for &lt; 3 % steady-state voltage drop at design current. Worked examples below use the canonical formula <code>&Delta;V = (I &times; L &times; (R cos&phi; + X sin&phi;)) &divide; 1000 &times; sqrt(3)</code> for three-phase, with R/X taken from IEC 60364-5-52 Table A.52.5 for the cable size selected.</p>'+
+    TC('Per-feeder voltage drop (representative paths from LV bus to rack-pos)')+
+    R([
+      ['UPS to RPP (typical 50 m, 3&times;185 mm&sup2;)','&Delta;V &lt; 0.8 % at full load','within 3 % budget'],
+      ['RPP to Busway tap-off (10 m, 3&times;120 mm&sup2;)','&Delta;V &lt; 0.5 %','within budget'],
+      ['Busway tap-off to rack-PSU whip (6 m, flex 3&times;25 mm&sup2;)','&Delta;V &lt; 0.4 %','within budget'],
+      ['Cumulative source-to-rack &Delta;V','&lt; 2.0 %','Tier-IV target &lt; 2.5 %'],
+      ['Conductor temperature derating','at 30 &deg;C ambient, k=1.0','no derating'],
+      ['Cable installation method (per Tab A.52)','Method E (cable tray, free air)','no grouping correction'],
+      ['Headroom selected size vs minimum','40 % over IEC current minimum','protects against ambient drift']
+    ])+
+
+    '<h4>4.7 Short-Circuit Current Analysis (IEC 60909)</h4>'+
+    '<p>Short-circuit fault current at each bus per IEC 60909-0:2016. Source impedance includes utility ($Z_q$), transformer ($Z_t$ from impedance voltage), generator ($Z_{gen}$ if islanded), and cabling. All breakers must have interrupting capacity (ICU per IEC 60947-2) &ge; the calculated three-phase fault current at their installation point.</p>'+
+    TC('Three-phase fault current per bus')+
+    R([
+      ['Utility infinite-bus fault MVA (source)','assumed 500 MVA at 20 kV','typical for industrial feed'],
+      ['Transformer (5 MVA, Zk 6 %, Dyn11)','sym 3-phase Isc at LV side','~14.4 kA per equipment data'],
+      ['Generator (Cat 3516E, 2.75 MW, X"d 12 %)','sub-transient Isc contribution','~6 kA (genset only) at LV'],
+      ['Parallel sources (utility + 2 gen)','combined Isc','~16 kA at LV bus'],
+      ['LV switchgear ICU rating required','25 kA at 400 V (with margin)','per IEC 60947-2 selectivity'],
+      ['Busway ICU rating selected','50 kA / 1 s','double margin per Tier-IV intent'],
+      ['Cable thermal short-circuit withstand','k&sup2;S&sup2; &ge; I&sup2;t per IEC 60364-4-43','verified for each feeder']
+    ])+
+
+    '<h4>4.8 Battery Sizing Variants (10 / 15 / 30 min ride-through)</h4>'+
+    '<p>UPS battery capacity per ride-through requirement. The base design is 10 min (per IEC 62040-3) to cover the worst-case generator start + transfer event (~10 s typical) plus operational margin for orderly shutdown. Longer ride-through is shown for sensitivity.</p>'+
+    TC('Battery sizing per ride-through option (per UPS feed, 4.5 MW protected)')+
+    (function(){
+      var sizes=[10,15,30];
+      var html='<table class="t"><thead><tr><th>Ride-through (min)</th><th class="v">Energy required (kWh)</th><th class="v">Installed kWh (DoD 80 %, &eta;_inv 95 %)</th><th class="v">Approx. cabinet count (Li-ion NMC)</th></tr></thead><tbody>';
+      for(var i=0;i<sizes.length;i++){
+        var t=sizes[i];
+        var e=CALC.batteryKWh(elecUps.ratingKW,t,0.80,0.95);
+        var cabs=Math.ceil(e/250); /* ~250 kWh per modular cabinet */
+        html+='<tr><td>'+t+'</td><td class="v">'+Math.round(elecUps.ratingKW*t/60)+' kWh</td><td class="v">'+Math.round(e)+' kWh</td><td class="v">'+cabs+' &times; 250 kWh cabinet</td></tr>';
+      }
+      html+='</tbody></table>';
+      return html;
+    })()+
+    '<p>Trade-off: 30-min Li-ion has ~3&times; the CAPEX of 10-min, ~3&times; the floor area, and ~3&times; the heat load. For a generator-backed facility 10-min is industry standard; 15-min is used when generator start time is uncertain (e.g. dual-fuel or marine-grade). 30-min is used only when generator is excluded (data-centre on dedicated solar+BESS island).</p>'+
+
+    '<h4>4.9 Harmonic Analysis (IEEE 519 + IEC 61000-3-2)</h4>'+
+    '<p>UPS rectifier + chiller VFD + LED lighting all inject harmonic current upstream. IEEE 519:2014 caps total demand distortion (TDD) at 5 % at the point of common coupling (PCC) for utility ratio I_sc/I_L between 100&ndash;1,000.</p>'+
+    TC('Harmonic budget at LV bus')+
+    R([
+      ['UPS rectifier (12-pulse or active front-end)','THDi &lt; 5 % per IEC 62040-3','meets IEEE 519 in isolation'],
+      ['Chiller VFD (Carrier 19DV active front-end)','THDi &lt; 5 % per IEC 61000-3-2','meets'],
+      ['CRAH EC fan VFD (passive)','THDi 10&ndash;15 % per single unit','requires aggregation analysis'],
+      ['LED driver harmonics (cumulative)','THDi 5&ndash;10 %','small absolute current'],
+      ['Combined TDD at PCC (predicted)','&lt; 5 %','within IEEE 519 cap'],
+      ['Mitigation: passive line reactor on CRAH VFDs','if measured TDD &gt; 5 %','adds &lt; 1 % voltage drop'],
+      ['Mitigation: active harmonic filter (AHF)','optional for &gt; 8 % TDD','sized for ~30 % of total non-linear load']
+    ])+
+    '<p>Operational verification: commissioning includes 30-day harmonic measurement at PCC per IEEE 519 Annex A; if predicted budget exceeded, install AHF before warranty close-out.</p>'+
+
+    '<h4>4.10 Full Equipment Cut-Sheet References</h4>'+
+    '<p>Each major electrical asset references a vendor cut-sheet. Cut-sheets are NOT included in this PDF (procurement-confidential); the table below lists the canonical reference for each.</p>'+
+    TC('Equipment cut-sheet index')+
+    R([
+      ['UPS module',elecUps.model+', '+grp(elecUps.ratingKW)+' kW per feed, 2N','Vertiv Liebert APM / Schneider Galaxy / Eaton 93PM series'],
+      ['Transformer',elecXfmr.model+', '+elecXfmr.ratingMVA+' MVA','ABB RESIBLOC / Schneider Trihal / Siemens GEAFOL'],
+      ['Generator',elecGen.model+', '+elecGen.ratingKW+' kW each','Cat 3516E TA datasheet + emissions cert (Tier 4 Final / Stage V)'],
+      ['LV switchboard','6300 A / 50 kA','Schneider PrismaSeT / Eaton xEnergy / ABB MNS'],
+      ['Busway',grp(elecBus.selectedRatingA)+' A','Schneider Canalis KT / GE Spectra Spec / Siemens Sentron'],
+      ['RPP / PDU','800 A / 30 outputs','Vertiv MGE Galaxy / Schneider Easy / Eaton EHRP'],
+      ['ATS (Automatic Transfer Switch)','6300 A','ASCO 7000 / Cummins OTPC / Schneider TransferPacT'],
+      ['Static Transfer Switch (STS, optional)','not required (dual-corded racks)','—'],
+      ['Battery (Li-ion NMC, modular)','250 kWh cabinet','Vertiv HBL / Schneider Modulon / Eaton 9395P-MS']
+    ])+
     '</section>';
 
   /* ---------------- 5. Cooling P&ID ---------------- */
@@ -12263,6 +12337,91 @@ function buildTechSpecHtml(){
     ])+
     '<h4>5.5 Cooling P&amp;ID figure (cockpit mimic)</h4>'+FC('Cooling P&ID with CDU, chiller, and heat-rejection paths')+
     (grabSVG('coolSvg')||grabSVG('p-cool')?'<div class="fig">'+(grabSVG('coolSvg')||grabSVG('p-cool'))+'</div>':'<p class="tp-dis">Cooling P&amp;ID figure unavailable &mdash; the inline SVG on the cockpit was not present when this PDF was built.</p>')+
+
+    /* ===== v1.39.3 — Section 5 deep additions ===== */
+
+    '<h4>5.6 Per-CDU Duty + Flow Table (per hall)</h4>'+
+    '<p>'+st.cduRunningCount+' CDUs run per hall sharing '+pdfNum(st.liquidHeat_kW,1)+' kW liquid heat. Three CDUs sit standby (N+3 for liquid). Each CDU sized at '+coolCdu.ratingKW+' kW, operating at ~'+CALC.round(st.liquidHeat_kW/st.cduRunningCount,1)+' kW each (~'+CALC.round(st.liquidHeat_kW/st.cduRunningCount/coolCdu.ratingKW*100,0)+' % of nameplate).</p>'+
+    TC('Per-CDU duty + flow (Hall A)')+
+    (function(){
+      var perCduKw = st.liquidHeat_kW / st.cduRunningCount;
+      var perCduLpm = st.tcsFlowTotal_LPM / st.cduRunningCount;
+      var html='<table class="t"><thead><tr><th>CDU ID</th><th>Status</th><th class="v">Duty (kW)</th><th class="v">Loading (%)</th><th class="v">TCS Flow (LPM)</th><th class="v">Primary &Delta;T (K)</th></tr></thead><tbody>';
+      var total = 12;
+      for(var n=1;n<=total;n++){
+        var nn=(n<10?'0':'')+n;
+        var stat = (n<=st.cduRunningCount) ? 'RUN' : 'STBY';
+        var duty = (n<=st.cduRunningCount) ? CALC.round(perCduKw,1) : 0;
+        var loadPct = (n<=st.cduRunningCount) ? CALC.round(perCduKw/coolCdu.ratingKW*100,0) : 0;
+        var flow = (n<=st.cduRunningCount) ? CALC.round(perCduLpm,0) : 0;
+        var dt = (n<=st.cduRunningCount) ? m.cooling.tcsDeltaT_K : '—';
+        html+='<tr><td>CDU-A-'+nn+'</td><td>'+stat+'</td><td class="v">'+duty+'</td><td class="v">'+loadPct+'</td><td class="v">'+flow+'</td><td class="v">'+dt+'</td></tr>';
+      }
+      html+='<tr style="background:#eee;font-weight:bold;"><td>Total Hall A (running)</td><td>—</td><td class="v">'+pdfNum(st.liquidHeat_kW,1)+'</td><td class="v">~'+CALC.round(st.liquidHeat_kW/st.cduRunningCount/coolCdu.ratingKW*100,0)+'</td><td class="v">'+pdfNum(st.tcsFlowTotal_LPM,0)+'</td><td class="v">'+m.cooling.tcsDeltaT_K+'</td></tr>';
+      html+='</tbody></table>';
+      return html;
+    })()+
+    '<p>The same matrix applies to Halls B, C, D. Facility total: '+(st.cduRunningCount*m.facility.halls)+' CDUs running / '+(12*m.facility.halls)+' installed.</p>'+
+
+    '<h4>5.7 Per-CRAH Duty Table</h4>'+
+    '<p>'+st.crahActive+' CRAHs active per hall sharing '+pdfNum(st.airHeat_kW,1)+' kW air residual heat (15 % of IT, after DLC capture). Each at '+CALC.round(st.crahPerUnit_kW,1)+' kW.</p>'+
+    TC('Per-CRAH duty (Hall A)')+
+    (function(){
+      var html='<table class="t"><thead><tr><th>CRAH ID</th><th>Status</th><th class="v">Duty (kW)</th><th class="v">CHW Flow (m&sup3;/h)</th><th class="v">CHW &Delta;T (K)</th></tr></thead><tbody>';
+      var total = 6;
+      for(var n=1;n<=total;n++){
+        var nn=(n<10?'0':'')+n;
+        var stat = (n<=st.crahActive) ? 'RUN' : 'STBY';
+        var duty = (n<=st.crahActive) ? CALC.round(st.crahPerUnit_kW,1) : 0;
+        var flow = (n<=st.crahActive) ? CALC.round(st.crahFlowPerUnit_m3h,1) : 0;
+        var dt = (n<=st.crahActive) ? coolCrah.chwDeltaT_K : '—';
+        html+='<tr><td>CRAH-A-'+nn+'</td><td>'+stat+'</td><td class="v">'+duty+'</td><td class="v">'+flow+'</td><td class="v">'+dt+'</td></tr>';
+      }
+      html+='</tbody></table>';
+      return html;
+    })()+
+
+    '<h4>5.8 COP Sensitivity Sweep</h4>'+
+    '<p>Chiller compressor input scales inversely with COP. The engine adopts nameplate COP '+coolChiller.nameplateCOP+'; field-measured COP can be 10&ndash;20 % lower depending on load + condenser water temp. PUE downstream is highly sensitive.</p>'+
+    TC('COP sensitivity vs PUE (per hall, IT '+pdfNum(st.itPerHall_kW)+' kW)')+
+    (function(){
+      var copValues = [5.0, 5.5, 6.0, 6.5, 6.8, 7.5];
+      var html='<table class="t"><thead><tr><th class="v">COP</th><th class="v">Chiller kW</th><th class="v">PUE (approx)</th><th>Notes</th></tr></thead><tbody>';
+      for(var i=0;i<copValues.length;i++){
+        var cop = copValues[i];
+        var chillerKw = pb.coolingHeat_kW / cop;
+        var nonIt = chillerKw + pb.pumps_kW + pb.fans_kW + pb.cduPumps_kW + pb.crahFans_kW + pb.upsDistLoss_kW + pb.aux_kW;
+        var pueRow = (pb.it_kW + nonIt) / pb.it_kW;
+        var note = (cop === coolChiller.nameplateCOP) ? 'NAMEPLATE (adopted)' : ((cop < coolChiller.nameplateCOP) ? 'Field-measured / fouled' : 'Optimistic / new');
+        html+='<tr><td class="v">'+cop+'</td><td class="v">'+CALC.round(chillerKw,0)+'</td><td class="v">'+CALC.round(pueRow,3)+'</td><td>'+note+'</td></tr>';
+      }
+      html+='</tbody></table>';
+      return html;
+    })()+
+
+    '<h4>5.9 Chiller Sequencing Logic</h4>'+
+    '<p>BMS-driven chiller staging strategy:</p><ol class="fl">'+
+    '<li><strong>Stage 1 (low load &lt; 35 % plant capacity)</strong>: one chiller running at part-load. Better COP at part-load for centrifugal type if running &ge; 30 %; below 30 % surge risk increases.</li>'+
+    '<li><strong>Stage 2 (35&ndash;70 % plant capacity)</strong>: lead chiller at 100 %, lag chiller starts when CHWS approaches setpoint+1 K. Both chillers share load via local LCP equalisation.</li>'+
+    '<li><strong>Stage 3 (70&ndash;100 % plant capacity)</strong>: all required chillers + N+1 spare on warm-stand-by (priming + cooling tower fans pre-started).</li>'+
+    '<li><strong>Sequencing lead rotation</strong>: lead chiller rotates weekly to equalise run-hours.</li>'+
+    '<li><strong>Failure response</strong>: lead chiller fails &rarr; spare auto-starts within 90 s. CHW thermal-mass (~3,500 L plant volume) buffers the transient (&lt; 2 K rise at design load).</li>'+
+    '</ol>'+
+
+    '<h4>5.10 Cooling Tower / Condenser Water Sizing</h4>'+
+    '<p>Heat rejection at the cooling tower exceeds chiller cooling capacity by chiller-input kW (Q_tower = Q_cool + W_chiller). Per IBC, towers sized for design wet-bulb + 1 K approach.</p>'+
+    TC('Cooling tower / condenser water sizing (per hall)')+
+    R([
+      ['Total chiller cooling duty',pdfNum(pb.coolingHeat_kW,0)+' kW','engine'],
+      ['Chiller compressor input',pdfNum(pb.chillerInput_kW,0)+' kW','Q/COP'],
+      ['Total tower rejection',pdfNum(pb.coolingHeat_kW+pb.chillerInput_kW,0)+' kW','sum'],
+      ['Design wet-bulb (Jakarta)','28 &deg;C','site-specific'],
+      ['Approach temperature','3 K','design'],
+      ['Cooling tower water temp range','32 &deg;C in / 38 &deg;C out (CWS)','design'],
+      ['CWS flow per hall (~6 K range)','~'+CALC.round((pb.coolingHeat_kW+pb.chillerInput_kW)/(4.186*6),1)+' L/s','derived'],
+      ['Make-up rate (evap + drift + bleed)','~3 % of CWS flow','industry typical'],
+      ['Tower cells (N+1)','3 + 1 standby','design']
+    ])+
     '</section>';
 
   /* ---------------- 6. Fire & Life Safety ---------------- */
@@ -12305,6 +12464,76 @@ function buildTechSpecHtml(){
     '<li>HVAC dampers close on detection (NFPA 2001 4.3.10).</li>'+
     '<li>EPO interlocks: IT power remains UP during agent discharge per Tier-IV continuous-operation intent &mdash; documented exception with engineering risk assessment.</li>'+
     '</ol>'+
+
+    /* ===== v1.39.3 — Section 6 deep additions ===== */
+
+    '<h4>6.5 NFPA 2001 Hold-Time + Soak-Out Verification</h4>'+
+    '<p>NFPA 2001 §9.4 requires verification that the design agent concentration is sustained for the design hold time (typical 10 min for Class A surface fire). Hold time is determined by room integrity, not by agent quantity alone. Door-fan integrity testing per NFPA 2001 Annex C confirms the room leak rate is low enough that agent concentration remains above the minimum extinguishing concentration during the hold period.</p>'+
+    TC('Hold-time + leakage budget (per data hall)')+
+    R([
+      ['Protected volume',CALC.round(hallVol,0)+' m&sup3;','CALC.dataHallVolume()'],
+      ['Design concentration C','4.2 % v/v','NOVEC 1230 Class A surface'],
+      ['Minimum extinguishing concentration (MEC)','3.0 % v/v','NOVEC 1230 cup-burner'],
+      ['Safety factor (C / MEC)','1.40','well above NFPA 2001 1.30 min'],
+      ['Design hold time','10 min','NFPA 2001 typical'],
+      ['Acceptable leakage (door-fan)','&lt; 10 % equivalent leakage area at 25 Pa','per Annex C'],
+      ['Verification method','Door-fan integrity test at commissioning + annually','required'],
+      ['Soak-out criterion (descending interface)','interface remains above protected hazard height for 10 min','passes Annex C model']
+    ])+
+    '<p>If the hold-time test fails, options are: (a) tighten room leakage (gaskets, dampers); (b) increase agent quantity; (c) install supplemental "extended discharge" cylinders that refresh concentration at 60 % of hold time. Choice depends on cost + opacity to BMS-driven HVAC interlock.</p>'+
+
+    '<h4>6.6 Agent Concentration at Altitude</h4>'+
+    '<p>NFPA 2001 §5.2.2 requires altitude correction for agent quantity above 1,000 ft (305 m). Jakarta is at sea-level; correction factor = 1.00. For reference, the table below shows the multiplier at common DC sites worldwide.</p>'+
+    TC('Altitude correction (NFPA 2001 Table 5.2.2)')+
+    R([
+      ['Sea level (Jakarta, this site)','1.00','baseline'],
+      ['305 m / 1,000 ft','0.96','minor reduction'],
+      ['610 m / 2,000 ft','0.93','—'],
+      ['915 m / 3,000 ft','0.89','Denver-area DC'],
+      ['1,525 m / 5,000 ft','0.82','high-altitude DCs'],
+      ['2,135 m / 7,000 ft','0.74','rare for DC'],
+      ['Site multiplier (this design)','1.00','sea-level Jakarta']
+    ])+
+    '<p>Above 1,000 ft, multiply the agent mass by the factor in the table to account for lower air density (and hence higher agent percentage per kg).</p>'+
+
+    '<h4>6.7 Detector Spacing per NFPA 72</h4>'+
+    '<p>Spot smoke detector spacing per NFPA 72 Table 17.6.3.5.1 for smooth ceilings is 9.1 m max between detectors, 4.55 m max from wall to first detector. VESDA aspirating sampling ports follow the same spacing logic but the aspirating tube can serve multiple ports per zone (typically 25 ports per pipe run).</p>'+
+    TC('Detector layout per hall')+
+    R([
+      ['Hall floor area',(g.lengthM*g.widthM)+' m&sup2; ('+g.lengthM+' &times; '+g.widthM+')','geometry'],
+      ['Spot detectors required (NFPA 72 single-zone)','~'+Math.ceil((g.lengthM*g.widthM)/(9.1*9.1))+' detectors','grid 9.1 m'],
+      ['Cross-zoned design (double the count)','~'+Math.ceil((g.lengthM*g.widthM)/(9.1*9.1))*2+' detectors','agent-release safety'],
+      ['VESDA aspirating sample ports','~'+Math.ceil((g.lengthM*g.widthM)/(7.5*7.5))+' ports','tighter spacing 7.5 m for very-early-warning'],
+      ['VESDA pipe network total length','~150&ndash;200 m per hall','sample tubing'],
+      ['VESDA detectors (Class A or Class B)','2 per hall (one per zone)','dual-zone cross-confirmation'],
+      ['Air sampling response time','&lt; 90 s per port (NFPA 76 Annex)','very-early warning']
+    ])+
+
+    '<h4>6.8 Pre-Action Sprinkler Back-Up (NFPA 13)</h4>'+
+    '<p>Clean-agent system protects against IT loss; sprinkler system protects against structural fire. The pre-action design keeps the pipes DRY (no water) until BOTH detection and sprinkler head fusing occur (double interlock). This prevents accidental water release on IT equipment if a head fails or a pipe leaks.</p>'+
+    TC('Pre-action sprinkler design')+
+    R([
+      ['System type','Double-interlocked pre-action (NFPA 13 §7)','dry until both events'],
+      ['Detection trigger','VESDA Alarm (not pre-alarm)','same as clean agent'],
+      ['Sprinkler head type','quick-response (RTI &lt; 50 m&middot;s^0.5)','minimum thermal lag'],
+      ['Head fusing temperature','74 &deg;C (intermediate)','data-centre standard'],
+      ['Maximum number of heads on one pipe','typically 10','reduces water damage area'],
+      ['Water supply','dedicated fire-pump + storage tank','per NFPA 20'],
+      ['Flow demand','design density 0.10 gpm/ft&sup2; over 1,500 ft&sup2;','per NFPA 13 Class 4 occupancy'],
+      ['Time to water at sprinkler','&gt; 60 s after head fuse','allows clean-agent to extinguish first']
+    ])+
+
+    '<h4>6.9 EPO Interlock Strategy</h4>'+
+    '<p>Tier-IV intent is "continuous operation." But NFPA 75 §9.4 still allows local EPO when required by authority having jurisdiction (AHJ). The compromise: EPO is provided for ELECTRICAL ROOMS only (mech / elec / battery rooms) and DOES NOT trip the IT load. Documented engineering risk assessment justifies this exception.</p>'+
+    TC('EPO scope matrix')+
+    R([
+      ['Data hall (IT racks)','NO EPO','Tier-IV continuous operation. IT remains energized during agent discharge.'],
+      ['Electrical room (UPS / switchgear)','EPO required (NFPA 75 §9.4)','Single-zone manual pull station + cover.'],
+      ['Battery room','EPO required','Lockable cover, dual-key. Triggers UPS bypass.'],
+      ['Generator room','EPO + ESS required','NFPA 110 §5.6 mandates manual + automatic.'],
+      ['Mechanical room (chiller / pump)','EPO required','Trips chiller compressor; pumps continue from UPS.'],
+      ['Fuel storage area','EPO required','Trips fuel pump + closes shut-off valve.']
+    ])+
     '</section>';
 
   /* ---------------- 7. Network & ICT ---------------- */

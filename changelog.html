@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 156 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 157 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 156,
+        "numberOfItems": 157,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.38.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.38.0"},
         {"@type":"ListItem","position":2,"name":"v1.37.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.37.0"},
@@ -84,7 +84,7 @@
         {"@type":"ListItem","position":7,"name":"v1.32.10 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.10"},
         {"@type":"ListItem","position":8,"name":"v1.32.7 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.7"},
         {"@type":"ListItem","position":9,"name":"v1.32.5 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.5"},
-        {"@type":"ListItem","position":10,"name":"v1.39.2 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.39.2"}
+        {"@type":"ListItem","position":10,"name":"v1.39.3 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.39.3"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.38.0</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">156 releases</span>
+        <span class="cl-count-badge">157 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1409,6 +1409,106 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.39.3">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.39.3</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-24">May 24, 2026</time>
+      </div>
+      <p class="changelog-caption">Tech Spec PDF deeper engineering — Section 4/5/6 expansion; 315 KB → 338 KB; ~75 estimated pages</p>
+      <div class="changelog-body">
+        <p>Phase B continuation. v1.39.2 expanded compute/BMS/cost annex. This</p>
+<p>ship deepens electrical, cooling, fire disciplines toward the</p>
+<p>200-300 page target. PDF HTML: 315 KB → 338 KB (+23 KB). Estimated</p>
+<p>printed pages: ~55-65 → ~70-80.</p>
+<h3 class="cl-subhead">Section 4 (Electrical) — added</h3>
+<ul>
+  <li><strong>4.6 Per-Feeder Voltage Drop (IEC 60364-5-52)</strong> — cumulative</li>
+</ul>
+<p>source-to-rack budget &lt; 2 % vs 2.5 % Tier-IV target; 40 %</p>
+<p>oversize headroom on conductor selection.</p>
+<ul>
+  <li><strong>4.7 Short-Circuit Current (IEC 60909)</strong> — three-phase fault</li>
+</ul>
+<p>current per bus with utility + transformer + generator contribution;</p>
+<p>busway ICU 50 kA / 1 s for double margin.</p>
+<ul>
+  <li><strong>4.8 Battery Sizing Variants</strong> — 10 / 15 / 30 min ride-through</li>
+</ul>
+<p>with installed kWh + cabinet count per variant.</p>
+<ul>
+  <li><strong>4.9 Harmonic Analysis (IEEE 519 + IEC 61000-3-2)</strong> — combined</li>
+</ul>
+<p>TDD predicted &lt; 5 % at PCC; AHF mitigation triggers.</p>
+<ul>
+  <li><strong>4.10 Full Equipment Cut-Sheet Index</strong> — vendor references for</li>
+</ul>
+<p>UPS / transformer / generator / LV switchgear / busway / RPP /</p>
+<p>ATS / STS / battery.</p>
+<h3 class="cl-subhead">Section 5 (Cooling) — added</h3>
+<ul>
+  <li><strong>5.6 Per-CDU Duty + Flow Table</strong> — 12-row matrix per hall with</li>
+</ul>
+<p>running/standby status, duty kW, loading %, TCS flow, &Delta;T.</p>
+<ul>
+  <li><strong>5.7 Per-CRAH Duty Table</strong> — 6-row per hall with status, duty,</li>
+</ul>
+<p>CHW flow, &Delta;T.</p>
+<ul>
+  <li><strong>5.8 COP Sensitivity Sweep</strong> — chiller compressor input + PUE</li>
+</ul>
+<p>at COP 5.0/5.5/6.0/6.5/6.8/7.5 with nameplate vs fouled vs</p>
+<p>optimistic labels.</p>
+<ul>
+  <li><strong>5.9 Chiller Sequencing Logic</strong> — 5-step staging strategy with</li>
+</ul>
+<p>failure-response timing.</p>
+<ul>
+  <li><strong>5.10 Cooling Tower / Condenser Water Sizing</strong> — heat rejection</li>
+</ul>
+<p>budget, design wet-bulb, CWS flow, make-up rate, tower-cell N+1.</p>
+<h3 class="cl-subhead">Section 6 (Fire) — added</h3>
+<ul>
+  <li><strong>6.5 NFPA 2001 Hold-Time + Soak-Out</strong> — design concentration</li>
+</ul>
+<p>margin, door-fan integrity test, MEC + safety factor.</p>
+<ul>
+  <li><strong>6.6 Agent Concentration at Altitude</strong> — NFPA 2001 Table 5.2.2</li>
+</ul>
+<p>multiplier (sea-level baseline; lookup at common DC altitudes).</p>
+<ul>
+  <li><strong>6.7 Detector Spacing per NFPA 72</strong> — spot vs cross-zoned vs</li>
+</ul>
+<p>VESDA aspirating port counts derived from hall geometry.</p>
+<ul>
+  <li><strong>6.8 Pre-Action Sprinkler Back-Up (NFPA 13)</strong> — double-interlock</li>
+</ul>
+<p>design, sprinkler head selection, water supply.</p>
+<ul>
+  <li><strong>6.9 EPO Interlock Strategy</strong> — scope matrix per room</li>
+</ul>
+<p>(data hall = NO EPO; electrical/battery/genset/mech = EPO required</p>
+<p>per NFPA 75 §9.4 / NFPA 110 §5.6).</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Engine files (<code>datahall-model.js</code>, <code>datahall-calculations.js</code>)</li>
+</ul>
+<p>byte-identical. New content is engine-bound where engine data</p>
+<p>exists (CDU/CRAH/chiller numbers); standards-derived where it</p>
+<p>doesn't (NFPA / IEC / IEEE references).</p>
+<ul>
+  <li>Probe 75/75 PASS &mdash; all existing assertions still hold.</li>
+  <li>DC AI Tech Spec PDF cumulative growth across v1.39.x:</li>
+</ul>
+<p>264 KB (v1.39.0 baseline) → <strong>338 KB</strong> (v1.39.3) = +74 KB / +28 %.</p>
+<ul>
+  <li>Realistic next targets (v1.39.4 if more depth wanted): Section 7</li>
+</ul>
+<p>network full IB cable schedule (216 cables per pod) + spine-leaf</p>
+<p>radix sizing + storage tier design.</p>
       </div>
     </article>
 
