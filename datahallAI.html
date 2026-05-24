@@ -11469,7 +11469,10 @@ function buildBodPdfHtml(){
       '<div class="wr">= '+E(result)+'</div>'+
       '<div class="wref">'+E(ref)+'</div></div>';
   }
-  /* reuse the page's own inline SVG figures (SLD + room layout) ---------- */
+  /* reuse the page's own inline SVG figures (SLD + room layout).
+     v1.39.1 — dark canvas + stroke bump so the dark-theme cockpit SVGs
+     render correctly on the white print page (owner: "gambarnya hitam,
+     pastikan line-nya solid"). See buildTechSpecHtml grabSVG for parallel. */
   function grabSVG(hostId){
     var h=d.getElementById(hostId);
     if(!h)return '';
@@ -11480,7 +11483,23 @@ function buildBodPdfHtml(){
       c.removeAttribute('style');
       c.setAttribute('width','100%');
       c.setAttribute('preserveAspectRatio','xMidYMid meet');
-      return c.outerHTML;
+      var bg=d.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('x','0'); bg.setAttribute('y','0');
+      bg.setAttribute('width','100%'); bg.setAttribute('height','100%');
+      bg.setAttribute('fill','#0f1729');
+      if(c.firstChild) c.insertBefore(bg,c.firstChild); else c.appendChild(bg);
+      var strokables=c.querySelectorAll('path,line,rect,circle,polyline,polygon');
+      for(var i=0;i<strokables.length;i++){
+        var el=strokables[i];
+        var sw=parseFloat(el.getAttribute('stroke-width')||'0');
+        if(el.getAttribute('stroke') && sw>0 && sw<1.2){
+          el.setAttribute('stroke-width','1.2');
+        }
+      }
+      return '<figure style="margin:8pt 0 12pt;border:0.6pt solid #475569;border-radius:4pt;padding:6pt;background:#0f1729;page-break-inside:avoid;">'+
+        c.outerHTML+
+        '<figcaption style="margin-top:4pt;font-size:8.5pt;color:#94a3b8;font-family:Inter,sans-serif;font-style:italic;text-align:center;">Source: live cockpit SVG &mdash; dark-theme palette preserved as designed.</figcaption>'+
+        '</figure>';
     }catch(e){ return ''; }
   }
   var sldSVG=grabSVG('elecSvg')||grabSVG('sldHost')||grabSVG('p-elec');
@@ -11857,12 +11876,44 @@ function buildTechSpecHtml(){
       '<div class="wr">= '+E(result)+'</div>'+
       '<div class="wref">'+E(ref)+'</div></div>';
   }
+  /* v1.39.1 — SVG embed for PDF.
+     Owner feedback: "gambarnya hitam tidak terlihat, pastikan gambar-gambarnya
+     line-nya solid". Cockpit SVGs are designed for a dark UI (slate fills,
+     muted greys); embedding them on the WHITE print page made dark blocks
+     read as solid black with invisible low-contrast strokes.
+     Fix: prepend a dark canvas rect so the SVG renders against its own
+     designed background, then bump any stroke-width < 1.2 so lines survive
+     print compression. Wrapped in a framed <figure> with a caption clarifying
+     it is a screenshot of the live cockpit. */
   function grabSVG(hostId){
     var h=d.getElementById(hostId); if(!h) return '';
     var svg=h.querySelector('svg'); if(!svg) return '';
-    try{ var c=svg.cloneNode(true); c.removeAttribute('style');
-      c.setAttribute('width','100%'); c.setAttribute('preserveAspectRatio','xMidYMid meet');
-      return c.outerHTML; }catch(e){ return ''; }
+    try{
+      var c=svg.cloneNode(true);
+      c.removeAttribute('style');
+      c.setAttribute('width','100%');
+      c.setAttribute('preserveAspectRatio','xMidYMid meet');
+      /* Inject dark canvas rect as first child — preserves dark-theme design */
+      var bg=d.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('x','0'); bg.setAttribute('y','0');
+      bg.setAttribute('width','100%'); bg.setAttribute('height','100%');
+      bg.setAttribute('fill','#0f1729');
+      if(c.firstChild) c.insertBefore(bg,c.firstChild); else c.appendChild(bg);
+      /* Bump tiny stroke widths so lines survive print compression */
+      var strokables=c.querySelectorAll('path,line,rect,circle,polyline,polygon');
+      for(var i=0;i<strokables.length;i++){
+        var el=strokables[i];
+        var sw=parseFloat(el.getAttribute('stroke-width')||'0');
+        if(el.getAttribute('stroke') && sw>0 && sw<1.2){
+          el.setAttribute('stroke-width','1.2');
+        }
+      }
+      /* Wrap in framed figure with caption — page-break-inside avoid */
+      return '<figure style="margin:8pt 0 12pt;border:0.6pt solid #475569;border-radius:4pt;padding:6pt;background:#0f1729;page-break-inside:avoid;">'+
+        c.outerHTML+
+        '<figcaption style="margin-top:4pt;font-size:8.5pt;color:#94a3b8;font-family:Inter,sans-serif;font-style:italic;text-align:center;">Source: live cockpit SVG &mdash; dark-theme palette preserved as designed.</figcaption>'+
+        '</figure>';
+    }catch(e){ return ''; }
   }
 
   var facIT=st.itPerFacility_kW;

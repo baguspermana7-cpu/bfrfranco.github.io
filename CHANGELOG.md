@@ -651,6 +651,68 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.39.1 — 2026-05-24 (SVG visibility fix in Tech Spec + BoD PDFs; mobile patch on 16 more Network Hub pages)
+
+Owner reported (screenshot 2026-05-24, page 10 of 25 in Tech Spec PDF):
+embedded SVG figures rendered as solid black blocks with invisible
+lines. Cockpit SVGs are designed for a dark UI (slate fills, muted
+greys); when cloned and embedded on the WHITE print page, the dark
+fills land on white with no surrounding context and read as black
+blobs. Lines technically render but are too low-contrast to see.
+
+This ship is Phase A of the v1.39.x Tech Spec depth + visibility
+plan; Phase B (substantial content expansion to 150–200 pages) lands
+in v1.39.2.
+
+### SVG fix — `grabSVG()` rewrite (both `buildTechSpecHtml` + `buildBodPdfHtml`)
+- **Inject dark canvas rect** as the first child of the cloned SVG —
+  preserves the dark-theme design intact, so the embedded figure
+  looks exactly like a screenshot of what the operator sees on the
+  cockpit. No fidelity loss; no surprise re-colouring.
+- **Stroke-width floor**: walk all `path / line / rect / circle /
+  polyline / polygon` elements; any element with a stroke AND
+  stroke-width < 1.2 gets bumped to 1.2. Print compression preserves
+  what would otherwise vanish.
+- **Wrap in framed `<figure>`** with 0.6pt slate border + dark
+  background + page-break-inside: avoid + italic caption: "Source:
+  live cockpit SVG — dark-theme palette preserved as designed".
+  Makes it clear to the reader that the dark panel is intentional,
+  not a print error.
+
+### Trade-off (transparent)
+Two valid approaches were considered:
+1. **Wrap in dark canvas** (chosen) — preserves cockpit design exactly,
+   reads as a screenshot.
+2. **Remap fills for print contrast** (not chosen) — better
+   stand-alone readability on white but the figure no longer matches
+   what the operator sees on the cockpit.
+
+Owner emphasis on "**line-nya solid**" favoured visibility-of-line
+work over context divergence; the dark-canvas approach delivers
+both (visible lines + faithful palette).
+
+### Mobile patch (incidental fix, surfaced by gate)
+Parallel session shipped v1.39.0 Phases 3–6 (Lane A + D + E + C of
+the Network Hub) with 16 new protocol pages. `ship-gate.sh --probe-http`
+flagged all 16 as failing `audit-mobile-responsive --strict`
+(score 2/10). Standard v1.8.0 mobile patch added to:
+- `network/foundations/{dhcp-dns,ipv4-vs-ipv6,osi-tcp-ip-models,subnetting-cidr,tcp-handshake}.html`
+- `network/security/{mtls,oauth-jwt,tls-handshake,wireguard}.html`
+- `network/apis-agents/{graphql,grpc,mcp-tool-call,rest-api}.html`
+- `network/dc-management/{ipmi-redfish,snmp,syslog}.html`
+
+Mobile audit: **132 pass / 0 fail** (was 116 / 16).
+
+### Notes
+- DC Conv Tech Spec doesn't use embedded SVGs — unaffected by SVG fix.
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- Probe 75/75 PASS (all existing PDF assertions still hold; visibility
+  fix doesn't change content character counts).
+- Substantial content expansion (Issue B from owner feedback — "kurang
+  detail, sangat-sangat kurang komprehensif") ships in v1.39.2.
+
+---
+
 ## v1.38.1 — 2026-05-24 (ship-gate.sh — HTTP probe mode + dev-server pre-flight + mobile patch on 5 more Network Hub pages)
 
 (Authored locally as v1.37.3. Parallel session shipped v1.38.0

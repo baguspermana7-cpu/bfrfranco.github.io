@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 154 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 155 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 154,
+        "numberOfItems": 155,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.38.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.38.0"},
         {"@type":"ListItem","position":2,"name":"v1.37.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.37.0"},
@@ -84,7 +84,7 @@
         {"@type":"ListItem","position":7,"name":"v1.32.10 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.10"},
         {"@type":"ListItem","position":8,"name":"v1.32.7 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.7"},
         {"@type":"ListItem","position":9,"name":"v1.32.5 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.5"},
-        {"@type":"ListItem","position":10,"name":"v1.38.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.38.1"}
+        {"@type":"ListItem","position":10,"name":"v1.39.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.39.1"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.38.0</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">154 releases</span>
+        <span class="cl-count-badge">155 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1409,6 +1409,83 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.39.1">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.39.1</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-24">May 24, 2026</time>
+      </div>
+      <p class="changelog-caption">SVG visibility fix in Tech Spec + BoD PDFs; mobile patch on 16 more Network Hub pages</p>
+      <div class="changelog-body">
+        <p>Owner reported (screenshot 2026-05-24, page 10 of 25 in Tech Spec PDF):</p>
+<p>embedded SVG figures rendered as solid black blocks with invisible</p>
+<p>lines. Cockpit SVGs are designed for a dark UI (slate fills, muted</p>
+<p>greys); when cloned and embedded on the WHITE print page, the dark</p>
+<p>fills land on white with no surrounding context and read as black</p>
+<p>blobs. Lines technically render but are too low-contrast to see.</p>
+<p>This ship is Phase A of the v1.39.x Tech Spec depth + visibility</p>
+<p>plan; Phase B (substantial content expansion to 150–200 pages) lands</p>
+<p>in v1.39.2.</p>
+<h3 class="cl-subhead">SVG fix — <code>grabSVG()</code> rewrite (both <code>buildTechSpecHtml</code> + <code>buildBodPdfHtml</code>)</h3>
+<ul>
+  <li><strong>Inject dark canvas rect</strong> as the first child of the cloned SVG —</li>
+</ul>
+<p>preserves the dark-theme design intact, so the embedded figure</p>
+<p>looks exactly like a screenshot of what the operator sees on the</p>
+<p>cockpit. No fidelity loss; no surprise re-colouring.</p>
+<ul>
+  <li><strong>Stroke-width floor</strong>: walk all `path / line / rect / circle /</li>
+</ul>
+<p>polyline / polygon` elements; any element with a stroke AND</p>
+<p>stroke-width < 1.2 gets bumped to 1.2. Print compression preserves</p>
+<p>what would otherwise vanish.</p>
+<ul>
+  <li><strong>Wrap in framed <code>&lt;figure&gt;</code></strong> with 0.6pt slate border + dark</li>
+</ul>
+<p>background + page-break-inside: avoid + italic caption: "Source:</p>
+<p>live cockpit SVG — dark-theme palette preserved as designed".</p>
+<p>Makes it clear to the reader that the dark panel is intentional,</p>
+<p>not a print error.</p>
+<h3 class="cl-subhead">Trade-off (transparent)</h3>
+<p>Two valid approaches were considered:</p>
+<ul>
+  <li><strong>Wrap in dark canvas</strong> (chosen) — preserves cockpit design exactly,</li>
+</ul>
+<p>reads as a screenshot.</p>
+<ul>
+  <li><strong>Remap fills for print contrast</strong> (not chosen) — better</li>
+</ul>
+<p>stand-alone readability on white but the figure no longer matches</p>
+<p>what the operator sees on the cockpit.</p>
+<p>Owner emphasis on "<strong>line-nya solid</strong>" favoured visibility-of-line</p>
+<p>work over context divergence; the dark-canvas approach delivers</p>
+<p>both (visible lines + faithful palette).</p>
+<h3 class="cl-subhead">Mobile patch (incidental fix, surfaced by gate)</h3>
+<p>Parallel session shipped v1.39.0 Phases 3–6 (Lane A + D + E + C of</p>
+<p>the Network Hub) with 16 new protocol pages. <code>ship-gate.sh --probe-http</code></p>
+<p>flagged all 16 as failing <code>audit-mobile-responsive --strict</code></p>
+<p>(score 2/10). Standard v1.8.0 mobile patch added to:</p>
+<ul>
+  <li><code>network/foundations/{dhcp-dns,ipv4-vs-ipv6,osi-tcp-ip-models,subnetting-cidr,tcp-handshake}.html</code></li>
+  <li><code>network/security/{mtls,oauth-jwt,tls-handshake,wireguard}.html</code></li>
+  <li><code>network/apis-agents/{graphql,grpc,mcp-tool-call,rest-api}.html</code></li>
+  <li><code>network/dc-management/{ipmi-redfish,snmp,syslog}.html</code></li>
+</ul>
+<p>Mobile audit: <strong>132 pass / 0 fail</strong> (was 116 / 16).</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>DC Conv Tech Spec doesn't use embedded SVGs — unaffected by SVG fix.</li>
+  <li>Engine files byte-identical. 57/57 + 22/22 tests pass.</li>
+  <li>Probe 75/75 PASS (all existing PDF assertions still hold; visibility</li>
+</ul>
+<p>fix doesn't change content character counts).</p>
+<ul>
+  <li>Substantial content expansion (Issue B from owner feedback — "kurang</li>
+</ul>
+<p>detail, sangat-sangat kurang komprehensif") ships in v1.39.2.</p>
       </div>
     </article>
 
