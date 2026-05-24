@@ -1565,7 +1565,27 @@ document.getElementById('bF').addEventListener('click',()=>{
   build();
 });
 document.getElementById('bH').addEventListener('click',()=>{
-  if(net)net.setOptions({layout:{hierarchical:{direction:'UD',sortMethod:'directed',levelSeparation:105}},physics:{enabled:false}});
+  /* v1.40.5 — sortMethod 'directed' requires a DAG with a clear root, but our
+     knowledge-graph has many bidirectional edges (articles ↔ comparisons ↔
+     calculators), so 'directed' collapses cycle members into pillars.
+     'hubsize' uses node degree as the root-selection heuristic — high-degree
+     hubs (Engineering Journal, MEMORY.md, RZEngine v1.2.0) become natural
+     roots, other nodes fan out beneath them. */
+  if(net)net.setOptions({
+    layout:{
+      hierarchical:{
+        direction:'UD',
+        sortMethod:'hubsize',
+        levelSeparation:180,
+        nodeSpacing:200,
+        treeSpacing:250,
+        parentCentralization:true,
+        blockShifting:true,
+        edgeMinimization:true
+      }
+    },
+    physics:{enabled:false}
+  });
   document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));
   document.getElementById('bH').classList.add('on');
 });

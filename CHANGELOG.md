@@ -803,6 +803,35 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.40.5 — 2026-05-25 (Second Brain Hierarchical view fix — `sortMethod: hubsize` for cyclic knowledge graph)
+
+Owner reported: Hierarchical view on `/Apps/second brain/index.html`
+showed nodes collapsed into 2 narrow pillars instead of a proper
+tree layout.
+
+### Diagnosis
+The view config used `sortMethod: 'directed'` which requires a DAG
+with a single root. The knowledge graph is **cyclic** — many
+bidirectional edges (articles ↔ comparisons ↔ calculators ↔ memory
+files). Vis-network's `directed` sort can't resolve cycles, so it
+collapses cycle members into vertical pillars.
+
+### Fixed
+- `sortMethod: 'directed'` → `'hubsize'` (root selection by node
+  degree — high-degree hubs like Engineering Journal, MEMORY.md,
+  RZEngine v1.2.0 become natural roots, others fan out beneath them)
+- `levelSeparation: 105` → `180` (more vertical room for 134 nodes)
+- New `nodeSpacing: 200` + `treeSpacing: 250` (horizontal breathing
+  room for siblings and disjoint subtrees)
+- New `parentCentralization: true` (parents centered over children)
+- New `blockShifting: true` + `edgeMinimization: true` (vis-network
+  auto-untangle + edge-cross reduction)
+
+### Notes
+- Engine files byte-identical. ship-gate 8/8 PASS.
+
+---
+
 ## v1.40.3 — 2026-05-25 (Second Brain Wiki link broken — relative-path fix)
 
 Owner reported: clicking the "Wiki" button on the Second Brain page

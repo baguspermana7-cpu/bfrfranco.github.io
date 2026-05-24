@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 161 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 162 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 161,
+        "numberOfItems": 162,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.40.1 — 2026-05-25","url":"https://resistancezero.com/changelog.html#v1.40.1"},
         {"@type":"ListItem","position":2,"name":"v1.40.0 — 2026-05-25","url":"https://resistancezero.com/changelog.html#v1.40.0"},
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.40.1</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">161 releases</span>
+        <span class="cl-count-badge">162 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1602,6 +1602,46 @@
   <li><code>Spares Readiness Calculator/</code> draft refresh (engine evolved v1.11&rarr;v1.16; existing drafts stale).</li>
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
+</ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.40.5">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.40.5</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-25">May 25, 2026</time>
+      </div>
+      <p class="changelog-caption">Second Brain Hierarchical view fix — `sortMethod: hubsize` for cyclic knowledge graph</p>
+      <div class="changelog-body">
+        <p>Owner reported: Hierarchical view on <code>/Apps/second brain/index.html</code></p>
+<p>showed nodes collapsed into 2 narrow pillars instead of a proper</p>
+<p>tree layout.</p>
+<h3 class="cl-subhead">Diagnosis</h3>
+<p>The view config used <code>sortMethod: &#x27;directed&#x27;</code> which requires a DAG</p>
+<p>with a single root. The knowledge graph is <strong>cyclic</strong> — many</p>
+<p>bidirectional edges (articles ↔ comparisons ↔ calculators ↔ memory</p>
+<p>files). Vis-network's <code>directed</code> sort can't resolve cycles, so it</p>
+<p>collapses cycle members into vertical pillars.</p>
+<h3 class="cl-subhead">Fixed</h3>
+<ul>
+  <li><code>sortMethod: &#x27;directed&#x27;</code> → <code>&#x27;hubsize&#x27;</code> (root selection by node</li>
+</ul>
+<p>degree — high-degree hubs like Engineering Journal, MEMORY.md,</p>
+<p>RZEngine v1.2.0 become natural roots, others fan out beneath them)</p>
+<ul>
+  <li><code>levelSeparation: 105</code> → <code>180</code> (more vertical room for 134 nodes)</li>
+  <li>New <code>nodeSpacing: 200</code> + <code>treeSpacing: 250</code> (horizontal breathing</li>
+</ul>
+<p>room for siblings and disjoint subtrees)</p>
+<ul>
+  <li>New <code>parentCentralization: true</code> (parents centered over children)</li>
+  <li>New <code>blockShifting: true</code> + <code>edgeMinimization: true</code> (vis-network</li>
+</ul>
+<p>auto-untangle + edge-cross reduction)</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Engine files byte-identical. ship-gate 8/8 PASS.</li>
 </ul>
       </div>
     </article>
