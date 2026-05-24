@@ -803,6 +803,67 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.41.1 — 2026-05-25 (STP modal full expansion + MMR room added)
+
+Ship 2 of 7 in v1.41.x batch.
+
+### STP modal expansion (datahallAI.html `renderStpHmi`)
+Owner asked for full drainage → sump → bio-septic → treatment train →
+reuse-to-irrigation visualisation. Existing modal had only equalisation/
+aeration/clarifier/chlorination. Expanded modal viewBox 780×480 → 980×620
+to fit the full flow.
+
+**Added stages:**
+- **Drainage sources** (Row B): 5-tile stack — WC drains, kitchen, CRAH
+  condensate, floor drains, leak-detection trip drain — converging
+  to sump pit
+- **Sump pit + duplex submersible pumps** (N+1, VFD 3 kW) lifting to
+  bio-septic
+- **Bio-septic tank** (anaerobic primary, 25 m³, 3-chamber baffled,
+  HRT 8-12 h, BOD removal ~30 %)
+- **Sand filter** (tertiary suspended-solids polish, backwash trigger
+  at 0.8 bar)
+- **Activated carbon filter** (residual organics, TOC < 1 mg/L, GAC
+  replace every 6 months)
+- **UV disinfection** (2× lamps N+1, UVT > 70 %, log-4 pathogen kill,
+  lamp replace 9,000 h)
+- **Reclaim tank** (20 m³ buffer, 2-3 d hold, NaOCl residual 0.5 mg/L)
+- **Irrigation distribution** (drip + spray, ~50 m³/day, landscape
+  1,500 m²)
+- **Sludge handling** sub-branch (drying bed → ~0.5 m³/week → hauled
+  to municipal)
+- **Reuse rate tile**: ~18,000 m³/yr reused, ~0.18 ML/yr water saved
+- **Compliance tile**: Jakarta Pergub 69/2013 + Permen LHK 68/2016 +
+  WHO Guidelines for Safe Use of Wastewater (irrigation grade)
+- **Operational tile**: SBR cycle (Fill 1h · React 4h · Settle 1h ·
+  Decant 2h), PLC Schneider M340 via Modbus TCP, daily/weekly/monthly
+  test cadence
+
+### MMR Room added (datahallAI.html Room Layout SVG)
+Owner: "di room layout tidak ada ruangan MMR". Added new MMR /
+TELECOM zone replacing one redundant WORKSHOP/STORAGE label.
+
+**Added MMR equipment sub-blocks:**
+- TM (Telkom carrier termination)
+- ISAT (Indosat carrier termination)
+- XL (XL Axiata carrier termination)
+- LINKNET (Linknet carrier termination)
+- FDF (Fiber Distribution Frame / customer cross-connect)
+- CRAH (dedicated CRAH for MMR cooling load)
+
+Sub-title: "Carrier-Neutral · Cross-Connect"
+Position: ground-floor east zone (near loading bay for carrier cable-
+pull access).
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`)
+  byte-identical.
+- Probe 75/75 PASS.
+- STP modal viewBox dynamically set on open via `el.setAttribute`.
+- DC AI Tech Spec PDF unchanged (~353 KB).
+
+---
+
 ## v1.41.0 — 2026-05-25 (All-In-One Dashboard page + geopolitics.html link fix)
 
 Ship 1 of 7 in the v1.41.x batch (owner approved 7 stacked plans).

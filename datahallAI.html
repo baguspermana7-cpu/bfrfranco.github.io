@@ -1235,8 +1235,18 @@ s+=isoLabel(36,18,f.z+FH+5,'BMS / EPMS','#c4b5fd',8,1);
 s+=isoLabel(10,31,f.z+FH+5,'WORKSHOP / STORAGE','#d6d3d1',9,1);
 s+=isoLabel(10,31,f.z+FH+3.5,'Support & Maintenance','#d6d3d1',6.5);
 s+=isoLabel(36,31,f.z+FH+5,'CONTROL CENTER','#93c5fd',9,1);
-s+=isoLabel(60,31,f.z+FH+5,'WORKSHOP / STORAGE','#d6d3d1',9,1);
-s+=isoLabel(60,31,f.z+FH+3.5,'Support & Maintenance','#d6d3d1',6.5);
+// v1.41.1 — MMR (Meet-Me Room) added to ground-floor support zone east.
+// Carrier-neutral telecom termination, customer cross-connects. Co-located
+// near loading bay for cable-pull access.
+s+=isoLabel(60,31,f.z+FH+5,'MMR / TELECOM','#67e8f9',9,1);
+s+=isoLabel(60,31,f.z+FH+3.5,'Carrier-Neutral · Cross-Connect','#67e8f9',6.5);
+// MMR equipment sub-blocks (4 carrier racks + customer FDF + CRAH + UPS)
+s+=isoBox(56,28,3,2,f.z+FH,1.5,'#06b6d4','TM','#67e8f9');
+s+=isoBox(60,28,3,2,f.z+FH,1.5,'#06b6d4','ISAT','#67e8f9');
+s+=isoBox(64,28,3,2,f.z+FH,1.5,'#06b6d4','XL','#67e8f9');
+s+=isoBox(56,32,3,2,f.z+FH,1.5,'#06b6d4','LINKNET','#67e8f9');
+s+=isoBox(60,32,3,2,f.z+FH,1.5,'#06b6d4','FDF','#67e8f9');
+s+=isoBox(64,32,3,2,f.z+FH,1.5,'#06b6d4','CRAH','#67e8f9');
 s+=isoLabel(20,43,f.z+FH+4,'NOC / SECURITY','#a5b4fc',9,1);
 s+=isoLabel(20,43,f.z+FH+2.5,'Control \u00B7 Comms \u00B7 Fire','#a5b4fc',6.5);
 s+=isoLabel(60,43,f.z+FH+5,'AHU ROOM','#c4b5fd',8,1);
@@ -2398,8 +2408,13 @@ rip.style.display='none';
 });
 
 // ===== STP P&ID HMI =====
+// v1.41.1 — full expansion: drainage inputs + sump pump + bio-septic + MBBR
+// + clarifier + sand filter + AC filter + UV + reclaim tank + irrigation
+// distribution + sludge handling + compliance footer. viewBox bumped to 980×620.
 function renderStpHmi(el){
-var F='JetBrains Mono',W=780,H=480;var s='';
+var F='JetBrains Mono',W=980,H=620;var s='';
+// Set viewBox to fit larger STP layout (parent SVG element)
+try{ el.setAttribute('viewBox','0 0 '+W+' '+H); }catch(e){}
 s+=`<rect width="${W}" height="${H}" fill="#080e1a" rx="4"/>`;
 // Header
 s+=`<rect x="0" y="0" width="${W}" height="26" fill="rgba(6,182,212,.08)"/>`;
@@ -2493,10 +2508,145 @@ s+=`<rect x="${OUX}" y="${PY}" width="70" height="50" rx="4" fill="rgba(34,197,9
 s+=`<text x="${OUX+35}" y="${PY+18}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">EFFLUENT</text>`;
 s+=`<text x="${OUX+35}" y="${PY+30}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Treated Water</text>`;
 s+=`<text x="${OUX+35}" y="${PY+40}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Landscape Irr.</text>`;
+// === ROW B (Y \u2248 290-410) \u2014 Drainage Sources + Sump Pump + Bio-Septic Tank ===
+var DY=290, DSX=20;
+// 5 drainage source tiles stacked vertically
+var srcs=[
+  {l:'WC drains',     n:'~1.5 m\u00B3/h'},
+  {l:'Kitchen + pantry', n:'~0.6 m\u00B3/h'},
+  {l:'CRAH condensate', n:'~0.2 m\u00B3/h'},
+  {l:'Floor drains',  n:'rain ingress'},
+  {l:'Leak-detection',n:'trip drain only'}
+];
+s+=`<text x="${DSX+45}" y="${DY-5}" fill="var(--o)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">DRAINAGE SOURCES</text>`;
+for(var i=0;i<srcs.length;i++){
+  s+=`<rect x="${DSX}" y="${DY+i*23}" width="90" height="20" rx="2" fill="rgba(245,158,11,.05)" stroke="rgba(245,158,11,.25)" stroke-width=".4"/>`;
+  s+=`<text x="${DSX+5}" y="${DY+i*23+9}" fill="var(--t2)" font-family="${F}" font-size="5.5">${srcs[i].l}</text>`;
+  s+=`<text x="${DSX+5}" y="${DY+i*23+17}" fill="var(--t3)" font-family="${F}" font-size="4.5">${srcs[i].n}</text>`;
+  // Convergence lines to sump
+  s+=`<line x1="${DSX+90}" y1="${DY+i*23+10}" x2="${DSX+125}" y2="${DY+57}" stroke="var(--o)" stroke-width=".6" opacity=".5"/>`;
+}
+// Sump pit
+var SPX=DSX+135;
+s+=`<rect x="${SPX}" y="${DY+30}" width="68" height="55" rx="3" fill="rgba(245,158,11,.08)" stroke="rgba(245,158,11,.4)" stroke-width=".7"/>`;
+s+=`<text x="${SPX+34}" y="${DY+42}" fill="var(--o)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">SUMP PIT</text>`;
+s+=`<text x="${SPX+34}" y="${DY+53}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Wet well 5 m\u00B3</text>`;
+s+=`<text x="${SPX+34}" y="${DY+62}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Level HH/H/L/LL</text>`;
+// Submersible duplex pumps (N+1)
+s+=`<circle cx="${SPX+15}" cy="${DY+78}" r="6" fill="rgba(34,197,94,.08)" stroke="var(--g)" stroke-width=".5"/>`;
+s+=`<text x="${SPX+15}" y="${DY+80}" fill="var(--g)" font-family="${F}" font-size="5" text-anchor="middle" font-weight="600">P-1</text>`;
+s+=`<circle cx="${SPX+53}" cy="${DY+78}" r="6" fill="rgba(148,163,184,.08)" stroke="var(--t3)" stroke-width=".5"/>`;
+s+=`<text x="${SPX+53}" y="${DY+80}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">P-2</text>`;
+s+=`<text x="${SPX+34}" y="${DY+97}" fill="var(--o)" font-family="${F}" font-size="4.5" text-anchor="middle">Duplex N+1 \u00B7 3kW \u00B7 VFD</text>`;
+// Flow to bio-septic
+s+=`<line x1="${SPX+68}" y1="${DY+57}" x2="${SPX+95}" y2="${DY+57}" stroke="var(--c)" stroke-width="1.6" class="fR"/>`;
+s+=`<text x="${SPX+82}" y="${DY+52}" fill="var(--c)" font-family="${F}" font-size="4.5" text-anchor="middle">~3 m\u00B3/h</text>`;
+// Bio-septic tank (anaerobic primary)
+var BSX=SPX+98;
+s+=`<rect x="${BSX}" y="${DY+15}" width="100" height="85" rx="4" fill="rgba(124,58,237,.06)" stroke="rgba(124,58,237,.4)" stroke-width=".7"/>`;
+s+=`<text x="${BSX+50}" y="${DY+27}" fill="var(--p)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">BIO-SEPTIC TANK</text>`;
+s+=`<text x="${BSX+50}" y="${DY+38}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Anaerobic primary</text>`;
+s+=`<text x="${BSX+50}" y="${DY+47}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">25 m\u00B3 \u00B7 3-chamber</text>`;
+// Internal baffles (3 chambers)
+s+=`<line x1="${BSX+35}" y1="${DY+55}" x2="${BSX+35}" y2="${DY+92}" stroke="rgba(124,58,237,.5)" stroke-width=".5" stroke-dasharray="3 2"/>`;
+s+=`<line x1="${BSX+65}" y1="${DY+55}" x2="${BSX+65}" y2="${DY+92}" stroke="rgba(124,58,237,.5)" stroke-width=".5" stroke-dasharray="3 2"/>`;
+s+=`<text x="${BSX+50}" y="${DY+72}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">BOD removal ~30%</text>`;
+s+=`<text x="${BSX+50}" y="${DY+82}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Settled solids \u2192 drying bed</text>`;
+s+=`<text x="${BSX+50}" y="${DY+92}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">HRT 8-12 h</text>`;
+// Flow from bio-septic upward to existing equalisation tank (Row A)
+s+=`<line x1="${BSX+100}" y1="${DY+57}" x2="${BSX+120}" y2="${DY+57}" stroke="var(--c)" stroke-width="1.6" class="fR"/>`;
+s+=`<line x1="${BSX+120}" y1="${DY+57}" x2="${BSX+120}" y2="${PY+30}" stroke="var(--c)" stroke-width="1.6" stroke-dasharray="3 2"/>`;
+s+=`<line x1="${BSX+120}" y1="${PY+30}" x2="${EQX}" y2="${PY+30}" stroke="var(--c)" stroke-width="1.6" class="fR"/>`;
+s+=`<text x="${BSX+125}" y="${PY+100}" fill="var(--c)" font-family="${F}" font-size="4.5">Pre-treated \u2192 EQ tank \u2197</text>`;
+
+// === ROW C (Y \u2248 420-490) \u2014 Tertiary polish train (after Clarifier) ===
+var TY=420, TSX=300;
+// Note: Clarifier exists in row A (Y=100); its outlet now feeds into this tertiary train
+s+=`<line x1="${CLX+35}" y1="${PY+57}" x2="${CLX+35}" y2="${TY-5}" stroke="var(--c)" stroke-width="1.4" stroke-dasharray="2 2"/>`;
+s+=`<text x="${CLX+38}" y="${TY-10}" fill="var(--c)" font-family="${F}" font-size="4.5">Clarifier OF \u2192</text>`;
+// Sand filter
+s+=`<rect x="${TSX}" y="${TY}" width="80" height="55" rx="3" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.4)" stroke-width=".7"/>`;
+s+=`<text x="${TSX+40}" y="${TY+13}" fill="var(--o)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">SAND FILTER</text>`;
+s+=`<text x="${TSX+40}" y="${TY+24}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Polish SS</text>`;
+s+=`<text x="${TSX+40}" y="${TY+33}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">&Delta;P ${R(0.2,0.7).toFixed(2)} bar</text>`;
+s+=`<text x="${TSX+40}" y="${TY+44}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Backwash @ 0.8 bar</text>`;
+s+=`<line x1="${TSX+80}" y1="${TY+27}" x2="${TSX+98}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
+// Activated carbon filter
+var ACX=TSX+100;
+s+=`<rect x="${ACX}" y="${TY}" width="80" height="55" rx="3" fill="rgba(168,162,158,.06)" stroke="rgba(168,162,158,.4)" stroke-width=".7"/>`;
+s+=`<text x="${ACX+40}" y="${TY+13}" fill="#d6d3d1" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">AC FILTER</text>`;
+s+=`<text x="${ACX+40}" y="${TY+24}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Granular GAC</text>`;
+s+=`<text x="${ACX+40}" y="${TY+33}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">TOC &lt; 1 mg/L</text>`;
+s+=`<text x="${ACX+40}" y="${TY+44}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Replace 6 months</text>`;
+s+=`<line x1="${ACX+80}" y1="${TY+27}" x2="${ACX+98}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
+// UV disinfection
+var UVX=ACX+100;
+s+=`<rect x="${UVX}" y="${TY}" width="80" height="55" rx="3" fill="rgba(139,92,246,.06)" stroke="rgba(139,92,246,.4)" stroke-width=".7"/>`;
+s+=`<text x="${UVX+40}" y="${TY+13}" fill="var(--p)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">UV DISINFECT</text>`;
+s+=`<text x="${UVX+40}" y="${TY+24}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">2&times; UV lamps \u00B7 N+1</text>`;
+var uvI=R(95,99.5).toFixed(1);
+s+=`<text x="${UVX+40}" y="${TY+33}" fill="var(--p)" font-family="${F}" font-size="5" text-anchor="middle">${uvI} % intensity</text>`;
+s+=`<text x="${UVX+40}" y="${TY+44}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">UVT &gt; 70 % \u00B7 log 4 kill</text>`;
+s+=`<line x1="${UVX+80}" y1="${TY+27}" x2="${UVX+98}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
+// Reclaim tank
+var RCX=UVX+100;
+s+=`<rect x="${RCX}" y="${TY-10}" width="90" height="75" rx="4" fill="rgba(34,197,94,.07)" stroke="rgba(34,197,94,.4)" stroke-width=".7"/>`;
+s+=`<text x="${RCX+45}" y="${TY+5}" fill="var(--g)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">RECLAIM TANK</text>`;
+s+=`<text x="${RCX+45}" y="${TY+15}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">20 m\u00B3 \u00B7 2-3 d hold</text>`;
+// Level indicator
+var rlvl=RI(50,85);
+s+=`<rect x="${RCX+70}" y="${TY+18}" width="10" height="35" rx="1" fill="rgba(34,197,94,.1)" stroke="var(--g)" stroke-width=".4"/>`;
+s+=`<rect x="${RCX+71}" y="${TY+18+35*(100-rlvl)/100}" width="8" height="${35*rlvl/100}" rx="1" fill="rgba(34,197,94,.3)"/>`;
+s+=`<text x="${RCX+45}" y="${TY+32}" fill="var(--g)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="700">${rlvl}%</text>`;
+s+=`<text x="${RCX+45}" y="${TY+45}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Treated water buffer</text>`;
+s+=`<text x="${RCX+45}" y="${TY+55}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">NaOCl residual 0.5 mg/L</text>`;
+s+=`<line x1="${RCX+90}" y1="${TY+27}" x2="${RCX+110}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
+// Irrigation distribution
+var IRX=RCX+110;
+s+=`<rect x="${IRX}" y="${TY}" width="90" height="55" rx="4" fill="rgba(125,221,180,.08)" stroke="var(--g)" stroke-width=".8"/>`;
+s+=`<text x="${IRX+45}" y="${TY+14}" fill="var(--g)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">IRRIGATION</text>`;
+s+=`<text x="${IRX+45}" y="${TY+25}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Drip + spray</text>`;
+s+=`<text x="${IRX+45}" y="${TY+34}" fill="var(--g)" font-family="${F}" font-size="5" text-anchor="middle">~50 m\u00B3/day</text>`;
+s+=`<text x="${IRX+45}" y="${TY+44}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Landscape 1,500 m\u00B2</text>`;
+
+// Sludge handling sub-branch (off Clarifier \u2014 already shown going to Sludge Hold; add drying bed + haul)
+var SBX=TSX-180;
+s+=`<rect x="${SBX}" y="${TY+25}" width="100" height="35" rx="3" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.35)" stroke-width=".5"/>`;
+s+=`<text x="${SBX+50}" y="${TY+37}" fill="var(--o)" font-family="${F}" font-size="6" text-anchor="middle" font-weight="600">SLUDGE DRYING</text>`;
+s+=`<text x="${SBX+50}" y="${TY+47}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">~0.5 m\u00B3/week</text>`;
+s+=`<text x="${SBX+50}" y="${TY+56}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Hauled \u00B7 municipal</text>`;
+// Sludge route from clarifier waste-hold
+s+=`<line x1="${CLX+35}" y1="${PY+125}" x2="${CLX+35}" y2="${TY+30}" stroke="var(--o)" stroke-width=".8" stroke-dasharray="2 2"/>`;
+s+=`<line x1="${CLX+35}" y1="${TY+30}" x2="${SBX+100}" y2="${TY+42}" stroke="var(--o)" stroke-width=".8" stroke-dasharray="2 2"/>`;
+
+// === ROW D (Y \u2248 510-580) \u2014 Reuse + compliance summary tiles ===
+var QY=510;
+// Reuse rate tile
+s+=`<rect x="20" y="${QY}" width="225" height="60" rx="3" fill="rgba(125,221,180,.06)" stroke="rgba(125,221,180,.3)" stroke-width=".5"/>`;
+s+=`<text x="30" y="${QY+13}" fill="var(--g)" font-family="${F}" font-size="6.5" font-weight="600">REUSE \u2014 Landscape Irrigation</text>`;
+s+=`<text x="30" y="${QY+25}" fill="var(--t3)" font-family="${F}" font-size="5">Daily reuse: ~50 m\u00B3/day \u00B7 Annual: ~18,000 m\u00B3</text>`;
+s+=`<text x="30" y="${QY+35}" fill="var(--t3)" font-family="${F}" font-size="5">Irrigated area: ~1,500 m\u00B2 (4 mm/day ET)</text>`;
+s+=`<text x="30" y="${QY+45}" fill="var(--t3)" font-family="${F}" font-size="5">Equivalent water saved: ~0.18 ML/yr vs city tap</text>`;
+s+=`<text x="30" y="${QY+55}" fill="var(--t3)" font-family="${F}" font-size="5">Sludge: 0.5 m\u00B3/week dewatered + hauled</text>`;
+// Compliance tile
+s+=`<rect x="255" y="${QY}" width="350" height="60" rx="3" fill="rgba(6,182,212,.05)" stroke="rgba(6,182,212,.3)" stroke-width=".5"/>`;
+s+=`<text x="265" y="${QY+13}" fill="var(--c)" font-family="${F}" font-size="6.5" font-weight="600">DISCHARGE COMPLIANCE \u2014 Effluent limits met</text>`;
+s+=`<text x="265" y="${QY+24}" fill="var(--t3)" font-family="${F}" font-size="4.7">Jakarta Pergub 69/2013 \u00B7 Indonesia Permen LHK 68/2016</text>`;
+s+=`<text x="265" y="${QY+33}" fill="var(--t3)" font-family="${F}" font-size="4.7">BOD &lt; 30 mg/L \u00B7 COD &lt; 100 \u00B7 TSS &lt; 30 \u00B7 NH\u2083-N &lt; 10</text>`;
+s+=`<text x="265" y="${QY+42}" fill="var(--t3)" font-family="${F}" font-size="4.7">Oil &amp; grease &lt; 10 mg/L \u00B7 pH 6-9 \u00B7 coliform &lt; 10\u2074 MPN/100mL</text>`;
+s+=`<text x="265" y="${QY+52}" fill="var(--t3)" font-family="${F}" font-size="4.7">WHO Guidelines for Safe Use of Wastewater \u2014 irrigation grade</text>`;
+// Operational tile
+s+=`<rect x="615" y="${QY}" width="345" height="60" rx="3" fill="rgba(139,92,246,.05)" stroke="rgba(139,92,246,.3)" stroke-width=".5"/>`;
+s+=`<text x="625" y="${QY+13}" fill="var(--p)" font-family="${F}" font-size="6.5" font-weight="600">OPERATIONAL \u2014 Auto-control + Maintenance</text>`;
+s+=`<text x="625" y="${QY+24}" fill="var(--t3)" font-family="${F}" font-size="4.7">SBR cycle: Fill 1h \u00B7 React 4h \u00B7 Settle 1h \u00B7 Decant 2h</text>`;
+s+=`<text x="625" y="${QY+33}" fill="var(--t3)" font-family="${F}" font-size="4.7">PLC: Schneider M340 \u00B7 BMS link via Modbus TCP</text>`;
+s+=`<text x="625" y="${QY+42}" fill="var(--t3)" font-family="${F}" font-size="4.7">Daily: pH/DO/turb/FCl \u00B7 Weekly: BOD/TSS/NH\u2083 \u00B7 Monthly: lab full</text>`;
+s+=`<text x="625" y="${QY+52}" fill="var(--t3)" font-family="${F}" font-size="4.7">Blower oil change 1,500 h \u00B7 UV lamp replace 9,000 h</text>`;
+
 // Bottom bar
-s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(6,182,212,.06)"/>`;
-s+=`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="6">Sequencing Batch Reactor | Capacity 50m\u00B3/day | BOD < 20mg/L | TSS < 30mg/L</text>`;
-s+=`<text x="${W-10}" y="${H-9}" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="end">Auto-refresh 3s</text>`;
+s+=`<rect x="0" y="${H-22}" width="${W}" height="22" fill="rgba(6,182,212,.06)"/>`;
+s+=`<text x="10" y="${H-8}" fill="var(--t3)" font-family="${F}" font-size="5.5">SBR + tertiary polish \u00B7 Capacity 50 m\u00B3/day \u00B7 Reuse 100% to landscape \u00B7 Zero discharge to municipal sewer (closed-loop)</text>`;
+s+=`<text x="${W-10}" y="${H-8}" fill="var(--c)" font-family="${F}" font-size="5.5" text-anchor="end">Auto-refresh 3 s</text>`;
 el.innerHTML=s;
 }
 
