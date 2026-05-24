@@ -11,6 +11,70 @@ release sections rather than semver.
 
 ---
 
+## v1.41.6 — 2026-05-24 (ict.html — Security HMI widgets + CCTV/ACS/intrusion expansion)
+
+MINOR ship: closes owner request "GUI tampilan2 HMI dga block/chart atau widget
+dll kok tidak ada... dan di security systemnya juga tidak lengkap mana monitoring
+semua cctv, aacs dll. sempurnakan".
+
+### Added
+
+- **Security HMI widget panel** on Security Systems tab. Three-tile grid
+  (1.4fr / 1fr / 1fr) with:
+  - **CCTV Live Mosaic** — 16-cell scan-line/gradient TV preview grid with
+    blinking rec dot per cell, camera ID + zone label, status colour ring
+    (ok / warn / bad). Plus 24-hour camera availability sparkline (SVG
+    polyline, green fill); 3-stat row (Cams Online / Uptime 24 h / VMS
+    Storage).
+  - **Access Control Doors** — scrollable list (max 240 px) of 12
+    representative doors (4 mantraps / DH-1..4 / NOC / MMR / Chiller /
+    Generator / Fuel Farm). Each row: door tag, 24-hour event count, status
+    pill (LOCKED green / UNLOCKED amber with left-border accent).
+  - **Intrusion Zones** — SVG donut (armed-green / disarmed-grey arcs) over
+    central numeric `armed/total` count; "No alarms" or "⚠ N alarm" subline.
+    Plus scrollable 10-zone list with PIR detector tag, zone name, status
+    pill (ARMED / DISARM / ALARM). Donut math: `2πR=201`, dasharray split
+    by `pctArmed` and `pctDisarmed` with proper offset rotation.
+
+- **Security segment data expanded** (`SEGMENTS.sec`):
+  - Services: 4 → 8 entries (NVR-01 + NVR-02 separate, Access Control
+    with door count, Intrusion + zone count, Fence-line PIR, VMS
+    Recording, SOC link, Mass Notification).
+  - Caps: 4 → 8 cards (cameras 96, doors 48, zones 24, trunk cap 10 Gbps,
+    trunk util 34 %, retention 14 d, NVR storage 192 TB, stream uptime
+    99.96 %).
+  - Links: 3 → 9 entries (NVR-01/02 separate, ACS-01/02 separate, IDS-01,
+    PIR-Fence, SEC-A/B failover, SOC link, Mass-Notif PA/strobe trigger).
+  - New `hmi` block with `cctv[16]` + `doors[12]` + `intrusion[10]`
+    structured data feeding the widgets.
+
+### CSS
+
+- `.hmi-grid` 3-column responsive (single-col under 1024 px), `.hmi-tile`,
+  `.cctv-grid` 4×4 with `aspect-ratio: 16/9`, `.cctv-cell` with scan-line
+  gradient + rec-dot pulse animation, `.door-list/.zone-list` with
+  scrollable max-height, status pills (.dr-st.locked/.unlocked, .zr-st
+  .armed/.disarmed/.alarm), `.hmi-donut` SVG holder, `.hmi-spark`
+  sparkline, `.hmi-row-stats` 3-cell bottom strip.
+
+### Engines locked
+
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
+  byte-identical. 57/57 + 22/22 tests pass.
+
+### Changed
+
+- `js/rz-version.js` &rarr; v1.41.6.
+- `sw.js` cache version &rarr; `rz-cache-v1.41.6`.
+
+### Files touched
+
+- `ict.html` — Security HMI CSS block; SEGMENTS.sec data expansion; new
+  `renderSecurityHmi(hmi)` function; renderSegment wiring (`if key==='sec'
+  && seg.hmi`).
+
+---
+
 ## v1.41.5 — 2026-05-24 (water-system.html — UV-401 / DOS-302 label overlap + TK-402 dual-pipe + CT-MK rename)
 
 PATCH ship: closes three water-system.html owner complaints in one pass.
