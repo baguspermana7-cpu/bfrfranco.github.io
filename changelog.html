@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 159 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 160 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 159,
+        "numberOfItems": 160,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.40.1 — 2026-05-25","url":"https://resistancezero.com/changelog.html#v1.40.1"},
         {"@type":"ListItem","position":2,"name":"v1.40.0 — 2026-05-25","url":"https://resistancezero.com/changelog.html#v1.40.0"},
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.40.1</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">159 releases</span>
+        <span class="cl-count-badge">160 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1603,6 +1603,88 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.40.2">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.40.2</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-25">May 25, 2026</time>
+      </div>
+      <p class="changelog-caption">Tech Spec PDF — Section 7 Network + Section 2 Site/Structural; 338 KB → 353 KB; ~80-90 pages</p>
+      <div class="changelog-body">
+        <p>(Authored locally as v1.39.4. Parallel session shipped v1.40.0 AI</p>
+<p>Maintenance review fixes + v1.40.1 Network Hub OG images mid-push;</p>
+<p>this lands as v1.40.2.)</p>
+<p>Phase B continuation. v1.39.3 deepened electrical/cooling/fire.</p>
+<p>This ship deepens network/ICT + adds structural/seismic/environmental</p>
+<p>depth to Section 2 (Site &amp; Facility). PDF: 338 → 353 KB (+15 KB).</p>
+<h3 class="cl-subhead">Bug caught + fixed during this ship</h3>
+<p>The first attempt failed the probe (`TS-AI-1: Generate Design returns</p>
+<p>~0 chars<code>) because Section 2 referenced </code>g.lengthM<code> but </code>g = m.geometry`</p>
+<p>was declared later (inside Section 6). Same class as v1.36.2's</p>
+<p><code>sldSVG</code> scope bug. Fixed by hoisting <code>var g = m.geometry;</code> + `var</p>
+<p>hallVol = vol;<code> to the top of </code>buildTechSpecHtml()`. **Probe caught</p>
+<p>it before push** — exactly its job.</p>
+<h3 class="cl-subhead">Section 7 (Network) — added</h3>
+<ul>
+  <li><strong>7.3 Spine-Leaf Radix Sizing</strong> — NVIDIA QM9700 (64-port NDR 400 G)</li>
+</ul>
+<p>reference; per-hall leaf + spine count (rail-aligned 8-rail</p>
+<p>topology); bisection bandwidth.</p>
+<ul>
+  <li><strong>7.4 Full IB Cable Schedule</strong> — cable type by length (DAC /</li>
+</ul>
+<p>AOC / MMF / SMF); per-hall + facility-wide cable count + length;</p>
+<p>cable-tray routing strategy.</p>
+<ul>
+  <li><strong>7.5 OOB Management Network</strong> — endpoints, switch sizing, Cat6A,</li>
+</ul>
+<p>SNMPv3 + IPMI 2.0 + Redfish.</p>
+<ul>
+  <li><strong>7.6 Storage Tier Design</strong> — hot/warm/cold tiers with capacity,</li>
+</ul>
+<p>bandwidth, and protocol stack (NVMe-oF, parallel FS, object).</p>
+<ul>
+  <li><strong>7.7 BMS Gateway + DCIM Integration</strong> — Distech ECY-VAV / Schneider</li>
+</ul>
+<p>SmartX AS-P, multi-protocol stack, IEC 62443 zoning.</p>
+<h3 class="cl-subhead">Section 2 (Site & Facility) — added</h3>
+<ul>
+  <li><strong>2.1 Structural Floor Loading</strong> — NVL72 weight 1,360 kg, per-rack-</li>
+</ul>
+<p>pos loading 830 kg, distributed live load 1,150 kg/m&sup2;,</p>
+<p>design 1,500 kg/m&sup2; with 30 % margin; post-tensioned RC</p>
+<p>slab-on-grade C40/50.</p>
+<ul>
+  <li><strong>2.2 Seismic Design (SNI 1726:2019)</strong> — Zone 4 Jakarta, PGA 0.5 g,</li>
+</ul>
+<p>SMRF building structure, M16 anchors &ge; 50 kN shear, bracing per</p>
+<p>IBC §13.5, ASCE 7-22 dual reference.</p>
+<ul>
+  <li><strong>2.3 Environmental Envelope</strong> — ASHRAE A1 + L4 (cold-aisle</li>
+</ul>
+<p>18&ndash;27 &deg;C, TCS supply 35 &deg;C); particulate (ISO 14644-1</p>
+<p>Class 8); vibration (ISO 10816 &lt; 0.5 mm/s); noise (&lt; 85 dBA);</p>
+<p>lighting (500 lux LED 4000K).</p>
+<ul>
+  <li><strong>2.4 Hall Layout Dimensions</strong> — detailed geometry per hall</li>
+</ul>
+<p>(length × width × height; aisle widths; row count; emergency-exit</p>
+<p>count per IBC §1006).</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Engine files (<code>datahall-model.js</code>, <code>datahall-calculations.js</code>)</li>
+</ul>
+<p>byte-identical. 57/57 + 22/22 tests pass.</p>
+<ul>
+  <li>Probe 75/75 PASS (after the post-bug fix).</li>
+  <li>Cumulative v1.39.x growth: 264 KB → <strong>353 KB</strong> (+34 %).</li>
+  <li>Owner: refresh <code>http://127.0.0.1:8090/datahallAI.html</code>, click</li>
+</ul>
+<p>📑 Generate Design — should see Sections 2, 7 substantially</p>
+<p>expanded plus all prior additions.</p>
       </div>
     </article>
 

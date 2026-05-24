@@ -803,6 +803,65 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.40.2 — 2026-05-25 (Tech Spec PDF — Section 7 Network + Section 2 Site/Structural; 338 KB → 353 KB; ~80-90 pages)
+
+(Authored locally as v1.39.4. Parallel session shipped v1.40.0 AI
+Maintenance review fixes + v1.40.1 Network Hub OG images mid-push;
+this lands as v1.40.2.)
+
+Phase B continuation. v1.39.3 deepened electrical/cooling/fire.
+This ship deepens network/ICT + adds structural/seismic/environmental
+depth to Section 2 (Site &amp; Facility). PDF: 338 → 353 KB (+15 KB).
+
+### Bug caught + fixed during this ship
+The first attempt failed the probe (`TS-AI-1: Generate Design returns
+~0 chars`) because Section 2 referenced `g.lengthM` but `g = m.geometry`
+was declared later (inside Section 6). Same class as v1.36.2's
+`sldSVG` scope bug. Fixed by hoisting `var g = m.geometry;` + `var
+hallVol = vol;` to the top of `buildTechSpecHtml()`. **Probe caught
+it before push** — exactly its job.
+
+### Section 7 (Network) — added
+- **7.3 Spine-Leaf Radix Sizing** — NVIDIA QM9700 (64-port NDR 400 G)
+  reference; per-hall leaf + spine count (rail-aligned 8-rail
+  topology); bisection bandwidth.
+- **7.4 Full IB Cable Schedule** — cable type by length (DAC /
+  AOC / MMF / SMF); per-hall + facility-wide cable count + length;
+  cable-tray routing strategy.
+- **7.5 OOB Management Network** — endpoints, switch sizing, Cat6A,
+  SNMPv3 + IPMI 2.0 + Redfish.
+- **7.6 Storage Tier Design** — hot/warm/cold tiers with capacity,
+  bandwidth, and protocol stack (NVMe-oF, parallel FS, object).
+- **7.7 BMS Gateway + DCIM Integration** — Distech ECY-VAV / Schneider
+  SmartX AS-P, multi-protocol stack, IEC 62443 zoning.
+
+### Section 2 (Site & Facility) — added
+- **2.1 Structural Floor Loading** — NVL72 weight 1,360 kg, per-rack-
+  pos loading 830 kg, distributed live load 1,150 kg/m&sup2;,
+  design 1,500 kg/m&sup2; with 30 % margin; post-tensioned RC
+  slab-on-grade C40/50.
+- **2.2 Seismic Design (SNI 1726:2019)** — Zone 4 Jakarta, PGA 0.5 g,
+  SMRF building structure, M16 anchors &ge; 50 kN shear, bracing per
+  IBC §13.5, ASCE 7-22 dual reference.
+- **2.3 Environmental Envelope** — ASHRAE A1 + L4 (cold-aisle
+  18&ndash;27 &deg;C, TCS supply 35 &deg;C); particulate (ISO 14644-1
+  Class 8); vibration (ISO 10816 &lt; 0.5 mm/s); noise (&lt; 85 dBA);
+  lighting (500 lux LED 4000K).
+- **2.4 Hall Layout Dimensions** — detailed geometry per hall
+  (length × width × height; aisle widths; row count; emergency-exit
+  count per IBC §1006).
+
+### Notes
+- Engine files (`datahall-model.js`, `datahall-calculations.js`)
+  byte-identical. 57/57 + 22/22 tests pass.
+- Probe 75/75 PASS (after the post-bug fix).
+- Cumulative v1.39.x growth: 264 KB → **353 KB** (+34 %).
+- Owner: refresh `http://127.0.0.1:8090/datahallAI.html`, click
+  📑 Generate Design — should see Sections 2, 7 substantially
+  expanded plus all prior additions.
+
+---
+
 ## v1.39.3 — 2026-05-24 (Tech Spec PDF deeper engineering — Section 4/5/6 expansion; 315 KB → 338 KB; ~75 estimated pages)
 
 Phase B continuation. v1.39.2 expanded compute/BMS/cost annex. This

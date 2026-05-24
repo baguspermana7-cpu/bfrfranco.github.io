@@ -11924,6 +11924,11 @@ function buildTechSpecHtml(){
      causing 'ReferenceError: sldSVG is not defined' when Generate Design was
      clicked. Found by the v1.36.2 Tech Spec PDF probe. */
   var sldSVG=grabSVG('elecSvg')||grabSVG('sldHost')||grabSVG('p-elec');
+  /* v1.39.4 — promote g + hallVol to top of function so Section 2 can use them.
+     Previously declared inside Section 6, causing ReferenceError when Section 2
+     was expanded with floor-loading + seismic + envelope tables. */
+  var g = m.geometry;
+  var hallVol = vol;
 
   var H='';
   /* ---------------- Title page ---------------- */
@@ -11994,6 +11999,83 @@ function buildTechSpecHtml(){
       ['Clear height',(vol.height_m||'&mdash;')+(vol.height_m?' m':''),'MODEL.facility.height_m'],
       ['Per-rack footprint','600 &times; 1200 mm (NVL72 reference)','NVIDIA GB200 NVL72 design guide'],
       ['Total facility GPU count',grp(m.facility.gpuPerFacility),'MODEL.facility.gpuPerFacility']
+    ])+
+
+    /* ===== v1.39.4 — Section 2 deep additions ===== */
+
+    '<h4>2.1 Structural Floor Loading</h4>'+
+    '<p>NVL72 weight is approximately 1,360 kg per system. Two rack-positions per NVL72 footprint means ~680 kg per rack position. With high-density cabling + PDU + busway tap above, total downward load can exceed 800 kg per rack-position. Floor must be designed accordingly.</p>'+
+    TC('Floor loading parameters')+
+    R([
+      ['Per-NVL72 system weight','~1,360 kg','NVIDIA reference'],
+      ['Per-rack-position weight (NVL72 split)','~680 kg','half of NVL72'],
+      ['Add cabling, PDU, busway tap (overhead structure)','~150 kg per rack position','engineering est'],
+      ['Total downward load per rack-pos','~830 kg','sum'],
+      ['Footprint per rack-pos','0.72 m&sup2; (600×1200 mm)','reference'],
+      ['Distributed live load','~1,150 kg/m&sup2;','830 / 0.72'],
+      ['Design floor live load (required)','&ge; 1,500 kg/m&sup2;','30 % margin'],
+      ['Slab type','Post-tensioned RC slab-on-grade','no raised floor for liquid-cooled DC'],
+      ['Slab thickness','300 mm + 150 mm sub-base','per geotechnical'],
+      ['Slab concrete grade','C40/50 (40 MPa)','high-strength'],
+      ['Floor finish','Epoxy ESD conductive','&lt; 1 M&Omega; per IEC 61340'],
+      ['Floor flatness','FM2 / DIN 18202','within 5 mm in 5 m'],
+      ['Floor drain (under CDU)','trapped, 1:100 slope','spill containment']
+    ])+
+
+    '<h4>2.2 Seismic Design (SNI 1726:2019)</h4>'+
+    '<p>Jakarta is Seismic Zone 4 (high). All major equipment must be braced/anchored to handle horizontal acceleration of approximately 0.5g.</p>'+
+    TC('Seismic design parameters')+
+    R([
+      ['Seismic zone classification','Zone 4 (high seismicity)','SNI 1726:2019'],
+      ['Building structural system','SMRF (Special Moment-Resisting Frame)','SNI 1726'],
+      ['Design horizontal PGA','~0.5g','site-specific response'],
+      ['Rack anchoring','M16 anchor &ge; 50 kN shear capacity','per IBC 2018 §13.5'],
+      ['Top-of-rack brace','to ceiling structure','prevent overturn'],
+      ['Cable tray lateral brace','every 6 m','prevent swing'],
+      ['Cable tray longitudinal brace','every 18 m','prevent shift'],
+      ['Busway hanger','seismic-rated, with expansion joint','allow 3D movement'],
+      ['Piping (CHW, TCS, fuel)','seismic brace every 3 m + flex joint','prevent rupture'],
+      ['CDU anchoring','anti-vibration mount + M12 anchor','isolate vibration + restrain'],
+      ['Chiller mounting','spring isolators + snubber','low-frequency damping'],
+      ['Standards applied','SNI 1726 + ASCE 7-22','dual reference']
+    ])+
+
+    '<h4>2.3 Environmental Envelope (per ASHRAE TC 9.9)</h4>'+
+    TC('Operating environmental envelope')+
+    R([
+      ['ASHRAE class','A1 recommended + L4 liquid','for AI factory'],
+      ['Dry-bulb temperature (cold aisle)','18&ndash;27 &deg;C','TC 9.9 recommended'],
+      ['Relative humidity','20&ndash;80 % (non-condensing)','TC 9.9 allowable'],
+      ['Dew-point','5.5&ndash;15 &deg;C','TC 9.9'],
+      ['TCS supply (liquid)','35 &deg;C &plusmn; 2','high-temp DLC ⇒ free-cool possible'],
+      ['TCS return (liquid)','45 &deg;C max','design'],
+      ['Air filtration','MERV 11 minimum','contamination control'],
+      ['Hall pressure (vs corridor)','+5 to +10 Pa positive','prevent dust ingress'],
+      ['Particulate (ISO 14644-1)','Class 8','data-centre typical'],
+      ['Vibration (ISO 10816)','&lt; 0.5 mm/s RMS','rack-level'],
+      ['Noise (occupied work area)','&lt; 85 dBA at 1 m','OSHA / EHS'],
+      ['Lighting','500 lux at maintenance plane, LED 4000K','energy-efficient'],
+      ['Outdoor design wet-bulb (Jakarta)','28 &deg;C','site climate'],
+      ['Outdoor design dry-bulb (cooling)','35 &deg;C','site climate'],
+      ['Outdoor design dry-bulb (heating)','22 &deg;C','site climate']
+    ])+
+
+    '<h4>2.4 Hall Layout Dimensions (per hall)</h4>'+
+    TC('Per-hall geometry detail')+
+    R([
+      ['Hall length',g.lengthM+' m','geometry'],
+      ['Hall width',g.widthM+' m','geometry'],
+      ['Clear height',g.heightM+' m','floor to ceiling structure'],
+      ['Floor area',(g.lengthM*g.widthM)+' m&sup2;','derived'],
+      ['Volume',CALC.round(hallVol,0)+' m&sup3;','for fire-agent sizing'],
+      ['Hot aisle width','1.2 m','contained'],
+      ['Cold aisle width','1.2 m','supply air'],
+      ['End-of-row walkway','1.5 m','egress + CDU access'],
+      ['Rack rows','2 (north-south orientation)','design'],
+      ['Rack positions per row',m.facility.racksPerHall/2+' per row','27 racks per row, 2 rows'],
+      ['Adjacent electrical room area','~80 m&sup2;','UPS / switchgear room'],
+      ['Adjacent BMS / control room','~30 m&sup2;','operator area'],
+      ['Emergency exit count','2 (opposite corners)','per IBC § 1006']
     ])+
     '</section>';
 
@@ -12561,6 +12643,88 @@ function buildTechSpecHtml(){
        (m.facility.nvl72PerHall*16)+' IB cables per hall',
        'design intent &mdash; verify with cable schedule')+
     '<p>The network discipline shape mirrors the cooling discipline: a per-NVL72 fabric (NVLink) anchored by switches, and a per-facility fabric (IB/RoCE) anchored by spine. Power for active networking is ~2&ndash;3 % of IT load and is included in the PUE aux line.</p>'+
+
+    /* ===== v1.39.4 — Section 7 deep additions ===== */
+
+    '<h4>7.3 Spine-Leaf Radix Sizing</h4>'+
+    '<p>Fat-tree non-blocking 2:1 oversubscription. For an AI training pod the design target is rail-aligned topology: each NVL72 connects to 8 leaves (1 per NVLink rail), each leaf has uplinks to spine for inter-NVL72 collective traffic. Leaf radix calculation per Mellanox/NVIDIA QM9700 (64-port NDR 400 Gb/s switch) reference.</p>'+
+    TC('Spine-leaf sizing (per hall, '+m.facility.nvl72PerHall+' NVL72 × 8 rails)')+
+    R([
+      ['Total leaf-facing endpoints',(m.facility.nvl72PerHall*8)+' NVL72 ports','27 × 8'],
+      ['Leaf switch model','NVIDIA QM9700 (64-port NDR 400G)','reference'],
+      ['Per-leaf downlinks (to NVL72)','32 ports','split half down half up'],
+      ['Per-leaf uplinks (to spine)','32 ports','non-blocking 1:1; 2:1 for cost-optimisation'],
+      ['Leaves required (rail-aligned)','~'+Math.ceil(m.facility.nvl72PerHall*8/32)+' leaves','round-up'],
+      ['Spine switches required (full mesh)','~'+Math.ceil(m.facility.nvl72PerHall*8/32/2)+' (per rail) × 8 rails','×8 for rail-aligned'],
+      ['Total spine count (per hall)','~'+Math.ceil(m.facility.nvl72PerHall*8/32/2)*8+' QM9700s',''],
+      ['Bisection bandwidth (peak)','~'+(m.facility.nvl72PerHall*8*400/1000)+' Tb/s','×8 NDR per NVL72'],
+      ['Cross-pod (storage / east-west) network','separate 100 GbE spine + leaf','independent layer'],
+      ['Power consumption (network total)','~'+CALC.round((m.facility.nvl72PerHall*8/32+m.facility.nvl72PerHall*8/32/2*8)*2.5,1)+' kW per hall','~2.5 kW per switch']
+    ])+
+
+    '<h4>7.4 Full IB Cable Schedule (representative)</h4>'+
+    '<p>Cable count enumeration per NVL72 + leaf + spine pair. Each NVL72 to its leaf is a 400 Gb/s NDR connection; each leaf to its spine is also 400 Gb/s NDR. Cable type by length (per NVIDIA reference):</p>'+
+    TC('Cable type by length (NVIDIA NDR reference)')+
+    R([
+      ['&le; 2 m, intra-rack','DAC (Direct Attach Copper)','passive, lowest cost'],
+      ['2&ndash;3 m, NVL72-to-leaf','AOC (Active Optical Cable)','transceiver embedded'],
+      ['3&ndash;30 m, leaf-to-spine','MMF + transceiver pair','OM4/OM5 multi-mode'],
+      ['&gt; 30 m, inter-hall / inter-pod','SMF + transceiver','single-mode (rare)']
+    ])+
+    TC('Per-hall IB cable count (rail-aligned NVL72 spine-leaf)')+
+    R([
+      ['NVL72-to-leaf cables',(m.facility.nvl72PerHall*8)+' per hall','27 NVL72 × 8 rails'],
+      ['Leaf-to-spine cables',(Math.ceil(m.facility.nvl72PerHall*8/32)*32)+' per hall','leaves × 32 uplinks each'],
+      ['Total IB cables per hall',((m.facility.nvl72PerHall*8) + (Math.ceil(m.facility.nvl72PerHall*8/32)*32))+'','sum'],
+      ['Total cables, all 4 halls',(((m.facility.nvl72PerHall*8) + (Math.ceil(m.facility.nvl72PerHall*8/32)*32))*m.facility.halls)+'','×4 halls'],
+      ['Average cable length (engineering est.)','~5 m','intra-pod'],
+      ['Total cable length installed','~'+CALC.round(((m.facility.nvl72PerHall*8) + (Math.ceil(m.facility.nvl72PerHall*8/32)*32))*m.facility.halls*5/1000,1)+' km','×5 m average'],
+      ['Cable tray + raceway routing','overhead, segregated from power','EMI separation']
+    ])+
+
+    '<h4>7.5 Out-of-Band (OOB) Management Network</h4>'+
+    '<p>Separate from the production IB fabric. Provides remote console (KVM-over-IP), BMC access, IPMI/Redfish, and power control. Topology: simple Ethernet star, no oversubscription concerns at this scale.</p>'+
+    TC('OOB management network sizing')+
+    R([
+      ['Endpoints per NVL72','~5 (BMC, switch mgmt, PDU mgmt, KVM, sensors)','reference'],
+      ['Endpoints per hall','~'+(m.facility.nvl72PerHall*5+20)+' (NVL72 ×5 + infra)','engineering'],
+      ['OOB switch capacity required','48-port 1 GbE managed','per hall'],
+      ['OOB switches per hall','~'+Math.ceil((m.facility.nvl72PerHall*5+20)/48)+' switches','round-up'],
+      ['Aggregation to OOB core','2 × 10 GbE uplinks per switch','redundant'],
+      ['OOB core switches','2 × 48-port 10 GbE (HA pair)','per facility'],
+      ['Network management protocols','SNMPv3 + IPMI 2.0 + Redfish','per IPMI spec'],
+      ['Cable type','Cat6A UTP','standard 10 GBASE-T'],
+      ['Power','UPS-backed (critical for remote recovery)','dedicated PDU']
+    ])+
+
+    '<h4>7.6 Storage Tier Design</h4>'+
+    '<p>AI training workload requires high-bandwidth + high-IOPS storage. Tiered: hot (NVMe-oF), warm (parallel filesystem), cold (object). Sized for typical 7&ndash;14 day training-data residency.</p>'+
+    TC('Storage tier capacity + bandwidth')+
+    R([
+      ['Hot tier (NVMe-oF / shared)','~2&ndash;5 PB per pod','training scratch'],
+      ['Hot tier bandwidth aggregate','~5 TB/s read aggregate','direct to GPU'],
+      ['Warm tier (parallel FS, e.g. Lustre / GPFS / WekaIO)','~20&ndash;50 PB per pod','checkpoint + dataset'],
+      ['Warm tier bandwidth aggregate','~500 GB/s','sustained read for training'],
+      ['Cold tier (object: S3 / Ceph / Cloud)','~PB-scale (capacity tier)','dataset archive'],
+      ['Cold tier bandwidth','as utility','retrieval to warm for training'],
+      ['Per-NVL72 dedicated bandwidth','~50&ndash;100 GB/s','direct attach + parallel fs'],
+      ['Storage cabling','100 GbE + NDR (depending on tier)','separate from IB compute fabric'],
+      ['Storage protocol stack','NVMe-oF over RoCEv2 / IB; POSIX over parallel-FS','reference']
+    ])+
+
+    '<h4>7.7 BMS Gateway + DCIM Integration</h4>'+
+    '<p>Network discipline meets BMS discipline at the gateway. BMS gateway aggregates field-level (L0/L1) telemetry and forwards to SCADA + DCIM via OPC-UA. Cross-reference to Section 8.4 for the full BMS tag catalog.</p>'+
+    TC('BMS gateway + DCIM integration points')+
+    R([
+      ['BMS gateways per hall','2 (HA pair)','redundant'],
+      ['BMS gateway model','Distech ECY-VAV or Schneider SmartX AS-P','programmable controller'],
+      ['Protocol stack', 'BACnet/IP + Modbus TCP + OPC-UA','multi-protocol'],
+      ['Tag count per gateway','~400&ndash;500 points','before aggregation'],
+      ['DCIM integration model','OPC-UA subscription','event-driven push'],
+      ['Asset inventory sync (BMS &harr; DCIM)','daily delta + monthly full','via REST API'],
+      ['Time synchronisation','IEEE 1588 PTP grandmaster','sub-microsecond at L1'],
+      ['Cybersecurity zoning (IEC 62443)','L0/L1/L2 in IACS zone','firewalled from L3+']
+    ])+
     '</section>';
 
   /* ---------------- 8. BMS & Telemetry ---------------- */
