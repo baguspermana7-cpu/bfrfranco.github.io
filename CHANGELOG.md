@@ -431,6 +431,56 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.35.1 — 2026-05-24 (Cross-page headline consistency probe — Rule 1 verified site-wide; 40/40 pass)
+
+(Authored locally as v1.33.3. Parallel session shipped v1.34.0 + v1.35.0
+Network Hub work mid-push; this lands as v1.35.1.)
+
+Closes the reviewer's Rule 1 ("one source of truth") with runnable
+cross-page verification. Previously the probe asserted each KPI on
+its own page; now it asserts the same engine value reconciles
+**across every page that displays it**.
+
+### Added (probe extension)
+- **X-Test-1**: PUE = 1.45 identical across dc-conv dashboard
+  (`#kpiPue`), dc-conv side panel (`#sPue`), and datahall ops-rollup
+  (`#dh-pue`). Three independent surfaces, one engine value, one assertion.
+- **X-Test-2**: WUE = 1.20 identical across dc-conv dashboard
+  (`#kpiWue`), dc-conv side (`#sWue` "1.20 L/kWh"), water-system
+  KPI (`#kWue`), water-system status bar (`#status-wue`).
+- **X-Test-3**: IT load reconciles in different units — dc-conv
+  "1,850 kW" (`#kpiIt`) = datahall "1.85 MW" (`#dh-rack-load`).
+
+### Probe robustness fix
+- Switched `page.goto` from `networkidle2` to `domcontentloaded` for
+  cross-page reads — `networkidle2` was timing out on `file://` mode
+  when third-party analytics (e.g. `ipapi`) blocked on CORS. Probe
+  only needs DOM + engine, not network quiescence.
+
+### Result
+**40/40 PASS** (was 37; +3 cross-page tests).
+
+### What this proves
+The reviewer's chief concern in docs 26+16 was that "the deeper tabs
+can be correct while the first screen tells a different story."
+**X-Test-1/2/3 demonstrably rule that out** for the three values
+where multiple pages display the same engine fact:
+- PUE 1.45 on 3 surfaces ✓
+- WUE 1.20 on 4 surfaces ✓
+- IT 1850 kW = 1.85 MW on 2 surfaces ✓
+
+If any future ship breaks the single-source-of-truth invariant on
+these metrics, the probe fails before push.
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- Probe runtime: ~50 s headless (+5 s for cross-page reads).
+- DC AI cockpit is on a different engine (Scenario A, PUE 1.30) so
+  not included in cross-page reconciliation with the CONV pages —
+  that would be a category error.
+
+---
+
 ## v1.33.2 — 2026-05-24 (Basis drawers extended to datahall.html ops-rollup — Rule 6 site-wide)
 
 ACCURACY_VALIDATION Rule 6 originally landed on the two cockpit

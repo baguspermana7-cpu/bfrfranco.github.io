@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 145 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 146 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 145,
+        "numberOfItems": 146,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.35.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.35.0"},
         {"@type":"ListItem","position":2,"name":"v1.34.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.34.0"},
@@ -81,10 +81,10 @@
         {"@type":"ListItem","position":4,"name":"v1.32.10 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.10"},
         {"@type":"ListItem","position":5,"name":"v1.32.7 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.7"},
         {"@type":"ListItem","position":6,"name":"v1.32.5 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.5"},
-        {"@type":"ListItem","position":7,"name":"v1.33.2 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.2"},
-        {"@type":"ListItem","position":8,"name":"v1.33.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.1"},
-        {"@type":"ListItem","position":9,"name":"v1.32.9 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.9"},
-        {"@type":"ListItem","position":10,"name":"v1.32.8 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.8"}
+        {"@type":"ListItem","position":7,"name":"v1.35.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.35.1"},
+        {"@type":"ListItem","position":8,"name":"v1.33.2 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.2"},
+        {"@type":"ListItem","position":9,"name":"v1.33.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.33.1"},
+        {"@type":"ListItem","position":10,"name":"v1.32.9 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.9"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.35.0</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">145 releases</span>
+        <span class="cl-count-badge">146 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1149,6 +1149,67 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.35.1">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.35.1</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-24">May 24, 2026</time>
+      </div>
+      <p class="changelog-caption">Cross-page headline consistency probe — Rule 1 verified site-wide; 40/40 pass</p>
+      <div class="changelog-body">
+        <p>(Authored locally as v1.33.3. Parallel session shipped v1.34.0 + v1.35.0</p>
+<p>Network Hub work mid-push; this lands as v1.35.1.)</p>
+<p>Closes the reviewer's Rule 1 ("one source of truth") with runnable</p>
+<p>cross-page verification. Previously the probe asserted each KPI on</p>
+<p>its own page; now it asserts the same engine value reconciles</p>
+<p><strong>across every page that displays it</strong>.</p>
+<h3 class="cl-subhead">Added (probe extension)</h3>
+<ul>
+  <li><strong>X-Test-1</strong>: PUE = 1.45 identical across dc-conv dashboard</li>
+</ul>
+<p>(<code>#kpiPue</code>), dc-conv side panel (<code>#sPue</code>), and datahall ops-rollup</p>
+<p>(<code>#dh-pue</code>). Three independent surfaces, one engine value, one assertion.</p>
+<ul>
+  <li><strong>X-Test-2</strong>: WUE = 1.20 identical across dc-conv dashboard</li>
+</ul>
+<p>(<code>#kpiWue</code>), dc-conv side (<code>#sWue</code> "1.20 L/kWh"), water-system</p>
+<p>KPI (<code>#kWue</code>), water-system status bar (<code>#status-wue</code>).</p>
+<ul>
+  <li><strong>X-Test-3</strong>: IT load reconciles in different units — dc-conv</li>
+</ul>
+<p>"1,850 kW" (<code>#kpiIt</code>) = datahall "1.85 MW" (<code>#dh-rack-load</code>).</p>
+<h3 class="cl-subhead">Probe robustness fix</h3>
+<ul>
+  <li>Switched <code>page.goto</code> from <code>networkidle2</code> to <code>domcontentloaded</code> for</li>
+</ul>
+<p>cross-page reads — <code>networkidle2</code> was timing out on <code>file://</code> mode</p>
+<p>when third-party analytics (e.g. <code>ipapi</code>) blocked on CORS. Probe</p>
+<p>only needs DOM + engine, not network quiescence.</p>
+<h3 class="cl-subhead">Result</h3>
+<p><strong>40/40 PASS</strong> (was 37; +3 cross-page tests).</p>
+<h3 class="cl-subhead">What this proves</h3>
+<p>The reviewer's chief concern in docs 26+16 was that "the deeper tabs</p>
+<p>can be correct while the first screen tells a different story."</p>
+<p><strong>X-Test-1/2/3 demonstrably rule that out</strong> for the three values</p>
+<p>where multiple pages display the same engine fact:</p>
+<ul>
+  <li>PUE 1.45 on 3 surfaces ✓</li>
+  <li>WUE 1.20 on 4 surfaces ✓</li>
+  <li>IT 1850 kW = 1.85 MW on 2 surfaces ✓</li>
+</ul>
+<p>If any future ship breaks the single-source-of-truth invariant on</p>
+<p>these metrics, the probe fails before push.</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Engine files byte-identical. 57/57 + 22/22 tests pass.</li>
+  <li>Probe runtime: ~50 s headless (+5 s for cross-page reads).</li>
+  <li>DC AI cockpit is on a different engine (Scenario A, PUE 1.30) so</li>
+</ul>
+<p>not included in cross-page reconciliation with the CONV pages —</p>
+<p>that would be a category error.</p>
       </div>
     </article>
 

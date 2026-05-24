@@ -218,3 +218,9 @@ alongside the four audit scripts (`audit-script-tags`,
   ops-rollup top-strip (5 KPIs: Hall State / Rack Load / Cooling
   Margin / PUE / Power Density). Probe extended +5 tests. **37/37
   PASS**.
+- **v1.33.3** (2026-05-24): Rule 1 (one source of truth) verified
+  CROSS-PAGE. Probe asserts PUE 1.45 identical on 3 surfaces, WUE
+  1.20 identical on 4 surfaces, IT load reconciles dc-conv "1,850 kW"
+  = datahall "1.85 MW". The reviewer's chief concern — "deeper tabs
+  can be correct while the first screen tells a different story" —
+  is now demonstrably ruled out for these metrics. **40/40 PASS**.

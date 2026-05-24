@@ -208,6 +208,59 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
 }
 
 /* ========================================================================
+ * CROSS-PAGE HEADLINE CONSISTENCY (v1.33.3 — reviewer's Rule 1 "one source
+ * of truth" verified across all pages that display the metric). Conv-engine
+ * pages share CONV_CALC.snapshot, so PUE/WUE/IT must reconcile identically.
+ * ====================================================================== */
+console.log('\n=== Cross-page headline consistency (Rule 1) ===');
+{
+  async function readId(url, ids) {
+    const p = await browser.newPage();
+    /* domcontentloaded — networkidle2 times out on file:// when third-party
+       analytics (e.g. ipapi) block on CORS. We only need the DOM + engine. */
+    await p.goto(`${BASE}/${url}`, {waitUntil:'domcontentloaded', timeout:30000});
+    await new Promise(r => setTimeout(r, 2000));
+    const out = await p.evaluate((ids) => {
+      const r = {};
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        r[id] = el ? el.textContent.trim() : null;
+      }
+      return r;
+    }, ids);
+    await p.close();
+    return out;
+  }
+
+  /* PUE consistency on CONV-engine pages (dc-conventional + datahall) */
+  const dcConv = await readId('dc-conventional.html', ['kpiPue','sPue','kpiWue','sWue','kpiIt']);
+  const datahall = await readId('datahall.html', ['dh-pue','dh-rack-load']);
+  const waterSys = await readId('water-system.html', ['kWue','status-wue']);
+
+  /* PUE 1.45 across CONV pages */
+  const pueValues = [dcConv.kpiPue, dcConv.sPue, datahall['dh-pue']];
+  const pueAllSame = pueValues.every(v => v === '1.45');
+  assert(pueAllSame, 'X-Test-1: PUE = 1.45 identical across dc-conv dashboard, dc-conv side panel, datahall ops-rollup', JSON.stringify({dcConv_kpi:dcConv.kpiPue, dcConv_side:dcConv.sPue, datahall:datahall['dh-pue']}));
+
+  /* WUE 1.20 across CONV pages that display WUE */
+  const wueDashboard = dcConv.kpiWue;       /* "1.20" */
+  const wueSide = dcConv.sWue;              /* "1.20 L/kWh" — same numeric */
+  const wueWater = waterSys.kWue;           /* "1.20" */
+  const wueStatusBar = waterSys['status-wue']; /* "1.20 L/kWh" — same numeric */
+  const wueOk = wueDashboard === '1.20'
+              && /^1\.20/.test(wueSide||'')
+              && wueWater === '1.20'
+              && /^1\.20/.test(wueStatusBar||'');
+  assert(wueOk, 'X-Test-2: WUE = 1.20 identical across dc-conv (2 surfaces) + water-system (2 surfaces)', JSON.stringify({dashboard:wueDashboard, side:wueSide, water:wueWater, statusBar:wueStatusBar}));
+
+  /* IT load — dc-conv shows 1,850 kW; datahall shows 1.85 MW (same value, different unit) */
+  const itDcConv = dcConv.kpiIt;                       /* "1,850" */
+  const itDatahall = datahall['dh-rack-load'];         /* "1.85" */
+  const itOk = itDcConv === '1,850' && itDatahall === '1.85';
+  assert(itOk, 'X-Test-3: IT load reconciles — dc-conv "1,850 kW" = datahall "1.85 MW"', JSON.stringify({dcConv:itDcConv, datahall:itDatahall}));
+}
+
+/* ========================================================================
  * datahall.html OPS-ROLLUP BASIS DRAWERS (v1.33.2 — extends Rule 6 site-wide)
  * ====================================================================== */
 console.log('\n=== datahall.html ops-rollup basis drawers ===');
