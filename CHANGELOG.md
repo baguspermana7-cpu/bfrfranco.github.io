@@ -11,6 +11,78 @@ release sections rather than semver.
 
 ---
 
+## v1.41.2 — 2026-05-24 (Water-quality Tech Spec sections — DC AI dry-only + DC Conv cooling-tower)
+
+PATCH ship: closes owner request "kualitas air masing-masing di dc ai dan dc conventional itu juga masukkan ya full standard parameter dan chemical dan consumption di tech spec."
+
+### Added
+
+- **DC AI Tech Spec (datahallAI.html) — 7 new sections** appended to Section 5
+  Cooling Discipline (after 5.10 Cooling Tower / Condenser Water Sizing):
+  - **5.11 Make-up Water Quality** &mdash; 13 inlet quality parameters vs WHO
+    drinking-water guidelines (pH, TDS, hardness, chloride, sulphate, iron,
+    manganese, turbidity, coliform, Legionella, FCl, inlet filtration spec).
+  - **5.12 Closed-Loop Condenser Water Chemistry** &mdash; 50 % USP propylene-glycol
+    dry-cooler loop (12 parameters: pH, reserve alkalinity, freeze protection,
+    specific gravity, nitrite, azole, Fe, Cu, glycol degradation, top-up rate,
+    refresh cadence).
+  - **5.13 TCS / DLC Water Quality** &mdash; Deionised water spec per ASTM Type II + OCP
+    + NVIDIA GB200 reference (14 parameters: conductivity &lt; 5 &micro;S/cm, pH 7-9,
+    TOC &lt; 50 ppb, silica &lt; 0.1 mg/L, &lt; 0.1 &micro;m filtration, ORP &gt; +200 mV,
+    DO &lt; 100 ppb, HPC &lt; 100 cfu/mL, quarterly polish bed replacement).
+  - **5.14 Chemical Dosing Programme** &mdash; 11-row table per CTI WTP-148 + ASHRAE
+    12-2020 + Nalco/ChemTreat.
+  - **5.15 Water Testing Programme** &mdash; 6-row tiered cadence (daily / weekly /
+    monthly / quarterly Legionella+ATP+coupons / annual audit / online continuous).
+  - **5.16 Annual Consumption + Discharge Budget** &mdash; 12-row facility-level annual
+    budget. PG top-up ~1,600 L/yr, TCS DI top-up ~30 L/yr, domestic ~4,200 m³/yr,
+    **zero blowdown** (closed loop), STP reuse-irrigation ~3,800 m³/yr, WUE
+    cooling-only = 0.00 (BASELINE-DECISION dry-only), annual water saved vs cooling-
+    tower design ~21,400 m³/yr.
+  - **5.17 Standards + References** &mdash; 8-entry list (ASHRAE 12-2020, CTI WTP-148,
+    BS 8580-1, WHO 4th, ASTM D1193-06, OCP, EU 2020/2184, Pergub 122/2005).
+
+- **DC Conv Tech Spec (dc-conventional.html) — 9 new sections** appended to Section 5
+  Water Discipline (after 5.4 Annualised water consumption):
+  - **5.5 Make-up Water Quality** &mdash; same inlet matrix as DC AI plus chloride
+    limit &lt; 150 mg/L in tower + silica &lt; 50.
+  - **5.6 Cooling-Tower Loop Chemistry** &mdash; 17-row evaporative-loop chemistry: pH
+    8.0-9.0, CoC 4-6, basin conductivity 1,200-1,800 &micro;S/cm, LSI, RSI, FCl
+    0.2-0.5, ORP +650-750, side-stream filter 5 % recirc.
+  - **5.7 Cooling-Tower Mass Balance** &mdash; Make-up = Evaporation + Drift + Blowdown
+    derivation; engine-bound to live `waterFlowLpm` from `CONV_CALC.snapshot`.
+  - **5.8 Closed-Loop CHW Chemistry** &mdash; CHW no-glycol loop, nitrite 500-1,000
+    ppm, azole 50-100 ppm.
+  - **5.9 Chemical Dosing Programme** &mdash; 11-row open-tower dosing schedule. Total
+    ~1,820 kg/yr (dominated by 720 kg/yr NaOCl + 280 kg/yr corrosion inhibitor +
+    220 kg/yr scale inhibitor).
+  - **5.10 Water Testing Programme** &mdash; 7-row tiered cadence with **mandatory
+    quarterly Legionella PCR + culture** per ASHRAE 12-2020.
+  - **5.11 Annual Consumption + Discharge Budget** &mdash; 11-row engine-bound budget.
+    WUE cooling-only from `MODEL.environment.wue_l_per_kwh`.
+  - **5.12 Effluent Discharge Compliance** &mdash; 12-row Pergub 122/2005 + Permen LHK
+    68/2016 effluent quality matrix. Quarterly KLHK reporting.
+  - **5.13 Standards + References** &mdash; 8-entry list (ASHRAE 12-2020, CTI WTP-148,
+    CTI STD-201, BS 8580-1, WHO 4th, Pergub 122/2005, Permen LHK 68/2016, SNI
+    6989.59:2008).
+
+### Engine binding
+
+- DC Conv 5.7 + 5.11 + 5.12 derive from `CONV_CALC.snapshot` (`waterFlowLpm`,
+  `wue`, `itKw`). PDF reflects live scenario state.
+- DC AI 5.11-5.17 reference design-locked dry-only basis (BASELINE-DECISION.md).
+
+### Engines locked
+
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
+  byte-identical. Tech Spec PDF is presentation-only; no engine drift.
+
+### Changed
+
+- `js/rz-version.js` &rarr; v1.41.2 (date 2026-05-24).
+
+---
+
 ## v1.40.1 — 2026-05-25 (OG images for 27 Network Hub pages + login form wrap + Spares draft refresh)
 
 PATCH ship: closes 3 deferred items from v1.40.0 + Network Hub backlog.

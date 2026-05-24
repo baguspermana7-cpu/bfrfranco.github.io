@@ -1726,6 +1726,145 @@ function buildTechSpecHtml(){
        grp(Math.round(waterFlowLpm*60*8760))+' L/yr (engineering estimate)',
        'derived &mdash; assumes 100 % runtime; PUE-aware actual is slightly lower')+
     '<p class="tp-dis">Actual water consumption follows seasonal load and cooling-tower cycles. The annualised number above assumes 100 % uptime and constant IT load; a billing-grade figure requires year-long metering.</p>'+
+
+    /* ===== v1.41.2 — Full water quality + chemistry + consumption (DC Conv cooling-tower design) ===== */
+
+    '<h4>5.5 Make-up Water Quality (city water inlet)</h4>'+
+    '<p>City water inlet feeds make-up to the cooling-tower basin and domestic / sanitary network. Inlet quality must meet WHO drinking-water guidelines plus tighter limits where the water touches the evaporative loop. Make-up rate at design load: ~'+round1(waterFlowLpm)+' L/min average (assumes 6 cycles of concentration).</p>'+
+    TC('Make-up water inlet — typical values vs design limits')+R([
+      ['pH (6.5&ndash;8.5)','7.4','WHO drinking-water guideline'],
+      ['Total dissolved solids (TDS, &lt; 500 mg/L)','220 mg/L','WHO'],
+      ['Hardness (&lt; 200 mg/L CaCO₃)','110 mg/L','WHO'],
+      ['Chloride (&lt; 250 mg/L, &lt; 150 in tower)','45 mg/L','WHO + CTI WTP-148'],
+      ['Sulphate (&lt; 250 mg/L)','30 mg/L','WHO'],
+      ['Silica (&lt; 50 mg/L in tower)','&lt; 10 mg/L','tower scaling prevention'],
+      ['Iron (&lt; 0.3 mg/L)','&lt; 0.05 mg/L','WHO'],
+      ['Manganese (&lt; 0.1 mg/L)','&lt; 0.02 mg/L','WHO'],
+      ['Turbidity (&lt; 1 NTU)','0.4 NTU','WHO'],
+      ['Total coliform','non-detect / 100 mL','WHO'],
+      ['Legionella spp.','non-detect','ASHRAE Guideline 12-2020'],
+      ['Free chlorine (residual)','0.3&ndash;0.6 mg/L','WHO disinfection residual'],
+      ['Inlet filtration','5 &micro;m sediment + 50 &micro;m basin strainer','prevents foreign-debris carryover']
+    ])+
+
+    '<h4>5.6 Cooling-Tower Loop Chemistry (evaporative condenser water)</h4>'+
+    '<p>The open cooling-tower loop concentrates dissolved solids as water evaporates. Maintained 4&ndash;6 cycles of concentration with continuous biocide + corrosion inhibitor + scale inhibitor dosing. pH controlled alkaline to prevent acidic corrosion of carbon-steel basin + galvanised fill.</p>'+
+    TC('Cooling-tower water chemistry (target ranges in basin)')+R([
+      ['pH (8.0&ndash;9.0 alkaline)','8.5&ndash;8.8','prevent acidic corrosion'],
+      ['Conductivity (cycles &times; make-up)','1,200&ndash;1,800 &micro;S/cm','CoC ratio control'],
+      ['Cycles of concentration (CoC)','4&ndash;6','optimised for make-up + chemistry'],
+      ['Total hardness (basin)','&lt; 800 mg/L CaCO₃','at 6 CoC'],
+      ['Chloride (basin)','&lt; 300 mg/L','prevents stainless pitting'],
+      ['Sulphate (basin)','&lt; 200 mg/L','scale prevention'],
+      ['Silica (basin)','&lt; 150 mg/L','amorphous silica scale limit'],
+      ['LSI (Langelier Saturation Index)','0.0 to +1.0','calcium carbonate equilibrium'],
+      ['RSI (Ryznar Stability Index)','6.0&ndash;7.0','stable / mildly scaling'],
+      ['Free chlorine (basin)','0.2&ndash;0.5 mg/L FCl maintained','Legionella prevention'],
+      ['ORP (Oxidation-Reduction Potential)','+650&ndash;750 mV','oxidising; sterile'],
+      ['Iron (Fe) — corrosion marker','&lt; 1.5 mg/L','&gt; 2 mg/L triggers inspection'],
+      ['Copper (Cu) — corrosion marker','&lt; 0.3 mg/L','protects condenser tubes'],
+      ['Suspended solids','&lt; 50 mg/L','side-stream filtration controls'],
+      ['Microbial — HPC','&lt; 10⁴ cfu/mL','ASHRAE 12-2020 acceptable'],
+      ['Legionella spp.','non-detect / 100 mL','quarterly mandatory test'],
+      ['Side-stream filter','5 % of recirculating flow','20 &micro;m sand or bag filter']
+    ])+
+
+    '<h4>5.7 Cooling-Tower Mass Balance (cycles of concentration)</h4>'+
+    '<p>Make-up = Evaporation + Drift + Blowdown. Cycles of concentration (CoC) determine how much blowdown is needed to keep dissolved solids below threshold. Higher CoC = less make-up but tighter chemistry control.</p>'+
+    TC('Mass balance at design load')+R([
+      ['Evaporation rate (~1 % of recirc per 5.6 K &Delta;T)',round1(waterFlowLpm*0.85)+' L/min','dominant loss'],
+      ['Drift loss (&lt; 0.005 % recirc)',round1(waterFlowLpm*0.002)+' L/min','drift eliminator design'],
+      ['Blowdown (E / (CoC &minus; 1))',round1(waterFlowLpm*0.17)+' L/min','at 6 CoC'],
+      ['Total make-up (E + D + B)',round1(waterFlowLpm)+' L/min','aligns with WUE basis'],
+      ['Annual blowdown discharge',grp(Math.round(waterFlowLpm*0.17*60*8760))+' L/yr','to sewer per Pergub 122/2005'],
+      ['Annual evaporation (lost to atmosphere)',grp(Math.round(waterFlowLpm*0.85*60*8760))+' L/yr','non-recoverable']
+    ])+
+
+    '<h4>5.8 Closed-Loop CHW Chemistry (chilled-water side)</h4>'+
+    '<p>The chilled-water loop between chiller evaporator + CRAH coils is closed (no evaporation). Single-fill plus top-up for leakage. Chemistry maintained alkaline with corrosion + biofilm protection only.</p>'+
+    TC('Closed-loop CHW chemistry')+R([
+      ['Fluid','treated water (no glycol typical for indoor CHW)','design'],
+      ['pH (8.5&ndash;10.0)','9.0&ndash;9.5','alkaline corrosion protection'],
+      ['Nitrite (corrosion inhibitor)','500&ndash;1,000 ppm NO₂','protects mild-steel piping'],
+      ['Azole (copper protection)','50&ndash;100 ppm','tolyltriazole'],
+      ['Microbial (HPC)','&lt; 10⁴ cfu/mL','low-flow biofilm risk'],
+      ['Conductivity stable','no upward drift','indicator of leakage'],
+      ['Iron (Fe)','&lt; 1.0 mg/L','&gt; 2 mg/L triggers inspection'],
+      ['Annual top-up','&lt; 2 % of loop volume','indicator of system tightness']
+    ])+
+
+    '<h4>5.9 Chemical Dosing Programme</h4>'+
+    '<p>Per Cooling Technology Institute WTP-148, ASHRAE Guideline 12-2020 (Legionella risk minimisation), and OEM (Nalco / ChemTreat / Solenis) recommendations. Open cooling tower requires higher dosing intensity than closed-loop designs because of evaporative concentration + atmospheric contamination.</p>'+
+    TC('Chemical inventory + annual consumption (facility-level)')+R([
+      ['Corrosion inhibitor (Nalco 7330 / ChemTreat CL2330)','5&ndash;10 ppm continuous · ~280 kg/yr','iron, copper, galvanised protection'],
+      ['Biocide oxidising (NaOCl 12 %)','0.2&ndash;0.5 mg/L FCl maintained · ~720 kg/yr','primary Legionella control'],
+      ['Biocide non-oxidising (isothiazolone / glutaraldehyde)','slug-dose 2&times;/week · ~120 kg/yr','rotation to prevent resistance'],
+      ['Scale inhibitor (HEDP / PBTC / PESA)','10&ndash;25 ppm continuous · ~220 kg/yr','prevents CaCO₃ + silica scaling'],
+      ['Dispersant (polymer, polyacrylate)','10&ndash;15 ppm continuous · ~90 kg/yr','suspended solids carry-through'],
+      ['pH adjuster (H₂SO₄ 98 %)','feedback-controlled · ~300 kg/yr','acid (more common with high alkalinity make-up)'],
+      ['pH adjuster (NaOH 50 %)','feedback-controlled · ~50 kg/yr','base'],
+      ['Closed-loop nitrite refill','annual maintain · ~40 kg/yr','CHW + condenser closed loops'],
+      ['Storage: max 30-day inventory','closed drums in chem-skid','EHS-compliant'],
+      ['Containment','bunded skid with leak-detection','spill prevention'],
+      ['Total chemical refill (combined)','~1,820 kg/yr','dominated by biocide + scale inhibitor']
+    ])+
+
+    '<h4>5.10 Water Testing Programme</h4>'+
+    '<p>Tiered testing cadence per CTI WTP-148 + ASHRAE Guideline 12-2020 (open evaporative system requires more aggressive testing than closed-loop). Mandatory quarterly Legionella per ASHRAE 12.</p>'+
+    TC('Test cadence + parameters (cooling-tower system)')+R([
+      ['Daily (operator)','pH · FCl · conductivity · ORP · basin level · flow','colorimetric kit + handheld meter'],
+      ['Weekly (operator)','hardness · alkalinity · Fe · Cu · TDS · turbidity · chloride · LSI/RSI calc','field kit (HACH or LaMotte)'],
+      ['Monthly (lab)','full ICP-OES · TOC · particulates · microbial HPC · silica','accredited 3rd-party lab'],
+      ['Quarterly (lab — MANDATORY)','Legionella spp. (PCR + culture) · ATP biofilm marker · deposit weight · corrosion coupons','per ASHRAE 12-2020'],
+      ['Semi-annual','fill / drift eliminator inspection · basin clean · UV / strainer maintenance','prevent biofilm build-up'],
+      ['Annual (audit)','water-management plan review · regulator inspection · chem-storage compliance · Pergub discharge limits','required for Class A facility'],
+      ['Online (continuous)','conductivity · pH · ORP · FCl · flow · basin level','BMS-bound; alarms on BMS-GW']
+    ])+
+
+    '<h4>5.11 Annual Consumption + Discharge Budget</h4>'+
+    '<p>DC Conv baseline retains open cooling-tower design (WUE ~'+wue.toFixed(2)+' L/kWh per current basis). Total water draw dominated by tower evaporation + blowdown. Annual consumption sized for 100 % uptime; actual values follow seasonal load + cooling-tower cycles.</p>'+
+    TC('Annual water + chemical budget (facility level)')+R([
+      ['Cooling-tower evaporation',grp(Math.round(waterFlowLpm*0.85*60*8760))+' L/yr','lost to atmosphere · non-recoverable'],
+      ['Cooling-tower drift',grp(Math.round(waterFlowLpm*0.002*60*8760))+' L/yr','minimised by high-efficiency eliminator'],
+      ['Cooling-tower blowdown discharge',grp(Math.round(waterFlowLpm*0.17*60*8760))+' L/yr','to sewer per Pergub 122/2005'],
+      ['Closed-loop CHW top-up','~3,000 L/yr','&lt; 2 % of loop volume'],
+      ['Domestic / sanitary (drinking, washroom)','~4,200 m³/yr','independent of cooling'],
+      ['Total water draw (cooling system)',grp(Math.round(waterFlowLpm*60*8760))+' L/yr','make-up to tower basin'],
+      ['Total chemical refill','~1,820 kg/yr','see 5.9 itemised'],
+      ['Cooling-system discharge (blowdown to municipal sewer)',grp(Math.round(waterFlowLpm*0.17*60*8760))+' L/yr','must meet Pergub effluent standards'],
+      ['Sanitary wastewater discharge','~3,800 m³/yr','to municipal sewer'],
+      ['WUE (cooling-system make-up)',wue.toFixed(2)+' L/kWh IT','MODEL.environment.wue_l_per_kwh'],
+      ['Effective WUE (all-water/IT, incl. domestic)',(wue+0.034).toFixed(2)+' L/kWh IT','adds domestic baseline']
+    ])+
+
+    '<h4>5.12 Effluent Discharge Compliance</h4>'+
+    '<p>Cooling-tower blowdown contains elevated TDS + biocide residuals + corrosion / scale inhibitor traces. Discharge to municipal sewer must comply with Jakarta Pergub 122/2005 (water-use permit) + Permen LHK 68/2016 (industrial wastewater quality standards). Direct surface-water discharge is prohibited for DC tower blowdown.</p>'+
+    TC('Effluent quality at point of discharge (cooling-tower blowdown)')+R([
+      ['pH (6.0&ndash;9.0)','7.5&ndash;8.5','Permen LHK 68/2016'],
+      ['Temperature (&lt; 38 &deg;C at sewer)','~32 &deg;C','condensed back from cooling water'],
+      ['BOD₅ (&lt; 50 mg/L)','&lt; 10 mg/L','non-organic chemistry'],
+      ['COD (&lt; 100 mg/L)','&lt; 40 mg/L','dominantly inorganic'],
+      ['TDS (&lt; 4,000 mg/L)','&lt; 2,500 mg/L','at 6 CoC'],
+      ['TSS (&lt; 200 mg/L)','&lt; 50 mg/L','side-stream filtered'],
+      ['Free chlorine residual (&lt; 1.0 mg/L)','&lt; 0.5 mg/L','dechlorinated if &gt; spec'],
+      ['Total phosphorus (&lt; 2 mg/L)','&lt; 1.5 mg/L','phosphonate residual'],
+      ['Total nitrogen (&lt; 30 mg/L)','&lt; 5 mg/L','no nitrogen source typical'],
+      ['Heavy metals (Cr, Cu, Zn, Pb)','&lt; 0.1 mg/L each','far below limit; from inhibitor decomposition'],
+      ['Oil &amp; grease (&lt; 10 mg/L)','non-detect','no oily contact path'],
+      ['Reporting','quarterly to KLHK','required for Class A facility']
+    ])+
+
+    '<h4>5.13 Standards + References</h4>'+
+    '<ul class="fl">'+
+    '<li><strong>ASHRAE Guideline 12-2020</strong> &mdash; Minimising the Risk of Legionellosis (open evaporative systems mandatory quarterly testing)</li>'+
+    '<li><strong>CTI WTP-148</strong> &mdash; Cooling Tower Water Treatment</li>'+
+    '<li><strong>CTI STD-201</strong> &mdash; Standard for Thermal Performance Certification</li>'+
+    '<li><strong>BS 8580-1:2019</strong> &mdash; Water Quality Risk Assessment for Legionella</li>'+
+    '<li><strong>WHO Guidelines for Drinking-Water Quality</strong> &mdash; 4th edition (inlet quality)</li>'+
+    '<li><strong>Jakarta Pergub 122/2005</strong> &mdash; Water-use permit + quality reporting (DKI Jakarta)</li>'+
+    '<li><strong>Permen LHK 68/2016</strong> &mdash; Industrial wastewater discharge quality standard (Indonesia)</li>'+
+    '<li><strong>SNI 6989.59:2008</strong> &mdash; Indonesian wastewater sampling standard</li>'+
+    '</ul>'+
     '</section>';
 
   /* 6. Fire & Life Safety */

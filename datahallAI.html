@@ -12654,6 +12654,117 @@ function buildTechSpecHtml(){
       ['Make-up rate (evap + drift + bleed)','~3 % of CWS flow','industry typical'],
       ['Tower cells (N+1)','3 + 1 standby','design']
     ])+
+
+    /* ===== v1.41.2 — Water quality + chemistry + consumption (DC AI dry-only design) ===== */
+
+    '<h4>5.11 Make-up Water Quality (city water inlet)</h4>'+
+    '<p>City water inlet feeds make-up to the dry-cooler closed loop top-up tank and the domestic / sanitary network. Inlet quality must meet WHO drinking-water guidelines plus tighter targets where the water touches heat-exchange surfaces.</p>'+
+    TC('Make-up water inlet — typical values vs design limits')+R([
+      ['pH (6.5&ndash;8.5)','7.4','WHO drinking-water guideline'],
+      ['Total dissolved solids (TDS, &lt; 500 mg/L)','220 mg/L','WHO'],
+      ['Hardness (&lt; 200 mg/L CaCO₃)','110 mg/L','WHO'],
+      ['Chloride (&lt; 250 mg/L)','45 mg/L','WHO'],
+      ['Sulphate (&lt; 250 mg/L)','30 mg/L','WHO'],
+      ['Iron (&lt; 0.3 mg/L)','&lt; 0.05 mg/L','WHO'],
+      ['Manganese (&lt; 0.1 mg/L)','&lt; 0.02 mg/L','WHO'],
+      ['Turbidity (&lt; 1 NTU)','0.4 NTU','WHO'],
+      ['Total coliform','non-detect / 100 mL','WHO'],
+      ['Legionella spp.','non-detect','ASHRAE Guideline 12-2020'],
+      ['Free chlorine (residual)','0.3&ndash;0.6 mg/L','WHO disinfection residual'],
+      ['Filtration on inlet','5 &micro;m sediment + activated carbon','removes residual Cl₂ to dry-cooler loop']
+    ])+
+
+    '<h4>5.12 Closed-Loop Condenser Water Chemistry (dry-cooler PG loop)</h4>'+
+    '<p>The dry-cooler condenser loop is closed (no evaporation, no make-up beyond top-up for leaks). Fluid is 50 % propylene glycol (food-grade, USP, inhibited) to prevent corrosion of carbon-steel piping + copper coils + cooling-tower-equivalent fins.</p>'+
+    TC('Condenser-loop fluid chemistry (target ranges)')+R([
+      ['Fluid','50 % USP propylene glycol (food-grade, inhibited)','ASHRAE Handbook'],
+      ['pH (8.0&ndash;9.5 alkaline)','8.5&ndash;9.0','prevent acidic corrosion'],
+      ['Reserve alkalinity','&gt; 80 mL HCl per 100 mL sample','degradation indicator'],
+      ['Freeze protection','-15 &deg;C (overspec for Jakarta)','condition stays liquid at lowest ambient'],
+      ['Specific gravity at 25 &deg;C','1.038&ndash;1.045','PG concentration check'],
+      ['Nitrite (corrosion inhibitor, if used)','300&ndash;500 ppm NO₂','protects mild steel + cast iron'],
+      ['Azole (copper protection)','50&ndash;100 ppm','tolyltriazole / benzotriazole'],
+      ['Iron (Fe) — corrosion marker','&lt; 1.0 mg/L','&gt; 2 mg/L triggers inspection'],
+      ['Copper (Cu) — corrosion marker','&lt; 0.2 mg/L','protects heat-exchange surfaces'],
+      ['Glycol degradation (formate)','&lt; 50 ppm','indicates over-temp / acid attack'],
+      ['Annual top-up rate (closed loop)','&lt; 2 % of loop volume','industry typical'],
+      ['Annual glycol refresh','full change at 5-7 yr OR sooner if degraded','OEM spec']
+    ])+
+
+    '<h4>5.13 TCS / DLC Water Quality (direct liquid-cooling loop)</h4>'+
+    '<p>The Technology Cooling System (TCS) supplies GPU cold-plates with deionised water. Purity is critical because the smallest contamination plates onto chip-level heat exchangers and degrades cooling performance / promotes biofilm.</p>'+
+    TC('TCS / DLC water spec (per OCP CDU + NVIDIA reference)')+R([
+      ['Water type','Deionised (DI) per ASTM Type II','engineering-grade'],
+      ['Conductivity at 25 &deg;C','&lt; 5 &micro;S/cm','strict purity'],
+      ['pH (controlled)','7.0&ndash;9.0','with corrosion inhibitor'],
+      ['TOC (Total Organic Carbon)','&lt; 50 ppb','low organics → no biofilm'],
+      ['Silica (SiO₂)','&lt; 0.1 mg/L','prevents fouling'],
+      ['Particulate filtration','&lt; 0.1 &micro;m absolute','OCP-recommended'],
+      ['ORP (Oxidation-Reduction Potential)','&gt; +200 mV','oxidising; no anaerobic growth'],
+      ['Dissolved oxygen','&lt; 100 ppb (degassed)','minimise corrosion'],
+      ['Iron (Fe)','&lt; 0.05 mg/L','prevents red-water'],
+      ['Copper (Cu)','&lt; 0.02 mg/L','protects cold-plate'],
+      ['Bacteria (HPC)','&lt; 100 cfu/mL','sterile design intent'],
+      ['Annual DI polish bed replacement','4&times; / yr','one per quarter; see Section 5.6 CDU table'],
+      ['Top-up rate','&lt; 0.1 % per year','near zero leak'],
+      ['Glycol fraction (if added)','typically 0 % for DLC','pure water for heat capacity']
+    ])+
+
+    '<h4>5.14 Chemical Dosing Programme</h4>'+
+    '<p>Per Cooling Technology Institute WTP-148, ASHRAE Guideline 12-2020 (Legionella risk minimisation), and OEM (Nalco / ChemTreat / Solenis) recommendations. Dry-cooler closed-loop receives lower dosing intensity than open-tower designs because no evaporative concentration.</p>'+
+    TC('Chemical inventory + annual consumption (per facility, 4 halls)')+R([
+      ['Corrosion inhibitor (Nalco 7330 / ChemTreat CL2330)','3&ndash;5 ppm continuous · ~80 kg/yr','iron, copper protection'],
+      ['Biocide oxidising (NaOCl 12 %)','0.5&ndash;2 mg/L FCl maintained · ~150 kg/yr','primary disinfection'],
+      ['Biocide non-oxidising (isothiazolone)','slug-dose weekly · ~25 kg/yr','rotation to prevent resistance'],
+      ['Scale inhibitor (HEDP / PBTC phosphonate)','5&ndash;15 ppm continuous · ~50 kg/yr','prevents hardness scale'],
+      ['Dispersant (polymer, polyacrylate)','5&ndash;10 ppm continuous · ~30 kg/yr','suspended-solid carry-through'],
+      ['pH adjuster (H₂SO₄ 98 %)','feedback-controlled · ~120 kg/yr','acid (rare for alkaline target)'],
+      ['pH adjuster (NaOH 50 %)','feedback-controlled · ~80 kg/yr','base (more common)'],
+      ['Glycol top-up (USP food-grade PG)','make up for leaks · ~1,600 L/yr','dry-cooler closed loop'],
+      ['DI polish resin (mixed bed)','quarterly replace · ~200 L resin/yr','TCS DI water polish'],
+      ['Storage: max 30-day inventory','closed drums in chem-skid','EHS-compliant'],
+      ['Containment','bunded skid with leak-detection','spill prevention']
+    ])+
+
+    '<h4>5.15 Water Testing Programme</h4>'+
+    '<p>Tiered testing cadence per CTI WTP-148 + ASHRAE Guideline 12-2020. Daily checks are operator-led on-site; weekly tests use field portable kits; monthly tests go to accredited labs.</p>'+
+    TC('Test cadence + parameters')+R([
+      ['Daily (operator, on-site)','pH · FCl · conductivity · ORP · level','colorimetric kit + handheld meter'],
+      ['Weekly (operator)','hardness · alkalinity · Fe · Cu · TDS · turbidity','field kit (HACH or LaMotte)'],
+      ['Monthly (lab)','full ICP-OES · TOC · particulates · microbial HPC','accredited 3rd-party lab'],
+      ['Quarterly (lab)','Legionella spp. · ATP biofilm marker · deposit weight · corrosion coupons','per ASHRAE 12-2020 risk-assessment'],
+      ['Annual (audit)','water-management plan review · regulator inspection · chem-storage compliance · discharge limits','required for Class A facility'],
+      ['Online (continuous)','conductivity · pH · ORP · FCl · flow','BMS-bound; alarms on BMS-GW']
+    ])+
+
+    '<h4>5.16 Annual Consumption + Discharge Budget</h4>'+
+    '<p>DC AI BASELINE-DECISION.md adopts dry-only cooling → WUE = 0 (no evaporation make-up). Consumption is limited to domestic / sanitary + closed-loop top-up + DI polish + chemical inventory. Discharge to municipal sewer is domestic-only (no cooling-system blowdown — closed loop = zero blowdown).</p>'+
+    TC('Annual water + chemical budget (facility level, 4 halls)')+R([
+      ['Dry-cooler PG top-up','~1,600 L/yr','&lt; 2 % of loop volume'],
+      ['TCS / DLC DI water top-up','~30 L/yr','closed loop, near zero'],
+      ['Domestic / sanitary (drinking, washroom, kitchen)','~4,200 m³/yr','~8 L/min average × 8,760 hr'],
+      ['Cooling-system make-up','0 L/yr','closed loop · WUE = 0 (BASELINE-DECISION)'],
+      ['Cooling-system blowdown','0 L/yr','no blowdown (closed loop)'],
+      ['Sanitary wastewater (to STP for reuse-irrigation)','~3,800 m³/yr','90 % of domestic'],
+      ['Irrigation reuse (from STP, see STP modal)','~3,800 m³/yr','closed water cycle on-site'],
+      ['Total chemical refill (combined)','~535 kg/yr','see 5.14 itemised'],
+      ['Discharge to municipal sewer','~400 m³/yr','non-reusable wastewater only'],
+      ['WUE (cooling-system-only)','0.00 L/kWh IT','BASELINE-DECISION dry-only'],
+      ['Effective WUE (all-water/IT, incl. domestic)','~0.034 L/kWh IT','low compared to industry avg 1.8'],
+      ['Annual water saved vs cooling-tower design','~21,400 m³/yr','vs WUE 1.5 reference site']
+    ])+
+
+    '<h4>5.17 Standards + References</h4>'+
+    '<ul class="fl">'+
+    '<li><strong>ASHRAE Guideline 12-2020</strong> &mdash; Minimising the Risk of Legionellosis</li>'+
+    '<li><strong>CTI WTP-148</strong> &mdash; Cooling Tower Water Treatment (applies to dry-cooler loop maintenance)</li>'+
+    '<li><strong>BS 8580-1:2019</strong> &mdash; Water Quality Risk Assessment for Legionella</li>'+
+    '<li><strong>WHO Guidelines for Drinking-Water Quality</strong> &mdash; 4th edition (inlet quality)</li>'+
+    '<li><strong>ASTM D1193-06</strong> &mdash; Standard Specification for Reagent Water (DI grade for TCS)</li>'+
+    '<li><strong>OCP Open Compute Project</strong> &mdash; ACS rev current (DLC water spec)</li>'+
+    '<li><strong>EU Directive 2020/2184</strong> &mdash; Drinking-water (informative, where applicable)</li>'+
+    '<li><strong>Jakarta Pergub 122/2005</strong> &mdash; Local water-use permit + quality reporting</li>'+
+    '</ul>'+
     '</section>';
 
   /* ---------------- 6. Fire & Life Safety ---------------- */
