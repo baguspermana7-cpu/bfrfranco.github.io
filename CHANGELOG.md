@@ -11,6 +11,94 @@ release sections rather than semver.
 
 ---
 
+## v1.41.0 — 2026-05-24 (Maintenance Decode Lab — Easergy EPZ / Galaxy VL RPT / Woodward DTSC-200)
+
+MINOR ship: new tool page + 3 cards added to `datacenter-solutions.html` in
+the `#tools-ltc-featured` section. Migrated `Documents/maintenance tools/`
+(Vite ES module project) into the rz-work zero-build static site,
+preserving the registry-driven module architecture.
+
+### Added
+
+- **`maintenance-decode-lab.html`** — new tool page. Three offline
+  maintenance decoders unified under a registry contract
+  (`detect → decode → visualize → simulate → export → validate`):
+  - **Easergy P3 EPZ decoder** — VAMPSET text parser, before/after diff,
+    engineering risk review for protection enable/pickup/delay changes,
+    protection-matrix matrix, category summary, XLSX/CSV export.
+  - **Galaxy VL RPT analyzer** — inflates embedded zlib JSON records,
+    clusters incidents (30s gap), classifies waveform events
+    (MAINS_TOTAL_LOSS · PHASE_LOSS · UNDERVOLTAGE · OUTPUT_LOST ·
+    BATTERY_DISCHARGE · GND_DISTURBANCE), calculates RMS/imbalance/crest
+    factor per channel, power-flow mimic.
+  - **Woodward DTSC-200 ATS simulator** — sequence model with S1/S2
+    sources, transfer-commit, open/delayed-neutral/closed transition,
+    HMI mimic with single-line + breakers + permissives + alarms,
+    DTSC text/config or PDF setting-report import with confidence
+    score + recognized-field evidence.
+- **3 new cards on `datacenter-solutions.html`** (section
+  `#tools-ltc-featured`, alongside Liquid-to-Chip Lab):
+  - AI Engineering Maintenance PRO — promoted from the buried
+    operational-engines row to a strategic-tier card next to LTC Lab,
+    so the two engineering-maintenance concepts sit side-by-side.
+  - Maintenance Decode Lab — the new card (NEW badge, instrument-green
+    accent `#10b981`).
+  - "More Maintenance Tools" — dashed-border placeholder slot
+    documenting the future module registry contract.
+- **`js/maintenance/`** — ported source files (zero-build, vanilla ES
+  modules): `main.js` (1020 LOC UI controller), `styles.css`
+  (1293 LOC, scoped under `#mdl-app.mdl-root` to avoid clashing with rz
+  globals), `core/{registry,detectors,epz,galaxy,dtsc,dtscImport,exporter}.js`.
+- **`assets/maintenance-fixtures/`** — `sample-before.epz`,
+  `sample-after.epz`, `sample-galaxy-vl.rpt`, `sample-dtsc200-export.txt`
+  validation samples copied from the source project so users can try
+  the lab without their own files.
+- **OG image** for `maintenance-decode-lab.html` at
+  `assets/og/maintenance-decode-lab.webp` (1200&times;630, instrument-green
+  accent). `tools/build-og-images.py` TARGETS list extended.
+
+### Changed
+
+- **Vite imports replaced with CDN globals** (zero-build pattern):
+  - `pako` → `https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js`
+    (used by EPZ inflateRaw + Galaxy RPT inflate).
+  - `pdfjs-dist` → `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js`
+    UMD build (used by DTSC PDF setting-report import). Worker source set
+    once in page head.
+  - `lucide` icon library → Font Awesome 6 (rz convention). Icon name
+    mapping table maintained in `main.js`.
+  - `import './styles.css'` → `<link>` in HTML head.
+- **`alert()` error UX replaced** with inline `[role="alert"]` banner
+  (auto-removes after 6 s).
+- **Mount point**: `#app` → `#mdl-app` to avoid clashing with rz globals.
+- **CSS scoping**: all 1293 lines wrapped under `.mdl-root` namespace
+  using native CSS nesting (`.mdl-root .panel`, `.mdl-root .btn`, etc.) so
+  generic class names don't bleed into rz globals.
+- **Aria-labels**: every interactive control has aria-label or visible
+  text.
+- **Safety boundary** — read-only-viewer language reinforced in hero
+  banner + disclaimer footer + JSON-LD `creativeWorkStatus: "Draft"`.
+
+### Bumped
+
+- `js/rz-version.js` &rarr; **v1.41.0**
+- `sw.js` &rarr; `rz-cache-v1.41.0`
+- `sitemap.xml`, `llms.txt`, `search-index.json` &rarr; entries for
+  `maintenance-decode-lab.html` (priority 0.75, weekly cadence).
+
+### Standardisation
+
+- Page follows `CALCULATOR_PROMPT_STANDARD.md` (rz navbar + share-buttons +
+  footer + version-stamp + mobile responsive + dark-mode coverage).
+- Per `CONTENT_LINKAGE_PLAYBOOK.md`: new tool added to
+  `datacenter-solutions.html` strat-grid + sitemap + llms.txt +
+  search-index + OG card + sw.js precache.
+- Per `feedback_script_tag_in_js_string.md`: every `</script>` inside
+  template literals escaped as `<\/script>` (verified via
+  `audit-script-tags.py --strict`).
+
+---
+
 ## v1.40.1 — 2026-05-25 (OG images for 27 Network Hub pages + login form wrap + Spares draft refresh)
 
 PATCH ship: closes 3 deferred items from v1.40.0 + Network Hub backlog.

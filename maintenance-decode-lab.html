@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+      window['ga-disable-G-GED7FX8RTV'] = true;
+    }
+    gtag('js', new Date());
+    gtag('config', 'G-GED7FX8RTV');
+    (function(){
+      var loaded=false;
+      function loadGtag(){
+        if(loaded)return;loaded=true;
+        if(window['ga-disable-G-GED7FX8RTV'])return;
+        var s=document.createElement('script');
+        s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+        s.async=true;document.head.appendChild(s);
+      }
+      ['scroll','click','keydown','touchstart'].forEach(function(e){
+        document.addEventListener(e,loadGtag,{once:true,passive:true});
+      });
+    })();
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Decode Lab — Easergy EPZ · Galaxy VL RPT · Woodward DTSC-200 | Resistance Zero</title>
+  <meta name="description" content="Offline-first maintenance lab for decoding Schneider Easergy P3 EPZ files, Galaxy VL RPT waveform reports, and simulating Woodward DTSC-200 ATS transfer sequences. Read-only evidence tool.">
+  <meta name="author" content="Bagus Dwi Permana">
+  <meta name="robots" content="index, follow">
+  <meta name="ai-content-declaration" content="human-authored">
+  <link rel="canonical" href="https://resistancezero.com/maintenance-decode-lab.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://resistancezero.com/maintenance-decode-lab.html">
+  <meta property="og:title" content="Maintenance Decode Lab — Easergy EPZ · Galaxy VL RPT · Woodward DTSC-200">
+  <meta property="og:description" content="Offline-first maintenance lab for decoding Schneider Easergy P3 EPZ files, Galaxy VL RPT waveform reports, and simulating Woodward DTSC-200 ATS transfer sequences. Read-only evidence tool.">
+  <meta property="og:image" content="https://resistancezero.com/assets/og/maintenance-decode-lab.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="ResistanceZero">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@BagusDPermana">
+  <meta name="twitter:title" content="Maintenance Decode Lab — EPZ · RPT · DTSC-200">
+  <meta name="twitter:description" content="Offline-first decoder, visualizer, and simulator for field maintenance files. Easergy P3, Galaxy VL, Woodward DTSC-200.">
+  <meta name="twitter:image" content="https://resistancezero.com/assets/og/maintenance-decode-lab.webp">
+
+  <!-- JSON-LD WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Maintenance Decode Lab",
+    "description": "Offline-first maintenance lab for decoding Schneider Easergy P3 EPZ files, Galaxy VL RPT waveform reports, and simulating Woodward DTSC-200 ATS transfer sequences. Read-only evidence tool.",
+    "url": "https://resistancezero.com/maintenance-decode-lab.html",
+    "applicationCategory": "EngineeringApplication",
+    "operatingSystem": "Web Browser",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
+      "@type": "Person",
+      "name": "Bagus Dwi Permana",
+      "jobTitle": "Engineering Operations Manager",
+      "url": "https://resistancezero.com/"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://resistancezero.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Datacenter Solutions",
+        "item": "https://resistancezero.com/datacenter-solutions.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Maintenance Decode Lab"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Theme (no FOUC) — default light -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="icon" type="image/png" href="assets/Favicon.png">
+  <link rel="apple-touch-icon" href="assets/Favicon.png">
+
+  <!-- Resource hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- pako CDN (non-defer: required by core JS parsers) -->
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+
+  <!-- PDF.js UMD 3.x (non-defer: must be present before module import) -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+  </script>
+
+  <!-- rz global CSS -->
+  <link rel="stylesheet" href="styles.min.css?v=20260525">
+
+  <!-- Page-scoped CSS (mdl-root namespace) -->
+  <link rel="stylesheet" href="js/maintenance/styles.css?v=1.41.0">
+
+  <style>
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width: 768px) {
+      html, body { overflow-x: hidden; max-width: 100vw; }
+      img { max-width: 100%; height: auto; display: block; }
+      .nav-links { display: none; }
+      button, a.btn, [role="button"] { min-height: 44px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+    }
+
+    /* Page hero (amber + cyan accent, thin-line industrial) */
+    .mdl-hero {
+      padding: 2.5rem 2rem 2rem;
+      background: linear-gradient(135deg, rgba(15,23,42,0.91) 0%, rgba(17,40,60,0.88) 50%, rgba(11,100,120,0.75) 100%),
+                  linear-gradient(90deg, rgba(168,105,0,0.04) 1px, transparent 1px),
+                  linear-gradient(0deg, rgba(168,105,0,0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
+      color: #f1f5f9;
+      border-bottom: 1px solid rgba(168,105,0,0.18);
+    }
+    .mdl-hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .mdl-advisory {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: rgba(168,105,0,0.12);
+      border: 1px solid rgba(168,105,0,0.35);
+      border-radius: 50px;
+      font-size: 0.78rem;
+      color: #fbbf24;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .mdl-hero h1 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      color: #f1f5f9;
+      margin: 0 0 0.75rem;
+    }
+    .mdl-hero-sub {
+      font-size: 1rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 1.25rem;
+    }
+    .mdl-hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .mdl-hero-chip {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.06);
+    }
+    .mdl-hero-chip.amber { border-color: rgba(168,105,0,0.45); color: #fbbf24; background: rgba(168,105,0,0.10); }
+    .mdl-hero-chip.cyan { border-color: rgba(6,182,212,0.45); color: #67e8f9; background: rgba(6,182,212,0.10); }
+
+    #mdl-main {
+      padding: 0 0 2rem;
+    }
+
+    /* Fixtures aside */
+    .mdl-fixtures {
+      max-width: 1200px;
+      margin: 1.5rem auto 0;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .mdl-fixtures { grid-template-columns: 1fr; } }
+
+    .mdl-fixture-panel {
+      border: 1px solid rgba(168,105,0,0.22);
+      border-radius: 10px;
+      background: rgba(168,105,0,0.05);
+      padding: 1rem 1.25rem;
+    }
+    .mdl-fixture-panel h3 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #a86900;
+      margin: 0 0 0.6rem;
+    }
+    .mdl-fixture-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mdl-fixture-list a {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.84rem;
+      color: #1e6bb8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .mdl-fixture-list a:hover { text-decoration: underline; }
+
+    .mdl-howto {
+      border: 1px solid #d8e0ea;
+      border-radius: 10px;
+      background: #fff;
+      padding: 1rem 1.25rem;
+    }
+    .mdl-howto h3 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #117b91;
+      margin: 0 0 0.6rem;
+    }
+    .mdl-howto ol {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #495057;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    [data-theme="dark"] .mdl-howto { background: #1e293b; border-color: rgba(255,255,255,0.08); color: #f1f5f9; }
+    [data-theme="dark"] .mdl-howto ol { color: #94a3b8; }
+  </style>
+</head>
+
+<body>
+  <!-- Skip link -->
+  <a class="skip-link" href="#mdl-main">Skip to maintenance lab</a>
+
+  <!-- Navbar (rz canonical) -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand" aria-label="ResistanceZero Home">
+        <div class="nav-logo" style="background:linear-gradient(135deg,#0e4f8f,#117b91);">
+          <span style="color:#fff;font-weight:800;font-size:11px;letter-spacing:0;">RZ</span>
+        </div>
+        <div>
+          <div class="nav-title">ResistanceZero</div>
+          <div class="nav-subtitle">Engineering Intelligence</div>
+        </div>
+      </a>
+      <div class="nav-links" role="list">
+        <a href="index.html" class="nav-link" role="listitem">Home</a>
+        <a href="articles.html" class="nav-link" role="listitem">Articles</a>
+        <a href="datacenter-solutions.html" class="nav-link" role="listitem">DC Solutions</a>
+        <a href="tools.html" class="nav-link" role="listitem">Tools</a>
+        <a href="datacenter-solutions.html" class="nav-back" aria-label="Back to Datacenter Solutions">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i> DC Solutions
+        </a>
+        <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleMdlTheme()" aria-label="Toggle dark mode">
+          <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+      </div>
+      <div class="nav-auth-wrap" id="navAuthWrap"></div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="mdl-hero" style="margin-top:64px;">
+    <div class="mdl-hero-inner">
+      <div class="mdl-advisory">
+        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+        Read-only evidence tool — do not write settings back to equipment
+      </div>
+      <h1>Maintenance Decode Lab</h1>
+      <p class="mdl-hero-sub">Offline-first decoder, visualizer, simulator, and Excel-export tool for field maintenance files. Read-only — do not write settings back to equipment.</p>
+      <div class="mdl-hero-chips">
+        <span class="mdl-hero-chip">Offline-first</span>
+        <span class="mdl-hero-chip amber">Easergy P3 EPZ</span>
+        <span class="mdl-hero-chip amber">Galaxy VL RPT</span>
+        <span class="mdl-hero-chip cyan">DTSC-200 ATS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab mount point -->
+  <main id="mdl-main" aria-label="Maintenance lab">
+    <div id="mdl-app" class="mdl-root" aria-live="polite" aria-label="Maintenance Decode Lab interface"></div>
+  </main>
+
+  <!-- Fixtures and How-to -->
+  <div class="mdl-fixtures">
+    <div class="mdl-fixture-panel">
+      <h3><i class="fas fa-folder-open" aria-hidden="true"></i> Sample fixtures</h3>
+      <ul class="mdl-fixture-list">
+        <li>
+          <a href="assets/maintenance-fixtures/sample-before.epz" download>
+            <i class="fas fa-file-arrow-down" aria-hidden="true"></i>
+            sample-before.epz
+          </a>
+          <span style="color:#657386;font-size:0.78rem;margin-left:4px;">Easergy P3 baseline</span>
+        </li>
+        <li>
+          <a href="assets/maintenance-fixtures/sample-after.epz" download>
+            <i class="fas fa-file-arrow-down" aria-hidden="true"></i>
+            sample-after.epz
+          </a>
+          <span style="color:#657386;font-size:0.78rem;margin-left:4px;">Easergy P3 revised</span>
+        </li>
+        <li>
+          <a href="assets/maintenance-fixtures/sample-galaxy-vl.rpt" download>
+            <i class="fas fa-file-arrow-down" aria-hidden="true"></i>
+            sample-galaxy-vl.rpt
+          </a>
+          <span style="color:#657386;font-size:0.78rem;margin-left:4px;">Galaxy VL waveform report</span>
+        </li>
+        <li>
+          <a href="assets/maintenance-fixtures/sample-dtsc200-export.txt" download>
+            <i class="fas fa-file-arrow-down" aria-hidden="true"></i>
+            sample-dtsc200-export.txt
+          </a>
+          <span style="color:#657386;font-size:0.78rem;margin-left:4px;">DTSC-200 text export</span>
+        </li>
+      </ul>
+    </div>
+    <div class="mdl-howto">
+      <h3><i class="fas fa-circle-info" aria-hidden="true"></i> How to use</h3>
+      <ol>
+        <li>Download a sample fixture above or use your own backup file from the device.</li>
+        <li>In the lab, click a module (Relay EPZ, UPS RPT, or ATS Simulator) from the left nav.</li>
+        <li>Drop or click the upload zone to import your file. Files are processed locally — nothing is uploaded.</li>
+        <li>Review decoded settings, incident classifications, or ATS sequence. Use Export Excel to create a maintenance evidence workbook.</li>
+        <li>For EPZ diff review: import both before and after files to see protection setting changes and risk flags.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Share buttons (rz canonical) -->
+  <aside class="share-buttons" id="shareButtons" aria-label="Share this tool">
+    <span class="share-label">Share</span>
+    <button class="share-btn linkedin" data-tooltip="Share on LinkedIn" onclick="shareLinkedIn()" aria-label="Share on LinkedIn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+    </button>
+    <button class="share-btn twitter" data-tooltip="Share on X" onclick="shareTwitter()" aria-label="Share on X (Twitter)">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    </button>
+    <button class="share-btn whatsapp" data-tooltip="Share on WhatsApp" onclick="shareWhatsApp()" aria-label="Share on WhatsApp">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+    </button>
+    <button class="share-btn instagram" data-tooltip="Share via Instagram" onclick="shareInstagram()" aria-label="Share via Instagram">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>
+    </button>
+    <button class="share-btn facebook" data-tooltip="Share on Facebook" onclick="shareFacebook()" aria-label="Share on Facebook">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- Footer (rz canonical) -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">ResistanceZero</div>
+        <p class="footer-brand-desc">Data center engineering tools, market intelligence, and analytical content for infrastructure professionals.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Calculators</div>
+        <a href="capex-calculator.html" class="footer-link">CAPEX Calculator</a>
+        <a href="opex-calculator.html" class="footer-link">OPEX Calculator</a>
+        <a href="pue-calculator.html" class="footer-link">PUE Calculator</a>
+        <a href="roi-calculator.html" class="footer-link">ROI Calculator</a>
+        <a href="tco-calculator.html" class="footer-link">TCO Calculator</a>
+      </div>
+      <div>
+        <div class="footer-heading">Resources</div>
+        <a href="articles.html" class="footer-link">Articles</a>
+        <a href="insights.html" class="footer-link">Insights</a>
+        <a href="datacenter-solutions.html" class="footer-link">DC Solutions</a>
+        <a href="glossary.html" class="footer-link">Glossary</a>
+      </div>
+      <div>
+        <div class="footer-heading">Company</div>
+        <a href="index.html" class="footer-link">Home</a>
+        <a href="terms.html" class="footer-link">Terms of Service</a>
+        <a href="privacy.html" class="footer-link">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts (order matters) -->
+  <script src="js/rz-version.js?v=1.41.0"></script>
+  <script src="js/rz-feature-flags.js?v=1.41.0" defer></script>
+  <script src="auth.js?v=1.41.0" defer></script>
+  <script src="js/rz-mobile-nav.js?v=1.41.0" defer></script>
+  <script src="script.min.js?v=20260525" defer></script>
+  <script type="module" src="js/maintenance/main.js?v=1.41.0"></script>
+
+  <!-- Dark mode toggle + share functions -->
+  <script>
+    function toggleMdlTheme() {
+      var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('theme', t);
+      var icon = document.getElementById('themeIcon');
+      if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    (function(){
+      var icon = document.getElementById('themeIcon');
+      var t = document.documentElement.getAttribute('data-theme');
+      if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    })();
+
+    // Share button visibility on scroll
+    (function() {
+      var shareButtons = document.getElementById('shareButtons');
+      if (shareButtons) {
+        document.body.classList.add('has-share-buttons');
+        window.addEventListener('scroll', function() {
+          if (window.scrollY > 200) {
+            shareButtons.classList.add('visible');
+            shareButtons.classList.remove('hidden');
+          } else {
+            shareButtons.classList.remove('visible');
+          }
+        }, { passive: true });
+      }
+    })();
+
+    function shareLinkedIn() {
+      window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(window.location.href), '_blank', 'width=600,height=500');
+    }
+    function shareTwitter() {
+      window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent('Maintenance Decode Lab — Offline-first EPZ, RPT, and DTSC-200 decoder tool'), '_blank', 'width=600,height=400');
+    }
+    function shareWhatsApp() {
+      window.open('https://wa.me/?text=' + encodeURIComponent('Maintenance Decode Lab — ' + window.location.href), '_blank');
+    }
+    function shareInstagram() {
+      navigator.clipboard && navigator.clipboard.writeText(window.location.href);
+    }
+    function shareFacebook() {
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), '_blank', 'width=600,height=500');
+    }
+  </script>
+</body>
+</html>

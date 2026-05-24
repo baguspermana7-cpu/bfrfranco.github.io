@@ -429,6 +429,10 @@ TARGETS = [
     ("network-mcp-tool-call", "MCP tool-call",
      "3-actor RPC over MCP transport: agent → tool → resource → back. Industrial register held.",
      "#00DDFF"),
+    # ----- v1.41.0 — Maintenance Decode Lab -----
+    ("maintenance-decode-lab", "Maintenance Decode Lab",
+     "Offline-first decoder: Easergy P3 EPZ · Galaxy VL RPT · Woodward DTSC-200 ATS. Read-only, evidence-only.",
+     "#10b981"),
 ]
 
 # Dynamically extend TARGETS with article + compare + pillar + FF + geopolitics pages
