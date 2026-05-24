@@ -121,6 +121,22 @@
       <label data-topic="profinet"><input type="checkbox" data-key="profinet"> PROFINET</label>
       <label data-topic="ethernet-ip"><input type="checkbox" data-key="ethernet-ip"> EtherNet/IP</label>
       <label data-topic="ethercat"><input type="checkbox" data-key="ethercat"> EtherCAT</label>
+      <label data-topic="osi-tcp-ip-models"><input type="checkbox" data-key="osi-tcp-ip-models"> OSI / TCP-IP models</label>
+      <label data-topic="ipv4-vs-ipv6"><input type="checkbox" data-key="ipv4-vs-ipv6"> IPv4 vs IPv6</label>
+      <label data-topic="subnetting-cidr"><input type="checkbox" data-key="subnetting-cidr"> Subnetting / CIDR</label>
+      <label data-topic="tcp-handshake"><input type="checkbox" data-key="tcp-handshake"> TCP handshake</label>
+      <label data-topic="dhcp-dns"><input type="checkbox" data-key="dhcp-dns"> DHCP / DNS</label>
+      <label data-topic="tls-handshake"><input type="checkbox" data-key="tls-handshake"> TLS handshake</label>
+      <label data-topic="oauth-jwt"><input type="checkbox" data-key="oauth-jwt"> OAuth 2.0 / JWT</label>
+      <label data-topic="mtls"><input type="checkbox" data-key="mtls"> mTLS</label>
+      <label data-topic="wireguard"><input type="checkbox" data-key="wireguard"> WireGuard</label>
+      <label data-topic="rest-api"><input type="checkbox" data-key="rest-api"> REST API</label>
+      <label data-topic="graphql"><input type="checkbox" data-key="graphql"> GraphQL</label>
+      <label data-topic="grpc"><input type="checkbox" data-key="grpc"> gRPC</label>
+      <label data-topic="mcp-tool-call"><input type="checkbox" data-key="mcp-tool-call"> MCP tool-call</label>
+      <label data-topic="snmp"><input type="checkbox" data-key="snmp"> SNMP</label>
+      <label data-topic="ipmi-redfish"><input type="checkbox" data-key="ipmi-redfish"> IPMI / Redfish</label>
+      <label data-topic="syslog"><input type="checkbox" data-key="syslog"> syslog</label>
       <div class="picker-actions">
         <span id="pickedCount">0 of 4</span>
         <button type="button" id="applyBtn">Apply</button>
@@ -163,6 +179,22 @@
 <script src="js/network-anim/topics/profinet.js?v=20260524"></script>
 <script src="js/network-anim/topics/ethernet-ip.js?v=20260524"></script>
 <script src="js/network-anim/topics/ethercat.js?v=20260524"></script>
+<script src="js/network-anim/topics/osi-tcp-ip-models.js?v=20260524"></script>
+<script src="js/network-anim/topics/ipv4-vs-ipv6.js?v=20260524"></script>
+<script src="js/network-anim/topics/subnetting-cidr.js?v=20260524"></script>
+<script src="js/network-anim/topics/tcp-handshake.js?v=20260524"></script>
+<script src="js/network-anim/topics/dhcp-dns.js?v=20260524"></script>
+<script src="js/network-anim/topics/tls-handshake.js?v=20260524"></script>
+<script src="js/network-anim/topics/oauth-jwt.js?v=20260524"></script>
+<script src="js/network-anim/topics/mtls.js?v=20260524"></script>
+<script src="js/network-anim/topics/wireguard.js?v=20260524"></script>
+<script src="js/network-anim/topics/rest-api.js?v=20260524"></script>
+<script src="js/network-anim/topics/graphql.js?v=20260524"></script>
+<script src="js/network-anim/topics/grpc.js?v=20260524"></script>
+<script src="js/network-anim/topics/mcp-tool-call.js?v=20260524"></script>
+<script src="js/network-anim/topics/snmp.js?v=20260524"></script>
+<script src="js/network-anim/topics/ipmi-redfish.js?v=20260524"></script>
+<script src="js/network-anim/topics/syslog.js?v=20260524"></script>
 <script src="js/rz-version.js?v=20260524"></script>
 
 <script>
@@ -182,7 +214,23 @@
     'dnp3':        { mod: window.RZNetAnim.dnp3,       name: 'DNP3'       },
     'profinet':    { mod: window.RZNetAnim.profinet,   name: 'PROFINET'   },
     'ethernet-ip': { mod: window.RZNetAnim.ethernetIp, name: 'EtherNet/IP' },
-    'ethercat':    { mod: window.RZNetAnim.ethercat,   name: 'EtherCAT'   }
+    'ethercat':    { mod: window.RZNetAnim.ethercat,   name: 'EtherCAT'   },
+    'osi-tcp-ip-models': { mod: window.RZNetAnim.osiTcpIpModels, name: 'OSI / TCP-IP models' },
+    'ipv4-vs-ipv6': { mod: window.RZNetAnim.ipv4VsIpv6, name: 'IPv4 vs IPv6' },
+    'subnetting-cidr': { mod: window.RZNetAnim.subnettingCidr, name: 'Subnetting / CIDR' },
+    'tcp-handshake': { mod: window.RZNetAnim.tcpHandshake, name: 'TCP handshake' },
+    'dhcp-dns': { mod: window.RZNetAnim.dhcpDns, name: 'DHCP / DNS' },
+    'tls-handshake': { mod: window.RZNetAnim.tlsHandshake, name: 'TLS handshake' },
+    'oauth-jwt': { mod: window.RZNetAnim.oauthJwt, name: 'OAuth 2.0 / JWT' },
+    'mtls': { mod: window.RZNetAnim.mtls, name: 'mTLS' },
+    'wireguard': { mod: window.RZNetAnim.wireguard, name: 'WireGuard' },
+    'rest-api': { mod: window.RZNetAnim.restApi, name: 'REST API' },
+    'graphql': { mod: window.RZNetAnim.graphql, name: 'GraphQL' },
+    'grpc': { mod: window.RZNetAnim.grpc, name: 'gRPC' },
+    'mcp-tool-call': { mod: window.RZNetAnim.mcpToolCall, name: 'MCP tool-call' },
+    'snmp': { mod: window.RZNetAnim.snmp, name: 'SNMP' },
+    'ipmi-redfish': { mod: window.RZNetAnim.ipmiRedfish, name: 'IPMI / Redfish' },
+    'syslog': { mod: window.RZNetAnim.syslog, name: 'syslog' }
   };
 
   var activeInstances = [];   // [{ slug, instance, engine, panelEl, chipEls, frameEl }]

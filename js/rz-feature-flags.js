@@ -357,6 +357,54 @@ window.RZ_FEATURE_FLAGS = {
   },
   'network-bacnet-mstp': {
     'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-osi-tcp-ip-models': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-ipv4-vs-ipv6': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-subnetting-cidr': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-tcp-handshake': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-dhcp-dns': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-tls-handshake': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-oauth-jwt': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-mtls': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-wireguard': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-rest-api': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-graphql': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-grpc': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-mcp-tool-call': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-snmp': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-ipmi-redfish': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-syslog': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
   }
 
 };
