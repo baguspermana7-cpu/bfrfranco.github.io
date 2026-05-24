@@ -3,10 +3,15 @@
 # Authored v1.35.2. Exit 0 = green (safe to push), 1 = a gate failed.
 #
 # Usage:
-#   bash tools/ship-gate.sh            # standard gates (no probe)
-#   bash tools/ship-gate.sh --probe    # also run accuracy probe (file:// mode, ~50 s)
+#   bash tools/ship-gate.sh                    # standard gates (no probe)
+#   bash tools/ship-gate.sh --probe            # also run accuracy probe (file:// mode)
+#   bash tools/ship-gate.sh --probe-http       # probe against a running dev server
+#   RZ_PROBE_BASE=http://127.0.0.1:8090 bash tools/ship-gate.sh --probe-http
 #
-# The probe is opt-in here because it requires Node + puppeteer (~30-50 s).
+# The probe is opt-in here because it requires Node + puppeteer (~30-60 s).
+# file:// mode works with no server but is ~25 % slower; --probe-http needs
+# a running `python3 -m http.server PORT` first (defaults to 8090).
+#
 # Owner can wire to a git pre-push hook if desired:
 #   echo 'bash tools/ship-gate.sh --probe' > .git/hooks/pre-push
 #   chmod +x .git/hooks/pre-push
@@ -52,11 +57,28 @@ else
   fail=$((fail+1))
 fi
 
-# 8: optional accuracy probe
-if [ "${1:-}" = "--probe" ]; then
-  gate "probe-accuracy-validation — 75/75 (reviewer + drawers + cross-page + Tech Spec PDF + BoD PDF + FAQ dialogs)" \
-    bash -c "RZ_BASE=file timeout 120 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
-fi
+# 8: optional accuracy probe (file:// or http://)
+case "${1:-}" in
+  --probe)
+    gate "probe-accuracy-validation — 75/75 (file://)" \
+      bash -c "RZ_BASE=file timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
+    ;;
+  --probe-http)
+    base="${RZ_PROBE_BASE:-http://127.0.0.1:8090}"
+    # Pre-flight: HTTP server must be reachable, else --probe-http would just timeout.
+    if ! curl -s -o /dev/null -w "%{http_code}" "${base}/datahallAI.html" | grep -q "^200$"; then
+      runs=$((runs+1))
+      echo
+      echo "── [$runs] probe-accuracy-validation (HTTP) ──"
+      echo "   ✗ FAIL — dev server not reachable at ${base}"
+      echo "   Start one first:  python3 -m http.server 8090 --directory \$(pwd)"
+      fail=$((fail+1))
+    else
+      gate "probe-accuracy-validation — 75/75 (HTTP ${base})" \
+        bash -c "RZ_BASE='${base}' timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
+    fi
+    ;;
+esac
 
 echo
 echo "────────────────────────────────────────"

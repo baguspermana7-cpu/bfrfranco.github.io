@@ -651,6 +651,58 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
+## v1.38.1 — 2026-05-24 (ship-gate.sh — HTTP probe mode + dev-server pre-flight + mobile patch on 5 more Network Hub pages)
+
+(Authored locally as v1.37.3. Parallel session shipped v1.38.0
+Network Hub Phase 2 [+5 protocol pages] mid-push; this lands as
+v1.38.1 with mobile patch on all 5.)
+
+### Mobile patch (incidental fix, surfaced by gate)
+Running `ship-gate.sh` after rebase flagged 5 new pages from
+v1.38.0 as failing `audit-mobile-responsive --strict` (score 2/10).
+Standard v1.8.0 patch added to all 5:
+- `network/industrial-ot/bacnet-mstp.html`
+- `network/industrial-ot/dnp3.html`
+- `network/industrial-ot/ethercat.html`
+- `network/industrial-ot/ethernet-ip.html`
+- `network/industrial-ot/profinet.html`
+
+Mobile audit: 116 pass / 0 fail (was 111 / 5).
+
+### ship-gate.sh enhancement
+Small developer-experience improvement to `tools/ship-gate.sh`.
+Previously the optional probe gate hardcoded `RZ_BASE=file` (no
+server needed, but ~25 % slower because file:// blocks on some
+third-party CORS attempts). When the owner has a dev server running
+(e.g. `python3 -m http.server 8090`), HTTP mode is faster.
+
+### Added
+- **`bash tools/ship-gate.sh --probe-http`** — runs the probe
+  against an HTTP dev server. Default base is
+  `http://127.0.0.1:8090`; override via
+  `RZ_PROBE_BASE=http://127.0.0.1:9000 bash tools/ship-gate.sh --probe-http`.
+- **Pre-flight curl check**: if the dev server is unreachable, the
+  gate fails immediately with a helpful message instead of letting
+  the probe time out:
+  ```
+  ✗ FAIL — dev server not reachable at http://127.0.0.1:8090
+  Start one first:  python3 -m http.server 8090 --directory $(pwd)
+  ```
+
+### Existing
+- `bash tools/ship-gate.sh` (no probe — 7 gates, ~5 s) still works.
+- `bash tools/ship-gate.sh --probe` (file:// mode — 8 gates, ~60 s)
+  still works.
+- The new `--probe-http` mode is ~50 % faster on the probe step
+  alone when a dev server is up (no CORS blocking).
+
+### Notes
+- Engine files byte-identical. 57/57 + 22/22 tests pass.
+- Probe 75/75 PASS verified against both `file://` and
+  `http://127.0.0.1:8090`.
+
+---
+
 ## v1.37.2 — 2026-05-24 (FAQ dialog probe coverage; caught DC Conv FAQ TypeError; 75/75 pass)
 
 The probe was extended to cover the FAQ dialog on both cockpits. On

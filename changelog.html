@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 153 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 154 shipped versions.",
         "dateModified": "2026-05-24",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 153,
+        "numberOfItems": 154,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.38.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.38.0"},
         {"@type":"ListItem","position":2,"name":"v1.37.0 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.37.0"},
@@ -84,7 +84,7 @@
         {"@type":"ListItem","position":7,"name":"v1.32.10 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.10"},
         {"@type":"ListItem","position":8,"name":"v1.32.7 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.7"},
         {"@type":"ListItem","position":9,"name":"v1.32.5 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.32.5"},
-        {"@type":"ListItem","position":10,"name":"v1.37.2 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.37.2"}
+        {"@type":"ListItem","position":10,"name":"v1.38.1 — 2026-05-24","url":"https://resistancezero.com/changelog.html#v1.38.1"}
         ]
       }
     ]
@@ -583,7 +583,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.38.0</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">153 releases</span>
+        <span class="cl-count-badge">154 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -1409,6 +1409,70 @@
   <li>Articles 23&ndash;27 draft-folder content sweep.</li>
   <li><code>CONTENT_LINKAGE_PLAYBOOK.md</code> update to include the post-draft step.</li>
 </ul>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.38.1">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.38.1</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-05-24">May 24, 2026</time>
+      </div>
+      <p class="changelog-caption">ship-gate.sh — HTTP probe mode + dev-server pre-flight + mobile patch on 5 more Network Hub pages</p>
+      <div class="changelog-body">
+        <p>(Authored locally as v1.37.3. Parallel session shipped v1.38.0</p>
+<p>Network Hub Phase 2 [+5 protocol pages] mid-push; this lands as</p>
+<p>v1.38.1 with mobile patch on all 5.)</p>
+<h3 class="cl-subhead">Mobile patch (incidental fix, surfaced by gate)</h3>
+<p>Running <code>ship-gate.sh</code> after rebase flagged 5 new pages from</p>
+<p>v1.38.0 as failing <code>audit-mobile-responsive --strict</code> (score 2/10).</p>
+<p>Standard v1.8.0 patch added to all 5:</p>
+<ul>
+  <li><code>network/industrial-ot/bacnet-mstp.html</code></li>
+  <li><code>network/industrial-ot/dnp3.html</code></li>
+  <li><code>network/industrial-ot/ethercat.html</code></li>
+  <li><code>network/industrial-ot/ethernet-ip.html</code></li>
+  <li><code>network/industrial-ot/profinet.html</code></li>
+</ul>
+<p>Mobile audit: 116 pass / 0 fail (was 111 / 5).</p>
+<h3 class="cl-subhead">ship-gate.sh enhancement</h3>
+<p>Small developer-experience improvement to <code>tools/ship-gate.sh</code>.</p>
+<p>Previously the optional probe gate hardcoded <code>RZ_BASE=file</code> (no</p>
+<p>server needed, but ~25 % slower because file:// blocks on some</p>
+<p>third-party CORS attempts). When the owner has a dev server running</p>
+<p>(e.g. <code>python3 -m http.server 8090</code>), HTTP mode is faster.</p>
+<h3 class="cl-subhead">Added</h3>
+<ul>
+  <li><strong><code>bash tools/ship-gate.sh --probe-http</code></strong> — runs the probe</li>
+</ul>
+<p>against an HTTP dev server. Default base is</p>
+<p><code>http://127.0.0.1:8090</code>; override via</p>
+<p><code>RZ_PROBE_BASE=http://127.0.0.1:9000 bash tools/ship-gate.sh --probe-http</code>.</p>
+<ul>
+  <li><strong>Pre-flight curl check</strong>: if the dev server is unreachable, the</li>
+</ul>
+<p>gate fails immediately with a helpful message instead of letting</p>
+<p>the probe time out:</p>
+<p>```</p>
+<p>✗ FAIL — dev server not reachable at <a href="http://127.0.0.1:8090" target="_blank" rel="noopener">http://127.0.0.1:8090</a></p>
+<p>Start one first:  python3 -m http.server 8090 --directory $(pwd)</p>
+<p>```</p>
+<h3 class="cl-subhead">Existing</h3>
+<ul>
+  <li><code>bash tools/ship-gate.sh</code> (no probe — 7 gates, ~5 s) still works.</li>
+  <li><code>bash tools/ship-gate.sh --probe</code> (file:// mode — 8 gates, ~60 s)</li>
+</ul>
+<p>still works.</p>
+<ul>
+  <li>The new <code>--probe-http</code> mode is ~50 % faster on the probe step</li>
+</ul>
+<p>alone when a dev server is up (no CORS blocking).</p>
+<h3 class="cl-subhead">Notes</h3>
+<ul>
+  <li>Engine files byte-identical. 57/57 + 22/22 tests pass.</li>
+  <li>Probe 75/75 PASS verified against both <code>file://</code> and</li>
+</ul>
+<p><code>http://127.0.0.1:8090</code>.</p>
       </div>
     </article>
 
