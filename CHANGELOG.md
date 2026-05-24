@@ -11,6 +11,93 @@ release sections rather than semver.
 
 ---
 
+## v1.36.0 — 2026-05-24 (Network Hub — Lane B complete: +BACnet/IP +OPC-UA +Compare scaffold)
+
+MINOR ship: Lane B (Industrial OT) Phase 1 complete with 4 live topics
+and a functional 4-panel compare scaffold. Audit confirms anti-monotony
+across all 4 (max pairwise share = 2 fields).
+
+### Added
+
+- **`network/industrial-ot/bacnet-ip.html`** &mdash; live Phase-1 topic.
+  ASHRAE 135 BACnet/IP packet exchange over UDP with BVLC tunnel rendered
+  as scan-line shroud at packet head. 3 parameter controls (payload bytes
+  / UDP RTT / line noise). 4 engineering pitfalls (BBMD foreign-device
+  registration, port 47808 firewall, instance ID collisions, COV
+  subscription leaks).
+- **`network/industrial-ot/opc-ua.html`** &mdash; live Phase-1 topic.
+  IEC 62541 subscription model: client &rarr; server with publishing
+  interval, monitored items, security mode (none / sign / sign-and-encrypt).
+  Always-on scan-line shroud when security != none. Tertiary discovery
+  server node visible. 4 engineering pitfalls (cert trust list,
+  publish/sample interval mismatch, queue overflow, endpoint discovery).
+- **`network-compare.html`** &mdash; 4-panel side-by-side compare scaffold.
+  Topic picker (any 2&ndash;4 of the 4 live protocols). Per-panel
+  instrument chip strip (throughput / latency / overhead / status)
+  reading from `getNormalized()` per Appendix B. URL deep-link
+  (`?topics=modbus-rtu,modbus-tcp,bacnet-ip,opc-ua`). Audio muted
+  default across all panels (compare-mode convention per §7).
+- **`js/network-anim/topics/bacnet-ip.js`** (~225 lines) &mdash; distinct
+  timbre per Appendix E row 4: **triangle 950 Hz**, **hex 8&times;8**,
+  **ethernet 1.0 px**, **controller-square** master, **1.2&times; medium**
+  tempo. Shares with RTU: 1 (tempo). Shares with TCP: 1 (wire).
+- **`js/network-anim/topics/opc-ua.js`** (~260 lines) &mdash; distinct
+  timbre per Appendix E row 5: **sine-sweep 1400&rarr;1700 Hz**,
+  **layered 10&times;8**, **ethernet 1.0 px**, **broker-diamond** master,
+  **1.2&times; medium** tempo, **progressive encryption**. Shares with
+  RTU: 1 (tempo). Shares with TCP: 1 (wire). Shares with BACnet/IP: 2
+  (wire + tempo).
+- **`js/rz-feature-flags.js`** &mdash; 4 new public-tier entries
+  (network-bacnet-ip, network-opc-ua, network-compare, plus prior
+  network-modbus-tcp).
+- **`sitemap.xml`** + **`llms.txt`** &mdash; 4 new entries.
+
+### Changed
+
+- `network-visualization-hub.html` &mdash; BACnet/IP + OPC-UA cards now
+  show **LIVE** status; compare-mode CTA upgraded from placeholder to
+  functional link.
+
+### Anti-monotony evidence (4 topics, pairwise within Lane B)
+
+| Pair | Shared fields |
+|------|---------------|
+| RTU vs TCP | 0 |
+| RTU vs BACnet/IP | 1 (tempo medium) |
+| RTU vs OPC-UA | 1 (tempo medium) |
+| TCP vs BACnet/IP | 1 (wire ethernet) |
+| TCP vs OPC-UA | 1 (wire ethernet) |
+| BACnet/IP vs OPC-UA | 2 (wire ethernet + tempo medium) |
+
+All pairs &le;2 shared. Anti-monotony cap holds. Each protocol has its
+own audio signature and visual chip vocabulary.
+
+### Status
+
+`tools/audit-network-anim.py` &mdash; CLEAN, **4 topics audited, 0 findings**.
+`tools/audit-script-tags.py --strict` &mdash; CLEAN (155 files).
+`tools/audit-js-syntax.py --strict` &mdash; CLEAN (106 files).
+
+### Versioning note
+
+v1.35.0 = Modbus TCP + hub landing
+v1.35.1 = parallel session's cross-page headline consistency probe
+v1.36.0 (this ship) = Lane B complete + compare scaffold
+
+### Next
+
+- Determinism test harness (`test-network-anim-determinism.py`)
+- OG images for the 4 live topics + hub + compare pages
+- Post-draft folders per POST_DRAFT_STANDARD
+- Phase 2: DNP3, PROFINET, EtherNet/IP, EtherCAT (5 more Lane B topics)
+
+### Changed
+
+- `js/rz-version.js` &mdash; v1.36.0 (MINOR; Lane B completion)
+- `sw.js` &mdash; cache `rz-cache-v1.36.0`
+
+---
+
 ## v1.35.0 — 2026-05-24 (Network Hub — Modbus TCP topic + hub landing page; anti-monotony gate proven at scale)
 
 MINOR ship: second live topic + landing page. The anti-monotony audit now

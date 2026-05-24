@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compare Protocols · Network Hub · ResistanceZero</title>
+<meta name="description" content="Compare up to 4 industrial / IT communication protocols side-by-side. Live animations, normalised metrics, instrument-grade comparison.">
+<meta name="theme-color" content="#0F172A">
+<link rel="canonical" href="https://resistancezero.com/network-compare.html">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="styles.min.css?v=20260524">
+<style>
+  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --wire:#475569; --canvas-bg:#0F172A; }
+  .cmp-hero { padding:2.5rem 1.5rem 0.5rem; max-width:1400px; margin:0 auto; }
+  .cmp-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.5rem,2.6vw,1.95rem); margin:0 0 0.4rem; }
+  .cmp-hero .lede { color:var(--wire); font-size:0.92rem; max-width:760px; }
+  .cmp-section { max-width:1400px; margin:0 auto; padding:0 1.5rem 2rem; }
+
+  .topic-picker {
+    display:flex; gap:0.5rem; flex-wrap:wrap; margin:1rem 0 1.2rem;
+    padding:0.7rem 0.9rem; border:0.8px solid var(--wire); border-radius:4px;
+    background:rgba(0,221,255,0.02);
+  }
+  .topic-picker label {
+    display:flex; align-items:center; gap:0.4rem;
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem;
+    color:var(--wire); cursor:pointer;
+  }
+  .topic-picker label input { accent-color:var(--cyan); }
+  .topic-picker label.picked { color:var(--cyan); }
+  .topic-picker .picker-actions { margin-left:auto; display:flex; gap:0.4rem; align-items:center; font-size:0.75rem; color:var(--wire); }
+
+  .panel-grid {
+    display:grid; grid-template-columns:repeat(2,1fr); gap:0.8rem;
+  }
+  @media (max-width:1023px) { .panel-grid { grid-template-columns:1fr; } }
+
+  .cmp-panel {
+    border:1px solid var(--wire); border-radius:4px;
+    background:var(--canvas-bg); overflow:hidden; min-height:280px;
+    display:flex; flex-direction:column;
+  }
+  .cmp-panel-head {
+    display:flex; align-items:center; gap:0.5rem;
+    padding:0.4rem 0.7rem; border-bottom:0.8px solid rgba(255,255,255,0.08);
+    background:#0a1220;
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem;
+  }
+  .cmp-panel-head .protocol-name { color:var(--cyan); font-weight:600; letter-spacing:0.02em; }
+  .cmp-panel-head .panel-frame { margin-left:auto; color:var(--wire); font-size:0.72rem; }
+  .cmp-panel canvas { display:block; width:100%; height:200px; background:var(--canvas-bg); }
+  .cmp-panel-chips {
+    padding:0.5rem 0.7rem; border-top:0.8px solid rgba(255,255,255,0.08);
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem;
+    color:var(--wire); display:grid; grid-template-columns:auto 1fr; gap:0.2rem 0.7rem;
+  }
+  .cmp-panel-chips dt { color:var(--wire); text-transform:uppercase; letter-spacing:0.04em; font-size:0.65rem; }
+  .cmp-panel-chips dd { color:var(--cyan); margin:0; font-variant-numeric:tabular-nums; }
+
+  .cmp-toolbar {
+    display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;
+    padding:0.6rem 0.8rem; margin:0.8rem 0;
+    border:0.8px solid var(--wire); border-radius:4px;
+    background:rgba(0,221,255,0.03);
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem;
+  }
+  .cmp-toolbar button {
+    font-family:inherit; font-size:0.78rem;
+    background:transparent; color:var(--cyan); border:0.8px solid var(--wire);
+    padding:0.3rem 0.7rem; cursor:pointer; border-radius:2px;
+    letter-spacing:0.04em; text-transform:uppercase;
+  }
+  .cmp-toolbar button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; border-color:var(--cyan); }
+  .cmp-toolbar .toolbar-note { color:var(--wire); margin-left:auto; }
+
+  .empty-state {
+    padding:2.5rem 1.5rem;
+    text-align:center; border:1px dashed var(--wire); border-radius:4px;
+    color:var(--wire); font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:0.82rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="logo">ResistanceZero</a>
+    <nav class="nav-right" aria-label="primary">
+      <a href="network-visualization-hub.html">Network Hub</a>
+      <a href="datacenter-solutions.html#knowledge-labs">Knowledge Labs</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="cmp-hero">
+    <h1>Compare protocols — side by side</h1>
+    <p class="lede">Pick up to 4 protocols and watch them run on the same wall clock. The chip strip below each canvas reads from <code>getNormalized()</code> per Appendix B of the v2.3 plan — throughput, latency, overhead, and encryption status as a 4-row instrument strip.</p>
+  </section>
+
+  <section class="cmp-section">
+
+    <div class="topic-picker" role="group" aria-label="Select protocols to compare">
+      <label data-topic="modbus-rtu"><input type="checkbox" data-key="modbus-rtu"> Modbus RTU</label>
+      <label data-topic="modbus-tcp"><input type="checkbox" data-key="modbus-tcp"> Modbus TCP</label>
+      <label data-topic="bacnet-ip"><input type="checkbox" data-key="bacnet-ip"> BACnet/IP</label>
+      <label data-topic="opc-ua"><input type="checkbox" data-key="opc-ua"> OPC-UA</label>
+      <div class="picker-actions">
+        <span id="pickedCount">0 of 4</span>
+        <button type="button" id="applyBtn">Apply</button>
+      </div>
+    </div>
+
+    <div class="cmp-toolbar" role="toolbar" aria-label="Compare mode controls">
+      <button type="button" id="playAllBtn">▶ Play all</button>
+      <button type="button" id="pauseAllBtn">❚❚ Pause all</button>
+      <span class="toolbar-note">Audio muted across all panels (compare mode default).</span>
+    </div>
+
+    <div id="panelGrid" class="panel-grid" aria-live="polite">
+      <div class="empty-state">
+        Pick 2&ndash;4 protocols above and press <strong>Apply</strong> to start comparing.<br>
+        Tip: append <code>?topics=modbus-rtu,modbus-tcp,bacnet-ip,opc-ua</code> to the URL to skip the picker.
+      </div>
+    </div>
+
+  </section>
+
+  <footer style="max-width:1400px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);text-align:center;">
+    <span id="versionStamp">· ResistanceZero · v?.?.? ·</span>
+  </footer>
+
+</main>
+
+<!-- Engine + all 4 live topic modules (lazy: only those picked will be init'd) -->
+<script src="js/network-anim/palette.js?v=20260524"></script>
+<script src="js/network-anim/audio.js?v=20260524"></script>
+<script src="js/network-anim/renderer.js?v=20260524"></script>
+<script src="js/network-anim/vfx.js?v=20260524"></script>
+<script src="js/network-anim/engine.js?v=20260524"></script>
+<script src="js/network-anim/topics/modbus-rtu.js?v=20260524"></script>
+<script src="js/network-anim/topics/modbus-tcp.js?v=20260524"></script>
+<script src="js/network-anim/topics/bacnet-ip.js?v=20260524"></script>
+<script src="js/network-anim/topics/opc-ua.js?v=20260524"></script>
+<script src="js/rz-version.js?v=20260524"></script>
+
+<script>
+(function () {
+  'use strict';
+
+  // Audio muted by default in compare mode (plan §7)
+  window.RZNetAnim.audio.setMuted(true);
+
+  // Topic registry — maps slug → module + display name
+  var TOPICS = {
+    'modbus-rtu': { mod: window.RZNetAnim.modbusRtu, name: 'Modbus RTU' },
+    'modbus-tcp': { mod: window.RZNetAnim.modbusTcp, name: 'Modbus TCP' },
+    'bacnet-ip':  { mod: window.RZNetAnim.bacnetIp,  name: 'BACnet/IP'  },
+    'opc-ua':     { mod: window.RZNetAnim.opcUa,     name: 'OPC-UA'    }
+  };
+
+  var activeInstances = [];   // [{ slug, instance, engine, panelEl, chipEls, frameEl }]
+  var pickedCountEl = document.getElementById('pickedCount');
+  var grid = document.getElementById('panelGrid');
+
+  function selectedSlugs() {
+    var out = [];
+    document.querySelectorAll('.topic-picker input[type=checkbox]').forEach(function (cb) {
+      if (cb.checked) out.push(cb.getAttribute('data-key'));
+    });
+    return out.slice(0, 4);   // hard cap 4
+  }
+
+  function updatePickedCount() {
+    var n = selectedSlugs().length;
+    pickedCountEl.textContent = n + ' of 4';
+    document.querySelectorAll('.topic-picker label').forEach(function (lbl) {
+      var key = lbl.getAttribute('data-topic');
+      var cb = lbl.querySelector('input');
+      lbl.classList.toggle('picked', cb && cb.checked);
+    });
+  }
+
+  function fmtBps(bps) {
+    if (!bps || bps < 1) return '—';
+    if (bps >= 1e9) return (bps / 1e9).toFixed(2) + ' Gbps';
+    if (bps >= 1e6) return (bps / 1e6).toFixed(2) + ' Mbps';
+    if (bps >= 1e3) return (bps / 1e3).toFixed(1) + ' kbps';
+    return bps.toFixed(0) + ' bps';
+  }
+  function fmtMs(ms) { return (ms == null) ? '—' : ms.toFixed(2) + ' ms'; }
+  function fmtBytes(b) { return (b == null) ? '—' : b + ' B / frame'; }
+  function fmtStatus(n) {
+    if (!n) return '—';
+    var parts = [];
+    if (n.isEncrypted) parts.push('▲ encrypted ✓');
+    else parts.push('▽ cleartext');
+    if (n.errorCount > 0) parts.push('× ' + n.errorCount + ' errors');
+    return parts.join(' · ');
+  }
+
+  function tearDown() {
+    activeInstances.forEach(function (a) {
+      try { a.instance.destroy(); } catch (_) {}
+    });
+    activeInstances = [];
+    grid.innerHTML = '';
+  }
+
+  function mountPanels(slugs) {
+    tearDown();
+    if (!slugs.length) {
+      grid.innerHTML = '<div class="empty-state">Pick 2&ndash;4 protocols and press <strong>Apply</strong>.</div>';
+      return;
+    }
+
+    slugs.forEach(function (slug) {
+      var t = TOPICS[slug];
+      if (!t || !t.mod) return;
+
+      var panel = document.createElement('div');
+      panel.className = 'cmp-panel';
+      panel.innerHTML =
+        '<div class="cmp-panel-head">' +
+          '<span class="protocol-name">' + t.name + '</span>' +
+          '<span class="panel-frame" data-role="frame">frame 0</span>' +
+        '</div>' +
+        '<canvas width="600" height="200" aria-label="' + t.name + ' animation"></canvas>' +
+        '<dl class="cmp-panel-chips">' +
+          '<dt>Throughput</dt><dd data-row="throughput">—</dd>' +
+          '<dt>Latency</dt>   <dd data-row="latency">—</dd>' +
+          '<dt>Overhead</dt>  <dd data-row="overhead">—</dd>' +
+          '<dt>Status</dt>    <dd data-row="status">—</dd>' +
+        '</dl>';
+      grid.appendChild(panel);
+
+      var canvas = panel.querySelector('canvas');
+      var frameEl = panel.querySelector('[data-role="frame"]');
+      var chips = {
+        throughput: panel.querySelector('[data-row="throughput"]'),
+        latency:    panel.querySelector('[data-row="latency"]'),
+        overhead:   panel.querySelector('[data-row="overhead"]'),
+        status:     panel.querySelector('[data-row="status"]')
+      };
+
+      var instance = t.mod.init(canvas, {}, {});
+      var engine = window.RZNetAnim.engine.create(instance, {});
+
+      activeInstances.push({
+        slug: slug,
+        instance: instance,
+        engine: engine,
+        frameEl: frameEl,
+        chips: chips
+      });
+    });
+
+    // Single shared UI tick — updates frame counter + normalized chip strip
+    requestAnimationFrame(function update() {
+      activeInstances.forEach(function (a) {
+        a.frameEl.textContent = 'frame ' + a.engine._debugFrameCount();
+        var n = a.instance.getNormalized();
+        a.chips.throughput.textContent = fmtBps(n.effectiveThroughputBps);
+        a.chips.latency.textContent    = fmtMs(n.endToEndLatencyMs);
+        a.chips.overhead.textContent   = fmtBytes(n.frameOverheadBytes);
+        a.chips.status.textContent     = fmtStatus(n);
+      });
+      requestAnimationFrame(update);
+    });
+  }
+
+  // ─── URL query string support ────────────────────────────────
+  function prefillFromUrl() {
+    var params = new URLSearchParams(window.location.search);
+    var topicsParam = params.get('topics');
+    if (!topicsParam) return false;
+    var slugs = topicsParam.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var any = false;
+    document.querySelectorAll('.topic-picker input[type=checkbox]').forEach(function (cb) {
+      if (slugs.indexOf(cb.getAttribute('data-key')) >= 0) {
+        cb.checked = true;
+        any = true;
+      }
+    });
+    if (any) {
+      updatePickedCount();
+      mountPanels(selectedSlugs());
+    }
+    return any;
+  }
+
+  // ─── Wire UI ─────────────────────────────────────────────────
+  document.querySelectorAll('.topic-picker input[type=checkbox]').forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      var picked = selectedSlugs();
+      if (picked.length > 4) {
+        cb.checked = false;
+      }
+      updatePickedCount();
+    });
+  });
+
+  document.getElementById('applyBtn').addEventListener('click', function () {
+    mountPanels(selectedSlugs());
+  });
+  document.getElementById('playAllBtn').addEventListener('click', function () {
+    activeInstances.forEach(function (a) { a.instance.play(); });
+  });
+  document.getElementById('pauseAllBtn').addEventListener('click', function () {
+    activeInstances.forEach(function (a) { a.instance.pause(); });
+  });
+
+  updatePickedCount();
+  if (!prefillFromUrl()) {
+    // No query string — leave empty state visible
+  }
+
+  // Version stamp
+  (function () {
+    var el = document.getElementById('versionStamp');
+    if (!el) return;
+    var v = window.RZ_VERSION || '1.x.x';
+    el.textContent = '· ResistanceZero · v' + v + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·';
+  })();
+})();
+</script>
+
+</body>
+</html>

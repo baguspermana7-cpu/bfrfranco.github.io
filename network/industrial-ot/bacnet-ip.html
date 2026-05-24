@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BACnet/IP · Network Hub · ResistanceZero</title>
+<meta name="description" content="Interactive animated visualisation of BACnet/IP — building-automation packet exchange over UDP/IP with BVLC tunnel scan-line at packet head. Parameter-driven, oscilloscope-grade.">
+<meta name="theme-color" content="#0F172A">
+<link rel="canonical" href="https://resistancezero.com/network/industrial-ot/bacnet-ip.html">
+<link rel="icon" href="../../assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="../../styles.min.css?v=20260524">
+<style>
+  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --wire:#475569; --canvas-bg:#0F172A; }
+  .net-hero { padding:3rem 1.5rem 1.5rem; max-width:1100px; margin:0 auto; }
+  .net-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.6rem,3vw,2.2rem); margin:0 0 0.5rem; }
+  .chip-meta { display:inline-flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .net-chip { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; padding:0.2rem 0.5rem; border:0.8px solid var(--wire); color:var(--cyan); background:rgba(0,221,255,0.04); border-radius:2px; text-transform:uppercase; }
+  .net-section { max-width:1100px; margin:0 auto; padding:1.5rem; }
+  .net-section h2 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.2rem; margin:0 0 0.8rem; }
+  .anim-cluster { border:1px solid var(--wire); border-radius:4px; background:var(--canvas-bg); overflow:hidden; margin:1rem 0; }
+  .anim-controls { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.8rem; border-bottom:0.8px solid rgba(255,255,255,0.08); background:#0a1220; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem; }
+  .anim-controls button { font-family:inherit; font-size:0.78rem; background:transparent; color:var(--cyan); border:0.8px solid var(--wire); padding:0.3rem 0.7rem; cursor:pointer; border-radius:2px; letter-spacing:0.04em; text-transform:uppercase; }
+  .anim-controls button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; border-color:var(--cyan); }
+  .anim-controls .mute-state { color:var(--wire); }
+  .anim-controls .mute-state.on { color:var(--green); }
+  #animCanvas { display:block; width:100%; height:320px; background:var(--canvas-bg); }
+  .param-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.8rem 1.2rem; margin-top:1rem; }
+  .param-grid label { display:block; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--wire); text-transform:uppercase; margin-bottom:0.2rem; }
+  .param-grid select, .param-grid input[type=number] { width:100%; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; padding:0.35rem 0.5rem; border:0.8px solid var(--wire); background:transparent; color:inherit; border-radius:2px; }
+  .param-grid input[type=range] { width:100%; }
+  .param-row { display:flex; align-items:center; gap:0.5rem; }
+  .param-row input[type=number] { width:80px; }
+  details.net-accord { border:0.8px solid var(--wire); border-radius:4px; margin:0.6rem 0; padding:0.7rem 1rem; }
+  details.net-accord > summary { cursor:pointer; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; letter-spacing:0.04em; color:var(--cyan); }
+  .live-region { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-container">
+    <a href="../../index.html" class="logo">ResistanceZero</a>
+    <nav class="nav-right" aria-label="primary">
+      <a href="../../network-visualization-hub.html">Network Hub</a>
+      <a href="../../datacenter-solutions.html#knowledge-labs">Knowledge Labs</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="net-hero">
+    <div class="chip-meta">
+      <span class="net-chip">ASHRAE 135</span>
+      <span class="net-chip">Lane B · Industrial OT</span>
+      <span class="net-chip">FREE</span>
+    </div>
+    <h1>BACnet/IP — building automation over UDP</h1>
+    <p>BACnet/IP wraps the ASHRAE 135 application protocol in a 4-byte BVLC (Building Automation Virtual Link Control) tunnel and ships it over UDP/IP. Watch the scan-line shroud that appears at the head of each packet — that's the BVLC tunnel made visible. Distinctive trait per Appendix E: hex chips on Ethernet wire, triangle waveform.</p>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-animation">
+    <h2 id="sec-animation">Animation</h2>
+
+    <div class="anim-cluster">
+      <div class="anim-controls" role="toolbar" aria-label="Animation controls">
+        <button type="button" id="playBtn">▶ Play</button>
+        <button type="button" id="pauseBtn">❚❚ Pause</button>
+        <button type="button" id="muteBtn">SFX <span class="mute-state" id="muteState">muted</span></button>
+        <span style="margin-left:auto;color:var(--wire);" id="frameLabel">frame 0</span>
+      </div>
+      <canvas id="animCanvas" width="800" height="320" aria-label="BACnet/IP packet exchange animation"></canvas>
+    </div>
+
+    <div class="param-grid" aria-label="BACnet/IP parameters">
+      <div>
+        <label for="paramPayload">Payload bytes (APDU)</label>
+        <div class="param-row">
+          <input type="range" id="paramPayload" min="4" max="120" value="12" step="2">
+          <input type="number" id="paramPayloadNum" min="4" max="120" value="12" step="2">
+        </div>
+      </div>
+      <div>
+        <label for="paramRtt">UDP RTT (ms)</label>
+        <div class="param-row">
+          <input type="range" id="paramRtt" min="0" max="30" value="2" step="1">
+          <input type="number" id="paramRttNum" min="0" max="30" value="2" step="1">
+        </div>
+      </div>
+      <div>
+        <label for="paramNoise">Line noise %</label>
+        <div class="param-row">
+          <input type="range" id="paramNoise" min="0" max="30" value="0" step="1">
+          <input type="number" id="paramNoiseNum" min="0" max="30" value="0" step="1">
+        </div>
+      </div>
+    </div>
+
+    <div id="scrubberLive" class="live-region" aria-live="polite"></div>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-compare">
+    <h2 id="sec-compare">Compare with</h2>
+    <ul>
+      <li><a href="modbus-rtu.html">Modbus RTU</a> — serial industrial, no IP tunnel</li>
+      <li><a href="modbus-tcp.html">Modbus TCP</a> — also IP-based but TCP stream, not UDP datagrams</li>
+      <li><a href="opc-ua.html">OPC-UA</a> — modern industrial with built-in security</li>
+    </ul>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-pitfalls">
+    <h2 id="sec-pitfalls">Engineering pitfalls</h2>
+
+    <details class="net-accord">
+      <summary>BBMD foreign-device registration timeout</summary>
+      <p>BACnet Broadcast Management Devices (BBMDs) bridge broadcast domains. A foreign device must re-register periodically (default 60 s); miss the renewal and your remote BMS controller goes silent without warning.</p>
+    </details>
+
+    <details class="net-accord">
+      <summary>Default port 47808 (0xBAC0) collisions</summary>
+      <p>BACnet/IP default is UDP/47808. Many enterprise IT teams have never heard of it and block "unknown UDP" by default. Verify firewall AND switch QoS — broadcast UDP gets deprioritised aggressively on managed switches.</p>
+    </details>
+
+    <details class="net-accord">
+      <summary>Object instance ID collision across vendors</summary>
+      <p>Object instance IDs are 22-bit per device. Mix vendors and you'll find both vendors using "Analog Input 1" instance 0. ASHRAE 135 requires uniqueness per device-object pair; gateway vendors often forget. Audit your instance map before commissioning.</p>
+    </details>
+
+    <details class="net-accord">
+      <summary>COV subscription leak under network partition</summary>
+      <p>Change-Of-Value subscriptions don't auto-expire on TCP-like timeouts (UDP has none). After a network partition, the server retains stale subscriptions and burns memory. Always set Lifetime &gt; 0 and re-subscribe periodically.</p>
+    </details>
+  </section>
+
+  <section class="net-section" aria-labelledby="sec-refs">
+    <h2 id="sec-refs">References</h2>
+    <details class="net-accord">
+      <summary>Primary sources</summary>
+      <ul>
+        <li>ASHRAE 135 — <em>BACnet — A Data Communication Protocol for Building Automation and Control Networks</em>.</li>
+        <li>BACnet/IP Annex J — <em>BACnet Virtual Link Layer for IP</em>.</li>
+        <li>IETF RFC 768 — <em>User Datagram Protocol</em>.</li>
+        <li>IANA port assignment: 47808/udp = bacnet.</li>
+      </ul>
+    </details>
+  </section>
+
+  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);">
+    <span id="versionStamp">· ResistanceZero · v?.?.? ·</span>
+  </footer>
+
+</main>
+
+<script src="../../js/network-anim/palette.js?v=20260524"></script>
+<script src="../../js/network-anim/audio.js?v=20260524"></script>
+<script src="../../js/network-anim/renderer.js?v=20260524"></script>
+<script src="../../js/network-anim/vfx.js?v=20260524"></script>
+<script src="../../js/network-anim/engine.js?v=20260524"></script>
+<script src="../../js/network-anim/topics/bacnet-ip.js?v=20260524"></script>
+<script src="../../js/rz-version.js?v=20260524"></script>
+
+<script>
+(function () {
+  'use strict';
+  var canvas = document.getElementById('animCanvas');
+  if (!canvas) return;
+
+  var lastAnnouncedPhase = '';
+  var liveRegion = document.getElementById('scrubberLive');
+  var frameLabel = document.getElementById('frameLabel');
+
+  var signals = {
+    onSFX: function (eventName, spec, ctx) {
+      if (ctx && ctx.role && eventName === 'byte') {
+        var phaseTag = ctx.role + '-byte';
+        if (phaseTag !== lastAnnouncedPhase) {
+          lastAnnouncedPhase = phaseTag;
+          if (liveRegion) liveRegion.textContent = 'Phase: ' + ctx.role + ' transmitting';
+        }
+      } else if (eventName === 'ack') {
+        if (liveRegion) liveRegion.textContent = 'Phase: ACK received';
+        lastAnnouncedPhase = 'ack';
+      }
+    }
+  };
+
+  var instance = window.RZNetAnim.bacnetIp.init(canvas, {}, signals);
+  var engine = window.RZNetAnim.engine.create(instance, { signals: signals });
+
+  document.getElementById('playBtn').addEventListener('click', function () {
+    window.RZNetAnim.audio.init();
+    instance.play();
+  });
+  document.getElementById('pauseBtn').addEventListener('click', function () { instance.pause(); });
+
+  var muted = true;
+  var muteState = document.getElementById('muteState');
+  document.getElementById('muteBtn').addEventListener('click', function () {
+    muted = !muted;
+    window.RZNetAnim.audio.setMuted(muted);
+    muteState.textContent = muted ? 'muted' : 'on';
+    muteState.classList.toggle('on', !muted);
+  });
+
+  function readParams() {
+    return {
+      payloadBytes: parseInt(document.getElementById('paramPayload').value, 10),
+      udpRttMs:     parseInt(document.getElementById('paramRtt').value, 10),
+      lineNoise:    parseInt(document.getElementById('paramNoise').value, 10)
+    };
+  }
+  function pushParams() { instance.setParams(readParams()); }
+  function bindTwin(rangeId, numId) {
+    var r = document.getElementById(rangeId), n = document.getElementById(numId);
+    r.addEventListener('input', function () { n.value = r.value; pushParams(); });
+    n.addEventListener('input', function () { r.value = n.value; pushParams(); });
+  }
+  bindTwin('paramPayload', 'paramPayloadNum');
+  bindTwin('paramRtt',     'paramRttNum');
+  bindTwin('paramNoise',   'paramNoiseNum');
+
+  function uiTick() {
+    var fc = engine._debugFrameCount();
+    if (frameLabel) frameLabel.textContent = 'frame ' + fc;
+    requestAnimationFrame(uiTick);
+  }
+  uiTick();
+
+  (function () {
+    var el = document.getElementById('versionStamp');
+    if (!el) return;
+    var v = window.RZ_VERSION || '1.x.x';
+    el.textContent = '· ResistanceZero · v' + v + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·';
+  })();
+})();
+</script>
+
+</body>
+</html>

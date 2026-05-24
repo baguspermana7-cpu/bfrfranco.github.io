@@ -333,6 +333,15 @@ window.RZ_FEATURE_FLAGS = {
   },
   'network-modbus-tcp': {
     'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-bacnet-ip': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-opc-ua': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-compare': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
   }
 
 };
