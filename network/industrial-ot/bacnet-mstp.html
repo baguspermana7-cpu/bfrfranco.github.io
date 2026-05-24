@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BACnet MS/TP · Network Hub · ResistanceZero</title>
+<meta name="description" content="Interactive animated visualisation of BACnet MS/TP — RS-485 token-passing serial protocol for building automation. Token visibly passes between nodes.">
+<link rel="canonical" href="https://resistancezero.com/network/industrial-ot/bacnet-mstp.html">
+<link rel="icon" href="../../assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="../../styles.min.css?v=20260524">
+<style>
+  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --wire:#475569; --canvas-bg:#0F172A; }
+  .net-hero { padding:3rem 1.5rem 1.5rem; max-width:1100px; margin:0 auto; }
+  .net-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.6rem,3vw,2.2rem); margin:0 0 0.5rem; }
+  .chip-meta { display:inline-flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .net-chip { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; padding:0.2rem 0.5rem; border:0.8px solid var(--wire); color:var(--cyan); background:rgba(0,221,255,0.04); border-radius:2px; text-transform:uppercase; }
+  .net-section { max-width:1100px; margin:0 auto; padding:1.5rem; }
+  .net-section h2 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.2rem; margin:0 0 0.8rem; }
+  .anim-cluster { border:1px solid var(--wire); border-radius:4px; background:var(--canvas-bg); overflow:hidden; margin:1rem 0; }
+  .anim-controls { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.8rem; border-bottom:0.8px solid rgba(255,255,255,0.08); background:#0a1220; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem; }
+  .anim-controls button { font-family:inherit; font-size:0.78rem; background:transparent; color:var(--cyan); border:0.8px solid var(--wire); padding:0.3rem 0.7rem; cursor:pointer; border-radius:2px; letter-spacing:0.04em; text-transform:uppercase; }
+  .anim-controls button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+  .anim-controls .mute-state { color:var(--wire); } .anim-controls .mute-state.on { color:var(--green); }
+  #animCanvas { display:block; width:100%; height:320px; background:var(--canvas-bg); }
+  .param-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.8rem 1.2rem; margin-top:1rem; }
+  .param-grid label { display:block; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--wire); text-transform:uppercase; margin-bottom:0.2rem; }
+  .param-grid select, .param-grid input[type=number] { width:100%; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; padding:0.35rem 0.5rem; border:0.8px solid var(--wire); background:transparent; color:inherit; border-radius:2px; }
+  .param-grid input[type=range] { width:100%; } .param-row { display:flex; align-items:center; gap:0.5rem; } .param-row input[type=number] { width:80px; }
+  details.net-accord { border:0.8px solid var(--wire); border-radius:4px; margin:0.6rem 0; padding:0.7rem 1rem; }
+  details.net-accord > summary { cursor:pointer; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; color:var(--cyan); }
+  .live-region { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<header class="navbar"><div class="nav-container"><a href="../../index.html" class="logo">ResistanceZero</a><nav class="nav-right"><a href="../../network-visualization-hub.html">Network Hub</a><a href="../../datacenter-solutions.html#knowledge-labs">Knowledge Labs</a></nav></div></header>
+
+<main>
+  <section class="net-hero">
+    <div class="chip-meta"><span class="net-chip">ASHRAE 135</span><span class="net-chip">Lane B · Industrial OT</span><span class="net-chip">FREE</span></div>
+    <h1>BACnet MS/TP — token-passing RS-485</h1>
+    <p>BACnet MS/TP (Master-Slave / Token-Passing) runs the BACnet application protocol over RS-485. Only the node holding the token may transmit. Distinctive trait: watch the <strong>amber token chip pass between nodes</strong> before any data frame is allowed onto the bus. Default 76,800 baud — slow enough that you can see the token rotation cycle.</p>
+  </section>
+
+  <section class="net-section"><h2>Animation</h2>
+    <div class="anim-cluster">
+      <div class="anim-controls" role="toolbar">
+        <button id="playBtn">▶ Play</button><button id="pauseBtn">❚❚ Pause</button>
+        <button id="muteBtn">SFX <span class="mute-state" id="muteState">muted</span></button>
+        <span style="margin-left:auto;color:var(--wire);" id="frameLabel">frame 0</span>
+      </div>
+      <canvas id="animCanvas" width="800" height="320"></canvas>
+    </div>
+    <div class="param-grid">
+      <div><label for="paramBaud">Baud rate</label>
+        <select id="paramBaud">
+          <option value="9600">9,600</option>
+          <option value="19200">19,200</option>
+          <option value="38400">38,400</option>
+          <option value="76800" selected>76,800 (typical)</option>
+          <option value="115200">115,200 (max common)</option>
+        </select></div>
+      <div><label for="paramNodes">Nodes on bus</label>
+        <div class="param-row"><input type="range" id="paramNodes" min="2" max="6" value="3" step="1"><input type="number" id="paramNodesNum" min="2" max="6" value="3"></div></div>
+      <div><label for="paramData">Data payload bytes</label>
+        <div class="param-row"><input type="range" id="paramData" min="2" max="40" value="8" step="1"><input type="number" id="paramDataNum" min="2" max="40" value="8"></div></div>
+      <div><label for="paramNoise">Line noise %</label>
+        <div class="param-row"><input type="range" id="paramNoise" min="0" max="30" value="0" step="1"><input type="number" id="paramNoiseNum" min="0" max="30" value="0"></div></div>
+    </div>
+    <div id="scrubberLive" class="live-region" aria-live="polite"></div>
+  </section>
+
+  <section class="net-section"><h2>Engineering pitfalls</h2>
+    <details class="net-accord"><summary>Mixed baud rates on the same segment</summary><p>BACnet MS/TP requires every node on a segment to use the same baud. One mis-configured node = the whole segment goes silent. Always document baud as part of commissioning.</p></details>
+    <details class="net-accord"><summary>Token-rotation timeout under-provisioned</summary><p>If a node drops out, the master waits for token timeout before initiating recovery. Set too short = false drops; too long = service interruption while bus reconfigures. Tune per node count.</p></details>
+    <details class="net-accord"><summary>Max-master setting incorrect</summary><p>Each node has a <code>Max_Master</code> property that defines the highest MAC address it polls for the token. Set lower than your actual highest MAC and that node is invisible. Audit against the device-list during install.</p></details>
+    <details class="net-accord"><summary>Reply-too-late frames cause re-poll storms</summary><p>If a slave replies after the token has rotated away, the master treats the reply as garbage and re-polls. Storm = effective bus collapse. Check reply timing against the baud-derived character time budget.</p></details>
+  </section>
+
+  <section class="net-section"><h2>References</h2>
+    <details class="net-accord"><summary>Primary sources</summary><ul>
+      <li>ASHRAE 135 — <em>BACnet — A Data Communication Protocol for Building Automation and Control Networks</em>.</li>
+      <li>ASHRAE 135 Annex H — <em>MS/TP Master-Slave/Token-Passing</em>.</li>
+      <li>TIA-485-A — <em>Electrical characteristics of RS-485 differential transmitters</em>.</li>
+    </ul></details>
+  </section>
+
+  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);"><span id="versionStamp">· ResistanceZero · v?.?.? ·</span></footer>
+</main>
+
+<script src="../../js/network-anim/palette.js?v=20260524"></script>
+<script src="../../js/network-anim/audio.js?v=20260524"></script>
+<script src="../../js/network-anim/renderer.js?v=20260524"></script>
+<script src="../../js/network-anim/vfx.js?v=20260524"></script>
+<script src="../../js/network-anim/engine.js?v=20260524"></script>
+<script src="../../js/network-anim/topics/bacnet-mstp.js?v=20260524"></script>
+<script src="../../js/rz-version.js?v=20260524"></script>
+<script>
+(function () {
+  var canvas = document.getElementById('animCanvas'); if (!canvas) return;
+  var live = document.getElementById('scrubberLive'); var frameLabel = document.getElementById('frameLabel');
+  var signals = { onSFX: function () {} };
+  var instance = window.RZNetAnim.bacnetMstp.init(canvas, {}, signals);
+  var engine = window.RZNetAnim.engine.create(instance, { signals: signals });
+  document.getElementById('playBtn').onclick = function () { window.RZNetAnim.audio.init(); instance.play(); };
+  document.getElementById('pauseBtn').onclick = function () { instance.pause(); };
+  var muted = true, ms = document.getElementById('muteState');
+  document.getElementById('muteBtn').onclick = function () { muted = !muted; window.RZNetAnim.audio.setMuted(muted); ms.textContent = muted ? 'muted' : 'on'; ms.classList.toggle('on', !muted); };
+  function pushParams() { instance.setParams({ baudRate: +document.getElementById('paramBaud').value, nodeCount: +document.getElementById('paramNodes').value, dataBytes: +document.getElementById('paramData').value, lineNoise: +document.getElementById('paramNoise').value }); }
+  document.getElementById('paramBaud').onchange = pushParams;
+  ['paramNodes', 'paramData', 'paramNoise'].forEach(function (id) {
+    var r = document.getElementById(id), n = document.getElementById(id + 'Num');
+    r.oninput = function () { n.value = r.value; pushParams(); };
+    n.oninput = function () { r.value = n.value; pushParams(); };
+  });
+  function uiTick() { frameLabel.textContent = 'frame ' + engine._debugFrameCount(); requestAnimationFrame(uiTick); }
+  uiTick();
+  (function () { var el = document.getElementById('versionStamp'); if (el) el.textContent = '· ResistanceZero · v' + (window.RZ_VERSION || '1.x.x') + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·'; })();
+})();
+</script>
+</body></html>

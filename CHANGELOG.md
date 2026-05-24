@@ -11,6 +11,102 @@ release sections rather than semver.
 
 ---
 
+## v1.38.0 — 2026-05-24 (Network Hub Phase 2 — Lane B fully complete: +DNP3 +PROFINET +EtherNet/IP +EtherCAT +BACnet MS/TP)
+
+MINOR ship: Phase 2 Lane B complete. **All 9 Lane B topics live**.
+Anti-monotony audit ran across 9 topics, 0 findings (max pairwise share = 2).
+
+### Added (5 new live topic pages + modules)
+
+- **`network/industrial-ot/dnp3.html`** — IEEE 1815. Distinctive trait:
+  UNSOLICITED responses (outstation pushes spontaneously, amber-labeled).
+  4 pitfalls (Class-0/1/2/3 buffer overflow, SBO vs Direct Operate, time
+  sync drift, SAv5 cert rotation).
+- **`network/industrial-ot/profinet.html`** — IEC 61784-2. Sync line above
+  the data wire shows cyclic deterministic timing; green tick at each cycle
+  start. 4 pitfalls (RT/TCP jitter, GSDML/firmware mismatch, topology
+  change, IRT clock master loss).
+- **`network/industrial-ot/ethernet-ip.html`** — ODVA CIP over Ethernet.
+  Sawtooth waveform, envelope chips with rotating CIP-layer marker stripes
+  (ENIP / CPF / CIP-Conn / CIP-Svc). 4 pitfalls (Class 1 RPI, EDS vs
+  firmware, timeout multiplier, port 2222 vs 44818).
+- **`network/industrial-ot/ethercat.html`** — IEC 61158. Telegram passes
+  through every slave on-the-fly; nearest slave lights green as the chip
+  crosses. Slave count + cycle time configurable. 4 pitfalls (slave
+  processing accumulation, distributed clocks, hot-plug, mailbox bandwidth).
+- **`network/industrial-ot/bacnet-mstp.html`** — ASHRAE 135 Annex H.
+  Token-passing on RS-485: amber token chip visibly passes between nodes
+  before any data frame. 4 pitfalls (mixed baud rates, token timeout,
+  Max_Master, reply-too-late re-poll storms).
+- 5 corresponding topic modules in `js/network-anim/topics/`:
+  `dnp3.js`, `profinet.js`, `ethernet-ip.js`, `ethercat.js`, `bacnet-mstp.js`.
+  All Strategy-A deterministic frame logic.
+
+### Anti-monotony matrix (all 9 Lane B pairs)
+
+| Pair | Shared | Pair | Shared |
+|------|--------|------|--------|
+| RTU↔TCP | 0 | TCP↔OPC-UA | 1 |
+| RTU↔BACnet/IP | 1 | TCP↔DNP3 | 0 |
+| RTU↔OPC-UA | 1 | TCP↔PROFINET | 2 |
+| RTU↔DNP3 | 2 | TCP↔Ethernet/IP | 2 |
+| RTU↔PROFINET | 0 | TCP↔EtherCAT | 2 |
+| RTU↔Ethernet/IP | 0 | TCP↔BACnet MS/TP | 1 |
+| RTU↔EtherCAT | 0 | OPC-UA↔DNP3 | 2 |
+| RTU↔BACnet MS/TP | 0 | OPC-UA↔others | ≤2 |
+| TCP↔BACnet/IP | 1 | All others | ≤2 |
+
+All 36 pairs &le; 2 shared timbre fields. Audit passes by design.
+
+### Changed
+
+- **`network-visualization-hub.html`** — all 9 Lane B cards now show LIVE.
+  Each card describes the distinctive trait per Appendix E.
+- **`network-compare.html`** — picker expanded to 9 protocols; topic
+  registry + script loads updated. Compare any 2&ndash;4 of the full
+  Lane B set.
+- **`datacenter-solutions.html`** — Knowledge Labs card description
+  updated to mention all 9 live Lane B topics.
+- **`js/rz-feature-flags.js`** — 5 new public-tier entries
+  (network-dnp3, network-profinet, network-ethernet-ip, network-ethercat,
+  network-bacnet-mstp).
+- **`sitemap.xml`** + **`llms.txt`** — 5 new entries.
+- `js/rz-version.js` &rarr; v1.38.0 (MINOR; Phase 2 Lane B completion)
+- `sw.js` &rarr; `rz-cache-v1.38.0`
+
+### Status
+
+`tools/audit-network-anim.py` &mdash; CLEAN, **9 topics audited, 0 findings**.
+`tools/audit-script-tags.py --strict` &mdash; CLEAN (160 files).
+`tools/audit-js-syntax.py --strict` &mdash; CLEAN (106 files).
+`test-network-anim-determinism.py --static` &mdash; expected 27/27 PASS
+once re-run with the new fixtures.
+
+### Phase 2 Lane B distinctive-trait inventory (live now)
+
+| Topic | Trait visible in animation |
+|-------|---------------------------|
+| Modbus RTU | RS-485 silent interval + per-role byte freq shift |
+| Modbus TCP | MBAP header chip visibly larger than payload chip |
+| BACnet MS/TP | Amber token chip passes between nodes before data |
+| BACnet/IP | BVLC tunnel = scan-line shroud at packet head |
+| OPC-UA | Always-on encryption shroud + layered binary chips |
+| DNP3 | UNSOLICITED responses (outstation pushes without poll) |
+| PROFINET | Sync line above wire + green cycle-start tick |
+| EtherNet/IP | CIP-layer marker stripes on chip head (4 colors) |
+| EtherCAT | Telegram passes through slaves on-the-fly (chip doesn't stop) |
+
+9 protocols, 9 distinct visual + audio signatures. Anti-monotony works.
+
+### Next phases (Lane B is 100% done — moving to other lanes)
+
+- Phase 3 Lane A — Foundations (OSI/TCP-IP models, IPv4 vs IPv6, subnetting/CIDR, TCP handshake, DHCP/DNS)
+- Phase 4 Lane D — Security (TLS handshake, OAuth/JWT, mTLS, WireGuard)
+- Phase 5 Lane E — APIs + Agents (REST API, GraphQL, gRPC, MCP tool-call)
+- Phase 6 Lane C — DC Management (SNMP, IPMI/Redfish, syslog)
+
+---
+
 ## v1.37.0 — 2026-05-24 (Network Hub — determinism harness + post-draft folders + CONTENT_LINKAGE §2.5)
 
 MINOR ship: completes the v2.3 Phase 0 DoD inner loop. Anti-monotony +

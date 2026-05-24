@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EtherCAT · Network Hub · ResistanceZero</title>
+<meta name="description" content="Interactive animated visualisation of EtherCAT — telegram passes through every slave on-the-fly. Distributed clocks, ultra-fast cycle times.">
+<link rel="canonical" href="https://resistancezero.com/network/industrial-ot/ethercat.html">
+<link rel="icon" href="../../assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="../../styles.min.css?v=20260524">
+<style>
+  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --wire:#475569; --canvas-bg:#0F172A; }
+  .net-hero { padding:3rem 1.5rem 1.5rem; max-width:1100px; margin:0 auto; }
+  .net-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.6rem,3vw,2.2rem); margin:0 0 0.5rem; }
+  .chip-meta { display:inline-flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .net-chip { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; padding:0.2rem 0.5rem; border:0.8px solid var(--wire); color:var(--cyan); background:rgba(0,221,255,0.04); border-radius:2px; text-transform:uppercase; }
+  .net-section { max-width:1100px; margin:0 auto; padding:1.5rem; }
+  .net-section h2 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.2rem; margin:0 0 0.8rem; }
+  .anim-cluster { border:1px solid var(--wire); border-radius:4px; background:var(--canvas-bg); overflow:hidden; margin:1rem 0; }
+  .anim-controls { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.8rem; border-bottom:0.8px solid rgba(255,255,255,0.08); background:#0a1220; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem; }
+  .anim-controls button { font-family:inherit; font-size:0.78rem; background:transparent; color:var(--cyan); border:0.8px solid var(--wire); padding:0.3rem 0.7rem; cursor:pointer; border-radius:2px; letter-spacing:0.04em; text-transform:uppercase; }
+  .anim-controls button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+  .anim-controls .mute-state { color:var(--wire); } .anim-controls .mute-state.on { color:var(--green); }
+  #animCanvas { display:block; width:100%; height:320px; background:var(--canvas-bg); }
+  .param-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.8rem 1.2rem; margin-top:1rem; }
+  .param-grid label { display:block; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--wire); text-transform:uppercase; margin-bottom:0.2rem; }
+  .param-grid select, .param-grid input[type=number] { width:100%; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; padding:0.35rem 0.5rem; border:0.8px solid var(--wire); background:transparent; color:inherit; border-radius:2px; }
+  .param-grid input[type=range] { width:100%; } .param-row { display:flex; align-items:center; gap:0.5rem; } .param-row input[type=number] { width:80px; }
+  details.net-accord { border:0.8px solid var(--wire); border-radius:4px; margin:0.6rem 0; padding:0.7rem 1rem; }
+  details.net-accord > summary { cursor:pointer; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; color:var(--cyan); }
+  .live-region { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<header class="navbar"><div class="nav-container"><a href="../../index.html" class="logo">ResistanceZero</a><nav class="nav-right"><a href="../../network-visualization-hub.html">Network Hub</a><a href="../../datacenter-solutions.html#knowledge-labs">Knowledge Labs</a></nav></div></header>
+
+<main>
+  <section class="net-hero">
+    <div class="chip-meta"><span class="net-chip">IEC 61158</span><span class="net-chip">Lane B · Industrial OT</span><span class="net-chip">FREE</span></div>
+    <h1>EtherCAT — telegram passes through, on-the-fly</h1>
+    <p>EtherCAT (Ethernet for Control Automation Technology) takes a radically different approach: the master sends a single telegram that <strong>passes through every slave on-the-fly</strong>. Each slave reads and modifies its bytes as the frame transits — no stop, no store-and-forward. Watch the chip travel along the bus-trunk; the nearest slave lights up green as the telegram crosses it.</p>
+  </section>
+
+  <section class="net-section"><h2>Animation</h2>
+    <div class="anim-cluster">
+      <div class="anim-controls" role="toolbar">
+        <button id="playBtn">▶ Play</button><button id="pauseBtn">❚❚ Pause</button>
+        <button id="muteBtn">SFX <span class="mute-state" id="muteState">muted</span></button>
+        <span style="margin-left:auto;color:var(--wire);" id="frameLabel">frame 0</span>
+      </div>
+      <canvas id="animCanvas" width="800" height="320"></canvas>
+    </div>
+    <div class="param-grid">
+      <div><label for="paramCycle">Cycle time (ms)</label>
+        <select id="paramCycle">
+          <option value="0.25">0.25 (motion control, ultra-fast)</option>
+          <option value="1" selected>1 (default)</option>
+          <option value="4">4 (process)</option>
+        </select></div>
+      <div><label for="paramSlaves">Slave count</label>
+        <div class="param-row"><input type="range" id="paramSlaves" min="2" max="8" value="4" step="1"><input type="number" id="paramSlavesNum" min="2" max="8" value="4"></div></div>
+      <div><label for="paramNoise">Line noise %</label>
+        <div class="param-row"><input type="range" id="paramNoise" min="0" max="30" value="0" step="1"><input type="number" id="paramNoiseNum" min="0" max="30" value="0"></div></div>
+    </div>
+    <div id="scrubberLive" class="live-region" aria-live="polite"></div>
+  </section>
+
+  <section class="net-section"><h2>Engineering pitfalls</h2>
+    <details class="net-accord"><summary>Slave processing time accumulates along the chain</summary><p>Each slave adds ~100-300 ns to the telegram pass-through. A 100-slave chain adds 10-30 µs of cumulative delay. For sub-millisecond cycle times, audit your chain length against the slave processing-time specs.</p></details>
+    <details class="net-accord"><summary>Distributed Clocks (DC) compensation</summary><p>EtherCAT's DC mechanism compensates for propagation delay. If a slave doesn't support DC and you have axes that need it, you'll see motion synchronisation errors. Verify DC capability of every slave on the bus.</p></details>
+    <details class="net-accord"><summary>Topology change mid-runtime</summary><p>Hot-plugging slaves into a running EtherCAT bus requires Hot Connect or Cable Redundancy modes. Plugging without these = master stops the entire chain on slave-count mismatch. Plan for it explicitly.</p></details>
+    <details class="net-accord"><summary>Mailbox protocols (CoE / EoE / FoE) on the same chain</summary><p>CANopen-over-EtherCAT (CoE), Ethernet-over-EtherCAT (EoE), File-over-EtherCAT (FoE) all coexist. Misallocating bandwidth (e.g. EoE flooding during cyclic operation) starves the cyclic channel. Configure mailbox slot timing carefully.</p></details>
+  </section>
+
+  <section class="net-section"><h2>References</h2>
+    <details class="net-accord"><summary>Primary sources</summary><ul>
+      <li>IEC 61158-3-12 / 61158-4-12 / 61158-5-12 / 61158-6-12 — <em>EtherCAT specification</em>.</li>
+      <li>EtherCAT Technology Group (ETG) — <em>EtherCAT Specification</em>.</li>
+      <li>IEEE 802.1AS — <em>Time-Sensitive Networking for Distributed Clocks</em>.</li>
+    </ul></details>
+  </section>
+
+  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);"><span id="versionStamp">· ResistanceZero · v?.?.? ·</span></footer>
+</main>
+
+<script src="../../js/network-anim/palette.js?v=20260524"></script>
+<script src="../../js/network-anim/audio.js?v=20260524"></script>
+<script src="../../js/network-anim/renderer.js?v=20260524"></script>
+<script src="../../js/network-anim/vfx.js?v=20260524"></script>
+<script src="../../js/network-anim/engine.js?v=20260524"></script>
+<script src="../../js/network-anim/topics/ethercat.js?v=20260524"></script>
+<script src="../../js/rz-version.js?v=20260524"></script>
+<script>
+(function () {
+  var canvas = document.getElementById('animCanvas'); if (!canvas) return;
+  var live = document.getElementById('scrubberLive'); var frameLabel = document.getElementById('frameLabel');
+  var signals = { onSFX: function () {} };
+  var instance = window.RZNetAnim.ethercat.init(canvas, {}, signals);
+  var engine = window.RZNetAnim.engine.create(instance, { signals: signals });
+  document.getElementById('playBtn').onclick = function () { window.RZNetAnim.audio.init(); instance.play(); };
+  document.getElementById('pauseBtn').onclick = function () { instance.pause(); };
+  var muted = true, ms = document.getElementById('muteState');
+  document.getElementById('muteBtn').onclick = function () { muted = !muted; window.RZNetAnim.audio.setMuted(muted); ms.textContent = muted ? 'muted' : 'on'; ms.classList.toggle('on', !muted); };
+  function pushParams() { instance.setParams({ cycleMs: +document.getElementById('paramCycle').value, slaveCount: +document.getElementById('paramSlaves').value, lineNoise: +document.getElementById('paramNoise').value }); }
+  document.getElementById('paramCycle').onchange = pushParams;
+  ['paramSlaves', 'paramNoise'].forEach(function (id) {
+    var r = document.getElementById(id), n = document.getElementById(id + 'Num');
+    r.oninput = function () { n.value = r.value; pushParams(); };
+    n.oninput = function () { r.value = n.value; pushParams(); };
+  });
+  function uiTick() { frameLabel.textContent = 'frame ' + engine._debugFrameCount(); requestAnimationFrame(uiTick); }
+  uiTick();
+  (function () { var el = document.getElementById('versionStamp'); if (el) el.textContent = '· ResistanceZero · v' + (window.RZ_VERSION || '1.x.x') + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·'; })();
+})();
+</script>
+</body></html>

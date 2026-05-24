@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNP3 · Network Hub · ResistanceZero</title>
+<meta name="description" content="Interactive animated visualisation of DNP3 — telemetry SCADA protocol with unsolicited responses. Parameter-driven, oscilloscope-grade.">
+<link rel="canonical" href="https://resistancezero.com/network/industrial-ot/dnp3.html">
+<link rel="icon" href="../../assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="stylesheet" href="../../styles.min.css?v=20260524">
+<style>
+  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --wire:#475569; --canvas-bg:#0F172A; }
+  .net-hero { padding:3rem 1.5rem 1.5rem; max-width:1100px; margin:0 auto; }
+  .net-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.6rem,3vw,2.2rem); margin:0 0 0.5rem; }
+  .chip-meta { display:inline-flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .net-chip { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; padding:0.2rem 0.5rem; border:0.8px solid var(--wire); color:var(--cyan); background:rgba(0,221,255,0.04); border-radius:2px; text-transform:uppercase; }
+  .net-section { max-width:1100px; margin:0 auto; padding:1.5rem; }
+  .net-section h2 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.2rem; margin:0 0 0.8rem; }
+  .anim-cluster { border:1px solid var(--wire); border-radius:4px; background:var(--canvas-bg); overflow:hidden; margin:1rem 0; }
+  .anim-controls { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.8rem; border-bottom:0.8px solid rgba(255,255,255,0.08); background:#0a1220; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem; }
+  .anim-controls button { font-family:inherit; font-size:0.78rem; background:transparent; color:var(--cyan); border:0.8px solid var(--wire); padding:0.3rem 0.7rem; cursor:pointer; border-radius:2px; letter-spacing:0.04em; text-transform:uppercase; }
+  .anim-controls button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+  .anim-controls .mute-state { color:var(--wire); } .anim-controls .mute-state.on { color:var(--green); }
+  #animCanvas { display:block; width:100%; height:320px; background:var(--canvas-bg); }
+  .param-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.8rem 1.2rem; margin-top:1rem; }
+  .param-grid label { display:block; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--wire); text-transform:uppercase; margin-bottom:0.2rem; }
+  .param-grid select, .param-grid input[type=number] { width:100%; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; padding:0.35rem 0.5rem; border:0.8px solid var(--wire); background:transparent; color:inherit; border-radius:2px; }
+  .param-grid input[type=range] { width:100%; } .param-row { display:flex; align-items:center; gap:0.5rem; } .param-row input[type=number] { width:80px; }
+  details.net-accord { border:0.8px solid var(--wire); border-radius:4px; margin:0.6rem 0; padding:0.7rem 1rem; }
+  details.net-accord > summary { cursor:pointer; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.85rem; color:var(--cyan); }
+  .live-region { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<header class="navbar"><div class="nav-container"><a href="../../index.html" class="logo">ResistanceZero</a><nav class="nav-right"><a href="../../network-visualization-hub.html">Network Hub</a><a href="../../datacenter-solutions.html#knowledge-labs">Knowledge Labs</a></nav></div></header>
+
+<main>
+  <section class="net-hero">
+    <div class="chip-meta"><span class="net-chip">IEEE 1815</span><span class="net-chip">Lane B · Industrial OT</span><span class="net-chip">FREE</span></div>
+    <h1>DNP3 — telemetry SCADA with unsolicited responses</h1>
+    <p>DNP3 (Distributed Network Protocol, IEEE 1815) is the workhorse of substation telemetry and water/wastewater SCADA. Distinctive trait visible in the animation: <strong>unsolicited responses</strong> — the outstation pushes event data spontaneously without a poll, marked with an amber UNSOLICITED label.</p>
+  </section>
+
+  <section class="net-section"><h2>Animation</h2>
+    <div class="anim-cluster">
+      <div class="anim-controls" role="toolbar">
+        <button id="playBtn">▶ Play</button><button id="pauseBtn">❚❚ Pause</button>
+        <button id="muteBtn">SFX <span class="mute-state" id="muteState">muted</span></button>
+        <span style="margin-left:auto;color:var(--wire);" id="frameLabel">frame 0</span>
+      </div>
+      <canvas id="animCanvas" width="800" height="320"></canvas>
+    </div>
+    <div class="param-grid">
+      <div><label for="paramUnsol">Unsolicited responses</label>
+        <select id="paramUnsol"><option value="true" selected>Enabled</option><option value="false">Disabled (poll-only)</option></select></div>
+      <div><label for="paramPayload">Payload bytes</label>
+        <div class="param-row"><input type="range" id="paramPayload" min="1" max="100" value="8" step="1"><input type="number" id="paramPayloadNum" min="1" max="100" value="8"></div></div>
+      <div><label for="paramNoise">Line noise %</label>
+        <div class="param-row"><input type="range" id="paramNoise" min="0" max="30" value="0" step="1"><input type="number" id="paramNoiseNum" min="0" max="30" value="0"></div></div>
+    </div>
+    <div id="scrubberLive" class="live-region" aria-live="polite"></div>
+  </section>
+
+  <section class="net-section"><h2>Engineering pitfalls</h2>
+    <details class="net-accord"><summary>Class-0/1/2/3 event-data overflow</summary><p>If the outstation collects more events than its buffer can hold between polls, the master gets a partial dataset. Always set unsolicited mode for Class-1/2/3 events; reserve polls for Class-0 static data only.</p></details>
+    <details class="net-accord"><summary>Confirm-on-data vs select-before-operate</summary><p>DNP3 SBO (Select-Before-Operate) is mandatory for control outputs. Skip the Select and you'll get a Direct Operate, which removes the safety checkpoint. Audit your control sequence logs quarterly.</p></details>
+    <details class="net-accord"><summary>Time synchronisation drift</summary><p>DNP3 time-stamps events at the outstation. If the outstation clock drifts &gt; 1 s from master, event correlation across substations becomes useless. Pair with IRIG-B or NTP on the outstation backplane.</p></details>
+    <details class="net-accord"><summary>Secure Authentication (SAv5) certificate rotation</summary><p>IEEE 1815-2012 added SAv5 for cryptographic authentication. Certificates expire. A SAv5 deployment without a cert-rotation runbook will silently degrade to authentication failures in 2-3 years.</p></details>
+  </section>
+
+  <section class="net-section"><h2>References</h2>
+    <details class="net-accord"><summary>Primary sources</summary><ul>
+      <li>IEEE 1815-2012 — <em>Distributed Network Protocol</em>.</li>
+      <li>IEEE 1815.1 — <em>Secure Authentication</em>.</li>
+      <li>NERC CIP-005-7 — <em>Electronic Security Perimeters</em> (DNP3 trust boundaries).</li>
+    </ul></details>
+  </section>
+
+  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);"><span id="versionStamp">· ResistanceZero · v?.?.? ·</span></footer>
+</main>
+
+<script src="../../js/network-anim/palette.js?v=20260524"></script>
+<script src="../../js/network-anim/audio.js?v=20260524"></script>
+<script src="../../js/network-anim/renderer.js?v=20260524"></script>
+<script src="../../js/network-anim/vfx.js?v=20260524"></script>
+<script src="../../js/network-anim/engine.js?v=20260524"></script>
+<script src="../../js/network-anim/topics/dnp3.js?v=20260524"></script>
+<script src="../../js/rz-version.js?v=20260524"></script>
+<script>
+(function () {
+  var canvas = document.getElementById('animCanvas'); if (!canvas) return;
+  var live = document.getElementById('scrubberLive'); var frameLabel = document.getElementById('frameLabel');
+  var lastPhase = '';
+  var signals = { onSFX: function (e, s, c) {
+    if (c && c.role && e === 'byte') { var pt = c.role + '-byte'; if (pt !== lastPhase) { lastPhase = pt; if (live) live.textContent = 'Phase: ' + c.role + ' transmitting'; } }
+    else if (e === 'ack') { if (live) live.textContent = 'Phase: ACK'; lastPhase = 'ack'; }
+  }};
+  var instance = window.RZNetAnim.dnp3.init(canvas, {}, signals);
+  var engine = window.RZNetAnim.engine.create(instance, { signals: signals });
+  document.getElementById('playBtn').onclick = function () { window.RZNetAnim.audio.init(); instance.play(); };
+  document.getElementById('pauseBtn').onclick = function () { instance.pause(); };
+  var muted = true, ms = document.getElementById('muteState');
+  document.getElementById('muteBtn').onclick = function () { muted = !muted; window.RZNetAnim.audio.setMuted(muted); ms.textContent = muted ? 'muted' : 'on'; ms.classList.toggle('on', !muted); };
+  function pushParams() { instance.setParams({ enableUnsolicited: document.getElementById('paramUnsol').value === 'true', payloadBytes: +document.getElementById('paramPayload').value, lineNoise: +document.getElementById('paramNoise').value }); }
+  document.getElementById('paramUnsol').onchange = pushParams;
+  ['paramPayload', 'paramNoise'].forEach(function (id) {
+    var r = document.getElementById(id), n = document.getElementById(id + 'Num');
+    r.oninput = function () { n.value = r.value; pushParams(); };
+    n.oninput = function () { r.value = n.value; pushParams(); };
+  });
+  function uiTick() { frameLabel.textContent = 'frame ' + engine._debugFrameCount(); requestAnimationFrame(uiTick); }
+  uiTick();
+  (function () { var el = document.getElementById('versionStamp'); if (el) el.textContent = '· ResistanceZero · v' + (window.RZ_VERSION || '1.x.x') + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·'; })();
+})();
+</script>
+</body></html>

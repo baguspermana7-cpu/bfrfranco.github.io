@@ -342,6 +342,21 @@ window.RZ_FEATURE_FLAGS = {
   },
   'network-compare': {
     'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-dnp3': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-profinet': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-ethernet-ip': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-ethercat': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
+  },
+  'network-bacnet-mstp': {
+    'page-access':             { free: true,  demo: true,  pro: true, root: true  }
   }
 
 };

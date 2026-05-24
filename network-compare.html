@@ -114,8 +114,13 @@
     <div class="topic-picker" role="group" aria-label="Select protocols to compare">
       <label data-topic="modbus-rtu"><input type="checkbox" data-key="modbus-rtu"> Modbus RTU</label>
       <label data-topic="modbus-tcp"><input type="checkbox" data-key="modbus-tcp"> Modbus TCP</label>
+      <label data-topic="bacnet-mstp"><input type="checkbox" data-key="bacnet-mstp"> BACnet MS/TP</label>
       <label data-topic="bacnet-ip"><input type="checkbox" data-key="bacnet-ip"> BACnet/IP</label>
       <label data-topic="opc-ua"><input type="checkbox" data-key="opc-ua"> OPC-UA</label>
+      <label data-topic="dnp3"><input type="checkbox" data-key="dnp3"> DNP3</label>
+      <label data-topic="profinet"><input type="checkbox" data-key="profinet"> PROFINET</label>
+      <label data-topic="ethernet-ip"><input type="checkbox" data-key="ethernet-ip"> EtherNet/IP</label>
+      <label data-topic="ethercat"><input type="checkbox" data-key="ethercat"> EtherCAT</label>
       <div class="picker-actions">
         <span id="pickedCount">0 of 4</span>
         <button type="button" id="applyBtn">Apply</button>
@@ -143,7 +148,7 @@
 
 </main>
 
-<!-- Engine + all 4 live topic modules (lazy: only those picked will be init'd) -->
+<!-- Engine + all 9 live topic modules (Lane B Phase 2 complete) -->
 <script src="js/network-anim/palette.js?v=20260524"></script>
 <script src="js/network-anim/audio.js?v=20260524"></script>
 <script src="js/network-anim/renderer.js?v=20260524"></script>
@@ -151,8 +156,13 @@
 <script src="js/network-anim/engine.js?v=20260524"></script>
 <script src="js/network-anim/topics/modbus-rtu.js?v=20260524"></script>
 <script src="js/network-anim/topics/modbus-tcp.js?v=20260524"></script>
+<script src="js/network-anim/topics/bacnet-mstp.js?v=20260524"></script>
 <script src="js/network-anim/topics/bacnet-ip.js?v=20260524"></script>
 <script src="js/network-anim/topics/opc-ua.js?v=20260524"></script>
+<script src="js/network-anim/topics/dnp3.js?v=20260524"></script>
+<script src="js/network-anim/topics/profinet.js?v=20260524"></script>
+<script src="js/network-anim/topics/ethernet-ip.js?v=20260524"></script>
+<script src="js/network-anim/topics/ethercat.js?v=20260524"></script>
 <script src="js/rz-version.js?v=20260524"></script>
 
 <script>
@@ -164,10 +174,15 @@
 
   // Topic registry — maps slug → module + display name
   var TOPICS = {
-    'modbus-rtu': { mod: window.RZNetAnim.modbusRtu, name: 'Modbus RTU' },
-    'modbus-tcp': { mod: window.RZNetAnim.modbusTcp, name: 'Modbus TCP' },
-    'bacnet-ip':  { mod: window.RZNetAnim.bacnetIp,  name: 'BACnet/IP'  },
-    'opc-ua':     { mod: window.RZNetAnim.opcUa,     name: 'OPC-UA'    }
+    'modbus-rtu':  { mod: window.RZNetAnim.modbusRtu,  name: 'Modbus RTU'  },
+    'modbus-tcp':  { mod: window.RZNetAnim.modbusTcp,  name: 'Modbus TCP'  },
+    'bacnet-mstp': { mod: window.RZNetAnim.bacnetMstp, name: 'BACnet MS/TP' },
+    'bacnet-ip':   { mod: window.RZNetAnim.bacnetIp,   name: 'BACnet/IP'   },
+    'opc-ua':      { mod: window.RZNetAnim.opcUa,      name: 'OPC-UA'     },
+    'dnp3':        { mod: window.RZNetAnim.dnp3,       name: 'DNP3'       },
+    'profinet':    { mod: window.RZNetAnim.profinet,   name: 'PROFINET'   },
+    'ethernet-ip': { mod: window.RZNetAnim.ethernetIp, name: 'EtherNet/IP' },
+    'ethercat':    { mod: window.RZNetAnim.ethercat,   name: 'EtherCAT'   }
   };
 
   var activeInstances = [];   // [{ slug, instance, engine, panelEl, chipEls, frameEl }]
