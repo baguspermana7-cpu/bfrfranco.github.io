@@ -324,6 +324,11 @@ window.RZ_FEATURE_FLAGS = {
     'page-access':             { free: false, demo: false, pro: true, root: true  }
   },
 
+  /* ── AI Maintenance Workbench (product-shell prototype — v1.41.7 schema, v1.41.9) ── */
+  'ai-maintenance-workbench': {
+    'page-access':             { free: false, demo: false, pro: true, root: true  }
+  },
+
   /* ── Network Visualization Hub topics (Phase 0+; public tier) ── */
   'network-visualization-hub': {
     'page-access':             { free: true,  demo: true,  pro: true, root: true  }

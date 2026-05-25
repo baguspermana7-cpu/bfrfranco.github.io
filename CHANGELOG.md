@@ -11,6 +11,141 @@ release sections rather than semver.
 
 ---
 
+## v1.41.9 — 2026-05-26 (AI Maintenance Workbench Prototype — product-shell vertical slice)
+
+MINOR-ish in scope (new page) but shipped as PATCH on the v1.41.x
+ladder to avoid version collision with the parallel BMS v1.42.x track.
+
+Closes review-v3 Section 5 final position: *"The next leap is not more
+explanation. The next leap is one usable workbench slice that proves:
+signal → diagnosis → evidence → calculation → human decision → CMMS
+draft → field feedback → audit."*
+
+### Added — `ai-maintenance-workbench.html` (1,694 lines)
+
+Static product-shell prototype rendering the Maintenance Intelligence
+Workbench's first viewport. Grounded in the v1.41.7 JSON-schema
+contracts (`docs/contracts/`).
+
+**3-column app-shell layout** (desktop ≥1024px):
+- **Top bar**: Brand · Tenant/Site picker · User · theme · sign-out
+- **Left nav** (220px): Command · Cases · Assets · Planner ·
+  Technician · Knowledge · Models · Integrations · Audit · Admin
+- **Main pane**: active view renders here
+- **Right rail** (320px): Approval Queue · CMMS Draft Queue · Warnings
+
+Mobile: nav collapses to drawer, right rail stacks under main.
+
+**10 views** wired through `WB_STATE.activeView`:
+
+1. **Command Center** — 4 KPI tiles (3 At Risk · 7 Needs Review ·
+   4 Draft WO · 42 SLA Healthy), 5×4 asset-system risk heatmap
+   (cooling · power · fire · ICT · misc), DQ Issues strip,
+   Connector Health strip.
+2. **Cases / Triage Queue** — 5-row sortable table. Click row →
+   loads case detail.
+3. **Diagnostic Case Detail** — THE vertical slice for
+   DC-CDU01-000142 (CDU-PUMP-01 flow obstruction · F11.2 · SEV-1).
+   - Case header strip (asset · site · severity · state · owner ·
+     DQ score · evidence coverage · 3 action buttons)
+   - **5 evidence tabs**:
+     1. Telemetry (3 sensor channels with min/max/p50/p95 + SVG
+        sparklines suggesting flow obstruction)
+     2. FMECA / KG path (F11.2 → M-MEC-022 → S-FLOW-LOSS → A11.2-P
+        → 4 steps, each clickable with source_ref tooltip)
+     3. Top-3 fault hypotheses (calibrated confidence bars, model
+        confidence, source_confidence_tier, conformal set,
+        decision_route)
+     4. Comparable cases (3 historical case IDs + outcomes)
+     5. Source claims (4 evidence-claim rows: ASHRAE TC 9.9 §3.2,
+        Hydraulic Inst 14.3, vendor app note, OREDA 7e §7.2)
+   - **Calculation Panel**: fault · FMECA priority rank (144
+     ordinal) · expected risk P50 BLOCKED (effects chain incomplete)
+     · formula version · DQ score · model · validation scope ·
+     reviewer · decision routing
+   - **Recommendation Panel**: action · 4-step pack · spare
+     readiness · safety notes · approval route
+   - **CMMS Draft Preview** (collapsible accordion): title · priority
+     P2_critical · score breakdown (multi-factor) · work type · task
+     steps · required parts · lockout · downtime · state · idempotency key
+   - **Audit Timeline** (5-7 entries): case_created → dq_gate_passed
+     → hypothesis_emitted → recommendation_proposed → placeholder
+4. **Planner Board** — placeholder card with "Phase B" status pill
+5. **Technician Workbench** — placeholder
+6. **Knowledge / FMECA Admin** — placeholder
+7. **Model Monitor** — placeholder
+8. **Integrations Health** — placeholder
+9. **Audit & Reports** — placeholder
+10. **Admin / RBAC** — placeholder
+
+**Right rail (persistent)**:
+- 3-item Approval Queue (cases awaiting reviewer verdict)
+- 4-item CMMS Draft Queue (drafts awaiting planner approval)
+- 2-item Warnings (model drift, connector lag)
+
+**Mock state shape** mirrors v1.41.7 schemas: WB_STATE.cases items
+have fields matching `DiagnosticCase` schema (case_id, fault_hypotheses,
+state, severity, data_quality_score, evidence_coverage_score,
+recommendation_readiness, owner_role, etc.).
+
+**Auth gate**: page is Pro/Educator-tier (`page-access` feature flag
+added to `js/rz-feature-flags.js`). v1.41.8 single-dialog pattern
+respected (inline `.root-gate` + session-diagnostic strip; no double
+modal).
+
+**49 dark-mode rules**, 134/134 mobile responsive (passed strict
+audit), `wb-*` CSS prefix throughout (no global clash).
+
+### Wired
+
+- **`ai-engineering-maintenance.html`** — Workbench Preview section
+  bottom now has explicit "Open Workbench Prototype →" CTA linking
+  to the new page. Reading guide updated to flag v1.41.9 as the ship
+  that delivered the vertical slice.
+- **`datacenter-solutions.html`** — new strat-card "AI Maintenance
+  Workbench" (PROTO badge, instrument-cyan accent) added to
+  `#tools-ltc-featured` between the Maintenance Decode Lab card
+  and the placeholder. 5 strat-cards + 1 placeholder = 6 cards in
+  the section.
+- **`js/rz-feature-flags.js`** — new entry `ai-maintenance-workbench`
+  with `page-access: { free:false, demo:false, pro:true, root:true }`.
+
+### SEO + AI search wired
+
+- **`sitemap.xml`** &mdash; entry added (priority 0.8, weekly).
+- **`llms.txt`** &mdash; description added so AI assistants can find
+  the prototype when answering workbench-architecture questions.
+- **`search-index.json`** &mdash; 91st entry with 19 keywords.
+- **`assets/og/ai-maintenance-workbench.webp`** &mdash; OG card
+  generated (1200×630, instrument-cyan accent).
+- **`sw.js`** precache list extended.
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.9
+- `sw.js` &rarr; `rz-cache-v1.41.9`
+
+### Audits
+
+- `audit-script-tags.py --strict` &mdash; CLEAN (178 files)
+- `audit-js-syntax.py --strict` &mdash; CLEAN (108 files)
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 134 PASS / 0 FAIL
+- `audit-seo.py` &mdash; 0 required errors
+
+### Still deferred from review-v3 Sprint 4-5
+
+- Frontend hardening (inline-style → external, CSP plan, SRI on CDN)
+- Telemetry schema + synthetic fixtures (live data ingestion)
+- Model validation / calibration / conformal acceptance criteria
+- Product event taxonomy + analytics pipeline
+- Server-side RBAC / multi-tenant enforcement (multi-year)
+- Actual engine connecting to a CMMS connector (long lead)
+
+These remain in `docs/plans/2026-05-25-ai-maintenance-product-roadmap.md`.
+
+---
+
 ## v1.41.8 — 2026-05-26 (Double-login dialog fix on AI Maintenance page)
 
 PATCH ship: closes user-reported "double login" bug on

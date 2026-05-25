@@ -594,6 +594,37 @@ Root-access reference modules: ASHRAE / ANSI / ISO / NFPA / Uptime standards eng
  **
  
  
+ AI Maintenance Workbench **PROTO 
+ Product Shell · CDU Pump Vertical Slice · v1.41.9 
+ 
+ 
+ Static product-shell prototype for the Maintenance Intelligence Workbench. Full CDU/chiller-pump diagnostic vertical slice rendered from the v1.41.7 JSON-schema contracts: Fleet Command Center, Triage Queue, FMECA/KG path, fault hypotheses, CMMS draft, audit timeline. 
+ 
+
+ 
+- ** 3-column app-shell (nav + main + rail)
+ 
+- ** Full CDU-PUMP-01 diagnostic case (F11.2)
+ 
+- ** 5 evidence tabs: telemetry · KG · hypotheses · cases · claims
+ 
+- ** CMMS draft preview + audit timeline
+ 
+
+ 
+ 
+ Open Workbench Prototype **
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ **
+ 
+ 
  More Maintenance Tools SLOT 
  Future module registry slot 
  
@@ -63590,11 +63621,19 @@ Skip to main content
  
 
  
- **Reading guide:** these mocks are deliberately shallow. The next ship is one vertical
+ **Reading guide:** these three mocks are deliberately shallow. The next leap is one vertical
  **CDU / chiller pump** slice that exercises the full loop (telemetry → DQ gate → diagnosis →
  evidence → calculation panel → recommendation review → CMMS draft → technician feedback → audit
- → KG diff). Until that slice ships, the page calls itself *research basis + product concept*, not a
- production product.
+ → KG diff). **v1.41.9** ships that slice as a separate page.
+ 
+
+ 
+ 
+ 
+ ** Product Shell Prototype is live 
+ A static product-shell prototype renders the full vertical slice: CDU-PUMP-01 flow obstruction (F11.2) through Fleet Command Center → Triage Queue → Diagnostic Case Detail (5 evidence tabs, FMECA/KG path, fault hypotheses, CMMS draft, audit timeline). Mock data grounded in the v1.41.7 JSON-schema contracts. 
+ 
+ Open Workbench Prototype **
  
  
 
@@ -64428,6 +64467,10 @@ FK integrity, RPN arithmetic, and column-level provenance are clean. However, se
 This concept brief is for Pro and Educator accounts. Sign in to continue, or return to the DC Solutions hub.
 
  
+ **Current session:**
+ 
+ 
+ 
  Sign In 
  Back to DC Solutions
  
@@ -64443,381 +64486,1002 @@ We use cookies for analytics to improve your experience. Learn more
 
 
 ======================================================================
-# Changelog — Resistance Zero (v1.41.6 latest) — https://resistancezero.com/changelog.html
+# Maintenance Workbench Prototype | Resistance Zero — https://resistancezero.com/ai-maintenance-workbench.html
+
+> Maintenance Intelligence Workbench prototype: Fleet Command Center, Triage Queue, Diagnostic Case, CMMS draft, audit timeline. CDU/chiller-pump vertical slice.
+
+Fleet Command Center 
+ Datacenter Bekasi 1 — live risk snapshot (mock data, updated T-0) 
+
+ 
+ 
+ 
+ 3 
+ At Risk (SEV-1/2) 
+ 
+ 
+ 7 
+ Needs Review 
+ 
+ 
+ 4 
+ Draft WO 
+ 
+ 
+ 42 
+ SLA Healthy 
+ 
+ 
+
+ 
+ 
+ ** Asset System Risk Heatmap 
+ 
+ 
+ 
+ Unit 1 
+ Unit 2 
+ Unit 3 
+ Unit 4 
+ 
+ Cooling 
+ CDU 
+ CRAH 
+ CRAH 
+ Chiller 
+ 
+ Power 
+ UPS-A 
+ UPS-B 
+ SWG 
+ GEN-2 
+ 
+ Fire 
+ FM-200 
+ VESDA 
+ — 
+ — 
+ 
+ ICT 
+ Modbus 
+ BACnet 
+ OPC-UA 
+ Net 
+ 
+ Misc 
+ BMS 
+ Water 
+ BATT 
+ Sec 
+ 
+ 
+Legend: ■ Alert   ■ Warn   ■ OK   ■ N/A. Click cells for drill-down (Phase B).
+
+ 
+
+ 
+ 
+ ** Data Quality Issues (3) 
+ 
+ **
+ **CDU01.PUMP01.DP.STRAINER** — tag stale 42 s at T-07:22 UTC. Auto-recovered. DQ gate passed (stale Case ID
+ | Asset
+ | Severity
+ | Confidence
+ | DQ
+ | Owner
+ | State
+ | Action
+ |
+ 
+
+ 
+
+ 
+
+ | DC-CDU01-000142
+ | CDU-PUMP-01
+ | SEV-1 
+ | 
+ 
+ 0.87 
+ 
+ 
+ 
+ | 0.82
+ | reliability_eng
+ | needs_review 
+ | **Review 
+ |
+ 
+
+ | DC-UPS-A-000128
+ | UPS-A bypass
+ | SEV-2 
+ | 
+ 
+ 0.71 
+ 
+ 
+ 
+ | 0.94
+ | reliability_eng
+ | needs_review 
+ | Review 
+ |
+ 
+
+ | DC-GEN-2-000091
+ | Genset-2 day-tank
+ | INFO 
+ | 
+ 
+ 0.62 
+ 
+ 
+ 
+ | 0.55
+ | reliability_eng
+ | open 
+ | Review 
+ |
+ 
+
+ | DC-CRAH-12-000115
+ | CRAH-12 evap coil
+ | SEV-2 
+ | 
+ 
+ 0.79 
+ 
+ 
+ 
+ | 0.91
+ | planner
+ | approved 
+ | View 
+ |
+ 
+
+ | DC-BATT-3-000077
+ | Battery-String-3
+ | INFO 
+ | 
+ 
+ 0.55 
+ 
+ 
+ 
+ | 0.88
+ | reliability_eng
+ | archived 
+ | View 
+ |
+ 
+
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+ ** Back to Triage Queue
+ 
+ 
+
+ 
+ 
+ 
+ DC-CDU01-000142 
+ ** SEV-1 
+ needs_review 
+ ** Pro 
+ 
+ CDU-PUMP-01 — Abnormal Flow Signature (F11.2 Pump Flow Obstruction) 
+ 
+ Asset CDU-PUMP-01 
+ Site Datacenter Bekasi 1 
+ Owner reliability_engineer 
+ Created 2026-05-26 07:22 UTC 
+ DQ Score 0.82 (pass) 
+ Evidence Coverage 4 / 5 tabs 
+ Model rf_pump_v0.3 
+ Decision Route advisory_possible 
+ 
+ 
+ ** Approve draft 
+ ** Reject + reason 
+ ** Ask for more evidence 
+ 
+ 
+
+ 
+ 
+ ** Evidence Panel 
+ 
+ Telemetry 
+ FMECA / KG Path 
+ Fault Hypotheses 
+ Comparable Cases 
+ Source Claims 
+ 
+
+ 
+ 
+ 
+3 sensor channels. 24 h window. Mock sparklines — dip near T-0 consistent with partial flow obstruction.
+
+ 
+ 
+ 
+ CDU01.PUMP01.FLOW.SUCTION 
+ 4-20 mA · L/min 
+ 
+ 
+ 
+ 
+ 
+ min 182 
+ p50 221 
+ p95 228 
+ max 234 
+ 
+ 
+ 
+ 
+ CDU01.PUMP01.DP.STRAINER 
+ kPa differential 
+ 
+ 
+ 
+ 
+ min 18.4 
+ p50 24.1 
+ p95 32.7 
+ max 38.2 
+ 
+ 
+ 
+ 
+ CDU01.PUMP01.MOTOR.AMPS 
+ Amps 
+ 
+ 
+ 
+ 
+ min 14.1 
+ p50 15.8 
+ p95 17.3 
+ max 18.0 
+ 
+ 
+** Dashed line = anomaly detection boundary crossing. DP rising + flow falling = strainer obstruction signature (F11.2). Motor amps within normal envelope = not cavitation.
+
+ 
+
+ 
+ 
+ 
+KG traversal path for diagnosis. Hover source_ref for citation. 4 nodes from fault to action steps.
+
+ 
+ 
+ 
+ 
+ Fault (F) 
+ F11.2 — Pump flow obstruction (strainer fouled) 
+ source: fmeca-seed-row-823 · HI-14.3-T4 
+ 
+ 
+ 
+ 
+ 
+ Mechanism (M) 
+ M-MEC-022 — Particulate accumulation on suction strainer mesh 
+ source: OREDA-7e-§7.2-T44 · vendor-appnote-CDU-PM-003 
+ 
+ 
+ 
+ 
+ 
+ Symptom (S) 
+ S-FLOW-LOSS — Flow rate below P10 operational envelope + DP rising trend 
+ source: ASHRAE-TC9.9-§3.2-T4 
+ 
+ 
+ 
+ 
+ 
+ Action (A) 
+ A11.2-P — Strainer clean + DP-trend review (4 steps) 
+ source: vendor-PM-003-RevB · NFPA-70E-§120 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+Top-3 ranked fault hypotheses from rf_pump_v0.3. Calibrated via isotonic regression on 847-sample pump pilot dataset.
+
+ 
+ #1 
+ F11.2 
+ 
+ Pump flow obstruction — strainer fouled 
+ conformal_set: {F11.2, F11.3}  ·  decision_route: advisory_possible  ·  model_conf_calibrated: 0.87 
+ 
+ 
+ 0.87 
+ 
+ tier-1 
+ 
+ 
+ 
+ #2 
+ F11.3 
+ 
+ Incipient cavitation — NPSH margin low 
+ motor amps within envelope → low probability; DP profile inconsistent with vapour collapse 
+ 
+ 
+ 0.06 
+ 
+ tier-3 
+ 
+ 
+ 
+ #3 
+ F11.5 
+ 
+ Sensor fault — flow transmitter drift 
+ DP channel also flagging → dual-channel corroboration reduces sensor-fault probability 
+ 
+ 
+ 0.04 
+ 
+ tier-3 
+ 
+ 
+ 
+** Residual probability 0.03 distributed across F11.1, F11.7, and out-of-model faults.
+
+ 
+
+ 
+ 
+ 
+3 historical cases with similar pump flow signature. Used for conformal prediction set construction.
+
+ 
+ DC-CDU02-000088 
+ CDU-PUMP-02 flow drop + DP rise, site Bekasi 2. Closed 2025-11-04. Action: strainer clean (A11.2-P). Resolved within 2 h. 
+ ** Resolved 
+ 
+ 
+ DC-CDU05-000062 
+ CDU-PUMP-05 gradual flow decline over 8 h, different site. Closed 2025-08-17. Action: strainer clean + pump curve re-check. Root cause: debris from pipe joint repair. 
+ ** Resolved 
+ 
+ 
+ DC-CDU01-000031 
+ CDU-PUMP-01 same asset, earlier event 2024-12-09. Escalated to cavitation initially (F11.3 confounded). Revised diagnosis after strainer inspection confirmed F11.2. Duration 6 h. 
+ ** Escalated 
+ 
+ 
+
+ 
+ 
+ 
+4 evidence claims backing the F11.2 hypothesis. Each claim cites a specific section of a recognised standard or vendor document.
+
+ 
+ ** 
+ 
+ ASHRAE TC 9.9 §3.2 Table 4 — CDU Pump Acceptance Criteria 
+ Flow rate > 95 % of rated at rated DP. Observed: 86 % of rated. Exceeds alert threshold (90 %). Consistent with F11.2 partial obstruction. 
+ 
+ 
+ 
+ ** 
+ 
+ Hydraulic Institute Standard 14.3 Table 4 — Strainer DP Guidelines 
+ Clean strainer DP 25 kPa, whichever first. Last clean: 2026-02-11 (2634 hours ago). Both triggers exceeded. 
+ 
+ 
+ 
+ ** 
+ 
+ OREDA 7th Ed. §7.2 Table 7.2.1 — Pump Failure Mode Frequencies 
+ Flow obstruction (incl. strainer fouling) accounts for 31 % of pump demand failures in liquid-cooling service. Base rate consistency supports F11.2 as primary hypothesis. 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ ** Calculation Panel — fault risk priority (formula: risk.v0.2) 
+ 
+ **
+ 
+ BLOCKED — expected risk P50 not computed.** The effects.csv chain for F11.2 is incomplete in the current KG seed: the F11.2 → Effects → Action → Step → Safety chain is missing 2 intermediate links. Draft WO is blocked until the KG seed is repaired and re-validated. Advisory recommendation is still possible (advisory_possible route).
+
+ 
+ 
+ Fault ID F11.2 CDU pump flow obstruction 
+ FMECA priority rank 144 (ordinal) 
+ Expected risk P50 BLOCKED — effects.csv chain incomplete 
+ Formula risk.v0.2 
+ Inputs rejected none — DQ gate passed 
+ Data quality 0.82 (pass ≥0.70 threshold) 
+ Model rf_pump_v0.3 isotonic calibration 
+ Validation scope pump telemetry pilot only 
+ Reviewer queue reliability_engineer (queued) 
+ Decision advisory_possible — draft_wo blocked (KG incomplete) 
+ 
+ 
+
+ 
+ 
+ ** Recommendation — A11.2-P: Strainer clean + DP-trend review 
+ 
+ Action ID A11.2-P 
+ Work type Corrective / PM 
+ Spare readiness Filter 200µm: IN STOCK 
+ Approval route RE → Planner → Dispatch 
+ 
+ ** Safety Notes 
+ 
+ LOTO required before strainer access (NFPA 70E §120). Dewar coolant pressure release before strainer cap removal. Minimum PPE: chemical splash goggles + nitrile gloves. Two-person rule for coolant system opening.
+ 
+ ** Step Pack (4 steps) 
+ 
+
+ 
+- 
+ 1 
+ 
+ Isolate CDU-PUMP-01 and apply LOTO 
+ 
+ ** 15 min 
+ ** 2 × Mech Tech (cert. LOTO) 
+ ** LOTO kit, lockout tag 
+ 
+ 
+ 
+ 
+- 
+ 2 
+ 
+ Depressurise suction line + drain coolant to recovery drum 
+ 
+ ** 20 min 
+ ** Mech Tech 
+ ** Pressure gauge, drain hose, 20L drum 
+ 
+ 
+ 
+ 
+- 
+ 3 
+ 
+ Remove, inspect, and clean/replace filter cartridge 200µm 
+ 
+ ** 45 min 
+ ** Mech Tech 
+ ** Filter cartridge 200µm (qty 1), torque wrench, O-ring lubricant 
+ 
+ 
+ 
+ 
+- 
+ 4 
+ 
+ Re-fill, re-pressurise, restart CDU-PUMP-01 and verify DP 
+ 
+ 
+ CDU-PUMP-01 strainer clean + DP-trend review (advisory) 
+ 
+ Priority P2_critical 
+ Work type corrective 
+ State proposed 
+ Human approval required ✓ 
+ FMECA rank 144 
+ SLA tier tier-3 24/7 
+ Safety class general_industry 
+ Redundancy lost 
+ Spares stocked 
+ Task steps 4 
+ Required parts Filter cartridge 200µm, qty 1 
+ Lockout required yes (NFPA 70E §120) 
+ Est. downtime 2 h 
+ Idempotency key wo-cdu01-f112-20260526-0722 
+ 
+ 
+ Advisory notice:** This draft WO was generated by an AI advisory system. It must be reviewed and approved by a qualified reliability engineer and planner before execution. The AI system does not issue physical commands.
+ 
+ 
+ 
+ 
+
+ 
+ 
+ ** Audit Timeline — DC-CDU01-000142 
+ 
+ 
+ 
+ 
+ 2026-05-26T07:22:04Z 
+ case_created 
+ Actor: system (anomaly-detector v0.4). Subject: CDU01.PUMP01.FLOW.SUCTION below P10 threshold for 18 min. Outcome: case opened SEV-1. 
+ 
+ 
+ 
+ 
+ 
+ 2026-05-26T07:22:31Z 
+ dq_gate_passed 
+ Actor: dq-engine v0.6. DQ score: 0.82 (threshold 0.70). 3 channels evaluated. DP tag stale 42 s at T-07:22 — auto-recovered, within 90 s tolerance. Outcome: pass. 
+ 
+ 
+ 
+ 
+ 
+ 2026-05-26T07:22:47Z 
+ hypothesis_emitted 
+ Actor: rf_pump_v0.3 (isotonic calibration). Top hypothesis: F11.2 conf 0.87. Conformal set: {F11.2, F11.3}. Outcome: hypothesis stored, case queued for reviewer. 
+ 
+ 
+ 
+ 
+ 
+ 2026-05-26T07:23:02Z 
+ recommendation_proposed 
+ Actor: recommendation-engine v0.5. Action A11.2-P identified via KG traversal. Spare readiness confirmed (filter cartridge 200µm in stock). Draft WO status: proposed (blocked — KG effects chain incomplete). Outcome: advisory_possible, queued for reliability_engineer review. 
+ 
+ 
+ 
+ 
+ 
+ — pending — 
+ reviewer_decision 
+ Awaiting: reliability_engineer verdict (approve / reject / ask). Use buttons above to act. 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+ Planner / Work Orders 
+ Review and dispatch approved recommendations as CMMS work orders 
+ 
+ ** 
+ Planner View 
+ Drag-and-drop scheduler, work order approval queue, technician assignment, and downtime window picker. Draft WOs from the Triage Queue flow here for planner approval before CMMS push. 
+ ** Coming in Phase B — see roadmap 
+ 
+ 
+
+ 
+ 
+ Technician Field View 
+ Mobile-optimised field card for assigned work orders, LOTO checklist, and step-by-step execution 
+ 
+ ** 
+ Technician Field View 
+ Step-by-step task cards, LOTO checklist with sign-off, photo evidence upload, part scan, and completion sign-off. Designed for tablet or phone on the data-centre floor. 
+ ** Coming in Phase B — see roadmap 
+ 
+ 
+
+ 
+ 
+ Knowledge Admin 
+ Manage FMECA seed data, KG node/edge editing, and source-claim provenance 
+ 
+ ** 
+ Knowledge Admin 
+ FMECA table editor, KG graph visualiser (Neo4j-backed), effects.csv chain validator, and source-claim version history. The blocked F11.2 effects chain shown in Case Detail would be repaired here. 
+ ** Coming in Phase B — see roadmap 
+ 
+ 
+
+ 
+ 
+ Model Monitor 
+ Track ML model performance, calibration drift, and retraining schedules 
+ 
+ ** 
+ Model Monitor 
+ Per-model calibration curves, precision/recall over time, isotonic residual drift alerts, shadow-model comparison, and one-click retraining trigger. Currently tracking: rf_pump_v0.3 (active, drift +0.04). 
+ ** Coming in Phase B — see roadmap 
+ 
+ 
+
+ 
+ 
+ Integrations Health 
+ BMS / SCADA / CMMS / edge-gateway connector status and latency metrics 
+ 
+ ** 
+ Integrations Health 
+ Real-time connector status for BMS (OPC-UA), SCADA (Modbus/BACnet), CMMS (Maximo REST), edge gateways, and the CIGRE-API. SLA breach alerts, retry history, and manual re-sync triggers. 
+ ** Coming in Phase B — see roadmap 
+ 
+ 
+
+ 
+ 
+ Audit Log 
+ Immutable event log for all system actions, reviewer decisions, and CMMS pushes 
+ 
+ ** 
+ Audit Log 
+ Append-only audit trail: case lifecycle events, reviewer approvals/rejections, CMMS pushes, model calibration runs, KG edits, and admin RBAC changes. Filter by actor, event type, asset, and date range. Export to CSV or PDF. 
+ ** Coming in Phase B — see roadmap 
+ 
+ 
+
+ 
+ 
+ Admin / RBAC 
+ Multi-tenant user management, role assignments, and feature-flag overrides 
+ 
+ ** 
+ Admin / RBAC 
+ Tenant and site provisioning, user role assignment (reliability_engineer / planner / technician / viewer / admin), feature-flag per-tenant overrides, SSO configuration, and audit-log retention policies. 
+ ** Coming in Phase B — see roadmap
+
+
+======================================================================
+# Changelog — Resistance Zero (v1.41.9 latest) — https://resistancezero.com/changelog.html
 
 > Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.
 
-v1.41.6 
+v1.41.9 
  PATCH 
  May 26, 2026 
  
  
-AI Maintenance review-v3 response — Workbench Preview + capability gating + standards-doc safety fix
+AI Maintenance Workbench Prototype — product-shell vertical slice
 
  
  
-PATCH ship: addresses 9 of 10 "Recommended Immediate Edits" from
+MINOR-ish in scope (new page) but shipped as PATCH on the v1.41.x
 
 
-`Documents/AI maintenance/2026-05-26-ai-engineering-maintenance-in-progress-review-v3.md`
+ladder to avoid version collision with the parallel BMS v1.42.x track.
 
 
-Section 7, plus the P0.5 standards-doc safety contradiction.
+Closes review-v3 Section 5 final position: *"The next leap is not more
 
 
-`ai-engineering-maintenance.html` grows **1,662 → 1,838 lines** (+176)
+explanation. The next leap is one usable workbench slice that proves:
 
 
-without losing v1.40.0 / v1.41.3 framing.
+signal → diagnosis → evidence → calculation → human decision → CMMS
 
 
-### Phase A — Standards safety fix (review-v3 P0.5)
+draft → field feedback → audit."*
 
 
- 
-- **`standarization/KNOWLEDGE_BASE_STANDARD.md`** confidence-tier table
+### Added — ai-maintenance-workbench.html (1,694 lines)
 
 
-rewritten. `high` previously read *"Auto-action allowed within RPN
+Static product-shell prototype rendering the Maintenance Intelligence
 
 
-thresholds"* — a dangerous contradiction of the page-level
+Workbench's first viewport. Grounded in the v1.41.7 JSON-schema
 
 
-advisory-only posture. Now corrected:
+contracts (`docs/contracts/`).
 
 
- 
-- `high` → eligible for **draft recommendation / draft work-order
-
-
-only**; human approval required before any operational action.
-
-
-**No autonomous actuation, ever.**
+**3-column app-shell layout** (desktop ≥1024px):
 
 
  
-- `medium` → reliability-engineer review required before draft
+- **Top bar**: Brand · Tenant/Site picker · User · theme · sign-out
+ 
+- **Left nav** (220px): Command · Cases · Assets · Planner ·
 
 
-WO.
+Technician · Knowledge · Models · Integrations · Audit · Admin
 
 
  
-- `thin` → **analysis-only**, vendor outreach required; no draft WO.
+- **Main pane**: active view renders here
  
-- Standard now states explicitly: AI is advisory-only by default;
+- **Right rail** (320px): Approval Queue · CMMS Draft Queue · Warnings
 
 
-physical control remains in SIS / protection relays / BMS engineered
+Mobile: nav collapses to drawer, right rail stacks under main.
 
 
-sequences (IEC 61508 / 62443).
-
-
-### Phase B — Concept page reframe
-
-
-**1. Hero compressed (P0.1)** — large yellow warning block replaced
-
-
-with a 5-pill status strip (`Concept build` · `AI advisory-only` ·
-
-
-`No physical control` · `Research basis linked` · `Product roadmap`)
-
-
-plus an expandable details element retaining the full framing prose.
-
-
-**2. Workbench Preview section added (P0.1 + P0.3)** — new
-
-
-`#sec-workbench-preview` section above the paper hero with 3 static
-
-
-mock panels:
+**10 views** wired through `WB_STATE.activeView`:
 
 
  
-- **Fleet Command Center**: 4 KPI tiles (At Risk · Needs Review · Draft
+- **Command Center** — 4 KPI tiles (3 At Risk · 7 Needs Review ·
 
 
-WO · SLA Healthy) + connector status strip.
+4 Draft WO · 42 SLA Healthy), 5×4 asset-system risk heatmap
 
 
- 
-- **Triage Queue (top 3)**: 3 ranked cards (SEV-1 CDU pump · SEV-2 UPS
+(cooling · power · fire · ICT · misc), DQ Issues strip,
 
 
-bypass · INFO genset day-tank) with severity pill, confidence, DQ,
-
-
-owner, FMECA ID.
+Connector Health strip.
 
 
  
-- **Active Diagnostic Case**: header + evidence summary + FMECA rank
+- **Cases / Triage Queue** — 5-row sortable table. Click row →
 
 
-callout (with `effects.csv` chain warning) + 5 decision rows +
-
-
-3 action buttons ([Approve draft] / [Reject] / [Ask for more
-
-
-evidence]) + audit-trail note.
+loads case detail.
 
 
  
-- Section nav gets a `Workbench Preview` pill at position 0 so it's
+- **Diagnostic Case Detail** — THE vertical slice for
 
 
-the first link.
-
-
-**3. Capability Status Matrix added (P0.4 + P1.7 + P1.8)** — new
-
-
-chip grid inside Enhanced Engine section. 11 engine capabilities each
-
-
-labeled `available` / `pilot` / `spec needed` / `future` / `blocked
-
-
-by data`. RUL marked **blocked by data** (74/144 components lack MTBF;
-
-
-no run-to-failure data in seed). Conformal marked **blocked by data**
-
-
-(needs calibration set). CMMS draft marked **future** (needs connector
-
-
-contract + audit ledger).
-
-
-**4. Data completeness banner added (P0.4 + Section 7 item 7)**
-
-
-— amber banner near KB section showing concrete gaps:
+DC-CDU01-000142 (CDU-PUMP-01 flow obstruction · F11.2 · SEV-1).
 
 
  
-- 23/109 faults with no mapped action
- 
-- 67/109 faults with no documented effect
- 
-- 120/138 actions with no procedure steps
- 
-- 74/144 components with no typical MTBF
+- Case header strip (asset · site · severity · state · owner ·
 
 
-Banner introduces planned `recommendation_readiness` tier vocabulary
-
-
-(`analysis_only` → `advisory_possible` → `draft_wo_possible`
-
-
-→ `production_ready`).
-
-
-**5. Asset Registry added as 12th canonical screen (P1.2)** — freezes
-
-
-the IA at 12 screens. Asset Registry was missing from the 11-screen
-
-
-list despite being structurally required for tag mapping and the
-
-
-tenant / site / asset hierarchy.
-
-
-**6. Mode A / Mode B renamed to user tasks (P2.3)** — 8 sites
-
-
-across the page now read `Ask Knowledge Base (Mode A · API)` and
-
-
-`Analyze Telemetry Case (Mode B · Engine)` instead of pure
-
-
-implementation vocabulary. Old Mode A/B retained as parenthetical
-
-
-secondary label for continuity.
-
-
-**7. CMMS wording fix (P0.8)** — Gap #03 enhancement rewritten:
+DQ score · evidence coverage · 3 action buttons)
 
 
  
-- `auto-create WO` → **propose a draft work order**
- 
-- `criticality from RPN` → **priority recommendation derived from
+- **5 evidence tabs**:
 
 
-the risk engine (RPN ordinal × SLA × safety ×
+1. Telemetry (3 sensor channels with min/max/p50/p95 + SVG
 
 
-redundancy × spares); planner approval required before
+sparklines suggesting flow obstruction)
 
 
-dispatch**
+2. FMECA / KG path (F11.2 → M-MEC-022 → S-FLOW-LOSS → A11.2-P
 
 
- 
-- Added CMMS state machine: `proposed → reviewed →
+→ 4 steps, each clickable with source_ref tooltip)
 
 
-draft_created → planner_approved → dispatched →
+3. Top-3 fault hypotheses (calibrated confidence bars, model
 
 
-closed → verified` with audit-logged transitions.
+confidence, source_confidence_tier, conformal set,
 
 
- 
-- Enhanced engine diagram label `WO auto-create` → `WO draft
+decision_route)
 
 
-(approval)`.
+4. Comparable cases (3 historical case IDs + outcomes)
 
 
-**8. RPN ordinal language fix (P1.7)** — "Top preventive-action
+5. Source claims (4 evidence-claim rows: ASHRAE TC 9.9 §3.2,
 
 
-target" rewritten to make RPN's ordinal nature explicit. Highest RPN
-
-
-row (F19.1 diesel microbial contamination, RPN 200) now framed as
-
-
-"FMECA priority rank" for reviewer attention; work-order priority
-
-
-must come from the risk engine (RPN ordinal × SLA ×
-
-
-safety class × redundancy state × spares readiness ×
-
-
-human approval), not RPN alone.
-
-
-**9. `source_confidence_tier` clarification (P1.5)** — Knowledge
-
-
-Base section now distinguishes:
+Hydraulic Inst 14.3, vendor app note, OREDA 7e §7.2)
 
 
  
-- `source_confidence_tier` (this dataset's citation strength)
+- **Calculation Panel**: fault · FMECA priority rank (144
+
+
+ordinal) · expected risk P50 BLOCKED (effects chain incomplete)
+
+
+· formula version · DQ score · model · validation scope ·
+
+
+reviewer · decision routing
+
+
  
-- `model_confidence_calibrated` (predictor output, future)
+- **Recommendation Panel**: action · 4-step pack · spare
+
+
+readiness · safety notes · approval route
+
+
  
-- `data_quality_score` (sensor health, future)
+- **CMMS Draft Preview** (collapsible accordion): title · priority
+
+
+P2_critical · score breakdown (multi-factor) · work type · task
+
+
+steps · required parts · lockout · downtime · state · idempotency key
+
+
  
-- `evidence_coverage_score` (chain completeness, future)
+- **Audit Timeline** (5-7 entries): case_created → dq_gate_passed
+
+
+→ hypothesis_emitted → recommendation_proposed → placeholder
+
+
+ 
+- **Planner Board** — placeholder card with "Phase B" status pill
+ 
+- **Technician Workbench** — placeholder
+ 
+- **Knowledge / FMECA Admin** — placeholder
+ 
+- **Model Monitor** — placeholder
+ 
+- **Integrations Health** — placeholder
+ 
+- **Audit & Reports** — placeholder
+ 
+- **Admin / RBAC** — placeholder
+
+
+**Right rail (persistent)**:
+
+
+ 
+- 3-item Approval Queue (cases awaiting reviewer verdict)
+ 
+- 4-item CMMS Draft Queue (drafts awaiting planner approval)
+ 
+- 2-item Warnings (model drift, connector lag)
+
+
+**Mock state shape** mirrors v1.41.7 schemas: WB_STATE.cases items
+
+
+have fields matching `DiagnosticCase` schema (case_id, fault_hypotheses,
+
+
+state, severity, data_quality_score, evidence_coverage_score,
+
+
+recommendation_readiness, owner_role, etc.).
+
+
+**Auth gate**: page is Pro/Educator-tier (`page-access` feature flag
+
+
+added to `js/rz-feature-flags.js`). v1.41.8 single-dialog pattern
+
+
+respected (inline `.root-gate` + session-diagnostic strip; no double
+
+
+modal).
+
+
+**49 dark-mode rules**, 134/134 mobile responsive (passed strict
+
+
+audit), `wb-*` CSS prefix throughout (no global clash).
+
+
+### Wired
+
+
+ 
+- **`ai-engineering-maintenance.html`** — Workbench Preview section
+
+
+bottom now has explicit "Open Workbench Prototype →" CTA linking
+
+
+to the new page. Reading guide updated to flag v1.41.9 as the ship
+
+
+that delivered the vertical slice.
+
+
+ 
+- **`datacenter-solutions.html`** — new strat-card "AI Maintenance
+
+
+Workbench" (PROTO badge, instrument-cyan accent) added to
+
+
+`#tools-ltc-featured` between the Maintenance Decode Lab card
+
+
+and the placeholder. 5 strat-cards + 1 placeholder = 6 cards in
+
+
+the section.
+
+
+ 
+- **`js/rz-feature-flags.js`** — new entry `ai-maintenance-workbench`
+
+
+with `page-access: { free:false, demo:false, pro:true, root:true }`.
+
+
+### SEO + AI search wired
+
+
+ 
+- **`sitemap.xml`** — entry added (priority 0.8, weekly).
+ 
+- **`llms.txt`** — description added so AI assistants can find
+
+
+the prototype when answering workbench-architecture questions.
+
+
+ 
+- **`search-index.json`** — 91st entry with 19 keywords.
+ 
+- **`assets/og/ai-maintenance-workbench.webp`** — OG card
+
+
+generated (1200×630, instrument-cyan accent).
+
+
+ 
+- **`sw.js`** precache list extended.
 
 
 ### Bumped
 
 
  
-- `js/rz-version.js` → v1.41.6
+- `js/rz-version.js` → v1.41.9
  
-- `sw.js` → `rz-cache-v1.41.6`
+- `sw.js` → `rz-cache-v1.41.9`
 
 
 ### Audits
 
 
  
-- `audit-script-tags.py --strict` — CLEAN
+- `audit-script-tags.py --strict` — CLEAN (178 files)
  
-- `audit-js-syntax.py --strict` — CLEAN
+- `audit-js-syntax.py --strict` — CLEAN (108 files)
  
 - `audit-pro-mode-indicator.py --strict` — CLEAN
  
-- `audit-mobile-responsive.py --strict` — 133 PASS / 0 FAIL
+- `audit-mobile-responsive.py --strict` — 134 PASS / 0 FAIL
  
 - `audit-seo.py` — 0 required errors
 
 
-### Not in this ship (deferred per scope)
-
-
-The reviewer's Sprint 3-5 backlog requires structural work beyond a
-
-
-single concept-page revision:
+### Still deferred from review-v3 Sprint 4-5
 
 
  
-- New `ai-maintenance-workbench.html` interactive prototype with one
-
-
-vertical CDU/chiller-pump slice (telemetry → DQ gate →
-
-
-diagnosis → evidence → calculation panel →
-
-
-recommendation review → CMMS draft → technician closeout
-
-
-→ audit → KG diff)
-
-
+- Frontend hardening (inline-style → external, CSP plan, SRI on CDN)
  
-- JSON-schema data contracts (`DiagnosticCase`,
-
-
-`TelemetryWindow`, `DataQualityResult`, `WorkOrderDraft`,
-
-
-`RecommendationReview`, `KGDiff`, `AuditEvent`,
-
-
-`IntegrationSync`)
-
-
+- Telemetry schema + synthetic fixtures (live data ingestion)
  
-- CSV readiness checker (per-row `recommendation_readiness` computed
-
-
-status)
-
-
+- Model validation / calibration / conformal acceptance criteria
  
-- Frontend hardening (inline-style → external CSS/JS, CSP plan,
-
-
-SRI on CDN assets)
-
-
+- Product event taxonomy + analytics pipeline
  
-- Server-side RBAC / multi-tenant security
+- Server-side RBAC / multi-tenant enforcement (multi-year)
  
-- Telemetry schema + synthetic fixtures
- 
-- Model validation/calibration/conformal acceptance criteria
- 
-- Product event taxonomy + dashboards
+- Actual engine connecting to a CMMS connector (long lead)
 
 
-These remain captured in
-
-
-`docs/plans/2026-05-25-ai-maintenance-product-roadmap.md` as
-
-
-multi-year initiatives. This page now points at them honestly via the
-
-
-status-strip "Product roadmap" link.
+These remain in `docs/plans/2026-05-25-ai-maintenance-product-roadmap.md`.
 
 
 ======================================================================

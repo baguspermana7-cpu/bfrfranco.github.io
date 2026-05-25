@@ -433,6 +433,10 @@ TARGETS = [
     ("maintenance-decode-lab", "Maintenance Decode Lab",
      "Offline-first decoder: Easergy P3 EPZ · Galaxy VL RPT · Woodward DTSC-200 ATS. Read-only, evidence-only.",
      "#10b981"),
+    # ----- v1.41.9 — AI Maintenance Workbench Prototype -----
+    ("ai-maintenance-workbench", "AI Maintenance Workbench",
+     "Product-shell prototype: Fleet Command Center · Triage Queue · Diagnostic Case · CMMS draft · audit timeline.",
+     "#00DDFF"),
 ]
 
 # Dynamically extend TARGETS with article + compare + pillar + FF + geopolitics pages

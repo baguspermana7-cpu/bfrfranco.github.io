@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Maintenance Workbench Prototype | Resistance Zero</title>
+    <meta name="description" content="Maintenance Intelligence Workbench prototype: Fleet Command Center, Triage Queue, Diagnostic Case, CMMS draft, audit timeline. CDU/chiller-pump vertical slice.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="maintenance intelligence workbench, prescriptive maintenance, FMECA, CDU pump diagnostic, CMMS integration, fault hypothesis, evidence panel, audit timeline, data center maintenance">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://resistancezero.com/ai-maintenance-workbench.html">
+    <link rel="alternate" hreflang="en" href="https://resistancezero.com/ai-maintenance-workbench.html">
+    <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/ai-maintenance-workbench.html">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="apple-touch-icon" href="assets/Favicon.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/ai-maintenance-workbench.html">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta property="og:title" content="Maintenance Intelligence Workbench — Product Shell Prototype">
+    <meta property="og:description" content="Static product-shell prototype: Fleet Command Center, Triage Queue, full CDU/chiller-pump diagnostic case, CMMS draft preview, and audit timeline. One vertical slice rendered from v1.41.7 JSON-schema contracts.">
+    <meta property="og:image" content="https://resistancezero.com/assets/og/ai-maintenance-workbench.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Maintenance Intelligence Workbench — Prototype">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Maintenance Intelligence Workbench — Prototype">
+    <meta name="twitter:description" content="Static product-shell: CDU pump diagnostic vertical slice, FMECA/KG path, CMMS draft, audit timeline.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/og/ai-maintenance-workbench.webp">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Maintenance Intelligence Workbench",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "Any",
+      "url": "https://resistancezero.com/ai-maintenance-workbench.html",
+      "description": "Static product-shell prototype of the Maintenance Intelligence Workbench — multi-tenant prescriptive maintenance advisor for data center engineered assets. One CDU/chiller-pump vertical slice rendered from v1.41.7 JSON-schema contracts.",
+      "author": {"@type":"Person","name":"Bagus Dwi Permana","sameAs":"https://www.linkedin.com/in/bagus-dwi-permana-ba90b092"},
+      "applicationSuite": "ResistanceZero DC Solutions"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},
+        {"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},
+        {"@type":"ListItem","position":3,"name":"AI Engineering Maintenance","item":"https://resistancezero.com/ai-engineering-maintenance.html"},
+        {"@type":"ListItem","position":4,"name":"Maintenance Intelligence Workbench Prototype"}
+      ]
+    }
+    </script>
+
+    <!-- Inline theme script (light default) — must run before paint -->
+    <script>
+    (function(){
+        var s=localStorage.getItem('theme');
+        var theme=s?s:'light';
+        document.documentElement.setAttribute('data-theme',theme);
+        var m=document.querySelector('meta[name="theme-color"]');
+        if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');
+    }());
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <style>
+    /* ── CSS custom tokens ────────────────────────────────────────── */
+    :root {
+        --bg: #f1f5f9;
+        --bg-solid: #f1f5f9;
+        --panel: rgba(255,255,255,0.96);
+        --panel-inner: rgba(241,245,249,0.9);
+        --panel-hover: rgba(226,232,240,0.8);
+        --text: #1e293b;
+        --text-strong: #0f172a;
+        --text-body: #334155;
+        --muted: #64748b;
+        --line: rgba(100,116,139,0.2);
+        --line-soft: rgba(100,116,139,0.1);
+        --cyan: #0891b2;
+        --cyan-dim: rgba(8,145,178,0.45);
+        --amber: #b45309;
+        --amber-dim: rgba(180,83,9,0.45);
+        --green: #047857;
+        --green-dim: rgba(4,120,87,0.45);
+        --red: #b91c1c;
+        --red-dim: rgba(185,28,28,0.45);
+        --shadow: rgba(100,116,139,0.1);
+        --shadow-deep: rgba(100,116,139,0.18);
+        --kv-bg: rgba(241,245,249,0.9);
+        /* wb-* tokens */
+        --wb-nav-bg: #1e293b;
+        --wb-nav-text: #cbd5e1;
+        --wb-nav-hover: rgba(255,255,255,0.08);
+        --wb-nav-active: rgba(8,145,178,0.18);
+        --wb-nav-active-text: #67e8f9;
+        --wb-rail-bg: rgba(255,255,255,0.98);
+        --wb-topbar-bg: rgba(255,255,255,0.98);
+        --wb-topbar-border: rgba(100,116,139,0.16);
+        --wb-main-bg: #f8fafc;
+        --wb-card-bg: #ffffff;
+        --wb-card-border: rgba(100,116,139,0.14);
+    }
+    [data-theme="dark"] {
+        --bg: #0b1324;
+        --bg-solid: #0b1324;
+        --panel: rgba(15,23,42,0.88);
+        --panel-inner: rgba(15,23,42,0.65);
+        --panel-hover: rgba(15,23,42,0.85);
+        --text: #e2e8f0;
+        --text-strong: #f1f5f9;
+        --text-body: #cbd5e1;
+        --muted: #94a3b8;
+        --line: rgba(148,163,184,0.2);
+        --line-soft: rgba(148,163,184,0.12);
+        --cyan: #00DDFF;
+        --cyan-dim: rgba(0,221,255,0.45);
+        --amber: #FFAA00;
+        --amber-dim: rgba(255,170,0,0.45);
+        --green: #00FF88;
+        --green-dim: rgba(0,255,136,0.45);
+        --red: #FF3030;
+        --red-dim: rgba(255,48,48,0.45);
+        --shadow: rgba(2,6,23,0.4);
+        --shadow-deep: rgba(2,6,23,0.55);
+        --kv-bg: rgba(15,23,42,0.6);
+        --wb-nav-bg: #0f172a;
+        --wb-nav-text: #94a3b8;
+        --wb-nav-hover: rgba(255,255,255,0.06);
+        --wb-nav-active: rgba(0,221,255,0.14);
+        --wb-nav-active-text: #67e8f9;
+        --wb-rail-bg: rgba(15,23,42,0.9);
+        --wb-topbar-bg: rgba(11,19,36,0.94);
+        --wb-topbar-border: rgba(148,163,184,0.14);
+        --wb-main-bg: #0d1829;
+        --wb-card-bg: rgba(15,23,42,0.8);
+        --wb-card-border: rgba(148,163,184,0.12);
+    }
+
+    /* ── Reset + base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; max-width: 100vw; font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; color: var(--text); background: var(--bg); line-height: 1.6; }
+    img, picture, video { max-width: 100%; height: auto; display: block; }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ── Site navbar (canonical) ─────────────────────────────────── */
+    .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11,19,36,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
+    [data-theme="light"] .navbar { background: rgba(255,255,255,0.94); }
+    .nav-container { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; height: 52px; gap: 0.5rem; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
+    .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+    .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
+    .nav-link { padding: 0.4rem 0.6rem; color: var(--muted); text-decoration: none; font-size: 0.8rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+    .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); text-decoration: none; }
+    .nav-dropdown { position: relative; }
+    .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
+    .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
+    .dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 200px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 0.4rem; z-index: 100; box-shadow: 0 8px 24px var(--shadow-deep); }
+    .nav-dropdown:hover .dropdown-menu { display: block; }
+    .dropdown-menu li { list-style: none; }
+    .dropdown-menu a { display: block; padding: 0.4rem 0.65rem; color: var(--text-body); font-size: 0.8rem; border-radius: 7px; text-decoration: none; }
+    .dropdown-menu a:hover { background: var(--panel-hover); color: var(--text); }
+    .theme-toggle { background: none; border: 1px solid var(--line); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all 0.2s; flex-shrink: 0; }
+    .theme-toggle:hover { color: var(--text); border-color: var(--cyan-dim); }
+    .theme-toggle svg { width: 15px; height: 15px; }
+    .moon-icon { display: block; } .sun-icon { display: none; }
+    [data-theme="light"] .moon-icon { display: none; } [data-theme="light"] .sun-icon { display: block; }
+    .hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; cursor: pointer; }
+    .hamburger .bar { width: 18px; height: 2px; background: var(--muted); border-radius: 1px; }
+
+    /* ── App-shell 3-column layout ───────────────────────────────── */
+    .wb-shell { display: flex; flex-direction: column; min-height: calc(100vh - 52px); }
+    .wb-topbar { background: var(--wb-topbar-bg); border-bottom: 1px solid var(--wb-topbar-border); padding: 0.55rem 1rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    [data-theme="dark"] .wb-topbar { background: var(--wb-topbar-bg); }
+    .wb-topbar-brand { font-size: 0.82rem; font-weight: 700; color: var(--text-strong); letter-spacing: -0.01em; }
+    .wb-topbar-sep { color: var(--line); font-size: 0.75rem; }
+    .wb-topbar-pick { font-size: 0.75rem; color: var(--muted); background: var(--kv-bg); border: 1px solid var(--line); border-radius: 7px; padding: 0.2rem 0.55rem; display: flex; align-items: center; gap: 4px; }
+    .wb-topbar-pick i { font-size: 0.7rem; }
+    .wb-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+    .wb-user-pill { font-size: 0.72rem; color: var(--muted); background: var(--kv-bg); border: 1px solid var(--line); border-radius: 20px; padding: 0.2rem 0.65rem; display: flex; align-items: center; gap: 5px; }
+    .wb-user-role { background: rgba(8,145,178,0.15); color: var(--cyan); border-radius: 10px; padding: 0.1rem 0.45rem; font-size: 0.65rem; font-weight: 600; }
+    [data-theme="dark"] .wb-user-role { background: rgba(0,221,255,0.12); color: #67e8f9; }
+
+    .wb-body { display: flex; flex: 1; }
+
+    /* Left nav */
+    .wb-leftnav { width: 220px; flex-shrink: 0; background: var(--wb-nav-bg); border-right: 1px solid rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+    [data-theme="light"] .wb-leftnav { background: #1e293b; }
+    [data-theme="dark"] .wb-leftnav { background: var(--wb-nav-bg); border-right: 1px solid rgba(255,255,255,0.06); }
+    .wb-leftnav-section { padding: 0.6rem 0.5rem 0.2rem; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.08em; color: #475569; text-transform: uppercase; }
+    .wb-nav-btn { display: flex; align-items: center; gap: 8px; padding: 0.5rem 0.75rem; color: var(--wb-nav-text); border: none; background: none; font-size: 0.79rem; font-weight: 500; border-radius: 8px; margin: 1px 4px; cursor: pointer; width: calc(100% - 8px); text-align: left; transition: all 0.18s; }
+    .wb-nav-btn:hover { background: var(--wb-nav-hover); color: #e2e8f0; }
+    .wb-nav-btn.active { background: var(--wb-nav-active); color: var(--wb-nav-active-text); }
+    .wb-nav-btn i { width: 16px; font-size: 0.8rem; flex-shrink: 0; opacity: 0.8; }
+    .wb-nav-btn.active i { opacity: 1; }
+    .wb-nav-badge { margin-left: auto; background: rgba(185,28,28,0.25); color: #f87171; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    .wb-nav-badge.amber { background: rgba(180,83,9,0.22); color: #fbbf24; }
+    .wb-nav-badge.cyan { background: rgba(8,145,178,0.2); color: #67e8f9; }
+    [data-theme="dark"] .wb-nav-badge.amber { background: rgba(255,170,0,0.18); color: #fcd34d; }
+
+    /* Main pane */
+    .wb-main { flex: 1; min-width: 0; background: var(--wb-main-bg); overflow-y: auto; padding: 1.1rem 1.2rem; }
+    [data-theme="dark"] .wb-main { background: var(--wb-main-bg); }
+
+    /* Right rail */
+    .wb-rail { width: 320px; flex-shrink: 0; background: var(--wb-rail-bg); border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow-y: auto; }
+    [data-theme="dark"] .wb-rail { background: var(--wb-rail-bg); border-left: 1px solid rgba(148,163,184,0.1); }
+    .wb-rail-section { padding: 0.85rem 0.9rem 0.5rem; border-bottom: 1px solid var(--line); }
+    .wb-rail-section:last-child { border-bottom: none; }
+    .wb-rail-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; display: flex; align-items: center; gap: 6px; }
+    .wb-rail-item { padding: 0.55rem 0.65rem; border-radius: 8px; border: 1px solid var(--wb-card-border); background: var(--wb-card-bg); margin-bottom: 0.4rem; cursor: pointer; transition: all 0.18s; }
+    .wb-rail-item:hover { border-color: var(--cyan-dim); background: var(--panel-hover); }
+    [data-theme="dark"] .wb-rail-item { background: rgba(15,23,42,0.6); }
+    .wb-rail-item-id { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-weight: 600; }
+    .wb-rail-item-title { font-size: 0.75rem; font-weight: 600; color: var(--text-strong); margin: 0.1rem 0; }
+    .wb-rail-item-sub { font-size: 0.7rem; color: var(--muted); }
+    .wb-rail-warn { padding: 0.5rem 0.65rem; border-radius: 8px; border: 1px solid rgba(180,83,9,0.35); background: rgba(180,83,9,0.07); margin-bottom: 0.4rem; }
+    [data-theme="dark"] .wb-rail-warn { border-color: rgba(255,170,0,0.3); background: rgba(255,170,0,0.06); }
+    .wb-rail-warn-title { font-size: 0.72rem; font-weight: 600; color: var(--amber); display: flex; align-items: center; gap: 5px; }
+    .wb-rail-warn-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+
+    /* ── wb-* card components ─────────────────────────────────────── */
+    .wb-card { background: var(--wb-card-bg); border: 1px solid var(--wb-card-border); border-radius: 10px; padding: 1rem 1.1rem; margin-bottom: 0.85rem; }
+    [data-theme="dark"] .wb-card { background: var(--wb-card-bg); }
+    .wb-card-title { font-size: 0.8rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 7px; }
+    .wb-card-title i { color: var(--cyan); font-size: 0.82rem; }
+    .wb-view-title { font-size: 1rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.25rem; }
+    .wb-view-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.9rem; }
+
+    /* KPI tiles */
+    .wb-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; margin-bottom: 0.85rem; }
+    .wb-kpi { background: var(--wb-card-bg); border: 1px solid var(--wb-card-border); border-radius: 10px; padding: 0.7rem 0.85rem; }
+    [data-theme="dark"] .wb-kpi { background: var(--wb-card-bg); }
+    .wb-kpi.red { border-color: rgba(185,28,28,0.4); background: rgba(185,28,28,0.05); }
+    [data-theme="dark"] .wb-kpi.red { border-color: rgba(255,48,48,0.35); background: rgba(255,48,48,0.05); }
+    .wb-kpi.amber { border-color: rgba(180,83,9,0.4); background: rgba(180,83,9,0.05); }
+    [data-theme="dark"] .wb-kpi.amber { border-color: rgba(255,170,0,0.3); background: rgba(255,170,0,0.04); }
+    .wb-kpi.cyan { border-color: rgba(8,145,178,0.4); background: rgba(8,145,178,0.05); }
+    [data-theme="dark"] .wb-kpi.cyan { border-color: rgba(0,221,255,0.28); background: rgba(0,221,255,0.04); }
+    .wb-kpi.green { border-color: rgba(4,120,87,0.4); background: rgba(4,120,87,0.05); }
+    [data-theme="dark"] .wb-kpi.green { border-color: rgba(0,255,136,0.28); background: rgba(0,255,136,0.04); }
+    .wb-kpi-num { font-size: 1.7rem; font-weight: 800; line-height: 1.1; font-family: 'JetBrains Mono', monospace; }
+    .wb-kpi.red .wb-kpi-num { color: var(--red); }
+    .wb-kpi.amber .wb-kpi-num { color: var(--amber); }
+    .wb-kpi.cyan .wb-kpi-num { color: var(--cyan); }
+    .wb-kpi.green .wb-kpi-num { color: var(--green); }
+    .wb-kpi-label { font-size: 0.72rem; color: var(--muted); font-weight: 500; margin-top: 0.15rem; }
+
+    /* Severity + state pills */
+    .wb-pill { display: inline-flex; align-items: center; gap: 4px; padding: 0.15rem 0.55rem; border-radius: 20px; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.04em; }
+    .wb-pill.sev1 { background: rgba(185,28,28,0.14); color: var(--red); border: 1px solid rgba(185,28,28,0.35); }
+    [data-theme="dark"] .wb-pill.sev1 { background: rgba(255,48,48,0.12); color: #f87171; border-color: rgba(255,48,48,0.3); }
+    .wb-pill.sev2 { background: rgba(180,83,9,0.14); color: var(--amber); border: 1px solid rgba(180,83,9,0.35); }
+    [data-theme="dark"] .wb-pill.sev2 { background: rgba(255,170,0,0.1); color: #fcd34d; border-color: rgba(255,170,0,0.28); }
+    .wb-pill.info { background: rgba(8,145,178,0.12); color: var(--cyan); border: 1px solid rgba(8,145,178,0.3); }
+    [data-theme="dark"] .wb-pill.info { background: rgba(0,221,255,0.08); color: #67e8f9; border-color: rgba(0,221,255,0.24); }
+    .wb-pill.needs-review { background: rgba(180,83,9,0.12); color: var(--amber); border: 1px solid rgba(180,83,9,0.3); }
+    [data-theme="dark"] .wb-pill.needs-review { background: rgba(255,170,0,0.08); color: #fcd34d; border-color: rgba(255,170,0,0.24); }
+    .wb-pill.approved { background: rgba(4,120,87,0.12); color: var(--green); border: 1px solid rgba(4,120,87,0.3); }
+    [data-theme="dark"] .wb-pill.approved { background: rgba(0,255,136,0.08); color: #6ee7b7; border-color: rgba(0,255,136,0.22); }
+    .wb-pill.open { background: rgba(8,145,178,0.1); color: var(--cyan); border: 1px solid rgba(8,145,178,0.25); }
+    .wb-pill.archived { background: var(--kv-bg); color: var(--muted); border: 1px solid var(--line); }
+    .wb-pill.pro { background: rgba(8,145,178,0.15); color: var(--cyan); border: 1px solid rgba(8,145,178,0.3); }
+    [data-theme="dark"] .wb-pill.pro { background: rgba(0,221,255,0.1); color: #67e8f9; border-color: rgba(0,221,255,0.25); }
+
+    /* Confidence bar */
+    .wb-conf-bar-wrap { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; width: 80px; display: inline-block; vertical-align: middle; }
+    .wb-conf-bar { height: 100%; border-radius: 3px; background: var(--green); transition: width 0.4s; }
+
+    /* Cases table */
+    .wb-table-wrap { overflow-x: auto; }
+    .wb-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+    .wb-table th { text-align: left; padding: 0.5rem 0.75rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--panel-inner); white-space: nowrap; }
+    .wb-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .wb-table tr:hover td { background: var(--panel-hover); cursor: pointer; }
+    [data-theme="dark"] .wb-table th { background: rgba(15,23,42,0.5); }
+    [data-theme="dark"] .wb-table tr:hover td { background: rgba(255,255,255,0.03); }
+    .wb-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan); font-weight: 600; }
+    .wb-table-action { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-dim); border-radius: 7px; padding: 0.2rem 0.6rem; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+    .wb-table-action:hover { background: var(--cyan); color: white; }
+    [data-theme="dark"] .wb-table-action { color: #67e8f9; border-color: rgba(0,221,255,0.25); background: rgba(0,221,255,0.08); }
+
+    /* Evidence tabs */
+    .wb-tabs { display: flex; gap: 0.3rem; border-bottom: 1px solid var(--line); margin-bottom: 0.85rem; flex-wrap: wrap; }
+    .wb-tab-btn { background: none; border: none; padding: 0.5rem 0.8rem; font-size: 0.76rem; font-weight: 500; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.18s; cursor: pointer; border-radius: 0; }
+    .wb-tab-btn:hover { color: var(--text); }
+    .wb-tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); font-weight: 600; }
+    [data-theme="dark"] .wb-tab-btn.active { color: #67e8f9; border-bottom-color: #67e8f9; }
+    .wb-tab-pane { display: none; }
+    .wb-tab-pane.active { display: block; }
+
+    /* Telemetry channel rows */
+    .wb-tele-row { display: grid; grid-template-columns: 180px 1fr 60px 60px 60px 60px; gap: 0.5rem; align-items: center; padding: 0.55rem 0.75rem; border-radius: 8px; margin-bottom: 0.4rem; background: var(--panel-inner); border: 1px solid var(--line); font-size: 0.74rem; }
+    [data-theme="dark"] .wb-tele-row { background: rgba(15,23,42,0.5); }
+    .wb-tele-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-strong); font-weight: 600; }
+    .wb-tele-sparkline svg { width: 100%; height: 36px; }
+    .wb-tele-stat-head { font-size: 0.63rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .wb-tele-stat-val { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600; color: var(--text-strong); }
+
+    /* KG path nodes */
+    .wb-kg-path { display: flex; flex-direction: column; gap: 0; }
+    .wb-kg-node { display: flex; align-items: flex-start; gap: 0.75rem; }
+    .wb-kg-node-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .wb-kg-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--cyan); background: var(--bg); flex-shrink: 0; margin-top: 3px; }
+    .wb-kg-connector { width: 2px; flex: 1; min-height: 20px; background: var(--line); }
+    .wb-kg-content { padding-bottom: 1rem; flex: 1; }
+    .wb-kg-type { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .wb-kg-label { font-size: 0.78rem; font-weight: 600; color: var(--text-strong); margin: 0.1rem 0; }
+    .wb-kg-ref { font-size: 0.67rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; cursor: help; border-bottom: 1px dotted var(--line); }
+    .wb-kg-dot.amber { border-color: var(--amber); }
+    .wb-kg-dot.green { border-color: var(--green); }
+    .wb-kg-dot.red { border-color: var(--red); }
+
+    /* Hypothesis rows */
+    .wb-hyp-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-inner); margin-bottom: 0.45rem; }
+    [data-theme="dark"] .wb-hyp-row { background: rgba(15,23,42,0.5); }
+    .wb-hyp-rank { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 700; color: var(--muted); width: 20px; flex-shrink: 0; }
+    .wb-hyp-id { font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-weight: 600; min-width: 60px; }
+    .wb-hyp-desc { flex: 1; font-size: 0.76rem; font-weight: 500; color: var(--text-strong); }
+    .wb-hyp-conf { display: flex; align-items: center; gap: 6px; min-width: 130px; }
+    .wb-hyp-conf-num { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700; color: var(--green); }
+    .wb-hyp-tier { font-size: 0.65rem; background: rgba(8,145,178,0.12); color: var(--cyan); border: 1px solid rgba(8,145,178,0.25); border-radius: 6px; padding: 1px 6px; }
+    [data-theme="dark"] .wb-hyp-tier { background: rgba(0,221,255,0.08); color: #67e8f9; border-color: rgba(0,221,255,0.2); }
+
+    /* Evidence claims */
+    .wb-claim-row { display: flex; gap: 0.65rem; padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-inner); margin-bottom: 0.4rem; align-items: flex-start; }
+    [data-theme="dark"] .wb-claim-row { background: rgba(15,23,42,0.5); }
+    .wb-claim-icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(4,120,87,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    [data-theme="dark"] .wb-claim-icon { background: rgba(0,255,136,0.08); }
+    .wb-claim-icon i { font-size: 0.68rem; color: var(--green); }
+    .wb-claim-body { flex: 1; }
+    .wb-claim-ref { font-size: 0.73rem; font-weight: 600; color: var(--text-strong); }
+    .wb-claim-text { font-size: 0.7rem; color: var(--text-body); margin-top: 0.1rem; }
+
+    /* Calc panel */
+    .wb-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.55rem; }
+    .wb-calc-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.35rem 0.6rem; border-radius: 6px; background: var(--panel-inner); border: 1px solid var(--line); }
+    [data-theme="dark"] .wb-calc-row { background: rgba(15,23,42,0.45); }
+    .wb-calc-key { font-size: 0.68rem; color: var(--muted); font-weight: 500; }
+    .wb-calc-val { font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text-strong); font-weight: 600; text-align: right; }
+    .wb-calc-val.blocked { color: var(--amber); }
+    .wb-calc-val.pass { color: var(--green); }
+    .wb-calc-val.advisory { color: var(--cyan); }
+    .wb-blocked-banner { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.65rem 0.8rem; border-radius: 8px; background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.3); margin-bottom: 0.55rem; }
+    [data-theme="dark"] .wb-blocked-banner { background: rgba(255,170,0,0.05); border-color: rgba(255,170,0,0.22); }
+    .wb-blocked-banner i { color: var(--amber); font-size: 0.82rem; margin-top: 2px; flex-shrink: 0; }
+    .wb-blocked-banner p { font-size: 0.73rem; color: var(--text-body); }
+
+    /* Step list */
+    .wb-step-list { list-style: none; padding: 0; }
+    .wb-step-item { display: flex; gap: 0.7rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-inner); margin-bottom: 0.4rem; align-items: flex-start; }
+    [data-theme="dark"] .wb-step-item { background: rgba(15,23,42,0.5); }
+    .wb-step-num { width: 20px; height: 20px; border-radius: 50%; background: rgba(8,145,178,0.14); color: var(--cyan); font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    [data-theme="dark"] .wb-step-num { background: rgba(0,221,255,0.1); color: #67e8f9; }
+    .wb-step-body { flex: 1; }
+    .wb-step-title { font-size: 0.75rem; font-weight: 600; color: var(--text-strong); }
+    .wb-step-meta { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .wb-step-meta span { display: flex; align-items: center; gap: 3px; }
+
+    /* CMMS draft accordion */
+    .wb-cmms-toggle { display: flex; align-items: center; justify-content: space-between; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.85rem; width: 100%; font-size: 0.78rem; font-weight: 600; color: var(--text-strong); cursor: pointer; transition: all 0.18s; }
+    .wb-cmms-toggle:hover { background: var(--panel-hover); }
+    .wb-cmms-toggle i.fa-chevron-down { transition: transform 0.2s; font-size: 0.7rem; color: var(--muted); }
+    .wb-cmms-toggle.open i.fa-chevron-down { transform: rotate(180deg); }
+    .wb-cmms-body { display: none; padding-top: 0.65rem; }
+    .wb-cmms-body.open { display: block; }
+    .wb-cmms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+
+    /* Audit timeline */
+    .wb-timeline { margin-top: 0.3rem; }
+    .wb-tl-entry { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); }
+    .wb-tl-entry:last-child { border-bottom: none; }
+    .wb-tl-dot-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .wb-tl-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--cyan); margin-top: 5px; flex-shrink: 0; }
+    .wb-tl-dot.pass { background: var(--green); }
+    .wb-tl-dot.pending { background: var(--line); border: 2px solid var(--muted); background: transparent; }
+    .wb-tl-line { width: 1px; flex: 1; min-height: 14px; background: var(--line-soft); }
+    .wb-tl-body { flex: 1; padding-bottom: 0.3rem; }
+    .wb-tl-ts { font-size: 0.64rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+    .wb-tl-action { font-size: 0.75rem; font-weight: 600; color: var(--text-strong); margin: 0.05rem 0; }
+    .wb-tl-detail { font-size: 0.7rem; color: var(--text-body); }
+
+    /* Comparable cases table */
+    .wb-comp-row { display: grid; grid-template-columns: 120px 1fr 80px; gap: 0.5rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-inner); margin-bottom: 0.4rem; align-items: center; font-size: 0.73rem; }
+    [data-theme="dark"] .wb-comp-row { background: rgba(15,23,42,0.5); }
+    .wb-comp-id { font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-size: 0.68rem; font-weight: 600; }
+    .wb-comp-desc { color: var(--text-body); }
+    .wb-comp-outcome { color: var(--green); font-size: 0.68rem; font-weight: 600; }
+
+    /* Case header strip */
+    .wb-case-header { background: var(--wb-card-bg); border: 1px solid var(--wb-card-border); border-radius: 10px; padding: 0.9rem 1.1rem; margin-bottom: 0.85rem; border-left: 3px solid var(--red); }
+    [data-theme="dark"] .wb-case-header { background: var(--wb-card-bg); }
+    .wb-case-header.sev2 { border-left-color: var(--amber); }
+    .wb-case-header.info { border-left-color: var(--cyan); }
+    .wb-case-header-top { display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+    .wb-case-id { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: var(--text-strong); }
+    .wb-case-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; font-size: 0.72rem; margin-bottom: 0.7rem; }
+    .wb-case-meta-item { background: var(--panel-inner); border: 1px solid var(--line); border-radius: 7px; padding: 0.35rem 0.55rem; }
+    [data-theme="dark"] .wb-case-meta-item { background: rgba(15,23,42,0.5); }
+    .wb-case-meta-key { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .wb-case-meta-val { font-weight: 600; color: var(--text-strong); font-size: 0.74rem; margin-top: 0.1rem; }
+    .wb-case-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .wb-btn { padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; border: 1px solid; cursor: pointer; transition: all 0.18s; display: inline-flex; align-items: center; gap: 5px; }
+    .wb-btn.approve { background: rgba(4,120,87,0.1); color: var(--green); border-color: rgba(4,120,87,0.35); }
+    .wb-btn.approve:hover { background: var(--green); color: white; border-color: var(--green); }
+    [data-theme="dark"] .wb-btn.approve { background: rgba(0,255,136,0.07); color: #6ee7b7; border-color: rgba(0,255,136,0.25); }
+    .wb-btn.reject { background: rgba(185,28,28,0.08); color: var(--red); border-color: rgba(185,28,28,0.3); }
+    .wb-btn.reject:hover { background: var(--red); color: white; border-color: var(--red); }
+    [data-theme="dark"] .wb-btn.reject { background: rgba(255,48,48,0.07); color: #f87171; border-color: rgba(255,48,48,0.25); }
+    .wb-btn.ask { background: rgba(8,145,178,0.09); color: var(--cyan); border-color: rgba(8,145,178,0.3); }
+    .wb-btn.ask:hover { background: var(--cyan); color: white; border-color: var(--cyan); }
+    [data-theme="dark"] .wb-btn.ask { background: rgba(0,221,255,0.06); color: #67e8f9; border-color: rgba(0,221,255,0.22); }
+
+    /* Heatmap */
+    .wb-heatmap { display: grid; grid-template-columns: 80px repeat(4, 1fr); gap: 3px; font-size: 0.66rem; }
+    .wb-hm-label { display: flex; align-items: center; color: var(--muted); font-weight: 500; padding: 0.2rem 0; white-space: nowrap; font-size: 0.65rem; }
+    .wb-hm-cell { border-radius: 5px; padding: 0.3rem 0.4rem; font-size: 0.63rem; font-weight: 600; text-align: center; cursor: default; transition: all 0.18s; }
+    .wb-hm-cell.ok { background: rgba(4,120,87,0.14); color: var(--green); border: 1px solid rgba(4,120,87,0.25); }
+    [data-theme="dark"] .wb-hm-cell.ok { background: rgba(0,255,136,0.08); color: #6ee7b7; border-color: rgba(0,255,136,0.18); }
+    .wb-hm-cell.warn { background: rgba(180,83,9,0.13); color: var(--amber); border: 1px solid rgba(180,83,9,0.25); }
+    [data-theme="dark"] .wb-hm-cell.warn { background: rgba(255,170,0,0.07); color: #fcd34d; border-color: rgba(255,170,0,0.2); }
+    .wb-hm-cell.alert { background: rgba(185,28,28,0.13); color: var(--red); border: 1px solid rgba(185,28,28,0.25); }
+    [data-theme="dark"] .wb-hm-cell.alert { background: rgba(255,48,48,0.08); color: #f87171; border-color: rgba(255,48,48,0.2); }
+    .wb-hm-cell.na { background: var(--panel-inner); color: var(--muted); border: 1px solid var(--line-soft); }
+    .wb-hm-header { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 0.2rem 0.4rem; text-align: center; }
+
+    /* Connector health */
+    .wb-conn-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .wb-conn-item { display: flex; align-items: center; gap: 5px; padding: 0.3rem 0.65rem; border-radius: 7px; border: 1px solid var(--line); background: var(--panel-inner); font-size: 0.71rem; }
+    [data-theme="dark"] .wb-conn-item { background: rgba(15,23,42,0.5); }
+    .wb-conn-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .wb-conn-dot.green { background: var(--green); }
+    .wb-conn-dot.amber { background: var(--amber); }
+    .wb-conn-label { color: var(--text-body); font-weight: 500; }
+    .wb-conn-status { color: var(--muted); font-size: 0.66rem; }
+
+    /* DQ warning rows */
+    .wb-dq-row { display: flex; gap: 0.65rem; align-items: flex-start; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid rgba(180,83,9,0.3); background: rgba(180,83,9,0.06); margin-bottom: 0.4rem; }
+    [data-theme="dark"] .wb-dq-row { border-color: rgba(255,170,0,0.22); background: rgba(255,170,0,0.04); }
+    .wb-dq-row i { color: var(--amber); font-size: 0.78rem; margin-top: 1px; flex-shrink: 0; }
+    .wb-dq-row span { font-size: 0.72rem; color: var(--text-body); }
+
+    /* Placeholder views */
+    .wb-placeholder { text-align: center; padding: 3.5rem 1rem; }
+    .wb-placeholder-icon { font-size: 2.5rem; color: var(--line); margin-bottom: 0.75rem; }
+    .wb-placeholder-title { font-size: 0.95rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; }
+    .wb-placeholder-sub { font-size: 0.78rem; color: var(--muted); max-width: 360px; margin: 0 auto 1rem; line-height: 1.55; }
+    .wb-placeholder-pill { display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(8,145,178,0.1); color: var(--cyan); border: 1px solid rgba(8,145,178,0.25); font-size: 0.72rem; font-weight: 600; }
+    [data-theme="dark"] .wb-placeholder-pill { background: rgba(0,221,255,0.07); color: #67e8f9; border-color: rgba(0,221,255,0.2); }
+
+    /* Root-gate (auth overlay) */
+    .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(241,245,249,0.85); padding: 1rem; backdrop-filter: blur(6px); }
+    body.locked .root-gate { display: flex; }
+    [data-theme="dark"] .root-gate { background: rgba(2,6,23,0.78); }
+    body.locked .wb-body, body.locked .wb-topbar { filter: blur(3px); pointer-events: none; user-select: none; }
+    .root-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.75rem 2rem; max-width: 420px; width: 100%; box-shadow: 0 20px 50px var(--shadow-deep); }
+    .root-card h2 { font-size: 1.05rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.5rem; }
+    .root-card p { font-size: 0.82rem; color: var(--text-body); margin-bottom: 1rem; line-height: 1.55; }
+    .root-actions { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+    .root-actions button { padding: 0.55rem 1.1rem; border-radius: 8px; background: var(--cyan); color: white; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .root-actions button:hover { opacity: 0.88; }
+    .root-actions a { padding: 0.55rem 1.1rem; border-radius: 8px; border: 1px solid var(--line); color: var(--text-body); font-size: 0.82rem; font-weight: 500; text-decoration: none; }
+    .root-actions a:hover { background: var(--panel-hover); }
+    .wb-session-diag { margin-top: 0.65rem; padding: 0.5rem 0.65rem; border-radius: 7px; border: 1px solid var(--line); background: var(--panel-inner); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+
+    /* Honest framing strip */
+    .wb-framing { margin-bottom: 0; padding: 0.55rem 1rem; border-bottom: 1px solid rgba(180,83,9,0.3); background: rgba(180,83,9,0.06); font-size: 0.75rem; color: var(--text-body); display: flex; align-items: flex-start; gap: 0.6rem; flex-wrap: wrap; }
+    [data-theme="dark"] .wb-framing { background: rgba(255,170,0,0.04); border-bottom-color: rgba(255,170,0,0.2); }
+    .wb-framing strong { color: var(--amber); }
+    .wb-framing details { font-size: 0.72rem; color: var(--muted); }
+    .wb-framing summary { cursor: pointer; color: var(--amber); font-weight: 600; font-size: 0.72rem; }
+    .wb-framing-pills { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-left: auto; align-items: center; }
+    .wb-fring-pill { font-size: 0.63rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 10px; background: rgba(8,145,178,0.1); color: var(--cyan); border: 1px solid rgba(8,145,178,0.25); white-space: nowrap; }
+    [data-theme="dark"] .wb-fring-pill { background: rgba(0,221,255,0.07); color: #67e8f9; border-color: rgba(0,221,255,0.18); }
+
+    /* Footer */
+    .wb-footer { border-top: 1px solid var(--line); padding: 1.1rem 1.25rem 0.7rem; color: var(--muted); font-size: 0.75rem; }
+    .wb-footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 860px; margin: 0 auto 0.7rem; }
+    .wb-footer-grid h4 { font-size: 0.72rem; color: var(--text-strong); margin-bottom: 0.3rem; }
+    .wb-footer-grid a { display: block; color: var(--muted); text-decoration: none; font-size: 0.72rem; padding: 0.12rem 0; }
+    .wb-footer-grid a:hover { color: var(--cyan); }
+    .wb-footer-ver { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-align: center; margin-top: 0.5rem; }
+
+    /* Share buttons (canonical) */
+    .share-buttons { position: fixed; right: 16px; top: 50%; transform: translateY(-50%); z-index: 500; display: flex; flex-direction: column; gap: 8px; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
+    .share-buttons.visible { opacity: 1; visibility: visible; }
+    .share-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 0.85rem; transition: transform 0.2s, opacity 0.2s; color: white; }
+    .share-btn:hover { transform: scale(1.12); opacity: 0.88; text-decoration: none; }
+    .share-btn.li { background: #0A66C2; }
+    .share-btn.tw { background: #000; }
+    .share-btn.wa { background: #25D366; }
+    .share-btn.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%); }
+    .share-btn.fb { background: #1877F2; }
+
+    /* Scroll-top button */
+    .scroll-top { position: fixed; bottom: 24px; right: 16px; z-index: 500; width: 36px; height: 36px; border-radius: 50%; background: var(--cyan); color: white; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.85rem; box-shadow: 0 4px 12px var(--shadow-deep); transition: all 0.2s; }
+    .scroll-top.visible { display: flex; }
+    .scroll-top:hover { opacity: 0.85; transform: translateY(-2px); }
+
+    /* Cookie banner */
+    .cookie-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10002; display: flex; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.7rem 1rem; background: rgba(15,23,42,0.96); border-top: 1px solid var(--line); color: var(--text-body); font-size: 0.76rem; flex-wrap: wrap; }
+    [data-theme="light"] .cookie-banner { background: rgba(30,41,59,0.97); }
+    .cookie-banner.hidden { display: none; }
+    .cookie-banner a { color: var(--cyan); }
+    .cookie-accept { background: var(--cyan); color: #0f172a; border: none; padding: 0.35rem 0.9rem; border-radius: 7px; font-size: 0.76rem; font-weight: 600; cursor: pointer; }
+    #cookieDecline { background: none; border: 1px solid var(--line); color: var(--muted); padding: 0.35rem 0.9rem; border-radius: 7px; font-size: 0.76rem; cursor: pointer; }
+
+    /* Skip link */
+    .skip-link { position: absolute; top: -40px; left: 8px; background: var(--cyan); color: white; padding: 6px 12px; border-radius: 0 0 8px 8px; font-size: 0.8rem; font-weight: 600; text-decoration: none; z-index: 99999; transition: top 0.2s; }
+    .skip-link:focus { top: 0; }
+
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width: 1023px) {
+        .wb-rail { display: none; }
+    }
+    @media (max-width: 768px) {
+        html, body { overflow-x: hidden; max-width: 100vw; }
+        img { max-width: 100%; height: auto; display: block; }
+        .nav-menu { display: none; }
+        .hamburger { display: flex; }
+        .nav-menu.active { display: flex; flex-direction: column; position: absolute; top: 52px; left: 0; right: 0; background: var(--panel); border-bottom: 1px solid var(--line); padding: 0.5rem; z-index: 999; }
+        .wb-body { flex-direction: column; }
+        .wb-leftnav { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.1); padding: 0.3rem 0.5rem; flex-shrink: 0; }
+        .wb-leftnav-section { display: none; }
+        .wb-nav-btn { width: auto; white-space: nowrap; flex-shrink: 0; margin: 0 2px; }
+        .wb-main { padding: 0.75rem 0.9rem; }
+        .wb-kpi-grid { grid-template-columns: 1fr 1fr; }
+        .wb-case-meta { grid-template-columns: 1fr 1fr; }
+        .wb-calc-grid { grid-template-columns: 1fr; }
+        .wb-cmms-grid { grid-template-columns: 1fr; }
+        .wb-footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+        button, a.wb-btn, [role="button"] { min-height: 44px; }
+        .share-buttons { position: fixed; bottom: 0; right: 0; left: 0; top: auto; transform: none; flex-direction: row; justify-content: center; padding: 8px; background: rgba(15,23,42,0.94); border-top: 1px solid var(--line); gap: 12px; }
+        .wb-tele-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+        .wb-heatmap { grid-template-columns: 60px repeat(4, 1fr); font-size: 0.6rem; }
+    }
+    @media (max-width: 480px) {
+        .wb-kpi-grid { grid-template-columns: 1fr 1fr; }
+        .wb-case-meta { grid-template-columns: 1fr; }
+    }
+    @media print {
+        .navbar, .root-gate, .cookie-banner, .share-buttons, .scroll-top { display: none !important; }
+        body { background: #fff !important; color: #000 !important; }
+    }
+    </style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#wb-main-content">Skip to main content</a>
+
+    <!-- Site navbar -->
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li role="menuitem"><a href="datacenter-solutions.html" style="color:var(--cyan);font-weight:600;">DC Solutions Hub</a></li>
+                    <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                    <li role="menuitem"><a href="datahallAI.html">DC AI/HPC</a></li>
+                    <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
+                    <li role="menuitem"><a href="ai-engineering-maintenance.html">AI Maintenance Concept</a></li>
+                    <li role="menuitem"><a href="spares-readiness-calculator.html">Spares Readiness</a></li>
+                </ul>
+            </li>
+            <li class="nav-dropdown">
+                <a href="articles.html" class="nav-link">Insights <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                <ul class="dropdown-menu">
+                    <li><a href="articles.html" style="color:var(--cyan);font-weight:600;">Engineering Journal</a></li>
+                    <li><a href="geopolitics.html">Global Analysis</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    </div></nav>
+
+    <!-- Honest framing strip -->
+    <div class="wb-framing" role="note">
+        <strong><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Concept build</strong> &mdash; This is a static product-shell prototype, not a production system. AI is <strong>advisory-only</strong>; no physical control. Research basis: Lin &amp; Ompusunggu (2026). UI rendered from v1.41.7 JSON-schema contracts.
+        <details>
+            <summary>Details</summary>
+            <p style="margin-top:0.35rem;">No physical actuator commands are issued. Recommendations require human approval and planner dispatch before any CMMS work order is created. Telemetry shown is mock data derived from the CDU pump diagnostic case scenario. Historical comparable cases are illustrative.</p>
+        </details>
+        <div class="wb-framing-pills">
+            <span class="wb-fring-pill">Concept build</span>
+            <span class="wb-fring-pill">AI advisory-only</span>
+            <span class="wb-fring-pill">No physical control</span>
+            <span class="wb-fring-pill">Research basis linked</span>
+            <span class="wb-fring-pill">Product roadmap</span>
+        </div>
+    </div>
+
+    <!-- App shell -->
+    <div class="wb-shell" id="wb-main-content">
+
+        <!-- App top bar -->
+        <div class="wb-topbar" role="banner">
+            <span class="wb-topbar-brand"><i class="fas fa-microchip" style="color:var(--cyan);margin-right:4px;" aria-hidden="true"></i> Maintenance Intelligence Workbench</span>
+            <span class="wb-topbar-sep">|</span>
+            <span class="wb-topbar-pick" title="Current tenant"><i class="fas fa-building" aria-hidden="true"></i> RZ Pilot Tenant</span>
+            <span class="wb-topbar-pick" title="Current site"><i class="fas fa-location-dot" aria-hidden="true"></i> Datacenter Bekasi 1</span>
+            <div class="wb-topbar-right">
+                <span class="wb-user-pill" title="Signed-in user">
+                    <i class="fas fa-user-circle" aria-hidden="true"></i>
+                    reliability.engineer@rz.demo
+                    <span class="wb-user-role">Pro</span>
+                </span>
+                <a href="ai-engineering-maintenance.html" style="font-size:0.72rem;color:var(--muted);text-decoration:none;" title="Back to concept brief"><i class="fas fa-arrow-left" aria-hidden="true"></i> Concept Brief</a>
+            </div>
+        </div>
+
+        <!-- Body: left nav + main + right rail -->
+        <div class="wb-body">
+
+            <!-- Left navigation -->
+            <nav class="wb-leftnav" aria-label="Workbench navigation">
+                <div class="wb-leftnav-section">Operational</div>
+                <button class="wb-nav-btn active" data-view="command" onclick="wbNav(this,'command')" aria-label="Fleet Command Center" aria-current="page">
+                    <i class="fas fa-gauge-high" aria-hidden="true"></i> Command Center
+                    <span class="wb-nav-badge amber" aria-label="3 at risk">3</span>
+                </button>
+                <button class="wb-nav-btn" data-view="cases" onclick="wbNav(this,'cases')" aria-label="Triage Queue — 7 cases need review">
+                    <i class="fas fa-list-check" aria-hidden="true"></i> Triage Queue
+                    <span class="wb-nav-badge" aria-label="7 cases">7</span>
+                </button>
+                <button class="wb-nav-btn" data-view="planner" onclick="wbNav(this,'planner')" aria-label="Planner / Work Orders — 4 draft WOs">
+                    <i class="fas fa-calendar-check" aria-hidden="true"></i> Planner
+                    <span class="wb-nav-badge cyan" aria-label="4 drafts">4</span>
+                </button>
+                <button class="wb-nav-btn" data-view="technician" onclick="wbNav(this,'technician')" aria-label="Technician Field View">
+                    <i class="fas fa-wrench" aria-hidden="true"></i> Technician
+                </button>
+
+                <div class="wb-leftnav-section" style="margin-top:0.5rem;">Knowledge</div>
+                <button class="wb-nav-btn" data-view="knowledge" onclick="wbNav(this,'knowledge')" aria-label="Knowledge Admin — FMECA and KG seed">
+                    <i class="fas fa-database" aria-hidden="true"></i> Knowledge Admin
+                </button>
+                <button class="wb-nav-btn" data-view="models" onclick="wbNav(this,'models')" aria-label="Model Monitor — RF and calibration">
+                    <i class="fas fa-brain" aria-hidden="true"></i> Model Monitor
+                </button>
+
+                <div class="wb-leftnav-section" style="margin-top:0.5rem;">System</div>
+                <button class="wb-nav-btn" data-view="integrations" onclick="wbNav(this,'integrations')" aria-label="Integrations Health — BMS, SCADA, CMMS">
+                    <i class="fas fa-plug" aria-hidden="true"></i> Integrations
+                </button>
+                <button class="wb-nav-btn" data-view="audit" onclick="wbNav(this,'audit')" aria-label="Audit Log — full event history">
+                    <i class="fas fa-shield-halved" aria-hidden="true"></i> Audit
+                </button>
+                <button class="wb-nav-btn" data-view="admin" onclick="wbNav(this,'admin')" aria-label="Admin and RBAC settings">
+                    <i class="fas fa-sliders" aria-hidden="true"></i> Admin / RBAC
+                </button>
+            </nav>
+
+            <!-- Main pane — views rendered here -->
+            <main class="wb-main" id="wb-main-pane" role="main">
+                <!-- ═══════════════════════════════════════════════════════════════
+                     VIEW: COMMAND CENTER (activeView = 'command')
+                ═══════════════════════════════════════════════════════════════ -->
+                <div id="view-command" class="wb-view" role="region" aria-label="Fleet Command Center">
+                    <div class="wb-view-title">Fleet Command Center</div>
+                    <div class="wb-view-sub">Datacenter Bekasi 1 &mdash; live risk snapshot (mock data, updated T-0)</div>
+
+                    <!-- KPI tiles -->
+                    <div class="wb-kpi-grid">
+                        <div class="wb-kpi red">
+                            <div class="wb-kpi-num">3</div>
+                            <div class="wb-kpi-label">At Risk (SEV-1/2)</div>
+                        </div>
+                        <div class="wb-kpi amber">
+                            <div class="wb-kpi-num">7</div>
+                            <div class="wb-kpi-label">Needs Review</div>
+                        </div>
+                        <div class="wb-kpi cyan">
+                            <div class="wb-kpi-num">4</div>
+                            <div class="wb-kpi-label">Draft WO</div>
+                        </div>
+                        <div class="wb-kpi green">
+                            <div class="wb-kpi-num">42</div>
+                            <div class="wb-kpi-label">SLA Healthy</div>
+                        </div>
+                    </div>
+
+                    <!-- Risk heatmap -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-th" aria-hidden="true"></i> Asset System Risk Heatmap</div>
+                        <div class="wb-heatmap" role="table" aria-label="Asset system risk heatmap">
+                            <!-- Header row -->
+                            <div class="wb-hm-header"></div>
+                            <div class="wb-hm-header">Unit 1</div>
+                            <div class="wb-hm-header">Unit 2</div>
+                            <div class="wb-hm-header">Unit 3</div>
+                            <div class="wb-hm-header">Unit 4</div>
+                            <!-- Cooling -->
+                            <div class="wb-hm-label">Cooling</div>
+                            <div class="wb-hm-cell alert" title="CDU — SEV-1 active" role="cell">CDU</div>
+                            <div class="wb-hm-cell ok" title="CRAH-11 — healthy" role="cell">CRAH</div>
+                            <div class="wb-hm-cell warn" title="CRAH-12 — coil dirty SEV-2" role="cell">CRAH</div>
+                            <div class="wb-hm-cell ok" title="Chiller — healthy" role="cell">Chiller</div>
+                            <!-- Power -->
+                            <div class="wb-hm-label">Power</div>
+                            <div class="wb-hm-cell warn" title="UPS-A — static-switch drift SEV-2" role="cell">UPS-A</div>
+                            <div class="wb-hm-cell ok" title="UPS-B — healthy" role="cell">UPS-B</div>
+                            <div class="wb-hm-cell ok" title="Switchgear — healthy" role="cell">SWG</div>
+                            <div class="wb-hm-cell warn" title="Genset-2 — fuel quality drift INFO" role="cell">GEN-2</div>
+                            <!-- Fire -->
+                            <div class="wb-hm-label">Fire</div>
+                            <div class="wb-hm-cell ok" title="FM-200 — healthy" role="cell">FM-200</div>
+                            <div class="wb-hm-cell ok" title="VESDA — healthy" role="cell">VESDA</div>
+                            <div class="wb-hm-cell na" title="N/A" role="cell">—</div>
+                            <div class="wb-hm-cell na" title="N/A" role="cell">—</div>
+                            <!-- ICT -->
+                            <div class="wb-hm-label">ICT</div>
+                            <div class="wb-hm-cell ok" title="Modbus — healthy" role="cell">Modbus</div>
+                            <div class="wb-hm-cell ok" title="BACnet — healthy" role="cell">BACnet</div>
+                            <div class="wb-hm-cell ok" title="OPC-UA — healthy" role="cell">OPC-UA</div>
+                            <div class="wb-hm-cell ok" title="Network — healthy" role="cell">Net</div>
+                            <!-- Misc -->
+                            <div class="wb-hm-label">Misc</div>
+                            <div class="wb-hm-cell ok" title="BMS — healthy" role="cell">BMS</div>
+                            <div class="wb-hm-cell ok" title="Water — healthy" role="cell">Water</div>
+                            <div class="wb-hm-cell warn" title="Battery-String-3 — impedance trend INFO" role="cell">BATT</div>
+                            <div class="wb-hm-cell ok" title="Security — healthy" role="cell">Sec</div>
+                        </div>
+                        <p style="font-size:0.66rem;color:var(--muted);margin-top:0.55rem;">Legend: <span style="color:var(--red);">&#9632;</span> Alert &nbsp; <span style="color:var(--amber);">&#9632;</span> Warn &nbsp; <span style="color:var(--green);">&#9632;</span> OK &nbsp; <span style="color:var(--muted);">&#9632;</span> N/A. Click cells for drill-down (Phase B).</p>
+                    </div>
+
+                    <!-- DQ issues -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> Data Quality Issues (3)</div>
+                        <div class="wb-dq-row" role="alert">
+                            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                            <span><strong>CDU01.PUMP01.DP.STRAINER</strong> — tag stale 42 s at T-07:22 UTC. Auto-recovered. DQ gate passed (stale &lt;90 s threshold for this channel).</span>
+                        </div>
+                        <div class="wb-dq-row" role="alert">
+                            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                            <span><strong>GEN2.FUEL.SAMPLE.DENSITY</strong> — lab value missing for 2026-05-25 sample window. Confidence downgraded to 0.62 for DC-GEN-2-000091.</span>
+                        </div>
+                        <div class="wb-dq-row" role="alert">
+                            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                            <span><strong>BATT3.CELL.IMPEDANCE[14]</strong> — outlier spike detected at T-03:41. Applied Winsorize clipping P5/P95. Flagged for manual review.</span>
+                        </div>
+                    </div>
+
+                    <!-- Connector health -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-plug" aria-hidden="true"></i> Connector Health</div>
+                        <div class="wb-conn-strip">
+                            <div class="wb-conn-item" title="BMS connector — healthy, last sync 12s ago">
+                                <span class="wb-conn-dot green" aria-hidden="true"></span>
+                                <span class="wb-conn-label">BMS</span>
+                                <span class="wb-conn-status">12 s</span>
+                            </div>
+                            <div class="wb-conn-item" title="SCADA connector — healthy, last sync 8s ago">
+                                <span class="wb-conn-dot green" aria-hidden="true"></span>
+                                <span class="wb-conn-label">SCADA</span>
+                                <span class="wb-conn-status">8 s</span>
+                            </div>
+                            <div class="wb-conn-item" title="CMMS Maximo sync — 4 min lag, SLA breach">
+                                <span class="wb-conn-dot amber" aria-hidden="true"></span>
+                                <span class="wb-conn-label">CMMS sync</span>
+                                <span class="wb-conn-status" style="color:var(--amber);">4 min lag</span>
+                            </div>
+                            <div class="wb-conn-item" title="CIGRE-API — healthy, last sync 31s ago">
+                                <span class="wb-conn-dot green" aria-hidden="true"></span>
+                                <span class="wb-conn-label">CIGRE-API</span>
+                                <span class="wb-conn-status">31 s</span>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /view-command -->
+
+                <!-- ═══════════════════════════════════════════════════════════════
+                     VIEW: TRIAGE QUEUE (activeView = 'cases')
+                ═══════════════════════════════════════════════════════════════ -->
+                <div id="view-cases" class="wb-view" style="display:none;" role="region" aria-label="Triage Queue">
+                    <div class="wb-view-title">Triage Queue</div>
+                    <div class="wb-view-sub">All active diagnostic cases — click a row to open the full detail view</div>
+                    <div class="wb-card" style="padding:0;overflow:hidden;">
+                        <div class="wb-table-wrap">
+                            <table class="wb-table" aria-label="Diagnostic cases triage queue">
+                                <thead>
+                                    <tr>
+                                        <th>Case ID</th>
+                                        <th>Asset</th>
+                                        <th>Severity</th>
+                                        <th>Confidence</th>
+                                        <th>DQ</th>
+                                        <th>Owner</th>
+                                        <th>State</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr onclick="wbOpenCase('DC-CDU01-000142')" style="cursor:pointer;" title="Open CDU-PUMP-01 case detail">
+                                        <td>DC-CDU01-000142</td>
+                                        <td>CDU-PUMP-01</td>
+                                        <td><span class="wb-pill sev1">SEV-1</span></td>
+                                        <td>
+                                            <div class="wb-hyp-conf">
+                                                <span class="wb-hyp-conf-num">0.87</span>
+                                                <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:87%;"></span></span>
+                                            </div>
+                                        </td>
+                                        <td style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;color:var(--green);">0.82</td>
+                                        <td style="font-size:0.72rem;">reliability_eng</td>
+                                        <td><span class="wb-pill needs-review">needs_review</span></td>
+                                        <td><button class="wb-table-action" onclick="event.stopPropagation();wbOpenCase('DC-CDU01-000142')" aria-label="Review case DC-CDU01-000142">Review</button></td>
+                                    </tr>
+                                    <tr title="Open UPS-A bypass case">
+                                        <td>DC-UPS-A-000128</td>
+                                        <td>UPS-A bypass</td>
+                                        <td><span class="wb-pill sev2">SEV-2</span></td>
+                                        <td>
+                                            <div class="wb-hyp-conf">
+                                                <span class="wb-hyp-conf-num" style="color:var(--amber);">0.71</span>
+                                                <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:71%;background:var(--amber);"></span></span>
+                                            </div>
+                                        </td>
+                                        <td style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;color:var(--green);">0.94</td>
+                                        <td style="font-size:0.72rem;">reliability_eng</td>
+                                        <td><span class="wb-pill needs-review">needs_review</span></td>
+                                        <td><button class="wb-table-action" aria-label="Review case DC-UPS-A-000128">Review</button></td>
+                                    </tr>
+                                    <tr title="Open Genset-2 fuel quality case">
+                                        <td>DC-GEN-2-000091</td>
+                                        <td>Genset-2 day-tank</td>
+                                        <td><span class="wb-pill info">INFO</span></td>
+                                        <td>
+                                            <div class="wb-hyp-conf">
+                                                <span class="wb-hyp-conf-num" style="color:var(--muted);">0.62</span>
+                                                <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:62%;background:var(--muted);"></span></span>
+                                            </div>
+                                        </td>
+                                        <td style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;color:var(--amber);">0.55</td>
+                                        <td style="font-size:0.72rem;">reliability_eng</td>
+                                        <td><span class="wb-pill open">open</span></td>
+                                        <td><button class="wb-table-action" aria-label="Review case DC-GEN-2-000091">Review</button></td>
+                                    </tr>
+                                    <tr title="Open CRAH-12 case">
+                                        <td>DC-CRAH-12-000115</td>
+                                        <td>CRAH-12 evap coil</td>
+                                        <td><span class="wb-pill sev2">SEV-2</span></td>
+                                        <td>
+                                            <div class="wb-hyp-conf">
+                                                <span class="wb-hyp-conf-num" style="color:var(--amber);">0.79</span>
+                                                <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:79%;background:var(--amber);"></span></span>
+                                            </div>
+                                        </td>
+                                        <td style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;color:var(--green);">0.91</td>
+                                        <td style="font-size:0.72rem;">planner</td>
+                                        <td><span class="wb-pill approved">approved</span></td>
+                                        <td><button class="wb-table-action" aria-label="View case DC-CRAH-12-000115">View</button></td>
+                                    </tr>
+                                    <tr title="Open Battery-String-3 case">
+                                        <td>DC-BATT-3-000077</td>
+                                        <td>Battery-String-3</td>
+                                        <td><span class="wb-pill info">INFO</span></td>
+                                        <td>
+                                            <div class="wb-hyp-conf">
+                                                <span class="wb-hyp-conf-num" style="color:var(--muted);">0.55</span>
+                                                <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:55%;background:var(--muted);"></span></span>
+                                            </div>
+                                        </td>
+                                        <td style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;color:var(--green);">0.88</td>
+                                        <td style="font-size:0.72rem;">reliability_eng</td>
+                                        <td><span class="wb-pill archived">archived</span></td>
+                                        <td><button class="wb-table-action" aria-label="View archived case DC-BATT-3-000077">View</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div><!-- /view-cases -->
+
+                <!-- ═══════════════════════════════════════════════════════════════
+                     VIEW: DIAGNOSTIC CASE DETAIL  DC-CDU01-000142
+                     THE VERTICAL SLICE
+                ═══════════════════════════════════════════════════════════════ -->
+                <div id="view-case-detail" class="wb-view" style="display:none;" role="region" aria-label="Diagnostic Case Detail">
+
+                    <!-- Back button -->
+                    <div style="margin-bottom:0.65rem;">
+                        <button class="wb-nav-btn" style="width:auto;background:var(--panel-inner);border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:0.74rem;" onclick="wbNav(document.querySelector('[data-view=cases]'),'cases')" aria-label="Back to Triage Queue">
+                            <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Triage Queue
+                        </button>
+                    </div>
+
+                    <!-- Case header strip -->
+                    <div class="wb-case-header" role="article" aria-label="Case DC-CDU01-000142 header">
+                        <div class="wb-case-header-top">
+                            <span class="wb-case-id">DC-CDU01-000142</span>
+                            <span class="wb-pill sev1"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> SEV-1</span>
+                            <span class="wb-pill needs-review">needs_review</span>
+                            <span class="wb-pill pro"><i class="fas fa-crown" aria-hidden="true"></i> Pro</span>
+                        </div>
+                        <div style="font-size:0.88rem;font-weight:700;color:var(--text-strong);margin-bottom:0.55rem;">CDU-PUMP-01 — Abnormal Flow Signature (F11.2 Pump Flow Obstruction)</div>
+                        <div class="wb-case-meta">
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Asset</div><div class="wb-case-meta-val">CDU-PUMP-01</div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Site</div><div class="wb-case-meta-val">Datacenter Bekasi 1</div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Owner</div><div class="wb-case-meta-val">reliability_engineer</div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Created</div><div class="wb-case-meta-val">2026-05-26 07:22 UTC</div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">DQ Score</div><div class="wb-case-meta-val" style="color:var(--green);">0.82 <span style="font-size:0.65rem;color:var(--muted);">(pass)</span></div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Evidence Coverage</div><div class="wb-case-meta-val">4 / 5 tabs</div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Model</div><div class="wb-case-meta-val">rf_pump_v0.3</div></div>
+                            <div class="wb-case-meta-item"><div class="wb-case-meta-key">Decision Route</div><div class="wb-case-meta-val" style="color:var(--cyan);">advisory_possible</div></div>
+                        </div>
+                        <div class="wb-case-actions">
+                            <button class="wb-btn approve" aria-label="Approve the draft work order for DC-CDU01-000142"><i class="fas fa-check" aria-hidden="true"></i> Approve draft</button>
+                            <button class="wb-btn reject" aria-label="Reject this recommendation and provide a reason"><i class="fas fa-xmark" aria-hidden="true"></i> Reject + reason</button>
+                            <button class="wb-btn ask" aria-label="Ask the system for more evidence on this case"><i class="fas fa-comments" aria-hidden="true"></i> Ask for more evidence</button>
+                        </div>
+                    </div>
+
+                    <!-- Evidence tabs -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-microscope" aria-hidden="true"></i> Evidence Panel</div>
+                        <div class="wb-tabs" role="tablist" aria-label="Evidence tabs">
+                            <button class="wb-tab-btn active" role="tab" aria-selected="true" aria-controls="etab-tele" id="etab-tele-btn" onclick="wbTab(this,'etab-tele')">Telemetry</button>
+                            <button class="wb-tab-btn" role="tab" aria-selected="false" aria-controls="etab-kg" id="etab-kg-btn" onclick="wbTab(this,'etab-kg')">FMECA / KG Path</button>
+                            <button class="wb-tab-btn" role="tab" aria-selected="false" aria-controls="etab-hyp" id="etab-hyp-btn" onclick="wbTab(this,'etab-hyp')">Fault Hypotheses</button>
+                            <button class="wb-tab-btn" role="tab" aria-selected="false" aria-controls="etab-comp" id="etab-comp-btn" onclick="wbTab(this,'etab-comp')">Comparable Cases</button>
+                            <button class="wb-tab-btn" role="tab" aria-selected="false" aria-controls="etab-claims" id="etab-claims-btn" onclick="wbTab(this,'etab-claims')">Source Claims</button>
+                        </div>
+
+                        <!-- Tab 1: Telemetry -->
+                        <div class="wb-tab-pane active" id="etab-tele" role="tabpanel" aria-labelledby="etab-tele-btn">
+                            <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.65rem;">3 sensor channels. 24 h window. Mock sparklines — dip near T-0 consistent with partial flow obstruction.</p>
+                            <!-- Channel 1 -->
+                            <div class="wb-tele-row">
+                                <div>
+                                    <div class="wb-tele-label">CDU01.PUMP01.FLOW.SUCTION</div>
+                                    <div style="font-size:0.65rem;color:var(--muted);margin-top:2px;">4-20 mA · L/min</div>
+                                </div>
+                                <div class="wb-tele-sparkline">
+                                    <!-- Static SVG sparkline — normal then dip -->
+                                    <svg viewBox="0 0 200 36" preserveAspectRatio="none" aria-hidden="true">
+                                        <polyline points="0,18 20,16 40,17 60,15 80,16 100,15 120,18 130,20 140,24 155,27 170,30 185,29 200,28" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="130" y1="0" x2="130" y2="36" stroke="var(--amber)" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.6"/>
+                                    </svg>
+                                </div>
+                                <div><div class="wb-tele-stat-head">min</div><div class="wb-tele-stat-val">182</div></div>
+                                <div><div class="wb-tele-stat-head">p50</div><div class="wb-tele-stat-val">221</div></div>
+                                <div><div class="wb-tele-stat-head">p95</div><div class="wb-tele-stat-val">228</div></div>
+                                <div><div class="wb-tele-stat-head">max</div><div class="wb-tele-stat-val">234</div></div>
+                            </div>
+                            <!-- Channel 2 -->
+                            <div class="wb-tele-row">
+                                <div>
+                                    <div class="wb-tele-label">CDU01.PUMP01.DP.STRAINER</div>
+                                    <div style="font-size:0.65rem;color:var(--muted);margin-top:2px;">kPa differential</div>
+                                </div>
+                                <div class="wb-tele-sparkline">
+                                    <svg viewBox="0 0 200 36" preserveAspectRatio="none" aria-hidden="true">
+                                        <polyline points="0,26 30,25 60,24 90,22 110,20 125,17 140,13 155,10 170,9 185,9 200,10" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="125" y1="0" x2="125" y2="36" stroke="var(--red)" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.55"/>
+                                    </svg>
+                                </div>
+                                <div><div class="wb-tele-stat-head">min</div><div class="wb-tele-stat-val">18.4</div></div>
+                                <div><div class="wb-tele-stat-head">p50</div><div class="wb-tele-stat-val">24.1</div></div>
+                                <div><div class="wb-tele-stat-head">p95</div><div class="wb-tele-stat-val">32.7</div></div>
+                                <div><div class="wb-tele-stat-head">max</div><div class="wb-tele-stat-val">38.2</div></div>
+                            </div>
+                            <!-- Channel 3 -->
+                            <div class="wb-tele-row">
+                                <div>
+                                    <div class="wb-tele-label">CDU01.PUMP01.MOTOR.AMPS</div>
+                                    <div style="font-size:0.65rem;color:var(--muted);margin-top:2px;">Amps</div>
+                                </div>
+                                <div class="wb-tele-sparkline">
+                                    <svg viewBox="0 0 200 36" preserveAspectRatio="none" aria-hidden="true">
+                                        <polyline points="0,18 25,17 55,18 85,17 105,16 120,15 140,14 160,16 180,17 200,16" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div><div class="wb-tele-stat-head">min</div><div class="wb-tele-stat-val">14.1</div></div>
+                                <div><div class="wb-tele-stat-head">p50</div><div class="wb-tele-stat-val">15.8</div></div>
+                                <div><div class="wb-tele-stat-head">p95</div><div class="wb-tele-stat-val">17.3</div></div>
+                                <div><div class="wb-tele-stat-head">max</div><div class="wb-tele-stat-val">18.0</div></div>
+                            </div>
+                            <p style="font-size:0.68rem;color:var(--muted);margin-top:0.5rem;"><i class="fas fa-circle-info" aria-hidden="true"></i> Dashed line = anomaly detection boundary crossing. DP rising + flow falling = strainer obstruction signature (F11.2). Motor amps within normal envelope = not cavitation.</p>
+                        </div>
+
+                        <!-- Tab 2: FMECA / KG Path -->
+                        <div class="wb-tab-pane" id="etab-kg" role="tabpanel" aria-labelledby="etab-kg-btn">
+                            <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.75rem;">KG traversal path for diagnosis. Hover source_ref for citation. 4 nodes from fault to action steps.</p>
+                            <div class="wb-kg-path" role="list" aria-label="Knowledge graph traversal path">
+                                <div class="wb-kg-node" role="listitem">
+                                    <div class="wb-kg-node-line"><div class="wb-kg-dot alert" aria-hidden="true"></div><div class="wb-kg-connector"></div></div>
+                                    <div class="wb-kg-content">
+                                        <div class="wb-kg-type">Fault (F)</div>
+                                        <div class="wb-kg-label">F11.2 — Pump flow obstruction (strainer fouled)</div>
+                                        <div class="wb-kg-ref" title="FMECA seed row 823; Hydraulic Institute Standard 14.3 Table 4">source: fmeca-seed-row-823 · HI-14.3-T4</div>
+                                    </div>
+                                </div>
+                                <div class="wb-kg-node" role="listitem">
+                                    <div class="wb-kg-node-line"><div class="wb-kg-dot amber" aria-hidden="true"></div><div class="wb-kg-connector"></div></div>
+                                    <div class="wb-kg-content">
+                                        <div class="wb-kg-type">Mechanism (M)</div>
+                                        <div class="wb-kg-label">M-MEC-022 — Particulate accumulation on suction strainer mesh</div>
+                                        <div class="wb-kg-ref" title="OREDA 7th ed §7.2 Table 7.2.1 row 44">source: OREDA-7e-§7.2-T44 · vendor-appnote-CDU-PM-003</div>
+                                    </div>
+                                </div>
+                                <div class="wb-kg-node" role="listitem">
+                                    <div class="wb-kg-node-line"><div class="wb-kg-dot amber" aria-hidden="true"></div><div class="wb-kg-connector"></div></div>
+                                    <div class="wb-kg-content">
+                                        <div class="wb-kg-type">Symptom (S)</div>
+                                        <div class="wb-kg-label">S-FLOW-LOSS — Flow rate below P10 operational envelope + DP rising trend</div>
+                                        <div class="wb-kg-ref" title="ASHRAE TC 9.9 §3.2 Table 4 CDU acceptance range">source: ASHRAE-TC9.9-§3.2-T4</div>
+                                    </div>
+                                </div>
+                                <div class="wb-kg-node" role="listitem">
+                                    <div class="wb-kg-node-line"><div class="wb-kg-dot green" aria-hidden="true"></div></div>
+                                    <div class="wb-kg-content">
+                                        <div class="wb-kg-type">Action (A)</div>
+                                        <div class="wb-kg-label">A11.2-P — Strainer clean + DP-trend review (4 steps)</div>
+                                        <div class="wb-kg-ref" title="Vendor PM procedure 003 Rev B; LOTO standard NFPA 70E §120">source: vendor-PM-003-RevB · NFPA-70E-§120</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Fault Hypotheses -->
+                        <div class="wb-tab-pane" id="etab-hyp" role="tabpanel" aria-labelledby="etab-hyp-btn">
+                            <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.65rem;">Top-3 ranked fault hypotheses from rf_pump_v0.3. Calibrated via isotonic regression on 847-sample pump pilot dataset.</p>
+                            <div class="wb-hyp-row">
+                                <span class="wb-hyp-rank">#1</span>
+                                <span class="wb-hyp-id">F11.2</span>
+                                <div class="wb-hyp-desc">
+                                    <div style="font-weight:600;color:var(--text-strong);">Pump flow obstruction — strainer fouled</div>
+                                    <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">conformal_set: {F11.2, F11.3} &nbsp;·&nbsp; decision_route: advisory_possible &nbsp;·&nbsp; model_conf_calibrated: 0.87</div>
+                                </div>
+                                <div class="wb-hyp-conf">
+                                    <span class="wb-hyp-conf-num">0.87</span>
+                                    <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:87%;"></span></span>
+                                    <span class="wb-hyp-tier">tier-1</span>
+                                </div>
+                            </div>
+                            <div class="wb-hyp-row">
+                                <span class="wb-hyp-rank">#2</span>
+                                <span class="wb-hyp-id">F11.3</span>
+                                <div class="wb-hyp-desc">
+                                    <div style="font-weight:600;color:var(--text-strong);">Incipient cavitation — NPSH margin low</div>
+                                    <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">motor amps within envelope → low probability; DP profile inconsistent with vapour collapse</div>
+                                </div>
+                                <div class="wb-hyp-conf">
+                                    <span class="wb-hyp-conf-num" style="color:var(--muted);">0.06</span>
+                                    <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:6%;background:var(--muted);"></span></span>
+                                    <span class="wb-hyp-tier">tier-3</span>
+                                </div>
+                            </div>
+                            <div class="wb-hyp-row">
+                                <span class="wb-hyp-rank">#3</span>
+                                <span class="wb-hyp-id">F11.5</span>
+                                <div class="wb-hyp-desc">
+                                    <div style="font-weight:600;color:var(--text-strong);">Sensor fault — flow transmitter drift</div>
+                                    <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">DP channel also flagging → dual-channel corroboration reduces sensor-fault probability</div>
+                                </div>
+                                <div class="wb-hyp-conf">
+                                    <span class="wb-hyp-conf-num" style="color:var(--muted);">0.04</span>
+                                    <span class="wb-conf-bar-wrap"><span class="wb-conf-bar" style="width:4%;background:var(--muted);"></span></span>
+                                    <span class="wb-hyp-tier">tier-3</span>
+                                </div>
+                            </div>
+                            <p style="font-size:0.68rem;color:var(--muted);margin-top:0.5rem;"><i class="fas fa-circle-info" aria-hidden="true"></i> Residual probability 0.03 distributed across F11.1, F11.7, and out-of-model faults.</p>
+                        </div>
+
+                        <!-- Tab 4: Comparable Cases -->
+                        <div class="wb-tab-pane" id="etab-comp" role="tabpanel" aria-labelledby="etab-comp-btn">
+                            <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.65rem;">3 historical cases with similar pump flow signature. Used for conformal prediction set construction.</p>
+                            <div class="wb-comp-row" role="row">
+                                <div class="wb-comp-id">DC-CDU02-000088</div>
+                                <div class="wb-comp-desc">CDU-PUMP-02 flow drop + DP rise, site Bekasi 2. Closed 2025-11-04. Action: strainer clean (A11.2-P). Resolved within 2 h.</div>
+                                <div class="wb-comp-outcome"><i class="fas fa-check-circle" aria-hidden="true"></i> Resolved</div>
+                            </div>
+                            <div class="wb-comp-row" role="row">
+                                <div class="wb-comp-id">DC-CDU05-000062</div>
+                                <div class="wb-comp-desc">CDU-PUMP-05 gradual flow decline over 8 h, different site. Closed 2025-08-17. Action: strainer clean + pump curve re-check. Root cause: debris from pipe joint repair.</div>
+                                <div class="wb-comp-outcome"><i class="fas fa-check-circle" aria-hidden="true"></i> Resolved</div>
+                            </div>
+                            <div class="wb-comp-row" role="row">
+                                <div class="wb-comp-id">DC-CDU01-000031</div>
+                                <div class="wb-comp-desc">CDU-PUMP-01 same asset, earlier event 2024-12-09. Escalated to cavitation initially (F11.3 confounded). Revised diagnosis after strainer inspection confirmed F11.2. Duration 6 h.</div>
+                                <div class="wb-comp-outcome" style="color:var(--amber);"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Escalated</div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 5: Source Claims -->
+                        <div class="wb-tab-pane" id="etab-claims" role="tabpanel" aria-labelledby="etab-claims-btn">
+                            <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.65rem;">4 evidence claims backing the F11.2 hypothesis. Each claim cites a specific section of a recognised standard or vendor document.</p>
+                            <div class="wb-claim-row">
+                                <div class="wb-claim-icon"><i class="fas fa-book" aria-hidden="true"></i></div>
+                                <div class="wb-claim-body">
+                                    <div class="wb-claim-ref">ASHRAE TC 9.9 §3.2 Table 4 — CDU Pump Acceptance Criteria</div>
+                                    <div class="wb-claim-text">Flow rate &gt; 95 % of rated at rated DP. Observed: 86 % of rated. Exceeds alert threshold (90 %). Consistent with F11.2 partial obstruction.</div>
+                                </div>
+                            </div>
+                            <div class="wb-claim-row">
+                                <div class="wb-claim-icon"><i class="fas fa-book" aria-hidden="true"></i></div>
+                                <div class="wb-claim-body">
+                                    <div class="wb-claim-ref">Hydraulic Institute Standard 14.3 Table 4 — Strainer DP Guidelines</div>
+                                    <div class="wb-claim-text">Clean strainer DP &lt; 15 kPa at rated flow. Dirty alarm at 28 kPa. Current DP: 38.2 kPa (p95). Exceeds dirty alarm threshold by 36 %.</div>
+                                </div>
+                            </div>
+                            <div class="wb-claim-row">
+                                <div class="wb-claim-icon"><i class="fas fa-file-lines" aria-hidden="true"></i></div>
+                                <div class="wb-claim-body">
+                                    <div class="wb-claim-ref">Vendor Application Note CDU-PM-003 Rev B — Strainer Maintenance</div>
+                                    <div class="wb-claim-text">Recommended clean interval: 500 operating hours or DP &gt; 25 kPa, whichever first. Last clean: 2026-02-11 (2634 hours ago). Both triggers exceeded.</div>
+                                </div>
+                            </div>
+                            <div class="wb-claim-row">
+                                <div class="wb-claim-icon"><i class="fas fa-book" aria-hidden="true"></i></div>
+                                <div class="wb-claim-body">
+                                    <div class="wb-claim-ref">OREDA 7th Ed. §7.2 Table 7.2.1 — Pump Failure Mode Frequencies</div>
+                                    <div class="wb-claim-text">Flow obstruction (incl. strainer fouling) accounts for 31 % of pump demand failures in liquid-cooling service. Base rate consistency supports F11.2 as primary hypothesis.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /evidence panel card -->
+
+                    <!-- Calculation Panel -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-calculator" aria-hidden="true"></i> Calculation Panel — fault risk priority (formula: risk.v0.2)</div>
+                        <div class="wb-blocked-banner" role="note">
+                            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                            <p><strong>BLOCKED — expected risk P50 not computed.</strong> The effects.csv chain for F11.2 is incomplete in the current KG seed: the F11.2 &rarr; Effects &rarr; Action &rarr; Step &rarr; Safety chain is missing 2 intermediate links. Draft WO is blocked until the KG seed is repaired and re-validated. Advisory recommendation is still possible (advisory_possible route).</p>
+                        </div>
+                        <div class="wb-calc-grid">
+                            <div class="wb-calc-row"><span class="wb-calc-key">Fault ID</span><span class="wb-calc-val">F11.2 CDU pump flow obstruction</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">FMECA priority rank</span><span class="wb-calc-val">144 (ordinal)</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Expected risk P50</span><span class="wb-calc-val blocked">BLOCKED — effects.csv chain incomplete</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Formula</span><span class="wb-calc-val">risk.v0.2</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Inputs rejected</span><span class="wb-calc-val pass">none — DQ gate passed</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Data quality</span><span class="wb-calc-val pass">0.82 (pass &ge;0.70 threshold)</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Model</span><span class="wb-calc-val">rf_pump_v0.3 isotonic calibration</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Validation scope</span><span class="wb-calc-val">pump telemetry pilot only</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Reviewer queue</span><span class="wb-calc-val">reliability_engineer (queued)</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Decision</span><span class="wb-calc-val advisory">advisory_possible — draft_wo blocked (KG incomplete)</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Panel -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-list-check" aria-hidden="true"></i> Recommendation — A11.2-P: Strainer clean + DP-trend review</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.55rem;margin-bottom:0.75rem;">
+                            <div class="wb-calc-row"><span class="wb-calc-key">Action ID</span><span class="wb-calc-val">A11.2-P</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Work type</span><span class="wb-calc-val">Corrective / PM</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Spare readiness</span><span class="wb-calc-val pass">Filter 200&micro;m: IN STOCK</span></div>
+                            <div class="wb-calc-row"><span class="wb-calc-key">Approval route</span><span class="wb-calc-val">RE &rarr; Planner &rarr; Dispatch</span></div>
+                        </div>
+                        <div class="wb-card-title" style="font-size:0.75rem;margin-top:0.1rem;"><i class="fas fa-shield-halved" style="color:var(--amber);" aria-hidden="true"></i> Safety Notes</div>
+                        <div style="padding:0.5rem 0.7rem;border-radius:8px;background:rgba(180,83,9,0.07);border:1px solid rgba(180,83,9,0.25);margin-bottom:0.7rem;font-size:0.73rem;color:var(--text-body);">
+                            LOTO required before strainer access (NFPA 70E §120). Dewar coolant pressure release before strainer cap removal. Minimum PPE: chemical splash goggles + nitrile gloves. Two-person rule for coolant system opening.
+                        </div>
+                        <div class="wb-card-title" style="font-size:0.75rem;"><i class="fas fa-screwdriver-wrench" aria-hidden="true"></i> Step Pack (4 steps)</div>
+                        <ul class="wb-step-list" aria-label="Maintenance step list for A11.2-P">
+                            <li class="wb-step-item">
+                                <div class="wb-step-num">1</div>
+                                <div class="wb-step-body">
+                                    <div class="wb-step-title">Isolate CDU-PUMP-01 and apply LOTO</div>
+                                    <div class="wb-step-meta">
+                                        <span><i class="fas fa-clock" aria-hidden="true"></i> 15 min</span>
+                                        <span><i class="fas fa-user" aria-hidden="true"></i> 2 × Mech Tech (cert. LOTO)</span>
+                                        <span><i class="fas fa-wrench" aria-hidden="true"></i> LOTO kit, lockout tag</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="wb-step-item">
+                                <div class="wb-step-num">2</div>
+                                <div class="wb-step-body">
+                                    <div class="wb-step-title">Depressurise suction line + drain coolant to recovery drum</div>
+                                    <div class="wb-step-meta">
+                                        <span><i class="fas fa-clock" aria-hidden="true"></i> 20 min</span>
+                                        <span><i class="fas fa-user" aria-hidden="true"></i> Mech Tech</span>
+                                        <span><i class="fas fa-wrench" aria-hidden="true"></i> Pressure gauge, drain hose, 20L drum</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="wb-step-item">
+                                <div class="wb-step-num">3</div>
+                                <div class="wb-step-body">
+                                    <div class="wb-step-title">Remove, inspect, and clean/replace filter cartridge 200µm</div>
+                                    <div class="wb-step-meta">
+                                        <span><i class="fas fa-clock" aria-hidden="true"></i> 45 min</span>
+                                        <span><i class="fas fa-user" aria-hidden="true"></i> Mech Tech</span>
+                                        <span><i class="fas fa-wrench" aria-hidden="true"></i> Filter cartridge 200&micro;m (qty 1), torque wrench, O-ring lubricant</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="wb-step-item">
+                                <div class="wb-step-num">4</div>
+                                <div class="wb-step-body">
+                                    <div class="wb-step-title">Re-fill, re-pressurise, restart CDU-PUMP-01 and verify DP &lt; 18 kPa + flow ≥ 95 % rated</div>
+                                    <div class="wb-step-meta">
+                                        <span><i class="fas fa-clock" aria-hidden="true"></i> 40 min</span>
+                                        <span><i class="fas fa-user" aria-hidden="true"></i> Mech Tech + RE sign-off</span>
+                                        <span><i class="fas fa-wrench" aria-hidden="true"></i> Coolant top-up, flow meter, DP gauge</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- CMMS Draft Preview (accordion) -->
+                    <div class="wb-card" style="padding:0.8rem 1rem;">
+                        <button class="wb-cmms-toggle" id="cmmsDraftToggle" onclick="wbToggleCmms()" aria-expanded="false" aria-controls="cmmsDraftBody">
+                            <span><i class="fas fa-file-pen" aria-hidden="true" style="color:var(--cyan);margin-right:6px;"></i> CMMS Draft Preview — WO-DRAFT-2026-0447</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="wb-cmms-body" id="cmmsDraftBody" role="region" aria-label="CMMS draft work order details">
+                            <div style="padding:0.3rem 0 0.6rem;">
+                                <div style="font-size:0.77rem;font-weight:700;color:var(--text-strong);margin-bottom:0.6rem;">CDU-PUMP-01 strainer clean + DP-trend review (advisory)</div>
+                                <div class="wb-cmms-grid">
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Priority</span><span class="wb-calc-val" style="color:var(--amber);">P2_critical</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Work type</span><span class="wb-calc-val">corrective</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">State</span><span class="wb-calc-val needs-review">proposed</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Human approval</span><span class="wb-calc-val">required &#x2713;</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">FMECA rank</span><span class="wb-calc-val">144</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">SLA tier</span><span class="wb-calc-val">tier-3 24/7</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Safety class</span><span class="wb-calc-val">general_industry</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Redundancy</span><span class="wb-calc-val" style="color:var(--red);">lost</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Spares</span><span class="wb-calc-val pass">stocked</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Task steps</span><span class="wb-calc-val">4</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Required parts</span><span class="wb-calc-val">Filter cartridge 200&micro;m, qty 1</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Lockout required</span><span class="wb-calc-val">yes (NFPA 70E §120)</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Est. downtime</span><span class="wb-calc-val">2 h</span></div>
+                                    <div class="wb-calc-row"><span class="wb-calc-key">Idempotency key</span><span class="wb-calc-val" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;">wo-cdu01-f112-20260526-0722</span></div>
+                                </div>
+                                <div style="margin-top:0.65rem;padding:0.5rem 0.7rem;border-radius:7px;background:rgba(180,83,9,0.06);border:1px solid rgba(180,83,9,0.22);font-size:0.7rem;color:var(--text-body);">
+                                    <strong style="color:var(--amber);">Advisory notice:</strong> This draft WO was generated by an AI advisory system. It must be reviewed and approved by a qualified reliability engineer and planner before execution. The AI system does not issue physical commands.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audit Timeline -->
+                    <div class="wb-card">
+                        <div class="wb-card-title"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Audit Timeline — DC-CDU01-000142</div>
+                        <div class="wb-timeline" role="list" aria-label="Audit timeline for case DC-CDU01-000142">
+                            <div class="wb-tl-entry" role="listitem">
+                                <div class="wb-tl-dot-wrap"><div class="wb-tl-dot pass" aria-hidden="true"></div><div class="wb-tl-line"></div></div>
+                                <div class="wb-tl-body">
+                                    <div class="wb-tl-ts">2026-05-26T07:22:04Z</div>
+                                    <div class="wb-tl-action">case_created</div>
+                                    <div class="wb-tl-detail">Actor: system (anomaly-detector v0.4). Subject: CDU01.PUMP01.FLOW.SUCTION below P10 threshold for 18 min. Outcome: case opened SEV-1.</div>
+                                </div>
+                            </div>
+                            <div class="wb-tl-entry" role="listitem">
+                                <div class="wb-tl-dot-wrap"><div class="wb-tl-dot pass" aria-hidden="true"></div><div class="wb-tl-line"></div></div>
+                                <div class="wb-tl-body">
+                                    <div class="wb-tl-ts">2026-05-26T07:22:31Z</div>
+                                    <div class="wb-tl-action">dq_gate_passed</div>
+                                    <div class="wb-tl-detail">Actor: dq-engine v0.6. DQ score: 0.82 (threshold 0.70). 3 channels evaluated. DP tag stale 42 s at T-07:22 — auto-recovered, within 90 s tolerance. Outcome: pass.</div>
+                                </div>
+                            </div>
+                            <div class="wb-tl-entry" role="listitem">
+                                <div class="wb-tl-dot-wrap"><div class="wb-tl-dot pass" aria-hidden="true"></div><div class="wb-tl-line"></div></div>
+                                <div class="wb-tl-body">
+                                    <div class="wb-tl-ts">2026-05-26T07:22:47Z</div>
+                                    <div class="wb-tl-action">hypothesis_emitted</div>
+                                    <div class="wb-tl-detail">Actor: rf_pump_v0.3 (isotonic calibration). Top hypothesis: F11.2 conf 0.87. Conformal set: {F11.2, F11.3}. Outcome: hypothesis stored, case queued for reviewer.</div>
+                                </div>
+                            </div>
+                            <div class="wb-tl-entry" role="listitem">
+                                <div class="wb-tl-dot-wrap"><div class="wb-tl-dot pass" aria-hidden="true"></div><div class="wb-tl-line"></div></div>
+                                <div class="wb-tl-body">
+                                    <div class="wb-tl-ts">2026-05-26T07:23:02Z</div>
+                                    <div class="wb-tl-action">recommendation_proposed</div>
+                                    <div class="wb-tl-detail">Actor: recommendation-engine v0.5. Action A11.2-P identified via KG traversal. Spare readiness confirmed (filter cartridge 200&micro;m in stock). Draft WO status: proposed (blocked — KG effects chain incomplete). Outcome: advisory_possible, queued for reliability_engineer review.</div>
+                                </div>
+                            </div>
+                            <div class="wb-tl-entry" role="listitem">
+                                <div class="wb-tl-dot-wrap"><div class="wb-tl-dot pending" aria-hidden="true"></div></div>
+                                <div class="wb-tl-body">
+                                    <div class="wb-tl-ts">— pending —</div>
+                                    <div class="wb-tl-action" style="color:var(--muted);">reviewer_decision</div>
+                                    <div class="wb-tl-detail" style="color:var(--muted);">Awaiting: reliability_engineer verdict (approve / reject / ask). Use buttons above to act.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /view-case-detail -->
+
+                <!-- ═══ PLACEHOLDER VIEWS — Phase B ═══ -->
+
+                <!-- View: Planner -->
+                <div id="view-planner" class="wb-view" style="display:none;" role="region" aria-label="Planner view">
+                    <div class="wb-view-title">Planner / Work Orders</div>
+                    <div class="wb-view-sub">Review and dispatch approved recommendations as CMMS work orders</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-calendar-check" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Planner View</div>
+                        <div class="wb-placeholder-sub">Drag-and-drop scheduler, work order approval queue, technician assignment, and downtime window picker. Draft WOs from the Triage Queue flow here for planner approval before CMMS push.</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+
+                <!-- View: Technician -->
+                <div id="view-technician" class="wb-view" style="display:none;" role="region" aria-label="Technician field view">
+                    <div class="wb-view-title">Technician Field View</div>
+                    <div class="wb-view-sub">Mobile-optimised field card for assigned work orders, LOTO checklist, and step-by-step execution</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-wrench" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Technician Field View</div>
+                        <div class="wb-placeholder-sub">Step-by-step task cards, LOTO checklist with sign-off, photo evidence upload, part scan, and completion sign-off. Designed for tablet or phone on the data-centre floor.</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+
+                <!-- View: Knowledge Admin -->
+                <div id="view-knowledge" class="wb-view" style="display:none;" role="region" aria-label="Knowledge Admin view">
+                    <div class="wb-view-title">Knowledge Admin</div>
+                    <div class="wb-view-sub">Manage FMECA seed data, KG node/edge editing, and source-claim provenance</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-database" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Knowledge Admin</div>
+                        <div class="wb-placeholder-sub">FMECA table editor, KG graph visualiser (Neo4j-backed), effects.csv chain validator, and source-claim version history. The blocked F11.2 effects chain shown in Case Detail would be repaired here.</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+
+                <!-- View: Model Monitor -->
+                <div id="view-models" class="wb-view" style="display:none;" role="region" aria-label="Model Monitor view">
+                    <div class="wb-view-title">Model Monitor</div>
+                    <div class="wb-view-sub">Track ML model performance, calibration drift, and retraining schedules</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-brain" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Model Monitor</div>
+                        <div class="wb-placeholder-sub">Per-model calibration curves, precision/recall over time, isotonic residual drift alerts, shadow-model comparison, and one-click retraining trigger. Currently tracking: rf_pump_v0.3 (active, drift +0.04).</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+
+                <!-- View: Integrations Health -->
+                <div id="view-integrations" class="wb-view" style="display:none;" role="region" aria-label="Integrations Health view">
+                    <div class="wb-view-title">Integrations Health</div>
+                    <div class="wb-view-sub">BMS / SCADA / CMMS / edge-gateway connector status and latency metrics</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-plug" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Integrations Health</div>
+                        <div class="wb-placeholder-sub">Real-time connector status for BMS (OPC-UA), SCADA (Modbus/BACnet), CMMS (Maximo REST), edge gateways, and the CIGRE-API. SLA breach alerts, retry history, and manual re-sync triggers.</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+
+                <!-- View: Audit -->
+                <div id="view-audit" class="wb-view" style="display:none;" role="region" aria-label="Audit Log view">
+                    <div class="wb-view-title">Audit Log</div>
+                    <div class="wb-view-sub">Immutable event log for all system actions, reviewer decisions, and CMMS pushes</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Audit Log</div>
+                        <div class="wb-placeholder-sub">Append-only audit trail: case lifecycle events, reviewer approvals/rejections, CMMS pushes, model calibration runs, KG edits, and admin RBAC changes. Filter by actor, event type, asset, and date range. Export to CSV or PDF.</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+
+                <!-- View: Admin / RBAC -->
+                <div id="view-admin" class="wb-view" style="display:none;" role="region" aria-label="Admin and RBAC view">
+                    <div class="wb-view-title">Admin / RBAC</div>
+                    <div class="wb-view-sub">Multi-tenant user management, role assignments, and feature-flag overrides</div>
+                    <div class="wb-placeholder">
+                        <div class="wb-placeholder-icon"><i class="fas fa-sliders" aria-hidden="true"></i></div>
+                        <div class="wb-placeholder-title">Admin / RBAC</div>
+                        <div class="wb-placeholder-sub">Tenant and site provisioning, user role assignment (reliability_engineer / planner / technician / viewer / admin), feature-flag per-tenant overrides, SSO configuration, and audit-log retention policies.</div>
+                        <span class="wb-placeholder-pill"><i class="fas fa-road" aria-hidden="true"></i> Coming in Phase B — see roadmap</span>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right rail (persistent) -->
+            <aside class="wb-rail" aria-label="Approval queue and warnings">
+
+                <!-- Approval queue -->
+                <div class="wb-rail-section">
+                    <div class="wb-rail-title"><i class="fas fa-clock" aria-hidden="true"></i> Approval Queue <span style="margin-left:auto;background:rgba(185,28,28,0.18);color:var(--red);font-size:0.62rem;padding:1px 6px;border-radius:8px;font-weight:700;">3</span></div>
+                    <div class="wb-rail-item" onclick="wbOpenCase('DC-CDU01-000142')" role="button" tabindex="0" aria-label="Open case DC-CDU01-000142">
+                        <div class="wb-rail-item-id">DC-CDU01-000142</div>
+                        <div class="wb-rail-item-title">CDU-PUMP-01 flow obstruction</div>
+                        <div class="wb-rail-item-sub"><span class="wb-pill sev1">SEV-1</span> &nbsp; conf 0.87 &nbsp; DQ 0.82</div>
+                    </div>
+                    <div class="wb-rail-item" role="button" tabindex="0" aria-label="Open case DC-UPS-A-000128">
+                        <div class="wb-rail-item-id">DC-UPS-A-000128</div>
+                        <div class="wb-rail-item-title">UPS-A static-switch drift</div>
+                        <div class="wb-rail-item-sub"><span class="wb-pill sev2">SEV-2</span> &nbsp; conf 0.71 &nbsp; DQ 0.94</div>
+                    </div>
+                    <div class="wb-rail-item" role="button" tabindex="0" aria-label="Open case DC-CRAH-12-000115">
+                        <div class="wb-rail-item-id">DC-CRAH-12-000115</div>
+                        <div class="wb-rail-item-title">CRAH-12 coil dirty</div>
+                        <div class="wb-rail-item-sub"><span class="wb-pill sev2">SEV-2</span> &nbsp; conf 0.79 &nbsp; DQ 0.91</div>
+                    </div>
+                </div>
+
+                <!-- CMMS draft queue -->
+                <div class="wb-rail-section">
+                    <div class="wb-rail-title"><i class="fas fa-file-pen" aria-hidden="true"></i> CMMS Draft Queue <span style="margin-left:auto;background:rgba(8,145,178,0.15);color:var(--cyan);font-size:0.62rem;padding:1px 6px;border-radius:8px;font-weight:700;">4</span></div>
+                    <div class="wb-rail-item" role="button" tabindex="0" aria-label="CMMS draft for DC-CRAH-12-000115">
+                        <div class="wb-rail-item-id">WO-2026-0441</div>
+                        <div class="wb-rail-item-title">CRAH-12 evaporator coil clean</div>
+                        <div class="wb-rail-item-sub">P2_critical &nbsp; <span class="wb-pill approved" style="font-size:0.62rem;">approved</span></div>
+                    </div>
+                    <div class="wb-rail-item" role="button" tabindex="0" aria-label="CMMS draft for CDU-PUMP-01">
+                        <div class="wb-rail-item-id">WO-DRAFT-2026-0447</div>
+                        <div class="wb-rail-item-title">CDU-PUMP-01 strainer clean (proposed)</div>
+                        <div class="wb-rail-item-sub"><span class="wb-pill needs-review">proposed</span></div>
+                    </div>
+                    <div class="wb-rail-item" role="button" tabindex="0" aria-label="CMMS draft for Battery-string-3">
+                        <div class="wb-rail-item-id">WO-DRAFT-2026-0448</div>
+                        <div class="wb-rail-item-title">Battery-String-3 impedance trend log</div>
+                        <div class="wb-rail-item-sub"><span class="wb-pill needs-review">proposed</span></div>
+                    </div>
+                    <div class="wb-rail-item" role="button" tabindex="0" aria-label="CMMS draft for Genset-2">
+                        <div class="wb-rail-item-id">WO-DRAFT-2026-0449</div>
+                        <div class="wb-rail-item-title">Genset-2 fuel quality sample</div>
+                        <div class="wb-rail-item-sub"><span class="wb-pill open">analysis_only</span></div>
+                    </div>
+                </div>
+
+                <!-- Warnings -->
+                <div class="wb-rail-section">
+                    <div class="wb-rail-title"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Warnings</div>
+                    <div class="wb-rail-warn" role="alert">
+                        <div class="wb-rail-warn-title"><i class="fas fa-chart-line" aria-hidden="true"></i> Model Drift — rf_pump_v0.3</div>
+                        <div class="wb-rail-warn-sub">Calibration isotonic residual +0.04 vs baseline. Recalibration queued for next batch.</div>
+                    </div>
+                    <div class="wb-rail-warn" role="alert">
+                        <div class="wb-rail-warn-title"><i class="fas fa-plug" aria-hidden="true"></i> CMMS Connector Lag</div>
+                        <div class="wb-rail-warn-sub">Maximo sync 4 min behind nominal (SLA: &lt;2 min). Network latency suspected.</div>
+                    </div>
+                </div>
+            </aside>
+        </div><!-- /wb-body -->
+    </div><!-- /wb-shell -->
+
+    <!-- Footer -->
+    <footer class="wb-footer">
+        <div class="wb-footer-grid">
+            <div>
+                <h4>Related</h4>
+                <a href="ai-engineering-maintenance.html">AI Engineering Maintenance Concept</a>
+                <a href="spares-readiness-calculator.html">Spares Readiness Calculator</a>
+                <a href="chiller-plant.html">Chiller Plant SCADA</a>
+                <a href="datacenter-solutions.html">DC Solutions Hub</a>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="index.html#contact">Contact</a>
+            </div>
+            <div>
+                <h4>Site</h4>
+                <a href="index.html">Home</a>
+                <a href="articles.html">Engineering Journal</a>
+                <a href="changelog.html">Changelog</a>
+            </div>
+        </div>
+        <div class="wb-footer-ver" id="versionStamp">&middot; ResistanceZero &middot; v?.?.? &middot;</div>
+        <p style="text-align:center;margin-top:0.3rem;font-size:0.68rem;color:var(--muted);">This is a concept prototype. No fabricated production numbers. All mock data is illustrative of the v1.41.7 schema contracts. AI is advisory-only.</p>
+    </footer>
+
+    <!-- Floating share buttons -->
+    <div class="share-buttons" id="shareButtons" aria-label="Share this page">
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fresistancezero.com%2Fai-maintenance-workbench.html" target="_blank" rel="noopener" class="share-btn li" aria-label="Share on LinkedIn" title="Share on LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+        <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fresistancezero.com%2Fai-maintenance-workbench.html&text=Maintenance+Intelligence+Workbench+%E2%80%94+Product+Shell+Prototype" target="_blank" rel="noopener" class="share-btn tw" aria-label="Share on X (Twitter)" title="Share on X"><i class="fab fa-x-twitter" aria-hidden="true"></i></a>
+        <a href="https://api.whatsapp.com/send?text=https%3A%2F%2Fresistancezero.com%2Fai-maintenance-workbench.html" target="_blank" rel="noopener" class="share-btn wa" aria-label="Share on WhatsApp" title="Share on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="share-btn ig" aria-label="Visit Instagram" title="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fresistancezero.com%2Fai-maintenance-workbench.html" target="_blank" rel="noopener" class="share-btn fb" aria-label="Share on Facebook" title="Share on Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+    </div>
+
+    <!-- Scroll-top button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Scroll to top" title="Scroll to top"><i class="fas fa-chevron-up" aria-hidden="true"></i></button>
+
+    <!-- Auth gate (inline — auth.js respects existing .root-gate) -->
+    <div class="root-gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+        <div class="root-card">
+            <h2 id="gateTitle"><i class="fas fa-lock" aria-hidden="true" style="color:var(--cyan);margin-right:0.3rem;"></i> Pro access required</h2>
+            <p>The Maintenance Intelligence Workbench prototype is available to Pro and Educator accounts. Sign in to continue, or return to the DC Solutions hub.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" aria-label="Sign in to access workbench">Sign In</button>
+                <a href="datacenter-solutions.html">Back to DC Solutions</a>
+            </div>
+            <div class="wb-session-diag" id="sessionDiag" aria-live="polite">session: checking&hellip;</div>
+        </div>
+    </div>
+
+    <!-- Cookie banner -->
+    <div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie consent">
+        <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Learn more</a></p>
+        <div class="cookie-actions"><button class="cookie-accept" id="cookieAccept">Accept</button><button id="cookieDecline">Decline</button></div>
+    </div>
+
+    <script src="js/rz-version.js?v=1.41.9"></script>
+    <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
+    <script src="auth.js?v=1.41.6" defer></script>
+    <script src="js/rz-mobile-nav.js?v=1.41.9" defer></script>
+    <script src="script.min.js?v=20260525" defer></script>
+
+    <script>
+    /* ── Workbench state ──────────────────────────────────────────────── */
+    var WB_STATE = {
+      tenant: { id: 'tenant-pilot', name: 'RZ Pilot Tenant' },
+      site:   { id: 'site-001',    name: 'Datacenter Bekasi 1' },
+      user:   { email: 'reliability.engineer@rz.demo', role: 'reliability_engineer', tier: 'pro' },
+      activeView: 'command',
+      activeCaseId: 'DC-CDU01-000142',
+      cases: [
+        { id:'DC-CDU01-000142', asset:'CDU-PUMP-01', sev:1, conf:0.87, dq:0.82, state:'needs_review' },
+        { id:'DC-UPS-A-000128', asset:'UPS-A bypass', sev:2, conf:0.71, dq:0.94, state:'needs_review' },
+        { id:'DC-GEN-2-000091', asset:'Genset-2 day-tank', sev:0, conf:0.62, dq:0.55, state:'open' },
+        { id:'DC-CRAH-12-000115', asset:'CRAH-12 evap coil', sev:2, conf:0.79, dq:0.91, state:'approved' },
+        { id:'DC-BATT-3-000077', asset:'Battery-String-3', sev:0, conf:0.55, dq:0.88, state:'archived' }
+      ],
+      rightRail: {
+        approvals: ['DC-CDU01-000142','DC-UPS-A-000128','DC-CRAH-12-000115'],
+        drafts: ['WO-2026-0441','WO-DRAFT-2026-0447','WO-DRAFT-2026-0448','WO-DRAFT-2026-0449'],
+        warnings: ['model-drift-rf_pump_v0.3','connector-lag-cmms']
+      }
+    };
+
+    /* ── View navigation ──────────────────────────────────────────────── */
+    function wbNav(btn, viewId) {
+      if (!viewId) return;
+      /* update state */
+      WB_STATE.activeView = viewId;
+      /* update nav buttons */
+      var btns = document.querySelectorAll('.wb-nav-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove('active');
+        btns[i].removeAttribute('aria-current');
+      }
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-current', 'page');
+      }
+      /* show/hide views */
+      var views = document.querySelectorAll('.wb-view');
+      for (var j = 0; j < views.length; j++) {
+        views[j].style.display = views[j].id === 'view-' + viewId ? '' : 'none';
+      }
+      /* scroll to top of main pane */
+      var pane = document.getElementById('wb-main-pane');
+      if (pane) pane.scrollTop = 0;
+    }
+
+    /* Open a specific case in the case-detail view */
+    function wbOpenCase(caseId) {
+      WB_STATE.activeCaseId = caseId;
+      var btn = document.querySelector('[data-view="cases"]');
+      wbNav(btn, 'case-detail');
+    }
+
+    /* ── Evidence tab switching ───────────────────────────────────────── */
+    function wbTab(btn, paneId) {
+      /* buttons */
+      var tabs = btn.closest('.wb-tabs').querySelectorAll('.wb-tab-btn');
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+        tabs[i].setAttribute('aria-selected', 'false');
+      }
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      /* panes */
+      var card = btn.closest('.wb-card');
+      var panes = card.querySelectorAll('.wb-tab-pane');
+      for (var j = 0; j < panes.length; j++) {
+        panes[j].classList.toggle('active', panes[j].id === paneId);
+      }
+    }
+
+    /* ── CMMS draft accordion ─────────────────────────────────────────── */
+    function wbToggleCmms() {
+      var toggle = document.getElementById('cmmsDraftToggle');
+      var body = document.getElementById('cmmsDraftBody');
+      if (!toggle || !body) return;
+      var isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      toggle.classList.toggle('open', !isOpen);
+      toggle.setAttribute('aria-expanded', String(!isOpen));
+    }
+
+    /* ── Theme toggle ─────────────────────────────────────────────────── */
+    (function(){
+      var t = document.getElementById('themeToggle');
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', theme === 'dark' ? '#0b1324' : '#f1f5f9');
+      }
+      /* already applied in inline head script; just wire the button */
+      if (t) t.addEventListener('click', function(){
+        var cur = document.documentElement.getAttribute('data-theme');
+        applyTheme(cur === 'dark' ? 'light' : 'dark');
+      });
+    }());
+
+    /* ── Hamburger nav ────────────────────────────────────────────────── */
+    (function(){
+      var b = document.getElementById('hamburgerBtn');
+      var m = document.getElementById('navMenu');
+      if (b && m) b.addEventListener('click', function(){
+        m.classList.toggle('active');
+        b.setAttribute('aria-expanded', String(m.classList.contains('active')));
+      });
+    }());
+
+    /* ── Page-access tier gate ────────────────────────────────────────── */
+    (function(){
+      function updateDiag(msg) {
+        var el = document.getElementById('sessionDiag');
+        if (el) el.textContent = 'session: ' + msg;
+      }
+      function ag() {
+        if (window._rzAuth && typeof window._rzAuth.enforceTierFeatureAccess === 'function') {
+          window._rzAuth.enforceTierFeatureAccess('ai-maintenance-workbench');
+          try {
+            var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            updateDiag(s ? (s.tier + ' · ' + (s.role || 'no-role') + ' · ' + (s.email || '')) : 'no session');
+          } catch(e) { updateDiag('parse error'); }
+        } else {
+          try {
+            var s2 = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+            var t = s2 && s2.tier, r = s2 && s2.role;
+            var passes = !!s2 && (t === 'pro' || t === 'root' || r === 'root' || r === 'pro' || r === 'educator');
+            document.body.classList.toggle('locked', !passes);
+            updateDiag(s2 ? (t + ' · ' + (r || '') + ' · ' + (s2.email || '')) : 'no session');
+          } catch(e) {
+            document.body.classList.add('locked');
+            updateDiag('error');
+          }
+        }
+      }
+      var loginBtn = document.getElementById('rootLoginBtn');
+      if (loginBtn) loginBtn.addEventListener('click', function(){
+        if (window._rzAuth && typeof window._rzAuth.showModal === 'function') window._rzAuth.showModal();
+      });
+      window.addEventListener('rz-auth-change', function(){ setTimeout(ag, 50); });
+      window.addEventListener('storage', function(e){ if (e.key === 'rz_premium_session') ag(); });
+      ag(); setTimeout(ag, 60); setTimeout(ag, 550); setTimeout(ag, 1600);
+    }());
+
+    /* ── Cookie banner ────────────────────────────────────────────────── */
+    (function(){
+      var b = document.getElementById('cookieBanner');
+      if (!localStorage.getItem('rz_cookie_consent') && b) b.classList.remove('hidden');
+      var ac = document.getElementById('cookieAccept');
+      var dc = document.getElementById('cookieDecline');
+      if (ac) ac.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','accepted'); b.classList.add('hidden'); });
+      if (dc) dc.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent','declined'); b.classList.add('hidden'); });
+    }());
+
+    /* ── Share buttons + scroll-top ───────────────────────────────────── */
+    (function(){
+      var sb = document.getElementById('shareButtons');
+      var st = document.getElementById('scrollTop');
+      window.addEventListener('scroll', function(){
+        if (sb) sb.classList.toggle('visible', window.scrollY > 300);
+        if (st) st.classList.toggle('visible', window.scrollY > 400);
+      });
+      if (st) st.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+    }());
+
+    /* ── Version stamp ────────────────────────────────────────────────── */
+    (function(){
+      var el = document.getElementById('versionStamp');
+      if (!el) return;
+      var v = window.RZ_VERSION || '1.x.x';
+      var d = window.RZ_VERSION_DATE || '';
+      var cn = window.RZ_VERSION_CODENAME || '';
+      el.textContent = '· ResistanceZero · v' + v + (d ? ' · ' + d : '') + (cn ? ' · ' + cn : '') + ' ·';
+    }());
+    </script>
+</body>
+</html>

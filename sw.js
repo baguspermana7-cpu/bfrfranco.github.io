@@ -2,7 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v1.41.8'; // version-aware: invalidates on every site bump
+const CACHE_NAME = 'rz-cache-v1.41.9'; // version-aware: invalidates on every site bump
 
 // v1.29.0 — Critical auth/config files that MUST be fetched fresh when online.
 // Cached only as offline fallback. Rescues users stranded on a stale SW
@@ -39,7 +39,9 @@ const PRE_CACHE_URLS = [
   '/assets/og/articles.webp',
   '/assets/og/datacenter-solutions.webp',
   '/assets/og/maintenance-decode-lab.webp',
+  '/assets/og/ai-maintenance-workbench.webp',
   '/maintenance-decode-lab.html',
+  '/ai-maintenance-workbench.html',
   '/js/maintenance/main.js',
   '/js/maintenance/styles.css',
   '/js/maintenance/core/registry.js',
