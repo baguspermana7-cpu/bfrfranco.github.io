@@ -11,6 +11,152 @@ release sections rather than semver.
 
 ---
 
+## v1.41.6 — 2026-05-26 (AI Maintenance review-v3 response — Workbench Preview + capability gating + standards-doc safety fix)
+
+PATCH ship: addresses 9 of 10 "Recommended Immediate Edits" from
+`Documents/AI maintenance/2026-05-26-ai-engineering-maintenance-in-progress-review-v3.md`
+Section 7, plus the P0.5 standards-doc safety contradiction.
+
+`ai-engineering-maintenance.html` grows **1,662 → 1,838 lines** (+176)
+without losing v1.40.0 / v1.41.3 framing.
+
+### Phase A — Standards safety fix (review-v3 P0.5)
+
+- **`standarization/KNOWLEDGE_BASE_STANDARD.md`** confidence-tier table
+  rewritten. `high` previously read *"Auto-action allowed within RPN
+  thresholds"* &mdash; a dangerous contradiction of the page-level
+  advisory-only posture. Now corrected:
+  - `high` &rarr; eligible for **draft recommendation / draft work-order
+    only**; human approval required before any operational action.
+    **No autonomous actuation, ever.**
+  - `medium` &rarr; reliability-engineer review required before draft
+    WO.
+  - `thin` &rarr; **analysis-only**, vendor outreach required; no draft WO.
+- Standard now states explicitly: AI is advisory-only by default;
+  physical control remains in SIS / protection relays / BMS engineered
+  sequences (IEC 61508 / 62443).
+
+### Phase B — Concept page reframe
+
+**1. Hero compressed (P0.1)** &mdash; large yellow warning block replaced
+with a 5-pill status strip (`Concept build` · `AI advisory-only` ·
+`No physical control` · `Research basis linked` · `Product roadmap`)
+plus an expandable details element retaining the full framing prose.
+
+**2. Workbench Preview section added (P0.1 + P0.3)** &mdash; new
+`#sec-workbench-preview` section above the paper hero with 3 static
+mock panels:
+- **Fleet Command Center**: 4 KPI tiles (At Risk · Needs Review · Draft
+  WO · SLA Healthy) + connector status strip.
+- **Triage Queue (top 3)**: 3 ranked cards (SEV-1 CDU pump · SEV-2 UPS
+  bypass · INFO genset day-tank) with severity pill, confidence, DQ,
+  owner, FMECA ID.
+- **Active Diagnostic Case**: header + evidence summary + FMECA rank
+  callout (with `effects.csv` chain warning) + 5 decision rows +
+  3 action buttons ([Approve draft] / [Reject] / [Ask for more
+  evidence]) + audit-trail note.
+- Section nav gets a `Workbench Preview` pill at position 0 so it's
+  the first link.
+
+**3. Capability Status Matrix added (P0.4 + P1.7 + P1.8)** &mdash; new
+chip grid inside Enhanced Engine section. 11 engine capabilities each
+labeled `available` / `pilot` / `spec needed` / `future` / `blocked
+by data`. RUL marked **blocked by data** (74/144 components lack MTBF;
+no run-to-failure data in seed). Conformal marked **blocked by data**
+(needs calibration set). CMMS draft marked **future** (needs connector
+contract + audit ledger).
+
+**4. Data completeness banner added (P0.4 + Section 7 item 7)**
+&mdash; amber banner near KB section showing concrete gaps:
+- 23/109 faults with no mapped action
+- 67/109 faults with no documented effect
+- 120/138 actions with no procedure steps
+- 74/144 components with no typical MTBF
+
+Banner introduces planned `recommendation_readiness` tier vocabulary
+(`analysis_only` &rarr; `advisory_possible` &rarr; `draft_wo_possible`
+&rarr; `production_ready`).
+
+**5. Asset Registry added as 12th canonical screen (P1.2)** &mdash; freezes
+the IA at 12 screens. Asset Registry was missing from the 11-screen
+list despite being structurally required for tag mapping and the
+tenant / site / asset hierarchy.
+
+**6. Mode A / Mode B renamed to user tasks (P2.3)** &mdash; 8 sites
+across the page now read `Ask Knowledge Base (Mode A · API)` and
+`Analyze Telemetry Case (Mode B · Engine)` instead of pure
+implementation vocabulary. Old Mode A/B retained as parenthetical
+secondary label for continuity.
+
+**7. CMMS wording fix (P0.8)** &mdash; Gap #03 enhancement rewritten:
+- `auto-create WO` &rarr; **propose a draft work order**
+- `criticality from RPN` &rarr; **priority recommendation derived from
+  the risk engine (RPN ordinal &times; SLA &times; safety &times;
+  redundancy &times; spares); planner approval required before
+  dispatch**
+- Added CMMS state machine: `proposed &rarr; reviewed &rarr;
+  draft_created &rarr; planner_approved &rarr; dispatched &rarr;
+  closed &rarr; verified` with audit-logged transitions.
+- Enhanced engine diagram label `WO auto-create` &rarr; `WO draft
+  (approval)`.
+
+**8. RPN ordinal language fix (P1.7)** &mdash; "Top preventive-action
+target" rewritten to make RPN's ordinal nature explicit. Highest RPN
+row (F19.1 diesel microbial contamination, RPN 200) now framed as
+"FMECA priority rank" for reviewer attention; work-order priority
+must come from the risk engine (RPN ordinal &times; SLA &times;
+safety class &times; redundancy state &times; spares readiness &times;
+human approval), not RPN alone.
+
+**9. `source_confidence_tier` clarification (P1.5)** &mdash; Knowledge
+Base section now distinguishes:
+- `source_confidence_tier` (this dataset's citation strength)
+- `model_confidence_calibrated` (predictor output, future)
+- `data_quality_score` (sensor health, future)
+- `evidence_coverage_score` (chain completeness, future)
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.6
+- `sw.js` &rarr; `rz-cache-v1.41.6`
+
+### Audits
+
+- `audit-script-tags.py --strict` &mdash; CLEAN
+- `audit-js-syntax.py --strict` &mdash; CLEAN
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 133 PASS / 0 FAIL
+- `audit-seo.py` &mdash; 0 required errors
+
+### Not in this ship (deferred per scope)
+
+The reviewer's Sprint 3-5 backlog requires structural work beyond a
+single concept-page revision:
+- New `ai-maintenance-workbench.html` interactive prototype with one
+  vertical CDU/chiller-pump slice (telemetry &rarr; DQ gate &rarr;
+  diagnosis &rarr; evidence &rarr; calculation panel &rarr;
+  recommendation review &rarr; CMMS draft &rarr; technician closeout
+  &rarr; audit &rarr; KG diff)
+- JSON-schema data contracts (`DiagnosticCase`,
+  `TelemetryWindow`, `DataQualityResult`, `WorkOrderDraft`,
+  `RecommendationReview`, `KGDiff`, `AuditEvent`,
+  `IntegrationSync`)
+- CSV readiness checker (per-row `recommendation_readiness` computed
+  status)
+- Frontend hardening (inline-style &rarr; external CSS/JS, CSP plan,
+  SRI on CDN assets)
+- Server-side RBAC / multi-tenant security
+- Telemetry schema + synthetic fixtures
+- Model validation/calibration/conformal acceptance criteria
+- Product event taxonomy + dashboards
+
+These remain captured in
+`docs/plans/2026-05-25-ai-maintenance-product-roadmap.md` as
+multi-year initiatives. This page now points at them honestly via the
+status-strip "Product roadmap" link.
+
+---
+
 ## v1.41.5 — 2026-05-26 (Network Hub tempo system — wire spec._tempo into audio playback)
 
 PATCH ship: closes the v1.40.1 deferred item *"Network Hub tempo system fix

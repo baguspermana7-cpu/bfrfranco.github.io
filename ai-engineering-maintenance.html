@@ -513,11 +513,21 @@
 
         <!-- ════════════════════════════════════════ HERO ════════════════════════════════════════ -->
         <section class="hero" id="main-content">
-            <!-- v1.40.0 — Honest framing banner (per 2026-05-24 production review) -->
-            <div style="margin-bottom:1.2rem;padding:0.9rem 1.1rem;border:1px solid rgba(255,170,0,0.45);border-radius:8px;background:rgba(255,170,0,0.08);font-size:0.86rem;line-height:1.5;">
-                <strong style="color:var(--amber);"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> This is a concept-and-design document, not a production product.</strong>
-                It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench &mdash; 11 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in <a href="docs/plans/2026-05-25-ai-maintenance-product-roadmap.md" style="color:var(--amber);">docs/plans/2026-05-25-ai-maintenance-product-roadmap.md</a>. AI is <strong>advisory-only by default</strong>; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508).
+            <!-- v1.41.6 — Status strip (compressed warning, review-v3 P0.1).
+                 Full framing detail moved into expandable details below. -->
+            <div style="margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.04em;">
+                <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.32rem 0.6rem;border:1px solid rgba(255,170,0,0.45);background:rgba(255,170,0,0.08);color:var(--amber);border-radius:6px;font-weight:700;text-transform:uppercase;"><i class="fas fa-circle-info" aria-hidden="true"></i> Concept build</span>
+                <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.32rem 0.6rem;border:1px solid rgba(34,211,238,0.45);background:rgba(34,211,238,0.08);color:#67e8f9;border-radius:6px;font-weight:700;text-transform:uppercase;"><i class="fas fa-shield-halved" aria-hidden="true"></i> AI advisory-only</span>
+                <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.32rem 0.6rem;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.06);color:#f87171;border-radius:6px;font-weight:700;text-transform:uppercase;"><i class="fas fa-ban" aria-hidden="true"></i> No physical control</span>
+                <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.32rem 0.6rem;border:1px solid rgba(148,163,184,0.35);background:rgba(148,163,184,0.06);color:#94a3b8;border-radius:6px;font-weight:700;text-transform:uppercase;"><i class="fas fa-link" aria-hidden="true"></i> Research basis linked</span>
+                <a href="docs/plans/2026-05-25-ai-maintenance-product-roadmap.md" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.32rem 0.6rem;border:1px solid rgba(34,211,238,0.45);color:#67e8f9;border-radius:6px;font-weight:700;text-transform:uppercase;text-decoration:none;"><i class="fas fa-route" aria-hidden="true"></i> Product roadmap</a>
             </div>
+            <details style="margin-bottom:1.2rem;font-size:0.82rem;color:#94a3b8;">
+                <summary style="cursor:pointer;color:var(--amber);font-weight:600;"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> What this page is and is not (framing detail)</summary>
+                <div style="padding:0.6rem 0 0;line-height:1.55;">
+                    This is a <strong>concept-and-design document</strong>, not a production product. It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench &mdash; 12 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in <a href="docs/plans/2026-05-25-ai-maintenance-product-roadmap.md" style="color:var(--amber);">docs/plans/2026-05-25-ai-maintenance-product-roadmap.md</a>. AI is <strong>advisory-only by default</strong>; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508 / 62443).
+                </div>
+            </details>
             <span class="pill"><i class="fas fa-microchip" aria-hidden="true"></i> Industrial Maintenance Intelligence · FMECA + KG + ML + NLP</span>
             <h1>AI Engineering Maintenance — Intelligent Advisor System Concept</h1>
             <p class="subtitle">
@@ -546,7 +556,8 @@
 
         <!-- ════════════════════════════════════════ SECTION NAV ════════════════════════════════════════ -->
         <nav class="section-nav" id="sectionNav">
-            <a class="nav-pill active" href="#sec-platform">Platform Concept</a>
+            <a class="nav-pill active" href="#sec-workbench-preview">Workbench Preview</a>
+            <a class="nav-pill" href="#sec-platform">Platform Concept</a>
             <a class="nav-pill" href="#sec-arch">Architecture</a>
             <a class="nav-pill" href="#sec-modules">4 Modules</a>
             <a class="nav-pill" href="#sec-modes">2 Modes</a>
@@ -557,6 +568,128 @@
             <a class="nav-pill" href="#sec-questions">Open Questions</a>
             <a class="nav-pill" href="#sec-knowledge-base">Knowledge Base</a>
         </nav>
+
+        <!-- ════════════════════════════════════════ WORKBENCH PREVIEW (mock, review-v3 P0.1 + P0.3) ════════════════════════════════════════ -->
+        <section class="section" id="sec-workbench-preview" data-nav-id="sec-workbench-preview" style="--card-border:rgba(34,211,238,0.35);">
+            <h2><i class="fas fa-desktop" aria-hidden="true"></i> Workbench Preview <span style="font-size:0.6rem;font-weight:800;padding:3px 9px;border-radius:6px;background:rgba(0,221,255,0.18);border:1px solid rgba(0,221,255,0.4);color:#00DDFF;letter-spacing:0.06em;display:inline-flex;align-items:center;gap:4px;margin-left:0.5rem;vertical-align:middle;"><i class="fas fa-flask" style="font-size:0.55rem;"></i>MOCK · STATIC</span></h2>
+            <p class="intro">
+                What the production <b>Maintenance Intelligence Workbench</b> first viewport would look like.
+                The three panels below are <strong>static mocks</strong> &mdash; sample state shaped from the v1.41.x
+                FMECA seed dataset. They are not connected to live telemetry, the engine isn't running, no
+                physical control is reachable from this page. The goal here is to answer the operator
+                question <em>"what can I do now, what asset is at risk, what case needs my action?"</em> before
+                the reader has to scroll past the research basis.
+            </p>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1.2rem;">
+
+                <!-- Panel 1: Fleet Command Center -->
+                <div style="border:1px solid rgba(255,255,255,0.10);background:rgba(15,23,42,0.6);border-radius:10px;padding:0.95rem 1rem;display:grid;gap:0.65rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:start;gap:0.4rem;">
+                        <div>
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;">Panel 01 / Mock</div>
+                            <div style="font-size:1rem;font-weight:700;color:#f8fafc;margin-top:0.15rem;">Fleet Command Center</div>
+                        </div>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;padding:0.15rem 0.45rem;background:rgba(34,211,238,0.18);color:#67e8f9;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;">LIVE</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                        <div style="padding:0.55rem;border:1px solid rgba(239,68,68,0.35);background:rgba(239,68,68,0.06);border-radius:6px;">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:#f87171;text-transform:uppercase;">At Risk</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:#fff;">3</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;">CDU pump · UPS bypass · Genset day-tank</div>
+                        </div>
+                        <div style="padding:0.55rem;border:1px solid rgba(255,170,0,0.35);background:rgba(255,170,0,0.06);border-radius:6px;">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--amber);text-transform:uppercase;">Needs Review</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:#fff;">7</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;">Reliability engineer queue</div>
+                        </div>
+                        <div style="padding:0.55rem;border:1px solid rgba(34,211,238,0.35);background:rgba(34,211,238,0.06);border-radius:6px;">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:#67e8f9;text-transform:uppercase;">Draft WO</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:#fff;">4</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;">Planner approval pending</div>
+                        </div>
+                        <div style="padding:0.55rem;border:1px solid rgba(16,185,129,0.35);background:rgba(16,185,129,0.06);border-radius:6px;">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:#10b981;text-transform:uppercase;">SLA Healthy</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:#fff;">42</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;">Assets within envelope</div>
+                        </div>
+                    </div>
+                    <div style="font-size:0.7rem;color:#64748b;border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;">Connectors: <span style="color:#10b981;">BMS ✓</span> · <span style="color:#10b981;">SCADA ✓</span> · <span style="color:var(--amber);">CMMS sync 4min lag</span></div>
+                </div>
+
+                <!-- Panel 2: Triage Queue -->
+                <div style="border:1px solid rgba(255,255,255,0.10);background:rgba(15,23,42,0.6);border-radius:10px;padding:0.95rem 1rem;display:grid;gap:0.5rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:start;gap:0.4rem;">
+                        <div>
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;">Panel 02 / Mock</div>
+                            <div style="font-size:1rem;font-weight:700;color:#f8fafc;margin-top:0.15rem;">Triage Queue (top 3)</div>
+                        </div>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;padding:0.15rem 0.45rem;background:rgba(15,23,42,0.6);color:#94a3b8;border:1px solid rgba(148,163,184,0.3);border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;">RANKED</span>
+                    </div>
+                    <div style="display:grid;gap:0.4rem;">
+                        <div style="padding:0.5rem;border:1px solid rgba(239,68,68,0.35);background:rgba(239,68,68,0.04);border-radius:6px;display:grid;grid-template-columns:auto 1fr auto;gap:0.5rem;align-items:center;">
+                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#f87171;padding:0.15rem 0.4rem;border:1px solid rgba(239,68,68,0.5);border-radius:4px;">SEV-1</span>
+                            <div>
+                                <div style="font-size:0.78rem;font-weight:600;color:#f8fafc;">CDU-PUMP-01 abnormal flow signature</div>
+                                <div style="font-size:0.66rem;color:#94a3b8;font-family:'JetBrains Mono',monospace;">Conf 0.87 · DQ 0.82 · owner: rel-eng</div>
+                            </div>
+                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#67e8f9;">F11.2</span>
+                        </div>
+                        <div style="padding:0.5rem;border:1px solid rgba(255,170,0,0.35);background:rgba(255,170,0,0.04);border-radius:6px;display:grid;grid-template-columns:auto 1fr auto;gap:0.5rem;align-items:center;">
+                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--amber);padding:0.15rem 0.4rem;border:1px solid rgba(255,170,0,0.5);border-radius:4px;">SEV-2</span>
+                            <div>
+                                <div style="font-size:0.78rem;font-weight:600;color:#f8fafc;">UPS-A bypass static-switch drift</div>
+                                <div style="font-size:0.66rem;color:#94a3b8;font-family:'JetBrains Mono',monospace;">Conf 0.71 · DQ 0.94 · owner: operator</div>
+                            </div>
+                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#67e8f9;">F03.1</span>
+                        </div>
+                        <div style="padding:0.5rem;border:1px solid rgba(148,163,184,0.25);background:rgba(15,23,42,0.4);border-radius:6px;display:grid;grid-template-columns:auto 1fr auto;gap:0.5rem;align-items:center;">
+                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#94a3b8;padding:0.15rem 0.4rem;border:1px solid rgba(148,163,184,0.4);border-radius:4px;">INFO</span>
+                            <div>
+                                <div style="font-size:0.78rem;font-weight:600;color:#f8fafc;">Genset-2 day-tank fuel quality drift</div>
+                                <div style="font-size:0.66rem;color:#94a3b8;font-family:'JetBrains Mono',monospace;">Conf 0.62 · DQ 0.55 · analysis-only</div>
+                            </div>
+                            <span style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#67e8f9;">F19.1</span>
+                        </div>
+                    </div>
+                    <div style="font-size:0.7rem;color:#64748b;border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;">Rank = severity · model-conf · data-quality · SLA exposure</div>
+                </div>
+
+                <!-- Panel 3: Active Diagnostic Case -->
+                <div style="border:1px solid rgba(255,255,255,0.10);background:rgba(15,23,42,0.6);border-radius:10px;padding:0.95rem 1rem;display:grid;gap:0.55rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:start;gap:0.4rem;">
+                        <div>
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;">Panel 03 / Mock</div>
+                            <div style="font-size:1rem;font-weight:700;color:#f8fafc;margin-top:0.15rem;">Active Diagnostic Case</div>
+                        </div>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;padding:0.15rem 0.45rem;background:rgba(255,170,0,0.18);color:var(--amber);border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;">AWAITING APPROVAL</span>
+                    </div>
+                    <div style="font-size:0.8rem;color:#f8fafc;font-weight:600;">CDU-PUMP-01 · Flow obstruction (F11.2)</div>
+                    <div style="display:grid;gap:0.35rem;font-size:0.72rem;color:#cbd5e1;">
+                        <div><span style="color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.65rem;">EVIDENCE</span> &nbsp;3 sensor channels · KG path F11.2→A11.2-P · DQ 0.82</div>
+                        <div><span style="color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.65rem;">FMECA RANK</span> &nbsp;144 (ordinal) · expected risk: <em>blocked &mdash; effects.csv chain incomplete</em></div>
+                        <div><span style="color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.65rem;">SOURCE TIER</span> &nbsp;high · ASHRAE TC 9.9 §3.2, Hydraulic Inst 14.3</div>
+                        <div><span style="color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.65rem;">ACTION</span> &nbsp;Strainer clean + DP-trend review (A11.2-P · 4 steps)</div>
+                        <div><span style="color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.65rem;">DECISION</span> &nbsp;<strong style="color:var(--amber);">draft WO proposed</strong> &mdash; reliability engineer review required (human approval before dispatch)</div>
+                    </div>
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.4rem;">
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:0.25rem 0.5rem;border:1px solid rgba(16,185,129,0.45);background:rgba(16,185,129,0.08);color:#10b981;border-radius:4px;">[Approve draft]</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:0.25rem 0.5rem;border:1px solid rgba(148,163,184,0.4);background:rgba(15,23,42,0.6);color:#94a3b8;border-radius:4px;">[Reject + reason]</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:0.25rem 0.5rem;border:1px solid rgba(34,211,238,0.45);background:rgba(34,211,238,0.06);color:#67e8f9;border-radius:4px;">[Ask for more evidence]</span>
+                    </div>
+                    <div style="font-size:0.7rem;color:#64748b;border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;">Audit trail captured on every transition (case · reviewer · timestamp · reason · source claim id).</div>
+                </div>
+
+            </div>
+
+            <div style="margin-top:1.2rem;padding:0.7rem 1rem;border:1px dashed rgba(148,163,184,0.3);border-radius:8px;background:rgba(15,23,42,0.35);font-size:0.78rem;color:#94a3b8;line-height:1.55;">
+                <strong style="color:#cbd5e1;">Reading guide:</strong> these mocks are deliberately shallow. The next ship is one vertical
+                <b>CDU / chiller pump</b> slice that exercises the full loop (telemetry &rarr; DQ gate &rarr; diagnosis &rarr;
+                evidence &rarr; calculation panel &rarr; recommendation review &rarr; CMMS draft &rarr; technician feedback &rarr; audit
+                &rarr; KG diff). Until that slice ships, the page calls itself <em>research basis + product concept</em>, not a
+                production product.
+            </div>
+        </section>
 
         <!-- ════════════════════════════════════════ PLATFORM CONCEPT ════════════════════════════════════════ -->
         <section class="section" id="sec-platform" data-nav-id="sec-platform">
@@ -631,6 +764,8 @@
                 <div class="screen-card"><div class="screen-kicker">09</div><div class="screen-name">Model Monitor</div><div class="screen-desc">Calibration, drift, false alarms, missed faults, training data coverage, and release gates.</div></div>
                 <div class="screen-card"><div class="screen-kicker">10</div><div class="screen-name">Tenant &amp; RBAC Admin</div><div class="screen-desc">Sites, assets, user roles, approval policy, API keys, environment separation, and access logs.</div></div>
                 <div class="screen-card"><div class="screen-kicker">11</div><div class="screen-name">Audit &amp; Compliance</div><div class="screen-desc">Decision history, evidence snapshots, reviewer chain, CMMS sync trail, and exportable incident packets.</div></div>
+                <!-- v1.41.6 — Asset Registry promoted to 12th canonical screen (review-v3 P1.2 freezes IA) -->
+                <div class="screen-card"><div class="screen-kicker">12</div><div class="screen-name">Asset Registry</div><div class="screen-desc">Tenant &middot; site &middot; system &middot; asset hierarchy with FMECA bindings, sensor-tag map, criticality class, redundancy state, and parent/child topology. Source-of-truth for every Diagnostic Case.</div></div>
             </div>
 
             <div class="decision-table" role="region" aria-label="Role-based workflow responsibilities">
@@ -767,12 +902,12 @@
                     <text class="d-text-sm" x="833" y="232">Failure description &middot; effects</text>
 
                     <rect class="d-block" x="820" y="260" width="260" height="60" rx="6"/>
-                    <text class="d-text" x="833" y="280">Mode A &middot; By API (Natural Lang.)</text>
+                    <text class="d-text" x="833" y="280">Ask Knowledge Base (Mode A &middot; API)</text>
                     <text class="d-text-cyan" x="833" y="296">User -&gt; NLP -&gt; Cypher -&gt; KG -&gt; Reply</text>
                     <text class="d-text-sm" x="833" y="310">Deterministic, explainable</text>
 
                     <rect class="d-block" x="820" y="340" width="260" height="60" rx="6"/>
-                    <text class="d-text" x="833" y="360">Mode B &middot; By Engine (Sensor)</text>
+                    <text class="d-text" x="833" y="360">Analyze Telemetry Case (Mode B &middot; Engine)</text>
                     <text class="d-text-amber" x="833" y="376">Data -&gt; RF -&gt; Label -&gt; KG -&gt; Reply</text>
                     <text class="d-text-sm" x="833" y="390">Data-driven, no framing needed</text>
 
@@ -976,8 +1111,8 @@
         <section class="section" id="sec-modes" data-nav-id="sec-modes">
             <h2><i class="fas fa-arrows-left-right" aria-hidden="true"></i> Two Interaction Modes</h2>
             <p class="intro">
-                The user reaches the advisor through one of two entry points. <b>Mode A</b> is for the engineer who
-                knows what to ask; <b>Mode B</b> is for the technician with raw data but no diagnosis. Both modes
+                The user reaches the advisor through one of two entry points. <b>Ask Knowledge Base (Mode A)</b> is for the engineer who
+                knows what to ask; <b>Analyze Telemetry Case (Mode B)</b> is for the technician with raw data but no diagnosis. Both flows
                 terminate at the same Cypher-template tail, so the answer surface is consistent &mdash; the upstream
                 arrival path is the only thing that changes.
             </p>
@@ -986,7 +1121,7 @@
                 <!-- Mode A -->
                 <div class="mode-card cyan">
                     <div>
-                        <span class="mode-tag">Mode A &middot; By API</span>
+                        <span class="mode-tag">Ask Knowledge Base &middot; Mode A (API)</span>
                     </div>
                     <div class="mode-title">Natural-Language Query Path</div>
                     <div class="mode-sub">
@@ -1027,12 +1162,12 @@
                 <!-- Mode B -->
                 <div class="mode-card amber">
                     <div>
-                        <span class="mode-tag">Mode B &middot; By Engine Algorithms</span>
+                        <span class="mode-tag">Analyze Telemetry Case &middot; Mode B (Engine)</span>
                     </div>
                     <div class="mode-title">Sensor-Upload Diagnostic Path</div>
                     <div class="mode-sub">
                         Operator uploads raw measurement data (paper's CLI: <code style="color:var(--amber);background:var(--kv-bg);padding:0 4px;border-radius:3px;">predict ./dataset/output_3</code>).
-                        PCA + RF classify the fault. Predicted label feeds the same Cypher tail as Mode A &mdash;
+                        PCA + RF classify the fault. Predicted label feeds the same Cypher tail as the Ask-KB flow &mdash;
                         same answer surface, different arrival path.
                     </div>
                     <div class="mode-svg">
@@ -1137,7 +1272,7 @@
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Paper mentions CMMS work orders abstractly. Advisor output is a text answer &mdash; not an action in the maintenance system. No bi-directional sync.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>True "prescriptive" maintenance requires the prescription to land in a planner's queue, with parts reserved, technicians assigned, and an estimated MTTR. Otherwise it's just decision support.</dd></dl>
-                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Bi-directional <b>CMMS hook</b> via REST or webhook (IBM Maximo, SAP PM, Infor EAM, Fiix, UpKeep). On advisor output: auto-create WO with prescribed steps, BOM, MTTR estimate, criticality from RPN. On WO completion: capture outcome back into the KG via Gap #02's experience-capture pipeline.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Bi-directional <b>CMMS hook</b> via REST or webhook (IBM Maximo, SAP PM, Infor EAM, Fiix, UpKeep). On advisor output: <b>propose a draft work order</b> with prescribed steps, BOM, MTTR estimate, and a <em>priority recommendation</em> derived from the risk engine (RPN ordinal &times; SLA &times; safety &times; redundancy &times; spares); <strong>planner approval required before dispatch</strong> &mdash; no auto-create. On WO completion: capture outcome back into the KG via Gap #02's experience-capture pipeline. State machine: <code>proposed &rarr; reviewed &rarr; draft_created &rarr; planner_approved &rarr; dispatched &rarr; closed &rarr; verified</code>; every transition is audit-logged with actor, role, timestamp, reason, source case ID, idempotency key, connector response.</dd></dl>
                 </div>
             </details>
 
@@ -1232,6 +1367,26 @@
                 uncertainty quantification). Amber blocks are <b>knowledge surfaces</b>. Cyan blocks are <b>inference</b>.
             </p>
 
+            <!-- v1.41.6 — Capability status matrix (review-v3 P0.4, P1.7, P1.8). Each engine capability
+                 carries an explicit readiness label so reader doesn't mistake "described" for "shipping". -->
+            <div style="margin:1rem 0 1.4rem;padding:0.95rem 1.1rem;border:1px solid rgba(34,211,238,0.3);border-radius:10px;background:rgba(34,211,238,0.04);">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.55rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#67e8f9;text-transform:uppercase;letter-spacing:0.07em;font-weight:700;"><i class="fas fa-list-check" aria-hidden="true"></i> Capability Status Matrix</div>
+                <p style="margin:0 0 0.65rem;font-size:0.78rem;color:#cbd5e1;line-height:1.55;">Every capability shown in the architecture above carries an explicit readiness label. The page describes the production target shape; only the labels marked <strong>available</strong> can be safely demoed today. Everything else needs data or pipeline work first.</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.5rem;font-size:0.74rem;">
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.06);border-radius:6px;"><div style="font-weight:700;color:#10b981;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Available</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>RPN ordinal ranking</strong> &mdash; arithmetic validated, 826 rows clean. Use for FMECA priority rank only; never as work-order priority.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.06);border-radius:6px;"><div style="font-weight:700;color:#10b981;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Available</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>FMECA / KG lookup</strong> &mdash; seed-ready, FK clean. Production governance (claim-level provenance, reviewer workflow) still needed.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(255,170,0,0.4);background:rgba(255,170,0,0.06);border-radius:6px;"><div style="font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Pilot</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>RF + PCA classifier</strong> &mdash; research baseline (Cranfield gearbox). Needs site-specific retraining + validation report per asset class before pilot deploy.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(255,170,0,0.4);background:rgba(255,170,0,0.06);border-radius:6px;"><div style="font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Pilot</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>Aho-Corasick NLP</strong> &mdash; works on bounded vocabulary; needs dictionary curation per tenant + audit trail on Cypher template selection.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.45);border-radius:6px;"><div style="font-weight:700;color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Spec needed</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>Data-quality gate</strong> &mdash; threshold matrix (per sensor class &times; per op state) not yet authored. Required before any model output is shown to user.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.45);border-radius:6px;"><div style="font-weight:700;color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Spec needed</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>Calibration (Platt / isotonic)</strong> &mdash; requires held-out validation set + acceptance criteria. Future; needs model pipeline first.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.45);border-radius:6px;"><div style="font-weight:700;color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Future</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>SHAP explainability</strong> &mdash; requires the calibrated model + a stable feature schema. Future after model pipeline ships.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.05);border-radius:6px;"><div style="font-weight:700;color:#f87171;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Blocked by data</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>Conformal prediction</strong> &mdash; requires exchangeability assumptions + per-class coverage validation. Needs calibration set before any conformal interval can be trusted.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.05);border-radius:6px;"><div style="font-weight:700;color:#f87171;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Blocked by data</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>RUL (survival / LSTM)</strong> &mdash; requires run-to-failure or censored survival data per asset class. Current seed has none; 74/144 components lack MTBF. Cannot ship until labelled degradation paths exist.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.45);border-radius:6px;"><div style="font-weight:700;color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Future</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>CMMS draft creation</strong> &mdash; needs connector contract (REST or webhook), idempotency key, audit ledger, planner-approval gate. No auto-create; draft + human approval only.</div></div>
+                    <div style="padding:0.55rem 0.7rem;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.45);border-radius:6px;"><div style="font-weight:700;color:#94a3b8;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;">Future</div><div style="color:#cbd5e1;margin-top:0.2rem;"><strong>KG / model learning loop</strong> &mdash; needs claim-level review workflow + KG-diff approval + model retraining cadence + drift monitor. Not yet specified.</div></div>
+                </div>
+            </div>
+
             <div class="big-diagram" role="img" aria-label="Enhanced architecture diagram">
                 <svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                     <!-- Section bands -->
@@ -1321,7 +1476,7 @@
                     <rect class="d-block-amber" x="635" y="155" width="265" height="60" rx="5"/>
                     <text class="d-text" x="647" y="175">Cypher Template Library</text>
                     <text class="d-text-amber" x="647" y="192">Versioned, audited templates</text>
-                    <text class="d-text-sm" x="647" y="206">Mode A &amp; Mode B share this surface</text>
+                    <text class="d-text-sm" x="647" y="206">Ask-KB &amp; Analyze-Telemetry share this surface</text>
 
                     <rect class="d-block-amber" x="635" y="230" width="265" height="80" rx="5"/>
                     <text class="d-text" x="647" y="253">Experience-Capture Pipeline</text>
@@ -1357,7 +1512,7 @@
 
                     <rect class="d-block-green" x="940" y="180" width="245" height="80" rx="5"/>
                     <text class="d-text" x="952" y="200">CMMS Hook (bi-directional)</text>
-                    <text class="d-text-green" x="952" y="217">Gap#03 &middot; WO auto-create</text>
+                    <text class="d-text-green" x="952" y="217">Gap#03 &middot; WO draft (approval)</text>
                     <text class="d-text-sm" x="952" y="232">Steps, BOM, MTTR, RPN crit.</text>
                     <text class="d-text-sm" x="952" y="247">WO close -&gt; experience capture</text>
 
@@ -1438,7 +1593,7 @@
                         <li>Neo4j KG (10 node types)</li>
                         <li>26-feature extraction + PCA + RF</li>
                         <li>Aho-Corasick NLP</li>
-                        <li>CLI for Mode A &amp; Mode B</li>
+                        <li>CLI for Ask-KB &amp; Analyze-Telemetry</li>
                         <li>Replicates 84.84% F1</li>
                     </ul>
                     <div class="ph-complex">Effort: <b>4-6 weeks</b> &middot; 1 ML eng + 1 reliability eng</div>
@@ -1536,16 +1691,37 @@
                 <div class="metric"><div class="m-val">46</div><div class="m-lbl">Primary citations (CIGRE, IEEE 493, ASHRAE TC 9.9, NFPA, NETA, OREDA 7e, NPRD-2016, FMD-2016)</div></div>
             </div>
 
+            <!-- v1.41.6 — Data completeness banner (review-v3 P0.4 + Section 7 item 7).
+                 The seed is KG-ready, not fully recommendation-ready. Make that visible. -->
+            <div style="margin-top:1.2rem;padding:0.95rem 1.1rem;border:1px solid rgba(255,170,0,0.45);border-radius:10px;background:rgba(255,170,0,0.05);">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.55rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--amber);text-transform:uppercase;letter-spacing:0.07em;font-weight:700;"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> Seed dataset is KG-ready, not fully recommendation-ready</div>
+                <p style="margin:0 0 0.6rem;font-size:0.8rem;color:#cbd5e1;line-height:1.55;">FK integrity, RPN arithmetic, and column-level provenance are clean. However, several chains are <em>not</em> complete enough to safely drive a prescriptive workflow. Incomplete chains are <strong>analysis-only</strong> until reviewed.</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.5rem;font-size:0.76rem;">
+                    <div style="padding:0.5rem 0.65rem;background:rgba(15,23,42,0.5);border:1px solid rgba(239,68,68,0.3);border-radius:6px;"><div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#f87171;text-transform:uppercase;">Faults &rarr; Actions</div><div style="font-size:1.1rem;font-weight:800;color:#fff;">23 / 109</div><div style="font-size:0.7rem;color:#94a3b8;">faults with no mapped action</div></div>
+                    <div style="padding:0.5rem 0.65rem;background:rgba(15,23,42,0.5);border:1px solid rgba(239,68,68,0.3);border-radius:6px;"><div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#f87171;text-transform:uppercase;">Faults &rarr; Effects</div><div style="font-size:1.1rem;font-weight:800;color:#fff;">67 / 109</div><div style="font-size:0.7rem;color:#94a3b8;">faults with no documented effect</div></div>
+                    <div style="padding:0.5rem 0.65rem;background:rgba(15,23,42,0.5);border:1px solid rgba(255,170,0,0.35);border-radius:6px;"><div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--amber);text-transform:uppercase;">Actions &rarr; Steps</div><div style="font-size:1.1rem;font-weight:800;color:#fff;">120 / 138</div><div style="font-size:0.7rem;color:#94a3b8;">actions without procedure steps</div></div>
+                    <div style="padding:0.5rem 0.65rem;background:rgba(15,23,42,0.5);border:1px solid rgba(255,170,0,0.35);border-radius:6px;"><div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--amber);text-transform:uppercase;">Components &rarr; MTBF</div><div style="font-size:1.1rem;font-weight:800;color:#fff;">74 / 144</div><div style="font-size:0.7rem;color:#94a3b8;">components without typical MTBF</div></div>
+                </div>
+                <div style="margin-top:0.65rem;font-size:0.74rem;color:#94a3b8;border-top:1px solid rgba(255,255,255,0.08);padding-top:0.55rem;line-height:1.5;">
+                    <strong style="color:#cbd5e1;">recommendation_readiness</strong> tiers (planned per-row computed status):
+                    <code style="color:#f87171;">analysis_only</code> (chain has gap) &middot;
+                    <code style="color:var(--amber);">advisory_possible</code> (effect + action present) &middot;
+                    <code style="color:#67e8f9;">draft_wo_possible</code> (full chain incl. steps + safety) &middot;
+                    <code style="color:#10b981;">production_ready</code> (chain + reviewer + approval route + validation set).
+                </div>
+            </div>
+
             <h3 style="margin-top:1.6rem;">Headline findings</h3>
             <ul style="margin-top:0.4rem;">
                 <li><b>54% of major DC outages are power-related</b> (Uptime Institute 2024 / 2025); 13% cooling; 12% network; ~40% involve human error somewhere in the chain. The graph weights human-error mechanism nodes (<code>M-HUM-001/002/003</code>) accordingly.</li>
                 <li><b>Liquid cooling has &lt;10 s ride-through</b> if the coolant pump fails, vs minutes for air. Severity scoring on pump-failure fault <code>F11.2</code> is one tier hotter than the equivalent CRAH failure &mdash; a structural change to the FMECA, not a tweak.</li>
                 <li><b>VRLA Arrhenius</b>: battery life halves for every <b>8.3 &deg;C</b> above 25 &deg;C ambient. A parameterised mechanism node, not a static FMECA cell &mdash; the engine evaluates it against actual battery-room temperature in real time.</li>
-                <li><b>Highest RPN in the dataset = 200</b>: diesel microbial contamination (<code>F19.1</code>). Slow to detect, devastating when it hits backup power. Top preventive-action target for any site running extended-runtime fuel storage.</li>
+                <li><b>Highest FMECA priority rank in the dataset = 200</b>: diesel microbial contamination (<code>F19.1</code>) &mdash; RPN is ordinal only, used as a ranking aid, never as a probability or business-risk score. Slow to detect, devastating when it hits backup power. Surfaced for reviewer attention; any production work-order priority must come from the risk engine (RPN ordinal &times; SLA &times; safety class &times; redundancy state &times; spares readiness &times; human approval), not from RPN alone.</li>
             </ul>
 
-            <h3 style="margin-top:1.6rem;">Confidence tiers</h3>
-            <p>Every fault row carries a <code>confidence_tier</code> column (<code>high</code> / <code>medium</code> / <code>thin</code>). <strong>Default stance is advisory-only.</strong> Confidence tiers gate the engine's <em>recommendation routing</em>, not autonomous action. Engine treatment:</p>
+            <h3 style="margin-top:1.6rem;">Confidence tiers <span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:5px;background:rgba(148,163,184,0.15);border:1px solid rgba(148,163,184,0.35);color:#94a3b8;letter-spacing:0.06em;margin-left:0.4rem;vertical-align:middle;text-transform:uppercase;">source_confidence_tier</span></h3>
+            <p style="margin:0 0 0.5rem;font-size:0.78rem;color:#94a3b8;line-height:1.55;"><strong style="color:#cbd5e1;">Naming note (review-v3 P1.5):</strong> the term "confidence" in this dataset means <code>source_confidence_tier</code> &mdash; the strength of the citation backing each row. It is <em>not</em> the same as <code>model_confidence_calibrated</code> (predictor output), <code>data_quality_score</code> (sensor health), or <code>evidence_coverage_score</code> (how complete the chain is). Future schemas will rename to disambiguate.</p>
+            <p>Every fault row carries a <code>confidence_tier</code> column (<code>high</code> / <code>medium</code> / <code>thin</code>). <strong>Default stance is advisory-only.</strong> Confidence tiers gate the engine's <em>recommendation routing</em>, not autonomous action. Engine treatment (synchronised with <code>standarization/KNOWLEDGE_BASE_STANDARD.md</code> v1.41.6):</p>
             <ul>
                 <li><b>High</b> &mdash; standards-body / peer-reviewed / canonical databook sources (IEEE, IEC, ISO, ASHRAE, CIGRE, NETA, NFPA, OREDA, NPRD-2016, IEEE 493). Eligible for draft work-order generation; <strong>human approval required</strong> before any operational action. AI is advisory only; physical control remains in SIS / protection relays / BMS engineered sequences.</li>
                 <li><b>Medium</b> &mdash; industry consortium / professional publication / trade-body source (Li-ion datasheets, CRAH/CRAC vendor application notes, Hydraulic Institute, CTI, OCP). Recommendation generated; <strong>reliability-engineer review required</strong> before draft work-order.</li>

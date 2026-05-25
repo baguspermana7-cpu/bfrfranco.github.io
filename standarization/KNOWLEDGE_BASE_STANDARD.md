@@ -52,11 +52,18 @@ Every CSV must:
 
 ## Confidence tiers
 
+> **v1.41.6 — advisory-only governance (review-v3 P0.5)**: the `high` tier
+> previously read *"Auto-action allowed within RPN thresholds"*. That wording
+> directly contradicted the page-level advisory-only safety posture and the
+> production roadmap. Now corrected: **no tier ever permits autonomous
+> actuation**. AI is advisory-only by default; physical control remains in
+> SIS / protection relays / BMS engineered sequences (IEC 61508 / 62443).
+
 | Tier | Definition | Engine treatment |
 |------|------------|------------------|
-| `high` | ≥2 independent peer-reviewed or industry-databook sources | Auto-action allowed within RPN thresholds |
-| `medium` | 1 primary + ≥1 secondary; or vendor white paper + 1 standard | Queue for human review |
-| `thin` | Single source or vendor-confidential estimate | Flag in UI; vendor outreach required |
+| `high` | ≥2 independent peer-reviewed or industry-databook sources | **Eligible for draft recommendation and draft work-order only.** Human approval required before any operational action. No autonomous actuation. |
+| `medium` | 1 primary + ≥1 secondary; or vendor white paper + 1 standard | **Reliability engineer review required** before draft work-order is proposed. Analysis-only otherwise. |
+| `thin` | Single source or vendor-confidential estimate | **Analysis-only.** Vendor outreach / second source required before any recommendation. No draft work-order. |
 
 Thin-data flags MUST be surfaced on the consuming page (gap section)
 so users understand the dataset's edges.

@@ -63425,8 +63425,17 @@ Skip to main content
  
  
  
- **** This is a concept-and-design document, not a production product.**
- It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench — 11 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in docs/plans/2026-05-25-ai-maintenance-product-roadmap.md. AI is **advisory-only by default**; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508).
+ ** Concept build 
+ ** AI advisory-only 
+ ** No physical control 
+ ** Research basis linked 
+ ** Product roadmap
+ 
+ 
+ ** What this page is and is not (framing detail) 
+ 
+ This is a **concept-and-design document**, not a production product. It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench — 12 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in docs/plans/2026-05-25-ai-maintenance-product-roadmap.md. AI is **advisory-only by default**; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508 / 62443).
+ 
  
  ** Industrial Maintenance Intelligence · FMECA + KG + ML + NLP 
  
@@ -63460,6 +63469,132 @@ Skip to main content
  
  
 
+ 
+ 
+
+ 
+ 
+ 
+## Workbench Preview MOCK · STATIC
+
+ 
+
+ What the production **Maintenance Intelligence Workbench** first viewport would look like.
+ The three panels below are **static mocks** — sample state shaped from the v1.41.x
+ FMECA seed dataset. They are not connected to live telemetry, the engine isn't running, no
+ physical control is reachable from this page. The goal here is to answer the operator
+ question *"what can I do now, what asset is at risk, what case needs my action?"* before
+ the reader has to scroll past the research basis.
+ 
+
+
+ 
+
+ 
+ 
+ 
+ 
+ Panel 01 / Mock 
+ Fleet Command Center 
+ 
+ LIVE 
+ 
+ 
+ 
+ At Risk 
+ 3 
+ CDU pump · UPS bypass · Genset day-tank 
+ 
+ 
+ Needs Review 
+ 7 
+ Reliability engineer queue 
+ 
+ 
+ Draft WO 
+ 4 
+ Planner approval pending 
+ 
+ 
+ SLA Healthy 
+ 42 
+ Assets within envelope 
+ 
+ 
+ Connectors: BMS ✓ · SCADA ✓ · CMMS sync 4min lag 
+ 
+
+ 
+ 
+ 
+ 
+ Panel 02 / Mock 
+ Triage Queue (top 3) 
+ 
+ RANKED 
+ 
+ 
+ 
+ SEV-1 
+ 
+ CDU-PUMP-01 abnormal flow signature 
+ Conf 0.87 · DQ 0.82 · owner: rel-eng 
+ 
+ F11.2 
+ 
+ 
+ SEV-2 
+ 
+ UPS-A bypass static-switch drift 
+ Conf 0.71 · DQ 0.94 · owner: operator 
+ 
+ F03.1 
+ 
+ 
+ INFO 
+ 
+ Genset-2 day-tank fuel quality drift 
+ Conf 0.62 · DQ 0.55 · analysis-only 
+ 
+ F19.1 
+ 
+ 
+ Rank = severity · model-conf · data-quality · SLA exposure 
+ 
+
+ 
+ 
+ 
+ 
+ Panel 03 / Mock 
+ Active Diagnostic Case 
+ 
+ AWAITING APPROVAL 
+ 
+ CDU-PUMP-01 · Flow obstruction (F11.2) 
+ 
+ EVIDENCE  3 sensor channels · KG path F11.2→A11.2-P · DQ 0.82 
+ FMECA RANK  144 (ordinal) · expected risk: *blocked — effects.csv chain incomplete* 
+ SOURCE TIER  high · ASHRAE TC 9.9 §3.2, Hydraulic Inst 14.3 
+ ACTION  Strainer clean + DP-trend review (A11.2-P · 4 steps) 
+ DECISION  **draft WO proposed** — reliability engineer review required (human approval before dispatch) 
+ 
+ 
+ [Approve draft] 
+ [Reject + reason] 
+ [Ask for more evidence] 
+ 
+ Audit trail captured on every transition (case · reviewer · timestamp · reason · source claim id). 
+ 
+
+ 
+
+ 
+ **Reading guide:** these mocks are deliberately shallow. The next ship is one vertical
+ **CDU / chiller pump** slice that exercises the full loop (telemetry → DQ gate → diagnosis →
+ evidence → calculation panel → recommendation review → CMMS draft → technician feedback → audit
+ → KG diff). Until that slice ships, the page calls itself *research basis + product concept*, not a
+ production product.
  
  
 
@@ -63568,6 +63703,8 @@ Skip to main content
  09 Model Monitor Calibration, drift, false alarms, missed faults, training data coverage, and release gates. 
  10 Tenant & RBAC Admin Sites, assets, user roles, approval policy, API keys, environment separation, and access logs. 
  11 Audit & Compliance Decision history, evidence snapshots, reviewer chain, CMMS sync trail, and exportable incident packets. 
+ 
+ 12 Asset Registry Tenant · site · system · asset hierarchy with FMECA bindings, sensor-tag map, criticality class, redundancy state, and parent/child topology. Source-of-truth for every Diagnostic Case. 
  
 
  
@@ -63752,8 +63889,8 @@ Skip to main content
 
  
 
- The user reaches the advisor through one of two entry points. **Mode A** is for the engineer who
- knows what to ask; **Mode B** is for the technician with raw data but no diagnosis. Both modes
+ The user reaches the advisor through one of two entry points. **Ask Knowledge Base (Mode A)** is for the engineer who
+ knows what to ask; **Analyze Telemetry Case (Mode B)** is for the technician with raw data but no diagnosis. Both flows
  terminate at the same Cypher-template tail, so the answer surface is consistent — the upstream
  arrival path is the only thing that changes.
  
@@ -63763,7 +63900,7 @@ Skip to main content
  
  
  
- Mode A · By API 
+ Ask Knowledge Base · Mode A (API) 
  
  Natural-Language Query Path 
  
@@ -63791,12 +63928,12 @@ Skip to main content
  
  
  
- Mode B · By Engine Algorithms 
+ Analyze Telemetry Case · Mode B (Engine) 
  
  Sensor-Upload Diagnostic Path 
  
  Operator uploads raw measurement data (paper's CLI: `predict ./dataset/output_3`).
- PCA + RF classify the fault. Predicted label feeds the same Cypher tail as Mode A —
+ PCA + RF classify the fault. Predicted label feeds the same Cypher tail as the Ask-KB flow —
  same answer surface, different arrival path.
  
  
@@ -63908,7 +64045,7 @@ Skip to main content
  
  Gap Paper mentions CMMS work orders abstractly. Advisor output is a text answer — not an action in the maintenance system. No bi-directional sync. 
  Why it matters True "prescriptive" maintenance requires the prescription to land in a planner's queue, with parts reserved, technicians assigned, and an estimated MTTR. Otherwise it's just decision support. 
- Enhancement Bi-directional **CMMS hook** via REST or webhook (IBM Maximo, SAP PM, Infor EAM, Fiix, UpKeep). On advisor output: auto-create WO with prescribed steps, BOM, MTTR estimate, criticality from RPN. On WO completion: capture outcome back into the KG via Gap #02's experience-capture pipeline. 
+ Enhancement Bi-directional **CMMS hook** via REST or webhook (IBM Maximo, SAP PM, Infor EAM, Fiix, UpKeep). On advisor output: **propose a draft work order** with prescribed steps, BOM, MTTR estimate, and a *priority recommendation* derived from the risk engine (RPN ordinal × SLA × safety × redundancy × spares); **planner approval required before dispatch** — no auto-create. On WO completion: capture outcome back into the KG via Gap #02's experience-capture pipeline. State machine: `proposed → reviewed → draft_created → planner_approved → dispatched → closed → verified`; every transition is audit-logged with actor, role, timestamp, reason, source case ID, idempotency key, connector response. 
  
  
 
@@ -64009,6 +64146,27 @@ Skip to main content
 
  
  
+ ** Capability Status Matrix 
+ 
+Every capability shown in the architecture above carries an explicit readiness label. The page describes the production target shape; only the labels marked **available** can be safely demoed today. Everything else needs data or pipeline work first.
+
+ 
+ Available **RPN ordinal ranking** — arithmetic validated, 826 rows clean. Use for FMECA priority rank only; never as work-order priority. 
+ Available **FMECA / KG lookup** — seed-ready, FK clean. Production governance (claim-level provenance, reviewer workflow) still needed. 
+ Pilot **RF + PCA classifier** — research baseline (Cranfield gearbox). Needs site-specific retraining + validation report per asset class before pilot deploy. 
+ Pilot **Aho-Corasick NLP** — works on bounded vocabulary; needs dictionary curation per tenant + audit trail on Cypher template selection. 
+ Spec needed **Data-quality gate** — threshold matrix (per sensor class × per op state) not yet authored. Required before any model output is shown to user. 
+ Spec needed **Calibration (Platt / isotonic)** — requires held-out validation set + acceptance criteria. Future; needs model pipeline first. 
+ Future **SHAP explainability** — requires the calibrated model + a stable feature schema. Future after model pipeline ships. 
+ Blocked by data **Conformal prediction** — requires exchangeability assumptions + per-class coverage validation. Needs calibration set before any conformal interval can be trusted. 
+ Blocked by data **RUL (survival / LSTM)** — requires run-to-failure or censored survival data per asset class. Current seed has none; 74/144 components lack MTBF. Cannot ship until labelled degradation paths exist. 
+ Future **CMMS draft creation** — needs connector contract (REST or webhook), idempotency key, audit ledger, planner-approval gate. No auto-create; draft + human approval only. 
+ Future **KG / model learning loop** — needs claim-level review workflow + KG-diff approval + model retraining cadence + drift monitor. Not yet specified. 
+ 
+ 
+
+ 
+ 
  
  
  ** Inference stack 
@@ -64046,7 +64204,7 @@ Skip to main content
  
 - Aho-Corasick NLP
  
-- CLI for Mode A & Mode B
+- CLI for Ask-KB & Analyze-Telemetry
  
 - Replicates 84.84% F1
  
@@ -64183,6 +64341,27 @@ Skip to main content
  
 
  
+ 
+ ** Seed dataset is KG-ready, not fully recommendation-ready 
+ 
+FK integrity, RPN arithmetic, and column-level provenance are clean. However, several chains are *not* complete enough to safely drive a prescriptive workflow. Incomplete chains are **analysis-only** until reviewed.
+
+ 
+ Faults → Actions 23 / 109 faults with no mapped action 
+ Faults → Effects 67 / 109 faults with no documented effect 
+ Actions → Steps 120 / 138 actions without procedure steps 
+ Components → MTBF 74 / 144 components without typical MTBF 
+ 
+ 
+ **recommendation_readiness** tiers (planned per-row computed status):
+ `analysis_only` (chain has gap) ·
+ `advisory_possible` (effect + action present) ·
+ `draft_wo_possible` (full chain incl. steps + safety) ·
+ `production_ready` (chain + reviewer + approval route + validation set).
+ 
+ 
+
+ 
 ### Headline findings
 
  
@@ -64264,188 +64443,301 @@ We use cookies for analytics to improve your experience. Learn more
 
 
 ======================================================================
-# Changelog — Resistance Zero (v1.41.4 latest) — https://resistancezero.com/changelog.html
+# Changelog — Resistance Zero (v1.41.6 latest) — https://resistancezero.com/changelog.html
 
 > Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.
 
-v1.41.4 
+v1.41.6 
  PATCH 
  May 26, 2026 
  
  
-pillar pages bundle — cooling + power + standards + sustainability depth pass
+AI Maintenance review-v3 response — Workbench Preview + capability gating + standards-doc safety fix
 
  
  
-PATCH ship: applies the v1.41.2 pillar-fire-safety depth template (8 new
+PATCH ship: addresses 9 of 10 "Recommended Immediate Edits" from
 
 
-sections + stats 3→8 + FAQ 4→15 + FAQPage/HowTo JSON-LD) to the remaining
+`Documents/AI maintenance/2026-05-26-ai-engineering-maintenance-in-progress-review-v3.md`
 
 
-4 pillar pages so all 5 pillar pages reach parity.
-
- 
+Section 7, plus the P0.5 standards-doc safety contradiction.
 
 
- | Pillar page | Before | After | Δ |
-
- | pillar-fire-safety.html (v1.41.2) | 676 | 1,836 | +1,160 |
-
- | pillar-cooling.html (this ship) | 1,030 | 2,159 | +1,129 |
-
- | pillar-power.html (this ship) | 854 | 1,989 | +1,135 |
-
- | pillar-standards.html (this ship) | 693 | 1,829 | +1,136 |
-
- | pillar-sustainability.html (this ship) | 688 | 1,394 | +706 |
-
- 
-
-### pillar-cooling.html — 1,030 → 2,159 (+1,129)
+`ai-engineering-maintenance.html` grows **1,662 → 1,838 lines** (+176)
 
 
-CSS prefix `pcl-*`. 26 dark-mode overrides.
+without losing v1.40.0 / v1.41.3 framing.
 
 
-8 new sections:
+### Phase A — Standards safety fix (review-v3 P0.5)
 
 
  
-- Standards Comparison Table — 9 rows × 5 cols (ASHRAE TC 9.9, ANSI/TIA-942-C, ISO 50001, ETSI EN 300 019, EN 50600-2-3).
- 
-- Decision Matrix — 4 questions (rack density, workload type, climate zone, water access). Recommends air / rear-door HX / direct-to-chip / immersion / evaporative-adiabatic / mechanical-chiller-closed-loop with ASHRAE/TIA cite.
- 
-- Compliance Checklist — 33 items (thermal envelope 8, airflow management 7, liquid cooling readiness 6, economizer & efficiency 6, maintenance & lifecycle 6). `pcl_checklist` localStorage.
- 
-- Cost Calculator — IT load × cooling type × climate hours × electricity/water rate × redundancy → CAPEX, annual cooling kWh, annual cost, PUE estimate, WUE estimate, 10-yr TCO. PUE color-coded.
- 
-- Heat-Removal Flow Diagram — 5-tier accordion (chip → server → rack → room → facility) with typical ΔT per tier.
- 
-- Case Studies — Meta Singapore 2022 (adiabatic equatorial PUE 1.19), Microsoft Project Natick 2018-2020 (underwater), OVHcloud Strasbourg rebuild 2021-2023.
- 
-- Glossary — 14 terms (PUE, WUE, CRAH, CRAC, CDU, D2C, TDP, ΔT, free-cooling, economizer, dewpoint, adiabatic, immersion single-phase, immersion two-phase).
- 
-- Cross-links — 6 cards to pue-calculator, compare-air-vs-liquid-cooling, ltc-system-modelling-lab, chiller-plant, water-system, tools.
+- **`standarization/KNOWLEDGE_BASE_STANDARD.md`** confidence-tier table
 
 
-Stats 4 → 8. FAQ 3 → 15. FAQPage JSON-LD updated to 15 Q&As. HowTo "How to size a cooling system for a data center" added.
+rewritten. `high` previously read *"Auto-action allowed within RPN
 
 
-### pillar-power.html — 854 → 1,989 (+1,135)
+thresholds"* — a dangerous contradiction of the page-level
 
 
-CSS prefix `ppw-*`. 26 dark-mode overrides. 127 aria attributes.
-
-
-8 new sections:
+advisory-only posture. Now corrected:
 
 
  
-- Standards Comparison Table — 8 rows × 5 cols (NFPA 70/NEC, IEEE 1547, IEC 60364, Uptime Institute Tier, ANSI/TIA-942-C).
- 
-- Decision Matrix — 4 questions (Tier target, downtime budget, IT load profile, site constraint). Recommends N+maintenance-bypass / N+1 / 2N / 2(N+1) / BESS-augmented / DC-bus+Li-UPS with IEEE/NEC/Uptime cite.
- 
-- Compliance Checklist — 33 items (utility & service entrance 6, UPS & batteries 7, generator & fuel 7, distribution & ATS 7, monitoring & maintenance 6). `ppw_checklist` localStorage.
- 
-- Cost Calculator — IT load × redundancy × UPS topology × generator hours × fuel/electricity rate → power-chain CAPEX, annual electricity, annual generator fuel, 10-yr TCO, stranded capacity %, estimated annual downtime.
- 
-- Power-Chain Flow Diagram — 5-tier accordion (utility → service entrance → MV/LV switchgear → UPS/PDU → IT rack) with typical losses + redundancy options.
- 
-- Case Studies — OVHcloud SBG2 fire 2021-03 (battery thermal + single-PDU exposure), Google Cloud us-east1 2019-06 (fuel polishing failure cascade), AWS US-East-1 2021-12 (power-system-controller firmware bug).
- 
-- Glossary — 14 terms (UPS, PDU, ATS, MV/LV switchgear, IDC, double-conversion, line-interactive, eco-mode, BESS, kAIC, arc flash, THD, power factor, EPO).
- 
-- Cross-links — 6 cards to tier-advisor, compare-ups-online-vs-offline, compare-diesel-vs-gas-generator, compare-tier-3-vs-tier-4, compare-n1-vs-2n, tools.
+- `high` → eligible for **draft recommendation / draft work-order
 
 
-Stats 4 → 8 (Tier IV 99.995% / Tier III 99.982% / 2N CAPEX 110% / Li-UPS 3× VRLA / 72-hr fuel NFPA / 40 cal/cm² arc-flash / <5 Ω ground fault). FAQ 3 → 15. FAQPage JSON-LD updated. HowTo "How to size a data center power chain" added.
+only**; human approval required before any operational action.
 
 
-### pillar-standards.html — 693 → 1,829 (+1,136)
-
-
-CSS prefix `pst-*`. 27 dark-mode overrides.
-
-
-8 new sections:
+**No autonomous actuation, ever.**
 
 
  
-- Standards Comparison Table — 5 frameworks × 9 rows (ANSI/TIA-942-C, ISO/IEC 22237, Uptime Institute Tier, EN 50600, BICSI 002).
- 
-- Decision Matrix — 4 questions (business goal, geographic market, facility size, certification budget). Recommends Uptime Tier / TIA-942 / ISO/IEC 22237 / EN 50600 / BICSI 002 / stacked-multi.
- 
-- Compliance Checklist — 33 items (documentation 7, infrastructure topology 7, operations & maintenance 7, testing & commissioning 6, continuous improvement 6). `pst_checklist` localStorage.
- 
-- Cost Calculator — facility size × cert × tier × readiness % × consultant engagement → audit fees, internal labor, consultant cost, total cost, timeline months, annual recert, 5-yr program TCO.
- 
-- Certification-Scope Diagram — 5-tier accordion (site & shell / power / cooling / IT room / operations & governance) with overlap pills per standard.
- 
-- Case Studies — Equinix LA1 Tier IV cert (18-month process, PE-stamped concurrent maintainability), Google Hyperscale Hamina (built without 3rd-party Tier cert; internal SLA), composite EU stacked-cert story.
- 
-- Glossary — 14 terms (Tier, Rated Class, KPI EN 50600, Concurrent Maintainability, Fault Tolerance, Compartmentation, IST, MOP, SOP, BCDR, PE Stamp, IST Witnessed, As-Built, Conformance vs Certification).
- 
-- Cross-links — 6 cards to tier-advisor, tia-942-checklist, standards-ltc-lab, compare-tier-3-vs-tier-4, plus 2 contextual links.
+- `medium` → reliability-engineer review required before draft
 
 
-Stats 4 → 8. FAQ 3 → 15. FAQPage updated. HowTo "How to choose a data center certification path" added.
-
-
-### pillar-sustainability.html — 688 → 1,394 (+706)
-
-
-CSS prefix `psu-*`. Authored via chunked Edits to dodge the 32k-output-
-
-
-token cap (a previous agent attempt failed by trying to Write the whole
-
-
-file in one call).
-
-
-8 new sections:
+WO.
 
 
  
-- Standards Comparison Table — 5 frameworks × 8 rows (ISO 50001, ISO 14064, RE100, CRREM, EU EED Article 11).
+- `thin` → **analysis-only**, vendor outreach required; no draft WO.
  
-- Decision Matrix — 4 questions (carbon goal, renewable availability, site constraint, reporting framework). Recommends 24/7 CFE / annual PPA matching / green tariff + offsets / heat reuse + circular / Scope 3 procurement.
- 
-- Compliance Checklist — 33 items (energy efficiency 7, renewable & carbon 7, water 5, circular & waste 7, reporting & governance 7). `psu_checklist` localStorage.
- 
-- Cost Calculator — annual IT MWh × grid carbon intensity × renewable strategy × PUE × offset price × water consumption → Scope 2 tCO₂e, offset cost, renewable premium, water cost, SBTi alignment %, 10-yr investment.
- 
-- Scope 1/2/3 Diagram — 5-tier accordion (Scope 1 direct / Scope 2 purchased energy / Scope 3 upstream / Scope 3 downstream / Avoided & offset) with reduction levers.
- 
-- Case Studies — Google 24/7 CFE (~64% in 2023, 2030 target), Microsoft Helsinki heat reuse (~250k homes 2022), Meta Singapore water-positive (2024 target).
- 
-- Glossary — 14 terms (PUE, WUE, CUE, Scope 1/2/3, SBTi, RE100, PPA, REC, 24/7 CFE, TCFD, CDP, GRI, SASB, CRREM, F-gas, GWP).
- 
-- Cross-links — 6 cards to pue-calculator, compare-air-vs-liquid-cooling, water-system, ISO 50001 governance, compare-pue-vs-dcie, tools.
+- Standard now states explicitly: AI is advisory-only by default;
 
 
-Stats 4 → 8 (Google PUE 1.07 / industry avg 1.59 / Helsinki 250k homes / ~40% hyperscaler net-zero 2030 / CRREM stranding 2035 median / 2-3% global electricity). FAQ 3 → 15. FAQPage updated. HowTo "How to design a data center sustainability strategy" added.
+physical control remains in SIS / protection relays / BMS engineered
+
+
+sequences (IEC 61508 / 62443).
+
+
+### Phase B — Concept page reframe
+
+
+**1. Hero compressed (P0.1)** — large yellow warning block replaced
+
+
+with a 5-pill status strip (`Concept build` · `AI advisory-only` ·
+
+
+`No physical control` · `Research basis linked` · `Product roadmap`)
+
+
+plus an expandable details element retaining the full framing prose.
+
+
+**2. Workbench Preview section added (P0.1 + P0.3)** — new
+
+
+`#sec-workbench-preview` section above the paper hero with 3 static
+
+
+mock panels:
+
+
+ 
+- **Fleet Command Center**: 4 KPI tiles (At Risk · Needs Review · Draft
+
+
+WO · SLA Healthy) + connector status strip.
+
+
+ 
+- **Triage Queue (top 3)**: 3 ranked cards (SEV-1 CDU pump · SEV-2 UPS
+
+
+bypass · INFO genset day-tank) with severity pill, confidence, DQ,
+
+
+owner, FMECA ID.
+
+
+ 
+- **Active Diagnostic Case**: header + evidence summary + FMECA rank
+
+
+callout (with `effects.csv` chain warning) + 5 decision rows +
+
+
+3 action buttons ([Approve draft] / [Reject] / [Ask for more
+
+
+evidence]) + audit-trail note.
+
+
+ 
+- Section nav gets a `Workbench Preview` pill at position 0 so it's
+
+
+the first link.
+
+
+**3. Capability Status Matrix added (P0.4 + P1.7 + P1.8)** — new
+
+
+chip grid inside Enhanced Engine section. 11 engine capabilities each
+
+
+labeled `available` / `pilot` / `spec needed` / `future` / `blocked
+
+
+by data`. RUL marked **blocked by data** (74/144 components lack MTBF;
+
+
+no run-to-failure data in seed). Conformal marked **blocked by data**
+
+
+(needs calibration set). CMMS draft marked **future** (needs connector
+
+
+contract + audit ledger).
+
+
+**4. Data completeness banner added (P0.4 + Section 7 item 7)**
+
+
+— amber banner near KB section showing concrete gaps:
+
+
+ 
+- 23/109 faults with no mapped action
+ 
+- 67/109 faults with no documented effect
+ 
+- 120/138 actions with no procedure steps
+ 
+- 74/144 components with no typical MTBF
+
+
+Banner introduces planned `recommendation_readiness` tier vocabulary
+
+
+(`analysis_only` → `advisory_possible` → `draft_wo_possible`
+
+
+→ `production_ready`).
+
+
+**5. Asset Registry added as 12th canonical screen (P1.2)** — freezes
+
+
+the IA at 12 screens. Asset Registry was missing from the 11-screen
+
+
+list despite being structurally required for tag mapping and the
+
+
+tenant / site / asset hierarchy.
+
+
+**6. Mode A / Mode B renamed to user tasks (P2.3)** — 8 sites
+
+
+across the page now read `Ask Knowledge Base (Mode A · API)` and
+
+
+`Analyze Telemetry Case (Mode B · Engine)` instead of pure
+
+
+implementation vocabulary. Old Mode A/B retained as parenthetical
+
+
+secondary label for continuity.
+
+
+**7. CMMS wording fix (P0.8)** — Gap #03 enhancement rewritten:
+
+
+ 
+- `auto-create WO` → **propose a draft work order**
+ 
+- `criticality from RPN` → **priority recommendation derived from
+
+
+the risk engine (RPN ordinal × SLA × safety ×
+
+
+redundancy × spares); planner approval required before
+
+
+dispatch**
+
+
+ 
+- Added CMMS state machine: `proposed → reviewed →
+
+
+draft_created → planner_approved → dispatched →
+
+
+closed → verified` with audit-logged transitions.
+
+
+ 
+- Enhanced engine diagram label `WO auto-create` → `WO draft
+
+
+(approval)`.
+
+
+**8. RPN ordinal language fix (P1.7)** — "Top preventive-action
+
+
+target" rewritten to make RPN's ordinal nature explicit. Highest RPN
+
+
+row (F19.1 diesel microbial contamination, RPN 200) now framed as
+
+
+"FMECA priority rank" for reviewer attention; work-order priority
+
+
+must come from the risk engine (RPN ordinal × SLA ×
+
+
+safety class × redundancy state × spares readiness ×
+
+
+human approval), not RPN alone.
+
+
+**9. `source_confidence_tier` clarification (P1.5)** — Knowledge
+
+
+Base section now distinguishes:
+
+
+ 
+- `source_confidence_tier` (this dataset's citation strength)
+ 
+- `model_confidence_calibrated` (predictor output, future)
+ 
+- `data_quality_score` (sensor health, future)
+ 
+- `evidence_coverage_score` (chain completeness, future)
 
 
 ### Bumped
 
 
  
-- `js/rz-version.js` → v1.41.4 (date 2026-05-26)
+- `js/rz-version.js` → v1.41.6
  
-- `sw.js` → `rz-cache-v1.41.4`
- 
-- `llms-full.txt` regenerated (4 enhanced pillars now indexed by AI bots)
+- `sw.js` → `rz-cache-v1.41.6`
 
 
-### Audits post-ship
+### Audits
 
 
  
-- `audit-script-tags.py --strict` — CLEAN (177 files)
+- `audit-script-tags.py --strict` — CLEAN
  
-- `audit-js-syntax.py --strict` — CLEAN (107 files)
+- `audit-js-syntax.py --strict` — CLEAN
  
 - `audit-pro-mode-indicator.py --strict` — CLEAN
  
@@ -64454,22 +64746,78 @@ Stats 4 → 8 (Google PUE 1.07 / industry avg 1.59 / Helsinki 250k homes / ~40% 
 - `audit-seo.py` — 0 required errors
 
 
-### Track coordination
+### Not in this ship (deferred per scope)
 
 
-The parallel **cockpit refinement sweep** track is also using v1.41.x
+The reviewer's Sprint 3-5 backlog requires structural work beyond a
 
 
-numbers in `main rz-work`. This `ft-phase2` track and the cockpit track
+single concept-page revision:
 
 
-are on separate branches; numbering reconciliation will happen at merge.
+ 
+- New `ai-maintenance-workbench.html` interactive prototype with one
 
 
-The proposed BMS v1.42.x-v1.45.x plan from the 2026-05-26 deep re-review
+vertical CDU/chiller-pump slice (telemetry → DQ gate →
 
 
-is preserved (this ship is PATCH so doesn't claim any v1.42.x slot).
+diagnosis → evidence → calculation panel →
+
+
+recommendation review → CMMS draft → technician closeout
+
+
+→ audit → KG diff)
+
+
+ 
+- JSON-schema data contracts (`DiagnosticCase`,
+
+
+`TelemetryWindow`, `DataQualityResult`, `WorkOrderDraft`,
+
+
+`RecommendationReview`, `KGDiff`, `AuditEvent`,
+
+
+`IntegrationSync`)
+
+
+ 
+- CSV readiness checker (per-row `recommendation_readiness` computed
+
+
+status)
+
+
+ 
+- Frontend hardening (inline-style → external CSS/JS, CSP plan,
+
+
+SRI on CDN assets)
+
+
+ 
+- Server-side RBAC / multi-tenant security
+ 
+- Telemetry schema + synthetic fixtures
+ 
+- Model validation/calibration/conformal acceptance criteria
+ 
+- Product event taxonomy + dashboards
+
+
+These remain captured in
+
+
+`docs/plans/2026-05-25-ai-maintenance-product-roadmap.md` as
+
+
+multi-year initiatives. This page now points at them honestly via the
+
+
+status-strip "Product roadmap" link.
 
 
 ======================================================================
