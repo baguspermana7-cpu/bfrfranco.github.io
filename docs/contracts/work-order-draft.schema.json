@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/work-order-draft.schema.json",
+  "title": "WorkOrderDraft",
+  "description": "The CMMS-ready draft proposed by the engine after a RecommendationReview verdict=approved. NO auto-create: every transition past 'proposed' requires a human approval gate. Schema-level enforcement of advisory-only safety posture.",
+  "type": "object",
+  "required": [
+    "wo_draft_id",
+    "case_id",
+    "review_id",
+    "asset_id",
+    "fmeca_fault_id",
+    "action_id",
+    "state",
+    "priority_recommendation",
+    "title",
+    "task_steps",
+    "idempotency_key",
+    "created_at",
+    "audit_event_ids"
+  ],
+  "properties": {
+    "wo_draft_id": { "type": "string", "format": "uuid" },
+    "case_id": { "type": "string" },
+    "review_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK into RecommendationReview that authorised this draft."
+    },
+    "asset_id": { "type": "string" },
+    "fmeca_fault_id": { "type": "string", "pattern": "^F[0-9]+\\.[0-9]+$" },
+    "action_id": {
+      "type": "string",
+      "pattern": "^A[0-9.A-Z-]+$",
+      "description": "FK into actions.csv."
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "reviewed",
+        "draft_created",
+        "planner_approved",
+        "dispatched",
+        "closed",
+        "verified",
+        "withdrawn"
+      ],
+      "description": "State machine — see allOf below for required-actor rules per transition."
+    },
+    "priority_recommendation": {
+      "type": "object",
+      "required": ["priority_class", "rationale", "score_breakdown"],
+      "properties": {
+        "priority_class": {
+          "type": "string",
+          "enum": ["P1_safety", "P2_critical", "P3_routine", "P4_deferred"]
+        },
+        "rationale": {
+          "type": "string",
+          "maxLength": 512,
+          "description": "Human-readable explanation of how the priority class was selected."
+        },
+        "score_breakdown": {
+          "type": "object",
+          "description": "Component factors. RPN ordinal alone is NOT permitted; multiple factors required.",
+          "properties": {
+            "fmeca_priority_rank_ordinal": { "type": "integer", "minimum": 1 },
+            "sla_class": { "type": "string" },
+            "safety_class": { "type": "string", "enum": ["sif", "general_industry", "non_safety"] },
+            "redundancy_state": { "type": "string", "enum": ["lost", "degraded", "healthy"] },
+            "spares_readiness": { "type": "string", "enum": ["stocked", "transit", "long_lead", "out_of_stock"] },
+            "human_approval_required": { "const": true }
+          },
+          "required": ["fmeca_priority_rank_ordinal", "sla_class", "safety_class", "redundancy_state", "spares_readiness", "human_approval_required"]
+        }
+      }
+    },
+    "title": { "type": "string", "maxLength": 200 },
+    "description": { "type": "string", "maxLength": 4096 },
+    "work_type": {
+      "type": "string",
+      "enum": ["corrective", "preventive", "inspection", "calibration", "modification", "emergency"]
+    },
+    "task_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["step_order", "description"],
+        "properties": {
+          "step_order": { "type": "integer", "minimum": 1 },
+          "description": { "type": "string" },
+          "duration_minutes": { "type": "number", "minimum": 0 },
+          "required_tool": { "type": "string" },
+          "required_skill_level": { "type": "string" },
+          "safety_note": { "type": "string" }
+        }
+      }
+    },
+    "required_parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["part_id", "qty"],
+        "properties": {
+          "part_id": { "type": "string" },
+          "description": { "type": "string" },
+          "qty": { "type": "number", "minimum": 0 },
+          "stock_status": { "type": "string", "enum": ["stocked", "transit", "long_lead", "out_of_stock"] }
+        }
+      }
+    },
+    "lockout_required": { "type": "boolean" },
+    "estimated_downtime_hours": { "type": "number", "minimum": 0 },
+    "planner_approved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "REQUIRED for state ∈ {dispatched, closed, verified}. Schema-enforced via allOf below."
+    },
+    "planner_approved_by": { "type": "string", "format": "uuid" },
+    "cmms_external_id": {
+      "type": "string",
+      "description": "Populated once CMMS connector successfully creates the WO. NULL before dispatch."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Required for CMMS write. Prevents duplicate WOs from retried network calls."
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "audit_event_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "format": "uuid" }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": { "enum": ["dispatched", "closed", "verified"] }
+        }
+      },
+      "then": {
+        "required": ["planner_approved_at", "planner_approved_by"],
+        "description": "Schema-level enforcement of advisory-only posture: dispatch is impossible without planner approval."
+      }
+    }
+  ]
+}

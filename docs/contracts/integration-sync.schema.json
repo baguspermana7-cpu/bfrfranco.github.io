@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/integration-sync.schema.json",
+  "title": "IntegrationSync",
+  "description": "Connector health snapshot for BMS / SCADA / CMMS / asset-registry / IoT-platform integrations. Surfaces idempotency-key state, lag, failed writes, data lineage. Every sync attempt emits one record + one AuditEvent.",
+  "type": "object",
+  "required": [
+    "sync_id",
+    "connector_id",
+    "connector_kind",
+    "direction",
+    "tenant_id",
+    "started_at",
+    "state",
+    "idempotency_key"
+  ],
+  "properties": {
+    "sync_id": { "type": "string", "format": "uuid" },
+    "connector_id": { "type": "string", "format": "uuid" },
+    "connector_kind": {
+      "type": "string",
+      "enum": [
+        "bms_bacnet_ip",
+        "bms_modbus_tcp",
+        "scada_opc_ua",
+        "scada_dnp3",
+        "cmms_maximo",
+        "cmms_sap_pm",
+        "cmms_infor_eam",
+        "cmms_fiix",
+        "cmms_upkeep",
+        "asset_registry",
+        "telemetry_historian",
+        "iot_platform",
+        "identity_provider"
+      ]
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["inbound", "outbound", "bidirectional"]
+    },
+    "tenant_id": { "type": "string", "format": "uuid" },
+    "site_id": { "type": "string", "format": "uuid" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "state": {
+      "type": "string",
+      "enum": ["pending", "in_flight", "succeeded", "failed", "partial", "retrying", "cancelled"]
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Required for outbound writes. Prevents duplicate CMMS WOs / KG mutations under retry."
+    },
+    "request_payload_hash": {
+      "type": "string",
+      "description": "SHA-256 of canonical JSON of outbound payload. Detects request tampering."
+    },
+    "response_status_code": { "type": "integer" },
+    "response_payload_hash": { "type": "string" },
+    "lag_seconds": {
+      "type": "number",
+      "minimum": 0,
+      "description": "For inbound: data freshness; for outbound: round-trip time."
+    },
+    "rows_processed": { "type": "integer", "minimum": 0 },
+    "rows_failed": { "type": "integer", "minimum": 0 },
+    "retry_count": { "type": "integer", "minimum": 0 },
+    "next_retry_at": { "type": "string", "format": "date-time" },
+    "error_code": { "type": "string" },
+    "error_narrative": { "type": "string", "maxLength": 2048 },
+    "linked_subjects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["subject_type", "subject_id"],
+        "properties": {
+          "subject_type": {
+            "type": "string",
+            "enum": ["work_order_draft", "kg_diff", "telemetry_window", "asset_node"]
+          },
+          "subject_id": { "type": "string" }
+        }
+      }
+    },
+    "audit_event_id": { "type": "string", "format": "uuid" }
+  },
+  "additionalProperties": false
+}

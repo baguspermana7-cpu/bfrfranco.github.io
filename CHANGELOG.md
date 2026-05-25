@@ -11,6 +11,108 @@ release sections rather than semver.
 
 ---
 
+## v1.41.7 — 2026-05-26 (AI Maintenance review-v3 Sprint 3 — JSON-schema data contracts + CSV readiness auditor)
+
+PATCH ship: closes review-v3 Sprint 3 deferred backlog from v1.41.6.
+
+### Phase A — JSON-schema data contracts (`docs/contracts/`)
+
+9 contract files added — JSON Schema draft 2020-12 documents that
+define the canonical shape of every entity the Maintenance Intelligence
+Workbench exchanges between layers. Required before any screen,
+calculator, or connector is built so that backlog, UI, and data work
+don't drift. Per review-v3 P0.6.
+
+| Contract | Layer | Lines |
+|---|---|---|
+| `README.md` | Index | ~75 |
+| `diagnostic-case.schema.json` | Core | ~110 |
+| `telemetry-window.schema.json` | Ingest | ~65 |
+| `data-quality-result.schema.json` | Ingest | ~55 |
+| `fault-hypothesis.schema.json` | Inference | ~90 |
+| `recommendation-review.schema.json` | Decision | ~75 |
+| `work-order-draft.schema.json` | Execute | ~135 |
+| `kg-diff.schema.json` | Learn | ~110 |
+| `audit-event.schema.json` | Govern | ~95 |
+| `integration-sync.schema.json` | Operate | ~75 |
+
+**Design principles enforced in schema**:
+- Every payload carries `tenant_id`, `site_id`, `asset_id`, model/
+  formula/KG versions, actor + role + timestamp.
+- Confidence disambiguated: `source_confidence_tier` /
+  `model_confidence_calibrated` / `data_quality_score` /
+  `evidence_coverage_score` are separate fields.
+- **`WorkOrderDraft.state ∈ {dispatched, closed, verified}`
+  REQUIRES `planner_approved_at` + `planner_approved_by`** &mdash;
+  schema-level enforcement of advisory-only posture.
+- `RecommendationReview.verdict=rejected` REQUIRES
+  `rejection_reason_code` + `rejection_narrative`.
+- `RecommendationReview.verdict=needs_more_evidence` REQUIRES
+  `additional_evidence_required` array.
+- `KGDiff.evidence_claims[]` requires section/table/page-grade
+  locators (review-v3 P1.9).
+- `AuditEvent` is hash-linked (`previous_event_hash` +
+  `this_event_hash`) for tamper-evident append-only ledger.
+- `priority_recommendation.score_breakdown` cannot use RPN alone
+  &mdash; multiple factors (RPN ordinal &times; SLA &times; safety
+  class &times; redundancy state &times; spares readiness +
+  `human_approval_required: true`) required.
+
+### Phase B — CSV readiness auditor (`tools/audit-csv-readiness.py`)
+
+New Python tool that walks the 8 FMECA seed CSVs and computes a
+`recommendation_readiness` tier for every fault:
+- `analysis_only` &mdash; chain has gap (no effect / no action / etc.)
+- `advisory_possible` &mdash; fault + effect + action present
+- `draft_wo_possible` &mdash; full chain incl. procedure steps + safety
+- `production_ready` &mdash; reserved for future reviewer-signoff workflow
+
+Cross-checks confidence_tier vs chain completeness per
+`KNOWLEDGE_BASE_STANDARD` v2.2 (v1.41.6). High-tier faults with
+incomplete chains are flagged as contradictions: the row promises more
+than the data supports.
+
+**First run revealed 23 contradictions** &mdash; high-tier faults
+stuck at `analysis_only` (F1.4, F2.3, F2.4, F3.5, F3.6, F4.6, F5.5,
+F6.4, F7.6, F8.4, F9.4, F9.5, F13.3, F13.5, F16.5, F17.2, F17.5,
+F18.2, F18.4, F18.5, F19.3, F19.5, F20.3). All from real data-coverage
+gaps (no_effect / no_action / component_missing_mtbf). Not blocking
+for this ship; surfaced for the next data-ops cycle to either complete
+the chain or downgrade the confidence tier.
+
+### Added artefact
+
+`docs/research/csv-audits/2026-05-26-fault-readiness.csv` &mdash;
+per-fault scoring snapshot. Future runs can diff against this to track
+chain-completeness improvements over time.
+
+### Audits
+
+- `audit-script-tags.py --strict` &mdash; CLEAN (177 files)
+- `audit-js-syntax.py --strict` &mdash; CLEAN (107 files)
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 133 PASS / 0 FAIL
+- `audit-csv-readiness.py` &mdash; **23 contradictions surfaced** (not
+  blocking; documented as data-ops backlog)
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.7
+- `sw.js` &rarr; `rz-cache-v1.41.7`
+
+### Still deferred (Sprint 3-5)
+
+- New `ai-maintenance-workbench.html` interactive prototype (Sprint 2 +
+  reviewer's Section 5.1) &mdash; one vertical CDU/chiller-pump slice
+- Frontend hardening (Sprint 4): inline-style → external, CSP plan,
+  SRI on CDN
+- Telemetry schema + synthetic fixtures (Sprint 5)
+- Model validation/calibration/conformal acceptance criteria (Sprint 5)
+- Product event taxonomy (Sprint 5)
+- Server-side RBAC / multi-tenant enforcement (multi-year)
+
+---
+
 ## v1.41.6 — 2026-05-26 (AI Maintenance review-v3 response — Workbench Preview + capability gating + standards-doc safety fix)
 
 PATCH ship: addresses 9 of 10 "Recommended Immediate Edits" from

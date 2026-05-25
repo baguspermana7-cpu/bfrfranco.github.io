@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/diagnostic-case.schema.json",
+  "title": "DiagnosticCase",
+  "description": "A single fault diagnosis instance from creation through closeout. The atom of the Maintenance Intelligence Workbench.",
+  "type": "object",
+  "required": [
+    "case_id",
+    "tenant_id",
+    "site_id",
+    "asset_id",
+    "fault_hypotheses",
+    "state",
+    "severity",
+    "data_quality_score",
+    "evidence_coverage_score",
+    "owner_role",
+    "created_at",
+    "kg_release",
+    "model_version",
+    "formula_version"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^DC-[A-Z0-9]{4,12}-[0-9]{6,}$",
+      "description": "Globally unique case identifier (e.g. DC-CDU01-000142)."
+    },
+    "tenant_id": { "type": "string", "format": "uuid" },
+    "site_id": { "type": "string", "format": "uuid" },
+    "asset_id": {
+      "type": "string",
+      "description": "FK into Asset Registry (e.g. CDU-PUMP-01)."
+    },
+    "fmeca_fault_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^F[0-9]+\\.[0-9]+$" },
+      "description": "Candidate FMECA fault rows backing the hypothesis (faults.csv keys)."
+    },
+    "fault_hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "fault-hypothesis.schema.json" },
+      "description": "Top-k ranked fault hypotheses with evidence path and confidence."
+    },
+    "telemetry_window_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK into TelemetryWindow used as evidence."
+    },
+    "data_quality_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Aggregate DQ score for the case's input window. Below threshold => analysis_only."
+    },
+    "evidence_coverage_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Fraction of expected evidence facets present (sensor, FMECA path, comparable cases, validation)."
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "needs_review",
+        "approved",
+        "rejected",
+        "draft_wo_created",
+        "dispatched",
+        "closed",
+        "verified",
+        "archived"
+      ],
+      "description": "Case lifecycle state."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["sev_1", "sev_2", "sev_3", "info"],
+      "description": "Operator-facing severity. NOT model probability; combines safety, SLA, redundancy."
+    },
+    "recommendation_readiness": {
+      "type": "string",
+      "enum": ["analysis_only", "advisory_possible", "draft_wo_possible", "production_ready"],
+      "description": "Computed status of whether the case has a complete fault→effect→action→step→safety chain."
+    },
+    "owner_role": {
+      "type": "string",
+      "enum": ["operator", "reliability_engineer", "planner", "technician", "engineering_manager", "admin"]
+    },
+    "owner_actor_id": { "type": "string", "format": "uuid" },
+    "review_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK into RecommendationReview when reviewed."
+    },
+    "work_order_draft_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK into WorkOrderDraft when a draft has been proposed."
+    },
+    "audit_event_ids": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "description": "Ordered list of audit events for this case (every state transition)."
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "closed_at": { "type": "string", "format": "date-time" },
+    "kg_release": { "type": "string", "pattern": "^kg\\.v[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "model_version": { "type": "string" },
+    "formula_version": { "type": "string", "pattern": "^[a-z_]+\\.v[0-9]+\\.[0-9]+$" },
+    "narrative": {
+      "type": "string",
+      "maxLength": 4096,
+      "description": "Free-form reviewer narrative; not used by the engine."
+    }
+  },
+  "additionalProperties": false
+}

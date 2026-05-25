@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/kg-diff.schema.json",
+  "title": "KGDiff",
+  "description": "A proposed knowledge-graph modification (add / change / retire a fault, action, effect, mechanism, or component). Claim-level provenance required. Every change has reviewer + audit chain. The KG is versioned; KGDiff is the unit of change between KG releases.",
+  "type": "object",
+  "required": [
+    "kg_diff_id",
+    "diff_type",
+    "subject_type",
+    "subject_id",
+    "proposer_actor_id",
+    "proposer_role",
+    "evidence_claims",
+    "state",
+    "created_at"
+  ],
+  "properties": {
+    "kg_diff_id": { "type": "string", "format": "uuid" },
+    "diff_type": {
+      "type": "string",
+      "enum": ["add", "modify", "retire", "merge", "split"]
+    },
+    "subject_type": {
+      "type": "string",
+      "enum": ["fault", "failure", "action", "step", "effect", "mechanism", "component", "edge"]
+    },
+    "subject_id": { "type": "string", "description": "Existing ID (modify/retire/merge/split) or proposed ID (add)." },
+    "fields_changed": {
+      "type": "object",
+      "description": "For modify: before/after value per field. For add: 'before' is null. For retire: 'after' is null.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "before": {},
+          "after": {}
+        }
+      }
+    },
+    "proposer_actor_id": { "type": "string", "format": "uuid" },
+    "proposer_role": {
+      "type": "string",
+      "enum": ["reliability_engineer", "engineering_manager", "admin", "external_research_pipeline"]
+    },
+    "evidence_claims": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Claim-level provenance per review-v3 P1.9. Section/table/page-level locators required.",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "claim_type", "source_ref_exact", "source_type"],
+        "properties": {
+          "claim_id": { "type": "string", "format": "uuid" },
+          "claim_type": {
+            "type": "string",
+            "enum": ["fault_exists", "mechanism_links_fault", "action_resolves_fault", "step_executes_action", "effect_follows_fault", "mtbf_value", "severity_value", "occurrence_value"]
+          },
+          "object_id_or_value": { "type": "string" },
+          "source_ref_exact": {
+            "type": "string",
+            "description": "Locator-grade reference, e.g. 'CIGRE TB-642 §5.2 Table 3' (NOT just 'CIGRE TB-642')."
+          },
+          "source_type": {
+            "type": "string",
+            "enum": ["peer_reviewed", "standards_body", "industry_databook", "vendor_white_paper", "trade_publication", "internal_research", "vendor_oem", "field_observation"]
+          },
+          "locator": {
+            "type": "object",
+            "properties": {
+              "section": { "type": "string" },
+              "table": { "type": "string" },
+              "page": { "type": "string" },
+              "url": { "type": "string", "format": "uri" }
+            }
+          },
+          "evidence_hash": {
+            "type": "string",
+            "description": "SHA-256 of the evidence snapshot (PDF page, screenshot, raw row) for tamper-evident audit."
+          },
+          "reviewer_actor_id": { "type": "string", "format": "uuid" },
+          "valid_from": { "type": "string", "format": "date-time" },
+          "valid_to": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "confidence_tier_proposed": {
+      "type": "string",
+      "enum": ["high", "medium", "thin"]
+    },
+    "state": {
+      "type": "string",
+      "enum": ["proposed", "under_review", "approved", "rejected", "merged_into_kg", "superseded"]
+    },
+    "merged_in_kg_release": {
+      "type": "string",
+      "pattern": "^kg\\.v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Populated when state=merged_into_kg."
+    },
+    "supersedes_kg_diff_id": { "type": "string", "format": "uuid" },
+    "audit_event_ids": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/recommendation-review.schema.json",
+  "title": "RecommendationReview",
+  "description": "A reviewer's verdict on a fault hypothesis or recommendation. Every diagnostic case that reaches draft_wo_possible state MUST have at least one RecommendationReview with verdict=approved before WorkOrderDraft can be issued.",
+  "type": "object",
+  "required": [
+    "review_id",
+    "case_id",
+    "hypothesis_id",
+    "reviewer_actor_id",
+    "reviewer_role",
+    "verdict",
+    "decided_at",
+    "audit_event_id"
+  ],
+  "properties": {
+    "review_id": { "type": "string", "format": "uuid" },
+    "case_id": { "type": "string" },
+    "hypothesis_id": { "type": "string", "format": "uuid" },
+    "reviewer_actor_id": { "type": "string", "format": "uuid" },
+    "reviewer_role": {
+      "type": "string",
+      "enum": ["operator", "reliability_engineer", "planner", "technician", "engineering_manager", "admin"],
+      "description": "Approval-policy matrix determines which roles can issue which verdicts."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["approved", "rejected", "needs_more_evidence", "deferred"],
+      "description": "approved → engine may emit WorkOrderDraft; rejected → case closed with reason; needs_more_evidence → reopens telemetry window or new data request; deferred → reviewer parks for later."
+    },
+    "rejection_reason_code": {
+      "type": "string",
+      "enum": [
+        "data_quality_below_threshold",
+        "evidence_coverage_insufficient",
+        "model_confidence_below_threshold",
+        "fmeca_chain_incomplete",
+        "wrong_asset_match",
+        "false_positive_known_pattern",
+        "outside_review_scope",
+        "other"
+      ]
+    },
+    "rejection_narrative": {
+      "type": "string",
+      "maxLength": 2048,
+      "description": "Required when verdict=rejected. Free-form reviewer explanation."
+    },
+    "additional_evidence_required": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "extended_telemetry_window",
+          "site_walkdown",
+          "vibration_signature",
+          "thermal_imaging",
+          "oil_analysis",
+          "current_signature",
+          "vendor_consultation",
+          "second_engineer_review"
+        ]
+      },
+      "description": "Required when verdict=needs_more_evidence."
+    },
+    "decided_at": { "type": "string", "format": "date-time" },
+    "audit_event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK into AuditEvent. Every verdict transition emits one."
+    },
+    "engine_version": { "type": "string" }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "const": "rejected" } } },
+      "then": { "required": ["rejection_reason_code", "rejection_narrative"] }
+    },
+    {
+      "if": { "properties": { "verdict": { "const": "needs_more_evidence" } } },
+      "then": { "required": ["additional_evidence_required"] }
+    }
+  ]
+}

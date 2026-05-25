@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/audit-event.schema.json",
+  "title": "AuditEvent",
+  "description": "A single immutable audit ledger entry. Every state-mutating action across DiagnosticCase, RecommendationReview, WorkOrderDraft, KGDiff, and IntegrationSync emits exactly one AuditEvent. Audit chain is append-only and hash-linked.",
+  "type": "object",
+  "required": [
+    "audit_event_id",
+    "tenant_id",
+    "actor_id",
+    "actor_role",
+    "event_type",
+    "subject_type",
+    "subject_id",
+    "timestamp",
+    "outcome",
+    "engine_release",
+    "previous_event_hash"
+  ],
+  "properties": {
+    "audit_event_id": { "type": "string", "format": "uuid" },
+    "tenant_id": { "type": "string", "format": "uuid" },
+    "site_id": { "type": "string", "format": "uuid" },
+    "asset_id": { "type": "string" },
+    "actor_id": { "type": "string", "format": "uuid" },
+    "actor_role": {
+      "type": "string",
+      "enum": ["operator", "reliability_engineer", "planner", "technician", "engineering_manager", "admin", "system", "connector"]
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "case_created",
+        "case_state_changed",
+        "dq_gate_passed",
+        "dq_gate_failed",
+        "hypothesis_emitted",
+        "recommendation_proposed",
+        "recommendation_approved",
+        "recommendation_rejected",
+        "recommendation_needs_more_evidence",
+        "wo_draft_created",
+        "wo_planner_approved",
+        "wo_dispatched",
+        "wo_closed",
+        "wo_verified",
+        "wo_withdrawn",
+        "actual_fault_recorded",
+        "kg_diff_proposed",
+        "kg_diff_reviewed",
+        "kg_diff_merged",
+        "model_release_deployed",
+        "model_drift_detected",
+        "calibration_acceptance_passed",
+        "calibration_acceptance_failed",
+        "connector_sync_succeeded",
+        "connector_sync_failed",
+        "config_changed",
+        "rbac_grant",
+        "rbac_revoke"
+      ]
+    },
+    "subject_type": {
+      "type": "string",
+      "enum": ["diagnostic_case", "recommendation_review", "work_order_draft", "kg_diff", "integration_sync", "model_release", "rbac_role", "system_config"]
+    },
+    "subject_id": { "type": "string" },
+    "case_id": {
+      "type": "string",
+      "description": "Optional FK back to DiagnosticCase, even when subject_type is something else (e.g. WO draft event references its parent case)."
+    },
+    "before_state": { "type": "string" },
+    "after_state": { "type": "string" },
+    "reason": {
+      "type": "string",
+      "maxLength": 1024,
+      "description": "Free-form explanation. Required when outcome=rejected or when transitioning to terminal states."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failed", "rejected", "warned", "noop"]
+    },
+    "model_version": { "type": "string" },
+    "formula_version": { "type": "string" },
+    "kg_release": { "type": "string" },
+    "engine_release": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "ingest_timestamp": { "type": "string", "format": "date-time" },
+    "previous_event_hash": {
+      "type": "string",
+      "description": "SHA-256 of the previous AuditEvent's canonical JSON. Empty string for genesis event. Forms append-only chain."
+    },
+    "this_event_hash": {
+      "type": "string",
+      "description": "Computed SHA-256 of canonical JSON of this event excluding this_event_hash itself. Filled by ledger writer."
+    }
+  },
+  "additionalProperties": false
+}

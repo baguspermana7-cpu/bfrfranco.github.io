@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/fault-hypothesis.schema.json",
+  "title": "FaultHypothesis",
+  "description": "A single ranked fault candidate inside a DiagnosticCase. The model emits top-k; only k=3 surfaces by default in UI. Confidence is calibrated and disambiguated from source confidence and data quality.",
+  "type": "object",
+  "required": [
+    "hypothesis_id",
+    "fmeca_fault_id",
+    "rank",
+    "model_confidence_calibrated",
+    "source_confidence_tier",
+    "evidence_path",
+    "decision_route"
+  ],
+  "properties": {
+    "hypothesis_id": { "type": "string", "format": "uuid" },
+    "fmeca_fault_id": {
+      "type": "string",
+      "pattern": "^F[0-9]+\\.[0-9]+$",
+      "description": "FK into faults.csv."
+    },
+    "rank": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Position in the ranked top-k list. Rank 1 = most likely."
+    },
+    "model_confidence_calibrated": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Calibrated probability (Platt or isotonic), not raw model vote share."
+    },
+    "model_confidence_raw": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Raw model output for debug only; UI never shows this."
+    },
+    "conformal_set": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^F[0-9]+\\.[0-9]+$" },
+      "description": "Conformal prediction set (e.g. all FMECA fault IDs covered at 95%). Empty until conformal pipeline is shipped."
+    },
+    "source_confidence_tier": {
+      "type": "string",
+      "enum": ["high", "medium", "thin"],
+      "description": "Citation strength of the FMECA row this hypothesis maps to. NOT model confidence."
+    },
+    "evidence_path": {
+      "type": "object",
+      "required": ["sensor_features", "fmeca_chain"],
+      "properties": {
+        "sensor_features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "feature_id": { "type": "string" },
+              "shap_contribution": { "type": "number" },
+              "actual_value": { "type": "number" }
+            }
+          }
+        },
+        "fmeca_chain": {
+          "type": "object",
+          "description": "Traversal of the KG path for evidence display.",
+          "properties": {
+            "fault_id": { "type": "string" },
+            "mechanism_id": { "type": "string" },
+            "failure_id": { "type": "string" },
+            "effect_ids": { "type": "array", "items": { "type": "string" } },
+            "action_ids": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "comparable_cases": {
+          "type": "array",
+          "items": { "type": "string", "format": "uuid" },
+          "description": "Historical case IDs whose feature signatures matched within configurable distance."
+        }
+      }
+    },
+    "fmeca_priority_rank": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000,
+      "description": "Ordinal FMECA priority rank (S × O × D from sod_rpn.csv). NEVER use as monetary risk."
+    },
+    "decision_route": {
+      "type": "string",
+      "enum": ["draft_wo_eligible", "review_required", "analysis_only", "blocked_data_gap"],
+      "description": "Final routing decision from the confidence-tier × DQ × evidence-coverage matrix."
+    },
+    "rejection_reason": { "type": "string" }
+  },
+  "additionalProperties": false
+}

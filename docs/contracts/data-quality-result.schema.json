@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/data-quality-result.schema.json",
+  "title": "DataQualityResult",
+  "description": "Per-window DQ assessment. Gates whether a case is eligible for diagnosis. Below threshold ⇒ case.state = open, case.recommendation_readiness = analysis_only, model output suppressed.",
+  "type": "object",
+  "required": [
+    "dq_id",
+    "window_id",
+    "dq_score",
+    "threshold_version",
+    "verdict",
+    "issued_at"
+  ],
+  "properties": {
+    "dq_id": { "type": "string", "format": "uuid" },
+    "window_id": { "type": "string", "format": "uuid" },
+    "dq_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Aggregate DQ score across all expected features. Threshold matrix is per asset class × operating state."
+    },
+    "threshold_version": {
+      "type": "string",
+      "description": "Version of the DQ threshold matrix used (e.g. dq.v0.1.0)."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "soft_warn", "fail"],
+      "description": "pass = case eligible for diagnosis; soft_warn = case eligible but UI shows DQ notice; fail = analysis-only."
+    },
+    "feature_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["feature_id", "status"],
+        "properties": {
+          "feature_id": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["ok", "stale", "missing", "out_of_range", "imputed", "rejected"]
+          },
+          "actual_value": { "type": ["number", "string", "null"] },
+          "threshold_min": { "type": ["number", "null"] },
+          "threshold_max": { "type": ["number", "null"] },
+          "stale_seconds_observed": { "type": "number", "minimum": 0 },
+          "rejection_reason": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "operating_state_at_assessment": {
+      "type": "string",
+      "enum": ["startup", "steady", "load_change", "shutdown", "fault", "unknown"]
+    },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "engine_release": { "type": "string" }
+  },
+  "additionalProperties": false
+}

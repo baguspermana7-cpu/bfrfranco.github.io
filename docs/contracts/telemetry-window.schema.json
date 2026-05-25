@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/docs/contracts/telemetry-window.schema.json",
+  "title": "TelemetryWindow",
+  "description": "A bounded slice of sensor data attached to a DiagnosticCase as evidence. The engine never consumes raw streams; everything flows through windowed extracts so feature derivation, DQ, and audit can be re-run deterministically.",
+  "type": "object",
+  "required": [
+    "window_id",
+    "asset_id",
+    "start_at",
+    "end_at",
+    "sample_rate_hz",
+    "sensors",
+    "operating_state",
+    "extracted_at",
+    "extraction_version"
+  ],
+  "properties": {
+    "window_id": { "type": "string", "format": "uuid" },
+    "asset_id": { "type": "string" },
+    "start_at": { "type": "string", "format": "date-time" },
+    "end_at": { "type": "string", "format": "date-time" },
+    "sample_rate_hz": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Native sample rate of the slowest sensor; downsampled bands captured separately."
+    },
+    "operating_state": {
+      "type": "string",
+      "enum": ["startup", "steady", "load_change", "shutdown", "fault", "unknown"],
+      "description": "Asset state during the window. Used to segment features and avoid mixing operating regimes."
+    },
+    "sensors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["tag", "unit", "sample_count", "tag_quality"],
+        "properties": {
+          "tag": {
+            "type": "string",
+            "description": "Canonical sensor tag (e.g. CDU01.PUMP01.FLOW.SUCTION)."
+          },
+          "unit": { "type": "string", "description": "SI unit, e.g. L/min, kPa, A." },
+          "sample_count": { "type": "integer", "minimum": 1 },
+          "tag_quality": {
+            "type": "string",
+            "enum": ["good", "stale", "missing", "out_of_range", "manual_override"]
+          },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "mean": { "type": "number" },
+          "p50": { "type": "number" },
+          "p95": { "type": "number" },
+          "stale_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Maximum age of any sample in the window vs end_at."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "feature_set_id": {
+      "type": "string",
+      "description": "FK into a feature-derivation manifest (which features were extracted, which model can consume this window)."
+    },
+    "extracted_at": { "type": "string", "format": "date-time" },
+    "extraction_version": {
+      "type": "string",
+      "description": "Version of the extraction pipeline used (e.g. tw_extract.v0.2.1)."
+    }
+  },
+  "additionalProperties": false
+}
