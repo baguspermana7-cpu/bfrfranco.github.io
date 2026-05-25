@@ -898,16 +898,27 @@
             var message = session
                 ? 'Pro or Educator access required for this module.'
                 : 'Please sign in with a Pro or Educator account to access this module.';
-            if (typeof this.showRootGatePrompt === 'function') {
-                this.showRootGatePrompt(message);
-            } else if (typeof this.showModal === 'function') {
-                this.showModal();
-                var err = (typeof document !== 'undefined')
-                    ? document.getElementById('rzModalError')
-                    : null;
-                if (err) {
-                    err.textContent = message;
-                    err.classList.add('show');
+            // v1.41.8 — if the page has its own inline `.root-gate` overlay,
+            // skip auth.js's own modal/prompt. The inline overlay's "Sign In"
+            // button already wires to showModal() on user click — opening BOTH
+            // at once stacked two dialogs ("double-login" bug reported on
+            // ai-engineering-maintenance.html). Inline overlay wins; auth.js
+            // modal opens on demand only.
+            var hasInlineGate = typeof document !== 'undefined'
+                && document.querySelector
+                && document.querySelector('.root-gate');
+            if (!hasInlineGate) {
+                if (typeof this.showRootGatePrompt === 'function') {
+                    this.showRootGatePrompt(message);
+                } else if (typeof this.showModal === 'function') {
+                    this.showModal();
+                    var err = (typeof document !== 'undefined')
+                        ? document.getElementById('rzModalError')
+                        : null;
+                    if (err) {
+                        err.textContent = message;
+                        err.classList.add('show');
+                    }
                 }
             }
             return false;

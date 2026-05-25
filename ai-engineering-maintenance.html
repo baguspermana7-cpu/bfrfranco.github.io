@@ -1800,11 +1800,15 @@
         </footer>
     </div>
 
-    <!-- Locked / page-access gate -->
+    <!-- Locked / page-access gate (v1.41.8 — single-dialog; shows current session state for self-diagnosis) -->
     <div class="root-gate">
         <div class="root-card">
             <h2><i class="fas fa-lock" aria-hidden="true" style="color:var(--cyan);margin-right:0.3rem;"></i> Pro or Educator access required</h2>
             <p>This concept brief is for Pro and Educator accounts. Sign in to continue, or return to the DC Solutions hub.</p>
+            <div id="rootGateSessionInfo" style="display:none;margin-top:0.7rem;padding:0.55rem 0.7rem;background:rgba(15,23,42,0.4);border:1px solid rgba(148,163,184,0.25);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#94a3b8;line-height:1.5;">
+                <strong style="color:#cbd5e1;">Current session:</strong>
+                <span id="rootGateSessionDetail"></span>
+            </div>
             <div class="root-actions">
                 <button id="rootLoginBtn">Sign In</button>
                 <a href="datacenter-solutions.html">Back to DC Solutions</a>
@@ -1825,8 +1829,41 @@
     (function(){var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');function g(){var s=localStorage.getItem('theme');return s||'dark';}function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(g());if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});})();
     /* Hamburger nav */
     (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
-    /* Page-access tier gate */
-    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('ai-engineering-maintenance');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var t=s&&s.tier,r=s&&s.role;var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    /* Page-access tier gate (v1.41.8 — single-fire + session diagnostic) */
+    (function(){
+        function readSession(){try{return JSON.parse(localStorage.getItem('rz_premium_session')||'null');}catch(e){return null;}}
+        function paintSessionDetail(){
+            var s=readSession(),box=document.getElementById('rootGateSessionInfo'),detail=document.getElementById('rootGateSessionDetail');
+            if(!box||!detail)return;
+            if(!s){box.style.display='none';return;}
+            box.style.display='block';
+            var email=s.email||'(unknown)',tier=s.tier||'(none)',role=s.role||'(auto)',exp=s.expires?(' · expires '+s.expires.slice(0,10)):'';
+            detail.textContent=' '+email+' · tier '+tier+' · role '+role+exp;
+        }
+        function ag(){
+            if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){
+                window._rzAuth.enforceTierFeatureAccess('ai-engineering-maintenance');
+            }else{
+                /* Pre-auth.js fallback: parses localStorage, no modal call. */
+                var s=readSession(),t=s&&s.tier,r=s&&s.role;
+                var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');
+                document.body.classList.toggle('locked',!passes);
+            }
+            paintSessionDetail();
+        }
+        var b=document.getElementById('rootLoginBtn');
+        if(b)b.addEventListener('click',function(){
+            if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();
+        });
+        window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});
+        window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});
+        /* Single initial fire + one retry after auth.js defer-loads. The
+           previous 4-call cascade caused gate flicker + re-stacking of the
+           login dialog after dismissal. The auth-change listener already
+           handles post-login refresh. */
+        ag();
+        setTimeout(ag,300);
+    })();
     /* Cookie banner */
     (function(){var b=document.getElementById('cookieBanner'),a=localStorage.getItem('rz_cookie_consent');if(!a&&b)b.classList.remove('hidden');var ac=document.getElementById('cookieAccept'),dc=document.getElementById('cookieDecline');if(ac)ac.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','accepted');b.classList.add('hidden');});if(dc)dc.addEventListener('click',function(){localStorage.setItem('rz_cookie_consent','declined');b.classList.add('hidden');window['ga-disable-G-GED7FX8RTV']=true;});})();
     /* Section nav scroll-spy */

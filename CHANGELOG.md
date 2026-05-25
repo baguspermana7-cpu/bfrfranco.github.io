@@ -11,6 +11,76 @@ release sections rather than semver.
 
 ---
 
+## v1.41.8 — 2026-05-26 (Double-login dialog fix on AI Maintenance page)
+
+PATCH ship: closes user-reported "double login" bug on
+`ai-engineering-maintenance.html`.
+
+### Bug
+
+User report (verbatim): *"kok aneh sih, padahal sudah login root, tepi
+masuk harus login ada login dialog, dan selesai login ada lagi suruh
+login. kok login berlapis."* &mdash; even when logged in (root), the
+page shows a sign-in dialog, and after signing in a SECOND sign-in
+dialog appears.
+
+### Root cause
+
+When `enforceTierFeatureAccess` denies access, **two independent
+overlays surface stacked**:
+
+1. **Page's inline `<div class="root-gate">` overlay** (line 1804)
+   &mdash; triggered by `body.classList.add('locked')` (auth.js line
+   896). The "Sign In / Back to DC Solutions" dialog visible in the
+   screenshot.
+2. **Auth.js `showModal()` login dialog** &mdash; triggered by
+   `showRootGatePrompt(message)` at line 901, which itself calls
+   `showModal()` at line 679.
+
+Plus the page IIFE fired `ag()` **4 times in 1.6 s**
+(`ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600)`), so
+when one denial closed and another fired, the dialog stack re-appeared.
+
+### Fix 1 — auth.js (site-wide)
+
+`enforceTierFeatureAccess` now checks `document.querySelector('.root-gate')`
+before firing its own modal. If the host page has its own inline
+overlay, auth.js **only toggles `body.locked`** and skips
+`showRootGatePrompt` / `showModal`. The inline overlay's "Sign In"
+button already wires to `showModal()` on user click &mdash; modal
+opens **on demand**, never auto-stacked.
+
+Applies to every page on the site that ships its own `.root-gate`
+overlay (currently `ai-engineering-maintenance.html`; same pattern
+will be respected on future opt-in-overlay pages).
+
+### Fix 2 — `ai-engineering-maintenance.html`
+
+- Trimmed the 4-time `ag()` setTimeout cascade to one initial fire +
+  one debounced retry at 300 ms (covers the auth.js `defer`-load
+  race). The `rz-auth-change` event listener already handles post-
+  login refresh.
+- Inline gate now shows a **session-diagnostic strip** when locked
+  (current email · tier · role · expiry) so the user can self-
+  diagnose why a session might be denied (e.g. tier=demo when page
+  needs pro, or expired session). Helps the user verify *which*
+  account is currently signed in.
+
+### Audits
+
+- `audit-script-tags.py --strict` &mdash; CLEAN
+- `audit-js-syntax.py --strict` &mdash; CLEAN
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 133 PASS / 0 FAIL
+- `node --check auth.js` &mdash; OK
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.8
+- `sw.js` &rarr; `rz-cache-v1.41.8`
+
+---
+
 ## v1.41.7 — 2026-05-26 (AI Maintenance review-v3 Sprint 3 — JSON-schema data contracts + CSV readiness auditor)
 
 PATCH ship: closes review-v3 Sprint 3 deferred backlog from v1.41.6.
