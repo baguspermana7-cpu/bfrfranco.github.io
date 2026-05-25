@@ -6972,6 +6972,8 @@ mc('var(--c)','Metering & SCADA','Power Monitoring',[['Branch','Schneider PM5xxx
 // NETWORK TOPOLOGY SVG - LIVE with laser animations and alarm simulation
 $('netSu').textContent='NVLink5 Intra-Domain (130 TB/s) + InfiniBand XDR 800G Scale-Out (4-Rail Fat-Tree) + 25GbE OOB Management';
 (function(){const el=$('netC');if(!el)return;let s='';
+// v1.42.3 — bind line-model for network fabric link semantics port (review doc-27 §5.5).
+var RZL=window.RZLineModel;
 // Laser animation definition
 s+=`<defs>
 <linearGradient id="laserG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(139,92,246,0)"/><stop offset="50%" stop-color="rgba(139,92,246,.8)"/><stop offset="100%" stop-color="rgba(139,92,246,0)"/></linearGradient>
@@ -7103,7 +7105,9 @@ const x1=sp.x+40,y1=83,x2=lf.x+44,y2=125;
 const linkId='sl'+si+''+li;
 // Quiet bundled lane: explicit low stroke-opacity (.15 ≤ 0.2) marks this
 // as the sanctioned quiet lane (not a full-opacity hairball stroke).
-s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--p)" stroke-opacity=".15" stroke-width=".6" id="${linkId}"/>`;
+// v1.42.3 — ported to semantic line model (review doc-27 §5.5: speed +
+// utilization + failure_domain). Rail = si (spine index 0-3) per 4-rail FT 1:1.
+s+=RZL?RZL.line({id:linkId,from:sp.id,to:lf.id,medium:'fiber',direction:'bidirectional',state:'energized',capacity:'800 Gb/s IB XDR',current:'782 Gb/s',redundancy:'redundant_a',tag:'rail-'+(si+1)+' / dom-pod-'+(li+1),geometry:{x1:x1,y1:y1,x2:x2,y2:y2},style:{stroke:'var(--p)',strokeWidth:.6,opacity:'.15'}}):`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--p)" stroke-opacity=".15" stroke-width=".6" id="${linkId}"/>`;
 });});
 // invisible hover target over the spine↔leaf band (sibling of .netSL group)
 s+=`<rect class="netSLzone" x="50" y="38" width="860" height="120" fill="transparent"/>`;
@@ -7127,7 +7131,8 @@ const x=25+di*103,y=198+ri*48;
 // Connect to leaf \u2014 quiet base line always on (bundled lane, opacity .12).
 const lfIdx=di%8;
 const lfX=leaves[lfIdx].x+44;
-s+=`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" stroke="var(--b)" stroke-opacity=".12" stroke-width=".5"/>`;
+// v1.42.3 — domain-to-leaf bundled lane ported. 800G OSFP per NIC, 4-rail FT 1:1.
+s+=RZL?RZL.line({id:'dom'+dom+'-to-'+leaves[lfIdx].id,from:'DOM-'+dom,to:leaves[lfIdx].id,medium:'fiber',direction:'bidirectional',state:'energized',capacity:'4× 800 Gb/s NIC',current:'756 Gb/s',redundancy:'redundant_a',tag:'leaf-row-'+ri+' / pod-'+(lfIdx+1),geometry:{x1:x+48,y1:y,x2:lfX,y2:153},style:{stroke:'var(--b)',strokeWidth:.5,opacity:'.12'}}):`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" stroke="var(--b)" stroke-opacity=".12" stroke-width=".5"/>`;
 // doc-07: bright individual link shown ONLY when this domain is selected/hovered.
 s+=`<g class="netDom" data-tip="NVL72 Domain DOM-${dom}: 72 GPUs (2 racks), 130 TB/s NVLink5 bisection, 18\u00D7NVSwitch5, full-mesh all-to-all, 132kW total">`;
 s+=`<rect x="${x}" y="${y}" width="95" height="40" rx="3" fill="rgba(34,197,94,.1)" stroke="rgba(34,197,94,.35)" stroke-width=".6" class="rg domBox"/>`;

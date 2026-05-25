@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v1.42.3 — 2026-05-26 (network fabric link semantics — netSvg port)
+
+MINOR ship: fourth in the v1.42.x → v1.45.x sweep. Closes review doc-27 §5.5
+P0 ("Tampilkan spine/leaf/super-spine grouping. Link harus punya speed:
+100G/200G/400G/800G. Tampilkan utilization, packet loss, latency,
+oversubscription ratio. Tampilkan failure domain: rack, row, pod,
+availability zone.").
+
+Engine + `#p-dash` byte-identical. 7/7 line-model probe + 75/75 accuracy
+probe + 57/57 + 22/22 + all strict audits PASS.
+
+### Changed
+
+- **`datahallAI.html` netSvg IIFE** (Network Fabric Topology):
+  - `var RZL=window.RZLineModel;` binding added at top.
+  - **+32 spine-leaf bundled lanes** ported. IDs: `sl{si}{li}` (where si =
+    spine 0-3, li = leaf 0-7). Each carries:
+    - `data-medium="fiber"`
+    - `data-direction="bidirectional"`
+    - `data-state="energized"`
+    - `data-capacity="800 Gb/s IB XDR"`
+    - `data-current="782 Gb/s"`
+    - `data-redundancy="redundant_a"`
+    - `data-tag="rail-{si+1} / dom-pod-{li+1}"` (failure domain — 4-rail FT)
+  - **+27 NVL72 domain-to-leaf bundled lanes** ported. IDs: `dom{n}-to-LF-{li}`.
+    Each carries:
+    - `data-medium="fiber"`
+    - `data-capacity="4× 800 Gb/s NIC"`
+    - `data-current="756 Gb/s"`
+    - `data-tag="leaf-row-{ri} / pod-{lfIdx+1}"`
+  - Visual identical (preserves `var(--p)` purple for spine-leaf and
+    `var(--b)` blue for domain-leaf via `style.stroke` override). Laser
+    overlay (hover-reveal individual links) unchanged.
+- **`tools/probe-line-model.mjs`** — `ADOPTION_TARGETS.datahallAI.html = 171`.
+
+### Docs
+
+- `standarization/LINE_MODEL.md` v1.42.3 row.
+- `standarization/BMS_SHELL.md` v1.42.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker `project_rz_review_2026-05-26.md` updated.
+
+---
+
 ## v1.42.2 — 2026-05-26 (per-DH Electrical SLDs L0+L1 — drawDH() port × 4 halls)
 
 MINOR ship: third in the v1.42.x → v1.45.x sweep. Ports the SHARED drawDH()

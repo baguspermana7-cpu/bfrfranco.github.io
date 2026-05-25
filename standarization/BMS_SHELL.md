@@ -445,7 +445,7 @@ Foundation pass responding to team review docs 27/28 (DC AI) + 17/18 (DC Conv). 
 | 1 | v1.42.0 | `datahallAI.html` Cooling P&ID | Foundation library + 7 pilot ports (CW/FWS/TCS supply + return) + probe + LINE_MODEL.md |
 | 2 | **v1.42.1** | `datahallAI.html` Electrical SLD overview | **+25 lines** (PLN→meter→VCB×2 + bus drops + tie + 8 feeders × 2 segments) + **new `js/rz-breaker-symbols.js`** (7-state IEC/ANSI glyph library) + **4 breakers** ported (VCB-INC-A/B, VCB-TIE, F1A) + BREAKER_SYMBOLS.md. Cumulative 32 lines + 4 breakers tagged. |
 | 3 | **v1.42.2** | `datahallAI.html` per-DH SLDs (elecDH1-4) — L0 substation + L1 RMU via `drawDH()` × 4 halls | **+80 lines** (11 L0 + 9 L1 × 4 halls) + **+32 breakers** (5 L0 + 3 L1 × 4 halls). Cumulative 112 lines + 36 breakers tagged on datahallAI.html. |
-| 4 | v1.42.3 (planned) | `datahallAI.html` Network fabric | Port ~15 network links + add speed labels (100G/200G/400G/800G) + utilization + failure-domain (doc-27 §5.5) |
+| 4 | **v1.42.3** | `datahallAI.html` netSvg Network Fabric (review doc-27 §5.5) | **+59 lines** (32 spine-leaf 800G IB XDR bundled lanes with `data-capacity`/`data-current`/`data-tag` rail+pod failure domain + 27 NVL72 domain-leaf bundled lanes). Cumulative 171 lines + 36 breakers on datahallAI.html. |
 | 4 | v1.42.3 (planned) | `dc-conventional.html` chiller + EPMS | Port ~25 lines + breaker symbols + source-to-load trace (doc-17 §3.2/§3.3) |
 | 5 | v1.42.4 (planned) | `water-system.html` + `chiller-plant.html` | Port ~30 lines + valve command/feedback + flow-arrow standard (doc-17 §3.3/§5.3) |
 | 6 | v1.45.x | full coverage target | 80–90 % of major-loop lines tagged across all 8 cockpit pages |
