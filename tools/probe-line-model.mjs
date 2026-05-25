@@ -31,18 +31,23 @@ const BASE = (process.env.RZ_BASE === 'file')
  * v1.42.2: +80 lines in drawDH() L0+L1 sections × 4 halls.
  * v1.42.3: +59 lines in netSvg (32 spine-leaf + 27 domain-leaf).
  * v1.42.4: cross-page — chiller-plant.html CHW P&ID (16 branch + 2 header = 18).
- *          EPMS_Telemetry.html intentionally untouched (owner: "jangan merusak"). */
+ *          EPMS_Telemetry.html intentionally untouched (owner: "jangan merusak").
+ * v1.42.5: water-system.html (10 pipes) + fire-system.html (14 pipes). */
 const ADOPTION_TARGETS = {
   'datahallAI.html': 171,
   'dc-conventional.html': 0,
-  'chiller-plant.html': 18
+  'chiller-plant.html': 18,
+  'water-system.html': 10,
+  'fire-system.html': 14
 };
 
 /* Breaker symbol library — verify pilot ports tagged. */
 const BREAKER_TARGETS = {
   'datahallAI.html': 36,  /* 4 elecOv + 20 L0 + 12 L1 across 4 DH SLDs */
   'dc-conventional.html': 0,
-  'chiller-plant.html': 0  /* P&ID has no breakers */
+  'chiller-plant.html': 0,  /* P&ID has no breakers */
+  'water-system.html': 0,
+  'fire-system.html': 0
 };
 
 let pass = 0, fail = 0;
@@ -59,7 +64,9 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
   const target = ADOPTION_TARGETS[slug];
   console.log(`\n=== Line-model probe (${slug}) ===`);
   const page = await browser.newPage();
-  await page.goto(`${BASE}/${slug}`, { waitUntil: 'networkidle2', timeout: 30000 });
+  /* Use 'load' for pages without long-polling telemetry; networkidle2 can
+   * hang on pages with setInterval-driven flow animations. */
+  await page.goto(`${BASE}/${slug}`, { waitUntil: 'load', timeout: 30000 });
   await new Promise(r => setTimeout(r, 1500));
 
   const report = await page.evaluate(() => {

@@ -76,6 +76,10 @@
          Loaded NON-deferred so window.CONV_CALC exists before the inline script.
          Basis: conv/review/09-engineering-basis-and-calculations.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
+         the static SVG fire-water + N2 pipes tagged with data-rz-line +
+         from / to / medium / state / capacity / current. -->
+    <script src="js/rz-line-model.js?v=1.42.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §5. -->
@@ -330,8 +334,8 @@
                     </linearGradient>
                 </defs>
 
-                <!-- Landlord make-up supply -->
-                <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" />
+                <!-- Landlord make-up supply. v1.42.5 — tagged with line-model metadata. -->
+                <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" data-rz-line="1" data-id="fs-landlord-makeup" data-from="LANDLORD-SUPPLY" data-to="TK-FW-01" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN150 make-up" data-current="auto-refill on tank low" data-redundancy="duty"/>
                 <g transform="translate(110, 268)">
                     <rect id="v-landlord" width="40" height="25" fill="#16203a" stroke="#475569" rx="2" />
                     <text x="20" y="44" text-anchor="middle" class="eq-tag">TK-FW-01 Make-up</text>
@@ -357,8 +361,8 @@
                     <text id="tank-dur-txt" x="150" y="274" text-anchor="middle" fill="#64748b" font-size="11" class="font-tech">Duration ≈ 0 min</text>
                 </g>
 
-                <!-- Suction header -->
-                <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" />
+                <!-- Suction header. v1.42.5 — tagged with line-model metadata. -->
+                <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" data-rz-line="1" data-id="fs-suction-header" data-from="TK-FW-01" data-to="FP-SUCTION-MANIFOLD" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN300 suction" data-current="0 m³/h (standby)" data-redundancy="common"/>
                 <rect class="pipe-label-box" x="585" y="388" width="74" height="16" rx="3" />
                 <text x="622" y="400" text-anchor="middle" class="pipe-label">SUCTION HDR</text>
 
@@ -398,12 +402,12 @@
                     <text x="60" y="40" class="eq-tag">N2-GEN-01</text>
                     <text x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold">Hdr 2.4 bar · STANDBY</text>
                 </g>
-                <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" />
+                <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-supply" data-from="N2-GEN-01" data-to="N2-DIST-HEADER" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 2.4 bar" data-current="STANDBY (pressure maintain)" data-redundancy="duty"/>
 
-                <!-- Discharge headers -->
-                <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" />
-                <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" />
-                <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" />
+                <!-- Discharge headers. v1.42.5 — tagged. -->
+                <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" data-rz-line="1" data-id="fs-fp01-discharge" data-from="FP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN250 main fire pump" data-current="0 m³/h (AUTO standby)" data-redundancy="duty" data-sensor="FP-01"/>
+                <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-jp-discharge" data-from="JP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN80 jockey" data-current="pressure maintain @ 7.5 bar" data-redundancy="duty" data-sensor="JP-01"/>
+                <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-fp02-discharge" data-from="FP-02" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN250 diesel standby" data-current="STANDBY" data-redundancy="redundant_b" data-sensor="FP-02"/>
                 <rect class="pipe-label-box" x="1052" y="392" width="86" height="16" rx="3" />
                 <text x="1095" y="404" text-anchor="middle" class="pipe-label">DISCHARGE HDR</text>
 
@@ -416,8 +420,8 @@
                     <text id="flow-val" x="84" y="74" text-anchor="middle" fill="#cbd5e1" font-size="12" class="font-tech" font-weight="bold">0.0 m³/h</text>
                 </g>
 
-                <path id="path-to-wet" d="M 1150 400 L 1150 110 L 1200 110" class="pipe-base" />
-                <path id="path-to-pre" d="M 1150 400 L 1150 520 L 1200 520" class="pipe-base" />
+                <path id="path-to-wet" d="M 1150 400 L 1150 110 L 1200 110" class="pipe-base" data-rz-line="1" data-id="fs-to-wet-zone" data-from="DISCHARGE-HEADER" data-to="WAV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN150 wet sprinkler" data-current="charged (Cl2 res 0.6 ppm)" data-redundancy="duty"/>
+                <path id="path-to-pre" d="M 1150 400 L 1150 520 L 1200 520" class="pipe-base" data-rz-line="1" data-id="fs-to-preaction-zone" data-from="DISCHARGE-HEADER" data-to="PACV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN150 pre-action" data-current="dry pipe charged on detect" data-redundancy="duty"/>
 
                 <!-- Wet alarm / zone control valves -->
                 <g transform="translate(1200, 70)">
@@ -430,13 +434,13 @@
                     <text x="140" y="36" text-anchor="middle" class="valve-label">WAV-03</text>
                 </g>
 
-                <!-- N2 distribution header to pre-action zone valves -->
-                <path id="path-n2-header" d="M 1200 348 L 1400 348" class="pipe-base" />
-                <path id="path-n2-pv1" d="M 1218 348 L 1218 480" class="pipe-base" />
-                <path id="path-n2-pv2" d="M 1262 348 L 1262 480" class="pipe-base" />
-                <path id="path-n2-pv3" d="M 1306 348 L 1306 480" class="pipe-base" />
-                <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" />
-                <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" />
+                <!-- N2 distribution header to pre-action zone valves. v1.42.5 — tagged. -->
+                <path id="path-n2-header" d="M 1200 348 L 1400 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-distribution-header" data-from="N2-GEN-01" data-to="PV-N2-MANIFOLD" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 2.4 bar header" data-current="pressure maintain" data-redundancy="duty"/>
+                <path id="path-n2-pv1" d="M 1218 348 L 1218 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv1" data-from="PV-N2-MANIFOLD" data-to="PACV-01" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
+                <path id="path-n2-pv2" d="M 1262 348 L 1262 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv2" data-from="PV-N2-MANIFOLD" data-to="PACV-02" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
+                <path id="path-n2-pv3" d="M 1306 348 L 1306 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv3" data-from="PV-N2-MANIFOLD" data-to="PACV-03" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
+                <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv4" data-from="PV-N2-MANIFOLD" data-to="PACV-04" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
+                <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv5" data-from="PV-N2-MANIFOLD" data-to="PACV-05" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
 
                 <g transform="translate(1200, 480)">
                     <text x="100" y="-12" text-anchor="middle" class="eq-tag">Pre-Action Zone Valves (data hall)</text>

@@ -11,6 +11,56 @@ release sections rather than semver.
 
 ---
 
+## v1.42.5 — 2026-05-26 (water-system + fire-system static SVG pipes tagged)
+
+MINOR ship: sixth in the v1.42.x → v1.45.x sweep. Cross-page adoption
+extends to water-system.html (water treatment P&ID) and fire-system.html
+(fire-water + N2 distribution P&ID).
+
+Static SVG `<path class="pipe-base">` elements tagged inline with
+`data-rz-line="1"` + `data-from` / `data-to` / `data-medium` / `data-state`
+/ `data-capacity` / `data-current` / `data-redundancy` / `data-sensor`.
+No JS changes — the validator queries the static attributes.
+
+Engine + `#p-dash` byte-identical. 19/19 line-model probe pass
+(datahallAI 171L+36B; chiller-plant 18L; water-system 10L; fire-system 14L)
++ 75/75 accuracy probe + 57/57 + 22/22 + all strict audits PASS.
+
+### Added
+
+- **`water-system.html`** + **`fire-system.html`** — `js/rz-line-model.js`
+  loaded non-deferred after `conv-engine.js` so the probe can call
+  `window.RZLineModel.audit()`.
+
+### Changed (additive metadata only, visual identical)
+
+- **`water-system.html`** — **10 pipes** tagged inline (raw → filter →
+  pump → UV → treated tank/makeup chains, backwash drain, makeup blowdown):
+  `ws-mains-in`, `ws-raw-to-filter`, `ws-filter-to-pump`, `ws-pump-to-uv`,
+  `ws-uv-to-treated-header`, `ws-treated-to-domtank`, `ws-treated-to-makeup`,
+  `ws-domtank-to-service`, `ws-bw-to-drain`, `ws-makeup-blowdown`.
+- **`fire-system.html`** — **14 pipes** tagged inline:
+  `fs-landlord-makeup`, `fs-suction-header`, `fs-n2-supply`,
+  `fs-fp01-discharge`, `fs-jp-discharge`, `fs-fp02-discharge`,
+  `fs-to-wet-zone`, `fs-to-preaction-zone`,
+  `fs-n2-distribution-header`, `fs-n2-pv1`..`fs-n2-pv5`.
+
+### Probe infrastructure
+
+- **`tools/probe-line-model.mjs`** — `waitUntil:'load'` (was `networkidle2`)
+  to avoid timeouts on pages with long-running flow animations.
+- Targets bumped:
+  `water-system.html: 10`, `fire-system.html: 14`.
+
+### Docs
+
+- `standarization/LINE_MODEL.md` v1.42.5 row.
+- `standarization/BMS_SHELL.md` v1.42.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker updated.
+
+---
+
 ## v1.42.4 — 2026-05-26 (first cross-page adoption — chiller-plant.html CHW P&ID)
 
 MINOR ship: fifth in the v1.42.x → v1.45.x sweep. First port to a SECOND

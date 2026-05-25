@@ -74,6 +74,10 @@
          Loaded NON-deferred + external so window.CONV_CALC exists before the
          inline binding script. NEVER inline this in a JS string literal. -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
+         the static SVG pipes tagged with data-rz-line / data-from / data-to
+         / data-medium / data-state / etc. Loaded for validator parity. -->
+    <script src="js/rz-line-model.js?v=1.42.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §7. -->
@@ -406,27 +410,28 @@
                  aria-label="Water treatment process and instrumentation diagram"
                  style="transition:transform .25s; transform-origin:top left;">
 
-                <!-- ===== Pipes (muted base) ===== -->
+                <!-- ===== Pipes (muted base) ===== v1.42.5 — tagged with line-model metadata.
+                     data-rz-line + from / to / medium / state / capacity / current / sensor. -->
                 <!-- Mains in -> raw tank -->
-                <path class="pipe" d="M40 90 H150"/>
+                <path class="pipe" d="M40 90 H150" data-rz-line="1" data-id="ws-mains-in" data-from="MAINS-FM-101" data-to="TK-101-RAW" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="45.0 L/min @ 2.1 bar" data-redundancy="duty" data-sensor="FM-101"/>
                 <!-- Raw tank -> filter -->
-                <path class="pipe" d="M250 130 H300"/>
+                <path class="pipe" d="M250 130 H300" data-rz-line="1" data-id="ws-raw-to-filter" data-from="TK-101-RAW" data-to="FLT-201" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.4 bar in" data-redundancy="duty"/>
                 <!-- Filter -> booster pump -->
-                <path class="pipe" d="M400 130 H470"/>
+                <path class="pipe" d="M400 130 H470" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.0 bar / DP 0.40 bar" data-redundancy="duty"/>
                 <!-- Pump -> dosing tee -> UV -->
-                <path class="pipe" d="M540 130 H660"/>
+                <path class="pipe" d="M540 130 H660" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50 / 7.5 kW pump" data-current="0.85 L/h Cl2 / 0.6 ppm residual" data-redundancy="duty" data-sensor="DOS-302"/>
                 <!-- UV -> treated header tee -->
-                <path class="pipe" d="M760 130 H850 V210"/>
+                <path class="pipe" d="M760 130 H850 V210" data-rz-line="1" data-id="ws-uv-to-treated-header" data-from="UV-401" data-to="TREATED-HEADER-TEE" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="99.8% UV efficacy" data-redundancy="duty" data-sensor="UV-401"/>
                 <!-- Treated header split: -> domestic tank (v1.41.5 — straight down, no Z-routing that visually appeared as 2 pipes) -->
-                <path class="pipe" d="M850 210 V250"/>
+                <path class="pipe" d="M850 210 V250" data-rz-line="1" data-id="ws-treated-to-domtank" data-from="TREATED-HEADER-TEE" data-to="TK-402-DOM" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="treated water to TK-402" data-redundancy="duty"/>
                 <!-- Treated header -> cooling makeup -->
-                <path class="pipe" d="M850 210 V300 H980"/>
+                <path class="pipe" d="M850 210 V300 H980" data-rz-line="1" data-id="ws-treated-to-makeup" data-from="TREATED-HEADER-TEE" data-to="MK-501-MAKEUP" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="treated water to cooling makeup" data-redundancy="duty"/>
                 <!-- Domestic tank -> service header -->
-                <path class="pipe" d="M760 360 H700"/>
+                <path class="pipe" d="M760 360 H700" data-rz-line="1" data-id="ws-domtank-to-service" data-from="TK-402-DOM" data-to="SERVICE-HEADER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="domestic service supply" data-redundancy="duty"/>
                 <!-- Filter backwash -> drain -->
-                <path class="pipe" d="M350 180 V250 H260"/>
+                <path class="pipe" d="M350 180 V250 H260" data-rz-line="1" data-id="ws-bw-to-drain" data-from="FLT-201" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="de-energized" data-capacity="DN50 backwash" data-current="INHIBIT (state machine)" data-redundancy="maintenance" data-sensor="XV-202"/>
                 <!-- Make-up system blowdown / discharge -> drain (v1.41.5) -->
-                <path class="pipe" d="M1075 360 V410 H40"/>
+                <path class="pipe" d="M1075 360 V410 H40" data-rz-line="1" data-id="ws-makeup-blowdown" data-from="MK-501-MAKEUP" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="energized" data-capacity="DN50 blowdown" data-current="make-up system discharge" data-redundancy="duty"/>
 
                 <!-- ===== Animated flow (medium-coloured) ===== -->
                 <path class="flow water" id="f-in"     d="M40 90 H150"/>
