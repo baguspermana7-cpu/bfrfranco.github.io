@@ -11,6 +11,87 @@ release sections rather than semver.
 
 ---
 
+## v1.41.3 — 2026-05-25 (ai-engineering-maintenance.html — Platform Concept reframe)
+
+PATCH ship: owner-authored concept-page enhancement, applied directly in
+`/home/baguspermana7/rz-work/` then synced into the `ft-phase2` worktree.
+
+`ai-engineering-maintenance.html` grows from **1,521 → 1,662 lines** (+141)
+without breaking any v1.40.0 framing fixes (advisory-only language, 826-row
+CSV count, confidence-tier discipline, concept-banner link to roadmap all
+preserved).
+
+### Added — Platform Concept section
+
+New `#sec-platform` section titled
+"Platform Concept — Maintenance Intelligence Workbench". Reframes the page
+away from "chatbot or dashboard-only prototype" toward an
+**operator-grade decision workbench** that the production shape *should* be:
+
+- **Product North Star card** — role-first UX (operator, reliability engineer,
+  planner, technician, engineering manager, admin each get a different work
+  surface); evidence-first AI (every recommendation shows sensor window,
+  FMECA link, KG path, model confidence, data-quality status, reviewer);
+  advisory-only default (drafts, escalates, documents — never bypasses
+  safety/control).
+- **Industrial Guardrails card** — risk engine (RPN ordinal vs production
+  risk with probability/downtime/safety/SLA/spares); approval matrix (4
+  thresholds: advisory note → draft WO → emergency escalation → KB/model
+  change); read-only OT boundary (BMS/SCADA via edge gateway/DMZ; physical
+  control stays in SIS/protection relays/BMS engineered sequences);
+  audit trail (source, version, reviewer, timestamp per diagnosis).
+- **Calculation Accuracy Contract** — decision-table mapping each layer
+  (Sensor Quality / Fault Diagnosis / Risk Priority / Recommended Action /
+  Work Order Draft / CMMS Sync) to its production accuracy requirement
+  and user-facing output.
+
+### Changed
+
+- **Page title**: "AI Engineering Maintenance — Concept" → "AI Engineering
+  Maintenance **Platform** Concept"
+- **Hero pill**: "Prescriptive Maintenance · FMECA + KG + ML + NLP" →
+  "Industrial Maintenance Intelligence · FMECA + KG + ML + NLP"
+- **Hero intro paragraph** rewritten to frame the page as an industrial
+  platform concept (not just an advisor brief).
+- **OG + Twitter card titles/descriptions** updated to match.
+- **Meta description** trimmed in `ft-phase2` worktree to clear SEO length
+  warning (207 → 160 chars).
+- **Mobile nav-menu CSS** improved — dropdown handling, max-height +
+  scroll behaviour for accessibility, min-height 44px on links.
+- New `.platform-top`, `.platform-card`, `.work-loop`, `.loop-step`,
+  `.surface-title`, `.screen-grid`, `.screen-card`, `.decision-table`,
+  `.pilot-strip` CSS classes — all light + dark theme aware,
+  mobile-responsive at 920px and 560px breakpoints.
+
+### Preserved (v1.40.0 framing fixes intact)
+
+- Concept-banner with link to `docs/plans/2026-05-25-ai-maintenance-product-roadmap.md`
+- 826-row CSV count (separates data rows from header lines)
+- Advisory-only language (no auto-action wording)
+- `confidence_tier` field documentation
+- All 8 CSV provenance columns
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.3 (date 2026-05-25)
+- `sw.js` &rarr; `rz-cache-v1.41.3`
+
+### Audits post-ship
+
+- `audit-script-tags.py --strict`: CLEAN
+- `audit-js-syntax.py --strict`: CLEAN
+- `audit-mobile-responsive.py --strict`: 133 PASS / 0 FAIL
+- `audit-seo.py`: 0 ERROR (1 description warning resolved by trim)
+
+### Carry-forward (still in-flight)
+
+- 3 pillar pages already enhanced in worktree but NOT yet committed
+  (cooling 1030→2159, power 854→1989, standards 693→1829). Will ship
+  as v1.42.0 once sustainability completes.
+- sustainability agent in-flight with chunked-Edit strategy.
+
+---
+
 ## v1.41.2 — 2026-05-24 (pillar-fire-safety.html — 8 new sections + interactive tools + 15-item FAQ)
 
 MINOR ship: substantial enhancement of the fire-safety pillar page in
