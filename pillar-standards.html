@@ -137,6 +137,144 @@
                     "@type": "Answer",
                     "text": "Standards overlap significantly. ASHRAE defines thermal envelopes that Uptime references in tier requirements. TIA-942 maps to Uptime tiers (Rated-1 through Rated-4). NFPA fire codes apply regardless of tier level. ISO 50001 energy management encompasses PUE metrics that ASHRAE also tracks. The key is understanding each standard's primary domain: ASHRAE owns thermal, Uptime owns availability, NFPA owns fire safety, ISO owns energy governance, and TIA owns telecom infrastructure topology."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between Uptime Tier and TIA-942 Rated Class?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Uptime Institute Tier (I–IV) and TIA-942 Rated Class (1–4) are parallel but distinct classification systems. Uptime defines availability targets and redundancy topology from an operational standpoint, backed by certification audits. TIA-942 Rated Classes map roughly to Uptime tiers for infrastructure design but are primarily a construction and cabling standard — not a certification. A Rated-3 TIA-942 facility is designed like a Tier III but has not necessarily been audited by Uptime. The terms are frequently conflated in procurement documents, so always clarify which body's certification is being referenced."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why do some hyperscale operators skip third-party tier certification?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Hyperscale operators like Google, Meta, and Amazon typically do not pursue Uptime Institute Tier certification for several reasons: their internal engineering standards often exceed Tier IV requirements; their distributed architecture means downtime for one facility does not create a customer SLA breach; the certification process is designed for a single-site facility topology, not globally distributed systems; and the operators have negotiating leverage with enterprise customers that removes the need for third-party validation. Instead, hyperscalers publish their own reliability SLAs and publish infrastructure design papers that substitute for certification documentation."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is concurrent maintainability and how is it demonstrated?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Concurrent maintainability means any planned maintenance activity on any single component of the power or cooling system can be performed without interrupting the IT load. This is the primary distinction between Tier III and Tier II. Demonstration requires a comprehensive single-point-of-failure analysis (SPFA) showing that for every maintenance action — including shutting down a UPS module, replacing a cooling unit, or testing a generator — at least one alternate path exists and can sustain full load. The analysis must cover the entire path from utility entrance to the PDU. Uptime Institute auditors review both the SPFA document and the physical design during the Constructed Facility certification."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What does fault tolerance mean in Tier IV context?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Fault tolerance (Tier IV requirement) means the facility can sustain any single component failure — not just a planned maintenance event — without loss of IT load. This requires a 2N or higher redundancy in all critical systems, fully independent distribution paths (separate physically routed), and compartmentation so a failure in one path cannot cascade to the other. A Tier III facility (concurrent maintainability) may lose IT load if an unplanned failure occurs during a maintenance window. A Tier IV facility maintains IT load through simultaneous planned maintenance AND an unplanned fault event."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "When should ISO 22237 be chosen over TIA-942?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "ISO/IEC 22237 is typically chosen when the facility targets European markets, needs a multi-part framework covering IT, power, cooling, physical security, and management simultaneously, or when the organization has an existing ISO management system (ISO 9001, ISO 50001) and wants an aligned approach. TIA-942 is preferred when the primary audience is North American customers, the facility houses telecommunications infrastructure, or the design team is more familiar with TIA specifications. ISO 22237 is also chosen for new builds in markets where EN 50600 is not yet firmly established as the local code reference."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does EN 50600 relate to EU public procurement and sustainability requirements?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "EN 50600 is the primary European standard for data center design and operations, published by CENELEC. It is referenced in EU public procurement frameworks and is aligned with EU Green Deal requirements through its KPI definitions for energy efficiency, water usage, and renewable energy sourcing. The European Green Deal Digital Strategy and the European Code of Conduct for Data Centres both reference EN 50600 KPIs. Organizations certifying to EN 50600 can directly demonstrate alignment with EU taxonomy screening criteria for sustainable infrastructure, which affects access to green financing and ESG reporting compliance."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between BICSI 002 and TIA-942?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "BICSI 002 (Data Center Design and Implementation Best Practices) covers the full design and construction process from site selection through commissioning and operations, with heavy emphasis on cabling infrastructure and low-voltage systems. TIA-942 is a telecommunications infrastructure standard that defines cabling topology and rated-level requirements. BICSI 002 references TIA-942 topology but adds substantially more guidance on project delivery, structured cabling design, grounding, pathways, and operational procedures. BICSI certifications (DCDC, RCDD) validate practitioner competency in the BICSI 002 body of knowledge, making it the preferred standard in markets where BICSI membership is widespread."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Who can perform Uptime Institute tier certification audits?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Only Uptime Institute directly certifies facilities under its Tier Certification program — the organization does not license third-party auditors to issue certifications. Certified Tier Design Documents (CTDD) and Certified Tier Constructed Facility (CTCF) certifications are issued by Uptime Institute after review by its engineering team, often in conjunction with an on-site audit. There is also the Tier Certification for Operational Sustainability (TCOS), which requires ongoing operational evidence. Some third-party consulting firms can prepare facilities for Uptime certification, but only Uptime Institute can issue the certificate itself."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What triggers a recertification requirement?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Uptime Institute tier certifications are not time-limited by default for design and constructed facility certifications, but major physical modifications to the facility typically require a re-evaluation. Triggers include: addition of a new distribution path or power feed, changes to generator capacity or UPS topology, modifications to cooling systems that affect concurrent maintainability, and physical expansion that adds new space to the certified footprint. Operational Sustainability certifications must be renewed annually. ISO-based certifications (ISO 22237, ISO 50001) have formal surveillance and recertification cycles — typically annual surveillance audits and a full recertification every three years."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do certified facilities receive insurance discounts?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. Uptime Institute Tier IV certified facilities typically receive 15–30% reductions in business interruption and property insurance premiums compared to non-certified facilities of similar size, according to major commercial underwriters including FM Global and Zurich. Tier III certifications earn smaller but meaningful credits. The rationale is that certification validates the design reduces probable maximum loss (PML). ISO 50001 certification can additionally qualify facilities for green financing instruments at reduced rates, as lenders increasingly use sustainability certifications as risk proxies. TIA-942 and EN 50600 conformance, while not directly generating insurance credits on their own, strengthen the overall compliance posture that underwriters assess."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between certification and conformance?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Certification involves independent third-party verification that a facility meets a specific standard's requirements, resulting in a formal certificate issued by an accredited body. Conformance means the facility has been designed or built according to a standard's requirements but has not gone through formal third-party verification. TIA-942 Rated designations, for example, can be self-declared conformance or can be independently verified by TIA or an accredited partner. Uptime Institute tier certification is always third-party verified. In procurement contexts, customers should always specify whether they require formal third-party certification or whether conformance documentation is acceptable, as the two terms are often used interchangeably but carry very different evidentiary weight."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the typical total cost and timeline for Uptime Tier III certification?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A Tier III certification process for a mid-size facility (1–5 MW IT load) typically takes 8–12 months from engagement to certificate issuance and costs $150,000–$400,000 in total program spend, including Uptime Institute fees ($80,000–$200,000 depending on facility size), internal labor for documentation preparation, and consultant fees if used. The process covers Design Document review (typically 3–6 months), Constructed Facility audit (post-commissioning, 2–4 months), and any remediation cycles. Tier IV adds 30–50% to both cost and timeline due to the additional fault-tolerance analysis and compartmentation verification requirements. These are illustrative estimates; actual costs depend heavily on facility complexity and existing documentation quality."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- HowTo Schema: How to choose a data center certification path -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Choose a Data Center Certification Path",
+        "description": "A 5-step process for selecting the right certification standard or combination for a data center, based on market, business goals, facility size, and budget.",
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Define the primary business objective",
+                "text": "Identify whether the goal is customer trust (colocation sales), regulatory or insurance compliance, internal governance, or competitive differentiation. Uptime Institute Tier Certification is the strongest signal for customer trust. ISO 22237 or EN 50600 satisfy EU regulatory contexts. TIA-942 and BICSI 002 address infrastructure design consistency. Internal benchmarking can use any standard without pursuing formal certification."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Map the target geographic market",
+                "text": "US-primary customers recognize Uptime Institute tiers most readily. European customers increasingly reference EN 50600 and ISO 22237. Asia-Pacific markets accept both Uptime and TIA-942. Global hyperscale deployments often require multiple certifications stacked. Confirm which standards your target customer base actually specifies in their data center procurement RFPs before investing in any single certification program."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Assess facility size and complexity",
+                "text": "Facilities under 500 kW IT load typically start with TIA-942 conformance or BICSI 002 design compliance, which offer the best cost-to-recognition ratio at smaller scale. Facilities between 500 kW and 5 MW are the core addressable market for Uptime Tier III certification and ISO 22237. Hyperscale facilities above 50 MW typically develop proprietary standards equivalent to or exceeding Tier IV, supplemented by specific EN 50600 or ISO 22237 modules for compliance reporting."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Evaluate budget and internal readiness",
+                "text": "Conduct an internal gap assessment against the target standard before engaging an auditor or certification body. Score your current state against the certification requirements across power, cooling, cabling, physical security, and operations. A readiness score above 70% suggests proceeding directly to certification engagement. Below 70%, complete infrastructure remediation first to avoid costly audit findings and remediation cycles that extend the timeline."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 5,
+                "name": "Select and sequence the certification program",
+                "text": "For most colocation operators, the recommended sequence is: (1) TIA-942 conformance documentation as a baseline, (2) Uptime Tier III or IV Design Documents certification, (3) Uptime Constructed Facility certification post-commissioning, and (4) Operational Sustainability certification 12 months into operation. Overlay ISO 22237 or EN 50600 for European market expansion. Add ISO 50001 for energy management credibility. Never pursue certifications in parallel without dedicated program management, as documentation requirements overlap and conflicts between auditors can cause delays."
             }
         ]
     }
@@ -360,6 +498,207 @@
     h1 { font-size: 1.4rem !important; }
 }
 
+/* ============================================================
+   PST — NEW SECTIONS (pst-* prefix)
+   ============================================================ */
+
+/* --- Standards Comparison Table --- */
+.pst-standards-table { padding: 4rem 2rem; background: var(--bg-primary); }
+.pst-table-wrap { max-width: 1100px; margin: 0 auto; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+.pst-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.pst-table thead th { background: #8b5cf6; color: #fff; padding: 0.85rem 1rem; text-align: left; font-weight: 700; font-size: 0.79rem; letter-spacing: 0.3px; position: sticky; top: 0; z-index: 2; white-space: nowrap; }
+.pst-table thead th:first-child { background: #7c3aed; min-width: 160px; }
+.pst-table tbody tr:nth-child(odd)  { background: var(--bg-secondary); }
+.pst-table tbody tr:nth-child(even) { background: var(--bg-primary); }
+.pst-table tbody tr:hover { background: rgba(139,92,246,0.06); }
+.pst-table td { padding: 0.75rem 1rem; color: var(--text-secondary); line-height: 1.5; vertical-align: top; border-bottom: 1px solid var(--border-color); }
+.pst-table td:first-child { font-weight: 600; color: var(--text-primary); font-size: 0.79rem; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.pst-table-note { max-width: 1100px; margin: 0.75rem auto 0; font-size: 0.74rem; color: #64748b; }
+
+/* --- Decision Matrix --- */
+.pst-decision { padding: 4rem 2rem; background: var(--bg-secondary); }
+.pst-decision-inner { max-width: 800px; margin: 0 auto; }
+.pst-questions { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem; }
+.pst-q-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.4rem; }
+.pst-q-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
+.pst-q-card h4 span { display: inline-block; background: #8b5cf6; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; margin-right: 0.5rem; vertical-align: middle; }
+.pst-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pst-opt { cursor: pointer; border: 1.5px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.82rem; color: var(--text-secondary); background: var(--bg-secondary); transition: border-color 0.2s, background 0.2s, color 0.2s; user-select: none; }
+.pst-opt:hover { border-color: #8b5cf6; color: #8b5cf6; }
+.pst-opt.selected { border-color: #8b5cf6; background: rgba(139,92,246,0.1); color: #8b5cf6; font-weight: 600; }
+.pst-calc-btn { display: block; width: 100%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; border: none; border-radius: 10px; padding: 0.9rem 1.5rem; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.2s; margin-bottom: 1.5rem; min-height: 44px; }
+.pst-calc-btn:hover { opacity: 0.88; }
+.pst-result { display: none; background: var(--bg-primary); border: 2px solid #8b5cf6; border-radius: 14px; padding: 1.8rem; }
+.pst-result.visible { display: block; }
+.pst-result-cert { font-size: 1.5rem; font-weight: 800; color: #8b5cf6; margin-bottom: 0.4rem; }
+.pst-result-sub { font-size: 0.78rem; color: #64748b; margin-bottom: 1rem; font-style: italic; }
+.pst-result h5 { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 1rem 0 0.4rem; }
+.pst-result ul { margin: 0; padding-left: 1.2rem; }
+.pst-result li { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; line-height: 1.5; }
+.pst-result-links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+.pst-result-links a { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #8b5cf6; font-weight: 600; text-decoration: none; padding: 0.35rem 0.75rem; border: 1px solid rgba(139,92,246,0.35); border-radius: 6px; }
+.pst-result-links a:hover { background: rgba(139,92,246,0.08); }
+
+/* --- Compliance Checklist --- */
+.pst-checklist-section { padding: 4rem 2rem; background: var(--bg-primary); }
+.pst-checklist-inner { max-width: 900px; margin: 0 auto; }
+.pst-score-bar { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.pst-score-num { font-size: 2rem; font-weight: 800; color: #8b5cf6; min-width: 60px; }
+.pst-score-label { font-size: 0.85rem; color: var(--text-secondary); flex: 1; }
+.pst-score-status { font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid; }
+.pst-score-status.red    { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.1); }
+.pst-score-status.amber  { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.pst-score-status.cyan   { color: #06b6d4; border-color: #06b6d4; background: rgba(6,182,212,0.1); }
+.pst-score-status.green  { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.1); }
+.pst-cl-group { margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+.pst-cl-group-hdr { background: var(--bg-secondary); padding: 0.8rem 1.2rem; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.5rem; }
+.pst-cl-group-hdr span { font-weight: 400; color: #64748b; font-size: 0.78rem; }
+.pst-cl-items { padding: 0.5rem 0; background: var(--bg-primary); }
+.pst-cl-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 1.2rem; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.pst-cl-item:last-child { border-bottom: none; }
+.pst-cl-item input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; accent-color: #8b5cf6; flex-shrink: 0; cursor: pointer; }
+.pst-cl-item label { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; cursor: pointer; }
+.pst-cl-item label .cite { font-size: 0.74rem; color: #94a3b8; margin-left: 0.3rem; }
+.pst-cl-btn-row { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+.pst-cl-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: 1.5px solid; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; min-height: 44px; transition: background 0.2s; }
+.pst-cl-btn-reset  { border-color: #64748b; color: #64748b; background: transparent; }
+.pst-cl-btn-reset:hover  { background: rgba(100,116,139,0.1); }
+.pst-cl-btn-export { border-color: #8b5cf6; color: #8b5cf6; background: transparent; }
+.pst-cl-btn-export:hover { background: rgba(139,92,246,0.1); }
+
+/* --- Cost Calculator --- */
+.pst-cost { padding: 4rem 2rem; background: var(--bg-secondary); }
+.pst-cost-inner { max-width: 960px; margin: 0 auto; }
+.pst-cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.pst-cost-inputs { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.8rem; }
+.pst-cost-inputs h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.2rem; }
+.pst-field { margin-bottom: 1rem; }
+.pst-field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; }
+.pst-field input, .pst-field select { width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.55rem 0.9rem; font-size: 0.88rem; color: var(--text-primary); font-family: 'Inter', sans-serif; box-sizing: border-box; }
+.pst-field input:focus, .pst-field select:focus { outline: 2px solid #8b5cf6; outline-offset: -1px; }
+.pst-field-range { display: flex; align-items: center; gap: 0.75rem; }
+.pst-field-range input[type="range"] { flex: 1; accent-color: #8b5cf6; }
+.pst-field-range .range-val { font-size: 0.88rem; font-weight: 700; color: #8b5cf6; min-width: 40px; text-align: right; }
+.pst-cost-outputs { display: flex; flex-direction: column; gap: 0.75rem; }
+.pst-out-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 1.2rem; }
+.pst-out-label { font-size: 0.74rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 0.25rem; }
+.pst-out-val { font-size: 1.25rem; font-weight: 800; color: #8b5cf6; }
+.pst-out-val.accent-green { color: #10b981; }
+.pst-cost-disclaimer { max-width: 960px; margin: 0.75rem auto 0; font-size: 0.74rem; color: #64748b; font-style: italic; }
+
+/* --- Scope Accordion --- */
+.pst-scope-diagram { padding: 4rem 2rem; background: var(--bg-primary); }
+.pst-scope-inner { max-width: 860px; margin: 0 auto; }
+.pst-scope-tiers { display: flex; flex-direction: column; gap: 0.5rem; }
+.pst-scope-tier { border-radius: 8px; cursor: pointer; }
+.pst-scope-tier-bar { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.4rem; border-radius: 8px; }
+.pst-scope-tier.open .pst-scope-tier-bar { border-radius: 8px 8px 0 0; }
+.pst-scope-num { font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.75); min-width: 44px; text-transform: uppercase; letter-spacing: 0.5px; }
+.pst-scope-label { font-size: 0.95rem; font-weight: 700; color: #fff; flex: 1; }
+.pst-scope-subs { font-size: 0.78rem; color: rgba(255,255,255,0.72); }
+.pst-scope-arrow { font-size: 0.7rem; color: rgba(255,255,255,0.6); transition: transform 0.3s; }
+.pst-scope-tier.open .pst-scope-arrow { transform: rotate(180deg); }
+.pst-scope-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: var(--bg-secondary); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; }
+.pst-scope-tier.open .pst-scope-detail { max-height: 350px; }
+.pst-scope-detail-inner { padding: 1rem 1.4rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+.pst-scope-detail-inner ul { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+.pst-scope-detail-inner li { margin-bottom: 0.35rem; }
+.pst-overlap-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+.pst-overlap-pill { font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; }
+.pst-pill-tia   { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+.pst-pill-iso   { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+.pst-pill-uptime { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+.pst-pill-en    { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+.pst-pill-bicsi { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+.pst-pill-ashrae { background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); }
+/* Tier gradient colors */
+.pst-scope-t1 .pst-scope-tier-bar { background: linear-gradient(135deg, #4c1d95, #5b21b6); }
+.pst-scope-t2 .pst-scope-tier-bar { background: linear-gradient(135deg, #5b21b6, #6d28d9); }
+.pst-scope-t3 .pst-scope-tier-bar { background: linear-gradient(135deg, #6d28d9, #7c3aed); }
+.pst-scope-t4 .pst-scope-tier-bar { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+.pst-scope-t5 .pst-scope-tier-bar { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+
+/* --- Case Studies --- */
+.pst-cases { padding: 4rem 2rem; background: var(--bg-secondary); }
+.pst-cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1050px; margin: 0 auto; }
+.pst-case-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.6rem; display: flex; flex-direction: column; }
+.pst-case-date { display: inline-block; background: rgba(139,92,246,0.1); color: #8b5cf6; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.75rem; }
+.pst-case-card h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.6rem; line-height: 1.4; }
+.pst-case-card p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; flex: 1; }
+.pst-case-meta { font-size: 0.8rem; margin-bottom: 0.75rem; }
+.pst-case-meta strong { color: var(--text-primary); }
+.pst-case-meta span { color: var(--text-secondary); }
+.pst-case-takeaways { border-top: 1px solid var(--border-color); padding-top: 0.75rem; }
+.pst-case-takeaways h4 { font-size: 0.78rem; font-weight: 700; color: #8b5cf6; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 0.4rem; }
+.pst-case-takeaways ul { margin: 0; padding-left: 1.1rem; }
+.pst-case-takeaways li { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; line-height: 1.5; }
+
+/* --- Glossary --- */
+.pst-glossary { padding: 4rem 2rem; background: var(--bg-primary); }
+.pst-glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; max-width: 1060px; margin: 0 auto; }
+.pst-term-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.1rem 1.2rem; transition: border-color 0.2s; }
+.pst-term-card:hover { border-color: rgba(139,92,246,0.4); }
+.pst-term-name { font-size: 0.88rem; font-weight: 700; color: #8b5cf6; margin-bottom: 0.4rem; }
+.pst-term-def { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+
+/* --- Related Links --- */
+.pst-related { padding: 3rem 2rem; background: var(--bg-secondary); }
+.pst-related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 1060px; margin: 0 auto; }
+.pst-related-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem; display: flex; align-items: center; gap: 0.9rem; text-decoration: none; transition: border-color 0.25s, transform 0.2s; }
+.pst-related-card:hover { border-color: #8b5cf6; transform: translateY(-2px); }
+.pst-related-icon { width: 36px; height: 36px; background: rgba(139,92,246,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8b5cf6; flex-shrink: 0; }
+.pst-related-icon svg { width: 18px; height: 18px; }
+.pst-related-text strong { display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.pst-related-text span { font-size: 0.75rem; color: #64748b; }
+
+/* --- Dark mode overrides (pst-*) --- */
+[data-theme="dark"] .pst-table-wrap { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-table tbody tr:nth-child(odd)  { background: #1e293b; }
+[data-theme="dark"] .pst-table tbody tr:nth-child(even) { background: #0f172a; }
+[data-theme="dark"] .pst-table tbody tr:hover { background: rgba(139,92,246,0.08); }
+[data-theme="dark"] .pst-table td { border-color: rgba(255,255,255,0.06); color: #94a3b8; }
+[data-theme="dark"] .pst-table td:first-child { color: #f1f5f9; }
+[data-theme="dark"] .pst-q-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-opt { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #94a3b8; }
+[data-theme="dark"] .pst-opt.selected { background: rgba(139,92,246,0.15); }
+[data-theme="dark"] .pst-result { background: #1e293b; }
+[data-theme="dark"] .pst-cl-group { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-cl-group-hdr { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-cl-items { background: #0f172a; }
+[data-theme="dark"] .pst-cl-item { border-color: rgba(255,255,255,0.04); }
+[data-theme="dark"] .pst-cl-item label { color: #94a3b8; }
+[data-theme="dark"] .pst-score-bar { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-cost-inputs { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-field input,
+[data-theme="dark"] .pst-field select { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #f1f5f9; }
+[data-theme="dark"] .pst-field select option { background: #1e293b; color: #f1f5f9; }
+[data-theme="dark"] .pst-out-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-scope-detail { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-case-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-case-takeaways { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-term-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-related-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pst-result-links a { border-color: rgba(139,92,246,0.3); }
+
+/* --- Mobile overrides (pst-*) --- */
+@media (max-width: 768px) {
+    .pst-cost-grid { grid-template-columns: 1fr !important; }
+    .pst-cost-outputs { flex-direction: column; }
+    .pst-cl-btn-row { flex-direction: column; }
+    .pst-cl-btn { width: 100%; }
+    .pst-cases-grid { grid-template-columns: 1fr !important; }
+    .pst-glossary-grid { grid-template-columns: 1fr 1fr !important; }
+    .pst-related-grid { grid-template-columns: 1fr 1fr !important; }
+    .pst-result-cert { font-size: 1.2rem; }
+    .pst-options { flex-direction: column; }
+    .pst-scope-tier-bar { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+    .pst-glossary-grid { grid-template-columns: 1fr !important; }
+    .pst-related-grid { grid-template-columns: 1fr !important; }
+    .pst-score-bar { flex-direction: column; align-items: flex-start; }
+}
+
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -430,12 +769,16 @@
                     <span class="label">Related Resources</span>
                 </div>
                 <div class="pillar-stat-badge">
-                    <span class="num">6</span>
-                    <span class="label">Standards Bodies</span>
+                    <span class="num">5</span>
+                    <span class="label">Major Frameworks</span>
                 </div>
                 <div class="pillar-stat-badge">
-                    <span class="num">99.982%</span>
-                    <span class="label">Tier III Uptime</span>
+                    <span class="num">99.995%</span>
+                    <span class="label">Tier IV Availability</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">9 mo</span>
+                    <span class="label">Avg Cert Timeline</span>
                 </div>
             </div>
         </div>
@@ -562,22 +905,52 @@
         </div>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                <div class="value">6+</div>
-                <div class="title">Major Standards Bodies</div>
-                <div class="desc">ASHRAE, Uptime Institute, NFPA, ISO, TIA/ANSI, and EN 50600 define the primary standards landscape for data center design, operations, and compliance worldwide.</div>
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="value">26 min</div>
+                <div class="title">Tier IV Downtime / Year</div>
+                <div class="desc">Tier IV (fault-tolerant) targets 99.995% availability — 26.3 minutes of total annual downtime. Achieved through 2N redundancy, independent distribution paths, and compartmentation that survives any single component failure.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                <div class="value">99.982%</div>
-                <div class="title">Tier III Availability</div>
-                <div class="desc">Tier III targets 99.982% uptime, allowing approximately 1.6 hours of downtime per year. This level requires N+1 redundancy with concurrent maintainability across all critical systems.</div>
+                <div class="value">1.6 hr</div>
+                <div class="title">Tier III Downtime / Year</div>
+                <div class="desc">Tier III (concurrent maintainability) allows 1.6 hours of planned downtime per year at 99.982% availability. Any single maintenance activity can be performed without interrupting the IT load.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                <div class="value">3,000+</div>
+                <div class="title">Uptime Tier Certs Issued</div>
+                <div class="desc">The Uptime Institute has issued over 3,000 tier certifications globally across Design, Constructed Facility, and Operational Sustainability programs — the largest portfolio of independently verified DC availability certifications worldwide.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="value">2005</div>
+                <div class="title">TIA-942 First Published</div>
+                <div class="desc">ANSI/TIA-942 was first published in 2005, with Addendum-A in 2008, Revision-A in 2012, and the current TIA-942-C edition released in 2024. It defines 4 Rated Levels mapping to Uptime tiers for telecom infrastructure design.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg></div>
+                <div class="value">7 parts</div>
+                <div class="title">ISO/IEC 22237 Series</div>
+                <div class="desc">ISO/IEC 22237 comprises 7 published parts: General Concepts, Building Construction, Power Supply, Environmental Control, Telecoms Cabling, Security, and Energy Efficiency Management — a comprehensive multi-domain framework.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+                <div class="value">11 parts</div>
+                <div class="title">EN 50600 Part Count</div>
+                <div class="desc">EN 50600 covers 11 published parts including general concepts, building construction, power supply, environmental control, ICT cabling, security, management &amp; operations, energy efficiency, and KPI definitions — the EU's most comprehensive DC standard.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                <div class="value">9 months</div>
+                <div class="title">Avg Tier Cert Duration</div>
+                <div class="desc">The average Uptime Institute Tier III certification program takes 9 months from initial engagement to certificate issuance, covering Design Documents review, Constructed Facility audit, and any remediation cycles between phases.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
                 <div class="value">3yr</div>
-                <div class="title">ISO 50001 Cycle</div>
-                <div class="desc">ISO 50001 energy management certification operates on a 3-year cycle with annual surveillance audits. Organizations must demonstrate continuous energy performance improvement throughout the cycle.</div>
+                <div class="title">ISO Recertification Cycle</div>
+                <div class="desc">ISO 22237 and ISO 50001 certifications operate on 3-year recertification cycles with annual surveillance audits. Uptime Operational Sustainability must be renewed annually. Major physical modifications may trigger mid-cycle re-evaluation.</div>
             </div>
         </div>
     </section>
@@ -585,23 +958,786 @@
     <section class="pillar-faq">
         <div class="pillar-section-header">
             <h2>Frequently Asked Questions</h2>
-            <p>Common questions about data center standards and compliance.</p>
+            <p>Common questions about data center standards, certifications, and compliance programs.</p>
         </div>
         <div class="faq-container">
             <div class="faq-item">
-                <button class="faq-question">Which data center standard should I follow?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <button class="faq-question" aria-expanded="false">Which data center standard should I follow?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">It depends on your requirements. For thermal management, follow ASHRAE TC 9.9. For availability classification, reference Uptime Institute tiers. For fire protection, comply with NFPA 75/76. For energy management, implement ISO 50001. For telecom infrastructure, use TIA-942. Most data centers follow multiple standards simultaneously because they are complementary rather than competing. Start with local building codes, then layer in industry standards based on SLA commitments and customer expectations.</div></div>
             </div>
             <div class="faq-item">
-                <button class="faq-question">Is Uptime Institute tier certification mandatory?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <button class="faq-question" aria-expanded="false">Is Uptime Institute tier certification mandatory?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">No, Uptime certification is voluntary. However, it has become a de facto industry benchmark that customers and investors use to evaluate reliability. Many colocation providers pursue Tier III or IV to differentiate competitively. The certification includes Design Documents review, Constructed Facility assessment, and optional Operational Sustainability evaluation. While not legally required, major enterprise and government contracts often specify a minimum tier level as a procurement requirement.</div></div>
             </div>
             <div class="faq-item">
-                <button class="faq-question">How do data center standards overlap with each other?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <button class="faq-question" aria-expanded="false">How do data center standards overlap with each other?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">Standards overlap significantly across domains. ASHRAE defines thermal envelopes that Uptime references in tier requirements. TIA-942 maps to Uptime tiers through its Rated-1 to Rated-4 system. NFPA fire codes apply regardless of tier level. ISO 50001 energy management encompasses PUE metrics that ASHRAE also tracks. The key is understanding each standard's primary domain: ASHRAE owns thermal, Uptime owns availability, NFPA owns fire safety, ISO owns energy governance, and TIA owns telecom infrastructure topology.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the difference between Uptime Tier and TIA-942 Rated Class?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Uptime Institute Tier (I–IV) and TIA-942 Rated Class (1–4) are parallel but distinct systems. Uptime defines availability targets and redundancy topology backed by formal certification audits. TIA-942 Rated Classes map roughly to Uptime tiers for infrastructure design but focus primarily on construction and cabling — not a certification. A Rated-3 TIA-942 facility is designed like a Tier III but has not necessarily been audited by Uptime. Always clarify in procurement documents which body's certification is required, as the terms are frequently conflated.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Why do hyperscale operators skip third-party tier certification?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Hyperscale operators like Google, Meta, and Amazon typically do not pursue Uptime tier certification because their internal engineering standards often exceed Tier IV; their distributed architecture means a single-site failure does not breach customer SLAs; the certification process is designed for single-site topology, not globally distributed systems; and they have negotiating leverage with customers that removes the need for third-party validation. Instead, hyperscalers publish proprietary reliability SLAs and infrastructure design papers as substitutes for certification documentation.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is concurrent maintainability and how is it demonstrated?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Concurrent maintainability means any planned maintenance activity on any single component can be performed without interrupting IT load — the key distinction between Tier III and Tier II. Demonstration requires a comprehensive single-point-of-failure analysis (SPFA) showing that for every maintenance action — shutting down a UPS module, replacing a cooling unit, testing a generator — at least one alternate path sustains full load. The analysis must cover the entire path from utility entrance to PDU. Uptime Institute auditors review both the SPFA document and the physical design during Constructed Facility certification.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What does fault tolerance mean in Tier IV context?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Fault tolerance (Tier IV) means the facility sustains any single unplanned component failure without loss of IT load — beyond merely planned maintenance. This requires 2N or higher redundancy in all critical systems, fully independent and physically separate distribution paths, and compartmentation preventing cascade failure. A Tier III facility may lose IT load if an unplanned failure occurs during a maintenance window. A Tier IV facility maintains IT load through simultaneous planned maintenance AND an unplanned fault event occurring at the same time.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">When should ISO 22237 be chosen over TIA-942?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">ISO/IEC 22237 is preferred when targeting European markets, needing a multi-part framework covering IT, power, cooling, physical security, and management simultaneously, or when the organization has an existing ISO management system. TIA-942 is preferred for North American customers, telecom infrastructure facilities, or when the design team is more familiar with TIA specifications. ISO 22237 is also chosen for new builds in markets where EN 50600 is not firmly established as local code reference.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">How does EN 50600 relate to EU sustainability and procurement requirements?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">EN 50600 is referenced in EU public procurement frameworks and aligned with EU Green Deal requirements through its KPI definitions for energy efficiency, water usage, and renewable energy sourcing. The European Code of Conduct for Data Centres references EN 50600 KPIs. Organizations certifying to EN 50600 can directly demonstrate alignment with EU taxonomy screening criteria for sustainable infrastructure, affecting access to green financing and ESG reporting compliance under the SFDR and EU Taxonomy Regulation.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the difference between BICSI 002 and TIA-942?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">BICSI 002 covers the full design and construction lifecycle from site selection through commissioning and operations, with heavy emphasis on cabling infrastructure and low-voltage systems. TIA-942 is primarily a telecommunications infrastructure standard defining cabling topology and rated-level requirements. BICSI 002 references TIA-942 topology but adds guidance on project delivery, structured cabling design, grounding, and operational procedures. BICSI certifications (DCDC, RCDD) validate practitioner competency, making it the preferred reference in markets with strong BICSI membership.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Who can perform Uptime Institute tier certification audits?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Only Uptime Institute directly issues tier certifications — it does not license third-party auditors to grant certifications. The Certified Tier Design Documents (CTDD), Certified Tier Constructed Facility (CTCF), and Tier Certification for Operational Sustainability (TCOS) are all issued exclusively by Uptime Institute after review by its engineering team, often including an on-site audit. Third-party consulting firms can prepare facilities for certification, but only Uptime Institute can issue the final certificate itself.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What triggers a recertification requirement?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Uptime design and constructed facility certifications are not time-limited by default, but major physical modifications require re-evaluation: adding distribution paths, changing generator or UPS topology, modifying cooling systems that affect concurrent maintainability, or expanding the certified footprint. Operational Sustainability certifications renew annually. ISO-based certifications (ISO 22237, ISO 50001) have formal 3-year recertification cycles with annual surveillance audits. Confirm with your certifying body which specific change types trigger a mandatory re-audit.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Do certified facilities receive insurance premium discounts?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Yes. Uptime Tier IV certified facilities typically receive 15–30% reductions in business interruption and property insurance premiums compared to non-certified facilities of similar size, per major commercial underwriters including FM Global and Zurich. Tier III certifications earn smaller but meaningful credits. The rationale is that certification validates the design reduces probable maximum loss (PML). ISO 50001 can additionally qualify facilities for green financing at reduced rates, as lenders increasingly use sustainability certifications as risk proxies.</div></div>
+            </div>,
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the difference between certification and conformance?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Certification involves independent third-party verification resulting in a formal certificate from an accredited body. Conformance means the facility has been designed or built to a standard's requirements but without formal third-party verification. TIA-942 Rated designations can be self-declared conformance or independently verified. Uptime Institute tier certification is always third-party verified. In procurement, always specify whether formal third-party certification or conformance documentation is acceptable — the two terms carry very different evidentiary weight.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the typical cost and timeline for Tier III certification?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">A Tier III certification program for a mid-size facility (1–5 MW IT load) typically takes 8–12 months and costs $150,000–$400,000 in total program spend — including Uptime Institute fees ($80,000–$200,000 depending on size), internal labor for documentation preparation, and consultant fees if engaged. The process covers Design Document review (3–6 months), Constructed Facility audit post-commissioning (2–4 months), and remediation cycles. Tier IV adds 30–50% to both cost and timeline. These are illustrative estimates; actual costs depend heavily on facility complexity and documentation quality.</div></div>
             </div>
         </div>
     </section>
+    <!-- ========== PST SECTION 1: Standards Comparison Table ========== -->
+    <section class="pst-standards-table" id="pst-standards-table" aria-labelledby="pst-std-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pst-std-hdr">Standards Compared Side-by-Side</h2>
+            <p>Five leading certification frameworks across nine dimensions. Use this to identify which standard best fits your market, facility type, and compliance goals.</p>
+        </div>
+        <div class="pst-table-wrap">
+            <table class="pst-table" role="table" aria-label="Data center standards comparison">
+                <thead>
+                    <tr>
+                        <th scope="col">Criterion</th>
+                        <th scope="col">ANSI/TIA-942-C</th>
+                        <th scope="col">ISO/IEC 22237</th>
+                        <th scope="col">Uptime Institute Tier</th>
+                        <th scope="col">EN 50600</th>
+                        <th scope="col">BICSI 002</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Scope</td>
+                        <td>Telecom &amp; data center infrastructure design — cabling, pathways, space, power, cooling</td>
+                        <td>Comprehensive DC facility — construction, power, cooling, cabling, security, management</td>
+                        <td>DC availability &amp; redundancy topology — rated from operational standpoint</td>
+                        <td>European DC design &amp; operations standard — multi-part, includes sustainability KPIs</td>
+                        <td>DC design, construction, installation best practices — cabling &amp; low-voltage systems emphasis</td>
+                    </tr>
+                    <tr>
+                        <td>Geographic primary</td>
+                        <td>North America; referenced in Middle East, Asia-Pacific</td>
+                        <td>International; strong adoption in EU, APAC hyperscale</td>
+                        <td>Global; originated in US; widely adopted in EMEA, APAC colocation</td>
+                        <td>European Union (CENELEC); increasingly adopted in MENA and SEA</td>
+                        <td>North America primary; BICSI international chapters worldwide</td>
+                    </tr>
+                    <tr>
+                        <td>Certification model</td>
+                        <td>Conformance self-declaration or third-party verified by TIA or accredited partners</td>
+                        <td>Third-party audit by ISO-accredited certification body; 3-yr recert cycle</td>
+                        <td>Exclusively by Uptime Institute; three stages: Design Docs, Constructed Facility, Operational Sustainability</td>
+                        <td>Third-party audit by CENELEC-accredited body; mandatory for EU public procurement compliance</td>
+                        <td>Conformance reviewed by BICSI-credentialed practitioners (DCDC, RCDD)</td>
+                    </tr>
+                    <tr>
+                        <td>Tier / Class structure</td>
+                        <td>Rated-1 (basic) through Rated-4 (fault-tolerant) — maps to Uptime Tier I–IV</td>
+                        <td>Availability Class 1–4 (power &amp; cooling); separate classification for physical security</td>
+                        <td>Tier I (basic) through Tier IV (fault-tolerant) — availability 99.671% to 99.995%</td>
+                        <td>Availability Class 1 (basic) through Class 4 (fault-tolerant) — plus separate energy efficiency class</td>
+                        <td>No explicit tier/class structure; references TIA-942 Rated Levels for topology requirements</td>
+                    </tr>
+                    <tr>
+                        <td>Key requirement focus</td>
+                        <td>Cabling topology, pathway design, telecommunications spaces, structured wiring redundancy</td>
+                        <td>Holistic facility lifecycle: site, structure, power, cooling, cabling, physical security, EnMS</td>
+                        <td>Redundancy topology, concurrent maintainability, fault tolerance, operational procedures</td>
+                        <td>KPI definitions (PUE, WUE, RER), energy efficiency, carbon reporting, sustainability governance</td>
+                        <td>Project delivery, site selection, grounding &amp; bonding, cable management, commissioning</td>
+                    </tr>
+                    <tr>
+                        <td>Audit process</td>
+                        <td>Design document review + site walk; no mandatory on-site audit for conformance declarations</td>
+                        <td>Full document review + mandatory on-site audit; annual surveillance; 3-yr recertification</td>
+                        <td>Three-phase: Design Documents review, Constructed Facility on-site audit, Operational Sustainability annual</td>
+                        <td>Document review + on-site assessment; annual surveillance; aligned with ISO audit protocols</td>
+                        <td>Peer review by BICSI-credentialed practitioners; no mandatory on-site audit by standards body</td>
+                    </tr>
+                    <tr>
+                        <td>Typical cost (illustrative)</td>
+                        <td>$20,000–$80,000 for verified conformance; self-declaration near zero</td>
+                        <td>$30,000–$120,000 depending on facility size and complexity</td>
+                        <td>$80,000–$300,000+ for Tier III/IV full certification program including all phases</td>
+                        <td>€25,000–€100,000 depending on scope and number of parts assessed</td>
+                        <td>$15,000–$50,000 for design review by credentialed practitioners</td>
+                    </tr>
+                    <tr>
+                        <td>Industry adoption</td>
+                        <td>Dominant in North American colocation and enterprise; widely referenced in procurement RFPs</td>
+                        <td>Growing APAC and EU adoption; preferred for multinational organizations with ISO systems</td>
+                        <td>Global industry gold standard for availability claims; highest brand recognition with enterprise buyers</td>
+                        <td>Mandatory in EU public sector procurement; required for EU green financing alignment</td>
+                        <td>Preferred in markets with strong BICSI membership (US, Canada, Australia); design-phase standard</td>
+                    </tr>
+                    <tr>
+                        <td>Critical sections to cite</td>
+                        <td>§6 (cabling), §7 (spaces), §8 (power), §9 (environmental), Annex H (redundancy topology)</td>
+                        <td>Part 1 (concepts), Part 2 (construction), Part 3 (power), Part 4 (cooling), Part 6 (security)</td>
+                        <td>Tier Standard (topology), Tier Certification Criteria, Operational Sustainability Standard</td>
+                        <td>Parts 2-1 (general concepts), 2-2 (construction), 2-3 (power), 2-4 (environmental), 2-6 (security)</td>
+                        <td>Chapter 2 (site selection), Chapter 4 (power), Chapter 5 (cooling), Chapter 6 (cabling), Chapter 9 (commissioning)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="pst-table-note">All information reflects publicly available editions as of 2024–2025. Always verify current edition with the respective standards body. Local AHJ requirements may impose additional obligations not captured here.</p>
+    </section>
+
+    <!-- ========== PST SECTION 2: Decision Matrix ========== -->
+    <section class="pst-decision" id="pst-decision" aria-labelledby="pst-dec-hdr">
+        <div class="pst-decision-inner">
+            <div class="pillar-section-header">
+                <h2 id="pst-dec-hdr">Certification Path Decision Matrix</h2>
+                <p>Answer 4 questions to receive a recommended certification path, rationale, cost estimate, and typical duration.</p>
+            </div>
+            <div class="pst-questions">
+                <div class="pst-q-card">
+                    <h4><span>Q1</span> Primary business goal for pursuing certification</h4>
+                    <div class="pst-options" role="group" aria-label="Business goal options">
+                        <div class="pst-opt" data-q="1" data-v="trust" tabindex="0" role="radio" aria-checked="false">Customer trust &amp; sales differentiation</div>
+                        <div class="pst-opt" data-q="1" data-v="insurance" tabindex="0" role="radio" aria-checked="false">Insurance premium discount</div>
+                        <div class="pst-opt" data-q="1" data-v="regulatory" tabindex="0" role="radio" aria-checked="false">Regulatory or procurement mandate</div>
+                        <div class="pst-opt" data-q="1" data-v="internal" tabindex="0" role="radio" aria-checked="false">Internal governance &amp; benchmark</div>
+                    </div>
+                </div>
+                <div class="pst-q-card">
+                    <h4><span>Q2</span> Primary geographic market served</h4>
+                    <div class="pst-options" role="group" aria-label="Geographic market options">
+                        <div class="pst-opt" data-q="2" data-v="us" tabindex="0" role="radio" aria-checked="false">US-primary</div>
+                        <div class="pst-opt" data-q="2" data-v="eu" tabindex="0" role="radio" aria-checked="false">Europe-primary</div>
+                        <div class="pst-opt" data-q="2" data-v="apac" tabindex="0" role="radio" aria-checked="false">Asia-Pacific</div>
+                        <div class="pst-opt" data-q="2" data-v="global" tabindex="0" role="radio" aria-checked="false">Global multi-region</div>
+                    </div>
+                </div>
+                <div class="pst-q-card">
+                    <h4><span>Q3</span> Facility IT load size</h4>
+                    <div class="pst-options" role="group" aria-label="Facility size options">
+                        <div class="pst-opt" data-q="3" data-v="small" tabindex="0" role="radio" aria-checked="false">&lt;500 kW</div>
+                        <div class="pst-opt" data-q="3" data-v="mid" tabindex="0" role="radio" aria-checked="false">500 kW – 5 MW</div>
+                        <div class="pst-opt" data-q="3" data-v="large" tabindex="0" role="radio" aria-checked="false">&gt;5 MW</div>
+                        <div class="pst-opt" data-q="3" data-v="hyper" tabindex="0" role="radio" aria-checked="false">Hyperscale (&gt;50 MW)</div>
+                    </div>
+                </div>
+                <div class="pst-q-card">
+                    <h4><span>Q4</span> Certification budget available</h4>
+                    <div class="pst-options" role="group" aria-label="Budget options">
+                        <div class="pst-opt" data-q="4" data-v="low" tabindex="0" role="radio" aria-checked="false">&lt;$50k</div>
+                        <div class="pst-opt" data-q="4" data-v="mid" tabindex="0" role="radio" aria-checked="false">$50k – $200k</div>
+                        <div class="pst-opt" data-q="4" data-v="high" tabindex="0" role="radio" aria-checked="false">&gt;$200k</div>
+                        <div class="pst-opt" data-q="4" data-v="open" tabindex="0" role="radio" aria-checked="false">Cost not a constraint</div>
+                    </div>
+                </div>
+            </div>
+            <button class="pst-calc-btn" id="pstDecisionBtn" aria-label="Get certification recommendation">Get Recommendation</button>
+            <div class="pst-result" id="pstResult" role="region" aria-live="polite">
+                <div class="pst-result-cert" id="pstResultCert">Uptime Tier III Certification</div>
+                <div class="pst-result-sub" id="pstResultSub">Primary recommendation with optional complementary standards</div>
+                <h5>Rationale</h5>
+                <ul id="pstResultRationale"></ul>
+                <h5>Estimated cost &amp; duration</h5>
+                <ul id="pstResultCost"></ul>
+                <h5>Recommended path</h5>
+                <ul id="pstResultPath"></ul>
+                <div class="pst-result-links" id="pstResultLinks"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PST SECTION 3: Compliance Checklist ========== -->
+    <section class="pst-checklist-section" id="pst-checklist" aria-labelledby="pst-cl-hdr">
+        <div class="pst-checklist-inner">
+            <div class="pillar-section-header">
+                <h2 id="pst-cl-hdr">Certification Readiness Checklist</h2>
+                <p>33 items across 5 categories. Track your readiness before engaging a certification auditor. Progress saves automatically.</p>
+            </div>
+            <div class="pst-score-bar" role="status" aria-live="polite" aria-label="Checklist score">
+                <div class="pst-score-num" id="pstClScore">0/33</div>
+                <div class="pst-score-label">items completed &mdash; <span id="pstClPct">0%</span> certification readiness</div>
+                <div class="pst-score-status red" id="pstClStatus">Not Ready</div>
+            </div>
+            <div class="pst-cl-group">
+                <div class="pst-cl-group-hdr">Documentation <span>(7 items)</span></div>
+                <div class="pst-cl-items">
+                    <div class="pst-cl-item"><input type="checkbox" id="c1" aria-label="As-built drawings current"><label for="c1">As-built drawings current and stamped by licensed PE <span class="cite">[TIA-942-C §4.1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c2" aria-label="Single-line diagrams"><label for="c2">Single-line electrical diagrams (SLDs) approved and version-controlled <span class="cite">[Uptime CTDD req]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c3" aria-label="P&amp;IDs for cooling"><label for="c3">Piping and instrumentation diagrams (P&amp;IDs) for all cooling systems current <span class="cite">[ISO 22237-4]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c4" aria-label="SOPs complete"><label for="c4">Standard Operating Procedures (SOPs) written for all critical systems <span class="cite">[Uptime TCOS req]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c5" aria-label="MOPs complete"><label for="c5">Method of Procedures (MOPs) written and reviewed for all maintenance activities <span class="cite">[Uptime TCOS req]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c6" aria-label="MOP review log"><label for="c6">MOP review log maintained with dated approval signatures <span class="cite">[ISO 22237-7 §8.2]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c7" aria-label="Certificate of occupancy"><label for="c7">Certificate of occupancy current and on file <span class="cite">[Local AHJ]</span></label></div>
+                </div>
+            </div>
+            <div class="pst-cl-group">
+                <div class="pst-cl-group-hdr">Infrastructure Topology <span>(7 items)</span></div>
+                <div class="pst-cl-items">
+                    <div class="pst-cl-item"><input type="checkbox" id="c8" aria-label="Power redundancy declared"><label for="c8">Power redundancy level formally declared (N+1, 2N, or 2N+1) with supporting analysis <span class="cite">[Uptime Tier Standard §2]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c9" aria-label="Cooling redundancy declared"><label for="c9">Cooling redundancy level declared with capacity margin documented at design temperature <span class="cite">[ASHRAE TC 9.9]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c10" aria-label="Distribution topology aligned"><label for="c10">Distribution topology (radial, ring, active-active) explicitly aligned to target tier/class <span class="cite">[TIA-942-C Annex H]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c11" aria-label="Fault tolerance demonstrated"><label for="c11">Single-point-of-failure analysis (SPFA) completed and no unmitigated SPOFs for target tier <span class="cite">[Uptime Tier Standard §4]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c12" aria-label="Compartmentation verified"><label for="c12">Compartmentation — fire-rated separation between IT rooms, UPS rooms, generator plant, and office areas <span class="cite">[EN 50600-2-2 §7]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c13" aria-label="Fire detection coverage"><label for="c13">Fire detection coverage: IT space, sub-floor, above-ceiling — VESDA or equivalent in high-airflow areas <span class="cite">[NFPA 75 §6]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c14" aria-label="Security zones documented"><label for="c14">Physical security zone classification documented (perimeter, reception, IT room, vault) <span class="cite">[ISO 22237-6]</span></label></div>
+                </div>
+            </div>
+            <div class="pst-cl-group">
+                <div class="pst-cl-group-hdr">Operations &amp; Maintenance <span>(7 items)</span></div>
+                <div class="pst-cl-items">
+                    <div class="pst-cl-item"><input type="checkbox" id="c15" aria-label="24x7 staffing"><label for="c15">Site staffing 24/7 with appropriately trained personnel (mandatory for Tier III/IV ops cert) <span class="cite">[Uptime TCOS §3.2]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c16" aria-label="Training program"><label for="c16">Formal training program with documented curricula, competency assessments, and completion records <span class="cite">[Uptime TCOS §5.1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c17" aria-label="Predictive maintenance"><label for="c17">Predictive maintenance program in place — thermography, vibration analysis, oil sampling on rotating equipment <span class="cite">[EN 50600-3 §8.3]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c18" aria-label="Change management process"><label for="c18">Change management process with approval workflow, risk assessment, and rollback plan for every change <span class="cite">[Uptime TCOS §4.1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c19" aria-label="Incident response plan tested"><label for="c19">Incident response plan written and tested at least annually with documented outcomes <span class="cite">[ISO 22237-7 §9]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c20" aria-label="BCDR tested annually"><label for="c20">Business continuity and disaster recovery (BCDR) plan tested annually with tabletop or live exercise <span class="cite">[Uptime TCOS §7.2]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c21" aria-label="Energy baseline established"><label for="c21">Energy baseline and PUE/WUE KPIs established per EN 50600-4-1 or ISO 50001 methodology <span class="cite">[EN 50600-4-1 §6]</span></label></div>
+                </div>
+            </div>
+            <div class="pst-cl-group">
+                <div class="pst-cl-group-hdr">Testing &amp; Commissioning <span>(6 items)</span></div>
+                <div class="pst-cl-items">
+                    <div class="pst-cl-item"><input type="checkbox" id="c22" aria-label="IST performed annually"><label for="c22">Integrated systems test (IST) performed annually — simulating utility failure and verifying full transfer to generator <span class="cite">[Uptime TCOS §6.1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c23" aria-label="Load bank tests complete"><label for="c23">Load bank tests at 25%, 50%, 75%, and 100% generator rated capacity completed and documented <span class="cite">[NFPA 110 §8.4]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c24" aria-label="Witnessed failover tests"><label for="c24">Witnessed failover tests for each UPS module, ATS, and cooling unit at least every 24 months <span class="cite">[Uptime TCOS §6.3]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c25" aria-label="Alarm validation"><label for="c25">BMS/DCIM alarm validation — all critical alarms point-to-point tested and documented in alarm management log <span class="cite">[EN 50600-3-1 §7.4]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c26" aria-label="Fault scenarios drilled"><label for="c26">Fault scenario drills for top-5 credible failure modes with MOPs validated against actual system response <span class="cite">[Uptime TCOS §6.4]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c27" aria-label="MOP execution logs"><label for="c27">MOP execution logs retained for minimum 2 years and available for auditor review <span class="cite">[ISO 22237-7 §8.5]</span></label></div>
+                </div>
+            </div>
+            <div class="pst-cl-group">
+                <div class="pst-cl-group-hdr">Continuous Improvement <span>(6 items)</span></div>
+                <div class="pst-cl-items">
+                    <div class="pst-cl-item"><input type="checkbox" id="c28" aria-label="Post-incident review process"><label for="c28">Post-incident review (PIR) process with root-cause analysis and corrective-action tracking for all events &gt;15 min <span class="cite">[Uptime TCOS §8.1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c29" aria-label="KPI dashboard"><label for="c29">KPI dashboard in production — PUE, DCIE, availability, MTTR, work-order backlog age — updated at least monthly <span class="cite">[EN 50600-4-1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c30" aria-label="Energy tracking"><label for="c30">Energy management tracking — monthly sub-metering data retained and trended against baseline <span class="cite">[ISO 50001 §9.1]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c31" aria-label="Security audit annual"><label for="c31">Physical and cyber security audit conducted annually by internal audit or third party <span class="cite">[ISO 22237-6 §10]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c32" aria-label="Customer feedback loop"><label for="c32">Formal customer feedback mechanism in place and feedback reviewed quarterly by management <span class="cite">[ISO 22237-7 §11]</span></label></div>
+                    <div class="pst-cl-item"><input type="checkbox" id="c33" aria-label="Governance review committee"><label for="c33">Governance review committee meets at least quarterly to review KPIs, incidents, and continuous improvement plans <span class="cite">[Uptime TCOS §9.2]</span></label></div>
+                </div>
+            </div>
+            <div class="pst-cl-btn-row">
+                <button class="pst-cl-btn pst-cl-btn-reset" id="pstClReset" aria-label="Reset checklist">Reset</button>
+                <button class="pst-cl-btn pst-cl-btn-export" id="pstClExport" aria-label="Export checklist as text">Export</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PST SECTION 4: Cost Calculator ========== -->
+    <section class="pst-cost" id="pst-cost-calc" aria-labelledby="pst-cost-hdr">
+        <div class="pst-cost-inner">
+            <div class="pillar-section-header">
+                <h2 id="pst-cost-hdr">Certification Cost Calculator</h2>
+                <p>Estimate total program cost, timeline, and 5-year TCO for your target certification. All figures are illustrative estimates — actual costs vary by facility and auditor.</p>
+            </div>
+            <div class="pst-cost-grid">
+                <div class="pst-cost-inputs">
+                    <h3>Inputs</h3>
+                    <div class="pst-field">
+                        <label for="pstCostMW">Facility IT load (kW)</label>
+                        <input type="number" id="pstCostMW" value="2000" min="100" max="200000" step="100" aria-label="Facility IT load in kilowatts">
+                    </div>
+                    <div class="pst-field">
+                        <label for="pstCostCert">Target certification</label>
+                        <select id="pstCostCert" aria-label="Target certification">
+                            <option value="uptime">Uptime Tier Certification</option>
+                            <option value="tia942">ANSI/TIA-942 (verified)</option>
+                            <option value="iso22237">ISO/IEC 22237</option>
+                            <option value="en50600">EN 50600</option>
+                            <option value="bicsi">BICSI 002 Review</option>
+                        </select>
+                    </div>
+                    <div class="pst-field">
+                        <label for="pstCostTier">Tier / Class level</label>
+                        <select id="pstCostTier" aria-label="Tier or class level">
+                            <option value="2">Tier II / Class 2</option>
+                            <option value="3" selected>Tier III / Class 3</option>
+                            <option value="4">Tier IV / Class 4</option>
+                        </select>
+                    </div>
+                    <div class="pst-field">
+                        <label for="pstCostReadiness">Internal readiness (0% = start from scratch, 100% = fully prepared)</label>
+                        <div class="pst-field-range">
+                            <input type="range" id="pstCostReadiness" min="0" max="100" value="50" step="5" aria-label="Internal readiness percentage">
+                            <span class="range-val" id="pstReadinessVal">50%</span>
+                        </div>
+                    </div>
+                    <div class="pst-field">
+                        <label for="pstCostConsultant">Consultant engagement</label>
+                        <select id="pstCostConsultant" aria-label="Consultant engagement level">
+                            <option value="none">None (internal only)</option>
+                            <option value="partial" selected>Partial (gap analysis + prep)</option>
+                            <option value="full">Full (end-to-end program management)</option>
+                        </select>
+                    </div>
+                    <button class="pst-calc-btn" id="pstCostCalcBtn" style="margin-top:0.5rem;" aria-label="Calculate certification costs">Calculate</button>
+                </div>
+                <div class="pst-cost-outputs" id="pstCostOutputs">
+                    <div class="pst-out-card"><div class="pst-out-label">Audit &amp; certification fees</div><div class="pst-out-val" id="pstOutFees">—</div></div>
+                    <div class="pst-out-card"><div class="pst-out-label">Internal labor cost estimate</div><div class="pst-out-val" id="pstOutLabor">—</div></div>
+                    <div class="pst-out-card"><div class="pst-out-label">Consultant cost estimate</div><div class="pst-out-val" id="pstOutConsultant">—</div></div>
+                    <div class="pst-out-card"><div class="pst-out-label">Total certification cost</div><div class="pst-out-val" id="pstOutTotal">—</div></div>
+                    <div class="pst-out-card"><div class="pst-out-label">Estimated timeline</div><div class="pst-out-val" id="pstOutTimeline">—</div></div>
+                    <div class="pst-out-card"><div class="pst-out-label">Annual recertification cost</div><div class="pst-out-val accent-green" id="pstOutRecert">—</div></div>
+                    <div class="pst-out-card"><div class="pst-out-label">5-year program TCO</div><div class="pst-out-val" id="pstOutTCO">—</div></div>
+                </div>
+            </div>
+            <p class="pst-cost-disclaimer">All figures are illustrative estimates only. Actual certification costs depend on facility complexity, documentation quality, number of audit findings, and selected auditing body. Figures do not include infrastructure remediation costs required to achieve compliance. Consult your target certification body for official fee schedules.</p>
+        </div>
+    </section>
+
+    <!-- ========== PST SECTION 5: Scope Diagram (Accordion) ========== -->
+    <section class="pst-scope-diagram" id="pst-scope-diagram" aria-labelledby="pst-scope-hdr">
+        <div class="pst-scope-inner">
+            <div class="pillar-section-header">
+                <h2 id="pst-scope-hdr">Standard Scope by Infrastructure Layer</h2>
+                <p>Which standards govern which part of your facility. Click a layer to expand the overlap matrix.</p>
+            </div>
+            <div class="pst-scope-tiers" role="list">
+                <div class="pst-scope-tier pst-scope-t1" role="listitem">
+                    <div class="pst-scope-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pst-scope-d1" aria-label="Tier 1: Site and shell — click to expand">
+                        <span class="pst-scope-num">Layer 1</span>
+                        <span class="pst-scope-label">Site &amp; Shell</span>
+                        <span class="pst-scope-subs">Location, building structure, security perimeter, access control</span>
+                        <span class="pst-scope-arrow" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="pst-scope-detail" id="pst-scope-d1">
+                        <div class="pst-scope-detail-inner">
+                            <p>Site selection, geohazard analysis, building structure, fire-rated construction, perimeter security, and access control systems.</p>
+                            <ul>
+                                <li><strong>TIA-942-C:</strong> §7 (space planning), Annex G (site selection criteria), fire-rated separation between spaces</li>
+                                <li><strong>ISO 22237:</strong> Part 2 (building construction — structural, fire rating, seismic, HVAC envelope), Part 6 (physical security zones)</li>
+                                <li><strong>BICSI 002:</strong> Chapter 2 (site selection), Chapter 3 (building space), grounding &amp; bonding for the structure</li>
+                            </ul>
+                            <div class="pst-overlap-pills">
+                                <span class="pst-overlap-pill pst-pill-tia">TIA-942-C</span>
+                                <span class="pst-overlap-pill pst-pill-iso">ISO 22237 Pt.2</span>
+                                <span class="pst-overlap-pill pst-pill-bicsi">BICSI 002</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pst-scope-tier pst-scope-t2" role="listitem">
+                    <div class="pst-scope-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pst-scope-d2" aria-label="Layer 2: Power infrastructure — click to expand">
+                        <span class="pst-scope-num">Layer 2</span>
+                        <span class="pst-scope-label">Power Infrastructure</span>
+                        <span class="pst-scope-subs">Utility feeds, generators, UPS, switchgear, distribution paths</span>
+                        <span class="pst-scope-arrow" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="pst-scope-detail" id="pst-scope-d2">
+                        <div class="pst-scope-detail-inner">
+                            <p>Utility entrance, standby generators, UPS systems, automatic transfer switches, switchgear, PDUs, and power distribution path redundancy.</p>
+                            <ul>
+                                <li><strong>TIA-942-C:</strong> §8 (electrical systems), redundancy topology Annex H — maps directly to Rated Levels 1–4</li>
+                                <li><strong>ISO 22237:</strong> Part 3 (power distribution) — availability classes, redundancy, metering, earthing</li>
+                                <li><strong>Uptime Tier:</strong> Core topology definitions — Tier I through IV redundancy and path independence requirements</li>
+                                <li><strong>EN 50600:</strong> Parts 2-3 (power supply), 2-6 (security) — KPIs for power usage effectiveness</li>
+                            </ul>
+                            <div class="pst-overlap-pills">
+                                <span class="pst-overlap-pill pst-pill-tia">TIA-942-C</span>
+                                <span class="pst-overlap-pill pst-pill-iso">ISO 22237 Pt.3</span>
+                                <span class="pst-overlap-pill pst-pill-uptime">Uptime Tier</span>
+                                <span class="pst-overlap-pill pst-pill-en">EN 50600-2-3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pst-scope-tier pst-scope-t3" role="listitem">
+                    <div class="pst-scope-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pst-scope-d3" aria-label="Layer 3: Cooling and airflow — click to expand">
+                        <span class="pst-scope-num">Layer 3</span>
+                        <span class="pst-scope-label">Cooling &amp; Airflow</span>
+                        <span class="pst-scope-subs">Chillers, CRAC/CRAH, containment, airflow management, thermal envelopes</span>
+                        <span class="pst-scope-arrow" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="pst-scope-detail" id="pst-scope-d3">
+                        <div class="pst-scope-detail-inner">
+                            <p>Chiller plant, CRAC/CRAH units, economizers, cold-aisle/hot-aisle containment, raised-floor plenum, airflow management, and thermal envelope requirements.</p>
+                            <ul>
+                                <li><strong>ASHRAE TC 9.9:</strong> A1–A4 temperature classes, recommended vs allowable envelopes (mandatory reference for all standards)</li>
+                                <li><strong>TIA-942-C:</strong> §9 (environmental) — temperature/humidity requirements aligned with ASHRAE; redundancy by Rated Level</li>
+                                <li><strong>EN 50600:</strong> Parts 2-4 (environmental control) — includes WUE, cooling redundancy classes, free cooling guidance</li>
+                                <li><strong>ISO 22237:</strong> Part 4 (environmental control) — cooling systems, air quality, temperature/humidity classes</li>
+                            </ul>
+                            <div class="pst-overlap-pills">
+                                <span class="pst-overlap-pill pst-pill-ashrae">ASHRAE TC 9.9</span>
+                                <span class="pst-overlap-pill pst-pill-tia">TIA-942-C</span>
+                                <span class="pst-overlap-pill pst-pill-en">EN 50600-2-4</span>
+                                <span class="pst-overlap-pill pst-pill-iso">ISO 22237 Pt.4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pst-scope-tier pst-scope-t4" role="listitem">
+                    <div class="pst-scope-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pst-scope-d4" aria-label="Layer 4: IT room and racks — click to expand">
+                        <span class="pst-scope-num">Layer 4</span>
+                        <span class="pst-scope-label">IT Room &amp; Racks</span>
+                        <span class="pst-scope-subs">Cabling infrastructure, rack layout, floor loading, DCIM integration</span>
+                        <span class="pst-scope-arrow" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="pst-scope-detail" id="pst-scope-d4">
+                        <div class="pst-scope-detail-inner">
+                            <p>Structured cabling, cable trays and pathways, rack layout, floor loading, raised floor design, DCIM integration, and equipment grounding within the IT room.</p>
+                            <ul>
+                                <li><strong>TIA-942-C:</strong> §6 (cabling) and §7 (spaces) — primary standard for structured cabling within data halls; pathway redundancy requirements</li>
+                                <li><strong>BICSI 002:</strong> Chapters 5–8 (cabling, grounding, pathways, spaces) — most detailed cabling design guidance of any standard</li>
+                                <li><strong>ASHRAE TC 9.9:</strong> Rack inlet temperature requirements inform containment and CRAC placement in the IT room</li>
+                            </ul>
+                            <div class="pst-overlap-pills">
+                                <span class="pst-overlap-pill pst-pill-tia">TIA-942-C</span>
+                                <span class="pst-overlap-pill pst-pill-bicsi">BICSI 002</span>
+                                <span class="pst-overlap-pill pst-pill-ashrae">ASHRAE TC 9.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pst-scope-tier pst-scope-t5" role="listitem">
+                    <div class="pst-scope-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pst-scope-d5" aria-label="Layer 5: Operations and governance — click to expand">
+                        <span class="pst-scope-num">Layer 5</span>
+                        <span class="pst-scope-label">Operations &amp; Governance</span>
+                        <span class="pst-scope-subs">SOPs, change management, energy management, training, continuous improvement</span>
+                        <span class="pst-scope-arrow" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="pst-scope-detail" id="pst-scope-d5">
+                        <div class="pst-scope-detail-inner">
+                            <p>Operational procedures, change management, incident response, training programs, energy management systems, continuous improvement, and governance review processes.</p>
+                            <ul>
+                                <li><strong>Uptime TCOS:</strong> Most rigorous operational certification — 24/7 staffing, MOPs, post-incident reviews, annual IST, KPI governance</li>
+                                <li><strong>ISO 50001:</strong> Energy management system — Plan-Do-Check-Act cycle, energy baselines, performance indicators, continual improvement</li>
+                                <li><strong>ISO 22237:</strong> Part 7 (management &amp; operations) — governance, service management, change control, capacity planning</li>
+                                <li><strong>EN 50600:</strong> Parts 2-7 (management &amp; operations) and 4-x (KPIs) — energy reporting aligned with EU taxonomy requirements</li>
+                            </ul>
+                            <div class="pst-overlap-pills">
+                                <span class="pst-overlap-pill pst-pill-uptime">Uptime TCOS</span>
+                                <span class="pst-overlap-pill pst-pill-iso">ISO 50001</span>
+                                <span class="pst-overlap-pill pst-pill-iso">ISO 22237 Pt.7</span>
+                                <span class="pst-overlap-pill pst-pill-en">EN 50600-2-7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PST SECTION 6: Case Studies ========== -->
+    <section class="pst-cases" id="pst-cases" aria-labelledby="pst-cases-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pst-cases-hdr">Certification in Practice</h2>
+            <p>Three real-world examples illustrating how operators approach — and occasionally bypass — formal certification programs.</p>
+        </div>
+        <div class="pst-cases-grid">
+            <div class="pst-case-card">
+                <span class="pst-case-date">Equinix LA1 &mdash; Los Angeles, CA</span>
+                <h3>First Major Colo Tier IV Certification in the Western US</h3>
+                <p>Equinix's LA1 facility became one of the first large-scale colocation data centers to achieve Uptime Institute Tier IV Certified Constructed Facility status on the West Coast. The 18-month certification program required PE-stamped concurrent maintainability and fault-tolerance proofs covering 20+ critical systems. The Design Documents phase alone involved resolving 34 audit findings before proceeding to the construction audit.</p>
+                <div class="pst-case-meta">
+                    <strong>Standard: </strong><span>Uptime Institute Tier IV CTCF</span><br>
+                    <strong>Duration: </strong><span>18 months from engagement to certificate</span><br>
+                    <strong>Facility: </strong><span>~12 MW IT load, multiple power distributions</span>
+                </div>
+                <div class="pst-case-takeaways">
+                    <h4>Key takeaways</h4>
+                    <ul>
+                        <li>Audit findings must be resolved before advancing phases — budget extra time for remediation cycles</li>
+                        <li>PE-stamped concurrent maintainability proofs require licensed structural and electrical engineers, not just O&amp;M staff</li>
+                        <li>Tier IV certification justified a measurable premium pricing tier over Tier III colo inventory</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pst-case-card">
+                <span class="pst-case-date">Google Hamina &mdash; Finland</span>
+                <h3>Hyperscale Without Third-Party Tier Certification</h3>
+                <p>Google's Hamina data center — built in a former paper mill with seawater cooling from the Gulf of Finland — demonstrates how hyperscale operators replace formal tier certification with engineering transparency. Google publishes detailed infrastructure design papers, internal SLA models, and annual sustainability reports that serve the same customer-assurance function as tier certification. Independent analysts have estimated the Hamina design exceeds Tier IV availability in practice, while Google has never sought Uptime Institute certification for the site.</p>
+                <div class="pst-case-meta">
+                    <strong>Standard: </strong><span>Proprietary Google SLA framework (no Uptime cert)</span><br>
+                    <strong>IT load: </strong><span>Confidential; estimated multi-hundred MW</span><br>
+                    <strong>Cooling: </strong><span>Seawater free-cooling — landmark sustainability model</span>
+                </div>
+                <div class="pst-case-takeaways">
+                    <h4>Key takeaways</h4>
+                    <ul>
+                        <li>Certification is a proxy for reliability — operators with sufficient engineering credibility can substitute transparency for a certificate</li>
+                        <li>Hyperscale distributed architecture makes single-site tier classification less meaningful than for colocation</li>
+                        <li>Customer SLA commitments backed by contractual remedies can replace certification as a procurement requirement in enterprise deals</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pst-case-card">
+                <span class="pst-case-date">EU Colocation Composite Case</span>
+                <h3>Stacking EN 50600 + ISO 22237 for EU Market Access</h3>
+                <p>A mid-size European colocation operator serving financial services and public sector clients pursued a stacked certification of EN 50600 (all applicable parts) combined with ISO 22237 for a 15 MW facility in Frankfurt. The two standards have substantial overlap in scope, which the operator leveraged by commissioning a single gap assessment covering both simultaneously and scheduling unified audit visits. The stacked certification satisfied both German public procurement frameworks and EU green financing criteria under the EU taxonomy, unlocking access to sustainable finance instruments at a 40-basis-point rate reduction.</p>
+                <div class="pst-case-meta">
+                    <strong>Standards: </strong><span>EN 50600 + ISO 22237 (stacked)</span><br>
+                    <strong>Duration: </strong><span>14 months combined; single gap assessment</span><br>
+                    <strong>Benefit: </strong><span>EU taxonomy compliance + public sector procurement access</span>
+                </div>
+                <div class="pst-case-takeaways">
+                    <h4>Key takeaways</h4>
+                    <ul>
+                        <li>EN 50600 and ISO 22237 overlap substantially — a unified audit program reduces cost versus two separate engagements by ~35%</li>
+                        <li>EU taxonomy alignment unlocks sustainable finance instruments that offset a meaningful portion of certification program cost</li>
+                        <li>Stacking certifications is viable but requires a single program manager tracking requirements across all standards simultaneously to avoid contradictions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PST SECTION 7: Inline Glossary ========== -->
+    <section class="pst-glossary" id="pst-glossary" aria-labelledby="pst-gloss-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pst-gloss-hdr">Standards Glossary</h2>
+            <p>14 essential terms for navigating data center certification and compliance conversations.</p>
+        </div>
+        <div class="pst-glossary-grid">
+            <div class="pst-term-card"><div class="pst-term-name">Tier (Uptime Institute)</div><div class="pst-term-def">Uptime's four-level classification (I–IV) of data center availability and redundancy topology. Tier IV = fault-tolerant (99.995% uptime). Each tier adds physical redundancy requirements to the previous level.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">Rated Class (TIA-942)</div><div class="pst-term-def">TIA-942's four-level classification (1–4) mapping to Uptime tiers for infrastructure design. A Rated-3 facility is designed to concurrent-maintainability topology but is NOT necessarily Uptime-certified.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">KPI (EN 50600)</div><div class="pst-term-def">Key Performance Indicator as defined in EN 50600-4-x. Includes PUE, WUE, RER (Renewable Energy Ratio), CUE, and Carbon Usage Effectiveness — standardized metrics for EU sustainability reporting and taxonomy alignment.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">Concurrent Maintainability</div><div class="pst-term-def">The ability to service, repair, or replace any single component in the power or cooling path while the IT load continues without interruption. Required for Tier III. Demonstrated by single-point-of-failure analysis (SPFA).</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">Fault Tolerance</div><div class="pst-term-def">The ability to sustain any single unplanned component failure without loss of IT load. Required for Tier IV. Demands 2N redundancy in all critical systems and physically independent distribution paths.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">Compartmentation</div><div class="pst-term-def">Fire-rated physical separation between data hall, UPS room, generator plant, battery room, and office areas. Prevents fire or flood in one zone from propagating to adjacent critical infrastructure. Required by EN 50600-2-2 and ISO 22237-2.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">IST (Integrated Systems Test)</div><div class="pst-term-def">A coordinated test simulating a real utility failure event to verify that all systems (generator, ATS, UPS, cooling, BMS) transfer correctly and maintain IT load through the sequence. Required annually for Uptime Operational Sustainability certification.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">MOP (Method of Procedure)</div><div class="pst-term-def">A step-by-step written procedure for a specific maintenance activity in a live data center environment. Includes pre-conditions, tools, step sequence, safety checks, and rollback steps. Required for every planned maintenance activity per Uptime TCOS.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">SOP (Standard Operating Procedure)</div><div class="pst-term-def">Written instructions for routine operational tasks — shift handover, alarm response, UPS battery check — that must be followed consistently by all staff. Distinguishable from MOPs in that SOPs cover recurring routine tasks; MOPs cover discrete maintenance events.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">BCDR</div><div class="pst-term-def">Business Continuity and Disaster Recovery. A combined plan covering how the organization maintains critical business functions (BC) and recovers IT systems (DR) after a major failure. Uptime TCOS requires annual BCDR testing with documented outcomes.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">PE Stamp</div><div class="pst-term-def">Licensed Professional Engineer (PE) certification on design drawings, indicating a state-licensed engineer has reviewed and accepted responsibility for the design. Uptime Institute requires PE-stamped design documents for Tier IV CTDD certification.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">IST Witnessed</div><div class="pst-term-def">An Integrated Systems Test conducted with Uptime Institute auditors physically present to observe and verify results. Required for Constructed Facility certification and for Operational Sustainability renewal — the witnessing requirement prevents falsified test documentation.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">As-Built</div><div class="pst-term-def">Engineering drawings reflecting actual installed conditions rather than original design intent. Required to be current and PE-stamped for Uptime certification. A common audit finding is as-built drawings that do not reflect post-construction modifications.</div></div>
+            <div class="pst-term-card"><div class="pst-term-name">Conformance vs Certification</div><div class="pst-term-def">Conformance = facility meets a standard's requirements per self-assessment or unaccredited review. Certification = formal third-party verified certificate from an accredited body. The two carry very different evidentiary weight in procurement and insurance contexts.</div></div>
+        </div>
+    </section>
+
+    <!-- ========== PST SECTION 8: Cross-Links ========== -->
+    <section class="pst-related" id="pst-related" aria-labelledby="pst-related-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pst-related-hdr">Related Tools &amp; Resources</h2>
+            <p>Deep-dive tools, comparisons, and interactive labs that complement this standards cluster.</p>
+        </div>
+        <div class="pst-related-grid">
+            <a href="tier-advisor.html" class="pst-related-card" aria-label="Tier Advisor interactive tool">
+                <div class="pst-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+                <div class="pst-related-text"><strong>Tier Advisor</strong><span>Interactive tier selection tool</span></div>
+            </a>
+            <a href="tia-942-checklist.html" class="pst-related-card" aria-label="TIA-942 Compliance Checklist">
+                <div class="pst-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+                <div class="pst-related-text"><strong>TIA-942 Checklist</strong><span>Interactive compliance tracker</span></div>
+            </a>
+            <a href="standards-ltc-lab.html" class="pst-related-card" aria-label="Standards LTC Lab">
+                <div class="pst-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg></div>
+                <div class="pst-related-text"><strong>Standards LTC Lab</strong><span>Interactive standards explorer</span></div>
+            </a>
+            <a href="ltc-iso-energy-governance.html" class="pst-related-card" aria-label="ISO Energy Governance LTC">
+                <div class="pst-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                <div class="pst-related-text"><strong>ISO Energy Governance</strong><span>ISO 50001 deep-dive</span></div>
+            </a>
+            <a href="compare-tier-3-vs-tier-4.html" class="pst-related-card" aria-label="Tier III vs Tier IV comparison">
+                <div class="pst-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <div class="pst-related-text"><strong>Tier III vs Tier IV</strong><span>Detailed availability comparison</span></div>
+            </a>
+            <a href="tools.html" class="pst-related-card" aria-label="All Tools hub">
+                <div class="pst-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                <div class="pst-related-text"><strong>All Tools</strong><span>Full calculator &amp; tool directory</span></div>
+            </a>
+        </div>
+    </section>
+
+    <script>
+    (function(){
+        /* ---- Decision Matrix ---- */
+        var pstAnswers = {};
+        document.querySelectorAll('.pst-opt').forEach(function(opt){
+            opt.addEventListener('click', function(){
+                var q = this.dataset.q;
+                document.querySelectorAll('.pst-opt[data-q="'+q+'"]').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-checked','false'); });
+                this.classList.add('selected');
+                this.setAttribute('aria-checked','true');
+                pstAnswers[q] = this.dataset.v;
+            });
+            opt.addEventListener('keydown', function(e){
+                if(e.key==='Enter'||e.key===' '){ e.preventDefault(); this.click(); }
+            });
+        });
+        document.getElementById('pstDecisionBtn').addEventListener('click', function(){
+            var g=pstAnswers['1'], geo=pstAnswers['2'], sz=pstAnswers['3'], bgt=pstAnswers['4'];
+            var cert='', sub='', rationale=[], cost=[], path=[], links='';
+            if(!g||!geo||!sz||!bgt){ alert('Please answer all 4 questions first.'); return; }
+            /* Logic matrix */
+            if(sz==='hyper'){
+                cert='Multiple Stacked Certifications'; sub='Uptime + ISO 22237 + EN 50600 (for EU) recommended at hyperscale';
+                rationale=['Hyperscale facilities benefit from stacked certifications to satisfy diverse customer bases','Uptime CTDD + ISO 22237 Part-by-part satisfies enterprise and EU public sector simultaneously','Internal standards exceeding Tier IV are common — certifications provide external validation'];
+                cost=['Total program: $400,000–$1,200,000+ depending on scope and stacking','Timeline: 18–30 months for full Uptime + ISO 22237 combined program','Annual recertification: $50,000–$150,000 for Uptime TCOS + ISO surveillance'];
+                path=['1. Complete Uptime Tier IV Design Documents certification','2. Proceed to Constructed Facility audit after commissioning','3. Simultaneously pursue ISO 22237 (all 7 parts) with unified audit program','4. Add EN 50600 if EU market or green financing is a priority'];
+                links='<a href="compare-tier-3-vs-tier-4.html">Tier III vs IV</a><a href="tier-advisor.html">Tier Advisor</a>';
+            } else if(geo==='eu'||g==='regulatory'){
+                cert='EN 50600 + ISO 22237 Stack'; sub='EU market, sustainability compliance, and public procurement alignment';
+                rationale=['EN 50600 is required for EU public procurement frameworks and aligns with EU taxonomy green finance criteria','ISO 22237 provides the broadest international recognition and aligns with existing ISO management systems','Stacking both maximizes market access with only ~35% cost overhead vs separate programs'];
+                cost=['EN 50600 alone: €30,000–€100,000 depending on parts assessed','ISO 22237: $35,000–$120,000','Combined stacked program with unified audits: $80,000–$180,000','Annual surveillance: ~$20,000–$40,000 combined'];
+                path=['1. Conduct unified gap assessment against both EN 50600 and ISO 22237','2. Schedule a single audit firm accredited for both standards','3. Add Uptime Tier certification if North American customers are also targeted'];
+                links='<a href="standards-ltc-lab.html">Standards Lab</a><a href="ltc-iso-energy-governance.html">ISO Energy</a>';
+            } else if(sz==='small'||bgt==='low'){
+                cert='TIA-942 Conformance + BICSI 002'; sub='Cost-effective baseline for smaller facilities or budget-constrained programs';
+                rationale=['TIA-942 conformance self-declaration or third-party verified is the lowest-cost route to demonstrable standards compliance','BICSI 002 design review adds credibility for telecom and enterprise customers without full third-party audit cost','Both can be completed for under $50,000 combined'];
+                cost=['TIA-942 verified conformance: $20,000–$50,000','BICSI 002 design review: $10,000–$30,000','Total: $30,000–$80,000 depending on facility complexity','Timeline: 4–6 months'];
+                path=['1. Complete as-built documentation update and SPFA','2. Engage TIA-accredited reviewer for conformance verification','3. Have BICSI DCDC review cabling and pathways design','4. Plan roadmap toward Uptime Tier III when revenue justifies it'];
+                links='<a href="tia-942-checklist.html">TIA-942 Checklist</a><a href="tier-advisor.html">Tier Advisor</a>';
+            } else if(g==='trust'||(geo==='us'&&bgt==='high')){
+                cert='Uptime Tier III Certification'; sub='Gold standard for customer trust and colocation sales differentiation in North America';
+                rationale=['Uptime Tier III CTCF is the most recognized availability credential for colocation customers','Customers interpret Tier III certification as validated concurrent maintainability — a meaningful reliability signal','Return on investment through premium pricing and reduced sales cycle length typically justifies program cost within 18–24 months'];
+                cost=['Total Tier III program: $150,000–$350,000','Uptime fees: $80,000–$180,000 (facility-size dependent)','Consultant + internal labor: $70,000–$170,000','Timeline: 8–12 months · Annual TCOS renewal: ~$40,000–$80,000'];
+                path=['1. Complete internal gap assessment against Uptime Tier Standard','2. Remediate any SPFA findings before engaging Uptime','3. Submit Design Documents for CTDD phase','4. After construction completion, schedule CTCF on-site audit','5. 12 months post-open, pursue Operational Sustainability certification'];
+                links='<a href="tier-advisor.html">Tier Advisor</a><a href="compare-tier-3-vs-tier-4.html">Tier III vs IV</a><a href="tia-942-checklist.html">TIA-942 Checklist</a>';
+            } else {
+                cert='Uptime Tier III + TIA-942-C Conformance'; sub='Comprehensive baseline combining highest-recognition cert with infrastructure design validation';
+                rationale=['Uptime Tier III provides availability credential; TIA-942-C conformance adds infrastructure design validation','Combined approach satisfies both customer trust and technical due-diligence audiences','TIA-942 conformance documentation produced during Uptime prep with minimal additional effort'];
+                cost=['Combined total: $180,000–$400,000','Timeline: 9–14 months for both programs in parallel','Annual recertification: $40,000–$80,000 for Uptime TCOS'];
+                path=['1. Begin TIA-942-C gap assessment and conformance documentation','2. Engage Uptime Institute for Design Documents phase simultaneously','3. Converge documentation into a unified evidence package','4. Complete Uptime CTCF audit post-commissioning'];
+                links='<a href="tier-advisor.html">Tier Advisor</a><a href="tia-942-checklist.html">TIA-942 Checklist</a><a href="standards-ltc-lab.html">Standards Lab</a>';
+            }
+            document.getElementById('pstResultCert').textContent = cert;
+            document.getElementById('pstResultSub').textContent = sub;
+            var ul1=document.getElementById('pstResultRationale'); ul1.innerHTML=''; rationale.forEach(function(r){ var li=document.createElement('li'); li.textContent=r; ul1.appendChild(li); });
+            var ul2=document.getElementById('pstResultCost'); ul2.innerHTML=''; cost.forEach(function(c){ var li=document.createElement('li'); li.textContent=c; ul2.appendChild(li); });
+            var ul3=document.getElementById('pstResultPath'); ul3.innerHTML=''; path.forEach(function(p){ var li=document.createElement('li'); li.textContent=p; ul3.appendChild(li); });
+            document.getElementById('pstResultLinks').innerHTML = links;
+            var res=document.getElementById('pstResult'); res.classList.add('visible'); res.scrollIntoView({behavior:'smooth',block:'nearest'});
+        });
+
+        /* ---- Compliance Checklist ---- */
+        var PST_KEY = 'pst_checklist';
+        function pstLoadChecklist(){
+            try{ var saved=JSON.parse(localStorage.getItem(PST_KEY)||'{}');
+                document.querySelectorAll('.pst-cl-item input[type="checkbox"]').forEach(function(cb){ if(saved[cb.id]) cb.checked=true; }); } catch(e){}
+        }
+        function pstSaveChecklist(){
+            var data={};
+            document.querySelectorAll('.pst-cl-item input[type="checkbox"]').forEach(function(cb){ data[cb.id]=cb.checked; });
+            try{ localStorage.setItem(PST_KEY, JSON.stringify(data)); } catch(e){}
+        }
+        function pstUpdateScore(){
+            var total=document.querySelectorAll('.pst-cl-item input[type="checkbox"]').length;
+            var checked=document.querySelectorAll('.pst-cl-item input[type="checkbox"]:checked').length;
+            var pct=Math.round(checked/total*100);
+            document.getElementById('pstClScore').textContent=checked+'/'+total;
+            document.getElementById('pstClPct').textContent=pct+'%';
+            var s=document.getElementById('pstClStatus');
+            if(pct>=90){ s.textContent='Audit Ready'; s.className='pst-score-status green'; }
+            else if(pct>=70){ s.textContent='Nearly Ready'; s.className='pst-score-status cyan'; }
+            else if(pct>=40){ s.textContent='In Progress'; s.className='pst-score-status amber'; }
+            else{ s.textContent='Not Ready'; s.className='pst-score-status red'; }
+        }
+        pstLoadChecklist(); pstUpdateScore();
+        document.querySelectorAll('.pst-cl-item input[type="checkbox"]').forEach(function(cb){
+            cb.addEventListener('change', function(){ pstSaveChecklist(); pstUpdateScore(); });
+        });
+        document.getElementById('pstClReset').addEventListener('click', function(){
+            if(!confirm('Reset all checklist items?')) return;
+            document.querySelectorAll('.pst-cl-item input[type="checkbox"]').forEach(function(cb){ cb.checked=false; });
+            try{ localStorage.removeItem(PST_KEY); } catch(e){}
+            pstUpdateScore();
+        });
+        document.getElementById('pstClExport').addEventListener('click', function(){
+            var lines=['Certification Readiness Checklist Export — '+new Date().toLocaleDateString(),''];
+            document.querySelectorAll('.pst-cl-group').forEach(function(g){
+                lines.push('## '+g.querySelector('.pst-cl-group-hdr').textContent.trim());
+                g.querySelectorAll('.pst-cl-item').forEach(function(item){
+                    var cb=item.querySelector('input'); var lbl=item.querySelector('label').textContent.trim();
+                    lines.push((cb.checked?'[x] ':'[ ] ')+lbl);
+                });
+                lines.push('');
+            });
+            var blob=new Blob([lines.join('\n')],{type:'text/plain'});
+            var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pst-checklist.txt'; a.click();
+        });
+
+        /* ---- Cost Calculator ---- */
+        var PST_CERTS = {
+            uptime:   { audit_base:80000, audit_per_kW:5, duration_months:9, recert_base:40000 },
+            tia942:   { audit_base:20000, audit_per_kW:2, duration_months:5, recert_base:12000 },
+            iso22237: { audit_base:30000, audit_per_kW:3, duration_months:7, recert_base:18000 },
+            en50600:  { audit_base:25000, audit_per_kW:2.5, duration_months:6, recert_base:14000 },
+            bicsi:    { audit_base:15000, audit_per_kW:1.5, duration_months:4, recert_base:8000 }
+        };
+        var tierMult = { '2':0.7, '3':1.0, '4':1.45 };
+        document.getElementById('pstCostReadiness').addEventListener('input', function(){
+            document.getElementById('pstReadinessVal').textContent = this.value+'%';
+        });
+        function fmtUSD(n){ return n>=1000000?'$'+(n/1000000).toFixed(2)+'M':'$'+Math.round(n/1000)+'k'; }
+        document.getElementById('pstCostCalcBtn').addEventListener('click', function(){
+            var kW = parseFloat(document.getElementById('pstCostMW').value)||2000;
+            var certKey = document.getElementById('pstCostCert').value;
+            var tier = document.getElementById('pstCostTier').value;
+            var readiness = parseFloat(document.getElementById('pstCostReadiness').value)/100;
+            var consultantLevel = document.getElementById('pstCostConsultant').value;
+            var c = PST_CERTS[certKey];
+            var tm = tierMult[tier]||1;
+            var auditFees = (c.audit_base + c.audit_per_kW * kW) * tm;
+            var MW = kW/1000;
+            var internalLaborBase = 40000 + MW * 8000;
+            var internalLabor = internalLaborBase * (1 - readiness * 0.6);
+            var consultantMult = consultantLevel==='none'?0 : consultantLevel==='partial'?0.35:0.7;
+            var consultantCost = auditFees * consultantMult;
+            var total = auditFees + internalLabor + consultantCost;
+            var months = Math.round(c.duration_months * tm * (1 + (1-readiness)*0.4));
+            var recert = c.recert_base * tm;
+            var tco5 = total + recert * 4;
+            document.getElementById('pstOutFees').textContent = fmtUSD(auditFees);
+            document.getElementById('pstOutLabor').textContent = fmtUSD(internalLabor);
+            document.getElementById('pstOutConsultant').textContent = consultantLevel==='none'?'$0 (internal only)':fmtUSD(consultantCost);
+            document.getElementById('pstOutTotal').textContent = fmtUSD(total);
+            document.getElementById('pstOutTimeline').textContent = months+' months';
+            document.getElementById('pstOutRecert').textContent = fmtUSD(recert)+' / yr';
+            document.getElementById('pstOutTCO').textContent = fmtUSD(tco5);
+        });
+
+        /* ---- Scope Accordion ---- */
+        document.querySelectorAll('.pst-scope-tier-bar').forEach(function(bar){
+            bar.addEventListener('click', function(){
+                var tier = this.closest('.pst-scope-tier');
+                var isOpen = tier.classList.contains('open');
+                document.querySelectorAll('.pst-scope-tier').forEach(function(t){ t.classList.remove('open'); t.querySelector('.pst-scope-tier-bar').setAttribute('aria-expanded','false'); });
+                if(!isOpen){ tier.classList.add('open'); this.setAttribute('aria-expanded','true'); }
+            });
+            bar.addEventListener('keydown', function(e){
+                if(e.key==='Enter'||e.key===' '){ e.preventDefault(); this.click(); }
+            });
+        });
+    })();
+    </script>
+
     </main>
 
     <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">

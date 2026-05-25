@@ -136,6 +136,144 @@
                     "@type": "Answer",
                     "text": "kW (kilowatts) measures real power — the actual work done. kVA (kilovolt-amperes) measures apparent power — the total power drawn from the circuit. The ratio between them is the power factor (PF): kW = kVA x PF. Modern IT equipment typically has a PF of 0.95-0.99, meaning kW and kVA are nearly equal. However, UPS systems are often rated in kVA, so understanding this distinction is critical for proper sizing to avoid overloading."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between Tier III and Tier IV data centers?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Tier III (Concurrently Maintainable) requires N+1 redundancy on all power and cooling paths so any single component can be serviced without shutting down the facility. Tier IV (Fault Tolerant) requires 2N redundancy with fully independent, simultaneous active power paths — any single fault or planned maintenance does not interrupt operations. Tier III targets 99.982% uptime (1.6 hr/yr downtime) while Tier IV targets 99.995% (26 min/yr). The 2N CAPEX premium for Tier IV is typically 60-110% over Tier III."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is concurrent maintenance in a data center?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Concurrent maintenance is the ability to perform planned maintenance activities on any component in the power or cooling infrastructure without causing an IT load interruption. It requires at least N+1 redundancy per Uptime Institute Tier III, meaning there is always a spare capacity path available while one component is taken offline. A facility that claims concurrent maintainability must demonstrate that every single component — every UPS module, PDU, ATS, and cooling unit — can be removed from service without cascading to the IT load."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why is 2N sometimes worse than N+1 for certain deployments?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "2N doubles capital and operating costs while adding complexity that increases the probability of maintenance-induced failures, firmware mismatches, and synchronization errors. For smaller IT loads, stranded capacity in the second power train can exceed 40%, making PUE significantly worse. N+1 with robust maintenance procedures, alarming, and fast spare parts availability often achieves better real-world availability than a poorly maintained 2N system. 2N is justified when IT load critically requires zero-transfer-time fault tolerance and the operator has the staffing to maintain two complete independent systems."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Lithium UPS vs VRLA — which is better for data centers?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Lithium-ion UPS batteries offer 3x higher energy density than VRLA, longer calendar life (10-15 years vs 4-6 years), faster recharge (30 min vs 4-8 hours), and built-in Battery Management System (BMS) with state-of-health monitoring. VRLA remains lower in upfront cost and is better understood by legacy maintenance teams. Lithium-ion is now the default for hyperscale and large colocation deployments due to lower total 10-year cost and smaller footprint. Thermal runaway risk with lithium-ion requires BMS monitoring and fire suppression compatible with lithium-ion chemistry."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "When should a rotary UPS be used instead of a static UPS?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Rotary UPS (diesel rotary UPS / DRUPS) is preferred when: (1) a facility requires zero battery footprint with generator-integrated ride-through via a flywheel; (2) extreme harmonic distortion from non-linear loads (high THD environments) that would damage static UPS rectifiers; (3) very high short-circuit current (kAIC) is required that static UPS cannot provide. Rotary UPS typically serves industrial, defense, and some financial trading facilities. Most modern hyperscale and colo deployments use static double-conversion UPS with lithium batteries due to lower cost, simpler maintenance, and modular scalability."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why is diesel fuel polishing necessary for data center generators?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Diesel stored in bulk tanks for more than 6-12 months accumulates microbial growth (algae and bacteria), water condensation, and oxidation products that form sludge and clog fuel injectors. Fuel polishing — continuous or periodic filtration through fine-mesh separators and biocide treatment — removes contaminants before they reach the fuel injection system. Without fuel polishing, a generator may fail to start or sustain load during a utility outage despite appearing to pass routine no-load tests. The 72-hour fuel autonomy requirement assumes polished, clean fuel; real-world failures traced to fuel contamination have reduced actual autonomy to 24-48 hours."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between open-transition and closed-transition ATS?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Open-transition ATS breaks the connection to the normal source before connecting to the alternate source, creating a brief power interruption (typically 100-200 ms) during transfer. Closed-transition ATS momentarily parallels both sources during the transfer window (typically less than 100 ms), providing a make-before-break transfer with zero interruption. Closed-transition is required for sensitive loads that cannot tolerate even a brief interruption and for generators that must be synchronized before connecting. Open-transition is simpler, lower cost, and acceptable for loads protected by double-conversion UPS with adequate battery hold time."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is a DC bus architecture and when is it preferred over AC distribution?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "DC bus architecture distributes power at 380 VDC (or 48 VDC at rack level) rather than the traditional 480/208 VAC chain. Eliminating multiple AC-DC and DC-AC conversion stages in the power chain reduces losses from 4-8% to 1-2% and removes the UPS inverter stage. Hyperscale operators including Google, Facebook, and Chinese cloud operators have adopted 380 VDC for select high-density deployments. It requires DC-native server power supplies and custom PDUs. AC distribution remains dominant in mixed-use colocation where tenant equipment is unknown, and Tier IV facilities where redundant independently sourced AC power paths are architecturally simpler to implement."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does harmonic distortion affect UPS sizing?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Total Harmonic Distortion (THD) from non-linear IT loads increases the apparent current drawn from the UPS without increasing real power output. A UPS sized in kVA at unity power factor may be overloaded in amperes when serving loads with high THD, even if the kW loading appears within limits. Modern double-conversion UPS systems with active front-end (AFE) rectifiers tolerate THD up to 10% on the input without derating. Legacy thyristor rectifiers require 12-pulse or 18-pulse configurations to manage THD. Harmonic filters or active power factor correction may be required when THD exceeds 20% to protect transformers and neutral conductors."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the primary arc flash mitigation methods in data center power infrastructure?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Arc flash incident energy at data center switchgear is typically in the range of 4-40 cal/cm² depending on available fault current and clearing time. Primary mitigation methods include: (1) Current-limiting fuses upstream of breakers to reduce fault clearing time below 8 ms; (2) Zone-selective interlocking (ZSI) between bus-tied breakers to shorten clearing time at the fault location; (3) Optical arc flash detection systems (light-sensing relays) that trip breakers in under 1 ms; (4) Remote racking systems that allow breakers to be racked in/out with the operator physically removed from the arc flash boundary. NFPA 70E §130.5 requires an arc flash risk assessment before any energized electrical work."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Why must a single-line diagram be kept current in a data center?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The single-line diagram (SLD) is the master reference for all power system protection coordination, arc flash analysis, and emergency response. An outdated SLD can misdirect technicians during a power event, cause breaker mis-coordination during fault clearance (leading to larger-than-necessary outages), and produce incorrect arc flash incident energy calculations that put personnel at risk. Any change to the power system — adding a PDU, replacing a breaker, reconfiguring bus ties, or changing generator paralleling settings — must be reflected in the SLD before the system is returned to service. Uptime Institute Operations Sustainability Criteria requires SLD accuracy verification as a standing audit checkpoint."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the NFPA 70 (NEC) requirement for emergency power off in data centers?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "NFPA 70 Article 645 governs information technology equipment rooms. Section 645.11 mandates that facilities meeting the occupancy criteria of 645.2 (IT rooms with raised floors, controlled access, and dedicated HVAC) must have a means to disconnect power to all IT equipment and HVAC from a single location at each access point to the room. The disconnect must be accessible to first responders and must de-energize all equipment within the room. This Emergency Power Off (EPO) requirement is separate from and in addition to normal electrical overcurrent protection, and must be integrated into the fire alarm system per NFPA 72."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- HowTo Schema: How to size a data center power chain -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Size a Data Center Power Chain",
+        "description": "A 5-step engineering procedure for sizing utility service, UPS, generator, and distribution from IT load requirements through Uptime Institute Tier targets.",
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Establish the IT load design basis",
+                "text": "Sum the rated nameplate power of all IT equipment and multiply by a diversity factor (typically 0.7-0.9 for mixed enterprise, 0.85-0.95 for fully loaded hyperscale). Add cooling power (typically 10-30% of IT load depending on PUE target) and facility loads (lighting, security, life safety). The result is the facility critical load in kW, which is the foundation for all downstream sizing."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Select redundancy architecture and Tier target",
+                "text": "Match the Uptime Institute Tier or Equivalent target to the required annual downtime budget: N for Tier I (28.8 hr/yr), N+1 for Tier II-III (1.6 hr/yr), 2N for Tier IV (26 min/yr). Multiply the design IT load by the redundancy multiplier (1.0 for N, 1.45 for N+1, 2.1 for 2N) to determine total installed power chain capacity. For Tier III, also verify each component can be taken offline individually without load interruption."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Size the UPS and battery runtime",
+                "text": "Select UPS modules sized to support the load on the active string(s) with the redundant string(s) offline. Specify battery runtime: minimum 5 minutes to allow generator start and load acceptance, typically 10-15 minutes for operational buffer, or 30+ minutes when local generation is not available. For lithium-ion, verify BMS compatibility with the UPS manufacturer. Confirm UPS kVA rating exceeds kW load divided by the site power factor (PF 0.9 is the IEEE/IEC standard design assumption)."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Size generators and fuel system",
+                "text": "Generator nameplate rating must cover IT load + cooling load + building essential load with a minimum 20% spare capacity margin for load growth. Fuel tank sizing targets 72 hours of continuous full-load operation per NFPA 110 Level 1 requirements. Calculate daily fuel consumption as generator fuel rate (L/hr at rated load) times 24. Verify day tank capacity (typically 8-hour supply) and transfer pump sizing. Include fuel polishing system in the specification."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 5,
+                "name": "Verify coordination and protection studies",
+                "text": "Commission a power system protection coordination study to confirm breaker settings are selective — a fault at any point should trip only the nearest upstream protective device. Commission an arc flash hazard analysis per IEEE 1584 (2018 edition) with updated equipment data. Verify ATS transfer time is within UPS battery bridge capability. Complete generator load testing at 100% nameplate rating for minimum 4 hours per NFPA 110 §8.4.2 and document results for insurance and Authority Having Jurisdiction review."
             }
         ]
     }
@@ -512,6 +650,196 @@
     h1 { font-size: 1.4rem !important; }
 }
 
+/* ============================================================
+   PPW — NEW SECTIONS (ppw-* prefix)
+   ============================================================ */
+
+/* --- Standards Table --- */
+.ppw-standards { padding: 4rem 2rem; background: var(--bg-primary); }
+.ppw-table-wrap { max-width: 1100px; margin: 0 auto; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+.ppw-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.ppw-table thead th { background: #f59e0b; color: #fff; padding: 0.85rem 1rem; text-align: left; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; position: sticky; top: 0; z-index: 2; white-space: nowrap; }
+.ppw-table thead th:first-child { background: #d97706; min-width: 160px; }
+.ppw-table tbody tr:nth-child(odd)  { background: var(--bg-secondary); }
+.ppw-table tbody tr:nth-child(even) { background: var(--bg-primary); }
+.ppw-table tbody tr:hover { background: rgba(245,158,11,0.06); }
+.ppw-table td { padding: 0.75rem 1rem; color: var(--text-secondary); line-height: 1.5; vertical-align: top; border-bottom: 1px solid var(--border-color); }
+.ppw-table td:first-child { font-weight: 600; color: var(--text-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; }
+.ppw-table-note { max-width: 1100px; margin: 0.75rem auto 0; font-size: 0.75rem; color: #64748b; }
+
+/* --- Decision Matrix --- */
+.ppw-decision { padding: 4rem 2rem; background: var(--bg-secondary); }
+.ppw-decision-inner { max-width: 800px; margin: 0 auto; }
+.ppw-questions { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem; }
+.ppw-q-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.4rem; }
+.ppw-q-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
+.ppw-q-card h4 span { display: inline-block; background: #f59e0b; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; margin-right: 0.5rem; vertical-align: middle; }
+.ppw-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.ppw-opt { cursor: pointer; border: 1.5px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.82rem; color: var(--text-secondary); background: var(--bg-secondary); transition: border-color 0.2s, background 0.2s, color 0.2s; user-select: none; }
+.ppw-opt:hover { border-color: #f59e0b; color: #f59e0b; }
+.ppw-opt.selected { border-color: #f59e0b; background: rgba(245,158,11,0.1); color: #d97706; font-weight: 600; }
+.ppw-calc-btn { display: block; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 10px; padding: 0.9rem 1.5rem; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.2s; margin-bottom: 1.5rem; min-height: 44px; }
+.ppw-calc-btn:hover { opacity: 0.88; }
+.ppw-result { display: none; background: var(--bg-primary); border: 2px solid #f59e0b; border-radius: 14px; padding: 1.8rem; }
+.ppw-result.visible { display: block; }
+.ppw-result-topo { font-size: 1.5rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.4rem; }
+.ppw-result-std { font-size: 0.78rem; color: #64748b; margin-bottom: 1rem; font-style: italic; }
+.ppw-result h5 { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 1rem 0 0.4rem; }
+.ppw-result ul { margin: 0; padding-left: 1.2rem; }
+.ppw-result li { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; line-height: 1.5; }
+.ppw-result-links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+.ppw-result-links a { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #f59e0b; font-weight: 600; text-decoration: none; padding: 0.35rem 0.75rem; border: 1px solid rgba(245,158,11,0.35); border-radius: 6px; }
+.ppw-result-links a:hover { background: rgba(245,158,11,0.08); }
+
+/* --- Compliance Checklist --- */
+.ppw-checklist-section { padding: 4rem 2rem; background: var(--bg-primary); }
+.ppw-checklist-inner { max-width: 900px; margin: 0 auto; }
+.ppw-score-bar { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.ppw-score-num { font-size: 2rem; font-weight: 800; color: #f59e0b; min-width: 60px; }
+.ppw-score-label { font-size: 0.85rem; color: var(--text-secondary); flex: 1; }
+.ppw-score-status { font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid; }
+.ppw-score-status.red   { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.1); }
+.ppw-score-status.amber { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.ppw-score-status.cyan  { color: #06b6d4; border-color: #06b6d4; background: rgba(6,182,212,0.1); }
+.ppw-score-status.green { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.1); }
+.ppw-cl-group { margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+.ppw-cl-group-hdr { background: var(--bg-secondary); padding: 0.8rem 1.2rem; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.5rem; }
+.ppw-cl-group-hdr span { font-weight: 400; color: #64748b; font-size: 0.78rem; }
+.ppw-cl-items { padding: 0.5rem 0; }
+.ppw-cl-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 1.2rem; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.ppw-cl-item:last-child { border-bottom: none; }
+.ppw-cl-item input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; accent-color: #f59e0b; flex-shrink: 0; cursor: pointer; }
+.ppw-cl-item label { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; cursor: pointer; }
+.ppw-cl-item label .cite { font-size: 0.74rem; color: #94a3b8; margin-left: 0.3rem; }
+.ppw-cl-btn-row { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+.ppw-cl-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: 1.5px solid; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; min-height: 44px; transition: background 0.2s; }
+.ppw-cl-btn-reset  { border-color: #64748b; color: #64748b; background: transparent; }
+.ppw-cl-btn-reset:hover  { background: rgba(100,116,139,0.1); }
+.ppw-cl-btn-export { border-color: #f59e0b; color: #f59e0b; background: transparent; }
+.ppw-cl-btn-export:hover { background: rgba(245,158,11,0.1); }
+
+/* --- Cost Calculator --- */
+.ppw-cost { padding: 4rem 2rem; background: var(--bg-secondary); }
+.ppw-cost-inner { max-width: 900px; margin: 0 auto; }
+.ppw-cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.ppw-cost-inputs { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.8rem; }
+.ppw-cost-inputs h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.2rem; }
+.ppw-field { margin-bottom: 1rem; }
+.ppw-field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; }
+.ppw-field input, .ppw-field select { width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.55rem 0.9rem; font-size: 0.88rem; color: var(--text-primary); font-family: 'Inter', sans-serif; }
+.ppw-field input:focus, .ppw-field select:focus { outline: 2px solid #f59e0b; outline-offset: -1px; }
+.ppw-cost-outputs { display: flex; flex-direction: column; gap: 0.75rem; }
+.ppw-out-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 1.2rem; }
+.ppw-out-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 0.25rem; }
+.ppw-out-val { font-size: 1.3rem; font-weight: 800; color: #f59e0b; }
+
+/* --- Power-Chain Flow (accordion) --- */
+.ppw-flow { padding: 4rem 2rem; background: var(--bg-primary); }
+.ppw-flow-inner { max-width: 860px; margin: 0 auto; }
+.ppw-flow-wrap { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+.ppw-flow-tier { border-radius: 8px; cursor: pointer; transition: opacity 0.2s; }
+.ppw-flow-tier:hover { opacity: 0.9; }
+.ppw-flow-bar { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.4rem; border-radius: 8px; }
+.ppw-flow-num { font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.7); min-width: 50px; text-transform: uppercase; letter-spacing: 0.5px; }
+.ppw-flow-label { font-size: 0.95rem; font-weight: 700; color: #fff; flex: 1; }
+.ppw-flow-subs { font-size: 0.78rem; color: rgba(255,255,255,0.75); }
+.ppw-flow-arrow { font-size: 0.7rem; color: rgba(255,255,255,0.6); transition: transform 0.3s; }
+.ppw-flow-tier.open .ppw-flow-arrow { transform: rotate(180deg); }
+.ppw-flow-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: var(--bg-secondary); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; }
+.ppw-flow-tier.open .ppw-flow-detail { max-height: 350px; }
+.ppw-flow-detail-inner { padding: 1rem 1.4rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+.ppw-flow-detail-inner ul { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+.ppw-flow-detail-inner li { margin-bottom: 0.35rem; }
+.ppw-flow-t1 .ppw-flow-bar { background: linear-gradient(135deg, #92400e, #b45309); }
+.ppw-flow-t2 .ppw-flow-bar { background: linear-gradient(135deg, #b45309, #d97706); }
+.ppw-flow-t3 .ppw-flow-bar { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.ppw-flow-t4 .ppw-flow-bar { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.ppw-flow-t5 .ppw-flow-bar { background: linear-gradient(135deg, #fbbf24, #fde68a); }
+.ppw-flow-t5 .ppw-flow-label,
+.ppw-flow-t5 .ppw-flow-subs,
+.ppw-flow-t5 .ppw-flow-num,
+.ppw-flow-t5 .ppw-flow-arrow { color: #1c1207; }
+
+/* --- Case Studies --- */
+.ppw-cases { padding: 4rem 2rem; background: var(--bg-secondary); }
+.ppw-cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto; }
+.ppw-case-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.6rem; display: flex; flex-direction: column; }
+.ppw-case-date { display: inline-block; background: rgba(245,158,11,0.1); color: #d97706; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.75rem; }
+.ppw-case-card h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.6rem; line-height: 1.4; }
+.ppw-case-card p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+.ppw-case-meta { font-size: 0.8rem; margin-bottom: 0.75rem; }
+.ppw-case-meta strong { color: var(--text-primary); }
+.ppw-case-meta span { color: var(--text-secondary); }
+.ppw-case-takeaways { margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 0.75rem; }
+.ppw-case-takeaways h4 { font-size: 0.78rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 0.4rem; }
+.ppw-case-takeaways ul { margin: 0; padding-left: 1.1rem; }
+.ppw-case-takeaways li { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; line-height: 1.5; }
+
+/* --- Glossary --- */
+.ppw-glossary { padding: 4rem 2rem; background: var(--bg-primary); }
+.ppw-glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; max-width: 1000px; margin: 0 auto; }
+.ppw-term-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.1rem 1.2rem; transition: border-color 0.2s; }
+.ppw-term-card:hover { border-color: rgba(245,158,11,0.4); }
+.ppw-term-name { font-size: 0.88rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.4rem; }
+.ppw-term-def { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+
+/* --- Related Links --- */
+.ppw-related { padding: 3rem 2rem; background: var(--bg-secondary); }
+.ppw-related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 1000px; margin: 0 auto; }
+.ppw-related-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem; display: flex; align-items: center; gap: 0.9rem; text-decoration: none; transition: border-color 0.25s, transform 0.2s; }
+.ppw-related-card:hover { border-color: #f59e0b; transform: translateY(-2px); }
+.ppw-related-icon { width: 36px; height: 36px; background: rgba(245,158,11,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #f59e0b; flex-shrink: 0; }
+.ppw-related-icon svg { width: 18px; height: 18px; }
+.ppw-related-text strong { display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.ppw-related-text span { font-size: 0.75rem; color: #64748b; }
+
+/* --- Dark mode overrides (ppw-*) --- */
+[data-theme="dark"] .ppw-table-wrap { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-table tbody tr:nth-child(odd)  { background: #1e293b; }
+[data-theme="dark"] .ppw-table tbody tr:nth-child(even) { background: #0f172a; }
+[data-theme="dark"] .ppw-table tbody tr:hover { background: rgba(245,158,11,0.08); }
+[data-theme="dark"] .ppw-table td { border-color: rgba(255,255,255,0.06); color: #94a3b8; }
+[data-theme="dark"] .ppw-table td:first-child { color: #f1f5f9; }
+[data-theme="dark"] .ppw-q-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-opt { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #94a3b8; }
+[data-theme="dark"] .ppw-opt.selected { background: rgba(245,158,11,0.15); }
+[data-theme="dark"] .ppw-result { background: #1e293b; }
+[data-theme="dark"] .ppw-cl-group { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-cl-group-hdr { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-cl-item { border-color: rgba(255,255,255,0.04); }
+[data-theme="dark"] .ppw-cl-item label { color: #94a3b8; }
+[data-theme="dark"] .ppw-score-bar { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-cost-inputs { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-field input,
+[data-theme="dark"] .ppw-field select { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #f1f5f9; }
+[data-theme="dark"] .ppw-field select option { background: #1e293b; color: #f1f5f9; }
+[data-theme="dark"] .ppw-out-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-flow-detail { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-case-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-case-takeaways { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-term-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-related-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .ppw-result-links a { border-color: rgba(245,158,11,0.3); }
+
+/* --- Mobile overrides (ppw-*) --- */
+@media (max-width: 768px) {
+    .ppw-cost-grid { grid-template-columns: 1fr !important; }
+    .ppw-cost-outputs { flex-direction: column; }
+    .ppw-cl-btn-row { flex-direction: column; }
+    .ppw-cl-btn { width: 100%; }
+    .ppw-cases-grid { grid-template-columns: 1fr !important; }
+    .ppw-glossary-grid { grid-template-columns: 1fr 1fr !important; }
+    .ppw-related-grid { grid-template-columns: 1fr 1fr !important; }
+    .ppw-result-topo { font-size: 1.2rem; }
+    .ppw-options { flex-direction: column; }
+    .ppw-flow-bar { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+    .ppw-glossary-grid { grid-template-columns: 1fr !important; }
+    .ppw-related-grid { grid-template-columns: 1fr !important; }
+    .ppw-score-bar { flex-direction: column; align-items: flex-start; }
+}
+
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -586,7 +914,7 @@
 
             <div class="pillar-stat-badges">
                 <div class="pillar-stat-badge">
-                    <span class="num">9</span>
+                    <span class="num">9+</span>
                     <span class="label">Related Resources</span>
                 </div>
                 <div class="pillar-stat-badge">
@@ -596,6 +924,14 @@
                 <div class="pillar-stat-badge">
                     <span class="num">10s</span>
                     <span class="label">Generator Start</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">99.995%</span>
+                    <span class="label">Tier IV Uptime</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">72 hr</span>
+                    <span class="label">Fuel Autonomy</span>
                 </div>
             </div>
         </div>
@@ -729,15 +1065,39 @@
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                <div class="value">60-80%</div>
+                <div class="value">110%</div>
                 <div class="title">2N CAPEX Premium</div>
-                <div class="desc">Fully redundant 2N power architecture adds 60-80% to capital costs compared to N+1. This premium buys concurrently maintainable systems with no single points of failure in the power path.</div>
+                <div class="desc">Fully redundant 2N power architecture adds up to 110% to capital costs versus N+1. This premium buys concurrently maintainable independent power paths with no single points of failure.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
                 <div class="value">99.995%</div>
                 <div class="title">Tier IV Uptime</div>
-                <div class="desc">Tier IV facilities target 99.995% uptime, equivalent to only 26.3 minutes of downtime per year. Achieving this requires 2N+1 power distribution with fully fault-tolerant design throughout.</div>
+                <div class="desc">Tier IV facilities target 99.995% uptime (26 min/yr). Tier III targets 99.982% (1.6 hr/yr). Achieving Tier IV requires fully fault-tolerant 2N design throughout the entire power chain.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+                <div class="value">3×</div>
+                <div class="title">Lithium vs VRLA Density</div>
+                <div class="desc">Lithium-ion UPS batteries achieve roughly 3× the energy density of VRLA at the same footprint, and last 10-15 years versus 4-6 years for VRLA — delivering lower total 10-year TCO despite higher upfront cost.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="value">72 hr</div>
+                <div class="title">Fuel Autonomy Standard</div>
+                <div class="desc">NFPA 110 Level 1 requires a minimum 96-hour fuel supply; Uptime Institute and most hyperscale operators specify 72-hour autonomy at full load. Fuel polishing is mandatory to achieve this in practice.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div class="value">40 cal/cm²</div>
+                <div class="title">Arc Flash Hazard</div>
+                <div class="desc">Incident energy at main data center switchgear can reach 40 cal/cm² or higher without zone-selective interlocking or current-limiting fuses. NFPA 70E §130.5 mandates arc flash risk assessment before any energized work.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <div class="value">&lt;5 Ω</div>
+                <div class="title">Ground Fault Resistance</div>
+                <div class="desc">IEEE 142 and NEC §250 require data center grounding systems to maintain ground fault resistance below 5 Ω (typically &lt;1 Ω for sensitive IT environments). Ground integrity tests should be performed annually and after any major power infrastructure change.</div>
             </div>
         </div>
     </section>
@@ -750,17 +1110,633 @@
         </div>
         <div class="faq-container">
             <div class="faq-item">
-                <button class="faq-question">What is N+1 redundancy in data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <button class="faq-question" aria-expanded="false">What is N+1 redundancy in data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">N+1 redundancy means deploying one additional component beyond the minimum needed (N) to carry the full IT load. For example, if 4 UPS modules are required for full capacity, an N+1 design installs 5 modules. If any single module fails or is taken offline for maintenance, the remaining 4 still handle the entire load without interruption. This approach adds roughly 20-25% to capital costs versus a non-redundant design, offering a practical balance between reliability and budget.</div></div>
             </div>
             <div class="faq-item">
-                <button class="faq-question">How does a UPS work in a data center?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <button class="faq-question" aria-expanded="false">How does a UPS work in a data center?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">An online double-conversion UPS continuously converts incoming AC power to DC through a rectifier, stores energy in batteries (lithium-ion or VRLA), then converts back to clean AC power through an inverter. This topology provides zero transfer time during outages and isolates IT equipment from power anomalies including voltage sags, surges, harmonics, and frequency variations. The batteries typically provide 5-15 minutes of runtime, bridging the gap until backup generators reach full load acceptance.</div></div>
             </div>
             <div class="faq-item">
-                <button class="faq-question">What is the difference between kW and kVA?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <button class="faq-question" aria-expanded="false">What is the difference between kW and kVA?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">kW (kilowatts) measures real power, which is the actual energy consumed to perform work. kVA (kilovolt-amperes) measures apparent power, the total power drawn from the electrical circuit including reactive components. The relationship is kW = kVA multiplied by the power factor (PF). Modern IT servers typically have a PF of 0.95-0.99, so the values are nearly identical. However, UPS systems and transformers are often rated in kVA, making it critical to understand this distinction when sizing equipment to avoid overloading.</div></div>
             </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the difference between Tier III and Tier IV data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Tier III (Concurrently Maintainable) requires N+1 redundancy so any single component can be serviced without shutting down the facility — planned maintenance never causes downtime but an unplanned failure of the redundant path can still interrupt operations. Tier IV (Fault Tolerant) requires 2N redundancy with fully independent, simultaneous active power paths — any single fault or planned maintenance does not interrupt operations. Tier III targets 99.982% uptime (1.6 hr/yr) and Tier IV targets 99.995% (26 min/yr). The 2N CAPEX premium for Tier IV is typically 60-110% over Tier III.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is concurrent maintenance and why does it matter?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Concurrent maintenance is the ability to take any single component in the power or cooling chain offline for planned maintenance without interrupting the IT load. It requires at least N+1 redundancy per Uptime Institute Tier III. A facility that claims concurrent maintainability must demonstrate that every component — every UPS module, PDU, ATS, cooling unit, and generator — can be individually removed from service without a cascade to the IT load. Real-world Tier III failures often trace to maintenance windows where N+1 capacity was consumed, leaving the facility running in N (no-redundancy) mode.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Why is 2N sometimes worse than N+1 in practice?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">2N doubles capital and operating costs while adding complexity that increases probability of maintenance-induced failures, firmware version mismatches between parallel UPS strings, and ATS synchronization errors. For smaller IT loads, stranded capacity can exceed 40%, worsening PUE significantly. N+1 with disciplined maintenance procedures, aggressive alarming, and fast spare parts availability often achieves better real-world availability than a poorly maintained 2N system. 2N is justified when the IT load critically requires zero-transfer-time fault tolerance and the operator has the staffing, procedures, and test regime to maintain two fully independent systems.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Lithium-ion UPS vs VRLA — which is better for data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Lithium-ion UPS batteries offer 3x higher energy density than VRLA, longer calendar life (10-15 years vs 4-6 years for VRLA), faster recharge (30 min vs 4-8 hours), and built-in Battery Management System monitoring. VRLA remains lower in upfront cost and is better understood by legacy maintenance teams. Lithium-ion is now the default for hyperscale and large colocation deployments due to lower 10-year TCO and smaller footprint. Thermal runaway risk with lithium-ion requires BMS integration with the fire suppression and monitoring system.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">When should a rotary UPS be used instead of a static UPS?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Rotary (diesel rotary / DRUPS) is preferred when: (1) zero battery footprint is required with generator-integrated flywheel ride-through; (2) extreme harmonic distortion from non-linear loads (high THD) would damage static UPS rectifiers; or (3) very high short-circuit fault current (kAIC) is required. Most modern hyperscale and colocation deployments use static double-conversion UPS with lithium-ion batteries due to lower cost, modular scalability, and simpler maintenance. DRUPS is predominantly specified for industrial, defense, and some financial trading facilities.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Why is diesel fuel polishing necessary for data center generators?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Diesel stored in bulk tanks for more than 6-12 months accumulates microbial growth, water condensation, and oxidation products that form sludge and clog fuel injectors. Fuel polishing — continuous or periodic filtration through fine-mesh separators with biocide treatment — removes these contaminants before they reach the injection system. Without fuel polishing, a generator may fail to sustain load during an outage despite passing routine no-load tests. Real-world incidents (Google Cloud 2019) have revealed that 72-hour autonomy assumptions were actually 24-48 hours once contaminated fuel degraded generator performance under full load.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the difference between open-transition and closed-transition ATS?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Open-transition ATS breaks the normal source connection before connecting to the alternate source, creating a brief interruption (100-200 ms) during transfer. Closed-transition ATS momentarily parallels both sources (less than 100 ms) for a make-before-break transfer with zero interruption. Closed-transition is required for sensitive loads that cannot tolerate any gap and for generators that must be synchronized before connecting. Open-transition is simpler, lower cost, and acceptable for loads protected by double-conversion UPS that have sufficient battery bridge time.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is a DC bus architecture and when is it preferred over AC?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">DC bus architecture distributes power at 380 VDC (or 48 VDC at rack level) rather than the traditional AC chain. Eliminating multiple AC-DC and DC-AC conversion stages reduces losses from 4-8% to 1-2% and removes the UPS inverter stage. Hyperscale operators including Google, Meta, and Chinese cloud providers have adopted 380 VDC for select high-density deployments. It requires DC-native server power supplies and custom PDUs. AC distribution remains dominant in mixed-use colocation where tenant equipment is varied, and in Tier IV facilities where independently sourced dual AC paths are architecturally simpler.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">How does harmonic distortion affect UPS sizing?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Total Harmonic Distortion (THD) from non-linear IT loads increases apparent current drawn from the UPS without increasing real power output. A UPS sized in kVA at unity power factor may be overloaded in amperes when serving loads with high THD, even if kW loading appears within limits. Modern double-conversion UPS with active front-end rectifiers tolerate input THD up to 10% without derating. Legacy thyristor rectifiers require 12-pulse or 18-pulse configurations. Harmonic filters or active power factor correction may be required when THD exceeds 20% to protect transformers and neutral conductors from overheating.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What are the primary arc flash mitigation methods in data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Arc flash incident energy at data center switchgear ranges from 4-40 cal/cm² depending on fault current and clearing time. Primary mitigation methods include: (1) Current-limiting fuses upstream to reduce fault clearing time below 8 ms; (2) Zone-selective interlocking (ZSI) to shorten clearing time at the fault location; (3) Optical arc flash detection systems (light-sensing relays) that trip breakers in under 1 ms; (4) Remote racking systems allowing breakers to be operated with the operator outside the arc flash boundary. NFPA 70E §130.5 mandates an arc flash risk assessment before any energized electrical work at data center voltages.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Why must a single-line diagram be kept current?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">The single-line diagram (SLD) is the master reference for protection coordination, arc flash analysis, and emergency response. An outdated SLD can misdirect technicians during a power event, cause breaker mis-coordination (larger-than-necessary outages), and produce incorrect arc flash incident energy calculations that expose personnel to injury risk. Any change to the power system — adding a PDU, replacing a breaker, reconfiguring bus ties — must be reflected in the SLD before return to service. Uptime Institute Operations Sustainability Criteria requires SLD accuracy verification as a standing audit checkpoint.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What does NFPA 70 Article 645 require for data center EPO?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">NFPA 70 Article 645 governs IT equipment rooms. Section 645.11 mandates that facilities meeting the §645.2 occupancy criteria (raised floors, controlled access, dedicated HVAC) must have a single disconnect means at each access point to the room to cut all IT equipment and HVAC power. This Emergency Power Off (EPO) must be accessible to first responders and must de-energize all in-room equipment. EPO is separate from normal overcurrent protection and must be integrated into the fire alarm system per NFPA 72. Guarded two-stage EPO switches are required to prevent inadvertent activation — accidental EPO is a leading cause of avoidable data center outages.</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 1: Standards Comparison Table ========== -->
+    <section class="ppw-standards" id="ppw-standards-table" aria-labelledby="ppw-std-hdr">
+        <div class="pillar-section-header">
+            <h2 id="ppw-std-hdr">Power Standards Compared</h2>
+            <p>Key requirements across five core standards governing data center power and electrical infrastructure.</p>
+        </div>
+        <div class="ppw-table-wrap">
+            <table class="ppw-table" role="table" aria-label="Power standards comparison table">
+                <thead>
+                    <tr>
+                        <th scope="col">Criterion</th>
+                        <th scope="col">NFPA 70 (NEC)</th>
+                        <th scope="col">IEEE 1547</th>
+                        <th scope="col">IEC 60364</th>
+                        <th scope="col">Uptime Institute Tier</th>
+                        <th scope="col">ANSI/TIA-942-C</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Scope</td>
+                        <td>All electrical installations in US; Article 645 covers IT equipment rooms</td>
+                        <td>Interconnection of distributed energy resources (generators, BESS) to the grid</td>
+                        <td>Low-voltage electrical installations internationally; Part 7-710 covers medical &amp; critical facilities</td>
+                        <td>Data center infrastructure reliability classification (I–IV)</td>
+                        <td>Telecommunications infrastructure in data centers; maps to Uptime Tier model</td>
+                    </tr>
+                    <tr>
+                        <td>Geographic primary</td>
+                        <td>United States (mandatory); referenced in Canada, Mexico, and Middle East</td>
+                        <td>United States; referenced by IEC 61727 for international DER</td>
+                        <td>European Union, Asia-Pacific, Middle East; ~100 countries</td>
+                        <td>Global (voluntary certification; recognized by all major operators)</td>
+                        <td>United States; referenced globally for carrier-grade data centers</td>
+                    </tr>
+                    <tr>
+                        <td>Redundancy framework</td>
+                        <td>Requires EPO disconnect per §645.11; no explicit N+1 or 2N mandate</td>
+                        <td>Governs generator/BESS grid parallel operation; anti-islanding requirements</td>
+                        <td>Part 7-710 requires alternate supply for essential services; does not specify N+1/2N</td>
+                        <td>Tier I = N, Tier II = N+1 partial, Tier III = N+1 concurrent maintain, Tier IV = 2N fault tolerant</td>
+                        <td>Rated 1–4 (mirrors Tier I–IV); requires redundant power paths for Rated 3+</td>
+                    </tr>
+                    <tr>
+                        <td>Grounding / bonding</td>
+                        <td>§250: single-point grounding, ground electrode system, equipotential bonding</td>
+                        <td>Grounding of DER must comply with NEC §250; anti-islanding protection per §4.4.1</td>
+                        <td>IEC 60364-4-41: TN-S preferred for IT environments; equipotential bonding per Part 5-54</td>
+                        <td>No direct grounding standard; defers to NEC/IEC as locally applicable</td>
+                        <td>References NEC §250 and BICSI 002 for grounding; TIA-607 for telecommunications bonding</td>
+                    </tr>
+                    <tr>
+                        <td>UPS topology requirements</td>
+                        <td>No topology mandate; Article 645 requires UPS in the power path for EPO compliance</td>
+                        <td>Not applicable (focuses on grid interconnection, not internal UPS)</td>
+                        <td>IEC 62040-3 classifies UPS (VFI = double-conversion, VI, VFD); Part 7-710 requires UPS for essential loads</td>
+                        <td>Tier III+ requires online double-conversion or equivalent zero-transfer-time topology</td>
+                        <td>Rated 3+ requires dual, independent UPS strings; online double-conversion per IEC 62040-3 VFI class</td>
+                    </tr>
+                    <tr>
+                        <td>Generator requirements</td>
+                        <td>NFPA 110 (referenced): Level 1 = 96-hr fuel; 10-s load acceptance; weekly test</td>
+                        <td>Generator DER interconnection: frequency/voltage tolerance, ride-through per §6.5</td>
+                        <td>IEC 60034 series (motors/generators); backup power per IEC 60364-5-56</td>
+                        <td>Tier III+: generator must bridge UPS ride-through; dual utility feed or generator per Tier IV</td>
+                        <td>Rated 3+: N+1 generator sets; minimum 72-hr fuel; automatic load testing per NFPA 110</td>
+                    </tr>
+                    <tr>
+                        <td>Inspection cadence</td>
+                        <td>Annual NFPA 70B PM recommended; arc flash study every 5 years</td>
+                        <td>Annual interconnection review per §10.3; anti-islanding test at commissioning</td>
+                        <td>IEC 60364-6: initial verification + periodic inspection per national schedule (typically 1–5 yr)</td>
+                        <td>Uptime Operations Sustainability: quarterly audits; annual Tier certification renewal</td>
+                        <td>TIA-942-C: annual infrastructure review; recommends BICSI 009 operations standard</td>
+                    </tr>
+                    <tr>
+                        <td>Critical sections to cite</td>
+                        <td>§110.3 (listing), §250 (grounding), §645 (IT rooms), §700 (emergency systems)</td>
+                        <td>§4 (interconnection requirements), §6.5 (voltage/freq ride-through), §7 (anti-islanding)</td>
+                        <td>Part 4-43 (overcurrent), Part 5-54 (earthing), Part 7-710 (medical/critical)</td>
+                        <td>Tier Standard: Topology, Operational Sustainability Criteria, Constructed Facility</td>
+                        <td>§6 (power distribution), §7 (grounding), §8 (redundancy), Annex A (rating definitions)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="ppw-table-note">Table reflects publicly available editions as of 2025. Always verify current edition with NFPA, IEEE, IEC, Uptime Institute, or TIA. Local Authority Having Jurisdiction (AHJ) requirements may impose additional constraints.</p>
+    </section>
+
+    <!-- ========== NEW SECTION 2: Interactive Decision Matrix ========== -->
+    <section class="ppw-decision" id="ppw-decision" aria-labelledby="ppw-dec-hdr">
+        <div class="ppw-decision-inner">
+            <div class="pillar-section-header">
+                <h2 id="ppw-dec-hdr">Power Topology Decision Matrix</h2>
+                <p>Answer 4 questions to receive an engineering-backed topology recommendation with Uptime Institute and NEC references.</p>
+            </div>
+            <div class="ppw-questions">
+                <div class="ppw-q-card">
+                    <h4><span>Q1</span>What is your facility tier target?</h4>
+                    <div class="ppw-options" role="group" aria-label="Tier target selection">
+                        <div class="ppw-opt" data-q="1" data-v="t1" role="button" tabindex="0" aria-pressed="false">Tier I</div>
+                        <div class="ppw-opt" data-q="1" data-v="t2" role="button" tabindex="0" aria-pressed="false">Tier II</div>
+                        <div class="ppw-opt" data-q="1" data-v="t3" role="button" tabindex="0" aria-pressed="false">Tier III</div>
+                        <div class="ppw-opt" data-q="1" data-v="t4" role="button" tabindex="0" aria-pressed="false">Tier IV</div>
+                    </div>
+                </div>
+                <div class="ppw-q-card">
+                    <h4><span>Q2</span>What is your annual downtime budget?</h4>
+                    <div class="ppw-options" role="group" aria-label="Downtime budget selection">
+                        <div class="ppw-opt" data-q="2" data-v="high" role="button" tabindex="0" aria-pressed="false">≤28.8 hr (Tier I)</div>
+                        <div class="ppw-opt" data-q="2" data-v="med" role="button" tabindex="0" aria-pressed="false">≤22 hr (Tier II)</div>
+                        <div class="ppw-opt" data-q="2" data-v="low" role="button" tabindex="0" aria-pressed="false">≤1.6 hr (Tier III)</div>
+                        <div class="ppw-opt" data-q="2" data-v="zero" role="button" tabindex="0" aria-pressed="false">≤26 min / concurrent maint (Tier IV)</div>
+                    </div>
+                </div>
+                <div class="ppw-q-card">
+                    <h4><span>Q3</span>What is your IT load profile?</h4>
+                    <div class="ppw-options" role="group" aria-label="IT load profile selection">
+                        <div class="ppw-opt" data-q="3" data-v="colo" role="button" tabindex="0" aria-pressed="false">Mixed colo</div>
+                        <div class="ppw-opt" data-q="3" data-v="hyper" role="button" tabindex="0" aria-pressed="false">Hyperscale steady</div>
+                        <div class="ppw-opt" data-q="3" data-v="ai" role="button" tabindex="0" aria-pressed="false">AI/HPC variable</div>
+                        <div class="ppw-opt" data-q="3" data-v="edge" role="button" tabindex="0" aria-pressed="false">Crypto/edge</div>
+                    </div>
+                </div>
+                <div class="ppw-q-card">
+                    <h4><span>Q4</span>What is your primary site constraint?</h4>
+                    <div class="ppw-options" role="group" aria-label="Site constraint selection">
+                        <div class="ppw-opt" data-q="4" data-v="single" role="button" tabindex="0" aria-pressed="false">Single-utility feed</div>
+                        <div class="ppw-opt" data-q="4" data-v="dual" role="button" tabindex="0" aria-pressed="false">Dual-feed available</div>
+                        <div class="ppw-opt" data-q="4" data-v="offgrid" role="button" tabindex="0" aria-pressed="false">Off-grid potential</div>
+                        <div class="ppw-opt" data-q="4" data-v="netzero" role="button" tabindex="0" aria-pressed="false">Net-zero target</div>
+                    </div>
+                </div>
+            </div>
+            <button class="ppw-calc-btn" id="ppwCalcBtn" aria-label="Calculate topology recommendation">Get Recommendation</button>
+            <div class="ppw-result" id="ppwResult" role="region" aria-live="polite" aria-label="Topology recommendation result">
+                <div class="ppw-result-topo" id="ppwTopo"></div>
+                <div class="ppw-result-std" id="ppwStd"></div>
+                <h5>Why this recommendation</h5>
+                <ul id="ppwWhy"></ul>
+                <h5>Trade-offs to consider</h5>
+                <ul id="ppwTrade"></ul>
+                <div class="ppw-result-links" id="ppwLinks"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 3: Compliance Checklist ========== -->
+    <section class="ppw-checklist-section" id="ppw-checklist" aria-labelledby="ppw-cl-hdr">
+        <div class="ppw-checklist-inner">
+            <div class="pillar-section-header">
+                <h2 id="ppw-cl-hdr">Power Infrastructure Compliance Checklist</h2>
+                <p>33-item interactive checklist across 5 categories. Score persists in localStorage. Export as text for audit records.</p>
+            </div>
+            <div class="ppw-score-bar" role="status" aria-live="polite" aria-label="Checklist score">
+                <div class="ppw-score-num" id="ppwScoreNum">0/33</div>
+                <div class="ppw-score-label">Items checked — complete all 33 for full compliance readiness</div>
+                <div class="ppw-score-status red" id="ppwScoreStatus">Critical gaps</div>
+            </div>
+
+            <!-- Utility & Service Entrance -->
+            <div class="ppw-cl-group">
+                <div class="ppw-cl-group-hdr">Utility &amp; Service Entrance <span>(6 items)</span></div>
+                <div class="ppw-cl-items">
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw1" aria-label="Two utility feeds from separate substations"><label for="pw1">Two utility feeds sourced from separate substations and separate transmission paths <span class="cite">(Uptime Tier IV; ANSI/TIA-942-C §6.2)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw2" aria-label="Primary breaker coordination study current"><label for="pw2">Primary breaker protection coordination study completed within the past 5 years <span class="cite">(IEEE 141; NFPA 70E §130.5)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw3" aria-label="Incoming service grounded per NEC §250"><label for="pw3">Incoming service grounded and bonded per NEC §250; ground electrode resistance &lt;5 Ω verified <span class="cite">(NFPA 70 §250)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw4" aria-label="Lightning protection per NFPA 780"><label for="pw4">Lightning protection system installed and bonded per NFPA 780; surge protection at service entrance <span class="cite">(NFPA 780; IEEE C62.41)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw5" aria-label="Surge protection at service entrance"><label for="pw5">Type 1 surge protective device (SPD) installed at the service entrance, coordinated with Type 2 SPDs at downstream panels <span class="cite">(NFPA 70 §285)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw6" aria-label="Utility SCADA points monitored"><label for="pw6">Utility voltage, frequency, and power quality monitored continuously with alarm thresholds set <span class="cite">(Uptime Ops Sustainability §3)</span></label></div>
+                </div>
+            </div>
+
+            <!-- UPS & Batteries -->
+            <div class="ppw-cl-group">
+                <div class="ppw-cl-group-hdr">UPS &amp; Batteries <span>(7 items)</span></div>
+                <div class="ppw-cl-items">
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw7" aria-label="UPS topology declared"><label for="pw7">UPS topology declared as IEC 62040-3 VFI class (double-conversion); topology documented in SLD <span class="cite">(IEC 62040-3; Uptime Tier III+)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw8" aria-label="Battery type and runtime documented"><label for="pw8">Battery technology (VRLA / Li-ion / flywheel), runtime at full load, and end-of-life date documented <span class="cite">(NFPA 110 §7.3)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw9" aria-label="Annual load bank test completed"><label for="pw9">Annual full-load bank test completed and documented; battery behavior under load recorded <span class="cite">(NFPA 110 §8.4; Uptime Ops §4)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw10" aria-label="Monthly self-test configured"><label for="pw10">Monthly UPS self-test configured in UPS firmware; alarm generated on any failed test <span class="cite">(NFPA 110 §8.3)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw11" aria-label="Battery impedance trended"><label for="pw11">Battery string impedance / internal resistance trended quarterly; degraded strings flagged for replacement <span class="cite">(IEEE 1188; NFPA 110 §7.3)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw12" aria-label="Dual UPS strings to dual PDUs"><label for="pw12">Dual UPS strings feed dual PDU A/B paths to all critical IT loads; no single-corded equipment on critical circuits <span class="cite">(Uptime Tier III; ANSI/TIA-942-C §6)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw13" aria-label="UPS sync checked on parallel operation"><label for="pw13">UPS parallel synchronization verified; phase angle, frequency, and voltage match confirmed at commissioning and after firmware updates <span class="cite">(IEC 62040-1; OEM spec)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Generator & Fuel -->
+            <div class="ppw-cl-group">
+                <div class="ppw-cl-group-hdr">Generator &amp; Fuel <span>(7 items)</span></div>
+                <div class="ppw-cl-items">
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw14" aria-label="Generator sized for IT + cooling + life safety"><label for="pw14">Generator nameplate capacity covers IT load + cooling + lighting + life safety with ≥20% spare margin <span class="cite">(NFPA 110 §7.2)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw15" aria-label="72-hr fuel supply minimum"><label for="pw15">Bulk fuel tank provides minimum 72-hr autonomy at rated full load; calculation documented and reviewed annually <span class="cite">(NFPA 110 §8.3.7; Uptime Tier III)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw16" aria-label="Weekly no-load test performed"><label for="pw16">Weekly no-load engine exercise test logged in maintenance management system <span class="cite">(NFPA 110 §8.4.1)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw17" aria-label="Monthly load test performed"><label for="pw17">Monthly load test at ≥30% of nameplate rating performed and documented <span class="cite">(NFPA 110 §8.4.2)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw18" aria-label="Annual full-load 4-hr test"><label for="pw18">Annual full-load (100% nameplate) 4-hour test completed with results submitted to insurance carrier and AHJ <span class="cite">(NFPA 110 §8.4.2)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw19" aria-label="Fuel polishing program active"><label for="pw19">Continuous or quarterly fuel polishing program active; fuel sample analysis performed annually <span class="cite">(ASTM D975; OEM fuel spec)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw20" aria-label="Day tank redundancy and transfer pumps"><label for="pw20">Day tank sized for minimum 8-hour supply; primary and backup transfer pumps with automatic failover <span class="cite">(NFPA 110 §7.9; FM Global 5-31)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Distribution & ATS -->
+            <div class="ppw-cl-group">
+                <div class="ppw-cl-group-hdr">Distribution &amp; ATS <span>(7 items)</span></div>
+                <div class="ppw-cl-items">
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw21" aria-label="ATS UL 1008 listed"><label for="pw21">All automatic transfer switches are UL 1008 listed and installed per manufacturer instructions <span class="cite">(NFPA 70 §700.12; UL 1008)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw22" aria-label="ATS transfer time under 100ms for Tier III"><label for="pw22">ATS transfer time verified ≤100 ms for Tier III or closed-transition ≤100 ms paralleling for Tier IV <span class="cite">(Uptime Tier III; IEEE C37.010)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw23" aria-label="Breaker selectivity coordination study"><label for="pw23">Breaker selectivity (coordination) study shows no upstream trip for any downstream fault scenario <span class="cite">(IEEE 1584; NFPA 70E)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw24" aria-label="Arc flash labeling NFPA 70E current"><label for="pw24">Arc flash incident energy labels affixed to all switchgear and MCC; study &lt;5 years old <span class="cite">(NFPA 70E §130.5)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw25" aria-label="PDU output isolation transformers"><label for="pw25">PDU output isolation transformers provide galvanic isolation and reduce harmonics to downstream circuits <span class="cite">(ANSI/TIA-942-C §6.4)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw26" aria-label="Branch circuit monitoring installed"><label for="pw26">Branch circuit monitoring (BCM) installed on all PDU outputs; per-circuit current logged and alarmable <span class="cite">(Uptime Ops Sustainability §3.2)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw27" aria-label="Ground integrity test performed annually"><label for="pw27">Ground fault and ground loop resistance tested annually; results trended for early failure detection <span class="cite">(IEEE 142; NFPA 70 §250)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Monitoring & Maintenance -->
+            <div class="ppw-cl-group">
+                <div class="ppw-cl-group-hdr">Monitoring &amp; Maintenance <span>(6 items)</span></div>
+                <div class="ppw-cl-items">
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw28" aria-label="SCADA points for all power equipment"><label for="pw28">SCADA/BMS monitors every circuit breaker status, UPS state, generator status, and ATS position in real time <span class="cite">(Uptime Ops Sustainability §3)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw29" aria-label="Alarm muster every shift change"><label for="pw29">Active power system alarms reviewed and acknowledged at every shift handover; unacknowledged alarms block shift sign-off <span class="cite">(Uptime Ops Sustainability §2.4)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw30" aria-label="Infrared thermography annual"><label for="pw30">Infrared thermographic scan of all electrical panels, bus bars, and cable joints performed annually <span class="cite">(NFPA 70B §11.14; IEC 60364-6)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw31" aria-label="Predictive maintenance program active"><label for="pw31">Predictive maintenance program active: oil analysis for generators, dissolved gas analysis for large transformers <span class="cite">(IEC 60422; IEEE C57.91)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw32" aria-label="Breaker exercising cycle maintained"><label for="pw32">Molded-case and power circuit breakers exercised (operated through full range) per OEM schedule (typically annually) <span class="cite">(NFPA 70B §12.4)</span></label></div>
+                    <div class="ppw-cl-item"><input type="checkbox" id="pw33" aria-label="Single-line diagram as-built current"><label for="pw33">Single-line diagram (SLD) maintained as-built and updated within 30 days of any infrastructure change <span class="cite">(Uptime Ops Sustainability §4.1)</span></label></div>
+                </div>
+            </div>
+
+            <div class="ppw-cl-btn-row">
+                <button class="ppw-cl-btn ppw-cl-btn-reset" id="ppwClReset" aria-label="Reset checklist">Reset Checklist</button>
+                <button class="ppw-cl-btn ppw-cl-btn-export" id="ppwClExport" aria-label="Export checklist as text file">Export as Text</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 4: Cost Calculator ========== -->
+    <section class="ppw-cost" id="ppw-cost-calc" aria-labelledby="ppw-cost-hdr">
+        <div class="ppw-cost-inner">
+            <div class="pillar-section-header">
+                <h2 id="ppw-cost-hdr">Power-Chain Cost Estimator</h2>
+                <p>Browser-side CAPEX, annual OPEX, and 10-yr TCO for the power chain. All figures are indicative 2025 USD — engage a licensed electrical engineer for formal design.</p>
+            </div>
+            <div class="ppw-cost-grid">
+                <div class="ppw-cost-inputs">
+                    <h3>Inputs</h3>
+                    <div class="ppw-field">
+                        <label for="ppwItLoad">IT load (kW)</label>
+                        <input type="number" id="ppwItLoad" value="1000" min="50" max="100000" step="50" aria-label="IT load in kilowatts">
+                    </div>
+                    <div class="ppw-field">
+                        <label for="ppwRedun">Redundancy level</label>
+                        <select id="ppwRedun" aria-label="Redundancy level">
+                            <option value="N">N — No redundancy (Tier I)</option>
+                            <option value="N1" selected>N+1 — One spare (Tier II-III)</option>
+                            <option value="2N">2N — Fully redundant (Tier IV)</option>
+                            <option value="2N1">2N+1 — Fault tolerant with spare</option>
+                        </select>
+                    </div>
+                    <div class="ppw-field">
+                        <label for="ppwUpsType">UPS topology</label>
+                        <select id="ppwUpsType" aria-label="UPS topology">
+                            <option value="static">Static double-conversion</option>
+                            <option value="rotary">Rotary (DRUPS)</option>
+                            <option value="hybrid">Hybrid flywheel + static</option>
+                        </select>
+                    </div>
+                    <div class="ppw-field">
+                        <label for="ppwGenHrs">Generator run hours per year</label>
+                        <input type="number" id="ppwGenHrs" value="200" min="0" max="8760" step="10" aria-label="Generator run hours per year">
+                    </div>
+                    <div class="ppw-field">
+                        <label for="ppwFuelPrice">Fuel price ($/L)</label>
+                        <input type="number" id="ppwFuelPrice" value="0.90" min="0.20" max="5.00" step="0.05" aria-label="Fuel price in dollars per litre">
+                    </div>
+                    <div class="ppw-field">
+                        <label for="ppwElecRate">Electricity rate ($/kWh)</label>
+                        <input type="number" id="ppwElecRate" value="0.08" min="0.02" max="0.50" step="0.01" aria-label="Electricity rate in dollars per kilowatt-hour">
+                    </div>
+                </div>
+                <div class="ppw-cost-outputs" aria-live="polite" aria-label="Cost calculation results">
+                    <div class="ppw-out-card">
+                        <div class="ppw-out-label">Power-Chain CAPEX</div>
+                        <div class="ppw-out-val" id="ppwCapex">—</div>
+                    </div>
+                    <div class="ppw-out-card">
+                        <div class="ppw-out-label">Annual electricity cost</div>
+                        <div class="ppw-out-val" id="ppwElecCost">—</div>
+                    </div>
+                    <div class="ppw-out-card">
+                        <div class="ppw-out-label">Annual generator fuel cost</div>
+                        <div class="ppw-out-val" id="ppwFuelCost">—</div>
+                    </div>
+                    <div class="ppw-out-card">
+                        <div class="ppw-out-label">10-year TCO</div>
+                        <div class="ppw-out-val" id="ppwTco">—</div>
+                    </div>
+                    <div class="ppw-out-card">
+                        <div class="ppw-out-label">Stranded capacity</div>
+                        <div class="ppw-out-val" id="ppwStranded">—</div>
+                    </div>
+                    <div class="ppw-out-card">
+                        <div class="ppw-out-label">Est. annual downtime (hr)</div>
+                        <div class="ppw-out-val" id="ppwDowntime">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 5: Power-Chain Flow Diagram ========== -->
+    <section class="ppw-flow" id="ppw-power-flow" aria-labelledby="ppw-flow-hdr">
+        <div class="ppw-flow-inner">
+            <div class="pillar-section-header">
+                <h2 id="ppw-flow-hdr">Power-Chain Flow: Utility to IT Rack</h2>
+                <p>Select any tier to explore typical losses, redundancy options, and component choices at each layer of the power chain.</p>
+            </div>
+            <div class="ppw-flow-wrap" role="list">
+                <div class="ppw-flow-tier ppw-flow-t1" role="listitem">
+                    <div class="ppw-flow-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="ppw-f1-detail">
+                        <span class="ppw-flow-num">Tier 1</span>
+                        <span class="ppw-flow-label">Utility Supply</span>
+                        <span class="ppw-flow-subs">Substation · MV cable · ATS · Utility metering</span>
+                        <span class="ppw-flow-arrow">&#9660;</span>
+                    </div>
+                    <div class="ppw-flow-detail" id="ppw-f1-detail">
+                        <div class="ppw-flow-detail-inner">
+                            <strong>Typical loss:</strong> 0.1–0.3% in cable and metering. <strong>Redundancy options:</strong> Dual utility feeds from separate substations (Tier IV requirement); single feed with generator backup (Tier II–III).
+                            <ul>
+                                <li><strong>Voltage levels:</strong> Utility supply typically at 33 kV, 22 kV, or 11 kV depending on grid region; stepped down at facility substation to 11 kV or 6.6 kV for MV distribution.</li>
+                                <li><strong>Automatic Transfer Switches:</strong> Main-tie-main switchgear with bus coupling; closed-transition transfer for Tier IV to prevent IT load interruption.</li>
+                                <li><strong>Metering and PQ:</strong> Revenue metering + power quality analyzer at service entrance; monitors voltage sags, harmonics, and frequency deviations that indicate UPS pre-charge events.</li>
+                                <li><strong>Lightning protection:</strong> Type 1 SPD at service entrance per NFPA 70 §285; coordinated with Type 2 SPDs at MV/LV transformers.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="ppw-flow-tier ppw-flow-t2" role="listitem">
+                    <div class="ppw-flow-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="ppw-f2-detail">
+                        <span class="ppw-flow-num">Tier 2</span>
+                        <span class="ppw-flow-label">Service Entrance &amp; Switchgear</span>
+                        <span class="ppw-flow-subs">MV/LV transformer · Main switchboard · Generators · Bus tie</span>
+                        <span class="ppw-flow-arrow">&#9660;</span>
+                    </div>
+                    <div class="ppw-flow-detail" id="ppw-f2-detail">
+                        <div class="ppw-flow-detail-inner">
+                            <strong>Typical loss:</strong> 1–2% in transformers. <strong>Redundancy options:</strong> N+1 transformers on ring bus; bus-tie breaker enabling cross-feed between A and B switchgear sections.
+                            <ul>
+                                <li><strong>Transformers:</strong> MV/LV dry-type preferred for indoor use (K-factor rated for non-linear IT loads); liquid-filled permissible with FM-compliant oil containment. Sized at 125% of IT design load minimum.</li>
+                                <li><strong>Main switchboard:</strong> Draws-out ACB (air circuit breaker) with zone-selective interlocking (ZSI) to minimize arc flash clearing time. Arc flash optical detection supplementation recommended at &gt;25 kA prospective fault current.</li>
+                                <li><strong>Generator switchgear:</strong> Generator output breakers with under/over-voltage and differential protection; synchronized to bus before closing (closed-transition ATS). Sizing: full IT + cooling + life safety load.</li>
+                                <li><strong>Earthing:</strong> Low-impedance earthing (LIE) for transformers; TN-S system throughout for IT environments per IEC 60364-5-54.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="ppw-flow-tier ppw-flow-t3" role="listitem">
+                    <div class="ppw-flow-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="ppw-f3-detail">
+                        <span class="ppw-flow-num">Tier 3</span>
+                        <span class="ppw-flow-label">UPS System</span>
+                        <span class="ppw-flow-subs">Rectifier · Battery string · Inverter · Static bypass</span>
+                        <span class="ppw-flow-arrow">&#9660;</span>
+                    </div>
+                    <div class="ppw-flow-detail" id="ppw-f3-detail">
+                        <div class="ppw-flow-detail-inner">
+                            <strong>Typical loss:</strong> 3–4% in double-conversion mode; 1% in eco-mode. <strong>Redundancy options:</strong> N+1 modular UPS; dual independent UPS strings (A/B) for 2N.
+                            <ul>
+                                <li><strong>Double-conversion topology (VFI):</strong> Rectifier converts AC to DC, charges batteries, and feeds inverter simultaneously. Zero transfer time — output is always inverter-sourced regardless of input state.</li>
+                                <li><strong>Battery runtime sizing:</strong> Minimum 5-minute bridging to generator start; typically 10–15 minutes for operational buffer; 30+ minutes for remote or off-grid sites.</li>
+                                <li><strong>Lithium-ion BMS:</strong> Cell-level monitoring of voltage, temperature, and state of health; early warning before thermal runaway; faster recharge allows generator off-loading sooner.</li>
+                                <li><strong>Eco-mode:</strong> 99% efficiency (vs 96-97% double-conversion) but relies on static bypass — brief transfer time on power event. Acceptable only where connected load is tolerant of &lt;20 ms interruptions.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="ppw-flow-tier ppw-flow-t4" role="listitem">
+                    <div class="ppw-flow-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="ppw-f4-detail">
+                        <span class="ppw-flow-num">Tier 4</span>
+                        <span class="ppw-flow-label">Power Distribution (PDU / STS)</span>
+                        <span class="ppw-flow-subs">Floor PDU · Static Transfer Switch · RPP · Branch circuits</span>
+                        <span class="ppw-flow-arrow">&#9660;</span>
+                    </div>
+                    <div class="ppw-flow-detail" id="ppw-f4-detail">
+                        <div class="ppw-flow-detail-inner">
+                            <strong>Typical loss:</strong> 1–2% in PDU transformers and branch wiring. <strong>Redundancy options:</strong> Dual-corded PDUs (A/B) fed from independent UPS strings; STS for single-corded critical loads requiring source switching.
+                            <ul>
+                                <li><strong>Floor PDU:</strong> Step-down isolation transformer (480V → 208/120V in North America; 400/230V in EU); output panel with MCBs for branch circuits. Branch circuit monitoring (BCM) per outlet for capacity management.</li>
+                                <li><strong>Static Transfer Switch (STS):</strong> Transfers single-corded loads between A and B sources in &lt;4 ms (faster than most IT equipment can detect). Used where dual-corded server PSUs are not available.</li>
+                                <li><strong>Rack PDU:</strong> Intelligent rPDU with per-outlet metering, remote switching, and environmental monitoring (temperature, humidity sensors). Feed from A and B floor PDUs independently.</li>
+                                <li><strong>Power path labeling:</strong> A-path circuits in blue, B-path in red — universal color convention that prevents dual-path collapse from miscabling.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="ppw-flow-tier ppw-flow-t5" role="listitem">
+                    <div class="ppw-flow-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="ppw-f5-detail">
+                        <span class="ppw-flow-num">Tier 5</span>
+                        <span class="ppw-flow-label">IT Rack / PSU</span>
+                        <span class="ppw-flow-subs">Dual PSU · Power capping · Rack busbar</span>
+                        <span class="ppw-flow-arrow">&#9660;</span>
+                    </div>
+                    <div class="ppw-flow-detail" id="ppw-f5-detail">
+                        <div class="ppw-flow-detail-inner">
+                            <strong>Typical loss:</strong> 3–8% in server PSU conversion. <strong>Redundancy options:</strong> Dual PSUs per server, each fed from an independent PDU; rack busbar systems for high-density AI/GPU racks.
+                            <ul>
+                                <li><strong>Dual PSU design:</strong> Each server or storage device has two independent power supplies fed from PDU-A and PDU-B respectively. If either PDU path fails, the active PSU continues without interruption.</li>
+                                <li><strong>PSU efficiency:</strong> 80 PLUS Platinum and Titanium-rated PSUs achieve 92–96% efficiency at 50% load; efficiency drops at low load (&lt;20%). Right-sizing servers to target 50-70% utilization optimizes PSU efficiency.</li>
+                                <li><strong>Rack busbar (AI/HPC):</strong> For GPU racks exceeding 30 kW, overhead or underfloor busbar systems replace traditional branch circuit wiring; whip connections reduce installation time and support rapid capacity changes.</li>
+                                <li><strong>Power capping:</strong> Server BMC/iDRAC power capping prevents individual servers from exceeding allocated breaker capacity during thermal or workload events — critical for preventing nuisance tripping on high-density AI infrastructure.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 6: Case Studies ========== -->
+    <section class="ppw-cases" id="ppw-cases" aria-labelledby="ppw-cases-hdr">
+        <div class="pillar-section-header">
+            <h2 id="ppw-cases-hdr">Power Failure Case Studies</h2>
+            <p>Three real-world incidents that changed how the industry designs and operates data center power infrastructure.</p>
+        </div>
+        <div class="ppw-cases-grid">
+            <div class="ppw-case-card">
+                <span class="ppw-case-date">March 2021</span>
+                <h3>OVHcloud SBG2 — Battery Thermal Event, Strasbourg</h3>
+                <p>A battery thermal event in the UPS room of OVHcloud's SBG2 data center ignited adjacent equipment. Lack of compartmentation between UPS rooms and single-PDU server exposure allowed the fire to propagate, destroying 12,000 servers and rendering three buildings unusable.</p>
+                <div class="ppw-case-meta"><strong>Root cause:</strong> <span>UPS battery thermal runaway with no suppression compartmentation; no UPS room fire barrier separating it from the data hall; 30%+ of customer servers had no cold backup (single PDU path).</span></div>
+                <div class="ppw-case-takeaways">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li>UPS battery rooms must be fire-rated compartments (minimum 1-hr) isolated from the data hall — batteries should never share a room with active IT load.</li>
+                        <li>Single-PDU server exposure in a multi-tenant colo collapses customer resilience regardless of building-level redundancy — dual-path PDU A/B is the baseline standard.</li>
+                        <li>Li-ion thermal runaway requires dedicated suppression systems (CO₂ or inert gas) compatible with lithium-ion chemistry, not conventional clean agents sized for cable fires.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ppw-case-card">
+                <span class="ppw-case-date">June 2019</span>
+                <h3>Google Cloud us-east1 — Fuel Polishing Failure Cascade</h3>
+                <p>During an extended utility outage, generators at Google Cloud's us-east1 region began failing under full load due to fuel contamination. What was designed as a 72-hour autonomous power chain was effectively a 48-hour system because diesel stored for over a year had accumulated bacterial growth and water contamination that blocked injectors under sustained load.</p>
+                <div class="ppw-case-meta"><strong>Root cause:</strong> <span>Fuel polishing program had lapsed due to a vendor change; annual fuel sample testing had been deferred; contamination was not detectable in no-load weekly tests but appeared catastrophically under full sustained load.</span></div>
+                <div class="ppw-case-takeaways">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li>72-hour autonomy is a calculation, not a guarantee — fuel quality must be verified by quarterly sample analysis and continuous polishing, not assumed from tank volume alone.</li>
+                        <li>Generator full-load tests (NFPA 110 annual 4-hour test) are not sufficient to catch slow-developing fuel contamination; fuel sample analysis is the only reliable indicator.</li>
+                        <li>Vendor transitions for fuel or maintenance contracts must trigger immediate inspection — continuity of maintenance data does not pass between contractors automatically.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ppw-case-card">
+                <span class="ppw-case-date">December 2021</span>
+                <h3>AWS US-East-1 — Power System Controller Firmware Bug</h3>
+                <p>A firmware defect in AWS's automated power system controllers caused them to interpret normal operating conditions as fault states, triggering automated protective actions that took down power systems across multiple Availability Zones simultaneously. The automation designed to protect the power infrastructure became the failure mechanism, knocking out EC2, RDS, EFS, and dozens of dependent services for over 7 hours.</p>
+                <div class="ppw-case-meta"><strong>Root cause:</strong> <span>Firmware update to power system controllers introduced a logic error in fault classification; the update had not been tested in a live-load environment that could replicate the specific operating state that triggered the bug.</span></div>
+                <div class="ppw-case-takeaways">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li>Power infrastructure firmware and control software must be subject to the same change management, staged rollout, and regression testing discipline as application software — "infrastructure is stable" is not an excuse for skipping test protocols.</li>
+                        <li>Automated protective systems need manual override capability that is tested regularly; if automation itself fails, operators must be able to revert to manual control within seconds, not minutes.</li>
+                        <li>Multi-AZ architecture is not sufficient protection when the failure mechanism is shared power infrastructure automation — true blast radius isolation requires independent control plane stacks per AZ, not just independent UPS and generators.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 7: Inline Glossary ========== -->
+    <section class="ppw-glossary" id="ppw-glossary" aria-labelledby="ppw-gls-hdr">
+        <div class="pillar-section-header">
+            <h2 id="ppw-gls-hdr">Power Infrastructure Glossary</h2>
+            <p>14 essential terms for data center power and electrical engineers.</p>
+        </div>
+        <div class="ppw-glossary-grid">
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">UPS</div>
+                <div class="ppw-term-def">Uninterruptible Power Supply. Device that provides continuous power by switching to battery (or flywheel) on utility failure, bridging the gap until generator pick-up. VFI (double-conversion) class provides zero transfer time per IEC 62040-3.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">PDU</div>
+                <div class="ppw-term-def">Power Distribution Unit. Transforms and distributes power from the UPS to server racks. Floor PDUs step down voltage (480→208 V or 400→230 V) and include isolation transformers; rack PDUs distribute to individual outlets with per-port metering.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">ATS</div>
+                <div class="ppw-term-def">Automatic Transfer Switch. Detects source failure and switches load from normal to alternate source. Open-transition ATS has a brief interruption (100–200 ms); closed-transition parallels both sources momentarily for zero interruption.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">MV/LV Switchgear</div>
+                <div class="ppw-term-def">Medium Voltage (above 1 kV, typically 6.6–33 kV) and Low Voltage (below 1 kV) switching and protection assemblies. MV switchgear controls utility feeds and generator outputs; LV switchgear distributes to downstream UPS and PDU panels.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">Double-Conversion</div>
+                <div class="ppw-term-def">UPS topology (IEC VFI class) where input AC is converted to DC and back to AC continuously. IT load is always supplied from the inverter — zero transfer time, complete power conditioning, and full isolation from grid anomalies.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">Line-Interactive</div>
+                <div class="ppw-term-def">UPS topology (IEC VI class) where the inverter conditions output and charges batteries but the load is supplied from the AC input through a voltage regulator. Brief transfer time (2–4 ms) to battery during deep sags or outages. Lower cost but less isolation than double-conversion.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">Eco-Mode</div>
+                <div class="ppw-term-def">UPS operating mode where load is supplied from utility input (bypass path) at 99% efficiency, with the inverter on hot standby. Transfers to inverter in &lt;1 ms on utility anomaly. Trades a small transfer risk for significant energy savings; accepted in some Tier III designs but typically avoided in Tier IV.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">BESS</div>
+                <div class="ppw-term-def">Battery Energy Storage System. Grid-scale or behind-the-meter lithium-ion battery array that can replace or supplement diesel generators for power chain resilience and demand charge reduction. Increasingly integrated into hyperscale data centers for sustainability targets and generator-less operation for short outages.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">kAIC</div>
+                <div class="ppw-term-def">Kiloampere Interrupting Capacity. The maximum fault current a circuit breaker or fuse can safely interrupt without damage. Data center switchgear near a utility substation may see 50–100 kA prospective fault current — all protective devices must be rated at or above this value.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">Arc Flash</div>
+                <div class="ppw-term-def">Explosive release of energy from an electrical fault, producing plasma temperatures up to 20,000 °C and incident energy measured in cal/cm². NFPA 70E requires a risk assessment before any energized electrical work; mitigation includes current-limiting fuses, zone-selective interlocking, optical detection, and remote racking.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">THD</div>
+                <div class="ppw-term-def">Total Harmonic Distortion. The ratio of all harmonic current components to the fundamental frequency current, expressed as a percentage. Non-linear IT loads (switched-mode power supplies) generate high THD that overheats neutral conductors, transformers, and UPS rectifiers. Active front-end (AFE) UPS rectifiers and harmonic filters mitigate THD.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">Power Factor</div>
+                <div class="ppw-term-def">Ratio of real power (kW) to apparent power (kVA). Modern IT equipment typically operates at PF 0.95–0.99. UPS systems are often rated in kVA — a 1000 kVA UPS at PF 0.9 supports 900 kW of real load. Poor PF from reactive loads wastes cable and transformer capacity without delivering useful work.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">IDC</div>
+                <div class="ppw-term-def">Internet Data Centre. Facility providing outsourced IT infrastructure (servers, storage, networking) to multiple tenants. Power infrastructure in IDCs must support diverse tenant equipment with unknown load characteristics, making PF tolerance, harmonic management, and flexible redundancy architectures especially important.</div>
+            </div>
+            <div class="ppw-term-card">
+                <div class="ppw-term-name">EPO</div>
+                <div class="ppw-term-def">Emergency Power Off. NFPA 70 §645.11 mandated disconnect system that de-energizes all IT equipment from a single control point at each room access. Required for first-responder safety during electrical fires. Guarded two-stage actuation prevents accidental activation — inadvertent EPO is a leading cause of avoidable data center outages.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 8: Cross-links ========== -->
+    <section class="ppw-related" id="ppw-related" aria-labelledby="ppw-rel-hdr">
+        <div class="pillar-section-header">
+            <h2 id="ppw-rel-hdr">Related Tools &amp; References</h2>
+            <p>Deep-dive comparisons, advisors, and calculators linked to data center power topics.</p>
+        </div>
+        <div class="ppw-related-grid">
+            <a href="tier-advisor.html" class="ppw-related-card" aria-label="Tier Advisor — find your Uptime Institute tier">
+                <div class="ppw-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                <div class="ppw-related-text"><strong>Tier Advisor</strong><span>Find your Uptime Institute Tier</span></div>
+            </a>
+            <a href="compare-ups-online-vs-offline.html" class="ppw-related-card" aria-label="Compare UPS topologies">
+                <div class="ppw-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 0 0-8 0v2"/></svg></div>
+                <div class="ppw-related-text"><strong>Online vs Offline UPS</strong><span>Topology deep-dive comparison</span></div>
+            </a>
+            <a href="compare-diesel-vs-gas-generator.html" class="ppw-related-card" aria-label="Compare diesel and gas generators">
+                <div class="ppw-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></div>
+                <div class="ppw-related-text"><strong>Diesel vs Gas Generator</strong><span>Full cost and reliability analysis</span></div>
+            </a>
+            <a href="compare-tier-3-vs-tier-4.html" class="ppw-related-card" aria-label="Compare Tier 3 and Tier 4 power design">
+                <div class="ppw-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+                <div class="ppw-related-text"><strong>Tier III vs Tier IV</strong><span>N+1 vs 2N decision guide</span></div>
+            </a>
+            <a href="compare-n1-vs-2n.html" class="ppw-related-card" aria-label="N+1 vs 2N redundancy comparison">
+                <div class="ppw-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
+                <div class="ppw-related-text"><strong>N+1 vs 2N Redundancy</strong><span>Architecture cost &amp; availability</span></div>
+            </a>
+            <a href="tools.html" class="ppw-related-card" aria-label="All engineering tools">
+                <div class="ppw-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                <div class="ppw-related-text"><strong>All Tools</strong><span>Calculators, labs, advisors</span></div>
+            </a>
         </div>
     </section>
     </main>
@@ -849,6 +1825,165 @@
                 if (!isActive) item.classList.add('active');
             });
         });
+
+        /* ========== PPW Decision Matrix ========== */
+        (function(){
+            var sel = {};
+            document.querySelectorAll('.ppw-opt').forEach(function(opt){
+                opt.addEventListener('click', function(){
+                    var q = this.dataset.q;
+                    document.querySelectorAll('.ppw-opt[data-q="'+q+'"]').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed','false'); });
+                    this.classList.add('selected');
+                    this.setAttribute('aria-pressed','true');
+                    sel[q] = this.dataset.v;
+                });
+                opt.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); this.click(); }});
+            });
+            var REC = {
+                t4:  { topo:'2N or 2(N+1) Fully Redundant Paths', std:'Uptime Institute Tier IV · IEEE 1547 · NEC §645',
+                        why:['Tier IV requires concurrent maintenance AND fault tolerance under any single failure','Every power path — UPS, ATS, PDU, and generator — must exist in duplicate with independent paths from separate substations','Zero transfer time required on any planned or unplanned event'],
+                        trade:['2N CAPEX premium can reach 110% over N+1 — budget must account for full second power train','PUE impact: stranded capacity in idle redundant strings adds 6-10% to average load losses','Maintenance complexity doubles — firmware, testing, and coordination procedures for two complete independent systems'] },
+                t3:  { topo:'N+1 Redundancy: UPS + Generator + ATS', std:'Uptime Institute Tier III · NFPA 110 · ANSI/TIA-942-C Rated 3',
+                        why:['N+1 provides concurrent maintainability: any single component can be serviced without IT load interruption','Online double-conversion UPS with battery bridge + diesel generator is the proven Tier III standard','ATS transfer time must be verified within UPS battery bridge capability (typically ≤10 s)'],
+                        trade:['N+1 does not provide fault tolerance — if the redundant component fails simultaneously with a demand, load is lost','Careful load management required: never exceed N capacity so the +1 always exists','Regular testing of generator under full load and ATS transfer is mandatory — N+1 only works if the spare is proven ready'] },
+                t2:  { topo:'N + Maintenance Bypass', std:'Uptime Institute Tier II · NFPA 110 Level 1 · NEC §700',
+                        why:['Tier II provides redundancy for select components, reducing unplanned outages from single failures','Maintenance bypass on UPS allows servicing without dropping load — critical for 24/7 operations','Single generator with weekly test exercise is minimum viable for Tier II mission profile'],
+                        trade:['No concurrent maintainability: maintenance still requires planned downtime for most components','UPS bypass exposes load to raw utility power — power quality events will reach servers during bypass periods','Single utility feed is the most common single point of failure for Tier II facilities'] },
+                bess: { topo:'BESS-Augmented Power Chain', std:'IEEE 1547 · IEC 60364 · Uptime Institute (net-zero variants)',
+                        why:['Battery Energy Storage System can replace or supplement diesel generators for short outages (&lt;30 min)','BESS enables demand charge reduction, frequency response participation, and net-zero carbon targets','Solar + BESS configurations increasingly viable for edge and off-grid data centers with variable loads'],
+                        trade:['BESS typically provides 15-30 minute bridge at full load — not a replacement for 72-hour diesel autonomy for most facilities','Grid interconnection per IEEE 1547 requires anti-islanding protection and utility coordination','Higher upfront cost vs diesel; lifecycle (10-15 yr) must be modeled in TCO comparison'] },
+                dc:   { topo:'DC Bus + Lithium UPS (Hyperscale)', std:'IEC 60364 Part 7-710 · IEEE 1547 · OCP (Open Compute) 380V DC',
+                        why:['380V DC distribution eliminates multiple AC-DC-AC conversion stages, reducing total chain losses to 1-2%','Lithium-ion batteries native to DC bus architecture — no DC-AC inverter required for battery integration','Hyperscale operators report 2-4% PUE improvement switching from AC UPS to DC bus architecture'],
+                        trade:['Requires DC-native server PSUs — not compatible with legacy AC-only equipment','Custom DC PDUs and busbar systems add upfront engineering cost','Limited vendor ecosystem compared to AC UPS; spare parts and trained technicians less available outside hyperscale deployments'] }
+            };
+            document.getElementById('ppwCalcBtn').addEventListener('click', function(){
+                var tier = sel['1'], dt = sel['2'], it = sel['3'], site = sel['4'];
+                var rec;
+                if (tier === 't4' || dt === 'zero') rec = REC.t4;
+                else if (site === 'netzero' || site === 'offgrid') rec = REC.bess;
+                else if (it === 'hyper' && site === 'dual') rec = REC.dc;
+                else if (tier === 't3' || dt === 'low') rec = REC.t3;
+                else rec = REC.t2;
+
+                document.getElementById('ppwTopo').textContent = rec.topo;
+                document.getElementById('ppwStd').textContent = 'Reference standards: ' + rec.std;
+                var whyEl = document.getElementById('ppwWhy');
+                var tradeEl = document.getElementById('ppwTrade');
+                whyEl.innerHTML = ''; tradeEl.innerHTML = '';
+                rec.why.forEach(function(w){ var li = document.createElement('li'); li.textContent = w; whyEl.appendChild(li); });
+                rec.trade.forEach(function(t){ var li = document.createElement('li'); li.textContent = t; tradeEl.appendChild(li); });
+                document.getElementById('ppwLinks').innerHTML =
+                    '<a href="compare-tier-3-vs-tier-4.html">Tier III vs IV</a>' +
+                    '<a href="compare-n1-vs-2n.html">N+1 vs 2N</a>' +
+                    '<a href="tier-advisor.html">Tier Advisor</a>' +
+                    '<a href="compare-ups-online-vs-offline.html">UPS Topologies</a>';
+                var r = document.getElementById('ppwResult');
+                r.classList.add('visible');
+                r.scrollIntoView({ behavior:'smooth', block:'nearest' });
+            });
+        })();
+
+        /* ========== PPW Compliance Checklist ========== */
+        (function(){
+            var TOTAL = 33;
+            var KEY = 'ppw_checklist';
+            var saved = {};
+            try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){}
+            function updateScore(){
+                var checked = document.querySelectorAll('.ppw-cl-item input[type="checkbox"]:checked').length;
+                document.getElementById('ppwScoreNum').textContent = checked + '/' + TOTAL;
+                var pct = checked / TOTAL;
+                var el = document.getElementById('ppwScoreStatus');
+                if (pct < 0.33) { el.textContent = 'Critical gaps'; el.className = 'ppw-score-status red'; }
+                else if (pct < 0.66) { el.textContent = 'In progress'; el.className = 'ppw-score-status amber'; }
+                else if (pct < 1) { el.textContent = 'Almost ready'; el.className = 'ppw-score-status cyan'; }
+                else { el.textContent = 'Compliance ready'; el.className = 'ppw-score-status green'; }
+                var state = {};
+                document.querySelectorAll('.ppw-cl-item input[type="checkbox"]').forEach(function(cb){ state[cb.id] = cb.checked; });
+                try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+            }
+            document.querySelectorAll('.ppw-cl-item input[type="checkbox"]').forEach(function(cb){
+                if (saved[cb.id]) cb.checked = true;
+                cb.addEventListener('change', updateScore);
+            });
+            updateScore();
+            document.getElementById('ppwClReset').addEventListener('click', function(){
+                document.querySelectorAll('.ppw-cl-item input[type="checkbox"]').forEach(function(cb){ cb.checked = false; });
+                try { localStorage.removeItem(KEY); } catch(e){}
+                updateScore();
+            });
+            document.getElementById('ppwClExport').addEventListener('click', function(){
+                var lines = ['PPW Power Infrastructure Compliance Checklist', new Date().toLocaleDateString(), ''];
+                document.querySelectorAll('.ppw-cl-group').forEach(function(grp){
+                    lines.push('== ' + grp.querySelector('.ppw-cl-group-hdr').childNodes[0].textContent.trim() + ' ==');
+                    grp.querySelectorAll('.ppw-cl-item').forEach(function(item){
+                        var cb = item.querySelector('input[type="checkbox"]');
+                        var lbl = item.querySelector('label').textContent.trim();
+                        lines.push((cb.checked ? '[x] ' : '[ ] ') + lbl);
+                    });
+                    lines.push('');
+                });
+                var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'ppw-checklist-' + new Date().toISOString().slice(0,10) + '.txt';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+        })();
+
+        /* ========== PPW Cost Calculator ========== */
+        (function(){
+            var REDUNDANCY = {
+                N:   { capex_mult: 1.0,  downtime_h: 1.6,   efficiency_loss: 0.04, stranded: 0 },
+                N1:  { capex_mult: 1.45, downtime_h: 0.37,  efficiency_loss: 0.06, stranded: 0.20 },
+                '2N':{ capex_mult: 2.1,  downtime_h: 0.067, efficiency_loss: 0.10, stranded: 0.42 },
+                '2N1':{ capex_mult: 2.5, downtime_h: 0.0,   efficiency_loss: 0.12, stranded: 0.52 }
+            };
+            var UPS_COST = { static: 150, rotary: 220, hybrid: 180 }; // $/kW
+            var BASE_INFRA = 350; // $/kW base power chain capex excl UPS
+            var GEN_FUEL_RATE = 0.28; // L/kWh at rated load (diesel)
+            function fmt(n){ return '$' + Math.round(n).toLocaleString(); }
+            function calc(){
+                var load = parseFloat(document.getElementById('ppwItLoad').value) || 1000;
+                var redun = document.getElementById('ppwRedun').value;
+                var upsType = document.getElementById('ppwUpsType').value;
+                var genHrs = parseFloat(document.getElementById('ppwGenHrs').value) || 200;
+                var fuelPrice = parseFloat(document.getElementById('ppwFuelPrice').value) || 0.90;
+                var elecRate = parseFloat(document.getElementById('ppwElecRate').value) || 0.08;
+                var r = REDUNDANCY[redun] || REDUNDANCY['N1'];
+                var capex = load * (BASE_INFRA + UPS_COST[upsType]) * r.capex_mult;
+                var totalLoad = load * (1 + r.efficiency_loss);
+                var elecAnnual = totalLoad * 8760 * elecRate;
+                var fuelAnnual = load * GEN_FUEL_RATE * genHrs * fuelPrice;
+                var opexAnnual = elecAnnual + fuelAnnual + capex * 0.03;
+                var tco10 = capex + opexAnnual * 10;
+                document.getElementById('ppwCapex').textContent = fmt(capex);
+                document.getElementById('ppwElecCost').textContent = fmt(elecAnnual) + '/yr';
+                document.getElementById('ppwFuelCost').textContent = fmt(fuelAnnual) + '/yr';
+                document.getElementById('ppwTco').textContent = fmt(tco10);
+                document.getElementById('ppwStranded').textContent = Math.round(r.stranded * 100) + '%';
+                document.getElementById('ppwDowntime').textContent = r.downtime_h.toFixed(2) + ' hr/yr';
+            }
+            ['ppwItLoad','ppwRedun','ppwUpsType','ppwGenHrs','ppwFuelPrice','ppwElecRate'].forEach(function(id){
+                var el = document.getElementById(id);
+                if (el) el.addEventListener('input', calc);
+            });
+            calc();
+        })();
+
+        /* ========== PPW Power-Chain Flow Accordion ========== */
+        (function(){
+            document.querySelectorAll('.ppw-flow-tier .ppw-flow-bar').forEach(function(bar){
+                bar.addEventListener('click', function(){
+                    var tier = this.closest('.ppw-flow-tier');
+                    var isOpen = tier.classList.contains('open');
+                    document.querySelectorAll('.ppw-flow-tier').forEach(function(t){ t.classList.remove('open'); t.querySelector('.ppw-flow-bar').setAttribute('aria-expanded','false'); });
+                    if (!isOpen) { tier.classList.add('open'); this.setAttribute('aria-expanded','true'); }
+                });
+                bar.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); this.click(); }});
+            });
+        })();
     })();
     </script>
 </body>

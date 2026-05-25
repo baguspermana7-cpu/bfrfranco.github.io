@@ -11,6 +11,110 @@ release sections rather than semver.
 
 ---
 
+## v1.41.4 — 2026-05-26 (pillar pages bundle — cooling + power + standards + sustainability depth pass)
+
+PATCH ship: applies the v1.41.2 pillar-fire-safety depth template (8 new
+sections + stats 3→8 + FAQ 4→15 + FAQPage/HowTo JSON-LD) to the remaining
+4 pillar pages so all 5 pillar pages reach parity.
+
+| Pillar page | Before | After | Δ |
+|-----------|--------|-------|---|
+| pillar-fire-safety.html (v1.41.2) | 676 | 1,836 | +1,160 |
+| pillar-cooling.html (this ship) | 1,030 | 2,159 | +1,129 |
+| pillar-power.html (this ship) | 854 | 1,989 | +1,135 |
+| pillar-standards.html (this ship) | 693 | 1,829 | +1,136 |
+| pillar-sustainability.html (this ship) | 688 | 1,394 | +706 |
+
+### pillar-cooling.html — 1,030 → 2,159 (+1,129)
+
+CSS prefix `pcl-*`. 26 dark-mode overrides.
+
+8 new sections:
+1. Standards Comparison Table — 9 rows &times; 5 cols (ASHRAE TC 9.9, ANSI/TIA-942-C, ISO 50001, ETSI EN 300 019, EN 50600-2-3).
+2. Decision Matrix — 4 questions (rack density, workload type, climate zone, water access). Recommends air / rear-door HX / direct-to-chip / immersion / evaporative-adiabatic / mechanical-chiller-closed-loop with ASHRAE/TIA cite.
+3. Compliance Checklist — 33 items (thermal envelope 8, airflow management 7, liquid cooling readiness 6, economizer & efficiency 6, maintenance & lifecycle 6). `pcl_checklist` localStorage.
+4. Cost Calculator — IT load &times; cooling type &times; climate hours &times; electricity/water rate &times; redundancy &rarr; CAPEX, annual cooling kWh, annual cost, PUE estimate, WUE estimate, 10-yr TCO. PUE color-coded.
+5. Heat-Removal Flow Diagram — 5-tier accordion (chip &rarr; server &rarr; rack &rarr; room &rarr; facility) with typical ΔT per tier.
+6. Case Studies — Meta Singapore 2022 (adiabatic equatorial PUE 1.19), Microsoft Project Natick 2018-2020 (underwater), OVHcloud Strasbourg rebuild 2021-2023.
+7. Glossary — 14 terms (PUE, WUE, CRAH, CRAC, CDU, D2C, TDP, ΔT, free-cooling, economizer, dewpoint, adiabatic, immersion single-phase, immersion two-phase).
+8. Cross-links — 6 cards to pue-calculator, compare-air-vs-liquid-cooling, ltc-system-modelling-lab, chiller-plant, water-system, tools.
+
+Stats 4 &rarr; 8. FAQ 3 &rarr; 15. FAQPage JSON-LD updated to 15 Q&As. HowTo "How to size a cooling system for a data center" added.
+
+### pillar-power.html — 854 → 1,989 (+1,135)
+
+CSS prefix `ppw-*`. 26 dark-mode overrides. 127 aria attributes.
+
+8 new sections:
+1. Standards Comparison Table — 8 rows &times; 5 cols (NFPA 70/NEC, IEEE 1547, IEC 60364, Uptime Institute Tier, ANSI/TIA-942-C).
+2. Decision Matrix — 4 questions (Tier target, downtime budget, IT load profile, site constraint). Recommends N+maintenance-bypass / N+1 / 2N / 2(N+1) / BESS-augmented / DC-bus+Li-UPS with IEEE/NEC/Uptime cite.
+3. Compliance Checklist — 33 items (utility & service entrance 6, UPS & batteries 7, generator & fuel 7, distribution & ATS 7, monitoring & maintenance 6). `ppw_checklist` localStorage.
+4. Cost Calculator — IT load &times; redundancy &times; UPS topology &times; generator hours &times; fuel/electricity rate &rarr; power-chain CAPEX, annual electricity, annual generator fuel, 10-yr TCO, stranded capacity %, estimated annual downtime.
+5. Power-Chain Flow Diagram — 5-tier accordion (utility &rarr; service entrance &rarr; MV/LV switchgear &rarr; UPS/PDU &rarr; IT rack) with typical losses + redundancy options.
+6. Case Studies — OVHcloud SBG2 fire 2021-03 (battery thermal + single-PDU exposure), Google Cloud us-east1 2019-06 (fuel polishing failure cascade), AWS US-East-1 2021-12 (power-system-controller firmware bug).
+7. Glossary — 14 terms (UPS, PDU, ATS, MV/LV switchgear, IDC, double-conversion, line-interactive, eco-mode, BESS, kAIC, arc flash, THD, power factor, EPO).
+8. Cross-links — 6 cards to tier-advisor, compare-ups-online-vs-offline, compare-diesel-vs-gas-generator, compare-tier-3-vs-tier-4, compare-n1-vs-2n, tools.
+
+Stats 4 &rarr; 8 (Tier IV 99.995% / Tier III 99.982% / 2N CAPEX 110% / Li-UPS 3&times; VRLA / 72-hr fuel NFPA / 40 cal/cm² arc-flash / &lt;5 Ω ground fault). FAQ 3 &rarr; 15. FAQPage JSON-LD updated. HowTo "How to size a data center power chain" added.
+
+### pillar-standards.html — 693 → 1,829 (+1,136)
+
+CSS prefix `pst-*`. 27 dark-mode overrides.
+
+8 new sections:
+1. Standards Comparison Table — 5 frameworks &times; 9 rows (ANSI/TIA-942-C, ISO/IEC 22237, Uptime Institute Tier, EN 50600, BICSI 002).
+2. Decision Matrix — 4 questions (business goal, geographic market, facility size, certification budget). Recommends Uptime Tier / TIA-942 / ISO/IEC 22237 / EN 50600 / BICSI 002 / stacked-multi.
+3. Compliance Checklist — 33 items (documentation 7, infrastructure topology 7, operations & maintenance 7, testing & commissioning 6, continuous improvement 6). `pst_checklist` localStorage.
+4. Cost Calculator — facility size &times; cert &times; tier &times; readiness % &times; consultant engagement &rarr; audit fees, internal labor, consultant cost, total cost, timeline months, annual recert, 5-yr program TCO.
+5. Certification-Scope Diagram — 5-tier accordion (site & shell / power / cooling / IT room / operations & governance) with overlap pills per standard.
+6. Case Studies — Equinix LA1 Tier IV cert (18-month process, PE-stamped concurrent maintainability), Google Hyperscale Hamina (built without 3rd-party Tier cert; internal SLA), composite EU stacked-cert story.
+7. Glossary — 14 terms (Tier, Rated Class, KPI EN 50600, Concurrent Maintainability, Fault Tolerance, Compartmentation, IST, MOP, SOP, BCDR, PE Stamp, IST Witnessed, As-Built, Conformance vs Certification).
+8. Cross-links — 6 cards to tier-advisor, tia-942-checklist, standards-ltc-lab, compare-tier-3-vs-tier-4, plus 2 contextual links.
+
+Stats 4 &rarr; 8. FAQ 3 &rarr; 15. FAQPage updated. HowTo "How to choose a data center certification path" added.
+
+### pillar-sustainability.html — 688 → 1,394 (+706)
+
+CSS prefix `psu-*`. Authored via chunked Edits to dodge the 32k-output-
+token cap (a previous agent attempt failed by trying to Write the whole
+file in one call).
+
+8 new sections:
+1. Standards Comparison Table — 5 frameworks &times; 8 rows (ISO 50001, ISO 14064, RE100, CRREM, EU EED Article 11).
+2. Decision Matrix — 4 questions (carbon goal, renewable availability, site constraint, reporting framework). Recommends 24/7 CFE / annual PPA matching / green tariff + offsets / heat reuse + circular / Scope 3 procurement.
+3. Compliance Checklist — 33 items (energy efficiency 7, renewable & carbon 7, water 5, circular & waste 7, reporting & governance 7). `psu_checklist` localStorage.
+4. Cost Calculator — annual IT MWh &times; grid carbon intensity &times; renewable strategy &times; PUE &times; offset price &times; water consumption &rarr; Scope 2 tCO&#8322;e, offset cost, renewable premium, water cost, SBTi alignment %, 10-yr investment.
+5. Scope 1/2/3 Diagram — 5-tier accordion (Scope 1 direct / Scope 2 purchased energy / Scope 3 upstream / Scope 3 downstream / Avoided & offset) with reduction levers.
+6. Case Studies — Google 24/7 CFE (~64% in 2023, 2030 target), Microsoft Helsinki heat reuse (~250k homes 2022), Meta Singapore water-positive (2024 target).
+7. Glossary — 14 terms (PUE, WUE, CUE, Scope 1/2/3, SBTi, RE100, PPA, REC, 24/7 CFE, TCFD, CDP, GRI, SASB, CRREM, F-gas, GWP).
+8. Cross-links — 6 cards to pue-calculator, compare-air-vs-liquid-cooling, water-system, ISO 50001 governance, compare-pue-vs-dcie, tools.
+
+Stats 4 &rarr; 8 (Google PUE 1.07 / industry avg 1.59 / Helsinki 250k homes / ~40% hyperscaler net-zero 2030 / CRREM stranding 2035 median / 2-3% global electricity). FAQ 3 &rarr; 15. FAQPage updated. HowTo "How to design a data center sustainability strategy" added.
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.4 (date 2026-05-26)
+- `sw.js` &rarr; `rz-cache-v1.41.4`
+- `llms-full.txt` regenerated (4 enhanced pillars now indexed by AI bots)
+
+### Audits post-ship
+
+- `audit-script-tags.py --strict` &mdash; CLEAN (177 files)
+- `audit-js-syntax.py --strict` &mdash; CLEAN (107 files)
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 133 PASS / 0 FAIL
+- `audit-seo.py` &mdash; 0 required errors
+
+### Track coordination
+
+The parallel **cockpit refinement sweep** track is also using v1.41.x
+numbers in `main rz-work`. This `ft-phase2` track and the cockpit track
+are on separate branches; numbering reconciliation will happen at merge.
+The proposed BMS v1.42.x-v1.45.x plan from the 2026-05-26 deep re-review
+is preserved (this ship is PATCH so doesn't claim any v1.42.x slot).
+
+---
+
 ## v1.41.3 — 2026-05-25 (ai-engineering-maintenance.html — Platform Concept reframe)
 
 PATCH ship: owner-authored concept-page enhancement, applied directly in

@@ -106,7 +106,7 @@
     }
     </script>
 
-    <!-- FAQPage Schema -->
+    <!-- FAQPage Schema (15 Q&As) -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -117,7 +117,7 @@
                 "name": "What is PUE and why does it matter?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Power Usage Effectiveness (PUE) is the ratio of total facility energy to IT equipment energy. A PUE of 1.0 means all energy goes to computing. The global average is 1.58, meaning 37% of energy is overhead — mostly cooling. Reducing PUE by even 0.1 can save hundreds of thousands of dollars annually at scale."
+                    "text": "Power Usage Effectiveness (PUE) is the ratio of total facility energy to IT equipment energy. A PUE of 1.0 means all energy goes to computing with zero overhead. The global average sits at 1.58, meaning roughly 37% of energy is consumed by cooling, lighting, and power distribution. Reducing PUE by 0.1 at a 10 MW facility saves $200,000–400,000 annually, making it the single most important efficiency metric for data center operators."
                 }
             },
             {
@@ -125,7 +125,7 @@
                 "name": "Why is cooling the biggest energy consumer in data centers?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Cooling typically accounts for 30-40% of total data center energy consumption. Every watt of IT power generates heat that must be removed. With rack densities increasing from 5 kW to 30+ kW per rack, and AI/GPU clusters reaching 100+ kW, cooling infrastructure must scale proportionally — often requiring chilled water systems, rear-door heat exchangers, or direct liquid cooling."
+                    "text": "Every watt of IT power generates heat that must be removed to prevent equipment failure. With rack densities increasing from 5 kW (traditional) to 30+ kW (high density) and AI/GPU clusters reaching 100+ kW, cooling demand scales proportionally. Compressors, pumps, fans, and cooling towers all consume significant power. In tropical climates without free cooling, the cooling overhead is even higher because outdoor temperatures rarely drop below the ASHRAE recommended supply air temperature of 18°C."
                 }
             },
             {
@@ -133,8 +133,146 @@
                 "name": "When should you switch from air cooling to liquid cooling?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Consider liquid cooling when rack densities exceed 25-30 kW per rack, when PUE targets drop below 1.3, or when deploying GPU/AI workloads. Direct liquid cooling (DLC) can handle 100+ kW per rack and achieves PUE values of 1.03-1.1. The transition point depends on density requirements, climate, available water, and total cost of ownership over 10+ years."
+                    "text": "Consider liquid cooling when rack densities exceed 25–30 kW, when PUE targets require sub-1.3 performance, or when deploying GPU/AI workloads that generate concentrated heat. Direct liquid cooling can handle 100+ kW per rack with PUE values of 1.03–1.1. The transition decision depends on density requirements, local climate, water availability, retrofit costs, and total cost of ownership over a 10–15 year lifecycle. Many operators adopt a hybrid approach — air cooling for standard IT and liquid cooling for high-density AI zones."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the difference between direct-to-chip liquid cooling and immersion cooling?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Direct-to-chip (D2C) liquid cooling routes coolant through cold plates attached directly to CPUs and GPUs inside a standard server chassis. The server remains air-cooled for peripheral components; only the primary heat sources receive liquid. Immersion cooling submerges entire servers in dielectric fluid — either a single-phase fluid (servers kept wet continuously) or a two-phase fluid that boils off the chip and condenses above. Immersion achieves higher thermal efficiency and near-zero airside energy, but requires full IT equipment re-engineering for two-phase, and single-phase immersion has higher fluid costs and complex maintenance. D2C is the dominant choice for retrofit scenarios and existing hardware."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What do the ASHRAE thermal envelope classes A1 through A4 mean?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "ASHRAE TC 9.9 defines four IT equipment environment classes. A1 (enterprise servers): recommended inlet 18–27°C, allowable 15–32°C, humidity 8–80% RH. A2 (volume/blade servers): recommended 18–27°C, allowable 10–35°C. A3 (storage, networking): allowable 5–40°C. A4 (edge, industrial): allowable 5–45°C. Higher classes permit wider envelopes, enabling more free-cooling hours and higher water-side economizer set points — at the cost of reduced equipment reliability margins. Declaring the class used for your facility's design is mandatory for ASHRAE compliance documentation."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is WUE and how does it complement PUE?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Water Usage Effectiveness (WUE) measures the annual water consumed (in litres) per kWh of IT energy delivered. Industry benchmark is around 1.8 L/kWh; hyperscale leaders achieve below 0.5 L/kWh. PUE captures energy efficiency while WUE captures water sustainability — a facility can have an excellent PUE of 1.2 yet a high WUE if it uses evaporative cooling in a water-stressed region. Both metrics together give a complete picture of resource efficiency. ISO 50001 and the Green Grid define measurement methodologies; annualised measurement removes seasonal bias."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does dew-point control differ from relative humidity control?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Relative humidity (RH) expresses moisture content as a percentage of air's maximum capacity at a given temperature — it changes as temperature changes, even if moisture content does not. Dew point is the absolute temperature at which condensation occurs, independent of air temperature. ASHRAE recommends controlling to a dew point of 5.5–15°C (A1/A2 classes) rather than %RH because RH swings dangerously during cooling system transients. A space at 27°C and 60% RH has a dew point of ~18.5°C — comfortably within spec. The same moisture content at 18°C would read 100% RH and cause condensation. Dew-point sensors at rack inlets provide the more reliable control signal."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is free cooling and when is it economically viable?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Free cooling (also called economiser mode) removes heat using outdoor air or cooling-tower water directly, bypassing mechanical refrigeration compressors. Air-side economisers introduce outdoor air when it is cooler and drier than the IT exhaust; water-side economisers circulate chilled water through a heat exchanger when outdoor wet-bulb temperature is below the supply water set point. Northern European facilities (UK, Netherlands, Nordics) achieve 7,000+ free-cooling hours per year, dramatically reducing PUE. Equatorial facilities may see fewer than 500 hours. The crossover set point depends on the ASHRAE class envelope in use — widening to A3/A4 can add 1,000–2,000 free-cooling hours annually in temperate climates."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What cooling approach is best when water access is restricted?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "When water access is restricted (arid regions, water-stressed grids, landlocked sites), closed-loop mechanical cooling with dry coolers or adiabatic pre-cooling pads minimises consumption. Direct-to-chip liquid cooling with a closed-loop CDU and air-blast dry cooler is highly effective — it circulates facility water without evaporative loss. Two-phase immersion uses dielectric fluid in a closed loop with near-zero water consumption. Avoid open-circuit cooling towers and direct evaporative systems. WUE targets should be modelled against local water tariffs and scarcity risk; many hyperscalers now set a WUE ceiling of 1.0 L/kWh for new sites in water-stressed areas."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can data center waste heat be reused for district heating?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. Data center waste heat is a viable district heating source when return temperatures exceed 60°C — achievable with direct-to-chip cooling (supply 30–45°C, return 50–65°C) or immersion cooling (return 60–70°C). Several European operators (Stockholm Data Parks, Equinix Paris, Ericsson Stockholm) supply waste heat to municipal district heating networks, recovering 60–100% of server heat. The economics depend on proximity to a district heat network, heating season length, and carbon credit value. Air-cooled facilities with 40°C supply air are marginal; liquid-cooled facilities with warm-water returns are highly compatible."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What chiller redundancy patterns are used in data centers?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Common chiller redundancy configurations are N (no redundancy — single chiller), N+1 (one spare chiller, standard for Tier III), 2N (two fully independent chiller plants, Tier IV), and N+2 (two spares for very high availability). Tier III requires concurrent maintainability — the cooling system must support full IT load while one component is under maintenance. Chiller redundancy must be matched by redundant cooling towers, condenser water pumps, chilled water pumps, and piping headers. The weakest link determines actual availability. For AI/HPC deployments where cooling failure causes immediate GPU throttle, N+1 minimum is the baseline; 2N is increasingly standard."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the EU F-gas regulation affect data center cooling?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "EU Regulation 2024/573 (F-Gas Regulation) phases down high-GWP HFC refrigerants used in CRAC and chiller compressors. R-410A (GWP 2,088) and R-134a (GWP 1,430) face significant quota reductions through 2030 and will be restricted in new equipment. Low-GWP alternatives include R-32 (GWP 675), R-454B (GWP 466), and R-1234ze (GWP <1). Operators specifying new cooling plant in the EU should require HFC-free or low-GWP refrigerants. Existing systems may continue with recycled refrigerant, but refill availability will tighten. Annual leak checks are mandatory under EU F-Gas rules for systems containing 5+ tonnes CO2-equivalent."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the key principles of hot and cold aisle containment?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Hot and cold aisle containment physically separates cooled supply air from hot exhaust air, preventing recirculation and enabling higher CRAC supply temperatures. Cold aisle containment (CAC) encloses the front-of-rack intake path with doors and ceiling panels; hot aisle containment (HAC) encloses the rear exhaust and ducts it directly to CRAC returns. CAC is simpler to retrofit; HAC achieves higher return temperatures (enabling better free cooling). Both require blanking panels in every empty rack U-space, brush-grommet cable seals at all cutouts, and raised-floor tile placement matched to actual thermal load. Without containment, average PUE improvement from CRAC set-point changes is limited; with containment, supply temperature can often be raised 2–4°C, saving significant compressor energy."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How is BMS integration used for cooling optimisation?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Building Management Systems (BMS) integrate cooling plant data — chiller staging, cooling tower fans, CRAH unit controls, and IT load measurements from PDUs — into a unified control layer. Advanced BMS implementations use predictive algorithms to pre-cool during off-peak tariff windows, optimise chilled water delta-T, and stage economiser changeover based on forecast ambient conditions. Integration with the DCIM layer allows rack-level power data to drive proactive CRAH adjustments before thermal events occur. Alarm thresholds should be reviewed quarterly; stale setpoints are a leading cause of thermal incidents during unusual workload patterns (AI training bursts, hardware refresh). ASHRAE 135 (BACnet) and MODBUS are the dominant BMS communication protocols in data center cooling plant."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the typical cooling fraction of total data center OpEx?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Cooling infrastructure typically represents 30–40% of total data center energy cost and 50%+ of non-IT OpEx. At a PUE of 1.58, cooling and other overhead consume 37% of all facility energy. Chiller plants, cooling towers, CRAC/CRAH units, and associated pumps and fans collectively account for most of this overhead. A move from a PUE of 1.58 to 1.30 at a 10 MW IT load saves approximately 2.8 MW of cooling power — worth $1–2 million annually at $0.08–0.12/kWh. Cooling OpEx is therefore the primary target for energy efficiency investment in any data center optimisation programme."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- HowTo Schema: How to size a cooling system -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Size a Cooling System for a Data Center",
+        "description": "A 5-step engineering workflow for selecting and sizing data center cooling — from IT load assessment through cooling type selection, CAPEX estimation, efficiency modelling, and commissioning verification.",
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Assess IT load and rack density profile",
+                "text": "Sum nameplate IT load (kW) across all populated racks. Identify peak-density zones (AI/GPU clusters, HPC rows) separately from standard IT rows. Calculate average and peak watts per rack. This load profile determines which cooling technology is viable: air cooling is practical up to ~20 kW/rack average; rear-door heat exchangers handle up to 30 kW; direct-to-chip handles 30–100 kW; immersion handles 100+ kW."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Select cooling type and efficiency targets",
+                "text": "Match cooling technology to rack density using the decision matrix: Air-DX or Air-CW for <20 kW/rack; rear-door HX for 20–30 kW; D2C liquid for 30–100 kW; immersion for >100 kW or >50 kW steady HPC. Set PUE target (≤1.4 standard, ≤1.2 high efficiency, ≤1.1 liquid-cooled) and WUE target based on local water scarcity. Confirm ASHRAE class (A1/A2/A3/A4) governing acceptable inlet temperature envelope."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Size primary cooling plant and redundancy",
+                "text": "Size chillers, cooling towers, CRAH units, or CDUs to carry 100% IT load at design ambient. Apply redundancy factor: N+1 minimum (Tier III), 2N for Tier IV. For liquid cooling, size the CDU secondary loop for 1.5–3 L/min/kW, with supply temperature 30–45°C and return 50–65°C. Size dry coolers or cooling towers for the selected WUE target. Include VFDs on all fans and pumps for part-load efficiency."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Estimate CAPEX, PUE, and 10-year TCO",
+                "text": "Apply technology CAPEX benchmarks: Air-DX $1,200/kW IT, Air-CW $1,500/kW, Rear-door HX $1,800/kW, D2C $2,400/kW, Immersion $3,000/kW. Estimate annual cooling energy as IT_kW × 8,760 hrs × cooling overhead fraction (0.4 for Air-DX down to 0.05 for immersion). Multiply by electricity rate for annual OpEx. Compute 10-year TCO as CAPEX + 10 × annual cooling cost + maintenance. Compare scenarios to identify the lowest TCO option for the target density."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 5,
+                "name": "Commission and verify performance",
+                "text": "After installation, verify: inlet temperatures at top/middle/bottom of all populated racks (target 18–27°C A1), cold-aisle/hot-aisle temperature spread <3°C between CRAH units, PUE at design load vs part load (measure continuously via BMS), WUE over 30-day period, and leak detection system activation test for liquid cooling manifolds. Document baseline PUE and WUE as reference for quarterly trend reporting. Conduct BMS alarm threshold review within 90 days of commissioning."
             }
         ]
     }
@@ -621,6 +759,198 @@
     h1 { font-size: 1.4rem !important; }
 }
 
+/* ============================================================
+   PCL — NEW SECTIONS (pcl-* prefix)
+   ============================================================ */
+
+/* --- Standards Table --- */
+.pcl-standards { padding: 4rem 2rem; background: var(--bg-primary); }
+.pcl-table-wrap { max-width: 1100px; margin: 0 auto; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+.pcl-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.pcl-table thead th { background: #06b6d4; color: #fff; padding: 0.85rem 1rem; text-align: left; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; position: sticky; top: 0; z-index: 2; white-space: nowrap; }
+.pcl-table thead th:first-child { background: #0891b2; min-width: 160px; }
+.pcl-table tbody tr:nth-child(odd)  { background: var(--bg-secondary); }
+.pcl-table tbody tr:nth-child(even) { background: var(--bg-primary); }
+.pcl-table tbody tr:hover { background: rgba(6,182,212,0.06); }
+.pcl-table td { padding: 0.75rem 1rem; color: var(--text-secondary); line-height: 1.5; vertical-align: top; border-bottom: 1px solid var(--border-color); }
+.pcl-table td:first-child { font-weight: 600; color: var(--text-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; }
+.pcl-table-note { max-width: 1100px; margin: 0.75rem auto 0; font-size: 0.75rem; color: #64748b; }
+
+/* --- Decision Matrix --- */
+.pcl-decision { padding: 4rem 2rem; background: var(--bg-secondary); }
+.pcl-decision-inner { max-width: 800px; margin: 0 auto; }
+.pcl-questions { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem; }
+.pcl-q-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.4rem; }
+.pcl-q-card h4 { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
+.pcl-q-card h4 span { display: inline-block; background: #06b6d4; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; margin-right: 0.5rem; vertical-align: middle; }
+.pcl-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pcl-opt { cursor: pointer; border: 1.5px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.82rem; color: var(--text-secondary); background: var(--bg-secondary); transition: border-color 0.2s, background 0.2s, color 0.2s; user-select: none; }
+.pcl-opt:hover { border-color: #06b6d4; color: #06b6d4; }
+.pcl-opt.selected { border-color: #06b6d4; background: rgba(6,182,212,0.1); color: #06b6d4; font-weight: 600; }
+.pcl-calc-btn { display: block; width: 100%; background: linear-gradient(135deg, #06b6d4, #0891b2); color: #fff; border: none; border-radius: 10px; padding: 0.9rem 1.5rem; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.2s; margin-bottom: 1.5rem; min-height: 44px; }
+.pcl-calc-btn:hover { opacity: 0.88; }
+.pcl-result { display: none; background: var(--bg-primary); border: 2px solid #06b6d4; border-radius: 14px; padding: 1.8rem; }
+.pcl-result.visible { display: block; }
+.pcl-result-tech { font-size: 1.5rem; font-weight: 800; color: #06b6d4; margin-bottom: 0.4rem; }
+.pcl-result-std { font-size: 0.78rem; color: #64748b; margin-bottom: 1rem; font-style: italic; }
+.pcl-result h5 { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 1rem 0 0.4rem; }
+.pcl-result ul { margin: 0; padding-left: 1.2rem; }
+.pcl-result li { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; line-height: 1.5; }
+.pcl-result-links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+.pcl-result-links a { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #06b6d4; font-weight: 600; text-decoration: none; padding: 0.35rem 0.75rem; border: 1px solid rgba(6,182,212,0.35); border-radius: 6px; }
+.pcl-result-links a:hover { background: rgba(6,182,212,0.08); }
+
+/* --- Compliance Checklist --- */
+.pcl-checklist-section { padding: 4rem 2rem; background: var(--bg-primary); }
+.pcl-checklist-inner { max-width: 900px; margin: 0 auto; }
+.pcl-score-bar { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.pcl-score-num { font-size: 2rem; font-weight: 800; color: #06b6d4; min-width: 60px; }
+.pcl-score-label { font-size: 0.85rem; color: var(--text-secondary); flex: 1; }
+.pcl-score-status { font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid; }
+.pcl-score-status.red    { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.1); }
+.pcl-score-status.amber  { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.pcl-score-status.cyan   { color: #06b6d4; border-color: #06b6d4; background: rgba(6,182,212,0.1); }
+.pcl-score-status.green  { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.1); }
+.pcl-cl-group { margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+.pcl-cl-group-hdr { background: var(--bg-secondary); padding: 0.8rem 1.2rem; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.5rem; }
+.pcl-cl-group-hdr span { font-weight: 400; color: #64748b; font-size: 0.78rem; }
+.pcl-cl-items { padding: 0.5rem 0; }
+.pcl-cl-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 1.2rem; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.pcl-cl-item:last-child { border-bottom: none; }
+.pcl-cl-item input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; accent-color: #06b6d4; flex-shrink: 0; cursor: pointer; }
+.pcl-cl-item label { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; cursor: pointer; }
+.pcl-cl-item label .cite { font-size: 0.74rem; color: #94a3b8; margin-left: 0.3rem; }
+.pcl-cl-btn-row { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+.pcl-cl-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: 1.5px solid; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; min-height: 44px; transition: background 0.2s; }
+.pcl-cl-btn-reset  { border-color: #64748b; color: #64748b; background: transparent; }
+.pcl-cl-btn-reset:hover  { background: rgba(100,116,139,0.1); }
+.pcl-cl-btn-export { border-color: #06b6d4; color: #06b6d4; background: transparent; }
+.pcl-cl-btn-export:hover { background: rgba(6,182,212,0.1); }
+
+/* --- Cost Calculator --- */
+.pcl-cost { padding: 4rem 2rem; background: var(--bg-secondary); }
+.pcl-cost-inner { max-width: 900px; margin: 0 auto; }
+.pcl-cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.pcl-cost-inputs { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.8rem; }
+.pcl-cost-inputs h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.2rem; }
+.pcl-field { margin-bottom: 1rem; }
+.pcl-field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; }
+.pcl-field input, .pcl-field select { width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.55rem 0.9rem; font-size: 0.88rem; color: var(--text-primary); font-family: 'Inter', sans-serif; }
+.pcl-field input:focus, .pcl-field select:focus { outline: 2px solid #06b6d4; outline-offset: -1px; }
+.pcl-cost-outputs { display: flex; flex-direction: column; gap: 0.75rem; }
+.pcl-out-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 1.2rem; }
+.pcl-out-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 0.25rem; }
+.pcl-out-val { font-size: 1.3rem; font-weight: 800; color: #06b6d4; }
+.pcl-out-val.pue-green  { color: #10b981; }
+.pcl-out-val.pue-cyan   { color: #06b6d4; }
+.pcl-out-val.pue-amber  { color: #f59e0b; }
+.pcl-out-val.pue-red    { color: #ef4444; }
+
+/* --- Heat-Flow Accordion --- */
+.pcl-heat-flow { padding: 4rem 2rem; background: var(--bg-primary); }
+.pcl-hf-inner { max-width: 860px; margin: 0 auto; }
+.pcl-pyramid-wrap { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+.pcl-tier { border-radius: 8px; cursor: pointer; transition: opacity 0.2s; }
+.pcl-tier:hover { opacity: 0.9; }
+.pcl-tier-bar { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.4rem; border-radius: 8px; }
+.pcl-tier.open > .pcl-tier-bar { border-radius: 8px 8px 0 0; }
+.pcl-tier-num { font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.7); min-width: 50px; text-transform: uppercase; letter-spacing: 0.5px; }
+.pcl-tier-label { font-size: 0.95rem; font-weight: 700; color: #fff; flex: 1; }
+.pcl-tier-subs { font-size: 0.78rem; color: rgba(255,255,255,0.75); }
+.pcl-tier-arrow { font-size: 0.7rem; color: rgba(255,255,255,0.6); transition: transform 0.3s; }
+.pcl-tier.open .pcl-tier-arrow { transform: rotate(180deg); }
+.pcl-tier-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: var(--bg-secondary); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; }
+.pcl-tier.open .pcl-tier-detail { max-height: 400px; }
+.pcl-tier-detail-inner { padding: 1rem 1.4rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+.pcl-tier-detail-inner ul { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+.pcl-tier-detail-inner li { margin-bottom: 0.35rem; }
+.pcl-tier-1 .pcl-tier-bar { background: linear-gradient(135deg, #164e63, #155e75); }
+.pcl-tier-2 .pcl-tier-bar { background: linear-gradient(135deg, #155e75, #0e7490); }
+.pcl-tier-3 .pcl-tier-bar { background: linear-gradient(135deg, #0e7490, #0891b2); }
+.pcl-tier-4 .pcl-tier-bar { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+.pcl-tier-5 .pcl-tier-bar { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+
+/* --- Case Studies --- */
+.pcl-cases { padding: 4rem 2rem; background: var(--bg-secondary); }
+.pcl-cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto; }
+.pcl-case-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.6rem; display: flex; flex-direction: column; }
+.pcl-case-date { display: inline-block; background: rgba(6,182,212,0.1); color: #06b6d4; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.75rem; }
+.pcl-case-card h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.6rem; line-height: 1.4; }
+.pcl-case-card p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+.pcl-case-meta { font-size: 0.8rem; margin-bottom: 0.75rem; }
+.pcl-case-meta strong { color: var(--text-primary); }
+.pcl-case-meta span { color: var(--text-secondary); }
+.pcl-case-takeaways { margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 0.75rem; }
+.pcl-case-takeaways h4 { font-size: 0.78rem; font-weight: 700; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 0.4rem; }
+.pcl-case-takeaways ul { margin: 0; padding-left: 1.1rem; }
+.pcl-case-takeaways li { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; line-height: 1.5; }
+
+/* --- Glossary --- */
+.pcl-glossary { padding: 4rem 2rem; background: var(--bg-primary); }
+.pcl-glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; max-width: 1000px; margin: 0 auto; }
+.pcl-term-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.1rem 1.2rem; transition: border-color 0.2s; }
+.pcl-term-card:hover { border-color: rgba(6,182,212,0.4); }
+.pcl-term-name { font-size: 0.88rem; font-weight: 700; color: #06b6d4; margin-bottom: 0.4rem; }
+.pcl-term-def { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+
+/* --- Related Links --- */
+.pcl-related { padding: 3rem 2rem; background: var(--bg-secondary); }
+.pcl-related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 1000px; margin: 0 auto; }
+.pcl-related-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem; display: flex; align-items: center; gap: 0.9rem; text-decoration: none; transition: border-color 0.25s, transform 0.2s; }
+.pcl-related-card:hover { border-color: #06b6d4; transform: translateY(-2px); }
+.pcl-related-icon { width: 36px; height: 36px; background: rgba(6,182,212,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #06b6d4; flex-shrink: 0; }
+.pcl-related-icon svg { width: 18px; height: 18px; }
+.pcl-related-text strong { display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.pcl-related-text span { font-size: 0.75rem; color: #64748b; }
+
+/* --- Dark mode overrides (pcl-*) --- */
+[data-theme="dark"] .pcl-table-wrap { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-table tbody tr:nth-child(odd)  { background: #1e293b; }
+[data-theme="dark"] .pcl-table tbody tr:nth-child(even) { background: #0f172a; }
+[data-theme="dark"] .pcl-table tbody tr:hover { background: rgba(6,182,212,0.08); }
+[data-theme="dark"] .pcl-table td { border-color: rgba(255,255,255,0.06); color: #94a3b8; }
+[data-theme="dark"] .pcl-table td:first-child { color: #f1f5f9; }
+[data-theme="dark"] .pcl-q-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-opt { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #94a3b8; }
+[data-theme="dark"] .pcl-opt.selected { background: rgba(6,182,212,0.15); }
+[data-theme="dark"] .pcl-result { background: #1e293b; }
+[data-theme="dark"] .pcl-cl-group { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-cl-group-hdr { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-cl-item { border-color: rgba(255,255,255,0.04); }
+[data-theme="dark"] .pcl-cl-item label { color: #94a3b8; }
+[data-theme="dark"] .pcl-score-bar { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-cost-inputs { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-field input,
+[data-theme="dark"] .pcl-field select { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #f1f5f9; }
+[data-theme="dark"] .pcl-field select option { background: #1e293b; color: #f1f5f9; }
+[data-theme="dark"] .pcl-out-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-tier-detail { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-case-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-case-takeaways { border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-term-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-related-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pcl-result-links a { border-color: rgba(6,182,212,0.3); }
+
+/* --- Mobile overrides (pcl-*) --- */
+@media (max-width: 768px) {
+    .pcl-cost-grid { grid-template-columns: 1fr !important; }
+    .pcl-cost-outputs { flex-direction: column; }
+    .pcl-cl-btn-row { flex-direction: column; }
+    .pcl-cl-btn { width: 100%; }
+    .pcl-cases-grid { grid-template-columns: 1fr !important; }
+    .pcl-glossary-grid { grid-template-columns: 1fr 1fr !important; }
+    .pcl-related-grid { grid-template-columns: 1fr 1fr !important; }
+    .pcl-result-tech { font-size: 1.2rem; }
+    .pcl-options { flex-direction: column; }
+    .pcl-tier-bar { flex-wrap: wrap; }
+    .pcl-tier-subs { display: none; }
+}
+@media (max-width: 480px) {
+    .pcl-glossary-grid { grid-template-columns: 1fr !important; }
+    .pcl-related-grid { grid-template-columns: 1fr !important; }
+    .pcl-score-bar { flex-direction: column; align-items: flex-start; }
+}
+
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -703,8 +1033,8 @@
 
             <div class="pillar-stat-badges">
                 <div class="pillar-stat-badge">
-                    <span class="num">8</span>
-                    <span class="label">Related Resources</span>
+                    <span class="num">1.07</span>
+                    <span class="label">PUE Leader</span>
                 </div>
                 <div class="pillar-stat-badge">
                     <span class="num">1.58</span>
@@ -713,6 +1043,18 @@
                 <div class="pillar-stat-badge">
                     <span class="num">100+</span>
                     <span class="label">kW/Rack with DLC</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">18-27°C</span>
+                    <span class="label">ASHRAE A1 Envelope</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">7,000+</span>
+                    <span class="label">Free-Cool Hrs/yr N.EU</span>
+                </div>
+                <div class="pillar-stat-badge">
+                    <span class="num">50%+</span>
+                    <span class="label">Cooling % of OpEx</span>
                 </div>
             </div>
         </div>
@@ -859,25 +1201,25 @@
                 <div class="stat-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
                 </div>
-                <div class="value">1.58</div>
-                <div class="title">Global Average PUE</div>
-                <div class="desc">The Uptime Institute's 2024 survey shows the industry average PUE has stagnated around 1.58 for years, indicating significant room for improvement in cooling efficiency.</div>
+                <div class="value">1.07</div>
+                <div class="title">Hyperscale PUE Leader</div>
+                <div class="desc">The best-in-class hyperscale facilities achieve PUE of 1.07, approaching theoretical minimum. This is only possible with liquid cooling, warm-water economizers, and near-zero air-side losses.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg>
                 </div>
-                <div class="value">100+</div>
-                <div class="title">kW/Rack with DLC</div>
-                <div class="desc">Direct liquid cooling enables rack power densities exceeding 100 kW, compared to 15-25 kW maximum for traditional air cooling with hot aisle containment.</div>
+                <div class="value">1.8 L/kWh</div>
+                <div class="title">WUE Industry Benchmark</div>
+                <div class="desc">Water Usage Effectiveness of 1.8 L/kWh is the global industry average. Hyperscale leaders with liquid cooling reach below 0.5 L/kWh. Facilities in water-stressed regions are targeting WUE &lt;1.0.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 27C18 33 6 33 6 27"/><path d="M12 3a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4z"/></svg>
                 </div>
-                <div class="value">18-27C</div>
-                <div class="title">ASHRAE A1 Range</div>
-                <div class="desc">ASHRAE A1 recommended inlet temperature envelope is 18-27 degrees Celsius. Widening to A2-A4 allows up to 45 degrees C but increases equipment failure risk.</div>
+                <div class="value">18-27°C</div>
+                <div class="title">ASHRAE A1 Recommended</div>
+                <div class="desc">ASHRAE TC 9.9 A1 recommended inlet temperature envelope. Widening to A3/A4 (up to 45°C allowable) enables more free-cooling hours but increases equipment failure probability.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon">
@@ -885,7 +1227,39 @@
                 </div>
                 <div class="value">30-40%</div>
                 <div class="title">Energy for Cooling</div>
-                <div class="desc">Cooling infrastructure typically consumes 30-40% of total data center energy, making it the single largest non-IT energy consumer and the primary lever for PUE reduction.</div>
+                <div class="desc">Cooling infrastructure typically consumes 30–40% of total data center energy, making it the single largest non-IT energy consumer and the primary lever for PUE reduction.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </div>
+                <div class="value">7,000+</div>
+                <div class="title">Free-Cooling Hours/yr</div>
+                <div class="desc">Northern European facilities achieve 7,000+ free-cooling hours per year — air-side economizers running without mechanical refrigeration. Equatorial facilities may see fewer than 500, making liquid cooling the default for tropical deployments.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="value">60-100°C</div>
+                <div class="title">Heat Reuse Temperature</div>
+                <div class="desc">Liquid-cooled data centers return water at 50–65°C (D2C) or 60–70°C (immersion) — hot enough for district heating networks. Several European hyperscale operators now supply waste heat to municipal heating grids year-round.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="value">A1–A4</div>
+                <div class="title">3 Climate Classes</div>
+                <div class="desc">ASHRAE TC 9.9 defines four IT equipment environment classes (A1–A4). Higher classes permit wider temperature envelopes, enabling free cooling in hotter climates at the cost of reduced equipment reliability margins. Class must be declared in design documentation.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="value">50%+</div>
+                <div class="title">Cooling % of Non-IT OpEx</div>
+                <div class="desc">Cooling infrastructure represents 50%+ of non-IT operational expenditure. A PUE improvement from 1.58 to 1.30 at a 10 MW IT load saves approximately $1–2 million annually at $0.08–0.12/kWh, making it the highest-ROI operational optimisation target.</div>
             </div>
         </div>
     </section>
@@ -898,40 +1272,642 @@
         </div>
         <div class="faq-container">
             <div class="faq-item">
-                <button class="faq-question">
-                    What is PUE and why does it matter?
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">
-                        Power Usage Effectiveness (PUE) is the ratio of total facility energy to IT equipment energy. A PUE of 1.0 means all energy goes to computing with zero overhead. The global average sits at 1.58, meaning roughly 37% of energy is consumed by cooling, lighting, and power distribution losses. Reducing PUE by even 0.1 at a 10 MW facility can save $200,000-400,000 annually, making it the single most important efficiency metric for data center operators.
+                <button class="faq-question" aria-expanded="false">What is PUE and why does it matter?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Power Usage Effectiveness (PUE) is the ratio of total facility energy to IT equipment energy. A PUE of 1.0 means all energy goes to computing with zero overhead. The global average sits at 1.58, meaning roughly 37% of energy is consumed by cooling, lighting, and power distribution. Reducing PUE by 0.1 at a 10 MW facility saves $200,000–400,000 annually, making it the single most important efficiency metric for data center operators.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Why is cooling the biggest energy consumer in data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Every watt of IT power generates heat that must be removed to prevent equipment failure. With rack densities increasing from 5 kW (traditional) to 30+ kW (high density) and AI/GPU clusters reaching 100+ kW, cooling demand scales proportionally. Compressors, pumps, fans, and cooling towers all consume significant power. In tropical climates without free cooling, the overhead is even higher because outdoor temperatures rarely drop below the ASHRAE recommended 18°C supply air temperature.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">When should you switch from air cooling to liquid cooling?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Consider liquid cooling when rack densities exceed 25–30 kW, when PUE targets require sub-1.3 performance, or when deploying GPU/AI workloads. Direct liquid cooling can handle 100+ kW per rack with PUE values of 1.03–1.1. The transition decision depends on density requirements, local climate, water availability, retrofit costs, and total cost of ownership over a 10–15 year lifecycle. Many operators adopt a hybrid approach — air cooling for standard IT rows and liquid cooling for high-density AI zones.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the difference between direct-to-chip and immersion cooling?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Direct-to-chip (D2C) routes coolant through cold plates attached to CPUs and GPUs inside a standard server chassis, while peripheral components remain air-cooled. Immersion cooling submerges entire servers in dielectric fluid — single-phase (continuously wet) or two-phase (fluid boils off chips and condenses above). Immersion achieves near-zero airside energy, but requires full IT re-engineering for two-phase, higher fluid costs, and complex maintenance. D2C is the dominant choice for retrofit scenarios and existing hardware platforms.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What do the ASHRAE thermal envelope classes A1 through A4 mean?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">ASHRAE TC 9.9 defines four classes. A1 (enterprise servers): recommended inlet 18–27°C, allowable 15–32°C, humidity 8–80% RH. A2 (volume/blade): recommended 18–27°C, allowable 10–35°C. A3 (storage, networking): allowable 5–40°C. A4 (edge, industrial): allowable 5–45°C. Higher classes enable more free-cooling hours at the cost of reduced equipment reliability margins. The declared class must appear in design documentation for ASHRAE compliance.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is WUE and how does it complement PUE?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Water Usage Effectiveness (WUE) measures annual water consumed (litres) per kWh of IT energy delivered. The industry benchmark is around 1.8 L/kWh; hyperscale leaders with liquid cooling reach below 0.5 L/kWh. PUE captures energy efficiency while WUE captures water sustainability — a facility can achieve PUE 1.2 yet high WUE if it relies on evaporative cooling in a water-stressed region. Both metrics together give a complete picture of resource efficiency and are used in Green Grid reporting.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">How does dew-point control differ from relative humidity control?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Relative humidity (RH) expresses moisture as a percentage of air's maximum capacity at a given temperature — it changes as temperature changes, even if moisture content does not. Dew point is the absolute temperature at which condensation forms, independent of air temperature. ASHRAE recommends controlling to a dew point of 5.5–15°C rather than %RH because RH swings dangerously during cooling transients. Dew-point sensors at rack inlets provide the more reliable control signal for preventing condensation events during economizer transitions.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is free cooling and when is it economically viable?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Free cooling removes heat using outdoor air or cooling-tower water directly, bypassing mechanical refrigeration compressors. Air-side economisers introduce outdoor air when cooler and drier than IT exhaust; water-side economisers circulate chilled water through a heat exchanger when outdoor wet-bulb temperature is below supply water set point. Northern European facilities achieve 7,000+ free-cooling hours per year. Equatorial facilities may see fewer than 500. Widening the ASHRAE class to A3/A4 can add 1,000–2,000 free-cooling hours in temperate climates.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What cooling approach is best when water access is restricted?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">When water access is restricted, closed-loop mechanical cooling with dry coolers minimises consumption. Direct-to-chip liquid cooling with a closed-loop CDU and air-blast dry cooler is highly effective — it circulates facility water without evaporative loss. Two-phase immersion uses dielectric fluid in a closed loop with near-zero water consumption. Avoid open-circuit cooling towers and direct evaporative systems. Many hyperscalers now set a WUE ceiling of 1.0 L/kWh for new sites in water-stressed regions, as defined by WRI Aqueduct baseline water stress data.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">Can data center waste heat be reused for district heating?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Yes. Data center waste heat is viable for district heating when return temperatures exceed 60°C — achievable with D2C cooling (supply 30–45°C, return 50–65°C) or immersion (return 60–70°C). Stockholm Data Parks, Equinix Paris, and several Nordic operators supply waste heat to municipal heating networks, recovering 60–100% of server heat output. Air-cooled facilities at 40°C exhaust are marginal; liquid-cooled facilities with warm-water returns are highly compatible with existing district heat infrastructure.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What chiller redundancy patterns are used in data centers?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Common configurations: N (no redundancy), N+1 (one spare chiller, standard for Tier III), 2N (two fully independent chiller plants, Tier IV), N+2 (two spares for very high availability). Tier III requires concurrent maintainability — the cooling system must carry full IT load while one component is under maintenance. Chiller redundancy must be matched by redundant cooling towers, condenser water pumps, chilled water pumps, and piping headers. For AI/HPC deployments where cooling failure causes immediate GPU throttle, N+1 minimum is the baseline; 2N is increasingly standard.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">How does the EU F-gas regulation affect data center cooling?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">EU Regulation 2024/573 phases down high-GWP HFC refrigerants used in CRAC and chiller compressors. R-410A (GWP 2,088) and R-134a (GWP 1,430) face significant quota reductions through 2030. Low-GWP alternatives include R-32 (GWP 675), R-454B (GWP 466), and R-1234ze (GWP &lt;1). New EU cooling plant should specify HFC-free or low-GWP refrigerants. Annual leak checks are mandatory for systems containing 5+ tonnes CO₂-equivalent. Existing systems may continue with recycled refrigerant but refill availability will tighten significantly through the decade.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What are the key principles of hot and cold aisle containment?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Hot and cold aisle containment physically separates cooled supply air from hot exhaust air, preventing recirculation. Cold aisle containment (CAC) encloses the front-of-rack intake path; hot aisle containment (HAC) encloses the rear exhaust and ducts it to CRAC returns. Both require blanking panels in every empty rack U-space, brush-grommet cable seals at all cutouts, and raised-floor tile placement matched to actual thermal load. With containment, supply temperature can typically be raised 2–4°C, saving significant compressor energy and increasing free-cooling hours.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">How is BMS integration used for cooling optimisation?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">BMS integrates chiller staging, cooling tower fans, CRAH controls, and PDU power measurements into a unified control layer. Advanced BMS implementations pre-cool during off-peak tariff windows, optimise chilled water delta-T, and stage economiser changeover based on forecast ambient conditions. Integration with DCIM allows rack-level power data to drive proactive CRAH adjustments before thermal events occur. Alarm thresholds should be reviewed quarterly — stale setpoints are a leading cause of thermal incidents during unusual workload patterns such as AI training burst loads.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">What is the typical cooling fraction of total data center OpEx?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">Cooling infrastructure represents 30–40% of total facility energy cost and 50%+ of non-IT operational expenditure. At a PUE of 1.58, cooling and other overhead consume 37% of all facility energy. A move from PUE 1.58 to 1.30 at a 10 MW IT load saves approximately 2.8 MW of cooling power — worth $1–2 million annually at $0.08–0.12/kWh. Cooling OpEx is therefore the primary target for energy efficiency investment in any data center optimisation programme.</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 1: Standards Comparison Table ========== -->
+    <section class="pcl-standards" id="pcl-standards-table" aria-labelledby="pcl-std-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pcl-std-hdr">Cooling Standards Compared</h2>
+            <p>Key requirements across the five most-cited standards in data center thermal management engineering.</p>
+        </div>
+        <div class="pcl-table-wrap">
+            <table class="pcl-table" role="table" aria-label="Cooling standards comparison">
+                <thead>
+                    <tr>
+                        <th scope="col">Criterion</th>
+                        <th scope="col">ASHRAE TC 9.9</th>
+                        <th scope="col">ANSI/TIA-942-C</th>
+                        <th scope="col">ISO 50001</th>
+                        <th scope="col">ETSI EN 300 019-1-3</th>
+                        <th scope="col">EN 50600-2-3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Scope</td>
+                        <td>Thermal environment for IT equipment — temperature and humidity envelopes for servers, storage, and networking</td>
+                        <td>Data center infrastructure including power, cooling, cabling, and physical security for four tiers</td>
+                        <td>Energy management systems — continuous improvement framework applicable to any energy-intensive facility</td>
+                        <td>Environmental conditions for telecom equipment — stationary use class 3.2 (weather-protected)</td>
+                        <td>Data center infrastructure — cooling systems, design, and performance requirements</td>
+                    </tr>
+                    <tr>
+                        <td>Recommended envelope</td>
+                        <td>18–27°C, dew point 5.5–15°C, 8–60% RH (A1 class)</td>
+                        <td>Aligned to ASHRAE A1/A2; Tier III/IV typically requires A1 envelope maintained at full redundancy</td>
+                        <td>No thermal envelope defined — sets management and measurement process</td>
+                        <td>+5 to +40°C operating; 5–85% RH non-condensing</td>
+                        <td>Inlet temperature 18–27°C standard; allowable 15–35°C aligned with ASHRAE A2</td>
+                    </tr>
+                    <tr>
+                        <td>Allowable envelope</td>
+                        <td>A1: 15–32°C / A2: 10–35°C / A3: 5–40°C / A4: 5–45°C; max humidity 80% RH (A1)</td>
+                        <td>Tier III must support IT load during any single component maintenance; thermal envelope maintained throughout</td>
+                        <td>N/A — process standard, not physical envelope</td>
+                        <td>–5 to +45°C storage; non-condensing throughout operating range</td>
+                        <td>Allowable 10–40°C with documented IT equipment compatibility; humidity 8–80% RH</td>
+                    </tr>
+                    <tr>
+                        <td>Key requirement</td>
+                        <td>Declare equipment class; measure at rack inlet (not outlet); humidity per dew-point not RH; continuous monitoring mandatory</td>
+                        <td>Cooling path redundancy per tier: Tier I (N), II (N+1 partial), III (N+1 concurrent maintainable), IV (2N fault tolerant)</td>
+                        <td>Top management commitment; Energy Review baseline; EnPIs defined; energy objectives with targets; internal audit program</td>
+                        <td>Temperature and humidity classified per class 3.2; equipment rated for class must be specified in procurement</td>
+                        <td>Cooling system categorised by availability class (A1–A4); capacity, redundancy, and monitoring requirements per class</td>
+                    </tr>
+                    <tr>
+                        <td>Measurement standard</td>
+                        <td>Temperature at rack inlet top/middle/bottom; dew point at inlet; ASHRAE SI method for airflow; PUE per The Green Grid</td>
+                        <td>ANSI/TIA-942-C Annex F — testing and measurement procedures for infrastructure systems</td>
+                        <td>ISO 50006 (energy baselines and EnPIs); measurement per ISO 50015; internal audit per ISO 19011</td>
+                        <td>IEC 60721-3-3 classification methodology; ETSI TR 102 628 measurement guidance</td>
+                        <td>EN 50600-4-1 (PUE measurement); EN 50600-4-2 (REF); EN 50600-4-3 (ERE); EN 50600-4-6 (WUE)</td>
+                    </tr>
+                    <tr>
+                        <td>Certification path</td>
+                        <td>No formal certification; compliance via documented design review; referenced in many colo SLAs</td>
+                        <td>TIA/EIA certification via accredited assessors; Tier rating requires on-site assessment by TIA-942 Certified Design Consultant</td>
+                        <td>ISO 50001 certification via accredited certification body; 3-year cycle with surveillance audits; integrates with ISO 14001</td>
+                        <td>No formal certification; compliance declared by equipment vendor; referenced in procurement specifications</td>
+                        <td>Third-party assessment via accredited conformity body; EN 50600 compliance mark; often required for EU public-sector DCs</td>
+                    </tr>
+                    <tr>
+                        <td>Geographic adoption</td>
+                        <td>Global — dominant in North America, widely adopted in Asia-Pacific, Middle East, and South America; referenced by Singapore IMDA</td>
+                        <td>North America primary; widely referenced in Middle East (QP, ADNOC, STC), Southeast Asia, and Latin America</td>
+                        <td>Global — 185 countries; widely mandated for public sector and utility operators; required by EU EED Art. 12 for large DCs</td>
+                        <td>Europe primary (ETSI member nations); referenced for carrier hotel and telecom DC procurement in EU and UK</td>
+                        <td>European Union primary; increasingly referenced in Singapore, UAE, and Australia for new hyperscale builds</td>
+                    </tr>
+                    <tr>
+                        <td>Typical use case</td>
+                        <td>Colocation design basis; enterprise IT room standard; AI/GPU deployment thermal planning</td>
+                        <td>New data center design and certification; colo lease SLA basis; carrier-neutral facility classification</td>
+                        <td>Hyperscale and large enterprise energy management programmes; EU Directive compliance; sustainability reporting</td>
+                        <td>Telecom POP and carrier hotel equipment specification; equipment procurement thermal rating</td>
+                        <td>European data center design compliance; public sector procurement specification; EU taxonomy alignment</td>
+                    </tr>
+                    <tr>
+                        <td>Critical sections to cite</td>
+                        <td>§2 (recommended envelopes), §3 (allowable envelopes), §4 (humidity), Appendix A (measurement), Appendix D (liquid cooling)</td>
+                        <td>§6 (cooling), Annex C (Tier definitions), Annex F (testing), Table 6-1 (cooling system requirements by tier)</td>
+                        <td>§6.3 (energy review), §6.4 (energy baseline), §6.5 (EnPIs), §9.1 (monitoring), §9.3 (internal audit)</td>
+                        <td>§5.3 (temperature class), §5.4 (humidity class), §5.7 (operational class 3.2 limits)</td>
+                        <td>§5 (cooling system design), §6 (performance), §7 (monitoring), Annex A (availability classification)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="pcl-table-note">Table reflects publicly available editions as of 2025. Always verify current edition with ASHRAE, TIA, ISO, or ETSI. Local authority requirements may impose additional constraints.</p>
+    </section>
+
+    <!-- ========== NEW SECTION 2: Decision Matrix ========== -->
+    <section class="pcl-decision" id="pcl-decision" aria-labelledby="pcl-dec-hdr">
+        <div class="pcl-decision-inner">
+            <div class="pillar-section-header">
+                <h2 id="pcl-dec-hdr">Cooling Technology Decision Matrix</h2>
+                <p>Answer 4 questions about your deployment to receive an engineering-backed cooling recommendation with ASHRAE and TIA section references.</p>
+            </div>
+            <div class="pcl-questions">
+                <div class="pcl-q-card">
+                    <h4><span>Q1</span>What is your rack power density?</h4>
+                    <div class="pcl-options" role="group" aria-label="Rack density selection">
+                        <div class="pcl-opt" data-q="1" data-v="low" role="button" tabindex="0" aria-pressed="false">&lt;8 kW/rack</div>
+                        <div class="pcl-opt" data-q="1" data-v="mid" role="button" tabindex="0" aria-pressed="false">8–20 kW/rack</div>
+                        <div class="pcl-opt" data-q="1" data-v="high" role="button" tabindex="0" aria-pressed="false">20–50 kW/rack</div>
+                        <div class="pcl-opt" data-q="1" data-v="ultra" role="button" tabindex="0" aria-pressed="false">&gt;50 kW/rack</div>
+                    </div>
+                </div>
+                <div class="pcl-q-card">
+                    <h4><span>Q2</span>What is your primary workload type?</h4>
+                    <div class="pcl-options" role="group" aria-label="Workload type selection">
+                        <div class="pcl-opt" data-q="2" data-v="gen" role="button" tabindex="0" aria-pressed="false">General IT</div>
+                        <div class="pcl-opt" data-q="2" data-v="hpc" role="button" tabindex="0" aria-pressed="false">HPC steady</div>
+                        <div class="pcl-opt" data-q="2" data-v="ai" role="button" tabindex="0" aria-pressed="false">AI training spiky</div>
+                        <div class="pcl-opt" data-q="2" data-v="mixed" role="button" tabindex="0" aria-pressed="false">Mixed</div>
+                    </div>
+                </div>
+                <div class="pcl-q-card">
+                    <h4><span>Q3</span>What is your climate zone?</h4>
+                    <div class="pcl-options" role="group" aria-label="Climate zone selection">
+                        <div class="pcl-opt" data-q="3" data-v="temp" role="button" tabindex="0" aria-pressed="false">Temperate</div>
+                        <div class="pcl-opt" data-q="3" data-v="hotdry" role="button" tabindex="0" aria-pressed="false">Hot-dry</div>
+                        <div class="pcl-opt" data-q="3" data-v="hothumid" role="button" tabindex="0" aria-pressed="false">Hot-humid</div>
+                        <div class="pcl-opt" data-q="3" data-v="cold" role="button" tabindex="0" aria-pressed="false">Cold</div>
+                    </div>
+                </div>
+                <div class="pcl-q-card">
+                    <h4><span>Q4</span>What is your water access situation?</h4>
+                    <div class="pcl-options" role="group" aria-label="Water access selection">
+                        <div class="pcl-opt" data-q="4" data-v="abund" role="button" tabindex="0" aria-pressed="false">Abundant</div>
+                        <div class="pcl-opt" data-q="4" data-v="restricted" role="button" tabindex="0" aria-pressed="false">Restricted</div>
+                        <div class="pcl-opt" data-q="4" data-v="none" role="button" tabindex="0" aria-pressed="false">None / closed loop only</div>
                     </div>
                 </div>
             </div>
-            <div class="faq-item">
-                <button class="faq-question">
-                    Why is cooling the biggest energy consumer in data centers?
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">
-                        Every watt of IT power generates heat that must be removed to prevent equipment failure. With rack densities increasing from 5 kW (traditional) to 30+ kW (high density) and AI/GPU clusters reaching 100+ kW, cooling demand scales proportionally. Compressors, pumps, fans, and cooling towers all consume significant power. In tropical climates without free cooling, the cooling overhead is even higher because the outdoor temperature rarely drops below the ASHRAE recommended supply air temperature.
+            <button class="pcl-calc-btn" id="pclCalcBtn" aria-label="Calculate cooling recommendation">Get Recommendation</button>
+            <div class="pcl-result" id="pclResult" role="region" aria-live="polite" aria-label="Cooling recommendation result">
+                <div class="pcl-result-tech" id="pclTech"></div>
+                <div class="pcl-result-std" id="pclStd"></div>
+                <h5>Why this recommendation</h5>
+                <ul id="pclWhy"></ul>
+                <h5>Trade-offs to consider</h5>
+                <ul id="pclTrade"></ul>
+                <div class="pcl-result-links" id="pclLinks"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 3: Compliance Checklist ========== -->
+    <section class="pcl-checklist-section" id="pcl-checklist" aria-labelledby="pcl-cl-hdr">
+        <div class="pcl-checklist-inner">
+            <div class="pillar-section-header">
+                <h2 id="pcl-cl-hdr">Cooling Compliance Checklist</h2>
+                <p>33-item interactive checklist across thermal envelope, airflow management, liquid cooling, efficiency, and maintenance. State persists across sessions.</p>
+            </div>
+            <div class="pcl-score-bar" role="status" aria-live="polite" aria-label="Checklist score">
+                <div class="pcl-score-num" id="pclScoreNum">0/33</div>
+                <div class="pcl-score-label">Items checked — complete all 33 for compliance certification readiness</div>
+                <div class="pcl-score-status red" id="pclScoreStatus">Critical gaps</div>
+            </div>
+
+            <!-- Thermal Envelope -->
+            <div class="pcl-cl-group">
+                <div class="pcl-cl-group-hdr">Thermal Envelope <span>(8 items)</span></div>
+                <div class="pcl-cl-items">
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl1" aria-label="Cold-aisle temperature 18-27°C"><label for="pcl1">Cold-aisle inlet temperature maintained 18–27°C at all monitored points <span class="cite">(ASHRAE TC 9.9 A1 recommended)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl2" aria-label="Dew point 5.5-15°C"><label for="pcl2">Dew point maintained 5.5–15°C at rack inlets; no condensation risk during economiser transitions <span class="cite">(ASHRAE TC 9.9 §4)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl3" aria-label="Relative humidity 8-60%"><label for="pcl3">Relative humidity maintained 8–60% RH within the IT space during normal operation <span class="cite">(ASHRAE A1 allowable)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl4" aria-label="No humidity excursion greater than 10% per hour"><label for="pcl4">No humidity excursion exceeding 10%/hr; BMS alarm configured to alert on rapid humidity change <span class="cite">(ASHRAE TC 9.9 §4.4)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl5" aria-label="Sensors at top, middle, and bottom of rack"><label for="pcl5">Temperature and humidity sensors at top, middle, and bottom of representative racks per aisle <span class="cite">(ASHRAE TC 9.9 Appendix A)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl6" aria-label="Measured at inlet not outlet"><label for="pcl6">All thermal measurements taken at rack inlet, not outlet — outlet temperatures are exhaust, not environmental conditions <span class="cite">(ASHRAE TC 9.9 §2.3)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl7" aria-label="ASHRAE class declared in design documentation"><label for="pcl7">ASHRAE equipment class (A1/A2/A3/A4) declared in design documentation; IT equipment compatibility verified <span class="cite">(ASHRAE TC 9.9 §2.1)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl8" aria-label="Real-time temperature dashboard operational"><label for="pcl8">Real-time thermal dashboard operational with historical trending for at least 30 days of data retention <span class="cite">(EN 50600-2-3 §7)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Airflow Management -->
+            <div class="pcl-cl-group">
+                <div class="pcl-cl-group-hdr">Airflow Management <span>(7 items)</span></div>
+                <div class="pcl-cl-items">
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl9" aria-label="Hot/cold aisle containment installed"><label for="pcl9">Hot/cold aisle containment installed with doors, ceiling panels, and end-of-row seals <span class="cite">(ASHRAE TC 9.9 Appendix F)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl10" aria-label="Blanking panels in every empty U-space"><label for="pcl10">Blanking panels installed in every empty U-space in all populated racks — no gaps above or below equipment <span class="cite">(ASHRAE TC 9.9 best practice)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl11" aria-label="Raised-floor tile placement matched to thermal load"><label for="pcl11">Raised-floor perforated tile location and % open area matched to rack thermal load map; hot spots eliminated <span class="cite">(ASHRAE TC 9.9 Appendix F)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl12" aria-label="Perforated tile open percentage specified"><label for="pcl12">Perforated tile % open area specified per section (typically 25% standard, 56% high-density zones) <span class="cite">(ASHRAE TC 9.9 Appendix F)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl13" aria-label="Brush/grommet seals around all cable cutouts"><label for="pcl13">Brush grommet or rubber gasket seals installed around all cable cutouts through raised floor tiles and containment walls <span class="cite">(ASHRAE TC 9.9 Appendix F)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl14" aria-label="Return-air bypass less than 10%"><label for="pcl14">Return-air bypass (hot air recirculating into cold aisle) measured and maintained below 10% of total CRAH airflow <span class="cite">(ASHRAE TC 9.9 §3.4)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl15" aria-label="CRAC supply temperature spread within 3°C"><label for="pcl15">CRAC/CRAH supply temperature spread less than 3°C between units in the same zone — unbalanced units indicate airflow or load imbalance <span class="cite">(ASHRAE TC 9.9 §3.5)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Liquid Cooling Readiness -->
+            <div class="pcl-cl-group">
+                <div class="pcl-cl-group-hdr">Liquid Cooling Readiness <span>(6 items)</span></div>
+                <div class="pcl-cl-items">
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl16" aria-label="CDU sized for full IT load"><label for="pcl16">Coolant Distribution Unit (CDU) sized to carry 100% IT liquid load plus 20% headroom at design ambient <span class="cite">(ASHRAE TC 9.9 Appendix D)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl17" aria-label="Leak detection at every manifold"><label for="pcl17">Secondary loop leak detection sensors installed at every manifold connection point; alarm wired to BMS <span class="cite">(EN 50600-2-3 §6.4)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl18" aria-label="Dielectric coolant compatibility verified"><label for="pcl18">Dielectric coolant compatibility verified for all IT components in immersion or D2C systems; OEM approval documented <span class="cite">(ASHRAE TC 9.9 Appendix D)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl19" aria-label="Supply temperature 30-45°C"><label for="pcl19">Facility water supply temperature 30–45°C to CDU/manifold; below 30°C risks condensation on external pipework <span class="cite">(ASHRAE TC 9.9 Appendix D §D.2)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl20" aria-label="Return temperature 50-65°C"><label for="pcl20">Facility water return temperature 50–65°C from CDU/manifold — within range for heat recovery and dry cooler efficiency <span class="cite">(ASHRAE TC 9.9 Appendix D)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl21" aria-label="Flow rate 1.5-3 L/min/kW"><label for="pcl21">Coolant flow rate 1.5–3 L/min/kW IT load confirmed at design point; flow meters installed on primary loop <span class="cite">(ASHRAE TC 9.9 Appendix D §D.3)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Economizer & Efficiency -->
+            <div class="pcl-cl-group">
+                <div class="pcl-cl-group-hdr">Economiser &amp; Efficiency <span>(6 items)</span></div>
+                <div class="pcl-cl-items">
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl22" aria-label="Free-cooling hours measured annually"><label for="pcl22">Free-cooling (economiser) hours measured and recorded annually; baseline established for trending <span class="cite">(EN 50600-4-1 §5)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl23" aria-label="PUE measured continuously"><label for="pcl23">PUE measured continuously via BMS; monthly and annual averages reported against target <span class="cite">(EN 50600-4-1; The Green Grid)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl24" aria-label="WUE measured and tracked"><label for="pcl24">WUE measured and tracked; water consumption metered at all cooling tower make-up, humidification, and CDU inputs <span class="cite">(EN 50600-4-6; The Green Grid)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl25" aria-label="Economiser changeover setpoint optimised"><label for="pcl25">Economiser changeover set point optimised seasonally; wet-bulb approach temperature minimised for maximum free-cooling hours <span class="cite">(ASHRAE TC 9.9 Appendix F)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl26" aria-label="Chilled-water reset schedule implemented"><label for="pcl26">Chilled-water supply temperature reset schedule implemented — temperature raised during low-load or low-ambient conditions <span class="cite">(ASHRAE Handbook: HVAC Systems)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl27" aria-label="VFDs on all CRAH fans, chillers, and cooling tower fans"><label for="pcl27">Variable frequency drives (VFDs) installed on all CRAH fans, chiller compressors, and cooling tower fans <span class="cite">(ISO 50001 §6.3; EU Eco-Design)</span></label></div>
+                </div>
+            </div>
+
+            <!-- Maintenance & Lifecycle -->
+            <div class="pcl-cl-group">
+                <div class="pcl-cl-group-hdr">Maintenance &amp; Lifecycle <span>(6 items)</span></div>
+                <div class="pcl-cl-items">
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl28" aria-label="Filter change cadence on schedule"><label for="pcl28">CRAC/CRAH filter change cadence defined and on schedule; pressure drop across filters monitored as trigger <span class="cite">(ASHRAE 62.1; OEM maintenance manuals)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl29" aria-label="Coil cleaning scheduled annually"><label for="pcl29">Condenser and evaporator coil cleaning scheduled annually; fouling factor below manufacturer limits confirmed <span class="cite">(ASHRAE Handbook: Refrigeration)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl30" aria-label="Refrigerant leak check annual"><label for="pcl30">Annual refrigerant leak check completed; EU F-Gas annual check mandatory for systems ≥5 tCO₂e; records retained ≥5 years <span class="cite">(EU Reg. 2024/573 Art. 5)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl31" aria-label="Chiller annual service completed"><label for="pcl31">Chiller annual service completed — vibration analysis, oil sample, compressor inspection, safety valve test <span class="cite">(ASHRAE 15; OEM maintenance schedule)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl32" aria-label="Cooling tower water treatment program active"><label for="pcl32">Cooling tower water treatment programme active — biocide dosing, Legionella risk assessment, bleed-off control, quarterly analysis <span class="cite">(ASHRAE 12; HSE L8 UK; CDC Legionella guidance)</span></label></div>
+                    <div class="pcl-cl-item"><input type="checkbox" id="pcl33" aria-label="BMS alarm thresholds reviewed quarterly"><label for="pcl33">BMS cooling alarm thresholds reviewed quarterly; stale setpoints identified and corrected; alarm response procedures tested <span class="cite">(EN 50600-2-3 §7; ISO 50001 §9.1)</span></label></div>
+                </div>
+            </div>
+
+            <div class="pcl-cl-btn-row">
+                <button class="pcl-cl-btn pcl-cl-btn-reset" id="pclClReset" aria-label="Reset checklist">Reset</button>
+                <button class="pcl-cl-btn pcl-cl-btn-export" id="pclClExport" aria-label="Export checklist as text">Export</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 4: Cost Calculator ========== -->
+    <section class="pcl-cost" id="pcl-cost-calc" aria-labelledby="pcl-cost-hdr">
+        <div class="pcl-cost-inner">
+            <div class="pillar-section-header">
+                <h2 id="pcl-cost-hdr">Cooling Cost & TCO Calculator</h2>
+                <p>Estimate CAPEX, annual cooling energy, PUE, WUE, and 10-year TCO for your cooling scenario. Illustrative benchmarks only.</p>
+            </div>
+            <div class="pcl-cost-grid">
+                <div class="pcl-cost-inputs">
+                    <h3>Inputs</h3>
+                    <div class="pcl-field">
+                        <label for="pclITLoad">IT Load (kW)</label>
+                        <input type="number" id="pclITLoad" value="1000" min="10" max="100000" aria-label="IT load in kilowatts">
+                    </div>
+                    <div class="pcl-field">
+                        <label for="pclCoolingType">Cooling Type</label>
+                        <select id="pclCoolingType" aria-label="Cooling type selection">
+                            <option value="air_dx">Air Cooling — DX (CRAC)</option>
+                            <option value="air_cw">Air Cooling — Chilled Water (CRAH)</option>
+                            <option value="rdhx">Rear-Door Heat Exchanger</option>
+                            <option value="d2c">Direct-to-Chip Liquid (D2C)</option>
+                            <option value="immersion">Immersion Cooling</option>
+                        </select>
+                    </div>
+                    <div class="pcl-field">
+                        <label for="pclElecRate">Electricity Rate ($/kWh)</label>
+                        <input type="number" id="pclElecRate" value="0.09" min="0.01" max="0.50" step="0.01" aria-label="Electricity rate per kilowatt-hour">
+                    </div>
+                    <div class="pcl-field">
+                        <label for="pclWaterRate">Water Rate ($/m³)</label>
+                        <input type="number" id="pclWaterRate" value="1.50" min="0.10" max="20" step="0.10" aria-label="Water rate per cubic metre">
+                    </div>
+                    <div class="pcl-field">
+                        <label for="pclRedundancy">Redundancy</label>
+                        <select id="pclRedundancy" aria-label="Redundancy level">
+                            <option value="1.0">N (no redundancy)</option>
+                            <option value="1.3" selected>N+1 (Tier III typical)</option>
+                            <option value="1.7">2N (Tier IV)</option>
+                        </select>
+                    </div>
+                    <button class="pcl-calc-btn" id="pclCostCalcBtn" aria-label="Calculate cooling TCO">Calculate</button>
+                </div>
+                <div class="pcl-cost-outputs" id="pclCostOutputs">
+                    <div class="pcl-out-card">
+                        <div class="pcl-out-label">CAPEX (Cooling Plant)</div>
+                        <div class="pcl-out-val" id="pclOutCapex">—</div>
+                    </div>
+                    <div class="pcl-out-card">
+                        <div class="pcl-out-label">Annual Cooling Energy (kWh)</div>
+                        <div class="pcl-out-val" id="pclOutEnergy">—</div>
+                    </div>
+                    <div class="pcl-out-card">
+                        <div class="pcl-out-label">Annual Cooling Cost</div>
+                        <div class="pcl-out-val" id="pclOutEnergyCost">—</div>
+                    </div>
+                    <div class="pcl-out-card">
+                        <div class="pcl-out-label">PUE Estimate</div>
+                        <div class="pcl-out-val" id="pclOutPUE">—</div>
+                    </div>
+                    <div class="pcl-out-card">
+                        <div class="pcl-out-label">WUE Estimate (L/kWh)</div>
+                        <div class="pcl-out-val" id="pclOutWUE">—</div>
+                    </div>
+                    <div class="pcl-out-card">
+                        <div class="pcl-out-label">10-Year TCO (Cooling)</div>
+                        <div class="pcl-out-val" id="pclOutTCO">—</div>
                     </div>
                 </div>
             </div>
-            <div class="faq-item">
-                <button class="faq-question">
-                    When should you switch from air cooling to liquid cooling?
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">
-                        Consider liquid cooling when rack densities exceed 25-30 kW, when PUE targets require sub-1.3 performance, or when deploying GPU/AI workloads that generate concentrated heat. Direct liquid cooling can handle 100+ kW per rack with PUE values of 1.03-1.1. The transition decision depends on density requirements, local climate, water availability, retrofit costs, and total cost of ownership over a 10-15 year lifecycle. Many operators adopt a hybrid approach, using air cooling for standard IT and liquid cooling for high-density AI zones.
+            <p class="pcl-table-note">Illustrative benchmarks only. CAPEX per kW: Air-DX $1,200, Air-CW $1,500, RDHX $1,800, D2C $2,400, Immersion $3,000. Redundancy multiplier applied to CAPEX. Annual energy = IT load × 8,760 hrs × cooling overhead fraction. 10-yr TCO = CAPEX + 10 × (annual cooling cost + annual water cost). Always obtain vendor quotes for project-specific sizing.</p>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 5: Heat-Removal Flow Diagram (5-tier accordion) ========== -->
+    <section class="pcl-heat-flow" id="pcl-heat-flow" aria-labelledby="pcl-hf-hdr">
+        <div class="pcl-hf-inner">
+            <div class="pillar-section-header">
+                <h2 id="pcl-hf-hdr">Heat-Removal Path — 5 Tiers</h2>
+                <p>From silicon junction to facility boundary: how heat moves through a data center and where each cooling technology acts.</p>
+            </div>
+            <div class="pcl-pyramid-wrap">
+                <div class="pcl-tier pcl-tier-1" id="pclTier1">
+                    <div class="pcl-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pclTier1Detail" onclick="pclToggleTier('pclTier1')" onkeydown="if(event.key==='Enter'||event.key===' ')pclToggleTier('pclTier1')">
+                        <span class="pcl-tier-num">Tier 1</span>
+                        <span class="pcl-tier-label">Chip</span>
+                        <span class="pcl-tier-subs">Silicon junction · TDP · Throttle threshold</span>
+                        <span class="pcl-tier-arrow">▼</span>
+                    </div>
+                    <div class="pcl-tier-detail" id="pclTier1Detail">
+                        <div class="pcl-tier-detail-inner">
+                            Heat originates at transistor junctions inside the CPU or GPU die. Junction temperature (Tj) must stay below the thermal design maximum — typically 80–105°C for enterprise CPUs, 83–90°C for datacenter GPUs. Thermal Design Power (TDP) is the maximum sustained heat output the cooling solution must handle. If Tj exceeds the threshold, the processor throttles frequency and voltage to reduce heat, degrading performance. Typical Tier 1 ΔT: junction to case ~10–25°C.
+                            <ul>
+                                <li><strong>Technologies:</strong> Integrated heat spreader (IHS), thermal interface material (TIM), die backside metallisation</li>
+                                <li><strong>ΔT typical:</strong> 10–25°C (junction to case lid)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="pcl-tier pcl-tier-2" id="pclTier2">
+                    <div class="pcl-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pclTier2Detail" onclick="pclToggleTier('pclTier2')" onkeydown="if(event.key==='Enter'||event.key===' ')pclToggleTier('pclTier2')">
+                        <span class="pcl-tier-num">Tier 2</span>
+                        <span class="pcl-tier-label">Server</span>
+                        <span class="pcl-tier-subs">Heat sink · Server fans · Cold-plate</span>
+                        <span class="pcl-tier-arrow">▼</span>
+                    </div>
+                    <div class="pcl-tier-detail" id="pclTier2Detail">
+                        <div class="pcl-tier-detail-inner">
+                            Inside the server chassis, heat is transferred from the chip package to either an air-cooled heat sink (with server fans forcing air across fins) or a liquid cold plate (circulating coolant through channels bonded to the chip package). Air-cooled servers exhaust 40–60°C air. Cold-plate liquid servers return 50–65°C facility water. GPU modules with TDP of 300–1,000 W each require high-airflow or liquid-cooled cold plates to prevent throttling.
+                            <ul>
+                                <li><strong>Air path:</strong> Heat sink fins + server fans (PWM 6,000–20,000 RPM) → 40–60°C exhaust</li>
+                                <li><strong>Liquid path:</strong> Cold plate → coolant manifold → CDU return at 50–65°C</li>
+                                <li><strong>ΔT typical:</strong> 15–35°C (case to exhaust air or coolant return)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="pcl-tier pcl-tier-3" id="pclTier3">
+                    <div class="pcl-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pclTier3Detail" onclick="pclToggleTier('pclTier3')" onkeydown="if(event.key==='Enter'||event.key===' ')pclToggleTier('pclTier3')">
+                        <span class="pcl-tier-num">Tier 3</span>
+                        <span class="pcl-tier-label">Rack</span>
+                        <span class="pcl-tier-subs">CDU on rack · In-row CRAH · Rear-door HX</span>
+                        <span class="pcl-tier-arrow">▼</span>
+                    </div>
+                    <div class="pcl-tier-detail" id="pclTier3Detail">
+                        <div class="pcl-tier-detail-inner">
+                            At the rack level, heat is managed by the combination of containment, in-row cooling units, rear-door heat exchangers, or rack-mounted CDUs. In-row CRAH units sit between rows and capture hot exhaust before it mixes with cold supply. Rear-door HX attach to the back of racks and cool exhaust to near-neutral temperature before it enters the hot aisle. Rack CDUs receive liquid from floor manifolds and distribute to cold plates inside the rack. Containment walls prevent hot/cold mixing.
+                            <ul>
+                                <li><strong>In-row CRAH:</strong> Reduces hot aisle temperature from 55–70°C to 28–35°C</li>
+                                <li><strong>Rear-door HX:</strong> Cools exhaust from 55°C to 25–30°C using chilled water at 12–18°C supply</li>
+                                <li><strong>CDU supply:</strong> 30–45°C; return: 50–65°C; ΔT across rack ~15–20°C</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="pcl-tier pcl-tier-4" id="pclTier4">
+                    <div class="pcl-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pclTier4Detail" onclick="pclToggleTier('pclTier4')" onkeydown="if(event.key==='Enter'||event.key===' ')pclToggleTier('pclTier4')">
+                        <span class="pcl-tier-num">Tier 4</span>
+                        <span class="pcl-tier-label">Room</span>
+                        <span class="pcl-tier-subs">CRAC/CRAH · Raised floor · Containment</span>
+                        <span class="pcl-tier-arrow">▼</span>
+                    </div>
+                    <div class="pcl-tier-detail" id="pclTier4Detail">
+                        <div class="pcl-tier-detail-inner">
+                            Room-level cooling units (CRAC — Computer Room Air Conditioner with internal DX refrigeration; CRAH — Computer Room Air Handler that uses chilled water) manage the overall thermal balance of the data hall. The raised floor acts as a pressurised plenum delivering cold air through perforated tiles at floor level to the front of racks. Containment systems (cold aisle or hot aisle) prevent mixing. Room temperature should be maintained uniformly at the ASHRAE recommended envelope without hot spots above 27°C.
+                            <ul>
+                                <li><strong>CRAC:</strong> Self-contained DX refrigeration; supply 18–20°C; less efficient at high ambient</li>
+                                <li><strong>CRAH:</strong> Uses chilled water from central plant; supply 12–18°C; more efficient; requires plant redundancy</li>
+                                <li><strong>ΔT typical (room):</strong> 8–12°C supply to return at CRAC/CRAH coil</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="pcl-tier pcl-tier-5" id="pclTier5">
+                    <div class="pcl-tier-bar" role="button" tabindex="0" aria-expanded="false" aria-controls="pclTier5Detail" onclick="pclToggleTier('pclTier5')" onkeydown="if(event.key==='Enter'||event.key===' ')pclToggleTier('pclTier5')">
+                        <span class="pcl-tier-num">Tier 5</span>
+                        <span class="pcl-tier-label">Facility</span>
+                        <span class="pcl-tier-subs">Chiller · Cooling tower · Dry cooler · Economiser</span>
+                        <span class="pcl-tier-arrow">▼</span>
+                    </div>
+                    <div class="pcl-tier-detail" id="pclTier5Detail">
+                        <div class="pcl-tier-detail-inner">
+                            The facility boundary is where heat is ultimately rejected to the environment. Chillers use vapour-compression refrigeration to produce chilled water (6–12°C supply) for the CRAH/RDHX loops. Cooling towers reject condenser heat to atmosphere via evaporation. Dry coolers (closed-circuit fluid coolers) reject heat without evaporative water loss. Air-side economisers bring outdoor air directly into the data hall during cool weather. Warm-water economisers (water-side economisers) use a plate heat exchanger to produce chilled water from cooling tower water when outdoor wet-bulb temperatures are low enough.
+                            <ul>
+                                <li><strong>Chiller CoP:</strong> 3.0–6.0 depending on load and ambient; modern magnetic bearing chillers reach CoP 8+ at part load</li>
+                                <li><strong>Cooling tower WUE impact:</strong> 1.5–3.0 L/kWh of heat rejected (evaporation + drift + bleed)</li>
+                                <li><strong>Air-side economiser:</strong> Zero refrigeration energy when active; typical annual hours: 500 (tropics) to 7,000+ (northern Europe)</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- ========== NEW SECTION 6: Case Studies ========== -->
+    <section class="pcl-cases" id="pcl-cases" aria-labelledby="pcl-cases-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pcl-cases-hdr">Cooling Case Studies</h2>
+            <p>Three real-world deployments demonstrating advanced cooling technologies and their operational outcomes.</p>
+        </div>
+        <div class="pcl-cases-grid">
+            <div class="pcl-case-card">
+                <span class="pcl-case-date">Singapore — 2022</span>
+                <h3>Meta Singapore — Equatorial Indirect Adiabatic Cooling</h3>
+                <p>Meta's Singapore data center became the first hyperscale facility to deploy indirect adiabatic cooling in an equatorial climate, where ambient temperatures rarely drop below 28°C and humidity exceeds 80% year-round. The design uses an indirect evaporative cooling stage that pre-cools outdoor air without introducing moisture into the IT space.</p>
+                <div class="pcl-case-meta">
+                    <strong>Key result: </strong><span>PUE 1.19 achieved despite 30°C+ ambient — significantly below Singapore average of ~1.55 for conventional colo. ASHRAE A2 envelope maintained continuously. Zero mechanical refrigeration chillers in primary cooling path.</span>
+                </div>
+                <div class="pcl-case-takeaways">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li>Indirect adiabatic cooling is viable in tropical climates when supply air humidity is carefully separated from the evaporative stage</li>
+                        <li>Widening the IT envelope to ASHRAE A2 (allowable 10–35°C) was essential to achieve the free-cooling hours required for the PUE target</li>
+                        <li>Water consumption (WUE) remains a trade-off — adiabatic cooling consumes more water than mechanical refrigeration; site water management plan was mandatory</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pcl-case-card">
+                <span class="pcl-case-date">Scottish Coast, UK — 2018–2020</span>
+                <h3>Microsoft Project Natick — Underwater Nitrogen-Atmosphere Cooling</h3>
+                <p>Microsoft submerged a sealed 12-rack data center module on the seabed off the Orkney Islands for two years, cooling it passively with seawater piped through a heat exchanger. The nitrogen atmosphere (rather than air) inside the vessel eliminated humidity and oxygen-related corrosion and virtually eliminated hardware failures.</p>
+                <div class="pcl-case-meta">
+                    <strong>Key result: </strong><span>Hardware failure rate was 1/8th of equivalent land-based deployment over 2 years. Seawater at 12°C provided near-free cooling. Nitrogen atmosphere reduced corrosion and eliminated moisture-related failures — demonstrating that the atmosphere, not just temperature, drives equipment reliability.</span>
+                </div>
+                <div class="pcl-case-takeaways">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li>Controlled atmosphere (nitrogen, zero humidity) is as important as temperature for hardware reliability — a lesson applicable to sealed immersion tank design</li>
+                        <li>Passive seawater cooling achieves near-zero PUE overhead and zero water consumption (closed-loop seawater heat exchange, no evaporation)</li>
+                        <li>Deployment logistics and maintenance access remain the primary barriers to commercial scaling of submerged or remote hermetic designs</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pcl-case-card">
+                <span class="pcl-case-date">Strasbourg, France — 2021–2023</span>
+                <h3>OVHcloud Strasbourg — Adiabatic Free Cooling Post-SBG2 Rebuild</h3>
+                <p>Following the catastrophic March 2021 SBG2 fire that destroyed one data center building and damaged three others, OVHcloud rebuilt the Strasbourg campus with structural compartmentation specifically designed to prevent fire spread and with adiabatic free cooling as the primary cooling strategy for the replacement SBG5 building.</p>
+                <div class="pcl-case-meta">
+                    <strong>Key result: </strong><span>SBG5 achieved PUE of 1.09 using air-side adiabatic economisers and Strasbourg's temperate climate (5,500+ free-cooling hours/year). The rebuild incorporated both fire compartmentation and thermal architecture lessons simultaneously — demonstrating that cooling redesign and fire safety redesign are coupled decisions in post-incident rebuilds.</span>
+                </div>
+                <div class="pcl-case-takeaways">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li>Temperate European climates enable adiabatic free cooling with minimal water consumption — Strasbourg's climate allows economiser operation for most of the year</li>
+                        <li>Compartmentation rebuilt simultaneously with cooling architecture — fire separation between modules reduces both fire risk and CRAC/CRAH zone complexity</li>
+                        <li>Post-incident rebuilds present the best opportunity to adopt next-generation cooling because the structural investment is being made regardless of efficiency gain</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 7: Glossary ========== -->
+    <section class="pcl-glossary" id="pcl-glossary" aria-labelledby="pcl-gloss-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pcl-gloss-hdr">Cooling Glossary</h2>
+            <p>14 key terms in data center thermal management — from efficiency metrics to physical phenomena.</p>
+        </div>
+        <div class="pcl-glossary-grid">
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">PUE</div>
+                <div class="pcl-term-def">Power Usage Effectiveness — ratio of total facility power to IT equipment power. PUE = 1.0 is theoretical perfection; global average is 1.58.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">WUE</div>
+                <div class="pcl-term-def">Water Usage Effectiveness — litres of water consumed per kWh of IT energy. Industry benchmark ~1.8 L/kWh; liquid-cooled hyperscale leaders achieve &lt;0.5 L/kWh.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">CRAH</div>
+                <div class="pcl-term-def">Computer Room Air Handler — a precision cooling unit that uses chilled water from a central plant, rather than a built-in compressor. More efficient than CRAC at scale; requires chiller plant redundancy.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">CRAC</div>
+                <div class="pcl-term-def">Computer Room Air Conditioner — a self-contained precision cooling unit with an integrated DX refrigeration compressor. Can operate independently but less efficient than centralised chilled water at large scale.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">CDU</div>
+                <div class="pcl-term-def">Coolant Distribution Unit — the interface between the facility chilled-water loop and the rack-level liquid cooling loop. Contains pumps, heat exchangers, and flow controls for distributing coolant to cold plates or manifolds.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">D2C (Direct-to-Chip)</div>
+                <div class="pcl-term-def">Liquid cooling method where coolant circulates through cold plates bonded directly to CPU/GPU packages inside a standard server chassis. Peripheral components remain air-cooled. Enables 30–100 kW/rack densities.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">TDP</div>
+                <div class="pcl-term-def">Thermal Design Power — the maximum sustained heat a processor generates under full workload, which the cooling solution must continuously remove without throttling. Measured in watts; ranges from 250 W (server CPU) to 1,000 W (AI accelerator).</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">ΔT (Delta-T)</div>
+                <div class="pcl-term-def">Temperature difference between two measurement points — e.g., the temperature rise across a rack from front inlet to rear exhaust, or the chilled water supply-to-return temperature differential. Critical for sizing cooling equipment and detecting airflow problems.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">Free Cooling</div>
+                <div class="pcl-term-def">Using outdoor air or cool ambient water to remove data center heat without operating mechanical refrigeration compressors — eliminating compressor energy during qualifying weather conditions. Also called economiser mode.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">Economiser</div>
+                <div class="pcl-term-def">System or operating mode that bypasses mechanical refrigeration by using outdoor conditions directly. Air-side economisers introduce outdoor air; water-side economisers use a heat exchanger between cooling tower water and chilled water loop when ambient wet-bulb temperature is sufficiently low.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">Dew Point</div>
+                <div class="pcl-term-def">The temperature at which air becomes saturated and water vapour begins to condense. ASHRAE recommends maintaining a dew point of 5.5–15°C in IT spaces. Below 5.5°C risks static electricity damage; above 15°C risks condensation on cooled surfaces.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">Adiabatic Cooling</div>
+                <div class="pcl-term-def">Cooling by evaporating water into incoming air, absorbing heat as latent energy. Direct adiabatic introduces moisture directly; indirect adiabatic pre-cools air on the wet side of a plate heat exchanger without adding moisture to the supply air. Used in data centers to extend free-cooling hours in hot climates.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">Immersion (Single-Phase)</div>
+                <div class="pcl-term-def">Servers fully submerged in a bath of non-evaporating dielectric fluid (engineered mineral oil or synthetic fluid). Fluid absorbs heat by convection and is pumped to an external dry cooler or heat exchanger. Enables 100+ kW/rack. Fluid remains liquid throughout; servers stay continuously wet.</div>
+            </div>
+            <div class="pcl-term-card">
+                <div class="pcl-term-name">Immersion (Two-Phase)</div>
+                <div class="pcl-term-def">Servers submerged in a low-boiling-point dielectric fluid (fluorinated hydrocarbon, e.g., 3M Novec). Fluid boils directly off chips, capturing latent heat; vapour condenses on a water-cooled condenser above the tank and drips back. Achieves highest thermal density with near-zero pump energy but requires fluorinated fluid containment and OEM re-engineering.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEW SECTION 8: Cross-Links ========== -->
+    <section class="pcl-related" id="pcl-related" aria-labelledby="pcl-rel-hdr">
+        <div class="pillar-section-header">
+            <h2 id="pcl-rel-hdr">Related Tools &amp; References</h2>
+            <p>Deep-dive resources connected to this cooling pillar — calculators, interactive labs, and system references.</p>
+        </div>
+        <div class="pcl-related-grid">
+            <a href="pue-calculator.html" class="pcl-related-card">
+                <div class="pcl-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/></svg></div>
+                <div class="pcl-related-text"><strong>PUE Calculator</strong><span>Calculator</span></div>
+            </a>
+            <a href="compare-air-vs-liquid-cooling.html" class="pcl-related-card">
+                <div class="pcl-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <div class="pcl-related-text"><strong>Air vs Liquid Cooling</strong><span>Comparison</span></div>
+            </a>
+            <a href="ltc-system-modelling-lab.html" class="pcl-related-card">
+                <div class="pcl-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+                <div class="pcl-related-text"><strong>LTC System Modelling Lab</strong><span>Virtual Lab</span></div>
+            </a>
+            <a href="chiller-plant.html" class="pcl-related-card">
+                <div class="pcl-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+                <div class="pcl-related-text"><strong>Chiller Plant SCADA</strong><span>Interactive Simulation</span></div>
+            </a>
+            <a href="water-system.html" class="pcl-related-card">
+                <div class="pcl-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
+                <div class="pcl-related-text"><strong>Water System</strong><span>System Reference</span></div>
+            </a>
+            <a href="tools.html" class="pcl-related-card">
+                <div class="pcl-related-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                <div class="pcl-related-text"><strong>All Tools</strong><span>Tools Hub</span></div>
+            </a>
+        </div>
+    </section>
+
     </main>
 
     <!-- Independence Disclaimer -->
@@ -1025,7 +2001,160 @@
                 if (!isActive) item.classList.add('active');
             });
         });
+
+        // PCL Decision Matrix
+        document.querySelectorAll('.pcl-opt').forEach(function(opt){
+            opt.addEventListener('click', function(){
+                var q = this.getAttribute('data-q');
+                document.querySelectorAll('.pcl-opt[data-q="'+q+'"]').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed','false'); });
+                this.classList.add('selected');
+                this.setAttribute('aria-pressed','true');
+            });
+        });
+        var pclCalcBtn = document.getElementById('pclCalcBtn');
+        if(pclCalcBtn){
+            pclCalcBtn.addEventListener('click', function(){
+                var q1 = (document.querySelector('.pcl-opt[data-q="1"].selected')||{}).getAttribute('data-v');
+                var q2 = (document.querySelector('.pcl-opt[data-q="2"].selected')||{}).getAttribute('data-v');
+                var q3 = (document.querySelector('.pcl-opt[data-q="3"].selected')||{}).getAttribute('data-v');
+                var q4 = (document.querySelector('.pcl-opt[data-q="4"].selected')||{}).getAttribute('data-v');
+                if(!q1||!q2||!q3||!q4){ alert('Please answer all 4 questions.'); return; }
+                var tech, std, why=[], trade=[], links='';
+                if(q1==='ultra'||q2==='hpc'){
+                    tech='Immersion Cooling (Single- or Two-Phase)';
+                    std='ASHRAE TC 9.9 Appendix D · ANSI/TIA-942-C Tier III/IV';
+                    why=['Rack densities above 50 kW or sustained HPC workloads exceed air and rear-door limits','Immersion provides the highest thermal density — 100+ kW/rack with PUE 1.03–1.07','Eliminates airside fans entirely, reducing both PUE and acoustic noise'];
+                    trade=['Requires full IT hardware re-engineering for two-phase; check OEM support','Single-phase fluid costs are significant; closed-loop management needed','Dielectric fluid handling, spill containment, and maintenance procedures must be established'];
+                    links='<a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a><a href="ltc-system-modelling-lab.html">Modelling Lab</a>';
+                } else if(q1==='high'||(q1==='mid'&&q2==='ai')){
+                    tech='Direct-to-Chip Liquid Cooling (D2C)';
+                    std='ASHRAE TC 9.9 Appendix D · ANSI/TIA-942-C Tier III';
+                    why=['20–50 kW/rack with spiky AI workloads requires liquid cold plates at CPU/GPU','D2C retrofits into standard server chassis without full IT re-engineering','PUE 1.05–1.15 achievable; closed-loop CDU eliminates evaporative water use'];
+                    trade=['Cold plate compatibility must be verified per server OEM model','CDU CAPEX ($2,400/kW) is higher than air cooling; payback period 3–5 years at scale','Leak detection at every manifold is mandatory — water near servers requires rigorous management'];
+                    links='<a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a><a href="chiller-plant.html">Chiller Plant</a>';
+                } else if(q1==='mid'&&q4!=='abund'&&q3!=='hotdry'){
+                    tech='Air Cooling + Rear-Door Heat Exchanger (RDHX)';
+                    std='ASHRAE TC 9.9 A1/A2 · ANSI/TIA-942-C §6';
+                    why=['8–20 kW/rack density is above standard CRAC limits but below D2C threshold','RDHX captures hot exhaust at the rack and cools to near-neutral before entering the hot aisle','Lower CAPEX than D2C; can be retrofitted to existing racks without server modifications'];
+                    trade=['Chilled water at 12–18°C supply required — increases cooling plant complexity vs DX','Not suitable above 30 kW/rack without supplemental D2C','WUE impact similar to chilled water cooling; cooling towers required unless using dry coolers'];
+                    links='<a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a><a href="pue-calculator.html">PUE Calculator</a>';
+                } else if(q3==='hotdry'&&q4==='abund'){
+                    tech='Evaporative / Adiabatic Cooling + Warm-Water Economiser';
+                    std='ASHRAE TC 9.9 A2/A3 · ISO 50001 §6.3';
+                    why=['Hot-dry climates have low wet-bulb temperatures enabling high evaporative cooling efficiency','Adiabatic pre-cooling allows free-cooling hours even when dry-bulb exceeds IT inlet limits','Abundant water access makes evaporative losses economically acceptable'];
+                    trade=['WUE will be high (2–4 L/kWh) — requires water management plan and scarcity risk assessment','Humidity control critical: adiabatic can over-humidify if not staged correctly with controls','Not viable for rack densities above 20 kW/rack without supplemental liquid cooling'];
+                    links='<a href="water-system.html">Water System</a><a href="pue-calculator.html">PUE Calculator</a>';
+                } else if(q4==='restricted'||q4==='none'){
+                    tech='Mechanical Chiller Closed Loop (Dry Cooler)';
+                    std='ASHRAE TC 9.9 A1 · ANSI/TIA-942-C §6 · ISO 50001';
+                    why=['No water evaporation: closed-loop mechanical refrigeration with air-blast dry coolers','WUE near zero — only minor make-up water for refrigerant cooling in extreme ambient conditions','Compatible with all rack densities up to 20 kW/rack; pair with RDHX or D2C for higher density'];
+                    trade=['Dry cooler efficiency degrades significantly above 35°C ambient — size for peak summer design day','Higher CAPEX than open-circuit cooling towers; no latent cooling benefit from evaporation','EU F-Gas regulation limits refrigerant choices — specify R-32 or R-1234ze for new plant'];
+                    links='<a href="chiller-plant.html">Chiller Plant</a><a href="ltc-iso-energy-governance.html">ISO Energy</a>';
+                } else {
+                    tech='Air Cooling — CRAC + Hot/Cold Aisle Containment';
+                    std='ASHRAE TC 9.9 A1 Recommended · ANSI/TIA-942-C §6 · EN 50600-2-3';
+                    why=['Under 8 kW/rack with standard IT workloads is fully manageable with precision air cooling','Hot/cold aisle containment raises CRAC supply temperature, improving free-cooling hours and CoP','Lowest CAPEX ($1,200/kW) and simplest maintenance; proven technology for general IT deployments'];
+                    trade=['PUE floor ~1.35–1.5 with best-practice air cooling; liquid cooling required for sub-1.2 PUE','Air cooling cannot support AI/GPU clusters above 20 kW/rack without hot spots and throttling','Free-cooling hours limited in tropical climates — pair with water-side economiser if budget allows'];
+                    links='<a href="pue-calculator.html">PUE Calculator</a><a href="ltc-ashrae-thermal-control.html">ASHRAE Standards</a>';
+                }
+                document.getElementById('pclTech').textContent=tech;
+                document.getElementById('pclStd').textContent='Standards: '+std;
+                var whyEl=document.getElementById('pclWhy'); whyEl.innerHTML='';
+                why.forEach(function(w){ var li=document.createElement('li'); li.textContent=w; whyEl.appendChild(li); });
+                var tradeEl=document.getElementById('pclTrade'); tradeEl.innerHTML='';
+                trade.forEach(function(t){ var li=document.createElement('li'); li.textContent=t; tradeEl.appendChild(li); });
+                document.getElementById('pclLinks').innerHTML=links;
+                var r=document.getElementById('pclResult'); r.classList.add('visible'); r.scrollIntoView({behavior:'smooth',block:'nearest'});
+            });
+        }
+
+        // PCL Checklist
+        var PCL_KEY='pcl_checklist';
+        function pclLoadChecklist(){
+            var saved=JSON.parse(localStorage.getItem(PCL_KEY)||'{}');
+            document.querySelectorAll('.pcl-cl-item input[type="checkbox"]').forEach(function(cb){
+                if(saved[cb.id]) cb.checked=true;
+                cb.addEventListener('change',function(){ pclSaveChecklist(); pclUpdateScore(); });
+            });
+            pclUpdateScore();
+        }
+        function pclSaveChecklist(){
+            var state={};
+            document.querySelectorAll('.pcl-cl-item input[type="checkbox"]').forEach(function(cb){ state[cb.id]=cb.checked; });
+            localStorage.setItem(PCL_KEY,JSON.stringify(state));
+        }
+        function pclUpdateScore(){
+            var total=document.querySelectorAll('.pcl-cl-item input[type="checkbox"]').length;
+            var checked=document.querySelectorAll('.pcl-cl-item input[type="checkbox"]:checked').length;
+            var numEl=document.getElementById('pclScoreNum'); if(numEl) numEl.textContent=checked+'/'+total;
+            var pct=total>0?checked/total:0;
+            var statusEl=document.getElementById('pclScoreStatus');
+            if(!statusEl) return;
+            statusEl.className='pcl-score-status';
+            if(pct<0.33){ statusEl.classList.add('red'); statusEl.textContent='Critical gaps'; }
+            else if(pct<0.66){ statusEl.classList.add('amber'); statusEl.textContent='Partial compliance'; }
+            else if(pct<1){ statusEl.classList.add('cyan'); statusEl.textContent='Near compliant'; }
+            else { statusEl.classList.add('green'); statusEl.textContent='Compliance ready'; }
+        }
+        var pclResetBtn=document.getElementById('pclClReset');
+        if(pclResetBtn){ pclResetBtn.addEventListener('click',function(){ document.querySelectorAll('.pcl-cl-item input[type="checkbox"]').forEach(function(cb){ cb.checked=false; }); localStorage.removeItem(PCL_KEY); pclUpdateScore(); }); }
+        var pclExportBtn=document.getElementById('pclClExport');
+        if(pclExportBtn){ pclExportBtn.addEventListener('click',function(){ var lines=['Data Center Cooling Compliance Checklist Export',new Date().toLocaleDateString(),'---']; document.querySelectorAll('.pcl-cl-group').forEach(function(grp){ var hdr=grp.querySelector('.pcl-cl-group-hdr'); lines.push('\n'+hdr.textContent.trim()); grp.querySelectorAll('.pcl-cl-item').forEach(function(item){ var cb=item.querySelector('input'); var lbl=item.querySelector('label'); lines.push((cb.checked?'[x] ':'[ ] ')+lbl.textContent.trim()); }); }); var blob=new Blob([lines.join('\n')],{type:'text/plain'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pcl-cooling-checklist.txt'; a.click(); }); }
+        pclLoadChecklist();
+
+        // PCL Cost Calculator
+        var COOLING_PARAMS={
+            air_dx:    { capex_per_kW:1200, eff_factor:0.40, wue_factor:0   },
+            air_cw:    { capex_per_kW:1500, eff_factor:0.35, wue_factor:1.8 },
+            rdhx:      { capex_per_kW:1800, eff_factor:0.30, wue_factor:1.5 },
+            d2c:       { capex_per_kW:2400, eff_factor:0.10, wue_factor:0.4 },
+            immersion:  { capex_per_kW:3000, eff_factor:0.05, wue_factor:0.1 }
+        };
+        function fmtUSD(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
+        function fmtNum(n,d){ return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+        var pclCostBtn=document.getElementById('pclCostCalcBtn');
+        if(pclCostBtn){
+            pclCostBtn.addEventListener('click',function(){
+                var itKW=parseFloat(document.getElementById('pclITLoad').value)||1000;
+                var cType=document.getElementById('pclCoolingType').value;
+                var elec=parseFloat(document.getElementById('pclElecRate').value)||0.09;
+                var water=parseFloat(document.getElementById('pclWaterRate').value)||1.50;
+                var redMult=parseFloat(document.getElementById('pclRedundancy').value)||1.3;
+                var p=COOLING_PARAMS[cType]||COOLING_PARAMS['air_dx'];
+                var capex=itKW*p.capex_per_kW*redMult;
+                var annCoolingKWh=itKW*8760*p.eff_factor;
+                var annEnergyCost=annCoolingKWh*elec;
+                var pueEst=1+p.eff_factor;
+                var wueEst=p.wue_factor;
+                var annWaterM3=p.wue_factor>0?(annCoolingKWh*p.wue_factor/1000):0;
+                var annWaterCost=annWaterM3*water;
+                var tco10=capex+10*(annEnergyCost+annWaterCost);
+                document.getElementById('pclOutCapex').textContent=fmtUSD(capex);
+                document.getElementById('pclOutEnergy').textContent=fmtNum(annCoolingKWh,0)+' kWh';
+                document.getElementById('pclOutEnergyCost').textContent=fmtUSD(annEnergyCost)+'/yr';
+                var pueEl=document.getElementById('pclOutPUE');
+                pueEl.textContent=pueEst.toFixed(2);
+                pueEl.className='pcl-out-val';
+                if(pueEst<=1.2) pueEl.classList.add('pue-green');
+                else if(pueEst<=1.4) pueEl.classList.add('pue-cyan');
+                else if(pueEst<=1.6) pueEl.classList.add('pue-amber');
+                else pueEl.classList.add('pue-red');
+                document.getElementById('pclOutWUE').textContent=wueEst.toFixed(1)+' L/kWh';
+                document.getElementById('pclOutTCO').textContent=fmtUSD(tco10);
+            });
+        }
+
     })();
+
+    // PCL Heat-Flow Tier Toggle (outside IIFE to be accessible by onclick)
+    function pclToggleTier(id){
+        var tier=document.getElementById(id);
+        if(!tier) return;
+        var isOpen=tier.classList.contains('open');
+        tier.classList.toggle('open',!isOpen);
+        var bar=tier.querySelector('.pcl-tier-bar');
+        if(bar) bar.setAttribute('aria-expanded',!isOpen);
+    }
     </script>
 </body>
 </html>
