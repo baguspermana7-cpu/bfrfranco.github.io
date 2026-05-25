@@ -3460,6 +3460,8 @@ function sLine(x1,y1,x2,y2,c,op,sw){return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x
 // Compact Y-coordinates (v5: side labels save ~30px per CB)
 var L0=30,L1=200,L2=340,L3=480,L4=610,L5=740,L6=890,L7=1380,L8=1510,L9=1750,L10=1950;
 var AX=300,BX=700;
+// v1.42.2 — bind semantic line / breaker model libraries for per-hall SLD port
+var RZL=window.RZLineModel,RZB=window.RZBreakerSymbols;
 
 // Background + dynamic viewBox
 s+='<rect width="'+W+'" height="'+H+'" fill="var(--bg2)"/>';
@@ -3496,37 +3498,42 @@ s+=tx(BX,L0+38,'PLN 20kV',CG,7,'middle',1);
 s+=tx(BX,L0+50,'Source B','var(--t2)',5,'middle');
 s+=tx(BX,L0+59,'150kV Substation','var(--t3)',4.5,'middle');
 
-// VCB Incomer A — RED animated
-s+=fLine(AX,L0+64,AX,L0+74,CA,'fD',.5,1.5);
+// VCB Incomer A — RED animated. v1.42.2 — ported to semantic line+breaker model.
+s+=RZL?RZL.line({id:'dh'+n+'-pln-a-to-meter',from:'PLN-A',to:'METER-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+64,x2:AX,y2:L0+74},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+64,AX,L0+74,CA,'fD',.5,1.5);
 s+=symMeter(AX,L0+80,CA,'kW');
-s+=fLine(AX,L0+86,AX,L0+95,CA,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-meter-a-to-vcb',from:'METER-DH'+n+'-A',to:'VCB-INC-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+86,x2:AX,y2:L0+95},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+86,AX,L0+95,CA,'fD',.5,1.5);
 s+=cblSide(AX,L0+102,'VCB-INC-A',['20kV|630A|25kA','12.6MVA Vacuum'],CA,'R');
+s+=RZB?RZB.render({id:'VCB-INC-DH'+n+'-A',state:'closed',x:AX,y:L0+102,color:CA,upstream:'PLN-A',downstream:'SM6-BUS-DH'+n+'-A',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_a'}):'';
 
-// VCB Incomer B — GREEN animated
-s+=fLine(BX,L0+64,BX,L0+74,CG,'fD',.5,1.5);
+// VCB Incomer B — GREEN animated. v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-pln-b-to-meter',from:'PLN-B',to:'METER-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+64,x2:BX,y2:L0+74},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+64,BX,L0+74,CG,'fD',.5,1.5);
 s+=symMeter(BX,L0+80,CG,'kW');
-s+=fLine(BX,L0+86,BX,L0+95,CG,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-meter-b-to-vcb',from:'METER-DH'+n+'-B',to:'VCB-INC-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+86,x2:BX,y2:L0+95},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+86,BX,L0+95,CG,'fD',.5,1.5);
 s+=cblSide(BX,L0+102,'VCB-INC-B',['20kV|630A|25kA','12.6MVA Vacuum'],CG,'L');
+s+=RZB?RZB.render({id:'VCB-INC-DH'+n+'-B',state:'closed',x:BX,y:L0+102,color:CG,upstream:'PLN-B',downstream:'SM6-BUS-DH'+n+'-B',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_b'}):'';
 
-// SM6 Bus A (RED) + Bus B (GREEN)
-s+=fLine(AX,L0+112,AX,L0+118,CA,'fD',.5,1.5);
-s+=fLine(BX,L0+112,BX,L0+118,CG,'fD',.5,1.5);
+// SM6 Bus A (BLUE) + Bus B (GREEN). v1.42.2 — bus drops ported.
+s+=RZL?RZL.line({id:'dh'+n+'-vcb-inc-a-to-bus',from:'VCB-INC-DH'+n+'-A',to:'SM6-BUS-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+112,x2:AX,y2:L0+118},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+112,AX,L0+118,CA,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-vcb-inc-b-to-bus',from:'VCB-INC-DH'+n+'-B',to:'SM6-BUS-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+112,x2:BX,y2:L0+118},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+112,BX,L0+118,CG,'fD',.5,1.5);
 s+=hB(170,L0+120,260,'SM6 BUS A \u2014 20kV',CA);
 s+=hB(570,L0+120,260,'SM6 BUS B \u2014 20kV',CG);
 
-// Bus Tie N.O. (purple dashed)
-s+='<line x1="430" y1="'+(L0+123)+'" x2="570" y2="'+(L0+123)+'" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="6 4"/>';
+// Bus Tie N.O. (purple dashed). v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-bus-tie',from:'SM6-BUS-DH'+n+'-A',to:'SM6-BUS-DH'+n+'-B',medium:'power_mv',direction:'bidirectional',state:'standby',capacity:'20 kV tie',redundancy:'tie',sensor:'ANSI 25 sync-check',geometry:{x1:430,y1:L0+123,x2:570,y2:L0+123},style:{stroke:'var(--p)',strokeWidth:1.2,dashPattern:'6 4'}}):'<line x1="430" y1="'+(L0+123)+'" x2="570" y2="'+(L0+123)+'" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="6 4"/>';
 s+=cbOpen(500,L0+123,'VCB-TIE',['20kV|630A|N.O.'],'var(--p)');
+s+=RZB?RZB.render({id:'VCB-TIE-DH'+n,state:'open',x:500,y:L0+123,color:'var(--p)',upstream:'SM6-BUS-DH'+n+'-A',downstream:'SM6-BUS-DH'+n+'-B',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['25','27'],interlock:'auto_close_on_uv',redundancy:'tie'}):'';
 
-// Feeder VCBs from Bus A — RED
-s+=fLine(AX,L0+127,AX,L0+138,CA,'fD',.5,1.5);
+// Feeder VCBs from Bus A — BLUE. v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-bus-to-fa',from:'SM6-BUS-DH'+n+'-A',to:'F'+n+'A-DH',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV feeder',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+127,x2:AX,y2:L0+138},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+127,AX,L0+138,CA,'fD',.5,1.5);
 s+=cblSide(AX,L0+145,'F'+n+'A',['20kV|630A|25kA','to RMU-'+n],CA,'R');
-s+=fLine(AX,L0+155,AX,L0+168,CA,'fD',.5,1.5);
+s+=RZB?RZB.render({id:'F'+n+'A-DH',state:'closed',x:AX,y:L0+145,color:CA,upstream:'SM6-BUS-DH'+n+'-A',downstream:'RMU-'+n,voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_a'}):'';
+s+=RZL?RZL.line({id:'dh'+n+'-fa-to-rmu-drop',from:'F'+n+'A-DH',to:'RMU-'+n,medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV -> RMU',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+155,x2:AX,y2:L0+168},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+155,AX,L0+168,CA,'fD',.5,1.5);
 
-// Feeder VCBs from Bus B — GREEN
-s+=fLine(BX,L0+127,BX,L0+138,CG,'fD',.5,1.5);
+// Feeder VCBs from Bus B — GREEN. v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-bus-to-fb',from:'SM6-BUS-DH'+n+'-B',to:'F'+n+'B-DH',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV feeder',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+127,x2:BX,y2:L0+138},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+127,BX,L0+138,CG,'fD',.5,1.5);
 s+=cblSide(BX,L0+145,'F'+n+'B',['20kV|630A|25kA','to RMU-'+n],CG,'L');
-s+=fLine(BX,L0+155,BX,L0+168,CG,'fD',.5,1.5);
+s+=RZB?RZB.render({id:'F'+n+'B-DH',state:'closed',x:BX,y:L0+145,color:CG,upstream:'SM6-BUS-DH'+n+'-B',downstream:'RMU-'+n,voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_b'}):'';
+s+=RZL?RZL.line({id:'dh'+n+'-fb-to-rmu-drop',from:'F'+n+'B-DH',to:'RMU-'+n,medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV -> RMU',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+155,x2:BX,y2:L0+168},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+155,BX,L0+168,CG,'fD',.5,1.5);
 
 s+='</g>';
 // L0→L1 connectors
@@ -3537,32 +3544,35 @@ s+=connector(BX,L0+168,L1+20,CG,'fD');
 s+='<g data-sld-click="rmu" data-dh="'+n+'">';
 s+=sH(L1,'L1: RMU-'+n+' \u2014 Schneider RM6 24kV SF6-Free \u2014 3-Panel','var(--o)');
 
-// VCB Feed A — RED
-s+=fLine(AX,L1+20,AX,L1+30,CA,'fD',.5,1.5);
+// VCB Feed A — BLUE. v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-input-a',from:'RMU-'+n,to:'METER-RMU-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:AX,y1:L1+20,x2:AX,y2:L1+30},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L1+20,AX,L1+30,CA,'fD',.5,1.5);
 s+=symMeter(AX,L1+36,CA,'kW');
-s+=fLine(AX,L1+42,AX,L1+50,CA,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-meter-a-to-vcb',from:'METER-RMU-DH'+n+'-A',to:'VCB-RMU-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:AX,y1:L1+42,x2:AX,y2:L1+50},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L1+42,AX,L1+50,CA,'fD',.5,1.5);
 s+=cblSide(AX,L1+57,'VCB-RMU-'+n+'A',['20kV|630A','IDMT OC 50/51'],CA,'R');
+s+=RZB?RZB.render({id:'VCB-RMU-DH'+n+'-A',state:'closed',x:AX,y:L1+57,color:CA,upstream:'RMU-'+n,downstream:'RMU-BUS-DH'+n+'-A',voltage:'20 kV',rating_a:'630 A',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_a'}):'';
 
-// VCB Feed B — GREEN
-s+=fLine(BX,L1+20,BX,L1+30,CG,'fD',.5,1.5);
+// VCB Feed B — GREEN. v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-input-b',from:'RMU-'+n,to:'METER-RMU-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:BX,y1:L1+20,x2:BX,y2:L1+30},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L1+20,BX,L1+30,CG,'fD',.5,1.5);
 s+=symMeter(BX,L1+36,CG,'kW');
-s+=fLine(BX,L1+42,BX,L1+50,CG,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-meter-b-to-vcb',from:'METER-RMU-DH'+n+'-B',to:'VCB-RMU-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:BX,y1:L1+42,x2:BX,y2:L1+50},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L1+42,BX,L1+50,CG,'fD',.5,1.5);
 s+=cblSide(BX,L1+57,'VCB-RMU-'+n+'B',['20kV|630A','IDMT OC 50/51'],CG,'L');
+s+=RZB?RZB.render({id:'VCB-RMU-DH'+n+'-B',state:'closed',x:BX,y:L1+57,color:CG,upstream:'RMU-'+n,downstream:'RMU-BUS-DH'+n+'-B',voltage:'20 kV',rating_a:'630 A',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_b'}):'';
 
-// RMU Bus A (RED) + Bus B (GREEN)
-s+=fLine(AX,L1+67,AX,L1+74,CA,'fD',.5,1.5);
-s+=fLine(BX,L1+67,BX,L1+74,CG,'fD',.5,1.5);
+// RMU Bus A (BLUE) + Bus B (GREEN). v1.42.2 — bus drops ported.
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-vcb-a-to-bus',from:'VCB-RMU-DH'+n+'-A',to:'RMU-BUS-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_a',geometry:{x1:AX,y1:L1+67,x2:AX,y2:L1+74},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L1+67,AX,L1+74,CA,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-vcb-b-to-bus',from:'VCB-RMU-DH'+n+'-B',to:'RMU-BUS-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_b',geometry:{x1:BX,y1:L1+67,x2:BX,y2:L1+74},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L1+67,BX,L1+74,CG,'fD',.5,1.5);
 s+=hB(200,L1+76,200,'RMU BUS A \u2014 20kV',CA);
 s+=hB(600,L1+76,200,'RMU BUS B \u2014 20kV',CG);
 
-// RMU Bus Tie (purple N.O.)
-s+='<line x1="400" y1="'+(L1+79)+'" x2="600" y2="'+(L1+79)+'" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="6 4"/>';
+// RMU Bus Tie (purple N.O.). v1.42.2 — ported.
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-bus-tie',from:'RMU-BUS-DH'+n+'-A',to:'RMU-BUS-DH'+n+'-B',medium:'power_mv',direction:'bidirectional',state:'standby',capacity:'20 kV tie',redundancy:'tie',sensor:'ANSI 25 sync-check',geometry:{x1:400,y1:L1+79,x2:600,y2:L1+79},style:{stroke:'var(--p)',strokeWidth:1.2,dashPattern:'6 4'}}):'<line x1="400" y1="'+(L1+79)+'" x2="600" y2="'+(L1+79)+'" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="6 4"/>';
 s+=cbOpen(500,L1+79,'VCB-TIE-RMU',['20kV|630A|N.O.'],'var(--p)');
+s+=RZB?RZB.render({id:'VCB-TIE-RMU-DH'+n,state:'open',x:500,y:L1+79,color:'var(--p)',upstream:'RMU-BUS-DH'+n+'-A',downstream:'RMU-BUS-DH'+n+'-B',voltage:'20 kV',rating_a:'630 A',deviceFunctions:['25','27'],interlock:'auto_close_on_uv',redundancy:'tie'}):'';
 
 s+='</g>';
-// L1→L2 connectors
-s+=fLine(AX,L1+83,AX,L1+90,CA,'fD',.5,1.5);
-s+=fLine(BX,L1+83,BX,L1+90,CG,'fD',.5,1.5);
+// L1→L2 connectors. v1.42.2 — ported (vertical drops; arrowhead connector below remains).
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-bus-a-drop',from:'RMU-BUS-DH'+n+'-A',to:'TX-'+n+'A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV to TX',redundancy:'redundant_a',geometry:{x1:AX,y1:L1+83,x2:AX,y2:L1+90},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L1+83,AX,L1+90,CA,'fD',.5,1.5);
+s+=RZL?RZL.line({id:'dh'+n+'-rmu-bus-b-drop',from:'RMU-BUS-DH'+n+'-B',to:'TX-'+n+'B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV to TX',redundancy:'redundant_b',geometry:{x1:BX,y1:L1+83,x2:BX,y2:L1+90},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L1+83,BX,L1+90,CG,'fD',.5,1.5);
 s+=connector(AX,L1+90,L2+20,CA,'fD');
 s+=connector(BX,L1+90,L2+20,CG,'fD');
 

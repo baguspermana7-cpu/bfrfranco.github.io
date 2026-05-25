@@ -149,8 +149,9 @@ Used by `tools/probe-line-model.mjs` to enforce the per-page adoption schedule.
 | Ship | Page | Lines tagged | Verifier |
 |---|---|---|---|
 | v1.42.0 | `datahallAI.html` Cooling P&ID | 7 (pilot — major loop supply + return) | `node tools/probe-line-model.mjs` ≥ 7 |
-| **v1.42.1** | `datahallAI.html` Electrical SLD overview | **+25** (PLN→meter→VCB×2 + bus drops + tie + 8 feeders × 2 segments). Total cumulative **32**. | `ADOPTION_TARGETS = 32` |
-| v1.42.2 (pending) | `datahallAI.html` Network fabric | +15 | bump `ADOPTION_TARGETS` |
+| **v1.42.1** | `datahallAI.html` Electrical SLD overview | **+25** (PLN→meter→VCB×2 + bus drops + tie + 8 feeders × 2 segments). Cumulative **32**. | `ADOPTION_TARGETS = 32` |
+| **v1.42.2** | `datahallAI.html` per-DH SLDs (elecDH1-4) — L0 substation + L1 RMU | **+80** (11 L0 lines + 9 L1 lines × 4 halls) + **+32 breakers** (5 L0 + 3 L1 × 4 halls). Cumulative **112 lines + 36 breakers**. | `ADOPTION_TARGETS = 112`, `BREAKER_TARGETS = 36` |
+| v1.42.3 (pending) | `datahallAI.html` Network fabric | +15 | bump `ADOPTION_TARGETS` |
 | v1.42.3 (pending) | `dc-conventional.html` chiller plant + EPMS | +25 | bump `ADOPTION_TARGETS` |
 | v1.42.4 (pending) | `water-system.html` + `chiller-plant.html` | +30 | bump `ADOPTION_TARGETS` |
 | v1.45.x | full coverage target | 80–90 % of major-loop lines tagged | coverage ≥ 80 % |

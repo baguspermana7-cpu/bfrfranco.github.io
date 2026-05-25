@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v1.42.2 — 2026-05-26 (per-DH Electrical SLDs L0+L1 — drawDH() port × 4 halls)
+
+MINOR ship: third in the v1.42.x → v1.45.x sweep. Ports the SHARED drawDH()
+function (called once per DH-01..04) so every per-hall SLD now carries the
+line-model + breaker-symbol metadata. Each port multiplies by 4 across the
+four data hall containers (elecDH1Svg–elecDH4Svg).
+
+Engine + `#p-dash` byte-identical. 75/75 accuracy probe + 57/57 + 22/22 +
+all strict audits PASS. Line-model probe **7/7** at the bumped targets
+(**112 lines + 36 breakers** on `datahallAI.html`).
+
+### Changed
+
+- **`datahallAI.html` drawDH() function** — local `var RZL/RZB` bindings
+  added at top after coordinate constants. L0 (MV Customer Substation)
+  and L1 (RMU) sections ported:
+  - **L0 lines** (×4 halls = 44 tagged):
+    - `dh{n}-pln-{a,b}-to-meter` (utility → revenue meter)
+    - `dh{n}-meter-{a,b}-to-vcb` (meter → VCB incomer)
+    - `dh{n}-vcb-inc-{a,b}-to-bus` (incomer → SM6 bus drop)
+    - `dh{n}-bus-tie` (purple N.O., redundancy=tie)
+    - `dh{n}-bus-to-f{a,b}` (bus → feeder)
+    - `dh{n}-f{a,b}-to-rmu-drop` (feeder exit to RMU)
+  - **L0 breakers** (×4 halls = 20 tagged):
+    - `VCB-INC-DH{n}-{A,B}` (closed, 50/51, PPE2)
+    - `VCB-TIE-DH{n}` (open, 25/27 sync, tie)
+    - `F{n}{A,B}-DH` (closed, 50/51, PPE2)
+  - **L1 lines** (×4 halls = 36 tagged):
+    - `dh{n}-rmu-input-{a,b}` (entry to RMU panel)
+    - `dh{n}-rmu-meter-{a,b}-to-vcb` (meter to RMU VCB)
+    - `dh{n}-rmu-vcb-{a,b}-to-bus` (RMU bus drop)
+    - `dh{n}-rmu-bus-tie` (purple N.O., redundancy=tie)
+    - `dh{n}-rmu-bus-{a,b}-drop` (RMU bus → TX downstream)
+  - **L1 breakers** (×4 halls = 12 tagged):
+    - `VCB-RMU-DH{n}-{A,B}` (closed, 50/51, IDMT OC)
+    - `VCB-TIE-RMU-DH{n}` (open, 25/27 sync, tie)
+- **`tools/probe-line-model.mjs`** — targets bumped:
+  `ADOPTION_TARGETS.datahallAI.html = 112`, `BREAKER_TARGETS.datahallAI.html = 36`.
+
+### Docs
+
+- `standarization/LINE_MODEL.md` adoption table v1.42.2 row.
+- `standarization/BMS_SHELL.md` v1.42.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regenerated.
+- Memory tracker `project_rz_review_2026-05-26.md` updated.
+
+---
+
 ## v1.42.1 — 2026-05-26 (IEC/ANSI breaker symbol library + Electrical SLD overview port)
 
 MINOR ship: second in the v1.42.x → v1.45.x sweep. Adds the breaker symbol

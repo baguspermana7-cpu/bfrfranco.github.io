@@ -27,15 +27,16 @@ const BASE = (process.env.RZ_BASE === 'file')
 
 /* Adoption schedule per ship — bump as v1.42.x → v1.45.x ports more lines.
  * v1.42.0 pilot: 7 lines in datahallAI Cooling P&ID.
- * v1.42.1: +25 lines in datahallAI Electrical SLD (incomers, bus, tie, 8 feeders × 2 segments). */
+ * v1.42.1: +25 lines in datahallAI Electrical SLD overview.
+ * v1.42.2: +80 lines in drawDH() L0+L1 sections × 4 halls. */
 const ADOPTION_TARGETS = {
-  'datahallAI.html': 32,
-  'dc-conventional.html': 0  /* port arrives in v1.42.3 */
+  'datahallAI.html': 112,
+  'dc-conventional.html': 0  /* port arrives in v1.42.4 */
 };
 
-/* v1.42.1: breaker symbol library — verify pilot ports tagged. */
+/* Breaker symbol library — verify pilot ports tagged. */
 const BREAKER_TARGETS = {
-  'datahallAI.html': 4,  /* VCB-INC-A, VCB-INC-B, VCB-TIE, F1A */
+  'datahallAI.html': 36,  /* 4 elecOv + 20 L0 + 12 L1 across 4 DH SLDs */
   'dc-conventional.html': 0
 };
 
