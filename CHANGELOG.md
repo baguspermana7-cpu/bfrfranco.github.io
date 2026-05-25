@@ -11,6 +11,64 @@ release sections rather than semver.
 
 ---
 
+## v1.42.1 — 2026-05-26 (IEC/ANSI breaker symbol library + Electrical SLD overview port)
+
+MINOR ship: second in the v1.42.x → v1.45.x sweep. Adds the breaker symbol
+library that the review docs flagged as P0 ("Red/green line can be misread as
+energized / alarm / source. Breaker state needs SYMBOL, not just color."),
+and ports the Electrical SLD overview to use both `RZLineModel` + new
+`RZBreakerSymbols`.
+
+Engine + `#p-dash` byte-identical. Probe targets bumped accordingly.
+
+### Added
+
+- **`js/rz-breaker-symbols.js`** — `window.RZBreakerSymbols` IEC 60617 /
+  IEEE C37.2 compliant symbol library. 7 STATES with distinct glyphs:
+  - `closed` — vertical mechanical link
+  - `open` — angled arm separated from upper terminal
+  - `tripped` — open arm + red X overlay + pulse animation
+  - `racked_out` — dashed cradle bracket + open arm
+  - `test` — open arm + 'T' badge
+  - `maintenance` — open arm + padlock badge (LOTO)
+  - `disabled` — faint arm + diagonal slash
+  - 11 ANSI device function numbers (25/27/50/51/52/67/67N/81/86/87T/87B)
+  - 4 NFPA 70E PPE categories (PPE1–PPE4)
+- **`standarization/BREAKER_SYMBOLS.md`** — full schema + glyph table +
+  device-function reference + adoption schedule.
+- **Probe extended** (`tools/probe-line-model.mjs`) — verifies breaker
+  tagging alongside line tagging. Result: **7 pass, 0 fail** at v1.42.1
+  (32 lines + 4 breakers tagged on `datahallAI.html`).
+
+### Changed
+
+- **`datahallAI.html` Electrical SLD overview** (elecOvC IIFE):
+  - **+25 lines** ported to `RZLineModel.line()`:
+    - `elec-pln-a-to-meter` / `elec-pln-b-to-meter` (MV utility supply)
+    - `elec-meter-a-to-vcb-inc-a` / `elec-meter-b-to-vcb-inc-b` (revenue meter to incomer)
+    - `elec-vcb-inc-{a,b}-to-bus-{a,b}` (incomer to MV bus, horiz + vert drops)
+    - `elec-bus-a-drop-vert` / `elec-bus-b-drop-vert`
+    - `elec-bus-tie` (bus tie N.O., redundancy=tie)
+    - 8 feeder loop × 2 segments = 16 feeders (`elec-feeder-{a,b}{1-4}-drop` / `-exit`)
+  - **4 breakers** ported to `RZBreakerSymbols.render()` (pilot):
+    - `VCB-INC-A` (closed, redundant_a, 50/51/67N, PPE2)
+    - `VCB-INC-B` (closed, redundant_b, 50/51/67N, PPE2)
+    - `VCB-TIE` (open, tie, 25/27 sync-check)
+    - `F1A` (closed, redundant_a, 50/51, PPE2)
+  - Visual identical via `style.stroke` overrides + co-existing with
+    legacy `cbl()` / `symCB()` markers. Engine integrity preserved.
+
+### Process
+
+- Review-doc mandates addressed: doc-27 §3.1 + §5.3, doc-17 §3.2,
+  doc-28/18 EPMS line callouts. Tracked in
+  `Documents/screenshot bms rz/REVIEW-ANALYSIS-2026-05-26-vs-v141x.md`.
+- Memory tracker `project_rz_review_2026-05-26.md` updated.
+- `standarization/BMS_SHELL.md` v1.42.x adoption row extended.
+- `standarization/LINE_MODEL.md` v1.42.1 target ≥32 codified.
+
+---
+
 ## v1.42.0 — 2026-05-26 (semantic line model foundation — review docs 27/28 + 17/18)
 
 MINOR ship: opens the v1.42.x → v1.45.x sweep responding to team review docs

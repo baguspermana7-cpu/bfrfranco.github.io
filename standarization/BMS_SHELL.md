@@ -443,7 +443,7 @@ Foundation pass responding to team review docs 27/28 (DC AI) + 17/18 (DC Conv). 
 | Ship | Version | Page(s) | Scope |
 |---|---|---|---|
 | 1 | v1.42.0 | `datahallAI.html` Cooling P&ID | Foundation library + 7 pilot ports (CW/FWS/TCS supply + return) + probe + LINE_MODEL.md |
-| 2 | v1.42.1 (planned) | `datahallAI.html` Electrical SLD | Port ~20 power lines + introduce IEC/ANSI breaker symbols (review doc-27 §3.1 + §5.3) |
+| 2 | **v1.42.1** | `datahallAI.html` Electrical SLD overview | **+25 lines** (PLN→meter→VCB×2 + bus drops + tie + 8 feeders × 2 segments) + **new `js/rz-breaker-symbols.js`** (7-state IEC/ANSI glyph library) + **4 breakers** ported (VCB-INC-A/B, VCB-TIE, F1A) + BREAKER_SYMBOLS.md. Cumulative 32 lines + 4 breakers tagged. |
 | 3 | v1.42.2 (planned) | `datahallAI.html` Network fabric | Port ~15 network links + add speed labels (100G/200G/400G/800G) + utilization + failure-domain (doc-27 §5.5) |
 | 4 | v1.42.3 (planned) | `dc-conventional.html` chiller + EPMS | Port ~25 lines + breaker symbols + source-to-load trace (doc-17 §3.2/§3.3) |
 | 5 | v1.42.4 (planned) | `water-system.html` + `chiller-plant.html` | Port ~30 lines + valve command/feedback + flow-arrow standard (doc-17 §3.3/§5.3) |

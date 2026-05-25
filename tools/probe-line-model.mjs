@@ -26,10 +26,17 @@ const BASE = (process.env.RZ_BASE === 'file')
   : (process.env.RZ_BASE || 'http://127.0.0.1:8081');
 
 /* Adoption schedule per ship — bump as v1.42.x → v1.45.x ports more lines.
- * v1.42.0 pilot: 7 lines in datahallAI Cooling P&ID. */
+ * v1.42.0 pilot: 7 lines in datahallAI Cooling P&ID.
+ * v1.42.1: +25 lines in datahallAI Electrical SLD (incomers, bus, tie, 8 feeders × 2 segments). */
 const ADOPTION_TARGETS = {
-  'datahallAI.html': 7,
-  'dc-conventional.html': 0  /* port arrives in v1.42.1 */
+  'datahallAI.html': 32,
+  'dc-conventional.html': 0  /* port arrives in v1.42.3 */
+};
+
+/* v1.42.1: breaker symbol library — verify pilot ports tagged. */
+const BREAKER_TARGETS = {
+  'datahallAI.html': 4,  /* VCB-INC-A, VCB-INC-B, VCB-TIE, F1A */
+  'dc-conventional.html': 0
 };
 
 let pass = 0, fail = 0;
@@ -86,6 +93,31 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
          stateIssues.length ? JSON.stringify(stateIssues) : '');
 
   console.log(`  · summary: ${report.tagged} tagged / ${report.total} total lines (${report.coverage}% adoption)`);
+
+  /* v1.42.1: breaker symbol coverage */
+  const brTarget = BREAKER_TARGETS[slug] || 0;
+  if (brTarget > 0) {
+    const brReport = await page.evaluate(() => {
+      if (!window.RZBreakerSymbols) return { error: 'RZBreakerSymbols-missing' };
+      return window.RZBreakerSymbols.audit(document);
+    });
+    if (brReport.error) {
+      assert(false, `${slug}: RZBreakerSymbols loaded`, brReport.error);
+    } else {
+      assert(brReport.tagged >= brTarget,
+             `${slug}: breaker-tag count ≥ ${brTarget}`,
+             `got ${brReport.tagged}`);
+      const brFieldIssues = brReport.issues.filter(i => i.kind === 'missing-field');
+      assert(brFieldIssues.length === 0,
+             `${slug}: every tagged breaker has id + state`,
+             brFieldIssues.length ? JSON.stringify(brFieldIssues.slice(0,5)) : '');
+      const brStateIssues = brReport.issues.filter(i => i.kind === 'unknown-state');
+      assert(brStateIssues.length === 0,
+             `${slug}: all breaker states are in RZBreakerSymbols.STATES`,
+             brStateIssues.length ? JSON.stringify(brStateIssues) : '');
+      console.log(`  · breaker summary: ${brReport.tagged} tagged breakers`);
+    }
+  }
   await page.close();
 }
 

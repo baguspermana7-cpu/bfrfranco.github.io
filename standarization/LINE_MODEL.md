@@ -149,7 +149,7 @@ Used by `tools/probe-line-model.mjs` to enforce the per-page adoption schedule.
 | Ship | Page | Lines tagged | Verifier |
 |---|---|---|---|
 | v1.42.0 | `datahallAI.html` Cooling P&ID | 7 (pilot — major loop supply + return) | `node tools/probe-line-model.mjs` ≥ 7 |
-| v1.42.1 (pending) | `datahallAI.html` Electrical SLD | +20 | bump `ADOPTION_TARGETS` |
+| **v1.42.1** | `datahallAI.html` Electrical SLD overview | **+25** (PLN→meter→VCB×2 + bus drops + tie + 8 feeders × 2 segments). Total cumulative **32**. | `ADOPTION_TARGETS = 32` |
 | v1.42.2 (pending) | `datahallAI.html` Network fabric | +15 | bump `ADOPTION_TARGETS` |
 | v1.42.3 (pending) | `dc-conventional.html` chiller plant + EPMS | +25 | bump `ADOPTION_TARGETS` |
 | v1.42.4 (pending) | `water-system.html` + `chiller-plant.html` | +30 | bump `ADOPTION_TARGETS` |
