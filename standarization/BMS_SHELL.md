@@ -435,3 +435,18 @@ Seven-ship sweep closing batched owner feedback on the cockpit family. All ships
 | 7 | v1.41.6 | `5e9c054` | `ict.html` | Security HMI widgets: CCTV 16-cell mosaic with rec dot + 24h availability sparkline; Access Doors list (12 doors with LOCKED/UNLOCKED pills); Intrusion Zones SVG donut + 10-zone list. SEGMENTS.sec data expanded (services 4→8, caps 4→8, links 3→9) |
 
 Owner-excluded `#p-dash` + `updateDashKPI()` + `dcCallouts` remain byte-identical throughout the sweep. Parallel `ai-engineering-maintenance.html` work (separate session) was stashed before each push and popped after to avoid bundle contamination.
+
+## v1.42.x semantic line model pass (2026-05-26 onward)
+
+Foundation pass responding to team review docs 27/28 (DC AI) + 17/18 (DC Conv). New library `js/rz-line-model.js` + new standard `standarization/LINE_MODEL.md` + new probe `tools/probe-line-model.mjs`. Engine files byte-identical; `#p-dash` byte-identical.
+
+| Ship | Version | Page(s) | Scope |
+|---|---|---|---|
+| 1 | v1.42.0 | `datahallAI.html` Cooling P&ID | Foundation library + 7 pilot ports (CW/FWS/TCS supply + return) + probe + LINE_MODEL.md |
+| 2 | v1.42.1 (planned) | `datahallAI.html` Electrical SLD | Port ~20 power lines + introduce IEC/ANSI breaker symbols (review doc-27 §3.1 + §5.3) |
+| 3 | v1.42.2 (planned) | `datahallAI.html` Network fabric | Port ~15 network links + add speed labels (100G/200G/400G/800G) + utilization + failure-domain (doc-27 §5.5) |
+| 4 | v1.42.3 (planned) | `dc-conventional.html` chiller + EPMS | Port ~25 lines + breaker symbols + source-to-load trace (doc-17 §3.2/§3.3) |
+| 5 | v1.42.4 (planned) | `water-system.html` + `chiller-plant.html` | Port ~30 lines + valve command/feedback + flow-arrow standard (doc-17 §3.3/§5.3) |
+| 6 | v1.45.x | full coverage target | 80–90 % of major-loop lines tagged across all 8 cockpit pages |
+
+Adoption rule: tagging is additive — un-tagged primitives keep rendering exactly as before. Each port preserves visual via `style.stroke` overrides; color discipline (status > domain > decorative) is a separate later sweep.

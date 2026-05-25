@@ -11,6 +11,64 @@ release sections rather than semver.
 
 ---
 
+## v1.42.0 — 2026-05-26 (semantic line model foundation — review docs 27/28 + 17/18)
+
+MINOR ship: opens the v1.42.x → v1.45.x sweep responding to team review docs
+27/28 (DC AI) and 17/18 (DC Conv). Foundation library so every pipe / busbar
+/ cable in the BMS cockpit can carry structured metadata (`from`, `to`,
+`medium`, `direction`, `state`, `capacity`, `current`, `redundancy`).
+
+Engine files (`js/datahall-model.js`, `js/datahall-calculations.js`,
+`js/conv-engine.js`) byte-identical. `#p-dash` panel byte-identical. 75/75
+accuracy probe + 57/57 + 22/22 engine tests + all 4 strict audits PASS.
+
+### Added
+
+- **`js/rz-line-model.js`** — semantic line model library. IIFE ES5, exposes
+  `window.RZLineModel` with:
+  - `MEDIUMS` (23 entries): CHWS / CHWR / TCS supply+return / CW supply+return
+    / FWS / FWR / dry-loop / liquid-supply+return / HV/MV/LV power / busway
+    / UPS feed / signal / fiber / copper / fire / leak / drain / fuel.
+  - `STATES` (7 entries): energized / de-energized / standby / fault /
+    isolated / maintenance / simulated. Each maps to opacity + pulse.
+  - `REDUNDANCY` (8 roles): duty / standby / redundant_a / redundant_b /
+    bypass / tie / maintenance / common.
+  - `line(spec)` / `path(spec)` / `polyline(spec)` builders — emit SVG with
+    both visual rendering AND `data-*` metadata baked in.
+  - `audit(rootEl)` — walks DOM, returns `{tagged, untagged, total, issues}`.
+- **`tools/probe-line-model.mjs`** — headless puppeteer probe. Verifies
+  per-page adoption schedule (v1.42.0 target: 7 lines in datahallAI Cooling
+  P&ID) + every tagged line has the required schema fields + all mediums /
+  states reference the canonical enum. Result: **4 pass, 0 fail**.
+- **`standarization/LINE_MODEL.md`** — new standard. Schema table, mediums
+  table, states table, redundancy table, builder API, validator usage, per-
+  ship adoption schedule v1.42.0 → v1.45.x.
+
+### Changed
+
+- **`datahallAI.html`** Cooling P&ID — 7 PILOT lines ported to `RZLineModel.line()`:
+  1. `cool-cw-dc-to-pump` — CW supply, DC array → CW pump station.
+  2. `cool-cw-pump-to-chiller` — CW supply, pump → chiller plant.
+  3. `cool-fws-chiller-to-cdu` — FWS supply, chiller → CDU array.
+  4. `cool-tcs-cdu-to-racks` — TCS supply, CDU → rack manifold.
+  5. `cool-tcs-return` — TCS return, racks → CDU.
+  6. `cool-fws-return` — FWR, CDU → chiller.
+  7. `cool-cw-return` — CW return, chiller → DC array.
+  Visual identical (style overrides preserve existing palette + `class="fR"`
+  / `class="fL"` animation hooks). Engine integrity preserved.
+
+### Process
+
+- Review-doc mandates addressed: doc-27 §3.1 line metadata requirement,
+  doc-28 per-screenshot line semantics. Full gap analysis at
+  `Documents/screenshot bms rz/REVIEW-ANALYSIS-2026-05-26-vs-v141x.md`.
+- Memory tracker: `project_rz_review_2026-05-26.md` + MEMORY.md pointer.
+- `BMS_SHELL.md` adoption row appended.
+- Per `CONTENT_LINKAGE_PLAYBOOK.md`: handoff to memory + standarization +
+  CHANGELOG (this entry) + Standards-Hub (next-pass note).
+
+---
+
 ## v1.41.6 — 2026-05-24 (ict.html — Security HMI widgets + CCTV/ACS/intrusion expansion)
 
 MINOR ship: closes owner request "GUI tampilan2 HMI dga block/chart atau widget

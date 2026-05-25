@@ -626,6 +626,11 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
          src reference only — never inlined (zero-build CSS/JS-in-string rule). -->
     <script src="js/datahall-model.js?v=1.20.0"></script>
     <script src="js/datahall-calculations.js?v=1.20.0"></script>
+    <!-- v1.42.0 — Semantic line model. Foundation for review docs 27/28 §3.1
+         "setiap line wajib punya from_id/to_id/medium/direction/state/capacity
+         /current_value/redundancy_role". Non-deferred so coolSvg IIFE can call
+         RZLineModel.line() at parse-time. -->
+    <script src="js/rz-line-model.js?v=1.42.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class (preserves the page's existing palette + 10k-line render tree).
@@ -6029,8 +6034,9 @@ const px=i%2===0?22:105,py=142+Math.floor(i/2)*12;
 s+=`<text x="${px}" y="${py}" fill="var(--t3)" font-family="${J}" font-size="3.8">${p[0]}</text>`;
 s+=`<text x="${px+75}" y="${py}" fill="${p[2]}" font-family="${J}" font-size="4.5" text-anchor="end" font-weight="500" id="${p[3]}">${p[1]}</text>`;
 });
-// Flow from DC (CW circuit = purple)
-s+=`<line x1="190" y1="90" x2="195" y2="90" stroke="var(--p)" stroke-width="2.5" class="fR"/>`;
+// Flow from DC (CW circuit = purple). v1.42.0 — ported to semantic line model
+// (review docs 27/28 §3.1 line metadata mandate). Visual identical.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-cw-dc-to-pump',from:'DC-ARRAY',to:'CW-PUMP-STATION',medium:'cw_supply',direction:'forward',state:'energized',capacity:'DN300 600 m³/h',current:'600 m³/h @ 32°C',redundancy:'duty',sensor:'FT-CW-101',geometry:{x1:190,y1:90,x2:195,y2:90},style:{stroke:'var(--p)',strokeWidth:2.5,cssClass:'fR'}}):'<line x1="190" y1="90" x2="195" y2="90" stroke="var(--p)" stroke-width="2.5" class="fR"/>';
 s+=tx(192,83,'DN300','var(--t3)',3,'middle');
 s+=tx(192,100,'600 m\u00B3/h','var(--p)',3,'middle');
 // ===== CW PUMP STATION =====
@@ -6083,8 +6089,8 @@ s+=tx(285,203,'4.5 bar','var(--p)',3.4,'middle');
 s+=symSensor(265,193,'var(--p)','F');
 s+=tx(265,203,'600 m³/h','var(--p)',3.4,'middle');
 s+=`</g>`;
-// Flow to chillers
-s+=`<line x1="295" y1="95" x2="305" y2="95" stroke="var(--p)" stroke-width="2.5" class="fR"/>`;
+// Flow to chillers. v1.42.0 — ported to semantic line model.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-cw-pump-to-chiller',from:'CW-PUMP-STATION',to:'CHILLER-PLANT',medium:'cw_supply',direction:'forward',state:'energized',capacity:'DN300 600 m³/h @ 4.5 bar',current:'600 m³/h @ 32°C',redundancy:'duty',sensor:'PT-CW-205',geometry:{x1:295,y1:95,x2:305,y2:95},style:{stroke:'var(--p)',strokeWidth:2.5,cssClass:'fR'}}):'<line x1="295" y1="95" x2="305" y2="95" stroke="var(--p)" stroke-width="2.5" class="fR"/>';
 s+=tx(300,84,'CW@4.5 bar','var(--p)',3.2,'middle');
 s+=tx(300,105,'DN300 30% PG','var(--t3)',3,'middle');
 // ===== CHILLER PLANT (FWS circuit = cyan) =====
@@ -6223,8 +6229,8 @@ s+=`<rect x="530" y="155" width="28" height="22" rx="2" fill="rgba(6,182,212,.06
 s+=tx(544,164,'EXP','var(--c)',3.5,'middle');
 s+=tx(544,173,RI(78,88)+'%','var(--c)',4,'middle');
 s+=`</g>`;
-// Flow to CDUs (FWS circuit = cyan)
-s+=`<line x1="645" y1="88" x2="655" y2="88" stroke="var(--c)" stroke-width="2.5" class="fR"/>`;
+// Flow to CDUs (FWS circuit = cyan). v1.42.0 — ported to semantic line model.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-fws-chiller-to-cdu',from:'CHILLER-PLANT',to:'CDU-ARRAY',medium:'fws',direction:'forward',state:'energized',capacity:'DN250 6 bar',current:'12.1°C / 58 L/s',redundancy:'duty',sensor:'TT-FWS-301',geometry:{x1:645,y1:88,x2:655,y2:88},style:{stroke:'var(--c)',strokeWidth:2.5,cssClass:'fR'}}):'<line x1="645" y1="88" x2="655" y2="88" stroke="var(--c)" stroke-width="2.5" class="fR"/>';
 s+=tx(650,79,'FWS@6 bar','var(--c)',3.2,'middle');
 s+=tx(650,102,'DN250','var(--t3)',3,'middle');
 // ===== CDU SECTION (Enhanced) =====
@@ -6290,8 +6296,8 @@ s+=`<text x="${px}" y="${py}" fill="var(--t3)" font-family="${J}" font-size="3.5
 if(p[3])s+=`<text x="${px+62}" y="${py}" fill="${p[2]}" font-family="${J}" font-size="4.5" text-anchor="end" font-weight="600" id="${p[3]}">${p[1]}</text>`;
 else s+=`<text x="${px+62}" y="${py}" fill="${p[2]}" font-family="${J}" font-size="4.5" text-anchor="end" font-weight="500">${p[1]}</text>`;
 });
-// Flow to TCS (TCS circuit = pink)
-s+=`<line x1="800" y1="88" x2="825" y2="88" stroke="var(--pk)" stroke-width="2" class="fR"/>`;
+// Flow to TCS (TCS circuit = pink). v1.42.0 — ported to semantic line model.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-tcs-cdu-to-racks',from:'CDU-ARRAY',to:'RACK-MANIFOLD',medium:'tcs_supply',direction:'forward',state:'energized',capacity:'DN150 SS316L @ 4 bar',current:'35.0°C / ~400 L/min per unit',redundancy:'duty',sensor:'PT-TCS-401',geometry:{x1:800,y1:88,x2:825,y2:88},style:{stroke:'var(--pk)',strokeWidth:2,cssClass:'fR'}}):'<line x1="800" y1="88" x2="825" y2="88" stroke="var(--pk)" stroke-width="2" class="fR"/>';
 s+=tx(812,81,'4 bar','var(--pk)',4,'middle');
 // ===== TCS TO RACKS (Enhanced) =====
 s+=`<g class="tcs-click" style="cursor:pointer">`;
@@ -6359,16 +6365,16 @@ else s+=`<text x="${px+48}" y="${py}" fill="${p[2]}" font-family="${J}" font-siz
 s+=`</g>`; // close tcs-click
 // ===== RETURN FLOW LINES (bottom of upper section, y~190-220) =====
 const RY=205;// return line Y position
-// TCS Return: Racks → CDU array
-s+=`<line x1="925" y1="${RY}" x2="800" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
+// TCS Return: Racks → CDU array. v1.42.0 — ported to semantic line model.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-tcs-return',from:'RACK-MANIFOLD',to:'CDU-ARRAY',medium:'tcs_return',direction:'reverse',state:'energized',capacity:'DN150 SS316L',current:'45.0°C',redundancy:'duty',sensor:'TT-TCS-451',geometry:{x1:925,y1:RY,x2:800,y2:RY},style:{stroke:'var(--o)',strokeWidth:2.5,cssClass:'fL'}}):`<line x1="925" y1="${RY}" x2="800" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
 s+=tx(860,RY-5,'TCS Return 45\u00B0C','var(--o)',4,'middle');
 s+=tx(860,RY+10,'DN150 SS316L','var(--t3)',3,'middle');
-// FWS Return: CDU → FWS Pump Station → Chiller
-s+=`<line x1="650" y1="${RY}" x2="525" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
+// FWS Return: CDU → FWS Pump Station → Chiller. v1.42.0 — ported to semantic line model.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-fws-return',from:'CDU-ARRAY',to:'CHILLER-PLANT',medium:'fwr',direction:'reverse',state:'energized',capacity:'DN250 CS insulated',current:'22.0°C',redundancy:'duty',sensor:'TT-FWR-351',geometry:{x1:650,y1:RY,x2:525,y2:RY},style:{stroke:'var(--o)',strokeWidth:2.5,cssClass:'fL'}}):`<line x1="650" y1="${RY}" x2="525" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
 s+=tx(585,RY-5,'FWS Return 22\u00B0C','var(--o)',4,'middle');
 s+=tx(585,RY+10,'DN250 CS insulated','var(--t3)',3,'middle');
-// CW Return: Chiller → CW Pump Station → CT
-s+=`<line x1="305" y1="${RY}" x2="190" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
+// CW Return: Chiller → CW Pump Station → CT/DC. v1.42.0 — ported to semantic line model.
+s+=window.RZLineModel?window.RZLineModel.line({id:'cool-cw-return',from:'CHILLER-PLANT',to:'DC-ARRAY',medium:'cw_return',direction:'reverse',state:'energized',capacity:'DN300 CS',current:'38.0°C',redundancy:'duty',sensor:'TT-CW-251',geometry:{x1:305,y1:RY,x2:190,y2:RY},style:{stroke:'var(--o)',strokeWidth:2.5,cssClass:'fL'}}):`<line x1="305" y1="${RY}" x2="190" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
 s+=tx(245,RY-5,'CW Return 38\u00B0C','var(--o)',4,'middle');
 s+=tx(245,RY+10,'DN300 CS','var(--t3)',3,'middle');
 // Temperature indicator badges on return lines (with prefix labels for clarity \u2014 v1.41.3)
