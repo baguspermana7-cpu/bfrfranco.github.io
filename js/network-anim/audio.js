@@ -121,7 +121,13 @@
     if (!spec) return;
 
     var now = c.currentTime;
-    var durSec = (spec.durationMs || 12) / 1000;
+    // v1.41.5 — apply spec._tempo (was computed in compose() but discarded).
+    // tempo > 1 = faster events (shorter durations); tempo < 1 = slower
+    // (longer durations). Lets `perState.handshake.tempoMultiplier: 0.7`
+    // produce an audible slowdown vs steady state.
+    var tempo = (typeof spec._tempo === 'number' && spec._tempo > 0) ? spec._tempo : 1.0;
+    var baseDurMs = spec.durationMs || 12;
+    var durSec = (baseDurMs / tempo) / 1000;
 
     var osc = c.createOscillator();
     osc.type = spec.waveform === 'square-sweep' || spec.waveform === 'sine-sweep'

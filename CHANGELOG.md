@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v1.41.5 — 2026-05-26 (Network Hub tempo system — wire spec._tempo into audio playback)
+
+PATCH ship: closes the v1.40.1 deferred item *"Network Hub tempo system fix
+(audio.js compose() computes tempoMultiplier but never applies it)"*.
+
+### Bug
+
+`js/network-anim/audio.js compose()` lines 74-109 dutifully computed
+`tempo = topLevelTempoMultiplier * perState.tempoMultiplier` (clamped to
+[0.7, 1.7]) and attached it as `spec._tempo`. The `play()` function then
+**ignored** it entirely — `durSec` was derived directly from `spec.durationMs`
+with no tempo scaling.
+
+Result: every topic-module's `perState.handshake.tempoMultiplier: 0.7`
+(and similar per-state overrides) had **zero audible effect**. Handshake
+and steady states sounded identical at the speaker even though the data
+model treated them as distinct.
+
+### Fix
+
+3-line change in `play()`:
+
+```js
+var tempo = (typeof spec._tempo === 'number' && spec._tempo > 0) ? spec._tempo : 1.0;
+var baseDurMs = spec.durationMs || 12;
+var durSec = (baseDurMs / tempo) / 1000;
+```
+
+Now:
+- tempo &gt; 1 &rarr; faster events (shorter SFX durations)
+- tempo &lt; 1 &rarr; slower events (longer SFX durations, audibly stretched)
+- The frequency sweep timing (`linearRampToValueAtTime(spec.freqEnd, now + durSec)`)
+  auto-applies the tempo because it uses the already-scaled `durSec`.
+- The hard decay cap (`Math.min(durSec, DECAY_HARD_CAP_MS / 1000)`) still
+  prevents runaway SFX even at the lowest tempo (0.7).
+
+### Topic-level consequence
+
+The 3 topics that actually emit `{state: 'handshake'}` to `signals.onSFX`
+(`tls-handshake.js`, `tcp-handshake.js`, `mtls.js`) will now produce
+audibly slower handshake SFX vs steady-state. The other 22 topics emit
+without a state argument, so they default to `'steady'` (tempo 1.0) — no
+behaviour change, but the per-state slowdown is now available if/when
+those topics start passing state to emit.
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.5
+- `sw.js` &rarr; `rz-cache-v1.41.5`
+
+### Audits
+
+- `audit-script-tags.py --strict` &mdash; CLEAN
+- `audit-js-syntax.py --strict` &mdash; CLEAN
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 133 PASS / 0 FAIL
+- `node --check js/network-anim/audio.js` &mdash; OK
+
+---
+
 ## v1.41.4 — 2026-05-26 (pillar pages bundle — cooling + power + standards + sustainability depth pass)
 
 PATCH ship: applies the v1.41.2 pillar-fire-safety depth template (8 new
