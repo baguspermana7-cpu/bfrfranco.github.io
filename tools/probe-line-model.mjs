@@ -29,16 +29,20 @@ const BASE = (process.env.RZ_BASE === 'file')
  * v1.42.0 pilot: 7 lines in datahallAI Cooling P&ID.
  * v1.42.1: +25 lines in datahallAI Electrical SLD overview.
  * v1.42.2: +80 lines in drawDH() L0+L1 sections × 4 halls.
- * v1.42.3: +59 lines in netSvg (32 spine-leaf + 27 domain-leaf). */
+ * v1.42.3: +59 lines in netSvg (32 spine-leaf + 27 domain-leaf).
+ * v1.42.4: cross-page — chiller-plant.html CHW P&ID (16 branch + 2 header = 18).
+ *          EPMS_Telemetry.html intentionally untouched (owner: "jangan merusak"). */
 const ADOPTION_TARGETS = {
   'datahallAI.html': 171,
-  'dc-conventional.html': 0  /* port arrives in v1.42.4 */
+  'dc-conventional.html': 0,
+  'chiller-plant.html': 18
 };
 
 /* Breaker symbol library — verify pilot ports tagged. */
 const BREAKER_TARGETS = {
   'datahallAI.html': 36,  /* 4 elecOv + 20 L0 + 12 L1 across 4 DH SLDs */
-  'dc-conventional.html': 0
+  'dc-conventional.html': 0,
+  'chiller-plant.html': 0  /* P&ID has no breakers */
 };
 
 let pass = 0, fail = 0;

@@ -152,6 +152,7 @@ Used by `tools/probe-line-model.mjs` to enforce the per-page adoption schedule.
 | **v1.42.1** | `datahallAI.html` Electrical SLD overview | **+25** (PLN→meter→VCB×2 + bus drops + tie + 8 feeders × 2 segments). Cumulative **32**. | `ADOPTION_TARGETS = 32` |
 | **v1.42.2** | `datahallAI.html` per-DH SLDs (elecDH1-4) — L0 substation + L1 RMU | **+80** (11 L0 lines + 9 L1 lines × 4 halls) + **+32 breakers** (5 L0 + 3 L1 × 4 halls). Cumulative **112 lines + 36 breakers**. | `ADOPTION_TARGETS = 112`, `BREAKER_TARGETS = 36` |
 | **v1.42.3** | `datahallAI.html` netSvg Network Fabric (review doc-27 §5.5) | **+59** (32 spine-leaf bundled lanes + 27 NVL72 domain-to-leaf bundled lanes). Speed metadata (`data-capacity="800 Gb/s IB XDR"` / `"4× 800 Gb/s NIC"`), `data-current` utilization, `data-tag` failure-domain (rail-N / pod-N / leaf-row-N). Cumulative **171 lines + 36 breakers**. | `ADOPTION_TARGETS = 171` |
+| **v1.42.4** | `chiller-plant.html` CHW P&ID (first cross-page adoption) | **+18** (4 loops × 4 lines + 2 distribution headers). Loop state binds to engine `evalLoop()` (`fault` when alarming, `energized` otherwise). EPMS_Telemetry.html intentionally untouched per owner mandate. | `ADOPTION_TARGETS['chiller-plant.html'] = 18` |
 | v1.42.3 (pending) | `dc-conventional.html` chiller plant + EPMS | +25 | bump `ADOPTION_TARGETS` |
 | v1.42.4 (pending) | `water-system.html` + `chiller-plant.html` | +30 | bump `ADOPTION_TARGETS` |
 | v1.45.x | full coverage target | 80–90 % of major-loop lines tagged | coverage ≥ 80 % |

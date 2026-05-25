@@ -11,6 +11,58 @@ release sections rather than semver.
 
 ---
 
+## v1.42.4 — 2026-05-26 (first cross-page adoption — chiller-plant.html CHW P&ID)
+
+MINOR ship: fifth in the v1.42.x → v1.45.x sweep. First port to a SECOND
+page (`chiller-plant.html`). Owner mandate respected: **EPMS_Telemetry.html
+intentionally untouched** — additive enhancement only, no rendering changes.
+
+Engine + `#p-dash` byte-identical. 11/11 line-model probe (datahallAI 171
+lines + 36 breakers; chiller-plant 18 lines) + 75/75 accuracy probe +
+57/57 + 22/22 + all strict audits PASS.
+
+### Added
+
+- **`chiller-plant.html` script imports** — `js/rz-line-model.js` +
+  `js/rz-breaker-symbols.js` loaded non-deferred after `conv-engine.js`,
+  before `drawPid()` inline IIFE can call them.
+
+### Changed
+
+- **`chiller-plant.html` `drawPid()` function** — `const RZL = window.RZLineModel;`
+  binding added at top.
+  - **+16 branch lines** ported (4 chiller loops × 4 lines):
+    - `chw-sup-drop-{loopId}` (CHWS header → loop supply tee)
+    - `chw-sup-leg-{loopId}` (loop supply tee → evaporator)
+    - `chw-ret-drop-{loopId}` (CHWR header → loop return tee)
+    - `chw-ret-leg-{loopId}` (evaporator → loop return tee)
+    - State binds to `evalLoop(lp).level` (fault when ALARM, energized otherwise).
+    - Sensor tags `TT-CHWS-{i+1}` / `TT-CHWR-{i+1}`.
+  - **+2 header lines** ported:
+    - `chw-header-supply` (CHILLER-PLANT → BUILDING-AHU,
+      data-current bound to engine `coolingKw` + flow + temp)
+    - `chw-header-return` (BUILDING-AHU → CHILLER-PLANT)
+  - Animation overlay (`<line class="flow chws|chwr" />`) unchanged.
+  - All ports use `style.stroke='currentColor'` to preserve the existing
+    `.pipe` CSS class colour (no visual regression).
+- **`tools/probe-line-model.mjs`** — `ADOPTION_TARGETS['chiller-plant.html'] = 18`.
+
+### NOT changed (owner mandate)
+
+- **`EPMS_Telemetry.html`** — left byte-identical. Owner: "jangan merusak
+  EPMS DC Conventional ya, enhance bole". Future ports to EPMS will follow
+  a separate, more cautious plan (likely v1.43.x with inspector pattern
+  ready first).
+
+### Docs
+
+- `standarization/LINE_MODEL.md` v1.42.4 row.
+- `standarization/BMS_SHELL.md` v1.42.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker `project_rz_review_2026-05-26.md` updated.
+
+---
+
 ## v1.42.3 — 2026-05-26 (network fabric link semantics — netSvg port)
 
 MINOR ship: fourth in the v1.42.x → v1.45.x sweep. Closes review doc-27 §5.5

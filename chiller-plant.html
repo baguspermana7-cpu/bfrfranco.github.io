@@ -468,6 +468,12 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.42.4 — Semantic line + breaker model libraries. Foundation for
+         review docs 27/28 §3.1 + 17/18 §3.2 cross-page adoption. Non-deferred
+         so drawPid() can call RZLineModel.line() at parse time. Additive —
+         existing rendering preserved when RZL/RZB are absent. -->
+    <script src="js/rz-line-model.js?v=1.42.0"></script>
+    <script src="js/rz-breaker-symbols.js?v=1.42.1"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Page-scoped (no body.rz-bms-shell class) so it adds the inspector + mode toggle
          additively without overriding chiller-plant's own typography/palette.
@@ -1049,6 +1055,8 @@ function loopSvg(loop, pos){
 
 
 function drawPid(){
+  // v1.42.4 — bind line-model for cross-page semantic adoption (review docs 27/28 + 17/18).
+  const RZL = window.RZLineModel;
   const VW = 2300, VH = 1400;
   const PZ_X = 36, PZ_Y = 100, PZ_W = 1280;
   const LOOP_X = 50, LOOP_W = 1060, LOOP_H = 240, LOOP_GAP = 40;
@@ -1076,19 +1084,27 @@ function drawPid(){
     const fs = e.disconnected?"flow chws broken":"flow chws";
     const fr = e.disconnected?"flow chwr broken":"flow chwr";
     const sC = e.level==="ALARM"?"#c25a5a":(e.level==="WARNING"?"#c08f46":"#38b56d");
+    const loopId = lp.id || ('LOOP-'+(i+1));
+    const loopState = e.disconnected ? 'fault' : (e.level === 'ALARM' ? 'fault' : 'energized');
+    // v1.42.4 — semantic line-model port (review doc-17 §3.2 + §5.3 line metadata).
+    // Pipe lines tagged with from/to/medium/state; animation overlay (`flow` class) unchanged.
+    const supDrop = RZL ? RZL.line({id:'chw-sup-drop-'+loopId,from:'CHWS-HEADER',to:loopId+'-SUP-TEE',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:'7.2°C / 58 L/s plant',redundancy:'duty',sensor:'TT-CHWS-'+(i+1),geometry:{x1:bxS,y1:HDR_CHWS_Y,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="pipe" />`;
+    const supLeg = RZL ? RZL.line({id:'chw-sup-leg-'+loopId,from:loopId+'-SUP-TEE',to:loopId+'-EVAP',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:'7.2°C',redundancy:'duty',geometry:{x1:portX,y1:supY,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="pipe" />`;
+    const retDrop = RZL ? RZL.line({id:'chw-ret-drop-'+loopId,from:'CHWR-HEADER',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:'14.8°C / 58 L/s plant',redundancy:'duty',sensor:'TT-CHWR-'+(i+1),geometry:{x1:bxR,y1:HDR_CHWR_Y,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="pipe" />`;
+    const retLeg = RZL ? RZL.line({id:'chw-ret-leg-'+loopId,from:loopId+'-EVAP',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:'14.8°C',redundancy:'duty',geometry:{x1:portX,y1:retY,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="pipe" />`;
     return `
-      <line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="pipe" />
+      ${supDrop}
       <line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="${fs}" />
-      <line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="pipe" />
+      ${supLeg}
       <line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="${fs}" />
       <circle cx="${bxS}" cy="${HDR_CHWS_Y}" r="7" class="tee" />
       <circle cx="${bxS}" cy="${supY}" r="7" class="tee" />
       ${flowArrow(bxS, HDR_CHWS_Y+18, "down", "supply")}
       ${i===0?`<text x="${bxS+16}" y="${HDR_CHWS_Y+30}" class="pipe-label" text-anchor="start">DN100</text>`:''}
 
-      <line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="pipe" />
+      ${retDrop}
       <line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="${fr}" />
-      <line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="pipe" />
+      ${retLeg}
       <line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="${fr}" />
       <circle cx="${bxR}" cy="${HDR_CHWR_Y}" r="7" class="tee" />
       <circle cx="${bxR}" cy="${retY}" r="7" class="tee" />
@@ -1191,16 +1207,17 @@ function drawPid(){
     ${flowArrow(HDR_X2+8, HDR_CHWR_Y, "left", "return")}
 
     <!-- CHWS supply header pipe (label box bounded inside reserved lane;
-         text is short so its bbox never reaches the first branch tee). -->
-    <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="pipe" />
+         text is short so its bbox never reaches the first branch tee).
+         v1.42.4 — pipe tagged via RZL; flow overlay unchanged. -->
+    ${RZL ? RZL.line({id:'chw-header-supply',from:'CHILLER-PLANT',to:'BUILDING-AHU',medium:'chws',direction:'forward',state:'energized',capacity:'DN300 distribution header',current:`${r1(st.header.coolingKw/1000)} MW @ ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} / ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`,redundancy:'duty',sensor:'TT-CHWS-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWS_Y,x2:HDR_X2,y2:HDR_CHWS_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="pipe" />`}
     <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="flow chws" />
     <rect x="${HDR_X1}" y="${HDR_CHWS_Y-42}" width="138" height="32" rx="6" fill="rgba(98,140,183,.14)" stroke="rgba(98,140,183,.45)" />
     ${text(HDR_X1+8,HDR_CHWS_Y-28,"hdr-pipe-label supply","PRIMARY CHWS")}
     ${text(HDR_X1+8,HDR_CHWS_Y-15,"hdr-pipe-label supply",`${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`)}
     ${flowArrow(LABEL_LANE_END+6, HDR_CHWS_Y, "right", "supply")}
 
-    <!-- CHWR return header pipe -->
-    <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />
+    <!-- CHWR return header pipe. v1.42.4 — pipe tagged via RZL. -->
+    ${RZL ? RZL.line({id:'chw-header-return',from:'BUILDING-AHU',to:'CHILLER-PLANT',medium:'chwr',direction:'reverse',state:'energized',capacity:'DN300 return header',current:`${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} / ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`,redundancy:'duty',sensor:'TT-CHWR-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWR_Y,x2:HDR_X2,y2:HDR_CHWR_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />`}
     <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="flow chwr" />
     <rect x="${HDR_X1}" y="${HDR_CHWR_Y+10}" width="138" height="32" rx="6" fill="rgba(93,160,149,.14)" stroke="rgba(93,160,149,.45)" />
     ${text(HDR_X1+8,HDR_CHWR_Y+24,"hdr-pipe-label return","PRIMARY CHWR")}
