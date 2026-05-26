@@ -107,6 +107,26 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
 
   console.log(`  · summary: ${report.tagged} tagged / ${report.total} total lines (${report.coverage}% adoption)`);
 
+  /* v1.43.0: inspector availability (datahallAI only for pilot ship) */
+  if (slug === 'datahallAI.html') {
+    const insp = await page.evaluate(() => ({
+      lib: !!window.RZInspector,
+      shellInjected: !!document.querySelector('[data-rz-inspector="1"]')
+    }));
+    assert(insp.lib, `${slug}: window.RZInspector exposed`,
+           'rz-inspector.js did not register');
+    /* Trigger a click on a tagged line to verify the inspector opens. */
+    const opened = await page.evaluate(() => {
+      const target = document.querySelector('[data-rz-line="1"]');
+      if (!target) return false;
+      try { target.dispatchEvent(new MouseEvent('click', { bubbles: true })); }
+      catch (e) { return false; }
+      return !!document.querySelector('.rz-inspector.open');
+    });
+    assert(opened, `${slug}: clicking [data-rz-line] opens inspector`,
+           'inspector did not open after synthetic click');
+  }
+
   /* v1.42.1: breaker symbol coverage */
   const brTarget = BREAKER_TARGETS[slug] || 0;
   if (brTarget > 0) {

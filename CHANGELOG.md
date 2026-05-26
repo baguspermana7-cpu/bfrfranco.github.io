@@ -11,6 +11,63 @@ release sections rather than semver.
 
 ---
 
+## v1.43.0 — 2026-05-26 (right-side inspector — review doc-27 §3.2 P0)
+
+MINOR ship: closes review doc-27 §3.2 P0 ("Equipment popup masih MODAL
+CENTER, menutup topology. Jadikan click equipment membuka right-side
+inspector, bukan modal tengah").
+
+Self-attaching inspector library that surfaces the metadata laid down by
+v1.42.0-v1.42.5. Click any `[data-rz-line]` or `[data-rz-breaker]` element
+on `datahallAI.html` to see Live / Capacity / Deps / Alarms / Trend /
+Maintenance tabs in a sticky right-side panel that does NOT occlude topology.
+
+Engine + `#p-dash` byte-identical. **21/21** line-model probe pass (including
+the two new inspector assertions: `window.RZInspector exposed` +
+`clicking [data-rz-line] opens inspector`) + 75/75 accuracy probe + 57/57 +
+22/22 + all strict audits PASS.
+
+### Added
+
+- **`js/rz-inspector.js`** — self-contained inspector library. Vanilla
+  ES5, no external dependencies. CSS injected on init (scoped to
+  `.rz-inspector*`).
+  - Slide-in panel from right (360px desktop, full-width on ≤640px).
+  - 6 tabs read directly from element `data-*` attributes.
+  - Delegated click handler — catches dynamically-rendered elements.
+  - ESC + outside-click close.
+  - Dependency-card click navigates to linked equipment ID.
+  - Pulsing dot when state=energized. Colour-coded state pills.
+  - State machine respects review doc-27 §4.3 alarm philosophy
+    (active / acknowledged / inhibited / RTN derived from state).
+- **`standarization/INSPECTOR.md`** — schema, tabs, API, adoption table,
+  authoring guidelines.
+
+### Changed
+
+- **`datahallAI.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+  loaded after rz-breaker-symbols.js. Other cockpit pages (chiller-plant,
+  water-system, fire-system) deferred to v1.43.1 to limit blast radius.
+- **`tools/probe-line-model.mjs`** — extended for datahallAI:
+  asserts `window.RZInspector` exposed + synthetic click on first
+  `[data-rz-line]` opens the panel.
+
+### Scope discipline
+
+- **`EPMS_Telemetry.html` intentionally untouched** per the owner mandate
+  ("jangan merusak EPMS DC Conventional ya, enhance bole" — 2026-05-26).
+- Other cockpit pages (chiller-plant, water-system, fire-system) deferred
+  to v1.43.1 — additive script load only, no rendering change.
+
+### Docs
+
+- `standarization/INSPECTOR.md` NEW spec doc.
+- `standarization/BMS_SHELL.md` v1.43.x adoption row.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker updated.
+
+---
+
 ## v1.42.5 — 2026-05-26 (water-system + fire-system static SVG pipes tagged)
 
 MINOR ship: sixth in the v1.42.x → v1.45.x sweep. Cross-page adoption
