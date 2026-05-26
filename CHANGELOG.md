@@ -11,6 +11,105 @@ release sections rather than semver.
 
 ---
 
+## v1.41.11 — 2026-05-26 (review-v3 Sprint 4 partial — CSP plan + SRI audit + P2.2/P2.4/P2.5 page fixes)
+
+PATCH ship: closes the Sprint 4 items the static portfolio site can
+ship as a single PATCH without the multi-day inline-style/script
+extraction. The big extraction is deferred per `csp-plan.md` Phase 2.
+
+### Added — Sprint 4 Phase 1 deliverables
+
+**`docs/contracts/csp-plan.md`** — 5-phase migration plan from
+"inline-everything" → enforced Content Security Policy. Documents
+why the site can't enforce CSP today (inline `<style>` blocks +
+inline `<script>` blocks + `style="..."` attrs on ~120 pages),
+defines the target end-state CSP directives, and lays out the
+extraction roadmap:
+- Phase 1 (this ship): inventory + audit
+- Phase 2: per-page CSS extraction (5 calc pages → 5 pillar pages
+  → AI Maint pages)
+- Phase 3: per-page JS extraction (removes the `</script>` escape
+  pitfall entirely)
+- Phase 4: server-rendered nonces (requires moving to Cloudflare
+  Pages Workers or similar edge)
+- Phase 5: enforce header (report-only for 2 weeks first)
+
+**`tools/audit-cdn-sri.py`** — new audit that scans every `<link>`
+and `<script>` that points at a CDN (cdnjs.cloudflare.com,
+cdn.jsdelivr.net, unpkg.com, bootstrapcdn.com) and reports any
+missing `integrity="sha384-..."` + `crossorigin`. Skips
+fonts.googleapis.com (dynamic CSS — no SRI by design) and
+googletagmanager.com (dynamic).
+
+First run baseline: **multiple CDN refs across 80+ pages without
+SRI** — site-wide remediation is too risky for one PATCH, scheduled
+per the csp-plan as Phase 2 batch work.
+
+### Page fixes on `ai-engineering-maintenance.html` (1,838 → 1,921)
+
+**P2.2 — Local CSS classes** for the Knowledge Base metric grid.
+Previously `.metric-grid` / `.metric` / `.m-val` / `.m-lbl` /
+`.kb-table` were referenced but **had no local CSS rules**, falling
+back to plain block layout. Added proper definitions:
+- `.metric-grid` — `repeat(auto-fit, minmax(220px, 1fr))` grid
+- `.metric` — bordered card, 10 px radius, themed background
+- `.m-val` — 1.6 rem JetBrains Mono numeric
+- `.m-lbl` — 0.72 rem muted label
+- `.kb-table` — full bordered table with pill-styled headers
+- Both light and dark theme variants
+
+**P2.4 — Cookie banner → compact corner toast**. Previously a
+full-width bottom bar that covered first-viewport content on
+desktop. Now a 380px-max bottom-right toast with a small
+"hidden" state. Mobile (≤560 px) reverts to full-width with 8 px
+margins.
+
+**P2.5 — Accessibility polish**:
+- `.nav-pill.active` is no longer color-only. Now adds
+  `font-weight: 800` + `text-decoration: underline` so non-color
+  cues mark the active section. `:focus-visible` outline added.
+- Two **diagram summary `<details>`** blocks before the
+  horizontal-scroll architecture SVGs. Operators on screen readers
+  or mobile get a textual summary of each architecture diagram's
+  bands and blocks before being offered the SVG.
+- `scope="col"` on the Knowledge Base CSV-inventory table headers
+  (previously bare `<th>` without scope).
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.11
+- `sw.js` &rarr; `rz-cache-v1.41.11`
+
+### Audits
+
+- `audit-script-tags.py --strict` &mdash; CLEAN
+- `audit-js-syntax.py --strict` &mdash; CLEAN
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 134 PASS / 0 FAIL
+- `audit-contracts-coverage.py --strict` &mdash; CLEAN (15/15)
+- `audit-cdn-sri.py` &mdash; 80+ pages flagged (CSP plan Phase 2 backlog)
+
+### Sprint 4 status
+
+| Sprint 4 item | Status |
+|---|---|
+| Inline `<style>` &rarr; external CSS | ⏳ Phase 2 (sitewide refactor) |
+| Inline `<script>` &rarr; external JS | ⏳ Phase 3 (after CSS extraction) |
+| CSP plan document | ✅ v1.41.11 |
+| SRI audit tool | ✅ v1.41.11 |
+| SRI sitewide remediation | ⏳ Phase 2 (80+ pages — batch refactor) |
+| P2.2 metric-grid orphans | ✅ v1.41.11 (on ai-engineering-maintenance) |
+| P2.4 cookie banner toast | ✅ v1.41.11 (on ai-engineering-maintenance) |
+| P2.5 a11y (scope=col, diagram summaries, nav active state) | ✅ v1.41.11 (on ai-engineering-maintenance) |
+
+The four review-v3 sprints that the static portfolio site can
+meaningfully close are now closed (Sprints 1 + 2 + 3 + 5 complete;
+Sprint 4 has its plan + auditor + concrete UX fixes shipped; the
+remaining Sprint 4 inline-extraction work is multi-day refactor
+work appropriately scheduled per the CSP plan).
+
+---
+
 ## v1.41.10 — 2026-05-26 (review-v3 Sprint 5 — telemetry schema + DQ matrix + risk formula + event taxonomy + audit)
 
 PATCH ship: closes review-v3 Sprint 5 backlog with the canonical Spec

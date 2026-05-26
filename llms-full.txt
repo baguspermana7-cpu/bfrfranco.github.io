@@ -63797,6 +63797,13 @@ Skip to main content
 
  
  
+ ** Diagram summary (for screen readers + mobile) 
+ 
+ Block diagram of the paper's baseline architecture. Three layers: **(A) Input** — user query or sensor data; **(B) Engine** — either Mode-A Cypher template selection via NLP or Mode-B PCA + RF classifier; **(C) Knowledge Graph** — Neo4j with 10 node types and 12 relationships, queried in both modes via the same Cypher tail. Output flows back to the user with explanation. SVG is horizontally scrollable on small screens.
+ 
+ 
+ 
+ 
  
  
  ** Knowledge / FMECA path 
@@ -64204,6 +64211,13 @@ Every capability shown in the architecture above carries an explicit readiness l
  
  
 
+ 
+ 
+ ** Diagram summary (for screen readers + mobile) 
+ 
+ Enhanced engine architecture across four bands: **(A) Ingest** — sensor stream + CMMS events + manual notes; **(B) Inference stack** — data-quality gate, PCA + RF, calibration + conformal, RUL regressor (blocked-by-data), anomaly net; **(C) Knowledge + linkage** — FMECA KG with claim-level provenance, learning loop, version control; **(D) Operator + CMMS** — explanation, work-order draft (planner approval), execution feedback. Green dashed lines = feedback loops. Red blocks = safety nets. SVG is horizontally scrollable on small screens.
+ 
+ 
  
  
  
@@ -65147,341 +65161,244 @@ Top-3 ranked fault hypotheses from rf_pump_v0.3. Calibrated via isotonic regress
 
 
 ======================================================================
-# Changelog — Resistance Zero (v1.41.9 latest) — https://resistancezero.com/changelog.html
+# Changelog — Resistance Zero (v1.41.11 latest) — https://resistancezero.com/changelog.html
 
 > Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.
 
-v1.41.9 
+v1.41.11 
  PATCH 
  May 26, 2026 
  
  
-AI Maintenance Workbench Prototype — product-shell vertical slice
+review-v3 Sprint 4 partial — CSP plan + SRI audit + P2.2/P2.4/P2.5 page fixes
 
  
  
-MINOR-ish in scope (new page) but shipped as PATCH on the v1.41.x
+PATCH ship: closes the Sprint 4 items the static portfolio site can
 
 
-ladder to avoid version collision with the parallel BMS v1.42.x track.
+ship as a single PATCH without the multi-day inline-style/script
 
 
-Closes review-v3 Section 5 final position: *"The next leap is not more
+extraction. The big extraction is deferred per `csp-plan.md` Phase 2.
 
 
-explanation. The next leap is one usable workbench slice that proves:
+### Added — Sprint 4 Phase 1 deliverables
 
 
-signal → diagnosis → evidence → calculation → human decision → CMMS
+**`docs/contracts/csp-plan.md`** — 5-phase migration plan from
 
 
-draft → field feedback → audit."*
+"inline-everything" → enforced Content Security Policy. Documents
 
 
-### Added — ai-maintenance-workbench.html (1,694 lines)
+why the site can't enforce CSP today (inline ` ` blocks +
 
 
-Static product-shell prototype rendering the Maintenance Intelligence
+inline ` ` blocks + `style="..."` attrs on ~120 pages),
 
 
-Workbench's first viewport. Grounded in the v1.41.7 JSON-schema
+defines the target end-state CSP directives, and lays out the
 
 
-contracts (`docs/contracts/`).
-
-
-**3-column app-shell layout** (desktop ≥1024px):
+extraction roadmap:
 
 
  
-- **Top bar**: Brand · Tenant/Site picker · User · theme · sign-out
+- Phase 1 (this ship): inventory + audit
  
-- **Left nav** (220px): Command · Cases · Assets · Planner ·
+- Phase 2: per-page CSS extraction (5 calc pages → 5 pillar pages
 
 
-Technician · Knowledge · Models · Integrations · Audit · Admin
-
-
- 
-- **Main pane**: active view renders here
- 
-- **Right rail** (320px): Approval Queue · CMMS Draft Queue · Warnings
-
-
-Mobile: nav collapses to drawer, right rail stacks under main.
-
-
-**10 views** wired through `WB_STATE.activeView`:
+→ AI Maint pages)
 
 
  
-- **Command Center** — 4 KPI tiles (3 At Risk · 7 Needs Review ·
+- Phase 3: per-page JS extraction (removes the ` ` escape
 
 
-4 Draft WO · 42 SLA Healthy), 5×4 asset-system risk heatmap
-
-
-(cooling · power · fire · ICT · misc), DQ Issues strip,
-
-
-Connector Health strip.
+pitfall entirely)
 
 
  
-- **Cases / Triage Queue** — 5-row sortable table. Click row →
+- Phase 4: server-rendered nonces (requires moving to Cloudflare
 
 
-loads case detail.
-
-
- 
-- **Diagnostic Case Detail** — THE vertical slice for
-
-
-DC-CDU01-000142 (CDU-PUMP-01 flow obstruction · F11.2 · SEV-1).
+Pages Workers or similar edge)
 
 
  
-- Case header strip (asset · site · severity · state · owner ·
+- Phase 5: enforce header (report-only for 2 weeks first)
 
 
-DQ score · evidence coverage · 3 action buttons)
+**`tools/audit-cdn-sri.py`** — new audit that scans every `
+- `
+
+
+and ` ` that points at a CDN (cdnjs.cloudflare.com,
+
+
+cdn.jsdelivr.net, unpkg.com, bootstrapcdn.com) and reports any
+
+
+missing `integrity="sha384-..."` + `crossorigin`. Skips
+
+
+fonts.googleapis.com (dynamic CSS — no SRI by design) and
+
+
+googletagmanager.com (dynamic).
+
+
+First run baseline: **multiple CDN refs across 80+ pages without
+
+
+SRI** — site-wide remediation is too risky for one PATCH, scheduled
+
+
+per the csp-plan as Phase 2 batch work.
+
+
+### Page fixes on ai-engineering-maintenance.html (1,838 → 1,921)
+
+
+**P2.2 — Local CSS classes** for the Knowledge Base metric grid.
+
+
+Previously `.metric-grid` / `.metric` / `.m-val` / `.m-lbl` /
+
+
+`.kb-table` were referenced but **had no local CSS rules**, falling
+
+
+back to plain block layout. Added proper definitions:
+
+
+ `.metric-grid` — `repeat(auto-fit, minmax(220px, 1fr))` grid
+ 
+- `.metric` — bordered card, 10 px radius, themed background
+ 
+- `.m-val` — 1.6 rem JetBrains Mono numeric
+ 
+- `.m-lbl` — 0.72 rem muted label
+ 
+- `.kb-table` — full bordered table with pill-styled headers
+ 
+- Both light and dark theme variants
+
+
+**P2.4 — Cookie banner → compact corner toast**. Previously a
+
+
+full-width bottom bar that covered first-viewport content on
+
+
+desktop. Now a 380px-max bottom-right toast with a small
+
+
+"hidden" state. Mobile (≤560 px) reverts to full-width with 8 px
+
+
+margins.
+
+
+**P2.5 — Accessibility polish**:
 
 
  
-- **5 evidence tabs**:
+- `.nav-pill.active` is no longer color-only. Now adds
 
 
-1. Telemetry (3 sensor channels with min/max/p50/p95 + SVG
+`font-weight: 800` + `text-decoration: underline` so non-color
 
 
-sparklines suggesting flow obstruction)
-
-
-2. FMECA / KG path (F11.2 → M-MEC-022 → S-FLOW-LOSS → A11.2-P
-
-
-→ 4 steps, each clickable with source_ref tooltip)
-
-
-3. Top-3 fault hypotheses (calibrated confidence bars, model
-
-
-confidence, source_confidence_tier, conformal set,
-
-
-decision_route)
-
-
-4. Comparable cases (3 historical case IDs + outcomes)
-
-
-5. Source claims (4 evidence-claim rows: ASHRAE TC 9.9 §3.2,
-
-
-Hydraulic Inst 14.3, vendor app note, OREDA 7e §7.2)
+cues mark the active section. `:focus-visible` outline added.
 
 
  
-- **Calculation Panel**: fault · FMECA priority rank (144
+- Two **diagram summary ` `** blocks before the
 
 
-ordinal) · expected risk P50 BLOCKED (effects chain incomplete)
+horizontal-scroll architecture SVGs. Operators on screen readers
 
 
-· formula version · DQ score · model · validation scope ·
+or mobile get a textual summary of each architecture diagram's
 
 
-reviewer · decision routing
-
-
- 
-- **Recommendation Panel**: action · 4-step pack · spare
-
-
-readiness · safety notes · approval route
+bands and blocks before being offered the SVG.
 
 
  
-- **CMMS Draft Preview** (collapsible accordion): title · priority
+- `scope="col"` on the Knowledge Base CSV-inventory table headers
 
 
-P2_critical · score breakdown (multi-factor) · work type · task
-
-
-steps · required parts · lockout · downtime · state · idempotency key
-
-
- 
-- **Audit Timeline** (5-7 entries): case_created → dq_gate_passed
-
-
-→ hypothesis_emitted → recommendation_proposed → placeholder
-
-
- 
-- **Planner Board** — placeholder card with "Phase B" status pill
- 
-- **Technician Workbench** — placeholder
- 
-- **Knowledge / FMECA Admin** — placeholder
- 
-- **Model Monitor** — placeholder
- 
-- **Integrations Health** — placeholder
- 
-- **Audit & Reports** — placeholder
- 
-- **Admin / RBAC** — placeholder
-
-
-**Right rail (persistent)**:
-
-
- 
-- 3-item Approval Queue (cases awaiting reviewer verdict)
- 
-- 4-item CMMS Draft Queue (drafts awaiting planner approval)
- 
-- 2-item Warnings (model drift, connector lag)
-
-
-**Mock state shape** mirrors v1.41.7 schemas: WB_STATE.cases items
-
-
-have fields matching `DiagnosticCase` schema (case_id, fault_hypotheses,
-
-
-state, severity, data_quality_score, evidence_coverage_score,
-
-
-recommendation_readiness, owner_role, etc.).
-
-
-**Auth gate**: page is Pro/Educator-tier (`page-access` feature flag
-
-
-added to `js/rz-feature-flags.js`). v1.41.8 single-dialog pattern
-
-
-respected (inline `.root-gate` + session-diagnostic strip; no double
-
-
-modal).
-
-
-**49 dark-mode rules**, 134/134 mobile responsive (passed strict
-
-
-audit), `wb-*` CSS prefix throughout (no global clash).
-
-
-### Wired
-
-
- 
-- **`ai-engineering-maintenance.html`** — Workbench Preview section
-
-
-bottom now has explicit "Open Workbench Prototype →" CTA linking
-
-
-to the new page. Reading guide updated to flag v1.41.9 as the ship
-
-
-that delivered the vertical slice.
-
-
- 
-- **`datacenter-solutions.html`** — new strat-card "AI Maintenance
-
-
-Workbench" (PROTO badge, instrument-cyan accent) added to
-
-
-`#tools-ltc-featured` between the Maintenance Decode Lab card
-
-
-and the placeholder. 5 strat-cards + 1 placeholder = 6 cards in
-
-
-the section.
-
-
- 
-- **`js/rz-feature-flags.js`** — new entry `ai-maintenance-workbench`
-
-
-with `page-access: { free:false, demo:false, pro:true, root:true }`.
-
-
-### SEO + AI search wired
-
-
- 
-- **`sitemap.xml`** — entry added (priority 0.8, weekly).
- 
-- **`llms.txt`** — description added so AI assistants can find
-
-
-the prototype when answering workbench-architecture questions.
-
-
- 
-- **`search-index.json`** — 91st entry with 19 keywords.
- 
-- **`assets/og/ai-maintenance-workbench.webp`** — OG card
-
-
-generated (1200×630, instrument-cyan accent).
-
-
- 
-- **`sw.js`** precache list extended.
+(previously bare ` | ` without scope).
 
 
 ### Bumped
 
 
  
-- `js/rz-version.js` → v1.41.9
+- `js/rz-version.js` → v1.41.11
  
-- `sw.js` → `rz-cache-v1.41.9`
+- `sw.js` → `rz-cache-v1.41.11`
 
 
 ### Audits
 
 
  
-- `audit-script-tags.py --strict` — CLEAN (178 files)
+- `audit-script-tags.py --strict` — CLEAN
  
-- `audit-js-syntax.py --strict` — CLEAN (108 files)
+- `audit-js-syntax.py --strict` — CLEAN
  
 - `audit-pro-mode-indicator.py --strict` — CLEAN
  
 - `audit-mobile-responsive.py --strict` — 134 PASS / 0 FAIL
  
-- `audit-seo.py` — 0 required errors
+- `audit-contracts-coverage.py --strict` — CLEAN (15/15)
+ 
+- `audit-cdn-sri.py` — 80+ pages flagged (CSP plan Phase 2 backlog)
 
 
-### Still deferred from review-v3 Sprint 4-5
+### Sprint 4 status
+
+ 
 
 
+ Sprint 4 item | Status |
+
+ | Inline ` ` → external CSS | ⏳ Phase 2 (sitewide refactor) |
+
+ | Inline ` ` → external JS | ⏳ Phase 3 (after CSS extraction) |
+
+ | CSP plan document | ✅ v1.41.11 |
+
+ | SRI audit tool | ✅ v1.41.11 |
+
+ | SRI sitewide remediation | ⏳ Phase 2 (80+ pages — batch refactor) |
+
+ | P2.2 metric-grid orphans | ✅ v1.41.11 (on ai-engineering-maintenance) |
+
+ | P2.4 cookie banner toast | ✅ v1.41.11 (on ai-engineering-maintenance) |
+
+ | P2.5 a11y (scope=col, diagram summaries, nav active state) | ✅ v1.41.11 (on ai-engineering-maintenance) |
+
  
-- Frontend hardening (inline-style → external, CSP plan, SRI on CDN)
- 
-- Telemetry schema + synthetic fixtures (live data ingestion)
- 
-- Model validation / calibration / conformal acceptance criteria
- 
-- Product event taxonomy + analytics pipeline
- 
-- Server-side RBAC / multi-tenant enforcement (multi-year)
- 
-- Actual engine connecting to a CMMS connector (long lead)
+
+The four review-v3 sprints that the static portfolio site can
 
 
-These remain in `docs/plans/2026-05-25-ai-maintenance-product-roadmap.md`.
+meaningfully close are now closed (Sprints 1 + 2 + 3 + 5 complete;
+
+
+Sprint 4 has its plan + auditor + concrete UX fixes shipped; the
+
+
+remaining Sprint 4 inline-extraction work is multi-day refactor
+
+
+work appropriately scheduled per the CSP plan).
 
 
 ======================================================================
