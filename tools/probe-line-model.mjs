@@ -107,8 +107,14 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
 
   console.log(`  · summary: ${report.tagged} tagged / ${report.total} total lines (${report.coverage}% adoption)`);
 
-  /* v1.43.0: inspector availability (datahallAI only for pilot ship) */
-  if (slug === 'datahallAI.html') {
+  /* v1.43.0 + v1.43.1: inspector availability on every tagged cockpit page. */
+  const INSPECTOR_PAGES = new Set([
+    'datahallAI.html',
+    'chiller-plant.html',
+    'water-system.html',
+    'fire-system.html'
+  ]);
+  if (INSPECTOR_PAGES.has(slug)) {
     const insp = await page.evaluate(() => ({
       lib: !!window.RZInspector,
       shellInjected: !!document.querySelector('[data-rz-inspector="1"]')

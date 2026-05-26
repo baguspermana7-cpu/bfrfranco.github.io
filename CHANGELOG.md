@@ -11,6 +11,56 @@ release sections rather than semver.
 
 ---
 
+## v1.43.1 — 2026-05-26 (inspector cross-page parity — chiller-plant + water-system + fire-system)
+
+PATCH ship: extends the v1.43.0 right-side inspector to the three other
+tagged cockpit pages. Pure additive — one `<script src>` per page,
+no rendering changes, no DOM modifications.
+
+Engine + `#p-dash` byte-identical. **27/27 line-model probe** (added 6
+inspector assertions for the 3 newly-covered pages) + 75/75 accuracy
+probe + 57/57 + 22/22 + all strict audits PASS.
+
+### Changed
+
+- **`chiller-plant.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+  added after rz-breaker-symbols.js. Click any of the 18 tagged CHW pipes
+  → inspector opens.
+- **`water-system.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+  added after rz-line-model.js. Click any of the 10 tagged pipes → inspector
+  opens.
+- **`fire-system.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+  added after rz-line-model.js. Click any of the 14 tagged fire-water / N2
+  pipes → inspector opens.
+- **`tools/probe-line-model.mjs`** — `INSPECTOR_PAGES` set extended; every
+  tagged cockpit page now verifies inspector availability + click-to-open
+  behaviour.
+
+### Scope discipline (unchanged)
+
+- **`EPMS_Telemetry.html`** — still untouched per owner mandate
+  ("jangan merusak EPMS DC Conventional ya, enhance bole" — 2026-05-26).
+- **`dc-conventional.html`** — landing page, no inspector needed
+  (no tagged equipment).
+
+### Cumulative state after v1.43.1
+
+| Page | Lines | Breakers | Inspector |
+|---|---|---|---|
+| datahallAI.html | 171 | 36 | ✓ |
+| chiller-plant.html | 18 | 0 | ✓ |
+| water-system.html | 10 | 0 | ✓ |
+| fire-system.html | 14 | 0 | ✓ |
+
+### Docs
+
+- `standarization/INSPECTOR.md` adoption table v1.43.1 row.
+- `standarization/BMS_SHELL.md` v1.43.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker updated.
+
+---
+
 ## v1.43.0 — 2026-05-26 (right-side inspector — review doc-27 §3.2 P0)
 
 MINOR ship: closes review doc-27 §3.2 P0 ("Equipment popup masih MODAL

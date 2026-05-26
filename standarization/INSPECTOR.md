@@ -53,8 +53,8 @@ window.RZInspector.isOpen();        /* boolean */
 | Ship | Page | Status |
 |---|---|---|
 | v1.43.0 | `datahallAI.html` | Loaded. Verified via probe — clicks open inspector. |
-| v1.43.1 (planned) | `chiller-plant.html`, `water-system.html`, `fire-system.html` | Pending — additive load only. |
-| v1.43.2 (planned) | `datahall.html`, `ict.html`, `EPMS_Telemetry.html` | EPMS deferred per owner mandate; datahall + ict on standard track. |
+| **v1.43.1** | `chiller-plant.html`, `water-system.html`, `fire-system.html` | **Loaded.** Each verified via probe (27/27 pass — 4 inspector assertions). |
+| v1.43.2 (planned) | `datahall.html`, `ict.html` | Pending — datahall standalone + ict on standard track. EPMS still deferred per owner mandate. |
 
 ## Visual
 
