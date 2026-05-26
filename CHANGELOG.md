@@ -11,6 +11,94 @@ release sections rather than semver.
 
 ---
 
+## v1.41.10 — 2026-05-26 (review-v3 Sprint 5 — telemetry schema + DQ matrix + risk formula + event taxonomy + audit)
+
+PATCH ship: closes review-v3 Sprint 5 backlog with the canonical Spec
+documents the workbench engine will consume. Plus a synthetic CDU-pump
+telemetry fixture and a contracts-coverage auditor.
+
+### Added — `docs/contracts/` spec docs
+
+| Doc | Purpose | Size |
+|---|---|---:|
+| `telemetry-schema.md` | Tag-naming convention, unit canonical list, sample-rate bands, per-asset-class expected channels, operating-state segmentation rules. | 5.8 KB |
+| `dq-threshold-matrix.md` | Per-feature DQ thresholds, verdict ladder (pass / soft_warn / fail), score composition (completeness + freshness + in-range + self-consistency), per-asset-class expected feature lists. | 4.9 KB |
+| `risk-formula-v0.2.md` | Two-number contract: ordinal `fmeca_priority_rank` separate from composite `priority_class`. Decision rules with multi-factor input (SLA × safety × redundancy × spares × human-approval). Explicit "expected_risk is blocked until data complete" stance. | 5.3 KB |
+| `product-event-taxonomy.md` | 12 event types across diagnosis / recommendation / CMMS / learning lifecycles. Universal context fields (tenant / site / asset / model_version / formula_version / kg_release / actor / timestamp). Sinks: AuditEvent ledger, product warehouse, operator dashboard, model retraining. | 6.2 KB |
+
+### Added — `docs/research/fixtures/synthetic-cdu-pump.csv`
+
+20-minute synthetic CDU-pump telemetry (40 samples × 7 columns) showing
+the F11.2 flow-obstruction signature: flow declining 318→220 L/min,
+DP rising 42→131 kPa, motor amps rising 18.6→26.4 A, vibration RMS
+2.1→7.0 mm/s, stator temp rising 58→79 °C. Hand-shaped so the
+workbench prototype's hypothesis ranking remains plausible when the
+engine is eventually wired.
+
+### Added — `tools/audit-contracts-coverage.py`
+
+New audit that enumerates the canonical contracts set (9 JSON
+schemas + 5 spec docs + 1 fixture = **15 artefacts**) and fails strict
+mode if any are missing or empty.
+
+First run: **15/15 canonical artefacts present**. 4 future-scope docs
+(model-validation-report-template, calibration-acceptance-criteria,
+asset-registry.schema.json, rbac-policy.schema.json) flagged as warn-
+only.
+
+### Why these four documents
+
+Reviewer's Sprint 5: "Define telemetry schema. Define data-quality
+threshold matrix. Define model validation report template. Define
+calibration/conformal acceptance criteria. Define risk formula
+versioning. Define product event taxonomy."
+
+This ship covers **4 of 6** Sprint 5 items concretely. Two remain
+future-scope:
+- `model-validation-report-template.md` — depends on the actual model
+  pipeline existing (currently RF research baseline only)
+- `calibration-acceptance-criteria.md` — depends on a held-out
+  validation set + actual calibrated model output
+
+Those are honest blockers, not paperwork the page can fix in
+isolation. They land when Phase B engineering work begins.
+
+### Bumped
+
+- `js/rz-version.js` &rarr; v1.41.10
+- `sw.js` &rarr; `rz-cache-v1.41.10`
+
+### Audits
+
+- `audit-contracts-coverage.py --strict` &mdash; CLEAN (15/15)
+- `audit-script-tags.py --strict` &mdash; CLEAN
+- `audit-js-syntax.py --strict` &mdash; CLEAN
+- `audit-pro-mode-indicator.py --strict` &mdash; CLEAN
+- `audit-mobile-responsive.py --strict` &mdash; 134 PASS / 0 FAIL
+- `audit-csv-readiness.py` &mdash; 23 contradictions surfaced (unchanged
+  baseline from v1.41.7; data-ops backlog)
+
+### Sprint 5 closeout
+
+Closes review-v3 Sprint 5 to the maximum extent the portfolio site
+can. Open items now require Phase B engineering work:
+
+| Sprint 5 item | Status |
+|---|---|
+| Define telemetry schema | ✅ v1.41.10 |
+| Define DQ threshold matrix | ✅ v1.41.10 |
+| Define risk formula versioning | ✅ v1.41.10 (`risk.v0.2`) |
+| Define product event taxonomy | ✅ v1.41.10 |
+| Define model validation report template | ⏳ blocked by model pipeline |
+| Define calibration/conformal acceptance | ⏳ blocked by calibrated model |
+
+All four review-v3 sprints that the static portfolio site can close
+are now closed (Sprints 1 + 2 + 3 + 5). Sprint 4 (frontend hardening:
+inline-style → external, CSP plan, SRI) is the last static-site item
+remaining.
+
+---
+
 ## v1.41.9 — 2026-05-26 (AI Maintenance Workbench Prototype — product-shell vertical slice)
 
 MINOR-ish in scope (new page) but shipped as PATCH on the v1.41.x
