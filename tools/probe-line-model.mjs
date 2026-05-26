@@ -131,6 +131,28 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
     });
     assert(opened, `${slug}: clicking [data-rz-line] opens inspector`,
            'inspector did not open after synthetic click');
+
+    /* v1.43.2: data-quality service — page mode + banner + lib availability. */
+    const tq = await page.evaluate(() => {
+      const out = {
+        lib: !!window.RZTelemetryQuality,
+        mode: document.body && document.body.getAttribute('data-rz-data-mode'),
+        bannerInjected: !!document.querySelector('[data-rz-tq-banner]')
+      };
+      if (window.RZTelemetryQuality) {
+        try { out.audit = window.RZTelemetryQuality.audit(document); }
+        catch (e) { out.audit = { error: e.message }; }
+      }
+      return out;
+    });
+    assert(tq.lib, `${slug}: window.RZTelemetryQuality exposed`,
+           'rz-telemetry-quality.js did not register');
+    assert(tq.mode === 'simulated',
+           `${slug}: body data-rz-data-mode = 'simulated'`,
+           `got '${tq.mode}'`);
+    assert(tq.bannerInjected,
+           `${slug}: simulated-mode banner rendered`,
+           'no .rz-tq-banner element found');
   }
 
   /* v1.42.1: breaker symbol coverage */

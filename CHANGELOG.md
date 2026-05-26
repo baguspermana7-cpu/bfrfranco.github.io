@@ -11,6 +11,67 @@ release sections rather than semver.
 
 ---
 
+## v1.43.2 — 2026-05-26 (data-quality service — review doc-27 §3.4 + §5.7)
+
+MINOR ship: closes review doc-27 §3.4 ("simulation mode banner") + §5.7 P1
+(BMS/DCIM data-quality discipline) + doc-28 Global UIUX Corrections ("data
+freshness badge on top bar"). Introduces the data-quality service that
+surfaces telemetry trust at both page level (banner) and point level (chip).
+
+Engine + `#p-dash` byte-identical. **39/39 line-model probe pass** (added
+3 telemetry-quality assertions per inspector page — total +12) + 75/75
+accuracy probe + 57/57 + 22/22 + all strict audits PASS.
+
+### Added
+
+- **`js/rz-telemetry-quality.js`** — `window.RZTelemetryQuality` service:
+  - 7 states with colour + chip label (`live` / `simulated` / `stale` /
+    `manual` / `comms_lost` / `inhibited` / `demo`).
+  - Page-level `setPageMode(mode)` → injects dismissible top banner
+    (skips render when mode = `live`).
+  - Per-element `markPoint(el, state)` + `getPointState(el)` (falls back to
+    page mode if no explicit `data-quality-state`).
+  - `chipHtml(state)` — small inline chip for embedded rendering.
+  - `audit(rootEl)` consumed by `probe-line-model.mjs`.
+  - Auto-init on `DOMContentLoaded` if `<body data-rz-data-mode="...">` set.
+- **`standarization/TELEMETRY_QUALITY.md`** — full schema + adoption table.
+- **Inspector Live tab** now renders a Data Quality chip below State,
+  reading `RZTelemetryQuality.getPointState(currentElement)`.
+
+### Changed
+
+- **`datahallAI.html`**:
+  - `<body data-rz-data-mode="simulated">` (added attribute, body otherwise
+    unchanged).
+  - `<script src="js/rz-telemetry-quality.js?v=1.43.2" defer>` loaded after
+    inspector. Both scripts bumped to `?v=1.43.2`.
+- **`chiller-plant.html`** — same body attribute + script. Body otherwise
+  byte-identical.
+- **`water-system.html`** — same body attribute + script.
+- **`fire-system.html`** — same body attribute + script.
+- **`js/rz-inspector.js`** — Live tab renders a "Data quality" row reading
+  the element's `data-quality-state` (or inherited page mode). No other
+  inspector behaviour changes.
+- **`tools/probe-line-model.mjs`** — added 3 telemetry-quality assertions
+  per inspector page:
+  - `window.RZTelemetryQuality exposed`
+  - `body data-rz-data-mode = 'simulated'`
+  - `simulated-mode banner rendered`
+
+### Scope discipline (unchanged)
+
+- **`EPMS_Telemetry.html`** — untouched per owner mandate.
+
+### Docs
+
+- `standarization/TELEMETRY_QUALITY.md` NEW spec.
+- `standarization/INSPECTOR.md` adoption table updated.
+- `standarization/BMS_SHELL.md` v1.43.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker updated.
+
+---
+
 ## v1.43.1 — 2026-05-26 (inspector cross-page parity — chiller-plant + water-system + fire-system)
 
 PATCH ship: extends the v1.43.0 right-side inspector to the three other

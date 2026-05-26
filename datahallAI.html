@@ -640,7 +640,12 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
          [data-rz-breaker] element to see Live / Capacity / Deps / Alarms /
          Trend / Maintenance tabs without occluding topology. Closes review
          doc-27 §3.2 P0. Deferred load — body-level init via DOMContentLoaded. -->
-    <script src="js/rz-inspector.js?v=1.43.0" defer></script>
+    <script src="js/rz-inspector.js?v=1.43.2" defer></script>
+    <!-- v1.43.2 — Data-quality service. Loaded before the inspector script so
+         body[data-rz-data-mode] banner renders + RZTelemetryQuality is
+         available when the inspector's Live tab renders its chip. Closes
+         review doc-27 §3.4 + §5.7. -->
+    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class (preserves the page's existing palette + 10k-line render tree).
@@ -653,7 +658,7 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 .skip-link:focus{top:0}
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
-</head><body class="locked">
+</head><body class="locked" data-rz-data-mode="simulated">
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <div class="root-gate" id="rootGate">

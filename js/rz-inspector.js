@@ -199,6 +199,14 @@
       '<span class="rz-inspector-k">State</span>' +
       '<span class="rz-inspector-v state-' + esc(m.state || 'unknown') + '">' +
       pulse + esc(m.state || '—') + '</span></div>';
+    /* v1.43.2 — data-quality chip from RZTelemetryQuality (review §3.4 + §5.7). */
+    if (root && root.RZTelemetryQuality && currentEl) {
+      var qState = root.RZTelemetryQuality.getPointState(currentEl);
+      html += '<div class="rz-inspector-row">' +
+        '<span class="rz-inspector-k">Data quality</span>' +
+        '<span class="rz-inspector-v">' + root.RZTelemetryQuality.chipHtml(qState) + '</span>' +
+      '</div>';
+    }
     html += row('Current value', m.current, m.state);
     html += row('Direction', m.direction);
     if (m.kind === 'line') { html += row('Medium', m.medium); }
