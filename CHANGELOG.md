@@ -11,6 +11,60 @@ release sections rather than semver.
 
 ---
 
+## v1.43.5 — 2026-05-26 (RZ Dark System v1 + animated-on-load primitive applied to #p-dash)
+
+Owner pivot: existing dark mode read as "AI design slop" — asked for animated-
+data-on-load, distinctive type, intuitive responsive (ref raihankalla.id).
+This ship lays the design-system foundation + applies the first motion
+primitive to the real cockpit.
+
+Engine + #p-dash DISPLAYED values byte-identical. 75/75 accuracy probe
+(count-up settles to exact original strings) + 57/57 + 22/22 + all strict
+audits PASS.
+
+### Added (design system — internal/reference)
+
+- **`rz-style-lab.html`** (noindex) — 4 switchable dark-mode characters
+  (Oscilloscope / Blueprint / Terminal / Editorial). Each replays its
+  signature animated chart on selection (trace-in / plot-in / grow / sweep)
+  + KPI count-up. Mobile-responsive switcher. The character picker.
+- **`rz-dark-beforeafter.html`** (noindex) — side-by-side generic-dark vs
+  RZ Dark System instrument register, same data block.
+- **`css/rz-dark.css`** — RZ Dark System v1 shared stylesheet. Two registers
+  (`[data-rz-register="instrument"|"editorial"]`) of one token system:
+  shared signal semantics + base ramp + atmosphere + motion primitives.
+- **`standarization/DARK_MODE_STANDARD.md`** — the standard: two registers,
+  anti-slop checklist, tokens, type scale, motion primitives, responsive
+  rules, adoption plan.
+
+### Changed
+
+- **`datahallAI.html`** — first cockpit adoption of the "animated on load"
+  primitive. `#p-dash` headline KPIs (PUE/WUE/CUE/IT/GPU/NVL72) now count up
+  on first paint via `requestAnimationFrame` cubic-ease.
+  - **PROBE-SAFE**: each value's exact original string is captured and
+    restored verbatim at animation end → displayed final text byte-identical.
+  - **HARD-SETTLE guarantee**: a `setTimeout(settle, dur+300)` forces the
+    exact original value even if rAF stalls (backgrounded/throttled tab).
+    Critical because dkGpu/dkDom are NOT refreshed by the 4s interval — without
+    it a stalled animation could freeze a wrong basis number. Caught + fixed
+    during verification (frozen 1.04 PUE / 6,148 GPU on a throttled read).
+  - Honours `prefers-reduced-motion` (skips animation entirely).
+
+### Process
+
+- Owner mandates logged (memory `feedback_planb_always_visual.md`): planb
+  plans must ALWAYS show a working visual; any change must present
+  before-vs-after VISUAL + code + explanation (not code+prose alone).
+
+### Docs
+
+- `standarization/DARK_MODE_STANDARD.md` NEW.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker + visual-mandate feedback updated.
+
+---
+
 ## v1.43.4 — 2026-05-26 (alarm state machine + color discipline — review doc-27 §3.3 P0 + §4.3 P1)
 
 MINOR ship: closes the LAST open P0 in review doc-27 — §3.3 color discipline

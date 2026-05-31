@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" data-variant="oscilloscope">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Style Lab — dark-mode character variations</title>
+<meta name="description" content="Four candidate visual characters for the resistancezero.com dark mode + plan-landing system. Switch between them; each replays its signature animated chart on selection. Pick one to standardize.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#070B12">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<script src="js/rz-version.js?v=1.43.5" defer></script>
+<style>
+/* ============================================================================
+   RZ STYLE LAB — 4 dark-mode characters, switchable + replayable.
+   Each [data-variant] re-skins the whole page via CSS custom properties +
+   a few structural accents. JS replays the signature chart on switch.
+   Stays inside the RZ industrial-instrumentation brand; no AI-slop defaults.
+   ============================================================================ */
+
+/* ---- shared reset ---- */
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  transition:background .5s ease, color .5s ease;
+  overflow-x:hidden;
+}
+::selection{background:var(--sel);color:var(--bg);}
+a{color:var(--accent);text-decoration:none;}
+
+/* =========================================================================
+   VARIANT TOKENS
+   ========================================================================= */
+
+/* A · OSCILLOSCOPE — CRT phosphor lab instrument */
+[data-variant="oscilloscope"]{
+  --bg:#060A0D; --bg2:#0A1014; --panel:#0C141A; --panel2:#101C22;
+  --text:#C8E6D4; --text-strong:#EAFBF0; --muted:#5E8472; --dim:#3C5B4D;
+  --accent:#22F5A8; --accent2:#2BE8FF; --warn:#FFC447; --fault:#FF5C5C;
+  --line:rgba(43,232,255,.12); --line-strong:rgba(43,232,255,.28);
+  --sel:#22F5A8;
+  --sans:'IBM Plex Mono',ui-monospace,monospace;
+  --display:'JetBrains Mono',ui-monospace,monospace;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --radius:3px; --glow:0 0 12px;
+}
+/* B · BLUEPRINT — engineering schematic / CAD plot */
+[data-variant="blueprint"]{
+  --bg:#0A1426; --bg2:#0D1A30; --panel:#0F2038; --panel2:#13284A;
+  --text:#C3D4EC; --text-strong:#F2F7FF; --muted:#6E89B0; --dim:#46618A;
+  --accent:#4DC8FF; --accent2:#7FE0FF; --warn:#FFB84D; --fault:#FF6B6B;
+  --line:rgba(120,180,240,.16); --line-strong:rgba(120,180,240,.34);
+  --sel:#4DC8FF;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --display:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --radius:2px; --glow:0 0 0;
+}
+/* C · TERMINAL — amber NOC ops console */
+[data-variant="terminal"]{
+  --bg:#0C0A06; --bg2:#13100A; --panel:#171309; --panel2:#1F1A0E;
+  --text:#E8D9B0; --text-strong:#FFF3D6; --muted:#8C7A4E; --dim:#5C4F30;
+  --accent:#FFB627; --accent2:#5BE08A; --warn:#FF8A3C; --fault:#FF5252;
+  --line:rgba(255,182,39,.14); --line-strong:rgba(255,182,39,.32);
+  --sel:#FFB627;
+  --sans:'IBM Plex Mono',ui-monospace,monospace;
+  --display:'JetBrains Mono',ui-monospace,monospace;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --radius:2px; --glow:0 0 10px;
+}
+/* D · EDITORIAL INSTRUMENT — refined premium report */
+[data-variant="editorial"]{
+  --bg:#0E0F12; --bg2:#141519; --panel:#16181D; --panel2:#1C1F25;
+  --text:#CFD3DA; --text-strong:#F6F7F9; --muted:#7E8590; --dim:#565C66;
+  --accent:#E8B563; --accent2:#6FBF9A; --warn:#E8B563; --fault:#D8685F;
+  --line:rgba(160,168,180,.13); --line-strong:rgba(160,168,180,.26);
+  --sel:#E8B563;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --display:'Fraunces',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --radius:10px; --glow:0 0 0;
+}
+
+/* =========================================================================
+   ATMOSPHERE per variant (backgrounds, texture)
+   ========================================================================= */
+.atmos{position:fixed;inset:0;z-index:0;pointer-events:none;}
+/* oscilloscope graticule + scanlines */
+[data-variant="oscilloscope"] .atmos{
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(43,232,255,.020) 2px 3px),
+    radial-gradient(120% 80% at 50% 0%, rgba(34,245,168,.06), transparent 60%),
+    linear-gradient(180deg,#070C10,#04080A);
+  background-size:100% 3px,100% 100%,100% 100%;
+}
+[data-variant="oscilloscope"] .atmos::after{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(43,232,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(43,232,255,.05) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(120% 90% at 50% 30%,#000 40%,transparent 85%);
+}
+/* blueprint grid */
+[data-variant="blueprint"] .atmos{
+  background:
+    linear-gradient(rgba(120,180,240,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(120,180,240,.05) 1px,transparent 1px),
+    linear-gradient(180deg,#0B1730,#08101F);
+  background-size:26px 26px,26px 26px,100% 100%;
+}
+[data-variant="blueprint"] .atmos::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(rgba(120,180,240,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(120,180,240,.08) 1px,transparent 1px);
+  background-size:130px 130px;
+}
+/* terminal faint scanline + vignette */
+[data-variant="terminal"] .atmos{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,182,39,.014) 3px 4px),
+    radial-gradient(130% 100% at 50% 0%,rgba(255,182,39,.05),transparent 55%),
+    #0A0805;
+}
+/* editorial calm wash */
+[data-variant="editorial"] .atmos{
+  background:
+    radial-gradient(800px 420px at 82% -8%,rgba(232,181,99,.06),transparent 64%),
+    radial-gradient(680px 380px at 6% 4%,rgba(111,191,154,.045),transparent 66%),
+    #0C0D10;
+}
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.shell{position:relative;z-index:1;}
+.wrap{max-width:1140px;margin:0 auto;padding:0 1.4rem;}
+
+/* switcher topbar */
+.switch{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:blur(9px);border-bottom:1px solid var(--line);}
+.switch-in{max-width:1140px;margin:0 auto;padding:.66rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.lab-brand{display:flex;align-items:center;gap:.55rem;font-family:var(--mono);font-weight:700;font-size:.78rem;letter-spacing:.05em;color:var(--text-strong);text-transform:uppercase;}
+.lab-brand .pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:var(--glow) var(--accent);animation:beat 1.8s ease-in-out infinite;}
+@keyframes beat{0%,100%{opacity:.45;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+.seg{display:flex;gap:.25rem;flex-wrap:wrap;}
+.seg button{font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
+  background:transparent;border:1px solid var(--line);border-radius:var(--radius);padding:.4rem .7rem;cursor:pointer;
+  transition:all .2s ease;font-weight:600;}
+.seg button:hover{color:var(--text-strong);border-color:var(--line-strong);}
+.seg button[aria-pressed="true"]{color:var(--bg);background:var(--accent);border-color:var(--accent);box-shadow:var(--glow) color-mix(in srgb,var(--accent) 50%,transparent);}
+
+/* hero */
+.hero{padding:3.4rem 0 2.2rem;position:relative;}
+.kick{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;display:inline-flex;align-items:center;gap:.5rem;}
+.kick::before{content:'';width:22px;height:1px;background:var(--accent);}
+.hero h1{font-family:var(--display);color:var(--text-strong);margin:1rem 0 .9rem;line-height:1.04;letter-spacing:-.02em;
+  font-size:clamp(2.1rem,6vw,3.9rem);max-width:16ch;font-weight:600;}
+[data-variant="editorial"] .hero h1{font-weight:500;letter-spacing:-.012em;line-height:1.02;}
+[data-variant="oscilloscope"] .hero h1,[data-variant="terminal"] .hero h1{letter-spacing:-.01em;font-weight:700;}
+.hero h1 .hl{color:var(--accent);}
+.hero h1 .hl2{color:var(--accent2);}
+.lede{font-size:clamp(1rem,1.7vw,1.16rem);color:var(--text);max-width:60ch;line-height:1.62;}
+.lede b{color:var(--text-strong);font-weight:600;}
+.char-note{margin-top:1.1rem;font-family:var(--mono);font-size:.72rem;color:var(--dim);letter-spacing:.03em;}
+.char-note b{color:var(--muted);}
+
+/* KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-top:2rem;}
+.kpi{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:.9rem 1rem;position:relative;overflow:hidden;}
+.kpi .kl{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.kpi .kv{font-family:var(--display);font-size:1.7rem;font-weight:700;color:var(--text-strong);margin-top:.3rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+[data-variant="editorial"] .kpi .kv{font-weight:600;}
+.kpi .ku{font-family:var(--mono);font-size:.64rem;color:var(--accent);margin-top:.15rem;}
+.kpi::after{content:'';position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,var(--accent),transparent);opacity:.5;}
+
+/* chart panel */
+.chart-card{margin-top:1.6rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden;}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.1rem;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.chart-head .ct{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-strong);font-weight:600;}
+.chart-head .cmeta{font-family:var(--mono);font-size:.64rem;color:var(--muted);}
+.chart-body{padding:1.1rem 1.1rem 1.3rem;position:relative;}
+.chart-svg{width:100%;height:auto;display:block;}
+.replay{font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:var(--radius);padding:.3rem .6rem;cursor:pointer;transition:all .2s;}
+.replay:hover{color:var(--accent);border-color:var(--accent);}
+
+/* section */
+.sec{padding:2.6rem 0;border-top:1px solid var(--line);}
+.sec-h{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;}
+.sec-h .n{color:var(--accent);}
+
+/* plan cards (the "kumpulan plan" menu) */
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.9rem;}
+.plan{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:1.15rem 1.2rem;position:relative;
+  transition:transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s;cursor:pointer;overflow:hidden;}
+.plan:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.plan::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 40%,color-mix(in srgb,var(--accent) 8%,transparent) 50%,transparent 60%);
+  transform:translateX(-120%);transition:transform .8s cubic-bezier(.4,0,.2,1);}
+.plan:hover::before{transform:translateX(120%);}
+.plan .pix{font-family:var(--mono);font-size:.62rem;color:var(--dim);letter-spacing:.1em;}
+.plan h3{font-family:var(--display);font-size:1.04rem;font-weight:600;color:var(--text-strong);margin:.4rem 0 .5rem;}
+[data-variant="editorial"] .plan h3{font-weight:500;font-size:1.16rem;}
+.plan p{font-size:.84rem;color:var(--muted);line-height:1.55;margin-bottom:.85rem;}
+.plan .tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:.4rem;color:var(--accent);}
+.plan .tag .led{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:var(--glow) var(--accent);}
+.plan .arrow{position:absolute;top:1.15rem;right:1.2rem;color:var(--dim);font-family:var(--mono);transition:transform .25s,color .25s;}
+.plan:hover .arrow{transform:translate(3px,-3px);color:var(--accent);}
+
+/* type specimen */
+.spec{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:1.4rem 1.5rem;}
+.spec .big{font-family:var(--display);font-size:clamp(1.6rem,4vw,2.6rem);color:var(--text-strong);line-height:1.05;letter-spacing:-.02em;font-weight:600;}
+[data-variant="editorial"] .spec .big{font-weight:500;}
+.spec .row{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:1.1rem;font-family:var(--mono);font-size:.7rem;color:var(--muted);}
+.spec .row b{color:var(--text-strong);font-weight:600;}
+.spec .glyphs{margin-top:1rem;font-family:var(--display);font-size:1.5rem;color:var(--muted);letter-spacing:.04em;}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:2rem 0 3rem;color:var(--dim);font-family:var(--mono);font-size:.7rem;letter-spacing:.03em;}
+footer .frow{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+
+/* entrance stagger */
+[data-enter]{opacity:0;transform:translateY(14px);}
+[data-enter].in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);}
+
+/* responsive */
+@media (max-width:760px){
+  .kpis{grid-template-columns:repeat(2,1fr);}
+  .switch-in{flex-direction:column;align-items:flex-start;gap:.6rem;}
+  .seg{overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch;padding-bottom:.2rem;}
+  .seg button{flex:0 0 auto;}
+  .hero{padding:2.4rem 0 1.6rem;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+  [data-enter]{opacity:1;transform:none;}
+}
+</style>
+</head>
+<body>
+<div class="atmos" id="atmos"></div>
+<div class="shell">
+
+  <!-- ───────── variant switcher ───────── -->
+  <div class="switch">
+    <div class="switch-in">
+      <div class="lab-brand"><span class="pulse"></span> RZ · STYLE LAB</div>
+      <div class="seg" id="seg" role="group" aria-label="Style variant">
+        <button data-v="oscilloscope" aria-pressed="true">A · Oscilloscope</button>
+        <button data-v="blueprint" aria-pressed="false">B · Blueprint</button>
+        <button data-v="terminal" aria-pressed="false">C · Terminal</button>
+        <button data-v="editorial" aria-pressed="false">D · Editorial</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── hero ───────── -->
+  <header class="hero">
+    <div class="wrap">
+      <span class="kick" id="kicker">Variant A — Oscilloscope</span>
+      <h1 data-enter><span id="h1">Pick the <span class="hl">character</span> for the <span class="hl2">dark mode</span>.</span></h1>
+      <p class="lede" data-enter id="lede">Four candidate visual identities for resistancezero.com — all inside the industrial-instrumentation brand, none of them generic. Switch between them above; the chart <b>re-draws live</b> on every selection. Choose one to standardize.</p>
+      <p class="char-note" data-enter id="charnote"></p>
+
+      <!-- KPI strip (count-up on load) -->
+      <div class="kpis" data-enter>
+        <div class="kpi"><div class="kl">Plans tracked</div><div class="kv" data-count="14">0</div><div class="ku" id="ku1">live</div></div>
+        <div class="kpi"><div class="kl">P0 closed</div><div class="kv" data-count="7">0</div><div class="ku">/ 7 review items</div></div>
+        <div class="kpi"><div class="kl">Cockpit pages</div><div class="kv" data-count="9">0</div><div class="ku">instrumented</div></div>
+        <div class="kpi"><div class="kl">Lines tagged</div><div class="kv" data-count="213">0</div><div class="ku">semantic</div></div>
+      </div>
+
+      <!-- signature animated chart -->
+      <div class="chart-card" data-enter>
+        <div class="chart-head">
+          <span class="ct" id="chartTitle">Live telemetry — replays on open</span>
+          <span style="display:flex;gap:.7rem;align-items:center">
+            <span class="cmeta" id="chartMeta">SIM · engine-derived</span>
+            <button class="replay" id="replayBtn">↻ Replay</button>
+          </span>
+        </div>
+        <div class="chart-body">
+          <svg class="chart-svg" id="chart" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated telemetry chart"></svg>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ───────── plan menu ───────── -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-h"><span class="n">01</span> Plan B — the plan collection (menu)</div>
+      <div class="plan-grid" id="planGrid"></div>
+    </div>
+  </section>
+
+  <!-- ───────── type specimen ───────── -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-h"><span class="n">02</span> Type &amp; character specimen</div>
+      <div class="spec" data-enter>
+        <div class="big" id="specBig">Resistance Zero — engineering operator intelligence</div>
+        <div class="glyphs" id="specGlyphs">0123456789 · kW kVA · PUE 1.30 · ΔT 7.6°C · 800G</div>
+        <div class="row" id="specRow"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap frow">
+      <span>RZ STYLE LAB · noindex · internal</span>
+      <span id="footVar">VARIANT: OSCILLOSCOPE</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ---- per-variant copy + chart config ---- */
+  var VARIANTS={
+    oscilloscope:{
+      kicker:'Variant A — Oscilloscope',
+      h1:'Pick the <span class="hl">character</span> for the <span class="hl2">dark mode</span>.',
+      note:'<b>Character:</b> CRT lab instrument. Phosphor-green trace on a cyan graticule, faint scanlines, waveform that sweeps in. Reads as a living measurement, not a static dashboard.',
+      chartTitle:'CDU return temperature — live trace',
+      chartMeta:'SIM · 60s window · °C',
+      chart:'wave'
+    },
+    blueprint:{
+      kicker:'Variant B — Blueprint',
+      h1:'Pick the <span class="hl">character</span> for the <span class="hl2">dark mode</span>.',
+      note:'<b>Character:</b> engineering schematic. Navy ink, fine cyan hairlines, dimension annotations. The series plots in like a drawing being drafted — precise, documentary, CAD-grade.',
+      chartTitle:'Cooling load vs capacity — design plot',
+      chartMeta:'kW · plotted',
+      chart:'area'
+    },
+    terminal:{
+      kicker:'Variant C — Terminal / NOC',
+      h1:'Pick the <span class="hl">character</span> for the <span class="hl2">ops console</span>.',
+      note:'<b>Character:</b> amber NOC console. Old-terminal amber on charcoal, tabular numerals, bars that grow and numbers that count up. Dense, operational, command-line confident.',
+      chartTitle:'Per-hall IT load — bar readout',
+      chartMeta:'MW · 4 halls',
+      chart:'bars'
+    },
+    editorial:{
+      kicker:'Variant D — Editorial Instrument',
+      h1:'Pick the <span class="hl">character</span> for the <span class="hl2">report mode</span>.',
+      note:'<b>Character:</b> refined premium report. Characterful Fraunces display + mono labels, generous whitespace, restrained accents, donut + area easing in. The deliberate anti-slop answer — quiet, editorial, credible.',
+      chartTitle:'Energy split + 30-day PUE trend',
+      chartMeta:'% · derived',
+      chart:'editorial'
+    }
+  };
+
+  /* ---- plan menu data (the "kumpulan plan") ---- */
+  var PLANS=[
+    {ix:'PLAN-B',t:'Self-improving operator platform',d:'Adopt the ECC agent-harness (skills · agents · rules · hooks · continuous-learning) to evolve RZ from static portfolio into a living intelligence platform.',tag:'In discussion'},
+    {ix:'STYLE',t:'Dark-mode character standard',d:'This lab. Choose one of four candidate identities, then codify it in design.md tokens + a shared dark stylesheet across every page.',tag:'Choosing now'},
+    {ix:'BMS-v1.43',t:'Cockpit semantic layer',d:'Line model + breaker symbols + inspector + data-quality + alarm state machine. All 7 review P0 items closed across 12 ships.',tag:'Shipped'},
+    {ix:'CONV',t:'Conventional-DC catch-up',d:'Fuel runtime, fire cause-effect, genset/ATS sequence timeline. Bring the conv suite to parity with the AI cockpit.',tag:'Queued'},
+    {ix:'NET',t:'Knowledge-graph hub',d:'Second-brain vault → public knowledge graph. Wire FMECA dataset + standards docs into a navigable map.',tag:'Queued'},
+    {ix:'SEO',t:'AI-search surface',d:'llms.txt + llms-full.txt + per-page schema. Keep RZ legible to ClaudeBot / GPTBot / Perplexity as the corpus grows.',tag:'Ongoing'}
+  ];
+
+  /* ---- type specimen per variant ---- */
+  function specForVariant(v){
+    var map={
+      oscilloscope:[['Display','JetBrains Mono 700'],['Body','IBM Plex Mono 400'],['Numerals','tabular · monospace'],['Feel','instrument trace']],
+      blueprint:[['Display','IBM Plex Sans 600'],['Body','IBM Plex Sans 400'],['Labels','IBM Plex Mono'],['Feel','CAD annotation']],
+      terminal:[['Display','JetBrains Mono 700'],['Body','IBM Plex Mono 400'],['Numerals','tabular · count-up'],['Feel','NOC console']],
+      editorial:[['Display','Fraunces 500 (serif)'],['Body','IBM Plex Sans 400'],['Labels','IBM Plex Mono'],['Feel','premium report']]
+    };
+    return map[v]||map.oscilloscope;
+  }
+
+  /* ====================================================================
+     CHART RENDERERS — each returns SVG markup + starts its own animation
+     ==================================================================== */
+  var chartEl=document.getElementById('chart');
+
+  function css(name){return getComputedStyle(root).getPropertyValue(name).trim();}
+
+  function seedSeries(n,lo,hi,seed){
+    /* deterministic pseudo-random so the trace is stable per variant */
+    var out=[],x=seed||7;
+    for(var i=0;i<n;i++){x=(x*9301+49297)%233280;var r=x/233280;out.push(lo+(hi-lo)*r);}
+    return out;
+  }
+
+  function renderWave(){
+    var w=720,h=220,pad=14,n=64;
+    var acc=css('--accent'),acc2=css('--accent2'),line=css('--line');
+    var vals=seedSeries(n,40,180,11);
+    var step=(w-pad*2)/(n-1);
+    var d='';
+    for(var i=0;i<n;i++){var x=pad+i*step,y=h-pad-vals[i];d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+    var grid='';
+    for(var g=1;g<5;g++){var gy=(h/5)*g;grid+='<line x1="0" y1="'+gy+'" x2="'+w+'" y2="'+gy+'" stroke="'+line+'" stroke-width="1"/>';}
+    for(var gx=1;gx<8;gx++){var x2=(w/8)*gx;grid+='<line x1="'+x2+'" y1="0" x2="'+x2+'" y2="'+h+'" stroke="'+line+'" stroke-width="1"/>';}
+    var svg=grid+
+      '<path id="trace" d="'+d+'" fill="none" stroke="'+acc+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 6px '+acc+'88)"/>'+
+      '<circle id="sweep" r="4.5" fill="'+acc2+'" style="filter:drop-shadow(0 0 8px '+acc2+')"/>';
+    chartEl.innerHTML=svg;
+    var path=document.getElementById('trace');
+    var L=path.getTotalLength();
+    path.style.strokeDasharray=L;path.style.strokeDashoffset=reduce?0:L;
+    var sweep=document.getElementById('sweep');
+    if(reduce){var p=path.getPointAtLength(L);sweep.setAttribute('cx',p.x);sweep.setAttribute('cy',p.y);return;}
+    var start=null,dur=1500;
+    function frame(t){
+      if(!start)start=t;var k=Math.min((t-start)/dur,1);
+      var e=1-Math.pow(1-k,3);
+      path.style.strokeDashoffset=L*(1-e);
+      var pt=path.getPointAtLength(L*e);sweep.setAttribute('cx',pt.x);sweep.setAttribute('cy',pt.y);
+      if(k<1)requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function renderArea(){
+    var w=720,h=220,pad=18,n=24;
+    var acc=css('--accent'),acc2=css('--accent2'),line=css('--line'),muted=css('--muted');
+    var cap=seedSeries(n,150,160,3).map(function(v){return 150;}); /* flat capacity line */
+    var load=seedSeries(n,70,150,21);
+    var step=(w-pad*2)/(n-1);
+    function path(arr,close){
+      var d='';for(var i=0;i<n;i++){var x=pad+i*step,y=h-pad-arr[i];d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+      if(close)d+='L'+(w-pad)+' '+(h-pad)+' L'+pad+' '+(h-pad)+' Z';return d;
+    }
+    var grid='';for(var g=0;g<=4;g++){var gy=pad+((h-pad*2)/4)*g;grid+='<line x1="'+pad+'" y1="'+gy+'" x2="'+(w-pad)+'" y2="'+gy+'" stroke="'+line+'" stroke-width="1"/>';}
+    /* dimension annotation */
+    var capY=h-pad-150;
+    chartEl.innerHTML=grid+
+      '<path id="area" d="'+path(load,true)+'" fill="'+acc+'" fill-opacity="0.12" stroke="none"/>'+
+      '<path id="loadline" d="'+path(load,false)+'" fill="none" stroke="'+acc+'" stroke-width="2"/>'+
+      '<line id="capline" x1="'+pad+'" y1="'+capY+'" x2="'+(w-pad)+'" y2="'+capY+'" stroke="'+acc2+'" stroke-width="1.4" stroke-dasharray="7 5"/>'+
+      '<text x="'+(w-pad)+'" y="'+(capY-7)+'" text-anchor="end" font-family="'+css('--mono')+'" font-size="11" fill="'+acc2+'">N+1 capacity 150 kW</text>'+
+      '<text x="'+pad+'" y="'+(h-4)+'" font-family="'+css('--mono')+'" font-size="10" fill="'+muted+'">0</text>';
+    var ll=document.getElementById('loadline'),ar=document.getElementById('area');
+    var L=ll.getTotalLength();ll.style.strokeDasharray=L;ar.style.opacity=0;
+    if(reduce){ll.style.strokeDashoffset=0;ar.style.opacity=1;return;}
+    ll.style.strokeDashoffset=L;
+    var start=null,dur=1400;
+    function frame(t){if(!start)start=t;var k=Math.min((t-start)/dur,1);var e=1-Math.pow(1-k,3);
+      ll.style.strokeDashoffset=L*(1-e);ar.style.opacity=e*1;if(k<1)requestAnimationFrame(frame);}
+    requestAnimationFrame(frame);
+  }
+
+  function renderBars(){
+    var w=720,h=220,pad=20,n=4,labels=['DH-01','DH-02','DH-03','DH-04'];
+    var acc=css('--accent'),acc2=css('--accent2'),line=css('--line'),muted=css('--muted'),strong=css('--text-strong');
+    var vals=[3.564,3.564,3.564,3.564];var maxv=4;
+    var gap=22,bw=(w-pad*2-gap*(n-1))/n;
+    var grid='';for(var g=0;g<=4;g++){var gy=pad+((h-pad*2)/4)*g;grid+='<line x1="'+pad+'" y1="'+gy+'" x2="'+(w-pad)+'" y2="'+gy+'" stroke="'+line+'" stroke-width="1"/>';}
+    var bars='';
+    for(var i=0;i<n;i++){
+      var x=pad+i*(bw+gap);var fullH=(h-pad*2)*(vals[i]/maxv);
+      bars+='<rect class="bar" x="'+x+'" y="'+(h-pad)+'" width="'+bw+'" height="0" rx="2" fill="'+acc+'" data-fh="'+fullH+'"/>'+
+        '<text x="'+(x+bw/2)+'" y="'+(h-6)+'" text-anchor="middle" font-family="'+css('--mono')+'" font-size="11" fill="'+muted+'">'+labels[i]+'</text>'+
+        '<text class="bval" x="'+(x+bw/2)+'" y="'+(h-pad-fullH-7)+'" text-anchor="middle" font-family="'+css('--mono')+'" font-size="13" font-weight="700" fill="'+strong+'" data-target="3.564" opacity="0">0.000</text>';
+    }
+    chartEl.innerHTML=grid+bars;
+    var rects=chartEl.querySelectorAll('.bar'),txts=chartEl.querySelectorAll('.bval');
+    if(reduce){rects.forEach(function(r){var fh=+r.getAttribute('data-fh');r.setAttribute('height',fh);r.setAttribute('y',(h-pad-fh));});txts.forEach(function(t){t.textContent='3.564';t.setAttribute('opacity',1);});return;}
+    var start=null,dur=1300;
+    function frame(t){if(!start)start=t;var k=Math.min((t-start)/dur,1);var e=1-Math.pow(1-k,3);
+      rects.forEach(function(r,i){var d=Math.min(Math.max((e*1.2)-(i*0.06),0),1);var fh=(+r.getAttribute('data-fh'))*d;r.setAttribute('height',fh);r.setAttribute('y',(h-pad-fh));});
+      txts.forEach(function(t,i){var d=Math.min(Math.max((e*1.2)-(i*0.06),0),1);t.textContent=(3.564*d).toFixed(3);t.setAttribute('opacity',d);});
+      if(k<1)requestAnimationFrame(frame);}
+    requestAnimationFrame(frame);
+  }
+
+  function renderEditorial(){
+    var w=720,h=220;
+    var acc=css('--accent'),acc2=css('--accent2'),line=css('--line'),muted=css('--muted'),strong=css('--text-strong'),panel=css('--panel2');
+    /* donut on the left, area trend on the right */
+    var cx=120,cy=110,r=70,sw=20;
+    var C=2*Math.PI*r;
+    var itFrac=0.77; /* IT share */
+    /* area trend */
+    var pad=16,x0=270,x1=w-16,n=30;
+    var trend=seedSeries(n,120,150,5).map(function(v){return v/10;}); /* ~1.2-1.5 */
+    var step=(x1-x0)/(n-1);
+    function trendPath(close){var d='';for(var i=0;i<n;i++){var x=x0+i*step,y=cy+60-(trend[i]-1.0)*180;d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}if(close)d+='L'+x1+' '+(h-14)+' L'+x0+' '+(h-14)+' Z';return d;}
+    chartEl.innerHTML=
+      '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+line+'" stroke-width="'+sw+'"/>'+
+      '<circle id="donut" cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+acc+'" stroke-width="'+sw+'" stroke-linecap="round" transform="rotate(-90 '+cx+' '+cy+')" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'"/>'+
+      '<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" font-family="'+css('--display')+'" font-size="26" font-weight="600" fill="'+strong+'" id="donutNum">0%</text>'+
+      '<text x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle" font-family="'+css('--mono')+'" font-size="10" fill="'+muted+'">IT share</text>'+
+      '<path id="earea" d="'+trendPath(true)+'" fill="'+acc2+'" fill-opacity="0.10"/>'+
+      '<path id="eline" d="'+trendPath(false)+'" fill="none" stroke="'+acc2+'" stroke-width="2"/>'+
+      '<text x="'+x1+'" y="20" text-anchor="end" font-family="'+css('--mono')+'" font-size="10" fill="'+muted+'">PUE 30-day · 1.30</text>';
+    var donut=document.getElementById('donut'),num=document.getElementById('donutNum'),el=document.getElementById('eline'),ar=document.getElementById('earea');
+    var L=el.getTotalLength();el.style.strokeDasharray=L;
+    if(reduce){donut.style.strokeDashoffset=C*(1-itFrac);num.textContent='77%';el.style.strokeDashoffset=0;return;}
+    el.style.strokeDashoffset=L;ar.style.opacity=0;
+    var start=null,dur=1500;
+    function frame(t){if(!start)start=t;var k=Math.min((t-start)/dur,1);var e=1-Math.pow(1-k,3);
+      donut.style.strokeDashoffset=C*(1-itFrac*e);num.textContent=Math.round(77*e)+'%';
+      el.style.strokeDashoffset=L*(1-e);ar.style.opacity=e;
+      if(k<1)requestAnimationFrame(frame);}
+    requestAnimationFrame(frame);
+  }
+
+  function drawChart(v){
+    var type=VARIANTS[v].chart;
+    if(type==='wave')renderWave();
+    else if(type==='area')renderArea();
+    else if(type==='bars')renderBars();
+    else renderEditorial();
+  }
+
+  /* ---- KPI count-up ---- */
+  function countUp(){
+    var els=document.querySelectorAll('[data-count]');
+    els.forEach(function(el){
+      var target=+el.getAttribute('data-count');
+      if(reduce){el.textContent=target.toLocaleString();return;}
+      var start=null,dur=1100;
+      function frame(t){if(!start)start=t;var k=Math.min((t-start)/dur,1);var e=1-Math.pow(1-k,3);
+        el.textContent=Math.round(target*e).toLocaleString();if(k<1)requestAnimationFrame(frame);}
+      requestAnimationFrame(frame);
+    });
+  }
+
+  /* ---- render plan menu ---- */
+  function renderPlans(){
+    var grid=document.getElementById('planGrid');
+    grid.innerHTML=PLANS.map(function(p){
+      return '<article class="plan" data-enter><span class="arrow">↗</span>'+
+        '<div class="pix">'+p.ix+'</div>'+
+        '<h3>'+p.t+'</h3><p>'+p.d+'</p>'+
+        '<span class="tag"><span class="led"></span>'+p.tag+'</span></article>';
+    }).join('');
+  }
+
+  /* ---- specimen ---- */
+  function renderSpec(v){
+    var rows=specForVariant(v);
+    document.getElementById('specRow').innerHTML=rows.map(function(r){return '<span><b>'+r[0]+':</b> '+r[1]+'</span>';}).join('');
+  }
+
+  /* ---- entrance observer ---- */
+  function observeEnter(){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+    document.querySelectorAll('[data-enter]').forEach(function(el){io.observe(el);});
+  }
+
+  /* ---- apply a variant ---- */
+  function apply(v,replayOnly){
+    var cfg=VARIANTS[v];if(!cfg)return;
+    if(!replayOnly){
+      root.setAttribute('data-variant',v);
+      document.getElementById('kicker').textContent=cfg.kicker;
+      document.getElementById('h1').innerHTML=cfg.h1;
+      document.getElementById('charnote').innerHTML=cfg.note;
+      document.getElementById('chartTitle').textContent=cfg.chartTitle;
+      document.getElementById('chartMeta').textContent=cfg.chartMeta;
+      document.getElementById('footVar').textContent='VARIANT: '+v.toUpperCase();
+      renderSpec(v);
+      /* re-trigger hero entrance + count-up on switch */
+      document.querySelectorAll('.hero [data-enter]').forEach(function(el){el.classList.remove('in');void el.offsetWidth;el.classList.add('in');});
+      countUp();
+      /* update pressed state */
+      document.querySelectorAll('#seg button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===v?'true':'false');});
+    }
+    /* charts read CSS vars — wait a tick for the variant attribute to settle */
+    setTimeout(function(){drawChart(v);},replayOnly?0:60);
+  }
+
+  /* ---- wire ---- */
+  document.getElementById('seg').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-v]');if(!b)return;apply(b.getAttribute('data-v'),false);
+  });
+  document.getElementById('replayBtn').addEventListener('click',function(){
+    drawChart(root.getAttribute('data-variant'));countUp();
+  });
+
+  /* ---- init ---- */
+  renderPlans();observeEnter();
+  apply('oscilloscope',false);
+})();
+</script>
+</body>
+</html>

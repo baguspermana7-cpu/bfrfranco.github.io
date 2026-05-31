@@ -1,0 +1,103 @@
+/* ============================================================================
+   rz-dark.css — RZ Dark System v1 (shared stylesheet)
+   Two registers of one token system: [data-rz-register="instrument"|"editorial"].
+   Spec: standarization/DARK_MODE_STANDARD.md · Reference: rz-style-lab.html
+   Presentation-only — never alters engine values or cockpit data.
+   ============================================================================ */
+
+/* ---- shared signal semantics (match ACCURACY_VALIDATION + ALARM_STATE) ---- */
+:root{
+  --rz-ok:#22c55e; --rz-warn:#f59e0b; --rz-fault:#ef4444; --rz-info:#2BE8FF;
+  --rz-ease:cubic-bezier(.2,.7,.2,1);
+  --rz-load-dur:1.4s;
+}
+
+/* ---- INSTRUMENT register (cockpits / SLD / labs) ---- */
+[data-rz-register="instrument"]{
+  --rz-bg:#060A0D; --rz-bg2:#0A1014; --rz-panel:#0C141A; --rz-panel2:#101C22;
+  --rz-text:#C8E6D4; --rz-text-strong:#EAFBF0; --rz-muted:#5E8472; --rz-dim:#3C5B4D;
+  --rz-accent:#22F5A8; --rz-accent2:#2BE8FF; --rz-sel:#22F5A8;
+  --rz-line:rgba(43,232,255,.12); --rz-line-strong:rgba(43,232,255,.28);
+  --rz-display:'JetBrains Mono',ui-monospace,monospace;
+  --rz-sans:'IBM Plex Mono',ui-monospace,monospace;
+  --rz-mono:'JetBrains Mono',ui-monospace,monospace;
+  --rz-radius:3px; --rz-glow:0 0 12px;
+}
+/* ---- EDITORIAL register (landing / articles / plans) ---- */
+[data-rz-register="editorial"]{
+  --rz-bg:#0E0F12; --rz-bg2:#141519; --rz-panel:#16181D; --rz-panel2:#1C1F25;
+  --rz-text:#CFD3DA; --rz-text-strong:#F6F7F9; --rz-muted:#7E8590; --rz-dim:#565C66;
+  --rz-accent:#E8B563; --rz-accent2:#6FBF9A; --rz-sel:#E8B563;
+  --rz-line:rgba(160,168,180,.13); --rz-line-strong:rgba(160,168,180,.26);
+  --rz-display:'Fraunces',Georgia,serif;
+  --rz-sans:'IBM Plex Sans',system-ui,sans-serif;
+  --rz-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --rz-radius:10px; --rz-glow:0 0 0;
+}
+
+/* ---- base ---- */
+[data-rz-register]{
+  background:var(--rz-bg); color:var(--rz-text);
+  font-family:var(--rz-sans); font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+[data-rz-register] ::selection{background:var(--rz-sel);color:var(--rz-bg);}
+[data-rz-register] h1,[data-rz-register] h2,[data-rz-register] h3{
+  font-family:var(--rz-display); color:var(--rz-text-strong);
+  line-height:1.06; letter-spacing:-.02em; font-weight:600; margin:0;
+}
+[data-rz-register="instrument"] h1,[data-rz-register="instrument"] h2{font-weight:700;letter-spacing:-.01em;}
+[data-rz-register] h1{font-size:clamp(2.1rem,6vw,3.9rem);}
+[data-rz-register] h2{font-size:clamp(1.4rem,2.6vw,2rem);letter-spacing:-.01em;}
+[data-rz-register] a{color:var(--rz-accent);text-decoration:none;}
+
+/* ---- atmosphere ---- */
+.rz-atmos{position:fixed;inset:0;z-index:0;pointer-events:none;}
+[data-rz-register="instrument"] .rz-atmos{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 2px,rgba(43,232,255,.02) 2px 3px),
+    radial-gradient(120% 80% at 50% 0%,rgba(34,245,168,.06),transparent 60%),
+    linear-gradient(180deg,#070C10,#04080A);
+  background-size:100% 3px,100% 100%,100% 100%;
+}
+[data-rz-register="instrument"] .rz-atmos::after{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(43,232,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(43,232,255,.05) 1px,transparent 1px);
+  background-size:34px 34px;
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 30%,#000 40%,transparent 85%);
+          mask-image:radial-gradient(120% 90% at 50% 30%,#000 40%,transparent 85%);
+}
+[data-rz-register="editorial"] .rz-atmos{
+  background:
+    radial-gradient(800px 420px at 82% -8%,rgba(232,181,99,.06),transparent 64%),
+    radial-gradient(680px 380px at 6% 4%,rgba(111,191,154,.045),transparent 66%),
+    #0C0D10;
+}
+
+/* ---- shared components ---- */
+.rz-kicker{font-family:var(--rz-mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rz-muted);font-weight:600;display:inline-flex;align-items:center;gap:.5rem;}
+.rz-kicker::before{content:'';width:22px;height:1px;background:var(--rz-accent);}
+.rz-panel{border:1px solid var(--rz-line);border-radius:var(--rz-radius);background:var(--rz-panel);}
+.rz-kpi .kv{font-family:var(--rz-display);font-size:1.7rem;font-weight:700;color:var(--rz-text-strong);font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+.rz-chip{font-family:var(--rz-mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .5rem;border-radius:var(--rz-radius);border:1px solid var(--rz-line-strong);color:var(--rz-muted);}
+
+/* ---- motion primitives ---- */
+.rz-enter{opacity:0;transform:translateY(14px);}
+.rz-enter.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s var(--rz-ease);}
+
+/* trace-in / plot-in: set strokeDasharray=len, animate strokeDashoffset len→0 via JS.
+   grow: animate rect height 0→full via JS. count-up: rAF number interpolation via JS.
+   sweep: donut stroke-dasharray arc via JS. See rz-style-lab.html for canonical renderers. */
+
+/* ---- responsive ---- */
+@media (max-width:760px){
+  .rz-kpis{grid-template-columns:repeat(2,1fr)!important;}
+  .rz-nav{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+}
+@media (max-width:420px){
+  .rz-kpis{grid-template-columns:1fr!important;}
+}
+@media (prefers-reduced-motion:reduce){
+  [data-rz-register] *{animation:none!important;transition:none!important;}
+  .rz-enter{opacity:1!important;transform:none!important;}
+}

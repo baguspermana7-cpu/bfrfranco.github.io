@@ -7628,6 +7628,37 @@ if(el('dcWind'))el('dcWind').textContent=RI(8,15)+'m/s';
 }
 updateDashKPI();
 setInterval(updateDashKPI,4000);
+/* v1.43.5 — RZ Dark System "animated on load" primitive applied to #p-dash
+   (review pivot: dark mode read as static/slop). One-time count-up on first
+   paint. ADDITIVE + PROBE-SAFE: each value's exact original string is captured
+   and restored verbatim at animation end, so displayed final text is
+   byte-identical (accuracy probe reads post-settle). Honours reduced-motion.
+   Spec: standarization/DARK_MODE_STANDARD.md (motion primitive: count-up). */
+(function(){
+  if(window.__rzKpiAnimated)return;window.__rzKpiAnimated=true;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(reduce)return;
+  var ids=['dkPue','dkWue','dkCue','dkIt','dkGpu','dkDom'];
+  var dur=820; /* settles well before the 1200ms accuracy-probe read */
+  ids.forEach(function(id){
+    var elx=document.getElementById(id);if(!elx)return;
+    var orig=elx.textContent;var num=parseFloat(orig.replace(/,/g,''));
+    if(isNaN(num)){return;}
+    var dec=(orig.split('.')[1]||'').length;
+    var hasComma=/,/.test(orig);
+    var start=null,done=false;
+    function fmt(v){var s=v.toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec});return hasComma?s:s.replace(/,/g,'');}
+    function settle(){if(done)return;done=true;elx.textContent=orig;}
+    function frame(t){if(done)return;if(!start)start=t;var k=Math.min((t-start)/dur,1);var e=1-Math.pow(1-k,3);
+      if(k<1){elx.textContent=fmt(num*e);requestAnimationFrame(frame);}else{settle();}}
+    requestAnimationFrame(frame);
+    /* HARD GUARANTEE — if rAF stalls (backgrounded/throttled tab), force the
+       exact original value. dkGpu/dkDom are NOT refreshed by the 4s interval,
+       so without this they could freeze mid-animation showing a wrong basis
+       number. setTimeout fires even in throttled tabs. */
+    setTimeout(settle,dur+300);
+  });
+})();
 
 /* =========================================================================
  * v1.32.7 — KPI Basis Drawer (ACCURACY_VALIDATION.md Rule 6).
