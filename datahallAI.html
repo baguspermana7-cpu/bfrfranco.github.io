@@ -640,7 +640,11 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
          [data-rz-breaker] element to see Live / Capacity / Deps / Alarms /
          Trend / Maintenance tabs without occluding topology. Closes review
          doc-27 §3.2 P0. Deferred load — body-level init via DOMContentLoaded. -->
-    <script src="js/rz-inspector.js?v=1.43.2" defer></script>
+    <!-- v1.43.4 — ISA-18.2 alarm state machine + color discipline. Loaded
+         before the inspector so RZAlarmState is available when the Alarms tab
+         renders. Closes review doc-27 §3.3 P0 + §4.3 P1. -->
+    <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
+    <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service. Loaded before the inspector script so
          body[data-rz-data-mode] banner renders + RZTelemetryQuality is
          available when the inspector's Live tab renders its chip. Closes

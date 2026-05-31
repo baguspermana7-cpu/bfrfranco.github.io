@@ -11,6 +11,69 @@ release sections rather than semver.
 
 ---
 
+## v1.43.4 — 2026-05-26 (alarm state machine + color discipline — review doc-27 §3.3 P0 + §4.3 P1)
+
+MINOR ship: closes the LAST open P0 in review doc-27 — §3.3 color discipline
+("warna status harus menang atas warna domain") + §4.3 alarm state UX
+(active/acknowledged/shelved/inhibited/returned-to-normal).
+
+Engine + `#p-dash` byte-identical. **52/52 line-model probe** (added 3 alarm-
+state assertions per inspector page) + 75/75 accuracy probe + 57/57 + 22/22
++ all strict audits PASS.
+
+### Added
+
+- **`js/rz-alarm-state.js`** — `window.RZAlarmState` ISA-18.2 alarm state
+  machine + colour-discipline arbiter:
+  - 7 states (`normal` / `unack` / `ack` / `rtn_unack` / `shelved` /
+    `suppressed` / `oos`). `oos` (maintenance) is visually distinct from
+    fault — closes review requirement.
+  - 4 severity tiers (critical / high / medium / low).
+  - `resolveColor(alarmState, domainColor)` — status colour WINS over domain
+    unless `normal`. A faulted cooling pipe shows fault-red, not cyan.
+  - `deriveFromEquipment(equipState)` — maps line/breaker data-state into
+    alarm state + severity + summary.
+  - `chipHtml()` + `audit()`.
+- **`standarization/ALARM_STATE.md`** — full schema + adoption table.
+
+### Changed
+
+- **`js/rz-inspector.js`** — Alarms tab now renders an ISA-18.2 alarm-state
+  chip + derived summary via `RZAlarmState.deriveFromEquipment()`. Graceful
+  fallback to v1.43.0 inline logic if the library is absent.
+- **`datahallAI.html` / `chiller-plant.html` / `water-system.html` /
+  `fire-system.html`** — `<script src="js/rz-alarm-state.js?v=1.43.4" defer>`
+  loaded before the inspector. Inspector cache bumped to `?v=1.43.4`.
+- **`tools/probe-line-model.mjs`** — 3 new assertions per inspector page:
+  `RZAlarmState exposed`, color-discipline (status overrides domain),
+  fault→unack/critical derivation.
+
+### Scope discipline
+
+- **`EPMS_Telemetry.html`** still untouched per owner mandate.
+
+### Review doc-27 P0 status — ALL CLOSED
+
+| § | Item | Ship |
+|---|---|---|
+| §3.1 | Line metadata | v1.42.0–v1.42.5 |
+| §3.2 | Right-side inspector | v1.43.0–v1.43.1 |
+| §3.3 | Color discipline | **v1.43.4** |
+| §3.4 | Simulation banner + KPI tooltip | v1.43.2 + v1.43.3 |
+| §5.3 | Breaker symbols | v1.42.1 |
+| §5.5 | Network speed/util/failure-domain | v1.42.3 |
+| §5.7 | BMS/DCIM data quality | v1.43.2 |
+
+### Docs
+
+- `standarization/ALARM_STATE.md` NEW spec.
+- `standarization/INSPECTOR.md` Alarms-tab note.
+- `standarization/BMS_SHELL.md` v1.43.x table extended.
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker updated.
+
+---
+
 ## v1.43.3 — 2026-05-26 (headline KPI source+formula+timestamp tooltips — review doc-27 §3.4 P0)
 
 MINOR ship: closes the remaining half of review doc-27 §3.4 P0 ("Setiap

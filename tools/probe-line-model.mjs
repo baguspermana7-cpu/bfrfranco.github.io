@@ -153,6 +153,29 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
     assert(tq.bannerInjected,
            `${slug}: simulated-mode banner rendered`,
            'no .rz-tq-banner element found');
+
+    /* v1.43.4: alarm state machine + color discipline. */
+    const al = await page.evaluate(() => {
+      const out = { lib: !!window.RZAlarmState };
+      if (window.RZAlarmState) {
+        try {
+          /* color discipline: fault state must NOT return the domain colour. */
+          const faultColor = window.RZAlarmState.resolveColor('unack', 'var(--c)');
+          const normalColor = window.RZAlarmState.resolveColor('normal', 'var(--c)');
+          out.statusWinsOverDomain = (faultColor !== 'var(--c)') && (normalColor === 'var(--c)');
+          out.derive = window.RZAlarmState.deriveFromEquipment('fault');
+        } catch (e) { out.error = e.message; }
+      }
+      return out;
+    });
+    assert(al.lib, `${slug}: window.RZAlarmState exposed`,
+           'rz-alarm-state.js did not register');
+    assert(al.statusWinsOverDomain,
+           `${slug}: color discipline — status overrides domain (review §3.3)`,
+           JSON.stringify(al));
+    assert(al.derive && al.derive.alarm === 'unack' && al.derive.severity === 'critical',
+           `${slug}: fault state derives unack/critical alarm`,
+           JSON.stringify(al.derive));
   }
 
   /* v1.43.3: headline KPI source+formula+timestamp tooltips (review §3.4 P0).

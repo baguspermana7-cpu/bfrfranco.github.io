@@ -252,14 +252,24 @@
   }
 
   function renderAlarms(m) {
-    var alarm = '';
-    if (m.state === 'fault' || m.state === 'tripped') { alarm = 'ACTIVE — fault/trip state'; }
-    else if (m.state === 'isolated' || m.state === 'maintenance') { alarm = 'Inhibited — maintenance / LOTO'; }
-    else if (m.state === 'standby') { alarm = 'Normal standby — N+1 spare ready'; }
-    else if (m.state === 'energized') { alarm = 'Normal — no active alarm'; }
-    else { alarm = 'Unknown state — operator review'; }
     var html = '';
-    html += row('Alarm summary', alarm, m.state);
+    /* v1.43.4 — ISA-18.2 alarm state machine via RZAlarmState (review §3.3 + §4.3). */
+    if (root && root.RZAlarmState) {
+      var d = root.RZAlarmState.deriveFromEquipment(m.state);
+      html += '<div class="rz-inspector-row">' +
+        '<span class="rz-inspector-k">Alarm state</span>' +
+        '<span class="rz-inspector-v">' + root.RZAlarmState.chipHtml(d.alarm, d.severity) + '</span>' +
+      '</div>';
+      html += row('Summary', d.summary, m.state);
+    } else {
+      var alarm = '';
+      if (m.state === 'fault' || m.state === 'tripped') { alarm = 'ACTIVE — fault/trip state'; }
+      else if (m.state === 'isolated' || m.state === 'maintenance') { alarm = 'Inhibited — maintenance / LOTO'; }
+      else if (m.state === 'standby') { alarm = 'Normal standby — N+1 spare ready'; }
+      else if (m.state === 'energized') { alarm = 'Normal — no active alarm'; }
+      else { alarm = 'Unknown state — operator review'; }
+      html += row('Alarm summary', alarm, m.state);
+    }
     html += row('State', m.state);
     if (m.kind === 'breaker' && m.deviceFns) {
       html += row('Protection (ANSI)', m.deviceFns);
