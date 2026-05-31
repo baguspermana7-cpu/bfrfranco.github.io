@@ -7602,6 +7602,25 @@ if(el('dcIT'))el('dcIT').textContent=IT_MW+'MW';
 if(el('dcOut'))el('dcOut').textContent=RI(30,35)+'°C';
 if(el('dcRH'))el('dcRH').textContent=RI(65,80)+'%';
 if(el('dcWind'))el('dcWind').textContent=RI(8,15)+'m/s';
+/* v1.43.3 — KPI source+formula+timestamp tooltips (review doc-27 §3.4 P0).
+   ADDITIVE: sets title attribute only; never alters textContent, so the
+   accuracy probe (no-random-on-basis-KPI) stays green. Timestamp refreshes
+   on every 4s tick so operators see data freshness on hover. */
+(function(){
+  var ts=new Date();
+  var stamp=String(ts.getHours()).padStart(2,'0')+':'+String(ts.getMinutes()).padStart(2,'0')+':'+String(ts.getSeconds()).padStart(2,'0');
+  function tip(id,formula,source){
+    var e=el(id);if(!e)return;
+    e.setAttribute('title',formula+'\nSource: '+source+'\nUpdated: '+stamp+' (engine-derived, SIM)');
+  }
+  tip('dkPue','PUE = Total facility kW ÷ IT kW','DATAHALL_CALC.pueBasis() · bottom-up loss model');
+  tip('dkWue','WUE = water L ÷ IT kWh = 0 (dry-cooler closed loop, zero evaporation)','BASELINE-DECISION.md dry-only baseline');
+  tip('dkCue','CUE_IT = grid factor × PUE = '+GRID_KG_PER_KWH+' × '+PUE,'PLN Java grid 0.69 kgCO2/kWh (2025) × engine PUE');
+  tip('dkIt','IT Load = 4 halls × 27 NVL72 × 132 kW = 14.256 MW','DATAHALL_MODEL Scenario A (locked)');
+  tip('dkGpu','GPUs = 108 NVL72 domains × 72 GPU = 7,776','DATAHALL_MODEL.gpusPerDomain × domains');
+  tip('dkDom','NVL72 domains = 4 halls × 27 = 108','DATAHALL_MODEL.nvl72PerHall × halls');
+  tip('dkCdu','CDU = ceil(3,029 kW liquid ÷ 350 kW) = 9 run / 12 installed per hall × 4','DATAHALL_CALC.lockedState().cdu');
+})();
 }
 updateDashKPI();
 setInterval(updateDashKPI,4000);

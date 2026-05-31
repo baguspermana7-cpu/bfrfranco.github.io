@@ -11,6 +11,55 @@ release sections rather than semver.
 
 ---
 
+## v1.43.3 — 2026-05-26 (headline KPI source+formula+timestamp tooltips — review doc-27 §3.4 P0)
+
+MINOR ship: closes the remaining half of review doc-27 §3.4 P0 ("Setiap
+number card harus punya tooltip 'source + formula + timestamp'"). The
+`#p-dash` dashboard's 7 headline KPI cards now carry hover tooltips citing
+the engine path, the formula, and the live update timestamp.
+
+Owner-exclusion on `#p-dash` was lifted 2026-05-23, so this binding is
+permitted under the accuracy gates. **ADDITIVE only** — the tooltip sets
+the `title` attribute; textContent (the displayed value) is never touched,
+so the no-random-on-basis-KPI accuracy rule stays intact.
+
+Engine + `#p-dash` displayed values byte-identical. **40/40 line-model
+probe** (added KPI-tooltip assertion) + 75/75 accuracy probe (no random-
+basis regression) + 57/57 + 22/22 + all strict audits PASS.
+
+### Changed
+
+- **`datahallAI.html` `updateDashKPI()`** — appended an additive IIFE that
+  sets a `title` tooltip on each headline KPI value:
+  - `dkPue` — "PUE = Total facility kW ÷ IT kW" · DATAHALL_CALC.pueBasis()
+  - `dkWue` — "WUE = water L ÷ IT kWh = 0 (dry-cooler closed loop)" · BASELINE-DECISION.md
+  - `dkCue` — "CUE_IT = grid factor × PUE = 0.69 × <pue>" · PLN Java grid 2025
+  - `dkIt` — "IT Load = 4 halls × 27 NVL72 × 132 kW = 14.256 MW" · Scenario A
+  - `dkGpu` — "GPUs = 108 domains × 72 = 7,776" · DATAHALL_MODEL
+  - `dkDom` — "NVL72 domains = 4 halls × 27 = 108" · DATAHALL_MODEL
+  - `dkCdu` — "CDU = ceil(3,029 kW ÷ 350) = 9/12 per hall × 4" · lockedState().cdu
+  - Each tooltip ends with "Updated: HH:MM:SS (engine-derived, SIM)" —
+    timestamp refreshes on every 4s tick so operators see data freshness.
+- **`tools/probe-line-model.mjs`** — added datahallAI assertion: all 7
+  headline KPIs carry a `title` containing both `Source:` and `Updated:`.
+
+### Scope discipline
+
+- **Displayed KPI values unchanged** — accuracy probe confirms no
+  random-basis regression. The owner-excluded `#p-dash` displayed numbers
+  are byte-identical; only the hover `title` metadata is new.
+- **`EPMS_Telemetry.html`** still untouched per owner mandate.
+
+### Docs
+
+- `standarization/BMS_SHELL.md` v1.43.x table extended.
+- `standarization/ACCURACY_VALIDATION.md` note (KPI tooltip = additive, no
+  random-basis impact).
+- CHANGELOG.md (this entry) + changelog.html regen.
+- Memory tracker updated.
+
+---
+
 ## v1.43.2 — 2026-05-26 (data-quality service — review doc-27 §3.4 + §5.7)
 
 MINOR ship: closes review doc-27 §3.4 ("simulation mode banner") + §5.7 P1

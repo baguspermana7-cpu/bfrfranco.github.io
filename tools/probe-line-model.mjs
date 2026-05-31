@@ -155,6 +155,27 @@ for (const slug of Object.keys(ADOPTION_TARGETS)) {
            'no .rz-tq-banner element found');
   }
 
+  /* v1.43.3: headline KPI source+formula+timestamp tooltips (review §3.4 P0).
+   * datahallAI #p-dash only. */
+  if (slug === 'datahallAI.html') {
+    /* updateDashKPI runs on load + every 4s; give it one tick. */
+    await new Promise(r => setTimeout(r, 600));
+    const tips = await page.evaluate(() => {
+      const ids = ['dkPue', 'dkWue', 'dkCue', 'dkIt', 'dkGpu', 'dkDom', 'dkCdu'];
+      const out = {};
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        out[id] = el ? (el.getAttribute('title') || '') : null;
+      });
+      return out;
+    });
+    const allTipped = Object.keys(tips).every(id =>
+      tips[id] && /Source:/.test(tips[id]) && /Updated:/.test(tips[id]));
+    assert(allTipped,
+           `${slug}: headline KPIs carry source+formula+timestamp tooltips`,
+           JSON.stringify(tips));
+  }
+
   /* v1.42.1: breaker symbol coverage */
   const brTarget = BREAKER_TARGETS[slug] || 0;
   if (brTarget > 0) {
