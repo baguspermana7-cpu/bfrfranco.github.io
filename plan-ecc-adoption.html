@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan · ECC Adoption — Interactive Deck</title>
+<meta name="description" content="Interactive slide-deck plan: adopting the ECC agent-harness architecture to evolve resistancezero.com into a self-improving operator-intelligence platform. SVG diagrams, clickable pillar explorer, A/B/C option toggle, deep per-pillar detail.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B1120">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --violet:#A855F7;
+    --bg:#0B1120; --bg-2:#0F172A; --panel:#121C2E; --panel-2:#16213A;
+    --line:rgba(148,163,184,0.14); --line-strong:rgba(148,163,184,0.28);
+    --text:#E2E8F0; --text-strong:#F8FAFC; --muted:#8295AE; --dim:#5B6B82;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:var(--cyan);text-decoration:none;} a:hover{text-decoration:underline;text-underline-offset:3px;}
+  h1,h2,h3,h4{color:var(--text-strong);font-weight:700;line-height:1.15;letter-spacing:-0.015em;margin:0;}
+  code{font-family:var(--mono);}
+  ::selection{background:rgba(0,221,255,0.22);}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* ── deck shell ── */
+  .deck{scroll-snap-type:y proximity;}
+  .slide{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:5rem 1.4rem 4rem;position:relative;border-bottom:1px solid var(--line);}
+  .slide-inner{max-width:1120px;margin:0 auto;width:100%;}
+  .slabel{font-family:var(--mono);font-size:0.66rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem;}
+  .slabel .sn{color:var(--accent,var(--cyan));}
+  .slabel .ln{flex:1;height:1px;background:var(--line);max-width:120px;}
+  .slide h2{font-size:clamp(1.5rem,3.4vw,2.4rem);margin-bottom:0.7rem;}
+  .slide .sub{color:var(--muted);max-width:74ch;font-size:clamp(0.95rem,1.5vw,1.1rem);line-height:1.6;}
+
+  /* progress + chrome */
+  .progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--cyan));z-index:120;transition:width .2s;}
+  .topchrome{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1.2rem;background:linear-gradient(180deg,rgba(11,17,32,0.92),transparent);}
+  .topchrome .brand{display:flex;align-items:center;gap:0.55rem;font-family:var(--mono);font-weight:700;font-size:0.74rem;letter-spacing:0.04em;color:var(--text-strong);}
+  .topchrome .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px rgba(255,170,0,0.16);}
+  .topchrome .hublink{font-family:var(--mono);font-size:0.68rem;color:var(--muted);border:1px solid var(--line);padding:0.28rem 0.55rem;border-radius:6px;}
+  .topchrome .hublink:hover{color:var(--text-strong);text-decoration:none;border-color:var(--line-strong);}
+
+  /* dot nav */
+  .dotnav{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:110;display:flex;flex-direction:column;gap:0.65rem;}
+  .dotnav button{width:11px;height:11px;border-radius:50%;border:1px solid var(--line-strong);background:transparent;padding:0;transition:all .18s;position:relative;}
+  .dotnav button:hover{border-color:var(--cyan);}
+  .dotnav button.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .dotnav button .tip{position:absolute;right:18px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--mono);font-size:0.6rem;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:0.15rem 0.45rem;opacity:0;pointer-events:none;transition:opacity .15s;}
+  .dotnav button:hover .tip{opacity:1;}
+
+  /* nav arrows + counter */
+  .navbtns{position:fixed;bottom:18px;right:18px;z-index:110;display:flex;gap:0.4rem;align-items:center;}
+  .navbtns .ct{font-family:var(--mono);font-size:0.66rem;color:var(--muted);margin-right:0.4rem;}
+  .navbtns button{width:38px;height:38px;border-radius:9px;border:1px solid var(--line-strong);background:var(--panel);color:var(--text);font-size:1rem;display:flex;align-items:center;justify-content:center;}
+  .navbtns button:hover{border-color:var(--cyan);color:var(--cyan);}
+  .hintkey{position:fixed;bottom:22px;left:18px;z-index:110;font-family:var(--mono);font-size:0.62rem;color:var(--dim);}
+  .hintkey kbd{border:1px solid var(--line-strong);border-radius:4px;padding:0.05rem 0.35rem;color:var(--muted);}
+
+  @media(max-width:780px){ .dotnav{display:none;} .hintkey{display:none;} }
+
+  /* badges */
+  .badge-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .badge{display:inline-flex;align-items:center;gap:0.4rem;font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.32rem 0.62rem;border-radius:6px;border:1px solid;}
+  .badge.amber{color:var(--amber);border-color:rgba(255,170,0,0.4);background:rgba(255,170,0,0.07);}
+  .badge.cyan{color:var(--cyan);border-color:rgba(0,221,255,0.4);background:rgba(0,221,255,0.07);}
+  .badge.green{color:var(--green);border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.07);}
+  .badge.violet{color:var(--violet);border-color:rgba(168,85,247,0.4);background:rgba(168,85,247,0.07);}
+
+  /* ── title slide ── */
+  #s-title{background:radial-gradient(900px 460px at 75% 8%,rgba(0,221,255,0.08),transparent 70%),radial-gradient(700px 420px at 8% 90%,rgba(255,170,0,0.06),transparent 72%);}
+  #s-title h1{font-size:clamp(2.3rem,5.6vw,4rem);font-weight:800;max-width:18ch;margin-bottom:1.1rem;}
+  #s-title h1 .hl{color:var(--cyan);}
+  #s-title .lede{font-size:clamp(1.05rem,1.8vw,1.25rem);color:var(--text);max-width:64ch;line-height:1.62;}
+  #s-title .lede b{color:var(--text-strong);}
+  .title-meta{margin-top:1.6rem;font-family:var(--mono);font-size:0.72rem;color:var(--dim);}
+  .title-meta a{color:var(--muted);}
+  .scrollcue{margin-top:2rem;font-family:var(--mono);font-size:0.66rem;color:var(--muted);display:inline-flex;align-items:center;gap:0.5rem;animation:bob 1.8s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(5px);}}
+  @media(prefers-reduced-motion:reduce){.scrollcue{animation:none;}}
+
+  /* mini stat strip on title */
+  .tstats{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:2rem;}
+  .tstat .v{font-family:var(--mono);font-size:1.7rem;font-weight:800;color:var(--text-strong);}
+  .tstat .v.cy{color:var(--cyan);} .tstat .v.am{color:var(--amber);} .tstat .v.vi{color:var(--violet);}
+  .tstat .k{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono);}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="topchrome">
+  <div class="brand"><span class="dot"></span> RZ · PLAN · ECC ADOPTION</div>
+  <a class="hublink" href="planb.html">↩ Plan B hub</a>
+</div>
+
+<nav class="dotnav" id="dotnav"></nav>
+<div class="navbtns"><span class="ct" id="counter">1 / 8</span><button id="prev" aria-label="Previous slide">‹</button><button id="next" aria-label="Next slide">›</button></div>
+<div class="hintkey"><kbd>←</kbd> <kbd>→</kbd> or scroll to navigate</div>
+
+<main class="deck" id="deck">
+
+  <!-- ░░ SLIDE 1 — TITLE ░░ -->
+  <section class="slide" id="s-title" data-title="Thesis" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="badge-row">
+        <span class="badge amber">Topic Plan · Interactive Deck</span>
+        <span class="badge cyan">Adopted from ECC</span>
+        <span class="badge violet">8 slides · ← → to navigate</span>
+      </div>
+      <h1>RZ as a <span class="hl">self-improving</span> operator intelligence platform.</h1>
+      <p class="lede">
+        ECC is a <b>meta-system</b> for AI-agent development — six composable layers that turn ad-hoc
+        tooling into a framework that <b>learns from its own use</b>. The thesis: <b>resistancezero.com
+        already built ECC-shaped primitives without naming them.</b> Formalise the layers, build the one
+        that's missing, and the site stops being a pile of pages and starts to compound.
+      </p>
+      <div class="tstats">
+        <div class="tstat"><div class="v cy">6/6</div><div class="k">ECC layers mapped</div></div>
+        <div class="tstat"><div class="v am">5</div><div class="k">already exist in RZ</div></div>
+        <div class="tstat"><div class="v vi">1</div><div class="k">missing — the loop</div></div>
+        <div class="tstat"><div class="v">7</div><div class="k">pillars · 3 options</div></div>
+      </div>
+      <div class="title-meta">
+        source studied · <a href="https://github.com/affaan-m/ECC" target="_blank" rel="noopener">github.com/affaan-m/ECC</a> · <span id="stamp"></span>
+      </div>
+      <div class="scrollcue">▼ scroll or press → to begin</div>
+    </div>
+  </section>
+
+<!-- APPEND-SLIDES-HERE -->
+</main>
+
+<script>
+/* Generic deck controller — works for any number of .slide elements.
+   As slides 2–8 are appended (see APPEND-SLIDES-HERE), this auto-adapts. */
+(function(){
+  var stamp=document.getElementById('stamp'); if(stamp) stamp.textContent='rev 2026-05-26';
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var deck=document.getElementById('deck');
+  var dotnav=document.getElementById('dotnav');
+  var counter=document.getElementById('counter');
+  var progress=document.getElementById('progress');
+  var cur=0;
+  // build dot nav
+  slides.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.setAttribute('aria-label','Go to slide '+(i+1));
+    var tip=document.createElement('span'); tip.className='tip'; tip.textContent=s.getAttribute('data-title')||('Slide '+(i+1));
+    b.appendChild(tip);
+    b.addEventListener('click',function(){ slides[i].scrollIntoView({behavior:'smooth'}); });
+    dotnav.appendChild(b);
+  });
+  var dots=[].slice.call(dotnav.children);
+  function setCur(i){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    dots.forEach(function(d,k){ d.classList.toggle('on',k===cur); });
+    if(counter) counter.textContent=(cur+1)+' / '+slides.length;
+    if(progress) progress.style.width=(((cur+1)/slides.length)*100)+'%';
+  }
+  // observe which slide is centered
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ var idx=slides.indexOf(e.target); if(idx>=0) setCur(idx); } });
+    },{threshold:0.5});
+    slides.forEach(function(s){ io.observe(s); });
+  }
+  function go(d){ var n=Math.max(0,Math.min(slides.length-1,cur+d)); slides[n].scrollIntoView({behavior:'smooth'}); }
+  document.getElementById('prev').addEventListener('click',function(){go(-1);});
+  document.getElementById('next').addEventListener('click',function(){go(1);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(-1);}
+    else if(e.key==='Home'){e.preventDefault();slides[0].scrollIntoView({behavior:'smooth'});}
+    else if(e.key==='End'){e.preventDefault();slides[slides.length-1].scrollIntoView({behavior:'smooth'});}
+  });
+  setCur(0);
+})();
+</script>
+</body>
+</html>

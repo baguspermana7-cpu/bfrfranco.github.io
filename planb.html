@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan B — RZ Concept &amp; Plan Hub</title>
+<meta name="description" content="Internal landing page for resistancezero.com concept & plan discussion. Each plan is its own topic-specific page with options and examples; this hub indexes them.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0F172A">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --violet:#A855F7;
+    --wire:#475569; --bg:#0B1120; --bg-2:#0F172A; --panel:#121C2E; --panel-2:#16213A;
+    --line:rgba(148,163,184,0.14); --line-strong:rgba(148,163,184,0.26);
+    --text:#E2E8F0; --text-strong:#F8FAFC; --muted:#8295AE; --dim:#5B6B82;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:var(--cyan);text-decoration:none;} a:hover{text-decoration:underline;text-underline-offset:3px;}
+  h1,h2,h3,h4{color:var(--text-strong);font-weight:700;line-height:1.18;letter-spacing:-0.01em;margin:0;}
+  code,.mono{font-family:var(--mono);}
+  ::selection{background:rgba(0,221,255,0.22);}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 1.4rem;}
+  .kicker{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(11,17,32,0.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:1080px;margin:0 auto;padding:0.7rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .brand{display:flex;align-items:center;gap:0.6rem;font-family:var(--mono);font-weight:700;font-size:0.82rem;letter-spacing:0.04em;color:var(--text-strong);}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px rgba(255,170,0,0.16);}
+  .tnav{display:flex;gap:0.2rem;flex-wrap:wrap;}
+  .tnav a{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);padding:0.3rem 0.55rem;border-radius:6px;border:1px solid transparent;}
+  .tnav a:hover{color:var(--text-strong);background:rgba(148,163,184,0.08);text-decoration:none;border-color:var(--line);}
+
+  .hero{padding:4.2rem 0 2.4rem;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:
+     radial-gradient(680px 320px at 80% -10%, rgba(255,170,0,0.06), transparent 70%),
+     radial-gradient(560px 300px at 6% 14%, rgba(0,221,255,0.06), transparent 72%);pointer-events:none;}
+  .hero .inner{position:relative;}
+  .badge-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.3rem;}
+  .badge{display:inline-flex;align-items:center;gap:0.4rem;font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.32rem 0.62rem;border-radius:6px;border:1px solid;}
+  .badge.amber{color:var(--amber);border-color:rgba(255,170,0,0.4);background:rgba(255,170,0,0.07);}
+  .badge.cyan{color:var(--cyan);border-color:rgba(0,221,255,0.4);background:rgba(0,221,255,0.07);}
+  .badge.violet{color:var(--violet);border-color:rgba(168,85,247,0.4);background:rgba(168,85,247,0.07);}
+  .hero h1{font-size:clamp(2rem,4.4vw,3rem);max-width:20ch;margin-bottom:1rem;}
+  .hero h1 .hl{color:var(--amber);}
+  .hero .lede{font-size:clamp(1rem,1.6vw,1.14rem);color:var(--text);max-width:64ch;line-height:1.62;}
+  .hero .lede b{color:var(--text-strong);}
+
+  section{padding:2.8rem 0;border-top:1px solid var(--line);}
+  .sec-head{margin-bottom:1.6rem;}
+  .sec-head .kicker{display:block;margin-bottom:0.5rem;}
+  .sec-head h2{font-size:clamp(1.35rem,2.4vw,1.85rem);}
+  .sec-head p{color:var(--muted);max-width:70ch;margin:0.55rem 0 0;}
+
+  /* convention strip */
+  .conv{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.85rem;}
+  .cv{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:0.9rem 1rem;}
+  .cv .n{font-family:var(--mono);font-size:0.64rem;color:var(--dim);letter-spacing:0.1em;}
+  .cv h3{font-size:0.92rem;margin:0.3rem 0 0.4rem;}
+  .cv p{font-size:0.82rem;color:var(--muted);margin:0;line-height:1.5;}
+
+  /* plan registry */
+  .reg{display:grid;gap:1rem;}
+  .plan{display:block;border:1px solid var(--line);border-left:3px solid var(--accent,var(--cyan));border-radius:12px;background:var(--panel);padding:1.2rem 1.3rem;text-decoration:none;color:inherit;transition:border-color .18s, transform .18s, background .18s;}
+  .plan:hover{text-decoration:none;border-color:var(--line-strong);background:var(--panel-2);transform:translateY(-1px);}
+  .plan .top{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;}
+  .plan .pid{font-family:var(--mono);font-size:0.66rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent,var(--cyan));font-weight:700;}
+  .plan .st{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:5px;border:1px solid;}
+  .st.live{color:var(--green);border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.06);}
+  .st.draft{color:var(--amber);border-color:rgba(255,170,0,0.4);background:rgba(255,170,0,0.06);}
+  .st.slot{color:var(--dim);border-color:var(--line-strong);}
+  .plan h3{font-size:1.18rem;margin:0.55rem 0 0.4rem;}
+  .plan p{margin:0 0 0.7rem;color:var(--text);font-size:0.9rem;}
+  .plan .meta{display:flex;gap:0.4rem;flex-wrap:wrap;}
+  .tag{font-family:var(--mono);font-size:0.63rem;letter-spacing:0.03em;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0.18rem 0.45rem;}
+  .plan .cta{margin-top:0.8rem;font-family:var(--mono);font-size:0.72rem;color:var(--accent,var(--cyan));letter-spacing:0.04em;}
+  .plan.slot{cursor:default;opacity:0.72;border-left-style:dashed;}
+  .plan.slot:hover{transform:none;background:var(--panel);}
+
+  .note{border:1px dashed var(--line-strong);border-radius:10px;background:rgba(168,85,247,0.05);padding:1.05rem 1.2rem;font-size:0.88rem;color:var(--text);line-height:1.6;}
+  .note b{color:var(--violet);}
+  .note code{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:0.05rem 0.35rem;font-size:0.82rem;color:var(--cyan);}
+
+  ol.recipe{margin:0;padding-left:1.3rem;display:grid;gap:0.5rem;}
+  ol.recipe li{font-size:0.88rem;color:var(--muted);line-height:1.55;}
+  ol.recipe li b{color:var(--text-strong);}
+
+  footer{border-top:1px solid var(--line);padding:2.2rem 0 3rem;color:var(--dim);font-family:var(--mono);font-size:0.72rem;letter-spacing:0.03em;}
+  footer .frow{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+
+  @media (max-width:680px){ .topbar .tnav{display:none;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="dot"></span> RESISTANCE&nbsp;ZERO · PLAN&nbsp;B&nbsp;HUB</div>
+    <nav class="tnav">
+      <a href="#convention">Convention</a>
+      <a href="#registry">Plan Registry</a>
+      <a href="#newplan">Add a Plan</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap inner">
+    <div class="badge-row">
+      <span class="badge amber">Concept &amp; Plan Hub</span>
+      <span class="badge cyan">One page per plan</span>
+      <span class="badge violet">Discussion home</span>
+    </div>
+    <h1>Plan B — the <span class="hl">hub</span> for RZ concept &amp; plan discussion.</h1>
+    <p class="lede">
+      This is a <b>landing page</b>, not a plan. Every strategic plan for resistancezero.com gets its
+      <b>own topic-specific page</b> — focused on one subject, with concrete <b>examples</b> and several
+      <b>options</b> to choose between. This hub indexes them, holds the shared convention, and is the
+      standing surface where plans get discussed before anything is built. New plans are added here
+      across sessions; the registry below grows over time.
+    </p>
+  </div>
+</header>
+
+<!-- ════════ CONVENTION ════════ -->
+<section id="convention">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">How this works</span>
+      <h2>The convention every plan page follows</h2>
+      <p>So plans stay comparable and decision-ready no matter which session authored them.</p>
+    </div>
+    <div class="conv">
+      <div class="cv"><div class="n">RULE 01</div><h3>One topic per page</h3><p>Each plan is a standalone HTML page scoped to a single subject (e.g. ECC adoption). The hub never holds plan content itself — only links.</p></div>
+      <div class="cv"><div class="n">RULE 02</div><h3>Always show options</h3><p>Every plan presents 2–4 distinct options (e.g. minimal / standard / full), each shippable on its own, with cost + risk + "who it's for".</p></div>
+      <div class="cv"><div class="n">RULE 03</div><h3>Always show examples</h3><p>Abstractions are cheap. Every plan includes concrete artefacts — code snippets, real shapes — so it's judged on output, not vocabulary.</p></div>
+      <div class="cv" style="border-color:rgba(0,221,255,0.3);"><div class="n" style="color:var(--cyan);">RULE 04 ★</div><h3>Always show a visual mockup</h3><p>Every plan renders a proper <b style="color:var(--text-strong);">layout mockup</b> of what the thing looks like — a CSS-rendered preview (console, flow, panel), not only code or text. Show the surface.</p></div>
+      <div class="cv" style="border-color:rgba(0,221,255,0.3);"><div class="n" style="color:var(--cyan);">RULE 05 ★</div><h3>Every change = before vs after</h3><p>Any proposed change shows a side-by-side <b style="color:var(--text-strong);">before / after</b> — each side with its visual snippet <i>and</i> code <i>and</i> a one-line explanation. Three together, never one alone.</p></div>
+      <div class="cv"><div class="n">RULE 06</div><h3>End with decisions</h3><p>Each plan closes with the open questions whose answers change the build, so a discussion can converge to a chosen path.</p></div>
+      <div class="cv"><div class="n">RULE 07</div><h3>Instrument aesthetic</h3><p>IBM Plex Sans + JetBrains Mono, signal-amber / oscilloscope-green / instrument-cyan / fault-red, thin lines, dark canvas. No AI-slop.</p></div>
+      <div class="cv"><div class="n">RULE 08</div><h3>Internal &amp; noindex</h3><p>Plan pages are working surfaces: <code>noindex,nofollow</code>, not in the sitemap. Promoted to <code>standarization/</code> + memory once agreed.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ REGISTRY ════════ -->
+<section id="registry">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Plan Registry</span>
+      <h2>Plans on the table</h2>
+      <p>Live plans link to their own page. Slots are reserved topics awaiting authoring in a future session.</p>
+    </div>
+    <div class="reg">
+
+      <a class="plan" href="plan-ecc-adoption.html" style="--accent:var(--cyan);">
+        <div class="top">
+          <span class="pid">PLAN 01 · architecture</span>
+          <span class="st live">● Live · 3 options + examples</span>
+        </div>
+        <h3>ECC Adoption — RZ as a self-improving operator intelligence platform</h3>
+        <p>Adopt the ECC agent-harness architecture (skills · agents · rules · hooks · continuous-learning · adversarial audit). RZ already has the bones — formalise the layers and build the one it's missing: a learning loop. 7 pillars, 3 adoption profiles, concrete artefact examples.</p>
+        <div class="meta">
+          <span class="tag">7 pillars</span><span class="tag">minimal / standard / full</span>
+          <span class="tag">continuous-learning keystone</span><span class="tag">RZ-Shield</span>
+        </div>
+        <div class="cta">Open plan →</div>
+      </a>
+
+      <a class="plan" href="plan-dark-mode-standard.html" style="--accent:var(--cyan);">
+        <div class="top">
+          <span class="pid">PLAN 02 · design system</span>
+          <span class="st live">● Live · 4 variants + before/after</span>
+        </div>
+        <h3>Dark-mode character standard — pick &amp; codify the RZ identity</h3>
+        <p>The current dark mode reads as generic. Four on-brand candidate characters (Oscilloscope / Blueprint / Terminal / Editorial), each with animated-on-load data viz + intuitive PC/mobile responsive. Choose one → codify into design.md tokens + a shared dark stylesheet. RZ Dark System v1.</p>
+        <div class="meta"><span class="tag">4 variants</span><span class="tag">animated charts</span><span class="tag">anti-AI-slop</span><span class="tag">2 registers</span></div>
+        <div class="cta">Open plan →</div>
+      </a>
+
+      <div class="plan slot" style="--accent:var(--amber);">
+        <div class="top">
+          <span class="pid">PLAN 03 · reserved</span>
+          <span class="st slot">○ Slot — awaiting authoring</span>
+        </div>
+        <h3>Live-data layer &amp; the static-vs-edge decision</h3>
+        <p>Reserved deep-dive: should RZ stay 100% static (GitHub Pages) or adopt one edge function (Cloudflare Pages Worker)? Unlocks live grid/energy/weather data, CSP nonces, and server-side RBAC. To be authored as its own page with options.</p>
+        <div class="meta"><span class="tag">platform decision</span><span class="tag">depends on ECC Plan §Q3</span></div>
+        <div class="cta" style="color:var(--dim);">Not yet authored</div>
+      </div>
+
+      <div class="plan slot" style="--accent:var(--green);">
+        <div class="top">
+          <span class="pid">PLAN 04 · reserved</span>
+          <span class="st slot">○ Slot — awaiting authoring</span>
+        </div>
+        <h3>Branch reconciliation — v1.41.x ↔ v1.42.x merge strategy</h3>
+        <p>Reserved: the ft-phase2 (v1.41.x) and main BMS (v1.42.x) tracks are diverging. A dedicated plan page weighing merge options (rebase / cherry-pick / long-lived), their risks, and the version-numbering reconciliation.</p>
+        <div class="meta"><span class="tag">git strategy</span><span class="tag">version collision</span></div>
+        <div class="cta" style="color:var(--dim);">Not yet authored</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ ADD A PLAN ════════ -->
+<section id="newplan">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">For future sessions</span>
+      <h2>Adding a new plan</h2>
+      <p>The repeatable recipe so any session produces a hub-consistent plan page.</p>
+    </div>
+    <ol class="recipe">
+      <li><b>Create</b> <code>plan-&lt;topic&gt;.html</code> in the site root — copy <code>plan-ecc-adoption.html</code> as the structural template (same CSS tokens, topbar with <code>← Hub</code> link, badge row).</li>
+      <li><b>Scope</b> it to one topic. Sections: Recognition/Context → core analysis → <b>Options</b> (2–4) → <b>Examples</b> (code) → <b>Visual mockups</b> (rendered layouts) → <b>Before/after</b> (visual + code + explanation per change) → Roadmap → Effort×Impact → Open Questions.</li>
+      <li><b>Visual is mandatory</b> (Rules 04–05): every plan must render at least one layout mockup, and every change must show before/after with all three — visual, code, explanation. Reuse the <code>.mock</code> / <code>.ba</code> CSS from <code>plan-ecc-adoption.html</code>.</li>
+      <li><b>Register</b> it: add a <code>.plan</code> card to the registry above (flip a reserved slot to live, or add a new card).</li>
+      <li><b>Keep it internal</b>: <code>&lt;meta name="robots" content="noindex, nofollow"&gt;</code>, do not add to <code>sitemap.xml</code> / <code>llms.txt</code> / nav.</li>
+      <li><b>Promote on agreement</b>: once a plan's option is chosen, fold the decision into <code>standarization/</code> + memory, and let the build track (versioned ships) execute it.</li>
+    </ol>
+    <div class="note" style="margin-top:1.4rem;">
+      <b>Discussion home.</b> This hub (<code>planb.html</code>) is the standing landing for RZ concept &amp;
+      plan discussion across sessions. Cross-plan strategy lives here; single-plan detail lives on each
+      plan's own page. Served internally at <code>localhost:8090/planb.html</code> · <code>noindex</code>.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap frow">
+    <div>RESISTANCE ZERO · PLAN B HUB · internal concept surface · noindex</div>
+    <div id="footstamp"></div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var d='2026-05-26';
+    var f=document.getElementById('footstamp'); if(f) f.textContent='rev '+d;
+    document.querySelectorAll('.tnav a').forEach(function(a){
+      a.addEventListener('click',function(e){
+        var id=this.getAttribute('href');
+        if(id&&id.charAt(0)==='#'){var t=document.querySelector(id);
+          if(t){e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-64;window.scrollTo({top:y,behavior:'smooth'});}}
+      });
+    });
+  })();
+</script>
+</body>
+</html>
