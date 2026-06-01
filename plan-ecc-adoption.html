@@ -89,6 +89,161 @@
   .tstat .v{font-family:var(--mono);font-size:1.7rem;font-weight:800;color:var(--text-strong);}
   .tstat .v.cy{color:var(--cyan);} .tstat .v.am{color:var(--amber);} .tstat .v.vi{color:var(--violet);}
   .tstat .k{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono);}
+
+  /* ── S2 recognition rack ── */
+  .rack{border:1px solid var(--line-strong);border-radius:14px;background:var(--bg-2);overflow:hidden;box-shadow:0 18px 46px rgba(0,0,0,0.4);margin-top:1.6rem;}
+  .rack-row{display:grid;grid-template-columns:150px 1fr 124px;gap:0;align-items:center;padding:0.85rem 1rem;border-bottom:1px solid var(--line);}
+  .rack-row:last-child{border-bottom:0;}
+  .rack-row .layer{font-family:var(--mono);font-size:0.78rem;font-weight:700;color:var(--accent,var(--cyan));display:flex;align-items:center;gap:0.55rem;}
+  .rack-row .layer .bar{width:3px;height:24px;border-radius:2px;background:var(--accent,var(--cyan));}
+  .rack-row .maps{font-size:0.85rem;color:var(--text);}
+  .rack-row .maps b{color:var(--text-strong);} .rack-row .maps .arrow{color:var(--dim);font-family:var(--mono);margin:0 0.4rem;}
+  .rack-row .stat{justify-self:end;font-family:var(--mono);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:0.4rem;padding:0.22rem 0.55rem;border-radius:5px;border:1px solid;}
+  .stat.have{color:var(--green);border-color:rgba(0,255,136,0.35);} .stat.part{color:var(--amber);border-color:rgba(255,170,0,0.35);} .stat.gap{color:var(--red);border-color:rgba(255,48,48,0.4);}
+  .stat .l{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;}
+  @media(max-width:680px){.rack-row{grid-template-columns:1fr;gap:0.4rem;}.rack-row .stat{justify-self:start;}}
+
+  /* ── S3 SVG architecture ── */
+  .archwrap{display:grid;grid-template-columns:1fr 300px;gap:1.4rem;margin-top:1.4rem;align-items:start;}
+  @media(max-width:840px){.archwrap{grid-template-columns:1fr;}}
+  .archsvg{border:1px solid var(--line-strong);border-radius:14px;background:var(--bg-2);padding:0.6rem;box-shadow:0 18px 46px rgba(0,0,0,0.4);}
+  .archsvg svg{width:100%;height:auto;display:block;}
+  .alayer-rect{fill:var(--panel);stroke:var(--line-strong);stroke-width:1;cursor:pointer;transition:fill .15s,stroke .15s;rx:8;}
+  .alayer-g:hover .alayer-rect, .alayer-g.on .alayer-rect{fill:var(--panel-2);}
+  .alayer-g.on .alayer-rect{stroke-width:2;}
+  .alabel{font-family:var(--sans);font-weight:700;font-size:13px;fill:var(--text-strong);pointer-events:none;}
+  .anum{font-family:var(--mono);font-weight:800;font-size:13px;pointer-events:none;}
+  .aflow{stroke-width:1.5;fill:none;marker-end:url(#arr);}
+  .aflow.loop{stroke:var(--violet);stroke-dasharray:5 4;}
+  .adetail{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1rem 1.1rem;position:sticky;top:5rem;}
+  .adetail .dh{font-family:var(--mono);font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent,var(--cyan));font-weight:700;}
+  .adetail h3{font-size:1.05rem;margin:0.35rem 0 0.5rem;}
+  .adetail p{font-size:0.85rem;color:var(--muted);margin:0 0 0.5rem;line-height:1.55;}
+  .adetail .pill{font-family:var(--mono);font-size:0.62rem;color:var(--accent,var(--cyan));border:1px solid var(--line-strong);border-radius:5px;padding:0.15rem 0.45rem;}
+
+  /* ── S4 pillar tab explorer ── */
+  .ptabs{display:flex;gap:0.4rem;flex-wrap:wrap;margin:1.3rem 0 1.1rem;}
+  .ptab{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.03em;padding:0.5rem 0.7rem;border-radius:8px;border:1px solid var(--line-strong);background:var(--panel);color:var(--muted);display:flex;align-items:center;gap:0.45rem;}
+  .ptab .pdot{width:8px;height:8px;border-radius:50%;background:var(--accent,var(--cyan));}
+  .ptab:hover{color:var(--text-strong);border-color:var(--accent,var(--cyan));}
+  .ptab.on{color:var(--text-strong);background:var(--panel-2);border-color:var(--accent,var(--cyan));box-shadow:0 0 0 1px var(--accent,var(--cyan));}
+  .ppanel{display:none;}
+  .ppanel.on{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .ppanel-grid{display:grid;grid-template-columns:1fr 300px;gap:1.3rem;align-items:start;border:1px solid var(--line);border-left:3px solid var(--accent,var(--cyan));border-radius:12px;background:var(--panel);padding:1.3rem 1.4rem;}
+  @media(max-width:780px){.ppanel-grid{grid-template-columns:1fr;}}
+  .ppanel-grid h3{font-size:1.25rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.3rem;}
+  .ppanel-grid .eccfrom{font-family:var(--mono);font-size:0.6rem;color:var(--dim);border:1px solid var(--line);border-radius:5px;padding:0.15rem 0.45rem;letter-spacing:0.04em;text-transform:uppercase;}
+  .ppanel-grid .pintro{font-size:0.92rem;color:var(--text);margin:0.2rem 0 0.9rem;line-height:1.55;}
+  .tbp{display:grid;gap:0.6rem;}
+  .tbp .seg{display:grid;grid-template-columns:66px 1fr;gap:0.7rem;align-items:start;}
+  .tbp .sk{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;padding-top:0.12rem;}
+  .tbp .sk.today{color:var(--muted);} .tbp .sk.build{color:var(--amber);} .tbp .sk.proof{color:var(--green);}
+  .tbp .sv{font-size:0.86rem;color:var(--text);line-height:1.55;}
+  .tbp .sv code{font-size:0.76rem;color:var(--cyan);background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:0.02rem 0.32rem;}
+  .tbp .sv b{color:var(--text-strong);}
+  .pviz{border:1px solid var(--line);border-radius:10px;background:var(--bg-2);padding:0.9rem;min-height:170px;display:flex;flex-direction:column;justify-content:center;gap:0.55rem;}
+  .pviz .pvcap{font-family:var(--mono);font-size:0.56rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;text-align:center;}
+  .mv-chain{display:flex;align-items:center;gap:0.3rem;justify-content:center;flex-wrap:wrap;}
+  .mv-chain .nd{border:1px solid var(--accent,var(--cyan));border-radius:6px;padding:0.32rem 0.5rem;font-family:var(--mono);font-size:0.64rem;color:var(--text-strong);background:var(--panel);}
+  .mv-chain .ar{color:var(--green);}
+  .mv-pair{display:grid;gap:0.4rem;font-family:var(--mono);font-size:0.64rem;}
+  .mv-pair .pr{display:flex;align-items:center;gap:0.45rem;}
+  .mv-pair .doc{flex:1;border:1px solid var(--line);border-radius:5px;padding:0.32rem 0.45rem;color:var(--text);background:var(--panel);}
+  .mv-pair .chk{color:var(--green);} .mv-pair .x{color:var(--red);}
+  .mv-gate{display:grid;gap:0.4rem;}
+  .mv-gate .g{display:flex;align-items:center;gap:0.5rem;font-family:var(--mono);font-size:0.62rem;}
+  .mv-gate .g .gl{color:var(--muted);min-width:56px;} .mv-gate .g .gb{height:9px;border-radius:3px;}
+  .mv-loop2{display:flex;align-items:center;justify-content:center;gap:0.35rem;font-family:var(--mono);font-size:0.6rem;color:var(--violet);flex-wrap:wrap;}
+  .mv-loop2 .s{border:1px solid rgba(168,85,247,0.4);border-radius:5px;padding:0.28rem 0.42rem;}
+  .mv-shield{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.35rem;font-family:var(--mono);font-size:0.56rem;text-align:center;}
+  .mv-shield .c{border:1px solid var(--line);border-radius:5px;padding:0.4rem 0.25rem;}
+  .mv-shield .c.r{border-color:rgba(255,48,48,0.4);color:var(--red);} .mv-shield .c.b{border-color:rgba(0,221,255,0.4);color:var(--cyan);} .mv-shield .c.s{border-color:rgba(0,255,136,0.4);color:var(--green);}
+  .mv-data{display:flex;align-items:center;gap:0.32rem;justify-content:center;font-family:var(--mono);font-size:0.6rem;flex-wrap:wrap;}
+  .mv-data .nd{border:1px solid var(--line);border-radius:5px;padding:0.32rem 0.42rem;color:var(--text);background:var(--panel);} .mv-data .fresh{color:var(--green);}
+  .mv-con{display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;}
+  .mv-con .t{border:1px solid var(--line);border-radius:5px;padding:0.4rem;text-align:center;font-family:var(--mono);}
+  .mv-con .t .v{font-size:0.85rem;font-weight:800;} .mv-con .t .k{font-size:0.5rem;color:var(--dim);text-transform:uppercase;}
+
+  /* ── S5 option toggle ── */
+  .optbar{display:flex;gap:0.5rem;flex-wrap:wrap;margin:1.3rem 0 1.2rem;}
+  .optbtn{flex:1;min-width:200px;text-align:left;border:1px solid var(--line-strong);border-radius:12px;background:var(--panel);padding:0.9rem 1rem;transition:all .18s;}
+  .optbtn:hover{border-color:var(--oc,var(--cyan));}
+  .optbtn.on{border-color:var(--oc,var(--cyan));background:var(--panel-2);box-shadow:0 0 0 1px var(--oc,var(--cyan));}
+  .optbtn .ot{font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--oc,var(--cyan));font-weight:700;}
+  .optbtn .on2{font-size:1.05rem;font-weight:700;color:var(--text-strong);margin:0.25rem 0;}
+  .optbtn .om{font-size:0.74rem;color:var(--muted);}
+  .optgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.5rem;margin-bottom:1rem;}
+  @media(max-width:680px){.optgrid{grid-template-columns:repeat(4,1fr);}}
+  .opcell{border:1px solid var(--line);border-radius:9px;background:var(--bg-2);padding:0.6rem 0.4rem;text-align:center;opacity:0.32;transition:all .2s;}
+  .opcell.lit{opacity:1;border-color:var(--litc,var(--cyan));background:var(--panel);box-shadow:0 0 12px -4px var(--litc,var(--cyan));}
+  .opcell .opn{font-family:var(--mono);font-size:0.56rem;color:var(--dim);} .opcell.lit .opn{color:var(--litc,var(--cyan));}
+  .opcell .opt2{font-size:0.66rem;color:var(--text-strong);font-weight:600;margin-top:0.2rem;line-height:1.3;}
+  .optmeta{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:0.9rem 1.1rem;font-size:0.86rem;color:var(--text);line-height:1.55;}
+  .optmeta b{color:var(--text-strong);}
+  .optmeta .row{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:0.5rem;font-family:var(--mono);font-size:0.72rem;color:var(--muted);}
+  .optmeta .row b{color:var(--green);}
+
+  /* ── S6 mockups ── */
+  .mockgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.3rem;}
+  @media(max-width:780px){.mockgrid{grid-template-columns:1fr;}}
+  .mock{border:1px solid var(--line-strong);border-radius:12px;background:var(--bg-2);overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,0.32);}
+  .mock-chrome{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.8rem;background:var(--panel-2);border-bottom:1px solid var(--line);}
+  .mock-lights{display:flex;gap:0.32rem;} .mock-lights i{width:9px;height:9px;border-radius:50%;display:block;}
+  .ml-r{background:#ff5f57;} .ml-y{background:#febc2e;} .ml-g{background:#28c840;}
+  .mock-url{font-family:var(--mono);font-size:0.62rem;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0.18rem 0.55rem;flex:1;}
+  .mock-cap{font-family:var(--mono);font-size:0.6rem;color:var(--dim);letter-spacing:0.04em;margin:0.5rem 0 0;text-align:center;text-transform:uppercase;}
+  .mock-pad{padding:0.85rem 0.95rem;}
+  .con-tiles{display:grid;grid-template-columns:1fr 1fr;gap:0.45rem;}
+  .ct{border:1px solid var(--line);border-radius:7px;padding:0.5rem 0.55rem;background:var(--panel);}
+  .ct .lab{font-family:var(--mono);font-size:0.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+  .ct .val{font-size:1rem;font-weight:800;font-family:var(--mono);margin-top:0.12rem;}
+  .ct.ok .val{color:var(--green);} .ct.warn .val{color:var(--amber);} .ct.crit .val{color:var(--red);} .ct.info .val{color:var(--cyan);}
+  .con-log{margin-top:0.5rem;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:0.5rem 0.6rem;}
+  .con-log .row{font-family:var(--mono);font-size:0.6rem;color:var(--text);padding:0.16rem 0;display:flex;gap:0.5rem;border-bottom:1px solid var(--line);}
+  .con-log .row:last-child{border-bottom:0;} .con-log .row .tm{color:var(--dim);}
+  .con-log .row.pass .st{color:var(--green);} .con-log .row.fail .st{color:var(--red);} .con-log .row.new .st{color:var(--cyan);}
+  .flowm{display:flex;align-items:center;gap:0.3rem;justify-content:center;flex-wrap:wrap;padding:0.6rem 0;}
+  .flowm .fn{border:1px solid var(--cyan);border-radius:7px;padding:0.5rem 0.6rem;font-family:var(--mono);font-size:0.62rem;color:var(--text-strong);background:var(--panel);text-align:center;}
+  .flowm .fa{color:var(--green);font-size:0.8rem;}
+  .shieldm{display:grid;grid-template-columns:1fr 1fr 1fr;}
+  .shieldm .sa{padding:0.7rem;border-right:1px solid var(--line);} .shieldm .sa:last-child{border-right:0;}
+  .shieldm .sa .role{font-family:var(--mono);font-size:0.58rem;text-transform:uppercase;font-weight:700;margin-bottom:0.35rem;}
+  .shieldm .sa.r .role{color:var(--red);} .shieldm .sa.b .role{color:var(--cyan);} .shieldm .sa.s .role{color:var(--green);}
+  .shieldm .sa p{font-size:0.68rem;color:var(--text);margin:0;line-height:1.45;}
+  .shieldm .sa .stamp{margin-top:0.4rem;font-family:var(--mono);font-size:0.6rem;font-weight:700;color:var(--red);border:1px solid var(--red);border-radius:5px;padding:0.15rem 0.4rem;display:inline-block;}
+  /* before/after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-top:1.3rem;}
+  @media(max-width:680px){.ba{grid-template-columns:1fr;} .mockgrid{grid-template-columns:1fr;}}
+  .ba-col{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .ba-col.before{border-color:rgba(255,48,48,0.3);} .ba-col.after{border-color:rgba(0,255,136,0.32);}
+  .ba-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;padding:0.45rem 0.8rem;display:flex;align-items:center;gap:0.45rem;}
+  .ba-col.before .ba-tag{color:var(--red);background:rgba(255,48,48,0.06);border-bottom:1px solid rgba(255,48,48,0.2);}
+  .ba-col.after .ba-tag{color:var(--green);background:rgba(0,255,136,0.06);border-bottom:1px solid rgba(0,255,136,0.2);}
+  .ba-vis{padding:0.85rem;background:var(--bg-2);min-height:84px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.62rem;}
+  .ba-body{padding:0.7rem 0.85rem;}
+  .ba-body .code{font-family:var(--mono);font-size:0.66rem;line-height:1.5;color:#c4d3e6;background:var(--bg-2);border:1px solid var(--line);border-radius:7px;padding:0.6rem 0.7rem;white-space:pre;overflow-x:auto;margin:0 0 0.5rem;}
+  .ba-body p{font-size:0.76rem;color:var(--muted);margin:0;line-height:1.5;}
+  .ledc{width:7px;height:7px;border-radius:50%;display:inline-block;} .ledc.r{background:var(--red);box-shadow:0 0 6px var(--red);} .ledc.g{background:var(--green);box-shadow:0 0 6px var(--green);}
+
+  /* ── S7 gantt ── */
+  .gantt{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1.1rem 1.2rem;overflow-x:auto;margin-top:1.3rem;}
+  .gantt-scale{display:grid;grid-template-columns:140px repeat(12,1fr);font-family:var(--mono);font-size:0.56rem;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:0.4rem;margin-bottom:0.5rem;min-width:640px;}
+  .gantt-scale .sl{text-align:center;}
+  .gantt-row{display:grid;grid-template-columns:140px 1fr;gap:0.7rem;align-items:center;padding:0.36rem 0;min-width:640px;}
+  .gantt-row .gname{font-family:var(--mono);font-size:0.68rem;color:var(--text);white-space:nowrap;}
+  .gantt-row .gtrack{position:relative;height:22px;background:var(--bg-2);border-radius:6px;}
+  .gantt-row .gbar{position:absolute;top:2px;height:18px;border-radius:5px;display:flex;align-items:center;padding:0 0.5rem;font-family:var(--mono);font-size:0.56rem;font-weight:700;color:#0b1120;white-space:nowrap;overflow:hidden;}
+
+  /* ── S8 decisions ── */
+  .disc{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-top:1.3rem;}
+  @media(max-width:680px){.disc{grid-template-columns:1fr;}}
+  .qa{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:1.05rem 1.15rem;border-top:2px solid var(--violet);}
+  .qa .qn{font-family:var(--mono);font-size:0.64rem;color:var(--violet);letter-spacing:0.06em;}
+  .qa h4{font-size:1rem;margin:0.3rem 0 0.45rem;}
+  .qa p{margin:0;font-size:0.83rem;color:var(--muted);line-height:1.55;}
+  .endnote{margin-top:1.4rem;border:1px dashed var(--line-strong);border-radius:11px;background:rgba(168,85,247,0.05);padding:1.05rem 1.2rem;font-size:0.86rem;color:var(--text);line-height:1.6;}
+  .endnote b{color:var(--violet);} .endnote code{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:0.05rem 0.35rem;color:var(--cyan);font-size:0.8rem;}
 </style>
 </head>
 <body>
@@ -130,6 +285,252 @@
         source studied · <a href="https://github.com/affaan-m/ECC" target="_blank" rel="noopener">github.com/affaan-m/ECC</a> · <span id="stamp"></span>
       </div>
       <div class="scrollcue">▼ scroll or press → to begin</div>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 2 — RECOGNITION ░░ -->
+  <section class="slide" id="s-recognition" data-title="Recognition" style="--accent:var(--amber);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">02</span> The recognition <span class="ln"></span></div>
+      <h2>RZ already has ECC's bones.</h2>
+      <p class="sub">Five of ECC's six layers already exist in RZ in some form — they just aren't named or connected. Map them, and the gap becomes obvious: there's no learning loop. That one gap is the entire opportunity.</p>
+      <div class="rack">
+        <div class="rack-row" style="--accent:var(--amber);"><span class="layer"><span class="bar"></span>Hooks</span><span class="maps">6 strict <b>audit-*.py</b> gates <span class="arrow">≡</span> ECC PreToolUse / Stop hooks</span><span class="stat have"><span class="l"></span>have</span></div>
+        <div class="rack-row" style="--accent:var(--green);"><span class="layer"><span class="bar"></span>Rules</span><span class="maps">30+ <b>standarization/</b> docs <span class="arrow">≡</span> ECC rules layer</span><span class="stat part"><span class="l"></span>partial</span></div>
+        <div class="rack-row" style="--accent:var(--cyan);"><span class="layer"><span class="bar"></span>Skills</span><span class="maps">28+ calculators &amp; labs <span class="arrow">≡</span> ECC skills (un-registered)</span><span class="stat part"><span class="l"></span>partial</span></div>
+        <div class="rack-row" style="--accent:var(--cyan);"><span class="layer"><span class="bar"></span>Agents</span><span class="maps">dev agents + Workbench reasoning <span class="arrow">≡</span> ECC agents</span><span class="stat part"><span class="l"></span>partial</span></div>
+        <div class="rack-row" style="--accent:var(--violet);"><span class="layer"><span class="bar"></span>Learning</span><span class="maps">— no self-improvement loop — <span class="arrow">≡</span> ECC instincts</span><span class="stat gap"><span class="l"></span>gap</span></div>
+        <div class="rack-row" style="--accent:var(--red);"><span class="layer"><span class="bar"></span>Audit</span><span class="maps">40-test accuracy probe <span class="arrow">≡</span> ECC AgentShield (not adversarial yet)</span><span class="stat part"><span class="l"></span>partial</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 3 — SVG ARCHITECTURE ░░ -->
+  <section class="slide" id="s-stack" data-title="The Stack" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">03</span> The assembled stack <span class="ln"></span></div>
+      <h2>Seven pillars, one system.</h2>
+      <p class="sub">Click any layer to inspect it. Data feeds the tools, hooks gate them, rules define them — and the dashed violet loop is the keystone: the learning layer rewrites the rules below it from real use. That feedback is what turns a pile of pages into a system that compounds.</p>
+      <div class="archwrap">
+        <div class="archsvg">
+          <svg viewBox="0 0 560 470" role="img" aria-label="Layered architecture diagram of the seven pillars">
+            <defs>
+              <marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="var(--cyan)"/></marker>
+              <marker id="arrv" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="var(--violet)"/></marker>
+            </defs>
+            <!-- upward flow spine -->
+            <line x1="40" y1="430" x2="40" y2="50" class="aflow" stroke="var(--cyan)" opacity="0.5"/>
+            <!-- layers (top→bottom) -->
+            <g class="alayer-g on" data-k="7" tabindex="0" role="button" aria-label="Operations Console layer">
+              <rect class="alayer-rect" x="70" y="36" width="420" height="46" rx="8" style="stroke:var(--green);"/>
+              <text class="anum" x="86" y="64" style="fill:var(--green);">7</text>
+              <text class="alabel" x="112" y="64">Operations Console</text>
+            </g>
+            <g class="alayer-g" data-k="4" tabindex="0" role="button" aria-label="Continuous learning loop layer">
+              <rect class="alayer-rect" x="70" y="92" width="420" height="46" rx="8" style="stroke:var(--violet);"/>
+              <text class="anum" x="86" y="120" style="fill:var(--violet);">4</text>
+              <text class="alabel" x="112" y="120">Continuous-learning loop ★</text>
+            </g>
+            <g class="alayer-g" data-k="5" tabindex="0" role="button" aria-label="RZ-Shield layer">
+              <rect class="alayer-rect" x="70" y="148" width="420" height="46" rx="8" style="stroke:var(--red);"/>
+              <text class="anum" x="86" y="176" style="fill:var(--red);">5</text>
+              <text class="alabel" x="112" y="176">RZ-Shield · adversarial audit</text>
+            </g>
+            <g class="alayer-g" data-k="1" tabindex="0" role="button" aria-label="Skill registry and agents layer">
+              <rect class="alayer-rect" x="70" y="204" width="420" height="46" rx="8" style="stroke:var(--cyan);"/>
+              <text class="anum" x="86" y="232" style="fill:var(--cyan);">1</text>
+              <text class="alabel" x="112" y="232">Skill Registry · Agents</text>
+            </g>
+            <g class="alayer-g" data-k="2" tabindex="0" role="button" aria-label="Rules layer">
+              <rect class="alayer-rect" x="70" y="260" width="420" height="46" rx="8" style="stroke:var(--green);"/>
+              <text class="anum" x="86" y="288" style="fill:var(--green);">2</text>
+              <text class="alabel" x="112" y="288">Rules — 100% auditor coverage</text>
+            </g>
+            <g class="alayer-g" data-k="3" tabindex="0" role="button" aria-label="Hooks gate layer">
+              <rect class="alayer-rect" x="70" y="316" width="420" height="46" rx="8" style="stroke:var(--amber);"/>
+              <text class="anum" x="86" y="344" style="fill:var(--amber);">3</text>
+              <text class="alabel" x="112" y="344">Hooks → profiled CI gate</text>
+            </g>
+            <g class="alayer-g" data-k="6" tabindex="0" role="button" aria-label="Live data layer">
+              <rect class="alayer-rect" x="70" y="372" width="420" height="46" rx="8" style="stroke:var(--cyan);"/>
+              <text class="anum" x="86" y="400" style="fill:var(--cyan);">6</text>
+              <text class="alabel" x="112" y="400">Live-data layer</text>
+            </g>
+            <!-- dashed feedback loop: from learning (top) curving down the right back to rules/hooks -->
+            <path d="M490,115 C540,150 540,300 492,335" class="aflow loop" marker-end="url(#arrv)"/>
+            <text x="548" y="232" class="anum" style="fill:var(--violet);font-size:11px;" transform="rotate(90 548 232)">feedback ↺</text>
+          </svg>
+        </div>
+        <div class="adetail" id="adetail" style="--accent:var(--violet);">
+          <div class="dh" id="ad-dh">Layer 4 · keystone</div>
+          <h3 id="ad-h3">Continuous-learning loop</h3>
+          <p id="ad-p">The one layer RZ has never built — and the one that makes every other pillar compound. Feedback → instinct → evolve → new rule/auditor, looping back down the stack so the system improves from its own use.</p>
+          <span class="pill" id="ad-pill">ECC · Instincts</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 4 — PILLAR EXPLORER ░░ -->
+  <section class="slide" id="s-pillars" data-title="7 Pillars" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">04</span> Seven pillars — click to explore <span class="ln"></span></div>
+      <h2>The build, pillar by pillar.</h2>
+      <p class="sub">Each pillar maps one ECC layer onto concrete RZ work — with what exists <b>today</b>, what to <b>build</b> (real files), and the first <b>proof</b> that it works. Tap a tab.</p>
+      <div class="ptabs" id="ptabs">
+        <button class="ptab on" data-p="1" style="--accent:var(--cyan);"><span class="pdot"></span>1 · Skill Registry</button>
+        <button class="ptab" data-p="2" style="--accent:var(--green);"><span class="pdot"></span>2 · Rules</button>
+        <button class="ptab" data-p="3" style="--accent:var(--amber);"><span class="pdot"></span>3 · Hooks/CI</button>
+        <button class="ptab" data-p="4" style="--accent:var(--violet);"><span class="pdot"></span>4 · Learning ★</button>
+        <button class="ptab" data-p="5" style="--accent:var(--red);"><span class="pdot"></span>5 · RZ-Shield</button>
+        <button class="ptab" data-p="6" style="--accent:var(--cyan);"><span class="pdot"></span>6 · Live Data</button>
+        <button class="ptab" data-p="7" style="--accent:var(--green);"><span class="pdot"></span>7 · Console</button>
+      </div>
+
+      <div class="ppanel on" data-p="1">
+        <div class="ppanel-grid" style="--accent:var(--cyan);">
+          <div>
+            <h3>Skill Registry <span class="eccfrom">ECC · Skills</span></h3>
+            <p class="pintro">Today every tool is an island. A user can't chain the PUE calculator's output into the TCO model, or feed a Decode-Lab fault into the Maintenance Workbench. ECC's skill manifest makes each tool a typed, composable node.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">28+ tools, zero shared contract. One registry exists — the Decode Lab's <code>detect→decode→visualize→simulate→export→validate</code>.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">Define <code>rz-skill.schema.json</code> (id · inputs · outputs · provenance · confidence · feeds). Write a manifest per tool. Generalise the Decode-Lab contract site-wide. Add <code>tools/audit-skill-registry.py</code> — fails if a tool ships without a manifest.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">First chained pair: <b>PUE → TCO</b> with provenance carried — no manual re-entry.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-chain"><span class="nd">PUE</span><span class="ar">▸</span><span class="nd">TCO</span><span class="ar">▸</span><span class="nd">Report</span></div>
+            <div style="text-align:center;font-family:var(--mono);font-size:0.56rem;color:var(--green);">prov: ashrae · conf high — carried</div>
+            <div class="pvcap">tools become composable nodes</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="2">
+        <div class="ppanel-grid" style="--accent:var(--green);">
+          <div>
+            <h3>Rules — 100% auditor coverage <span class="eccfrom">ECC · Rules</span></h3>
+            <p class="pintro">RZ already learned the meta-rule in v1.41.1: <i>a standard without an auditor drifts.</i> Six auditors exist; ~30 standarization docs don't all have one. Close the gap so no rule can silently rot.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">6 auditors (script-tags, js-syntax, pro-mode, mobile, contracts-coverage, cdn-sri) cover ~6 of ~30 standards.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">Author missing auditors — <code>responsive</code>, <code>SEO</code>, <code>content-linkage</code>, <code>post-draft</code>, <code>knowledge-base</code> each get a strict checker. Add <code>audit-rule-coverage.py</code>: fails if any <code>standarization/*.md</code> lacks a matching <code>tools/audit-*.py</code>.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv"><b>audit-rule-coverage reports 30/30 green</b> — every standard enforced, not just written.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-pair">
+              <div class="pr"><span class="doc">VERSIONING_STANDARD</span><span class="chk">✓</span></div>
+              <div class="pr"><span class="doc">RESPONSIVE_STANDARD</span><span class="chk">✓</span></div>
+              <div class="pr"><span class="doc">CONTENT_LINKAGE</span><span class="x">✕ build</span></div>
+              <div class="pr"><span class="doc">POST_DRAFT_STANDARD</span><span class="x">✕ build</span></div>
+            </div>
+            <div class="pvcap">every rule ↔ one auditor</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="3">
+        <div class="ppanel-grid" style="--accent:var(--amber);">
+          <div>
+            <h3>Hooks → profiled CI gate <span class="eccfrom">ECC · Hooks</span></h3>
+            <p class="pintro">The auditors run by hand pre-ship — discipline by memory. ECC makes them event-driven and profile-gated, so the right depth runs automatically and merge is blocked on failure.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">6 auditors invoked manually before each ship. Easy to forget; nothing blocks a bad merge.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv"><code>tools/rz-gate.py --profile minimal|standard|strict</code> (mirrors <code>ECC_HOOK_PROFILE</code>). A GitHub Actions workflow auto-selects by changed path: docs→minimal, content→standard, calc/cockpit→strict.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">A PR that breaks a cockpit number is <b>blocked at CI</b> — the gate is the contract, not a habit.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-gate">
+              <div class="g"><span class="gl">minimal</span><span class="gb" style="width:30%;background:var(--green);"></span></div>
+              <div class="g"><span class="gl">standard</span><span class="gb" style="width:62%;background:var(--amber);"></span></div>
+              <div class="g"><span class="gl">strict</span><span class="gb" style="width:100%;background:var(--cyan);"></span></div>
+            </div>
+            <div class="pvcap">depth auto-selected by change type</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="4">
+        <div class="ppanel-grid" style="--accent:var(--violet);">
+          <div>
+            <h3>Continuous-learning loop <span class="eccfrom">ECC · Instincts · KEYSTONE</span></h3>
+            <p class="pintro">The one layer RZ has never built — and the one that makes every other pillar compound. Two loops: how RZ is <i>built</i>, and what RZ <i>serves</i>.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">Improvement is manual. Feedback lives informally in memory files + the bug tracker; the AI-Maintenance KG loop is designed but unfinished.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv"><b>Dev loop:</b> every comment/bug/review → a confidence-scored <i>instinct</i>; at high confidence it evolves into a <code>standarization/</code> rule + auditor. <b>Surface loop:</b> finish the KG cycle — closeout → <code>kg-diff</code> → review → retrain (the v1.41.7 <code>KGDiff</code>/<code>AuditEvent</code> contracts already exist).</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">A recurring complaint auto-promotes to a new auditor — <b>the site fixed a class of bug from its own use.</b></span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-loop2"><span class="s">feedback</span><span>→</span><span class="s">instinct 0.91</span><span>→</span><span class="s">evolve</span><span>→</span><span class="s">standard</span></div>
+            <div style="text-align:center;font-family:var(--mono);font-size:0.58rem;color:var(--dim);">↻ loops back into the gate</div>
+            <div class="pvcap">RZ improves from its own use</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="5">
+        <div class="ppanel-grid" style="--accent:var(--red);">
+          <div>
+            <h3>RZ-Shield — adversarial accuracy audit <span class="eccfrom">ECC · AgentShield</span></h3>
+            <p class="pintro">AgentShield runs three agents — red-team / blue-team / synthesise. RZ's standing accuracy mandate ("jangan agree aja, bener-bener review") <i>is</i> that loop, applied to engineering numbers instead of secrets.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">A 40-test accuracy probe checks the cockpit pages — pattern-matching, not adversarial reasoning.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">Extend into a 3-agent loop: <b>red</b> attacks each numeric/content claim, <b>blue</b> defends with sources, <b>synth</b> issues a verdict. Re-use the v1.41.7 <code>confidence_tier</code> + claim-level provenance as evidence. Wire <code>rz-shield.py</code> as a pre-ship gate on calculators + cockpit pages.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">An unsourced reorder-point formula is <b>caught and blocked</b> before ship, refutation logged.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-shield"><span class="c r">RED<br>attack</span><span class="c b">BLUE<br>defend</span><span class="c s">SYNTH<br>verdict</span></div>
+            <div style="text-align:center;font-family:var(--mono);font-size:0.58rem;color:var(--red);border:1px solid var(--red);border-radius:5px;padding:0.2rem;">claim FAIL → ship blocked</div>
+            <div class="pvcap">red / blue / synthesise per claim</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="6">
+        <div class="ppanel-grid" style="--accent:var(--cyan);">
+          <div>
+            <h3>Live-data layer <span class="eccfrom">ECC · MCP</span></h3>
+            <p class="pintro">RZ calculators run on pinned 2025 figures. ECC's MCP layer connects to live external capability. The static-safe RZ analog: a thin, cached, attribution-carrying data layer that never breaks offline.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">Every calculator hardcodes a 2025 dataset. Accurate at ship, stale forever after.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv"><code>js/rz-data-layer.js</code> — fetch + cache + graceful fallback to the pinned dataset. Wire the inputs that matter: grid carbon intensity, regional energy price, weather→free-cooling hours. Every live value carries source + timestamp.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">PUE/carbon calc shows <b>live grid intensity</b> with a freshness chip — and still works offline.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-data"><span class="nd">grid API</span><span style="color:var(--green);">▸</span><span class="nd">cache</span><span style="color:var(--green);">▸</span><span class="nd">calc</span></div>
+            <div style="text-align:center;" class="mv-data"><span class="fresh">● 412 gCO₂/kWh · 2m fresh</span></div>
+            <div class="pvcap">live input, static fallback</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="7">
+        <div class="ppanel-grid" style="--accent:var(--green);">
+          <div>
+            <h3>RZ Operations Console <span class="eccfrom">ECC · Dashboard</span></h3>
+            <p class="pintro">ECC ships a dashboard that surfaces the whole system's state. <code>rz-ops</code> is the seed — evolve it into one console where the entire self-improving system is observable at a glance.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv"><code>rz-ops</code> admin panel manages auth/educators only — no view of system health.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">One pane: skill-registry health · gate pass/fail history · open instincts · RZ-Shield findings · live-data freshness. Reads from the artefacts the other six pillars already emit.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">The operator opens one screen: <b>28/28 skills · gate PASS · 3 instincts · 1 shield-block · data fresh.</b></span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-con">
+              <div class="t"><div class="v" style="color:var(--green);">28/28</div><div class="k">skills</div></div>
+              <div class="t"><div class="v" style="color:var(--green);">PASS</div><div class="k">gate</div></div>
+              <div class="t"><div class="v" style="color:var(--amber);">3</div><div class="k">instincts</div></div>
+              <div class="t"><div class="v" style="color:var(--red);">1</div><div class="k">shield</div></div>
+            </div>
+            <div class="pvcap">the whole system, one pane</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -180,6 +581,48 @@
     else if(e.key==='End'){e.preventDefault();slides[slides.length-1].scrollIntoView({behavior:'smooth'});}
   });
   setCur(0);
+})();
+
+/* pillar tab explorer (slide 4) */
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.ptab'));
+  var panels=[].slice.call(document.querySelectorAll('.ppanel'));
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      var p=t.getAttribute('data-p');
+      tabs.forEach(function(x){x.classList.toggle('on',x===t);});
+      panels.forEach(function(x){x.classList.toggle('on',x.getAttribute('data-p')===p);});
+    });
+  });
+})();
+
+/* SVG architecture layer inspector (slide 3) */
+(function(){
+  var DET={
+    '1':{dh:'Layer 1 · composability',h:'Skill Registry · Agents',p:'28+ tools become typed, composable nodes via a manifest, plus delegable reasoning agents. Outputs flow tool→tool with carried provenance.',pill:'ECC · Skills',c:'var(--cyan)'},
+    '2':{dh:'Layer 2 · governance',h:'Rules — 100% auditor coverage',p:'Every standarization doc paired with a machine-checkable auditor. No rule can silently drift — the v1.41.1 meta-rule, applied to all 30.',pill:'ECC · Rules',c:'var(--green)'},
+    '3':{dh:'Layer 3 · enforcement',h:'Hooks → profiled CI gate',p:'rz-gate.py with minimal/standard/strict profiles, auto-selected by change type, blocking merge on failure. Quality becomes automatic.',pill:'ECC · Hooks',c:'var(--amber)'},
+    '4':{dh:'Layer 4 · keystone',h:'Continuous-learning loop',p:'The one layer RZ has never built — and the one that makes every other pillar compound. Feedback → instinct → evolve → new rule/auditor, looping back down the stack so the system improves from its own use.',pill:'ECC · Instincts',c:'var(--violet)'},
+    '5':{dh:'Layer 5 · accuracy',h:'RZ-Shield · adversarial audit',p:'Three agents — red attacks each numeric claim, blue defends with sources, synth issues a verdict. Unsourced or contradicted numbers are blocked before ship.',pill:'ECC · AgentShield',c:'var(--red)'},
+    '6':{dh:'Layer 6 · freshness',h:'Live-data layer',p:'Cached external feeds (grid carbon · energy price · weather→free-cooling) with graceful static fallback. Every value carries source + timestamp.',pill:'ECC · MCP',c:'var(--cyan)'},
+    '7':{dh:'Layer 7 · observability',h:'RZ Operations Console',p:'One pane over the whole system: skill-registry health, gate history, open instincts, shield findings, live-data freshness. rz-ops evolved into the operator home.',pill:'ECC · Dashboard',c:'var(--green)'}
+  };
+  var layers=[].slice.call(document.querySelectorAll('.alayer-g'));
+  var box=document.getElementById('adetail');
+  function show(k){
+    var d=DET[k]; if(!d||!box) return;
+    layers.forEach(function(g){g.classList.toggle('on',g.getAttribute('data-k')===k);});
+    box.style.setProperty('--accent',d.c);
+    document.getElementById('ad-dh').textContent=d.dh;
+    document.getElementById('ad-h3').textContent=d.h;
+    document.getElementById('ad-p').textContent=d.p;
+    document.getElementById('ad-pill').textContent=d.pill;
+  }
+  layers.forEach(function(g){
+    var k=g.getAttribute('data-k');
+    g.addEventListener('click',function(){show(k);});
+    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(k);}});
+  });
 })();
 </script>
 </body>
