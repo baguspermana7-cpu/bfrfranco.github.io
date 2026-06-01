@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.43.6 — 2026-06-01 (planb PLAN 02 design-system card + dedicated plan page; hybrid register locked)
+
+PATCH ship: registers the dark-mode design-system plan in the planb hub as a
+live card and adds its dedicated visual plan page. Owner locked the HYBRID
+register split (instrument for cockpits, editorial for landing/articles).
+
+Internal/noindex only — no cockpit logic touched. Engine + #p-dash
+byte-identical (no change). audit-script-tags + audit-js-syntax CLEAN.
+
+### Added
+- **`plan-dark-mode-standard.html`** (noindex) — dedicated PLAN 02 page in the
+  editorial register (dogfoods RZ Dark System). Fully visual per the planb
+  mandate: embeds the before/after demo + the 4-variant Style Lab switcher
+  (iframes), register tables, anti-slop checklist, code, and the 3 decision
+  questions. Carries version stamp.
+
+### Changed
+- **`planb.html`** — new active "PLAN 02 · design system" card (cyan, live)
+  linking to plan-dark-mode-standard.html; reserved slots renumbered to 03/04.
+  Added the site version-stamp script.
+- **`standarization/DARK_MODE_STANDARD.md`** — marked the HYBRID register
+  decision as LOCKED (2026-06-01).
+
+### Decision
+- **HYBRID register split LOCKED** — Instrument register (oscilloscope
+  character) for cockpits + SLD/P&ID labs; Editorial register (Fraunces serif,
+  refined) for landing / articles / hubs / plans. Cockpit instrument re-skin
+  queued as a future ship — must preserve semantic SLD/alarm colours
+  (additive atmosphere/type only).
+
+---
+
 ## v1.43.5 — 2026-05-26 (RZ Dark System v1 + animated-on-load primitive applied to #p-dash)
 
 Owner pivot: existing dark mode read as "AI design slop" — asked for animated-

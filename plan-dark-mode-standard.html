@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-rz-register="editorial">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLAN 02 · Dark-mode character standard — RZ Plan B</title>
+<meta name="description" content="Pick &amp; codify the RZ dark-mode identity. Four on-brand candidate characters, each with animated-on-load data viz + intuitive responsive. RZ Dark System v1 — two registers, anti-slop.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E0F12">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/rz-dark.css">
+<script src="js/rz-version.js?v=1.43.5" defer></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 1.4rem;}
+  .atmos{position:fixed;inset:0;z-index:0;}
+
+  /* topbar */
+  .top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--rz-bg) 84%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rz-line);}
+  .top-in{max-width:1080px;margin:0 auto;padding:.7rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .back{font-family:var(--rz-mono);font-size:.72rem;letter-spacing:.04em;color:var(--rz-muted);display:inline-flex;align-items:center;gap:.45rem;}
+  .back:hover{color:var(--rz-text-strong);}
+  .top .v{font-family:var(--rz-mono);font-size:.64rem;color:var(--rz-dim);letter-spacing:.06em;}
+  .shell{position:relative;z-index:1;}
+
+  /* hero */
+  .hero{padding:3.4rem 0 2rem;}
+  .pid{font-family:var(--rz-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rz-accent);font-weight:600;display:inline-flex;align-items:center;gap:.5rem;}
+  .pid::before{content:'';width:22px;height:1px;background:var(--rz-accent);}
+  .hero h1{margin:1rem 0 .9rem;font-size:clamp(2rem,5vw,3.4rem);max-width:18ch;}
+  .hero .lede{font-size:clamp(1rem,1.7vw,1.16rem);color:var(--rz-text);max-width:64ch;line-height:1.62;}
+  .hero .lede b{color:var(--rz-text-strong);font-weight:600;}
+  .status{margin-top:1.1rem;display:inline-flex;align-items:center;gap:.5rem;font-family:var(--rz-mono);font-size:.72rem;color:var(--rz-accent2);}
+  .status .led{width:8px;height:8px;border-radius:50%;background:var(--rz-accent2);box-shadow:0 0 8px var(--rz-accent2);}
+
+  /* section */
+  section{padding:2.6rem 0;border-top:1px solid var(--rz-line);}
+  .sh{display:flex;align-items:baseline;gap:.7rem;margin-bottom:1.3rem;flex-wrap:wrap;}
+  .sh .n{font-family:var(--rz-mono);font-size:.72rem;color:var(--rz-accent);letter-spacing:.1em;}
+  .sh h2{font-size:clamp(1.4rem,2.6vw,2rem);}
+  .sh p{flex-basis:100%;color:var(--rz-muted);max-width:70ch;margin-top:.2rem;font-size:.92rem;}
+
+  /* embedded live demo frame */
+  .demo{border:1px solid var(--rz-line);border-radius:var(--rz-radius);overflow:hidden;background:var(--rz-panel);}
+  .demo .cap{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.6rem .9rem;border-bottom:1px solid var(--rz-line);font-family:var(--rz-mono);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;color:var(--rz-muted);flex-wrap:wrap;}
+  .demo .cap a{color:var(--rz-accent);}
+  .demo iframe{width:100%;border:0;display:block;background:var(--rz-bg);}
+
+  /* register cards */
+  .regs{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .reg{border:1px solid var(--rz-line);border-radius:var(--rz-radius);background:var(--rz-panel);padding:1.2rem 1.3rem;border-top:3px solid var(--ra);}
+  .reg h3{font-size:1.1rem;margin-bottom:.2rem;display:flex;align-items:center;gap:.5rem;}
+  .reg .tag{font-family:var(--rz-mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ra);border:1px solid var(--ra);border-radius:4px;padding:.1rem .4rem;}
+  .reg p{font-size:.86rem;color:var(--rz-muted);margin:.5rem 0 .7rem;line-height:1.55;}
+  .reg ul{list-style:none;display:grid;gap:.35rem;}
+  .reg li{font-family:var(--rz-mono);font-size:.74rem;color:var(--rz-text);padding-left:1.1rem;position:relative;}
+  .reg li::before{content:'▸';position:absolute;left:0;color:var(--ra);}
+
+  /* anti-slop checklist */
+  .slop{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.7rem;}
+  .sx{border:1px solid var(--rz-line);border-radius:var(--rz-radius);background:var(--rz-panel);padding:.85rem .95rem;}
+  .sx .x{color:var(--rz-fault);font-family:var(--rz-mono);font-size:.78rem;}
+  .sx .o{color:var(--rz-accent2);font-family:var(--rz-mono);font-size:.78rem;margin-top:.3rem;}
+
+  /* code block */
+  pre{background:#0a0b0e;border:1px solid var(--rz-line);border-radius:var(--rz-radius);padding:1rem 1.1rem;overflow-x:auto;font-family:var(--rz-mono);font-size:.78rem;line-height:1.55;color:var(--rz-text);}
+  pre .c{color:var(--rz-dim);} pre .a{color:var(--rz-accent);} pre .a2{color:var(--rz-accent2);} pre .f{color:var(--rz-fault);}
+
+  /* decision */
+  .qa{border:1px solid var(--rz-line);border-radius:var(--rz-radius);background:var(--rz-panel);padding:1.1rem 1.2rem;margin-bottom:.8rem;}
+  .qa .q{font-family:var(--rz-mono);font-size:.66rem;color:var(--rz-accent);letter-spacing:.06em;text-transform:uppercase;}
+  .qa h4{font-size:.98rem;margin:.3rem 0 .45rem;}
+  .qa p{font-size:.86rem;color:var(--rz-muted);line-height:1.55;}
+  .cta-row{margin-top:1.4rem;display:flex;gap:.7rem;flex-wrap:wrap;}
+  .btn{font-family:var(--rz-mono);font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;padding:.6rem 1rem;border-radius:var(--rz-radius);border:1px solid var(--rz-accent);color:var(--rz-bg);background:var(--rz-accent);font-weight:600;}
+  .btn.ghost{background:transparent;color:var(--rz-accent);}
+
+  footer{border-top:1px solid var(--rz-line);padding:2rem 0 3rem;color:var(--rz-dim);font-family:var(--rz-mono);font-size:.7rem;}
+  footer .fr{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+
+  @media (max-width:760px){.regs{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="atmos rz-atmos"></div>
+<div class="shell">
+
+  <div class="top"><div class="top-in">
+    <a class="back" href="planb.html">← Plan B Hub</a>
+    <span class="v">PLAN 02 · DESIGN SYSTEM · noindex</span>
+  </div></div>
+
+  <header class="hero"><div class="wrap">
+    <span class="pid">Plan 02 — Design System</span>
+    <h1>Dark-mode character standard.</h1>
+    <p class="lede">The current dark mode reads as generic — flat panels, static numbers, default type. This plan picks <b>one of four on-brand characters</b>, each with <b>animated-on-load data viz</b> and intuitive PC/mobile responsive, then codifies it as <b>RZ Dark System v1</b> — a token system with two registers. Every section below is a live visual, not a description.</p>
+    <span class="status"><span class="led"></span>Live · 4 variants + before/after · awaiting your pick</span>
+  </div></header>
+
+  <!-- 01 problem: before/after -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">01</span><h2>The problem — before vs after</h2>
+      <p>Same data block. Left = the generic "AI-slop" dark (Inter, static numbers, rounded panels, purple accent). Right = RZ Dark System instrument register (mono, graticule, phosphor trace that draws in, count-up, sharp corners).</p></div>
+    <div class="demo">
+      <div class="cap"><span>Before vs after — live</span><a href="rz-dark-beforeafter.html" target="_blank" rel="noopener">open standalone ↗</a></div>
+      <iframe src="rz-dark-beforeafter.html" height="430" loading="lazy" title="Before vs after"></iframe>
+    </div>
+  </div></section>
+
+  <!-- 02 the four characters -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">02</span><h2>Four candidate characters</h2>
+      <p>All inside the RZ industrial-instrumentation brand, none generic. Switch A/B/C/D in the frame — the chart re-draws live on every selection (that's the "data bukan static, ada movement" you asked for). This is the picker.</p></div>
+    <div class="demo">
+      <div class="cap"><span>RZ Style Lab — switch + replay</span><a href="rz-style-lab.html" target="_blank" rel="noopener">open full ↗</a></div>
+      <iframe src="rz-style-lab.html" height="900" loading="lazy" title="Style lab — 4 variants"></iframe>
+    </div>
+  </div></section>
+
+  <!-- 03 the system: two registers -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">03</span><h2>The system — two registers, one token set</h2>
+      <p>RZ has two page families. Each gets a register of the same system — identical structure + motion + signal-semantics, different surface character. Swap with one <code>data-rz-register</code> attribute.</p></div>
+    <div class="regs">
+      <div class="reg" style="--ra:#22F5A8;">
+        <h3>Instrument <span class="tag">data-rz-register="instrument"</span></h3>
+        <p>Oscilloscope character — phosphor-green/cyan, graticule grid, scanlines, JetBrains Mono display, animated traces.</p>
+        <ul><li>cockpits · datahallAI · dc-conventional</li><li>chiller / water / fire / EPMS / ict</li><li>SLD &amp; P&amp;ID labs · market monitors</li></ul>
+      </div>
+      <div class="reg" style="--ra:#E8B563;">
+        <h3>Editorial <span class="tag">data-rz-register="editorial"</span></h3>
+        <p>Refined report — Fraunces serif display, generous whitespace, quiet accents, eased data viz. (This page uses it.)</p>
+        <ul><li>index · articles · hubs</li><li>plan landings (planb)</li><li>calculator marketing shells</li></ul>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- 04 anti-slop checklist -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">04</span><h2>Anti-slop checklist (every dark page must pass)</h2>
+      <p>The patterns that made the old dark mode read generic — banned, with the fix.</p></div>
+    <div class="slop">
+      <div class="sx"><div class="x">✗ static numbers</div><div class="o">✓ count-up / trace-in on load</div></div>
+      <div class="sx"><div class="x">✗ Inter / system font</div><div class="o">✓ Plex + JetBrains + Fraunces</div></div>
+      <div class="sx"><div class="x">✗ Anthropic-purple accent</div><div class="o">✓ signal tokens (amber/green/cyan/red)</div></div>
+      <div class="sx"><div class="x">✗ rounded-everything</div><div class="o">✓ 3px instrument / 10px editorial</div></div>
+      <div class="sx"><div class="x">✗ flat dead panels</div><div class="o">✓ graticule / wash atmosphere</div></div>
+      <div class="sx"><div class="x">✗ glassmorphism / dot-grid</div><div class="o">✓ thin-line discipline</div></div>
+    </div>
+  </div></section>
+
+  <!-- 05 the code -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">05</span><h2>The code — one attribute swaps the whole skin</h2>
+      <p>Tokens live in <code>css/rz-dark.css</code>. A page declares its register; everything else inherits.</p></div>
+<pre><span class="c">/* css/rz-dark.css — two registers of one token system */</span>
+[data-rz-register=<span class="a">"instrument"</span>]{
+  --rz-bg:#060A0D; --rz-accent:<span class="a">#22F5A8</span>; --rz-accent2:<span class="a2">#2BE8FF</span>;
+  --rz-display:<span class="a">'JetBrains Mono'</span>; --rz-radius:3px;   <span class="c">/* graticule + scanlines */</span>
+}
+[data-rz-register=<span class="a2">"editorial"</span>]{
+  --rz-bg:#0E0F12; --rz-accent:<span class="a2">#E8B563</span>; --rz-accent2:#6FBF9A;
+  --rz-display:<span class="a2">'Fraunces'</span> (serif); --rz-radius:10px;  <span class="c">/* calm wash, no grid */</span>
+}
+
+<span class="c">// animated-on-load primitive (probe-safe count-up) — applied to #p-dash in v1.43.5</span>
+requestAnimationFrame(frame);            <span class="c">// smooth cubic-ease 0 → value</span>
+setTimeout(settle, dur+300);             <span class="f">// HARD guarantee exact final value</span>
+</pre>
+  </div></section>
+
+  <!-- 06 decision -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">06</span><h2>Decision — open questions</h2>
+      <p>Answers converge the build to a chosen path.</p></div>
+    <div class="qa"><div class="q">Q1 · register split</div><h4>One character everywhere, or hybrid?</h4><p>Recommendation: hybrid — Instrument for cockpits (where the brand identity lives), Editorial for landing/articles/plans (the raihankalla-informed refinement). Or lock a single character A/B/C/D.</p></div>
+    <div class="qa"><div class="q">Q2 · rollout order</div><h4>Which page adopts the full skin first?</h4><p>v1.43.5 already applied the count-up primitive to datahallAI #p-dash (probe-safe). Next: full token/type/atmosphere skin on one page — recommend the cockpit you most want de-slopped, or this plan landing.</p></div>
+    <div class="qa"><div class="q">Q3 · light mode</div><h4>Touch the light-mode toggle, or dark-only for now?</h4><p>This standard is dark-only; the existing light toggle is untouched. A light-mode redesign would be its own plan card.</p></div>
+    <div class="cta-row">
+      <a class="btn" href="rz-style-lab.html" target="_blank" rel="noopener">Open the picker ↗</a>
+      <a class="btn ghost" href="planb.html">← Back to Plan B Hub</a>
+    </div>
+  </div></section>
+
+  <footer><div class="wrap fr">
+    <span>RZ PLAN 02 · DESIGN SYSTEM · noindex · internal</span>
+    <span>RZ Dark System v1 · standarization/DARK_MODE_STANDARD.md</span>
+  </div></footer>
+</div>
+</body>
+</html>

@@ -4,6 +4,8 @@ Status: **adopted 2026-05-26**. Reference implementation: `rz-style-lab.html` (4
 
 Origin: owner flagged the existing cockpit dark mode as "AI design slop" and asked for (1) animated-data-on-load, (2) distinctive type, (3) intuitive PC/mobile responsive — referencing the refinement of raihankalla.id. The Style Lab explored four on-brand characters; this standard codifies the two that ship.
 
+> **Decision (LOCKED 2026-06-01, owner "proceed all"):** HYBRID register split — **Instrument** register for cockpits + SLD/P&ID labs, **Editorial** register for landing / articles / hubs / plans. First editorial adoption shipped on `plan-dark-mode-standard.html`. Cockpit instrument re-skin queued (must preserve semantic SLD/alarm colours — additive atmosphere/type only).
+
 ## Core principle — two registers, one token system
 
 RZ has two page families. Each gets a **register** of the same system — identical structure + motion + semantics, different surface character. Swap a page between registers by changing one `data-rz-register` attribute.
