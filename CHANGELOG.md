@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v1.43.7 — 2026-06-01 (RZ Skin Gallery — before/after for all 12 surfaces + cockpit mockup)
+
+PATCH ship: comprehensive visual mockups for the dark-mode standard, per owner
+request "kurang banyak before after buat semua mock up" (make before/after
+mockups for ALL surfaces) + "enhance front end design skin".
+
+Internal/noindex only — no cockpit logic touched. Engine + #p-dash unchanged.
+audit-script-tags + audit-js-syntax + audit-version-stamp CLEAN. Both new
+pages headless-verified NONE errors.
+
+### Added
+- **`rz-skin-gallery.html`** (noindex) — before/after for 12 surfaces: KPI strip,
+  telemetry line (trace-in), per-hall bars (grow+count), energy donut (sweep),
+  SLD breakers (symbol + semantic colour), equipment inspector, ISA-18.2 alarm
+  states, data-quality + sim banner, plan card, landing hero, buttons, data
+  table. Instrument register for cockpit surfaces, editorial for content.
+  Charts animate on load with hard-settle. Guarded getPointAtLength against
+  non-finite path length (fixed mid-build).
+- **`rz-cockpit-mockup.html`** (noindex) — datahallAI cockpit slice before/after
+  (KPI + MV-intake SLD + cooling trace) proving the instrument register lands
+  on a cockpit WITHOUT breaking load-bearing semantic colours (feed A blue /
+  feed B green / trip red / cooling cyan). Tripped breaker stays red both sides.
+
+### Changed
+- **`plan-dark-mode-standard.html`** — new §02b (cockpit before/after iframe)
+  + new §07 (full skin gallery iframe). Q1 register-split marked LOCKED (hybrid).
+  Version stamp bumped.
+
+### Process
+- Reinforces the visual mandate (memory `feedback_planb_always_visual.md`):
+  every change shows before/after VISUAL + code + explanation.
+
+---
+
 ## v1.43.6 — 2026-06-01 (planb PLAN 02 design-system card + dedicated plan page; hybrid register locked)
 
 PATCH ship: registers the dark-mode design-system plan in the planb hub as a

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Skin Gallery — before vs after, every surface</title>
+<meta name="description" content="Comprehensive before/after mockups for the RZ Dark System v1 — every major surface (KPI, charts, SLD, inspector, alarms, data-quality, cards, hero, buttons, tables) shown generic-dark vs the instrument/editorial registers.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#05080B">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="js/rz-version.js?v=1.43.7" defer></script>
+<style>
+/* ============================================================================
+   RZ SKIN GALLERY — every surface, before vs after.
+   Left column = generic "AI-slop" dark. Right column = RZ Dark System
+   (instrument for cockpit surfaces, editorial for content surfaces).
+   ============================================================================ */
+:root{
+  --ink:#05080B; --paper:#0A0F14; --hair:#1b2630;
+  --ok:#22c55e; --warn:#f59e0b; --fault:#ef4444; --info:#2BE8FF;
+  --feedA:#3b82f6; --feedB:#22c55e; --phos:#22F5A8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{background:var(--ink);color:#c8d2dc;font-family:'IBM Plex Mono',monospace;padding:24px;}
+.lead{max-width:980px;margin:0 auto 26px;}
+.lead .tag{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:#5E8472;display:inline-flex;gap:.5rem;align-items:center;}
+.lead .tag::before{content:'';width:22px;height:1px;background:var(--phos);}
+.lead h1{font-family:'JetBrains Mono',monospace;color:#EAFBF0;font-size:clamp(1.5rem,3.4vw,2.4rem);margin:.6rem 0 .5rem;letter-spacing:-.01em;}
+.lead p{color:#7E8590;font-size:.9rem;max-width:74ch;line-height:1.6;}
+.lead .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:.62rem;color:#5E8472;}
+.lead .legend i{width:14px;height:3px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle;}
+
+.gallery{max-width:1180px;margin:0 auto;display:grid;gap:14px;}
+.surface{border:1px solid var(--hair);border-radius:8px;background:#070C11;overflow:hidden;}
+.surface > .title{display:flex;align-items:baseline;gap:.6rem;padding:.7rem .95rem;border-bottom:1px solid var(--hair);flex-wrap:wrap;}
+.surface > .title .n{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--phos);letter-spacing:.08em;}
+.surface > .title h2{font-family:'JetBrains Mono',monospace;font-size:.92rem;color:#EAFBF0;font-weight:600;}
+.surface > .title .reg{margin-left:auto;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:#5E8472;border:1px solid var(--hair);border-radius:4px;padding:.12rem .45rem;}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+@media(max-width:860px){.ba{grid-template-columns:1fr;}}
+.side{padding:16px;}
+.side.b{background:#0a0d11;border-right:1px solid var(--hair);}
+@media(max-width:860px){.side.b{border-right:0;border-bottom:1px solid var(--hair);}}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:7px;}
+.tagline .d{width:7px;height:7px;border-radius:50%;}
+.b .tagline{color:#64748b;} .b .tagline .d{background:#64748b;}
+.a .tagline{color:var(--phos);} .a .tagline .d{background:var(--phos);box-shadow:0 0 9px var(--phos);}
+
+/* ===== GENERIC (before) primitives ===== */
+.g{font-family:'Inter',system-ui,sans-serif;}
+.g .panel{background:#1e293b;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px;}
+.g .row{display:grid;gap:8px;}
+.g .kp{background:#0f172a;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:11px;}
+.g .kl{font-size:.6rem;color:#94a3b8;} .g .kv{font-size:1.4rem;font-weight:700;color:#e2e8f0;margin-top:2px;} .g .ku{font-size:.58rem;color:#8b5cf6;}
+.g .btn{background:#8b5cf6;color:#fff;border:0;border-radius:10px;padding:9px 16px;font-size:.8rem;font-weight:600;font-family:inherit;}
+.g .btn.sec{background:transparent;border:1px solid #475569;color:#cbd5e1;}
+.g h3{color:#e2e8f0;font-size:1.2rem;font-weight:700;} .g p{color:#94a3b8;font-size:.82rem;margin-top:5px;line-height:1.5;}
+.g table{width:100%;border-collapse:collapse;font-size:.78rem;} .g th{color:#94a3b8;text-align:left;padding:7px;border-bottom:1px solid rgba(255,255,255,.08);font-weight:600;} .g td{padding:7px;color:#cbd5e1;border-bottom:1px solid rgba(255,255,255,.05);}
+.g .pill{display:inline-block;padding:2px 9px;border-radius:999px;background:#334155;color:#cbd5e1;font-size:.66rem;}
+.g svg{width:100%;height:auto;display:block;}
+
+/* ===== INSTRUMENT register (after, cockpit) ===== */
+.i{position:relative;font-family:'IBM Plex Mono',monospace;}
+.i .canvas{position:relative;background:#0C141A;border:1px solid rgba(43,232,255,.14);border-radius:3px;padding:13px;overflow:hidden;}
+.i .canvas::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(43,232,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(43,232,255,.045) 1px,transparent 1px);background-size:26px 26px;-webkit-mask-image:radial-gradient(130% 100% at 50% 0%,#000 36%,transparent 92%);mask-image:radial-gradient(130% 100% at 50% 0%,#000 36%,transparent 92%);pointer-events:none;}
+.i .canvas > *{position:relative;}
+.i .row{display:grid;gap:8px;}
+.i .kp{position:relative;background:#101C22;border:1px solid rgba(43,232,255,.14);border-radius:3px;padding:11px;overflow:hidden;}
+.i .kp::after{content:'';position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,var(--phos),transparent);opacity:.55;}
+.i .kl{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:#5E8472;} .i .kv{font-family:'JetBrains Mono',monospace;font-size:1.45rem;color:#EAFBF0;margin-top:2px;font-variant-numeric:tabular-nums;letter-spacing:-.01em;} .i .ku{font-size:.58rem;color:var(--phos);}
+.i .btn{background:var(--phos);color:#06121a;border:0;border-radius:3px;padding:9px 16px;font-size:.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 0 12px rgba(34,245,168,.35);}
+.i .btn.sec{background:transparent;border:1px solid var(--phos);color:var(--phos);box-shadow:none;}
+.i table{width:100%;border-collapse:collapse;font-size:.74rem;font-family:'JetBrains Mono',monospace;} .i th{color:#5E8472;text-align:left;padding:7px;border-bottom:1px solid rgba(43,232,255,.22);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;} .i td{padding:7px;color:#C8E6D4;border-bottom:1px solid rgba(43,232,255,.08);font-variant-numeric:tabular-nums;}
+.i svg{width:100%;height:auto;display:block;}
+/* chips */
+.chip{display:inline-block;padding:1px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;letter-spacing:.04em;}
+.chip.live{background:rgba(34,197,94,.16);color:#86efac;border:1px solid rgba(34,197,94,.45);}
+.chip.sim{background:rgba(167,139,250,.16);color:#c4b5fd;border:1px solid rgba(167,139,250,.45);}
+.chip.stale{background:rgba(245,158,11,.16);color:#fbbf24;border:1px solid rgba(245,158,11,.45);}
+.chip.unack{background:rgba(239,68,68,.16);color:#fca5a5;border:1px solid rgba(239,68,68,.5);}
+.chip.oos{background:rgba(167,139,250,.14);color:#c4b5fd;border:1px solid rgba(167,139,250,.4);}
+
+/* ===== EDITORIAL register (after, content) ===== */
+.e{position:relative;font-family:'IBM Plex Sans',system-ui,sans-serif;}
+.e .canvas{position:relative;background:#16181D;border:1px solid rgba(160,168,180,.13);border-radius:10px;padding:15px;overflow:hidden;}
+.e .canvas::before{content:'';position:absolute;inset:0;background:radial-gradient(420px 200px at 88% -20%,rgba(232,181,99,.07),transparent 64%);pointer-events:none;}
+.e .canvas > *{position:relative;}
+.e .kick{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.45rem;align-items:center;}
+.e .kick::before{content:'';width:20px;height:1px;background:#E8B563;}
+.e h3{font-family:'Fraunces',Georgia,serif;color:#F6F7F9;font-size:1.5rem;font-weight:500;margin:.5rem 0 .4rem;letter-spacing:-.01em;line-height:1.08;}
+.e p{color:#7E8590;font-size:.84rem;line-height:1.6;}
+.e .btn{background:#E8B563;color:#191512;border:0;border-radius:8px;padding:9px 18px;font-size:.74rem;font-weight:600;font-family:'IBM Plex Mono',monospace;letter-spacing:.03em;text-transform:uppercase;}
+.e .btn.sec{background:transparent;border:1px solid #E8B563;color:#E8B563;}
+.e .meta{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}
+.e .mtag{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.04em;color:#7E8590;border:1px solid rgba(160,168,180,.2);border-radius:4px;padding:.12rem .45rem;}
+.e svg{width:100%;height:auto;display:block;}
+
+.btnrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+.note{max-width:1180px;margin:18px auto 0;font-size:.66rem;color:#475569;font-family:'JetBrains Mono',monospace;}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <span class="tag">RZ Skin Gallery</span>
+  <h1>Before vs after — every surface.</h1>
+  <p>Left = the generic "AI-slop" dark (Inter, flat panels, rounded-everything, purple accent, static numbers). Right = RZ Dark System v1 — <b>instrument</b> register for cockpit surfaces, <b>editorial</b> register for content surfaces. Charts animate on load; semantic colours (feed A/B, alarm, cooling) are preserved.</p>
+  <div class="legend">
+    <span><i style="background:var(--feedA)"></i>Feed A</span>
+    <span><i style="background:var(--feedB)"></i>Feed B</span>
+    <span><i style="background:var(--fault)"></i>Trip/alarm</span>
+    <span><i style="background:var(--info)"></i>Cooling</span>
+    <span><i style="background:var(--phos)"></i>Phosphor accent</span>
+    <span><i style="background:#E8B563"></i>Editorial accent</span>
+  </div>
+</div>
+
+<div class="gallery" id="gallery"></div>
+<div class="note">RZ Dark System v1 · standarization/DARK_MODE_STANDARD.md · noindex internal · charts replay on reload</div>
+
+<script>
+(function(){
+  /* ---------- helpers ---------- */
+  function seed(n,lo,hi,s){var o=[],x=s;for(var i=0;i<n;i++){x=(x*9301+49297)%233280;o.push(lo+(hi-lo)*(x/233280));}return o;}
+  function linePath(arr,w,h,pad){var n=arr.length,step=(w-pad*2)/(n-1),d='';for(var i=0;i<n;i++){var x=pad+i*step,y=h-pad-arr[i];d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}return d;}
+
+  /* surface registry — each returns {n,title,reg,before,after} HTML */
+  var S=[];
+
+  /* 01 KPI cards (instrument) */
+  S.push({n:'01',title:'KPI strip',reg:'instrument',
+    before:'<div class="g"><div class="row" style="grid-template-columns:repeat(3,1fr)"><div class="kp"><div class="kl">PUE</div><div class="kv">1.30</div><div class="ku">derived</div></div><div class="kp"><div class="kl">IT</div><div class="kv">14.26</div><div class="ku">MW</div></div><div class="kp"><div class="kl">GPUs</div><div class="kv">7,776</div><div class="ku">Blackwell</div></div></div></div>',
+    after:'<div class="i"><div class="canvas"><div class="row" style="grid-template-columns:repeat(3,1fr)"><div class="kp"><div class="kl">PUE</div><div class="kv" data-count="1.30" data-dec="2">0.00</div><div class="ku">derived ✓</div></div><div class="kp"><div class="kl">IT</div><div class="kv" data-count="14.26" data-dec="2">0.00</div><div class="ku">MW</div></div><div class="kp"><div class="kl">GPUs</div><div class="kv" data-count="7776" data-dec="0">0</div><div class="ku">Blackwell</div></div></div></div></div>'});
+
+  /* 02 line/trace chart (instrument) */
+  S.push({n:'02',title:'Telemetry line — trace-in',reg:'instrument',
+    before:'<div class="g"><div class="panel"><svg viewBox="0 0 360 110"><path d="'+linePath(seed(44,20,84,11),360,110,8)+'" fill="none" stroke="#64748b" stroke-width="2"/></svg></div></div>',
+    after:'<div class="i"><div class="canvas"><svg viewBox="0 0 360 110" data-trace="11"></svg></div></div>'});
+
+  /* 03 bar chart (instrument) */
+  S.push({n:'03',title:'Per-hall bars — grow + count',reg:'instrument',
+    before:'<div class="g"><div class="panel"><svg viewBox="0 0 360 110" id="barBefore"></svg></div></div>',
+    after:'<div class="i"><div class="canvas"><svg viewBox="0 0 360 110" data-bars="1"></svg></div></div>'});
+
+  /* 04 donut (editorial) */
+  S.push({n:'04',title:'Energy split — donut sweep',reg:'editorial',
+    before:'<div class="g"><div class="panel"><svg viewBox="0 0 360 120" id="donutBefore"></svg></div></div>',
+    after:'<div class="e"><div class="canvas"><svg viewBox="0 0 360 120" data-donut="1"></svg></div></div>'});
+
+  /* 05 SLD breakers (instrument) */
+  S.push({n:'05',title:'SLD breakers — symbol + semantic colour',reg:'instrument',
+    before:'<div class="g"><div class="panel"><svg viewBox="0 0 360 90" id="sldBefore"></svg></div></div>',
+    after:'<div class="i"><div class="canvas"><svg viewBox="0 0 360 90" id="sldAfter"></svg></div></div>'});
+
+  /* 06 inspector (instrument) */
+  S.push({n:'06',title:'Equipment inspector',reg:'instrument',
+    before:'<div class="g"><div class="panel" style="text-align:center"><div style="background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;max-width:230px;margin:0 auto"><div style="font-weight:700;color:#e2e8f0">VCB-INC-A</div><p style="color:#94a3b8;font-size:.78rem;margin-top:6px">Center modal — covers the topology behind it.</p></div><p style="font-size:.66rem;color:#64748b;margin-top:8px">modal occludes diagram</p></div></div>',
+    after:'<div class="i"><div class="canvas" style="min-height:150px"><div style="position:absolute;top:0;right:0;width:54%;height:100%;background:rgba(12,20,26,.97);border-left:1px solid rgba(43,232,255,.28);padding:11px 13px"><div style="font-family:\'JetBrains Mono\',monospace;font-size:.58rem;color:#7dd3fc;letter-spacing:.08em">BREAKER</div><div style="font-family:\'JetBrains Mono\',monospace;color:#EAFBF0;font-weight:600;font-size:.85rem">VCB-INC-A</div><div style="display:flex;gap:6px;margin:8px 0"><span class="chip live">CLOSED</span><span class="chip sim">SIM</span></div><div style="font-size:.66rem;color:#5E8472;line-height:1.6">20 kV · 630 A · 25 kA<br>ANSI 50/51/67N · PPE2</div></div><div style="position:absolute;left:11px;top:13px;font-size:.6rem;color:#5E8472">topology stays visible →</div></div></div>'});
+
+  /* 07 alarm states (instrument) */
+  S.push({n:'07',title:'Alarm states — ISA-18.2',reg:'instrument',
+    before:'<div class="g"><div class="panel"><span class="pill">alarm</span> <span class="pill">ok</span> <span class="pill">maint</span><p>colour-only, no state grammar</p></div></div>',
+    after:'<div class="i"><div class="canvas" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="chip unack">UNACK · CRITICAL</span><span class="chip stale">ACK · HIGH</span><span class="chip oos">OOS · MAINT</span><span class="chip live">NORMAL</span></div></div>'});
+
+  /* 08 data quality (instrument) */
+  S.push({n:'08',title:'Data quality + sim banner',reg:'instrument',
+    before:'<div class="g"><div class="panel"><div class="kv" style="font-size:1.2rem">14.8 °C</div><p>no provenance — looks live even when it isn\'t</p></div></div>',
+    after:'<div class="i"><div class="canvas"><div style="display:inline-flex;gap:6px;align-items:center;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.45);border-radius:0 0 8px 8px;padding:3px 10px;font-family:\'JetBrains Mono\',monospace;font-size:.6rem;font-weight:700;color:#c4b5fd;margin-bottom:10px"><span style="width:7px;height:7px;border-radius:50%;background:#c4b5fd"></span>SIMULATED TELEMETRY</div><div style="font-family:\'JetBrains Mono\',monospace;color:#EAFBF0;font-size:1.2rem">14.8 °C <span class="chip sim" style="vertical-align:middle">SIM</span></div></div></div>'});
+
+  /* 09 plan card (editorial) */
+  S.push({n:'09',title:'Plan card',reg:'editorial',
+    before:'<div class="g"><div class="panel"><h3 style="font-size:1.05rem">Dark-mode standard</h3><p>Pick and codify the RZ identity.</p><div style="margin-top:8px"><span class="pill">design</span></div></div></div>',
+    after:'<div class="e"><div class="canvas"><span class="kick">Plan 02 · Design</span><h3>Dark-mode character standard</h3><p>Pick &amp; codify the RZ identity — 4 on-brand characters, animated viz, two registers.</p><div class="meta"><span class="mtag">4 variants</span><span class="mtag">anti-slop</span></div></div></div>'});
+
+  /* 10 landing hero (editorial) */
+  S.push({n:'10',title:'Landing hero',reg:'editorial',
+    before:'<div class="g"><div class="panel"><h3>Resistance Zero</h3><p>Engineering operator intelligence.</p><div style="margin-top:10px" class="btnrow"><button class="btn">Get started</button><button class="btn sec">Learn more</button></div></div></div>',
+    after:'<div class="e"><div class="canvas"><span class="kick">Operator intelligence</span><h3>Resistance Zero — the instrument behind the data center.</h3><p>Cockpits, calculators, and a living knowledge graph for engineering operations.</p><div style="margin-top:11px" class="btnrow"><button class="btn">Get started</button><button class="btn sec">Explore labs</button></div></div></div>'});
+
+  /* 11 buttons (both) */
+  S.push({n:'11',title:'Controls — buttons',reg:'instrument + editorial',
+    before:'<div class="g"><div class="panel btnrow"><button class="btn">Primary</button><button class="btn sec">Secondary</button></div></div>',
+    after:'<div class="i"><div class="canvas btnrow"><button class="btn">Run</button><button class="btn sec">Cancel</button><span style="width:14px"></span><span class="e" style="display:contents"></span></div></div>'});
+
+  /* 12 table (instrument) */
+  S.push({n:'12',title:'Data table',reg:'instrument',
+    before:'<div class="g"><div class="panel"><table><thead><tr><th>Tag</th><th>Load</th><th>State</th></tr></thead><tbody><tr><td>CH-1</td><td>78%</td><td>RUN</td></tr><tr><td>CH-2</td><td>74%</td><td>RUN</td></tr><tr><td>CH-8</td><td>0%</td><td>STBY</td></tr></tbody></table></div></div>',
+    after:'<div class="i"><div class="canvas"><table><thead><tr><th>Tag</th><th>Load</th><th>State</th></tr></thead><tbody><tr><td>CH-1</td><td>78%</td><td style="color:#86efac">RUN</td></tr><tr><td>CH-2</td><td>74%</td><td style="color:#86efac">RUN</td></tr><tr><td>CH-8</td><td>0%</td><td style="color:#fbbf24">STBY</td></tr></tbody></table></div></div>'});
+
+  /* render */
+  var g=document.getElementById('gallery');
+  g.innerHTML=S.map(function(s){
+    return '<div class="surface"><div class="title"><span class="n">'+s.n+'</span><h2>'+s.title+'</h2><span class="reg">'+s.reg+'</span></div>'+
+      '<div class="ba"><div class="side b"><div class="tagline"><span class="d"></span>before</div>'+s.before+'</div>'+
+      '<div class="side a"><div class="tagline"><span class="d"></span>after</div>'+s.after+'</div></div></div>';
+  }).join('');
+
+  /* ---------- animate after-charts ---------- */
+  /* trace lines */
+  document.querySelectorAll('svg[data-trace]').forEach(function(svg){
+    var w=360,h=110,vals=seed(44,20,84,+svg.getAttribute('data-trace'));
+    svg.innerHTML='<path d="'+linePath(vals,w,h,8)+'" fill="none" stroke="#2BE8FF" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 5px #2BE8FF88)"/><circle r="3.4" fill="#22F5A8" style="filter:drop-shadow(0 0 6px #22F5A8)"/>';
+    var p=svg.querySelector('path'),sw=svg.querySelector('circle'),L=p.getTotalLength();
+    if(!isFinite(L)||L<=0){sw.setAttribute('opacity','0');return;}
+    p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+    var st=null;(function fr(t){if(!st)st=t;var k=Math.min((t-st)/1400,1),e=1-Math.pow(1-k,3);p.style.strokeDashoffset=L*(1-e);var pos=L*e;if(!isFinite(pos)||pos<0)pos=0;var pt=p.getPointAtLength(pos);sw.setAttribute('cx',pt.x);sw.setAttribute('cy',pt.y);if(k<1)requestAnimationFrame(fr);})();
+  });
+  /* before bars (static) + after bars (grow) */
+  function barsSVG(svg,anim){
+    var w=360,h=110,pad=14,n=4,labels=['DH1','DH2','DH3','DH4'],vals=[3.56,3.56,3.56,3.56],maxv=4,gap=20,bw=(w-pad*2-gap*(n-1))/n;
+    var col=anim?'#22F5A8':'#64748b',html='';
+    for(var i=0;i<n;i++){var x=pad+i*(bw+gap),fh=(h-pad*2)*(vals[i]/maxv);
+      html+='<rect class="bar" x="'+x+'" y="'+(anim?h-pad:h-pad-fh)+'" width="'+bw+'" height="'+(anim?0:fh)+'" rx="2" fill="'+col+'" data-fh="'+fh+'"/>';
+      html+='<text x="'+(x+bw/2)+'" y="'+(h-3)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#5E8472">'+labels[i]+'</text>';}
+    svg.innerHTML=html;
+    if(anim){var rects=svg.querySelectorAll('.bar'),st=null;(function fr(t){if(!st)st=t;var k=Math.min((t-st)/1200,1),e=1-Math.pow(1-k,3);rects.forEach(function(r,i){var dd=Math.min(Math.max(e*1.2-i*.06,0),1),fh=(+r.getAttribute('data-fh'))*dd;r.setAttribute('height',fh);r.setAttribute('y',h-pad-fh);});if(k<1)requestAnimationFrame(fr);})();}
+  }
+  barsSVG(document.getElementById('barBefore'),false);
+  document.querySelectorAll('svg[data-bars]').forEach(function(s){barsSVG(s,true);});
+  /* donut before (static) + after (sweep) */
+  function donut(svg,anim){
+    var cx=70,cy=60,r=40,sw=14,C=2*Math.PI*r,frac=.77,col=anim?'#E8B563':'#64748b',track=anim?'rgba(160,168,180,.16)':'rgba(255,255,255,.08)';
+    svg.innerHTML='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="'+sw+'"/>'+
+      '<circle class="dn" cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'" stroke-linecap="round" transform="rotate(-90 '+cx+' '+cy+')" stroke-dasharray="'+C+'" stroke-dashoffset="'+(anim?C:C*(1-frac))+'"/>'+
+      '<text class="dnum" x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" font-family="'+(anim?'Fraunces,serif':'Inter,sans-serif')+'" font-size="20" font-weight="600" fill="'+(anim?'#F6F7F9':'#e2e8f0')+'">'+(anim?'0%':'77%')+'</text>'+
+      '<text x="150" y="46" font-family="IBM Plex Mono,monospace" font-size="9" fill="'+(anim?'#7E8590':'#94a3b8')+'">IT share</text>'+
+      '<text x="150" y="64" font-family="IBM Plex Mono,monospace" font-size="9" fill="'+(anim?'#6FBF9A':'#94a3b8')+'">cooling 18%</text>'+
+      '<text x="150" y="82" font-family="IBM Plex Mono,monospace" font-size="9" fill="'+(anim?'#7E8590':'#94a3b8')+'">losses 5%</text>';
+    if(anim){var dn=svg.querySelector('.dn'),num=svg.querySelector('.dnum'),st=null;(function fr(t){if(!st)st=t;var k=Math.min((t-st)/1500,1),e=1-Math.pow(1-k,3);dn.style.strokeDashoffset=C*(1-frac*e);num.textContent=Math.round(77*e)+'%';if(k<1)requestAnimationFrame(fr);})();}
+  }
+  donut(document.getElementById('donutBefore'),false);
+  document.querySelectorAll('svg[data-donut]').forEach(function(s){donut(s,true);});
+  /* SLD */
+  function brk(cx,cy,c,closed){return closed?'<line x1="'+cx+'" y1="'+(cy-6)+'" x2="'+cx+'" y2="'+(cy+6)+'" stroke="'+c+'" stroke-width="1.8"/><circle cx="'+cx+'" cy="'+(cy-7)+'" r="2" fill="'+c+'"/><circle cx="'+cx+'" cy="'+(cy+7)+'" r="2" fill="'+c+'"/>':'<line x1="'+cx+'" y1="'+(cy+6)+'" x2="'+(cx+6)+'" y2="'+(cy-5)+'" stroke="'+c+'" stroke-width="1.8"/><line x1="'+(cx-4)+'" y1="'+(cy-3)+'" x2="'+(cx+4)+'" y2="'+(cy+3)+'" stroke="'+c+'" stroke-width="1.1"/><line x1="'+(cx-4)+'" y1="'+(cy+3)+'" x2="'+(cx+4)+'" y2="'+(cy-3)+'" stroke="'+c+'" stroke-width="1.1"/>';}
+  function sld(svg,mono,txt){
+    var A='#3b82f6',B='#22c55e',R='#ef4444';
+    svg.innerHTML='<line x1="60" y1="14" x2="60" y2="30" stroke="'+A+'" stroke-width="1.6"/>'+brk(60,40,A,true)+
+      '<line x1="300" y1="14" x2="300" y2="30" stroke="'+B+'" stroke-width="1.6"/>'+brk(300,40,B,true)+
+      '<line x1="60" y1="50" x2="60" y2="62" stroke="'+A+'" stroke-width="1.3"/><line x1="300" y1="50" x2="300" y2="62" stroke="'+B+'" stroke-width="1.3"/>'+
+      '<line x1="30" y1="63" x2="175" y2="63" stroke="'+A+'" stroke-width="3"/><line x1="185" y1="63" x2="330" y2="63" stroke="'+B+'" stroke-width="3"/>'+
+      '<line x1="120" y1="63" x2="120" y2="74" stroke="'+A+'" stroke-width="1.2"/>'+brk(120,82,A,true)+
+      '<line x1="240" y1="63" x2="240" y2="74" stroke="'+B+'" stroke-width="1.2"/>'+brk(240,82,R,false)+
+      '<text x="60" y="12" fill="'+txt+'" font-family="'+mono+'" font-size="8" text-anchor="middle">A</text>'+
+      '<text x="300" y="12" fill="'+txt+'" font-family="'+mono+'" font-size="8" text-anchor="middle">B</text>'+
+      '<text x="240" y="98" fill="'+R+'" font-family="'+mono+'" font-size="7.5" text-anchor="middle" font-weight="700">TRIP</text>';
+  }
+  sld(document.getElementById('sldBefore'),'Inter,sans-serif','#94a3b8');
+  sld(document.getElementById('sldAfter'),'JetBrains Mono,monospace','#5E8472');
+  /* count-up (hard settle) */
+  document.querySelectorAll('.i [data-count]').forEach(function(el){
+    var tg=+el.getAttribute('data-count'),dc=+el.getAttribute('data-dec'),st=null,done=false;
+    function fmt(v){return v.toLocaleString(undefined,{minimumFractionDigits:dc,maximumFractionDigits:dc});}
+    function settle(){if(done)return;done=true;el.textContent=fmt(tg);}
+    (function f(t){if(done)return;if(!st)st=t;var k=Math.min((t-st)/900,1),e=1-Math.pow(1-k,3);if(k<1){el.textContent=fmt(tg*e);requestAnimationFrame(f);}else settle();})();
+    setTimeout(settle,1200);
+  });
+})();
+</script>
+</body>
+</html>

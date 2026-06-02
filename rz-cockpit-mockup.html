@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Cockpit re-skin — before vs after (semantic colours preserved)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="js/rz-version.js?v=1.43.7" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#05080B;color:#cbd5e1;font-family:'IBM Plex Mono',monospace;padding:22px;}
+.h{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:#5E8472;margin-bottom:6px;}
+.sub{font-size:.78rem;color:#475569;margin-bottom:18px;max-width:80ch;line-height:1.5;}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+@media(max-width:900px){.cmp{grid-template-columns:1fr;}}
+.col-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.col-label .dot{width:8px;height:8px;border-radius:50%;}
+.before .col-label{color:#64748b;} .before .dot{background:#64748b;}
+.after .col-label{color:#22F5A8;} .after .dot{background:#22F5A8;box-shadow:0 0 10px #22F5A8;}
+
+/* shared cockpit slice layout */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.k{padding:11px 12px;}
+.kl{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;}
+.kv{font-size:1.45rem;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;}
+.ku{font-size:.6rem;margin-top:1px;}
+.sld-wrap,.chart-wrap{padding:11px 12px;margin-bottom:12px;}
+.ct{font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+svg{width:100%;height:auto;display:block;}
+
+/* ===== BEFORE — generic slop ===== */
+.before .frame{background:#1e293b;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;font-family:'Inter',system-ui,sans-serif;}
+.before .k{background:#0f172a;border:1px solid rgba(255,255,255,.06);border-radius:12px;}
+.before .kl{color:#94a3b8;} .before .kv{color:#e2e8f0;} .before .ku{color:#8b5cf6;}
+.before .sld-wrap,.before .chart-wrap{background:#0f172a;border:1px solid rgba(255,255,255,.06);border-radius:12px;}
+.before .ct{color:#94a3b8;}
+
+/* ===== AFTER — instrument register, SEMANTIC COLOURS PRESERVED ===== */
+.after .frame{position:relative;background:#0C141A;border:1px solid rgba(43,232,255,.14);border-radius:3px;padding:16px;font-family:'IBM Plex Mono',monospace;overflow:hidden;}
+.after .frame::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(43,232,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(43,232,255,.045) 1px,transparent 1px);background-size:28px 28px;-webkit-mask-image:radial-gradient(130% 100% at 50% 0%,#000 38%,transparent 90%);mask-image:radial-gradient(130% 100% at 50% 0%,#000 38%,transparent 90%);pointer-events:none;}
+.after .k{position:relative;background:#101C22;border:1px solid rgba(43,232,255,.14);border-radius:3px;overflow:hidden;}
+.after .k::after{content:'';position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,#22F5A8,transparent);opacity:.55;}
+.after .kl{color:#5E8472;} .after .kv{font-family:'JetBrains Mono',monospace;color:#EAFBF0;letter-spacing:-.01em;} .after .ku{color:#22F5A8;}
+.after .sld-wrap,.after .chart-wrap{position:relative;background:#101C22;border:1px solid rgba(43,232,255,.14);border-radius:3px;}
+.after .ct{color:#EAFBF0;}
+.after .frame > *{position:relative;}
+
+/* semantic legend */
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:.62rem;color:#5E8472;}
+.leg span{display:inline-flex;align-items:center;gap:5px;}
+.leg i{width:14px;height:3px;border-radius:2px;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="h">Cockpit re-skin — before vs after · instrument register</div>
+<div class="sub">Same datahallAI dashboard slice. The instrument register changes <b>surface</b> (charcoal-green canvas, graticule, JetBrains Mono, 3px corners, animated traces, count-up) but <b>preserves the load-bearing semantic colours</b>: Feed&nbsp;A blue · Feed&nbsp;B green · trip/alarm red · cooling cyan. Status colour still wins over domain — the tripped breaker stays red on both sides.</div>
+
+<div class="cmp">
+
+  <!-- BEFORE -->
+  <div class="before">
+    <div class="col-label"><span class="dot"></span> BEFORE — generic flat dark, static</div>
+    <div class="frame">
+      <div class="kpis">
+        <div class="k"><div class="kl">PUE</div><div class="kv">1.30</div><div class="ku">derived</div></div>
+        <div class="k"><div class="kl">IT</div><div class="kv">14.26</div><div class="ku">MW</div></div>
+        <div class="k"><div class="kl">GPUs</div><div class="kv">7,776</div><div class="ku">Blackwell</div></div>
+        <div class="k"><div class="kl">CDU</div><div class="kv">36/48</div><div class="ku">running</div></div>
+      </div>
+      <div class="sld-wrap"><div class="ct">MV intake — single line</div>
+        <svg id="sldBefore" viewBox="0 0 420 150" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="chart-wrap"><div class="ct">CDU return temperature</div>
+        <svg id="chBefore" viewBox="0 0 420 90" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="after">
+    <div class="col-label"><span class="dot"></span> AFTER — instrument register, semantic colours kept</div>
+    <div class="frame">
+      <div class="kpis">
+        <div class="k"><div class="kl">PUE</div><div class="kv" data-count="1.30" data-dec="2">0.00</div><div class="ku">derived ✓</div></div>
+        <div class="k"><div class="kl">IT</div><div class="kv" data-count="14.26" data-dec="2">0.00</div><div class="ku">MW</div></div>
+        <div class="k"><div class="kl">GPUs</div><div class="kv" data-count="7776" data-dec="0">0</div><div class="ku">Blackwell</div></div>
+        <div class="k"><div class="kl">CDU</div><div class="kv">36/48</div><div class="ku">running</div></div>
+      </div>
+      <div class="sld-wrap"><div class="ct">MV intake — single line</div>
+        <svg id="sldAfter" viewBox="0 0 420 150" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="chart-wrap"><div class="ct">CDU return temperature — live trace</div>
+        <svg id="chAfter" viewBox="0 0 420 90" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="leg">
+  <span><i style="background:#3b82f6"></i> Feed A (blue)</span>
+  <span><i style="background:#22c55e"></i> Feed B (green)</span>
+  <span><i style="background:#ef4444"></i> Trip / alarm (red)</span>
+  <span><i style="background:#2BE8FF"></i> Cooling (cyan)</span>
+  <span style="color:#475569">— identical semantics both sides; only the surface character changes.</span>
+</div>
+
+<script>
+(function(){
+  /* ---------- SLD renderer (shared geometry; colour params per side) ---------- */
+  function breaker(cx,cy,c,closed){
+    if(closed) return '<circle cx="'+cx+'" cy="'+(cy-7)+'" r="2.2" fill="'+c+'"/><circle cx="'+cx+'" cy="'+(cy+7)+'" r="2.2" fill="'+c+'"/><line x1="'+cx+'" y1="'+(cy-6)+'" x2="'+cx+'" y2="'+(cy+6)+'" stroke="'+c+'" stroke-width="1.8"/>';
+    /* tripped/open: angled arm + X */
+    return '<circle cx="'+cx+'" cy="'+(cy-7)+'" r="2.2" fill="none" stroke="'+c+'" stroke-width=".9"/><circle cx="'+cx+'" cy="'+(cy+7)+'" r="2.2" fill="'+c+'"/><line x1="'+cx+'" y1="'+(cy+6)+'" x2="'+(cx+6)+'" y2="'+(cy-5)+'" stroke="'+c+'" stroke-width="1.8"/><line x1="'+(cx-4)+'" y1="'+(cy-3)+'" x2="'+(cx+4)+'" y2="'+(cy+3)+'" stroke="'+c+'" stroke-width="1.1"/><line x1="'+(cx-4)+'" y1="'+(cy+3)+'" x2="'+(cx+4)+'" y2="'+(cy-3)+'" stroke="'+c+'" stroke-width="1.1"/>';
+  }
+  function sld(opts){
+    var A=opts.feedA,B=opts.feedB,R=opts.trip,line=opts.line,txt=opts.txt,mono=opts.mono;
+    var s='';
+    /* sources */
+    s+='<text x="70" y="16" fill="'+txt+'" font-family="'+mono+'" font-size="9" text-anchor="middle">PLN-A</text>';
+    s+='<text x="350" y="16" fill="'+txt+'" font-family="'+mono+'" font-size="9" text-anchor="middle">PLN-B</text>';
+    /* drops to breakers */
+    s+='<line x1="70" y1="22" x2="70" y2="40" stroke="'+A+'" stroke-width="1.6"/>';
+    s+='<line x1="350" y1="22" x2="350" y2="40" stroke="'+B+'" stroke-width="1.6"/>';
+    s+=breaker(70,52,A,true);
+    s+=breaker(350,52,B,true);
+    s+='<text x="84" y="55" fill="'+txt+'" font-family="'+mono+'" font-size="7.5">VCB-A · closed</text>';
+    s+='<text x="336" y="55" fill="'+txt+'" font-family="'+mono+'" font-size="7.5" text-anchor="end">VCB-B · closed</text>';
+    /* bus drops */
+    s+='<line x1="70" y1="64" x2="70" y2="86" stroke="'+A+'" stroke-width="1.4"/>';
+    s+='<line x1="350" y1="64" x2="350" y2="86" stroke="'+B+'" stroke-width="1.4"/>';
+    /* bus bars */
+    s+='<line x1="40" y1="88" x2="200" y2="88" stroke="'+A+'" stroke-width="3"/>';
+    s+='<line x1="220" y1="88" x2="380" y2="88" stroke="'+B+'" stroke-width="3"/>';
+    /* tie (open) */
+    s+='<line x1="200" y1="88" x2="220" y2="88" stroke="'+line+'" stroke-width="1" stroke-dasharray="4 3"/>';
+    /* feeders down */
+    s+='<line x1="120" y1="88" x2="120" y2="104" stroke="'+A+'" stroke-width="1.3"/>';
+    s+=breaker(120,116,A,true);
+    s+='<line x1="300" y1="88" x2="300" y2="104" stroke="'+B+'" stroke-width="1.3"/>';
+    /* one feeder TRIPPED — alarm red wins over domain green */
+    s+=breaker(300,116,R,false);
+    s+='<text x="120" y="140" fill="'+txt+'" font-family="'+mono+'" font-size="7.5" text-anchor="middle">F1A</text>';
+    s+='<text x="300" y="140" fill="'+R+'" font-family="'+mono+'" font-size="7.5" text-anchor="middle" font-weight="700">F1B · TRIP</text>';
+    return s;
+  }
+  document.getElementById('sldBefore').innerHTML=sld({feedA:'#3b82f6',feedB:'#22c55e',trip:'#ef4444',line:'#64748b',txt:'#94a3b8',mono:'Inter,sans-serif'});
+  document.getElementById('sldAfter').innerHTML=sld({feedA:'#3b82f6',feedB:'#22c55e',trip:'#ef4444',line:'#5E8472',txt:'#5E8472',mono:'JetBrains Mono,monospace'});
+
+  /* ---------- cooling trace ---------- */
+  function seed(n,lo,hi,s){var o=[],x=s;for(var i=0;i<n;i++){x=(x*9301+49297)%233280;o.push(lo+(hi-lo)*(x/233280));}return o;}
+  var n=46,vals=seed(n,22,66,11),w=420,h=90,pad=8,step=(w-pad*2)/(n-1),d='';
+  for(var i=0;i<n;i++){var x=pad+i*step,y=h-pad-vals[i];d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+  /* before: static muted */
+  document.getElementById('chBefore').innerHTML='<path d="'+d+'" fill="none" stroke="#64748b" stroke-width="2"/>';
+  /* after: cyan phosphor trace draws in + sweep */
+  var ca=document.getElementById('chAfter');
+  ca.innerHTML='<path id="ctr" d="'+d+'" fill="none" stroke="#2BE8FF" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 5px #2BE8FF88)"/><circle id="csw" r="3.5" fill="#22F5A8" style="filter:drop-shadow(0 0 6px #22F5A8)"/>';
+  var pth=document.getElementById('ctr'),sw=document.getElementById('csw'),L=pth.getTotalLength();
+  pth.style.strokeDasharray=L;pth.style.strokeDashoffset=L;
+  var st=null;function fr(t){if(!st)st=t;var k=Math.min((t-st)/1400,1),e=1-Math.pow(1-k,3);
+    pth.style.strokeDashoffset=L*(1-e);var pt=pth.getPointAtLength(L*e);sw.setAttribute('cx',pt.x);sw.setAttribute('cy',pt.y);
+    if(k<1)requestAnimationFrame(fr);}
+  requestAnimationFrame(fr);
+
+  /* ---------- KPI count-up (probe-safe pattern: hard settle) ---------- */
+  [].forEach.call(document.querySelectorAll('.after [data-count]'),function(el){
+    var orig=el.textContent,tg=+el.getAttribute('data-count'),dc=+el.getAttribute('data-dec'),hc=/,/.test('7,776')&&el.getAttribute('data-dec')==='0',s2=null,done=false;
+    function fmt(v){var x=v.toLocaleString(undefined,{minimumFractionDigits:dc,maximumFractionDigits:dc});return x;}
+    function settle(){if(done)return;done=true;el.textContent=fmt(tg);}
+    function f2(t){if(done)return;if(!s2)s2=t;var k=Math.min((t-s2)/900,1),e=1-Math.pow(1-k,3);if(k<1){el.textContent=fmt(tg*e);requestAnimationFrame(f2);}else settle();}
+    requestAnimationFrame(f2);setTimeout(settle,1200);
+  });
+})();
+</script>
+</body>
+</html>
