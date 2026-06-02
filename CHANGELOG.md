@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v1.43.9 — 2026-06-01 (article editorial skin + article-26 pilot)
+
+Owner directed the skin rollout at ARTICLES (content), not the DC AI / DC
+Conventional cockpits. First real-page adoption of the editorial register.
+
+No cockpit/engine touched. Light mode verified UNCHANGED (skin scoped to
+`data-rz-register="editorial"` + dark). Gates CLEAN. Pilot headless-verified.
+
+### Added
+- **`css/rz-article-dark.css`** — editorial register for articles. Activates
+  ONLY when `<html data-rz-register="editorial">` AND dark mode. Restyles the
+  existing `.article-*` chrome: Fraunces serif title (italic accent), mono
+  kickers/meta, drop-cap, accent rail on h2, editorial callout/quote rail,
+  read-progress bar, staggered entrance. Body copy stays IBM Plex Sans for
+  readability. Per-series accent via `--rz-art-accent` override.
+- **`js/rz-article-editorial.js`** — progressive-enhancement runtime
+  (read-progress bar + entrance stagger). No-op unless editorial register
+  declared. Honours prefers-reduced-motion.
+- **`rz-article-mockup.html`** (noindex) — article before/after demo.
+
+### Changed
+- **`article-26.html`** — PILOT. `<html data-rz-register="editorial"
+  style="--rz-art-accent:#ef4444">` + Fraunces/Plex fonts + the editorial
+  CSS/JS. Structure + light mode untouched.
+- **`plan-dark-mode-standard.html`** — new §08 (article editorial skin +
+  before/after iframe).
+
+### Rollout plan
+- Shared CSS + one-line-per-page opt-in. Batch remaining 27 articles 3–4 per
+  ship, each with its series accent, after this pilot is approved.
+
+---
+
 ## v1.43.8 — 2026-06-01 (codify RZ Dark System into design.md — Section 16)
 
 DOCS ship: folds the dark-mode design system into the brand bible as a

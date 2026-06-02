@@ -1,0 +1,139 @@
+/* ============================================================================
+   rz-article-dark.css — editorial register for article pages (v1.43.9)
+   Part of RZ Dark System v1 (design.md §16 · DARK_MODE_STANDARD.md).
+
+   Activates ONLY when BOTH:
+     <html data-theme="dark"> AND <html data-rz-register="editorial">
+   So it never touches light mode or non-opted pages.
+
+   Restyles the existing .article-* chrome (display type, kickers, meta,
+   callouts) — body copy stays IBM Plex Sans for readability. Each article's
+   series accent is preserved via --rz-art-accent (default warm amber;
+   override per page with style="--rz-art-accent:#ef4444").
+
+   Requires the page to load: Fraunces + IBM Plex Sans + IBM Plex Mono.
+   ============================================================================ */
+
+html[data-rz-register="editorial"][data-theme="dark"]{
+  --rz-art-accent:#E8B563;        /* default editorial amber; override per series */
+  --rz-art-accent2:#6FBF9A;
+  --rz-art-bg:#0E0F12;
+  --rz-art-panel:#16181D;
+  --rz-art-text:#CFD3DA;
+  --rz-art-strong:#F6F7F9;
+  --rz-art-muted:#7E8590;
+  --rz-art-line:rgba(160,168,180,.14);
+  --rz-art-serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --rz-art-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --rz-art-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+
+/* ---- page canvas ---- */
+html[data-rz-register="editorial"][data-theme="dark"] body{
+  background:var(--rz-art-bg);
+  color:var(--rz-art-text);
+}
+
+/* ---- HERO ---- */
+html[data-rz-register="editorial"][data-theme="dark"] .article-hero{
+  position:relative;
+  background:var(--rz-art-bg) !important;
+  border-bottom:1px solid var(--rz-art-line);
+  overflow:hidden;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(620px 280px at 86% -18%, color-mix(in srgb,var(--rz-art-accent) 12%,transparent), transparent 64%),
+    radial-gradient(460px 240px at 4% 118%, rgba(111,191,154,.06), transparent 66%);
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-hero > *{position:relative;z-index:1;}
+
+html[data-rz-register="editorial"][data-theme="dark"] .article-title{
+  font-family:var(--rz-art-serif) !important;
+  font-weight:500 !important;
+  letter-spacing:-.015em;
+  line-height:1.06 !important;
+  color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-title .highlight{
+  color:var(--rz-art-accent) !important;
+  font-style:italic;
+}
+/* thin accent rule under the hero */
+html[data-rz-register="editorial"][data-theme="dark"] .article-hero::after{
+  content:'';position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  width:48px;height:2px;border-radius:2px;background:var(--rz-art-accent);opacity:.9;z-index:1;
+}
+
+/* ---- META (mono, instrument-grade) ---- */
+html[data-rz-register="editorial"][data-theme="dark"] .article-meta{
+  font-family:var(--rz-art-mono) !important;
+  letter-spacing:.03em;
+  border-bottom-color:var(--rz-art-line) !important;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-meta-item,
+html[data-rz-register="editorial"][data-theme="dark"] .article-meta *{
+  color:var(--rz-art-muted) !important;
+}
+
+/* ---- BODY: headings to serif, copy stays sans ---- */
+html[data-rz-register="editorial"][data-theme="dark"] .article-body h2{
+  font-family:var(--rz-art-serif) !important;
+  font-weight:500 !important;
+  letter-spacing:-.01em;
+  color:var(--rz-art-strong) !important;
+  border-left:0 !important;          /* drop the generic red bar */
+  padding-left:0 !important;
+}
+/* re-introduce a restrained accent tick before h2 */
+html[data-rz-register="editorial"][data-theme="dark"] .article-body h2::before{
+  content:'';display:inline-block;width:18px;height:2px;border-radius:2px;
+  background:var(--rz-art-accent);vertical-align:middle;margin-right:.6rem;
+  transform:translateY(-4px);
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-body h3{
+  font-family:var(--rz-art-serif) !important;
+  font-weight:500 !important;
+  color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-body p{
+  font-family:var(--rz-art-sans) !important;
+  color:var(--rz-art-text) !important;
+  line-height:1.75 !important;
+}
+/* drop-cap on the first paragraph of the body */
+html[data-rz-register="editorial"][data-theme="dark"] .article-body > p:first-of-type::first-letter{
+  font-family:var(--rz-art-serif);
+  font-size:3.1rem;font-weight:600;float:left;line-height:.82;
+  padding:6px 10px 0 0;color:var(--rz-art-accent);
+}
+
+/* ---- CALLOUTS / QUOTES → editorial accent rail ---- */
+html[data-rz-register="editorial"][data-theme="dark"] .quote-callout{
+  background:color-mix(in srgb,var(--rz-art-accent) 7%,transparent) !important;
+  border:1px solid color-mix(in srgb,var(--rz-art-accent) 26%,transparent) !important;
+  border-left:2px solid var(--rz-art-accent) !important;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .quote-callout blockquote{
+  font-family:var(--rz-art-serif) !important;font-style:italic;
+  color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .quote-callout cite{
+  font-family:var(--rz-art-mono) !important;
+  color:var(--rz-art-muted) !important;font-style:normal;letter-spacing:.04em;
+}
+
+/* ---- read-progress bar (injected by rz-article-editorial.js) ---- */
+.rz-read-prog{position:fixed;top:0;left:0;height:3px;width:0;z-index:9999;
+  background:linear-gradient(90deg,var(--rz-art-accent,#E8B563),var(--rz-art-accent2,#6FBF9A));
+  transition:width .12s linear;}
+
+/* ---- staggered entrance ---- */
+html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter]{opacity:0;transform:translateY(12px);}
+html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter].rz-in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);}
+
+@media (prefers-reduced-motion:reduce){
+  html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter]{opacity:1 !important;transform:none !important;}
+  .rz-read-prog{transition:none;}
+}

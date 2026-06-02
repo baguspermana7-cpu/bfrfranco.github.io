@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Article skin — before vs after (editorial register)</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E0F12">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="js/rz-version.js?v=1.43.9" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:#05080B;color:#c8d2dc;font-family:'IBM Plex Mono',monospace;padding:24px;}
+.lead{max-width:1000px;margin:0 auto 22px;}
+.lead .tag{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.5rem;align-items:center;}
+.lead .tag::before{content:'';width:22px;height:1px;background:#E8B563;}
+.lead h1{font-family:'Fraunces',serif;color:#F6F7F9;font-size:clamp(1.5rem,3.4vw,2.3rem);margin:.6rem 0 .5rem;font-weight:500;letter-spacing:-.01em;}
+.lead p{color:#7E8590;font-size:.9rem;max-width:76ch;line-height:1.6;}
+.cmp{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+@media(max-width:980px){.cmp{grid-template-columns:1fr;}}
+.col{border:1px solid #1b2630;border-radius:10px;overflow:hidden;}
+.col-h{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem .9rem;border-bottom:1px solid #1b2630;display:flex;align-items:center;gap:8px;}
+.col-h .d{width:8px;height:8px;border-radius:50%;}
+.b .col-h{color:#64748b;background:#0a0d11;} .b .col-h .d{background:#64748b;}
+.a .col-h{color:#E8B563;background:#11100c;} .a .col-h .d{background:#E8B563;box-shadow:0 0 9px #E8B563;}
+.frame{height:560px;overflow-y:auto;}
+
+/* ============ BEFORE — current generic dark article ============ */
+.before .frame{background:#0f172a;font-family:'Inter',system-ui,sans-serif;padding:22px;}
+.before .kicker{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;}
+.before h1{font-size:1.7rem;font-weight:700;color:#f1f5f9;margin:8px 0;line-height:1.15;}
+.before .meta{display:flex;gap:14px;font-size:.74rem;color:#64748b;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:12px;}
+.before h2{font-size:1.2rem;color:#fca5a5;border-left:3px solid #dc2626;padding-left:10px;margin:18px 0 8px;}
+.before p{font-size:.92rem;color:#cbd5e1;line-height:1.7;margin-bottom:12px;}
+.before .callout{background:rgba(220,38,38,.1);border:1px solid rgba(252,165,165,.3);border-radius:12px;padding:14px;margin:14px 0;}
+.before .callout h4{color:#fca5a5;font-size:.95rem;margin-bottom:6px;}
+.before .callout p{font-size:.84rem;color:#d1d5db;margin:0;}
+.before .tags{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;}
+.before .pill{background:#334155;color:#cbd5e1;border-radius:999px;padding:3px 11px;font-size:.7rem;}
+
+/* ============ AFTER — editorial register ============ */
+.after .frame{position:relative;background:#0E0F12;font-family:'IBM Plex Sans',system-ui,sans-serif;padding:0;}
+/* hero band */
+.ed-hero{position:relative;padding:30px 26px 22px;border-bottom:1px solid rgba(160,168,180,.13);overflow:hidden;}
+.ed-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(560px 240px at 86% -20%,rgba(232,181,99,.10),transparent 64%),radial-gradient(420px 220px at 4% 120%,rgba(111,191,154,.06),transparent 66%);pointer-events:none;}
+.ed-hero > *{position:relative;}
+.ed-kicker{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.5rem;align-items:center;}
+.ed-kicker::before{content:'';width:20px;height:1px;background:#E8B563;}
+.ed-hero h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:2rem;color:#F6F7F9;line-height:1.06;letter-spacing:-.015em;margin:.6rem 0 .1rem;max-width:20ch;}
+.ed-hero h1 .hl{font-style:italic;color:#E8B563;}
+.ed-dek{font-family:'IBM Plex Sans',sans-serif;font-size:1rem;color:#A9B0BC;line-height:1.55;max-width:54ch;margin-top:.5rem;}
+.ed-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:#7E8590;letter-spacing:.02em;}
+.ed-meta b{color:#CFD3DA;font-weight:500;}
+.ed-rule{height:2px;width:48px;background:#E8B563;margin-top:16px;border-radius:2px;}
+/* read progress */
+.ed-prog{position:absolute;top:0;left:0;height:2px;background:linear-gradient(90deg,#E8B563,#6FBF9A);width:0;}
+/* body */
+.ed-body{padding:22px 26px 30px;}
+.ed-body .drop::first-letter{font-family:'Fraunces',serif;font-size:3.1rem;font-weight:600;float:left;line-height:.82;padding:6px 10px 0 0;color:#E8B563;}
+.ed-body h2{font-family:'Fraunces',serif;font-weight:500;font-size:1.4rem;color:#F6F7F9;margin:22px 0 9px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:.6rem;}
+.ed-body h2 .ix{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:#E8B563;font-weight:600;}
+.ed-body p{font-size:.96rem;color:#CFD3DA;line-height:1.75;margin-bottom:13px;}
+.ed-pull{border-left:2px solid #E8B563;padding:4px 0 4px 16px;margin:16px 0;}
+.ed-pull blockquote{font-family:'Fraunces',serif;font-style:italic;font-size:1.18rem;color:#F6F7F9;line-height:1.4;}
+.ed-pull cite{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:#7E8590;font-style:normal;letter-spacing:.04em;display:block;margin-top:8px;}
+.ed-callout{background:rgba(232,181,99,.07);border:1px solid rgba(232,181,99,.26);border-radius:10px;padding:15px 16px;margin:16px 0;}
+.ed-callout .lbl{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:#E8B563;}
+.ed-callout h4{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:.98rem;color:#F6F7F9;margin:4px 0 6px;}
+.ed-callout p{font-size:.86rem;color:#A9B0BC;margin:0;line-height:1.6;}
+.ed-tags{display:flex;gap:7px;margin-top:18px;flex-wrap:wrap;}
+.ed-tag{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.04em;color:#7E8590;border:1px solid rgba(160,168,180,.22);border-radius:5px;padding:.18rem .5rem;}
+.note{max-width:1280px;margin:18px auto 0;font-size:.66rem;color:#475569;font-family:'IBM Plex Mono',monospace;}
+[data-enter]{opacity:0;transform:translateY(10px);}
+[data-enter].in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);}
+@media(prefers-reduced-motion:reduce){[data-enter]{opacity:1;transform:none;}}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <span class="tag">RZ Article Skin · editorial register</span>
+  <h1>Article dark mode — before vs after.</h1>
+  <p>Same article (A26 · PFAS investigation). Left = current generic dark (Inter headings, flat callouts, pill tags, no entrance). Right = editorial register — Fraunces serif display with an italic accent, mono kickers + metadata, a drop-cap, pull-quote, warm signal-amber accent rail, read-progress bar, and staggered entrance. Article body type stays IBM Plex Sans for readability; only the editorial chrome changes.</p>
+</div>
+
+<div class="cmp">
+
+  <!-- BEFORE -->
+  <div class="col before">
+    <div class="col-h"><span class="d"></span>before — generic dark (Inter, flat)</div>
+    <div class="frame">
+      <div class="kicker">Global Analysis</div>
+      <h1>The PFAS Maintenance Trap</h1>
+      <div class="meta"><span>Apr 11, 2026</span><span>12 min read</span><span>Investigation</span></div>
+      <p>Data centers were told their cooling fluids were safe. The sealed-leak narrative missed the real vector entirely — and the substitution chemistry quietly made it worse.</p>
+      <h2>The vapor nobody measured</h2>
+      <p>Maintenance vapor release, not sealed leaks, is the genuine PFAS exposure path. Every drain-and-fill cycle vents a fraction of the fluid inventory the data sheets never accounted for.</p>
+      <div class="callout"><h4>Key finding</h4><p>"PFAS-free" HFO refrigerants degrade into TFA — a persistent breakdown product that re-enters the same waterways the substitution was meant to protect.</p></div>
+      <p>The trap is structural: the regulatory test measures the sealed system, while the exposure happens during service.</p>
+      <div class="tags"><span class="pill">PFAS</span><span class="pill">cooling</span><span class="pill">TFA</span></div>
+    </div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="col after">
+    <div class="col-h"><span class="d"></span>after — editorial register (Fraunces, animated)</div>
+    <div class="frame" id="afterFrame">
+      <div class="ed-prog" id="edProg"></div>
+      <div class="ed-hero">
+        <span class="ed-kicker" data-enter>Global Analysis · Investigation</span>
+        <h1 data-enter>The PFAS <span class="hl">maintenance</span> trap.</h1>
+        <p class="ed-dek" data-enter>Data centers were told their cooling fluids were safe. The sealed-leak narrative missed the real vector — and the substitution chemistry quietly made it worse.</p>
+        <div class="ed-meta" data-enter><span><b>Apr 11, 2026</b></span><span>12 MIN READ</span><span>A26 · GLOBAL ANALYSIS</span></div>
+        <div class="ed-rule" data-enter></div>
+      </div>
+      <div class="ed-body">
+        <p class="drop" data-enter>Maintenance vapor release, not sealed leaks, is the genuine PFAS exposure path. Every drain-and-fill cycle vents a fraction of the fluid inventory that the data sheets never accounted for — and the industry's safety case was built on the sealed system, not the service event.</p>
+        <h2 data-enter><span class="ix">01</span> The vapor nobody measured</h2>
+        <p data-enter>The regulatory test measures a closed loop at steady state. The exposure happens during maintenance — when the loop is opened, drained, and refilled, venting vapor that no compliance sheet captures.</p>
+        <div class="ed-pull" data-enter><blockquote>"The test measures the sealed system. The exposure happens during service."</blockquote><cite>— Field maintenance review, 2026</cite></div>
+        <div class="ed-callout" data-enter><span class="lbl">Key finding</span><h4>"PFAS-free" is a label, not an outcome.</h4><p>HFO refrigerants marketed as PFAS-free degrade into TFA — a persistent breakdown product that re-enters the same waterways the substitution was meant to protect.</p></div>
+        <p data-enter>The trap is structural, not accidental: the measurement boundary and the exposure boundary are different surfaces. Close the gap and the "safe" substitution stops looking safe.</p>
+        <div class="ed-tags" data-enter><span class="ed-tag">PFAS</span><span class="ed-tag">cooling fluid</span><span class="ed-tag">TFA</span><span class="ed-tag">maintenance vector</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="note">RZ Dark System v1 · editorial register · article chrome only (body type stays Plex Sans) · noindex internal</div>
+
+<script>
+(function(){
+  /* staggered entrance */
+  var els=document.querySelectorAll('.after [data-enter]');
+  els.forEach(function(el,i){setTimeout(function(){el.classList.add('in');},120+i*90);});
+  /* read-progress on the after frame scroll */
+  var fr=document.getElementById('afterFrame'),pr=document.getElementById('edProg');
+  if(fr&&pr){fr.addEventListener('scroll',function(){var max=fr.scrollHeight-fr.clientHeight;pr.style.width=(max>0?(fr.scrollTop/max*100):0)+'%';});}
+})();
+</script>
+</body>
+</html>
