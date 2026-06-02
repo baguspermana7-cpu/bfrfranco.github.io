@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.43.8 — 2026-06-01 (codify RZ Dark System into design.md — Section 16)
+
+DOCS ship: folds the dark-mode design system into the brand bible as a
+permanent numbered chapter (was only a standalone standard + live demos).
+
+No page logic touched. audit-script-tags + audit-js-syntax + audit-version-stamp CLEAN.
+
+### Changed
+- **`documentation/design.md`** — new **Section 16 "Dark Mode — RZ Dark System v1"**:
+  why-it-exists, two-register principle (instrument + editorial, hybrid locked),
+  tokens, 6 motion primitives (with the probe-safe count-up + hard-settle rule),
+  anti-slop checklist, responsive rules, adoption order. Plus a Decision Log row
+  recording the 2026-06-01 dark-system decision.
+
+### Links
+- Implementation: `css/rz-dark.css` + `standarization/DARK_MODE_STANDARD.md`.
+- Live: `rz-style-lab.html` (picker), `rz-skin-gallery.html` (12-surface before/after),
+  `rz-cockpit-mockup.html`, `plan-dark-mode-standard.html` (PLAN 02).
+
+---
+
 ## v1.43.7 — 2026-06-01 (RZ Skin Gallery — before/after for all 12 surfaces + cockpit mockup)
 
 PATCH ship: comprehensive visual mockups for the dark-mode standard, per owner

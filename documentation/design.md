@@ -1885,6 +1885,73 @@ This is an append-only record of design decisions made for resistancezero.com, w
 | 2026-05-13 | Content strategy discipline codified in Section 1 | Brand voice must govern content structure (article openings, calculator copy, chart titles, error messages), not just visual aesthetics. Voice consistency reinforces brand authority. | Content strategy as informal convention (inconsistently applied across new pages added by different sessions) | Confirmed |
 | 2026-05-13 | Color token versioning protocol added to Section 5 | Token values must not drift silently. Documenting before/after hex, contrast ratio impact, and affected components makes color changes auditable and reversible. | Informal token changes without documentation (causes per-page drift when different sessions adjust the same token independently) | Confirmed |
 | 2026-05-13 | 6 appendices added to design.md (A through F) | Design system must be actionable, not just declarative. Checklists (Appendix A), token reference (B), standards citations (C), typographic specimens (D), naming conventions (E), and standarization relationship (F) make the strategic document operationally useful. | Separate operational docs (risk of drift from strategic intent) | Confirmed |
+| 2026-06-01 | RZ Dark System v1 — two registers (instrument + editorial), HYBRID split locked (§16) | Old dark mode read as generic "AI-slop". Two registers of one token system give cockpits an oscilloscope-instrument character and content an editorial-refined character while sharing signal-semantics + motion + responsive rules. Animated-on-load + distinctive type + anti-slop checklist make the dark surface unmistakably RZ. | One character everywhere (loses the cockpit-vs-content distinction), keep generic dark (rejected by owner as slop) | Confirmed |
+
+---
+
+## 16. Dark Mode — RZ Dark System v1
+
+> Added 2026-06-01. Full implementation reference: `css/rz-dark.css` + `standarization/DARK_MODE_STANDARD.md`. Live picker: `rz-style-lab.html`. Before/after gallery (12 surfaces): `rz-skin-gallery.html`.
+
+### 16.1 Why this exists
+
+The earlier dark mode read as generic "AI-slop": flat panels, static numbers, Inter/system type, rounded-everything, Anthropic-purple accents. Owner mandate (2026-05-26, ref raihankalla.id): the dark surface must feel **animated-on-load, distinctively typed, and intuitively responsive** — and unmistakably RZ.
+
+### 16.2 Core principle — two registers, one token system
+
+RZ has two page families. Each gets a **register** of the same system: identical structure, motion, and signal-semantics; different surface character. A page swaps register with a single attribute: `data-rz-register="instrument" | "editorial"`.
+
+| Register | Character | Display font | Radius | Atmosphere | Used on |
+|---|---|---|---|---|---|
+| **Instrument** (`instrument`) | Oscilloscope — phosphor-green/cyan | JetBrains Mono | 3px | graticule grid + scanlines + radial glow | cockpits (datahallAI, dc-conventional, chiller/water/fire/EPMS/ict), SLD/P&ID labs, market monitors |
+| **Editorial** (`editorial`) | Refined report | Fraunces (serif) | 10px | two calm radial washes, no grid | index, articles, hubs, plan landings, calculator marketing shells |
+
+**Decision LOCKED 2026-06-01: HYBRID** — instrument for cockpits, editorial for content. Not one character everywhere.
+
+### 16.3 Tokens
+
+Shared signal semantics (match §5 + ACCURACY_VALIDATION + ALARM_STATE): `--rz-ok` green / `--rz-warn` amber / `--rz-fault` red / `--rz-info` cyan. **Status colour always wins over domain colour** (a faulted cooling pipe renders fault-red, not cooling-cyan — see ALARM_STATE `resolveColor()`).
+
+```css
+[data-rz-register="instrument"]{ --rz-bg:#060A0D; --rz-accent:#22F5A8; --rz-accent2:#2BE8FF;
+  --rz-display:'JetBrains Mono'; --rz-radius:3px; }
+[data-rz-register="editorial"]{ --rz-bg:#0E0F12; --rz-accent:#E8B563; --rz-accent2:#6FBF9A;
+  --rz-display:'Fraunces'; --rz-radius:10px; }
+```
+
+### 16.4 Motion primitives (the "animated on load" requirement)
+
+Vanilla `requestAnimationFrame`, cubic-ease, 1.3–1.5s, all honour `prefers-reduced-motion`. **Probe-safe rule for engine-bound KPIs: capture the exact original string and restore it verbatim at animation end, plus a `setTimeout` hard-settle** so a backgrounded tab never freezes a wrong basis value (lesson from v1.43.5).
+
+| Primitive | Mechanism | Used for |
+|---|---|---|
+| trace-in | `stroke-dashoffset` L→0 + sweep dot | line / waveform |
+| plot-in | path draw + area fade | schematic area |
+| grow | bar height 0→full, staggered | bar readouts |
+| count-up | rAF number interpolation + hard-settle | KPI values |
+| sweep | donut `stroke-dasharray` arc | ratio / share |
+| stagger reveal | `[data-enter]` + IntersectionObserver | section entrance |
+
+### 16.5 Anti-slop checklist (every dark page must pass)
+
+1. ❌ static numbers → ✓ count-up / trace-in on load
+2. ❌ Inter/system character font → ✓ Plex + JetBrains + Fraunces
+3. ❌ Anthropic-purple / Tailwind-default / blue→purple gradient → ✓ signal tokens
+4. ❌ rounded-everything → ✓ 3px instrument / 10px editorial
+5. ❌ flat dead panels → ✓ graticule (instrument) / calm wash (editorial)
+6. ❌ glassmorphism / neumorphism / dot-grid noise / cursor-tilt
+7. ❌ decorative motion with no meaning → ✓ motion encodes data/state or one orchestrated load reveal
+
+### 16.6 Responsive
+
+Switcher/nav → horizontal scroll strip < 760px; KPI strips 4→2→1 col; charts full-bleed (`viewBox` + `preserveAspectRatio`, never fixed-px); touch targets ≥ 44px; ≥7/10 on `audit-mobile-responsive.py`.
+
+### 16.7 Adoption order
+
+1. ✓ v1.43.5 — `#p-dash` count-up primitive (datahallAI), probe-safe.
+2. ✓ v1.43.6 — editorial register on `plan-dark-mode-standard.html`.
+3. ✓ v1.43.7 — full 12-surface before/after gallery + cockpit semantic-preservation mockup.
+4. ⏳ cockpit instrument re-skin — apply atmosphere/type/panel-chrome ADDITIVELY; preserve semantic SLD feed-A/B + alarm colours; engine + `#p-dash` byte-identical; 75/75 accuracy probe must stay green. Show before/after mockup before any live edit.
 
 ---
 
