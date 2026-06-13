@@ -96,6 +96,25 @@
   footer .frow{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
 
   @media (max-width:680px){ .topbar .tnav{display:none;} }
+
+  /* hero lifecycle flow */
+  .hubflow{margin-top:2rem;border:1px solid var(--line-strong);border-radius:14px;background:var(--bg-2);padding:1.1rem 1.2rem;box-shadow:0 16px 40px rgba(0,0,0,0.35);}
+  .hubflow .hfh{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.8rem;}
+  .hubflow .steps{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;}
+  .hubflow .hstep{flex:1;min-width:140px;border:1px solid var(--line);border-top:2px solid var(--hc,var(--cyan));border-radius:9px;background:var(--panel);padding:0.7rem 0.8rem;}
+  .hubflow .hstep .hi{font-family:var(--mono);font-size:0.6rem;color:var(--hc,var(--cyan));font-weight:700;letter-spacing:0.05em;}
+  .hubflow .hstep .ht{font-size:0.86rem;font-weight:700;color:var(--text-strong);margin:0.25rem 0 0.2rem;}
+  .hubflow .hstep .hd{font-size:0.72rem;color:var(--muted);line-height:1.4;}
+  .hubflow .harr{display:flex;align-items:center;justify-content:center;padding:0 0.5rem;color:var(--dim);font-size:1.1rem;}
+  @media(max-width:680px){.hubflow .harr{transform:rotate(90deg);padding:0.3rem 0;width:100%;}.hubflow .steps{flex-direction:column;}}
+
+  /* registry card thumbnail — top strip */
+  .planthumb{display:flex;align-items:center;gap:0.7rem;border:1px solid var(--line);border-radius:8px;background:var(--bg-2);padding:0.45rem 0.7rem;margin-bottom:0.85rem;}
+  .planthumb .pt-ic{font-family:var(--mono);font-weight:800;font-size:1.1rem;color:var(--accent,var(--cyan));line-height:1;}
+  .planthumb .pt-bars{display:flex;gap:3px;flex:1;align-items:center;}
+  .planthumb .pt-bars span{flex:1;height:6px;border-radius:2px;background:var(--accent,var(--cyan));opacity:0.85;}
+  .planthumb.slot{border-style:dashed;opacity:0.55;}
+  .planthumb .pt-lab{font-family:var(--mono);font-size:0.56rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -126,6 +145,20 @@
       standing surface where plans get discussed before anything is built. New plans are added here
       across sessions; the registry below grows over time.
     </p>
+
+    <!-- how Plan B works -->
+    <div class="hubflow">
+      <div class="hfh">How a plan moves through Plan B</div>
+      <div class="steps">
+        <div class="hstep" style="--hc:var(--amber);"><div class="hi">01 · IDEA</div><div class="ht">A concept lands</div><div class="hd">A strategic idea or refinement for RZ surfaces in a session.</div></div>
+        <div class="harr">→</div>
+        <div class="hstep" style="--hc:var(--cyan);"><div class="hi">02 · PLAN PAGE</div><div class="ht">Its own page</div><div class="hd">A <code>plan-&lt;topic&gt;.html</code> with options + examples + visual mockups + before/after.</div></div>
+        <div class="harr">→</div>
+        <div class="hstep" style="--hc:var(--violet);"><div class="hi">03 · DISCUSS</div><div class="ht">Decisions converge</div><div class="hd">Open questions answered here; an option gets chosen.</div></div>
+        <div class="harr">→</div>
+        <div class="hstep" style="--hc:var(--green);"><div class="hi">04 · PROMOTE</div><div class="ht">Becomes standard</div><div class="hd">Agreed plan folds into <code>standarization/</code> + memory; the build track executes it.</div></div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -161,6 +194,7 @@
     <div class="reg">
 
       <a class="plan" href="plan-ecc-adoption.html" style="--accent:var(--cyan);">
+        <div class="planthumb"><div class="pt-ic">⌗</div><div class="pt-bars"><span></span><span style="opacity:0.5;"></span><span></span><span style="opacity:0.5;"></span><span></span><span style="opacity:0.5;"></span><span></span></div><div class="pt-lab">7-layer stack</div></div>
         <div class="top">
           <span class="pid">PLAN 01 · architecture</span>
           <span class="st live">● Live · 3 options + examples</span>
@@ -175,6 +209,7 @@
       </a>
 
       <a class="plan" href="plan-dark-mode-standard.html" style="--accent:var(--cyan);">
+        <div class="planthumb"><div class="pt-ic">◐</div><div class="pt-bars"><span style="background:var(--cyan);"></span><span style="background:var(--green);"></span><span style="background:var(--amber);"></span><span style="background:var(--violet);"></span></div><div class="pt-lab">4 variants</div></div>
         <div class="top">
           <span class="pid">PLAN 02 · design system</span>
           <span class="st live">● Live · 4 variants + before/after</span>
@@ -186,6 +221,7 @@
       </a>
 
       <div class="plan slot" style="--accent:var(--amber);">
+        <div class="planthumb slot"><div class="pt-ic">⌁</div><div class="pt-bars"><span></span><span style="opacity:0.4;"></span><span style="opacity:0.4;"></span></div><div class="pt-lab">reserved</div></div>
         <div class="top">
           <span class="pid">PLAN 03 · reserved</span>
           <span class="st slot">○ Slot — awaiting authoring</span>
@@ -197,6 +233,7 @@
       </div>
 
       <div class="plan slot" style="--accent:var(--green);">
+        <div class="planthumb slot"><div class="pt-ic">⑂</div><div class="pt-bars"><span></span><span style="opacity:0.4;"></span></div><div class="pt-lab">reserved</div></div>
         <div class="top">
           <span class="pid">PLAN 04 · reserved</span>
           <span class="st slot">○ Slot — awaiting authoring</span>
