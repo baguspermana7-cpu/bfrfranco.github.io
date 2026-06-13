@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.43.11 — 2026-06-01 (article editorial skin — batch 2: articles 23, 24, 25, 1)
+
+Third wave of the article editorial-register rollout. Same one-line-per-page
+opt-in via the shared `css/rz-article-dark.css`; each article keeps its series
+accent.
+
+No cockpit/engine touched. Light mode unchanged (dark-scoped). Gates CLEAN.
+All four headless-verified (Fraunces title, read-progress, correct accent,
+NONE errors).
+
+### Changed (editorial-register opt-in)
+- **`article-23.html`** — xAI Colossus — red `#dc2626`
+- **`article-24.html`** — manpower shortage — green `#059669`
+- **`article-25.html`** — PJM grid crisis — deep red `#b91c1c`
+- **`article-1.html`** — When Nothing Happens — navy `#1e3a5f`
+
+### Progress
+- Articles on editorial register: 9 / 28 (26 pilot + 19/20/21/22 + 23/24/25/1).
+  Remaining 19 to follow in batches.
+
+---
+
 ## v1.43.10 — 2026-06-01 (article editorial skin — batch 1: articles 19–22)
 
 Second wave of the article editorial-register rollout. Four articles opted in
