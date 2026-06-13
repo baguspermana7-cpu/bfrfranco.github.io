@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.43.10 — 2026-06-01 (article editorial skin — batch 1: articles 19–22)
+
+Second wave of the article editorial-register rollout. Four articles opted in
+via the shared `css/rz-article-dark.css` (one-line-per-page pattern), each
+keeping its series accent.
+
+No cockpit/engine touched. Light mode unchanged (skin dark-scoped). Gates CLEAN.
+All four headless-verified (Fraunces serif title, read-progress bar, correct
+accent, NONE errors).
+
+### Changed (editorial-register opt-in)
+- **`article-19.html`** — Singapore vs Batam — cyan `#0891b2`
+- **`article-20.html`** — AI water use — red `#dc2626`
+- **`article-21.html`** — Nuclear SMRs — green `#059669`
+- **`article-22.html`** — NVIDIA photonics — cyan `#0891b2`
+
+Each: `<html data-rz-register="editorial" style="--rz-art-accent:…">` + Fraunces/
+Plex fonts + `rz-article-dark.css` + `rz-article-editorial.js`. Structure +
+light mode untouched.
+
+### Progress
+- Articles on editorial register: 5 / 28 (26 pilot + 19/20/21/22). Remaining 23
+  to follow in batches of ~4, each with its series accent.
+
+---
+
 ## v1.43.9 — 2026-06-01 (article editorial skin + article-26 pilot)
 
 Owner directed the skin rollout at ARTICLES (content), not the DC AI / DC
