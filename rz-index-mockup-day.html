@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Index — day / light-mode options (review)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* light / day palette — warm paper, single warm-amber accent, ink mono for precision */
+  :root{--paper:#FAF8F3;--panel:#FFFFFF;--ink:#23262B;--body:#50555E;--muted:#8A8F98;
+        --amber:#B07A1E;--amber-deep:#946312;--green2:#4E8A6B;--hair:rgba(40,30,10,.16);--hair2:rgba(40,30,10,.09);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#EFEBE2;color:var(--body);font-family:'IBM Plex Mono',monospace;padding:22px;}
+  .lead{max-width:1080px;margin:0 auto 22px;}
+  .lead .k{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber-deep);display:inline-flex;gap:.5rem;align-items:center;}
+  .lead .k::before{content:'';width:22px;height:1px;background:var(--amber);}
+  .lead h1{font-family:'Fraunces',Georgia,serif;color:var(--ink);font-size:clamp(1.5rem,3.4vw,2.2rem);font-weight:500;margin:.55rem 0 .4rem;letter-spacing:-.01em;}
+  .lead p{color:#6b7079;font-size:.88rem;max-width:80ch;line-height:1.6;}
+  .lead p b{color:#3b3f47;}
+  .opts{max-width:1080px;margin:0 auto;display:grid;gap:18px;}
+  .opt{border:1px solid var(--hair);border-radius:9px;overflow:hidden;background:var(--panel);box-shadow:0 1px 3px rgba(40,30,10,.05);}
+  .opt > .oh{display:flex;align-items:baseline;gap:.7rem;padding:.75rem 1rem;border-bottom:1px solid var(--hair);flex-wrap:wrap;background:#FCFBF8;}
+  .opt > .oh .on{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--amber-deep);letter-spacing:.08em;}
+  .opt > .oh h2{font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--ink);font-weight:600;}
+  .opt > .oh .ch{margin-left:auto;font-size:.56rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border:1px solid var(--hair);border-radius:4px;padding:.14rem .5rem;}
+  .stage{padding:0;}
+  .note{padding:.65rem 1rem;border-top:1px solid var(--hair);font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);line-height:1.6;background:#FCFBF8;}
+  .note b{color:#5c616a;}
+  /* shared hero scaffold */
+  .hero{position:relative;padding:34px 30px;min-height:300px;display:grid;grid-template-columns:1.5fr .9fr;gap:26px;align-items:center;overflow:hidden;}
+  @media(max-width:720px){.hero{grid-template-columns:1fr;padding:24px 20px;}}
+  .stat{font-variant-numeric:tabular-nums;}
+  .ph{border-radius:10px;min-height:210px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;}
+  .ctaR{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .cta{border:0;padding:10px 18px;font-size:.74rem;font-weight:700;letter-spacing:.03em;cursor:pointer;}
+  .cta.sec{background:transparent;}
+
+  /* ===== A · WARM PAPER EDITORIAL ===== */
+  .A{background:#FAF8F3;font-family:'IBM Plex Sans',system-ui,sans-serif;}
+  .A::before{content:'';position:absolute;inset:0;background:radial-gradient(560px 260px at 86% -16%,rgba(176,122,30,.07),transparent 64%),radial-gradient(460px 240px at 4% 116%,rgba(78,138,107,.05),transparent 66%);pointer-events:none;}
+  .A>*{position:relative;}
+  .A .kick{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:#7a7f88;display:inline-flex;gap:.5rem;align-items:center;}
+  .A .kick::before{content:'';width:22px;height:1px;background:var(--amber);}
+  .A h3{font-family:'Fraunces',Georgia,serif;color:var(--ink);font-size:clamp(2rem,4.6vw,3.2rem);font-weight:500;line-height:1.04;letter-spacing:-.015em;margin:.5rem 0 .55rem;}
+  .A h3 em{font-style:italic;color:var(--amber-deep);}
+  .A .bio{color:#5a5f68;font-size:1rem;line-height:1.6;max-width:46ch;}
+  .A .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px;}
+  .A .stat .v{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--ink);font-weight:500;}
+  .A .stat .l{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:#7a7f88;margin-top:1px;}
+  .A .cta{border-radius:8px;background:var(--amber);color:#fff;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
+  .A .cta.sec{border:1px solid var(--amber);color:var(--amber-deep);}
+  .A .ph{background:linear-gradient(155deg,#f1ece2,#e6dfd1);border:1px solid rgba(176,122,30,.2);color:#a99b82;}
+
+  /* ===== B · BLUEPRINT INSTRUMENT ===== */
+  .B{background:#F4F2EC;font-family:'IBM Plex Mono',monospace;}
+  .B::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(40,55,75,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(40,55,75,.07) 1px,transparent 1px);background-size:30px 30px;-webkit-mask-image:radial-gradient(130% 100% at 50% 0%,#000 34%,transparent 92%);mask-image:radial-gradient(130% 100% at 50% 0%,#000 34%,transparent 92%);pointer-events:none;}
+  .B>*{position:relative;}
+  .B .kick{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#6c7682;display:inline-flex;gap:.5rem;align-items:center;}
+  .B .kick::before{content:'';width:20px;height:1px;background:var(--amber);}
+  .B h3{font-family:'JetBrains Mono',monospace;color:var(--ink);font-size:clamp(1.7rem,4vw,2.7rem);font-weight:700;line-height:1.08;letter-spacing:-.02em;margin:.5rem 0 .5rem;}
+  .B h3 span{color:var(--amber-deep);}
+  .B .bio{color:#5a626c;font-size:.9rem;line-height:1.6;max-width:48ch;}
+  .B .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px;}
+  @media(max-width:520px){.B .stats{grid-template-columns:repeat(2,1fr);}}
+  .B .stat{border:1px solid rgba(40,55,75,.18);border-radius:3px;background:#FBFAF7;padding:9px 10px;position:relative;overflow:hidden;}
+  .B .stat::after{content:'';position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,var(--amber),transparent);opacity:.6;}
+  .B .stat .v{font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:var(--ink);}
+  .B .stat .l{font-size:.52rem;letter-spacing:.05em;text-transform:uppercase;color:#7a828d;margin-top:1px;}
+  .B .cta{border-radius:3px;background:var(--ink);color:#FAF8F3;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+  .B .cta.sec{border:1px solid var(--ink);color:var(--ink);}
+  .B .ph{background:#FBFAF7;border:1px solid rgba(40,55,75,.18);color:#9aa4ae;}
+  .B .ph svg{width:100%;height:auto;}
+
+  /* ===== C · HYBRID — aligned, one accent (amber), one grid (day twin of the dark pick) ===== */
+  .C{background:#FAF8F3;font-family:'IBM Plex Sans',system-ui,sans-serif;}
+  .C::before{content:'';position:absolute;inset:0;background:radial-gradient(560px 260px at 88% -16%,rgba(176,122,30,.07),transparent 64%);pointer-events:none;}
+  .C>*{position:relative;}
+  /* one shared left rule ties kicker → headline → readout → cta to a single grid */
+  .C .col{padding-left:18px;border-left:1px solid rgba(176,122,30,.34);}
+  .C .kick{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#7a7f88;display:inline-flex;gap:.5rem;align-items:center;}
+  .C .kick::before{content:'';width:20px;height:1px;background:var(--amber);}
+  .C h3{font-family:'Fraunces',Georgia,serif;color:var(--ink);font-size:clamp(2rem,4.5vw,3.1rem);font-weight:500;line-height:1.05;letter-spacing:-.015em;margin:.55rem 0 .5rem;}
+  .C h3 em{font-style:italic;color:var(--amber-deep);}
+  .C .bio{color:#5a5f68;font-size:.98rem;line-height:1.6;max-width:46ch;}
+  /* readout: full-width hairline-ruled row, flush to the same left edge — precision, warm palette, mono tabular */
+  .C .stats{display:flex;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(176,122,30,.28);border-bottom:1px solid rgba(176,122,30,.13);}
+  .C .stat{padding:11px 22px 11px 0;margin-right:22px;font-family:'IBM Plex Mono',monospace;position:relative;}
+  .C .stat + .stat{border-left:1px solid rgba(176,122,30,.16);padding-left:22px;}
+  .C .stat .v{font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .C .stat .l{font-size:.54rem;letter-spacing:.07em;text-transform:uppercase;color:#7a7f88;margin-top:2px;}
+  .C .stat .v::after{content:'';display:block;width:14px;height:2px;background:var(--amber);opacity:.7;margin-top:5px;}
+  .C .cta{border-radius:7px;background:var(--amber);color:#fff;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
+  .C .cta.sec{border:1px solid var(--amber);color:var(--amber-deep);}
+  .C .ph{background:linear-gradient(155deg,#f1ece2,#e6dfd1);border:1px solid rgba(176,122,30,.2);color:#a99b82;}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <span class="k">RZ Day · index options</span>
+  <h1>Portfolio homepage — light mode, three aligned characters.</h1>
+  <p>The dark-mode pick is locked (Hybrid — aligned). <b>Day mode must be its twin, not a separate look.</b> These three light directions mirror the dark trio one-for-one (Editorial / Instrument / Hybrid) so the toggle feels like a lamp turning on, not a different site. Same single warm-amber accent, same one-grid alignment, same mono readout — re-toned for paper. Pick the day character; for a coherent toggle, match the dark choice (→ <b>C</b>).</p>
+</div>
+
+<div class="opts">
+
+  <!-- OPTION A -->
+  <div class="opt">
+    <div class="oh"><span class="on">DAY A</span><h2>Warm Paper Editorial</h2><span class="ch">paper · serif · calm</span></div>
+    <div class="stage"><div class="hero A">
+      <div>
+        <span class="kick">Engineering Operations Leader · Bekasi, ID</span>
+        <h3>Bagus Dwi&nbsp;Permana — the operator <em>behind</em> the data center.</h3>
+        <p class="bio">Mission-critical reliability, cooling, and power — plus the calculators and knowledge graph that make the work legible.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" data-cu="12" data-suf="+">0</div><div class="l">yrs mission-critical</div></div>
+          <div class="stat"><div class="v" data-cu="28" data-suf="">0</div><div class="l">tools shipped</div></div>
+          <div class="stat"><div class="v" data-cu="27" data-suf="">0</div><div class="l">field articles</div></div>
+          <div class="stat"><div class="v" data-txt="CDFOM">CDFOM</div><div class="l">certified</div></div>
+        </div>
+        <div class="ctaR"><button class="cta">View work</button><button class="cta sec">Insights</button></div>
+      </div>
+      <div class="ph">[ portrait ]</div>
+    </div></div>
+    <div class="note"><b>Character:</b> warm paper magazine. Fraunces serif + italic amber accent on off-white, calm radial wash, mono labels. Lowest-risk day twin of dark Option A — but the quietest "engineering" signal, and a little soft next to the current bento homepage.</div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="opt">
+    <div class="oh"><span class="on">DAY B</span><h2>Blueprint Instrument</h2><span class="ch">ink grid · mono · amber</span></div>
+    <div class="stage"><div class="hero B">
+      <div>
+        <span class="kick">Operator intelligence · mission-critical</span>
+        <h3>BAGUS DWI <span>PERMANA</span></h3>
+        <p class="bio">The instrument behind the data center — reliability, cooling, power, and a living knowledge graph for engineering operations.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" data-cu="12" data-suf="+">0</div><div class="l">yrs ops</div></div>
+          <div class="stat"><div class="v" data-cu="28" data-suf="">0</div><div class="l">tools</div></div>
+          <div class="stat"><div class="v" data-cu="99" data-suf=".99%">0</div><div class="l">uptime defended</div></div>
+          <div class="stat"><div class="v" data-cu="27" data-suf="">0</div><div class="l">articles</div></div>
+        </div>
+        <div class="ctaR"><button class="cta">Enter cockpits</button><button class="cta sec">Labs</button></div>
+      </div>
+      <div class="ph"><svg viewBox="0 0 220 150" aria-hidden="true"><path id="tr" d="" fill="none" stroke="#B07A1E" stroke-width="2"/><circle id="trd" r="3.2" fill="#946312"/></svg></div>
+    </div></div>
+    <div class="note"><b>Character:</b> engineering blueprint. JetBrains Mono display, faint ink graticule, amber accent + ink-filled CTA, instrument KPI cells, animated trace. Day twin of dark Option B — strongest engineering identity, but treats a personal portfolio like a drawing sheet (can read cold for non-technical visitors).</div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="opt">
+    <div class="oh"><span class="on">DAY C</span><h2>Hybrid — aligned <span style="color:var(--amber-deep)">★ matches dark pick</span></h2><span class="ch">one accent · one grid · serif + mono</span></div>
+    <div class="stage"><div class="hero C">
+      <div class="col">
+        <span class="kick">Engineering Operations Leader · Bekasi, ID</span>
+        <h3>Bagus Dwi&nbsp;Permana — engineering <em>operations</em>, instrumented.</h3>
+        <p class="bio">Hyperscale reliability, cooling, and power — paired with the calculators, labs, and knowledge graph behind the work.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" data-cu="12" data-suf="+">0</div><div class="l">yrs ops</div></div>
+          <div class="stat"><div class="v" data-cu="28" data-suf="">0</div><div class="l">tools</div></div>
+          <div class="stat"><div class="v" data-cu="27" data-suf="">0</div><div class="l">articles</div></div>
+          <div class="stat"><div class="v" data-txt="CDFOM">CDFOM</div><div class="l">certified</div></div>
+        </div>
+        <div class="ctaR"><button class="cta">View work</button><button class="cta sec">Cockpits &amp; labs</button></div>
+      </div>
+      <div class="ph">[ portrait ]</div>
+    </div></div>
+    <div class="note"><b>Recommended — exact day twin of the dark pick.</b> Same one accent (warm amber, no second colour), same calm wash, same single left rule tying kicker → name → readout → CTA to one grid. Instrument character comes only from <b>mono tabular numerals + hairline precision + amber baseline ticks</b>; Fraunces serif name carries the warmth. Toggling day↔night re-tones the <i>same</i> layout — a lamp turning on, not a different page. <b>Pick this for a coherent toggle.</b></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  function ease(k){return 1-Math.pow(1-k,3);}
+  function run(el){
+    var target=+el.getAttribute('data-cu'),suf=el.getAttribute('data-suf')||'',st=null,dur=1300;
+    function fr(t){if(!st)st=t;var k=Math.min((t-st)/dur,1);el.textContent=Math.round(target*ease(k))+suf;if(k<1)requestAnimationFrame(fr);else el.textContent=target+suf;}
+    requestAnimationFrame(fr);
+  }
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  document.querySelectorAll('[data-cu]').forEach(function(el){
+    if(reduce){el.textContent=el.getAttribute('data-cu')+(el.getAttribute('data-suf')||'');return;}
+    run(el);
+  });
+  // option B trace
+  var svg=document.getElementById('tr');
+  if(svg){
+    var w=220,h=150,n=26,pad=12,vals=[];var s=7;
+    for(var i=0;i<n;i++){s=(s*9301+49297)%233280;vals.push(0.3+ (s/233280)*0.55);}
+    var d='';for(var j=0;j<n;j++){var x=pad+j*((w-pad*2)/(n-1)),y=h-pad-(h-pad*2)*vals[j];d+=(j?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+    svg.setAttribute('d',d);
+    var dot=document.getElementById('trd'),L=svg.getTotalLength();
+    if(isFinite(L)&&L>0&&!reduce){
+      svg.style.strokeDasharray=L;svg.style.strokeDashoffset=L;var st=null;
+      (function fr(t){if(!st)st=t;var k=Math.min((t-st)/1500,1),e=ease(k);svg.style.strokeDashoffset=L*(1-e);var p=svg.getPointAtLength(L*e);dot.setAttribute('cx',p.x);dot.setAttribute('cy',p.y);if(k<1)requestAnimationFrame(fr);})();
+    } else if(dot){var p=svg.getPointAtLength(L||0);dot.setAttribute('cx',p?p.x:0);dot.setAttribute('cy',p?p.y:0);}
+  }
+})();
+</script>
+</body>
+</html>
