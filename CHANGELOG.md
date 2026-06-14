@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.43.15 — 2026-06-14 (article editorial skin — geopolitics series 1–3)
+
+Extends the editorial-register rollout to the Geopolitics series children
+(same standard `.article-*` template as articles 1–26). Landing pages
+(`geopolitics.html`, `future-forward.html`) use bespoke templates and are
+out of scope here.
+
+No cockpit/engine touched. Light mode unchanged (dark-scoped). Gates CLEAN.
+All three headless-verified (Fraunces title, read-progress, accent, NONE errors).
+
+### Changed (editorial-register opt-in)
+- **`geopolitics-1.html`** — 72-Hour Warning — green `#059669`
+- **`geopolitics-2.html`** — $50T Shift — green `#059669`
+- **`geopolitics-3.html`** — Hormuz Fiber Shock — deep red `#991b1b`
+
+### Progress
+- Standard-template articles + geopolitics children on the editorial register:
+  31 pages (28 articles + geopolitics-1/2/3).
+
+---
+
 ## v1.43.14 — 2026-06-14 (index dark-mode polish)
 
 ### Changed
