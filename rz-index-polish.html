@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Index — polish (same character, better) · before vs after</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#070A0E;color:#9aa4ae;font-family:'Inter',system-ui,sans-serif;padding:20px;}
+  .lead{max-width:1180px;margin:0 auto 20px;}
+  .lead .k{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#34d399;display:inline-flex;gap:.5rem;align-items:center;}
+  .lead .k::before{content:'';width:22px;height:1px;background:#34d399;}
+  .lead h1{font-weight:800;color:#EAF1F6;font-size:clamp(1.5rem,3.4vw,2.2rem);margin:.55rem 0 .4rem;letter-spacing:-.02em;}
+  .lead p{color:#7c8590;font-size:.9rem;max-width:84ch;line-height:1.65;}
+  .lead p b{color:#c3ccd4;}
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .frame{border:1px solid #1b2630;border-radius:10px;overflow:hidden;margin-bottom:20px;background:#0A0E13;}
+  .fh{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid #1b2630;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.2rem .6rem;border-radius:4px;}
+  .badge.b{background:rgba(148,163,184,.14);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
+  .badge.a{background:rgba(52,211,153,.14);color:#34d399;border:1px solid rgba(52,211,153,.4);}
+  .fh .ft{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#c3ccd4;}
+  .fh .replay{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#8aa093;background:transparent;border:1px solid #2a3744;border-radius:5px;padding:.32rem .7rem;cursor:pointer;transition:all .2s;}
+  .fh .replay:hover{border-color:#34d399;color:#34d399;}
+  .stage{padding:18px;}
+  .note{padding:.7rem 1rem;border-top:1px solid #1b2630;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#6b7d8f;line-height:1.7;}
+  .note b{color:#9fb3c4;}
+  .note .bad{color:#d98a8a;}.note .good{color:#7fcfa3;}
+
+  /* ============ shared bento scaffold ============ */
+  .bento{display:grid;gap:14px;}
+  .row1{grid-template-columns:3fr 1.15fr;}
+  .row2{grid-template-columns:repeat(4,1fr);}
+  .row3{grid-template-columns:2fr 1fr 1fr;}
+  @media(max-width:760px){.row1,.row2,.row3{grid-template-columns:1fr 1fr;}.bento .ident{grid-column:1/-1;}}
+  @media(max-width:460px){.row1,.row2,.row3{grid-template-columns:1fr;}}
+  .card{position:relative;overflow:hidden;display:flex;flex-direction:column;}
+  .ident{justify-content:space-between;min-height:15rem;}
+  .num{font-variant-numeric:tabular-nums;}
+  .enter{opacity:0;transform:translateY(12px);}
+  .enter.in{opacity:1;transform:none;transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1);}
+  @media(prefers-reduced-motion:reduce){.enter{opacity:1!important;transform:none!important;}}
+
+  /* ============ BEFORE — current dark homepage (faithful) ============ */
+  .before .card{background:#131e2e;border:1px solid rgba(255,255,255,.07);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.4);padding:1.4rem;}
+  .before .ident{padding:2.2rem;border-radius:12px;}
+  .before .exp{border-radius:16px;}
+  .before .tag{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:#cbd5e1;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:4px;margin-bottom:10px;display:block;}
+  .before .name{font-size:clamp(2rem,4.6vw,3.2rem);font-weight:700;letter-spacing:-.03em;color:#f1f5f9;line-height:1.1;margin-bottom:1rem;}
+  .before .desc{color:#cbd5e1;font-size:1rem;line-height:1.7;max-width:42ch;font-weight:500;}
+  .before .acc{color:#34d399;}
+  .before .ctaR{display:flex;gap:.8rem;margin-top:1.3rem;flex-wrap:wrap;}
+  .before .cta{background:#34d399;color:#0f172a;padding:.6rem 1.4rem;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;border-radius:6px;border:0;cursor:pointer;}
+  .before .cta.o{background:transparent;border:1px solid rgba(255,255,255,.18);color:#e0e6ef;}
+  .before .photo{background:linear-gradient(160deg,#1c2a3d,#131e2e);border-radius:12px;min-height:15rem;display:flex;align-items:center;justify-content:center;color:#3d5266;font-family:'JetBrains Mono',monospace;font-size:.58rem;}
+  .before .big{font-size:1.9rem;font-weight:700;color:#e0e6ef;}
+  .before .lbl{font-size:.62rem;color:#94a3b8;margin-top:.2rem;}
+  .before .role{font-weight:700;color:#e0e6ef;font-size:.92rem;margin:.2rem 0;}
+  .before .meta{font-size:.72rem;color:#94a3b8;}
+
+  /* ============ AFTER — SAME character, polished dark (premium surfaces, color kept, motion) ============ */
+  .after{--em:#34d399;}
+  .after-bg{position:relative;background:#0A0D13;border-radius:12px;padding:18px;overflow:hidden;}
+  .after-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(900px 380px at 18% -8%,rgba(52,211,153,.07),transparent 60%),radial-gradient(700px 320px at 92% 108%,rgba(139,92,246,.05),transparent 62%);pointer-events:none;}
+  .after .bento{position:relative;}
+  /* premium card: layered elevation, inner top highlight, per-card accent */
+  .after .card{
+    --acc:#4a90b8;
+    background:linear-gradient(180deg,#161C27,#121823);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;padding:1.5rem;
+    box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 1px 2px rgba(0,0,0,.5),0 14px 30px -18px rgba(0,0,0,.7);
+    transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s;
+  }
+  /* accent corner glow per card */
+  .after .card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:var(--acc);opacity:.10;filter:blur(34px);pointer-events:none;transition:opacity .35s;}
+  .after .card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--acc) 55%,transparent);box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -20px var(--acc);}
+  .after .card:hover::after{opacity:.2;}
+  .after .ident{--acc:#34d399;padding:2.3rem;min-height:15rem;background:linear-gradient(160deg,#172033,#121826 60%);}
+  .after .tag{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:#8fb9d0;text-transform:uppercase;letter-spacing:.14em;display:inline-flex;align-items:center;gap:.45rem;margin-bottom:.85rem;}
+  .after .tag::before{content:'';width:16px;height:2px;border-radius:2px;background:var(--acc);}
+  .after .name{font-weight:800;font-size:clamp(2.2rem,4.9vw,3.5rem);letter-spacing:-.035em;line-height:1.05;color:#F4F7FB;margin-bottom:1rem;}
+  .after .name b{color:var(--em);font-weight:800;}
+  .after .desc{color:#aeb9c6;font-size:1.02rem;line-height:1.65;max-width:42ch;font-weight:450;}
+  .after .desc .acc{color:var(--em);font-weight:600;}
+  .after .ctaR{display:flex;gap:.75rem;margin-top:1.4rem;flex-wrap:wrap;}
+  .after .cta{background:var(--em);color:#072014;padding:.68rem 1.5rem;font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;border-radius:8px;border:0;cursor:pointer;box-shadow:0 6px 18px -8px rgba(52,211,153,.6);transition:transform .2s,box-shadow .2s;}
+  .after .cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px -8px rgba(52,211,153,.7);}
+  .after .cta.o{background:transparent;border:1px solid rgba(255,255,255,.16);color:#dbe3ec;box-shadow:none;}
+  .after .cta.o:hover{border-color:var(--em);color:var(--em);}
+  /* photo card refined */
+  .after .photo{--acc:#8b5cf6;position:relative;min-height:15rem;border-radius:14px;background:linear-gradient(160deg,#1d2438,#141a2a);display:flex;align-items:flex-end;padding:1rem;overflow:hidden;}
+  .after .photo::before{content:'';position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0,rgba(139,92,246,.18),transparent 70%);}
+  .after .photo .chip{position:relative;font-family:'JetBrains Mono',monospace;font-size:.54rem;letter-spacing:.06em;color:#cbd5e1;background:rgba(10,14,20,.55);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:.3rem .7rem;display:inline-flex;align-items:center;gap:.4rem;backdrop-filter:blur(4px);}
+  .after .photo .chip i{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399;}
+  /* metric cards — colored numbers + accent bar */
+  .after .mtag{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:#7e8b9a;text-transform:uppercase;letter-spacing:.12em;}
+  .after .role{font-weight:700;color:#e7edf4;font-size:.94rem;margin:.4rem 0 .15rem;}
+  .after .meta{font-size:.72rem;color:#8593a3;}
+  .after .big{font-weight:800;font-size:1.95rem;color:var(--acc);letter-spacing:-.02em;margin-top:.5rem;}
+  .after .lbl{font-size:.6rem;color:#8593a3;text-transform:uppercase;letter-spacing:.08em;margin-top:.1rem;}
+  .after .bar{height:4px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:.7rem;overflow:hidden;}
+  .after .bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--acc);transition:width 1.2s cubic-bezier(.2,.7,.2,1);}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <span class="k">RZ Index · polish (same character)</span>
+  <h1>Keep the homepage you like — just make it premium. Before vs after, both animated.</h1>
+  <p>No reskin, no mono, no serif. <b>Same colourful bento, same emerald, same rounded cards + photo.</b> The "after" only raises the <b>quality of dark mode</b>: deeper layered surfaces with soft elevation + inner highlight, each card keeps its <b>accent colour</b> (now a tasteful corner glow + coloured KPI + accent bar instead of an invisible 6% wash), refined type rhythm, and a <b>lift-on-hover</b>. Plus a gentle <b>load animation</b> — cards stagger up, numbers count up, bars grow. Tap <b>▸ replay</b>. Character untouched; it just looks finished.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- BEFORE -->
+  <div class="frame">
+    <div class="fh"><span class="badge b">Before</span><span class="ft">current index.html · dark mode</span><button class="replay" data-replay="before">▸ replay</button></div>
+    <div class="stage">
+      <div class="bento before" id="before">
+        <div class="bento row1" style="display:grid;gap:14px;">
+          <div class="card ident enter">
+            <div><span class="tag">Mission Critical Leadership</span>
+              <div class="name">Bagus Dwi Permana</div>
+              <p class="desc">Engineering Operations Leader with 12+ years in <span class="acc">hyperscale data centers</span>, high-voltage infrastructure, and industrial automation.</p></div>
+            <div class="ctaR"><button class="cta">Download Resume</button><button class="cta o">Get Started</button><button class="cta o">Contact</button></div>
+          </div>
+          <div class="card photo enter">[ portrait ]</div>
+        </div>
+        <div class="bento row2" style="display:grid;gap:14px;">
+          <div class="card exp enter"><span class="tag">2021 — Now</span><div class="role">Site Operations</div><div class="meta">Hyperscale DC</div><div class="big">99.99%</div><div class="lbl">uptime</div></div>
+          <div class="card exp enter"><span class="tag">Award</span><div class="role">Reliability</div><div class="meta">Excellence</div><div class="big">12+</div><div class="lbl">yrs</div></div>
+          <div class="card exp enter"><span class="tag">Platform</span><div class="role">Calculators</div><div class="meta">Tools shipped</div><div class="big">28</div><div class="lbl">live</div></div>
+          <div class="card exp enter"><span class="tag">Writing</span><div class="role">Field Articles</div><div class="meta">Published</div><div class="big">27</div><div class="lbl">articles</div></div>
+        </div>
+        <div class="bento row3" style="display:grid;gap:14px;">
+          <div class="card enter"><span class="tag">Governance</span><div class="role">Standards &amp; Compliance</div><div class="meta">ISO · Uptime Institute · ISA-18.2</div></div>
+          <div class="card enter"><span class="tag">SAP</span><div class="role">PM / MM</div><div class="meta">CMMS</div></div>
+          <div class="card enter"><span class="tag">More</span><div class="role">Explore →</div><div class="meta">Cockpits &amp; labs</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b class="bad">Flat:</b> single-tone <code>#131e2e</code> cards, no depth · pastel accents almost invisible (6% wash) · numbers static · no load motion · reads unfinished in the dark.</div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="frame">
+    <div class="fh"><span class="badge a">After</span><span class="ft">same character · premium dark</span><button class="replay" data-replay="after">▸ replay</button></div>
+    <div class="stage">
+      <div class="after-bg"><div class="bento after" id="after">
+        <div class="bento row1" style="display:grid;gap:14px;">
+          <div class="card ident enter">
+            <div><span class="tag">Mission Critical Leadership</span>
+              <div class="name">Bagus Dwi <b>Permana</b></div>
+              <p class="desc">Engineering Operations Leader with 12+ years in <span class="acc">hyperscale data centers</span>, high-voltage infrastructure, and industrial automation.</p></div>
+            <div class="ctaR"><button class="cta">Download Resume</button><button class="cta o">Get Started</button><button class="cta o">Contact</button></div>
+          </div>
+          <div class="card photo enter"><span class="chip"><i></i>Bekasi, ID · available</span></div>
+        </div>
+        <div class="bento row2" style="display:grid;gap:14px;">
+          <div class="card exp enter" style="--acc:#34d399;"><span class="mtag">2021 — Now</span><div class="role">Site Operations</div><div class="meta">Hyperscale DC</div><div class="big num" data-cu="99" data-suf=".99%">0</div><div class="lbl">uptime</div><div class="bar"><i data-bar="98"></i></div></div>
+          <div class="card exp enter" style="--acc:#f59e0b;"><span class="mtag">Award</span><div class="role">Reliability</div><div class="meta">Excellence</div><div class="big num" data-cu="12" data-suf="+">0</div><div class="lbl">years</div><div class="bar"><i data-bar="85"></i></div></div>
+          <div class="card exp enter" style="--acc:#4a90b8;"><span class="mtag">Platform</span><div class="role">Calculators</div><div class="meta">Tools shipped</div><div class="big num" data-cu="28" data-suf="">0</div><div class="lbl">live</div><div class="bar"><i data-bar="80"></i></div></div>
+          <div class="card exp enter" style="--acc:#f97316;"><span class="mtag">Writing</span><div class="role">Field Articles</div><div class="meta">Published</div><div class="big num" data-cu="27" data-suf="">0</div><div class="lbl">articles</div><div class="bar"><i data-bar="72"></i></div></div>
+        </div>
+        <div class="bento row3" style="display:grid;gap:14px;">
+          <div class="card enter" style="--acc:#8b5cf6;"><span class="mtag">Governance</span><div class="role">Standards &amp; Compliance</div><div class="meta">ISO · Uptime Institute · ISA-18.2 · NFPA</div></div>
+          <div class="card enter" style="--acc:#4a90b8;"><span class="mtag">SAP</span><div class="role">PM / MM</div><div class="meta">CMMS</div></div>
+          <div class="card enter" style="--acc:#34d399;"><span class="mtag">More</span><div class="role">Explore →</div><div class="meta">9 live cockpits &amp; labs</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note"><b class="good">Polished, not changed:</b> layered card surface (gradient + inner highlight + soft shadow) = depth · each card keeps its accent as a <b>corner glow + coloured number + accent bar</b> · <b>lift-on-hover</b> with accent glow · refined type/spacing · <b>animated on load</b> (stagger + count-up + bars) · emerald + pastels + Inter + rounded all kept. Same homepage — just finished.</div>
+  </div>
+
+  <div class="note" style="border:1px solid #1b2630;border-radius:8px;margin-top:4px;color:#7c8590;">
+    <b style="color:#34d399;">Dari HP:</b> kalau arah poles ini oke → balas <b>"poles go"</b>, aku terapkan ke dark-mode <code style="color:#c3ccd4">index.html</code> asli (karakter tetap, cuma kualitas dark + animasi), bump + push. Atau bilang yang mau diubah (mis. warna kartu, besar foto, jenis animasi). <code style="color:#c3ccd4">index.html</code> asli masih utuh sampai kamu bilang go.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  function ease(k){return 1-Math.pow(1-k,3);}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function countUp(el){
+    var target=+el.getAttribute('data-cu'),suf=el.getAttribute('data-suf')||'',st=null,dur=1300;
+    if(reduce){el.textContent=target+suf;return;}
+    function fr(t){if(!st)st=t;var k=Math.min((t-st)/dur,1);el.textContent=Math.round(target*ease(k))+suf;if(k<1)requestAnimationFrame(fr);else el.textContent=target+suf;}
+    requestAnimationFrame(fr);
+  }
+  function animate(root){
+    var cards=root.querySelectorAll('.enter');
+    cards.forEach(function(c,i){
+      c.classList.remove('in');
+      if(reduce){c.classList.add('in');return;}
+      setTimeout(function(){c.classList.add('in');},75*i);
+    });
+    var delay=reduce?0:75*cards.length;
+    setTimeout(function(){
+      root.querySelectorAll('[data-cu]').forEach(countUp);
+      root.querySelectorAll('[data-bar]').forEach(function(b){b.style.width=b.getAttribute('data-bar')+'%';});
+    },delay);
+  }
+  var before=document.getElementById('before'),after=document.getElementById('after');
+  animate(before);animate(after);
+  document.querySelectorAll('[data-replay]').forEach(function(btn){
+    btn.addEventListener('click',function(){animate(btn.getAttribute('data-replay')==='before'?before:after);});
+  });
+})();
+</script>
+</body>
+</html>
