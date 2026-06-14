@@ -100,6 +100,40 @@ body{background:var(--ink);color:#c8d2dc;font-family:'IBM Plex Mono',monospace;p
 .e svg{width:100%;height:auto;display:block;}
 
 .btnrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+
+/* ===== §07 redesign — proper instrument components ===== */
+/* ISA-18.2 alarm summary */
+@keyframes almblink{0%,49%{opacity:1}50%,100%{opacity:.3}}
+.almleg{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:9px;font-size:.55rem;color:#5E8472;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;}
+.almleg span{display:inline-flex;align-items:center;gap:5px;} .almleg i{width:9px;height:9px;border-radius:1px;display:inline-block;}
+.alm{width:100%;font-family:'JetBrains Mono',monospace;font-size:.62rem;border:1px solid rgba(43,232,255,.16);border-radius:3px;overflow:hidden;}
+.alm .ah,.alm .ar{display:grid;grid-template-columns:5px 58px 1fr 56px;gap:8px;align-items:center;padding:6px 9px;}
+.alm .ah{background:#0a141a;border-bottom:1px solid rgba(43,232,255,.2);color:#5E8472;text-transform:uppercase;letter-spacing:.06em;font-size:.52rem;}
+.alm .ar{border-bottom:1px solid rgba(43,232,255,.07);} .alm .ar:last-child{border-bottom:0;}
+.alm .pb{align-self:stretch;border-radius:1px;min-height:16px;}
+.alm .p1{background:#ef4444;} .alm .p2{background:#f59e0b;} .alm .p3{background:#eab308;} .alm .p4{background:#3b82f6;}
+.alm .at{color:#5E8472;} .alm .atag{color:#EAFBF0;font-weight:600;} .alm .ad{color:#9fb3aa;}
+.alm .ast{justify-self:end;font-weight:700;font-size:.55rem;padding:1px 5px;border-radius:3px;letter-spacing:.02em;}
+.alm .s-un{color:#fca5a5;border:1px solid rgba(239,68,68,.55);animation:almblink 1.1s step-end infinite;}
+.alm .s-ack{color:#fbbf24;border:1px solid rgba(245,158,11,.45);}
+.alm .s-rtn{color:#86efac;border:1px solid rgba(34,197,94,.45);}
+.alm .s-shv{color:#c4b5fd;border:1px solid rgba(167,139,250,.4);}
+/* data-quality card */
+.dqbar{height:5px;border-radius:2px;background:rgba(43,232,255,.1);overflow:hidden;margin:8px 0 5px;}
+.dqbar span{display:block;height:100%;border-radius:2px;}
+.dqmeta{font-size:.55rem;color:#5E8472;letter-spacing:.02em;line-height:1.5;}
+.simrib{display:inline-flex;gap:6px;align-items:center;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.45);border-radius:3px;padding:2px 8px;font-size:.57rem;font-weight:700;color:#c4b5fd;letter-spacing:.05em;}
+.simrib i{width:6px;height:6px;border-radius:50%;background:#c4b5fd;box-shadow:0 0 6px #c4b5fd;}
+/* instrument button variants */
+.i .btn.danger{background:transparent;border:1px solid #ef4444;color:#fca5a5;box-shadow:none;}
+.i .btn.danger:hover{background:rgba(239,68,68,.14);}
+.i .btn.dis{background:transparent;border:1px solid #29323a;color:#46555f;box-shadow:none;cursor:not-allowed;}
+.i .btn:active{transform:translateY(1px);}
+.btnnote{font-size:.55rem;color:#5E8472;margin-top:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;}
+/* instrument table enhancements */
+.i th.num,.i td.num{text-align:right;}
+.i tr.alarm td{background:rgba(239,68,68,.07);} .i tr.alarm td:first-child{box-shadow:inset 3px 0 0 #ef4444;}
+
 .note{max-width:1180px;margin:18px auto 0;font-size:.66rem;color:#475569;font-family:'JetBrains Mono',monospace;}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
@@ -162,15 +196,27 @@ body{background:var(--ink);color:#c8d2dc;font-family:'IBM Plex Mono',monospace;p
     before:'<div class="g"><div class="panel" style="text-align:center"><div style="background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;max-width:230px;margin:0 auto"><div style="font-weight:700;color:#e2e8f0">VCB-INC-A</div><p style="color:#94a3b8;font-size:.78rem;margin-top:6px">Center modal — covers the topology behind it.</p></div><p style="font-size:.66rem;color:#64748b;margin-top:8px">modal occludes diagram</p></div></div>',
     after:'<div class="i"><div class="canvas" style="min-height:150px"><div style="position:absolute;top:0;right:0;width:54%;height:100%;background:rgba(12,20,26,.97);border-left:1px solid rgba(43,232,255,.28);padding:11px 13px"><div style="font-family:\'JetBrains Mono\',monospace;font-size:.58rem;color:#7dd3fc;letter-spacing:.08em">BREAKER</div><div style="font-family:\'JetBrains Mono\',monospace;color:#EAFBF0;font-weight:600;font-size:.85rem">VCB-INC-A</div><div style="display:flex;gap:6px;margin:8px 0"><span class="chip live">CLOSED</span><span class="chip sim">SIM</span></div><div style="font-size:.66rem;color:#5E8472;line-height:1.6">20 kV · 630 A · 25 kA<br>ANSI 50/51/67N · PPE2</div></div><div style="position:absolute;left:11px;top:13px;font-size:.6rem;color:#5E8472">topology stays visible →</div></div></div>'});
 
-  /* 07 alarm states (instrument) */
+  /* 07 alarm states (instrument) — real ISA-18.2 summary list */
   S.push({n:'07',title:'Alarm states — ISA-18.2',reg:'instrument',
-    before:'<div class="g"><div class="panel"><span class="pill">alarm</span> <span class="pill">ok</span> <span class="pill">maint</span><p>colour-only, no state grammar</p></div></div>',
-    after:'<div class="i"><div class="canvas" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="chip unack">UNACK · CRITICAL</span><span class="chip stale">ACK · HIGH</span><span class="chip oos">OOS · MAINT</span><span class="chip live">NORMAL</span></div></div>'});
+    before:'<div class="g"><div class="panel"><span class="pill">alarm</span> <span class="pill">ok</span> <span class="pill">maint</span><p>colour-only, no priority + no state grammar</p></div></div>',
+    after:'<div class="i"><div class="canvas">'+
+      '<div class="almleg"><span><i style="background:#ef4444"></i>P1 crit</span><span><i style="background:#f59e0b"></i>P2 high</span><span><i style="background:#eab308"></i>P3 med</span><span><i style="background:#3b82f6"></i>P4 low</span></div>'+
+      '<div class="alm"><div class="ah"><span></span><span>time</span><span>tag · description</span><span>state</span></div>'+
+      '<div class="ar"><span class="pb p1"></span><span class="at">14:02:11</span><span><span class="atag">CDU-P1</span> <span class="ad">flow low-low</span></span><span class="ast s-un">UNACK</span></div>'+
+      '<div class="ar"><span class="pb p2"></span><span class="at">13:58:40</span><span><span class="atag">UPS-A</span> <span class="ad">bypass V/F drift</span></span><span class="ast s-ack">ACK</span></div>'+
+      '<div class="ar"><span class="pb p3"></span><span class="at">13:51:03</span><span><span class="atag">CRAH-12</span> <span class="ad">coil dP high</span></span><span class="ast s-rtn">RTN</span></div>'+
+      '<div class="ar"><span class="pb p4"></span><span class="at">13:44:—</span><span><span class="atag">GEN-2</span> <span class="ad">fuel polish due</span></span><span class="ast s-shv">SHLV</span></div>'+
+      '</div></div></div>'});
 
-  /* 08 data quality (instrument) */
+  /* 08 data quality (instrument) — value + DQ score + provenance + sim ribbon */
   S.push({n:'08',title:'Data quality + sim banner',reg:'instrument',
     before:'<div class="g"><div class="panel"><div class="kv" style="font-size:1.2rem">14.8 °C</div><p>no provenance — looks live even when it isn\'t</p></div></div>',
-    after:'<div class="i"><div class="canvas"><div style="display:inline-flex;gap:6px;align-items:center;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.45);border-radius:0 0 8px 8px;padding:3px 10px;font-family:\'JetBrains Mono\',monospace;font-size:.6rem;font-weight:700;color:#c4b5fd;margin-bottom:10px"><span style="width:7px;height:7px;border-radius:50%;background:#c4b5fd"></span>SIMULATED TELEMETRY</div><div style="font-family:\'JetBrains Mono\',monospace;color:#EAFBF0;font-size:1.2rem">14.8 °C <span class="chip sim" style="vertical-align:middle">SIM</span></div></div></div>'});
+    after:'<div class="i"><div class="canvas">'+
+      '<div class="simrib"><i></i>SIMULATED TELEMETRY</div>'+
+      '<div style="display:flex;align-items:baseline;gap:9px;margin-top:10px"><span style="font-family:\'JetBrains Mono\',monospace;font-size:1.5rem;color:#EAFBF0;font-variant-numeric:tabular-nums;letter-spacing:-.01em">14.8<span style="font-size:.85rem;color:var(--phos)"> °C</span></span><span class="chip stale">STALE 92s</span></div>'+
+      '<div class="dqbar"><span style="width:64%;background:linear-gradient(90deg,#f59e0b,#eab308)"></span></div>'+
+      '<div class="dqmeta">DQ 64/100 &middot; src BMS.AHU3.RAT &middot; age 92s &gt; 30s thresh &middot; fallback &rarr; pinned 2025 set</div>'+
+      '</div></div>'});
 
   /* 09 plan card (editorial) */
   S.push({n:'09',title:'Plan card',reg:'editorial',
@@ -182,15 +228,25 @@ body{background:var(--ink);color:#c8d2dc;font-family:'IBM Plex Mono',monospace;p
     before:'<div class="g"><div class="panel"><h3>Resistance Zero</h3><p>Engineering operator intelligence.</p><div style="margin-top:10px" class="btnrow"><button class="btn">Get started</button><button class="btn sec">Learn more</button></div></div></div>',
     after:'<div class="e"><div class="canvas"><span class="kick">Operator intelligence</span><h3>Resistance Zero — the instrument behind the data center.</h3><p>Cockpits, calculators, and a living knowledge graph for engineering operations.</p><div style="margin-top:11px" class="btnrow"><button class="btn">Get started</button><button class="btn sec">Explore labs</button></div></div></div>'});
 
-  /* 11 buttons (both) */
+  /* 11 buttons (both registers) — full instrument control set + editorial row */
   S.push({n:'11',title:'Controls — buttons',reg:'instrument + editorial',
     before:'<div class="g"><div class="panel btnrow"><button class="btn">Primary</button><button class="btn sec">Secondary</button></div></div>',
-    after:'<div class="i"><div class="canvas btnrow"><button class="btn">Run</button><button class="btn sec">Cancel</button><span style="width:14px"></span><span class="e" style="display:contents"></span></div></div>'});
+    after:'<div class="i"><div class="canvas">'+
+      '<div class="btnrow"><button class="btn">Run</button><button class="btn sec">Cancel</button><button class="btn danger">TRIP</button><button class="btn dis" disabled>Apply</button></div>'+
+      '<div class="btnnote">instrument &middot; 3px &middot; signal-coloured &middot; guarded danger &middot; :active depress</div>'+
+      '</div>'+
+      '<div class="e" style="margin-top:9px"><div class="canvas btnrow" style="padding:11px 13px"><button class="btn">Get started</button><button class="btn sec">Explore</button></div></div></div>'});
 
-  /* 12 table (instrument) */
+  /* 12 table (instrument) — state chips, right-aligned numerics, alarm row */
   S.push({n:'12',title:'Data table',reg:'instrument',
     before:'<div class="g"><div class="panel"><table><thead><tr><th>Tag</th><th>Load</th><th>State</th></tr></thead><tbody><tr><td>CH-1</td><td>78%</td><td>RUN</td></tr><tr><td>CH-2</td><td>74%</td><td>RUN</td></tr><tr><td>CH-8</td><td>0%</td><td>STBY</td></tr></tbody></table></div></div>',
-    after:'<div class="i"><div class="canvas"><table><thead><tr><th>Tag</th><th>Load</th><th>State</th></tr></thead><tbody><tr><td>CH-1</td><td>78%</td><td style="color:#86efac">RUN</td></tr><tr><td>CH-2</td><td>74%</td><td style="color:#86efac">RUN</td></tr><tr><td>CH-8</td><td>0%</td><td style="color:#fbbf24">STBY</td></tr></tbody></table></div></div>'});
+    after:'<div class="i"><div class="canvas"><table>'+
+      '<thead><tr><th>Tag</th><th class="num">Load</th><th class="num">&Delta;T</th><th>State</th></tr></thead><tbody>'+
+      '<tr><td class="atag" style="color:#EAFBF0">CH-1</td><td class="num">78%</td><td class="num">5.4</td><td><span class="chip live">RUN</span></td></tr>'+
+      '<tr><td style="color:#EAFBF0">CH-2</td><td class="num">74%</td><td class="num">5.1</td><td><span class="chip live">RUN</span></td></tr>'+
+      '<tr class="alarm"><td style="color:#EAFBF0">CH-5</td><td class="num">91%</td><td class="num">7.8</td><td><span class="chip unack">ALM</span></td></tr>'+
+      '<tr><td style="color:#EAFBF0">CH-8</td><td class="num">0%</td><td class="num">&mdash;</td><td><span class="chip stale">STBY</span></td></tr>'+
+      '</tbody></table></div></div>'});
 
   /* render */
   var g=document.getElementById('gallery');

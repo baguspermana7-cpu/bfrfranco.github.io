@@ -93,25 +93,104 @@ Default ease: `cubic-bezier(.2,.7,.2,1)`; default load duration 1.3–1.5s.
 - Charts stay full-bleed (`width:100%`, `viewBox` + `preserveAspectRatio`), never fixed-px.
 - Touch targets ≥ 44px. Honours the site's mobile-responsive audit (≥7/10).
 
-## Adoption plan
+## Component library (canonical — instrument register)
 
-| Step | Page(s) | Register | Status |
-|---|---|---|---|
-| Reference | `rz-style-lab.html` | both (switchable) | ✓ live |
-| 1 | plan landings (`planb.html`) | editorial | owner's other session |
-| 2 | cockpit dark mode (datahallAI etc.) | instrument | pending — apply after owner confirms register split |
-| 3 | index / articles / hubs | editorial | pending |
+Reference renders live in `rz-skin-gallery.html` (surfaces 01–12, before vs after). The four below
+were re-specified 2026-06-01 after the owner flagged the first pass as still-slop. These are the
+**canonical component specs**; every cockpit re-skin must reproduce this grammar, not a colour swap.
 
-Cockpit application (step 2) must preserve the engine + `#p-dash` byte-identical rule and pass the 75/75 accuracy probe — the dark-system tokens are presentation-only.
+### Alarm summary — ISA-18.2 (surface 07)
+
+The alarm surface is an **alarm summary list**, not a row of coloured pills. Grammar:
+
+- **Priority** is a left-edge colour bar, 4 classes (ANSI/ISA-18.2 ordering):
+  `P1 critical #ef4444 · P2 high #f59e0b · P3 medium #eab308 · P4 low #3b82f6`. A legend declares them.
+- **State** column uses ISA-18.2 state names, never colour alone:
+  `UNACK` (red, **blinking** `almblink 1.1s step-end` — the only sanctioned blink on the site,
+  honours `prefers-reduced-motion`), `ACK` (amber, steady), `RTN` (green — returned-to-normal),
+  `SHLV` (violet — shelved). Add `SUPP` / `OOS` as needed.
+- Columns: `priority-bar · time(HH:MM:SS) · tag · description · state`. JetBrains Mono, tabular.
+- Status **always wins** over domain colour (see `ALARM_STATE.md resolveColor()`).
+
+### Data-quality + simulation (surface 08)
+
+A value is never shown bare. The DQ card carries:
+
+- a **SIM ribbon** (`.simrib`, violet, pulsing dot) whenever the source is simulated;
+- the **value** + a quality **state chip** (`live` / `stale Ns` / `sim` / `uncertain`);
+- a **DQ meter** (`.dqbar`, 0–100, amber→green gradient by score);
+- a **provenance line** (`.dqmeta`): `DQ score · source tag · age vs threshold · fallback`.
+
+### Controls — buttons (surface 11)
+
+Instrument button set, 3px radius, JetBrains Mono, uppercase, `:active` depresses 1px:
+
+- **primary** (`.btn`) phosphor-filled with glow · **secondary** (`.btn.sec`) phosphor outline ·
+  **danger** (`.btn.danger`) red outline, guarded (used for TRIP / EPO) · **disabled** (`.btn.dis`).
+- Editorial register variant: amber fill / amber outline, 8px radius, no glow.
+
+### Data table (surface 12)
+
+Instrument equipment table:
+
+- JetBrains Mono; **hairline** rows (`rgba(43,232,255,.08)`); header mono-uppercase with cyan rule.
+- Numeric columns **right-aligned** + `font-variant-numeric:tabular-nums` (`.num`).
+- State rendered as a **chip** (`live` / `stale` / `unack`), not coloured text.
+- **Alarm row** highlight: `tr.alarm` → red tint + 3px red left inset on first cell.
+
+## Comprehensive rollout plan
+
+Two register tracks, sequenced so the lowest-risk, highest-visibility work ships first. Each page
+adoption is gated by the **per-page checklist** below.
+
+### Track E — Editorial (content surfaces)
+
+| Phase | Pages | Status |
+|---|---|---|
+| E0 reference | `plan-dark-mode-standard.html`, `planb.html`, plan pages | ✓ shipped |
+| E1 article pilot | `article-26.html` (editorial register via `css/rz-article-dark.css`) | **APPROVED — build next** |
+| E2 article batch | articles 1–25, batched 3–4 per ship, per-series accent override | queued |
+| E3 hubs + index | `index.html`, `articles.html`, `insights.html`, `datacenter-solutions.html` | queued |
+| E4 calc shells | calculator marketing shells (chrome only; engine untouched) | queued |
+
+### Track I — Instrument (cockpit surfaces)
+
+| Phase | Pages | Status |
+|---|---|---|
+| I0 primitive | `datahallAI.html #p-dash` count-up (v1.43.5, probe-safe) | ✓ shipped |
+| I1 component lib | port surfaces 07/08/11/12 specs into the shared cockpit CSS | **next** |
+| I2 first cockpit | one full cockpit (recommend `chiller-plant` or `datahallAI`) — tokens + atmosphere + alarm/DQ/table grammar | queued |
+| I3 cockpit sweep | dc-conventional · water · fire · fuel · EPMS · ict | queued |
+| I4 labs + monitors | SLD/P&ID labs · market monitors | queued |
+
+### Per-page adoption checklist (every page MUST pass before ship)
+
+1. ☐ `data-rz-register` declared; tokens inherited from `css/rz-dark.css` (no per-page colour redefs).
+2. ☐ Headline data **animates on first paint** (trace/grow/count-up/sweep) + honours `prefers-reduced-motion`.
+3. ☐ Type: instrument = Plex Mono + JetBrains Mono; editorial = Plex Sans + Fraunces display. No Inter-as-character.
+4. ☐ Radius ≤ 3px (instrument) / ≤ 10px (editorial). No glassmorphism / dot-grid / neumorphism.
+5. ☐ Signal semantics intact — status wins over domain; alarm states use the ISA-18.2 grammar above.
+6. ☐ Components (alarm/DQ/button/table) match the canonical specs, not ad-hoc colour swaps.
+7. ☐ Responsive: KPI 4→2→1 col; charts full-bleed; touch ≥44px; mobile audit ≥7/10.
+8. ☐ **Cockpit only:** engine + `#p-dash` byte-identical; 75/75 accuracy probe green (tokens are presentation-only).
+9. ☐ Version bump + CHANGELOG + the standard audit gate.
+
+### Acceptance gate
+
+A page is "RZ-Dark-adopted" only when all 9 checklist items pass AND it visually matches the
+corresponding `rz-skin-gallery.html` "after" surface. The gallery is the spec; pages conform to it.
 
 ## Files
 
-- `css/rz-dark.css` — the shared stylesheet (tokens + base + atmosphere + motion CSS).
-- `rz-style-lab.html` — living reference + character picker.
-- `documentation/design.md` — brand bible; this standard is the dark-mode chapter.
+- `css/rz-dark.css` — shared stylesheet (tokens + base + atmosphere + motion).
+- `css/rz-article-dark.css` — editorial article register (Track E).
+- `rz-style-lab.html` — character picker (4 variants).
+- `rz-skin-gallery.html` — **the 12-surface component spec** (before/after); canonical reference for I1.
+- `rz-cockpit-mockup.html` · `rz-article-mockup.html` — register before/after mockups.
+- `plan-dark-mode-standard.html` — the plan landing (PLAN 02 on the Plan B hub).
+- `documentation/design.md` — brand bible; this standard is its dark-mode chapter.
 
 ## Out of scope this standard
 
-- Light-mode redesign (separate; current toggle untouched).
-- Per-component library (buttons/forms/tables) — follows once a register is applied to a real page.
-- Chart data binding to live engines (cockpit charts already engine-bound; the motion layer is additive).
+- Light-mode redesign (separate plan; current toggle untouched).
+- Chart data binding to live engines (cockpit charts already engine-bound; the motion layer is additive only).

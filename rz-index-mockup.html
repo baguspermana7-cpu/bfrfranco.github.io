@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Index — dark-mode options (review)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#05080B;--hair:#1b2630;--phos:#22F5A8;--cyan:#2BE8FF;--amber:#E8B563;--green2:#6FBF9A;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--ink);color:#c8d2dc;font-family:'IBM Plex Mono',monospace;padding:22px;}
+  .lead{max-width:1080px;margin:0 auto 22px;}
+  .lead .k{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:#5E8472;display:inline-flex;gap:.5rem;align-items:center;}
+  .lead .k::before{content:'';width:22px;height:1px;background:var(--phos);}
+  .lead h1{font-family:'JetBrains Mono',monospace;color:#EAFBF0;font-size:clamp(1.4rem,3.2vw,2.1rem);margin:.55rem 0 .4rem;}
+  .lead p{color:#7E8590;font-size:.88rem;max-width:78ch;line-height:1.6;}
+  .opts{max-width:1080px;margin:0 auto;display:grid;gap:18px;}
+  .opt{border:1px solid var(--hair);border-radius:9px;overflow:hidden;background:#070C11;}
+  .opt > .oh{display:flex;align-items:baseline;gap:.7rem;padding:.75rem 1rem;border-bottom:1px solid var(--hair);flex-wrap:wrap;}
+  .opt > .oh .on{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--phos);letter-spacing:.08em;}
+  .opt > .oh h2{font-family:'JetBrains Mono',monospace;font-size:.95rem;color:#EAFBF0;font-weight:600;}
+  .opt > .oh .ch{margin-left:auto;font-size:.56rem;letter-spacing:.05em;text-transform:uppercase;color:#5E8472;border:1px solid var(--hair);border-radius:4px;padding:.14rem .5rem;}
+  .stage{padding:0;}
+  .note{padding:.65rem 1rem;border-top:1px solid var(--hair);font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#5E8472;line-height:1.6;}
+  .note b{color:#9fb3aa;}
+  /* shared hero scaffold */
+  .hero{position:relative;padding:34px 30px;min-height:300px;display:grid;grid-template-columns:1.5fr .9fr;gap:26px;align-items:center;overflow:hidden;}
+  @media(max-width:720px){.hero{grid-template-columns:1fr;padding:24px 20px;}}
+  .stat{font-variant-numeric:tabular-nums;}
+  .ph{border-radius:10px;min-height:210px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;}
+  .ctaR{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .cta{border:0;padding:10px 18px;font-size:.74rem;font-weight:700;letter-spacing:.03em;cursor:pointer;}
+  .cta.sec{background:transparent;}
+
+  /* ===== A · EDITORIAL ===== */
+  .A{background:#0E0F12;font-family:'IBM Plex Sans',system-ui,sans-serif;}
+  .A::before{content:'';position:absolute;inset:0;background:radial-gradient(560px 260px at 86% -16%,rgba(232,181,99,.09),transparent 64%),radial-gradient(460px 240px at 4% 116%,rgba(111,191,154,.06),transparent 66%);pointer-events:none;}
+  .A>*{position:relative;}
+  .A .kick{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.5rem;align-items:center;}
+  .A .kick::before{content:'';width:22px;height:1px;background:var(--amber);}
+  .A h3{font-family:'Fraunces',Georgia,serif;color:#F6F7F9;font-size:clamp(2rem,4.6vw,3.2rem);font-weight:500;line-height:1.04;letter-spacing:-.015em;margin:.5rem 0 .55rem;}
+  .A h3 em{font-style:italic;color:var(--amber);}
+  .A .bio{color:#9aa0aa;font-size:1rem;line-height:1.6;max-width:46ch;}
+  .A .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px;}
+  .A .stat .v{font-family:'Fraunces',serif;font-size:1.8rem;color:#F6F7F9;font-weight:500;}
+  .A .stat .l{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:#7E8590;margin-top:1px;}
+  .A .cta{border-radius:8px;background:var(--amber);color:#191512;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
+  .A .cta.sec{border:1px solid var(--amber);color:var(--amber);}
+  .A .ph{background:linear-gradient(155deg,#1a1c22,#121317);border:1px solid rgba(232,181,99,.18);color:#5b5e66;}
+
+  /* ===== B · INSTRUMENT ===== */
+  .B{background:#060A0D;font-family:'IBM Plex Mono',monospace;}
+  .B::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(43,232,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(43,232,255,.05) 1px,transparent 1px);background-size:30px 30px;-webkit-mask-image:radial-gradient(130% 100% at 50% 0%,#000 34%,transparent 92%);mask-image:radial-gradient(130% 100% at 50% 0%,#000 34%,transparent 92%);pointer-events:none;}
+  .B>*{position:relative;}
+  .B .kick{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#5E8472;display:inline-flex;gap:.5rem;align-items:center;}
+  .B .kick::before{content:'';width:20px;height:1px;background:var(--phos);}
+  .B h3{font-family:'JetBrains Mono',monospace;color:#EAFBF0;font-size:clamp(1.7rem,4vw,2.7rem);font-weight:700;line-height:1.08;letter-spacing:-.02em;margin:.5rem 0 .5rem;}
+  .B h3 span{color:var(--phos);}
+  .B .bio{color:#8aa093;font-size:.9rem;line-height:1.6;max-width:48ch;}
+  .B .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px;}
+  @media(max-width:520px){.B .stats{grid-template-columns:repeat(2,1fr);}}
+  .B .stat{border:1px solid rgba(43,232,255,.16);border-radius:3px;background:#0C141A;padding:9px 10px;position:relative;overflow:hidden;}
+  .B .stat::after{content:'';position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,var(--phos),transparent);opacity:.5;}
+  .B .stat .v{font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:#EAFBF0;}
+  .B .stat .l{font-size:.52rem;letter-spacing:.05em;text-transform:uppercase;color:#5E8472;margin-top:1px;}
+  .B .cta{border-radius:3px;background:var(--phos);color:#06121a;font-family:'JetBrains Mono',monospace;text-transform:uppercase;box-shadow:0 0 12px rgba(34,245,168,.32);}
+  .B .cta.sec{border:1px solid var(--phos);color:var(--phos);box-shadow:none;}
+  .B .ph{background:#0C141A;border:1px solid rgba(43,232,255,.16);color:#3d5a4d;}
+  .B .ph svg{width:100%;height:auto;}
+
+  /* ===== C · HYBRID ===== */
+  .C{background:#0C0D10;font-family:'IBM Plex Sans',system-ui,sans-serif;}
+  .C::before{content:'';position:absolute;inset:0;background:radial-gradient(520px 240px at 88% -16%,rgba(43,232,255,.06),transparent 64%);pointer-events:none;}
+  .C::after{content:'';position:absolute;left:0;right:0;bottom:0;height:64px;background-image:linear-gradient(90deg,rgba(43,232,255,.06) 1px,transparent 1px);background-size:26px 100%;-webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000);pointer-events:none;}
+  .C>*{position:relative;}
+  .C .kick{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.5rem;align-items:center;}
+  .C .kick::before{content:'';width:20px;height:1px;background:var(--cyan);}
+  .C h3{font-family:'Fraunces',Georgia,serif;color:#F6F7F9;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:500;line-height:1.05;letter-spacing:-.015em;margin:.5rem 0 .5rem;}
+  .C h3 em{font-style:italic;color:var(--cyan);}
+  .C .bio{color:#98a0aa;font-size:.98rem;line-height:1.6;max-width:46ch;}
+  .C .stats{display:flex;gap:0;flex-wrap:wrap;margin-top:20px;border:1px solid rgba(43,232,255,.16);border-radius:4px;overflow:hidden;width:fit-content;max-width:100%;}
+  .C .stat{padding:9px 16px;border-right:1px solid rgba(43,232,255,.12);font-family:'JetBrains Mono',monospace;}
+  .C .stat:last-child{border-right:0;}
+  .C .stat .v{font-size:1.25rem;color:#EAFBF0;} .C .stat .l{font-size:.52rem;letter-spacing:.05em;text-transform:uppercase;color:#7E8590;margin-top:1px;}
+  .C .cta{border-radius:7px;background:var(--cyan);color:#06121a;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
+  .C .cta.sec{border:1px solid var(--cyan);color:var(--cyan);}
+  .C .ph{background:linear-gradient(155deg,#12161b,#0d0f12);border:1px solid rgba(43,232,255,.16);color:#4a5a5f;}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <span class="k">RZ Dark · index options</span>
+  <h1>Portfolio homepage — three dark characters to review.</h1>
+  <p>The current index dark mode reads generic (flat panels, Inter, static numbers, purple). Below are three on-brand directions for the homepage, each a live hero mock — stats count up on load. The standard says index → <b>editorial</b>, but a portfolio that is <i>also</i> an engineering instrument can lean three ways. Pick one (or a blend) and it codifies into <code>css/rz-dark.css</code>.</p>
+</div>
+
+<div class="opts">
+
+  <!-- OPTION A -->
+  <div class="opt">
+    <div class="oh"><span class="on">OPTION A</span><h2>Editorial Report</h2><span class="ch">warm · serif · calm</span></div>
+    <div class="stage"><div class="hero A">
+      <div>
+        <span class="kick">Engineering Operations Leader · Bekasi, ID</span>
+        <h3>Bagus Dwi&nbsp;Permana — the operator <em>behind</em> the data center.</h3>
+        <p class="bio">Mission-critical reliability, cooling, and power — plus the calculators and knowledge graph that make the work legible.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" data-cu="12" data-suf="+">0</div><div class="l">yrs mission-critical</div></div>
+          <div class="stat"><div class="v" data-cu="28" data-suf="">0</div><div class="l">tools shipped</div></div>
+          <div class="stat"><div class="v" data-cu="27" data-suf="">0</div><div class="l">field articles</div></div>
+          <div class="stat"><div class="v" data-txt="CDFOM">CDFOM</div><div class="l">certified</div></div>
+        </div>
+        <div class="ctaR"><button class="cta">View work</button><button class="cta sec">Insights</button></div>
+      </div>
+      <div class="ph">[ portrait ]</div>
+    </div></div>
+    <div class="note"><b>Character:</b> refined magazine. Fraunces serif display + italic amber accent, generous whitespace, calm radial wash, mono labels. Reads human + credible. Closest to the locked editorial register — lowest-risk, but quietest "engineering" signal.</div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="opt">
+    <div class="oh"><span class="on">OPTION B</span><h2>Instrument Portfolio</h2><span class="ch">phosphor · mono · graticule</span></div>
+    <div class="stage"><div class="hero B">
+      <div>
+        <span class="kick">Operator intelligence · mission-critical</span>
+        <h3>BAGUS DWI <span>PERMANA</span></h3>
+        <p class="bio">The instrument behind the data center — reliability, cooling, power, and a living knowledge graph for engineering operations.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" data-cu="12" data-suf="+">0</div><div class="l">yrs ops</div></div>
+          <div class="stat"><div class="v" data-cu="28" data-suf="">0</div><div class="l">tools</div></div>
+          <div class="stat"><div class="v" data-cu="99" data-suf=".99%">0</div><div class="l">uptime defended</div></div>
+          <div class="stat"><div class="v" data-cu="27" data-suf="">0</div><div class="l">articles</div></div>
+        </div>
+        <div class="ctaR"><button class="cta">Enter cockpits</button><button class="cta sec">Labs</button></div>
+      </div>
+      <div class="ph"><svg viewBox="0 0 220 150" aria-hidden="true"><path id="tr" d="" fill="none" stroke="#2BE8FF" stroke-width="2" style="filter:drop-shadow(0 0 5px #2BE8FF88)"/><circle id="trd" r="3.2" fill="#22F5A8" style="filter:drop-shadow(0 0 6px #22F5A8)"/></svg></div>
+    </div></div>
+    <div class="note"><b>Character:</b> engineering instrument. JetBrains Mono display, faint graticule wash, phosphor/cyan, an animated live trace, instrument KPI cells. Strongest "engineering" identity — but treats a personal portfolio like a cockpit (may read cold for non-technical visitors).</div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="opt">
+    <div class="oh"><span class="on">OPTION C</span><h2>Hybrid — editorial display + instrument readout <span style="color:var(--cyan)">★ recommended</span></h2><span class="ch">serif name · mono data</span></div>
+    <div class="stage"><div class="hero C">
+      <div>
+        <span class="kick">Engineering Operations Leader · Bekasi, ID</span>
+        <h3>Bagus Dwi&nbsp;Permana — engineering <em>operations</em>, instrumented.</h3>
+        <p class="bio">Hyperscale reliability, cooling, and power — paired with the calculators, labs, and knowledge graph behind the work.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" data-cu="12" data-suf="+">0</div><div class="l">yrs ops</div></div>
+          <div class="stat"><div class="v" data-cu="28" data-suf="">0</div><div class="l">tools</div></div>
+          <div class="stat"><div class="v" data-cu="27" data-suf="">0</div><div class="l">articles</div></div>
+          <div class="stat"><div class="v" data-txt="CDFOM">CDFOM</div><div class="l">certified</div></div>
+        </div>
+        <div class="ctaR"><button class="cta">View work</button><button class="cta sec">Cockpits &amp; labs</button></div>
+      </div>
+      <div class="ph">[ portrait ]</div>
+    </div></div>
+    <div class="note"><b>Character:</b> warm human <i>and</i> credible engineer. Fraunces serif name (editorial warmth) + a mono instrument KPI strip + a thin graticule footer. Editorial body for readability, instrument data for proof. <b>Recommended</b> — keeps the editorial register the standard mandates while signalling the engineering brand the portfolio is built on.</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  function ease(k){return 1-Math.pow(1-k,3);}
+  function run(el){
+    var target=+el.getAttribute('data-cu'),suf=el.getAttribute('data-suf')||'',st=null,dur=1300;
+    function fr(t){if(!st)st=t;var k=Math.min((t-st)/dur,1);el.textContent=Math.round(target*ease(k))+suf;if(k<1)requestAnimationFrame(fr);else el.textContent=target+suf;}
+    requestAnimationFrame(fr);
+  }
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  document.querySelectorAll('[data-cu]').forEach(function(el){
+    if(reduce){el.textContent=el.getAttribute('data-cu')+(el.getAttribute('data-suf')||'');return;}
+    run(el);
+  });
+  // option B trace
+  var svg=document.getElementById('tr');
+  if(svg){
+    var w=220,h=150,n=26,pad=12,vals=[];var s=7;
+    for(var i=0;i<n;i++){s=(s*9301+49297)%233280;vals.push(0.3+ (s/233280)*0.55);}
+    var d='';for(var j=0;j<n;j++){var x=pad+j*((w-pad*2)/(n-1)),y=h-pad-(h-pad*2)*vals[j];d+=(j?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+    svg.setAttribute('d',d);
+    var dot=document.getElementById('trd'),L=svg.getTotalLength();
+    if(isFinite(L)&&L>0&&!reduce){
+      svg.style.strokeDasharray=L;svg.style.strokeDashoffset=L;var st=null;
+      (function fr(t){if(!st)st=t;var k=Math.min((t-st)/1500,1),e=ease(k);svg.style.strokeDashoffset=L*(1-e);var p=svg.getPointAtLength(L*e);dot.setAttribute('cx',p.x);dot.setAttribute('cy',p.y);if(k<1)requestAnimationFrame(fr);})();
+    } else if(dot){var p=svg.getPointAtLength(L||0);dot.setAttribute('cx',p?p.x:0);dot.setAttribute('cy',p?p.y:0);}
+  }
+})();
+</script>
+</body>
+</html>
