@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.43.14 — 2026-06-14 (index dark-mode polish)
+
+### Changed
+- **Homepage (`index.html`) dark mode — polished, not reskinned.** Owner kept the
+  current colourful bento character (emerald + pastel accents + rounded cards +
+  photo + Inter); only the dark-mode *quality* was raised. Pure CSS, dark-only
+  (`[data-theme="dark"]` scoped) — **light/day mode unchanged**:
+  - **Layered card surfaces** — `.bento-card` gains a gradient body + inner top
+    highlight + soft layered shadow (was flat `#131e2e`), so cards read with depth.
+  - **Per-card accent restored** — each `.bento-exp-card` keeps its `--bexp-accent`
+    (blue/emerald/amber/orange/violet) as an always-on corner glow (was an
+    invisible 6–12 % hover-only wash).
+  - **Hover lift** — cards rise 4px with a deeper shadow on hover.
+  - **Staggered reveal on load** — `bentoRise` keyframe walks the bento rows in on
+    first paint; honours `prefers-reduced-motion`. No JS, no markup change.
+- Rules mirrored in both `styles.css` + `styles-index.css` (2-stylesheet rule),
+  re-minified; cache-bust `styles-index.min.css?v=2026-06-14-polish`.
+- Plan + before/after mock: `plan-dark-mode-standard.html` §10 · `rz-index-polish.html`.
+  See `standarization/DARK_MODE_STANDARD.md` (Track E3 index).
+
 ## v1.43.13 — 2026-06-14 (EPMS — ATS→rack final leg renders green)
 
 Owner-requested fix on `EPMS_Telemetry.html` (owner explicitly directed this
