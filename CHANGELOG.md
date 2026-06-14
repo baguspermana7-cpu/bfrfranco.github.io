@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.43.12 — 2026-06-01 (article editorial skin — sweep: articles 2–18)
+
+Final wave of the standard-template article rollout. 17 articles opted into the
+editorial register in one sweep (pattern fully proven), each accent read from
+its own `theme-color` meta. **All 28 standard articles now on the editorial
+register.**
+
+No cockpit/engine touched. Light mode unchanged (dark-scoped). Gates CLEAN.
+16/17 headless-verified clean; art-2 shows a PRE-EXISTING Chart.js
+`'helpers'` timing error (present on origin before this change — not caused by
+the skin; the editorial chrome renders correctly).
+
+### Changed (editorial-register opt-in, articles 2–18)
+- Each: `<html data-rz-register="editorial" style="--rz-art-accent:…">` + fonts
+  + `rz-article-dark.css` + `rz-article-editorial.js`. Accent per `theme-color`.
+- **`article-8.html`** — its `#8b5cf6` (Anthropic-purple, a CLAUDE.md rejected
+  token) was REMAPPED to editorial amber `#E8B563` to avoid reintroducing slop.
+
+### Progress
+- **28 / 28 standard articles** on the editorial register (1, 2–18, 19–26).
+  Future-Forward + Geopolitics series pages use different templates — separate
+  pass if desired.
+
+---
+
 ## v1.43.11 — 2026-06-01 (article editorial skin — batch 2: articles 23, 24, 25, 1)
 
 Third wave of the article editorial-register rollout. Same one-line-per-page
