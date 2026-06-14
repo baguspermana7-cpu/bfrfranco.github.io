@@ -70,23 +70,28 @@
   .B .ph{background:#0C141A;border:1px solid rgba(43,232,255,.16);color:#3d5a4d;}
   .B .ph svg{width:100%;height:auto;}
 
-  /* ===== C · HYBRID ===== */
-  .C{background:#0C0D10;font-family:'IBM Plex Sans',system-ui,sans-serif;}
-  .C::before{content:'';position:absolute;inset:0;background:radial-gradient(520px 240px at 88% -16%,rgba(43,232,255,.06),transparent 64%);pointer-events:none;}
-  .C::after{content:'';position:absolute;left:0;right:0;bottom:0;height:64px;background-image:linear-gradient(90deg,rgba(43,232,255,.06) 1px,transparent 1px);background-size:26px 100%;-webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000);pointer-events:none;}
+  /* ===== C · HYBRID — aligned, one accent (amber), one grid ===== */
+  /* Editorial surface; the "instrument" reads through mono tabular data + hairline precision, NOT a 2nd colour. */
+  .C{background:#0E0F12;font-family:'IBM Plex Sans',system-ui,sans-serif;}
+  .C::before{content:'';position:absolute;inset:0;background:radial-gradient(560px 260px at 88% -16%,rgba(232,181,99,.08),transparent 64%);pointer-events:none;}
   .C>*{position:relative;}
-  .C .kick{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.5rem;align-items:center;}
-  .C .kick::before{content:'';width:20px;height:1px;background:var(--cyan);}
-  .C h3{font-family:'Fraunces',Georgia,serif;color:#F6F7F9;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:500;line-height:1.05;letter-spacing:-.015em;margin:.5rem 0 .5rem;}
-  .C h3 em{font-style:italic;color:var(--cyan);}
-  .C .bio{color:#98a0aa;font-size:.98rem;line-height:1.6;max-width:46ch;}
-  .C .stats{display:flex;gap:0;flex-wrap:wrap;margin-top:20px;border:1px solid rgba(43,232,255,.16);border-radius:4px;overflow:hidden;width:fit-content;max-width:100%;}
-  .C .stat{padding:9px 16px;border-right:1px solid rgba(43,232,255,.12);font-family:'JetBrains Mono',monospace;}
-  .C .stat:last-child{border-right:0;}
-  .C .stat .v{font-size:1.25rem;color:#EAFBF0;} .C .stat .l{font-size:.52rem;letter-spacing:.05em;text-transform:uppercase;color:#7E8590;margin-top:1px;}
-  .C .cta{border-radius:7px;background:var(--cyan);color:#06121a;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
-  .C .cta.sec{border:1px solid var(--cyan);color:var(--cyan);}
-  .C .ph{background:linear-gradient(155deg,#12161b,#0d0f12);border:1px solid rgba(43,232,255,.16);color:#4a5a5f;}
+  /* one shared left rule ties kicker → headline → readout → cta to a single grid */
+  .C .col{padding-left:18px;border-left:1px solid rgba(232,181,99,.28);}
+  .C .kick{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#7E8590;display:inline-flex;gap:.5rem;align-items:center;}
+  .C .kick::before{content:'';width:20px;height:1px;background:var(--amber);}
+  .C h3{font-family:'Fraunces',Georgia,serif;color:#F6F7F9;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:500;line-height:1.05;letter-spacing:-.015em;margin:.55rem 0 .5rem;}
+  .C h3 em{font-style:italic;color:var(--amber);}
+  .C .bio{color:#9aa0aa;font-size:.98rem;line-height:1.6;max-width:46ch;}
+  /* readout: full-width hairline-ruled row, flush to the same left edge — precision, warm palette, mono tabular */
+  .C .stats{display:flex;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(232,181,99,.22);border-bottom:1px solid rgba(232,181,99,.10);}
+  .C .stat{padding:11px 22px 11px 0;margin-right:22px;font-family:'IBM Plex Mono',monospace;position:relative;}
+  .C .stat + .stat{border-left:1px solid rgba(232,181,99,.12);padding-left:22px;}
+  .C .stat .v{font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:#F6F7F9;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .C .stat .l{font-size:.54rem;letter-spacing:.07em;text-transform:uppercase;color:#7E8590;margin-top:2px;}
+  .C .stat .v::after{content:'';display:block;width:14px;height:2px;background:var(--amber);opacity:.65;margin-top:5px;}
+  .C .cta{border-radius:7px;background:var(--amber);color:#191512;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
+  .C .cta.sec{border:1px solid var(--amber);color:var(--amber);}
+  .C .ph{background:linear-gradient(155deg,#1a1c22,#121317);border:1px solid rgba(232,181,99,.18);color:#5b5e66;}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;}}
 </style>
 </head>
@@ -144,9 +149,9 @@
 
   <!-- OPTION C -->
   <div class="opt">
-    <div class="oh"><span class="on">OPTION C</span><h2>Hybrid — editorial display + instrument readout <span style="color:var(--cyan)">★ recommended</span></h2><span class="ch">serif name · mono data</span></div>
+    <div class="oh"><span class="on">OPTION C</span><h2>Hybrid — aligned <span style="color:var(--amber)">★ chosen</span></h2><span class="ch">one accent · one grid · serif + mono</span></div>
     <div class="stage"><div class="hero C">
-      <div>
+      <div class="col">
         <span class="kick">Engineering Operations Leader · Bekasi, ID</span>
         <h3>Bagus Dwi&nbsp;Permana — engineering <em>operations</em>, instrumented.</h3>
         <p class="bio">Hyperscale reliability, cooling, and power — paired with the calculators, labs, and knowledge graph behind the work.</p>
@@ -160,7 +165,7 @@
       </div>
       <div class="ph">[ portrait ]</div>
     </div></div>
-    <div class="note"><b>Character:</b> warm human <i>and</i> credible engineer. Fraunces serif name (editorial warmth) + a mono instrument KPI strip + a thin graticule footer. Editorial body for readability, instrument data for proof. <b>Recommended</b> — keeps the editorial register the standard mandates while signalling the engineering brand the portfolio is built on.</div>
+    <div class="note"><b>Chosen — aligned, not mixed.</b> One accent (warm amber, no cyan), one calm wash, and a single left rule that ties kicker → name → readout → CTA to the <b>same grid</b>. The "instrument" character comes only from <b>mono tabular numerals + hairline precision + amber baseline ticks</b> — not a clashing second colour or a tacked-on graticule. Fraunces serif name carries the editorial warmth; the readout proves the engineering. One coherent system, two type roles.</div>
   </div>
 
 </div>
