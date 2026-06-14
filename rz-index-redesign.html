@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RZ Index — bento redesign · before vs after (review)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#070A0E;color:#9aa4ae;font-family:'IBM Plex Sans',system-ui,sans-serif;padding:20px;}
+  .lead{max-width:1180px;margin:0 auto 20px;}
+  .lead .k{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#E8B563;display:inline-flex;gap:.5rem;align-items:center;}
+  .lead .k::before{content:'';width:22px;height:1px;background:#E8B563;}
+  .lead h1{font-family:'IBM Plex Sans',sans-serif;font-weight:800;color:#EAF1F6;font-size:clamp(1.5rem,3.4vw,2.2rem);margin:.55rem 0 .4rem;letter-spacing:-.02em;}
+  .lead p{color:#7c8590;font-size:.9rem;max-width:82ch;line-height:1.65;}
+  .lead p b{color:#c3ccd4;}
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* comparison frame */
+  .frame{border:1px solid #1b2630;border-radius:10px;overflow:hidden;margin-bottom:20px;background:#0A0E13;}
+  .fh{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid #1b2630;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.2rem .6rem;border-radius:4px;}
+  .badge.b{background:rgba(148,163,184,.14);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
+  .badge.a{background:rgba(232,181,99,.14);color:#E8B563;border:1px solid rgba(232,181,99,.4);}
+  .fh .ft{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#c3ccd4;}
+  .fh .replay{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#8aa093;background:transparent;border:1px solid #2a3744;border-radius:5px;padding:.32rem .7rem;cursor:pointer;transition:all .2s;}
+  .fh .replay:hover{border-color:#E8B563;color:#E8B563;}
+  .stage{padding:18px;}
+  .note{padding:.7rem 1rem;border-top:1px solid #1b2630;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#5E8472;line-height:1.7;}
+  .note b{color:#9fb3aa;}
+  .note .bad{color:#d98a8a;}.note .good{color:#7fcfa3;}
+
+  /* ============ shared bento scaffold ============ */
+  .bento{display:grid;gap:12px;}
+  .row1{grid-template-columns:3fr 1.15fr;}
+  .row2{grid-template-columns:repeat(4,1fr);}
+  .row3{grid-template-columns:2fr 1fr 1fr;}
+  @media(max-width:760px){.row1,.row2,.row3{grid-template-columns:1fr 1fr;}.bento .ident{grid-column:1/-1;}}
+  @media(max-width:460px){.row1,.row2,.row3{grid-template-columns:1fr;}}
+  .card{position:relative;overflow:hidden;display:flex;flex-direction:column;}
+  .ident{justify-content:space-between;min-height:15rem;}
+  .num{font-variant-numeric:tabular-nums;}
+  .enter{opacity:0;transform:translateY(10px);}
+  .enter.in{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1);}
+  @media(prefers-reduced-motion:reduce){.enter{opacity:1!important;transform:none!important;}}
+
+  /* ============ BEFORE — current homepage (rounded, emerald, Inter, soft) ============ */
+  .before{font-family:'Inter',sans-serif;}
+  .before .card{background:#131e2e;border:1px solid rgba(255,255,255,.07);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.4);padding:1.4rem;transition:border-color .3s,box-shadow .3s;}
+  .before .ident{padding:2.2rem;border-radius:12px;}
+  .before .exp{border-radius:16px;}
+  .before .card:hover{border-color:rgba(52,211,153,.35);box-shadow:0 10px 30px -10px rgba(52,211,153,.2);}
+  .before .tag{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:#cbd5e1;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:4px;margin-bottom:10px;display:block;}
+  .before .name{font-family:'Inter',sans-serif;font-size:clamp(2rem,4.6vw,3.2rem);font-weight:700;letter-spacing:-.03em;color:#f1f5f9;line-height:1.1;margin-bottom:1rem;}
+  .before .desc{color:#cbd5e1;font-size:1rem;line-height:1.7;max-width:42ch;font-weight:500;}
+  .before .acc{color:#34d399;}
+  .before .ctaR{display:flex;gap:.8rem;margin-top:1.3rem;flex-wrap:wrap;}
+  .before .cta{background:#34d399;color:#0f172a;padding:.6rem 1.4rem;font-weight:700;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;border-radius:6px;border:0;cursor:pointer;}
+  .before .cta.o{background:transparent;border:1px solid rgba(255,255,255,.18);color:#e0e6ef;}
+  .before .photo{background:linear-gradient(160deg,#1c2a3d,#131e2e);border-radius:12px;min-height:15rem;display:flex;align-items:center;justify-content:center;color:#3d5266;font-family:'JetBrains Mono',monospace;font-size:.58rem;}
+  .before .big{font-size:1.9rem;font-weight:700;color:#e0e6ef;}
+  .before .lbl{font-size:.62rem;color:#94a3b8;margin-top:.2rem;}
+  .before .role{font-weight:700;color:#e0e6ef;font-size:.92rem;margin:.2rem 0;}
+  .before .meta{font-size:.72rem;color:#94a3b8;}
+
+  /* ============ AFTER — instrument bento (sharp, amber, bold sans + mono, animated) ============ */
+  .after{font-family:'IBM Plex Sans',sans-serif;position:relative;}
+  .aframe{position:relative;background:#060A0D;border-radius:6px;padding:16px;overflow:hidden;}
+  .aframe::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(232,181,99,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(232,181,99,.05) 1px,transparent 1px);background-size:34px 34px;-webkit-mask-image:radial-gradient(130% 80% at 78% 0%,#000 8%,transparent 70%);mask-image:radial-gradient(130% 80% at 78% 0%,#000 8%,transparent 70%);pointer-events:none;}
+  .aframe::after{content:'';position:absolute;inset:0;background:radial-gradient(620px 280px at 88% -10%,rgba(232,181,99,.10),transparent 62%);pointer-events:none;}
+  .after .bento{position:relative;}
+  .after .card{background:#0A1014;border:1px solid rgba(232,181,99,.16);border-radius:3px;padding:1.25rem;transition:border-color .25s,box-shadow .25s;}
+  .after .card:hover{border-color:rgba(232,181,99,.5);box-shadow:0 0 0 1px rgba(232,181,99,.12),0 10px 26px -14px rgba(232,181,99,.4);}
+  .after .ident{padding:1.9rem;background:linear-gradient(160deg,#0B1117,#080C10);}
+  .after .tag{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:#5E8472;text-transform:uppercase;letter-spacing:.16em;display:inline-flex;gap:.45rem;align-items:center;margin-bottom:.7rem;}
+  .after .tag::before{content:'';width:16px;height:1px;background:#E8B563;}
+  .after .kick{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#7c8590;text-transform:uppercase;letter-spacing:.18em;display:inline-flex;gap:.5rem;align-items:center;}
+  .after .kick::before{content:'';width:22px;height:1px;background:#E8B563;}
+  .after .name{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:clamp(2.2rem,5.2vw,3.6rem);letter-spacing:-.035em;line-height:1.02;color:#EAFBF0;margin:.55rem 0 .55rem;}
+  .after .name b{color:#E8B563;font-weight:800;}
+  .after .desc{color:#8aa093;font-size:.96rem;line-height:1.6;max-width:44ch;}
+  .after .desc em{color:#E8B563;font-style:normal;font-weight:600;}
+  /* identity readout strip — count-up, mono tabular, amber ticks, one ruled row */
+  .after .readout{display:flex;flex-wrap:wrap;margin-top:1.2rem;border-top:1px solid rgba(232,181,99,.24);border-bottom:1px solid rgba(232,181,99,.1);}
+  .after .ro{padding:10px 20px 10px 0;margin-right:20px;font-family:'JetBrains Mono',monospace;}
+  .after .ro+.ro{border-left:1px solid rgba(232,181,99,.13);padding-left:20px;}
+  .after .ro .v{font-size:1.35rem;color:#EAFBF0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .after .ro .l{font-size:.52rem;letter-spacing:.07em;text-transform:uppercase;color:#5E8472;margin-top:3px;}
+  .after .ro .v::after{content:'';display:block;width:14px;height:2px;background:#E8B563;opacity:.7;margin-top:5px;}
+  .after .ctaR{display:flex;gap:.7rem;margin-top:1.3rem;flex-wrap:wrap;}
+  .after .cta{background:#E8B563;color:#191512;padding:.6rem 1.4rem;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;border-radius:3px;border:0;cursor:pointer;}
+  .after .cta.o{background:transparent;border:1px solid #E8B563;color:#E8B563;}
+  /* photo card — instrument frame */
+  .after .photo{position:relative;min-height:13.5rem;border-radius:3px;background:linear-gradient(160deg,#0d141b,#0a0f15);display:flex;align-items:flex-end;padding:.9rem;color:#3d5a4d;overflow:hidden;}
+  .after .photo .corner{position:absolute;width:14px;height:14px;border:1px solid rgba(232,181,99,.5);}
+  .after .photo .corner.tl{top:8px;left:8px;border-right:0;border-bottom:0;}
+  .after .photo .corner.br{bottom:8px;right:8px;border-left:0;border-top:0;}
+  .after .photo .rec{position:absolute;top:10px;right:12px;font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.1em;color:#E8B563;display:flex;align-items:center;gap:.3rem;}
+  .after .photo .rec i{width:6px;height:6px;border-radius:50%;background:#E8B563;display:inline-block;animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.35;}50%{opacity:1;}}
+  @media(prefers-reduced-motion:reduce){.after .photo .rec i{animation:none;opacity:1;}}
+  .after .photo .cap{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:#5E8472;}
+  /* module cards */
+  .after .mtag{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:#5E8472;text-transform:uppercase;letter-spacing:.12em;}
+  .after .mrole{color:#cfe0d6;font-weight:600;font-size:.86rem;margin:.35rem 0 .15rem;}
+  .after .mmeta{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#5E8472;}
+  .after .mbig{font-family:'JetBrains Mono',monospace;font-size:1.5rem;color:#EAFBF0;font-variant-numeric:tabular-nums;margin-top:.5rem;}
+  .after .mbig small{font-size:.7rem;color:#E8B563;}
+  .after .bar{height:3px;background:rgba(232,181,99,.12);border-radius:2px;margin-top:.6rem;overflow:hidden;}
+  .after .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#E8B563,rgba(232,181,99,.4));transition:width 1.3s cubic-bezier(.2,.7,.2,1);}
+  .after .spark{width:100%;height:38px;display:block;margin-top:.5rem;}
+  .after .wide .mbig{font-size:1.2rem;}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <span class="k">RZ Index · bento redesign</span>
+  <h1>Homepage = the showcase. Before vs after, both rendered, both animated.</h1>
+  <p>The homepage is a <b>bento grid</b> — that <i>is</i> the thing to show off, so the fix elevates the bento, it doesn't turn it into an article. <b>Before</b> = the current dark homepage exactly as it ships (rounded cards, emerald, Inter, static numbers). <b>After</b> = the same grid re-cut as an <b>instrument console</b>: sharp hairlines, one amber accent, a bold display name (no serif), and an <b>orchestrated load animation</b> — cards stagger in, KPIs count up, bars + sparkline draw, a live status pulses. Tap <b>▸ replay</b> on either to watch the motion again.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== BEFORE ===================== -->
+  <div class="frame">
+    <div class="fh"><span class="badge b">Before</span><span class="ft">current index.html · dark mode</span><button class="replay" data-replay="before">▸ replay</button></div>
+    <div class="stage">
+      <div class="bento before" id="before">
+        <div class="bento row1" style="display:grid;gap:12px;">
+          <div class="card ident enter">
+            <div>
+              <span class="tag">Mission Critical Leadership</span>
+              <div class="name">Bagus Dwi Permana</div>
+              <p class="desc">Engineering Operations Leader with 12+ years in <span class="acc">hyperscale data centers</span>, high-voltage infrastructure, and industrial automation.</p>
+            </div>
+            <div class="ctaR"><button class="cta">Download Resume</button><button class="cta o">Get Started</button><button class="cta o">Contact</button></div>
+          </div>
+          <div class="card photo enter">[ portrait ]</div>
+        </div>
+        <div class="bento row2" style="display:grid;gap:12px;">
+          <div class="card exp enter"><span class="tag">2021 — Now</span><div class="role">Site Operations</div><div class="meta">Hyperscale DC</div><div class="big">99.99%</div><div class="lbl">uptime</div></div>
+          <div class="card exp enter"><span class="tag">Award</span><div class="role">Reliability</div><div class="meta">Excellence</div><div class="big">12+</div><div class="lbl">yrs</div></div>
+          <div class="card exp enter"><span class="tag">Platform</span><div class="role">Calculators</div><div class="meta">Tools shipped</div><div class="big">28</div><div class="lbl">live</div></div>
+          <div class="card exp enter"><span class="tag">Writing</span><div class="role">Field Articles</div><div class="meta">Published</div><div class="big">27</div><div class="lbl">articles</div></div>
+        </div>
+        <div class="bento row3" style="display:grid;gap:12px;">
+          <div class="card enter"><span class="tag">Governance</span><div class="role">Standards &amp; Compliance</div><div class="meta">ISO · Uptime Institute · ISA-18.2</div></div>
+          <div class="card enter"><span class="tag">SAP</span><div class="role">PM / MM</div><div class="meta">CMMS</div></div>
+          <div class="card enter"><span class="tag">More</span><div class="role">Explore →</div><div class="meta">Cockpits &amp; labs</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b class="bad">Why it's slop:</b> rounded 12–16px cards + soft drop-shadows = generic SaaS bento · <b class="bad">Inter</b> as the character font · timid emerald-on-navy · <b>static numbers</b> (no life) · no engineering signal — could be anyone's portfolio template.</div>
+  </div>
+
+  <!-- ===================== AFTER ===================== -->
+  <div class="frame">
+    <div class="fh"><span class="badge a">After</span><span class="ft">instrument bento · showcase</span><button class="replay" data-replay="after">▸ replay</button></div>
+    <div class="stage">
+      <div class="aframe"><div class="bento after-inner after" id="after">
+        <div class="bento row1" style="display:grid;gap:12px;">
+          <div class="card ident enter">
+            <div>
+              <span class="kick">Engineering Operations Leader · Bekasi, ID</span>
+              <div class="name">Bagus Dwi <b>Permana</b></div>
+              <p class="desc">The <em>instrument</em> behind the data center — hyperscale reliability, cooling, and power, paired with the calculators, labs, and knowledge graph behind the work.</p>
+              <div class="readout">
+                <div class="ro"><div class="v num" data-cu="12" data-suf="+">0</div><div class="l">yrs mission-critical</div></div>
+                <div class="ro"><div class="v num" data-cu="28" data-suf="">0</div><div class="l">tools shipped</div></div>
+                <div class="ro"><div class="v num" data-cu="27" data-suf="">0</div><div class="l">field articles</div></div>
+                <div class="ro"><div class="v" data-txt="CDFOM">—</div><div class="l">certified</div></div>
+              </div>
+            </div>
+            <div class="ctaR"><button class="cta">View work</button><button class="cta o">Cockpits &amp; labs</button></div>
+          </div>
+          <div class="card photo enter">
+            <span class="corner tl"></span><span class="corner br"></span>
+            <span class="rec"><i></i>LIVE</span>
+            <span class="cap">PORTRAIT · 01</span>
+          </div>
+        </div>
+        <div class="bento row2" style="display:grid;gap:12px;">
+          <div class="card enter"><span class="mtag">SITE-OPS · 2021—NOW</span><div class="mrole">Reliability defended</div><div class="mbig num" data-cu="99" data-suf=".99%">0</div><div class="bar"><i data-bar="96"></i></div></div>
+          <div class="card enter"><span class="mtag">PLATFORM</span><div class="mrole">Calculators shipped</div><div class="mbig num" data-cu="28" data-suf="">0</div><div class="bar"><i data-bar="82"></i></div></div>
+          <div class="card enter"><span class="mtag">TELEMETRY</span><div class="mrole">IT load trend</div><svg class="spark" viewBox="0 0 200 38" preserveAspectRatio="none" aria-hidden="true"><path class="sp" d="" fill="none" stroke="#E8B563" stroke-width="1.6"/></svg></div>
+          <div class="card enter"><span class="mtag">WRITING</span><div class="mrole">Field articles</div><div class="mbig num" data-cu="27" data-suf="">0</div><div class="bar"><i data-bar="70"></i></div></div>
+        </div>
+        <div class="bento row3" style="display:grid;gap:12px;">
+          <div class="card wide enter"><span class="mtag">GOVERNANCE</span><div class="mrole">Standards &amp; compliance</div><div class="mmeta">ISO · Uptime Institute · ISA-18.2 · NFPA</div></div>
+          <div class="card enter"><span class="mtag">SAP PM/MM</span><div class="mrole">CMMS</div><div class="mbig num" data-cu="6" data-suf=" mods">0</div></div>
+          <div class="card enter"><span class="mtag">EXPLORE</span><div class="mrole">Cockpits &amp; labs →</div><div class="mmeta">9 live consoles</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note"><b class="good">What changed:</b> same grid, <b>3px hairline</b> cards (no rounded SaaS look) · <b class="good">bold Plex Sans 800 name</b> — impact, not serif/article · one amber accent + graticule wash · <b>animated on load:</b> cards stagger in, KPIs count up, bars + sparkline draw, LIVE dot pulses · reads as an <b>operator console</b> — "the instrument behind the data center". Showcase, not template.</div>
+  </div>
+
+  <div class="note" style="border:1px solid #1b2630;border-radius:8px;margin-top:4px;color:#7c8590;">
+    <b style="color:#E8B563;">Pick from your phone:</b> reply <b>"after go"</b> to apply this instrument bento to the real index dark mode, or tell me what to push further (bigger name? photo duotone? more live data? different accent?). The real <code style="color:#c3ccd4">index.html</code> stays untouched until you say go. Day/light twin of this comes next once the dark direction is locked.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  function ease(k){return 1-Math.pow(1-k,3);}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function countUp(el){
+    var target=+el.getAttribute('data-cu'),suf=el.getAttribute('data-suf')||'',st=null,dur=1300;
+    if(reduce){el.textContent=target+suf;return;}
+    function fr(t){if(!st)st=t;var k=Math.min((t-st)/dur,1);el.textContent=Math.round(target*ease(k))+suf;if(k<1)requestAnimationFrame(fr);else el.textContent=target+suf;}
+    requestAnimationFrame(fr);
+  }
+  function sparkPath(){
+    var n=24,pad=2,w=200,h=38,vals=[],s=13;
+    for(var i=0;i<n;i++){s=(s*9301+49297)%233280;vals.push(0.25+(s/233280)*0.6);}
+    var d='';for(var j=0;j<n;j++){var x=pad+j*((w-pad*2)/(n-1)),y=h-pad-(h-pad*2)*vals[j];d+=(j?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+    return d;
+  }
+  function drawSpark(svgPath){
+    svgPath.setAttribute('d',sparkPath());
+    var L=svgPath.getTotalLength&&svgPath.getTotalLength();
+    if(!L||!isFinite(L)||reduce)return;
+    svgPath.style.strokeDasharray=L;svgPath.style.strokeDashoffset=L;var st=null;
+    (function fr(t){if(!st)st=t;var k=Math.min((t-st)/1500,1);svgPath.style.strokeDashoffset=L*(1-ease(k));if(k<1)requestAnimationFrame(fr);})();
+  }
+
+  function animate(root){
+    // stagger reveal
+    var cards=root.querySelectorAll('.enter');
+    cards.forEach(function(c,i){
+      c.classList.remove('in');
+      if(reduce){c.classList.add('in');return;}
+      setTimeout(function(){c.classList.add('in');},80*i);
+    });
+    var delay=reduce?0:80*cards.length;
+    setTimeout(function(){
+      root.querySelectorAll('[data-cu]').forEach(countUp);
+      root.querySelectorAll('[data-txt]').forEach(function(e){e.textContent=e.getAttribute('data-txt');});
+      root.querySelectorAll('[data-bar]').forEach(function(b){b.style.width=b.getAttribute('data-bar')+'%';});
+      var sp=root.querySelector('.sp');if(sp)drawSpark(sp);
+    },delay);
+  }
+
+  var before=document.getElementById('before'),after=document.getElementById('after');
+  // run on load
+  animate(before);animate(after);
+  // replay buttons
+  document.querySelectorAll('[data-replay]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var id=btn.getAttribute('data-replay');
+      animate(id==='before'?before:after);
+    });
+  });
+})();
+</script>
+</body>
+</html>
