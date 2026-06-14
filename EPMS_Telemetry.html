@@ -856,7 +856,11 @@ function calcPowerFlow(){
             if(SIM.breakers[w.br] === 'closed'){
                 const flowEl = document.getElementById(`flow-${w.id}`);
                 if(flowEl){
-                    let visualClass = `energized-${color}`;
+                    // Final leg after the rack ATS (ATS -> Rack) renders GREEN —
+                    // downstream of the ATS is on the protected/green bus regardless
+                    // of which upstream source (A/B) the ATS selected.
+                    let legColor = w.id && w.id.indexOf('w_ats_rack_') === 0 ? 'B' : color;
+                    let visualClass = `energized-${legColor}`;
                     if(sourceType === 'GEN') visualClass += '-gen';
                     flowEl.setAttribute('class', `flow ${visualClass}`);
                 }

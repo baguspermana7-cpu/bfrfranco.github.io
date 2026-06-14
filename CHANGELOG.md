@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.43.13 — 2026-06-14 (EPMS — ATS→rack final leg renders green)
+
+Owner-requested fix on `EPMS_Telemetry.html` (owner explicitly directed this
+edit; the earlier "jangan merusak" applied to the dark-skin rollout, not to
+operator-requested corrections).
+
+Single surgical change: the dashed flow line AFTER each rack ATS (ATS → Rack —
+the final leg to the load) now renders GREEN instead of inheriting the upstream
+source colour (red, Feed A). Downstream of the ATS is on the protected/green
+bus regardless of which source the ATS selected.
+
+### Changed
+- **`EPMS_Telemetry.html`** `energize()` — one conditional: wires whose id
+  starts with `w_ats_rack_` use colour class `energized-B` (green); all other
+  legs unchanged (upstream PDU→ATS stays Feed-A red). Verified: 10/10 ATS→rack
+  legs green, upstream legs unchanged, NONE errors.
+
+No other EPMS wiring, engine, or page touched.
+
+---
+
 ## v1.43.12 — 2026-06-01 (article editorial skin — sweep: articles 2–18)
 
 Final wave of the standard-template article rollout. 17 articles opted into the
