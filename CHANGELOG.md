@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.43.20 — 2026-06-14 (cockpit instrument re-skin — remaining 8 pages; COMPLETE)
+
+Completes the cockpit instrument re-skin. Same chrome-only, additive, scoped,
+dark-only treatment as the datahallAI pilot, applied to the remaining 8 cockpit
+pages via the 2-line opt-in. Per `standarization/COCKPIT_RESKIN_PLAN.md`.
+
+**Hard invariants verified (all green):**
+- SVG semantic colours untouched · engine byte-identical
+  (`probe-accuracy-validation` 75/75, `test-datahall-calc` 57/57,
+  `test-conv-calc` 22/22, `probe-line-model` 52/52) · light mode inert.
+- All 8 pages headless-verified: instrument register active + graticule
+  atmosphere on in dark, NONE errors. EPMS ATS→rack green fix intact.
+
+### Changed (`<html data-rz-register="instrument">` + 1 CSS link each)
+- **`dc-conventional.html`** (2nd light-mode page; light inert)
+- **`chiller-plant.html`** · **`water-system.html`** · **`fuel-system.html`**
+- **`fire-system.html`** · **`ict.html`** · **`EPMS_Telemetry.html`** · **`datahall.html`**
+
+### Rollout status — cockpit instrument register COMPLETE
+- **9 / 9 cockpit pages** on the instrument register (datahallAI + 8 here).
+- Chrome-only: atmosphere + mono headings + cyan-hairline panels. Zero SVG/
+  engine/inline-CSS edits. Trivially reversible (2 lines per page).
+
+---
+
 ## v1.43.19 — 2026-06-14 (cockpit instrument re-skin — datahallAI pilot)
 
 First cockpit page on the instrument register. CHROME-ONLY, additive, scoped,
