@@ -7960,3 +7960,36 @@ section {
 [data-theme="dark"] .bento-row-governance .bento-card:nth-child(2){animation-delay:.52s;}
 [data-theme="dark"] .bento-row-governance .bento-card:nth-child(3){animation-delay:.59s;}
 @media(prefers-reduced-motion:reduce){[data-theme="dark"] .bento-row .bento-card{animation:none;}}
+
+/* ============================================================
+   v1.43.18 — INDEX LIGHT-MODE POLISH (day twin of the dark polish)
+   Light/default scope. Mirrors dark: layered surfaces · visible
+   per-card accents · hover lift · staggered reveal. Reveal is
+   theme-agnostic (runs in light + dark). Honours reduced-motion.
+   ============================================================ */
+.bento-card{
+  background:linear-gradient(180deg,#ffffff,#f7f9fc);
+  border-color:rgba(15,23,42,.07);
+  box-shadow:0 1px 2px rgba(15,23,42,.05),0 12px 28px -16px rgba(15,23,42,.18);
+  transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s ease,box-shadow .3s ease;
+}
+.bento-identity{background:linear-gradient(160deg,#ffffff,#f1f7f4 70%);}
+.bento-exp-card::before{opacity:.4;}
+.bento-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(15,23,42,.14);
+  box-shadow:0 1px 2px rgba(15,23,42,.05),0 18px 36px -18px rgba(15,23,42,.28);
+}
+.bento-exp-card:hover::before{opacity:.7;}
+/* staggered reveal — theme-agnostic (light + dark) */
+.bento-row .bento-card{animation:bentoRise .6s cubic-bezier(.2,.7,.2,1) backwards;}
+.bento-row-identity .bento-card:nth-child(2){animation-delay:.07s;}
+.bento-row-career .bento-card:nth-child(1){animation-delay:.10s;}
+.bento-row-career .bento-card:nth-child(2){animation-delay:.17s;}
+.bento-row-career .bento-card:nth-child(3){animation-delay:.24s;}
+.bento-row-career .bento-card:nth-child(4){animation-delay:.31s;}
+.bento-row-career .bento-card:nth-child(5){animation-delay:.38s;}
+.bento-row-governance .bento-card:nth-child(1){animation-delay:.45s;}
+.bento-row-governance .bento-card:nth-child(2){animation-delay:.52s;}
+.bento-row-governance .bento-card:nth-child(3){animation-delay:.59s;}
+@media(prefers-reduced-motion:reduce){.bento-row .bento-card{animation:none;}}

@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.43.18 — 2026-06-14 (index light-mode polish — day twin)
+
+### Changed
+- **Homepage (`index.html`) light mode — polished to twin the dark polish (v1.43.14).**
+  Same decision (keep the colourful bento character; raise quality only), now applied
+  light-scoped so day↔night match. Pure CSS:
+  - **Layered light card surfaces** — `.bento-card` gets a soft white gradient body +
+    layered shadow (was flat white + faint shadow).
+  - **Per-card accent restored** — `.bento-exp-card` corner glow (`--bexp-accent`) now
+    always-on in light too.
+  - **Hover lift** — cards rise 4px with a deeper shadow.
+  - **Staggered reveal** — the `bentoRise` reveal is now **theme-agnostic** (runs in light
+    + dark); honours `prefers-reduced-motion`.
+- Rules in both `styles.css` + `styles-index.css` (2-stylesheet rule), re-minified;
+  cache-bust `styles-index.min.css?v=2026-06-14-light`. Plan/mock: `rz-index-mockup-day.html`.
+
 ## v1.43.17 — 2026-06-14 (article editorial skin — series landings + FF-1; rollout COMPLETE)
 
 Finishes the article-family editorial rollout. The three bespoke series
