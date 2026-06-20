@@ -151,7 +151,8 @@ adoption is gated by the **per-page checklist** below.
 | E1 article pilot | `article-26.html` (editorial register via `css/rz-article-dark.css`) | **APPROVED — build next** |
 | E2 article batch | articles 1–25, batched 3–4 per ship, per-series accent override | queued |
 | E3 index (dark) | `index.html` dark mode **polished** — kept the colourful bento character; layered surfaces + visible per-card accents + hover lift + staggered reveal; pure CSS, dark-only | **✓ shipped v1.43.14** |
-| E3b hubs + light | `articles.html`, `insights.html`, `datacenter-solutions.html`; optional `index.html` light twin (mock `rz-index-mockup-day.html`) | queued |
+| E3 index (light) | `index.html` light mode **polished** — day twin of the dark polish (layered surfaces + accent glow + hover lift; `bentoRise` reveal made theme-agnostic) | **✓ shipped v1.43.18** |
+| E3b hubs | `articles.html`, `insights.html`, `datacenter-solutions.html` | queued |
 | E4 calc shells | calculator marketing shells (chrome only; engine untouched) | queued |
 
 > **Index direction note (2026-06-14):** owner rejected both dark *reskins* — editorial-serif read like an article, instrument-mono read colder/emptier than the live page. Locked direction = **POLISH the current bento, not reskin** (keep emerald + pastel + rounded + Inter; raise dark-mode quality only). Mock: `rz-index-polish.html`. The "instrument register on the homepage" idea is **not** applied to index — index stays editorial-leaning but *polished*; instrument register remains cockpit-only.
