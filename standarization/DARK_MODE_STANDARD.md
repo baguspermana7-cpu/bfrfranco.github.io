@@ -138,6 +138,33 @@ Instrument equipment table:
 - State rendered as a **chip** (`live` / `stale` / `unack`), not coloured text.
 - **Alarm row** highlight: `tr.alarm` → red tint + 3px red left inset on first cell.
 
+## Bento polish pattern (index — editorial/content surfaces)
+
+The homepage is **not** re-skinned to the instrument register — the owner chose to **polish the
+existing colourful bento** (emerald + pastel per-card accents + rounded cards + photo + Inter), not
+replace its character. This is the canonical pattern for elevating an existing card surface to
+premium quality **without** changing its identity. Shipped: dark `v1.43.14`, light `v1.43.18`.
+Rules live at the END of **both** `styles.css` + `styles-index.css` (2-stylesheet rule); `index.html`
+loads only `styles-index.min.css`. Mock: `rz-index-polish.html` (dark) + `rz-index-mockup-day.html` (light).
+
+Four moves, applied per-theme, character untouched:
+
+1. **Layered surface** — flat card → gradient body + inner top highlight + layered shadow.
+   - dark: `background:linear-gradient(180deg,#161c27,#121823)` · `box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5),0 14px 30px -18px rgba(0,0,0,.7)`
+   - light: `background:linear-gradient(180deg,#fff,#f7f9fc)` · `box-shadow:0 1px 2px rgba(15,23,42,.05),0 12px 28px -16px rgba(15,23,42,.18)`
+2. **Always-on per-card accent** — the existing `--bexp-accent` corner glow (`.bento-exp-card::before`)
+   goes from hover-only (invisible 6–12 %) to **always-on** (`opacity:.5` dark / `.4` light), → full on hover.
+3. **Hover lift** — `transform:translateY(-4px)` + deeper shadow; transition scoped per theme so the
+   other mode's hover is unaffected.
+4. **Staggered reveal on load** — `@keyframes bentoRise{from{opacity:0;transform:translateY(14px)}to{...}}`
+   on `.bento-row .bento-card` with `animation: … backwards` (NOT `forwards` — `backwards` lets `:hover`
+   transform win after the reveal ends) + `nth-child` delays per row. **Theme-agnostic** (runs in both
+   modes). Honours `prefers-reduced-motion` (`animation:none`). **No JS** — pure CSS, flash-safe.
+
+> Reuse rule: this is the template for any **existing** card surface that should look finished without
+> a redesign (hubs, calculator shells). Do NOT invent KPI/count-up content the page doesn't already
+> have — the reveal *is* the animation; the index career cards are content cards, not KPI cards.
+
 ## Comprehensive rollout plan
 
 Two register tracks, sequenced so the lowest-risk, highest-visibility work ships first. Each page
