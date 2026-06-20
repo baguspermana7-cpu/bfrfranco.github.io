@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.43.25 — 2026-06-20 (CDU guide — verified 2-phase in-rack units)
+
+### Changed
+- **`cdu-selection-guide.html`** — enriched the in-rack comparison table with two link-verified
+  **two-phase** (dielectric direct-to-chip) units: **Accelsius NeuCool IR150** (150 kW rack-
+  integrated, R-1233zd(E), 1+1 pumps, ASHRAE W27/W45, `accelsius.com/ir150/` VERIFIED) and
+  **ZutaCore HyperCool In-Rack** (20–120 kW waterless 3U/6U, `zutacore.com/solutions` VERIFIED).
+  Added a `2-PHASE` tag (violet) and a section-lead note distinguishing single-phase water CDUs
+  from two-phase/waterless options. Both URLs independently curl-verified (HTTP 200 + content
+  match); gated lead-capture spec sheets tagged VENDOR PORTAL. Chilldyne (negative-pressure
+  single-phase) and LiquidStack (2-phase immersion only) excluded as not 2-phase in-rack DTC.
+
 ## v1.43.24 — 2026-06-20 (index — kill excessive card-hover movement)
 
 ### Fixed
