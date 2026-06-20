@@ -101,3 +101,43 @@
   [data-rz-register] *{animation:none!important;transition:none!important;}
   .rz-enter{opacity:1!important;transform:none!important;}
 }
+
+/* ============================================================================
+   POLISH TRACK — character-agnostic consistency tokens (added 2026-06-20)
+   For the "polish + unify tokens" path: pages keep their OWN type + accent
+   hues but adopt ONE shared structural language (radius · elevation · surface).
+   NO register, NO font/accent imposed — distinct from the full Instrument /
+   Editorial reskin above. Owner direction 2026-06-20: unify, don't re-skin.
+   Available on any page that loads this file; adopt via the vars / .rz-surface.
+   ============================================================================ */
+:root{
+  /* radius scale — snap to the nearest step, stop free-handing px per page */
+  --rz-r-xs:6px; --rz-r-sm:8px; --rz-r-md:12px; --rz-r-lg:16px; --rz-r-xl:20px; --rz-r-pill:999px;
+  /* elevation scale (light) */
+  --rz-elev-1:0 1px 2px rgba(15,23,42,.05);
+  --rz-elev-2:0 1px 2px rgba(15,23,42,.05),0 12px 28px -16px rgba(15,23,42,.18);
+  --rz-elev-3:0 1px 2px rgba(15,23,42,.05),0 24px 48px -20px rgba(15,23,42,.28);
+  /* premium card surface body (light) */
+  --rz-surface-bg:linear-gradient(180deg,#ffffff,#f7f9fc);
+  --rz-surface-border:rgba(15,23,42,.07);
+}
+[data-theme="dark"]{
+  --rz-elev-1:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5);
+  --rz-elev-2:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5),0 14px 30px -18px rgba(0,0,0,.7);
+  --rz-elev-3:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.5),0 24px 48px -22px rgba(0,0,0,.85);
+  --rz-surface-bg:linear-gradient(180deg,#161c27,#121823);
+  --rz-surface-border:rgba(255,255,255,.08);
+}
+/* opt-in utility: premium layered card surface — keeps the element's own accent + type */
+.rz-surface{
+  background:var(--rz-surface-bg);
+  border:1px solid var(--rz-surface-border);
+  border-radius:var(--rz-r-md);
+  box-shadow:var(--rz-elev-2);
+}
+.rz-surface.rz-surface--lg{border-radius:var(--rz-r-lg);}
+.rz-surface.rz-surface--flat{box-shadow:var(--rz-elev-1);}
+/* staggered reveal — NO hover movement (matches the global no-card-movement rule) */
+@keyframes rzRise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.rz-reveal-on{animation:rzRise .6s var(--rz-ease) backwards;}
+@media (prefers-reduced-motion:reduce){.rz-reveal-on{animation:none;}}

@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.43.26 — 2026-06-20 (AWS dark logo fix + dark token foundation)
+
+### Fixed
+- **AWS company logo invisible in dark mode.** `assets/aws-dark.svg` was byte-identical to the day
+  version and used `fill="currentColor"` on the wordmark — via `<img>`, `currentColor` resolves to the
+  SVG's default **black**, so the "dark" logo rendered black-on-dark. Made the wordmark `#FFFFFF`
+  (orange `#F90` smile kept) + cache-bust the `<img src>` so the white version loads. The day/dark
+  toggle CSS (`[data-theme="dark"] .exp-logo-aws-dark{display:block}`) was already correct.
+
+### Added
+- **`css/rz-dark.css` — POLISH-TRACK consistency tokens** (character-agnostic): radius scale
+  (`--rz-r-xs…xl/pill`), elevation scale (`--rz-elev-1..3`, light + dark), `.rz-surface` premium
+  card utility, `.rz-reveal-on` (no hover movement). For the "polish + unify tokens" path — pages keep
+  their own type + accent, adopt one structural language. Distinct from the Fraunces editorial register.
+
 ## v1.43.25 — 2026-06-20 (CDU guide — verified 2-phase in-rack units)
 
 ### Changed
