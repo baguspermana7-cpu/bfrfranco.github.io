@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v1.43.24 — 2026-06-20 (index — kill excessive card-hover movement)
+
+### Fixed
+- **Stale cached JS re-running the cursor-tracking 3D tilt.** `index.html` loaded
+  `script.min.js?v=2026-05-09-v1`; the on-disk min has `initCardTilt()` disabled, but returning
+  visitors were served the **old cached build** (active `perspective rotateX/Y + translateY(-10px) +
+  scale + parallax children`) under that unchanged query string — cards wobbled, shifted out from under
+  the cursor, and flickered. Bumped to `?v=2026-06-20-cards` to force the clean, tilt-free build.
+- **Company-logo hover pop too large** — `.bento-exp-card:hover .bento-company-logo` scaled `1.15`
+  (visible "wobble"); reduced to a subtle `1.04`. The grayscale→colour fade on hover is kept.
+- Both `styles.css` + `styles-index.css` re-minified; CSS cache-bust → `?v=2026-06-20-cards`.
+- Card hover feedback is now border/glow + logo colour-fade only — **no card movement** (matches the
+  owner's no-card-movement rule). Verified via headless hover probe (card transform = `none`).
+
+## v1.43.23 — 2026-06-20 (CDU Selection & Deployment Guide + Checklist — new pages)
+
+### Added
+- **`cdu-selection-guide.html`** (new public page) — liquid-cooling Coolant Distribution Unit
+  resource for the DC Solutions hub. CDU type taxonomy (in-rack · in-row · sidecar · L2A · L2L ·
+  facility-scale), an in-row + facility comparison table and an in-rack comparison table with
+  **link-verified** vendor specs and product/datasheet/manual links (Vertiv CoolChip, CoolIT CHx,
+  Motivair, Boyd, Delta, nVent, Stulz, Envicool, ZutaCore), a manuals/documentation hub of
+  HTTP-200-verified vendor portals, an L2L-vs-L2A decision section, and ASHRAE TC 9.9 / OCP
+  standards references. Every shipped link was fetched and tagged `VERIFIED` (200 + content match)
+  or `VENDOR PORTAL` (working docs page, deep PDF not auto-verifiable) — no unverified deep links.
+- **`cdu-checklist.html`** (new public page, linked from the guide) — operational parameter bands
+  (supply temp / ΔT / flow / dP / system pressure / coolant / ASHRAE class / filtration / pump
+  redundancy / leak / ATD), an installation checklist, an inspection checklist, a preventive-
+  maintenance checklist with cadence tags, a symptom→cause→action troubleshooting table, and a
+  printable on-screen service-record form (`window.print()` + print stylesheet).
+
+### Cross-linkage (CONTENT_LINKAGE_PLAYBOOK)
+- Registered both pages: `datacenter-solutions.html` (two DS tool rows), `tools.html` (two tool
+  cards), `sitemap.xml`, `search-index.json` (`cdu-guide-1` + `cdu-checklist-1`), `llms.txt`, and a
+  glossary cross-link from the existing CDU term.
+
 ## v1.43.22 — 2026-06-20 (index bento polish — audit fixes)
 
 ### Fixed
