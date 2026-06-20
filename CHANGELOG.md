@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v1.43.16 — 2026-06-14 (article editorial skin — articles.html index pilot)
+
+Completes the article-family editorial rollout with the journal index. Extends
+the scoped `css/rz-article-dark.css` with an additive index-grid block
+(`.articles-hero` + `.article-card-*`) and opts in `articles.html`.
+
+No cockpit/engine touched. Light mode unchanged (skin scoped to
+`[data-rz-register=editorial][data-theme=dark]`). Gates CLEAN. Verified dark =
+Fraunces hero + serif card titles across 27 cards; light = Inter (scope guard);
+NONE errors. Existing aurora hero + card layout preserved.
+
+### Added
+- **`css/rz-article-dark.css`** — index-grid block: `.articles-hero h1/p`,
+  `.article-card-title` (serif), `.article-card-excerpt`, `.article-card-number`
+  (mono accent), `.article-card-category` (mono). Additive + scoped.
+
+### Changed
+- **`articles.html`** — `<html data-rz-register="editorial"
+  style="--rz-art-accent:#0891b2">` + Fraunces/Plex fonts + scoped editorial CSS.
+  Structure + light mode untouched.
+
+### Rollout status — article family
+- **32 pages on the editorial register**: 28 standard articles + geopolitics-1/2/3
+  + articles.html index.
+- Out of scope (bespoke landing templates, parallel landing/index track):
+  `insights.html`, `geopolitics.html`, `future-forward.html`,
+  `future-forward-1.html` — handed off to the landing/index design pass.
+
+---
+
 ## v1.43.15 — 2026-06-14 (article editorial skin — geopolitics series 1–3)
 
 Extends the editorial-register rollout to the Geopolitics series children
