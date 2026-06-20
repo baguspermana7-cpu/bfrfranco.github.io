@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v1.43.19 — 2026-06-14 (cockpit instrument re-skin — datahallAI pilot)
+
+First cockpit page on the instrument register. CHROME-ONLY, additive, scoped,
+dark-only. Per `standarization/COCKPIT_RESKIN_PLAN.md`.
+
+**Hard invariants verified (the "no mistake" gates):**
+- SVG semantic colours (feed A/B, alarm red, cooling cyan) — UNTOUCHED (CSS
+  contains zero SVG stroke/fill selectors).
+- Engine values byte-identical — `probe-accuracy-validation` 75/75, KPIs
+  (PUE 1.30 / IT 14.26 / GPU 7,776) unchanged; `test-datahall-calc` 57/57.
+- Light mode inert — skin gated `:not([data-theme="light"])`; datahallAI
+  defaults to light, so the skin only activates on dark toggle.
+
+### Added
+- **`css/rz-cockpit-instrument.css`** — instrument register for cockpits.
+  Activates on `<html data-rz-register="instrument">` + dark. Styles ONLY:
+  page atmosphere (graticule + faint scanlines via `body::before/::after`),
+  display headings → JetBrains Mono (`.hdr h1`, `.bx h3`, `.cd h4`, `.sb h4`),
+  panel borders → cyan hairline + 3px radius. No SVG, no engine text.
+- **`standarization/COCKPIT_RESKIN_PLAN.md`** — full plan: invariants, page
+  inventory (9 pages), ship sequence, per-ship verification checklist, rollback.
+
+### Changed
+- **`datahallAI.html`** — `<html data-rz-register="instrument">` + one CSS
+  link. Two lines; trivially reversible. SVG/engine/inline-CSS untouched.
+
+### Next (per plan)
+- v1.43.2x — dc-conventional, then chiller/water/fuel, then fire/ict/EPMS/datahall.
+
+---
+
 ## v1.43.18 — 2026-06-14 (index light-mode polish — day twin)
 
 ### Changed

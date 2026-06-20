@@ -1,0 +1,67 @@
+/* ============================================================================
+   rz-cockpit-instrument.css — instrument register for cockpit pages (v1.43.18)
+   Part of RZ Dark System v1 (design.md §16 · DARK_MODE_STANDARD.md).
+
+   Activates ONLY when <html data-rz-register="instrument"> AND NOT light mode.
+   So it never touches the existing light theme.
+
+   STRICT SCOPE — chrome only. This stylesheet styles page atmosphere, heading
+   type, and panel borders. It MUST NOT touch:
+     - any SVG stroke / fill (feed A/B, alarm red, cooling cyan are load-bearing)
+     - any engine-bound value text (#p-dash KPIs, telemetry)
+     - the accuracy-probe surfaces
+   Verified by: probe-accuracy-validation (75/75) must stay green after load.
+   ============================================================================ */
+
+html[data-rz-register="instrument"]:not([data-theme="light"]){
+  --rzi-phos:#22F5A8;          /* phosphor accent (chrome only, not SVG) */
+  --rzi-cyan:#2BE8FF;
+  --rzi-line:rgba(43,232,255,.10);
+  --rzi-line-strong:rgba(43,232,255,.20);
+  --rzi-display:'JetBrains Mono',ui-monospace,monospace;
+}
+
+/* ---- page atmosphere: graticule + scanlines behind everything ---- */
+html[data-rz-register="instrument"]:not([data-theme="light"]) body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(43,232,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(43,232,255,.022) 1px,transparent 1px);
+  background-size:34px 34px;
+  -webkit-mask-image:radial-gradient(130% 90% at 50% 0%,#000 42%,transparent 92%);
+          mask-image:radial-gradient(130% 90% at 50% 0%,#000 42%,transparent 92%);
+}
+html[data-rz-register="instrument"]:not([data-theme="light"]) body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(43,232,255,.012) 2px 3px);
+}
+/* keep app shell above the atmosphere */
+html[data-rz-register="instrument"]:not([data-theme="light"]) .hdr,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .tabs,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .mn,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .sb{position:relative;z-index:1;}
+
+/* ---- display type → JetBrains Mono (heading chrome only, not data text) ---- */
+html[data-rz-register="instrument"]:not([data-theme="light"]) .hdr h1,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .bx h3,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .cd h4,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .sb h4{
+  font-family:var(--rzi-display) !important;letter-spacing:.01em;
+}
+
+/* ---- panel chrome: sharper borders + cyan hairline accent ---- */
+html[data-rz-register="instrument"]:not([data-theme="light"]) .bx,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .cd,
+html[data-rz-register="instrument"]:not([data-theme="light"]) .k{
+  border-color:var(--rzi-line) !important;border-radius:3px !important;
+}
+/* phosphor underline accent on box headers (chrome decoration, not data) */
+html[data-rz-register="instrument"]:not([data-theme="light"]) .bx > h3{
+  border-bottom:1px solid var(--rzi-line);padding-bottom:3px;
+}
+/* header brand dot glow */
+html[data-rz-register="instrument"]:not([data-theme="light"]) .hdr h1{
+  text-shadow:0 0 12px rgba(34,245,168,.12);
+}
+
+/* respect reduced-motion (atmosphere is static anyway; no animation here) */
