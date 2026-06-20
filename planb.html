@@ -115,6 +115,17 @@
   .planthumb .pt-bars span{flex:1;height:6px;border-radius:2px;background:var(--accent,var(--cyan));opacity:0.85;}
   .planthumb.slot{border-style:dashed;opacity:0.55;}
   .planthumb .pt-lab{font-family:var(--mono);font-size:0.56rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
+  /* mini before/after schematic (hub-only preview, CSS — no image) */
+  .bamini{display:flex;align-items:stretch;gap:0.55rem;border:1px solid var(--line);border-radius:8px;background:var(--bg-2);padding:0.5rem 0.6rem;margin-bottom:0.85rem;}
+  .bamini .col{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .bamini .lab{font-family:var(--mono);font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
+  .bamini .mini{height:40px;border-radius:5px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:5px;gap:3px;}
+  .bamini .mini.b{background:#131e2e;border:1px solid rgba(255,255,255,0.06);}
+  .bamini .mini.b i{width:14px;height:3px;border-radius:2px;background:rgba(255,255,255,0.07);}
+  .bamini .mini.a{background:linear-gradient(180deg,#1a2336,#121a2b);border:1px solid rgba(255,255,255,0.12);box-shadow:0 6px 14px -8px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,255,255,0.05);}
+  .bamini .mini.a::after{content:'';position:absolute;top:-12px;right:-12px;width:36px;height:36px;border-radius:50%;background:var(--green);opacity:0.3;filter:blur(10px);}
+  .bamini .mini.a i{width:14px;height:3px;border-radius:2px;}
+  .bamini .arrow{align-self:center;font-family:var(--mono);color:var(--green);font-size:0.85rem;}
 </style>
 </head>
 <body>
@@ -209,7 +220,11 @@
       </a>
 
       <a class="plan" href="plan-dark-mode-standard.html" style="--accent:var(--cyan);">
-        <div class="planthumb"><div class="pt-ic">◐</div><div class="pt-bars"><span style="background:var(--cyan);"></span><span style="background:var(--green);"></span><span style="background:var(--amber);"></span><span style="background:var(--violet);"></span></div><div class="pt-lab">before / after</div></div>
+        <div class="bamini" aria-hidden="true">
+          <div class="col"><span class="mini b"><i></i><i></i><i></i></span><span class="lab">before · flat</span></div>
+          <span class="arrow">→</span>
+          <div class="col"><span class="mini a"><i style="background:var(--cyan);"></i><i style="background:var(--green);"></i><i style="background:var(--amber);"></i></span><span class="lab">after · depth+accent</span></div>
+        </div>
         <div class="top">
           <span class="pid">PLAN 02 · design system</span>
           <span class="st live">● Shipped · index dark polish v1.43.14</span>
