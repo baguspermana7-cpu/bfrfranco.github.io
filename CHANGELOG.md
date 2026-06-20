@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.43.22 — 2026-06-20 (index bento polish — audit fixes)
+
+### Fixed
+- **Hover-lift removed (it never worked).** The `translateY(-4px)` bento hover added with the
+  polish was dead on every card — a pre-existing global `.bento-card:hover{transform:none!important}`
+  (the owner's deliberate no-card-movement rule) overrode it. Removed the dead rule rather than force
+  it with `!important` (which would reintroduce motion the owner removed). Hover feedback stays via the
+  existing border/glow rules — no card movement. Found by the `uiux-reviewer` agent (headless-verified).
+- **Stale cache-bust** — `index.html` `styles-index.min.css?v=2026-06-14-light` → `?v=2026-06-20-bento`
+  so the fixes reach returning visitors.
+- **Rejected-purple disclaimer** — the independence-disclaimer box used Anthropic-default `#8b5cf6`
+  (CLAUDE.md Rejected-Patterns #3) with no dark path; retoned to neutral slate + emerald link.
+- **No-op `.bento-sap` dark tint** — dark override re-declared the identical 2% emerald (invisible);
+  bumped to 6% so the SAP card keeps its emerald identity in dark.
+- Deduped the redundant dark-scoped `bentoRise` reveal block (theme-agnostic block already covers dark).
+- Both `styles.css` + `styles-index.css` re-minified. Standard `DARK_MODE_STANDARD.md` updated.
+
 ## v1.43.21 — 2026-06-14 (P1 — ict + datahall metadata extension)
 
 Closes the P1 metadata items (review doc-27 §5.5 + §5.7). ADDITIVE ONLY —

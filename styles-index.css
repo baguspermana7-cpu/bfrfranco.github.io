@@ -1562,7 +1562,7 @@ a {
 }
 
 [data-theme="dark"] .bento-sap {
-    background: rgba(16, 185, 129, 0.02);
+    background: rgba(16, 185, 129, 0.06);
 }
 
 .bento-sap-title {
@@ -6307,60 +6307,36 @@ section {
 
 
 /* ============================================================
-   v1.43.14 — INDEX DARK-MODE POLISH (dark-only; light untouched)
-   Layered premium card surfaces · always-on per-card accent glow ·
-   hover lift · staggered reveal on load. Pure CSS, no JS.
+   INDEX BENTO POLISH — v1.43.14 dark / v1.43.18 light.
+   v1.43.22: hover-lift REMOVED — it conflicted with the global
+   no-card-movement rule (.bento-card:hover{transform:none!important}
+   at ~line 5325, owner's deliberate decision) and never rendered.
+   Hover feedback (border/glow) stays with the existing base + dark
+   hover rules. What remains: layered premium surfaces · always-on
+   per-card accent glow · staggered reveal. Pure CSS, no JS.
    ============================================================ */
+/* dark surfaces */
 [data-theme="dark"] .bento-card{
   background:linear-gradient(180deg,#161c27,#121823);
   border-color:rgba(255,255,255,.08);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5),0 14px 30px -18px rgba(0,0,0,.7);
-  transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s ease,box-shadow .3s ease;
+  transition:border-color .3s ease,box-shadow .3s ease;
 }
-[data-theme="dark"] .bento-identity{
-  background:linear-gradient(160deg,#172033,#121826 62%);
-}
+[data-theme="dark"] .bento-identity{background:linear-gradient(160deg,#172033,#121826 62%);}
 [data-theme="dark"] .bento-exp-card::before{opacity:.5;}
-[data-theme="dark"] .bento-card:hover{
-  transform:translateY(-4px);
-  border-color:rgba(255,255,255,.14);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 40px -20px rgba(0,0,0,.85);
-}
 [data-theme="dark"] .bento-exp-card:hover::before{opacity:1;}
-@keyframes bentoRise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-[data-theme="dark"] .bento-row .bento-card{animation:bentoRise .6s cubic-bezier(.2,.7,.2,1) backwards;}
-[data-theme="dark"] .bento-row-identity .bento-card:nth-child(2){animation-delay:.07s;}
-[data-theme="dark"] .bento-row-career .bento-card:nth-child(1){animation-delay:.10s;}
-[data-theme="dark"] .bento-row-career .bento-card:nth-child(2){animation-delay:.17s;}
-[data-theme="dark"] .bento-row-career .bento-card:nth-child(3){animation-delay:.24s;}
-[data-theme="dark"] .bento-row-career .bento-card:nth-child(4){animation-delay:.31s;}
-[data-theme="dark"] .bento-row-career .bento-card:nth-child(5){animation-delay:.38s;}
-[data-theme="dark"] .bento-row-governance .bento-card:nth-child(1){animation-delay:.45s;}
-[data-theme="dark"] .bento-row-governance .bento-card:nth-child(2){animation-delay:.52s;}
-[data-theme="dark"] .bento-row-governance .bento-card:nth-child(3){animation-delay:.59s;}
-@media(prefers-reduced-motion:reduce){[data-theme="dark"] .bento-row .bento-card{animation:none;}}
-
-/* ============================================================
-   v1.43.18 — INDEX LIGHT-MODE POLISH (day twin of the dark polish)
-   Light/default scope. Mirrors dark: layered surfaces · visible
-   per-card accents · hover lift · staggered reveal. Reveal is
-   theme-agnostic (runs in light + dark). Honours reduced-motion.
-   ============================================================ */
+/* light surfaces */
 .bento-card{
   background:linear-gradient(180deg,#ffffff,#f7f9fc);
   border-color:rgba(15,23,42,.07);
   box-shadow:0 1px 2px rgba(15,23,42,.05),0 12px 28px -16px rgba(15,23,42,.18);
-  transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s ease,box-shadow .3s ease;
+  transition:border-color .3s ease,box-shadow .3s ease;
 }
 .bento-identity{background:linear-gradient(160deg,#ffffff,#f1f7f4 70%);}
 .bento-exp-card::before{opacity:.4;}
-.bento-card:hover{
-  transform:translateY(-4px);
-  border-color:rgba(15,23,42,.14);
-  box-shadow:0 1px 2px rgba(15,23,42,.05),0 18px 36px -18px rgba(15,23,42,.28);
-}
 .bento-exp-card:hover::before{opacity:.7;}
-/* staggered reveal — theme-agnostic (light + dark) */
+/* staggered reveal on load — theme-agnostic (light + dark); no hover movement */
+@keyframes bentoRise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
 .bento-row .bento-card{animation:bentoRise .6s cubic-bezier(.2,.7,.2,1) backwards;}
 .bento-row-identity .bento-card:nth-child(2){animation-delay:.07s;}
 .bento-row-career .bento-card:nth-child(1){animation-delay:.10s;}
