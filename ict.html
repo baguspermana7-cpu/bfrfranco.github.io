@@ -541,12 +541,19 @@
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §8. -->
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.24.2">
     <script src="js/rz-bms-shell.js?v=1.24.2" defer></script>
+    <!-- v1.43.21 — semantic line model + inspector + data-quality. Network link
+         rows carry data-rz-line metadata (additive — displayed table unchanged).
+         Closes P1 ict metadata extension (review doc-27 §5.5). -->
+    <script src="js/rz-line-model.js?v=1.42.0"></script>
+    <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
+    <script src="js/rz-inspector.js?v=1.43.4" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
 </head>
-<body>
+<body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
@@ -1134,7 +1141,24 @@
                     var util = up && cap > 0 ? round1((traf / cap) * 100) : 0;
                     var uc = utilClass(util);
                     var stLabel = st === 'up' ? 'UP' : (st === 'stby' ? 'STANDBY' : (st === 'warn' ? 'WARN' : 'DOWN'));
-                    html += '<tr class="linkrow" data-seg="' + key + '" data-i="' + L + '">'
+                    // v1.43.21 — semantic line-model metadata (ADDITIVE: hidden data-* only,
+                    // derived from the existing row data; the displayed table is unchanged).
+                    var _ep = String(lk[0]).split('→');   // "FROM -> TO"
+                    var _from = (_ep[0] || '').trim(), _to = (_ep[1] || '').trim();
+                    var _med = (cap >= 10 ? 'fiber' : 'copper');
+                    var _state = up ? 'energized' : (st === 'stby' ? 'standby' : (st === 'warn' ? 'fault' : 'de-energized'));
+                    var _redun = (lk[1] === 'Backup' ? 'standby' : 'duty');
+                    var _meta = ' data-rz-line="1"'
+                          + ' data-id="ictlink-' + key + '-' + L + '"'
+                          + ' data-from="' + _from.replace(/"/g, '') + '"'
+                          + ' data-to="' + _to.replace(/"/g, '') + '"'
+                          + ' data-medium="' + _med + '"'
+                          + ' data-direction="bidirectional"'
+                          + ' data-state="' + _state + '"'
+                          + ' data-capacity="' + cap + ' Gbps"'
+                          + ' data-current="' + (up ? traf.toFixed(2) + ' Gbps / ' + util + '%' : 'down') + '"'
+                          + ' data-redundancy="' + _redun + '"';
+                    html += '<tr class="linkrow" data-seg="' + key + '" data-i="' + L + '"' + _meta + '>'
                           + '<td class="tag">' + lk[0] + '</td>'
                           + '<td>' + lk[1] + '</td>'
                           + '<td class="num">' + cap + '</td>'

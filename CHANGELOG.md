@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.43.21 — 2026-06-14 (P1 — ict + datahall metadata extension)
+
+Closes the P1 metadata items (review doc-27 §5.5 + §5.7). ADDITIVE ONLY —
+displayed data unchanged (owner mandate: skin/metadata only, never alter
+content). Verified: network link table values + rack/CRAH grid byte-identical;
+accuracy probe 75/75.
+
+### Changed
+- **`ict.html`** — network link rows (`tr.linkrow`) now carry `data-rz-line`
+  metadata derived from the EXISTING row data (from/to/medium/state/capacity/
+  current/redundancy). The displayed table (cap/traffic/util/latency/loss/
+  jitter/state/redundancy columns) is unchanged. Loads rz-line-model +
+  rz-inspector + rz-alarm-state + rz-telemetry-quality; `data-rz-data-mode=
+  "simulated"`. 5/5 rows tagged, 0 unknown mediums, NONE errors.
+- **`datahall.html`** — data-quality service: `data-rz-data-mode="simulated"`
+  + rz-telemetry-quality.js (SIM banner + chip). The rack/CRAH grid (200 racks
+  + 20 CRAH cells) and all engine-bound values are unchanged. Accuracy probe
+  75/75 confirms byte-identical.
+
+### Scope discipline
+- Metadata + library + banner only. ZERO content/data edits. Per
+  `feedback_skin_only_preserve_data` (owner 2026-06-14).
+
+---
+
 ## v1.43.20 — 2026-06-14 (cockpit instrument re-skin — remaining 8 pages; COMPLETE)
 
 Completes the cockpit instrument re-skin. Same chrome-only, additive, scoped,
