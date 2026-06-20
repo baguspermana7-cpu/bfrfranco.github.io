@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v1.43.17 — 2026-06-14 (article editorial skin — series landings + FF-1; rollout COMPLETE)
+
+Finishes the article-family editorial rollout. The three bespoke series
+landings get the serif hero treatment (additive, hero-only — bespoke card
+grids untouched); FF-1 (the real Future-Forward article, standard `.article-*`
+template) gets the full opt-in. `future-forward-1.html` is a redirect stub to
+FF-1 and is left as-is.
+
+No cockpit/engine touched. Light mode unchanged (scoped). Gates CLEAN. All four
+headless-verified (dark = Fraunces serif hero, light = Inter, NONE errors).
+
+### Added
+- **`css/rz-article-dark.css`** — landing-hero block: `.insights-hero`,
+  `.geopolitics-hero`, `.futureforward-hero` H1/dek → serif; shared
+  `.section-title` → serif. Additive + scoped.
+
+### Changed (editorial-register opt-in)
+- **`insights.html`** — cyan `#0891b2` (hero-only treatment)
+- **`geopolitics.html`** — red `#dc2626` (hero-only)
+- **`future-forward.html`** — amber `#E8B563` (remapped from violet `#a855f7`,
+  a CLAUDE.md rejected token; hero-only)
+- **`FF-1.html`** — amber `#E8B563` (remapped from violet `#6d28d9`); full
+  `.article-*` editorial treatment + read-progress runtime.
+
+### Rollout status — article family COMPLETE
+- **36 pages on the editorial register**: 28 standard articles + geopolitics-1/2/3
+  + FF-1 + articles index + insights/geopolitics/future-forward landings.
+- Every public article-family page is now on the editorial register (dark-only,
+  light untouched). The remaining dark-mode work is the instrument-register
+  cockpit re-skin (separate track, owner approval pending).
+
+---
+
 ## v1.43.16 — 2026-06-14 (article editorial skin — articles.html index pilot)
 
 Completes the article-family editorial rollout with the journal index. Extends
