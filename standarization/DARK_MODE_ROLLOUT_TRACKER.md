@@ -28,6 +28,16 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.35 | 06-21 | geopolitics-2/3 · FF-1/2 | **/ultraplan batch 2** — added missing `.confidence-low` + `.prob-*` dark badge overrides |
 | v1.43.36 | 06-21 | `styles.css` (52 pages) | **/ultraplan batch 3** — site-wide `#64748b` disclaimer/nav contrast lift (1 shared `!important` rule) |
 | v1.43.38 | 06-21 | articles · tia-942 · dc-market-tracker | **/ultraplan batch 4** — philosophy-section dark gradient + reset/dropdown/cookie-decline dark overrides |
+| v1.43.39 | 06-21 | `css/rz-bms-shell.css` + 5 cockpits | **/ultraplan batch 5** — cockpit cookie banners dark (probe-gated, 75/75 PASS) |
+
+---
+
+## ✅ Rollout COMPLETE (batches 1–5, 2026-06-21)
+
+All confirmed real dark-mode defects from the 9-agent audit are fixed and live; verified false
+positives left as-is. ~70 pages improved across 5 batches. Cockpit changes were presentation-only
+with the accuracy probe re-run green. Remaining dark-mode work is *polish/token-unification*
+(optional, low-risk) via the `css/rz-dark.css` polish-track — not defects.
 
 **Internal (no version bump — noindex surfaces):** `plan-dark-mode-standard.html` (§10–§12), `rz-index-polish.html`, `rz-index-mockup-day.html`, `planb.html` (PLAN 02 card + mini before/after), `DARK_MODE_STANDARD.md` (bento-polish pattern + Track E3).
 
@@ -57,7 +67,7 @@ false positives. Real, grouped:
 |---|---|---|---|---|
 | `.references-section` light bg | infographic-dc-cost-breakdown · -sustainability · -pue-global · asean-dc-report-2026 | inline `#f8fafc` overrode dark rule → light text invisible | high | **✅ fixed v1.43.33** (shared rule → `!important`) |
 | status badges light-on-dark | geopolitics-2 · -3 · FF-1 · FF-2 | `.confidence-low` / `.prob-medium` / `.prob-high` light bg, no dark override | high | **✅ fixed v1.43.35** |
-| cookie banners (cockpits) | datahallAI · dc-conventional · datahall · water-system · fire-system | white bg/`#374151` text (presentation-only) | high/med | ⏳ **probe-gated** — load `css/rz-bms-shell.css` (NOT styles.css); run 75/75 accuracy probe before ship |
+| cookie banners (cockpits) | datahallAI · dc-conventional (+ accept-btn on datahall/water/fire) | white bg/`#374151` text (presentation-only) | high/med | **✅ fixed v1.43.39** — dark overrides in `css/rz-bms-shell.css`; probe re-run 75/75 PASS |
 | white cookie/buttons (non-cockpit) | dc-market-tracker · tia-942-checklist | `.dmt-cookie-decline` / `.tia-btn-reset` / `.nav-user-dropdown` white bg | high | **✅ fixed v1.43.38** (active pills left white — intentional highlight) |
 | disclaimer `#64748b` (site-wide, 52 pages) | pillars + articles + more | low-contrast inline disclaimer + nav `#64748b` | high/med | **✅ fixed v1.43.36** (1 shared rule) |
 | articles `.philosophy-section` | articles.html | light gradient section bg, no dark override | med | **✅ fixed v1.43.38** |

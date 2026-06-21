@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.39 — 2026-06-21 (dark-mode /ultraplan — batch 5: cockpit cookie banners, probe-gated)
+
+### Fixed
+- **Cookie banner rendered white-on-dark on `datahallAI` + `dc-conventional`** (they use the
+  `.cookie-banner` + `.cookie-accept`/`.cookie-decline` scheme with no dark override). Added shared
+  dark overrides to `css/rz-bms-shell.css` (loaded by all 5 cockpits) — banner → `rgba(15,23,42,.95)`,
+  light text, brighter accept button; `!important` beats per-page inline. datahall/water/fire already
+  had a dark banner (this only brightens their accept button). Presentation-only — **accuracy probe
+  re-run 75/75 PASS** (engine/alarm/SLD untouched). Cache-bust bumped on all 5 cockpit pages.
+
+### Notes
+- Completes the `/ultraplan` dark-mode defect rollout (batches 1–5). All confirmed real defects fixed;
+  verified false positives left as-is. Tracker + vault note finalized.
+
 ## v1.43.38 — 2026-06-21 (dark-mode /ultraplan — batch 4: safe non-cockpit light elements)
 
 ### Fixed
