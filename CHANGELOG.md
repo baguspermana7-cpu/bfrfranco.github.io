@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.43.30 — 2026-06-21 (CDU Deep Comparison — all aspects, source-tagged)
+
+### Added
+- **`cdu-comparison.html`** (new public page, editorial register) — a deep, source-tagged
+  multi-aspect comparison of liquid-cooling CDUs, the companion to the Selection Guide:
+  - **§01 Worldwide common field issues** — 12 failure modes (leaks, biofilm, galvanic/chloride
+    corrosion, glycol degradation, particulate/microchannel clog, flow maldistribution, cavitation,
+    dew-point condensation, pump/N+1, controls gaps, commissioning defects, standardization) with
+    symptom → root cause → prevention.
+  - **§02 Control systems & BMS/DCIM** — pump VFD (flow vs ΔP), temperature PID valve, dew-point
+    reset, N+1 changeover, leak→action; per-vendor Modbus/BACnet/SNMP/Redfish matrix; DMTF Redfish
+    CoolingUnit (DSP2064) + OCP telemetry standards.
+  - **§03 After-sales & support** — per-vendor warranty/SLA/serviceability/remote-monitoring matrix
+    (Vertiv, CoolIT, Motivair/Schneider, Boyd/Eaton, nVent, Delta, Stulz, Accelsius, ZutaCore,
+    Lenovo) with honest "not publicly disclosed" markers.
+  - **§04 TCO & maintenance by type** — relative trade-off matrix (capex/opex/density/water/retrofit/
+    maintenance/redundancy) across in-rack/in-row/sidecar/L2L/L2A/2-phase.
+  - Every figure tagged STANDARD (ASHRAE/OCP/DMTF) vs VENDOR vs REPORTED; vendor-sponsored TCO
+    claims attributed by name. Registered in dc-solutions/tools/sitemap/search-index/llms; cross-
+    linked from the Selection Guide.
+
 ## v1.43.29 — 2026-06-21 (CDU guide — per-type layout/P&ID mini-diagrams in taxonomy)
 
 ### Changed

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-rz-register="editorial">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CDU Deep Comparison — Technical, Control, Field Issues, After-Sales &amp; TCO | ResistanceZero</title>
+    <meta name="description" content="A deep, source-tagged comparison of liquid-cooling CDUs across every aspect: worldwide common field issues & failure modes, control systems & BMS/DCIM integration, after-sales & warranty per vendor, and TCO & maintenance burden by type (in-rack, in-row, sidecar, L2L, L2A, 2-phase).">
+    <meta name="keywords" content="CDU comparison, CDU TCO, CDU failure modes, CDU control system, CDU BMS integration, Redfish CoolingUnit, liquid cooling field issues, CDU maintenance, CDU after-sales, in-row vs in-rack CDU">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0E0F12">
+    <link rel="canonical" href="https://resistancezero.com/cdu-comparison.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/cdu-comparison.html">
+    <meta property="og:title" content="CDU Deep Comparison — Technical, Control, Field Issues, After-Sales & TCO">
+    <meta property="og:description" content="Liquid-cooling CDUs compared across all aspects — common field issues, control systems, after-sales, and TCO by type. Source-tagged.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <style>
+        :root{ --cp-bg:#f8fafc; --cp-card:#ffffff; --cp-border:#e2e8f0; --cp-text:#0f172a; --cp-muted:#64748b; --cp-inset:#f1f5f9; --cp-accent:#0891b2;
+            --cp-serif:'Fraunces',Georgia,serif; --cp-sans:'IBM Plex Sans',system-ui,sans-serif; --cp-mono:'IBM Plex Mono',ui-monospace,monospace; }
+        [data-theme="dark"]{ --cp-bg:#0E0F12; --cp-card:#16181D; --cp-border:rgba(160,168,180,.16); --cp-text:#F6F7F9; --cp-muted:#7E8590; --cp-inset:#1c1f25; --cp-accent:#E8B563; }
+        body{ background:var(--cp-bg); color:var(--cp-text); font-family:var(--cp-sans); }
+        .cp-hero{ position:relative; padding:7rem 1.5rem 2.4rem; overflow:hidden; border-bottom:1px solid var(--cp-border); }
+        [data-theme="dark"] .cp-hero::before{ content:''; position:absolute; inset:0; background:radial-gradient(640px 300px at 84% -16%,rgba(232,181,99,.10),transparent 64%); pointer-events:none; }
+        .cp-hero>*{ position:relative; }
+        .cp-kick{ font-family:var(--cp-mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--cp-accent); font-weight:600; }
+        .cp-hero h1{ font-family:var(--cp-serif); font-weight:600; font-size:clamp(1.9rem,4vw,2.9rem); letter-spacing:-.015em; margin:.5rem 0 .6rem; line-height:1.05; max-width:22ch; }
+        .cp-hero p{ color:var(--cp-muted); max-width:74ch; font-size:1.02rem; line-height:1.6; }
+        .cp-hero .crumb{ font-family:var(--cp-mono); font-size:.72rem; color:var(--cp-muted); margin-top:1rem; }
+        .cp-hero .crumb a{ color:var(--cp-accent); }
+        .toc{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
+        .toc a{ font-family:var(--cp-mono); font-size:.68rem; padding:.3rem .6rem; border:1px solid var(--cp-border); border-radius:6px; color:var(--cp-muted); text-decoration:none; }
+        .toc a:hover{ color:var(--cp-accent); border-color:var(--cp-accent); }
+
+        .cp-wrap{ max-width:1140px; margin:0 auto; padding:0 1.4rem; }
+        .cp-sec{ padding:2.6rem 0; border-top:1px solid var(--cp-border); }
+        .cp-sec h2{ font-family:var(--cp-serif); font-weight:500; font-size:clamp(1.4rem,2.6vw,2rem); margin:0 0 .3rem; display:flex; align-items:baseline; gap:.6rem; }
+        .cp-sec h2 .n{ font-family:var(--cp-mono); font-size:.74rem; color:var(--cp-accent); font-weight:600; }
+        .cp-sec h3{ font-family:var(--cp-serif); font-weight:500; font-size:1.16rem; margin:1.5rem 0 .5rem; }
+        .cp-sec .lead{ color:var(--cp-muted); max-width:78ch; margin:.2rem 0 1.1rem; line-height:1.6; }
+
+        .src{ font-family:var(--cp-mono); font-size:.54rem; font-weight:700; letter-spacing:.03em; padding:1px 5px; border-radius:4px; white-space:nowrap; text-transform:uppercase; vertical-align:middle; }
+        .src.std{ background:rgba(16,185,129,.14); color:#10b981; border:1px solid rgba(16,185,129,.4); }
+        .src.ven{ background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
+        .src.rep{ background:rgba(59,130,246,.14); color:#2563eb; border:1px solid rgba(59,130,246,.4); }
+        [data-theme="dark"] .src.rep{ color:#60a5fa; }
+        .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--cp-muted); align-items:center; }
+
+        .tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cp-border); border-radius:10px; }
+        table.cp-tbl{ width:100%; border-collapse:collapse; font-size:.83rem; min-width:720px; }
+        table.cp-tbl th{ background:var(--cp-inset); text-align:left; padding:.6rem .75rem; font-family:var(--cp-mono); font-size:.6rem; letter-spacing:.05em; text-transform:uppercase; color:var(--cp-muted); border-bottom:1px solid var(--cp-border); position:sticky; top:0; }
+        table.cp-tbl td{ padding:.6rem .75rem; border-bottom:1px solid var(--cp-border); vertical-align:top; line-height:1.5; }
+        table.cp-tbl tr:last-child td{ border-bottom:0; }
+        table.cp-tbl td.sym{ font-weight:600; color:var(--cp-text); white-space:nowrap; }
+        table.cp-tbl .mono{ font-family:var(--cp-mono); font-size:.76rem; color:var(--cp-accent); }
+        .win{ color:#10b981; font-weight:700; } .mid{ color:#d97706; font-weight:700; } .lose{ color:#ef4444; font-weight:700; }
+
+        .cp-note{ border:1px dashed var(--cp-border); border-radius:10px; background:var(--cp-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--cp-muted); line-height:1.6; margin-top:1.3rem; }
+        .cp-note b{ color:var(--cp-text); }
+        .cp-links{ display:flex; gap:.6rem; flex-wrap:wrap; margin:.3rem 0 0; }
+        .cp-links a{ font-family:var(--cp-mono); font-size:.72rem; padding:.45rem .8rem; border:1px solid var(--cp-border); border-radius:7px; color:var(--cp-accent); text-decoration:none; }
+        .cp-links a:hover{ border-color:var(--cp-accent); }
+
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width:768px){
+            html, body{ overflow-x:hidden; max-width:100vw; }
+            img, picture, video, svg{ max-width:100%; height:auto; }
+            .cp-hero{ padding:5.5rem 1rem 2rem; }
+            .nav-menu, .nav-links{ display:none; }
+            .footer-grid{ grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+            button, a.btn, [role="button"]{ min-height:44px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li role="menuitem"><a href="cdu-selection-guide.html" style="color:#06b6d4;">CDU Selection Guide</a></li>
+                        <li role="menuitem"><a href="cdu-checklist.html">CDU Checklist</a></li>
+                        <li role="menuitem"><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <header class="cp-hero">
+        <div class="cp-wrap">
+            <span class="cp-kick">CDU Deep Comparison</span>
+            <h1>Every aspect — issues, controls, support &amp; TCO</h1>
+            <p>The CDU Selection Guide compares capacity and links. This companion goes deeper across the aspects that actually decide a deployment: the <b>field failure modes</b> that bite worldwide, how the <b>control system</b> regulates the loop and talks to the BMS/DCIM, the <b>after-sales</b> reality per vendor, and the <b>TCO &amp; maintenance burden</b> by type. Every figure is tagged by source so a vendor claim is never mistaken for a published standard.</p>
+            <div class="legend"><span class="src std">STANDARD</span> ASHRAE / OCP / DMTF Redfish &nbsp;·&nbsp; <span class="src ven">VENDOR</span> vendor datasheet/claim &nbsp;·&nbsp; <span class="src rep">REPORTED</span> widely reported, not quantified to a named standard</div>
+            <div class="toc">
+                <a href="#issues">01 · Field issues</a>
+                <a href="#control">02 · Control systems</a>
+                <a href="#aftersales">03 · After-sales</a>
+                <a href="#tco">04 · TCO &amp; maintenance</a>
+            </div>
+            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Deep Comparison</div>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+    <!-- ───────── 1. Field issues ───────── -->
+    <section class="cp-sec" id="issues"><div class="cp-wrap">
+        <h2><span class="n">01</span> Worldwide common field issues &amp; failure modes</h2>
+        <p class="lead">The three universal enemies of any cooling loop are <b>corrosion, mineral scale and microbiological fouling</b> <span class="src std">ASHRAE TC 9.9 5th ed.</span>. The CDU's core job is to hydraulically decouple the chip-side TCS loop from the facility FWS loop. Below are the failure modes operators actually report, with the prevention that addresses each.</p>
+        <div class="tbl-wrap"><table class="cp-tbl">
+            <thead><tr><th>Issue</th><th>Symptom</th><th>Root cause</th><th>Prevention</th></tr></thead>
+            <tbody>
+                <tr><td class="sym">Leaks <span class="src rep">REP</span></td><td>Slow seepage / droplets at QDs, gaskets, plate-HX joints; most start small.</td><td>QD not fully seated, bypassed interlocks, debris in coupling, rushed swaps, pump-seal failure; unclear who owns wet connections.</td><td>Dry-break / dripless blind-mate couplers; drip trays + secondary containment; leak sensors at QDs/hoses/manifolds/low points; clear IT-vs-facilities boundary. <span class="src std">ASHRAE 5th ed. formalises dry-break QDs + segmented shutoff valves</span></td></tr>
+                <tr><td class="sym">Biofilm / biological fouling <span class="src rep">REP</span></td><td>Biofilm restricts microchannel flow, raises hydraulic resistance, cuts efficiency.</td><td>Microbial growth — worst with <b>plain DI water</b> (no biocidal protection).</td><td><b>PG-25 (25% propylene glycol)</b> suppresses microbes far better than DI <span class="src std">OCP rationale</span>; coolant-quality + filtration monitoring; TCS filtration 50→25 µm cuts the particulate substrate.</td></tr>
+                <tr><td class="sym">Galvanic / chloride corrosion <span class="src rep">REP</span></td><td>Localised pitting through the oxide layer; particles shed into coolant; eventual cold-plate/HX failure.</td><td>Dissimilar metals in a conductive fluid (Al anode vs Cu cathode); chloride drives pitting; falling inhibitor reserve = active attack.</td><td>Chloride &lt; 25 ppm (consensus, not one named standard); mandatory azole inhibitor if mixed metals; prefer single-metal (copper) wetted paths; monthly inhibitor-reserve test.</td></tr>
+                <tr><td class="sym">Glycol / PG degradation <span class="src ven">VEN</span></td><td>pH drifts down; fluid turns acidic and corrodes Cu/Al/steel.</td><td>PG oxidises into organic acids (glycolic/lactic/formic), consuming alkalinity; makeup water dilutes inhibitor.</td><td>Hold pH ~8.0–10.5 (below 7.0 nonferrous corrodes fast); test pH, reserve alkalinity, glycol %, conductivity — baseline at commissioning, full panel at 3 &amp; 6 mo then annually, quarterly pH spot-checks. Inhibited OAT glycol can extend life ~2–3→8–10 yr <span class="src ven">vendor claim</span>.</td></tr>
+                <tr><td class="sym">Particulate / microchannel clog <span class="src ven">VEN</span></td><td>Clogged filters/fins, insulating scale, rising ΔP, abrupt shutdowns.</td><td>Poor water quality + weak filtration; corrosion fines abrade narrow channels at high velocity.</td><td>CDU supply filtration 50→25 µm as chip microchannel pitch narrows; side-stream/sub-micron polishing; trend filter ΔP; commissioning flush before operation.</td></tr>
+                <tr><td class="sym">Flow maldistribution <span class="src rep">REP</span></td><td>Uneven flow → hot racks/sleds; in two-phase, cold-plate dry-out (quality → &gt;100%).</td><td>Nonuniform heating raises ΔP with vapour, so hotter sleds get <i>less</i> flow (self-reinforcing); unbalanced hose routing.</td><td>Manifolds with balancing valves; dedicated inlet/outlet paths; flow restrictors for even two-phase split; CDU VFD tied to ΔT + dP setpoints.</td></tr>
+                <tr><td class="sym">Air entrainment / cavitation <span class="src ven">VEN</span></td><td>Vapour in low-pressure zones; impeller erosion; pumps short of rated life.</td><td>Low NPSH available, poor inlet geometry, trapped air, incomplete fill/bleed after service.</td><td>Cavitation-resistant inlet; purge/bleed modes; ≥10–20% NPSH margin; size pump near best-efficiency point; air-ingress alarms.</td></tr>
+                <tr><td class="sym">Condensation / dew-point sweat <span class="src ven">VEN</span></td><td>Sweating on cold plates/pipes/IT — catastrophic on electronics.</td><td>TCS supply driven <b>below room dew point</b>.</td><td>Hold TCS supply ≥2–3 °C above room dew point (dew-point-aware reset); coolant preheat; humidity sensors in controls. <span class="src std">ASHRAE W-classes cap facility supply temps</span></td></tr>
+                <tr><td class="sym">Pump wear / failed N+1 <span class="src ven">VEN</span></td><td>Premature pump failure; loss of flow if failover doesn't engage.</td><td>Oversizing (off-BEP), inadequate NPSH, seal wear, vibration; unproven failover.</td><td>N+1 with auto-failover + isolation valves (PLC &lt;100 ms); seal-less / mag-coupled pumps for online service; size near BEP; predictive analytics.</td></tr>
+                <tr><td class="sym">Controls / integration gaps <span class="src rep">REP</span></td><td>False leak alarms; sensor drift/EMI; out-of-range flow/pressure; unclear alarm response.</td><td>Rope sensors tripped by residue; aging/uncalibrated sensors; CDU↔BMS↔DCIM integration gaps; blurred monitoring ownership.</td><td>Integrate via Modbus/BACnet/dry-contact into BMS/DCIM; calibrate at commissioning; standard false-alarm procedure (dry, clean, function-test); continuous trending + automated alarms.</td></tr>
+                <tr><td class="sym">Commissioning defects <span class="src rep">REP</span></td><td>Early-life fouling, contamination, leaks, weak heat transfer, "blame-the-chiller" misdiagnosis.</td><td>Pre-charge fluid not flushed; wrong glycol % (high → viscosity penalty, low → lost freeze/biocide); incompatible refill; cross-mated QDs.</td><td>Manufacturer fill/flush with a flushing skid; staged filtration + adequate flush velocity; QC on pH/turbidity/inhibitor/glycol %. <span class="src std">OCP pre-commissioning prep for TCS row manifolds</span></td></tr>
+                <tr><td class="sym">Fluid / standardization gaps <span class="src std">STD</span></td><td>Proprietary coolants/connectors with poor cross-vendor interoperability across refresh cycles.</td><td>Historically vendor-specific connectors, hoses, manifolds and fluids.</td><td><b>OCP Cooling Environments</b> standardises interfaces/operating params; OCP <b>PG-25</b> guideline specifies wetted-material compatibility, tubing, temp/pressure, filtration + safety for multi-vendor supply.</td></tr>
+            </tbody>
+        </table></div>
+        <div class="cp-note"><b>Reported context (attribute carefully).</b> Uptime Institute 2024: ~1 in 3 outages cost &gt;$250k and cooling ≈19% of outages, rising as halls shift air→liquid <span class="src rep">REPORTED</span>. Integrated leak detection cuts response to ~8–12 min vs 2–4 hr for visual <span class="src rep">REPORTED</span>. ASHRAE TC 9.9 "Liquid Cooling: Resiliency Guidance for Cold-Plate Deployments" (Sept 2024) governs ride-through within the server's minimum time-to-throttle <span class="src std">STANDARD (paywalled — verify before quoting numbers)</span>.</div>
+    </div></section>
+
+    <!-- ───────── 2. Control systems ───────── -->
+    <section class="cp-sec" id="control"><div class="cp-wrap">
+        <h2><span class="n">02</span> Control systems &amp; BMS / DCIM integration</h2>
+        <p class="lead">A CDU runs <b>two loops at once</b>: a <b>VFD pump loop</b> for hydraulic delivery and a <b>temperature loop</b> that modulates the primary control valve to hold secondary supply temp. The fullest public description of the actual algorithms is the Lenovo Neptune RM100 O&amp;M guide (built by Cooltera); DMTF Redfish + OCP anchor the standards layer.</p>
+        <h3>How the loops are regulated <span class="src ven">VENDOR — Lenovo RM100</span></h3>
+        <div class="tbl-wrap"><table class="cp-tbl">
+            <thead><tr><th>Loop</th><th>Controls</th><th>Strategy / detail</th></tr></thead>
+            <tbody>
+                <tr><td class="sym">Pump (VFD)</td><td><span class="mono">Flow</span> or <span class="mono">ΔP</span> control</td><td>Ramp pump speed until measured flow = setpoint, or until supply-return ΔP = setpoint (10 s scan to avoid oscillation). <b>ΔP control</b> is the common default for direct-to-chip with many parallel server branches (holds head as node valves open/close); flow control where a fixed total delivery is the target. Supply temp is <i>not</i> a pump-loop variable.</td></tr>
+                <tr><td class="sym">Temperature (PID + valve)</td><td>PID on primary 2-way / 3-way valve</td><td>Modulates 0–100% flow (or 0% bypass → 100% HX). Demand-vs-feedback checked every 15 min; &gt;10% deviation → valve fault. Loss of valve signal fails to bypass/closed = <b>no cooling</b>. Retune via Ziegler-Nichols (PI for slow loads, PID for fast).</td></tr>
+                <tr><td class="sym">Setpoint / reset</td><td>Fixed SP / SP + dew-point offset</td><td>RM100 default secondary setpoint 18 °C. Vertiv XDU1350 secondary range 10–52 °C, dew-point control standard. Framed by ASHRAE W-classes (W17/W27/W32/<b>W40 new</b>/W45/W+) <span class="src std">STANDARD</span>.</td></tr>
+                <tr><td class="sym">Dew-point reset</td><td>Room temp + RH monitor</td><td>If dew point rises within 3 °C of setpoint, the CDU re-adjusts to stay <b>≥3 °C above dew point</b>; RH-sensor failure → safe fallback to Fixed SP 18 °C. <span class="src std">ASHRAE concurs: coolant must stay above dew point</span></td></tr>
+                <tr><td class="sym">N+1 pump changeover</td><td>Lead/standby, 7-day duty</td><td>Changeover ~0.25 s; on restart picks lowest-runtime pump; if a pump can't reach 90% of demand within 100 s it stops, standby starts, alarms raise; both failing → latching shutdown.</td></tr>
+                <tr><td class="sym">Leak → action</td><td>Level sensor + pressure interlock</td><td>Latching SHUTDOWN if level-open AND flow/dP &lt;50% setpoint (1 s delay); external rope/spot leak-tape connector. Boyd alternative = bypass-loop standby. <b>A dedicated motorised leak-isolation-valve algorithm is not publicly disclosed</b> — documented responses are pump-shutdown or bypass-standby.</td></tr>
+            </tbody>
+        </table></div>
+
+        <h3>BMS / DCIM protocols actually supported (per vendor)</h3>
+        <div class="tbl-wrap"><table class="cp-tbl">
+            <thead><tr><th>Vendor / product</th><th>Modbus</th><th>BACnet</th><th>SNMP</th><th>Redfish</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td class="sym">Vertiv XDU1350</td><td>RTU+TCP</td><td>—</td><td>Yes</td><td>—</td><td>CLI, web server, 7″ HMI</td></tr>
+                <tr><td class="sym">CoolIT CHx/AHx (CHx2000)</td><td>Yes</td><td>Yes</td><td>Yes</td><td><b>Yes</b></td><td>"+ many others"; group control 20 units</td></tr>
+                <tr><td class="sym">Motivair / by Schneider</td><td>Yes (+LON)</td><td>MS/TP + IP</td><td>Yes</td><td>—</td><td>EcoStruxure integration</td></tr>
+                <tr><td class="sym">Lenovo Neptune (XCC)</td><td>RS485/CAN</td><td>—</td><td>v3</td><td><b>Redfish</b></td><td>Dual Ethernet; XClarity Call-Home</td></tr>
+                <tr><td class="sym">ZutaCore</td><td>—</td><td>—</td><td>—</td><td>RESTful</td><td>HyperCool Cloud fleet ops</td></tr>
+                <tr><td class="sym">OCP requirement</td><td>legacy</td><td>legacy</td><td>legacy</td><td><b>REQUIRED</b></td><td>Prometheus telemetry; pump-RPM + valve-aperture commands</td></tr>
+            </tbody>
+        </table></div>
+        <div class="cp-note"><b>Standards layer <span class="src std">STANDARD</span>.</b> DMTF Redfish "Liquid Cooling Equipment" (DSP2064 v1.1.0) defines <span class="mono">CoolingUnit / CoolingLoop / CoolantConnector / Pump / LeakDetection / Filters / Reservoirs</span>; CDU controls landed in Redfish 2024.4 (Dec 2024). Settable on <span class="mono">CoolantConnector</span>: FlowControlLitersPerMinute, SupplyTemperatureControlCelsius, ReturnTemperatureControlCelsius, DeltaPressureControlkPa, DeltaTemperatureControlCelsius — the standardised encoding of the "which control variable" choice. OCP design flow 1.25–2.0 L/min/kW (1.5 typical) for ≤10 °C rise; Project Deschutes (Google→OCP, 2 MW) uses N+1 seal-less pumps, low-harmonic VFD, 3 °C approach, built-in leak/quality monitoring. <b>Telemetry exposed</b> (RM100, fullest public set): supply/return temps (secondary triple-redundant), ambient + RH + dew point, primary/secondary flow, static/supply pressures + unit ΔP + filter ΔP, per-pump speed/V/A/run-hours, valve demand/feedback, primary &amp; secondary duty (kW), level/leak/filter-dirty.</div>
+    </div></section>
+
+    <!-- ───────── 3. After-sales ───────── -->
+    <section class="cp-sec" id="aftersales"><div class="cp-wrap">
+        <h2><span class="n">03</span> After-sales, support &amp; warranty</h2>
+        <p class="lead">Serviceability and support are where deployments live or die over a 5–10 year life. Note two recent ownership moves that change the after-sales entity: <b>Boyd Thermal → Eaton</b> (CDU service is now Eaton's) and <b>Motivair → Schneider Electric</b> (75%). Published warranty <i>lengths</i> are rare — most vendors don't disclose them, so the table marks "n/d" honestly rather than guessing.</p>
+        <div class="tbl-wrap"><table class="cp-tbl">
+            <thead><tr><th>Vendor</th><th>Warranty (published only)</th><th>SLA / response</th><th>Serviceability</th><th>Remote monitoring</th></tr></thead>
+            <tbody>
+                <tr><td class="sym">Vertiv</td><td>n/d (optional Prime Labor Warranty; length n/d)</td><td>Guaranteed Emergency Response tiers (hours n/d); agreements 1→5 yr</td><td>Redundant pumps, dual feeds, 50 µm filter, 7″ HMI</td><td>Proactive remote monitoring + leak algorithms</td></tr>
+                <tr><td class="sym">CoolIT</td><td>Implied 2–5 yr via SLA alignment</td><td>SLA 2–5 yr; PM every 6 mo</td><td><b>Hot-swap pumps/filters/sensors, front+back, N+N</b> (CHx2000); 25 µm</td><td>Redfish/SNMP/Modbus; 80+ countries direct, 157+ via ASPs</td></tr>
+                <tr><td class="sym">Motivair / Schneider</td><td><b>12-mo parts; 4-yr compressor; 2–5 yr extended</b> (needs PM)</td><td><b>Platinum 24×7 + 6-hr onsite</b>; 2 PM visits/yr</td><td>Redundant pumps each with own VFD; corridor service access</td><td>Centurion cellular cloud (read-only) + EcoStruxure; 600+ field techs</td></tr>
+                <tr><td class="sym">Boyd / Eaton</td><td>n/d</td><td>"quick response" (hours n/d)</td><td><b>Hot-swap cold plates + pumps</b>; FRU + depots (Taiwan/USA/Poland)</td><td>Predictive PM (loss-of-flow, pump-life, hours-based)</td></tr>
+                <tr><td class="sym">nVent</td><td><b>Up to 5 yr via annual PM, then lifetime PM</b> (base n/d)</td><td>PM yearly (hours n/d)</td><td><b>Hot-swap pump-filter-drive cartridge, 1 tech &lt;30 min</b>; N+1 seal-less pumps; N+1 isolatable filters; live maintenance</td><td>Liquid-quality + leak + telemetry in pump modules</td></tr>
+                <tr><td class="sym">Delta</td><td>n/d</td><td>n/d</td><td>GoCool L2L: hot-swap filtration + dual power (N+1 count unconfirmed)</td><td>SNMP/Modbus TCP/BACnet; InfraSuite</td></tr>
+                <tr><td class="sym">Stulz</td><td>n/d</td><td><b>8-hr response</b>; 12–36 mo contracts</td><td>Optional redundant pumps; front+rear serviceable; quick-release sanitary couplings; 50 µm</td><td>Filter status + level via Modbus/BACnet/SNMP</td></tr>
+                <tr><td class="sym">Accelsius (2-phase)</td><td>"Multi-year" custom, CNA-underwritten; up to $100k/rack leak cover (NeuGuard)</td><td>Standard + white-glove (numbers n/d)</td><td><b>Hot-swap pumps/PSUs/control boards/sensors</b>; retrofit-ready; non-conductive dielectric leak</td><td>n/d</td></tr>
+                <tr><td class="sym">ZutaCore (2-phase)</td><td>References obligations (length n/d)</td><td>"Time-response objectives" (n/d)</td><td>Waterless closed loop; minimal scheduled maintenance (no glycol/strainer)</td><td>Integrated CDU health monitoring; strongest training tier (certification + LMS)</td></tr>
+                <tr><td class="sym">Lenovo</td><td>Premier Support tiers (base n/d; record-retention condition)</td><td>Scalable 24×7; quarterly health checks</td><td>RM100 4U ~100 kW; <b>drip-free blind-mate</b> couplers; Commissioning Kit included</td><td><b>XClarity</b> suite + auto Call-Home + Energy Manager (most mature)</td></tr>
+            </tbody>
+        </table></div>
+        <div class="cp-note"><b>Honesty flags.</b> Only <b>Motivair</b> (12-mo parts / 4-yr compressor / 2–5 yr extended) and <b>nVent</b> (up to 5 yr via PM) publish clean warranty figures; CoolIT implies 2–5 yr; Accelsius is "multi-year" custom. Published SLA response hours exist for only <b>Motivair (6-hr onsite)</b> and <b>Stulz (8-hr)</b>. Everything marked n/d is genuinely not publicly disclosed — confirm with the vendor.</div>
+    </div></section>
+
+    <!-- ───────── 4. TCO ───────── -->
+    <section class="cp-sec" id="tco"><div class="cp-wrap">
+        <h2><span class="n">04</span> TCO &amp; maintenance burden by type</h2>
+        <p class="lead">No neutral $/kW CDU price is publicly sourceable — so this is a <b>relative</b> trade-off read, not a quote. The biggest single capex fork is whether the type needs a <b>facility-water plant</b> (L2L) or not (L2A / 2-phase). The biggest maintenance fork is <b>many small units vs few large ones</b>. High-temp water (W40/W45) is what turns direct-to-chip into near-free cooling — the facility loop can reject through a dry cooler / tower most or all hours, eliminating the mechanical chiller.</p>
+        <div class="tbl-wrap"><table class="cp-tbl">
+            <thead><tr><th>Type</th><th>CapEx</th><th>OpEx / efficiency</th><th>Density</th><th>Water (WUE)</th><th>Retrofit</th><th>Maint. burden</th><th>Redundancy / SPOF</th></tr></thead>
+            <tbody>
+                <tr><td class="sym">In-rack</td><td class="mid">⚠ many units</td><td class="mid">⚠ good</td><td class="win">✅ 100–300 kW</td><td>depends</td><td class="win">✅ easy</td><td class="lose">❌ many small, high PM</td><td>✅ small domain / ❌ N+1 per rack costly</td></tr>
+                <tr><td class="sym">In-row</td><td class="mid">⚠ plumbing</td><td class="win">✅ good</td><td class="win">✅ 0.6–2.3 MW</td><td>depends</td><td class="mid">⚠ row piping</td><td class="win">✅ few large, easy service</td><td class="lose">❌ central SPOF → N+1</td></tr>
+                <tr><td class="sym">Sidecar</td><td class="mid">⚠ moderate</td><td class="mid">⚠ good</td><td class="win">✅ ~200 kW</td><td class="win">✅ if L2A</td><td class="win">✅ strong</td><td class="mid">⚠ per-rack + airside</td><td class="win">✅ contained</td></tr>
+                <tr><td class="sym">L2L</td><td class="lose">❌ water plant</td><td class="win">✅ best (PUE&lt;1.1, free-cool)</td><td class="win">✅ multi-MW</td><td class="lose">❌ high if evaporative</td><td class="lose">❌ needs water infra</td><td class="win">✅ pump/filter/HX focus</td><td class="lose">❌ large central SPOF</td></tr>
+                <tr><td class="sym">L2A</td><td class="win">✅ no water plant</td><td class="lose">❌ PUE&lt;1.2, summer-sensitive</td><td class="mid">⚠ 16–200 kW</td><td class="win">✅ ~zero</td><td class="win">✅ best</td><td class="mid">⚠ fan/filter/finned-tube</td><td class="mid">⚠ many small units</td></tr>
+                <tr><td class="sym">2-phase D2C</td><td class="mid">⚠ costly fluid, no water plant</td><td class="win">✅ ~35% OpEx*, low pump power</td><td class="win">✅ &gt;100 kW/rack</td><td class="win">✅ waterless</td><td class="win">✅ good</td><td class="win">✅ no fluid replacement, ITE-safe</td><td class="mid">✅ low-flow/low-leak; ⚠ newer</td></tr>
+            </tbody>
+        </table></div>
+        <p class="lead" style="margin-top:1rem;"><b>The read.</b> Lowest capex / best retrofit / zero water = <b>L2A</b> (and waterless two-phase). Best efficiency at scale = <b>L2L with warm-water free cooling</b> — at the cost of a water plant, WUE, and a large central single-point-of-failure that makes N+1 mandatory. Maintenance burden is the <b>many-small-vs-few-large</b> axis: in-rack and L2A multiply units and leak surface area; in-row and L2L concentrate into fewer serviceable units but raise SPOF. <b>Two-phase</b> is the emerging density play (≈1/10 the flow → smaller pumps, waterless), tempered by expensive dielectric fluid (two-phase fluids can exceed $50/L) and lower maturity.</p>
+        <div class="cp-note"><b>Publishing caveats.</b> *The "~35% lower OpEx" and "8–17% lower 5-yr TCO" (Accelsius/Jacobs) and "six-nines" (CoolIT) figures are <b>vendor/sponsored</b> — attribute by name <span class="src ven">VENDOR</span>. The 25 ppm chloride, pH band, and 2–3→8–10 yr fluid-life figures are industry consensus, <i>not</i> a single named standard <span class="src rep">REPORTED</span>. The most consistently corroborated numeric practices are 50 µm/25 µm filtration and the 2–3 °C-above-dew-point rule.</div>
+
+        <div class="cp-links">
+            <a href="cdu-selection-guide.html">↗ CDU Selection &amp; Deployment Guide</a>
+            <a href="cdu-checklist.html">↗ Parameters, water-quality &amp; PM checklist</a>
+            <a href="cdu-mini-bms.html">↗ CDU Mini-BMS — layout, P&amp;ID &amp; live params</a>
+        </div>
+        <div class="cp-note"><b>Disclaimer.</b> Independent educational reference built from publicly available vendor pages, ASHRAE TC 9.9, OCP and DMTF Redfish material. Source tags distinguish published standards from vendor claims and widely-reported-but-unquantified practice. Several primary PDFs (ASHRAE Sept-2024 resiliency bulletin, DMTF DSP2064, some vendor datasheets) are paywalled/bot-blocked — verify load-bearing numbers against the live source before using them in a design package. Not procurement, safety, or engineering advice.</div>
+    </div></section>
+
+    </main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container"><div class="footer-grid">
+            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
+            <div class="footer-nav"><h4 class="footer-heading">NAVIGATION</h4><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="cdu-selection-guide.html">CDU Selection Guide</a></li><li><a href="cdu-checklist.html">CDU Checklist</a></li><li><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li></ul></div>
+            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="articles.html">Technical Journal</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
+        </div></div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('rz_theme')||'light';
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('rz_theme',n); });
+        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
+        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
+        document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click',function(e){ var t=document.querySelector(this.getAttribute('href')); if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});} }); });
+    })();
+    </script>
+    <script src="auth.js?v=2026-05-09-v1" defer></script>
+</body>
+</html>
