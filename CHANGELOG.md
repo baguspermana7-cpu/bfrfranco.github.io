@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.43.28 — 2026-06-21 (CDU Mini-BMS — layout + P&ID + live parameters)
+
+### Added
+- **`cdu-mini-bms.html`** (new public page, instrument register) — an interactive miniature
+  building-management cockpit for liquid-cooling CDUs. Per CDU type (in-rack · in-row · sidecar ·
+  L2L end-of-row · L2A air-cooled): a **datahall installation layout** plan view (cold/hot aisle,
+  rack row, CDU placement, facility-water vs room-air rejection, animated flow), an **animated
+  P&ID schematic** (HX, N+1 pumps, filter, expansion tank, FT/PT/dPT sensors, manifold → rack
+  cold-plates, leak rope), and a **live simulated parameter panel** (flow LPM/kW + total, supply/
+  return temp, ΔT, dP, system pressure, pump N+1, filter, leak, HX approach, coolant) with
+  warn/alarm tile states and a RUN/WARN/ALARM P&ID pill. **Fault-injection scenarios** (leak,
+  pump-A fail, filter clog, hot facility water, low flow) drive the controls so users can see how
+  a CDU controller responds. Animation honours `prefers-reduced-motion`; all values are on-device
+  simulation from the sourced bands in the CDU Checklist (not a live feed).
+
+### Cross-linkage
+- Registered in `datacenter-solutions.html`, `tools.html`, `sitemap.xml`, `search-index.json`
+  (`cdu-mini-bms-1`), `llms.txt`; cross-linked from the CDU Selection Guide next-strip and back to
+  the Guide + Checklist from the cockpit.
+
 ## v1.43.27 — 2026-06-20 (CDU checklist — water-quality & commissioning super-detail)
 
 ### Changed
