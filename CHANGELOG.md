@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.43.52 — 2026-06-21 (editorial skin — 100% render-verified: fix h2 underline bug on all 33 articles)
+
+### Fixed
+- **The editorial h2 chrome was broken on ~30 articles — not just article-27.** The editorial CSS
+  (`rz-article-dark.css`) neutralises `border-left` but NOT `border-bottom`. Every article whose base
+  `.article-body h2` used a `border-bottom: 3px solid <accent>` underline kept that underline sitting
+  **on top of** the editorial accent-rail in dark mode — so the editorial register never fully took.
+  The original article-skin rollout shipped this latent bug across the whole batch.
+- **Fixed via a parallel `/ultraplan` workflow** (6 agents): rendered all 33 articles in dark mode,
+  detected the underline (computed `border-bottom-width` ≠ 0), and surgically added
+  `[data-theme="dark"] .article-body h2 { border-bottom:none; padding-bottom:0; }` per article so the
+  editorial rail owns the chrome. **Light-mode underline preserved**; content-specific styling
+  (calculators `.ws-*`, PDF-export strings, data tables) left untouched.
+- **100% verified** by an independent full render probe: **33/33 PASS** — every article now computes
+  Fraunces h2 (no underline) + Fraunces title + IBM Plex Mono meta. Audits CLEAN (script-tags,
+  js-syntax). 31 files changed (article-19/20 were already correct).
+- Tracker + second-brain vault updated.
+
 ## v1.43.51 — 2026-06-21 (site-wide — fix transparent-navbar bleed on custom-script pages)
 
 ### Fixed

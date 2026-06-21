@@ -26,6 +26,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 - **v1.43.46** — index hero-name infinite animations removed (nameGlow+rzNameSweep "blink") + OE hover-expand removed ("wobble")
 - **v1.43.48** — **article editorial skin now 29/29** — applied the approved §08 editorial register (`css/rz-article-dark.css` + Fraunces) to the 3 missed articles: **article-27** (red #dc2626), **FF-2 + FF-3** (amber #E8B563). Replicated article-26's head block; calculator/content untouched.
 - **v1.43.50** — **editorial consistency tanpa pengecualian** — added read-progress JS to 4 hubs (articles/insights/geopolitics/future-forward); gave `article-9-paper` (print/PDF) a **screen-only** dark editorial mode (`@media screen`, Fraunces + amber) so **print output stays white/pristine** — print feature untouched, verified. Full editorial coverage now complete.
+- **v1.43.52** — **editorial h2 underline bug fixed on ALL 33 articles** (via `/ultraplan` 6-agent render-verify+fix). Root cause: editorial CSS kills `border-left` but not `border-bottom`; base `.article-body h2{border-bottom:3px}` underline sat on the editorial rail → register never fully took. Neutralized in dark per article. **33/33 render-PASS, independently re-probed (h2 no-underline + Fraunces + Plex Mono meta).** This is the real "100%".
 
 ## `/ultraplan` audit (9-agent parallel, read-only)
 

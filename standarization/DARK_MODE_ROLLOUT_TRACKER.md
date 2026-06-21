@@ -32,6 +32,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.46 | 06-21 | `index.html` (styles) | removed hero-name infinite animations ("blink") + OE hover-expand ("wobble") |
 | v1.43.48 | 06-21 | article-27 · FF-2 · FF-3 | **article editorial skin catch-up** — §08 editorial register applied to the 3 missed articles (now 29/29) |
 | v1.43.50 | 06-21 | 4 hubs + article-9-paper | **editorial consistency (no exceptions)** — read-progress JS on hubs; screen-only dark editorial on the print paper (print stays white, verified) |
+| v1.43.52 | 06-21 | 31 articles | **editorial h2 underline bug fixed across ALL articles** (via `/ultraplan` 6-agent render-verify+fix) — base `border-bottom:3px` underline was sitting on the editorial rail; neutralized in dark. **33/33 render-PASS, independently re-probed.** |
 
 ---
 
