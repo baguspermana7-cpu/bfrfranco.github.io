@@ -114,10 +114,19 @@
         .faq-item .faq-a b{ color:var(--cdu-text); }
 
         /* comparison tables */
-        .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:8px; }
+        .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:8px;
+            background:
+              linear-gradient(to right, var(--cdu-card) 30%, rgba(255,255,255,0)) 0 0/36px 100% no-repeat local,
+              linear-gradient(to left, var(--cdu-card) 30%, rgba(255,255,255,0)) 100% 0/36px 100% no-repeat local,
+              radial-gradient(farthest-side at 0 50%, rgba(8,145,178,.22), rgba(0,0,0,0)) 0 0/14px 100% no-repeat scroll,
+              radial-gradient(farthest-side at 100% 50%, rgba(8,145,178,.22), rgba(0,0,0,0)) 100% 0/14px 100% no-repeat scroll;
+            background-color:var(--cdu-card); }
         table.cdu-tbl { width:100%; border-collapse:collapse; font-size:.85rem; min-width:760px; }
         table.cdu-tbl th { background:var(--cdu-inset); text-align:left; padding:.7rem .8rem; font-family:'JetBrains Mono',monospace; font-size:.64rem; letter-spacing:.05em; text-transform:uppercase; color:var(--cdu-muted); border-bottom:1px solid var(--cdu-border); position:sticky; top:0; }
-        table.cdu-tbl td { padding:.7rem .8rem; border-bottom:1px solid var(--cdu-border); vertical-align:top; }
+        table.cdu-tbl td { padding:.7rem .8rem; border-bottom:1px solid rgba(148,163,184,.16); vertical-align:top; }
+        /* sticky first column (Model) keeps context while scrolling specs */
+        table.cdu-tbl th:first-child, table.cdu-tbl td:first-child { position:sticky; left:0; z-index:2; background:var(--cdu-card); box-shadow:1px 0 0 var(--cdu-border); }
+        table.cdu-tbl th:first-child { background:var(--cdu-inset); z-index:3; }
         table.cdu-tbl tr:last-child td { border-bottom:0; }
         table.cdu-tbl tbody tr:hover { background:var(--cdu-inset); }
         table.cdu-tbl .model { font-weight:700; color:var(--cdu-text); }

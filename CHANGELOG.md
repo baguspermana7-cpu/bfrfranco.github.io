@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.43 — 2026-06-21 (CDU pages — dense-table UIUX polish, round 2)
+
+### Changed (applied to the new high-density tables)
+- **Sticky first column** — the Model/Vendor/Symptom column now pins to the left on the wide 9-column
+  guide tables, the comparison tables and the 16-row checklist tables, so context stays visible while
+  scrolling the spec columns horizontally (`cdu-selection-guide.html` `.cdu-tbl`, `cdu-comparison.html`
+  `.cp-tbl`, `cdu-checklist.html` `.ck-tbl`).
+- **Scroll-shadow affordance** — `.tbl-wrap` gains the classic CSS scroll-shadow (edge fades + inner
+  shadows that appear only when there's more to scroll), signalling the horizontal overflow on dense
+  tables instead of silently clipping.
+- **Capability matrix** — the comparison matrix's ✓/—/~ glyph columns are now centred + mono for
+  faster scanning (`.cp-matrix`).
+- **Lighter inner-row hairlines** on the guide table to match the editorial-register tables.
+
 ## v1.43.42 — 2026-06-21 (CDU checklist + comparison — deeper content)
 
 ### Changed
