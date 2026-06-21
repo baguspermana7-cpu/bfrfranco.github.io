@@ -167,6 +167,24 @@
                 }
             });
         }
+
+        // Scroll-aware navbar solidity: the base .navbar is background:transparent and only
+        // turns solid via the .scrolled class (normally added by script.js). Pages that use a
+        // custom inline script instead of script.js never get it, so content bleeds THROUGH the
+        // navbar on scroll. Bind it here once so every page that loads this shared nav script is
+        // covered. Idempotent with script.js's own handler (both compute from scrollY).
+        if (!window.__rzNavScrollBound) {
+            window.__rzNavScrollBound = true;
+            var navEl = document.querySelector('nav.navbar, header.navbar, .navbar');
+            if (navEl) {
+                var onNavScroll = function(){
+                    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+                    navEl.classList.toggle('scrolled', y > 10);
+                };
+                window.addEventListener('scroll', onNavScroll, { passive: true });
+                onNavScroll();
+            }
+        }
     }
 
     if (document.readyState === 'loading') {

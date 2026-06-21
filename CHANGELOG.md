@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.43.51 — 2026-06-21 (site-wide — fix transparent-navbar bleed on custom-script pages)
+
+### Fixed
+- **Scroll-aware navbar, now site-wide.** Extended the CDU-page navbar fix (v1.43.49) to the whole
+  site: the base `.navbar` is `background:transparent` and only turns solid via the `.scrolled`
+  class added by `script.js`. ~23 pages use custom inline scripts instead of `script.js` (calculators,
+  comparison pages, LTC labs, network hub) and never got it, so content bled through the navbar on
+  scroll. Added the scroll-aware `.scrolled` toggle once to the shared **`js/rz-mobile-nav.js`** (loaded
+  site-wide; idempotent + self-guarded so it never double-binds with `script.js`), fixing all of them
+  in one place. Also added the missing `rz-mobile-nav.js` tag to `network-visualization-hub.html`
+  (was absent — a hamburger-mandate gap too). Verified the solid-on-scroll navbar on calculators,
+  comparisons, LTC labs, network hub and CDU pages.
+
 ## v1.43.50 — 2026-06-21 (editorial skin — final consistency: hubs + print paper, no exceptions)
 
 ### Changed
