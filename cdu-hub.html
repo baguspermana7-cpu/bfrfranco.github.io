@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Liquid-Cooling CDU Toolkit | Selection, Checklist, Mini-BMS &amp; Comparison | ResistanceZero</title>
+    <meta name="description" content="The complete liquid-cooling Coolant Distribution Unit (CDU) toolkit for AI/HPC data centers: a selection & deployment guide, an install/inspection/maintenance checklist, an interactive Mini-BMS cockpit (datahall layout + P&ID + live parameters), and a deep all-aspects comparison.">
+    <meta name="keywords" content="CDU, coolant distribution unit, liquid cooling, in-row CDU, in-rack CDU, L2L, L2A, direct-to-chip, CDU comparison, CDU checklist, CDU BMS, data center cooling">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0E0F12">
+    <link rel="canonical" href="https://resistancezero.com/cdu-hub.html">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/cdu-hub.html">
+    <meta property="og:title" content="Liquid-Cooling CDU Toolkit | ResistanceZero">
+    <meta property="og:description" content="Selection guide, maintenance checklist, interactive Mini-BMS cockpit, and a deep all-aspects comparison for liquid-cooling CDUs.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Liquid-Cooling CDU Toolkit">
+    <meta name="twitter:description" content="Selection guide, maintenance checklist, interactive Mini-BMS cockpit, and a deep all-aspects comparison for liquid-cooling CDUs.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"CollectionPage","name":"Liquid-Cooling CDU Toolkit","description":"A four-part toolkit for liquid-cooling Coolant Distribution Units: selection & deployment guide, maintenance checklist, interactive Mini-BMS cockpit, and deep all-aspects comparison.","url":"https://resistancezero.com/cdu-hub.html","hasPart":[{"@type":"TechArticle","name":"CDU Selection & Deployment Guide","url":"https://resistancezero.com/cdu-selection-guide.html"},{"@type":"TechArticle","name":"CDU Installation, Inspection & Maintenance Checklist","url":"https://resistancezero.com/cdu-checklist.html"},{"@type":"WebApplication","name":"CDU Mini-BMS","url":"https://resistancezero.com/cdu-mini-bms.html"},{"@type":"TechArticle","name":"CDU Deep Comparison","url":"https://resistancezero.com/cdu-comparison.html"}]}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"CDU Toolkit"}]}
+    </script>
+    <style>
+        :root { --cdu-primary:#06b6d4; --cdu-accent:#0891b2; }
+        [data-theme="dark"] { --cdu-bg:#0f172a; --cdu-card:#1e293b; --cdu-border:#334155; --cdu-text:#f1f5f9; --cdu-muted:#94a3b8; --cdu-inset:#0b1220; }
+        :root, [data-theme="light"] { --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#64748b; --cdu-inset:#f1f5f9; }
+        body { font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif; background:var(--cdu-bg); color:var(--cdu-text); }
+        main { background:var(--cdu-bg); }
+        .hub-hero { position:relative; padding:7rem 1.5rem 2.4rem; border-bottom:1px solid var(--cdu-border); overflow:hidden; }
+        [data-theme="dark"] .hub-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(680px 320px at 80% -20%,rgba(6,182,212,.12),transparent 64%); pointer-events:none; }
+        .hub-hero > * { position:relative; }
+        .hub-kick { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--cdu-primary); font-weight:600; }
+        .hub-hero h1 { font-size:clamp(2rem,4.4vw,3rem); font-weight:700; letter-spacing:-.02em; margin:.5rem 0 .6rem; line-height:1.05; }
+        .hub-hero p { color:var(--cdu-muted); max-width:70ch; font-size:1.05rem; line-height:1.6; }
+        .hub-hero .crumb { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--cdu-muted); margin-top:1rem; }
+        .hub-hero .crumb a { color:var(--cdu-primary); }
+        .hub-wrap { max-width:1080px; margin:0 auto; padding:2.4rem 1.4rem 3rem; }
+        .hub-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.1rem; }
+        .hub-card { display:flex; flex-direction:column; gap:.5rem; border:1px solid var(--cdu-border); border-top:2px solid var(--tc,var(--cdu-primary)); border-radius:8px; background:var(--cdu-card); padding:1.4rem 1.5rem; text-decoration:none; color:inherit; position:relative; transition:transform .15s, border-color .15s, box-shadow .15s; }
+        .hub-card:hover { transform:translateY(-2px); border-color:var(--tc,var(--cdu-primary)); box-shadow:0 8px 24px rgba(0,0,0,.18); }
+        .hub-card .ico { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; background:color-mix(in srgb, var(--tc,var(--cdu-primary)) 16%, transparent); color:var(--tc,var(--cdu-primary)); }
+        .hub-card h2 { font-size:1.12rem; margin:.3rem 0 0; font-weight:700; }
+        .hub-card .num { font-family:'JetBrains Mono',monospace; font-size:.64rem; letter-spacing:.1em; color:var(--cdu-muted); text-transform:uppercase; }
+        .hub-card p { font-size:.9rem; color:var(--cdu-muted); margin:0; line-height:1.55; flex:1; }
+        .hub-card .go { font-family:'JetBrains Mono',monospace; font-size:.74rem; font-weight:600; color:var(--tc,var(--cdu-primary)); margin-top:.4rem; }
+        .hub-card .go::after { content:' →'; transition:margin-left .15s; }
+        .hub-card:hover .go::after { margin-left:4px; }
+        .hub-tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.2rem; }
+        .hub-tags span { font-family:'JetBrains Mono',monospace; font-size:.58rem; padding:1px 6px; border-radius:4px; background:var(--cdu-inset); color:var(--cdu-muted); border:1px solid var(--cdu-border); }
+        .hub-note { border:1px dashed var(--cdu-border); border-radius:10px; background:var(--cdu-inset); padding:1rem 1.2rem; font-size:.84rem; color:var(--cdu-muted); line-height:1.6; margin-top:1.6rem; }
+        .hub-note b { color:var(--cdu-text); }
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width:768px){
+            html, body { overflow-x:hidden; max-width:100vw; }
+            img, picture, video, svg { max-width:100%; height:auto; }
+            .hub-hero { padding:5.5rem 1rem 2rem; }
+            .nav-menu, .nav-links { display:none; }
+            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+            button, a.btn, [role="button"] { min-height:44px; }
+            .hub-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li role="menuitem"><a href="cdu-selection-guide.html" style="color:#06b6d4;">CDU Selection Guide</a></li>
+                        <li role="menuitem"><a href="cdu-checklist.html">CDU Checklist</a></li>
+                        <li role="menuitem"><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li>
+                        <li role="menuitem"><a href="cdu-comparison.html">CDU Deep Comparison</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <header class="hub-hero">
+        <div class="hub-wrap" style="padding-bottom:0;">
+            <span class="hub-kick">Liquid Cooling · CDU Toolkit</span>
+            <h1>Coolant Distribution Unit toolkit</h1>
+            <p>Everything for selecting, deploying, operating and comparing liquid-cooling CDUs in AI/HPC data centers — four linked resources, from a verified-spec selection guide to an interactive mini-BMS cockpit. Pick a tool below.</p>
+            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → CDU Toolkit</div>
+        </div>
+    </header>
+
+    <main id="main-content"><div class="hub-wrap">
+        <div class="hub-grid">
+
+            <a class="hub-card" href="cdu-selection-guide.html" style="--tc:#06b6d4;">
+                <span class="ico">≈</span>
+                <span class="num">01 · Select</span>
+                <h2>CDU Selection &amp; Deployment Guide</h2>
+                <p>Compare in-row, in-rack, sidecar, L2L vs L2A and 2-phase CDUs with verified vendor specs and manual links, the flow/ΔT sizing math, installation requirements, a documentation hub, and an FAQ.</p>
+                <div class="hub-tags"><span>9-col deep tables</span><span>sizing math</span><span>verified links</span></div>
+                <span class="go">Open the guide</span>
+            </a>
+
+            <a class="hub-card" href="cdu-checklist.html" style="--tc:#0891b2;">
+                <span class="ico">✓</span>
+                <span class="num">02 · Operate</span>
+                <h2>Install, Inspection &amp; Maintenance Checklist</h2>
+                <p>Operational parameter bands, water-quality acceptance criteria (ASHRAE W-classes, OCP limits), the numeric commissioning procedure, a symptom→cause→action table, PM cadences, and a printable service-record form.</p>
+                <div class="hub-tags"><span>water quality</span><span>commissioning</span><span>printable form</span></div>
+                <span class="go">Open the checklist</span>
+            </a>
+
+            <a class="hub-card" href="cdu-mini-bms.html" style="--tc:#22d3ee;">
+                <span class="ico">📡</span>
+                <span class="num">03 · Visualise</span>
+                <h2>CDU Mini-BMS</h2>
+                <p>An interactive cockpit per CDU type: datahall installation layout, a full ISA P&amp;ID schematic, and live simulated parameters with sparkline trends — inject a fault (leak, pump-fail, clog…) and watch the controls respond.</p>
+                <div class="hub-tags"><span>animated P&amp;ID</span><span>live params</span><span>fault scenarios</span></div>
+                <span class="go">Open the cockpit</span>
+            </a>
+
+            <a class="hub-card" href="cdu-comparison.html" style="--tc:#0ea5b7;">
+                <span class="ico">⚖</span>
+                <span class="num">04 · Compare</span>
+                <h2>Deep Comparison — All Aspects</h2>
+                <p>Source-tagged comparison across worldwide common field issues, control systems &amp; BMS/DCIM integration, after-sales &amp; warranty per vendor, and TCO &amp; maintenance burden by type — plus a 10-vendor capability matrix.</p>
+                <div class="hub-tags"><span>field issues</span><span>control + TCO</span><span>vendor matrix</span></div>
+                <span class="go">Open the comparison</span>
+            </a>
+
+        </div>
+
+        <div class="hub-note">
+            <b>What is a CDU?</b> A Coolant Distribution Unit hydraulically decouples the facility water loop from the chip-side technology cooling loop and regulates flow, temperature and pressure to direct-to-chip cold plates. This toolkit is an independent, educational reference built from published vendor datasheets and standards (ASHRAE TC 9.9, OCP, DMTF Redfish) — every figure is source-tagged, and links are validated. Not procurement, safety, or engineering advice.
+        </div>
+    </div></main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container"><div class="footer-grid">
+            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
+            <div class="footer-nav"><h4 class="footer-heading">CDU TOOLKIT</h4><ul class="footer-links"><li><a href="cdu-selection-guide.html">Selection Guide</a></li><li><a href="cdu-checklist.html">Checklist</a></li><li><a href="cdu-mini-bms.html">Mini-BMS</a></li><li><a href="cdu-comparison.html">Deep Comparison</a></li></ul></div>
+            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
+        </div></div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('rz_theme')||'light';
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('rz_theme',n); });
+        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
+        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
+    })();
+    </script>
+    <script src="auth.js?v=2026-05-09-v1" defer></script>
+</body>
+</html>

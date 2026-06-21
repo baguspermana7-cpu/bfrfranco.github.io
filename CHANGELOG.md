@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.43.47 — 2026-06-21 (CDU hub consolidation + dense-table fixes)
+
+### Added
+- **`cdu-hub.html`** (new) — a single landing page for the liquid-cooling CDU toolkit with four
+  resource cards (Selection Guide · Checklist · Mini-BMS · Deep Comparison). The four separate CDU
+  cards on `datacenter-solutions.html` and `tools.html` are now **consolidated into one** "Liquid-
+  Cooling CDU Toolkit" card that opens this hub. Registered in sitemap/search-index/llms.
+
+### Fixed
+- **Dense comparison tables were cramped & unprofessional** — the 9-column guide tables had
+  `min-width:760px`, forcing the spec column to wrap word-by-word. Raised to 1320px with explicit
+  per-column min-widths (spec column 300–340px) so cells breathe; widened the comparison tables to
+  880px. Header rows get a 2px under-rule + no-wrap.
+- **Table header collided with the fixed navbar** — removed `th{position:sticky;top:0}` (stuck the
+  header under the navbar on scroll) and the sticky-first-column `z-index` rules (raised cells above
+  the nav) from `.cdu-tbl` / `.cp-tbl` / `.ck-tbl`. Content now scrolls cleanly under the navbar.
+
 ## v1.43.46 — 2026-06-21 (index — kill distracting hero-name "blink" + OE hover "wobble")
 
 ### Fixed
