@@ -25,6 +25,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 - **v1.43.39** — /ultraplan batch 5: cockpit cookie banners dark (`css/rz-bms-shell.css`, probe-gated 75/75 PASS) — defect rollout COMPLETE
 - **v1.43.46** — index hero-name infinite animations removed (nameGlow+rzNameSweep "blink") + OE hover-expand removed ("wobble")
 - **v1.43.48** — **article editorial skin now 29/29** — applied the approved §08 editorial register (`css/rz-article-dark.css` + Fraunces) to the 3 missed articles: **article-27** (red #dc2626), **FF-2 + FF-3** (amber #E8B563). Replicated article-26's head block; calculator/content untouched.
+- **v1.43.50** — **editorial consistency tanpa pengecualian** — added read-progress JS to 4 hubs (articles/insights/geopolitics/future-forward); gave `article-9-paper` (print/PDF) a **screen-only** dark editorial mode (`@media screen`, Fraunces + amber) so **print output stays white/pristine** — print feature untouched, verified. Full editorial coverage now complete.
 
 ## `/ultraplan` audit (9-agent parallel, read-only)
 

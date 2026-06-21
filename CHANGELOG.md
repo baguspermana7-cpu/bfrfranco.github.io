@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.43.50 — 2026-06-21 (editorial skin — final consistency: hubs + print paper, no exceptions)
+
+### Changed
+- **Editorial skin consistency, tanpa pengecualian.** After confirming all 29 articles + 6 series
+  landings are consistent, closed the last 2 edge cases:
+  - **4 hub/landing pages** (`articles`, `insights`, `geopolitics`, `future-forward`) — added the
+    `js/rz-article-editorial.js` read-progress/stagger (they already had the editorial CSS + Fraunces;
+    JS is progressive-enhancement + self-guards). Verified: no errors, hubs render fine.
+  - **`article-9-paper.html`** (print/PDF "Technical Paper" variant) — given a **screen-only dark
+    editorial mode** (Fraunces title + amber accent + dark surfaces) scoped under `@media screen` so
+    the **print/PDF output stays pristine white** — the print feature is untouched. Verified headless:
+    screen bg `#0E0F12` + Fraunces title; print media bg `#fff` + dark text; zero console errors.
+
+### Notes
+- No `.article-*` classes on the paper, so it uses a self-contained `@media screen` override (not
+  `rz-article-dark.css`). Colours only — no layout/structure changes. Tracker + vault updated.
+
 ## v1.43.49 — 2026-06-21 (CDU pages — fix transparent navbar bleed-through on scroll)
 
 ### Fixed

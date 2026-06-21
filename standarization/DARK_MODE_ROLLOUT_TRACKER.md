@@ -31,6 +31,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.39 | 06-21 | `css/rz-bms-shell.css` + 5 cockpits | **/ultraplan batch 5** — cockpit cookie banners dark (probe-gated, 75/75 PASS) |
 | v1.43.46 | 06-21 | `index.html` (styles) | removed hero-name infinite animations ("blink") + OE hover-expand ("wobble") |
 | v1.43.48 | 06-21 | article-27 · FF-2 · FF-3 | **article editorial skin catch-up** — §08 editorial register applied to the 3 missed articles (now 29/29) |
+| v1.43.50 | 06-21 | 4 hubs + article-9-paper | **editorial consistency (no exceptions)** — read-progress JS on hubs; screen-only dark editorial on the print paper (print stays white, verified) |
 
 ---
 
