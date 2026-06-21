@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.43.44 — 2026-06-21 (CDU Mini-BMS — full-width P&ID for legibility)
+
+### Changed
+- **`cdu-mini-bms.html`** — reorganised the cockpit so the detailed ISA P&ID gets a **full-width row**
+  (capped 920 px, centred) instead of sharing a half-width column; the datahall layout + live
+  parameter tiles now share the top row. The dense instrumentation (valve/pump/instrument symbols,
+  tag bubbles, manifold, legend) is now legible at full scale. No data/logic change.
+
 ## v1.43.43 — 2026-06-21 (CDU pages — dense-table UIUX polish, round 2)
 
 ### Changed (applied to the new high-density tables)
