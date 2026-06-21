@@ -144,4 +144,9 @@ Full raw audit JSON: workflow `rz-darkmode-defect-audit` run `wf_a66cc0ed-021`.
 
 ## Parked
 
-- `plan-live-data-edge.html` (PLAN 03) — static-vs-edge deck, slides 1–5 rewritten, slides 6–8 + option-JS still hold ECC content. Uncommitted, unregistered. Finish + register in `planb.html` or revert.
+- ~~`plan-live-data-edge.html` (PLAN 03) — static-vs-edge deck~~ — **✅ DONE 2026-06-21.**
+  Slides 6–8 + the option-JS `META` rewritten off the leftover ECC content to the static-vs-edge
+  topic (edge-unlock mockups · skeleton→unlock→harden roadmap · 4 platform decisions with
+  **verdict placeholders left open** for the owner). Registered as **PLAN 03 (Live)** in
+  `planb.html`. Verified: 8 slides, option/ptab/SVG interactions work, 0 ECC leftovers, 0 errors.
+  Internal/noindex — no version bump (planb convention).

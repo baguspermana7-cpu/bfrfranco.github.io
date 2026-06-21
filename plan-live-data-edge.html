@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan · Static vs Edge — the decision that unlocks live data</title>
+<meta name="description" content="Interactive slide-deck plan: should resistancezero.com stay 100% static or adopt one edge function? Unlocks live data, CSP nonces, server-side RBAC. SVG request-flow diagram, clickable unlock explorer, A/B/C option toggle, before/after.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B1120">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/rz-version.js?v=1.43.57" defer></script>
+<style>
+  :root{
+    --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --violet:#A855F7;
+    --bg:#0B1120; --bg-2:#0F172A; --panel:#121C2E; --panel-2:#16213A;
+    --line:rgba(148,163,184,0.14); --line-strong:rgba(148,163,184,0.28);
+    --text:#E2E8F0; --text-strong:#F8FAFC; --muted:#8295AE; --dim:#5B6B82;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:var(--cyan);text-decoration:none;} a:hover{text-decoration:underline;text-underline-offset:3px;}
+  h1,h2,h3,h4{color:var(--text-strong);font-weight:700;line-height:1.15;letter-spacing:-0.015em;margin:0;}
+  code{font-family:var(--mono);}
+  ::selection{background:rgba(0,221,255,0.22);}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* ── deck shell ── */
+  .deck{scroll-snap-type:y proximity;}
+  .slide{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:5rem 1.4rem 4rem;position:relative;border-bottom:1px solid var(--line);}
+  .slide-inner{max-width:1120px;margin:0 auto;width:100%;}
+  .slabel{font-family:var(--mono);font-size:0.66rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem;}
+  .slabel .sn{color:var(--accent,var(--cyan));}
+  .slabel .ln{flex:1;height:1px;background:var(--line);max-width:120px;}
+  .slide h2{font-size:clamp(1.5rem,3.4vw,2.4rem);margin-bottom:0.7rem;}
+  .slide .sub{color:var(--muted);max-width:74ch;font-size:clamp(0.95rem,1.5vw,1.1rem);line-height:1.6;}
+
+  /* progress + chrome */
+  .progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--cyan));z-index:120;transition:width .2s;}
+  .topchrome{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1.2rem;background:linear-gradient(180deg,rgba(11,17,32,0.92),transparent);}
+  .topchrome .brand{display:flex;align-items:center;gap:0.55rem;font-family:var(--mono);font-weight:700;font-size:0.74rem;letter-spacing:0.04em;color:var(--text-strong);}
+  .topchrome .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px rgba(255,170,0,0.16);}
+  .topchrome .hublink{font-family:var(--mono);font-size:0.68rem;color:var(--muted);border:1px solid var(--line);padding:0.28rem 0.55rem;border-radius:6px;}
+  .topchrome .hublink:hover{color:var(--text-strong);text-decoration:none;border-color:var(--line-strong);}
+
+  /* dot nav */
+  .dotnav{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:110;display:flex;flex-direction:column;gap:0.65rem;}
+  .dotnav button{width:11px;height:11px;border-radius:50%;border:1px solid var(--line-strong);background:transparent;padding:0;transition:all .18s;position:relative;}
+  .dotnav button:hover{border-color:var(--cyan);}
+  .dotnav button.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .dotnav button .tip{position:absolute;right:18px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--mono);font-size:0.6rem;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:0.15rem 0.45rem;opacity:0;pointer-events:none;transition:opacity .15s;}
+  .dotnav button:hover .tip{opacity:1;}
+
+  /* nav arrows + counter */
+  .navbtns{position:fixed;bottom:18px;right:18px;z-index:110;display:flex;gap:0.4rem;align-items:center;}
+  .navbtns .ct{font-family:var(--mono);font-size:0.66rem;color:var(--muted);margin-right:0.4rem;}
+  .navbtns button{width:38px;height:38px;border-radius:9px;border:1px solid var(--line-strong);background:var(--panel);color:var(--text);font-size:1rem;display:flex;align-items:center;justify-content:center;}
+  .navbtns button:hover{border-color:var(--cyan);color:var(--cyan);}
+  .hintkey{position:fixed;bottom:22px;left:18px;z-index:110;font-family:var(--mono);font-size:0.62rem;color:var(--dim);}
+  .hintkey kbd{border:1px solid var(--line-strong);border-radius:4px;padding:0.05rem 0.35rem;color:var(--muted);}
+
+  @media(max-width:780px){ .dotnav{display:none;} .hintkey{display:none;} }
+
+  /* badges */
+  .badge-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .badge{display:inline-flex;align-items:center;gap:0.4rem;font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.32rem 0.62rem;border-radius:6px;border:1px solid;}
+  .badge.amber{color:var(--amber);border-color:rgba(255,170,0,0.4);background:rgba(255,170,0,0.07);}
+  .badge.cyan{color:var(--cyan);border-color:rgba(0,221,255,0.4);background:rgba(0,221,255,0.07);}
+  .badge.green{color:var(--green);border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.07);}
+  .badge.violet{color:var(--violet);border-color:rgba(168,85,247,0.4);background:rgba(168,85,247,0.07);}
+
+  /* ── title slide ── */
+  #s-title{background:radial-gradient(900px 460px at 75% 8%,rgba(0,221,255,0.08),transparent 70%),radial-gradient(700px 420px at 8% 90%,rgba(255,170,0,0.06),transparent 72%);}
+  #s-title h1{font-size:clamp(2.3rem,5.6vw,4rem);font-weight:800;max-width:18ch;margin-bottom:1.1rem;}
+  #s-title h1 .hl{color:var(--cyan);}
+  #s-title .lede{font-size:clamp(1.05rem,1.8vw,1.25rem);color:var(--text);max-width:64ch;line-height:1.62;}
+  #s-title .lede b{color:var(--text-strong);}
+  .title-meta{margin-top:1.6rem;font-family:var(--mono);font-size:0.72rem;color:var(--dim);}
+  .title-meta a{color:var(--muted);}
+  .scrollcue{margin-top:2rem;font-family:var(--mono);font-size:0.66rem;color:var(--muted);display:inline-flex;align-items:center;gap:0.5rem;animation:bob 1.8s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(5px);}}
+  @media(prefers-reduced-motion:reduce){.scrollcue{animation:none;}}
+
+  /* mini stat strip on title */
+  .tstats{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:2rem;}
+  .tstat .v{font-family:var(--mono);font-size:1.7rem;font-weight:800;color:var(--text-strong);}
+  .tstat .v.cy{color:var(--cyan);} .tstat .v.am{color:var(--amber);} .tstat .v.vi{color:var(--violet);}
+  .tstat .k{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono);}
+
+  /* ── S2 recognition rack ── */
+  .rack{border:1px solid var(--line-strong);border-radius:14px;background:var(--bg-2);overflow:hidden;box-shadow:0 18px 46px rgba(0,0,0,0.4);margin-top:1.6rem;}
+  .rack-row{display:grid;grid-template-columns:150px 1fr 124px;gap:0;align-items:center;padding:0.85rem 1rem;border-bottom:1px solid var(--line);}
+  .rack-row:last-child{border-bottom:0;}
+  .rack-row .layer{font-family:var(--mono);font-size:0.78rem;font-weight:700;color:var(--accent,var(--cyan));display:flex;align-items:center;gap:0.55rem;}
+  .rack-row .layer .bar{width:3px;height:24px;border-radius:2px;background:var(--accent,var(--cyan));}
+  .rack-row .maps{font-size:0.85rem;color:var(--text);}
+  .rack-row .maps b{color:var(--text-strong);} .rack-row .maps .arrow{color:var(--dim);font-family:var(--mono);margin:0 0.4rem;}
+  .rack-row .stat{justify-self:end;font-family:var(--mono);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:0.4rem;padding:0.22rem 0.55rem;border-radius:5px;border:1px solid;}
+  .stat.have{color:var(--green);border-color:rgba(0,255,136,0.35);} .stat.part{color:var(--amber);border-color:rgba(255,170,0,0.35);} .stat.gap{color:var(--red);border-color:rgba(255,48,48,0.4);}
+  .stat .l{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;}
+  @media(max-width:680px){.rack-row{grid-template-columns:1fr;gap:0.4rem;}.rack-row .stat{justify-self:start;}}
+
+  /* ── S3 SVG architecture ── */
+  .archwrap{display:grid;grid-template-columns:1fr 300px;gap:1.4rem;margin-top:1.4rem;align-items:start;}
+  @media(max-width:840px){.archwrap{grid-template-columns:1fr;}}
+  .archsvg{border:1px solid var(--line-strong);border-radius:14px;background:var(--bg-2);padding:0.6rem;box-shadow:0 18px 46px rgba(0,0,0,0.4);}
+  .archsvg svg{width:100%;height:auto;display:block;}
+  .alayer-rect{fill:var(--panel);stroke:var(--line-strong);stroke-width:1;cursor:pointer;transition:fill .15s,stroke .15s;rx:8;}
+  .alayer-g:hover .alayer-rect, .alayer-g.on .alayer-rect{fill:var(--panel-2);}
+  .alayer-g.on .alayer-rect{stroke-width:2;}
+  .alabel{font-family:var(--sans);font-weight:700;font-size:13px;fill:var(--text-strong);pointer-events:none;}
+  .anum{font-family:var(--mono);font-weight:800;font-size:13px;pointer-events:none;}
+  .aflow{stroke-width:1.5;fill:none;marker-end:url(#arr);}
+  .aflow.loop{stroke:var(--violet);stroke-dasharray:5 4;}
+  .adetail{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1rem 1.1rem;position:sticky;top:5rem;}
+  .adetail .dh{font-family:var(--mono);font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent,var(--cyan));font-weight:700;}
+  .adetail h3{font-size:1.05rem;margin:0.35rem 0 0.5rem;}
+  .adetail p{font-size:0.85rem;color:var(--muted);margin:0 0 0.5rem;line-height:1.55;}
+  .adetail .pill{font-family:var(--mono);font-size:0.62rem;color:var(--accent,var(--cyan));border:1px solid var(--line-strong);border-radius:5px;padding:0.15rem 0.45rem;}
+
+  /* ── S4 pillar tab explorer ── */
+  .ptabs{display:flex;gap:0.4rem;flex-wrap:wrap;margin:1.3rem 0 1.1rem;}
+  .ptab{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.03em;padding:0.5rem 0.7rem;border-radius:8px;border:1px solid var(--line-strong);background:var(--panel);color:var(--muted);display:flex;align-items:center;gap:0.45rem;}
+  .ptab .pdot{width:8px;height:8px;border-radius:50%;background:var(--accent,var(--cyan));}
+  .ptab:hover{color:var(--text-strong);border-color:var(--accent,var(--cyan));}
+  .ptab.on{color:var(--text-strong);background:var(--panel-2);border-color:var(--accent,var(--cyan));box-shadow:0 0 0 1px var(--accent,var(--cyan));}
+  .ppanel{display:none;}
+  .ppanel.on{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .ppanel-grid{display:grid;grid-template-columns:1fr 300px;gap:1.3rem;align-items:start;border:1px solid var(--line);border-left:3px solid var(--accent,var(--cyan));border-radius:12px;background:var(--panel);padding:1.3rem 1.4rem;}
+  @media(max-width:780px){.ppanel-grid{grid-template-columns:1fr;}}
+  .ppanel-grid h3{font-size:1.25rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.3rem;}
+  .ppanel-grid .eccfrom{font-family:var(--mono);font-size:0.6rem;color:var(--dim);border:1px solid var(--line);border-radius:5px;padding:0.15rem 0.45rem;letter-spacing:0.04em;text-transform:uppercase;}
+  .ppanel-grid .pintro{font-size:0.92rem;color:var(--text);margin:0.2rem 0 0.9rem;line-height:1.55;}
+  .tbp{display:grid;gap:0.6rem;}
+  .tbp .seg{display:grid;grid-template-columns:66px 1fr;gap:0.7rem;align-items:start;}
+  .tbp .sk{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;padding-top:0.12rem;}
+  .tbp .sk.today{color:var(--muted);} .tbp .sk.build{color:var(--amber);} .tbp .sk.proof{color:var(--green);}
+  .tbp .sv{font-size:0.86rem;color:var(--text);line-height:1.55;}
+  .tbp .sv code{font-size:0.76rem;color:var(--cyan);background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:0.02rem 0.32rem;}
+  .tbp .sv b{color:var(--text-strong);}
+  .pviz{border:1px solid var(--line);border-radius:10px;background:var(--bg-2);padding:0.9rem;min-height:170px;display:flex;flex-direction:column;justify-content:center;gap:0.55rem;}
+  .pviz .pvcap{font-family:var(--mono);font-size:0.56rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;text-align:center;}
+  .mv-chain{display:flex;align-items:center;gap:0.3rem;justify-content:center;flex-wrap:wrap;}
+  .mv-chain .nd{border:1px solid var(--accent,var(--cyan));border-radius:6px;padding:0.32rem 0.5rem;font-family:var(--mono);font-size:0.64rem;color:var(--text-strong);background:var(--panel);}
+  .mv-chain .ar{color:var(--green);}
+  .mv-pair{display:grid;gap:0.4rem;font-family:var(--mono);font-size:0.64rem;}
+  .mv-pair .pr{display:flex;align-items:center;gap:0.45rem;}
+  .mv-pair .doc{flex:1;border:1px solid var(--line);border-radius:5px;padding:0.32rem 0.45rem;color:var(--text);background:var(--panel);}
+  .mv-pair .chk{color:var(--green);} .mv-pair .x{color:var(--red);}
+  .mv-gate{display:grid;gap:0.4rem;}
+  .mv-gate .g{display:flex;align-items:center;gap:0.5rem;font-family:var(--mono);font-size:0.62rem;}
+  .mv-gate .g .gl{color:var(--muted);min-width:56px;} .mv-gate .g .gb{height:9px;border-radius:3px;}
+  .mv-loop2{display:flex;align-items:center;justify-content:center;gap:0.35rem;font-family:var(--mono);font-size:0.6rem;color:var(--violet);flex-wrap:wrap;}
+  .mv-loop2 .s{border:1px solid rgba(168,85,247,0.4);border-radius:5px;padding:0.28rem 0.42rem;}
+  .mv-shield{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.35rem;font-family:var(--mono);font-size:0.56rem;text-align:center;}
+  .mv-shield .c{border:1px solid var(--line);border-radius:5px;padding:0.4rem 0.25rem;}
+  .mv-shield .c.r{border-color:rgba(255,48,48,0.4);color:var(--red);} .mv-shield .c.b{border-color:rgba(0,221,255,0.4);color:var(--cyan);} .mv-shield .c.s{border-color:rgba(0,255,136,0.4);color:var(--green);}
+  .mv-data{display:flex;align-items:center;gap:0.32rem;justify-content:center;font-family:var(--mono);font-size:0.6rem;flex-wrap:wrap;}
+  .mv-data .nd{border:1px solid var(--line);border-radius:5px;padding:0.32rem 0.42rem;color:var(--text);background:var(--panel);} .mv-data .fresh{color:var(--green);}
+  .mv-con{display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;}
+  .mv-con .t{border:1px solid var(--line);border-radius:5px;padding:0.4rem;text-align:center;font-family:var(--mono);}
+  .mv-con .t .v{font-size:0.85rem;font-weight:800;} .mv-con .t .k{font-size:0.5rem;color:var(--dim);text-transform:uppercase;}
+
+  /* ── S5 option toggle ── */
+  .optbar{display:flex;gap:0.5rem;flex-wrap:wrap;margin:1.3rem 0 1.2rem;}
+  .optbtn{flex:1;min-width:200px;text-align:left;border:1px solid var(--line-strong);border-radius:12px;background:var(--panel);padding:0.9rem 1rem;transition:all .18s;}
+  .optbtn:hover{border-color:var(--oc,var(--cyan));}
+  .optbtn.on{border-color:var(--oc,var(--cyan));background:var(--panel-2);box-shadow:0 0 0 1px var(--oc,var(--cyan));}
+  .optbtn .ot{font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--oc,var(--cyan));font-weight:700;}
+  .optbtn .on2{font-size:1.05rem;font-weight:700;color:var(--text-strong);margin:0.25rem 0;}
+  .optbtn .om{font-size:0.74rem;color:var(--muted);}
+  .optgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.5rem;margin-bottom:1rem;}
+  @media(max-width:680px){.optgrid{grid-template-columns:repeat(4,1fr);}}
+  .opcell{border:1px solid var(--line);border-radius:9px;background:var(--bg-2);padding:0.6rem 0.4rem;text-align:center;opacity:0.32;transition:all .2s;}
+  .opcell.lit{opacity:1;border-color:var(--litc,var(--cyan));background:var(--panel);box-shadow:0 0 12px -4px var(--litc,var(--cyan));}
+  .opcell .opn{font-family:var(--mono);font-size:0.56rem;color:var(--dim);} .opcell.lit .opn{color:var(--litc,var(--cyan));}
+  .opcell .opt2{font-size:0.66rem;color:var(--text-strong);font-weight:600;margin-top:0.2rem;line-height:1.3;}
+  .optmeta{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:0.9rem 1.1rem;font-size:0.86rem;color:var(--text);line-height:1.55;}
+  .optmeta b{color:var(--text-strong);}
+  .optmeta .row{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:0.5rem;font-family:var(--mono);font-size:0.72rem;color:var(--muted);}
+  .optmeta .row b{color:var(--green);}
+
+  /* ── S6 mockups ── */
+  .mockgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.3rem;}
+  @media(max-width:780px){.mockgrid{grid-template-columns:1fr;}}
+  .mock{border:1px solid var(--line-strong);border-radius:12px;background:var(--bg-2);overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,0.32);}
+  .mock-chrome{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.8rem;background:var(--panel-2);border-bottom:1px solid var(--line);}
+  .mock-lights{display:flex;gap:0.32rem;} .mock-lights i{width:9px;height:9px;border-radius:50%;display:block;}
+  .ml-r{background:#ff5f57;} .ml-y{background:#febc2e;} .ml-g{background:#28c840;}
+  .mock-url{font-family:var(--mono);font-size:0.62rem;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0.18rem 0.55rem;flex:1;}
+  .mock-cap{font-family:var(--mono);font-size:0.6rem;color:var(--dim);letter-spacing:0.04em;margin:0.5rem 0 0;text-align:center;text-transform:uppercase;}
+  .mock-pad{padding:0.85rem 0.95rem;}
+  .con-tiles{display:grid;grid-template-columns:1fr 1fr;gap:0.45rem;}
+  .ct{border:1px solid var(--line);border-radius:7px;padding:0.5rem 0.55rem;background:var(--panel);}
+  .ct .lab{font-family:var(--mono);font-size:0.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+  .ct .val{font-size:1rem;font-weight:800;font-family:var(--mono);margin-top:0.12rem;}
+  .ct.ok .val{color:var(--green);} .ct.warn .val{color:var(--amber);} .ct.crit .val{color:var(--red);} .ct.info .val{color:var(--cyan);}
+  .con-log{margin-top:0.5rem;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:0.5rem 0.6rem;}
+  .con-log .row{font-family:var(--mono);font-size:0.6rem;color:var(--text);padding:0.16rem 0;display:flex;gap:0.5rem;border-bottom:1px solid var(--line);}
+  .con-log .row:last-child{border-bottom:0;} .con-log .row .tm{color:var(--dim);}
+  .con-log .row.pass .st{color:var(--green);} .con-log .row.fail .st{color:var(--red);} .con-log .row.new .st{color:var(--cyan);}
+  .flowm{display:flex;align-items:center;gap:0.3rem;justify-content:center;flex-wrap:wrap;padding:0.6rem 0;}
+  .flowm .fn{border:1px solid var(--cyan);border-radius:7px;padding:0.5rem 0.6rem;font-family:var(--mono);font-size:0.62rem;color:var(--text-strong);background:var(--panel);text-align:center;}
+  .flowm .fa{color:var(--green);font-size:0.8rem;}
+  .shieldm{display:grid;grid-template-columns:1fr 1fr 1fr;}
+  .shieldm .sa{padding:0.7rem;border-right:1px solid var(--line);} .shieldm .sa:last-child{border-right:0;}
+  .shieldm .sa .role{font-family:var(--mono);font-size:0.58rem;text-transform:uppercase;font-weight:700;margin-bottom:0.35rem;}
+  .shieldm .sa.r .role{color:var(--red);} .shieldm .sa.b .role{color:var(--cyan);} .shieldm .sa.s .role{color:var(--green);}
+  .shieldm .sa p{font-size:0.68rem;color:var(--text);margin:0;line-height:1.45;}
+  .shieldm .sa .stamp{margin-top:0.4rem;font-family:var(--mono);font-size:0.6rem;font-weight:700;color:var(--red);border:1px solid var(--red);border-radius:5px;padding:0.15rem 0.4rem;display:inline-block;}
+  /* before/after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-top:1.3rem;}
+  @media(max-width:680px){.ba{grid-template-columns:1fr;} .mockgrid{grid-template-columns:1fr;}}
+  .ba-col{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .ba-col.before{border-color:rgba(255,48,48,0.3);} .ba-col.after{border-color:rgba(0,255,136,0.32);}
+  .ba-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;padding:0.45rem 0.8rem;display:flex;align-items:center;gap:0.45rem;}
+  .ba-col.before .ba-tag{color:var(--red);background:rgba(255,48,48,0.06);border-bottom:1px solid rgba(255,48,48,0.2);}
+  .ba-col.after .ba-tag{color:var(--green);background:rgba(0,255,136,0.06);border-bottom:1px solid rgba(0,255,136,0.2);}
+  .ba-vis{padding:0.85rem;background:var(--bg-2);min-height:84px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.62rem;}
+  .ba-body{padding:0.7rem 0.85rem;}
+  .ba-body .code{font-family:var(--mono);font-size:0.66rem;line-height:1.5;color:#c4d3e6;background:var(--bg-2);border:1px solid var(--line);border-radius:7px;padding:0.6rem 0.7rem;white-space:pre;overflow-x:auto;margin:0 0 0.5rem;}
+  .ba-body p{font-size:0.76rem;color:var(--muted);margin:0;line-height:1.5;}
+  .ledc{width:7px;height:7px;border-radius:50%;display:inline-block;} .ledc.r{background:var(--red);box-shadow:0 0 6px var(--red);} .ledc.g{background:var(--green);box-shadow:0 0 6px var(--green);}
+
+  /* ── S7 gantt ── */
+  .gantt{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1.1rem 1.2rem;overflow-x:auto;margin-top:1.3rem;}
+  .gantt-scale{display:grid;grid-template-columns:140px repeat(12,1fr);font-family:var(--mono);font-size:0.56rem;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:0.4rem;margin-bottom:0.5rem;min-width:640px;}
+  .gantt-scale .sl{text-align:center;}
+  .gantt-row{display:grid;grid-template-columns:140px 1fr;gap:0.7rem;align-items:center;padding:0.36rem 0;min-width:640px;}
+  .gantt-row .gname{font-family:var(--mono);font-size:0.68rem;color:var(--text);white-space:nowrap;}
+  .gantt-row .gtrack{position:relative;height:22px;background:var(--bg-2);border-radius:6px;}
+  .gantt-row .gbar{position:absolute;top:2px;height:18px;border-radius:5px;display:flex;align-items:center;padding:0 0.5rem;font-family:var(--mono);font-size:0.56rem;font-weight:700;color:#0b1120;white-space:nowrap;overflow:hidden;}
+
+  /* ── S8 decisions ── */
+  .disc{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-top:1.3rem;}
+  @media(max-width:680px){.disc{grid-template-columns:1fr;}}
+  .qa{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:1.05rem 1.15rem;border-top:2px solid var(--violet);}
+  .qa .qn{font-family:var(--mono);font-size:0.64rem;color:var(--violet);letter-spacing:0.06em;}
+  .qa h4{font-size:1rem;margin:0.3rem 0 0.45rem;}
+  .qa p{margin:0;font-size:0.83rem;color:var(--muted);line-height:1.55;}
+  .qa .qdec{margin-top:0.7rem;padding-top:0.5rem;border-top:1px dashed var(--line-strong);font-family:var(--mono);font-size:0.64rem;letter-spacing:0.05em;color:var(--amber);font-weight:600;}
+  .qa .qdec .qph{color:var(--dim);font-weight:400;font-style:italic;}
+  .endnote{margin-top:1.4rem;border:1px dashed var(--line-strong);border-radius:11px;background:rgba(168,85,247,0.05);padding:1.05rem 1.2rem;font-size:0.86rem;color:var(--text);line-height:1.6;}
+  .endnote b{color:var(--violet);} .endnote code{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:0.05rem 0.35rem;color:var(--cyan);font-size:0.8rem;}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="topchrome">
+  <div class="brand"><span class="dot"></span> RZ · PLAN · STATIC vs EDGE</div>
+  <a class="hublink" href="planb.html">↩ Plan B hub</a>
+</div>
+
+<nav class="dotnav" id="dotnav"></nav>
+<div class="navbtns"><span class="ct" id="counter">1 / 8</span><button id="prev" aria-label="Previous slide">‹</button><button id="next" aria-label="Next slide">›</button></div>
+<div class="hintkey"><kbd>←</kbd> <kbd>→</kbd> or scroll to navigate</div>
+
+<main class="deck" id="deck">
+
+  <!-- ░░ SLIDE 1 — TITLE ░░ -->
+  <section class="slide" id="s-title" data-title="Thesis" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="badge-row">
+        <span class="badge amber">Topic Plan · Interactive Deck</span>
+        <span class="badge cyan">Platform decision</span>
+        <span class="badge violet">8 slides · interactive · ← → to navigate</span>
+      </div>
+      <h1>Stay static, or add <span class="hl">one edge function?</span></h1>
+      <p class="lede">
+        RZ is 100% static on GitHub Pages — fast, free, durable. But that ceiling is exactly what blocks
+        the most-wanted upgrades: <b>live data</b>, a strict <b>CSP</b>, and <b>server-side auth</b> for
+        the Maintenance Workbench. <b>One small edge function</b> (a Cloudflare Pages Worker) unlocks all
+        three at once. This deck weighs static vs edge — and answers the ECC plan's open question Q3.
+      </p>
+      <div class="tstats">
+        <div class="tstat"><div class="v cy">3</div><div class="k">capabilities blocked</div></div>
+        <div class="tstat"><div class="v am">1</div><div class="k">worker unlocks all</div></div>
+        <div class="tstat"><div class="v vi">3</div><div class="k">options weighed</div></div>
+        <div class="tstat"><div class="v">$0–5</div><div class="k">/mo realistic cost</div></div>
+      </div>
+      <div class="title-meta">
+        answers ECC plan Q3 · <a href="plan-ecc-adoption.html">plan-ecc-adoption ↗</a> · <span id="stamp"></span>
+      </div>
+      <div class="scrollcue">▼ scroll or press → to begin</div>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 2 — RECOGNITION ░░ -->
+  <section class="slide" id="s-recognition" data-title="The Wall" style="--accent:var(--red);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">02</span> The static ceiling <span class="ln"></span></div>
+      <h2>Three things RZ can't do — because it's 100% static.</h2>
+      <p class="sub">GitHub Pages serves files; it runs no code server-side. Everything below is blocked by that single fact. None is a content problem — they're all the same platform wall.</p>
+      <div class="rack">
+        <div class="rack-row" style="--accent:var(--cyan);"><span class="layer"><span class="bar"></span>Live data</span><span class="maps">calculators hardcode <b>2025 figures</b> <span class="arrow">—</span> no way to pull live grid / energy / weather safely (CORS + key exposure)</span><span class="stat gap"><span class="l"></span>blocked</span></div>
+        <div class="rack-row" style="--accent:var(--amber);"><span class="layer"><span class="bar"></span>Strict CSP</span><span class="maps">inline styles/scripts on ~120 pages <span class="arrow">—</span> can't ship a nonce'd <b>Content-Security-Policy</b> header (Pages sets no headers)</span><span class="stat gap"><span class="l"></span>blocked</span></div>
+        <div class="rack-row" style="--accent:var(--red);"><span class="layer"><span class="bar"></span>Server RBAC</span><span class="maps">workbench auth is <b>client-side only</b> <span class="arrow">—</span> no tenant/role/asset scoping can be enforced; anyone can read the JS gate</span><span class="stat gap"><span class="l"></span>blocked</span></div>
+        <div class="rack-row" style="--accent:var(--green);"><span class="layer"><span class="bar"></span>Static site</span><span class="maps">fast · free · durable · zero-ops <span class="arrow">—</span> the thing we do <b>not</b> want to lose</span><span class="stat have"><span class="l"></span>keep</span></div>
+      </div>
+      <p class="sub" style="margin-top:1rem;font-size:0.92rem;">The question isn't "static or not" — it's <b style="color:var(--text-strong);">how little server we can add</b> to unblock these three without giving up the static benefits.</p>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 3 — SVG ARCHITECTURE ░░ -->
+  <section class="slide" id="s-stack" data-title="What unlocks" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">03</span> One worker, four unlocks <span class="ln"></span></div>
+      <h2>How one edge function changes the request.</h2>
+      <p class="sub">Click a node. Today the browser hits a static file directly. Add a tiny edge worker in front and the same request gains a place to run code: fetch live data with a hidden key, inject a CSP nonce, check a real auth token, and cache — all before the HTML reaches the user.</p>
+      <div class="archwrap">
+        <div class="archsvg">
+          <svg viewBox="0 0 560 470" role="img" aria-label="Edge request-flow diagram">
+            <defs>
+              <marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="var(--cyan)"/></marker>
+              <marker id="arrv" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="var(--violet)"/></marker>
+            </defs>
+            <!-- request spine: browser → worker → static -->
+            <line x1="280" y1="92" x2="280" y2="150" class="aflow" stroke="var(--cyan)"/>
+            <line x1="280" y1="196" x2="280" y2="420" class="aflow" stroke="var(--cyan)" opacity="0.5"/>
+            <!-- browser -->
+            <g class="alayer-g" data-k="0" tabindex="0" role="button" aria-label="Browser">
+              <rect class="alayer-rect" x="190" y="40" width="180" height="48" rx="8" style="stroke:var(--cyan);"/>
+              <text class="alabel" x="232" y="69" style="font-size:12px;">Browser request</text>
+            </g>
+            <!-- worker (center) -->
+            <g class="alayer-g on" data-k="W" tabindex="0" role="button" aria-label="Edge worker">
+              <rect class="alayer-rect" x="160" y="150" width="240" height="48" rx="8" style="stroke:var(--violet);stroke-width:2;"/>
+              <text class="anum" x="178" y="179" style="fill:var(--violet);font-size:12px;">⚡</text>
+              <text class="alabel" x="200" y="179" style="fill:var(--violet);">Edge Worker (≤1)</text>
+            </g>
+            <!-- four unlocks branch from worker -->
+            <line x1="200" y1="198" x2="120" y2="250" class="aflow" stroke="var(--cyan)"/>
+            <line x1="247" y1="198" x2="240" y2="250" class="aflow" stroke="var(--amber)"/>
+            <line x1="313" y1="198" x2="360" y2="250" class="aflow" stroke="var(--red)"/>
+            <line x1="360" y1="198" x2="470" y2="250" class="aflow" stroke="var(--green)"/>
+            <g class="alayer-g" data-k="1" tabindex="0" role="button" aria-label="Live data unlock">
+              <rect class="alayer-rect" x="40" y="252" width="150" height="44" rx="8" style="stroke:var(--cyan);"/>
+              <text class="alabel" x="58" y="279" style="font-size:11px;">Live data + key</text>
+            </g>
+            <g class="alayer-g" data-k="2" tabindex="0" role="button" aria-label="CSP unlock">
+              <rect class="alayer-rect" x="200" y="252" width="150" height="44" rx="8" style="stroke:var(--amber);"/>
+              <text class="alabel" x="218" y="279" style="font-size:11px;">CSP nonce</text>
+            </g>
+            <g class="alayer-g" data-k="3" tabindex="0" role="button" aria-label="RBAC unlock">
+              <rect class="alayer-rect" x="360" y="252" width="160" height="44" rx="8" style="stroke:var(--red);"/>
+              <text class="alabel" x="378" y="279" style="font-size:11px;">Server RBAC</text>
+            </g>
+            <!-- static origin at bottom -->
+            <g class="alayer-g" data-k="S" tabindex="0" role="button" aria-label="Static origin">
+              <rect class="alayer-rect" x="170" y="386" width="220" height="46" rx="8" style="stroke:var(--green);"/>
+              <text class="alabel" x="194" y="414" style="fill:var(--green);">Static files (Pages) — unchanged</text>
+            </g>
+            <text x="296" y="345" class="anum" style="fill:var(--green);font-size:10px;">+ KV cache · fallback</text>
+          </svg>
+        </div>
+        <div class="adetail" id="adetail" style="--accent:var(--violet);">
+          <div class="dh" id="ad-dh">The worker</div>
+          <h3 id="ad-h3">Edge Worker — one small function</h3>
+          <p id="ad-p">A single Cloudflare Pages Worker sits in front of the static origin. It runs ≤50 lines of code per request: it can fetch external APIs with a secret key, rewrite the response to inject a CSP nonce, validate an auth token, and read/write a KV cache — then pass the static HTML through untouched. The site stays static; the worker is the only moving part.</p>
+          <span class="pill" id="ad-pill">click a node to inspect</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 4 — PILLAR EXPLORER ░░ -->
+  <section class="slide" id="s-pillars" data-title="Unlocks" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">04</span> What one worker unlocks — click a capability <span class="ln"></span></div>
+      <h2>One function, four walls gone.</h2>
+      <p class="sub">Each capability is blocked today purely because GitHub Pages is static — there is nowhere to run code between browser and file. Each panel shows what exists <b>today</b>, what to <b>build</b> (real files), and the first <b>proof</b>. Tap a tab.</p>
+      <div class="ptabs" id="ptabs">
+        <button class="ptab on" data-p="1" style="--accent:var(--cyan);"><span class="pdot"></span>1 · Live Data</button>
+        <button class="ptab" data-p="2" style="--accent:var(--amber);"><span class="pdot"></span>2 · Strict CSP</button>
+        <button class="ptab" data-p="3" style="--accent:var(--red);"><span class="pdot"></span>3 · Server RBAC</button>
+        <button class="ptab" data-p="4" style="--accent:var(--green);"><span class="pdot"></span>4 · Edge Cache</button>
+      </div>
+
+      <div class="ppanel on" data-p="1">
+        <div class="ppanel-grid" style="--accent:var(--cyan);">
+          <div>
+            <h3>Live data with a hidden key <span class="eccfrom">EDGE · fetch</span></h3>
+            <p class="pintro">RZ calculators run on pinned 2025 figures — accurate at ship, stale forever after. A browser can't call most data APIs directly: CORS blocks it, and any API key shipped to the client is public. The worker fetches server-side with a secret, caches the result, and falls back to the pinned dataset offline.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">Every calculator hardcodes a 2025 dataset. No way to pull live grid carbon, energy price, or weather without exposing a key or hitting CORS.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">Worker route <code>/api/data/:metric</code> calls the upstream API with <code>env.API_KEY</code>, writes the response to <b>KV</b> with a TTL, returns it with a freshness header. Client <code>js/rz-data-layer.js</code> reads it and falls back to the pinned JSON if the route is unreachable.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">PUE/carbon calc shows <b>live grid intensity</b> with a freshness chip — key never in the browser, still works offline.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-data"><span class="nd">grid API</span><span style="color:var(--green);">▸</span><span class="nd">worker+KV</span><span style="color:var(--green);">▸</span><span class="nd">calc</span></div>
+            <div style="text-align:center;" class="mv-data"><span class="fresh">● 412 gCO₂/kWh · 2m fresh · key hidden</span></div>
+            <div class="pvcap">live input, static fallback</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="2">
+        <div class="ppanel-grid" style="--accent:var(--amber);">
+          <div>
+            <h3>Strict CSP via per-request nonce <span class="eccfrom">EDGE · headers</span></h3>
+            <p class="pintro">A strict <code>Content-Security-Policy</code> is the single biggest hardening win — but it forbids inline <code>&lt;script&gt;</code>/<code>&lt;style&gt;</code> unless each carries a matching nonce. ~120 RZ pages have inline code. Extracting it all is a months-long refactor; a worker injects a nonce at the edge instead.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">No CSP (or a loose one). Inline scripts/styles everywhere mean a strict policy would break the whole site until every page is refactored.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">Worker generates a random nonce per request, rewrites inline tags to <code>nonce="…"</code> via <code>HTMLRewriter</code>, and sets <code>Content-Security-Policy: script-src 'nonce-…'</code>. Zero page edits; the static HTML ships untouched.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">securityheaders.com grades <b>A+</b>; an injected <code>&lt;script&gt;</code> without the nonce is <b>refused by the browser</b>.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-chain"><span class="nd">inline</span><span class="ar">▸</span><span class="nd">+nonce</span><span class="ar">▸</span><span class="nd">CSP set</span></div>
+            <div style="text-align:center;font-family:var(--mono);font-size:0.56rem;color:var(--amber);">no page rewrite · 120 pages covered at once</div>
+            <div class="pvcap">strict CSP without refactoring inline code</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="3">
+        <div class="ppanel-grid" style="--accent:var(--red);">
+          <div>
+            <h3>Real server-side RBAC <span class="eccfrom">EDGE · auth</span></h3>
+            <p class="pintro">The v1.41.x workbench gates pages by tier/role — but a client-side gate only <i>hides</i> content; the file is still on the origin and fetchable by URL. Genuine access control has to happen <b>before</b> the bytes are served. Only a server can do that.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">Auth is enforced in JS (<code>enforceTierFeatureAccess</code>). Bypassable by anyone who requests the raw HTML directly — fine for soft-gating, not for anything sensitive.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">Worker validates a signed session token (HMAC/JWT) and checks tenant · role · asset scope against the page's access entry <b>before</b> proxying the origin file. Unauthorised → 302 to login, never the content.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">A free user requesting a pro workbench URL directly gets <b>redirected, not the file</b> — the gate is real, not cosmetic.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-chain"><span class="nd">token</span><span class="ar">▸</span><span class="nd">verify+scope</span><span class="ar">▸</span><span class="nd">serve / 302</span></div>
+            <div style="text-align:center;font-family:var(--mono);font-size:0.56rem;color:var(--red);">enforced before bytes leave the edge</div>
+            <div class="pvcap">access control the client can't fake</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppanel" data-p="4">
+        <div class="ppanel-grid" style="--accent:var(--green);">
+          <div>
+            <h3>Edge cache &amp; resilience <span class="eccfrom">EDGE · KV</span></h3>
+            <p class="pintro">The same worker that fetches live data also makes the site <i>faster</i> and <i>tougher</i>: cache hot responses in KV at the edge, serve stale-while-revalidate when an upstream is slow, and degrade gracefully to the pinned static data when everything else fails. The worker is purely additive — remove it and the site is exactly what it is today.</p>
+            <div class="tbp">
+              <div class="seg"><span class="sk today">Today</span><span class="sv">Static files are already fast + durable on GitHub Pages. But there's no shared cache for live values, and no server layer to absorb an upstream outage.</span></div>
+              <div class="seg"><span class="sk build">Build</span><span class="sv">KV namespace per metric with TTL + <code>stale-while-revalidate</code>; a tiny purge route for manual invalidation. Every cached value carries <code>source · fetched-at · ttl</code> so the freshness chip is honest.</span></div>
+              <div class="seg"><span class="sk proof">Proof</span><span class="sv">Upstream API down → calc still renders <b>last-good value + "stale 6m" chip</b>, never an error. Worker removed → site degrades to today's static behaviour.</span></div>
+            </div>
+          </div>
+          <div class="pviz">
+            <div class="mv-gate">
+              <div class="g"><span class="gl">KV hit</span><span class="gb" style="width:90%;background:var(--green);"></span></div>
+              <div class="g"><span class="gl">revalidate</span><span class="gb" style="width:55%;background:var(--amber);"></span></div>
+              <div class="g"><span class="gl">static fallback</span><span class="gb" style="width:100%;background:var(--cyan);"></span></div>
+            </div>
+            <div class="pvcap">fast, fresh, and never broken offline</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 5 — OPTIONS ░░ -->
+  <section class="slide" id="s-options" data-title="Options" style="--accent:var(--amber);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">05</span> Three options — click a profile <span class="ln"></span></div>
+      <h2>Pick the adoption profile, not the whole thing.</h2>
+      <p class="sub">This is mostly a binary: stay 100% static, or add <b>one</b> small edge function. Three coherent stopping points — click one to see which capabilities light up.</p>
+      <div class="optbar" id="optbar">
+        <button class="optbtn on" data-o="A" data-pillars="" style="--oc:var(--green);">
+          <div class="ot">Option A · safest</div>
+          <div class="on2">Stay Pure Static</div>
+          <div class="om">No worker. Client-side cached fallbacks only — live values where a public/CORS-friendly API allows, pinned data otherwise. Zero new infra, zero new failure mode. Three walls stay up.</div>
+        </button>
+        <button class="optbtn" data-o="B" data-pillars="1,2,3,4" style="--oc:var(--amber);">
+          <div class="ot">Option B · recommended</div>
+          <div class="on2">One Edge Worker</div>
+          <div class="om">A single Cloudflare Pages Worker in front of the static origin. ≤50 lines/request. All four walls fall at once; static files unchanged; remove it → back to today.</div>
+        </button>
+        <button class="optbtn" data-o="C" data-pillars="1,2,3,4" style="--oc:var(--cyan);">
+          <div class="ot">Option C · ambitious</div>
+          <div class="on2">Full Edge Platform</div>
+          <div class="om">The worker + KV + the workbench RBAC productised + request observability. Same four unlocks, now a real product surface, not a one-off function.</div>
+        </button>
+      </div>
+      <div class="optgrid" id="optgrid">
+        <div class="opcell" data-pk="1" style="--litc:var(--cyan);"><div class="opn">C1</div><div class="opt2">Live Data</div></div>
+        <div class="opcell" data-pk="2" style="--litc:var(--amber);"><div class="opn">C2</div><div class="opt2">Strict CSP</div></div>
+        <div class="opcell" data-pk="3" style="--litc:var(--red);"><div class="opn">C3</div><div class="opt2">Server RBAC</div></div>
+        <div class="opcell" data-pk="4" style="--litc:var(--green);"><div class="opn">C4</div><div class="opt2">Edge Cache</div></div>
+      </div>
+      <div class="optmeta" id="optmeta">
+        <b>Stay Pure Static.</b> Keep the zero-infra, zero-cost, can't-go-down posture. Live data only where a public API + CORS allow; CSP stays loose; gating stays client-side (cosmetic). The honest default if none of the four walls actually hurt yet.
+        <div class="row"><span>cost <b>0</b></span><span>risk <b>none</b></span><span>for: <b>"don't add moving parts I don't need"</b></span></div>
+      </div>
+      <p class="sub" style="margin-top:1.1rem;font-size:0.92rem;"><b style="color:var(--text-strong);">Recommendation:</b> if even one wall matters (live carbon data, a real CSP grade, or genuinely-gated workbench pages), go <b>B</b> — one worker unlocks all four and is fully reversible. Stay <b>A</b> if none of them bite yet. <b>C</b> is a later call once the worker has earned its keep.</p>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 6 — MOCKUPS ░░ -->
+  <section class="slide" id="s-mockups" data-title="Mockups" style="--accent:var(--cyan);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">06</span> What it looks like <span class="ln"></span></div>
+      <h2>Rendered, not described.</h2>
+      <p class="sub">CSS mockups of what the one worker unlocks (illustrative sample state), then a before/after of the keystone change: a calculator stops being frozen at 2025.</p>
+      <div class="mockgrid">
+        <div>
+          <div class="mock">
+            <div class="mock-chrome"><div class="mock-lights"><i class="ml-r"></i><i class="ml-y"></i><i class="ml-g"></i></div><div class="mock-url">pue-calculator · live</div></div>
+            <div class="mock-pad">
+              <div class="con-tiles">
+                <div class="ct ok"><div class="lab">Grid intensity</div><div class="val">412 g</div></div>
+                <div class="ct ok"><div class="lab">Freshness</div><div class="val">2m</div></div>
+                <div class="ct ok"><div class="lab">Key</div><div class="val">hidden</div></div>
+                <div class="ct warn"><div class="lab">Source</div><div class="val">live</div></div>
+              </div>
+              <div class="con-log">
+                <div class="row pass"><span class="tm">edge</span><span class="st">200</span><span>/api/data/grid-intensity · KV hit</span></div>
+                <div class="row new"><span class="tm">calc</span><span class="st">USE</span><span>412 gCO₂/kWh → PUE carbon line</span></div>
+                <div class="row pass"><span class="tm">off</span><span class="st">OK</span><span>upstream down → pinned 2025 fallback</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="mock-cap">Unlock 1 · live data with a hidden key</p>
+        </div>
+        <div>
+          <div class="mock">
+            <div class="mock-chrome"><div class="mock-lights"><i class="ml-r"></i><i class="ml-y"></i><i class="ml-g"></i></div><div class="mock-url">securityheaders.com</div></div>
+            <div class="mock-pad">
+              <div class="flowm"><span class="fn">inline</span><span class="fa">▸</span><span class="fn">+nonce</span><span class="fa">▸</span><span class="fn">CSP A+</span></div>
+              <div style="text-align:center;font-family:var(--mono);font-size:0.58rem;color:var(--green);margin-top:0.4rem;">strict CSP · 120 pages · no refactor</div>
+            </div>
+          </div>
+          <p class="mock-cap">Unlock 2 · strict CSP via edge nonce</p>
+          <div class="mock" style="margin-top:1rem;">
+            <div class="mock-chrome"><div class="mock-lights"><i class="ml-r"></i><i class="ml-y"></i><i class="ml-g"></i></div><div class="mock-url">workbench · access</div></div>
+            <div class="shieldm">
+              <div class="sa r"><div class="role">free</div><p>requests /workbench/cdu directly</p></div>
+              <div class="sa b"><div class="role">edge</div><p>token invalid · scope fail</p></div>
+              <div class="sa s"><div class="role">302</div><span class="stamp">→ LOGIN · never the file</span></div>
+            </div>
+          </div>
+          <p class="mock-cap">Unlock 3 · server RBAC the client can't fake</p>
+        </div>
+      </div>
+
+      <div class="ba">
+        <div class="ba-col before">
+          <div class="ba-tag"><span class="ledc r"></span> Before — frozen static</div>
+          <div class="ba-vis"><span style="color:var(--cyan);font-weight:800;">PUE 1.28</span> &nbsp;<span style="color:var(--red);">✕ 2025 data · a key would be public</span></div>
+          <div class="ba-body">
+            <pre class="code">var gridCO2 = 437;  // 2025, pinned
+// live fetch? CORS blocks it, and
+// any API key in JS ships to client</pre>
+            <p>Calculators freeze their dataset at ship. A browser can't fetch live data safely — CORS blocks the call and any key in the JS is public. The figure quietly drifts out of date.</p>
+          </div>
+        </div>
+        <div class="ba-col after">
+          <div class="ba-tag"><span class="ledc g"></span> After — one edge worker</div>
+          <div class="ba-vis"><span style="color:var(--green);">PUE 1.28 · live 412 g · 2m fresh · key hidden</span></div>
+          <div class="ba-body">
+            <pre class="code">// worker — secret stays server-side
+const r = await fetch(API,
+  { headers:{ k: env.API_KEY }});
+await KV.put('grid', r, { ttl });
+// client reads /api/data, falls back
+// to pinned JSON when offline</pre>
+            <p>The worker fetches with a secret key, caches in KV, and serves a freshness-stamped value. The key never reaches the browser; offline, the calc falls back to the pinned dataset. Same static site — one moving part.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 7 — ROADMAP ░░ -->
+  <section class="slide" id="s-roadmap" data-title="Roadmap" style="--accent:var(--amber);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">07</span> Sequenced roadmap <span class="ln"></span></div>
+      <h2>Skeleton → unlock → harden.</h2>
+      <p class="sub">Dependency-ordered, lowest-risk first. The worker skeleton is a passthrough that changes nothing; each later phase lights exactly one wall. Reversible at every step — delete the worker and the site is exactly today's static.</p>
+      <div class="gantt">
+        <div class="gantt-scale"><span></span><span class="sl">S1</span><span class="sl">S2</span><span class="sl">S3</span><span class="sl">S4</span><span class="sl">S5</span><span class="sl">S6</span><span class="sl">S7</span><span class="sl">S8</span><span class="sl">S9</span><span class="sl">S10</span><span class="sl">S11</span><span class="sl">S12+</span></div>
+        <div class="gantt-row"><span class="gname">P0 Decide · Q3</span><span class="gtrack"><span class="gbar" style="left:0%;width:7%;background:var(--violet);color:#fff;">choose</span></span></div>
+        <div class="gantt-row"><span class="gname">P1 Worker skeleton</span><span class="gtrack"><span class="gbar" style="left:7%;width:16%;background:var(--green);">low risk</span></span></div>
+        <div class="gantt-row"><span class="gname">P2 Live data + KV ★</span><span class="gtrack"><span class="gbar" style="left:23%;width:24%;background:var(--cyan);color:#06202b;">keystone</span></span></div>
+        <div class="gantt-row"><span class="gname">P3 CSP nonce</span><span class="gtrack"><span class="gbar" style="left:45%;width:20%;background:var(--amber);">med</span></span></div>
+        <div class="gantt-row"><span class="gname">P4 Server RBAC</span><span class="gtrack"><span class="gbar" style="left:63%;width:22%;background:var(--red);color:#fff;">high · auth</span></span></div>
+        <div class="gantt-row"><span class="gname">P5 Productise · C</span><span class="gtrack"><span class="gbar" style="left:80%;width:20%;background:var(--violet);color:#fff;">option C</span></span></div>
+      </div>
+      <p class="sub" style="margin-top:1.1rem;font-size:0.9rem;">Option A stops at P0 (no worker). Option B runs P1–P4 — one worker, all four walls down. Option C adds P5 (KV observability + the workbench RBAC productised).</p>
+    </div>
+  </section>
+
+  <!-- ░░ SLIDE 8 — DECISIONS ░░ -->
+  <section class="slide" id="s-decisions" data-title="Decisions" style="--accent:var(--violet);">
+    <div class="slide-inner">
+      <div class="slabel"><span class="sn">08</span> Open for discussion <span class="ln"></span></div>
+      <h2>Decisions this plan needs from you.</h2>
+      <p class="sub">Four questions whose answers change the build. Answer them and the roadmap converges to a chosen path — each is left open below for your verdict.</p>
+      <div class="disc">
+        <div class="qa"><div class="qn">Q1 · PLATFORM</div><h4>Stay static, or add one edge function?</h4><p>The core call. Live data, a strict CSP, and server-side RBAC all hit the same wall — GitHub Pages runs no code. One small Cloudflare Pages Worker unlocks all four at once, leaves the static files unchanged, and is fully reversible. Worth one moving part, or keep everything client-side with cached fallbacks?</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (A / B / C)</span></div></div>
+        <div class="qa"><div class="qn">Q2 · TRIGGER</div><h4>Which wall justifies the worker first?</h4><p>If you go B, one unlock leads. Live carbon/energy data is the most visible (calculators stop being frozen at 2025); a real CSP grade is the biggest hardening win; genuine workbench RBAC is the one a client-side gate can never fake. Pick the lead and the rest follow on the same worker.</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (live data / CSP / RBAC)</span></div></div>
+        <div class="qa"><div class="qn">Q3 · HOST</div><h4>Cloudflare, or another edge runtime — and does the origin move?</h4><p>Cloudflare Pages Workers + KV is the assumed default (generous free tier, HTMLRewriter for the nonce). Netlify/Vercel edge are alternatives. Separately: keep the static origin on GitHub Pages and put the worker in front, or move hosting to Cloudflare Pages entirely?</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (CF / other · origin stays / moves)</span></div></div>
+        <div class="qa"><div class="qn">Q4 · AMBITION</div><h4>One function, or a full edge platform?</h4><p>Option B is a single ≤50-line worker — the minimal unblock. Option C productises it: KV observability, the workbench RBAC as a real product surface, request analytics. Same four unlocks; C is a later call once the worker has earned its keep.</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (B stop / C productise)</span></div></div>
+      </div>
+      <div class="endnote">
+        <b>This is one topic plan.</b> The standing landing for all RZ concept &amp; plan discussion is the <a href="planb.html">Plan B hub</a> — every plan gets its own page like this (topic-specific, with options + examples + visual mockups). Decisions agreed here get promoted to <code>standarization/</code> + memory. <code>noindex</code> · internal working surface.
+      </div>
+    </div>
+  </section>
+
+<!-- APPEND-SLIDES-HERE -->
+</main>
+
+<script>
+/* Generic deck controller — works for any number of .slide elements.
+   As slides 2–8 are appended (see APPEND-SLIDES-HERE), this auto-adapts. */
+(function(){
+  var stamp=document.getElementById('stamp'); if(stamp) stamp.textContent='rev 2026-06-21';
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var deck=document.getElementById('deck');
+  var dotnav=document.getElementById('dotnav');
+  var counter=document.getElementById('counter');
+  var progress=document.getElementById('progress');
+  var cur=0;
+  // build dot nav
+  slides.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.setAttribute('aria-label','Go to slide '+(i+1));
+    var tip=document.createElement('span'); tip.className='tip'; tip.textContent=s.getAttribute('data-title')||('Slide '+(i+1));
+    b.appendChild(tip);
+    b.addEventListener('click',function(){ slides[i].scrollIntoView({behavior:'smooth'}); });
+    dotnav.appendChild(b);
+  });
+  var dots=[].slice.call(dotnav.children);
+  function setCur(i){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    dots.forEach(function(d,k){ d.classList.toggle('on',k===cur); });
+    if(counter) counter.textContent=(cur+1)+' / '+slides.length;
+    if(progress) progress.style.width=(((cur+1)/slides.length)*100)+'%';
+  }
+  // observe which slide is centered
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ var idx=slides.indexOf(e.target); if(idx>=0) setCur(idx); } });
+    },{threshold:0.5});
+    slides.forEach(function(s){ io.observe(s); });
+  }
+  function go(d){ var n=Math.max(0,Math.min(slides.length-1,cur+d)); slides[n].scrollIntoView({behavior:'smooth'}); }
+  document.getElementById('prev').addEventListener('click',function(){go(-1);});
+  document.getElementById('next').addEventListener('click',function(){go(1);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(-1);}
+    else if(e.key==='Home'){e.preventDefault();slides[0].scrollIntoView({behavior:'smooth'});}
+    else if(e.key==='End'){e.preventDefault();slides[slides.length-1].scrollIntoView({behavior:'smooth'});}
+  });
+  setCur(0);
+})();
+
+/* pillar tab explorer (slide 4) */
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.ptab'));
+  var panels=[].slice.call(document.querySelectorAll('.ppanel'));
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      var p=t.getAttribute('data-p');
+      tabs.forEach(function(x){x.classList.toggle('on',x===t);});
+      panels.forEach(function(x){x.classList.toggle('on',x.getAttribute('data-p')===p);});
+    });
+  });
+})();
+
+/* SVG architecture layer inspector (slide 3) */
+(function(){
+  var DET={
+    '0':{dh:'Step 1 · the request',h:'Browser request',p:'Today this hits a static file directly — no code runs between the browser and the HTML. That is the whole limitation: there is nowhere to fetch a key, set a header, or check a token.',pill:'unchanged today',c:'var(--cyan)'},
+    'W':{dh:'The worker',h:'Edge Worker — one small function',p:'A single Cloudflare Pages Worker sits in front of the static origin. ≤50 lines per request: fetch external APIs with a secret key, inject a CSP nonce, validate an auth token, read/write a KV cache — then pass the static HTML through untouched.',pill:'≤1 function · the only moving part',c:'var(--violet)'},
+    '1':{dh:'Unlock · live data',h:'Live data with a hidden key',p:'The worker calls the grid/energy/weather API server-side with a secret stored as an env var — the key never reaches the browser, CORS is moot. Response cached in KV; static 2025 dataset is the fallback if the API is down.',pill:'unblocks live data',c:'var(--cyan)'},
+    '2':{dh:'Unlock · CSP nonce',h:'Strict Content-Security-Policy',p:'The worker generates a per-request nonce, injects it into the static HTML’s inline script/style tags, and sets the CSP header. This is the only way to ship a strict CSP without first extracting all ~120 pages’ inline code.',pill:'unblocks strict CSP',c:'var(--amber)'},
+    '3':{dh:'Unlock · server RBAC',h:'Server-side auth for the workbench',p:'The worker validates a real signed token and enforces tenant / role / asset scope before serving gated pages — the v1.41.x workbench RBAC that a client-side gate can never truly enforce.',pill:'unblocks workbench RBAC',c:'var(--red)'},
+    'S':{dh:'The origin',h:'Static files — unchanged',p:'GitHub Pages (or Cloudflare Pages static) still serves every file as-is. Fast, free, durable. The worker is additive; if it is removed, the site degrades gracefully to exactly what it is today.',pill:'keep the static benefits',c:'var(--green)'}
+  };
+  var layers=[].slice.call(document.querySelectorAll('.alayer-g'));
+  var box=document.getElementById('adetail');
+  function show(k){
+    var d=DET[k]; if(!d||!box) return;
+    layers.forEach(function(g){g.classList.toggle('on',g.getAttribute('data-k')===k);});
+    box.style.setProperty('--accent',d.c);
+    document.getElementById('ad-dh').textContent=d.dh;
+    document.getElementById('ad-h3').textContent=d.h;
+    document.getElementById('ad-p').textContent=d.p;
+    document.getElementById('ad-pill').textContent=d.pill;
+  }
+  layers.forEach(function(g){
+    var k=g.getAttribute('data-k');
+    g.addEventListener('click',function(){show(k);});
+    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(k);}});
+  });
+})();
+
+/* option toggle (slide 5) — lights up which pillars each profile includes */
+(function(){
+  var META={
+    'A':{t:'Stay Pure Static',d:'No worker. Live values only where a public / CORS-friendly API allows; pinned 2025 data otherwise. Zero new infra, zero new failure mode — the three walls stay up.',cost:'$0',risk:'none',who:'"don’t add moving parts I don’t need"'},
+    'B':{t:'One Edge Worker',d:'A single Cloudflare Pages Worker (≤50 lines/request) in front of the static origin. All four walls fall at once; static files stay unchanged; remove it and the site is exactly what it is today.',cost:'~$0–5/mo',risk:'low · reversible',who:'"unblock live data, a real CSP, real gating — cheaply"'},
+    'C':{t:'Full Edge Platform',d:'The worker + KV cache + the workbench RBAC productised + request observability. Same four unlocks, now a real product surface rather than a one-off function.',cost:'$5–20/mo + build',risk:'medium',who:'"make the edge layer a product, not a patch"'}
+  };
+  var btns=[].slice.call(document.querySelectorAll('.optbtn'));
+  var cells=[].slice.call(document.querySelectorAll('.opcell'));
+  var meta=document.getElementById('optmeta');
+  function pick(btn){
+    btns.forEach(function(b){b.classList.toggle('on',b===btn);});
+    var set=(btn.getAttribute('data-pillars')||'').split(',');
+    cells.forEach(function(c){c.classList.toggle('lit',set.indexOf(c.getAttribute('data-pk'))>=0);});
+    var m=META[btn.getAttribute('data-o')];
+    if(m&&meta){ meta.innerHTML='<b>'+m.t+'.</b> '+m.d+'<div class="row"><span>cost <b>'+m.cost+'</b></span><span>risk <b>'+m.risk+'</b></span><span>for: <b>'+m.who+'</b></span></div>'; }
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){pick(b);}); });
+})();
+</script>
+</body>
+</html>
