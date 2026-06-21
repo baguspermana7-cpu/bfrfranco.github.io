@@ -24,6 +24,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.22 | 06-20 | `index.html` | Removed dead hover-lift · retoned rejected-purple disclaimer · fixed no-op `.bento-sap` dark tint |
 | v1.43.24 | 06-20 | `index.html` | Killed card-hover flicker (stale `script.min.js` cache-bust) · toned logo pop 1.15→1.04 |
 | v1.43.26 | 06-20 | `index.html`, `css/rz-dark.css` | AWS dark logo white fix · added polish-track tokens (`--rz-r-*`, `--rz-elev-*`, `.rz-surface`, `.rz-reveal-on`) |
+| v1.43.33 | 06-21 | `styles.css` (4 report pages) | **/ultraplan batch 1** — `.references-section` dark override → `!important` (fixes light-on-dark on infographic-* + asean-dc-report) |
 
 **Internal (no version bump — noindex surfaces):** `plan-dark-mode-standard.html` (§10–§12), `rz-index-polish.html`, `rz-index-mockup-day.html`, `planb.html` (PLAN 02 card + mini before/after), `DARK_MODE_STANDARD.md` (bento-polish pattern + Track E3).
 
@@ -44,14 +45,22 @@ yet still go dark via the shared sheet). So the real work is:
 
 ---
 
-## Defect register (from parallel audit — fills on completion)
+## Defect register (from 9-agent parallel audit, 2026-06-21)
 
-> Populated by the `rz-darkmode-defect-audit` workflow (9 families, read-only).
-> Status: **AUDIT RUNNING** — table below updates when it returns.
+**58 pages checked · 56 raw defects · 32 clean.** Verification (headless) reclassified some as
+false positives. Real, grouped:
 
-| File | Element | Defect | Severity | Fix | Status |
-|---|---|---|---|---|---|
-| _pending audit_ | | | | | |
+| Group | Pages | Defect | Sev | Status |
+|---|---|---|---|---|
+| `.references-section` light bg | infographic-dc-cost-breakdown · -sustainability · -pue-global · asean-dc-report-2026 | inline `#f8fafc` overrode dark rule → light text invisible | high | **✅ fixed v1.43.33** (shared rule → `!important`) |
+| status badges light-on-dark | geopolitics-2 · -3 · FF-1 · FF-2 | `.confidence-low` / `.prob-medium` / `.prob-high` light bg, no dark override | high | ⏳ next |
+| white cookie banner/buttons | datahallAI · dc-conventional · datahall · water-system · fire-system · dc-market-tracker | `rgba(255,255,255,.92)` bg / `#374151` text, no dark override (presentation-only) | high/med | ⏳ |
+| tia-942 white buttons | tia-942-checklist | `.tia-btn-reset` / `.tier-btn.active` / `.dctype-btn.active` / `.nav-user-dropdown` white bg | high | ⏳ |
+| pillar disclaimer `#64748b` | pillar-cooling/-fire-safety/-power/-standards/-sustainability | low-contrast disclaimer text + nav `#64748b` | high/med | ⏳ |
+| articles `.philosophy-section` | articles.html | light gradient section bg, no dark override | med | ⏳ |
+| **FALSE POSITIVES (verified OK, skip)** | compare-* table accent headers (amber/cyan/emerald + white text); insights `.insights-hero h1` white-gradient (dark hero) | read fine on dark | — | ✅ no action |
+
+Full raw audit JSON: workflow `rz-darkmode-defect-audit` run `wf_a66cc0ed-021`.
 
 ---
 

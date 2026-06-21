@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.43.33 — 2026-06-21 (dark-mode /ultraplan — batch 1: references-section light-on-dark)
+
+### Fixed
+- **`.references-section` rendered light-on-dark on 4 report/infographic pages** — the section
+  carries an inline `style="background:#f8fafc"` that overrode the shared dark rule, so in dark mode
+  the panel stayed light gray while its text was light → text invisible. Made the shared
+  `[data-theme="dark"] .references-section` rule `!important` (styles.css) so it beats the inline bg.
+  Fixes `infographic-dc-cost-breakdown` · `infographic-dc-sustainability` · `infographic-pue-global`
+  · `asean-dc-report-2026` at once. Verified dark (`rgb(15,23,42)`) via headless probe.
+- Found by the `/ultraplan` 9-agent parallel dark-mode audit (56 defects/27 files). Audit also
+  caught false positives (saturated-accent compare-table headers read fine on dark — left as-is).
+  Tracker: `standarization/DARK_MODE_ROLLOUT_TRACKER.md` + vault `05-Standards/Dark-Mode-Rollout.md`.
+
 ## v1.43.32 — 2026-06-21 (CDU suite — SEO/schema, link re-validation & cross-link close-out)
 
 ### Changed

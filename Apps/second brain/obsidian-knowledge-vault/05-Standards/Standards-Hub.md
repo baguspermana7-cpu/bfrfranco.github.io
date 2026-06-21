@@ -1,6 +1,7 @@
 # Standards & Labs Hub
 
 > 6 standards tools + 4 DC system pages + 4 cockpit operations pages + 1 dashboard showcase
+> 🌑 Site-wide dark-mode rollout: [[Dark-Mode-Rollout]] (living `/ultraplan` tracker)
 
 ---
 
