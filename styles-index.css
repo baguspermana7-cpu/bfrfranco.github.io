@@ -5108,11 +5108,7 @@ section {
     transition: max-height 0.4s ease, -webkit-line-clamp 0s;
     max-height: 3em;
 }
-.oe-card:hover .oe-desc {
-    -webkit-line-clamp: unset;
-    max-height: 10em;
-    overflow: visible;
-}
+/* v1.43.x — OE hover-expand removed (card grew 3em→10em on hover = "bergoyang"/wobble). Desc stays clamped. */
 
 /* --- Scroll-to-Top Morph (#50) --- */
 .scroll-top-btn {
@@ -5212,7 +5208,7 @@ section {
     50%      { filter: drop-shadow(0 0 20px rgba(74,144,184,0.15)); }
 }
 .bento-name {
-    animation: nameGlow 4s ease-in-out infinite;
+    /* v1.43.x — nameGlow infinite pulse removed (distracting "blink" on hero name) */
 }
 
 /* --- Case Card Image Zoom on Hover --- */
@@ -5722,7 +5718,8 @@ section {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: rzNameSweep 12s ease-in-out infinite;
+    background-position: 0% 50%;
+    /* v1.43.x — rzNameSweep infinite gradient sweep removed (distracting "blink"); gradient now static */
 }
 @keyframes rzNameSweep {
     0%, 100% { background-position: 0% 50%; }

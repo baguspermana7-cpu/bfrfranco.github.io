@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.46 — 2026-06-21 (index — kill distracting hero-name "blink" + OE hover "wobble")
+
+### Fixed
+- **Hero name "blink" (disappears/reappears even without hover).** `.bento-name` carried TWO infinite
+  animations — `nameGlow` (4s drop-shadow pulse) + `rzNameSweep` (12s gradient sweep, dark). Removed
+  both; the gradient text is now **static** (`background-position:0% 50%`). Identified via headless
+  animation probe (cards themselves were stable; the looping name animation was the culprit).
+- **Operational Excellence card "wobble" on hover.** `.oe-card:hover .oe-desc` expanded the description
+  `max-height: 3em → 10em` (#30 hover-expand) — the card grew on hover = the bergoyang. Removed the
+  expand; desc stays 2-line clamped, card no longer changes size on hover. Verified (max-height
+  38.4px → 38.4px, no growth).
+- Both removals mirrored in `styles.css` + `styles-index.css`, re-minified; cache-bust
+  `styles-index.min.css?v=2026-06-21-calm`.
+
 ## v1.43.45 — 2026-06-21 (CDU Mini-BMS — live sparkline trends on parameter tiles)
 
 ### Added
