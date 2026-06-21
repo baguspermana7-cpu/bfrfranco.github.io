@@ -1,0 +1,38 @@
+/* ============================================================
+   rz-monitor-instrument.css — PLAN02 §09 Track I4
+   Instrument-register CHROME for market / grid monitors.
+   CHROME ONLY — header + section-title typography signature.
+   NEVER touches: Leaflet/SVG map rendering, SLD lines/labels,
+   voltage-tier colours, legend swatches, tooltip data, animation
+   thresholds, or any owner-tuned viz. Those stay pixel-identical.
+   Scoped to html[data-rz-register="instrument"]; additive + reversible
+   (remove the register attr + this <link> to revert).
+   Instrument accents: phosphor-cyan #2BE8FF / green #22F5A8.
+   ============================================================ */
+
+:root { --rz-mi-cyan: #2BE8FF; --rz-mi-green: #22F5A8; }
+
+/* monitor header title → reinforce mono instrument character (no layout change) */
+html[data-rz-register="instrument"] .nav-title {
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+    letter-spacing: 0.01em;
+}
+
+/* section-title → instrument signature: mono + phosphor accent tick.
+   Targets only the two hub pages' heading classes (headings, not viz). */
+html[data-rz-register="instrument"] .pjg-section-title,
+html[data-rz-register="instrument"] .dmt-section-title {
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+    letter-spacing: 0.02em;
+}
+html[data-rz-register="instrument"] .pjg-section-title::before,
+html[data-rz-register="instrument"] .dmt-section-title::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--rz-mi-cyan), var(--rz-mi-green));
+}

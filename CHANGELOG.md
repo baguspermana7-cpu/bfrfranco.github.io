@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.43.56 — 2026-06-21 (planb Track I4 — instrument chrome on market/grid monitors; planb 100%)
+
+Closes the last open planb item (**I4**). With this, every `plan-dark-mode-standard.html`
+track is shipped or already-live — **PLAN 02 is 100%**.
+
+### Added
+- **I4 — instrument-register chrome for the 6 monitor pages** (`dc-market-tracker` +
+  `pln-java-grid` and its 4 province pages). Each now declares
+  `data-rz-register="instrument"` and loads `css/rz-monitor-instrument.css`, which applies a
+  **header + section-title signature only**: `.nav-title` reinforced to JetBrains Mono, and
+  `.pjg-section-title` / `.dmt-section-title` get mono + a phosphor cyan→green accent tick.
+- **CHROME ONLY — owner-tuned viz preserved.** The stylesheet targets *only* those heading
+  classes; it never touches the Leaflet/SVG map, SLD line widths/labels, voltage-tier colours,
+  legend swatches, tooltips, or animation thresholds. Verified headless: maps render (21/13
+  Leaflet elements), tier legend colours unchanged, section-title mono+tick present, **0 page
+  errors**. Reversible (remove the register attr + the `<link>`).
+
+### Status — planb PLAN 02 complete
+- **Track E** 100% (E0–E4). **§11** index hero ✓. **§12** light twin ✓.
+- **Track I** I0–I3 already-live (9 cockpits in instrument register, probe 75/75); **I4 ✓** here.
+
 ## v1.43.55 — 2026-06-21 (planb rollout — §11 index editorial hero + E4 calculator shells)
 
 Continues "semua di planb diimplementasikan". Closes the remaining **Track E** item

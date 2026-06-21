@@ -55,12 +55,14 @@ Reconciliation of `plan-dark-mode-standard.html` §09 against the live site:
   `css/rz-bms-shell.css` instrument component library (= the I1 deliverable) + JetBrains Mono +
   the I0 count-up. **Accuracy probe 75/75 green** (verified this session). No re-skin performed —
   it would risk the gate + collide with the in-flight BMS track.
-- **I4 (market monitors / SLD labs) — deferred-by-design.** dc-market-tracker + pln-java-grid
-  are already dark + on-brand; the PLN grid's SLD readability defaults are owner-locked, so a
-  phosphor reskin is intentionally NOT applied (would regress tuned viz). Open as an explicit
-  opt-in if ever wanted.
+- **I4 (market monitors) — ✓ SHIPPED v1.43.56.** dc-market-tracker + pln-java-grid (+4 province
+  pages) now declare `data-rz-register="instrument"` + load `css/rz-monitor-instrument.css` —
+  **chrome only** (`.nav-title` mono; `.pjg-section-title`/`.dmt-section-title` mono + phosphor
+  cyan→green tick). The owner-locked SLD line widths / label defaults / voltage-tier colours /
+  Leaflet map viz are left pixel-identical (CSS targets heading classes only; verified headless:
+  maps render, tier legend unchanged, 0 errors). **Track I COMPLETE.**
 
-**Net: every planb track is shipped or already-live except I4, which is a deliberate hold.**
+**Net: planb PLAN 02 is 100% — every track shipped or already-live.**
 
 ---
 

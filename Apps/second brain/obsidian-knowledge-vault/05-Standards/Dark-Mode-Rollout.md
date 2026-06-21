@@ -41,10 +41,12 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
   + load `css/rz-bms-shell.css` (the I1 component library) + JetBrains Mono + I0 count-up; the BMS
   track built them in-register. **Accuracy probe 75/75 green.** Not re-skinned (would risk the gate
   + collide with the in-flight BMS track).
-- **I4 (market monitors / SLD labs)** — deferred-by-design (already dark; PLN grid SLD readability
-  owner-locked, phosphor reskin would regress it).
+- **I4 (market monitors)** — ✓ SHIPPED v1.43.56. dc-market-tracker + pln-java-grid (+4 provinces)
+  get `data-rz-register="instrument"` + `css/rz-monitor-instrument.css` (header/section-title mono
+  + phosphor tick, **chrome only**). Owner-locked SLD line widths / labels / tier colours / map viz
+  pixel-identical (verified). **Track I COMPLETE.**
 
-Net: every planb track shipped or already-live except I4 (deliberate hold).
+Net: **planb PLAN 02 is 100%** — every track shipped or already-live.
 
 ## `/ultraplan` audit (9-agent parallel, read-only)
 
