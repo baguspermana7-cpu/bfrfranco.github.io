@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.31 — 2026-06-21 (CDU guide — sizing & installation requirements section)
+
+### Added
+- **`cdu-selection-guide.html`** — new **§05 Sizing & installation requirements** section: the core
+  flow/ΔT sizing equation (flow ≈ 14.7 × Q(kW) / ΔT for PG25; ≈1.5 L/min/kW at ΔT 10, OCP band
+  1.25–2.0) with worked rack/node examples; a pipe-sizing table (DN25→DN200 at ~2 m/s); heat-
+  exchanger approach + W-class supply-temperature + dew-point guidance; and a physical-install
+  checklist (floor loading, clearances, facility water vs L2A air budget, dual feeds, BMS/leak,
+  N+1). Manuals/Standards sections renumbered to 06/07.
+
 ## v1.43.30 — 2026-06-21 (CDU Deep Comparison — all aspects, source-tagged)
 
 ### Added
