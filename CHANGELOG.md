@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.43.41 — 2026-06-21 (CDU guide — deep spec comparison tables)
+
+### Changed
+- **`cdu-selection-guide.html`** — rebuilt both comparison tables from a single "notable specs" cell
+  into a **9-column deep comparison** (Model · Capacity · Type · Secondary flow · dP/head · Approach ·
+  Dimensions & weight · Fluid·filter·conn·BMS·class · Links), populated from per-model datasheet
+  research. In-row table now 13 rows incl. **Vertiv Liebert XDU1350** and **CoolChip CDU 70 (L2A)**
+  with verified datasheets, **CoolIT CHx1500**, and a corrected **nVent RackChiller CDU800** (the
+  earlier "CX121" was wrong — nVent has no CX series). In-rack table now 7 rows incl. **nVent
+  RackChiller CHx** (real 4U specs: 150 L/min, 2.76 bar, 4 °C, 41 kg, W4) and **Lenovo Neptune RM100**
+  (corrected to **L2L**, with verified O&M manual). Every new external link curl-verified (200) or
+  tagged VENDOR PORTAL; "n/p" marks genuinely unpublished specs.
+
 ## v1.43.40 — 2026-06-21 (CDU Mini-BMS — full ISA P&ID + dimensioned layout)
 
 ### Changed
