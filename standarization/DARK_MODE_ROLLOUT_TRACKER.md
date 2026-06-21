@@ -56,8 +56,8 @@ false positives. Real, grouped:
 |---|---|---|---|---|
 | `.references-section` light bg | infographic-dc-cost-breakdown · -sustainability · -pue-global · asean-dc-report-2026 | inline `#f8fafc` overrode dark rule → light text invisible | high | **✅ fixed v1.43.33** (shared rule → `!important`) |
 | status badges light-on-dark | geopolitics-2 · -3 · FF-1 · FF-2 | `.confidence-low` / `.prob-medium` / `.prob-high` light bg, no dark override | high | **✅ fixed v1.43.35** |
-| white cookie banner/buttons | datahallAI · dc-conventional · datahall · water-system · fire-system · dc-market-tracker | `rgba(255,255,255,.92)` bg / `#374151` text, no dark override (presentation-only) | high/med | ⏳ |
-| tia-942 white buttons | tia-942-checklist | `.tia-btn-reset` / `.tier-btn.active` / `.dctype-btn.active` / `.nav-user-dropdown` white bg | high | ⏳ |
+| cookie banners (cockpits) | datahallAI · dc-conventional · datahall · water-system · fire-system | white bg/`#374151` text (presentation-only) | high/med | ⏳ **probe-gated** — load `css/rz-bms-shell.css` (NOT styles.css); run 75/75 accuracy probe before ship |
+| white cookie/buttons (non-cockpit) | dc-market-tracker · tia-942-checklist | `.dmt-cookie-decline` / `.tia-btn-reset` / `.tier-btn.active` / `.dctype-btn.active` / `.nav-user-dropdown` white bg | high | ⏳ next (safe) |
 | disclaimer `#64748b` (site-wide, 52 pages) | pillars + articles + more | low-contrast inline disclaimer + nav `#64748b` | high/med | **✅ fixed v1.43.36** (1 shared rule) |
 | articles `.philosophy-section` | articles.html | light gradient section bg, no dark override | med | ⏳ |
 | **FALSE POSITIVES (verified OK, skip)** | compare-* table accent headers (amber/cyan/emerald + white text); insights `.insights-hero h1` white-gradient (dark hero) | read fine on dark | — | ✅ no action |
