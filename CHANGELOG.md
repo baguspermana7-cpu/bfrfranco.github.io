@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.49 — 2026-06-21 (CDU pages — fix transparent navbar bleed-through on scroll)
+
+### Fixed
+- **Navbar collision, real root cause** — the site's base `.navbar` is `background:transparent` and only
+  gets its solid blur background from a `.scrolled` class that `script.js` adds on scroll. The CDU
+  pages use inline scripts and don't load `script.js`, so their navbar stayed transparent and table
+  content bled *through* it on scroll (most visible in dark mode). Added the scroll-aware `.scrolled`
+  toggle to the inline script of all five CDU pages (`cdu-hub`, `cdu-selection-guide`, `cdu-checklist`,
+  `cdu-mini-bms`, `cdu-comparison`). Navbar is now opaque on scroll, matching the rest of the site.
+
 ## v1.43.48 — 2026-06-21 (article editorial skin — catch up the 3 missed articles)
 
 ### Changed
