@@ -20,6 +20,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 - **v1.43.26** — AWS dark logo white fix · added polish-track tokens to `css/rz-dark.css`
 - **v1.43.33** — /ultraplan batch 1: `.references-section` light-on-dark fixed on 4 report pages (`!important` shared rule)
 - **v1.43.35** — /ultraplan batch 2: geopolitics-2/3 + FF-1/2 status badges (`.confidence-low` + `.prob-*`) dark overrides
+- **v1.43.36** — /ultraplan batch 3: site-wide `#64748b` disclaimer/nav contrast lift across 52 pages (1 shared rule)
 
 ## `/ultraplan` audit (9-agent parallel, read-only)
 
@@ -41,7 +42,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | articles (28) | clean | parallel session editorial skin |
 | infographics/reports (4) | 4 high | ✅ fixed v1.43.33 |
 | geopolitics + FF (4) | 12 high | ✅ fixed v1.43.35 |
-| pillar (5) | 5 high + 1 nav | ⏳ batch |
+| pillar (5) + 52-page disclaimer | 5 high + 1 nav | ✅ fixed v1.43.36 |
 | checklists/misc (tia-942, dc-market) | 5 high | ⏳ batch |
 | cockpits (cookie banners) | ~10 | ⏳ batch (presentation-only, preserve alarm/SLD) |
 | compare-* (4) | 8 (verify) | ⏳ verify-first |

@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.36 — 2026-06-21 (dark-mode /ultraplan — batch 3: site-wide #64748b disclaimer contrast)
+
+### Fixed
+- **Inline `#64748b` disclaimer + nav links low-contrast on dark — across 52 pages.** The shared
+  independence-disclaimer `<p style="...color:#64748b...">` (and the "All Insights" nav link) is an
+  inline style CSS can't normally override. Added one targeted `[data-theme="dark"] [style*="color:#64748b"]`
+  rule (`!important`) in `styles.css` → lifts to `#94a3b8` (readable, still de-emphasized) on every
+  page at once (pillars, articles, etc.). Index unaffected (uses `#94a3b8` already). Verified via probe.
+- Part of the `/ultraplan` rollout. Tracker + vault updated.
+
 ## v1.43.35 — 2026-06-21 (dark-mode /ultraplan — batch 2: geopolitics/FF status badges)
 
 ### Fixed
