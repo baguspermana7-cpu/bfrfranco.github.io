@@ -78,6 +78,17 @@
         .typecard h3 { font-size:1.02rem; margin:0 0 .3rem; }
         .typecard .cap { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--cdu-primary); margin-bottom:.5rem; }
         .typecard p { font-size:.85rem; color:var(--cdu-muted); margin:0; line-height:1.55; }
+        /* type mini-diagram (layout + P&ID signature) */
+        .tc-svg{ width:100%; height:auto; display:block; margin:.1rem 0 .7rem; border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-inset); }
+        .tc-svg .rk{ fill:var(--cdu-card); stroke:var(--cdu-border); stroke-width:1; }
+        .tc-svg .cd{ fill:var(--tc); fill-opacity:.18; stroke:var(--tc); stroke-width:1.4; }
+        .tc-svg .lb{ font-family:'JetBrains Mono',monospace; font-size:7px; fill:var(--cdu-muted); }
+        .tc-svg .lbc{ font-family:'JetBrains Mono',monospace; font-size:7px; fill:var(--tc); font-weight:700; }
+        .tc-svg .ps{ stroke:#3b82f6; stroke-width:2; fill:none; stroke-linecap:round; }
+        .tc-svg .pr{ stroke:#ef4444; stroke-width:2; fill:none; stroke-linecap:round; opacity:.8; }
+        .tc-svg .pa{ stroke:#f59e0b; stroke-width:2; fill:none; stroke-linecap:round; }
+        @media (prefers-reduced-motion:no-preference){ .tc-svg .fl{ stroke-dasharray:5 6; animation:tcdash 1.3s linear infinite; } }
+        @keyframes tcdash{ to{ stroke-dashoffset:-22; } }
 
         /* comparison tables */
         .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:12px; }
@@ -194,31 +205,88 @@
             <div class="typecard" style="--tc:#06b6d4;">
                 <h3>In-rack CDU</h3>
                 <div class="cap">~50–200 kW · 4U–8U in the rack</div>
+                <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="In-rack CDU: a CDU slice inside one rack, fed by facility water">
+                    <rect class="rk" x="20" y="22" width="26" height="46" rx="2"/>
+                    <rect class="rk" x="50" y="22" width="26" height="46" rx="2"/><rect class="cd" x="50" y="22" width="26" height="13" rx="2"/><text class="lbc" x="63" y="31" text-anchor="middle">CDU</text>
+                    <rect class="rk" x="80" y="22" width="26" height="46" rx="2"/>
+                    <rect class="rk" x="110" y="22" width="26" height="46" rx="2"/>
+                    <path class="ps fl" d="M18 76 H140"/><path class="pr fl" d="M18 88 H140"/><path class="ps fl" d="M63 76 V68"/>
+                    <path class="ps fl" d="M150 40 H180"/><path class="pr fl" d="M150 52 H180"/>
+                    <text class="lb" x="150" y="36">facility CDW</text><text class="lb" x="184" y="44">supply</text><text class="lb" x="184" y="56">return</text>
+                </svg>
                 <p>Mounts inside the 19″ rack it serves. Fast to deploy, isolates one rack/pod, no separate floor space. Capacity capped by rack U-height and the facility-water tap available at the cabinet.</p>
             </div>
             <div class="typecard" style="--tc:#0891b2;">
                 <h3>In-row / row-based CDU</h3>
                 <div class="cap">~120 kW–2.3 MW · floor-standing in the row</div>
+                <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="In-row CDU: a CDU cabinet standing between racks in the row">
+                    <rect class="rk" x="20" y="22" width="22" height="46" rx="2"/>
+                    <rect class="rk" x="46" y="22" width="22" height="46" rx="2"/>
+                    <rect class="cd" x="72" y="22" width="26" height="46" rx="2"/><text class="lbc" x="85" y="48" text-anchor="middle" transform="rotate(-90 85 48)">CDU</text>
+                    <rect class="rk" x="102" y="22" width="22" height="46" rx="2"/>
+                    <rect class="rk" x="128" y="22" width="22" height="46" rx="2"/>
+                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M85 76 V68"/>
+                    <path class="ps fl" d="M162 40 H190"/><path class="pr fl" d="M162 52 H190"/>
+                    <text class="lb" x="160" y="36">facility CDW</text><text class="lb" x="194" y="44">supply</text><text class="lb" x="194" y="56">return</text>
+                </svg>
                 <p>Stands in the row and feeds several racks via manifolds. The workhorse for dense AI halls — large heat exchanger, redundant pumps, big integrated filter. Needs facility chilled/condenser water piped to it.</p>
             </div>
             <div class="typecard" style="--tc:#10b981;">
                 <h3>Sidecar CDU</h3>
                 <div class="cap">~tens–150 kW · bolts to the rack side</div>
+                <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Sidecar CDU: a slim unit bolted to the side of a rack">
+                    <rect class="rk" x="20" y="22" width="26" height="46" rx="2"/>
+                    <rect class="rk" x="54" y="22" width="26" height="46" rx="2"/><rect class="cd" x="80" y="22" width="11" height="46" rx="2"/><text class="lbc" x="86" y="80" text-anchor="middle">SC</text>
+                    <rect class="rk" x="95" y="22" width="26" height="46" rx="2"/>
+                    <rect class="rk" x="125" y="22" width="26" height="46" rx="2"/>
+                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M86 76 V68"/>
+                    <path class="ps fl" d="M162 40 H190"/><path class="pr fl" d="M162 52 H190"/>
+                    <text class="lb" x="160" y="36">facility CDW</text><text class="lb" x="194" y="44">supply</text><text class="lb" x="194" y="56">return</text>
+                </svg>
                 <p>A slim cabinet attached to the side of a rack — between in-rack and in-row. Useful when in-rack U-space is full but a full row CDU is overkill, or for rear-door / single-cabinet retrofits.</p>
             </div>
             <div class="typecard" style="--tc:#f59e0b;">
                 <h3>Liquid-to-Air (L2A) CDU</h3>
                 <div class="cap">~70–240 kW · no facility water needed</div>
+                <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Liquid-to-air CDU: rejects heat to room air, no facility water">
+                    <rect class="rk" x="20" y="22" width="22" height="46" rx="2"/>
+                    <rect class="rk" x="46" y="22" width="22" height="46" rx="2"/>
+                    <rect class="cd" x="72" y="22" width="26" height="46" rx="2"/><text class="lbc" x="85" y="48" text-anchor="middle" transform="rotate(-90 85 48)">CDU</text>
+                    <rect class="rk" x="102" y="22" width="22" height="46" rx="2"/>
+                    <rect class="rk" x="128" y="22" width="22" height="46" rx="2"/>
+                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M85 76 V68"/>
+                    <path class="pa fl" d="M85 22 V8"/><text class="lb" x="92" y="13" fill="#f59e0b">→ room air (no facility water)</text>
+                </svg>
                 <p>Rejects the secondary-loop heat straight to <b>room air</b> via an internal air coil. The key retrofit enabler: lets you run direct-to-chip in a hall that has <b>no chilled-water plumbing</b> — at the cost of lower capacity and adding heat to the room.</p>
             </div>
             <div class="typecard" style="--tc:#8b5cf6;">
                 <h3>Liquid-to-Liquid (L2L) CDU</h3>
                 <div class="cap">~120 kW–2.3 MW · needs facility CDW</div>
+                <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Liquid-to-liquid CDU: rejects to facility water through a plate heat exchanger">
+                    <rect class="rk" x="20" y="22" width="22" height="46" rx="2"/>
+                    <rect class="rk" x="46" y="22" width="22" height="46" rx="2"/>
+                    <rect class="cd" x="72" y="22" width="26" height="46" rx="2"/><text class="lbc" x="85" y="48" text-anchor="middle" transform="rotate(-90 85 48)">CDU</text>
+                    <rect class="rk" x="102" y="22" width="22" height="46" rx="2"/>
+                    <rect class="rk" x="128" y="22" width="22" height="46" rx="2"/>
+                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M85 76 V68"/>
+                    <rect class="cd" x="160" y="34" width="18" height="26" rx="2"/><text class="lb" x="169" y="50" text-anchor="middle">HX</text>
+                    <path class="ps fl" d="M98 40 H160"/><path class="pr fl" d="M178 52 H210"/>
+                    <text class="lb" x="150" y="30">facility plate HX</text>
+                </svg>
                 <p>Rejects to a <b>facility water loop</b> through a plate heat exchanger. Highest capacity and efficiency; the standard for purpose-built AI halls with a chilled- or condenser-water plant.</p>
             </div>
             <div class="typecard" style="--tc:#ef4444;">
                 <h3>Facility / room-scale CDU</h3>
                 <div class="cap">1 MW–2.3 MW+ · serves many rows</div>
+                <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Facility-scale CDU: a central large unit distributing to multiple rows">
+                    <rect class="rk" x="16" y="22" width="14" height="20" rx="1.5"/><rect class="rk" x="32" y="22" width="14" height="20" rx="1.5"/><rect class="rk" x="48" y="22" width="14" height="20" rx="1.5"/>
+                    <rect class="rk" x="16" y="58" width="14" height="20" rx="1.5"/><rect class="rk" x="32" y="58" width="14" height="20" rx="1.5"/><rect class="rk" x="48" y="58" width="14" height="20" rx="1.5"/>
+                    <rect class="cd" x="92" y="30" width="34" height="40" rx="3"/><text class="lbc" x="109" y="53" text-anchor="middle">CDU</text>
+                    <path class="ps fl" d="M62 32 H92"/><path class="pr fl" d="M62 68 H92"/><path class="ps fl" d="M62 50 H92"/>
+                    <rect class="cd" x="150" y="38" width="16" height="24" rx="2"/><text class="lb" x="158" y="53" text-anchor="middle">HX</text>
+                    <path class="ps fl" d="M126 44 H150"/><path class="pr fl" d="M166 56 H200"/>
+                    <text class="lb" x="150" y="34">facility</text><text class="lb" x="64" y="92">many rows → central unit</text>
+                </svg>
                 <p>Large L2L units (e.g. 1.35–2.3 MW) that distribute to multiple rows/pods from a central location. Fewer units, central maintenance, but a bigger single-point footprint to design for redundancy (N+1 at the unit level).</p>
             </div>
         </div>

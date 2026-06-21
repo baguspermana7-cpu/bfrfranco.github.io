@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.43.29 — 2026-06-21 (CDU guide — per-type layout/P&ID mini-diagrams in taxonomy)
+
+### Changed
+- **`cdu-selection-guide.html`** — the "CDU types — what each is for" taxonomy section now carries a
+  **visual mini-diagram per type** (not just text cards): an inline SVG showing the CDU's datahall
+  placement signature + animated supply/return flow + heat-rejection path. In-rack (CDU slice inside
+  a rack), In-row (cabinet between racks), Sidecar (slim unit on the rack side), L2A (→ room air, no
+  facility water), L2L (plate HX to facility CDW), Facility/room-scale (multiple rows → central unit
+  + HX). Each in its type accent colour; flow animation honours `prefers-reduced-motion`. Full
+  interactive version lives on the CDU Mini-BMS cockpit.
+
 ## v1.43.28 — 2026-06-21 (CDU Mini-BMS — layout + P&ID + live parameters)
 
 ### Added
