@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.43.42 — 2026-06-21 (CDU checklist + comparison — deeper content)
+
+### Changed
+- **`cdu-checklist.html`** — §01 operational parameters +5 (supply-vs-dew-point, pipe velocity,
+  corrosion-inhibitor reserve, pump NPSH margin, footprint+weight) → 16 rows; §06 PM +5 tasks
+  (make-up/level, dew-point-reset verify, control-valve stroke, BMS telemetry verify, inhibitor+Cu/Fe)
+  → 16 rows; §07 symptom→action +6 rows (condensation, GPU throttle/maldistribution, 2-phase dry-out,
+  frequent make-up, control-valve fault, over-pressure) → 16 rows.
+- **`cdu-comparison.html`** — added a **per-vendor published-spec & capability matrix** (10 vendors ×
+  Redfish / dP published / ASHRAE class / hot-swap service / filtration / notable), distilling the
+  datasheet research into a single scannable view; Redfish is published only by CoolIT, Accelsius,
+  Lenovo. 6 tables total.
+
 ## v1.43.41 — 2026-06-21 (CDU guide — deep spec comparison tables)
 
 ### Changed

@@ -183,8 +183,12 @@
                 <tr><td>Filtration rating</td><td class="p">~50 micron (integrated)</td><td>e.g. Vertiv CoolChip integrated 50-micron filter; supplement with side-stream if specified.</td></tr>
                 <tr><td>Pump redundancy</td><td class="p">N+1</td><td>Dual/redundant pumps + dual power feeds (e.g. CoolIT CHx N+1 pumps + N+1 PSUs).</td></tr>
                 <tr><td>Leak detection</td><td class="p">0 leaks · rope/zone</td><td>Leak-detection rope/sensors at CDU base, manifolds, QDs; alarm → isolate.</td></tr>
-                <tr><td>Approach temp (ATD, L2L)</td><td class="p">~5 °C</td><td>Heat-exchanger approach (e.g. CoolIT CHx2000 5 °C ATD). Higher ATD = fouling.</td></tr>
-                <tr><td>Footprint / clearance</td><td class="p">per model (e.g. 2400×1200×1200 mm)</td><td>Service clearance front/rear per manual; floor loading checked for filled weight.</td></tr>
+                <tr><td>Approach temp (ATD, L2L)</td><td class="p">~3–5 °C</td><td>Heat-exchanger approach (e.g. Boyd 3 °C, CoolIT 5 °C ATD). Higher ATD = fouling.</td></tr>
+                <tr><td>Supply vs room dew point</td><td class="p">≥ +2–3 °C above dew point</td><td>Dew-point-aware reset prevents condensation on plates/pipe. Critical safety interlock.</td></tr>
+                <tr><td>Pipe velocity (sizing)</td><td class="p">~1.5–3 m/s</td><td>Too slow → fouling/air; too fast → erosion + high dP. Sets pipe DN for the flow.</td></tr>
+                <tr><td>Corrosion inhibitor reserve</td><td class="p">&gt; 100 ppm azole</td><td>No nitrites; depletes over time. Cu &lt; 0.2 ppm / Fe &lt; 0.1 ppm = corrosion indicators.</td></tr>
+                <tr><td>Pump NPSH margin</td><td class="p">≥ 10–20%</td><td>Below margin → cavitation + impeller erosion. Maintain system pressure + de-air.</td></tr>
+                <tr><td>Footprint / clearance / weight</td><td class="p">per model (e.g. 2400×1200×1200 mm · ~1793 kg wet)</td><td>Service clearance front/rear per manual; floor loading checked for filled weight.</td></tr>
             </tbody>
         </table></div>
     </div></section>
@@ -355,11 +359,16 @@
                 <tr><td>Read &amp; log flow / dP / temps / pressure; check alarms</td><td><span class="cad d">DAILY</span></td><td>All within §01 band; trend for drift.</td></tr>
                 <tr><td>Visual leak walk-down (base, QDs, manifolds, seals)</td><td><span class="cad d">DAILY</span></td><td>Dry; any glycol residue → investigate.</td></tr>
                 <tr><td>Verify N+1 (standby pump/PSU healthy)</td><td><span class="cad w">WEEKLY</span></td><td>Standby ready; exercise per vendor.</td></tr>
+                <tr><td>Check make-up rate &amp; expansion-tank level/pressure</td><td><span class="cad w">WEEKLY</span></td><td>Make-up minimal; level/pressure in band — rising make-up = slow leak.</td></tr>
+                <tr><td>Verify dew-point reset active (supply ≥ room dew point +2–3 °C)</td><td><span class="cad w">WEEKLY</span></td><td>No condensation risk; RH sensor reading true.</td></tr>
                 <tr><td>Leak-detection function test</td><td><span class="cad m">MONTHLY</span></td><td>Alarm + isolation confirmed.</td></tr>
                 <tr><td>Filter dP check / replace if clogged</td><td><span class="cad m">MONTHLY</span></td><td>Replace at vendor dP threshold; record.</td></tr>
                 <tr><td>Coolant sample — pH, conductivity, glycol%, biology, particulate</td><td><span class="cad q">QUARTERLY</span></td><td>Within ASHRAE W-quality; dose/replace per result.</td></tr>
                 <tr><td>Flow &amp; dP sensor calibration check</td><td><span class="cad q">QUARTERLY</span></td><td>Within sensor tolerance; re-cal if drift.</td></tr>
                 <tr><td>Pump seal / bearing inspection (vibration, noise)</td><td><span class="cad q">QUARTERLY</span></td><td>Service per runtime hours / vendor.</td></tr>
+                <tr><td>Control-valve stroke / actuator demand-vs-feedback test</td><td><span class="cad q">QUARTERLY</span></td><td>Deviation &lt;10%; fail-safe (bypass) confirmed.</td></tr>
+                <tr><td>BMS/DCIM telemetry &amp; alarm-point verification</td><td><span class="cad q">QUARTERLY</span></td><td>All points live + correct; no stale data; alarms route.</td></tr>
+                <tr><td>Corrosion-inhibitor reserve + Cu/Fe ion test</td><td><span class="cad q">QUARTERLY</span></td><td>Inhibitor &gt;100 ppm; Cu &lt;0.2 / Fe &lt;0.1 ppm (rising = active corrosion).</td></tr>
                 <tr><td>Heat-exchanger approach (ATD) check / clean</td><td><span class="cad a">ANNUAL</span></td><td>Rising ATD = fouling → clean side.</td></tr>
                 <tr><td>Coolant replacement (or per sample)</td><td><span class="cad a">ANNUAL</span></td><td>Replace if chemistry out of band.</td></tr>
                 <tr><td>Full redundancy + failover drill; firmware/controls review</td><td><span class="cad a">ANNUAL</span></td><td>N+1 holds under fault; backups current.</td></tr>
@@ -384,6 +393,12 @@
                 <tr><td class="sym">Coolant chemistry out of band</td><td>Biology growth; glycol degradation; contamination</td><td>Sample; dose biocide / inhibitor</td><td>Partial/full coolant replacement; side-stream filtration</td></tr>
                 <tr><td class="sym">Air in loop (gurgling, unstable dP)</td><td>Incomplete de-air; make-up drawing air; leak</td><td>Bleed at high points; check make-up</td><td>Find/seal air ingress; re-fill correctly</td></tr>
                 <tr><td class="sym">Stale / lost telemetry</td><td>Sensor fault; comms loss to BMS</td><td>Treat values as suspect; local gauge check</td><td>Replace sensor; restore comms; re-cal</td></tr>
+                <tr><td class="sym">Condensation / sweating on plates &amp; pipe</td><td>Supply temp driven below room dew point; dew-point reset disabled / RH sensor fault</td><td>Raise supply setpoint above room dew point; check RH sensor</td><td>Enable dew-point-aware reset (≥2–3 °C above dew point); fix humidity sensor; insulate</td></tr>
+                <tr><td class="sym">GPU throttling / hot sleds</td><td>Flow maldistribution across the manifold; under-provisioned flow vs chip TDP</td><td>Compare per-branch flow; verify total flow ≥ design L/min/kW</td><td>Balance manifold (balancing valves / flow restrictors); raise flow setpoint</td></tr>
+                <tr><td class="sym">Two-phase cold-plate dry-out (2-phase)</td><td>Vapour quality too high in hot sleds; uneven 2-phase distribution</td><td>Check refrigerant charge / sub-cooling; inspect distribution</td><td>Re-balance flow restrictors; restore charge; correct manifold geometry</td></tr>
+                <tr><td class="sym">Frequent make-up / falling level</td><td>Slow leak; air being purged; expansion bladder fault</td><td>Trend make-up rate + level (LT); leak walk-down</td><td>Find/seal leak; recharge / replace expansion bladder; re-pressurise</td></tr>
+                <tr><td class="sym">Control valve fault (TCV)</td><td>Actuator demand vs feedback &gt;10%; signal loss → fail to bypass = no cooling</td><td>Switch to manual / verify fail-safe position; protect IT load</td><td>Re-stroke / replace actuator; re-tune PID (Ziegler-Nichols)</td></tr>
+                <tr><td class="sym">System over-pressure</td><td>Thermal expansion with closed expansion path; PSV not relieving</td><td>Verify expansion/relief path open; check PT vs component PN</td><td>Restore expansion control; test/replace PSV; re-set fill pressure</td></tr>
             </tbody>
         </table></div>
     </div></section>
