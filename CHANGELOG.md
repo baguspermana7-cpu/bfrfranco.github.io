@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.34 — 2026-06-21 (CDU guide FAQ + FAQPage schema + glossary terms)
+
+### Added
+- **`cdu-selection-guide.html`** — new **§08 FAQ** section (8 questions: L2L vs L2A, flow sizing,
+  coolant/water quality, filtration, dew-point, quick-disconnect standards, type selection, leak
+  safety) using native `<details>` accordions, plus a **FAQPage** JSON-LD block (8 Q&As) for rich
+  results / AI-search.
+- **`glossary.html`** — three new liquid-cooling terms cross-linked to the CDU suite: **L2A**
+  (liquid-to-air CDU), **L2L** (liquid-to-liquid CDU), and **Quick-Disconnect (QD/UQD/UQDB)**.
+
 ## v1.43.33 — 2026-06-21 (dark-mode /ultraplan — batch 1: references-section light-on-dark)
 
 ### Fixed

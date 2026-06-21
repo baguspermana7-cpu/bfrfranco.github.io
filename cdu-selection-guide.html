@@ -100,6 +100,14 @@
         .szlist li b{ color:var(--cdu-text); }
         .formula{ font-family:'JetBrains Mono',monospace; font-size:.92rem; background:var(--cdu-inset); border:1px solid var(--cdu-border); border-left:3px solid var(--cdu-primary); border-radius:8px; padding:.75rem 1rem; margin:.6rem 0; color:var(--cdu-text); overflow-x:auto; }
         .formula .c{ color:var(--cdu-muted); font-size:.76rem; }
+        /* FAQ */
+        .faq-item{ border:1px solid var(--cdu-border); border-radius:10px; background:var(--cdu-card); margin-bottom:8px; overflow:hidden; }
+        .faq-item summary{ cursor:pointer; padding:.85rem 1rem; font-weight:600; font-size:.94rem; color:var(--cdu-text); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+        .faq-item summary::-webkit-details-marker{ display:none; }
+        .faq-item summary::after{ content:'+'; font-family:'JetBrains Mono',monospace; color:var(--cdu-primary); font-size:1.2rem; line-height:1; }
+        .faq-item[open] summary::after{ content:'\2013'; }
+        .faq-item .faq-a{ padding:0 1rem 1rem; font-size:.87rem; color:var(--cdu-muted); line-height:1.6; }
+        .faq-item .faq-a b{ color:var(--cdu-text); }
 
         /* comparison tables */
         .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:12px; }
@@ -563,7 +571,42 @@
         </div>
     </div></section>
 
+    <!-- ───────── 8. FAQ ───────── -->
+    <section class="cdu-sec"><div class="cdu-wrap">
+        <span class="cdu-kick">08 · FAQ</span>
+        <h2>Frequently asked questions</h2>
+        <p class="lead">Short answers to the questions that come up most when choosing and deploying a CDU. Deeper detail and sources are on the <a href="cdu-checklist.html" style="color:var(--cdu-primary);font-weight:600;">checklist</a> and <a href="cdu-comparison.html" style="color:var(--cdu-primary);font-weight:600;">deep comparison</a>.</p>
+
+        <details class="faq-item"><summary>What's the difference between an L2L and an L2A CDU?</summary><div class="faq-a">An <b>L2L (liquid-to-liquid)</b> CDU rejects the chip-side heat to a <b>facility water loop</b> through a plate heat exchanger — highest capacity and efficiency, but it needs a chilled- or condenser-water plant. An <b>L2A (liquid-to-air)</b> CDU rejects straight to <b>room air</b> via an internal coil — no facility water, so it's the retrofit enabler, but the room's CRAH/CRAC must absorb that heat, which caps density. Many sites stage L2A first, then move to L2L when the water plant exists.</div></details>
+
+        <details class="faq-item"><summary>How do I size the coolant flow to my rack load?</summary><div class="faq-a">From the heat balance Q = ṁ·c<sub>p</sub>·ΔT, for a 25% propylene-glycol fluid: <b>flow (L/min) ≈ 14.7 × Q(kW) / ΔT(°C)</b>. At the OCP design point (ΔT ≈ 10 °C) that's about <b>1.5 L/min per kW</b>; OCP's published band is 1.25–2.0 L/min/kW for a 7.5–12 °C rise. A 120 kW rack ≈ 180 L/min. Always stay within the cold-plate's minimum per-chip flow and the CDU's dP window. See §05 Sizing.</div></details>
+
+        <details class="faq-item"><summary>What coolant and water quality does a cold-plate loop need?</summary><div class="faq-a">The de-facto direct-to-chip fluid is <b>PG25</b> (25% propylene glycol) — it balances freeze point, viscosity and biostatic protection far better than plain DI water. The secondary (TCS) loop has published acceptance limits (OCP): pH 8.0–10.5, conductivity &lt; 1,500 µS/cm, chloride &lt; 50 ppm (304SS), hardness &lt; 30 ppm, bacteria &lt; 100 CFU/mL operational, corrosion inhibitor &gt; 100 ppm. The facility (FWS) loop has its own, looser limits. Full tables on the checklist §02.</div></details>
+
+        <details class="faq-item"><summary>What filtration does the loop need?</summary><div class="faq-a">Typical practice: facility/primary 150–500 µm, secondary/TCS main filter <b>25–50 µm</b> (trending to 25 µm as chip microchannels narrow), and a cold-plate <b>side-stream / polishing filter down to &lt; 5–10 µm</b> (some vendors go to 0.2 µm). Trend the filter differential pressure and replace at the vendor threshold — a clogging filter is a leading cause of rising loop dP.</div></details>
+
+        <details class="faq-item"><summary>Why must the supply temperature stay above the room dew point?</summary><div class="faq-a">If the secondary supply runs below the room dew point, moisture condenses on cold plates, pipes and — worst case — electronics. The CDU's dew-point-aware control holds supply <b>≥ 2–3 °C above the room dew point</b> (re-setting upward if humidity rises). This is also why warmer ASHRAE water classes (W40/W45) are attractive: they keep you clear of condensation <i>and</i> enable chiller-less free cooling.</div></details>
+
+        <details class="faq-item"><summary>What is a quick-disconnect (QD) standard like UQD / UQDB?</summary><div class="faq-a">OCP's <b>UQD (Universal Quick Disconnect)</b> and <b>UQDB (blind-mate)</b> standardise the coupler dimensions and performance so parts from different makers interoperate on single-phase water/glycol lines. Typical figures: 100 psi working / 300 psi burst, ≥ 5,000 mating cycles, dripless ~0.02–0.07 mL per connect; UQDB adds ±1 mm blind-mate tolerance for rack insertion. Match one QD standard across the whole loop — never mix couplers.</div></details>
+
+        <details class="faq-item"><summary>In-row vs in-rack vs facility-scale — which should I pick?</summary><div class="faq-a"><b>In-rack</b> is fastest to deploy and isolates one rack, but you buy many units (more PM + leak surface). <b>In-row</b> is the density workhorse — fewer larger units feeding several racks, easier to service, but a central single-point-of-failure that makes N+1 essential. <b>Facility/room-scale</b> L2L gives economy of scale across many rows with the biggest footprint to design for redundancy. The TCO trade-off matrix on the deep comparison breaks this down by capex / opex / density / water / retrofit / maintenance.</div></details>
+
+        <details class="faq-item"><summary>Is direct-to-chip liquid cooling safe near electronics? What about leaks?</summary><div class="faq-a">It's mainstream for AI/HPC, but leaks are the most-reported field issue, so the safety case is built in: dripless/blind-mate quick-disconnects, drip trays + secondary containment, leak-detection rope/spot sensors at QDs, manifolds and low points, and an automatic response (alarm → isolate / pump-shutdown or bypass-standby). Two-phase dielectric systems add the advantage that any leak is non-conductive. Field issues, root causes and prevention are catalogued on the deep comparison §01.</div></details>
+    </div></section>
+
     </main>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+        {"@type":"Question","name":"What's the difference between an L2L and an L2A CDU?","acceptedAnswer":{"@type":"Answer","text":"An L2L (liquid-to-liquid) CDU rejects chip-side heat to a facility water loop through a plate heat exchanger — highest capacity and efficiency, but needs a chilled/condenser-water plant. An L2A (liquid-to-air) CDU rejects to room air via an internal coil — no facility water, the retrofit enabler, but the room CRAH/CRAC must absorb the heat, capping density."}},
+        {"@type":"Question","name":"How do I size the coolant flow to my rack load?","acceptedAnswer":{"@type":"Answer","text":"From Q = m·cp·ΔT, for PG25: flow (L/min) ≈ 14.7 × Q(kW) / ΔT(°C). At ΔT ≈ 10 °C that is about 1.5 L/min per kW; OCP's band is 1.25–2.0 L/min/kW for a 7.5–12 °C rise. A 120 kW rack ≈ 180 L/min. Stay within the cold-plate minimum per-chip flow and the CDU dP window."}},
+        {"@type":"Question","name":"What coolant and water quality does a cold-plate loop need?","acceptedAnswer":{"@type":"Answer","text":"PG25 (25% propylene glycol) is the de-facto direct-to-chip fluid. The secondary TCS loop has OCP acceptance limits: pH 8.0–10.5, conductivity < 1,500 µS/cm, chloride < 50 ppm (304SS), hardness < 30 ppm, bacteria < 100 CFU/mL operational, inhibitor > 100 ppm. The facility loop has its own looser limits."}},
+        {"@type":"Question","name":"What filtration does the loop need?","acceptedAnswer":{"@type":"Answer","text":"Facility/primary 150–500 µm, secondary/TCS main filter 25–50 µm, and a cold-plate side-stream/polishing filter down to < 5–10 µm (some vendors 0.2 µm). Trend filter dP and replace at the vendor threshold."}},
+        {"@type":"Question","name":"Why must the supply temperature stay above the room dew point?","acceptedAnswer":{"@type":"Answer","text":"Running secondary supply below room dew point condenses moisture on cold plates, pipes and electronics. The CDU holds supply ≥ 2–3 °C above room dew point (re-setting upward if humidity rises). Warmer ASHRAE classes (W40/W45) keep clear of condensation and enable chiller-less free cooling."}},
+        {"@type":"Question","name":"What is a quick-disconnect standard like UQD / UQDB?","acceptedAnswer":{"@type":"Answer","text":"OCP UQD (Universal Quick Disconnect) and UQDB (blind-mate) standardise coupler dimensions and performance so different makers interoperate on single-phase water/glycol lines. Typical: 100 psi working / 300 psi burst, ≥ 5,000 mating cycles, dripless ~0.02–0.07 mL per connect; UQDB adds ±1 mm blind-mate tolerance. Never mix couplers."}},
+        {"@type":"Question","name":"In-row vs in-rack vs facility-scale — which should I pick?","acceptedAnswer":{"@type":"Answer","text":"In-rack is fastest and isolates one rack but multiplies units (more PM + leak surface). In-row is the density workhorse — fewer larger units feeding several racks, easier to service, but a central single-point-of-failure needing N+1. Facility-scale L2L gives economy of scale across many rows with the largest redundancy footprint."}},
+        {"@type":"Question","name":"Is direct-to-chip liquid cooling safe near electronics? What about leaks?","acceptedAnswer":{"@type":"Answer","text":"It is mainstream for AI/HPC. Leaks are the most-reported field issue, so the safety case uses dripless/blind-mate quick-disconnects, drip trays + secondary containment, leak-detection sensors at QDs/manifolds/low points, and an automatic response (alarm → isolate / pump-shutdown or bypass-standby). Two-phase dielectric systems make any leak non-conductive."}}
+    ]}
+    </script>
 
     <footer class="footer footer-enhanced">
         <div class="container"><div class="footer-grid">
