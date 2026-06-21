@@ -178,7 +178,7 @@
             --a20-red: #b45309;
             --a20-red-light: #d97706;
             --a20-dark: #451a03;
-            --a20-light: #fffbeb;
+            --a20-light: rgba(232,181,99,0.06);
             --a20-accent: #fbbf24;
             --a20-amber: #f59e0b;
             --a20-green: #10b981;
@@ -396,7 +396,7 @@
             vertical-align: top;
         }
         .verdict-table tbody tr:hover {
-            background: #fffbeb;
+            background: rgba(232,181,99,0.06);
         }
         .vt-true { color: #16a34a; font-weight: 700; }
         .vt-partial { color: #d97706; font-weight: 700; }
@@ -422,13 +422,13 @@
             line-height: 1.6;
         }
         .fcb-false {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
+            background: rgba(232,181,99,0.06);
+            border: 1px solid rgba(232,181,99,0.22);
         }
         .fcb-false h4 { color: #b45309; }
         .fcb-partial {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
+            background: rgba(232,181,99,0.06);
+            border: 1px solid rgba(232,181,99,0.22);
         }
         .fcb-partial h4 { color: #d97706; }
         .fcb-true {
@@ -2096,7 +2096,7 @@ function wfcReset() {
 }
 
 // === SHARED PDF HELPERS ===
-var wcPDFCSS = '*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,-apple-system,sans-serif;color:#1f2937;padding:30px;max-width:900px;margin:0 auto;font-size:11px;line-height:1.6}h1{font-size:22px;color:#92400e;margin-bottom:4px}h2{font-size:14px;color:#92400e;border-bottom:2px solid #b45309;padding-bottom:4px;margin:20px 0 10px}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f8fafc;font-size:10px;text-transform:uppercase;color:#64748b;padding:8px;text-align:left;border:1px solid #e5e7eb}td{padding:8px;border:1px solid #e5e7eb;font-size:11px}.kpi-row{display:flex;gap:12px;margin:10px 0}.kpi-box{flex:1;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;text-align:center}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase}.kpi-val{font-size:16px;font-weight:700;color:#92400e}.narr{background:#fffbeb;border-left:3px solid #b45309;padding:12px;margin:10px 0;font-size:10px;line-height:1.6}.narr h4{font-size:12px;color:#92400e;margin-bottom:6px}.narr strong{color:#92400e}.chart-row{display:flex;gap:16px;margin:12px 0}.chart-row>div{flex:1;min-width:0}.method{font-size:9px;color:#64748b;line-height:1.5;margin:12px 0;padding:10px;background:#f8fafc;border-radius:6px}.rec{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px;margin:8px 0}.rec-title{font-size:11px;font-weight:700;color:#92400e;margin-bottom:4px}.rec-text{font-size:10px;color:#374151;line-height:1.5}@media print{@page{margin:15mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+var wcPDFCSS = '*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,-apple-system,sans-serif;color:#1f2937;padding:30px;max-width:900px;margin:0 auto;font-size:11px;line-height:1.6}h1{font-size:22px;color:#92400e;margin-bottom:4px}h2{font-size:14px;color:#92400e;border-bottom:2px solid #b45309;padding-bottom:4px;margin:20px 0 10px}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f8fafc;font-size:10px;text-transform:uppercase;color:#64748b;padding:8px;text-align:left;border:1px solid #e5e7eb}td{padding:8px;border:1px solid #e5e7eb;font-size:11px}.kpi-row{display:flex;gap:12px;margin:10px 0}.kpi-box{flex:1;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;text-align:center}.kpi-label{font-size:9px;color:#64748b;text-transform:uppercase}.kpi-val{font-size:16px;font-weight:700;color:#92400e}.narr{background:rgba(232,181,99,0.06);border-left:3px solid #b45309;padding:12px;margin:10px 0;font-size:10px;line-height:1.6}.narr h4{font-size:12px;color:#92400e;margin-bottom:6px}.narr strong{color:#92400e}.chart-row{display:flex;gap:16px;margin:12px 0}.chart-row>div{flex:1;min-width:0}.method{font-size:9px;color:#64748b;line-height:1.5;margin:12px 0;padding:10px;background:#f8fafc;border-radius:6px}.rec{background:rgba(232,181,99,0.06);border:1px solid rgba(232,181,99,0.22);border-radius:8px;padding:12px;margin:8px 0}.rec-title{font-size:11px;font-weight:700;color:#92400e;margin-bottom:4px}.rec-text{font-size:10px;color:#374151;line-height:1.5}@media print{@page{margin:15mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
 
 function wcPDFHead(title, subtitle) {
     var now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -2374,7 +2374,7 @@ function dcwExportPDF() {
     dcwBenchmarks.forEach(function(b) {
         html += '<tr><td>' + b.name + '</td><td>' + wcFmtVol(b.perMW) + '</td><td>' + b.wue.toFixed(2) + '</td><td style="font-size:9px">' + b.note + '</td></tr>';
     });
-    html += '<tr style="background:#fffbeb;font-weight:600"><td>Your Facility</td><td>' + wcFmtVol(yourPerMW) + '</td><td>' + wue.toFixed(2) + '</td><td style="font-size:9px">' + loadVal + ' MW, ' + (coolingNames[cool] || cool) + '</td></tr></table>';
+    html += '<tr style="background:rgba(232,181,99,0.06);font-weight:600"><td>Your Facility</td><td>' + wcFmtVol(yourPerMW) + '</td><td>' + wue.toFixed(2) + '</td><td style="font-size:9px">' + loadVal + ' MW, ' + (coolingNames[cool] || cool) + '</td></tr></table>';
 
     // Pro sections
     if (isPro) {
@@ -2582,7 +2582,7 @@ function avhExportPDF() {
         var mw = m.water;
         if (upstream === 'yes') mw *= (1 + wfcUpstreamFactor);
         var totalW = (mw * totalQ) / 1000;
-        html += '<tr' + (k === model ? ' style="background:#fffbeb;font-weight:600"' : '') + '>';
+        html += '<tr' + (k === model ? ' style="background:rgba(232,181,99,0.06);font-weight:600"' : '') + '>';
         html += '<td>' + m.name + (k === model ? ' \u2605' : '') + '</td><td>' + m.company + '</td><td>' + m.type + '</td>';
         html += '<td>' + mw.toFixed(2) + '</td><td>' + (totalW < 1 ? (totalW * 1000).toFixed(0) + ' mL' : wcFmtVol(totalW) + ' L') + '</td></tr>';
     });

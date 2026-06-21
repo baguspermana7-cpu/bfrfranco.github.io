@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.43.57 — 2026-06-21 (articles — refine amber: gold accent, not yellow highlighter)
+
+Owner feedback on the v1.43.54 amber swap: the re-toned callouts read as garish
+**yellow highlighter blocks** in light mode, unlike the restrained §08 mockup (which
+uses the soft gold `#E8B563` as an *accent* — rails/borders/text — not a fill).
+
+### Changed
+- **De-yellowed every amber FILL across the 9 amber-body articles** (`article-11/14/20/23/25/26/27`
+  + `geopolitics`/`-3`). The cream/amber-50/100 backgrounds and gradient stops
+  (`#fffbeb`, `#fef3c7`, `#fde68a`) on callout boxes, insight boxes, banners, and inline
+  stat pills were swapped to a subtle gold tint (`rgba(232,181,99,0.06–0.22)`). Text colours
+  that legitimately use those hexes (button labels, dark-mode emphasis) were protected and
+  left intact.
+- **article-27 inline stats refined** — the `.ws-stat` pills lost their yellow box (was
+  `#fffbeb` fill + amber border + pill padding); they now read as clean amber-bold figures
+  with a thin gold underline. The `.ws-insight-box` / `.ws-narrative` callouts moved from a
+  yellow gradient to a subtle gold tint + a `#E8B563` left rail (the mockup's "Key finding"
+  style).
+- Net effect: articles now match the mockup's gold-accent restraint instead of looking
+  highlighter-marked. Verified light + dark on article-26 (the mockup's own subject) and
+  article-27 — 0 page errors.
+
 ## v1.43.56 — 2026-06-21 (planb Track I4 — instrument chrome on market/grid monitors; planb 100%)
 
 Closes the last open planb item (**I4**). With this, every `plan-dark-mode-standard.html`
