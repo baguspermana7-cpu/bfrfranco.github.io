@@ -38,13 +38,13 @@
         /* ===== CDU Mini-BMS — instrument register (cockpit) ===== */
         :root{
             --bm-bg:#f4f6f8; --bm-panel:#ffffff; --bm-border:#d8dee6; --bm-text:#0f172a; --bm-muted:#5b6675;
-            --bm-inset:#eef1f5; --bm-grid:rgba(8,145,178,.10);
+            --bm-inset:#eef1f5; --bm-grid:rgba(8,145,178,.06);
             --bm-cyan:#0891b2; --bm-green:#0a8a5a; --bm-amber:#b45309; --bm-red:#dc2626; --bm-blue:#2563eb;
             --bm-mono:'JetBrains Mono',ui-monospace,monospace; --bm-sans:'IBM Plex Sans',system-ui,sans-serif;
         }
         [data-theme="dark"]{
             --bm-bg:#0E0F12; --bm-panel:#15171C; --bm-border:rgba(140,150,165,.18); --bm-text:#EAEEF3; --bm-muted:#828B98;
-            --bm-inset:#1b1e24; --bm-grid:rgba(43,232,255,.07);
+            --bm-inset:#1b1e24; --bm-grid:rgba(43,232,255,.05);
             --bm-cyan:#2BE8FF; --bm-green:#22F5A8; --bm-amber:#F5C84B; --bm-red:#FF5C5C; --bm-blue:#5BA8FF;
         }
         body{ background:var(--bm-bg); color:var(--bm-text); font-family:var(--bm-sans); }
@@ -77,7 +77,7 @@
         /* cockpit grid */
         .bm-grid{ display:grid; grid-template-columns:1.15fr 1fr; gap:14px; padding:1.2rem 0; }
         @media (max-width:900px){ .bm-grid{ grid-template-columns:1fr; } }
-        .panel{ background:var(--bm-panel); border:1px solid var(--bm-border); border-radius:12px; overflow:hidden; }
+        .panel{ background:var(--bm-panel); border:1px solid var(--bm-border); border-radius:8px; overflow:hidden; }
         .panel-hd{ display:flex; align-items:center; justify-content:space-between; padding:.6rem .9rem; border-bottom:1px solid var(--bm-border); background:var(--bm-inset); }
         .panel-hd h3{ font-family:var(--bm-mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--bm-text); margin:0; font-weight:700; }
         .panel-hd .tag{ font-family:var(--bm-mono); font-size:.58rem; color:var(--bm-muted); }
@@ -92,9 +92,9 @@
 
         /* parameter tiles */
         .tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr)); gap:8px; }
-        .tile{ border:1px solid var(--bm-border); border-radius:9px; padding:.55rem .6rem; background:var(--bm-inset); position:relative; }
+        .tile{ border:1px solid var(--bm-border); border-radius:6px; padding:.55rem .6rem; background:var(--bm-inset); position:relative; }
         .tile .k{ font-family:var(--bm-mono); font-size:.54rem; letter-spacing:.07em; text-transform:uppercase; color:var(--bm-muted); }
-        .tile .v{ font-family:var(--bm-mono); font-size:1.18rem; font-weight:700; color:var(--bm-text); line-height:1.15; margin-top:2px; }
+        .tile .v{ font-family:var(--bm-mono); font-size:1.18rem; font-weight:700; color:var(--bm-text); line-height:1.15; margin-top:2px; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
         .tile .v .u{ font-size:.62rem; color:var(--bm-muted); font-weight:500; margin-left:2px; }
         .tile .b{ font-family:var(--bm-mono); font-size:.52rem; color:var(--bm-muted); margin-top:1px; }
         .tile.warn{ border-color:var(--bm-amber); } .tile.warn .v{ color:var(--bm-amber); }
@@ -103,13 +103,14 @@
         .tile.warn .led{ background:var(--bm-amber); box-shadow:0 0 6px var(--bm-amber); }
         .tile.alarm .led{ background:var(--bm-red); box-shadow:0 0 7px var(--bm-red); animation:blink 1s steps(2) infinite; }
         @keyframes blink{ 50%{ opacity:.25; } }
+        @media (prefers-reduced-motion:reduce){ .tile.alarm .led, .leak-x.on{ animation:none; } }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
         .sch-eq2{ fill:none; stroke:var(--bm-muted); stroke-width:1.1; }
         .sch-lbl{ font-family:var(--bm-mono); font-size:9px; fill:var(--bm-text); }
         .sch-sub{ font-family:var(--bm-mono); font-size:7.5px; fill:var(--bm-muted); }
-        .sch-val{ font-family:var(--bm-mono); font-size:8.5px; font-weight:700; fill:var(--bm-cyan); }
+        .sch-val{ font-family:var(--bm-mono); font-size:8.5px; font-weight:700; fill:var(--bm-cyan); font-variant-numeric:tabular-nums slashed-zero; }
         .pipe-s{ stroke:var(--bm-blue); stroke-width:3; fill:none; stroke-linecap:round; }
         .pipe-r{ stroke:var(--bm-red); stroke-width:3; fill:none; stroke-linecap:round; opacity:.85; }
         .pipe-hot{ stroke:var(--bm-amber); stroke-width:3; fill:none; stroke-linecap:round; }

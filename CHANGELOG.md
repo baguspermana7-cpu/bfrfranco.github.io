@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.43.37 — 2026-06-21 (CDU suite — UIUX polish pass per design.md review)
+
+### Changed (uiux-reviewer findings applied across all 4 CDU pages)
+- **Brand typography** — `cdu-selection-guide.html` swapped **Inter → IBM Plex Sans** (design.md
+  mandates IBM Plex, "not Inter — generic SaaS") and set an explicit `body` font-family.
+- **Tabular numerics** — added `font-variant-numeric:tabular-nums slashed-zero` to every mono
+  numeric class (guide `.kw`/`.formula`, checklist `.p`/form inputs, mini-bms `.tile .v`/`.sch-val`,
+  comparison `.mono`) so dense data columns align and live instrument readouts stop jittering.
+- **Accessibility** — gated the mini-BMS alarm/leak `blink` animations behind
+  `prefers-reduced-motion:reduce` (they already carry text + colour, so motion is now enhancement
+  only).
+- **Token/radius discipline** — container radii 12→8 px (typecard/panel/tbl-wrap) and tile 9→6 px;
+  taxonomy card `border-top` 3→2 px; taxonomy SVG pipes re-graded to tier weights (supply 1.6 /
+  return 1.2 / air 1.4 px) with return re-pointed to fault-red `#FF3030`; comparison `.win/.mid/.lose`
+  re-pointed to RZ severity tokens (`#00FF88`/`#FFAA00`/`#FF3030` in dark); tier-3 lighter inner-row
+  hairlines on dense tables; mini-BMS hero line-grid opacity lowered to ≤0.06; FAQ summary hover +
+  focus-visible ring; lead paragraphs capped at 70ch; removed a no-op sticky `th`.
+
 ## v1.43.36 — 2026-06-21 (dark-mode /ultraplan — batch 3: site-wide #64748b disclaimer contrast)
 
 ### Fixed

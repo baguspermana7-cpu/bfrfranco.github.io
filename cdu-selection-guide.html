@@ -45,7 +45,7 @@
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
 
     <style>
@@ -61,12 +61,14 @@
         .cdu-badges { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin-top:1.4rem; }
         .cdu-badge { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:.35rem .7rem; border-radius:6px; border:1px solid rgba(255,255,255,.35); background:rgba(255,255,255,.08); color:#fff; }
 
+        body { font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif; }
         main { background:var(--cdu-bg); color:var(--cdu-text); }
+        .kw, .formula, table.cdu-tbl .kw { font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
         .cdu-wrap { max-width:1180px; margin:0 auto; padding:0 1.4rem; }
         .cdu-sec { padding:3rem 0; border-top:1px solid var(--cdu-border); }
         .cdu-sec:first-of-type { border-top:0; }
         .cdu-sec h2 { font-size:clamp(1.4rem,2.6vw,2rem); margin:0 0 .4rem; letter-spacing:-.01em; }
-        .cdu-sec .lead { color:var(--cdu-muted); max-width:74ch; margin:0 0 1.4rem; line-height:1.6; }
+        .cdu-sec .lead { color:var(--cdu-muted); max-width:70ch; margin:0 0 1.4rem; line-height:1.6; }
         .cdu-kick { font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--cdu-primary); font-weight:600; display:block; margin-bottom:.5rem; }
 
         /* link-status legend + tags */
@@ -77,7 +79,7 @@
 
         /* type taxonomy cards */
         .cdu-types { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:.9rem; }
-        .typecard { border:1px solid var(--cdu-border); border-radius:12px; background:var(--cdu-card); padding:1.1rem 1.2rem; border-top:3px solid var(--tc,var(--cdu-primary)); }
+        .typecard { border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-card); padding:1.1rem 1.2rem; border-top:2px solid var(--tc,var(--cdu-primary)); }
         .typecard h3 { font-size:1.02rem; margin:0 0 .3rem; }
         .typecard .cap { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--cdu-primary); margin-bottom:.5rem; }
         .typecard p { font-size:.85rem; color:var(--cdu-muted); margin:0; line-height:1.55; }
@@ -87,9 +89,9 @@
         .tc-svg .cd{ fill:var(--tc); fill-opacity:.18; stroke:var(--tc); stroke-width:1.4; }
         .tc-svg .lb{ font-family:'JetBrains Mono',monospace; font-size:7px; fill:var(--cdu-muted); }
         .tc-svg .lbc{ font-family:'JetBrains Mono',monospace; font-size:7px; fill:var(--tc); font-weight:700; }
-        .tc-svg .ps{ stroke:#3b82f6; stroke-width:2; fill:none; stroke-linecap:round; }
-        .tc-svg .pr{ stroke:#ef4444; stroke-width:2; fill:none; stroke-linecap:round; opacity:.8; }
-        .tc-svg .pa{ stroke:#f59e0b; stroke-width:2; fill:none; stroke-linecap:round; }
+        .tc-svg .ps{ stroke:#3b82f6; stroke-width:1.6; fill:none; stroke-linecap:round; }
+        .tc-svg .pr{ stroke:#FF3030; stroke-width:1.2; fill:none; stroke-linecap:round; opacity:.85; }
+        .tc-svg .pa{ stroke:#f59e0b; stroke-width:1.4; fill:none; stroke-linecap:round; }
         @media (prefers-reduced-motion:no-preference){ .tc-svg .fl{ stroke-dasharray:5 6; animation:tcdash 1.3s linear infinite; } }
         @keyframes tcdash{ to{ stroke-dashoffset:-22; } }
         /* sizing section */
@@ -101,8 +103,10 @@
         .formula{ font-family:'JetBrains Mono',monospace; font-size:.92rem; background:var(--cdu-inset); border:1px solid var(--cdu-border); border-left:3px solid var(--cdu-primary); border-radius:8px; padding:.75rem 1rem; margin:.6rem 0; color:var(--cdu-text); overflow-x:auto; }
         .formula .c{ color:var(--cdu-muted); font-size:.76rem; }
         /* FAQ */
-        .faq-item{ border:1px solid var(--cdu-border); border-radius:10px; background:var(--cdu-card); margin-bottom:8px; overflow:hidden; }
-        .faq-item summary{ cursor:pointer; padding:.85rem 1rem; font-weight:600; font-size:.94rem; color:var(--cdu-text); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+        .faq-item{ border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-card); margin-bottom:8px; overflow:hidden; }
+        .faq-item summary{ cursor:pointer; padding:.85rem 1rem; font-weight:600; font-size:.94rem; color:var(--cdu-text); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem; transition:color .15s; }
+        .faq-item summary:hover{ color:var(--cdu-primary); }
+        .faq-item summary:focus-visible{ outline:2px solid var(--cdu-primary); outline-offset:2px; border-radius:6px; }
         .faq-item summary::-webkit-details-marker{ display:none; }
         .faq-item summary::after{ content:'+'; font-family:'JetBrains Mono',monospace; color:var(--cdu-primary); font-size:1.2rem; line-height:1; }
         .faq-item[open] summary::after{ content:'\2013'; }
@@ -110,7 +114,7 @@
         .faq-item .faq-a b{ color:var(--cdu-text); }
 
         /* comparison tables */
-        .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:12px; }
+        .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:8px; }
         table.cdu-tbl { width:100%; border-collapse:collapse; font-size:.85rem; min-width:760px; }
         table.cdu-tbl th { background:var(--cdu-inset); text-align:left; padding:.7rem .8rem; font-family:'JetBrains Mono',monospace; font-size:.64rem; letter-spacing:.05em; text-transform:uppercase; color:var(--cdu-muted); border-bottom:1px solid var(--cdu-border); position:sticky; top:0; }
         table.cdu-tbl td { padding:.7rem .8rem; border-bottom:1px solid var(--cdu-border); vertical-align:top; }
