@@ -84,6 +84,13 @@
         .btn-print{ font-family:var(--ck-mono); font-size:.74rem; letter-spacing:.04em; text-transform:uppercase; padding:.6rem 1.1rem; border-radius:8px; border:1px solid var(--ck-accent); background:var(--ck-accent); color:#191512; font-weight:600; cursor:pointer; }
         .btn-print.ghost{ background:transparent; color:var(--ck-accent); }
 
+        /* source tags — distinguish published standards from typical/vendor figures */
+        .src{ font-family:var(--ck-mono); font-size:.56rem; font-weight:700; letter-spacing:.04em; padding:1px 5px; border-radius:4px; white-space:nowrap; text-transform:uppercase; vertical-align:middle; }
+        .src.std{ background:rgba(16,185,129,.14); color:#10b981; border:1px solid rgba(16,185,129,.4); }
+        .src.typ{ background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
+        .ck-sec h2 .src{ font-size:.5rem; }
+        .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--ck-muted); align-items:center; }
+        table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
         .ck-note{ border:1px dashed var(--ck-border); border-radius:10px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
         .ck-note b{ color:var(--ck-text); }
         .toc{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
@@ -136,6 +143,8 @@
         <p>The companion document to the <a href="cdu-selection-guide.html" style="color:var(--ck-accent)">CDU Selection Guide</a>. Every operational parameter — flow, differential pressure, supply/return temperatures, system pressure, coolant chemistry, leak limits, dimensions and clearances — with installation and PM checklists, a symptom→action troubleshooting table, and printable fill-in forms for site sign-off.</p>
         <div class="toc">
             <a href="#params">Operational parameters</a>
+            <a href="#water">Water quality</a>
+            <a href="#commission">Commissioning (numeric)</a>
             <a href="#install">Installation checklist</a>
             <a href="#inspect">Inspection checklist</a>
             <a href="#maint">Maintenance (PM)</a>
@@ -170,9 +179,117 @@
         </table></div>
     </div></section>
 
+    <!-- ───────── water quality: acceptance criteria ───────── -->
+    <section class="ck-sec" id="water"><div class="ck-wrap">
+        <h2><span class="n">02</span> Water quality — acceptance criteria &amp; standard limits</h2>
+        <p class="lead">The single biggest driver of cold-plate reliability is fluid chemistry. Two loops have <b>different</b> limits — the secondary <b>Technology Cooling System (TCS)</b> that touches the chips, and the primary <b>Facility Water System (FWS)</b> — because the fluids differ (inhibited PG25 glycol vs treated facility water). Use the table that matches your loop as the commissioning <b>acceptance criteria</b> and the operational monitoring band.</p>
+        <div class="legend"><span class="src std">STANDARD</span> published code / spec figure &nbsp;·&nbsp; <span class="src typ">TYPICAL/VENDOR</span> typical or vendor range, not a fixed standard</div>
+
+        <h3>ASHRAE facility-water (W) classes — max supply temperature</h3>
+        <p class="lead" style="margin-bottom:.6rem;">ASHRAE TC 9.9 liquid-cooling classes. The number <b>is</b> the max facility <b>supply</b> temperature in °C; all classes share a 2 °C lower limit. Higher class → more free-cooling / chiller-less operation. <span class="src std">STANDARD</span> <span class="ref">ASHRAE TC 9.9 (2021)</span></p>
+        <div class="tbl-wrap"><table class="ck-tbl">
+            <thead><tr><th>Class (new)</th><th>Old</th><th>Max supply temp</th><th>Typical plant</th></tr></thead>
+            <tbody>
+                <tr><td class="sym">W17</td><td>W1</td><td class="p">≤ 17 °C (62.6 °F)</td><td>Chiller + tower, water-side economizer</td></tr>
+                <tr><td class="sym">W27</td><td>W2</td><td class="p">≤ 27 °C (80.6 °F)</td><td>Chiller + tower, more economizer hours</td></tr>
+                <tr><td class="sym">W32</td><td>W3</td><td class="p">≤ 32 °C (89.6 °F)</td><td>Chiller-less in most climates</td></tr>
+                <tr><td class="sym">W40</td><td>—</td><td class="p">≤ 40 °C (104 °F)</td><td>Chiller-less (added 2021)</td></tr>
+                <tr><td class="sym">W45</td><td>W4</td><td class="p">≤ 45 °C (113 °F)</td><td>Chiller-less for capex/efficiency</td></tr>
+                <tr><td class="sym">W+</td><td>W5</td><td class="p">&gt; 45 °C</td><td>Warmest-water designs</td></tr>
+            </tbody>
+        </table></div>
+
+        <h3>TCS (secondary / cold-plate loop) — fluid acceptance criteria</h3>
+        <p class="lead" style="margin-bottom:.6rem;">For single-phase water-based cold-plate racks. <span class="src std">STANDARD</span> <span class="ref">OCP, Guidelines for Using Water-Based Transfer Fluids in Single-Phase Cold-Plate Racks, Rev 1.0, Table 1</span></p>
+        <div class="tbl-wrap"><table class="ck-tbl">
+            <thead><tr><th>Parameter</th><th>Acceptance limit</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td>pH</td><td class="p">8.0 – 10.5</td><td>Inhibited/glycol TCS runs alkaline; &gt;9.5 may reduce biocide need. (Don't apply the older generic "7–8.5" water figure here.)</td></tr>
+                <tr><td>Conductivity</td><td class="p">&lt; 1,500 µS/cm @25 °C</td><td>After treatment, then monitor rate-of-rise. Inhibited fluid is <i>intentionally</i> conductive — the &lt;5–10 µS/cm target is for <b>DI-water</b> loops only.</td></tr>
+                <tr><td>TDS (total dissolved solids)</td><td class="p">&lt; 1,000 ppm</td><td>—</td></tr>
+                <tr><td>TSS (suspended solids)</td><td class="p">&lt; 5 ppm op · &lt; 1 ppm fill</td><td>Tighter at initial fill.</td></tr>
+                <tr><td>Total hardness (CaCO₃)</td><td class="p">&lt; 30 ppm · &lt; 2 ppm fill</td><td>Scale prevention.</td></tr>
+                <tr><td>Chloride</td><td class="p">&lt; 50 ppm (304SS) · &lt; 500 ppm (316SS)</td><td>Pitting risk — limit depends on wetted stainless grade.</td></tr>
+                <tr><td>Turbidity</td><td class="p">&lt; 5 NTU</td><td>—</td></tr>
+                <tr><td>Bacteria</td><td class="p">&lt; 1 CFU/mL fill · &lt; 100 CFU/mL op</td><td>Biofilm clogs microchannels.</td></tr>
+                <tr><td>Corrosion inhibitor (azoles/TTA)</td><td class="p">&gt; 100 ppm</td><td>No nitrites. Depletes over time — dose per sample.</td></tr>
+                <tr><td>Cu / Fe ions</td><td class="p">&lt; 0.2 ppm / &lt; 0.1 ppm</td><td>Corrosion indicators — rising = active attack.</td></tr>
+                <tr><td>Side-stream filtration</td><td class="p">down to &lt; 5 µm</td><td>Polishing loop keeps particulate low.</td></tr>
+            </tbody>
+        </table></div>
+
+        <h3>TCS vs FWS — side-by-side limits</h3>
+        <p class="lead" style="margin-bottom:.6rem;"><span class="src std">STANDARD</span> <span class="ref">ASHRAE TC 9.9, reproduced in Dell "Liquid Coolants Guidance for TCS and FWS", Table 2</span></p>
+        <div class="tbl-wrap"><table class="ck-tbl">
+            <thead><tr><th>Parameter</th><th>TCS (PG25 secondary)</th><th>FWS (facility primary)</th></tr></thead>
+            <tbody>
+                <tr><td>pH</td><td class="p">8.0 – 10.5</td><td class="p">7.0 – 9.0</td></tr>
+                <tr><td>Total hardness (CaCO₃)</td><td class="p">&lt; 50 ppm</td><td class="p">&lt; 200 ppm</td></tr>
+                <tr><td>Chloride</td><td class="p">&lt; 25 ppm</td><td class="p">&lt; 50 ppm</td></tr>
+                <tr><td>Sulfate</td><td class="p">&lt; 25 ppm</td><td class="p">&lt; 100 ppm</td></tr>
+                <tr><td>Sulfide</td><td class="p">—</td><td class="p">&lt; 10 ppm</td></tr>
+                <tr><td>Cu / Fe</td><td class="p">&lt; 2 ppm each</td><td class="p">—</td></tr>
+            </tbody>
+        </table></div>
+        <div class="ck-note">
+            <b>Make-up / top-off water (OCP sub-spec).</b> <span class="src std">STANDARD</span> chloride &lt; 25 ppm · sulfate &lt; 25 ppm · Ca &lt; 25 ppm · Mg &lt; 25 ppm · total hardness &lt; 50 ppm CaCO₃ · &lt; 1 CFU/mL. Blend/dilution water benchmark: <b>ASTM D1193 Type II</b> (resistivity &gt; 1 MΩ·cm, ≈ &lt; 1 µS/cm). <b>Not over-stated:</b> TOC has <i>no</i> published numeric cold-plate limit (treat as <span class="src typ">TYPICAL/VENDOR</span>); the biostatic glycol % is a freeze/viscosity choice, not a fixed biocide standard.
+        </div>
+    </div></section>
+
+    <!-- ───────── installation & commissioning deep-dive ───────── -->
+    <section class="ck-sec" id="commission"><div class="ck-wrap">
+        <h2><span class="n">03</span> Installation &amp; commissioning — numeric procedure</h2>
+        <p class="lead">The numbers behind the §04 checklist ticks. Where a value is a published code/spec it is tagged <span class="src std">STANDARD</span>; where it is common engineering practice it is tagged <span class="src typ">TYPICAL/VENDOR</span> so you don't over-cite it in a design package.</p>
+
+        <h3>Pressure test (hydrostatic)</h3>
+        <ul class="ck-list">
+            <li class="ck-item"><input type="checkbox"><span class="txt">Hydrostatic test pressure = <b>1.5 × design pressure</b>, temperature-corrected P<sub>T</sub> = 1.5 × P<sub>D</sub> × (S<sub>T</sub>/S<sub>D</sub>).<span class="spec">STANDARD — ASME B31.3 / B31.1</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Hold ≥ 10 min</b> at test pressure before/while examining joints, then for the full inspection duration.<span class="spec">STANDARD — ASME B31.x minimum (a 4-hr hold is a TYPICAL/VENDOR DC practice)</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Acceptance = no leakage / no visible decay.</b> ASME does <i>not</i> set a "% drop over N hours" — any such figure is project/vendor.<span class="spec">pneumatic alt: B31.3 1.1× · B31.1 1.2×</span></span></li>
+        </ul>
+
+        <h3>Flush &amp; cleanliness</h3>
+        <ul class="ck-list">
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Turbulent flush</b> — sustain <b>Re &gt; 4,000</b> (≈ 2–3 m/s) to scour debris before connecting cold plates.<span class="spec">STANDARD flushing convention · velocity TYPICAL</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Cleanliness target</b> by <b>ISO 4406</b> (&gt;4/&gt;6/&gt;14 µm code) or <b>NAS 1638</b>; sensitive loops aim ~<b>16/14/11</b> or better.<span class="spec">STANDARD frameworks · target TYPICAL</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Flush until clean</b> — common gate: conductivity stabilises &lt; ~5 µS/cm (DI loops); TCS in-loop turbidity &lt; 5 NTU (OCP fluid spec).<span class="spec">VENDOR gate · OCP turbidity STANDARD</span></span></li>
+        </ul>
+
+        <h3>Filtration sizing</h3>
+        <div class="tbl-wrap"><table class="ck-tbl">
+            <thead><tr><th>Loop</th><th>Filter rating</th><th>Source</th></tr></thead>
+            <tbody>
+                <tr><td>FWS / primary</td><td class="p">150 – 500 µm</td><td><span class="src typ">TYPICAL/VENDOR</span></td></tr>
+                <tr><td>TCS / secondary (main)</td><td class="p">25 – 50 µm</td><td>50 µm ≈ 288 mesh <span class="src typ">VENDOR (Lenovo Neptune citing ASHRAE)</span></td></tr>
+                <tr><td>Cold-plate side-stream</td><td class="p">&lt; 5 – 10 µm</td><td><span class="src std">OCP</span> (&lt; 5 µm)</td></tr>
+                <tr><td>Polishing (fine side-stream)</td><td class="p">down to 0.2 µm</td><td><span class="src typ">VENDOR (Boyd/Eaton)</span></td></tr>
+            </tbody>
+        </table></div>
+
+        <h3>Coolant &amp; flow</h3>
+        <ul class="ck-list">
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>PG25 (25 vol% propylene glycol)</b> is the de-facto DTC grade (freeze ≈ −10 °C); practical band 20–35%.<span class="spec">PG25 STANDARD (OCP-listed) · band TYPICAL</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Design flow ≈ 1.5 LPM/kW at ~10 °C rise</b>; published band 1.25–2.0 LPM/kW (7.5–12 °C ΔT). Physics: Q = ṁ·c<sub>p</sub>·ΔT, c<sub>p</sub>(PG25) ≈ 3.9–4.0 kJ/kg·K.<span class="spec">STANDARD — OCP cold-plate design point</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>2-phase / refrigerant DLC fluids:</b> R-1233zd(E) (GWP 1, A1, boil ≈ 18 °C) · R-515B (GWP ≈ 293, A1) · R-1336mzz(Z).<span class="spec">vendor datasheet figures</span></span></li>
+        </ul>
+
+        <h3>Quick-disconnects (QD) — OCP UQD / UQDB</h3>
+        <ul class="ck-list">
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Match the QD standard</b> across the loop — no mixed couplers. UQD = hand-mate, drip-free, hot-pluggable; <b>UQDB = blind-mate</b> with ±1 mm radial tolerance for rack/manifold insertion.<span class="spec">STANDARD — OCP UQD/UQDB</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt">Sizes UQD02/04/06/08 · max working <b>100 psi (6.9 bar)</b> · min burst <b>300 psi (20.7 bar)</b> · op 17–65 °C · ≥ 5,000 mating cycles · dripless spillage ~0.02–0.07 mL/connect.<span class="spec">cross-checked vs Parker/CPC datasheets</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>No standardised coupler torque</b> (push-to-connect). Torque applies only to threaded fitting/manifold ports — per vendor.<span class="spec">TYPICAL/VENDOR</span></span></li>
+        </ul>
+
+        <h3>Leak detection &amp; response</h3>
+        <ul class="ck-list">
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Two sensing types:</b> rope/cable zone sensing (area coverage under floor / along runs) + point/spot sensors (CDU drains, QD manifolds, headers).<span class="spec">industry practice</span></span></li>
+            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Response sequence:</b> detect → alarm to BMS/DCIM → isolate / auto-shutoff valves → contain. Guidance: OCP OAI Liquid Cooling Guidelines + ASHRAE TC 9.9 5th ed.<span class="spec">STANDARD guidance · timing figures TYPICAL</span></span></li>
+        </ul>
+    </div></section>
+
     <!-- ───────── installation checklist ───────── -->
     <section class="ck-sec" id="install"><div class="ck-wrap">
-        <h2><span class="n">02</span> Installation checklist</h2>
+        <h2><span class="n">04</span> Installation checklist</h2>
         <p class="lead">Phased from delivery to handover. Tick each item; the printable form (§06) captures readings + sign-off.</p>
         <h3>Site preparation</h3>
         <ul class="ck-list">
@@ -204,7 +321,7 @@
 
     <!-- ───────── inspection checklist ───────── -->
     <section class="ck-sec" id="inspect"><div class="ck-wrap">
-        <h2><span class="n">03</span> Routine inspection checklist</h2>
+        <h2><span class="n">05</span> Routine inspection checklist</h2>
         <p class="lead">Walk-down checks. Anything outside the §01 band → log + see the symptom table (§05).</p>
         <ul class="ck-list">
             <li class="ck-item"><input type="checkbox"><span class="txt"><b>No leak alarm</b>; visually dry at base, manifolds, QDs, HX, pump seals.<span class="spec">0 leaks · check for glycol residue / drips</span></span></li>
@@ -220,7 +337,7 @@
 
     <!-- ───────── maintenance PM ───────── -->
     <section class="ck-sec" id="maint"><div class="ck-wrap">
-        <h2><span class="n">04</span> Preventive-maintenance (PM) checklist</h2>
+        <h2><span class="n">06</span> Preventive-maintenance (PM) checklist</h2>
         <p class="lead">PM tasks by cadence. <span class="cad d">DAILY</span> <span class="cad w">WEEKLY</span> <span class="cad m">MONTHLY</span> <span class="cad q">QUARTERLY</span> <span class="cad a">ANNUAL</span>. Intervals are a baseline — follow the vendor PM schedule and adjust to fluid-sample results.</p>
         <div class="tbl-wrap"><table class="ck-tbl">
             <thead><tr><th>Task</th><th>Cadence</th><th>Acceptance / action</th></tr></thead>
@@ -242,7 +359,7 @@
 
     <!-- ───────── symptom table ───────── -->
     <section class="ck-sec" id="symptom"><div class="ck-wrap">
-        <h2><span class="n">05</span> Symptom → cause → action</h2>
+        <h2><span class="n">07</span> Symptom → cause → action</h2>
         <p class="lead">Troubleshooting reference. On any active symptom: protect the IT load first (the CDU's N+1 / isolation logic), then diagnose.</p>
         <div class="tbl-wrap"><table class="ck-tbl">
             <thead><tr><th>Symptom</th><th>Likely cause</th><th>Immediate action</th><th>Corrective action</th></tr></thead>
@@ -263,7 +380,7 @@
 
     <!-- ───────── printable form ───────── -->
     <section class="ck-sec" id="form"><div class="ck-wrap">
-        <h2><span class="n">06</span> CDU service record — printable form</h2>
+        <h2><span class="n">08</span> CDU service record — printable form</h2>
         <p class="lead">Fill on-screen and <b>Print / Save as PDF</b>. Captures site identity, readings against the §01 band, checklist pass/fail, and sign-off. Stored on the RZ site as the standard CDU service-record form.</p>
         <div class="form-card">
             <div class="form-row">

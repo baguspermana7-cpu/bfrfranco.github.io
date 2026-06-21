@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.43.27 — 2026-06-20 (CDU checklist — water-quality & commissioning super-detail)
+
+### Changed
+- **`cdu-checklist.html`** — added two deep, source-tagged sections (every figure tagged
+  `STANDARD` vs `TYPICAL/VENDOR` so nothing is overstated):
+  - **§02 Water quality — acceptance criteria & standard limits**: ASHRAE TC 9.9 facility-water
+    W-class table (W17–W+, max supply temps); OCP cold-plate TCS fluid acceptance table (pH,
+    conductivity, TDS, TSS, hardness, chloride, turbidity, bacteria, inhibitor, Cu/Fe, filtration);
+    ASHRAE/Dell TCS-vs-FWS side-by-side limits; OCP make-up water sub-spec + ASTM D1193 Type II.
+    Honest caveats on pH/conductivity loop regimes and the absence of a published TOC limit.
+  - **§03 Installation & commissioning — numeric procedure**: hydrostatic test (1.5× design,
+    ≥10-min hold per ASME B31.3/B31.1, "no-leakage" acceptance), turbulent flush (Re>4000, ISO 4406
+    / NAS 1638 target), filtration sizing table, coolant & flow (PG25, 1.5 LPM/kW @10 °C, band
+    1.25–2.0), OCP UQD/UQDB quick-disconnect spec (100 psi working / 300 psi burst / ≥5000 cycles /
+    ±1 mm blind-mate), leak detection sequence.
+  - Sections renumbered 02→04…06→08; TOC + source-tag legend added.
+
 ## v1.43.26 — 2026-06-20 (AWS dark logo fix + dark token foundation)
 
 ### Fixed
