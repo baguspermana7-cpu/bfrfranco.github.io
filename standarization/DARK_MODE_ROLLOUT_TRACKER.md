@@ -29,6 +29,8 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.36 | 06-21 | `styles.css` (52 pages) | **/ultraplan batch 3** — site-wide `#64748b` disclaimer/nav contrast lift (1 shared `!important` rule) |
 | v1.43.38 | 06-21 | articles · tia-942 · dc-market-tracker | **/ultraplan batch 4** — philosophy-section dark gradient + reset/dropdown/cookie-decline dark overrides |
 | v1.43.39 | 06-21 | `css/rz-bms-shell.css` + 5 cockpits | **/ultraplan batch 5** — cockpit cookie banners dark (probe-gated, 75/75 PASS) |
+| v1.43.46 | 06-21 | `index.html` (styles) | removed hero-name infinite animations ("blink") + OE hover-expand ("wobble") |
+| v1.43.48 | 06-21 | article-27 · FF-2 · FF-3 | **article editorial skin catch-up** — §08 editorial register applied to the 3 missed articles (now 29/29) |
 
 ---
 
@@ -82,7 +84,7 @@ Full raw audit JSON: workflow `rz-darkmode-defect-audit` run `wf_a66cc0ed-021`.
 | Family | Pages | Audit | Fixed | Notes |
 |---|---|---|---|---|
 | index | 1 | ✓ | ✓ shipped | polish pattern reference |
-| articles | 28 | — | — | editorial skin done by parallel session (v1.43.12–17) |
+| articles | 29 | ✓ | ✓ | editorial skin COMPLETE 29/29 — rollout did 1–26 (v1.43.12–17); **article-27 + FF-2 + FF-3 caught up v1.43.48** (`article-9-paper` = print variant, excluded) |
 | compare-* | 10 | running | — | suspect: tables light-on-dark |
 | pillar-* | 5 | running | — | |
 | pln-grid-* | 6 | running | — | Leaflet legend/tooltip/panel |

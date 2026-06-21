@@ -177,8 +177,8 @@ adoption is gated by the **per-page checklist** below.
 | Phase | Pages | Status |
 |---|---|---|
 | E0 reference | `plan-dark-mode-standard.html`, `planb.html`, plan pages | ✓ shipped |
-| E1 article pilot | `article-26.html` (editorial register via `css/rz-article-dark.css`) | **APPROVED — build next** |
-| E2 article batch | articles 1–25, batched 3–4 per ship, per-series accent override | queued |
+| E1 article pilot | `article-26.html` (editorial register via `css/rz-article-dark.css`) | **✓ shipped v1.43.9** |
+| E2 article batch | articles 1–25 + series landings (geopolitics/FF/future-forward/insights) + the 3 missed (article-27, FF-2, FF-3, v1.43.48) | **✓ COMPLETE 29/29** (`article-9-paper` print variant excluded) |
 | E3 index (dark) | `index.html` dark mode **polished** — kept the colourful bento character; layered surfaces + visible per-card accents + hover lift + staggered reveal; pure CSS, dark-only | **✓ shipped v1.43.14** |
 | E3 index (light) | `index.html` light mode **polished** — day twin of the dark polish (layered surfaces + accent glow + hover lift; `bentoRise` reveal made theme-agnostic) | **✓ shipped v1.43.18** |
 | E3b hubs | `articles.html`, `insights.html`, `datacenter-solutions.html` | queued |

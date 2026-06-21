@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.43.48 — 2026-06-21 (article editorial skin — catch up the 3 missed articles)
+
+### Changed
+- **Applied the approved §08 article editorial skin to the 3 articles the rollout skipped.**
+  The editorial register (`css/rz-article-dark.css` + Fraunces/Plex fonts + read-progress + staggered
+  entrance) shipped to 26 articles (v1.43.9–17) but **article-27, FF-2, FF-3** were missed and still
+  rendered in generic dark mode. Added the identical editorial head block (replicated from `article-26`)
+  to each:
+  - `article-27.html` — `data-rz-register="editorial"` + `--rz-art-accent:#dc2626` (Global Analysis red).
+  - `FF-2.html` / `FF-3.html` — `--rz-art-accent:#E8B563` (Future Forward amber, matching FF-1).
+  Verified dark: Fraunces serif hero + accent italic, mono meta, editorial chrome, read-progress bar.
+  article-27's inline `.ws-*` workforce calculator + content untouched (head-only change). Body copy
+  stays IBM Plex Sans. Light mode unchanged. **Article editorial skin is now 29/29 complete**
+  (`article-9-paper` = print variant, intentionally excluded).
+- Tracker + second-brain vault + plan §08/E2 updated.
+
 ## v1.43.47 — 2026-06-21 (CDU hub consolidation + dense-table fixes)
 
 ### Added
