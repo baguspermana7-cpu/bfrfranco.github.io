@@ -19,6 +19,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 - **v1.43.24** — killed card-hover flicker (stale `script.min.js` cache-bust) · toned logo pop
 - **v1.43.26** — AWS dark logo white fix · added polish-track tokens to `css/rz-dark.css`
 - **v1.43.33** — /ultraplan batch 1: `.references-section` light-on-dark fixed on 4 report pages (`!important` shared rule)
+- **v1.43.35** — /ultraplan batch 2: geopolitics-2/3 + FF-1/2 status badges (`.confidence-low` + `.prob-*`) dark overrides
 
 ## `/ultraplan` audit (9-agent parallel, read-only)
 
@@ -39,7 +40,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | index | — | ✅ shipped |
 | articles (28) | clean | parallel session editorial skin |
 | infographics/reports (4) | 4 high | ✅ fixed v1.43.33 |
-| geopolitics + FF (4) | 12 high | ⏳ batch |
+| geopolitics + FF (4) | 12 high | ✅ fixed v1.43.35 |
 | pillar (5) | 5 high + 1 nav | ⏳ batch |
 | checklists/misc (tia-942, dc-market) | 5 high | ⏳ batch |
 | cockpits (cookie banners) | ~10 | ⏳ batch (presentation-only, preserve alarm/SLD) |

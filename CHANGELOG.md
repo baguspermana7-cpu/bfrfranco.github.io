@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.35 — 2026-06-21 (dark-mode /ultraplan — batch 2: geopolitics/FF status badges)
+
+### Fixed
+- **Status badges rendered light-on-dark** on `geopolitics-2` · `geopolitics-3` · `FF-1` · `FF-2`.
+  Pages already had `[data-theme="dark"]` overrides for `.confidence-high/-medium` but **missed**
+  `.confidence-low` + all `.prob-low/-medium/-high` (light pastel bg, no dark override). Added the
+  missing translucent-tint dark overrides per page (prob-high colour matched each page: red for
+  geo-2/3, violet for FF-1, amber for FF-2). Verified dark via headless probe.
+- Part of the `/ultraplan` rollout. Tracker + vault note updated.
+
 ## v1.43.34 — 2026-06-21 (CDU guide FAQ + FAQPage schema + glossary terms)
 
 ### Added

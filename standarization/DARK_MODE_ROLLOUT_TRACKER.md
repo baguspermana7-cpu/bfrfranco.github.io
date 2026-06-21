@@ -25,6 +25,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.24 | 06-20 | `index.html` | Killed card-hover flicker (stale `script.min.js` cache-bust) · toned logo pop 1.15→1.04 |
 | v1.43.26 | 06-20 | `index.html`, `css/rz-dark.css` | AWS dark logo white fix · added polish-track tokens (`--rz-r-*`, `--rz-elev-*`, `.rz-surface`, `.rz-reveal-on`) |
 | v1.43.33 | 06-21 | `styles.css` (4 report pages) | **/ultraplan batch 1** — `.references-section` dark override → `!important` (fixes light-on-dark on infographic-* + asean-dc-report) |
+| v1.43.35 | 06-21 | geopolitics-2/3 · FF-1/2 | **/ultraplan batch 2** — added missing `.confidence-low` + `.prob-*` dark badge overrides |
 
 **Internal (no version bump — noindex surfaces):** `plan-dark-mode-standard.html` (§10–§12), `rz-index-polish.html`, `rz-index-mockup-day.html`, `planb.html` (PLAN 02 card + mini before/after), `DARK_MODE_STANDARD.md` (bento-polish pattern + Track E3).
 
@@ -53,7 +54,7 @@ false positives. Real, grouped:
 | Group | Pages | Defect | Sev | Status |
 |---|---|---|---|---|
 | `.references-section` light bg | infographic-dc-cost-breakdown · -sustainability · -pue-global · asean-dc-report-2026 | inline `#f8fafc` overrode dark rule → light text invisible | high | **✅ fixed v1.43.33** (shared rule → `!important`) |
-| status badges light-on-dark | geopolitics-2 · -3 · FF-1 · FF-2 | `.confidence-low` / `.prob-medium` / `.prob-high` light bg, no dark override | high | ⏳ next |
+| status badges light-on-dark | geopolitics-2 · -3 · FF-1 · FF-2 | `.confidence-low` / `.prob-medium` / `.prob-high` light bg, no dark override | high | **✅ fixed v1.43.35** |
 | white cookie banner/buttons | datahallAI · dc-conventional · datahall · water-system · fire-system · dc-market-tracker | `rgba(255,255,255,.92)` bg / `#374151` text, no dark override (presentation-only) | high/med | ⏳ |
 | tia-942 white buttons | tia-942-checklist | `.tia-btn-reset` / `.tier-btn.active` / `.dctype-btn.active` / `.nav-user-dropdown` white bg | high | ⏳ |
 | pillar disclaimer `#64748b` | pillar-cooling/-fire-safety/-power/-standards/-sustainability | low-contrast disclaimer text + nav `#64748b` | high/med | ⏳ |
