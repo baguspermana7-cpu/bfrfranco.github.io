@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan · Branch reconciliation — how ft-phase2 lands on main</title>
+<meta name="description" content="Internal plan: one branch (ft-phase2, the v1.41.x track) is 12 commits unmerged from main. Weigh cherry-pick / rebase / merge / re-port / abandon, clean up the fully-merged branches, decide the version-numbering reconciliation.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B1120">
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/rz-version.js?v=1.43.57" defer></script>
+<style>
+  :root{
+    --cyan:#00DDFF; --amber:#FFAA00; --green:#00FF88; --red:#FF3030; --violet:#A855F7;
+    --bg:#0B1120; --bg-2:#0F172A; --panel:#121C2E; --panel-2:#16213A;
+    --line:rgba(148,163,184,0.14); --line-strong:rgba(148,163,184,0.28);
+    --text:#E2E8F0; --text-strong:#F8FAFC; --muted:#8295AE; --dim:#5B6B82;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  a{color:var(--cyan);text-decoration:none;} a:hover{text-decoration:underline;text-underline-offset:3px;}
+  h1,h2,h3,h4{color:var(--text-strong);font-weight:700;line-height:1.18;letter-spacing:-0.015em;margin:0;}
+  code{font-family:var(--mono);font-size:0.9em;background:rgba(148,163,184,0.1);padding:0.05rem 0.35rem;border-radius:4px;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 1.4rem;}
+
+  .top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .top-in{max-width:1040px;margin:0 auto;padding:.7rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .back{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;color:var(--muted);}
+  .back:hover{color:var(--text-strong);text-decoration:none;}
+  .top .v{font-family:var(--mono);font-size:.64rem;color:var(--dim);letter-spacing:.06em;}
+
+  .hero{padding:3.2rem 0 1.6rem;}
+  .pid{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:600;display:inline-flex;align-items:center;gap:.5rem;}
+  .pid::before{content:'';width:22px;height:1px;background:var(--amber);}
+  .hero h1{margin:1rem 0 .9rem;font-size:clamp(1.9rem,4.6vw,3rem);max-width:20ch;}
+  .hero .lede{font-size:clamp(1rem,1.6vw,1.14rem);color:var(--text);max-width:70ch;}
+  .hero .lede b{color:var(--text-strong);}
+  .status{margin-top:1.1rem;display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.72rem;color:var(--amber);}
+  .status .led{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber);}
+
+  section{padding:2.4rem 0;border-top:1px solid var(--line);}
+  .sh{display:flex;align-items:baseline;gap:.7rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+  .sh .n{font-family:var(--mono);font-size:.72rem;color:var(--amber);letter-spacing:.1em;}
+  .sh h2{font-size:clamp(1.35rem,2.5vw,1.9rem);}
+  .sh p{flex-basis:100%;color:var(--muted);max-width:72ch;margin-top:.2rem;font-size:.92rem;}
+
+  /* branch topology */
+  .topo{display:grid;gap:0.5rem;font-family:var(--mono);font-size:0.78rem;}
+  .brow{display:grid;grid-template-columns:200px 1fr auto;gap:0.8rem;align-items:center;border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:0.7rem 0.9rem;border-left:3px solid var(--bc,var(--line-strong));}
+  .brow .bn{color:var(--text-strong);font-weight:600;}
+  .brow .bd{color:var(--muted);font-size:0.72rem;font-family:var(--sans);}
+  .brow .bs{font-size:0.68rem;padding:0.15rem 0.5rem;border-radius:5px;white-space:nowrap;}
+  .bs.trunk{background:rgba(0,255,136,0.12);color:var(--green);}
+  .bs.diverged{background:rgba(255,170,0,0.14);color:var(--amber);}
+  .bs.stale{background:rgba(148,163,184,0.12);color:var(--muted);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr;}.brow{grid-template-columns:1fr;gap:0.3rem;}}
+
+  /* commit list */
+  .cmts{display:grid;gap:0.3rem;font-family:var(--mono);font-size:0.74rem;}
+  .cmt{display:flex;gap:0.6rem;padding:0.4rem 0.7rem;border:1px solid var(--line);border-radius:7px;background:var(--panel);}
+  .cmt .h{color:var(--amber);}
+  .cmt .m{color:var(--text);}
+
+  /* options */
+  .opts{display:grid;gap:0.8rem;}
+  .opt{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:1.05rem 1.2rem;border-top:3px solid var(--oc,var(--cyan));}
+  .opt h3{font-size:1.05rem;display:flex;align-items:center;gap:0.5rem;}
+  .opt .otag{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--oc);border:1px solid var(--oc);border-radius:4px;padding:0.1rem 0.4rem;}
+  .opt p{margin:0.5rem 0 0.6rem;font-size:0.86rem;color:var(--muted);line-height:1.55;}
+  .opt .pc{display:flex;gap:1.2rem;flex-wrap:wrap;font-family:var(--mono);font-size:0.68rem;}
+  .opt .pc .pro{color:var(--green);} .opt .pc .con{color:var(--red);}
+
+  pre.sh-cmd{background:#0a0f17;border:1px solid var(--line);border-radius:8px;padding:0.9rem 1rem;overflow-x:auto;font-family:var(--mono);font-size:0.74rem;line-height:1.7;color:var(--text);}
+  pre.sh-cmd .c{color:var(--dim);} pre.sh-cmd .g{color:var(--green);}
+
+  .qa{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:1.05rem 1.2rem;margin-bottom:0.8rem;border-top:2px solid var(--violet);}
+  .qa .qn{font-family:var(--mono);font-size:.64rem;color:var(--violet);letter-spacing:.06em;text-transform:uppercase;}
+  .qa h4{font-size:1rem;margin:.3rem 0 .45rem;}
+  .qa p{font-size:.86rem;color:var(--muted);line-height:1.55;margin:0;}
+  .qa .qdec{margin-top:0.7rem;padding-top:0.5rem;border-top:1px dashed var(--line-strong);font-family:var(--mono);font-size:0.64rem;letter-spacing:0.05em;color:var(--amber);font-weight:600;}
+  .qa .qdec .qph{color:var(--dim);font-weight:400;font-style:italic;}
+
+  .endnote{margin-top:1.4rem;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);padding:1rem 1.15rem;font-size:0.84rem;color:var(--muted);}
+  footer{border-top:1px solid var(--line);padding:2rem 0 3rem;color:var(--dim);font-family:var(--mono);font-size:.7rem;}
+  footer .fr{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+  <div class="top"><div class="top-in">
+    <a class="back" href="planb.html">← Plan B Hub</a>
+    <span class="v">PLAN 04 · GIT STRATEGY · noindex</span>
+  </div></div>
+
+  <header class="hero"><div class="wrap">
+    <span class="pid">Plan 04 — Branch reconciliation</span>
+    <h1>One branch left unmerged. Decide how it lands.</h1>
+    <p class="lede">
+      <code>main</code> is the live trunk (v1.43.x) and has run far ahead. Of all the side branches, only
+      <b>one still holds unmerged work</b> — <code>ft-phase2</code>, the <b>v1.41.x track</b>, sitting
+      <b>12 commits</b> off main. The other four branches are already fully contained in main and are
+      safe to delete. This plan weighs how to land those 12 commits — and reconciles the version
+      numbering — without a 428-conflict big-bang merge.
+    </p>
+    <span class="status"><span class="led"></span>Live · real branch state as of v1.43.x · awaiting your pick</span>
+  </div></header>
+
+  <!-- 01 topology -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">01</span><h2>The real topology</h2>
+      <p>Six branches exist; only <code>ft-phase2</code> diverges. Counts are <code>commits-unique-to-branch</code> vs main (measured live, not from memory).</p></div>
+    <div class="topo">
+      <div class="brow" style="--bc:var(--green);"><span class="bn">main</span><span class="bd">live deploy trunk · v1.43.x · GitHub Pages serves this</span><span class="bs trunk">canonical · 0 behind</span></div>
+      <div class="brow" style="--bc:var(--amber);"><span class="bn">ft-phase2</span><span class="bd">the v1.41.x track · 12 commits unmerged · split at v1.40.1 · 65 files / +30.5k lines</span><span class="bs diverged">12 unmerged ⚠</span></div>
+      <div class="brow" style="--bc:var(--line-strong);"><span class="bn">educator-tier</span><span class="bd">fully contained in main — nothing unique</span><span class="bs stale">merged · safe delete</span></div>
+      <div class="brow" style="--bc:var(--line-strong);"><span class="bn">ft-bloomberg-phase1</span><span class="bd">fully contained in main — nothing unique</span><span class="bs stale">merged · safe delete</span></div>
+      <div class="brow" style="--bc:var(--line-strong);"><span class="bn">user-mgmt-self-service</span><span class="bd">fully contained in main — nothing unique</span><span class="bs stale">merged · safe delete</span></div>
+      <div class="brow" style="--bc:var(--line-strong);"><span class="bn">worktree-agent-…</span><span class="bd">stray agent worktree branch — fully contained in main</span><span class="bs stale">merged · safe delete</span></div>
+    </div>
+    <p style="margin-top:0.9rem;font-size:0.85rem;color:var(--muted);">Plus <code>origin/vercel/enable-vercel-web-analytics-…</code> — a Vercel auto-branch with 1 unique commit (analytics config); review separately, not part of this decision.</p>
+  </div></section>
+
+  <!-- 02 what's in ft-phase2 -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">02</span><h2>What ft-phase2 holds — the v1.41.x ships</h2>
+      <p>12 commits, v1.41.0 → v1.41.11. These are real, shipped-to-that-branch features that never reached main while the BMS v1.42.x→v1.43.x work advanced main in parallel.</p></div>
+    <div class="cmts">
+      <div class="cmt"><span class="h">v1.41.0</span><span class="m">Maintenance Decode Lab (Easergy EPZ / Galaxy VL RPT / Woodward DTSC-200)</span></div>
+      <div class="cmt"><span class="h">v1.41.1</span><span class="m">mode-btn dark-mode fix · Knowledge Labs de-dupe · SEO hardening</span></div>
+      <div class="cmt"><span class="h">v1.41.2</span><span class="m">pillar-fire-safety depth pass (676 → 1,836 lines)</span></div>
+      <div class="cmt"><span class="h">v1.41.3</span><span class="m">AI-Maintenance Platform Concept reframe (owner-authored)</span></div>
+      <div class="cmt"><span class="h">v1.41.4</span><span class="m">pillar depth: cooling / power / standards / sustainability</span></div>
+      <div class="cmt"><span class="h">v1.41.5</span><span class="m">network-hub — wire spec._tempo into audio playback</span></div>
+      <div class="cmt"><span class="h">v1.41.6</span><span class="m">AI-Maint review-v3: Workbench Preview + capability gating + standards safety</span></div>
+      <div class="cmt"><span class="h">v1.41.7</span><span class="m">AI-Maint review-v3 Sprint 3: data contracts + readiness auditor</span></div>
+      <div class="cmt"><span class="h">v1.41.8</span><span class="m">double-login dialog fix on AI Maintenance page</span></div>
+      <div class="cmt"><span class="h">v1.41.9</span><span class="m">Maintenance Intelligence Workbench prototype</span></div>
+      <div class="cmt"><span class="h">v1.41.10</span><span class="m">review-v3 Sprint 5: telemetry/DQ/risk/event specs + fixture + audit</span></div>
+      <div class="cmt"><span class="h">v1.41.11</span><span class="m">Sprint 4 partial: CSP plan + SRI audit + page fixes</span></div>
+    </div>
+  </div></section>
+
+  <!-- 03 the conflict reality -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">03</span><h2>Why a naive merge hurts</h2>
+      <p>The two tracks split at <code>v1.40.1</code> and then both edited the same surfaces. A straight <code>git merge ft-phase2</code> estimates <b>~428 conflict hunks</b> across <b>65 files</b> — pillars, <code>sw.js</code>, <code>search-index.json</code>, <code>sitemap.xml</code>, <code>js/rz-version.js</code>, and several <code>standarization/</code> docs all moved on both sides.</p></div>
+    <div class="grid2">
+      <div class="opt" style="--oc:var(--red);"><h3>The overlap</h3><p>main advanced <code>pillar-*</code>, <code>sw.js</code>, the version file and search/sitemap during the BMS sweep; ft-phase2 advanced the same files for the v1.41.x sweep. Same lines, both sides → conflict.</p></div>
+      <div class="opt" style="--oc:var(--green);"><h3>The clean parts</h3><p>The net-new, ft-phase2-only files have <b>no counterpart on main</b> and apply clean: <code>tools/audit-cdn-sri.py</code>, <code>audit-contracts-coverage.py</code>, <code>audit-csv-readiness.py</code>, <code>audit-pro-mode-indicator.py</code>, <code>scope-mdl-css.py</code>, the Decode Lab + Workbench pages.</p></div>
+    </div>
+  </div></section>
+
+  <!-- 04 options -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">04</span><h2>Five ways to reconcile</h2>
+      <p>Ordered roughly safest → fastest. The split between "clean net-new files" and "conflicting shared files" is what makes a hybrid attractive.</p></div>
+    <div class="opts">
+      <div class="opt" style="--oc:var(--green);"><h3>A · Cherry-pick the clean wins <span class="otag">safest</span></h3>
+        <p>Land the net-new, conflict-free work first (Decode Lab, Workbench prototype, the 5 audit tools, AI-Maint pages), then hand-port the pillar/standards depth passes as fresh edits on main. Drop nothing of value; never fight a 428-hunk merge.</p>
+        <div class="pc"><span class="pro">+ low risk · incremental · each piece gated</span><span class="con">– manual · several sessions</span></div>
+      </div>
+      <div class="opt" style="--oc:var(--cyan);"><h3>B · Rebase ft-phase2 onto main <span class="otag">linear history</span></h3>
+        <p>Replay the 12 commits on top of current main. Keeps authorship + a clean linear log, but you resolve conflicts <b>12 times</b> (once per commit) across the overlapping files.</p>
+        <div class="pc"><span class="pro">+ clean history · preserves commits</span><span class="con">– 12× conflict passes · easy to mis-resolve</span></div>
+      </div>
+      <div class="opt" style="--oc:var(--amber);"><h3>C · One merge commit <span class="otag">fastest</span></h3>
+        <p>A single <code>git merge ft-phase2</code>, resolve all ~428 hunks once, ship as one reconciliation commit. Fast to start, but the big simultaneous conflict resolution is the highest-risk single step.</p>
+        <div class="pc"><span class="pro">+ one operation · done in a day</span><span class="con">– 428 hunks at once · regression-prone</span></div>
+      </div>
+      <div class="opt" style="--oc:var(--violet);"><h3>D · Re-port feature-by-feature <span class="otag">cleanest result</span></h3>
+        <p>Treat ft-phase2 as a <i>reference</i>, not a source. Re-apply each v1.41.x feature freshly on main, using the branch as the spec. Slowest, but the result matches current main's conventions exactly.</p>
+        <div class="pc"><span class="pro">+ no merge debt · matches current code</span><span class="con">– most effort · loses original commits</span></div>
+      </div>
+      <div class="opt" style="--oc:var(--red);"><h3>E · Abandon ft-phase2 <span class="otag">last resort</span></h3>
+        <p>Declare main canonical and salvage only a few specific files by hand. Only sane if the v1.41.x work is judged superseded by the v1.42–43.x BMS direction.</p>
+        <div class="pc"><span class="pro">+ zero merge work</span><span class="con">– loses Decode Lab / Workbench / pillar depth unless re-done</span></div>
+      </div>
+    </div>
+    <p style="margin-top:1rem;font-size:0.88rem;color:var(--muted);"><b style="color:var(--text-strong);">Recommendation (mine, not a decision):</b> <b>A then D</b> — cherry-pick the conflict-free net-new files immediately (instant value, zero risk), then re-port the pillar/standards depth as fresh edits. It avoids the 428-hunk merge entirely and ends with main fully current. But the verdict is yours below.</p>
+  </div></section>
+
+  <!-- 05 cleanup -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">05</span><h2>Cleanup — the 4 already-merged branches</h2>
+      <p>These have zero commits not already in main. Deleting them removes the "which branch absorbs what" confusion entirely — only <code>main</code> + <code>ft-phase2</code> would remain to reason about.</p></div>
+<pre class="sh-cmd"><span class="c"># verified: each is fully contained in main (0 unique commits)</span>
+git branch -d educator-tier ft-bloomberg-phase1 user-mgmt-self-service
+git branch -D worktree-agent-a309a2abe15d0981d   <span class="c"># stray worktree branch</span>
+<span class="c"># and their remotes, once you're happy:</span>
+git push origin --delete educator-tier ft-bloomberg-phase1 user-mgmt-self-service
+<span class="g"># leaves: main (trunk) + ft-phase2 (the one real decision)</span></pre>
+    <p style="margin-top:0.7rem;font-size:0.84rem;color:var(--muted);">Leave <code>origin/vercel/…</code> alone — that's Vercel's own analytics branch.</p>
+  </div></section>
+
+  <!-- 06 decision -->
+  <section><div class="wrap">
+    <div class="sh"><span class="n">06</span><h2>Decisions this needs from you</h2>
+      <p>Four calls converge the reconciliation to one path. Each is left open — your verdict goes in the placeholder.</p></div>
+    <div class="qa"><div class="qn">Q1 · STRATEGY</div><h4>Which reconciliation path — A / B / C / D / E?</h4><p>The core call. A (cherry-pick clean + re-port rest) is the safest-with-no-loss; C (one merge) is fastest-but-riskiest; E only if v1.41.x is judged superseded.</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (A / B / C / D / E)</span></div></div>
+    <div class="qa"><div class="qn">Q2 · VERSION</div><h4>How does numbering reconcile?</h4><p>ft-phase2 is v1.41.x; main is already v1.43.x. Landed work can't re-use v1.41.x numbers. Re-stamp each landed feature with the next free v1.43.x/1.44.x patch, or open a v1.44.0 minor for "v1.41.x track merged"?</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (re-stamp patches / v1.44.0 minor)</span></div></div>
+    <div class="qa"><div class="qn">Q3 · SCOPE</div><h4>All 12 commits, or a subset?</h4><p>Some v1.41.x work may already be obsoleted by the BMS v1.42–43.x direction. Land everything, or only the still-relevant pieces (Decode Lab, Workbench, audit tools, pillar depth)?</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (all 12 / named subset)</span></div></div>
+    <div class="qa"><div class="qn">Q4 · CLEANUP</div><h4>Delete the 4 merged branches now?</h4><p>educator-tier · ft-bloomberg-phase1 · user-mgmt-self-service · the stray worktree branch are all fully contained in main. Delete now to simplify, or keep as historical refs?</p><div class="qdec">□ DECISION — <span class="qph">awaiting your answer (delete / keep)</span></div></div>
+    <div class="endnote">
+      <b>This is one topic plan.</b> The standing landing for all RZ concept &amp; plan discussion is the <a href="planb.html">Plan B hub</a>. Once you pick a path, the reconciliation itself becomes execution work (cherry-pick / re-port, gated + version-stamped per the normal ship discipline). <code>noindex</code> · internal working surface.
+    </div>
+  </div></section>
+
+  <footer><div class="wrap fr">
+    <span>RZ PLAN 04 · GIT STRATEGY · noindex · internal</span>
+    <span>branch state measured live at v1.43.x</span>
+  </div></footer>
+</body>
+</html>
