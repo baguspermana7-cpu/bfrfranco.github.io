@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.43.38 — 2026-06-21 (dark-mode /ultraplan — batch 4: safe non-cockpit light elements)
+
+### Fixed
+- **`articles.html .philosophy-section`** — light gradient section block rendered on dark; added
+  `[data-theme="dark"]` dark-gradient override.
+- **`tia-942-checklist`** — `.tia-btn-reset` + `.nav-user-dropdown` were white-on-dark (chrome);
+  added dark overrides. (Left `.tier-btn.active`/`.dctype-btn.active` white — intentional selected-state
+  highlight, dark-text-on-white reads fine.)
+- **`dc-market-tracker`** — `.dmt-cookie-decline` white button on dark cookie bar → dark override.
+- Part of the `/ultraplan` rollout. Tracker + vault updated. Remaining: cockpit cookie banners
+  (probe-gated — they load `css/rz-bms-shell.css`).
+
 ## v1.43.37 — 2026-06-21 (CDU suite — UIUX polish pass per design.md review)
 
 ### Changed (uiux-reviewer findings applied across all 4 CDU pages)

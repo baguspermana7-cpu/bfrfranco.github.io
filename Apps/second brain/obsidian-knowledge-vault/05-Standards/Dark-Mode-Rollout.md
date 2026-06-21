@@ -21,6 +21,7 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 - **v1.43.33** — /ultraplan batch 1: `.references-section` light-on-dark fixed on 4 report pages (`!important` shared rule)
 - **v1.43.35** — /ultraplan batch 2: geopolitics-2/3 + FF-1/2 status badges (`.confidence-low` + `.prob-*`) dark overrides
 - **v1.43.36** — /ultraplan batch 3: site-wide `#64748b` disclaimer/nav contrast lift across 52 pages (1 shared rule)
+- **v1.43.38** — /ultraplan batch 4: articles `.philosophy-section` + tia-942 + dc-market-tracker chrome dark overrides
 
 ## `/ultraplan` audit (9-agent parallel, read-only)
 
