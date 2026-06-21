@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.43.53 — 2026-06-21 (CDU pages — clear all SEO audit warnings)
+
+### Changed
+- **SEO compliance** — tightened `<title>` (≤60 chars) and `<meta name="description">` (≤160 chars)
+  on all 5 CDU pages (`cdu-hub`, `cdu-selection-guide`, `cdu-checklist`, `cdu-mini-bms`,
+  `cdu-comparison`) and added the missing `<meta name="ai-content-declaration" content="human-authored">`.
+  The CDU pages now pass the **full** audit suite — script-tags, js-syntax, version-stamp, mobile,
+  and SEO — with no warnings.
+
 ## v1.43.52 — 2026-06-21 (editorial skin — 100% render-verified: fix h2 underline bug on all 33 articles)
 
 ### Fixed
