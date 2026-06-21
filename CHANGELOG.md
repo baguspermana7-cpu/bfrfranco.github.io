@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.40 — 2026-06-21 (CDU Mini-BMS — full ISA P&ID + dimensioned layout)
+
+### Changed
+- **`cdu-mini-bms.html`** — rebuilt the P&ID from a simplified schematic into a full **ISA-instrumented
+  diagram**: facility isolation valves (HV-01/02) + 3-way control valve TCV-01, E-01 plate HX with
+  approach (TI-03), CDU skid with expansion tank T-01 + level LT-01 + makeup MV-01 + relief PSV-01,
+  dual pumps **P-01A (duty) / P-01B (standby)** with check valves, F-01 50 µm strainer, tagged
+  instruments **FT-01 / PT-01 / PDT-01 (filter) / PDT-02 (loop) / TT-01 / TT-02** with live values,
+  rack manifold M-01 with QD couplers + cold plates, leak rope LSH-01, a control-setpoint note
+  (TCV holds TT-01=18 °C ≥ dew-point+3; P-01 VFD on ΔP; N+1 changeover), and a symbol legend.
+  Datahall layout gained a 600 mm rack-pitch dimension line and a per-type footprint/density caption
+  (CDU dims, kW/rack, aisle containment). All values feed from the live sim; renders clean across all
+  5 types × light/dark.
+
 ## v1.43.39 — 2026-06-21 (dark-mode /ultraplan — batch 5: cockpit cookie banners, probe-gated)
 
 ### Fixed

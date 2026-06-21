@@ -289,7 +289,7 @@
             var racks='', x=18, slot=44, n=7, cduAt;
             // choose CDU placement index
             if(curType==='inrow') cduAt=3; else if(curType==='l2l') cduAt=7; else cduAt=-1;
-            var html='<svg viewBox="0 0 360 230" role="img" aria-label="datahall layout">';
+            var html='<svg viewBox="0 0 360 246" role="img" aria-label="datahall layout">';
             // cold aisle / hot aisle bands
             html+='<rect class="aisle" x="10" y="36" width="340" height="20" rx="3"/><text class="sch-sub" x="14" y="50">COLD AISLE</text>';
             html+='<rect class="aisle" x="10" y="150" width="340" height="20" rx="3" '+(hot?'fill="rgba(220,38,38,.10)"':'')+'/><text class="sch-sub" x="14" y="164">HOT AISLE'+(hot?' · room reject ↑':'')+'</text>';
@@ -328,62 +328,122 @@
             // leak marker
             var lx = curType==='l2l'? (x+n*slot+15) : (curType==='inrow'?(x+cduAt*slot+18):(x+3*slot+18));
             html+='<g class="leak-x'+(curScen==='leak'?' on':'')+'"><line x1="'+(lx-7)+'" y1="139" x2="'+(lx+7)+'" y2="153"/><line x1="'+(lx+7)+'" y1="139" x2="'+(lx-7)+'" y2="153"/></g>';
+            // rack-pitch dimension line
+            html+='<g stroke="var(--bm-muted)" stroke-width=".6"><line x1="'+x+'" y1="182" x2="'+(x+slot)+'" y2="182"/><line x1="'+x+'" y1="179" x2="'+x+'" y2="185"/><line x1="'+(x+slot)+'" y1="179" x2="'+(x+slot)+'" y2="185"/></g>';
+            html+='<text class="sch-sub" x="'+(x+slot/2)+'" y="178" text-anchor="middle">600 mm pitch</text>';
+            // per-type dims caption
+            var DIMS={ inrack:'CDU = 4U in-rack · ~80–200 kW/rack · shortest tube run · one unit per rack',
+                inrow:'CDU cabinet ~600×1100 mm footprint · serves 4–6 racks · ~0.3–2.3 MW/row',
+                sidecar:'sidecar ~300 mm wide on the rack side · ~120 kW · frees rack U-space',
+                l2l:'EoR CDU ~2400×1200 mm (e.g. CoolChip 2300, 2.3 MW) · serves the row · facility CDW',
+                l2a:'L2A row unit ~2300×600 mm · ~70–240 kW · rejects to room air (CRAH must absorb)' };
+            html+='<text class="sch-sub" x="14" y="226" fill="var(--bm-cyan)">'+(DIMS[curType]||'')+'</text>';
+            html+='<text class="sch-sub" x="14" y="240">cold-aisle containment · '+(hot?'L2A adds heat to the hot aisle':'rack inlets face the cold aisle')+'</text>';
             html+='</svg>';
             return html;
         }
 
-        /* ---------- P&ID SVG ---------- */
+        /* ---------- P&ID SVG (ISA-instrumented) ---------- */
+        // symbol helpers (ES5 string concat)
+        function pHV(x,y,tag){ // isolation (gate) valve — bowtie
+            return '<g><path class="sch-eq" d="M'+(x-7)+' '+(y-6)+' L'+x+' '+y+' L'+(x-7)+' '+(y+6)+' Z"/>'
+                 + '<path class="sch-eq" d="M'+(x+7)+' '+(y-6)+' L'+x+' '+y+' L'+(x+7)+' '+(y+6)+' Z"/>'
+                 + (tag?'<text class="sch-sub" x="'+x+'" y="'+(y-9)+'" text-anchor="middle">'+tag+'</text>':'')+'</g>'; }
+        function pCHK(x,y,tag){ // check valve — bowtie + seat bar
+            return pHV(x,y,tag).replace('</g>','')+'<line x1="'+(x+7)+'" y1="'+(y-7)+'" x2="'+(x+7)+'" y2="'+(y+7)+'" stroke="var(--bm-cyan)" stroke-width="1.4"/></g>'; }
+        function pTCV(x,y,tag){ // 3-way control valve + actuator
+            return '<g><path class="sch-eq" d="M'+(x-7)+' '+(y-6)+' L'+x+' '+y+' L'+(x-7)+' '+(y+6)+' Z"/>'
+                 + '<path class="sch-eq" d="M'+(x+7)+' '+(y-6)+' L'+x+' '+y+' L'+(x+7)+' '+(y+6)+' Z"/>'
+                 + '<path class="sch-eq" d="M'+(x-6)+' '+(y+7)+' L'+x+' '+y+' L'+(x+6)+' '+(y+7)+' Z"/>'
+                 + '<rect class="sch-eq2" x="'+(x-5)+'" y="'+(y-18)+'" width="10" height="8"/><line x1="'+x+'" y1="'+(y-10)+'" x2="'+x+'" y2="'+(y-6)+'" stroke="var(--bm-muted)" stroke-width="1"/>'
+                 + '<text class="sch-sub" x="'+x+'" y="'+(y-21)+'" text-anchor="middle">'+tag+'</text></g>'; }
+        function pPump(x,y,tag,on,slow){ return '<g><circle class="'+(on?'sch-eq':'sch-eq2')+'" cx="'+x+'" cy="'+y+'" r="12"/>'
+                 + '<path class="pump-rot '+(on?(slow?'slow':'on'):'off')+'" d="M'+x+' '+(y-8)+' L'+x+' '+(y+8)+' M'+(x-8)+' '+y+' L'+(x+8)+' '+y+'" stroke="var(--bm-cyan)" stroke-width="1.5"/>'
+                 + '<text class="sch-sub" x="'+x+'" y="'+(y+24)+'" text-anchor="middle">'+tag+'</text></g>'; }
+        function pInst(x,y,top,tag,valId){ return '<g><circle class="sch-eq2" cx="'+x+'" cy="'+y+'" r="11"/>'
+                 + '<line x1="'+(x-11)+'" y1="'+y+'" x2="'+(x+11)+'" y2="'+y+'" stroke="var(--bm-muted)" stroke-width=".5"/>'
+                 + '<text class="sch-sub" x="'+x+'" y="'+(y-2.5)+'" text-anchor="middle">'+top+'</text>'
+                 + '<text class="sch-sub" x="'+x+'" y="'+(y+7)+'" text-anchor="middle">'+tag+'</text>'
+                 + (valId?'<text class="sch-val" id="'+valId+'" x="'+x+'" y="'+(y+21)+'" text-anchor="middle"></text>':'')+'</g>'; }
+
         function pidSVG(t){
-            var slow = curScen==='lowflow';
-            var fcls = 'flow '+(slow?'slow':'on');
-            var pumpAon = curScen!=='pumpfail';
-            var html='<svg viewBox="0 0 380 250" role="img" aria-label="P&ID schematic">';
-            // facility / heat-reject side
+            var slow=curScen==='lowflow', fcls='flow '+(slow?'slow':'on'), pumpAon=curScen!=='pumpfail';
+            var h='<svg viewBox="0 0 500 388" role="img" aria-label="CDU piping and instrumentation diagram">';
+            // ===== heat-reject side (left) =====
             if(t.arch==='L2L'){
-                html+='<text class="sch-sub" x="8" y="16">FACILITY WATER (FWS)</text>';
-                html+='<path class="pipe-s '+fcls+'" d="M14 30 H70"/><path class="pipe-r '+fcls+'" d="M14 70 H70"/>';
-                html+='<text class="sch-sub" x="14" y="26">supply</text><text class="sch-sub" x="14" y="84">return</text>';
-                // heat exchanger
-                html+='<rect class="sch-eq" x="70" y="22" width="40" height="56" rx="3"/><text class="sch-lbl" x="90" y="46" text-anchor="middle">HX</text><text class="sch-sub" x="90" y="58" text-anchor="middle">plate</text>';
-                html+='<text class="sch-val" id="pv-atd" x="90" y="92" text-anchor="middle">ATD 5°C</text>';
+                h+='<text class="sch-sub" x="6" y="14">FACILITY WATER · FWS</text>';
+                h+='<path class="pipe-s '+fcls+'" d="M8 44 H86"/>'+pHV(40,44,'HV-01')+pTCV(68,44,'TCV-01');
+                h+='<path class="pipe-r '+fcls+'" d="M8 250 H86"/>'+pHV(40,250,'HV-02');
+                h+='<text class="sch-sub" x="8" y="40">supply</text><text class="sch-sub" x="8" y="264">return</text>';
+                // plate HX E-01
+                h+='<rect class="sch-eq" x="86" y="30" width="34" height="234" rx="3"/>';
+                h+='<path class="sch-eq2" d="M90 40 L116 70 M90 70 L116 100 M90 130 L116 160 M90 200 L116 230"/>';
+                h+='<text class="sch-lbl" x="103" y="150" text-anchor="middle" transform="rotate(-90 103 150)">E-01 PLATE HX</text>';
+                h+='<text class="sch-sub" x="103" y="272" text-anchor="middle">HX approach</text>'+pInst(103,288,'TI','03','pv-atd');
             } else {
-                html+='<text class="sch-sub" x="8" y="16">AIR-COOLED (L2A)</text>';
-                html+='<rect class="sch-eq" x="70" y="20" width="40" height="60" rx="3"/><text class="sch-lbl" x="90" y="44" text-anchor="middle">AIR</text><text class="sch-lbl" x="90" y="56" text-anchor="middle">COIL</text>';
-                html+='<path class="pipe-hot flow on" d="M90 20 V6"/><text class="sch-sub" x="96" y="12">→ room air</text>';
+                h+='<text class="sch-sub" x="6" y="14">AIR-COOLED · L2A</text>';
+                h+='<rect class="sch-eq" x="86" y="40" width="34" height="150" rx="3"/>';
+                h+='<text class="sch-lbl" x="103" y="118" text-anchor="middle" transform="rotate(-90 103 118)">AIR COIL + FANS</text>';
+                h+='<path class="pipe-hot flow on" d="M103 40 V12"/><text class="sch-sub" x="108" y="20">→ room air (no FWS)</text>';
+                h+=pInst(103,288,'TI','03','pv-atd');
             }
-            // CDU envelope
-            html+='<rect x="120" y="14" width="180" height="150" rx="6" fill="none" stroke="var(--bm-cyan)" stroke-dasharray="3 3" stroke-width="1"/><text class="sch-sub" x="124" y="26">CDU</text>';
-            // pumps (N+1)
-            html+='<g><circle class="sch-eq" cx="150" cy="50" r="13"/><path class="pump-rot '+(pumpAon?(slow?'slow':'on'):'off')+'" d="M150 41 L150 59 M141 50 L159 50" stroke="var(--bm-cyan)" stroke-width="1.6"/><text class="sch-sub" x="150" y="78" text-anchor="middle">P1 duty</text></g>';
-            html+='<g><circle class="sch-eq2" cx="150" cy="108" r="13"/><text class="sch-sub" x="150" y="135" text-anchor="middle">P2 standby</text><text class="sch-val" id="pv-pump" x="150" y="146" text-anchor="middle">N+1</text></g>';
-            // filter
-            html+='<rect class="sch-eq" x="196" y="40" width="20" height="20"/><text class="sch-sub" x="206" y="72" text-anchor="middle">FILT</text>';
-            // expansion tank
-            html+='<rect class="sch-eq" x="196" y="96" width="20" height="26" rx="3"/><text class="sch-sub" x="206" y="134" text-anchor="middle">EXP</text>';
-            // sensors cluster
-            html+='<circle class="sch-eq2" cx="250" cy="44" r="9"/><text class="sch-sub" x="250" y="47" text-anchor="middle">FT</text>';
-            html+='<circle class="sch-eq2" cx="250" cy="74" r="9"/><text class="sch-sub" x="250" y="77" text-anchor="middle">PT</text>';
-            html+='<circle class="sch-eq2" cx="250" cy="104" r="9"/><text class="sch-sub" x="250" y="107" text-anchor="middle">dPT</text>';
-            // internal pipes
-            html+='<path class="pipe-s '+fcls+'" d="M110 36 H150 M163 50 H196 M216 50 H280 V40"/>';
-            html+='<path class="pipe-r '+fcls+'" d="M280 120 H150 V94 M150 121 V70 M110 70 H137"/>';
-            // secondary supply/return to manifold
-            html+='<text class="sch-sub" x="300" y="30">TCS →</text>';
-            html+='<path class="pipe-s '+fcls+'" d="M280 40 H336 V120"/>';
-            html+='<path class="pipe-r '+fcls+'" d="M336 120 H280"/>';
-            // manifold + cold plates (rack)
-            html+='<rect class="sch-eq" x="312" y="120" width="56" height="110" rx="4"/><text class="sch-lbl" x="340" y="138" text-anchor="middle">RACK</text><text class="sch-sub" x="340" y="150" text-anchor="middle">cold plates</text>';
-            for(var i=0;i<5;i++){ html+='<rect class="cdu-block" x="318" y="'+(158+i*13)+'" width="44" height="8" rx="1.5"/>'; }
-            // sensor live labels
-            html+='<text class="sch-val" id="pv-flow" x="250" y="58" text-anchor="middle"></text>';
-            html+='<text class="sch-val" id="pv-sysp" x="250" y="88" text-anchor="middle"></text>';
-            html+='<text class="sch-val" id="pv-dp" x="250" y="118" text-anchor="middle"></text>';
-            html+='<text class="sch-val" id="pv-sup" x="336" y="36" text-anchor="end"></text>';
-            // leak sensor at base
-            html+='<line x1="120" y1="160" x2="300" y2="160" stroke="var(--bm-muted)" stroke-width="1" stroke-dasharray="2 3"/><text class="sch-sub" x="124" y="158">leak rope</text>';
-            html+='<g class="leak-x'+(curScen==='leak'?' on':'')+'"><line x1="203" y1="153" x2="217" y2="167"/><line x1="217" y1="153" x2="203" y2="167"/></g>';
-            html+='</svg>';
-            return html;
+            // ===== CDU envelope =====
+            h+='<rect x="130" y="18" width="270" height="318" rx="6" fill="none" stroke="var(--bm-cyan)" stroke-dasharray="3 3" stroke-width="1"/>';
+            h+='<text class="sch-sub" x="340" y="30">CDU SKID</text>';
+            // expansion tank T-01 + makeup MV-01 + relief PSV-01 (top)
+            h+='<rect class="sch-eq" x="150" y="40" width="22" height="30" rx="10"/><path class="sch-eq2" d="M150 58 H172"/><text class="sch-sub" x="161" y="80" text-anchor="middle">T-01 EXP</text>';
+            h+=pInst(196,52,'LT','01','pv-level');
+            h+='<path class="pipe-s" d="M161 40 V30 H120" stroke-dasharray="2 2"/>'+pHV(140,30,'MV-01')+'<text class="sch-sub" x="120" y="26">makeup</text>';
+            h+='<path class="sch-eq2" d="M161 40 V26 M156 26 l5 -6 l5 6" /><text class="sch-sub" x="178" y="26">PSV-01</text>';
+            // pumps P-01A duty / P-01B standby (N+1) with suction iso, check, discharge iso
+            h+=pPump(175,150,'P-01A '+(pumpAon?'(duty)':'(off)'),pumpAon,slow);
+            h+=pPump(175,222,'P-01B '+(pumpAon?'(stby)':'(DUTY)'),!pumpAon,slow);
+            h+=pCHK(205,150)+pCHK(205,222);
+            // strainer/filter F-01 + filter dP PDT-01
+            h+='<rect class="sch-eq" x="230" y="138" width="18" height="22"/><path class="sch-eq2" d="M232 140 l14 18 M232 158 l14 -18"/><text class="sch-sub" x="239" y="134" text-anchor="middle">F-01 · 50µm</text>';
+            h+=pInst(266,150,'FT','01','pv-flow');
+            h+=pInst(350,150,'PT','01','pv-sysp');
+            h+=pInst(266,222,'PDT','01','pv-fdp');
+            h+=pInst(350,222,'PDT','02','pv-dp');
+            // pipework facility→HX→pumps→filter→supply header
+            h+='<path class="pipe-s '+fcls+'" d="M120 50 H148 V150 H163"/>';            // HX sec out → suction header → P-01A
+            h+='<path class="pipe-s '+fcls+'" d="M148 150 V222 H163"/>';                 // suction header → P-01B
+            h+='<path class="pipe-s '+fcls+'" d="M187 150 H230"/>';                      // P-01A disch (via CHK) → filter
+            h+='<path class="pipe-s '+fcls+'" d="M187 222 H214 V150"/>';                 // P-01B disch (via CHK) → common
+            h+='<path class="pipe-s '+fcls+'" d="M248 150 H388 V60"/>';                  // filter → TCS supply header out
+            // ===== secondary TCS to rack =====
+            h+=pInst(355,60,'TT','01','pv-sup')+'<text class="sch-sub" x="355" y="44" text-anchor="middle">TCS supply</text>';
+            h+=pHV(388,90,'HV-03')+'<text class="sch-sub" x="404" y="90" text-anchor="start">bal BV-01</text>';
+            h+='<text class="sch-sub" x="412" y="56">TCS →</text>';
+            h+='<path class="pipe-s '+fcls+'" d="M388 60 H430 V120"/>';
+            // rack manifold M-01 + QD couplers + cold plates
+            h+='<rect class="sch-eq" x="430" y="118" width="60" height="160" rx="4"/><text class="sch-lbl" x="460" y="134" text-anchor="middle">RACK</text><text class="sch-sub" x="460" y="146" text-anchor="middle">M-01 manifold</text>';
+            for(var i=0;i<6;i++){ var ry=156+i*18;
+                h+='<rect class="cdu-block" x="438" y="'+ry+'" width="44" height="10" rx="1.5"/>';
+                // QD coupler pair on the supply tap
+                h+='<path class="sch-eq2" d="M430 '+(ry+5)+' a3 3 0 0 1 0 6 M436 '+(ry+5)+' a3 3 0 0 0 0 6"/>';
+            }
+            h+='<text class="sch-sub" x="460" y="292" text-anchor="middle">cold plates · QD</text>';
+            // TCS return back to HX
+            h+='<path class="pipe-r '+fcls+'" d="M430 270 H120 V60"/>';
+            h+='<text class="sch-sub" x="355" y="283" text-anchor="middle">TCS return</text>'+pInst(355,300,'TT','02','pv-ret');
+            h+=pHV(300,270,'HV-04');
+            // pump status readout
+            h+='<text class="sch-val" id="pv-pump" x="175" y="120" text-anchor="middle"></text>';
+            // ===== leak rope + setpoint note + legend strip =====
+            h+='<line x1="135" y1="322" x2="392" y2="322" stroke="var(--bm-muted)" stroke-width="1" stroke-dasharray="2 3"/><text class="sch-sub" x="138" y="319">leak rope LSH-01</text>';
+            h+='<g class="leak-x'+(curScen==='leak'?' on':'')+'"><line x1="251" y1="315" x2="265" y2="329"/><line x1="265" y1="315" x2="251" y2="329"/></g>';
+            h+='<text class="sch-sub" x="8" y="352">SETPOINT — TCV-01 holds TT-01 = 18 °C (≥ dew point +3 °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover</text>';
+            // legend strip (bottom) — simple inline symbols, tight spacing
+            h+='<g transform="translate(120,368)">'
+             + '<path class="sch-eq" d="M2 -4 L9 1 L2 6 Z M16 -4 L9 1 L16 6 Z"/><text class="sch-sub" x="22" y="4">iso valve</text>'
+             + '<circle class="sch-eq2" cx="82" cy="1" r="6"/><line x1="76" y1="1" x2="88" y2="1" stroke="var(--bm-muted)" stroke-width=".5"/><text class="sch-sub" x="92" y="4">instrument</text>'
+             + '<circle class="sch-eq" cx="166" cy="1" r="7"/><path d="M166 -5 V7 M160 1 H172" stroke="var(--bm-cyan)" stroke-width="1.3"/><text class="sch-sub" x="176" y="4">pump N+1</text>'
+             + '<rect class="sch-eq" x="240" y="-6" width="12" height="14"/><path class="sch-eq2" d="M242 -4 l8 10 M242 6 l8 -10"/><text class="sch-sub" x="258" y="4">HX/strainer</text>'
+             + '<path class="sch-eq2" d="M328 -4 a3 3 0 0 1 0 6 M334 -4 a3 3 0 0 0 0 6"/><text class="sch-sub" x="340" y="4">QD</text>'
+             + '</g>';
+            h+='</svg>';
+            return h;
         }
 
         /* ---------- live parameter compute + render ---------- */
@@ -435,14 +495,19 @@
             setTile('leak', leak?'ALARM':'0', leak?'alarm':'ok');
             setTile('atd', atd.toFixed(1)+'<span class="u">°C</span>', t.arch==='L2A'?'ok':band(atd,3,7));
             setTile('chem', 'PG25 OK', 'ok');
-            // P&ID live labels
+            // P&ID live labels (tagged instruments)
             function st(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
-            st('pv-flow', Math.round(flowtot)+' LPM');
-            st('pv-sysp', sysP.toFixed(1)+' bar');
-            st('pv-dp', dP.toFixed(1)+' bar');
-            st('pv-sup', supply.toFixed(0)+'°C');
-            st('pv-pump', pumpA?'N+1':'P2');
-            var atdEl=document.getElementById('pv-atd'); if(atdEl) atdEl.textContent='ATD '+atd.toFixed(0)+'°C';
+            var fdp=0.28+(filterBad?1.9:0)+rnd(7)*0.02;          // filter dP (PDT-01)
+            var level=56+(leak?-9:0)+rnd(8)*1.2;                  // expansion level (LT-01)
+            st('pv-flow', Math.round(flowtot)+' LPM');           // FT-01
+            st('pv-sysp', sysP.toFixed(1)+' bar');               // PT-01
+            st('pv-dp', dP.toFixed(1)+' bar');                   // PDT-02 loop
+            st('pv-fdp', fdp.toFixed(2)+' bar');                 // PDT-01 filter
+            st('pv-sup', supply.toFixed(0)+'°C');                // TT-01
+            st('pv-ret', ret.toFixed(0)+'°C');                   // TT-02
+            st('pv-level', Math.round(level)+'%');               // LT-01
+            st('pv-pump', pumpA?'N+1':'P-01B');
+            var atdEl=document.getElementById('pv-atd'); if(atdEl) atdEl.textContent=(t.arch==='L2A'?'—':atd.toFixed(0)+'°C');
             // overall state pill
             var worst='ok';
             [band(flow,1.0,1.5),band(supply,17,45),band(dT,8,12),(filterBad?'alarm':band(dP,0.5,3.0)),band(sysP,2,6),(pumpA?'ok':'warn'),(leak?'alarm':'ok')].forEach(function(x){ if(x==='alarm')worst='alarm'; else if(x==='warn'&&worst!=='alarm')worst='warn'; });
