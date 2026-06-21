@@ -147,12 +147,13 @@
 
   <!-- 03 the conflict reality -->
   <section><div class="wrap">
-    <div class="sh"><span class="n">03</span><h2>Why a naive merge hurts</h2>
-      <p>The two tracks split at <code>v1.40.1</code> and then both edited the same surfaces. A straight <code>git merge ft-phase2</code> estimates <b>~428 conflict hunks</b> across <b>65 files</b> — pillars, <code>sw.js</code>, <code>search-index.json</code>, <code>sitemap.xml</code>, <code>js/rz-version.js</code>, and several <code>standarization/</code> docs all moved on both sides.</p></div>
+    <div class="sh"><span class="n">03</span><h2>Why a naive merge hurts — but the real surface is small</h2>
+      <p>A straight <code>git merge ft-phase2</code> estimates ~428 hunks, which sounds brutal. But a file-level dry-run (read-only, measured live) shows the actual conflict surface is tiny: <b>52 of the 65 files land conflict-free</b>, and most of the 13 conflicts are auto-regenerated build artefacts, not hand-merges.</p></div>
     <div class="grid2">
-      <div class="opt" style="--oc:var(--red);"><h3>The overlap</h3><p>main advanced <code>pillar-*</code>, <code>sw.js</code>, the version file and search/sitemap during the BMS sweep; ft-phase2 advanced the same files for the v1.41.x sweep. Same lines, both sides → conflict.</p></div>
-      <div class="opt" style="--oc:var(--green);"><h3>The clean parts</h3><p>The net-new, ft-phase2-only files have <b>no counterpart on main</b> and apply clean: <code>tools/audit-cdn-sri.py</code>, <code>audit-contracts-coverage.py</code>, <code>audit-csv-readiness.py</code>, <code>audit-pro-mode-indicator.py</code>, <code>scope-mdl-css.py</code>, the Decode Lab + Workbench pages.</p></div>
+      <div class="opt" style="--oc:var(--green);"><h3>52 files · land clean <span class="otag">no conflict</span></h3><p>Net-new, ft-phase2-only — no counterpart on main, apply additively with zero conflict: the <b>Maintenance Decode Lab</b> + engine (<code>js/maintenance/*</code>), the <b>Workbench prototype</b>, all <code>docs/contracts/*</code> schemas, the 6 audit tools, the depth-passed <code>pillar-*</code> pages, fixtures, OG images.</p></div>
+      <div class="opt" style="--oc:var(--amber);"><h3>13 files · conflict <span class="otag">mostly auto</span></h3><p><b>8 just regenerate</b> — <code>changelog.html</code>, <code>llms.txt</code>, <code>llms-full.txt</code>, <code>search-index.json</code>, <code>sitemap.xml</code> (re-run the build tools); <code>js/rz-version.js</code> (take main's higher number), <code>sw.js</code> + <code>CHANGELOG.md</code> (mechanical append). <b>Only ~5 are real content merges</b>: <code>FF-1</code>, <code>FF-2</code>, <code>geopolitics-3</code> (edited on main this session for the amber refine), <code>datacenter-solutions</code>, <code>network-visualization-hub</code>.</p></div>
     </div>
+    <p style="margin-top:0.9rem;font-size:0.86rem;color:var(--muted);">So the honest effort is <b style="color:var(--text-strong);">land 52 clean → regenerate 8 → hand-merge ~5 content pages</b>. That's what makes <b style="color:var(--green);">Option A</b> below realistic in a session or two, not the merge nightmare the raw hunk count implies.</p>
   </div></section>
 
   <!-- 04 options -->
