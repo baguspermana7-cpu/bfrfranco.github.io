@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.32 — 2026-06-21 (CDU suite — SEO/schema, link re-validation & cross-link close-out)
+
+### Changed
+- **SEO/JSON-LD** — added `TechArticle`/`WebApplication` + `BreadcrumbList` structured data and
+  Twitter Card meta to `cdu-checklist.html`, `cdu-mini-bms.html`, `cdu-comparison.html`, and a
+  `TechArticle` block to `cdu-selection-guide.html` (all 4 pages now carry 2 valid JSON-LD blocks).
+- **Link re-validation** — re-curled every external CDU link (21); honestly downgraded the nVent
+  Data Solutions resource-library link from VERIFIED to VENDOR PORTAL (now intermittently 403s to
+  automated fetch / bot-blocked).
+- **Cross-link completeness** — every CDU page now links to the other three (added Mini-BMS +
+  Deep Comparison to the checklist footer nav; added Deep Comparison to the Mini-BMS links strip).
+- **AI search** — regenerated `llms-full.txt` so all five CDU pages are included.
+- Full render QA: 4 pages × light/dark = 8 renders, 0 console errors.
+
 ## v1.43.31 — 2026-06-21 (CDU guide — sizing & installation requirements section)
 
 ### Added
