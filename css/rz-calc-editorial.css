@@ -1,0 +1,57 @@
+/* ============================================================
+   rz-calc-editorial.css — PLAN02 §09 Track E4
+   Editorial register chrome for calculator MARKETING SHELLS.
+   CHROME ONLY: restyles the hero (title / badge / accent) — never
+   the calculator engine, inputs, results, or any interactive UI.
+   Scoped to html[data-rz-register="editorial"][data-theme="dark"]
+   so day mode and the tool UI are 100% untouched. Reversible:
+   remove the register attribute + this <link> to revert.
+   Accent: mockup amber #E8B563 / mint #6FBF9A (matches articles).
+   ============================================================ */
+
+:root { --rz-ced-accent: #E8B563; --rz-ced-accent2: #6FBF9A; }
+
+/* --- hero title → Fraunces serif display --- */
+html[data-rz-register="editorial"][data-theme="dark"] .hero h1,
+html[data-rz-register="editorial"][data-theme="dark"] .tco-hero h1,
+html[data-rz-register="editorial"][data-theme="dark"] .cx-hero h1 {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+}
+
+/* --- hero badge → mono kicker with amber accent tick --- */
+html[data-rz-register="editorial"][data-theme="dark"] .hero-badge,
+html[data-rz-register="editorial"][data-theme="dark"] .tco-hero-badge {
+    font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rz-ced-accent);
+    border-color: rgba(232, 181, 99, 0.30);
+    background: rgba(232, 181, 99, 0.08);
+}
+html[data-rz-register="editorial"][data-theme="dark"] .hero-badge i,
+html[data-rz-register="editorial"][data-theme="dark"] .tco-hero-badge i {
+    color: var(--rz-ced-accent);
+}
+
+/* --- thin amber rule under the hero title (editorial signature) --- */
+html[data-rz-register="editorial"][data-theme="dark"] .hero h1::after,
+html[data-rz-register="editorial"][data-theme="dark"] .tco-hero h1::after,
+html[data-rz-register="editorial"][data-theme="dark"] .cx-hero h1::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 2px;
+    margin-top: 14px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--rz-ced-accent), var(--rz-ced-accent2));
+}
+
+/* --- gradient/accent words in the hero subtitle → amber --- */
+html[data-rz-register="editorial"][data-theme="dark"] .hero .hero-accent,
+html[data-rz-register="editorial"][data-theme="dark"] .hero .accent-text,
+html[data-rz-register="editorial"][data-theme="dark"] .tco-hero .accent-text {
+    color: var(--rz-ced-accent);
+}

@@ -11,6 +11,71 @@ release sections rather than semver.
 
 ---
 
+## v1.43.55 — 2026-06-21 (planb rollout — §11 index editorial hero + E4 calculator shells)
+
+Continues "semua di planb diimplementasikan". Closes the remaining **Track E** item
+(E4) and the **§11** index-hero recipe from `plan-dark-mode-standard.html`.
+
+### Added
+- **§11 — index identity hero, editorial register (DARK-ONLY, additive, reversible).**
+  Applied the planb §11 recipe to `index.html` scoped to `.bento-identity`, dark mode only:
+  Fraunces serif `.bento-name`, IBM Plex Mono kicker on `.bento-tag` with a 20px amber tick
+  rail, amber-italic `.bento-accent-text`, and a new **`.bento-readout`** hairline strip — 4
+  site-factual KPIs (12+ Years Ops · 40+ Tools Built · 27 Articles · 100+ Pages) in JetBrains
+  Mono tabular with amber baseline ticks and a **count-up on load** (IntersectionObserver,
+  `prefers-reduced-motion`-aware, hard final-value guarantee). **Day mode untouched** —
+  readout is `display:none` in light, all reskin rules are `[data-theme="dark"]`-scoped.
+  Page-local inline `<style>` + the amber accent in `styles-index.css` (re-minified) per the
+  2-stylesheet rule. Reversible: delete the font link + CSS block + readout markup.
+- **E4 — calculator marketing shells, editorial chrome (`css/rz-calc-editorial.css`).**
+  All 7 calculators (`pue`, `capex`, `opex`, `roi`, `tco`, `cx`, `spares-readiness`) now carry
+  `data-rz-register="editorial"`; in dark mode the **hero only** gets the editorial treatment —
+  Fraunces serif `<h1>`, mono amber badge (`#E8B563`), and a thin amber→mint rule under the
+  title. **Chrome only**: the calculator engines, inputs, results, and tool UI are not touched;
+  day mode is unchanged. Verified: dark `<h1>`=Fraunces / light=Inter on all 7, badge amber,
+  **no new console/page errors** (the pre-existing `ipapi.co` CORS notice on capex/opex is
+  unrelated to this change).
+
+### Notes
+- **§10/Q4 (index = POLISH) remains in force** for the bento grid; §11 only restyles the
+  identity hero card, dark-only — it does not reskin the colourful bento.
+- Verified via headless dark/light probes + hero screenshots before ship.
+
+## v1.43.54 — 2026-06-21 (articles — unify editorial register on the §08 mockup amber)
+
+### Changed
+- **All 34 editorial pages now use the approved §08-mockup amber accent.** The article
+  *editorial register* (`css/rz-article-dark.css` + Fraunces) reads the per-page
+  `--rz-art-accent` / `--rz-art-accent2` CSS vars to colour its chrome (Fraunces h2 accent
+  rail, drop-cap, mono kicker/meta rail, pull-quote, read-progress bar). Every editorial
+  page's vars were flipped to the mockup's exact pair — **`--rz-art-accent:#E8B563` (amber)
+  / `--rz-art-accent2:#6FBF9A` (mint)** — sourced verbatim from `rz-article-mockup.html`
+  (`linear-gradient(90deg,#E8B563,#6FBF9A)`). Previously each article carried its own
+  per-series hue (navy / blue / cyan / emerald / red); the chrome is now uniform amber,
+  matching the planb mockup the owner approved.
+- **The 9 red-series pages were fully re-toned red → amber in body too** (not just chrome):
+  `article-11`, `article-14`, `article-20`, `article-23`, `article-25`, `article-26`,
+  `article-27`, `geopolitics`, `geopolitics-3`. The Global-Analysis red palette
+  (`#dc2626/#ef4444/#fca5a5/#fef2f2/#991b1b/#b91c1c/#7f1d1d/#450a0a` + matching `rgba()`)
+  was mapped onto the Tailwind **amber ladder** (`#b45309/#d97706/#fcd34d/#fffbeb/#92400e/
+  #78350f/#451a03` + matching `rgba()`). This fixes the owner's "warna dll kok masih sama"
+  report — the chrome had gone amber but the red-themed bodies (hero highlight, callouts,
+  `article-27`'s `.ws-*` workforce calculator) were still red.
+
+### Preserved
+- **Semantic reds untouched.** Reds that encode meaning in non-red articles (e.g. `article-8`
+  `--accent-red` / `.trajectory-arrow.deteriorating` / "Deteriorating" cells paired with
+  `#10b981` green for good-vs-bad contrast) were deliberately **not** swapped — only the
+  series-accent red theme on the 9 red pages was re-toned.
+- **`article-27` Workforce Strategy calculator** still renders and recalculates — colour-only
+  swap, no structural/JS change (verified: input→recalc fires, **0 page/console errors**).
+- **`article-9-paper.html`** (print variant) excluded.
+
+### Verification
+- Headless dark-mode probe (hue-accurate): **9/9 red-series pages = 0 residual red, amber chrome present.**
+- `article-27` calculator interaction probe: **0 errors**, recalc fires on input change.
+- `audit-script-tags --strict` CLEAN · `audit-js-syntax --strict` CLEAN.
+
 ## v1.43.53 — 2026-06-21 (CDU pages — clear all SEO audit warnings)
 
 ### Changed

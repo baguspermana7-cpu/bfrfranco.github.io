@@ -33,6 +33,34 @@ Last updated: **2026-06-21** · Scope: **98 public pages**
 | v1.43.48 | 06-21 | article-27 · FF-2 · FF-3 | **article editorial skin catch-up** — §08 editorial register applied to the 3 missed articles (now 29/29) |
 | v1.43.50 | 06-21 | 4 hubs + article-9-paper | **editorial consistency (no exceptions)** — read-progress JS on hubs; screen-only dark editorial on the print paper (print stays white, verified) |
 | v1.43.52 | 06-21 | 31 articles | **editorial h2 underline bug fixed across ALL articles** (via `/ultraplan` 6-agent render-verify+fix) — base `border-bottom:3px` underline was sitting on the editorial rail; neutralized in dark. **33/33 render-PASS, independently re-probed.** |
+| v1.43.55 | 06-21 | index + 7 calculators | **planb §11 + E4** — §11 index identity hero editorial register (dark-only: Fraunces name · mono amber kicker · `.bento-readout` 4-KPI count-up; day untouched, reversible). E4: all 7 calc heroes get Fraunces + amber badge in dark via `css/rz-calc-editorial.css` (chrome only, engines untouched). **Track E COMPLETE.** Probes dark/light + screenshots verified, 0 new errors. |
+| v1.43.54 | 06-21 | 34 editorial pages | **§08-mockup amber unification** — flipped every editorial page's `--rz-art-accent`/`--rz-art-accent2` to the mockup's exact `#E8B563`/`#6FBF9A` (was per-series navy/blue/cyan/emerald/red); fully re-toned the **9 red-series pages** (art-11/14/20/23/25/26/27 + geopolitics/-3) red→amber **in body too** (Tailwind red ladder → amber ladder), incl. art-27 `.ws-*` calculator (colour-only, calc still works, 0 errors). Semantic reds in non-red articles (art-8 good/bad green-vs-red) preserved. **Hue-accurate probe 9/9 = 0 residual red.** |
+
+---
+
+## planb PLAN 02 — full rollout status (2026-06-21, "semua di planb diimplementasikan")
+
+Reconciliation of `plan-dark-mode-standard.html` §09 against the live site:
+
+- **Track E (editorial) — 100% COMPLETE.** E0 plans ✓ · E1 article-26 pilot ✓ · E2 all 34
+  editorial pages on the §08 amber ✓ (v1.43.54) · E3 hub read-progress ✓ (v1.43.50) ·
+  **E4 calculator shells ✓ (v1.43.55)** — 7 calc heroes get Fraunces + amber badge in dark
+  via `css/rz-calc-editorial.css`, chrome only.
+- **§11 index editorial hero — ✓ SHIPPED v1.43.55** (dark-only, reversible; §10 bento-polish
+  lock still in force for the grid). §12 light twin ✓ (v1.43.18).
+- **Track I (instrument cockpits) — I0–I3 ALREADY LIVE.** Reality overtook the plan: the BMS
+  track built/migrated all **9 cockpits** (datahallAI · dc-conventional · chiller-plant ·
+  water-system · fire-system · fuel-system · ict · EPMS_Telemetry · datahall) directly in the
+  instrument register — each carries `data-rz-register="instrument"` + loads the shared
+  `css/rz-bms-shell.css` instrument component library (= the I1 deliverable) + JetBrains Mono +
+  the I0 count-up. **Accuracy probe 75/75 green** (verified this session). No re-skin performed —
+  it would risk the gate + collide with the in-flight BMS track.
+- **I4 (market monitors / SLD labs) — deferred-by-design.** dc-market-tracker + pln-java-grid
+  are already dark + on-brand; the PLN grid's SLD readability defaults are owner-locked, so a
+  phosphor reskin is intentionally NOT applied (would regress tuned viz). Open as an explicit
+  opt-in if ever wanted.
+
+**Net: every planb track is shipped or already-live except I4, which is a deliberate hold.**
 
 ---
 

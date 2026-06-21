@@ -98,6 +98,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+    <!-- §11 PLAN02: editorial hero (dark-only) — Fraunces display + JetBrains Mono readout -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"></noscript>
 
     <!-- Minimal critical CSS: dark mode flash prevention + layout skeleton -->
     <style>
@@ -212,6 +215,32 @@
     .bento-name { font-size: 1.7rem !important; }
     .bento-photo { max-height: 220px; }
     .nav-brand-text { display: none; }
+}
+
+/* ============================================================
+   §11 PLAN02 — editorial hero (DARK-ONLY, additive, reversible)
+   Page-local per 2-stylesheet rule (index loads only styles-index).
+   Day mode untouched: readout hidden in light; reskin scoped to dark.
+   ============================================================ */
+.bento-readout { display: none; }
+[data-theme="dark"] .bento-identity { border-color:rgba(232,181,99,.18); }
+[data-theme="dark"] .bento-identity .bento-tag { font-family:'IBM Plex Mono','JetBrains Mono',monospace; letter-spacing:.18em; color:#7E8590; text-transform:uppercase; font-size:.7rem; border:0; padding:0; background:none; }
+[data-theme="dark"] .bento-identity .bento-tag::before { content:''; width:20px; height:1px; background:#E8B563; display:inline-block; vertical-align:middle; margin-right:.5rem; }
+[data-theme="dark"] .bento-identity .bento-name { font-family:'Fraunces',Georgia,serif; font-weight:500; letter-spacing:-.015em; }
+[data-theme="dark"] .bento-readout {
+    display:flex; flex-wrap:wrap; gap:0 1.6rem; margin-top:18px; padding:12px 0 0;
+    border-top:1px solid rgba(232,181,99,.22);
+}
+[data-theme="dark"] .bento-readout .ro { display:flex; flex-direction:column; gap:2px; padding:4px 0 4px 10px; border-left:1px solid rgba(232,181,99,.32); }
+[data-theme="dark"] .bento-readout .v { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:1.18rem; font-weight:600; color:#f1f5f9; line-height:1.1; }
+[data-theme="dark"] .bento-readout .v .sfx { color:#E8B563; }
+[data-theme="dark"] .bento-readout .k { font-family:'IBM Plex Mono','JetBrains Mono',monospace; font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:#7E8590; }
+@media (prefers-reduced-motion: no-preference) {
+    [data-theme="dark"] .bento-readout .v { will-change:contents; }
+}
+@media (max-width:480px) {
+    [data-theme="dark"] .bento-readout { gap:0 1rem; }
+    [data-theme="dark"] .bento-readout .v { font-size:1rem; }
 }
 </style>
 
@@ -399,6 +428,13 @@
                             Get Started
                         </a>
                         <a href="#contact" class="btn-bento-outline">Contact Us</a>
+                    </div>
+                    <!-- §11 PLAN02 — dark-only editorial readout (count-up on load) -->
+                    <div class="bento-readout" aria-label="Portfolio at a glance">
+                        <div class="ro"><span class="v"><span data-cu="12">12</span><span class="sfx">+</span></span><span class="k">Years Ops</span></div>
+                        <div class="ro"><span class="v"><span data-cu="40">40</span><span class="sfx">+</span></span><span class="k">Tools Built</span></div>
+                        <div class="ro"><span class="v"><span data-cu="27">27</span></span><span class="k">Articles</span></div>
+                        <div class="ro"><span class="v"><span data-cu="100">100</span><span class="sfx">+</span></span><span class="k">Pages</span></div>
                     </div>
                 </div>
                 <div class="bento-card bento-photo-card">
@@ -2266,6 +2302,39 @@ if ('serviceWorker' in navigator) {
         });
     }, { rootMargin: '-10% 0px -10% 0px', threshold: 0.05 });
     els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+<!-- §11 PLAN02 — bento-readout count-up (dark-only effect, reduced-motion aware) -->
+<script>
+(function(){
+    var ro = document.querySelector('.bento-readout');
+    if (!ro) return;
+    var nums = ro.querySelectorAll('[data-cu]');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function setFinal(){ nums.forEach(function(n){ n.textContent = n.getAttribute('data-cu'); }); }
+    // only animate when the editorial readout is actually visible (dark mode)
+    function isDark(){ return document.documentElement.getAttribute('data-theme') === 'dark'; }
+    if (reduce || !isDark()) { setFinal(); return; }
+    function run(){
+        var dur = 900, start = null;
+        function frame(ts){
+            if (start === null) start = ts;
+            var p = Math.min((ts - start) / dur, 1);
+            var e = 1 - Math.pow(1 - p, 3); // easeOutCubic
+            nums.forEach(function(n){
+                var target = parseInt(n.getAttribute('data-cu'), 10) || 0;
+                n.textContent = Math.round(target * e);
+            });
+            if (p < 1) requestAnimationFrame(frame); else setFinal();
+        }
+        requestAnimationFrame(frame);
+        setTimeout(setFinal, dur + 300); // hard guarantee exact final value
+    }
+    var io = new IntersectionObserver(function(entries, obs){
+        entries.forEach(function(en){ if (en.isIntersecting){ run(); obs.disconnect(); } });
+    }, { threshold: 0.4 });
+    io.observe(ro);
 })();
 </script>
 
