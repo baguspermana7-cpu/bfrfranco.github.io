@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.45 — 2026-06-21 (CDU Mini-BMS — live sparkline trends on parameter tiles)
+
+### Added
+- **`cdu-mini-bms.html`** — each numeric parameter tile (flow, flow-total, supply/return temp, ΔT,
+  dP, system pressure, HX approach) now carries a **live sparkline** showing the rolling 30-sample
+  trend with a subtle fill area — making it read as a real BMS dashboard rather than a static
+  readout. Sparkline colour follows the tile's OK/WARN/ALARM state; history resets on CDU-type
+  change; status tiles (pumps/filter/leak/coolant) stay static. Pure presentation — no change to
+  the simulation logic or values.
+
 ## v1.43.44 — 2026-06-21 (CDU Mini-BMS — full-width P&ID for legibility)
 
 ### Changed

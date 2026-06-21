@@ -97,6 +97,11 @@
         .tile .v{ font-family:var(--bm-mono); font-size:1.18rem; font-weight:700; color:var(--bm-text); line-height:1.15; margin-top:2px; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
         .tile .v .u{ font-size:.62rem; color:var(--bm-muted); font-weight:500; margin-left:2px; }
         .tile .b{ font-family:var(--bm-mono); font-size:.52rem; color:var(--bm-muted); margin-top:1px; }
+        .tile .spark{ width:100%; height:15px; display:block; margin-top:4px; }
+        .tile .spark polyline{ fill:none; stroke:var(--bm-cyan); stroke-width:1.1; opacity:.85; vector-effect:non-scaling-stroke; }
+        .tile .spark .fillarea{ fill:var(--bm-cyan); opacity:.08; stroke:none; }
+        .tile.warn .spark polyline{ stroke:var(--bm-amber); } .tile.warn .spark .fillarea{ fill:var(--bm-amber); }
+        .tile.alarm .spark polyline{ stroke:var(--bm-red); } .tile.alarm .spark .fillarea{ fill:var(--bm-red); }
         .tile.warn{ border-color:var(--bm-amber); } .tile.warn .v{ color:var(--bm-amber); }
         .tile.alarm{ border-color:var(--bm-red); } .tile.alarm .v{ color:var(--bm-red); }
         .tile .led{ position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--bm-green); box-shadow:0 0 6px var(--bm-green); }
@@ -463,11 +468,23 @@
         ];
         function buildTiles(){
             var h=''; for(var i=0;i<TILES.length;i++){ var t=TILES[i];
-                h+='<div class="tile" id="tile-'+t.k+'"><span class="led"></span><div class="k">'+t.label+'</div><div class="v" id="val-'+t.k+'">–</div><div class="b">'+(t.band?'band '+t.band:'&nbsp;')+'</div></div>';
+                var spark = t.dec!==-1 ? '<svg class="spark" id="spark-'+t.k+'" viewBox="0 0 60 15" preserveAspectRatio="none"><polygon class="fillarea" points=""/><polyline points=""/></svg>' : '<div class="b">&nbsp;</div>';
+                h+='<div class="tile" id="tile-'+t.k+'"><span class="led"></span><div class="k">'+t.label+'</div><div class="v" id="val-'+t.k+'">–</div><div class="b">'+(t.band?'band '+t.band:'&nbsp;')+'</div>'+spark+'</div>';
             }
             document.getElementById('tiles').innerHTML=h;
         }
         function setTile(k,txt,state){ var el=document.getElementById('val-'+k); if(el) el.innerHTML=txt; var tl=document.getElementById('tile-'+k); if(tl){ tl.className='tile'+(state==='warn'?' warn':state==='alarm'?' alarm':''); } }
+        var SPARK_HIST={};
+        function drawSpark(k,val){
+            if(!SPARK_HIST[k]) SPARK_HIST[k]=[];
+            var a=SPARK_HIST[k]; a.push(val); if(a.length>30) a.shift();
+            var sv=document.getElementById('spark-'+k); if(!sv || a.length<2) return;
+            var mn=Math.min.apply(null,a), mx=Math.max.apply(null,a), rng=(mx-mn)||1, n=a.length;
+            var pts='', i;
+            for(i=0;i<n;i++){ var x=(i/(n-1))*60, y=14-((a[i]-mn)/rng)*12-1; pts+=x.toFixed(1)+','+y.toFixed(1)+' '; }
+            sv.querySelector('polyline').setAttribute('points',pts.trim());
+            sv.querySelector('polygon').setAttribute('points','0,15 '+pts.trim()+' 60,15');
+        }
 
         function compute(){
             var t=TYPES[curType], s=SCEN[curScen]||{};
@@ -495,6 +512,9 @@
             setTile('leak', leak?'ALARM':'0', leak?'alarm':'ok');
             setTile('atd', atd.toFixed(1)+'<span class="u">°C</span>', t.arch==='L2A'?'ok':band(atd,3,7));
             setTile('chem', 'PG25 OK', 'ok');
+            // sparkline trends (rolling history per numeric tile)
+            drawSpark('flow',flow); drawSpark('flowtot',flowtot); drawSpark('supply',supply); drawSpark('return',ret);
+            drawSpark('dT',dT); drawSpark('dP',dP); drawSpark('sysP',sysP); drawSpark('atd',atd);
             // P&ID live labels (tagged instruments)
             function st(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
             var fdp=0.28+(filterBad?1.9:0)+rnd(7)*0.02;          // filter dP (PDT-01)
@@ -528,7 +548,7 @@
         }
         function setPressed(seg,attr,val){ seg.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute(attr)===val?'true':'false'); }); }
 
-        document.getElementById('typeSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curType=b.getAttribute('data-type'); setPressed(this,'data-type',curType); render(); });
+        document.getElementById('typeSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curType=b.getAttribute('data-type'); setPressed(this,'data-type',curType); SPARK_HIST={}; render(); });
         document.getElementById('scenSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curScen=b.getAttribute('data-scen'); setPressed(this,'data-scen',curScen); render(); });
 
         buildTiles(); render();
