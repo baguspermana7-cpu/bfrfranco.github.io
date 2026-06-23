@@ -184,6 +184,17 @@
         .walk-btns button:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
         .walk-btns button[disabled]{ opacity:.4; cursor:not-allowed; }
         #walkExit{ color:var(--bm-muted); }
+        /* Phase 5 — zoom / pan on the SVG panels */
+        .panel{ position:relative; }
+        #layoutBox, #pidBox{ transform-origin:0 0; will-change:transform; touch-action:none; }
+        #layoutBox:focus-visible, #pidBox:focus-visible{ outline:2px solid var(--bm-cyan); outline-offset:-2px; }
+        .panel.zoomable .panel-bd{ overflow:hidden; }
+        .panel.zoomable.is-pan #layoutBox, .panel.zoomable.is-pan #pidBox{ cursor:grab; }
+        .panel.zoomable.dragging #layoutBox, .panel.zoomable.dragging #pidBox{ cursor:grabbing; }
+        .zoom-ctl{ position:absolute; top:8px; right:8px; z-index:6; display:flex; gap:3px; background:var(--bm-panel); border:1px solid var(--bm-border); border-radius:7px; padding:3px; opacity:.9; }
+        .zoom-ctl button{ width:28px; height:28px; min-height:28px; border:1px solid var(--bm-border); background:var(--bm-inset); color:var(--bm-text); border-radius:5px; cursor:pointer; font-size:.85rem; line-height:1; font-family:var(--bm-mono); padding:0; }
+        .zoom-ctl button:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
+        .zoom-ctl .zlvl{ display:inline-flex; align-items:center; justify-content:center; min-width:34px; font-family:var(--bm-mono); font-size:.6rem; color:var(--bm-muted); }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
@@ -807,6 +818,38 @@
         document.getElementById('walkExit').addEventListener('click', walkStop);
         document.getElementById('walkNext').addEventListener('click', function(){ var n=walkSteps().length; if(walkIdx<n-1){ walkIdx++; walkRender(); } });
         document.getElementById('walkPrev').addEventListener('click', function(){ if(walkIdx>0){ walkIdx--; walkRender(); } });
+
+        /* ---------- Phase 5: zoom / pan on the SVG panels ---------- */
+        function makeZoomable(box){
+            var panel=box.closest('.panel'); if(!panel) return;
+            panel.classList.add('zoomable');
+            box.setAttribute('tabindex','0');
+            box.setAttribute('aria-label','Schematic — scroll to zoom, drag to pan, 0 to reset');
+            var scale=1, tx=0, ty=0, drag=false, sx=0, sy=0, stx=0, sty=0;
+            // zoom control cluster
+            var ctl=document.createElement('div'); ctl.className='zoom-ctl';
+            ctl.innerHTML='<button type="button" data-z="out" aria-label="Zoom out">−</button><span class="zlvl">100%</span><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="reset" aria-label="Reset view">⤢</button>';
+            panel.appendChild(ctl);
+            var lvl=ctl.querySelector('.zlvl');
+            function clampPan(){
+                var pw=box.parentNode.clientWidth, ph=box.parentNode.clientHeight, cw=box.clientWidth, ch=box.clientHeight;
+                tx=Math.max(Math.min(0, pw-scale*cw), Math.min(0, tx));
+                ty=Math.max(Math.min(0, ph-scale*ch), Math.min(0, ty));
+            }
+            function apply(){ if(scale<=1.001){ scale=1; tx=0; ty=0; } clampPan(); box.style.transform='translate('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px) scale('+scale.toFixed(3)+')'; lvl.textContent=Math.round(scale*100)+'%'; panel.classList.toggle('is-pan', scale>1); }
+            function zoomAt(vx,vy,ns){ ns=Math.max(1,Math.min(5,ns)); var k=ns/scale; tx=vx-k*(vx-tx); ty=vy-k*(vy-ty); scale=ns; apply(); }
+            function localXY(e){ var pr=box.parentNode.getBoundingClientRect(), cs=getComputedStyle(box.parentNode); return [e.clientX-pr.left-parseFloat(cs.paddingLeft), e.clientY-pr.top-parseFloat(cs.paddingTop)]; }
+            box.addEventListener('wheel', function(e){ if(document.activeElement!==box && !e.ctrlKey) return; e.preventDefault(); var c=localXY(e); zoomAt(c[0],c[1], scale*(e.deltaY<0?1.15:1/1.15)); }, {passive:false});
+            box.addEventListener('pointerdown', function(e){ box.focus({preventScroll:true}); if(scale<=1) return; drag=true; sx=e.clientX; sy=e.clientY; stx=tx; sty=ty; panel.classList.add('dragging'); box.setPointerCapture&&box.setPointerCapture(e.pointerId); });
+            box.addEventListener('pointermove', function(e){ if(!drag) return; tx=stx+(e.clientX-sx); ty=sty+(e.clientY-sy); apply(); });
+            function endDrag(){ drag=false; panel.classList.remove('dragging'); }
+            box.addEventListener('pointerup', endDrag); box.addEventListener('pointercancel', endDrag); box.addEventListener('pointerleave', endDrag);
+            box.addEventListener('keydown', function(e){ var pw=box.parentNode.clientWidth, ph=box.parentNode.clientHeight; if(e.key==='+'||e.key==='='){ e.preventDefault(); zoomAt(pw/2,ph/2,scale*1.2); } else if(e.key==='-'){ e.preventDefault(); zoomAt(pw/2,ph/2,scale/1.2); } else if(e.key==='0'){ e.preventDefault(); scale=1; tx=0; ty=0; apply(); } });
+            ctl.addEventListener('click', function(e){ var bt=e.target.closest('button'); if(!bt) return; var pw=box.parentNode.clientWidth, ph=box.parentNode.clientHeight, z=bt.getAttribute('data-z'); if(z==='in') zoomAt(pw/2,ph/2,scale*1.25); else if(z==='out') zoomAt(pw/2,ph/2,scale/1.25); else { scale=1; tx=0; ty=0; apply(); } });
+            apply();
+        }
+        makeZoomable(document.getElementById('layoutBox'));
+        makeZoomable(document.getElementById('pidBox'));
 
         /* ---------- Phase 2: simulation controls (pause/play · speed · step) ---------- */
         var simSpeed=1, simPaused=false, simTimer=null;

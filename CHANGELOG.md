@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.43.62 — 2026-06-24 (CDU Mini-BMS — interaction Phase 5: zoom/pan — ULTRAPLAN complete)
+
+### Added (ULTRAPLAN cockpit interaction, phase 5 of 5 — final)
+- **`cdu-mini-bms.html`** — **zoom / pan** on the P&ID and datahall layout: + / − buttons with a
+  live zoom-level readout and reset (⤢), **wheel-zoom toward the cursor** (gated on the SVG being
+  focused or Ctrl held, so it never hijacks page scroll), **drag-pan when zoomed** (pointer events +
+  capture, clamped so the content always covers the viewport), and keyboard +/−/0. Implemented as a
+  CSS transform on the persistent box element, so it survives the SVG re-render. Vector-crisp at any
+  scale. Real-interaction deep-tested (button/keyboard/wheel zoom + drag-pan + reset + a Phase-1
+  click regression at 1×), both themes, 0 console errors.
+
+### ULTRAPLAN — CDU Mini-BMS operator-interaction layer COMPLETE (v1.43.58 → v1.43.62)
+The cockpit is now a fully operable instrument panel: (1) bidirectional P&ID ↔ tile linking,
+(2) pause/step/speed simulation controls, (3) trend history drawers, (4) guided fault walkthroughs,
+(5) zoom/pan. Five reversible, real-mouse-deep-tested ships; presentation-only throughout — the
+simulated values were never altered.
+
 ## v1.43.61 — 2026-06-21 (CDU Mini-BMS — interaction Phase 4: guided fault walkthrough)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 4 of 5)
