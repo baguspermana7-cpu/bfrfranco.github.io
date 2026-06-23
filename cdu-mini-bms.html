@@ -110,6 +110,23 @@
         .tile.alarm .led{ background:var(--bm-red); box-shadow:0 0 7px var(--bm-red); animation:blink 1s steps(2) infinite; }
         @keyframes blink{ 50%{ opacity:.25; } }
         @media (prefers-reduced-motion:reduce){ .tile.alarm .led, .leak-x.on{ animation:none; } }
+        /* Phase 1 — P&ID ↔ tile linking */
+        /* decorative pipes must not intercept clicks meant for the instruments beneath them */
+        #pidBox .pipe-s, #pidBox .pipe-r, #pidBox .pipe-hot{ pointer-events:none; }
+        .pid-inst{ cursor:pointer; }
+        .pid-inst circle.sch-eq2{ transition:stroke-width .12s, stroke .12s; }
+        .pid-inst:hover circle.sch-eq2, .pid-inst.linked circle.sch-eq2{ stroke:var(--bm-cyan); stroke-width:2.6; }
+        .pid-inst:focus{ outline:none; }
+        .pid-inst:focus-visible circle.sch-eq2{ stroke:var(--bm-cyan); stroke-width:2.8; }
+        .tile{ transition:outline-color .15s, box-shadow .15s; }
+        .tile.hoverhl{ outline:1px dashed var(--bm-cyan); outline-offset:1px; }
+        .tile.linkhl{ outline:2px solid var(--bm-cyan); outline-offset:1px; }
+        @media (prefers-reduced-motion:no-preference){
+            .tile.pulse{ animation:tilepulse .8s ease; }
+            .pid-inst.pulse circle.sch-eq2{ animation:instpulse .8s ease; }
+        }
+        @keyframes tilepulse{ 0%{ box-shadow:0 0 0 0 rgba(43,232,255,.55); } 100%{ box-shadow:0 0 0 12px rgba(43,232,255,0); } }
+        @keyframes instpulse{ 0%{ stroke-width:1.1; } 40%{ stroke-width:3.4; } 100%{ stroke-width:2.6; } }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
@@ -236,7 +253,7 @@
         </div>
 
         <div class="panel" style="margin-bottom:1rem;">
-            <div class="panel-hd"><h3>P&amp;ID schematic — piping &amp; instrumentation</h3><span class="statepill st-ok" id="pidState">RUN</span></div>
+            <div class="panel-hd"><h3>P&amp;ID schematic — piping &amp; instrumentation</h3><span class="tag" style="margin-left:auto;margin-right:.6rem;">click a tag ↔ tile to link</span><span class="statepill st-ok" id="pidState">RUN</span></div>
             <div class="panel-bd"><div id="pidBox" style="max-width:920px;margin:0 auto;"></div></div>
         </div>
 
@@ -367,7 +384,10 @@
         function pPump(x,y,tag,on,slow){ return '<g><circle class="'+(on?'sch-eq':'sch-eq2')+'" cx="'+x+'" cy="'+y+'" r="12"/>'
                  + '<path class="pump-rot '+(on?(slow?'slow':'on'):'off')+'" d="M'+x+' '+(y-8)+' L'+x+' '+(y+8)+' M'+(x-8)+' '+y+' L'+(x+8)+' '+y+'" stroke="var(--bm-cyan)" stroke-width="1.5"/>'
                  + '<text class="sch-sub" x="'+x+'" y="'+(y+24)+'" text-anchor="middle">'+tag+'</text></g>'; }
-        function pInst(x,y,top,tag,valId){ return '<g><circle class="sch-eq2" cx="'+x+'" cy="'+y+'" r="11"/>'
+        function pInst(x,y,top,tag,valId,link){
+                 var attrs = link ? ' class="pid-inst" data-link="'+link+'" role="button" tabindex="0" aria-label="'+top+'-'+tag+' instrument — show '+link+' reading"' : '';
+                 var hit = link ? '<rect x="'+(x-16)+'" y="'+(y-15)+'" width="32" height="41" rx="4" fill="transparent" style="pointer-events:all"/>' : '';
+                 return '<g'+attrs+'>'+hit+'<circle class="sch-eq2" cx="'+x+'" cy="'+y+'" r="11"/>'
                  + '<line x1="'+(x-11)+'" y1="'+y+'" x2="'+(x+11)+'" y2="'+y+'" stroke="var(--bm-muted)" stroke-width=".5"/>'
                  + '<text class="sch-sub" x="'+x+'" y="'+(y-2.5)+'" text-anchor="middle">'+top+'</text>'
                  + '<text class="sch-sub" x="'+x+'" y="'+(y+7)+'" text-anchor="middle">'+tag+'</text>'
@@ -386,13 +406,13 @@
                 h+='<rect class="sch-eq" x="86" y="30" width="34" height="234" rx="3"/>';
                 h+='<path class="sch-eq2" d="M90 40 L116 70 M90 70 L116 100 M90 130 L116 160 M90 200 L116 230"/>';
                 h+='<text class="sch-lbl" x="103" y="150" text-anchor="middle" transform="rotate(-90 103 150)">E-01 PLATE HX</text>';
-                h+='<text class="sch-sub" x="103" y="272" text-anchor="middle">HX approach</text>'+pInst(103,288,'TI','03','pv-atd');
+                h+='<text class="sch-sub" x="103" y="272" text-anchor="middle">HX approach</text>'+pInst(103,288,'TI','03','pv-atd','atd');
             } else {
                 h+='<text class="sch-sub" x="6" y="14">AIR-COOLED · L2A</text>';
                 h+='<rect class="sch-eq" x="86" y="40" width="34" height="150" rx="3"/>';
                 h+='<text class="sch-lbl" x="103" y="118" text-anchor="middle" transform="rotate(-90 103 118)">AIR COIL + FANS</text>';
                 h+='<path class="pipe-hot flow on" d="M103 40 V12"/><text class="sch-sub" x="108" y="20">→ room air (no FWS)</text>';
-                h+=pInst(103,288,'TI','03','pv-atd');
+                h+=pInst(103,288,'TI','03','pv-atd','atd');
             }
             // ===== CDU envelope =====
             h+='<rect x="130" y="18" width="270" height="318" rx="6" fill="none" stroke="var(--bm-cyan)" stroke-dasharray="3 3" stroke-width="1"/>';
@@ -408,10 +428,10 @@
             h+=pCHK(205,150)+pCHK(205,222);
             // strainer/filter F-01 + filter dP PDT-01
             h+='<rect class="sch-eq" x="230" y="138" width="18" height="22"/><path class="sch-eq2" d="M232 140 l14 18 M232 158 l14 -18"/><text class="sch-sub" x="239" y="134" text-anchor="middle">F-01 · 50µm</text>';
-            h+=pInst(266,150,'FT','01','pv-flow');
-            h+=pInst(350,150,'PT','01','pv-sysp');
-            h+=pInst(266,222,'PDT','01','pv-fdp');
-            h+=pInst(350,222,'PDT','02','pv-dp');
+            h+=pInst(266,150,'FT','01','pv-flow','flow');
+            h+=pInst(350,150,'PT','01','pv-sysp','sysP');
+            h+=pInst(266,222,'PDT','01','pv-fdp','filter');
+            h+=pInst(350,222,'PDT','02','pv-dp','dP');
             // pipework facility→HX→pumps→filter→supply header
             h+='<path class="pipe-s '+fcls+'" d="M120 50 H148 V150 H163"/>';            // HX sec out → suction header → P-01A
             h+='<path class="pipe-s '+fcls+'" d="M148 150 V222 H163"/>';                 // suction header → P-01B
@@ -419,7 +439,7 @@
             h+='<path class="pipe-s '+fcls+'" d="M187 222 H214 V150"/>';                 // P-01B disch (via CHK) → common
             h+='<path class="pipe-s '+fcls+'" d="M248 150 H388 V60"/>';                  // filter → TCS supply header out
             // ===== secondary TCS to rack =====
-            h+=pInst(355,60,'TT','01','pv-sup')+'<text class="sch-sub" x="355" y="44" text-anchor="middle">TCS supply</text>';
+            h+=pInst(355,60,'TT','01','pv-sup','supply')+'<text class="sch-sub" x="355" y="44" text-anchor="middle">TCS supply</text>';
             h+=pHV(388,90,'HV-03')+'<text class="sch-sub" x="404" y="90" text-anchor="start">bal BV-01</text>';
             h+='<text class="sch-sub" x="412" y="56">TCS →</text>';
             h+='<path class="pipe-s '+fcls+'" d="M388 60 H430 V120"/>';
@@ -433,7 +453,7 @@
             h+='<text class="sch-sub" x="460" y="292" text-anchor="middle">cold plates · QD</text>';
             // TCS return back to HX
             h+='<path class="pipe-r '+fcls+'" d="M430 270 H120 V60"/>';
-            h+='<text class="sch-sub" x="355" y="283" text-anchor="middle">TCS return</text>'+pInst(355,300,'TT','02','pv-ret');
+            h+='<text class="sch-sub" x="355" y="283" text-anchor="middle">TCS return</text>'+pInst(355,300,'TT','02','pv-ret','return');
             h+=pHV(300,270,'HV-04');
             // pump status readout
             h+='<text class="sch-val" id="pv-pump" x="175" y="120" text-anchor="middle"></text>';
@@ -471,7 +491,7 @@
         function buildTiles(){
             var h=''; for(var i=0;i<TILES.length;i++){ var t=TILES[i];
                 var spark = t.dec!==-1 ? '<svg class="spark" id="spark-'+t.k+'" viewBox="0 0 60 15" preserveAspectRatio="none"><polygon class="fillarea" points=""/><polyline points=""/></svg>' : '<div class="b">&nbsp;</div>';
-                h+='<div class="tile" id="tile-'+t.k+'"><span class="led"></span><div class="k">'+t.label+'</div><div class="v" id="val-'+t.k+'">–</div><div class="b">'+(t.band?'band '+t.band:'&nbsp;')+'</div>'+spark+'</div>';
+                h+='<div class="tile" id="tile-'+t.k+'" data-link="'+t.k+'"><span class="led"></span><div class="k">'+t.label+'</div><div class="v" id="val-'+t.k+'">–</div><div class="b">'+(t.band?'band '+t.band:'&nbsp;')+'</div>'+spark+'</div>';
             }
             document.getElementById('tiles').innerHTML=h;
         }
@@ -554,6 +574,31 @@
         document.getElementById('scenSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curScen=b.getAttribute('data-scen'); setPressed(this,'data-scen',curScen); render(); });
 
         buildTiles(); render();
+
+        /* ---------- Phase 1: bidirectional P&ID ↔ tile linking ---------- */
+        var pidBox=document.getElementById('pidBox'), tilesBox=document.getElementById('tiles');
+        function clearLink(){
+            var i; var t=document.querySelectorAll('.tile.linkhl'); for(i=0;i<t.length;i++) t[i].classList.remove('linkhl');
+            var g=document.querySelectorAll('.pid-inst.linked'); for(i=0;i<g.length;i++) g[i].classList.remove('linked');
+        }
+        function pulseEl(el){ if(!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
+        function selectLink(key,fromTile){
+            if(!key) return;
+            clearLink();
+            var tile=document.getElementById('tile-'+key);
+            var inst=pidBox.querySelector('.pid-inst[data-link="'+key+'"]');
+            if(tile){ tile.classList.add('linkhl'); pulseEl(tile); if(!fromTile) tile.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+            if(inst){ inst.classList.add('linked'); if(fromTile) pulseEl(inst); }
+        }
+        pidBox.addEventListener('click',function(e){ var g=e.target.closest('.pid-inst'); if(g) selectLink(g.getAttribute('data-link'),false); });
+        pidBox.addEventListener('keydown',function(e){ var g=e.target.closest('.pid-inst'); if(g && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); selectLink(g.getAttribute('data-link'),false); } });
+        pidBox.addEventListener('mouseover',function(e){ var g=e.target.closest('.pid-inst'); if(g){ var t=document.getElementById('tile-'+g.getAttribute('data-link')); if(t) t.classList.add('hoverhl'); } });
+        pidBox.addEventListener('mouseout',function(e){ var g=e.target.closest('.pid-inst'); if(g){ var t=document.getElementById('tile-'+g.getAttribute('data-link')); if(t) t.classList.remove('hoverhl'); } });
+        tilesBox.addEventListener('click',function(e){ var t=e.target.closest('.tile[data-link]'); if(t) selectLink(t.getAttribute('data-link'),true); });
+        tilesBox.addEventListener('mouseover',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g) g.classList.add('linked'); } });
+        tilesBox.addEventListener('mouseout',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g && !document.querySelector('.tile.linkhl[data-link="'+t.getAttribute('data-link')+'"]')) g.classList.remove('linked'); } });
+        document.addEventListener('keydown',function(e){ if(e.key==='Escape') clearLink(); });
+
         setInterval(compute, 1000);
     })();
     </script>

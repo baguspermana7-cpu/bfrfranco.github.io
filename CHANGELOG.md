@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.58 — 2026-06-21 (CDU Mini-BMS — interaction Phase 1: P&ID ↔ tile linking)
+
+### Added (ULTRAPLAN — CDU cockpit operator-interaction layer, phase 1 of 5)
+- **`cdu-mini-bms.html`** — the P&ID is now **operable**: click (or keyboard-activate) any tagged
+  instrument (FT-01 / PT-01 / PDT-01 / PDT-02 / TT-01 / TT-02 / TI-03) to highlight + pulse its
+  parameter tile and scroll it into view; click a tile to pulse its linked instrument; hover
+  cross-highlights both ways; Esc clears; single-selection invariant. Instruments get
+  `role="button"` + `tabindex="0"` + `aria-label` + a 32×41 transparent hit-rect.
+- **Fix surfaced by deep-testing:** the animated flow pipes were painted over the instruments and
+  intercepted clicks intermittently (depending on the moving dash position) — set
+  `#pidBox .pipe-* { pointer-events:none }` so clicks reach the instruments beneath.
+- Plan tracker: `standarization/CDU_COCKPIT_INTERACTION_PLAN.md` (5 phases). Presentation-only —
+  no change to the simulated values. prefers-reduced-motion honoured. Real-mouse deep-tested, 0 errors.
+
 ## v1.43.57 — 2026-06-21 (articles — refine amber: gold accent, not yellow highlighter)
 
 Owner feedback on the v1.43.54 amber swap: the re-toned callouts read as garish
