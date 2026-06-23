@@ -170,6 +170,20 @@
         .td-cklink{ display:inline-block; margin-top:.9rem; font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-cyan); text-decoration:none; }
         .td-cklink:hover{ text-decoration:underline; }
         .tile{ cursor:pointer; }
+        /* Phase 4 — guided walkthrough */
+        .seg #walkToggle[aria-pressed="true"]{ background:var(--bm-amber); border-color:var(--bm-amber); color:#1c1407; }
+        .walk-bar{ position:fixed; left:0; right:0; bottom:0; z-index:80; background:var(--bm-panel); border-top:1px solid var(--bm-border); box-shadow:0 -8px 28px rgba(0,0,0,.22); }
+        .walk-bar[hidden]{ display:none !important; }
+        @media (prefers-reduced-motion:no-preference){ .walk-bar{ animation:walkup .22s ease; } @keyframes walkup{ from{ transform:translateY(14px); opacity:.4; } to{ transform:none; opacity:1; } } }
+        .walk-wrap{ max-width:1280px; margin:0 auto; padding:.7rem 1.2rem; display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; }
+        .walk-step{ font-family:var(--bm-mono); font-size:.66rem; font-weight:700; color:#1c1407; background:var(--bm-amber); padding:3px 8px; border-radius:5px; white-space:nowrap; }
+        .walk-scen{ font-family:var(--bm-mono); font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:var(--bm-amber); white-space:nowrap; }
+        .walk-text{ flex:1; min-width:200px; font-size:.9rem; color:var(--bm-text); line-height:1.5; }
+        .walk-btns{ display:flex; gap:6px; }
+        .walk-btns button{ font-family:var(--bm-mono); font-size:.72rem; font-weight:600; padding:.45rem .8rem; min-height:36px; border-radius:6px; border:1px solid var(--bm-border); background:var(--bm-inset); color:var(--bm-text); cursor:pointer; }
+        .walk-btns button:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
+        .walk-btns button[disabled]{ opacity:.4; cursor:not-allowed; }
+        #walkExit{ color:var(--bm-muted); }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
@@ -290,6 +304,7 @@
                         <button class="spd" data-spd="4" aria-pressed="false">4×</button>
                     </span>
                     <span class="statepill st-ok" id="simState" style="align-self:center;">LIVE</span>
+                    <button id="walkToggle" type="button" aria-pressed="false" title="Guided walkthrough of the selected scenario" style="margin-left:6px;">▷ Walkthrough</button>
                 </div>
             </div>
         </div>
@@ -340,6 +355,20 @@
             <a class="td-cklink" href="cdu-checklist.html#params">↗ Full parameter bands &amp; standards (checklist §01)</a>
         </div>
     </aside>
+
+    <!-- Phase 4 — guided fault walkthrough -->
+    <div id="walkBar" class="walk-bar" hidden role="region" aria-label="Scenario walkthrough">
+        <div class="walk-wrap">
+            <span class="walk-step" id="walkStep">1 / 1</span>
+            <span class="walk-scen" id="walkScen"></span>
+            <span class="walk-text" id="walkText"></span>
+            <span class="walk-btns">
+                <button id="walkPrev" type="button" aria-label="Previous step">‹ Prev</button>
+                <button id="walkNext" type="button" aria-label="Next step">Next ›</button>
+                <button id="walkExit" type="button" aria-label="Exit walkthrough">✕ Exit</button>
+            </span>
+        </div>
+    </div>
 
     <footer class="footer footer-enhanced">
         <div class="container"><div class="footer-grid">
@@ -648,7 +677,7 @@
         function setPressed(seg,attr,val){ seg.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute(attr)===val?'true':'false'); }); }
 
         document.getElementById('typeSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curType=b.getAttribute('data-type'); setPressed(this,'data-type',curType); SPARK_HIST={}; render(); });
-        document.getElementById('scenSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curScen=b.getAttribute('data-scen'); setPressed(this,'data-scen',curScen); render(); });
+        document.getElementById('scenSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; curScen=b.getAttribute('data-scen'); setPressed(this,'data-scen',curScen); render(); if(window._walkOn){ walkIdx=0; walkRender(); } });
 
         buildTiles(); render();
 
@@ -717,6 +746,67 @@
         function closeTrend(){ window._tdOpenKey=null; document.getElementById('trendDrawer').hidden=true; document.getElementById('trendBackdrop').hidden=true; }
         document.getElementById('tdClose').addEventListener('click', closeTrend);
         document.getElementById('trendBackdrop').addEventListener('click', closeTrend);
+
+        /* ---------- Phase 4: guided fault walkthrough ---------- */
+        var SCEN_LABEL={ normal:'Normal operation', leak:'Leak', pumpfail:'Pump A fail', clog:'Filter clog', hotfws:'Hot facility water', lowflow:'Low flow' };
+        var WALK={
+            normal:[
+                {t:'Facility water enters via isolation valve HV-01 and the 3-way control valve TCV-01 into the plate HX E-01.', hl:'supply'},
+                {t:'E-01 transfers heat to the facility loop; the approach (TI-03) sits ~3–5 °C — rising approach would mean fouling.', hl:'atd'},
+                {t:'Duty pump P-01A circulates the secondary loop; P-01B stands by — that is the N+1 redundancy.', hl:'pump'},
+                {t:'Flow (FT-01) ~1.0–1.5 LPM/kW, system pressure (PT-01) and loop dP (PDT-02) are all held within band.', hl:'flow'},
+                {t:'Coolant reaches the rack cold plates through the M-01 manifold and the dripless QD couplers.', hl:'dP'},
+                {t:'Leak rope LSH-01 watches the whole skid. Everything is nominal — try injecting a fault scenario.', hl:'leak'}
+            ],
+            leak:[
+                {t:'A leak develops — most commonly at a quick-disconnect, gasket or manifold joint.', hl:'leak'},
+                {t:'The leak-detection rope LSH-01 trips and raises a BMS/DCIM alarm.', hl:'leak'},
+                {t:'Coolant level falls (LT-01) and make-up demand rises as fluid escapes the loop.', hl:'sysP'},
+                {t:'The CDU latches isolation to protect the IT load. Locate the leak via the rope/zone and repair.', hl:'pump'}
+            ],
+            pumpfail:[
+                {t:'Duty pump P-01A fails — typically seal/bearing wear or cavitation from low NPSH.', hl:'pump'},
+                {t:'The N+1 logic auto-starts standby pump P-01B within ~0.25 s (changeover).', hl:'pump'},
+                {t:'Secondary flow (FT-01) is maintained — there is no cooling loss to the rack.', hl:'flow'},
+                {t:'An alarm is raised and P-01A is scheduled for service. This is exactly why N+1 matters.', hl:'pump'}
+            ],
+            clog:[
+                {t:'The strainer F-01 begins to clog with particulate (corrosion fines or fill debris).', hl:'filter'},
+                {t:'Filter differential pressure (PDT-01) rises above the clean range — the first warning.', hl:'filter'},
+                {t:'Loop dP (PDT-02) climbs; if left unaddressed, flow eventually falls and racks run hot.', hl:'dP'},
+                {t:'Replace the filter at the vendor dP threshold; trend the side-stream filtration.', hl:'flow'}
+            ],
+            hotfws:[
+                {t:'Facility water (FWS) supply runs warm — a plant upset or a hot day on the dry cooler.', hl:'atd'},
+                {t:'The HX approach can no longer reject enough, so the secondary supply (TT-01) rises.', hl:'supply'},
+                {t:'ΔT and the return temperature (TT-02) climb with it; the rack inlet warms up.', hl:'return'},
+                {t:'Restore the CDW temperature/flow, or clean the heat exchanger if the approach has drifted.', hl:'atd'}
+            ],
+            lowflow:[
+                {t:'Secondary flow (FT-01) drops below the design band — a throttled valve, airlock or weak pump.', hl:'flow'},
+                {t:'With less flow, ΔT widens to carry the same heat (Q = ṁ·c_p·ΔT).', hl:'dT'},
+                {t:'Loop dP falls; the real risk is hot sleds and GPU throttling from flow maldistribution.', hl:'dP'},
+                {t:'Check pumps, valves and QD seating; restore flow to the band.', hl:'flow'}
+            ]
+        };
+        var walkIdx=0;
+        var walkBar=document.getElementById('walkBar');
+        function walkSteps(){ return WALK[curScen]||WALK.normal; }
+        function walkRender(){
+            var steps=walkSteps(), s=steps[walkIdx]||steps[0];
+            document.getElementById('walkStep').textContent=(walkIdx+1)+' / '+steps.length;
+            document.getElementById('walkScen').textContent=SCEN_LABEL[curScen]||curScen;
+            document.getElementById('walkText').textContent=s.t;
+            if(s.hl) selectLink(s.hl,false); else clearLink();
+            document.getElementById('walkPrev').disabled=walkIdx===0;
+            document.getElementById('walkNext').disabled=walkIdx===steps.length-1;
+        }
+        function walkStart(){ window._walkOn=true; walkIdx=0; walkBar.hidden=false; document.getElementById('walkToggle').setAttribute('aria-pressed','true'); walkRender(); }
+        function walkStop(){ window._walkOn=false; walkBar.hidden=true; document.getElementById('walkToggle').setAttribute('aria-pressed','false'); clearLink(); }
+        document.getElementById('walkToggle').addEventListener('click', function(){ if(window._walkOn) walkStop(); else walkStart(); });
+        document.getElementById('walkExit').addEventListener('click', walkStop);
+        document.getElementById('walkNext').addEventListener('click', function(){ var n=walkSteps().length; if(walkIdx<n-1){ walkIdx++; walkRender(); } });
+        document.getElementById('walkPrev').addEventListener('click', function(){ if(walkIdx>0){ walkIdx--; walkRender(); } });
 
         /* ---------- Phase 2: simulation controls (pause/play · speed · step) ---------- */
         var simSpeed=1, simPaused=false, simTimer=null;

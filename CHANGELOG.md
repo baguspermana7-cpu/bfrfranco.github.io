@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.43.61 — 2026-06-21 (CDU Mini-BMS — interaction Phase 4: guided fault walkthrough)
+
+### Added (ULTRAPLAN cockpit interaction, phase 4 of 5)
+- **`cdu-mini-bms.html`** — a **Walkthrough** toggle opens a bottom bar that steps through narrated
+  callouts for the active scenario (Normal · Leak · Pump-A-fail · Filter-clog · Hot-FWS · Low-flow —
+  4–6 steps each). Each step explains the cause→effect chain and **highlights the relevant P&ID
+  instrument + parameter tile** (reusing the Phase-1 link). Prev / Next / Exit, a step counter and
+  scenario label; switching scenario mid-walkthrough resets to step 1 of the new one. Reduced-motion
+  honoured. Real-mouse deep-tested (start / next / prev / scenario-reset / exit + highlight +
+  disabled edge-steps), both themes, 0 console errors. Presentation-only.
+
 ## v1.43.60 — 2026-06-21 (CDU Mini-BMS — interaction Phase 3: trend history drawer)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 3 of 5)
