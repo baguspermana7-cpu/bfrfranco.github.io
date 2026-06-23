@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.43.59 — 2026-06-21 (CDU Mini-BMS — interaction Phase 2: simulation controls)
+
+### Added (ULTRAPLAN cockpit interaction, phase 2 of 5)
+- **`cdu-mini-bms.html`** — a **Simulation** control group: **Pause / Resume** (freezes the data
+  ticks *and* the flow/pump animation via `body.sim-paused` + `animation-play-state`), **Step**
+  (advance exactly one tick while paused), **speed** 0.5× / 1× / 2× / 4× (variable timer rate +
+  CSS `animation-duration` scaling so faster ticks visibly flow faster), and a **LIVE / PAUSED**
+  state pill. Play/pause kept neutral (toggle, not radio); reduced-motion honoured. Real-mouse
+  deep-tested: pause held a value stable over 1.6 s, Step advanced one tick, speed set the rate,
+  both themes, 0 console errors. Still presentation-only — sim values unchanged.
+
 ## v1.43.58 — 2026-06-21 (CDU Mini-BMS — interaction Phase 1: P&ID ↔ tile linking)
 
 ### Added (ULTRAPLAN — CDU cockpit operator-interaction layer, phase 1 of 5)

@@ -127,6 +127,24 @@
         }
         @keyframes tilepulse{ 0%{ box-shadow:0 0 0 0 rgba(43,232,255,.55); } 100%{ box-shadow:0 0 0 12px rgba(43,232,255,0); } }
         @keyframes instpulse{ 0%{ stroke-width:1.1; } 40%{ stroke-width:3.4; } 100%{ stroke-width:2.6; } }
+        /* Phase 2 — simulation controls */
+        .sim-speed{ display:inline-flex; gap:2px; margin-left:4px; }
+        .seg .spd{ min-width:36px; padding:.4rem .5rem; }
+        .seg .spd[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#05222b; }
+        #simState{ font-size:.58rem; }
+        #simState.st-paused{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
+        #simStep[disabled]{ opacity:.4; cursor:not-allowed; }
+        /* play/pause is a toggle (not a radio) — keep it neutral; the LIVE/PAUSED pill shows state */
+        .seg #simPlay[aria-pressed="true"], .seg #simPlay[aria-pressed="false"]{ background:var(--bm-inset); border-color:var(--bm-border); color:var(--bm-text); }
+        .seg #simPlay:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
+        /* paused → freeze the data-driven motion (flow + pump + sparkline-feed visuals) */
+        body.sim-paused .flow.on, body.sim-paused .flow.slow,
+        body.sim-paused .pump-rot.on, body.sim-paused .pump-rot.slow,
+        body.sim-paused .tc-svg .fl{ animation-play-state:paused !important; }
+        /* speed → scale the flow + pump animation so faster ticks look faster */
+        body[data-sim-speed="0.5"] .flow.on{ animation-duration:2.2s; } body[data-sim-speed="0.5"] .flow.slow{ animation-duration:5.2s; } body[data-sim-speed="0.5"] .pump-rot.on{ animation-duration:2.8s; }
+        body[data-sim-speed="2"] .flow.on{ animation-duration:.55s; } body[data-sim-speed="2"] .flow.slow{ animation-duration:1.3s; } body[data-sim-speed="2"] .pump-rot.on{ animation-duration:.7s; }
+        body[data-sim-speed="4"] .flow.on{ animation-duration:.28s; } body[data-sim-speed="4"] .flow.slow{ animation-duration:.65s; } body[data-sim-speed="4"] .pump-rot.on{ animation-duration:.35s; }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
@@ -233,6 +251,20 @@
                     <button data-scen="clog" aria-pressed="false">Filter clog</button>
                     <button data-scen="hotfws" aria-pressed="false">Hot facility water</button>
                     <button data-scen="lowflow" aria-pressed="false">Low flow</button>
+                </div>
+            </div>
+            <div class="ctl-group">
+                <span class="ctl-label">Simulation</span>
+                <div class="seg" role="group" aria-label="Simulation controls">
+                    <button id="simPlay" type="button" aria-pressed="true" title="Pause / resume the simulation">⏸ Pause</button>
+                    <button id="simStep" type="button" title="Advance one tick (when paused)" disabled>⏭ Step</button>
+                    <span class="sim-speed" role="group" aria-label="Speed">
+                        <button class="spd" data-spd="0.5" aria-pressed="false">0.5×</button>
+                        <button class="spd" data-spd="1" aria-pressed="true">1×</button>
+                        <button class="spd" data-spd="2" aria-pressed="false">2×</button>
+                        <button class="spd" data-spd="4" aria-pressed="false">4×</button>
+                    </span>
+                    <span class="statepill st-ok" id="simState" style="align-self:center;">LIVE</span>
                 </div>
             </div>
         </div>
@@ -599,7 +631,27 @@
         tilesBox.addEventListener('mouseout',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g && !document.querySelector('.tile.linkhl[data-link="'+t.getAttribute('data-link')+'"]')) g.classList.remove('linked'); } });
         document.addEventListener('keydown',function(e){ if(e.key==='Escape') clearLink(); });
 
-        setInterval(compute, 1000);
+        /* ---------- Phase 2: simulation controls (pause/play · speed · step) ---------- */
+        var simSpeed=1, simPaused=false, simTimer=null;
+        var simPlay=document.getElementById('simPlay'), simStepBtn=document.getElementById('simStep'),
+            simState=document.getElementById('simState');
+        function simStop(){ if(simTimer){ clearInterval(simTimer); simTimer=null; } }
+        function simStart(){ simStop(); if(!simPaused) simTimer=setInterval(compute, Math.round(1000/simSpeed)); }
+        function simUI(){
+            simPlay.textContent = simPaused ? '▶ Resume' : '⏸ Pause';
+            simPlay.setAttribute('aria-pressed', simPaused ? 'false' : 'true');
+            simStepBtn.disabled = !simPaused;
+            simState.textContent = simPaused ? 'PAUSED' : 'LIVE';
+            simState.className = 'statepill ' + (simPaused ? 'st-paused' : 'st-ok');
+        }
+        function setPaused(p){ simPaused=p; document.body.classList.toggle('sim-paused', p); if(p) simStop(); else simStart(); simUI(); }
+        function setSpeed(s){ simSpeed=s; document.body.setAttribute('data-sim-speed', String(s)); if(!simPaused) simStart();
+            var bs=document.querySelectorAll('.spd'); for(var i=0;i<bs.length;i++){ bs[i].setAttribute('aria-pressed', bs[i].getAttribute('data-spd')===String(s)?'true':'false'); } }
+        simPlay.addEventListener('click', function(){ setPaused(!simPaused); });
+        simStepBtn.addEventListener('click', function(){ if(simPaused) compute(); });
+        document.querySelector('.sim-speed').addEventListener('click', function(e){ var b=e.target.closest('.spd'); if(b) setSpeed(parseFloat(b.getAttribute('data-spd'))); });
+        document.body.setAttribute('data-sim-speed','1');
+        simStart(); simUI();
     })();
     </script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>

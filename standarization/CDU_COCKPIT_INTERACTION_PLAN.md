@@ -70,7 +70,7 @@
   intercepted clicks intermittently (dash-position dependent) → set `#pidBox .pipe-* {pointer-events:none}`.
   Deep-tested with REAL mouse clicks (synthetic banned): all 7 instruments resolve via elementFromPoint,
   both directions + both themes + Esc verified, tap-targets checked, 0 console errors.
-- [ ] Phase 2 — pending
+- [x] **Phase 2 — DONE (v1.43.59).** Sim controls: Pause/Resume (freezes data + flow/pump animation via body.sim-paused + animation-play-state), Step (one tick when paused), speed 0.5×/1×/2×/4× (variable timer rate + CSS animation-duration scaling), LIVE/PAUSED pill. Real-mouse deep-tested: pause froze value over 1.6s, step advanced exactly one tick, speed set data-sim-speed=4, both themes, 0 errors.
 - [ ] Phase 3 — pending
 - [ ] Phase 4 — pending
 - [ ] Phase 5 — pending
