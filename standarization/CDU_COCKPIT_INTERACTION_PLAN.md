@@ -71,6 +71,6 @@
   Deep-tested with REAL mouse clicks (synthetic banned): all 7 instruments resolve via elementFromPoint,
   both directions + both themes + Esc verified, tap-targets checked, 0 console errors.
 - [x] **Phase 2 — DONE (v1.43.59).** Sim controls: Pause/Resume (freezes data + flow/pump animation via body.sim-paused + animation-play-state), Step (one tick when paused), speed 0.5×/1×/2×/4× (variable timer rate + CSS animation-duration scaling), LIVE/PAUSED pill. Real-mouse deep-tested: pause froze value over 1.6s, step advanced exactly one tick, speed set data-sim-speed=4, both themes, 0 errors.
-- [ ] Phase 3 — pending
+- [x] **Phase 3 — DONE (v1.43.60).** Trend history drawer: click a tile → slide-in drawer with the full 300-sample sparkline (SPARK_HIST cap 30→300; tile shows last 30), current value, min/avg/max, sample count, the band + a checklist reference, and a §01 deep-link. Status tiles (pump/filter/leak/chem) show info without a chart. Live-updates while open; Esc + ✕ + backdrop close. **Bug fixed during deep-test:** `.trend-drawer{display:flex}` overrode the `[hidden]` attribute → drawer always rendered over the tiles, intercepting clicks; added `[hidden]{display:none!important}`. Real-mouse deep-tested, both themes, 0 errors.
 - [ ] Phase 4 — pending
 - [ ] Phase 5 — pending

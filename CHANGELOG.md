@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.43.60 — 2026-06-21 (CDU Mini-BMS — interaction Phase 3: trend history drawer)
+
+### Added (ULTRAPLAN cockpit interaction, phase 3 of 5)
+- **`cdu-mini-bms.html`** — click a parameter tile to open a **trend history drawer**: a slide-in
+  panel with the full **300-sample** sparkline (history cap raised 30→300; the tile keeps showing
+  the last 30), current value, **min / avg / max**, sample count, the parameter band and a sourced
+  reference, plus a deep-link to the checklist §01. Status tiles (pumps / filter / leak / coolant)
+  show their info without a chart. The drawer **live-updates** while open; closes on ✕ / Esc /
+  backdrop; reduced-motion honoured.
+- **Bug fixed via deep-testing:** the `.trend-drawer{display:flex}` rule overrode the `[hidden]`
+  attribute, so the drawer was always rendered on top of the tiles and silently swallowed their
+  clicks — added `.trend-drawer[hidden]{display:none!important}`. Real-mouse deep-tested (numeric +
+  status tiles, Esc + backdrop), both themes, 0 console errors.
+
 ## v1.43.59 — 2026-06-21 (CDU Mini-BMS — interaction Phase 2: simulation controls)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 2 of 5)

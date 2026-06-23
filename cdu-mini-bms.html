@@ -145,6 +145,31 @@
         body[data-sim-speed="0.5"] .flow.on{ animation-duration:2.2s; } body[data-sim-speed="0.5"] .flow.slow{ animation-duration:5.2s; } body[data-sim-speed="0.5"] .pump-rot.on{ animation-duration:2.8s; }
         body[data-sim-speed="2"] .flow.on{ animation-duration:.55s; } body[data-sim-speed="2"] .flow.slow{ animation-duration:1.3s; } body[data-sim-speed="2"] .pump-rot.on{ animation-duration:.7s; }
         body[data-sim-speed="4"] .flow.on{ animation-duration:.28s; } body[data-sim-speed="4"] .flow.slow{ animation-duration:.65s; } body[data-sim-speed="4"] .pump-rot.on{ animation-duration:.35s; }
+        /* Phase 3 — trend history drawer */
+        .trend-drawer[hidden], .trend-backdrop[hidden]{ display:none !important; }
+        .trend-backdrop{ position:fixed; inset:0; background:rgba(8,10,14,.5); z-index:90; }
+        .trend-drawer{ position:fixed; top:0; right:0; bottom:0; width:min(420px,92vw); z-index:91; background:var(--bm-panel);
+            border-left:1px solid var(--bm-border); box-shadow:-8px 0 32px rgba(0,0,0,.28); display:flex; flex-direction:column; }
+        @media (prefers-reduced-motion:no-preference){ .trend-drawer{ animation:tdslide .22s ease; } @keyframes tdslide{ from{ transform:translateX(20px); opacity:.4; } to{ transform:none; opacity:1; } } }
+        .td-hd{ display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.1rem; border-bottom:1px solid var(--bm-border); background:var(--bm-inset); }
+        .td-hd h3{ font-family:var(--bm-mono); font-size:.82rem; letter-spacing:.04em; margin:0; color:var(--bm-text); }
+        #tdClose{ background:none; border:1px solid var(--bm-border); color:var(--bm-muted); width:30px; height:30px; border-radius:6px; cursor:pointer; font-size:1rem; line-height:1; }
+        #tdClose:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
+        .td-bd{ padding:1.1rem; overflow-y:auto; }
+        .td-now{ display:flex; align-items:baseline; gap:.6rem; margin-bottom:.9rem; }
+        .td-nowlbl{ font-family:var(--bm-mono); font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:var(--bm-muted); }
+        .td-nowval{ font-family:var(--bm-mono); font-size:1.7rem; font-weight:700; color:var(--bm-cyan); font-variant-numeric:tabular-nums slashed-zero; }
+        .td-spark{ width:100%; height:90px; display:block; border:1px solid var(--bm-border); border-radius:6px; background:var(--bm-inset); }
+        .td-spark polyline{ fill:none; stroke:var(--bm-cyan); stroke-width:1.4; vector-effect:non-scaling-stroke; }
+        .td-spark .fillarea{ fill:var(--bm-cyan); opacity:.1; stroke:none; }
+        .td-stats{ display:flex; gap:1rem; flex-wrap:wrap; margin-top:.5rem; font-family:var(--bm-mono); font-size:.66rem; color:var(--bm-muted); }
+        .td-stats b{ color:var(--bm-text); }
+        .td-samples{ margin-left:auto; }
+        .td-band{ font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-text); margin:1rem 0 .4rem; padding:.5rem .7rem; border-left:3px solid var(--bm-cyan); background:var(--bm-inset); border-radius:0 6px 6px 0; }
+        .td-ref{ font-size:.82rem; color:var(--bm-muted); line-height:1.55; }
+        .td-cklink{ display:inline-block; margin-top:.9rem; font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-cyan); text-decoration:none; }
+        .td-cklink:hover{ text-decoration:underline; }
+        .tile{ cursor:pointer; }
 
         /* SVG schematic styling */
         .sch-eq{ fill:var(--bm-inset); stroke:var(--bm-cyan); stroke-width:1.4; }
@@ -299,6 +324,22 @@
             <b>Educational simulation — not a live feed.</b> Values are generated on-device from typical operating bands (see the <a href="cdu-checklist.html" style="color:var(--bm-cyan)">CDU Checklist §01–§03</a> for the sourced parameter ranges, ASHRAE TC 9.9 W-classes and OCP cold-plate guidance). Parameter targets: secondary supply ~17–45 °C · ΔT ~8–12 °C · flow ~1.0–1.5 LPM/kW · dP ~0.5–3.0 bar · system pressure ~2–6 bar · pumps N+1 · leaks 0. Confirm exact set-points and alarm limits against the specific CDU's manufacturer manual. Not procurement, safety, or engineering advice.
         </div>
     </div></main>
+
+    <!-- Phase 3 — trend history drawer -->
+    <div id="trendBackdrop" class="trend-backdrop" hidden></div>
+    <aside id="trendDrawer" class="trend-drawer" hidden role="dialog" aria-modal="true" aria-labelledby="tdTitle">
+        <div class="td-hd"><h3 id="tdTitle">Parameter</h3><button id="tdClose" type="button" aria-label="Close trend">✕</button></div>
+        <div class="td-bd">
+            <div class="td-now"><span class="td-nowlbl">Current</span><span class="td-nowval" id="tdVal">–</span></div>
+            <div id="tdChart">
+                <svg class="td-spark" viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true"><polygon class="fillarea" points=""></polygon><polyline points=""></polyline></svg>
+                <div class="td-stats"><span>min <b id="tdMin">–</b></span><span>avg <b id="tdAvg">–</b></span><span>max <b id="tdMax">–</b></span><span id="tdSamples" class="td-samples"></span></div>
+            </div>
+            <div class="td-band" id="tdBand"></div>
+            <div class="td-ref" id="tdRef"></div>
+            <a class="td-cklink" href="cdu-checklist.html#params">↗ Full parameter bands &amp; standards (checklist §01)</a>
+        </div>
+    </aside>
 
     <footer class="footer footer-enhanced">
         <div class="container"><div class="footer-grid">
@@ -531,13 +572,17 @@
         var SPARK_HIST={};
         function drawSpark(k,val){
             if(!SPARK_HIST[k]) SPARK_HIST[k]=[];
-            var a=SPARK_HIST[k]; a.push(val); if(a.length>30) a.shift();
-            var sv=document.getElementById('spark-'+k); if(!sv || a.length<2) return;
-            var mn=Math.min.apply(null,a), mx=Math.max.apply(null,a), rng=(mx-mn)||1, n=a.length;
-            var pts='', i;
-            for(i=0;i<n;i++){ var x=(i/(n-1))*60, y=14-((a[i]-mn)/rng)*12-1; pts+=x.toFixed(1)+','+y.toFixed(1)+' '; }
-            sv.querySelector('polyline').setAttribute('points',pts.trim());
-            sv.querySelector('polygon').setAttribute('points','0,15 '+pts.trim()+' 60,15');
+            var a=SPARK_HIST[k]; a.push(val); if(a.length>300) a.shift();
+            var sv=document.getElementById('spark-'+k); if(sv){
+                var d=a.slice(-30); /* tile sparkline shows the last 30 */
+                if(d.length>=2){
+                    var mn=Math.min.apply(null,d), mx=Math.max.apply(null,d), rng=(mx-mn)||1, n=d.length, pts='', i;
+                    for(i=0;i<n;i++){ var x=(i/(n-1))*60, y=14-((d[i]-mn)/rng)*12-1; pts+=x.toFixed(1)+','+y.toFixed(1)+' '; }
+                    sv.querySelector('polyline').setAttribute('points',pts.trim());
+                    sv.querySelector('polygon').setAttribute('points','0,15 '+pts.trim()+' 60,15');
+                }
+            }
+            if(window._tdOpenKey===k) renderTrend(k); /* live-update an open drawer */
         }
 
         function compute(){
@@ -626,10 +671,52 @@
         pidBox.addEventListener('keydown',function(e){ var g=e.target.closest('.pid-inst'); if(g && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); selectLink(g.getAttribute('data-link'),false); } });
         pidBox.addEventListener('mouseover',function(e){ var g=e.target.closest('.pid-inst'); if(g){ var t=document.getElementById('tile-'+g.getAttribute('data-link')); if(t) t.classList.add('hoverhl'); } });
         pidBox.addEventListener('mouseout',function(e){ var g=e.target.closest('.pid-inst'); if(g){ var t=document.getElementById('tile-'+g.getAttribute('data-link')); if(t) t.classList.remove('hoverhl'); } });
-        tilesBox.addEventListener('click',function(e){ var t=e.target.closest('.tile[data-link]'); if(t) selectLink(t.getAttribute('data-link'),true); });
+        tilesBox.addEventListener('click',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var k=t.getAttribute('data-link'); selectLink(k,true); openTrend(k); } });
         tilesBox.addEventListener('mouseover',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g) g.classList.add('linked'); } });
         tilesBox.addEventListener('mouseout',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g && !document.querySelector('.tile.linkhl[data-link="'+t.getAttribute('data-link')+'"]')) g.classList.remove('linked'); } });
-        document.addEventListener('keydown',function(e){ if(e.key==='Escape') clearLink(); });
+        document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(window._tdOpenKey){ closeTrend(); } else { clearLink(); } } });
+
+        /* ---------- Phase 3: trend history drawer ---------- */
+        var TREND_META={
+            flow:{ref:'OCP cold-plate design point ≈1.5 LPM/kW at a 10 °C rise; published band 1.25–2.0.'},
+            flowtot:{band:'flow × capacity', ref:'Total secondary flow delivered to the rack manifold.'},
+            supply:{ref:'ASHRAE TC 9.9 W-classes set the max supply temp. Hold ≥2–3 °C above room dew point.'},
+            'return':{band:'supply + ΔT', ref:'Return-side temperature = supply + ΔT across the cold plates.'},
+            dT:{ref:'Sized with flow to the rack heat load (Q = ṁ·c_p·ΔT).'},
+            dP:{ref:'Within the cold-plate min/max window; a rising trend signals filter clogging.'},
+            sysP:{ref:'Loop pressure below the component PN; held by expansion + make-up control.'},
+            atd:{band:'~3–5 °C', ref:'Heat-exchanger approach (L2L). A rising trend = HX fouling.'},
+            pump:{ref:'Duty + standby pumps with auto-changeover. Status only — no trend.', status:1},
+            filter:{ref:'Filter differential pressure; replace at the vendor dP threshold. Status only.', status:1},
+            leak:{ref:'Leak-detection rope/sensors at base, manifolds, QDs. Status only.', status:1},
+            chem:{ref:'Coolant chemistry (pH, conductivity, glycol %, inhibitor). Status only.', status:1}
+        };
+        function tileOf(k){ for(var i=0;i<TILES.length;i++) if(TILES[i].k===k) return TILES[i]; return null; }
+        function fmtStat(k,v){ var t=tileOf(k); var dec=(t&&t.dec>=0)?t.dec:1; return (typeof v==='number'?v.toFixed(dec):v); }
+        function renderTrend(k){
+            var meta=TREND_META[k]||{}, t=tileOf(k);
+            document.getElementById('tdTitle').textContent=(t?t.label:k)+(t&&t.unit?(' · '+t.unit):'');
+            var valEl=document.getElementById('val-'+k); document.getElementById('tdVal').innerHTML=valEl?valEl.innerHTML:'–';
+            document.getElementById('tdBand').textContent='Band: '+(meta.band||(t&&t.band)||'—');
+            document.getElementById('tdRef').textContent=meta.ref||'';
+            var chart=document.getElementById('tdChart'), a=SPARK_HIST[k];
+            if(meta.status || !a || a.length<2){ chart.style.display='none'; return; }
+            chart.style.display='';
+            var mn=Math.min.apply(null,a), mx=Math.max.apply(null,a), n=a.length, sum=0, i;
+            for(i=0;i<n;i++) sum+=a[i]; var avg=sum/n, rng=(mx-mn)||1, pts='';
+            for(i=0;i<n;i++){ var x=(i/(n-1))*300, y=88-((a[i]-mn)/rng)*84-2; pts+=x.toFixed(1)+','+y.toFixed(1)+' '; }
+            var sv=document.querySelector('#tdChart .td-spark');
+            sv.querySelector('polyline').setAttribute('points',pts.trim());
+            sv.querySelector('polygon').setAttribute('points','0,90 '+pts.trim()+' 300,90');
+            document.getElementById('tdMin').textContent=fmtStat(k,mn);
+            document.getElementById('tdAvg').textContent=fmtStat(k,avg);
+            document.getElementById('tdMax').textContent=fmtStat(k,mx);
+            document.getElementById('tdSamples').textContent=n+' samples';
+        }
+        function openTrend(k){ window._tdOpenKey=k; renderTrend(k); document.getElementById('trendBackdrop').hidden=false; document.getElementById('trendDrawer').hidden=false; document.getElementById('tdClose').focus(); }
+        function closeTrend(){ window._tdOpenKey=null; document.getElementById('trendDrawer').hidden=true; document.getElementById('trendBackdrop').hidden=true; }
+        document.getElementById('tdClose').addEventListener('click', closeTrend);
+        document.getElementById('trendBackdrop').addEventListener('click', closeTrend);
 
         /* ---------- Phase 2: simulation controls (pause/play · speed · step) ---------- */
         var simSpeed=1, simPaused=false, simTimer=null;
