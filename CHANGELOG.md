@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.43.65 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 3 of 4)
+
+### Added (article-26.html — PFAS Risk Calculator Pro extension)
+- **Panel 5 — Fluid-Loss & Environmental Cost** (new gated Pro panel) — 4 KPI cards derived from the
+  calculator's existing maintenance-vapor mass model (single source of truth, no new inputs):
+  **Annual fluid lost** (L/yr + kg/yr + make-up % of charge), **Replacement cost** ($/yr at the
+  per-fluid unit price), **GWP-weighted** (t CO₂e/yr), **TFA formed** (kg/yr for HFO fluids).
+- Per-fluid property table in JS (`runFluidCost`): density, $/L, 100-yr GWP, molar TFA yield for
+  `two-phase-pfas` (Novec-class, GWP ~320, TFA n/a — yields short-chain PFCAs) and `two-phase-hfo`
+  (GWP ~10, TFA yield 0.695). PFAS-free configs zero out cleanly.
+- `.pfas-pro-kpi-grid.cols-4` 4-up variant (collapses to 2×2 under 680px); `pfasGate5` wired into the
+  existing lock/unlock + Pro-mode flow. Free-tier risk output untouched.
+
+### Verified
+- Real-mouse Pro login (demo creds) unlocks Panel 5; KPIs compute across PFAS / HFO / PFAS-free paths;
+  0 console errors; values internally consistent with the on-page vapor estimate (256 kg → 183 L →
+  $12,800/yr → 82 t CO₂e at default 10×800 L).
+
 ## v1.43.64 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 2 of 4)
 
 ### Added (article-26.html — quantification core)

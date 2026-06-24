@@ -588,6 +588,8 @@
         [data-theme="dark"] .pfas-pro-panel-title { color:#f1f5f9; }
         .pfas-pro-panel-inner { padding:1.25rem; }
         .pfas-pro-kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:1rem; }
+        .pfas-pro-kpi-grid.cols-4 { grid-template-columns:repeat(4,1fr); }
+        @media (max-width:680px) { .pfas-pro-kpi-grid.cols-4 { grid-template-columns:repeat(2,1fr); } }
         .pfas-chart-container { height:240px; position:relative; margin-bottom:0.5rem; }
 
         /* Gate overlay */
@@ -1719,6 +1721,24 @@
                 </div>
                 <div class="pfas-gate" id="pfasGate4"><i class="fas fa-lock"></i><p>Strategic roadmap requires Pro access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Unlock Pro Analysis</button></div>
             </div>
+
+            <!-- Panel 5: Fluid-Loss & Environmental Cost -->
+            <div class="pfas-pro-panel">
+                <div class="pfas-pro-panel-header">
+                    <span class="pfas-pro-panel-title"><i class="fas fa-coins" style="color:#b45309;margin-right:0.4rem;"></i>Panel 5 — Fluid-Loss &amp; Environmental Cost</span>
+                    <span style="font-size:0.72rem;color:#9ca3af;">Derived from the vapor-loss model · see article §Worked Models</span>
+                </div>
+                <div class="pfas-pro-panel-inner">
+                    <div class="pfas-pro-kpi-grid cols-4">
+                        <div class="pfas-kpi-card"><div class="pfas-kpi-label">Annual Fluid Lost</div><div class="pfas-kpi-value" id="pfasFluidLostL" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidLostSub">Litres / year to atmosphere</div></div>
+                        <div class="pfas-kpi-card"><div class="pfas-kpi-label">Replacement Cost</div><div class="pfas-kpi-value" id="pfasFluidCost" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidCostSub">Fluid re-purchase / year</div></div>
+                        <div class="pfas-kpi-card"><div class="pfas-kpi-label">GWP-Weighted</div><div class="pfas-kpi-value" id="pfasFluidCO2e" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidCO2eSub">t CO₂e / year (Scope-1 equiv.)</div></div>
+                        <div class="pfas-kpi-card"><div class="pfas-kpi-label">TFA Formed</div><div class="pfas-kpi-value" id="pfasFluidTFA" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidTFASub">kg / year (HFO fluids)</div></div>
+                    </div>
+                    <p style="font-size:0.72rem;color:#9ca3af;margin:0.75rem 0 0;line-height:1.6;">Illustrative model — fluid density, unit price (<span style="white-space:nowrap;">$50–90/L</span>), GWP and TFA molar yield are representative published/vendor values; results scale linearly with the maintenance-vapor estimate above. Make-up rate shown as % of installed charge.</p>
+                </div>
+                <div class="pfas-gate" id="pfasGate5"><i class="fas fa-lock"></i><p>Fluid-loss cost model requires Pro access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Unlock Pro Analysis</button></div>
+            </div>
         </div>
 
         <!-- Benchmark tags -->
@@ -2323,14 +2343,14 @@ function copyLink() {
     };
 
     function unlockPanels() {
-        ['pfasGate1','pfasGate2','pfasGate3','pfasGate4'].forEach(function(id) {
+        ['pfasGate1','pfasGate2','pfasGate3','pfasGate4','pfasGate5'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
     }
 
     function lockPanels() {
-        ['pfasGate1','pfasGate2','pfasGate3','pfasGate4'].forEach(function(id) {
+        ['pfasGate1','pfasGate2','pfasGate3','pfasGate4','pfasGate5'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) el.classList.remove('hidden');
         });
@@ -2563,6 +2583,46 @@ function copyLink() {
         runRegulatoryTimeline(inp, r);
         runSensitivity(inp, r);
         buildRoadmap(inp, r);
+        runFluidCost(inp, r);
+    }
+
+    // Fluid-loss & environmental cost (W6) — derived from the same annualVaporKg mass model.
+    // Per-fluid props: density (kg/L), price ($/L), 100-yr GWP, molar TFA yield (MW ratio × fraction).
+    function runFluidCost(inp, r) {
+        var props = {
+            'two-phase-pfas': { density: 1.40, price: 70, gwp: 320,  tfaYield: 0 },     // Novec/PFPE-class; TFA not the primary product
+            'two-phase-hfo':  { density: 1.37, price: 60, gwp: 10,   tfaYield: 0.695 }  // HFO → TFA, ~1 mol/mol at 100% (MW 114/164)
+        }[inp.coolingType];
+
+        var kgLost = r.annualVaporKg || 0;
+        if (!props || kgLost <= 0) {
+            setText('pfasFluidLostL', 'None');  setText('pfasFluidLostSub', 'PFAS-free cooling — no fluorinated fluid lost');
+            setText('pfasFluidCost', '$0');     setText('pfasFluidCostSub', 'No make-up fluid required');
+            setText('pfasFluidCO2e', '0');      setText('pfasFluidCO2eSub', 't CO₂e / year');
+            setText('pfasFluidTFA', 'n/a');     setText('pfasFluidTFASub', 'No HFO degradation pathway');
+            return;
+        }
+
+        var litres = kgLost / props.density;
+        var charge = (inp.tankCount || 1) * (inp.fluidVol || 800);
+        var makeupPct = charge > 0 ? (litres / charge) * 100 : 0;
+        var cost = litres * props.price;
+        var co2e = kgLost * props.gwp / 1000; // tonnes
+        var tfaKg = kgLost * props.tfaYield;
+
+        setText('pfasFluidLostL', litres.toFixed(0) + ' L');
+        setText('pfasFluidLostSub', kgLost.toFixed(0) + ' kg/yr · make-up ≈ ' + makeupPct.toFixed(1) + '% of charge');
+        setText('pfasFluidCost', '$' + Math.round(cost).toLocaleString());
+        setText('pfasFluidCostSub', 'at ~$' + props.price + '/L re-purchase');
+        setText('pfasFluidCO2e', co2e.toFixed(co2e < 10 ? 1 : 0));
+        setText('pfasFluidCO2eSub', 't CO₂e/yr · GWP ~' + props.gwp + (props.gwp >= 300 ? ' (PFPE-class far higher)' : ''));
+        if (props.tfaYield > 0) {
+            setText('pfasFluidTFA', tfaKg.toFixed(0) + ' kg');
+            setText('pfasFluidTFASub', 'kg TFA/yr · molar yield undisclosed by vendor');
+        } else {
+            setText('pfasFluidTFA', 'n/a');
+            setText('pfasFluidTFASub', 'PFAS fluid — yields short-chain PFCAs, not TFA');
+        }
     }
 
     // Monte Carlo
