@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.43.64 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 2 of 4)
+
+### Added (article-26.html — quantification core)
+- **Fluid-loss KPI framework** (`#section-kpi`) — 6-KPI table (make-up rate, loss rate vs §608 trigger,
+  GWP-weighted t CO₂e/yr, TFA formation kg/yr, fluid-loss $/yr, reporting completeness) each with
+  formula · reference threshold · source class, closing on the "~0% reporting completeness" metric.
+- **Worked calculation models** (`#section-models`) — 6 monospace ledgers with every input tagged
+  [published]/[vendor]/[illustrative] and results as bounded ranges: reference inputs · Model A
+  (single 800 L tank annual loss & cost, $1,120→$9,590/yr) · Model B (per-MW hall, $9k→$77k/yr) ·
+  Model C (GWP-weighted emissions, 61 t→1,920 t CO₂e/yr depending on fluid) · Model D (HFO→TFA
+  10-yr loading, 651–1,303 kg TFA/tank) · plus a "what the numbers do and do not say" caveat box.
+
+### Fixed
+- **`.pfas-chem-block` now renders multi-line** — added `white-space: pre-wrap` + `overflow-x:auto`
+  (the class had a monospace font but no whitespace preservation, so the original chemistry block was
+  silently collapsing to a run-on line). Mobile font-size reduced to keep ledgers on-screen; verified
+  no horizontal page overflow at 390px.
+
+### Changed
+- article-26.html wordCount 4800 → 6200.
+
 ## v1.43.63 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 1 of 4)
 
 ### Added (article-26.html — research-grounded fluid-loss metrics)

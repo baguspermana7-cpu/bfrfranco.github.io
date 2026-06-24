@@ -115,7 +115,7 @@
         },
         "datePublished": "2026-04-11",
         "dateModified": "2026-06-24",
-        "wordCount": "4800",
+        "wordCount": "6200",
         "articleSection": "Global Analysis",
         "keywords": ["PFAS data center", "per- and polyfluoroalkyl substances", "two-phase immersion cooling", "Novec 7000", "forever chemicals", "PFAS-free alternatives", "HFO refrigerants", "maintenance vapor release", "data center environmental contamination"],
         "mainEntityOfPage": {"@type": "WebPage", "@id": "https://resistancezero.com/article-26.html"}
@@ -438,7 +438,10 @@
             font-size: 0.82rem;
             color: #e2e8f0;
             line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-x: auto;
         }
+        @media (max-width: 768px) { .pfas-chem-block { font-size: 0.72rem; padding: 1rem 1.1rem; } }
         .pfas-chem-block .chem-label {
             font-size: 0.72rem;
             color: #fcd34d;
@@ -1063,6 +1066,150 @@
     <div class="pfas-warning-box">
         <h4><i class="fas fa-magnifying-glass"></i> The gaps are the story</h4>
         <p>Read the &ldquo;Typical magnitude&rdquo; column again. The two largest, most routine zones &mdash; <strong>seal permeation</strong> and the <strong>per-event maintenance loss from sensor swaps and top-ups</strong> &mdash; have <em>no published value</em>. The literature quantifies water-vapour transmission through packaging films, but not fluorocarbon-fluid permeation through data-center seals; and the patent corpus is full of inventions to <em>reduce</em> hot-swap loss, which only confirms that a baseline loss exists and has never been measured. When the most frequent loss pathways are also the least quantified, &ldquo;invisible&rdquo; is not a metaphor &mdash; it is an accurate description of the data.</p>
+    </div>
+
+    <!-- Section 3c: KPI framework (W3) -->
+    <h2 id="section-kpi">Making the Invisible Visible &mdash; A Fluid-Loss KPI Framework</h2>
+
+    <p>You cannot manage what you do not measure, and you cannot measure what you have not defined. The loss-zone taxonomy above names <em>where</em> the fluid goes; this section defines the small set of metrics that turn those pathways into numbers an operator, an auditor, or a regulator can actually track. None of these requires new instrumentation beyond what a competently run facility already has &mdash; a flow meter on the make-up line, the purchasing ledger, and the fluid's own datasheet. Each KPI below is given with its formula, a reference threshold, and the source class of that threshold.</p>
+
+    <div class="pfas-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">KPI</th>
+                    <th scope="col">Definition / formula</th>
+                    <th scope="col">Reference threshold</th>
+                    <th scope="col">Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Make-up rate</strong> (headline)</td>
+                    <td>Annual top-up volume &divide; installed charge, as %/yr</td>
+                    <td>1&ndash;2%/yr vendor &ldquo;sealed&rdquo; claim; <span class="pfas-stat">17.1%/yr</span> measured in the field</td>
+                    <td>vendor + published [16]</td>
+                </tr>
+                <tr>
+                    <td><strong>Loss rate vs. regulatory trigger</strong></td>
+                    <td>Make-up rate compared against the sealed-leak benchmark for a refrigerant loop of equivalent charge</td>
+                    <td>EPA &sect;608: 10% (comfort) / 20% (commercial) / 30% (industrial)</td>
+                    <td>regulator [22]</td>
+                </tr>
+                <tr>
+                    <td><strong>GWP-weighted emissions</strong></td>
+                    <td>Loss mass (L &times; density) &times; fluid GWP &divide; 1000 = t&nbsp;CO&#8322;e/yr</td>
+                    <td>No DC-specific cap; F-Gas reporting applies to high-GWP charges</td>
+                    <td>vendor GWP + regulator [20]</td>
+                </tr>
+                <tr>
+                    <td><strong>TFA formation</strong> (HFO fluids)</td>
+                    <td>Annual HFO loss mass &times; molar TFA yield (MW<sub>TFA</sub>/MW<sub>HFO</sub> &times; yield) = kg TFA/yr</td>
+                    <td>No DC threshold; EU DWD PFAS-Total 0.5&nbsp;&micro;g/L in receiving water</td>
+                    <td>published yield [17] + regulator [19]</td>
+                </tr>
+                <tr>
+                    <td><strong>Fluid-loss cost</strong></td>
+                    <td>Annual loss volume &times; fluid unit price ($/L)</td>
+                    <td>Benchmark vs. the 5&ndash;12% of immersion OPEX savings it erodes</td>
+                    <td>vendor price ($50&ndash;90/L)</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td><strong>Reporting completeness</strong></td>
+                    <td>Metered loss &divide; total estimated loss, as %</td>
+                    <td class="pfas-cell-alert">Effectively ~0% today &mdash; the metric that exposes all the others</td>
+                    <td>derived</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The last row is the uncomfortable one. Every other KPI can be estimated from data a facility already holds; <em>reporting completeness</em> measures how much of that loss is actually captured in any reportable form &mdash; and today the honest answer is close to zero. The remaining sections put real numbers through these formulas.</p>
+
+    <!-- Section 3d: worked models (W4) -->
+    <h2 id="section-models">Worked Models &mdash; Putting Numbers to the Loss</h2>
+
+    <p>The calculations below are illustrative but rigorous: every input is tagged <strong>[published]</strong> (peer-reviewed or field-measured), <strong>[vendor]</strong> (manufacturer datasheet), or <strong>[illustrative]</strong> (a representative mid-range chosen for the worked example). Results are given as <em>ranges</em> bounded by the well-run case and the one measured field case &mdash; not as point predictions. Substitute your own charge, price and make-up rate and the arithmetic carries through unchanged.</p>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">Reference inputs (tagged)</span>
+        Single immersion tank charge .......  <span class="chem-highlight">800 L</span>        [illustrative — mid-range tank]
+        Fluid unit price ...................  <span class="chem-highlight">$70 / L</span>      [vendor — midpoint of $50–90/L]
+        Fluid density (HFE / Novec-class) ..  1.40 kg / L     [vendor datasheet]
+        Make-up rate — well-run ............  2 %/yr          [vendor — "sealed" claim, low end]
+        Make-up rate — measured field ......  <span class="chem-highlight">17.1 %/yr</span>     [published — DoD/LBNL [16]]
+        QD spillage ........................  3 mL / connect  [published — dry-break [16]]
+        100-yr GWP (Novec-class HFE) .......  ~320            [vendor — representative]
+        100-yr GWP (Galden-class PFPE) .....  ~10,000         [vendor / literature]
+    </div>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">Model A — annual loss &amp; cost, single 800 L tank</span>
+        Evaporative / maintenance loss
+          well-run :  0.020 × 800 L  =   <span class="chem-highlight">16 L/yr</span>
+          field    :  0.171 × 800 L  =  <span class="chem-highlight">137 L/yr</span>
+
+        Quick-disconnect spillage (20 connects × 4 services/yr)
+          20 × 3 mL × 4  =  240 mL  =  0.24 L/yr     ← negligible beside evaporation
+
+        Fluid replacement cost @ $70/L
+          well-run :   16 L × $70  =   <span class="chem-highlight">$1,120 / yr</span>
+          field    :  137 L × $70  =   <span class="chem-highlight">$9,590 / yr</span>
+
+        Read-out: even the "good" tank quietly spends four figures a year replacing
+        fluid that went to atmosphere; the measured-field tank approaches $10k/yr — per tank.
+    </div>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">Model B — per-MW reference hall (8 × 800 L tanks ≈ 6,400 L)</span>
+        Charge ........................  8 × 800 L  =  6,400 L
+        Annual loss
+          well-run :  0.020 × 6,400  =    128 L/yr   →   $8,960 / yr
+          field    :  0.171 × 6,400  =  1,094 L/yr   →  <span class="chem-highlight">$76,600 / yr</span>
+
+        Per-MW fluid-replacement OPEX therefore runs ~$9k–$77k/yr.
+        Independent analyses put fluid loss at 5–12% of the OPEX savings that
+        justified the immersion build in the first place — a real erosion of the
+        business case, hidden inside the consumables line.
+    </div>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">Model C — GWP-weighted emissions, single tank at field loss (137 L)</span>
+        Loss mass  =  137 L × 1.40 kg/L  =  <span class="chem-highlight">192 kg/yr</span>
+
+        CO₂e if HFE / Novec-class (GWP ~320)
+          192 kg × 320 / 1000  =   <span class="chem-highlight">61 t CO₂e / yr</span>     ≈ 13 average US cars
+
+        CO₂e if Galden-class PFPE (GWP ~10,000)
+          192 kg × 10,000 / 1000  =  <span class="chem-highlight">1,920 t CO₂e / yr</span>  ≈ 400 cars
+
+        The fluid choice swings the climate footprint of the *same leak* by ~30×.
+        None of this appears in a facility's Scope-1 inventory today.
+    </div>
+
+    <div class="pfas-chem-block">
+        <span class="chem-label">Model D — HFO → TFA 10-year loading, single Opteon-class tank</span>
+        HFO density 1.37 kg/L ; MW(HFO-1336mzz-Z) 164 ; MW(TFA) 114 → ratio 0.695
+        TFA yield = the undisclosed variable → modelled at 50% and 100% of a single-TFA path
+
+        10-yr cumulative HFO loss (field 17.1%/yr × 800 L × 1.37 kg/L × 10)
+          ≈ 1,874 kg HFO over a decade
+
+        TFA formed over 10 yr
+          yield 50%  :  1,874 × 0.695 × 0.50  =   <span class="chem-highlight">651 kg TFA</span>
+          yield 100% :  1,874 × 0.695 × 1.00  =  <span class="chem-highlight">1,303 kg TFA</span>
+          (the molecule carries two CF₃ groups — a two-TFA path could double this)
+
+        Hundreds of kilograms to over a tonne of a persistent, water-mobile acid
+        from ONE tank over a typical service life — entering watersheds where the
+        modelled rainwater background is already ~0.89 µg/L [18]. This is the number
+        the "PFAS-free" replacement story leaves out, and the yield that would pin
+        it down is the figure vendors do not publish.
+    </div>
+
+    <div class="pfas-warning-box">
+        <h4><i class="fas fa-circle-exclamation"></i> What the numbers do and do not say</h4>
+        <p>These models are bounded by two real anchors &mdash; a vendor &ldquo;sealed&rdquo; claim and a single published field measurement &mdash; not by a population of audited sites, because that population does not exist. Treat the field-loss column as a credible upper-middle case, not a worst case, and the well-run column as an aspiration few operators have independently verified. The honest conclusion is not &ldquo;every tank loses 137&nbsp;litres a year&rdquo;; it is that <strong>the plausible range spans an order of magnitude, the climate and TFA consequences are large at the top of that range, and nobody is currently measuring where on the range any given facility actually sits.</strong></p>
     </div>
 
     <!-- Section 4 -->
