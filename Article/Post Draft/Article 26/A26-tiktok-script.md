@@ -60,9 +60,9 @@ SECTION 2: The Maintenance Sequence — What Actually Happens (2:00 — 4:30)
 
 "And maintenance doesn't happen once. In a hyperscale facility, you're doing this on a regular cycle. Weekly inspections. Monthly top-offs. Component swaps every time a GPU fails, which is often."
 
-[TEXT OVERLAY: "Maintenance releases = 20-30x more PFAS than sealed leaks"]
+[TEXT OVERLAY: "Field study: 17% of the fluid gone to vapor in ONE year"]
 
-"Research and engineering assessments put maintenance vapor releases at 20 to 30 times higher than what escapes from intact sealed systems over the same period. The thing everyone is worried about — the leak — is not the dominant pathway. Opening the tank is."
+"There's one real field measurement of this — a Department of Defense study run with Berkeley Lab. They tracked deployed two-phase systems and found that 17 percent of the entire fluid charge evaporated away in a single year. Most of it during open service. That's several times more than a sealed refrigerant loop is even allowed to leak — and the worst-run sites are estimated even higher. The thing everyone worries about — the leak — is not the dominant pathway. Opening the tank is."
 
 [Direct to camera]
 
@@ -90,15 +90,19 @@ SECTION 3: The "PFAS-Free" Scam — Opteon and TFA (4:30 — 6:30)
 
 "In the environment, Opteon 2P50 breaks down into trifluoroacetic acid. TFA. And TFA is persistent in water. It doesn't break down. It accumulates in aquatic systems. Studies have linked it to effects on plant growth and aquatic organisms."
 
-[TEXT OVERLAY: "TFA = persistent + unregulated + building up in water systems"]
+[TEXT OVERLAY: "TFA = persistent + building up in water systems"]
 
-"And here's the part that matters for regulation: TFA is classified differently from PFAS. So it doesn't fall under most existing PFAS frameworks. It's not counted in the contamination measurements. It doesn't trigger reporting requirements."
+"And for years the part that mattered for regulation was that TFA was classified differently from PFAS — so it didn't fall under most existing frameworks, wasn't counted in contamination measurements, didn't trigger reporting."
 
-"We renamed the forever chemical. We moved it into a different regulatory bucket. And the industry called it solved."
+[TEXT OVERLAY: "2026: EU moves to classify TFA a reproductive toxicant"]
+
+"But that's changing fast. In 2026, the European Chemicals Agency moved to classify TFA as a reproductive toxicant. The EU's drinking-water PFAS limits came into force. Several countries set their own TFA thresholds. The bucket the industry hid it in is being taken apart."
+
+"We renamed the forever chemical and moved it into a different regulatory bucket. And the industry called it solved — right as the regulators started catching up."
 
 [Beat]
 
-"The EPA is still reviewing whether to fast-track HFO-containing fluids for continued use. Meanwhile, the cooling fluid market has already moved, the stockpiles are building, and the environmental accumulation of TFA is already underway."
+"Meanwhile the cooling fluid market has already moved, the stockpiles are building, and the environmental accumulation of TFA is already underway."
 
 ---
 

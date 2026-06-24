@@ -1,9 +1,9 @@
-Less than 5% of data centers actually need two-phase PFAS cooling.
+Under 5% of data centers need two-phase PFAS cooling — you need >100 kW/rack.
 
-You need >100 kW/rack to justify it. Most never get there.
+Most never get there. They adopted it for signaling.
 
-The rest adopted it for competitive signaling.
+At measured loss rates one tank bleeds ~$9,500/yr of fluid to vapor.
 
-The environmental liability was real. It never appeared on any balance sheet.
+None of it ever appeared on a balance sheet.
 
 resistancezero.com/article-26.html
