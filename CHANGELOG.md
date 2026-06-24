@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.43.63 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 1 of 4)
+
+### Added (article-26.html — research-grounded fluid-loss metrics)
+- **Loss-zone taxonomy** (`#section-loss-zones`) — new 8-row table mapping every fluid-escape pathway
+  (maintenance vapour, QD spillage, operating evaporative loss, drain/transfer residual, seal/permeation,
+  fill/flush, end-of-life) against sourced magnitude · metered? · reportable?, plus a "gaps are the
+  story" callout: the most routine loss zones (seal permeation, sensor-swap loss) carry **no published
+  value** — reinforcing the "invisible/unmetered" thesis.
+- **"Metrics to Watch"** (`#section-metrics`) — leading-indicator watch-list table (make-up rate,
+  top-up cadence, level/chemistry drift, worker-air PFAS, exhaust concentration, boundary groundwater)
+  with healthy band · action threshold · interpretation, and a "cheapest instrument you already own"
+  box putting **make-up rate** forward as the single dashboard KPI (purchasing data ÷ installed charge).
+- **"Regulatory Horizon"** (`#section-horizon`) — what changed *after* the April-2026 publication: the
+  **ECHA RAC proposal to classify TFA as Reproductive Toxicant 1B (2025-2026)** and the **EU Drinking
+  Water Directive PFAS-Total 0.5 µg/L limit live since 12 Jan 2026**, plus a 6-row instrument table
+  (EPA MCL, EPA §608, EU F-Gas 2024/573, EU DWD, ECHA TFA, member-state TFA limits).
+- **8 new references [16]-[23]** — DoD/LBNL field-loss study, UBA TFA degradation, Kazil 2014 rainwater,
+  EU DWD 2020/2184, EU F-Gas 2024/573, ECHA RAC TFA opinion, EPA §608, Solomon TFA review.
+- **Glossary** — new `Make-up Rate` and `TFA (Trifluoroacetic Acid)` terms; updated `Maintenance Vapor
+  Release` term to the reframed estimate.
+
+### Changed
+- **Reframed the unsourced "20-30×" headline** as a transparent modeled estimate anchored on the one
+  published field measurement (DoD/LBNL 17.1%/yr evaporative loss) vs the EPA §608 10% sealed-leak
+  baseline — labelled a modeled upper bound, not a measured constant.
+- article-26.html `dateModified` → 2026-06-24, wordCount 3000 → 4800; sitemap lastmod + search-index
+  keywords/description/readingTime refreshed.
+
 ## v1.43.62 — 2026-06-24 (CDU Mini-BMS — interaction Phase 5: zoom/pan — ULTRAPLAN complete)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 5 of 5 — final)

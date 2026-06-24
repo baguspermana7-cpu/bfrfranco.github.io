@@ -114,8 +114,8 @@
             "logo": {"@type": "ImageObject", "url": "https://resistancezero.com/assets/Favicon.png"}
         },
         "datePublished": "2026-04-11",
-        "dateModified": "2026-04-11",
-        "wordCount": "3000",
+        "dateModified": "2026-06-24",
+        "wordCount": "4800",
         "articleSection": "Global Analysis",
         "keywords": ["PFAS data center", "per- and polyfluoroalkyl substances", "two-phase immersion cooling", "Novec 7000", "forever chemicals", "PFAS-free alternatives", "HFO refrigerants", "maintenance vapor release", "data center environmental contamination"],
         "mainEntityOfPage": {"@type": "WebPage", "@id": "https://resistancezero.com/article-26.html"}
@@ -901,7 +901,7 @@
 
     <p>The physics make this quantitatively significant. Novec 7000 has a vapor pressure of approximately <span class="pfas-stat">270 hPa at 25&deg;C</span>. Water, by comparison, has a vapor pressure of <span class="pfas-stat">32 hPa at the same temperature</span>. This means Novec 7000 evaporates into the air approximately <span class="pfas-stat">8.4 times faster than water</span> under identical ambient conditions. When a technician opens a system housing that has been running at operating temperature &mdash; even after completing a pre-maintenance drain-down cycle &mdash; the residual fluid on every surface inside that enclosure begins evaporating immediately. Pump housings, heat exchanger fins, manifold surfaces, server chassis interiors, cable management trays, all of it is coated with a thin film of Novec 7000 that will evaporate into the surrounding room air within minutes of the system being opened.</p>
 
-    <p>The Accelsius technical whitepaper published in 2024 on immersion cooling fluid behavior notes this vapor pressure differential explicitly, though it frames the observation in terms of fluid loss accounting rather than environmental release. When the industry itself documents that their fluids evaporate eight times faster than water at room temperature, and the maintenance cycle requires opening these systems multiple times per year, the cumulative atmospheric release over the operational life of a large deployment is not trivial. Industry estimates I have seen for maintenance-associated vapor release suggest the pathway may account for <span class="pfas-stat">20 to 30 times more atmospheric release</span> than equivalent sealed-system leaks &mdash; because leaks are detected and repaired, while maintenance vapor release is simply how the work gets done.</p>
+    <p>When the industry itself documents that their fluids evaporate eight times faster than water at room temperature, and the maintenance cycle requires opening these systems multiple times per year, the cumulative atmospheric release over the operational life of a large deployment is not trivial. <em>How much?</em> The honest answer is that no one has measured maintenance vapor release directly &mdash; which is the whole problem. But it can be bounded. The single published field measurement of fluid loss from a deployed two-phase system &mdash; a 2016 study of Novec&nbsp;649 installations at U.S. Department of Defense sites &mdash; recorded <span class="pfas-stat">17.1% of the fluid charge lost to evaporation in one year</span> (102&nbsp;litres gone from a 595-litre charge), the bulk of it during the open service intervals these systems require [16]. Set that against the regulatory benchmark for a <em>sealed</em> refrigerant loop: EPA Section&nbsp;608 treats a comfort-cooling system as defective above a <span class="pfas-stat">10% annual leak rate</span>, and well-run sealed installations run below 3&ndash;5% [22]. On those two anchors, maintenance-dominated loss runs on the order of 3&ndash;6&times; a <em>tolerated</em> leak and 5&ndash;15&times; a well-maintained sealed loop. The <span class="pfas-stat">20&ndash;30&times;</span> figure cited informally across the industry is best read as a modeled upper bound for the worst-maintained, highest-cadence GPU deployments &mdash; not a measured constant. The precise multiplier is unknown precisely because the release is unmetered, and that absence of measurement is itself the finding.</p>
 
     <div class="quote-callout">
         <blockquote>&ldquo;The industry has solved the accidental release problem reasonably well. Leak detection, fluid sensors, pressure monitoring &mdash; these are mature technologies. What nobody has solved, or even formally acknowledged, is the intentional release. Every planned maintenance window on a two-phase system involves releasing PFAS vapor to atmosphere. We call it routine service. The EPA would call it an unmonitored emission.&rdquo;</blockquote>
@@ -983,6 +983,88 @@
 
     <p>Now multiply this by scale. A hyperscale AI campus deploying two-phase cooling at meaningful density might have 50 to 200 racks of immersion-cooled compute. Quarterly maintenance windows mean four of these events per year, per system cluster. Monthly monitoring of GPU-dense systems means the frequency is higher. Over a five-year operational period, a mid-sized two-phase deployment will have undergone somewhere between 20 and 60 planned maintenance windows, each releasing unmeasured quantities of PFAS vapor to atmosphere. No one is counting. No one is required to count.</p>
 
+    <!-- Section 3b: loss-zone taxonomy -->
+    <h2 id="section-loss-zones">Where the Fluid Actually Goes &mdash; A Loss-Zone Taxonomy</h2>
+
+    <p>&ldquo;The invisible leak&rdquo; is not one pathway; it is a stack of them. If you want to make the loss visible, you first have to name every place the fluid escapes &mdash; and then ask, for each, whether anyone is metering it and whether anyone is required to report it. The table below maps the loss zones in a two-phase or immersion deployment against published magnitudes. The pattern is consistent: where a number exists, it is large; where the loss is most routine, no number exists at all.</p>
+
+    <div class="pfas-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Loss zone</th>
+                    <th scope="col">Mechanism</th>
+                    <th scope="col">Typical magnitude (sourced)</th>
+                    <th scope="col">Metered?</th>
+                    <th scope="col">Reportable?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Maintenance vapour</strong> (open bath / hatch)</td>
+                    <td>Residual surface film flash-evaporates the moment the enclosure is opened</td>
+                    <td><span class="pfas-stat">3&ndash;12 L per service</span> &mdash; the 2&ndash;6% residual after drain [3]</td>
+                    <td>No</td>
+                    <td class="pfas-cell-alert">No</td>
+                </tr>
+                <tr>
+                    <td><strong>Quick-disconnect spillage</strong></td>
+                    <td>Fluid trapped in the coupler released at each connect/disconnect</td>
+                    <td><span class="pfas-stat">2&ndash;3 mL per connect</span> (≈3 mL flat-face / dry-break) [16]</td>
+                    <td>No</td>
+                    <td class="pfas-cell-alert">No</td>
+                </tr>
+                <tr>
+                    <td><strong>Operating evaporative loss</strong></td>
+                    <td>Boil-off + head-space vapour during normal running</td>
+                    <td><span class="pfas-stat">1&ndash;2%/yr</span> vendor (sealed) vs <span class="pfas-stat">17.1%/yr</span> measured (field) [16]</td>
+                    <td>Rarely</td>
+                    <td class="pfas-cell-alert">No</td>
+                </tr>
+                <tr>
+                    <td><strong>Drain / transfer residual</strong></td>
+                    <td>Automated drain recovers most volume; the rest clings to surfaces</td>
+                    <td>Recovery <span class="pfas-stat">94&ndash;96%</span> &rarr; 4&ndash;6% retained [3]</td>
+                    <td>Partial (recovery %)</td>
+                    <td class="pfas-cell-alert">No</td>
+                </tr>
+                <tr>
+                    <td><strong>Seal / permeation</strong></td>
+                    <td>Slow vapour transmission through elastomer seals over time</td>
+                    <td><strong>Not quantified</strong> for fluorocarbon fluids &mdash; a genuine literature gap</td>
+                    <td>No</td>
+                    <td class="pfas-cell-alert">No</td>
+                </tr>
+                <tr>
+                    <td><strong>Fill / flush / commissioning</strong></td>
+                    <td>Charge handling, purge and venting during build-out</td>
+                    <td><strong>Not separately quantified</strong></td>
+                    <td>No</td>
+                    <td class="pfas-cell-alert">No</td>
+                </tr>
+                <tr>
+                    <td><strong>End-of-life / decommission</strong></td>
+                    <td>Residual that recovery cannot recapture + disposal handling</td>
+                    <td><span class="pfas-stat">~5&ndash;10%</span> of charge clings to tank/piping [patent corpus]</td>
+                    <td>No</td>
+                    <td>CERCLA liability, not an emission line</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td>Net picture</td>
+                    <td>Several routine zones, each below any reporting trigger</td>
+                    <td>Field loss has been measured as high as 17.1%/yr; most zones carry no number at all</td>
+                    <td>Mostly No</td>
+                    <td class="pfas-cell-alert">Effectively zero</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pfas-warning-box">
+        <h4><i class="fas fa-magnifying-glass"></i> The gaps are the story</h4>
+        <p>Read the &ldquo;Typical magnitude&rdquo; column again. The two largest, most routine zones &mdash; <strong>seal permeation</strong> and the <strong>per-event maintenance loss from sensor swaps and top-ups</strong> &mdash; have <em>no published value</em>. The literature quantifies water-vapour transmission through packaging films, but not fluorocarbon-fluid permeation through data-center seals; and the patent corpus is full of inventions to <em>reduce</em> hot-swap loss, which only confirms that a baseline loss exists and has never been measured. When the most frequent loss pathways are also the least quantified, &ldquo;invisible&rdquo; is not a metaphor &mdash; it is an accurate description of the data.</p>
+    </div>
+
     <!-- Section 4 -->
     <h2 id="section-4">The &ldquo;PFAS-Free&rdquo; Replacement Problem: A Forever Chemical With a Different Name?</h2>
 
@@ -1009,9 +1091,9 @@
         Projected increase from HFO adoption: <span class="chem-highlight">Not modeled by EPA or DOE</span>
     </div>
 
-    <p>The primary atmospheric breakdown product of HFO-1336mzz-Z is trifluoroacetic acid &mdash; TFA. TFA contains three C-F bonds. TFA is highly water-soluble and integrates rapidly into the hydrological cycle: it washes out of the atmosphere in rainfall, accumulates in surface water and groundwater, and does not biodegrade under natural conditions. TFA is not regulated by the EPA. It is not monitored by the EPA. It is not listed under PFAS regulatory frameworks because it was not among the compounds originally targeted by PFAS remediation efforts, and because its association with HFO degradation is a relatively recent area of scientific focus.</p>
+    <p>The primary atmospheric breakdown product of HFO-1336mzz-Z is trifluoroacetic acid &mdash; TFA. TFA contains three C-F bonds. TFA is highly water-soluble and integrates rapidly into the hydrological cycle: it washes out of the atmosphere in rainfall, accumulates in surface water and groundwater, and does not biodegrade under natural conditions &mdash; peer-reviewed reviews describe it as effectively non-removable by conventional water treatment and persistent at watershed scale [23]. The degradation yields are not uniform across these fluids: the closely related refrigerant R-1234yf degrades to TFA at a molar yield approaching 100%, while R-1233zd(E) yields only about 2% [17] &mdash; which is precisely why the yield for a given two-phase fluid matters and why vendors not disclosing it is a meaningful gap. TFA is not regulated by the EPA. It is not monitored by the EPA. It is not listed under PFAS regulatory frameworks because it was not among the compounds originally targeted by PFAS remediation efforts, and because its association with HFO degradation is a relatively recent area of scientific focus.</p>
 
-    <p>Studies from European research groups &mdash; notably work published through the German Environment Agency (Umweltbundesamt) &mdash; have documented rising TFA concentrations in precipitation, surface water, and groundwater across monitoring sites in Western Europe over the past two decades, correlated with the increasing global use of HFC and HFO refrigerants. The researchers do not describe TFA as definitively harmless. Its health effects are under active investigation, with particular attention to reproductive and developmental impacts at concentration levels that are already measurable in some water sources.</p>
+    <p>Studies from European research groups &mdash; notably work published through the German Environment Agency (Umweltbundesamt) &mdash; have documented rising TFA concentrations in precipitation, surface water, and groundwater across monitoring sites in Western Europe over the past two decades, correlated with the increasing global use of HFC and HFO refrigerants [17]. Atmospheric modelling of HFC-134a degradation alone put U.S. rainwater TFA at roughly <span class="pfas-stat">0.89&nbsp;&micro;g/L on average, peaking near 7.8&nbsp;&micro;g/L</span> &mdash; a useful scale against which any incremental two-phase-cooling contribution should be measured [18]. The researchers do not describe TFA as definitively harmless. Its health effects are under active investigation, with particular attention to reproductive and developmental impacts at concentration levels that are already measurable in some water sources.</p>
 
     <div class="pfas-warning-box">
         <h4><i class="fas fa-triangle-exclamation"></i> The Regulatory Approval Accelerator</h4>
@@ -1129,6 +1211,129 @@
         <h4><i class="fas fa-gavel"></i> The Precedent Already Exists</h4>
         <p>Clean Air Act Section 608 has required refrigerant recovery before servicing since 1993. The data center industry has been operating two-phase PFAS systems for over a decade with no equivalent requirement, despite PFAS compounds having significantly higher environmental persistence than the HFCs they regulate. The regulatory asymmetry is not a technical necessity — it is a policy choice that has never been formally examined.</p>
     </div>
+
+    <!-- Section 8: metrics to watch + regulatory horizon (W5) -->
+    <h2 id="section-metrics">Metrics to Watch &mdash; Leading Indicators of an Invisible Leak</h2>
+
+    <p>If the loss is unmetered, the operator is flying blind &mdash; but not entirely. Several second-order signals move <em>before</em> a fluid-loss problem becomes a compliance problem, and every one of them is already visible in data an operator typically collects. The discipline is to treat them as leak indicators rather than housekeeping noise. The table below is the watch-list: what to trend, what a healthy band looks like, and what a deviation is actually telling you.</p>
+
+    <div class="pfas-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Leading indicator</th>
+                    <th scope="col">Healthy band</th>
+                    <th scope="col">Watch / action threshold</th>
+                    <th scope="col">What a deviation means</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Make-up rate</strong> (top-up volume &divide; charge, %/yr)</td>
+                    <td>&le; 1&ndash;2%/yr (vendor sealed claim)</td>
+                    <td class="pfas-cell-alert">&ge; 5%/yr trending toward the 17.1%/yr field figure [16]</td>
+                    <td>The single best proxy for total loss. Rising make-up = rising atmospheric release, dollar-for-dollar.</td>
+                </tr>
+                <tr>
+                    <td><strong>Top-up cadence</strong> (refill events / yr)</td>
+                    <td>Stable, predictable interval</td>
+                    <td class="pfas-cell-alert">Shortening interval or unscheduled top-ups</td>
+                    <td>A seal, gasket or QD is bleeding fluid between services &mdash; the un-metered zones from the taxonomy above.</td>
+                </tr>
+                <tr>
+                    <td><strong>Level / chemistry drift</strong></td>
+                    <td>Level stable; fluid spec in-band</td>
+                    <td class="pfas-cell-alert">Falling level with no service; viscosity / acid-number drift</td>
+                    <td>Degradation or evaporative concentration &mdash; early sign of both loss and breakdown-product formation.</td>
+                </tr>
+                <tr>
+                    <td><strong>Worker-air PFAS / TWA readings</strong></td>
+                    <td>Well below OSHA 200 ppm 8-hr TWA</td>
+                    <td class="pfas-cell-alert">Any rising trend across consecutive service windows</td>
+                    <td>More vapour in the room each service = more reaching the return plenum and the outdoor stack.</td>
+                </tr>
+                <tr>
+                    <td><strong>Exhaust / plenum concentration</strong></td>
+                    <td>Not currently measured (gap)</td>
+                    <td class="pfas-cell-alert">Establish a baseline &mdash; you cannot trend what you never sampled</td>
+                    <td>The only direct measure of environmental release. Its absence is why the leak is &ldquo;invisible.&rdquo;</td>
+                </tr>
+                <tr>
+                    <td><strong>Boundary groundwater PFAS / TFA</strong></td>
+                    <td>&lt; EPA MCL 4 ppt (PFOA/PFOS); TFA &lt; member-state limit</td>
+                    <td class="pfas-cell-alert">Any detection trend, esp. TFA toward EU 0.5&nbsp;&micro;g/L PFAS-Total [19]</td>
+                    <td>The lagging indicator that becomes a liability. By the time it moves, the release already happened.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pfas-warning-box">
+        <h4><i class="fas fa-gauge-high"></i> The cheapest instrument you already own</h4>
+        <p>Of all of these, <strong>make-up rate is the one to put on a dashboard tomorrow.</strong> It needs no new sensor &mdash; it is purchasing data you already have: litres of fluid bought to keep the system topped up, divided by the installed charge. A loop quietly running at 8&ndash;10%/yr make-up is leaking the equivalent of <span class="pfas-stat">several thousand dollars of fluid</span> and an unreported PFAS plume to atmosphere every year, and the only place it shows up today is the consumables budget. Trend it, set an alarm band against the EPA 608 sealed-leak benchmark [22], and the invisible leak becomes a number on a screen.</p>
+    </div>
+
+    <h2 id="section-horizon">The Regulatory Horizon &mdash; What Changed After This Article Was Published</h2>
+
+    <p>This piece first went out in April 2026. In the months since, the regulatory picture moved harder and faster than the body above anticipated &mdash; mostly against the &ldquo;PFAS-free&rdquo; HFO narrative the industry has leaned on. An operator reading this today should treat the following as the live compliance horizon, not a forecast.</p>
+
+    <div class="pfas-danger-box">
+        <h4><i class="fas fa-tower-broadcast"></i> Regulatory update &mdash; the two that postdate publication</h4>
+        <p><strong>ECHA &mdash; TFA proposed as Reproductive Toxicant Category&nbsp;1B (2025&ndash;2026).</strong> The European Chemicals Agency's Committee for Risk Assessment moved to harmonise classification of <strong>trifluoroacetic acid</strong> &mdash; the very breakdown product of the HFO &ldquo;PFAS-free&rdquo; replacements &mdash; as a reproductive toxicant and hazardous to the ozone layer [21]. If finalised, the marketing claim that HFOs solve the PFAS problem inverts: the degradation product acquires a formal hazard classification of its own. <strong>EU Drinking Water Directive &mdash; PFAS limits live since 12 January 2026.</strong> Directive (EU) 2020/2184 brought a PFAS-Total parametric value of <span class="pfas-stat">0.5&nbsp;&micro;g/L</span> (and PFAS-Sum 0.1&nbsp;&micro;g/L) into force [19] &mdash; a measurable line that TFA-loaded groundwater near a large deployment can realistically approach.</p>
+    </div>
+
+    <div class="pfas-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Instrument</th>
+                    <th scope="col">Threshold / trigger</th>
+                    <th scope="col">Status &amp; timing</th>
+                    <th scope="col">Why it bites two-phase cooling</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>EPA PFAS Drinking-Water MCL [1]</td>
+                    <td>4 ppt PFOA / PFOS</td>
+                    <td>Final, April 2024</td>
+                    <td>Sets the boundary-well trigger &mdash; but <strong>TFA is not on the list</strong> (the gap).</td>
+                </tr>
+                <tr>
+                    <td>EPA Clean Air Act Section&nbsp;608 [22]</td>
+                    <td>10 / 20 / 30% leak-rate triggers; scope 50&rarr;15 lb</td>
+                    <td>Tightened scope effective 1 Jan 2026</td>
+                    <td>The closest existing analogue for a mandatory recovery + leak-repair regime.</td>
+                </tr>
+                <tr>
+                    <td>EU F-Gas Regulation 2024/573 [20]</td>
+                    <td>Containment, leak-check, reporting for high-GWP fluids</td>
+                    <td>In force 2024</td>
+                    <td>PFPE charges (Galden, GWP&nbsp;&asymp;10,000) fall squarely in scope.</td>
+                </tr>
+                <tr>
+                    <td>EU Drinking Water Directive 2020/2184 [19]</td>
+                    <td>PFAS-Total 0.5&nbsp;&micro;g/L; PFAS-Sum 0.1&nbsp;&micro;g/L</td>
+                    <td class="pfas-cell-alert">Monitoring live from 12 Jan 2026</td>
+                    <td>Measurable line TFA-loaded groundwater can approach.</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td><strong>ECHA TFA harmonised classification [21]</strong></td>
+                    <td><strong>Reproductive Toxicant 1B + ozone hazard (proposed)</strong></td>
+                    <td class="pfas-cell-alert"><strong>RAC opinion 2025&ndash;2026 &mdash; postdates this article</strong></td>
+                    <td><strong>Reclassifies the HFO &ldquo;solution&rdquo; product as a hazard in its own right.</strong></td>
+                </tr>
+                <tr>
+                    <td>Member-state TFA limits</td>
+                    <td>Italy 10 · NL 2.2 · Denmark 9 · Germany 60&nbsp;&micro;g/L</td>
+                    <td>National, in force</td>
+                    <td>A patchwork already regulating TFA the EPA does not.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The throughline is the same one the rest of this article makes: the technology to measure the loss exists, and now the thresholds to make it a liability exist too. What is still missing &mdash; on both sides of the Atlantic &mdash; is any requirement to <em>meter the maintenance release itself</em>. Until that arrives, the make-up-rate line on a spreadsheet remains the only honest number an operator has. The calculator below turns the model in this article into that number for your own configuration.</p>
 
     <!-- PFAS Risk Assessment Calculator -->
     <div class="pfas-calculator" id="pfas-calculator">
@@ -1504,6 +1709,62 @@
                 <div>
                     NIOSH. <a href="https://www.cdc.gov/niosh/topics/pfas/" target="_blank" rel="noopener noreferrer"><em>NIOSH &mdash; Per- and Polyfluoroalkyl Substances (PFAS) Workplace Exposure.</em></a>
                     <div class="reference-source">Occupational exposure guidance relevant to DC technicians servicing two-phase systems.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-16">
+                <span class="reference-number">[16]</span>
+                <div>
+                    Coles, H. &amp; Greenberg, S. &mdash; Lawrence Berkeley National Laboratory / U.S. DoD. (2016). <a href="https://datacenters.lbl.gov/sites/default/files/ImmersionCooling2016.pdf" target="_blank" rel="noopener noreferrer"><em>Direct Liquid Immersion Cooling for Data Centers &mdash; Field Demonstration.</em></a>
+                    <div class="reference-source">The single published field measurement of two-phase fluid loss: 17.1% of a 595&nbsp;L Novec-649 charge (102&nbsp;L) lost to evaporation over one year. Used here as the high-loss anchor against vendor &ldquo;sealed-tank&rdquo; 1&ndash;2%/yr claims.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-17">
+                <span class="reference-number">[17]</span>
+                <div>
+                    Behringer, D., Heydel, F., et al. (2021). <a href="https://www.umweltbundesamt.de/en/publikationen/persistent-degradation-products-of-halogenated" target="_blank" rel="noopener noreferrer"><em>Persistent Degradation Products of Halogenated Refrigerants and Blowing Agents in the Environment (TFA).</em></a> German Environment Agency (UBA).
+                    <div class="reference-source">Atmospheric degradation of HFOs to trifluoroacetic acid (TFA); R-1234yf yields &asymp;100% TFA, R-1233zd(E) &asymp;2%. Basis for the HFO&rarr;TFA loading model.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-18">
+                <span class="reference-number">[18]</span>
+                <div>
+                    Kazil, J., McKeen, S., et al. (2014). <a href="https://acp.copernicus.org/articles/14/3527/2014/" target="_blank" rel="noopener noreferrer"><em>Deposition and Rainwater Concentrations of Trifluoroacetic Acid in the United States from HFC-134a Degradation.</em></a> Atmospheric Chemistry &amp; Physics, 14, 3527&ndash;3536.
+                    <div class="reference-source">Modeled TFA rainwater concentrations: 0.89&nbsp;&micro;g/L average, 7.8&nbsp;&micro;g/L peak. Reference scale for contextualizing two-phase HFO TFA contribution.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-19">
+                <span class="reference-number">[19]</span>
+                <div>
+                    European Parliament &amp; Council. (2020). <a href="https://eur-lex.europa.eu/eli/dir/2020/2184/oj" target="_blank" rel="noopener noreferrer"><em>Directive (EU) 2020/2184 on the Quality of Water Intended for Human Consumption (recast).</em></a>
+                    <div class="reference-source">PFAS-Total parametric value 0.5&nbsp;&micro;g/L and PFAS-Sum 0.1&nbsp;&micro;g/L; monitoring obligations applying from 12&nbsp;January 2026 &mdash; postdates the original article.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-20">
+                <span class="reference-number">[20]</span>
+                <div>
+                    European Parliament &amp; Council. (2024). <a href="https://eur-lex.europa.eu/eli/reg/2024/573/oj" target="_blank" rel="noopener noreferrer"><em>Regulation (EU) 2024/573 on Fluorinated Greenhouse Gases (F-Gas Regulation recast).</em></a>
+                    <div class="reference-source">Reporting, containment and leak-check obligations for high-GWP fluids; relevant to PFPE (Galden, GWP &asymp;10,000) two-phase charges.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-21">
+                <span class="reference-number">[21]</span>
+                <div>
+                    European Chemicals Agency (ECHA), Committee for Risk Assessment (RAC). (2025&ndash;2026). <a href="https://echa.europa.eu/registry-of-clh-intentions-until-outcome" target="_blank" rel="noopener noreferrer"><em>Harmonised Classification &amp; Labelling Opinion &mdash; Trifluoroacetic Acid and Sodium Trifluoroacetate.</em></a>
+                    <div class="reference-source">RAC opinion proposing classification of TFA as Reproductive Toxicant Category 1B and hazardous to the ozone layer &mdash; the most significant regulatory shift postdating the article.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-22">
+                <span class="reference-number">[22]</span>
+                <div>
+                    US EPA. <a href="https://www.epa.gov/section608/refrigerant-management-regulations-under-section-608-clean-air-act" target="_blank" rel="noopener noreferrer"><em>Refrigerant Management Regulations under Section 608 of the Clean Air Act.</em></a>
+                    <div class="reference-source">Leak-rate trigger thresholds (10% comfort cooling / 20% commercial / 30% industrial process), repair and reporting duties. Used as the &ldquo;tolerated sealed-leak&rdquo; baseline against which maintenance loss is normalized.</div>
+                </div>
+            </div>
+            <div class="reference-item" id="ref-23">
+                <span class="reference-number">[23]</span>
+                <div>
+                    Solomon, K.R., V&ouml;lz, H., et al. (2016). <a href="https://setac.onlinelibrary.wiley.com/journal/15513793" target="_blank" rel="noopener noreferrer"><em>Trifluoroacetate in the Environment: Sources, Fate and Effects (Review).</em></a> Environmental Toxicology &amp; Chemistry.
+                    <div class="reference-source">Peer-reviewed synthesis of TFA persistence, mobility and non-removal by conventional water treatment &mdash; supports the &ldquo;forever-mobile&rdquo; framing.</div>
                 </div>
             </div>
         </div>
