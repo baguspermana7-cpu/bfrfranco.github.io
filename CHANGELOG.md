@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.43.66 — 2026-06-24 (Article 26 — uiux-reviewer polish on the new fluid-loss UI)
+
+### Fixed
+- **Tabular figures** — added `font-variant-numeric: tabular-nums` + slashed-zero to `.pfas-stat`,
+  `.pfas-kpi-value`, and `.pfas-table-container td` so the number-dense new tables and Panel-5 KPI
+  cards align per design.md §2 (the chem-block ledgers already used JetBrains Mono numerics).
+- **Tablet dead-band** — `.pfas-pro-kpi-grid.cols-4` mobile fallback moved from `max-width:680px` to
+  `768px` to align with the page's master breakpoint; the 4-up Panel-5 grid no longer cramps to four
+  ~160px columns on 681–768px tablets. (uiux-reviewer HIGH items; APPROVED with no blockers.)
+
 ## v1.43.65 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 3 of 4)
 
 ### Added (article-26.html — PFAS Risk Calculator Pro extension)
