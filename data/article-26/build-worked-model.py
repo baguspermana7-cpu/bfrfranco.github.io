@@ -20,9 +20,9 @@ import csv
 # gwp100 (100-yr), tfa_molar_yield = MW(TFA)/MW(parent) x fraction-to-TFA.
 FLUIDS = [
     # key,           label,                 type,  density, price, gwp100, tfa_yield, source
-    ("novec-7000",  "3M Novec 7000 (HFE-7000)", "pfas", 1.40, 70, 320,   0.0,   "3M datasheet; HFE GWP representative"),
-    ("galden-ht",   "Solvay Galden HT-series (PFPE)", "pfas", 1.70, 90, 10000, 0.0, "Syensqo datasheet; PFPE GWP ~10,000"),
-    ("opteon-2p50", "Chemours Opteon 2P50 (HFO-1336mzz-Z)", "hfo", 1.37, 60, 10, 0.695, "Chemours; MW 114/164, ~1 mol TFA/mol at 100%"),
+    ("novec-7000",  "3M Novec 7000 (HFE-7000)", "pfas", 1.40, 70, 320,   0.0,   "representative; 3M HFE-7000 GWP 370-575, 320 used as low-end illustrative"),
+    ("galden-ht",   "Solvay Galden HT-series (PFPE)", "pfas", 1.70, 90, 10000, 0.0, "PFPE GWP ~10,000 commonly cited but UNVERIFIED/disputed (low volatility); illustrative upper bound"),
+    ("opteon-2p50", "Chemours Opteon 2P50 (HFO-1336mzz-Z)", "hfo", 1.37, 60, 2, 0.695, "GWP ~2 per EPA SNAP; MW 114/164, ~1 mol TFA/mol at 100%"),
 ]
 
 CHARGES = list(range(100, 5001, 100))          # 100..5000 L, 50 steps

@@ -38,3 +38,16 @@ assessment.
 - **modelled / representative** — computed or mid-range value chosen for the worked example
 
 See the reference list in `/article-26.html` (refs [1]–[23]) for the full citations.
+
+## Verification (2026-06-25)
+
+`fluid-properties.csv`, `tfa-pfas-reference-values.csv`, `regulatory-thresholds.csv` and
+`external-databases.csv` were independently source-verified. Most values were confirmed against
+agency/peer-reviewed sources (a `verified_source` column carries the DOI/URL). Corrections applied:
+Kazil 2014 journal (JGR Atmos., not ACP); TRI PFAS threshold (100 lb, not 25,000 lb); ECHA TFA
+status (RAC opinion *adopted* June 2026); Novec breakdown products (COF₂/HF/CO₂, not PFCAs); Opteon
+lifetime (~22 d EPA SNAP); Opteon GWP (~2); R-1233zd(E) lifetime (~40 d); FC-40/FC-72 GWP & lifetime
+quantified; AGAGE portal URL updated. **Galden (PFPE) GWP remains unverified** — the ~10,000 figure
+is commonly cited but physically disputed (PFPEs are nearly involatile); treat as an illustrative
+upper bound only.
+

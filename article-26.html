@@ -1194,11 +1194,13 @@
         CO₂e if HFE / Novec-class (GWP ~320)
           192 kg × 320 / 1000  =   <span class="chem-highlight">61 t CO₂e / yr</span>     ≈ 13 average US cars
 
-        CO₂e if Galden-class PFPE (GWP ~10,000)
+        CO₂e if Galden-class PFPE (GWP ~10,000 — commonly cited but disputed*)
           192 kg × 10,000 / 1000  =  <span class="chem-highlight">1,920 t CO₂e / yr</span>  ≈ 400 cars
 
         The fluid choice swings the climate footprint of the *same leak* by ~30×.
         None of this appears in a facility's Scope-1 inventory today.
+        * PFPEs are nearly involatile, so the effective atmospheric GWP is contested;
+          treat the Galden line as an illustrative upper bound (see fluid-properties.csv).
     </div>
 
     <div class="pfas-chem-block">
@@ -1440,7 +1442,7 @@
 
     <div class="pfas-danger-box">
         <h4><i class="fas fa-tower-broadcast"></i> Regulatory update &mdash; the two that postdate publication</h4>
-        <p><strong>ECHA &mdash; TFA proposed as Reproductive Toxicant Category&nbsp;1B (2025&ndash;2026).</strong> The European Chemicals Agency's Committee for Risk Assessment moved to harmonise classification of <strong>trifluoroacetic acid</strong> &mdash; the very breakdown product of the HFO &ldquo;PFAS-free&rdquo; replacements &mdash; as a reproductive toxicant and hazardous to the ozone layer [21]. If finalised, the marketing claim that HFOs solve the PFAS problem inverts: the degradation product acquires a formal hazard classification of its own. <strong>EU Drinking Water Directive &mdash; PFAS limits live since 12 January 2026.</strong> Directive (EU) 2020/2184 brought a PFAS-Total parametric value of <span class="pfas-stat">0.5&nbsp;&micro;g/L</span> (and PFAS-Sum 0.1&nbsp;&micro;g/L) into force [19] &mdash; a measurable line that TFA-loaded groundwater near a large deployment can realistically approach.</p>
+        <p><strong>ECHA &mdash; TFA classified as Reproductive Toxicant Category&nbsp;1B (RAC opinion adopted June&nbsp;2026).</strong> The European Chemicals Agency's Committee for Risk Assessment adopted its opinion harmonising classification of <strong>trifluoroacetic acid</strong> &mdash; the very breakdown product of the HFO &ldquo;PFAS-free&rdquo; replacements &mdash; as a reproductive toxicant (H360Df) and hazardous to the ozone layer [21]. The marketing claim that HFOs solve the PFAS problem inverts: the degradation product now carries a formal hazard classification of its own. <strong>EU Drinking Water Directive &mdash; PFAS limits live since 12 January 2026.</strong> Directive (EU) 2020/2184 brought a PFAS-Total parametric value of <span class="pfas-stat">0.5&nbsp;&micro;g/L</span> (and PFAS-Sum 0.1&nbsp;&micro;g/L) into force [19] &mdash; a measurable line that TFA-loaded groundwater near a large deployment can realistically approach.</p>
     </div>
 
     <div class="pfas-table-container">
@@ -1480,8 +1482,8 @@
                 </tr>
                 <tr class="highlight-row">
                     <td><strong>ECHA TFA harmonised classification [21]</strong></td>
-                    <td><strong>Reproductive Toxicant 1B + ozone hazard (proposed)</strong></td>
-                    <td class="pfas-cell-alert"><strong>RAC opinion 2025&ndash;2026 &mdash; postdates this article</strong></td>
+                    <td><strong>Reproductive Toxicant 1B (H360Df) + ozone hazard</strong></td>
+                    <td class="pfas-cell-alert"><strong>RAC opinion adopted Jun&nbsp;2026 &mdash; postdates this article</strong></td>
                     <td><strong>Reclassifies the HFO &ldquo;solution&rdquo; product as a hazard in its own right.</strong></td>
                 </tr>
                 <tr>
@@ -1981,7 +1983,7 @@
                 <span class="reference-number">[21]</span>
                 <div>
                     European Chemicals Agency (ECHA), Committee for Risk Assessment (RAC). (2025&ndash;2026). <a href="https://echa.europa.eu/registry-of-clh-intentions-until-outcome" target="_blank" rel="noopener noreferrer"><em>Harmonised Classification &amp; Labelling Opinion &mdash; Trifluoroacetic Acid and Sodium Trifluoroacetate.</em></a>
-                    <div class="reference-source">RAC opinion proposing classification of TFA as Reproductive Toxicant Category 1B and hazardous to the ozone layer &mdash; the most significant regulatory shift postdating the article.</div>
+                    <div class="reference-source">RAC opinion (adopted June 2026) classifying TFA as Reproductive Toxicant Category 1B (H360Df) and hazardous to the ozone layer &mdash; the most significant regulatory shift postdating the article.</div>
                 </div>
             </div>
             <div class="reference-item" id="ref-22">
@@ -2655,7 +2657,7 @@ function copyLink() {
     function runFluidCost(inp, r) {
         var props = {
             'two-phase-pfas': { density: 1.40, price: 70, gwp: 320,  tfaYield: 0 },     // Novec/PFPE-class; TFA not the primary product
-            'two-phase-hfo':  { density: 1.37, price: 60, gwp: 10,   tfaYield: 0.695 }  // HFO → TFA, ~1 mol/mol at 100% (MW 114/164)
+            'two-phase-hfo':  { density: 1.37, price: 60, gwp: 2,    tfaYield: 0.695 }  // HFO → TFA, ~1 mol/mol at 100% (MW 114/164); GWP ~2 per EPA SNAP
         }[inp.coolingType];
 
         var kgLost = r.annualVaporKg || 0;

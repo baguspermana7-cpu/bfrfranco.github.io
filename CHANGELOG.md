@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.43.72 — 2026-06-25 (Article 26 — independent source-verification of the evidence CSVs)
+
+### Changed (data/article-26/ — corrections + verified_source columns)
+- Two independent verification passes hardened the four curated CSVs; a `verified_source` column
+  (DOI/agency URL) was added to `fluid-properties.csv`, `tfa-pfas-reference-values.csv` and
+  `regulatory-thresholds.csv`. Corrections:
+  - **Kazil 2014** journal fixed → *J. Geophys. Res. Atmos.* 119(24):14059-14079, DOI 10.1002/2014JD022058 (was mis-cited as ACP).
+  - **TRI PFAS threshold** 25,000 lb → **100 lb** (PFAS are chemicals of special concern, NDAA 2020).
+  - **ECHA TFA status** "proposed" → **RAC opinion adopted (June 2026), Repr. 1B / H360Df** — also reflected in the article body + ref [21].
+  - **Novec 7000/7100 breakdown products** → COF₂ / HF / CO₂ (not shorter-chain PFCAs).
+  - **Opteon 2P50**: lifetime ~22 d (EPA SNAP), GWP **~2** (was ~10) — propagated to the calculator (`runFluidCost`) and the worked-model generator; `worked-model-scenarios.csv` regenerated.
+  - **R-1233zd(E)** lifetime ~40 d, GWP ~3.9; **FC-40** GWP ~7100 / ~500 yr; **FC-72** GWP ~7910 / ~3100 yr; **Novec 649** GWP <1.
+  - **AGAGE** portal URL updated to the NASA LaRC archive; GHGRP format corrected to Excel/zip.
+  - **Galden (PFPE) GWP** flagged **unverified/disputed** (~10,000 commonly cited but PFPEs are nearly involatile) — marked in the CSV, the model constants, and a Model C footnote in the article.
+- `README.md` gains a Verification section documenting the above.
+
 ## v1.43.71 — 2026-06-25 (Article 26 — GenX extract + the TFA-absence finding)
 
 ### Added
