@@ -42,6 +42,7 @@ gate "audit-mobile-responsive --strict" python3 tools/audit-mobile-responsive.py
 # 5-6: engine acceptance suites
 gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.mjs
 gate "conv engine — 22/22 DoD identities"      node tools/test-conv-calc.mjs
+gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs
 
 # 7: engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo

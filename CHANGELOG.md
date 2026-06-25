@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.43.73 — 2026-06-25 (CDU calculation hub — Ship 1: frozen thermohydraulic engine + tests)
+
+### Added (foundation for the CDU data + calculation hub — no UI yet)
+- **`js/cdu-model.js`** — deep-frozen `window.CDU_MODEL`: the single source of truth for CDU work.
+  Per-type presets (lifted from cdu-mini-bms `TYPES`/`SCEN`), operational bands (cdu-checklist §01),
+  ASHRAE W-classes, OCP cold-plate flow points, fluid anchors (water + PG-25), pipe IDs/K-values,
+  pump + TCO defaults, standards register, and verified vendor model rows. Every constant carries a
+  `// source:` tag + basisTag (STANDARD/VENDOR/DERIVED/ILLUSTRATIVE) per ACCURACY_VALIDATION rule 6.
+- **`js/cdu-engine.js`** — pure deterministic engine `window.CDU_ENGINE` (no Math.random, numeric
+  guards): fluid properties f(T,glycol%); heat↔flow (Q=ṁ·cp·ΔT); ε-NTU + LMTD + approach; pressure
+  drop (Darcy-Weisbach, Haaland friction, velocity + fittings); NPSH + cavitation margin; dew-point
+  reset (Magnus/Tetens); pump hydraulic/shaft/electrical power + N+1; water chemistry (glycol top-up,
+  make-up, inhibitor reserve); per-type TCO/NPV/payback; and a `cduState()` composite (one source of
+  truth for the upcoming calculator + mini-BMS).
+- **`tools/test-cdu-calc.mjs`** — vm-sandbox acceptance harness, **40/40 PASS**. ~11 worked examples
+  with hand-derived expected values (independent of the engine) + deep-frozen, no-PRNG, determinism
+  guards. Wired into `tools/ship-gate.sh`.
+
 ## v1.43.72 — 2026-06-25 (Article 26 — independent source-verification of the evidence CSVs)
 
 ### Changed (data/article-26/ — corrections + verified_source columns)
