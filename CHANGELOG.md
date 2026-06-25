@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.44.1 — 2026-06-25 (CDU calculation hub — Ship 3b: calculator Pro tier + PDF)
+
+### Added (cdu-calculator.html — Pro analysis tier)
+- **Free/Pro toggle + login modal** (demo `demo@resistancezero.com` / `demo2026`), gated `.cc-pro`
+  section with blur overlay, `rz_premium_session` auth + `rz-auth-change` integration.
+- **TCO & ROI panel** — capex (engine `capexUsd` by type), annual energy (computed pump power ×
+  $/kWh), annual opex, 10-yr NPV of ownership, $/kW·year — all from the engine's TCO functions.
+- **Monte-Carlo (10,000 runs)** on annual pump-energy cost — inputs perturbed ±15–20%, P5/P50/P95 +
+  an inline SVG histogram. Randomness lives only in the page layer (SIMULATED), never the engine.
+- **Sensitivity tornado** — ranks heat-load / run-length / fittings / pump-efficiency by impact on
+  pump kW (inline SVG).
+- **Dynamic engineering narrative** (hydraulics / thermal-safety / economics).
+- **PDF tech-spec export** — `window.open()` first, `<\/script>` escaped, derived-results + Pro
+  tables + embedded SVG charts, print-color-exact. Privacy note (browser-only).
+- Font Awesome added for the lock/PDF icons.
+- Verified end-to-end: real-click login unlocks; TCO/MC/sensitivity/narrative compute; 0 console
+  errors; audits clean; page still passes version-stamp + mobile.
+
 ## v1.44.0 — 2026-06-25 (CDU calculation hub — Ship 3: interactive sizing calculator)
 
 ### Added

@@ -27,6 +27,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script src="js/cdu-model.js?v=2026-06-25" defer></script>
@@ -92,6 +93,46 @@
         .cc-note { grid-column:1 / -1; border:1px dashed var(--cdu-border); border-radius:10px; background:var(--cdu-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--cdu-muted); line-height:1.6; }
         .cc-note b { color:var(--cdu-text); }
         .cc-note a { color:var(--cdu-primary); }
+        /* toolbar: mode toggle + PDF */
+        .cc-actionbar { grid-column:1 / -1; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+        .cc-mode { display:inline-flex; border:1px solid var(--cdu-border); border-radius:8px; overflow:hidden; }
+        .cc-mode button { font-family:'JetBrains Mono',monospace; font-size:.74rem; font-weight:600; padding:6px 16px; border:none; background:var(--cdu-card); color:var(--cdu-muted); cursor:pointer; }
+        .cc-mode button.active { color:#fff; }
+        .cc-mode button.free.active { background:var(--cdu-primary); }
+        .cc-mode button.pro.active { background:linear-gradient(135deg,#7c3aed,#a855f7); }
+        .cc-pdf { font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 14px; border-radius:8px; border:1px solid var(--cdu-border); background:transparent; color:var(--cdu-muted); cursor:pointer; }
+        .cc-pdf:hover { color:var(--cdu-text); border-color:var(--cdu-primary); }
+        /* pro section + gate */
+        .cc-pro { grid-column:1 / -1; position:relative; margin-top:.4rem; }
+        .cc-pro.locked > .cc-pro-inner { filter:blur(6px); user-select:none; pointer-events:none; }
+        .cc-pro-overlay { display:none; position:absolute; inset:0; z-index:10; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:rgba(15,23,42,.55); border-radius:12px; cursor:pointer; }
+        .cc-pro.locked .cc-pro-overlay { display:flex; }
+        .cc-pro-overlay i { font-size:1.8rem; color:#a855f7; }
+        .cc-pro-overlay .t { font-weight:700; color:#fff; }
+        .cc-pro-overlay .d { font-size:.8rem; color:#cbd5e1; max-width:300px; text-align:center; }
+        .cc-pro-overlay .b { padding:8px 18px; background:linear-gradient(135deg,#7c3aed,#a855f7); border:none; border-radius:8px; color:#fff; font-weight:600; font-size:.8rem; cursor:pointer; }
+        .cc-pro-inner { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:.9rem; }
+        .cc-pro-panel { background:var(--cdu-card); border:1px solid var(--cdu-border); border-top:2px solid #a855f7; border-radius:11px; padding:1rem 1.1rem; }
+        .cc-pro-panel h3 { font-size:.8rem; font-family:'JetBrains Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:#a855f7; margin:0 0 .7rem; }
+        .cc-pp-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+        .cc-pp-kpi { background:var(--cdu-inset); border:1px solid var(--cdu-border); border-radius:8px; padding:.55rem .7rem; }
+        .cc-pp-kpi .l { font-size:.62rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; color:var(--cdu-muted); }
+        .cc-pp-kpi .v { font-size:1.05rem; font-weight:700; font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; margin-top:.15rem; }
+        .cc-pp-narr { font-size:.82rem; line-height:1.6; color:var(--cdu-text); }
+        .cc-pp-narr p { margin:0 0 .55rem; }
+        .cc-svg { width:100%; height:auto; display:block; margin-top:.5rem; }
+        /* login modal */
+        .cc-modal { display:none; position:fixed; inset:0; z-index:200; background:rgba(2,6,23,.7); align-items:center; justify-content:center; padding:1rem; }
+        .cc-modal.show { display:flex; }
+        .cc-modal-box { background:var(--cdu-card); border:1px solid var(--cdu-border); border-radius:14px; padding:1.6rem; width:100%; max-width:360px; position:relative; }
+        .cc-modal-box h3 { margin:0 0 .3rem; font-size:1.1rem; }
+        .cc-modal-box p { font-size:.82rem; color:var(--cdu-muted); margin:0 0 1rem; }
+        .cc-modal-box input { width:100%; padding:9px 11px; margin-bottom:.6rem; border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-inset); color:var(--cdu-text); font-size:.9rem; }
+        .cc-modal-box .sub { width:100%; padding:10px; background:linear-gradient(135deg,#7c3aed,#a855f7); border:none; border-radius:8px; color:#fff; font-weight:600; cursor:pointer; }
+        .cc-modal-box .demo { font-size:.72rem; color:var(--cdu-muted); margin-top:.7rem; text-align:center; }
+        .cc-modal-box .demo code { color:var(--cdu-primary); }
+        .cc-modal-x { position:absolute; top:.7rem; right:.9rem; background:none; border:none; font-size:1.3rem; color:var(--cdu-muted); cursor:pointer; }
+        .cc-err { color:#dc2626; font-size:.76rem; margin-bottom:.5rem; display:none; }
         .cc-results-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:.8rem; }
         .cc-results-head h2 { font-size:1.05rem; margin:0; }
         .cc-results-head .vtag { font-family:'JetBrains Mono',monospace; font-size:.66rem; color:var(--cdu-muted); }
@@ -158,6 +199,15 @@
             <button class="preset-btn" data-type="l2l">L2L 1200kW</button>
             <button class="preset-btn" data-type="l2a">L2A 60kW</button>
             <button class="cc-reset" id="ccReset">↺ Reset</button>
+        </div>
+
+        <div class="cc-actionbar">
+            <div class="cc-mode">
+                <button class="free active" id="ccFree">Free</button>
+                <button class="pro" id="ccPro">Pro ★</button>
+            </div>
+            <button class="cc-pdf" id="ccPdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--cdu-muted);">PDF builds in your browser — no server transmission.</span>
         </div>
 
         <!-- INPUTS -->
@@ -234,7 +284,50 @@
             </div>
         </div>
 
+        <!-- PRO TIER -->
+        <div class="cc-pro locked" id="ccProSection">
+            <div class="cc-pro-overlay" id="ccProOverlay">
+                <i class="fas fa-lock"></i>
+                <div class="t">Pro Analysis</div>
+                <div class="d">Lifecycle TCO &amp; NPV, a 10,000-run Monte-Carlo on pump energy, sensitivity ranking, and a PDF tech-spec.</div>
+                <button class="b">Unlock Pro</button>
+            </div>
+            <div class="cc-pro-inner">
+                <div class="cc-pro-panel">
+                    <h3><i class="fas fa-coins" style="margin-right:.3rem;"></i>TCO &amp; ROI (10-yr)</h3>
+                    <div class="cc-pp-grid" id="ccTco"></div>
+                    <p style="font-size:.7rem;color:var(--cdu-muted);margin:.6rem 0 0;line-height:1.5;">Capex/maintenance defaults per CDU type are <b>illustrative</b>; energy from computed pump power × $/kWh. vs an air-cooled baseline.</p>
+                </div>
+                <div class="cc-pro-panel">
+                    <h3><i class="fas fa-chart-area" style="margin-right:.3rem;"></i>Monte-Carlo — pump energy (10k)</h3>
+                    <div class="cc-pp-grid" id="ccMc"></div>
+                    <div id="ccMcChart"></div>
+                </div>
+                <div class="cc-pro-panel">
+                    <h3><i class="fas fa-wind" style="margin-right:.3rem;"></i>Sensitivity — drivers of pump kW</h3>
+                    <div id="ccTornado"></div>
+                </div>
+                <div class="cc-pro-panel">
+                    <h3><i class="fas fa-file-lines" style="margin-right:.3rem;"></i>Engineering assessment</h3>
+                    <div class="cc-pp-narr" id="ccNarr"></div>
+                </div>
+            </div>
+        </div>
+
     </div></main>
+
+    <div class="cc-modal" id="ccModal">
+        <div class="cc-modal-box">
+            <button class="cc-modal-x" id="ccModalX">&times;</button>
+            <h3>Pro Analysis</h3>
+            <p>Unlock TCO/NPV, Monte-Carlo, sensitivity and the PDF tech-spec.</p>
+            <div class="cc-err" id="ccErr">Invalid credentials. Try the demo below.</div>
+            <input type="email" id="ccEmail" placeholder="Email" autocomplete="email">
+            <input type="password" id="ccPass" placeholder="Password">
+            <button class="sub" id="ccLogin">Unlock Pro</button>
+            <div class="demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
+        </div>
+    </div>
 
     <footer class="footer footer-enhanced">
         <div class="container"><div class="footer-grid">
@@ -322,6 +415,13 @@
             html += kpiCard('Pumps (N+1)', npumps, 'units', Math.max(npumps-1,1)+' duty + 1 standby · '+perPump+' LPM each', 'ok');
             $('ccKpis').innerHTML = html;
             $('ccEngTag').textContent = 'engine v'+E.version+' · '+fluid.toUpperCase()+' @ '+supply+'°C';
+
+            var act = document.querySelector('.preset-btn.active');
+            window.__cdu = { type: act ? (act.getAttribute('data-type')||'inrow') : 'inrow',
+                load:load, dt:dt, fluid:fluid, glycol:glycol, supply:supply, dn:dn, len:len, K:K,
+                pumpEff:pumpEff, motorEff:motorEff, perPump:perPump, flow:flow, dpTotal:leg.dpTotalBar,
+                pumpElec:elec, perKw:perKw, approach:approach, marginPct:margin };
+            if (window.__cduProRefresh) { window.__cduProRefresh(); }
         }
 
         function setPreset(type){
@@ -344,6 +444,165 @@
             document.querySelectorAll('.preset-btn').forEach(function(b){ b.addEventListener('click', function(){ setPreset(b.getAttribute('data-type')); }); });
             $('ccReset').addEventListener('click', reset);
             compute();
+        }
+        if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+    </script>
+    <script>
+    /* CDU calculator — Pro tier (TCO/NPV, Monte-Carlo, sensitivity, narrative, PDF).
+       The engine stays deterministic; Monte-Carlo randomness lives only in this
+       page layer (a SIMULATED panel, not a basis KPI) per ACCURACY_VALIDATION r2. */
+    (function(){
+        function $(id){ return document.getElementById(id); }
+        var mode='free';
+        function isPremium(){
+            try { var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
+                  return !!(s && (s.tier==='pro' || s.tier==='root') && (!s.expires || s.expires>Date.now())); }
+            catch(e){ return false; }
+        }
+        function usd(n){ return '$'+Math.round(n).toLocaleString(); }
+
+        function pumpElecFor(o){
+            var E=window.CDU_ENGINE, M=window.CDU_MODEL;
+            var fp=E.fluidProps(o.fluid,o.supply,o.glycol);
+            var flow=E.flowLpmFromQ(o.load, fp.rho/1000, fp.cp, o.dt);
+            var idmm=M.pipeIdMm[o.dn]||52.5;
+            var leg=E.legDpBar(flow, idmm, o.len, o.K, o.fluid, o.supply, o.glycol);
+            var shaft=E.pumpShaftKW(E.pumpHydraulicKW(flow, leg.dpTotalBar), o.pumpEff);
+            return E.pumpElectricalKW(shaft, o.motorEff);
+        }
+        function nrand(){ var u=Math.max(1e-9,Math.random()), v=Math.random();
+            return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+        function svgHistogram(vals, w, h){
+            var n=24, min=vals[0], max=vals[vals.length-1], bw=(max-min)/n||1, c=new Array(n).fill(0);
+            vals.forEach(function(v){ var b=Math.min(n-1,Math.floor((v-min)/bw)); c[b]++; });
+            var mx=Math.max.apply(null,c), bar=w/n, s='';
+            for(var i=0;i<n;i++){ var bh=(c[i]/mx)*(h-18); s+='<rect x="'+(i*bar+1)+'" y="'+(h-18-bh)+'" width="'+(bar-1.5)+'" height="'+bh+'" fill="#a855f7" opacity="0.85"></rect>'; }
+            function px(v){ return ((v-min)/(max-min))*w; }
+            var p50=vals[Math.floor(vals.length*0.5)];
+            s+='<line x1="'+px(p50)+'" y1="0" x2="'+px(p50)+'" y2="'+(h-18)+'" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="3 2"></line>';
+            s+='<text x="2" y="'+(h-5)+'" font-size="8" fill="#94a3b8" font-family="JetBrains Mono">'+usd(min)+'</text>';
+            s+='<text x="'+(w-2)+'" y="'+(h-5)+'" font-size="8" fill="#94a3b8" font-family="JetBrains Mono" text-anchor="end">'+usd(max)+'</text>';
+            return '<svg class="cc-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+s+'</svg>';
+        }
+        function svgTornado(rows, w){
+            var h=rows.length*26+10, mx=Math.max.apply(null,rows.map(function(r){return Math.abs(r.delta);}))||1, cx=w*0.5, s='';
+            rows.forEach(function(r,i){ var y=i*26+6, len=(Math.abs(r.delta)/mx)*(w*0.42);
+                var x=r.delta>=0?cx:cx-len, col=r.delta>=0?'#0891b2':'#d97706';
+                s+='<rect x="'+x+'" y="'+y+'" width="'+len+'" height="15" rx="2" fill="'+col+'" opacity="0.85"></rect>';
+                s+='<text x="4" y="'+(y+11)+'" font-size="9" fill="#94a3b8" font-family="JetBrains Mono">'+r.label+'</text>';
+                s+='<text x="'+(w-2)+'" y="'+(y+11)+'" font-size="9" fill="#cbd5e1" font-family="JetBrains Mono" text-anchor="end">'+(r.delta>=0?'+':'')+r.delta.toFixed(2)+' kW</text>'; });
+            s+='<line x1="'+cx+'" y1="0" x2="'+cx+'" y2="'+h+'" stroke="#475569" stroke-width="1" stroke-dasharray="2 2"></line>';
+            return '<svg class="cc-svg" viewBox="0 0 '+w+' '+h+'">'+s+'</svg>';
+        }
+
+        var lastPro=null;
+        function computePro(){
+            if(!window.CDU_ENGINE || !window.__cdu) return;
+            var E=window.CDU_ENGINE, M=window.CDU_MODEL, o=window.__cdu, T=M.tco;
+            // --- TCO ---
+            var type=T.capexUsdPerKw[o.type]?o.type:'l2l';
+            var capex=E.capexUsd(type, o.load);
+            var annKWh=E.annualEnergyKWh(o.pumpElec, T.hoursPerYear);
+            var annEnergy=annKWh*T.electricityUsdPerKwh;
+            var annMaint=capex*T.annualMaintPctOfCapex[type]/100;
+            var annOpex=annEnergy+annMaint;
+            var cf=[0]; for(var y=1;y<=T.horizonYears;y++){ cf.push(annOpex); }
+            var npvOpex=E.npv(cf, T.discountRatePct);
+            var ownership=capex+npvOpex;
+            var perKwYr=ownership/o.load/T.horizonYears;
+            $('ccTco').innerHTML =
+                kpi('Capex',usd(capex))+kpi('Annual energy',usd(annEnergy))+
+                kpi('Annual opex',usd(annOpex))+kpi('10-yr NPV cost',usd(ownership))+
+                kpi('$/kW·year',usd(perKwYr))+kpi('Pump load',o.pumpElec.toFixed(1)+' kW');
+            // --- Monte-Carlo on annual pump energy cost ---
+            var N=10000, res=[];
+            for(var i=0;i<N;i++){
+                var p={ load:Math.max(1,o.load*(1+nrand()*0.15)), dt:o.dt, fluid:o.fluid, glycol:o.glycol,
+                    supply:o.supply, dn:o.dn, len:Math.max(1,o.len*(1+nrand()*0.20)),
+                    K:Math.max(0,o.K*(1+nrand()*0.20)), pumpEff:Math.min(0.9,Math.max(0.4,o.pumpEff*(1+nrand()*0.10))),
+                    motorEff:Math.min(0.99,Math.max(0.7,o.motorEff*(1+nrand()*0.05))) };
+                res.push(pumpElecFor(p)*T.hoursPerYear*T.electricityUsdPerKwh);
+            }
+            res.sort(function(a,b){return a-b;});
+            $('ccMc').innerHTML = kpi('P5',usd(res[Math.floor(N*0.05)]))+kpi('P50',usd(res[Math.floor(N*0.5)]))+
+                kpi('P95',usd(res[Math.floor(N*0.95)]))+kpi('Spread',usd(res[Math.floor(N*0.95)]-res[Math.floor(N*0.05)]));
+            $('ccMcChart').innerHTML = svgHistogram(res, 300, 90);
+            // --- Sensitivity ---
+            var base=o.pumpElec, drivers=[
+                {label:'Heat load', key:'load'}, {label:'Run length', key:'len'},
+                {label:'Fittings ΣK', key:'K'}, {label:'Pump eff.', key:'pumpEff'} ];
+            var rows=drivers.map(function(d){
+                function variant(f){ var p={load:o.load,dt:o.dt,fluid:o.fluid,glycol:o.glycol,supply:o.supply,dn:o.dn,len:o.len,K:o.K,pumpEff:o.pumpEff,motorEff:o.motorEff}; p[d.key]=p[d.key]*f; return pumpElecFor(p); }
+                var hi=variant(d.key==='pumpEff'?0.8:1.2), lo=variant(d.key==='pumpEff'?1.2:0.8);
+                return { label:d.label, delta:(hi-lo)/2 };
+            }).sort(function(a,b){return Math.abs(b.delta)-Math.abs(a.delta);});
+            $('ccTornado').innerHTML = svgTornado(rows, 300);
+            // --- Narrative ---
+            var n='';
+            n+='<p><b>Hydraulics.</b> At '+o.load+' kW and ΔT '+o.dt+' K the loop needs <b>'+o.flow.toFixed(0)+' LPM</b> ('+o.perKw.toFixed(2)+' LPM/kW) of '+o.fluid.toUpperCase()+', driving a pump electrical load of <b>'+o.pumpElec.toFixed(2)+' kW</b> in an N+1 set.</p>';
+            n+='<p><b>Thermal &amp; safety.</b> The exchanger holds a <b>'+o.approach.toFixed(1)+' °C approach</b> and the suction shows a <b>'+o.marginPct.toFixed(0)+'% NPSH margin</b>'+(o.marginPct<M.bands.npshMarginPct.min?' — below the 10% floor; raise system pressure or reduce suction losses':' — within the safe window')+'.</p>';
+            n+='<p><b>Economics.</b> Pump energy costs about <b>'+usd(annEnergy)+'/yr</b>; with maintenance the 10-year NPV of ownership is <b>'+usd(ownership)+'</b> (~'+usd(perKwYr)+' per kW-year). The Monte-Carlo P95 energy cost is '+usd(res[Math.floor(N*0.95)])+'. Capex/maintenance defaults are illustrative — confirm with vendor quotes.</p>';
+            $('ccNarr').innerHTML = n;
+            lastPro = { capex:capex, annEnergy:annEnergy, annOpex:annOpex, ownership:ownership, perKwYr:perKwYr,
+                mcP5:res[Math.floor(N*0.05)], mcP50:res[Math.floor(N*0.5)], mcP95:res[Math.floor(N*0.95)],
+                mcSvg:$('ccMcChart').innerHTML, tornSvg:$('ccTornado').innerHTML, narr:n, type:type };
+        }
+        function kpi(l,v){ return '<div class="cc-pp-kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div></div>'; }
+
+        function setMode(m){
+            if(m==='pro' && !isPremium()){ $('ccModal').classList.add('show'); return; }
+            mode=m;
+            $('ccFree').classList.toggle('active', m==='free');
+            $('ccPro').classList.toggle('active', m==='pro');
+            var sec=$('ccProSection');
+            if(m==='pro'){ sec.classList.remove('locked'); computePro(); }
+            else { sec.classList.add('locked'); }
+        }
+        window.__cduProRefresh = function(){ if(mode==='pro' && isPremium()){ computePro(); } };
+
+        function doLogin(){
+            var e=($('ccEmail').value||'').trim().toLowerCase(), p=$('ccPass').value||'';
+            if(e==='demo@resistancezero.com' && p==='demo2026'){
+                localStorage.setItem('rz_premium_session', JSON.stringify({email:e,tier:'pro',expires:Date.now()+86400000}));
+                $('ccModal').classList.remove('show');
+                try{ window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{action:'login'}})); }catch(_){}
+                setMode('pro');
+            } else { $('ccErr').style.display='block'; }
+        }
+
+        function exportPDF(){
+            var w=window.open('','_blank'); if(!w) return;       // open FIRST, before heavy work
+            var o=window.__cdu||{}, pro=lastPro;
+            var kpis=document.getElementById('ccKpis').innerText.replace(/\n+/g,' · ');
+            var rows='';
+            document.querySelectorAll('#ccKpis .kpi').forEach(function(k){
+                rows+='<tr><td>'+k.querySelector('.kpi-label').textContent.replace('Derived','').trim()+'</td><td>'+k.querySelector('.kpi-val').textContent.trim()+'</td><td>'+k.querySelector('.kpi-sub').textContent.trim()+'</td></tr>'; });
+            var proHtml='';
+            if(pro){ proHtml='<h2>Pro analysis</h2><table><tr><td>Capex</td><td>'+usd(pro.capex)+'</td></tr><tr><td>Annual energy</td><td>'+usd(pro.annEnergy)+'</td></tr><tr><td>Annual opex</td><td>'+usd(pro.annOpex)+'</td></tr><tr><td>10-yr NPV cost</td><td>'+usd(pro.ownership)+'</td></tr><tr><td>$/kW-year</td><td>'+usd(pro.perKwYr)+'</td></tr><tr><td>Monte-Carlo energy P5 / P50 / P95</td><td>'+usd(pro.mcP5)+' / '+usd(pro.mcP50)+' / '+usd(pro.mcP95)+'</td></tr></table>'
+                +'<div style="display:flex;gap:12px;flex-wrap:wrap;">'+pro.mcSvg+pro.tornSvg+'</div>'+pro.narr; }
+            var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>CDU Sizing Report</title><style>'
+                +'body{font-family:Arial,sans-serif;color:#1f2937;margin:24px;font-size:12px;}h1{color:#0e3a52;font-size:20px;margin:0 0 2px;}h2{color:#0e3a52;font-size:14px;margin:16px 0 6px;border-bottom:1px solid #ddd;padding-bottom:3px;}'
+                +'table{border-collapse:collapse;width:100%;margin:4px 0;}td{border:1px solid #e5e7eb;padding:5px 8px;}tr td:first-child{color:#374151;font-weight:600;width:40%;}'
+                +'.sub{color:#6b7280;font-size:11px;}svg{max-width:300px;border:1px solid #eee;}@media print{@page{margin:15mm;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head><body>'
+                +'<h1>CDU Sizing &amp; Thermohydraulic Report</h1><div class="sub">resistancezero.com — CDU calculator · engine v'+(window.CDU_ENGINE?window.CDU_ENGINE.version:'')+' · '+(o.fluid||'').toUpperCase()+' @ '+(o.supply||'')+'°C · load '+(o.load||'')+' kW</div>'
+                +'<h2>Sizing results (derived)</h2><table><tr><td>Metric</td><td>Value</td><td>Basis</td></tr>'+rows+'</table>'
+                +proHtml
+                +'<p class="sub">Educational estimate. Computed by a validated engine (40/40 tests) anchored to ASHRAE TC9.9 + OCP. PG-25 properties and TCO defaults are illustrative — confirm with the manufacturer. Not procurement or safety advice.</p>'
+                +'<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script></body></html>';
+            w.document.write(html); w.document.close();
+        }
+
+        function init(){
+            $('ccFree').addEventListener('click',function(){ setMode('free'); });
+            $('ccPro').addEventListener('click',function(){ setMode('pro'); });
+            $('ccProOverlay').addEventListener('click',function(){ setMode('pro'); });
+            $('ccPdf').addEventListener('click', exportPDF);
+            $('ccLogin').addEventListener('click', doLogin);
+            $('ccModalX').addEventListener('click',function(){ $('ccModal').classList.remove('show'); });
+            $('ccModal').addEventListener('click',function(e){ if(e.target===$('ccModal')) $('ccModal').classList.remove('show'); });
+            window.addEventListener('rz-auth-change',function(ev){ if(ev.detail && ev.detail.action==='logout'){ setMode('free'); } });
         }
         if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
     })();
