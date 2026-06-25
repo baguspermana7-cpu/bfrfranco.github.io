@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.43.69 — 2026-06-25 (Article 26 — real USGS PFOA water-measurement extract)
+
+### Added
+- **`data/article-26/measurements-usgs-wqp-pfoa.csv`** — 5,438 rows of **real** PFOA
+  (Perfluorooctanoic acid) monitoring results from the USGS Water Quality Portal (USGS/EPA/NWQMC)
+  since 2020: surface water, groundwater, sediment and tissue, reported by state agencies
+  (Minnesota PCA, Indiana, NJDEP, Arizona DEQ, NY DEC, Delaware River Basin, …). PFOA is one of the
+  two compounds under the EPA 4 ppt MCL. Public domain. Reproduce via `fetch-usgs-wqp-pfoa.sh`.
+- Featured as the second card in the "Data & Downloads" block (now two real measurement extracts:
+  atmospheric HFC-134a + aqueous PFOA); section intro + README updated.
+
 ## v1.43.68 — 2026-06-25 (Article 26 — real NOAA atmospheric measurement extract)
 
 ### Added
