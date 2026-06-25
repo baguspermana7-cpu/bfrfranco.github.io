@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.43.74 — 2026-06-25 (CDU calculation hub — Ship 2: data layer + glossary)
+
+### Added (data/cdu/ + glossary)
+- **`data/cdu/coolant-fluid-properties.csv`** (24 rows) — water + PG-25 density/cp/viscosity/thermal-
+  conductivity/Prandtl across 5–60 °C, **generated from the engine** (`build-fluid-properties.mjs`).
+- **`data/cdu/cdu-operating-bands.csv`** (20 rows) — the acceptance windows (supply, ΔT, flow LPM/kW,
+  dP, system pressure, approach, dew-margin, velocity, NPSH margin, water chemistry) from
+  cdu-checklist §01–03 + ASHRAE/OCP, each basis-tagged.
+- **`data/cdu/cdu-models.csv`** (15 rows) — verified vendor CDU models with capacity/flow/dP/approach/
+  fluid/BMS-protocol/ASHRAE-class/link-status.
+- **`data/cdu/standards-references.csv`** (10 rows) — ASHRAE TC9.9, OCP cold-plate/UQD/Deschutes,
+  Redfish DSP2064, ASME B31.3, ISO 4406/NAS 1638, ASTM D1193, PG-25.
+- **`data/cdu/README.md`** manifest + basis-tag legend + link-validation mandate.
+- **Glossary: 12 new CDU terms** — Approach Temperature, Cold Plate, Dew-Point Reset, Effectiveness-NTU
+  (ε-NTU), FWS, Filtration (ISO 4406), Inhibitor Reserve, Leak Detection (CDU), Manifold, NPSH,
+  Redfish CoolingUnit, TCS — each cross-linked to the relevant CDU page.
+
 ## v1.43.73 — 2026-06-25 (CDU calculation hub — Ship 1: frozen thermohydraulic engine + tests)
 
 ### Added (foundation for the CDU data + calculation hub — no UI yet)
