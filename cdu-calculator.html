@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CDU Sizing &amp; Thermohydraulic Calculator | ResistanceZero</title>
+    <meta name="description" content="Interactive CDU calculator — size secondary flow, pressure drop, pipe velocity, HX approach (ε-NTU), NPSH margin, dew-point and pump power. ASHRAE TC9.9 / OCP-anchored, validated engine.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="CDU calculator, coolant distribution unit sizing, secondary flow LPM/kW, pressure drop, NPSH, approach temperature, epsilon-NTU, dew point reset, liquid cooling calculator, OCP cold plate flow">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0E0F12">
+    <link rel="canonical" href="https://resistancezero.com/cdu-calculator.html">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/cdu-calculator.html">
+    <meta property="og:title" content="CDU Sizing &amp; Thermohydraulic Calculator | ResistanceZero">
+    <meta property="og:description" content="Size secondary flow, pressure drop, pipe velocity, HX approach, NPSH and pump power for a Coolant Distribution Unit — validated engine, ASHRAE/OCP anchored.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CDU Sizing &amp; Thermohydraulic Calculator">
+    <meta name="twitter:description" content="Size secondary flow, dP, velocity, HX approach, NPSH, dew-point and pump power for a CDU — validated engine, ASHRAE/OCP anchored.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="js/cdu-model.js?v=2026-06-25" defer></script>
+    <script src="js/cdu-engine.js?v=2026-06-25" defer></script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"CDU Sizing & Thermohydraulic Calculator","applicationCategory":"EngineeringApplication","operatingSystem":"Web","url":"https://resistancezero.com/cdu-calculator.html","description":"Size secondary flow, pressure drop, pipe velocity, heat-exchanger approach (epsilon-NTU), NPSH margin, dew-point reset and pump power for a Coolant Distribution Unit.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"CDU Toolkit","item":"https://resistancezero.com/cdu-hub.html"},{"@type":"ListItem","position":4,"name":"CDU Calculator"}]}
+    </script>
+    <style>
+        :root { --cdu-primary:#06b6d4; --cdu-accent:#0891b2; }
+        [data-theme="dark"] { --cdu-bg:#0f172a; --cdu-card:#1e293b; --cdu-border:#334155; --cdu-text:#f1f5f9; --cdu-muted:#94a3b8; --cdu-inset:#0b1220; }
+        :root, [data-theme="light"] { --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#64748b; --cdu-inset:#f1f5f9; }
+        body { font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif; background:var(--cdu-bg); color:var(--cdu-text); }
+        main { background:var(--cdu-bg); }
+        .cc-hero { position:relative; padding:7rem 1.5rem 1.6rem; border-bottom:1px solid var(--cdu-border); overflow:hidden; }
+        [data-theme="dark"] .cc-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(680px 320px at 80% -20%,rgba(6,182,212,.12),transparent 64%); pointer-events:none; }
+        .cc-hero > * { position:relative; }
+        .cc-wrap { max-width:1180px; margin:0 auto; padding:0 1.4rem; }
+        .cc-kick { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--cdu-primary); font-weight:600; }
+        .cc-hero h1 { font-size:clamp(1.8rem,4vw,2.6rem); font-weight:700; letter-spacing:-.02em; margin:.5rem 0 .5rem; line-height:1.06; }
+        .cc-hero p { color:var(--cdu-muted); max-width:74ch; font-size:1.02rem; line-height:1.6; }
+        .cc-hero .crumb { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--cdu-muted); margin-top:.9rem; }
+        .cc-hero .crumb a { color:var(--cdu-primary); }
+        .cc-body { max-width:1180px; margin:0 auto; padding:1.8rem 1.4rem 3rem; display:grid; grid-template-columns:minmax(0,360px) 1fr; gap:1.4rem; align-items:start; }
+        /* toolbar */
+        .cc-presets { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+        .cc-presets .lbl { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--cdu-muted); margin-right:.2rem; }
+        .preset-btn { font-family:'JetBrains Mono',monospace; font-size:.74rem; font-weight:600; padding:6px 12px; border-radius:7px; border:1px solid var(--cdu-border); background:var(--cdu-card); color:var(--cdu-text); cursor:pointer; transition:all .15s; }
+        .preset-btn:hover { border-color:var(--cdu-primary); color:var(--cdu-primary); }
+        .preset-btn.active { background:var(--cdu-primary); border-color:var(--cdu-primary); color:#fff; }
+        .cc-reset { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 12px; border-radius:7px; border:1px solid var(--cdu-border); background:transparent; color:var(--cdu-muted); cursor:pointer; }
+        .cc-reset:hover { color:var(--cdu-text); border-color:var(--cdu-muted); }
+        /* inputs */
+        .cc-panel { background:var(--cdu-card); border:1px solid var(--cdu-border); border-radius:12px; padding:1.1rem 1.2rem; }
+        .input-section { margin-bottom:1.1rem; }
+        .input-section:last-child { margin-bottom:0; }
+        .input-section h3 { font-size:.74rem; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--cdu-primary); margin:0 0 .6rem; padding-bottom:.35rem; border-bottom:1px solid var(--cdu-border); }
+        .input-row { margin-bottom:.7rem; }
+        .input-label { display:flex; align-items:center; font-size:.82rem; font-weight:500; margin-bottom:.3rem; color:var(--cdu-text); }
+        .input-field, select.input-field { width:100%; padding:8px 10px; border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-inset); color:var(--cdu-text); font-size:.9rem; font-family:'JetBrains Mono',monospace; }
+        .input-field:focus { outline:none; border-color:var(--cdu-primary); }
+        [data-theme="dark"] select.input-field option { background:#1e293b; color:#f1f5f9; }
+        .tip { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:auto; background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.35); border-radius:50%; font-size:10px; color:var(--cdu-primary); cursor:help; position:relative; }
+        .tip .tipbox { display:none; position:absolute; bottom:130%; right:0; width:248px; background:#0b1220; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; }
+        .tip:hover .tipbox { display:block; }
+        .tip .tipbox b { color:var(--cdu-primary); }
+        /* results */
+        .cc-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.8rem; }
+        .kpi { background:var(--cdu-card); border:1px solid var(--cdu-border); border-left:3px solid var(--cdu-primary); border-radius:10px; padding:.85rem .95rem; }
+        .kpi.ok { border-left-color:#0891b2; }
+        .kpi.warn { border-left-color:#d97706; }
+        .kpi.alarm { border-left-color:#dc2626; }
+        .kpi-label { font-size:.68rem; font-family:'JetBrains Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--cdu-muted); display:flex; align-items:center; gap:.4rem; }
+        .kpi-val { font-size:1.32rem; font-weight:700; font-family:'JetBrains Mono',monospace; margin:.2rem 0 .1rem; font-variant-numeric:tabular-nums; }
+        .kpi-sub { font-size:.72rem; color:var(--cdu-muted); line-height:1.4; }
+        .chip { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; letter-spacing:.06em; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
+        .chip.derived { background:rgba(6,182,212,.14); color:#0891b2; }
+        .chip.warn { background:rgba(217,119,6,.16); color:#b45309; }
+        .chip.alarm { background:rgba(220,38,38,.16); color:#dc2626; }
+        [data-theme="dark"] .chip.derived { color:#67e8f9; }
+        .cc-note { grid-column:1 / -1; border:1px dashed var(--cdu-border); border-radius:10px; background:var(--cdu-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--cdu-muted); line-height:1.6; }
+        .cc-note b { color:var(--cdu-text); }
+        .cc-note a { color:var(--cdu-primary); }
+        .cc-results-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:.8rem; }
+        .cc-results-head h2 { font-size:1.05rem; margin:0; }
+        .cc-results-head .vtag { font-family:'JetBrains Mono',monospace; font-size:.66rem; color:var(--cdu-muted); }
+        /* v1.8.0 — mobile responsive patch */
+        @media (max-width:980px){ .cc-body { grid-template-columns:1fr; } }
+        @media (max-width:768px){
+            html, body { overflow-x:hidden; max-width:100vw; }
+            img, picture, video, svg { max-width:100%; height:auto; }
+            .cc-hero { padding:5.5rem 1rem 1.4rem; }
+            .nav-menu, .nav-links { display:none; }
+            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+            button, a.btn, [role="button"] { min-height:44px; }
+            .tip .tipbox { width:200px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li role="menuitem"><a href="cdu-hub.html" style="color:#06b6d4;">CDU Toolkit Hub</a></li>
+                        <li role="menuitem"><a href="cdu-calculator.html" style="color:#06b6d4;">CDU Calculator</a></li>
+                        <li role="menuitem"><a href="cdu-selection-guide.html">CDU Selection Guide</a></li>
+                        <li role="menuitem"><a href="cdu-checklist.html">CDU Checklist</a></li>
+                        <li role="menuitem"><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li>
+                        <li role="menuitem"><a href="cdu-comparison.html">CDU Deep Comparison</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <header class="cc-hero">
+        <div class="cc-wrap">
+            <span class="cc-kick">Liquid Cooling · CDU Toolkit</span>
+            <h1>CDU sizing &amp; thermohydraulic calculator</h1>
+            <p>Size a Coolant Distribution Unit from first principles — secondary flow, pipe velocity, pressure drop, heat-exchanger approach (&epsilon;-NTU), NPSH margin, dew-point reset and pump power. Every output is computed by the same validated engine the rest of this toolkit uses, anchored to ASHRAE TC&nbsp;9.9 and OCP cold-plate guidance. Educational reference only — confirm with the manufacturer before design use.</p>
+            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-hub.html">CDU Toolkit</a> → Calculator</div>
+        </div>
+    </header>
+
+    <main id="main-content"><div class="cc-body">
+
+        <div class="cc-presets">
+            <span class="lbl">Load preset:</span>
+            <button class="preset-btn" data-type="inrack">In-Rack 80kW</button>
+            <button class="preset-btn active" data-type="inrow">In-Row 300kW</button>
+            <button class="preset-btn" data-type="sidecar">Sidecar 120kW</button>
+            <button class="preset-btn" data-type="l2l">L2L 1200kW</button>
+            <button class="preset-btn" data-type="l2a">L2A 60kW</button>
+            <button class="cc-reset" id="ccReset">↺ Reset</button>
+        </div>
+
+        <!-- INPUTS -->
+        <div class="cc-panel">
+            <div class="input-section">
+                <h3>Heat load &amp; loop</h3>
+                <div class="input-row">
+                    <label class="input-label">IT heat load (kW) <span class="tip">?<span class="tipbox"><b>Heat load</b> — total rack/cold-plate heat the CDU must remove. The denominator for flow-per-kW. AI racks today run 60–130 kW.</span></span></label>
+                    <input class="input-field" id="inLoad" type="number" value="300" min="1" step="10">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Secondary &Delta;T (K) <span class="tip">?<span class="tipbox"><b>&Delta;T</b> — secondary supply-to-return rise. Band 8–12 K (cdu-checklist §01). Higher &Delta;T = lower flow for the same heat.</span></span></label>
+                    <input class="input-field" id="inDt" type="number" value="11" min="3" max="20" step="0.5">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Fluid <span class="tip">?<span class="tipbox"><b>Secondary fluid</b> — water or PG-25 (25% propylene glycol, OCP direct-to-chip grade). PG-25 carries ~9% less heat per litre.</span></span></label>
+                    <select class="input-field" id="inFluid"><option value="pg25" selected>PG-25 (glycol)</option><option value="water">Water</option></select>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Glycol % (PG only) <span class="tip">?<span class="tipbox"><b>Glycol fraction</b> — band 20–35% vol. 25% freezes near −10 °C. Affects cp, density and viscosity.</span></span></label>
+                    <input class="input-field" id="inGlycol" type="number" value="25" min="0" max="50" step="1">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Secondary supply T (°C) <span class="tip">?<span class="tipbox"><b>TCS supply</b> — temperature delivered to the cold plates. Band 17–45 °C (ASHRAE W-classes). Must stay above room dew point.</span></span></label>
+                    <input class="input-field" id="inSupply" type="number" value="32" min="10" max="50" step="0.5">
+                </div>
+            </div>
+            <div class="input-section">
+                <h3>Hydraulics</h3>
+                <div class="input-row">
+                    <label class="input-label">Pipe size (secondary) <span class="tip">?<span class="tipbox"><b>Nominal pipe</b> — sets internal diameter for velocity + Darcy-Weisbach friction. Velocity band 1.5–3.0 m/s.</span></span></label>
+                    <select class="input-field" id="inDn"><option>DN40</option><option selected>DN50</option><option>DN65</option><option>DN80</option><option>DN100</option><option>DN125</option><option>DN150</option></select>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Run length, one-way (m) <span class="tip">?<span class="tipbox"><b>Pipe length</b> — straight-run length for friction loss. Total developed length of the worst secondary leg.</span></span></label>
+                    <input class="input-field" id="inLen" type="number" value="20" min="1" max="200" step="1">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Fittings (sum K) <span class="tip">?<span class="tipbox"><b>Fitting loss</b> — sum of minor-loss K-values (elbows ~0.9, tee ~1.8, valve, QD couplers ~1.5). Crane TP-410 typical.</span></span></label>
+                    <input class="input-field" id="inK" type="number" value="8" min="0" max="50" step="0.5">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Pump / motor efficiency <span class="tip">?<span class="tipbox"><b>Efficiencies</b> — pump BEP (~0.70) and motor (~0.92). Used for shaft and electrical pump power.</span></span></label>
+                    <div style="display:flex; gap:.5rem;"><input class="input-field" id="inPumpEff" type="number" value="0.70" min="0.3" max="0.9" step="0.01"><input class="input-field" id="inMotorEff" type="number" value="0.92" min="0.7" max="0.99" step="0.01"></div>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Per-pump capacity (LPM) <span class="tip">?<span class="tipbox"><b>Duty pump flow</b> — capacity of one pump; drives the N+1 count (OCP Deschutes mandates N+1).</span></span></label>
+                    <input class="input-field" id="inPerPump" type="number" value="600" min="50" max="3000" step="50">
+                </div>
+            </div>
+            <div class="input-section">
+                <h3>Heat exchanger &amp; environment</h3>
+                <div class="input-row">
+                    <label class="input-label">Facility supply T (°C) <span class="tip">?<span class="tipbox"><b>FWS supply</b> — primary/facility water temperature into the CDU heat exchanger. The cold side of the approach.</span></span></label>
+                    <input class="input-field" id="inFac" type="number" value="28" min="5" max="45" step="0.5">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">HX NTU <span class="tip">?<span class="tipbox"><b>NTU</b> — heat-exchanger size (UA/Cmin). Higher NTU → higher effectiveness → smaller approach. Typical CDU plate HX 1.5–3.</span></span></label>
+                    <input class="input-field" id="inNtu" type="number" value="2.0" min="0.5" max="6" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Room air T / RH (°C / %) <span class="tip">?<span class="tipbox"><b>Dew-point inputs</b> — room air temperature and relative humidity set the dew point. Supply must stay ≥2–3 °C above it.</span></span></label>
+                    <div style="display:flex; gap:.5rem;"><input class="input-field" id="inAir" type="number" value="24" min="10" max="40" step="0.5"><input class="input-field" id="inRh" type="number" value="60" min="10" max="100" step="1"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div>
+            <div class="cc-results-head"><h2>Sizing results</h2><span class="vtag" id="ccEngTag">engine —</span></div>
+            <div class="cc-kpis" id="ccKpis"></div>
+            <div class="cc-note" style="margin-top:1rem;">
+                <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Pro analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
+            </div>
+        </div>
+
+    </div></main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container"><div class="footer-grid">
+            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
+            <div class="footer-nav"><h4 class="footer-heading">CDU TOOLKIT</h4><ul class="footer-links"><li><a href="cdu-hub.html">Toolkit Hub</a></li><li><a href="cdu-selection-guide.html">Selection Guide</a></li><li><a href="cdu-checklist.html">Checklist</a></li><li><a href="cdu-mini-bms.html">Mini-BMS</a></li><li><a href="cdu-comparison.html">Deep Comparison</a></li></ul></div>
+            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
+        </div></div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('rz_theme')||'light';
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('rz_theme',n); });
+        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
+        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
+        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
+    })();
+    </script>
+
+    <script>
+    /* CDU calculator — wires the validated engine to live KPIs. */
+    (function(){
+        var DEFAULTS = { inLoad:300, inDt:11, inFluid:'pg25', inGlycol:25, inSupply:32, inDn:'DN50',
+            inLen:20, inK:8, inPumpEff:0.70, inMotorEff:0.92, inPerPump:600, inFac:28, inNtu:2.0, inAir:24, inRh:60 };
+        function $(id){ return document.getElementById(id); }
+        function val(id){ var el=$(id); return el ? (el.tagName==='SELECT'? el.value : parseFloat(el.value)) : null; }
+
+        function chipFor(state){ return state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'derived'); }
+        function kpiCard(label, value, unit, sub, state){
+            var cls = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'ok');
+            var chip = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'derived');
+            return '<div class="kpi '+cls+'"><div class="kpi-label">'+label+' <span class="chip '+chip+'">Derived</span></div>'+
+                   '<div class="kpi-val">'+value+'<span style="font-size:.8rem;color:var(--cdu-muted);font-weight:500;"> '+unit+'</span></div>'+
+                   '<div class="kpi-sub">'+sub+'</div></div>';
+        }
+
+        function compute(){
+            if(!window.CDU_ENGINE || !window.CDU_MODEL){ return; }
+            var E = window.CDU_ENGINE, M = window.CDU_MODEL;
+            var load=val('inLoad'), dt=val('inDt'), fluid=val('inFluid'), glycol=val('inGlycol'),
+                supply=val('inSupply'), dn=val('inDn'), len=val('inLen'), K=val('inK'),
+                pumpEff=val('inPumpEff'), motorEff=val('inMotorEff'), perPump=val('inPerPump'),
+                fac=val('inFac'), ntu=val('inNtu'), air=val('inAir'), rh=val('inRh');
+            if(!(load>0)||!(dt>0)){ return; }
+
+            var fp = E.fluidProps(fluid, supply, glycol);
+            var rhoKgL = fp.rho/1000;
+            // flow from heat
+            var flow = E.flowLpmFromQ(load, rhoKgL, fp.cp, dt);
+            var perKw = flow/load;
+            var perKwState = E.bandState(perKw, M.bands.flowLpmPerKw);
+            // hydraulics
+            var idmm = M.pipeIdMm[dn] || 52.5;
+            var leg = E.legDpBar(flow, idmm, len, K, fluid, supply, glycol);
+            // approach via eps-NTU (balanced Cr~0.9 typical secondary/primary)
+            var eps = E.epsilonNTU(ntu, 0.9);
+            // hot-in = secondary return (supply+dt), cold-in = facility supply
+            var approach = E.approachTempC(supply + dt, fac, eps);
+            var approachState = E.bandState(approach, M.bands.atdK);
+            // NPSH
+            var vp = E.vaporPressureBar(supply);
+            var fricHead = leg.dpTotalBar * M.phys.barToPa / (fp.rho * M.phys.gravityMs2);
+            var npshA = E.npshAvailableM(M.phys.atmPressureBar, vp, 2.0, fricHead, fp.rho);
+            var margin = E.cavitationMarginPct(npshA, M.pump.npshRequiredMDefault);
+            var marginState = E.bandState(margin, M.bands.npshMarginPct);
+            // dew point
+            var dew = E.dewPointC(air, rh);
+            var dewMargin = supply - dew;
+            var dewState = dewMargin >= M.bands.dewMarginK.min ? 'ok' : 'alarm';
+            // pump
+            var hyd = E.pumpHydraulicKW(flow, leg.dpTotalBar);
+            var shaft = E.pumpShaftKW(hyd, pumpEff);
+            var elec = E.pumpElectricalKW(shaft, motorEff);
+            var npumps = E.pumpCountNplus1(flow, perPump);
+
+            var html = '';
+            html += kpiCard('Secondary flow', flow.toFixed(0), 'LPM', perKw.toFixed(2)+' LPM/kW · OCP band 1.0–1.5', perKwState);
+            html += kpiCard('Pipe velocity', leg.velocityMs.toFixed(2), 'm/s', dn+' · band 1.5–3.0 m/s · Re '+(leg.reynolds/1000).toFixed(0)+'k', leg.velState);
+            html += kpiCard('Pressure drop', leg.dpTotalBar.toFixed(2), 'bar', len+'m + ΣK '+K+' · Haaland f '+leg.frictionFactor.toFixed(4), E.bandState(leg.dpTotalBar, M.bands.dpBar));
+            html += kpiCard('HX approach', approach.toFixed(1), '°C', 'ε '+eps.toFixed(2)+' (NTU '+ntu+') · band 3–5 °C', approachState);
+            html += kpiCard('NPSH margin', margin.toFixed(0), '%', 'avail '+npshA.toFixed(1)+'m vs req '+M.pump.npshRequiredMDefault+'m · ≥10–20%', marginState);
+            html += kpiCard('Dew-point margin', dewMargin.toFixed(1), 'K', 'supply '+supply+'°C vs dew '+dew.toFixed(1)+'°C · ≥2–3 K', dewState);
+            html += kpiCard('Pump electrical', elec.toFixed(2), 'kW', 'shaft '+shaft.toFixed(2)+' kW · hyd '+hyd.toFixed(2)+' kW', 'ok');
+            html += kpiCard('Pumps (N+1)', npumps, 'units', Math.max(npumps-1,1)+' duty + 1 standby · '+perPump+' LPM each', 'ok');
+            $('ccKpis').innerHTML = html;
+            $('ccEngTag').textContent = 'engine v'+E.version+' · '+fluid.toUpperCase()+' @ '+supply+'°C';
+        }
+
+        function setPreset(type){
+            if(!window.CDU_MODEL) return;
+            var t = window.CDU_MODEL.types[type]; if(!t) return;
+            $('inLoad').value = t.cap; $('inDt').value = t.dT; $('inSupply').value = t.supply;
+            document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-type')===type); });
+            compute();
+        }
+        function reset(){
+            Object.keys(DEFAULTS).forEach(function(k){ var el=$(k); if(el) el.value = DEFAULTS[k]; });
+            document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-type')==='inrow'); });
+            compute();
+        }
+
+        function init(){
+            ['inLoad','inDt','inFluid','inGlycol','inSupply','inDn','inLen','inK','inPumpEff','inMotorEff','inPerPump','inFac','inNtu','inAir','inRh'].forEach(function(id){
+                var el=$(id); if(el){ el.addEventListener('input', compute); el.addEventListener('change', compute); }
+            });
+            document.querySelectorAll('.preset-btn').forEach(function(b){ b.addEventListener('click', function(){ setPreset(b.getAttribute('data-type')); }); });
+            $('ccReset').addEventListener('click', reset);
+            compute();
+        }
+        if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+    </script>
+    <script src="auth.js?v=2026-05-09-v1" defer></script>
+</body>
+</html>

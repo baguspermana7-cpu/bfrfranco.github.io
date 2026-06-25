@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.44.0 — 2026-06-25 (CDU calculation hub — Ship 3: interactive sizing calculator)
+
+### Added
+- **`cdu-calculator.html`** — a new interactive CDU sizing & thermohydraulic calculator (the
+  centerpiece of the hub). Wires the validated `js/cdu-engine.js` to live KPIs: secondary flow +
+  LPM/kW (vs OCP band), pipe velocity, pressure drop (Darcy-Weisbach), HX approach (ε-NTU), NPSH
+  margin, dew-point margin, pump electrical power and N+1 count. Per-CDU-type load presets, a tooltip
+  on every input, **basis chips + band-coloured rails** on every KPI (ACCURACY_VALIDATION rule 6),
+  `--cdu-` theme, full dark-mode + mobile, version stamp. 0 console errors.
+- Registered across the site: `cdu-hub.html` (new "05 · Calculate" card + JSON-LD hasPart + "five
+  resources" copy), `sitemap.xml` (112 URLs), `llms.txt` (123 pages), `search-index.json` (new entry).
+
+### Notes
+- Free-tier core ships first per the rollout plan; the Pro tier (TCO/NPV, Monte-Carlo, sensitivity
+  and a PDF tech-spec) lands next as Ship 3b. PG-25 fluid properties are handbook-class (ILLUSTRATIVE).
+
 ## v1.43.74 — 2026-06-25 (CDU calculation hub — Ship 2: data layer + glossary)
 
 ### Added (data/cdu/ + glossary)
