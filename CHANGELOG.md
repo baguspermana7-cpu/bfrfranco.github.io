@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.43.70 — 2026-06-25 (Article 26 — real USGS PFOS water-measurement extract)
+
+### Added
+- **`data/article-26/measurements-usgs-wqp-pfos.csv`** — 9,230 rows of **real** PFOS monitoring
+  results from the USGS Water Quality Portal since 2020 (both controlled-vocabulary terms ORed:
+  "Perfluorooctanesulfonate" + "Perfluorooctane sulfonic acid"), across water/groundwater/sediment/
+  tissue. PFOS is the second compound under the EPA 4 ppt MCL. Public domain. Reproduce via
+  `fetch-usgs-wqp-pfos.sh`.
+- Now ~30,000 rows of real measurements across three extracts (atmospheric HFC-134a + aqueous
+  PFOA + PFOS); Data & Downloads grid → 9 cards; README + section intro updated.
+
 ## v1.43.69 — 2026-06-25 (Article 26 — real USGS PFOA water-measurement extract)
 
 ### Added
