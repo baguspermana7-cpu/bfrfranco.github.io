@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.44.2 — 2026-06-25 (CDU calculation hub — Ship 4/5: suite integration)
+
+### Changed (cross-link the new calculator into the CDU suite)
+- Added in-content links to `cdu-calculator.html` from `cdu-selection-guide.html` (sizing lead),
+  `cdu-checklist.html` (operating-bands lead), `cdu-comparison.html` (intro) and `cdu-mini-bms.html`
+  (hero crumb) — the calculator was previously reachable only from the hub.
+
+### Deferred (with rationale)
+- The mini-BMS physics-rewrite (route its synthetic basis through `cduState()`) is **intentionally
+  deferred**: its `TYPES`/`SCEN` values are already numerically identical to `cdu-model.js` (they were
+  lifted from it), so a core rewrite of the polished, accuracy-gated 5-phase cockpit would risk
+  regressions for zero numeric change. Recommended only as a separately-probe-verified effort if desired.
+
 ## v1.44.1 — 2026-06-25 (CDU calculation hub — Ship 3b: calculator Pro tier + PDF)
 
 ### Added (cdu-calculator.html — Pro analysis tier)
