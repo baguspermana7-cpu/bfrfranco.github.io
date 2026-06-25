@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.43.67 — 2026-06-25 (Article 26 — downloadable data & evidence files)
+
+### Added (data/article-26/ — 6 downloadable CSVs + manifest)
+- **`worked-model-scenarios.csv`** (6,000 rows) — the article's fluid-loss model across charge
+  (100–5,000 L) × make-up rate (0.5–20 %/yr) × 3 fluids → annual loss (L/kg), replacement cost,
+  t CO₂e/yr, kg TFA/yr. Reproducible via committed `build-worked-model.py`.
+- **`fluid-properties.csv`**, **`loss-zones.csv`**, **`regulatory-thresholds.csv`**,
+  **`tfa-pfas-reference-values.csv`** — sourced evidence tables (each value source-class tagged).
+- **`external-databases.csv`** — verified portal links to the large public monitoring archives
+  (EPA UCMR 5, TRI, CompTox; USGS WQP; NOAA GML / AGAGE; EU EEA Waterbase; NORMAN; German UBA;
+  CA GAMA; EPA GHGRP) where the raw measurement rows can be downloaded in full.
+- **`README.md`** manifest documenting every file + source-class tags.
+- **Article "Data & Downloads" section** (`#section-data`) — a links-only block (no inline data)
+  with `download` anchors to all six CSVs; new `.pfas-downloads`/`.pfas-dl` styles (dark-mode +
+  mobile-collapse covered).
+
+### Changed
+- Refreshed article `meta description` + `og:description` to the reframed 17.1%/yr framing (they
+  still asserted the old "20-30x" as fact).
+
 ## v1.43.66 — 2026-06-24 (Article 26 — uiux-reviewer polish on the new fluid-loss UI)
 
 ### Fixed

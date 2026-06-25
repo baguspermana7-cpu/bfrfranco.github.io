@@ -32,7 +32,7 @@
 
     <!-- SEO Meta Tags -->
     <title>The Invisible Leak: PFAS Vapor Release in Data Centers | ResistanceZero</title>
-    <meta name="description" content="PFAS in data centers isn't just a sealed-system leak problem. Maintenance vapor release is 20-30x larger — and zero federal reporting is required. An engineer's inside view.">
+    <meta name="description" content="The real PFAS vector in two-phase data center cooling isn't sealed leaks — it's maintenance vapor. One field study measured 17.1%/yr fluid loss, and nobody is required to report it.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="PFAS data center cooling, per- and polyfluoroalkyl substances, two-phase immersion cooling, Novec 7000 PFAS, data center forever chemicals, PFAS-free cooling alternatives, HFO refrigerants, data center environmental contamination, immersion cooling PFAS replacement">
     <meta name="author" content="Bagus Dwi Permana">
@@ -52,7 +52,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-26.html">
     <meta property="og:title" content="The Invisible Leak: What Happens When You Open a Two-Phase Cooling System — And Why Nobody Is Measuring It">
-    <meta property="og:description" content="PFAS in data centers isn't just a sealed-system leak problem. Maintenance vapor release is 20-30x larger — and zero federal reporting is required. An engineer's inside view.">
+    <meta property="og:description" content="The real PFAS vector in two-phase data center cooling isn't sealed leaks — it's maintenance vapor. One field study measured 17.1%/yr fluid loss, and nobody is required to report it.">
     <meta property="og:image" content="https://resistancezero.com/assets/og/article-26.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -630,6 +630,16 @@
         /* Disclaimer */
         .pfas-disclaimer { font-size:0.76rem; color:#9ca3af; line-height:1.55; border-top:1px solid #f3f4f6; padding-top:0.875rem; margin-top:1rem; }
         [data-theme="dark"] .pfas-disclaimer { color:#94a3b8; border-color:#374151; }
+        .pfas-downloads { display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; margin:1.25rem 0; }
+        .pfas-dl { display:flex; gap:0.7rem; align-items:flex-start; padding:0.8rem 1rem; border:1px solid rgba(180,83,9,0.3); border-radius:10px; background:rgba(232,181,99,0.05); text-decoration:none; color:inherit; transition:border-color .15s ease, transform .15s ease; }
+        .pfas-dl:hover { border-color:#b45309; transform:translateY(-1px); }
+        .pfas-dl > i { color:#b45309; margin-top:0.15rem; font-size:0.95rem; }
+        .pfas-dl-name { display:block; font-family:'JetBrains Mono', monospace; font-weight:700; font-size:0.8rem; color:#b45309; word-break:break-all; }
+        .pfas-dl-desc { display:block; font-size:0.78rem; color:#4b5563; line-height:1.45; margin-top:0.25rem; }
+        [data-theme="dark"] .pfas-dl { background:rgba(180,83,9,0.1); border-color:#374151; }
+        [data-theme="dark"] .pfas-dl:hover { border-color:#d97706; }
+        [data-theme="dark"] .pfas-dl-desc { color:#cbd5e1; }
+        @media (max-width:768px) { .pfas-downloads { grid-template-columns:1fr; } }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -1770,6 +1780,38 @@
             <div class="pfas-login-terms">By signing in you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a></div>
         </div>
     </div>
+
+    <!-- Data & Downloads -->
+    <h2 id="section-data">Data &amp; Downloads</h2>
+    <p>Every number in this investigation is reproducible. The datasets below are downloadable as CSV &mdash; the fluid-loss model behind the worked examples, the sourced loss-zone and regulatory tables, key published TFA/PFAS values, and a manifest of the large public monitoring databases where the raw measurement records (thousands to millions of rows) can be pulled in full. Source-class tags (<em>published / vendor / regulator / modelled</em>) are carried in each file.</p>
+
+    <div class="pfas-downloads">
+        <a class="pfas-dl" href="data/article-26/worked-model-scenarios.csv" download>
+            <i class="fas fa-table"></i>
+            <span><span class="pfas-dl-name">worked-model-scenarios.csv</span><span class="pfas-dl-desc">6,000 rows &mdash; annual loss (L, kg), replacement cost, t&nbsp;CO&#8322;e and kg&nbsp;TFA/yr across charge &times; make-up rate &times; fluid.</span></span>
+        </a>
+        <a class="pfas-dl" href="data/article-26/fluid-properties.csv" download>
+            <i class="fas fa-flask"></i>
+            <span><span class="pfas-dl-name">fluid-properties.csv</span><span class="pfas-dl-desc">Boiling point, vapour pressure, density, GWP, lifetime, breakdown product and PFAS status per fluid.</span></span>
+        </a>
+        <a class="pfas-dl" href="data/article-26/loss-zones.csv" download>
+            <i class="fas fa-sitemap"></i>
+            <span><span class="pfas-dl-name">loss-zones.csv</span><span class="pfas-dl-desc">The loss-zone taxonomy: pathway, sourced magnitude, metered?, reportable?</span></span>
+        </a>
+        <a class="pfas-dl" href="data/article-26/regulatory-thresholds.csv" download>
+            <i class="fas fa-gavel"></i>
+            <span><span class="pfas-dl-name">regulatory-thresholds.csv</span><span class="pfas-dl-desc">EPA MCL/&sect;608, EU DWD/F-Gas, ECHA TFA, member-state limits &mdash; with status and date.</span></span>
+        </a>
+        <a class="pfas-dl" href="data/article-26/tfa-pfas-reference-values.csv" download>
+            <i class="fas fa-droplet"></i>
+            <span><span class="pfas-dl-name">tfa-pfas-reference-values.csv</span><span class="pfas-dl-desc">Key published TFA/PFAS concentrations and limits (Kazil 2014, member-state, EU/EPA), each cited.</span></span>
+        </a>
+        <a class="pfas-dl" href="data/article-26/external-databases.csv" download>
+            <i class="fas fa-database"></i>
+            <span><span class="pfas-dl-name">external-databases.csv</span><span class="pfas-dl-desc">Portal links to EPA UCMR&nbsp;5, TRI, CompTox, USGS WQP, NOAA/AGAGE, EEA, NORMAN, UBA, CA&nbsp;GAMA, GHGRP.</span></span>
+        </a>
+    </div>
+    <p style="font-size:0.82rem;color:#6b7280;"><i class="fas fa-circle-info" style="color:#b45309;"></i> The raw measurement archives (UCMR&nbsp;5 PFAS results, USGS water-quality records, NOAA halocarbon time series) are hundreds of megabytes and live on the agencies' own portals &mdash; <a href="data/article-26/external-databases.csv" download>external-databases.csv</a> links each one directly rather than mirroring government files here. A full manifest is in <a href="data/article-26/README.md" download>README.md</a>; the model is regenerable via <code>build-worked-model.py</code>.</p>
 
     <!-- References -->
     <div class="references-section">
