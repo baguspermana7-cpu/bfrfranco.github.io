@@ -1783,7 +1783,7 @@
 
     <!-- Data & Downloads -->
     <h2 id="section-data">Data &amp; Downloads</h2>
-    <p>Every number in this investigation is reproducible. The datasets below are downloadable as CSV &mdash; including <strong>~30,000 rows of real measurements &mdash; NOAA atmospheric HFC-134a (15,336) plus USGS PFOA (5,438) and PFOS (9,230) water-quality records</strong>, the fluid-loss model behind the worked examples, the sourced loss-zone and regulatory tables, key published TFA/PFAS values, and a manifest of the large public monitoring databases where further raw records (thousands to millions of rows) can be pulled in full. Source-class tags (<em>measured / published / vendor / regulator / modelled</em>) are carried in each file.</p>
+    <p>Every number in this investigation is reproducible. The datasets below are downloadable as CSV &mdash; including <strong>~35,000 rows of real measurements &mdash; NOAA atmospheric HFC-134a (15,336) plus USGS PFOA (5,438), PFOS (9,230) and GenX (4,832) water-quality records</strong>, the fluid-loss model behind the worked examples, the sourced loss-zone and regulatory tables, key published TFA/PFAS values, and a manifest of the large public monitoring databases where further raw records (thousands to millions of rows) can be pulled in full. Source-class tags (<em>measured / published / vendor / regulator / modelled</em>) are carried in each file.</p>
 
     <div class="pfas-downloads">
         <a class="pfas-dl" href="data/article-26/measurements-noaa-hfc134a.csv" download>
@@ -1797,6 +1797,10 @@
         <a class="pfas-dl" href="data/article-26/measurements-usgs-wqp-pfos.csv" download>
             <i class="fas fa-water"></i>
             <span><span class="pfas-dl-name">measurements-usgs-wqp-pfos.csv</span><span class="pfas-dl-desc"><strong>9,230 real measurements</strong> &mdash; PFOS results from the USGS Water Quality Portal since 2020 (both vocabulary terms), water / groundwater / sediment / tissue. PFOS is the other EPA 4&nbsp;ppt MCL compound.</span></span>
+        </a>
+        <a class="pfas-dl" href="data/article-26/measurements-usgs-wqp-genx-hfpo-da.csv" download>
+            <i class="fas fa-vials"></i>
+            <span><span class="pfas-dl-name">measurements-usgs-wqp-genx-hfpo-da.csv</span><span class="pfas-dl-desc"><strong>4,832 real measurements</strong> &mdash; GenX (HFPO-DA) from the USGS portal since 2020. The &ldquo;safer&rdquo; next-gen PFAS replacement, now EPA-regulated &mdash; the direct analogue to the HFO&rarr;TFA story.</span></span>
         </a>
         <a class="pfas-dl" href="data/article-26/worked-model-scenarios.csv" download>
             <i class="fas fa-table"></i>
@@ -1823,7 +1827,11 @@
             <span><span class="pfas-dl-name">external-databases.csv</span><span class="pfas-dl-desc">Portal links to EPA UCMR&nbsp;5, TRI, CompTox, USGS WQP, NOAA/AGAGE, EEA, NORMAN, UBA, CA&nbsp;GAMA, GHGRP.</span></span>
         </a>
     </div>
-    <p style="font-size:0.82rem;color:#6b7280;"><i class="fas fa-circle-info" style="color:#b45309;"></i> The raw measurement archives (UCMR&nbsp;5 PFAS results, USGS water-quality records, NOAA halocarbon time series) are hundreds of megabytes and live on the agencies' own portals &mdash; <a href="data/article-26/external-databases.csv" download>external-databases.csv</a> links each one directly rather than mirroring government files here. A full manifest is in <a href="data/article-26/README.md" download>README.md</a>; the model is regenerable via <code>build-worked-model.py</code>.</p>
+    <div class="pfas-warning-box" style="margin-top:1rem;">
+        <h4><i class="fas fa-magnifying-glass-minus"></i> The dataset that doesn't exist</h4>
+        <p>Querying the USGS Water Quality Portal for <strong>trifluoroacetic acid (TFA)</strong> &mdash; the breakdown product at the centre of this article &mdash; returns <strong>zero records</strong>, under every name variant. PFOA, PFOS and even GenX are monitored in the thousands; the compound the &ldquo;PFAS-free&rdquo; cooling fluids actually become is not monitored in US water-quality systems at all. The absence is the evidence.</p>
+    </div>
+    <p style="font-size:0.82rem;color:#6b7280;"><i class="fas fa-circle-info" style="color:#b45309;"></i> The full raw archives (EPA UCMR&nbsp;5 PFAS results, the complete USGS water-quality record, NOAA halocarbon time series) are hundreds of megabytes and live on the agencies' own portals &mdash; <a href="data/article-26/external-databases.csv" download>external-databases.csv</a> links each one directly rather than mirroring government files here. A full manifest is in <a href="data/article-26/README.md" download>README.md</a>; every dataset has a committed regeneration script.</p>
 
     <!-- References -->
     <div class="references-section">

@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.43.71 — 2026-06-25 (Article 26 — GenX extract + the TFA-absence finding)
+
+### Added
+- **`data/article-26/measurements-usgs-wqp-genx-hfpo-da.csv`** — 4,832 rows of **real** GenX
+  (HFPO-DA) monitoring results from the USGS Water Quality Portal since 2020. GenX is the
+  current-generation "safer" PFAS replacement, now itself EPA-regulated (10 ppt MCL) — the direct
+  analogue to the article's HFO→TFA replacement argument. Reproduce via `fetch-usgs-wqp-genx.sh`.
+- **"The dataset that doesn't exist" finding box** in the Data & Downloads section: querying the
+  USGS portal for trifluoroacetic acid (TFA) returns **zero records** under every name variant —
+  the breakdown product central to the article is unmonitored in US water-quality systems, a literal
+  confirmation of the "nobody is measuring it" thesis (this is a finding, not inline data).
+- Now ~35,000 rows of real measurements across four extracts; grid → 10 cards; README + intro updated.
+
 ## v1.43.70 — 2026-06-25 (Article 26 — real USGS PFOS water-measurement extract)
 
 ### Added
