@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.43.68 — 2026-06-25 (Article 26 — real NOAA atmospheric measurement extract)
+
+### Added
+- **`data/article-26/measurements-noaa-hfc134a.csv`** — 15,336 rows of **real** atmospheric
+  HFC-134a flask measurements from NOAA's Global Monitoring Lab (16 global sites, 1994–2026,
+  ~1.8 → ~150 ppt). HFC-134a degrades to TFA at ~100% molar yield — the same TFA endpoint as the
+  HFO "PFAS-free" cooling replacements. Public-domain US Government data (PI: Montzka & Vimont).
+  Committed extract + `convert-noaa-hfc134a.py` (regenerable from the NOAA source URL).
+- Featured as the first card in the article's "Data & Downloads" block; section intro + README
+  manifest updated; added a `measured` source-class tag.
+
 ## v1.43.67 — 2026-06-25 (Article 26 — downloadable data & evidence files)
 
 ### Added (data/article-26/ — 6 downloadable CSVs + manifest)
