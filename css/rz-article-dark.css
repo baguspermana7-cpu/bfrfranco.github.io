@@ -113,7 +113,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body > p:first-of
 html[data-rz-register="editorial"][data-theme="dark"] .quote-callout{
   background:color-mix(in srgb,var(--rz-art-accent) 7%,transparent) !important;
   border:1px solid color-mix(in srgb,var(--rz-art-accent) 26%,transparent) !important;
-  border-left:2px solid var(--rz-art-accent) !important;
+  border-left:1px solid color-mix(in srgb,var(--rz-art-accent) 26%,transparent) !important;  /* even hairline; accent now carried by the hanging quote glyph */
 }
 html[data-rz-register="editorial"][data-theme="dark"] .quote-callout blockquote{
   font-family:var(--rz-art-serif) !important;font-style:italic;
@@ -197,7 +197,9 @@ html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter].rz-in{opac
    backgrounds) are intentionally kept, so bespoke light layouts don't break.
    ============================================================================ */
 html[data-rz-register="editorial"]:not([data-theme="dark"]){
-  --rz-art-accent:#b45309;            /* amber-700 — readable gold on white */
+  /* !important beats the inline style="--rz-art-accent:#E8B563" each article sets on <html>:
+     #E8B563 is the DARK accent (≈1.7:1 on white, fails) — day needs the readable gold #b45309. */
+  --rz-art-accent:#b45309 !important;            /* amber-700 — readable gold on white */
   --rz-art-accent2:#6FBF9A;
   --rz-art-strong:#1a1d23;
   --rz-art-muted:#6b7280;
@@ -255,7 +257,7 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body > p:fi
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout{
   background:rgba(232,181,99,.08) !important;
   border:1px solid rgba(180,83,9,.26) !important;
-  border-left:2px solid var(--rz-art-accent) !important;
+  border-left:1px solid color-mix(in srgb,var(--rz-art-accent) 26%,transparent) !important;  /* even hairline; accent now carried by the hanging quote glyph */
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout blockquote{
   font-family:var(--rz-art-serif) !important;font-style:italic;color:var(--rz-art-strong) !important;
@@ -295,4 +297,53 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-enter]{opac
 html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-enter].rz-in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);}
 @media (prefers-reduced-motion:reduce){
   html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-enter]{opacity:1 !important;transform:none !important;}
+}
+
+/* ============================================================================
+   EDITORIAL ENHANCEMENTS (v1.46.x) — theme-agnostic refinements that read the
+   per-theme --rz-art-accent / --rz-art-muted vars, so each applies correctly in
+   BOTH dark and day. Self-contained to editorial elements (no global coupling).
+   ============================================================================ */
+
+/* --- inline body links: amber, always-underlined (accessible), brighten on hover.
+   No !important, so per-link inline colours (e.g. the purple disclaimer link) win. --- */
+html[data-rz-register="editorial"] .article-body p a,
+html[data-rz-register="editorial"] .article-body li a{
+  color:var(--rz-art-accent);
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb,var(--rz-art-accent) 45%,transparent);
+  transition:text-decoration-color .25s ease;
+}
+html[data-rz-register="editorial"] .article-body p a:hover,
+html[data-rz-register="editorial"] .article-body li a:hover{
+  text-decoration-color:var(--rz-art-accent);
+}
+
+/* --- pull-quote: replace the 2px accent side-stripe with an even hairline border
+   + a hanging Fraunces quotation glyph (editorial, and clears the side-stripe ban). --- */
+html[data-rz-register="editorial"] .quote-callout{
+  position:relative;
+  border-left-width:1px !important;
+  border-left-color:color-mix(in srgb,var(--rz-art-accent) 26%,transparent) !important;
+  padding-left:2.6rem;
+}
+html[data-rz-register="editorial"] .quote-callout::before{
+  content:'\201C';
+  position:absolute;left:.6rem;top:.02rem;
+  font-family:'Fraunces',Georgia,serif;font-size:2.8rem;line-height:1;
+  color:var(--rz-art-accent);opacity:.55;
+}
+
+/* --- editorial selection: a warm amber wash instead of the browser default --- */
+html[data-rz-register="editorial"] ::selection{
+  background:color-mix(in srgb,var(--rz-art-accent) 26%,transparent);
+}
+
+/* --- figure captions → mono, muted (matches the instrument-grade meta) --- */
+html[data-rz-register="editorial"] figcaption{
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+  font-size:.78rem;letter-spacing:.02em;
+  color:var(--rz-art-muted);
 }

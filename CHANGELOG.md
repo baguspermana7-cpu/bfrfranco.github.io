@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v1.46.4 — 2026-06-26 (Articles — editorial reading-experience refinements + day-accent contrast fix)
+
+Design pass on the editorial register (impeccable-guided, on-brand). All in the shared
+`css/rz-article-dark.css`, so every article + hub gets them; both themes.
+
+### Fixed
+- **Day-mode accent contrast.** Each article sets `style="--rz-art-accent:#E8B563"` inline on
+  `<html>` (the dark gold). That inline value was overriding the day variant, so day-mode
+  links/meta/rails rendered in light gold `#E8B563` (≈1.7:1 on white — fails). Forced the day
+  accent to readable `#b45309` with `!important` (beats the inline). Dark unchanged (#E8B563).
+
+### Changed
+- **Inline body links** now read as editorial amber with an always-on hairline underline that
+  brightens on hover (accessible; per-link inline colours like the purple disclaimer link are
+  preserved). Resolves the accent per theme.
+- **Pull-quotes** lose the 2px accent side-stripe (an impeccable absolute-ban) for an even
+  hairline border + a hanging Fraunces quotation glyph — more editorial, on-brand.
+- **Figure captions** → IBM Plex Mono, muted (matches the instrument-grade meta).
+- **Selection** → a warm amber wash on editorial pages.
+
+### Verification
+- Both themes: pull-quote glyph renders + border is 1px; links amber/underlined and readable
+  (day #b45309 / dark #E8B563); global dark re-probe 0 light-on-dark / 0 errors (34/34). Audits CLEAN.
+
 ## v1.46.3 — 2026-06-26 (Article HUBS — editorial parity + theme bug-fixes)
 
 Extends v1.46.2 from the 34 articles to the article-ecosystem hub pages
