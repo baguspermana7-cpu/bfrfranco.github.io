@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.48.2 — 2026-06-27 (Both-mode text audit — fix comparison-badge contrast)
+
+Audited all 114 pages in **both light and dark** (228 renders) with a refined,
+gradient-aware text-contrast probe, then visually verified the worst-flagged pages.
+
+### Fixed
+- **`.cmp-badge-a/-b` low contrast** on the comparison pages — the A/B badges set
+  accent-coloured text on a light tint of the **same** accent (`color:var(--cmp-accent)` on
+  `background:var(--cmp-accent-light)`), ≈2.5 contrast (sub-WCAG) in both themes. Changed to a
+  solid accent background with white text (high contrast, theme-independent). 5 compare pages.
+
+### Audit result
+- The rest of the contrast flags were **false positives** confirmed by screenshot: hero photo /
+  overlay backgrounds, auth-gate dimming (gated labs/cockpits), gradient card backgrounds, and
+  intentionally-dim mono labels/captions. Body text, headings, lists, and tables render readable
+  in both modes across the site. The genuine white-body-in-dark class was already fixed + gated
+  in v1.48.1 (`audit-dark-coverage.mjs`, still CLEAN across 114 pages).
+
 ## v1.48.1 — 2026-06-26 (Dark-mode standard — fix white-body-in-dark on 13 pages + enforcement gate)
 
 Owner report: many content pages render broken in dark mode (only nav + title dark,
