@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.45.0 — 2026-06-26 (Fire-safety hub — Ship 3: clean-agent & Li-ion fire calculator)
+
+### Added
+- **`fire-calculator.html`** — interactive fire-protection calculator wiring `js/fire-engine.js` to
+  live KPIs: clean-agent quantity (NFPA 2001) + cylinders + kg/m³, design concentration, **occupant
+  safety vs NOAEL** (alarms when design conc exceeds NOAEL), GWP-weighted CO₂e (or inert residual-O₂),
+  smoke-detector coverage, discharge/hold bands, and a **Li-ion BBU panel** — thermal-runaway heat,
+  off-gas volume, and off-gas-vs-LFL room concentration (hazard-flagged, NFPA 855 / UL 9540A). Per-
+  scenario presets, tooltip per input, basis chips + band-coloured rails, `--fc-` fire theme.
+- Applied the pending uiux fixes from the start: theme key `theme` (site-consistent), slashed-zero
+  numerics, dark-mode chip overrides, keyboard-focusable tooltips, 2px focus outline.
+- Registered: `sitemap.xml` (113), `llms.txt` (124), `search-index.json` (new entry).
+
+### Verified
+- Audits clean; 9 KPIs render; engine-backed values correct (Novec 500 m³ → 343 kg; FM-200 11% →
+  occupant-safety alarm −2 pts to NOAEL; IG-541 → 235 m³ inert + residual-O₂; 333 kWh NMC → off-gas
+  72.7 vol% hazard); 0 console errors; dark + mobile pass. No bug, no error.
+
 ## v1.44.4 — 2026-06-25 (Fire-safety hub — Ship 2: data layer + glossary)
 
 ### Added (data/fire/ + glossary)
