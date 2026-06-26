@@ -146,6 +146,11 @@
         .pid-inst:hover circle.sch-eq2, .pid-inst.linked circle.sch-eq2{ stroke:var(--bm-cyan); stroke-width:2.6; }
         .pid-inst:focus{ outline:none; }
         .pid-inst:focus-visible circle.sch-eq2{ stroke:var(--bm-cyan); stroke-width:2.8; }
+        /* instrument lights up by alarm state, mirroring its tile */
+        .pid-inst.pid-warn circle.sch-eq2{ stroke:var(--bm-amber); stroke-width:2; }
+        .pid-inst.pid-warn text{ fill:var(--bm-amber); }
+        .pid-inst.pid-alarm circle.sch-eq2{ stroke:var(--bm-red); stroke-width:2.2; }
+        .pid-inst.pid-alarm text{ fill:var(--bm-red); }
         .tile{ transition:outline-color .15s, box-shadow .15s; }
         .tile.hoverhl{ outline:1px dashed var(--bm-cyan); outline-offset:1px; }
         .tile.linkhl{ outline:2px solid var(--bm-cyan); outline-offset:1px; }
@@ -428,9 +433,9 @@
     <script>
     (function(){
         /* theme + nav */
-        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('rz_theme')||'light';
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
         document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('rz_theme',n); });
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
         var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
         if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
         var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
@@ -583,7 +588,7 @@
             h+='<text class="sch-sub" x="340" y="30">CDU SKID</text>';
             // expansion tank T-01 + makeup MV-01 + relief PSV-01 (top)
             h+='<rect class="sch-eq" x="150" y="40" width="22" height="30" rx="10"/><path class="sch-eq2" d="M150 58 H172"/><text class="sch-sub" x="161" y="80" text-anchor="middle">T-01 EXP</text>';
-            h+=pInst(196,52,'LT','01','pv-level');
+            h+=pInst(196,52,'LT','01','pv-level','level');
             h+='<path class="pipe-s" d="M161 40 V30 H120" stroke-dasharray="2 2"/>'+pHV(140,30,'MV-01')+'<text class="sch-sub" x="120" y="26">makeup</text>';
             h+='<path class="sch-eq2" d="M161 40 V26 M156 26 l5 -6 l5 6" /><text class="sch-sub" x="178" y="26">PSV-01</text>';
             // pumps P-01A duty / P-01B standby (N+1) with suction iso, check, discharge iso
@@ -745,6 +750,13 @@
             st('pv-level', Math.round(level)+'%');               // LT-01
             st('pv-pump', pumpA?'N+1':'P-01B');
             var atdEl=document.getElementById('pv-atd'); if(atdEl) atdEl.textContent=(L2A?'—':atd.toFixed(0)+'°C');
+            // light up the P&ID instruments that tripped, mirroring their tiles
+            var pidEl=document.getElementById('pidBox');
+            if(pidEl){ ['atd','flow','sysP','filter','dP','level'].forEach(function(k){
+                var g=pidEl.querySelector('.pid-inst[data-link="'+k+'"]'); if(!g) return;
+                g.classList.remove('pid-warn','pid-alarm');
+                var sv=states[k]; if(sv==='warn') g.classList.add('pid-warn'); else if(sv==='alarm') g.classList.add('pid-alarm');
+            }); }
             // ----- overall state + active-alarm banner -----
             var worst='ok'; for(var kk in states) worst=worse(worst,states[kk]);
             var ps=document.getElementById('pidState');

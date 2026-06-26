@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.49.4 — 2026-06-27 (CDU Mini-BMS — P&ID instruments light up by alarm state)
+
+### Changed
+- **`cdu-mini-bms.html` P&ID schematic** now colours each tagged instrument by its live alarm state
+  (amber WARN / red ALARM), mirroring the tiles and the active-alarm banner — so a fault reads
+  consistently across all three views instead of the schematic only showing the leak marker. Example:
+  on Filter clog, PDT-01 (filter ΔP) and PDT-02 (loop ΔP) go red and FT-01 (flow) goes amber. The
+  LT-01 reservoir-level instrument is now also link-interactive (click ↔ its tile) and state-coloured.
+
 ## v1.49.3 — 2026-06-27 (Both-mode enforcement — fix stuck-dark-in-light + gate covers both themes)
 
 The both-mode audit's structural check (body must match the active theme) caught the
