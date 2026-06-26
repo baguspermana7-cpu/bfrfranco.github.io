@@ -780,6 +780,12 @@ def build_html(entries):
     }}
 
     /* Light mode overrides */
+    /* v1.48.x — light-mode body was missing, so the page stayed dark under a light navbar
+       (a broken middle state). Lighten the body/surface; the hero band stays dark intentionally. */
+    [data-theme="light"] body {{
+      background: #f8fafc;
+      color: #334155;
+    }}
     [data-theme="light"] .changelog-entry {{
       background: rgba(248,250,252,0.8);
       border-color: rgba(0,0,0,0.08);

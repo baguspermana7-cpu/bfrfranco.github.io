@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.49.3 — 2026-06-27 (Both-mode enforcement — fix stuck-dark-in-light + gate covers both themes)
+
+The both-mode audit's structural check (body must match the active theme) caught the
+**inverse** of the v1.48.1 bug: pages with a light palette that stay **dark in light mode**.
+
+### Fixed
+- **`changelog.html` stuck dark in light mode** — it had `[data-theme="light"]` rules for the
+  content cards but no `[data-theme="light"] body`, so light mode showed a light navbar over a
+  dark body (a broken middle state). Added the light body/surface rule to the generator template
+  (`tools/build-changelog-html.py`) and regenerated; the hero band stays dark intentionally.
+  (`achievements.html` is intentionally dark-only — no light palette — so it's correct as-is.)
+
+### Changed — enforcement now covers BOTH modes
+- **`tools/audit-dark-coverage.mjs`** now also fails **STUCK-DARK-IN-LIGHT**: a page declaring a
+  light palette (`[data-theme="light"]` / `:root:not([data-theme="dark"])`) must render a light
+  body in light mode. Pages with no light palette are dark-only (cockpits, dark trophy pages) and
+  skip the light check. Gate CLEAN across 114 pages in **both** themes.
+
 ## v1.49.2 — 2026-06-27 (Tools hub — surface the missing Fire suite + PLN Sumatra grid)
 
 ### Added

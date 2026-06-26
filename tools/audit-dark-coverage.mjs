@@ -25,20 +25,27 @@ const ROOT = process.cwd();
 const SKIP = /^(rz-|plan-|planb|google|404|sitemap|robots|llms)/;
 const pages = readdirSync(ROOT).filter(f => f.endsWith('.html') && !SKIP.test(f)).sort();
 
-// 1) Static: the :root,[data-theme=light] cascade bug
+// 1) Static: the :root,[data-theme=light] cascade bug + light-palette presence
 const cascadeBug = [];
+const hasLightPalette = {};
 for (const f of pages) {
   const src = readFileSync(resolve(ROOT, f), 'utf8');
   if (/:root\s*,\s*\[data-theme="light"\]|\[data-theme="light"\]\s*,\s*:root/.test(src)) cascadeBug.push(f);
+  // a page that defines any light-mode palette rule is expected to actually switch to light;
+  // a page with none is dark-only by design (instrument cockpits, dark trophy pages) -> skip light check.
+  hasLightPalette[f] = /\[data-theme="light"\]|:root:not\(\[data-theme="dark"\]\)/.test(src);
 }
 
-// 2) Render: white body / white content block in dark
+// 2) Render BOTH modes: dark must be dark (no white body/content), light must be light (not stuck dark)
 const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 const renderBroken = [];
+const lightStuck = [];
+const bodyLum = async (pg) => pg.evaluate(() => { const m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g); return m ? Math.round(0.299*+m[0] + 0.587*+m[1] + 0.114*+m[2]) : -1; });
 for (const f of pages) {
   const pg = await browser.newPage();
   try {
     await pg.goto('file://' + resolve(ROOT, f), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    // --- DARK ---
     await pg.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await new Promise(r => setTimeout(r, 350));
     const res = await pg.evaluate(() => {
@@ -57,6 +64,13 @@ for (const f of pages) {
     if (res.bbgLum > 195 || res.maxLight > 60000) {
       renderBroken.push(`${f}  body-lum=${res.bbgLum}  light-block=${res.cls}(${res.maxLight}px²)`);
     }
+    // --- LIGHT --- (only for pages that declare a light palette; dark-only pages are skipped)
+    if (hasLightPalette[f]) {
+      await pg.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+      await new Promise(r => setTimeout(r, 250));
+      const ll = await bodyLum(pg);
+      if (ll >= 0 && ll < 90) lightStuck.push(`${f}  body-lum=${ll} (stuck dark in light mode)`);
+    }
   } catch (e) { /* heavy/auth pages may time out on file://; not counted as a skin failure */ }
   await pg.close();
 }
@@ -73,10 +87,15 @@ if (renderBroken.length) {
   console.log(`\n✗ WHITE-IN-DARK — body or a large content block renders light in dark mode:`);
   renderBroken.forEach(f => console.log('   ' + f));
 }
+if (lightStuck.length) {
+  failed = true;
+  console.log(`\n✗ STUCK-DARK-IN-LIGHT — page declares a light palette but body stays dark in light mode (add [data-theme="light"] body):`);
+  lightStuck.forEach(f => console.log('   ' + f));
+}
 if (!failed) {
-  console.log(`\nDARK-COVERAGE AUDIT — CLEAN. ${pages.length} content pages render dark with no white body/content block.`);
+  console.log(`\nDARK-COVERAGE AUDIT — CLEAN (both modes). ${pages.length} content pages: dark renders dark (no white body/content), light renders light.`);
 } else {
-  console.log(`\nDARK-COVERAGE AUDIT — ${cascadeBug.length} cascade-bug + ${renderBroken.length} white-in-dark, of ${pages.length} pages.`);
-  console.log('Fix: every content page must define a dark palette ([data-theme="dark"]{ --bg/--text/... }) or load the standard skin, and pass this audit.');
+  console.log(`\nDARK-COVERAGE AUDIT — ${cascadeBug.length} cascade-bug + ${renderBroken.length} white-in-dark + ${lightStuck.length} stuck-dark-in-light, of ${pages.length} pages.`);
+  console.log('Fix: every content page must define a dark palette ([data-theme="dark"]{ --bg/--text/... }) AND switch cleanly in both modes, or be dark-only (no light palette), and pass this audit.');
 }
 process.exit(STRICT && failed ? 1 : 0);
