@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.46.0 — 2026-06-26 (Fire-safety hub — Ship 4: design/commissioning + Li-ion checklist)
+
+### Added
+- **`fire-checklist.html`** — a super-detailed fire-safety checklist (9 sections, 5 source-tagged
+  tables): clean-agent design parameters (NFPA 2001 design conc / NOAEL / discharge / hold), detection
+  & alarm (aspirating, cross-zoned release, EPO), a dedicated **Li-ion battery-room fire-safety**
+  section (NFPA 855 / UL 9540A — off-gas H₂/CO detection ≤25% LFL, ventilation/explosion control,
+  thermal-runaway onset, BMS↔FACP coordination), the numeric commissioning procedure (door-fan
+  integrity, discharge test, cross-zone, Li-ion off-gas commissioning), installation + routine
+  inspection checklists, a PM cadence table (daily→annual), a symptom→cause→action troubleshooting
+  table, and a printable service-record form (`window.print` + print CSS). `--fc-` fire theme,
+  STANDARD/TYPICAL source tags, dark + mobile.
+- Registered: `sitemap.xml` (114), `llms.txt` (125), `search-index.json` (new entry).
+
+### Verified
+- Audits clean; 9 sections / 5 tables / 25 checkboxes / 35 source tags render; print form works;
+  0 console errors; dark + mobile pass. No bug, no error.
+
 ## v1.45.0 — 2026-06-26 (Fire-safety hub — Ship 3: clean-agent & Li-ion fire calculator)
 
 ### Added

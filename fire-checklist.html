@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DC Fire-Safety Design, Commissioning &amp; Li-ion Checklist | ResistanceZero</title>
+    <meta name="description" content="A super-detailed data-center fire-safety checklist — clean-agent design bands (NFPA 2001), detection, the Li-ion battery-room requirements (NFPA 855 / UL 9540A), commissioning numerics, PM cadence, troubleshooting, and a printable service-record form.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="fire safety checklist, NFPA 2001 commissioning, clean agent door-fan test, Li-ion battery room, NFPA 855, off-gas detection, fire PM cadence, data center fire troubleshooting">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0E0F12">
+    <link rel="canonical" href="https://resistancezero.com/fire-checklist.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://resistancezero.com/fire-checklist.html">
+    <meta property="og:title" content="DC Fire-Safety Design, Commissioning &amp; Li-ion Checklist">
+    <meta property="og:description" content="Clean-agent design bands, Li-ion battery-room (NFPA 855) requirements, commissioning numerics, PM cadence, troubleshooting + printable service form.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DC Fire-Safety Checklist">
+    <meta name="twitter:description" content="Clean-agent + Li-ion battery-room fire-safety checklist, commissioning numerics, PM cadence + printable form.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"TechArticle","headline":"DC Fire-Safety Design, Commissioning & Li-ion Checklist","description":"Clean-agent design bands (NFPA 2001), Li-ion battery-room requirements (NFPA 855 / UL 9540A), commissioning numerics, PM cadence, troubleshooting, and a printable service-record form.","author":{"@type":"Person","name":"Bagus Dwi Permana"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana"},"datePublished":"2026-06-26","dateModified":"2026-06-26","mainEntityOfPage":"https://resistancezero.com/fire-checklist.html","image":"https://resistancezero.com/assets/profile-photo.jpg"}
+    </script>
+    <style>
+        :root, [data-theme="light"] { --fc-primary:#ef4444; --fc-accent:#dc2626; --fc-bg:#f8fafc; --fc-card:#ffffff; --fc-border:#e2e8f0; --fc-text:#0f172a; --fc-muted:#64748b; --fc-inset:#f1f5f9; }
+        [data-theme="dark"] { --fc-primary:#f87171; --fc-accent:#ef4444; --fc-bg:#0f172a; --fc-card:#1e293b; --fc-border:#334155; --fc-text:#f1f5f9; --fc-muted:#94a3b8; --fc-inset:#0b1220; }
+        body { font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif; background:var(--fc-bg); color:var(--fc-text); }
+        main { background:var(--fc-bg); }
+        .ck-hero { position:relative; padding:7rem 1.5rem 1.6rem; border-bottom:1px solid var(--fc-border); }
+        .ck-wrap { max-width:980px; margin:0 auto; padding:0 1.4rem; }
+        .ck-kick { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--fc-primary); font-weight:600; }
+        .ck-hero h1 { font-size:clamp(1.8rem,4vw,2.5rem); font-weight:700; letter-spacing:-.02em; margin:.5rem 0 .5rem; line-height:1.08; }
+        .ck-hero p.lead { color:var(--fc-muted); max-width:74ch; font-size:1.02rem; line-height:1.6; }
+        .ck-hero .crumb { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--fc-muted); margin-top:.9rem; }
+        .ck-hero .crumb a { color:var(--fc-primary); }
+        .ck-body { max-width:980px; margin:0 auto; padding:1.8rem 1.4rem 3rem; }
+        .ck-sec { margin:2.2rem 0; }
+        .ck-sec > h2 { font-size:1.25rem; font-weight:700; margin:0 0 .3rem; display:flex; align-items:baseline; gap:.6rem; }
+        .ck-sec > h2 .n { font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--fc-primary); }
+        .ck-sec > p.lead { color:var(--fc-muted); font-size:.92rem; line-height:1.6; margin:.2rem 0 1rem; }
+        .ck-tbl-wrap { overflow-x:auto; border:1px solid var(--fc-border); border-radius:10px; }
+        table.ck-tbl { width:100%; border-collapse:collapse; font-size:.85rem; background:var(--fc-card); }
+        .ck-tbl th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.05em; text-transform:uppercase; color:var(--fc-muted); padding:.6rem .8rem; border-bottom:1px solid var(--fc-border); background:var(--fc-inset); }
+        .ck-tbl td { padding:.6rem .8rem; border-bottom:1px solid var(--fc-border); color:var(--fc-text); vertical-align:top; font-variant-numeric:tabular-nums slashed-zero; }
+        .ck-tbl tr:last-child td { border-bottom:none; }
+        .src { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
+        .src.std { background:rgba(10,138,90,.14); color:#0a8a5a; border:1px solid rgba(10,138,90,.35); }
+        .src.typ { background:rgba(217,119,6,.16); color:#b45309; border:1px solid rgba(217,119,6,.35); }
+        [data-theme="dark"] .src.std { color:#34d399; } [data-theme="dark"] .src.typ { color:#fbbf24; }
+        .ck-list { list-style:none; padding:0; margin:.6rem 0; }
+        .ck-item { display:flex; gap:.6rem; align-items:flex-start; padding:.45rem .2rem; border-bottom:1px solid var(--fc-border); font-size:.9rem; line-height:1.5; }
+        .ck-item input { margin-top:.2rem; width:16px; height:16px; accent-color:var(--fc-primary); flex-shrink:0; }
+        .ck-item b { color:var(--fc-text); }
+        .cad { font-family:'JetBrains Mono',monospace; font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase; }
+        .cad.d { background:rgba(10,138,90,.16); color:#0a8a5a; } .cad.w { background:rgba(6,182,212,.16); color:#0891b2; }
+        .cad.m { background:rgba(217,119,6,.16); color:#b45309; } .cad.q { background:rgba(139,92,246,.16); color:#7c3aed; }
+        .cad.a { background:rgba(239,68,68,.16); color:#dc2626; }
+        [data-theme="dark"] .cad.d{color:#34d399}[data-theme="dark"] .cad.w{color:#22d3ee}[data-theme="dark"] .cad.m{color:#fbbf24}[data-theme="dark"] .cad.q{color:#a78bfa}[data-theme="dark"] .cad.a{color:#f87171}
+        .ck-callout { border:1px solid var(--fc-border); border-left:3px solid var(--fc-primary); border-radius:8px; background:var(--fc-inset); padding:.8rem 1rem; font-size:.88rem; line-height:1.6; margin:1rem 0; }
+        .ck-callout.danger { border-left-color:#dc2626; background:rgba(239,68,68,.06); }
+        .ck-callout b { color:var(--fc-text); }
+        .ck-toc { background:var(--fc-card); border:1px solid var(--fc-border); border-radius:10px; padding:1rem 1.2rem; margin:1.5rem 0; }
+        .ck-toc h3 { font-size:.7rem; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--fc-muted); margin:0 0 .5rem; }
+        .ck-toc ol { margin:0; padding-left:1.2rem; columns:2; font-size:.86rem; line-height:1.8; }
+        .ck-toc a { color:var(--fc-primary); text-decoration:none; }
+        .form-card { border:1px solid var(--fc-border); border-radius:10px; background:var(--fc-card); padding:1.2rem; }
+        .form-card label { display:block; font-size:.78rem; color:var(--fc-muted); margin:.5rem 0 .2rem; font-weight:600; }
+        .form-card input[type=text], .form-card input[type=date] { width:100%; padding:7px 9px; border:1px solid var(--fc-border); border-radius:6px; background:var(--fc-inset); color:var(--fc-text); font-family:'JetBrains Mono',monospace; font-size:.85rem; }
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.5rem 1rem; }
+        .btn-print { font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:600; padding:8px 16px; border-radius:8px; border:1px solid var(--fc-primary); background:var(--fc-primary); color:#fff; cursor:pointer; margin-top:1rem; }
+        .btn-print.ghost { background:transparent; color:var(--fc-primary); margin-left:.5rem; }
+        @media (max-width:768px){
+            html, body { overflow-x:hidden; max-width:100vw; }
+            img, picture, video, svg { max-width:100%; height:auto; }
+            .ck-hero { padding:5.5rem 1rem 1.4rem; }
+            .nav-menu, .nav-links { display:none; }
+            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+            button, a.btn, [role="button"] { min-height:44px; }
+            .ck-toc ol { columns:1; } .form-grid { grid-template-columns:1fr; }
+        }
+        @media print {
+            .navbar, .ck-hero .crumb, .ck-toc, .footer, .btn-print, #themeToggle, .hamburger { display:none !important; }
+            body { background:#fff; color:#000; } .ck-item input { -webkit-appearance:none; appearance:none; border:1.5px solid #000; border-radius:2px; }
+            @page { margin:14mm; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#ef4444;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li role="menuitem"><a href="pillar-fire-safety.html" style="color:#ef4444;">Fire Safety Pillar</a></li>
+                        <li role="menuitem"><a href="fire-calculator.html" style="color:#ef4444;">Fire Calculator</a></li>
+                        <li role="menuitem"><a href="fire-checklist.html" style="color:#ef4444;">Fire Checklist</a></li>
+                        <li role="menuitem"><a href="fire-system.html">Fire System (P&amp;ID)</a></li>
+                        <li role="menuitem"><a href="ltc-nfpa-fire-risk.html">NFPA Fire Risk</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <header class="ck-hero">
+        <div class="ck-wrap">
+            <span class="ck-kick">Fire Safety · Design &amp; Commissioning</span>
+            <h1>DC fire-safety design, commissioning &amp; Li-ion checklist</h1>
+            <p class="lead">The site-side companion to the <a href="fire-calculator.html" style="color:var(--fc-primary);font-weight:600;">fire calculator</a> and <a href="pillar-fire-safety.html" style="color:var(--fc-primary);font-weight:600;">fire-safety pillar</a>: clean-agent design bands, the Li-ion battery-room requirements that NFPA&nbsp;855 now mandates, the numeric commissioning procedure, PM cadences, a symptom→cause→action table, and a printable service-record form. Figures tagged <span class="src std">STANDARD</span> are from code; <span class="src typ">TYPICAL</span> are common engineering practice &mdash; confirm against the AHJ, the equipment listing and a fire-protection engineer.</p>
+            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="pillar-fire-safety.html">Fire Safety</a> → Checklist</div>
+        </div>
+    </header>
+
+    <main id="main-content"><div class="ck-body">
+
+        <div class="ck-toc">
+            <h3>On this page</h3>
+            <ol>
+                <li><a href="#s1">Clean-agent design parameters</a></li>
+                <li><a href="#s2">Detection &amp; alarm</a></li>
+                <li><a href="#s3">Li-ion battery-room fire safety</a></li>
+                <li><a href="#s4">Commissioning — numeric procedure</a></li>
+                <li><a href="#s5">Installation checklist</a></li>
+                <li><a href="#s6">Routine inspection</a></li>
+                <li><a href="#s7">Preventive-maintenance cadence</a></li>
+                <li><a href="#s8">Symptom → cause → action</a></li>
+                <li><a href="#s9">Printable service record</a></li>
+            </ol>
+        </div>
+
+        <section class="ck-sec" id="s1">
+            <h2><span class="n">01</span> Clean-agent design parameters</h2>
+            <p class="lead">Acceptance bands for a gaseous clean-agent system in an IT/data hall (NFPA 2001). Agent quantity is set by W&nbsp;=&nbsp;(V/s)·(C/(100−C)) for halocarbons — compute it on the <a href="fire-calculator.html">calculator</a>.</p>
+            <div class="ck-tbl-wrap"><table class="ck-tbl">
+                <thead><tr><th>Parameter</th><th>Novec 1230</th><th>FM-200</th><th>IG-541</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Class-A design concentration</td><td>~4.7%</td><td>~7.0%</td><td>~37.5%</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>Min. extinguishing concentration</td><td>3.5%</td><td>5.8%</td><td>34.2%</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>NOAEL (occupant safety ceiling)</td><td>10%</td><td>9.0%</td><td>43%</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>LOAEL</td><td>&gt;10%</td><td>10.5%</td><td>52%</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>Discharge time</td><td colspan="2">≤ 10 s (halocarbon)</td><td>≤ 60 s (inert)</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>Concentration hold (retention)</td><td colspan="3">≥ 10 min (verified by door-fan test)</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>100-yr GWP</td><td>1</td><td>3,220</td><td>0</td><td><span class="src std">IPCC AR6</span></td></tr>
+                    <tr><td>Atmospheric lifetime</td><td>~5 days</td><td>~36 yr</td><td>n/a</td><td><span class="src std">IPCC</span></td></tr>
+                </tbody>
+            </table></div>
+            <div class="ck-callout"><b>Occupant rule.</b> In a normally-occupied space the design concentration must stay at or below the agent NOAEL — FM-200's 9% NOAEL leaves little headroom above its ~7% design, while Novec 1230 and inert gases are comfortable. The calculator flags a NOAEL exceedance as a hazard.</div>
+        </section>
+
+        <section class="ck-sec" id="s2">
+            <h2><span class="n">02</span> Detection &amp; alarm</h2>
+            <div class="ck-tbl-wrap"><table class="ck-tbl">
+                <thead><tr><th>Item</th><th>Requirement / band</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Very-early-warning (aspirating / VESDA)</td><td>Pre-alarm sensitivity ~0.005–0.05%/m obscuration; sampling network per design</td><td><span class="src std">NFPA 72</span></td></tr>
+                    <tr><td>Spot smoke detector spacing</td><td>~9.1 m on-centre (≈84 m² per detector), reduced near airflow</td><td><span class="src std">NFPA 72</span></td></tr>
+                    <tr><td>Cross-zoned release logic</td><td>Two independent detectors/zones must alarm before agent discharges</td><td><span class="src std">NFPA 72 / 2001</span></td></tr>
+                    <tr><td>Pre-discharge warning + abort</td><td>Audible/visual alarm + time delay (typ. 30 s) and abort station</td><td><span class="src std">NFPA 2001</span></td></tr>
+                    <tr><td>HVAC / damper interlock</td><td>Shut down air handlers + close dampers on confirmed alarm (room integrity)</td><td><span class="src typ">TYPICAL</span></td></tr>
+                    <tr><td>EPO (emergency power off)</td><td>Guarded two-stage station; coordinates with suppression release</td><td><span class="src std">NFPA 70 / 75</span></td></tr>
+                </tbody>
+            </table></div>
+        </section>
+
+        <section class="ck-sec" id="s3">
+            <h2><span class="n">03</span> Lithium-ion battery-room fire safety</h2>
+            <p class="lead">The modern gap. A Li-ion UPS/BBU pack in thermal runaway vents flammable gas (H₂/CO) whose volume vastly exceeds any room's flammable limit — so detection + ventilation lead, suppression follows. NFPA 855 + UL 9540A govern.</p>
+            <div class="ck-callout danger"><b>Why off-gas detection comes first.</b> A 1,333 kWh NMC pack can release on the order of <b>5,000 m³ of vent gas</b> and ~12 GJ of heat in full runaway (run it on the calculator). No practical clean-agent or sprinkler system "puts out" a propagating cell-to-cell runaway — the strategy is <b>detect the off-gas early, ventilate/exhaust, isolate (BMS shutdown), and contain (compartmentation)</b> to stop propagation, with suppression for any associated ordinary-combustible fire.</div>
+            <div class="ck-tbl-wrap"><table class="ck-tbl">
+                <thead><tr><th>Requirement</th><th>Band / action</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Off-gas / combustible-gas detection</td><td>H₂ + CO sensors; alarm at ≤ 25% LFL (H₂ LFL 4% vol)</td><td><span class="src std">NFPA 855</span></td></tr>
+                    <tr><td>Thermal-runaway onset (alarm before flame)</td><td>NMC ~150 °C · LFP ~166.8 °C · cell ΔT / dT/dt trending in BMS</td><td><span class="src std">UL 9540A / IEC 62619</span></td></tr>
+                    <tr><td>Ventilation / explosion control</td><td>Mechanical exhaust sized to keep vent gas &lt; 25% LFL; deflagration venting per NFPA 68/69 where required</td><td><span class="src std">NFPA 855</span></td></tr>
+                    <tr><td>Unit spacing &amp; fire-rated separation</td><td>Spacing per UL 9540A test results; rated walls to limit propagation</td><td><span class="src std">NFPA 855</span></td></tr>
+                    <tr><td>Battery-room temperature</td><td>~15–27 °C; thermal management prevents drift toward onset</td><td><span class="src typ">TYPICAL</span></td></tr>
+                    <tr><td>BMS ↔ FACP coordination</td><td>BMS isolates pack on cell fault; sequence vs agent discharge defined</td><td><span class="src std">NFPA 855 / 72</span></td></tr>
+                    <tr><td>Suppression role</td><td>Clean agent / water mist for associated Class-A fire; NOT relied on to stop TR propagation</td><td><span class="src typ">TYPICAL</span></td></tr>
+                </tbody>
+            </table></div>
+        </section>
+
+        <section class="ck-sec" id="s4">
+            <h2><span class="n">04</span> Commissioning — numeric procedure</h2>
+            <ul class="ck-list">
+                <li class="ck-item"><input type="checkbox"><span><b>Room integrity (door-fan) test.</b> Measure equivalent leakage area; confirm the agent concentration is retained for the required <b>hold time (≥10 min)</b>. Seal penetrations and re-test until pass. <span class="src std">NFPA 2001</span></span></li>
+                <li class="ck-item"><input type="checkbox"><span><b>Agent quantity &amp; cylinder charge.</b> Verify charged weight/pressure vs the design (W = (V/s)·(C/(100−C))); record cylinder serials, fill weight and superpressurization. <span class="src std">NFPA 2001</span></span></li>
+                <li class="ck-item"><input type="checkbox"><span><b>Discharge test (where required).</b> Confirm full discharge ≤ 10 s (halocarbon) / ≤ 60 s (inert) and measured concentration reaches design. <span class="src std">NFPA 2001</span></span></li>
+                <li class="ck-item"><input type="checkbox"><span><b>Detection cross-zone verification.</b> Prove no single detector releases agent; confirm pre-discharge delay + abort + manual release. <span class="src std">NFPA 72</span></span></li>
+                <li class="ck-item"><input type="checkbox"><span><b>HVAC/damper + EPO interlocks.</b> On confirmed alarm: air handlers stop, dampers close, EPO sequence verified. <span class="src std">NFPA 70/75</span></span></li>
+                <li class="ck-item"><input type="checkbox"><span><b>Li-ion off-gas detection commissioning.</b> Calibrate H₂/CO sensors; verify alarm at ≤25% LFL and exhaust/ventilation start; confirm BMS-shutdown sequence. <span class="src std">NFPA 855</span></span></li>
+                <li class="ck-item"><input type="checkbox"><span><b>Integrated systems test (IST).</b> End-to-end: detection → alarm → HVAC → EPO → release → BMS, all together. <span class="src typ">TYPICAL</span></span></li>
+            </ul>
+        </section>
+
+        <section class="ck-sec" id="s5">
+            <h2><span class="n">05</span> Installation checklist</h2>
+            <ul class="ck-list">
+                <li class="ck-item"><input type="checkbox"><span>Enclosure sealed (cable penetrations, floor/ceiling voids, dampers) for room integrity</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Cylinders mounted, restrained, labelled; discharge nozzles positioned per drawings</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Detectors (aspirating + spot) installed, addressed, cross-zoned to the panel</span></li>
+                <li class="ck-item"><input type="checkbox"><span>FACP, abort/manual-release stations, pre-discharge warning devices installed</span></li>
+                <li class="ck-item"><input type="checkbox"><span>HVAC/damper interlocks and EPO wired and labelled</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Li-ion room: H₂/CO gas detection, exhaust fans, fire-rated separation in place</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Signage, occupant safety placards, and as-built documentation pack</span></li>
+            </ul>
+        </section>
+
+        <section class="ck-sec" id="s6">
+            <h2><span class="n">06</span> Routine inspection</h2>
+            <ul class="ck-list">
+                <li class="ck-item"><input type="checkbox"><span>Cylinder pressure gauges in the green band; no leak indication</span></li>
+                <li class="ck-item"><input type="checkbox"><span>FACP normal — no trouble/alarm; detectors not in fault</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Abort/manual-release stations unobstructed; signage legible</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Room enclosure intact (no new penetrations, doors self-close/seal)</span></li>
+                <li class="ck-item"><input type="checkbox"><span>Li-ion room: gas-detection normal, exhaust available, temperature in band</span></li>
+            </ul>
+        </section>
+
+        <section class="ck-sec" id="s7">
+            <h2><span class="n">07</span> Preventive-maintenance cadence</h2>
+            <div class="ck-tbl-wrap"><table class="ck-tbl">
+                <thead><tr><th>Task</th><th>Cadence</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>Visual: cylinder pressure, FACP status, gas-detection status</td><td><span class="cad d">Daily</span></td><td><span class="src typ">TYPICAL</span></td></tr>
+                    <tr><td>Detector sampling-airflow / aspirating filter check</td><td><span class="cad w">Weekly</span></td><td><span class="src typ">TYPICAL</span></td></tr>
+                    <tr><td>FACP function test; abort/release station test</td><td><span class="cad m">Monthly</span></td><td><span class="src std">NFPA 72</span></td></tr>
+                    <tr><td>Detector sensitivity calibration; H₂/CO sensor calibration; semi-annual agent inspection</td><td><span class="cad q">Quarterly</span></td><td><span class="src std">NFPA 72/2001</span></td></tr>
+                    <tr><td>Cylinder weight/pressure check; door-fan re-test; full IST; hydrostatic per schedule</td><td><span class="cad a">Annual</span></td><td><span class="src std">NFPA 2001/72</span></td></tr>
+                </tbody>
+            </table></div>
+        </section>
+
+        <section class="ck-sec" id="s8">
+            <h2><span class="n">08</span> Symptom → cause → action</h2>
+            <div class="ck-tbl-wrap"><table class="ck-tbl">
+                <thead><tr><th>Symptom</th><th>Likely cause</th><th>Immediate action</th><th>Corrective action</th></tr></thead>
+                <tbody>
+                    <tr><td>Accidental agent discharge</td><td>Single-detector release / no cross-zone; testing without lockout</td><td>Ventilate; account for occupants; secure system</td><td>Restore cross-zone logic; recharge; lockout-tagout for tests</td></tr>
+                    <tr><td>Cylinder pressure low</td><td>Slow agent/superpressurant leak</td><td>Tag; plan recharge; keep backup zone armed</td><td>Find leak; recharge to design weight/pressure</td></tr>
+                    <tr><td>Room-integrity / hold-time fail</td><td>New penetrations; door seals; damper leakage</td><td>Note as deficiency; do not rely on agent alone</td><td>Seal penetrations; re-run door-fan test to pass</td></tr>
+                    <tr><td>Detector in trouble / drift</td><td>Dust loading; sensitivity drift; airflow change</td><td>Investigate; do not disable release</td><td>Clean/replace; recalibrate; re-survey spacing vs airflow</td></tr>
+                    <tr><td>Li-ion off-gas (H₂/CO) alarm</td><td>Cell venting / incipient thermal runaway</td><td>Evacuate; start exhaust; isolate pack via BMS; standby suppression</td><td>Quarantine module; investigate per UL 9540A; replace; review spacing</td></tr>
+                    <tr><td>Battery cell over-temp trend</td><td>Charger fault; cooling loss; ageing cell</td><td>Reduce charge; restore cooling; watch dT/dt</td><td>Replace cell/module; recalibrate BMS thresholds</td></tr>
+                    <tr><td>Suppression released, no refill</td><td>Post-discharge gap; single-shot zone</td><td>Restrict the zone; heighten watch / fire-watch</td><td>Recharge promptly; consider reserve/backup supply</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+
+        <section class="ck-sec" id="s9">
+            <h2><span class="n">09</span> Printable service record</h2>
+            <div class="form-card">
+                <div class="form-grid">
+                    <div><label>Site / facility</label><input type="text"></div>
+                    <div><label>Suppression zone / tag</label><input type="text"></div>
+                    <div><label>Agent &amp; cylinder serials</label><input type="text"></div>
+                    <div><label>Date</label><input type="date"></div>
+                    <div><label>Technician</label><input type="text"></div>
+                    <div><label>Service type</label><input type="text"></div>
+                </div>
+                <ul class="ck-list" style="margin-top:.8rem;">
+                    <li class="ck-item"><input type="checkbox"><span>Cylinder weight / pressure within design — value: ____________</span></li>
+                    <li class="ck-item"><input type="checkbox"><span>Door-fan / room-integrity hold time ≥ 10 min — value: ____________</span></li>
+                    <li class="ck-item"><input type="checkbox"><span>Detection cross-zone + abort verified</span></li>
+                    <li class="ck-item"><input type="checkbox"><span>HVAC/damper + EPO interlocks verified</span></li>
+                    <li class="ck-item"><input type="checkbox"><span>Li-ion gas detection (H₂/CO) calibrated; exhaust verified</span></li>
+                    <li class="ck-item"><input type="checkbox"><span>FACP normal; no outstanding trouble</span></li>
+                </ul>
+                <div><label>Findings / next service date</label><input type="text"></div>
+                <div class="form-grid" style="margin-top:.5rem;"><div><label>Technician signature</label><input type="text"></div><div><label>Supervisor sign-off</label><input type="text"></div></div>
+                <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+                <button class="btn-print ghost" onclick="document.querySelectorAll('.form-card input').forEach(function(i){i.type==='checkbox'?i.checked=false:i.value='';})">Clear form</button>
+            </div>
+        </section>
+
+    </div></main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container"><div class="footer-grid">
+            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
+            <div class="footer-nav"><h4 class="footer-heading">FIRE SAFETY</h4><ul class="footer-links"><li><a href="pillar-fire-safety.html">Fire Safety Pillar</a></li><li><a href="fire-calculator.html">Fire Calculator</a></li><li><a href="fire-checklist.html">Fire Checklist</a></li><li><a href="fire-system.html">Fire System P&amp;ID</a></li></ul></div>
+            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
+        </div></div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
+        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
+        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
+        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
+    })();
+    </script>
+    <script src="auth.js?v=2026-05-09-v1" defer></script>
+</body>
+</html>
