@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.49.0 — 2026-06-27 (CDU checklist spares-planning view + Mini-BMS tile reading-guide)
+
+### Added
+- **`cdu-checklist.html` §07 — "Spares planning" subsection** turning the parts register into an
+  actionable stocking plan: per-item **min stock on site**, **typical service life** (real replacement
+  cadence, not just the inspection interval), **lead time** (the real driver for holding a critical
+  spare), and **estimated annual spend per CDU**. Closed with a **budget roll-up**: recurring
+  consumables ≈ `$1,000–4,000/yr/CDU`, one-time on-site critical-spare kit ≈ `$1,500–6,000`, shared
+  fleet spare pump ≈ `$600–3,500` — all `EST` planning bands (not a quote), noting filters + fluid as
+  the dominant cost drivers.
+- **`cdu-mini-bms.html` tile reading-guide** — a compact "how to read a tile" strip above the live
+  tiles explaining the anatomy (instrument tag matching the P&ID · value+unit · range bar with normal
+  band + live marker · NORMAL/WARN/ALARM status · click for trend), so the redesigned board is
+  self-explanatory to learn.
+
 ## v1.48.2 — 2026-06-27 (Both-mode text audit — fix comparison-badge contrast)
 
 Audited all 114 pages in **both light and dark** (228 renders) with a refined,

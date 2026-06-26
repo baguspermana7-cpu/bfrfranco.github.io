@@ -92,6 +92,9 @@
         .st-alarm{ background:rgba(220,38,38,.16); color:var(--bm-red); }
 
         /* parameter tiles */
+        .tile-guide{ font-size:.72rem; line-height:1.5; color:var(--bm-muted); margin:0 0 .7rem; padding:.5rem .65rem; border:1px dashed var(--bm-border); border-radius:6px; background:var(--bm-inset); }
+        .tile-guide b{ color:var(--bm-text); }
+        .tile-guide .tg-tag{ font-family:var(--bm-mono); font-size:.58rem; font-weight:700; color:var(--bm-cyan); background:rgba(6,182,212,.1); border:1px solid rgba(6,182,212,.28); border-radius:3px; padding:0 3px; }
         .tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr)); gap:8px; }
         .tile{ border:1px solid var(--bm-border); border-radius:6px; padding:.55rem .6rem; background:var(--bm-inset); position:relative; }
         .tile .th{ display:flex; align-items:baseline; gap:.3rem; padding-right:12px; }
@@ -361,7 +364,10 @@
             </div>
             <div class="panel">
                 <div class="panel-hd"><h3>Live parameters (simulated)</h3><span class="tag" id="capTag"></span></div>
-                <div class="panel-bd"><div class="tiles" id="tiles"></div></div>
+                <div class="panel-bd">
+                    <p class="tile-guide">How to read a tile: <span class="tg-tag">FT-01</span> instrument tag (matches the P&amp;ID) · big value &amp; unit · the bar shows the <b>normal band</b> (shaded) with a marker for the <b>live value</b> · the status line reads <b style="color:var(--bm-green)">NORMAL</b> / <b style="color:var(--bm-amber)">WARN</b> / <b style="color:var(--bm-red)">ALARM</b>. Click a tile for its trend &amp; reference.</p>
+                    <div class="tiles" id="tiles"></div>
+                </div>
             </div>
         </div>
 
