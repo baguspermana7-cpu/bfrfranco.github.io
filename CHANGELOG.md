@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.49.5 — 2026-06-27 (Theme persistence — unify the localStorage key site-wide)
+
+### Fixed
+- **Cross-page theme persistence.** 19 pages stored the theme under non-standard localStorage keys
+  (`rz_theme` on the cdu-*, compare-*, pln-java-grid-*, dc-market-tracker, tier-advisor pages;
+  `rfs_theme` on rfs-readiness-workbench) while the rest of the site + `script.js` + the FOUC guard
+  use `'theme'`. Result: setting dark on one page didn't carry over when you navigated to one of
+  these — it reverted to its own key's default. Unified all of them to **`'theme'`** so the theme
+  persists across the whole site (the admin panel's separate `rz_admin_theme` is intentionally left).
+  Verified: the affected pages now honour the shared key on load and write it on toggle; dark-coverage
+  gate CLEAN in both modes; JS audits CLEAN.
+
+### Known (pre-existing, separate)
+- `tier-advisor.html` has a `chartjs-plugin-annotation` console error (chart-lifecycle, unrelated to
+  the theme-key change) — tracked for a separate fix.
+
 ## v1.49.4 — 2026-06-27 (CDU Mini-BMS — P&ID instruments light up by alarm state)
 
 ### Changed

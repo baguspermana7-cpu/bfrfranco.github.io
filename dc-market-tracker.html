@@ -2052,7 +2052,7 @@
             var current = root.getAttribute('data-theme');
             var next = current === 'dark' ? 'light' : 'dark';
             root.setAttribute('data-theme', next);
-            localStorage.setItem('rz_theme', next);
+            localStorage.setItem('theme', next);
             var icon = document.getElementById('dmtThemeIcon');
             icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             // Re-render charts with new theme colors
@@ -2068,7 +2068,7 @@
 
         // Apply saved theme
         (function() {
-            var saved = localStorage.getItem('rz_theme');
+            var saved = localStorage.getItem('theme');
             if (saved === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 var icon = document.getElementById('dmtThemeIcon');

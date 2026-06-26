@@ -96,7 +96,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 
     <!-- Inline boot theme to avoid FOUC; default dark -->
-    <script>(function(){try{var t=localStorage.getItem('rz_theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+    <script>(function(){try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
 
     <style>
         :root {
@@ -2357,14 +2357,14 @@
         function bindTheme() {
             var btn = $('pjgThemeToggle');
             var icon = $('pjgThemeIcon');
-            var saved = (function(){try{return localStorage.getItem('rz_theme');}catch(e){return null;}})() || 'light';
+            var saved = (function(){try{return localStorage.getItem('theme');}catch(e){return null;}})() || 'light';
             document.documentElement.setAttribute('data-theme', saved);
             icon.className = (saved === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
             btn.addEventListener('click', function () {
                 var cur = document.documentElement.getAttribute('data-theme');
                 var nxt = (cur === 'dark') ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', nxt);
-                try { localStorage.setItem('rz_theme', nxt); } catch (e) { /* ignore */ }
+                try { localStorage.setItem('theme', nxt); } catch (e) { /* ignore */ }
                 icon.className = (nxt === 'dark') ? 'fas fa-sun' : 'fas fa-moon';
             });
         }

@@ -555,9 +555,9 @@
 
     <script>
     (function(){
-        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('rz_theme')||'light';
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
         document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('rz_theme',n); });
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
         var hamburger=document.querySelector('.hamburger'), navMenu=document.querySelector('.nav-menu');
         if(hamburger&&navMenu) hamburger.addEventListener('click',function(){ hamburger.classList.toggle('active'); navMenu.classList.toggle('active'); hamburger.setAttribute('aria-expanded',navMenu.classList.contains('active')); });
         var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();

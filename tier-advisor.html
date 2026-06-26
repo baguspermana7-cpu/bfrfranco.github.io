@@ -1915,13 +1915,13 @@
         var current = html.getAttribute('data-theme');
         var next = current === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', next);
-        localStorage.setItem('rz-theme', next);
+        localStorage.setItem('theme', next);
         var icon = document.querySelector('#themeToggle i');
         icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         calculate(); // refresh charts with new colors
     }
     (function loadTheme() {
-        var saved = localStorage.getItem('rz-theme');
+        var saved = localStorage.getItem('theme');
         if (saved === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
             var icon = document.querySelector('#themeToggle i');
