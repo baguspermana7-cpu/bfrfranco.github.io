@@ -80,7 +80,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-meta *{
 /* ---- BODY: headings to serif, copy stays sans ---- */
 html[data-rz-register="editorial"][data-theme="dark"] .article-body h2{
   font-family:var(--rz-art-serif) !important;
-  font-weight:500 !important;
+  font-weight:600 !important;        /* heavier than h3 (500) to restore section/subsection contrast */
   letter-spacing:-.01em;
   color:var(--rz-art-strong) !important;
   border-left:0 !important;          /* drop the generic red bar */
@@ -210,11 +210,11 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]){
 }
 /* ---- HERO ---- (keep article bg; add soft warm wash + accent rule) */
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero{position:relative;overflow:hidden;}
+/* Day hero wash removed: stacking an amber radial over articles that already carry a
+   saturated bespoke hero (e.g. article-26's orange) muddied the gradient and washed out
+   the dek/meta. Day heroes keep their own background; the editorial type carries the register. */
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(620px 280px at 86% -18%, rgba(232,181,99,.14), transparent 64%),
-    radial-gradient(460px 240px at 4% 118%, rgba(111,191,154,.07), transparent 66%);
+  content:none;
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero > *{position:relative;z-index:1;}
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-title{
@@ -247,7 +247,7 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h2::be
   background:var(--rz-art-accent);vertical-align:middle;margin-right:.6rem;transform:translateY(-4px);
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h3{
-  font-family:var(--rz-art-serif) !important;font-weight:600 !important;color:var(--rz-art-strong) !important;
+  font-family:var(--rz-art-serif) !important;font-weight:500 !important;color:var(--rz-art-strong) !important;
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body > p:first-of-type::first-letter{
   font-family:var(--rz-art-serif);font-size:3.1rem;font-weight:600;float:left;line-height:.82;
@@ -341,9 +341,74 @@ html[data-rz-register="editorial"] ::selection{
   background:color-mix(in srgb,var(--rz-art-accent) 26%,transparent);
 }
 
-/* --- figure captions → mono, muted (matches the instrument-grade meta) --- */
+/* --- figure captions → mono, muted (matches the instrument-grade meta).
+   !important + font-style:normal beat the inline italic/#64748b articles hardcode. --- */
 html[data-rz-register="editorial"] figcaption{
-  font-family:'IBM Plex Mono',ui-monospace,monospace;
-  font-size:.78rem;letter-spacing:.02em;
-  color:var(--rz-art-muted);
+  font-family:'IBM Plex Mono',ui-monospace,monospace !important;
+  font-size:.78rem !important;letter-spacing:.02em;font-style:normal !important;
+  color:var(--rz-art-muted) !important;
 }
+
+/* ============================================================================
+   READING MEASURE + HIERARCHY (v1.46.x, uiux-review) — theme-independent
+   properties (size, weight contrast, rhythm, measure) applied once for both
+   themes. Colour/font-family per-theme is set in the register blocks above.
+   ============================================================================ */
+/* measure — cap the prose column to a readable editorial line length (~68ch).
+   Tables / figures / media stay full-width (only text elements are capped). */
+html[data-rz-register="editorial"] .article-body p,
+html[data-rz-register="editorial"] .article-body li,
+html[data-rz-register="editorial"] .article-body h2,
+html[data-rz-register="editorial"] .article-body h3,
+html[data-rz-register="editorial"] .article-body blockquote{
+  max-width:68ch;
+}
+html[data-rz-register="editorial"] .article-body ul,
+html[data-rz-register="editorial"] .article-body ol{ max-width:70ch; }
+/* day body copy was inheriting Inter (day block had no p font rule) — force Plex +
+   the editorial line-height in BOTH themes. */
+html[data-rz-register="editorial"] .article-body p{
+  font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  line-height:1.75;
+}
+/* editorial heading scale + rhythm (size/margins are theme-independent; weight set per block) */
+html[data-rz-register="editorial"] .article-body h2{
+  font-size:clamp(1.75rem,3vw,2.25rem) !important;
+  line-height:1.18 !important;
+  margin:2.4em 0 .55em !important;
+}
+html[data-rz-register="editorial"] .article-body h3{
+  font-size:clamp(1.2rem,2vw,1.45rem) !important;
+  line-height:1.25 !important;
+  margin:1.7em 0 .4em !important;
+}
+/* title — normalise the drift (51–56px across articles) to one editorial floor */
+html[data-rz-register="editorial"] .article-title{
+  font-size:clamp(2.6rem,5vw,3.5rem) !important;
+}
+
+/* ---- SECTION NUMBER KICKERS — magazine-style mono "01 / 02 / 03" on each h2,
+   replacing the bare amber tick with the number + an amber underline (number + tick
+   in one mark). !important overrides the register blocks' tick ::before. ---- */
+html[data-rz-register="editorial"] .article-body{ counter-reset:rz-h2; }
+html[data-rz-register="editorial"] .article-body h2{ counter-increment:rz-h2; }
+html[data-rz-register="editorial"] .article-body h2::before{
+  content:counter(rz-h2,decimal-leading-zero) !important;
+  display:inline-block !important;
+  font-family:'IBM Plex Mono',ui-monospace,monospace !important;
+  font-size:.5em !important;font-weight:600 !important;line-height:1 !important;
+  color:var(--rz-art-accent) !important;
+  background:none !important;width:auto !important;height:auto !important;border-radius:0 !important;
+  vertical-align:middle !important;transform:translateY(-.4em) !important;
+  margin-right:.7rem !important;letter-spacing:.06em !important;
+  padding-bottom:3px !important;border-bottom:2px solid var(--rz-art-accent) !important;
+}
+
+/* ---- LEAD PARAGRAPH — a touch larger, to open the article (works with the drop-cap) ---- */
+html[data-rz-register="editorial"] .article-body > p:first-of-type{
+  font-size:1.14rem !important;line-height:1.7 !important;
+}
+
+/* ---- FIGURE framing — generous rhythm, soft corners (caption already mono/muted above) ---- */
+html[data-rz-register="editorial"] figure{ margin:2.2rem 0; }
+html[data-rz-register="editorial"] figure img{ border-radius:8px; display:block; max-width:100%; height:auto; }

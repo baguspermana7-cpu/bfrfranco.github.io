@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.46.5 — 2026-06-26 (Articles — uiux-review reading-experience overhaul)
+
+Acted on a uiux-reviewer audit of the editorial register. All in shared
+`css/rz-article-dark.css`, both themes, every article + hub. Verified 37 pages:
+0 light-on-dark, 0 errors, 0 over-wide measure.
+
+### Fixed (review CRITICAL/HIGH)
+- **Reading measure** — prose was uncapped (~142ch). Capped `.article-body p/li/h2/h3/blockquote`
+  to **68ch** (lists 70ch); tables/figures stay full-width. The single biggest readability win.
+- **Day body font** — the day register block had no `.article-body p` rule, so day copy fell back
+  to **Inter** (the font design.md rejects). Forced **IBM Plex Sans + line-height 1.75** in both themes.
+- **Heading hierarchy** — skin never set heading sizes (h2 inherited 24px, h2/h3 ratio 1.2, equal
+  weight in dark). Now explicit editorial scale: **h2 `clamp(1.75rem,3vw,2.25rem)` weight 600**,
+  **h3 `clamp(1.2rem,2vw,1.45rem)` weight 500** (ratio ≈1.55, weight contrast restored).
+- **Vertical rhythm** — h2 was glued to the next paragraph; added `margin:2.4em 0 .55em` (h2),
+  `1.7em 0 .4em` (h3).
+- **Day hero wash** — the day `.article-hero::before` amber radial stacked over saturated bespoke
+  heroes (e.g. article-26 orange) and washed out the dek; removed it in day (`content:none`).
+- **figcaption** — articles hardcode inline `italic 14px #64748b`; the skin rule now uses
+  `!important` + `font-style:normal` so captions render as intended mono/muted.
+- **Title size** normalised to one floor `clamp(2.6rem,5vw,3.5rem)`.
+
+### Added (requested refinements)
+- **Section-number kickers** — magazine-style mono `01 / 02 / 03` on each h2 (CSS counter),
+  replacing the bare amber tick with the number + an amber underline.
+- **Lead paragraph** — first body paragraph set to `1.14rem` to open the article (pairs with the drop-cap).
+- **Figure framing** — `2.2rem` rhythm, soft `8px` corners, responsive `img`.
+
 ## v1.46.4 — 2026-06-26 (Articles — editorial reading-experience refinements + day-accent contrast fix)
 
 Design pass on the editorial register (impeccable-guided, on-brand). All in the shared
