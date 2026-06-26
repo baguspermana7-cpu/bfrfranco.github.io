@@ -94,10 +94,35 @@
         /* parameter tiles */
         .tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr)); gap:8px; }
         .tile{ border:1px solid var(--bm-border); border-radius:6px; padding:.55rem .6rem; background:var(--bm-inset); position:relative; }
+        .tile .th{ display:flex; align-items:baseline; gap:.3rem; padding-right:12px; }
+        .tile .tag{ font-family:var(--bm-mono); font-size:.5rem; font-weight:700; letter-spacing:.04em; color:var(--bm-cyan); background:rgba(6,182,212,.1); border:1px solid rgba(6,182,212,.28); border-radius:3px; padding:0 3px; white-space:nowrap; }
         .tile .k{ font-family:var(--bm-mono); font-size:.54rem; letter-spacing:.07em; text-transform:uppercase; color:var(--bm-muted); }
         .tile .v{ font-family:var(--bm-mono); font-size:1.18rem; font-weight:700; color:var(--bm-text); line-height:1.15; margin-top:2px; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
         .tile .v .u{ font-size:.62rem; color:var(--bm-muted); font-weight:500; margin-left:2px; }
         .tile .b{ font-family:var(--bm-mono); font-size:.52rem; color:var(--bm-muted); margin-top:1px; }
+        /* status line replaces the old "band X" subtitle */
+        .tile .st{ font-family:var(--bm-mono); font-size:.5rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-top:3px; color:var(--bm-green); display:flex; justify-content:space-between; gap:4px; }
+        .tile .st .rngtxt{ color:var(--bm-muted); font-weight:500; }
+        .tile.warn .st{ color:var(--bm-amber); } .tile.alarm .st{ color:var(--bm-red); }
+        /* range bar — shows where the live value sits between lo/hi limits */
+        .tile .bar{ position:relative; height:5px; border-radius:3px; margin-top:5px; background:var(--bm-border); overflow:hidden; }
+        .tile .bar .zone{ position:absolute; top:0; bottom:0; background:rgba(10,138,90,.32); }
+        .tile .bar .mark{ position:absolute; top:-1px; width:2px; height:7px; background:var(--bm-text); border-radius:1px; transition:left .4s ease; }
+        .tile.warn .bar .mark{ background:var(--bm-amber); } .tile.alarm .bar .mark{ background:var(--bm-red); }
+        /* active-alarm banner */
+        .alarmbar{ display:flex; align-items:flex-start; gap:.6rem; border:1px solid var(--bm-border); border-left:4px solid var(--bm-green); border-radius:8px; background:var(--bm-inset); padding:.6rem .85rem; margin-bottom:.9rem; font-size:.82rem; line-height:1.5; }
+        .alarmbar.warn{ border-left-color:var(--bm-amber); background:rgba(180,83,9,.06); }
+        .alarmbar.alarm{ border-left-color:var(--bm-red); background:rgba(220,38,38,.06); }
+        .alarmbar .ab-ico{ font-family:var(--bm-mono); font-size:.6rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 7px; border-radius:5px; white-space:nowrap; background:rgba(10,138,90,.16); color:var(--bm-green); flex-shrink:0; margin-top:1px; }
+        .alarmbar.warn .ab-ico{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
+        .alarmbar.alarm .ab-ico{ background:rgba(220,38,38,.16); color:var(--bm-red); }
+        .alarmbar .ab-body b{ color:var(--bm-text); }
+        .alarmbar .ab-chips{ display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+        .alarmbar .ab-chip{ font-family:var(--bm-mono); font-size:.56rem; font-weight:700; padding:1px 6px; border-radius:4px; }
+        .alarmbar .ab-chip.warn{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
+        .alarmbar .ab-chip.alarm{ background:rgba(220,38,38,.16); color:var(--bm-red); }
+        /* scenario chip severity — Normal reads neutral-green, faults amber */
+        .seg.scen button[data-scen="normal"][aria-pressed="true"]{ background:var(--bm-green); border-color:var(--bm-green); color:#04241a; }
         .tile .spark{ width:100%; height:15px; display:block; margin-top:4px; }
         .tile .spark polyline{ fill:none; stroke:var(--bm-cyan); stroke-width:1.1; opacity:.85; vector-effect:non-scaling-stroke; }
         .tile .spark .fillarea{ fill:var(--bm-cyan); opacity:.08; stroke:none; }
@@ -324,6 +349,11 @@
     <main id="main-content"><div class="bm-wrap">
         <p class="typedesc" id="typeDesc"></p>
 
+        <div class="alarmbar" id="alarmBar" role="status" aria-live="polite">
+            <span class="ab-ico" id="abIco">NORMAL</span>
+            <div class="ab-body" id="abBody"></div>
+        </div>
+
         <div class="bm-grid">
             <div class="panel">
                 <div class="panel-hd"><h3>Datahall installation layout — plan view</h3><span class="tag" id="layoutTag">in-row</span></div>
@@ -412,8 +442,23 @@
             l2a:{ name:'L2A · Air-cooled', cap:60, arch:'L2A', supply:33, dT:9, flow:1.20, dP:1.0, sysP:3.0, fac:'AIR',
                 desc:'A <b>liquid-to-air</b> CDU that rejects heat to <b>room air</b> — no facility water. Retrofit-friendly, but the room CRAH/CRAC must absorb the heat, capping density.' }
         };
+        // each fault propagates to the parameters it physically affects, so correlated
+        // tiles change state together (not just one isolated alarm).
         var SCEN={
-            normal:{}, leak:{leak:1}, pumpfail:{pumpA:0}, clog:{dP:+2.4,filter:1}, hotfws:{supply:+9,dT:-2,atd:+4}, lowflow:{flow:-0.6,dT:+5,dP:-0.5}
+            normal:{},
+            leak:{leak:1, sysP:-0.7, level:-15, flow:-0.06},                 // coolant leak → pressure sags, reservoir level falls, make-up active
+            pumpfail:{pumpA:0, flow:-0.12, dP:-0.18},                        // duty pump fails → standby carries load, N+1 lost
+            clog:{dP:+2.4, filter:1, flow:-0.4, dT:+3.2},                    // filter clogs → loop dP up, flow down, ΔT rises
+            hotfws:{supply:+9, dT:-2, atd:+4},                              // hot facility water → supply up, HX approach widens
+            lowflow:{flow:-0.6, dT:+5, dP:-0.5}                             // low secondary flow → ΔT rises, dP falls
+        };
+        // human-readable cause for the active-alarm banner
+        var SCEN_CAUSE={
+            leak:{sev:'alarm',title:'Coolant leak detected',msg:'Leak switch <b>LSH-01</b> tripped — reservoir level (<b>LT-01</b>) falling and system pressure sagging while make-up runs. <b>Acknowledge → isolate the affected zone → locate via the leak rope</b>, then pressure-test and refill.'},
+            pumpfail:{sev:'warn',title:'Duty pump failed — running on standby',msg:'Pump <b>P-01A</b> is down; standby <b>P-01B</b> is carrying the load so flow holds, but redundancy is lost (<b>N+1 → N</b>). Service/replace the failed pump before the next fault.'},
+            clog:{sev:'alarm',title:'Filter clogging',msg:'Filter ΔP (<b>PDT-01</b>) is high — secondary flow is dropping and ΔT is climbing as the strainer blocks. <b>Replace the filter element</b> at the vendor dP threshold and re-check flow.'},
+            hotfws:{sev:'warn',title:'Hot facility water',msg:'Primary supply is warm — coolant supply temp is up and HX approach (<b>ATD</b>) is widening. Check the facility CDW supply temp/flow and verify the heat-exchanger is not fouled.'},
+            lowflow:{sev:'alarm',title:'Low secondary flow',msg:'Secondary flow is below the design point — ΔT is rising and GPUs risk throttling. Confirm pump/valve/QD, purge air, and raise the flow setpoint.'}
         };
 
         var curType='inrow', curScen='normal';
@@ -587,28 +632,51 @@
         }
 
         /* ---------- live parameter compute + render ---------- */
+        // each tile carries its instrument tag + (lo,hi) alarm band so the UI can show
+        // a range bar + status instead of an ambiguous "band X" subtitle.
         var TILES=[
-            {k:'flow',label:'Flow',unit:'LPM/kW',band:'1.0–1.5',dec:2},
-            {k:'flowtot',label:'Flow total',unit:'LPM',band:'cap×',dec:0},
-            {k:'supply',label:'Supply T',unit:'°C',band:'17–45',dec:1},
-            {k:'return',label:'Return T',unit:'°C',band:'',dec:1},
-            {k:'dT',label:'ΔT',unit:'°C',band:'8–12',dec:1},
-            {k:'dP',label:'Diff press',unit:'bar',band:'0.5–3.0',dec:2},
-            {k:'sysP',label:'System press',unit:'bar',band:'2–6',dec:2},
-            {k:'pump',label:'Pumps',unit:'',band:'N+1',dec:-1},
-            {k:'filter',label:'Filter dP',unit:'',band:'clean',dec:-1},
-            {k:'leak',label:'Leak',unit:'',band:'0',dec:-1},
-            {k:'atd',label:'HX approach',unit:'°C',band:'~5',dec:1},
-            {k:'chem',label:'Coolant',unit:'',band:'PG25 OK',dec:-1}
+            {k:'flow',tag:'FT-01',label:'Flow',unit:'LPM/kW',lo:1.0,hi:1.5,dec:2},
+            {k:'flowtot',tag:'FT-01Σ',label:'Flow total',unit:'LPM',dec:0,info:'= flow × capacity'},
+            {k:'supply',tag:'TT-01',label:'Supply T',unit:'°C',lo:17,hi:45,dec:1},
+            {k:'return',tag:'TT-02',label:'Return T',unit:'°C',dec:1,info:'= supply + ΔT'},
+            {k:'dT',tag:'ΔT-01',label:'ΔT',unit:'°C',lo:8,hi:12,dec:1},
+            {k:'dP',tag:'PDT-02',label:'Loop dP',unit:'bar',lo:0.5,hi:3.0,dec:2},
+            {k:'sysP',tag:'PT-01',label:'System press',unit:'bar',lo:2,hi:6,dec:2},
+            {k:'level',tag:'LT-01',label:'Reservoir level',unit:'%',lo:45,hi:70,dec:0},
+            {k:'pump',tag:'P-01',label:'Pumps',state:1,norm:'N+1 ready'},
+            {k:'filter',tag:'PDT-01',label:'Filter',state:1,norm:'clean'},
+            {k:'leak',tag:'LSH-01',label:'Leak detect',state:1,norm:'dry'},
+            {k:'atd',tag:'TT-Δ',label:'HX approach',unit:'°C',lo:3,hi:7,dec:1},
+            {k:'chem',tag:'AT-01',label:'Coolant',state:1,norm:'PG25 in-spec'}
         ];
+        var TMETA={}; for(var _i=0;_i<TILES.length;_i++) TMETA[TILES[_i].k]=TILES[_i];
+        function dispRange(lo,hi){ var span=(hi-lo)||1; return {lo:lo-span*0.35,hi:hi+span*0.35}; }
+        function markPct(v,lo,hi){ var d=dispRange(lo,hi); var p=(v-d.lo)/(d.hi-d.lo); return Math.max(0,Math.min(1,p))*100; }
+        function zoneCss(lo,hi){ var d=dispRange(lo,hi); var z0=(lo-d.lo)/(d.hi-d.lo)*100, z1=(hi-d.lo)/(d.hi-d.lo)*100; return 'left:'+z0.toFixed(1)+'%;width:'+(z1-z0).toFixed(1)+'%'; }
+        function bandState(v,lo,hi){ if(v<lo*0.9||v>hi*1.1) return 'alarm'; if(v<lo||v>hi) return 'warn'; return 'ok'; }
         function buildTiles(){
             var h=''; for(var i=0;i<TILES.length;i++){ var t=TILES[i];
-                var spark = t.dec!==-1 ? '<svg class="spark" id="spark-'+t.k+'" viewBox="0 0 60 15" preserveAspectRatio="none"><polygon class="fillarea" points=""/><polyline points=""/></svg>' : '<div class="b">&nbsp;</div>';
-                h+='<div class="tile" id="tile-'+t.k+'" data-link="'+t.k+'"><span class="led"></span><div class="k">'+t.label+'</div><div class="v" id="val-'+t.k+'">–</div><div class="b">'+(t.band?'band '+t.band:'&nbsp;')+'</div>'+spark+'</div>';
+                var inner='<span class="led"></span><div class="th"><span class="tag">'+t.tag+'</span><span class="k">'+t.label+'</span></div>'
+                        + '<div class="v" id="val-'+t.k+'">–</div>';
+                if(t.state){
+                    inner+='<div class="st"><span id="sttxt-'+t.k+'">NORMAL</span><span class="rngtxt" id="rng-'+t.k+'">'+t.norm+'</span></div>';
+                } else {
+                    if(t.lo!=null) inner+='<div class="bar"><span class="zone" style="'+zoneCss(t.lo,t.hi)+'"></span><span class="mark" id="mark-'+t.k+'" style="left:0%"></span></div>';
+                    inner+='<div class="st"><span id="sttxt-'+t.k+'">'+(t.info?'DERIVED':'NORMAL')+'</span><span class="rngtxt" id="rng-'+t.k+'">'+(t.info?t.info:(t.lo+'–'+t.hi+' '+t.unit))+'</span></div>';
+                    inner+='<svg class="spark" id="spark-'+t.k+'" viewBox="0 0 60 15" preserveAspectRatio="none"><polygon class="fillarea" points=""/><polyline points=""/></svg>';
+                }
+                h+='<div class="tile" id="tile-'+t.k+'" data-link="'+t.k+'">'+inner+'</div>';
             }
             document.getElementById('tiles').innerHTML=h;
         }
-        function setTile(k,txt,state){ var el=document.getElementById('val-'+k); if(el) el.innerHTML=txt; var tl=document.getElementById('tile-'+k); if(tl){ tl.className='tile'+(state==='warn'?' warn':state==='alarm'?' alarm':''); } }
+        function applyState(k,state){ var tl=document.getElementById('tile-'+k); if(tl) tl.className='tile'+(state==='warn'?' warn':state==='alarm'?' alarm':''); var sx=document.getElementById('sttxt-'+k); if(sx) sx.textContent=state==='alarm'?'ALARM':state==='warn'?'WARN':(TMETA[k].info?'DERIVED':'NORMAL'); }
+        // numeric tile — sets value, range-marker position and status from the band
+        function setNum(k,v,unit){ var t=TMETA[k]; var el=document.getElementById('val-'+k); var txt=(t.dec>=0?v.toFixed(t.dec):Math.round(v))+'<span class="u">'+unit+'</span>'; if(el) el.innerHTML=txt;
+            var state = t.info ? 'ok' : bandState(v,t.lo,t.hi);
+            if(t.lo!=null){ var m=document.getElementById('mark-'+k); if(m) m.style.left=markPct(v,t.lo,t.hi).toFixed(1)+'%'; }
+            applyState(k,state); return state; }
+        // state tile — sets value text + explicit state + a short condition note
+        function setState(k,valHtml,state,note){ var el=document.getElementById('val-'+k); if(el) el.innerHTML=valHtml; var rg=document.getElementById('rng-'+k); if(rg&&note!=null) rg.textContent=note; applyState(k,state); return state; }
         var SPARK_HIST={};
         function drawSpark(k,val){
             if(!SPARK_HIST[k]) SPARK_HIST[k]=[];
@@ -625,39 +693,43 @@
             if(window._tdOpenKey===k) renderTrend(k); /* live-update an open drawer */
         }
 
+        function worse(a,b){ if(a==='alarm'||b==='alarm') return 'alarm'; if(a==='warn'||b==='warn') return 'warn'; return 'ok'; }
         function compute(){
-            var t=TYPES[curType], s=SCEN[curScen]||{};
+            var t=TYPES[curType], s=SCEN[curScen]||{}, L2A=t.arch==='L2A';
             var supply=t.supply+(s.supply||0)+rnd(1)*0.5;
             var dT=t.dT+(s.dT||0)+rnd(2)*0.4;
             var flow=t.flow+(s.flow||0)+rnd(3)*0.03;
             var dP=t.dP+(s.dP||0)+rnd(4)*0.05;
-            var sysP=t.sysP+rnd(5)*0.06;
+            var sysP=t.sysP+(s.sysP||0)+rnd(5)*0.06;
             var ret=supply+dT;
             var atd=5+(s.atd||0)+rnd(6)*0.2;
             var pumpA=(s.pumpA===0)?0:1;
             var leak=s.leak?1:0, filterBad=s.filter?1:0;
             var flowtot=flow*t.cap;
-            // states
-            function band(v,lo,hi){ if(v<lo*0.9||v>hi*1.1) return 'alarm'; if(v<lo||v>hi) return 'warn'; return 'ok'; }
-            setTile('flow', flow.toFixed(2)+'<span class="u">LPM/kW</span>', band(flow,1.0,1.5));
-            setTile('flowtot', Math.round(flowtot)+'<span class="u">LPM</span>', 'ok');
-            setTile('supply', supply.toFixed(1)+'<span class="u">°C</span>', band(supply,17,45));
-            setTile('return', ret.toFixed(1)+'<span class="u">°C</span>', 'ok');
-            setTile('dT', dT.toFixed(1)+'<span class="u">°C</span>', band(dT,8,12));
-            setTile('dP', dP.toFixed(2)+'<span class="u">bar</span>', filterBad?'alarm':band(dP,0.5,3.0));
-            setTile('sysP', sysP.toFixed(2)+'<span class="u">bar</span>', band(sysP,2,6));
-            setTile('pump', pumpA? 'N+1' : 'P2 only', pumpA?'ok':'warn');
-            setTile('filter', filterBad?'CLOG':'OK', filterBad?'alarm':'ok');
-            setTile('leak', leak?'ALARM':'0', leak?'alarm':'ok');
-            setTile('atd', atd.toFixed(1)+'<span class="u">°C</span>', t.arch==='L2A'?'ok':band(atd,3,7));
-            setTile('chem', 'PG25 OK', 'ok');
-            // sparkline trends (rolling history per numeric tile)
+            var level=56+(s.level||0)+rnd(8)*1.2;                 // expansion/reservoir level (LT-01)
+            var fdp=0.28+(filterBad?1.9:0)+rnd(7)*0.02;           // filter dP (PDT-01)
+            // numeric tiles — value + range marker + status
+            var states={};
+            states.flow=setNum('flow',flow,'LPM/kW');
+            states.flowtot=setNum('flowtot',flowtot,'LPM');
+            states.supply=setNum('supply',supply,'°C');
+            states.return=setNum('return',ret,'°C');
+            states.dT=setNum('dT',dT,'°C');
+            // filter clog forces the loop-dP tile to alarm even if the number is mid-band
+            states.dP=setNum('dP',dP,'bar'); if(filterBad){ states.dP='alarm'; applyState('dP','alarm'); }
+            states.sysP=setNum('sysP',sysP,'bar');
+            states.level=setNum('level',level,'%');
+            states.atd = L2A ? setState('atd','n/a','ok','L2A — air reject') : setNum('atd',atd,'°C');
+            // state tiles — explicit condition + note
+            states.pump=setState('pump', pumpA?'N+1':'N (no standby)', pumpA?'ok':'warn', pumpA?'N+1 ready':'P-01A failed → P-01B duty');
+            states.filter=setState('filter', filterBad?'CLOG':'OK', filterBad?'alarm':'ok', filterBad?'ΔP high — replace element':'clean');
+            states.leak=setState('leak', leak?'ALARM':'DRY', leak?'alarm':'ok', leak?'LSH-01 tripped — isolate':'dry');
+            states.chem=setState('chem','PG25 OK','ok','PG25 in-spec');
+            // sparkline trends (numeric tiles only)
             drawSpark('flow',flow); drawSpark('flowtot',flowtot); drawSpark('supply',supply); drawSpark('return',ret);
-            drawSpark('dT',dT); drawSpark('dP',dP); drawSpark('sysP',sysP); drawSpark('atd',atd);
+            drawSpark('dT',dT); drawSpark('dP',dP); drawSpark('sysP',sysP); drawSpark('level',level); if(!L2A) drawSpark('atd',atd);
             // P&ID live labels (tagged instruments)
             function st(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
-            var fdp=0.28+(filterBad?1.9:0)+rnd(7)*0.02;          // filter dP (PDT-01)
-            var level=56+(leak?-9:0)+rnd(8)*1.2;                  // expansion level (LT-01)
             st('pv-flow', Math.round(flowtot)+' LPM');           // FT-01
             st('pv-sysp', sysP.toFixed(1)+' bar');               // PT-01
             st('pv-dp', dP.toFixed(1)+' bar');                   // PDT-02 loop
@@ -666,13 +738,29 @@
             st('pv-ret', ret.toFixed(0)+'°C');                   // TT-02
             st('pv-level', Math.round(level)+'%');               // LT-01
             st('pv-pump', pumpA?'N+1':'P-01B');
-            var atdEl=document.getElementById('pv-atd'); if(atdEl) atdEl.textContent=(t.arch==='L2A'?'—':atd.toFixed(0)+'°C');
-            // overall state pill
-            var worst='ok';
-            [band(flow,1.0,1.5),band(supply,17,45),band(dT,8,12),(filterBad?'alarm':band(dP,0.5,3.0)),band(sysP,2,6),(pumpA?'ok':'warn'),(leak?'alarm':'ok')].forEach(function(x){ if(x==='alarm')worst='alarm'; else if(x==='warn'&&worst!=='alarm')worst='warn'; });
+            var atdEl=document.getElementById('pv-atd'); if(atdEl) atdEl.textContent=(L2A?'—':atd.toFixed(0)+'°C');
+            // ----- overall state + active-alarm banner -----
+            var worst='ok'; for(var kk in states) worst=worse(worst,states[kk]);
             var ps=document.getElementById('pidState');
             ps.className='statepill '+(worst==='alarm'?'st-alarm':worst==='warn'?'st-warn':'st-ok');
             ps.textContent=worst==='alarm'?'ALARM':worst==='warn'?'WARN':'RUN';
+            renderAlarmBar(worst,states);
+        }
+        // build the active-alarm banner from the scenario cause + the tiles that tripped
+        function renderAlarmBar(worst,states){
+            var bar=document.getElementById('alarmBar'), ico=document.getElementById('abIco'), body=document.getElementById('abBody');
+            if(!bar) return;
+            var cause=SCEN_CAUSE[curScen];
+            if(worst==='ok' || !cause){
+                bar.className='alarmbar'; ico.textContent='NORMAL';
+                body.innerHTML='<b>All parameters nominal.</b> N+1 pumps healthy, loop dry, chemistry in-spec — every reading sits inside its alarm band.';
+                return;
+            }
+            bar.className='alarmbar '+(worst==='alarm'?'alarm':'warn');
+            ico.textContent=worst==='alarm'?'ALARM':'WARN';
+            // chips for each tripped tile
+            var chips=''; for(var i=0;i<TILES.length;i++){ var k=TILES[i].k, sv=states[k]; if(sv==='warn'||sv==='alarm') chips+='<span class="ab-chip '+sv+'">'+TILES[i].tag+' '+TILES[i].label+'</span>'; }
+            body.innerHTML='<b>'+cause.title+'.</b> '+cause.msg+(chips?'<div class="ab-chips">'+chips+'</div>':'');
         }
 
         /* ---------- view wiring ---------- */
@@ -725,6 +813,7 @@
             dT:{ref:'Sized with flow to the rack heat load (Q = ṁ·c_p·ΔT).'},
             dP:{ref:'Within the cold-plate min/max window; a rising trend signals filter clogging.'},
             sysP:{ref:'Loop pressure below the component PN; held by expansion + make-up control.'},
+            level:{ref:'Expansion/reservoir level. A falling trend with rising make-up = a slow leak.'},
             atd:{band:'~3–5 °C', ref:'Heat-exchanger approach (L2L). A rising trend = HX fouling.'},
             pump:{ref:'Duty + standby pumps with auto-changeover. Status only — no trend.', status:1},
             filter:{ref:'Filter differential pressure; replace at the vendor dP threshold. Status only.', status:1},
@@ -737,7 +826,7 @@
             var meta=TREND_META[k]||{}, t=tileOf(k);
             document.getElementById('tdTitle').textContent=(t?t.label:k)+(t&&t.unit?(' · '+t.unit):'');
             var valEl=document.getElementById('val-'+k); document.getElementById('tdVal').innerHTML=valEl?valEl.innerHTML:'–';
-            document.getElementById('tdBand').textContent='Band: '+(meta.band||(t&&t.band)||'—');
+            document.getElementById('tdBand').textContent='Band: '+(meta.band||(t&&t.lo!=null?(t.lo+'–'+t.hi+' '+t.unit):(t&&t.norm)||'—'));
             document.getElementById('tdRef').textContent=meta.ref||'';
             var chart=document.getElementById('tdChart'), a=SPARK_HIST[k];
             if(meta.status || !a || a.length<2){ chart.style.display='none'; return; }

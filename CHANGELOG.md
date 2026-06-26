@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.48.0 — 2026-06-26 (CDU Mini-BMS — accurate fault propagation + tile redesign)
+
+### Changed
+- **`cdu-mini-bms.html` live-parameter tiles redesigned** for BMS accuracy and clarity.
+  Each tile now shows its **instrument tag** (FT-01, TT-01, PT-01, LT-01 … matching the
+  P&ID), a **range bar** with the normal band shaded and a live position marker, and an
+  explicit **NORMAL / WARN / ALARM** status line with the numeric range. Replaces the
+  ambiguous "band X" subtitle (which printed nonsense like "band PG25 OK" / "band cap×").
+  Derived tiles (flow total, return temp) are now labelled `DERIVED` with their formula.
+- **Faults now propagate to the parameters they physically affect** (the previous model
+  flipped a single flag, so a Leak alarm left every other tile green). Now: **Leak** →
+  reservoir level (LT-01) falls + system pressure sags + make-up active; **Filter clog** →
+  loop dP up + flow down + ΔT rises; **Pump-A fail** → N+1 → N (flow holds on standby);
+  **Hot facility water** → supply up + HX approach widens; **Low flow** → ΔT up + dP down.
+  Correlated tiles change state together, so the board reads like a real BMS.
+
+### Added
+- **Active-alarm banner** above the tiles — severity badge (NORMAL/WARN/ALARM), a
+  plain-language cause + operator response for the selected fault, and chips listing every
+  tripped instrument (tag + parameter). Reads "All parameters nominal" when healthy.
+- **Reservoir-level tile (LT-01)** with its own trend, giving the leak scenario a second
+  correlated signal (level falling) beyond the leak switch.
+
+### Fixed
+- Scenario selector: the active **Normal** chip now reads neutral-green (healthy) instead
+  of the alarm-rust colour that made a healthy board look faulted.
+
 ## v1.47.1 — 2026-06-26 (Articles — KPI hero strip: instrument-grade values)
 
 ### Changed
