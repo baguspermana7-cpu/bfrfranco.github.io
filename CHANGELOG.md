@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.46.3 — 2026-06-26 (Article HUBS — editorial parity + theme bug-fixes)
+
+Extends v1.46.2 from the 34 articles to the article-ecosystem hub pages
+(`articles.html`, `insights.html`, `future-forward.html`) the §08 skin also targets.
+
+### Fixed
+- **No-FOUC theme guard** added to the 3 hubs (they had the editorial register + skin CSS but
+  not the guard → dark readers flashed white on load). `geopolitics.html` already had it.
+- **insights.html — 6 white-card light-on-dark islands.** The resource cards
+  (`.reports-grid > a`: Live Tracker / Regional Report / AI-HPC Platform / Infographic) use inline
+  `background:var(--bg-card,#fff)`; `--bg-card` is undefined in dark there, so they fell back to
+  pure white. Added dark overrides (`#1e293b` card / light text). **Re-probe: 0 light-on-dark.**
+
+### Verification
+- All 3 hubs: FOUC fires pre-paint, dark 0 light-on-dark, toggle flips cleanly, hero renders
+  Fraunces in both themes, 0 console errors. Audits CLEAN.
+
 ## v1.46.2 — 2026-06-26 (Articles — §08 editorial skin in BOTH themes + zero switching bugs)
 
 Owner report: the approved §08 article skin (`plan-dark-mode-standard.html`) wasn't

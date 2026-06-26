@@ -118,6 +118,11 @@
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
 
     <style>
+        /* v1.46.x dark-mode coverage fix — resource cards use inline background:var(--bg-card,#fff);
+           --bg-card is undefined in dark here, so they fell back to white islands. Override explicitly. */
+        [data-theme="dark"] .reports-grid > a { background:#1e293b !important; border-color:rgba(255,255,255,0.1) !important; }
+        [data-theme="dark"] .reports-grid > a h3 { color:#f1f5f9 !important; }
+        [data-theme="dark"] .reports-grid > a p { color:#94a3b8 !important; }
         /* Insights Hub Specific Styles */
         .insights-hero {
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
@@ -506,6 +511,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <!-- Search Overlay & Modal -->
