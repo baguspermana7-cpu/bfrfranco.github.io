@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.49.1 — 2026-06-27 (Nav cleanup — Tools out of the Insights dropdown)
+
+### Removed
+- **`index.html` Insights navbar dropdown** — removed the "Tools & Calculators" sub-item (it mixed a
+  tools link into a reading/insights menu). The dropdown now reads Engineering Journal · Global Analysis
+  · Future Forward · Glossary · — · Second Brain · All Insights, matching the Insights dropdown already
+  used on the rest of the site. `tools.html` stays reachable via the global search and page footers;
+  the calculators remain in the DC Solutions dropdown.
+
 ## v1.49.0 — 2026-06-27 (CDU checklist spares-planning view + Mini-BMS tile reading-guide)
 
 ### Added
