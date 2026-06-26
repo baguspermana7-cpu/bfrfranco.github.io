@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.49.2 — 2026-06-27 (Tools hub — surface the missing Fire suite + PLN Sumatra grid)
+
+### Added
+- **`tools.html`** now lists the recently-shipped tools that were missing from the hub:
+  **Fire Suppression Calculator** (`fire-calculator.html`) and **Fire Safety Checklist**
+  (`fire-checklist.html`) in Compliance & Standards Tools, and the **PLN Sumatra Interconnected
+  Grid** (`pln-sumatra-grid.html`) in Market & Grid Monitors. (All three pages already existed and
+  were in sitemap/search-index/llms — only the hub listing was stale.)
+
+### Fixed
+- **`tools.html` tool count** corrected `18 → 23` across the hero copy, hero badge, meta/OG/Twitter
+  descriptions, and the JSON-LD `CollectionPage` `ItemList` — which was also completed to 23 entries
+  (it had been missing the CDU toolkit and Spares Readiness calculator in addition to the new tools).
+
 ## v1.49.1 — 2026-06-27 (Nav cleanup — Tools out of the Insights dropdown)
 
 ### Removed
