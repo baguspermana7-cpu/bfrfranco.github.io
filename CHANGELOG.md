@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.49.6 — 2026-06-27 (DC Solutions hub — surface the Fire suite)
+
+### Added
+- **`datacenter-solutions.html` Engineering & Compliance Tools** now lists the **Fire Suppression
+  Calculator** (`fire-calculator.html`) and **Fire Safety Checklist** (`fire-checklist.html`) alongside
+  the CDU Toolkit — previously only the Fire-Safety *pillar* was linked, not the interactive tools
+  (the same discoverability gap just fixed on `tools.html`). Tool-count badge `9 → 11`.
+
+### Fixed
+- Corrected a stale `<!-- coming soon -->` code comment on the PLN Sumatra card (the card itself has
+  been published/linked since v1.46.6).
+
 ## v1.49.5 — 2026-06-27 (Theme persistence — unify the localStorage key site-wide)
 
 ### Fixed
