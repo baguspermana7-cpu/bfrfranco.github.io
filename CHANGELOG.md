@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.44.4 — 2026-06-25 (Fire-safety hub — Ship 2: data layer + glossary)
+
+### Added (data/fire/ + glossary)
+- **`data/fire/clean-agent-properties.csv`** (5) — Novec 1230 / FM-200 / IG-541 / IG-55 / CO₂: NFPA
+  2001 design concentrations, min-extinguishing, NOAEL/LOAEL, s=k1+k2·T coefficients, GWP, discharge.
+- **`data/fire/li-ion-chemistry.csv`** (5) — NMC/LFP/LCO/VRLA thermal-runaway onset (150 / 166.8 /
+  150 °C), energy density, off-gas L/Wh + species, TR heat factor, governing vent-gas LFL.
+- **`data/fire/standards-references.csv`** (12) — NFPA 75/76/2001/72/13/855, NFPA 70, UL 9540/9540A,
+  IEC 62619, FM Global DS 5-32, ISO 14520.
+- **`data/fire/README.md`** manifest + basis-tag legend + key formulas.
+- **Glossary: 9 new fire/battery terms** — Thermal Runaway, UL 9540A, Off-Gassing, Cross-Zoned
+  Detection, Compartmentation, Room Integrity (door-fan test), Design Concentration, NOAEL & LOAEL,
+  NFPA 855 — cross-linked to the fire pages.
+
 ## v1.44.3 — 2026-06-25 (Fire-safety hub — Ship 1: frozen fire engine + tests)
 
 ### Added (foundation for the DC fire-safety calculation hub — no UI yet)
