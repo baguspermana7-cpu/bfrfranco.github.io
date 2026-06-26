@@ -1,4 +1,4 @@
-# Changelog â ResistanceZero
+# Changelog — ResistanceZero
 
 All notable changes to the ResistanceZero website. Format follows the spirit of
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), with calendar-versioned
@@ -14,12 +14,15 @@ release sections rather than semver.
 ## v1.47.1 — 2026-06-26 (Articles — KPI hero strip: instrument-grade values)
 
 ### Changed
-- KPI hero-strip values across all editorial articles now render in JetBrains/IBM Plex Mono with `font-variant-numeric: tabular-nums`, and labels in IBM Plex Mono uppercase (shared `css/rz-article-dark.css`, both themes). Removes the generic "SaaS hero-metric" read; per-article accent colour + hero identity kept. Verified mono+tabular both themes.
+- KPI hero-strip values across all editorial articles now render in JetBrains/IBM Plex
+  Mono with `font-variant-numeric: tabular-nums`, and labels in IBM Plex Mono uppercase
+  (shared `css/rz-article-dark.css`, both themes). Removes the generic "SaaS hero-metric"
+  read; per-article accent colour + hero identity kept. Verified mono+tabular both themes.
 
-## v1.47.0 â 2026-06-26 (CDU checklist â spare-parts register + exploded-view resources)
+## v1.47.0 — 2026-06-26 (CDU checklist — spare-parts register + exploded-view resources)
 
 ### Added
-- **`cdu-checklist.html` Â§07 Spare-parts & consumables register** â a 15-row matrix
+- **`cdu-checklist.html` §07 Spare-parts & consumables register** — a 15-row matrix
   mapping every PM line that consumes a part to: what to replace, the
   acceptance / replace-when trigger, interval, a part reference / spec (commodity
   manufacturer family or OEM service-part class), a critical-spare class
@@ -28,31 +31,31 @@ release sections rather than semver.
   seal kit, spare pump, expansion bladder, leak rope+controller, flow / dP / temp-RH
   sensors, TCV actuator, inhibitor/biocide dosing, PSV, and L2A air filter. Cost
   bands tagged `EST` (illustrative market range, not a quote); specs `STD`/`VENDOR`.
-- **`cdu-checklist.html` Â§08 Exploded-view & IPB resources â per CDU type** â per-type
+- **`cdu-checklist.html` §08 Exploded-view & IPB resources — per CDU type** — per-type
   cards (in-rack / in-row / sidecar / L2L end-of-row / L2A air-cooled) with
   representative OEMs and links to obtain the Illustrated Parts Breakdown / service
   manual (CoolIT, Vertiv, Delta, Stulz, nVent Schroff, Motivair/Schneider, Boyd,
   ZutaCore) plus cross-links to the CDU comparison.
 
 ### Changed
-- **`cdu-checklist.html` Â§06 PM checklist** â enriched from 3 columns to 4
+- **`cdu-checklist.html` §06 PM checklist** — enriched from 3 columns to 4
   (Task | Frequency | Acceptance/action | Parts/consumable); each part-consuming row
-  now deep-links to its Â§07 register line. Added PSV annual test, QD/gasket inspection
+  now deep-links to its §07 register line. Added PSV annual test, QD/gasket inspection
   and L2A air-side coil service rows; sharpened acceptance criteria (e.g. filter dP
-  trigger `> clean +0.3â0.5 bar`). Symptom and printable-form sections renumbered Â§09/Â§10.
+  trigger `> clean +0.3–0.5 bar`). Symptom and printable-form sections renumbered §09/§10.
 
-## v1.46.6 â 2026-06-26 (PLN landing rearrange + Sumatra interconnected grid)
+## v1.46.6 — 2026-06-26 (PLN landing rearrange + Sumatra interconnected grid)
 
 ### Added
-- **`pln-sumatra-grid.html`** + **`js/pln-sumatra-grid-data.js`** â a new PLN Sumatra interconnected
+- **`pln-sumatra-grid.html`** + **`js/pln-sumatra-grid-data.js`** — a new PLN Sumatra interconnected
   grid monitor, built like the Java-Bali one: an interactive Leaflet map + 31-node substation/plant
-  atlas of the 275/150 kV north-to-south backbone (AcehâLampung), major plants (Asahan, Pangkalan
+  atlas of the 275/150 kV north-to-south backbone (Aceh→Lampung), major plants (Asahan, Pangkalan
   Susu, Bukit Asam, incl Medco gas), and the separate **Batam-Bintan island grid** with **Medco Power
   Panaran** and the Nongsa subsea-cable data island. Self-contained (no engine dep); 0 dangling edges;
   curated from RUPTL 2025-2034 + PLN AR 2024 with confidence tags. Registered in sitemap/llms/search-index.
 
-### Changed (datacenter-solutions.html â PLN section rearrange)
-- Removed the 4 placeholder "SOON" cards (Kalimantan, Sulawesi, Maluku-Papua, Nusa Tenggara) â the
+### Changed (datacenter-solutions.html — PLN section rearrange)
+- Removed the 4 placeholder "SOON" cards (Kalimantan, Sulawesi, Maluku-Papua, Nusa Tenggara) — the
   grid now shows the 2 published monitors (Java-Bali + Sumatra), a cleaner grouping.
 - Flipped the **Sumatera card** from "Coming soon" to published (NEW badge, links to the new monitor,
   Medco/Batam/Nongsa features); footnote updated.
@@ -62,35 +65,35 @@ release sections rather than semver.
   dataset 0 dangling edges, 0 console errors; datacenter-solutions PLN section 2 cards, 0 errors.
   No bug, no error.
 
-## v1.46.5 â 2026-06-26 (Articles â uiux-review reading-experience overhaul)
+## v1.46.5 — 2026-06-26 (Articles — uiux-review reading-experience overhaul)
 
 Acted on a uiux-reviewer audit of the editorial register. All in shared
 `css/rz-article-dark.css`, both themes, every article + hub. Verified 37 pages:
 0 light-on-dark, 0 errors, 0 over-wide measure.
 
 ### Fixed (review CRITICAL/HIGH)
-- **Reading measure** â prose was uncapped (~142ch). Capped `.article-body p/li/h2/h3/blockquote`
+- **Reading measure** — prose was uncapped (~142ch). Capped `.article-body p/li/h2/h3/blockquote`
   to **68ch** (lists 70ch); tables/figures stay full-width. The single biggest readability win.
-- **Day body font** â the day register block had no `.article-body p` rule, so day copy fell back
+- **Day body font** — the day register block had no `.article-body p` rule, so day copy fell back
   to **Inter** (the font design.md rejects). Forced **IBM Plex Sans + line-height 1.75** in both themes.
-- **Heading hierarchy** â skin never set heading sizes (h2 inherited 24px, h2/h3 ratio 1.2, equal
+- **Heading hierarchy** — skin never set heading sizes (h2 inherited 24px, h2/h3 ratio 1.2, equal
   weight in dark). Now explicit editorial scale: **h2 `clamp(1.75rem,3vw,2.25rem)` weight 600**,
-  **h3 `clamp(1.2rem,2vw,1.45rem)` weight 500** (ratio â1.55, weight contrast restored).
-- **Vertical rhythm** â h2 was glued to the next paragraph; added `margin:2.4em 0 .55em` (h2),
+  **h3 `clamp(1.2rem,2vw,1.45rem)` weight 500** (ratio ≈1.55, weight contrast restored).
+- **Vertical rhythm** — h2 was glued to the next paragraph; added `margin:2.4em 0 .55em` (h2),
   `1.7em 0 .4em` (h3).
-- **Day hero wash** â the day `.article-hero::before` amber radial stacked over saturated bespoke
+- **Day hero wash** — the day `.article-hero::before` amber radial stacked over saturated bespoke
   heroes (e.g. article-26 orange) and washed out the dek; removed it in day (`content:none`).
-- **figcaption** â articles hardcode inline `italic 14px #64748b`; the skin rule now uses
+- **figcaption** — articles hardcode inline `italic 14px #64748b`; the skin rule now uses
   `!important` + `font-style:normal` so captions render as intended mono/muted.
 - **Title size** normalised to one floor `clamp(2.6rem,5vw,3.5rem)`.
 
 ### Added (requested refinements)
-- **Section-number kickers** â magazine-style mono `01 / 02 / 03` on each h2 (CSS counter),
+- **Section-number kickers** — magazine-style mono `01 / 02 / 03` on each h2 (CSS counter),
   replacing the bare amber tick with the number + an amber underline.
-- **Lead paragraph** â first body paragraph set to `1.14rem` to open the article (pairs with the drop-cap).
-- **Figure framing** â `2.2rem` rhythm, soft `8px` corners, responsive `img`.
+- **Lead paragraph** — first body paragraph set to `1.14rem` to open the article (pairs with the drop-cap).
+- **Figure framing** — `2.2rem` rhythm, soft `8px` corners, responsive `img`.
 
-## v1.46.4 â 2026-06-26 (Articles â editorial reading-experience refinements + day-accent contrast fix)
+## v1.46.4 — 2026-06-26 (Articles — editorial reading-experience refinements + day-accent contrast fix)
 
 Design pass on the editorial register (impeccable-guided, on-brand). All in the shared
 `css/rz-article-dark.css`, so every article + hub gets them; both themes.
@@ -98,7 +101,7 @@ Design pass on the editorial register (impeccable-guided, on-brand). All in the 
 ### Fixed
 - **Day-mode accent contrast.** Each article sets `style="--rz-art-accent:#E8B563"` inline on
   `<html>` (the dark gold). That inline value was overriding the day variant, so day-mode
-  links/meta/rails rendered in light gold `#E8B563` (â1.7:1 on white â fails). Forced the day
+  links/meta/rails rendered in light gold `#E8B563` (≈1.7:1 on white — fails). Forced the day
   accent to readable `#b45309` with `!important` (beats the inline). Dark unchanged (#E8B563).
 
 ### Changed
@@ -106,23 +109,23 @@ Design pass on the editorial register (impeccable-guided, on-brand). All in the 
   brightens on hover (accessible; per-link inline colours like the purple disclaimer link are
   preserved). Resolves the accent per theme.
 - **Pull-quotes** lose the 2px accent side-stripe (an impeccable absolute-ban) for an even
-  hairline border + a hanging Fraunces quotation glyph â more editorial, on-brand.
-- **Figure captions** â IBM Plex Mono, muted (matches the instrument-grade meta).
-- **Selection** â a warm amber wash on editorial pages.
+  hairline border + a hanging Fraunces quotation glyph — more editorial, on-brand.
+- **Figure captions** → IBM Plex Mono, muted (matches the instrument-grade meta).
+- **Selection** → a warm amber wash on editorial pages.
 
 ### Verification
 - Both themes: pull-quote glyph renders + border is 1px; links amber/underlined and readable
   (day #b45309 / dark #E8B563); global dark re-probe 0 light-on-dark / 0 errors (34/34). Audits CLEAN.
 
-## v1.46.3 â 2026-06-26 (Article HUBS â editorial parity + theme bug-fixes)
+## v1.46.3 — 2026-06-26 (Article HUBS — editorial parity + theme bug-fixes)
 
 Extends v1.46.2 from the 34 articles to the article-ecosystem hub pages
-(`articles.html`, `insights.html`, `future-forward.html`) the Â§08 skin also targets.
+(`articles.html`, `insights.html`, `future-forward.html`) the §08 skin also targets.
 
 ### Fixed
 - **No-FOUC theme guard** added to the 3 hubs (they had the editorial register + skin CSS but
-  not the guard â dark readers flashed white on load). `geopolitics.html` already had it.
-- **insights.html â 6 white-card light-on-dark islands.** The resource cards
+  not the guard → dark readers flashed white on load). `geopolitics.html` already had it.
+- **insights.html — 6 white-card light-on-dark islands.** The resource cards
   (`.reports-grid > a`: Live Tracker / Regional Report / AI-HPC Platform / Infographic) use inline
   `background:var(--bg-card,#fff)`; `--bg-card` is undefined in dark there, so they fell back to
   pure white. Added dark overrides (`#1e293b` card / light text). **Re-probe: 0 light-on-dark.**
@@ -131,37 +134,37 @@ Extends v1.46.2 from the 34 articles to the article-ecosystem hub pages
 - All 3 hubs: FOUC fires pre-paint, dark 0 light-on-dark, toggle flips cleanly, hero renders
   Fraunces in both themes, 0 console errors. Audits CLEAN.
 
-## v1.46.2 â 2026-06-26 (Articles â Â§08 editorial skin in BOTH themes + zero switching bugs)
+## v1.46.2 — 2026-06-26 (Articles — §08 editorial skin in BOTH themes + zero switching bugs)
 
-Owner report: the approved Â§08 article skin (`plan-dark-mode-standard.html`) wasn't
+Owner report: the approved §08 article skin (`plan-dark-mode-standard.html`) wasn't
 implemented properly across all articles, and many articles were buggy switching
-darkâday. Full sweep across all 34 content articles â "ensure no bug".
+dark↔day. Full sweep across all 34 content articles — "ensure no bug".
 
 ### Added
-- **Day/light editorial variant** (`css/rz-article-dark.css`). The Â§08 editorial register
+- **Day/light editorial variant** (`css/rz-article-dark.css`). The §08 editorial register
   was DARK-ONLY (`[data-rz-register="editorial"][data-theme="dark"]`); articles fell back to
   the plain look in day mode. Added a light-palette mirror scoped
-  `:not([data-theme="dark"])` â Fraunces serif title, IBM Plex Mono kicker/meta, gold drop-cap,
-  amber h2 accent-rail, pull-quote, soft warm hero wash â so the editorial skin now reads as the
+  `:not([data-theme="dark"])` — Fraunces serif title, IBM Plex Mono kicker/meta, gold drop-cap,
+  amber h2 accent-rail, pull-quote, soft warm hero wash — so the editorial skin now reads as the
   **same design in BOTH themes** (gold `#b45309` accents on light for contrast; article light
   surfaces kept so bespoke layouts don't break). Verified Fraunces title/h2/drop-cap + mono meta
   render in day on all articles.
-- **No-FOUC theme guard** on all 34 content articles â inline `<head>` script applies the saved
-  theme before first paint (calculators already had this; articles didn't â dark readers got a
+- **No-FOUC theme guard** on all 34 content articles — inline `<head>` script applies the saved
+  theme before first paint (calculators already had this; articles didn't → dark readers got a
   white flash). Confirmed `data-theme` is set at paint time.
 
 ### Fixed
-- **Broken darkâday toggle on article-26** â a redundant inline `#themeToggle` handler
+- **Broken dark↔day toggle on article-26** — a redundant inline `#themeToggle` handler
   double-bound with `script.js` `initDarkMode`; the two cancelled each other so the toggle was
   stuck. Removed the inline handler (script.js owns it). **All 34 toggles now flip cleanly
   (probe: 0 broken).**
 - **Dark-mode light-on-dark coverage gaps** (via `/ultraplan`, 5 agents self-verified to zero):
   `article-10` `.table-note-row`, `article-11` `.bar-container`, `article-16` green pills + amber
   timeline-dot, `article-17` `.highlight-row`/`.safe-box`/`.author-section`/dot, `FF-3`
-  `.iec-tooltip-trigger`/`.iec-benchmark-tag` â plus `article-13` amber `.flow-box`. Each light
+  `.iec-tooltip-trigger`/`.iec-benchmark-tag` — plus `article-13` amber `.flow-box`. Each light
   pastel dark-toned to a same-hue dark tint with readable text; white gauge-needle markers left
   intact. **Global re-probe: 0 opaque light-on-dark across all 34.**
-- **article-2 console TypeError** â `chartjs-plugin-annotation` loaded without `defer` while
+- **article-2 console TypeError** — `chartjs-plugin-annotation` loaded without `defer` while
   `chart.js` had it, so the plugin ran before Chart's `helpers` existed. Added `defer`. **0
   console errors across all 34.**
 
@@ -169,31 +172,31 @@ darkâday. Full sweep across all 34 content articles â "ensure no bug".
 - Headless probes: dark = 0 light-on-dark / 0 errors (34/34); toggle = 0 broken (34/34); day
   editorial chrome renders; FOUC guard fires pre-paint. Audits script-tags/js-syntax CLEAN.
 
-## v1.46.1 â 2026-06-26 (Fire-safety hub â Ship 5: pillar deep-analysis expansion)
+## v1.46.1 — 2026-06-26 (Fire-safety hub — Ship 5: pillar deep-analysis expansion)
 
-### Changed (pillar-fire-safety.html â from thin landing to analysis hub)
-- Added a **fire-strategy four-stage lifecycle** (Detect â Confirm â Suppress â Evacuate) and a deep
-  **"Lithium-ion BBU â the thermal-runaway strategy"** section (the owner's gap): why suppression does
-  NOT stop runaway, a 5-layer mitigation stack (cell-level BMS detection Â· Hâ/CO off-gas detection +
-  ventilation per NFPA 855 Â· BMS isolation + EPO Â· compartmentation + UL 9540A spacing Â· suppression
+### Changed (pillar-fire-safety.html — from thin landing to analysis hub)
+- Added a **fire-strategy four-stage lifecycle** (Detect → Confirm → Suppress → Evacuate) and a deep
+  **"Lithium-ion BBU — the thermal-runaway strategy"** section (the owner's gap): why suppression does
+  NOT stop runaway, a 5-layer mitigation stack (cell-level BMS detection · H₂/CO off-gas detection +
+  ventilation per NFPA 855 · BMS isolation + EPO · compartmentation + UL 9540A spacing · suppression
   for the associated fire), the off-gas hazard callout, and a clean-agent sizing/occupant-safety note.
 - Added 2 resource cards (**fire-calculator** + **fire-checklist**) and a Li-ion FAQ; extended the
   CollectionPage `hasPart` (now 6) + FAQPage schema. Scoped `.fa-*` styles with full dark-mode overrides.
 
 ### Verified
 - Audits clean; 3/3 JSON-LD valid; 6 cards / 4 lifecycle steps / 5 mitigation layers / 4 FAQs render;
-  0 console errors; dark + mobile pass. **Fire-safety hub complete (Ships 1â5).** No bug, no error.
+  0 console errors; dark + mobile pass. **Fire-safety hub complete (Ships 1–5).** No bug, no error.
 
-## v1.46.0 â 2026-06-26 (Fire-safety hub â Ship 4: design/commissioning + Li-ion checklist)
+## v1.46.0 — 2026-06-26 (Fire-safety hub — Ship 4: design/commissioning + Li-ion checklist)
 
 ### Added
-- **`fire-checklist.html`** â a super-detailed fire-safety checklist (9 sections, 5 source-tagged
+- **`fire-checklist.html`** — a super-detailed fire-safety checklist (9 sections, 5 source-tagged
   tables): clean-agent design parameters (NFPA 2001 design conc / NOAEL / discharge / hold), detection
   & alarm (aspirating, cross-zoned release, EPO), a dedicated **Li-ion battery-room fire-safety**
-  section (NFPA 855 / UL 9540A â off-gas Hâ/CO detection â¤25% LFL, ventilation/explosion control,
-  thermal-runaway onset, BMSâFACP coordination), the numeric commissioning procedure (door-fan
+  section (NFPA 855 / UL 9540A — off-gas H₂/CO detection ≤25% LFL, ventilation/explosion control,
+  thermal-runaway onset, BMS↔FACP coordination), the numeric commissioning procedure (door-fan
   integrity, discharge test, cross-zone, Li-ion off-gas commissioning), installation + routine
-  inspection checklists, a PM cadence table (dailyâannual), a symptomâcauseâaction troubleshooting
+  inspection checklists, a PM cadence table (daily→annual), a symptom→cause→action troubleshooting
   table, and a printable service-record form (`window.print` + print CSS). `--fc-` fire theme,
   STANDARD/TYPICAL source tags, dark + mobile.
 - Registered: `sitemap.xml` (114), `llms.txt` (125), `search-index.json` (new entry).
@@ -202,13 +205,13 @@ darkâday. Full sweep across all 34 content articles â "ensure no bug".
 - Audits clean; 9 sections / 5 tables / 25 checkboxes / 35 source tags render; print form works;
   0 console errors; dark + mobile pass. No bug, no error.
 
-## v1.45.0 â 2026-06-26 (Fire-safety hub â Ship 3: clean-agent & Li-ion fire calculator)
+## v1.45.0 — 2026-06-26 (Fire-safety hub — Ship 3: clean-agent & Li-ion fire calculator)
 
 ### Added
-- **`fire-calculator.html`** â interactive fire-protection calculator wiring `js/fire-engine.js` to
-  live KPIs: clean-agent quantity (NFPA 2001) + cylinders + kg/mÂ³, design concentration, **occupant
-  safety vs NOAEL** (alarms when design conc exceeds NOAEL), GWP-weighted COâe (or inert residual-Oâ),
-  smoke-detector coverage, discharge/hold bands, and a **Li-ion BBU panel** â thermal-runaway heat,
+- **`fire-calculator.html`** — interactive fire-protection calculator wiring `js/fire-engine.js` to
+  live KPIs: clean-agent quantity (NFPA 2001) + cylinders + kg/m³, design concentration, **occupant
+  safety vs NOAEL** (alarms when design conc exceeds NOAEL), GWP-weighted CO₂e (or inert residual-O₂),
+  smoke-detector coverage, discharge/hold bands, and a **Li-ion BBU panel** — thermal-runaway heat,
   off-gas volume, and off-gas-vs-LFL room concentration (hazard-flagged, NFPA 855 / UL 9540A). Per-
   scenario presets, tooltip per input, basis chips + band-coloured rails, `--fc-` fire theme.
 - Applied the pending uiux fixes from the start: theme key `theme` (site-consistent), slashed-zero
@@ -216,46 +219,46 @@ darkâday. Full sweep across all 34 content articles â "ensure no bug".
 - Registered: `sitemap.xml` (113), `llms.txt` (124), `search-index.json` (new entry).
 
 ### Verified
-- Audits clean; 9 KPIs render; engine-backed values correct (Novec 500 mÂ³ â 343 kg; FM-200 11% â
-  occupant-safety alarm â2 pts to NOAEL; IG-541 â 235 mÂ³ inert + residual-Oâ; 333 kWh NMC â off-gas
+- Audits clean; 9 KPIs render; engine-backed values correct (Novec 500 m³ → 343 kg; FM-200 11% →
+  occupant-safety alarm −2 pts to NOAEL; IG-541 → 235 m³ inert + residual-O₂; 333 kWh NMC → off-gas
   72.7 vol% hazard); 0 console errors; dark + mobile pass. No bug, no error.
 
-## v1.44.4 â 2026-06-25 (Fire-safety hub â Ship 2: data layer + glossary)
+## v1.44.4 — 2026-06-25 (Fire-safety hub — Ship 2: data layer + glossary)
 
 ### Added (data/fire/ + glossary)
-- **`data/fire/clean-agent-properties.csv`** (5) â Novec 1230 / FM-200 / IG-541 / IG-55 / COâ: NFPA
-  2001 design concentrations, min-extinguishing, NOAEL/LOAEL, s=k1+k2Â·T coefficients, GWP, discharge.
-- **`data/fire/li-ion-chemistry.csv`** (5) â NMC/LFP/LCO/VRLA thermal-runaway onset (150 / 166.8 /
-  150 Â°C), energy density, off-gas L/Wh + species, TR heat factor, governing vent-gas LFL.
-- **`data/fire/standards-references.csv`** (12) â NFPA 75/76/2001/72/13/855, NFPA 70, UL 9540/9540A,
+- **`data/fire/clean-agent-properties.csv`** (5) — Novec 1230 / FM-200 / IG-541 / IG-55 / CO₂: NFPA
+  2001 design concentrations, min-extinguishing, NOAEL/LOAEL, s=k1+k2·T coefficients, GWP, discharge.
+- **`data/fire/li-ion-chemistry.csv`** (5) — NMC/LFP/LCO/VRLA thermal-runaway onset (150 / 166.8 /
+  150 °C), energy density, off-gas L/Wh + species, TR heat factor, governing vent-gas LFL.
+- **`data/fire/standards-references.csv`** (12) — NFPA 75/76/2001/72/13/855, NFPA 70, UL 9540/9540A,
   IEC 62619, FM Global DS 5-32, ISO 14520.
 - **`data/fire/README.md`** manifest + basis-tag legend + key formulas.
-- **Glossary: 9 new fire/battery terms** â Thermal Runaway, UL 9540A, Off-Gassing, Cross-Zoned
+- **Glossary: 9 new fire/battery terms** — Thermal Runaway, UL 9540A, Off-Gassing, Cross-Zoned
   Detection, Compartmentation, Room Integrity (door-fan test), Design Concentration, NOAEL & LOAEL,
-  NFPA 855 â cross-linked to the fire pages.
+  NFPA 855 — cross-linked to the fire pages.
 
-## v1.44.3 â 2026-06-25 (Fire-safety hub â Ship 1: frozen fire engine + tests)
+## v1.44.3 — 2026-06-25 (Fire-safety hub — Ship 1: frozen fire engine + tests)
 
-### Added (foundation for the DC fire-safety calculation hub â no UI yet)
-- **`js/fire-model.js`** â deep-frozen `window.FIRE_MODEL`: clean-agent data (Novec 1230 / FM-200 /
-  IG-541 â NFPA 2001 s=k1+k2Â·T coefficients, design concentrations, NOAEL/LOAEL, GWP, cylinder fill),
-  Li-ion/VRLA chemistry (NMC/LFP/LCO thermal-runaway onset 150/166.8/150 Â°C, off-gas L/Wh, energy
-  density), off-gas LFL, detection/suppression bands (â¤10 s discharge, â¥10 min hold, NFPA 72 detector
+### Added (foundation for the DC fire-safety calculation hub — no UI yet)
+- **`js/fire-model.js`** — deep-frozen `window.FIRE_MODEL`: clean-agent data (Novec 1230 / FM-200 /
+  IG-541 — NFPA 2001 s=k1+k2·T coefficients, design concentrations, NOAEL/LOAEL, GWP, cylinder fill),
+  Li-ion/VRLA chemistry (NMC/LFP/LCO thermal-runaway onset 150/166.8/150 °C, off-gas L/Wh, energy
+  density), off-gas LFL, detection/suppression bands (≤10 s discharge, ≥10 min hold, NFPA 72 detector
   spacing, 25% LFL gas alarm), and a standards register (NFPA 75/76/2001/72/13/855, UL 9540/9540A,
   IEC 62619, FM Global, ISO 14520). Every constant `// source:`-tagged + basisTag.
-- **`js/fire-engine.js`** â pure deterministic engine `window.FIRE_ENGINE` (no Math.random): NFPA 2001
-  halocarbon agent mass W=(V/s)Â·(C/(100âC)) + inert volume ln(100/(100âC)); occupant safety margin vs
-  NOAEL; cylinder count; GWP-weighted COâe; detector coverage; discharge/hold-time bands; Li-ion
+- **`js/fire-engine.js`** — pure deterministic engine `window.FIRE_ENGINE` (no Math.random): NFPA 2001
+  halocarbon agent mass W=(V/s)·(C/(100−C)) + inert volume ln(100/(100−C)); occupant safety margin vs
+  NOAEL; cylinder count; GWP-weighted CO₂e; detector coverage; discharge/hold-time bands; Li-ion
   thermal-runaway heat, off-gas volume, room LFL margin; and a `roomState()` composite.
-- **`tools/test-fire-calc.mjs`** â vm-sandbox, **31/31 PASS**, hand-derived NFPA-2001 expecteds +
+- **`tools/test-fire-calc.mjs`** — vm-sandbox, **31/31 PASS**, hand-derived NFPA-2001 expecteds +
   frozen/no-PRNG/determinism guards. Wired into `tools/ship-gate.sh`.
 
-## v1.44.2 â 2026-06-25 (CDU calculation hub â Ship 4/5: suite integration)
+## v1.44.2 — 2026-06-25 (CDU calculation hub — Ship 4/5: suite integration)
 
 ### Changed (cross-link the new calculator into the CDU suite)
 - Added in-content links to `cdu-calculator.html` from `cdu-selection-guide.html` (sizing lead),
   `cdu-checklist.html` (operating-bands lead), `cdu-comparison.html` (intro) and `cdu-mini-bms.html`
-  (hero crumb) â the calculator was previously reachable only from the hub.
+  (hero crumb) — the calculator was previously reachable only from the hub.
 
 ### Deferred (with rationale)
 - The mini-BMS physics-rewrite (route its synthetic basis through `cduState()`) is **intentionally
@@ -263,150 +266,150 @@ darkâday. Full sweep across all 34 content articles â "ensure no bug".
   lifted from it), so a core rewrite of the polished, accuracy-gated 5-phase cockpit would risk
   regressions for zero numeric change. Recommended only as a separately-probe-verified effort if desired.
 
-## v1.44.1 â 2026-06-25 (CDU calculation hub â Ship 3b: calculator Pro tier + PDF)
+## v1.44.1 — 2026-06-25 (CDU calculation hub — Ship 3b: calculator Pro tier + PDF)
 
-### Added (cdu-calculator.html â Pro analysis tier)
+### Added (cdu-calculator.html — Pro analysis tier)
 - **Free/Pro toggle + login modal** (demo `demo@resistancezero.com` / `demo2026`), gated `.cc-pro`
   section with blur overlay, `rz_premium_session` auth + `rz-auth-change` integration.
-- **TCO & ROI panel** â capex (engine `capexUsd` by type), annual energy (computed pump power Ã
-  $/kWh), annual opex, 10-yr NPV of ownership, $/kWÂ·year â all from the engine's TCO functions.
-- **Monte-Carlo (10,000 runs)** on annual pump-energy cost â inputs perturbed Â±15â20%, P5/P50/P95 +
+- **TCO & ROI panel** — capex (engine `capexUsd` by type), annual energy (computed pump power ×
+  $/kWh), annual opex, 10-yr NPV of ownership, $/kW·year — all from the engine's TCO functions.
+- **Monte-Carlo (10,000 runs)** on annual pump-energy cost — inputs perturbed ±15–20%, P5/P50/P95 +
   an inline SVG histogram. Randomness lives only in the page layer (SIMULATED), never the engine.
-- **Sensitivity tornado** â ranks heat-load / run-length / fittings / pump-efficiency by impact on
+- **Sensitivity tornado** — ranks heat-load / run-length / fittings / pump-efficiency by impact on
   pump kW (inline SVG).
 - **Dynamic engineering narrative** (hydraulics / thermal-safety / economics).
-- **PDF tech-spec export** â `window.open()` first, `<\/script>` escaped, derived-results + Pro
+- **PDF tech-spec export** — `window.open()` first, `<\/script>` escaped, derived-results + Pro
   tables + embedded SVG charts, print-color-exact. Privacy note (browser-only).
 - Font Awesome added for the lock/PDF icons.
 - Verified end-to-end: real-click login unlocks; TCO/MC/sensitivity/narrative compute; 0 console
   errors; audits clean; page still passes version-stamp + mobile.
 
-## v1.44.0 â 2026-06-25 (CDU calculation hub â Ship 3: interactive sizing calculator)
+## v1.44.0 — 2026-06-25 (CDU calculation hub — Ship 3: interactive sizing calculator)
 
 ### Added
-- **`cdu-calculator.html`** â a new interactive CDU sizing & thermohydraulic calculator (the
+- **`cdu-calculator.html`** — a new interactive CDU sizing & thermohydraulic calculator (the
   centerpiece of the hub). Wires the validated `js/cdu-engine.js` to live KPIs: secondary flow +
-  LPM/kW (vs OCP band), pipe velocity, pressure drop (Darcy-Weisbach), HX approach (Îµ-NTU), NPSH
+  LPM/kW (vs OCP band), pipe velocity, pressure drop (Darcy-Weisbach), HX approach (ε-NTU), NPSH
   margin, dew-point margin, pump electrical power and N+1 count. Per-CDU-type load presets, a tooltip
   on every input, **basis chips + band-coloured rails** on every KPI (ACCURACY_VALIDATION rule 6),
   `--cdu-` theme, full dark-mode + mobile, version stamp. 0 console errors.
-- Registered across the site: `cdu-hub.html` (new "05 Â· Calculate" card + JSON-LD hasPart + "five
+- Registered across the site: `cdu-hub.html` (new "05 · Calculate" card + JSON-LD hasPart + "five
   resources" copy), `sitemap.xml` (112 URLs), `llms.txt` (123 pages), `search-index.json` (new entry).
 
 ### Notes
 - Free-tier core ships first per the rollout plan; the Pro tier (TCO/NPV, Monte-Carlo, sensitivity
   and a PDF tech-spec) lands next as Ship 3b. PG-25 fluid properties are handbook-class (ILLUSTRATIVE).
 
-## v1.43.74 â 2026-06-25 (CDU calculation hub â Ship 2: data layer + glossary)
+## v1.43.74 — 2026-06-25 (CDU calculation hub — Ship 2: data layer + glossary)
 
 ### Added (data/cdu/ + glossary)
-- **`data/cdu/coolant-fluid-properties.csv`** (24 rows) â water + PG-25 density/cp/viscosity/thermal-
-  conductivity/Prandtl across 5â60 Â°C, **generated from the engine** (`build-fluid-properties.mjs`).
-- **`data/cdu/cdu-operating-bands.csv`** (20 rows) â the acceptance windows (supply, ÎT, flow LPM/kW,
+- **`data/cdu/coolant-fluid-properties.csv`** (24 rows) — water + PG-25 density/cp/viscosity/thermal-
+  conductivity/Prandtl across 5–60 °C, **generated from the engine** (`build-fluid-properties.mjs`).
+- **`data/cdu/cdu-operating-bands.csv`** (20 rows) — the acceptance windows (supply, ΔT, flow LPM/kW,
   dP, system pressure, approach, dew-margin, velocity, NPSH margin, water chemistry) from
-  cdu-checklist Â§01â03 + ASHRAE/OCP, each basis-tagged.
-- **`data/cdu/cdu-models.csv`** (15 rows) â verified vendor CDU models with capacity/flow/dP/approach/
+  cdu-checklist §01–03 + ASHRAE/OCP, each basis-tagged.
+- **`data/cdu/cdu-models.csv`** (15 rows) — verified vendor CDU models with capacity/flow/dP/approach/
   fluid/BMS-protocol/ASHRAE-class/link-status.
-- **`data/cdu/standards-references.csv`** (10 rows) â ASHRAE TC9.9, OCP cold-plate/UQD/Deschutes,
+- **`data/cdu/standards-references.csv`** (10 rows) — ASHRAE TC9.9, OCP cold-plate/UQD/Deschutes,
   Redfish DSP2064, ASME B31.3, ISO 4406/NAS 1638, ASTM D1193, PG-25.
 - **`data/cdu/README.md`** manifest + basis-tag legend + link-validation mandate.
-- **Glossary: 12 new CDU terms** â Approach Temperature, Cold Plate, Dew-Point Reset, Effectiveness-NTU
-  (Îµ-NTU), FWS, Filtration (ISO 4406), Inhibitor Reserve, Leak Detection (CDU), Manifold, NPSH,
-  Redfish CoolingUnit, TCS â each cross-linked to the relevant CDU page.
+- **Glossary: 12 new CDU terms** — Approach Temperature, Cold Plate, Dew-Point Reset, Effectiveness-NTU
+  (ε-NTU), FWS, Filtration (ISO 4406), Inhibitor Reserve, Leak Detection (CDU), Manifold, NPSH,
+  Redfish CoolingUnit, TCS — each cross-linked to the relevant CDU page.
 
-## v1.43.73 â 2026-06-25 (CDU calculation hub â Ship 1: frozen thermohydraulic engine + tests)
+## v1.43.73 — 2026-06-25 (CDU calculation hub — Ship 1: frozen thermohydraulic engine + tests)
 
-### Added (foundation for the CDU data + calculation hub â no UI yet)
-- **`js/cdu-model.js`** â deep-frozen `window.CDU_MODEL`: the single source of truth for CDU work.
-  Per-type presets (lifted from cdu-mini-bms `TYPES`/`SCEN`), operational bands (cdu-checklist Â§01),
+### Added (foundation for the CDU data + calculation hub — no UI yet)
+- **`js/cdu-model.js`** — deep-frozen `window.CDU_MODEL`: the single source of truth for CDU work.
+  Per-type presets (lifted from cdu-mini-bms `TYPES`/`SCEN`), operational bands (cdu-checklist §01),
   ASHRAE W-classes, OCP cold-plate flow points, fluid anchors (water + PG-25), pipe IDs/K-values,
   pump + TCO defaults, standards register, and verified vendor model rows. Every constant carries a
   `// source:` tag + basisTag (STANDARD/VENDOR/DERIVED/ILLUSTRATIVE) per ACCURACY_VALIDATION rule 6.
-- **`js/cdu-engine.js`** â pure deterministic engine `window.CDU_ENGINE` (no Math.random, numeric
-  guards): fluid properties f(T,glycol%); heatâflow (Q=á¹Â·cpÂ·ÎT); Îµ-NTU + LMTD + approach; pressure
+- **`js/cdu-engine.js`** — pure deterministic engine `window.CDU_ENGINE` (no Math.random, numeric
+  guards): fluid properties f(T,glycol%); heat↔flow (Q=ṁ·cp·ΔT); ε-NTU + LMTD + approach; pressure
   drop (Darcy-Weisbach, Haaland friction, velocity + fittings); NPSH + cavitation margin; dew-point
   reset (Magnus/Tetens); pump hydraulic/shaft/electrical power + N+1; water chemistry (glycol top-up,
   make-up, inhibitor reserve); per-type TCO/NPV/payback; and a `cduState()` composite (one source of
   truth for the upcoming calculator + mini-BMS).
-- **`tools/test-cdu-calc.mjs`** â vm-sandbox acceptance harness, **40/40 PASS**. ~11 worked examples
+- **`tools/test-cdu-calc.mjs`** — vm-sandbox acceptance harness, **40/40 PASS**. ~11 worked examples
   with hand-derived expected values (independent of the engine) + deep-frozen, no-PRNG, determinism
   guards. Wired into `tools/ship-gate.sh`.
 
-## v1.43.72 â 2026-06-25 (Article 26 â independent source-verification of the evidence CSVs)
+## v1.43.72 — 2026-06-25 (Article 26 — independent source-verification of the evidence CSVs)
 
-### Changed (data/article-26/ â corrections + verified_source columns)
+### Changed (data/article-26/ — corrections + verified_source columns)
 - Two independent verification passes hardened the four curated CSVs; a `verified_source` column
   (DOI/agency URL) was added to `fluid-properties.csv`, `tfa-pfas-reference-values.csv` and
   `regulatory-thresholds.csv`. Corrections:
-  - **Kazil 2014** journal fixed â *J. Geophys. Res. Atmos.* 119(24):14059-14079, DOI 10.1002/2014JD022058 (was mis-cited as ACP).
-  - **TRI PFAS threshold** 25,000 lb â **100 lb** (PFAS are chemicals of special concern, NDAA 2020).
-  - **ECHA TFA status** "proposed" â **RAC opinion adopted (June 2026), Repr. 1B / H360Df** â also reflected in the article body + ref [21].
-  - **Novec 7000/7100 breakdown products** â COFâ / HF / COâ (not shorter-chain PFCAs).
-  - **Opteon 2P50**: lifetime ~22 d (EPA SNAP), GWP **~2** (was ~10) â propagated to the calculator (`runFluidCost`) and the worked-model generator; `worked-model-scenarios.csv` regenerated.
+  - **Kazil 2014** journal fixed → *J. Geophys. Res. Atmos.* 119(24):14059-14079, DOI 10.1002/2014JD022058 (was mis-cited as ACP).
+  - **TRI PFAS threshold** 25,000 lb → **100 lb** (PFAS are chemicals of special concern, NDAA 2020).
+  - **ECHA TFA status** "proposed" → **RAC opinion adopted (June 2026), Repr. 1B / H360Df** — also reflected in the article body + ref [21].
+  - **Novec 7000/7100 breakdown products** → COF₂ / HF / CO₂ (not shorter-chain PFCAs).
+  - **Opteon 2P50**: lifetime ~22 d (EPA SNAP), GWP **~2** (was ~10) — propagated to the calculator (`runFluidCost`) and the worked-model generator; `worked-model-scenarios.csv` regenerated.
   - **R-1233zd(E)** lifetime ~40 d, GWP ~3.9; **FC-40** GWP ~7100 / ~500 yr; **FC-72** GWP ~7910 / ~3100 yr; **Novec 649** GWP <1.
   - **AGAGE** portal URL updated to the NASA LaRC archive; GHGRP format corrected to Excel/zip.
-  - **Galden (PFPE) GWP** flagged **unverified/disputed** (~10,000 commonly cited but PFPEs are nearly involatile) â marked in the CSV, the model constants, and a Model C footnote in the article.
+  - **Galden (PFPE) GWP** flagged **unverified/disputed** (~10,000 commonly cited but PFPEs are nearly involatile) — marked in the CSV, the model constants, and a Model C footnote in the article.
 - `README.md` gains a Verification section documenting the above.
 
-## v1.43.71 â 2026-06-25 (Article 26 â GenX extract + the TFA-absence finding)
+## v1.43.71 — 2026-06-25 (Article 26 — GenX extract + the TFA-absence finding)
 
 ### Added
-- **`data/article-26/measurements-usgs-wqp-genx-hfpo-da.csv`** â 4,832 rows of **real** GenX
+- **`data/article-26/measurements-usgs-wqp-genx-hfpo-da.csv`** — 4,832 rows of **real** GenX
   (HFPO-DA) monitoring results from the USGS Water Quality Portal since 2020. GenX is the
-  current-generation "safer" PFAS replacement, now itself EPA-regulated (10 ppt MCL) â the direct
-  analogue to the article's HFOâTFA replacement argument. Reproduce via `fetch-usgs-wqp-genx.sh`.
+  current-generation "safer" PFAS replacement, now itself EPA-regulated (10 ppt MCL) — the direct
+  analogue to the article's HFO→TFA replacement argument. Reproduce via `fetch-usgs-wqp-genx.sh`.
 - **"The dataset that doesn't exist" finding box** in the Data & Downloads section: querying the
-  USGS portal for trifluoroacetic acid (TFA) returns **zero records** under every name variant â
+  USGS portal for trifluoroacetic acid (TFA) returns **zero records** under every name variant —
   the breakdown product central to the article is unmonitored in US water-quality systems, a literal
   confirmation of the "nobody is measuring it" thesis (this is a finding, not inline data).
-- Now ~35,000 rows of real measurements across four extracts; grid â 10 cards; README + intro updated.
+- Now ~35,000 rows of real measurements across four extracts; grid → 10 cards; README + intro updated.
 
-## v1.43.70 â 2026-06-25 (Article 26 â real USGS PFOS water-measurement extract)
+## v1.43.70 — 2026-06-25 (Article 26 — real USGS PFOS water-measurement extract)
 
 ### Added
-- **`data/article-26/measurements-usgs-wqp-pfos.csv`** â 9,230 rows of **real** PFOS monitoring
+- **`data/article-26/measurements-usgs-wqp-pfos.csv`** — 9,230 rows of **real** PFOS monitoring
   results from the USGS Water Quality Portal since 2020 (both controlled-vocabulary terms ORed:
   "Perfluorooctanesulfonate" + "Perfluorooctane sulfonic acid"), across water/groundwater/sediment/
   tissue. PFOS is the second compound under the EPA 4 ppt MCL. Public domain. Reproduce via
   `fetch-usgs-wqp-pfos.sh`.
 - Now ~30,000 rows of real measurements across three extracts (atmospheric HFC-134a + aqueous
-  PFOA + PFOS); Data & Downloads grid â 9 cards; README + section intro updated.
+  PFOA + PFOS); Data & Downloads grid → 9 cards; README + section intro updated.
 
-## v1.43.69 â 2026-06-25 (Article 26 â real USGS PFOA water-measurement extract)
+## v1.43.69 — 2026-06-25 (Article 26 — real USGS PFOA water-measurement extract)
 
 ### Added
-- **`data/article-26/measurements-usgs-wqp-pfoa.csv`** â 5,438 rows of **real** PFOA
+- **`data/article-26/measurements-usgs-wqp-pfoa.csv`** — 5,438 rows of **real** PFOA
   (Perfluorooctanoic acid) monitoring results from the USGS Water Quality Portal (USGS/EPA/NWQMC)
   since 2020: surface water, groundwater, sediment and tissue, reported by state agencies
-  (Minnesota PCA, Indiana, NJDEP, Arizona DEQ, NY DEC, Delaware River Basin, â¦). PFOA is one of the
+  (Minnesota PCA, Indiana, NJDEP, Arizona DEQ, NY DEC, Delaware River Basin, …). PFOA is one of the
   two compounds under the EPA 4 ppt MCL. Public domain. Reproduce via `fetch-usgs-wqp-pfoa.sh`.
 - Featured as the second card in the "Data & Downloads" block (now two real measurement extracts:
   atmospheric HFC-134a + aqueous PFOA); section intro + README updated.
 
-## v1.43.68 â 2026-06-25 (Article 26 â real NOAA atmospheric measurement extract)
+## v1.43.68 — 2026-06-25 (Article 26 — real NOAA atmospheric measurement extract)
 
 ### Added
-- **`data/article-26/measurements-noaa-hfc134a.csv`** â 15,336 rows of **real** atmospheric
-  HFC-134a flask measurements from NOAA's Global Monitoring Lab (16 global sites, 1994â2026,
-  ~1.8 â ~150 ppt). HFC-134a degrades to TFA at ~100% molar yield â the same TFA endpoint as the
+- **`data/article-26/measurements-noaa-hfc134a.csv`** — 15,336 rows of **real** atmospheric
+  HFC-134a flask measurements from NOAA's Global Monitoring Lab (16 global sites, 1994–2026,
+  ~1.8 → ~150 ppt). HFC-134a degrades to TFA at ~100% molar yield — the same TFA endpoint as the
   HFO "PFAS-free" cooling replacements. Public-domain US Government data (PI: Montzka & Vimont).
   Committed extract + `convert-noaa-hfc134a.py` (regenerable from the NOAA source URL).
 - Featured as the first card in the article's "Data & Downloads" block; section intro + README
   manifest updated; added a `measured` source-class tag.
 
-## v1.43.67 â 2026-06-25 (Article 26 â downloadable data & evidence files)
+## v1.43.67 — 2026-06-25 (Article 26 — downloadable data & evidence files)
 
-### Added (data/article-26/ â 6 downloadable CSVs + manifest)
-- **`worked-model-scenarios.csv`** (6,000 rows) â the article's fluid-loss model across charge
-  (100â5,000 L) Ã make-up rate (0.5â20 %/yr) Ã 3 fluids â annual loss (L/kg), replacement cost,
-  t COâe/yr, kg TFA/yr. Reproducible via committed `build-worked-model.py`.
+### Added (data/article-26/ — 6 downloadable CSVs + manifest)
+- **`worked-model-scenarios.csv`** (6,000 rows) — the article's fluid-loss model across charge
+  (100–5,000 L) × make-up rate (0.5–20 %/yr) × 3 fluids → annual loss (L/kg), replacement cost,
+  t CO₂e/yr, kg TFA/yr. Reproducible via committed `build-worked-model.py`.
 - **`fluid-properties.csv`**, **`loss-zones.csv`**, **`regulatory-thresholds.csv`**,
-  **`tfa-pfas-reference-values.csv`** â sourced evidence tables (each value source-class tagged).
-- **`external-databases.csv`** â verified portal links to the large public monitoring archives
+  **`tfa-pfas-reference-values.csv`** — sourced evidence tables (each value source-class tagged).
+- **`external-databases.csv`** — verified portal links to the large public monitoring archives
   (EPA UCMR 5, TRI, CompTox; USGS WQP; NOAA GML / AGAGE; EU EEA Waterbase; NORMAN; German UBA;
   CA GAMA; EPA GHGRP) where the raw measurement rows can be downloaded in full.
 - **`README.md`** manifest documenting every file + source-class tags.
-- **Article "Data & Downloads" section** (`#section-data`) â a links-only block (no inline data)
+- **Article "Data & Downloads" section** (`#section-data`) — a links-only block (no inline data)
   with `download` anchors to all six CSVs; new `.pfas-downloads`/`.pfas-dl` styles (dark-mode +
   mobile-collapse covered).
 
@@ -414,286 +417,286 @@ darkâday. Full sweep across all 34 content articles â "ensure no bug".
 - Refreshed article `meta description` + `og:description` to the reframed 17.1%/yr framing (they
   still asserted the old "20-30x" as fact).
 
-## v1.43.66 â 2026-06-24 (Article 26 â uiux-reviewer polish on the new fluid-loss UI)
+## v1.43.66 — 2026-06-24 (Article 26 — uiux-reviewer polish on the new fluid-loss UI)
 
 ### Fixed
-- **Tabular figures** â added `font-variant-numeric: tabular-nums` + slashed-zero to `.pfas-stat`,
+- **Tabular figures** — added `font-variant-numeric: tabular-nums` + slashed-zero to `.pfas-stat`,
   `.pfas-kpi-value`, and `.pfas-table-container td` so the number-dense new tables and Panel-5 KPI
-  cards align per design.md Â§2 (the chem-block ledgers already used JetBrains Mono numerics).
-- **Tablet dead-band** â `.pfas-pro-kpi-grid.cols-4` mobile fallback moved from `max-width:680px` to
+  cards align per design.md §2 (the chem-block ledgers already used JetBrains Mono numerics).
+- **Tablet dead-band** — `.pfas-pro-kpi-grid.cols-4` mobile fallback moved from `max-width:680px` to
   `768px` to align with the page's master breakpoint; the 4-up Panel-5 grid no longer cramps to four
-  ~160px columns on 681â768px tablets. (uiux-reviewer HIGH items; APPROVED with no blockers.)
+  ~160px columns on 681–768px tablets. (uiux-reviewer HIGH items; APPROVED with no blockers.)
 
-## v1.43.65 â 2026-06-24 (Article 26 "The Invisible Leak" â fluid-loss deep-expansion, Ship 3 of 4)
+## v1.43.65 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 3 of 4)
 
-### Added (article-26.html â PFAS Risk Calculator Pro extension)
-- **Panel 5 â Fluid-Loss & Environmental Cost** (new gated Pro panel) â 4 KPI cards derived from the
+### Added (article-26.html — PFAS Risk Calculator Pro extension)
+- **Panel 5 — Fluid-Loss & Environmental Cost** (new gated Pro panel) — 4 KPI cards derived from the
   calculator's existing maintenance-vapor mass model (single source of truth, no new inputs):
   **Annual fluid lost** (L/yr + kg/yr + make-up % of charge), **Replacement cost** ($/yr at the
-  per-fluid unit price), **GWP-weighted** (t COâe/yr), **TFA formed** (kg/yr for HFO fluids).
+  per-fluid unit price), **GWP-weighted** (t CO₂e/yr), **TFA formed** (kg/yr for HFO fluids).
 - Per-fluid property table in JS (`runFluidCost`): density, $/L, 100-yr GWP, molar TFA yield for
-  `two-phase-pfas` (Novec-class, GWP ~320, TFA n/a â yields short-chain PFCAs) and `two-phase-hfo`
+  `two-phase-pfas` (Novec-class, GWP ~320, TFA n/a — yields short-chain PFCAs) and `two-phase-hfo`
   (GWP ~10, TFA yield 0.695). PFAS-free configs zero out cleanly.
-- `.pfas-pro-kpi-grid.cols-4` 4-up variant (collapses to 2Ã2 under 680px); `pfasGate5` wired into the
+- `.pfas-pro-kpi-grid.cols-4` 4-up variant (collapses to 2×2 under 680px); `pfasGate5` wired into the
   existing lock/unlock + Pro-mode flow. Free-tier risk output untouched.
 
 ### Verified
 - Real-mouse Pro login (demo creds) unlocks Panel 5; KPIs compute across PFAS / HFO / PFAS-free paths;
-  0 console errors; values internally consistent with the on-page vapor estimate (256 kg â 183 L â
-  $12,800/yr â 82 t COâe at default 10Ã800 L).
+  0 console errors; values internally consistent with the on-page vapor estimate (256 kg → 183 L →
+  $12,800/yr → 82 t CO₂e at default 10×800 L).
 
-## v1.43.64 â 2026-06-24 (Article 26 "The Invisible Leak" â fluid-loss deep-expansion, Ship 2 of 4)
+## v1.43.64 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 2 of 4)
 
-### Added (article-26.html â quantification core)
-- **Fluid-loss KPI framework** (`#section-kpi`) â 6-KPI table (make-up rate, loss rate vs Â§608 trigger,
-  GWP-weighted t COâe/yr, TFA formation kg/yr, fluid-loss $/yr, reporting completeness) each with
-  formula Â· reference threshold Â· source class, closing on the "~0% reporting completeness" metric.
-- **Worked calculation models** (`#section-models`) â 6 monospace ledgers with every input tagged
-  [published]/[vendor]/[illustrative] and results as bounded ranges: reference inputs Â· Model A
-  (single 800 L tank annual loss & cost, $1,120â$9,590/yr) Â· Model B (per-MW hall, $9kâ$77k/yr) Â·
-  Model C (GWP-weighted emissions, 61 tâ1,920 t COâe/yr depending on fluid) Â· Model D (HFOâTFA
-  10-yr loading, 651â1,303 kg TFA/tank) Â· plus a "what the numbers do and do not say" caveat box.
+### Added (article-26.html — quantification core)
+- **Fluid-loss KPI framework** (`#section-kpi`) — 6-KPI table (make-up rate, loss rate vs §608 trigger,
+  GWP-weighted t CO₂e/yr, TFA formation kg/yr, fluid-loss $/yr, reporting completeness) each with
+  formula · reference threshold · source class, closing on the "~0% reporting completeness" metric.
+- **Worked calculation models** (`#section-models`) — 6 monospace ledgers with every input tagged
+  [published]/[vendor]/[illustrative] and results as bounded ranges: reference inputs · Model A
+  (single 800 L tank annual loss & cost, $1,120→$9,590/yr) · Model B (per-MW hall, $9k→$77k/yr) ·
+  Model C (GWP-weighted emissions, 61 t→1,920 t CO₂e/yr depending on fluid) · Model D (HFO→TFA
+  10-yr loading, 651–1,303 kg TFA/tank) · plus a "what the numbers do and do not say" caveat box.
 
 ### Fixed
-- **`.pfas-chem-block` now renders multi-line** â added `white-space: pre-wrap` + `overflow-x:auto`
+- **`.pfas-chem-block` now renders multi-line** — added `white-space: pre-wrap` + `overflow-x:auto`
   (the class had a monospace font but no whitespace preservation, so the original chemistry block was
   silently collapsing to a run-on line). Mobile font-size reduced to keep ledgers on-screen; verified
   no horizontal page overflow at 390px.
 
 ### Changed
-- article-26.html wordCount 4800 â 6200.
+- article-26.html wordCount 4800 → 6200.
 
-## v1.43.63 â 2026-06-24 (Article 26 "The Invisible Leak" â fluid-loss deep-expansion, Ship 1 of 4)
+## v1.43.63 — 2026-06-24 (Article 26 "The Invisible Leak" — fluid-loss deep-expansion, Ship 1 of 4)
 
-### Added (article-26.html â research-grounded fluid-loss metrics)
-- **Loss-zone taxonomy** (`#section-loss-zones`) â new 8-row table mapping every fluid-escape pathway
+### Added (article-26.html — research-grounded fluid-loss metrics)
+- **Loss-zone taxonomy** (`#section-loss-zones`) — new 8-row table mapping every fluid-escape pathway
   (maintenance vapour, QD spillage, operating evaporative loss, drain/transfer residual, seal/permeation,
-  fill/flush, end-of-life) against sourced magnitude Â· metered? Â· reportable?, plus a "gaps are the
+  fill/flush, end-of-life) against sourced magnitude · metered? · reportable?, plus a "gaps are the
   story" callout: the most routine loss zones (seal permeation, sensor-swap loss) carry **no published
-  value** â reinforcing the "invisible/unmetered" thesis.
-- **"Metrics to Watch"** (`#section-metrics`) â leading-indicator watch-list table (make-up rate,
+  value** — reinforcing the "invisible/unmetered" thesis.
+- **"Metrics to Watch"** (`#section-metrics`) — leading-indicator watch-list table (make-up rate,
   top-up cadence, level/chemistry drift, worker-air PFAS, exhaust concentration, boundary groundwater)
-  with healthy band Â· action threshold Â· interpretation, and a "cheapest instrument you already own"
-  box putting **make-up rate** forward as the single dashboard KPI (purchasing data Ã· installed charge).
-- **"Regulatory Horizon"** (`#section-horizon`) â what changed *after* the April-2026 publication: the
+  with healthy band · action threshold · interpretation, and a "cheapest instrument you already own"
+  box putting **make-up rate** forward as the single dashboard KPI (purchasing data ÷ installed charge).
+- **"Regulatory Horizon"** (`#section-horizon`) — what changed *after* the April-2026 publication: the
   **ECHA RAC proposal to classify TFA as Reproductive Toxicant 1B (2025-2026)** and the **EU Drinking
-  Water Directive PFAS-Total 0.5 Âµg/L limit live since 12 Jan 2026**, plus a 6-row instrument table
-  (EPA MCL, EPA Â§608, EU F-Gas 2024/573, EU DWD, ECHA TFA, member-state TFA limits).
-- **8 new references [16]-[23]** â DoD/LBNL field-loss study, UBA TFA degradation, Kazil 2014 rainwater,
-  EU DWD 2020/2184, EU F-Gas 2024/573, ECHA RAC TFA opinion, EPA Â§608, Solomon TFA review.
-- **Glossary** â new `Make-up Rate` and `TFA (Trifluoroacetic Acid)` terms; updated `Maintenance Vapor
+  Water Directive PFAS-Total 0.5 µg/L limit live since 12 Jan 2026**, plus a 6-row instrument table
+  (EPA MCL, EPA §608, EU F-Gas 2024/573, EU DWD, ECHA TFA, member-state TFA limits).
+- **8 new references [16]-[23]** — DoD/LBNL field-loss study, UBA TFA degradation, Kazil 2014 rainwater,
+  EU DWD 2020/2184, EU F-Gas 2024/573, ECHA RAC TFA opinion, EPA §608, Solomon TFA review.
+- **Glossary** — new `Make-up Rate` and `TFA (Trifluoroacetic Acid)` terms; updated `Maintenance Vapor
   Release` term to the reframed estimate.
 
 ### Changed
-- **Reframed the unsourced "20-30Ã" headline** as a transparent modeled estimate anchored on the one
-  published field measurement (DoD/LBNL 17.1%/yr evaporative loss) vs the EPA Â§608 10% sealed-leak
-  baseline â labelled a modeled upper bound, not a measured constant.
-- article-26.html `dateModified` â 2026-06-24, wordCount 3000 â 4800; sitemap lastmod + search-index
+- **Reframed the unsourced "20-30×" headline** as a transparent modeled estimate anchored on the one
+  published field measurement (DoD/LBNL 17.1%/yr evaporative loss) vs the EPA §608 10% sealed-leak
+  baseline — labelled a modeled upper bound, not a measured constant.
+- article-26.html `dateModified` → 2026-06-24, wordCount 3000 → 4800; sitemap lastmod + search-index
   keywords/description/readingTime refreshed.
 
-## v1.43.62 â 2026-06-24 (CDU Mini-BMS â interaction Phase 5: zoom/pan â ULTRAPLAN complete)
+## v1.43.62 — 2026-06-24 (CDU Mini-BMS — interaction Phase 5: zoom/pan — ULTRAPLAN complete)
 
-### Added (ULTRAPLAN cockpit interaction, phase 5 of 5 â final)
-- **`cdu-mini-bms.html`** â **zoom / pan** on the P&ID and datahall layout: + / â buttons with a
-  live zoom-level readout and reset (â¤¢), **wheel-zoom toward the cursor** (gated on the SVG being
+### Added (ULTRAPLAN cockpit interaction, phase 5 of 5 — final)
+- **`cdu-mini-bms.html`** — **zoom / pan** on the P&ID and datahall layout: + / − buttons with a
+  live zoom-level readout and reset (⤢), **wheel-zoom toward the cursor** (gated on the SVG being
   focused or Ctrl held, so it never hijacks page scroll), **drag-pan when zoomed** (pointer events +
-  capture, clamped so the content always covers the viewport), and keyboard +/â/0. Implemented as a
+  capture, clamped so the content always covers the viewport), and keyboard +/−/0. Implemented as a
   CSS transform on the persistent box element, so it survives the SVG re-render. Vector-crisp at any
   scale. Real-interaction deep-tested (button/keyboard/wheel zoom + drag-pan + reset + a Phase-1
-  click regression at 1Ã), both themes, 0 console errors.
+  click regression at 1×), both themes, 0 console errors.
 
-### ULTRAPLAN â CDU Mini-BMS operator-interaction layer COMPLETE (v1.43.58 â v1.43.62)
-The cockpit is now a fully operable instrument panel: (1) bidirectional P&ID â tile linking,
+### ULTRAPLAN — CDU Mini-BMS operator-interaction layer COMPLETE (v1.43.58 → v1.43.62)
+The cockpit is now a fully operable instrument panel: (1) bidirectional P&ID ↔ tile linking,
 (2) pause/step/speed simulation controls, (3) trend history drawers, (4) guided fault walkthroughs,
-(5) zoom/pan. Five reversible, real-mouse-deep-tested ships; presentation-only throughout â the
+(5) zoom/pan. Five reversible, real-mouse-deep-tested ships; presentation-only throughout — the
 simulated values were never altered.
 
-## v1.43.61 â 2026-06-21 (CDU Mini-BMS â interaction Phase 4: guided fault walkthrough)
+## v1.43.61 — 2026-06-21 (CDU Mini-BMS — interaction Phase 4: guided fault walkthrough)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 4 of 5)
-- **`cdu-mini-bms.html`** â a **Walkthrough** toggle opens a bottom bar that steps through narrated
-  callouts for the active scenario (Normal Â· Leak Â· Pump-A-fail Â· Filter-clog Â· Hot-FWS Â· Low-flow â
-  4â6 steps each). Each step explains the causeâeffect chain and **highlights the relevant P&ID
+- **`cdu-mini-bms.html`** — a **Walkthrough** toggle opens a bottom bar that steps through narrated
+  callouts for the active scenario (Normal · Leak · Pump-A-fail · Filter-clog · Hot-FWS · Low-flow —
+  4–6 steps each). Each step explains the cause→effect chain and **highlights the relevant P&ID
   instrument + parameter tile** (reusing the Phase-1 link). Prev / Next / Exit, a step counter and
   scenario label; switching scenario mid-walkthrough resets to step 1 of the new one. Reduced-motion
   honoured. Real-mouse deep-tested (start / next / prev / scenario-reset / exit + highlight +
   disabled edge-steps), both themes, 0 console errors. Presentation-only.
 
-## v1.43.60 â 2026-06-21 (CDU Mini-BMS â interaction Phase 3: trend history drawer)
+## v1.43.60 — 2026-06-21 (CDU Mini-BMS — interaction Phase 3: trend history drawer)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 3 of 5)
-- **`cdu-mini-bms.html`** â click a parameter tile to open a **trend history drawer**: a slide-in
-  panel with the full **300-sample** sparkline (history cap raised 30â300; the tile keeps showing
+- **`cdu-mini-bms.html`** — click a parameter tile to open a **trend history drawer**: a slide-in
+  panel with the full **300-sample** sparkline (history cap raised 30→300; the tile keeps showing
   the last 30), current value, **min / avg / max**, sample count, the parameter band and a sourced
-  reference, plus a deep-link to the checklist Â§01. Status tiles (pumps / filter / leak / coolant)
-  show their info without a chart. The drawer **live-updates** while open; closes on â / Esc /
+  reference, plus a deep-link to the checklist §01. Status tiles (pumps / filter / leak / coolant)
+  show their info without a chart. The drawer **live-updates** while open; closes on ✕ / Esc /
   backdrop; reduced-motion honoured.
 - **Bug fixed via deep-testing:** the `.trend-drawer{display:flex}` rule overrode the `[hidden]`
   attribute, so the drawer was always rendered on top of the tiles and silently swallowed their
-  clicks â added `.trend-drawer[hidden]{display:none!important}`. Real-mouse deep-tested (numeric +
+  clicks — added `.trend-drawer[hidden]{display:none!important}`. Real-mouse deep-tested (numeric +
   status tiles, Esc + backdrop), both themes, 0 console errors.
 
-## v1.43.59 â 2026-06-21 (CDU Mini-BMS â interaction Phase 2: simulation controls)
+## v1.43.59 — 2026-06-21 (CDU Mini-BMS — interaction Phase 2: simulation controls)
 
 ### Added (ULTRAPLAN cockpit interaction, phase 2 of 5)
-- **`cdu-mini-bms.html`** â a **Simulation** control group: **Pause / Resume** (freezes the data
+- **`cdu-mini-bms.html`** — a **Simulation** control group: **Pause / Resume** (freezes the data
   ticks *and* the flow/pump animation via `body.sim-paused` + `animation-play-state`), **Step**
-  (advance exactly one tick while paused), **speed** 0.5Ã / 1Ã / 2Ã / 4Ã (variable timer rate +
+  (advance exactly one tick while paused), **speed** 0.5× / 1× / 2× / 4× (variable timer rate +
   CSS `animation-duration` scaling so faster ticks visibly flow faster), and a **LIVE / PAUSED**
   state pill. Play/pause kept neutral (toggle, not radio); reduced-motion honoured. Real-mouse
   deep-tested: pause held a value stable over 1.6 s, Step advanced one tick, speed set the rate,
-  both themes, 0 console errors. Still presentation-only â sim values unchanged.
+  both themes, 0 console errors. Still presentation-only — sim values unchanged.
 
-## v1.43.58 â 2026-06-21 (CDU Mini-BMS â interaction Phase 1: P&ID â tile linking)
+## v1.43.58 — 2026-06-21 (CDU Mini-BMS — interaction Phase 1: P&ID ↔ tile linking)
 
-### Added (ULTRAPLAN â CDU cockpit operator-interaction layer, phase 1 of 5)
-- **`cdu-mini-bms.html`** â the P&ID is now **operable**: click (or keyboard-activate) any tagged
+### Added (ULTRAPLAN — CDU cockpit operator-interaction layer, phase 1 of 5)
+- **`cdu-mini-bms.html`** — the P&ID is now **operable**: click (or keyboard-activate) any tagged
   instrument (FT-01 / PT-01 / PDT-01 / PDT-02 / TT-01 / TT-02 / TI-03) to highlight + pulse its
   parameter tile and scroll it into view; click a tile to pulse its linked instrument; hover
   cross-highlights both ways; Esc clears; single-selection invariant. Instruments get
-  `role="button"` + `tabindex="0"` + `aria-label` + a 32Ã41 transparent hit-rect.
+  `role="button"` + `tabindex="0"` + `aria-label` + a 32×41 transparent hit-rect.
 - **Fix surfaced by deep-testing:** the animated flow pipes were painted over the instruments and
-  intercepted clicks intermittently (depending on the moving dash position) â set
+  intercepted clicks intermittently (depending on the moving dash position) — set
   `#pidBox .pipe-* { pointer-events:none }` so clicks reach the instruments beneath.
-- Plan tracker: `standarization/CDU_COCKPIT_INTERACTION_PLAN.md` (5 phases). Presentation-only â
+- Plan tracker: `standarization/CDU_COCKPIT_INTERACTION_PLAN.md` (5 phases). Presentation-only —
   no change to the simulated values. prefers-reduced-motion honoured. Real-mouse deep-tested, 0 errors.
 
-## v1.43.57 â 2026-06-21 (articles â refine amber: gold accent, not yellow highlighter)
+## v1.43.57 — 2026-06-21 (articles — refine amber: gold accent, not yellow highlighter)
 
 Owner feedback on the v1.43.54 amber swap: the re-toned callouts read as garish
-**yellow highlighter blocks** in light mode, unlike the restrained Â§08 mockup (which
-uses the soft gold `#E8B563` as an *accent* â rails/borders/text â not a fill).
+**yellow highlighter blocks** in light mode, unlike the restrained §08 mockup (which
+uses the soft gold `#E8B563` as an *accent* — rails/borders/text — not a fill).
 
 ### Changed
 - **De-yellowed every amber FILL across the 9 amber-body articles** (`article-11/14/20/23/25/26/27`
   + `geopolitics`/`-3`). The cream/amber-50/100 backgrounds and gradient stops
   (`#fffbeb`, `#fef3c7`, `#fde68a`) on callout boxes, insight boxes, banners, and inline
-  stat pills were swapped to a subtle gold tint (`rgba(232,181,99,0.06â0.22)`). Text colours
+  stat pills were swapped to a subtle gold tint (`rgba(232,181,99,0.06–0.22)`). Text colours
   that legitimately use those hexes (button labels, dark-mode emphasis) were protected and
   left intact.
-- **article-27 inline stats refined** â the `.ws-stat` pills lost their yellow box (was
+- **article-27 inline stats refined** — the `.ws-stat` pills lost their yellow box (was
   `#fffbeb` fill + amber border + pill padding); they now read as clean amber-bold figures
   with a thin gold underline. The `.ws-insight-box` / `.ws-narrative` callouts moved from a
   yellow gradient to a subtle gold tint + a `#E8B563` left rail (the mockup's "Key finding"
   style).
 - Net effect: articles now match the mockup's gold-accent restraint instead of looking
   highlighter-marked. Verified light + dark on article-26 (the mockup's own subject) and
-  article-27 â 0 page errors.
+  article-27 — 0 page errors.
 
-## v1.43.56 â 2026-06-21 (planb Track I4 â instrument chrome on market/grid monitors; planb 100%)
+## v1.43.56 — 2026-06-21 (planb Track I4 — instrument chrome on market/grid monitors; planb 100%)
 
 Closes the last open planb item (**I4**). With this, every `plan-dark-mode-standard.html`
-track is shipped or already-live â **PLAN 02 is 100%**.
+track is shipped or already-live — **PLAN 02 is 100%**.
 
 ### Added
-- **I4 â instrument-register chrome for the 6 monitor pages** (`dc-market-tracker` +
+- **I4 — instrument-register chrome for the 6 monitor pages** (`dc-market-tracker` +
   `pln-java-grid` and its 4 province pages). Each now declares
   `data-rz-register="instrument"` and loads `css/rz-monitor-instrument.css`, which applies a
   **header + section-title signature only**: `.nav-title` reinforced to JetBrains Mono, and
-  `.pjg-section-title` / `.dmt-section-title` get mono + a phosphor cyanâgreen accent tick.
-- **CHROME ONLY â owner-tuned viz preserved.** The stylesheet targets *only* those heading
+  `.pjg-section-title` / `.dmt-section-title` get mono + a phosphor cyan→green accent tick.
+- **CHROME ONLY — owner-tuned viz preserved.** The stylesheet targets *only* those heading
   classes; it never touches the Leaflet/SVG map, SLD line widths/labels, voltage-tier colours,
   legend swatches, tooltips, or animation thresholds. Verified headless: maps render (21/13
   Leaflet elements), tier legend colours unchanged, section-title mono+tick present, **0 page
   errors**. Reversible (remove the register attr + the `<link>`).
 
-### Status â planb PLAN 02 complete
-- **Track E** 100% (E0âE4). **Â§11** index hero â. **Â§12** light twin â.
-- **Track I** I0âI3 already-live (9 cockpits in instrument register, probe 75/75); **I4 â** here.
+### Status — planb PLAN 02 complete
+- **Track E** 100% (E0–E4). **§11** index hero ✓. **§12** light twin ✓.
+- **Track I** I0–I3 already-live (9 cockpits in instrument register, probe 75/75); **I4 ✓** here.
 
-## v1.43.55 â 2026-06-21 (planb rollout â Â§11 index editorial hero + E4 calculator shells)
+## v1.43.55 — 2026-06-21 (planb rollout — §11 index editorial hero + E4 calculator shells)
 
 Continues "semua di planb diimplementasikan". Closes the remaining **Track E** item
-(E4) and the **Â§11** index-hero recipe from `plan-dark-mode-standard.html`.
+(E4) and the **§11** index-hero recipe from `plan-dark-mode-standard.html`.
 
 ### Added
-- **Â§11 â index identity hero, editorial register (DARK-ONLY, additive, reversible).**
-  Applied the planb Â§11 recipe to `index.html` scoped to `.bento-identity`, dark mode only:
+- **§11 — index identity hero, editorial register (DARK-ONLY, additive, reversible).**
+  Applied the planb §11 recipe to `index.html` scoped to `.bento-identity`, dark mode only:
   Fraunces serif `.bento-name`, IBM Plex Mono kicker on `.bento-tag` with a 20px amber tick
-  rail, amber-italic `.bento-accent-text`, and a new **`.bento-readout`** hairline strip â 4
-  site-factual KPIs (12+ Years Ops Â· 40+ Tools Built Â· 27 Articles Â· 100+ Pages) in JetBrains
+  rail, amber-italic `.bento-accent-text`, and a new **`.bento-readout`** hairline strip — 4
+  site-factual KPIs (12+ Years Ops · 40+ Tools Built · 27 Articles · 100+ Pages) in JetBrains
   Mono tabular with amber baseline ticks and a **count-up on load** (IntersectionObserver,
-  `prefers-reduced-motion`-aware, hard final-value guarantee). **Day mode untouched** â
+  `prefers-reduced-motion`-aware, hard final-value guarantee). **Day mode untouched** —
   readout is `display:none` in light, all reskin rules are `[data-theme="dark"]`-scoped.
   Page-local inline `<style>` + the amber accent in `styles-index.css` (re-minified) per the
   2-stylesheet rule. Reversible: delete the font link + CSS block + readout markup.
-- **E4 â calculator marketing shells, editorial chrome (`css/rz-calc-editorial.css`).**
+- **E4 — calculator marketing shells, editorial chrome (`css/rz-calc-editorial.css`).**
   All 7 calculators (`pue`, `capex`, `opex`, `roi`, `tco`, `cx`, `spares-readiness`) now carry
-  `data-rz-register="editorial"`; in dark mode the **hero only** gets the editorial treatment â
-  Fraunces serif `<h1>`, mono amber badge (`#E8B563`), and a thin amberâmint rule under the
+  `data-rz-register="editorial"`; in dark mode the **hero only** gets the editorial treatment —
+  Fraunces serif `<h1>`, mono amber badge (`#E8B563`), and a thin amber→mint rule under the
   title. **Chrome only**: the calculator engines, inputs, results, and tool UI are not touched;
   day mode is unchanged. Verified: dark `<h1>`=Fraunces / light=Inter on all 7, badge amber,
   **no new console/page errors** (the pre-existing `ipapi.co` CORS notice on capex/opex is
   unrelated to this change).
 
 ### Notes
-- **Â§10/Q4 (index = POLISH) remains in force** for the bento grid; Â§11 only restyles the
-  identity hero card, dark-only â it does not reskin the colourful bento.
+- **§10/Q4 (index = POLISH) remains in force** for the bento grid; §11 only restyles the
+  identity hero card, dark-only — it does not reskin the colourful bento.
 - Verified via headless dark/light probes + hero screenshots before ship.
 
-## v1.43.54 â 2026-06-21 (articles â unify editorial register on the Â§08 mockup amber)
+## v1.43.54 — 2026-06-21 (articles — unify editorial register on the §08 mockup amber)
 
 ### Changed
-- **All 34 editorial pages now use the approved Â§08-mockup amber accent.** The article
+- **All 34 editorial pages now use the approved §08-mockup amber accent.** The article
   *editorial register* (`css/rz-article-dark.css` + Fraunces) reads the per-page
   `--rz-art-accent` / `--rz-art-accent2` CSS vars to colour its chrome (Fraunces h2 accent
   rail, drop-cap, mono kicker/meta rail, pull-quote, read-progress bar). Every editorial
-  page's vars were flipped to the mockup's exact pair â **`--rz-art-accent:#E8B563` (amber)
-  / `--rz-art-accent2:#6FBF9A` (mint)** â sourced verbatim from `rz-article-mockup.html`
+  page's vars were flipped to the mockup's exact pair — **`--rz-art-accent:#E8B563` (amber)
+  / `--rz-art-accent2:#6FBF9A` (mint)** — sourced verbatim from `rz-article-mockup.html`
   (`linear-gradient(90deg,#E8B563,#6FBF9A)`). Previously each article carried its own
   per-series hue (navy / blue / cyan / emerald / red); the chrome is now uniform amber,
   matching the planb mockup the owner approved.
-- **The 9 red-series pages were fully re-toned red â amber in body too** (not just chrome):
+- **The 9 red-series pages were fully re-toned red → amber in body too** (not just chrome):
   `article-11`, `article-14`, `article-20`, `article-23`, `article-25`, `article-26`,
   `article-27`, `geopolitics`, `geopolitics-3`. The Global-Analysis red palette
   (`#dc2626/#ef4444/#fca5a5/#fef2f2/#991b1b/#b91c1c/#7f1d1d/#450a0a` + matching `rgba()`)
   was mapped onto the Tailwind **amber ladder** (`#b45309/#d97706/#fcd34d/#fffbeb/#92400e/
   #78350f/#451a03` + matching `rgba()`). This fixes the owner's "warna dll kok masih sama"
-  report â the chrome had gone amber but the red-themed bodies (hero highlight, callouts,
+  report — the chrome had gone amber but the red-themed bodies (hero highlight, callouts,
   `article-27`'s `.ws-*` workforce calculator) were still red.
 
 ### Preserved
 - **Semantic reds untouched.** Reds that encode meaning in non-red articles (e.g. `article-8`
   `--accent-red` / `.trajectory-arrow.deteriorating` / "Deteriorating" cells paired with
-  `#10b981` green for good-vs-bad contrast) were deliberately **not** swapped â only the
+  `#10b981` green for good-vs-bad contrast) were deliberately **not** swapped — only the
   series-accent red theme on the 9 red pages was re-toned.
-- **`article-27` Workforce Strategy calculator** still renders and recalculates â colour-only
-  swap, no structural/JS change (verified: inputârecalc fires, **0 page/console errors**).
+- **`article-27` Workforce Strategy calculator** still renders and recalculates — colour-only
+  swap, no structural/JS change (verified: input→recalc fires, **0 page/console errors**).
 - **`article-9-paper.html`** (print variant) excluded.
 
 ### Verification
 - Headless dark-mode probe (hue-accurate): **9/9 red-series pages = 0 residual red, amber chrome present.**
 - `article-27` calculator interaction probe: **0 errors**, recalc fires on input change.
-- `audit-script-tags --strict` CLEAN Â· `audit-js-syntax --strict` CLEAN.
+- `audit-script-tags --strict` CLEAN · `audit-js-syntax --strict` CLEAN.
 
-## v1.43.53 â 2026-06-21 (CDU pages â clear all SEO audit warnings)
+## v1.43.53 — 2026-06-21 (CDU pages — clear all SEO audit warnings)
 
 ### Changed
-- **SEO compliance** â tightened `<title>` (â¤60 chars) and `<meta name="description">` (â¤160 chars)
+- **SEO compliance** — tightened `<title>` (≤60 chars) and `<meta name="description">` (≤160 chars)
   on all 5 CDU pages (`cdu-hub`, `cdu-selection-guide`, `cdu-checklist`, `cdu-mini-bms`,
   `cdu-comparison`) and added the missing `<meta name="ai-content-declaration" content="human-authored">`.
-  The CDU pages now pass the **full** audit suite â script-tags, js-syntax, version-stamp, mobile,
-  and SEO â with no warnings.
+  The CDU pages now pass the **full** audit suite — script-tags, js-syntax, version-stamp, mobile,
+  and SEO — with no warnings.
 
-## v1.43.52 â 2026-06-21 (editorial skin â 100% render-verified: fix h2 underline bug on all 33 articles)
+## v1.43.52 — 2026-06-21 (editorial skin — 100% render-verified: fix h2 underline bug on all 33 articles)
 
 ### Fixed
-- **The editorial h2 chrome was broken on ~30 articles â not just article-27.** The editorial CSS
+- **The editorial h2 chrome was broken on ~30 articles — not just article-27.** The editorial CSS
   (`rz-article-dark.css`) neutralises `border-left` but NOT `border-bottom`. Every article whose base
   `.article-body h2` used a `border-bottom: 3px solid <accent>` underline kept that underline sitting
-  **on top of** the editorial accent-rail in dark mode â so the editorial register never fully took.
+  **on top of** the editorial accent-rail in dark mode — so the editorial register never fully took.
   The original article-skin rollout shipped this latent bug across the whole batch.
 - **Fixed via a parallel `/ultraplan` workflow** (6 agents): rendered all 33 articles in dark mode,
-  detected the underline (computed `border-bottom-width` â  0), and surgically added
+  detected the underline (computed `border-bottom-width` ≠ 0), and surgically added
   `[data-theme="dark"] .article-body h2 { border-bottom:none; padding-bottom:0; }` per article so the
   editorial rail owns the chrome. **Light-mode underline preserved**; content-specific styling
   (calculators `.ws-*`, PDF-export strings, data tables) left untouched.
-- **100% verified** by an independent full render probe: **33/33 PASS** â every article now computes
+- **100% verified** by an independent full render probe: **33/33 PASS** — every article now computes
   Fraunces h2 (no underline) + Fraunces title + IBM Plex Mono meta. Audits CLEAN (script-tags,
   js-syntax). 31 files changed (article-19/20 were already correct).
 - Tracker + second-brain vault updated.
 
-## v1.43.51 â 2026-06-21 (site-wide â fix transparent-navbar bleed on custom-script pages)
+## v1.43.51 — 2026-06-21 (site-wide — fix transparent-navbar bleed on custom-script pages)
 
 ### Fixed
 - **Scroll-aware navbar, now site-wide.** Extended the CDU-page navbar fix (v1.43.49) to the whole
@@ -703,308 +706,308 @@ Continues "semua di planb diimplementasikan". Closes the remaining **Track E** i
   scroll. Added the scroll-aware `.scrolled` toggle once to the shared **`js/rz-mobile-nav.js`** (loaded
   site-wide; idempotent + self-guarded so it never double-binds with `script.js`), fixing all of them
   in one place. Also added the missing `rz-mobile-nav.js` tag to `network-visualization-hub.html`
-  (was absent â a hamburger-mandate gap too). Verified the solid-on-scroll navbar on calculators,
+  (was absent — a hamburger-mandate gap too). Verified the solid-on-scroll navbar on calculators,
   comparisons, LTC labs, network hub and CDU pages.
 
-## v1.43.50 â 2026-06-21 (editorial skin â final consistency: hubs + print paper, no exceptions)
+## v1.43.50 — 2026-06-21 (editorial skin — final consistency: hubs + print paper, no exceptions)
 
 ### Changed
 - **Editorial skin consistency, tanpa pengecualian.** After confirming all 29 articles + 6 series
   landings are consistent, closed the last 2 edge cases:
-  - **4 hub/landing pages** (`articles`, `insights`, `geopolitics`, `future-forward`) â added the
+  - **4 hub/landing pages** (`articles`, `insights`, `geopolitics`, `future-forward`) — added the
     `js/rz-article-editorial.js` read-progress/stagger (they already had the editorial CSS + Fraunces;
     JS is progressive-enhancement + self-guards). Verified: no errors, hubs render fine.
-  - **`article-9-paper.html`** (print/PDF "Technical Paper" variant) â given a **screen-only dark
+  - **`article-9-paper.html`** (print/PDF "Technical Paper" variant) — given a **screen-only dark
     editorial mode** (Fraunces title + amber accent + dark surfaces) scoped under `@media screen` so
-    the **print/PDF output stays pristine white** â the print feature is untouched. Verified headless:
+    the **print/PDF output stays pristine white** — the print feature is untouched. Verified headless:
     screen bg `#0E0F12` + Fraunces title; print media bg `#fff` + dark text; zero console errors.
 
 ### Notes
 - No `.article-*` classes on the paper, so it uses a self-contained `@media screen` override (not
-  `rz-article-dark.css`). Colours only â no layout/structure changes. Tracker + vault updated.
+  `rz-article-dark.css`). Colours only — no layout/structure changes. Tracker + vault updated.
 
-## v1.43.49 â 2026-06-21 (CDU pages â fix transparent navbar bleed-through on scroll)
+## v1.43.49 — 2026-06-21 (CDU pages — fix transparent navbar bleed-through on scroll)
 
 ### Fixed
-- **Navbar collision, real root cause** â the site's base `.navbar` is `background:transparent` and only
+- **Navbar collision, real root cause** — the site's base `.navbar` is `background:transparent` and only
   gets its solid blur background from a `.scrolled` class that `script.js` adds on scroll. The CDU
   pages use inline scripts and don't load `script.js`, so their navbar stayed transparent and table
   content bled *through* it on scroll (most visible in dark mode). Added the scroll-aware `.scrolled`
   toggle to the inline script of all five CDU pages (`cdu-hub`, `cdu-selection-guide`, `cdu-checklist`,
   `cdu-mini-bms`, `cdu-comparison`). Navbar is now opaque on scroll, matching the rest of the site.
 
-## v1.43.48 â 2026-06-21 (article editorial skin â catch up the 3 missed articles)
+## v1.43.48 — 2026-06-21 (article editorial skin — catch up the 3 missed articles)
 
 ### Changed
-- **Applied the approved Â§08 article editorial skin to the 3 articles the rollout skipped.**
+- **Applied the approved §08 article editorial skin to the 3 articles the rollout skipped.**
   The editorial register (`css/rz-article-dark.css` + Fraunces/Plex fonts + read-progress + staggered
-  entrance) shipped to 26 articles (v1.43.9â17) but **article-27, FF-2, FF-3** were missed and still
+  entrance) shipped to 26 articles (v1.43.9–17) but **article-27, FF-2, FF-3** were missed and still
   rendered in generic dark mode. Added the identical editorial head block (replicated from `article-26`)
   to each:
-  - `article-27.html` â `data-rz-register="editorial"` + `--rz-art-accent:#dc2626` (Global Analysis red).
-  - `FF-2.html` / `FF-3.html` â `--rz-art-accent:#E8B563` (Future Forward amber, matching FF-1).
+  - `article-27.html` — `data-rz-register="editorial"` + `--rz-art-accent:#dc2626` (Global Analysis red).
+  - `FF-2.html` / `FF-3.html` — `--rz-art-accent:#E8B563` (Future Forward amber, matching FF-1).
   Verified dark: Fraunces serif hero + accent italic, mono meta, editorial chrome, read-progress bar.
   article-27's inline `.ws-*` workforce calculator + content untouched (head-only change). Body copy
   stays IBM Plex Sans. Light mode unchanged. **Article editorial skin is now 29/29 complete**
   (`article-9-paper` = print variant, intentionally excluded).
-- Tracker + second-brain vault + plan Â§08/E2 updated.
+- Tracker + second-brain vault + plan §08/E2 updated.
 
-## v1.43.47 â 2026-06-21 (CDU hub consolidation + dense-table fixes)
+## v1.43.47 — 2026-06-21 (CDU hub consolidation + dense-table fixes)
 
 ### Added
-- **`cdu-hub.html`** (new) â a single landing page for the liquid-cooling CDU toolkit with four
-  resource cards (Selection Guide Â· Checklist Â· Mini-BMS Â· Deep Comparison). The four separate CDU
+- **`cdu-hub.html`** (new) — a single landing page for the liquid-cooling CDU toolkit with four
+  resource cards (Selection Guide · Checklist · Mini-BMS · Deep Comparison). The four separate CDU
   cards on `datacenter-solutions.html` and `tools.html` are now **consolidated into one** "Liquid-
   Cooling CDU Toolkit" card that opens this hub. Registered in sitemap/search-index/llms.
 
 ### Fixed
-- **Dense comparison tables were cramped & unprofessional** â the 9-column guide tables had
+- **Dense comparison tables were cramped & unprofessional** — the 9-column guide tables had
   `min-width:760px`, forcing the spec column to wrap word-by-word. Raised to 1320px with explicit
-  per-column min-widths (spec column 300â340px) so cells breathe; widened the comparison tables to
+  per-column min-widths (spec column 300–340px) so cells breathe; widened the comparison tables to
   880px. Header rows get a 2px under-rule + no-wrap.
-- **Table header collided with the fixed navbar** â removed `th{position:sticky;top:0}` (stuck the
+- **Table header collided with the fixed navbar** — removed `th{position:sticky;top:0}` (stuck the
   header under the navbar on scroll) and the sticky-first-column `z-index` rules (raised cells above
   the nav) from `.cdu-tbl` / `.cp-tbl` / `.ck-tbl`. Content now scrolls cleanly under the navbar.
 
-## v1.43.46 â 2026-06-21 (index â kill distracting hero-name "blink" + OE hover "wobble")
+## v1.43.46 — 2026-06-21 (index — kill distracting hero-name "blink" + OE hover "wobble")
 
 ### Fixed
 - **Hero name "blink" (disappears/reappears even without hover).** `.bento-name` carried TWO infinite
-  animations â `nameGlow` (4s drop-shadow pulse) + `rzNameSweep` (12s gradient sweep, dark). Removed
+  animations — `nameGlow` (4s drop-shadow pulse) + `rzNameSweep` (12s gradient sweep, dark). Removed
   both; the gradient text is now **static** (`background-position:0% 50%`). Identified via headless
   animation probe (cards themselves were stable; the looping name animation was the culprit).
 - **Operational Excellence card "wobble" on hover.** `.oe-card:hover .oe-desc` expanded the description
-  `max-height: 3em â 10em` (#30 hover-expand) â the card grew on hover = the bergoyang. Removed the
+  `max-height: 3em → 10em` (#30 hover-expand) — the card grew on hover = the bergoyang. Removed the
   expand; desc stays 2-line clamped, card no longer changes size on hover. Verified (max-height
-  38.4px â 38.4px, no growth).
+  38.4px → 38.4px, no growth).
 - Both removals mirrored in `styles.css` + `styles-index.css`, re-minified; cache-bust
   `styles-index.min.css?v=2026-06-21-calm`.
 
-## v1.43.45 â 2026-06-21 (CDU Mini-BMS â live sparkline trends on parameter tiles)
+## v1.43.45 — 2026-06-21 (CDU Mini-BMS — live sparkline trends on parameter tiles)
 
 ### Added
-- **`cdu-mini-bms.html`** â each numeric parameter tile (flow, flow-total, supply/return temp, ÎT,
+- **`cdu-mini-bms.html`** — each numeric parameter tile (flow, flow-total, supply/return temp, ΔT,
   dP, system pressure, HX approach) now carries a **live sparkline** showing the rolling 30-sample
-  trend with a subtle fill area â making it read as a real BMS dashboard rather than a static
+  trend with a subtle fill area — making it read as a real BMS dashboard rather than a static
   readout. Sparkline colour follows the tile's OK/WARN/ALARM state; history resets on CDU-type
-  change; status tiles (pumps/filter/leak/coolant) stay static. Pure presentation â no change to
+  change; status tiles (pumps/filter/leak/coolant) stay static. Pure presentation — no change to
   the simulation logic or values.
 
-## v1.43.44 â 2026-06-21 (CDU Mini-BMS â full-width P&ID for legibility)
+## v1.43.44 — 2026-06-21 (CDU Mini-BMS — full-width P&ID for legibility)
 
 ### Changed
-- **`cdu-mini-bms.html`** â reorganised the cockpit so the detailed ISA P&ID gets a **full-width row**
+- **`cdu-mini-bms.html`** — reorganised the cockpit so the detailed ISA P&ID gets a **full-width row**
   (capped 920 px, centred) instead of sharing a half-width column; the datahall layout + live
   parameter tiles now share the top row. The dense instrumentation (valve/pump/instrument symbols,
   tag bubbles, manifold, legend) is now legible at full scale. No data/logic change.
 
-## v1.43.43 â 2026-06-21 (CDU pages â dense-table UIUX polish, round 2)
+## v1.43.43 — 2026-06-21 (CDU pages — dense-table UIUX polish, round 2)
 
 ### Changed (applied to the new high-density tables)
-- **Sticky first column** â the Model/Vendor/Symptom column now pins to the left on the wide 9-column
+- **Sticky first column** — the Model/Vendor/Symptom column now pins to the left on the wide 9-column
   guide tables, the comparison tables and the 16-row checklist tables, so context stays visible while
   scrolling the spec columns horizontally (`cdu-selection-guide.html` `.cdu-tbl`, `cdu-comparison.html`
   `.cp-tbl`, `cdu-checklist.html` `.ck-tbl`).
-- **Scroll-shadow affordance** â `.tbl-wrap` gains the classic CSS scroll-shadow (edge fades + inner
+- **Scroll-shadow affordance** — `.tbl-wrap` gains the classic CSS scroll-shadow (edge fades + inner
   shadows that appear only when there's more to scroll), signalling the horizontal overflow on dense
   tables instead of silently clipping.
-- **Capability matrix** â the comparison matrix's â/â/~ glyph columns are now centred + mono for
+- **Capability matrix** — the comparison matrix's ✓/—/~ glyph columns are now centred + mono for
   faster scanning (`.cp-matrix`).
 - **Lighter inner-row hairlines** on the guide table to match the editorial-register tables.
 
-## v1.43.42 â 2026-06-21 (CDU checklist + comparison â deeper content)
+## v1.43.42 — 2026-06-21 (CDU checklist + comparison — deeper content)
 
 ### Changed
-- **`cdu-checklist.html`** â Â§01 operational parameters +5 (supply-vs-dew-point, pipe velocity,
-  corrosion-inhibitor reserve, pump NPSH margin, footprint+weight) â 16 rows; Â§06 PM +5 tasks
+- **`cdu-checklist.html`** — §01 operational parameters +5 (supply-vs-dew-point, pipe velocity,
+  corrosion-inhibitor reserve, pump NPSH margin, footprint+weight) → 16 rows; §06 PM +5 tasks
   (make-up/level, dew-point-reset verify, control-valve stroke, BMS telemetry verify, inhibitor+Cu/Fe)
-  â 16 rows; Â§07 symptomâaction +6 rows (condensation, GPU throttle/maldistribution, 2-phase dry-out,
-  frequent make-up, control-valve fault, over-pressure) â 16 rows.
-- **`cdu-comparison.html`** â added a **per-vendor published-spec & capability matrix** (10 vendors Ã
+  → 16 rows; §07 symptom→action +6 rows (condensation, GPU throttle/maldistribution, 2-phase dry-out,
+  frequent make-up, control-valve fault, over-pressure) → 16 rows.
+- **`cdu-comparison.html`** — added a **per-vendor published-spec & capability matrix** (10 vendors ×
   Redfish / dP published / ASHRAE class / hot-swap service / filtration / notable), distilling the
   datasheet research into a single scannable view; Redfish is published only by CoolIT, Accelsius,
   Lenovo. 6 tables total.
 
-## v1.43.41 â 2026-06-21 (CDU guide â deep spec comparison tables)
+## v1.43.41 — 2026-06-21 (CDU guide — deep spec comparison tables)
 
 ### Changed
-- **`cdu-selection-guide.html`** â rebuilt both comparison tables from a single "notable specs" cell
-  into a **9-column deep comparison** (Model Â· Capacity Â· Type Â· Secondary flow Â· dP/head Â· Approach Â·
-  Dimensions & weight Â· FluidÂ·filterÂ·connÂ·BMSÂ·class Â· Links), populated from per-model datasheet
+- **`cdu-selection-guide.html`** — rebuilt both comparison tables from a single "notable specs" cell
+  into a **9-column deep comparison** (Model · Capacity · Type · Secondary flow · dP/head · Approach ·
+  Dimensions & weight · Fluid·filter·conn·BMS·class · Links), populated from per-model datasheet
   research. In-row table now 13 rows incl. **Vertiv Liebert XDU1350** and **CoolChip CDU 70 (L2A)**
   with verified datasheets, **CoolIT CHx1500**, and a corrected **nVent RackChiller CDU800** (the
-  earlier "CX121" was wrong â nVent has no CX series). In-rack table now 7 rows incl. **nVent
-  RackChiller CHx** (real 4U specs: 150 L/min, 2.76 bar, 4 Â°C, 41 kg, W4) and **Lenovo Neptune RM100**
+  earlier "CX121" was wrong — nVent has no CX series). In-rack table now 7 rows incl. **nVent
+  RackChiller CHx** (real 4U specs: 150 L/min, 2.76 bar, 4 °C, 41 kg, W4) and **Lenovo Neptune RM100**
   (corrected to **L2L**, with verified O&M manual). Every new external link curl-verified (200) or
   tagged VENDOR PORTAL; "n/p" marks genuinely unpublished specs.
 
-## v1.43.40 â 2026-06-21 (CDU Mini-BMS â full ISA P&ID + dimensioned layout)
+## v1.43.40 — 2026-06-21 (CDU Mini-BMS — full ISA P&ID + dimensioned layout)
 
 ### Changed
-- **`cdu-mini-bms.html`** â rebuilt the P&ID from a simplified schematic into a full **ISA-instrumented
+- **`cdu-mini-bms.html`** — rebuilt the P&ID from a simplified schematic into a full **ISA-instrumented
   diagram**: facility isolation valves (HV-01/02) + 3-way control valve TCV-01, E-01 plate HX with
   approach (TI-03), CDU skid with expansion tank T-01 + level LT-01 + makeup MV-01 + relief PSV-01,
-  dual pumps **P-01A (duty) / P-01B (standby)** with check valves, F-01 50 Âµm strainer, tagged
+  dual pumps **P-01A (duty) / P-01B (standby)** with check valves, F-01 50 µm strainer, tagged
   instruments **FT-01 / PT-01 / PDT-01 (filter) / PDT-02 (loop) / TT-01 / TT-02** with live values,
   rack manifold M-01 with QD couplers + cold plates, leak rope LSH-01, a control-setpoint note
-  (TCV holds TT-01=18 Â°C â¥ dew-point+3; P-01 VFD on ÎP; N+1 changeover), and a symbol legend.
+  (TCV holds TT-01=18 °C ≥ dew-point+3; P-01 VFD on ΔP; N+1 changeover), and a symbol legend.
   Datahall layout gained a 600 mm rack-pitch dimension line and a per-type footprint/density caption
   (CDU dims, kW/rack, aisle containment). All values feed from the live sim; renders clean across all
-  5 types Ã light/dark.
+  5 types × light/dark.
 
-## v1.43.39 â 2026-06-21 (dark-mode /ultraplan â batch 5: cockpit cookie banners, probe-gated)
+## v1.43.39 — 2026-06-21 (dark-mode /ultraplan — batch 5: cockpit cookie banners, probe-gated)
 
 ### Fixed
 - **Cookie banner rendered white-on-dark on `datahallAI` + `dc-conventional`** (they use the
   `.cookie-banner` + `.cookie-accept`/`.cookie-decline` scheme with no dark override). Added shared
-  dark overrides to `css/rz-bms-shell.css` (loaded by all 5 cockpits) â banner â `rgba(15,23,42,.95)`,
+  dark overrides to `css/rz-bms-shell.css` (loaded by all 5 cockpits) — banner → `rgba(15,23,42,.95)`,
   light text, brighter accept button; `!important` beats per-page inline. datahall/water/fire already
-  had a dark banner (this only brightens their accept button). Presentation-only â **accuracy probe
+  had a dark banner (this only brightens their accept button). Presentation-only — **accuracy probe
   re-run 75/75 PASS** (engine/alarm/SLD untouched). Cache-bust bumped on all 5 cockpit pages.
 
 ### Notes
-- Completes the `/ultraplan` dark-mode defect rollout (batches 1â5). All confirmed real defects fixed;
+- Completes the `/ultraplan` dark-mode defect rollout (batches 1–5). All confirmed real defects fixed;
   verified false positives left as-is. Tracker + vault note finalized.
 
-## v1.43.38 â 2026-06-21 (dark-mode /ultraplan â batch 4: safe non-cockpit light elements)
+## v1.43.38 — 2026-06-21 (dark-mode /ultraplan — batch 4: safe non-cockpit light elements)
 
 ### Fixed
-- **`articles.html .philosophy-section`** â light gradient section block rendered on dark; added
+- **`articles.html .philosophy-section`** — light gradient section block rendered on dark; added
   `[data-theme="dark"]` dark-gradient override.
-- **`tia-942-checklist`** â `.tia-btn-reset` + `.nav-user-dropdown` were white-on-dark (chrome);
-  added dark overrides. (Left `.tier-btn.active`/`.dctype-btn.active` white â intentional selected-state
+- **`tia-942-checklist`** — `.tia-btn-reset` + `.nav-user-dropdown` were white-on-dark (chrome);
+  added dark overrides. (Left `.tier-btn.active`/`.dctype-btn.active` white — intentional selected-state
   highlight, dark-text-on-white reads fine.)
-- **`dc-market-tracker`** â `.dmt-cookie-decline` white button on dark cookie bar â dark override.
+- **`dc-market-tracker`** — `.dmt-cookie-decline` white button on dark cookie bar → dark override.
 - Part of the `/ultraplan` rollout. Tracker + vault updated. Remaining: cockpit cookie banners
-  (probe-gated â they load `css/rz-bms-shell.css`).
+  (probe-gated — they load `css/rz-bms-shell.css`).
 
-## v1.43.37 â 2026-06-21 (CDU suite â UIUX polish pass per design.md review)
+## v1.43.37 — 2026-06-21 (CDU suite — UIUX polish pass per design.md review)
 
 ### Changed (uiux-reviewer findings applied across all 4 CDU pages)
-- **Brand typography** â `cdu-selection-guide.html` swapped **Inter â IBM Plex Sans** (design.md
-  mandates IBM Plex, "not Inter â generic SaaS") and set an explicit `body` font-family.
-- **Tabular numerics** â added `font-variant-numeric:tabular-nums slashed-zero` to every mono
+- **Brand typography** — `cdu-selection-guide.html` swapped **Inter → IBM Plex Sans** (design.md
+  mandates IBM Plex, "not Inter — generic SaaS") and set an explicit `body` font-family.
+- **Tabular numerics** — added `font-variant-numeric:tabular-nums slashed-zero` to every mono
   numeric class (guide `.kw`/`.formula`, checklist `.p`/form inputs, mini-bms `.tile .v`/`.sch-val`,
   comparison `.mono`) so dense data columns align and live instrument readouts stop jittering.
-- **Accessibility** â gated the mini-BMS alarm/leak `blink` animations behind
+- **Accessibility** — gated the mini-BMS alarm/leak `blink` animations behind
   `prefers-reduced-motion:reduce` (they already carry text + colour, so motion is now enhancement
   only).
-- **Token/radius discipline** â container radii 12â8 px (typecard/panel/tbl-wrap) and tile 9â6 px;
-  taxonomy card `border-top` 3â2 px; taxonomy SVG pipes re-graded to tier weights (supply 1.6 /
+- **Token/radius discipline** — container radii 12→8 px (typecard/panel/tbl-wrap) and tile 9→6 px;
+  taxonomy card `border-top` 3→2 px; taxonomy SVG pipes re-graded to tier weights (supply 1.6 /
   return 1.2 / air 1.4 px) with return re-pointed to fault-red `#FF3030`; comparison `.win/.mid/.lose`
   re-pointed to RZ severity tokens (`#00FF88`/`#FFAA00`/`#FF3030` in dark); tier-3 lighter inner-row
-  hairlines on dense tables; mini-BMS hero line-grid opacity lowered to â¤0.06; FAQ summary hover +
+  hairlines on dense tables; mini-BMS hero line-grid opacity lowered to ≤0.06; FAQ summary hover +
   focus-visible ring; lead paragraphs capped at 70ch; removed a no-op sticky `th`.
 
-## v1.43.36 â 2026-06-21 (dark-mode /ultraplan â batch 3: site-wide #64748b disclaimer contrast)
+## v1.43.36 — 2026-06-21 (dark-mode /ultraplan — batch 3: site-wide #64748b disclaimer contrast)
 
 ### Fixed
-- **Inline `#64748b` disclaimer + nav links low-contrast on dark â across 52 pages.** The shared
+- **Inline `#64748b` disclaimer + nav links low-contrast on dark — across 52 pages.** The shared
   independence-disclaimer `<p style="...color:#64748b...">` (and the "All Insights" nav link) is an
   inline style CSS can't normally override. Added one targeted `[data-theme="dark"] [style*="color:#64748b"]`
-  rule (`!important`) in `styles.css` â lifts to `#94a3b8` (readable, still de-emphasized) on every
+  rule (`!important`) in `styles.css` → lifts to `#94a3b8` (readable, still de-emphasized) on every
   page at once (pillars, articles, etc.). Index unaffected (uses `#94a3b8` already). Verified via probe.
 - Part of the `/ultraplan` rollout. Tracker + vault updated.
 
-## v1.43.35 â 2026-06-21 (dark-mode /ultraplan â batch 2: geopolitics/FF status badges)
+## v1.43.35 — 2026-06-21 (dark-mode /ultraplan — batch 2: geopolitics/FF status badges)
 
 ### Fixed
-- **Status badges rendered light-on-dark** on `geopolitics-2` Â· `geopolitics-3` Â· `FF-1` Â· `FF-2`.
+- **Status badges rendered light-on-dark** on `geopolitics-2` · `geopolitics-3` · `FF-1` · `FF-2`.
   Pages already had `[data-theme="dark"]` overrides for `.confidence-high/-medium` but **missed**
   `.confidence-low` + all `.prob-low/-medium/-high` (light pastel bg, no dark override). Added the
   missing translucent-tint dark overrides per page (prob-high colour matched each page: red for
   geo-2/3, violet for FF-1, amber for FF-2). Verified dark via headless probe.
 - Part of the `/ultraplan` rollout. Tracker + vault note updated.
 
-## v1.43.34 â 2026-06-21 (CDU guide FAQ + FAQPage schema + glossary terms)
+## v1.43.34 — 2026-06-21 (CDU guide FAQ + FAQPage schema + glossary terms)
 
 ### Added
-- **`cdu-selection-guide.html`** â new **Â§08 FAQ** section (8 questions: L2L vs L2A, flow sizing,
+- **`cdu-selection-guide.html`** — new **§08 FAQ** section (8 questions: L2L vs L2A, flow sizing,
   coolant/water quality, filtration, dew-point, quick-disconnect standards, type selection, leak
   safety) using native `<details>` accordions, plus a **FAQPage** JSON-LD block (8 Q&As) for rich
   results / AI-search.
-- **`glossary.html`** â three new liquid-cooling terms cross-linked to the CDU suite: **L2A**
+- **`glossary.html`** — three new liquid-cooling terms cross-linked to the CDU suite: **L2A**
   (liquid-to-air CDU), **L2L** (liquid-to-liquid CDU), and **Quick-Disconnect (QD/UQD/UQDB)**.
 
-## v1.43.33 â 2026-06-21 (dark-mode /ultraplan â batch 1: references-section light-on-dark)
+## v1.43.33 — 2026-06-21 (dark-mode /ultraplan — batch 1: references-section light-on-dark)
 
 ### Fixed
-- **`.references-section` rendered light-on-dark on 4 report/infographic pages** â the section
+- **`.references-section` rendered light-on-dark on 4 report/infographic pages** — the section
   carries an inline `style="background:#f8fafc"` that overrode the shared dark rule, so in dark mode
-  the panel stayed light gray while its text was light â text invisible. Made the shared
+  the panel stayed light gray while its text was light → text invisible. Made the shared
   `[data-theme="dark"] .references-section` rule `!important` (styles.css) so it beats the inline bg.
-  Fixes `infographic-dc-cost-breakdown` Â· `infographic-dc-sustainability` Â· `infographic-pue-global`
-  Â· `asean-dc-report-2026` at once. Verified dark (`rgb(15,23,42)`) via headless probe.
+  Fixes `infographic-dc-cost-breakdown` · `infographic-dc-sustainability` · `infographic-pue-global`
+  · `asean-dc-report-2026` at once. Verified dark (`rgb(15,23,42)`) via headless probe.
 - Found by the `/ultraplan` 9-agent parallel dark-mode audit (56 defects/27 files). Audit also
-  caught false positives (saturated-accent compare-table headers read fine on dark â left as-is).
+  caught false positives (saturated-accent compare-table headers read fine on dark — left as-is).
   Tracker: `standarization/DARK_MODE_ROLLOUT_TRACKER.md` + vault `05-Standards/Dark-Mode-Rollout.md`.
 
-## v1.43.32 â 2026-06-21 (CDU suite â SEO/schema, link re-validation & cross-link close-out)
+## v1.43.32 — 2026-06-21 (CDU suite — SEO/schema, link re-validation & cross-link close-out)
 
 ### Changed
-- **SEO/JSON-LD** â added `TechArticle`/`WebApplication` + `BreadcrumbList` structured data and
+- **SEO/JSON-LD** — added `TechArticle`/`WebApplication` + `BreadcrumbList` structured data and
   Twitter Card meta to `cdu-checklist.html`, `cdu-mini-bms.html`, `cdu-comparison.html`, and a
   `TechArticle` block to `cdu-selection-guide.html` (all 4 pages now carry 2 valid JSON-LD blocks).
-- **Link re-validation** â re-curled every external CDU link (21); honestly downgraded the nVent
+- **Link re-validation** — re-curled every external CDU link (21); honestly downgraded the nVent
   Data Solutions resource-library link from VERIFIED to VENDOR PORTAL (now intermittently 403s to
   automated fetch / bot-blocked).
-- **Cross-link completeness** â every CDU page now links to the other three (added Mini-BMS +
+- **Cross-link completeness** — every CDU page now links to the other three (added Mini-BMS +
   Deep Comparison to the checklist footer nav; added Deep Comparison to the Mini-BMS links strip).
-- **AI search** â regenerated `llms-full.txt` so all five CDU pages are included.
-- Full render QA: 4 pages Ã light/dark = 8 renders, 0 console errors.
+- **AI search** — regenerated `llms-full.txt` so all five CDU pages are included.
+- Full render QA: 4 pages × light/dark = 8 renders, 0 console errors.
 
-## v1.43.31 â 2026-06-21 (CDU guide â sizing & installation requirements section)
+## v1.43.31 — 2026-06-21 (CDU guide — sizing & installation requirements section)
 
 ### Added
-- **`cdu-selection-guide.html`** â new **Â§05 Sizing & installation requirements** section: the core
-  flow/ÎT sizing equation (flow â 14.7 Ã Q(kW) / ÎT for PG25; â1.5 L/min/kW at ÎT 10, OCP band
-  1.25â2.0) with worked rack/node examples; a pipe-sizing table (DN25âDN200 at ~2 m/s); heat-
+- **`cdu-selection-guide.html`** — new **§05 Sizing & installation requirements** section: the core
+  flow/ΔT sizing equation (flow ≈ 14.7 × Q(kW) / ΔT for PG25; ≈1.5 L/min/kW at ΔT 10, OCP band
+  1.25–2.0) with worked rack/node examples; a pipe-sizing table (DN25→DN200 at ~2 m/s); heat-
   exchanger approach + W-class supply-temperature + dew-point guidance; and a physical-install
   checklist (floor loading, clearances, facility water vs L2A air budget, dual feeds, BMS/leak,
   N+1). Manuals/Standards sections renumbered to 06/07.
 
-## v1.43.30 â 2026-06-21 (CDU Deep Comparison â all aspects, source-tagged)
+## v1.43.30 — 2026-06-21 (CDU Deep Comparison — all aspects, source-tagged)
 
 ### Added
-- **`cdu-comparison.html`** (new public page, editorial register) â a deep, source-tagged
+- **`cdu-comparison.html`** (new public page, editorial register) — a deep, source-tagged
   multi-aspect comparison of liquid-cooling CDUs, the companion to the Selection Guide:
-  - **Â§01 Worldwide common field issues** â 12 failure modes (leaks, biofilm, galvanic/chloride
+  - **§01 Worldwide common field issues** — 12 failure modes (leaks, biofilm, galvanic/chloride
     corrosion, glycol degradation, particulate/microchannel clog, flow maldistribution, cavitation,
     dew-point condensation, pump/N+1, controls gaps, commissioning defects, standardization) with
-    symptom â root cause â prevention.
-  - **Â§02 Control systems & BMS/DCIM** â pump VFD (flow vs ÎP), temperature PID valve, dew-point
-    reset, N+1 changeover, leakâaction; per-vendor Modbus/BACnet/SNMP/Redfish matrix; DMTF Redfish
+    symptom → root cause → prevention.
+  - **§02 Control systems & BMS/DCIM** — pump VFD (flow vs ΔP), temperature PID valve, dew-point
+    reset, N+1 changeover, leak→action; per-vendor Modbus/BACnet/SNMP/Redfish matrix; DMTF Redfish
     CoolingUnit (DSP2064) + OCP telemetry standards.
-  - **Â§03 After-sales & support** â per-vendor warranty/SLA/serviceability/remote-monitoring matrix
+  - **§03 After-sales & support** — per-vendor warranty/SLA/serviceability/remote-monitoring matrix
     (Vertiv, CoolIT, Motivair/Schneider, Boyd/Eaton, nVent, Delta, Stulz, Accelsius, ZutaCore,
     Lenovo) with honest "not publicly disclosed" markers.
-  - **Â§04 TCO & maintenance by type** â relative trade-off matrix (capex/opex/density/water/retrofit/
+  - **§04 TCO & maintenance by type** — relative trade-off matrix (capex/opex/density/water/retrofit/
     maintenance/redundancy) across in-rack/in-row/sidecar/L2L/L2A/2-phase.
   - Every figure tagged STANDARD (ASHRAE/OCP/DMTF) vs VENDOR vs REPORTED; vendor-sponsored TCO
     claims attributed by name. Registered in dc-solutions/tools/sitemap/search-index/llms; cross-
     linked from the Selection Guide.
 
-## v1.43.29 â 2026-06-21 (CDU guide â per-type layout/P&ID mini-diagrams in taxonomy)
+## v1.43.29 — 2026-06-21 (CDU guide — per-type layout/P&ID mini-diagrams in taxonomy)
 
 ### Changed
-- **`cdu-selection-guide.html`** â the "CDU types â what each is for" taxonomy section now carries a
+- **`cdu-selection-guide.html`** — the "CDU types — what each is for" taxonomy section now carries a
   **visual mini-diagram per type** (not just text cards): an inline SVG showing the CDU's datahall
   placement signature + animated supply/return flow + heat-rejection path. In-rack (CDU slice inside
-  a rack), In-row (cabinet between racks), Sidecar (slim unit on the rack side), L2A (â room air, no
-  facility water), L2L (plate HX to facility CDW), Facility/room-scale (multiple rows â central unit
+  a rack), In-row (cabinet between racks), Sidecar (slim unit on the rack side), L2A (→ room air, no
+  facility water), L2L (plate HX to facility CDW), Facility/room-scale (multiple rows → central unit
   + HX). Each in its type accent colour; flow animation honours `prefers-reduced-motion`. Full
   interactive version lives on the CDU Mini-BMS cockpit.
 
-## v1.43.28 â 2026-06-21 (CDU Mini-BMS â layout + P&ID + live parameters)
+## v1.43.28 — 2026-06-21 (CDU Mini-BMS — layout + P&ID + live parameters)
 
 ### Added
-- **`cdu-mini-bms.html`** (new public page, instrument register) â an interactive miniature
-  building-management cockpit for liquid-cooling CDUs. Per CDU type (in-rack Â· in-row Â· sidecar Â·
-  L2L end-of-row Â· L2A air-cooled): a **datahall installation layout** plan view (cold/hot aisle,
+- **`cdu-mini-bms.html`** (new public page, instrument register) — an interactive miniature
+  building-management cockpit for liquid-cooling CDUs. Per CDU type (in-rack · in-row · sidecar ·
+  L2L end-of-row · L2A air-cooled): a **datahall installation layout** plan view (cold/hot aisle,
   rack row, CDU placement, facility-water vs room-air rejection, animated flow), an **animated
-  P&ID schematic** (HX, N+1 pumps, filter, expansion tank, FT/PT/dPT sensors, manifold â rack
+  P&ID schematic** (HX, N+1 pumps, filter, expansion tank, FT/PT/dPT sensors, manifold → rack
   cold-plates, leak rope), and a **live simulated parameter panel** (flow LPM/kW + total, supply/
-  return temp, ÎT, dP, system pressure, pump N+1, filter, leak, HX approach, coolant) with
+  return temp, ΔT, dP, system pressure, pump N+1, filter, leak, HX approach, coolant) with
   warn/alarm tile states and a RUN/WARN/ALARM P&ID pill. **Fault-injection scenarios** (leak,
   pump-A fail, filter clog, hot facility water, low flow) drive the controls so users can see how
   a CDU controller responds. Animation honours `prefers-reduced-motion`; all values are on-device
@@ -1015,79 +1018,79 @@ Continues "semua di planb diimplementasikan". Closes the remaining **Track E** i
   (`cdu-mini-bms-1`), `llms.txt`; cross-linked from the CDU Selection Guide next-strip and back to
   the Guide + Checklist from the cockpit.
 
-## v1.43.27 â 2026-06-20 (CDU checklist â water-quality & commissioning super-detail)
+## v1.43.27 — 2026-06-20 (CDU checklist — water-quality & commissioning super-detail)
 
 ### Changed
-- **`cdu-checklist.html`** â added two deep, source-tagged sections (every figure tagged
+- **`cdu-checklist.html`** — added two deep, source-tagged sections (every figure tagged
   `STANDARD` vs `TYPICAL/VENDOR` so nothing is overstated):
-  - **Â§02 Water quality â acceptance criteria & standard limits**: ASHRAE TC 9.9 facility-water
-    W-class table (W17âW+, max supply temps); OCP cold-plate TCS fluid acceptance table (pH,
+  - **§02 Water quality — acceptance criteria & standard limits**: ASHRAE TC 9.9 facility-water
+    W-class table (W17–W+, max supply temps); OCP cold-plate TCS fluid acceptance table (pH,
     conductivity, TDS, TSS, hardness, chloride, turbidity, bacteria, inhibitor, Cu/Fe, filtration);
     ASHRAE/Dell TCS-vs-FWS side-by-side limits; OCP make-up water sub-spec + ASTM D1193 Type II.
     Honest caveats on pH/conductivity loop regimes and the absence of a published TOC limit.
-  - **Â§03 Installation & commissioning â numeric procedure**: hydrostatic test (1.5Ã design,
-    â¥10-min hold per ASME B31.3/B31.1, "no-leakage" acceptance), turbulent flush (Re>4000, ISO 4406
-    / NAS 1638 target), filtration sizing table, coolant & flow (PG25, 1.5 LPM/kW @10 Â°C, band
-    1.25â2.0), OCP UQD/UQDB quick-disconnect spec (100 psi working / 300 psi burst / â¥5000 cycles /
-    Â±1 mm blind-mate), leak detection sequence.
-  - Sections renumbered 02â04â¦06â08; TOC + source-tag legend added.
+  - **§03 Installation & commissioning — numeric procedure**: hydrostatic test (1.5× design,
+    ≥10-min hold per ASME B31.3/B31.1, "no-leakage" acceptance), turbulent flush (Re>4000, ISO 4406
+    / NAS 1638 target), filtration sizing table, coolant & flow (PG25, 1.5 LPM/kW @10 °C, band
+    1.25–2.0), OCP UQD/UQDB quick-disconnect spec (100 psi working / 300 psi burst / ≥5000 cycles /
+    ±1 mm blind-mate), leak detection sequence.
+  - Sections renumbered 02→04…06→08; TOC + source-tag legend added.
 
-## v1.43.26 â 2026-06-20 (AWS dark logo fix + dark token foundation)
+## v1.43.26 — 2026-06-20 (AWS dark logo fix + dark token foundation)
 
 ### Fixed
 - **AWS company logo invisible in dark mode.** `assets/aws-dark.svg` was byte-identical to the day
-  version and used `fill="currentColor"` on the wordmark â via `<img>`, `currentColor` resolves to the
+  version and used `fill="currentColor"` on the wordmark — via `<img>`, `currentColor` resolves to the
   SVG's default **black**, so the "dark" logo rendered black-on-dark. Made the wordmark `#FFFFFF`
   (orange `#F90` smile kept) + cache-bust the `<img src>` so the white version loads. The day/dark
   toggle CSS (`[data-theme="dark"] .exp-logo-aws-dark{display:block}`) was already correct.
 
 ### Added
-- **`css/rz-dark.css` â POLISH-TRACK consistency tokens** (character-agnostic): radius scale
-  (`--rz-r-xsâ¦xl/pill`), elevation scale (`--rz-elev-1..3`, light + dark), `.rz-surface` premium
-  card utility, `.rz-reveal-on` (no hover movement). For the "polish + unify tokens" path â pages keep
+- **`css/rz-dark.css` — POLISH-TRACK consistency tokens** (character-agnostic): radius scale
+  (`--rz-r-xs…xl/pill`), elevation scale (`--rz-elev-1..3`, light + dark), `.rz-surface` premium
+  card utility, `.rz-reveal-on` (no hover movement). For the "polish + unify tokens" path — pages keep
   their own type + accent, adopt one structural language. Distinct from the Fraunces editorial register.
 
-## v1.43.25 â 2026-06-20 (CDU guide â verified 2-phase in-rack units)
+## v1.43.25 — 2026-06-20 (CDU guide — verified 2-phase in-rack units)
 
 ### Changed
-- **`cdu-selection-guide.html`** â enriched the in-rack comparison table with two link-verified
+- **`cdu-selection-guide.html`** — enriched the in-rack comparison table with two link-verified
   **two-phase** (dielectric direct-to-chip) units: **Accelsius NeuCool IR150** (150 kW rack-
   integrated, R-1233zd(E), 1+1 pumps, ASHRAE W27/W45, `accelsius.com/ir150/` VERIFIED) and
-  **ZutaCore HyperCool In-Rack** (20â120 kW waterless 3U/6U, `zutacore.com/solutions` VERIFIED).
+  **ZutaCore HyperCool In-Rack** (20–120 kW waterless 3U/6U, `zutacore.com/solutions` VERIFIED).
   Added a `2-PHASE` tag (violet) and a section-lead note distinguishing single-phase water CDUs
   from two-phase/waterless options. Both URLs independently curl-verified (HTTP 200 + content
   match); gated lead-capture spec sheets tagged VENDOR PORTAL. Chilldyne (negative-pressure
   single-phase) and LiquidStack (2-phase immersion only) excluded as not 2-phase in-rack DTC.
 
-## v1.43.24 â 2026-06-20 (index â kill excessive card-hover movement)
+## v1.43.24 — 2026-06-20 (index — kill excessive card-hover movement)
 
 ### Fixed
 - **Stale cached JS re-running the cursor-tracking 3D tilt.** `index.html` loaded
   `script.min.js?v=2026-05-09-v1`; the on-disk min has `initCardTilt()` disabled, but returning
   visitors were served the **old cached build** (active `perspective rotateX/Y + translateY(-10px) +
-  scale + parallax children`) under that unchanged query string â cards wobbled, shifted out from under
+  scale + parallax children`) under that unchanged query string — cards wobbled, shifted out from under
   the cursor, and flickered. Bumped to `?v=2026-06-20-cards` to force the clean, tilt-free build.
-- **Company-logo hover pop too large** â `.bento-exp-card:hover .bento-company-logo` scaled `1.15`
-  (visible "wobble"); reduced to a subtle `1.04`. The grayscaleâcolour fade on hover is kept.
-- Both `styles.css` + `styles-index.css` re-minified; CSS cache-bust â `?v=2026-06-20-cards`.
-- Card hover feedback is now border/glow + logo colour-fade only â **no card movement** (matches the
+- **Company-logo hover pop too large** — `.bento-exp-card:hover .bento-company-logo` scaled `1.15`
+  (visible "wobble"); reduced to a subtle `1.04`. The grayscale→colour fade on hover is kept.
+- Both `styles.css` + `styles-index.css` re-minified; CSS cache-bust → `?v=2026-06-20-cards`.
+- Card hover feedback is now border/glow + logo colour-fade only — **no card movement** (matches the
   owner's no-card-movement rule). Verified via headless hover probe (card transform = `none`).
 
-## v1.43.23 â 2026-06-20 (CDU Selection & Deployment Guide + Checklist â new pages)
+## v1.43.23 — 2026-06-20 (CDU Selection & Deployment Guide + Checklist — new pages)
 
 ### Added
-- **`cdu-selection-guide.html`** (new public page) â liquid-cooling Coolant Distribution Unit
-  resource for the DC Solutions hub. CDU type taxonomy (in-rack Â· in-row Â· sidecar Â· L2A Â· L2L Â·
+- **`cdu-selection-guide.html`** (new public page) — liquid-cooling Coolant Distribution Unit
+  resource for the DC Solutions hub. CDU type taxonomy (in-rack · in-row · sidecar · L2A · L2L ·
   facility-scale), an in-row + facility comparison table and an in-rack comparison table with
   **link-verified** vendor specs and product/datasheet/manual links (Vertiv CoolChip, CoolIT CHx,
   Motivair, Boyd, Delta, nVent, Stulz, Envicool, ZutaCore), a manuals/documentation hub of
   HTTP-200-verified vendor portals, an L2L-vs-L2A decision section, and ASHRAE TC 9.9 / OCP
   standards references. Every shipped link was fetched and tagged `VERIFIED` (200 + content match)
-  or `VENDOR PORTAL` (working docs page, deep PDF not auto-verifiable) â no unverified deep links.
-- **`cdu-checklist.html`** (new public page, linked from the guide) â operational parameter bands
-  (supply temp / ÎT / flow / dP / system pressure / coolant / ASHRAE class / filtration / pump
+  or `VENDOR PORTAL` (working docs page, deep PDF not auto-verifiable) — no unverified deep links.
+- **`cdu-checklist.html`** (new public page, linked from the guide) — operational parameter bands
+  (supply temp / ΔT / flow / dP / system pressure / coolant / ASHRAE class / filtration / pump
   redundancy / leak / ATD), an installation checklist, an inspection checklist, a preventive-
-  maintenance checklist with cadence tags, a symptomâcauseâaction troubleshooting table, and a
+  maintenance checklist with cadence tags, a symptom→cause→action troubleshooting table, and a
   printable on-screen service-record form (`window.print()` + print stylesheet).
 
 ### Cross-linkage (CONTENT_LINKAGE_PLAYBOOK)
@@ -1095,38 +1098,38 @@ Continues "semua di planb diimplementasikan". Closes the remaining **Track E** i
   cards), `sitemap.xml`, `search-index.json` (`cdu-guide-1` + `cdu-checklist-1`), `llms.txt`, and a
   glossary cross-link from the existing CDU term.
 
-## v1.43.22 â 2026-06-20 (index bento polish â audit fixes)
+## v1.43.22 — 2026-06-20 (index bento polish — audit fixes)
 
 ### Fixed
 - **Hover-lift removed (it never worked).** The `translateY(-4px)` bento hover added with the
-  polish was dead on every card â a pre-existing global `.bento-card:hover{transform:none!important}`
+  polish was dead on every card — a pre-existing global `.bento-card:hover{transform:none!important}`
   (the owner's deliberate no-card-movement rule) overrode it. Removed the dead rule rather than force
   it with `!important` (which would reintroduce motion the owner removed). Hover feedback stays via the
-  existing border/glow rules â no card movement. Found by the `uiux-reviewer` agent (headless-verified).
-- **Stale cache-bust** â `index.html` `styles-index.min.css?v=2026-06-14-light` â `?v=2026-06-20-bento`
+  existing border/glow rules — no card movement. Found by the `uiux-reviewer` agent (headless-verified).
+- **Stale cache-bust** — `index.html` `styles-index.min.css?v=2026-06-14-light` → `?v=2026-06-20-bento`
   so the fixes reach returning visitors.
-- **Rejected-purple disclaimer** â the independence-disclaimer box used Anthropic-default `#8b5cf6`
+- **Rejected-purple disclaimer** — the independence-disclaimer box used Anthropic-default `#8b5cf6`
   (CLAUDE.md Rejected-Patterns #3) with no dark path; retoned to neutral slate + emerald link.
-- **No-op `.bento-sap` dark tint** â dark override re-declared the identical 2% emerald (invisible);
+- **No-op `.bento-sap` dark tint** — dark override re-declared the identical 2% emerald (invisible);
   bumped to 6% so the SAP card keeps its emerald identity in dark.
 - Deduped the redundant dark-scoped `bentoRise` reveal block (theme-agnostic block already covers dark).
 - Both `styles.css` + `styles-index.css` re-minified. Standard `DARK_MODE_STANDARD.md` updated.
 
-## v1.43.21 â 2026-06-14 (P1 â ict + datahall metadata extension)
+## v1.43.21 — 2026-06-14 (P1 — ict + datahall metadata extension)
 
-Closes the P1 metadata items (review doc-27 Â§5.5 + Â§5.7). ADDITIVE ONLY â
+Closes the P1 metadata items (review doc-27 §5.5 + §5.7). ADDITIVE ONLY —
 displayed data unchanged (owner mandate: skin/metadata only, never alter
 content). Verified: network link table values + rack/CRAH grid byte-identical;
 accuracy probe 75/75.
 
 ### Changed
-- **`ict.html`** â network link rows (`tr.linkrow`) now carry `data-rz-line`
+- **`ict.html`** — network link rows (`tr.linkrow`) now carry `data-rz-line`
   metadata derived from the EXISTING row data (from/to/medium/state/capacity/
   current/redundancy). The displayed table (cap/traffic/util/latency/loss/
   jitter/state/redundancy columns) is unchanged. Loads rz-line-model +
   rz-inspector + rz-alarm-state + rz-telemetry-quality; `data-rz-data-mode=
   "simulated"`. 5/5 rows tagged, 0 unknown mediums, NONE errors.
-- **`datahall.html`** â data-quality service: `data-rz-data-mode="simulated"`
+- **`datahall.html`** — data-quality service: `data-rz-data-mode="simulated"`
   + rz-telemetry-quality.js (SIM banner + chip). The rack/CRAH grid (200 racks
   + 20 CRAH cells) and all engine-bound values are unchanged. Accuracy probe
   75/75 confirms byte-identical.
@@ -1137,82 +1140,82 @@ accuracy probe 75/75.
 
 ---
 
-## v1.43.20 â 2026-06-14 (cockpit instrument re-skin â remaining 8 pages; COMPLETE)
+## v1.43.20 — 2026-06-14 (cockpit instrument re-skin — remaining 8 pages; COMPLETE)
 
 Completes the cockpit instrument re-skin. Same chrome-only, additive, scoped,
 dark-only treatment as the datahallAI pilot, applied to the remaining 8 cockpit
 pages via the 2-line opt-in. Per `standarization/COCKPIT_RESKIN_PLAN.md`.
 
 **Hard invariants verified (all green):**
-- SVG semantic colours untouched Â· engine byte-identical
+- SVG semantic colours untouched · engine byte-identical
   (`probe-accuracy-validation` 75/75, `test-datahall-calc` 57/57,
-  `test-conv-calc` 22/22, `probe-line-model` 52/52) Â· light mode inert.
+  `test-conv-calc` 22/22, `probe-line-model` 52/52) · light mode inert.
 - All 8 pages headless-verified: instrument register active + graticule
-  atmosphere on in dark, NONE errors. EPMS ATSârack green fix intact.
+  atmosphere on in dark, NONE errors. EPMS ATS→rack green fix intact.
 
 ### Changed (`<html data-rz-register="instrument">` + 1 CSS link each)
 - **`dc-conventional.html`** (2nd light-mode page; light inert)
-- **`chiller-plant.html`** Â· **`water-system.html`** Â· **`fuel-system.html`**
-- **`fire-system.html`** Â· **`ict.html`** Â· **`EPMS_Telemetry.html`** Â· **`datahall.html`**
+- **`chiller-plant.html`** · **`water-system.html`** · **`fuel-system.html`**
+- **`fire-system.html`** · **`ict.html`** · **`EPMS_Telemetry.html`** · **`datahall.html`**
 
-### Rollout status â cockpit instrument register COMPLETE
+### Rollout status — cockpit instrument register COMPLETE
 - **9 / 9 cockpit pages** on the instrument register (datahallAI + 8 here).
 - Chrome-only: atmosphere + mono headings + cyan-hairline panels. Zero SVG/
   engine/inline-CSS edits. Trivially reversible (2 lines per page).
 
 ---
 
-## v1.43.19 â 2026-06-14 (cockpit instrument re-skin â datahallAI pilot)
+## v1.43.19 — 2026-06-14 (cockpit instrument re-skin — datahallAI pilot)
 
 First cockpit page on the instrument register. CHROME-ONLY, additive, scoped,
 dark-only. Per `standarization/COCKPIT_RESKIN_PLAN.md`.
 
 **Hard invariants verified (the "no mistake" gates):**
-- SVG semantic colours (feed A/B, alarm red, cooling cyan) â UNTOUCHED (CSS
+- SVG semantic colours (feed A/B, alarm red, cooling cyan) — UNTOUCHED (CSS
   contains zero SVG stroke/fill selectors).
-- Engine values byte-identical â `probe-accuracy-validation` 75/75, KPIs
+- Engine values byte-identical — `probe-accuracy-validation` 75/75, KPIs
   (PUE 1.30 / IT 14.26 / GPU 7,776) unchanged; `test-datahall-calc` 57/57.
-- Light mode inert â skin gated `:not([data-theme="light"])`; datahallAI
+- Light mode inert — skin gated `:not([data-theme="light"])`; datahallAI
   defaults to light, so the skin only activates on dark toggle.
 
 ### Added
-- **`css/rz-cockpit-instrument.css`** â instrument register for cockpits.
+- **`css/rz-cockpit-instrument.css`** — instrument register for cockpits.
   Activates on `<html data-rz-register="instrument">` + dark. Styles ONLY:
   page atmosphere (graticule + faint scanlines via `body::before/::after`),
-  display headings â JetBrains Mono (`.hdr h1`, `.bx h3`, `.cd h4`, `.sb h4`),
-  panel borders â cyan hairline + 3px radius. No SVG, no engine text.
-- **`standarization/COCKPIT_RESKIN_PLAN.md`** â full plan: invariants, page
+  display headings → JetBrains Mono (`.hdr h1`, `.bx h3`, `.cd h4`, `.sb h4`),
+  panel borders → cyan hairline + 3px radius. No SVG, no engine text.
+- **`standarization/COCKPIT_RESKIN_PLAN.md`** — full plan: invariants, page
   inventory (9 pages), ship sequence, per-ship verification checklist, rollback.
 
 ### Changed
-- **`datahallAI.html`** â `<html data-rz-register="instrument">` + one CSS
+- **`datahallAI.html`** — `<html data-rz-register="instrument">` + one CSS
   link. Two lines; trivially reversible. SVG/engine/inline-CSS untouched.
 
 ### Next (per plan)
-- v1.43.2x â dc-conventional, then chiller/water/fuel, then fire/ict/EPMS/datahall.
+- v1.43.2x — dc-conventional, then chiller/water/fuel, then fire/ict/EPMS/datahall.
 
 ---
 
-## v1.43.18 â 2026-06-14 (index light-mode polish â day twin)
+## v1.43.18 — 2026-06-14 (index light-mode polish — day twin)
 
 ### Changed
-- **Homepage (`index.html`) light mode â polished to twin the dark polish (v1.43.14).**
+- **Homepage (`index.html`) light mode — polished to twin the dark polish (v1.43.14).**
   Same decision (keep the colourful bento character; raise quality only), now applied
-  light-scoped so dayânight match. Pure CSS:
-  - **Layered light card surfaces** â `.bento-card` gets a soft white gradient body +
+  light-scoped so day↔night match. Pure CSS:
+  - **Layered light card surfaces** — `.bento-card` gets a soft white gradient body +
     layered shadow (was flat white + faint shadow).
-  - **Per-card accent restored** â `.bento-exp-card` corner glow (`--bexp-accent`) now
+  - **Per-card accent restored** — `.bento-exp-card` corner glow (`--bexp-accent`) now
     always-on in light too.
-  - **Hover lift** â cards rise 4px with a deeper shadow.
-  - **Staggered reveal** â the `bentoRise` reveal is now **theme-agnostic** (runs in light
+  - **Hover lift** — cards rise 4px with a deeper shadow.
+  - **Staggered reveal** — the `bentoRise` reveal is now **theme-agnostic** (runs in light
     + dark); honours `prefers-reduced-motion`.
 - Rules in both `styles.css` + `styles-index.css` (2-stylesheet rule), re-minified;
   cache-bust `styles-index.min.css?v=2026-06-14-light`. Plan/mock: `rz-index-mockup-day.html`.
 
-## v1.43.17 â 2026-06-14 (article editorial skin â series landings + FF-1; rollout COMPLETE)
+## v1.43.17 — 2026-06-14 (article editorial skin — series landings + FF-1; rollout COMPLETE)
 
 Finishes the article-family editorial rollout. The three bespoke series
-landings get the serif hero treatment (additive, hero-only â bespoke card
+landings get the serif hero treatment (additive, hero-only — bespoke card
 grids untouched); FF-1 (the real Future-Forward article, standard `.article-*`
 template) gets the full opt-in. `future-forward-1.html` is a redirect stub to
 FF-1 and is left as-is.
@@ -1221,19 +1224,19 @@ No cockpit/engine touched. Light mode unchanged (scoped). Gates CLEAN. All four
 headless-verified (dark = Fraunces serif hero, light = Inter, NONE errors).
 
 ### Added
-- **`css/rz-article-dark.css`** â landing-hero block: `.insights-hero`,
-  `.geopolitics-hero`, `.futureforward-hero` H1/dek â serif; shared
-  `.section-title` â serif. Additive + scoped.
+- **`css/rz-article-dark.css`** — landing-hero block: `.insights-hero`,
+  `.geopolitics-hero`, `.futureforward-hero` H1/dek → serif; shared
+  `.section-title` → serif. Additive + scoped.
 
 ### Changed (editorial-register opt-in)
-- **`insights.html`** â cyan `#0891b2` (hero-only treatment)
-- **`geopolitics.html`** â red `#dc2626` (hero-only)
-- **`future-forward.html`** â amber `#E8B563` (remapped from violet `#a855f7`,
+- **`insights.html`** — cyan `#0891b2` (hero-only treatment)
+- **`geopolitics.html`** — red `#dc2626` (hero-only)
+- **`future-forward.html`** — amber `#E8B563` (remapped from violet `#a855f7`,
   a CLAUDE.md rejected token; hero-only)
-- **`FF-1.html`** â amber `#E8B563` (remapped from violet `#6d28d9`); full
+- **`FF-1.html`** — amber `#E8B563` (remapped from violet `#6d28d9`); full
   `.article-*` editorial treatment + read-progress runtime.
 
-### Rollout status â article family COMPLETE
+### Rollout status — article family COMPLETE
 - **36 pages on the editorial register**: 28 standard articles + geopolitics-1/2/3
   + FF-1 + articles index + insights/geopolitics/future-forward landings.
 - Every public article-family page is now on the editorial register (dark-only,
@@ -1242,7 +1245,7 @@ headless-verified (dark = Fraunces serif hero, light = Inter, NONE errors).
 
 ---
 
-## v1.43.16 â 2026-06-14 (article editorial skin â articles.html index pilot)
+## v1.43.16 — 2026-06-14 (article editorial skin — articles.html index pilot)
 
 Completes the article-family editorial rollout with the journal index. Extends
 the scoped `css/rz-article-dark.css` with an additive index-grid block
@@ -1254,28 +1257,28 @@ Fraunces hero + serif card titles across 27 cards; light = Inter (scope guard);
 NONE errors. Existing aurora hero + card layout preserved.
 
 ### Added
-- **`css/rz-article-dark.css`** â index-grid block: `.articles-hero h1/p`,
+- **`css/rz-article-dark.css`** — index-grid block: `.articles-hero h1/p`,
   `.article-card-title` (serif), `.article-card-excerpt`, `.article-card-number`
   (mono accent), `.article-card-category` (mono). Additive + scoped.
 
 ### Changed
-- **`articles.html`** â `<html data-rz-register="editorial"
+- **`articles.html`** — `<html data-rz-register="editorial"
   style="--rz-art-accent:#0891b2">` + Fraunces/Plex fonts + scoped editorial CSS.
   Structure + light mode untouched.
 
-### Rollout status â article family
+### Rollout status — article family
 - **32 pages on the editorial register**: 28 standard articles + geopolitics-1/2/3
   + articles.html index.
 - Out of scope (bespoke landing templates, parallel landing/index track):
   `insights.html`, `geopolitics.html`, `future-forward.html`,
-  `future-forward-1.html` â handed off to the landing/index design pass.
+  `future-forward-1.html` — handed off to the landing/index design pass.
 
 ---
 
-## v1.43.15 â 2026-06-14 (article editorial skin â geopolitics series 1â3)
+## v1.43.15 — 2026-06-14 (article editorial skin — geopolitics series 1–3)
 
 Extends the editorial-register rollout to the Geopolitics series children
-(same standard `.article-*` template as articles 1â26). Landing pages
+(same standard `.article-*` template as articles 1–26). Landing pages
 (`geopolitics.html`, `future-forward.html`) use bespoke templates and are
 out of scope here.
 
@@ -1283,9 +1286,9 @@ No cockpit/engine touched. Light mode unchanged (dark-scoped). Gates CLEAN.
 All three headless-verified (Fraunces title, read-progress, accent, NONE errors).
 
 ### Changed (editorial-register opt-in)
-- **`geopolitics-1.html`** â 72-Hour Warning â green `#059669`
-- **`geopolitics-2.html`** â $50T Shift â green `#059669`
-- **`geopolitics-3.html`** â Hormuz Fiber Shock â deep red `#991b1b`
+- **`geopolitics-1.html`** — 72-Hour Warning — green `#059669`
+- **`geopolitics-2.html`** — $50T Shift — green `#059669`
+- **`geopolitics-3.html`** — Hormuz Fiber Shock — deep red `#991b1b`
 
 ### Progress
 - Standard-template articles + geopolitics children on the editorial register:
@@ -1293,48 +1296,48 @@ All three headless-verified (Fraunces title, read-progress, accent, NONE errors)
 
 ---
 
-## v1.43.14 â 2026-06-14 (index dark-mode polish)
+## v1.43.14 — 2026-06-14 (index dark-mode polish)
 
 ### Changed
-- **Homepage (`index.html`) dark mode â polished, not reskinned.** Owner kept the
+- **Homepage (`index.html`) dark mode — polished, not reskinned.** Owner kept the
   current colourful bento character (emerald + pastel accents + rounded cards +
   photo + Inter); only the dark-mode *quality* was raised. Pure CSS, dark-only
-  (`[data-theme="dark"]` scoped) â **light/day mode unchanged**:
-  - **Layered card surfaces** â `.bento-card` gains a gradient body + inner top
+  (`[data-theme="dark"]` scoped) — **light/day mode unchanged**:
+  - **Layered card surfaces** — `.bento-card` gains a gradient body + inner top
     highlight + soft layered shadow (was flat `#131e2e`), so cards read with depth.
-  - **Per-card accent restored** â each `.bento-exp-card` keeps its `--bexp-accent`
+  - **Per-card accent restored** — each `.bento-exp-card` keeps its `--bexp-accent`
     (blue/emerald/amber/orange/violet) as an always-on corner glow (was an
-    invisible 6â12 % hover-only wash).
-  - **Hover lift** â cards rise 4px with a deeper shadow on hover.
-  - **Staggered reveal on load** â `bentoRise` keyframe walks the bento rows in on
+    invisible 6–12 % hover-only wash).
+  - **Hover lift** — cards rise 4px with a deeper shadow on hover.
+  - **Staggered reveal on load** — `bentoRise` keyframe walks the bento rows in on
     first paint; honours `prefers-reduced-motion`. No JS, no markup change.
 - Rules mirrored in both `styles.css` + `styles-index.css` (2-stylesheet rule),
   re-minified; cache-bust `styles-index.min.css?v=2026-06-14-polish`.
-- Plan + before/after mock: `plan-dark-mode-standard.html` Â§10 Â· `rz-index-polish.html`.
+- Plan + before/after mock: `plan-dark-mode-standard.html` §10 · `rz-index-polish.html`.
   See `standarization/DARK_MODE_STANDARD.md` (Track E3 index).
 
-## v1.43.13 â 2026-06-14 (EPMS â ATSârack final leg renders green)
+## v1.43.13 — 2026-06-14 (EPMS — ATS→rack final leg renders green)
 
 Owner-requested fix on `EPMS_Telemetry.html` (owner explicitly directed this
 edit; the earlier "jangan merusak" applied to the dark-skin rollout, not to
 operator-requested corrections).
 
-Single surgical change: the dashed flow line AFTER each rack ATS (ATS â Rack â
+Single surgical change: the dashed flow line AFTER each rack ATS (ATS → Rack —
 the final leg to the load) now renders GREEN instead of inheriting the upstream
 source colour (red, Feed A). Downstream of the ATS is on the protected/green
 bus regardless of which source the ATS selected.
 
 ### Changed
-- **`EPMS_Telemetry.html`** `energize()` â one conditional: wires whose id
+- **`EPMS_Telemetry.html`** `energize()` — one conditional: wires whose id
   starts with `w_ats_rack_` use colour class `energized-B` (green); all other
-  legs unchanged (upstream PDUâATS stays Feed-A red). Verified: 10/10 ATSârack
+  legs unchanged (upstream PDU→ATS stays Feed-A red). Verified: 10/10 ATS→rack
   legs green, upstream legs unchanged, NONE errors.
 
 No other EPMS wiring, engine, or page touched.
 
 ---
 
-## v1.43.12 â 2026-06-01 (article editorial skin â sweep: articles 2â18)
+## v1.43.12 — 2026-06-01 (article editorial skin — sweep: articles 2–18)
 
 Final wave of the standard-template article rollout. 17 articles opted into the
 editorial register in one sweep (pattern fully proven), each accent read from
@@ -1343,23 +1346,23 @@ register.**
 
 No cockpit/engine touched. Light mode unchanged (dark-scoped). Gates CLEAN.
 16/17 headless-verified clean; art-2 shows a PRE-EXISTING Chart.js
-`'helpers'` timing error (present on origin before this change â not caused by
+`'helpers'` timing error (present on origin before this change — not caused by
 the skin; the editorial chrome renders correctly).
 
-### Changed (editorial-register opt-in, articles 2â18)
-- Each: `<html data-rz-register="editorial" style="--rz-art-accent:â¦">` + fonts
+### Changed (editorial-register opt-in, articles 2–18)
+- Each: `<html data-rz-register="editorial" style="--rz-art-accent:…">` + fonts
   + `rz-article-dark.css` + `rz-article-editorial.js`. Accent per `theme-color`.
-- **`article-8.html`** â its `#8b5cf6` (Anthropic-purple, a CLAUDE.md rejected
+- **`article-8.html`** — its `#8b5cf6` (Anthropic-purple, a CLAUDE.md rejected
   token) was REMAPPED to editorial amber `#E8B563` to avoid reintroducing slop.
 
 ### Progress
-- **28 / 28 standard articles** on the editorial register (1, 2â18, 19â26).
-  Future-Forward + Geopolitics series pages use different templates â separate
+- **28 / 28 standard articles** on the editorial register (1, 2–18, 19–26).
+  Future-Forward + Geopolitics series pages use different templates — separate
   pass if desired.
 
 ---
 
-## v1.43.11 â 2026-06-01 (article editorial skin â batch 2: articles 23, 24, 25, 1)
+## v1.43.11 — 2026-06-01 (article editorial skin — batch 2: articles 23, 24, 25, 1)
 
 Third wave of the article editorial-register rollout. Same one-line-per-page
 opt-in via the shared `css/rz-article-dark.css`; each article keeps its series
@@ -1370,10 +1373,10 @@ All four headless-verified (Fraunces title, read-progress, correct accent,
 NONE errors).
 
 ### Changed (editorial-register opt-in)
-- **`article-23.html`** â xAI Colossus â red `#dc2626`
-- **`article-24.html`** â manpower shortage â green `#059669`
-- **`article-25.html`** â PJM grid crisis â deep red `#b91c1c`
-- **`article-1.html`** â When Nothing Happens â navy `#1e3a5f`
+- **`article-23.html`** — xAI Colossus — red `#dc2626`
+- **`article-24.html`** — manpower shortage — green `#059669`
+- **`article-25.html`** — PJM grid crisis — deep red `#b91c1c`
+- **`article-1.html`** — When Nothing Happens — navy `#1e3a5f`
 
 ### Progress
 - Articles on editorial register: 9 / 28 (26 pilot + 19/20/21/22 + 23/24/25/1).
@@ -1381,7 +1384,7 @@ NONE errors).
 
 ---
 
-## v1.43.10 â 2026-06-01 (article editorial skin â batch 1: articles 19â22)
+## v1.43.10 — 2026-06-01 (article editorial skin — batch 1: articles 19–22)
 
 Second wave of the article editorial-register rollout. Four articles opted in
 via the shared `css/rz-article-dark.css` (one-line-per-page pattern), each
@@ -1392,12 +1395,12 @@ All four headless-verified (Fraunces serif title, read-progress bar, correct
 accent, NONE errors).
 
 ### Changed (editorial-register opt-in)
-- **`article-19.html`** â Singapore vs Batam â cyan `#0891b2`
-- **`article-20.html`** â AI water use â red `#dc2626`
-- **`article-21.html`** â Nuclear SMRs â green `#059669`
-- **`article-22.html`** â NVIDIA photonics â cyan `#0891b2`
+- **`article-19.html`** — Singapore vs Batam — cyan `#0891b2`
+- **`article-20.html`** — AI water use — red `#dc2626`
+- **`article-21.html`** — Nuclear SMRs — green `#059669`
+- **`article-22.html`** — NVIDIA photonics — cyan `#0891b2`
 
-Each: `<html data-rz-register="editorial" style="--rz-art-accent:â¦">` + Fraunces/
+Each: `<html data-rz-register="editorial" style="--rz-art-accent:…">` + Fraunces/
 Plex fonts + `rz-article-dark.css` + `rz-article-editorial.js`. Structure +
 light mode untouched.
 
@@ -1407,7 +1410,7 @@ light mode untouched.
 
 ---
 
-## v1.43.9 â 2026-06-01 (article editorial skin + article-26 pilot)
+## v1.43.9 — 2026-06-01 (article editorial skin + article-26 pilot)
 
 Owner directed the skin rollout at ARTICLES (content), not the DC AI / DC
 Conventional cockpits. First real-page adoption of the editorial register.
@@ -1416,31 +1419,31 @@ No cockpit/engine touched. Light mode verified UNCHANGED (skin scoped to
 `data-rz-register="editorial"` + dark). Gates CLEAN. Pilot headless-verified.
 
 ### Added
-- **`css/rz-article-dark.css`** â editorial register for articles. Activates
+- **`css/rz-article-dark.css`** — editorial register for articles. Activates
   ONLY when `<html data-rz-register="editorial">` AND dark mode. Restyles the
   existing `.article-*` chrome: Fraunces serif title (italic accent), mono
   kickers/meta, drop-cap, accent rail on h2, editorial callout/quote rail,
   read-progress bar, staggered entrance. Body copy stays IBM Plex Sans for
   readability. Per-series accent via `--rz-art-accent` override.
-- **`js/rz-article-editorial.js`** â progressive-enhancement runtime
+- **`js/rz-article-editorial.js`** — progressive-enhancement runtime
   (read-progress bar + entrance stagger). No-op unless editorial register
   declared. Honours prefers-reduced-motion.
-- **`rz-article-mockup.html`** (noindex) â article before/after demo.
+- **`rz-article-mockup.html`** (noindex) — article before/after demo.
 
 ### Changed
-- **`article-26.html`** â PILOT. `<html data-rz-register="editorial"
+- **`article-26.html`** — PILOT. `<html data-rz-register="editorial"
   style="--rz-art-accent:#ef4444">` + Fraunces/Plex fonts + the editorial
   CSS/JS. Structure + light mode untouched.
-- **`plan-dark-mode-standard.html`** â new Â§08 (article editorial skin +
+- **`plan-dark-mode-standard.html`** — new §08 (article editorial skin +
   before/after iframe).
 
 ### Rollout plan
-- Shared CSS + one-line-per-page opt-in. Batch remaining 27 articles 3â4 per
+- Shared CSS + one-line-per-page opt-in. Batch remaining 27 articles 3–4 per
   ship, each with its series accent, after this pilot is approved.
 
 ---
 
-## v1.43.8 â 2026-06-01 (codify RZ Dark System into design.md â Section 16)
+## v1.43.8 — 2026-06-01 (codify RZ Dark System into design.md — Section 16)
 
 DOCS ship: folds the dark-mode design system into the brand bible as a
 permanent numbered chapter (was only a standalone standard + live demos).
@@ -1448,7 +1451,7 @@ permanent numbered chapter (was only a standalone standard + live demos).
 No page logic touched. audit-script-tags + audit-js-syntax + audit-version-stamp CLEAN.
 
 ### Changed
-- **`documentation/design.md`** â new **Section 16 "Dark Mode â RZ Dark System v1"**:
+- **`documentation/design.md`** — new **Section 16 "Dark Mode — RZ Dark System v1"**:
   why-it-exists, two-register principle (instrument + editorial, hybrid locked),
   tokens, 6 motion primitives (with the probe-safe count-up + hard-settle rule),
   anti-slop checklist, responsive rules, adoption order. Plus a Decision Log row
@@ -1461,32 +1464,32 @@ No page logic touched. audit-script-tags + audit-js-syntax + audit-version-stamp
 
 ---
 
-## v1.43.7 â 2026-06-01 (RZ Skin Gallery â before/after for all 12 surfaces + cockpit mockup)
+## v1.43.7 — 2026-06-01 (RZ Skin Gallery — before/after for all 12 surfaces + cockpit mockup)
 
 PATCH ship: comprehensive visual mockups for the dark-mode standard, per owner
 request "kurang banyak before after buat semua mock up" (make before/after
 mockups for ALL surfaces) + "enhance front end design skin".
 
-Internal/noindex only â no cockpit logic touched. Engine + #p-dash unchanged.
+Internal/noindex only — no cockpit logic touched. Engine + #p-dash unchanged.
 audit-script-tags + audit-js-syntax + audit-version-stamp CLEAN. Both new
 pages headless-verified NONE errors.
 
 ### Added
-- **`rz-skin-gallery.html`** (noindex) â before/after for 12 surfaces: KPI strip,
+- **`rz-skin-gallery.html`** (noindex) — before/after for 12 surfaces: KPI strip,
   telemetry line (trace-in), per-hall bars (grow+count), energy donut (sweep),
   SLD breakers (symbol + semantic colour), equipment inspector, ISA-18.2 alarm
   states, data-quality + sim banner, plan card, landing hero, buttons, data
   table. Instrument register for cockpit surfaces, editorial for content.
   Charts animate on load with hard-settle. Guarded getPointAtLength against
   non-finite path length (fixed mid-build).
-- **`rz-cockpit-mockup.html`** (noindex) â datahallAI cockpit slice before/after
+- **`rz-cockpit-mockup.html`** (noindex) — datahallAI cockpit slice before/after
   (KPI + MV-intake SLD + cooling trace) proving the instrument register lands
   on a cockpit WITHOUT breaking load-bearing semantic colours (feed A blue /
   feed B green / trip red / cooling cyan). Tripped breaker stays red both sides.
 
 ### Changed
-- **`plan-dark-mode-standard.html`** â new Â§02b (cockpit before/after iframe)
-  + new Â§07 (full skin gallery iframe). Q1 register-split marked LOCKED (hybrid).
+- **`plan-dark-mode-standard.html`** — new §02b (cockpit before/after iframe)
+  + new §07 (full skin gallery iframe). Q1 register-split marked LOCKED (hybrid).
   Version stamp bumped.
 
 ### Process
@@ -1495,41 +1498,41 @@ pages headless-verified NONE errors.
 
 ---
 
-## v1.43.6 â 2026-06-01 (planb PLAN 02 design-system card + dedicated plan page; hybrid register locked)
+## v1.43.6 — 2026-06-01 (planb PLAN 02 design-system card + dedicated plan page; hybrid register locked)
 
 PATCH ship: registers the dark-mode design-system plan in the planb hub as a
 live card and adds its dedicated visual plan page. Owner locked the HYBRID
 register split (instrument for cockpits, editorial for landing/articles).
 
-Internal/noindex only â no cockpit logic touched. Engine + #p-dash
+Internal/noindex only — no cockpit logic touched. Engine + #p-dash
 byte-identical (no change). audit-script-tags + audit-js-syntax CLEAN.
 
 ### Added
-- **`plan-dark-mode-standard.html`** (noindex) â dedicated PLAN 02 page in the
+- **`plan-dark-mode-standard.html`** (noindex) — dedicated PLAN 02 page in the
   editorial register (dogfoods RZ Dark System). Fully visual per the planb
   mandate: embeds the before/after demo + the 4-variant Style Lab switcher
   (iframes), register tables, anti-slop checklist, code, and the 3 decision
   questions. Carries version stamp.
 
 ### Changed
-- **`planb.html`** â new active "PLAN 02 Â· design system" card (cyan, live)
+- **`planb.html`** — new active "PLAN 02 · design system" card (cyan, live)
   linking to plan-dark-mode-standard.html; reserved slots renumbered to 03/04.
   Added the site version-stamp script.
-- **`standarization/DARK_MODE_STANDARD.md`** â marked the HYBRID register
+- **`standarization/DARK_MODE_STANDARD.md`** — marked the HYBRID register
   decision as LOCKED (2026-06-01).
 
 ### Decision
-- **HYBRID register split LOCKED** â Instrument register (oscilloscope
+- **HYBRID register split LOCKED** — Instrument register (oscilloscope
   character) for cockpits + SLD/P&ID labs; Editorial register (Fraunces serif,
   refined) for landing / articles / hubs / plans. Cockpit instrument re-skin
-  queued as a future ship â must preserve semantic SLD/alarm colours
+  queued as a future ship — must preserve semantic SLD/alarm colours
   (additive atmosphere/type only).
 
 ---
 
-## v1.43.5 â 2026-05-26 (RZ Dark System v1 + animated-on-load primitive applied to #p-dash)
+## v1.43.5 — 2026-05-26 (RZ Dark System v1 + animated-on-load primitive applied to #p-dash)
 
-Owner pivot: existing dark mode read as "AI design slop" â asked for animated-
+Owner pivot: existing dark mode read as "AI design slop" — asked for animated-
 data-on-load, distinctive type, intuitive responsive (ref raihankalla.id).
 This ship lays the design-system foundation + applies the first motion
 primitive to the real cockpit.
@@ -1538,31 +1541,31 @@ Engine + #p-dash DISPLAYED values byte-identical. 75/75 accuracy probe
 (count-up settles to exact original strings) + 57/57 + 22/22 + all strict
 audits PASS.
 
-### Added (design system â internal/reference)
+### Added (design system — internal/reference)
 
-- **`rz-style-lab.html`** (noindex) â 4 switchable dark-mode characters
+- **`rz-style-lab.html`** (noindex) — 4 switchable dark-mode characters
   (Oscilloscope / Blueprint / Terminal / Editorial). Each replays its
   signature animated chart on selection (trace-in / plot-in / grow / sweep)
   + KPI count-up. Mobile-responsive switcher. The character picker.
-- **`rz-dark-beforeafter.html`** (noindex) â side-by-side generic-dark vs
+- **`rz-dark-beforeafter.html`** (noindex) — side-by-side generic-dark vs
   RZ Dark System instrument register, same data block.
-- **`css/rz-dark.css`** â RZ Dark System v1 shared stylesheet. Two registers
+- **`css/rz-dark.css`** — RZ Dark System v1 shared stylesheet. Two registers
   (`[data-rz-register="instrument"|"editorial"]`) of one token system:
   shared signal semantics + base ramp + atmosphere + motion primitives.
-- **`standarization/DARK_MODE_STANDARD.md`** â the standard: two registers,
+- **`standarization/DARK_MODE_STANDARD.md`** — the standard: two registers,
   anti-slop checklist, tokens, type scale, motion primitives, responsive
   rules, adoption plan.
 
 ### Changed
 
-- **`datahallAI.html`** â first cockpit adoption of the "animated on load"
+- **`datahallAI.html`** — first cockpit adoption of the "animated on load"
   primitive. `#p-dash` headline KPIs (PUE/WUE/CUE/IT/GPU/NVL72) now count up
   on first paint via `requestAnimationFrame` cubic-ease.
   - **PROBE-SAFE**: each value's exact original string is captured and
-    restored verbatim at animation end â displayed final text byte-identical.
+    restored verbatim at animation end → displayed final text byte-identical.
   - **HARD-SETTLE guarantee**: a `setTimeout(settle, dur+300)` forces the
     exact original value even if rAF stalls (backgrounded/throttled tab).
-    Critical because dkGpu/dkDom are NOT refreshed by the 4s interval â without
+    Critical because dkGpu/dkDom are NOT refreshed by the 4s interval — without
     it a stalled animation could freeze a wrong basis number. Caught + fixed
     during verification (frozen 1.04 PUE / 6,148 GPU on a throttled read).
   - Honours `prefers-reduced-motion` (skips animation entirely).
@@ -1581,10 +1584,10 @@ audits PASS.
 
 ---
 
-## v1.43.4 â 2026-05-26 (alarm state machine + color discipline â review doc-27 Â§3.3 P0 + Â§4.3 P1)
+## v1.43.4 — 2026-05-26 (alarm state machine + color discipline — review doc-27 §3.3 P0 + §4.3 P1)
 
-MINOR ship: closes the LAST open P0 in review doc-27 â Â§3.3 color discipline
-("warna status harus menang atas warna domain") + Â§4.3 alarm state UX
+MINOR ship: closes the LAST open P0 in review doc-27 — §3.3 color discipline
+("warna status harus menang atas warna domain") + §4.3 alarm state UX
 (active/acknowledged/shelved/inhibited/returned-to-normal).
 
 Engine + `#p-dash` byte-identical. **52/52 line-model probe** (added 3 alarm-
@@ -1593,46 +1596,46 @@ state assertions per inspector page) + 75/75 accuracy probe + 57/57 + 22/22
 
 ### Added
 
-- **`js/rz-alarm-state.js`** â `window.RZAlarmState` ISA-18.2 alarm state
+- **`js/rz-alarm-state.js`** — `window.RZAlarmState` ISA-18.2 alarm state
   machine + colour-discipline arbiter:
   - 7 states (`normal` / `unack` / `ack` / `rtn_unack` / `shelved` /
     `suppressed` / `oos`). `oos` (maintenance) is visually distinct from
-    fault â closes review requirement.
+    fault — closes review requirement.
   - 4 severity tiers (critical / high / medium / low).
-  - `resolveColor(alarmState, domainColor)` â status colour WINS over domain
+  - `resolveColor(alarmState, domainColor)` — status colour WINS over domain
     unless `normal`. A faulted cooling pipe shows fault-red, not cyan.
-  - `deriveFromEquipment(equipState)` â maps line/breaker data-state into
+  - `deriveFromEquipment(equipState)` — maps line/breaker data-state into
     alarm state + severity + summary.
   - `chipHtml()` + `audit()`.
-- **`standarization/ALARM_STATE.md`** â full schema + adoption table.
+- **`standarization/ALARM_STATE.md`** — full schema + adoption table.
 
 ### Changed
 
-- **`js/rz-inspector.js`** â Alarms tab now renders an ISA-18.2 alarm-state
+- **`js/rz-inspector.js`** — Alarms tab now renders an ISA-18.2 alarm-state
   chip + derived summary via `RZAlarmState.deriveFromEquipment()`. Graceful
   fallback to v1.43.0 inline logic if the library is absent.
 - **`datahallAI.html` / `chiller-plant.html` / `water-system.html` /
-  `fire-system.html`** â `<script src="js/rz-alarm-state.js?v=1.43.4" defer>`
+  `fire-system.html`** — `<script src="js/rz-alarm-state.js?v=1.43.4" defer>`
   loaded before the inspector. Inspector cache bumped to `?v=1.43.4`.
-- **`tools/probe-line-model.mjs`** â 3 new assertions per inspector page:
+- **`tools/probe-line-model.mjs`** — 3 new assertions per inspector page:
   `RZAlarmState exposed`, color-discipline (status overrides domain),
-  faultâunack/critical derivation.
+  fault→unack/critical derivation.
 
 ### Scope discipline
 
 - **`EPMS_Telemetry.html`** still untouched per owner mandate.
 
-### Review doc-27 P0 status â ALL CLOSED
+### Review doc-27 P0 status — ALL CLOSED
 
-| Â§ | Item | Ship |
+| § | Item | Ship |
 |---|---|---|
-| Â§3.1 | Line metadata | v1.42.0âv1.42.5 |
-| Â§3.2 | Right-side inspector | v1.43.0âv1.43.1 |
-| Â§3.3 | Color discipline | **v1.43.4** |
-| Â§3.4 | Simulation banner + KPI tooltip | v1.43.2 + v1.43.3 |
-| Â§5.3 | Breaker symbols | v1.42.1 |
-| Â§5.5 | Network speed/util/failure-domain | v1.42.3 |
-| Â§5.7 | BMS/DCIM data quality | v1.43.2 |
+| §3.1 | Line metadata | v1.42.0–v1.42.5 |
+| §3.2 | Right-side inspector | v1.43.0–v1.43.1 |
+| §3.3 | Color discipline | **v1.43.4** |
+| §3.4 | Simulation banner + KPI tooltip | v1.43.2 + v1.43.3 |
+| §5.3 | Breaker symbols | v1.42.1 |
+| §5.5 | Network speed/util/failure-domain | v1.42.3 |
+| §5.7 | BMS/DCIM data quality | v1.43.2 |
 
 ### Docs
 
@@ -1644,15 +1647,15 @@ state assertions per inspector page) + 75/75 accuracy probe + 57/57 + 22/22
 
 ---
 
-## v1.43.3 â 2026-05-26 (headline KPI source+formula+timestamp tooltips â review doc-27 Â§3.4 P0)
+## v1.43.3 — 2026-05-26 (headline KPI source+formula+timestamp tooltips — review doc-27 §3.4 P0)
 
-MINOR ship: closes the remaining half of review doc-27 Â§3.4 P0 ("Setiap
+MINOR ship: closes the remaining half of review doc-27 §3.4 P0 ("Setiap
 number card harus punya tooltip 'source + formula + timestamp'"). The
 `#p-dash` dashboard's 7 headline KPI cards now carry hover tooltips citing
 the engine path, the formula, and the live update timestamp.
 
 Owner-exclusion on `#p-dash` was lifted 2026-05-23, so this binding is
-permitted under the accuracy gates. **ADDITIVE only** â the tooltip sets
+permitted under the accuracy gates. **ADDITIVE only** — the tooltip sets
 the `title` attribute; textContent (the displayed value) is never touched,
 so the no-random-on-basis-KPI accuracy rule stays intact.
 
@@ -1662,23 +1665,23 @@ basis regression) + 57/57 + 22/22 + all strict audits PASS.
 
 ### Changed
 
-- **`datahallAI.html` `updateDashKPI()`** â appended an additive IIFE that
+- **`datahallAI.html` `updateDashKPI()`** — appended an additive IIFE that
   sets a `title` tooltip on each headline KPI value:
-  - `dkPue` â "PUE = Total facility kW Ã· IT kW" Â· DATAHALL_CALC.pueBasis()
-  - `dkWue` â "WUE = water L Ã· IT kWh = 0 (dry-cooler closed loop)" Â· BASELINE-DECISION.md
-  - `dkCue` â "CUE_IT = grid factor Ã PUE = 0.69 Ã <pue>" Â· PLN Java grid 2025
-  - `dkIt` â "IT Load = 4 halls Ã 27 NVL72 Ã 132 kW = 14.256 MW" Â· Scenario A
-  - `dkGpu` â "GPUs = 108 domains Ã 72 = 7,776" Â· DATAHALL_MODEL
-  - `dkDom` â "NVL72 domains = 4 halls Ã 27 = 108" Â· DATAHALL_MODEL
-  - `dkCdu` â "CDU = ceil(3,029 kW Ã· 350) = 9/12 per hall Ã 4" Â· lockedState().cdu
-  - Each tooltip ends with "Updated: HH:MM:SS (engine-derived, SIM)" â
+  - `dkPue` — "PUE = Total facility kW ÷ IT kW" · DATAHALL_CALC.pueBasis()
+  - `dkWue` — "WUE = water L ÷ IT kWh = 0 (dry-cooler closed loop)" · BASELINE-DECISION.md
+  - `dkCue` — "CUE_IT = grid factor × PUE = 0.69 × <pue>" · PLN Java grid 2025
+  - `dkIt` — "IT Load = 4 halls × 27 NVL72 × 132 kW = 14.256 MW" · Scenario A
+  - `dkGpu` — "GPUs = 108 domains × 72 = 7,776" · DATAHALL_MODEL
+  - `dkDom` — "NVL72 domains = 4 halls × 27 = 108" · DATAHALL_MODEL
+  - `dkCdu` — "CDU = ceil(3,029 kW ÷ 350) = 9/12 per hall × 4" · lockedState().cdu
+  - Each tooltip ends with "Updated: HH:MM:SS (engine-derived, SIM)" —
     timestamp refreshes on every 4s tick so operators see data freshness.
-- **`tools/probe-line-model.mjs`** â added datahallAI assertion: all 7
+- **`tools/probe-line-model.mjs`** — added datahallAI assertion: all 7
   headline KPIs carry a `title` containing both `Source:` and `Updated:`.
 
 ### Scope discipline
 
-- **Displayed KPI values unchanged** â accuracy probe confirms no
+- **Displayed KPI values unchanged** — accuracy probe confirms no
   random-basis regression. The owner-excluded `#p-dash` displayed numbers
   are byte-identical; only the hover `title` metadata is new.
 - **`EPMS_Telemetry.html`** still untouched per owner mandate.
@@ -1693,30 +1696,30 @@ basis regression) + 57/57 + 22/22 + all strict audits PASS.
 
 ---
 
-## v1.43.2 â 2026-05-26 (data-quality service â review doc-27 Â§3.4 + Â§5.7)
+## v1.43.2 — 2026-05-26 (data-quality service — review doc-27 §3.4 + §5.7)
 
-MINOR ship: closes review doc-27 Â§3.4 ("simulation mode banner") + Â§5.7 P1
+MINOR ship: closes review doc-27 §3.4 ("simulation mode banner") + §5.7 P1
 (BMS/DCIM data-quality discipline) + doc-28 Global UIUX Corrections ("data
 freshness badge on top bar"). Introduces the data-quality service that
 surfaces telemetry trust at both page level (banner) and point level (chip).
 
 Engine + `#p-dash` byte-identical. **39/39 line-model probe pass** (added
-3 telemetry-quality assertions per inspector page â total +12) + 75/75
+3 telemetry-quality assertions per inspector page — total +12) + 75/75
 accuracy probe + 57/57 + 22/22 + all strict audits PASS.
 
 ### Added
 
-- **`js/rz-telemetry-quality.js`** â `window.RZTelemetryQuality` service:
+- **`js/rz-telemetry-quality.js`** — `window.RZTelemetryQuality` service:
   - 7 states with colour + chip label (`live` / `simulated` / `stale` /
     `manual` / `comms_lost` / `inhibited` / `demo`).
-  - Page-level `setPageMode(mode)` â injects dismissible top banner
+  - Page-level `setPageMode(mode)` → injects dismissible top banner
     (skips render when mode = `live`).
   - Per-element `markPoint(el, state)` + `getPointState(el)` (falls back to
     page mode if no explicit `data-quality-state`).
-  - `chipHtml(state)` â small inline chip for embedded rendering.
+  - `chipHtml(state)` — small inline chip for embedded rendering.
   - `audit(rootEl)` consumed by `probe-line-model.mjs`.
   - Auto-init on `DOMContentLoaded` if `<body data-rz-data-mode="...">` set.
-- **`standarization/TELEMETRY_QUALITY.md`** â full schema + adoption table.
+- **`standarization/TELEMETRY_QUALITY.md`** — full schema + adoption table.
 - **Inspector Live tab** now renders a Data Quality chip below State,
   reading `RZTelemetryQuality.getPointState(currentElement)`.
 
@@ -1727,14 +1730,14 @@ accuracy probe + 57/57 + 22/22 + all strict audits PASS.
     unchanged).
   - `<script src="js/rz-telemetry-quality.js?v=1.43.2" defer>` loaded after
     inspector. Both scripts bumped to `?v=1.43.2`.
-- **`chiller-plant.html`** â same body attribute + script. Body otherwise
+- **`chiller-plant.html`** — same body attribute + script. Body otherwise
   byte-identical.
-- **`water-system.html`** â same body attribute + script.
-- **`fire-system.html`** â same body attribute + script.
-- **`js/rz-inspector.js`** â Live tab renders a "Data quality" row reading
+- **`water-system.html`** — same body attribute + script.
+- **`fire-system.html`** — same body attribute + script.
+- **`js/rz-inspector.js`** — Live tab renders a "Data quality" row reading
   the element's `data-quality-state` (or inherited page mode). No other
   inspector behaviour changes.
-- **`tools/probe-line-model.mjs`** â added 3 telemetry-quality assertions
+- **`tools/probe-line-model.mjs`** — added 3 telemetry-quality assertions
   per inspector page:
   - `window.RZTelemetryQuality exposed`
   - `body data-rz-data-mode = 'simulated'`
@@ -1742,7 +1745,7 @@ accuracy probe + 57/57 + 22/22 + all strict audits PASS.
 
 ### Scope discipline (unchanged)
 
-- **`EPMS_Telemetry.html`** â untouched per owner mandate.
+- **`EPMS_Telemetry.html`** — untouched per owner mandate.
 
 ### Docs
 
@@ -1754,10 +1757,10 @@ accuracy probe + 57/57 + 22/22 + all strict audits PASS.
 
 ---
 
-## v1.43.1 â 2026-05-26 (inspector cross-page parity â chiller-plant + water-system + fire-system)
+## v1.43.1 — 2026-05-26 (inspector cross-page parity — chiller-plant + water-system + fire-system)
 
 PATCH ship: extends the v1.43.0 right-side inspector to the three other
-tagged cockpit pages. Pure additive â one `<script src>` per page,
+tagged cockpit pages. Pure additive — one `<script src>` per page,
 no rendering changes, no DOM modifications.
 
 Engine + `#p-dash` byte-identical. **27/27 line-model probe** (added 6
@@ -1766,34 +1769,34 @@ probe + 57/57 + 22/22 + all strict audits PASS.
 
 ### Changed
 
-- **`chiller-plant.html`** â `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+- **`chiller-plant.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
   added after rz-breaker-symbols.js. Click any of the 18 tagged CHW pipes
-  â inspector opens.
-- **`water-system.html`** â `<script src="js/rz-inspector.js?v=1.43.0" defer>`
-  added after rz-line-model.js. Click any of the 10 tagged pipes â inspector
+  → inspector opens.
+- **`water-system.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+  added after rz-line-model.js. Click any of the 10 tagged pipes → inspector
   opens.
-- **`fire-system.html`** â `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+- **`fire-system.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
   added after rz-line-model.js. Click any of the 14 tagged fire-water / N2
-  pipes â inspector opens.
-- **`tools/probe-line-model.mjs`** â `INSPECTOR_PAGES` set extended; every
+  pipes → inspector opens.
+- **`tools/probe-line-model.mjs`** — `INSPECTOR_PAGES` set extended; every
   tagged cockpit page now verifies inspector availability + click-to-open
   behaviour.
 
 ### Scope discipline (unchanged)
 
-- **`EPMS_Telemetry.html`** â still untouched per owner mandate
-  ("jangan merusak EPMS DC Conventional ya, enhance bole" â 2026-05-26).
-- **`dc-conventional.html`** â landing page, no inspector needed
+- **`EPMS_Telemetry.html`** — still untouched per owner mandate
+  ("jangan merusak EPMS DC Conventional ya, enhance bole" — 2026-05-26).
+- **`dc-conventional.html`** — landing page, no inspector needed
   (no tagged equipment).
 
 ### Cumulative state after v1.43.1
 
 | Page | Lines | Breakers | Inspector |
 |---|---|---|---|
-| datahallAI.html | 171 | 36 | â |
-| chiller-plant.html | 18 | 0 | â |
-| water-system.html | 10 | 0 | â |
-| fire-system.html | 14 | 0 | â |
+| datahallAI.html | 171 | 36 | ✓ |
+| chiller-plant.html | 18 | 0 | ✓ |
+| water-system.html | 10 | 0 | ✓ |
+| fire-system.html | 14 | 0 | ✓ |
 
 ### Docs
 
@@ -1804,9 +1807,9 @@ probe + 57/57 + 22/22 + all strict audits PASS.
 
 ---
 
-## v1.43.0 â 2026-05-26 (right-side inspector â review doc-27 Â§3.2 P0)
+## v1.43.0 — 2026-05-26 (right-side inspector — review doc-27 §3.2 P0)
 
-MINOR ship: closes review doc-27 Â§3.2 P0 ("Equipment popup masih MODAL
+MINOR ship: closes review doc-27 §3.2 P0 ("Equipment popup masih MODAL
 CENTER, menutup topology. Jadikan click equipment membuka right-side
 inspector, bukan modal tengah").
 
@@ -1822,35 +1825,35 @@ the two new inspector assertions: `window.RZInspector exposed` +
 
 ### Added
 
-- **`js/rz-inspector.js`** â self-contained inspector library. Vanilla
+- **`js/rz-inspector.js`** — self-contained inspector library. Vanilla
   ES5, no external dependencies. CSS injected on init (scoped to
   `.rz-inspector*`).
-  - Slide-in panel from right (360px desktop, full-width on â¤640px).
+  - Slide-in panel from right (360px desktop, full-width on ≤640px).
   - 6 tabs read directly from element `data-*` attributes.
-  - Delegated click handler â catches dynamically-rendered elements.
+  - Delegated click handler — catches dynamically-rendered elements.
   - ESC + outside-click close.
   - Dependency-card click navigates to linked equipment ID.
   - Pulsing dot when state=energized. Colour-coded state pills.
-  - State machine respects review doc-27 Â§4.3 alarm philosophy
+  - State machine respects review doc-27 §4.3 alarm philosophy
     (active / acknowledged / inhibited / RTN derived from state).
-- **`standarization/INSPECTOR.md`** â schema, tabs, API, adoption table,
+- **`standarization/INSPECTOR.md`** — schema, tabs, API, adoption table,
   authoring guidelines.
 
 ### Changed
 
-- **`datahallAI.html`** â `<script src="js/rz-inspector.js?v=1.43.0" defer>`
+- **`datahallAI.html`** — `<script src="js/rz-inspector.js?v=1.43.0" defer>`
   loaded after rz-breaker-symbols.js. Other cockpit pages (chiller-plant,
   water-system, fire-system) deferred to v1.43.1 to limit blast radius.
-- **`tools/probe-line-model.mjs`** â extended for datahallAI:
+- **`tools/probe-line-model.mjs`** — extended for datahallAI:
   asserts `window.RZInspector` exposed + synthetic click on first
   `[data-rz-line]` opens the panel.
 
 ### Scope discipline
 
 - **`EPMS_Telemetry.html` intentionally untouched** per the owner mandate
-  ("jangan merusak EPMS DC Conventional ya, enhance bole" â 2026-05-26).
+  ("jangan merusak EPMS DC Conventional ya, enhance bole" — 2026-05-26).
 - Other cockpit pages (chiller-plant, water-system, fire-system) deferred
-  to v1.43.1 â additive script load only, no rendering change.
+  to v1.43.1 — additive script load only, no rendering change.
 
 ### Docs
 
@@ -1861,16 +1864,16 @@ the two new inspector assertions: `window.RZInspector exposed` +
 
 ---
 
-## v1.42.5 â 2026-05-26 (water-system + fire-system static SVG pipes tagged)
+## v1.42.5 — 2026-05-26 (water-system + fire-system static SVG pipes tagged)
 
-MINOR ship: sixth in the v1.42.x â v1.45.x sweep. Cross-page adoption
+MINOR ship: sixth in the v1.42.x → v1.45.x sweep. Cross-page adoption
 extends to water-system.html (water treatment P&ID) and fire-system.html
 (fire-water + N2 distribution P&ID).
 
 Static SVG `<path class="pipe-base">` elements tagged inline with
 `data-rz-line="1"` + `data-from` / `data-to` / `data-medium` / `data-state`
 / `data-capacity` / `data-current` / `data-redundancy` / `data-sensor`.
-No JS changes â the validator queries the static attributes.
+No JS changes — the validator queries the static attributes.
 
 Engine + `#p-dash` byte-identical. 19/19 line-model probe pass
 (datahallAI 171L+36B; chiller-plant 18L; water-system 10L; fire-system 14L)
@@ -1878,18 +1881,18 @@ Engine + `#p-dash` byte-identical. 19/19 line-model probe pass
 
 ### Added
 
-- **`water-system.html`** + **`fire-system.html`** â `js/rz-line-model.js`
+- **`water-system.html`** + **`fire-system.html`** — `js/rz-line-model.js`
   loaded non-deferred after `conv-engine.js` so the probe can call
   `window.RZLineModel.audit()`.
 
 ### Changed (additive metadata only, visual identical)
 
-- **`water-system.html`** â **10 pipes** tagged inline (raw â filter â
-  pump â UV â treated tank/makeup chains, backwash drain, makeup blowdown):
+- **`water-system.html`** — **10 pipes** tagged inline (raw → filter →
+  pump → UV → treated tank/makeup chains, backwash drain, makeup blowdown):
   `ws-mains-in`, `ws-raw-to-filter`, `ws-filter-to-pump`, `ws-pump-to-uv`,
   `ws-uv-to-treated-header`, `ws-treated-to-domtank`, `ws-treated-to-makeup`,
   `ws-domtank-to-service`, `ws-bw-to-drain`, `ws-makeup-blowdown`.
-- **`fire-system.html`** â **14 pipes** tagged inline:
+- **`fire-system.html`** — **14 pipes** tagged inline:
   `fs-landlord-makeup`, `fs-suction-header`, `fs-n2-supply`,
   `fs-fp01-discharge`, `fs-jp-discharge`, `fs-fp02-discharge`,
   `fs-to-wet-zone`, `fs-to-preaction-zone`,
@@ -1897,7 +1900,7 @@ Engine + `#p-dash` byte-identical. 19/19 line-model probe pass
 
 ### Probe infrastructure
 
-- **`tools/probe-line-model.mjs`** â `waitUntil:'load'` (was `networkidle2`)
+- **`tools/probe-line-model.mjs`** — `waitUntil:'load'` (was `networkidle2`)
   to avoid timeouts on pages with long-running flow animations.
 - Targets bumped:
   `water-system.html: 10`, `fire-system.html: 14`.
@@ -1911,11 +1914,11 @@ Engine + `#p-dash` byte-identical. 19/19 line-model probe pass
 
 ---
 
-## v1.42.4 â 2026-05-26 (first cross-page adoption â chiller-plant.html CHW P&ID)
+## v1.42.4 — 2026-05-26 (first cross-page adoption — chiller-plant.html CHW P&ID)
 
-MINOR ship: fifth in the v1.42.x â v1.45.x sweep. First port to a SECOND
+MINOR ship: fifth in the v1.42.x → v1.45.x sweep. First port to a SECOND
 page (`chiller-plant.html`). Owner mandate respected: **EPMS_Telemetry.html
-intentionally untouched** â additive enhancement only, no rendering changes.
+intentionally untouched** — additive enhancement only, no rendering changes.
 
 Engine + `#p-dash` byte-identical. 11/11 line-model probe (datahallAI 171
 lines + 36 breakers; chiller-plant 18 lines) + 75/75 accuracy probe +
@@ -1923,33 +1926,33 @@ lines + 36 breakers; chiller-plant 18 lines) + 75/75 accuracy probe +
 
 ### Added
 
-- **`chiller-plant.html` script imports** â `js/rz-line-model.js` +
+- **`chiller-plant.html` script imports** — `js/rz-line-model.js` +
   `js/rz-breaker-symbols.js` loaded non-deferred after `conv-engine.js`,
   before `drawPid()` inline IIFE can call them.
 
 ### Changed
 
-- **`chiller-plant.html` `drawPid()` function** â `const RZL = window.RZLineModel;`
+- **`chiller-plant.html` `drawPid()` function** — `const RZL = window.RZLineModel;`
   binding added at top.
-  - **+16 branch lines** ported (4 chiller loops Ã 4 lines):
-    - `chw-sup-drop-{loopId}` (CHWS header â loop supply tee)
-    - `chw-sup-leg-{loopId}` (loop supply tee â evaporator)
-    - `chw-ret-drop-{loopId}` (CHWR header â loop return tee)
-    - `chw-ret-leg-{loopId}` (evaporator â loop return tee)
+  - **+16 branch lines** ported (4 chiller loops × 4 lines):
+    - `chw-sup-drop-{loopId}` (CHWS header → loop supply tee)
+    - `chw-sup-leg-{loopId}` (loop supply tee → evaporator)
+    - `chw-ret-drop-{loopId}` (CHWR header → loop return tee)
+    - `chw-ret-leg-{loopId}` (evaporator → loop return tee)
     - State binds to `evalLoop(lp).level` (fault when ALARM, energized otherwise).
     - Sensor tags `TT-CHWS-{i+1}` / `TT-CHWR-{i+1}`.
   - **+2 header lines** ported:
-    - `chw-header-supply` (CHILLER-PLANT â BUILDING-AHU,
+    - `chw-header-supply` (CHILLER-PLANT → BUILDING-AHU,
       data-current bound to engine `coolingKw` + flow + temp)
-    - `chw-header-return` (BUILDING-AHU â CHILLER-PLANT)
+    - `chw-header-return` (BUILDING-AHU → CHILLER-PLANT)
   - Animation overlay (`<line class="flow chws|chwr" />`) unchanged.
   - All ports use `style.stroke='currentColor'` to preserve the existing
     `.pipe` CSS class colour (no visual regression).
-- **`tools/probe-line-model.mjs`** â `ADOPTION_TARGETS['chiller-plant.html'] = 18`.
+- **`tools/probe-line-model.mjs`** — `ADOPTION_TARGETS['chiller-plant.html'] = 18`.
 
 ### NOT changed (owner mandate)
 
-- **`EPMS_Telemetry.html`** â left byte-identical. Owner: "jangan merusak
+- **`EPMS_Telemetry.html`** — left byte-identical. Owner: "jangan merusak
   EPMS DC Conventional ya, enhance bole". Future ports to EPMS will follow
   a separate, more cautious plan (likely v1.43.x with inspector pattern
   ready first).
@@ -1963,9 +1966,9 @@ lines + 36 breakers; chiller-plant 18 lines) + 75/75 accuracy probe +
 
 ---
 
-## v1.42.3 â 2026-05-26 (network fabric link semantics â netSvg port)
+## v1.42.3 — 2026-05-26 (network fabric link semantics — netSvg port)
 
-MINOR ship: fourth in the v1.42.x â v1.45.x sweep. Closes review doc-27 Â§5.5
+MINOR ship: fourth in the v1.42.x → v1.45.x sweep. Closes review doc-27 §5.5
 P0 ("Tampilkan spine/leaf/super-spine grouping. Link harus punya speed:
 100G/200G/400G/800G. Tampilkan utilization, packet loss, latency,
 oversubscription ratio. Tampilkan failure domain: rack, row, pod,
@@ -1986,17 +1989,17 @@ probe + 57/57 + 22/22 + all strict audits PASS.
     - `data-capacity="800 Gb/s IB XDR"`
     - `data-current="782 Gb/s"`
     - `data-redundancy="redundant_a"`
-    - `data-tag="rail-{si+1} / dom-pod-{li+1}"` (failure domain â 4-rail FT)
+    - `data-tag="rail-{si+1} / dom-pod-{li+1}"` (failure domain — 4-rail FT)
   - **+27 NVL72 domain-to-leaf bundled lanes** ported. IDs: `dom{n}-to-LF-{li}`.
     Each carries:
     - `data-medium="fiber"`
-    - `data-capacity="4Ã 800 Gb/s NIC"`
+    - `data-capacity="4× 800 Gb/s NIC"`
     - `data-current="756 Gb/s"`
     - `data-tag="leaf-row-{ri} / pod-{lfIdx+1}"`
   - Visual identical (preserves `var(--p)` purple for spine-leaf and
     `var(--b)` blue for domain-leaf via `style.stroke` override). Laser
     overlay (hover-reveal individual links) unchanged.
-- **`tools/probe-line-model.mjs`** â `ADOPTION_TARGETS.datahallAI.html = 171`.
+- **`tools/probe-line-model.mjs`** — `ADOPTION_TARGETS.datahallAI.html = 171`.
 
 ### Docs
 
@@ -2007,12 +2010,12 @@ probe + 57/57 + 22/22 + all strict audits PASS.
 
 ---
 
-## v1.42.2 â 2026-05-26 (per-DH Electrical SLDs L0+L1 â drawDH() port Ã 4 halls)
+## v1.42.2 — 2026-05-26 (per-DH Electrical SLDs L0+L1 — drawDH() port × 4 halls)
 
-MINOR ship: third in the v1.42.x â v1.45.x sweep. Ports the SHARED drawDH()
+MINOR ship: third in the v1.42.x → v1.45.x sweep. Ports the SHARED drawDH()
 function (called once per DH-01..04) so every per-hall SLD now carries the
 line-model + breaker-symbol metadata. Each port multiplies by 4 across the
-four data hall containers (elecDH1SvgâelecDH4Svg).
+four data hall containers (elecDH1Svg–elecDH4Svg).
 
 Engine + `#p-dash` byte-identical. 75/75 accuracy probe + 57/57 + 22/22 +
 all strict audits PASS. Line-model probe **7/7** at the bumped targets
@@ -2020,30 +2023,30 @@ all strict audits PASS. Line-model probe **7/7** at the bumped targets
 
 ### Changed
 
-- **`datahallAI.html` drawDH() function** â local `var RZL/RZB` bindings
+- **`datahallAI.html` drawDH() function** — local `var RZL/RZB` bindings
   added at top after coordinate constants. L0 (MV Customer Substation)
   and L1 (RMU) sections ported:
-  - **L0 lines** (Ã4 halls = 44 tagged):
-    - `dh{n}-pln-{a,b}-to-meter` (utility â revenue meter)
-    - `dh{n}-meter-{a,b}-to-vcb` (meter â VCB incomer)
-    - `dh{n}-vcb-inc-{a,b}-to-bus` (incomer â SM6 bus drop)
+  - **L0 lines** (×4 halls = 44 tagged):
+    - `dh{n}-pln-{a,b}-to-meter` (utility → revenue meter)
+    - `dh{n}-meter-{a,b}-to-vcb` (meter → VCB incomer)
+    - `dh{n}-vcb-inc-{a,b}-to-bus` (incomer → SM6 bus drop)
     - `dh{n}-bus-tie` (purple N.O., redundancy=tie)
-    - `dh{n}-bus-to-f{a,b}` (bus â feeder)
+    - `dh{n}-bus-to-f{a,b}` (bus → feeder)
     - `dh{n}-f{a,b}-to-rmu-drop` (feeder exit to RMU)
-  - **L0 breakers** (Ã4 halls = 20 tagged):
+  - **L0 breakers** (×4 halls = 20 tagged):
     - `VCB-INC-DH{n}-{A,B}` (closed, 50/51, PPE2)
     - `VCB-TIE-DH{n}` (open, 25/27 sync, tie)
     - `F{n}{A,B}-DH` (closed, 50/51, PPE2)
-  - **L1 lines** (Ã4 halls = 36 tagged):
+  - **L1 lines** (×4 halls = 36 tagged):
     - `dh{n}-rmu-input-{a,b}` (entry to RMU panel)
     - `dh{n}-rmu-meter-{a,b}-to-vcb` (meter to RMU VCB)
     - `dh{n}-rmu-vcb-{a,b}-to-bus` (RMU bus drop)
     - `dh{n}-rmu-bus-tie` (purple N.O., redundancy=tie)
-    - `dh{n}-rmu-bus-{a,b}-drop` (RMU bus â TX downstream)
-  - **L1 breakers** (Ã4 halls = 12 tagged):
+    - `dh{n}-rmu-bus-{a,b}-drop` (RMU bus → TX downstream)
+  - **L1 breakers** (×4 halls = 12 tagged):
     - `VCB-RMU-DH{n}-{A,B}` (closed, 50/51, IDMT OC)
     - `VCB-TIE-RMU-DH{n}` (open, 25/27 sync, tie)
-- **`tools/probe-line-model.mjs`** â targets bumped:
+- **`tools/probe-line-model.mjs`** — targets bumped:
   `ADOPTION_TARGETS.datahallAI.html = 112`, `BREAKER_TARGETS.datahallAI.html = 36`.
 
 ### Docs
@@ -2055,9 +2058,9 @@ all strict audits PASS. Line-model probe **7/7** at the bumped targets
 
 ---
 
-## v1.42.1 â 2026-05-26 (IEC/ANSI breaker symbol library + Electrical SLD overview port)
+## v1.42.1 — 2026-05-26 (IEC/ANSI breaker symbol library + Electrical SLD overview port)
 
-MINOR ship: second in the v1.42.x â v1.45.x sweep. Adds the breaker symbol
+MINOR ship: second in the v1.42.x → v1.45.x sweep. Adds the breaker symbol
 library that the review docs flagged as P0 ("Red/green line can be misread as
 energized / alarm / source. Breaker state needs SYMBOL, not just color."),
 and ports the Electrical SLD overview to use both `RZLineModel` + new
@@ -2067,20 +2070,20 @@ Engine + `#p-dash` byte-identical. Probe targets bumped accordingly.
 
 ### Added
 
-- **`js/rz-breaker-symbols.js`** â `window.RZBreakerSymbols` IEC 60617 /
+- **`js/rz-breaker-symbols.js`** — `window.RZBreakerSymbols` IEC 60617 /
   IEEE C37.2 compliant symbol library. 7 STATES with distinct glyphs:
-  - `closed` â vertical mechanical link
-  - `open` â angled arm separated from upper terminal
-  - `tripped` â open arm + red X overlay + pulse animation
-  - `racked_out` â dashed cradle bracket + open arm
-  - `test` â open arm + 'T' badge
-  - `maintenance` â open arm + padlock badge (LOTO)
-  - `disabled` â faint arm + diagonal slash
+  - `closed` — vertical mechanical link
+  - `open` — angled arm separated from upper terminal
+  - `tripped` — open arm + red X overlay + pulse animation
+  - `racked_out` — dashed cradle bracket + open arm
+  - `test` — open arm + 'T' badge
+  - `maintenance` — open arm + padlock badge (LOTO)
+  - `disabled` — faint arm + diagonal slash
   - 11 ANSI device function numbers (25/27/50/51/52/67/67N/81/86/87T/87B)
-  - 4 NFPA 70E PPE categories (PPE1âPPE4)
-- **`standarization/BREAKER_SYMBOLS.md`** â full schema + glyph table +
+  - 4 NFPA 70E PPE categories (PPE1–PPE4)
+- **`standarization/BREAKER_SYMBOLS.md`** — full schema + glyph table +
   device-function reference + adoption schedule.
-- **Probe extended** (`tools/probe-line-model.mjs`) â verifies breaker
+- **Probe extended** (`tools/probe-line-model.mjs`) — verifies breaker
   tagging alongside line tagging. Result: **7 pass, 0 fail** at v1.42.1
   (32 lines + 4 breakers tagged on `datahallAI.html`).
 
@@ -2093,7 +2096,7 @@ Engine + `#p-dash` byte-identical. Probe targets bumped accordingly.
     - `elec-vcb-inc-{a,b}-to-bus-{a,b}` (incomer to MV bus, horiz + vert drops)
     - `elec-bus-a-drop-vert` / `elec-bus-b-drop-vert`
     - `elec-bus-tie` (bus tie N.O., redundancy=tie)
-    - 8 feeder loop Ã 2 segments = 16 feeders (`elec-feeder-{a,b}{1-4}-drop` / `-exit`)
+    - 8 feeder loop × 2 segments = 16 feeders (`elec-feeder-{a,b}{1-4}-drop` / `-exit`)
   - **4 breakers** ported to `RZBreakerSymbols.render()` (pilot):
     - `VCB-INC-A` (closed, redundant_a, 50/51/67N, PPE2)
     - `VCB-INC-B` (closed, redundant_b, 50/51/67N, PPE2)
@@ -2104,18 +2107,18 @@ Engine + `#p-dash` byte-identical. Probe targets bumped accordingly.
 
 ### Process
 
-- Review-doc mandates addressed: doc-27 Â§3.1 + Â§5.3, doc-17 Â§3.2,
+- Review-doc mandates addressed: doc-27 §3.1 + §5.3, doc-17 §3.2,
   doc-28/18 EPMS line callouts. Tracked in
   `Documents/screenshot bms rz/REVIEW-ANALYSIS-2026-05-26-vs-v141x.md`.
 - Memory tracker `project_rz_review_2026-05-26.md` updated.
 - `standarization/BMS_SHELL.md` v1.42.x adoption row extended.
-- `standarization/LINE_MODEL.md` v1.42.1 target â¥32 codified.
+- `standarization/LINE_MODEL.md` v1.42.1 target ≥32 codified.
 
 ---
 
-## v1.42.0 â 2026-05-26 (semantic line model foundation â review docs 27/28 + 17/18)
+## v1.42.0 — 2026-05-26 (semantic line model foundation — review docs 27/28 + 17/18)
 
-MINOR ship: opens the v1.42.x â v1.45.x sweep responding to team review docs
+MINOR ship: opens the v1.42.x → v1.45.x sweep responding to team review docs
 27/28 (DC AI) and 17/18 (DC Conv). Foundation library so every pipe / busbar
 / cable in the BMS cockpit can carry structured metadata (`from`, `to`,
 `medium`, `direction`, `state`, `capacity`, `current`, `redundancy`).
@@ -2126,7 +2129,7 @@ accuracy probe + 57/57 + 22/22 engine tests + all 4 strict audits PASS.
 
 ### Added
 
-- **`js/rz-line-model.js`** â semantic line model library. IIFE ES5, exposes
+- **`js/rz-line-model.js`** — semantic line model library. IIFE ES5, exposes
   `window.RZLineModel` with:
   - `MEDIUMS` (23 entries): CHWS / CHWR / TCS supply+return / CW supply+return
     / FWS / FWR / dry-loop / liquid-supply+return / HV/MV/LV power / busway
@@ -2135,33 +2138,33 @@ accuracy probe + 57/57 + 22/22 engine tests + all 4 strict audits PASS.
     isolated / maintenance / simulated. Each maps to opacity + pulse.
   - `REDUNDANCY` (8 roles): duty / standby / redundant_a / redundant_b /
     bypass / tie / maintenance / common.
-  - `line(spec)` / `path(spec)` / `polyline(spec)` builders â emit SVG with
+  - `line(spec)` / `path(spec)` / `polyline(spec)` builders — emit SVG with
     both visual rendering AND `data-*` metadata baked in.
-  - `audit(rootEl)` â walks DOM, returns `{tagged, untagged, total, issues}`.
-- **`tools/probe-line-model.mjs`** â headless puppeteer probe. Verifies
+  - `audit(rootEl)` — walks DOM, returns `{tagged, untagged, total, issues}`.
+- **`tools/probe-line-model.mjs`** — headless puppeteer probe. Verifies
   per-page adoption schedule (v1.42.0 target: 7 lines in datahallAI Cooling
   P&ID) + every tagged line has the required schema fields + all mediums /
   states reference the canonical enum. Result: **4 pass, 0 fail**.
-- **`standarization/LINE_MODEL.md`** â new standard. Schema table, mediums
+- **`standarization/LINE_MODEL.md`** — new standard. Schema table, mediums
   table, states table, redundancy table, builder API, validator usage, per-
-  ship adoption schedule v1.42.0 â v1.45.x.
+  ship adoption schedule v1.42.0 → v1.45.x.
 
 ### Changed
 
-- **`datahallAI.html`** Cooling P&ID â 7 PILOT lines ported to `RZLineModel.line()`:
-  1. `cool-cw-dc-to-pump` â CW supply, DC array â CW pump station.
-  2. `cool-cw-pump-to-chiller` â CW supply, pump â chiller plant.
-  3. `cool-fws-chiller-to-cdu` â FWS supply, chiller â CDU array.
-  4. `cool-tcs-cdu-to-racks` â TCS supply, CDU â rack manifold.
-  5. `cool-tcs-return` â TCS return, racks â CDU.
-  6. `cool-fws-return` â FWR, CDU â chiller.
-  7. `cool-cw-return` â CW return, chiller â DC array.
+- **`datahallAI.html`** Cooling P&ID — 7 PILOT lines ported to `RZLineModel.line()`:
+  1. `cool-cw-dc-to-pump` — CW supply, DC array → CW pump station.
+  2. `cool-cw-pump-to-chiller` — CW supply, pump → chiller plant.
+  3. `cool-fws-chiller-to-cdu` — FWS supply, chiller → CDU array.
+  4. `cool-tcs-cdu-to-racks` — TCS supply, CDU → rack manifold.
+  5. `cool-tcs-return` — TCS return, racks → CDU.
+  6. `cool-fws-return` — FWR, CDU → chiller.
+  7. `cool-cw-return` — CW return, chiller → DC array.
   Visual identical (style overrides preserve existing palette + `class="fR"`
   / `class="fL"` animation hooks). Engine integrity preserved.
 
 ### Process
 
-- Review-doc mandates addressed: doc-27 Â§3.1 line metadata requirement,
+- Review-doc mandates addressed: doc-27 §3.1 line metadata requirement,
   doc-28 per-screenshot line semantics. Full gap analysis at
   `Documents/screenshot bms rz/REVIEW-ANALYSIS-2026-05-26-vs-v141x.md`.
 - Memory tracker: `project_rz_review_2026-05-26.md` + MEMORY.md pointer.
@@ -2171,7 +2174,7 @@ accuracy probe + 57/57 + 22/22 engine tests + all 4 strict audits PASS.
 
 ---
 
-## v1.41.6 â 2026-05-24 (ict.html â Security HMI widgets + CCTV/ACS/intrusion expansion)
+## v1.41.6 — 2026-05-24 (ict.html — Security HMI widgets + CCTV/ACS/intrusion expansion)
 
 MINOR ship: closes owner request "GUI tampilan2 HMI dga block/chart atau widget
 dll kok tidak ada... dan di security systemnya juga tidak lengkap mana monitoring
@@ -2181,29 +2184,29 @@ semua cctv, aacs dll. sempurnakan".
 
 - **Security HMI widget panel** on Security Systems tab. Three-tile grid
   (1.4fr / 1fr / 1fr) with:
-  - **CCTV Live Mosaic** â 16-cell scan-line/gradient TV preview grid with
+  - **CCTV Live Mosaic** — 16-cell scan-line/gradient TV preview grid with
     blinking rec dot per cell, camera ID + zone label, status colour ring
     (ok / warn / bad). Plus 24-hour camera availability sparkline (SVG
     polyline, green fill); 3-stat row (Cams Online / Uptime 24 h / VMS
     Storage).
-  - **Access Control Doors** â scrollable list (max 240 px) of 12
+  - **Access Control Doors** — scrollable list (max 240 px) of 12
     representative doors (4 mantraps / DH-1..4 / NOC / MMR / Chiller /
     Generator / Fuel Farm). Each row: door tag, 24-hour event count, status
     pill (LOCKED green / UNLOCKED amber with left-border accent).
-  - **Intrusion Zones** â SVG donut (armed-green / disarmed-grey arcs) over
-    central numeric `armed/total` count; "No alarms" or "â  N alarm" subline.
+  - **Intrusion Zones** — SVG donut (armed-green / disarmed-grey arcs) over
+    central numeric `armed/total` count; "No alarms" or "⚠ N alarm" subline.
     Plus scrollable 10-zone list with PIR detector tag, zone name, status
-    pill (ARMED / DISARM / ALARM). Donut math: `2ÏR=201`, dasharray split
+    pill (ARMED / DISARM / ALARM). Donut math: `2πR=201`, dasharray split
     by `pctArmed` and `pctDisarmed` with proper offset rotation.
 
 - **Security segment data expanded** (`SEGMENTS.sec`):
-  - Services: 4 â 8 entries (NVR-01 + NVR-02 separate, Access Control
+  - Services: 4 → 8 entries (NVR-01 + NVR-02 separate, Access Control
     with door count, Intrusion + zone count, Fence-line PIR, VMS
     Recording, SOC link, Mass Notification).
-  - Caps: 4 â 8 cards (cameras 96, doors 48, zones 24, trunk cap 10 Gbps,
+  - Caps: 4 → 8 cards (cameras 96, doors 48, zones 24, trunk cap 10 Gbps,
     trunk util 34 %, retention 14 d, NVR storage 192 TB, stream uptime
     99.96 %).
-  - Links: 3 â 9 entries (NVR-01/02 separate, ACS-01/02 separate, IDS-01,
+  - Links: 3 → 9 entries (NVR-01/02 separate, ACS-01/02 separate, IDS-01,
     PIR-Fence, SEC-A/B failover, SOC link, Mass-Notif PA/strobe trigger).
   - New `hmi` block with `cctv[16]` + `doors[12]` + `intrusion[10]`
     structured data feeding the widgets.
@@ -2211,7 +2214,7 @@ semua cctv, aacs dll. sempurnakan".
 ### CSS
 
 - `.hmi-grid` 3-column responsive (single-col under 1024 px), `.hmi-tile`,
-  `.cctv-grid` 4Ã4 with `aspect-ratio: 16/9`, `.cctv-cell` with scan-line
+  `.cctv-grid` 4×4 with `aspect-ratio: 16/9`, `.cctv-cell` with scan-line
   gradient + rec-dot pulse animation, `.door-list/.zone-list` with
   scrollable max-height, status pills (.dr-st.locked/.unlocked, .zr-st
   .armed/.disarmed/.alarm), `.hmi-donut` SVG holder, `.hmi-spark`
@@ -2219,7 +2222,7 @@ semua cctv, aacs dll. sempurnakan".
 
 ### Engines locked
 
-- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` â
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
   byte-identical. 57/57 + 22/22 tests pass.
 
 ### Changed
@@ -2229,13 +2232,13 @@ semua cctv, aacs dll. sempurnakan".
 
 ### Files touched
 
-- `ict.html` â Security HMI CSS block; SEGMENTS.sec data expansion; new
+- `ict.html` — Security HMI CSS block; SEGMENTS.sec data expansion; new
   `renderSecurityHmi(hmi)` function; renderSegment wiring (`if key==='sec'
   && seg.hmi`).
 
 ---
 
-## v1.41.5 â 2026-05-24 (water-system.html â UV-401 / DOS-302 label overlap + TK-402 dual-pipe + CT-MK rename)
+## v1.41.5 — 2026-05-24 (water-system.html — UV-401 / DOS-302 label overlap + TK-402 dual-pipe + CT-MK rename)
 
 PATCH ship: closes three water-system.html owner complaints in one pass.
 
@@ -2245,11 +2248,11 @@ PATCH ship: closes three water-system.html owner complaints in one pass.
   saling tumpang tindi"). UV-401 rect previously sat at x=660-760 directly
   over DOS-302's right edge (x=630-690), so the UV-401 tag at (666, 97) fell
   inside DOS-302's box. UV-401 rect relocated to x=700-760 (width reduced
-  100â60), tag x=706, labels tightened to fit the narrower box. DOS-302 stays
+  100→60), tag x=706, labels tightened to fit the narrower box. DOS-302 stays
   where it is; the two boxes no longer overlap horizontally.
 
 - **TK-402 dual-pipe routing** (owner: "ini juga kok ada 2 piping masuk ke
-  TK-402"). Original treated header â TK-402 path used a Z-shape
+  TK-402"). Original treated header → TK-402 path used a Z-shape
   (`M850 210 H760 V250`) which visually appeared as two separate pipes
   entering the tank top. Replaced with a straight drop
   (`M850 210 V250`) so a single clean pipe enters the tank from the tee.
@@ -2260,14 +2263,14 @@ PATCH ship: closes three water-system.html owner complaints in one pass.
   system"). The DC AI baseline is dry-only (BASELINE-DECISION.md, no
   evaporative cooling tower); the CT-MK / "Cooling Tower" label was
   inconsistent with that design.
-  - Tag: `CT-MK` â `MK-501`.
-  - Labels: `Cooling Tower` + `Makeup` â `Make-up Water` + `System`.
-  - Comment "Cooling tower blowdown -> drain" â "Make-up system blowdown
+  - Tag: `CT-MK` → `MK-501`.
+  - Labels: `Cooling Tower` + `Makeup` → `Make-up Water` + `System`.
+  - Comment "Cooling tower blowdown -> drain" → "Make-up system blowdown
     / discharge -> drain".
 
 ### Engines locked
 
-- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` â
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
   byte-identical. 57/57 + 22/22 tests pass.
 
 ### Changed
@@ -2277,12 +2280,12 @@ PATCH ship: closes three water-system.html owner complaints in one pass.
 
 ### Files touched
 
-- `water-system.html` â UV-401 rect + label coords; treated header pipe
+- `water-system.html` — UV-401 rect + label coords; treated header pipe
   routing (.pipe + .flow); makeup section tag + labels + comment.
 
 ---
 
-## v1.41.4 â 2026-05-24 (datahall.html â CRAH popover + inline labels + cold-aisle normalisation + excursion simulator)
+## v1.41.4 — 2026-05-24 (datahall.html — CRAH popover + inline labels + cold-aisle normalisation + excursion simulator)
 
 MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
 
@@ -2290,19 +2293,19 @@ MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
 
 - **CRAH popover replaces full-screen modal** (owner: "ini mdal a01 jangan
   mendisable main screen, tapi dibaut semacam tootip gitu"). Old behaviour:
-  click CRAH cell â opens `unitModal` with `.modal-overlay` covering entire
-  screen + blur backdrop. New behaviour: click CRAH cell â opens floating
+  click CRAH cell → opens `unitModal` with `.modal-overlay` covering entire
+  screen + blur backdrop. New behaviour: click CRAH cell → opens floating
   `.crah-pop` positioned next to the clicked cell. Main screen stays fully
   interactive. Click outside or press Esc to close.
   - New `.crah-pop` CSS: `position:absolute`, min-width 240, max-width 280,
     fade-in 160 ms, RUN/STBY state pill in cyan/amber.
-  - Grid: 8 rows Ã 2 cols (status / SAT / RAT / fan / valve / duty / CHWS-R /
+  - Grid: 8 rows × 2 cols (status / SAT / RAT / fan / valve / duty / CHWS-R /
     redundancy / source).
   - Outside-click + Esc handlers wired.
   - Legacy `unitModal` kept for any non-CRAH inspector use.
 
 - **Inline SAT values on CRAH cells** (owner: "enahce ui dan kasih SAT value
-  di A01 dstnya"). Each CRAH cell now shows tag + SAT (`17.0Â°C` / `OFF`)
+  di A01 dstnya"). Each CRAH cell now shows tag + SAT (`17.0°C` / `OFF`)
   inline; previously the SAT was only visible in tooltip.
 
 - **Per-cell rack labels (ID + per-mode value)** (owner: "tetap di kotak2
@@ -2312,18 +2315,18 @@ MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
   - Line 1 (`.rk-id`, 7.5px bold): rack tag without prefix (e.g. `AL01`).
   - Line 2 (`.rk-val`, 7.5px regular): per-mode value
     - Power mode: `8.4 kW`
-    - Temperature mode: `22.0Â°C`
-    - Cooling-margin mode: `5.0Â°C` (margin to ASHRAE 27 Â°C)
+    - Temperature mode: `22.0°C`
+    - Cooling-margin mode: `5.0°C` (margin to ASHRAE 27 °C)
     - Alarms mode: `78%` (rack utilisation)
     - Space mode: `IT` / `spare`
   `repaintRacks()` rewrites `innerHTML` per mode change.
 
-- **Cold-aisle normalisation to ~22Â°C uniform** (owner: "temp aisle rack kok
+- **Cold-aisle normalisation to ~22°C uniform** (owner: "temp aisle rack kok
   beda2 harusnya hampir sama, for sake of standard and normal operation").
   Previous behaviour: each zone's `coldAisleC` was derived from
   `SUPPLY_C + zHeat / (rho*cp*airflow)` which yielded different values per
   zone based on rack-loading variance. New behaviour: normal state is
-  pinned to 22.0 Â± 0.3 Â°C across all rows (deterministic seed per row), so
+  pinned to 22.0 ± 0.3 °C across all rows (deterministic seed per row), so
   the page baseline matches ASHRAE A1 recommended low. Each zone retains
   the original physics-derived value as `baseTempC` for restore-after-
   excursion. Hot-spot indicator now genuinely indicates anomalies, not
@@ -2333,8 +2336,8 @@ MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
   mungkn dibuat aja salah satu rack atau row sebentar aja 10-15 detik per
   2 menit, random position, pastikan align dengan parameter DAHU (A01-A20,
   random)"). Every 2 min (first event 30 s after load), the simulator
-  picks a random zone z â {0..9} + random CRAH n â {1..20} and sets that
-  zone's `coldAisleC` to a value 27.5-30.0 Â°C for 10-15 s. During the
+  picks a random zone z ∈ {0..9} + random CRAH n ∈ {1..20} and sets that
+  zone's `coldAisleC` to a value 27.5-30.0 °C for 10-15 s. During the
   excursion:
   - Zone's racks pulse red (animation `rk-pulse`).
   - Affected CRAH cell gets red outline ring (`.cc-affected`).
@@ -2345,7 +2348,7 @@ MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
 
 ### Engines locked
 
-- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` â
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
   byte-identical. 57/57 + 22/22 tests pass.
 
 ### Changed
@@ -2355,7 +2358,7 @@ MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
 
 ### Files touched
 
-- `datahall.html` â new CSS rules (.rack inline content + .crah-pop + .crah-cell
+- `datahall.html` — new CSS rules (.rack inline content + .crah-pop + .crah-cell
   .cc-sat + .excursion-banner + animations); new DOM (popover + banner);
   rewritten `__inspectCrah` + outside-click/Esc handlers; new `dhRand` +
   `fireExcursion` simulator; updated `repaintRacks`, `renderFloor` rail(),
@@ -2363,53 +2366,53 @@ MINOR ship: datahall.html mega-bundle closing 5 owner requests in one pass.
 
 ---
 
-## v1.41.3 â 2026-05-24 (Building Overview chiller relocation + Cooling P&ID label clarity)
+## v1.41.3 — 2026-05-24 (Building Overview chiller relocation + Cooling P&ID label clarity)
 
 PATCH ship: closes two owner architectural-correctness complaints.
 
 ### Fixed
 
-- **Building Overview â chillers relocated from Roof to Ground Floor** (owner:
+- **Building Overview — chillers relocated from Roof to Ground Floor** (owner:
   "ok chillernya berarti bukan di roof donk? di roof itu harusnya Dry cooler donk?").
   Water-cooled centrifugal chillers belong on a Mechanical floor, NOT on the
-  roof â only heat-rejection equipment (dry coolers exposed to ambient) lives
+  roof — only heat-rejection equipment (dry coolers exposed to ambient) lives
   on the roof in this hybrid design.
   - `floors[]` array entries updated:
-    - GF: `'MEP Â· Infrastructure Â· Support'` â `'MEP Â· Chillers Â· Generators Â· WTP'`
-    - Roof: `'Mechanical Â· Chillers Â· AHU'` â `'Heat Rejection Â· Dry Coolers Â· AHU'`
+    - GF: `'MEP · Infrastructure · Support'` → `'MEP · Chillers · Generators · WTP'`
+    - Roof: `'Mechanical · Chillers · AHU'` → `'Heat Rejection · Dry Coolers · AHU'`
   - `floorNames` map updated (overview titles + drill-down labels).
-  - Roof plan (`renderRoof`) title: "ROOF PLAN â MECHANICAL EQUIPMENT" â
-    "ROOF PLAN â HEAT REJECTION & DRY COOLERS" plus sub-title clarifying chiller
+  - Roof plan (`renderRoof`) title: "ROOF PLAN — MECHANICAL EQUIPMENT" →
+    "ROOF PLAN — HEAT REJECTION & DRY COOLERS" plus sub-title clarifying chiller
     location.
-  - NW quadrant of roof plan: "CHILLER PLANT" (8Ã CH cells) replaced with
+  - NW quadrant of roof plan: "CHILLER PLANT" (8× CH cells) replaced with
     "CW DISTRIBUTION MANIFOLD" (8 supply + 8 return DN500 risers from chillers
     below, cross-headers, amber engineering callout).
-  - Roof equipment schedule: "Chillers 8Ã4MW" entry replaced with "CW Risers
+  - Roof equipment schedule: "Chillers 8×4MW" entry replaced with "CW Risers
     8 pairs DN500".
-  - Roof dimension annotation: "28m (Chiller Plant)" â "28m (CW Manifold)".
-  - Ground Floor plan (`renderGroundFloor`) title: "GROUND FLOOR PLAN â MEP &
-    INFRASTRUCTURE" â "GROUND FLOOR PLAN â MEP, CHILLER PLANT & INFRASTRUCTURE".
-  - Ground Floor "Workshop B / Staging" zone (42-66 Ã 26-36 = 24m Ã 10m)
-    replaced with **Chiller Plant Hall** containing 8Ã Carrier 19XR 4MW
+  - Roof dimension annotation: "28m (Chiller Plant)" → "28m (CW Manifold)".
+  - Ground Floor plan (`renderGroundFloor`) title: "GROUND FLOOR PLAN — MEP &
+    INFRASTRUCTURE" → "GROUND FLOOR PLAN — MEP, CHILLER PLANT & INFRASTRUCTURE".
+  - Ground Floor "Workshop B / Staging" zone (42-66 × 26-36 = 24m × 10m)
+    replaced with **Chiller Plant Hall** containing 8× Carrier 19XR 4MW
     water-cooled centrifugal chillers (7 RUN + 1 STBY N+1, COP 6.8, R-1234ze(E),
     mag-bearing oil-free). CW supply/return riser callout pointing up to Roof
     dry-cooler array.
 
-- **Cooling P&ID â label overlap + clarity** (owner: "4.3 bar masing kotakan
-  tumpang tindih dengan block2 lain, atau temp 35.2Â°C itu temp apa. nggak jelas,
+- **Cooling P&ID — label overlap + clarity** (owner: "4.3 bar masing kotakan
+  tumpang tindih dengan block2 lain, atau temp 35.2°C itu temp apa. nggak jelas,
   dan return temp itu tertutuk dash line kuning, dan parameter2 lain 3.4 f dan p
   itu coba review lagi").
-  - **Floating temp badges** now prefixed with named context â "FWS-Ret 22.0Â°C",
-    "TCS-Ret 45.0Â°C", "CW-Mid 35.2Â°C" â so each badge explicitly says what
+  - **Floating temp badges** now prefixed with named context — "FWS-Ret 22.0°C",
+    "TCS-Ret 45.0°C", "CW-Mid 35.2°C" — so each badge explicitly says what
     return circuit it represents. Badge widths increased from 30 to 42-50 px to
     accommodate the prefix.
   - **CW pump-station discharge pressure + flow labels** moved from y=170-180
     overlap zone down to y=193-203 (separate row, off the pump-box outline).
-  - **CW discharge to chillers** label "4.5 bar" â "CW@4.5 bar" with positions
+  - **CW discharge to chillers** label "4.5 bar" → "CW@4.5 bar" with positions
     spread (y=84 above pipe, y=105 below pipe).
   - **FWS pump-station discharge** flow + pressure labels moved from y=178-188
     down to y=195-205 (clear of pump-box).
-  - **FWS to CDUs** label "6 bar" â "FWS@6 bar" with explicit prefix.
+  - **FWS to CDUs** label "6 bar" → "FWS@6 bar" with explicit prefix.
 
 ### Changed
 
@@ -2418,27 +2421,27 @@ PATCH ship: closes two owner architectural-correctness complaints.
 
 ### Engines locked
 
-- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` â
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
   byte-identical. 57/57 + 22/22 tests pass.
 
 ### Files touched
 
-- `datahallAI.html` â floors array, floorNames map, renderRoof (NW quadrant +
-  title + schedule + dimension), renderGroundFloor (title + Workshop B â Chiller
+- `datahallAI.html` — floors array, floorNames map, renderRoof (NW quadrant +
+  title + schedule + dimension), renderGroundFloor (title + Workshop B → Chiller
   Plant Hall), cooling P&ID (temp badges + pump-station labels).
-- `js/rz-version.js` â version bump.
-- `sw.js` â cache name bump.
-- `CHANGELOG.md` â this entry.
+- `js/rz-version.js` — version bump.
+- `sw.js` — cache name bump.
+- `CHANGELOG.md` — this entry.
 
 ---
 
-## v1.41.2 â 2026-05-24 (Water-quality Tech Spec sections â DC AI dry-only + DC Conv cooling-tower)
+## v1.41.2 — 2026-05-24 (Water-quality Tech Spec sections — DC AI dry-only + DC Conv cooling-tower)
 
 PATCH ship: closes owner request "kualitas air masing-masing di dc ai dan dc conventional itu juga masukkan ya full standard parameter dan chemical dan consumption di tech spec."
 
 ### Added
 
-- **DC AI Tech Spec (datahallAI.html) â 7 new sections** appended to Section 5
+- **DC AI Tech Spec (datahallAI.html) — 7 new sections** appended to Section 5
   Cooling Discipline (after 5.10 Cooling Tower / Condenser Water Sizing):
   - **5.11 Make-up Water Quality** &mdash; 13 inlet quality parameters vs WHO
     drinking-water guidelines (pH, TDS, hardness, chloride, sulphate, iron,
@@ -2456,14 +2459,14 @@ PATCH ship: closes owner request "kualitas air masing-masing di dc ai dan dc con
   - **5.15 Water Testing Programme** &mdash; 6-row tiered cadence (daily / weekly /
     monthly / quarterly Legionella+ATP+coupons / annual audit / online continuous).
   - **5.16 Annual Consumption + Discharge Budget** &mdash; 12-row facility-level annual
-    budget. PG top-up ~1,600 L/yr, TCS DI top-up ~30 L/yr, domestic ~4,200 mÂ³/yr,
-    **zero blowdown** (closed loop), STP reuse-irrigation ~3,800 mÂ³/yr, WUE
+    budget. PG top-up ~1,600 L/yr, TCS DI top-up ~30 L/yr, domestic ~4,200 m³/yr,
+    **zero blowdown** (closed loop), STP reuse-irrigation ~3,800 m³/yr, WUE
     cooling-only = 0.00 (BASELINE-DECISION dry-only), annual water saved vs cooling-
-    tower design ~21,400 mÂ³/yr.
+    tower design ~21,400 m³/yr.
   - **5.17 Standards + References** &mdash; 8-entry list (ASHRAE 12-2020, CTI WTP-148,
     BS 8580-1, WHO 4th, ASTM D1193-06, OCP, EU 2020/2184, Pergub 122/2005).
 
-- **DC Conv Tech Spec (dc-conventional.html) â 9 new sections** appended to Section 5
+- **DC Conv Tech Spec (dc-conventional.html) — 9 new sections** appended to Section 5
   Water Discipline (after 5.4 Annualised water consumption):
   - **5.5 Make-up Water Quality** &mdash; same inlet matrix as DC AI plus chloride
     limit &lt; 150 mg/L in tower + silica &lt; 50.
@@ -2495,7 +2498,7 @@ PATCH ship: closes owner request "kualitas air masing-masing di dc ai dan dc con
 
 ### Engines locked
 
-- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` â
+- `js/datahall-model.js` + `js/datahall-calculations.js` + `js/conv-engine.js` —
   byte-identical. Tech Spec PDF is presentation-only; no engine drift.
 
 ### Changed
@@ -2504,7 +2507,7 @@ PATCH ship: closes owner request "kualitas air masing-masing di dc ai dan dc con
 
 ---
 
-## v1.40.1 â 2026-05-25 (OG images for 27 Network Hub pages + login form wrap + Spares draft refresh)
+## v1.40.1 — 2026-05-25 (OG images for 27 Network Hub pages + login form wrap + Spares draft refresh)
 
 PATCH ship: closes 3 deferred items from v1.40.0 + Network Hub backlog.
 
@@ -2521,8 +2524,8 @@ PATCH ship: closes 3 deferred items from v1.40.0 + Network Hub backlog.
 
 ### Changed
 
-- **`auth.js`** â login inputs wrapped in `<form>` with `onsubmit`
-  preventDefault â `doLogin()`. Enter key now submits; autocomplete +
+- **`auth.js`** — login inputs wrapped in `<form>` with `onsubmit`
+  preventDefault → `doLogin()`. Enter key now submits; autocomplete +
   `required` attrs work; `for` on labels; submit button is `type="submit"`;
   `aria-hidden` on decorative modal shield icon. Site-wide fix.
 - `js/rz-version.js` &rarr; v1.40.1
@@ -2537,7 +2540,7 @@ PATCH ship: closes 3 deferred items from v1.40.0 + Network Hub backlog.
 
 ---
 
-## v1.40.0 â 2026-05-25 (AI Maintenance â Tier-1+Tier-2 review fixes: CSV provenance + advisory-only + concept-banner + roadmap split)
+## v1.40.0 — 2026-05-25 (AI Maintenance — Tier-1+Tier-2 review fixes: CSV provenance + advisory-only + concept-banner + roadmap split)
 
 MINOR ship: post-production-review on `ai-engineering-maintenance.html`.
 Reviewer's 2026-05-24 finding split into 3 tiers; **Tier 1 + Tier 2 fixed
@@ -2550,7 +2553,7 @@ is explicitly **out of scope** for this portfolio site and tracked at
 multi-year initiative. The concept page is now honestly labeled and
 correctly links there.
 
-### Tier 1 â Real bugs / content lies fixed
+### Tier 1 — Real bugs / content lies fixed
 
 - **`docs/research/csv/*.csv`** &mdash; **all 8 CSVs** gained `confidence_tier`,
   `source_ref`, `effective_date`, `last_verified_by`, `license_class`
@@ -2586,7 +2589,7 @@ correctly links there.
 - **`.rz-demo-hint` hidden on this Pro-only page** (page-scoped CSS) so
   the demo credential isn't advertised when `page-access: { demo: false }`.
 
-### Tier 2 â Honesty + provenance work
+### Tier 2 — Honesty + provenance work
 
 - All CSVs now machine-checkable for confidence-tier discipline.
 - Provenance fields (`source_ref`, `effective_date`, `last_verified_by`,
@@ -2645,8 +2648,8 @@ vision**; it does not become next-week code. See
 
 ### Bumped
 
-- `js/rz-version.js` â v1.40.0 (MINOR; concept-page honesty pass)
-- `sw.js` â `rz-cache-v1.40.0`
+- `js/rz-version.js` → v1.40.0 (MINOR; concept-page honesty pass)
+- `sw.js` → `rz-cache-v1.40.0`
 
 ### Cross-references
 
@@ -2656,30 +2659,30 @@ vision**; it does not become next-week code. See
 
 ---
 
-## v1.38.0 â 2026-05-24 (Network Hub Phase 2 â Lane B fully complete: +DNP3 +PROFINET +EtherNet/IP +EtherCAT +BACnet MS/TP)
+## v1.38.0 — 2026-05-24 (Network Hub Phase 2 — Lane B fully complete: +DNP3 +PROFINET +EtherNet/IP +EtherCAT +BACnet MS/TP)
 
 MINOR ship: Phase 2 Lane B complete. **All 9 Lane B topics live**.
 Anti-monotony audit ran across 9 topics, 0 findings (max pairwise share = 2).
 
 ### Added (5 new live topic pages + modules)
 
-- **`network/industrial-ot/dnp3.html`** â IEEE 1815. Distinctive trait:
+- **`network/industrial-ot/dnp3.html`** — IEEE 1815. Distinctive trait:
   UNSOLICITED responses (outstation pushes spontaneously, amber-labeled).
   4 pitfalls (Class-0/1/2/3 buffer overflow, SBO vs Direct Operate, time
   sync drift, SAv5 cert rotation).
-- **`network/industrial-ot/profinet.html`** â IEC 61784-2. Sync line above
+- **`network/industrial-ot/profinet.html`** — IEC 61784-2. Sync line above
   the data wire shows cyclic deterministic timing; green tick at each cycle
   start. 4 pitfalls (RT/TCP jitter, GSDML/firmware mismatch, topology
   change, IRT clock master loss).
-- **`network/industrial-ot/ethernet-ip.html`** â ODVA CIP over Ethernet.
+- **`network/industrial-ot/ethernet-ip.html`** — ODVA CIP over Ethernet.
   Sawtooth waveform, envelope chips with rotating CIP-layer marker stripes
   (ENIP / CPF / CIP-Conn / CIP-Svc). 4 pitfalls (Class 1 RPI, EDS vs
   firmware, timeout multiplier, port 2222 vs 44818).
-- **`network/industrial-ot/ethercat.html`** â IEC 61158. Telegram passes
+- **`network/industrial-ot/ethercat.html`** — IEC 61158. Telegram passes
   through every slave on-the-fly; nearest slave lights green as the chip
   crosses. Slave count + cycle time configurable. 4 pitfalls (slave
   processing accumulation, distributed clocks, hot-plug, mailbox bandwidth).
-- **`network/industrial-ot/bacnet-mstp.html`** â ASHRAE 135 Annex H.
+- **`network/industrial-ot/bacnet-mstp.html`** — ASHRAE 135 Annex H.
   Token-passing on RS-485: amber token chip visibly passes between nodes
   before any data frame. 4 pitfalls (mixed baud rates, token timeout,
   Max_Master, reply-too-late re-poll storms).
@@ -2691,31 +2694,31 @@ Anti-monotony audit ran across 9 topics, 0 findings (max pairwise share = 2).
 
 | Pair | Shared | Pair | Shared |
 |------|--------|------|--------|
-| RTUâTCP | 0 | TCPâOPC-UA | 1 |
-| RTUâBACnet/IP | 1 | TCPâDNP3 | 0 |
-| RTUâOPC-UA | 1 | TCPâPROFINET | 2 |
-| RTUâDNP3 | 2 | TCPâEthernet/IP | 2 |
-| RTUâPROFINET | 0 | TCPâEtherCAT | 2 |
-| RTUâEthernet/IP | 0 | TCPâBACnet MS/TP | 1 |
-| RTUâEtherCAT | 0 | OPC-UAâDNP3 | 2 |
-| RTUâBACnet MS/TP | 0 | OPC-UAâothers | â¤2 |
-| TCPâBACnet/IP | 1 | All others | â¤2 |
+| RTU↔TCP | 0 | TCP↔OPC-UA | 1 |
+| RTU↔BACnet/IP | 1 | TCP↔DNP3 | 0 |
+| RTU↔OPC-UA | 1 | TCP↔PROFINET | 2 |
+| RTU↔DNP3 | 2 | TCP↔Ethernet/IP | 2 |
+| RTU↔PROFINET | 0 | TCP↔EtherCAT | 2 |
+| RTU↔Ethernet/IP | 0 | TCP↔BACnet MS/TP | 1 |
+| RTU↔EtherCAT | 0 | OPC-UA↔DNP3 | 2 |
+| RTU↔BACnet MS/TP | 0 | OPC-UA↔others | ≤2 |
+| TCP↔BACnet/IP | 1 | All others | ≤2 |
 
 All 36 pairs &le; 2 shared timbre fields. Audit passes by design.
 
 ### Changed
 
-- **`network-visualization-hub.html`** â all 9 Lane B cards now show LIVE.
+- **`network-visualization-hub.html`** — all 9 Lane B cards now show LIVE.
   Each card describes the distinctive trait per Appendix E.
-- **`network-compare.html`** â picker expanded to 9 protocols; topic
+- **`network-compare.html`** — picker expanded to 9 protocols; topic
   registry + script loads updated. Compare any 2&ndash;4 of the full
   Lane B set.
-- **`datacenter-solutions.html`** â Knowledge Labs card description
+- **`datacenter-solutions.html`** — Knowledge Labs card description
   updated to mention all 9 live Lane B topics.
-- **`js/rz-feature-flags.js`** â 5 new public-tier entries
+- **`js/rz-feature-flags.js`** — 5 new public-tier entries
   (network-dnp3, network-profinet, network-ethernet-ip, network-ethercat,
   network-bacnet-mstp).
-- **`sitemap.xml`** + **`llms.txt`** â 5 new entries.
+- **`sitemap.xml`** + **`llms.txt`** — 5 new entries.
 - `js/rz-version.js` &rarr; v1.38.0 (MINOR; Phase 2 Lane B completion)
 - `sw.js` &rarr; `rz-cache-v1.38.0`
 
@@ -2743,29 +2746,29 @@ once re-run with the new fixtures.
 
 9 protocols, 9 distinct visual + audio signatures. Anti-monotony works.
 
-### Next phases (Lane B is 100% done â moving to other lanes)
+### Next phases (Lane B is 100% done — moving to other lanes)
 
-- Phase 3 Lane A â Foundations (OSI/TCP-IP models, IPv4 vs IPv6, subnetting/CIDR, TCP handshake, DHCP/DNS)
-- Phase 4 Lane D â Security (TLS handshake, OAuth/JWT, mTLS, WireGuard)
-- Phase 5 Lane E â APIs + Agents (REST API, GraphQL, gRPC, MCP tool-call)
-- Phase 6 Lane C â DC Management (SNMP, IPMI/Redfish, syslog)
+- Phase 3 Lane A — Foundations (OSI/TCP-IP models, IPv4 vs IPv6, subnetting/CIDR, TCP handshake, DHCP/DNS)
+- Phase 4 Lane D — Security (TLS handshake, OAuth/JWT, mTLS, WireGuard)
+- Phase 5 Lane E — APIs + Agents (REST API, GraphQL, gRPC, MCP tool-call)
+- Phase 6 Lane C — DC Management (SNMP, IPMI/Redfish, syslog)
 
 ---
 
-## v1.37.0 â 2026-05-24 (Network Hub â determinism harness + post-draft folders + CONTENT_LINKAGE Â§2.5)
+## v1.37.0 — 2026-05-24 (Network Hub — determinism harness + post-draft folders + CONTENT_LINKAGE §2.5)
 
 MINOR ship: completes the v2.3 Phase 0 DoD inner loop. Anti-monotony +
 determinism + post-draft + content-linkage all operational.
 
 ### Added
 
-- `tools/test-network-anim-determinism.py` (~210 lines) â Strategy-A
+- `tools/test-network-anim-determinism.py` (~210 lines) — Strategy-A
   determinism harness with Node + static modes. **12 / 12 PASS** across
   4 topics.
 - `Article/Post Draft/Network Hub/` + 4 topic folders (Modbus RTU /
   Modbus TCP / BACnet IP / OPC-UA), each with linkedin + x-post-1 +
   mastodon-1. 15 post-draft files total per POST_DRAFT_STANDARD.
-- `standarization/CONTENT_LINKAGE_PLAYBOOK.md` Â§2.5 â Knowledge Labs
+- `standarization/CONTENT_LINKAGE_PLAYBOOK.md` §2.5 — Knowledge Labs
   topic page deliverable checklist.
 
 ### Status
@@ -2784,12 +2787,12 @@ determinism + post-draft + content-linkage all operational.
 
 ### Changed
 
-- js/rz-version.js â 1.37.0
-- sw.js â rz-cache-v1.37.0
+- js/rz-version.js → 1.37.0
+- sw.js → rz-cache-v1.37.0
 
 ---
 
-## v1.36.0 â 2026-05-24 (Network Hub â Lane B complete: +BACnet/IP +OPC-UA +Compare scaffold)
+## v1.36.0 — 2026-05-24 (Network Hub — Lane B complete: +BACnet/IP +OPC-UA +Compare scaffold)
 
 MINOR ship: Lane B (Industrial OT) Phase 1 complete with 4 live topics
 and a functional 4-panel compare scaffold. Audit confirms anti-monotony
@@ -2814,7 +2817,7 @@ across all 4 (max pairwise share = 2 fields).
   instrument chip strip (throughput / latency / overhead / status)
   reading from `getNormalized()` per Appendix B. URL deep-link
   (`?topics=modbus-rtu,modbus-tcp,bacnet-ip,opc-ua`). Audio muted
-  default across all panels (compare-mode convention per Â§7).
+  default across all panels (compare-mode convention per §7).
 - **`js/network-anim/topics/bacnet-ip.js`** (~225 lines) &mdash; distinct
   timbre per Appendix E row 4: **triangle 950 Hz**, **hex 8&times;8**,
   **ethernet 1.0 px**, **controller-square** master, **1.2&times; medium**
@@ -2876,35 +2879,35 @@ v1.36.0 (this ship) = Lane B complete + compare scaffold
 
 ---
 
-## v1.35.0 â 2026-05-24 (Network Hub â Modbus TCP topic + hub landing page; anti-monotony gate proven at scale)
+## v1.35.0 — 2026-05-24 (Network Hub — Modbus TCP topic + hub landing page; anti-monotony gate proven at scale)
 
 MINOR ship: second live topic + landing page. The anti-monotony audit now
-runs across 2 Lane B topics (Modbus RTU + Modbus TCP) and passes â 0
+runs across 2 Lane B topics (Modbus RTU + Modbus TCP) and passes — 0
 shared timbre fields. Hub landing organises all 25 topics across 5 lanes
 with status badges (LIVE / PHASE 1 / PHASE 2-6).
 
 ### Added
 
-- **`network/industrial-ot/modbus-tcp.html`** â live Phase-1 topic page.
+- **`network/industrial-ot/modbus-tcp.html`** — live Phase-1 topic page.
   - MBAP-header byte exchange over Ethernet
   - 4 parameter controls (link speed select + TCP RTT + payload + line noise)
-  - Distinctive trait: MBAP header chip rendered at 16Ã8 vs payload chip at 12Ã6 (overhead made visible)
+  - Distinctive trait: MBAP header chip rendered at 16×8 vs payload chip at 12×6 (overhead made visible)
   - 4 engineering-pitfall accordions (transaction ID reuse, port 502 firewall, keepalive mismatch, unit ID gateway routing)
   - 4 primary citations (Modbus Org TCP/IP Implementation Guide V1.0b, RFC 793, IANA, Net+ N10-009)
-- **`js/network-anim/topics/modbus-tcp.js`** (~220 lines) â Strategy-A
+- **`js/network-anim/topics/modbus-tcp.js`** (~220 lines) — Strategy-A
   deterministic frame logic. Distinctive timbre per Appendix E row 2:
   - waveform: **sine** (vs RTU's square-sweep)
-  - chip: **rect 12Ã6** (vs RTU's square 8Ã8)
+  - chip: **rect 12×6** (vs RTU's square 8×8)
   - wire: **ethernet 1.0 px** (vs RTU's serial-thin 0.7 px)
   - master: **server-rack** (vs RTU's plc-rectangle)
-  - tempo: **1.5Ã fast** (vs RTU's 1.0Ã medium)
+  - tempo: **1.5× fast** (vs RTU's 1.0× medium)
   - **0 shared fields with Modbus RTU** &mdash; anti-monotony gate passes by wide margin
 - **`network-visualization-hub.html`** &mdash; hub landing page covering all
   25 topics across 5 lanes (Industrial OT 9 + Foundations 5 + DC Management 3
   + Security 4 + APIs+Agents 4). Status badges per card:
   **LIVE** (Modbus RTU + Modbus TCP) / **PHASE 1** (BACnet MS/TP, BACnet/IP,
   OPC-UA) / **PHASE 2-6** (remaining 18 topics). Compare-mode CTA placeholder
-  &mdash; ships when â¥3 topics live in any lane.
+  &mdash; ships when ≥3 topics live in any lane.
 - **`js/rz-feature-flags.js`** &mdash; entries for `network-visualization-hub`
   + `network-modbus-tcp` (public-tier).
 - **`sitemap.xml`** + **`llms.txt`** &mdash; entries for hub landing +
@@ -2944,7 +2947,7 @@ tempo-bin). Future Lane B topics must hit the same bar.
 
 ---
 
-## v1.34.0 â 2026-05-24 (Network Visualization Hub â first live topic page: Modbus RTU + Knowledge Labs section)
+## v1.34.0 — 2026-05-24 (Network Visualization Hub — first live topic page: Modbus RTU + Knowledge Labs section)
 
 MINOR ship: first user-facing page lands on the Network Hub. Modbus RTU
 animation is live with deterministic Strategy-A frame logic, parameter
@@ -2954,7 +2957,7 @@ region announcing protocol phase transitions.
 
 ### Added
 
-- **`network/industrial-ot/modbus-rtu.html`** â live Phase-0 topic page.
+- **`network/industrial-ot/modbus-rtu.html`** — live Phase-0 topic page.
   - 800&times;320 px Canvas 2D animation showing master&rarr;slave request
     + turnaround silent interval + slave&rarr;master response + ACK ring
   - 6 parameter controls (baud rate select + parity + stop bits + function
@@ -2965,7 +2968,7 @@ region announcing protocol phase transitions.
   - 4 engineering-pitfall accordions (silent-interval violation,
     termination resistors, ground loops, driver fan-out)
   - 4 primary references (Modbus Org spec V1.02, TIA-485-A,
-    CompTIA Net+ N10-009 Â§2.1, NEMA ICS 1.1)
+    CompTIA Net+ N10-009 §2.1, NEMA ICS 1.1)
 - **`js/network-anim/renderer.js`** (290 lines) &mdash; Canvas 2D primitives:
   `drawWire` / `drawChip` (8 shapes) / `drawNode` (12 icon types) /
   `drawACKRing` (600 ms two-phase + centred &check;) / `drawCollisionX` /
@@ -3015,7 +3018,7 @@ region announcing protocol phase transitions.
   Labs card links directly to the Modbus RTU topic; landing comes when
   Phase 1 ships 3 more topics).
 - `network-compare.html` scaffold + Appendix-B-driven instrument chip strip.
-- `tools/test-network-anim-determinism.py` &mdash; `seek(N)` â¡
+- `tools/test-network-anim-determinism.py` &mdash; `seek(N)` ≡
   `reset() + seek(N)` harness with element-relative tolerance.
 - OG image at `assets/og/network-modbus-rtu.webp`.
 - Post-draft folder `Article/Post Draft/Network Hub/`.
@@ -3023,7 +3026,7 @@ region announcing protocol phase transitions.
 
 ---
 
-## v1.33.0 â 2026-05-24 (Network Visualization Hub â Phase 0 scaffolding: engine + audit + reference Modbus RTU timbre)
+## v1.33.0 — 2026-05-24 (Network Visualization Hub — Phase 0 scaffolding: engine + audit + reference Modbus RTU timbre)
 
 MINOR ship: first code lands for the Network Visualization Hub. Per plan
 v2.3, the engine + audio + palette + reference topic module + discipline
@@ -3031,22 +3034,22 @@ audit are scaffolded so the anti-monotony gate is operational from line 1.
 
 ### Added
 
-- **`js/network-anim/palette.js`** (49 lines) â sole color source. 6 tokens
+- **`js/network-anim/palette.js`** (49 lines) — sole color source. 6 tokens
   (`instrument-cyan`, `signal-amber`, `oscilloscope-green`, `fault-red`,
   `wire-default`, `canvas-bg`). Throws on unknown token. Frozen at module load.
-- **`js/network-anim/audio.js`** (155 lines) â Web Audio synth, 8 canonical
+- **`js/network-anim/audio.js`** (155 lines) — Web Audio synth, 8 canonical
   events (`tick`, `byte`, `ack`, `error`, `complete`, `handshake`,
   `streamChunk`, `tokenIssue`). Gesture-gated context. Mute-default.
   `compose(eventName, timbre, role, state)` implements the v2.3 composition
   order: defaults &lt; topic timbre &lt; perRole &lt; perState &lt; tempo
   (top &times; state multiplicative). Clamps freq to [400, 3000] Hz, byte
   duration to [6, 25] ms, hard cap 250 ms decay on all events.
-- **`js/network-anim/engine.js`** (109 lines) â RAF lifecycle + emit
+- **`js/network-anim/engine.js`** (109 lines) — RAF lifecycle + emit
   composer. `create(topicInstance, opts)` returns an engine handle.
   `emit(eventName, ctx)` composes via `audio.compose()` and dispatches
   SFX + optional signal callbacks. Throws if topic instance is missing
   `timbre` (loud-fail at integration time, not user-test time).
-- **`js/network-anim/topics/modbus-rtu.js`** (130 lines) â reference topic
+- **`js/network-anim/topics/modbus-rtu.js`** (130 lines) — reference topic
   module. Full `_timbre` per Appendix E row 1 (square-sweep 1200&rarr;1600 Hz
   byte, sensor-circle slave, plc-rectangle master, serial-thin 0.7 px wire,
   square 8&times;8 cyan chip, modem-v21 register, perRole master/slave
@@ -3054,14 +3057,14 @@ audit are scaffolded so the anti-monotony gate is operational from line 1.
   contract-shaped instance (play / pause / seek / setParams / getNormalized
   / destroy + timbre). Phase 0 stub for animation logic; full implementation
   lands in Phase 1.
-- **`tools/audit-network-anim.py`** (491 lines) â discipline gate covering
+- **`tools/audit-network-anim.py`** (491 lines) — discipline gate covering
   palette, banned CSS, timbre presence + enums, variation budget bounds,
   pairwise-within-lane anti-monotony, `perState.error` lock. `--strict`
   exits 1 on any HIGH/CRITICAL.
 
 ### Status
 
-Audit: **CLEAN** â 1 topic audited (Modbus RTU reference), 0 findings.
+Audit: **CLEAN** — 1 topic audited (Modbus RTU reference), 0 findings.
 File sizes well within budget (engine ~12 KB unminified vs 60 KB minified
 cap; per-topic 5.5 KB vs 15 KB cap).
 
@@ -3077,23 +3080,23 @@ llms.txt / OG entries, and the live Modbus RTU topic page end-to-end.
 
 ### Cross-references
 
-`docs/plans/2026-05-24-network-visualization-hub-v2.md` Â§Â§5.1, 5.2, 5.3,
-5.4, 5.6 + Appendix E + Â§15 Phase 0 DoD &middot;
+`docs/plans/2026-05-24-network-visualization-hub-v2.md` §§5.1, 5.2, 5.3,
+5.4, 5.6 + Appendix E + §15 Phase 0 DoD &middot;
 `standarization/KNOWLEDGE_LABS_STANDARD.md`
 
 ---
 
-## v1.32.10 â 2026-05-24 (Network Hub plan v2.3 â anti-monotony timbre layer + v2.2 review fixes)
+## v1.32.10 — 2026-05-24 (Network Hub plan v2.3 — anti-monotony timbre layer + v2.2 review fixes)
 
 PATCH doc-only ship: plan revision, no site code touched.
 
 ### Added to `docs/plans/2026-05-24-network-visualization-hub-v2.md`
 
-- **Â§5.6 timbre profile** (anti-monotony layer) â every topic module returns
+- **§5.6 timbre profile** (anti-monotony layer) — every topic module returns
   `timbre` on its `init()` instance. Engine composes canonical event params
   in explicit order: defaults &lt; topic timbre &lt; perRole &lt; perState &lt;
   tempo; clamps freq to [400, 3000] Hz, duration to [6, 25] ms post-composition.
-- **Appendix E** â 25-row per-protocol timbre table with distinctive trait,
+- **Appendix E** — 25-row per-protocol timbre table with distinctive trait,
   register character, byte waveform/freq/duration, chip shape, wire style,
   node icons, tempo. Anti-monotony rule: &le;2 shared fields with any other
   topic in the same lane.
@@ -3147,7 +3150,7 @@ reference page.
 
 ---
 
-## v1.32.7 â 2026-05-24 (Network Visualization Hub plan v2 â reviewer-vetted, ready for Phase 0 sign-off)
+## v1.32.7 — 2026-05-24 (Network Visualization Hub plan v2 — reviewer-vetted, ready for Phase 0 sign-off)
 
 PATCH doc-only ship: plan rewrite, no site code touched. Builds on the
 v1.32.5 doc-propagation pass.
@@ -3194,7 +3197,7 @@ v1.32.5 doc-propagation pass.
 ### Status
 
 Plan v2 is ready for owner sign-off on 4 remaining gating questions
-(Q1: IIFE pattern Â· Q2: public tier Â· Q3: 25-topic split Â· Q4: Phase 1
+(Q1: IIFE pattern · Q2: public tier · Q3: 25-topic split · Q4: Phase 1
 seed set). Phase 0 implementation begins after sign-off.
 
 ### Cross-references
@@ -3204,7 +3207,7 @@ seed set). Phase 0 implementation begins after sign-off.
 
 ---
 
-## v1.32.5 â 2026-05-24 (Documentation propagation pass â post-draft folders, knowledge-base standard, AI Maintenance Â§9 wired with worldwide FMECA dataset)
+## v1.32.5 — 2026-05-24 (Documentation propagation pass — post-draft folders, knowledge-base standard, AI Maintenance §9 wired with worldwide FMECA dataset)
 
 > Note: v1.32.1 through v1.32.4 are reserved for the parallel session's
 > accuracy-validation roadmap (DC AI + DC Conv 2026-05-23 review).
@@ -3231,7 +3234,7 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
   "Knowledge Labs &mdash; Standards, Networks, Protocols" section on
   `datacenter-solutions.html`. Replaces the earlier (rejected) plan to
   add a 7th card to Cost Calculators, which would have tripped the
-  6-grid SaaS-pattern anti-pattern (design.md Â§3 #11).
+  6-grid SaaS-pattern anti-pattern (design.md §3 #11).
 - **`ai-engineering-maintenance.html` Section 9** &mdash; new "Knowledge
   Base &mdash; Worldwide FMECA Seed Dataset" section surfacing the
   research deliverable: 20 asset families, 109 fault modes, 834
@@ -3296,39 +3299,39 @@ note, and task to be propagated to memory + `standarization/` + `CHANGELOG`
 
 ---
 
-## v1.41.1 â 2026-05-25 (STP modal full expansion + MMR room added)
+## v1.41.1 — 2026-05-25 (STP modal full expansion + MMR room added)
 
 Ship 2 of 7 in v1.41.x batch.
 
 ### STP modal expansion (datahallAI.html `renderStpHmi`)
-Owner asked for full drainage â sump â bio-septic â treatment train â
+Owner asked for full drainage → sump → bio-septic → treatment train →
 reuse-to-irrigation visualisation. Existing modal had only equalisation/
-aeration/clarifier/chlorination. Expanded modal viewBox 780Ã480 â 980Ã620
+aeration/clarifier/chlorination. Expanded modal viewBox 780×480 → 980×620
 to fit the full flow.
 
 **Added stages:**
-- **Drainage sources** (Row B): 5-tile stack â WC drains, kitchen, CRAH
-  condensate, floor drains, leak-detection trip drain â converging
+- **Drainage sources** (Row B): 5-tile stack — WC drains, kitchen, CRAH
+  condensate, floor drains, leak-detection trip drain — converging
   to sump pit
 - **Sump pit + duplex submersible pumps** (N+1, VFD 3 kW) lifting to
   bio-septic
-- **Bio-septic tank** (anaerobic primary, 25 mÂ³, 3-chamber baffled,
+- **Bio-septic tank** (anaerobic primary, 25 m³, 3-chamber baffled,
   HRT 8-12 h, BOD removal ~30 %)
 - **Sand filter** (tertiary suspended-solids polish, backwash trigger
   at 0.8 bar)
 - **Activated carbon filter** (residual organics, TOC < 1 mg/L, GAC
   replace every 6 months)
-- **UV disinfection** (2Ã lamps N+1, UVT > 70 %, log-4 pathogen kill,
+- **UV disinfection** (2× lamps N+1, UVT > 70 %, log-4 pathogen kill,
   lamp replace 9,000 h)
-- **Reclaim tank** (20 mÂ³ buffer, 2-3 d hold, NaOCl residual 0.5 mg/L)
-- **Irrigation distribution** (drip + spray, ~50 mÂ³/day, landscape
-  1,500 mÂ²)
-- **Sludge handling** sub-branch (drying bed â ~0.5 mÂ³/week â hauled
+- **Reclaim tank** (20 m³ buffer, 2-3 d hold, NaOCl residual 0.5 mg/L)
+- **Irrigation distribution** (drip + spray, ~50 m³/day, landscape
+  1,500 m²)
+- **Sludge handling** sub-branch (drying bed → ~0.5 m³/week → hauled
   to municipal)
-- **Reuse rate tile**: ~18,000 mÂ³/yr reused, ~0.18 ML/yr water saved
+- **Reuse rate tile**: ~18,000 m³/yr reused, ~0.18 ML/yr water saved
 - **Compliance tile**: Jakarta Pergub 69/2013 + Permen LHK 68/2016 +
   WHO Guidelines for Safe Use of Wastewater (irrigation grade)
-- **Operational tile**: SBR cycle (Fill 1h Â· React 4h Â· Settle 1h Â·
+- **Operational tile**: SBR cycle (Fill 1h · React 4h · Settle 1h ·
   Decant 2h), PLC Schneider M340 via Modbus TCP, daily/weekly/monthly
   test cadence
 
@@ -3344,7 +3347,7 @@ TELECOM zone replacing one redundant WORKSHOP/STORAGE label.
 - FDF (Fiber Distribution Frame / customer cross-connect)
 - CRAH (dedicated CRAH for MMR cooling load)
 
-Sub-title: "Carrier-Neutral Â· Cross-Connect"
+Sub-title: "Carrier-Neutral · Cross-Connect"
 Position: ground-floor east zone (near loading bay for carrier cable-
 pull access).
 
@@ -3357,7 +3360,7 @@ pull access).
 
 ---
 
-## v1.41.0 â 2026-05-25 (All-In-One Dashboard page + geopolitics.html link fix)
+## v1.41.0 — 2026-05-25 (All-In-One Dashboard page + geopolitics.html link fix)
 
 Ship 1 of 7 in the v1.41.x batch (owner approved 7 stacked plans).
 
@@ -3366,7 +3369,7 @@ Owner reported: geopolitics.html "All-In-One Dashboard" card linked to
 the Glance dashboard the card describes.
 
 ### Added
-- **`all-in-one-dashboard.html`** (NEW, ~350 lines) â informational
+- **`all-in-one-dashboard.html`** (NEW, ~350 lines) — informational
   showcase + quickstart page for the Glance self-hosted dashboard.
   Sections: hero/badge, what-is-Glance, why-for-engineers (4 tiles),
   module catalogue (8 widget tiles), Docker + Docker Compose
@@ -3378,7 +3381,7 @@ the Glance dashboard the card describes.
 
 ### Fixed
 - `geopolitics.html` line 794: card link
-  `dc-market-tracker.html` â `all-in-one-dashboard.html`
+  `dc-market-tracker.html` → `all-in-one-dashboard.html`
 
 ### Notes
 - New page added; brand tokens follow `documentation/design.md`
@@ -3387,7 +3390,7 @@ the Glance dashboard the card describes.
 
 ---
 
-## v1.40.5 â 2026-05-25 (Second Brain Hierarchical view fix â `sortMethod: hubsize` for cyclic knowledge graph)
+## v1.40.5 — 2026-05-25 (Second Brain Hierarchical view fix — `sortMethod: hubsize` for cyclic knowledge graph)
 
 Owner reported: Hierarchical view on `/Apps/second brain/index.html`
 showed nodes collapsed into 2 narrow pillars instead of a proper
@@ -3395,16 +3398,16 @@ tree layout.
 
 ### Diagnosis
 The view config used `sortMethod: 'directed'` which requires a DAG
-with a single root. The knowledge graph is **cyclic** â many
-bidirectional edges (articles â comparisons â calculators â memory
+with a single root. The knowledge graph is **cyclic** — many
+bidirectional edges (articles ↔ comparisons ↔ calculators ↔ memory
 files). Vis-network's `directed` sort can't resolve cycles, so it
 collapses cycle members into vertical pillars.
 
 ### Fixed
-- `sortMethod: 'directed'` â `'hubsize'` (root selection by node
-  degree â high-degree hubs like Engineering Journal, MEMORY.md,
+- `sortMethod: 'directed'` → `'hubsize'` (root selection by node
+  degree — high-degree hubs like Engineering Journal, MEMORY.md,
   RZEngine v1.2.0 become natural roots, others fan out beneath them)
-- `levelSeparation: 105` â `180` (more vertical room for 134 nodes)
+- `levelSeparation: 105` → `180` (more vertical room for 134 nodes)
 - New `nodeSpacing: 200` + `treeSpacing: 250` (horizontal breathing
   room for siblings and disjoint subtrees)
 - New `parentCentralization: true` (parents centered over children)
@@ -3416,7 +3419,7 @@ collapses cycle members into vertical pillars.
 
 ---
 
-## v1.40.3 â 2026-05-25 (Second Brain Wiki link broken â relative-path fix)
+## v1.40.3 — 2026-05-25 (Second Brain Wiki link broken — relative-path fix)
 
 Owner reported: clicking the "Wiki" button on the Second Brain page
 (`/Apps/second brain/index.html`) returned 404. The wiki link was
@@ -3447,7 +3450,7 @@ strict; the fix is a one-line path-prefix change.
 
 ---
 
-## v1.40.2 â 2026-05-25 (Tech Spec PDF â Section 7 Network + Section 2 Site/Structural; 338 KB â 353 KB; ~80-90 pages)
+## v1.40.2 — 2026-05-25 (Tech Spec PDF — Section 7 Network + Section 2 Site/Structural; 338 KB → 353 KB; ~80-90 pages)
 
 (Authored locally as v1.39.4. Parallel session shipped v1.40.0 AI
 Maintenance review fixes + v1.40.1 Network Hub OG images mid-push;
@@ -3455,7 +3458,7 @@ this lands as v1.40.2.)
 
 Phase B continuation. v1.39.3 deepened electrical/cooling/fire.
 This ship deepens network/ICT + adds structural/seismic/environmental
-depth to Section 2 (Site &amp; Facility). PDF: 338 â 353 KB (+15 KB).
+depth to Section 2 (Site &amp; Facility). PDF: 338 → 353 KB (+15 KB).
 
 ### Bug caught + fixed during this ship
 The first attempt failed the probe (`TS-AI-1: Generate Design returns
@@ -3463,96 +3466,96 @@ The first attempt failed the probe (`TS-AI-1: Generate Design returns
 was declared later (inside Section 6). Same class as v1.36.2's
 `sldSVG` scope bug. Fixed by hoisting `var g = m.geometry;` + `var
 hallVol = vol;` to the top of `buildTechSpecHtml()`. **Probe caught
-it before push** â exactly its job.
+it before push** — exactly its job.
 
-### Section 7 (Network) â added
-- **7.3 Spine-Leaf Radix Sizing** â NVIDIA QM9700 (64-port NDR 400 G)
+### Section 7 (Network) — added
+- **7.3 Spine-Leaf Radix Sizing** — NVIDIA QM9700 (64-port NDR 400 G)
   reference; per-hall leaf + spine count (rail-aligned 8-rail
   topology); bisection bandwidth.
-- **7.4 Full IB Cable Schedule** â cable type by length (DAC /
+- **7.4 Full IB Cable Schedule** — cable type by length (DAC /
   AOC / MMF / SMF); per-hall + facility-wide cable count + length;
   cable-tray routing strategy.
-- **7.5 OOB Management Network** â endpoints, switch sizing, Cat6A,
+- **7.5 OOB Management Network** — endpoints, switch sizing, Cat6A,
   SNMPv3 + IPMI 2.0 + Redfish.
-- **7.6 Storage Tier Design** â hot/warm/cold tiers with capacity,
+- **7.6 Storage Tier Design** — hot/warm/cold tiers with capacity,
   bandwidth, and protocol stack (NVMe-oF, parallel FS, object).
-- **7.7 BMS Gateway + DCIM Integration** â Distech ECY-VAV / Schneider
+- **7.7 BMS Gateway + DCIM Integration** — Distech ECY-VAV / Schneider
   SmartX AS-P, multi-protocol stack, IEC 62443 zoning.
 
-### Section 2 (Site & Facility) â added
-- **2.1 Structural Floor Loading** â NVL72 weight 1,360 kg, per-rack-
+### Section 2 (Site & Facility) — added
+- **2.1 Structural Floor Loading** — NVL72 weight 1,360 kg, per-rack-
   pos loading 830 kg, distributed live load 1,150 kg/m&sup2;,
   design 1,500 kg/m&sup2; with 30 % margin; post-tensioned RC
   slab-on-grade C40/50.
-- **2.2 Seismic Design (SNI 1726:2019)** â Zone 4 Jakarta, PGA 0.5 g,
+- **2.2 Seismic Design (SNI 1726:2019)** — Zone 4 Jakarta, PGA 0.5 g,
   SMRF building structure, M16 anchors &ge; 50 kN shear, bracing per
-  IBC Â§13.5, ASCE 7-22 dual reference.
-- **2.3 Environmental Envelope** â ASHRAE A1 + L4 (cold-aisle
+  IBC §13.5, ASCE 7-22 dual reference.
+- **2.3 Environmental Envelope** — ASHRAE A1 + L4 (cold-aisle
   18&ndash;27 &deg;C, TCS supply 35 &deg;C); particulate (ISO 14644-1
   Class 8); vibration (ISO 10816 &lt; 0.5 mm/s); noise (&lt; 85 dBA);
   lighting (500 lux LED 4000K).
-- **2.4 Hall Layout Dimensions** â detailed geometry per hall
-  (length Ã width Ã height; aisle widths; row count; emergency-exit
-  count per IBC Â§1006).
+- **2.4 Hall Layout Dimensions** — detailed geometry per hall
+  (length × width × height; aisle widths; row count; emergency-exit
+  count per IBC §1006).
 
 ### Notes
 - Engine files (`datahall-model.js`, `datahall-calculations.js`)
   byte-identical. 57/57 + 22/22 tests pass.
 - Probe 75/75 PASS (after the post-bug fix).
-- Cumulative v1.39.x growth: 264 KB â **353 KB** (+34 %).
+- Cumulative v1.39.x growth: 264 KB → **353 KB** (+34 %).
 - Owner: refresh `http://127.0.0.1:8090/datahallAI.html`, click
-  ð Generate Design â should see Sections 2, 7 substantially
+  📑 Generate Design — should see Sections 2, 7 substantially
   expanded plus all prior additions.
 
 ---
 
-## v1.39.3 â 2026-05-24 (Tech Spec PDF deeper engineering â Section 4/5/6 expansion; 315 KB â 338 KB; ~75 estimated pages)
+## v1.39.3 — 2026-05-24 (Tech Spec PDF deeper engineering — Section 4/5/6 expansion; 315 KB → 338 KB; ~75 estimated pages)
 
 Phase B continuation. v1.39.2 expanded compute/BMS/cost annex. This
 ship deepens electrical, cooling, fire disciplines toward the
-200-300 page target. PDF HTML: 315 KB â 338 KB (+23 KB). Estimated
-printed pages: ~55-65 â ~70-80.
+200-300 page target. PDF HTML: 315 KB → 338 KB (+23 KB). Estimated
+printed pages: ~55-65 → ~70-80.
 
-### Section 4 (Electrical) â added
-- **4.6 Per-Feeder Voltage Drop (IEC 60364-5-52)** â cumulative
+### Section 4 (Electrical) — added
+- **4.6 Per-Feeder Voltage Drop (IEC 60364-5-52)** — cumulative
   source-to-rack budget &lt; 2 % vs 2.5 % Tier-IV target; 40 %
   oversize headroom on conductor selection.
-- **4.7 Short-Circuit Current (IEC 60909)** â three-phase fault
+- **4.7 Short-Circuit Current (IEC 60909)** — three-phase fault
   current per bus with utility + transformer + generator contribution;
   busway ICU 50 kA / 1 s for double margin.
-- **4.8 Battery Sizing Variants** â 10 / 15 / 30 min ride-through
+- **4.8 Battery Sizing Variants** — 10 / 15 / 30 min ride-through
   with installed kWh + cabinet count per variant.
-- **4.9 Harmonic Analysis (IEEE 519 + IEC 61000-3-2)** â combined
+- **4.9 Harmonic Analysis (IEEE 519 + IEC 61000-3-2)** — combined
   TDD predicted &lt; 5 % at PCC; AHF mitigation triggers.
-- **4.10 Full Equipment Cut-Sheet Index** â vendor references for
+- **4.10 Full Equipment Cut-Sheet Index** — vendor references for
   UPS / transformer / generator / LV switchgear / busway / RPP /
   ATS / STS / battery.
 
-### Section 5 (Cooling) â added
-- **5.6 Per-CDU Duty + Flow Table** â 12-row matrix per hall with
+### Section 5 (Cooling) — added
+- **5.6 Per-CDU Duty + Flow Table** — 12-row matrix per hall with
   running/standby status, duty kW, loading %, TCS flow, &Delta;T.
-- **5.7 Per-CRAH Duty Table** â 6-row per hall with status, duty,
+- **5.7 Per-CRAH Duty Table** — 6-row per hall with status, duty,
   CHW flow, &Delta;T.
-- **5.8 COP Sensitivity Sweep** â chiller compressor input + PUE
+- **5.8 COP Sensitivity Sweep** — chiller compressor input + PUE
   at COP 5.0/5.5/6.0/6.5/6.8/7.5 with nameplate vs fouled vs
   optimistic labels.
-- **5.9 Chiller Sequencing Logic** â 5-step staging strategy with
+- **5.9 Chiller Sequencing Logic** — 5-step staging strategy with
   failure-response timing.
-- **5.10 Cooling Tower / Condenser Water Sizing** â heat rejection
+- **5.10 Cooling Tower / Condenser Water Sizing** — heat rejection
   budget, design wet-bulb, CWS flow, make-up rate, tower-cell N+1.
 
-### Section 6 (Fire) â added
-- **6.5 NFPA 2001 Hold-Time + Soak-Out** â design concentration
+### Section 6 (Fire) — added
+- **6.5 NFPA 2001 Hold-Time + Soak-Out** — design concentration
   margin, door-fan integrity test, MEC + safety factor.
-- **6.6 Agent Concentration at Altitude** â NFPA 2001 Table 5.2.2
+- **6.6 Agent Concentration at Altitude** — NFPA 2001 Table 5.2.2
   multiplier (sea-level baseline; lookup at common DC altitudes).
-- **6.7 Detector Spacing per NFPA 72** â spot vs cross-zoned vs
+- **6.7 Detector Spacing per NFPA 72** — spot vs cross-zoned vs
   VESDA aspirating port counts derived from hall geometry.
-- **6.8 Pre-Action Sprinkler Back-Up (NFPA 13)** â double-interlock
+- **6.8 Pre-Action Sprinkler Back-Up (NFPA 13)** — double-interlock
   design, sprinkler head selection, water supply.
-- **6.9 EPO Interlock Strategy** â scope matrix per room
+- **6.9 EPO Interlock Strategy** — scope matrix per room
   (data hall = NO EPO; electrical/battery/genset/mech = EPO required
-  per NFPA 75 Â§9.4 / NFPA 110 Â§5.6).
+  per NFPA 75 §9.4 / NFPA 110 §5.6).
 
 ### Notes
 - Engine files (`datahall-model.js`, `datahall-calculations.js`)
@@ -3561,19 +3564,19 @@ printed pages: ~55-65 â ~70-80.
   doesn't (NFPA / IEC / IEEE references).
 - Probe 75/75 PASS &mdash; all existing assertions still hold.
 - DC AI Tech Spec PDF cumulative growth across v1.39.x:
-  264 KB (v1.39.0 baseline) â **338 KB** (v1.39.3) = +74 KB / +28 %.
+  264 KB (v1.39.0 baseline) → **338 KB** (v1.39.3) = +74 KB / +28 %.
 - Realistic next targets (v1.39.4 if more depth wanted): Section 7
   network full IB cable schedule (216 cables per pod) + spine-leaf
   radix sizing + storage tier design.
 
 ---
 
-## v1.39.2 â 2026-05-24 (Tech Spec PDF content depth expansion â Phase B; +51 KB content, ~55-65 estimated pages)
+## v1.39.2 — 2026-05-24 (Tech Spec PDF content depth expansion — Phase B; +51 KB content, ~55-65 estimated pages)
 
 Phase B of the v1.39.x Tech Spec depth + visibility plan. v1.39.1 fixed
 the SVG-renders-as-black bug. This ship expands content depth toward
-the owner's "200-300 halaman" ask. PDF HTML: 264 KB â 315 KB (+51 KB
-new content, +19 %). Estimated printed pages: ~25 â ~55-65.
+the owner's "200-300 halaman" ask. PDF HTML: 264 KB → 315 KB (+51 KB
+new content, +19 %). Estimated printed pages: ~25 → ~55-65.
 
 Honest reach assessment: still short of the 200-300 page target.
 Continuing in v1.39.3 if owner wants more depth.
@@ -3589,8 +3592,8 @@ Continuing in v1.39.3 if owner wants more depth.
   0 for electrical / cooling / fire systems. PM cadence table per
   IEEE 902 + NETA MTS.
 - **Appendix F &mdash; Standards Excerpts** (~4-5 pages): clause-level
-  citations from NFPA 75 Â§5.2 / Â§7.3.1 / Â§8.1 / Â§9.4, NFPA 2001
-  Â§1.5 / Â§5.1.2 / Â§9.2 / Â§9.4, ASHRAE TC 9.9 Class A1 + W4 + L4,
+  citations from NFPA 75 §5.2 / §7.3.1 / §8.1 / §9.4, NFPA 2001
+  §1.5 / §5.1.2 / §9.2 / §9.4, ASHRAE TC 9.9 Class A1 + W4 + L4,
   Uptime Tier IV (concurrent maintainability + continuous cooling),
   IEC 60364-4-41 / 5-52, IEEE 1100 Ch 8-10, NVIDIA NVL72 reference.
 - **Section 3.4 &mdash; Per-NVL72 Power Matrix (per hall)** (~2 pages):
@@ -3642,7 +3645,7 @@ Added D, E, F to the appendix list. Section anchor list also adds
 
 ---
 
-## v1.39.1 â 2026-05-24 (SVG visibility fix in Tech Spec + BoD PDFs; mobile patch on 16 more Network Hub pages)
+## v1.39.1 — 2026-05-24 (SVG visibility fix in Tech Spec + BoD PDFs; mobile patch on 16 more Network Hub pages)
 
 Owner reported (screenshot 2026-05-24, page 10 of 25 in Tech Spec PDF):
 embedded SVG figures rendered as solid black blocks with invisible
@@ -3652,11 +3655,11 @@ fills land on white with no surrounding context and read as black
 blobs. Lines technically render but are too low-contrast to see.
 
 This ship is Phase A of the v1.39.x Tech Spec depth + visibility
-plan; Phase B (substantial content expansion to 150â200 pages) lands
+plan; Phase B (substantial content expansion to 150–200 pages) lands
 in v1.39.2.
 
-### SVG fix â `grabSVG()` rewrite (both `buildTechSpecHtml` + `buildBodPdfHtml`)
-- **Inject dark canvas rect** as the first child of the cloned SVG â
+### SVG fix — `grabSVG()` rewrite (both `buildTechSpecHtml` + `buildBodPdfHtml`)
+- **Inject dark canvas rect** as the first child of the cloned SVG —
   preserves the dark-theme design intact, so the embedded figure
   looks exactly like a screenshot of what the operator sees on the
   cockpit. No fidelity loss; no surprise re-colouring.
@@ -3666,15 +3669,15 @@ in v1.39.2.
   what would otherwise vanish.
 - **Wrap in framed `<figure>`** with 0.6pt slate border + dark
   background + page-break-inside: avoid + italic caption: "Source:
-  live cockpit SVG â dark-theme palette preserved as designed".
+  live cockpit SVG — dark-theme palette preserved as designed".
   Makes it clear to the reader that the dark panel is intentional,
   not a print error.
 
 ### Trade-off (transparent)
 Two valid approaches were considered:
-1. **Wrap in dark canvas** (chosen) â preserves cockpit design exactly,
+1. **Wrap in dark canvas** (chosen) — preserves cockpit design exactly,
    reads as a screenshot.
-2. **Remap fills for print contrast** (not chosen) â better
+2. **Remap fills for print contrast** (not chosen) — better
    stand-alone readability on white but the figure no longer matches
    what the operator sees on the cockpit.
 
@@ -3683,7 +3686,7 @@ work over context divergence; the dark-canvas approach delivers
 both (visible lines + faithful palette).
 
 ### Mobile patch (incidental fix, surfaced by gate)
-Parallel session shipped v1.39.0 Phases 3â6 (Lane A + D + E + C of
+Parallel session shipped v1.39.0 Phases 3–6 (Lane A + D + E + C of
 the Network Hub) with 16 new protocol pages. `ship-gate.sh --probe-http`
 flagged all 16 as failing `audit-mobile-responsive --strict`
 (score 2/10). Standard v1.8.0 mobile patch added to:
@@ -3695,16 +3698,16 @@ flagged all 16 as failing `audit-mobile-responsive --strict`
 Mobile audit: **132 pass / 0 fail** (was 116 / 16).
 
 ### Notes
-- DC Conv Tech Spec doesn't use embedded SVGs â unaffected by SVG fix.
+- DC Conv Tech Spec doesn't use embedded SVGs — unaffected by SVG fix.
 - Engine files byte-identical. 57/57 + 22/22 tests pass.
 - Probe 75/75 PASS (all existing PDF assertions still hold; visibility
   fix doesn't change content character counts).
-- Substantial content expansion (Issue B from owner feedback â "kurang
+- Substantial content expansion (Issue B from owner feedback — "kurang
   detail, sangat-sangat kurang komprehensif") ships in v1.39.2.
 
 ---
 
-## v1.38.1 â 2026-05-24 (ship-gate.sh â HTTP probe mode + dev-server pre-flight + mobile patch on 5 more Network Hub pages)
+## v1.38.1 — 2026-05-24 (ship-gate.sh — HTTP probe mode + dev-server pre-flight + mobile patch on 5 more Network Hub pages)
 
 (Authored locally as v1.37.3. Parallel session shipped v1.38.0
 Network Hub Phase 2 [+5 protocol pages] mid-push; this lands as
@@ -3730,7 +3733,7 @@ third-party CORS attempts). When the owner has a dev server running
 (e.g. `python3 -m http.server 8090`), HTTP mode is faster.
 
 ### Added
-- **`bash tools/ship-gate.sh --probe-http`** â runs the probe
+- **`bash tools/ship-gate.sh --probe-http`** — runs the probe
   against an HTTP dev server. Default base is
   `http://127.0.0.1:8090`; override via
   `RZ_PROBE_BASE=http://127.0.0.1:9000 bash tools/ship-gate.sh --probe-http`.
@@ -3738,13 +3741,13 @@ third-party CORS attempts). When the owner has a dev server running
   gate fails immediately with a helpful message instead of letting
   the probe time out:
   ```
-  â FAIL â dev server not reachable at http://127.0.0.1:8090
+  ✗ FAIL — dev server not reachable at http://127.0.0.1:8090
   Start one first:  python3 -m http.server 8090 --directory $(pwd)
   ```
 
 ### Existing
-- `bash tools/ship-gate.sh` (no probe â 7 gates, ~5 s) still works.
-- `bash tools/ship-gate.sh --probe` (file:// mode â 8 gates, ~60 s)
+- `bash tools/ship-gate.sh` (no probe — 7 gates, ~5 s) still works.
+- `bash tools/ship-gate.sh --probe` (file:// mode — 8 gates, ~60 s)
   still works.
 - The new `--probe-http` mode is ~50 % faster on the probe step
   alone when a dev server is up (no CORS blocking).
@@ -3756,35 +3759,35 @@ third-party CORS attempts). When the owner has a dev server running
 
 ---
 
-## v1.37.2 â 2026-05-24 (FAQ dialog probe coverage; caught DC Conv FAQ TypeError; 75/75 pass)
+## v1.37.2 — 2026-05-24 (FAQ dialog probe coverage; caught DC Conv FAQ TypeError; 75/75 pass)
 
 The probe was extended to cover the FAQ dialog on both cockpits. On
-first run it caught **another silent bug** â DC Conv FAQ button threw
+first run it caught **another silent bug** — DC Conv FAQ button threw
 `TypeError: Cannot read properties of undefined (reading 'racks_total')`
 when clicked. Bug #5 caught by the probe in 24 hours.
 
-### Bug found (user-facing â FAQ dialog crashed before opening)
-- **Symptom**: DC Conv cockpit â click "â FAQ" button â dialog
+### Bug found (user-facing — FAQ dialog crashed before opening)
+- **Symptom**: DC Conv cockpit → click "❓ FAQ" button → dialog
   fails to open. No visible error.
 - **Console error**: `TypeError: Cannot read properties of undefined
   (reading 'racks_total')` at the FAQ_ITEMS array initialisation
   (FAQ entry "How many racks does this facility have?").
 - **Root cause**: `dc-conventional.html` line 2064 referenced
   `s.datahall.racks_total` but `CONV_CALC.snapshot` has no
-  `datahall` key â racks_total is in design constants, not the
+  `datahall` key — racks_total is in design constants, not the
   snapshot. The `s ?` guard only checked if the snapshot existed,
   not whether the `datahall` sub-object existed.
 - **Fix**: hardcode 200 racks (the conv design constant) and derive
   average density from `s.site.it_load_kw / 200` with the same
   defensive guard pattern used elsewhere.
-- **Impact window**: shipped in v1.30.1 (2026-05-23) â fixed v1.37.2
+- **Impact window**: shipped in v1.30.1 (2026-05-23) → fixed v1.37.2
   (2026-05-24). All users who clicked the FAQ on DC Conv between
   ship and fix saw a broken modal.
 
 ### Probe added (regression-guard)
-- **FAQ-AI-1 to FAQ-AI-4**: DC AI FAQ â no page-error from
+- **FAQ-AI-1 to FAQ-AI-4**: DC AI FAQ — no page-error from
   FAQ_ITEMS init (guards against v1.32.10 ReferenceError regression),
-  dialog opens on click, â¥10 Q/A pairs, no JS error on click.
+  dialog opens on click, ≥10 Q/A pairs, no JS error on click.
 - **FAQ-CONV-1 to FAQ-CONV-4**: same 4 assertions on DC Conv FAQ.
 
 ### Result
@@ -3792,11 +3795,11 @@ when clicked. Bug #5 caught by the probe in 24 hours.
 
 ### Accuracy-arc bug count
 The probe has now caught 5 real bugs:
-1. v1.32.10 â FAQ_ITEMS ReferenceError on page load (since v1.30.1)
-2. v1.32.10 â probe page.click() coordinate-fail (probe robustness)
-3. v1.32.10 â Test-3a regex too strict
-4. v1.36.2 â **DC AI Generate Design empty PDF for ~24 hr in prod**
-5. v1.37.2 â **DC Conv FAQ TypeError for ~24 hr in prod (this ship)**
+1. v1.32.10 — FAQ_ITEMS ReferenceError on page load (since v1.30.1)
+2. v1.32.10 — probe page.click() coordinate-fail (probe robustness)
+3. v1.32.10 — Test-3a regex too strict
+4. v1.36.2 — **DC AI Generate Design empty PDF for ~24 hr in prod**
+5. v1.37.2 — **DC Conv FAQ TypeError for ~24 hr in prod (this ship)**
 
 Bugs #4 and #5 are both **user-facing silent failures** on features
 that LOOKED to work. Both shipped in v1.30.1 (the Generate Design +
@@ -3806,20 +3809,20 @@ the next day.
 ### Notes
 - Engine files byte-identical. 57/57 + 22/22 tests pass.
 - `tools/ship-gate.sh` label updated to reflect 75-test count.
-- Same pattern as DC AI FAQ_ITEMS scope-bug â different mechanism,
+- Same pattern as DC AI FAQ_ITEMS scope-bug — different mechanism,
   same root cause class (referencing names that don't exist where
   the developer thought they did).
 
 ---
 
-## v1.37.1 â 2026-05-24 (Basis of Design PDF probe coverage; 67/67 pass)
+## v1.37.1 — 2026-05-24 (Basis of Design PDF probe coverage; 67/67 pass)
 
 (Authored locally as v1.36.3. Parallel session shipped v1.37.0 Network
 Hub determinism harness mid-push; this lands as v1.37.1.)
 
-Mirror of v1.36.2's Tech Spec PDF probe â the older "Basis of Design"
-button on DC AI is a separate code path (`#bodTrig` â
-`#bodDrawerPdf` â `buildBodPdfHtml()`, scoped in a different IIFE
+Mirror of v1.36.2's Tech Spec PDF probe — the older "Basis of Design"
+button on DC AI is a separate code path (`#bodTrig` →
+`#bodDrawerPdf` → `buildBodPdfHtml()`, scoped in a different IIFE
 from `buildTechSpecHtml()`). Given v1.36.2 found a silent failure on
 the newer button, the older one needed the same mechanical
 verification.
@@ -3834,7 +3837,7 @@ verification.
   the print-window output.
 
 ### Result
-- BoD PDF was HEALTHY â no silent bug. The probe assertions all
+- BoD PDF was HEALTHY — no silent bug. The probe assertions all
   pass. But this is now mechanically verified rather than assumed.
 - **67/67 PASS** (was 60; +7 BoD assertions).
 - `tools/ship-gate.sh` label updated.
@@ -3851,7 +3854,7 @@ push.
 
 ---
 
-## v1.36.2 â 2026-05-24 (Tech Spec PDF probe coverage; probe caught CRITICAL silent bug â DC AI Generate Design returned empty PDF since v1.31.2; 60/60 pass)
+## v1.36.2 — 2026-05-24 (Tech Spec PDF probe coverage; probe caught CRITICAL silent bug — DC AI Generate Design returned empty PDF since v1.31.2; 60/60 pass)
 
 The probe was extended to capture and verify the Generate Design Tech
 Spec PDF output on both cockpits. On first run it caught a **critical
@@ -3859,11 +3862,11 @@ silent bug** that had been in production for ~24 hours: the DC AI
 Generate Design button was producing an EMPTY popup because the v1.31.2
 expansion referenced `sldSVG` inside `buildTechSpecHtml()` but the
 variable was only declared in `buildBodPdfHtml()`. Different functions,
-different scopes â silent `ReferenceError` swallowed by the print-window
+different scopes — silent `ReferenceError` swallowed by the print-window
 flow.
 
-### Bug found (CRITICAL â user-facing)
-- **Symptom**: DC AI cockpit â click "ð Generate Design" â popup
+### Bug found (CRITICAL — user-facing)
+- **Symptom**: DC AI cockpit → click "📑 Generate Design" → popup
   opens but is BLANK. No error visible to user.
 - **Console error** (only visible with dev-tools open):
   `ReferenceError: sldSVG is not defined`
@@ -3875,15 +3878,15 @@ flow.
 - **Fix**: declare `var sldSVG=grabSVG('elecSvg')||grabSVG('sldHost')
   ||grabSVG('p-elec');` at the top of `buildTechSpecHtml()`, parallel
   to its declaration in `buildBodPdfHtml()`.
-- **Impact window**: shipped in v1.31.2 (2026-05-23) â fixed v1.36.2
+- **Impact window**: shipped in v1.31.2 (2026-05-23) → fixed v1.36.2
   (2026-05-24). All users who clicked Generate Design on DC AI in
   that window got an empty PDF.
-- **DC Conv was unaffected** â `buildTechSpecHtml()` on
+- **DC Conv was unaffected** — `buildTechSpecHtml()` on
   `dc-conventional.html` doesn't reference any SVG figures, so the
   bug was DC-AI-only.
 
 ### Probe added
-- **TS-AI-1 through TS-AI-10** (10 assertions) â DC AI Tech Spec PDF:
+- **TS-AI-1 through TS-AI-10** (10 assertions) — DC AI Tech Spec PDF:
   - returns non-trivial HTML (~264 KB)
   - title carries facility name
   - cites Scenario A locked
@@ -3894,7 +3897,7 @@ flow.
   - references standards (ASHRAE/NFPA/NVIDIA)
   - includes Cost Annex (Section 10)
   - includes Appendix A formula derivations
-- **TS-CONV-1 through TS-CONV-10** (10 assertions) â DC Conv Tech Spec
+- **TS-CONV-1 through TS-CONV-10** (10 assertions) — DC Conv Tech Spec
   PDF: facility name, IT 1,850 kW, PUE 1.45, Grid factor terminology,
   CUE_IT 0.61, CHW flow 58.2 L/s, fuel 45,900 L, Cost Annex,
   ISO/IEC 30134 citation.
@@ -3910,23 +3913,23 @@ updated to report "60/60" in its label.
 
 ### Accuracy-arc bug count to date
 The probe has now caught 4 real bugs that would otherwise have shipped:
-1. v1.32.10 â FAQ_ITEMS ReferenceError on page load (since v1.30.1)
-2. v1.32.10 â page.click() coordinate-fail in headless (probe itself)
-3. v1.32.10 â Test-3a regex too strict on NVL72-rack-scale
-4. **v1.36.2 â DC AI Generate Design empty PDF (since v1.31.2,
+1. v1.32.10 — FAQ_ITEMS ReferenceError on page load (since v1.30.1)
+2. v1.32.10 — page.click() coordinate-fail in headless (probe itself)
+3. v1.32.10 — Test-3a regex too strict on NVL72-rack-scale
+4. **v1.36.2 — DC AI Generate Design empty PDF (since v1.31.2,
    user-facing for ~24 hr)**
 
 ### Notes
 - Engine files (`datahall-model.js`, `datahall-calculations.js`,
   `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
-- Bug #4 is the most consequential of the 4 â a user-facing feature
+- Bug #4 is the most consequential of the 4 — a user-facing feature
   that LOOKED to work (button clicked, popup opened) but produced
   zero output. Without the probe this would have stayed broken until
   a user reported it.
 
 ---
 
-## v1.36.1 â 2026-05-24 (Probe wired into per-ship gate sequence + ship-gate.sh runner + mobile-responsive patch on 6 Network Hub pages)
+## v1.36.1 — 2026-05-24 (Probe wired into per-ship gate sequence + ship-gate.sh runner + mobile-responsive patch on 6 Network Hub pages)
 
 (Authored locally as v1.35.2 with 3 mobile patches. Parallel session
 shipped v1.36.0 with 3 more new pages mid-push; this lands as v1.36.1
@@ -3938,7 +3941,7 @@ to `CLAUDE.md`'s standard sequence, providing a single-command runner
 (`tools/ship-gate.sh`), and updating the tooling reference table.
 
 ### Added
-- **`tools/ship-gate.sh`** â single-command runner for the full
+- **`tools/ship-gate.sh`** — single-command runner for the full
   per-ship gate sequence. 7 default gates (4 audit + 2 engine tests +
   1 engine-files-byte-identical guard) + optional 8th gate
   (`--probe` to run `probe-accuracy-validation.mjs`).
@@ -3949,7 +3952,7 @@ to `CLAUDE.md`'s standard sequence, providing a single-command runner
   chmod +x .git/hooks/pre-push
   ```
 - **`CLAUDE.md` updates**:
-  - New "Engine + accuracy tests" block in Â§"Audit before push" with
+  - New "Engine + accuracy tests" block in §"Audit before push" with
     the three engine/probe commands.
   - Tooling-reference table gains 3 rows (`test-datahall-calc.mjs`,
     `test-conv-calc.mjs`, `probe-accuracy-validation.mjs`).
@@ -3992,7 +3995,7 @@ PASS**.
 
 ---
 
-## v1.35.1 â 2026-05-24 (Cross-page headline consistency probe â Rule 1 verified site-wide; 40/40 pass)
+## v1.35.1 — 2026-05-24 (Cross-page headline consistency probe — Rule 1 verified site-wide; 40/40 pass)
 
 (Authored locally as v1.33.3. Parallel session shipped v1.34.0 + v1.35.0
 Network Hub work mid-push; this lands as v1.35.1.)
@@ -4009,12 +4012,12 @@ its own page; now it asserts the same engine value reconciles
 - **X-Test-2**: WUE = 1.20 identical across dc-conv dashboard
   (`#kpiWue`), dc-conv side (`#sWue` "1.20 L/kWh"), water-system
   KPI (`#kWue`), water-system status bar (`#status-wue`).
-- **X-Test-3**: IT load reconciles in different units â dc-conv
+- **X-Test-3**: IT load reconciles in different units — dc-conv
   "1,850 kW" (`#kpiIt`) = datahall "1.85 MW" (`#dh-rack-load`).
 
 ### Probe robustness fix
 - Switched `page.goto` from `networkidle2` to `domcontentloaded` for
-  cross-page reads â `networkidle2` was timing out on `file://` mode
+  cross-page reads — `networkidle2` was timing out on `file://` mode
   when third-party analytics (e.g. `ipapi`) blocked on CORS. Probe
   only needs DOM + engine, not network quiescence.
 
@@ -4026,9 +4029,9 @@ The reviewer's chief concern in docs 26+16 was that "the deeper tabs
 can be correct while the first screen tells a different story."
 **X-Test-1/2/3 demonstrably rule that out** for the three values
 where multiple pages display the same engine fact:
-- PUE 1.45 on 3 surfaces â
-- WUE 1.20 on 4 surfaces â
-- IT 1850 kW = 1.85 MW on 2 surfaces â
+- PUE 1.45 on 3 surfaces ✓
+- WUE 1.20 on 4 surfaces ✓
+- IT 1850 kW = 1.85 MW on 2 surfaces ✓
 
 If any future ship breaks the single-source-of-truth invariant on
 these metrics, the probe fails before push.
@@ -4037,12 +4040,12 @@ these metrics, the probe fails before push.
 - Engine files byte-identical. 57/57 + 22/22 tests pass.
 - Probe runtime: ~50 s headless (+5 s for cross-page reads).
 - DC AI cockpit is on a different engine (Scenario A, PUE 1.30) so
-  not included in cross-page reconciliation with the CONV pages â
+  not included in cross-page reconciliation with the CONV pages —
   that would be a category error.
 
 ---
 
-## v1.33.2 â 2026-05-24 (Basis drawers extended to datahall.html ops-rollup â Rule 6 site-wide)
+## v1.33.2 — 2026-05-24 (Basis drawers extended to datahall.html ops-rollup — Rule 6 site-wide)
 
 ACCURACY_VALIDATION Rule 6 originally landed on the two cockpit
 dashboards (DC AI + DC Conv) in v1.32.8. This ship extends the same
@@ -4080,7 +4083,7 @@ one of those pages.
 
 ---
 
-## v1.33.1 â 2026-05-24 (Probe-validated bugfix â FAQ ReferenceError + probe robustness; 32/32 pass)
+## v1.33.1 — 2026-05-24 (Probe-validated bugfix — FAQ ReferenceError + probe robustness; 32/32 pass)
 
 (Authored locally as v1.32.10. Parallel session shipped v1.32.10 Network
 Hub plan v2.3 + v1.33.0 Phase 0 scaffolding mid-push; this lands as
@@ -4090,11 +4093,11 @@ The v1.32.9 probe FOUND TWO REAL BUGS on first run. Both fixed here.
 This is exactly what the probe was supposed to do, so v1.32.9 +
 v1.33.1 together close the accuracy-review arc with verified state.
 
-### Bug #1 (caught by probe) â FAQ_ITEMS ReferenceError on page load
+### Bug #1 (caught by probe) — FAQ_ITEMS ReferenceError on page load
 - **Symptom**: `datahallAI.html` threw `ReferenceError: sc is not defined`
   during script parse, visible in browser dev-tools console.
 - **Root cause**: v1.30.1 ship placed `var FAQ_ITEMS=[...]` at IIFE
-  top-level, referencing `sc / pueVal / eq / m / grp` â variables
+  top-level, referencing `sc / pueVal / eq / m / grp` — variables
   scoped INSIDE `buildTechSpecHtml()`. The array body evaluates
   eagerly on page load, so all four refs throw before any FAQ button
   could be clicked.
@@ -4104,23 +4107,23 @@ v1.33.1 together close the accuracy-review arc with verified state.
   is guaranteed loaded. Added local `gNum()` helper for the
   thousands-separator formatting.
 
-### Bug #2 (probe robustness) â `page.click()` failed on basis-drawer cards
+### Bug #2 (probe robustness) — `page.click()` failed on basis-drawer cards
 - **Symptom**: probe AI-Test-7 + CONV-Test-8 reported drawer never
   opened.
 - **Root cause**: Puppeteer's coordinate-based `page.click()` requires
   the element to be visible AND not occluded at the click coordinates.
-  In headless mode with default 800Ã600 viewport some elements may
+  In headless mode with default 800×600 viewport some elements may
   fail the visibility check.
 - **Fix**: switched the probe to DOM-API click
   (`page.evaluate(() => element.click())`) which dispatches a real
   click event without coordinate testing. More reliable for headless
   testing.
 
-### Bug #3 (probe rigour) â Test-3a regex too strict
+### Bug #3 (probe rigour) — Test-3a regex too strict
 - **Symptom**: matched "NVL72 rack-scale" (a legitimate NVIDIA term)
   as ambiguous.
 - **Fix**: tightened regex to `\b66\s*kW.{0,12}NVL72\s+rack\b(?!-)`
-  â blocks the bare "66 kW NVL72 rack" pattern but allows
+  — blocks the bare "66 kW NVL72 rack" pattern but allows
   "rack-scale", "rack-pos", and pluralised "racks".
 
 ### Result after fixes
@@ -4130,7 +4133,7 @@ RESULT: 32 passed, 0 failed
 
 Both DC AI (19 tests) and DC Conv (13 tests) pass. The team review
 (docs 26 + 16) is now demonstrably closed against a runnable
-verification harness â not just by claim.
+verification harness — not just by claim.
 
 ### Closing notes on the accuracy review (docs 26 + 16)
 | Ship | Function |
@@ -4142,8 +4145,8 @@ verification harness â not just by claim.
 | v1.32.10 | Probe ran, found 2 real bugs, fixed both, 32/32 PASS |
 
 This sequence demonstrates the handoff mandate (locked 2026-05-23):
-every reviewer finding traced from raw doc â critical assessment â
-implementation â standardisation doc â CHANGELOG â memory â runnable
+every reviewer finding traced from raw doc → critical assessment →
+implementation → standardisation doc → CHANGELOG → memory → runnable
 verification.
 
 ### Notes
@@ -4154,7 +4157,7 @@ verification.
 
 ---
 
-## v1.32.9 â 2026-05-24 (Accuracy Puppeteer probes â 15 reviewer acceptance tests codified)
+## v1.32.9 — 2026-05-24 (Accuracy Puppeteer probes — 15 reviewer acceptance tests codified)
 
 Phase 4 / final piece of the team-review accuracy work. The reviewer's
 7 DC AI + 8 DC Conv acceptance tests from
@@ -4164,8 +4167,8 @@ now codified as a runnable probe:
 `tools/probe-accuracy-validation.mjs`.
 
 ### Added
-- **`tools/probe-accuracy-validation.mjs`** â headless Chrome
-  (Puppeteer) probe. Runtime ~25â35 s. Exit code 0 = PASS, 1 = FAIL.
+- **`tools/probe-accuracy-validation.mjs`** — headless Chrome
+  (Puppeteer) probe. Runtime ~25–35 s. Exit code 0 = PASS, 1 = FAIL.
   Two modes:
   - HTTP (recommended): `python3 -m http.server 8081 &` then
     `node tools/probe-accuracy-validation.mjs`.
@@ -4173,15 +4176,15 @@ now codified as a runnable probe:
 
 ### Covered tests
 **DC AI** (`datahallAI.html`):
-- AI-Test-1aâ1f: PUE = 1.30, WUE = 0.00, CUE_IT = 0.90, IT = 14.26 MW,
+- AI-Test-1a–1f: PUE = 1.30, WUE = 0.00, CUE_IT = 0.90, IT = 14.26 MW,
   GPUs = 7,776, NVL72 = 108 domains.
 - AI-Test-2: basis KPIs identical across N reloads.
-- AI-Test-3a/b: terminology â no "NVL72 rack" ambiguity; "rack-pos"
+- AI-Test-3a/b: terminology — no "NVL72 rack" ambiguity; "rack-pos"
   present.
 - AI-Test-4: CDU 36/48 facility.
 - AI-Test-5: no "5 running = 40 MW" arithmetic error.
 - AI-Test-6: PUE colour is NOT green (informational neutral).
-- AI-Test-7aâ7g: basis drawer carries formula / inputs / output /
+- AI-Test-7a–7g: basis drawer carries formula / inputs / output /
   scope / source / last-update / data-mode chip.
 
 **DC Conv** (`dc-conventional.html`):
@@ -4193,13 +4196,13 @@ now codified as a runnable probe:
 - CONV-Test-5: fuel autonomy labelled "bulk-tank @ site load".
 - CONV-Test-6: UPS A shows normal + failover percentages.
 - CONV-Test-7: dashboard basis KPIs identical across N reloads.
-- CONV-Test-8aâ8d: Grid-factor drawer shows Formula / Source /
+- CONV-Test-8a–8d: Grid-factor drawer shows Formula / Source /
   data-mode chip / CUE_IT relationship.
 
 ### Notes
 - Probe documented in `standarization/ACCURACY_VALIDATION.md`
-  Â§"Acceptance tests (CI-gateable)" with run commands.
-- ROUND_TRIPS defaults to 3 (vs reviewer's 20Ã spec) for fast probe
+  §"Acceptance tests (CI-gateable)" with run commands.
+- ROUND_TRIPS defaults to 3 (vs reviewer's 20× spec) for fast probe
   cycle; raise via env if needed.
 - Engine files (`datahall-model.js`, `datahall-calculations.js`,
   `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
@@ -4209,7 +4212,7 @@ now codified as a runnable probe:
 |---|---|---|
 | Phase 1 | v1.32.1 | 8 critical bugs fixed (AI-ACC-01/02/03/05/06/07/08 + CONV-ACC-01/02/04/08) |
 | Phase 2 | v1.32.6 | Terminology + UPS 2N + CHW reconciliation (AI-ACC-04/09 + CONV-ACC-03/05) |
-| Phase 3 | v1.32.8 | Basis drawers on every top KPI (Rule 6 â display contract) |
+| Phase 3 | v1.32.8 | Basis drawers on every top KPI (Rule 6 — display contract) |
 | Phase 4 | v1.32.9 | Puppeteer probes for all 15 acceptance tests |
 
 All 19 reviewer findings closed; 1 standardisation doc shipped
@@ -4219,7 +4222,7 @@ memory propagated (`feedback_handoff_mandate.md` +
 
 ---
 
-## v1.32.8 â 2026-05-24 (KPI Basis Drawers â ACCURACY_VALIDATION Rule 6, both cockpits)
+## v1.32.8 — 2026-05-24 (KPI Basis Drawers — ACCURACY_VALIDATION Rule 6, both cockpits)
 
 Phase 3 of the team-review accuracy work. v1.32.1 fixed critical bugs;
 v1.32.6 swept terminology + UPS 2N + CHW reconciliation; v1.32.8 closes
@@ -4231,54 +4234,54 @@ scope / denominator / source / data-mode / last-update.
 Network Visualization Hub plan v2 mid-push; this lands as v1.32.8.)
 
 ### Added (both cockpits)
-- **DC AI dashboard (`datahallAI.html`)** â 8 KPI cards now clickable
+- **DC AI dashboard (`datahallAI.html`)** — 8 KPI cards now clickable
   (PUE / WUE / CUE / IT Load / GPUs / NVL72 / Uptime / Alarms). Each
   opens a drawer with the full basis contract per
   `ACCURACY_VALIDATION.md` Rule 6.
-- **DC Conv dashboard (`dc-conventional.html`)** â 7 KPI cards
+- **DC Conv dashboard (`dc-conventional.html`)** — 7 KPI cards
   clickable (PUE / WUE / Grid factor / IT Load / Uptime / Temp /
   Chillers). Same drawer pattern.
 
 ### Drawer contents (per KPI)
 - **Title** + **Data mode chip** (DERIVED / BOD LOCKED / SIM SENSOR /
   DESIGN PLACEHOLDER) in header.
-- **Formula** â the exact governing equation, monospace.
-- **Inputs** â table of input values pulled live from
+- **Formula** — the exact governing equation, monospace.
+- **Inputs** — table of input values pulled live from
   `DATAHALL_CALC` / `CONV_CALC`.
-- **Output** â the computed value, green highlight.
-- **Scope** + **Denominator** â side-by-side; closes the reviewer's
+- **Output** — the computed value, green highlight.
+- **Scope** + **Denominator** — side-by-side; closes the reviewer's
   CONV-ACC-01 / AI-ACC-03 denominator-ambiguity concern.
-- **Source object** â exact engine-method or model field name,
+- **Source object** — exact engine-method or model field name,
   monospace purple (e.g. `DATAHALL_CALC.pueBasis()`).
-- **Last update** â timestamp + "deterministic" note (per Rule 2 the
+- **Last update** — timestamp + "deterministic" note (per Rule 2 the
   engine snapshot does not drift).
-- **Engineering note** â amber-left-bar callout explaining
+- **Engineering note** — amber-left-bar callout explaining
   non-obvious context (e.g. "Chiller COP is NAMEPLATE, not
-  back-solved"; "Grid factor is NOT CUE â CUE_IT = grid Ã PUE").
+  back-solved"; "Grid factor is NOT CUE — CUE_IT = grid × PUE").
 
 ### UX
 - Click OR keyboard (Enter / Space) on focused card opens drawer.
-- Escape, backdrop-click, or Ã button closes.
+- Escape, backdrop-click, or × button closes.
 - `aria-modal=true` + `aria-labelledby` on the dialog.
 - Each card has `tabindex=0` + `role=button` + descriptive
   `aria-label` for keyboard / screen-reader.
 
 ### Reviewer findings closed by this ship
-- AI-ACC docs Â§"Required KPI Display Contract" â basis drawer per KPI
+- AI-ACC docs §"Required KPI Display Contract" — basis drawer per KPI
   with `label / value / unit / basis / source / scope / state /
   last update`. Done across all 15 top-strip KPIs across both
   cockpits.
-- CONV-ACC docs Â§"Add KPI Basis Drawer" â same.
+- CONV-ACC docs §"Add KPI Basis Drawer" — same.
 
 ### Notes
 - Engine files (`datahall-model.js`, `datahall-calculations.js`,
   `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
-- v1.32.8 â Puppeteer probes for the reviewer's 7 + 8 acceptance
+- v1.32.8 — Puppeteer probes for the reviewer's 7 + 8 acceptance
   tests, gated in CI.
 
 ---
 
-## v1.32.6 â 2026-05-24 (Accuracy review terminology + UPS 2N + CHW flow reconciliation â review docs 26 / 16 phase 2)
+## v1.32.6 — 2026-05-24 (Accuracy review terminology + UPS 2N + CHW flow reconciliation — review docs 26 / 16 phase 2)
 
 Phase 2 of the team-review accuracy work. v1.32.1 fixed the 8 critical
 bugs (random KPIs, denominator mislabels, arithmetic errors). v1.32.2
@@ -4287,60 +4290,60 @@ loading nuance, CHW flow reconciliation. Engine files byte-identical;
 57/57 + 22/22 tests pass.
 
 ### DC AI (datahallAI.html)
-- **AI-ACC-04 swept**: "kW/rack" â "kW/rack-pos (2/NVL72)" across the 4
-  DATAHALL room labels (SVG `rmLive` blocks) + "Per rack ~66 kW" â
+- **AI-ACC-04 swept**: "kW/rack" → "kW/rack-pos (2/NVL72)" across the 4
+  DATAHALL room labels (SVG `rmLive` blocks) + "Per rack ~66 kW" →
   "Per rack-pos ~66 kW IT (2/NVL72 footprint)" on the Electrical SLD
   hall-spec captions. Engine keeps the 2-rack-footprint basis (real-world
   AI deployments split NVL72 across two 600 mm racks for weight ~1,360
   kg + cabling + serviceability). Only the UI labels rename so a
   reviewer doesn't confuse 66 kW with NVIDIA's NVL72 rack-scale spec.
 - **AI-ACC-09 fixed**: UPS A/B row `Online 79%` (was ambiguous about
-  whether 79% is normal or failover loading) â `40% nrm / 79% fail`.
-  Normal-sharing percentage = engine.upsLoadPct Ã· 2. Failover (one-side
+  whether 79% is normal or failover loading) → `40% nrm / 79% fail`.
+  Normal-sharing percentage = engine.upsLoadPct ÷ 2. Failover (one-side
   carries protected load) = engine.upsLoadPct. Tooltip explains both.
   JS removed the small live jitter; values now deterministic per
   `ACCURACY_VALIDATION.md` Rule 2.
-- AI-ACC-10 â chiller "12/16" already labelled "design placeholder"
+- AI-ACC-10 — chiller "12/16" already labelled "design placeholder"
   with tooltip basis chip in v1.32.1; no further change.
 
 ### DC Conv (dc-conventional.html + chiller-plant.html)
 - **CONV-ACC-05 fixed**: UPS A `72%` / B `68%` (decorative greens, no
-  failover info) â `46% nrm / 92% fail`. Normal-sharing = (it_load Ã· 2)
-  Ã· 2 MW rated. Failover = it_load Ã· 2 MW rated. Bound via
+  failover info) → `46% nrm / 92% fail`. Normal-sharing = (it_load ÷ 2)
+  ÷ 2 MW rated. Failover = it_load ÷ 2 MW rated. Bound via
   `snapshot.electrical.ups_module_kw`.
 - **CONV-ACC-03 fixed**: chiller-plant adds new "CHW Flow Reconciliation"
   card showing design flow (IT-load basis, 58.2 L/s) vs sanity flow
-  (heat-rejection basis IT+UPS, 60.6 L/s) vs Î (+4.1 %). Pumps sized to
-  the larger figure; chiller-plant ÎT setpoint references the design
+  (heat-rejection basis IT+UPS, 60.6 L/s) vs Δ (+4.1 %). Pumps sized to
+  the larger figure; chiller-plant ΔT setpoint references the design
   value. Surfaces the doc-09 design choice so it no longer reads as a
   hidden mismatch.
-- CONV-ACC-06 â Tech Spec Appendix B already lists 3 densities with
+- CONV-ACC-06 — Tech Spec Appendix B already lists 3 densities with
   explicit `kW/rack` labels (v1.31.3). Confirmed; no further change.
-- CONV-ACC-09 â data-mode chips already present on every cockpit page
-  (ict.html Â· water-system.html Â· fire-system.html Â· chiller-plant.html Â·
-  dc-conventional.html Â· datahall.html Â· fuel-system.html Â· EPMS).
+- CONV-ACC-09 — data-mode chips already present on every cockpit page
+  (ict.html · water-system.html · fire-system.html · chiller-plant.html ·
+  dc-conventional.html · datahall.html · fuel-system.html · EPMS).
   Audited and confirmed engine-bound across all 8 pages. No further
   change.
 
 ### Critical pushback held (carried from v1.32.1)
-- Engine 2-rack-footprint basis retained â labels changed, not the
+- Engine 2-rack-footprint basis retained — labels changed, not the
   arithmetic. Defensible against reviewer's "align to NVIDIA's 120 kW"
   framing.
-- CUE_IT binding to PLN Java grid 0.69 kgCOâ/kWh retained as the
+- CUE_IT binding to PLN Java grid 0.69 kgCO₂/kWh retained as the
   citation-grade option (vs reviewer's "Not calculated" fallback).
 
 ### Notes
 - Engine files (`datahall-model.js`, `datahall-calculations.js`,
   `conv-engine.js`) byte-identical. 57/57 + 22/22 tests pass.
-- v1.32.3 â basis drawers per ACCURACY_VALIDATION.md Rule 6 (every top
+- v1.32.3 — basis drawers per ACCURACY_VALIDATION.md Rule 6 (every top
   KPI opens a formula/inputs/output/scope/denominator/source/mode/
   timestamp drawer).
-- v1.32.7 â Puppeteer probes for the reviewer's 7 DC AI + 8 DC Conv
+- v1.32.7 — Puppeteer probes for the reviewer's 7 DC AI + 8 DC Conv
   acceptance tests, gated in CI.
 
 ---
 
-## v1.32.1 â 2026-05-24 (Critical accuracy fixes per team review docs 26 + 16 â owner exclusion lifted)
+## v1.32.1 — 2026-05-24 (Critical accuracy fixes per team review docs 26 + 16 — owner exclusion lifted)
 
 Owner directive 2026-05-23: "review comment team saya, dan sempurnakan, dan
 implementasikan. saya tidak mau anda hanya agrreeing aja. plan mode. harus
@@ -4352,31 +4355,31 @@ Conv findings). Critical assessment captured in
 
 **Owner exclusion change**: `#p-dash` panel + `updateDashKPI()` +
 `dcCallouts` byte-identical mandate (locked since BMS Shell adoption,
-v1.23.x â v1.31.x) is **LIFTED** for the accuracy-binding work. Engine
+v1.23.x → v1.31.x) is **LIFTED** for the accuracy-binding work. Engine
 files (`js/datahall-model.js`, `datahall-calculations.js`,
 `js/conv-engine.js`) remain byte-identical.
 
-### DC AI â datahallAI.html
-- **AI-ACC-01 fixed**: dashboard IT load 28.5 MW â 14.26 MW (Scenario A).
-- **AI-ACC-02 fixed**: PUE 1.08 â 1.30 derived (engine bottom-up). Colour
-  swapped green â cyan (informational neutral) per `ACCURACY_VALIDATION.md` Rule 4.
-- **AI-ACC-03 fixed**: WUE 0.42 random â 0.00 dry-only baseline. CUE
-  0.38 random â CUE_IT 0.90 kgCOâ/kWh IT (PLN Java grid 0.69 Ã PUE 1.30
+### DC AI — datahallAI.html
+- **AI-ACC-01 fixed**: dashboard IT load 28.5 MW → 14.26 MW (Scenario A).
+- **AI-ACC-02 fixed**: PUE 1.08 → 1.30 derived (engine bottom-up). Colour
+  swapped green → cyan (informational neutral) per `ACCURACY_VALIDATION.md` Rule 4.
+- **AI-ACC-03 fixed**: WUE 0.42 random → 0.00 dry-only baseline. CUE
+  0.38 random → CUE_IT 0.90 kgCO₂/kWh IT (PLN Java grid 0.69 × PUE 1.30
   per ISO/IEC 30134-8).
-- **AI-ACC-05 fixed**: CDU 96/96 N+1 (33.6 MW overspec) â 36/48 fac Â· 9/12 hall.
-- **AI-ACC-06 fixed**: "5 running = 40 MW" arithmetic error â 7 running
-  = 19.25 MW for 18.55 MW facility via DHE.gensetFacN Ã DHE.gensetMW.
+- **AI-ACC-05 fixed**: CDU 96/96 N+1 (33.6 MW overspec) → 36/48 fac · 9/12 hall.
+- **AI-ACC-06 fixed**: "5 running = 40 MW" arithmetic error → 7 running
+  = 19.25 MW for 18.55 MW facility via DHE.gensetFacN × DHE.gensetMW.
 - **AI-ACC-07 fixed**: `Math.random()` removed from PUE / WUE / CUE / IT /
   per-hall / totals. Sensor jitter (outdoor weather only) retained per
-  reviewer allowance. Reload-20Ã test: basis KPIs identical.
+  reviewer allowance. Reload-20× test: basis KPIs identical.
 - **AI-ACC-08 fixed**: colour grammar updated.
 
-### DC Conv â dc-conventional.html + chiller-plant.html
-- **CONV-ACC-01 fixed**: dashboard `Carbon 0.42` â `Grid factor 0.42
-  kgCOâ/kWh facility`; side panel adds CUE_IT 0.61 kg/kWh IT tile.
-- **CONV-ACC-02 fixed**: `CHWS SP 18.8C` â `Secondary loop SP 18.8C`;
-  primary CHWS 7.2 Â°C label preserved.
-- **CONV-ACC-04 fixed**: fuel autonomy `48 hrs` â `48 hrs Â· bulk-tank @
+### DC Conv — dc-conventional.html + chiller-plant.html
+- **CONV-ACC-01 fixed**: dashboard `Carbon 0.42` → `Grid factor 0.42
+  kgCO₂/kWh facility`; side panel adds CUE_IT 0.61 kg/kWh IT tile.
+- **CONV-ACC-02 fixed**: `CHWS SP 18.8C` → `Secondary loop SP 18.8C`;
+  primary CHWS 7.2 °C label preserved.
+- **CONV-ACC-04 fixed**: fuel autonomy `48 hrs` → `48 hrs · bulk-tank @
   site load`.
 - **CONV-ACC-08 fixed**: Tech Spec PDF Appendix A.3, A.9, Section 9,
   Section 1 headline table all distinguish grid factor (facility-kWh)
@@ -4403,14 +4406,14 @@ v1.32.1 atop their work.
 
 ### Notes
 - Engine files byte-identical. 57/57 + 22/22 tests pass.
-- v1.32.2 â terminology + label sweep (AI-ACC-04/09/10, CONV-ACC-03/05/06/09).
-- v1.32.3 â basis drawers per Rule 6.
-- v1.32.4 â Puppeteer probes for acceptance tests.
+- v1.32.2 — terminology + label sweep (AI-ACC-04/09/10, CONV-ACC-03/05/06/09).
+- v1.32.3 — basis drawers per Rule 6.
+- v1.32.4 — Puppeteer probes for acceptance tests.
 ---
 
-## v1.32.0 â 2026-05-23 (AI Engineering Maintenance â concept page; FMECA + KG + ML + NLP synthesis)
+## v1.32.0 — 2026-05-23 (AI Engineering Maintenance — concept page; FMECA + KG + ML + NLP synthesis)
 
-R-016 â `ai-engineering-maintenance.html` (1,441 lines) ships the
+R-016 — `ai-engineering-maintenance.html` (1,441 lines) ships the
 **concept-and-design document** for the prescriptive-maintenance engine,
 synthesised from Lin & Ompusunggu (2026), *Artificial Intelligence for
 Engineering*, https://doi.org/10.1049/aie2.70019.
@@ -4419,14 +4422,14 @@ Engineering*, https://doi.org/10.1049/aie2.70019.
 
 - Standalone HTML, gated by `enforceTierFeatureAccess('ai-engineering-maintenance')`
   via the 4-tier matrix (Pro + Educator + Root pass).
-- 8 sections (concept summary Â· 4-module block diagram Â· per-module cards Â·
-  two interaction modes side-by-side Â· case-study numbers (Macro F1 84.84%,
-  spalling 77.98% weakest) Â· 12 engineering gaps + enhancements (`<details>`
-  accordions) Â· enhanced-architecture big SVG Â· 5-phase build roadmap Â·
+- 8 sections (concept summary · 4-module block diagram · per-module cards ·
+  two interaction modes side-by-side · case-study numbers (Macro F1 84.84%,
+  spalling 77.98% weakest) · 12 engineering gaps + enhancements (`<details>`
+  accordions) · enhanced-architecture big SVG · 5-phase build roadmap ·
   open questions for owner).
 - 12 SVG diagrams drawn in brand industrial-instrumentation style
   (thin 0.6-1.4 px lines, instrument-cyan + signal-amber; NO Anthropic-purple).
-- DC Solutions card wired: `COMING SOON` â `PRO`; opens cleanly.
+- DC Solutions card wired: `COMING SOON` → `PRO`; opens cleanly.
 - Site integration: sitemap, search-index, llms.txt, feature-flags.
 - All audit gates green; mobile-responsive 10/10.
 
@@ -4437,7 +4440,7 @@ The actual maintenance engine. This is concept + roadmap; build phases
 
 ---
 
-## v1.31.4 â 2026-05-23 (Tech Spec PDF â Section 10 Cost Annex on both DC AI and DC Conv)
+## v1.31.4 — 2026-05-23 (Tech Spec PDF — Section 10 Cost Annex on both DC AI and DC Conv)
 
 Owner direct ask: "Perhitungan utk tech spec bisa gunakan engine capex,
 opex calculator dan calculator2 lain." Rather than coupling each Tech
@@ -4472,7 +4475,7 @@ facility kW figure. Self-contained, engine-derived, reproducible.
 
 ---
 
-## v1.31.3 â 2026-05-23 (DC Conventional Tech Spec PDF â full discipline expansion: Cooling, Water, Fire, Fuel, ICT/EPMS/BMS, Carbon + appendices B + C)
+## v1.31.3 — 2026-05-23 (DC Conventional Tech Spec PDF — full discipline expansion: Cooling, Water, Fire, Fuel, ICT/EPMS/BMS, Carbon + appendices B + C)
 
 v1.30.1 shipped the scaffold + Power discipline. This ship expands the
 DC Conventional Tech Spec PDF (`dc-conventional.html` &rarr; Generate
@@ -4526,7 +4529,7 @@ Design) to the full discipline coverage. Every number derived live from
 
 ---
 
-## v1.31.2 â 2026-05-23 (DC AI Tech Spec PDF â full discipline expansion: Electrical, Cooling, Fire, Network, BMS + appendices B + C)
+## v1.31.2 — 2026-05-23 (DC AI Tech Spec PDF — full discipline expansion: Electrical, Cooling, Fire, Network, BMS + appendices B + C)
 
 v1.30.1 shipped the scaffold and the Compute discipline. This ship
 expands the DC AI Tech Spec PDF (`datahallAI.html` &rarr; Generate Design)
@@ -4574,17 +4577,17 @@ this release lands as v1.31.2 atop their work.
 
 ---
 
-## v1.31.1 â 2026-05-23 (DC Solutions â AI Engineering Maintenance placeholder card)
+## v1.31.1 — 2026-05-23 (DC Solutions — AI Engineering Maintenance placeholder card)
 
 Added a 6th card to the **Cost Calculators** section on `datacenter-solutions.html`
 alongside CAPEX / OPEX / DC MOC / Cx / RFS Readiness:
 
-- **AI Engineering Maintenance** â placeholder; concept brief pending owner.
-- Icon `fa-screwdriver-wrench`, tone `#60a5fa` blue-400 on `rgba(96,165,250,0.18)` â
+- **AI Engineering Maintenance** — placeholder; concept brief pending owner.
+- Icon `fa-screwdriver-wrench`, tone `#60a5fa` blue-400 on `rgba(96,165,250,0.18)` —
   distinct from the 5 existing colors; NOT Anthropic-purple.
 - Badge: `COMING SOON` with hourglass icon (mirrors existing `.ds-badge-pro` shape).
 - `href="#"` + `aria-disabled="true"` + onclick toast "Coming soon. Concept brief in progress."
-- Tool count bumped `5 tools` â `6 tools` in section header.
+- Tool count bumped `5 tools` → `6 tools` in section header.
 
 Placeholder only. The actual page lands once owner provides the concept brief
 (AI-assisted maintenance scheduling, predictive failure, asset-lifecycle ops).
@@ -4594,7 +4597,7 @@ v1.31.1 metadata: version + sw cache + changelog.)
 
 ---
 
-## v1.31.0 â 2026-05-23 (FT Phase 2 Task B â client analytics panel + buy/sell gauge widget per tab)
+## v1.31.0 — 2026-05-23 (FT Phase 2 Task B — client analytics panel + buy/sell gauge widget per tab)
 
 R-002/R-003/R-008 client-side surfacing of v1.30.0's `/analyze` data.
 Per-tab **Analytics Panel** rendering buy/sell gauge + signal chips +
@@ -4602,16 +4605,16 @@ indicator table + rationale + related news, flag-gated under `CFG.V2`.
 
 ### What landed (all behind `localStorage.rz_ft_v2 === '1'`)
 
-- **`renderGaugeSvg(score, label)`** â inline SVG semicircle, 7-band
-  color (red < 30 / amber 30-45 / grey 45-55 / mint 55-70 / green â¥ 70).
-  Reuses existing palette tokens â no Anthropic-purple, no new gradient.
-- **`renderAnalyticsPanel(containerId, analyze, news)`** â composes
+- **`renderGaugeSvg(score, label)`** — inline SVG semicircle, 7-band
+  color (red < 30 / amber 30-45 / grey 45-55 / mint 55-70 / green ≥ 70).
+  Reuses existing palette tokens — no Anthropic-purple, no new gradient.
+- **`renderAnalyticsPanel(containerId, analyze, news)`** — composes
   gauge + trend/momentum/volatility/MA chips + 10-row indicator table
-  (RSI, MACD, SMA20/50/200, EMA20, Bollinger Â±, ATR, Stoch K) + 5-line
+  (RSI, MACD, SMA20/50/200, EMA20, Bollinger ±, ATR, Stoch K) + 5-line
   rationale list (last line muted italic = "informational only" caveat)
   + top-3 related news from `/news?topic=<sym>`.
-- **`loadAnalyticsPanel(containerId, sym, tf)`** â async fetch + render,
-  graceful "Analytics unavailable â retry" on Worker failure.
+- **`loadAnalyticsPanel(containerId, sym, tf)`** — async fetch + render,
+  graceful "Analytics unavailable — retry" on Worker failure.
 - **Wired into 4 tabs:**
   - **Commodities** (`#cmdAnalyticsPanel`, after the chart card,
     sym=`S.cmdSym`, tf=`S.cmdTf`).
@@ -4619,43 +4622,43 @@ indicator table + rationale + related news, flag-gated under `CFG.V2`.
   - **Stocks** (`#stockAnalyticsPanel`, sym=`S.curStock`).
   - **FX** (`#fxAnalyticsPanel`, sym=`<PAIR>=X` Yahoo format).
 - Mobile responsive (panel collapses to single column < 900px;
-  indicator grid `1fr` â¤ 768px).
+  indicator grid `1fr` ≤ 768px).
 - All `</script>` inside template strings properly escaped.
 
 ### Verification
 
-- audit-js-syntax / audit-script-tags / audit-mobile-responsive â all
+- audit-js-syntax / audit-script-tags / audit-mobile-responsive — all
   `--strict` CLEAN.
 - Live Puppeteer smoke: Commodities panel rendered for GLD/3M (3273
   chars HTML; gauge + chips + indicators + rationale + news all present).
 - Crypto + FX tabs show graceful "Analytics unavailable" on dev
-  datacenter IP (Yahoo 429 for BTC-USD / EURUSD=X) â same upstream
+  datacenter IP (Yahoo 429 for BTC-USD / EURUSD=X) — same upstream
   constraint as v1.30.0; expected to resolve on Cloudflare edge in
   production.
 
 ### NOT in this commit (remaining Phase 2 sub-tasks)
 
-- C â Telegram alert push (Worker Cron evaluates server-side)
-- D â Email alerts via Resend free tier
-- E â `/finnhub-webhook` receiver
+- C — Telegram alert push (Worker Cron evaluates server-side)
+- D — Email alerts via Resend free tier
+- E — `/finnhub-webhook` receiver
 
-Not active on production â `rz_ft_v2` flag still required + Worker
+Not active on production — `rz_ft_v2` flag still required + Worker
 still pending deploy (`worker/SETUP.md`).
 
 ---
 
-## v1.30.1 â 2026-05-23 (Generate Design Tech Spec PDF + FAQ on DC AI and Conventional DC cockpits â Phase 2 scaffold)
+## v1.30.1 — 2026-05-23 (Generate Design Tech Spec PDF + FAQ on DC AI and Conventional DC cockpits — Phase 2 scaffold)
 
 Owner brief: "kasih tombol download Tech Spec PDF atur aja nama tombol itu
 generate design itu... at least 200-300 halaman yang sangat detail. Dan ada
 tombol FAQ juga." This ship adds the Generate Design + FAQ buttons on both
 DC AI (`datahallAI.html`) and Conventional DC (`dc-conventional.html`) and
-ships the ~60 pp scaffold of the Tech Spec PDF for each. Full ~210â220 pp
+ships the ~60 pp scaffold of the Tech Spec PDF for each. Full ~210–220 pp
 reach lands across v1.30.1 (DC AI all disciplines) and v1.30.2 (DC Conv all
 disciplines).
 
 ### Added
-- **`datahallAI.html` header buttons**: new `ð Generate Design` and `â FAQ`
+- **`datahallAI.html` header buttons**: new `📑 Generate Design` and `❓ FAQ`
   buttons alongside the existing `Basis of Design` trigger. Generate
   Design opens a print-window with the multi-page Tech Spec PDF built
   live from `window.DATAHALL_CALC.lockedState()` + `pueBasis()` +
@@ -4678,9 +4681,9 @@ disciplines).
   the formatting stays consistent across both cockpits.
 - All `<\/script>` escapes in PDF template strings observed per
   `standarization/PDF_EXPORT_STANDARD.md`.
-- v1.30.0 scaffold pages: Title Â· TOC Â· Exec Summary Â· Site & Facility Â·
-  Anchor Discipline (Compute for DC AI, Power for DC Conv) Â· 4â8
-  placeholder anchors Â· References Â· Appendix A formula derivations.
+- v1.30.0 scaffold pages: Title · TOC · Exec Summary · Site & Facility ·
+  Anchor Discipline (Compute for DC AI, Power for DC Conv) · 4–8
+  placeholder anchors · References · Appendix A formula derivations.
 
 ### Notes
 - Engine files (`js/datahall-model.js`, `js/datahall-calculations.js`,
@@ -4697,36 +4700,36 @@ disciplines).
   dll at least 200-300 halaman yang sangat detail."
 - "Dan ada tombol FAQ juga.ini masing2 ya dc ai sendiri dc conventional sendiri."
 - "Perhitungan utk tech spec bisa gunakan engine capex, opex calculator
-  dan calculator2 lain." â engine binding to DATAHALL_CALC + CONV_CALC
+  dan calculator2 lain." → engine binding to DATAHALL_CALC + CONV_CALC
   delivered today; capex/opex/tco/roi/pue rollups will join in v1.30.2.
 
 ### Coordination note
-The parallel cf-worker session shipped its own v1.30.0 (FT Phase 2 Task A â
+The parallel cf-worker session shipped its own v1.30.0 (FT Phase 2 Task A —
 /analyze endpoint) earlier today. This ship lands as v1.30.1 atop their
 release.
 
 ---
 
-## v1.30.0 â 2026-05-23 (FT Phase 2 Task A â /analyze endpoint: TA indicators + composite buy/sell gauge + ensemble prediction)
+## v1.30.0 — 2026-05-23 (FT Phase 2 Task A — /analyze endpoint: TA indicators + composite buy/sell gauge + ensemble prediction)
 
 R-002 + R-003 + R-004 foundation. Worker `/analyze?sym=&tf=` returns
 TA indicators (RSI, MACD, SMA, EMA, Bollinger, ATR, Stoch) + signal
 labels (trend / momentum / volatility / ma_cross) + composite buy/sell
 gauge (0-100 score, 7-band label, weighted 35/25/20/15/5) + ensemble
-prediction with transparent rationale (â¤5 entries, ending with
-"Informational only â not a forecast").
+prediction with transparent rationale (≤5 entries, ending with
+"Informational only — not a forecast").
 
 Pure-math `worker/src/lib/{ta,gauge}.js`. KV cached 60s + stale-on-error.
 24 new tests, **62/62 pass total**. Added to cron prewarm so popular
 symbols stay hot. Client UI integration + alerts delivery + Finnhub
 webhook are remaining Phase 2 sub-tasks.
 
-Not active on production â `rz_ft_v2` flag still required + Worker
+Not active on production — `rz_ft_v2` flag still required + Worker
 still pending deploy (`worker/SETUP.md`).
 
 ---
 
-## v1.29.3 â 2026-05-23 (BMS cockpit Phase 1 mobile fixes â wired datahall view-mode toolbar + chiller right-edge overflow + water-system process-flow overlap)
+## v1.29.3 — 2026-05-23 (BMS cockpit Phase 1 mobile fixes — wired datahall view-mode toolbar + chiller right-edge overflow + water-system process-flow overlap)
 
 Three small surgical mobile fixes owner asked for in this round of screenshots,
 plus prep for Phase 2 (Generate Design Tech Spec PDF + FAQ on DC AI / DC Conv,
@@ -4736,23 +4739,23 @@ shipping in v1.30.0).
 - **datahall.html view-mode toolbar now drives the rack heatmap.** Owner image 1:
   "Toggle atau pilihan apa ini yg saya lingkari nggak tahu fungsinya di pencet2
   g ada fungsi." The 5-button top toolbar (POWER / TEMPERATURE / COOLING MARGIN
-  / SPACE / ALARMS) was a visual scaffold in v1.24.1 â only `body[data-dh-mode]`
+  / SPACE / ALARMS) was a visual scaffold in v1.24.1 — only `body[data-dh-mode]`
   was set, no render path. Now: radio-style toggle delegates to the existing
   `window.setMode()`, paints the rack floor, syncs the centre `.mode-bar`
-  buttons. A new `cooling-margin` mode tints racks by ASHRAE A1 27 Â°C high
-  margin (>5Â°C green / 3â5 muted green / 1â3 amber / <1 deep amber / over =
+  buttons. A new `cooling-margin` mode tints racks by ASHRAE A1 27 °C high
+  margin (>5°C green / 3–5 muted green / 1–3 amber / <1 deep amber / over =
   red). Legend updates per-mode.
 - **chiller-plant.html right-edge panels stop bleeding off mobile viewport.**
   Owner image 2: "Ini pada keluar2." Plant Capacity / Loop Summary / Drawing
-  Info panels live at x=1520â2280 in viewBox 2300. v1.25.4 only set
+  Info panels live at x=1520–2280 in viewBox 2300. v1.25.4 only set
   `min-width:1200px` so half the right edge was off the rendered SVG. Bumped to
-  `min-width:2300px` at `â¤1280px` and split into two breakpoints (`â¤760px`
+  `min-width:2300px` at `≤1280px` and split into two breakpoints (`≤760px`
   drops to 1600 for thumb-pan reachability). Status-strip chips wrap properly
   and no longer push a second horizontal scrollbar.
 - **water-system.html process-flow labels no longer stack.** Owner image 3:
   "Ini juga saling bertumpuk2." viewBox 0 0 1180 460 was squished to 760px
   min-width on mobile, collapsing DOS-302 / P-301 / TK-402 / CT-MK labels onto
-  each other. Bumped to `min-width:1180px` at `â¤1024px` and `â¤768px` so labels
+  each other. Bumped to `min-width:1180px` at `≤1024px` and `≤768px` so labels
   stay at design coordinates and the user pans horizontally. Equipment-block
   fill bumped from `#0f1a2e` thin to `#14213a` opaque slate per the v1.25.4
   EcoStruxure-grade solid-panel mandate owner approved earlier.
@@ -4765,12 +4768,12 @@ shipping in v1.30.0).
 
 ---
 
-## v1.29.2 â 2026-05-22 (Restore sw.js NETWORK_FIRST_PATHS for auth files â accidentally removed in v1.29.1)
+## v1.29.2 — 2026-05-22 (Restore sw.js NETWORK_FIRST_PATHS for auth files — accidentally removed in v1.29.1)
 
 Hot-fix: v1.29.1's BMS-cockpit ship (`c4bc870`) had collateral edits to
 `sw.js` that removed the v1.29.0 critical-asset network-first logic
 (`NETWORK_FIRST_PATHS`, `isNetworkFirst()`, `networkFirstCriticalAsset()`).
-Without those, `/auth.js` falls back to cache-first â users on stale SW
+Without those, `/auth.js` falls back to cache-first → users on stale SW
 can re-hit the "Invalid email or password" stale-cache trap that
 v1.29.0 was shipped specifically to prevent.
 
@@ -4779,7 +4782,7 @@ v1.29.0 was shipped specifically to prevent.
 - `sw.js`: restored `NETWORK_FIRST_PATHS = ['/auth.js', '/auth.min.js',
   '/js/rz-version.js', '/js/rz-feature-flags.js']` + `isNetworkFirst()` +
   `networkFirstCriticalAsset()` helpers + fetch-handler dispatch line.
-- Cache bump `rz-cache-v1.29.1` â `rz-cache-v1.29.2` so existing service
+- Cache bump `rz-cache-v1.29.1` → `rz-cache-v1.29.2` so existing service
   workers re-install with the network-first logic in place.
 
 ### Why this matters
@@ -4801,36 +4804,36 @@ now in sync at v1.29.2.
 
 ---
 
-## v1.29.1 â 2026-05-22 (Cockpit SVG mobile readability + EcoStruxure-grade solid panels + kill rotating-triangle pump animation)
+## v1.29.1 — 2026-05-22 (Cockpit SVG mobile readability + EcoStruxure-grade solid panels + kill rotating-triangle pump animation)
 
-Owner-reported (mobile screenshot) â three concrete issues fixed plus a
+Owner-reported (mobile screenshot) — three concrete issues fixed plus a
 queued engineering-value audit doc shipped. (Was authored as v1.25.4
 locally; renumbered v1.29.1 after rebase onto remote v1.29.0.)
 
 ### Fixed
 - **Rotating-triangle pump animation removed** (owner: "ngapain segitiganya
   muter, jadi terkesan bug"). The ISA pump-symbol triangle no longer
-  rotates 360Â° forever. Green fill stays as the ON indicator (standard
+  rotates 360° forever. Green fill stays as the ON indicator (standard
   SCADA pattern). `datahallAI.html` `.pmp` rule line 167 + same fix added
   to `chiller-plant.html` for any future pmp use.
 - **Cooling P&ID equipment-block opacity bumped from glassy to solid**
   (owner: "agak solid seperti EcoStruxure"). Block backgrounds bumped
-  rgba alpha `.03/.04 â .25`; header tints `.06 â .35`; strokes `.20 â
+  rgba alpha `.03/.04 → .25`; header tints `.06 → .35`; strokes `.20 →
   .55`. Targets the 6 major shells visible in the screenshot: CW Pump
   Station + CW Pump Group + Chiller Plant + FWS Pump Station + CDU Array
   + TCS+Racks (datahallAI cooling IIFE).
 - **Cockpit SVG mobile responsive sizing fixed** (owner: "kotak2 tumpang
-  tindih, hitung based on aspect ratio responsive"). On `â¤1024 px` the
+  tindih, hitung based on aspect ratio responsive"). On `≤1024 px` the
   panel wrappers gain `overflow-x:auto` + the SVGs gain `min-width:720 px`;
-  on `â¤600 px` `min-width:640 px`. Industry-standard SCADA approach:
+  on `≤600 px` `min-width:640 px`. Industry-standard SCADA approach:
   diagrams keep their design width and the user pans horizontally
   instead of squishing everything into 390 px. `#p-dash` excluded via
   `.pn:not(#p-dash) .bx svg` selector.
 - Same responsive treatment added to `chiller-plant.html` `#pidSvg`
-  (min-width 1200 px @â¤1024 / 960 px @â¤600 + `.pid-panel{overflow-x:auto}`).
+  (min-width 1200 px @≤1024 / 960 px @≤600 + `.pid-panel{overflow-x:auto}`).
 
 ### Added
-- **`documentation/engineering-value-audit-v1.md`** â captures the
+- **`documentation/engineering-value-audit-v1.md`** — captures the
   broader engineering-value review.
 
 ### Preserved
@@ -4846,11 +4849,11 @@ locally; renumbered v1.29.1 after rebase onto remote v1.29.0.)
 
 ---
 
-## v1.29.0 â 2026-05-22 (R-015 Phase 4 admin UI + login-modal stale-cache rescue + sw network-first for critical assets)
+## v1.29.0 — 2026-05-22 (R-015 Phase 4 admin UI + login-modal stale-cache rescue + sw network-first for critical assets)
 
 ### Phase 4 admin UI shipping (flag-gated)
 
-R-015 Phase 4 â `rz-ops-p7x3k9m.html` gains full admin UI for the new
+R-015 Phase 4 — `rz-ops-p7x3k9m.html` gains full admin UI for the new
 auth backend, all behind `localStorage.rz_auth_v2 === '1'`:
 
 - **User Management** extended: Add User modal, row actions
@@ -4874,12 +4877,12 @@ service-worker caching of pre-educator `auth.js`. The new SW (v1.28.0+)
 correctly invalidates old caches on activation, but EXISTING visitors
 remained on the previous SW until next install/activate cycle.
 
-- **`sw.js` network-first for critical auth files** â
+- **`sw.js` network-first for critical auth files** —
   `/auth.js`, `/auth.min.js`, `/js/rz-version.js`, `/js/rz-feature-flags.js`
   always fetched from network first when online (cache fallback only on
   offline). Prevents stale-cache traps even when the visitor's SW is one
   version behind.
-- **Login-modal recovery link** â "Try fresh reload" inline link on
+- **Login-modal recovery link** — "Try fresh reload" inline link on
   "Invalid email or password" now unregisters service workers, clears
   caches, wipes auth localStorage, and reloads. Applied to both
   AUTH_V2 and legacy catch branches so it's reachable on either auth path.
@@ -4889,29 +4892,29 @@ remained on the previous SW until next install/activate cycle.
 - `worker-auth/`: tests still 94/94 PASS.
 - `tools/probe-rz-ops-admin.mjs` 14/14 PASS.
 - audit-js-syntax / audit-script-tags / audit-mobile-responsive
-  / audit-version-stamp â all `--strict` CLEAN.
+  / audit-version-stamp — all `--strict` CLEAN.
 
 ---
 
-## v1.28.0 â 2026-05-22 (R-015 Phase 3 â client auth.js refactor, flag-gated rz_auth_v2)
+## v1.28.0 — 2026-05-22 (R-015 Phase 3 — client auth.js refactor, flag-gated rz_auth_v2)
 
 `auth.js` now talks to `rz-auth-gateway` when `localStorage.rz_auth_v2 === '1'`.
-Flag default OFF â when off, behavior byte-identical to the hardcoded
+Flag default OFF — when off, behavior byte-identical to the hardcoded
 `VALID_USERS` mock (no regression for any existing user).
 
 ### What landed (all behind `AUTH_V2` flag)
 
-- **`auth.js`** (+197 lines) â additive:
+- **`auth.js`** (+197 lines) — additive:
   - `AUTH_V2` + `AUTH_GW` config block (reads `localStorage.rz_auth_v2` + `rz_auth_gw`)
-  - `gw(path, opts)` â fetch helper with credentials:include + CSRF header
-  - `loginV2(email, password)` â POST /auth/login (cookie set by Worker)
-  - `logoutV2()` â POST /auth/logout + clear local mirror
-  - `hydrateSessionFromWorker()` â GET /auth/me on page load
+  - `gw(path, opts)` — fetch helper with credentials:include + CSRF header
+  - `loginV2(email, password)` — POST /auth/login (cookie set by Worker)
+  - `logoutV2()` — POST /auth/logout + clear local mirror
+  - `hydrateSessionFromWorker()` — GET /auth/me on page load
   - Login modal + logout button + initial-load hydrate all guard `if (AUTH_V2)`
   - `__rzAuth.getCsrf()` public helper (Phase 4 admin UI consumes)
 - **`auth.min.js`** rebuilt with terser (`--reserve loginV2,logoutV2,hydrateSessionFromWorker,gw`)
-- **`worker-auth/test/client-auth-shape.test.mjs`** â 5 new tests pinning the Worker contract from the client's perspective (cookie shape, expiresAt seconds vs ms, CSRF lifecycle)
-- **`worker-auth/SETUP.md` Â§7** â per-browser activation guide
+- **`worker-auth/test/client-auth-shape.test.mjs`** — 5 new tests pinning the Worker contract from the client's perspective (cookie shape, expiresAt seconds vs ms, CSRF lifecycle)
+- **`worker-auth/SETUP.md` §7** — per-browser activation guide
 
 ### Activation (per-browser opt-in)
 
@@ -4927,16 +4930,16 @@ When the worker is stable across user testing, a future release will flip
 
 ### Safety
 
-- Worker unreachable when flag ON â explicit "Auth service unavailable â
-  retry" UX rather than silent fallback to mock (per plan Â§6 threat model;
+- Worker unreachable when flag ON → explicit "Auth service unavailable —
+  retry" UX rather than silent fallback to mock (per plan §6 threat model;
   silent fallback would mask real outages and let admin actions vanish).
-- Hardcoded `VALID_USERS` array UNCHANGED â flag-off fallback still works.
-  Removal scheduled for a future MAJOR after â¥1 stable release of v2.
+- Hardcoded `VALID_USERS` array UNCHANGED — flag-off fallback still works.
+  Removal scheduled for a future MAJOR after ≥1 stable release of v2.
 
 ### NOT in this commit (Phase 4+)
 
-- rz-ops Tier Manager UI + user CRUD UI â Phase 4
-- E2E probe + reviews + flag-default flip + ship â Phase 5
+- rz-ops Tier Manager UI + user CRUD UI — Phase 4
+- E2E probe + reviews + flag-default flip + ship — Phase 5
 
 ### Tests
 
@@ -4946,7 +4949,7 @@ When the worker is stable across user testing, a future release will flip
 
 ---
 
-## v1.27.2 â 2026-05-22 (R-015 Phase 2 â admin CRUD endpoints on rz-auth-gateway)
+## v1.27.2 — 2026-05-22 (R-015 Phase 2 — admin CRUD endpoints on rz-auth-gateway)
 
 Infrastructure-only ship (no user-visible behavior change on the static
 site). Adds 11 admin endpoints to `rz-auth-gateway`, gating every state
@@ -4954,8 +4957,8 @@ change behind `role === 'root'` + `X-CSRF-Token` + audit-log.
 
 ### What landed
 
-- **`worker-auth/src/handlers/admin.js`** (NEW, 618 lines) â 11 handlers:
-  - `GET /admin/users` (paginated list, sanitized â no hash/salt exposed)
+- **`worker-auth/src/handlers/admin.js`** (NEW, 618 lines) — 11 handlers:
+  - `GET /admin/users` (paginated list, sanitized — no hash/salt exposed)
   - `POST /admin/users` (create with PBKDF2 hash, validates uniqueness + tier + role)
   - `PATCH /admin/users/:email` (tier/role/status/featureOverrides; 404 + audit before/after)
   - `POST /admin/users/:email/reset-password` (new salt+hash; best-effort revoke existing sessions)
@@ -4963,14 +4966,14 @@ change behind `role === 'root'` + `X-CSRF-Token` + audit-log.
   - `GET /admin/tiers` (sorted by priority, full feature matrix)
   - `POST /admin/tiers` (slug + color hex + uniqueness validation; `isSystem:false`)
   - `PATCH /admin/tiers/:name` (label/color/priority/defaultFeatures; system-tier rules)
-  - `DELETE /admin/tiers/:name` (rejects system; rejects when â¥1 user attached)
+  - `DELETE /admin/tiers/:name` (rejects system; rejects when ≥1 user attached)
   - `GET /admin/pages` (23-entry static page-key registry for matrix UI)
   - `GET /admin/audit` (chronological log, filter by actor/action/date range)
-- **`worker-auth/src/data/page-keys.js`** (NEW) â static page registry (DC AI,
+- **`worker-auth/src/data/page-keys.js`** (NEW) — static page registry (DC AI,
   DC Conv, DCMOC, 8 LTC labs, calculators, etc.)
-- **`worker-auth/src/middleware.js`** â `requireAdmin()`, `requireCsrf()`,
+- **`worker-auth/src/middleware.js`** — `requireAdmin()`, `requireCsrf()`,
   timing-safe string compare.
-- **`worker-auth/SETUP.md` Â§5** â shell walkthrough for admin operations
+- **`worker-auth/SETUP.md` §5** — shell walkthrough for admin operations
   before Phase 4 UI lands.
 - **TDD**: 50 new admin tests across 5 suites. **89/89 total pass.**
 
@@ -4980,44 +4983,44 @@ change behind `role === 'root'` + `X-CSRF-Token` + audit-log.
 - Phase 4: rz-ops Tier Manager UI + user CRUD UI
 - Phase 5: E2E probe + reviews + ship
 
-Static site unaffected â `auth.js` still uses hardcoded `VALID_USERS`.
+Static site unaffected — `auth.js` still uses hardcoded `VALID_USERS`.
 
 ---
 
-## v1.27.1 â 2026-05-22 (R-015 Phase 0+1 â rz-auth-gateway Worker scaffold + login/seed endpoints)
+## v1.27.1 — 2026-05-22 (R-015 Phase 0+1 — rz-auth-gateway Worker scaffold + login/seed endpoints)
 
 Infrastructure-only ship (no user-visible behavior change on the static
-site). Lands the foundation for R-015 "self-service user management" â
+site). Lands the foundation for R-015 "self-service user management" —
 the long-term replacement for the hardcoded `VALID_USERS` array in
 `auth.js`.
 
 ### What landed
 
-- **`worker-auth/`** â new Cloudflare Worker (`rz-auth-gateway`) with
+- **`worker-auth/`** — new Cloudflare Worker (`rz-auth-gateway`) with
   PBKDF2 password hashing, HMAC-signed sessions, login rate-limit,
   audit log.
 - **Endpoints (Phase 1):** `POST /auth/login`, `POST /auth/logout`,
   `GET /auth/me`, `GET /auth/features`, `GET /auth/tiers/public`,
   `POST /admin/__seed` (one-time bootstrap migration, self-disables).
 - **39/39 unit tests** (5 endpoint suites + crypto + health/CORS).
-- **`worker-auth/SETUP.md`** â owner-step provisioning guide.
-- **`docs/plans/2026-05-22-user-mgmt-self-service.md`** â full R-015 plan.
+- **`worker-auth/SETUP.md`** — owner-step provisioning guide.
+- **`docs/plans/2026-05-22-user-mgmt-self-service.md`** — full R-015 plan.
 
 ### NOT in this commit (Phase 2+ follow-ups)
 
-- Admin CRUD endpoints â Phase 2
-- Client `auth.js` refactor â Phase 3
-- rz-ops UI integration â Phase 4
-- E2E probe + reviews + ship â Phase 5
+- Admin CRUD endpoints — Phase 2
+- Client `auth.js` refactor — Phase 3
+- rz-ops UI integration — Phase 4
+- E2E probe + reviews + ship — Phase 5
 
 The static site keeps using the existing client-side mock auth until
 Phase 3 lands.
 
 ---
 
-## v1.27.0 â 2026-05-22 (Finance Terminal Phase 1 â Cloudflare Worker data gateway shipped behind rz_ft_v2 flag)
+## v1.27.0 — 2026-05-22 (Finance Terminal Phase 1 — Cloudflare Worker data gateway shipped behind rz_ft_v2 flag)
 
-R-001..R-005 + B-002..B-012 â Finance Terminal (embedded as iframe in
+R-001..R-005 + B-002..B-012 — Finance Terminal (embedded as iframe in
 `rz-ops-p7x3k9m.html`) gains a Cloudflare Worker (`rz-finance-gateway`)
 that fixes every broken tab. **Feature-flagged: OFF by default. No
 behavior change for any user until `localStorage.rz_ft_v2 === '1'`
@@ -5025,33 +5028,33 @@ is set OR the flag default is flipped in a future release.**
 
 ### What landed (all under flag)
 
-- **`worker/`** â new Cloudflare Worker scaffold + endpoints:
-  - `/health`, `/fx` (Frankfurterâexchangerate.hostâopen.er-api),
-  - `/q` (YahooâStooqâFinnhub quotes; Stooq `Prev`-field for real chg%),
-  - `/candles` (YahooâStooq daily; TradingView lightweight-charts ready),
-  - `/news` (GDELTâYahoo RSSâFinnhub),
+- **`worker/`** — new Cloudflare Worker scaffold + endpoints:
+  - `/health`, `/fx` (Frankfurter→exchangerate.host→open.er-api),
+  - `/q` (Yahoo→Stooq→Finnhub quotes; Stooq `Prev`-field for real chg%),
+  - `/candles` (Yahoo→Stooq daily; TradingView lightweight-charts ready),
+  - `/news` (GDELT→Yahoo RSS→Finnhub),
   - `/sectors` `/economy` `/futures` (ETF-proxy aggregations),
   - `/screener` (curated 124-entry universe + live-quote enrichment),
   - `/crypto` (CoinGecko + Market Dominance),
   - `/fx-history` (Frankfurter timeseries for FX chart line),
-  - `scheduled()` cron (every 2 min) pre-warms hot caches â sub-5s loads.
+  - `scheduled()` cron (every 2 min) pre-warms hot caches → sub-5s loads.
   - KV cache + stale-on-error on every endpoint. 38/38 unit tests.
-- **`Apps/finance-terminal/index.html`** â additive: `CFG.GW` + `CFG.V2`
+- **`Apps/finance-terminal/index.html`** — additive: `CFG.GW` + `CFG.V2`
   flag + `gw()` helper + V2 branches in every tab loader that route data
   through the gateway. Flag-OFF path BYTE-IDENTICAL to before.
   - Candlestick + volume + SMA20 charts via lightweight-charts CDN.
   - Sortable + filterable tables (Name dbl-click toggles direction).
   - Market Dominance cards populated.
   - Screener active-state + results render fixed.
-- **`tools/probe-finance-terminal.mjs`** â Puppeteer E2E (9 tabs, 0
+- **`tools/probe-finance-terminal.mjs`** — Puppeteer E2E (9 tabs, 0
   pageerrors) verified locally against `wrangler dev` + `python3 -m http.server`.
 
 ### Activation (NOT done in this commit; documented for follow-up)
 
 The flag default remains OFF until:
 1. Owner provisions Cloudflare Worker (`worker/SETUP.md`): `wrangler login`
-   â `wrangler kv namespace create FT_KV` â `wrangler secret put FINNHUB_KEY`
-   â `wrangler deploy`.
+   → `wrangler kv namespace create FT_KV` → `wrangler secret put FINNHUB_KEY`
+   → `wrangler deploy`.
 2. Owner flips `CFG.V2` default to true in `Apps/finance-terminal/index.html`
    and bumps to v1.28.x.
 3. Users with `localStorage.rz_ft_v2 = '1'` can activate per-browser now.
@@ -5066,21 +5069,21 @@ last-good cached data rather than a broken tab.
 
 ---
 
-## v1.26.0 â 2026-05-22 (Educator role + 4-tier matrix; DC AI/DC Conv/DCMOC + 8 LTC labs converted from hard root-only to matrix-gated)
+## v1.26.0 — 2026-05-22 (Educator role + 4-tier matrix; DC AI/DC Conv/DCMOC + 8 LTC labs converted from hard root-only to matrix-gated)
 
-R-014 â introduces a new **educator** role that grants Pro-tier feature access
+R-014 — introduces a new **educator** role that grants Pro-tier feature access
 without admin-panel access. Educators see a cyan EDUCATOR badge (instrument-cyan
 tokens, NOT Anthropic purple). Admin can promote/demote any user to/from
 educator from the rz-ops User Management section.
 
 ### What landed
 
-- **`auth.js`** â `EDUCATOR_EMAILS` allowlist (seed `educator@resistancezero.com`
+- **`auth.js`** — `EDUCATOR_EMAILS` allowlist (seed `educator@resistancezero.com`
   + merged with `localStorage.rz_admin_educators` admin-managed list).
   `detectRole` + `getTier` + session helpers extended for educator. New helper
   `__rzAuth.enforceTierFeatureAccess(pageKey)` replaces the hardcoded
   `ROOT_ONLY_PATHS` block for 11 in-scope pages. `auth.min.js` rebuilt (terser).
-- **`js/rz-feature-flags.js`** â 4-tier matrix (FREE | DEMO | PRO | ROOT â
+- **`js/rz-feature-flags.js`** — 4-tier matrix (FREE | DEMO | PRO | ROOT —
   ROOT now explicit, not a bypass). New `page-access` feature convention used
   by `enforceTierFeatureAccess`. Resolver respects per-page admin overrides
   stored in `rz_admin_features_by_page`. Root-inviolable guard on `page-access`.
@@ -5093,30 +5096,30 @@ educator from the rz-ops User Management section.
   `ltc-nfpa-fire-risk.html`. Modal copy switched from "Root Access Required"
   to "Pro or Educator access required". `/dc-market-tracker.html` remains
   root-only by design.
-- **`rz-ops-p7x3k9m.html`** â User Management: cyan EDUCATOR badge, tier filter
+- **`rz-ops-p7x3k9m.html`** — User Management: cyan EDUCATOR badge, tier filter
   adds educator/demo/root options, sidebar role label role-aware, row actions
-  **Promote â Educator / Demote â Demo** (writes `rz_admin_educators` +
+  **Promote → Educator / Demote → Demo** (writes `rz_admin_educators` +
   dispatches `rz-educators-changed` + audit log `tier_change`). Feature Flags
   matrix gains explicit **ROOT column** (4-col table) + bulk presets
   `all_demo+`, `all_pro+`, `all_root_only`. CSV export updated.
-- **Demo seed alignment** â `demo@resistancezero.com` now `tier: 'demo'` (was
+- **Demo seed alignment** — `demo@resistancezero.com` now `tier: 'demo'` (was
   inconsistent `tier:'pro'`). Resolves a latent UI badge bug and removes a
   brief unlock window on 6 LTC inline fallbacks that the security review
   flagged.
-- **`firebase-auth.js`** + **`supabase-auth.js`** â educator-aware badge
+- **`firebase-auth.js`** + **`supabase-auth.js`** — educator-aware badge
   handlers + `detectRole` ensures the EDUCATOR badge renders cyan everywhere,
   not just under `auth.js`.
-- **Standardisation docs** â `AUTH_STANDARD.md`, `PRO_MODE_STANDARDIZATION.md`,
+- **Standardisation docs** — `AUTH_STANDARD.md`, `PRO_MODE_STANDARDIZATION.md`,
   `FEATURE_FLAGS_STANDARD.md`, `CLAUDE.md` all updated with the 4-tier matrix
   + educator role tables + `page-access` convention + `enforceTierFeatureAccess`
   reference.
 
 ### Verification
 
-- `tools/probe-educator-access.mjs` (new): Puppeteer E2E covering 5 sessions Ã
+- `tools/probe-educator-access.mjs` (new): Puppeteer E2E covering 5 sessions ×
   13 pages = **65/65 PASS, 0 pageerrors** against a local server.
 - Audit gates: `audit-js-syntax --strict`, `audit-script-tags --strict`,
-  `audit-version-stamp --strict`, `audit-mobile-responsive --strict` â all GREEN.
+  `audit-version-stamp --strict`, `audit-mobile-responsive --strict` — all GREEN.
 - Code review + security review subagent passes; findings addressed.
 
 ### Threat model note
@@ -5128,7 +5131,7 @@ is tracked separately as R-015 (Phase 0 + Phase 1 already shipped on the
 
 ---
 
-## v1.25.3 â 2026-05-22 (datahallAI mobile order fix â main SCADA leads, sidebar telemetry spine drops below)
+## v1.25.3 — 2026-05-22 (datahallAI mobile order fix — main SCADA leads, sidebar telemetry spine drops below)
 
 Owner-reported regression (image attached, mobile view of
 `/datahallAI.html`): the left telemetry sidebar (Safety + Alarms +
@@ -5136,15 +5139,15 @@ other sections) was rendering above the SCADA tabs / KPI strip /
 facility image on mobile because `.wrap { flex-direction: column }`
 stacks DOM order, and the sidebar comes first in DOM.
 
-### Changed (datahallAI.html only â one CSS block)
+### Changed (datahallAI.html only — one CSS block)
 - `@media (max-width: 1024px)` gets two new rules:
-  - `.mn { order: 1 }` â main SCADA content leads.
-  - `.side { order: 2 }` â sidebar drops below.
-- `.side` max-height raised 200 â 240 px + `overflow-y: auto` so the
+  - `.mn { order: 1 }` — main SCADA content leads.
+  - `.side { order: 2 }` — sidebar drops below.
+- `.side` max-height raised 200 → 240 px + `overflow-y: auto` so the
   longer sidebar stays scrollable when stacked.
 
 ### Preserved (verified untouched)
-- Desktop layout (â¥1025 px) unchanged.
+- Desktop layout (≥1025 px) unchanged.
 - `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical.
   57/57 datahall + 22/22 conv tests pass.
 - `#p-dash` + `updateDashKPI()` + `dcCallouts` byte-identical.
@@ -5158,31 +5161,31 @@ stacks DOM order, and the sidebar comes first in DOM.
 
 ---
 
-## v1.25.2 â 2026-05-22 (chiller-plant mode-rules â finishes v1.23.1 deferred work per doc-14 Â§4)
+## v1.25.2 — 2026-05-22 (chiller-plant mode-rules — finishes v1.23.1 deferred work per doc-14 §4)
 
 Fourteenth ship. Completes the v1.23.1 deferred scaffold: the
 Overview / Performance / Maintenance toolbar now drives actual section
 show/hide via CSS, and behaves as a radio (one mode active at a time).
 
 ### Changed (chiller-plant.html only)
-- **Radio-style mode toolbar** â `initBmsShellShim()` now enforces
+- **Radio-style mode toolbar** — `initBmsShellShim()` now enforces
   single-mode selection via direct click listeners. The shell's
   multi-select `layerToggle` builds the buttons; the shim manages
   mutual exclusion and sets `body[data-bms-mode]` to the actually
   pressed button. Default = `overview`.
-- **CSS show/hide rules** â new `<style id="rz-bms-mode-rules-v1252">`:
+- **CSS show/hide rules** — new `<style id="rz-bms-mode-rules-v1252">`:
   ```
   body[data-bms-mode="overview"]    [data-bms-mode-hide~="overview"]    { display:none }
   body[data-bms-mode="performance"] [data-bms-mode-hide~="performance"] { display:none }
   body[data-bms-mode="maintenance"] [data-bms-mode-hide~="maintenance"] { display:none }
   ```
 - **Operator Controls card** tagged `data-bms-mode-hide="overview"`
-  (clean default view per doc-14 Â§4: "Overview hides most tuning
+  (clean default view per doc-14 §4: "Overview hides most tuning
   controls"). Visible in Performance + Maintenance.
 - **Alarm History card** tagged `data-bms-mode-hide="overview performance"`
-  (visible only in Maintenance per doc-14 Â§4: "Maintenance shows run
+  (visible only in Maintenance per doc-14 §4: "Maintenance shows run
   hours, duty rotation, alarms").
-- Cache-bust query for shell tags bumped `?v=1.23.1` â `?v=1.25.2`.
+- Cache-bust query for shell tags bumped `?v=1.23.1` → `?v=1.25.2`.
 
 ### Preserved (verified untouched)
 - `js/conv-engine.js` byte-identical. 22/22 conv + 57/57 datahall tests pass.
@@ -5197,24 +5200,24 @@ show/hide via CSS, and behaves as a radio (one mode active at a time).
 
 ---
 
-## v1.25.1 â 2026-05-22 (datahallAI cockpit fix #8 â per-tab primary-read hint per doc-24)
+## v1.25.1 — 2026-05-22 (datahallAI cockpit fix #8 — per-tab primary-read hint per doc-24)
 
-Thirteenth adoption ship. Adds the doc-24 Â§8 "tab-level primary question"
+Thirteenth adoption ship. Adds the doc-24 §8 "tab-level primary question"
 hint to each of the 8 in-scope panels on `datahallAI.html`. One italic
 single-line hint per panel; surgical, additive, zero engine impact.
 
-### Changed (datahallAI.html only â 8 in-scope panels)
+### Changed (datahallAI.html only — 8 in-scope panels)
 - **`#p-over`** Building Overview: *Primary read: where is the alarm and where do I click next?*
-- **`#p-hall`** Data Hall: *Primary read: where are the outliers â thermal, power, cooling margin?*
-- **`#p-rack`** Rack Architecture: *Primary read: how is an NVL72 built â and what is the current risk on the selected rack?*
-- **`#p-cool`** Cooling & Piping P&ID: *Primary read: where is the heat going â and what is the cooling constraint right now?*
+- **`#p-hall`** Data Hall: *Primary read: where are the outliers — thermal, power, cooling margin?*
+- **`#p-rack`** Rack Architecture: *Primary read: how is an NVL72 built — and what is the current risk on the selected rack?*
+- **`#p-cool`** Cooling & Piping P&ID: *Primary read: where is the heat going — and what is the cooling constraint right now?*
 - **`#p-elec`** Facility Electrical SLD (Overview sub-tab): *Primary read: what is energized, what is loaded, what is at risk of trip?*
-- **`#p-net`** Network Fabric: *Primary read: what is the fabric health â congestion, packet loss, degraded redundancy?*
-- **`#p-fire`** Fire Detection & Suppression: *Primary read: what is the current protection state â and what is bypassed?*
+- **`#p-net`** Network Fabric: *Primary read: what is the fabric health — congestion, packet loss, degraded redundancy?*
+- **`#p-fire`** Fire Detection & Suppression: *Primary read: what is the current protection state — and what is bypassed?*
 - **`#p-bms`** BMS/DCIM Architecture: *Primary read: is the monitoring system itself trustworthy?*
 
 ### Preserved (verified untouched)
-- `#p-dash` tab + `updateDashKPI()` + `dcCallouts` byte-identical (owner exclusion held â no primary-read hint on the excluded dashboard).
+- `#p-dash` tab + `updateDashKPI()` + `dcCallouts` byte-identical (owner exclusion held — no primary-read hint on the excluded dashboard).
 - `js/datahall-model.js` + `js/datahall-calculations.js` byte-identical. 57/57 datahall + 22/22 conv engine tests pass.
 - All SVG diagrams, KPI strips, alarm strip, sidebar telemetry spine, BoD drawer.
 
@@ -5226,35 +5229,35 @@ single-line hint per panel; surgical, additive, zero engine impact.
 
 ---
 
-## v1.25.0 â 2026-05-22 (BMS Shell phase milestone â adoption status table + rules of engagement + deferred-work queue)
+## v1.25.0 — 2026-05-22 (BMS Shell phase milestone — adoption status table + rules of engagement + deferred-work queue)
 
 Phase-closing polish ship. No code changes to any page; locks in the
-v1.23 â v1.24 BMS Shell adoption milestone with proper documentation
+v1.23 → v1.24 BMS Shell adoption milestone with proper documentation
 handoff. Standardization-only.
 
 ### Changed (`standarization/BMS_SHELL.md` only)
 - Added **Adoption Status Table** at the top: 9 rows (1 foundation + 8
   conv + 1 AI cockpit), columns for ship version, library loaded,
   body-scope, doc-14/24 fixes applied, engine binding integrity.
-- Added **Adoption Rules of Engagement** â 5 locked-in rules from this
+- Added **Adoption Rules of Engagement** — 5 locked-in rules from this
   phase (engine preservation non-negotiable, owner exclusions hold, no
   global body-scope flip, surgical/additive, full per-ship discipline).
-- Added **Deferred Work Queue** â 10+ items from doc-14/doc-24 that go
+- Added **Deferred Work Queue** — 10+ items from doc-14/doc-24 that go
   beyond the surgical/additive scope of this phase; each requires
   explicit owner go-ahead before further ships. Includes the
   DEFERRED-OWNER-EXCLUDED note on doc-24 fix #7 (Seismic / Wind / Floor
   callouts live inside `dcCallouts` on owner-excluded `#p-dash`).
 - v1.25.0 status entry added.
 
-### Phase summary (v1.23.0 â v1.24.4)
+### Phase summary (v1.23.0 → v1.24.4)
 11 commits in 14 ships:
-`dbfec30` (v1.23.0 foundation) â `414d19c` (v1.23.1 chiller-plant
-inspector) â `6a79479` (v1.23.2 dc-conventional callouts demoted) â
-`9a033fc` (v1.23.3 fuel autonomy hero) â `7423bad` (v1.23.4 water WUE
-hero) â `a9abfe1` (v1.23.5 fire-stages legend) â `e611707` (v1.24.0
-EPMS engine-bound) â `e1980e1` (v1.24.1 datahall ops rollup) â
-`87090fe` (v1.24.2 ict BMS-OT health) â `5bed229` (v1.24.3 datahallAI
-library load) â `4217d20` (v1.24.4 datahallAI data-mode chip).
+`dbfec30` (v1.23.0 foundation) → `414d19c` (v1.23.1 chiller-plant
+inspector) → `6a79479` (v1.23.2 dc-conventional callouts demoted) →
+`9a033fc` (v1.23.3 fuel autonomy hero) → `7423bad` (v1.23.4 water WUE
+hero) → `a9abfe1` (v1.23.5 fire-stages legend) → `e611707` (v1.24.0
+EPMS engine-bound) → `e1980e1` (v1.24.1 datahall ops rollup) →
+`87090fe` (v1.24.2 ict BMS-OT health) → `5bed229` (v1.24.3 datahallAI
+library load) → `4217d20` (v1.24.4 datahallAI data-mode chip).
 
 ### Preserved (verified untouched, every ship)
 - `js/conv-engine.js`, `js/datahall-model.js`,
@@ -5268,13 +5271,13 @@ library load) â `4217d20` (v1.24.4 datahallAI data-mode chip).
 
 ---
 
-## v1.24.4 â 2026-05-22 (datahallAI cockpit fix #1 â compact `Data Mode: Simulated` chip per doc-24)
+## v1.24.4 — 2026-05-22 (datahallAI cockpit fix #1 — compact `Data Mode: Simulated` chip per doc-24)
 
 Tenth adoption ship. First specific cockpit fix on datahallAI per doc-24:
 the legal/methodology notice now carries a compact `Data Mode: Simulated`
 chip in the same line. Operators can scan data-mode in a glance without
 expanding the legal notice. No new rows, no layout disruption, no
-component swap â strictly inline addition.
+component swap — strictly inline addition.
 
 ### Note on doc-24 fix #7 (Seismic / Wind / Floor callouts)
 That fix targets entries inside `dcCallouts` on `#p-dash`, which is
@@ -5283,10 +5286,10 @@ Recorded as DEFERRED-OWNER-EXCLUDED in the tracker; skipping unless the
 owner lifts the exclusion explicitly.
 
 ### Changed (datahallAI.html only)
-- **Legal disclaimer `<summary>`** â converted to a flex row carrying:
+- **Legal disclaimer `<summary>`** — converted to a flex row carrying:
   - **[NEW]** `Data Mode: Simulated` chip (cyan accent, mono font,
-    8-px text â matches BMS Shell `is-simulated` chip styling).
-  - The existing `â  Legal & methodology notice` text + `View details`
+    8-px text — matches BMS Shell `is-simulated` chip styling).
+  - The existing `⚠ Legal & methodology notice` text + `View details`
     link (unchanged).
   The collapsed `<details>` element + the expanded body text + all
   links to terms / privacy remain identical.
@@ -5305,20 +5308,20 @@ owner lifts the exclusion explicitly.
 
 ---
 
-## v1.24.3 â 2026-05-22 (BMS Shell adoption #9 â `datahallAI.html` cross-page consistency, no component adoption yet)
+## v1.24.3 — 2026-05-22 (BMS Shell adoption #9 — `datahallAI.html` cross-page consistency, no component adoption yet)
 
 Ninth adoption ship. Datahall AI is the 10,000+ line flagship cockpit
 page with rich existing engine binding (`js/datahall-model.js` +
 `js/datahall-calculations.js` deep-frozen Scenario-A), alarm strip,
 sidebar telemetry spine, BoD drawer, 9 tab panels. For this ship we
-only LOAD the BMS Shell library â no component adoption â so future
+only LOAD the BMS Shell library — no component adoption — so future
 cockpit-pass ships (v1.24.4+) can pick up doc-24's specific fixes
 incrementally without bundling them with library availability.
 
 ### Added (datahallAI.html only)
-- **BMS Shell library** â `css/rz-bms-shell.css?v=1.24.3` +
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.3` +
   `js/rz-bms-shell.js?v=1.24.3`. `body` does NOT carry
-  `class="rz-bms-shell"` â the existing 10k-line render tree, palette,
+  `class="rz-bms-shell"` — the existing 10k-line render tree, palette,
   and DC-dashboard owner-excluded `#p-dash` are byte-identical.
 
 ### Preserved (verified untouched)
@@ -5333,10 +5336,10 @@ incrementally without bundling them with library availability.
 - 4 strict audit gates CLEAN.
 
 ### Next ships in v1.24.x cockpit pass (doc-24)
-v1.24.4 â demote structural/static basis callouts (Seismic Zone 4 / Wind
+v1.24.4 — demote structural/static basis callouts (Seismic Zone 4 / Wind
 12m/s / Floor 3.5t/m2) from live image to Basis-of-Design drawer (doc-24
-fix #7). v1.24.5 â compact "Data Mode: Simulated" chip replacing the
-full-width legal strip (doc-24 fix #1). v1.24.6+ â quiet normal states /
+fix #7). v1.24.5 — compact "Data Mode: Simulated" chip replacing the
+full-width legal strip (doc-24 fix #1). v1.24.6+ — quiet normal states /
 right inspector consistency / layer toggles on diagrams (doc-24 fixes
 #4, #6, #9). Each ship surgical and additive.
 
@@ -5345,7 +5348,7 @@ right inspector consistency / layer toggles on diagrams (doc-24 fixes
 
 ---
 
-## v1.24.2 â 2026-05-22 (BMS Shell adoption #8 â `ict.html`, ICT-as-BMS-operations summary + OT gateway health per doc-14 Â§8)
+## v1.24.2 — 2026-05-22 (BMS Shell adoption #8 — `ict.html`, ICT-as-BMS-operations summary + OT gateway health per doc-14 §8)
 
 Eighth adoption ship. Surgical and additive. ICT page reframed as a BMS
 operations view (answers "can operations still see and control the
@@ -5354,21 +5357,21 @@ strip, nav rail, network segment views, capacity tables, alerts panel,
 and engineering notes preserved.
 
 ### Added (ict.html only)
-- **ICT Ops summary strip** (`#ict-ops-strip`) â second status strip
-  after the existing alarm strip: `ICT Ops Â· WAN OK Â· BMS Fabric OK Â·
-  Cameras OK Â· Access Control OK`. Includes the doc-14 Â§8 framing
+- **ICT Ops summary strip** (`#ict-ops-strip`) — second status strip
+  after the existing alarm strip: `ICT Ops · WAN OK · BMS Fabric OK ·
+  Cameras OK · Access Control OK`. Includes the doc-14 §8 framing
   question.
-- **BMS/OT gateway health row** (`#ict-otgw`) â 5 chips: EPMS / Chiller /
-  Fire Panel / AccessÂ·CCTV / Historian â all Online by default
+- **BMS/OT gateway health row** (`#ict-otgw`) — 5 chips: EPMS / Chiller /
+  Fire Panel / Access·CCTV / Historian — all Online by default
   (deterministic / engine-aligned). Calm normal green.
-- **BMS Shell library** â `css/rz-bms-shell.css?v=1.24.2` +
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.2` +
   `js/rz-bms-shell.js?v=1.24.2`. Cross-page consistency only; body has
   no `rz-bms-shell` class.
 
 ### Preserved (verified untouched)
 - `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
 - Existing alarm strip, top topbar (Back / Portfolio / Basis / Print /
-  Export), network segment nav (IT / BMS / AccessÂ·CCTV / WAN), capacity
+  Export), network segment nav (IT / BMS / Access·CCTV / WAN), capacity
   tables, active alerts, engineering notes.
 
 ### Verified
@@ -5379,30 +5382,30 @@ and engineering notes preserved.
 
 ---
 
-## v1.24.1 â 2026-05-22 (BMS Shell adoption #7 â `datahall.html`, operations rollup + view-mode selector per doc-14 Â§3)
+## v1.24.1 — 2026-05-22 (BMS Shell adoption #7 — `datahall.html`, operations rollup + view-mode selector per doc-14 §3)
 
-Seventh adoption ship. Surgical and additive â preserves the existing
+Seventh adoption ship. Surgical and additive — preserves the existing
 alarm strip, sidebar, main rack grid, modal, and engine binding. Adds the
-two doc-14 Â§3 elements that were missing: an engineering rollup right
+two doc-14 §3 elements that were missing: an engineering rollup right
 after the alarm strip + a view-mode selector chip row.
 
 ### Added (datahall.html only)
-- **Operations Rollup** (`#dh-ops-rollup`) â second status strip after the
-  existing alarm strip: `Hall NORMAL Â· Rack Load 1.85 MW Â· Cooling Margin
-  18% Â· PUE 1.45 Â· Power Density 9.3 kW/rack`. Live-bound to
+- **Operations Rollup** (`#dh-ops-rollup`) — second status strip after the
+  existing alarm strip: `Hall NORMAL · Rack Load 1.85 MW · Cooling Margin
+  18% · PUE 1.45 · Power Density 9.3 kW/rack`. Live-bound to
   `window.CONV_CALC.snapshot`.
-- **View Mode toolbar** (`#dh-mode-toolbar`) â `RZBMSShell.layerToggle`
+- **View Mode toolbar** (`#dh-mode-toolbar`) — `RZBMSShell.layerToggle`
   with 5 modes: Power / Temperature / Cooling Margin / Space / Alarms.
   Toggle sets `body[data-dh-mode]`; per-mode render rules ship later.
-- **BMS Shell library** â `css/rz-bms-shell.css?v=1.24.1` +
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.1` +
   `js/rz-bms-shell.js?v=1.24.1`.
 
 ### Preserved (verified untouched)
 - `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
 - Existing alarm strip (state/critical/warning/maint/comms/last-update/
-  data-quality/scenario chips) â engine-bound.
+  data-quality/scenario chips) — engine-bound.
 - Sidebar (Chiller Plant Feed / CRAH air-side), main rack grid, modal,
-  log panel â all unchanged.
+  log panel — all unchanged.
 
 ### Verified
 - 4 strict audit gates CLEAN.
@@ -5412,28 +5415,28 @@ after the alarm strip + a view-mode selector chip row.
 
 ---
 
-## v1.24.0 â 2026-05-22 (BMS Shell adoption #6 â `EPMS_Telemetry.html`, engine-bound top status strip + line-status legend per doc-14 Â§2)
+## v1.24.0 — 2026-05-22 (BMS Shell adoption #6 — `EPMS_Telemetry.html`, engine-bound top status strip + line-status legend per doc-14 §2)
 
 Sixth adoption ship; first of the v1.24.x phase. EPMS_Telemetry's
 "byte-untouched exemplar" designation was revoked by the owner for this
 design pass; the page now joins the engine + shared shell. All existing
 SVG one-line content, topbar, zoom controls, and export functionality
-preserved â strictly additive insertions above the SVG.
+preserved — strictly additive insertions above the SVG.
 
 ### Added (EPMS_Telemetry.html only)
-- **Engine integration** â `js/conv-engine.js?v=1.22.0` loaded
+- **Engine integration** — `js/conv-engine.js?v=1.22.0` loaded
   non-deferred so `window.CONV_CALC` exists before the binder runs. EPMS
   is no longer engine-disconnected; Facility Load / IT Load / PUE values
   match the dashboard exactly.
-- **BMS Shell library** â `css/rz-bms-shell.css?v=1.24.0` +
+- **BMS Shell library** — `css/rz-bms-shell.css?v=1.24.0` +
   `js/rz-bms-shell.js?v=1.24.0`. Loaded for cross-page consistency; body
   does not carry `rz-bms-shell` class this ship.
-- **Engineering status strip** (doc-14 Â§2 top strip spec) â new
-  `#epms-status-strip` above the SVG: "EPMS NORMAL Â· Facility Load
-  2.68 MW Â· IT Load 1.85 MW Â· PUE 1.45 Â· Utility OK Â· UPS A/B Online Â·
-  Gen Standby Â· Trips 0 Â· Data GOOD Â· Scenario Simulated". Live-bound to
+- **Engineering status strip** (doc-14 §2 top strip spec) — new
+  `#epms-status-strip` above the SVG: "EPMS NORMAL · Facility Load
+  2.68 MW · IT Load 1.85 MW · PUE 1.45 · Utility OK · UPS A/B Online ·
+  Gen Standby · Trips 0 · Data GOOD · Scenario Simulated". Live-bound to
   `window.CONV_CALC.snapshot` via inline IIFE.
-- **Line-status legend** (doc-14 Â§2 visible legend spec) â new
+- **Line-status legend** (doc-14 §2 visible legend spec) — new
   `#epms-legend` chip row below the status strip: Energized (green) /
   Standby (dashed gray) / Open (thin slate) / Alarm/Trip (red) /
   Maintenance Bypass (amber). Operator-facing.
@@ -5453,35 +5456,35 @@ preserved â strictly additive insertions above the SVG.
 
 ---
 
-## v1.23.5 â 2026-05-22 (BMS Shell adoption #5 â `fire-system.html`, fire-stages legend + shell library)
+## v1.23.5 — 2026-05-22 (BMS Shell adoption #5 — `fire-system.html`, fire-stages legend + shell library)
 
-Fifth adoption ship. Surgical and additive â preserves alarm strip,
+Fifth adoption ship. Surgical and additive — preserves alarm strip,
 cause-effect matrix, P&ID, simulation gate, all state-machine logic.
-Adds a visible fire-stages legend per doc-14 Â§5 so operators see the
+Adds a visible fire-stages legend per doc-14 §5 so operators see the
 6-stage progression at a glance, with the active stage highlighted
 dynamically from `state.stage`.
 
 ### Added (fire-system.html only)
-- **Fire-stages legend** â new `#fire-stages-legend` chip row inserted
+- **Fire-stages legend** — new `#fire-stages-legend` chip row inserted
   between the top alarm strip and the main layout grid. 7 chips:
-  `0 Normal / 1 VESDA Alert / 2 SmokeÂ·Pre-alarm / 3 Confirmed /
-  4 Pre-action Armed / 5 Suppression Release / 6 DischargedÂ·Lockout`.
+  `0 Normal / 1 VESDA Alert / 2 Smoke·Pre-alarm / 3 Confirmed /
+  4 Pre-action Armed / 5 Suppression Release / 6 Discharged·Lockout`.
   Calm by default; only the active chip in stage 3+ gets the red
-  treatment (doc-14 Â§5: "Use red only during active alarm/discharge").
-- **`setFireStageChip(stage)`** â called from `updateAlarmStrip()` on
+  treatment (doc-14 §5: "Use red only during active alarm/discharge").
+- **`setFireStageChip(stage)`** — called from `updateAlarmStrip()` on
   every state transition. Highlights the active chip with state-correct
-  color (green â¤0 / amber 1â2 / red 3â6).
-- **BMS Shell library** â `css/rz-bms-shell.css` + `js/rz-bms-shell.js`
+  color (green ≤0 / amber 1–2 / red 3–6).
+- **BMS Shell library** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js`
   with `?v=1.23.5` cache-bust. `body` does not carry `rz-bms-shell`
-  class â page palette preserved.
+  class — page palette preserved.
 
 ### Preserved (verified untouched)
 - `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
 - Existing alarm strip (line 273+) with FACP/VESDA/Critical/Supervisory/
-  Trouble/Tank/Pressure/Quality/Scenario chips â engine-bound and
+  Trouble/Tank/Pressure/Quality/Scenario chips — engine-bound and
   state-machine-driven.
 - Cause-effect matrix + simulation gate + ARM/SIMULATE/RESET buttons.
-- All 6-stage simulation logic (`state.stage` transitions at lines 850â895).
+- All 6-stage simulation logic (`state.stage` transitions at lines 850–895).
 
 ### Verified
 - 4 strict audit gates CLEAN.
@@ -5491,32 +5494,32 @@ dynamically from `state.stage`.
 
 ---
 
-## v1.23.4 â 2026-05-22 (BMS Shell adoption #4 â `water-system.html`, Instant WUE promoted to visual hero per doc-14 Â§7)
+## v1.23.4 — 2026-05-22 (BMS Shell adoption #4 — `water-system.html`, Instant WUE promoted to visual hero per doc-14 §7)
 
-Fourth adoption ship. Same pattern as v1.23.3 â surgical and additive,
+Fourth adoption ship. Same pattern as v1.23.3 — surgical and additive,
 engine binding intact. Instant WUE is the page-purpose KPI (per
 conv/review/09), so it gets the hero treatment in the strip.
 
 ### Changed (water-system.html only)
-- **`.kpi-grid`** layout changed `repeat(5, 1fr)` â `2fr 1fr 1fr 1fr 1fr`
+- **`.kpi-grid`** layout changed `repeat(5, 1fr)` → `2fr 1fr 1fr 1fr 1fr`
   so the Instant WUE card spans 2 columns.
 - **`.kpi.hero`** new rules: teal-tinted border (treated-water medium
   `#2dd4bf` at 45% alpha), inset glow box-shadow, gradient bg.
   - `.kpi.hero h3` upsized to 11 px with teal accent.
-  - `.kpi.hero .v` upsized 24 â **36 px** (50% larger).
+  - `.kpi.hero .v` upsized 24 → **36 px** (50% larger).
   - `.kpi.hero .v small` upsized to 14 px.
   - `.kpi.hero .th` upsized to 11 px.
-- **Responsive** â hero spans 3 cols on â¤1280 px (full width of the
+- **Responsive** — hero spans 3 cols on ≤1280 px (full width of the
   3-col fallback grid); value font 32 px on that breakpoint.
 - WUE card given `class="kpi hero"` so the new styles apply.
 
 ### Added (loaded but not yet applied to body scope)
-- BMS Shell library â `css/rz-bms-shell.css` + `js/rz-bms-shell.js` with
+- BMS Shell library — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` with
   `?v=1.23.4` cache-bust.
 
 ### Preserved (verified untouched)
 - `js/conv-engine.js` byte-identical; 22/22 conv + 57/57 datahall tests pass.
-- WUE engine binding (`#kWue` â `CONV_CALC` 1.20 L/kWh) unchanged.
+- WUE engine binding (`#kWue` ← `CONV_CALC` 1.20 L/kWh) unchanged.
 - All other KPIs (Makeup / Treatment / Filter DP / TDS) unchanged.
 - Process flow diagram + reconciliation panel untouched.
 
@@ -5528,36 +5531,36 @@ conv/review/09), so it gets the hero treatment in the strip.
 
 ---
 
-## v1.23.3 â 2026-05-22 (BMS Shell adoption #3 â `fuel-system.html`, autonomy promoted to visual hero per doc-14 Â§6)
+## v1.23.3 — 2026-05-22 (BMS Shell adoption #3 — `fuel-system.html`, autonomy promoted to visual hero per doc-14 §6)
 
-Third adoption ship. Surgical and additive â preserves engine binding,
+Third adoption ship. Surgical and additive — preserves engine binding,
 existing alarm strip, P&ID layout, all 5 KPIs. The only visible change is
-the Generator Autonomy KPI now visually dominates the strip per doc-14 Â§6
+the Generator Autonomy KPI now visually dominates the strip per doc-14 §6
 fix ("Make autonomy the largest result, not hidden in a panel").
 
 ### Changed (fuel-system.html only)
-- **KPI strip layout** â `.kpi-strip` grid changed `repeat(5, 1fr)` â
+- **KPI strip layout** — `.kpi-strip` grid changed `repeat(5, 1fr)` →
   `2fr 1fr 1fr 1fr 1fr` so the Generator Autonomy hero card is twice as wide
   as the other 4 cards.
 - **Hero KPI styling amplified**:
-  - `.kpi.hero .k-val` font-size `1.85rem` â **2.85rem** (~54% larger).
-  - `.kpi.hero .k-val` weight `700` â **800**; letter-spacing tightened.
+  - `.kpi.hero .k-val` font-size `1.85rem` → **2.85rem** (~54% larger).
+  - `.kpi.hero .k-val` weight `700` → **800**; letter-spacing tightened.
   - `.kpi.hero .k-lbl` upsized to `0.78rem` + amber tint (`var(--diesel-main)`).
   - `.kpi.hero .k-unit` upsized to `1rem` with amber-bright color.
   - Hero card gets a subtle inset gold border via `box-shadow` for extra weight.
-- **Responsive** â hero card spans 3 columns (full width) on â¤1280 px and
-  â¤900 px breakpoints; falls back to single-column on â¤768 px. Mobile font
+- **Responsive** — hero card spans 3 columns (full width) on ≤1280 px and
+  ≤900 px breakpoints; falls back to single-column on ≤768 px. Mobile font
   scaling proportional (2.5 / 2.35 / default rem).
 
 ### Added (loaded but not yet applied to body scope)
-- **BMS Shell library** â `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
+- **BMS Shell library** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
   with `?v=1.23.3` cache-bust for cross-page consistency. `body` does NOT carry
-  `class="rz-bms-shell"` this ship â page palette preserved.
+  `class="rz-bms-shell"` this ship — page palette preserved.
 
 ### Preserved (verified untouched)
 - `js/conv-engine.js` byte-identical to HEAD; 22/22 conv + 57/57 datahall
   tests pass.
-- Engine binding chain (`window.CONV_CALC.snapshot` â `kpi-autonomy` /
+- Engine binding chain (`window.CONV_CALC.snapshot` → `kpi-autonomy` /
   `kpi-usable` / `kpi-consumption` / `kpi-genload` / `kpi-np1`) unchanged.
 - UST-01 tank + Tank Inventory + Bulk Fill Point panels + all instrument
   bubbles (LIT-101, TIT-101, etc.) untouched.
@@ -5565,7 +5568,7 @@ fix ("Make autonomy the largest result, not hidden in a panel").
 ### Verified
 - 4 strict audit gates CLEAN.
 - 22/22 conv + 57/57 datahall tests pass.
-- Headless puppeteer @ 1440: KPI grid columns measured 2Ã wider for hero
+- Headless puppeteer @ 1440: KPI grid columns measured 2× wider for hero
   vs others; hero `.k-val` computed font-size > 40 px (was 26 px); engine
   autonomy reads 48 hr from `CONV_CALC`. Zero pageErrors.
 
@@ -5574,22 +5577,22 @@ fix ("Make autonomy the largest result, not hidden in a panel").
 
 ---
 
-## v1.23.2 â 2026-05-22 (BMS Shell adoption #2 â `dc-conventional.html`, static facility-image callouts demoted per doc-14 Â§1)
+## v1.23.2 — 2026-05-22 (BMS Shell adoption #2 — `dc-conventional.html`, static facility-image callouts demoted per doc-14 §1)
 
-Second adoption ship. Surgical and additive â preserves the page's existing
+Second adoption ship. Surgical and additive — preserves the page's existing
 theme, alarm strip, KPI strip, engine binding to `conv-engine.js`, and right
 stats-panel. The only visible change is the facility image becomes calmer:
-17 callouts â 6 operational ones per doc-14 Â§1 fix #1 ("Move static callouts
+17 callouts → 6 operational ones per doc-14 §1 fix #1 ("Move static callouts
 like general labels away from image. Keep only operational callouts: PUE, IT
 Load, CHW/TCS, Fuel autonomy, Active alarm, Outdoor condition if cooling
 relevant"). Theme flip + top-status-strip migration deferred to a later ship.
 
 ### Changed (dc-conventional.html only)
-- **Facility-image callouts demoted 17 â 6** per doc-14 Â§1 fix #1. Kept on
+- **Facility-image callouts demoted 17 → 6** per doc-14 §1 fix #1. Kept on
   the image (operational + cooling-relevant + autonomy):
   - `PUE`, `IT Load`, `CHW`, `Temp`, `Fuel`, `RH (outdoor)`.
   - Active alarm count remains in the top alarm strip.
-  Demoted to the right stats-panel (zero data lost â every demoted item
+  Demoted to the right stats-panel (zero data lost — every demoted item
   already had or now has a row in the panel):
   - `WUE` and `Carbon (CUE)` (already in Efficiency section).
   - `UPS 2N OK` (added to new Network & Reliability section).
@@ -5602,18 +5605,18 @@ relevant"). Theme flip + top-status-strip migration deferred to a later ship.
   consolidating UPS topology / Network / Uptime YTD.
 
 ### Added (loaded but not yet applied to body scope)
-- **BMS Shell library** â `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
+- **BMS Shell library** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
   with `?v=1.23.2` cache-bust for cross-page consistency. `body` does NOT carry
-  `class="rz-bms-shell"` this ship â page's existing typography + palette
+  `class="rz-bms-shell"` this ship — page's existing typography + palette
   preserved.
 
 ### Preserved (verified untouched)
-- `js/conv-engine.js` â byte-identical to HEAD. 22/22 tests pass.
+- `js/conv-engine.js` — byte-identical to HEAD. 22/22 tests pass.
 - Existing alarm-strip (state/critical/warning/maint/comms/stale/last
-  update/scenario chips) â engine-bound, deterministic.
+  update/scenario chips) — engine-bound, deterministic.
 - Existing KPI strip (PUE/WUE/Carbon/IT/Uptime/Temp/Chillers/Alarms).
 - Existing right stats-panel sections (Efficiency / Power / Cooling /
-  Environment / Safety / Fuel) â additive change only.
+  Environment / Safety / Fuel) — additive change only.
 
 ### Verified
 - 4 strict audit gates CLEAN.
@@ -5625,39 +5628,39 @@ relevant"). Theme flip + top-status-strip migration deferred to a later ship.
 
 ---
 
-## v1.23.1 â 2026-05-22 (BMS Shell adoption #1 â `chiller-plant.html`, the doc's visual benchmark)
+## v1.23.1 — 2026-05-22 (BMS Shell adoption #1 — `chiller-plant.html`, the doc's visual benchmark)
 
-First adoption ship of the BMS Shell foundation. Surgical and additive â the page's
-existing dark SCADA visual identity is preserved (doc-14 Â§4: "Keep this page as the
+First adoption ship of the BMS Shell foundation. Surgical and additive — the page's
+existing dark SCADA visual identity is preserved (doc-14 §4: "Keep this page as the
 visual benchmark, but simplify hierarchy"). Engine binding to `conv-engine.js` (CHWS 7.2 /
-CHWR 14.8 / ÎT 7.6 / 58 L/s) untouched; deep-detail modal flow untouched; 22/22 conv
+CHWR 14.8 / ΔT 7.6 / 58 L/s) untouched; deep-detail modal flow untouched; 22/22 conv
 engine tests still pass.
 
 ### Added (chiller-plant.html only)
-- **Shell library loaded** â `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
+- **Shell library loaded** — `css/rz-bms-shell.css` + `js/rz-bms-shell.js` referenced
   with `?v=1.23.1` cache-bust. NOT applied to `<body>` scope to preserve the page's
   own typography/palette; only standalone component classes used.
-- **Right-side Selected-Equipment Inspector** (doc-14 Â§4 #4: "Put selected loop
+- **Right-side Selected-Equipment Inspector** (doc-14 §4 #4: "Put selected loop
   detail in right inspector instead of making every loop equally detailed").
   New `.rz-bms-inspector#chillerInspector` panel at the top of the existing
   `<aside class="side">`. Populated by `RZBMSShell.inspector.select()` whenever the
   user clicks a `[data-loop-id]` group in the P&ID SVG. Payload includes:
   CH-NN title, status chip (NORMAL/WARN/ALARM/TRIP), critical values (CHWS/CHWR/
-  ÎT/Flow/Comps/Duty/Pump speed) from `st.loops[id-1]` + `ui.metrics[id-1]`,
+  ΔT/Flow/Comps/Duty/Pump speed) from `st.loops[id-1]` + `ui.metrics[id-1]`,
   thresholds, trend hint, alarm summary, interlocks, maintenance note, source
   badge.
-- **View Mode toolbar** â Overview / Performance / Maintenance buttons (doc-14 Â§4
+- **View Mode toolbar** — Overview / Performance / Maintenance buttons (doc-14 §4
   "Best Design Detail: three modes"). UI scaffold in this ship; toggle sets
   `body[data-bms-mode]`. Section show/hide rules ship in v1.23.2 once the visual
   baseline is confirmed.
-- **`updateLoopInspector(id)`** + **`loopInspectorPayload(id)`** helpers â read-only
+- **`updateLoopInspector(id)`** + **`loopInspectorPayload(id)`** helpers — read-only
   on engine state. Hooked into the existing `pidSvg` click handler (which still
-  opens the deep-detail modal â inspector + modal coexist).
+  opens the deep-detail modal — inspector + modal coexist).
 
 ### Preserved (verified untouched)
-- `js/conv-engine.js` â byte-identical to HEAD. 22/22 tests pass.
+- `js/conv-engine.js` — byte-identical to HEAD. 22/22 tests pass.
 - Existing `.alarm-strip` with engine-bound CHW values (`asChw` shows 7.2/14.8/7.6/58).
-- Deep-detail modal flow (click loop â `openModal(id)` still fires alongside the
+- Deep-detail modal flow (click loop → `openModal(id)` still fires alongside the
   inspector update).
 - P&ID SVG content + ISA tag scheme (`CH-NN`, `CHWP-NNA/B`, `FT/DPS/TT` bubbles)
   unchanged.
@@ -5669,44 +5672,44 @@ engine tests still pass.
 - 57/57 datahall + 22/22 conv engine tests pass.
 - Headless puppeteer: page loads zero errors, inspector renders on click with
   engine-bound values, mode toolbar mounts 3 buttons with aria-pressed wiring,
-  CHWS still reads 7.2Â°C from `conv-engine.js`.
+  CHWS still reads 7.2°C from `conv-engine.js`.
 
 ---
 
-## v1.23.0 â 2026-05-22 (BMS Shell foundation â shared dark-operations console library, no page migrations yet)
+## v1.23.0 — 2026-05-22 (BMS Shell foundation — shared dark-operations console library, no page migrations yet)
 
 Foundation ship for the conv-suite unification + DC AI cockpit pass (owner-approved direction per
-`Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` and `â¦dc ai/review/24-uiux-re-review-2026-05-22-best-design.md`).
-Library only â no pages migrated yet. Per-page adoption ships start at v1.23.1
+`Documents/screenshot bms rz/conv/review/14-uiux-re-review-2026-05-22-best-design.md` and `…dc ai/review/24-uiux-re-review-2026-05-22-best-design.md`).
+Library only — no pages migrated yet. Per-page adoption ships start at v1.23.1
 (chiller-plant first, the doc's visual benchmark).
 
 ### Added
-- **`css/rz-bms-shell.css`** â dark operations design system in 11 sections:
-  tokens (`#0b1118` bg â `#e7edf5` text + `#55b878 #dca33a #d94c4c #50c8ff`
+- **`css/rz-bms-shell.css`** — dark operations design system in 11 sections:
+  tokens (`#0b1118` bg → `#e7edf5` text + `#55b878 #dca33a #d94c4c #50c8ff`
   semantics + subsystem hues), top status strip, left subsystem nav with status
   dots + alarm badges, right object-inspector, KPI card anatomy
   (label/value/unit/target/trend/source), shared alarm row, layer-toggle
   toolbar, bottom event strip, chip + dot primitives, responsive collapse
-  (â¤1180 stacks inspector / â¤900 collapses nav / â¤390 stacks everything).
-  Opt-in only â scoped under `body.rz-bms-shell` so it has zero side-effect on
+  (≤1180 stacks inspector / ≤900 collapses nav / ≤390 stacks everything).
+  Opt-in only — scoped under `body.rz-bms-shell` so it has zero side-effect on
   pages that don't carry the class.
-- **`js/rz-bms-shell.js`** â vanilla ES5 controller with public API:
+- **`js/rz-bms-shell.js`** — vanilla ES5 controller with public API:
   `RZBMSShell.init / setStatus / layerToggle / inspector.select / inspector.clear /
   attachClickToInspector / alarmBadge`. ARIA-aware (`role="status"`+`aria-live`
   on status strip, `aria-pressed` on layer toggles, keyboard activation on
   click-to-inspect). Engine preservation: never reads or writes engine state;
   pages remain responsible for feeding engine-derived values.
-- **`standarization/BMS_SHELL.md`** â adoption guide + token reference +
-  component catalog + migration order (v1.23.1 chiller-plant â v1.23.3 fuel/
-  water/fire â v1.24.0 EPMS/datahall/ict â v1.24.x datahallAI cockpit pass â
+- **`standarization/BMS_SHELL.md`** — adoption guide + token reference +
+  component catalog + migration order (v1.23.1 chiller-plant → v1.23.3 fuel/
+  water/fire → v1.24.0 EPMS/datahall/ict → v1.24.x datahallAI cockpit pass →
   v1.25.0 polish).
 
 ### Decisions captured
 - **Theme strategy**: dark operations everywhere (DC Conv dashboard flips dark
-  too â no lightâdark jolt between dashboard and subsystems).
+  too — no light↔dark jolt between dashboard and subsystems).
 - **EPMS_Telemetry exemplar designation revoked** for this design pass per
   owner. Migrates onto shared shell alongside the other 7 conv pages.
-- **DC Dashboard tab `#p-dash`** in `datahallAI.html` remains owner-excluded â
+- **DC Dashboard tab `#p-dash`** in `datahallAI.html` remains owner-excluded —
   every adoption ship must keep it byte-identical to HEAD.
 - **Migration order**: DC Conv unification first (v1.23.x), then datahallAI
   cockpit pass (v1.24.x). Per owner.
@@ -5715,58 +5718,58 @@ Library only â no pages migrated yet. Per-page adoption ships start at v1.2
 - 4 strict audit gates CLEAN.
 - 57/57 datahall + 22/22 conv engine tests still pass (engine files untouched).
 - `node --check` on `js/rz-bms-shell.js`: parses clean.
-- No existing pages reference the new files yet â zero rendered-DOM change on
+- No existing pages reference the new files yet — zero rendered-DOM change on
   the live site.
 
 ---
 
-## v1.22.8 â 2026-05-22 (DC AI engineering audit P1+P2 fixes â Cooling PUE, BMS service health, UPS/MSB engine-bound first-paint)
+## v1.22.8 — 2026-05-22 (DC AI engineering audit P1+P2 fixes — Cooling PUE, BMS service health, UPS/MSB engine-bound first-paint)
 
 Closes the five P1 + two P2 acceptance-line violations surfaced by the
 background engineering audit on datahallAI.html. All edits are
-surgical, in-scope panels only â owner-excluded `#p-dash` byte-untouched,
+surgical, in-scope panels only — owner-excluded `#p-dash` byte-untouched,
 engine files (`js/datahall-model.js` / `js/datahall-calculations.js`)
 untouched, 57/57 calc tests still pass.
 
 ### Fixed (datahallAI.html only)
-- **GAP-1 (P1)** â Cooling P&ID THERMO SUMMARY (`#p-cool`) no longer
+- **GAP-1 (P1)** — Cooling P&ID THERMO SUMMARY (`#p-cool`) no longer
   hardcodes `Total PUE ~1.18` / `PUE (cooling) ~0.12`. Now reads
   `DH.pue.toFixed(2)` (`1.30`) and `(DH.pb_cooling/DH.itHall).toFixed(3)`
-  (`0.238`) from the locked engine â matches doc-21 worked example Ex9.
-- **GAP-2 (P1)** â Cooling P&ID floating PUE badge (`#pueBadgeV`) no
+  (`0.238`) from the locked engine — matches doc-21 worked example Ex9.
+- **GAP-2 (P1)** — Cooling P&ID floating PUE badge (`#pueBadgeV`) no
   longer derives PUE from `Math.random R(6.5,7.2)` and the
   `(1 + 1/copV2 + 0.02)` shortcut formula (producing ~1.17). Now reads
   `window.DATAHALL_CALC.pueBasis().pue` (the engine's five-part PUE) on
   every interval tick. Initial badge value also engine-derived.
-- **GAP-3/4/5 (P1)** â `#p-bms` panel now carries a "BMS Service Health"
+- **GAP-3/4/5 (P1)** — `#p-bms` panel now carries a "BMS Service Health"
   strip above the architecture SVG with:
-  - **Alarm lifecycle counters** â `Active / Ack / Cleared`, bound to
+  - **Alarm lifecycle counters** — `Active / Ack / Cleared`, bound to
     the existing `rules()` aggregator (active = crit + warn, ack = 0,
     cleared = scheduled maint). Refreshed on the same 4 s cadence.
-  - **Historian status** â `Online Â· 1 yr hi-res + 5 yr daily`
+  - **Historian status** — `Online · 1 yr hi-res + 5 yr daily`
     (doc-18 BMS criterion: historian health visible).
-  - **Notification service** â `Online Â· email + SMS + push`
+  - **Notification service** — `Online · email + SMS + push`
     (doc-18: notification service health visible).
-  - **Aggregate gateways online** â `16 / 16` (doc-18:
+  - **Aggregate gateways online** — `16 / 16` (doc-18:
     "Controllers/gateways online count is visible").
-- **GAP-7 (P2)** â MSB-SLD first-paint `Total Load A` no longer
-  hardcodes `RI(5200,5600)` (a random 5,200â5,600 kW that's ~50% over
+- **GAP-7 (P2)** — MSB-SLD first-paint `Total Load A` no longer
+  hardcodes `RI(5200,5600)` (a random 5,200–5,600 kW that's ~50% over
   the engine 3,564 kW). Now reads `DHE.itHallFmt` at construction time.
-- **GAP-8 (P2)** â UPS overview fallback strings (`#eOvUPS*Ak/Bk` in
+- **GAP-8 (P2)** — UPS overview fallback strings (`#eOvUPS*Ak/Bk` in
   `#p-elec` overview + `#eUPS*A/B` in per-DH SLD) no longer hardcode
   `5,420 kW | 68%` / `5,380 kW | 67%` on first paint. Now read
   `DH.itHallFmt` + `DH.upsLoadPct` so the values are engine-correct
   immediately, before the first live-update tick.
 
 ### Not in scope (verified untouched)
-- `#p-dash` tab (owner exclusion â byte-identical to HEAD).
+- `#p-dash` tab (owner exclusion — byte-identical to HEAD).
 - `js/datahall-model.js` / `js/datahall-calculations.js` (immutable
-  engine â byte-identical).
+  engine — byte-identical).
 - `js/conv-engine.js`, `EPMS_Telemetry.html`, the 6 conv suite pages
   (dc-conventional / datahall / chiller-plant / fire-system /
-  fuel-system / water-system / ict) â DC Conventional audit returned
+  fuel-system / water-system / ict) — DC Conventional audit returned
   full PASS; no edits needed in this ship.
-- **GAP-6** â Feed-A red on Electrical SLD: already fixed in earlier
+- **GAP-6** — Feed-A red on Electrical SLD: already fixed in earlier
   v1.20.2 Stage 6 (`var CA='var(--b)'` blue, Feed A title says
   "FEED A (BLUE) / FEED B (GREEN)"). Audit was flagging a stale
   reference; current code is correct.
@@ -5774,134 +5777,134 @@ untouched, 57/57 calc tests still pass.
 ### Notes
 - UIUX audit findings (ict.html + datahall.html P0 redesign, IBM Plex
   + brand-token system-wide, EPMS_Telemetry mobile overflow) are
-  separate larger work â queued for v1.23.x with their own plan,
+  separate larger work — queued for v1.23.x with their own plan,
   not bundled here (keep scope tight, one concern per ship).
 
 ---
 
-## v1.22.7 â 2026-05-22 (Featured Engineering Deep-Dive & Standards grouping â promotes the LTC Lab out of the buried bottom row)
+## v1.22.7 — 2026-05-22 (Featured Engineering Deep-Dive & Standards grouping — promotes the LTC Lab out of the buried bottom row)
 
 ### Changed
-- **datacenter-solutions.html** â new "Engineering Deep-Dive & Standards" featured section inserted directly above "Strategic Analysis & Market Intelligence" with two cards using the same `.ds-strat-card` bento pattern (gradient top-border, large icon, badge, feature bullets, gradient CTA):
-  - **Card 1** â Standards + Liquid-to-Chip Lab (amber gold theme, ROOT lock badge, links to standards-ltc-lab.html, keeps `id="rootStandardsCard"` + `.root-only-card` class so the existing amber-tinted lock styling carries over).
-  - **Card 2** â Liquid-to-Chip System Modelling Lab (cyan teal theme, links to ltc-system-modelling-lab.html).
-- **standards-ltc-lab.html** â lifted the "Liquid-to-Chip Engineering Lab" card out of the 6-sibling Standards Deep-Dive grid into a dedicated "Main Module" hero section above the standards grid; new self-contained `.standards-hero` CSS block (gradient top-border, 56 px icon, feature bullets, cyan CTA) with light + dark coverage + small-screen responsive collapse.
+- **datacenter-solutions.html** — new "Engineering Deep-Dive & Standards" featured section inserted directly above "Strategic Analysis & Market Intelligence" with two cards using the same `.ds-strat-card` bento pattern (gradient top-border, large icon, badge, feature bullets, gradient CTA):
+  - **Card 1** — Standards + Liquid-to-Chip Lab (amber gold theme, ROOT lock badge, links to standards-ltc-lab.html, keeps `id="rootStandardsCard"` + `.root-only-card` class so the existing amber-tinted lock styling carries over).
+  - **Card 2** — Liquid-to-Chip System Modelling Lab (cyan teal theme, links to ltc-system-modelling-lab.html).
+- **standards-ltc-lab.html** — lifted the "Liquid-to-Chip Engineering Lab" card out of the 6-sibling Standards Deep-Dive grid into a dedicated "Main Module" hero section above the standards grid; new self-contained `.standards-hero` CSS block (gradient top-border, 56 px icon, feature bullets, cyan CTA) with light + dark coverage + small-screen responsive collapse.
 
 ### Removed
-- **datacenter-solutions.html** â buried duplicate `ds-tool-row#rootStandardsCard` row in the "Engineering & Compliance Tools" list (it lived just under "Pillar: Sustainability"). The LTC Lab entry-point is now featured up-page only â no duplication.
-- **standards-ltc-lab.html** â the LTC Lab card removed from the 6-card `.standards-grid` (5 standards-engine cards remain: ASHRAE / ANSI-TIA / ISO / NFPA / Uptime).
+- **datacenter-solutions.html** — buried duplicate `ds-tool-row#rootStandardsCard` row in the "Engineering & Compliance Tools" list (it lived just under "Pillar: Sustainability"). The LTC Lab entry-point is now featured up-page only — no duplication.
+- **standards-ltc-lab.html** — the LTC Lab card removed from the 6-card `.standards-grid` (5 standards-engine cards remain: ASHRAE / ANSI-TIA / ISO / NFPA / Uptime).
 
 ### Notes
-- Reuses `.ds-strategic-grid` / `.ds-strat-card` / `.ds-strat-card::before` / `.ds-strat-icon` / `.ds-strat-title` / `.ds-strat-subtitle` / `.ds-strat-desc` / `.ds-strat-features` / `.ds-strat-cta` from the existing Strategic Analysis section â no new global stylesheet rules; the page's existing light + dark coverage applies automatically.
+- Reuses `.ds-strategic-grid` / `.ds-strat-card` / `.ds-strat-card::before` / `.ds-strat-icon` / `.ds-strat-title` / `.ds-strat-subtitle` / `.ds-strat-desc` / `.ds-strat-features` / `.ds-strat-cta` from the existing Strategic Analysis section — no new global stylesheet rules; the page's existing light + dark coverage applies automatically.
 - Auth gating unchanged: `standards-ltc-lab.html` is not in `auth.js` `ROOT_ONLY_PATHS`; the lock chip stays decorative (signals "root-only territory").
 - DC AI + DC Conventional pages untouched in this ship (under independent background-agent audit). Engineering-audit P1s (datahallAI Cooling P&ID `~1.18` / `~0.12` hardcodes + Math.random PUE badge, BMS lifecycle gaps, Feed-A red, MSB/UPS first-paint values) queued for v1.22.8.
 
 ---
 
-## v1.22.6 â 2026-05-18 (B-016 part 2: 390px horizontal-overflow fixed â B-016 COMPLETE)
+## v1.22.6 — 2026-05-18 (B-016 part 2: 390px horizontal-overflow fixed — B-016 COMPLETE)
 
-### Fixed (CSS-only, additive, one idempotent `<style id="b016-mobile-overflow-fix">` per page, â¤768px-scoped)
-- **ltc-system-modelling-lab.html** 371pxâ**0px**: `.calculator-layout`
+### Fixed (CSS-only, additive, one idempotent `<style id="b016-mobile-overflow-fix">` per page, ≤768px-scoped)
+- **ltc-system-modelling-lab.html** 371px→**0px**: `.calculator-layout`
   `grid-template-columns:minmax(0,1fr)` (removes the min-content floor);
   panels/grids/labels `min-width:0;max-width:100%`; oversized schematic
   SVGs `max-width:100%;overflow-x:auto`; `overflow-x:clip` on html/body to
   drop the clipped-child phantom width (no scroll container / sticky impact).
-- **opex-calculator.html** 296pxâ**0px**: container + toolbar + charts-grid
+- **opex-calculator.html** 296px→**0px**: container + toolbar + charts-grid
   single-column; panels/cards `min-width:0;max-width:100%`; `.breakdown-table`
   `display:block;overflow-x:auto`.
-- **cx-calculator.html** 216pxâ**0px**: off-canvas `.cx-drawer` switched
-  `right:-520px` â `transform:translateX(105%)` (closed) / `translateX(0)`
+- **cx-calculator.html** 216px→**0px**: off-canvas `.cx-drawer` switched
+  `right:-520px` → `transform:translateX(105%)` (closed) / `translateX(0)`
   (open) so the off-screen box no longer inflates scrollWidth; scenario bar
   wraps; shared auth dropdown clipped to viewport. Drawer open/close intact.
-- capex-calculator already measured 0px â correctly untouched.
+- capex-calculator already measured 0px — correctly untouched.
 - Independently verified: all 3 = 0px @390 **and** @1440 (desktop layout
   unchanged, panels still multi-column), 0 pageerror, cx drawer toggles;
   dark/light unaffected; 4 `--strict` gates all 0.
 
-### B-016 â COMPLETE
+### B-016 — COMPLETE
 Part 1 (v1.22.5): ltc lab external-JS SyntaxError fixed git-authoritatively
 + `audit-js-syntax.py` hardened to scan external `js/*.js`. Part 2 (this):
 390px overflow on ltc/opex/cx fixed. Both verified.
 
-## v1.22.5 â 2026-05-18 (B-016 part 1: ltc lab external-JS SyntaxError fixed + audit hardened)
+## v1.22.5 — 2026-05-18 (B-016 part 1: ltc lab external-JS SyntaxError fixed + audit hardened)
 
 ### Fixed
 - **`js/ltc-system-modelling-lab.js`** (699 KB extracted IIFE) threw
-  `SyntaxError: Invalid or unexpected token` at line 5386 â the v1.8.2
+  `SyntaxError: Invalid or unexpected token` at line 5386 — the v1.8.2
   responsive patch (commit a1e0abb) had injected its raw
-  `/* v1.8.0 â mobile sim/lab responsive patch */ @media(max-width:768px){â¦}`
+  `/* v1.8.0 — mobile sim/lab responsive patch */ @media(max-width:768px){…}`
   block INTO a JS print-document string (clobbering the
   `'</style></head><body><div class="r-wrap">' + innerHtml +` line), then
   commit 17a5bf4 extracted the already-broken inline IIFE to this external
-  file â so the **entire lab was non-functional in-browser**. Collapsed the
+  file — so the **entire lab was non-functional in-browser**. Collapsed the
   81-line injected region back to the **git-authoritative original line**
   (from the a1e0abb `-` hunk; 0 heuristic guesses). `node --check` exit 0;
   browser: 0 pageerror, lab renders (117 interactive elements). Script
-  cache-bust `?v=2026-05-09` â `?v=2026-05-18`.
+  cache-bust `?v=2026-05-09` → `?v=2026-05-18`.
 - **`tools/audit-js-syntax.py` hardened**: now also `node --check`s every
-  shipped external `js/*.js` â the inline-block-only scan structurally
+  shipped external `js/*.js` — the inline-block-only scan structurally
   could not see external `<script src>` files, the exact gap that let this
   broken 699 KB bundle ship silently. Verified CLEAN (103 HTML + all js/).
 
 ### Still open (B-016 part 2)
 - `ltc-system-modelling-lab` / `capex` / `opex` / `cx` pre-existing
-  ~210â371 px horizontal overflow @390 px (responsive layout, NOT a JS
-  regression) â addressed next.
+  ~210–371 px horizontal overflow @390 px (responsive layout, NOT a JS
+  regression) — addressed next.
 
-## v1.22.4 â 2026-05-18 (B-015 Stage 9 finalize: dc-conventional alarm strip â conventional suite COMPLETE)
+## v1.22.4 — 2026-05-18 (B-015 Stage 9 finalize: dc-conventional alarm strip — conventional suite COMPLETE)
 
 Stage-9 consolidated QA across all 7 redesigned conv pages found one
 consistency gap: `dc-conventional` (the Stage-1 engine-bind page) lacked the
 operator-first top alarm strip the other 6 received (doc-12 "Top status bar
 shows active alarms, data quality, last update"). (The probe-flagged "ict
-neon" was a false positive â the word "scanline" inside a documentation
+neon" was a false positive — the word "scanline" inside a documentation
 comment, not a rendered element; dismissed via source inspection.)
 
 ### Added
 - **dc-conventional.html**: operator-first `.alarm-strip #alarmStrip`
   (role=status, aria-live) as first child of `<main>`, mirroring the
-  verified datahall pattern â state pill + Critical/Warning/MaintÂ·Bypass/
+  verified datahall pattern — state pill + Critical/Warning/Maint·Bypass/
   Comms/Stale/Last-Update + Data-Quality + Scenario, painted from
   `window.CONV_CALC.snapshot` on the existing 5 s `updateData()` cadence
   (deterministic, threshold-driven per documented PUE/cooling-redundancy/
-  ASHRAE-band/fuel-autonomy rules â no `Math.random`). Light + dark coverage;
+  ASHRAE-band/fuel-autonomy rules — no `Math.random`). Light + dark coverage;
   responsive wrap; red bound strictly to alarm severity.
 - Independently re-verified: strip present & first-child-of-main, engine-
   bound (NORMAL/0/0/1/OK/0, stable on reload), 0 pageerror, 0px overflow
   @390+1440; all 4 `--strict` gates + conv-calc test pass; EPMS_Telemetry /
   js/conv-engine.js / version files untouched.
 
-### B-015 status â Conventional BMS suite COMPLETE
-Stage 1 engine+dc-conventional (v1.22.0) Â· Stage 2 EPMS audit (exemplar,
-untouched) Â· Stages 3-8 datahall/chiller-plant/fire/fuel/water/ict bind+
-de-slop (v1.22.3) Â· Stage 9 dc-conventional alarm strip (this). All 7 pages:
+### B-015 status — Conventional BMS suite COMPLETE
+Stage 1 engine+dc-conventional (v1.22.0) · Stage 2 EPMS audit (exemplar,
+untouched) · Stages 3-8 datahall/chiller-plant/fire/fuel/water/ict bind+
+de-slop (v1.22.3) · Stage 9 dc-conventional alarm strip (this). All 7 pages:
 single `js/conv-engine.js` basis, deterministic, top alarm strip, grounded
 slate/graphite palette matching the EPMS_Telemetry exemplar, red=alarm-only,
 0 neon (rendered), 0 pageerror, 0px overflow. conv/review doc-12 acceptance
 substantially met.
 
-## v1.22.3 â 2026-05-18 (B-015 Stages 3-8: 6 conventional BMS pages bound + de-slopped)
+## v1.22.3 — 2026-05-18 (B-015 Stages 3-8: 6 conventional BMS pages bound + de-slopped)
 
 Conventional BMS suite redesign per the owner conv/review 14-doc spec.
 Stage 1 (engine + dc-conventional) shipped v1.22.0; EPMS_Telemetry is the
 owner-OK exemplar (audited Stage 2, byte-untouched). This ships Stages 3-8:
 6 pages each bound to the single scenario engine and de-slopped to the
-grounded SCADA standard, via 6 parallel agents â every claim independently
+grounded SCADA standard, via 6 parallel agents — every claim independently
 re-verified by the orchestrator (audits + headless 1440/390 + git scope).
 
 ### Changed (each page = external `js/conv-engine.js` + de-slop, one-file diffs)
 - **datahall.html**: rack field SUM == engine IT 1.850 MW exactly (deterministic,
   was random); hall-balance band; heatmap modes; 0 neon; alarm-first.
-- **chiller-plant.html**: CHWS/CHWR engine-locked 7.2/14.8 Â°C (was drifting
-  19â18.7 via PRNG); the ~19/23 Â°C readings correctly relabelled SEC/condenser
-  loop (doc-04 critical fix â verified no CHWS/CHWR sits on a 19/23 value);
-  pipe-labelâtee collisions 10â0.
+- **chiller-plant.html**: CHWS/CHWR engine-locked 7.2/14.8 °C (was drifting
+  19→18.7 via PRNG); the ~19/23 °C readings correctly relabelled SEC/condenser
+  loop (doc-04 critical fix — verified no CHWS/CHWR sits on a 19/23 value);
+  pipe-label↔tee collisions 10→0.
 - **fire-system.html**: red reserved for alarm/trip/fire/leak only (0 red on
-  normal); dangerous one-click TRIGGER-FIRE â gated 2-step SIMULATION panel;
+  normal); dangerous one-click TRIGGER-FIRE → gated 2-step SIMULATION panel;
   explicit cause-&-effect matrix.
-- **fuel-system.html**: autonomy computed (usable Ã· consumption = 48.0 hr,
+- **fuel-system.html**: autonomy computed (usable ÷ consumption = 48.0 hr,
   was static); tank inventory + interlock indicators; flow-path direction.
-- **water-system.html**: WUE computed (37 L/min Ã· IT energy = 1.20 L/kWh,
+- **water-system.html**: WUE computed (37 L/min ÷ IT energy = 1.20 L/kWh,
   was static); scope split + WUE-vs-all-flow reconciliation; equipment tags.
 - **ict.html**: BMS/OT air-gapped segment separated; per-link
   capacity/util/latency/status; neon + CRT scanline removed.
@@ -5912,115 +5915,115 @@ re-verified by the orchestrator (audits + headless 1440/390 + git scope).
 - Gates verified by explicit exit-code: audit-js-syntax / script-tags /
   version-stamp / mobile-responsive `--strict` all 0; conv-calc test pass.
 
-## v1.22.2 â 2026-05-18 (finalize light-mode contrast: shared-token sweep)
+## v1.22.2 — 2026-05-18 (finalize light-mode contrast: shared-token sweep)
 
-Closes the Track-1 light-mode work â the per-page agents consistently
+Closes the Track-1 light-mode work — the per-page agents consistently
 deferred the same SHARED stylesheet tokens (correctly, being out of their
 page scope). A v2 WCAG-AA probe across 10 representative pages (default
 light, gradient/opacity-aware) found 104 distinct fail-signatures; only **4
-were genuinely shared (â¥3 pages)**:
+were genuinely shared (≥3 pages)**:
 
-### Fixed (shared, dark-safe â base recolour, `[data-theme="dark"]` overrides untouched)
+### Fixed (shared, dark-safe — base recolour, `[data-theme="dark"]` overrides untouched)
 - **`.cookie-decline`** (7 pages): base `#94a3b8` (2.56:1 on the white
-  cookie banner) â `#64748b` (**4.76:1**). Fixed in BOTH `styles.css` +
+  cookie banner) → `#64748b` (**4.76:1**). Fixed in BOTH `styles.css` +
   `styles-index.css` (2-stylesheet architecture); dark override keeps
   `#94a3b8`. Verified light pass + dark unchanged.
 - **`.rz-version-num`** (7 pages, the easter-egg version stamp): base
-  `#10b981` (2.54:1 on white) â `#047857` (**5.48:1**) in `styles.css`;
+  `#10b981` (2.54:1 on white) → `#047857` (**5.48:1**) in `styles.css`;
   `[data-theme="dark"]` keeps `#34d399`. Verified.
-- `styles.min.css` + `styles-index.min.css` re-minified; cache-bust â
+- `styles.min.css` + `styles-index.min.css` re-minified; cache-bust →
   `?v=2026-05-18-lm` on 62 pages.
 
-### Accepted (documented â NOT changed, deliberately)
+### Accepted (documented — NOT changed, deliberately)
 - `--gray-600 #6c757d` on `#f8fafc` = **4.48:1** (4 pages) and violet accent
-  links `#8b5cf6` on white = **4.23:1** (6 pages): within 0.02â0.27 of the
+  links `#8b5cf6` on white = **4.23:1** (6 pages): within 0.02–0.27 of the
   4.5 guideline on a pervasive global CSS variable / brand-identity accent.
   A site-wide variable or brand change risks dark-mode + identity
-  regressions for a sub-threshold gain â the disciplined call is to accept
+  regressions for a sub-threshold gain — the disciplined call is to accept
   and document rather than introduce risk. Remaining 100 fail-signatures are
-  [1â2 page] page-local brand accents / large-display / JS-driven values,
+  [1–2 page] page-local brand accents / large-display / JS-driven values,
   already documented out-of-scope by the per-page agents.
 - All 4 `--strict` gates CLEAN; dark mode provably unchanged.
 
-## v1.22.1 â 2026-05-18 (hotfix: v1.22.0 shipped a broken changelog.html + generator guard)
+## v1.22.1 — 2026-05-18 (hotfix: v1.22.0 shipped a broken changelog.html + generator guard)
 
 ### Fixed
 - The v1.22.0 CHANGELOG entry had an inline code span split across two
   markdown source lines. `inline_md()` matches per line, so the span never
   closed and a raw `&lt;script` leaked into changelog.html (the easter-egg
-  page) â `audit-script-tags --strict` flagged it CRITICAL but a faulty
+  page) — `audit-script-tags --strict` flagged it CRITICAL but a faulty
   `&&` shell chain let v1.22.0 push anyway (process failure, acknowledged).
   Rephrased the offending entry; code spans kept single-line.
 - **Defense-in-depth**: `tools/build-changelog-html.py` now self-checks its
   generated output and `sys.exit(1)` (build fails loudly) if a raw
-  backtick-tag pattern leaks â a malformed CHANGELOG can no longer silently
+  backtick-tag pattern leaks — a malformed CHANGELOG can no longer silently
   ship a broken changelog.html.
 - Verified: build exit 0, `audit-script-tags`/`audit-js-syntax --strict`
   CLEAN, 0 raw backtick-tags in changelog.html.
 
-## v1.22.0 â 2026-05-18 (B-015 Stage 1: Conventional BMS scenario engine + dc-conventional bind)
+## v1.22.0 — 2026-05-18 (B-015 Stage 1: Conventional BMS scenario engine + dc-conventional bind)
 
 User: *"dc-conventional.html garisnya tabrakan dan gambar2nya seperti
-coret2an newbie â¦ kecuali EPMS_Telemetry sudah ok â¦ review dan
+coret2an newbie … kecuali EPMS_Telemetry sudah ok … review dan
 sempurnakan"* (per the owner 14-doc `conv/review` spec). Stage 1 of a
 multi-stage suite redesign; EPMS_Telemetry.html is the OK exemplar (left
 byte-untouched).
 
 ### Added
-- **`js/conv-engine.js`** â deep-frozen `window.CONV_MODEL` single scenario
+- **`js/conv-engine.js`** — deep-frozen `window.CONV_MODEL` single scenario
   basis + pure `window.CONV_CALC` per conv/review doc-00 Engineering Data
-  Contract (it_design 2.0 MW, it_load 1.85 MW, PUE 1.45 â facility 2.6825
+  Contract (it_design 2.0 MW, it_load 1.85 MW, PUE 1.45 → facility 2.6825
   MW, non-IT, EPMS, cooling/CHW flow, WUE, fuel autonomy). Every constant
   `// source:`-cited; NO `Math.random`; Node-interop shim.
-- **`tools/test-conv-calc.mjs`** â vm-sandboxed; reproduces the doc-00
+- **`tools/test-conv-calc.mjs`** — vm-sandboxed; reproduces the doc-00
   Definition-of-Done identities + doc-09 worked examples. **22/22 pass.**
 
 ### Changed
 - **dc-conventional.html** bound to the engine via an external
   `<script src>` (not inlined): dashboard KPIs/callouts now read
-  `window.CONV_CALC.snapshot` (was `Math.random()`). Total = ITÃPUE = **2,683
-  kW** shown exactly; Non-IT = FacilityâIT; CHW single basis 7.2/14.8 Â°C
+  `window.CONV_CALC.snapshot` (was `Math.random()`). Total = IT×PUE = **2,683
+  kW** shown exactly; Non-IT = Facility−IT; CHW single basis 7.2/14.8 °C
   (conflict resolved per doc-00/09, condenser loop relabel deferred).
   Stable across reloads (not random). 0 pageerror, 0px overflow @390.
 - EPMS_Telemetry.html + the 6 sibling conv pages BYTE-UNTOUCHED.
-  Remaining per-page bind/de-slop = Stages 2â9 (tracked B-015).
+  Remaining per-page bind/de-slop = Stages 2–9 (tracked B-015).
 - Gates: `audit-js-syntax`/`script-tags` `--strict` CLEAN.
 
-## v1.21.2 â 2026-05-18 (B-014: datahallAI Basis-of-Design drawer â overlap + re-skin + Export-PDF + value audit)
+## v1.21.2 — 2026-05-18 (B-014: datahallAI Basis-of-Design drawer — overlap + re-skin + Export-PDF + value audit)
 
 User (plan mode, in detail): *"basis of design ini pada tertutup dengan
 button2 nggak proper responsivenessnya, dan jangan selalu ai design slop
-transparant biru-abu2 â¦ kasih tombol export pdf â¦ basis of design pastikan
-ada reference, calculation â¦ jika ada value parameter tidak valid validkan."*
+transparant biru-abu2 … kasih tombol export pdf … basis of design pastikan
+ada reference, calculation … jika ada value parameter tidak valid validkan."*
 
-### Fixed (datahallAI.html only â DC-dash + engine byte-identical)
+### Fixed (datahallAI.html only — DC-dash + engine byte-identical)
 - **Overlap/responsive**: `.dh-bod` raised to `z-index:1002` (above the
   global nav burger 1001) + burger hidden while drawer open; header sticky
-  with safe-area top padding, flex-wraps â¤480px; â¤94vw / full-width â¤600px.
+  with safe-area top padding, flex-wraps ≤480px; ≤94vw / full-width ≤600px.
   Header + close-X fully visible & reachable at 1440/768/390 px, 0px
   overflow, Esc closes.
 - **De-AI-slop re-skin**: replaced transparent navy/purple glassmorphism +
   backdrop-filter with mostly-solid graphite surfaces + ONE restrained
   signal-amber accent (ISA-18.2), correct LIGHT (`#f4f6f9`/`#b45309`) +
   DARK (`#11151f`/`#171d29`) variants per `documentation/design.md`.
-- **Export PDF**: solid amber button â print-window (escaped `<\/script>`,
+- **Export PDF**: solid amber button → print-window (escaped `<\/script>`,
   audit-clean) generating a 14-page A4 engineering Basis-of-Design: title +
   revision history + design philosophy + per-discipline sections (Compute/
-  Electrical/Cooling/Fire-Safety/Network/BMS) = assumptions â formulae â
-  worked calcs LIVE from `DATAHALL_CALC`/`DATAHALL_MODEL` (honest PUE â1.30
+  Electrical/Cooling/Fire-Safety/Network/BMS) = assumptions → formulae →
+  worked calcs LIVE from `DATAHALL_CALC`/`DATAHALL_MODEL` (honest PUE ≈1.30
   + 5-part basis, "NOT a fudged 1.08") + figures + references (NVIDIA GB200
   NVL72/Vertiv CoolChip/Cat 3516E/Carrier 19DV/ASHRAE/Uptime/NFPA) +
   appendices; `@page A4`, running header/footer, page numbers.
-- **Value audit**: 6 stray legacy values (28.4/28.5 MW IT, PUE 1.08, 7,776Ã
-  B200) â engine-derived Scenario-A baseline. Remaining 1.08/28.5 confined
+- **Value audit**: 6 stray legacy values (28.4/28.5 MW IT, PUE 1.08, 7,776×
+  B200) → engine-derived Scenario-A baseline. Remaining 1.08/28.5 confined
   to excluded `#p-dash`, dead code, or the intentional honest-vs-fudged BoD
   contrast. `node tools/test-datahall-calc.mjs` 57/57.
 
-## v1.21.1 â 2026-05-18 (R-013: Second Brain wired into Insights dropdown)
+## v1.21.1 — 2026-05-18 (R-013: Second Brain wired into Insights dropdown)
 
-User: *"page second brain saya â¦ ada wiki, obsidian dan graphify kok tidak
-ada menunya â¦ hilang di dropdown insight. fix it"*. The second-brain app
-(`Apps/second brain/index.html` â the Knowledge-Graph / "Graphify" hub that
+User: *"page second brain saya … ada wiki, obsidian dan graphify kok tidak
+ada menunya … hilang di dropdown insight. fix it"*. The second-brain app
+(`Apps/second brain/index.html` — the Knowledge-Graph / "Graphify" hub that
 internally surfaces the Wiki link + Obsidian-vault node) was built but
 **never linked from the site nav** (git-confirmed; not a regression).
 
@@ -6029,27 +6032,27 @@ internally surfaces the Wiki link + Obsidian-vault node) was built but
   "All Insights" in the Insights dropdown on **all 62 pages** that carry it,
   consistently, per `CONTENT_LINKAGE_PLAYBOOK`. Links to the one real
   servable entry `Apps/second%20brain/index.html` (resolves 200). Wiki /
-  Obsidian / Graphify are facets WITHIN that app â only `index.html` is a
+  Obsidian / Graphify are facets WITHIN that app — only `index.html` is a
   servable page (the vault dir has no index, the wiki target is raw `.md`),
   so 3 separate links would have been fabricated URLs; one correct entry is
   the honest fix. Idempotent.
 - Verified: link present + resolves; `audit-js-syntax`/`mobile-responsive
   --strict` CLEAN.
 
-## v1.21.0 â 2026-05-18 (P0: site-wide light-mode regression recovery + B-001 changelog generator fix)
+## v1.21.0 — 2026-05-18 (P0: site-wide light-mode regression recovery + B-001 changelog generator fix)
 
-User: *"what have you done, ini cardsnya tidak terlihat â¦ tulisannya tidak
-terlihat"* â the v1.19.1 default-light flip broke 35 dark-first pages
-(`[data-theme="dark"]` rules, zero `[data-theme="light"]`) â invisible/low
+User: *"what have you done, ini cardsnya tidak terlihat … tulisannya tidak
+terlihat"* — the v1.19.1 default-light flip broke 35 dark-first pages
+(`[data-theme="dark"]` rules, zero `[data-theme="light"]`) → invisible/low
 contrast in the now-default light theme.
 
-### Fixed â light-mode contrast (B-013) across 25 pages
-- **articles.html**: card meta authored `#9ca3af` (2.54:1 on white) â
+### Fixed — light-mode contrast (B-013) across 25 pages
+- **articles.html**: card meta authored `#9ca3af` (2.54:1 on white) →
   light-scoped `#64748b` (4.6:1). Philosophy cards verified white/readable
-  (4.76:1) â the screenshotted defect.
-- **article-23..27, FF-1/2/3, geopolitics-1/2/3**: accent text 600â700
-  same-hue shades, inline-coloured cells â classed, muted `#94a3b8/#9ca3af`
-  â `#64748b/#475569`, all light-scoped (`html:not([data-theme="dark"])`);
+  (4.76:1) — the screenshotted defect.
+- **article-23..27, FF-1/2/3, geopolitics-1/2/3**: accent text 600→700
+  same-hue shades, inline-coloured cells → classed, muted `#94a3b8/#9ca3af`
+  → `#64748b/#475569`, all light-scoped (`html:not([data-theme="dark"])`);
   dark verified unchanged/improved.
 - **7 calculators** (capex/opex/roi/tco/pue/carbon-footprint/spares):
   idempotent `<style id="rz-lightfix-v1">` before structural `</head>`,
@@ -6062,54 +6065,54 @@ contrast in the now-default light theme.
   (`v1.19.1 light-contrast` markers); dark mode provably unchanged; 4
   `--strict` gates CLEAN.
 
-### Fixed â B-001 (changelog.html generator)
+### Fixed — B-001 (changelog.html generator)
 - `tools/build-changelog-html.py` `inline_md()` now extracts inline-code
   spans FIRST and `html.escape`s them, so backticked HTML in CHANGELOG
-  (`` `<script src>` ``, `` `<li>` ``, `` `<style id=â¦>` ``) can no longer
+  (`` `<script src>` ``, `` `<li>` ``, `` `<style id=…>` ``) can no longer
   emit a live tag into changelog.html (the easter-egg page). Verified:
   0 raw literal tags, browser `syntaxErr=0`, 89 entries render. SOLVED.
 
-### Out of scope (flagged, pre-existing â not v1.19.1/this-work)
+### Out of scope (flagged, pre-existing — not v1.19.1/this-work)
 - ltc-system-modelling-lab external-JS `Invalid or unexpected token` +
   ltc/capex/opex/cx 390px horizontal overflow + shared `auth.js`/`styles.css`
-  widget contrast â pre-existing, tracked, not regressions from this change.
+  widget contrast — pre-existing, tracked, not regressions from this change.
 
-## v1.20.8 â 2026-05-18 (insights freshness + changelog easter-egg-only + linkage playbook)
+## v1.20.8 — 2026-05-18 (insights freshness + changelog easter-egg-only + linkage playbook)
 
-User: *"insights.html sama sekali tidak update dan tidak align"* Â·
-*"changelog â¦ tidak usah ada menunya â¦ muncul klw klik version â¦ easter egg"* Â·
-*"jika ada keterkaitan begini â¦ anda harus ingat di document & memory â¦
+User: *"insights.html sama sekali tidak update dan tidak align"* ·
+*"changelog … tidak usah ada menunya … muncul klw klik version … easter egg"* ·
+*"jika ada keterkaitan begini … anda harus ingat di document & memory …
 playbook dan handoff."*
 
 ### Fixed
 - **insights.html alignment**: `.categories-grid` was `max-width:1000px` +
-  auto-fit â only 2 columns, orphaning the 3rd "Future Forward" card.
-  Now `repeat(3,1fr)` max-width 1200 (3-up desktop, 2-up â¤1024, 1-up â¤768)
-  â all 3 category cards align in one row.
+  auto-fit → only 2 columns, orphaning the 3rd "Future Forward" card.
+  Now `repeat(3,1fr)` max-width 1200 (3-up desktop, 2-up ≤1024, 1-up ≤768)
+  — all 3 category cards align in one row.
 - **insights.html stale "Latest Publications"**: feed stopped at article-13
-  while articles 14â27 existed. Replaced with the 8 newest (27â20) using
+  while articles 14–27 existed. Replaced with the 8 newest (27→20) using
   REAL `datePublished` + titles + correct `feed-category`.
 - **search-index.json**: `article-27` was missing (in sitemap, absent from
-  search) â added (id 45, newest-first position). Caught by the new playbook.
+  search) — added (id 45, newest-first position). Caught by the new playbook.
 
 ### Changed
-- **Changelog is now easter-egg-only**: removed the `<li>â¦Changelog NEW</li>`
+- **Changelog is now easter-egg-only**: removed the `<li>…Changelog NEW</li>`
   nav-menu item from `index.html` / `articles.html` / `tools.html`. The
-  footer version stamp (`script.js injectVersionStamp()` â `changelog.html`,
-  and standalone pages' `<span class="version-stamp">`) is the sole path â
+  footer version stamp (`script.js injectVersionStamp()` → `changelog.html`,
+  and standalone pages' `<span class="version-stamp">`) is the sole path —
   intact & verified.
 
-### Added â durable handoff
-- **`standarization/CONTENT_LINKAGE_PLAYBOOK.md`** â the "when X changes,
-  also update Y" checklist (article â insights/articles/series/glossary/
-  sitemap/search-index/llms/post-drafts; tool â tools/dc-solutions/rz-ops;
-  every change â version+changelog+sw+gates+memory; invariants). Wired into
+### Added — durable handoff
+- **`standarization/CONTENT_LINKAGE_PLAYBOOK.md`** — the "when X changes,
+  also update Y" checklist (article → insights/articles/series/glossary/
+  sitemap/search-index/llms/post-drafts; tool → tools/dc-solutions/rz-ops;
+  every change → version+changelog+sw+gates+memory; invariants). Wired into
   `CLAUDE.md` (Standardisation-docs + Process-discipline) + memory
   (`feedback_content_linkage_playbook.md`, MEMORY.md). Read at START & END
   of every content/feature task; a stale cross-ref is a failure even on a
   green build.
 
-## v1.20.7 â 2026-05-18 (datahallAI â 3 doc-18 conformance gaps fixed)
+## v1.20.7 — 2026-05-18 (datahallAI — 3 doc-18 conformance gaps fixed)
 
 Read-only per-screen conformance audit vs `18-qa-acceptance-criteria.md`
 found the in-scope redesign substantially passing; 3 concrete fixable gaps
@@ -6119,13 +6122,13 @@ owner sign-off).
 ### Fixed
 - **GAP-1 (P1) netSvg link/label hairball** (doc-07 / doc-18 "no line
   crosses text"): per-domain fabric lasers now hover-gated (`.laser{opacity:0}`
-  default; bright on `.netDom`/`.netSL` hover) over an explicit â¤0.2
+  default; bright on `.netDom`/`.netSL` hover) over an explicit ≤0.2
   quiet-lane base. Full-opacity line-vs-text bbox overlap on netSvg
-  **46 â 0** in default state (desktop+mobile); SPINE-4/LEAF-8/DOMAINS-27
+  **46 → 0** in default state (desktop+mobile); SPINE-4/LEAF-8/DOMAINS-27
   + all `data-tip`/live IDs intact.
 - **GAP-2 (P2) Room Layout north arrow** (doc-03): `bldgSvg` decorative
   compass-rose replaced with the page's industrial thin-stroke N-arrow,
-  top-right clear of equipment â consistent with the 4 floor views.
+  top-right clear of equipment — consistent with the 4 floor views.
 - **GAP-3 (P2) BMS protocol/spec drawer** (doc-09 / doc-18 BMS): the
   Modbus/BACnet/OPC-UA/SNMP spec block moved out of the main ops view into a
   collapsed native `<details>` (data preserved, expands on click). Fixed a
@@ -6133,16 +6136,16 @@ owner sign-off).
   `.dh-specwrap:not([open])>.gr{display:none}` (only affects collapsed
   drawers; the 8 authored-`open` panels verified unaffected).
 - Verified independently: audit-js-syntax/mobile-responsive --strict CLEAN;
-  engine 57/57; desktop 1440 + mobile 390 â 0 pageerror/0 console/0px
+  engine 57/57; desktop 1440 + mobile 390 → 0 pageerror/0 console/0px
   overflow; per-diagram overlap table no-regression elsewhere; other
   `<details open>` spec panels still visible; DC-dashboard panel +
   `updateDashKPI` + `dcCallouts` + engine files BYTE-IDENTICAL.
 
-## v1.20.6 â 2026-05-18 (datahallAI â Cooling P&ID header collision fixed)
+## v1.20.6 — 2026-05-18 (datahallAI — Cooling P&ID header collision fixed)
 
 From owner dark-mode screenshot review: the Cooling & Piping P&ID title
 (~109 chars, font-8, centred at x=480 in a 960-wide viewBox) overran into
-the top-right status-badge strip at x=700 â "â¦Carrier 19DV Chiller Plant"
+the top-right status-badge strip at x=700 — "…Carrier 19DV Chiller Plant"
 bled over the ASHRAE W4 / FREE-COOL ENG / ISA-5.1 TAGS badges (read as
 garbled "ISO-5.1 TARG 1.16"). doc-14 "no line/text crosses unrelated
 element".
@@ -6151,40 +6154,40 @@ element".
 - Removed the redundant " | Carrier 19DV Chiller Plant" title tail (already
   shown by the CHILLER PLANT section header + CHILLER PLANT SPECS panel).
   Title now ends "= 3,564 kW PER HALL"; geometric verify: title right edge
-  viewBox xâ674 vs ASHRAE badge xâ728 â 54px clear gap, overlap=false.
+  viewBox x≈674 vs ASHRAE badge x≈728 → 54px clear gap, overlap=false.
   No information loss; engine-bound numbers unchanged.
 - Verified: audit-js-syntax --strict CLEAN; engine test 57/57; engine files
   untouched; visually confirmed (dark mode) header now clean.
 
-## v1.20.5 â 2026-05-17 (datahallAI â desktop diagram legibility)
+## v1.20.5 — 2026-05-17 (datahallAI — desktop diagram legibility)
 
-doc-00 "text too small for operator use" + doc-13 Â§4 typography minimum +
+doc-00 "text too small for operator use" + doc-13 §4 typography minimum +
 doc-18 "Text readable at 100% zoom" / "Detail/spec panels are collapsible" /
 "Sidebar does not compete with main diagram".
 
 ### Changed (datahallAI.html only)
 - **Collapsible desktop sidebar** (`@media(min-width:1025px)`, default open
-  so first paint is unchanged) â reclaims 180px so diagrams scale ~+14.5%
+  so first paint is unchanged) — reclaims 180px so diagrams scale ~+14.5%
   when collapsed (doc-18 sidebar/main-diagram).
-- **Collapsible per-diagram spec panels** â 10 `.gr` spec-card grids wrapped
+- **Collapsible per-diagram spec panels** — 10 `.gr` spec-card grids wrapped
   in native `<details open>` (default open = non-regressive); operator can
   collapse to give the diagram the viewport (doc-18 collapsible spec panels).
-- **Minimum legible font floor** â idempotent **desktop-only** (â¥1025px)
+- **Minimum legible font floor** — idempotent **desktop-only** (≥1025px)
   post-render IIFE raises only sub-floor SVG `<text>` toward a per-diagram
   tuned floor (x/y/geometry untouched, original cached in `data-fs0`,
-  strict mobile no-op). Applied to net/fire/bms/rack/elecOv/elecDH1-4 â
-  9 diagrams improved (net & fire median +~50%, e.g. fire 5.81â8.72 px).
+  strict mobile no-op). Applied to net/fire/bms/rack/elecOv/elecDH1-4 —
+  9 diagrams improved (net & fire median +~50%, e.g. fire 5.81→8.72 px).
   **Deliberately NOT applied to hSvg/coolSvg/bldgSvg**: any lift there
   introduced line/text overlap, so per the no-regression rule those keep
   only the safe sidebar/spec-panel gains (honest trade-off, not a miss).
 - Verified independently: `audit-js-syntax`/`mobile-responsive --strict`
-  CLEAN; engine 57/57; desktop 1440 + mobile 390 â 0 pageerror/console,
+  CLEAN; engine 57/57; desktop 1440 + mobile 390 → 0 pageerror/console,
   0 px overflow, **mobile byte-no-op** (desktop text larger than mobile,
   proving desktop-scoped); 0 overlap regression vs HEAD baseline; visually
   confirmed (net/fire markedly more readable, cool unchanged); DC-dashboard
   panel + `updateDashKPI` + `dcCallouts` + engine files BYTE-IDENTICAL.
 
-## v1.20.4 â 2026-05-17 (datahallAI â legal notice no longer blocks operational area)
+## v1.20.4 — 2026-05-17 (datahallAI — legal notice no longer blocks operational area)
 
 From the owner's visual review + `18-qa-acceptance-criteria.md` ("Legal
 notice is not blocking operational area"; "first read on every page is
@@ -6194,28 +6197,28 @@ high-value vertical space and repeats across pages").
 ### Changed
 - The top-of-`<main>` 3-paragraph Legal Notice block (pushed the alarm
   strip / KPIs / diagrams down on every tab) is now a **collapsed native
-  `<details>`** â a single thin summary line ("â  Legal & methodology
-  notice â¦ View details"), full text one click away, zero JS, keyboard-
+  `<details>`** — a single thin summary line ("⚠ Legal & methodology
+  notice … View details"), full text one click away, zero JS, keyboard-
   accessible, Terms/Privacy links preserved. Operational status is now the
   first read on every panel (verified desktop 1440px + mobile 390px).
-- Surgical: the `<details>` sits above all `.pn` panels (page chrome) â the
+- Surgical: the `<details>` sits above all `.pn` panels (page chrome) — the
   excluded DC-dashboard panel + engine files remain BYTE-IDENTICAL;
   `audit-js-syntax`/`mobile-responsive --strict` CLEAN; engine test 57/57.
 
-## v1.20.3 â 2026-05-17 (datahallAI â Basis-of-Design + Calc-Audit drawer; Track 4 build sequence COMPLETE)
+## v1.20.3 — 2026-05-17 (datahallAI — Basis-of-Design + Calc-Audit drawer; Track 4 build sequence COMPLETE)
 
-Spec P3 "Documentation and Trust" (`00`/`11`) â closes the 24-doc build sequence.
+Spec P3 "Documentation and Trust" (`00`/`11`) — closes the 24-doc build sequence.
 
-### Added â operator trust / traceability drawer
+### Added — operator trust / traceability drawer
 - `#bodDrawer` slide-in reusing the v1.20.2 `DHModal` shell (scrim,
   `role="dialog"`, `aria-modal`, focus-trap, Esc, focus-return), triggered
   from the page header on every in-scope view (never inside `#p-dash`).
-- **Basis-of-Design**: Compute Â· Electrical Â· Cooling Â· Fire/Safety Â·
-  Assumptions Â· Formula/engine version â every number read **live** from
+- **Basis-of-Design**: Compute · Electrical · Cooling · Fire/Safety ·
+  Assumptions · Formula/engine version — every number read **live** from
   `window.DATAHALL_MODEL`/`DATAHALL_CALC` (never hardcoded; cannot diverge).
-- **Calculation-Audit**: 6 cards `formula â substituted â result` (IT load,
+- **Calculation-Audit**: 6 cards `formula → substituted → result` (IT load,
   liquid, TCS flow, required current, CDU count, and **PUE bottom-up with
-  the full 5-part `pueBasis()` breakdown** â honest â1.30, "not a fudged
+  the full 5-part `pueBasis()` breakdown** — honest ≈1.30, "not a fudged
   1.08"), mirroring `21-calculation-worked-examples.md`.
 - Non-alarmist "values simulated/modelled from locked baseline" advisory;
   Scenario-B surfaced as labelled non-adopted variant (doc-21 Ex1); 4 vendor
@@ -6226,59 +6229,59 @@ Spec P3 "Documentation and Trust" (`00`/`11`) â closes the 24-doc build seq
   panel + `updateDashKPI` BYTE-IDENTICAL; engine files untouched.
 
 ### Track 4 status
-Spec build sequence (model â calc engine â bind dashboard/cooling/electrical
-â colour/alarm â modal â SVG routing â basis-of-design) **COMPLETE**; DC
+Spec build sequence (model → calc engine → bind dashboard/cooling/electrical
+→ colour/alarm → modal → SVG routing → basis-of-design) **COMPLETE**; DC
 dashboard tab excluded throughout per owner instruction. Final acceptance
 review vs `18-qa-acceptance-criteria.md` follows.
 
-## v1.20.2 â 2026-05-17 (datahallAI â colour/alarm semantics + accessible modal)
+## v1.20.2 — 2026-05-17 (datahallAI — colour/alarm semantics + accessible modal)
 
 Track 4 Stage 6 + Stage 7 of the datahallAI revision (spec under
 `Documents/screenshot bms rz/dc ai/review/`). The DC dashboard tab
 (`#p-dash` / `updateDashKPI` / `dcCallouts`) and the calculation engine
 (`js/datahall-*.js`) are byte-identical vs prior HEAD (SHA-verified).
 
-### Changed â strict colour semantics (per `13-uiux-justification`, `00-overview-audit` P1)
+### Changed — strict colour semantics (per `13-uiux-justification`, `00-overview-audit` P1)
 - **Red is now reserved for alarm / trip / fire / critical / leak / safety
   only.** ~190 non-alarm red tokens recoloured to the correct doc-13
   category:
   - **Electrical Feed A / MV utility / PLN incomer / TX-A / MSB-A / busway /
-    generator / ATS** â **blue** (`CA` var + `bus()`/`hB()`/tint helpers +
+    generator / ATS** → **blue** (`CA` var + `bus()`/`hB()`/tint helpers +
     SLD-mimic `sldArrowR`/`mvGrad` + room-layout genset room/G1-G6/ATS
     boxes). doc-13: *"Electrical Feed A: blue, Not red"*. Legend/title copy
-    "FEED A (RED)" â "FEED A (BLUE)".
+    "FEED A (RED)" → "FEED A (BLUE)".
   - **Cooling return / hot-aisle / condenser / HP-gas / IT-load heat /
     ambient / fluid-in / return-air** (CDU, chiller, dry-cooler, CRAH,
     In-Rack CDU HMIs + cooling P&ID + hot-aisle containment + `retGrad`/
-    `hotG`) â **amber/orange**. doc-13: *"Cooling return: orange/brown"*.
-  - **Arc-flash / PPE / protection-compliance** â **amber** (doc-13:
-    warning, not alarm). **Warning `!` marker / LINK-WARN** â amber.
+    `hotG`) → **amber/orange**. doc-13: *"Cooling return: orange/brown"*.
+  - **Arc-flash / PPE / protection-compliance** → **amber** (doc-13:
+    warning, not alarm). **Warning `!` marker / LINK-WARN** → amber.
   - **North compass arrows / gate barriers / lightning-rod grid /
-    dimension-leader lines / power-loss labels / BMS-arch headers** â
+    dimension-leader lines / power-loss labels / BMS-arch headers** →
     **neutral gray** (decoration, not status).
-  - **Phase L1 conductor** â magenta (`--pk`); **`.vr` value class** â
-    neutral; **10 modal close buttons** â neutral + enlarged (doc-10).
+  - **Phase L1 conductor** → magenta (`--pk`); **`.vr` value class** →
+    neutral; **10 modal close buttons** → neutral + enlarged (doc-10).
 - Genuine red KEPT: fire/EPO/leak/smoke/heat-detector/suppression symbols,
   PRV/PSV/relief-valve safety, severity-scale critical ends, alarm
-  thresholds â exactly the doc-13-sanctioned categories.
+  thresholds — exactly the doc-13-sanctioned categories.
 
-### Added â alarm-first top strip (per `00-overview-audit` P1, `22-alarm-cause-effect-matrix`)
+### Added — alarm-first top strip (per `00-overview-audit` P1, `22-alarm-cause-effect-matrix`)
 - `DHAlarm`: a **rule-based** alarm model. Alarm STATE is the deterministic
-  result of doc-22 threshold rules (rack inlet >27/>30 Â°C, CDU margin
-  <15/<5 %, UPS load >80/>95 %, TCS ÎT >13/>15 K, stale points) evaluated
-  against engine-derived steady-state values + controlled sensor jitter â
+  result of doc-22 threshold rules (rack inlet >27/>30 °C, CDU margin
+  <15/<5 %, UPS load >80/>95 %, TCS ΔT >13/>15 K, stale points) evaluated
+  against engine-derived steady-state values + controlled sensor jitter —
   never `Math.random` for alarm presence.
 - `STATE | Critical | Warning | Maintenance | Comms | Stale | Last update`
   strip rendered on every in-scope page panel (8 tabs; **NOT** the excluded
   DC dashboard). Normal state is quiet; CRITICAL pulses (honours
   `prefers-reduced-motion`).
 
-### Added â one shared accessible modal controller (per `10-modal-accessibility-maintainability`)
+### Added — one shared accessible modal controller (per `10-modal-accessibility-maintainability`)
 - `DHModal`: a single backdrop **scrim** + **focus trap** + **Escape close**
   + **focus-return-to-trigger** + `role="dialog"` + `aria-modal="true"` +
   `aria-labelledby`, decorating all 10 equipment/detail modals
   (`cduHmi`/`rackModal`/`chHmi`/`ctHmiModal`/`eqHmi`/`irCduHmi`/`crahHmi`/
-  `corrHmi`/`batHmi`/`sldMimic`) via a `MutationObserver` on `.show` â
+  `corrHmi`/`batHmi`/`sldMimic`) via a `MutationObserver` on `.show` —
   zero rewrites of per-modal render code, all data bindings preserved.
 - **Summary-first**: sticky header + injected per-modal alarm summary line
   above the deep SVG body. SVG `<g>` triggers (un-focusable in Chrome)
@@ -6286,82 +6289,82 @@ Track 4 Stage 6 + Stage 7 of the datahallAI revision (spec under
   to `<body>`.
 
 ### Verified
-- `audit-js-syntax.py --strict` CLEAN Â· `audit-mobile-responsive.py
-  --strict` 104/0 Â· `test-datahall-calc.mjs` 57/57 Â· headless puppeteer
+- `audit-js-syntax.py --strict` CLEAN · `audit-mobile-responsive.py
+  --strict` 104/0 · `test-datahall-calc.mjs` 57/57 · headless puppeteer
   (1440 + 390 px) 0 pageerror/console-error, 0 horizontal overflow at
-  390 px, full modal a11y assertions PASS Â· DC-dashboard + engine
+  390 px, full modal a11y assertions PASS · DC-dashboard + engine
   byte-identical vs HEAD (SHA match).
 
-## v1.20.1 â 2026-05-17 (datahallAI â SVG line-routing accuracy + responsive)
+## v1.20.1 — 2026-05-17 (datahallAI — SVG line-routing accuracy + responsive)
 
 User: *"Accuracy gambar dan garis dan pastikan responsive. Ini yg selalu
-fail"* â diagram/line-routing accuracy + true mobile responsiveness.
+fail"* — diagram/line-routing accuracy + true mobile responsiveness.
 
-### Fixed â diagram line-routing accuracy (per `14-line-routing-and-diagram-accuracy.md`)
-- **`netSvg`** (Network Fabric): spineâleaf (32) + domainâleaf (27) link
+### Fixed — diagram line-routing accuracy (per `14-line-routing-and-diagram-accuracy.md`)
+- **`netSvg`** (Network Fabric): spine→leaf (32) + domain→leaf (27) link
   fans were crossing the SPINE/LEAF/DOMAIN band titles. Titles relocated to
   link-free zones + given opaque P&ID label-mask rects so the bundled fan
-  terminates at the label edge (doc-14 Â§3/Â§6/rule-7). Live bindings
+  terminates at the label edge (doc-14 §3/§6/rule-7). Live bindings
   (`sp0bw`/`lf0bw`/`dom0nvl`) + `data-tip` preserved.
 - **`coolSvg`** (Cooling P&ID): dry-cooler fan/exhaust paths intruded into
-  the header band over the RUNNING / DRY COOLER ARRAY labels â units moved
-  down so equipment clears the section header (doc-14 Â§3/rule-4).
+  the header band over the RUNNING / DRY COOLER ARRAY labels — units moved
+  down so equipment clears the section header (doc-14 §3/rule-4).
 - **`bldgSvg`** (isometric room/building): added opaque text-break chips
-  behind floating iso labels for scan-speed legibility (doc-14 Â§3 / doc-13 Â§4).
+  behind floating iso labels for scan-speed legibility (doc-14 §3 / doc-13 §4).
 
-### Fixed â diagram responsiveness
+### Fixed — diagram responsiveness
 - `preserveAspectRatio="xMidYMid meet"` added to all 21 diagram/HMI SVGs
   that lacked it (23/24 now; the 1 remaining is a decorative chevron icon,
   not a diagram). Every diagram scales uniformly inside its container.
 - Headless-verified desktop **1440px** and mobile **390px**: 0 `pageerror`,
   0 console errors, **0 px horizontal overflow**, 0 visible SVG without a
-  `viewBox`, 0 line/text overlaps remaining (baseline had bldgÃ38, coolÃ2,
-  netÃ4).
+  `viewBox`, 0 line/text overlaps remaining (baseline had bldg×38, cool×2,
+  net×4).
 
 ### Discipline
 - Conservative, spec-justified scope: full link-bundling deferred (would
-  risk live-update bindings) â title-clearing + quiet low-opacity fan is the
+  risk live-update bindings) — title-clearing + quiet low-opacity fan is the
   regression-safe doc-14-compliant fix. DC dashboard tab + `js/datahall-*.js`
   byte-identical (verified). `audit-js-syntax`/`mobile-responsive` `--strict`
   CLEAN; engine test 57/57.
 
-## v1.20.0 â 2026-05-17 (datahallAI â central calc engine + page-wide bind, Stage 1/3â5 of 9)
+## v1.20.0 — 2026-05-17 (datahallAI — central calc engine + page-wide bind, Stage 1/3–5 of 9)
 
-User: *"revisi yang major, datahallAI.html, kecuali yang DC dashboard â¦
-analisa dan sempurnakan"* â executing the owner's 24-doc spec at
+User: *"revisi yang major, datahallAI.html, kecuali yang DC dashboard …
+analisa dan sempurnakan"* — executing the owner's 24-doc spec at
 `Documents/screenshot bms rz/dc ai/review/`.
 
-### Added â single source-of-truth engine (Stage 1)
-- **`js/datahall-model.js`** â deep-frozen `window.DATAHALL_MODEL`: the LOCKED
-  basis-of-design (4 halls Ã 27 NVL72 Ã **132 kW/NVL72** â 3,564 kW IT/hall,
-  ~14.26 MW facility; 66 kW/NVL36-rack; 85% liquid capture; 35/45 Â°C TCS
-  ÎT10K; spec-corrected equipment â Cat 3516E â¤2.75 MW, not 8 MW). Every
+### Added — single source-of-truth engine (Stage 1)
+- **`js/datahall-model.js`** — deep-frozen `window.DATAHALL_MODEL`: the LOCKED
+  basis-of-design (4 halls × 27 NVL72 × **132 kW/NVL72** → 3,564 kW IT/hall,
+  ~14.26 MW facility; 66 kW/NVL36-rack; 85% liquid capture; 35/45 °C TCS
+  ΔT10K; spec-corrected equipment — Cat 3516E ≤2.75 MW, not 8 MW). Every
   constant carries a `// source:` citation. Exposes a Scenario-B variant for
   UI labelling.
-- **`js/datahall-calculations.js`** â pure `window.DATAHALL_CALC`: every
+- **`js/datahall-calculations.js`** — pure `window.DATAHALL_CALC`: every
   `00-overview-audit.md` formula (PUE = Facility/IT, WUE, CUE, hydronic Q/flow,
   3-phase current, battery, etc.); deterministic, no `Math.random`,
   `pueBasis()` returns the 5-part breakdown.
-- **`tools/test-datahall-calc.mjs`** â Node `vm`-sandboxed; reproduces every
+- **`tools/test-datahall-calc.mjs`** — Node `vm`-sandboxed; reproduces every
   real `21-calculation-worked-examples.md` figure (Scenario A+B). **57/57
   pass, exit 0.**
 
-### Changed â datahallAI.html bound to the engine (Stages 3â5)
+### Changed — datahallAI.html bound to the engine (Stages 3–5)
 - Sidebar, Data Hall, Room Layout, Rack, Cooling/CDU/TCS/CRAH and
-  Electrical-SLD views now render engine-derived values â one consistent
+  Electrical-SLD views now render engine-derived values — one consistent
   model, no per-tab divergence, no `Math.random` feeding any basis-of-design
   number. Engine loaded via plain `<script src>` (zero-build; never inlined).
 - Corrected per `17-basis-of-design-correction-table.md` /
-  `21-calculation-worked-examples.md`: IT/hall 7,128â**3,564 kW**; genset
-  "Cat 3516E 8 MW"â**2.75 MW**; UPS 8 MWâ**4.5 MW @ 79.2%**; TXâ**5 MVA @
-  74.3%**; busway 12 kAâ**6,300 A**; DLC 6,060â**3,029 kW** / air
-  1,070â**535 kW**; CDU 5/6â**9/12 N+2**; racks 22â**54**, 132 kW/rackâ**66
+  `21-calculation-worked-examples.md`: IT/hall 7,128→**3,564 kW**; genset
+  "Cat 3516E 8 MW"→**2.75 MW**; UPS 8 MW→**4.5 MW @ 79.2%**; TX→**5 MVA @
+  74.3%**; busway 12 kA→**6,300 A**; DLC 6,060→**3,029 kW** / air
+  1,070→**535 kW**; CDU 5/6→**9/12 N+2**; racks 22→**54**, 132 kW/rack→**66
   kW/rack** (NVL72/rack interpretation disambiguated). Copy per
   `19-specific-copy-replacements.md`.
-- **PUE shown honestly**: the bottom-up derived value (**â1.30** at nameplate
+- **PUE shown honestly**: the bottom-up derived value (**≈1.30** at nameplate
   COP 6.8) **with its IT/cooling/UPS-dist/aux basis**, per doc-00 "PUE must
-  show basis" and doc-21 Ex9 â the vanity 1.08/1.12 is gone and was NOT
-  fudged to hit the 1.12â1.25 design band (that requires a
+  show basis" and doc-21 Ex9 — the vanity 1.08/1.12 is gone and was NOT
+  fudged to hit the 1.12–1.25 design band (that requires a
   physically-justified economizer factor the spec does not quantify).
 - **DC dashboard tab deliberately untouched** per the owner's exclusion
   (`#p-dash` / `updateDashKPI` / `dcCallouts` zones verified out of scope).
@@ -6372,59 +6375,59 @@ analisa dan sempurnakan"* â executing the owner's 24-doc spec at
 **SVG orthogonal line-routing accuracy** + **mobile responsiveness**,
 basis-of-design drawer (per `13`/`14`/`18`/`22`/`23`).
 
-## v1.19.1 â 2026-05-17 (skip-link sr-only consistency + default DAY mode site-wide)
+## v1.19.1 — 2026-05-17 (skip-link sr-only consistency + default DAY mode site-wide)
 
 User: *"ini kenapa ada link tulisan skip to main content. ini masih tidak
-konsisten"*, *"website ini buat defaultnya day mode jangan dark mode â¦ saat
+konsisten"*, *"website ini buat defaultnya day mode jangan dark mode … saat
 buka pertama itu semua pagenya normal mode bukan dark mode"*, *"ingat di
 memory utk selalu tulis di changelog, standarization docs dll"*.
 
-### Fixed â skip-link rendered visible on 36 standalone pages
+### Fixed — skip-link rendered visible on 36 standalone pages
 - `tools/inject-skip-link.py` had added `<a class="skip-link">` to 101 pages,
   but ~36 standalone pages (calculators, virtual labs, PLN grid, datahall,
-  workbench, dc-conventional, â¦) load **neither** `styles.css` nor
+  workbench, dc-conventional, …) load **neither** `styles.css` nor
   `styles-index.css`, so the link had no sr-only CSS and rendered as a plain
   visible blue link top-left.
 - New **`tools/inject-skiplink-style.py`** injects ONE idempotent
-  `<style id="rz-skiplink-v1">` â **byte-identical to the canonical rule in
-  `styles.css`** (consistency is the point) â before each page's first
+  `<style id="rz-skiplink-v1">` — **byte-identical to the canonical rule in
+  `styles.css`** (consistency is the point) — before each page's first
   structural `</head>`. Browser-verified `getBoundingClientRect().bottom<=0`
   (hidden) until focus on every spot-check.
 - `rfs-readiness-workbench.html`: removed a duplicate page-specific
   `.rfs-skip-link` and fixed an invalid double `id` on `<main>`
-  (`id="rfsMain" id="main-content"` â `id="main-content"`) so the canonical
+  (`id="rfsMain" id="main-content"` → `id="main-content"`) so the canonical
   skip-link target resolves. Now consistent with every other page.
 
-### Changed â default theme is now DAY (light), not dark/OS
+### Changed — default theme is now DAY (light), not dark/OS
 - Flipped every *default-fallback* (never toggles or saved-theme apply) to
   `'light'` across **35 files** + `script.js`: `script.js` `getPreferredTheme`
   no longer follows `prefers-color-scheme`; inline FOUC scripts
   (`getItem('theme')||'dark'`, `getItem('rz_theme')||'dark'`,
-  `}catch{â¦'dark'}`, `s||(prefersDark.matches?'dark':'light')`,
+  `}catch{…'dark'}`, `s||(prefersDark.matches?'dark':'light')`,
   `return prefersDark.matches?'dark':'light'`), the 6 PLN-grid `bindTheme`
   IIFE defaults, and the rfs OS-dark default. `script.min.js` rebuilt
   (terser). Supersedes the 2026-04-04 "dark default" decision per explicit
   user instruction.
-- Verified headless (cleared localStorage â first load): **light on all 12
+- Verified headless (cleared localStorage → first load): **light on all 12
   representative pages** across every pattern; toggle + reload-persist pass
   on 11/12. *Known minor pre-existing limitation:* `pln-java-grid.html`
   (heavy Leaflet overview) saves `rz_theme` correctly but a page-specific
-  actor doesn't re-apply dark on reload â orthogonal to the day-mode default
+  actor doesn't re-apply dark on reload — orthogonal to the day-mode default
   (which works there); its 5 sibling PLN pages persist correctly.
 
 ### Added
 - `tools/inject-skiplink-style.py` (canonical sr-only skip-link injector).
 
-## v1.19.0 â 2026-05-17 (EMERGENCY â site-wide JS syntax catastrophe repaired + credentials strip removed)
+## v1.19.0 — 2026-05-17 (EMERGENCY — site-wide JS syntax catastrophe repaired + credentials strip removed)
 
-User: *"masih aja ada calculator yang error â¦ saya bilang cek audit total semua dan
+User: *"masih aja ada calculator yang error … saya bilang cek audit total semua dan
 test semua. ini tidak bisa di pakai calculator dan fitur free dan pro juga no
 respond. cek semuanya"*, *"check all ALL calculator"*, *"login button no function
 no respond export pdf. waduh. ini semuanya pada error"*, *"rfs-readiness-workbench
 dan menunya pada error, no respond"*.
 
-### Fixed â CRITICAL (production was serving ~33 broken pages)
-- **Site-wide `SyntaxError: Invalid or unexpected token` on 33 pages** â 4 calculators
+### Fixed — CRITICAL (production was serving ~33 broken pages)
+- **Site-wide `SyntaxError: Invalid or unexpected token` on 33 pages** — 4 calculators
   (`tco`, `roi`, `pue`, `carbon-footprint`), ~23 articles (`article-2..27`),
   `FF-1/2/3`, `geopolitics-3`, `dc-market-tracker`, `rfs-readiness-workbench`. A single
   syntax error voids the **entire** `<script>`, so the calculator engine, free/pro
@@ -6434,7 +6437,7 @@ dan menunya pada error, no respond"*.
   Banner", `a1e0abb`/`f460741` v1.8.x "mobile responsive patch") each matched a
   `</style>` / `</body></html>` that was actually *inside a JS string literal* in a
   PDF/print builder and spliced raw CSS/HTML there, clobbering the string's closing
-  tail â unterminated string literal. The newer articles (`article-20..27`) carried
+  tail → unterminated string literal. The newer articles (`article-20..27`) carried
   **three stacked injections** in one builder.
 - **Repair:** every restored line is taken **verbatim from git history** (the exact
   pre-injection `-` line of the qualifying hunk). 27 pages repaired by the new
@@ -6445,45 +6448,45 @@ dan menunya pada error, no respond"*.
   ground-truth (`tools/probe-all-pageerrors.mjs`) = 0 `SyntaxError` on all 33; all 9
   calc probes `pageErrors:0`, `handlersMissing:[]`, `proUnlock:true`.
 
-### Changed â mobile CSS moved to the correct place
+### Changed — mobile CSS moved to the correct place
 - The reverted injections had been *falsely* satisfying
   `tools/audit-mobile-responsive.py` because that grep counted the dead CSS
   that lived **inside the JS strings** (never rendered). After the revert,
   the 33 pages legitimately needed the mobile-responsive CSS in a real
   `<head><style>`. New **`tools/inject-mobile-responsive.py`** adds one
   idempotent canonical `<style id="rz-mobile-v18">` block before the
-  document's first (structural) `</head>` â satisfying every checkpoint
+  document's first (structural) `</head>` — satisfying every checkpoint
   (media-768, body overflow-x, img max-width, nav/footer collapse, v1.8.0
   marker, 44 px tap targets) where it actually applies. All 33 now score
-  â¥7/10; `audit-mobile-responsive.py --strict` PASS.
+  ≥7/10; `audit-mobile-responsive.py --strict` PASS.
 
-### Added â durable regression gate
-- **`tools/audit-js-syntax.py`** â `node --check`s every executable inline `<script>`
+### Added — durable regression gate
+- **`tools/audit-js-syntax.py`** — `node --check`s every executable inline `<script>`
   (skips JSON-LD / importmap / speculationrules / templates; excludes the generated
   `changelog.html`). This catches the unterminated-string class that
   `audit-script-tags.py` structurally cannot. Now a **mandatory pre-push gate**.
-- **`tools/fix-css-in-js-injection.py`**, **`tools/probe-all-pageerrors.mjs`** â the
+- **`tools/fix-css-in-js-injection.py`**, **`tools/probe-all-pageerrors.mjs`** — the
   git-verified repair tool and the browser-truth backstop probe.
 
 ### Removed
-- **`.rz-cred-band`** â the static "CERTIFICATIONS Â· STANDARDS Â· OUTCOMES" credentials
+- **`.rz-cred-band`** — the static "CERTIFICATIONS · STANDARDS · OUTCOMES" credentials
   strip below the bento hero on `index.html`. This was the v1.18.5 lean-editorial
   replacement for the older `.rz-marquee`; the user now wants no credentials strip at
   all between the bento grid and the career timeline.
   - Removed the `<div class="rz-cred-band">` markup block from `index.html`
     (label + 12 credential items).
   - Removed the full `.rz-cred-band` / `.rz-cred-label` / `.rz-cred-track` /
-    `.rz-cred-item` rule group (incl. light-theme + â¤768px overrides) from
+    `.rz-cred-item` rule group (incl. light-theme + ≤768px overrides) from
     `styles-index.css`; re-minified to `styles-index.min.css`
     (`?v=2026-05-17-v1` cache-bust bump).
   - `styles.css` confirmed clean (the band was index-only per the 2-stylesheet
-    architecture â never duplicated there).
-  - Stale `/* v1.18.5 â¦ */` inline comment in `index.html` `<style>` updated.
+    architecture — never duplicated there).
+  - Stale `/* v1.18.5 … */` inline comment in `index.html` `<style>` updated.
 
-## v1.18.14 â 2026-05-14 (spares â 5-Year Spend Projection tab, Phase 3 of 3)
+## v1.18.14 — 2026-05-14 (spares — 5-Year Spend Projection tab, Phase 3 of 3)
 
 ### Added (Spares Readiness Calculator)
-- **5-Year Spend Projection tab (11 Â· 5-Yr Spend Projection)** â year-by-year
+- **5-Year Spend Projection tab (11 · 5-Yr Spend Projection)** — year-by-year
   cash-flow forecast across 8 commodity classes: Chillers, Transformers /
   Switchgear, UPS Systems, PDU / Floor Distribution, Network, Mechanical,
   Sensors / Controls, Consumables. Failure rates and unit costs are industry-
@@ -6504,16 +6507,16 @@ dan menunya pada error, no respond"*.
 - Post-draft folder created: Article/Post Draft/5-Year Spares Spend Projection/
 
 ### User feedback addressed
-- "itu masih ada 2 open" (from prior session) â this closes the second and
+- "itu masih ada 2 open" (from prior session) — this closes the second and
   final open analytical tab from the v1.17 plan (Phase 3 of 3). v1.17 plan
   fully implemented.
 
 ---
 
-## v1.18.13 â 2026-05-14 (spares â Sensitivity Surfaces tab, Phase 2 of 3)
+## v1.18.13 — 2026-05-14 (spares — Sensitivity Surfaces tab, Phase 2 of 3)
 
 ### Added (Spares Readiness Calculator)
-- **Sensitivity Surfaces tab (10 Â· Sensitivity)** â 2D sweep of any two inputs
+- **Sensitivity Surfaces tab (10 · Sensitivity)** — 2D sweep of any two inputs
   vs. a chosen output metric; renders a viridis heatmap via Canvas 2D API
   (N x N grid, N = 5/7/9). Eight sweep variables: lambda, lead_time, demand,
   severity, alternates, holding_pct, unit_cost, backorder_cost. Six output
@@ -6530,67 +6533,67 @@ dan menunya pada error, no respond"*.
 - Post-draft folder created: Article/Post Draft/Sensitivity Surfaces/
 
 ### User feedback addressed
-- "itu masih ada 2 open" (from prior session) â this is the first of the two
+- "itu masih ada 2 open" (from prior session) — this is the first of the two
   remaining analytical tabs from the v1.17 plan.
 
 ---
 
-## v1.18.12 â 2026-05-14 (dcmoc â mobile scroll + strategic planning + FAQ + cause-effect)
+## v1.18.12 — 2026-05-14 (dcmoc — mobile scroll + strategic planning + FAQ + cause-effect)
 
 ### Added (DCMOC)
-- **Mobile horizontal scroll fix** â `CapexDashboard` and `SimulationDashboard` now
+- **Mobile horizontal scroll fix** — `CapexDashboard` and `SimulationDashboard` now
   use `flex-col lg:flex-row` + responsive padding so parameter cards scroll vertically
   on narrow viewports instead of overflowing. KPI grid changed from hard `grid-cols-4`
   to `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`. Power Chain row uses `flex-wrap`.
-- **Strategic Planning module** (`StrategicPlanningDashboard.tsx`) â three sub-modes:
-  - *Feasibility*: land area + grid capacity + climate zone â buildable IT MW, effective
+- **Strategic Planning module** (`StrategicPlanningDashboard.tsx`) — three sub-modes:
+  - *Feasibility*: land area + grid capacity + climate zone → buildable IT MW, effective
     PUE with climate penalty, grid headroom %, annual energy cost estimate
-  - *Acquisition*: target ask price vs. 3 market comparables â bid floor/ceiling,
+  - *Acquisition*: target ask price vs. 3 market comparables → bid floor/ceiling,
     cap rate, simple payback, acquisition signal (buy / negotiate / walk away)
-  - *Expansion*: current footprint + demand growth % â demand timeline, 80%-utilization
+  - *Expansion*: current footprint + demand growth % → demand timeline, 80%-utilization
     trigger year, phased CAPEX schedule, grid reservation deadlines
-- **Cause-Effect Lever Map** in `SimulationDashboard` â 7 annotated input-to-output
+- **Cause-Effect Lever Map** in `SimulationDashboard` — 7 annotated input-to-output
   chains (rack density, tier upgrade, AQI escalation, turnover, shift model, maintenance
   model, cooling strategy) with impact level and cost-direction legend
-- **Floating FAQ / Manual button** in `Shell.tsx` â fixed bottom-right button visible
+- **Floating FAQ / Manual button** in `Shell.tsx` — fixed bottom-right button visible
   on all tabs except FAQ itself, collapses to icon-only on mobile
-- **Strategic Planning FAQ entries** â 10 new Q&A pairs in the FAQ module covering
+- **Strategic Planning FAQ entries** — 10 new Q&A pairs in the FAQ module covering
   feasibility calculation methodology, acquisition bid range derivation, grid reservation
   lead time, expansion trigger logic, climate PUE penalty, and PPA assessment workflow
-- **FAQ quick-start guide** â 4-card grid at the top of FaqDashboard explaining the
+- **FAQ quick-start guide** — 4-card grid at the top of FaqDashboard explaining the
   recommended workflow for investment analysis, strategic planning, and scenario comparison
-- **Version bump** `js/rz-version.js` â v1.18.12 Â· SW cache key synced
+- **Version bump** `js/rz-version.js` → v1.18.12 · SW cache key synced
 
 ### User feedback addressed
-- "DCmoc itu saat mobile tdk bisa scroll samping" â fixed via flex direction + responsive
+- "DCmoc itu saat mobile tdk bisa scroll samping" — fixed via flex direction + responsive
   column grids on all major dashboard panels
-- "enhance more agar bener2 powerfull complete utk investment" â Strategic Planning
+- "enhance more agar bener2 powerfull complete utk investment" — Strategic Planning
   module now covers land feasibility, acquisition due diligence, and expansion scheduling
-- "analitycnya sangat kurang" â Cause-Effect Lever Map added to Simulation dashboard
-- "ada flow2nya dan penjelasan cause effect" â lever map with 7 annotated chains
-- "kasih button utk ke arah faq/manual guidance" â floating FAQ button in Shell
+- "analitycnya sangat kurang" — Cause-Effect Lever Map added to Simulation dashboard
+- "ada flow2nya dan penjelasan cause effect" — lever map with 7 annotated chains
+- "kasih button utk ke arah faq/manual guidance" — floating FAQ button in Shell
 - "bisa dipakai utk strategic planning accuisition atau bahkan feasibility saat mau
-  amankan land atau power di suatu area" â dedicated Strategic Planning module
+  amankan land atau power di suatu area" — dedicated Strategic Planning module
 
 ---
 
-## v1.18.10 â 2026-05-14 (achievements â concept refinement)
+## v1.18.10 — 2026-05-14 (achievements — concept refinement)
 
 ### Changed
-- `achievements.html`: Full concept refinement following user feedback ("Ini membingungkan â
+- `achievements.html`: Full concept refinement following user feedback ("Ini membingungkan —
   coba konsepnya di sempurnakan"). Key changes:
-  - **Hero**: Added explicit "How badges are earned" explainer panel â always visible,
+  - **Hero**: Added explicit "How badges are earned" explainer panel — always visible,
     describes the automatic tracking mechanic and localStorage-only storage.
   - **Hero subtitle**: Level description is appended to the static explainer so the
     subtitle is never ambiguous about what the page does.
-  - **Progress panel**: Restructured to show `X / N badges unlocked â Y%` in
+  - **Progress panel**: Restructured to show `X / N badges unlocked — Y%` in
     JetBrains Mono, with three instrument-chip stat tiles (Pages / Calcs used / Articles read).
   - **CTA strip**: Added new row between hero and badges with direct links to Articles,
-    Calculators, and Home â gives users an obvious path to earn badges.
-  - **Badge cards**: `desc` field replaced with `criterion` â each card now shows the
+    Calculators, and Home — gives users an obvious path to earn badges.
+  - **Badge cards**: `desc` field replaced with `criterion` — each card now shows the
     exact unlock condition in plain language (e.g., "Visit **10 different pages**").
     Per-card progress bars now show both count and percentage.
-  - **Category headers**: Added `catDesc` field â each category section now has a
+  - **Category headers**: Added `catDesc` field — each category section now has a
     one-line explanation of what qualifies (e.g., "Awarded for reading articles to the bottom.").
   - **FAQ section**: Added 6-item FAQ covering: how to earn, data privacy, partial
     progress bars, reset, script-blocking, and level meanings.
@@ -6599,22 +6602,22 @@ dan menunya pada error, no respond"*.
     per `documentation/design.md`. Removed glassmorphism, heavy radial glows.
   - **Reset button**: Moved to labelled "danger zone" row with explanatory copy.
   - `window.achReset` exposed for onclick safety compliance.
-- `js/rz-version.js`: Bumped 1.18.7 â 1.18.10 (1.18.8 reserved for stale-doc stamps; 1.18.9 consumed by hook auto-bump).
+- `js/rz-version.js`: Bumped 1.18.7 → 1.18.10 (1.18.8 reserved for stale-doc stamps; 1.18.9 consumed by hook auto-bump).
 - `sw.js`: Cache name synced via `sync-sw-version.py`.
 - **Output card tooltips (parity with spares v1.18.2)**: Added `.tip` pattern output tooltips to 5 of 7 calc pages (PUE 4 tooltips, ROI 8, TCO 8, CX 4, Carbon 8). CAPEX and OPEX were already covered by existing tooltip patterns.
 
 ---
 
-## v1.18.7 â 2026-05-14 (Spares â Loading placeholders resolve + 4s timeout fallback)
+## v1.18.7 — 2026-05-14 (Spares — Loading placeholders resolve + 4s timeout fallback)
 
-User: "loading2nya nggak berhenti" (from earlier marathon â items showing "Loadingâ¦" forever).
+User: "loading2nya nggak berhenti" (from earlier marathon — items showing "Loading…" forever).
 
 The 6 catalog placeholders (`cat_summary_counts`, `cat_tbody@colspan=13`, OEM tbody, facility-types panel, `ca_blind_tbody`, `ca_sc_lane_tbody`) only resolved when the user activated the Catalog tab. If the user landed elsewhere and never clicked Catalog, they stayed Loading forever.
 
 Fix: at end of the catalog IIFE (line ~8204), added `_eagerInitCatalog()` that:
 - Fires on DOMContentLoaded (or immediately if already loaded)
 - If `window.SPARES_CATALOG` is available, calls `catInitIfReady()` + `calcCatalogAnalytics()` eagerly
-- Plus a `_loadingFallback()` 4-second `setTimeout` that scans for any `Loadingâ¦` text in catalog placeholders and replaces it with a graceful "Catalog data unavailable â refresh the page" message
+- Plus a `_loadingFallback()` 4-second `setTimeout` that scans for any `Loading…` text in catalog placeholders and replaces it with a graceful "Catalog data unavailable — refresh the page" message
 
 This honours `feedback_basic_feature_discipline.md` rule #6 (Loading placeholders must always resolve).
 
@@ -6622,49 +6625,49 @@ Probe SUMMARY: 0 consoleErrors, 0 pageErrors, 0 issues, 27 tabs OK.
 
 ---
 
-## v1.18.6 â 2026-05-14 (OG image meta fixes â 33 pages updated)
+## v1.18.6 — 2026-05-14 (OG image meta fixes — 33 pages updated)
 
-See commit `73338de`. 33 HTML pages had `og:image` pointing to non-existent files OR missing `og:image:alt`. Fixed in batch via NEW `tools/fix-og-meta-tags.py`. Audit went from 66 PASS / 33 FAIL â 99 PASS / 0 FAIL. Plus 99 NEW per-page OG images at `assets/og/*.webp` (1200Ã630 editorial cards).
+See commit `73338de`. 33 HTML pages had `og:image` pointing to non-existent files OR missing `og:image:alt`. Fixed in batch via NEW `tools/fix-og-meta-tags.py`. Audit went from 66 PASS / 33 FAIL → 99 PASS / 0 FAIL. Plus 99 NEW per-page OG images at `assets/og/*.webp` (1200×630 editorial cards).
 
 ---
 
-## v1.18.5 â 2026-05-14 (index.html â replace tacky marquee with lean credentials band)
+## v1.18.5 — 2026-05-14 (index.html — replace tacky marquee with lean credentials band)
 
 User: "running text ini jelek sekali, kurang lean, kurang professional look. norak"
 
 The engineering-keyword marquee at `index.html:423-454` was a 60s linear infinite
-scroll with mint diamond bullets (`â`), 3rem gap, 24 duplicated items, gradient
-overlay background, dual borders, and edge-fade-out masks â every decoration
+scroll with mint diamond bullets (`◆`), 3rem gap, 24 duplicated items, gradient
+overlay background, dual borders, and edge-fade-out masks — every decoration
 working against signal density.
 
 Replaced with `.rz-cred-band`: static, dense, editorial credit line.
 - JetBrains Mono 10.5px (engineering numerics font)
-- Uppercase, `letter-spacing: 0.08em` (half the prior 0.16em â denser)
-- Pipe `|` separator (replaces `â` diamond)
+- Uppercase, `letter-spacing: 0.08em` (half the prior 0.16em → denser)
+- Pipe `|` separator (replaces `◆` diamond)
 - One hairline top border (no bottom, no gradient, no fade masks)
 - 12 unique items (no duplication, no animation)
-- Left label `CERTIFICATIONS Â· STANDARDS Â· OUTCOMES` in muted signal-amber
+- Left label `CERTIFICATIONS · STANDARDS · OUTCOMES` in muted signal-amber
 - Mobile: horizontal-scroll on overflow, scrollbar chrome hidden
 - Hover state: signal-amber colour shift, editorial accent
 
 Files: `index.html` (markup swap), `styles-index.css:5759-5820` (CSS swap),
-`js/rz-version.js` â 1.18.5, sw.js auto-synced.
+`js/rz-version.js` → 1.18.5, sw.js auto-synced.
 
 Out of scope (separate tickets):
-- Other pages with `.rz-marquee` references â `articles.html` / `glossary.html`
+- Other pages with `.rz-marquee` references — `articles.html` / `glossary.html`
   / `datacenter-solutions.html` keep their patterns until separately flagged.
-- The historical `changelog.html` v1.4.0 entry referencing the marquee â stays
+- The historical `changelog.html` v1.4.0 entry referencing the marquee — stays
   as historical record.
 
 ---
 
-## v1.18.2 â 2026-05-14 (output card tooltips â 52 metric-box + 8 summary-kpi)
+## v1.18.2 — 2026-05-14 (output card tooltips — 52 metric-box + 8 summary-kpi)
 
 User complaint (verbatim): "Banyak parameter input:output atau variable itu g ada tooltip"
 
 ### Added
-- `spares-readiness-calculator.html`: 60 `<span class="tip" tabindex="0" data-tip="...">â</span>` tooltip spans
-  added to every output metric label across all modules â resolves the long-standing gap where inputs
+- `spares-readiness-calculator.html`: 60 `<span class="tip" tabindex="0" data-tip="...">ⓘ</span>` tooltip spans
+  added to every output metric label across all modules — resolves the long-standing gap where inputs
   had 189 tooltips but outputs had zero.
 - M1 Criticality (4): RPN, Effective Severity, Fleet Exp. Failures/yr, Alternates Factor
 - M2 Readiness (4): Confirmed Supply, Gap, Date Slack, LT/Horizon ratio
@@ -6695,7 +6698,7 @@ User complaint (verbatim): "Banyak parameter input:output atau variable itu g ad
 
 ---
 
-## v1.18.0 â 2026-05-14 (3-tier feature flags + per-page admin matrix + post-drafts catch-up + indexing freshness)
+## v1.18.0 — 2026-05-14 (3-tier feature flags + per-page admin matrix + post-drafts catch-up + indexing freshness)
 
 User mandates this turn (verbatim per `feedback_log_every_user_comment.md`):
 
@@ -6705,20 +6708,20 @@ User mandates this turn (verbatim per `feedback_log_every_user_comment.md`):
 
 ### Shipped (4 commits)
 
-- **`18b56ea` Phase A â Feature flag foundation**
-  - NEW `js/rz-feature-flags.js` (315 lines): `window.RZ_FEATURE_FLAGS` schema for 14 page-keys Ã 6-13 flags each with `{free, demo, pro}` booleans; `window._rzFeatures = { getTier, has, listFeatures, listPages }`
+- **`18b56ea` Phase A — Feature flag foundation**
+  - NEW `js/rz-feature-flags.js` (315 lines): `window.RZ_FEATURE_FLAGS` schema for 14 page-keys × 6-13 flags each with `{free, demo, pro}` booleans; `window._rzFeatures = { getTier, has, listFeatures, listPages }`
   - `auth.js` (+27 lines): `DEMO_EMAILS`, `detectRole` returns 3 tiers, `_rzAuth.getTier()` exposed
   - NEW `standarization/FEATURE_FLAGS_STANDARD.md` (599 lines)
   - `standarization/PRO_MODE_STANDARDIZATION.md` (+80 lines, section 13)
 
-- **`8e58e2c` Phase B â Admin console refactor**
+- **`8e58e2c` Phase B — Admin console refactor**
   - `rz-ops-p7x3k9m.html` (+218 lines): per-page sub-nav (14 pages), 3-tier toggle columns (FREE | DEMO | PRO), `localStorage.rz_admin_features_by_page`, `rz-features-changed` event, apply-preset dropdown, per-page reset
 
-- **`764cd82` Phase C â Post-draft catch-up**
-  - 30 new MD files across 6 new folders (Spares, PLN Java-Bali family Ã5, plus confirmed coverage of TCO/CAPEX/OPEX/PUE/Tier Advisor/TIA-942/RFS)
+- **`764cd82` Phase C — Post-draft catch-up**
+  - 30 new MD files across 6 new folders (Spares, PLN Java-Bali family ×5, plus confirmed coverage of TCO/CAPEX/OPEX/PUE/Tier Advisor/TIA-942/RFS)
 
-- **`731a992` Phase H â Indexing freshness**
-  - NEW `tools/build-indexing-list.py`; regenerated `standarization/Indexing gconsole/top-urls-request-indexing.txt` from 37 URLs (Feb 2026) â 102 URLs (May 2026)
+- **`731a992` Phase H — Indexing freshness**
+  - NEW `tools/build-indexing-list.py`; regenerated `standarization/Indexing gconsole/top-urls-request-indexing.txt` from 37 URLs (Feb 2026) → 102 URLs (May 2026)
 
 ### 5 discipline mandates codified to memory this session
 - `feedback_always_document_everything.md`
@@ -6728,7 +6731,7 @@ User mandates this turn (verbatim per `feedback_log_every_user_comment.md`):
 - `feedback_standarization_freshness.md`
 
 ### Brand foundation
-- `documentation/design.md` (2,374 lines, 15 H2 + 8 appendices â anti-AI-design-slop brand system)
+- `documentation/design.md` (2,374 lines, 15 H2 + 8 appendices — anti-AI-design-slop brand system)
 - NEW `~/.claude/agents/uiux-reviewer.md` (impeccable design eye agent)
 
 ### Reconciliation follow-up
@@ -6736,61 +6739,61 @@ Agent A's `RZ_FEATURE_FLAGS` (14 pages) and Agent B's `RZ_FEATURE_FLAGS_FALLBACK
 
 ---
 
-## v1.17.3 â 2026-05-13 (Spares Engine â workflow visibility + Stakeholder strategic refactor)
+## v1.17.3 — 2026-05-13 (Spares Engine — workflow visibility + Stakeholder strategic refactor)
 
 User context: "tidak perlu ada tailored message draft itu tidak penting, yang penting strategicnya bagaimana bisa come up" + "belum ada alur, flowchart, cards, jadi melihat engine spares-readiness-calculator.html jadi membingungkan alurnya" + "di awal2 kasih high level summary context"
 
-### Phase G â Stakeholder strategic refactor
-- **Removed** Tailored Message Drafts section from `genStakeholder()` output â replaced with 4 strategic outputs.
+### Phase G — Stakeholder strategic refactor
+- **Removed** Tailored Message Drafts section from `genStakeholder()` output — replaced with 4 strategic outputs.
 - **Added** Influence &times; Impact 2&times;2 matrix (Manage Closely / Keep Satisfied / Keep Informed / Monitor) computed per stakeholder from their role and urgency level.
 - **Added** Strategic Narrative Arc table (3-act per stakeholder: Act 1 current belief, Act 2 pivot, Act 3 commitment + First-Step Trigger).
-- **Added** Coalition-Building Sequence (5-step alignment path: Anchor â Validate â Brief â Decide â Reinforce).
+- **Added** Coalition-Building Sequence (5-step alignment path: Anchor → Validate → Brief → Decide → Reinforce).
 - **Added** Strategy Heuristics card (8 Cialdini-based influence principles adapted for DC procurement context).
 - **Changed** button label from "Generate Plan" to "Build Strategy"; updated placeholder and ops-intro text to reflect strategic focus.
 
-### Phase H â Per-module flow cards
-- **Added** `<div class="module-flow-card">` to all 9 analytical modules (criticality, readiness, stock, meio, hub, supplier, ltb, kraljic, montecarlo) showing Inputs â Computation â Outputs â Connects-To data flow.
+### Phase H — Per-module flow cards
+- **Added** `<div class="module-flow-card">` to all 9 analytical modules (criticality, readiness, stock, meio, hub, supplier, ltb, kraljic, montecarlo) showing Inputs → Computation → Outputs → Connects-To data flow.
 
-### Phase I â Top-of-page workflow flowchart
-- **Added** `<details class="workflow-flowchart-wrap">` collapsible SVG flowchart (viewBox 1200Ã440) showing all 27 modules across 4 column groups: ANALYTICAL / OPERATING ENGINE / SUPPLY CHAIN / REFERENCE. Module labels are clickable (`onclick="switchTab(...)"`) with tier-1 amber flow lines and tier-2 dashed cross-connections. Respects `prefers-reduced-motion`.
+### Phase I — Top-of-page workflow flowchart
+- **Added** `<details class="workflow-flowchart-wrap">` collapsible SVG flowchart (viewBox 1200×440) showing all 27 modules across 4 column groups: ANALYTICAL / OPERATING ENGINE / SUPPLY CHAIN / REFERENCE. Module labels are clickable (`onclick="switchTab(...)"`) with tier-1 amber flow lines and tier-2 dashed cross-connections. Respects `prefers-reduced-motion`.
 
-### Phase J â Per-pane high-level summary cards
+### Phase J — Per-pane high-level summary cards
 - **Added** `<div class="module-summary-card">` to all 9 analytical modules + catalog module. Each card has Q (what problem this solves) / A (method) / Output (what you get) / Use-when (trigger conditions).
 
 ### CSS additions
-- `.module-summary-card`, `.module-flow-card`, `.module-flow-col`, `.module-flow-arrow` â per-module workflow visualization.
-- `.workflow-flowchart-wrap`, `.workflow-flowchart-summary`, `.workflow-svg` â top-of-page flowchart.
-- `.influence-matrix`, `.influence-quad`, `.iq-manage/.iq-satisfy/.iq-inform/.iq-monitor` â 2Ã2 matrix grid for Stakeholder output.
+- `.module-summary-card`, `.module-flow-card`, `.module-flow-col`, `.module-flow-arrow` — per-module workflow visualization.
+- `.workflow-flowchart-wrap`, `.workflow-flowchart-summary`, `.workflow-svg` — top-of-page flowchart.
+- `.influence-matrix`, `.influence-quad`, `.iq-manage/.iq-satisfy/.iq-inform/.iq-monitor` — 2×2 matrix grid for Stakeholder output.
 - All rules include `[data-theme="dark"]` overrides and `@media (max-width: 768px)` responsive behaviour.
 
 ---
 
-## v1.18.0-prep â 2026-05-13 (Brand & design system foundation)
+## v1.18.0-prep — 2026-05-13 (Brand & design system foundation)
 
-User-mandated work to escape "AI design slop" and establish identifiable brand character. Foundational artefacts created â visual changes to come in v1.18.x releases.
+User-mandated work to escape "AI design slop" and establish identifiable brand character. Foundational artefacts created — visual changes to come in v1.18.x releases.
 
-- **NEW** `~/.claude/agents/uiux-reviewer.md` â local Claude Code agent with impeccable design eye. Enforces anti-pattern list (dot-grid noise, default Tailwind palettes, Anthropic-purple, saturated-emerald-everywhere, glassmorphism, neumorphism, cursor-3D-tilt, lifestyle stock photos, etc.). MUST BE USED on every UI commit going forward.
-- **NEW** `documentation/design.md` â comprehensive brand & design system manifest (target 2,500-3,500 lines). Covers: brand essence, visual character (industrial-instrumentation aesthetic), 30+ anti-patterns, typography (IBM Plex Sans + JetBrains Mono), color tokens (signal-amber `#FFAA00`, oscilloscope green `#00FF88`, fault-red `#FF3030`, instrument-cyan `#00DDFF`), layout patterns, kinetic patterns, iconography, component library map, 7 page archetypes with ASCII wireframes, PDF export design, accessibility (WCAG 2.2 AA), mobile responsiveness, 5-year roadmap (2026-2031), decision log. Authored async via sonnet agent.
-- **NEW** `~/.claude/projects/-home-baguspermana7/memory/feedback_always_document_everything.md` â codified user mandate: every code/content change MUST update CHANGELOG + standardization + relevant docs in the same commit. No exceptions.
+- **NEW** `~/.claude/agents/uiux-reviewer.md` — local Claude Code agent with impeccable design eye. Enforces anti-pattern list (dot-grid noise, default Tailwind palettes, Anthropic-purple, saturated-emerald-everywhere, glassmorphism, neumorphism, cursor-3D-tilt, lifestyle stock photos, etc.). MUST BE USED on every UI commit going forward.
+- **NEW** `documentation/design.md` — comprehensive brand & design system manifest (target 2,500-3,500 lines). Covers: brand essence, visual character (industrial-instrumentation aesthetic), 30+ anti-patterns, typography (IBM Plex Sans + JetBrains Mono), color tokens (signal-amber `#FFAA00`, oscilloscope green `#00FF88`, fault-red `#FF3030`, instrument-cyan `#00DDFF`), layout patterns, kinetic patterns, iconography, component library map, 7 page archetypes with ASCII wireframes, PDF export design, accessibility (WCAG 2.2 AA), mobile responsiveness, 5-year roadmap (2026-2031), decision log. Authored async via sonnet agent.
+- **NEW** `~/.claude/projects/-home-baguspermana7/memory/feedback_always_document_everything.md` — codified user mandate: every code/content change MUST update CHANGELOG + standardization + relevant docs in the same commit. No exceptions.
 
 Next: v1.17.2 site-wide calc-page stabilization sweep (3 parallel agents per page-risk slice).
 
 ---
 
-## v1.17.2 â 2026-05-13 (Spares Engine â basic-features sweep + Negotiation enhancement)
+## v1.17.2 — 2026-05-13 (Spares Engine — basic-features sweep + Negotiation enhancement)
 
 User reported across multiple screenshots that "basic feature selalu bermasalah" (basic features always broken). Specific complaints + fixes:
 
 - **Login button dead** on spares-readiness-calculator.html. Root cause: `auth.js` detects inline `.nav-login-btn` and skips its own injection, but the inline button had no click handler. Fix: added `onclick="if(window._rzAuth)_rzAuth.showModal();"`. Pattern now codified in `feedback_basic_feature_discipline.md`.
 - **Active tab indicator invisible** ("tidak ada indicative sedang active bisa ada warna kuning"). Root cause: line-724 CSS rule `.tab-btn.active { border-bottom: 2px solid var(--amber-light) !important; }` was the cascade winner because it came last + used `!important`, but it only set the underline (no background fill). The line-203 amber-fill rule was overridden. Fix: rule now uses filled amber background + amber border + 700 weight + `::after` underline accent, all with `!important` to lock the cascade.
-- **Negotiation tab horizontal overflow** â `.leverage-list` rendered 12 long pills with `white-space:nowrap` in a flat row, expanding the pane beyond viewport. Fix: `flex-wrap: wrap` on the list + `max-width:100%; overflow-x:hidden` on `.module-pane.active`.
-- **Negotiation output too thin** ("level detail ini sangat2 kurang") â added ZOPA / Walk-Away table, weighted Decision Matrix (3 paths Ã 5 criteria), Risk Register (5 risks with prob/impact RAG), Role Allocation (5 roles), Cause-Effect Lever Map (5 levers + primary/secondary effects), Communication Cadence (5 time-buckets). Roughly tripled analytical depth.
-- **Loading placeholders stuck** ("loading2nya nggak berhenti") â diagnosed 9 Loading placeholders; resolution pattern documented in standardization. Implementation continues into v1.17.3 per orchestration.
+- **Negotiation tab horizontal overflow** — `.leverage-list` rendered 12 long pills with `white-space:nowrap` in a flat row, expanding the pane beyond viewport. Fix: `flex-wrap: wrap` on the list + `max-width:100%; overflow-x:hidden` on `.module-pane.active`.
+- **Negotiation output too thin** ("level detail ini sangat2 kurang") — added ZOPA / Walk-Away table, weighted Decision Matrix (3 paths × 5 criteria), Risk Register (5 risks with prob/impact RAG), Role Allocation (5 roles), Cause-Effect Lever Map (5 levers + primary/secondary effects), Communication Cadence (5 time-buckets). Roughly tripled analytical depth.
+- **Loading placeholders stuck** ("loading2nya nggak berhenti") — diagnosed 9 Loading placeholders; resolution pattern documented in standardization. Implementation continues into v1.17.3 per orchestration.
 
 Documentation discipline established this session (per user mandate "ingat di memory anda"):
-- `feedback_always_document_everything.md` â every change touches CHANGELOG + standardization + relevant docs.
-- `feedback_log_every_user_comment.md` â every user comment logged into changelog/standardization/memory before moving on.
-- `feedback_basic_feature_discipline.md` â 8-rule pre-commit checklist preventing Login / Tab / Tooltip / Mobile-burger / inline-handler / Loading-resolution regressions.
+- `feedback_always_document_everything.md` — every change touches CHANGELOG + standardization + relevant docs.
+- `feedback_log_every_user_comment.md` — every user comment logged into changelog/standardization/memory before moving on.
+- `feedback_basic_feature_discipline.md` — 8-rule pre-commit checklist preventing Login / Tab / Tooltip / Mobile-burger / inline-handler / Loading-resolution regressions.
 
 Probe SUMMARY (live URL after push): all 27 tabs OK, all handlers exposed, login button reaches `_rzAuth.showModal()`.
 
@@ -6798,323 +6801,323 @@ Probe SUMMARY (live URL after push): all 27 tabs OK, all handlers exposed, login
 
 Root cause identified: the v1.8.0 mobile-responsive patch tool injected a raw multi-line CSS block directly into JS `html += '...'` string literals inside PDF export functions. This created a JS syntax error (`Invalid or unexpected token`) that silently killed every function declaration in the script block, making all inline `onclick=` handlers throw `ReferenceError`.
 
-- **tia-942-checklist.html** â Fixed CSS injection (line 1513: `html += '` â template literal); added 12 window exports (attemptLogin, closeLoginModal, exportPDF, handlePremiumTab, logoutPremium, onCheck, resetChecklist, setDcType, setMode, setTier, toggleCat, toggleUserDropdown). Probe: 0 errors, 0 missing, burger+back-link OK.
-- **tier-advisor.html** â Fixed CSS injection (line 1570); added 12 window exports (attemptLogin, closeLoginModal, debouncedCalculate, exportPDF, handlePremiumTab, logoutPremium, resetDefaults, setMode, setPreset, toggleMobileMenu, toggleTheme, toggleUserDropdown). Probe: 0 errors, 0 missing, burger+back-link OK.
-- **cx-calculator.html** â Fixed CSS injection (line 4125); fixed `walk(ganttData)` â `walk(ganttData.items)` bug in `cxRenderGanttStats` (Calculate button threw `items.forEach is not a function`); added 25 window exports. Probe: 0 errors, 0 missing, burger+back-link OK.
+- **tia-942-checklist.html** — Fixed CSS injection (line 1513: `html += '` → template literal); added 12 window exports (attemptLogin, closeLoginModal, exportPDF, handlePremiumTab, logoutPremium, onCheck, resetChecklist, setDcType, setMode, setTier, toggleCat, toggleUserDropdown). Probe: 0 errors, 0 missing, burger+back-link OK.
+- **tier-advisor.html** — Fixed CSS injection (line 1570); added 12 window exports (attemptLogin, closeLoginModal, debouncedCalculate, exportPDF, handlePremiumTab, logoutPremium, resetDefaults, setMode, setPreset, toggleMobileMenu, toggleTheme, toggleUserDropdown). Probe: 0 errors, 0 missing, burger+back-link OK.
+- **cx-calculator.html** — Fixed CSS injection (line 4125); fixed `walk(ganttData)` → `walk(ganttData.items)` bug in `cxRenderGanttStats` (Calculate button threw `items.forEach is not a function`); added 25 window exports. Probe: 0 errors, 0 missing, burger+back-link OK.
 - Three Puppeteer probes created: `tools/probe-calc-tia942.mjs`, `tools/probe-calc-tieradvisor.mjs`, `tools/probe-calc-cx.mjs`.
 - `audit-script-tags.py --strict`: CLEAN (149 files). `audit-onclick-handlers.py --strict`: CLEAN on all 3 pages.
 
 ---
 
-## v1.17.1 â 2026-05-13 (Spares Engine â stabilization #3: dead Generate buttons)
+## v1.17.1 — 2026-05-13 (Spares Engine — stabilization #3: dead Generate buttons)
 
 User reported "Generate Proposal" button (and 8 sibling generators) silently dead on Operating-Engine tabs after v1.17.0 ship.
 
-Root cause: inline handler pattern is `onclick="safeGen(genX)"` â it requires BOTH `safeGen` AND `genX` (the function REFERENCE passed as arg) to be on `window`. v1.16.2 exposed `safeGen` but missed the 9 generators. The v1.16.2 audit tool only checked direct call targets (`onclick="X("`), not identifiers passed as arguments.
+Root cause: inline handler pattern is `onclick="safeGen(genX)"` — it requires BOTH `safeGen` AND `genX` (the function REFERENCE passed as arg) to be on `window`. v1.16.2 exposed `safeGen` but missed the 9 generators. The v1.16.2 audit tool only checked direct call targets (`onclick="X("`), not identifiers passed as arguments.
 
-1. **9 `gen*` functions exposed on window** â `genPMOps`, `genNegotiation`, `genContract`, `genProcessImprovement`, `genMeetingPrep`, `genStakeholder`, `genEOLPlan`, `genAmbiguitySolver`, `genSTAR` â all added to the export block in `spares-readiness-calculator.html` near line 9620.
-2. **`tools/audit-onclick-handlers.py` tightened** â `extract_handlers()` now walks the entire event-handler expression (`onclick="Y(X, Z)"`) and reports EVERY identifier, not just the call target. Skips JS built-ins.
+1. **9 `gen*` functions exposed on window** — `genPMOps`, `genNegotiation`, `genContract`, `genProcessImprovement`, `genMeetingPrep`, `genStakeholder`, `genEOLPlan`, `genAmbiguitySolver`, `genSTAR` — all added to the export block in `spares-readiness-calculator.html` near line 9620.
+2. **`tools/audit-onclick-handlers.py` tightened** — `extract_handlers()` now walks the entire event-handler expression (`onclick="Y(X, Z)"`) and reports EVERY identifier, not just the call target. Skips JS built-ins.
 
 Probe SUMMARY (live URL after push): consoleErrors=0, pageErrors=0, all 65+ inline-event handlers exposed.
 
 ---
 
-## v1.17.0 â 2026-05-13 (Spares Engine â MEIO optimizer)
+## v1.17.0 — 2026-05-13 (Spares Engine — MEIO optimizer)
 
 ### Added
-- New tab "4 Â· MEIO Optimizer" (`pane-meio`) in the Analytical group, inserted between Optimal Stock and Hub Positioning.
+- New tab "4 · MEIO Optimizer" (`pane-meio`) in the Analytical group, inserted between Optimal Stock and Hub Positioning.
 - `calcMEIO()`: 2-echelon METRIC marginal-analysis solver (Sherbrooke 1968 + VARI-METRIC effective-LT expansion, Graves 1985). Iteratively allocates stock units between Regional Warehouse (s1*) and Site (s2*) to minimise total annual cost given a target fill rate and optional budget cap.
 - `poissonBackorders(lambda, s)`: Poisson expected-backorder helper used by VARI-METRIC echelon-1 backorder expansion. Normal approximation kicks in for lambda > 200.
 - `exportMEIOPDF()`: minimal print-window PDF report for MEIO results.
-- Crosslink pills in pane-stock (â MEIO) and pane-hub (â MEIO).
+- Crosslink pills in pane-stock (→ MEIO) and pane-hub (→ MEIO).
 - TAB_ORDER updated to 27 entries; probe TAB_NAMES updated accordingly.
 
-## v1.16.3 â 2026-05-13 (Spares Engine â stabilization sweep 2: per-module calc handlers)
+## v1.16.3 — 2026-05-13 (Spares Engine — stabilization sweep 2: per-module calc handlers)
 
 User reported "still many errors" after v1.16.2. Re-probed comprehensively with a deeper Puppeteer audit covering ALL inline event attributes (not just `onclick`). v1.16.2 only audited `onclick` and missed 19 functions called via `oninput=` / `onchange=` on input elements across 10 modules.
 
-1. **19 more handlers exposed on window** â every input-bound recalc function across the Readiness, Stock, Hub, Supplier-Risk, LTB, Kraljic, Fleet, Scorecard, SC-Risk, Catalog-Analytics, Commodity-Defaults, Preset, MC-labels, Fleet-update, and SC-part-from-catalog handlers. Pattern: `window.X = (typeof X !== 'undefined') ? X : null;` for forward-compat in case any are deprecated later.
-2. **`tools/audit-onclick-handlers.py` updated** â now extracts handler names from ALL inline event attributes: `onclick`, `oninput`, `onchange`, `onkeyup`, `onkeydown`, `onfocus`, `onblur`, `onsubmit`, `onmouseover`, `onmouseout`, `ondblclick`. Skips JS built-ins (`if`, `for`, `Math`, etc.) via blocklist. Strict mode for CI.
-3. **`tools/audit-all-handlers.mjs`** â companion Puppeteer-driven cross-check that loads the live page and reports any handler typeof !== 'function' on `window`.
-4. **Deep probe coverage expanded** â `tools/probe-spares-deep.mjs` now exercises Save/Load/Share, 15 calc functions across all module groups, tour Start â NextÃ2 â Skip, 189 tooltip elements, and mobile viewport at 375Ã667.
+1. **19 more handlers exposed on window** — every input-bound recalc function across the Readiness, Stock, Hub, Supplier-Risk, LTB, Kraljic, Fleet, Scorecard, SC-Risk, Catalog-Analytics, Commodity-Defaults, Preset, MC-labels, Fleet-update, and SC-part-from-catalog handlers. Pattern: `window.X = (typeof X !== 'undefined') ? X : null;` for forward-compat in case any are deprecated later.
+2. **`tools/audit-onclick-handlers.py` updated** — now extracts handler names from ALL inline event attributes: `onclick`, `oninput`, `onchange`, `onkeyup`, `onkeydown`, `onfocus`, `onblur`, `onsubmit`, `onmouseover`, `onmouseout`, `ondblclick`. Skips JS built-ins (`if`, `for`, `Math`, etc.) via blocklist. Strict mode for CI.
+3. **`tools/audit-all-handlers.mjs`** — companion Puppeteer-driven cross-check that loads the live page and reports any handler typeof !== 'function' on `window`.
+4. **Deep probe coverage expanded** — `tools/probe-spares-deep.mjs` now exercises Save/Load/Share, 15 calc functions across all module groups, tour Start → Next×2 → Skip, 189 tooltip elements, and mobile viewport at 375×667.
 
 Probe SUMMARY (live URL): consoleErrors=0, pageErrors=0, tabsFailed=0, all 80 inline-event handlers exposed.
 
-## v1.16.2 â 2026-05-13 (Spares Engine â stabilization: dead handlers, NaN cards)
+## v1.16.2 — 2026-05-13 (Spares Engine — stabilization: dead handlers, NaN cards)
 
 Runtime-verified stabilization of the 9,302-line calculator (Puppeteer probe green):
 
-1. **All 59 inline onclick handlers exposed on window (critical)** â every function used in `onclick="X(...)"` was defined inside the main IIFE and unreachable from global scope, causing `ReferenceError` on every user interaction. Added a `window.X = X` export block before `})(); // end IIFE`. All 26 tabs now switch correctly.
-2. **NaN% on 4 criticality KPI cards (critical)** â `script.min.js` `initMetricCounters()` selected ALL `.metric-value` elements via `querySelectorAll('.metric-value')` and wrote `NaN%` to any card lacking a `data-target` attribute (the calc engine's KPI cards). Fixed by changing the selector to `.metric-value[data-target]` so the counter animation only targets landing/article page stats. Rebuilt `script.min.js`.
-3. **Dead `switchTab` + `TAB_ORDER` (cleanup)** â removed the 14-item `TAB_ORDER` and the stub `switchTab` function (declared at the top of the tab-switching section but immediately overridden by the 26-item version 2000+ lines later). Promoted the authoritative declarations with proper `var` / `function` syntax.
-4. **`logoutPremium` stub** â the nav dropdown had `onclick="logoutPremium()"` with no definition anywhere; added a safe stub that delegates to `window._rzAuth.logout()`.
-5. **`tools/audit-onclick-handlers.py`** â new CI tool that enumerates inline `onclick` handler names and verifies each has a `window.X =` exposure. Exits 1 in `--strict` mode if any are missing. Passes clean on v1.16.2.
+1. **All 59 inline onclick handlers exposed on window (critical)** — every function used in `onclick="X(...)"` was defined inside the main IIFE and unreachable from global scope, causing `ReferenceError` on every user interaction. Added a `window.X = X` export block before `})(); // end IIFE`. All 26 tabs now switch correctly.
+2. **NaN% on 4 criticality KPI cards (critical)** — `script.min.js` `initMetricCounters()` selected ALL `.metric-value` elements via `querySelectorAll('.metric-value')` and wrote `NaN%` to any card lacking a `data-target` attribute (the calc engine's KPI cards). Fixed by changing the selector to `.metric-value[data-target]` so the counter animation only targets landing/article page stats. Rebuilt `script.min.js`.
+3. **Dead `switchTab` + `TAB_ORDER` (cleanup)** — removed the 14-item `TAB_ORDER` and the stub `switchTab` function (declared at the top of the tab-switching section but immediately overridden by the 26-item version 2000+ lines later). Promoted the authoritative declarations with proper `var` / `function` syntax.
+4. **`logoutPremium` stub** — the nav dropdown had `onclick="logoutPremium()"` with no definition anywhere; added a safe stub that delegates to `window._rzAuth.logout()`.
+5. **`tools/audit-onclick-handlers.py`** — new CI tool that enumerates inline `onclick` handler names and verifies each has a `window.X =` exposure. Exits 1 in `--strict` mode if any are missing. Passes clean on v1.16.2.
 
 Probe SUMMARY (node tools/probe-spares.mjs): consoleErrors=0, pageErrors=0, tabsFailed=0, cardNaN=[], all windowExposure="function".
 
 ---
 
-## v1.16.1 â 2026-05-13 (Spares Engine â final QA pass: 7 fixes)
+## v1.16.1 — 2026-05-13 (Spares Engine — final QA pass: 7 fixes)
 
 Comprehensive code review of the 9,302-line calculator after its ~8 build passes. 7 surgical fixes, no regressions:
-1. **`TAB_ORDER` regression (critical)** â the runtime-authoritative `TAB_ORDER` reassignment (line ~6996) was missing `'sc-lane','sc-risk','sc-sim','sc-expedite'` (the v1.16.0 agent added them only to the *first* assignment), so keyboard Arrow/Home/End navigation + the mobile jump-to-module loop skipped all 4 Supply-Chain tabs. Added them â `TAB_ORDER` now lists all 26 module panes.
-2. **Patched `switchTab` calcs map missing the 4 SC handlers (critical)** â opening a Supply-Chain tab via click/keyboard never triggered its calc on first open (stale/empty output). Added the 4 SC handlers to the patched map (they existed in the pre-patch `switchTab` but the later reassignment dropped them).
-3. **`onTimeCnt` double-increment in `runSCSim`** â the disruption-sim loop set `onTime = true` then immediately `if (onTime) onTimeCnt++` (always true) â the on-time-% was overstated. Fixed to a single increment.
-4. **Duplicate fleet-storage init** â the Fleet list was loaded from `localStorage` twice on startup (two identical IIFEs); removed the second.
-5. **Stale chart registry on `scsim_output`/`sc_expedite` re-render** â `setHTML(...)` wiped the `<canvas>` but left `charts[...]` pointing at a detached node â `getOrCreateChart` would `.destroy()` a stale object on the second run. Added explicit registry cleanup before re-injecting the canvas (both charts).
-6. **Dead variable `demandForSites` in `calcHub`** â declared, never read; removed.
-7. **NaN guards on lane fields** â added `|| 4` / `|| 9` / `|| 30` fallbacks on `customsD`/`airD`/`oceanD` in `calcLanePlanner` + `calcExpedite` so a catalog entry missing a field can't propagate `NaN`.
+1. **`TAB_ORDER` regression (critical)** — the runtime-authoritative `TAB_ORDER` reassignment (line ~6996) was missing `'sc-lane','sc-risk','sc-sim','sc-expedite'` (the v1.16.0 agent added them only to the *first* assignment), so keyboard Arrow/Home/End navigation + the mobile jump-to-module loop skipped all 4 Supply-Chain tabs. Added them — `TAB_ORDER` now lists all 26 module panes.
+2. **Patched `switchTab` calcs map missing the 4 SC handlers (critical)** — opening a Supply-Chain tab via click/keyboard never triggered its calc on first open (stale/empty output). Added the 4 SC handlers to the patched map (they existed in the pre-patch `switchTab` but the later reassignment dropped them).
+3. **`onTimeCnt` double-increment in `runSCSim`** — the disruption-sim loop set `onTime = true` then immediately `if (onTime) onTimeCnt++` (always true) → the on-time-% was overstated. Fixed to a single increment.
+4. **Duplicate fleet-storage init** — the Fleet list was loaded from `localStorage` twice on startup (two identical IIFEs); removed the second.
+5. **Stale chart registry on `scsim_output`/`sc_expedite` re-render** — `setHTML(...)` wiped the `<canvas>` but left `charts[...]` pointing at a detached node → `getOrCreateChart` would `.destroy()` a stale object on the second run. Added explicit registry cleanup before re-injecting the canvas (both charts).
+6. **Dead variable `demandForSites` in `calcHub`** — declared, never read; removed.
+7. **NaN guards on lane fields** — added `|| 4` / `|| 9` / `|| 30` fallbacks on `customsD`/`airD`/`oceanD` in `calcLanePlanner` + `calcExpedite` so a catalog entry missing a field can't propagate `NaN`.
 
-Confirmed already-correct: all ~26 tabs render, charts re-render on hiddenâvisible switch, `SCENARIO_FIELDS` covers the inputs, the 5 presets round-trip, math (Poisson `lambdaLT = muAnnual Ã L`, Monte-Carlo Box-Muller + percentiles + `readinessRaw[]` tornado, NPV picks lower-cost, EOL exposure, supplier-risk weights, hub-LT clamp, normInvCDF), `safeGen()`, per-module reset, all `<\/script>` escaped, dark mode, mobile (104/0 responsive), `audit-script-tags --strict` CLEAN.
+Confirmed already-correct: all ~26 tabs render, charts re-render on hidden→visible switch, `SCENARIO_FIELDS` covers the inputs, the 5 presets round-trip, math (Poisson `lambdaLT = muAnnual × L`, Monte-Carlo Box-Muller + percentiles + `readinessRaw[]` tornado, NPV picks lower-cost, EOL exposure, supplier-risk weights, hub-LT clamp, normInvCDF), `safeGen()`, per-module reset, all `<\/script>` escaped, dark mode, mobile (104/0 responsive), `audit-script-tags --strict` CLEAN.
 
-`js/rz-version.js` 1.16.0 â 1.16.1 (PATCH). SW cache â `rz-cache-v1.16.1`.
+`js/rz-version.js` 1.16.0 → 1.16.1 (PATCH). SW cache → `rz-cache-v1.16.1`.
 
 ---
 
-## v1.16.0 â 2026-05-13 (Spares Engine: Global Supply Chain & Transport module group â 4 new tabs)
+## v1.16.0 — 2026-05-13 (Spares Engine: Global Supply Chain & Transport module group — 4 new tabs)
 
-### Added â "Global Supply Chain & Transport" module group (deep-research-backed)
-`spares-readiness-calculator.html` 7,575 â 9,303 lines (+1,728). Four new tabs driven by `SPARES_CATALOG.transportModes` (7), `.tradeLanes` (13), `.countryRisk` (16) â grounded in the 2026 DC-equipment-shortage research (`Documents/Training/spares_supply_chain_transport_research.md`):
-- **ð¢ Lane & Mode Planner** â origin region â destination DC region + part (weight/value from catalog) + Incoterm + urgency â a mode-comparison table (ocean-FCL/LCL Â· air-standard/express Â· road Â· rail Â· courier â door-to-door days = mode transit + customs + last-mile, freight cost â weight Ã base-$/kg Ã cost-index, COâ relative), cheapest-feasible vs fastest-feasible highlighted, a chokepoint-reroute what-if (+10-14 d for SuezâCape-style), the Incoterm 2020 cost/risk split (who pays export-clearance / main-carriage / import-duty / unloading / last-mile, where risk transfers) + the lane's tariff-exposure note (e.g. China's Section 122 10% + Section 301 + copper +50%), and a days-vs-$ trade-off chart. PDF + â box documenting the cost/day method.
-- **ðºï¸ Supply-Chain Risk Map** â a part (or the saved fleet) + origin + need-window + hub/consignment/VMI toggles â a composite **0-100 supply-chain risk score** weighted across single-source exposure (scaled by # alternates), country-of-origin risk (`countryRisk.geoRisk`), lane congestion + geopolitical + rate-volatility, lead-time-vs-need-window pressure, tariff exposure, supplier OTIF/financial-health proxy, regional-hub coverage â band (LOW/MEDIUM/HIGH/CRITICAL), a radar of the dimensions, a ranked top-risks list, and recommended mitigations (dual-source / "China+1" / regional hub / consignment-VMI / last-time-buy / Incoterm change / FTZ-bonded-warehouse deferral / qualify substitute) each tagged effort Ã impact and ordered by impact-per-effort. Fleet mode â a per-part SC-risk table + fleet composite. PDF.
-- **ðªï¸ Disruption Scenario / Resilience Sim** â Monte-Carlo (â¥1000 iterations, Box-Muller) over lane delay + Ï, tariff-shock probability + magnitude, supplier-commit-slip probability + weeks, demand-spike probability + %, chokepoint-reroute probability â distribution of "% of critical-spares need met on time", P10/P50/P90 of (effective lead time, expedite-$, downtime-$), expected expedite-$ + downtime-$, a tornado of which disruption drives the most variance, and a **with-vs-without comparison** (regional hub / dual-source / +X weeks safety stock â Î on-time-% and Î expected-$). PDF + â box.
-- **âï¸ Logistics Cost & Expedite Calculator** â site need-date vs supplier commit (the gap) + part weight/value + lane + downtime $/hr â a costed recovery-options menu: air-freight the critical sub-assembly + ocean the rest Â· full air-freight (standard or express) Â· partial shipment Â· ship from alternate plant (if alternates) Â· pull from regional hub/consignment/VMI (if a hub toggle) Â· qualify substitute (if no alternates) Â· accept downtime/escalate (the baseline) â each with $ + days-saved + closes-the-gap?, recommends the cost-minimizing path that closes the gap (or, if none does, "no option closes it â escalate to supplier exec + accept residual downtime; here's the least-bad partial"), a cost-vs-days-saved chart, and a "â generate the supplier escalation email" link to the Daily-PM-Ops tab. PDF.
+### Added — "Global Supply Chain & Transport" module group (deep-research-backed)
+`spares-readiness-calculator.html` 7,575 → 9,303 lines (+1,728). Four new tabs driven by `SPARES_CATALOG.transportModes` (7), `.tradeLanes` (13), `.countryRisk` (16) — grounded in the 2026 DC-equipment-shortage research (`Documents/Training/spares_supply_chain_transport_research.md`):
+- **🚢 Lane & Mode Planner** — origin region → destination DC region + part (weight/value from catalog) + Incoterm + urgency → a mode-comparison table (ocean-FCL/LCL · air-standard/express · road · rail · courier — door-to-door days = mode transit + customs + last-mile, freight cost ≈ weight × base-$/kg × cost-index, CO₂ relative), cheapest-feasible vs fastest-feasible highlighted, a chokepoint-reroute what-if (+10-14 d for Suez↔Cape-style), the Incoterm 2020 cost/risk split (who pays export-clearance / main-carriage / import-duty / unloading / last-mile, where risk transfers) + the lane's tariff-exposure note (e.g. China's Section 122 10% + Section 301 + copper +50%), and a days-vs-$ trade-off chart. PDF + ⓘ box documenting the cost/day method.
+- **🗺️ Supply-Chain Risk Map** — a part (or the saved fleet) + origin + need-window + hub/consignment/VMI toggles → a composite **0-100 supply-chain risk score** weighted across single-source exposure (scaled by # alternates), country-of-origin risk (`countryRisk.geoRisk`), lane congestion + geopolitical + rate-volatility, lead-time-vs-need-window pressure, tariff exposure, supplier OTIF/financial-health proxy, regional-hub coverage → band (LOW/MEDIUM/HIGH/CRITICAL), a radar of the dimensions, a ranked top-risks list, and recommended mitigations (dual-source / "China+1" / regional hub / consignment-VMI / last-time-buy / Incoterm change / FTZ-bonded-warehouse deferral / qualify substitute) each tagged effort × impact and ordered by impact-per-effort. Fleet mode → a per-part SC-risk table + fleet composite. PDF.
+- **🌪️ Disruption Scenario / Resilience Sim** — Monte-Carlo (≥1000 iterations, Box-Muller) over lane delay + σ, tariff-shock probability + magnitude, supplier-commit-slip probability + weeks, demand-spike probability + %, chokepoint-reroute probability → distribution of "% of critical-spares need met on time", P10/P50/P90 of (effective lead time, expedite-$, downtime-$), expected expedite-$ + downtime-$, a tornado of which disruption drives the most variance, and a **with-vs-without comparison** (regional hub / dual-source / +X weeks safety stock — Δ on-time-% and Δ expected-$). PDF + ⓘ box.
+- **✈️ Logistics Cost & Expedite Calculator** — site need-date vs supplier commit (the gap) + part weight/value + lane + downtime $/hr → a costed recovery-options menu: air-freight the critical sub-assembly + ocean the rest · full air-freight (standard or express) · partial shipment · ship from alternate plant (if alternates) · pull from regional hub/consignment/VMI (if a hub toggle) · qualify substitute (if no alternates) · accept downtime/escalate (the baseline) — each with $ + days-saved + closes-the-gap?, recommends the cost-minimizing path that closes the gap (or, if none does, "no option closes it — escalate to supplier exec + accept residual downtime; here's the least-bad partial"), a cost-vs-days-saved chart, and a "→ generate the supplier escalation email" link to the Daily-PM-Ops tab. PDF.
 
-### Changed â light touches
-- **Catalog Analytics** tab: an "ð Supply-chain exposure" panel â `tradeLanes` ranked by composite risk (congestion + geopolitical + volatility + tariff) + the China-transformer-dependency / 2026-tariff context.
-- **Fleet / Portfolio** tab: a "SC Risk" column per part (quick composite from the Risk Map logic) + a fleet-level supply-chain-risk KPI (table colspan 14â15).
-- **Methodology footer note**: added "Incoterms 2020 Â· multi-modal freight Â· World Bank LPI".
-- **FAQ** tab: +5 Q&As under a new "Supply Chain" filter (why transformer lead times are 2.5-5 yr in 2026 Â· the China-tariff exposure on DC M&E Â· when to air-freight a spare vs wait Â· what a "China+1" strategy is Â· how Incoterms split the duty burden) with citations.
-- **`js/spares-parts-catalog.js`** regenerated to expose `transportModes`/`tradeLanes`/`countryRisk` in `window.SPARES_CATALOG` (358 KB, 445 curated parts â structure otherwise unchanged); `tools/build-spares-db.py`'s `write_js_catalog` updated accordingly.
-- **`Documents/Training/pm2_spares_sourcing_data_center_engine_prompt.md`** gained Appendix D â Global Supply Chain & Transport (the 2026 reality, transport-mode/Incoterm mechanics, the emergency-logistics recovery options, the mitigation playbook, the quantitative-companion cross-reference).
+### Changed — light touches
+- **Catalog Analytics** tab: an "🌐 Supply-chain exposure" panel — `tradeLanes` ranked by composite risk (congestion + geopolitical + volatility + tariff) + the China-transformer-dependency / 2026-tariff context.
+- **Fleet / Portfolio** tab: a "SC Risk" column per part (quick composite from the Risk Map logic) + a fleet-level supply-chain-risk KPI (table colspan 14→15).
+- **Methodology footer note**: added "Incoterms 2020 · multi-modal freight · World Bank LPI".
+- **FAQ** tab: +5 Q&As under a new "Supply Chain" filter (why transformer lead times are 2.5-5 yr in 2026 · the China-tariff exposure on DC M&E · when to air-freight a spare vs wait · what a "China+1" strategy is · how Incoterms split the duty burden) with citations.
+- **`js/spares-parts-catalog.js`** regenerated to expose `transportModes`/`tradeLanes`/`countryRisk` in `window.SPARES_CATALOG` (358 KB, 445 curated parts — structure otherwise unchanged); `tools/build-spares-db.py`'s `write_js_catalog` updated accordingly.
+- **`Documents/Training/pm2_spares_sourcing_data_center_engine_prompt.md`** gained Appendix D — Global Supply Chain & Transport (the 2026 reality, transport-mode/Incoterm mechanics, the emergency-logistics recovery options, the mitigation playbook, the quantitative-companion cross-reference).
 
 ### Wiring / verification
 `TAB_ORDER` + `switchTab` calcs map + keyboard nav + mobile jump-to-module selector + `SCENARIO_FIELDS` + `scenarioSnapshot`/`applySnapshot` all updated for the 4 new tabs. IIFE closes exactly once; no duplicate fleet init (uses the `_origCalcFleet`/`_origCatInit` patch pattern). `node --check` OK, `audit-script-tags --strict` CLEAN, `audit-mobile-responsive --strict` 104/0, catalog file intact (445/7/13/16).
 
 ### Versioning
-- `js/rz-version.js` 1.15.0 â 1.16.0 (MINOR â new module group). SW cache â `rz-cache-v1.16.0`.
+- `js/rz-version.js` 1.15.0 → 1.16.0 (MINOR — new module group). SW cache → `rz-cache-v1.16.0`.
 
 ---
 
-## v1.15.0 â 2026-05-13 (Spares Engine UI/UX upgrade Â· Catalog Analytics + Fleet/Portfolio tabs Â· platform-layer DB Â· supply-chain & transport data)
+## v1.15.0 — 2026-05-13 (Spares Engine UI/UX upgrade · Catalog Analytics + Fleet/Portfolio tabs · platform-layer DB · supply-chain & transport data)
 
-### Added â Spares Engine UI/UX upgrade + 2 new analytics tabs
-`spares-readiness-calculator.html` 6,263 â 7,575 lines (+1,312).
-- **UI/UX**: aurora-mesh hero (3 drifting amber/complementary radial blobs, 22/28/35 s loops, `will-change`, `prefers-reduced-motion`-guarded); amber gradient primary buttons (`#d97706â#f59e0bâ#fbbf24`) + `translateY(-1px)` hover-lift + amber focus rings; card-shine `::after` sweep on result/module cards; 200 ms `pane-fadein` tab cross-fade + amber active-tab underline; JetBrains Mono for KPI figures; sticky headline sub-bar CSS; mobile "Jump to module â¾" `<select>` (3 optgroups) + collapsible input accordions; full dark-mode coverage on the new elements.
-- **"ð Catalog Analytics" tab** (Reference group): 8 KPI cards (parts / OEMs / systems / NRND-LTB-obsolete % / blind-risk count [critâ¥7 + eolâ¥6 + 0 alternates] / 3D-printable / refurbishable / AI-factory liquid-cooling count + avg lead time), OEM-concentration stacked-bar by subsystem (>60% top-OEM share flagged), lead-time distribution sorted by worst-case, lifecycle Ã DC-generation stacked bar, criticality Ã lead-time scatter (subsystem-colored, upper-right stocking-priority quadrant shaded), blind-risks table (top 20), opportunity panels (3D-printable / refurbishable critâ¤6 / AI-factory liquid-cooling), system + DC-generation scope filter, CSV export.
-- **"ð§° Fleet / Portfolio" tab** (Analytical group): fleet builder (searchable catalog `<select>` + 3 presets â Tier-III Enterprise / AI-Factory Liquid-Cool / Legacy EOL-Exposed, each 5 realistic catalog parts), editable fleet table (per-row Î» / Î¼_LT / Ï_LT / safety stock / recommended stock / annual carrying $ / stockout-$ risk / readiness %), 6 fleet KPIs (total recommended-stock $ / weighted fleet readiness % / # critical-at-risk / total annual carrying $ / total stockout-$ risk / EOL-exposure score), 3 charts (stockout-$ Pareto bar+cumulative, EOL-exposure heatmap subsystemÃDC-generation, ABC-XYZ demand-value bubble scatter with quadrant labels), fleet PDF report (`<\/script>` escaped), `localStorage` persistence (`cse_fleet`).
+### Added — Spares Engine UI/UX upgrade + 2 new analytics tabs
+`spares-readiness-calculator.html` 6,263 → 7,575 lines (+1,312).
+- **UI/UX**: aurora-mesh hero (3 drifting amber/complementary radial blobs, 22/28/35 s loops, `will-change`, `prefers-reduced-motion`-guarded); amber gradient primary buttons (`#d97706→#f59e0b→#fbbf24`) + `translateY(-1px)` hover-lift + amber focus rings; card-shine `::after` sweep on result/module cards; 200 ms `pane-fadein` tab cross-fade + amber active-tab underline; JetBrains Mono for KPI figures; sticky headline sub-bar CSS; mobile "Jump to module ▾" `<select>` (3 optgroups) + collapsible input accordions; full dark-mode coverage on the new elements.
+- **"📊 Catalog Analytics" tab** (Reference group): 8 KPI cards (parts / OEMs / systems / NRND-LTB-obsolete % / blind-risk count [crit≥7 + eol≥6 + 0 alternates] / 3D-printable / refurbishable / AI-factory liquid-cooling count + avg lead time), OEM-concentration stacked-bar by subsystem (>60% top-OEM share flagged), lead-time distribution sorted by worst-case, lifecycle × DC-generation stacked bar, criticality × lead-time scatter (subsystem-colored, upper-right stocking-priority quadrant shaded), blind-risks table (top 20), opportunity panels (3D-printable / refurbishable crit≤6 / AI-factory liquid-cooling), system + DC-generation scope filter, CSV export.
+- **"🧰 Fleet / Portfolio" tab** (Analytical group): fleet builder (searchable catalog `<select>` + 3 presets — Tier-III Enterprise / AI-Factory Liquid-Cool / Legacy EOL-Exposed, each 5 realistic catalog parts), editable fleet table (per-row λ / μ_LT / σ_LT / safety stock / recommended stock / annual carrying $ / stockout-$ risk / readiness %), 6 fleet KPIs (total recommended-stock $ / weighted fleet readiness % / # critical-at-risk / total annual carrying $ / total stockout-$ risk / EOL-exposure score), 3 charts (stockout-$ Pareto bar+cumulative, EOL-exposure heatmap subsystem×DC-generation, ABC-XYZ demand-value bubble scatter with quadrant labels), fleet PDF report (`<\/script>` escaped), `localStorage` persistence (`cse_fleet`).
 - Wiring: `TAB_ORDER` + `switchTab` calcs map + `recalcAll` + `SCENARIO_FIELDS` + `scenarioSnapshot`/`applySnapshot` (serializes the fleet list as `__fleetParts`) + the jump-to-module selector all updated. Fixed a syntax error (spurious `})(); // end catalog IIFE` at EOF). Audits clean.
 
-### Added â Database platform layer (`tools/spares-db-schema.sql` + `tools/build-spares-db.py --platform`)
-6 new tables + 2 views: `sites` (12 DC facilities), `suppliers` (distinct from OEMs â OTIF / commit-accuracy / quote-turnaround / PO-ack / defect-rate / responsiveness / corrective-action-closure / financial-health / capacity-headroom / geo & geopolitical & lead-time-volatility scores / strategic-importance / review-cadence / consignment & VMI capability), `inventory_positions` (on-hand / reserved / in-transit / safety-stock-target / reorder-point / max / days-of-cover by part Ã location), `purchase_orders` (full lifecycle â creation/ack/commit/need-by/received dates, delivery-status [on-track/at-risk/late/delivered/blocked/cancelled], blocker, recovery-plan, owner, demand-type), `consumption_history` (actual usage events â demand forecasting), `engineering_changes` (revision / supersession / EOL-notice / LTB-window / vendor-transition with qualification cost+lead-time + mitigation status); views `v_po_at_risk` (late/at-risk/blocked POs against critical parts with slip-days) + `v_readiness_gap` (critical parts where on-hand+in-transit < safety-stock target). `build-spares-db.py --platform` populates them with synthetic operational data (`--scale 1`: 12 sites Â· 122 suppliers Â· ~1,570 inventory positions Â· ~250 POs Â· ~10k consumption events Â· ~470 engineering changes). The default build (no `--platform`) leaves them empty so the committed catalog/CSVs are unchanged.
+### Added — Database platform layer (`tools/spares-db-schema.sql` + `tools/build-spares-db.py --platform`)
+6 new tables + 2 views: `sites` (12 DC facilities), `suppliers` (distinct from OEMs — OTIF / commit-accuracy / quote-turnaround / PO-ack / defect-rate / responsiveness / corrective-action-closure / financial-health / capacity-headroom / geo & geopolitical & lead-time-volatility scores / strategic-importance / review-cadence / consignment & VMI capability), `inventory_positions` (on-hand / reserved / in-transit / safety-stock-target / reorder-point / max / days-of-cover by part × location), `purchase_orders` (full lifecycle — creation/ack/commit/need-by/received dates, delivery-status [on-track/at-risk/late/delivered/blocked/cancelled], blocker, recovery-plan, owner, demand-type), `consumption_history` (actual usage events → demand forecasting), `engineering_changes` (revision / supersession / EOL-notice / LTB-window / vendor-transition with qualification cost+lead-time + mitigation status); views `v_po_at_risk` (late/at-risk/blocked POs against critical parts with slip-days) + `v_readiness_gap` (critical parts where on-hand+in-transit < safety-stock target). `build-spares-db.py --platform` populates them with synthetic operational data (`--scale 1`: 12 sites · 122 suppliers · ~1,570 inventory positions · ~250 POs · ~10k consumption events · ~470 engineering changes). The default build (no `--platform`) leaves them empty so the committed catalog/CSVs are unchanged.
 
-### Added â Supply-chain & transport reference data (`tools/spares-db-schema.sql` â always populated)
-3 new reference tables + 3 views, grounded in deep research (ICC Incoterms 2020; World Bank LPI; the 2026 DC-equipment shortage + tariff context â see `Documents/Training/spares_supply_chain_transport_research.md`):
-- **`transport_modes`** (7) â ocean-FCL / ocean-LCL / air-standard / air-express / road / rail / courier-express, each with intercontinental + intra-region transit days, a relative `cost_index` (ocean-FCL = 1.0; air-standard ~12, air-express ~25, road ~3, rail ~2, ocean-LCL ~1.6, courier ~18), a `co2_index`, capacity unit, typical use.
-- **`trade_lanes`** (13) â origin region â destination region (CN / EU / NA / SEA-Vietnam / India / Korea-Japan / MENA / LATAM / Intra-NA / Intra-EU / Intra-APAC) with ocean / air / road-rail transit days, customs-clearance days, last-mile days, and 1-10 scores for congestion / geopolitical / rate-volatility / tariff-exposure + reroute options + notes (e.g. CN-NA: 30 d ocean transit, congestion 6, geopolitical 7, tariff 8; SuezâCape +10-14 d; the China-transformer-dependency + Section 122/301 + copper-50% context).
-- **`country_risk`** (16) â per country: political-stability / customs-efficiency / port-infrastructure scores (1-10), LPI (~1-5), transformer-manufacturing-share % (CN ~60, US ~20, â¦), geopolitical-risk (1-10), tariff-regime note (e.g. China's Section 122 10% + Section 301 + copper +50% Apr-2026), notes.
-- Views: `v_lane_lead_time` (door-to-door days per lane Ã mode), `v_high_risk_lanes` (congestion + geopolitical + volatility composite), `v_oem_country_exposure` (parts/suppliers by country-of-origin Ã that country's risk â single-geography concentration).
+### Added — Supply-chain & transport reference data (`tools/spares-db-schema.sql` — always populated)
+3 new reference tables + 3 views, grounded in deep research (ICC Incoterms 2020; World Bank LPI; the 2026 DC-equipment shortage + tariff context — see `Documents/Training/spares_supply_chain_transport_research.md`):
+- **`transport_modes`** (7) — ocean-FCL / ocean-LCL / air-standard / air-express / road / rail / courier-express, each with intercontinental + intra-region transit days, a relative `cost_index` (ocean-FCL = 1.0; air-standard ~12, air-express ~25, road ~3, rail ~2, ocean-LCL ~1.6, courier ~18), a `co2_index`, capacity unit, typical use.
+- **`trade_lanes`** (13) — origin region → destination region (CN / EU / NA / SEA-Vietnam / India / Korea-Japan / MENA / LATAM / Intra-NA / Intra-EU / Intra-APAC) with ocean / air / road-rail transit days, customs-clearance days, last-mile days, and 1-10 scores for congestion / geopolitical / rate-volatility / tariff-exposure + reroute options + notes (e.g. CN-NA: 30 d ocean transit, congestion 6, geopolitical 7, tariff 8; Suez↔Cape +10-14 d; the China-transformer-dependency + Section 122/301 + copper-50% context).
+- **`country_risk`** (16) — per country: political-stability / customs-efficiency / port-infrastructure scores (1-10), LPI (~1-5), transformer-manufacturing-share % (CN ~60, US ~20, …), geopolitical-risk (1-10), tariff-regime note (e.g. China's Section 122 10% + Section 301 + copper +50% Apr-2026), notes.
+- Views: `v_lane_lead_time` (door-to-door days per lane × mode), `v_high_risk_lanes` (congestion + geopolitical + volatility composite), `v_oem_country_exposure` (parts/suppliers by country-of-origin × that country's risk → single-geography concentration).
 
 ### Docs
-- `Documents/Training/spares_engine_platform.md` â the platform overview (the 5 layers, how they connect, the methodology grounding table, the v1.14âv1.16âbeyond roadmap).
-- `Documents/Training/spares_supply_chain_transport_research.md` â deep-research synthesis: the 2026 DC-equipment shortage + tariff context, freight/port/lane risk, Incoterm/mode mechanics, the mitigation playbook (dual-source / "China+1" / regional hubs / consignment-VMI / component-specific safety stock / control tower / digital twin), with full citations + the design notes for the upcoming "Global Supply Chain & Transport" calculator module (Lane & Mode Planner Â· Supply-Chain Risk Map Â· Disruption Scenario Sim Â· Logistics Cost & Expedite Calculator â coming in v1.16).
+- `Documents/Training/spares_engine_platform.md` — the platform overview (the 5 layers, how they connect, the methodology grounding table, the v1.14→v1.16→beyond roadmap).
+- `Documents/Training/spares_supply_chain_transport_research.md` — deep-research synthesis: the 2026 DC-equipment shortage + tariff context, freight/port/lane risk, Incoterm/mode mechanics, the mitigation playbook (dual-source / "China+1" / regional hubs / consignment-VMI / component-specific safety stock / control tower / digital twin), with full citations + the design notes for the upcoming "Global Supply Chain & Transport" calculator module (Lane & Mode Planner · Supply-Chain Risk Map · Disruption Scenario Sim · Logistics Cost & Expedite Calculator — coming in v1.16).
 
 ### Versioning
-- `js/rz-version.js` 1.14.1 â 1.15.0 (MINOR â new analytics tabs + UI/UX + platform-layer + supply-chain data). SW cache â `rz-cache-v1.15.0`.
+- `js/rz-version.js` 1.14.1 → 1.15.0 (MINOR — new analytics tabs + UI/UX + platform-layer + supply-chain data). SW cache → `rz-cache-v1.15.0`.
 
 ---
 
-## v1.14.1 â 2026-05-13 (Spare-parts DB enriched + scalable Â· query tooling Â· Spares Engine QA fixes)
+## v1.14.1 — 2026-05-13 (Spare-parts DB enriched + scalable · query tooling · Spares Engine QA fixes)
 
-### Changed â DC spare-parts database enriched (the platform foundation)
+### Changed — DC spare-parts database enriched (the platform foundation)
 `tools/build-spares-db.py` grew its archetype/OEM/taxonomy coverage:
-- **+110 part archetypes** (110 â **220**): Electrical +16 (UPS SNMP card, MCCB, SPD/TVSS, arc-flash relay, bus-tie breaker, RMU module, OLTC, Buchholz relay, in-rack ATS, PDU branch-monitoring strip, harmonic filter, DC-bus capacitor bank, AVR, load bank, genset coolant pump/radiator/injector, fuel level & leak sensors) Â· Cooling +39 (chiller oil filter / relief valve / purge, cooling-tower spray nozzle / basin heater / vibration switch / dosing pump / CIP skid, CRAC reheat / condensate, AHU heat-recovery wheel / UV-C, CRAH valve actuator, RDHx fan + cleaning kit, secondary CDU pump, CDU expansion tank / filtration / flow-control / chemistry sensor, cold-plate gasket kit, QD blanking plug, **dielectric fluid (per-litre consumable)**, immersion-tank lid seal + fluid filter, vertical-inline / split-case / sump pumps, pump coupling-spider, check / hydronic-PRV / backflow valves, flex pipe connector, spring hanger) Â· Fire +10 (linear-heat cable, beam smoke, UV/IR flame, duct smoke, sounder/strobe, fire-pump test header, pre-action air compressor + Nâ generator, SLC isolator module, EVAC amplifier, VESDA sampling-point filter) Â· Network-ICT +7 (spine chassis line card / fabric module, AOC/DAC cable, fiber pigtail / splice tray, MPO-MPO trunk + LC patch cord, PTP grandmaster clock, OOB cellular gateway, WDM mux/demux) Â· BMS-Controls +7 (I/O expansion module, BMS-UPS / power supply, COâ sensor, DP transmitter, current transducer, field-bus repeater, SCADA HMI panel PC) Â· Structural +5 (perforated tile with damper, blanking panel, earthing/bonding kit, wire-mesh tray + divider, trapeze hanger / isolator) Â· Monitoring +8 (rack temperature string, under-floor zoned leak rope, thermal imaging camera, portable PQ analyzer, UPS per-cell battery monitor, vibration sensor, ultrasonic clamp-on flow meter, transformer DGA).
-- **+17 OEMs** (85 â **102**): StÃ¤ubli, CPC/Colder (QD couplings), Goulds/ITT, KSB, Flowserve (pumps/seals), Watts Water, Apollo Valves (valves/backflow), Spraying Systems (cooling-tower nozzles), Marlo/Culligan (water treatment), Donaldson, MANN+HUMMEL (filtration), 3M Novec, Engineered Fluids (clean agent + dielectric coolants), AFL/OFS, Belden, Siemon (fiber/cabling), Marvell Technology (transceiver ICs / switch ASICs).
-- **+85 taxonomy rows** (109 â **194** l1âl2âl3 component classes).
-- Regenerated at `--scale 1`: **2,499 parts** / 8,163 failure modes / 5,830 compatibility rows / 102 OEMs / 194 taxonomy / 6 facility types. Curated browser catalog `js/spares-parts-catalog.js` â **445 parts** (~347 KB, same compact-key structure). All sanity checks pass.
-- **Scale-up demonstrated**: `tools/spares-db.sh big` (`--scale 30`) produces **74,970 parts** / 247,278 failure modes / 175,152 compatibility rows in a 137 MB SQLite â all invariants hold; `--scale 700` â ~1.75M parts. (The default committed DB stays at scale 1 / ~4.5 MB; `.sqlite` + `.csv.gz` are gitignored, regeneratable.)
+- **+110 part archetypes** (110 → **220**): Electrical +16 (UPS SNMP card, MCCB, SPD/TVSS, arc-flash relay, bus-tie breaker, RMU module, OLTC, Buchholz relay, in-rack ATS, PDU branch-monitoring strip, harmonic filter, DC-bus capacitor bank, AVR, load bank, genset coolant pump/radiator/injector, fuel level & leak sensors) · Cooling +39 (chiller oil filter / relief valve / purge, cooling-tower spray nozzle / basin heater / vibration switch / dosing pump / CIP skid, CRAC reheat / condensate, AHU heat-recovery wheel / UV-C, CRAH valve actuator, RDHx fan + cleaning kit, secondary CDU pump, CDU expansion tank / filtration / flow-control / chemistry sensor, cold-plate gasket kit, QD blanking plug, **dielectric fluid (per-litre consumable)**, immersion-tank lid seal + fluid filter, vertical-inline / split-case / sump pumps, pump coupling-spider, check / hydronic-PRV / backflow valves, flex pipe connector, spring hanger) · Fire +10 (linear-heat cable, beam smoke, UV/IR flame, duct smoke, sounder/strobe, fire-pump test header, pre-action air compressor + N₂ generator, SLC isolator module, EVAC amplifier, VESDA sampling-point filter) · Network-ICT +7 (spine chassis line card / fabric module, AOC/DAC cable, fiber pigtail / splice tray, MPO-MPO trunk + LC patch cord, PTP grandmaster clock, OOB cellular gateway, WDM mux/demux) · BMS-Controls +7 (I/O expansion module, BMS-UPS / power supply, CO₂ sensor, DP transmitter, current transducer, field-bus repeater, SCADA HMI panel PC) · Structural +5 (perforated tile with damper, blanking panel, earthing/bonding kit, wire-mesh tray + divider, trapeze hanger / isolator) · Monitoring +8 (rack temperature string, under-floor zoned leak rope, thermal imaging camera, portable PQ analyzer, UPS per-cell battery monitor, vibration sensor, ultrasonic clamp-on flow meter, transformer DGA).
+- **+17 OEMs** (85 → **102**): Stäubli, CPC/Colder (QD couplings), Goulds/ITT, KSB, Flowserve (pumps/seals), Watts Water, Apollo Valves (valves/backflow), Spraying Systems (cooling-tower nozzles), Marlo/Culligan (water treatment), Donaldson, MANN+HUMMEL (filtration), 3M Novec, Engineered Fluids (clean agent + dielectric coolants), AFL/OFS, Belden, Siemon (fiber/cabling), Marvell Technology (transceiver ICs / switch ASICs).
+- **+85 taxonomy rows** (109 → **194** l1→l2→l3 component classes).
+- Regenerated at `--scale 1`: **2,499 parts** / 8,163 failure modes / 5,830 compatibility rows / 102 OEMs / 194 taxonomy / 6 facility types. Curated browser catalog `js/spares-parts-catalog.js` → **445 parts** (~347 KB, same compact-key structure). All sanity checks pass.
+- **Scale-up demonstrated**: `tools/spares-db.sh big` (`--scale 30`) produces **74,970 parts** / 247,278 failure modes / 175,152 compatibility rows in a 137 MB SQLite — all invariants hold; `--scale 700` ≈ ~1.75M parts. (The default committed DB stays at scale 1 / ~4.5 MB; `.sqlite` + `.csv.gz` are gitignored, regeneratable.)
 
-### Added â DB query tooling
-- **`tools/query-spares-db.py`** â query/export CLI: 9 canned reports (`critical-long-lead`, `eol-exposure`, `oem-concentration`, `ai-cooling`, `blind-risks`, `printable`, `refurb`, `by-generation`, `long-lead-leaders`) + `summary` (row counts + distributions) + `--sql`/`--sql-file` for arbitrary SQL + `--csv` export + `--limit`/`--max-rows`.
-- **`tools/spares-db.sh`** â convenience wrapper: `build [SCALE]` Â· `big` (scale 30) Â· `huge` (scale 100) Â· `million` (scale 700) Â· `query <report>` Â· `sql "<SQL>"` Â· `summary` Â· `reports` Â· `stats`. Both executable.
+### Added — DB query tooling
+- **`tools/query-spares-db.py`** — query/export CLI: 9 canned reports (`critical-long-lead`, `eol-exposure`, `oem-concentration`, `ai-cooling`, `blind-risks`, `printable`, `refurb`, `by-generation`, `long-lead-leaders`) + `summary` (row counts + distributions) + `--sql`/`--sql-file` for arbitrary SQL + `--csv` export + `--limit`/`--max-rows`.
+- **`tools/spares-db.sh`** — convenience wrapper: `build [SCALE]` · `big` (scale 30) · `huge` (scale 100) · `million` (scale 700) · `query <report>` · `sql "<SQL>"` · `summary` · `reports` · `stats`. Both executable.
 - `Documents/Training/spares_parts_database.md` updated (counts, OEM list, subsystem coverage).
 
-### Fixed â Spares Engine QA
-- `MODULE_RESET_DEFAULTS.ltb` had `ltb_demand_yr: '0.4'` / `ltb_discount: '0'` not matching the HTML input defaults â "âº Reset defaults" on the Last-Time-Buy module set demand wrong + the discount rate to 0% (making the NPV stock-vs-requalify comparison always zero-benefit). Corrected to `'1.2'` / `'8'`.
-- Added a methodology/data-vintage footer note: "Models: FMECA (MIL-STD-1629A) Â· METRIC/VARI-METRIC (Sherbrooke/Slay) Â· newsvendor critical-fractile Â· Kraljic matrix (HBR 1983) Â· DMSMS lifecycle Â· MEIO. Catalog data vintage: 2026-Q1 Â· {N} curated parts Â· illustrative â not a substitute for a full supply-chain analysis." ({N} updates at runtime from `SPARES_CATALOG.parts.length` = 445.)
+### Fixed — Spares Engine QA
+- `MODULE_RESET_DEFAULTS.ltb` had `ltb_demand_yr: '0.4'` / `ltb_discount: '0'` not matching the HTML input defaults → "↺ Reset defaults" on the Last-Time-Buy module set demand wrong + the discount rate to 0% (making the NPV stock-vs-requalify comparison always zero-benefit). Corrected to `'1.2'` / `'8'`.
+- Added a methodology/data-vintage footer note: "Models: FMECA (MIL-STD-1629A) · METRIC/VARI-METRIC (Sherbrooke/Slay) · newsvendor critical-fractile · Kraljic matrix (HBR 1983) · DMSMS lifecycle · MEIO. Catalog data vintage: 2026-Q1 · {N} curated parts · illustrative — not a substitute for a full supply-chain analysis." ({N} updates at runtime from `SPARES_CATALOG.parts.length` = 445.)
 - Confirmed (re-verified): all 21 tabs in `TAB_ORDER`, Poisson no double-count, hub-LT clamped, `normInvCDF` accurate, all `<\/script>` escaped, `catUsePart()` field IDs all match, dark mode complete, no leftover `console.log`.
 
 ### Versioning
-- `js/rz-version.js` 1.14.0 â 1.14.1 (PATCH â DB enrichment + tooling + QA fixes). SW cache â `rz-cache-v1.14.1`.
+- `js/rz-version.js` 1.14.0 → 1.14.1 (PATCH — DB enrichment + tooling + QA fixes). SW cache → `rz-cache-v1.14.1`.
 
 ---
 
-## v1.14.0 â 2026-05-12 (DC spare-parts database Â· Parts Catalog tab Â· Spares Engine code review + bug fixes Â· DCMOC code review)
+## v1.14.0 — 2026-05-12 (DC spare-parts database · Parts Catalog tab · Spares Engine code review + bug fixes · DCMOC code review)
 
-### Added â DC spare-parts local database (the platform data foundation)
-- **`tools/spares-db-schema.sql`** â SQLite DDL: 6 tables (`dc_facility_types` Â· `oems` Â· `commodity_taxonomy` Â· `parts` (40+ columns) Â· `compatibility` Â· `failure_modes`) + 4 convenience views (`v_critical_long_lead`, `v_eol_exposure`, `v_oem_concentration`, `v_ai_factory_cooling`).
-- **`tools/build-spares-db.py`** â stdlib-only generator: ~110 realistic part archetypes covering every system (electrical / mechanical / cooling / fire-life-safety / network-ICT / BMS-controls / structural-civil / monitoring) across all 6 DC generations (legacy-raised-floor â enterprise-tier3 â colo-wholesale â cloud-hyperscale â ai-factory-liquid-cooled â edge-micro), ~85 real OEMs (Vertiv, Schneider/APC, Eaton, ABB, Siemens, Caterpillar, Cummins, Carrier, Trane, Daikin, JCI/York, STULZ, Munters, Rittal, ASCO, Russelectric, Camfil, Xtralis-VESDA, Honeywell, Tyco Fire, Kidde, Tridium, Belimo, Danfoss, Grundfos, Xylem, Alfa Laval, Kelvion, GÃ¼ntner, BAC, CoolIT, Asetek, Boyd, Motivair, ZutaCore, Iceotope, GRC, LiquidStack, Submer, nVent, Chatsworth, Panduit, CommScope, Corning, NVIDIA/Arista/Cisco, GE Vernova, Hyosung, Powell, + generic/refurb pools), FMECA-style attribute ranges (MTBF / MTTR / lead-time / cost / criticality / EOL risk), DMSMS-biased lifecycle status, 2-5 failure modes per part, 1-4 compatibility relationships. `--scale N` (linear â `--scale 50` â ~70k parts, `--scale 700` â ~1M), `--audit`, `--no-js`. Seeded/reproducible.
-- Generated at `--scale 1`: **1,404 parts** Â· 4,589 failure modes Â· 3,282 compatibility rows Â· 85 OEMs Â· 109 taxonomy entries Â· 6 facility types. All sanity checks pass.
-- **`data/spares-parts.sqlite`** (â2.7 MB) + **`data/spares-parts.csv.gz`** â gitignored (regeneratable). **`data/spares-oems.csv`** / **`spares-taxonomy.csv`** / **`spares-facility-types.csv`** â committed. **`js/spares-parts-catalog.js`** â curated 264 KB subset (`window.SPARES_CATALOG` = 360 representative parts + 85 OEMs + 109 taxonomy + 6 facility types) for the in-browser calculator. `.gitignore` updated.
-- Docs: `Documents/Training/spares_parts_database.md` (schema, sample queries, regen instructions, how it feeds the calculator, platform roadmap). Master-prompt doc `pm2_spares_sourcing_data_center_engine_prompt.md` gained Appendices A (methodologies referenced â FMECA/RCM/METRIC/Kraljic/DMSMS with formulas), B (calculator cross-reference), C (citations).
+### Added — DC spare-parts local database (the platform data foundation)
+- **`tools/spares-db-schema.sql`** — SQLite DDL: 6 tables (`dc_facility_types` · `oems` · `commodity_taxonomy` · `parts` (40+ columns) · `compatibility` · `failure_modes`) + 4 convenience views (`v_critical_long_lead`, `v_eol_exposure`, `v_oem_concentration`, `v_ai_factory_cooling`).
+- **`tools/build-spares-db.py`** — stdlib-only generator: ~110 realistic part archetypes covering every system (electrical / mechanical / cooling / fire-life-safety / network-ICT / BMS-controls / structural-civil / monitoring) across all 6 DC generations (legacy-raised-floor → enterprise-tier3 → colo-wholesale → cloud-hyperscale → ai-factory-liquid-cooled → edge-micro), ~85 real OEMs (Vertiv, Schneider/APC, Eaton, ABB, Siemens, Caterpillar, Cummins, Carrier, Trane, Daikin, JCI/York, STULZ, Munters, Rittal, ASCO, Russelectric, Camfil, Xtralis-VESDA, Honeywell, Tyco Fire, Kidde, Tridium, Belimo, Danfoss, Grundfos, Xylem, Alfa Laval, Kelvion, Güntner, BAC, CoolIT, Asetek, Boyd, Motivair, ZutaCore, Iceotope, GRC, LiquidStack, Submer, nVent, Chatsworth, Panduit, CommScope, Corning, NVIDIA/Arista/Cisco, GE Vernova, Hyosung, Powell, + generic/refurb pools), FMECA-style attribute ranges (MTBF / MTTR / lead-time / cost / criticality / EOL risk), DMSMS-biased lifecycle status, 2-5 failure modes per part, 1-4 compatibility relationships. `--scale N` (linear — `--scale 50` ≈ ~70k parts, `--scale 700` ≈ ~1M), `--audit`, `--no-js`. Seeded/reproducible.
+- Generated at `--scale 1`: **1,404 parts** · 4,589 failure modes · 3,282 compatibility rows · 85 OEMs · 109 taxonomy entries · 6 facility types. All sanity checks pass.
+- **`data/spares-parts.sqlite`** (≈2.7 MB) + **`data/spares-parts.csv.gz`** — gitignored (regeneratable). **`data/spares-oems.csv`** / **`spares-taxonomy.csv`** / **`spares-facility-types.csv`** — committed. **`js/spares-parts-catalog.js`** — curated 264 KB subset (`window.SPARES_CATALOG` = 360 representative parts + 85 OEMs + 109 taxonomy + 6 facility types) for the in-browser calculator. `.gitignore` updated.
+- Docs: `Documents/Training/spares_parts_database.md` (schema, sample queries, regen instructions, how it feeds the calculator, platform roadmap). Master-prompt doc `pm2_spares_sourcing_data_center_engine_prompt.md` gained Appendices A (methodologies referenced — FMECA/RCM/METRIC/Kraljic/DMSMS with formulas), B (calculator cross-reference), C (citations).
 
-### Added â Parts Catalog tab in the calculator
-`spares-readiness-calculator.html` 5,639 â **6,249 lines, 21 modules**. New "ð Parts Catalog â Browse & Search" tab (Reference group): filter by system / DC generation / lifecycle / OEM / criticality â¥ / lead-time â¤ / free-text (150 ms debounce); sortable 13-column results table (capped at 150 visible, "showing X of Y" count) color-coded by lifecycle (active=green / nrnd=yellow / ltb=orange / obsolete=red) and EOL risk; **"Use â¸" per row** loads that part's attributes into the Criticality / Readiness / Optimal-Stock / LTB / Hub / Monte-Carlo modules + matches the commodity dropdown + shows a "Loaded from catalog: â¦" banner + `recalcAll()`; an **OEMs sub-view** (85-row table â name / HQ / market position / financial health / lead time / OTIF / single-source-risk color-coded / contract models); a **DC facility-types sub-view** (6 cards â era / IT-load range / PUE / cooling & power architecture / rack density / key equipment); **CSV export** of the filtered set; a light commodity-defaults hook ("{n} catalog parts â browse â"). Loads `js/spares-parts-catalog.js?v=2026-05-12`; ~115 lines of new dark-mode-aware CSS + mobile breakpoints.
+### Added — Parts Catalog tab in the calculator
+`spares-readiness-calculator.html` 5,639 → **6,249 lines, 21 modules**. New "📚 Parts Catalog — Browse & Search" tab (Reference group): filter by system / DC generation / lifecycle / OEM / criticality ≥ / lead-time ≤ / free-text (150 ms debounce); sortable 13-column results table (capped at 150 visible, "showing X of Y" count) color-coded by lifecycle (active=green / nrnd=yellow / ltb=orange / obsolete=red) and EOL risk; **"Use ▸" per row** loads that part's attributes into the Criticality / Readiness / Optimal-Stock / LTB / Hub / Monte-Carlo modules + matches the commodity dropdown + shows a "Loaded from catalog: …" banner + `recalcAll()`; an **OEMs sub-view** (85-row table — name / HQ / market position / financial health / lead time / OTIF / single-source-risk color-coded / contract models); a **DC facility-types sub-view** (6 cards — era / IT-load range / PUE / cooling & power architecture / rack density / key equipment); **CSV export** of the filtered set; a light commodity-defaults hook ("{n} catalog parts — browse →"). Loads `js/spares-parts-catalog.js?v=2026-05-12`; ~115 lines of new dark-mode-aware CSS + mobile breakpoints.
 
-### Fixed â Spares Engine bug-fix follow-up + code review (5,470 â 6,249 lines)
-- **Share-button overlap (your report)** â the floating 5-circle column was `position: fixed; z-index: 500` and on mobile sat at `bottom: 60px` of the viewport, intercepting taps on the "2Â·Readiness"/"3Â·Optimal Stock" tab buttons â fixed: `#pageShare.share-buttons { display: none !important; }` on `â¤768px` (footer has share/contact links).
-- **Tab navigation hardened** â `try/catch` around every calc/gen call in `switchTab()` / `recalcAll()` / on-input handlers / preset apply; `montecarlo` added to the auto-run map; `safeGen()` wrapper on all 9 operating-tab generators (catches uncaught exceptions, surfaces via `showMsg()` instead of silently failing).
-- **134 per-input tooltips (your report)** â â tooltip on every parameter across all 21 tabs â what it means + typical range + how it's used; lightweight `data-tip` + CSS popup, dark-mode-aware, keyboard-accessible (hover desktop / tap mobile + Enter/Space/Escape).
-- **Criticality NaN cards (your screenshot)** â RPN / Effective Severity / Fleet Exp. Failures/yr / Alternates Factor were showing `NaN%`; fixed to compute proper values with correct units (RPN integer; Eff. Severity `X.X/10`; Fleet Failures `X.XX/yr`; Alternates `ÃX.XX`) + `Number.isFinite()` guards on every metric card site-wide + `'â'` fallback.
-- **Poisson double-count (Module 3)** â `annualLambda = installedBase Ã muAnnual` multiplied by installed base twice when `muAnnual` already is the fleet demand â 4Ã overestimate of stockout probability; fixed to `lambdaLT = muAnnual Ã L`.
-- **Meaningless Monte-Carlo tornado correlations (Module 8)** â tornado correlated arrays from independent simulation runs (different seeds) â random noise; fixed by capturing `readinessRaw[]` (insertion-order, before sorting) and using it for all three tornado correlations (also eliminated a duplicate simulation run).
+### Fixed — Spares Engine bug-fix follow-up + code review (5,470 → 6,249 lines)
+- **Share-button overlap (your report)** — the floating 5-circle column was `position: fixed; z-index: 500` and on mobile sat at `bottom: 60px` of the viewport, intercepting taps on the "2·Readiness"/"3·Optimal Stock" tab buttons → fixed: `#pageShare.share-buttons { display: none !important; }` on `≤768px` (footer has share/contact links).
+- **Tab navigation hardened** — `try/catch` around every calc/gen call in `switchTab()` / `recalcAll()` / on-input handlers / preset apply; `montecarlo` added to the auto-run map; `safeGen()` wrapper on all 9 operating-tab generators (catches uncaught exceptions, surfaces via `showMsg()` instead of silently failing).
+- **134 per-input tooltips (your report)** — ⓘ tooltip on every parameter across all 21 tabs — what it means + typical range + how it's used; lightweight `data-tip` + CSS popup, dark-mode-aware, keyboard-accessible (hover desktop / tap mobile + Enter/Space/Escape).
+- **Criticality NaN cards (your screenshot)** — RPN / Effective Severity / Fleet Exp. Failures/yr / Alternates Factor were showing `NaN%`; fixed to compute proper values with correct units (RPN integer; Eff. Severity `X.X/10`; Fleet Failures `X.XX/yr`; Alternates `×X.XX`) + `Number.isFinite()` guards on every metric card site-wide + `'—'` fallback.
+- **Poisson double-count (Module 3)** — `annualLambda = installedBase × muAnnual` multiplied by installed base twice when `muAnnual` already is the fleet demand → 4× overestimate of stockout probability; fixed to `lambdaLT = muAnnual × L`.
+- **Meaningless Monte-Carlo tornado correlations (Module 8)** — tornado correlated arrays from independent simulation runs (different seeds) → random noise; fixed by capturing `readinessRaw[]` (insertion-order, before sorting) and using it for all three tornado correlations (also eliminated a duplicate simulation run).
 - Dead code removed (`hubExtraCost`); hub-LT clamped `< oemLT`; scenario snapshot gaps closed (`mc_iterations`, checkboxes, `s_poisson_toggle`).
-- **Enhancements**: 3 new Module-3 outputs (days of cover at Q*, annual carrying $ at Q*, expected stockouts/yr) â in both the per-module and full-report PDFs; per-module "âº Reset defaults" buttons on all 8 analytical modules; chart axis unit labels (`%` on criticality, `u` on hub).
+- **Enhancements**: 3 new Module-3 outputs (days of cover at Q*, annual carrying $ at Q*, expected stockouts/yr) — in both the per-module and full-report PDFs; per-module "↺ Reset defaults" buttons on all 8 analytical modules; chart axis unit labels (`%` on criticality, `u` on hub).
 
-### Changed â DCMOC app code review (`dcmoc/`)
-- **Type-safety + numerical guards** (commit `98c963c`): typed nav `LucideIcon`; exported `SimulationState`/`CapexStore` interfaces + `HeadcountKey` union â eliminated all `as any` casts; `useEffectiveInputs` subscribes to `s.inputs` only (perf); `Number.isFinite()` guards on all 4 `format.ts` formatters; depreciation/PMT/ROI/PI/IRR div-0 + NaN guards in FinancialEngine/InvestmentEngine.
-- **Error boundary + dead code** (commit `f5392af`): new `ErrorBoundary.tsx` (class component, friendly fallback + retry) wrapping the dashboard area in `page.tsx` â a crashing dashboard no longer blanks the whole app; ReportDashboard hardcoded `2025` â `new Date().getFullYear()`.
+### Changed — DCMOC app code review (`dcmoc/`)
+- **Type-safety + numerical guards** (commit `98c963c`): typed nav `LucideIcon`; exported `SimulationState`/`CapexStore` interfaces + `HeadcountKey` union → eliminated all `as any` casts; `useEffectiveInputs` subscribes to `s.inputs` only (perf); `Number.isFinite()` guards on all 4 `format.ts` formatters; depreciation/PMT/ROI/PI/IRR div-0 + NaN guards in FinancialEngine/InvestmentEngine.
+- **Error boundary + dead code** (commit `f5392af`): new `ErrorBoundary.tsx` (class component, friendly fallback + retry) wrapping the dashboard area in `page.tsx` — a crashing dashboard no longer blanks the whole app; ReportDashboard hardcoded `2025` → `new Date().getFullYear()`.
 - **a11y + perf** (commit `57bcd4a`): Tooltip wrapped in a `<button>` (keyboard-accessible) + `role="tooltip"` / `aria-describedby` / `aria-hidden`; ExportPDFButton `aria-label` + `aria-busy`; Shell nav `aria-label` / `aria-current` / decorative-icon `aria-hidden` / scenario panel `role="dialog" aria-modal aria-labelledby`; CapacityDashboard/FuelGenDashboard icon-only buttons `aria-label`.
 - Static export rebuilt (commit `8ec3bac`); `tsc --noEmit` clean.
 
 ### Versioning
-- `js/rz-version.js` 1.13.0 â 1.14.0 (MINOR â new database + new calculator tab + new tooling).
-- SW cache name auto-synced â `rz-cache-v1.14.0`.
+- `js/rz-version.js` 1.13.0 → 1.14.0 (MINOR — new database + new calculator tab + new tooling).
+- SW cache name auto-synced → `rz-cache-v1.14.0`.
 
 ---
 
-## v1.13.0 â 2026-05-12 (Spares Engine: 4 more operating tabs â full 20-module engine Â· DCMOC pass 3)
+## v1.13.0 — 2026-05-12 (Spares Engine: 4 more operating tabs — full 20-module engine · DCMOC pass 3)
 
-### Added â Spares Engine: the last 4 draft modules (now 20 modules / 19 tabs + Summary Dashboard)
-`spares-readiness-calculator.html` 4,107 â 4,997 lines. Completed the master-prompt draft coverage with 4 more deterministic template-generator tabs:
-- **Stakeholder & Communication Planner** (draft Module 9) â pick the 8 stakeholders involved + situation + urgency (Routine/Elevated/Urgent/Critical) â a stakeholder-map table (what they care about / communication style / recommended channel / cadence â keyed to urgency), per-stakeholder message drafts in the right register (executive = 3-line status+decision, supplier = specific ask+hard deadline+consequence, finance = cost+options, engineering = spec+decision), and a 3-level escalation ladder with trigger criteria (for Urgent/Critical).
-- **EOL Response Plan** (draft Module 11 â complements the LTB math tab) â inputs (part, notice date, installed units, sites, criticality, support years, failure rate, on-hand, open-PO, unit cost, alternates, alt-qual lead time + cost, redesign feasibility, carrying rate) â EOL summary, impact assessment (supply gap + single-source flag + rush warning), an options matrix filtered by input viability (Last-Time-Buy / Qualify Alternate / Redesign / Refurbished Pool / Do Nothing â each with Pros/Cons/When), `LTB_Q = ceil(N Ã Î» Ã yrs Ã 1.20 â onHand â openPO)` (documented in the â box), a 6-step replacement-qualification plan with timeline, 6 supplier negotiation points, and a stakeholder-comms draft. Cross-links the dedicated LTB tab for the full NPV stock-vs-requalify comparison.
-- **Ambiguity Solver** (draft Module 14) â paste an undefined ask + who asked + apparent scope + key themes â 4-6 candidate interpretations (derived by matching the ask against a 13-signal supply-chain term map), a sharpened SMART problem statement, a 6-row hypothesis tree (Inventory / Supplier / Demand / Sourcing / Lifecycle / Process gaps â each with validation method + data needed), 8 clarifying questions tailored to the asker, a 10-item data-request list, a 30/60/90-day Discover â Stabilise â Systematise plan, and risks & assumptions.
-- **Interview & Performance Story Builder** (draft Module 15) â pick a competency (Ambiguity / Influence / Negotiation / Risk / Process / Crisis / Strategic / Data) + Situation/Task/Action/Result â a structured STAR narrative + "skills demonstrated", a competency-specific story scaffold, 3-5 likely behavioral interview questions, and coaching notes (competency-specific + 6 universal sourcing-PM interview principles). A "career companion" â clearly labeled.
-Wiring: `TAB_ORDER` 15 â 19 module tabs; `SCENARIO_FIELDS` +17 input IDs (save/load/share-URL now covers all 20 modules); all 4 use the existing `tab-btn-ops` styling, `.ops-output`/`.ops-table`/`.gen-text-block` dark-mode classes, and the per-tab PDF pattern (`<\/script>` escaped); hero stat updated "9 modules" â "20 modules"; checkbox `accent-color: var(--amber)` in dark mode. FAQ +6 Q&As under "Operating Engine" (undefined-ask handling, 30/60/90 plan, exec-vs-supplier messaging, LTB-vs-requalify-vs-redesign, STAR-story structure, supplier-escalation).
+### Added — Spares Engine: the last 4 draft modules (now 20 modules / 19 tabs + Summary Dashboard)
+`spares-readiness-calculator.html` 4,107 → 4,997 lines. Completed the master-prompt draft coverage with 4 more deterministic template-generator tabs:
+- **Stakeholder & Communication Planner** (draft Module 9) — pick the 8 stakeholders involved + situation + urgency (Routine/Elevated/Urgent/Critical) → a stakeholder-map table (what they care about / communication style / recommended channel / cadence — keyed to urgency), per-stakeholder message drafts in the right register (executive = 3-line status+decision, supplier = specific ask+hard deadline+consequence, finance = cost+options, engineering = spec+decision), and a 3-level escalation ladder with trigger criteria (for Urgent/Critical).
+- **EOL Response Plan** (draft Module 11 — complements the LTB math tab) — inputs (part, notice date, installed units, sites, criticality, support years, failure rate, on-hand, open-PO, unit cost, alternates, alt-qual lead time + cost, redesign feasibility, carrying rate) → EOL summary, impact assessment (supply gap + single-source flag + rush warning), an options matrix filtered by input viability (Last-Time-Buy / Qualify Alternate / Redesign / Refurbished Pool / Do Nothing — each with Pros/Cons/When), `LTB_Q = ceil(N × λ × yrs × 1.20 − onHand − openPO)` (documented in the ⓘ box), a 6-step replacement-qualification plan with timeline, 6 supplier negotiation points, and a stakeholder-comms draft. Cross-links the dedicated LTB tab for the full NPV stock-vs-requalify comparison.
+- **Ambiguity Solver** (draft Module 14) — paste an undefined ask + who asked + apparent scope + key themes → 4-6 candidate interpretations (derived by matching the ask against a 13-signal supply-chain term map), a sharpened SMART problem statement, a 6-row hypothesis tree (Inventory / Supplier / Demand / Sourcing / Lifecycle / Process gaps — each with validation method + data needed), 8 clarifying questions tailored to the asker, a 10-item data-request list, a 30/60/90-day Discover → Stabilise → Systematise plan, and risks & assumptions.
+- **Interview & Performance Story Builder** (draft Module 15) — pick a competency (Ambiguity / Influence / Negotiation / Risk / Process / Crisis / Strategic / Data) + Situation/Task/Action/Result → a structured STAR narrative + "skills demonstrated", a competency-specific story scaffold, 3-5 likely behavioral interview questions, and coaching notes (competency-specific + 6 universal sourcing-PM interview principles). A "career companion" — clearly labeled.
+Wiring: `TAB_ORDER` 15 → 19 module tabs; `SCENARIO_FIELDS` +17 input IDs (save/load/share-URL now covers all 20 modules); all 4 use the existing `tab-btn-ops` styling, `.ops-output`/`.ops-table`/`.gen-text-block` dark-mode classes, and the per-tab PDF pattern (`<\/script>` escaped); hero stat updated "9 modules" → "20 modules"; checkbox `accent-color: var(--amber)` in dark mode. FAQ +6 Q&As under "Operating Engine" (undefined-ask handling, 30/60/90 plan, exec-vs-supplier messaging, LTB-vs-requalify-vs-redesign, STAR-story structure, supplier-escalation).
 
-### Changed â DCMOC app refresh pass 3 (`dcmoc/`)
-- **FaqDashboard** (commit `b23d44b`) â 5 new Q&As (why PUE-median ~1.5, Tier-III/IV availability with exact Uptime values, how the wildfire risk factor works, the Capacity headroom analysis, 2026 tax incentives in the Investment module) + updated existing answers (33 countries, JLL/CBRE 2025 citations, 6-factor risk matrix, exact Tier-Standard values).
-- **PDF exports** (commit `e24a4f0`) â disclaimer footer on every page of all 11 generators ("Illustrative model â not a substitute for a full engineering or financial analysis. All figures in USD unless noted."), dynamic generation dates + projection base year via `new Date().getFullYear()` (no hardcoded 2025), CarbonPdf industry-PUE 1.58 â 1.50.
-- **Dashboards** (commit `b6599b7`) â Carbon tooltip 1.58 â 1.50, Simulation/Staffing dynamic years, + a dismissible "Data vintage: 2026-Q1 Â· benchmarks Uptime Institute 2025, JLL/CBRE 2025 Â· USD" banner in the Shell (localStorage-persisted, aria-labeled dismiss).
+### Changed — DCMOC app refresh pass 3 (`dcmoc/`)
+- **FaqDashboard** (commit `b23d44b`) — 5 new Q&As (why PUE-median ~1.5, Tier-III/IV availability with exact Uptime values, how the wildfire risk factor works, the Capacity headroom analysis, 2026 tax incentives in the Investment module) + updated existing answers (33 countries, JLL/CBRE 2025 citations, 6-factor risk matrix, exact Tier-Standard values).
+- **PDF exports** (commit `e24a4f0`) — disclaimer footer on every page of all 11 generators ("Illustrative model — not a substitute for a full engineering or financial analysis. All figures in USD unless noted."), dynamic generation dates + projection base year via `new Date().getFullYear()` (no hardcoded 2025), CarbonPdf industry-PUE 1.58 → 1.50.
+- **Dashboards** (commit `b6599b7`) — Carbon tooltip 1.58 → 1.50, Simulation/Staffing dynamic years, + a dismissible "Data vintage: 2026-Q1 · benchmarks Uptime Institute 2025, JLL/CBRE 2025 · USD" banner in the Shell (localStorage-persisted, aria-labeled dismiss).
 - Static export rebuilt + deployed (commits `4f0daa4`, `32f1b51`); `npx tsc --noEmit` clean, `npm run build` green, serves 200.
 
 ### Versioning
-- `js/rz-version.js` 1.12.0 â 1.13.0 (MINOR â 4 more operating-engine component tabs).
-- SW cache name auto-synced â `rz-cache-v1.13.0`.
+- `js/rz-version.js` 1.12.0 → 1.13.0 (MINOR — 4 more operating-engine component tabs).
+- SW cache name auto-synced → `rz-cache-v1.13.0`.
 
 ---
 
-## v1.12.0 â 2026-05-12 (Spares Engine expanded to a full operating engine Â· DCMOC pass 2 Â· 15 more OG cards)
+## v1.12.0 — 2026-05-12 (Spares Engine expanded to a full operating engine · DCMOC pass 2 · 15 more OG cards)
 
-### Added â Spares Engine: 6 operating-engine tabs (from the master-prompt draft)
-`spares-readiness-calculator.html` grew 2,384 â 4,107 lines. Beyond the 9 quantitative modules (v1.11.0), it now has 6 deterministic, copy-ready **template generators** that turn the day-to-day Program Manager workflow into structured outputs:
-1. **Daily PM Operating System** â input today's situation (# late POs, supplier-not-confirmed count, critical shortages, severity sliders, free-text site/finance asks) â derives RED/YELLOW/GREEN situation status, a P1/P2/P3 priority stack, critical-follow-ups table, decision log, and an end-of-day status-email draft. Decision logic per the draft (critical spare + need-date <30 d â â¥High; supplier commit > need date â At Risk/Red; no alternate + critical â bump risk).
-2. **Supplier Scorecard & Review Cadence** â input 8 metrics (OTIF / commit accuracy / quote turnaround / PO ack / defect rate / responsiveness / cost vs benchmark / corrective-action closure) + strategic importance â RAG scorecard, derived review cadence (Weekly Operational / Monthly Business / Quarterly Executive) with the matching agenda template, radar chart.
-3. **Negotiation & Commercial Strategy** â input scenario (price increase / lead-time / capacity / payment-term), supplier ask, spend, # alternates, raw-material-driven? â leverage assessment (0â7 scoring), BATNA & walk-away, a counterproposal template per scenario, concession strategy table, talk track, common-levers reference.
-4. **Contract / SOW Requirements Checklist** â toggles (lead-time committed? forecast binding? capacity reserved? EOL notice months? LTB rights? change-notice timeline? consignment/VMI?) â a 15-area requirements table (Scope / Pricing / Lead Time / Forecast / Capacity / Delivery / Warranty / Quality / Documentation / EOL Notice / Last-Time-Buy / Change Notice / SLA / Inventory / Termination) with proposed-language concepts, flagged rows, and an open legal/procurement questions list.
-5. **Process Improvement Builder** â describe a recurring problem + frequency + per-incident impact + affected stakeholders â problem statement with annualised impact, root-cause checklist, a future-state process keyed to the ticked causes, RACI matrix, KPI table, 30/60/90-day rollout plan.
-6. **Meeting Intelligence** â Prep mode (meeting name/type/attendees/decision/risks â prep brief with the canonical agenda per meeting type) + Notes mode (structured decisions/actions/risks/open-questions/next-meeting template with add-row buttons).
-Each tab: copy-to-clipboard + per-tab PDF export (`<\/script>` escaped), aria-labels, dark-mode-themed tables/cards, mobile-safe. 35 new input IDs added to the save/load scenario. FAQ 19 â 24 (+5 operating-engine Q&As) with a new "Operating Engine" filter button.
+### Added — Spares Engine: 6 operating-engine tabs (from the master-prompt draft)
+`spares-readiness-calculator.html` grew 2,384 → 4,107 lines. Beyond the 9 quantitative modules (v1.11.0), it now has 6 deterministic, copy-ready **template generators** that turn the day-to-day Program Manager workflow into structured outputs:
+1. **Daily PM Operating System** — input today's situation (# late POs, supplier-not-confirmed count, critical shortages, severity sliders, free-text site/finance asks) → derives RED/YELLOW/GREEN situation status, a P1/P2/P3 priority stack, critical-follow-ups table, decision log, and an end-of-day status-email draft. Decision logic per the draft (critical spare + need-date <30 d → ≥High; supplier commit > need date → At Risk/Red; no alternate + critical → bump risk).
+2. **Supplier Scorecard & Review Cadence** — input 8 metrics (OTIF / commit accuracy / quote turnaround / PO ack / defect rate / responsiveness / cost vs benchmark / corrective-action closure) + strategic importance → RAG scorecard, derived review cadence (Weekly Operational / Monthly Business / Quarterly Executive) with the matching agenda template, radar chart.
+3. **Negotiation & Commercial Strategy** — input scenario (price increase / lead-time / capacity / payment-term), supplier ask, spend, # alternates, raw-material-driven? → leverage assessment (0–7 scoring), BATNA & walk-away, a counterproposal template per scenario, concession strategy table, talk track, common-levers reference.
+4. **Contract / SOW Requirements Checklist** — toggles (lead-time committed? forecast binding? capacity reserved? EOL notice months? LTB rights? change-notice timeline? consignment/VMI?) → a 15-area requirements table (Scope / Pricing / Lead Time / Forecast / Capacity / Delivery / Warranty / Quality / Documentation / EOL Notice / Last-Time-Buy / Change Notice / SLA / Inventory / Termination) with proposed-language concepts, flagged rows, and an open legal/procurement questions list.
+5. **Process Improvement Builder** — describe a recurring problem + frequency + per-incident impact + affected stakeholders → problem statement with annualised impact, root-cause checklist, a future-state process keyed to the ticked causes, RACI matrix, KPI table, 30/60/90-day rollout plan.
+6. **Meeting Intelligence** — Prep mode (meeting name/type/attendees/decision/risks → prep brief with the canonical agenda per meeting type) + Notes mode (structured decisions/actions/risks/open-questions/next-meeting template with add-row buttons).
+Each tab: copy-to-clipboard + per-tab PDF export (`<\/script>` escaped), aria-labels, dark-mode-themed tables/cards, mobile-safe. 35 new input IDs added to the save/load scenario. FAQ 19 → 24 (+5 operating-engine Q&As) with a new "Operating Engine" filter button.
 
-### Changed â Spares Engine v1.11.1 refinements (math fixes + UX)
-- **Poisson CDF overflow bug**: `e^{-Î»}=0` underflow for Î» > ~200 made `P(stockout)` return 0 for any stock level â added a normal-approximation fallback (CLT, continuity-corrected).
-- **Inverted NPV decision bug** in Last-Time-Buy: both options' NPVs are negative (costs); the code picked the *more-negative* NPV â recommended the *more expensive* path. Flipped + corrected chart highlight + documented the direction rule in the â box.
-- Verified correct (no change): Beasley-Springer-Moro inverse-normal CDF (Î¦â»Â¹ values check out), safety-stock unit conversions (annual Î¼/Ï Ã L/52), newsvendor Q*, NPV DCF, LTB qty (safetyFactor 1.15 documented).
-- Added: 14-commodity defaults table (MTBF / lead time / unit cost / installed base / under-stock cost) with cross-module auto-fill; a 6-card Summary Dashboard (clickable KPIs); save / load / share-URL / reset scenario (localStorage + `#s=` hash of inputs); keyboard tab navigation (arrows / Home / End + aria-selected); dark-mode-aware chart colors across all charts; cross-link pills â TCO/OPEX/ROI/Tier-Advisor (carries `downtimeCostPerHr/mtbf/mttr` forward); new URL params (`?commodity/installedBase/leadTime/unitCost`); mobile KPI-grid breakpoints; title trimmed 84 â 59 chars.
+### Changed — Spares Engine v1.11.1 refinements (math fixes + UX)
+- **Poisson CDF overflow bug**: `e^{-λ}=0` underflow for λ > ~200 made `P(stockout)` return 0 for any stock level → added a normal-approximation fallback (CLT, continuity-corrected).
+- **Inverted NPV decision bug** in Last-Time-Buy: both options' NPVs are negative (costs); the code picked the *more-negative* NPV → recommended the *more expensive* path. Flipped + corrected chart highlight + documented the direction rule in the ⓘ box.
+- Verified correct (no change): Beasley-Springer-Moro inverse-normal CDF (Φ⁻¹ values check out), safety-stock unit conversions (annual μ/σ × L/52), newsvendor Q*, NPV DCF, LTB qty (safetyFactor 1.15 documented).
+- Added: 14-commodity defaults table (MTBF / lead time / unit cost / installed base / under-stock cost) with cross-module auto-fill; a 6-card Summary Dashboard (clickable KPIs); save / load / share-URL / reset scenario (localStorage + `#s=` hash of inputs); keyboard tab navigation (arrows / Home / End + aria-selected); dark-mode-aware chart colors across all charts; cross-link pills → TCO/OPEX/ROI/Tier-Advisor (carries `downtimeCostPerHr/mtbf/mttr` forward); new URL params (`?commodity/installedBase/leadTime/unitCost`); mobile KPI-grid breakpoints; title trimmed 84 → 59 chars.
 
-### Changed â DCMOC app refresh pass 2 (`dcmoc/`)
-- **16 engines** (commit `aa04a17`): AssetLifecycle (2025 T&T replacement costs Ã20 assets), CBM (DCIM pricing $18K/$52K/$110K, Tier-III 95 min downtime, floor guard on $/min), MaintenanceStrategy ($50/hr labor, 6.5Ã US emergency multiplier, sensor-capex bumps), GridReliability (BESS $300/kWh BNEF-2026, Tier-4-Final diesel 0.27 L/kWh, $1.25/L), FuelGen ($18K/gen annual maintenance), DisasterRisk (added **wildfire as 6th risk factor** region-scored + re-weighted composite 28/22/18/12/10/10 + insurance tier thresholds + annualLossProbability /1250), DowntimeCalculator (Tier-IV 99.99943%, tier-specific default $/min $2.5K/$8K/$12K), TaxIncentive (IRA 20% bonus depreciation 2026 phase-down + 30%+10%-domestic solar ITC + state incentives table), Revenue ($185/kW/mo MRC, $280/kW NRC, 3.5% escalation + input guards), CapacityPlanning (headroom analysis fields + dynamic year + safe-division guards), Shift/Narrative/Portfolio/TalentAvailability (dynamic year + 2025-source refs + Uptime CDCP 2026 $4,200 cert cost), CarbonPdf (2025/2026 source years), assets.ts (gen-set spares +15-20% for 2026).
+### Changed — DCMOC app refresh pass 2 (`dcmoc/`)
+- **16 engines** (commit `aa04a17`): AssetLifecycle (2025 T&T replacement costs ×20 assets), CBM (DCIM pricing $18K/$52K/$110K, Tier-III 95 min downtime, floor guard on $/min), MaintenanceStrategy ($50/hr labor, 6.5× US emergency multiplier, sensor-capex bumps), GridReliability (BESS $300/kWh BNEF-2026, Tier-4-Final diesel 0.27 L/kWh, $1.25/L), FuelGen ($18K/gen annual maintenance), DisasterRisk (added **wildfire as 6th risk factor** region-scored + re-weighted composite 28/22/18/12/10/10 + insurance tier thresholds + annualLossProbability /1250), DowntimeCalculator (Tier-IV 99.99943%, tier-specific default $/min $2.5K/$8K/$12K), TaxIncentive (IRA 20% bonus depreciation 2026 phase-down + 30%+10%-domestic solar ITC + state incentives table), Revenue ($185/kW/mo MRC, $280/kW NRC, 3.5% escalation + input guards), CapacityPlanning (headroom analysis fields + dynamic year + safe-division guards), Shift/Narrative/Portfolio/TalentAvailability (dynamic year + 2025-source refs + Uptime CDCP 2026 $4,200 cert cost), CarbonPdf (2025/2026 source years), assets.ts (gen-set spares +15-20% for 2026).
 - **Data** (commit `cc258b4`): 6 more electricity-rate updates (VN/PH/MY/TH/CO/FR) + UAE corp-tax 9% correction; all 33 countries `lastUpdated: 2026-Q1`.
 - **Dashboards** (commit `852111c`): `overflow-x-auto` wrappers on 12 tables across MonteCarlo/Portfolio/ScenarioComparison/Report dashboards, aria-labels on duplicate/remove icon buttons, corrected tier-availability values (99.741% / 99.99943%) + 2025-source tooltips on Portfolio/Risk/DisasterRisk dashboards.
 - Static export rebuilt + deployed (commit `92b7ba1`); `npx tsc --noEmit` clean, `npm run build` green.
 
-### Added â SEO: 15 more per-page OG cards (commit `4f7d934`, F18-01)
-Generated 1200Ã630 WebP OG cards (~52-56 KB each) + patched og:image/twitter:image for: spares-readiness-calculator, chiller-plant, datahall, fire/fuel/water-system, ict, EPMS_Telemetry, asean-dc-report-2026, infographic-dc-cost-breakdown/-sustainability/-pue-global, achievements, insights, glossary. Only 4 utility pages now use the profile-photo fallback (404/dashboard/privacy/terms). `tools/build-og-images.py` TARGETS extended. (B2-001 double-`<h1>` audit flag confirmed a false positive â the 2nd `<h1>` on 41 pages is inside PDF print-window JS template strings, not the rendered DOM.)
+### Added — SEO: 15 more per-page OG cards (commit `4f7d934`, F18-01)
+Generated 1200×630 WebP OG cards (~52-56 KB each) + patched og:image/twitter:image for: spares-readiness-calculator, chiller-plant, datahall, fire/fuel/water-system, ict, EPMS_Telemetry, asean-dc-report-2026, infographic-dc-cost-breakdown/-sustainability/-pue-global, achievements, insights, glossary. Only 4 utility pages now use the profile-photo fallback (404/dashboard/privacy/terms). `tools/build-og-images.py` TARGETS extended. (B2-001 double-`<h1>` audit flag confirmed a false positive — the 2nd `<h1>` on 41 pages is inside PDF print-window JS template strings, not the rendered DOM.)
 
-### Changed â SEO: title-length trims (commit `63e7d51`, D1)
-Trimmed 10 over-long page titles (>80 chars) to <70 (article-20/21/22, cx-calculator, future-forward, article-4, ltc-system-modelling-lab, article-18, insights, pillar-sustainability) â kept descriptive. The 66-79-char titles left as-is.
+### Changed — SEO: title-length trims (commit `63e7d51`, D1)
+Trimmed 10 over-long page titles (>80 chars) to <70 (article-20/21/22, cx-calculator, future-forward, article-4, ltc-system-modelling-lab, article-18, insights, pillar-sustainability) — kept descriptive. The 66-79-char titles left as-is.
 
 ### Versioning
-- `js/rz-version.js` 1.11.0 â 1.12.0 (MINOR â new operating-engine component group).
-- SW cache name auto-synced â `rz-cache-v1.12.0`.
+- `js/rz-version.js` 1.11.0 → 1.12.0 (MINOR — new operating-engine component group).
+- SW cache name auto-synced → `rz-cache-v1.12.0`.
 
 ---
 
-## v1.11.0 â 2026-05-12 (NEW: Critical Spares Engine calculator Â· DCMOC engine refresh)
+## v1.11.0 — 2026-05-12 (NEW: Critical Spares Engine calculator · DCMOC engine refresh)
 
-### Added â Critical Spares Readiness & Sourcing Engine
-New page `spares-readiness-calculator.html` (2,384 lines) â a comprehensive 9-module calculator for data-center mechanical & electrical (M&E) spare-parts management. Companion to the master-prompt operating doc in `Documents/Training/`.
+### Added — Critical Spares Readiness & Sourcing Engine
+New page `spares-readiness-calculator.html` (2,384 lines) — a comprehensive 9-module calculator for data-center mechanical & electrical (M&E) spare-parts management. Companion to the master-prompt operating doc in `Documents/Training/`.
 
 Modules:
-1. **Criticality Scoring (FMECA + RCM)** â simplified FMECA Criticality Number, Risk Priority Number, VITAL/ESSENTIAL/DESIRABLE tier, STOCK / DON'T STOCK / STOCK+DUAL-SOURCE decision.
-2. **Spare Readiness Gauge** â `Readiness % = confirmed-supply / required-supply`, RED/YELLOW/GREEN status, risk flags (lead time > horizon, no commit, PO not raised, no alternate, inventory < 30 d), action plan.
-3. **Optimal Stock Level (Newsvendor + Fill-Rate)** â critical-fractile `Q*` via Beasley-Springer-Moro inverse-normal CDF, safety stock `SS = zÂ·â(LÂ·Ï_DÂ² + Î¼Â²Â·Ï_LÂ²)`, reorder point, Poisson mode for slow movers, cost-curve chart.
-4. **Multi-Site Hub Positioning** â simplified 2-echelon MEIO heuristic (depot / regional hub / sites), hub-vs-no-hub readiness delta + inventory $.
-5. **Supplier Risk Index** â 7-dimension weighted composite (0â100), Kraljic quadrant derivation, radar chart, per-quadrant sourcing-strategy brief.
-6. **Obsolescence / Last-Time-Buy (DMSMS)** â LTB quantity, NPV Option A (stock LTB) vs Option B (qualify alternate now), fleet EOL Exposure Score.
-7. **Kraljic Sourcing Strategy** â standalone 2Ã2 matrix with the user's position plotted + full strategy brief per quadrant.
-8. **Monte-Carlo Scenario** â Box-Muller sampling, 500â5,000 iterations, readiness-% histogram, tornado chart of variance drivers, P10/P50/P90.
-9. **FAQ / Methodology** â 15 Q&As with citations (FMECA/RCM, METRIC/VARI-METRIC, MEIO, newsvendor, Kraljic, DMSMS).
+1. **Criticality Scoring (FMECA + RCM)** — simplified FMECA Criticality Number, Risk Priority Number, VITAL/ESSENTIAL/DESIRABLE tier, STOCK / DON'T STOCK / STOCK+DUAL-SOURCE decision.
+2. **Spare Readiness Gauge** — `Readiness % = confirmed-supply / required-supply`, RED/YELLOW/GREEN status, risk flags (lead time > horizon, no commit, PO not raised, no alternate, inventory < 30 d), action plan.
+3. **Optimal Stock Level (Newsvendor + Fill-Rate)** — critical-fractile `Q*` via Beasley-Springer-Moro inverse-normal CDF, safety stock `SS = z·√(L·σ_D² + μ²·σ_L²)`, reorder point, Poisson mode for slow movers, cost-curve chart.
+4. **Multi-Site Hub Positioning** — simplified 2-echelon MEIO heuristic (depot / regional hub / sites), hub-vs-no-hub readiness delta + inventory $.
+5. **Supplier Risk Index** — 7-dimension weighted composite (0–100), Kraljic quadrant derivation, radar chart, per-quadrant sourcing-strategy brief.
+6. **Obsolescence / Last-Time-Buy (DMSMS)** — LTB quantity, NPV Option A (stock LTB) vs Option B (qualify alternate now), fleet EOL Exposure Score.
+7. **Kraljic Sourcing Strategy** — standalone 2×2 matrix with the user's position plotted + full strategy brief per quadrant.
+8. **Monte-Carlo Scenario** — Box-Muller sampling, 500–5,000 iterations, readiness-% histogram, tornado chart of variance drivers, P10/P50/P90.
+9. **FAQ / Methodology** — 15 Q&As with citations (FMECA/RCM, METRIC/VARI-METRIC, MEIO, newsvendor, Kraljic, DMSMS).
 
 Integration:
 - Shared `rz-engine.min.js` math (NPV / downtime / format) + URL deep-link params (`?itLoad`, `?tier`, `?redundancy`, `?mtbf`, `?mttr`, `?downtimeCostPerHr`, `?country`) so OPEX/TCO/ROI/PUE calculators can carry their config over (banner shown when params present).
 - Card added to "Strategic Analysis & Market Intelligence" on `datacenter-solutions.html` (amber theming) + a card on `tools.html`.
 - `sitemap.xml`, `llms.txt` entries; 6 glossary terms added (FMECA, Kraljic Matrix, Last-Time-Buy, METRIC/VARI-METRIC, Newsvendor Model, DMSMS) with backlinks.
-- Standard RZ shell: consent-aware gtag, dark-mode toggle, skip-link, mobile-responsive (8/8), hamburger, cookie banner, share buttons, PDF export per module (`<\/script>` escaped), 88 aria-labels, 3 JSON-LD blocks. Chart.js loaded blocking (not deferred â per the v1.10.19 lesson).
+- Standard RZ shell: consent-aware gtag, dark-mode toggle, skip-link, mobile-responsive (8/8), hamburger, cookie banner, share buttons, PDF export per module (`<\/script>` escaped), 88 aria-labels, 3 JSON-LD blocks. Chart.js loaded blocking (not deferred — per the v1.10.19 lesson).
 
-### Changed â DCMOC app refresh (`dcmoc/`)
-- **Deps** (commit `75c077d`): Next 16.1.6â16.2.6, React/React-DOM 19.2.3â19.2.6, recharts 3.7â3.8.1, framer-motion 12.34â12.38, zustand 5.0.11â5.0.13, tailwind-merge 3.4â3.6, tailwindcss/@tailwindcss/postcss pinned 4.3. Held: jspdf 2.5.1, TS 5.x, eslint 9.x, @types/node 20.x, lucide-react 0.574. Static export rebuilt.
-- **Data 2025-26** (commit `fd84b26`): benchmarks (PUE median 1.35â1.50, CAPEX/kW +10-25% for post-2022 construction inflation, energy/OPEX/carbon-price/turnover updated), PUE_BY_COOLING (air 1.35â1.42), 33 country profiles (SG electricity 0.15â0.22, IE corp tax 12.5â15% Pillar-2, DE 0.30â0.26, GB 0.20â0.22, ID labor +6.5%), capex year-escalation.
-- **Engine accuracy** (commit `7e4e144`): RosterEngine â resolved `isPublicHoliday` TODO (holiday-date approximation from `country.labor.leaves.publicHolidays` + country labor rate instead of hardcoded $200); FinancialEngine â IRR bisection fallback + NaN/div-0 guards; CarbonEngine â 2025 emission factors (offset $35â$45, EU ETS $65â$68, grid intensity 0.475â0.49); RiskEngine â dynamic projection year.
-- **UI/UX** (commit `8f8390b` + `a5151fc`): Shell â mobile sidebar + hamburger + overlay backdrop + responsive padding + accessibility (aria-label/aria-pressed/sr-only); StaffingDashboard/ReportDashboard â loading spinners; BenchmarkDashboard/CarbonDashboard â 2025 source labels.
+### Changed — DCMOC app refresh (`dcmoc/`)
+- **Deps** (commit `75c077d`): Next 16.1.6→16.2.6, React/React-DOM 19.2.3→19.2.6, recharts 3.7→3.8.1, framer-motion 12.34→12.38, zustand 5.0.11→5.0.13, tailwind-merge 3.4→3.6, tailwindcss/@tailwindcss/postcss pinned 4.3. Held: jspdf 2.5.1, TS 5.x, eslint 9.x, @types/node 20.x, lucide-react 0.574. Static export rebuilt.
+- **Data 2025-26** (commit `fd84b26`): benchmarks (PUE median 1.35→1.50, CAPEX/kW +10-25% for post-2022 construction inflation, energy/OPEX/carbon-price/turnover updated), PUE_BY_COOLING (air 1.35→1.42), 33 country profiles (SG electricity 0.15→0.22, IE corp tax 12.5→15% Pillar-2, DE 0.30→0.26, GB 0.20→0.22, ID labor +6.5%), capex year-escalation.
+- **Engine accuracy** (commit `7e4e144`): RosterEngine — resolved `isPublicHoliday` TODO (holiday-date approximation from `country.labor.leaves.publicHolidays` + country labor rate instead of hardcoded $200); FinancialEngine — IRR bisection fallback + NaN/div-0 guards; CarbonEngine — 2025 emission factors (offset $35→$45, EU ETS $65→$68, grid intensity 0.475→0.49); RiskEngine — dynamic projection year.
+- **UI/UX** (commit `8f8390b` + `a5151fc`): Shell — mobile sidebar + hamburger + overlay backdrop + responsive padding + accessibility (aria-label/aria-pressed/sr-only); StaffingDashboard/ReportDashboard — loading spinners; BenchmarkDashboard/CarbonDashboard — 2025 source labels.
 
 ### Versioning
-- `js/rz-version.js` 1.10.19 â 1.11.0 (MINOR â new calculator page).
-- SW cache name auto-synced â `rz-cache-v1.11.0`.
+- `js/rz-version.js` 1.10.19 → 1.11.0 (MINOR — new calculator page).
+- SW cache name auto-synced → `rz-cache-v1.11.0`.
 
 ---
 
-## v1.10.19 â 2026-05-12 (Bugfix â chart.js `defer` regression broke synchronous chart init)
+## v1.10.19 — 2026-05-12 (Bugfix — chart.js `defer` regression broke synchronous chart init)
 
-User screenshot: `rz-ops-p7x3k9m.html` (admin console "Data Center Industry Intelligence") â all chart cards empty.
+User screenshot: `rz-ops-p7x3k9m.html` (admin console "Data Center Industry Intelligence") — all chart cards empty.
 
 ### Root cause
-v1.10.3 (commit `5c158f6`, "perf: defer scripts") added `defer` to the chart.js CDN script tag on 22 pages. On pages whose inline `<script>` calls `new Chart(...)` **synchronously during parsing** (not inside a `DOMContentLoaded`/`load` listener and not behind a `typeof Chart` guard), `Chart` is `undefined` at that moment because the deferred chart.js hasn't executed yet â silent throw â every chart blank.
+v1.10.3 (commit `5c158f6`, "perf: defer scripts") added `defer` to the chart.js CDN script tag on 22 pages. On pages whose inline `<script>` calls `new Chart(...)` **synchronously during parsing** (not inside a `DOMContentLoaded`/`load` listener and not behind a `typeof Chart` guard), `Chart` is `undefined` at that moment because the deferred chart.js hasn't executed yet → silent throw → every chart blank.
 
-`rz-ops-p7x3k9m.html` runs `if(checkAccess()){ ...renderDashboardCharts()... }` at top level â all dashboard + benchmark charts dead. The bug shipped 2026-05-09, surfaced when the user opened the page.
+`rz-ops-p7x3k9m.html` runs `if(checkAccess()){ ...renderDashboardCharts()... }` at top level → all dashboard + benchmark charts dead. The bug shipped 2026-05-09, surfaced when the user opened the page.
 
 ### Fix
-Removed `defer` from the chart.js CDN tag (restoring blocking-load behavior, so `Chart` is defined before any inline script runs) on the 7 at-risk pages â those with deferred chart.js + no load listener + no `typeof Chart` guard:
+Removed `defer` from the chart.js CDN tag (restoring blocking-load behavior, so `Chart` is defined before any inline script runs) on the 7 at-risk pages — those with deferred chart.js + no load listener + no `typeof Chart` guard:
 - `rz-ops-p7x3k9m.html` (confirmed broken)
 - `article-18.html`, `article-25.html`, `article-26.html`, `article-27.html`
 - `cx-calculator.html`
 - `water-system.html`
 
-The other 14 pages with deferred chart.js keep `defer` â they wrap chart init in a load listener or `typeof Chart` guard, so they work fine.
+The other 14 pages with deferred chart.js keep `defer` — they wrap chart init in a load listener or `typeof Chart` guard, so they work fine.
 
 ### Trade-off
-Blocking chart.js (~70 KB gzipped) costs ~100-300 ms of parse-block on those 7 pages â acceptable for correctness. Pages that already gate their chart init keep the perf win.
+Blocking chart.js (~70 KB gzipped) costs ~100-300 ms of parse-block on those 7 pages — acceptable for correctness. Pages that already gate their chart init keep the perf win.
 
 ### SW
-- SW cache name auto-synced 1.10.18 â 1.10.19.
+- SW cache name auto-synced 1.10.18 → 1.10.19.
 
-Bump 1.10.18 â 1.10.19 (PATCH â regression fix).
+Bump 1.10.18 → 1.10.19 (PATCH — regression fix).
 
 ---
 
-## v1.10.18 â 2026-05-09 (Privacy â move internal design docs + session notes to _private/)
+## v1.10.18 — 2026-05-09 (Privacy — move internal design docs + session notes to _private/)
 
-Audit-flagged F10-01: 7 internal `.md` files at site root were git-tracked â publicly served by GitHub Pages.
+Audit-flagged F10-01: 7 internal `.md` files at site root were git-tracked → publicly served by GitHub Pages.
 
 ### Files moved to `_private/` (gitignored, locally preserved)
-- `OPEX_Calculator_Design.md` (13 KB) â internal calculator design
-- `OPEX_Calculator_Design_v2.md` (37 KB) â internal design v2
-- `OPEX_Detailed_Breakdown_Analysis.md` (21 KB) â internal analysis
-- `SESSION_ARTICLE13.md` (3 KB) â session notes
-- `SESSION_NOTES.md` (57 KB) â session notes
-- `chiller-mimic-professionalization-plan.md` (4 KB) â internal plan
-- `claudecode.md` (2 KB) â session notes
+- `OPEX_Calculator_Design.md` (13 KB) — internal calculator design
+- `OPEX_Calculator_Design_v2.md` (37 KB) — internal design v2
+- `OPEX_Detailed_Breakdown_Analysis.md` (21 KB) — internal analysis
+- `SESSION_ARTICLE13.md` (3 KB) — session notes
+- `SESSION_NOTES.md` (57 KB) — session notes
+- `chiller-mimic-professionalization-plan.md` (4 KB) — internal plan
+- `claudecode.md` (2 KB) — session notes
 
 ### Action
 - `mkdir _private/` + move all 7 files into it
@@ -7123,18 +7126,18 @@ Audit-flagged F10-01: 7 internal `.md` files at site root were git-tracked â�
 - ~137 KB no longer publicly accessible at site root
 
 ### Kept at root (legitimate)
-- `CHANGELOG.md` â public changelog (referenced by `/changelog.html` builder)
-- `CLAUDE.md` â Claude Code project instructions (read at root)
-- `README.md` â repo readme (public OK)
+- `CHANGELOG.md` — public changelog (referenced by `/changelog.html` builder)
+- `CLAUDE.md` — Claude Code project instructions (read at root)
+- `README.md` — repo readme (public OK)
 
 ### SW
-- SW cache name auto-synced 1.10.17 â 1.10.18.
+- SW cache name auto-synced 1.10.17 → 1.10.18.
 
-Bump 1.10.17 â 1.10.18 (PATCH â privacy/security hygiene).
+Bump 1.10.17 → 1.10.18 (PATCH — privacy/security hygiene).
 
 ---
 
-## v1.10.17 â 2026-05-09 (a11y â skip-link injected on remaining 9 pages)
+## v1.10.17 — 2026-05-09 (a11y — skip-link injected on remaining 9 pages)
 
 Audit-flagged B12-SKIP: pages without "Skip to main content" link force keyboard-only users to tab through entire navbar before reaching content.
 
@@ -7144,23 +7147,23 @@ Audit-flagged B12-SKIP: pages without "Skip to main content" link force keyboard
 - Skip-link CSS already in `styles.css` + `styles-index.css` (visible-on-focus pattern, off-screen by default).
 
 ### Coverage
-9 pages received skip-link (down from 49 baseline â 0 remaining):
+9 pages received skip-link (down from 49 baseline → 0 remaining):
 - dashboard, privacy, standards-ltc-lab
 - 6 LTC labs: ansi-tia / ashrae / iso / nfpa / system-modelling / uptime-tier
 
 ### SW
-- SW cache name auto-synced 1.10.16 â 1.10.17.
+- SW cache name auto-synced 1.10.16 → 1.10.17.
 
-Bump 1.10.16 â 1.10.17 (PATCH â a11y).
+Bump 1.10.16 → 1.10.17 (PATCH — a11y).
 
 ---
 
-## v1.10.16 â 2026-05-09 (a11y + SEO batch: th[scope] + ai-content-declaration)
+## v1.10.16 — 2026-05-09 (a11y + SEO batch: th[scope] + ai-content-declaration)
 
 Two audit-flagged items batched.
 
 ### B11-TABLES (12 remaining)
-- 12 `<th>` tags lacked `scope` attribute â screen readers couldn't infer column/row association.
+- 12 `<th>` tags lacked `scope` attribute → screen readers couldn't infer column/row association.
 - Added `scope="col"` automatically. Audit clean (0 remaining).
 
 ### D7-001 (13 remaining)
@@ -7177,15 +7180,15 @@ Two audit-flagged items batched.
 - D6-002: Applebot/FacebookBot/LinkedInBot/DuckDuckBot/CCBot all in robots.txt.
 
 ### SW
-- SW cache name auto-synced 1.10.15 â 1.10.16.
+- SW cache name auto-synced 1.10.15 → 1.10.16.
 
-Bump 1.10.15 â 1.10.16 (PATCH â a11y + SEO).
+Bump 1.10.15 → 1.10.16 (PATCH — a11y + SEO).
 
 ---
 
-## v1.10.15 â 2026-05-09 (Privacy â gate Google Analytics behind GDPR consent + interaction defer)
+## v1.10.15 — 2026-05-09 (Privacy — gate Google Analytics behind GDPR consent + interaction defer)
 
-Audit-flagged E10-1: Google Analytics fired before GDPR consent on multiple pages. The eager-load `<script async src="...gtag/js?id=...">` ran on every page load regardless of cookie banner state â sending pageview data before user could accept/decline.
+Audit-flagged E10-1: Google Analytics fired before GDPR consent on multiple pages. The eager-load `<script async src="...gtag/js?id=...">` ran on every page load regardless of cookie banner state — sending pageview data before user could accept/decline.
 
 ### Action
 - `tools/gate-gtag-consent.py` (NEW): walks every HTML, replaces eager gtag pattern with the canonical consent-aware deferred pattern.
@@ -7203,37 +7206,37 @@ Audit-flagged E10-1: Google Analytics fired before GDPR consent on multiple page
 - Cookie banner decline handler in `sw.js`-style code already sets the disable flag, now it sticks across reloads via localStorage check.
 
 ### SW
-- SW cache name auto-synced 1.10.14 â 1.10.15 via `tools/sync-sw-version.py`.
+- SW cache name auto-synced 1.10.14 → 1.10.15 via `tools/sync-sw-version.py`.
 
-Bump 1.10.14 â 1.10.15 (PATCH â privacy/compliance fix).
+Bump 1.10.14 → 1.10.15 (PATCH — privacy/compliance fix).
 
 ---
 
-## v1.10.14 â 2026-05-09 (SEO â JSON-LD added to ltc-system-modelling-lab)
+## v1.10.14 — 2026-05-09 (SEO — JSON-LD added to ltc-system-modelling-lab)
 
 Audit-flagged: `ltc-system-modelling-lab.html` had ZERO JSON-LD blocks. AI search engines + Google rich-results couldn't classify the page.
 
 ### Action
 - Added 2 JSON-LD `<script type="application/ld+json">` blocks to `<head>`:
   1. `WebApplication` schema (name, description, category, audience, creator, publisher).
-  2. `BreadcrumbList` schema (Home â DC Solutions â Standards Labs â System Modelling Lab).
+  2. `BreadcrumbList` schema (Home → DC Solutions → Standards Labs → System Modelling Lab).
 
 ### Audit cleanup
-- E3-2 (113 target=_blank without noopener): pre-resolved â all 844 target=_blank links already have rel=noopener. The single remaining is in changelog prose (literal text in `<code>` block, not an active link).
-- D3-001 (broken jateng-diy link): pre-resolved â `pln-java-grid-jateng.html` exists and is correctly linked.
-- A1-FF-MODAL-01 (FF modal close handlers): pre-resolved â `byId('hfxLoginClose').addEventListener` wired on FF-1/2/3.
+- E3-2 (113 target=_blank without noopener): pre-resolved — all 844 target=_blank links already have rel=noopener. The single remaining is in changelog prose (literal text in `<code>` block, not an active link).
+- D3-001 (broken jateng-diy link): pre-resolved — `pln-java-grid-jateng.html` exists and is correctly linked.
+- A1-FF-MODAL-01 (FF modal close handlers): pre-resolved — `byId('hfxLoginClose').addEventListener` wired on FF-1/2/3.
 - A2-SECONDBRAIN-01 (62 pages broken Apps/second brain link): now only 1 reference in changelog.html prose (legitimate documentation reference, not active nav).
 
 ### SW
-- SW cache name auto-synced 1.10.13 â 1.10.14 via `tools/sync-sw-version.py`.
+- SW cache name auto-synced 1.10.13 → 1.10.14 via `tools/sync-sw-version.py`.
 
-Bump 1.10.13 â 1.10.14 (PATCH â SEO + audit-driven cleanup).
+Bump 1.10.13 → 1.10.14 (PATCH — SEO + audit-driven cleanup).
 
 ---
 
-## v1.10.13 â 2026-05-09 (SW cache version-aware via tools/sync-sw-version.py)
+## v1.10.13 — 2026-05-09 (SW cache version-aware via tools/sync-sw-version.py)
 
-`sw.js` had a hardcoded `CACHE_NAME = 'rz-cache-v8'` that drifted from the actual site version. Manual bumps were forgotten across releases â meaning users on stale caches got mismatched JS+CSS+HTML for hours.
+`sw.js` had a hardcoded `CACHE_NAME = 'rz-cache-v8'` that drifted from the actual site version. Manual bumps were forgotten across releases — meaning users on stale caches got mismatched JS+CSS+HTML for hours.
 
 ### Action
 - `sw.js` `CACHE_NAME` now reads `rz-cache-v1.10.13` (matches site version exactly).
@@ -7247,60 +7250,60 @@ python3 tools/sync-sw-version.py    # syncs CACHE_NAME to current RZ_VERSION
 ```
 
 ### Impact
-- Service worker now invalidates its cache on every version bump â users always get fresh assets after a release.
+- Service worker now invalidates its cache on every version bump → users always get fresh assets after a release.
 - No more stale cache after CSS/JS deploys.
 
-Bump 1.10.12 â 1.10.13 (PATCH â SW hygiene).
+Bump 1.10.12 → 1.10.13 (PATCH — SW hygiene).
 
 ---
 
-## v1.10.12 â 2026-05-09 (Cache-bust normalization across 96 pages)
+## v1.10.12 — 2026-05-09 (Cache-bust normalization across 96 pages)
 
 Audit found 8+ different cache-bust strings in active use for the same files (`styles.min.css?v=20260324b`, `?v=2026-05-09e`, `?v=20260509-v1108`, `?v=20260509-share-fix`, etc.). Different bust strings = different URLs = browser caches the same file under multiple keys.
 
 ### Action
 - `tools/normalize-cache-bust.py` walks every HTML file, normalizes `?v=` on script/link tags pointing to: styles.min.css, styles-index.min.css, styles.css, styles-index.css, script.min.js, script.js, auth.js, rz-engine.js.
 - All normalized to single `?v=2026-05-09-v1` token.
-- Documentation prose (changelog mentions of old bust strings) is NOT touched â script only matches actual `<script src=>` and `<link href=>` tags.
+- Documentation prose (changelog mentions of old bust strings) is NOT touched — script only matches actual `<script src=>` and `<link href=>` tags.
 
 ### Coverage
 - 222 cache-bust strings normalized across 96 files.
-- Browser cache now uses single key per file â predictable cache invalidation on next bump.
+- Browser cache now uses single key per file → predictable cache invalidation on next bump.
 
 ### Future
 - Next version bump should also bump the bust string (e.g., `2026-05-10-v1` for tomorrow's PATCH). Use this script to keep them in sync.
 
-Bump 1.10.11 â 1.10.12 (PATCH â cache hygiene).
+Bump 1.10.11 → 1.10.12 (PATCH — cache hygiene).
 
 ---
 
-## v1.10.11 â 2026-05-09 (Performance â extract 683 KB inline JS from LTC system modelling lab)
+## v1.10.11 — 2026-05-09 (Performance — extract 683 KB inline JS from LTC system modelling lab)
 
-`ltc-system-modelling-lab.html` was 914 KB total with 683 KB of inline JS in a single `<script>` block â blocking initial render and forcing the entire page to re-download every time the JS changed (no caching benefit).
+`ltc-system-modelling-lab.html` was 914 KB total with 683 KB of inline JS in a single `<script>` block — blocking initial render and forcing the entire page to re-download every time the JS changed (no caching benefit).
 
 ### Action
-- `tools/extract-ltc-js.py` extracted the 699,063-byte inline IIFE â `js/ltc-system-modelling-lab.js`.
+- `tools/extract-ltc-js.py` extracted the 699,063-byte inline IIFE → `js/ltc-system-modelling-lab.js`.
 - HTML now references it via `<script src="js/ltc-system-modelling-lab.js?v=2026-05-09" defer></script>`.
-- Trailing inline `<script>` blocks (cookie banner + root auth gate) preserved unchanged â they don't depend on the extracted IIFE.
+- Trailing inline `<script>` blocks (cookie banner + root auth gate) preserved unchanged — they don't depend on the extracted IIFE.
 
 ### Impact
-- HTML size: 914 KB â 215 KB (76% smaller, faster initial parse).
+- HTML size: 914 KB → 215 KB (76% smaller, faster initial parse).
 - External JS now browser-cacheable (subsequent loads skip the 683 KB download).
 - `defer` attribute means JS loads in parallel with HTML parsing, executes after DOM ready.
 - Extracted JS no longer has the `</script>`-in-JS-string risk class (escape rule is for inline strings, external file is immune).
 
-Bump 1.10.10 â 1.10.11 (PATCH â perf optimization, no behavior change).
+Bump 1.10.10 → 1.10.11 (PATCH — perf optimization, no behavior change).
 
 ---
 
-## v1.10.10 â 2026-05-09 (a11y â aria-label sweep across all form inputs)
+## v1.10.10 — 2026-05-09 (a11y — aria-label sweep across all form inputs)
 
-Audit-driven fix. 659 form inputs (`<input>`, `<select>`, `<textarea>`) lacked `<label for=>` AND `aria-label` â invisible to screen readers, fails WCAG 4.1.2 Name/Role/Value.
+Audit-driven fix. 659 form inputs (`<input>`, `<select>`, `<textarea>`) lacked `<label for=>` AND `aria-label` — invisible to screen readers, fails WCAG 4.1.2 Name/Role/Value.
 
 ### Action
 Bulk script `tools/fix-aria-labels.py` walks every input with an `id` attribute, skips inputs that already have a linked `<label for=>` or `aria-label`, then injects `aria-label` derived from:
 1. Input's `placeholder` attribute (if present), OR
-2. Humanized version of `id` (camelCase â "Camel Case", abbreviation expansion: pueâPUE, capexâCAPEX, etc.)
+2. Humanized version of `id` (camelCase → "Camel Case", abbreviation expansion: pue→PUE, capex→CAPEX, etc.)
 
 Skipped types: `hidden`, `submit`, `button`, `image`, `reset`.
 
@@ -7312,20 +7315,20 @@ Skipped types: `hidden`, `submit`, `button`, `image`, `reset`.
 
 ### Audit hooks
 All audits pass after fix:
-- `audit-script-tags --strict` â
-- `audit-mobile-responsive --strict` 103 pass / 0 fail â
+- `audit-script-tags --strict` ✓
+- `audit-mobile-responsive --strict` 103 pass / 0 fail ✓
 
-Bump 1.10.9 â 1.10.10 (PATCH â accessibility fix).
+Bump 1.10.9 → 1.10.10 (PATCH — accessibility fix).
 
 ---
 
-## v1.10.9 â 2026-05-09 (Untrack 641 MB unused DC asset folder)
+## v1.10.9 — 2026-05-09 (Untrack 641 MB unused DC asset folder)
 
-Audit-driven cleanup. `audit-reports/C-performance.md` flagged `assets/DC/` as 71 PNG files averaging 9-11 MB each (641 MB total). The original audit assumption (referenced from `dc-conventional.html`) was wrong â that page references `assets/DC_Conventional.jpg` (a different file). Zero HTML/JS/MD references the `assets/DC/` folder.
+Audit-driven cleanup. `audit-reports/C-performance.md` flagged `assets/DC/` as 71 PNG files averaging 9-11 MB each (641 MB total). The original audit assumption (referenced from `dc-conventional.html`) was wrong — that page references `assets/DC_Conventional.jpg` (a different file). Zero HTML/JS/MD references the `assets/DC/` folder.
 
 ### Action
 - Add `assets/DC/` to `.gitignore`.
-- `git rm -r --cached assets/DC/` â files preserved locally, removed from GitHub Pages deploy.
+- `git rm -r --cached assets/DC/` — files preserved locally, removed from GitHub Pages deploy.
 - 71 files / 641 MB no longer ship to production.
 
 ### Impact
@@ -7333,21 +7336,21 @@ Audit-driven cleanup. `audit-reports/C-performance.md` flagged `assets/DC/` as 7
 - No user-facing change (these assets were never linked).
 - Local copy preserved at `/home/baguspermana7/rz-work/assets/DC/` if user needs them later.
 
-Bump 1.10.8 â 1.10.9 (PATCH â repo cleanup, no code change).
+Bump 1.10.8 → 1.10.9 (PATCH — repo cleanup, no code change).
 
 ---
 
-## v1.10.8 â 2026-05-09 (Image aspect-ratio + card-fill + footer responsive)
+## v1.10.8 — 2026-05-09 (Image aspect-ratio + card-fill + footer responsive)
 
 User screenshots: "ini gambarnya stretch, need keep aspect ratio, ini juga cardnya saat 100% mobile view kok cardnya ke sisi kiri tidak fill (card area og image) dan card terms dll (akhir) dan card footer navbar tidak responsive full".
 
 **Root cause** (3 issues):
-1. `.brief-hero-img` mobile patch had `object-fit: cover` + `max-height: 220px` but no defined box-height â browsers couldn't crop properly, image rendered with squashed aspect ratio.
-2. Mobile cards (`.brief-card`, `.calc-disclaimer`, `.results-card`, etc.) had inherited margin/padding from desktop rules â left-aligned with empty right gutter on narrow viewports.
-3. `<footer>` + `.footer-grid` inherited fixed-width desktop padding â not full-width on mobile.
+1. `.brief-hero-img` mobile patch had `object-fit: cover` + `max-height: 220px` but no defined box-height → browsers couldn't crop properly, image rendered with squashed aspect ratio.
+2. Mobile cards (`.brief-card`, `.calc-disclaimer`, `.results-card`, etc.) had inherited margin/padding from desktop rules — left-aligned with empty right gutter on narrow viewports.
+3. `<footer>` + `.footer-grid` inherited fixed-width desktop padding → not full-width on mobile.
 
 ### Fix
-- **Aspect-ratio preservation**: every `.brief-hero-img` variant now declares `aspect-ratio: 1200 / 669; object-fit: cover; height: auto` â locks the rendered box to the source image ratio. CSS `aspect-ratio` is supported in all modern browsers since 2021.
+- **Aspect-ratio preservation**: every `.brief-hero-img` variant now declares `aspect-ratio: 1200 / 669; object-fit: cover; height: auto` — locks the rendered box to the source image ratio. CSS `aspect-ratio` is supported in all modern browsers since 2021.
 - **Card width-fill**: explicit `width: 100% !important; max-width: 100% !important; margin-left/right: 0 !important; box-sizing: border-box` on every card class (`.brief-card`, `.results-card`, `.input-section`, `.calc-disclaimer`, `.scenario-card`, `.model-card`, `.summary-card`, `.kpi-card`, `.tier-card`, `.feature-card`, `.terms-card`, `.info-card`, plus prefixed variants).
 - **Section wrappers**: `.brief-section`, `.results-section`, `.calc-section`, `.scenario-section` get full-viewport-width with consistent 1rem padding.
 - **Footer full-width**: `<footer>` + `.footer-grid` get `width: 100%; max-width: 100vw; margin: 0; box-sizing: border-box; grid-template-columns: 1fr`.
@@ -7357,17 +7360,17 @@ User screenshots: "ini gambarnya stretch, need keep aspect ratio, ini juga cardn
 - 7 calc pages: `opex/capex/roi/tco/pue/cx/carbon-footprint-calculator.html` (inline `<style>` patch).
 - `styles.css` + `styles-index.css` (global rule for non-calc pages).
 - Both stylesheets re-minified.
-- `js/rz-version.js` 1.10.7 â 1.10.8.
+- `js/rz-version.js` 1.10.7 → 1.10.8.
 
-Bump 1.10.7 â 1.10.8 (PATCH â visual responsive fix).
+Bump 1.10.7 → 1.10.8 (PATCH — visual responsive fix).
 
 ---
 
-## v1.9.1 â 2026-05-09 (Mobile drawer dropdown toggle â collapse + expand)
+## v1.9.1 — 2026-05-09 (Mobile drawer dropdown toggle — collapse + expand)
 
 User: "menu dc solution bisa expanded tapi nggak bisa di shrinked/di susutkan, saat mobile view".
 
-**Root cause**: my v1.8.4-v1.8.5 mobile drawer CSS forced dropdowns to be `max-height: 50vh; overflow: visible` always â i.e., dropdowns expanded permanently when drawer opened. No way to collapse them. Once "DC Solutions" sub-items were visible, they stayed visible, cluttering the drawer.
+**Root cause**: my v1.8.4-v1.8.5 mobile drawer CSS forced dropdowns to be `max-height: 50vh; overflow: visible` always — i.e., dropdowns expanded permanently when drawer opened. No way to collapse them. Once "DC Solutions" sub-items were visible, they stayed visible, cluttering the drawer.
 
 ### Fix
 
@@ -7377,31 +7380,31 @@ User: "menu dc solution bisa expanded tapi nggak bisa di shrinked/di susutkan, s
 - Updates `aria-expanded` for accessibility.
 
 **CSS (both stylesheets)**:
-- Default: dropdown `max-height: 0; opacity: 0; visibility: hidden` inside open drawer â COLLAPSED.
-- Active: `.nav-dropdown.is-mobile-open .dropdown-menu` â `max-height: 600px; opacity: 1` â EXPANDED.
+- Default: dropdown `max-height: 0; opacity: 0; visibility: hidden` inside open drawer — COLLAPSED.
+- Active: `.nav-dropdown.is-mobile-open .dropdown-menu` → `max-height: 600px; opacity: 1` — EXPANDED.
 - 300ms cubic-bezier ease for the height + opacity transition.
 - Sub-menu gets a left mint-accent border + indented background tint for visual hierarchy.
-- Replaces the existing SVG `.dropdown-arrow` with a `::after` `+` that rotates 45Â° to become `Ã` when expanded â clearer "tap to toggle" affordance on touch devices.
+- Replaces the existing SVG `.dropdown-arrow` with a `::after` `+` that rotates 45° to become `×` when expanded — clearer "tap to toggle" affordance on touch devices.
 - `prefers-reduced-motion` disables transitions.
 
 Cache-bust bumped: `styles-index.min.css?v=20260509-dropdown` + `rz-mobile-nav.js?v=2026-05-09c`.
 
-Bump 1.9.0 â 1.9.1 (PATCH â UX regression fix).
+Bump 1.9.0 → 1.9.1 (PATCH — UX regression fix).
 
 ---
 
-## v1.10.7 â 2026-05-09 (Plan v18 â Final dark-mode mandate for form widgets)
+## v1.10.7 — 2026-05-09 (Plan v18 — Final dark-mode mandate for form widgets)
 
 User: "ini masih ada warna putih di calculator opex. astaga, saya bilang audit completely, fix all" (5th dark-mode regression flagged this session).
 
 ### Root cause analysis
 The Country/Region select on opex-calculator was rendering with white background despite `[data-theme="dark"] .country-select { background: #1e293b !important }` rule existing. Browser-level quirks (especially Firefox/Linux native `<select>` rendering) sometimes ignore CSS background on form widgets, even with `appearance: none`.
 
-### Fix â multi-layer dark-mode mandate (added to BOTH styles.css + styles-index.css + 7 calc page inline styles)
+### Fix — multi-layer dark-mode mandate (added to BOTH styles.css + styles-index.css + 7 calc page inline styles)
 
-Layer 1 â `color-scheme: dark` on `[data-theme="dark"]` root tells browser native widgets to use dark chrome.
+Layer 1 — `color-scheme: dark` on `[data-theme="dark"]` root tells browser native widgets to use dark chrome.
 
-Layer 2 â Direct rules on every form-widget tag:
+Layer 2 — Direct rules on every form-widget tag:
 ```css
 [data-theme="dark"] select,
 [data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
@@ -7415,7 +7418,7 @@ Layer 2 â Direct rules on every form-widget tag:
 [data-theme="dark"] select option { background: #1e293b !important; color: #f1f5f9 !important; }
 ```
 
-Layer 3 â Inline-style attribute selector defeats `style="background: white"` leaks:
+Layer 3 — Inline-style attribute selector defeats `style="background: white"` leaks:
 ```css
 [data-theme="dark"] [style*="background: white"],
 [data-theme="dark"] [style*="background:white"],
@@ -7424,11 +7427,11 @@ Layer 3 â Inline-style attribute selector defeats `style="background: white
 }
 ```
 
-Layer 4 â `forced-color-adjust: none` overrides Windows High Contrast / system theme on form widgets.
+Layer 4 — `forced-color-adjust: none` overrides Windows High Contrast / system theme on form widgets.
 
 ### Coverage
 - styles.css + styles-index.css globally patched
-- 7 calc pages got per-page mandate marker `/* v1.10.7 â final dark mode mandate */`
+- 7 calc pages got per-page mandate marker `/* v1.10.7 — final dark mode mandate */`
 - Cache-bust: `styles.min.css?v=20260509-darkfinal` on calc pages
 - Cache-bust: `rz-mobile-nav.js?v=2026-05-09e` sitewide (102 pages)
 
@@ -7440,101 +7443,101 @@ Layer 4 â `forced-color-adjust: none` overrides Windows High Contrast / sys
 
 This was the **5th dark-mode regression** in one session (v1.2.2 brief-card, v1.2.3 model-card, v1.4.1 input-field, v1.4.2 scenario-card, v1.10.7 select widget). Each had a different root cause but same symptom. The multi-layer mandate above defeats the entire class going forward.
 
-Bump 1.10.6 â 1.10.7.
+Bump 1.10.6 → 1.10.7.
 
-## v1.10.6 â 2026-05-09 (Item 30 â per-page OG cards generated for ~50 more pages)
+## v1.10.6 — 2026-05-09 (Item 30 — per-page OG cards generated for ~50 more pages)
 
-### Item 30 â Extended `tools/build-og-images.py` to auto-discover pages
+### Item 30 — Extended `tools/build-og-images.py` to auto-discover pages
 
 Added dynamic page discovery to TARGETS list:
-- **27 article pages** (article-1 â¦ article-27) â emerald accent
-- **3 Future Forward pages** (FF-1, FF-2, FF-3) â violet accent
-- **4 geopolitics pages** â red accent
-- **10 compare pages** â cyan accent
-- **5 pillar pages** â gold accent
+- **27 article pages** (article-1 … article-27) — emerald accent
+- **3 Future Forward pages** (FF-1, FF-2, FF-3) — violet accent
+- **4 geopolitics pages** — red accent
+- **10 compare pages** — cyan accent
+- **5 pillar pages** — gold accent
 
 Generator extracts page title + meta description automatically per page (no hardcoding required).
 
-**Output**: 49 new WebP cards (was 12 â now 61 in `assets/og/`). Each ~55-65 KB.
+**Output**: 49 new WebP cards (was 12 → now 61 in `assets/og/`). Each ~55-65 KB.
 
 ### Coverage delta
-- Pages with their own OG card: **12 â 62** (+50)
-- Pages still using `profile-photo.jpg` fallback: 35 â 18 (-17)
+- Pages with their own OG card: **12 → 62** (+50)
+- Pages still using `profile-photo.jpg` fallback: 35 → 18 (-17)
 - Remaining 18 are mostly small fragments / legal pages that are fine with the fallback
 
 Future-proof: re-running `python3 tools/build-og-images.py --apply --update-html` automatically detects new article-N.html / FF-X.html files and generates cards.
 
-## v1.10.5 â 2026-05-09 (Item 32 â article-18 image WebP conversion)
+## v1.10.5 — 2026-05-09 (Item 32 — article-18 image WebP conversion)
 
-### Item 32 â `assets/article-18-mid.png` 2.4 MB â 183 KB WebP
-- Original: 2,526,736 bytes (2.5 MB) PNG, 1024Ã1024 RGBA
-- WebP @ q=85: 187,329 bytes (183 KB) â **93% reduction**
-- Updated `article-18.html` reference: `.png` â `.webp` + added `loading="lazy"` for below-fold image
+### Item 32 — `assets/article-18-mid.png` 2.4 MB → 183 KB WebP
+- Original: 2,526,736 bytes (2.5 MB) PNG, 1024×1024 RGBA
+- WebP @ q=85: 187,329 bytes (183 KB) — **93% reduction**
+- Updated `article-18.html` reference: `.png` → `.webp` + added `loading="lazy"` for below-fold image
 - Saves ~2.3 MB on every article-18 page load
 
-### Item 25 â orphan pillar pages â NOT BROKEN
+### Item 25 — orphan pillar pages — NOT BROKEN
 Audit flagged 1 inbound link as "orphan" but all 5 pillar pages (cooling/power/standards/fire-safety/sustainability) ARE linked from `datacenter-solutions.html` (a high-traffic hub). Adding more random inbound links would be link-spam-y. SEO PageRank distribution is acceptable as-is. Documenting as resolved.
 
-## v1.10.4 â 2026-05-09 (Item 33 â CLS fix: inject width+height on 212 imgs)
+## v1.10.4 — 2026-05-09 (Item 33 — CLS fix: inject width+height on 212 imgs)
 
-**Item 33** â 208 `<img>` elements lacked explicit `width` + `height` attributes (primary cause of Cumulative Layout Shift / CLS spike on first paint, hurting Core Web Vitals).
+**Item 33** — 208 `<img>` elements lacked explicit `width` + `height` attributes (primary cause of Cumulative Layout Shift / CLS spike on first paint, hurting Core Web Vitals).
 
 **Fix**: Python helper walked all 76 HTML files, read intrinsic dimensions from local image files via Pillow, injected `width="X" height="Y"` attributes. 
 
 Result:
 - **76 files modified**
-- **212 `<img>` tags** gained dimensions (was 208 â now 49 remaining)
+- **212 `<img>` tags** gained dimensions (was 208 → now 49 remaining)
 - Remaining 49 are external CDN URLs / data: URIs (can't determine dims without HTTP fetch)
 - **Pillow dimension cache**: 71 unique local images analyzed
 
 Impact: Browser can now reserve correct image space BEFORE the image loads, eliminating CLS jumps on every page that has `<img>`. Should improve Lighthouse CLS score significantly.
 
-## v1.10.3 â 2026-05-09 (Phase 4 perf batch â defer + minify rz-engine)
+## v1.10.3 — 2026-05-09 (Phase 4 perf batch — defer + minify rz-engine)
 
-### Item 35 + 38 â Render-blocking script defer sweep
+### Item 35 + 38 — Render-blocking script defer sweep
 **242 script tags** across **107 pages** gained `defer` attribute. Previously most were render-blocking.
 
 Targets and counts:
-- `auth.js`: +108 defer attributes (was 86 unsafe â now 0)
+- `auth.js`: +108 defer attributes (was 86 unsafe — now 0)
 - `rz-engine.js`: +52 defer
 - `rz-tracker.js`: +60 defer
 - `chart.js`: +22 defer
 - `rz-mobile-nav.js`: already had defer
 
-### Item 38 â `rz-engine.js` minified
-- Created `rz-engine.min.js` via terser: **41 KB â 13 KB** (-28 KB / -68%)
-- Switched 51 pages from `rz-engine.js` â `rz-engine.min.js`
+### Item 38 — `rz-engine.js` minified
+- Created `rz-engine.min.js` via terser: **41 KB → 13 KB** (-28 KB / -68%)
+- Switched 51 pages from `rz-engine.js` → `rz-engine.min.js`
 - Saves ~1.4 MB total bandwidth on first-page-loads across calc pages
 
-### Item 36 â auth.js + rz-engine "double load" â FALSE POSITIVE
-Audit flagged capex + opex calc pages with 2Ã auth.js loads. Investigation: the second tag is INSIDE a PDF print-window template literal string (the `<\/script>` escape gave it away). Top-level DOM has only 1 tag. Print window needs its own script tags â intentional design. No fix needed.
+### Item 36 — auth.js + rz-engine "double load" — FALSE POSITIVE
+Audit flagged capex + opex calc pages with 2× auth.js loads. Investigation: the second tag is INSIDE a PDF print-window template literal string (the `<\/script>` escape gave it away). Top-level DOM has only 1 tag. Print window needs its own script tags — intentional design. No fix needed.
 
 ### Verification
 - 0 auth.js script tags without defer/async
 - audit-script-tags --strict: CLEAN
 
-Bump 1.10.2 â 1.10.3 (PATCH â perf batch).
+Bump 1.10.2 → 1.10.3 (PATCH — perf batch).
 
-## v1.10.2 â 2026-05-09 (Phase v1.10.1 a11y batch â Items 42, 43, 44)
+## v1.10.2 — 2026-05-09 (Phase v1.10.1 a11y batch — Items 42, 43, 44)
 
 Accessibility-sweep agent failed earlier (Anthropic rate limit). Foreground helper completed Items 42-44.
 
-### Item 42 â Color contrast WCAG AA fail
+### Item 42 — Color contrast WCAG AA fail
 `#6b7280` on dark background measured 2.96:1 (WCAG AA requires 4.5:1).
-Replaced with `#94a3b8` (4.6:1 â passes AA).
+Replaced with `#94a3b8` (4.6:1 — passes AA).
 - **327 occurrences** replaced across **39 files**.
 - styles.css + styles-index.css re-minified.
 
-### Item 43 â Tables without `<th scope=>` 
+### Item 43 — Tables without `<th scope=>` 
 Screen readers couldn't associate column headers with data cells on 75 files.
 - **2421 `<th>` elements** patched with `scope="col"` across **74 files**.
-- Idempotent â `<th>` elements that already had `scope=` were skipped.
+- Idempotent — `<th>` elements that already had `scope=` were skipped.
 
-### Item 44 â Skip-link sweep
+### Item 44 — Skip-link sweep
 49 pages had no skip-link to bypass nav for keyboard/screen-reader users.
 - **42 pages** got `<a href="#main-content" class="skip-link">Skip to main content</a>` injected after `<body>`.
 - **15 pages** that had skip-link but missing target got `<a id="main-content" tabindex="-1">` anchor injected after `</nav>` (or after the skip-link itself if no nav).
-- Total skip-link-equipped pages: **49 â 91** (+42).
+- Total skip-link-equipped pages: **49 → 91** (+42).
 - 11 noindex pages correctly skipped, 5 fragments without `<body>` skipped.
 - 0 pages now have broken skip-link targets.
 
@@ -7543,133 +7546,133 @@ Screen readers couldn't associate column headers with data cells on 75 files.
 - audit-mobile-responsive --strict (threshold 7): 103 pass, 0 fail
 - Re-minified CSS via cleancss
 
-Bump 1.10.1 â 1.10.2 (PATCH â accessibility batch).
+Bump 1.10.1 → 1.10.2 (PATCH — accessibility batch).
 
-## v1.10.1 â 2026-05-09 (Portrait Scenes 5+6+7 density + hamburger inline-style fallback)
+## v1.10.1 — 2026-05-09 (Portrait Scenes 5+6+7 density + hamburger inline-style fallback)
 
-User screenshot: tiny "white dot" on capex-calculator mobile navbar that zooms when tapped. Confirms the hamburger button was rendering with no styling on calc pages â the spans inside collapsed to 0Ã0 dots.
+User screenshot: tiny "white dot" on capex-calculator mobile navbar that zooms when tapped. Confirms the hamburger button was rendering with no styling on calc pages — the spans inside collapsed to 0×0 dots.
 
 ### Hamburger inline-style fallback (calc page fix)
 
 `js/rz-mobile-nav.js` now applies INLINE STYLES on the injected hamburger button as a defensive fallback. Inline styles win over any CSS specificity collision on calc pages (which have their own navbar styling that may not include `.rz-nav-burger` rules).
 
 Forced on every injected burger:
-- 44Ã44 px button with 1 px mint border + 8 px border-radius
-- 3 spans @ 20Ã2 px each, displayed as block flex children
+- 44×44 px button with 1 px mint border + 8 px border-radius
+- 3 spans @ 20×2 px each, displayed as block flex children
 - All `!important` to win cascade
 - `position: relative; z-index: 1001` so it sits above other nav items
 
 This means the hamburger renders correctly on calc pages even if the page's CSS doesn't load `.rz-nav-burger` rules from styles.css.
 
-### Portrait video 2nd render â Scenes 5 + 6 + 7 all densified
+### Portrait video 2nd render — Scenes 5 + 6 + 7 all densified
 
 This render picks up ALL the v6 source patches:
-- **Scene 5** (Virtual Standards Labs): per-lab descriptions + 4 live audit metrics cards + 12-month compliance bar chart + 5 standards-body logos row. Vertical fill: 30% â 85%.
-- **Scene 6** (DC AI vs Conventional): added stats sidebars filling the empty left â on each half (AI/HPC metrics top, Conventional metrics bottom) + architectural delta callout at the bottom (25Ã density, 0.35 PUE delta, 38% energy savings).
-- **Scene 7** (Markets/Grid): added "Global Footprint" panel filling the 680 px empty middle â capacity utilization donut (Used 47% / Available 38% / Reserved 15%, total 2.4 GW) + 5Ã5 latency matrix (SG / TYO / LON / NV / DXB intercity ms) with color-coded heatmap.
+- **Scene 5** (Virtual Standards Labs): per-lab descriptions + 4 live audit metrics cards + 12-month compliance bar chart + 5 standards-body logos row. Vertical fill: 30% → 85%.
+- **Scene 6** (DC AI vs Conventional): added stats sidebars filling the empty left ⅔ on each half (AI/HPC metrics top, Conventional metrics bottom) + architectural delta callout at the bottom (25× density, 0.35 PUE delta, 38% energy savings).
+- **Scene 7** (Markets/Grid): added "Global Footprint" panel filling the 680 px empty middle — capacity utilization donut (Used 47% / Available 38% / Reserved 15%, total 2.4 GW) + 5×5 latency matrix (SG / TYO / LON / NV / DXB intercity ms) with color-coded heatmap.
 
-Output: 12.5 MB portrait MP4, 90s, 1080Ã1920.
+Output: 12.5 MB portrait MP4, 90s, 1080×1920.
 
 Cache-bust: `js/rz-mobile-nav.js?v=2026-05-09d`.
 
-Bump 1.10.0 â 1.10.1 (PATCH â visual regression fix + portrait completion).
+Bump 1.10.0 → 1.10.1 (PATCH — visual regression fix + portrait completion).
 
-## v1.10.0 â 2026-05-09 (Remotion v6 portrait â Scene 5 density rebuild)
+## v1.10.0 — 2026-05-09 (Remotion v6 portrait — Scene 5 density rebuild)
 
 User: "Remotion video masih nggak ada perubahan as per my comment. Maaih banyak space kosong saat portrait" (3rd time complaining about empty space).
 
-### Scene 5 (Virtual Standards Labs) â densified
+### Scene 5 (Virtual Standards Labs) — densified
 Added to fill empty middle (was ~50% empty):
-- **Per-lab descriptions** under each hex (1-2 lines): "Connectivity readiness Â· 80 audit items", "ASHRAE TC9.9 W3-W5 envelopes Â· 64 checks", "ISO/IEC 30134 metrics Â· KPI tracking", "NFPA 75/76 compliance Â· 42 risk vectors", "PUE/CUE/WUE simulation Â· multi-region", "Tier I-IV alignment Â· 99.671%-99.995%"
-- **Live audit metrics row** (4 large cards): 127 audits performed Â· 94% pass rate Â· 18 standards covered Â· 5 active labs
+- **Per-lab descriptions** under each hex (1-2 lines): "Connectivity readiness · 80 audit items", "ASHRAE TC9.9 W3-W5 envelopes · 64 checks", "ISO/IEC 30134 metrics · KPI tracking", "NFPA 75/76 compliance · 42 risk vectors", "PUE/CUE/WUE simulation · multi-region", "Tier I-IV alignment · 99.671%-99.995%"
+- **Live audit metrics row** (4 large cards): 127 audits performed · 94% pass rate · 18 standards covered · 5 active labs
 - **12-month compliance trend** mini-chart: 5 horizontal bars (ANSI/TIA, ASHRAE, ISO, NFPA, UPTIME) with animated draw-in showing audit pass rates 89%-98%
 - **Standards body logos row**: 5 pulsing badges (ANSI, ASHRAE, ISO, NFPA, UPTIME) at bottom
 
-Vertical fill: ~30% â ~85%.
+Vertical fill: ~30% → ~85%.
 
 ### Audio mux fix
 `-shortest` was truncating 90s video to 60s (audio length). Replaced with `apad,atrim=duration=90` filter complex so audio pads to 90s with silence and full video length is preserved.
 
 ### Pending in v1.10.1 (next render)
-- **Scene 6** (DC AI vs Conventional): left â empty fill â add stats sidebars + architectural delta callout
-- **Scene 7** (Markets/Grid): empty middle fill â add capacity utilization donut + 5Ã5 latency matrix
+- **Scene 6** (DC AI vs Conventional): left ⅔ empty fill — add stats sidebars + architectural delta callout
+- **Scene 7** (Markets/Grid): empty middle fill — add capacity utilization donut + 5×5 latency matrix
 
 These edits already in source (`my-video/src/compositions/ResistanceZeroIntroPortrait.tsx`); 2nd render already triggered in background.
 
-Bump 1.9.3 â 1.10.0 (MINOR â Remotion content rebuild).
+Bump 1.9.3 → 1.10.0 (MINOR — Remotion content rebuild).
 
-## v1.9.3 â 2026-05-09 (Phase 2 SEO sweep â items 21-29 from MASTER-AUDIT-REPORT)
+## v1.9.3 — 2026-05-09 (Phase 2 SEO sweep — items 21-29 from MASTER-AUDIT-REPORT)
 
 Background SEO agent stalled mid-batch; foreground helper finished items 27-29. Total ~24 modified files + helper script.
 
-### Item 21 â Title + meta-description trim (24 pages)
+### Item 21 — Title + meta-description trim (24 pages)
 Trimmed titles to 30-60 chars + descriptions to 120-160 chars across:
 geopolitics-3, article-18/21-27, FF-1/2/3, cx-calculator, datacenter-solutions, compare-pue-vs-dcie, carbon-footprint, achievements, datahallAI.
 
-### Item 22 â `glossary.html` JSON-LD `@type` fix
+### Item 22 — `glossary.html` JSON-LD `@type` fix
 Empty `@type` was rejecting validators. Set to appropriate Schema.org type for a glossary.
 
-### Item 23 â Added Article + WebApplication JSON-LD
+### Item 23 — Added Article + WebApplication JSON-LD
 - `datahallAI.html` had ZERO JSON-LD. Now has WebApplication schema with author + sameAs.
 - `ltc-system-modelling-lab.html`: pending (deferred to v1.9.4).
 
-### Item 24 â Broken cross-link
+### Item 24 — Broken cross-link
 `pln-java-grid-jatim.html`: 3 references to non-existent `pln-java-grid-jateng-diy.html` corrected to `pln-java-grid-jateng.html`.
 
-### Item 26 â Sitemap dedup
+### Item 26 — Sitemap dedup
 Updated `tools/build-sitemap.py` noindex skip logic. Regenerated `sitemap.xml`. `changelog.html` (noindex) + `404.html` no longer in sitemap.
 
-### Item 27 â hreflang x-default
+### Item 27 — hreflang x-default
 Already done by agent before stalling. 7 articles + datahallAI all have `hreflang="x-default"` paired with `hreflang="en"`.
 
-### Item 28 â robots.txt â 5 new bot allows + bogus sitemap removed
-Added explicit `Allow: /` blocks for: Applebot, FacebookBot, LinkedInBot, DuckDuckBot, CCBot. Total User-agent blocks: 12 â 17.
-Removed `Sitemap: https://resistancezero.com/llms-full.txt` directive â `llms-full.txt` is content not a sitemap; Google Search Console rejects non-XML sitemaps.
+### Item 28 — robots.txt — 5 new bot allows + bogus sitemap removed
+Added explicit `Allow: /` blocks for: Applebot, FacebookBot, LinkedInBot, DuckDuckBot, CCBot. Total User-agent blocks: 12 → 17.
+Removed `Sitemap: https://resistancezero.com/llms-full.txt` directive — `llms-full.txt` is content not a sitemap; Google Search Console rejects non-XML sitemaps.
 
-### Item 29 â `ai-content-declaration` sweep
-Tagged page count: **45 â 89** (+44). Helper walked all main HTML pages, skipped noindex (13) + pages with no description meta (6) + already-tagged (48), patched 55 new pages.
+### Item 29 — `ai-content-declaration` sweep
+Tagged page count: **45 → 89** (+44). Helper walked all main HTML pages, skipped noindex (13) + pages with no description meta (6) + already-tagged (48), patched 55 new pages.
 
 ### Items deferred to v1.9.4
-- **Item 25** (3 orphan pillar pages + achievements) â needs careful inbound-link planning
-- **Item 30** (35 pages still using profile-photo as og:image) â extend `tools/build-og-images.py` TARGETS for ~70 articles + compares + pillars
+- **Item 25** (3 orphan pillar pages + achievements) — needs careful inbound-link planning
+- **Item 30** (35 pages still using profile-photo as og:image) — extend `tools/build-og-images.py` TARGETS for ~70 articles + compares + pillars
 
-Bump 1.9.2 â 1.9.3 (PATCH â Phase 2 SEO).
+Bump 1.9.2 → 1.9.3 (PATCH — Phase 2 SEO).
 
-## v1.9.2 â 2026-05-09 (Phase 1 broken-functionality fixes â items 9-20)
+## v1.9.2 — 2026-05-09 (Phase 1 broken-functionality fixes — items 9-20)
 
-**Item 9+10 â `subscribeNewsletter()` unified to mailto: pattern**
+**Item 9+10 — `subscribeNewsletter()` unified to mailto: pattern**
 - Added global `window.subscribeNewsletter()` to `script.js`: validates email, opens `mailto:bagusdpermana7@gmail.com` with pre-filled subject + body, shows inline confirmation message. No localStorage, no fake save.
 - Removed 18 per-page inline stubs (article-1 through article-17, FF-1/2/3, geopolitics-1/2/3) that used localStorage-only fake sign-up.
 - Articles 3, 9, 10, 14, 15, 19 (which had the form but no function) now work via the global.
 
-**Item 11 â `exportToPDF()` stub removed from article-10.html**
+**Item 11 — `exportToPDF()` stub removed from article-10.html**
 - Removed "Download PDF" button (was calling a stub that showed an `alert()` placeholder).
 - "Print Article" button (`window.print()`) remains as the working alternative.
 - Stub function definition also removed.
 
-**Item 12 â FF-1/2/3 modal close buttons (FALSE POSITIVE)**
+**Item 12 — FF-1/2/3 modal close buttons (FALSE POSITIVE)**
 - All three close buttons (`#hfxLoginClose`, `#tgsLoginClose`, `#iecLoginClose`) already have `addEventListener('click', ...)` wired correctly inside their IIFE. No change needed.
 
-**Item 17 â article-12.html duplicate IDs (FALSE POSITIVE)**
-- `opmRegion` and `opmTier` appear only once in the DOM (line 2364, 2377). The second occurrences are inside JS comments: `// ââ Region data (must match <select id="opmRegion">...)`. No duplicate IDs exist.
+**Item 17 — article-12.html duplicate IDs (FALSE POSITIVE)**
+- `opmRegion` and `opmTier` appear only once in the DOM (line 2364, 2377). The second occurrences are inside JS comments: `// ── Region data (must match <select id="opmRegion">...)`. No duplicate IDs exist.
 
-**Item 18 â Skip-link targets added**
+**Item 18 — Skip-link targets added**
 - `404.html`: Added `id="main-content"` to `<div class="scene">` (the first post-nav content element).
 - `datacenter-solutions.html`: Added `id="main-content"` to `<main class="main-content">`.
 
-**Item 19 â `_rzAuth` null guards (ALREADY FIXED)**
+**Item 19 — `_rzAuth` null guards (ALREADY FIXED)**
 - `dashboard.html`, `dc-conventional.html`, `dc-market-tracker.html`, `datahallAI.html`, `datacenter-solutions.html`: all `_rzAuth.*` calls already wrapped in `if (window._rzAuth && typeof window._rzAuth.X === 'function')` guards from a prior session. No change needed.
 
-**Item 20 â `alert()` â `showToast()` across 35 files**
+**Item 20 — `alert()` → `showToast()` across 35 files**
 - Added `window.showToast()` utility to `script.js`: non-blocking bottom toast, 3s auto-dismiss, dark glass style.
 - Replaced all `alert(msg)` calls with `(window.showToast||alert)(msg)` across 35 HTML files (~55 occurrences). Fallback to native `alert` for pages that don't load `script.js` (e.g. ltc-system-modelling-lab.html, calc pages).
 - `prompt()` and `confirm()` deferred to v1.9.1+ (need richer modal UI).
 
-## v1.9.0 â 2026-05-09 (Plan v15 audit aggregate + Remotion v5 + Phase 1 critical security)
+## v1.9.0 — 2026-05-09 (Plan v15 audit aggregate + Remotion v5 + Phase 1 critical security)
 
 User: "Continue, audit total feature, cari celah error, bug terkait functionality atau area improvement. High and medium impact at least 500 item".
 
-### 6-agent comprehensive audit â 759 items found (target 500)
+### 6-agent comprehensive audit — 759 items found (target 500)
 - **Agent A (functionality)**: 157 items
 - **Agent B (a11y)**: 119 items
 - **Agent C (performance)**: 124 items
@@ -7677,32 +7680,32 @@ User: "Continue, audit total feature, cari celah error, bug terkait functionalit
 - **Agent E (mobile/consistency/security)**: 155 items
 - **Agent F (tech debt)**: 93 items
 - All 6 reports + master aggregation in `audit-reports/`.
-- Top 50 fix candidates documented in `MASTER-AUDIT-REPORT.md` with phase roadmap (v1.9.0 â v2.0.0).
+- Top 50 fix candidates documented in `MASTER-AUDIT-REPORT.md` with phase roadmap (v1.9.0 → v2.0.0).
 
-### Phase 1 â Critical security/privacy fixes
-- **localhost:8200 link removed** from `geopolitics.html:776` â replaced with `dc-market-tracker.html`.
-- **`target="_blank"` rel sweep**: 962 anchor tags across 96 files now have `rel="noopener noreferrer"` (was 113 unsafe â now 0).
+### Phase 1 — Critical security/privacy fixes
+- **localhost:8200 link removed** from `geopolitics.html:776` — replaced with `dc-market-tracker.html`.
+- **`target="_blank"` rel sweep**: 962 anchor tags across 96 files now have `rel="noopener noreferrer"` (was 113 unsafe — now 0).
 - **"Second Brain" broken nav link** removed from 67 pages (file path didn't exist anywhere).
-- **Underscore-em markdown emphasis disabled** in `tools/build-changelog-html.py` â was producing malformed `target="<em>blank"` because `target="_blank"` matched the underscore-em pattern. Disabled the underscore variant; `*emphasis*` still works.
+- **Underscore-em markdown emphasis disabled** in `tools/build-changelog-html.py` — was producing malformed `target="<em>blank"` because `target="_blank"` matched the underscore-em pattern. Disabled the underscore variant; `*emphasis*` still works.
 
-### Remotion v5 â fill empty space + complete DC Conventional + new VFX
+### Remotion v5 — fill empty space + complete DC Conventional + new VFX
 User: "Tidak hanya ini, hampir semua screen remotion videonya kurang optimal penggunaan spacenya banyak ruang kosong... dc conventional kosong... Enhance more vfx dan visual nya".
 
-**Scene 6 â DC AI vs Conventional**: Conventional bottom half now mirrors AI top half â full 3Ã2 rack grid with 9 thin server rows per rack, vent grilles, raised-floor scrolling stripe pattern, overhead cable tray, 2 animated CRAC units with rotating fan blades, sub-callout "Single feed Â· CRAC perimeter cooling", PUE 1.45 badge. AI top half gains liquid-cooling pipe particle flow + PUE 1.10 badge.
+**Scene 6 — DC AI vs Conventional**: Conventional bottom half now mirrors AI top half — full 3×2 rack grid with 9 thin server rows per rack, vent grilles, raised-floor scrolling stripe pattern, overhead cable tray, 2 animated CRAC units with rotating fan blades, sub-callout "Single feed · CRAC perimeter cooling", PUE 1.45 badge. AI top half gains liquid-cooling pipe particle flow + PUE 1.10 badge.
 
-**Scene 7 â Markets & Grid**: Empty middle filled with NEW "LIVE CAPACITY FLOW" animated bar chart (10 bars, sinusoidal MW values, growth arrows, per-market colors) + running stats line "Global capacity: 2.4 GW Â· YoY growth: 18% Â· Avg PUE: 1.32". PLN chain compacted.
+**Scene 7 — Markets & Grid**: Empty middle filled with NEW "LIVE CAPACITY FLOW" animated bar chart (10 bars, sinusoidal MW values, growth arrows, per-market colors) + running stats line "Global capacity: 2.4 GW · YoY growth: 18% · Avg PUE: 1.32". PLN chain compacted.
 
-**Scene 8 â DCMOC + Finance**: Major compaction â KPI gap tightened, ROI gauge moved up (top:680â390), gauge radius 110â80. NEW NPV/IRR/Payback row ("$42.3M NPV Â· 22.7% IRR Â· 4.3 yrs"). NEW monthly OPEX trend mini line chart (12 months, gradient area). NEW live operations alert feed (3 rows with rotating active highlight).
+**Scene 8 — DCMOC + Finance**: Major compaction — KPI gap tightened, ROI gauge moved up (top:680→390), gauge radius 110→80. NEW NPV/IRR/Payback row ("$42.3M NPV · 22.7% IRR · 4.3 yrs"). NEW monthly OPEX trend mini line chart (12 months, gradient area). NEW live operations alert feed (3 rows with rotating active highlight).
 
 **New VFX layers**:
-- `GlitchTransition` `variant="vhs"` â 30-frame extended glitch with stronger chromatic aberration (18px), 3 VHS horizontal distortion bands (yellow/teal/magenta), tracking noise bar, stronger CRT scanlines, corner vignette intensification. Applied at major scene boundaries (frames 1558, 1888, 2218).
-- `AmbientParticles` â seeded deterministic upward-drifting particle dots with sinusoidal drift + fade. Added on scenes 6/7/8.
+- `GlitchTransition` `variant="vhs"` — 30-frame extended glitch with stronger chromatic aberration (18px), 3 VHS horizontal distortion bands (yellow/teal/magenta), tracking noise bar, stronger CRT scanlines, corner vignette intensification. Applied at major scene boundaries (frames 1558, 1888, 2218).
+- `AmbientParticles` — seeded deterministic upward-drifting particle dots with sinusoidal drift + fade. Added on scenes 6/7/8.
 
-**Output**: `assets/resistancezero-intro.mp4` 16 MB landscape Â· `assets/resistancezero-intro-portrait.mp4` 14 MB portrait. Both <18 MB cap.
+**Output**: `assets/resistancezero-intro.mp4` 16 MB landscape · `assets/resistancezero-intro-portrait.mp4` 14 MB portrait. Both <18 MB cap.
 
-Bump 1.8.5 â 1.9.0 (MINOR â major content additions to video, audit aggregate, security batch).
+Bump 1.8.5 → 1.9.0 (MINOR — major content additions to video, audit aggregate, security batch).
 
-## v1.8.5 â 2026-05-09 (Hamburger fixÂ² â duplicate suppression + drawer scroll + universal navbar detection)
+## v1.8.5 — 2026-05-09 (Hamburger fix² — duplicate suppression + drawer scroll + universal navbar detection)
 
 User screenshots showed v1.8.4 regressions:
 1. **index.html** had TWO hamburger buttons (existing `<button class="hamburger">` at line 344 + my new `.rz-nav-burger`).
@@ -7712,8 +7715,8 @@ User screenshots showed v1.8.4 regressions:
 
 ### Fixes
 
-**`js/rz-mobile-nav.js` â comprehensive rewrite**:
-- **Detect existing hamburger** before injecting: `.hamburger`, `.menu-toggle`, `[data-nav-toggle]`, `.nav-toggle`, `.mobile-menu-btn`, `button.menuButton` â if found, WIRE UP that button instead of double-injecting.
+**`js/rz-mobile-nav.js` — comprehensive rewrite**:
+- **Detect existing hamburger** before injecting: `.hamburger`, `.menu-toggle`, `[data-nav-toggle]`, `.nav-toggle`, `.mobile-menu-btn`, `button.menuButton` — if found, WIRE UP that button instead of double-injecting.
 - Mark wired buttons with `.rz-nav-burger-bound` class so CSS knows.
 - Expanded navbar selector: `nav.navbar, header.navbar, .navbar, nav.cx-nav, nav.rfs-navbar, header > nav, body > nav:first-of-type`.
 - Outside-click handler: properly closes drawer when clicking outside menu+navbar, but ignores burger clicks.
@@ -7721,22 +7724,22 @@ User screenshots showed v1.8.4 regressions:
 - Older Safari fallback: `mq.addListener` if `addEventListener` unavailable.
 - Cache-bust bumped: `?v=2026-05-09b`.
 
-**CSS (both stylesheets â 2-stylesheet rule)**:
-- `body .hamburger:not(.rz-nav-burger-bound):not(.rz-nav-burger) { display: none; }` â orphan hamburgers hidden.
-- `body.rz-nav-open .nav-menu` gets `max-height: calc(100dvh - 56px); -webkit-overflow-scrolling: touch; overscroll-behavior: contain;` â proper scroll on iOS.
+**CSS (both stylesheets — 2-stylesheet rule)**:
+- `body .hamburger:not(.rz-nav-burger-bound):not(.rz-nav-burger) { display: none; }` — orphan hamburgers hidden.
+- `body.rz-nav-open .nav-menu` gets `max-height: calc(100dvh - 56px); -webkit-overflow-scrolling: touch; overscroll-behavior: contain;` — proper scroll on iOS.
 - `100dvh` for modern mobile browsers (handles floating address bar).
-- z-index stacking: burger 1002, navbar 1003 when open â burger stays clickable above backdrop.
+- z-index stacking: burger 1002, navbar 1003 when open — burger stays clickable above backdrop.
 - Smooth scrollbar styling inside drawer.
 
 **Cache-bust** on `js/rz-mobile-nav.js?v=2026-05-09b` across 101 pages.
 
-Bump 1.8.4 â 1.8.5 (PATCH â critical UX fix).
+Bump 1.8.4 → 1.8.5 (PATCH — critical UX fix).
 
-## v1.8.4 â 2026-05-09 (CRITICAL FIX: mobile hamburger nav menu)
+## v1.8.4 — 2026-05-09 (CRITICAL FIX: mobile hamburger nav menu)
 
 User: "Critical bug, menu tidak keluar saat di klik button menu yg hamburger button in mobile view. Please audit properly, fix comprehensive".
 
-**Root cause**: v1.8.0 mobile responsive sweep added `.nav-menu, .nav-links { display: none; }` on `â¤768px` to all 116 pages â but DID NOT add a hamburger toggle button. Mobile users had ZERO way to access the navigation menu after the v1.8.0 ship.
+**Root cause**: v1.8.0 mobile responsive sweep added `.nav-menu, .nav-links { display: none; }` on `≤768px` to all 116 pages — but DID NOT add a hamburger toggle button. Mobile users had ZERO way to access the navigation menu after the v1.8.0 ship.
 
 ### Fix
 
@@ -7747,8 +7750,8 @@ User: "Critical bug, menu tidak keluar saat di klik button menu yg hamburger but
 - Locks body scroll while menu is open
 - Hamburger animates to X on open
 
-**CSS in BOTH stylesheets** (per CLAUDE.md 2-stylesheet rule â `styles.css` AND `styles-index.css`):
-- `.rz-nav-burger` button styling (44Ã44 mint-on-hover, 3-line icon â X morph)
+**CSS in BOTH stylesheets** (per CLAUDE.md 2-stylesheet rule — `styles.css` AND `styles-index.css`):
+- `.rz-nav-burger` button styling (44×44 mint-on-hover, 3-line icon → X morph)
 - `body.rz-nav-open .nav-menu/.nav-links` full-screen drawer override (`position:fixed; top:56px; bottom:0; flex-direction:column; backdrop-filter:blur(14px)`)
 - Backdrop overlay via `body.rz-nav-open::before`
 - Slide-in animation, `prefers-reduced-motion` honoured
@@ -7762,96 +7765,96 @@ User: "Critical bug, menu tidak keluar saat di klik button menu yg hamburger but
 
 Added "Mobile menu MUST have hamburger toggle" rule to prevent this regression class.
 
-Bump 1.8.3 â 1.8.4 (PATCH â critical UX fix).
+Bump 1.8.3 → 1.8.4 (PATCH — critical UX fix).
 
-## v1.8.3 â 2026-05-09 (CLAUDE.md project instructions + service worker v8)
+## v1.8.3 — 2026-05-09 (CLAUDE.md project instructions + service worker v8)
 
 User: "All lesson learnt utk diupdate juga di claude.md agar tidak ulangi kesalahan yg sama atau serupa".
 
-### NEW: `/CLAUDE.md` â comprehensive project instruction file
+### NEW: `/CLAUDE.md` — comprehensive project instruction file
 Every lesson learned in today's 33-commit session codified in one place so future Claude sessions don't repeat the same mistakes:
 
-- **CRITICAL: 2-stylesheet architecture** â `index.html` loads `styles-index.css` only, NOT `styles.css`. 3 separate session regressions (v1.4.1 share-buttons, v1.6.3 video-modal close, others) caused by editing styles.css when index.html needed the rule.
-- **CRITICAL: `</script>` in JS strings** â must escape as `<\/script>`. Audit gate: `tools/audit-script-tags.py --strict`.
-- **Dark-mode class-name discipline** â never trust pattern-matching across pages. v1.2.2 (.brief-card un-prefixed missed), v1.2.3 (.model-card opex-only missed), v1.4.1 (.input-field vs .opex-input class-mismatch on 5 pages).
-- **Mobile responsive 8-checkpoint standard** â every page must score â¥7/10.
+- **CRITICAL: 2-stylesheet architecture** — `index.html` loads `styles-index.css` only, NOT `styles.css`. 3 separate session regressions (v1.4.1 share-buttons, v1.6.3 video-modal close, others) caused by editing styles.css when index.html needed the rule.
+- **CRITICAL: `</script>` in JS strings** — must escape as `<\/script>`. Audit gate: `tools/audit-script-tags.py --strict`.
+- **Dark-mode class-name discipline** — never trust pattern-matching across pages. v1.2.2 (.brief-card un-prefixed missed), v1.2.3 (.model-card opex-only missed), v1.4.1 (.input-field vs .opex-input class-mismatch on 5 pages).
+- **Mobile responsive 8-checkpoint standard** — every page must score ≥7/10.
 - **Rejected patterns DO NOT REINTRODUCE**: dot-grid hero, rotated side cards, default purple user pill, cursor-tracking effects, visible GitHub URL, saturated emerald bento.
 - **Canonical patterns**: aurora mesh, Pixel Rise scroll cue, pastel bento palette, card shine sweep, marquee strip, OG card fallback.
 - **Required process discipline**: TaskCreate, minimal surgical changes, verify-before-claim, think-comprehensively, always-log-comments, always-update-standardization.
 - **Tooling + standardisation reference table**.
 
-### Service worker bumped: v1 â v8
-- Cache name `rz-cache-v1` â `rz-cache-v8` invalidates ALL stale caches on next visit.
+### Service worker bumped: v1 → v8
+- Cache name `rz-cache-v1` → `rz-cache-v8` invalidates ALL stale caches on next visit.
 - Pre-cache extended: tools.html, changelog.html, llms.txt, humans.txt, sitemap.xml, robots.txt, key OG images, styles-index.min.css.
-- Network timeout: 2s before falling back to cache (was none â slow connections hung).
+- Network timeout: 2s before falling back to cache (was none — slow connections hung).
 - MP4 video files explicitly skipped from caching (too large).
 - Branded offline page (mint gradient + dark slate, matches v1.4.0 aesthetic) replaces the plain offline.
 
-## v1.8.2 â 2026-05-09 (Plan v15 Track A complete â 100% responsive coverage)
+## v1.8.2 — 2026-05-09 (Plan v15 Track A complete — 100% responsive coverage)
 
 - **34 article pages** + **9 lab pages** + `future-forward.html` + `changelog.html` patched. Articles agent + virtual-labs agent stalled, so foreground helper script applied the same canonical patches.
-- **`tools/build-changelog-html.py` extended** with embedded mobile patch â every regen of `changelog.html` ships the responsive block.
+- **`tools/build-changelog-html.py` extended** with embedded mobile patch — every regen of `changelog.html` ships the responsive block.
 - **Audit pass count: 103 / 0 fail**. All 103 indexable pages now meet the 8-checkpoint responsive standard (threshold 7/10).
 - **Total Plan v15 Track A coverage**: 7 calc + 6 landing + 34 article + 9 lab + 18 utility + 35 sweep + 2 final-cleanup = **111 mobile patches applied** across the site.
 - IndexNow ping fired for v1.8.x: 62 URLs submitted to Bing/Yandex/Seznam.
 
-## v1.8.1 â 2026-05-09 (Remotion v4 posters synced + Plan v15 Track B confirmed shipped)
+## v1.8.1 — 2026-05-09 (Remotion v4 posters synced + Plan v15 Track B confirmed shipped)
 
 - **Remotion v4** (90 s, 9 scenes, deeper VFX) confirmed shipped in v1.8.0 commit:
-  - `assets/resistancezero-intro.mp4` 13 MB / 10.6 â 13 MB landscape, 1920Ã1080
-  - `assets/resistancezero-intro-portrait.mp4` 11 MB portrait, 1080Ã1920
-  - 9 scenes: Electricity Awakens Â· DC Awakens Â· SLD Â· Calculators Â· **Virtual Labs** (NEW: 6 LTC standards labs in honeycomb) Â· **DC AI vs Conventional** (NEW: split-screen comparison) Â· **Market & Grid Monitors** (NEW: world map dots + PLN SLD) Â· **DCMOC + Finance** (NEW: 6-KPI dashboard + ROI gauge + 10-yr TCO chart) Â· Knowledge Graph + Finale
+  - `assets/resistancezero-intro.mp4` 13 MB / 10.6 → 13 MB landscape, 1920×1080
+  - `assets/resistancezero-intro-portrait.mp4` 11 MB portrait, 1080×1920
+  - 9 scenes: Electricity Awakens · DC Awakens · SLD · Calculators · **Virtual Labs** (NEW: 6 LTC standards labs in honeycomb) · **DC AI vs Conventional** (NEW: split-screen comparison) · **Market & Grid Monitors** (NEW: world map dots + PLN SLD) · **DCMOC + Finance** (NEW: 6-KPI dashboard + ROI gauge + 10-yr TCO chart) · Knowledge Graph + Finale
   - 4 new VFX components: `glitch-transition.tsx` (RGB aberration + scan-line at 8 scene boundaries), `holographic-grid.tsx` (animated hex overlay), `kinetic-text.tsx` (spring-powered slide-in), `lens-distortion.tsx` (pincushion warp on finale)
 - **Posters synced**: agent generated `intro-poster-landscape.webp` + `intro-poster-portrait.webp` with new naming; renamed to canonical `resistancezero-intro-poster.webp` + `resistancezero-intro-portrait-poster.webp` so `index.html` modal works without further edits.
 
-## v1.8.0 â 2026-05-09 (Plan v15 Track A â mobile responsive sweep, partial)
+## v1.8.0 — 2026-05-09 (Plan v15 Track A — mobile responsive sweep, partial)
 
 User: "Perbaiki responsiveness semua page ini contoh saat mobile, imagenya kekiri nggak auto adjust agar center page atau fill. Begitu juga card di bawah atau navbar footer itu. Dan navbar atas jadi tidak ada hilang semua... Audit semua page literally semua page. Deploy more agent to paralel audit total."
 
 Mobile responsive patches applied across **60 pages** in this commit (3 of 7 parallel agents have landed; remaining 4 ship in v1.8.1+):
 
-### Agent 1 â Calc pages (7)
-pue/capex/opex/roi/tco/cx/carbon-footprint â patched with `/* v1.8.0 â mobile responsive patch */`. Each gains: body overflow-x guard, image responsive default, navbar mobile collapse, footer 3-col â single-col, KPI grid 2-col phone / 1-col tiny phone, breakdown-table horizontal scroll, mode-bar wrap, button stacking, tap targets â¥44px.
+### Agent 1 — Calc pages (7)
+pue/capex/opex/roi/tco/cx/carbon-footprint — patched with `/* v1.8.0 — mobile responsive patch */`. Each gains: body overflow-x guard, image responsive default, navbar mobile collapse, footer 3-col → single-col, KPI grid 2-col phone / 1-col tiny phone, breakdown-table horizontal scroll, mode-bar wrap, button stacking, tap targets ≥44px.
 
-### Agent 5 â Utility/tool pages (18)
+### Agent 5 — Utility/tool pages (18)
 tia-942-checklist + tier-advisor + rfs-readiness-workbench + dc-market-tracker + 5 PLN Java grid pages + 5 system pages (water/fire/fuel/ict/chiller-plant) + EPMS_Telemetry + 404 + terms + privacy. Includes Leaflet map `60vh` mobile cap, SVG diagram horizontal-scroll wrap, toggle-bar wrapping.
 
-### Agent 6 â Sweep (35)
+### Agent 6 — Sweep (35)
 9 compare-* pages + 5 pillar-* + 3 infographic-* + insights + achievements + asean-dc-report + datahall + pln-java-grid-historical + 11 dc-market/* city pages. Compare grid stacking, pillar/infographic collapse, market-stat tiles, table scroll.
 
 ### Tooling + standardisation
-- **NEW** `tools/audit-mobile-responsive.py` â per-page 0-10 score on 8 checkpoints (viewport, @media 768px, body overflow-x, img max-width, nav collapse, footer collapse, v1.8.0 marker, tap targets). `--strict` for CI.
-- **NEW** `standarization/RESPONSIVE_STANDARD.md` â required breakpoints, 8 checkpoint patterns, common collapse patterns, pre-merge checklist.
+- **NEW** `tools/audit-mobile-responsive.py` — per-page 0-10 score on 8 checkpoints (viewport, @media 768px, body overflow-x, img max-width, nav collapse, footer collapse, v1.8.0 marker, tap targets). `--strict` for CI.
+- **NEW** `standarization/RESPONSIVE_STANDARD.md` — required breakpoints, 8 checkpoint patterns, common collapse patterns, pre-merge checklist.
 - Excludes email signatures + Google verification token from audit.
 
 ### Audit progression
-Pass count: **32 â 66** (+34) immediately after this commit. Articles + landing + virtual labs ship in v1.8.1.
+Pass count: **32 → 66** (+34) immediately after this commit. Articles + landing + virtual labs ship in v1.8.1.
 
 ### IndexNow
 Will ping after final v1.8.x lands.
 
-Bump 1.7.3 â 1.8.0 (MINOR â major new feature: full responsive mobile coverage).
+Bump 1.7.3 → 1.8.0 (MINOR — major new feature: full responsive mobile coverage).
 
-## v1.7.3 â 2026-05-09 (404 page Awwwards uplift)
+## v1.7.3 — 2026-05-09 (404 page Awwwards uplift)
 
 - **404.html re-themed** to dark-default matching v1.4.0 aesthetic. Was a light pastel design that clashed with the rest of the site.
 - **Aurora mesh body background** (mint/gold/violet radial gradients drifting on 22s loop)
-- **Gradient-shift text** on the big "404" + smaller H1 â different timing curves so they're not synced (12s + 8s)
+- **Gradient-shift text** on the big "404" + smaller H1 — different timing curves so they're not synced (12s + 8s)
 - **Mint return button** matching the index Get Started style (Motion+ feel, mint glow shadow on hover)
 - **Pill-row popular links** with backdrop-blur + mint hover
 - **Character image** now has soft mint glow halo + dark drop-shadow
-- **Subtle film grain overlay** (3% opacity, mix-blend-mode overlay) â matches sitewide pattern
+- **Subtle film grain overlay** (3% opacity, mix-blend-mode overlay) — matches sitewide pattern
 - Honours `prefers-reduced-motion`.
 
 Lost traffic now lands on a beautiful branded page with clear navigation back to popular content (Engineering Journal, DC Solutions, CAPEX Calculator, etc.).
 
-## v1.7.2 â 2026-05-09
+## v1.7.2 — 2026-05-09
 - **Nav link**: added `Tools & Calculators` to index.html Insights dropdown with mint accent + NEW badge. Changelog `NEW` badge moved to Tools (more recent ship).
 - IndexNow ping for v1.7.x: 7 URLs submitted (HTTP 200).
 
-## v1.7.1 â 2026-05-09 (public /tools.html hub page)
+## v1.7.1 — 2026-05-09 (public /tools.html hub page)
 
-- **NEW**: `/tools.html` (591 lines, 38 KB) â public hub page listing all 18 calculators + tools across 4 categories:
+- **NEW**: `/tools.html` (591 lines, 38 KB) — public hub page listing all 18 calculators + tools across 4 categories:
   - **Cost & Capacity Calculators** (7): PUE, CAPEX, OPEX, ROI, TCO, CX, Carbon Footprint
   - **Compliance & Standards Tools** (4): TIA-942 Checklist, Tier Advisor, RFS Readiness, Standards LTC Lab
   - **Market & Grid Monitors** (2): DC Market Tracker, PLN Java-Bali Grid Monitor
@@ -7859,98 +7862,98 @@ Lost traffic now lands on a beautiful branded page with clear navigation back to
 - **Design**: aurora mesh hero, gradient-shift "Tools & Calculators" H1, per-card accent color via `--tool-accent` CSS variable + shine-sweep on hover + 3-layer glow shadow.
 - **SEO**: full meta + Open Graph + Twitter Cards + `CollectionPage` JSON-LD with 18-item `ItemList` + `BreadcrumbList`.
 - **Navigation**: linked from `articles.html` Insights dropdown (between Changelog and All Insights).
-- **Sitemap regen**: 102 â 103 URLs (added tools.html).
+- **Sitemap regen**: 102 → 103 URLs (added tools.html).
 - **llms.txt regen**: 98 pages now indexable to AI search engines.
 
-## v1.7.0 â 2026-05-09 (Remotion v3 â landscape + portrait + auto-detect, plus title polish)
+## v1.7.0 — 2026-05-09 (Remotion v3 — landscape + portrait + auto-detect, plus title polish)
 
-### Remotion video v3 â orientation-aware
-- **NEW**: `assets/resistancezero-intro-portrait.mp4` â 60s 1080Ã1920 portrait composition (`ResistanceZeroIntroPortrait`). For mobile users where landscape would letterbox awkwardly.
-- **UPDATED**: `assets/resistancezero-intro.mp4` â landscape (1920Ã1080) re-rendered with deeper VFX (higher glow strength, vignette, color grading, 12â16 frame transitions, more electricity callouts in Scene 3 SLD: ANSI relays 50/51 + 87T + 25 + 27/59 + 32 + 67, transformer Z=8% impedance, ÎT=5Â°C cooling annotation).
+### Remotion video v3 — orientation-aware
+- **NEW**: `assets/resistancezero-intro-portrait.mp4` — 60s 1080×1920 portrait composition (`ResistanceZeroIntroPortrait`). For mobile users where landscape would letterbox awkwardly.
+- **UPDATED**: `assets/resistancezero-intro.mp4` — landscape (1920×1080) re-rendered with deeper VFX (higher glow strength, vignette, color grading, 12→16 frame transitions, more electricity callouts in Scene 3 SLD: ANSI relays 50/51 + 87T + 25 + 27/59 + 32 + 67, transformer Z=8% impedance, ΔT=5°C cooling annotation).
 - **NEW posters**: `resistancezero-intro-poster.webp` + `resistancezero-intro-portrait-poster.webp`.
 - **JS auto-detect**: `openIntroVideo()` now reads `window.matchMedia('(max-width: 768px) and (orientation: portrait)')` and swaps `<video src>` accordingly. Modal aspect-ratio also flips between 16:9 and 9:16.
 - **Source elements**: `<source media="...">` tags as a CSS-only fallback if JS fails.
-- File sizes: 10.6 MB landscape + 10.3 MB portrait â both within hard cap.
+- File sizes: 10.6 MB landscape + 10.3 MB portrait — both within hard cap.
 
 ### SEO title polish
-- **TIA-942 checklist**: 69 â 47 chars (was the persistent SEO title-length WARN).
-- **TCO calculator**: 64 â 53 chars (in SEO sweet spot 30-60 now).
+- **TIA-942 checklist**: 69 → 47 chars (was the persistent SEO title-length WARN).
+- **TCO calculator**: 64 → 53 chars (in SEO sweet spot 30-60 now).
 
-Bump 1.6.4 â 1.7.0 (MINOR â adds responsive video tier).
+Bump 1.6.4 → 1.7.0 (MINOR — adds responsive video tier).
 
-## v1.6.4 â 2026-05-09 (small polish: humans.txt + TIA-942 title + author links)
+## v1.6.4 — 2026-05-09 (small polish: humans.txt + TIA-942 title + author links)
 
-- **NEW**: `/humans.txt` â web-tradition file at site root listing owner / certifications / tech stack / tooling / inspirations. Linked from index, articles, datacenter-solutions, changelog via `<link rel="author" href="/humans.txt">` on those 4 pages.
-- **Fix**: `tia-942-checklist.html` title shortened from 66 â 56 chars (now in SEO sweet spot 30-60). Was the last audit-seo title-length WARN.
+- **NEW**: `/humans.txt` — web-tradition file at site root listing owner / certifications / tech stack / tooling / inspirations. Linked from index, articles, datacenter-solutions, changelog via `<link rel="author" href="/humans.txt">` on those 4 pages.
+- **Fix**: `tia-942-checklist.html` title shortened from 66 → 56 chars (now in SEO sweet spot 30-60). Was the last audit-seo title-length WARN.
 - **Polish**: `rel="author"` discoverable from search engines + curious humans inspecting source.
 
-## v1.6.3 â 2026-05-09 (video modal X close button + styles-index.css fix)
+## v1.6.3 — 2026-05-09 (video modal X close button + styles-index.css fix)
 
 User: "saat video remotionnya kasi tombol x close button" (give the video an X close button).
 
-**Root cause**: same class as the v1.4.1 share-button bug â the `.video-modal-close` CSS was in `styles.css` but `index.html` loads `styles-index.min.css`. The X close button rendered as a default browser button, easy to miss against the dark video.
+**Root cause**: same class as the v1.4.1 share-button bug — the `.video-modal-close` CSS was in `styles.css` but `index.html` loads `styles-index.min.css`. The X close button rendered as a default browser button, easy to miss against the dark video.
 
 **Fix**:
 - Copied the video-modal + overlay + close button rules into `styles-index.css`.
-- **Enhanced the close button**: 44Ã44 mint-bordered floating button positioned ABOVE the video frame (not overlapping native video controls), with backdrop blur, glow on hover, 90Â° rotate animation on hover.
-- **Tap target**: 48Ã48 on mobile (â¤560 px width).
-- **Portrait orientation modal**: when device is portrait + â¤768 px wide, modal flips to 9:16 aspect ratio (420 px max width) â sets up for the upcoming portrait Remotion video.
+- **Enhanced the close button**: 44×44 mint-bordered floating button positioned ABOVE the video frame (not overlapping native video controls), with backdrop blur, glow on hover, 90° rotate animation on hover.
+- **Tap target**: 48×48 on mobile (≤560 px width).
+- **Portrait orientation modal**: when device is portrait + ≤768 px wide, modal flips to 9:16 aspect ratio (420 px max width) — sets up for the upcoming portrait Remotion video.
 - Cache-bust: `?v=20260509-modal-fix`.
 
-## v1.6.2 â 2026-05-09 (articles.html hub Awwwards uplift)
+## v1.6.2 — 2026-05-09 (articles.html hub Awwwards uplift)
 
 - **Aurora mesh hero** on `.articles-hero` (blue/mint/violet/gold/pink radial gradients drifting)
-- **Gradient-shift H1** on "Operations Engineering Journal" (slateâblueâmintâslate sweep, 12s)
-- **Article-card dark-mode override**: was `background: #fff` (hardcoded white) â now `rgba(30,41,59,0.6)` + 1px white-mix border + 8px backdrop blur. Cards finally render properly in dark mode.
+- **Gradient-shift H1** on "Operations Engineering Journal" (slate→blue→mint→slate sweep, 12s)
+- **Article-card dark-mode override**: was `background: #fff` (hardcoded white) — now `rgba(30,41,59,0.6)` + 1px white-mix border + 8px backdrop blur. Cards finally render properly in dark mode.
 - **Article-card shine sweep on hover** + 3-layer mint-glow shadow (matches index + datacenter-solutions pattern).
 - **Philosophy-card** dark-mode override (was hardcoded white).
 - Honours `prefers-reduced-motion`.
 
-## v1.6.1 â 2026-05-09
-- **Sitemap regenerated**: 102 indexable URLs (was 101) â `/changelog.html` now included.
-- **llms.txt regenerated**: 140 lines / 97 pages â `/changelog.html` now listed for AI search engines.
+## v1.6.1 — 2026-05-09
+- **Sitemap regenerated**: 102 indexable URLs (was 101) — `/changelog.html` now included.
+- **llms.txt regenerated**: 140 lines / 97 pages — `/changelog.html` now listed for AI search engines.
 - **3-audit pass**: audit-script-tags + audit-version-stamp + audit-seo all CLEAN post v1.6.0.
 
-## v1.6.0 â 2026-05-09 (public-facing /changelog.html + ai-content-declaration sweep)
+## v1.6.0 — 2026-05-09 (public-facing /changelog.html + ai-content-declaration sweep)
 
 ### Public changelog page (Linear/Vercel pattern)
-- **NEW**: `/changelog.html` â auto-generated from `CHANGELOG.md` source. 22 release entries rendered as backdrop-blur cards with mint-pill version badges.
-- **Filter chips**: `All / MAJOR / MINOR / PATCH` at the hero â JS toggles `[data-version-tier]` visibility.
+- **NEW**: `/changelog.html` — auto-generated from `CHANGELOG.md` source. 22 release entries rendered as backdrop-blur cards with mint-pill version badges.
+- **Filter chips**: `All / MAJOR / MINOR / PATCH` at the hero — JS toggles `[data-version-tier]` visibility.
 - **Aurora mesh hero** + gradient-shift "Changelog" headline (matches v1.4.0 pattern).
 - **Current-version badge** on the latest entry (mint pill in top-right).
-- **GitHub commit hashes** auto-linked to GitHub commit URLs (e.g., `5a0235c` â live link).
+- **GitHub commit hashes** auto-linked to GitHub commit URLs (e.g., `5a0235c` → live link).
 - **Nav links added**: `index.html` + `articles.html` Insights dropdown gain a `Changelog` item.
 - **SEO meta complete**: title, description, canonical, OG card (uses `assets/og/index.webp`), Twitter, JSON-LD `WebPage` + `BreadcrumbList`, ai-content-declaration.
-- **Generator preserved** at `tools/build-changelog-html.py` â re-run on every CHANGELOG.md update.
+- **Generator preserved** at `tools/build-changelog-html.py` — re-run on every CHANGELOG.md update.
 
 ### ai-content-declaration sweep on tool pages
-Patched 6 more pages that audit-seo flagged: `tia-942-checklist.html`, `tier-advisor.html`, `water-system.html`, `fire-system.html`, `fuel-system.html`, `ict.html`. `chiller-plant.html` already had it (idempotent skip). Total tagged pages: 39 â 45.
+Patched 6 more pages that audit-seo flagged: `tia-942-checklist.html`, `tier-advisor.html`, `water-system.html`, `fire-system.html`, `fuel-system.html`, `ict.html`. `chiller-plant.html` already had it (idempotent skip). Total tagged pages: 39 → 45.
 
-Bump 1.5.3 â 1.6.0 (MINOR â adds new public-facing page + sweep).
+Bump 1.5.3 → 1.6.0 (MINOR — adds new public-facing page + sweep).
 
-## v1.5.3 â 2026-05-09 (View Transitions API + brand-mark continuity)
+## v1.5.3 — 2026-05-09 (View Transitions API + brand-mark continuity)
 
-- **Added**: View Transitions API opt-in (`@view-transition { navigation: auto; }`) â supported browsers (Chrome 126+, Safari 18+, Edge) get smooth fade+slide transitions when navigating between pages on the site. Older browsers no-op gracefully.
-- **Continuity**: declared `view-transition-name: rz-brand-mark` on `.nav-logo`, `.nav-avatar`, `.footer-logo`, `#rzVersionStamp img` so the brand mark visually persists across navigation (one of the signature 2026 web feels â Apple, Vercel, Linear all use this).
+- **Added**: View Transitions API opt-in (`@view-transition { navigation: auto; }`) — supported browsers (Chrome 126+, Safari 18+, Edge) get smooth fade+slide transitions when navigating between pages on the site. Older browsers no-op gracefully.
+- **Continuity**: declared `view-transition-name: rz-brand-mark` on `.nav-logo`, `.nav-avatar`, `.footer-logo`, `#rzVersionStamp img` so the brand mark visually persists across navigation (one of the signature 2026 web feels — Apple, Vercel, Linear all use this).
 - Honours `prefers-reduced-motion`.
 
-## v1.5.2 â 2026-05-09 (FAQ + HowTo schema for AI search ranking)
+## v1.5.2 — 2026-05-09 (FAQ + HowTo schema for AI search ranking)
 
 - **Added FAQPage schema** (`@type: FAQPage`) to 5 calculator pages: pue / capex / opex / roi / tco. Each block has 3-4 Q&A pairs covering: how the metric is calculated, typical industry ranges, country/climate sensitivity, biggest input drivers. Surfaces in Google rich-results, Google AI Overview, ChatGPT Search, Perplexity.
 - **Added HowTo schema** (`@type: HowTo`) to `tia-942-checklist.html` (5-step audit workflow). `tier-advisor.html` + `cx-calculator.html` already had HowTo blocks (idempotent skip).
-- Each calc page now signals 4 schema types: WebApplication + HowTo + BreadcrumbList + FAQPage â a rich signal stack for AI search engine ranking.
+- Each calc page now signals 4 schema types: WebApplication + HowTo + BreadcrumbList + FAQPage — a rich signal stack for AI search engine ranking.
 - 29 JSON-LD blocks across 8 files validated cleanly (no syntax errors).
 - New tool: `tools/inject-schema-faq-howto.py` (idempotent, marker-gated).
 
-## v1.5.1 â 2026-05-09 (per-page Open Graph images + IndexNow batch ping)
+## v1.5.1 — 2026-05-09 (per-page Open Graph images + IndexNow batch ping)
 
-- **Added**: 12 unique 1200Ã630 WebP Open Graph cards at `assets/og/<slug>.webp` (~52 KB each, 656 KB total). Pages: index, datacenter-solutions, articles, pue-calc, capex-calc, opex-calc, roi-calc, tco-calc, cx-calc, carbon-footprint, dc-market-tracker, pln-java-grid.
-- **Card design**: dark slate gradient bg + accent radial blob (per-page brand colour) + RZ wordmark top-left + 64px Ubuntu-Bold title + 26px subtitle + 22px JetBrains-Mono brand strip + 4% noise overlay + bottom 4px goldâemeraldâblue gradient strip.
+- **Added**: 12 unique 1200×630 WebP Open Graph cards at `assets/og/<slug>.webp` (~52 KB each, 656 KB total). Pages: index, datacenter-solutions, articles, pue-calc, capex-calc, opex-calc, roi-calc, tco-calc, cx-calc, carbon-footprint, dc-market-tracker, pln-java-grid.
+- **Card design**: dark slate gradient bg + accent radial blob (per-page brand colour) + RZ wordmark top-left + 64px Ubuntu-Bold title + 26px subtitle + 22px JetBrains-Mono brand strip + 4% noise overlay + bottom 4px gold→emerald→blue gradient strip.
 - **Patched 12 HTML pages**: replaced `og:image` + `twitter:image` to point at the new per-page WebP. Added `og:image:width=1200` + `og:image:height=630` where missing. dc-market-tracker.html gained its first-ever `twitter:image`.
-- **Tooling**: new `tools/build-og-images.py` â idempotent generator (`--apply`, `--force`, `--update-html` flags). Deterministic noise (seed=42).
+- **Tooling**: new `tools/build-og-images.py` — idempotent generator (`--apply`, `--force`, `--update-html` flags). Deterministic noise (seed=42).
 - **IndexNow ping**: 36 URLs from v1.5.0 commits submitted to Bing/Yandex/Seznam (HTTP 200). Re-crawl in minutes-to-hours.
 
-## v1.5.0 â 2026-05-09 (Awwwards uplift rolled out + global polish + article typography)
+## v1.5.0 — 2026-05-09 (Awwwards uplift rolled out + global polish + article typography)
 
 User: "keep working to make keep website improved, i need you to work autonomously".
 
@@ -7959,21 +7962,21 @@ Three parallel work streams shipped:
 ### 1. v1.4.0 uplift rolled out to `datacenter-solutions.html`
 - Aurora mesh hero (emerald/blue/amber radial gradients drifting on 22s + 28s alternating animations)
 - Film grain noise overlay (sitewide via body::before, dark mode only)
-- Gradient-shift H1 (4-stop blueâemeraldâgoldâwhite sweep)
+- Gradient-shift H1 (4-stop blue→emerald→gold→white sweep)
 - `.ds-strat-card` shine sweep on hover + 3-layer mint glow shadow (scoped to `:not(.is-soon)` so disabled cards aren't affected)
 - 24-span DC-engineering keyword marquee strip (Hyperscale / Edge Computing / AI Factory / Liquid Cooling / PUE 1.15 / Tier IV / OCP Compatible / ASHRAE TC 9.9 / TIA-942-C / 30 MW Cap / N+2 / Mission-Critical) at 60s loop with edge fade-out masks
 - Scroll-reveal IntersectionObserver applied to all 10 `.ds-strat-card` elements
 - Reduced-motion guards throughout
 
 ### 2. Article typography uplift across 34 article-class pages
-Patched `article-1.html` â¦ `article-26.html` + `article-27.html` + `FF-1`/`FF-2`/`FF-3` + `geopolitics`/`-1`/`-2`/`-3`. Skipped `article-9-paper.html` (print variant).
+Patched `article-1.html` … `article-26.html` + `article-27.html` + `FF-1`/`FF-2`/`FF-3` + `geopolitics`/`-1`/`-2`/`-3`. Skipped `article-9-paper.html` (print variant).
 
-Per page: gradient drop-cap on first paragraph (4.5rem, goldâemeraldâblue 3-stop), inline-link gradient underline (resend.com style with hover thicken), section-header `h2::before` gold-emerald accent stripe on hover, `.rz-reveal` scroll fade-up class. Helper script preserved at `tools/apply_typography_uplift.py` (idempotent; marker-gated).
+Per page: gradient drop-cap on first paragraph (4.5rem, gold→emerald→blue 3-stop), inline-link gradient underline (resend.com style with hover thicken), section-header `h2::before` gold-emerald accent stripe on hover, `.rz-reveal` scroll fade-up class. Helper script preserved at `tools/apply_typography_uplift.py` (idempotent; marker-gated).
 
 ### 3. Global polish (sitewide via styles.css)
-- `:root { color-scheme: dark light; }` â proper UA scrollbar theming
+- `:root { color-scheme: dark light; }` — proper UA scrollbar theming
 - Selection color: mint `rgba(125,221,180,0.32)` on dark, emerald-tint on light
-- Sitewide custom scrollbar â gradient mintâblue thumb on dark, emerald-tint on light, Firefox `scrollbar-color` variants
+- Sitewide custom scrollbar — gradient mint→blue thumb on dark, emerald-tint on light, Firefox `scrollbar-color` variants
 - `:focus-visible` enhanced (border-radius 4px for rounded outlines)
 
 ### 4. Search-engine verification scaffolding (index.html)
@@ -7981,53 +7984,53 @@ Per page: gradient drop-cap on first paragraph (4.5rem, goldâemeraldâb
 - IndexNow key already verified (existing `768683436...txt`)
 - RSS feed alternate link (sitemap.xml as feed source)
 
-Bump 1.4.2 â 1.5.0 (MINOR â feature-class uplift across many pages + global polish).
+Bump 1.4.2 → 1.5.0 (MINOR — feature-class uplift across many pages + global polish).
 
-## v1.4.2 â 2026-05-09
+## v1.4.2 — 2026-05-09
 - **Proactive sweep**: ran a comprehensive `regex` audit across all 7 calc pages for any class with hardcoded white/light backgrounds lacking a `[data-theme="dark"]` override. ONE remaining gap surfaced: `.scenario-card` on `opex-calculator.html` (line 947, `background: white`).
 - **Fix**: added 5 dark-mode rules covering `.scenario-card` base + `.current` active state + scenario-name / scenario-total / scenario-diff text colours. Active scenario card now shows a soft mint gradient instead of solid white.
 - **Audit clean**: all 7 calc pages now report CLEAN on the regex audit (every class with light bg has a corresponding dark override).
-- Inline `style="background:#fffbeb"` PDF-template callouts (10 in capex, 1-2 each in other pages) are intentional cream-accent info boxes used inside print-window templates â not user-visible in dark mode and correctly left alone.
+- Inline `style="background:#fffbeb"` PDF-template callouts (10 in capex, 1-2 each in other pages) are intentional cream-accent info boxes used inside print-window templates — not user-visible in dark mode and correctly left alone.
 - The capex legacy `#loginModal` (hidden `display:none`, replaced by auth.js widget) intentionally untouched.
 
-## v1.4.1 â 2026-05-09
-- **Fix**: `.input-field` selects + inputs were rendering with white backgrounds in dark mode on opex/capex/roi/pue/carbon-footprint. Root cause: class-mismatch â HTML uses `<select class="input-field">` but the dark-mode CSS targeted page-prefixed classes (`.opex-input` / `.capex-input` etc.) that don't exist in the markup. Effectively the entire input dark-mode coverage was a no-op on 5 calc pages.
+## v1.4.1 — 2026-05-09
+- **Fix**: `.input-field` selects + inputs were rendering with white backgrounds in dark mode on opex/capex/roi/pue/carbon-footprint. Root cause: class-mismatch — HTML uses `<select class="input-field">` but the dark-mode CSS targeted page-prefixed classes (`.opex-input` / `.capex-input` etc.) that don't exist in the markup. Effectively the entire input dark-mode coverage was a no-op on 5 calc pages.
 - **Pages affected**: opex / capex / roi / pue / carbon-footprint. tco + cx were already correct (they use prefixed `.tco-input-field` + `.cx-input-field` consistently in HTML + CSS).
 - **Fix scope**: added `[data-theme="dark"] .input-field` + `.country-select` + option overrides + focus state to all 5 affected pages. Fields now render with slate (#1e293b) background, light text (#f1f5f9), and emerald focus glow.
 
-## v1.4.0 â 2026-05-09 (Awwwards uplift â adopt linear.app + vercel.com + resend.com patterns)
+## v1.4.0 — 2026-05-09 (Awwwards uplift — adopt linear.app + vercel.com + resend.com patterns)
 
 User: "enhance more agar tidak terlihat default claude standard theme, tapi yg keren. Cari website yg keren di website dan adopt".
 
 Reference sites adopted:
-- **linear.app** â animated aurora mesh hero, gradient-shift display text
-- **vercel.com** â marquee logo/keyword strip with edge fade-out masks
-- **resend.com** â card shine sweep on hover, animated conic-gradient borders
+- **linear.app** — animated aurora mesh hero, gradient-shift display text
+- **vercel.com** — marquee logo/keyword strip with edge fade-out masks
+- **resend.com** — card shine sweep on hover, animated conic-gradient borders
 - All effects honour `prefers-reduced-motion`. NO cursor-tracking effects (those were previously rejected).
 
 Changes:
 - **Aurora mesh hero**: `.hero::before` + `.hero::after` carry multi-stop radial gradients (mint/gold/violet/blue/pink) drifting via 22s + 28s alternating animations. GPU-accelerated transforms only.
 - **Film grain noise overlay**: `body::before` (dark mode) carries an SVG fractal-noise texture at 3.5% opacity with `mix-blend-mode: overlay`. Adds analog/cinematic depth.
-- **Gradient-shift H1**: `.bento-name` ("Bagus Dwi Permana") now uses `background-clip:text` with a 4-stop linear-gradient (slateâmintâgoldâslate) and 12s sweep animation.
+- **Gradient-shift H1**: `.bento-name` ("Bagus Dwi Permana") now uses `background-clip:text` with a 4-stop linear-gradient (slate→mint→gold→slate) and 12s sweep animation.
 - **Card shine sweep**: `.bento-card::after` carries a diagonal light streak that translates across on hover (0.9s cubic-bezier).
 - **Card hover glow**: replaces solid border with a 3-layer shadow (mint outline + dark depth + emerald aura).
-- **Engineering keyword marquee**: new `<div class="rz-marquee">` strip below the identity row, scrolls 12 keywords (Hyperscale Operations, PUE 1.25, Tier III, N+1, SAP HV/LV, SCADAÂ·BMS, CDFOM, Ahli K3 Listrik, ISO 50001, TIA-942, 99.999%, Mission-Critical) at 60s linear loop with edge fade-out gradient masks.
-- **Scroll-reveal helper**: `.rz-reveal` class + IntersectionObserver in inline `<script>` â fade-up on 10% viewport entry. Available for retroactive application on any element.
+- **Engineering keyword marquee**: new `<div class="rz-marquee">` strip below the identity row, scrolls 12 keywords (Hyperscale Operations, PUE 1.25, Tier III, N+1, SAP HV/LV, SCADA·BMS, CDFOM, Ahli K3 Listrik, ISO 50001, TIA-942, 99.999%, Mission-Critical) at 60s linear loop with edge fade-out gradient masks.
+- **Scroll-reveal helper**: `.rz-reveal` class + IntersectionObserver in inline `<script>` — fade-up on 10% viewport entry. Available for retroactive application on any element.
 - **Cache bust**: `styles-index.min.css?v=20260509-uplift-v1.4`.
 
 Result: index.html now feels like a 2026 dev portfolio (linear/vercel/resend territory) instead of a generic dark theme.
 
-## v1.3.1 â 2026-05-09
-- **Fix**: `chiller-plant.html` â was missing canonical, all OG tags, all Twitter cards (audit-seo flagged as REQUIRED-tag errors). Added full meta-tag block + ai-content-declaration. Title bumped from 24 to 60 chars to fit SEO range.
-- **Fix**: `cx-calculator.html` â added missing `og:image` + `twitter:image` (using canonical fallback `assets/profile-photo.jpg`).
+## v1.3.1 — 2026-05-09
+- **Fix**: `chiller-plant.html` — was missing canonical, all OG tags, all Twitter cards (audit-seo flagged as REQUIRED-tag errors). Added full meta-tag block + ai-content-declaration. Title bumped from 24 to 60 chars to fit SEO range.
+- **Fix**: `cx-calculator.html` — added missing `og:image` + `twitter:image` (using canonical fallback `assets/profile-photo.jpg`).
 - **Tooling**: `tools/audit-seo.py` now correctly skips `<meta name="robots" content="noindex...">` pages (LTC labs, redirects). Strict mode no longer false-positives on intentionally-internal pages.
-- **IndexNow**: synced `.indexnow-key` store to use the existing 2026-03 verification key (`768683436ffdfcc2bb9140345660b139.txt`) â Bing already verified this key, no need to register a new one.
-- audit-seo strict mode: 0 errors, clean pages 9 â 20.
+- **IndexNow**: synced `.indexnow-key` store to use the existing 2026-03 verification key (`768683436ffdfcc2bb9140345660b139.txt`) — Bing already verified this key, no need to register a new one.
+- audit-seo strict mode: 0 errors, clean pages 9 → 20.
 
-## v1.3.0 â 2026-05-09 (Plan v14 â SEO + AI search sweep)
+## v1.3.0 — 2026-05-09 (Plan v14 — SEO + AI search sweep)
 
-- **Added**: `/llms.txt` â canonical LLM content map per llmstxt.org spec, listing all calculators / articles / tools / simulations.
-- **Added**: `/llms-full.txt` â full-content variant for one-shot LLM context (Markdown extraction of all main pages).
+- **Added**: `/llms.txt` — canonical LLM content map per llmstxt.org spec, listing all calculators / articles / tools / simulations.
+- **Added**: `/llms-full.txt` — full-content variant for one-shot LLM context (Markdown extraction of all main pages).
 - **Added**: explicit AI-bot allows in `robots.txt` for GPTBot, ClaudeBot, anthropic-ai, PerplexityBot, OAI-SearchBot, Google-Extended, cohere-ai, ChatGPT-User, Diffbot, Bingbot. Signals consent + improves crawl priority.
 - **Added**: `<meta name="ai-content-declaration" content="human-authored">` to 39 key pages (all articles + calc pages + landing pages).
 - **Added**: `BingSiteAuth.xml` placeholder + IndexNow key file (Bing/Yandex/Seznam push indexing).
@@ -8035,48 +8038,48 @@ Result: index.html now feels like a 2026 dev portfolio (linear/vercel/resend ter
 - **Added**: `tools/build-sitemap.py` (regenerates sitemap.xml from filesystem; covers all 101 indexable pages, was 100).
 - **Added**: `tools/build-llms-txt.py` + `tools/build-llms-full.py` (regenerate AI files on demand).
 - **Added**: `tools/indexnow-submit.py` (push changed URLs to Bing IndexNow API).
-- **Updated**: `sitemap.xml` regenerated via build-sitemap.py â 101 indexable URLs, normalised lastmod ISO 8601, proper priority/changefreq by page type; 11 noindex pages correctly excluded.
-- **Updated**: `standarization/SEO_OPTIMIZATION_STANDARD.md` â major new "AI Search Optimisation" section.
-- **Version**: `js/rz-version.js` bumped 1.2.3 â 1.3.0 (MINOR â adds discoverability tier).
+- **Updated**: `sitemap.xml` regenerated via build-sitemap.py — 101 indexable URLs, normalised lastmod ISO 8601, proper priority/changefreq by page type; 11 noindex pages correctly excluded.
+- **Updated**: `standarization/SEO_OPTIMIZATION_STANDARD.md` — major new "AI Search Optimisation" section.
+- **Version**: `js/rz-version.js` bumped 1.2.3 → 1.3.0 (MINOR — adds discoverability tier).
 
-## v1.2.3 â 2026-05-09
-- **Fix**: dark-mode regression on `opex-calculator.html` â staffing-model cards (`.model-card` for In-House / Hybrid Mix / 100% Outsource) had hardcoded `background: white` (line 592) with no dark override. Unselected cards rendered as bright white blocks against the dark page. Added 8 `[data-theme="dark"] .model-card*` rules covering base, hover, active, name, desc, icon states. Audited other calc pages â only opex uses the `.model-card` pattern.
+## v1.2.3 — 2026-05-09
+- **Fix**: dark-mode regression on `opex-calculator.html` — staffing-model cards (`.model-card` for In-House / Hybrid Mix / 100% Outsource) had hardcoded `background: white` (line 592) with no dark override. Unselected cards rendered as bright white blocks against the dark page. Added 8 `[data-theme="dark"] .model-card*` rules covering base, hover, active, name, desc, icon states. Audited other calc pages — only opex uses the `.model-card` pattern.
 
-## v1.2.2 â 2026-05-09
-- **Fix**: dark-mode regression on `opex-calculator.html` + `capex-calculator.html` â the `.brief-card` hero intro block (the "OPEX is what actually kills the margin..." paragraph + stats row) was rendered with a transparent gradient `rgba(16,185,129,0.04)` over a dark page, making the entire intro card invisible on dark mode. The Plan v13 dark-mode agent missed the `.brief-*` class family because tco uses prefixed `.tco-brief-*` while opex/capex use unprefixed `.brief-*`. Added 9 dark-mode rules per page covering `.brief-card`, `.brief-lead`, `.brief-body`, `.brief-stats`, `.brief-stat`, `.brief-stat-icon`, `.brief-disclaimer`, `.brief-hero-img`. The card now has a visible accent-coloured gradient + border in dark mode.
+## v1.2.2 — 2026-05-09
+- **Fix**: dark-mode regression on `opex-calculator.html` + `capex-calculator.html` — the `.brief-card` hero intro block (the "OPEX is what actually kills the margin..." paragraph + stats row) was rendered with a transparent gradient `rgba(16,185,129,0.04)` over a dark page, making the entire intro card invisible on dark mode. The Plan v13 dark-mode agent missed the `.brief-*` class family because tco uses prefixed `.tco-brief-*` while opex/capex use unprefixed `.brief-*`. Added 9 dark-mode rules per page covering `.brief-card`, `.brief-lead`, `.brief-body`, `.brief-stats`, `.brief-stat`, `.brief-stat-icon`, `.brief-disclaimer`, `.brief-hero-img`. The card now has a visible accent-coloured gradient + border in dark mode.
 
-## v1.2.1 â 2026-05-09
-- **Fix**: gridline pattern (linear-gradient 1px @ 50Ã50 px) was still present on `datacenter-solutions.html` â same noise that was killed on `index.html` in v1.1.1 had a sibling instance on the second-most-prominent landing page. Both `[data-theme="dark"] .page-background` (line 141) and base `.page-background` (line 256) now have only the soft radial washes, no grid.
+## v1.2.1 — 2026-05-09
+- **Fix**: gridline pattern (linear-gradient 1px @ 50×50 px) was still present on `datacenter-solutions.html` — same noise that was killed on `index.html` in v1.1.1 had a sibling instance on the second-most-prominent landing page. Both `[data-theme="dark"] .page-background` (line 141) and base `.page-background` (line 256) now have only the soft radial washes, no grid.
 - Cross-page audit confirms 5 major landing pages are gridline-free: `index.html`, `datacenter-solutions.html`, `articles.html`, `dc-market-tracker.html`, `future-forward.html`.
 
-## v1.2.0 â 2026-05-09 (Plan v13 â Calc dark-mode audit)
+## v1.2.0 — 2026-05-09 (Plan v13 — Calc dark-mode audit)
 
-- **Fixed**: `opex-calculator.html` â "Detailed Cost Breakdown" card (`.breakdown-table`) and "Category Comparison" chart card (`.chart-card`) showed WHITE backgrounds in dark mode. Added 35+ `[data-theme="dark"]` rules covering `.breakdown-table th/td/hover`, `.chart-card`, `.results-card`, `.results-panel`, `.input-section`, `.breakdown-card`, `.kpi-card`, `.narrative-card`, `.calc-disclaimer`, and mode-bar elements.
-- **Fixed**: `capex-calculator.html` â added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.breakdown-card`, `.breakdown-table` (th/td/hover), `.input-field`, `.calc-disclaimer`, `.kpi-card`, `.results-panel`, `.narrative-card`.
-- **Fixed**: `roi-calculator.html` â added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.input-field`, `.roi-mode-bar`, `.roi-btn-reset`, `.cashflow-table`, `.breakdown-table`, `.calc-disclaimer`, `.kpi-card`, `.pro-panel`, `.narrative-card`.
-- **Fixed**: `pue-calculator.html` â added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.input-field`, `.pue-mode-bar`, `.breakdown-table`, `.calc-disclaimer`, `.kpi-card`, `.pro-panel`, `.narrative-card`.
-- **Added**: `carbon-footprint.html` â had ZERO dark-mode rules. Added complete `[data-theme="dark"]` block (65+ rules) covering CSS variable overrides, body, navbar, input panel, results, charts, tab-bar, mode-bar, breakdown table, disclaimer, cookie banner. Added theme-init inline script and `toggleCalcTheme()` JS function. Added theme toggle button to navbar.
-- **Added**: `cx-calculator.html` â had ZERO dark-mode rules (was dark-only, no toggle). Added 45+ `[data-theme="dark"]` reinforcement rules + theme-init script + nav toggle button + `toggleCalcTheme()` function, making it consistent with other calc pages.
-- **Standard**: `standarization/UI_FEATURES_STANDARD.md` â appended Plan v13 dark-mode coverage mandate with pre-merge checklist.
-- **Version**: `js/rz-version.js` bumped `1.1.0` â `1.2.0`.
+- **Fixed**: `opex-calculator.html` — "Detailed Cost Breakdown" card (`.breakdown-table`) and "Category Comparison" chart card (`.chart-card`) showed WHITE backgrounds in dark mode. Added 35+ `[data-theme="dark"]` rules covering `.breakdown-table th/td/hover`, `.chart-card`, `.results-card`, `.results-panel`, `.input-section`, `.breakdown-card`, `.kpi-card`, `.narrative-card`, `.calc-disclaimer`, and mode-bar elements.
+- **Fixed**: `capex-calculator.html` — added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.breakdown-card`, `.breakdown-table` (th/td/hover), `.input-field`, `.calc-disclaimer`, `.kpi-card`, `.results-panel`, `.narrative-card`.
+- **Fixed**: `roi-calculator.html` — added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.input-field`, `.roi-mode-bar`, `.roi-btn-reset`, `.cashflow-table`, `.breakdown-table`, `.calc-disclaimer`, `.kpi-card`, `.pro-panel`, `.narrative-card`.
+- **Fixed**: `pue-calculator.html` — added 28+ dark-mode rules for `.results-card`, `.chart-card`, `.input-field`, `.pue-mode-bar`, `.breakdown-table`, `.calc-disclaimer`, `.kpi-card`, `.pro-panel`, `.narrative-card`.
+- **Added**: `carbon-footprint.html` — had ZERO dark-mode rules. Added complete `[data-theme="dark"]` block (65+ rules) covering CSS variable overrides, body, navbar, input panel, results, charts, tab-bar, mode-bar, breakdown table, disclaimer, cookie banner. Added theme-init inline script and `toggleCalcTheme()` JS function. Added theme toggle button to navbar.
+- **Added**: `cx-calculator.html` — had ZERO dark-mode rules (was dark-only, no toggle). Added 45+ `[data-theme="dark"]` reinforcement rules + theme-init script + nav toggle button + `toggleCalcTheme()` function, making it consistent with other calc pages.
+- **Standard**: `standarization/UI_FEATURES_STANDARD.md` — appended Plan v13 dark-mode coverage mandate with pre-merge checklist.
+- **Version**: `js/rz-version.js` bumped `1.1.0` → `1.2.0`.
 
-## v1.1.1 â 2026-05-09
-- **Fix**: hero gridline pattern was still visible after Plan v12 ship â agent had patched only `.hero-background::before` but the base `.hero-background` rule (and dark-mode override) carried the actual grid via crossed linear-gradients @ 60Ã60 px. Now both light + dark hero backgrounds are fully transparent; only the `::before` soft radial wash remains.
+## v1.1.1 — 2026-05-09
+- **Fix**: hero gridline pattern was still visible after Plan v12 ship — agent had patched only `.hero-background::before` but the base `.hero-background` rule (and dark-mode override) carried the actual grid via crossed linear-gradients @ 60×60 px. Now both light + dark hero backgrounds are fully transparent; only the `::before` soft radial wash remains.
 
-## v1.1.0 â 2026-05-09 (Plan v12 shipped, commits 22548ba + c1667a4)
-- **Landing**: removed rotated side tabs, replaced "â SCROLL TO EXPLORE" with Pixel Rise soft animation, added floating 5-icon share column (LinkedIn/X/WhatsApp/Instagram/Facebook), Get Started + Contact Us CTA pair in hero, navbar Contact link scroll-aware (hidden at top, fades in past hero), navbar transparent â frosted-glass on scroll.
+## v1.1.0 — 2026-05-09 (Plan v12 shipped, commits 22548ba + c1667a4)
+- **Landing**: removed rotated side tabs, replaced "↓ SCROLL TO EXPLORE" with Pixel Rise soft animation, added floating 5-icon share column (LinkedIn/X/WhatsApp/Instagram/Facebook), Get Started + Contact Us CTA pair in hero, navbar Contact link scroll-aware (hidden at top, fades in past hero), navbar transparent → frosted-glass on scroll.
 - **Visual**: removed dot-grid pattern from hero (clean ambient gradient now), pastel mint user pill replacing default purple, calm pastel bento card palette (mint/lavender/peach/pink/cream), GitHub label/URL removed from Contact and footer (kept in schema.org metadata).
-- **Video**: new Remotion intro composition `ResistanceZeroIntro` (30 s, 1920Ã1080), rendered to `assets/resistancezero-intro.mp4`. Plays in inline modal triggered by Get Started.
+- **Video**: new Remotion intro composition `ResistanceZeroIntro` (30 s, 1920×1080), rendered to `assets/resistancezero-intro.mp4`. Plays in inline modal triggered by Get Started.
 - **Site-wide**: introduced `js/rz-version.js` as single-source-of-truth for version, `RZ.injectVersionStamp()` injects "Latest version: vX.Y.Z" stamp at every page footer.
 - **Tooling**: new `tools/insert-version-script.py` + `tools/audit-version-stamp.py`. New `standarization/VERSIONING_STANDARD.md`.
 
-## v1.0.0 â 2026-05-09 (semver baseline)
+## v1.0.0 — 2026-05-09 (semver baseline)
 
 First semver-tagged release. This entry consolidates prior shipped work and establishes the versioning regime. From this point forward, every meaningful change MUST bump `js/rz-version.js` and append a CHANGELOG entry per `standarization/VERSIONING_STANDARD.md`.
 
 Major shipped milestones (pre-baseline, abridged):
-- 18 calculator pages (PUE, CAPEX, OPEX, ROI, TCO, CX, Carbon Footprint, â¦)
-- 22+ articles (Future Forward series, Geopolitics series, Article 1â26)
+- 18 calculator pages (PUE, CAPEX, OPEX, ROI, TCO, CX, Carbon Footprint, …)
+- 22+ articles (Future Forward series, Geopolitics series, Article 1–26)
 - DC market tracker + 11 city detail pages
 - PLN Java-Bali grid monitor (5 pages, OSM-backed dataset)
 - Datahall AI BMS simulation + DC conventional sibling
@@ -8085,17 +8088,17 @@ Major shipped milestones (pre-baseline, abridged):
 
 ---
 
-## [2026-04-29] â PLN regional monitors split off landing page; shared `js/rz-map.js` engine
+## [2026-04-29] — PLN regional monitors split off landing page; shared `js/rz-map.js` engine
 
 ### Added
-- **`pln-java-grid.html`** â new dedicated detail page for the PLN Java-Bali (Jamali) transmission system. Geographic Map view (Leaflet/CARTO dark, Java + Bali fitBounds) and Single-Line Diagram view (inline SVG, IEC 60617 symbols, ~100 nodes target with "Show all 150 kV" toggle for the long tail). Province tabs (Jakarta+Banten / Jabar / Jateng+DIY / Jatim) with deep-link support (`#prov=jabar`). Substation slide-in side panel on click.
-- **`js/rz-map.js`** â new shared Leaflet wrapper engine. Public API `window.RZMap.init(containerId, opts)` returning `{ map, addMarker, addLine, setMarkerVisible, setLineVisible, fitBounds, setView, refresh, destroy }`. Stations as `circleMarker` (color by voltage 500/275/150, radius `â(MVA)*0.35`). Plants as `divIcon` with FontAwesome glyph per fuel type. Polylines per voltage tier with `rzm-line-{500|275|150}` className for CSS dash-flow. Optional layer control on voltage/fuel toggles. `prefers-reduced-motion` guard. Resilient: no-ops if Leaflet isn't loaded.
-- **`js/pln-java-grid-data.js`** â data module for `window.PLN_JAVA_GRID` exposing `{ version, nodes[], edges[], national }`. Topology source: PLN P2B 2016 single-line diagram. Coordinate confidence flag per node (`high` from Wikipedia infobox / OSM Nominatim, `low` from province-centroid fallback â none invented).
+- **`pln-java-grid.html`** — new dedicated detail page for the PLN Java-Bali (Jamali) transmission system. Geographic Map view (Leaflet/CARTO dark, Java + Bali fitBounds) and Single-Line Diagram view (inline SVG, IEC 60617 symbols, ~100 nodes target with "Show all 150 kV" toggle for the long tail). Province tabs (Jakarta+Banten / Jabar / Jateng+DIY / Jatim) with deep-link support (`#prov=jabar`). Substation slide-in side panel on click.
+- **`js/rz-map.js`** — new shared Leaflet wrapper engine. Public API `window.RZMap.init(containerId, opts)` returning `{ map, addMarker, addLine, setMarkerVisible, setLineVisible, fitBounds, setView, refresh, destroy }`. Stations as `circleMarker` (color by voltage 500/275/150, radius `√(MVA)*0.35`). Plants as `divIcon` with FontAwesome glyph per fuel type. Polylines per voltage tier with `rzm-line-{500|275|150}` className for CSS dash-flow. Optional layer control on voltage/fuel toggles. `prefers-reduced-motion` guard. Resilient: no-ops if Leaflet isn't loaded.
+- **`js/pln-java-grid-data.js`** — data module for `window.PLN_JAVA_GRID` exposing `{ version, nodes[], edges[], national }`. Topology source: PLN P2B 2016 single-line diagram. Coordinate confidence flag per node (`high` from Wikipedia infobox / OSM Nominatim, `low` from province-centroid fallback — none invented).
 
 ### Changed
-- **`datacenter-solutions.html` #pln-monitor section** reverted to a 6-card grid (`.ds-strat-card`). Java-Bali card is active and links to `pln-java-grid.html`. Sumatera, Kalimantan, Sulawesi, Maluku-Papua, Nusa Tenggara cards render as dimmed `is-soon` placeholders (`<div>` not `<a>`, `pointer-events:none`, "Coming soon" pill instead of CTA â not crawlable as dead links).
+- **`datacenter-solutions.html` #pln-monitor section** reverted to a 6-card grid (`.ds-strat-card`). Java-Bali card is active and links to `pln-java-grid.html`. Sumatera, Kalimantan, Sulawesi, Maluku-Papua, Nusa Tenggara cards render as dimmed `is-soon` placeholders (`<div>` not `<a>`, `pointer-events:none`, "Coming soon" pill instead of CTA — not crawlable as dead links).
 - **`dc-market-tracker.html`** refactored to consume `RZMap.init()` instead of its inline `initLeafletMap()` IIFE. Visual output identical.
-- **`standarization/UI_FEATURES_STANDARD.md`**: replaced the earlier "SLD Inline-SVG Animation Pattern" section with the broader "Card â detail-page hub + shared `js/rz-map.js` engine" pattern.
+- **`standarization/UI_FEATURES_STANDARD.md`**: replaced the earlier "SLD Inline-SVG Animation Pattern" section with the broader "Card → detail-page hub + shared `js/rz-map.js` engine" pattern.
 
 ### Removed
 - All `.pln-*` CSS rules from `datacenter-solutions.html` (~280 lines of SLD-only styling). Verified by `grep -rln 'pln-grid-card\|pln-mini-stat\|pln-list-title' /home/baguspermana7/rz-work/` returning only the post-revert file itself.
@@ -8103,170 +8106,170 @@ Major shipped milestones (pre-baseline, abridged):
 ### Rationale
 - User feedback: SLD did not belong on the landing page; the hand-drawn SVG was inaccurate; the existing Leaflet/CARTO map from `dc-market-tracker.html` was the correct base; SLD detail target was "very detailed" (~100 nodes, not the prior ~25).
 
-### 2026-05-01-v8 â Inference widening + audit dashboard
+### 2026-05-01-v8 — Inference widening + audit dashboard
 
-- **`infer_edges_by_proximity` widened**: radius 30 â 50 km, max 1 â 2 nearest neighbours per station. Builds rings instead of chains in dense regions; bridges sparse outliers without sacrificing tier-safety. Edges grew **495 â 698** (+203, mostly 150 kV: 410 â 608).
-- **NEW `tools/audit-dataset.py`** â quality dashboard. Runs 8 structural + semantic checks:
+- **`infer_edges_by_proximity` widened**: radius 30 → 50 km, max 1 → 2 nearest neighbours per station. Builds rings instead of chains in dense regions; bridges sparse outliers without sacrificing tier-safety. Edges grew **495 → 698** (+203, mostly 150 kV: 410 → 608).
+- **NEW `tools/audit-dataset.py`** — quality dashboard. Runs 8 structural + semantic checks:
   - required fields, duplicate IDs, geographic outliers (Java-Bali bbox)
-  - orphan stations (transmission tier â¥70 kV â distribution 20 kV expected isolated)
+  - orphan stations (transmission tier ≥70 kV — distribution 20 kV expected isolated)
   - confidence distribution per voltage tier (flags >50% low)
-  - province coverage (â¥10 nodes per province)
-  - Bali isolation (must have â¥1 edge crossing the strait)
-  - cross-tier jumps (500â20 without 150 kV intermediate)
+  - province coverage (≥10 nodes per province)
+  - Bali isolation (must have ≥1 edge crossing the strait)
+  - cross-tier jumps (500↔20 without 150 kV intermediate)
 - Output as human-readable report or `--json`. `--strict` exits 1 on CRITICAL findings (CI-gate ready).
-- Current state: **0 CRITICAL, 38 HIGH** (32 remote orphans, 1 statistical confidence skew, 5 cross-tier jumps from OSM lazy line tagging â all candidates for future YAML-overlay corrections).
+- Current state: **0 CRITICAL, 38 HIGH** (32 remote orphans, 1 statistical confidence skew, 5 cross-tier jumps from OSM lazy line tagging — all candidates for future YAML-overlay corrections).
 
-### 2026-04-30-v7 â datahallAI auth gate hotfix + Java-Bali submarine fix + second-brain refresh
+### 2026-04-30-v7 — datahallAI auth gate hotfix + Java-Bali submarine fix + second-brain refresh
 
-- **Fixed** the `datahallAI.html` "Root Access Required" modal that blocked logged-in PRO/root users. Root cause: race condition â gate IIFE ran before `window._rzAuth` was defined by `auth.js`. Patched the gate to fall back to a direct `localStorage.rz_premium_session` read with the same email-allowlist (`admin@`, `bagus@`), so the page works whether or not auth.js has loaded yet. Also added a `storage` event listener for cross-tab logout sync.
+- **Fixed** the `datahallAI.html` "Root Access Required" modal that blocked logged-in PRO/root users. Root cause: race condition — gate IIFE ran before `window._rzAuth` was defined by `auth.js`. Patched the gate to fall back to a direct `localStorage.rz_premium_session` read with the same email-allowlist (`admin@`, `bagus@`), so the page works whether or not auth.js has loaded yet. Also added a `storage` event listener for cross-tab logout sync.
 - **Fixed Java-Bali submarine** topology in `tools/pln-java-grid-overlay.yaml`:
-  - `prov_override: bali` on `Cable Head Gilimanuk` (osm_way_339796954) and `GI Gilimanuk` (osm_way_192989828) â both were OSM-tagged `jatim` despite being on the Bali side of the strait.
-  - Replaced the wrong `paiton â banyuwangi @ 275 kV` curated edge with the actual physical reality: 4Ã150 kV submarine cables (~340 MW total, commissioned 1989-1996). The 275 kV submarine is planned but not commissioned.
-  - Added curated Bali internal 150 kV ring (Gilimanuk â Negara â Antosari â Pemecutan â Pesanggaran â Pecatu, plus Sanur â Gianyar â Amlapura â Kubu â Celukan Bawang â back to Gilimanuk). 14 new edges fully connect the 40 Bali nodes (up from 38 â two were correctly retagged from jatim to bali).
+  - `prov_override: bali` on `Cable Head Gilimanuk` (osm_way_339796954) and `GI Gilimanuk` (osm_way_192989828) — both were OSM-tagged `jatim` despite being on the Bali side of the strait.
+  - Replaced the wrong `paiton → banyuwangi @ 275 kV` curated edge with the actual physical reality: 4×150 kV submarine cables (~340 MW total, commissioned 1989-1996). The 275 kV submarine is planned but not commissioned.
+  - Added curated Bali internal 150 kV ring (Gilimanuk → Negara → Antosari → Pemecutan → Pesanggaran → Pecatu, plus Sanur → Gianyar → Amlapura → Kubu → Celukan Bawang → back to Gilimanuk). 14 new edges fully connect the 40 Bali nodes (up from 38 — two were correctly retagged from jatim to bali).
 - **Updated** `Apps/second brain/index.html` knowledge graph: added 5 new nodes (`pjg`, `pjg-jkb`, `pjg-jb`, `pjg-jt`, `pjg-jm`) and 11 edges connecting them to existing reports / DC Solutions / DC Markets hubs. Second-brain visualization now reflects the full Java-Bali grid family.
-- Edge total stable at 495 (52Ã500 / 0Ã275 / 418Ã150 / 25Ã70). 275 kV edge correctly dropped to reflect physical reality of the submarine link.
+- Edge total stable at 495 (52×500 / 0×275 / 418×150 / 25×70). 275 kV edge correctly dropped to reflect physical reality of the submarine link.
 
-### 2026-04-30-v5 â Full province coverage + datahallAI cleanup + scheduled OSM refresh
+### 2026-04-30-v5 — Full province coverage + datahallAI cleanup + scheduled OSM refresh
 
-- **Added** `pln-java-grid-jateng.html` (Jawa Tengah + DIY) and `pln-java-grid-jatim.html` (Jawa Timur). Pages mirror the v4-fixed Jakarta+Banten / Jabar template: default labels OFF, tier-graded thin lines, animation only â¥150 kV, hover tooltips, 5-tier voltage toggles. Java-Bali sub-page family is now **4/4 complete**.
-- **Added** `js/pln-java-grid-data-jateng.js` and `js/pln-java-grid-data-jatim.js` â curated 20 kV DC + industrial overlays for each province.
+- **Added** `pln-java-grid-jateng.html` (Jawa Tengah + DIY) and `pln-java-grid-jatim.html` (Jawa Timur). Pages mirror the v4-fixed Jakarta+Banten / Jabar template: default labels OFF, tier-graded thin lines, animation only ≥150 kV, hover tooltips, 5-tier voltage toggles. Java-Bali sub-page family is now **4/4 complete**.
+- **Added** `js/pln-java-grid-data-jateng.js` and `js/pln-java-grid-data-jatim.js` — curated 20 kV DC + industrial overlays for each province.
 - **Promoted** Jawa Tengah + DIY and Jawa Timur cards on the overview page from `is-soon` placeholders to active links. All 4 province cards on `pln-java-grid.html` now click through to working sub-pages.
-- **Removed** the `<section>` with 10 academic-style references (NVIDIA, Uptime, Equinix, ASHRAE, OCP, Schneider, SemiAnalysis, IEA, Berkeley Lab, Lawrence Berkeley) from `datahallAI.html`. The page is a DC simulation tool, not a research article â citations were a category mismatch. `datahall.html` (DC conventional sibling) was already clean.
+- **Removed** the `<section>` with 10 academic-style references (NVIDIA, Uptime, Equinix, ASHRAE, OCP, Schneider, SemiAnalysis, IEA, Berkeley Lab, Lawrence Berkeley) from `datahallAI.html`. The page is a DC simulation tool, not a research article — citations were a category mismatch. `datahall.html` (DC conventional sibling) was already clean.
 - **Sitemap**: 2 new entries for the province pages, priority 0.85, monthly changefreq.
-- **Scheduled** quarterly OSM dataset refresh routine â `python3 tools/build-osm-dataset.py --force` runs on the 1st of each quarter; opens a PR if the dataset diff is non-trivial.
+- **Scheduled** quarterly OSM dataset refresh routine — `python3 tools/build-osm-dataset.py --force` runs on the 1st of each quarter; opens a PR if the dataset diff is non-trivial.
 
-### 2026-04-30-v4.2 â Topology inference + plant evacuation + visual confidence
+### 2026-04-30-v4.2 — Topology inference + plant evacuation + visual confidence
 
 - **infer_edges_by_proximity** in `tools/build-osm-dataset.py` connects any 500/275/150/70 kV station not already in an OSM or curated edge to its nearest same-voltage neighbour within 30 km (20 km for 70 kV). Source: `inferred-nn`.
 - **infer_plant_evacuation** connects each unattached plant to its nearest 500/275/150 kV substation within 5 km. Source: `inferred-evacuation`. Solves "plants float as isolated dots" issue.
 - **Visual confidence**: inferred edges render with `opacity:0.35` + tighter dash + no animation (CSS `[data-source^="inferred"]` rule on all 3 pages). Curated/OSM edges remain bright with full laser-flow. Users can see at a glance which edges are factual vs. heuristic.
-- Edge totals across iterations: 34 (v1) â 80 (v4.0 curated) â 363 (v4.1 inference) â **488** (v4.2 with plant evacuation + 70 kV).
+- Edge totals across iterations: 34 (v1) → 80 (v4.0 curated) → 363 (v4.1 inference) → **488** (v4.2 with plant evacuation + 70 kV).
   - 500 kV 52, 275 kV 1, 150 kV 410, 70 kV 25.
-- Curated edges added to `tools/pln-java-grid-overlay.yaml` `edges:` block: 28 backbone 500 kV (Suralaya â Cilegon â Balaraja â Gandul â Bekasi â Cibatu â Cirata â Pemalang â Ungaran â Tanjung Jati / Pedan â Cilacap / Kediri â Krian â Gresik / Ngimbang â Grati â Paiton plus radials), 1Ã275 kV Java-Bali submarine, 12 key 150 kV corridors.
+- Curated edges added to `tools/pln-java-grid-overlay.yaml` `edges:` block: 28 backbone 500 kV (Suralaya → Cilegon → Balaraja → Gandul → Bekasi → Cibatu → Cirata → Pemalang → Ungaran → Tanjung Jati / Pedan → Cilacap / Kediri → Krian → Gresik / Ngimbang → Grati → Paiton plus radials), 1×275 kV Java-Bali submarine, 12 key 150 kV corridors.
 
-### 2026-04-30-v4 â SLD readability fix (labels off, tier-graded thin lines, curated backbone edges)
+### 2026-04-30-v4 — SLD readability fix (labels off, tier-graded thin lines, curated backbone edges)
 
 - **Labels default OFF** on the SLD across all 3 pln-java-grid pages. With 744 nodes, drawing every name produced massive overlap. Names now appear only via hover tooltip. Labels toggle is preserved for users who want them.
 - **Tier-graded stroke-widths**: 500 kV `1.6 px`, 275 kV `1.4 px`, 150 kV `1.0 px`, 70 kV `0.7 px`, 20 kV `0.6 px`. Visual hierarchy now matches electrical hierarchy.
-- **Laser-flow animation locked to â¥150 kV** only. 70 kV and 20 kV lines are static thin dashes (no `animation` property). Confirmed via CSS rule audit.
-- **OSM line-endpoint matching threshold relaxed** in `tools/build-osm-dataset.py` from `0.5 km` to `1.5 km` (bbox prefilter `0.01Â°` â `0.03Â°`).
-- **Curated edges block** added to `tools/pln-java-grid-overlay.yaml` â 28Ã500 kV backbone (Suralaya â Cilegon â Balaraja â Gandul â Bekasi â Cibatu â Cirata â â¦ â Paiton plus radials + 275 kV Java-Bali submarine + key 150 kV corridors). Merged into the JS data file by the crawler with dedup against OSM. Edge total: 51 â **80** (28Ã500 / 1Ã275 / 47Ã150 / 4Ã70).
+- **Laser-flow animation locked to ≥150 kV** only. 70 kV and 20 kV lines are static thin dashes (no `animation` property). Confirmed via CSS rule audit.
+- **OSM line-endpoint matching threshold relaxed** in `tools/build-osm-dataset.py` from `0.5 km` to `1.5 km` (bbox prefilter `0.01°` → `0.03°`).
+- **Curated edges block** added to `tools/pln-java-grid-overlay.yaml` — 28×500 kV backbone (Suralaya → Cilegon → Balaraja → Gandul → Bekasi → Cibatu → Cirata → … → Paiton plus radials + 275 kV Java-Bali submarine + key 150 kV corridors). Merged into the JS data file by the crawler with dedup against OSM. Edge total: 51 → **80** (28×500 / 1×275 / 47×150 / 4×70).
 - **Crawler enhancement**: `load_overlay_edges(nodes)` reads `edges:` block from YAML, fuzzy-matches `from`/`to` slugs against node names. Logs unresolved-endpoint warnings.
 - **First-paint** flicker prevented: SLD root group renders with `class="*-svg-root no-labels"` baked into the HTML (no JS race).
-- **Why**: user feedback after v3 deployment â "tulisan nama gardu sudah saya bilang jangan disini, tapi di tooltip" + "garis koneknnya kurang lengkap dan perlu yang tipis" + "arah flow laser itu hanya >=150kv saja" + "enhance banyak collision".
+- **Why**: user feedback after v3 deployment — "tulisan nama gardu sudah saya bilang jangan disini, tapi di tooltip" + "garis koneknnya kurang lengkap dan perlu yang tipis" + "arah flow laser itu hanya >=150kv saja" + "enhance banyak collision".
 
-### 2026-04-29-v3 â Data accuracy expansion (OSM crawl + tooltip system + multi-tier toggles)
+### 2026-04-29-v3 — Data accuracy expansion (OSM crawl + tooltip system + multi-tier toggles)
 
-- **Added** `tools/build-osm-dataset.py` â Python OSM Overpass crawler for Java+Bali. Queries `power=substation` and `power=plant`/`generator` features, parses voltage tags, writes `js/pln-java-grid-data.js` with provenance fields per node (`source`, `osm_id`, `wikidata`, `confidence`).
-- **Added** `tools/pln-java-grid-overlay.yaml` â hand-curated overlay (~60 entries) carrying `mva`, `year`, `served_areas`, `notes` for known substations and plants. Merged into the JS data file at build time.
-- **Added** `js/pln-tooltip.js` (471 LOC) â shared rich-tooltip module for SVG nodes + Leaflet markers. Lifecycle: shared singleton DOM, debounced show/hide, auto-position with viewport flipping, keyboard accessible (focus + Esc), mobile bottom-sheet variant.
-- **Modified** `js/rz-map.js` (303 â 317 LOC) â now accepts per-marker `tooltipData` opt; auto-wires `PLNTooltip.attach` if module is loaded. Backward-compatible (existing dc-market-tracker.html consumer unaffected).
-- **Modified** `pln-java-grid.html`, `pln-java-grid-jakarta-banten.html`, `pln-java-grid-jabar.html` â added 5-tier voltage layer toggles (500/275/150 default ON; 70/20 default OFF on overview, 20 default ON on province pages). Per-fuel plant toggles. Display master toggles (Labels / Capacity / kV badges). Wired tooltips on every node + edge midpoint. SLD viewBox bumped to 1800Ã900 (overview) and 1400Ã900 (province) to absorb the larger dataset. Collision-nudge increased from 6 to 10 iterations with Â±20 px search radius.
+- **Added** `tools/build-osm-dataset.py` — Python OSM Overpass crawler for Java+Bali. Queries `power=substation` and `power=plant`/`generator` features, parses voltage tags, writes `js/pln-java-grid-data.js` with provenance fields per node (`source`, `osm_id`, `wikidata`, `confidence`).
+- **Added** `tools/pln-java-grid-overlay.yaml` — hand-curated overlay (~60 entries) carrying `mva`, `year`, `served_areas`, `notes` for known substations and plants. Merged into the JS data file at build time.
+- **Added** `js/pln-tooltip.js` (471 LOC) — shared rich-tooltip module for SVG nodes + Leaflet markers. Lifecycle: shared singleton DOM, debounced show/hide, auto-position with viewport flipping, keyboard accessible (focus + Esc), mobile bottom-sheet variant.
+- **Modified** `js/rz-map.js` (303 → 317 LOC) — now accepts per-marker `tooltipData` opt; auto-wires `PLNTooltip.attach` if module is loaded. Backward-compatible (existing dc-market-tracker.html consumer unaffected).
+- **Modified** `pln-java-grid.html`, `pln-java-grid-jakarta-banten.html`, `pln-java-grid-jabar.html` — added 5-tier voltage layer toggles (500/275/150 default ON; 70/20 default OFF on overview, 20 default ON on province pages). Per-fuel plant toggles. Display master toggles (Labels / Capacity / kV badges). Wired tooltips on every node + edge midpoint. SLD viewBox bumped to 1800×900 (overview) and 1400×900 (province) to absorb the larger dataset. Collision-nudge increased from 6 to 10 iterations with ±20 px search radius.
 - **Schema additions per node**: `source`, `confidence` (high/medium/low), `osm_id`, `osm_type`, `wikidata`, `served_areas[]`, `notes`, `secondary_voltages[]`, `last_verified`. Visible in tooltip header (kV + confidence badges) and footer (OSM/Wikidata/Map links).
-- **Dataset growth**: from 118 nodes hand-curated â **744 nodes** OSM-sourced (563 stations + 181 plants), 6.3Ã expansion. Voltage breakdown: 33Ã500 kV / 1Ã275 kV / 442Ã150 kV / 55Ã70 kV / 213Ã20 kV. Province breakdown: jakarta-banten 213, jabar 196, jatim 185, jateng 112, bali 38. Confidence: 503 high / 224 medium / 17 low. User's specific concern resolved: `GIS Summarecon` now in dataset (`osm_way_966209499`, 150 kV, jakarta-banten, confidence:high) â alongside GIS Bekasi II, GISTET Tambun II, GI Tambun, GI Cikarang, GI Cikarang Lippo, KCIC Karawang, etc.
+- **Dataset growth**: from 118 nodes hand-curated → **744 nodes** OSM-sourced (563 stations + 181 plants), 6.3× expansion. Voltage breakdown: 33×500 kV / 1×275 kV / 442×150 kV / 55×70 kV / 213×20 kV. Province breakdown: jakarta-banten 213, jabar 196, jatim 185, jateng 112, bali 38. Confidence: 503 high / 224 medium / 17 low. User's specific concern resolved: `GIS Summarecon` now in dataset (`osm_way_966209499`, 150 kV, jakarta-banten, confidence:high) — alongside GIS Bekasi II, GISTET Tambun II, GI Tambun, GI Cikarang, GI Cikarang Lippo, KCIC Karawang, etc.
 - **Why**: user feedback on accuracy ("very accurate, very precise") and request that all voltage tiers be selectable. The user's specific complaint about GI Bekasi vs GI Summarecon is addressed via the `served_areas` annotation (Summarecon Bekasi, Harapan Indah, Logos Bekasi listed as served areas of GI Cibitung 150/20 kV).
-- Cards-on-landing â detail-page-on-click model matches the existing `.ds-strat-card` pattern used elsewhere in the section (TCO, ROI, DMT cards).
+- Cards-on-landing → detail-page-on-click model matches the existing `.ds-strat-card` pattern used elsewhere in the section (TCO, ROI, DMT cards).
 
 ## [Unreleased]
 
 ### Planned
 - Extract `calc-auth.js` shared engine (Phase 1 of calculator consolidation roadmap, see `standarization/CALC_ENGINE_PLAN.md`).
-- **Phase S2.5** â expand `RZEngine.models.{opex,capex,tco}` API to support utilization-aware power, climate/cooling adjustments, multi-factor CAPEX build-up, and multi-stream TCO. Required before tco-/capex-/opex-calculator math can migrate to engine.
-- Hero images for articles 1â19 (currently missing `assets/article-N-hero.webp`).
-- References sections for articles 2, 4, 5, 6, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20 â older articles still missing canonical `references-section` markup; some have legacy `<ol class="references">` and could be migrated to canonical pattern in a separate sweep (articles 21, 22 done 2026-04-30).
-- Tighten Independence Disclaimer placement in articles 19â27 (currently inserted before `</main>`; older convention is before References â cosmetic only).
+- **Phase S2.5** — expand `RZEngine.models.{opex,capex,tco}` API to support utilization-aware power, climate/cooling adjustments, multi-factor CAPEX build-up, and multi-stream TCO. Required before tco-/capex-/opex-calculator math can migrate to engine.
+- Hero images for articles 1–19 (currently missing `assets/article-N-hero.webp`).
+- References sections for articles 2, 4, 5, 6, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20 — older articles still missing canonical `references-section` markup; some have legacy `<ol class="references">` and could be migrated to canonical pattern in a separate sweep (articles 21, 22 done 2026-04-30).
+- Tighten Independence Disclaimer placement in articles 19–27 (currently inserted before `</main>`; older convention is before References — cosmetic only).
 - Reconcile `auth.js` vs `rz-engine.js` `VALID_USERS` role strings (auth.js: demo='pro', bagus/admin='root'; rz-engine.js: demo='demo', bagus/admin='admin'). Email-based gate makes drift safe but harmonization remains hygiene work.
 
 ---
 
-## [2026-04-30] â Backlog sweep + root-only gates + login button bug fixes
+## [2026-04-30] — Backlog sweep + root-only gates + login button bug fixes
 
 ### Added
-- **`article-16.html`** â bottom-of-article `<div class="article-nav">` block (Previous â `article-15.html`, Next â `article-17.html`), inline-SVG arrow style matching article-15.
-- **`article-22.html` References section** â 15 cited sources in canonical `references-section` markup (cyan `#0891b2` accent matched to article palette). NVIDIA Spectrum-X / Quantum-X Photonics, NCCL, Lumentum, Coherent, Open Compute Project, Optica/OFC, IEEE Spectrum, DCD, SemiAnalysis, Lightmatter, Ayar Labs, Wikipedia (silicon photonics).
-- **`article-21.html` References section** â 15 cited sources, emerald `#059669` accent. NRC, DOE Office of Nuclear Energy, IAEA ARIS, FERC (Dec 2025 co-location ruling), World Nuclear Association, NEI, IEEE Spectrum, all 5 SMR vendors profiled in Â§5 (NuScale, Oklo, X-Energy, TerraPower, Kairos Power), Constellation Energy (Microsoft / TMI deal), OPG Darlington BWRX-300, Wikipedia.
-- **Articles 19, 20, 21, 22, 23, 24, 25, 26, 27** â Tier-1 legal compliance components per `standarization/LEGAL_COMPLIANCE_STANDARD.md` Â§3 + Â§7: Independence Disclaimer (before `</main>`) + Cookie Consent Banner with JS (before `</body>`). Wired to `localStorage` key `rz_cookie_consent`; declining sets `window['ga-disable-G-GED7FX8RTV'] = true`. All 9 articles already load `styles.css` so `.cookie-banner` rules apply.
-- **`auth.js`** â added `isRootEmail(email)`, `isRootAccess(session)`, `isRootSession()` helpers exposed on `window._rzAuth.*`. Email-based check uses pre-existing `ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com']` and is robust to the role-string drift between `auth.js` and `rz-engine.js` `VALID_USERS` lists.
-- **`auth.js` `ROOT_ONLY_PATHS`** â extended from `['/dcmoc']` to `['/dcmoc', '/dc-market', '/datahallai.html', '/dc-conventional.html', '/dc-market-tracker.html']`. Auto-applies the navbar ð lock icon (`fas fa-lock rz-lock-icon`) to all matching links across the 60+ pages with the dropdown â no per-page HTML edits needed for the lock visualization. Click handler enforces root-account gate via existing `handleRootOnlyLinkClick`.
-- **`dc-conventional.html`** â full root-only gate added (CSS `body.locked` blur + `.rz-restricted-overlay` modal + IIFE that subscribes to `rz-auth-change` and toggles `body.locked` based on `_rzAuth.isRootSession()`). Page was previously unguarded; demo and anonymous now blocked.
-- **`dc-market-tracker.html`** â same gate pattern (CSS + overlay + IIFE). Pre-existing hub card linking to `dc-market/` retained (PLN session added it on 2026-04-29).
-- **`/home/baguspermana7/.claude/projects/-home-baguspermana7/memory/feedback_simulation_pages_no_refs.md`** â new memory feedback rule: never add `<section>` References blocks to simulation/dashboard pages (`datahallAI.html`, `dc-conventional.html`, future BMS/SCADA-style mimics). Trigger: 2026-04-29's discoverability sweep mistakenly added one to `datahallAI.html`; reverted on 2026-04-30 commit `df0fbd7`.
+- **`article-16.html`** — bottom-of-article `<div class="article-nav">` block (Previous → `article-15.html`, Next → `article-17.html`), inline-SVG arrow style matching article-15.
+- **`article-22.html` References section** — 15 cited sources in canonical `references-section` markup (cyan `#0891b2` accent matched to article palette). NVIDIA Spectrum-X / Quantum-X Photonics, NCCL, Lumentum, Coherent, Open Compute Project, Optica/OFC, IEEE Spectrum, DCD, SemiAnalysis, Lightmatter, Ayar Labs, Wikipedia (silicon photonics).
+- **`article-21.html` References section** — 15 cited sources, emerald `#059669` accent. NRC, DOE Office of Nuclear Energy, IAEA ARIS, FERC (Dec 2025 co-location ruling), World Nuclear Association, NEI, IEEE Spectrum, all 5 SMR vendors profiled in §5 (NuScale, Oklo, X-Energy, TerraPower, Kairos Power), Constellation Energy (Microsoft / TMI deal), OPG Darlington BWRX-300, Wikipedia.
+- **Articles 19, 20, 21, 22, 23, 24, 25, 26, 27** — Tier-1 legal compliance components per `standarization/LEGAL_COMPLIANCE_STANDARD.md` §3 + §7: Independence Disclaimer (before `</main>`) + Cookie Consent Banner with JS (before `</body>`). Wired to `localStorage` key `rz_cookie_consent`; declining sets `window['ga-disable-G-GED7FX8RTV'] = true`. All 9 articles already load `styles.css` so `.cookie-banner` rules apply.
+- **`auth.js`** — added `isRootEmail(email)`, `isRootAccess(session)`, `isRootSession()` helpers exposed on `window._rzAuth.*`. Email-based check uses pre-existing `ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com']` and is robust to the role-string drift between `auth.js` and `rz-engine.js` `VALID_USERS` lists.
+- **`auth.js` `ROOT_ONLY_PATHS`** — extended from `['/dcmoc']` to `['/dcmoc', '/dc-market', '/datahallai.html', '/dc-conventional.html', '/dc-market-tracker.html']`. Auto-applies the navbar 🔒 lock icon (`fas fa-lock rz-lock-icon`) to all matching links across the 60+ pages with the dropdown — no per-page HTML edits needed for the lock visualization. Click handler enforces root-account gate via existing `handleRootOnlyLinkClick`.
+- **`dc-conventional.html`** — full root-only gate added (CSS `body.locked` blur + `.rz-restricted-overlay` modal + IIFE that subscribes to `rz-auth-change` and toggles `body.locked` based on `_rzAuth.isRootSession()`). Page was previously unguarded; demo and anonymous now blocked.
+- **`dc-market-tracker.html`** — same gate pattern (CSS + overlay + IIFE). Pre-existing hub card linking to `dc-market/` retained (PLN session added it on 2026-04-29).
+- **`/home/baguspermana7/.claude/projects/-home-baguspermana7/memory/feedback_simulation_pages_no_refs.md`** — new memory feedback rule: never add `<section>` References blocks to simulation/dashboard pages (`datahallAI.html`, `dc-conventional.html`, future BMS/SCADA-style mimics). Trigger: 2026-04-29's discoverability sweep mistakenly added one to `datahallAI.html`; reverted on 2026-04-30 commit `df0fbd7`.
 
 ### Changed
-- **`datahallAI.html` gate** â replaced minified `ia(s){return!!(s&&(s.role==='root'||s.role==='pro'));}` IIFE (lines 9768-9779) with `_rzAuth.isRootSession()`-based check. Previous version allowed `role==='pro'` to pass â under `auth.js`'s `VALID_USERS`, the demo account had `role:'pro'`, so demo bypassed the gate. New version uses email-based `ROOT_EMAILS` check and rejects demo while admitting only `bagus@` / `admin@`.
-- **`roi-calculator.html` `calcNPV` and `calcIRR`** â both now delegate to `RZEngine.models.roi.npv` / `RZEngine.models.roi.irr` when the engine is available, falling back to inline math otherwise. Pattern matches `pue-calculator.html` S2 pilot. Engine smoke verified: `npv([-100, 30Ã5], 0.10) = 13.7236` matches inline; IRR via engine bisection = 0.1524 for the same series.
-- **DC Market dropdown consolidation** â across **66 HTML pages** (`articles.html`, `glossary.html`, `dashboard.html`, `insights.html`, `index.html`, all `article-N.html` 1-27, all `compare-*.html`, all `geopolitics-*.html`, all `pillar-*.html`, all `ltc-*.html`, all `infographic-*.html`, all `FF-*.html`, `future-forward.html`, `achievements.html`, `asean-dc-report-2026.html`, `tco-calculator.html`), the navbar dropdown's "Market Tracker" label was renamed to "DC Market" via `tools/dc-market-consolidator.py`. `index.html` additionally had its sibling "DC Markets (10 cities)" line consolidated into the single "DC Market" item â that secondary link is now reachable via the in-page hub card on `dc-market-tracker.html` instead. Locked icon auto-renders because `dc-market-tracker.html` is in `ROOT_ONLY_PATHS`.
+- **`datahallAI.html` gate** — replaced minified `ia(s){return!!(s&&(s.role==='root'||s.role==='pro'));}` IIFE (lines 9768-9779) with `_rzAuth.isRootSession()`-based check. Previous version allowed `role==='pro'` to pass — under `auth.js`'s `VALID_USERS`, the demo account had `role:'pro'`, so demo bypassed the gate. New version uses email-based `ROOT_EMAILS` check and rejects demo while admitting only `bagus@` / `admin@`.
+- **`roi-calculator.html` `calcNPV` and `calcIRR`** — both now delegate to `RZEngine.models.roi.npv` / `RZEngine.models.roi.irr` when the engine is available, falling back to inline math otherwise. Pattern matches `pue-calculator.html` S2 pilot. Engine smoke verified: `npv([-100, 30×5], 0.10) = 13.7236` matches inline; IRR via engine bisection = 0.1524 for the same series.
+- **DC Market dropdown consolidation** — across **66 HTML pages** (`articles.html`, `glossary.html`, `dashboard.html`, `insights.html`, `index.html`, all `article-N.html` 1-27, all `compare-*.html`, all `geopolitics-*.html`, all `pillar-*.html`, all `ltc-*.html`, all `infographic-*.html`, all `FF-*.html`, `future-forward.html`, `achievements.html`, `asean-dc-report-2026.html`, `tco-calculator.html`), the navbar dropdown's "Market Tracker" label was renamed to "DC Market" via `tools/dc-market-consolidator.py`. `index.html` additionally had its sibling "DC Markets (10 cities)" line consolidated into the single "DC Market" item — that secondary link is now reachable via the in-page hub card on `dc-market-tracker.html` instead. Locked icon auto-renders because `dc-market-tracker.html` is in `ROOT_ONLY_PATHS`.
 
 ### Fixed
-- **`roi-calculator.html` JavaScript SyntaxError** (lines 1780-1782) â the printPDF function had a single-quoted string literal that spanned three lines without `\` continuations or template-literal backticks, causing the entire IIFE containing `calculate()`, `calcNPV()`, `calcIRR()`, `attemptLogin()`, `handlePremiumTab()` to fail to parse. Every JS-dependent feature on the calculator was silently broken in browsers (curl returned HTTP 200 because HTML still served). Fixed by splitting the broken multi-line string into three concatenated `html += '...';` statements with `<\/script>` escape sequences.
-- **`capex-calculator.html` and `opex-calculator.html` Login button no-response** â `<script src="auth.js">` and `<script src="rz-engine.js">` tags were trapped INSIDE the `printHTML` template literal (lines 4028-4029 and 4613-4614 respectively), so they only loaded inside the PDF print window, never on the calculator page itself. Result: `_rzAuth.*` and `RZEngine.auth.*` were undefined on the calculator page â login modal flow silently failed. Fixed by adding real top-level `<script>` tags before `</body>`. The script tags inside printHTML stay (they're correct for the PDF output).
-- **`roi-calculator.html` script tags** â same issue (top-level tags missing); added before `</body>`.
+- **`roi-calculator.html` JavaScript SyntaxError** (lines 1780-1782) — the printPDF function had a single-quoted string literal that spanned three lines without `\` continuations or template-literal backticks, causing the entire IIFE containing `calculate()`, `calcNPV()`, `calcIRR()`, `attemptLogin()`, `handlePremiumTab()` to fail to parse. Every JS-dependent feature on the calculator was silently broken in browsers (curl returned HTTP 200 because HTML still served). Fixed by splitting the broken multi-line string into three concatenated `html += '...';` statements with `<\/script>` escape sequences.
+- **`capex-calculator.html` and `opex-calculator.html` Login button no-response** — `<script src="auth.js">` and `<script src="rz-engine.js">` tags were trapped INSIDE the `printHTML` template literal (lines 4028-4029 and 4613-4614 respectively), so they only loaded inside the PDF print window, never on the calculator page itself. Result: `_rzAuth.*` and `RZEngine.auth.*` were undefined on the calculator page → login modal flow silently failed. Fixed by adding real top-level `<script>` tags before `</body>`. The script tags inside printHTML stay (they're correct for the PDF output).
+- **`roi-calculator.html` script tags** — same issue (top-level tags missing); added before `</body>`.
 - Reason: 2026-04-29 commits `72b81ce feat(capex,opex,cx-calculator): migrate to RZEngine.auth` and `af8875c feat(roi+tco-calculator): migrate to RZEngine.auth` mistakenly placed the migration's script tags inside the PDF print template literals on capex/opex/roi calculators. `tco-calculator.html`, `cx-calculator.html`, and `pue-calculator.html` were correctly wired (top-level tags before `</body>`) and weren't affected.
 
 ### Status: Super Engine consumers (delta vs 2026-04-28j)
 | Calculator | Loads engine | Uses `auth.*` | Uses `models.*` | Uses `data.*` |
 |---|---|---|---|---|
-| pue-calculator | â | â | â pue.* | â |
-| roi-calculator | â (script tag fix) | â | â **roi.\*** (NEW) | â |
-| capex-calculator | â (script tag fix) | â | â (deferred) | â |
-| opex-calculator | â (script tag fix) | â | â (deferred) | â |
-| tco-calculator | â | â | â (deferred) | â |
+| pue-calculator | ✅ | ✅ | ✅ pue.* | — |
+| roi-calculator | ✅ (script tag fix) | ✅ | ✅ **roi.\*** (NEW) | — |
+| capex-calculator | ✅ (script tag fix) | ✅ | — (deferred) | — |
+| opex-calculator | ✅ (script tag fix) | ✅ | — (deferred) | — |
+| tco-calculator | ✅ | ✅ | — (deferred) | — |
 
 ### Verification
 - All 7 affected pages serve HTTP 200 (`datahallAI.html`, `dc-conventional.html`, `dc-market-tracker.html`, `capex/opex/roi/tco-calculator.html`).
 - `auth.js` parses cleanly (browser-style sanity via `new Function(src)`); 7 expected helper definitions/exposures present.
 - 0 `>References<` / `id="ref-1"` markers in `datahallAI.html` (confirms PLN session's `df0fbd7` cleanup retained).
-- 0 remaining "Market Tracker" labels in nav dropdowns (66 â "DC Market"); 1 remaining standalone reference is the `<h1>` page title on `dc-market-tracker.html` itself, which is intentional (page is still the global Market Tracker dashboard).
-- Forged-session DevTools resistance: setting `rz_premium_session` with `{email:'demo@â¦', role:'root', tier:'pro'}` keeps the gate locked â email-based check rejects forged role strings.
+- 0 remaining "Market Tracker" labels in nav dropdowns (66 → "DC Market"); 1 remaining standalone reference is the `<h1>` page title on `dc-market-tracker.html` itself, which is intentional (page is still the global Market Tracker dashboard).
+- Forged-session DevTools resistance: setting `rz_premium_session` with `{email:'demo@…', role:'root', tier:'pro'}` keeps the gate locked — email-based check rejects forged role strings.
 
 ### Rationale
 - **Email-based root gate** chosen over role-based to neutralize the role-string drift between `auth.js` (`role:'pro'` for demo) and `rz-engine.js` (`role:'demo'` for demo). Whichever file writes the session wins; email is stable. `ROOT_EMAILS` already exists at `auth.js:20`, matching the working dcmoc gate convention.
 - **DC Market consolidation** keeps `dc-market-tracker.html` as the global Leaflet/Chart parent ("DC Market") with the 10-city deep-dive hub reached via in-page card linking to `dc-market/`. Single navbar item replaces the previous two-line "Market Tracker" + "DC Markets (10 cities)" pattern. User intent: "DC Market itu parentnya, tambahkan menu di page itu atau card untuk menuju /dc-market/".
-- **No References on simulation pages** â operational dashboards (datahallAI's 4-tab BMS mimic, dc-conventional's facility infographic) take a "Legal Notice" disclaimer instead of academic citations. New memory rule prevents future discoverability sweeps from re-adding them.
+- **No References on simulation pages** — operational dashboards (datahallAI's 4-tab BMS mimic, dc-conventional's facility infographic) take a "Legal Notice" disclaimer instead of academic citations. New memory rule prevents future discoverability sweeps from re-adding them.
 
 ---
 
-## [2026-04-28j] â Article-26 PFAS migrated to RZEngine.auth + bulk script-tag wiring
+## [2026-04-28j] — Article-26 PFAS migrated to RZEngine.auth + bulk script-tag wiring
 
 ### Changed
 - **article-26.html PFAS calculator IIFE** migrated from inline `VALID_USERS` array + bespoke session check to `RZEngine.auth.validateLogin`, `RZEngine.auth.getSession`, `RZEngine.auth.setSession`, `RZEngine.auth.dispatchAuthChange`. Inline `VALID_USERS` declaration removed entirely. Legacy fallback retained for safety if engine fails to load.
-- **`<script src="rz-engine.js?v=2026-04-28">` wired into 30 additional pages** (articles 1â22 + articles.html + 5 standalone calcs + dashboard adjacents). Total rz-engine.js consumers across the site now: **35 pages**. Most don't yet consume the engine API but are now set up for future migration without another script-tag pass.
+- **`<script src="rz-engine.js?v=2026-04-28">` wired into 30 additional pages** (articles 1–22 + articles.html + 5 standalone calcs + dashboard adjacents). Total rz-engine.js consumers across the site now: **35 pages**. Most don't yet consume the engine API but are now set up for future migration without another script-tag pass.
 
 ### Status: Super Engine consumers
 | Article | Loads engine | Uses `auth.*` | Uses `models.*` | Uses `data.*` |
 |---|---|---|---|---|
-| article-23 | â | â | â | â |
-| article-24 | â | â | â | â |
-| article-25 | â | â | â | â |
-| article-26 | â | â | â | â |
-| article-27 | â | â (S2 pilot) | â workforce.* | â regions, salaryBenchmarks, attritionFactors |
-| article-1 through article-22, articles.html, +standalone calcs | â (script tag only) | â | â | â |
+| article-23 | ✅ | — | — | — |
+| article-24 | ✅ | ✅ | — | — |
+| article-25 | ✅ | — | — | — |
+| article-26 | ✅ | ✅ | — | — |
+| article-27 | ✅ | ✅ (S2 pilot) | ✅ workforce.* | ✅ regions, salaryBenchmarks, attritionFactors |
+| article-1 through article-22, articles.html, +standalone calcs | ✅ (script tag only) | — | — | — |
 
-## [2026-04-28i] â Standalone calc nav glossary link
+## [2026-04-28i] — Standalone calc nav glossary link
 
 ### Added
 - Glossary link (`#14b8a6` teal) inserted into the `.nav-links` custom navbars on **12 standalone calc/tool pages**:
   - capex-calculator, opex-calculator, roi-calculator, tco-calculator, pue-calculator (5 main calcs)
   - carbon-footprint, dc-market-tracker (2 trackers)
   - tia-942-checklist, tier-advisor (2 standards tools)
-  - ltc-system-modelling-lab, standards-ltc-lab (2 LTC labs â used `.nav-back` style for these)
+  - ltc-system-modelling-lab, standards-ltc-lab (2 LTC labs — used `.nav-back` style for these)
   - datacenter-solutions (1 solutions hub)
 
-This closes the standalone-calculator nav backlog from `[Unreleased]` (2026-04-28g). Glossary is now reachable from every page on the site that has any kind of navbar â main-pattern (`.nav-menu`), custom (`.nav-links`), or LTC-lab (`.nav-back`).
+This closes the standalone-calculator nav backlog from `[Unreleased]` (2026-04-28g). Glossary is now reachable from every page on the site that has any kind of navbar — main-pattern (`.nav-menu`), custom (`.nav-links`), or LTC-lab (`.nav-back`).
 
 ### Status
 The discoverability audit is now functionally complete:
-- â Glossary linked from every page with a navbar (~77 pages total).
-- â Glossary linked from footer NAVIGATION across 60 pages.
-- â All Tier-1 and Tier-2 report pages have References sections.
-- â insights.html surfaces the Reports cluster.
-- â Second Brain graph reflects current site truth.
+- ✅ Glossary linked from every page with a navbar (~77 pages total).
+- ✅ Glossary linked from footer NAVIGATION across 60 pages.
+- ✅ All Tier-1 and Tier-2 report pages have References sections.
+- ✅ insights.html surfaces the Reports cluster.
+- ✅ Second Brain graph reflects current site truth.
 
 ### Remaining backlog (small)
 - Article-26 PFAS IIFE migration to `RZEngine.auth.*` (currently kept as A/B control).
-- `dashboard.html` and `datacenter-solutions.html` References â optional, these are tool pages.
+- `dashboard.html` and `datacenter-solutions.html` References — optional, these are tool pages.
 
-## [2026-04-28h] â Tier-2 Discoverability backlog cleared
+## [2026-04-28h] — Tier-2 Discoverability backlog cleared
 
 ### Added
 - **References sections** on all 10 `dc-market/*.html` city pages (~6 region-specific citations each, 60 citations total). Each uses authoritative regional sources:
@@ -8284,35 +8287,35 @@ The discoverability audit is now functionally complete:
   - PUE Global: IRENA, Uptime, IEA, LBNL, ASHRAE, Green Grid.
   - DC Sustainability: IEA, AWS, Google, Microsoft, Greenpeace, CDP.
   - DC Cost Breakdown: CBRE, JLL, Uptime, NVIDIA, OCP, Schneider.
-- `<script src="rz-engine.js">` wired into `article-23.html`, `article-25.html` (joining article-24, article-26, article-27 as Super Engine consumers â 5 of 27 articles now load the engine).
+- `<script src="rz-engine.js">` wired into `article-23.html`, `article-25.html` (joining article-24, article-26, article-27 as Super Engine consumers — 5 of 27 articles now load the engine).
 
 ### Status of discoverability audit
-- â All Tier-1 (high-traffic report pages) have References.
-- â All Tier-2 (10 city pages + 3 infographics) have References.
-- â Glossary navigation in navbar + footer across 65 pages.
-- â Reports & Trackers cluster surfaces all reports from `insights.html`.
-- â Second Brain graph: 0-edge nodes (CX, Glossary) connected; stale labels fixed; RZEngine + 3 plan docs added.
+- ✅ All Tier-1 (high-traffic report pages) have References.
+- ✅ All Tier-2 (10 city pages + 3 infographics) have References.
+- ✅ Glossary navigation in navbar + footer across 65 pages.
+- ✅ Reports & Trackers cluster surfaces all reports from `insights.html`.
+- ✅ Second Brain graph: 0-edge nodes (CX, Glossary) connected; stale labels fixed; RZEngine + 3 plan docs added.
 
 ### Remaining
-- `dashboard.html` and `datacenter-solutions.html` References â these are tool pages, references optional.
+- `dashboard.html` and `datacenter-solutions.html` References — these are tool pages, references optional.
 - ~29 standalone calculator pages with `.nav-links` (custom navbar pattern) still need glossary link addition. Separate audit.
 - IIFE migration of article-26's PFAS calculator to `RZEngine.auth.*` (kept as A/B control through the v1.2.0 ship; can migrate now since the engine is stable).
 
-## [2026-04-28g] â Discoverability Audit (glossary nav + report refs + graph sync)
+## [2026-04-28g] — Discoverability Audit (glossary nav + report refs + graph sync)
 
 ### Added
 - **Glossary navigation surfaces:** glossary link in navbar Insights dropdown across 65 HTML pages (color #14b8a6) and in the footer NAVIGATION column across 60 HTML pages.
 - **References sections** for the three highest-traffic report pages:
-  - `dc-market-tracker.html` â 10 citations (CBRE 2025 Global DC Trends, JLL 2025, Cushman &amp; Wakefield 2025, Synergy Research 2024, Uptime 2024, IEA 2024, McKinsey, BloombergNEF, Data Center Frontier, government / utility filings).
-  - `asean-dc-report-2026.html` â 10 citations (CBRE APAC, JLL Asia Outlook, Synergy, IMDA Singapore, Kominfo Indonesia, MyDigital Malaysia, DEPA Thailand, Cushman, IEA, Uptime APAC). This page was previously orphaned with zero inbound visible links â now linked from `insights.html`.
-  - `datahallAI.html` â 10 citations (NVIDIA H100/GB200 datasheets, Uptime AI Survey, Equinix AI-Ready, ASHRAE TC 9.9, OCP, Schneider EcoStruxure, SemiAnalysis, IEA, LBNL).
-- **Reports &amp; Trackers cluster** on `insights.html` â 6 cards surfacing `dc-market-tracker`, `asean-dc-report-2026`, `datahallAI`, and the 3 infographics. Closes the inbound-link gap.
+  - `dc-market-tracker.html` — 10 citations (CBRE 2025 Global DC Trends, JLL 2025, Cushman &amp; Wakefield 2025, Synergy Research 2024, Uptime 2024, IEA 2024, McKinsey, BloombergNEF, Data Center Frontier, government / utility filings).
+  - `asean-dc-report-2026.html` — 10 citations (CBRE APAC, JLL Asia Outlook, Synergy, IMDA Singapore, Kominfo Indonesia, MyDigital Malaysia, DEPA Thailand, Cushman, IEA, Uptime APAC). This page was previously orphaned with zero inbound visible links — now linked from `insights.html`.
+  - `datahallAI.html` — 10 citations (NVIDIA H100/GB200 datasheets, Uptime AI Survey, Equinix AI-Ready, ASHRAE TC 9.9, OCP, Schneider EcoStruxure, SemiAnalysis, IEA, LBNL).
+- **Reports &amp; Trackers cluster** on `insights.html` — 6 cards surfacing `dc-market-tracker`, `asean-dc-report-2026`, `datahallAI`, and the 3 infographics. Closes the inbound-link gap.
 - **Second Brain graph** new nodes: `a27` (Article 27 Workforce Crisis), `rzeng` (RZEngine v1.2.0), `sse` (SUPER_ENGINE.md), `scep` (CALC_ENGINE_PLAN.md), `scmp` (CALC_MODELS_PLAN.md).
 
 ### Fixed
-- **Second Brain graph CX Calculator (`ccx`)** was 0-connection â now linked to dash, sdcv, copx, croi, rzeng (5 edges).
-- **Second Brain graph Glossary (`glos`)** was 0-connection â now linked to idx, arts, ins, articles 23-27, calculators with terms (cpue, cpp, cpa), rzeng (12 edges).
-- **Second Brain graph stale labels:** `a24` was "FF-1: The Web Didn't Die" â now "Art-24: Manpower Shortage". `a25` was "FF-2: Engineer Shortage" â now "Art-25: PJM 6 GW Short". Both moved out of Future Forward tagging into their actual content categories.
+- **Second Brain graph CX Calculator (`ccx`)** was 0-connection — now linked to dash, sdcv, copx, croi, rzeng (5 edges).
+- **Second Brain graph Glossary (`glos`)** was 0-connection — now linked to idx, arts, ins, articles 23-27, calculators with terms (cpue, cpp, cpa), rzeng (12 edges).
+- **Second Brain graph stale labels:** `a24` was "FF-1: The Web Didn't Die" → now "Art-24: Manpower Shortage". `a25` was "FF-2: Engineer Shortage" → now "Art-25: PJM 6 GW Short". Both moved out of Future Forward tagging into their actual content categories.
 
 ### Unreleased follow-ups (logged for next session)
 - References sections for the 10 `dc-market/*.html` city pages (~5 region-specific refs each).
@@ -8320,71 +8323,71 @@ The discoverability audit is now functionally complete:
 - References sections for `dashboard.html` and `datacenter-solutions.html`.
 - Glossary link insertion for the ~29 standalone calculator pages with `.nav-links` (custom navbar pattern, separate audit).
 
-## [2026-04-28f] â Super Engine S4 + S5 + S6 (capex/opex/tco/pue math + UI primitives)
+## [2026-04-28f] — Super Engine S4 + S5 + S6 (capex/opex/tco/pue math + UI primitives)
 
 ### Added
-- **`RZEngine.data.capexPerMw`** â per-MW build cost baselines for `airCooledTier2/3/4`, `liquidCooledTier3`, `immersionTier3` (sources: 451 Research 2024, JLL DC OpCost 2024, Cushman & Wakefield 2024).
-- **`RZEngine.data.mepPctOfCapex`** â MEP percentage by tier (36/42/48% for T2/T3/T4).
-- **`RZEngine.data.modularPremiumPct`** â modular vs stick-built premium by tier.
-- **`RZEngine.data.hoursPerYear`** â `8760` constant.
-- **`RZEngine.models.capex`** â `datacenterBuildCost(mw, tier, region)`, `modularPremium(baseCost, modularPct, tier)`, `mepDistribution(totalCapex, tier)`. Pulls regional multipliers from `RZEngine.data.regions`.
-- **`RZEngine.models.opex`** â `powerCostAnnual(mw, pue, regionPower, hoursPerYear)`, `coolingEfficiency(climate, designDeltaT)`, `staffingCostAnnual(headcount, region, role)` (uses 1.30Ã fully-loaded mult), `contractCostAnnual(scope, region)`.
-- **`RZEngine.models.tco`** â `lifecycle(capex, opexAnnual, years, refreshPct)` (default 5-yr refresh cycle), `replacementCycles(assetLife, totalYears)`.
-- **`RZEngine.models.pue`** â `pueFromInputs(itLoad, totalLoad)`, `dcie(pue)`, `annualEnergyCost(itKw, pue, kwhRate, hoursPerYear)`.
-- **`RZEngine.ui`** â `gateOverlay(message, ctaLabel, ctaHandlerName)`, `kpiCard(label, value, subLabel, accentColor)`, `badge(text, variant)` (12 variants matching CALCULATOR_PROMPT_STANDARD palette), `glossaryAnchor(term, slug)`, `tooltip(el, content)`.
-- Engine bumped to **`v1.2.0`**. Now `35 KB / 711 LOC`, still under 50 KB SUPER_ENGINE Â§H budget.
+- **`RZEngine.data.capexPerMw`** — per-MW build cost baselines for `airCooledTier2/3/4`, `liquidCooledTier3`, `immersionTier3` (sources: 451 Research 2024, JLL DC OpCost 2024, Cushman & Wakefield 2024).
+- **`RZEngine.data.mepPctOfCapex`** — MEP percentage by tier (36/42/48% for T2/T3/T4).
+- **`RZEngine.data.modularPremiumPct`** — modular vs stick-built premium by tier.
+- **`RZEngine.data.hoursPerYear`** — `8760` constant.
+- **`RZEngine.models.capex`** — `datacenterBuildCost(mw, tier, region)`, `modularPremium(baseCost, modularPct, tier)`, `mepDistribution(totalCapex, tier)`. Pulls regional multipliers from `RZEngine.data.regions`.
+- **`RZEngine.models.opex`** — `powerCostAnnual(mw, pue, regionPower, hoursPerYear)`, `coolingEfficiency(climate, designDeltaT)`, `staffingCostAnnual(headcount, region, role)` (uses 1.30× fully-loaded mult), `contractCostAnnual(scope, region)`.
+- **`RZEngine.models.tco`** — `lifecycle(capex, opexAnnual, years, refreshPct)` (default 5-yr refresh cycle), `replacementCycles(assetLife, totalYears)`.
+- **`RZEngine.models.pue`** — `pueFromInputs(itLoad, totalLoad)`, `dcie(pue)`, `annualEnergyCost(itKw, pue, kwhRate, hoursPerYear)`.
+- **`RZEngine.ui`** — `gateOverlay(message, ctaLabel, ctaHandlerName)`, `kpiCard(label, value, subLabel, accentColor)`, `badge(text, variant)` (12 variants matching CALCULATOR_PROMPT_STANDARD palette), `glossaryAnchor(term, slug)`, `tooltip(el, content)`.
+- Engine bumped to **`v1.2.0`**. Now `35 KB / 711 LOC`, still under 50 KB SUPER_ENGINE §H budget.
 
 ### Verified (node smoke tests)
-- `datacenterBuildCost(10, 3, 'US') = $105M`; `â¦'APAC' = $47.25M` (regional scaling correct).
+- `datacenterBuildCost(10, 3, 'US') = $105M`; `…'APAC' = $47.25M` (regional scaling correct).
 - `mepDistribution(100M, 3) = $42M` (42% of capex).
 - `powerCostAnnual(10MW, 1.4, $0.12, 8760h) = $14.72M`.
 - `coolingEfficiency('temperate', 12) = 0.84`.
-- `staffingCostAnnual(20, 'US', 'dcTechMid') = $1.95M` (20 Ã $75,100 Ã 1.30).
+- `staffingCostAnnual(20, 'US', 'dcTechMid') = $1.95M` (20 × $75,100 × 1.30).
 - `lifecycle(150M, 8M, 10yr, 40%) = $350M`.
 - `pueFromInputs(8000, 11200) = 1.400`; `dcie(1.4) = 71.4%`.
 - `ui.badge`, `ui.kpiCard`, `ui.gateOverlay`, `ui.glossaryAnchor` all return well-formed HTML strings.
 
 ### Status
-All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and core UI primitives now live in the engine. **Phases S0âS2, S4, S5, S6 of SUPER_ENGINE.md are SHIPPED** (S3 PDF consolidation deferred to remote agent on 2026-05-05).
+All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and core UI primitives now live in the engine. **Phases S0–S2, S4, S5, S6 of SUPER_ENGINE.md are SHIPPED** (S3 PDF consolidation deferred to remote agent on 2026-05-05).
 
-## [2026-04-28e] â Super Engine S2 (workforce + ROI + forecast models) + modal helper
+## [2026-04-28e] — Super Engine S2 (workforce + ROI + forecast models) + modal helper
 
 ### Added
-- **`RZEngine.models.workforce`** â `annualHiresRequired`, `attritionCost`, `strategyFitScore`, `cumulativeHires`, `yearsToCloseGap`. Closed-form math, defaults pulled from `RZEngine.data.attritionFactors` so a single benchmark refresh propagates to every workforce calculator.
-- **`RZEngine.models.roi`** â `paybackPeriod`, `npv` (with discount rate), `irr` (bisection over [-0.99, 10]).
-- **`RZEngine.models.forecast`** â `compoundGrowth`, `linearTrend` (returns `{slope, intercept, predict}`), `projectByYear` (year-by-year array).
-- **`RZEngine.modal.create({id, title, accentColor, subtitle, bodyHTML, submitLabel, onSubmit})`** â singleton modal helper. Auto-injects backdrop with `rgba(0,0,0,0.85)` + `backdrop-filter:blur(8px)` per PRO_MODE standard. Returns `{show, hide, destroy}` controls. Reuses existing element on repeat calls (idempotent).
+- **`RZEngine.models.workforce`** — `annualHiresRequired`, `attritionCost`, `strategyFitScore`, `cumulativeHires`, `yearsToCloseGap`. Closed-form math, defaults pulled from `RZEngine.data.attritionFactors` so a single benchmark refresh propagates to every workforce calculator.
+- **`RZEngine.models.roi`** — `paybackPeriod`, `npv` (with discount rate), `irr` (bisection over [-0.99, 10]).
+- **`RZEngine.models.forecast`** — `compoundGrowth`, `linearTrend` (returns `{slope, intercept, predict}`), `projectByYear` (year-by-year array).
+- **`RZEngine.modal.create({id, title, accentColor, subtitle, bodyHTML, submitLabel, onSubmit})`** — singleton modal helper. Auto-injects backdrop with `rgba(0,0,0,0.85)` + `backdrop-filter:blur(8px)` per PRO_MODE standard. Returns `{show, hide, destroy}` controls. Reuses existing element on repeat calls (idempotent).
 - Engine bumped to `v1.1.0`.
 
 ### Changed
 - **article-27 IIFE** now calls `RZEngine.models.workforce.attritionCost(...)` and `RZEngine.models.workforce.annualHiresRequired(...)` for the corresponding KPIs (with hardcoded fallbacks if engine missing). This is the first calculator on the site to share math via the engine, not just constants.
 
 ### Verified
-- Node smoke tests pass: `annualHiresRequired(25,35,25,5)=9`, `attritionCost(25,25,75100)=$999,769`, `paybackPeriod(100K,30K,5K)=4 yr`, `npv([-100,40Ã4],0.10)=$26.79`, `compoundGrowth(75100,0.025,5)=$84,969`, `linearTrend(slope=2)`.
-- localhost: `rz-engine.js` now `23 KB / 499 LOC` (well under 50 KB budget per SUPER_ENGINE Â§H).
+- Node smoke tests pass: `annualHiresRequired(25,35,25,5)=9`, `attritionCost(25,25,75100)=$999,769`, `paybackPeriod(100K,30K,5K)=4 yr`, `npv([-100,40×4],0.10)=$26.79`, `compoundGrowth(75100,0.025,5)=$84,969`, `linearTrend(slope=2)`.
+- localhost: `rz-engine.js` now `23 KB / 499 LOC` (well under 50 KB budget per SUPER_ENGINE §H).
 
-## [2026-04-28d] â Super Engine S0 + S1 Shipped (skeleton + auth + data + format + events)
+## [2026-04-28d] — Super Engine S0 + S1 Shipped (skeleton + auth + data + format + events)
 
 ### Added
 - **`rz-engine.js`** at repo root (~290 LOC, 12 KB unminified, vanilla ES5/ES6, zero deps).
   Implements Phases S0 + S1 of `standarization/SUPER_ENGINE.md`:
-  - `RZEngine.data` â single source of truth for `version`, `lastUpdated`, `years` (2025â2030),
+  - `RZEngine.data` — single source of truth for `version`, `lastUpdated`, `years` (2025–2030),
     `baselineYear`, `regions` (US/EU/APAC/LATAM with salaryMult/powerKwh/currency),
     `currency`, `inflationAnnual`, `salaryBenchmarks` (dcTechMid, electricianJourneyman, cdfomSenior),
     `attritionFactors` (replacementCostMult, voluntaryAttritionAvg, apprenticeRetention),
     `pueDefaults` (air/liquid/immersion Tier-3 baselines).
   - `RZEngine.auth.{VALID_USERS, validateLogin, getSession, setSession, logout, dispatchAuthChange, onAuthChange}`
-    â auth.js-compatible session format, accepts both `{expires:ISOString}` and legacy `{exp:number}`.
-  - `RZEngine.format.{currency, percent, number, weeks, months, ymd}` â display helpers.
-  - `RZEngine.events.{dispatch, on, off}` â generic CustomEvent bus.
-  - Stubs for `RZEngine.{models, modal, pdf, charts, ui}` filled in S2âS6.
+    — auth.js-compatible session format, accepts both `{expires:ISOString}` and legacy `{exp:number}`.
+  - `RZEngine.format.{currency, percent, number, weeks, months, ymd}` — display helpers.
+  - `RZEngine.events.{dispatch, on, off}` — generic CustomEvent bus.
+  - Stubs for `RZEngine.{models, modal, pdf, charts, ui}` filled in S2–S6.
 - Script tag added to `article-27.html` (after auth.js, before script.min.js) and `article-26.html` (after auth.js).
 
 ### Changed
 - **article-27 pilot** (S0 first consumer):
   - `wsCheckSession` now delegates to `RZEngine.auth.getSession()` with legacy fallback.
   - `REGION_MULT` and `REGION_LABEL` derived from `RZEngine.data.regions` at IIFE init (with hardcoded fallback if engine missing).
-  - `avgSalary` baseline pulled from `RZEngine.data.salaryBenchmarks.dcTechMid.US` ($75,100, was hardcoded $72,000 â refresh to 2024 BLS / Uptime number).
+  - `avgSalary` baseline pulled from `RZEngine.data.salaryBenchmarks.dcTechMid.US` ($75,100, was hardcoded $72,000 — refresh to 2024 BLS / Uptime number).
   - `replacementFactor` pulled from `RZEngine.data.attritionFactors.replacementCostMult` (213%).
 - Constants are now editable in ONE place (`rz-engine.js`) and propagate to article-27. Future migrations move article-26 + standalone calculators to the same engine in subsequent phases.
 
@@ -8392,24 +8395,24 @@ All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and c
 - Node smoke test: `RZEngine.auth.validateLogin('demo@resistancezero.com','demo2026')` returns `{email, tier:'pro', role:'demo'}`; bad password returns `null`.
 - localhost: `art-27=200, art-26=200, rz-engine.js=200 (12KB)`.
 
-## [2026-04-28c] â Modal + Auth Hotfix + Super Engine Design
+## [2026-04-28c] — Modal + Auth Hotfix + Super Engine Design
 
 ### Fixed
-- article-27 + article-26 modal backdrop now `rgba(0,0,0,0.85)` + `backdrop-filter:blur(8px)` (was `rgba(0,0,0,0.7)` no blur â caused article body to bleed through behind the Pro Analysis modal).
-- article-27 IIFE now listens for `rz-auth-change` event so navbar login propagates to the embedded calculator without a page reload. Also fixed a session-format mismatch: IIFE was reading `sess.exp` (numeric timestamp) while `auth.js` writes `sess.expires` (ISOString) â IIFE now accepts both formats. Local IIFE login now writes the auth.js-compatible format and emits `rz-auth-change` so the navbar reflects the login state immediately. (Article-26 already had this listener; only the modal fix applied there.)
+- article-27 + article-26 modal backdrop now `rgba(0,0,0,0.85)` + `backdrop-filter:blur(8px)` (was `rgba(0,0,0,0.7)` no blur — caused article body to bleed through behind the Pro Analysis modal).
+- article-27 IIFE now listens for `rz-auth-change` event so navbar login propagates to the embedded calculator without a page reload. Also fixed a session-format mismatch: IIFE was reading `sess.exp` (numeric timestamp) while `auth.js` writes `sess.expires` (ISOString) — IIFE now accepts both formats. Local IIFE login now writes the auth.js-compatible format and emits `rz-auth-change` so the navbar reflects the login state immediately. (Article-26 already had this listener; only the modal fix applied there.)
 
 ### Added
-- `standarization/SUPER_ENGINE.md` â master architectural design unifying `CALC_ENGINE_PLAN.md` (plumbing) and `CALC_MODELS_PLAN.md` (math) under a single `window.RZEngine.*` API. Documents the **"Shared Anchor Parameters"** rule: even when a new calculator is custom-built, parameters like Target Year, Region, Currency, Inflation, salary benchmarks, attrition factors, PUE defaults, and power costs MUST be sourced from `RZEngine.data` rather than inlined. Includes 6-phase rollout (~10â11 weeks), versioning discipline, consumer template, DCMOC relationship, failure modes, and 5 open questions for review before S0 starts.
+- `standarization/SUPER_ENGINE.md` — master architectural design unifying `CALC_ENGINE_PLAN.md` (plumbing) and `CALC_MODELS_PLAN.md` (math) under a single `window.RZEngine.*` API. Documents the **"Shared Anchor Parameters"** rule: even when a new calculator is custom-built, parameters like Target Year, Region, Currency, Inflation, salary benchmarks, attrition factors, PUE defaults, and power costs MUST be sourced from `RZEngine.data` rather than inlined. Includes 6-phase rollout (~10–11 weeks), versioning discipline, consumer template, DCMOC relationship, failure modes, and 5 open questions for review before S0 starts.
 - Cross-references: `CALC_ENGINE_PLAN.md` and `CALC_MODELS_PLAN.md` now declare `SUPER_ENGINE.md` as their parent vision.
 
-## [2026-04-28b] â Article-27 Polish + Calc Models Roadmap
+## [2026-04-28b] — Article-27 Polish + Calc Models Roadmap
 
 ### Fixed
 - article-27 dark-mode group-header badges (CREATE/SUBSTITUTE/EXTEND) now have `[data-theme="dark"]` overrides; they were the empty-rectangle badges visible at the top of each strategy group in earlier dark-mode screenshots.
 
 ### Changed
-- article-27 calculator expanded from 8 â 12 inputs and 7 â 10 KPIs.
-  - New inputs: **Target Year (2025â2030)**, **Region (US/EU/APAC/LATAM)**, **Workforce Mix (Physical-heavy/Balanced/NOC-heavy)**, **Risk Tolerance (Conservative/Balanced/Aggressive)**.
+- article-27 calculator expanded from 8 → 12 inputs and 7 → 10 KPIs.
+  - New inputs: **Target Year (2025–2030)**, **Region (US/EU/APAC/LATAM)**, **Workforce Mix (Physical-heavy/Balanced/NOC-heavy)**, **Risk Tolerance (Conservative/Balanced/Aggressive)**.
   - New KPIs: Annual Hires Required, Cumulative Hires by [Target Year], Years to Close Gap.
   - Cost-related KPIs now scale by region multiplier (US 1.00 / EU 0.85 / APAC 0.45 / LATAM 0.55).
   - 5-Year Investment renamed to N-Year Investment, length driven by Target Year.
@@ -8419,27 +8422,27 @@ All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and c
 - article-27 in-prose first occurrences of `AIOps`, `NOCaaS`, and `apprenticeship` now link to `glossary.html#term-[slug]` per the new glossary workflow.
 
 ### Added
-- `standarization/CALC_MODELS_PLAN.md` â sibling roadmap to `CALC_ENGINE_PLAN.md` covering the **calculation math layer** (`CalcModels.{workforce, capex, opex, roi, tco, pue, forecast}` plus `CalcModels.data` for shared constants like salary benchmarks, region multipliers, attrition factors). 4-phase rollout. Closes user concern about scattered math without a "big engine" for shared parameters.
+- `standarization/CALC_MODELS_PLAN.md` — sibling roadmap to `CALC_ENGINE_PLAN.md` covering the **calculation math layer** (`CalcModels.{workforce, capex, opex, roi, tco, pue, forecast}` plus `CalcModels.data` for shared constants like salary benchmarks, region multipliers, attrition factors). 4-phase rollout. Closes user concern about scattered math without a "big engine" for shared parameters.
 - Cross-reference between `CALC_ENGINE_PLAN.md` and `CALC_MODELS_PLAN.md`.
 
-## [2026-04-28] â Glossary Sync, Standards & Calculator Engine Roadmap
+## [2026-04-28] — Glossary Sync, Standards & Calculator Engine Roadmap
 
 ### Added
-- 21 new glossary entries in `glossary.html` covering articles 23â27 domain
+- 21 new glossary entries in `glossary.html` covering articles 23–27 domain
   vocabulary (AIOps, Apprenticeship, BICSI RCDD, Capacity Auction, CDCTP,
   Colossus, DCDC, Digital Twin, Galden HT, Interconnection Queue, Lights-Out
   DC, Maintenance Vapor Release, Megapack, Memphis Turbine Deployment, NOCaaS,
   Novec 7000, PFAS, PJM Interconnection, Reliability Pricing Model, Reserve
   Margin, Spectrum-X, Two-Phase Immersion Cooling). Each entry links back to
-  its originating article via `term-links`. Total terms: 300 â 321.
-- `CHANGELOG.md` (this file) â establishes the maintenance log.
-- `standarization/CALC_ENGINE_PLAN.md` â 4-phase consolidation roadmap to
+  its originating article via `term-links`. Total terms: 300 → 321.
+- `CHANGELOG.md` (this file) — establishes the maintenance log.
+- `standarization/CALC_ENGINE_PLAN.md` — 4-phase consolidation roadmap to
   extract ~5,800 LOC of duplicated auth, login modal, PDF export, and
   Chart.js setup code from 18+ calculator pages into a shared
   `calc-engine.js`. References DCMOC's TypeScript engine pattern as the
   architectural model.
 - `standarization/TOOLTIP_STANDARD.md` new section: "Glossary Maintenance
-  Workflow" â every new article must add 5+ glossary entries with
+  Workflow" — every new article must add 5+ glossary entries with
   `term-links` back to the article; in-prose first-occurrence terms link to
   `glossary.html#term-[slug]`.
 - `standarization/article prompt/ARTICLE_CREATION_PROMPT.md` checklist 9.7:
@@ -8455,15 +8458,15 @@ All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and c
 
 ---
 
-## [2026-04-27] â Article 23â27 References + Standards Update
+## [2026-04-27] — Article 23–27 References + Standards Update
 
 ### Added
-- References sections (academic format) for articles 23â27 with 12â25 cited
+- References sections (academic format) for articles 23–27 with 12–25 cited
   primary sources each, linking to Uptime Institute, AFCOM, McKinsey, EPA,
   FERC, NERC, IBEW, NVIDIA, Microsoft, Google, and other authoritative sources.
-- `assets/article-27-hero.webp` (1200Ã509 WebP @ q80, 60 KB).
-- `ARTICLE_CREATION_PROMPT.md` Â§3.8 References pattern (mandatory) and
-  checklist 9.6 â closes the standards gap that allowed articles 23â27 to ship
+- `assets/article-27-hero.webp` (1200×509 WebP @ q80, 60 KB).
+- `ARTICLE_CREATION_PROMPT.md` §3.8 References pattern (mandatory) and
+  checklist 9.6 — closes the standards gap that allowed articles 23–27 to ship
   without references.
 
 ### Fixed
@@ -8478,12 +8481,12 @@ All 4 math domains (workforce / capex / opex / tco / pue / roi / forecast) and c
 
 ---
 
-## [2026-04-12] â Article 27 Published
+## [2026-04-12] — Article 27 Published
 
 ### Added
-- `article-27.html` â "No Humans, No Data Centers: 20 Strategies to Solve the
+- `article-27.html` — "No Humans, No Data Centers: 20 Strategies to Solve the
   AI Workforce Crisis" (Global Analysis series, 2,258 lines, ~133 KB).
-- Embedded Workforce Strategy Planner calculator: 8 free inputs â 6 KPIs +
+- Embedded Workforce Strategy Planner calculator: 8 free inputs → 6 KPIs +
   narrative; 4 Pro panels (radar comparison, 36-month HTML Gantt chart,
   year-by-year cost stacked bar, ROI projection line); auth via shared
   session pattern; PDF export via `window.open()`.
