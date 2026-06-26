@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>PLN Sumatra Interconnected Grid Monitor | 275/150 kV + Batam</title>
+    <meta name="description" content="The PLN Sumatra interconnected 275/150 kV grid for AI/HPC data-center siting — north-to-south backbone, key substations, major power plants (incl Medco), and the separate Batam-Bintan island grid. Interactive Leaflet map + substation atlas.">
+    <meta name="ai-content-declaration" content="human-authored">
+    <meta name="keywords" content="PLN Sumatra grid, Sumatra interconnected 275 kV, Batam grid, Medco power, Bukit Asam, Asahan hydro, data center Sumatra, Medan Palembang Batam DC, RUPTL Sumatra">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0E0F12">
+    <link rel="canonical" href="https://resistancezero.com/pln-sumatra-grid.html">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resistancezero.com/pln-sumatra-grid.html">
+    <meta property="og:title" content="PLN Sumatra Interconnected Grid Monitor | 275/150 kV + Batam">
+    <meta property="og:description" content="Sumatra 275/150 kV backbone, key substations, major plants (incl Medco), and the Batam-Bintan island grid — interactive map + atlas.">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PLN Sumatra Interconnected Grid Monitor">
+    <meta name="twitter:description" content="Sumatra 275/150 kV backbone + Batam-Bintan island grid (incl Medco) — interactive map + atlas.">
+    <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin>
+    <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin defer></script>
+    <script src="js/pln-sumatra-grid-data.js?v=2026-06-26" defer></script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"PLN Sumatra Interconnected Grid Monitor","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://resistancezero.com/pln-sumatra-grid.html","description":"Interactive monitor of the PLN Sumatra 275/150 kV interconnected grid plus the Batam-Bintan island grid, for data-center siting."}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"Sumatra Grid Monitor"}]}
+    </script>
+    <style>
+        :root, [data-theme="light"] { --sg-primary:#0891b2; --sg-accent:#06b6d4; --sg-bg:#f8fafc; --sg-card:#ffffff; --sg-border:#e2e8f0; --sg-text:#0f172a; --sg-muted:#64748b; --sg-inset:#f1f5f9; }
+        [data-theme="dark"] { --sg-primary:#22d3ee; --sg-accent:#06b6d4; --sg-bg:#0f172a; --sg-card:#1e293b; --sg-border:#334155; --sg-text:#f1f5f9; --sg-muted:#94a3b8; --sg-inset:#0b1220; }
+        body { font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif; background:var(--sg-bg); color:var(--sg-text); }
+        main { background:var(--sg-bg); }
+        .sg-hero { position:relative; padding:7rem 1.5rem 1.4rem; border-bottom:1px solid var(--sg-border); overflow:hidden; }
+        [data-theme="dark"] .sg-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(680px 320px at 80% -20%,rgba(6,182,212,.12),transparent 64%); pointer-events:none; }
+        .sg-hero > * { position:relative; }
+        .sg-wrap { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
+        .sg-kick { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--sg-primary); font-weight:600; }
+        .sg-hero h1 { font-size:clamp(1.7rem,3.8vw,2.5rem); font-weight:700; letter-spacing:-.02em; margin:.5rem 0 .5rem; line-height:1.07; }
+        .sg-hero p { color:var(--sg-muted); max-width:78ch; font-size:1rem; line-height:1.6; }
+        .sg-hero .crumb { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--sg-muted); margin-top:.8rem; }
+        .sg-hero .crumb a { color:var(--sg-primary); }
+        .sg-body { max-width:1200px; margin:0 auto; padding:1.6rem 1.4rem 3rem; }
+        .sg-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.7rem; margin-bottom:1.2rem; }
+        .sg-stat { background:var(--sg-card); border:1px solid var(--sg-border); border-top:2px solid var(--sg-primary); border-radius:9px; padding:.7rem .85rem; }
+        .sg-stat .v { font-size:1.3rem; font-weight:700; font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums slashed-zero; }
+        .sg-stat .l { font-size:.64rem; font-family:'JetBrains Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:var(--sg-muted); margin-top:.1rem; }
+        #sgMap { height:540px; border-radius:12px; border:1px solid var(--sg-border); z-index:1; }
+        .sg-legend { display:flex; flex-wrap:wrap; gap:.5rem 1rem; margin:.8rem 0; font-size:.78rem; color:var(--sg-muted); align-items:center; }
+        .sg-legend span { display:inline-flex; align-items:center; gap:.35rem; }
+        .sg-dot { width:11px; height:11px; border-radius:50%; display:inline-block; }
+        .sg-line { width:18px; height:0; border-top-width:3px; border-top-style:solid; display:inline-block; }
+        .sg-tbl-wrap { overflow-x:auto; border:1px solid var(--sg-border); border-radius:10px; margin-top:1.4rem; }
+        table.sg-tbl { width:100%; border-collapse:collapse; font-size:.84rem; background:var(--sg-card); }
+        .sg-tbl th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:.64rem; letter-spacing:.05em; text-transform:uppercase; color:var(--sg-muted); padding:.55rem .8rem; border-bottom:1px solid var(--sg-border); background:var(--sg-inset); position:sticky; top:0; }
+        .sg-tbl td { padding:.5rem .8rem; border-bottom:1px solid var(--sg-border); font-variant-numeric:tabular-nums slashed-zero; }
+        .sg-tbl tr:last-child td { border-bottom:none; }
+        .sg-tag { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
+        .sg-tag.s { background:rgba(59,130,246,.16); color:#2563eb; } .sg-tag.p { background:rgba(239,68,68,.16); color:#dc2626; } .sg-tag.dc { background:rgba(168,85,247,.16); color:#7c3aed; }
+        [data-theme="dark"] .sg-tag.s{color:#60a5fa}[data-theme="dark"] .sg-tag.p{color:#f87171}[data-theme="dark"] .sg-tag.dc{color:#c084fc}
+        .sg-note { border:1px dashed var(--sg-border); border-radius:10px; background:var(--sg-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--sg-muted); line-height:1.6; margin:1.2rem 0; }
+        .sg-note b { color:var(--sg-text); } .sg-note a { color:var(--sg-primary); }
+        .sg-h2 { font-size:1.15rem; margin:1.6rem 0 .3rem; }
+        .leaflet-popup-content { font-family:'IBM Plex Sans',sans-serif; font-size:.8rem; line-height:1.45; }
+        .leaflet-popup-content b { color:#0891b2; }
+        @media (max-width:768px){
+            html, body { overflow-x:hidden; max-width:100vw; }
+            img, picture, video, svg { max-width:100%; height:auto; }
+            .sg-hero { padding:5.5rem 1rem 1.2rem; }
+            .nav-menu, .nav-links { display:none; }
+            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+            button, a.btn, [role="button"] { min-height:44px; }
+            #sgMap { height:380px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
+                        <li role="menuitem"><a href="pln-java-grid.html">PLN Java-Bali Grid</a></li>
+                        <li role="menuitem"><a href="pln-sumatra-grid.html" style="color:#06b6d4;">PLN Sumatra Grid</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <header class="sg-hero">
+        <div class="sg-wrap">
+            <span class="sg-kick">PLN Indonesia · Grid Monitor</span>
+            <h1>PLN Sumatra interconnected grid</h1>
+            <p>The Sumatra 275/150 kV interconnected system — a north-to-south backbone from Aceh through Medan, Pekanbaru and Palembang to Lampung — plus the separate <strong>Batam-Bintan (Barelang)</strong> island grid operated by PLN Batam, where <strong>Medco Power</strong> runs the Panaran gas plants. Built like the Java-Bali monitor: an interactive map, a substation/plant atlas, and the DC-relevant clusters (Medan, Palembang, and the Nongsa/Batam subsea-cable data island). Curated from RUPTL 2025-2034 + PLN AR 2024 — coordinates approximate, not an operational topology.</p>
+            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="pln-java-grid.html">Java-Bali Grid</a> → Sumatra Grid</div>
+        </div>
+    </header>
+
+    <main id="main-content"><div class="sg-body">
+        <div class="sg-stats" id="sgStats"></div>
+        <div id="sgMap" aria-label="Interactive map of the PLN Sumatra grid"></div>
+        <div class="sg-legend">
+            <span><i class="sg-line" style="border-top-color:#1d4ed8;"></i> 275 kV backbone</span>
+            <span><i class="sg-line" style="border-top-color:#3b82f6;border-top-width:2px;"></i> 150 kV</span>
+            <span><i class="sg-line" style="border-top-color:#22d3ee;border-top-style:dashed;"></i> Batam island (separate)</span>
+            <span><i class="sg-dot" style="background:#2563eb;"></i> Substation</span>
+            <span><i class="sg-dot" style="background:#dc2626;"></i> Plant</span>
+            <span><i class="sg-dot" style="background:#a855f7;"></i> Data center</span>
+        </div>
+
+        <div class="sg-note"><b>Batam is islanded.</b> The Batam-Bintan-Rempang-Galang (Barelang) 150 kV grid is <em>not</em> synchronously tied to the mainland Sumatra interconnection — it is its own system run by b'right PLN Batam, with <b>Medco Power's Panaran gas plants</b> and PLTU Tanjung Kasam as base-load, and the Nongsa Digital Park subsea-cable DC hub as a fast-growing, Singapore-adjacent AI/edge load.</div>
+
+        <h2 class="sg-h2">Substation &amp; plant atlas</h2>
+        <div class="sg-tbl-wrap"><table class="sg-tbl" id="sgTbl"><thead><tr><th>Node</th><th>Type</th><th>kV</th><th>Capacity</th><th>Region</th><th>Notes</th></tr></thead><tbody></tbody></table></div>
+    </div></main>
+
+    <footer class="footer footer-enhanced">
+        <div class="container"><div class="footer-grid">
+            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
+            <div class="footer-nav"><h4 class="footer-heading">GRID MONITORS</h4><ul class="footer-links"><li><a href="pln-java-grid.html">Java-Bali Grid</a></li><li><a href="pln-sumatra-grid.html">Sumatra Grid</a></li><li><a href="datacenter-solutions.html">DC Solutions</a></li></ul></div>
+            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
+        </div></div>
+    </footer>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
+        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
+        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
+        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
+    })();
+    </script>
+
+    <script>
+    /* Sumatra grid — render the curated dataset on a Leaflet map + atlas table. */
+    (function(){
+        function init(){
+            var G = window.PLN_SUMATRA_GRID;
+            if(!window.L || !G){ return; }
+            var byId = {}; G.nodes.forEach(function(n){ byId[n.id]=n; });
+            // ---- stats ----
+            var subs=0, plants=0, dcs=0, genMW=0, kv275=0, batamMW=0, medcoMW=0;
+            G.nodes.forEach(function(n){
+                if(n.kind==='station'){ subs++; if(n.voltage===275) kv275++; }
+                else if(n.kind==='plant'){ plants++; genMW += (n.mw||0); if(n.island) batamMW += (n.mw||0); if(n.operator==='Medco') medcoMW += (n.mw||0); }
+                else if(n.kind==='dc'){ dcs++; }
+            });
+            var stats = [
+                {v:subs, l:'Substations'}, {v:plants, l:'Power plants'},
+                {v:Math.round(genMW).toLocaleString()+' MW', l:'Mapped generation'},
+                {v:kv275, l:'275 kV nodes'}, {v:Math.round(batamMW).toLocaleString()+' MW', l:'Batam island gen'},
+                {v:Math.round(medcoMW).toLocaleString()+' MW', l:'Medco-operated'}
+            ];
+            document.getElementById('sgStats').innerHTML = stats.map(function(s){ return '<div class="sg-stat"><div class="v">'+s.v+'</div><div class="l">'+s.l+'</div></div>'; }).join('');
+            // ---- map ----
+            var map = L.map('sgMap', { scrollWheelZoom:false }).setView([-0.5, 102.5], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution:'&copy; OpenStreetMap, &copy; CARTO', maxZoom:18
+            }).addTo(map);
+            function edgeStyle(e){
+                if(e.island) return { color:'#22d3ee', weight:2, opacity:.85, dashArray:'5 4' };
+                if(e.voltage===275) return { color:'#1d4ed8', weight:4, opacity:.9 };
+                if(e.voltage===150) return { color:'#3b82f6', weight:2.2, opacity:.8 };
+                return { color:'#a855f7', weight:1.5, opacity:.7, dashArray:'2 3' };
+            }
+            G.edges.forEach(function(e){
+                var a=byId[e.from], b=byId[e.to]; if(!a||!b) return;
+                L.polyline([[a.lat,a.lng],[b.lat,b.lng]], edgeStyle(e)).addTo(map);
+            });
+            function nodeColor(n){
+                if(n.kind==='dc') return '#a855f7';
+                if(n.kind==='plant'){ return n.fuel==='hydro'?'#06b6d4':(n.fuel==='gas'?'#f59e0b':'#dc2626'); }
+                return n.voltage===275?'#1d4ed8':'#2563eb';
+            }
+            G.nodes.forEach(function(n){
+                var cap = n.kind==='plant' ? (n.mw?n.mw+' MW':'') : (n.mva?n.mva+' MVA':(n.mw?n.mw+' MW':''));
+                var html = '<b>'+n.name+'</b><br>'+(n.kind==='plant'?('Plant'+(n.fuel?' · '+n.fuel:'')):(n.kind==='dc'?'Data center':n.voltage+' kV substation'))
+                    +(cap?(' · '+cap):'')+(n.operator?('<br>Operator: '+n.operator):'')+'<br>'+(n.prov||'')
+                    +(n.notes?('<br><span style="color:#64748b">'+n.notes+'</span>'):'')+'<br><span style="color:#94a3b8;font-size:.7rem">confidence: '+(n.confidence||'n/a')+'</span>';
+                L.circleMarker([n.lat,n.lng], {
+                    radius: n.kind==='plant'? Math.max(5,Math.min(12,Math.sqrt((n.mw||50))/2)) : (n.voltage===275?7:5),
+                    fillColor: nodeColor(n), color:'#fff', weight:1, fillOpacity:.9
+                }).addTo(map).bindPopup(html);
+            });
+            map.on('click', function(){ if(!map.scrollWheelZoomEnabled()){ map.scrollWheelZoom.enable(); } });
+            // ---- table ----
+            var rows = G.nodes.slice().sort(function(a,b){ return (a.prov||'').localeCompare(b.prov||''); }).map(function(n){
+                var type = n.kind==='plant'?'<span class="sg-tag p">Plant'+(n.fuel?' '+n.fuel:'')+'</span>':(n.kind==='dc'?'<span class="sg-tag dc">DC</span>':'<span class="sg-tag s">Substation</span>');
+                var cap = n.kind==='plant'?(n.mw?n.mw+' MW':'—'):(n.mva?n.mva+' MVA':'—');
+                return '<tr><td><b>'+n.name+'</b>'+(n.operator==='Medco'?' <span class="sg-tag p" style="background:rgba(8,145,178,.16);color:#0891b2;">Medco</span>':'')+(n.island?' <span class="sg-tag s" style="background:rgba(34,211,238,.16);color:#0891b2;">Batam</span>':'')+'</td><td>'+type+'</td><td>'+(n.voltage||'—')+'</td><td>'+cap+'</td><td>'+(n.prov||'—')+'</td><td style="color:var(--sg-muted);font-size:.78rem;">'+(n.notes||'')+'</td></tr>';
+            }).join('');
+            document.querySelector('#sgTbl tbody').innerHTML = rows;
+        }
+        if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', function(){ setTimeout(init, 60); }); } else { setTimeout(init, 60); }
+    })();
+    </script>
+    <script src="auth.js?v=2026-05-09-v1" defer></script>
+</body>
+</html>

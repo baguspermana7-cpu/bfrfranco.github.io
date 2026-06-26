@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.46.6 — 2026-06-26 (PLN landing rearrange + Sumatra interconnected grid)
+
+### Added
+- **`pln-sumatra-grid.html`** + **`js/pln-sumatra-grid-data.js`** — a new PLN Sumatra interconnected
+  grid monitor, built like the Java-Bali one: an interactive Leaflet map + 31-node substation/plant
+  atlas of the 275/150 kV north-to-south backbone (Aceh→Lampung), major plants (Asahan, Pangkalan
+  Susu, Bukit Asam, incl Medco gas), and the separate **Batam-Bintan island grid** with **Medco Power
+  Panaran** and the Nongsa subsea-cable data island. Self-contained (no engine dep); 0 dangling edges;
+  curated from RUPTL 2025-2034 + PLN AR 2024 with confidence tags. Registered in sitemap/llms/search-index.
+
+### Changed (datacenter-solutions.html — PLN section rearrange)
+- Removed the 4 placeholder "SOON" cards (Kalimantan, Sulawesi, Maluku-Papua, Nusa Tenggara) — the
+  grid now shows the 2 published monitors (Java-Bali + Sumatra), a cleaner grouping.
+- Flipped the **Sumatera card** from "Coming soon" to published (NEW badge, links to the new monitor,
+  Medco/Batam/Nongsa features); footnote updated.
+
+### Verified
+- Audits clean; Sumatra page: map + 60 markers/lines + 31 atlas rows + Medco/Batam stats render,
+  dataset 0 dangling edges, 0 console errors; datacenter-solutions PLN section 2 cards, 0 errors.
+  No bug, no error.
+
 ## v1.46.5 — 2026-06-26 (Articles — uiux-review reading-experience overhaul)
 
 Acted on a uiux-reviewer audit of the editorial register. All in shared
