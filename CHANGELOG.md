@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v1.49.7 — 2026-06-27 (Cooling pillar — link the CDU toolkit)
+
+### Added
+- **`pillar-cooling.html`** now includes a **Liquid-Cooling CDU Toolkit** resource card (→ `cdu-hub.html`),
+  placed next to the Air-vs-Liquid comparison. The pillar's own intro promises it "links every
+  cooling-related resource," but the CDU suite — the biggest recent cooling addition — was missing.
+  Found via a cross-linkage evaluation (search-index coverage for all 9 new pages is complete; the
+  fire pillar↔tools links were already in place; this was the one real pillar→tool gap).
+
 ## v1.49.6 — 2026-06-27 (DC Solutions hub — surface the Fire suite)
 
 ### Added
