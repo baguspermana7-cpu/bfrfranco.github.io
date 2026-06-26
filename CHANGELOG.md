@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.46.1 — 2026-06-26 (Fire-safety hub — Ship 5: pillar deep-analysis expansion)
+
+### Changed (pillar-fire-safety.html — from thin landing to analysis hub)
+- Added a **fire-strategy four-stage lifecycle** (Detect → Confirm → Suppress → Evacuate) and a deep
+  **"Lithium-ion BBU — the thermal-runaway strategy"** section (the owner's gap): why suppression does
+  NOT stop runaway, a 5-layer mitigation stack (cell-level BMS detection · H₂/CO off-gas detection +
+  ventilation per NFPA 855 · BMS isolation + EPO · compartmentation + UL 9540A spacing · suppression
+  for the associated fire), the off-gas hazard callout, and a clean-agent sizing/occupant-safety note.
+- Added 2 resource cards (**fire-calculator** + **fire-checklist**) and a Li-ion FAQ; extended the
+  CollectionPage `hasPart` (now 6) + FAQPage schema. Scoped `.fa-*` styles with full dark-mode overrides.
+
+### Verified
+- Audits clean; 3/3 JSON-LD valid; 6 cards / 4 lifecycle steps / 5 mitigation layers / 4 FAQs render;
+  0 console errors; dark + mobile pass. **Fire-safety hub complete (Ships 1–5).** No bug, no error.
+
 ## v1.46.0 — 2026-06-26 (Fire-safety hub — Ship 4: design/commissioning + Li-ion checklist)
 
 ### Added

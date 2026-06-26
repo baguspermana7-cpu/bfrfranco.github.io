@@ -84,7 +84,9 @@
                 {"@type": "ListItem", "position": 1, "url": "https://resistancezero.com/ltc-nfpa-fire-risk.html", "name": "NFPA Fire & Risk Standards"},
                 {"@type": "ListItem", "position": 2, "url": "https://resistancezero.com/compare-fm200-vs-novec.html", "name": "FM-200 vs Novec 1230"},
                 {"@type": "ListItem", "position": 3, "url": "https://resistancezero.com/compare-wet-vs-preaction.html", "name": "Wet vs Pre-Action Sprinkler"},
-                {"@type": "ListItem", "position": 4, "url": "https://resistancezero.com/fire-system.html", "name": "Fire Protection System"}
+                {"@type": "ListItem", "position": 4, "url": "https://resistancezero.com/fire-system.html", "name": "Fire Protection System"},
+                {"@type": "ListItem", "position": 5, "url": "https://resistancezero.com/fire-calculator.html", "name": "Clean-Agent & Li-ion Fire Calculator"},
+                {"@type": "ListItem", "position": 6, "url": "https://resistancezero.com/fire-checklist.html", "name": "Fire Design, Commissioning & Li-ion Checklist"}
             ]
         }
     }
@@ -130,6 +132,14 @@
                 "acceptedAnswer": {
                     "@type": "Answer",
                     "text": "Yes, in most jurisdictions. Building codes and insurance requirements typically mandate sprinkler coverage regardless of clean agent systems. The standard approach uses pre-action sprinklers, which require two triggers — both a detection signal and physical heat activation of the sprinkler head — before water flows. This double-interlock design minimizes accidental discharge. Clean agents protect against small, fast-growing electrical fires, while sprinklers provide building-level protection for larger fire events."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do you protect a lithium-ion (Li-ion) UPS/BBU battery room from fire?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A clean-agent system alone is not enough — it cannot stop a thermal-runaway reaction that, once started (~150 °C for NMC, ~166.8 °C for LFP), generates its own heat and propagates cell to cell. The strategy is layered and led by detection, not suppression: cell-level BMS monitoring to isolate a failing pack early; dedicated H2/CO off-gas detection alarming at 25% of the lower flammable limit with mechanical exhaust (NFPA 855); BMS isolation coordinated with EPO; fire-rated compartmentation and unit spacing per UL 9540A propagation testing; and clean agent or water mist for any associated ordinary-combustible fire. The governing standards are NFPA 855, UL 9540/9540A and IEC 62619."
                 }
             }
         ]
@@ -535,7 +545,75 @@
                 <p>Interactive fire protection system reference. Explore detection layers (VESDA, spot detectors, beam detectors), suppression zones (clean agent, pre-action sprinkler), alarm integration, EPO procedures, and evacuation routing for data center environments.</p>
                 <a href="fire-system.html" class="pillar-card-link">Explore system <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
             </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Calculator</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="18"/></svg></div>
+                <h3>Clean-Agent &amp; Li-ion Calculator</h3>
+                <p>Size the system from first principles — clean-agent quantity (NFPA 2001), occupant safety vs the agent NOAEL, cylinder count, GWP footprint, smoke-detector coverage, and the <strong>lithium-ion BBU thermal-runaway off-gas risk</strong> — computed live by a validated engine with basis chips.</p>
+                <a href="fire-calculator.html" class="pillar-card-link">Open calculator <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+            <div class="pillar-card">
+                <span class="pillar-card-tag">Checklist</span>
+                <div class="pillar-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                <h3>Design, Commissioning &amp; Li-ion Checklist</h3>
+                <p>A super-detailed checklist: clean-agent design bands, the <strong>Li-ion battery-room requirements (NFPA 855 / UL 9540A)</strong>, the numeric commissioning procedure (door-fan integrity, discharge, cross-zone), PM cadence, a symptom→cause→action table, and a printable service-record form.</p>
+                <a href="fire-checklist.html" class="pillar-card-link">Open checklist <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
         </div>
+    </section>
+
+    <style>
+        .fa-sec { max-width:1080px; margin:0 auto; padding:1rem 2rem 0; }
+        .fa-sec h2 { font-size:1.6rem; font-weight:700; margin:1.5rem 0 .4rem; }
+        .fa-lead { color:#64748b; font-size:1rem; line-height:1.65; max-width:75ch; margin:0 0 1.2rem; }
+        [data-theme="dark"] .fa-lead { color:#94a3b8; }
+        .fa-flow { display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem; margin:1.2rem 0; }
+        .fa-step { border:1px solid #e2e8f0; border-top:3px solid #ef4444; border-radius:10px; background:#fff; padding:1rem 1.1rem; }
+        [data-theme="dark"] .fa-step { background:#1e293b; border-color:#334155; }
+        .fa-step .k { font-family:'JetBrains Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:#ef4444; font-weight:700; }
+        .fa-step h4 { margin:.25rem 0 .35rem; font-size:1rem; }
+        .fa-step p { margin:0; font-size:.82rem; line-height:1.55; color:#64748b; }
+        [data-theme="dark"] .fa-step p { color:#94a3b8; }
+        .fa-layers { border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; margin:1.2rem 0; }
+        [data-theme="dark"] .fa-layers { border-color:#334155; }
+        .fa-layer { display:flex; gap:1rem; align-items:flex-start; padding:.9rem 1.2rem; border-bottom:1px solid #e2e8f0; background:#fff; }
+        [data-theme="dark"] .fa-layer { background:#1e293b; border-color:#334155; }
+        .fa-layer:last-child { border-bottom:none; }
+        .fa-layer .num { font-family:'JetBrains Mono',monospace; font-weight:700; color:#ef4444; font-size:1.1rem; flex-shrink:0; width:1.4rem; }
+        .fa-layer h4 { margin:0 0 .2rem; font-size:.95rem; }
+        .fa-layer p { margin:0; font-size:.85rem; line-height:1.55; color:#64748b; }
+        [data-theme="dark"] .fa-layer p { color:#94a3b8; }
+        .fa-layer .std { font-family:'JetBrains Mono',monospace; font-size:.58rem; font-weight:700; color:#0a8a5a; background:rgba(10,138,90,.12); padding:1px 5px; border-radius:4px; white-space:nowrap; }
+        [data-theme="dark"] .fa-layer .std { color:#34d399; }
+        .fa-danger { border:1px solid rgba(239,68,68,.4); border-left:4px solid #dc2626; border-radius:10px; background:rgba(239,68,68,.06); padding:1rem 1.2rem; margin:1.2rem 0; font-size:.92rem; line-height:1.65; color:#0f172a; }
+        [data-theme="dark"] .fa-danger { color:#f1f5f9; background:rgba(239,68,68,.1); }
+        .fa-danger b { color:#dc2626; } [data-theme="dark"] .fa-danger b { color:#f87171; }
+        .fa-cta { display:inline-block; margin-top:.4rem; font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:600; color:#ef4444; text-decoration:none; }
+        @media (max-width:768px){ .fa-flow { grid-template-columns:1fr 1fr; } .fa-sec { padding:1rem 1.2rem 0; } }
+    </style>
+    <section class="fa-sec">
+        <h2>Fire strategy — the four-stage lifecycle</h2>
+        <p class="fa-lead">Data-center fire protection is not one system but a sequenced strategy. Each stage buys time for the next, and the goal is to act at the earliest possible stage — ideally before there is any flame at all.</p>
+        <div class="fa-flow">
+            <div class="fa-step"><span class="k">01 · Detect</span><h4>Very-early warning</h4><p>Aspirating smoke detection (VESDA) samples air continuously and alarms at incipient obscuration — hours before a spot detector, and before a Li-ion cell reaches flame.</p></div>
+            <div class="fa-step"><span class="k">02 · Confirm</span><h4>Cross-zone + delay</h4><p>Two independent detectors must agree before release; a pre-discharge warning and abort window prevent a costly accidental discharge from a single faulty device.</p></div>
+            <div class="fa-step"><span class="k">03 · Suppress</span><h4>Clean agent + sprinkler</h4><p>HVAC shuts down, dampers close, and the clean agent floods to design concentration in ≤10 s — with pre-action sprinklers as the building-level backstop.</p></div>
+            <div class="fa-step"><span class="k">04 · Evacuate</span><h4>Life safety + EPO</h4><p>Occupants egress on alarm; a guarded two-stage EPO de-energizes the zone for responders. People first — the agent concentration must stay within occupant-safe limits.</p></div>
+        </div>
+
+        <h2>Lithium-ion BBU — the thermal-runaway strategy</h2>
+        <p class="fa-lead">Modern data centers have replaced VRLA UPS strings with lithium-ion battery backup units (BBU) — this site's own AI hall models <strong>8× NMC packs at 1,333 kWh</strong>. Li-ion changes the fire problem entirely, and a clean-agent system alone does not solve it.</p>
+        <div class="fa-danger"><b>Suppression does not stop thermal runaway.</b> Once a Li-ion cell goes into runaway (~150 °C for NMC, ~166.8 °C for LFP) it generates its own oxygen and heat and propagates cell-to-cell. A clean agent or sprinkler can knock down an associated Class-A fire, but it will <b>not</b> halt the internal runaway reaction. Worse, the cell first vents a large volume of flammable gas (H₂/CO) — a 1,333 kWh NMC pack can release on the order of <b>thousands of cubic metres of vent gas</b>, far exceeding the room's flammable limit and creating an explosion hazard. So the Li-ion strategy is a layered one, led by <em>detection and ventilation</em>, not suppression. <a href="fire-calculator.html" class="fa-cta">Model the off-gas + runaway energy →</a></div>
+        <div class="fa-layers">
+            <div class="fa-layer"><span class="num">1</span><div><h4>Cell-level early detection <span class="std">UL 9540A / IEC 62619</span></h4><p>BMS monitors per-cell voltage and temperature (and dT/dt). Rising temperature or a voltage anomaly trips an alarm and isolates the pack <em>before</em> off-gassing — the earliest possible intervention.</p></div></div>
+            <div class="fa-layer"><span class="num">2</span><div><h4>Off-gas (H₂/CO) detection + ventilation <span class="std">NFPA 855</span></h4><p>Dedicated combustible-gas sensors alarm at ≤25% of the lower flammable limit and start mechanical exhaust, keeping the vent gas below its explosive concentration. This is the primary line of defence.</p></div></div>
+            <div class="fa-layer"><span class="num">3</span><div><h4>BMS isolation + EPO coordination <span class="std">NFPA 855 / 72</span></h4><p>The battery management system disconnects the failing pack to stop electrical energy feeding the event; the sequence between BMS shutdown and any agent discharge is defined and tested.</p></div></div>
+            <div class="fa-layer"><span class="num">4</span><div><h4>Compartmentation + spacing <span class="std">NFPA 855 / UL 9540A</span></h4><p>Fire-rated separation, unit spacing per UL 9540A propagation testing, and sealed penetrations contain a runaway to one pack/zone so it cannot cascade across the battery room.</p></div></div>
+            <div class="fa-layer"><span class="num">5</span><div><h4>Suppression for the associated fire <span class="std">NFPA 2001 / 13</span></h4><p>Clean agent or water mist addresses any ordinary-combustible fire ignited by the event — a supporting role, never the primary mitigation for the runaway itself.</p></div></div>
+        </div>
+
+        <h2>Clean-agent design — sizing &amp; occupant safety</h2>
+        <p class="fa-lead">For the electrical/IT fire risk, gaseous clean agents remain the workhorse. The agent mass follows the NFPA 2001 equation W = (V/s)·(C/(100−C)); the design concentration must reach the extinguishing level yet stay at or below the agent's NOAEL so the space remains safe for any occupants. Novec 1230 (GWP 1) has displaced FM-200 (GWP 3,220) on environmental grounds as F-Gas rules tighten, while inert gases (IG-541) flood by volume and lower oxygen to ~12.5%. <a href="fire-calculator.html" class="fa-cta">Size an agent for your room →</a></p>
     </section>
 
     <section class="pillar-stats">
@@ -582,6 +660,10 @@
             <div class="faq-item">
                 <button class="faq-question">Do data centers need sprinklers if they have clean agents?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
                 <div class="faq-answer"><div class="faq-answer-inner">Yes, in most jurisdictions. Building codes and insurance requirements typically mandate sprinkler coverage regardless of clean agent systems. The standard approach uses pre-action sprinklers with double interlock, requiring both a detection signal and physical heat activation of the sprinkler head before water flows. This design minimizes accidental discharge. Clean agents protect against small, fast-growing electrical fires at the rack level, while sprinklers provide building-level protection for larger fire events that overwhelm or exhaust the clean agent supply.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How do you protect a lithium-ion (Li-ion) UPS/BBU battery room from fire?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="faq-answer"><div class="faq-answer-inner">A clean-agent system alone is not enough — it cannot stop a thermal-runaway reaction that, once started (~150 °C for NMC, ~166.8 °C for LFP), generates its own heat and propagates cell to cell. The strategy is layered and led by detection, not suppression: (1) cell-level BMS monitoring of voltage and temperature to isolate a failing pack early; (2) dedicated H₂/CO off-gas detection alarming at ≤25% of the lower flammable limit, with mechanical exhaust — because the vent gas volume far exceeds any room's flammable limit (NFPA 855); (3) BMS isolation coordinated with EPO; (4) fire-rated compartmentation and unit spacing per UL 9540A propagation testing to stop cascade; and (5) clean agent or water mist for any associated ordinary-combustible fire. The governing standards are NFPA 855, UL 9540/9540A and IEC 62619.</div></div>
             </div>
         </div>
     </section>
