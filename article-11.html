@@ -749,6 +749,10 @@
         [data-theme="dark"] .article-body a { color: #60a5fa; }
         [data-theme="dark"] .article-body strong { color: #f1f5f9; }
 
+        /* v1.44.x dark-mode coverage fix */
+        /* .forecast-bar .bar-container had opaque light slate #f1f5f9 — render as light islands in dark */
+        [data-theme="dark"] .forecast-bar .bar-container { background: #1e293b !important; color: #cbd5e1 !important; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .article-hero { padding: 6rem 1rem 3rem; }
@@ -1033,6 +1037,7 @@
   button, a.btn, [role="button"] { min-height: 44px; }
 }
 </style>
+    <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <!-- Reading Progress Bar -->

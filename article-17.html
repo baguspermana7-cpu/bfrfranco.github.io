@@ -1152,6 +1152,15 @@
         .sea-inaction-capture.y1{color:#34d399}.sea-inaction-capture.y2{color:#fbbf24}.sea-inaction-capture.y3{color:#f97316}.sea-inaction-capture.y4{color:#ef4444}
         [data-theme="dark"] .sea-glass-panel{background:rgba(15,23,42,0.6)}
         [data-theme="dark"] .sea-control-deck{background:rgba(15,23,42,0.4)}
+        /* v1.44.x dark-mode coverage fix — opaque light-on-dark islands missed by earlier dark block */
+        /* light GREEN #d1fae5 highlight-row -> emerald tint + light-emerald text */
+        [data-theme="dark"] .data-table .highlight-row { background: rgba(16,185,129,0.14) !important; }
+        [data-theme="dark"] .data-table .highlight-row td { color: #6ee7b7 !important; }
+        /* light GREEN gradient islands (#ecfdf5 -> #d1fae5) without prior dark coverage -> flat emerald tint */
+        [data-theme="dark"] .safe-box { background: rgba(16,185,129,0.14) !important; border-color: rgba(16,185,129,0.3) !important; color: #6ee7b7 !important; }
+        [data-theme="dark"] .author-section { background: rgba(16,185,129,0.10) !important; border-color: rgba(16,185,129,0.25) !important; }
+        /* gold timeline node #eab308 -> deeper amber (same hue) so it passes luminance + stays a visible marker */
+        [data-theme="dark"] .timeline-dot[style*="eab308"] { background: #d97706 !important; }
         @media(max-width:768px){.sea-exec-grid{grid-template-columns:1fr}.sea-scenario-btns{grid-template-columns:1fr}}
     
         /* Result Card Tooltip System */
@@ -1200,6 +1209,7 @@
   button, a.btn, [role="button"] { min-height: 44px; }
 }
 </style>
+    <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <!-- Reading Progress Bar -->

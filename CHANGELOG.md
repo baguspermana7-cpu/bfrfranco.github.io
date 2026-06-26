@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v1.46.2 — 2026-06-26 (Articles — §08 editorial skin in BOTH themes + zero switching bugs)
+
+Owner report: the approved §08 article skin (`plan-dark-mode-standard.html`) wasn't
+implemented properly across all articles, and many articles were buggy switching
+dark↔day. Full sweep across all 34 content articles — "ensure no bug".
+
+### Added
+- **Day/light editorial variant** (`css/rz-article-dark.css`). The §08 editorial register
+  was DARK-ONLY (`[data-rz-register="editorial"][data-theme="dark"]`); articles fell back to
+  the plain look in day mode. Added a light-palette mirror scoped
+  `:not([data-theme="dark"])` — Fraunces serif title, IBM Plex Mono kicker/meta, gold drop-cap,
+  amber h2 accent-rail, pull-quote, soft warm hero wash — so the editorial skin now reads as the
+  **same design in BOTH themes** (gold `#b45309` accents on light for contrast; article light
+  surfaces kept so bespoke layouts don't break). Verified Fraunces title/h2/drop-cap + mono meta
+  render in day on all articles.
+- **No-FOUC theme guard** on all 34 content articles — inline `<head>` script applies the saved
+  theme before first paint (calculators already had this; articles didn't → dark readers got a
+  white flash). Confirmed `data-theme` is set at paint time.
+
+### Fixed
+- **Broken dark↔day toggle on article-26** — a redundant inline `#themeToggle` handler
+  double-bound with `script.js` `initDarkMode`; the two cancelled each other so the toggle was
+  stuck. Removed the inline handler (script.js owns it). **All 34 toggles now flip cleanly
+  (probe: 0 broken).**
+- **Dark-mode light-on-dark coverage gaps** (via `/ultraplan`, 5 agents self-verified to zero):
+  `article-10` `.table-note-row`, `article-11` `.bar-container`, `article-16` green pills + amber
+  timeline-dot, `article-17` `.highlight-row`/`.safe-box`/`.author-section`/dot, `FF-3`
+  `.iec-tooltip-trigger`/`.iec-benchmark-tag` — plus `article-13` amber `.flow-box`. Each light
+  pastel dark-toned to a same-hue dark tint with readable text; white gauge-needle markers left
+  intact. **Global re-probe: 0 opaque light-on-dark across all 34.**
+- **article-2 console TypeError** — `chartjs-plugin-annotation` loaded without `defer` while
+  `chart.js` had it, so the plugin ran before Chart's `helpers` existed. Added `defer`. **0
+  console errors across all 34.**
+
+### Verification
+- Headless probes: dark = 0 light-on-dark / 0 errors (34/34); toggle = 0 broken (34/34); day
+  editorial chrome renders; FOUC guard fires pre-paint. Audits script-tags/js-syntax CLEAN.
+
 ## v1.46.1 — 2026-06-26 (Fire-safety hub — Ship 5: pillar deep-analysis expansion)
 
 ### Changed (pillar-fire-safety.html — from thin landing to analysis hub)

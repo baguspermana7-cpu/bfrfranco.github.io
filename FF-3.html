@@ -858,6 +858,22 @@
             .navbar, .search-modal, .search-overlay, .toc-section, .toc-sidebar, .toc-mobile-toggle, .toc-mobile-backdrop, .toc-mobile-drawer, .share-buttons, .cookie-banner { display: none !important; }
             .article-hero { padding: 1.5rem 1rem; }
         }
+
+        /* v1.44.x dark-mode coverage fix
+           Opaque light backgrounds set via inline style on .iec-* elements had no
+           dark override, rendering as light islands on the dark page. Each gets a
+           same-hue dark tint + readable same-hue light text. */
+        /* .iec-tooltip-trigger — inline background:#e2e8f0 (slate/grey) */
+        [data-theme="dark"] .iec-tooltip-trigger {
+            background: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+        /* .iec-benchmark-tag — inline background:#ecfeff + border #a5f3fc (cyan) */
+        [data-theme="dark"] .iec-benchmark-tag {
+            background: rgba(6, 182, 212, 0.14) !important;
+            color: #67e8f9 !important;
+            border-color: rgba(6, 182, 212, 0.4) !important;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
@@ -872,6 +888,7 @@
   button, a.btn, [role="button"] { min-height: 44px; }
 }
 </style>
+    <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <!-- Reading Progress Bar -->

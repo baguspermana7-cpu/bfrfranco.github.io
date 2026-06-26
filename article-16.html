@@ -1153,6 +1153,20 @@
             background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
             color: #67e8f9; margin-top: 4px; display: block;
         }
+
+        /* v1.44.x dark-mode coverage fix
+           Opaque light-on-dark islands that lacked a [data-theme="dark"] override.
+           Each tinted to the same semantic hue with readable light text. */
+        /* light GREEN inline badges (LOW / LOW-MED risk pills, bg #d1fae5, color #065f46) */
+        [data-theme="dark"] [style*="d1fae5"] {
+            background: rgba(16,185,129,0.14) !important;
+            color: #6ee7b7 !important;
+        }
+        /* AMBER timeline-dot marker (bg #eab308) — scoped to the dot so the
+           #eab308 text/border uses elsewhere are untouched */
+        [data-theme="dark"] .timeline-dot[style*="eab308"] {
+            background: #b45309 !important;
+        }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
@@ -1167,6 +1181,7 @@
   button, a.btn, [role="button"] { min-height: 44px; }
 }
 </style>
+    <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <!-- Reading Progress Bar -->

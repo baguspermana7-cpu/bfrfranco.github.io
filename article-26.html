@@ -680,6 +680,7 @@
   button, a.btn, [role="button"] { min-height: 44px; }
 }
 </style>
+    <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -3035,19 +3036,10 @@ function copyLink() {
         });
     }
 
-    var themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
-            var root = document.documentElement;
-            var current = root.getAttribute('data-theme');
-            var next = current === 'dark' ? 'light' : 'dark';
-            root.setAttribute('data-theme', next);
-            try { localStorage.setItem('theme', next); } catch(e) {}
-        });
-        var saved = '';
-        try { saved = localStorage.getItem('theme') || ''; } catch(e) {}
-        if (saved) document.documentElement.setAttribute('data-theme', saved);
-    }
+    /* v1.44.x fix: removed a redundant inline #themeToggle handler that
+       double-bound with script.js initDarkMode — the two cancelled each other,
+       so the toggle appeared stuck. script.js now owns the toggle (theme is
+       pre-applied by the inline FOUC guard in <head>). */
 })();
 </script>
 

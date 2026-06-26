@@ -187,3 +187,112 @@ html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter].rz-in{opac
   html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter]{opacity:1 !important;transform:none !important;}
   .rz-read-prog{transition:none;}
 }
+
+/* ============================================================================
+   DAY / LIGHT editorial variant (v1.44.x) — mirrors the dark register on a
+   warm-light, readable-gold palette so the §08 editorial skin reads as the
+   SAME design in BOTH themes. Scoped to :not([data-theme="dark"]) so it applies
+   in light/default and never collides with the dark rules above.
+   Type + gold-accent chrome only — the article's own light surfaces (hero/body
+   backgrounds) are intentionally kept, so bespoke light layouts don't break.
+   ============================================================================ */
+html[data-rz-register="editorial"]:not([data-theme="dark"]){
+  --rz-art-accent:#b45309;            /* amber-700 — readable gold on white */
+  --rz-art-accent2:#6FBF9A;
+  --rz-art-strong:#1a1d23;
+  --rz-art-muted:#6b7280;
+  --rz-art-line:rgba(40,44,52,.12);
+  --rz-art-serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --rz-art-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --rz-art-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+/* ---- HERO ---- (keep article bg; add soft warm wash + accent rule) */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero{position:relative;overflow:hidden;}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(620px 280px at 86% -18%, rgba(232,181,99,.14), transparent 64%),
+    radial-gradient(460px 240px at 4% 118%, rgba(111,191,154,.07), transparent 66%);
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero > *{position:relative;z-index:1;}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-title{
+  font-family:var(--rz-art-serif) !important;font-weight:600 !important;
+  letter-spacing:-.015em;line-height:1.06 !important;color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-title .highlight{
+  color:var(--rz-art-accent) !important;font-style:italic;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero::after{
+  content:'';position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  width:48px;height:2px;border-radius:2px;background:var(--rz-art-accent);opacity:.9;z-index:1;
+}
+/* ---- META ---- */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-meta{
+  font-family:var(--rz-art-mono) !important;letter-spacing:.03em;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-meta-item,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-meta *{
+  color:var(--rz-art-muted) !important;
+}
+/* ---- BODY ---- */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h2{
+  font-family:var(--rz-art-serif) !important;font-weight:600 !important;
+  letter-spacing:-.01em;color:var(--rz-art-strong) !important;
+  border-left:0 !important;padding-left:0 !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h2::before{
+  content:'';display:inline-block;width:18px;height:2px;border-radius:2px;
+  background:var(--rz-art-accent);vertical-align:middle;margin-right:.6rem;transform:translateY(-4px);
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h3{
+  font-family:var(--rz-art-serif) !important;font-weight:600 !important;color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body > p:first-of-type::first-letter{
+  font-family:var(--rz-art-serif);font-size:3.1rem;font-weight:600;float:left;line-height:.82;
+  padding:6px 10px 0 0;color:var(--rz-art-accent);
+}
+/* ---- CALLOUTS / QUOTES ---- */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout{
+  background:rgba(232,181,99,.08) !important;
+  border:1px solid rgba(180,83,9,.26) !important;
+  border-left:2px solid var(--rz-art-accent) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout blockquote{
+  font-family:var(--rz-art-serif) !important;font-style:italic;color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout cite{
+  font-family:var(--rz-art-mono) !important;color:var(--rz-art-muted) !important;font-style:normal;letter-spacing:.04em;
+}
+/* ---- INDEX GRID + SERIES HEROES + SECTION TITLES (mirror) ---- */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .articles-hero h1,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .insights-hero h1,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .geopolitics-hero h1,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .futureforward-hero h1{
+  font-family:var(--rz-art-serif) !important;font-weight:600 !important;
+  letter-spacing:-.015em;color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .articles-hero p,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .insights-hero p,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .geopolitics-hero p,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .futureforward-hero p{
+  font-family:var(--rz-art-sans) !important;color:var(--rz-art-muted) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-card-title{
+  font-family:var(--rz-art-serif) !important;font-weight:600 !important;letter-spacing:-.01em;color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-card-number{
+  font-family:var(--rz-art-mono) !important;color:var(--rz-art-accent) !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-card-category{
+  font-family:var(--rz-art-mono) !important;letter-spacing:.04em;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .section-title h2,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .section-title{
+  font-family:var(--rz-art-serif) !important;
+}
+/* ---- staggered entrance (day) ---- */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-enter]{opacity:0;transform:translateY(12px);}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-enter].rz-in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);}
+@media (prefers-reduced-motion:reduce){
+  html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-enter]{opacity:1 !important;transform:none !important;}
+}
