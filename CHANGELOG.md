@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.44.3 — 2026-06-25 (Fire-safety hub — Ship 1: frozen fire engine + tests)
+
+### Added (foundation for the DC fire-safety calculation hub — no UI yet)
+- **`js/fire-model.js`** — deep-frozen `window.FIRE_MODEL`: clean-agent data (Novec 1230 / FM-200 /
+  IG-541 — NFPA 2001 s=k1+k2·T coefficients, design concentrations, NOAEL/LOAEL, GWP, cylinder fill),
+  Li-ion/VRLA chemistry (NMC/LFP/LCO thermal-runaway onset 150/166.8/150 °C, off-gas L/Wh, energy
+  density), off-gas LFL, detection/suppression bands (≤10 s discharge, ≥10 min hold, NFPA 72 detector
+  spacing, 25% LFL gas alarm), and a standards register (NFPA 75/76/2001/72/13/855, UL 9540/9540A,
+  IEC 62619, FM Global, ISO 14520). Every constant `// source:`-tagged + basisTag.
+- **`js/fire-engine.js`** — pure deterministic engine `window.FIRE_ENGINE` (no Math.random): NFPA 2001
+  halocarbon agent mass W=(V/s)·(C/(100−C)) + inert volume ln(100/(100−C)); occupant safety margin vs
+  NOAEL; cylinder count; GWP-weighted CO₂e; detector coverage; discharge/hold-time bands; Li-ion
+  thermal-runaway heat, off-gas volume, room LFL margin; and a `roomState()` composite.
+- **`tools/test-fire-calc.mjs`** — vm-sandbox, **31/31 PASS**, hand-derived NFPA-2001 expecteds +
+  frozen/no-PRNG/determinism guards. Wired into `tools/ship-gate.sh`.
+
 ## v1.44.2 — 2026-06-25 (CDU calculation hub — Ship 4/5: suite integration)
 
 ### Changed (cross-link the new calculator into the CDU suite)
