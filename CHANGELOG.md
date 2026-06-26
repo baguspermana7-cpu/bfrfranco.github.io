@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.48.1 — 2026-06-26 (Dark-mode standard — fix white-body-in-dark on 13 pages + enforcement gate)
+
+Owner report: many content pages render broken in dark mode (only nav + title dark,
+article body stays white) and the standard isn't enforced across sessions. Root-caused,
+fixed, and made self-enforcing.
+
+### Fixed
+- **The `:root, [data-theme="light"]` cascade bug** on 11 pages (`cdu-calculator`, `cdu-hub`,
+  `cdu-selection-guide`, `compare-air-vs-liquid-cooling`, `compare-ashrae-vs-uptime`,
+  `compare-fm200-vs-novec`, `compare-pue-vs-dcie`, `compare-tier-3-vs-tier-4`, `fire-calculator`,
+  `fire-checklist`, `pln-sumatra-grid`). They defined a dark var palette, but a
+  `:root, [data-theme="light"]` selector matched in **all** themes and (equal specificity, later
+  in source) overrode the dark values, so body + cards + **text** stayed light in dark mode.
+  Changed the light fallback to `:root:not([data-theme="dark"])`. One-selector fix; flips the
+  whole var-driven palette (background AND body text) to dark.
+- **`tia-942-checklist`** — `:root` had only a light palette; added a `[data-theme="dark"]`
+  block redefining `--bg-primary/--bg-secondary/--text-*/--glass-bg` to the dark palette, plus a
+  `.calc-disclaimer` dark override.
+- **`tier-advisor`** — added a `.calc-disclaimer` dark override (the one hardcoded-light element).
+
+### Added — enforcement (so future sessions can't ship broken dark mode)
+- **`tools/audit-dark-coverage.mjs`** — render gate: loads every content page in dark and FAILS
+  on a white body or large light content block, and statically flags the `:root,` cascade bug.
+  Added to the ship-audit suite in `CLAUDE.md`. Run: `node tools/audit-dark-coverage.mjs --strict`.
+- Documented the mandatory pattern in `CLAUDE.md` + `standarization/DARK_MODE_STANDARD.md`: every
+  content page must define a dark palette (or load the standard skin) and pass the gate; never use
+  `:root,` for the light fallback.
+
+### Verification
+- Gate CLEAN across 114 content pages (0 white-in-dark, 0 cascade bug); `cdu-selection-guide`
+  (the reported example) now body-lum 15. Audits script-tags/js-syntax CLEAN.
+
 ## v1.48.0 — 2026-06-26 (CDU Mini-BMS — accurate fault propagation + tile redesign)
 
 ### Changed

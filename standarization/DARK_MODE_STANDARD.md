@@ -6,6 +6,22 @@ Origin: owner flagged the existing cockpit dark mode as "AI design slop" and ask
 
 > **Decision (LOCKED 2026-06-01, owner "proceed all"):** HYBRID register split — **Instrument** register for cockpits + SLD/P&ID labs, **Editorial** register for landing / articles / hubs / plans. First editorial adoption shipped on `plan-dark-mode-standard.html`. Cockpit instrument re-skin queued (must preserve semantic SLD/alarm colours — additive atmosphere/type only).
 
+## MANDATORY: every content page must define a dark palette (v1.47.x)
+
+The recurring failure — pages that render **white body in dark mode** (only the nav + title go dark) — comes from hand-rolled per-page skins that never wire a dark palette. Two rules, **enforced by `node tools/audit-dark-coverage.mjs --strict`** (in the ship-audit suite):
+
+1. **Define a dark palette.** A content page that styles surfaces via CSS vars (`--bg`, `--card`, `--text`, …) MUST include a `[data-theme="dark"]{ … }` block redefining those surface + **text** vars to the dark palette (bg `#0E0F12`, surface `#16181D`, text `#CFD3DA`, muted `#7E8590`, border `rgba(255,255,255,0.08)`). Hardcoded-light elements (`background:#f1f5f9`) each need a `[data-theme="dark"]` override.
+2. **Never use `:root,` for the light fallback.** This is the exact cascade bug that broke 11 pages:
+
+   ```css
+   /* WRONG — :root matches in ALL themes and wins by source order, so dark never applies */
+   :root, [data-theme="light"] { --bg: #f8fafc; }
+   /* CORRECT — light only when NOT dark */
+   :root:not([data-theme="dark"]) { --bg: #f8fafc; }
+   ```
+
+The gate fails any page with a white body / large light content block in dark, and statically flags the `:root,` pattern. Don't ship a page that fails it. (See the [implement-applicable-standards] memory mandate — different sessions diverging is the root cause this prevents.)
+
 ## Core principle — two registers, one token system
 
 RZ has two page families. Each gets a **register** of the same system — identical structure + motion + semantics, different surface character. Swap a page between registers by changing one `data-rz-register` attribute.

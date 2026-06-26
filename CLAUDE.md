@@ -40,6 +40,7 @@ python3 tools/audit-js-syntax.py --strict          # unterminated strings / CSS-
 python3 tools/audit-version-stamp.py --strict      # version stamp on all pages
 python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD
+node   tools/audit-dark-coverage.mjs --strict      # NO white body/content in dark mode (v1.47.x)
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):
@@ -109,6 +110,23 @@ This bug previously killed every interactive feature on 5 calc pages (commits `a
 **Never trust class-name pattern-matching across pages.** Each calc page's classes must be enumerated individually before claiming dark-mode coverage is complete.
 
 **Audit hint**: `grep -E '\\[data-theme="dark"\\]' <page>.html | wc -l` should report ≥30 on calc pages. Reference: `tco-calculator.html` (49 dark rules, canonical pattern).
+
+### CRITICAL: the `:root, [data-theme="light"]` cascade bug (v1.47.x — fixed 11 pages)
+
+Many bespoke pages (cdu-*, compare-*, fire-*, pln-sumatra) rendered **white body in dark mode** — "only the nav + title go dark, the article background stays white". Root cause was a theme-var cascade bug:
+
+```css
+[data-theme="dark"]          { --bg: #0f172a; }   /* dark values */
+:root, [data-theme="light"]  { --bg: #f8fafc; }   /* WRONG: :root matches in ALL themes */
+```
+
+`:root` (specificity 0,1,0) matches the html element regardless of theme and, coming **after** the `[data-theme="dark"]` block (equal specificity), **always wins** — so dark values never apply. **Always write the light fallback as `:root:not([data-theme="dark"])`** (or `[data-theme="light"]` only):
+
+```css
+:root:not([data-theme="dark"]) { --bg: #f8fafc; }   /* CORRECT: light only when NOT dark */
+```
+
+**Every content page MUST define a dark palette** (a `[data-theme="dark"]{ --bg/--surface/--text/... }` block redefining its surface + text vars) **or load the standard skin, and MUST pass `node tools/audit-dark-coverage.mjs --strict`** — the render gate that fails any page showing a white body or large light content block in dark mode (it also statically flags the `:root,` cascade bug). This is now in the ship-audit suite. Don't ship a page that fails it. See [DARK_MODE_STANDARD.md] and the [implement-applicable-standards] memory mandate.
 
 ---
 
@@ -314,6 +332,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/audit-script-tags.py` | `</script>` in JS strings — STRICT for CI |
 | `tools/audit-version-stamp.py` | version-stamp on all pages — STRICT for CI |
 | `tools/audit-mobile-responsive.py` | 8-checkpoint responsive scorer — STRICT for CI |
+| `tools/audit-dark-coverage.mjs` | render gate — fails any page with white body/content in dark mode + the `:root,` cascade bug — STRICT for CI (v1.47.x) |
 | `tools/audit-seo.py` | per-page SEO meta health — non-strict |
 | `tools/build-sitemap.py` | regen sitemap.xml from filesystem |
 | `tools/build-llms-txt.py` | regen llms.txt |
