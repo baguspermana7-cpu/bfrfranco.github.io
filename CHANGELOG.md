@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v1.47.0 — 2026-06-26 (CDU checklist — spare-parts register + exploded-view resources)
+
+### Added
+- **`cdu-checklist.html` §07 Spare-parts & consumables register** — a 15-row matrix
+  mapping every PM line that consumes a part to: what to replace, the
+  acceptance / replace-when trigger, interval, a part reference / spec (commodity
+  manufacturer family or OEM service-part class), a critical-spare class
+  (`CRITICAL` / `RECOMMENDED` / `ON-DEMAND`), and an estimated unit-cost band.
+  Covers filter/strainer element, PG25 fluid, dry-break QDs, EPDM gasket kit, pump
+  seal kit, spare pump, expansion bladder, leak rope+controller, flow / dP / temp-RH
+  sensors, TCV actuator, inhibitor/biocide dosing, PSV, and L2A air filter. Cost
+  bands tagged `EST` (illustrative market range, not a quote); specs `STD`/`VENDOR`.
+- **`cdu-checklist.html` §08 Exploded-view & IPB resources — per CDU type** — per-type
+  cards (in-rack / in-row / sidecar / L2L end-of-row / L2A air-cooled) with
+  representative OEMs and links to obtain the Illustrated Parts Breakdown / service
+  manual (CoolIT, Vertiv, Delta, Stulz, nVent Schroff, Motivair/Schneider, Boyd,
+  ZutaCore) plus cross-links to the CDU comparison.
+
+### Changed
+- **`cdu-checklist.html` §06 PM checklist** — enriched from 3 columns to 4
+  (Task | Frequency | Acceptance/action | Parts/consumable); each part-consuming row
+  now deep-links to its §07 register line. Added PSV annual test, QD/gasket inspection
+  and L2A air-side coil service rows; sharpened acceptance criteria (e.g. filter dP
+  trigger `> clean +0.3–0.5 bar`). Symptom and printable-form sections renumbered §09/§10.
+
 ## v1.46.6 — 2026-06-26 (PLN landing rearrange + Sumatra interconnected grid)
 
 ### Added

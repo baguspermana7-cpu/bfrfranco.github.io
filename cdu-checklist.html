@@ -106,7 +106,25 @@
         .src{ font-family:var(--ck-mono); font-size:.56rem; font-weight:700; letter-spacing:.04em; padding:1px 5px; border-radius:4px; white-space:nowrap; text-transform:uppercase; vertical-align:middle; }
         .src.std{ background:rgba(16,185,129,.14); color:#10b981; border:1px solid rgba(16,185,129,.4); }
         .src.typ{ background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
+        .src.ill{ background:rgba(6,182,212,.12); color:#0891b2; border:1px solid rgba(6,182,212,.38); }
         .ck-sec h2 .src{ font-size:.5rem; }
+        /* critical-spare class pill */
+        .crit{ font-family:var(--ck-mono); font-size:.58rem; font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+        .crit.y{ background:rgba(239,68,68,.14); color:#ef4444; border:1px solid rgba(239,68,68,.4); }
+        .crit.m{ background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
+        .crit.n{ background:rgba(120,130,145,.14); color:#6b7280; border:1px solid rgba(120,130,145,.4); }
+        table.ck-tbl td .cost{ font-family:var(--ck-mono); font-weight:600; color:var(--ck-text); white-space:nowrap; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
+        table.ck-tbl td .pn{ font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-accent); }
+        table.ck-tbl td small{ color:var(--ck-muted); font-size:.72rem; }
+        /* exploded-view resource cards */
+        .xv-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.9rem; margin-top:.4rem; }
+        .xv-card{ border:1px solid var(--ck-border); border-radius:10px; background:var(--ck-card); padding:1rem 1.1rem; }
+        .xv-card h4{ font-family:var(--ck-mono); font-size:.74rem; letter-spacing:.03em; text-transform:uppercase; color:var(--ck-accent); margin:0 0 .2rem; }
+        .xv-card .arch{ font-family:var(--ck-mono); font-size:.6rem; color:var(--ck-muted); }
+        .xv-card p{ font-size:.82rem; color:var(--ck-muted); line-height:1.55; margin:.5rem 0 .6rem; }
+        .xv-card .lnk{ display:flex; flex-wrap:wrap; gap:.4rem; }
+        .xv-card .lnk a{ font-family:var(--ck-mono); font-size:.68rem; padding:.28rem .55rem; border:1px solid var(--ck-border); border-radius:6px; color:var(--ck-muted); text-decoration:none; }
+        .xv-card .lnk a:hover{ color:var(--ck-accent); border-color:var(--ck-accent); }
         .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--ck-muted); align-items:center; }
         table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
         .ck-note{ border:1px dashed var(--ck-border); border-radius:10px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
@@ -166,6 +184,8 @@
             <a href="#install">Installation checklist</a>
             <a href="#inspect">Inspection checklist</a>
             <a href="#maint">Maintenance (PM)</a>
+            <a href="#spares">Spare-parts register</a>
+            <a href="#exploded">Exploded views (per type)</a>
             <a href="#symptom">Symptom → action</a>
             <a href="#form">Printable form</a>
         </div>
@@ -360,33 +380,82 @@
     <!-- ───────── maintenance PM ───────── -->
     <section class="ck-sec" id="maint"><div class="ck-wrap">
         <h2><span class="n">06</span> Preventive-maintenance (PM) checklist</h2>
-        <p class="lead">PM tasks by cadence. <span class="cad d">DAILY</span> <span class="cad w">WEEKLY</span> <span class="cad m">MONTHLY</span> <span class="cad q">QUARTERLY</span> <span class="cad a">ANNUAL</span>. Intervals are a baseline — follow the vendor PM schedule and adjust to fluid-sample results.</p>
+        <p class="lead">PM tasks by cadence. <span class="cad d">DAILY</span> <span class="cad w">WEEKLY</span> <span class="cad m">MONTHLY</span> <span class="cad q">QUARTERLY</span> <span class="cad a">ANNUAL</span>. Intervals are a baseline — follow the vendor PM schedule and adjust to fluid-sample results. The <b>Parts / consumable</b> column points to the line in <a href="#spares" style="color:var(--cdu-primary);font-weight:600;">§07 — Spare-parts register</a> with part reference, critical-spare class and cost band.</p>
         <div class="tbl-wrap"><table class="ck-tbl">
-            <thead><tr><th>Task</th><th>Cadence</th><th>Acceptance / action</th></tr></thead>
+            <thead><tr><th>Task</th><th>Frequency</th><th>Acceptance / action</th><th>Parts / consumable</th></tr></thead>
             <tbody>
-                <tr><td>Read &amp; log flow / dP / temps / pressure; check alarms</td><td><span class="cad d">DAILY</span></td><td>All within §01 band; trend for drift.</td></tr>
-                <tr><td>Visual leak walk-down (base, QDs, manifolds, seals)</td><td><span class="cad d">DAILY</span></td><td>Dry; any glycol residue → investigate.</td></tr>
-                <tr><td>Verify N+1 (standby pump/PSU healthy)</td><td><span class="cad w">WEEKLY</span></td><td>Standby ready; exercise per vendor.</td></tr>
-                <tr><td>Check make-up rate &amp; expansion-tank level/pressure</td><td><span class="cad w">WEEKLY</span></td><td>Make-up minimal; level/pressure in band — rising make-up = slow leak.</td></tr>
-                <tr><td>Verify dew-point reset active (supply ≥ room dew point +2–3 °C)</td><td><span class="cad w">WEEKLY</span></td><td>No condensation risk; RH sensor reading true.</td></tr>
-                <tr><td>Leak-detection function test</td><td><span class="cad m">MONTHLY</span></td><td>Alarm + isolation confirmed.</td></tr>
-                <tr><td>Filter dP check / replace if clogged</td><td><span class="cad m">MONTHLY</span></td><td>Replace at vendor dP threshold; record.</td></tr>
-                <tr><td>Coolant sample — pH, conductivity, glycol%, biology, particulate</td><td><span class="cad q">QUARTERLY</span></td><td>Within ASHRAE W-quality; dose/replace per result.</td></tr>
-                <tr><td>Flow &amp; dP sensor calibration check</td><td><span class="cad q">QUARTERLY</span></td><td>Within sensor tolerance; re-cal if drift.</td></tr>
-                <tr><td>Pump seal / bearing inspection (vibration, noise)</td><td><span class="cad q">QUARTERLY</span></td><td>Service per runtime hours / vendor.</td></tr>
-                <tr><td>Control-valve stroke / actuator demand-vs-feedback test</td><td><span class="cad q">QUARTERLY</span></td><td>Deviation &lt;10%; fail-safe (bypass) confirmed.</td></tr>
-                <tr><td>BMS/DCIM telemetry &amp; alarm-point verification</td><td><span class="cad q">QUARTERLY</span></td><td>All points live + correct; no stale data; alarms route.</td></tr>
-                <tr><td>Corrosion-inhibitor reserve + Cu/Fe ion test</td><td><span class="cad q">QUARTERLY</span></td><td>Inhibitor &gt;100 ppm; Cu &lt;0.2 / Fe &lt;0.1 ppm (rising = active corrosion).</td></tr>
-                <tr><td>Heat-exchanger approach (ATD) check / clean</td><td><span class="cad a">ANNUAL</span></td><td>Rising ATD = fouling → clean side.</td></tr>
-                <tr><td>Coolant replacement (or per sample)</td><td><span class="cad a">ANNUAL</span></td><td>Replace if chemistry out of band.</td></tr>
-                <tr><td>Full redundancy + failover drill; firmware/controls review</td><td><span class="cad a">ANNUAL</span></td><td>N+1 holds under fault; backups current.</td></tr>
+                <tr><td>Read &amp; log flow / dP / temps / pressure; check alarms</td><td><span class="cad d">DAILY</span></td><td>All within §01 band; trend for drift.</td><td><small>none</small></td></tr>
+                <tr><td>Visual leak walk-down (base, QDs, manifolds, seals)</td><td><span class="cad d">DAILY</span></td><td>Dry; any glycol residue → investigate.</td><td><small>none</small></td></tr>
+                <tr><td>Verify N+1 (standby pump/PSU healthy)</td><td><span class="cad w">WEEKLY</span></td><td>Standby ready; exercise per vendor.</td><td><small>none</small></td></tr>
+                <tr><td>Check make-up rate &amp; expansion-tank level/pressure</td><td><span class="cad w">WEEKLY</span></td><td>Make-up minimal; level/pressure in band — rising make-up = slow leak.</td><td><a href="#sp-fluid">PG25 top-up</a> · <a href="#sp-exp">bladder</a></td></tr>
+                <tr><td>Verify dew-point reset active (supply ≥ room dew point +2–3 °C)</td><td><span class="cad w">WEEKLY</span></td><td>No condensation risk; RH sensor reading true.</td><td><a href="#sp-rh">RH sensor</a></td></tr>
+                <tr><td>Leak-detection function test</td><td><span class="cad m">MONTHLY</span></td><td>Alarm + isolation confirmed.</td><td><a href="#sp-leak">leak rope/controller</a></td></tr>
+                <tr><td>Filter / strainer dP check — replace element if clogged</td><td><span class="cad m">MONTHLY</span></td><td>Replace when filter dP &gt; vendor threshold (typ. &gt;+0.3–0.5 bar above clean); record.</td><td><a href="#sp-filter">filter element</a></td></tr>
+                <tr><td>Coolant sample — pH, conductivity, glycol%, biology, particulate</td><td><span class="cad q">QUARTERLY</span></td><td>Within ASHRAE W-quality; dose/replace per result.</td><td><a href="#sp-fluid">PG25</a> · <a href="#sp-dose">inhibitor/biocide</a></td></tr>
+                <tr><td>Flow &amp; dP sensor calibration check</td><td><span class="cad q">QUARTERLY</span></td><td>Within sensor tolerance; re-cal if drift.</td><td><a href="#sp-flow">flow</a> · <a href="#sp-dp">dP xmtr</a></td></tr>
+                <tr><td>Pump seal / bearing inspection (vibration, noise)</td><td><span class="cad q">QUARTERLY</span></td><td>Service per runtime hours / vendor; weep or rising vibration → reseal.</td><td><a href="#sp-seal">seal kit</a> · <a href="#sp-pump">pump</a></td></tr>
+                <tr><td>Control-valve stroke / actuator demand-vs-feedback test</td><td><span class="cad q">QUARTERLY</span></td><td>Deviation &lt;10%; fail-safe (bypass) confirmed.</td><td><a href="#sp-act">TCV actuator</a></td></tr>
+                <tr><td>BMS/DCIM telemetry &amp; alarm-point verification</td><td><span class="cad q">QUARTERLY</span></td><td>All points live + correct; no stale data; alarms route.</td><td><small>none</small></td></tr>
+                <tr><td>Corrosion-inhibitor reserve + Cu/Fe ion test</td><td><span class="cad q">QUARTERLY</span></td><td>Inhibitor &gt;100 ppm; Cu &lt;0.2 / Fe &lt;0.1 ppm (rising = active corrosion).</td><td><a href="#sp-dose">inhibitor</a></td></tr>
+                <tr><td>QD / gasket / O-ring seal inspection (glycol-compatible EPDM)</td><td><span class="cad q">QUARTERLY</span></td><td>No weep; replace any seal showing compression-set or leak.</td><td><a href="#sp-qd">QD</a> · <a href="#sp-gasket">EPDM kit</a></td></tr>
+                <tr><td>Pressure-relief valve (PSV/PRV) test</td><td><span class="cad a">ANNUAL</span></td><td>Relieves at set pressure &lt; component PN; reseats. Replace if passing/stuck.</td><td><a href="#sp-psv">PSV</a></td></tr>
+                <tr><td>Heat-exchanger approach (ATD) check / clean</td><td><span class="cad a">ANNUAL</span></td><td>Rising ATD = fouling → clean / CIP the fouled side.</td><td><a href="#sp-gasket">HX gaskets</a> (if opened)</td></tr>
+                <tr><td>Coolant replacement (or per sample)</td><td><span class="cad a">ANNUAL</span></td><td>Replace full charge if chemistry out of band.</td><td><a href="#sp-fluid">PG25 full charge</a></td></tr>
+                <tr><td>Air-side coil &amp; filter service (L2A only)</td><td><span class="cad a">ANNUAL</span></td><td>Clean coil; replace air filter at dP threshold — restores room-reject capacity.</td><td><a href="#sp-air">air filter</a></td></tr>
+                <tr><td>Full redundancy + failover drill; firmware/controls review</td><td><span class="cad a">ANNUAL</span></td><td>N+1 holds under fault; backups current.</td><td><small>none</small></td></tr>
             </tbody>
         </table></div>
     </div></section>
 
+    <!-- ───────── spare-parts & consumables register ───────── -->
+    <section class="ck-sec" id="spares"><div class="ck-wrap">
+        <h2><span class="n">07</span> Spare-parts &amp; consumables register</h2>
+        <p class="lead">Every PM line that consumes a part maps to a row here: <b>what to replace</b>, the <b>acceptance / replace-when trigger</b>, the <b>interval</b>, a <b>part reference / spec</b> (commodity manufacturer family or OEM service-part class — exact OEM part numbers are proprietary and obtained from the unit's IPB, see <a href="#exploded" style="color:var(--cdu-primary);font-weight:600;">§08</a>), a <b>critical-spare class</b>, and an <b>estimated unit-cost band</b>. <span class="crit y">CRITICAL</span> = hold on site (failure stops cooling). <span class="crit m">RECOMMENDED</span> = short-lead consumable. <span class="crit n">ON-DEMAND</span> = order when condition-flagged.</p>
+        <div class="legend">
+            <span><span class="src std">STD</span> published standard / spec</span>
+            <span><span class="src typ">VENDOR</span> typical vendor part family</span>
+            <span><span class="src ill">EST</span> illustrative cost band — representative market range, <b>not a quote</b></span>
+        </div>
+        <div class="tbl-wrap"><table class="ck-tbl">
+            <thead><tr><th>Item</th><th>Function / where</th><th>Replace-when (acceptance trigger)</th><th>Interval</th><th>Part reference / spec</th><th>Critical</th><th>Est. unit cost</th><th>Src</th></tr></thead>
+            <tbody>
+                <tr id="sp-filter"><td><b>Secondary-loop filter / strainer element</b></td><td>Y-strainer or cartridge on the TCS loop — protects cold-plate micro-channels.</td><td>Filter dP &gt; clean +0.3–0.5 bar, or monthly.</td><td><span class="cad m">MONTHLY</span></td><td><span class="pn">50 µm SS mesh (Y-strainer) / 25–50 µm pleated cartridge</span> <small>e.g. Parker, 3M, Eaton families</small></td><td><span class="crit y">CRITICAL</span></td><td><span class="cost">$25–120</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-fluid"><td><b>Heat-transfer fluid — inhibited PG25</b></td><td>Secondary coolant (25 % inhibited propylene glycol) touching the cold plates.</td><td>Chemistry out of band (pH/conductivity/glycol %/biology) or annual.</td><td><span class="cad q">QUARTERLY</span> top-up · <span class="cad a">ANNUAL</span> charge</td><td><span class="pn">25 % inhibited PG, low-conductivity</span> <small>e.g. Dynalene PG, DOWFROST, ClearTech 25-PG; charge ≈ 60–200 L/unit</small></td><td><span class="crit m">RECOMMENDED</span></td><td><span class="cost">$8–25 / L</span> <small>(charge $1k–4k)</small></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-qd"><td><b>Quick-disconnect coupling (dry-break)</b></td><td>Rack-manifold &amp; CDU service connections — no-spill on de-mate.</td><td>Seal weep, drip on de-mate, or compression-set on inspection.</td><td><span class="cad q">QUARTERLY</span> inspect</td><td><span class="pn">Dripless / dry-break QD</span> <small>e.g. Stäubli CGO/SPT, CPC LQ, Parker Non-Spill; EPDM seals</small></td><td><span class="crit y">CRITICAL</span></td><td><span class="cost">$40–180</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-gasket"><td><b>EPDM gasket / O-ring kit</b></td><td>Manifold, HX ports, flange &amp; QD seals — must be glycol-compatible EPDM, <b>not NBR</b>.</td><td>Any weep; replace whenever a joint is broken for service.</td><td><span class="cad q">QUARTERLY</span> inspect</td><td><span class="pn">EPDM O-ring / gasket set</span> <small>per unit seal schedule (peroxide-cured EPDM)</small></td><td><span class="crit y">CRITICAL</span></td><td><span class="cost">$40–150 / kit</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-seal"><td><b>Pump mechanical / cartridge seal kit</b></td><td>Circulation pump shaft seal (duty &amp; standby).</td><td>Weep at seal, rising vibration/noise, or per runtime-hour limit.</td><td><span class="cad q">QUARTERLY</span> inspect</td><td><span class="pn">Mechanical seal kit per pump model</span> <small>e.g. Grundfos / Wilo / canned-rotor service kit</small></td><td><span class="crit m">RECOMMENDED</span></td><td><span class="cost">$80–400</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-pump"><td><b>Spare circulation pump (N+1)</b></td><td>Duty/standby secondary pump — the unit holds N+1 with auto-changeover.</td><td>Bearing/seal failure, persistent low flow after reseal.</td><td><span class="cad a">condition</span></td><td><span class="pn">EC/wet-rotor or canned pump per CDU</span> <small>e.g. Grundfos CRE / Wilo-Stratos class</small></td><td><span class="crit m">RECOMMENDED</span> <small>(1/fleet)</small></td><td><span class="cost">$600–3,500</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-exp"><td><b>Expansion-tank bladder / diaphragm</b></td><td>Holds loop pressure &amp; absorbs thermal expansion.</td><td>Waterlogged tank, pressure won't hold, air on bladder side.</td><td><span class="cad a">condition</span></td><td><span class="pn">EPDM bladder per tank model</span></td><td><span class="crit n">ON-DEMAND</span></td><td><span class="cost">$60–300</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-leak"><td><b>Leak-detection rope + controller</b></td><td>Sensing cable at base/manifolds/QDs feeding the leak alarm &amp; isolation.</td><td>Fails monthly function test, contamination, or physical damage.</td><td><span class="cad m">MONTHLY</span> test</td><td><span class="pn">Water/glycol-sensing rope + zone controller</span> <small>e.g. TTK, RLE SeaHawk, nVent Raychem</small></td><td><span class="crit y">CRITICAL</span></td><td><span class="cost">rope $15–40/m · ctrl $300–900</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-flow"><td><b>Flow sensor (turbine / vortex / ultrasonic)</b></td><td>Secondary flow measurement — the primary cooling-delivery proof.</td><td>Drift beyond sensor tolerance vs reference; signal loss.</td><td><span class="cad q">QUARTERLY</span> cal</td><td><span class="pn">Inline flow sensor</span> <small>e.g. ifm SM-series, Grundfos VFS</small></td><td><span class="crit m">RECOMMENDED</span></td><td><span class="cost">$150–600</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-dp"><td><b>Pressure / differential-pressure transmitter</b></td><td>Loop &amp; filter dP, system pressure (drives VFD &amp; filter alarm).</td><td>Drift vs gauge, signal loss, out-of-range.</td><td><span class="cad q">QUARTERLY</span> cal</td><td><span class="pn">4–20 mA P / ΔP transmitter</span> <small>e.g. ifm PN/PT, Danfoss MBS</small></td><td><span class="crit m">RECOMMENDED</span></td><td><span class="cost">$120–450</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-rh"><td><b>Temperature / RH sensor (+ thermowell)</b></td><td>Supply/return temp &amp; room dew-point reset reference.</td><td>Drift vs reference; dew-point reset depends on a true RH reading.</td><td><span class="cad q">QUARTERLY</span> cal</td><td><span class="pn">PT100/PT1000 + thermowell; RH probe</span></td><td><span class="crit n">ON-DEMAND</span></td><td><span class="cost">$25–120</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-act"><td><b>Control-valve actuator (TCV / PICV)</b></td><td>Modulates supply temp / bypass — fail-safe to a safe (cooling) position.</td><td>Demand-vs-feedback &gt;10 %, stiction, signal loss.</td><td><span class="cad q">QUARTERLY</span> test</td><td><span class="pn">Modulating actuator per valve</span> <small>e.g. Belimo class</small></td><td><span class="crit n">ON-DEMAND</span></td><td><span class="cost">$200–900</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-dose"><td><b>Corrosion inhibitor / biocide dosing</b></td><td>Maintains inhibitor reserve &amp; controls biology in the loop.</td><td>Inhibitor &lt;100 ppm; biology positive; Cu/Fe rising.</td><td><span class="cad q">QUARTERLY</span></td><td><span class="pn">Glycol-compatible inhibitor + isothiazolinone biocide</span> <small>e.g. Dynalene inhibitor pack</small></td><td><span class="crit m">RECOMMENDED</span></td><td><span class="cost">$20–60 / L</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-psv"><td><b>Pressure-relief valve (PSV / PRV)</b></td><td>Over-pressure protection below component pressure rating (PN).</td><td>Fails annual lift test, passes/weeps, or stuck.</td><td><span class="cad a">ANNUAL</span> test</td><td><span class="pn">Set-pressure relief valve &lt; loop PN</span></td><td><span class="crit n">ON-DEMAND</span></td><td><span class="cost">$80–300</span></td><td><span class="src std">STD</span> <span class="src ill">EST</span></td></tr>
+                <tr id="sp-air"><td><b>Air-side coil filter (L2A only)</b></td><td>Protects the liquid-to-air reject coil; L2A rejects to room air.</td><td>Air-side dP at threshold; reduced room-reject capacity.</td><td><span class="cad a">ANNUAL</span></td><td><span class="pn">Panel / pleated air filter per unit</span></td><td><span class="crit n">ON-DEMAND</span></td><td><span class="cost">$15–60</span></td><td><span class="src typ">VENDOR</span> <span class="src ill">EST</span></td></tr>
+            </tbody>
+        </table></div>
+        <div class="ck-note"><b>Stocking logic.</b> Hold every <span class="crit y">CRITICAL</span> item on site (a clogged filter, failed QD, weeping seal or dead leak-rope can stop cooling or trip the rack). Keep a charge-fraction of <b>PG25</b>, one <b>seal kit</b> and one <b>spare pump</b> per fleet as <span class="crit m">RECOMMENDED</span>. Cost bands are <span class="src ill">EST</span> illustrative market ranges for budgeting — confirm against your OEM service-parts quote and the unit's IPB before purchase.</div>
+    </div></section>
+
+    <!-- ───────── exploded-view / IPB resources per type ───────── -->
+    <section class="ck-sec" id="exploded"><div class="ck-wrap">
+        <h2><span class="n">08</span> Exploded-view &amp; IPB resources — per CDU type</h2>
+        <p class="lead">Exact service-part numbers live in each unit's <b>Illustrated Parts Breakdown (IPB)</b> / service manual — request it from the OEM for your model (it is not public for most CDUs). Below, per CDU type, are the representative manufacturers and where to obtain the exploded-view / parts documentation. Match your unit to a row in the <a href="cdu-comparison.html" style="color:var(--cdu-primary);font-weight:600;">CDU comparison</a> to find its OEM, then pull that OEM's manual.</p>
+        <div class="xv-grid">
+            <div class="xv-card"><h4>In-Rack</h4><span class="arch">L2L · in-cabinet 3U–4U</span><p>Compact in-rack CDU. Exploded views cover the pump module, plate-HX, filter and QD manifold. Request the model's service manual / IPB.</p><div class="lnk"><a href="https://www.coolitsystems.com/" target="_blank" rel="noopener">CoolIT</a><a href="https://www.vertiv.com/" target="_blank" rel="noopener">Vertiv Liebert XDU</a><a href="cdu-comparison.html">compare models →</a></div></div>
+            <div class="xv-card"><h4>In-Row</h4><span class="arch">L2L · between-rack cabinet</span><p>The density workhorse. IPB covers dual-pump skid, expansion tank, dual-stage filtration, instrumentation &amp; control valve.</p><div class="lnk"><a href="https://www.vertiv.com/" target="_blank" rel="noopener">Vertiv Liebert XDU/XDM</a><a href="https://www.deltapowersolutions.com/" target="_blank" rel="noopener">Delta</a><a href="https://www.stulz.com/" target="_blank" rel="noopener">Stulz</a></div></div>
+            <div class="xv-card"><h4>Sidecar</h4><span class="arch">L2L · rack-side slim unit</span><p>Slim rack-mounted unit. Exploded views focus on the side-mounted HX/pump pack and rack-manifold QDs.</p><div class="lnk"><a href="https://www.nvent.com/" target="_blank" rel="noopener">nVent Schroff</a><a href="https://www.coolitsystems.com/" target="_blank" rel="noopener">CoolIT</a><a href="cdu-comparison.html">compare models →</a></div></div>
+            <div class="xv-card"><h4>L2L · End-of-Row</h4><span class="arch">L2L · facility-scale</span><p>Large facility-coupled CDU (e.g. ≈2.3 MW). IPB covers large plate-HX, N+1 pump bank, facility-water interface &amp; PSV.</p><div class="lnk"><a href="https://www.se.com/" target="_blank" rel="noopener">Motivair / Schneider</a><a href="https://www.boydcorp.com/" target="_blank" rel="noopener">Boyd</a><a href="https://www.vertiv.com/" target="_blank" rel="noopener">Vertiv</a></div></div>
+            <div class="xv-card"><h4>L2A · Air-cooled</h4><span class="arch">L2A · room-air reject</span><p>Liquid-to-air unit — no facility water. Exploded views add the air-side reject coil, fans &amp; air filter to the standard liquid pack.</p><div class="lnk"><a href="https://www.zutacore.com/" target="_blank" rel="noopener">ZutaCore</a><a href="https://www.nvent.com/" target="_blank" rel="noopener">nVent</a><a href="cdu-comparison.html">compare models →</a></div></div>
+        </div>
+        <div class="ck-note">External links open the manufacturer's site — navigate to <b>Support / Documentation</b> and request the service manual or IPB for your exact model. These pages may block automated access but open normally in a browser.</div>
+    </div></section>
+
     <!-- ───────── symptom table ───────── -->
     <section class="ck-sec" id="symptom"><div class="ck-wrap">
-        <h2><span class="n">07</span> Symptom → cause → action</h2>
+        <h2><span class="n">09</span> Symptom → cause → action</h2>
         <p class="lead">Troubleshooting reference. On any active symptom: protect the IT load first (the CDU's N+1 / isolation logic), then diagnose.</p>
         <div class="tbl-wrap"><table class="ck-tbl">
             <thead><tr><th>Symptom</th><th>Likely cause</th><th>Immediate action</th><th>Corrective action</th></tr></thead>
@@ -413,7 +482,7 @@
 
     <!-- ───────── printable form ───────── -->
     <section class="ck-sec" id="form"><div class="ck-wrap">
-        <h2><span class="n">08</span> CDU service record — printable form</h2>
+        <h2><span class="n">10</span> CDU service record — printable form</h2>
         <p class="lead">Fill on-screen and <b>Print / Save as PDF</b>. Captures site identity, readings against the §01 band, checklist pass/fail, and sign-off. Stored on the RZ site as the standard CDU service-record form.</p>
         <div class="form-card">
             <div class="form-row">
