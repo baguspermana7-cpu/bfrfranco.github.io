@@ -74,6 +74,15 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.9 — 2026-06-27 (Phase 2 batch — article-19 Singapore-vs-Batam power-cost chart)
+
+### Added
+- **`article-19.html`** ("Singapore vs Batam: Why Cost Alone Doesn't Win") — free industrial power-cost
+  comparison: Singapore **USD 0.17–0.22/kWh** vs Batam **USD 0.07–0.09/kWh** (SG 2–3× more; a 50 MW Batam
+  facility saves >US$25M/yr) — floating bars that set up the article's "cost alone doesn't win" thesis. New
+  `data/article-19/power-cost.csv`. Rendered by `js/rz-article-chart.js`. 12 interactive sourced charts now live
+  (gate clean).
+
 ## v1.50.8 — 2026-06-27 (Phase 2 batch — article-12 hyperscaler renewable-contracts chart)
 
 ### Added
