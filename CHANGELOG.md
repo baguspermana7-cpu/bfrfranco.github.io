@@ -74,6 +74,14 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.11 — 2026-06-27 (cdu-selection-guide editorial serif hero)
+
+### Changed
+- **`cdu-selection-guide.html`** — the last CDU landing/guide page without the editorial skin now matches its
+  siblings: `data-rz-register="editorial"` + Fraunces serif hero (`.cdu-hero h1` was generic bold sans). Page
+  keeps its own palette (inline-serif approach, like cdu-checklist / cdu-comparison). All four CDU landing pages
+  (hub / selection-guide / checklist / comparison) now share the editorial serif-hero treatment.
+
 ## v1.50.10 — 2026-06-27 (cdu-hub adopts the editorial landing skin)
 
 ### Changed
