@@ -27,6 +27,14 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.7 — 2026-06-27 (Phase 2 batch — article-18 rack power-density chart)
+
+### Added
+- **`article-18.html`** ("AI Factories vs Traditional Data Centers") — free rack power-density evolution line:
+  **5 kW (2015 x86) → ~600 kW (Rubin Ultra NVL576, 2027+)** across NVIDIA generations (A100, H100, GB300, Vera
+  Rubin), conveying the AI density explosion. New `data/article-18/rack-density.csv` (vendor generation specs).
+  Rendered by `js/rz-article-chart.js`. 10 interactive sourced charts now live (gate clean).
+
 ## v1.50.6 — 2026-06-27 (Phase 2 batch — article-16 + article-11 free sourced charts)
 
 ### Added
