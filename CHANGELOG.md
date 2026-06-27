@@ -74,6 +74,14 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.10 — 2026-06-27 (cdu-hub adopts the editorial landing skin)
+
+### Changed
+- **`cdu-hub.html`** ("Liquid-Cooling CDU Toolkit" landing) now adopts the **editorial register** like the other
+  landing/hub pages (insights / geopolitics / future-forward): `data/rz-register="editorial"` + Fraunces serif
+  hero title + `css/rz-article-dark.css`. The `.hub-hero h1/p` selectors were added to the shared editorial hero
+  rules (dark + light). The hero title renders in Fraunces serif (was generic sans); body + cards unchanged.
+
 ## v1.50.9 — 2026-06-27 (Phase 2 batch — article-19 Singapore-vs-Batam power-cost chart)
 
 ### Added
