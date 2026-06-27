@@ -81,7 +81,7 @@
           bodyFont: { family: "'IBM Plex Mono',monospace", size: 12 },
           callbacks: {
             title: function(items){ return (cfg.x ? cfg.x + ': ' : '') + (items[0] ? items[0].label : ''); },
-            label: function(it){ var u = (cfg.series[it.datasetIndex] && cfg.series[it.datasetIndex].unit) || ''; return ' ' + it.dataset.label + ': ' + fmt(it.raw) + (u ? ' ' + u : ''); }
+            label: function(it){ var u = (cfg.series[it.datasetIndex] && cfg.series[it.datasetIndex].unit) || ''; var v = (it.raw && it.raw.length === 2 && typeof it.raw[0] === 'number') ? (fmt(it.raw[0]) + '–' + fmt(it.raw[1])) : fmt(it.raw); return ' ' + it.dataset.label + ': ' + v + (u ? ' ' + u : ''); }
           }
         }
       },

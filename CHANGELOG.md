@@ -27,6 +27,19 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.4 — 2026-06-27 (Phase 2 batch — article-24 salary-ladder chart + floating-bar support)
+
+### Added
+- **`article-24.html`** ("Data Center Manpower Shortage") gains a free interactive **salary-ladder** chart — a
+  min–max floating bar per role/level: Technician **$38–57K** → Operations mid **$68–84K** → senior
+  **$105–142K** → Liquid-cooling specialist **$90–160K** → AI-infrastructure specialist **$140–200K** (no
+  four-year degree). New validated `data/article-24/salary-by-role.csv` (Glassdoor / PayScale / SalaryExpert +
+  BLS). Per ARTICLE_DATAVIZ_STANDARD.md.
+
+### Changed
+- `js/rz-article-chart.js` — bar charts now support **floating (min–max) bars**; the tooltip renders the range
+  (`$min–$max`).
+
 ## v1.50.3 — 2026-06-27 (Phase 2 batch — article-25 free sourced auction-price chart)
 
 ### Added
