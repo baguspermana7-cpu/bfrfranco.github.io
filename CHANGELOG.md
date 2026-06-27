@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.50.10 — 2026-06-27 (Finance Terminal B-002 forex endpoint + B-003 proxy race)
+
+### Fixed
+- **B-002 — "Error loading forex data"** (`Apps/finance-terminal/index.html`): the forex API
+  (`CFG.FK`) pointed at `api.frankfurter.app`, which now **301-redirects to `api.frankfurter.dev`
+  without CORS headers on the redirect** — so the browser blocks the cross-origin redirect and the
+  fetch throws. Pointed `CFG.FK` straight at `https://api.frankfurter.dev/v1` (HTTP 200 + `ACAO:*`,
+  identical `{rates}` shape; `/latest`, `/{date}`, `/{start}..{end}` all verified). Forex now loads
+  (29 live rates returned in-browser).
+- **B-003 — slow data load**: `yahooCandles()` tried the 3 CORS proxies **sequentially** with an 8s
+  timeout each, so a single hung proxy stalled a chart up to 8s before the next was tried (compounding
+  across symbols → the reported multi-minute load). Now races all proxies in **parallel**
+  (`Promise.any`, 7s) — the fastest valid responder wins, a hung proxy can't block. Verified a chart
+  fetch returns 22 points in ~350ms.
+
 ## v1.50.9 — 2026-06-27 (Finance Terminal B-004 — un-gate table sort + filter)
 
 ### Fixed

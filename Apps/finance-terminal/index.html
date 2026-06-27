@@ -644,7 +644,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 const CFG={
   FH:'https://finnhub.io/api/v1',
   CG:'https://api.coingecko.com/api/v3',
-  FK:'https://api.frankfurter.app',
+  FK:'https://api.frankfurter.dev/v1', // B-002: frankfurter.app now 301-redirects to .dev WITHOUT CORS headers on the redirect, so the browser blocks it ("Error loading forex data"). Point straight at the new host (200 + ACAO:* ; same {rates} shape; /latest, /{date}, /{start}..{end} all work)
   LS:{KEY:'rz_ft_key',WL:'rz_ft_wl',PORT:'rz_ft_port',THEME:'rz_ft_theme',ALERTS:'rz_ft_alerts'},
   REFRESH:{QUOTES:300000,NEWS:1800000,FULL:3600000},
   INDICES:['SPY','QQQ','DIA','IWM','GLD','TLT','USO','VGK'],
@@ -850,14 +850,20 @@ const CORS_PROXIES=[
 ];
 async function yahooCandles(symbol,range,interval){
   const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval||'1d'}&range=${range||'1mo'}`;
+  // B-003: race the CORS proxies in PARALLEL (not sequentially) so a single
+  // hung/slow proxy can no longer stall the chart for its full 8s timeout before
+  // the next is tried — the fastest proxy that returns valid candle JSON wins.
+  // Promise.any rejects only if ALL proxies fail (→ null, same as before).
   let json=null;
-  for(const proxy of CORS_PROXIES){
-    try{
-      const r=await fetchWithTimeout(proxy(yUrl),8000);
-      if(!r.ok)continue;
-      json=await r.json();break;
-    }catch(e){continue}
-  }
+  try{
+    json=await Promise.any(CORS_PROXIES.map(async function(proxy){
+      const r=await fetchWithTimeout(proxy(yUrl),7000);
+      if(!r.ok)throw new Error('proxy '+r.status);
+      const j=await r.json();
+      if(!j||!j.chart)throw new Error('bad shape');
+      return j;
+    }));
+  }catch(e){json=null}
   if(!json)return null;
   const result=json.chart?.result?.[0];
   if(!result||!result.timestamp||!result.timestamp.length)return null;
