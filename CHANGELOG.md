@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.50.2 — 2026-06-27 (Phase 2 batch — article-20 free sourced water-use chart)
+
+### Added
+- **`article-20.html`** ("AI Data Center Water Use: Altman vs the Data") now carries a free, interactive,
+  finding-titled chart in the reading flow — U.S. data-center water use **2023 measured (17B gal, *Joule*,
+  peer-reviewed) → 2028 projected (68B gal, Global Water Intelligence), ≈4×** — directly grounding the
+  fact-check. Driven by a new validated `data/article-20/water-usage.csv` (source + basis_tag per row) via
+  `js/rz-article-chart.js`; theme-aware brand tokens, Source caption + PUBLISHED chip. Per
+  ARTICLE_DATAVIZ_STANDARD.md. (First Phase-2 rollout increment after the v1.50.1 article-26/27 reference pair.)
+
 ## v1.50.1 — 2026-06-27 (Article experience overhaul — reading column, related rail, callout de-slop, calculator tooltips, interactive sourced charts)
 
 Phase 1 (shared system + article-26/article-27 reference pair). The shared CSS/JS lands on all 27 editorial articles; the bespoke calculator/chart work is the reference pair, with the rest to roll out in batches.
