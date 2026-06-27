@@ -74,6 +74,14 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.13 — 2026-06-27 (Compare pages adopt the editorial serif hero)
+
+### Changed
+- **All 10 `compare-*` pages** now adopt the editorial landing skin: `data-rz-register="editorial"` + Fraunces
+  serif hero (covers both hero-class variants, `.compare-hero` and `.cmp-hero`; was bold Inter sans).
+  Inline-serif approach — each page keeps its own palette/Inter body. Continues the landing-skin rollout
+  (articles, series landings, CDU landings, pillars).
+
 ## v1.50.12 — 2026-06-27 (Pillar pages adopt the editorial serif hero)
 
 ### Changed
