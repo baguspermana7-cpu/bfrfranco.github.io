@@ -74,6 +74,15 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.14 — 2026-06-27 (Report / glossary / infographic landings adopt the editorial serif hero)
+
+### Changed
+- **`asean-dc-report-2026`, `carbon-footprint`, `glossary`, and the 3 `infographic-*` pages** now adopt the
+  editorial landing skin: `data-rz-register="editorial"` + Fraunces serif hero (was bold Inter sans).
+  Inline-serif approach. This completes the editorial serif-hero rollout across the site's content landings
+  (articles, series landings, CDU landings, pillars, compares, reports, infographics, glossary). Cockpits
+  (calculators / mini-BMS / EPMS / grid monitors) intentionally keep the instrument register.
+
 ## v1.50.13 — 2026-06-27 (Compare pages adopt the editorial serif hero)
 
 ### Changed
