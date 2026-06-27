@@ -144,6 +144,16 @@
         .fm-sod{ display:flex; gap:.8rem; margin-top:.6rem; font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-muted); }
         .fm-sod b{ color:var(--ck-text); font-variant-numeric:tabular-nums slashed-zero; }
         .fm-sod .fm-rpn-val{ margin-left:auto; }
+        /* interactive sourced charts (rz-article-chart.js) — un-scoped, theme-aware */
+        .rz-chart{ margin:1.6rem 0; }
+        .rz-chart-title{ font-family:var(--ck-mono); font-size:.82rem; font-weight:600; color:var(--ck-text); margin-bottom:.7rem; line-height:1.45; }
+        .rz-chart-canvas{ position:relative; height:300px; }
+        .rz-chart-src{ font-family:var(--ck-mono); font-size:.64rem; color:var(--ck-muted); margin-top:.7rem; line-height:1.5; }
+        .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--ck-muted); }
+        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
+        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#d97706; }
+        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
+        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
         .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--ck-muted); align-items:center; }
         table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
         .ck-note{ border:1px dashed var(--ck-border); border-radius:10px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
@@ -425,6 +435,12 @@
                 <tr><td>Full redundancy + failover drill; firmware/controls review</td><td><span class="cad a">ANNUAL</span></td><td>N+1 holds under fault; backups current.</td><td><small>none</small></td></tr>
             </tbody>
         </table></div>
+        <figure class="rz-chart" data-rz-chart>
+            <div class="rz-chart-canvas"><canvas></canvas></div>
+            <script type="application/json" class="rz-chart-cfg">
+{"type":"bar","title":"Most CDU preventive-maintenance load sits at the quarterly interval","x":"Cadence","labels":["Daily","Weekly","Monthly","Quarterly","Annual"],"series":[{"label":"PM tasks","data":[3,4,5,17,9],"accent":"info"}],"y":"Tasks","source":"cdu-checklist.html §06 PM checklist (38 tasks) · data/cdu/chart-pm-cadence.csv","basisTag":"derived"}
+            </script>
+        </figure>
     </div></section>
 
     <!-- ───────── spare-parts & consumables register ───────── -->
@@ -476,6 +492,12 @@
         </table></div>
         <div class="ck-note" style="border-style:solid;border-left:3px solid var(--ck-accent);">
             <b>Budget roll-up (EST, per CDU)</b> — recurring consumables (filters, fluid top-up, dosing, amortised seals/sensors) sum to roughly <b class="cost" style="color:var(--ck-accent);">$1,000–4,000 / yr</b>. A one-time on-site <b>critical-spare kit</b> (2× filter, 2× QD, 1× gasket kit, 1× seal kit, 1× leak-rope spare) runs roughly <b class="cost" style="color:var(--ck-accent);">$1,500–6,000</b>, plus a shared <b>fleet spare pump</b> at <b class="cost" style="color:var(--ck-accent);">$600–3,500</b>. These are <span class="src ill">EST</span> planning bands rolled up from the register above — <b>not a quote</b>; size to your fleet count, runtime hours and OEM service-parts pricing. The dominant driver is usually <b>filter elements</b> (frequency) and <b>fluid</b> (charge volume × $/L).</div>
+        <figure class="rz-chart" data-rz-chart>
+            <div class="rz-chart-canvas"><canvas></canvas></div>
+            <script type="application/json" class="rz-chart-cfg">
+{"type":"bar","title":"The leak-detection controller is the costliest critical spare to stock on-site","x":"Spare item","labels":["Filter element","Dry-break QD","EPDM gasket kit","Leak-rope controller","Pump seal kit","Flow sensor","dP transmitter"],"series":[{"label":"Est. unit cost (USD, band midpoint)","data":[72,110,95,600,240,375,285],"colors":["#ef4444","#ef4444","#ef4444","#ef4444","#f59e0b","#f59e0b","#f59e0b"]}],"y":"USD (band midpoint)","source":"cdu-checklist.html §07 spare-parts register EST cost bands · data/cdu/chart-spares-cost-criticality.csv. Red = CRITICAL (hold on site), amber = RECOMMENDED.","basisTag":"illustrative"}
+            </script>
+        </figure>
     </div></section>
 
     <!-- ───────── exploded-view / IPB resources per type ───────── -->
@@ -596,6 +618,12 @@
                 </div>
             </details>
         </div>
+        <figure class="rz-chart" data-rz-chart>
+            <div class="rz-chart-canvas"><canvas></canvas></div>
+            <script type="application/json" class="rz-chart-cfg">
+{"type":"bar","title":"By RPN, coolant chemistry drift (F11.1) is the top liquid-cooling risk — but pump failure (F11.2) is the most severe","x":"FMECA fault mode","labels":["F11.1 chemistry","F11.4 fluid","F11.3 leak","F11.2 pump","F11.5 filter"],"series":[{"label":"RPN (Severity × Occurrence × Detectability)","data":[140,120,108,60,60],"colors":["#ef4444","#ef4444","#f59e0b","#10b981","#10b981"]}],"y":"RPN","source":"FMECA-KG docs/research/csv/sod_rpn.csv (Lin & Ompusunggu 2026; ASME/Vertiv/OCP/3M) · data/cdu/chart-fmeca-rpn.csv. RPN per IEC 60812; note F11.2 severity=10 (catastrophic) is understated by RPN.","basisTag":"derived"}
+            </script>
+        </figure>
         <div class="ck-note"><b>Source.</b> FMECA-KG seed (Lin &amp; Ompusunggu 2026 synthesis; per-fault: ASME J.Electron.Packag. 140 020902 · Vertiv · OCP · 3M) at <code>docs/research/csv/</code>. S·O·D + RPN per IEC 60812; confidence tiers (HIGH / MEDIUM / THIN) reflect data provenance — vendor MTBF is often confidential. Full knowledge base + ML advisory concept: <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--cdu-primary);font-weight:600;">AI Engineering Maintenance</a>.</div>
     </div></section>
 
@@ -664,5 +692,7 @@
     })();
     </script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="js/rz-article-chart.js?v=2026-06-28-cdu" defer></script>
 </body>
 </html>

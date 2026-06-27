@@ -102,6 +102,15 @@
             .footer-grid{ grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
             button, a.btn, [role="button"]{ min-height:44px; }
         }
+        .rz-chart{ margin:1.6rem 0; }
+        .rz-chart-title{ font-family:var(--cp-mono); font-size:.82rem; font-weight:600; color:var(--cp-text); margin-bottom:.7rem; line-height:1.45; }
+        .rz-chart-canvas{ position:relative; height:300px; }
+        .rz-chart-src{ font-family:var(--cp-mono); font-size:.64rem; color:var(--cp-muted); margin-top:.7rem; line-height:1.5; }
+        .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cp-muted); }
+        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
+        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#d97706; }
+        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
+        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
     </style>
 </head>
 <body>
@@ -263,6 +272,12 @@
             </tbody>
         </table></div>
         <p class="lead" style="margin-top:1rem;"><b>The read.</b> Lowest capex / best retrofit / zero water = <b>L2A</b> (and waterless two-phase). Best efficiency at scale = <b>L2L with warm-water free cooling</b> — at the cost of a water plant, WUE, and a large central single-point-of-failure that makes N+1 mandatory. Maintenance burden is the <b>many-small-vs-few-large</b> axis: in-rack and L2A multiply units and leak surface area; in-row and L2L concentrate into fewer serviceable units but raise SPOF. <b>Two-phase</b> is the emerging density play (≈1/10 the flow → smaller pumps, waterless), tempered by expensive dielectric fluid (two-phase fluids can exceed $50/L) and lower maturity.</p>
+        <figure class="rz-chart" data-rz-chart>
+            <div class="rz-chart-canvas"><canvas></canvas></div>
+            <script type="application/json" class="rz-chart-cfg">
+{"type":"bar","title":"The many-small-vs-few-large axis: facility L2L CDUs reach ~4 MW; in-rack units stay ≤100 kW","x":"CDU type","labels":["In-rack","In-row","Facility (L2L)"],"series":[{"label":"Max single-unit capacity","data":[100,2400,4000],"accent":"info","unit":"kW"}],"y":"Capacity (kW)","source":"data/cdu/cdu-models.csv (15 verified vendor models) · data/cdu/chart-capacity-by-type.csv — max per architecture (Lenovo RM100 / Delta In-Row 2.4 MW / Boyd ROL4000)","basisTag":"vendor"}
+            </script>
+        </figure>
         <div class="cp-note"><b>Publishing caveats.</b> *The "~35% lower OpEx" and "8–17% lower 5-yr TCO" (Accelsius/Jacobs) and "six-nines" (CoolIT) figures are <b>vendor/sponsored</b> — attribute by name <span class="src ven">VENDOR</span>. The 25 ppm chloride, pH band, and 2–3→8–10 yr fluid-life figures are industry consensus, <i>not</i> a single named standard <span class="src rep">REPORTED</span>. The most consistently corroborated numeric practices are 50 µm/25 µm filtration and the 2–3 °C-above-dew-point rule.</div>
 
         <div class="cp-links">
@@ -295,5 +310,7 @@
     })();
     </script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="js/rz-article-chart.js?v=2026-06-28-cdu" defer></script>
 </body>
 </html>

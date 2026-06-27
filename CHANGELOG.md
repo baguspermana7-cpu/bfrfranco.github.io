@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.50.19 — 2026-06-28 (CDU tools — interactive sourced charts — Ship 3)
+
+### Added
+- **Interactive sourced charts** (`js/rz-article-chart.js` + Chart.js, theme-aware, crosshair) on the CDU
+  tools — 6 charts, each `data-rz-chart` figure carrying a `source` + `basisTag`, all passing
+  `audit-article-charts --strict`. Datasets under **`data/cdu/chart-*.csv`** (each with `source`/`basis_tag`):
+  - **cdu-checklist**: PM-cadence by interval (DERIVED) · spare-parts cost × criticality (ILLUSTRATIVE) ·
+    **FMECA fault RPN** (DERIVED, from `sod_rpn.csv`).
+  - **cdu-comparison**: max single-unit capacity by CDU type (VENDOR, from `cdu-models.csv`).
+  - **cdu-selection-guide**: secondary flow vs capacity, ~0.85–0.93 LPM/kW (VENDOR).
+  - **cdu-calculator**: pressure drop vs flow, dP ∝ Q² Darcy-Weisbach (DERIVED).
+- Chart CSS is supplied **inline per page** (un-scoped, theme-aware via each page's `--cdu-`/`--ck-`/`--cp-`
+  tokens) since the editorial chart CSS in `css/rz-article-dark.css` is register-scoped + parallel-owned.
+
+Verified: 6 charts render + redraw on theme toggle, source caption + basis chip on each, 0 console errors;
+script-tags / js-syntax / version-stamp / mobile / responsive-layout / dark-coverage / **article-charts** all
+pass for the 4 pages. Ship 3 of the 4-ship CDU integration.
+
 ## v1.50.18 — 2026-06-28 (CDU checklist — FMECA fault-reference section — Ship 2)
 
 ### Added

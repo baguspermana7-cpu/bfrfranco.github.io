@@ -147,6 +147,15 @@
             button, a.btn, [role="button"] { min-height:44px; }
             .tip .tipbox { width:200px; }
         }
+        .rz-chart{ margin:1.6rem 0; }
+        .rz-chart-title{ font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:600; color:var(--cdu-text); margin-bottom:.7rem; line-height:1.45; }
+        .rz-chart-canvas{ position:relative; height:300px; }
+        .rz-chart-src{ font-family:'JetBrains Mono',monospace; font-size:.64rem; color:var(--cdu-muted); margin-top:.7rem; line-height:1.5; }
+        .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cdu-muted); }
+        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
+        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#d97706; }
+        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
+        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
     </style>
 </head>
 <body>
@@ -282,6 +291,12 @@
             <div class="cc-note" style="margin-top:1rem;">
                 <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Pro analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
             </div>
+            <figure class="rz-chart" data-rz-chart>
+                <div class="rz-chart-canvas"><canvas></canvas></div>
+                <script type="application/json" class="rz-chart-cfg">
+{"type":"line","title":"Loop pressure drop rises with the square of flow — Darcy-Weisbach (dP ∝ Q²)","x":"Secondary flow (LPM per kW)","labels":[0.5,0.75,1.0,1.25,1.5,1.75,2.0],"series":[{"label":"Pressure drop","data":[0.22,0.50,0.89,1.39,2.00,2.72,3.56],"accent":"signal","unit":"bar"}],"y":"Pressure drop (bar)","source":"js/cdu-engine.js Darcy-Weisbach/Haaland (dP ∝ Q², calibrated 1.5 LPM/kW → 2.0 bar) · data/cdu/chart-flow-dp.csv","basisTag":"derived"}
+                </script>
+            </figure>
         </div>
 
         <!-- PRO TIER -->
@@ -608,5 +623,7 @@
     })();
     </script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="js/rz-article-chart.js?v=2026-06-28-cdu" defer></script>
 </body>
 </html>
