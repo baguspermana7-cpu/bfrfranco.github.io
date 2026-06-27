@@ -85,8 +85,8 @@
          the editorial article skin (scoped to data-rz-register=editorial + dark),
          and the read-progress/entrance runtime. Light mode + structure untouched. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.43.9">
-    <script src="js/rz-article-editorial.js?v=1.43.9" defer></script>
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.1">
+    <script src="js/rz-article-editorial.js?v=1.50.1" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1145,6 +1145,13 @@
     <h2 id="section-models">Worked Models &mdash; Putting Numbers to the Loss</h2>
 
     <p>The calculations below are illustrative but rigorous: every input is tagged <strong>[published]</strong> (peer-reviewed or field-measured), <strong>[vendor]</strong> (manufacturer datasheet), or <strong>[illustrative]</strong> (a representative mid-range chosen for the worked example). Results are given as <em>ranges</em> bounded by the well-run case and the one measured field case &mdash; not as point predictions. Substitute your own charge, price and make-up rate and the arithmetic carries through unchanged.</p>
+    <figure class="rz-chart" data-rz-chart>
+      <div class="rz-chart-canvas"><canvas></canvas></div>
+      <script type="application/json" class="rz-chart-cfg">
+{"type": "line", "title": "Fluid loss — and its CO₂e footprint — scale linearly with make-up rate", "x": "Make-up rate (%/yr)", "labels": [0.5, 2, 5, 8, 10, 12, 15, 18, 20], "series": [{"label": "Annual fluid loss", "data": [0.7, 2.8, 7.0, 11.2, 14.0, 16.8, 21.0, 25.2, 28.0], "accent": "signal", "unit": "kg/yr", "axis": "y"}, {"label": "CO₂-equivalent", "data": [0.224, 0.896, 2.24, 3.584, 4.48, 5.376, 6.72, 8.064, 8.96], "accent": "info", "unit": "t/yr", "axis": "y1"}], "y": "Fluid loss (kg/yr)", "y1": "CO₂e (t/yr)", "source": "RZ worked models · data/article-26/worked-model-scenarios.csv (3M Novec 7000, 100 L charge; GWP100 320 low-end, 3M TDS). Field-measured make-up reaches 17.1%/yr (DoD/LBNL).", "basisTag": "modelled"}
+      </script>
+    </figure>
+
 
     <div class="pfas-chem-block">
         <span class="chem-label">Reference inputs (tagged)</span>
@@ -2305,6 +2312,7 @@ function copyLink() {
 
 <!-- PFAS Calculator IIFE -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/rz-article-chart.js?v=1.50.1" defer></script>
 <script>
 (function() {
     'use strict';

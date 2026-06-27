@@ -37,7 +37,7 @@ for (const f of pages) {
 }
 
 // 2) Render BOTH modes: dark must be dark (no white body/content), light must be light (not stuck dark)
-const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
 const renderBroken = [];
 const lightStuck = [];
 const bodyLum = async (pg) => pg.evaluate(() => { const m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g); return m ? Math.round(0.299*+m[0] + 0.587*+m[1] + 0.114*+m[2]) : -1; });
@@ -72,9 +72,9 @@ for (const f of pages) {
       if (ll >= 0 && ll < 90) lightStuck.push(`${f}  body-lum=${ll} (stuck dark in light mode)`);
     }
   } catch (e) { /* heavy/auth pages may time out on file://; not counted as a skin failure */ }
-  await pg.close();
+  try { await pg.close(); } catch (e) { /* page/browser may have crashed; ignore */ }
 }
-await browser.close();
+try { await browser.close(); } catch (e) {}
 
 let failed = false;
 if (cascadeBug.length) {

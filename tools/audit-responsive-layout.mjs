@@ -27,7 +27,7 @@ const ROOT = process.cwd();
 const SKIP = /^(rz-|plan-|planb|google|404|sitemap|robots|llms|article-9-paper)/;
 const pages = readdirSync(ROOT).filter(f => f.endsWith('.html') && !SKIP.test(f)).sort();
 
-const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
 
 async function measure(f) {
   const r = { f, mobileOverflow: 0, tabletOverflow: 0, wideTableW: 0 };

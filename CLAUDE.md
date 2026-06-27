@@ -42,6 +42,7 @@ python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints (sta
 node   tools/audit-responsive-layout.mjs --strict  # render gate: real horizontal-scroll + wide article tables (v1.49.8)
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD
 node   tools/audit-dark-coverage.mjs --strict      # NO white body/content in dark mode (v1.47.x)
+node   tools/audit-article-charts.mjs --strict     # every article chart carries source + basisTag (v1.50.1)
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):
@@ -215,6 +216,9 @@ These were explicitly rejected by the user. Adding them back is a regression:
 4. **Cursor-tracking effects** (mouse spotlight, magnetic cursor, 3D card tilt with mouse follow) — explicitly disabled in `script.js` (`initCardTilt`, `initSpotlight` — early return). Don't re-enable.
 5. **Visible "GitHub" label + `github.com/baguspermana7-cpu` URL** in Contact section + footer — removed in v1.1.0. Schema.org `sameAs` JSON-LD references are kept; visible text is gone.
 6. **Saturated emerald solid bento cards** — replaced with calm pastel rotation (mint / lavender / peach / pink / cream).
+7. **Saturated gradient callout fills + 3–4px accent borders** (`.info-box`/`.ws-insight-box`/`.ws-engineer-note`) — replaced (v1.50.1) by the editorial language: flat `color-mix` tint + 1px hairline + a 2px semantic accent rail, scoped to `html[data-rz-register="editorial"]` in `css/rz-article-dark.css`. See ARTICLE_DATAVIZ + DARK_MODE standards.
+8. **White text on saturated category-gradient number badges** (articles grid) — washed out on red/teal thumbnails; replaced with one dark-glass instrument chip (`rgba(13,16,20,.72)` + hairline + mono tabular number) in `articles.html`.
+9. **Article body centered per-paragraph with a `ch`-based measure** — caused ragged left edges (lead ¶ vs body ¶). Use the single LEFT-aligned, justified, fixed-`rem` reading column in `css/rz-article-dark.css` (v1.50.1).
 
 ---
 
@@ -335,6 +339,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/audit-mobile-responsive.py` | 8-checkpoint responsive scorer — STRICT for CI |
 | `tools/audit-dark-coverage.mjs` | render gate — fails any page with white body/content in dark mode + the `:root,` cascade bug — STRICT for CI (v1.47.x) |
 | `tools/audit-responsive-layout.mjs` | render gate — fails real mobile/tablet horizontal scroll (actual `scrollX`) + article tables wider than the reading column — STRICT for CI (v1.49.8) |
+| `tools/audit-article-charts.mjs` | data-viz provenance gate — fails any `[data-rz-chart]` config missing `source`/`basisTag` — STRICT for CI (v1.50.1) |
 | `tools/audit-seo.py` | per-page SEO meta health — non-strict |
 | `tools/build-sitemap.py` | regen sitemap.xml from filesystem |
 | `tools/build-llms-txt.py` | regen llms.txt |

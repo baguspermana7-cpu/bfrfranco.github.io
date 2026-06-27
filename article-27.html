@@ -87,8 +87,8 @@
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
     <!-- v1.43.x — editorial register (RZ Dark System v1, §08 article skin). Adds Fraunces + Plex fonts, editorial dark chrome + read-progress/stagger. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.43.9">
-    <script src="js/rz-article-editorial.js?v=1.43.9" defer></script>
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.1">
+    <script src="js/rz-article-editorial.js?v=1.50.1" defer></script>
     <link rel="preload" as="image" href="assets/article-27-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -520,8 +520,8 @@
         }
 
         /* ===== WS Calculator Styles ===== */
-        .ws-calculator { background:#fff; border:1px solid #fcd34d; border-radius:12px; padding:2rem; margin:2rem 0; }
-        [data-theme="dark"] .ws-calculator { background:rgba(180,83,9,0.06); border-color:rgba(252,211,77,0.2); }
+        .ws-calc-wrap { background:#fff; border:1px solid #fcd34d; border-radius:12px; padding:2rem; margin:2rem 0; }
+        [data-theme="dark"] .ws-calc-wrap { background:rgba(180,83,9,0.06); border-color:rgba(252,211,77,0.2); }
         .ws-calc-header { margin-bottom:1rem; }
         .ws-calc-header h3 { font-size:1.25rem; color:#b45309; margin:0 0 0.3rem; }
         [data-theme="dark"] .ws-calc-header h3 { color:#fcd34d; }
@@ -655,6 +655,16 @@
         .reference-item a { color: #b45309; text-decoration: none; }
         [data-theme="dark"] .reference-item a { color: #fcd34d; }
         .reference-item a:hover { text-decoration: underline; }
+        /* v1.49.10 — calculator tooltips (TOOLTIP_STANDARD compliance): every input + KPI carries a help affordance */
+        .ws-calc-wrap .tip { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:.35rem; background:rgba(180,83,9,.14); border:1px solid rgba(180,83,9,.42); border-radius:50%; font-size:10px; line-height:1; color:#b45309; cursor:help; position:relative; vertical-align:middle; font-weight:700; flex:0 0 auto; }
+        [data-theme="dark"] .ws-calc-wrap .tip { color:#fcd34d; background:rgba(252,211,77,.14); border-color:rgba(252,211,77,.4); }
+        .ws-calc-wrap .tip .tipbox { display:none; position:absolute; bottom:150%; right:0; width:242px; background:#0b1220; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:60; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; white-space:normal; text-transform:none; letter-spacing:normal; }
+        .ws-calc-wrap .tip:hover .tipbox, .ws-calc-wrap .tip:focus .tipbox { display:block; }
+        .ws-calc-wrap .tip .tipbox b { color:#fcd34d; }
+        .ws-calc-wrap .tip .tipbox i { color:#9aa8bb; font-style:normal; display:block; margin-top:.3rem; }
+        .ws-calc-wrap .ws-kpi-card, .ws-calc-wrap .ws-input-group { overflow:visible; }
+        .ws-calc-wrap .ws-kpi-label { display:flex; align-items:center; gap:.3rem; }
+
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -863,6 +873,13 @@
     <p>The headline figure is <span class="ws-stat">467,000&ndash;498,000 unfilled operational positions</span> across the global data center sector, per research from the 7x24 Exchange and the Mission Critical Global Alliance (MCGA). That gap is not a forecast. It is the current shortfall, as of 2024&ndash;2026, in a sector that is simultaneously expanding capacity at <span class="ws-stat">30% per year</span> driven by AI infrastructure demand. The Uptime Institute&rsquo;s 2024 Global Data Center Survey found that more than <span class="ws-stat">65% of operators</span> report significant difficulty finding qualified candidates. To understand what that means operationally: if you are an enterprise or colocation operator, there is a better than even chance that your next critical hire is not on the market today.</p>
 
     <p>The aging dimension makes this worse. According to AFCOM&rsquo;s 2024 State of the Data Center Report, <span class="ws-stat">70% of current DC personnel are aged 45 or older</span>, with <span class="ws-stat">33% at or near retirement age</span>. The institutional knowledge embedded in that cohort &mdash; how to safely work on live 400V distribution, how to troubleshoot a chiller plant at 3 AM, how to commission a 2N+1 UPS system without dropping load &mdash; took decades to accumulate. It cannot be downloaded from a training portal. When those engineers retire, they take that knowledge with them, and the industry has no pipeline adequate to replace it.</p>
+    <figure class="rz-chart" data-rz-chart>
+      <div class="rz-chart-canvas"><canvas></canvas></div>
+      <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Seven in ten data-center staff are 45+, and a third are at or near retirement", "labels": ["Under 45", "45 to pre-retirement", "At or near retirement"], "series": [{"label": "Share of DC personnel", "data": [30, 37, 33], "unit": "%", "colorAccents": ["data", "signal", "alert"]}], "source": "AFCOM 2024 State of the Data Center (70% aged 45+; 33% at/near retirement). Under-45 and 45-to-pre-retirement derived to sum to 100%. data/article-27/workforce-stats.csv", "basisTag": "published", "x": "Age cohort", "y": "Share of DC personnel (%)"}
+      </script>
+    </figure>
+
 
     <p>The electrical worker shortage is particularly severe. Approximately <span class="ws-stat">20,000 licensed electricians retire annually</span> across the US alone, per Fortune and IBEW data. Electrical work constitutes <span class="ws-stat">45&ndash;70% of data center construction costs</span>, and BlackRock and IBEW joint research estimates that more than <span class="ws-stat">300,000 additional electricians</span> will be needed over the next decade just to build the infrastructure already committed. Google&rsquo;s $15M commitment to the Electrical Training Alliance is not philanthropy. It is a recognition that the labor market for the workers who physically build and maintain data centers is approaching a structural break.</p>
 
@@ -1261,7 +1278,7 @@
 
             <div class="ws-input-grid">
                 <div class="ws-input-group">
-                    <label class="ws-label">Organization Type</label>
+                    <label class="ws-label">Organization Type<span class="tip" tabindex="0">?<span class="tipbox"><b>Organization Type</b> Hyperscaler, Enterprise and Colocation differ in staffing density and shift model — this sets the baseline ops-staff ratio per MW.<i>Hyperscalers run leaner per-MW; colos staff to per-customer SLAs.</i></span></span></label>
                     <select class="ws-select" id="ws-org-type" onchange="wsCalculate()" aria-label="Ws org type">
                         <option value="hyperscaler">Hyperscaler (50MW+)</option>
                         <option value="enterprise">Enterprise DC</option>
@@ -1271,7 +1288,7 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Facility Size</label>
+                    <label class="ws-label">Facility Size<span class="tip" tabindex="0">?<span class="tipbox"><b>Facility Size</b> Critical IT load band. Larger facilities need more shift coverage and specialised trades.<i>1–10MW = Medium; 50MW+ = Hyperscale.</i></span></span></label>
                     <select class="ws-select" id="ws-facility-size" onchange="wsCalculate()" aria-label="Ws facility size">
                         <option value="small">Small (&lt;1MW)</option>
                         <option value="medium" selected>Medium (1&ndash;10MW)</option>
@@ -1280,19 +1297,19 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Current Ops Staff</label>
+                    <label class="ws-label">Current Ops Staff<span class="tip" tabindex="0">?<span class="tipbox"><b>Current Ops Staff</b> Your present on-site operations headcount (FTEs), excluding contractors.<i>Typical 1–10MW site: 15–30 ops FTEs.</i></span></span></label>
                     <input type="number" class="ws-num" id="ws-current-staff" value="25" min="1" max="5000" oninput="wsCalculate()" aria-label="Ws current staff">
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Target Staff (12 months)</label>
+                    <label class="ws-label">Target Staff (12 months)<span class="tip" tabindex="0">?<span class="tipbox"><b>Target Staff</b> Headcount you aim to reach within 12 months to meet growth and redundancy.<i>Set above current staff to define the gap.</i></span></span></label>
                     <input type="number" class="ws-num" id="ws-target-staff" value="35" min="1" max="5000" oninput="wsCalculate()" aria-label="Ws target staff">
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Annual Attrition Rate (%)</label>
+                    <label class="ws-label">Annual Attrition Rate (%)<span class="tip" tabindex="0">?<span class="tipbox"><b>Annual Attrition Rate</b> Share of staff leaving per year — drives replacement hiring and cost.<i>DC industry 15–40%; ~25% typical (Uptime 2024).</i></span></span></label>
                     <input type="number" class="ws-num" id="ws-attrition" value="25" min="0" max="100" oninput="wsCalculate()" aria-label="Ws attrition">
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Available Budget</label>
+                    <label class="ws-label">Available Budget<span class="tip" tabindex="0">?<span class="tipbox"><b>Available Budget</b> Funding envelope for hiring, training and retention over the plan horizon.<i>Moderate = $500K–$5M.</i></span></span></label>
                     <select class="ws-select" id="ws-budget" onchange="wsCalculate()" aria-label="Ws budget">
                         <option value="low">Limited (&lt;$500K)</option>
                         <option value="medium" selected>Moderate ($500K&ndash;$5M)</option>
@@ -1300,7 +1317,7 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Primary Strategy</label>
+                    <label class="ws-label">Primary Strategy<span class="tip" tabindex="0">?<span class="tipbox"><b>Primary Strategy</b> Lead mitigation lever. Each strategy carries a different cost, lead time and risk.<i>Retention pays back fastest; pipeline-building is slowest.</i></span></span></label>
                     <select class="ws-select" id="ws-strategy1" onchange="wsCalculate()" aria-label="Ws strategy1">
                         <option value="16">16 — Retention &amp; Comp Restructuring</option>
                         <option value="8">08 — Cross-Training Adjacent Industries</option>
@@ -1325,7 +1342,7 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Secondary Strategy (optional)</label>
+                    <label class="ws-label">Secondary Strategy (optional)<span class="tip" tabindex="0">?<span class="tipbox"><b>Secondary Strategy</b> Optional second lever stacked on the primary for combined effect.<i>Stacking adds cost but de-risks single-strategy reliance.</i></span></span></label>
                     <select class="ws-select" id="ws-strategy2" onchange="wsCalculate()" aria-label="Ws strategy2">
                         <option value="0">None</option>
                         <option value="8">08 — Cross-Training Adjacent Industries</option>
@@ -1352,7 +1369,7 @@
                 </div>
                 <!-- New 2026-04-28: Target Year, Region, Workforce Mix, Risk Tolerance -->
                 <div class="ws-input-group">
-                    <label class="ws-label">Target Year</label>
+                    <label class="ws-label">Target Year<span class="tip" tabindex="0">?<span class="tipbox"><b>Target Year</b> Year by which the staffing gap should be closed — sets the annual hiring pace.<i>Pace = gap ÷ years remaining.</i></span></span></label>
                     <select class="ws-select" id="ws-target-year" onchange="wsCalculate()" aria-label="Ws target year">
                         <option value="2025">2025</option>
                         <option value="2026">2026</option>
@@ -1363,7 +1380,7 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Region</label>
+                    <label class="ws-label">Region<span class="tip" tabindex="0">?<span class="tipbox"><b>Region</b> Labour-market and salary multiplier applied to every cost output.<i>United States = 1.00× baseline.</i></span></span></label>
                     <select class="ws-select" id="ws-region" onchange="wsCalculate()" aria-label="Ws region">
                         <option value="us" selected>United States (1.00&times;)</option>
                         <option value="eu">Europe (0.85&times;)</option>
@@ -1372,7 +1389,7 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Workforce Mix</label>
+                    <label class="ws-label">Workforce Mix<span class="tip" tabindex="0">?<span class="tipbox"><b>Workforce Mix</b> Split between physical ops and NOC/remote roles — affects automation applicability.<i>Balanced = 50/50.</i></span></span></label>
                     <select class="ws-select" id="ws-workforce-mix" onchange="wsCalculate()" aria-label="Ws workforce mix">
                         <option value="physical">Physical-heavy (70/30)</option>
                         <option value="balanced" selected>Balanced (50/50)</option>
@@ -1380,7 +1397,7 @@
                     </select>
                 </div>
                 <div class="ws-input-group">
-                    <label class="ws-label">Risk Tolerance</label>
+                    <label class="ws-label">Risk Tolerance<span class="tip" tabindex="0">?<span class="tipbox"><b>Risk Tolerance</b> Appetite for unproven strategies. Conservative favours proven levers; Aggressive allows early-stage tech.<i>Balanced blends both.</i></span></span></label>
                     <select class="ws-select" id="ws-risk-tolerance" onchange="wsCalculate()" aria-label="Ws risk tolerance">
                         <option value="conservative">Conservative (proven only)</option>
                         <option value="balanced" selected>Balanced</option>
@@ -1390,15 +1407,15 @@
             </div>
 
             <div class="ws-kpi-grid">
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Staff Gap</div><div class="ws-kpi-value" id="ws-kpi-gap">—</div><div class="ws-kpi-sub" id="ws-kpi-gap-sub">positions to fill</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Est. Implementation Cost</div><div class="ws-kpi-value" id="ws-kpi-cost">—</div><div class="ws-kpi-sub" id="ws-kpi-cost-sub">combined strategy setup</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Time to First Hire</div><div class="ws-kpi-value" id="ws-kpi-time">—</div><div class="ws-kpi-sub">fastest strategy selected</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Annual Attrition Cost</div><div class="ws-kpi-value" id="ws-kpi-attrition">—</div><div class="ws-kpi-sub" id="ws-kpi-attrition-sub">current replacement cost/yr</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">N-Year Total Investment</div><div class="ws-kpi-value" id="ws-kpi-5yr">—</div><div class="ws-kpi-sub" id="ws-kpi-5yr-sub">setup + ongoing operations</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Strategy Risk Level</div><div class="ws-kpi-value" id="ws-kpi-risk">—</div><div class="ws-kpi-sub">combined risk assessment</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Annual Hires Required</div><div class="ws-kpi-value" id="ws-kpi-annual-hires">—</div><div class="ws-kpi-sub" id="ws-kpi-annual-hires-sub">to close gap by target year</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Cumulative Hires</div><div class="ws-kpi-value" id="ws-kpi-cum-hires">—</div><div class="ws-kpi-sub" id="ws-kpi-cum-hires-sub">total positions filled by 2030</div></div>
-                <div class="ws-kpi-card"><div class="ws-kpi-label">Years to Close Gap</div><div class="ws-kpi-value" id="ws-kpi-years-close">—</div><div class="ws-kpi-sub">at projected hire rate</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Staff Gap <span class="tip" tabindex="0" aria-label="Staff Gap explanation">ⓘ<span class="tipbox">Positions you must fill. Formula: Target − Current staff, plus attrition replacements. Unit: headcount. Higher = larger hiring task.</span></span></div><div class="ws-kpi-value" id="ws-kpi-gap">—</div><div class="ws-kpi-sub" id="ws-kpi-gap-sub">positions to fill</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Est. Implementation Cost <span class="tip" tabindex="0" aria-label="Est. Implementation Cost explanation">ⓘ<span class="tipbox">One-time setup for the selected strategies (recruiting, training, onboarding), region-adjusted. Formula: Σ per-strategy setup × region multiplier. Unit: USD.</span></span></div><div class="ws-kpi-value" id="ws-kpi-cost">—</div><div class="ws-kpi-sub" id="ws-kpi-cost-sub">combined strategy setup</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Time to First Hire <span class="tip" tabindex="0" aria-label="Time to First Hire explanation">ⓘ<span class="tipbox">Time to the first productive hire under the fastest selected strategy. Lower = quicker impact. Unit: weeks.</span></span></div><div class="ws-kpi-value" id="ws-kpi-time">—</div><div class="ws-kpi-sub">fastest strategy selected</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Annual Attrition Cost <span class="tip" tabindex="0" aria-label="Annual Attrition Cost explanation">ⓘ<span class="tipbox">Yearly cost to replace leavers. Formula: Current staff × attrition rate × replacement cost (a fraction of salary, AFCOM 2024). Unit: USD/yr.</span></span></div><div class="ws-kpi-value" id="ws-kpi-attrition">—</div><div class="ws-kpi-sub" id="ws-kpi-attrition-sub">current replacement cost/yr</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">N-Year Total Investment <span class="tip" tabindex="0" aria-label="N-Year Total Investment explanation">ⓘ<span class="tipbox">Setup plus ongoing operating cost through the target year. Formula: setup + (annual ops × years to target). Unit: USD.</span></span></div><div class="ws-kpi-value" id="ws-kpi-5yr">—</div><div class="ws-kpi-sub" id="ws-kpi-5yr-sub">setup + ongoing operations</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Strategy Risk Level <span class="tip" tabindex="0" aria-label="Strategy Risk Level explanation">ⓘ<span class="tipbox">Composite risk of the chosen strategy mix (maturity, complexity, single-lever reliance). Lower = safer.</span></span></div><div class="ws-kpi-value" id="ws-kpi-risk">—</div><div class="ws-kpi-sub">combined risk assessment</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Annual Hires Required <span class="tip" tabindex="0" aria-label="Annual Hires Required explanation">ⓘ<span class="tipbox">Hiring pace to close the gap by the target year. Formula: Staff Gap ÷ (target year − current year), incl. attrition. Unit: hires/yr.</span></span></div><div class="ws-kpi-value" id="ws-kpi-annual-hires">—</div><div class="ws-kpi-sub" id="ws-kpi-annual-hires-sub">to close gap by target year</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Cumulative Hires <span class="tip" tabindex="0" aria-label="Cumulative Hires explanation">ⓘ<span class="tipbox">Total positions filled by the target year at the projected pace. Unit: headcount.</span></span></div><div class="ws-kpi-value" id="ws-kpi-cum-hires">—</div><div class="ws-kpi-sub" id="ws-kpi-cum-hires-sub">total positions filled by 2030</div></div>
+                <div class="ws-kpi-card"><div class="ws-kpi-label">Years to Close Gap <span class="tip" tabindex="0" aria-label="Years to Close Gap explanation">ⓘ<span class="tipbox">Time to reach a zero gap at the current hiring pace. Formula: Staff Gap ÷ Annual Hires Required. Unit: years.</span></span></div><div class="ws-kpi-value" id="ws-kpi-years-close">—</div><div class="ws-kpi-sub">at projected hire rate</div></div>
             </div>
 
             <div class="ws-narrative" id="ws-narrative">Select your organization type and strategies above to generate your workforce strategy assessment.</div>
@@ -1842,6 +1859,7 @@
 <script src="rz-engine.min.js" defer></script>
 <script src="script.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/rz-article-chart.js?v=1.50.1" defer></script>
 <script>
 (function() {
     'use strict';

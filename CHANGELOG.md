@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v1.50.1 — 2026-06-27 (Article experience overhaul — reading column, related rail, callout de-slop, calculator tooltips, interactive sourced charts)
+
+Phase 1 (shared system + article-26/article-27 reference pair). The shared CSS/JS lands on all 27 editorial articles; the bespoke calculator/chart work is the reference pair, with the rest to roll out in batches.
+
+### Fixed
+- **Article body alignment ("nggak lurus").** Paragraphs were individually centered with a `ch`-based measure, so the 1.14rem lead paragraph and 1rem body paragraphs computed different widths and landed on different left edges. Replaced with a single **left-aligned, justified** reading column at a fixed `rem` measure (`css/rz-article-dark.css`) — every prose block (incl. the drop-cap lead), the hero figure, and tables now share one left+right edge.
+- **Callout AI-design-slop.** `.info-box`(+variants), `.ws-insight-box`, `.ws-engineer-note`, `.ws-evidence-block` carried saturated gradient fills + 3–4px borders. All adopt the editorial language: flat `color-mix` tint + 1px hairline + a 2px semantic accent rail + one restrained shadow + capped radius — scoped to the editorial register so it lands site-wide. Inner callout text re-aligned to the heading edge.
+- **Article number badges washed out** (`articles.html`): white text on saturated category gradients → one legible dark-glass instrument chip (hairline + mono tabular number) that reads on any thumbnail in both themes.
+
+### Added
+- **Section dividers** — a tier-3 hairline above each `<h2>`, aligned with the hero/reading column.
+- **Related-articles rail** — a compact sticky right rail built by `js/rz-article-editorial.js` from each page's existing "Continue Reading" cards (thumbnail derived from the href). 2-col on wide screens, collapses to the bottom grid < 1024px. Zero per-article markup edits.
+- **Calculator tooltip compliance** (`article-27.html` `.ws-calc-wrap`): all 12 inputs + 9 KPI cards now carry `.tip` help affordances (formula / denominator / source) per TOOLTIP_STANDARD.
+- **Interactive, validated-data charts** — new `js/rz-article-chart.js` renders on-brand Chart.js charts (CNBC-style hover crosshair + tooltip, instrument tokens, theme-aware, finding-titled) from an inline sourced config, with a visible **Source caption + basis chip**. Reference charts: `article-26` dual-axis fluid-loss line (from the verified `data/article-26/worked-model-scenarios.csv`) and `article-27` aging-workforce bar (new `data/article-27/workforce-stats.csv`, AFCOM 2024). New gate `tools/audit-article-charts.mjs` blocks any chart without a `source`+`basisTag`. See **`standarization/ARTICLE_DATAVIZ_STANDARD.md`**.
+
+### Changed
+- `tools/audit-dark-coverage.mjs` + `tools/audit-responsive-layout.mjs` hardened (`--disable-dev-shm-usage`, resilient page close) to survive headless browser crashes when cycling many pages.
+
 ## v1.50.0 — 2026-06-27 (index hover fixes + WhatsApp removal + Contact box enhancement)
 
 ### Fixed

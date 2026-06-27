@@ -354,20 +354,209 @@ html[data-rz-register="editorial"] figcaption{
    properties (size, weight contrast, rhythm, measure) applied once for both
    themes. Colour/font-family per-theme is set in the register blocks above.
    ============================================================================ */
-/* measure — cap the prose column to a readable editorial line length (~68ch).
-   Tables / figures / media stay full-width (only text elements are capped). */
-html[data-rz-register="editorial"] .article-body p,
-html[data-rz-register="editorial"] .article-body li,
-html[data-rz-register="editorial"] .article-body h2,
-html[data-rz-register="editorial"] .article-body h3,
-html[data-rz-register="editorial"] .article-body blockquote{
-  max-width:68ch;
-  margin-left:auto;margin-right:auto;   /* center the measure (v1.49.8) — not left-stuck on wide screens */
+/* ============================================================================
+   READING COLUMN (v1.49.10) — ONE left-aligned, justified measure.
+   Root-cause of the old "nggak lurus": 68ch is font-size-dependent, so the
+   1.14rem lead ¶ and 1rem body ¶ computed different widths and, centered, landed
+   on different left edges. Fix: a FIXED rem measure (font-size independent),
+   LEFT-aligned (one shared left edge), justified. Prose + hero + tables share the
+   same column so section dividers align with the hero. Wide widgets (.ws-* / grids)
+   are NOT capped — they fill the content column. The right rail (rz-article-editorial.js)
+   adds a 2nd grid column on wide screens. */
+:root{ --rz-measure: 46rem; }   /* ~736px — consistent for every prose block */
+html[data-rz-register="editorial"] .article-body > p,
+html[data-rz-register="editorial"] .article-body > ul,
+html[data-rz-register="editorial"] .article-body > ol,
+html[data-rz-register="editorial"] .article-body > dl,
+html[data-rz-register="editorial"] .article-body > h2,
+html[data-rz-register="editorial"] .article-body > h3,
+html[data-rz-register="editorial"] .article-body > h4,
+html[data-rz-register="editorial"] .article-body > blockquote,
+html[data-rz-register="editorial"] .article-body > figure,
+html[data-rz-register="editorial"] .article-body > pre,
+html[data-rz-register="editorial"] .article-body > .table-wrap,
+html[data-rz-register="editorial"] .article-body > table{
+  max-width: var(--rz-measure);
+  margin-left: 0; margin-right: 0;   /* LEFT-aligned — one shared edge, not centered */
 }
-html[data-rz-register="editorial"] .article-body ul,
-html[data-rz-register="editorial"] .article-body ol{ max-width:70ch;margin-left:auto;margin-right:auto; }
-/* tables share the centered reading column so they never sit wider than the prose (v1.49.8) */
-html[data-rz-register="editorial"] .article-body > table{ max-width:68ch;margin-left:auto;margin-right:auto; }
+/* justified body copy (rata kanan-kiri) like the editorial references */
+html[data-rz-register="editorial"] .article-body > p,
+html[data-rz-register="editorial"] .article-body li{
+  text-align: justify; text-justify: inter-word; hyphens: auto;
+}
+/* the article-body itself owns no width/centering on editorial pages — the
+   .container grid below owns the layout (override the v1.49.8 generic caps) */
+html[data-rz-register="editorial"] .article-body{
+  max-width: none; margin: 0; padding-inline: 0;
+}
+/* ---- LAYOUT: centered content block; 2-col (content + related rail) when the
+   rail is present (rz-article-editorial.js adds .rz-has-rail). ---- */
+html[data-rz-register="editorial"] .article-content > .container{
+  max-width: 820px; margin: 0 auto;            /* default: single centered column */
+}
+html[data-rz-register="editorial"] .article-content.rz-has-rail > .container{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 288px;
+  gap: clamp(32px, 4vw, 56px);
+  align-items: start;
+  max-width: 1160px;
+}
+/* wide widgets fill the content column (not capped to the prose measure) */
+html[data-rz-register="editorial"] .article-body > .ws-calculator,
+html[data-rz-register="editorial"] .article-body > .ws-strategy-grid,
+html[data-rz-register="editorial"] .article-body > .article-bleed{
+  max-width: none; margin-left: 0; margin-right: 0;
+}
+/* collapse to a single centered column on tablet/phone; rail drops to the
+   bottom "Continue Reading" fallback */
+@media (max-width: 1023px){
+  html[data-rz-register="editorial"] .article-content.rz-has-rail > .container{
+    display: block; max-width: 820px;
+  }
+  html[data-rz-register="editorial"] .article-rail{ display: none; }
+}
+
+/* ---- SECTION DIVIDERS — a tier-3 hairline above each h2, spanning the prose
+   column so it lines up with the hero image edge (W-C). ---- */
+html[data-rz-register="editorial"] .article-body > h2{
+  border-top: 1px solid var(--rz-art-line, rgba(160,168,180,.14));
+  padding-top: 2.1rem;
+}
+html[data-rz-register="editorial"] .article-body > h2:first-child{
+  border-top: 0; padding-top: 0;
+}
+
+/* ---- RELATED RAIL (W-D) — compact, sticky, hairline. Built by
+   rz-article-editorial.js from the bottom "Continue Reading" cards. ---- */
+html[data-rz-register="editorial"] .article-rail{
+  position: sticky; top: 96px; align-self: start;
+  display: flex; flex-direction: column; gap: .55rem;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+}
+html[data-rz-register="editorial"] .article-rail-head{
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--rz-art-muted, #7E8590);
+  padding-bottom: .5rem; margin-bottom: .15rem;
+  border-bottom: 1px solid var(--rz-art-line, rgba(160,168,180,.14));
+}
+html[data-rz-register="editorial"] .rz-rail-card{
+  display: flex; gap: .6rem; align-items: flex-start;
+  text-decoration: none; padding: .5rem; border-radius: 8px;
+  border: 1px solid transparent; transition: border-color .2s, background .2s;
+}
+html[data-rz-register="editorial"] .rz-rail-card:hover{
+  border-color: var(--rz-art-line, rgba(160,168,180,.18));
+  background: color-mix(in srgb, var(--rz-art-accent) 5%, transparent);
+}
+html[data-rz-register="editorial"] .rz-rail-thumb{
+  width: 64px; height: 44px; flex: 0 0 64px; object-fit: cover;
+  border-radius: 5px; border: 1px solid var(--rz-art-line, rgba(160,168,180,.14));
+}
+html[data-rz-register="editorial"] .rz-rail-title{
+  font-size: .82rem; line-height: 1.3; color: var(--rz-art-text, #334155);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+html[data-rz-register="editorial"] .rz-rail-card:hover .rz-rail-title{ color: var(--rz-art-strong, #0f172a); }
+/* on wide screens the rail replaces the bottom grid; on narrow the grid returns */
+html[data-rz-register="editorial"] .article-content.rz-has-rail .related-articles{ display: none; }
+@media (max-width: 1023px){
+  html[data-rz-register="editorial"] .article-content.rz-has-rail .related-articles{ display: block; }
+}
+
+/* ============================================================================
+   CALLOUT DE-SLOP (W-E, v1.49.10) — every callout adopts the editorial
+   .quote-callout language: a flat surface (NO saturated gradient), one hairline
+   border + a thin semantic accent rail (tier-2, 2px — never the old 3–4px slabs),
+   one restrained shadow, capped radius. A local --cl var carries the semantic
+   accent so warning/critical/success keep meaning without rainbow fills.
+   Scoped to the editorial register so it lands on all 27 articles at once. ============================================================================ */
+html[data-rz-register="editorial"] .info-box,
+html[data-rz-register="editorial"] .key-insight,
+html[data-rz-register="editorial"] .ws-insight-box,
+html[data-rz-register="editorial"] .ws-engineer-note,
+html[data-rz-register="editorial"] .pfas-insight-box,
+html[data-rz-register="editorial"] .pfas-warning-box,
+html[data-rz-register="editorial"] .pfas-danger-box,
+html[data-rz-register="editorial"] .pfas-engineer-note{
+  --cl: var(--rz-art-accent, #b45309);
+  background: color-mix(in srgb, var(--cl) 6%, transparent) !important;
+  background-image: none !important;                 /* kill the gradient fill */
+  border: 1px solid color-mix(in srgb, var(--cl) 24%, transparent) !important;
+  border-left: 2px solid var(--cl) !important;       /* thin accent rail (was 3–4px) */
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  padding: 1.15rem 1.35rem !important;
+}
+html[data-rz-register="editorial"] .info-box.warning,
+html[data-rz-register="editorial"] .pfas-warning-box{  --cl:#d97706; }
+html[data-rz-register="editorial"] .info-box.critical,
+html[data-rz-register="editorial"] .pfas-danger-box{   --cl:#dc2626; }
+html[data-rz-register="editorial"] .info-box.success{  --cl:#0a8a5a; }
+/* callout headings + body sit at the callout's own left edge (fixes the old
+   centered/indented inner text); body copy stays Plex, left-aligned. */
+html[data-rz-register="editorial"] .info-box > *,
+html[data-rz-register="editorial"] .key-insight > *,
+html[data-rz-register="editorial"] .ws-insight-box > *,
+html[data-rz-register="editorial"] .ws-engineer-note > *,
+html[data-rz-register="editorial"] .pfas-insight-box > *,
+html[data-rz-register="editorial"] .pfas-warning-box > *,
+html[data-rz-register="editorial"] .pfas-danger-box > *,
+html[data-rz-register="editorial"] .pfas-engineer-note > *{
+  max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; text-align: left !important;
+}
+html[data-rz-register="editorial"] .info-box h4,
+html[data-rz-register="editorial"] .ws-insight-box h4,
+html[data-rz-register="editorial"] .ws-engineer-note h4,
+html[data-rz-register="editorial"] .pfas-insight-box h4,
+html[data-rz-register="editorial"] .pfas-warning-box h4,
+html[data-rz-register="editorial"] .pfas-danger-box h4,
+html[data-rz-register="editorial"] .pfas-engineer-note h4,
+html[data-rz-register="editorial"] .key-insight .key-insight-title{
+  color: var(--cl) !important;
+}
+/* trim residual 4px accent rails on bespoke cards to the 2px standard (MEDIUM) */
+html[data-rz-register="editorial"] .ws-strat-card,
+html[data-rz-register="editorial"] .pfas-chem-block{ border-left-width: 2px !important; }
+/* evidence band: flatten the saturated brown gradient to a calm flat surface */
+html[data-rz-register="editorial"] .ws-evidence-block{
+  background: color-mix(in srgb, var(--rz-art-accent, #b45309) 9%, var(--rz-art-panel, #16181D)) !important;
+  background-image: none !important;
+  border: 1px solid var(--rz-art-line, rgba(160,168,180,.18)) !important;
+  box-shadow: none !important;
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .ws-evidence-block{
+  background: color-mix(in srgb, var(--rz-art-accent, #b45309) 7%, #ffffff) !important;
+}
+/* hero figure: design.md allows ONE restrained shadow — drop the heavy 0 4px 20px */
+html[data-rz-register="editorial"] .article-body > figure img{
+  box-shadow: 0 1px 3px rgba(0,0,0,.35) !important;
+}
+
+/* ============================================================================
+   ARTICLE DATA CHART (W-G, v1.49.10) — interactive, finding-titled, sourced.
+   The figure is a direct child of .article-body so it inherits the reading
+   measure (lines up with prose). Rendered by js/rz-article-chart.js. ============================================================================ */
+html[data-rz-register="editorial"] .rz-chart{ margin: 2.4rem 0; }
+html[data-rz-register="editorial"] .rz-chart-title{
+  font-family: 'IBM Plex Sans', system-ui, sans-serif; font-weight: 600;
+  font-size: 1.02rem; line-height: 1.35; color: var(--rz-art-strong, #0f172a);
+  margin: 0 0 .8rem; text-align: left;
+}
+html[data-rz-register="editorial"] .rz-chart-canvas{ position: relative; height: 300px; }
+html[data-rz-register="editorial"] .rz-chart-src{
+  font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: .7rem;
+  color: var(--rz-art-muted, #7E8590); margin-top: .7rem; line-height: 1.5; text-align: left;
+}
+html[data-rz-register="editorial"] .rz-chart-chip{
+  display: inline-block; font-size: .6rem; letter-spacing: .05em; font-weight: 600;
+  padding: .12rem .42rem; border-radius: 4px; margin-right: .45rem; vertical-align: middle;
+}
+html[data-rz-register="editorial"] .rz-chart-chip.derived{ background: rgba(10,138,90,.14); color: #0a8a5a; }
+html[data-rz-register="editorial"] .rz-chart-chip.warn{ background: rgba(217,119,6,.16); color: #b45309; }
+html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.derived{ background: rgba(0,255,136,.14); color: #00FF88; }
+html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.warn{ background: rgba(252,211,77,.16); color: #fcd34d; }
+
 /* day body copy was inheriting Inter (day block had no p font rule) — force Plex +
    the editorial line-height in BOTH themes. */
 html[data-rz-register="editorial"] .article-body p{

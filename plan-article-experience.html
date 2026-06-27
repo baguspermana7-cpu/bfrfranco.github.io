@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Plan · Article Experience Overhaul</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0E0F12; --panel:#16181D; --panel2:#1b1e24; --line:rgba(160,168,180,.14);
+    --text:#CFD3DA; --muted:#8b93a1; --strong:#F6F7F9; --amber:#FFAA00; --cyan:#00DDFF; --green:#00FF88; --red:#FF3030; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.6;}
+  .wrap{max-width:880px;margin:0 auto;padding:0 1.5rem 5rem;}
+  .topbar{position:sticky;top:0;background:rgba(14,15,18,.86);backdrop-filter:saturate(1.2);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:1rem;padding:.9rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;z-index:10;}
+  .topbar a{color:var(--cyan);text-decoration:none;}
+  .topbar .pid{color:var(--muted);letter-spacing:.06em;}
+  h1{font-size:clamp(1.7rem,4vw,2.4rem);color:var(--strong);line-height:1.15;margin:2.4rem 0 .4rem;letter-spacing:-.01em;}
+  .dek{color:var(--muted);font-size:1.05rem;margin:0 0 2rem;}
+  h2{font-size:1.25rem;color:var(--strong);margin:2.6rem 0 .3rem;padding-top:1.6rem;border-top:1px solid var(--line);}
+  h2 .k{font-family:'JetBrains Mono',monospace;font-size:.7em;color:var(--amber);margin-right:.5rem;}
+  h3{font-size:1rem;color:var(--strong);margin:1.4rem 0 .3rem;}
+  code{font-family:'JetBrains Mono',monospace;font-size:.86em;background:var(--panel2);padding:.08em .35em;border-radius:4px;color:#cfe;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--accent,var(--amber));border-radius:8px;padding:1.1rem 1.3rem;margin:1rem 0;}
+  .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.05em;text-transform:uppercase;
+    padding:.12rem .45rem;border-radius:4px;background:rgba(255,170,0,.14);color:var(--amber);margin:0 .3rem .3rem 0;}
+  .tag.pub{background:rgba(0,255,136,.14);color:var(--green);}
+  ul{margin:.4rem 0 .8rem;padding-left:1.2rem;} li{margin:.3rem 0;}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;}
+  .ba .col{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.9rem;font-size:.86rem;}
+  .ba .lab{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+  .bad{border-left:2px solid var(--red);} .good{border-left:2px solid var(--green);}
+  @media(max-width:640px){.ba{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="planb.html">← Hub</a><span class="pid">PLAN 05 · ARTICLE EXPERIENCE · Phase 1 shipped v1.50.1</span></div>
+<div class="wrap">
+  <h1>Article Experience Overhaul</h1>
+  <p class="dek">Seven defects surfaced in a live review of the article pages — alignment, related navigation,
+    callout styling, calculator standards-compliance, and data visualisation. The fix is a shared system (lands on
+    all 27 editorial articles) plus a verified <code>article-26</code> / <code>article-27</code> reference pair.</p>
+
+  <div class="card">
+    <span class="tag pub">Owner decisions (locked)</span>
+    <ul>
+      <li><b>Sequencing</b> — build the shared system + perfect the two reference articles first; batch-roll the bespoke per-article work after.</li>
+      <li><b>Slop sweep</b> — site-wide shared-CSS overrides (extend the editorial <code>.quote-callout</code> language to every callout). Article heroes stay as-is this round.</li>
+    </ul>
+  </div>
+
+  <h2><span class="k">01</span>Reading column — "lurus" &amp; justified</h2>
+  <p>The <code>68ch</code> measure is font-size-dependent, so the 1.14rem lead paragraph and 1rem body paragraphs
+    computed different widths and, centered, landed on different left edges. Replaced with a single
+    <b>left-aligned, justified</b> column at a fixed <code>rem</code> measure — prose, hero figure and tables share
+    one left+right edge; a tier-3 hairline divides each <code>&lt;h2&gt;</code>, aligned with the hero.</p>
+  <div class="ba">
+    <div class="col bad"><div class="lab">Before</div>lead ¶ 837px @ x531 · body ¶ 734px @ x583 · h2 @ x392 — three left edges, ragged, not justified.</div>
+    <div class="col good"><div class="lab">After</div>every block 744px @ x176 — one shared edge, justified, divider aligned to hero. <code>css/rz-article-dark.css</code></div>
+  </div>
+
+  <h2><span class="k">02</span>Related rail</h2>
+  <p>A compact, sticky right rail built by <code>js/rz-article-editorial.js</code> from each page's existing
+    "Continue Reading" cards (thumbnail derived from the href). 2-column grid on wide screens; collapses to the
+    bottom grid &lt; 1024px. Zero per-article markup edits.</p>
+
+  <h2><span class="k">03</span>Callout de-slop</h2>
+  <p>Saturated gradient fills + 3–4px borders (<code>.info-box</code>, <code>.ws-insight-box</code>,
+    <code>.ws-engineer-note</code>, <code>.ws-evidence-block</code>) → the editorial language: flat
+    <code>color-mix</code> tint + 1px hairline + a 2px semantic accent rail + one restrained shadow, scoped to the
+    editorial register. Per <code>documentation/design.md</code> §2 line tiers (never 3–4px) + §3 anti-patterns.</p>
+
+  <h2><span class="k">04</span>Calculator tooltips</h2>
+  <p>The in-article <code>.ws-calc-wrap</code> calculator now meets <code>TOOLTIP_STANDARD.md</code>: all 12 inputs
+    carry a <code>?</code> help affordance and all 9 KPI cards a <code>ⓘ</code> tooltip with the formula /
+    denominator / source. CSS-only hover/focus, themed to the article accent.</p>
+
+  <h2><span class="k">05</span>Number badges</h2>
+  <p>White text on saturated category-gradient ovals washed out on red/teal thumbnails. Replaced (<code>articles.html</code>)
+    with one dark-glass instrument chip — hairline + mono <code>tabular-nums</code> slashed-zero — legible on any
+    thumbnail in both themes.</p>
+
+  <h2><span class="k">06</span>Interactive, source-validated charts</h2>
+  <p>Owner brief: intuitive interactive charts (CNBC-style hover crosshair + tooltip), 1–2 key parameters per
+    article, <b>valid data with sources — "tidak ngawur, ada sumbernya."</b></p>
+  <ul>
+    <li><b>Component</b> <code>js/rz-article-chart.js</code> — on-brand Chart.js (signal-amber / instrument-cyan /
+      oscilloscope-green, mono tabular axes, 0.6px grid, crosshair), theme-aware, finding-titled, with a visible
+      <b>Source caption + basis chip</b>.</li>
+    <li><b>Data</b> <code>data/article-N/</code> CSV — every row carries <code>source</code> + <code>basis_tag</code>
+      (precedent: <code>data/fire/</code>, <code>data/cdu/</code>, the 16 verified <code>data/article-26/</code> files).</li>
+    <li><b>Gate</b> <code>tools/audit-article-charts.mjs --strict</code> — fails any chart missing source/basisTag.</li>
+    <li><b>Reference</b> article-26 dual-axis fluid-loss line (modelled, from <code>worked-model-scenarios.csv</code>);
+      article-27 aging-workforce bar (published, AFCOM 2024).</li>
+  </ul>
+  <p>Full spec: <code>standarization/ARTICLE_DATAVIZ_STANDARD.md</code>.</p>
+
+  <h2><span class="k">07</span>Rollout (Phase 2+)</h2>
+  <p>Reading column, dividers, related rail and callout de-slop land on all 27 editorial articles automatically via
+    the shared CSS/JS. The bespoke remainder rolls in batches: calculator-tooltip compliance on every other
+    in-article calculator; a free inline sourced chart for each remaining text-heavy article; per-article slop the
+    shared overrides can't reach. Each batch re-runs the gate suite + <code>uiux-reviewer</code>.</p>
+</div>
+</body>
+</html>
