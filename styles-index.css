@@ -1145,8 +1145,8 @@ a {
 }
 
 .bento-exp-card:hover .bento-company-logo {
-    transform: scale(1.04) !important;
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transform: scale(1.02) !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 [data-theme="dark"] .bento-card {
@@ -2718,6 +2718,75 @@ section {
     padding: 2.5rem;
     border-radius: 20px;
 }
+
+/* ── Contact box enhancement (v1.50.0): lead CTA · grouped+labelled methods · copy email ── */
+.contact-info { gap: 1.6rem; }
+/* availability + primary email CTA */
+.contact-lead {
+    display: flex; flex-direction: column; gap: 0.9rem;
+    padding: 1.25rem 1.25rem 1.4rem;
+    border: 1px solid rgba(45, 90, 135, 0.16);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(74,144,184,0.06), rgba(45,90,135,0.03));
+}
+.contact-avail {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.86rem; color: var(--gray-600); line-height: 1.45;
+}
+.avail-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    background: #10b981; box-shadow: 0 0 0 0 rgba(16,185,129,0.5);
+    animation: availPulse 2.4s ease-out infinite;
+}
+@keyframes availPulse {
+    0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.45); }
+    70% { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+@media (prefers-reduced-motion: reduce) { .avail-dot { animation: none; } }
+.contact-primary-cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
+    align-self: flex-start;
+    padding: 0.72rem 1.4rem; border-radius: 12px;
+    font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em;
+    color: #fff; background: linear-gradient(135deg, var(--medium-blue), var(--light-blue));
+    box-shadow: 0 6px 18px -8px rgba(45,90,135,0.55);
+    transition: box-shadow 0.25s ease, filter 0.25s ease;
+}
+.contact-primary-cta svg { width: 18px; height: 18px; }
+.contact-primary-cta:hover { filter: brightness(1.05); box-shadow: 0 10px 24px -8px rgba(45,90,135,0.6); }
+/* grouped + labelled methods */
+.contact-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.contact-group-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.66rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gray-400); padding: 0 0.25rem 0.15rem; margin-bottom: 0.1rem;
+    border-bottom: 1px solid rgba(45,90,135,0.1);
+}
+.contact-item { border: 1px solid transparent; }
+.contact-item:hover { background: var(--gray-100); border-color: rgba(45,90,135,0.12); }
+/* copy-to-clipboard on email rows */
+.copy-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.copy-btn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 2px 7px; border-radius: 7px; cursor: pointer;
+    border: 1px solid rgba(45,90,135,0.2); background: transparent; color: var(--medium-blue);
+    font-size: 0.66rem; font-family: 'JetBrains Mono', ui-monospace, monospace; line-height: 1;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.copy-btn svg { width: 13px; height: 13px; }
+.copy-btn:hover { background: rgba(45,90,135,0.08); border-color: var(--medium-blue); }
+.copy-btn .copy-tip { font-weight: 600; }
+.copy-btn.copied { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.1); }
+
+/* dark mode */
+[data-theme="dark"] .contact-lead { border-color: rgba(56,189,248,0.18); background: linear-gradient(135deg, rgba(56,189,248,0.07), rgba(30,41,59,0.4)); }
+[data-theme="dark"] .contact-avail { color: #94a3b8; }
+[data-theme="dark"] .contact-group-label { color: #64748b; border-bottom-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .contact-item:hover { border-color: rgba(56,189,248,0.18); }
+[data-theme="dark"] .copy-btn { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
+[data-theme="dark"] .copy-btn:hover { background: rgba(56,189,248,0.12); border-color: #38bdf8; }
+[data-theme="dark"] .copy-btn.copied { color: #34d399; border-color: #34d399; background: rgba(16,185,129,0.14); }
 
 .form-group {
     margin-bottom: 1.25rem;
@@ -5333,13 +5402,16 @@ section {
 .hover-lift:hover,
 .contact-item:hover {
     transform: none !important;
-    animation: none !important;
+    /* NOTE: do NOT re-add `animation: none !important` here — toggling it on hover
+       re-applies the entrance keyframes (swingIn/bentoRise) on mouse-leave and replays
+       them from opacity:0, which is the "card blinks/disappears on hover" bug. Cards are
+       kept still by `transform: none` above; entrances run once on load (script.js freezes them). */
 }
 
 /* Company logos enlarge subtly on card hover — only logos, not cards */
 .bento-exp-card:hover .bento-company-logo {
-    transform: scale(1.04) !important;
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transform: scale(1.02) !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .cert-item:hover img,

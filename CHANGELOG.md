@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.50.0 — 2026-06-27 (index hover fixes + WhatsApp removal + Contact box enhancement)
+
+### Fixed
+- **Hover wobble (`index.html` cards)** — the company-logo hover used a springy easing
+  `cubic-bezier(0.34, 1.56, 0.64, 1)` (Y=1.56 overshoots) that made the logo bounce/oscillate. Replaced
+  with a smooth `cubic-bezier(0.4, 0, 0.2, 1)` + smaller `scale(1.02)` → a subtle micro-movement.
+- **Hover blink/disappear (`index.html` cards)** — the global hover rule set `animation: none !important`
+  while the entrance animations (`swingIn` on `.oe-card`, `bentoRise` on `.bento-exp-card`) stayed bound
+  to the cards, so every mouse-leave **re-applied and replayed the entrance from opacity:0**. Several
+  reveal observers also kept re-adding `.visible`. Fix: the IntersectionObserver now `unobserve`s after the
+  first reveal, an observer-independent init-time handler freezes each card's entrance animation
+  (`animation:none`) once it ends so it can never replay, and the `animation:none` was removed from the
+  hover rule. Verified by instrumented hover-testing: **0 entrance-animation restarts** on hover.
+
+### Removed
+- **Personal WhatsApp number** `+62 812-1687-4606` removed from `index.html` — the visible contact card
+  and all four structured-data spots (Person `telephone`+`sameAs`, ProfessionalService `telephone`,
+  Organization `sameAs`+`contactPoint`). The generic "Share on WhatsApp" share-bar button (shares the page
+  URL, not the number) is kept.
+
+### Changed
+- **Contact box enhanced** (`index.html` `.contact-info`): availability line with a pulsing status dot +
+  a primary **"Email me"** CTA; the methods are grouped under labels (*Direct contact* · *Find me
+  elsewhere* · *Based in*); each email has a **copy-to-clipboard** button with "Copied!" feedback; refined
+  card styling with matching dark-mode overrides. Re-minified `styles-index.min.css` + `script.min.js`,
+  cache-busts bumped.
+
 ## v1.49.10 — 2026-06-27 (cdu-calculator — slashed-zero KPI numerics)
 
 ### Changed

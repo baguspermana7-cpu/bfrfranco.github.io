@@ -281,8 +281,7 @@ function initScrollAnimations() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                // Optional: unobserve after animation
-                // observer.unobserve(entry.target);
+                observer.unobserve(entry.target); // reveal once; don't re-fire on re-scroll
             }
         });
     }, observerOptions);
@@ -290,6 +289,21 @@ function initScrollAnimations() {
     // Observe all fade-in elements
     fadeElements.forEach(element => {
         observer.observe(element);
+    });
+
+    // One-shot freeze for entrance animations so they play EXACTLY once and can never
+    // replay. The page has several reveal observers (cascade / scroll-reveal) that re-add
+    // `.visible`, and a `:hover` repaint could otherwise restart `swingIn`/`bentoRise` from
+    // opacity:0 — the "card blinks/disappears on hover" bug. We attach a direct, observer-
+    // independent listener at init: the moment each card's entrance animation ends, we pin
+    // `animation:none` inline (beats the non-!important `.visible` rule), so nothing can
+    // restart it regardless of which observer reveals it or how many times.
+    document.querySelectorAll('.bento-row .bento-card, .oe-card').forEach(function (card) {
+        card.addEventListener('animationend', function _freezeCard(ev) {
+            if (ev.target !== card) return; // ignore animationend bubbling up from children
+            card.style.animation = 'none';
+            card.removeEventListener('animationend', _freezeCard);
+        });
     });
 
     // Trigger hero animations immediately
