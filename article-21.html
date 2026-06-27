@@ -85,6 +85,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.1">
     <script src="js/rz-article-editorial.js?v=1.50.1" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="js/rz-article-chart.js?v=1.50.1" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1111,6 +1113,13 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <h3>Which design makes the most sense for data centers?</h3>
 
     <p>From a data center engineering perspective, several factors matter beyond raw megawatts:</p>
+    <figure class="rz-chart" data-rz-chart>
+      <div class="rz-chart-canvas"><canvas></canvas></div>
+      <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "SMR designs for AI data centers span ~75 to 500 MWe per unit", "x": "Reactor design", "y": "Electrical output (MWe)", "labels": ["Oklo Aurora", "NuScale VOYGR", "X-energy Xe-100", "GE-Hitachi BWRX-300", "TerraPower Natrium"], "series": [{"label": "Output", "data": [75, 77, 80, 300, [345, 500]], "unit": "MWe", "accent": "info"}], "source": "SMR design ratings (vendor specs): Oklo Aurora 75, NuScale VOYGR 77, X-energy Xe-100 80, GE-Hitachi BWRX-300 300, TerraPower Natrium 345–500 MWe. data/article-21/smr-capacity.csv", "basisTag": "vendor"}
+      </script>
+    </figure>
+
 
     <p><strong>Oklo Aurora (75 MWe)</strong> is sized perfectly for a single data hall (60-72 MW typical). Its compact footprint and sodium cooling (no water towers) make it ideal for co-location. But it's unproven and faced an NRC rejection in 2022 before resubmitting.</p>
 

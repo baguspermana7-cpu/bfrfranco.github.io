@@ -27,6 +27,17 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.5 — 2026-06-27 (Phase 2 batch — article-21 + article-23 free sourced charts)
+
+### Added
+- **`article-21.html`** ("Nuclear SMRs for AI") — free SMR-capacity bar: Oklo Aurora 75 / NuScale VOYGR 77 /
+  X-energy Xe-100 80 / GE-Hitachi BWRX-300 300 / TerraPower Natrium **345–500 MWe** (vendor design ratings).
+  New `data/article-21/smr-capacity.csv`.
+- **`article-23.html`** ("xAI Colossus: 150 MW in 122 Days") — free build-pace bar: Colossus **~4 months**
+  (122 days, 100,000 GPUs / 150 MW) vs typical hyperscale **18–24 months**. New `data/article-23/build-pace.csv`.
+- Both rendered by `js/rz-article-chart.js` (theme-aware, Source caption + basis chip), using the floating
+  (min–max) bar support added in v1.50.4. 7 interactive sourced charts now live (gate clean).
+
 ## v1.50.4 — 2026-06-27 (Phase 2 batch — article-24 salary-ladder chart + floating-bar support)
 
 ### Added
