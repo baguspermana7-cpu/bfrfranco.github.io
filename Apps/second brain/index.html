@@ -737,6 +737,15 @@ const RAW=[
   {id:'ppwr',  label:'Pillar: Power',      group:'standards',url:'pillar-power.html',          desc:'Power systems pillar content page.',tags:['pillar','power'],path:'rz-work/pillar-power.html'},
   {id:'pstd',  label:'Pillar: Standards',  group:'standards',url:'pillar-standards.html',      desc:'Standards pillar content page.',tags:['pillar','standards'],path:'rz-work/pillar-standards.html'},
   {id:'psust', label:'Pillar: Sustainability',group:'standards',url:'pillar-sustainability.html',desc:'Sustainability pillar content page.',tags:['pillar','sustainability'],path:'rz-work/pillar-sustainability.html'},
+  /* ─ CDU LIQUID-COOLING SUITE (added 2026-06-28 — v1.50.x; FMECA-integrated) ─ */
+  {id:'cduh',  label:'CDU Hub',             group:'standards',  url:'cdu-hub.html',                 desc:'Coolant Distribution Unit toolkit hub — 5 sub-tools + maintenance-intelligence row linking the FMECA engine + spares readiness.',tags:['cdu','liquid-cooling','hub'],path:'rz-work/cdu-hub.html'},
+  {id:'cducal',label:'CDU Sizing Calculator',group:'standards', url:'cdu-calculator.html',          desc:'CDU thermohydraulic sizing — engine-backed KPIs (cdu-engine.js, Darcy-Weisbach/Haaland) + flow-vs-dP sourced chart. Pro TCO/Monte-Carlo/PDF.',tags:['cdu','calculator','sizing'],path:'rz-work/cdu-calculator.html'},
+  {id:'cdusel',label:'CDU Selection Guide', group:'standards',  url:'cdu-selection-guide.html',     desc:'CDU selection guide — in-row vs facility-scale, capacity-vs-flow vendor chart (cdu-models.csv).',tags:['cdu','selection','guide'],path:'rz-work/cdu-selection-guide.html'},
+  {id:'cducmp',label:'CDU Comparison',      group:'standards',  url:'cdu-comparison.html',          desc:'CDU type comparison — in-rack vs in-row vs facility L2L, capacity-by-type vendor chart, TCO read.',tags:['cdu','comparison'],path:'rz-work/cdu-comparison.html'},
+  {id:'cduchk',label:'CDU PM Checklist',    group:'standards',  url:'cdu-checklist.html',           desc:'CDU preventive-maintenance checklist + FMECA fault reference (F11.1–F11.5) + PM-cadence / spares cost×criticality / RPN charts.',tags:['cdu','maintenance','fmeca','checklist'],path:'rz-work/cdu-checklist.html'},
+  {id:'cdubms',label:'CDU Mini-BMS',        group:'standards',  url:'cdu-mini-bms.html',            desc:'CDU mini building-management simulator — inject faults (leak→F11.3, pump-fail→F11.2, clog→F11.5) mapped to FMECA fault modes.',tags:['cdu','bms','simulator'],path:'rz-work/cdu-mini-bms.html'},
+  {id:'aim',   label:'AI Eng. Maintenance', group:'standards',  url:'ai-engineering-maintenance.html',desc:'FMECA knowledge-base + KG + ML advisor concept page. Liquid-cooling fault modes F11.1–F11.5 (component C-LQC-001..007).',tags:['fmeca','maintenance','ai','knowledge-graph'],path:'rz-work/ai-engineering-maintenance.html'},
+  {id:'cspr',  label:'Spares Readiness Calc',group:'calculators',url:'spares-readiness-calculator.html',desc:'Critical-spares readiness + FMECA criticality model. CDU-coolant-distribution subsystem; downtime-cost driven.',tags:['spares','readiness','fmeca'],path:'rz-work/spares-readiness-calculator.html'},
 
   /* ─ PROJECTS (Bagus_Apps) ─ */
   {id:'mp2',   label:'MoneyPrinter V2',    group:'projects',url:null,desc:'AI video generation pipeline. Ollama llama3.2, Gemini API, KittenTTS. Flask dashboard. Python 3.13.',tags:['video','ai','youtube'],path:'Bagus_Apps/MoneyPrinter2/'},
@@ -826,6 +835,14 @@ const E=[
   ['ppwr','cpu'],['ppwr','cpg'],['ppwr','cpn'],      // Power pillar → UPS + Diesel vs Gas + N+1 vs 2N
   ['pstd','stia'],['pstd','stier'],['pstd','srfs'], // Standards pillar → TIA-942 + Tier Advisor + RFS
   ['psust','cco2'],['psust','isust'],               // Sustainability pillar → Carbon calc + Sustainability infographic
+  /* ─ CDU liquid-cooling suite (2026-06-28) — hub fans out to its 5 sub-tools ─ */
+  ['cduh','cducal'],['cduh','cdusel'],['cduh','cducmp'],['cduh','cduchk'],['cduh','cdubms'],
+  ['cduh','aim'],['cduh','cspr'],                   // hub maintenance-intelligence row → FMECA engine + spares
+  ['cduchk','aim'],['cdubms','aim'],                // FMECA refs: checklist F11.x + mini-BMS fault map → AI maintenance
+  ['cspr','cduchk'],                                // spares register ↔ PM checklist register
+  /* CDU suite → cooling neighborhood */
+  ['cduh','pcool'],['cducmp','cpc'],['dcsol','cduh'],['pcool','cduh'],
+  ['cducal','cspr'],['aim','cduchk'],
   /* Diesel vs Gas Gen connections (was isolated) */
   ['cpg','sfu'],['cpg','sfr'],['cpg','ppwr'],['cpg','cpn'],
   /* UPS Online vs Offline connections (was isolated) */

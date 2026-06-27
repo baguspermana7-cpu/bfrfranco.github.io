@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.50.20 — 2026-06-28 (CDU suite — second-brain + knowledge graph — Ship 4)
+
+**Added** — the CDU↔FMECA integration (Ships 1–3) is now reflected in the Obsidian
+second-brain vault + the web knowledge graph, closing the 4-ship CDU-integration plan.
+
+- **`Apps/second brain/obsidian-knowledge-vault/05-Standards/CDU-Suite.md`** (new) — living
+  note documenting the 6-page CDU toolkit, the FMECA fault-mode integration (F11.1–F11.5,
+  component C-LQC-001..007, with S·O·D + RPN table), the 6 sourced charts, and a
+  standards-compliance status table. `[[wikilinks]]` to Standards-Hub / Calculators-Hub /
+  Comparisons-Hub / Dark-Mode-Rollout.
+- **`Standards-Hub.md`** — added a "CDU Liquid-Cooling Suite" section (6-page table) linking to [[CDU-Suite]].
+- **`Apps/second brain/index.html`** (web graph) — added 8 nodes (cduh, cducal, cdusel, cducmp,
+  cduchk, cdubms, aim, cspr) + their edge cluster (hub → 5 sub-tools; checklist/mini-BMS → AI
+  maintenance FMECA engine; calculator ↔ spares; cooling-pillar + Air-vs-Liquid compare + DC
+  Solutions). `sync-graph.py`: 0 dead URLs; node + edge arrays parse (146 nodes / 296 edges,
+  0 dangling endpoints); page renders headless with 0 console errors.
+
+See `standarization/CONTENT_LINKAGE_PLAYBOOK.md` §2.6.
+
+---
+
 ## v1.50.19 — 2026-06-28 (CDU tools — interactive sourced charts — Ship 3)
 
 ### Added

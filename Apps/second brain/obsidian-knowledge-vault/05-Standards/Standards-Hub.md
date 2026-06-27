@@ -73,6 +73,24 @@ Connected from `geo` (geopolitics card) + `idx` (home) + `dash` (dashboard nav).
 
 ---
 
+## CDU Liquid-Cooling Suite (cdu-*.html)
+
+> Full detail: [[CDU-Suite]] — 6-page Coolant Distribution Unit toolkit, FMECA-integrated (v1.50.17–.19).
+
+| ID | Name | File | Role |
+|---|---|---|---|
+| cduh | CDU Hub | cdu-hub.html | Toolkit hub + maintenance-intelligence row (→ FMECA engine + spares) |
+| cducal | CDU Sizing Calculator | cdu-calculator.html | Engine-backed sizing (`cdu-engine.js`) + flow-vs-dP chart |
+| cdusel | CDU Selection Guide | cdu-selection-guide.html | Selection + capacity-vs-flow chart |
+| cducmp | CDU Comparison | cdu-comparison.html | Type comparison + capacity-by-type chart |
+| cduchk | CDU PM Checklist | cdu-checklist.html | PM checklist + FMECA fault reference (F11.1–F11.5) + 3 charts |
+| cdubms | CDU Mini-BMS | cdu-mini-bms.html | Fault-injection sim (leak→F11.3, pump→F11.2, clog→F11.5) |
+
+FMECA modes F11.1–F11.5 (component C-LQC-001..007) link into `ai-engineering-maintenance.html`.
+6 sourced charts via `js/rz-article-chart.js`. All 6 pages pass dark-coverage + responsive + chart-provenance gates.
+
+---
+
 ## LTC Series (ltc-*.html)
 
 5 LTC lab pages in rz-work root:
