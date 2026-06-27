@@ -74,6 +74,14 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.12 — 2026-06-27 (Pillar pages adopt the editorial serif hero)
+
+### Changed
+- **The 5 pillar pages** (`pillar-cooling/power/fire-safety/standards/sustainability`) now adopt the editorial
+  landing skin: `data-rz-register="editorial"` + Fraunces serif hero (`.pillar-hero h1` was bold Inter sans).
+  Inline-serif approach — the rest of each page keeps its existing palette/Inter body. Brings the topic-hub
+  landings in line with the CDU landings + series landings (insights / geopolitics / future-forward).
+
 ## v1.50.11 — 2026-06-27 (cdu-selection-guide editorial serif hero)
 
 ### Changed
