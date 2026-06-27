@@ -74,6 +74,16 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.16 — 2026-06-28 (Phase 2 batch — article-7 + article-5 free sourced charts)
+
+### Added
+- **`article-7.html`** ("From Reliability to Resilience") — free Uptime Tier downtime bar: max annual downtime
+  **28.8 h (Tier I) → 0.4 h (Tier IV)** (99.671% → 99.995% availability), red→green severity ramp. New
+  `data/article-7/tier-availability.csv` (Uptime Institute Tier Standard).
+- **`article-5.html`** ("Technical Debt Is Operational Risk") — free cost-premium floating bar: vendor-lock-in
+  premiums **integration 30–50% / parts 50–200% / service 20–40%**. New `data/article-5/tech-debt-premiums.csv`
+  (Schneider WP37). 14 interactive sourced charts now live (gate clean).
+
 ## v1.50.15 — 2026-06-27 (datacenter-solutions serif hero — landing-skin rollout complete)
 
 ### Changed

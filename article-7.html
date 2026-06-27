@@ -85,6 +85,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.1">
     <script src="js/rz-article-editorial.js?v=1.50.1" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="js/rz-article-chart.js?v=1.50.1" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
@@ -1485,6 +1487,13 @@
                 <h3>What Tier Ratings Actually Measure</h3>
 
                 <p>The Uptime Institute's Tier Classification System defines four progressive levels of data center infrastructure capability <a href="#ref3" class="cite">[3]</a>. Each tier specifies requirements related to redundancy, distribution path architecture, and concurrent maintainability. At its core, the system evaluates the design topology of the facility, answering a specific question: can the infrastructure sustain IT load through a defined set of failure scenarios without requiring load interruption?</p>
+    <figure class="rz-chart" data-rz-chart>
+      <div class="rz-chart-canvas"><canvas></canvas></div>
+      <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Annual downtime drops from ~29 hours (Tier I) to ~26 minutes (Tier IV)", "x": "Uptime Tier", "y": "Max annual downtime (hours)", "labels": ["Tier I", "Tier II", "Tier III", "Tier IV"], "series": [{"label": "Max annual downtime", "data": [28.8, 22.7, 1.6, 0.4], "unit": "h/yr", "colorAccents": ["alert", "signal", "info", "data"]}], "source": "Uptime Institute Tier Standard — availability + max annual downtime: Tier I 99.671% (28.8h), II 99.741% (22.7h), III 99.982% (1.6h), IV 99.995% (0.4h). data/article-7/tier-availability.csv", "basisTag": "standard"}
+      </script>
+    </figure>
+
 
                 <div class="data-table-wrapper">
                     <table class="data-table">
