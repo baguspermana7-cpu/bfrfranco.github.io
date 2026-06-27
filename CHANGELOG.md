@@ -74,6 +74,16 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.15 — 2026-06-27 (datacenter-solutions serif hero — landing-skin rollout complete)
+
+### Changed
+- **`datacenter-solutions.html`** — the DC Solutions landing now adopts the editorial skin:
+  `data-rz-register="editorial"` + Fraunces serif hero. The `.hero h1` rule is page-INLINE (scoped to this page,
+  overriding the global `.hero`), so the gradient-clipped title keeps its gradient and only the global `.hero`
+  on other pages is untouched. **This completes the editorial serif-hero rollout across every content landing
+  on the site** (articles · series landings · CDU landings · pillars · compares · reports · infographics ·
+  glossary · DC solutions). Cockpits keep the instrument register.
+
 ## v1.50.14 — 2026-06-27 (Report / glossary / infographic landings adopt the editorial serif hero)
 
 ### Changed
