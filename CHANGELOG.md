@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.49.10 — 2026-06-27 (cdu-calculator — slashed-zero KPI numerics)
+
+### Changed
+- **`cdu-calculator.html`** KPI value displays (`.kpi-val`, `.cc-pp-kpi .v`) now use
+  `font-variant-numeric:tabular-nums slashed-zero`, matching the instrument-grade numeric style
+  already used on `fire-calculator.html` and the checklist tables. Closes the last item of the
+  CDU-hub uiux back-port (theme-key was already unified in v1.49.5; dark chips already present).
+
 ## v1.49.9 — 2026-06-27 (Add root favicon.ico — kill the site-wide /favicon.ico 404)
 
 ### Fixed
