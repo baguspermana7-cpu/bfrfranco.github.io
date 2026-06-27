@@ -1802,3 +1802,31 @@ Stacked area chart (Chart.js line type with fill:true) for multi-year spend proj
 - 4 output KPI cards mandatory: Total Spend (Horizon), Year-N Annual Spend, Growth vs Year 0, Largest Commodity Class.
 - All output cards must have `.tip[data-tip]` tooltips per v1.18.2 standard.
 - Methodology details in `<details class="info-box">` block documenting compounding formulas.
+
+---
+
+## Feature 31: Contact box — grouped methods + availability + copy-to-clipboard (v1.50.0)
+
+`index.html` `.contact-info` (left column of `.contact-content`; the right column is the message form).
+
+**Structure** (top → bottom):
+- `.contact-lead` — an availability line (`.contact-avail` with a pulsing `.avail-dot`, green, `availPulse` keyframe; honours `prefers-reduced-motion`) + a primary CTA `.contact-primary-cta` ("Email me", gradient button → `mailto:`).
+- One `.contact-group` per category, each with a `.contact-group-label` (uppercase JetBrains-Mono, hairline underline): *Direct contact* (Email + LinkedIn) · *Find me elsewhere* (Discord + Live build/Vercel) · *Based in* (Location).
+- Email rows use `.copy-row` (flex) = `<a mailto>` + a `.copy-btn` (`data-copy="<addr>"`, `.copy-tip` label).
+
+**Copy-to-clipboard** — one delegated listener (inline `<script>` before `</body>`), 3-tier fallback:
+`navigator.clipboard.writeText` → `document.execCommand('copy')` (works even when the Clipboard API is unavailable) → `selectEmailNear()` selects the visible address so the user can Ctrl+C. Success → `.copied` + "Copied!"; final tier → "Press Ctrl+C". Verify the execCommand tier by forcing `navigator.clipboard=undefined` in a headless probe (real clipboard write needs a trusted gesture + secure context and is unreliable headless).
+
+**CSS** lives in `styles-index.css` (index-only) with full `[data-theme="dark"]` overrides; re-minify `styles-index.min.css` + bump the `?v=` cache-bust on edit.
+
+**Caveat**: the availability copy ("Open to … work — usually replies within a day or two") is an owner-facing public claim — confirm wording with the owner; don't invent commitments.
+
+## Lessons Learned — 2026-06-27 (Index card hover: wobble + blink)
+
+See memory `feedback_index_hover_blink_rootcause.md`. Two index-only bugs (styles-index.css + script.js):
+
+1. **Excessive hover wobble** = a springy easing on the company-logo hover, `cubic-bezier(0.34, 1.56, 0.64, 1)` (Y=1.56 overshoots → bounce), declared twice. → `scale(1.02)` + `cubic-bezier(0.4, 0, 0.2, 1)` (no overshoot) = subtle micro-movement.
+
+2. **Card "blinks/disappears" on hover** = the global `.<card>:hover { animation: none !important }` rule toggled the entrance keyframes (`swingIn` on `.oe-card`, `bentoRise` on `.bento-card`) that stay bound to the cards, so every mouse-LEAVE re-applied the entrance and **replayed it from opacity:0**. Multiple reveal observers (`cascadeIO`, inline IOs) also kept re-adding `.visible`. **Fixing one observer or only the card transform does NOT fix it** (why a prior attempt failed). The fix needs all three: (a) `observer.unobserve` after first reveal; (b) an **observer-independent, init-time** `animationend` freeze — `querySelectorAll('.bento-row .bento-card, .oe-card')` → on each card's own `animationend` (guard `ev.target !== card` against child bubbling) set inline `animation:none` (beats the non-`!important` `.visible` rule, so it can never replay); (c) remove `animation:none` from the global `:hover` rule (keep `transform:none`).
+
+**Verification discipline** (owner: "test the hover, don't just claim"): instrument an `animationstart` listener on the cards, **reveal in place → wait for freeze → hover/leave without scrolling**, assert 0 `animationstart`. Pitfall: `scrollIntoView` triggers a legit first-reveal that pollutes the count.
