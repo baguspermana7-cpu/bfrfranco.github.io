@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v1.49.9 — 2026-06-27 (Add root favicon.ico — kill the site-wide /favicon.ico 404)
+
+### Fixed
+- Added a multi-resolution root **`favicon.ico`** (16/32/48 px, generated from `assets/Favicon.png`).
+  The site declared a PNG favicon via `<link rel="icon">`, but browsers still auto-request
+  `/favicon.ico` from the web root — which 404'd on **every** page (a console error visible on all
+  100+ pages). A health probe across the CDU + Fire pages confirmed this was the only remaining
+  console artifact; with the file in place, those pages now report 0 console errors and 0 4xx.
+
+## v1.49.8 — 2026-06-27 (Responsive reading column + responsive tables)
+
+### Fixed
+- **Articles no longer sprawl or sit left-stuck on wide screens.** Root cause: there was no site-wide
+  reading-width rule on `.article-content` / `.article-body` (only inside `@media print`), so the body grew
+  with the viewport while the 68ch paragraph cap held text left-aligned and tables filled the full body width
+  — at a 2400px viewport `article-27`'s body reached 1520px with a 1520px table beside a 930px text column
+  ("table lebih lebar dari text, berantakan"). Added a shared reading-layout system in `styles.css`:
+  `.article-body` is capped to `1180px` and centered, and its **direct** prose children (`p, h2–h4, ul, ol,
+  dl, blockquote, figure, pre, table`) share one centered `760px` reading column. Because only direct prose
+  children are capped, the interactive widgets embedded in `.article-body` (calculators, strategy grids,
+  gantt charts) keep full width — verified `article-27`'s Workforce calculator still renders at 1116px.
+- **Tables scroll instead of overflowing on phones.** `.article-body table` becomes an `overflow-x:auto`
+  scroll container ≤900px. Fixes `article-1` (4 data tables, was +210px horizontal page scroll) and
+  `tia-942-checklist` (`.gap-table`, was +38px).
+- **`EPMS_Telemetry` no longer scrolls sideways on mobile.** The `position:absolute` `.ui` overlay held a
+  fixed-height toolbar wider than a phone; the page's `overflow-x:hidden` guard was defeated by the
+  `overflow-x:hidden`+default-`overflow-y:visible` scroll-promotion quirk. Switched the guard to
+  `overflow-x:clip` and constrained the toolbar to `100vw` with internal horizontal scroll (cockpit stays a
+  desktop dashboard).
+- Editorial skin (`css/rz-article-dark.css`) reconciled: the 68ch measure is now centered
+  (`margin-inline:auto`) and extends to direct-child tables, so editorial articles match the new column.
+
+### Added
+- **`tools/audit-responsive-layout.mjs`** — new ship-gate. Renders every content page at 390 / 768 / 2400px
+  and FAILS on real user-facing horizontal scroll (measured via actual `scrollX`, not the `scrollWidth`
+  artifact) or an article prose table wider than the reading column. CLEAN across 113 pages. Added to the
+  CLAUDE.md audit suite. See `standarization/RESPONSIVE_STANDARD.md` "Article reading column".
+
 ## v1.49.7 — 2026-06-27 (Cooling pillar — link the CDU toolkit)
 
 ### Added
