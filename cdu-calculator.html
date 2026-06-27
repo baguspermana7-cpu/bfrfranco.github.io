@@ -136,6 +136,16 @@
         .cc-results-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:.8rem; }
         .cc-results-head h2 { font-size:1.05rem; margin:0; }
         .cc-results-head .vtag { font-family:'JetBrains Mono',monospace; font-size:.66rem; color:var(--cdu-muted); }
+        /* interactive sourced charts (js/rz-article-chart.js) — page-local copy of the canonical skin */
+        .rz-chart{ margin:1.6rem 0 .4rem; }
+        .rz-chart-title{ font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:600; font-size:1.02rem; line-height:1.35; color:var(--cdu-text); margin:0 0 .8rem; text-align:left; }
+        .rz-chart-canvas{ position:relative; height:300px; }
+        .rz-chart-src{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.7rem; color:var(--cdu-muted); margin-top:.7rem; line-height:1.5; text-align:left; }
+        .rz-chart-chip{ display:inline-block; font-size:.6rem; letter-spacing:.05em; font-weight:600; padding:.12rem .42rem; border-radius:4px; margin-right:.45rem; vertical-align:middle; }
+        .rz-chart-chip.derived{ background:rgba(10,138,90,.14); color:#0a8a5a; }
+        .rz-chart-chip.warn{ background:rgba(217,119,6,.16); color:#b45309; }
+        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(0,255,136,.14); color:#00FF88; }
+        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(252,211,77,.16); color:#fcd34d; }
         /* v1.8.0 — mobile responsive patch */
         @media (max-width:980px){ .cc-body { grid-template-columns:1fr; } }
         @media (max-width:768px){
@@ -282,6 +292,12 @@
             <div class="cc-note" style="margin-top:1rem;">
                 <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Pro analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
             </div>
+            <figure class="rz-chart" data-rz-chart>
+              <div class="rz-chart-canvas"><canvas></canvas></div>
+              <script type="application/json" class="rz-chart-cfg">
+{"type":"line","title":"Pressure drop climbs ~quadratically with flow — every extra L/min costs disproportionately more pump head","x":"Secondary flow (L/min)","y":"Pressure drop (bar)","labels":["200","400","600","800","1000","1200","1400","1600","1800","2000"],"series":[{"label":"ΔP","data":[0.036,0.138,0.304,0.535,0.831,1.19,1.614,2.101,2.653,3.269],"accent":"signal","unit":"bar"}],"source":"js/cdu-engine.js Darcy-Weisbach + Haaland friction, sampled at a fixed 80 mm ID / 20 m run / ΣK=10 / PG25 25% @ 30°C · data/cdu/flow-dp.csv. Your live ΔP above uses your own pipe size & flow.","basisTag":"derived"}
+              </script>
+            </figure>
         </div>
 
         <!-- PRO TIER -->
@@ -608,5 +624,7 @@
     })();
     </script>
     <script src="auth.js?v=2026-05-09-v1" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/rz-article-chart.js?v=1.51.0" defer></script>
 </body>
 </html>

@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.52.0 — 2026-06-27 (Interactive sourced charts on the CDU toolkit)
+
+### Added
+- **Six interactive, source-tagged charts** on four CDU pages (theme-aware, hover crosshair, basis chip
+  + source caption via `js/rz-article-chart.js`; each backed by a CSV in `data/cdu/` and gated by
+  `tools/audit-article-charts.mjs`):
+  - `cdu-checklist.html`: PM-cadence distribution (`data/cdu/pm-cadence.csv`), spares cost × criticality
+    with per-bar accent (`data/cdu/spares-cost-criticality.csv`), and the FMECA F11.x RPN ranking
+    (`data/cdu/fmeca-rpn.csv`).
+  - `cdu-comparison.html` §04: secondary ΔP across 9 vendor models (`data/cdu/cdu-models.csv`) — the
+    pump-energy/opex lever.
+  - `cdu-selection-guide.html` §sizing: secondary flow vs capacity across 9 vendor models.
+  - `cdu-calculator.html`: pressure-drop-vs-flow curve, sampled offline from the validated engine
+    (`js/cdu-engine.js` Darcy-Weisbach + Haaland) → `data/cdu/flow-dp.csv`.
+- New datasets under `data/cdu/` (each with `source` + `basis_tag` columns).
+
+### Notes
+- Chart findings use only defensible numbers: vendor specs (`vendor`), engine/derived counts (`derived`),
+  or clearly-labelled `illustrative` cost-band midpoints. The comparison chart shows real vendor ΔP data
+  rather than a fabricated TCO-by-type bar. Charts verified rendering in light + dark with zero page errors.
+
 ## v1.51.0 — 2026-06-27 (CDU toolkit ↔ FMECA maintenance integration)
 
 ### Added
