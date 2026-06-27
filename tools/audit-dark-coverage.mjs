@@ -47,7 +47,7 @@ for (const f of pages) {
     await pg.goto('file://' + resolve(ROOT, f), { waitUntil: 'domcontentloaded', timeout: 30000 });
     // --- DARK ---
     await pg.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
-    await new Promise(r => setTimeout(r, 350));
+    await new Promise(r => setTimeout(r, 700));  // settle past FOUC guard + theme transitions (350ms sampled mid-transition → flaky false-positives)
     const res = await pg.evaluate(() => {
       const L = c => { const m = c && c.match(/[\d.]+/g); if (!m) return null; return { a: m[3] !== undefined ? +m[3] : 1, lum: 0.299*+m[0] + 0.587*+m[1] + 0.114*+m[2] }; };
       const bbg = L(getComputedStyle(document.body).backgroundColor);
@@ -67,7 +67,7 @@ for (const f of pages) {
     // --- LIGHT --- (only for pages that declare a light palette; dark-only pages are skipped)
     if (hasLightPalette[f]) {
       await pg.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
-      await new Promise(r => setTimeout(r, 250));
+      await new Promise(r => setTimeout(r, 500));
       const ll = await bodyLum(pg);
       if (ll >= 0 && ll < 90) lightStuck.push(`${f}  body-lum=${ll} (stuck dark in light mode)`);
     }

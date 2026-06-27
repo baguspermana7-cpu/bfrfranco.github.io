@@ -5135,6 +5135,50 @@ section {
 }
 
 /* ==========================================
+   Article reading layout (v1.49.8) — centered reading column + responsive tables
+   Fixes wide-screen sprawl (text stuck left, tables wider than the prose) and
+   mobile table overflow. The reading column (prose + tables) is centered to a
+   measure; interactive widgets embedded in .article-body (calculators, grids,
+   charts) keep their full width because only DIRECT prose children are capped.
+   See standarization/RESPONSIVE_STANDARD.md "Article reading column".
+   ========================================== */
+.article-body {
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 32px);
+    box-sizing: border-box;
+}
+.article-body > p,
+.article-body > h2,
+.article-body > h3,
+.article-body > h4,
+.article-body > ul,
+.article-body > ol,
+.article-body > dl,
+.article-body > blockquote,
+.article-body > figure,
+.article-body > pre,
+.article-body > .table-wrap,
+.article-body > table {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.article-body table { width: 100%; border-collapse: collapse; }
+@media (max-width: 900px) {
+    .article-body table,
+    .article-body .table-wrap {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+@media (max-width: 768px) {
+    .article-body { padding-inline: 16px; }
+}
+
+/* ==========================================
    Print Stylesheet
    ========================================== */
 @media print {

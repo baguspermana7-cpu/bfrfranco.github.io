@@ -176,17 +176,76 @@ Marker variants by page category:
 
 ---
 
+## Article reading column (wide-screen) + responsive tables (v1.49.8)
+
+**Problem this fixes:** articles relied on per-page inline styles for layout width, and most never set
+one — so on a wide screen (e.g. a browser zoomed out to a ~2400px effective viewport) `.article-body` kept
+growing with the viewport, the 68ch paragraph cap held text **left-aligned** instead of centered, and tables
+filled the **full body width** — text stuck left, table wider than the prose, huge empty right margin
+("sangat tidak responsive, tidak lurus dan berantakan"). There was no site-wide reading-width rule on
+`.article-content` / `.article-body` outside `@media print`.
+
+**The rule (lives in `styles.css`, so every non-index page inherits it):**
+
+```css
+/* Cap + center the body. Generous enough that embedded widgets (calculators,
+   grids, charts) keep their width — they are NOT direct prose children. */
+.article-body {
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 32px);
+    box-sizing: border-box;
+}
+/* Reading measure: prose + tables share ONE centered ~760px column.
+   DIRECT children only (`>`), so widget internals are never capped. */
+.article-body > p,
+.article-body > h2, .article-body > h3, .article-body > h4,
+.article-body > ul, .article-body > ol, .article-body > dl,
+.article-body > blockquote, .article-body > figure, .article-body > pre,
+.article-body > .table-wrap, .article-body > table {
+    max-width: 760px; margin-left: auto; margin-right: auto;
+}
+.article-body table { width: 100%; border-collapse: collapse; }
+@media (max-width: 900px) {
+    .article-body table, .article-body .table-wrap {
+        display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+}
+```
+
+**Why `>` (direct child) matters — the widget-escape rule:** nearly every article embeds an interactive
+widget (a calculator, a `*-strategy-grid`, a gantt, a chart) *inside* `.article-body`. Capping `.article-body`
+itself, or using a descendant selector, would strangle those widgets. Capping only **direct prose children**
+centers the text + tables into one column while leaving widget `<div>`s at full container width. Full-bleed
+bands (hero, colored evidence strips) live **outside** `.article-body` and are intentionally viewport-wide —
+do not cap them.
+
+**The `overflow-x: hidden` scroll-promotion trap:** `html, body { overflow-x: hidden }` *without* also pinning
+`overflow-y` lets the browser promote `overflow-x` back to `auto`, so a too-wide child still scrolls the page.
+If a page genuinely has a wide fixed/absolute element (e.g. an instrument cockpit toolbar), use
+`overflow-x: clip` on the guard and constrain the offending element to `100vw` with its own
+`overflow-x: auto`. (See `EPMS_Telemetry.html`.)
+
+> The legacy "Tables become horizontal-scroll" snippet above (`white-space:nowrap` on every `table`) is the
+> blunt fallback for non-article pages. Inside `.article-body`, prefer the reading-column rule — it both caps
+> the table to the prose width on desktop and scrolls it on mobile, without `nowrap` (which forces tall rows).
+
+---
+
 ## Audit gate
 
 Run before every push:
 
 ```bash
-python3 tools/audit-mobile-responsive.py --strict
+python3 tools/audit-mobile-responsive.py --strict   # 8-checkpoint static scorer (≥7/10)
+node   tools/audit-responsive-layout.mjs --strict   # render gate: real horizontal-scroll + wide article tables
 ```
 
-The audit scores each page 0-10 based on the 8 checkpoints above. `--strict`
-mode fails CI if any indexable page scores < 7. Noindex pages are
-correctly skipped.
+`audit-mobile-responsive.py` scores each page 0-10 on the 8 static checkpoints above; `--strict` fails CI if
+any indexable page scores < 7. `audit-responsive-layout.mjs` renders every content page at 390 / 768 / 2400px
+and fails on **actual** user-facing horizontal scroll (measured via real `scrollX`, not the `scrollWidth`
+artifact that `overflow-x:hidden` leaves behind) or an article prose table wider than the reading column.
+Noindex / print-variant pages are skipped.
 
 ---
 

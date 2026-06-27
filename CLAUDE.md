@@ -38,7 +38,8 @@ window.RZ_VERSION_CODENAME = 'Pixel Rise';
 python3 tools/audit-script-tags.py --strict        # </script> in JS strings
 python3 tools/audit-js-syntax.py --strict          # unterminated strings / CSS-in-JS (v1.19.0)
 python3 tools/audit-version-stamp.py --strict      # version stamp on all pages
-python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints
+python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints (static scorer)
+node   tools/audit-responsive-layout.mjs --strict  # render gate: real horizontal-scroll + wide article tables (v1.49.8)
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD
 node   tools/audit-dark-coverage.mjs --strict      # NO white body/content in dark mode (v1.47.x)
 ```
@@ -333,6 +334,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/audit-version-stamp.py` | version-stamp on all pages — STRICT for CI |
 | `tools/audit-mobile-responsive.py` | 8-checkpoint responsive scorer — STRICT for CI |
 | `tools/audit-dark-coverage.mjs` | render gate — fails any page with white body/content in dark mode + the `:root,` cascade bug — STRICT for CI (v1.47.x) |
+| `tools/audit-responsive-layout.mjs` | render gate — fails real mobile/tablet horizontal scroll (actual `scrollX`) + article tables wider than the reading column — STRICT for CI (v1.49.8) |
 | `tools/audit-seo.py` | per-page SEO meta health — non-strict |
 | `tools/build-sitemap.py` | regen sitemap.xml from filesystem |
 | `tools/build-llms-txt.py` | regen llms.txt |

@@ -1341,13 +1341,22 @@ init();
 
 /* v1.8.0 — mobile utility responsive patch */
 @media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
+    html, body { overflow-x: clip; max-width: 100vw; }
     img, picture, video, svg { max-width: 100%; height: auto; }
 
     /* Hero / page header */
     h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
     .hero, .page-hero { padding: 1.5rem 1rem !important; }
     .hero p, .hero-subtitle { font-size: 0.9rem !important; }
+
+    /* v1.49.8 — the .ui overlay is position:absolute/inset:0 holding a fixed-height
+       toolbar whose content is wider than a phone; constrain it to the viewport and
+       scroll the toolbar internally so the PAGE never scrolls sideways (cockpit stays
+       a desktop dashboard). */
+    .ui { overflow-x: clip; max-width: 100vw; }
+    .topbar { width: 100vw; max-width: 100vw; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .topbar > * { flex-shrink: 0; }
+    table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
     /* Map containers (Leaflet) */
     .map-container, #map, [id*="leaflet" i], [id*="dmtLeafletMap"], #pjg-map {
@@ -1458,7 +1467,7 @@ init();
     
 /* v1.8.0 — mobile sweep responsive patch */
 @media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
+    html, body { overflow-x: clip; max-width: 100vw; }
     img, picture, video, svg { max-width: 100%; height: auto; }
 
     /* Hero / page header */
