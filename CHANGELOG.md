@@ -104,6 +104,15 @@ script-tags / js-syntax / version-stamp / mobile / dark-coverage pass for the to
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.17 — 2026-06-28 (Phase 2 batch — article-14 community-opposition chart)
+
+### Added
+- **`article-14.html`** ("The $64 Billion Rebellion") — free opposition-impact bar: **$18B blocked + $46B
+  delayed = $64B** of US data-center projects stalled by community opposition (24 states; cancellations
+  quadrupled 6→25, 2024→2025). New `data/article-14/opposition.csv`. Rendered by `js/rz-article-chart.js`.
+  15 interactive sourced charts now live (gate clean). (article-4 MTTR data is calculator-generated/dynamic →
+  not charted, to keep the free-flow series defensible.)
+
 ## v1.50.16 — 2026-06-28 (Phase 2 batch — article-7 + article-5 free sourced charts)
 
 ### Added
