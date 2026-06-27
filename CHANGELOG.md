@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.50.18 — 2026-06-28 (CDU checklist — FMECA fault-reference section — Ship 2)
+
+### Added
+- **`cdu-checklist.html` §10 — FMECA fault reference (liquid cooling, F11.x)**: 5 expandable fault-mode
+  cards sourced from the FMECA-KG (`docs/research/csv/`), ordered by **RPN** (Severity × Occurrence ×
+  Detectability, IEC 60812): F11.1 chemistry-drift **140** · F11.4 fluid-degradation **120** · F11.3
+  manifold/hose-leak **108** · F11.2 CDU-pump-fail **60** · F11.5 filter-clog **60**. Each card carries
+  component (C-LQC-00x), mechanism, effect chain, detection, corrective + preventive actions, S·O·D and a
+  source/confidence tag (ASME/OCP = STD · Vertiv/3M = VENDOR). Notes that RPN understates the high-severity
+  F11.2 (S=10). Links to the Mini-BMS + the FMECA knowledge base. Printable form renumbered §10 → §11.
+
+Verified: 5 cards render + expand, nav + cross-links resolve, 0 console errors; script-tags / js-syntax /
+version-stamp / mobile / responsive-layout / dark-coverage all pass. Ship 2 of the 4-ship CDU integration.
+
 ## v1.50.17 — 2026-06-28 (CDU ↔ AI-maintenance/FMECA cross-linking — Ship 1)
 
 ### Added

@@ -125,6 +125,25 @@
         .xv-card .lnk{ display:flex; flex-wrap:wrap; gap:.4rem; }
         .xv-card .lnk a{ font-family:var(--ck-mono); font-size:.68rem; padding:.28rem .55rem; border:1px solid var(--ck-border); border-radius:6px; color:var(--ck-muted); text-decoration:none; }
         .xv-card .lnk a:hover{ color:var(--ck-accent); border-color:var(--ck-accent); }
+        /* FMECA fault-reference cards */
+        .fm-grid{ display:grid; gap:.6rem; margin-top:.4rem; }
+        .fm-card{ border:1px solid var(--ck-border); border-left:3px solid var(--ck-muted); border-radius:8px; background:var(--ck-card); overflow:hidden; }
+        .fm-card.r-hi{ border-left-color:#ef4444; } .fm-card.r-md{ border-left-color:#d97706; } .fm-card.r-lo{ border-left-color:#10b981; }
+        .fm-card summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; padding:.7rem .95rem; font-size:.86rem; }
+        .fm-card summary::-webkit-details-marker{ display:none; }
+        .fm-card summary::before{ content:'▸'; color:var(--ck-muted); font-size:.7rem; transition:transform .15s; }
+        .fm-card[open] summary::before{ transform:rotate(90deg); }
+        .fm-id{ font-family:var(--ck-mono); font-weight:700; color:var(--ck-accent); }
+        .fm-name{ font-weight:600; color:var(--ck-text); flex:1; min-width:140px; }
+        .fm-rpn{ font-family:var(--ck-mono); font-size:.62rem; font-weight:700; padding:1px 7px; border-radius:4px; white-space:nowrap; background:rgba(120,130,145,.14); color:var(--ck-muted); }
+        .fm-card.r-hi .fm-rpn{ background:rgba(239,68,68,.14); color:#ef4444; } .fm-card.r-md .fm-rpn{ background:rgba(245,158,11,.14); color:#d97706; }
+        .fm-body{ padding:.2rem .95rem 1rem; border-top:1px solid var(--ck-border); font-size:.82rem; }
+        .fm-row{ display:grid; grid-template-columns:96px 1fr; gap:.5rem; padding:.3rem 0; border-bottom:1px solid rgba(160,168,180,.09); }
+        .fm-row:last-of-type{ border-bottom:0; }
+        .fm-k{ font-family:var(--ck-mono); font-size:.64rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ck-muted); padding-top:2px; }
+        .fm-sod{ display:flex; gap:.8rem; margin-top:.6rem; font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-muted); }
+        .fm-sod b{ color:var(--ck-text); font-variant-numeric:tabular-nums slashed-zero; }
+        .fm-sod .fm-rpn-val{ margin-left:auto; }
         .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--ck-muted); align-items:center; }
         table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
         .ck-note{ border:1px dashed var(--ck-border); border-radius:10px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
@@ -187,6 +206,7 @@
             <a href="#spares">Spare-parts register</a>
             <a href="#exploded">Exploded views (per type)</a>
             <a href="#symptom">Symptom → action</a>
+            <a href="#fmeca">FMECA fault reference</a>
             <a href="#form">Printable form</a>
         </div>
         <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Checklist</div>
@@ -500,8 +520,87 @@
     </div></section>
 
     <!-- ───────── printable form ───────── -->
+    <!-- ───────── FMECA fault reference ───────── -->
+    <section class="ck-sec" id="fmeca"><div class="ck-wrap">
+        <h2><span class="n">10</span> FMECA fault reference — liquid cooling (F11.x)</h2>
+        <p class="lead">The five direct-to-chip liquid-cooling fault modes from the site's
+            <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--cdu-primary);font-weight:600;">FMECA knowledge graph</a>,
+            ordered by <b>RPN</b> (Risk Priority Number = Severity × Occurrence × Detectability, per IEC 60812).
+            These are the same faults the <a href="cdu-mini-bms.html" style="color:var(--cdu-primary);font-weight:600;">Mini-BMS</a>
+            injects and the §07 register stocks against. <b>Higher RPN → act first</b> — but RPN can understate a
+            high-severity, rarely-occurring fault: <b>F11.2 (pump failure)</b> scores S=10 yet RPN=60 because it's
+            detectable and infrequent. Expand a card for component, mechanism, effect chain, detection, and corrective/preventive actions.</p>
+        <div class="legend">
+            <span><span class="src std">STD</span> published code / standard (ASME · OCP)</span>
+            <span><span class="src typ">VENDOR</span> vendor data (Vertiv · 3M)</span>
+        </div>
+        <div class="fm-grid">
+            <details class="fm-card r-hi">
+                <summary><span class="fm-id">F11.1</span><span class="fm-name">Coolant chemistry drift</span><span class="fm-rpn">RPN 140</span><span class="src std">ASME · HIGH</span></summary>
+                <div class="fm-body">
+                    <div class="fm-row"><span class="fm-k">Component</span><span>CDU coolant / dielectric fluid <span class="ref">(C-LQC-005)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Mechanism</span><span>Coolant pH / conductivity drift <span class="ref">(M-CHM-005)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Effect</span><span>pH / conductivity drift → long-term cold-plate corrosion → reduced asset life</span></div>
+                    <div class="fm-row"><span class="fm-k">Detection</span><span>Conductivity · pH · TDS · ORP</span></div>
+                    <div class="fm-row"><span class="fm-k">Corrective</span><span>Coolant change + flush <span class="ref">(on detection)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Preventive</span><span>Inline chemistry monitoring <span class="ref">(continuous)</span></span></div>
+                    <div class="fm-sod"><span>S&nbsp;<b>7</b></span><span>O&nbsp;<b>5</b></span><span>D&nbsp;<b>4</b></span><span class="fm-rpn-val">RPN&nbsp;<b>140</b></span></div>
+                </div>
+            </details>
+            <details class="fm-card r-hi">
+                <summary><span class="fm-id">F11.4</span><span class="fm-name">Dielectric fluid degradation</span><span class="fm-rpn">RPN 120</span><span class="src typ">3M · THIN</span></summary>
+                <div class="fm-body">
+                    <div class="fm-row"><span class="fm-k">Component</span><span>Dielectric fluid (single-phase) <span class="ref">(C-LQC-005)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Mechanism</span><span>Dielectric fluid oxidation <span class="ref">(M-CHM-006)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Effect</span><span>Viscosity rise · dielectric-strength fall → heat-transfer loss</span></div>
+                    <div class="fm-row"><span class="fm-k">Detection</span><span>Fluid sample analysis</span></div>
+                    <div class="fm-row"><span class="fm-k">Corrective</span><span>Fluid replacement <span class="ref">(on detection)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Preventive</span><span>Quarterly fluid sample</span></div>
+                    <div class="fm-sod"><span>S&nbsp;<b>6</b></span><span>O&nbsp;<b>4</b></span><span>D&nbsp;<b>5</b></span><span class="fm-rpn-val">RPN&nbsp;<b>120</b></span></div>
+                </div>
+            </details>
+            <details class="fm-card r-md">
+                <summary><span class="fm-id">F11.3</span><span class="fm-name">Manifold / hose leak</span><span class="fm-rpn">RPN 108</span><span class="src std">OCP · MEDIUM</span></summary>
+                <div class="fm-body">
+                    <div class="fm-row"><span class="fm-k">Component</span><span>In-rack manifold <span class="ref">(C-LQC-003)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Mechanism</span><span>Hose / fitting leak <span class="ref">(M-MEC-009)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Effect</span><span>Coolant spill → electrical-short risk · rack damage → IT loss + cleanup <span class="ref">(24–168 h)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Detection</span><span>Leak rope · drip-pan · pressure decay</span></div>
+                    <div class="fm-row"><span class="fm-k">Corrective</span><span>Replace QD or hose <span class="ref">(on detection)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Preventive</span><span>Pressure-decay test <span class="ref">(quarterly)</span></span></div>
+                    <div class="fm-sod"><span>S&nbsp;<b>9</b></span><span>O&nbsp;<b>4</b></span><span>D&nbsp;<b>3</b></span><span class="fm-rpn-val">RPN&nbsp;<b>108</b></span></div>
+                </div>
+            </details>
+            <details class="fm-card r-lo">
+                <summary><span class="fm-id">F11.2</span><span class="fm-name">CDU pump failure <span class="ref" style="font-weight:400">· S=10 catastrophic</span></span><span class="fm-rpn">RPN 60</span><span class="src typ">Vertiv · THIN</span></summary>
+                <div class="fm-body">
+                    <div class="fm-row"><span class="fm-k">Component</span><span>CDU canned-rotor pump <span class="ref">(C-LQC-001 · ~50,000 h MTBF)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Mechanism</span><span>Pump bearing wear <span class="ref">(M-WER-007)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Effect</span><span>Flow loss to cold plates → CPU thermal trip in &lt;10 s → server reboot / damage <span class="ref">(0–4 h)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Detection</span><span>Flow meter · ΔP · pump vibration</span></div>
+                    <div class="fm-row"><span class="fm-k">Corrective</span><span>Replace CDU pump <span class="ref">(on detection)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Preventive</span><span>N+1 pump + vibration test <span class="ref">(monthly)</span></span></div>
+                    <div class="fm-sod"><span>S&nbsp;<b>10</b></span><span>O&nbsp;<b>3</b></span><span>D&nbsp;<b>2</b></span><span class="fm-rpn-val">RPN&nbsp;<b>60</b></span></div>
+                </div>
+            </details>
+            <details class="fm-card r-lo">
+                <summary><span class="fm-id">F11.5</span><span class="fm-name">Filter clogging</span><span class="fm-rpn">RPN 60</span><span class="src std">OCP · MEDIUM</span></summary>
+                <div class="fm-body">
+                    <div class="fm-row"><span class="fm-k">Component</span><span>Filter (5–50 µm) <span class="ref">(C-LQC-007)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Mechanism</span><span>CDU filter loading <span class="ref">(M-FOU-005)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Effect</span><span>ΔP across filter rises → secondary-loop flow loss → ΔT / approach creep</span></div>
+                    <div class="fm-row"><span class="fm-k">Detection</span><span>Filter ΔP</span></div>
+                    <div class="fm-row"><span class="fm-k">Corrective</span><span>Replace filter <span class="ref">(on detection)</span></span></div>
+                    <div class="fm-row"><span class="fm-k">Preventive</span><span>Monitor filter ΔP <span class="ref">(monthly)</span></span></div>
+                    <div class="fm-sod"><span>S&nbsp;<b>5</b></span><span>O&nbsp;<b>6</b></span><span>D&nbsp;<b>2</b></span><span class="fm-rpn-val">RPN&nbsp;<b>60</b></span></div>
+                </div>
+            </details>
+        </div>
+        <div class="ck-note"><b>Source.</b> FMECA-KG seed (Lin &amp; Ompusunggu 2026 synthesis; per-fault: ASME J.Electron.Packag. 140 020902 · Vertiv · OCP · 3M) at <code>docs/research/csv/</code>. S·O·D + RPN per IEC 60812; confidence tiers (HIGH / MEDIUM / THIN) reflect data provenance — vendor MTBF is often confidential. Full knowledge base + ML advisory concept: <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--cdu-primary);font-weight:600;">AI Engineering Maintenance</a>.</div>
+    </div></section>
+
     <section class="ck-sec" id="form"><div class="ck-wrap">
-        <h2><span class="n">10</span> CDU service record — printable form</h2>
+        <h2><span class="n">11</span> CDU service record — printable form</h2>
         <p class="lead">Fill on-screen and <b>Print / Save as PDF</b>. Captures site identity, readings against the §01 band, checklist pass/fail, and sign-off. Stored on the RZ site as the standard CDU service-record form.</p>
         <div class="form-card">
             <div class="form-row">
