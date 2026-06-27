@@ -2352,26 +2352,38 @@ if ('serviceWorker' in navigator) {
 <!-- Contact: copy-to-clipboard on email addresses -->
 <script>
 (function(){
+    function selectEmailNear(btn){
+        var row = btn.closest && btn.closest('.copy-row');
+        var a = row && row.querySelector('a');
+        if (!a) return;
+        try {
+            var rng = document.createRange(); rng.selectNodeContents(a);
+            var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(rng);
+        } catch (e) {}
+    }
+    function tryExec(value){
+        try {
+            var ta = document.createElement('textarea');
+            ta.value = value; ta.style.position = 'fixed'; ta.style.top = '-9999px';
+            document.body.appendChild(ta); ta.focus(); ta.select();
+            var ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return ok;
+        } catch (err) { return false; }
+    }
     document.addEventListener('click', function(e){
         var btn = e.target.closest && e.target.closest('.copy-btn');
         if (!btn) return;
         e.preventDefault();
         var val = btn.getAttribute('data-copy') || '';
         var tip = btn.querySelector('.copy-tip');
-        var done = function(ok){
-            btn.classList.add('copied');
-            if (tip) tip.textContent = ok ? 'Copied!' : 'Press Ctrl+C';
-            setTimeout(function(){ btn.classList.remove('copied'); if (tip) tip.textContent = 'Copy'; }, 1600);
-        };
+        var reset = function(){ btn.classList.remove('copied'); if (tip) tip.textContent = 'Copy'; };
+        var ok = function(){ btn.classList.add('copied'); if (tip) tip.textContent = 'Copied!'; setTimeout(reset, 1600); };
+        var fail = function(){ selectEmailNear(btn); btn.classList.add('copied'); if (tip) tip.textContent = 'Press Ctrl+C'; setTimeout(reset, 2400); };
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(val).then(function(){ done(true); }, function(){ done(false); });
+            navigator.clipboard.writeText(val).then(ok, function(){ tryExec(val) ? ok() : fail(); });
         } else {
-            try {
-                var ta = document.createElement('textarea');
-                ta.value = val; ta.style.position = 'fixed'; ta.style.opacity = '0';
-                document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-                document.body.removeChild(ta); done(true);
-            } catch (err) { done(false); }
+            tryExec(val) ? ok() : fail();
         }
     });
 })();

@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.50.4 — 2026-06-27 (Contact copy-to-clipboard — robust fallback chain)
+
+### Changed
+- Hardened the Contact-box email **copy-to-clipboard** (`index.html`) into a 3-tier fallback:
+  `navigator.clipboard.writeText` → `document.execCommand('copy')` → select the visible email text so
+  the user can press Ctrl+C. Verified the execCommand tier succeeds even with the Clipboard API forced
+  unavailable (shows "Copied!"); the final tier selects the address. js-syntax + script-tags clean.
+
 ## v1.50.3 — 2026-06-27 (Scrub personal phone number from the public changelog)
 
 ### Fixed
