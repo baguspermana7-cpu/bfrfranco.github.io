@@ -58,6 +58,20 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | OG image | `python3 tools/build-og-images.py --apply` (use `--force` for regeneration). |
 | `Article/Post Draft/<Topic Name>/` | At minimum: `linkedin.md`, `x-post-1.md`, `mastodon-1.md`. |
 
+## 2.6 NEW / updated MAINTENANCE TOOL or CDU ↔ FMECA integration
+
+> Added v1.50.x (2026-06-27). A maintenance-oriented tool (or any page with a
+> maintenance/fault aspect) must be cross-wired to the AI-maintenance/FMECA layer
+> + the spares engine + the interactive sourced-chart system — not stand alone.
+
+| Touch | Update |
+|---|---|
+| Tool/page with a maintenance aspect | Add a "Maintenance intelligence" card/row linking to `ai-engineering-maintenance.html` (FMECA-KG) + `spares-readiness-calculator.html`. (Both are plain links — the spares calc reads only financial query params.) |
+| Fault scenarios / symptom tables | Tag with the matching **FMECA fault ID** from `docs/research/csv/faults.csv` (e.g. liquid-cooling **F11.1–F11.5**) + link to `ai-engineering-maintenance.html#sec-knowledge-base`. CDU map: leak→F11.3, pump-fail→F11.2, clog→F11.5. |
+| `docs/research/csv/` | If a new asset family / fault mode is added, regenerate the FMECA seed files + bump the count cited on `ai-engineering-maintenance.html` (coordinate — that file is parallel-session-owned). |
+| Interactive charts | Number-driven maintenance pages carry ≥1 `data-rz-chart` (rz-article-chart.js) with `source`+`basisTag`; dataset in `data/<slug>/` with `source`/`basis_tag` columns; **must pass `node tools/audit-article-charts.mjs --strict`** (`ARTICLE_DATAVIZ_STANDARD.md`). |
+| Obsidian second-brain | Add/refresh the suite note in `Apps/second brain/obsidian-knowledge-vault/` + the web-graph nodes/edges in `Apps/second brain/index.html`. |
+
 ## 3. EVERY shipped change (always — no exceptions)
 
 1. `js/rz-version.js` — bump semver **and** `RZ_VERSION_DATE` (today's date).

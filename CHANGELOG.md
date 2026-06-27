@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.50.17 — 2026-06-28 (CDU ↔ AI-maintenance/FMECA cross-linking — Ship 1)
+
+### Added
+- **`cdu-hub.html`** — new "Maintenance intelligence" card row linking the CDU toolkit to
+  **`ai-engineering-maintenance.html`** (FMECA + Knowledge-Graph + ML-advisor; calls out the CDU
+  liquid-cooling fault modes **F11.1–F11.5**) and **`spares-readiness-calculator.html`** (CDU critical-spares
+  readiness — plain link; the spares calc reads only financial query params).
+- **`cdu-mini-bms.html`** — the educational note now maps each injected fault to its FMECA fault mode
+  (leak → **F11.3**, pump-fail → **F11.2**, filter-clog → **F11.5**) and links to the FMECA knowledge base.
+- **`standarization/CONTENT_LINKAGE_PLAYBOOK.md` §2.6** — new handoff rule for maintenance tools / CDU↔FMECA
+  integration (cross-link AI-maintenance + spares, tag fault IDs, carry sourced charts, update the second-brain).
+
+Cross-links verified (ai-engineering-maintenance + spares-readiness-calculator resolve 200); 0 console errors;
+script-tags / js-syntax / version-stamp / mobile / dark-coverage pass for the touched pages. Part of the
+4-ship CDU↔maintenance integration. (`ai-engineering-maintenance.html` is parallel-session-owned — linked TO, not edited.)
+
 ## v1.50.12 — 2026-06-27 (Finance Terminal B-004 — sort/filter on sector + futures tables)
 
 ### Fixed
