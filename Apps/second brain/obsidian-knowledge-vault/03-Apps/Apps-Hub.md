@@ -13,6 +13,7 @@
 | app-dca | [[DCA-App]] | `Apps/dca-app/index.html` | Vanilla JS | Live |
 | dcmoc | [[DC-MOC]] | `dcmoc/` | Next.js 16 | Live |
 | dunia | [[Dunia-Emosi/g13-battle-layout\|Dunia-Emosi]] | `Dunia-Emosi/` | HTML+Pixi 8 | Live (`dunia-emosi.vercel.app`) |
+| cdu | [[CDU-Suite]] | `cdu-hub.html` | Vanilla JS + Chart.js | Live (v1.52.0 — FMECA + 6 charts) |
 
 ---
 

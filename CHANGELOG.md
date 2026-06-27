@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v1.52.1 — 2026-06-27 (CDU suite mirrored in the second-brain + knowledge graph)
+
+### Added
+- **Obsidian vault note** `Apps/second brain/obsidian-knowledge-vault/03-Apps/CDU-Suite.md` — the 6 CDU
+  pages, the FMECA F11.x integration, the 6 charts, and a standards-compliance table, with `[[wikilinks]]`
+  to Apps/Calculators/Comparisons/Standards hubs. Added a CDU row to `03-Apps/Apps-Hub.md`.
+- **Web knowledge graph** (`Apps/second brain/index.html`): 3 new nodes — `cdu` (CDU Toolkit),
+  `aimnt` (AI Engineering-Maintenance), `cspr` (Spares Readiness) — plus 7 edges wiring the CDU toolkit
+  to the FMECA/AI-maintenance engine, the spares calculator, the cooling comparison + pillar, and the
+  TCO calculator cluster. All edge endpoints resolve.
+
 ## v1.52.0 — 2026-06-27 (Interactive sourced charts on the CDU toolkit)
 
 ### Added
