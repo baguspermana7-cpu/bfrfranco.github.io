@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.50.9 — 2026-06-27 (Finance Terminal B-004 — un-gate table sort + filter)
+
+### Fixed
+- **Finance Terminal** (`Apps/finance-terminal/index.html`) — table **column sorting + live filtering**
+  (B-004) were wired through `wireTable()`, which early-returned on `if(!CFG.V2)`. So whenever the V2
+  gateway flag was off (the default, and the state when the gateway is down), every data table was
+  un-sortable and un-filterable — the reported symptom. Sorting/filtering are pure client-side DOM
+  operations (reorder the rendered rows / hide by text) with no dependency on the data source, so the
+  V2 gate was removed. Verified: header click sorts asc, re-click toggles desc, and the filter input
+  hides non-matching rows (crypto / screener / sector / futures tables). Self-contained app — does not
+  use `rz-version.js`; recorded here for the changelog only.
+
 ## v1.50.4 — 2026-06-27 (Contact copy-to-clipboard — robust fallback chain)
 
 ### Changed

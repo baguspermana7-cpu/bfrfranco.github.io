@@ -1015,7 +1015,11 @@ function attachFilter(input,table){
    optional filter <input> id. Safe to call repeatedly (idempotent
    guards above). */
 function wireTable(id,filterId){
-  if(!CFG.V2)return;
+  /* B-004: sorting + filtering are pure client-side DOM operations (sort the
+     rendered tbody rows, hide rows by text) — they do NOT depend on the V2
+     gateway/data source. The old `if(!CFG.V2)return` left every table un-sortable
+     and un-filterable whenever V2 was off (the default + the gateway-down state),
+     which is exactly the reported symptom. Wire them in all modes. */
   var t=$(id);if(!t)return;
   makeSortable(t,{nameSelector:'Name'});
   if(filterId){var inp=$(filterId);if(inp)attachFilter(inp,t);}
@@ -2186,7 +2190,7 @@ function renderCryptoTable(){
   // Pagination
   const totalPages=Math.ceil(S.cryptoList.length/perPage);
   $('cryptoPaging').innerHTML=Array.from({length:totalPages},(_, i)=>`<button class="pg-btn${i+1===S.cryptoPage?' active':''}" onclick="S.cryptoPage=${i+1};renderCryptoTable()">${i+1}</button>`).join('');
-  wireTable('cryptoTable','cryptoFilter'); // B-004 (V2-gated, idempotent)
+  wireTable('cryptoTable','cryptoFilter'); // B-004 (sort+filter; idempotent)
 }
 
 async function loadTrending(){
@@ -2334,7 +2338,7 @@ function renderScreenerResults(){
   </tr>`).join('');
   const totalPages=Math.ceil(S.scrResults.length/perPage);
   $('screenerPaging').innerHTML=Array.from({length:totalPages},(_,i)=>`<button class="pg-btn${i+1===S.scrPage?' active':''}" onclick="S.scrPage=${i+1};renderScreenerResults()">${i+1}</button>`).join('');
-  wireTable('screenerTable','screenerFilter'); // B-004 (V2-gated, idempotent)
+  wireTable('screenerTable','screenerFilter'); // B-004 (sort+filter; idempotent)
 }
 
 function exportScreenerCSV(){
@@ -2749,7 +2753,7 @@ async function loadSectorsV2(){
       data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
     });
-    wireTable('sectorTable','sectorFilter'); // B-004 (V2-gated, idempotent)
+    wireTable('sectorTable','sectorFilter'); // B-004 (sort+filter; idempotent)
   }catch(e){
     tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadSectorsV2()">Retry</a></p></div></td></tr>';
   }
@@ -3188,7 +3192,7 @@ async function loadFuturesV2(){
         scales:{x:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:9}}},y:{grid:{display:false},ticks:{color:cc.text,font:{size:9}}}}}
     });
     if(!S.futSym)S.futSym=topSyms[0]||'SPY';
-    wireTable('futuresTable','futuresFilter'); // B-004 (V2-gated, idempotent)
+    wireTable('futuresTable','futuresFilter'); // B-004 (sort+filter; idempotent)
     loadFuturesChart('M');
   }catch(e){
     tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Unavailable — <a href="#" style="color:var(--acc)" onclick="event.preventDefault();loadFuturesV2()">Retry</a></p></div></td></tr>';
