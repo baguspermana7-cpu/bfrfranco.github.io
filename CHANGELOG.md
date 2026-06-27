@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.50.12 — 2026-06-27 (Finance Terminal B-004 — sort/filter on sector + futures tables)
+
+### Fixed
+- **B-004 completion** (`Apps/finance-terminal/index.html`): the V2-gate removal (v1.50.9) made
+  `wireTable()` work in all modes, but the **non-V2** render paths for the Sector and Futures tables
+  (`loadSectors` / `loadFutures`) never called it (the calls lived only in the V2 paths). So with a
+  Finnhub key in the default non-V2 mode, those tables populated but stayed un-sortable/un-filterable.
+  Added `wireTable('sectorTable','sectorFilter')` / `wireTable('futuresTable','futuresFilter')` to the
+  non-V2 paths. Both tables have proper `<thead>`s; page parses clean.
+
 ## v1.50.11 — 2026-06-27 (Finance Terminal B-005 — Market Dominance renders empty)
 
 ### Fixed
