@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.50.11 — 2026-06-27 (Finance Terminal B-005 — Market Dominance renders empty)
+
+### Fixed
+- **B-005 — "Market Dominance" cards render empty** (`Apps/finance-terminal/index.html`): the working
+  horizontal-bar renderer (`renderDominanceCards`) was only wired into the V2 (gateway) crypto path; the
+  non-V2 `loadDominance()` still drew a Chart.js **doughnut on `#dominanceChart` that rendered empty**
+  (canvas sizing). Routed the non-V2 path through the same bar renderer (`renderDominanceCards(g.data)`,
+  since CoinGecko `/global` wraps the payload in `{data:{…}}`). Verified: 6 dominance bars
+  (BTC/ETH/USDT/BNB/…) render with live data, empty canvas gone. (Same V2-gating root pattern as B-004.)
+
 ## v1.50.10 — 2026-06-27 (Finance Terminal B-002 forex endpoint + B-003 proxy race)
 
 ### Fixed

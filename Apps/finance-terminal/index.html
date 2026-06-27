@@ -2217,20 +2217,12 @@ async function loadTrending(){
 }
 
 async function loadDominance(){
+  // B-005: the old doughnut on #dominanceChart rendered empty (canvas sizing).
+  // Route the non-V2 path through the SAME horizontal-bar renderer the V2 path
+  // uses — robust, no canvas. CoinGecko /global wraps the payload in {data:{…}}.
   try{
     const g=await cg('/global');
-    const pcts=g.data?.market_cap_percentage||{};
-    const entries=Object.entries(pcts).slice(0,6);
-    const labels=entries.map(e=>e[0].toUpperCase());
-    const values=entries.map(e=>e[1]);
-    const colors=['#f7931a','#627eea','#34d399','#f87171','#60a5fa','#fbbf24'];
-    const cc=chartColors();
-    destroyChart('dominance');
-    S.charts.dominance=new Chart($('dominanceChart'),{
-      type:'doughnut',
-      data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:cc.grid,borderWidth:1}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:11},padding:8}}}}
-    });
+    renderDominanceCards(g&&g.data);
   }catch(e){}
 }
 
