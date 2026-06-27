@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v1.50.3 — 2026-06-27 (Scrub personal phone number from the public changelog)
+
+### Fixed
+- The v1.50.0 changelog entry documenting the WhatsApp-number removal had itself printed the full
+  number into the **public `/changelog.html`** — which defeats the privacy intent. Scrubbed the literal
+  number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
+  internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
+
+## v1.50.3 — 2026-06-27 (Phase 2 batch — article-25 free sourced auction-price chart)
+
+### Added
+- **`article-25.html`** ("PJM Grid Crisis") gains a free interactive chart: PJM's Base Residual Auction clearing
+  price **jumped ~9× in a single cycle — $28.92 → $269.92/MW-day** (July 2024, 2025/26 delivery; total
+  procurement $2.2B → $14.7B). New validated `data/article-25/auction-prices.csv` (source + basis_tag per row),
+  rendered by `js/rz-article-chart.js` (theme-aware tokens, Source caption + PUBLISHED chip). Per
+  ARTICLE_DATAVIZ_STANDARD.md.
+
 ## v1.50.2 — 2026-06-27 (Phase 2 batch — article-20 free sourced water-use chart)
 
 ### Added
@@ -54,7 +71,7 @@ Phase 1 (shared system + article-26/article-27 reference pair). The shared CSS/J
   hover rule. Verified by instrumented hover-testing: **0 entrance-animation restarts** on hover.
 
 ### Removed
-- **Personal WhatsApp number** `+62 812-1687-4606` removed from `index.html` — the visible contact card
+- **Personal WhatsApp number** removed from `index.html` — the visible contact card
   and all four structured-data spots (Person `telephone`+`sameAs`, ProfessionalService `telephone`,
   Organization `sameAs`+`contactPoint`). The generic "Share on WhatsApp" share-bar button (shares the page
   URL, not the number) is kept.
