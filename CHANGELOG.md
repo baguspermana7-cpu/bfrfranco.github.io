@@ -27,6 +27,17 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.6 — 2026-06-27 (Phase 2 batch — article-16 + article-11 free sourced charts)
+
+### Added
+- **`article-16.html`** ("Southeast Asia DC bubble?") — free Johor pipeline-by-stage bar: **487 MW operational /
+  422 MW under construction / 1.4 GW committed / 3.4 GW early-stage planning** (5.8 GW total), making the
+  "mostly unbuilt / speculative" bear case visible. New `data/article-16/johor-pipeline.csv`.
+- **`article-11.html`** ("AI Data Centers vs Citizen Bills") — free electricity-cost-index bar: Bloomberg's
+  **267% higher** costs near major data-center activity vs 5 years ago (index 100 → 367). New
+  `data/article-11/electricity-cost.csv`.
+- Both via `js/rz-article-chart.js`. 9 interactive sourced charts now live (gate clean).
+
 ## v1.50.5 — 2026-06-27 (Phase 2 batch — article-21 + article-23 free sourced charts)
 
 ### Added
