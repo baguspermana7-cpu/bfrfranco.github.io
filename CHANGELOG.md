@@ -27,6 +27,15 @@ release sections rather than semver.
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.8 — 2026-06-27 (Phase 2 batch — article-12 hyperscaler renewable-contracts chart)
+
+### Added
+- **`article-12.html`** ("How AI Data Centers Fund $57B in Grid Modernization") — free renewable-contracts bar:
+  **Amazon 34 GW vs Microsoft 23.2 GW vs Malaysia's entire 35 GW grid** (reference), making the article's "a
+  single company contracts as much renewable capacity as a whole country" point visible. New
+  `data/article-12/renewable-contracts.csv` (basis distinction noted: contracted PPAs vs total grid). Rendered by
+  `js/rz-article-chart.js`. 11 interactive sourced charts now live (gate clean).
+
 ## v1.50.7 — 2026-06-27 (Phase 2 batch — article-18 rack power-density chart)
 
 ### Added
