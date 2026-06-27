@@ -113,6 +113,11 @@
         .crit.y{ background:rgba(239,68,68,.14); color:#ef4444; border:1px solid rgba(239,68,68,.4); }
         .crit.m{ background:rgba(245,158,11,.14); color:#d97706; border:1px solid rgba(245,158,11,.4); }
         .crit.n{ background:rgba(120,130,145,.14); color:#6b7280; border:1px solid rgba(120,130,145,.4); }
+        /* FMECA fault-mode cross-reference pill (→ AI Engineering-Maintenance knowledge base) */
+        .fref{ font-family:var(--ck-mono); font-size:.58rem; font-weight:700; padding:1px 6px; border-radius:4px; letter-spacing:.03em; white-space:nowrap; text-decoration:none; background:rgba(8,145,178,.12); color:#0891b2; border:1px solid rgba(8,145,178,.38); }
+        .fref:hover{ background:rgba(8,145,178,.2); }
+        [data-theme="dark"] .fref{ background:rgba(0,221,255,.12); color:#67e8f9; border-color:rgba(0,221,255,.34); }
+        [data-theme="dark"] .fref:hover{ background:rgba(0,221,255,.2); }
         table.ck-tbl td .cost{ font-family:var(--ck-mono); font-weight:600; color:var(--ck-text); white-space:nowrap; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
         table.ck-tbl td .pn{ font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-accent); }
         table.ck-tbl td small{ color:var(--ck-muted); font-size:.72rem; }
@@ -129,6 +134,27 @@
         table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
         .ck-note{ border:1px dashed var(--ck-border); border-radius:10px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
         .ck-note b{ color:var(--ck-text); }
+        /* FMECA fault-reference cards (§10) */
+        .fmeca-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:.9rem; margin-top:.4rem; }
+        .fm-card{ border:1px solid var(--ck-border); border-top:2px solid var(--ck-accent); border-radius:10px; background:var(--ck-card); padding:1rem 1.1rem; display:flex; flex-direction:column; gap:.5rem; }
+        .fm-head{ display:flex; align-items:baseline; gap:.5rem; flex-wrap:wrap; }
+        .fm-id{ font-family:var(--ck-mono); font-size:.66rem; font-weight:700; letter-spacing:.04em; padding:1px 6px; border-radius:4px; background:rgba(8,145,178,.12); color:#0891b2; border:1px solid rgba(8,145,178,.38); }
+        [data-theme="dark"] .fm-id{ background:rgba(0,221,255,.12); color:#67e8f9; border-color:rgba(0,221,255,.34); }
+        .fm-name{ font-family:var(--ck-serif); font-weight:600; font-size:1.02rem; }
+        .fm-rpn{ margin-left:auto; font-family:var(--ck-mono); font-size:.6rem; font-weight:700; padding:2px 7px; border-radius:5px; white-space:nowrap; }
+        .fm-rpn.hi{ background:rgba(239,68,68,.16); color:#ef4444; border:1px solid rgba(239,68,68,.4); }
+        .fm-rpn.md{ background:rgba(245,158,11,.16); color:#d97706; border:1px solid rgba(245,158,11,.4); }
+        .fm-rpn.lo{ background:rgba(16,185,129,.16); color:#10b981; border:1px solid rgba(16,185,129,.4); }
+        .fm-meta{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); line-height:1.5; }
+        .fm-meta b{ color:var(--ck-text); }
+        .fm-row{ font-size:.82rem; line-height:1.5; }
+        .fm-row .k{ font-family:var(--ck-mono); font-size:.6rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ck-muted); display:block; }
+        .fm-sod{ display:flex; gap:.5rem; margin-top:.2rem; }
+        .fm-sod span{ flex:1; text-align:center; font-family:var(--ck-mono); border:1px solid var(--ck-border); border-radius:6px; padding:.3rem; background:var(--ck-inset); }
+        .fm-sod span b{ display:block; font-size:1rem; color:var(--ck-accent); font-variant-numeric:tabular-nums; }
+        .fm-sod span small{ font-size:.54rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ck-muted); }
+        .fm-card .fm-src{ font-family:var(--ck-mono); font-size:.64rem; color:var(--ck-muted); margin-top:.1rem; }
+        .fm-card .fm-src a{ color:var(--ck-accent); }
         .toc{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
         .toc a{ font-family:var(--ck-mono); font-size:.68rem; padding:.3rem .6rem; border:1px solid var(--ck-border); border-radius:6px; color:var(--ck-muted); text-decoration:none; }
         .toc a:hover{ color:var(--ck-accent); border-color:var(--ck-accent); }
@@ -187,6 +213,7 @@
             <a href="#spares">Spare-parts register</a>
             <a href="#exploded">Exploded views (per type)</a>
             <a href="#symptom">Symptom → action</a>
+            <a href="#fmeca">FMECA reference (F11.x)</a>
             <a href="#form">Printable form</a>
         </div>
         <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Checklist</div>
@@ -380,7 +407,7 @@
     <!-- ───────── maintenance PM ───────── -->
     <section class="ck-sec" id="maint"><div class="ck-wrap">
         <h2><span class="n">06</span> Preventive-maintenance (PM) checklist</h2>
-        <p class="lead">PM tasks by cadence. <span class="cad d">DAILY</span> <span class="cad w">WEEKLY</span> <span class="cad m">MONTHLY</span> <span class="cad q">QUARTERLY</span> <span class="cad a">ANNUAL</span>. Intervals are a baseline — follow the vendor PM schedule and adjust to fluid-sample results. The <b>Parts / consumable</b> column points to the line in <a href="#spares" style="color:var(--cdu-primary);font-weight:600;">§07 — Spare-parts register</a> with part reference, critical-spare class and cost band.</p>
+        <p class="lead">PM tasks by cadence. <span class="cad d">DAILY</span> <span class="cad w">WEEKLY</span> <span class="cad m">MONTHLY</span> <span class="cad q">QUARTERLY</span> <span class="cad a">ANNUAL</span>. Intervals are a baseline — follow the vendor PM schedule and adjust to fluid-sample results. The <b>Parts / consumable</b> column points to the line in <a href="#spares" style="color:var(--cdu-primary);font-weight:600;">§07 — Spare-parts register</a> with part reference, critical-spare class and cost band. These PM tasks are the preventive controls for the FMECA fault modes ranked in <a href="#fmeca" style="color:var(--cdu-primary);font-weight:600;">§10 — FMECA reference (F11.x)</a>.</p>
         <div class="tbl-wrap"><table class="ck-tbl">
             <thead><tr><th>Task</th><th>Frequency</th><th>Acceptance / action</th><th>Parts / consumable</th></tr></thead>
             <tbody>
@@ -475,18 +502,18 @@
     <!-- ───────── symptom table ───────── -->
     <section class="ck-sec" id="symptom"><div class="ck-wrap">
         <h2><span class="n">09</span> Symptom → cause → action</h2>
-        <p class="lead">Troubleshooting reference. On any active symptom: protect the IT load first (the CDU's N+1 / isolation logic), then diagnose.</p>
+        <p class="lead">Troubleshooting reference. On any active symptom: protect the IT load first (the CDU's N+1 / isolation logic), then diagnose. Each fault family is cross-referenced to the site's FMECA knowledge base — the liquid-cooling fault modes <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--ck-accent);font-weight:600;">F11.1–F11.5</a> on the <a href="ai-engineering-maintenance.html" style="color:var(--ck-accent);font-weight:600;">AI Engineering-Maintenance engine</a>, with severity / occurrence / detection and RPN tabulated below in <a href="#fmeca" style="color:var(--ck-accent);font-weight:600;">§10 — FMECA fault reference</a>.</p>
         <div class="tbl-wrap"><table class="ck-tbl">
             <thead><tr><th>Symptom</th><th>Likely cause</th><th>Immediate action</th><th>Corrective action</th></tr></thead>
             <tbody>
-                <tr><td class="sym">High differential pressure</td><td>Filter clogging; valve throttled; air pocket</td><td>Check filter dP; confirm valves open; bleed air</td><td>Replace filter; re-balance; full de-air</td></tr>
-                <tr><td class="sym">Low / no flow</td><td>Pump fault; closed valve; QD not seated; airlock</td><td>Confirm standby pump took over (N+1); check valves/QD</td><td>Service/replace pump; reseat QD; purge air</td></tr>
-                <tr><td class="sym">Leak alarm</td><td>Loose QD; failed seal/gasket; manifold/HX leak</td><td>Acknowledge → isolate affected zone; locate via rope/zone</td><td>Tighten/replace QD or seal; pressure-test; refill + de-air</td></tr>
+                <tr><td class="sym">High differential pressure</td><td>Filter clogging; valve throttled; air pocket <a class="fref" href="ai-engineering-maintenance.html#sec-knowledge-base" title="FMECA: Filter clogging (RPN 60)">F11.5</a></td><td>Check filter dP; confirm valves open; bleed air</td><td>Replace filter; re-balance; full de-air</td></tr>
+                <tr><td class="sym">Low / no flow</td><td>Pump fault; closed valve; QD not seated; airlock <a class="fref" href="ai-engineering-maintenance.html#sec-knowledge-base" title="FMECA: CDU pump failure (RPN 60)">F11.2</a></td><td>Confirm standby pump took over (N+1); check valves/QD</td><td>Service/replace pump; reseat QD; purge air</td></tr>
+                <tr><td class="sym">Leak alarm</td><td>Loose QD; failed seal/gasket; manifold/HX leak <a class="fref" href="ai-engineering-maintenance.html#sec-knowledge-base" title="FMECA: Manifold/hose leak (RPN 108)">F11.3</a></td><td>Acknowledge → isolate affected zone; locate via rope/zone</td><td>Tighten/replace QD or seal; pressure-test; refill + de-air</td></tr>
                 <tr><td class="sym">High coolant supply temp</td><td>Facility water warm/low flow (L2L); HX fouling; high ATD</td><td>Check primary supply temp/flow; check ATD</td><td>Restore CDW; clean HX; verify control setpoint</td></tr>
                 <tr><td class="sym">High room temp (L2A)</td><td>Room CRAH can't absorb rejected heat; coil dirty</td><td>Check CRAH capacity/airflow; clean coil</td><td>Add room cooling / move to L2L; coil service</td></tr>
                 <tr><td class="sym">Rising ATD (approach)</td><td>Heat-exchanger fouling; reduced flow one side</td><td>Compare primary/secondary ΔT; check flows</td><td>Clean/flush HX; restore flow</td></tr>
-                <tr><td class="sym">Pump fault / vibration</td><td>Bearing/seal wear; cavitation (low pressure/air)</td><td>Switch to standby; raise system pressure; de-air</td><td>Replace pump/seal; correct expansion control</td></tr>
-                <tr><td class="sym">Coolant chemistry out of band</td><td>Biology growth; glycol degradation; contamination</td><td>Sample; dose biocide / inhibitor</td><td>Partial/full coolant replacement; side-stream filtration</td></tr>
+                <tr><td class="sym">Pump fault / vibration</td><td>Bearing/seal wear; cavitation (low pressure/air) <a class="fref" href="ai-engineering-maintenance.html#sec-knowledge-base" title="FMECA: CDU pump failure (RPN 60)">F11.2</a></td><td>Switch to standby; raise system pressure; de-air</td><td>Replace pump/seal; correct expansion control</td></tr>
+                <tr><td class="sym">Coolant chemistry out of band</td><td>Biology growth; glycol degradation; contamination <a class="fref" href="ai-engineering-maintenance.html#sec-knowledge-base" title="FMECA: Coolant chemistry drift (RPN 140)">F11.1</a> <a class="fref" href="ai-engineering-maintenance.html#sec-knowledge-base" title="FMECA: Dielectric fluid degradation (RPN 120)">F11.4</a></td><td>Sample; dose biocide / inhibitor</td><td>Partial/full coolant replacement; side-stream filtration</td></tr>
                 <tr><td class="sym">Air in loop (gurgling, unstable dP)</td><td>Incomplete de-air; make-up drawing air; leak</td><td>Bleed at high points; check make-up</td><td>Find/seal air ingress; re-fill correctly</td></tr>
                 <tr><td class="sym">Stale / lost telemetry</td><td>Sensor fault; comms loss to BMS</td><td>Treat values as suspect; local gauge check</td><td>Replace sensor; restore comms; re-cal</td></tr>
                 <tr><td class="sym">Condensation / sweating on plates &amp; pipe</td><td>Supply temp driven below room dew point; dew-point reset disabled / RH sensor fault</td><td>Raise supply setpoint above room dew point; check RH sensor</td><td>Enable dew-point-aware reset (≥2–3 °C above dew point); fix humidity sensor; insulate</td></tr>
@@ -499,9 +526,69 @@
         </table></div>
     </div></section>
 
+    <!-- ───────── FMECA fault reference (liquid cooling F11.x) ───────── -->
+    <section class="ck-sec" id="fmeca"><div class="ck-wrap">
+        <h2><span class="n">10</span> FMECA fault reference — liquid cooling (F11.x)</h2>
+        <p class="lead">The five liquid-cooling failure modes from the site's <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--ck-accent);font-weight:600;">FMECA knowledge base</a>, scored by <b>S</b>everity · <b>O</b>ccurrence · <b>D</b>etection on a 1–10 scale, with the <b>RPN</b> (= S×O×D) that ranks where to spend maintenance attention. The symptom table (<a href="#symptom" style="color:var(--ck-accent);font-weight:600;">§09</a>) maps each live symptom to these IDs; the <a href="#maint" style="color:var(--ck-accent);font-weight:600;">PM checklist (§06)</a> and <a href="#spares" style="color:var(--ck-accent);font-weight:600;">spare-parts register (§07)</a> are the preventive controls. <b>Chemistry drift (F11.1, RPN 140)</b> and <b>fluid degradation (F11.4, RPN 120)</b> top the table — slow, hard-to-detect chemistry problems outrank the dramatic-but-obvious pump and leak failures.</p>
+        <div class="fmeca-grid">
+
+            <div class="fm-card">
+                <div class="fm-head"><span class="fm-id">F11.1</span><span class="fm-name">Coolant chemistry drift</span><span class="fm-rpn hi">RPN 140</span></div>
+                <div class="fm-meta">Component <b>C-LQC-005 · dielectric / treated coolant</b> · Mechanism <b>pH / conductivity drift</b> (halocarbon hydrolysis; inhibitor depletion)</div>
+                <div class="fm-row"><span class="k">Symptoms → detection</span>Conductivity &gt;5 µS/cm; pH excursion; approach-temp creep → conductivity / pH / TDS / ORP probes</div>
+                <div class="fm-row"><span class="k">Effect</span>Long-term corrosion of cold plates → reduced asset life</div>
+                <div class="fm-row"><span class="k">Corrective / preventive</span>Coolant change + system flush · <b>preventive:</b> continuous inline chemistry monitoring + quarterly sample (§06)</div>
+                <div class="fm-sod"><span><b>7</b><small>Sev</small></span><span><b>5</b><small>Occ</small></span><span><b>4</b><small>Det</small></span></div>
+                <div class="fm-src">Source: FMECA-KG · ASME J. Electron. Packag. 140 020902 · ASHRAE TC 9.9 — <a href="ai-engineering-maintenance.html#sec-knowledge-base">knowledge base ↗</a></div>
+            </div>
+
+            <div class="fm-card">
+                <div class="fm-head"><span class="fm-id">F11.4</span><span class="fm-name">Dielectric fluid degradation</span><span class="fm-rpn hi">RPN 120</span></div>
+                <div class="fm-meta">Component <b>C-LQC-005 · dielectric fluid</b> · Mechanism <b>dielectric fluid oxidation</b> (thermal oxidation; water absorption)</div>
+                <div class="fm-row"><span class="k">Symptoms → detection</span>Viscosity rise; dielectric-strength fall → periodic fluid-sample analysis</div>
+                <div class="fm-row"><span class="k">Effect</span>Degraded heat transfer + dielectric margin → fouling and chemistry knock-on</div>
+                <div class="fm-row"><span class="k">Corrective / preventive</span>Drain + refill with fresh dielectric · <b>preventive:</b> quarterly fluid sample &amp; trend (§06)</div>
+                <div class="fm-sod"><span><b>6</b><small>Sev</small></span><span><b>4</b><small>Occ</small></span><span><b>5</b><small>Det</small></span></div>
+                <div class="fm-src">Source: FMECA-KG · 3M fluid data — <a href="ai-engineering-maintenance.html#sec-knowledge-base">knowledge base ↗</a></div>
+            </div>
+
+            <div class="fm-card">
+                <div class="fm-head"><span class="fm-id">F11.3</span><span class="fm-name">Manifold / hose leak</span><span class="fm-rpn md">RPN 108</span></div>
+                <div class="fm-meta">Component <b>C-LQC-003 · in-rack manifold</b> · Mechanism <b>hose / fitting leak</b> (O-ring degradation; loose QD; hose abrasion)</div>
+                <div class="fm-row"><span class="k">Symptoms → detection</span>Underfloor wet; drip-pan alarm → leak rope; drip-pan; pressure-decay test</div>
+                <div class="fm-row"><span class="k">Effect</span>Coolant spill → electrical short risk / rack damage (24–168 h downtime)</div>
+                <div class="fm-row"><span class="k">Corrective / preventive</span>Tighten / replace QD or hose; pressure-decay test · <b>preventive:</b> quarterly pressure-decay test + monthly leak-detection function test (§06)</div>
+                <div class="fm-sod"><span><b>9</b><small>Sev</small></span><span><b>4</b><small>Occ</small></span><span><b>3</b><small>Det</small></span></div>
+                <div class="fm-src">Source: FMECA-KG · OCP — <a href="ai-engineering-maintenance.html#sec-knowledge-base">knowledge base ↗</a></div>
+            </div>
+
+            <div class="fm-card">
+                <div class="fm-head"><span class="fm-id">F11.2</span><span class="fm-name">CDU pump failure</span><span class="fm-rpn lo">RPN 60</span></div>
+                <div class="fm-meta">Component <b>C-LQC-001 · CDU canned-rotor pump</b> · Mechanism <b>pump bearing wear</b> (lubricant contamination; electrical fluting; misalignment)</div>
+                <div class="fm-row"><span class="k">Symptoms → detection</span>Flow drop; ΔP rise → flow meter; ΔP; pump vibration</div>
+                <div class="fm-row"><span class="k">Effect</span>Flow loss to cold plates → CPU thermal trip in &lt;10 s (ride-through is the saver, hence high severity / low detection-difficulty)</div>
+                <div class="fm-row"><span class="k">Corrective / preventive</span>Swap pump + recommission · <b>preventive:</b> N+1 standby pump + monthly vibration test (§06)</div>
+                <div class="fm-sod"><span><b>10</b><small>Sev</small></span><span><b>3</b><small>Occ</small></span><span><b>2</b><small>Det</small></span></div>
+                <div class="fm-src">Source: FMECA-KG · Vertiv · Uptime Institute — <a href="ai-engineering-maintenance.html#sec-knowledge-base">knowledge base ↗</a></div>
+            </div>
+
+            <div class="fm-card">
+                <div class="fm-head"><span class="fm-id">F11.5</span><span class="fm-name">Filter clogging</span><span class="fm-rpn lo">RPN 60</span></div>
+                <div class="fm-meta">Component <b>C-LQC-007 · 5–50 µm filter</b> · Mechanism <b>CDU filter loading</b> (new-pipework particulates; gasket debris)</div>
+                <div class="fm-row"><span class="k">Symptoms → detection</span>ΔP across filter rises → filter ΔP transmitter (a clear, easily-trended signal)</div>
+                <div class="fm-row"><span class="k">Effect</span>Restricted secondary flow → starves cold-plate micro-channels if left unaddressed</div>
+                <div class="fm-row"><span class="k">Corrective / preventive</span>Replace cartridge filter · <b>preventive:</b> monthly filter-ΔP check, replace at vendor threshold (§06)</div>
+                <div class="fm-sod"><span><b>5</b><small>Sev</small></span><span><b>6</b><small>Occ</small></span><span><b>2</b><small>Det</small></span></div>
+                <div class="fm-src">Source: FMECA-KG · OCP — <a href="ai-engineering-maintenance.html#sec-knowledge-base">knowledge base ↗</a></div>
+            </div>
+
+        </div>
+        <div class="ck-note">RPN = Severity × Occurrence × Detection (each 1–10), the standard FMECA risk index — higher = act sooner. Values are from the site's FMECA knowledge base (<a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--ck-accent)">AI Engineering-Maintenance engine</a>), sourced to ASME, ASHRAE TC 9.9, OCP, Uptime Institute and vendor data. Use them to prioritise the PM cadence in §06, not as a substitute for the OEM's maintenance schedule.</div>
+    </div></section>
+
     <!-- ───────── printable form ───────── -->
     <section class="ck-sec" id="form"><div class="ck-wrap">
-        <h2><span class="n">10</span> CDU service record — printable form</h2>
+        <h2><span class="n">11</span> CDU service record — printable form</h2>
         <p class="lead">Fill on-screen and <b>Print / Save as PDF</b>. Captures site identity, readings against the §01 band, checklist pass/fail, and sign-off. Stored on the RZ site as the standard CDU service-record form.</p>
         <div class="form-card">
             <div class="form-row">

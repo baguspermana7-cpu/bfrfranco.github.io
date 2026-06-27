@@ -58,6 +58,21 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | OG image | `python3 tools/build-og-images.py --apply` (use `--force` for regeneration). |
 | `Article/Post Draft/<Topic Name>/` | At minimum: `linkedin.md`, `x-post-1.md`, `mastodon-1.md`. |
 
+## 2.6 NEW / updated MAINTENANCE tool or CDU ↔ FMECA integration
+
+> Added v1.51.x (2026-06-27) — when a maintenance/operations page (CDU toolkit,
+> checklist, Mini-BMS, a cockpit page) gains fault content, wire it to the FMECA
+> knowledge base instead of leaving it isolated.
+
+| Touch | Update |
+|---|---|
+| FMECA dataset of record | `docs/research/csv/{faults,mechanisms,effects,actions,sod_rpn,components}.csv` — the source of truth for every fault ID (e.g. liquid-cooling = `F11.1`–`F11.5`, components `C-LQC-00x`). Do NOT invent fault IDs or RPNs; cite these rows. |
+| `ai-engineering-maintenance.html` | Link TO it (anchor `#sec-knowledge-base`); it is the live FMECA + KG + ML-advisor engine. **Never edit it from a CDU/maintenance task** (parallel-session-owned). |
+| `spares-readiness-calculator.html` | Plain link for critical-spares readiness — it reads only `tier/redundancy/mtbf/mttr/downtimeCostPerHr/country` query params (no subsystem deep-link param). |
+| Fault tags on the page | Tag symptom/scenario rows with their `F11.x` (or relevant family) ID + a link to the engine; mirror the S·O·D + RPN from `sod_rpn.csv` exactly. |
+| Charts (if added) | Any FMECA-derived chart (e.g. RPN ranking) follows `ARTICLE_DATAVIZ_STANDARD.md` — `source` = "FMECA-KG · <csv>" + `basisTag` `derived`; must pass `node tools/audit-article-charts.mjs --strict`. |
+| Second-brain | Mirror the suite note + web-graph node/edges to the FMECA/spares nodes (see §3 + `SECOND-BRAIN-STANDARD.md`). |
+
 ## 3. EVERY shipped change (always — no exceptions)
 
 1. `js/rz-version.js` — bump semver **and** `RZ_VERSION_DATE` (today's date).

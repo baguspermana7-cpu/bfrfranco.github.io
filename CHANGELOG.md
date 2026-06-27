@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.51.0 — 2026-06-27 (CDU toolkit ↔ FMECA maintenance integration)
+
+### Added
+- **CDU ↔ AI-maintenance cross-linking** — the CDU toolkit is no longer isolated from the site's
+  predictive-maintenance engine:
+  - `cdu-hub.html`: new **"Maintenance intelligence — FMECA & spares"** card (06 · Integrate) linking to
+    `ai-engineering-maintenance.html` (FMECA knowledge base) and `spares-readiness-calculator.html`
+    (critical-spares readiness).
+  - `cdu-checklist.html`: new **§10 — FMECA fault reference (F11.x)** section — the five liquid-cooling
+    failure modes (F11.1 chemistry drift · F11.4 fluid degradation · F11.3 manifold/hose leak · F11.2 CDU
+    pump fail · F11.5 filter clog) rendered as cards with component / mechanism / symptoms / detection /
+    effect / corrective+preventive actions and S·O·D + RPN, sourced to the FMECA-KG
+    (`docs/research/csv/*`). Printable form renumbered §10 → §11; TOC updated.
+  - `cdu-checklist.html` §09 symptom→action rows tagged with their `F11.x` fault ID (links to the engine).
+  - `cdu-mini-bms.html`: fault-injection scenarios tagged with FMECA IDs (Leak = F11.3 · Pump A fail =
+    F11.2 · Filter clog = F11.5) in the control caption and the active-alarm banner.
+
+### Changed
+- `standarization/CONTENT_LINKAGE_PLAYBOOK.md`: added **§2.6 — new maintenance tool / CDU ↔ FMECA**
+  handoff rule (cite the FMECA CSVs of record; link to — never edit — `ai-engineering-maintenance.html`).
+
 ## v1.50.12 — 2026-06-27 (Finance Terminal B-004 — sort/filter on sector + futures tables)
 
 ### Fixed

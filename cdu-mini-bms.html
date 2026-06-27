@@ -126,6 +126,10 @@
         .alarmbar .ab-chip.alarm{ background:rgba(220,38,38,.16); color:var(--bm-red); }
         /* scenario chip severity — Normal reads neutral-green, faults amber */
         .seg.scen button[data-scen="normal"][aria-pressed="true"]{ background:var(--bm-green); border-color:var(--bm-green); color:#04241a; }
+        /* FMECA cross-reference (→ AI Engineering-Maintenance knowledge base) */
+        .scen-fmeca{ display:block; margin-top:.4rem; font-family:var(--bm-mono,'IBM Plex Mono',monospace); font-size:.62rem; line-height:1.5; color:var(--bm-muted); }
+        .fmeca-link{ color:var(--bm-cyan); text-decoration:none; border-bottom:1px dotted var(--bm-cyan); white-space:nowrap; }
+        .fmeca-link:hover{ border-bottom-style:solid; }
         .tile .spark{ width:100%; height:15px; display:block; margin-top:4px; }
         .tile .spark polyline{ fill:none; stroke:var(--bm-cyan); stroke-width:1.1; opacity:.85; vector-effect:non-scaling-stroke; }
         .tile .spark .fillarea{ fill:var(--bm-cyan); opacity:.08; stroke:none; }
@@ -335,6 +339,11 @@
                     <button data-scen="hotfws" aria-pressed="false">Hot facility water</button>
                     <button data-scen="lowflow" aria-pressed="false">Low flow</button>
                 </div>
+                <span class="scen-fmeca">FMECA fault modes:
+                    <a class="fmeca-link" href="ai-engineering-maintenance.html#sec-knowledge-base" target="_blank" rel="noopener" title="Manifold/hose leak · RPN 108">Leak = F11.3</a> ·
+                    <a class="fmeca-link" href="ai-engineering-maintenance.html#sec-knowledge-base" target="_blank" rel="noopener" title="CDU pump failure · RPN 60">Pump A fail = F11.2</a> ·
+                    <a class="fmeca-link" href="ai-engineering-maintenance.html#sec-knowledge-base" target="_blank" rel="noopener" title="Filter clogging · RPN 60">Filter clog = F11.5</a>
+                </span>
             </div>
             <div class="ctl-group">
                 <span class="ctl-label">Simulation</span>
@@ -465,9 +474,9 @@
         };
         // human-readable cause for the active-alarm banner
         var SCEN_CAUSE={
-            leak:{sev:'alarm',title:'Coolant leak detected',msg:'Leak switch <b>LSH-01</b> tripped — reservoir level (<b>LT-01</b>) falling and system pressure sagging while make-up runs. <b>Acknowledge → isolate the affected zone → locate via the leak rope</b>, then pressure-test and refill.'},
-            pumpfail:{sev:'warn',title:'Duty pump failed — running on standby',msg:'Pump <b>P-01A</b> is down; standby <b>P-01B</b> is carrying the load so flow holds, but redundancy is lost (<b>N+1 → N</b>). Service/replace the failed pump before the next fault.'},
-            clog:{sev:'alarm',title:'Filter clogging',msg:'Filter ΔP (<b>PDT-01</b>) is high — secondary flow is dropping and ΔT is climbing as the strainer blocks. <b>Replace the filter element</b> at the vendor dP threshold and re-check flow.'},
+            leak:{sev:'alarm',title:'Coolant leak detected',msg:'Leak switch <b>LSH-01</b> tripped — reservoir level (<b>LT-01</b>) falling and system pressure sagging while make-up runs. <b>Acknowledge → isolate the affected zone → locate via the leak rope</b>, then pressure-test and refill. <a href="ai-engineering-maintenance.html#sec-knowledge-base" target="_blank" rel="noopener" class="fmeca-link" title="FMECA: Manifold/hose leak · RPN 108">FMECA F11.3 ↗</a>'},
+            pumpfail:{sev:'warn',title:'Duty pump failed — running on standby',msg:'Pump <b>P-01A</b> is down; standby <b>P-01B</b> is carrying the load so flow holds, but redundancy is lost (<b>N+1 → N</b>). Service/replace the failed pump before the next fault. <a href="ai-engineering-maintenance.html#sec-knowledge-base" target="_blank" rel="noopener" class="fmeca-link" title="FMECA: CDU pump failure · RPN 60">FMECA F11.2 ↗</a>'},
+            clog:{sev:'alarm',title:'Filter clogging',msg:'Filter ΔP (<b>PDT-01</b>) is high — secondary flow is dropping and ΔT is climbing as the strainer blocks. <b>Replace the filter element</b> at the vendor dP threshold and re-check flow. <a href="ai-engineering-maintenance.html#sec-knowledge-base" target="_blank" rel="noopener" class="fmeca-link" title="FMECA: Filter clogging · RPN 60">FMECA F11.5 ↗</a>'},
             hotfws:{sev:'warn',title:'Hot facility water',msg:'Primary supply is warm — coolant supply temp is up and HX approach (<b>ATD</b>) is widening. Check the facility CDW supply temp/flow and verify the heat-exchanger is not fouled.'},
             lowflow:{sev:'alarm',title:'Low secondary flow',msg:'Secondary flow is below the design point — ΔT is rising and GPUs risk throttling. Confirm pump/valve/QD, purge air, and raise the flow setpoint.'}
         };
