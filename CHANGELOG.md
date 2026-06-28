@@ -143,6 +143,15 @@ script-tags / js-syntax / version-stamp / mobile / dark-coverage pass for the to
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.18 — 2026-06-28 (Phase 2 batch — article-22 optics-power chart)
+
+### Added
+- **`article-22.html`** ("NVIDIA's $4B Photonics Play") — free interconnect-power bar: **pluggable optics ~16W
+  vs co-packaged optics (CPO) ~9W per 800G port** (~44% cut; ≈350 kW saved across a 50,000-GPU factory). New
+  `data/article-22/optics-power.csv`. A better, on-thesis angle than the flat $2B+$2B investment split.
+  Rendered by `js/rz-article-chart.js`. (article-3 / article-9 checked and skipped — calculator-generated /
+  scattered-prose data, no defensible free static series.)
+
 ## v1.50.17 — 2026-06-28 (Phase 2 batch — article-14 community-opposition chart)
 
 ### Added
