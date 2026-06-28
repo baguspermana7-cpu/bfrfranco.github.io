@@ -875,6 +875,78 @@ async function yahooCandles(symbol,range,interval){
   return{s:'ok',t:valid.map(i=>data.t[i]),c:valid.map(i=>data.c[i]),o:valid.map(i=>data.o[i]),h:valid.map(i=>data.h[i]),l:valid.map(i=>data.l[i]),v:valid.map(i=>data.v[i])};
 }
 
+// B-009/B-010/B-011: free, KEY-LESS quote fallback. Yahoo's chart endpoint is
+// CORS-proxy-reachable (same path yahooCandles already uses) and its 5-day daily
+// series + meta yield a Finnhub-shaped quote {c,dp,d,v}. day-change = last daily
+// close vs the prior daily close (meta.chartPreviousClose spans the whole window,
+// so it is NOT a 1-day change — use the closes array). Lets Sectors / Economy /
+// Futures render real data with no API key and no gateway Worker.
+async function yahooQuote(symbol){
+  const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`;
+  let json=null;
+  try{
+    json=await Promise.any(CORS_PROXIES.map(async function(proxy){
+      const r=await fetchWithTimeout(proxy(yUrl),7000);
+      if(!r.ok)throw new Error('proxy '+r.status);
+      const j=await r.json();
+      if(!j||!j.chart||!j.chart.result)throw new Error('bad shape');
+      return j;
+    }));
+  }catch(e){return null}
+  return _yQuoteFromResult(json.chart?.result?.[0]);
+}
+// Derive a {c,dp,d,v} quote from a Yahoo chart/spark `result` object.
+function _yQuoteFromResult(res){
+  if(!res||!res.meta)return null;
+  const m=res.meta;
+  const closes=((res.indicators?.quote?.[0]?.close)||[]).filter(v=>v!=null);
+  const vols=((res.indicators?.quote?.[0]?.volume)||[]).filter(v=>v!=null);
+  const price=(typeof m.regularMarketPrice==='number')?m.regularMarketPrice:closes[closes.length-1];
+  if(price==null)return null;
+  const prev=closes.length>=2?closes[closes.length-2]:(m.chartPreviousClose??m.previousClose);
+  const d=(prev!=null)?price-prev:0;
+  const dp=(prev!=null&&prev!==0)?(d/prev)*100:0;
+  return{c:price,d,dp,v:vols.length?vols[vols.length-1]:(m.regularMarketVolume||0),pc:prev,_src:'yahoo'};
+}
+// Resolve a list of symbols to quotes via Yahoo, caching each. Uses the SINGLE
+// multi-symbol `spark` endpoint (1 request for the whole list) so 11-12 ETF
+// symbols no longer fan out to 11-12 proxied requests that trip public-proxy
+// rate limits (the recurring keyless-data failure mode). Falls back to per-symbol
+// yahooQuote() only for whatever spark could not resolve.
+async function yahooBatchQuotes(syms){
+  if(!syms.length)return;
+  // chunk to keep each spark URL modest; spark handles many but stay <=20/req.
+  const chunks=[];for(let i=0;i<syms.length;i+=18)chunks.push(syms.slice(i,i+18));
+  await Promise.allSettled(chunks.map(async function(chunk){
+    const sUrl=`https://query1.finance.yahoo.com/v7/finance/spark?symbols=${encodeURIComponent(chunk.join(','))}&range=5d&interval=1d`;
+    let json=null;
+    try{
+      json=await Promise.any(CORS_PROXIES.map(async function(proxy){
+        const r=await fetchWithTimeout(proxy(sUrl),7000);
+        if(!r.ok)throw new Error('proxy '+r.status);
+        const j=await r.json();
+        if(!j||!j.spark||!Array.isArray(j.spark.result))throw new Error('bad spark');
+        return j;
+      }));
+    }catch(e){json=null}
+    if(json){
+      json.spark.result.forEach(it=>{
+        const q=_yQuoteFromResult(it.response&&it.response[0]);
+        if(q&&typeof q.c==='number'&&q.c>0)QUOTE_CACHE.set(it.symbol,q);
+      });
+    }
+  }));
+  // per-symbol fallback for anything spark missed (delisted/odd ticker).
+  const miss=syms.filter(s=>!QUOTE_CACHE.get(s));
+  if(miss.length){
+    const res=await Promise.allSettled(miss.map(s=>yahooQuote(s)));
+    res.forEach((r,i)=>{
+      if(r.status==='fulfilled'&&r.value&&typeof r.value.c==='number'&&r.value.c>0)
+        QUOTE_CACHE.set(miss[i],r.value);
+    });
+  }
+}
+
 const CACHE={_s:{},get(k,ms){const i=this._s[k];if(!i)return null;if(Date.now()-i.t>ms){delete this._s[k];return null}return i.d},set(k,d){this._s[k]={d,t:Date.now()}},clear(){this._s={}}};
 
 /* Global quote cache — all tabs share one pool of quotes with 5-min TTL */
@@ -884,7 +956,18 @@ const QUOTE_CACHE={
   set(sym,q){this._d[sym]=q;this._t[sym]=Date.now()},
   clear(){this._d={};this._t={}}
 };
-async function batchQuotes(syms){
+async function batchQuotes(syms,opts){
+  opts=opts||{};
+  // yahooFirst: for ETF/index batch tabs (Sectors/Economy/Futures) resolve via the
+  // single keyless Yahoo spark request FIRST (~1 req, ~400ms) instead of fanning
+  // out N Finnhub /quote calls through the shared 55/min fhLim — on page load that
+  // shared budget is already spent by overview/watchlist, so those N calls stall in
+  // the rate-limit window for seconds. Yahoo has no such contention. Finnhub then
+  // only fills whatever Yahoo missed.
+  if(opts.yahooFirst){
+    const need0=syms.filter(s=>!QUOTE_CACHE.get(s));
+    if(need0.length)await yahooBatchQuotes(need0);
+  }
   const need=syms.filter(s=>!QUOTE_CACHE.get(s));
   if(need.length&&S.fhKey){
     const res=await Promise.allSettled(need.map(s=>fh('/quote',{symbol:s})));
@@ -904,6 +987,11 @@ async function batchQuotes(syms){
       });
     }
   }
+  // B-009/B-010/B-011: KEY-LESS fallback — whatever is still uncached (no Finnhub
+  // key, or Finnhub failed/rate-limited the symbol) is resolved via Yahoo so the
+  // ETF-backed tabs (Sectors / Economy / Futures) render real data unconditionally.
+  const stillNeed=syms.filter(s=>!QUOTE_CACHE.get(s));
+  if(stillNeed.length)await yahooBatchQuotes(stillNeed);
   const out={};
   syms.forEach(s=>{const q=QUOTE_CACHE.get(s);if(q)out[s]=q});
   return out;
@@ -2758,28 +2846,35 @@ async function loadSectorsV2(){
 }
 async function loadSectors(){
   if(CFG.V2)return loadSectorsV2();
-  if(!S.fhKey){$('sectorTable').querySelector('tbody').innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-key"></i><p>Enter API key</p></div></td></tr>';return}
-  const quotes=await batchQuotes(SECTOR_ETFS.map(s=>s.sym));
+  // B-009: keyless + fast — Yahoo spark first, no fhLim contention.
+  const quotes=await batchQuotes(SECTOR_ETFS.map(s=>s.sym),{yahooFirst:true});
   const data=SECTOR_ETFS.map(sec=>{const q=quotes[sec.sym];return{...sec,c:q?.c||0,dp:q?.dp||0,d:q?.d||0,v:q?.v||0}});
-  // Bar chart
-  const cc=chartColors();destroyChart('sector');
   data.sort((a,b)=>b.dp-a.dp);
-  S.charts.sector=new Chart($('sectorChart'),{
-    type:'bar',
-    data:{labels:data.map(d=>d.name),datasets:[{label:'Day Change %',data:data.map(d=>d.dp),backgroundColor:data.map(d=>d.dp>=0?'rgba(52,211,153,.7)':'rgba(248,113,113,.7)'),borderRadius:6}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
-  });
-  // Table
+  const cc=chartColors();
+  // B-009: render the DATA TABLE first — a charting exception must never blank
+  // the table (loadYields/loadFutures already render table-before-chart; sectors
+  // used to build the bar chart first, so any Chart.js throw left the tab empty).
   $('sectorTable').querySelector('tbody').innerHTML=data.map(d=>`<tr><td class="fw7 c-t1">${d.name}</td><td class="mono c-t4">${d.sym}</td><td class="txt-r mono c-t1">$${fmtP(d.c)}</td><td class="txt-r fw6" style="color:${chgColor(d.dp)}">${d.dp>0?'+':''}${fmtP(d.dp)}%</td><td class="txt-r mono c-t4">${fmt(d.v)}</td></tr>`).join('');
-  // Pie chart
-  destroyChart('secPie');
-  const weights=data.map(d=>d.c>0?d.c:1);
-  S.charts.secPie=new Chart($('sectorPie'),{
-    type:'doughnut',
-    data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
-  });
   wireTable('sectorTable','sectorFilter'); // B-004: sortable/filterable in non-V2 mode too
+  // Bar chart (guarded — decorative)
+  try{
+    destroyChart('sector');
+    S.charts.sector=new Chart($('sectorChart'),{
+      type:'bar',
+      data:{labels:data.map(d=>d.name),datasets:[{label:'Day Change %',data:data.map(d=>d.dp),backgroundColor:data.map(d=>d.dp>=0?'rgba(52,211,153,.7)':'rgba(248,113,113,.7)'),borderRadius:6}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>0?'+':'')+fmtP(ctx.raw)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:cc.text,font:{size:10}}},y:{grid:{color:cc.grid},ticks:{color:cc.text,callback:v=>v+'%',font:{size:10}}}}}
+    });
+  }catch(e){}
+  // Pie chart (guarded — decorative)
+  try{
+    destroyChart('secPie');
+    const weights=data.map(d=>d.c>0?d.c:1);
+    S.charts.secPie=new Chart($('sectorPie'),{
+      type:'doughnut',
+      data:{labels:data.map(d=>d.name),datasets:[{data:weights,backgroundColor:data.map(d=>d.color),borderColor:'transparent',borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:9},padding:4,boxWidth:10}}},cutout:'55%'}
+    });
+  }catch(e){}
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2845,8 +2940,8 @@ async function loadYields(){
     {sym:'HYG',name:'High Yield Corp',dur:'Corp HY'},
     {sym:'AGG',name:'Total Bond Market',dur:'Aggregate'}
   ];
-  if(!S.fhKey){$('econKpis').innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-key"></i><p>Enter API key</p></div>';return}
-  const quotes=await batchQuotes(bonds.map(b=>b.sym));
+  // B-010: keyless + fast — Yahoo spark first, no fhLim contention.
+  const quotes=await batchQuotes(bonds.map(b=>b.sym),{yahooFirst:true});
   // KPIs
   const topBonds=['SHY','IEF','TLT','HYG'];
   $('econKpis').innerHTML=topBonds.map(sym=>{
@@ -3200,7 +3295,7 @@ async function loadFuturesV2(){
 }
 async function loadFutures(){
   if(CFG.V2)return loadFuturesV2();
-  const quotes=await batchQuotes(FUTURES_PROXIES.map(f=>f.sym));
+  const quotes=await batchQuotes(FUTURES_PROXIES.map(f=>f.sym),{yahooFirst:true});// B-011: keyless + fast
   // KPIs - top 4
   const topSyms=['SPY','QQQ','USO','GLD'];
   $('futuresKpis').innerHTML=topSyms.map(sym=>{

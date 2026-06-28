@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.50.21 — 2026-06-28 (Finance Terminal B-009/B-010/B-011 — keyless data on Sectors / Economy / Futures)
+
+**Fixed** — the Sectors, Economy and Futures tabs rendered empty (they gated on a
+Finnhub API key, or stalled behind the shared 55/min Finnhub rate-limit budget that
+the overview/watchlist tabs spend on page load).
+
+- New **keyless Yahoo quote fallback** in the data layer: `yahooQuote()` +
+  `yahooBatchQuotes()` derive a Finnhub-shaped `{c,dp,d,v}` quote from Yahoo's
+  CORS-proxy-reachable chart/`spark` endpoints (the same proxy race that already
+  powers the candlestick charts). The multi-symbol `spark` endpoint resolves a whole
+  tab's ETF list in **one** request (~400ms) instead of N proxied requests that trip
+  public-proxy rate limits.
+- `batchQuotes(syms,{yahooFirst:true})` — Sectors / Economy / Futures now resolve via
+  Yahoo first (fast, keyless, no `fhLim` contention); Finnhub only fills any gaps.
+  Removed the `Enter API key` early-returns on those tabs.
+- `loadSectors()` now renders the data table **before** its charts and guards each
+  `new Chart()` in try/catch, so a charting exception can no longer blank the tab
+  (matches the table-before-chart order the Economy/Futures tabs already use).
+- Verified headless (no API key): all three tabs render real data in ~0.4s, 0 console
+  errors; the default `batchQuotes` path (overview/watchlist) is byte-identical
+  (`opts` defaults to `{}`).
+
+Tracker: B-009, B-010, B-011 → SOLVED. (B-006 commodity candlesticks / B-008 news
+remain — News is Finnhub-only; the broader fix is the gateway Worker, ROOT item.)
+
+---
+
 ## v1.50.20 — 2026-06-28 (CDU suite — second-brain + knowledge graph — Ship 4)
 
 **Added** — the CDU↔FMECA integration (Ships 1–3) is now reflected in the Obsidian
