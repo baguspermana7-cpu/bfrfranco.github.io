@@ -538,6 +538,44 @@ html[data-rz-register="editorial"] .article-body > figure img{
 }
 
 /* ============================================================================
+   CALLOUT DE-SLOP — SYSTEMIC SWEEP (v1.50.19). Articles use dozens of bespoke
+   callout namespaces (formula-box, conclusion-box, warning-box, insight-box,
+   plus per-article prefixes: aif-*, pjm-*, col-*, dcj-*, a21-*, …) that all
+   carried saturated gradient fills + 3–4px borders. Attribute selectors catch
+   the whole -box / -note callout family at once and apply the editorial
+   language (flat color-mix tint + hairline + 2px semantic accent rail, no
+   gradient, one restrained shadow). A local --cl carries the semantic accent
+   via the class-name hint so warning/danger/success keep meaning.
+   Cards / panels / grids (-card, -panel, -grid) are intentionally NOT swept —
+   they are structural, not text callouts. ============================================================================ */
+html[data-rz-register="editorial"] .article-body [class*="-box"],
+html[data-rz-register="editorial"] .article-body [class*="-note"]{
+  --cl: var(--rz-art-accent, #b45309);
+  background: color-mix(in srgb, var(--cl) 6%, transparent) !important;
+  background-image: none !important;
+  border: 1px solid color-mix(in srgb, var(--cl) 22%, transparent) !important;
+  border-left: 2px solid var(--cl) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+/* semantic accent via class-name hint (these come AFTER the base so --cl wins) */
+html[data-rz-register="editorial"] .article-body [class*="warning"],
+html[data-rz-register="editorial"] .article-body [class*="caution"],
+html[data-rz-register="editorial"] .article-body [class*="alert-box"]{ --cl:#d97706; }
+html[data-rz-register="editorial"] .article-body [class*="danger"],
+html[data-rz-register="editorial"] .article-body [class*="critical"],
+html[data-rz-register="editorial"] .article-body [class*="bear-box"]{ --cl:#dc2626; }
+html[data-rz-register="editorial"] .article-body [class*="safe-box"],
+html[data-rz-register="editorial"] .article-body [class*="positive"],
+html[data-rz-register="editorial"] .article-body [class*="opportunity"],
+html[data-rz-register="editorial"] .article-body [class*="success"]{ --cl:#0a8a5a; }
+/* callout inner blocks sit at the box's own left edge (no centering / no measure cap) */
+html[data-rz-register="editorial"] .article-body [class*="-box"] > *,
+html[data-rz-register="editorial"] .article-body [class*="-note"] > *{
+  max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; text-align: left !important;
+}
+
+/* ============================================================================
    ARTICLE DATA CHART (W-G, v1.49.10) — interactive, finding-titled, sourced.
    The figure is a direct child of .article-body so it inherits the reading
    measure (lines up with prose). Rendered by js/rz-article-chart.js. ============================================================================ */

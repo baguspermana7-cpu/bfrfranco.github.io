@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 310 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 311 shipped versions.",
         "dateModified": "2026-06-28",
         "author": {
           "@type": "Person",
@@ -73,7 +73,7 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 310,
+        "numberOfItems": 311,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.50.22 — 2026-06-28","url":"https://resistancezero.com/changelog.html#v1.50.22"},
         {"@type":"ListItem","position":2,"name":"v1.50.21 — 2026-06-28","url":"https://resistancezero.com/changelog.html#v1.50.21"},
@@ -589,7 +589,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.50.22</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">310 releases</span>
+        <span class="cl-count-badge">311 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -908,6 +908,30 @@
 <p>number into the <strong>public <code>/changelog.html</code></strong> — which defeats the privacy intent. Scrubbed the literal</p>
 <p>number from the CHANGELOG entry and regenerated <code>changelog.html</code>. (The number remains only in an</p>
 <p>internal, <code>noindex</code>, non-sitemapped security-audit report that records the original finding.)</p>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.50.19">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.50.19</span>
+        <span class="changelog-tier-pill" style="background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-06-28">June 28, 2026</time>
+      </div>
+      <p class="changelog-caption">Systemic callout de-slop sweep — every article</p>
+      <div class="changelog-body">
+        <h3 class="cl-subhead">Changed</h3>
+<ul>
+  <li><strong>Callout AI-slop, eliminated site-wide.</strong> The earlier de-slop covered only a handful of callout class names;</li>
+</ul>
+<p>the uiux-reviewer flagged it as a systemic gap, and a scan confirmed <strong>nearly every article</strong> had bespoke</p>
+<p>callout namespaces (<code>formula-box</code>, <code>conclusion-box</code>, <code>warning-box</code>, <code>insight-box</code>, <code>danger-box</code>, plus</p>
+<p>per-article prefixes <code>aif-*</code> / <code>pjm-*</code> / <code>col-*</code> / <code>dcj-*</code> / <code>a21-*</code> …) still carrying saturated gradient</p>
+<p>fills + 3–4px borders. Added <strong>attribute-selector</strong> rules in <code>css/rz-article-dark.css</code> that catch the whole</p>
+<p><code>-box</code> / <code>-note</code> callout family at once and apply the editorial language (flat <code>color-mix</code> tint +</p>
+<p>background-image:none + hairline + 2px semantic accent rail + no heavy shadow), with a <code>--cl</code> accent driven by</p>
+<p>the class-name hint (warning→amber, danger→red, success/positive→green). **Cards / panels / grids are</p>
+<p>intentionally NOT swept** (structural, not text callouts). Cache-bust on all 38 editorial pages bumped to</p>
+<p><code>?v=1.50.19</code> so the shared CSS reaches live visitors. Dark-coverage gate CLEAN (114 pages, both modes).</p>
       </div>
     </article>
 

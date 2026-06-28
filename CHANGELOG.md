@@ -192,6 +192,20 @@ script-tags / js-syntax / version-stamp / mobile / dark-coverage pass for the to
   number from the CHANGELOG entry and regenerated `changelog.html`. (The number remains only in an
   internal, `noindex`, non-sitemapped security-audit report that records the original finding.)
 
+## v1.50.19 — 2026-06-28 (Systemic callout de-slop sweep — every article)
+
+### Changed
+- **Callout AI-slop, eliminated site-wide.** The earlier de-slop covered only a handful of callout class names;
+  the uiux-reviewer flagged it as a systemic gap, and a scan confirmed **nearly every article** had bespoke
+  callout namespaces (`formula-box`, `conclusion-box`, `warning-box`, `insight-box`, `danger-box`, plus
+  per-article prefixes `aif-*` / `pjm-*` / `col-*` / `dcj-*` / `a21-*` …) still carrying saturated gradient
+  fills + 3–4px borders. Added **attribute-selector** rules in `css/rz-article-dark.css` that catch the whole
+  `-box` / `-note` callout family at once and apply the editorial language (flat `color-mix` tint +
+  background-image:none + hairline + 2px semantic accent rail + no heavy shadow), with a `--cl` accent driven by
+  the class-name hint (warning→amber, danger→red, success/positive→green). **Cards / panels / grids are
+  intentionally NOT swept** (structural, not text callouts). Cache-bust on all 38 editorial pages bumped to
+  `?v=1.50.19` so the shared CSS reaches live visitors. Dark-coverage gate CLEAN (114 pages, both modes).
+
 ## v1.50.18 — 2026-06-28 (Phase 2 batch — article-22 optics-power chart)
 
 ### Added
