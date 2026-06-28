@@ -573,7 +573,7 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div class="panel" id="panel-commodities">
 <div class="kpi-grid" id="cmdKpis"></div>
 <div class="g23">
-<div class="card"><div class="card-title"><i class="fas fa-chart-area"></i>Commodity Chart</div><div class="tf-bar" id="cmdTfBar"></div><div style="position:relative;height:320px"><canvas id="cmdChart"></canvas></div></div>
+<div class="card"><div class="card-title"><i class="fas fa-chart-area"></i>Commodity Chart<span id="cmdOhlc" class="mono c-t4" style="margin-left:auto;font-size:.7rem;font-weight:400"></span></div><div class="tf-bar" id="cmdTfBar"></div><div style="position:relative;height:320px"><canvas id="cmdChart"></canvas></div></div>
 <div>
 <div class="card"><div class="card-title"><i class="fas fa-list"></i>All Commodities</div>
 <div class="tbl-wrap"><table class="dtbl" id="cmdTable"><thead><tr><th>Commodity</th><th>ETF</th><th class="txt-r">Price</th><th class="txt-r">Change</th></tr></thead><tbody></tbody></table></div>
@@ -2718,9 +2718,9 @@ function renderCommodities(quotes){
 }
 async function loadCommodities(){
   if(CFG.V2)return loadCommoditiesV2();
-  if(!S.fhKey){$('cmdKpis').innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-key"></i><p>Enter API key for commodity data</p></div>';return}
+  // B-006: keyless + fast — Yahoo spark first (no key gate, no fhLim stall).
   showLoading('cmdKpis');
-  const quotes=await batchQuotes(COMMODITIES.map(c=>c.sym));
+  const quotes=await batchQuotes(COMMODITIES.map(c=>c.sym),{yahooFirst:true});
   renderCommodities(quotes);
 }
 
@@ -2760,14 +2760,37 @@ async function loadCmdChart(){
   if(CFG.V2)return loadCmdChartV2();
   return loadCmdChartLegacy();
 }
+// Convert yahooCandles' parallel arrays -> renderCandles' [{t,o,h,l,c,v}] rows.
+function yCandleRows(data){
+  if(!data||!data.t)return[];
+  return data.t.map((t,i)=>({t,o:data.o[i],h:data.h[i],l:data.l[i],c:data.c[i],v:(data.v&&data.v[i])||0}))
+               .filter(k=>isFinite(k.t)&&isFinite(k.c)&&isFinite(k.o));
+}
 async function loadCmdChartLegacy(){
   const rangeMap={'1W':'5d','1M':'1mo','3M':'3mo','6M':'6mo','1Y':'1y'};
   const range=rangeMap[S.cmdTf]||'3mo';
   const interval=S.cmdTf==='1W'?'15m':'1d';
   document.querySelectorAll('#cmdTfBar .tf-btn').forEach(b=>b.classList.toggle('active',b.textContent===S.cmdTf));
+  const cv=$('cmdChart');
   try{
     const data=await yahooCandles(S.cmdSym,range,interval);
-    if(!data||!data.c){const wrap=$('cmdChart');if(wrap)wrap.parentElement.querySelector('.empty')||wrap.insertAdjacentHTML('afterend','');return}
+    if(!data||!data.c||!data.c.length)return;
+    // B-006: render real CANDLESTICKS (lightweight-charts: candle + volume + SMA20)
+    // keylessly, the same TradingView-grade renderer the V2 gateway path uses —
+    // the Commodity chart was a flat Chart.js line. Reversibly hand the canvas area
+    // to a sized <div> (the lib needs a div, not a canvas).
+    const rows=yCandleRows(data);
+    const host=cv?cv.parentElement:null;
+    if(host&&typeof LightweightCharts!=='undefined'&&rows.length){
+      if(cv)cv.style.display='none';
+      let lwc=$('cmdChart-lwc');
+      if(!lwc){lwc=document.createElement('div');lwc.id='cmdChart-lwc';lwc.style.cssText='width:100%;height:320px';host.appendChild(lwc);}
+      lwc.style.display='';
+      if(renderCandles('cmdChart-lwc',rows,{height:320,infoId:'cmdOhlc'}))return;
+      // lib failed to draw → restore canvas and fall through to the line chart.
+      lwc.style.display='none';if(cv)cv.style.display='';
+    }
+    // Fallback: Chart.js line (when lightweight-charts is unavailable).
     const cc=chartColors();destroyChart('cmd');
     const name=COMMODITIES.find(c=>c.sym===S.cmdSym)?.name||S.cmdSym;
     S.charts.cmd=new Chart($('cmdChart'),{

@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.50.22 — 2026-06-28 (Finance Terminal B-006 — keyless commodity data + candlestick chart)
+
+**Fixed / Changed** — the Commodities tab rendered empty KPIs/table and a flat line
+chart with no candlesticks.
+
+- KPIs + table: removed the `Enter API key` gate; `loadCommodities()` now uses
+  `batchQuotes(...,{yahooFirst:true})` (keyless Yahoo spark first, no `fhLim` stall —
+  same fix as B-009/B-010/B-011). 14 commodity ETFs render in ~0.4s.
+- **Real candlesticks:** `loadCmdChartLegacy()` now renders through the in-house
+  `renderCandles()` (lightweight-charts: candle + volume histogram + SMA20 + crosshair
+  OHLC) using keyless `yahooCandles` data — the same TradingView-grade renderer the V2
+  gateway path uses, previously V2-only. New `yCandleRows()` adapts the candle arrays.
+  The Chart.js line remains as a graceful fallback if lightweight-charts is unavailable.
+- Added a crosshair OHLC readout (`#cmdOhlc`) to the Commodity Chart card header.
+- Verified headless (no key): 14 rows + drawn candlestick canvas; timeframe switch
+  (1W–1Y), commodity selection, and light/dark re-render cleanly; 0 console errors.
+
+Tracker: B-006 candlestick chart → SOLVED (the analytics-panel + related-news half of
+B-006 is the broader R-008 scope, gateway-backed — deferred).
+
+---
+
 ## v1.50.21 — 2026-06-28 (Finance Terminal B-009/B-010/B-011 — keyless data on Sectors / Economy / Futures)
 
 **Fixed** — the Sectors, Economy and Futures tabs rendered empty (they gated on a
