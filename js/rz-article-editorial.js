@@ -69,8 +69,58 @@
     document.querySelector('.article-content').classList.add('rz-has-rail');
   }
 
+  /* heading anchor links — hover a section h2 to copy its deep link (v1.50.24) */
+  function buildAnchors(){
+    var body=document.querySelector('.article-body'); if(!body) return;
+    var used={};
+    [].forEach.call(body.querySelectorAll('h2'),function(h,i){
+      if(h.querySelector('.rz-anchor')) return;
+      if(!h.id){
+        var slug=(h.textContent||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,48)||('section-'+i);
+        while(used[slug]||document.getElementById(slug)) slug+='-'+i;
+        h.id=slug;
+      }
+      used[h.id]=1;
+      var a=document.createElement('a');
+      a.className='rz-anchor'; a.href='#'+h.id; a.textContent='#';
+      a.setAttribute('aria-label','Copy link to this section');
+      a.addEventListener('click',function(ev){
+        ev.preventDefault();
+        var url=location.origin+location.pathname+'#'+h.id;
+        try{ history.replaceState(null,'','#'+h.id); }catch(e){}
+        var done=function(){ a.textContent='✓'; a.classList.add('rz-copied');
+          setTimeout(function(){ a.textContent='#'; a.classList.remove('rz-copied'); },1200); };
+        if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,done);
+        else done();
+      });
+      h.appendChild(a);
+    });
+  }
+
+  /* live "~N min left" chip in the rail head (v1.50.24) */
+  function buildMinLeft(){
+    var head=document.querySelector('.article-rail-head'); if(!head) return null;
+    var body=document.querySelector('.article-body'); if(!body) return null;
+    /* prose-only word count (p/li/blockquote/h2-h4) — body.textContent would
+       also count embedded calculator/widget text and badly over-estimate */
+    var words=0;
+    [].forEach.call(body.querySelectorAll('p,li,blockquote,h2,h3,h4'),function(el){
+      words+=(el.textContent||'').split(/\s+/).length;
+    });
+    var total=Math.max(1,Math.round(words/220));
+    var chip=document.createElement('span'); chip.className='rz-minleft';
+    head.appendChild(chip);
+    return function(progress){
+      var left=Math.ceil(total*(1-progress));
+      chip.textContent=left<=0?'done':('≈'+left+' min left');
+    };
+  }
+
   function init(){
     try{ buildRail(); }catch(e){}
+    try{ buildAnchors(); }catch(e){}
+    var minLeft=null;
+    try{ minLeft=buildMinLeft(); }catch(e){}
     /* read-progress bar */
     var bar=document.createElement('div');
     bar.className='rz-read-prog';
@@ -80,7 +130,9 @@
       var doc=document.documentElement,bd=document.body;
       var st=window.pageYOffset||doc.scrollTop||bd.scrollTop||0;
       var max=(doc.scrollHeight||bd.scrollHeight)-window.innerHeight;
-      bar.style.width=(max>0?Math.min(st/max*100,100):0)+'%';
+      var p=max>0?Math.min(st/max,1):0;
+      bar.style.width=(p*100)+'%';
+      if(minLeft) minLeft(p);
     }
     window.addEventListener('scroll',onScroll,{passive:true});
     onScroll();

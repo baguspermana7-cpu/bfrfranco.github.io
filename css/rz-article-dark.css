@@ -430,6 +430,25 @@ html[data-rz-register="editorial"] .article-body > h2:first-child{
   border-top: 0; padding-top: 0;
 }
 
+/* ---- READING POLISH (v1.50.24) ---- */
+/* exactly ONE read-progress bar: the editorial runtime injects .rz-read-prog,
+   so the older per-page inline bar is retired wherever the register is active */
+html[data-rz-register="editorial"] .scroll-progress-container{ display:none !important; }
+/* heading anchor affordance — hover a section title to copy its deep link */
+html[data-rz-register="editorial"] .article-body h2 .rz-anchor{
+  opacity:0; margin-left:.45rem; font-size:.68em; font-weight:400;
+  text-decoration:none; color:var(--rz-art-muted, #7E8590);
+  transition:opacity .15s; vertical-align:middle;
+}
+html[data-rz-register="editorial"] .article-body h2:hover .rz-anchor,
+html[data-rz-register="editorial"] .article-body h2 .rz-anchor:focus{ opacity:1; }
+html[data-rz-register="editorial"] .rz-anchor.rz-copied{ color:#0a8a5a !important; opacity:1 !important; }
+/* live "≈N min left" chip in the related-rail head */
+html[data-rz-register="editorial"] .rz-minleft{
+  float:right; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.62rem;
+  letter-spacing:.08em; color:var(--rz-art-muted, #7E8590); text-transform:none;
+}
+
 /* ---- RELATED RAIL (W-D) — compact, sticky, hairline. Built by
    rz-article-editorial.js from the bottom "Continue Reading" cards. ---- */
 html[data-rz-register="editorial"] .article-rail{

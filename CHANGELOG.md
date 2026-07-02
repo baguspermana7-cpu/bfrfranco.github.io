@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.50.24 — 2026-06-28 (Reading micro-polish pack)
+
+### Fixed
+- **Editorial articles ran TWO read-progress bars** (an older per-page inline `#scrollProgress` + the editorial
+  runtime's `.rz-read-prog`). The inline bar is now retired wherever the editorial register is active (one CSS
+  rule in `css/rz-article-dark.css`) — exactly one bar remains.
+- **View Transitions coverage**: the `@view-transition` cross-page fade/slide block existed only in `styles.css`
+  — mirrored into `styles-index.css` per the 2-stylesheet rule, so the homepage participates too.
+
+### Added
+- **Heading anchor links** — hover any article `h2` for a `#` affordance; click copies the deep link
+  (clipboard + ✓ confirmation) and sets the URL hash. Auto-slugs ids where missing. (`js/rz-article-editorial.js`)
+- **Live "≈N min left" chip** in the related-rail head — prose-only word count (excludes embedded calculator/
+  widget text) ÷ 220 wpm, counts down as you scroll.
+- **Non-blocking editorial fonts** — the Fraunces/Plex Google-Fonts stylesheet now loads async
+  (`media="print" onload`) with a `<noscript>` fallback on 68 pages; system-font fallback shows during load
+  (display=swap behavior), removing a render-blocking request.
+- Note: the article TOC was found already present on every article (33 inline copies with scrollspy) — the
+  planned shared-TOC extraction was skipped as pure churn risk with no user-visible gain.
+
 ## v1.50.23 — 2026-06-28 (Command palette — and fixing the DEAD search on 10 pages)
 
 ### Fixed
