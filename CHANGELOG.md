@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.50.23 — 2026-06-28 (Command palette — and fixing the DEAD search on 10 pages)
+
+### Fixed
+- **Search was completely dead on 9 pages** (FF-2, FF-3, articles 20–25, 27): the navbar search button +
+  "Ctrl+K" tooltip + modal markup rendered, but zero JS was wired — clicking/typing did nothing. And
+  **article-26** ran a degraded inline search that filtered a non-existent `tags` field (the index has
+  `keywords`), so keyword search silently never matched. All 10 now run the shared module below; article-26's
+  broken inline block removed.
+
+### Added
+- **`js/rz-command-palette.js`** — the shared site search + command palette (standard going forward, see
+  `UI_FEATURES_STANDARD.md`). Ports the canonical Fuse.js modal (lazy CDN, `search-index.json`, recents, category
+  chips, match highlighting, hover preview, Ctrl/Cmd+K + arrows + Enter + Esc) and adds: a **"/" shortcut**
+  (outside inputs), a **Commands group** (theme toggle + quick navigation to Home / Articles / DC Solutions /
+  Glossary / Insights) shown when the query is empty and substring-matched while typing, and self-injecting
+  modal markup so it works on any page. Guarded by `window.__rzPalette`; the 29 pages with a working inline copy
+  are untouched this batch (migrate opportunistically).
+- Verified by real keyboard interaction over HTTP: Ctrl+K opens, "fire" → 8 results, Esc closes, "/" reopens,
+  theme command toggles; article-26 + FF-2 same; index.html inline search regression-free.
+
 ## v1.50.22 — 2026-06-28 (Finance Terminal B-006 — keyless commodity data + candlestick chart)
 
 **Fixed / Changed** — the Commodities tab rendered empty KPIs/table and a flat line

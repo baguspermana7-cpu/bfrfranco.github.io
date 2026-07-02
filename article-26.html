@@ -87,6 +87,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.19">
     <script src="js/rz-article-editorial.js?v=1.50.19" defer></script>
+    <script src="js/rz-command-palette.js?v=1.50.23" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -2259,56 +2260,7 @@ function copyLink() {
 })();
 </script>
 
-<!-- Search -->
-<script>
-(function() {
-    var searchInput = document.getElementById('searchInput');
-    var searchResults = document.getElementById('searchResults');
-    if (!searchInput || !searchResults) return;
-    var searchIndex = null;
-    var debounceTimer;
-
-    function loadIndex(cb) {
-        if (searchIndex) { cb(); return; }
-        fetch('search-index.json')
-            .then(function(r) { return r.json(); })
-            .then(function(data) { searchIndex = data; cb(); })
-            .catch(function() { searchIndex = []; });
-    }
-
-    function doSearch(q) {
-        if (!q || q.length < 2) { searchResults.style.display = 'none'; return; }
-        var ql = q.toLowerCase();
-        var matches = searchIndex.filter(function(item) {
-            return (item.title && item.title.toLowerCase().indexOf(ql) > -1) ||
-                   (item.tags && item.tags.some(function(t) { return t.toLowerCase().indexOf(ql) > -1; })) ||
-                   (item.description && item.description.toLowerCase().indexOf(ql) > -1);
-        }).slice(0, 6);
-
-        if (!matches.length) { searchResults.style.display = 'none'; return; }
-        searchResults.innerHTML = matches.map(function(m) {
-            return '<a class="search-result-item" href="' + m.url + '">' +
-                '<span class="search-result-title">' + m.title + '</span>' +
-                (m.description ? '<span class="search-result-desc">' + m.description.substring(0, 80) + '&hellip;</span>' : '') +
-                '</a>';
-        }).join('');
-        searchResults.style.display = 'block';
-    }
-
-    searchInput.addEventListener('input', function() {
-        var q = searchInput.value.trim();
-        clearTimeout(debounceTimer);
-        if (q.length < 2) { searchResults.style.display = 'none'; return; }
-        debounceTimer = setTimeout(function() { loadIndex(function() { doSearch(q); }); }, 200);
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!searchResults.contains(e.target) && e.target !== searchInput) {
-            searchResults.style.display = 'none';
-        }
-    });
-})();
-</script>
+<!-- Search: shared js/rz-command-palette.js -->
 
 <!-- PFAS Calculator IIFE -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

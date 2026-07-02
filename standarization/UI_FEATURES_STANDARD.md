@@ -1830,3 +1830,21 @@ See memory `feedback_index_hover_blink_rootcause.md`. Two index-only bugs (style
 2. **Card "blinks/disappears" on hover** = the global `.<card>:hover { animation: none !important }` rule toggled the entrance keyframes (`swingIn` on `.oe-card`, `bentoRise` on `.bento-card`) that stay bound to the cards, so every mouse-LEAVE re-applied the entrance and **replayed it from opacity:0**. Multiple reveal observers (`cascadeIO`, inline IOs) also kept re-adding `.visible`. **Fixing one observer or only the card transform does NOT fix it** (why a prior attempt failed). The fix needs all three: (a) `observer.unobserve` after first reveal; (b) an **observer-independent, init-time** `animationend` freeze — `querySelectorAll('.bento-row .bento-card, .oe-card')` → on each card's own `animationend` (guard `ev.target !== card` against child bubbling) set inline `animation:none` (beats the non-`!important` `.visible` rule, so it can never replay); (c) remove `animation:none` from the global `:hover` rule (keep `transform:none`).
 
 **Verification discipline** (owner: "test the hover, don't just claim"): instrument an `animationstart` listener on the cards, **reveal in place → wait for freeze → hover/leave without scrolling**, assert 0 `animationstart`. Pitfall: `scrollIntoView` triggers a legit first-reveal that pollutes the count.
+
+
+## Command palette / site search (v1.50.23)
+
+Shared module **`js/rz-command-palette.js`** is the standard search+command implementation.
+- Self-contained: injects the `.search-overlay/.search-modal/.search-preview` markup if the page lacks it
+  (styles = the `.search-*` selectors, present in BOTH `styles.css` and `styles-index.css`).
+- Bindings: `#navSearchBtn` click, **Ctrl/Cmd+K**, **"/"** (outside inputs), Esc, ArrowUp/Down + Enter.
+- Fuse.js (lazy CDN pin `fuse.js@7.0.0`) over `search-index.json`; recents (localStorage `rz-search-recent`),
+  category chips, match highlighting, hover preview.
+- **Commands group**: theme toggle + quick navigation (Home / All articles / DC Solutions / Glossary / Insights),
+  shown when the query is empty and substring-matched while typing.
+- Guard: `window.__rzPalette` — pages still carrying a working inline Fuse copy must NOT load this file
+  (double Ctrl+K handlers cancel each other). New pages: include the shared module, do NOT copy the inline script.
+- Rollout state: shared module live on FF-2/FF-3 + articles 20–27 (previously DEAD search) and article-26
+  (previously a degraded `tags`-field filter). 29 older pages (index/articles/articles 1–19/geopolitics/FF-1/
+  insights/datacenter-solutions) still run the inline copy — migrate opportunistically by deleting the inline
+  search block and adding the module.
