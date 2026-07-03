@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v1.50.29 — 2026-07-03 (Fire calculator — production hardening: input validation + CSV export)
+
+**Added / Changed** — same production-readiness pass as v1.50.28, now on
+`fire-calculator.html` (Program Phase 3 — calculator-suite consistency).
+
+- **Input validation + error states.** Numeric inputs (room volume/area/temp, battery
+  energy) are validated against their min/max before the engine runs; the design
+  concentration stays **optional** (blank = default Class-A). Invalid fields get
+  `.invalid` + `aria-invalid` and a clear inline summary ("Room volume is required",
+  "Design concentration must be 1–60"); results show "Awaiting valid inputs" instead of
+  `NaN`.
+- **CSV export.** New "Export CSV" button downloads all inputs plus the computed KPIs
+  (agent quantity, design concentration, occupant-safety margin, GWP/residual-O₂,
+  detectors, discharge time, and the Li-ion runaway/off-gas panel when present) —
+  in-browser, no server transmission.
+- Verified headless: valid → 9 KPIs + 9 CSV rows; cleared field + out-of-range → summary
+  + marking; blank optional concentration → no error; 0 JS errors; audits clean.
+
+This completes the production-readiness hardening across the site's two bespoke
+engine-backed calculators (CDU + Fire). The Finance-Terminal gateway (Phase 1) is built
++ tested and awaits the owner's one-time Cloudflare deploy (`cf-worker/DEPLOY.md`).
+
+---
+
 ## v1.50.28 — 2026-07-03 (CDU calculator — production hardening: input validation + CSV export)
 
 **Added / Changed** — production-readiness pass on `cdu-calculator.html` (Program Phase 2).

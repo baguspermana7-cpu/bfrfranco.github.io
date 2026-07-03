@@ -69,6 +69,13 @@
         .input-field, select.input-field { width:100%; padding:8px 10px; border:1px solid var(--fc-border); border-radius:8px; background:var(--fc-inset); color:var(--fc-text); font-size:.9rem; font-family:'JetBrains Mono',monospace; }
         .input-field:focus { outline:2px solid var(--fc-primary); outline-offset:1px; border-color:var(--fc-primary); }
         [data-theme="dark"] select.input-field option { background:#1e293b; color:#f1f5f9; }
+        /* production hardening: input validation error states */
+        .input-field.invalid { border-color:#ef4444; background:rgba(239,68,68,.06); }
+        .cc-csv { font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 12px; border-radius:7px; border:1px solid var(--fc-border); background:transparent; color:var(--fc-muted); cursor:pointer; }
+        .cc-csv:hover { color:var(--fc-text); border-color:var(--fc-muted); }
+        .fc-validation { margin:0 0 .75rem; padding:8px 12px; border:1px solid #ef4444; border-radius:8px; background:rgba(239,68,68,.08); color:#b91c1c; font-size:.78rem; line-height:1.5; }
+        .fc-validation b { font-weight:700; }
+        [data-theme="dark"] .fc-validation { color:#fca5a5; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.5); }
         .tip { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:auto; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35); border-radius:50%; font-size:10px; color:var(--fc-primary); cursor:help; position:relative; }
         .tip[tabindex] { cursor:help; }
         .tip .tipbox { display:none; position:absolute; bottom:130%; right:0; width:248px; background:#0b1220; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; }
@@ -154,6 +161,7 @@
             <button class="preset-btn" data-preset="small">Comms room 50 m³</button>
             <button class="preset-btn" data-preset="battery">Battery room + NMC BBU</button>
             <button class="fc-reset" id="fcReset">↺ Reset</button>
+            <button class="cc-csv" id="fcCsv"><i class="fas fa-file-csv"></i> Export CSV</button>
         </div>
 
         <div class="fc-panel">
@@ -198,6 +206,7 @@
 
         <div>
             <div class="fc-results-head"><h2>Fire-protection results</h2><span class="vtag" id="fcEngTag">engine —</span></div>
+            <div class="fc-validation" id="fcValidation" role="alert" aria-live="polite" hidden></div>
             <div class="fc-kpis" id="fcKpis"></div>
             <div class="fc-note" style="margin-top:1rem;">
                 <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated fire engine (<code>js/fire-engine.js</code>, 31/31 tests) from your inputs. Clean-agent mass uses the NFPA&nbsp;2001 equation W&nbsp;=&nbsp;(V/s)·(C/(100−C)); inert agents use ln(100/(100−C)). A green rail = within band, amber = watch, red = out of band / hazard. <b>Occupant safety:</b> the design concentration must stay ≤ the agent NOAEL. <b>Li-ion:</b> the off-gas volume from a battery in thermal runaway vastly exceeds any room's flammable limit — so early H₂/CO off-gas detection (UL 9540A / NFPA 855) + ventilation is the primary mitigation, ahead of suppression. PG-class / cost values are illustrative. Not a substitute for a fire-protection engineer's stamped design.
@@ -236,7 +245,37 @@
         };
         function $(id){ return document.getElementById(id); }
         function val(id){ var el=$(id); if(!el) return null; return el.tagName==='SELECT'? el.value : (el.value===''?'':parseFloat(el.value)); }
+
+        // Production hardening: validate numeric inputs against their min/max; inConc is
+        // optional (blank = default Class-A). Never feed NaN to the engine.
+        var NUM_FIELDS = { inVol:'Room volume', inArea:'Room area', inTemp:'Room temp', inKwh:'Battery energy (kWh)' };
+        function validateInputs(){
+            var errors=[];
+            function check(id, optional){
+                var el=$(id); if(!el) return;
+                el.classList.remove('invalid'); el.removeAttribute('aria-invalid');
+                var raw=(el.value||'').trim();
+                if(raw==='' && optional) return;
+                var v=parseFloat(raw);
+                var min=el.hasAttribute('min')?parseFloat(el.getAttribute('min')):-Infinity;
+                var max=el.hasAttribute('max')?parseFloat(el.getAttribute('max')):Infinity;
+                var label=NUM_FIELDS[id]|| (id==='inConc'?'Design concentration':id);
+                if(raw===''||!isFinite(v)){ errors.push({id:id,msg:label+' is required'}); el.classList.add('invalid'); el.setAttribute('aria-invalid','true'); }
+                else if(v<min||v>max){ errors.push({id:id,msg:label+' must be '+min+'–'+max}); el.classList.add('invalid'); el.setAttribute('aria-invalid','true'); }
+            }
+            Object.keys(NUM_FIELDS).forEach(function(id){ check(id, false); });
+            check('inConc', true);
+            return { ok: errors.length===0, errors: errors };
+        }
+        function showValidation(errors){
+            var box=$('fcValidation'); if(!box) return;
+            box.innerHTML='<b>Check '+errors.length+' input'+(errors.length>1?'s':'')+':</b> '+errors.map(function(e){return e.msg;}).join(' · ');
+            box.hidden=false;
+        }
+        function hideValidation(){ var box=$('fcValidation'); if(box){ box.hidden=true; box.innerHTML=''; } }
+        var __fcRows=[];
         function kpiCard(label, value, unit, sub, state){
+            try{ __fcRows.push({ label:label, value:String(value), unit:unit||'', note:sub||'' }); }catch(e){}
             var cls = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'ok');
             var chip = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'derived');
             var clabel = state==='alarm' ? 'Hazard' : (state==='warn' ? 'Watch' : 'Derived');
@@ -247,6 +286,14 @@
         function compute(){
             if(!window.FIRE_ENGINE || !window.FIRE_MODEL){ return; }
             var E=window.FIRE_ENGINE, M=window.FIRE_MODEL;
+            var vres = validateInputs();
+            if(!vres.ok){
+                showValidation(vres.errors);
+                $('fcKpis').innerHTML = '<div class="kpi warn" style="grid-column:1/-1"><div class="kpi-label">Awaiting valid inputs</div><div class="kpi-sub">Correct the highlighted field'+(vres.errors.length>1?'s':'')+' above to compute.</div></div>';
+                return;
+            }
+            hideValidation();
+            __fcRows = [];
             var vol=val('inVol'), area=val('inArea'), temp=val('inTemp'), agent=val('inAgent'),
                 conc=val('inConc'), chem=val('inChem'), kwh=val('inKwh');
             if(!(vol>0)){ return; }
@@ -285,6 +332,24 @@
             }
             $('fcKpis').innerHTML = html;
             $('fcEngTag').textContent = 'engine v'+E.version+' · '+a.name;
+            window.__fcKpis = __fcRows.slice();
+        }
+        function csvEscape(s){ s=String(s==null?'':s); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; }
+        function downloadCSV(){
+            var k=window.__fcKpis;
+            if(!k||!k.length){ compute(); k=window.__fcKpis; if(!k||!k.length) return; }
+            var lines=['# Fire-protection sizing — resistancezero.com (validated engine, educational reference)'];
+            lines.push('# Generated '+new Date().toISOString()); lines.push('');
+            lines.push('Section,Field,Value,Unit,Note');
+            ['inVol','inArea','inTemp','inAgent','inConc','inChem','inKwh'].forEach(function(id){
+                var el=$(id); if(el){ var lbl=NUM_FIELDS[id]||id; lines.push(['Input',csvEscape(lbl),csvEscape(el.value||'(default)'),'',''].join(',')); }
+            });
+            k.forEach(function(r){ lines.push(['Result',csvEscape(r.label),csvEscape(r.value),csvEscape(r.unit),csvEscape(r.note)].join(',')); });
+            var blob=new Blob([lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+            var url=URL.createObjectURL(blob); var a=document.createElement('a');
+            a.href=url; a.download='fire-sizing-'+new Date().toISOString().slice(0,10)+'.csv';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
         }
         function applyPreset(p){
             var cfg = PRESETS[p]; if(!cfg) return;
@@ -303,6 +368,7 @@
             });
             document.querySelectorAll('.preset-btn').forEach(function(b){ b.addEventListener('click', function(){ applyPreset(b.getAttribute('data-preset')); }); });
             $('fcReset').addEventListener('click', reset);
+            var csvBtn=$('fcCsv'); if(csvBtn){ csvBtn.addEventListener('click', downloadCSV); }
             compute();
         }
         if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
