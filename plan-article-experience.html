@@ -35,7 +35,7 @@
 </style>
 </head>
 <body>
-<div class="topbar"><a href="planb.html">← Hub</a><span class="pid">PLAN 05 · ARTICLE EXPERIENCE · Phase 1 shipped v1.50.1</span></div>
+<div class="topbar"><a href="planb.html">← Hub</a><span class="pid">PLAN 05 · ARTICLE EXPERIENCE · v1.50.1 → v1.50.27 (keren program shipped)</span></div>
 <div class="wrap">
   <h1>Article Experience Overhaul</h1>
   <p class="dek">Seven defects surfaced in a live review of the article pages — alignment, related navigation,
@@ -101,6 +101,26 @@
     the shared CSS/JS. The bespoke remainder rolls in batches: calculator-tooltip compliance on every other
     in-article calculator; a free inline sourced chart for each remaining text-heavy article; per-article slop the
     shared overrides can't reach. Each batch re-runs the gate suite + <code>uiux-reviewer</code>.</p>
+  <h2><span class="k">08</span>"Jauh lebih keren" program — SHIPPED v1.50.23–.27</h2>
+  <p>Four ambitious upgrades built on the article system, each shipped + gated independently (auto-mode):</p>
+  <ul>
+    <li><b>Command palette</b> (<code>js/rz-command-palette.js</code>) — Cmd+K + <code>/</code>, Fuse search,
+      recents, Commands group (theme, quick-nav). Fixed search that was <b>completely dead on 10 pages</b>;
+      v1.50.27 removed all 29 inline copies — <b>one implementation site-wide</b>.</li>
+    <li><b>Reading polish</b> — single progress bar, heading anchor copy-links, live "&#8776;N min left" chip,
+      async editorial fonts (68pp), view-transitions on index.</li>
+    <li><b>LIVING DIAGRAMS</b> (<code>js/rz-article-diagram.js</code>) — the cockpit dash-flow + ticker + fault
+      injection as an in-article widget. Reference pair: article-13 (2N SLD — kill UPS-A, rack never notices)
+      + article-9 (warm-water loop — Jakarta 35&#176;C collapses the dry-cooler approach). uiux-reviewer
+      APPROVED; provenance gate covers <code>rz-diagram-cfg</code>.</li>
+    <li><b>Scrollytelling</b> (<code>js/rz-scrolly.js</code>) — pinned canvas + step cards; flagship article-23:
+      the Colossus build, empty factory &#8594; turbines+BESS (MW&#8594;150) &#8594; 100,000 GPUs &#8594;
+      DAY 122 LIVE. Reverses cleanly; reduced-motion safe.</li>
+  </ul>
+  <p>Recipes live in <code>standarization/ARTICLE_DATAVIZ_STANDARD.md</code> (living diagrams + scrollytelling)
+    and <code>standarization/UI_FEATURES_STANDARD.md</code> (command palette). Both puppeteer gates now relaunch
+    Chromium on mid-run crashes.</p>
+
 </div>
 </body>
 </html>
