@@ -355,6 +355,22 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 
 ---
 
+## Shared article/site JS modules — REUSE, never re-implement
+
+These shared modules are the ONLY implementation of their feature. Do NOT hand-roll a per-page copy —
+that is exactly how the site ended up with 3 divergent inline search implementations (2 of them broken,
+unified in v1.50.23–.27). When editing any of these, **cache-bust the `?v=` on every page that loads it**.
+
+| Module | Feature | Notes |
+|---|---|---|
+| `js/rz-command-palette.js` | Site search + command palette (Ctrl/Cmd+K, "/", Fuse.js over search-index.json, Commands group) | Self-injects modal markup if absent; guard `window.__rzPalette`. NEVER re-add an inline search block. |
+| `js/rz-article-editorial.js` | Editorial runtime: read-progress, related rail, entrance stagger, heading anchors, "≈N min left" chip | Activates only under `data-rz-register="editorial"`. |
+| `js/rz-article-chart.js` | Interactive sourced charts (`[data-rz-chart]` + `rz-chart-cfg` JSON) | Provenance gated (`audit-article-charts.mjs`). See ARTICLE_DATAVIZ_STANDARD.md. |
+| `js/rz-article-diagram.js` | Living diagrams — animated SVG schematics + ticker + fault scenarios (`[data-rz-diagram]`) | Same provenance gate; conduit stroke idiom (4px base + 2px dash). |
+| `js/rz-scrolly.js` | Scrollytelling — pinned canvas + step cards (`[data-rz-scrolly]`) | Flagship: article-23. Recipe in ARTICLE_DATAVIZ_STANDARD.md. |
+| `js/rz-mobile-nav.js` | Hamburger nav (mandatory on every page) | See responsive section above. |
+| `js/rz-calc-utils.js` | Calculator input-validation + CSV export (`window.RZCalc`) | Rollout tracker: standarization/CALC_HARDENING_ROLLOUT.md. |
+
 ## Standardisation docs
 
 Reference these BEFORE adding new patterns. Update them WHEN shipping a new pattern.
