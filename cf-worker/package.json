@@ -1,0 +1,20 @@
+{
+  "name": "rz-finance-gateway",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cloudflare Worker gateway for resistancezero.com Finance Terminal — server-side Finnhub key, KV cache, Yahoo/CoinGecko/Frankfurter adapters + server-side technical analysis. Phase 1 of the Finance-Terminal R-001..R-012 initiative.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local --port 8787",
+    "test": "node test/gateway.test.mjs",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "kv:create:quote": "wrangler kv namespace create rz_ft_quote_cache",
+    "kv:create:meta": "wrangler kv namespace create rz_ft_meta_cache",
+    "secret:finnhub": "wrangler secret put FINNHUB_TOKEN",
+    "secret:webhook": "wrangler secret put FINNHUB_WEBHOOK_SECRET"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

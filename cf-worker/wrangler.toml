@@ -1,0 +1,40 @@
+name = "rz-finance-gateway"
+main = "src/index.js"
+compatibility_date = "2026-05-01"
+workers_dev = true
+
+# Account + zone IDs are pulled from CF login (wrangler login) — no IDs committed.
+
+# KV namespaces. Bind names must be stable; IDs are filled after
+# `wrangler kv:namespace create rz_ft_quote_cache` etc.
+# Leaving placeholder IDs so wrangler refuses to deploy until set.
+[[kv_namespaces]]
+binding = "QUOTE_CACHE"
+id = "PLACEHOLDER_QUOTE_KV_ID"
+preview_id = "PLACEHOLDER_QUOTE_KV_PREVIEW_ID"
+
+[[kv_namespaces]]
+binding = "META_CACHE"
+id = "PLACEHOLDER_META_KV_ID"
+preview_id = "PLACEHOLDER_META_KV_PREVIEW_ID"
+
+# Cron — warm caches every 15 minutes (cheap; well under free-tier 100k req/day).
+# Disabled by default until Phase 2; uncomment to enable.
+# [triggers]
+# crons = ["*/15 * * * *"]
+
+[vars]
+# Public, non-secret config. Secrets go via `wrangler secret put`:
+#   - FINNHUB_TOKEN
+#   - FINNHUB_WEBHOOK_SECRET
+#   - TELEGRAM_BOT_TOKEN          (Phase 2, optional)
+#   - TELEGRAM_DEFAULT_CHAT_ID    (Phase 2, optional)
+#   - RESEND_API_KEY              (Phase 2, optional, alert email)
+ALLOWED_ORIGINS = "https://resistancezero.com,http://127.0.0.1:8081,http://localhost:8081,http://127.0.0.1:8097,http://localhost:8097"
+QUOTE_TTL_SEC = "30"
+PROFILE_TTL_SEC = "86400"
+CANDLE_TTL_SEC = "300"
+FOREX_TTL_SEC = "300"
+NEWS_TTL_SEC = "120"
+CALENDAR_TTL_SEC = "600"
+ECONOMIC_TTL_SEC = "1800"
