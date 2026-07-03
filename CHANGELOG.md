@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v1.50.32 — 2026-07-03 (Homepage portfolio — reference-matched colored card treatment)
+
+**Changed** — reworked the homepage portfolio (bento) section to match the owner's
+reference across day / dark / rainbow, closing the "only partial elements checked" gap.
+
+- **Per-card colored glow.** Each experience card now has a pronounced gradient glow
+  rising from its bottom edge in its own accent — ZTE blue, Astra green, Cargill amber,
+  AWS violet, Pure Data magenta (recolored AWS orange→violet + Pure Data purple→magenta
+  to match the reference). The bottom feature cards get the same treatment (governance
+  teal, SAP green, Explore amber). Previously the accent was a faint hover-only corner
+  circle (~0.10 alpha); now it's an always-visible bottom radial with content stacked
+  above it (`.bento-exp-card > * { z-index:1 }`).
+- **Intensity scales by mode** — day subtle pastel (opacity .34), dark medium (.66),
+  **rainbow full-strength (1.0)** — so rainbow reads as the vibrant reference while day
+  stays clean.
+- **Download Resume CTA** → amber-gold gradient (`#E8B563→#f59e0b`, a brand accent),
+  matching the reference (was emerald).
+- Verified visually against the reference in all three modes (screenshots), 0 console
+  errors; gates CLEAN (dark both modes, responsive, version-stamp, js-syntax, script-tags).
+  Index-only CSS in `styles-index.css` (re-minified, cache-bust bumped).
+
+---
+
 ## v1.50.31 — 2026-07-03 (Calc-hardening rollout complete — all financial calculators)
 
 **Changed** — rolled the shared `RZCalc` hardening (input validation with error states

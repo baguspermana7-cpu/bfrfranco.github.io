@@ -1124,19 +1124,45 @@ a {
     overflow: hidden;
     border-radius: 16px;
 }
+/* Per-card colored glow rising from the bottom edge (reference-matched). Always
+   visible; intensity scales by theme (day subtle → dark medium → rainbow strong). */
 .bento-exp-card::before {
     content: '';
     position: absolute;
-    top: 0; right: 0;
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: var(--bexp-accent, rgba(74,144,184,0.06));
-    filter: blur(24px);
+    inset: 0;
+    border-radius: inherit;
+    background:
+        radial-gradient(135% 78% at 50% 122%, var(--bexp-accent, rgba(74,144,184,0.5)), transparent 60%),
+        radial-gradient(90% 40% at 12% 108%, var(--bexp-accent, rgba(74,144,184,0.5)), transparent 66%);
     pointer-events: none;
-    opacity: 0;
+    opacity: 0.42;
     transition: opacity 0.4s ease;
 }
-.bento-exp-card:hover::before { opacity: 1; }
+.bento-exp-card:hover::before { opacity: 0.62; }
+/* keep card content above the glow layer */
+.bento-exp-card > * { position: relative; z-index: 1; }
+
+/* Bottom feature cards — same bottom-rising colored glow, per-card accent
+   (governance = teal, SAP = green, Explore = amber), reference-matched. */
+.bento-governance, .bento-sap, .bento-more { position: relative; overflow: hidden; }
+.bento-governance > *, .bento-sap > *, .bento-more > * { position: relative; z-index: 1; }
+.bento-governance::before, .bento-sap::before, .bento-more::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background:
+        radial-gradient(130% 82% at 50% 122%, var(--bfeat-accent, rgba(45,212,191,0.5)), transparent 60%),
+        radial-gradient(80% 45% at 16% 110%, var(--bfeat-accent, rgba(45,212,191,0.5)), transparent 66%);
+    opacity: 0.34; transition: opacity 0.4s ease;
+}
+.bento-governance { --bfeat-accent: rgba(45,212,191,0.52); }
+.bento-sap        { --bfeat-accent: rgba(52,211,153,0.44); }
+.bento-more       { --bfeat-accent: rgba(245,158,11,0.48); }
+.bento-governance:hover::before, .bento-sap:hover::before, .bento-more:hover::before { opacity: 0.5; }
+[data-theme="dark"] .bento-governance::before,
+[data-theme="dark"] .bento-sap::before,
+[data-theme="dark"] .bento-more::before { opacity: 0.62; }
+html.rz-rainbow .bento-governance::before,
+html.rz-rainbow .bento-sap::before,
+html.rz-rainbow .bento-more::before { opacity: 0.96; }
 
 .bento-exp-card:hover {
     border-color: rgba(74, 144, 184, 0.45);
@@ -1230,8 +1256,8 @@ a {
 .btn-bento-primary {
     display: inline-flex;
     align-items: center;
-    background: var(--accent-emerald);
-    color: #0f172a;
+    background: linear-gradient(135deg, #E8B563 0%, #f59e0b 55%, #d9930b 100%);
+    color: #1a1205;
     padding: 0.625rem 1.5rem;
     font-weight: 700;
     font-size: 0.625rem;
@@ -6394,8 +6420,12 @@ section {
   transition:border-color .3s ease,box-shadow .3s ease;
 }
 [data-theme="dark"] .bento-identity{background:linear-gradient(160deg,#172033,#121826 62%);}
-[data-theme="dark"] .bento-exp-card::before{opacity:.5;}
-[data-theme="dark"] .bento-exp-card:hover::before{opacity:1;}
+[data-theme="dark"] .bento-exp-card::before{opacity:.66;}
+[data-theme="dark"] .bento-exp-card:hover::before{opacity:.85;}
+/* Rainbow mode — full-strength colored card glows (matches the reference) */
+html.rz-rainbow .bento-exp-card::before{opacity:1;}
+html.rz-rainbow .bento-exp-card:hover::before{opacity:1;}
+html.rz-rainbow .bento-exp-card{border-color:rgba(148,163,255,.22);}
 /* light surfaces */
 .bento-card{
   background:linear-gradient(180deg,#ffffff,#f7f9fc);
@@ -6404,8 +6434,8 @@ section {
   transition:border-color .3s ease,box-shadow .3s ease;
 }
 .bento-identity{background:linear-gradient(160deg,#ffffff,#f1f7f4 70%);}
-.bento-exp-card::before{opacity:.4;}
-.bento-exp-card:hover::before{opacity:.7;}
+.bento-exp-card::before{opacity:.34;}
+.bento-exp-card:hover::before{opacity:.5;}
 /* staggered reveal on load — theme-agnostic (light + dark); no hover movement */
 @keyframes bentoRise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
 .bento-row .bento-card{animation:bentoRise .6s cubic-bezier(.2,.7,.2,1) backwards;}
