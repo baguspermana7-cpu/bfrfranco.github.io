@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v1.50.26 — 2026-07-03 (Homepage gradient backdrop + index-only Rainbow mode)
+
+**Added** — the homepage (`index.html`) now has a full-page gradient backdrop and a
+third, index-only **Rainbow** theme, per owner reference designs.
+
+- **Gradient backdrop** — a fixed, GPU-composited `.rz-bg-gradient` layer behind all
+  content (no `background-attachment:fixed`, so it never repaints on scroll — safe on
+  low-power tablets). Three tasteful variants driven by the theme:
+  - **Day** — soft pastel radial wash (blue / lavender / peach, 0.10–0.18 alpha).
+  - **Dark** — subtle teal / blue / violet aurora on the near-black body.
+  - **Rainbow** — vibrant multi-hue aurora (violet → blue → teal → magenta → amber),
+    a slow 26s hue-drift (reduced-motion-safe), brightened hero aurora-orbs, and a
+    faint iridescent bento-card edge.
+- **Index-only 3-way theme toggle** (day → dark → rainbow → day) with a dedicated
+  rainbow glyph. Architecture keeps it isolated: Rainbow = `data-theme="dark"` + an
+  additive `html.rz-rainbow` class, so every dark component style still applies and
+  stays readable, and the shared `theme` key stays `light`/`dark` — **the other 66
+  pages are completely unaffected** (they never see Rainbow; an index-only `rzRainbow`
+  localStorage key drives it). A pre-paint FOUC guard applies the theme before first paint.
+- Verified headless: 3-way cycle + rainbow persistence across reloads + rainbow icon;
+  other pages correctly stay dark (not rainbow); 0 console errors; no mobile overflow;
+  dark-coverage CLEAN (both modes); hero-text contrast over the rainbow wash 6.28:1 (AA);
+  uiux-reviewer APPROVED (no blockers). `styles-index.min.css` re-minified + cache-bust bumped.
+
+CSS lives ONLY in `styles-index.css` (index-only feature; 2-stylesheet architecture).
+
+---
+
 ## v1.50.25 — 2026-07-03 (LIVING DIAGRAMS — animated schematics in the reading flow)
 
 ### Added
