@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v1.50.30 — 2026-07-03 (Shared calc-hardening utility + PUE calculator rollout)
+
+**Added** — a reusable production-hardening utility for the engine-backed calculators
+(M-303: one shared engine, not per-page hardcoded), plus its first rollout.
+
+- **`js/rz-calc-utils.js`** (`window.RZCalc`) — self-contained, zero-dependency ES5
+  helper that injects its own theme-aware CSS and provides: `validateNumbers()`
+  (checks numeric inputs vs their `min`/`max`, marks `.rz-invalid` + `aria-invalid`,
+  returns `{ok,errors}`), `showErrors()` (toggles a `.rz-calc-validation` summary),
+  and `downloadCSV()` / `csvEscape()`.
+- **`pue-calculator.html`** now uses it: out-of-range inputs (e.g. IT load beyond
+  50–100000) surface an inline summary + field marking (non-gating — the calc is
+  already defensive with `||default`), and a new **Export CSV** button downloads all
+  inputs + the computed results (PUE, DCiE, total power, cooling load, UPS loss,
+  annual energy/cost, rating). Verified headless: calc renders; out-of-range → summary
+  + `.rz-invalid`; restore → cleared; CSV → 16 rows; 0 console errors.
+- **`standarization/CALC_HARDENING_ROLLOUT.md`** — tracker + integration pattern for the
+  remaining calculators (capex/opex/roi/tco/carbon/cx), so the rollout is consistent.
+
+---
+
 ## v1.50.29 — 2026-07-03 (Fire calculator — production hardening: input validation + CSV export)
 
 **Added / Changed** — same production-readiness pass as v1.50.28, now on

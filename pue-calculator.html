@@ -444,6 +444,7 @@
 
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
@@ -653,8 +654,12 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                 <button class="pue-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
+                <button class="pue-btn-reset" id="btnExportCSV" onclick="exportPueCSV()">
+                    <i class="fas fa-file-csv"></i> Export CSV
+                </button>
             </div>
         </div>
+        <div class="rz-calc-validation" id="pueValidation" role="alert" aria-live="polite" hidden></div>
 
         <!-- Calculator -->
         <section class="calculator-section">
@@ -1200,7 +1205,42 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
     function fmt(n, d) { return n.toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
 
     // Main calculation
+    function exportPueCSV() {
+        if (!window.RZCalc) return;
+        function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
+        function selText(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
+        var rows = [
+            ['Input', 'IT load (kW)', txt('itLoad'), 'kW', ''],
+            ['Input', 'Rack density', selText('rackDensity'), '', ''],
+            ['Input', 'Rack count', txt('rackCount'), '', ''],
+            ['Input', 'Cooling type', selText('coolingType'), '', ''],
+            ['Input', 'Containment', selText('containment'), '', ''],
+            ['Input', 'Climate zone', selText('climateZone'), '', ''],
+            ['Input', 'UPS type', selText('upsType'), '', ''],
+            ['Input', 'Redundancy', selText('redundancy'), '', ''],
+            ['Result', 'PUE', txt('pueValue'), '', ''],
+            ['Result', 'DCiE', txt('dcieValue'), '', ''],
+            ['Result', 'Total power', txt('totalPowerValue'), '', ''],
+            ['Result', 'Cooling load', txt('coolingLoadValue'), '', ''],
+            ['Result', 'UPS loss', txt('upsLossValue'), '', ''],
+            ['Result', 'Annual energy', txt('annualEnergyValue'), '', ''],
+            ['Result', 'Annual cost', txt('annualCostValue'), '', ''],
+            ['Result', 'Efficiency rating', txt('ratingText'), '', '']
+        ];
+        var header = ['# PUE calculation — resistancezero.com (educational reference)',
+            '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
+        RZCalc.downloadCSV('pue-calculation-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
+    }
+
     function calculate() {
+        // Production hardening: non-blocking input feedback (calc is defensive with
+        // defaults, so we flag out-of-range inputs rather than gate the result).
+        if (window.RZCalc) {
+            var _vr = RZCalc.validateNumbers([
+                { id: 'itLoad', label: 'IT load' }
+            ]);
+            RZCalc.showErrors('pueValidation', _vr.errors);
+        }
         const itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
         const rackDensity = parseFloat(document.getElementById('rackDensity').value) || 8;
         const coolingType = document.getElementById('coolingType').value;
