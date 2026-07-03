@@ -37,12 +37,23 @@ for (const f of pages) {
 }
 
 // 2) Render BOTH modes: dark must be dark (no white body/content), light must be light (not stuck dark)
-const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
+const LAUNCH_ARGS = { args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] };
+let browser = await puppeteer.launch(LAUNCH_ARGS);
+// the Chromium process occasionally dies mid-run under resource pressure
+// (ConnectionClosedError on newPage) — relaunch instead of aborting the audit
+async function newPageSafe() {
+  try { return await browser.newPage(); }
+  catch (e) {
+    try { await browser.close(); } catch (e2) {}
+    browser = await puppeteer.launch(LAUNCH_ARGS);
+    return browser.newPage();
+  }
+}
 const renderBroken = [];
 const lightStuck = [];
 const bodyLum = async (pg) => pg.evaluate(() => { const m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g); return m ? Math.round(0.299*+m[0] + 0.587*+m[1] + 0.114*+m[2]) : -1; });
 for (const f of pages) {
-  const pg = await browser.newPage();
+  const pg = await newPageSafe();
   try {
     await pg.goto('file://' + resolve(ROOT, f), { waitUntil: 'domcontentloaded', timeout: 30000 });
     // --- DARK ---

@@ -62,3 +62,27 @@ Add to the ship-audit suite. A chart with a missing/invalid `source` or `basisTa
 ## Reference implementations
 - `article-26.html` — dual-axis line (make-up rate → fluid-loss kg + CO₂e), `data/article-26/worked-model-scenarios.csv`, basis **modelled**.
 - `article-27.html` — bar (aging-workforce cohorts), `data/article-27/workforce-stats.csv` (AFCOM 2024), basis **published**.
+
+
+## Living diagrams (v1.50.25)
+
+Animated schematic widgets for the FREE reading flow — the cockpit visual language (flowing dots on SVG
+pipes/busbars + live values + fault scenarios) packaged as `js/rz-article-diagram.js`.
+
+Markup: `<figure class="rz-diagram" data-rz-diagram>` containing an authored inline SVG + a
+`<script type="application/json" class="rz-diagram-cfg">` config. Inside the SVG:
+- flow segments = `<g data-flow="name">` holding `.dg-pipe-base` (faint solid) + `.dg-pipe` (dashed, animated;
+  `.alt` for the second accent). Engine toggles `.flow/.slow/.off`.
+- live values = `<text data-pv="key">`; instrument groups = `data-inst="key"` (get `.warn/.alarm`).
+Config: `baselines` (`{v, unit, dp, noise, min, max}` per key), `flows` (initial states), `scenarios`
+(`{label, deltas, flows, alarms, msg}` — rendered as instrument buttons with "Normal" first), `title`
+(finding sentence), `source` + `basisTag` (caption + chip, reuses `.rz-chart-src/.rz-chart-chip`).
+Behavior: ~1s ticker (pauses offscreen via IntersectionObserver); `prefers-reduced-motion` disables the dash
+animation (values still tick); theme-aware via the `--dg-*` CSS vars in `css/rz-article-dark.css`.
+
+Provenance: same gate as charts — `tools/audit-article-charts.mjs` validates `rz-diagram-cfg` blocks too
+(source + basisTag mandatory). Values must trace to the article body; anything modelled beyond stated figures
+uses `basisTag: "illustrative"` and says so in the caption.
+
+Reference implementations: `article-13` (2N power SLD — UPS-A failure re-routes flow, rack unaffected) and
+`article-9` (warm-water DLC loop — "Tropical: Jakarta 35°C" collapses the dry-cooler approach; CDU pump failover).

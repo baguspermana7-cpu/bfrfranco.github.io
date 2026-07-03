@@ -21,7 +21,7 @@ const files = readdirSync(ROOT).filter(f => f.endsWith('.html'));
 const problems = [];
 let charts = 0;
 // pull each <script ... class="rz-chart-cfg"> ... </script> JSON block
-const cfgRe = /<script[^>]*class="rz-chart-cfg"[^>]*>([\s\S]*?)<\/script>/g;
+const cfgRe = /<script[^>]*class="rz-(?:chart|diagram)-cfg"[^>]*>([\s\S]*?)<\/script>/g;
 for (const f of files) {
   const src = readFileSync(resolve(ROOT, f), 'utf8');
   let m;
@@ -32,7 +32,8 @@ for (const f of files) {
     catch (e) { problems.push(`${f}: chart config is not valid JSON (${e.message.slice(0, 50)})`); continue; }
     if (!cfg.source || !String(cfg.source).trim()) problems.push(`${f}: chart "${(cfg.title||'').slice(0,40)}" has no source`);
     if (!cfg.basisTag || !VALID_TAGS.includes(String(cfg.basisTag).toLowerCase())) problems.push(`${f}: chart "${(cfg.title||'').slice(0,40)}" has no/invalid basisTag (got "${cfg.basisTag}")`);
-    if (!cfg.series || !cfg.series.length) problems.push(`${f}: chart "${(cfg.title||'').slice(0,40)}" has no series`);
+    if (!cfg.series && !cfg.baselines) problems.push(`${f}: config "${(cfg.title||'').slice(0,40)}" has neither series (chart) nor baselines (diagram)`);
+    if (cfg.series && !cfg.series.length) problems.push(`${f}: chart "${(cfg.title||'').slice(0,40)}" has empty series`);
   }
 }
 

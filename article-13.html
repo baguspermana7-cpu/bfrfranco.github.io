@@ -79,8 +79,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.24">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.25">
     <script src="js/rz-article-editorial.js?v=1.50.24" defer></script>
+    <script src="js/rz-article-diagram.js?v=1.50.25" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
@@ -1488,6 +1489,49 @@
                 <p>
                     AWS has pioneered a <strong>distributed micro-UPS architecture</strong> that represents a significant departure from traditional centralized UPS designs. Rather than using large third-party UPS systems, AWS deploys small battery packs and custom power supplies integrated into every rack.
                 </p>
+<figure class="rz-diagram" data-rz-diagram>
+<svg viewBox="0 0 760 310" role="img" aria-label="Animated single-line diagram: utility to transformer to 2N UPS pair to PDU to GPU rack">
+  <g data-flow="utiltx"><path class="dg-pipe-base" d="M120,155 L165,155"/><path class="dg-pipe alt" d="M120,155 L165,155"/></g>
+  <g data-flow="txA"><path class="dg-pipe-base" d="M255,155 L280,155 L280,75 L305,75"/><path class="dg-pipe alt" d="M255,155 L280,155 L280,75 L305,75"/></g>
+  <g data-flow="txB"><path class="dg-pipe-base" d="M255,155 L280,155 L280,235 L305,235"/><path class="dg-pipe alt" d="M255,155 L280,155 L280,235 L305,235"/></g>
+  <g data-flow="aPdu"><path class="dg-pipe-base" d="M415,75 L445,75 L445,145 L470,145"/><path class="dg-pipe alt" d="M415,75 L445,75 L445,145 L470,145"/></g>
+  <g data-flow="bPdu"><path class="dg-pipe-base" d="M415,235 L445,235 L445,165 L470,165"/><path class="dg-pipe alt" d="M415,235 L445,235 L445,165 L470,165"/></g>
+  <g data-flow="pduRack"><path class="dg-pipe-base" d="M560,155 L615,155"/><path class="dg-pipe alt" d="M560,155 L615,155"/></g>
+  <rect class="dg-box" x="20" y="125" width="100" height="60" rx="6"/>
+  <text class="dg-name" x="70" y="151" text-anchor="middle">UTILITY</text>
+  <text class="dg-label" x="70" y="168" text-anchor="middle">MV feed</text>
+  <rect class="dg-box" x="165" y="125" width="90" height="60" rx="6"/>
+  <text class="dg-name" x="210" y="151" text-anchor="middle">TX</text>
+  <text class="dg-label" x="210" y="168" text-anchor="middle">&#8594; 480 V AC</text>
+  <g data-inst="upsA">
+    <rect class="dg-box" x="305" y="45" width="110" height="60" rx="6"/>
+    <circle class="dg-inst-ring" cx="397" cy="58" r="4.5"/>
+    <text class="dg-name" x="360" y="70" text-anchor="middle">UPS A</text>
+    <text class="dg-pv" data-pv="loadA" x="360" y="90" text-anchor="middle">50 %</text>
+  </g>
+  <g data-inst="upsB">
+    <rect class="dg-box" x="305" y="205" width="110" height="60" rx="6"/>
+    <circle class="dg-inst-ring" cx="397" cy="218" r="4.5"/>
+    <text class="dg-name" x="360" y="230" text-anchor="middle">UPS B</text>
+    <text class="dg-pv" data-pv="loadB" x="360" y="250" text-anchor="middle">50 %</text>
+  </g>
+  <rect class="dg-box" x="470" y="125" width="90" height="60" rx="6"/>
+  <text class="dg-name" x="515" y="151" text-anchor="middle">PDU</text>
+  <text class="dg-label" x="515" y="168" text-anchor="middle">480 V AC</text>
+  <g data-inst="rack">
+    <rect class="dg-box" x="615" y="115" width="125" height="80" rx="6"/>
+    <circle class="dg-inst-ring" cx="722" cy="128" r="4.5"/>
+    <text class="dg-name" x="677" y="142" text-anchor="middle">GPU RACK</text>
+    <text class="dg-label" x="677" y="158" text-anchor="middle">NVL72 &#183; 72 GPUs</text>
+    <text class="dg-pv" data-pv="rackLoad" x="677" y="180" text-anchor="middle">120 kW</text>
+  </g>
+  <text class="dg-label" x="380" y="300" text-anchor="middle">2N architecture &#8212; each UPS can carry the full rack load alone</text>
+</svg>
+<script type="application/json" class="rz-diagram-cfg">
+{"title": "Live: why hyperscalers pay for 2N — kill UPS-A and the rack never notices", "interval": 1000, "baselines": {"loadA": {"v": 50, "unit": "%", "dp": 0, "noise": 1.5, "min": 0, "max": 100}, "loadB": {"v": 50, "unit": "%", "dp": 0, "noise": 1.5, "min": 0, "max": 100}, "rackLoad": {"v": 120, "unit": "kW", "dp": 0, "noise": 2}}, "flows": {"utiltx": "flow", "txA": "flow", "txB": "flow", "aPdu": "flow", "bPdu": "flow", "pduRack": "flow"}, "scenarios": [{"id": "upsafail", "label": "Inject: UPS-A failure", "deltas": {"loadB": 50}, "exact": {"loadA": 0}, "flows": {"txA": "off", "aPdu": "off"}, "alarms": {"upsA": "alarm"}, "msg": "UPS-A offline. 2N redundancy: UPS-B instantly carries 100% of the load — the rack sees zero interruption. This is the failure scenario the article's arc-flash and protection analysis is built around."}], "source": "Illustrative 2N single-line schematic. 480 V AC distribution and NVL72 = 72 GPUs ≈ 120 kW per rack as stated in the article body; load-share values illustrative.", "basisTag": "illustrative"}
+</script>
+</figure>
+
 
                 <div class="architecture-diagram">
                     <div class="architecture-title">AWS Distributed Power Architecture</div>

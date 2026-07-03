@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Index theme (day / dark / rainbow) — applied pre-paint so there is no flash.
+         Rainbow is INDEX-ONLY: it reuses the dark palette (data-theme="dark") plus an
+         additive .rz-rainbow class, so every dark component style still applies and the
+         shared theme system (localStorage 'theme') stays light/dark for all other pages. -->
+    <script>(function(){try{var d=document.documentElement;
+        if(localStorage.getItem('rzRainbow')==='1'){d.setAttribute('data-theme','dark');d.classList.add('rz-rainbow');}
+        else{d.setAttribute('data-theme',localStorage.getItem('theme')||'light');}
+    }catch(e){}})();</script>
     <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -245,13 +253,16 @@
 </style>
 
     <!-- Index-only stylesheet — 83KB vs 121KB full, sync to prevent CLS -->
-    <link rel="stylesheet" href="styles-index.min.css?v=2026-06-27-contact">
+    <link rel="stylesheet" href="styles-index.min.css?v=2026-07-03-rainbow">
 
     <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
 </head>
 <body>
+<!-- Full-page gradient backdrop (day / dark / rainbow). Fixed + composited (no scroll
+     repaint), behind all content. Rainbow variant is the vibrant multi-hue aurora. -->
+<div class="rz-bg-gradient" aria-hidden="true"></div>
     <!-- Search Overlay & Modal -->
     <div class="search-overlay" id="searchOverlay" style="display:none;"></div>
     <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search content" style="display:none;">
@@ -349,7 +360,7 @@
             <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </button>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false" title="Toggle dark/light mode">
+            <button class="theme-toggle" id="themeToggle" aria-label="Switch theme (day / dark / rainbow)" aria-pressed="false" title="Switch theme: day → dark → rainbow">
                 <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
@@ -363,6 +374,12 @@
                     <line x1="21" y1="12" x2="23" y2="12"></line>
                     <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <!-- Rainbow-mode icon (shown only when html.rz-rainbow is active) -->
+                <svg class="rainbow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                    <path d="M3 17a9 9 0 0 1 18 0" stroke="#f43f5e"></path>
+                    <path d="M6 17a6 6 0 0 1 12 0" stroke="#f59e0b"></path>
+                    <path d="M9 17a3 3 0 0 1 6 0" stroke="#22d3ee"></path>
                 </svg>
             </button>
             <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
@@ -1311,6 +1328,32 @@
 
 
     <script src="script.min.js?v=2026-06-27-hover" defer></script>
+    <!-- Index-only 3-way theme controller (day → dark → rainbow). Rebinds the toggle
+         AFTER script.min.js's shared 2-way handler (on window.load) by cloning the
+         button to strip its listener, then cycles the three modes. Rainbow keeps
+         'theme' = dark so every other page is unaffected. -->
+    <script>(function(){
+        var KEY_T='theme', KEY_R='rzRainbow';
+        function metaColor(mode){var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',mode==='light'?'#0066cc':'#0a0a14');}
+        function apply(mode){
+            var d=document.documentElement;
+            try{
+                if(mode==='rainbow'){localStorage.setItem(KEY_R,'1');localStorage.setItem(KEY_T,'dark');d.setAttribute('data-theme','dark');d.classList.add('rz-rainbow');}
+                else{localStorage.removeItem(KEY_R);localStorage.setItem(KEY_T,mode);d.setAttribute('data-theme',mode);d.classList.remove('rz-rainbow');}
+            }catch(e){}
+            metaColor(mode);
+        }
+        function current(){try{if(localStorage.getItem(KEY_R)==='1')return 'rainbow';return localStorage.getItem(KEY_T)||'light';}catch(e){return 'light';}}
+        function next(c){return c==='light'?'dark':c==='dark'?'rainbow':'light';} // day → dark → rainbow → day
+        function bind(){
+            var btn=document.getElementById('themeToggle');if(!btn)return;
+            var clone=btn.cloneNode(true);btn.parentNode.replaceChild(clone,btn); // strip shared 2-way listener
+            function sync(){var c=current();clone.setAttribute('data-mode',c);clone.setAttribute('title','Theme: '+c+' — click for '+next(c));}
+            clone.addEventListener('click',function(){apply(next(current()));sync();this.style.transform='scale(0.95)';var b=this;setTimeout(function(){b.style.transform='';},150);});
+            sync();
+        }
+        if(document.readyState==='complete')bind();else window.addEventListener('load',bind);
+    })();</script>
 
     <!-- Advanced Schema.org JSON-LD - Person Type (Perfect 100) -->
     <script type="application/ld+json">

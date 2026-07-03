@@ -430,6 +430,72 @@ html[data-rz-register="editorial"] .article-body > h2:first-child{
   border-top: 0; padding-top: 0;
 }
 
+/* ============================================================================
+   LIVING DIAGRAM (v1.50.25) — animated schematic widget for the reading flow.
+   Rendered by js/rz-article-diagram.js. The flow language mirrors the cockpit
+   pattern (cdu-mini-bms): dashed SVG strokes whose dashoffset animates =
+   coolant/power moving through pipes/busbars. Honours prefers-reduced-motion.
+   ============================================================================ */
+html[data-rz-register="editorial"] .rz-diagram{ margin:2.4rem 0; }
+html[data-rz-register="editorial"] .rz-diagram svg{
+  display:block; width:100%; height:auto;
+  border:1px solid var(--rz-art-line, rgba(160,168,180,.14));
+  border-radius:8px;
+  background:var(--rz-art-panel, #16181D);
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) .rz-diagram svg{ background:#f8fafc; }
+/* SVG internals inherit tokens via CSS vars */
+.rz-diagram svg{
+  --dg-line:#43506033; --dg-strong:#0f172a; --dg-muted:#64748b;
+  --dg-pipe:#0e7490; --dg-pipe2:#b45309; --dg-ok:#0a8a5a; --dg-warn:#d97706; --dg-alarm:#dc2626;
+  --dg-box:#ffffff;
+}
+html[data-theme="dark"] .rz-diagram svg{
+  --dg-line:#a0a8b426; --dg-strong:#F6F7F9; --dg-muted:#9aa8bb;
+  --dg-pipe:#00DDFF; --dg-pipe2:#FFAA00; --dg-ok:#00FF88; --dg-warn:#FFAA00; --dg-alarm:#FF3030;
+  --dg-box:#1b1e24;
+}
+.rz-diagram .dg-box{ fill:var(--dg-box); stroke:var(--dg-line); stroke-width:1; }
+.rz-diagram .dg-label{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:10px; fill:var(--dg-muted); letter-spacing:.04em; }
+.rz-diagram .dg-name{ font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:11px; font-weight:600; fill:var(--dg-strong); }
+.rz-diagram .dg-pv{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11px; font-weight:600; fill:var(--dg-strong); font-variant-numeric:tabular-nums; }
+/* pipes / busbars: solid faint base + dashed animated overlay */
+.rz-diagram .dg-pipe-base{ fill:none; stroke:var(--dg-line); stroke-width:4; stroke-linecap:round; }
+.rz-diagram .dg-pipe{ fill:none; stroke:var(--dg-pipe); stroke-width:2; stroke-linecap:round; stroke-dasharray:7 9; }
+.rz-diagram .dg-pipe.alt{ stroke:var(--dg-pipe2); }
+.rz-diagram [data-flow].flow .dg-pipe{ animation:rzDgDash 1s linear infinite; }
+.rz-diagram [data-flow].slow .dg-pipe{ animation:rzDgDash 2.6s linear infinite; opacity:.75; }
+.rz-diagram [data-flow].off  .dg-pipe{ animation:none; opacity:.14; }
+@keyframes rzDgDash{ to{ stroke-dashoffset:-32; } }
+@media (prefers-reduced-motion: reduce){
+  .rz-diagram [data-flow] .dg-pipe{ animation:none !important; }
+}
+/* instrument warn/alarm states */
+.rz-diagram [data-inst] .dg-inst-ring{ fill:none; stroke:var(--dg-ok); stroke-width:1.2; }
+.rz-diagram [data-inst].warn .dg-inst-ring{ stroke:var(--dg-warn); stroke-width:1.6; }
+.rz-diagram [data-inst].alarm .dg-inst-ring{ stroke:var(--dg-alarm); stroke-width:1.8; }
+.rz-diagram [data-inst].warn .dg-pv{ fill:var(--dg-warn); }
+.rz-diagram [data-inst].alarm .dg-pv{ fill:var(--dg-alarm); }
+/* scenario buttons — instrument controls (solid state, no gradients) */
+html[data-rz-register="editorial"] .rz-diagram-bar{ display:flex; flex-wrap:wrap; gap:.45rem; margin:0 0 .7rem; }
+html[data-rz-register="editorial"] .rz-diagram-btn{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.68rem; letter-spacing:.05em;
+  padding:.34rem .7rem; border-radius:6px; cursor:pointer;
+  border:1px solid var(--rz-art-line, rgba(160,168,180,.25));
+  background:transparent; color:var(--rz-art-muted, #7E8590);
+  transition:border-color .15s, color .15s, background .15s;
+  min-height:30px;
+}
+html[data-rz-register="editorial"] .rz-diagram-btn:hover{ border-color:var(--rz-art-accent,#b45309); color:var(--rz-art-strong,#0f172a); }
+html[data-rz-register="editorial"] .rz-diagram-btn.active{
+  background:color-mix(in srgb, var(--rz-art-accent,#b45309) 14%, transparent);
+  border-color:var(--rz-art-accent,#b45309); color:var(--rz-art-strong,#0f172a);
+}
+html[data-rz-register="editorial"] .rz-diagram-msg{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.7rem; line-height:1.5;
+  color:var(--rz-art-muted,#7E8590); margin-top:.55rem; min-height:1em;
+}
+
 /* ---- READING POLISH (v1.50.24) ---- */
 /* exactly ONE read-progress bar: the editorial runtime injects .rz-read-prog,
    so the older per-page inline bar is retired wherever the register is active */

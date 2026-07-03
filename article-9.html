@@ -82,8 +82,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.24">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.25">
     <script src="js/rz-article-editorial.js?v=1.50.24" defer></script>
+    <script src="js/rz-article-diagram.js?v=1.50.25" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
@@ -2125,6 +2126,43 @@
                 <div class="key-insight">
                     <h4>The Interesting Bit for Facility Operators</h4>
                     <p>Nvidia's technical blog describes warm-water, single-phase direct liquid cooling operating at a supply temperature around <strong>45°C</strong>. Liquid captures heat more efficiently than air, enabling higher operating temperatures and reducing fan and chiller energy. The higher supply temperature allows dry-cooler operation with minimal water usage. Rubin also doubles liquid flow rates at the same CDU pressure head to ensure rapid heat removal under sustained extreme workloads.</p>
+<figure class="rz-diagram" data-rz-diagram>
+<svg viewBox="0 0 760 310" role="img" aria-label="Animated cooling loop: dry cooler to CDU to GPU rack cold plates, warm-water direct liquid cooling">
+  <g data-flow="supply"><path class="dg-pipe-base" d="M445,135 L600,135"/><path class="dg-pipe" d="M445,135 L600,135"/></g>
+  <g data-flow="return"><path class="dg-pipe-base" d="M600,175 L445,175"/><path class="dg-pipe alt" d="M600,175 L445,175"/></g>
+  <g data-flow="priOut"><path class="dg-pipe-base" d="M315,175 L160,175"/><path class="dg-pipe alt" d="M315,175 L160,175"/></g>
+  <g data-flow="priIn"><path class="dg-pipe-base" d="M160,135 L315,135"/><path class="dg-pipe" d="M160,135 L315,135"/></g>
+  <g data-inst="drycooler">
+    <rect class="dg-box" x="30" y="115" width="130" height="80" rx="6"/>
+    <circle class="dg-inst-ring" cx="142" cy="128" r="4.5"/>
+    <text class="dg-name" x="95" y="142" text-anchor="middle">DRY COOLER</text>
+    <text class="dg-label" x="95" y="158" text-anchor="middle">heat &#8594; ambient</text>
+    <text class="dg-label" x="95" y="176" text-anchor="middle">ambient</text>
+    <text class="dg-pv" data-pv="amb" x="95" y="190" text-anchor="middle">22 &#176;C</text>
+  </g>
+  <g data-inst="cdu">
+    <rect class="dg-box" x="315" y="115" width="130" height="80" rx="6"/>
+    <circle class="dg-inst-ring" cx="427" cy="128" r="4.5"/>
+    <text class="dg-name" x="380" y="142" text-anchor="middle">CDU</text>
+    <text class="dg-label" x="380" y="158" text-anchor="middle">warm-water DLC</text>
+    <text class="dg-label" x="380" y="176" text-anchor="middle">no chiller</text>
+  </g>
+  <rect class="dg-box" x="600" y="115" width="130" height="80" rx="6"/>
+  <text class="dg-name" x="665" y="142" text-anchor="middle">GPU RACK</text>
+  <text class="dg-label" x="665" y="158" text-anchor="middle">cold plates</text>
+  <g data-inst="supplyT">
+    <text class="dg-label" x="522" y="115" text-anchor="middle">supply</text>
+    <text class="dg-pv" data-pv="supply" x="522" y="128" text-anchor="middle">45.0 &#176;C</text>
+  </g>
+  <text class="dg-label" x="522" y="192" text-anchor="middle">return</text>
+  <text class="dg-pv" data-pv="ret" x="522" y="205" text-anchor="middle">55.0 &#176;C</text>
+  <text class="dg-label" x="380" y="300" text-anchor="middle">warm-water loop &#8212; the dry cooler only works while ambient stays far enough below the return temperature</text>
+</svg>
+<script type="application/json" class="rz-diagram-cfg">
+{"title": "Live: NVIDIA's 45°C chiller-less claim vs a Jakarta afternoon", "interval": 1000, "baselines": {"supply": {"v": 45.0, "unit": "°C", "dp": 1, "noise": 0.2}, "ret": {"v": 55.0, "unit": "°C", "dp": 1, "noise": 0.3}, "amb": {"v": 22.0, "unit": "°C", "dp": 0, "noise": 0.4}}, "flows": {"supply": "flow", "return": "flow", "priOut": "flow", "priIn": "flow"}, "scenarios": [{"id": "tropic", "label": "Tropical: Jakarta 35°C", "deltas": {"amb": 13, "supply": 2.5, "ret": 2.5}, "alarms": {"drycooler": "warn", "supplyT": "warn"}, "msg": "At 35°C ambient (and 75–90% RH) the dry-cooler approach collapses — supply creeps past the 45°C design point. The article's tropical thesis: 'no chillers necessary' is a temperate-climate claim."}, {"id": "cdufail", "label": "Inject: CDU pump failover", "flows": {"supply": "slow", "return": "slow"}, "alarms": {"cdu": "warn"}, "msg": "Primary pump trips; the redundant pump ramps and valves reposition — full flow restored on the backup path (the N+1 failover sequence the article walks through)."}], "source": "Illustrative warm-water DLC loop. Supply ≈45°C per NVIDIA (article body); tropical ambient 35°C per the article's thesis; return/ambient-normal values illustrative.", "basisTag": "illustrative"}
+</script>
+</figure>
+
                 </div>
 
                 <blockquote>

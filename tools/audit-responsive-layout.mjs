@@ -27,12 +27,26 @@ const ROOT = process.cwd();
 const SKIP = /^(rz-|plan-|planb|google|404|sitemap|robots|llms|article-9-paper)/;
 const pages = readdirSync(ROOT).filter(f => f.endsWith('.html') && !SKIP.test(f)).sort();
 
-const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
+const LAUNCH_ARGS = { args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] };
+let browser = await puppeteer.launch(LAUNCH_ARGS);
+let relaunching = null;
+async function newPageSafe() {
+  try { return await browser.newPage(); }
+  catch (e) {
+    if (!relaunching) relaunching = (async () => {
+      try { await browser.close(); } catch (e2) {}
+      browser = await puppeteer.launch(LAUNCH_ARGS);
+      relaunching = null;
+    })();
+    await relaunching;
+    return browser.newPage();
+  }
+}
 
 async function measure(f) {
   const r = { f, mobileOverflow: 0, tabletOverflow: 0, wideTableW: 0 };
   for (const [w, key] of [[390, 'm'], [768, 't'], [2400, 'wide']]) {
-    const pg = await browser.newPage();
+    const pg = await newPageSafe();
     await pg.setViewport({ width: w, height: 900 });
     try {
       await pg.goto('file://' + resolve(ROOT, f), { waitUntil: 'domcontentloaded', timeout: 25000 });

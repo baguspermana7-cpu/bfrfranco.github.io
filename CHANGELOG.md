@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.50.25 — 2026-07-03 (LIVING DIAGRAMS — animated schematics in the reading flow)
+
+### Added
+- **`js/rz-article-diagram.js`** — the cockpit animated-schematic language (CSS dash-flow on SVG pipes/busbars +
+  a live 1s ticker + fault-injection scenarios, the cdu-mini-bms/chiller-plant idiom) packaged as a reusable
+  in-article widget: `[data-rz-diagram]` figure = authored SVG + JSON config (`baselines` with min/max/exact
+  clamps, `flows`, `scenarios` with deltas/alarms/msg). Instrument scenario buttons ("Normal" first,
+  `aria-pressed`), `aria-live` narration, ticker pauses offscreen (IntersectionObserver), `prefers-reduced-motion`
+  disables the dash animation, theme-aware `--dg-*` tokens, caption + basis chip (ILLUSTRATIVE) reusing the chart
+  styles. Conduit stroke = 4px base + 2px dashed overlay at ~32 px/s (matches the cockpit spec).
+- **Reference pair**:
+  - **`article-13`** (Power Distribution) — live 2N single-line diagram: UTILITY → TX → UPS-A/UPS-B → PDU →
+    GPU RACK (NVL72 ≈ 120 kW, 480 V AC per the article). "Inject: UPS-A failure" kills the A-path, pins UPS-A at
+    exactly 0%, UPS-B carries 100% — the rack never notices. The 2N story, animated.
+  - **`article-9`** (HVAC Shock) — live warm-water DLC loop: DRY COOLER ↔ CDU ↔ GPU RACK cold plates
+    (supply ≈45°C per NVIDIA, per the article). "Tropical: Jakarta 35°C" collapses the dry-cooler approach and
+    pushes supply past the design point (the article's thesis, animated); "CDU pump failover" slows the loop and
+    recovers.
+- **Provenance gate extended**: `tools/audit-article-charts.mjs` now validates `rz-diagram-cfg` blocks too
+  (source + basisTag mandatory) — 24 configs clean. New "Living diagrams" section in ARTICLE_DATAVIZ_STANDARD.md.
+- `uiux-reviewer`: APPROVED, no blockers; its MEDIUM patches (exact-value scenarios, `aria-pressed`,
+  `aria-live`, basis-chip mapping) shipped in this release. Conduit-stroke idiom ruled conformant.
+
+### Changed
+- `tools/audit-dark-coverage.mjs` + `tools/audit-responsive-layout.mjs` now **relaunch the browser** when the
+  Chromium process dies mid-run (ConnectionClosedError under resource pressure) instead of aborting the audit.
+
 ## v1.50.24 — 2026-06-28 (Reading micro-polish pack)
 
 ### Fixed
