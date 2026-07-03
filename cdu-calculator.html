@@ -72,6 +72,12 @@
         .input-field, select.input-field { width:100%; padding:8px 10px; border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-inset); color:var(--cdu-text); font-size:.9rem; font-family:'JetBrains Mono',monospace; }
         .input-field:focus { outline:none; border-color:var(--cdu-primary); }
         [data-theme="dark"] select.input-field option { background:#1e293b; color:#f1f5f9; }
+        /* v1.50.x production hardening: input validation error states */
+        .input-field.invalid { border-color:#ef4444; background:rgba(239,68,68,.06); }
+        .input-field.invalid:focus { border-color:#ef4444; }
+        .cc-validation { margin:0 0 .75rem; padding:8px 12px; border:1px solid #ef4444; border-radius:8px; background:rgba(239,68,68,.08); color:#b91c1c; font-size:.78rem; line-height:1.5; }
+        .cc-validation b { font-weight:700; }
+        [data-theme="dark"] .cc-validation { color:#fca5a5; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.5); }
         .tip { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:auto; background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.35); border-radius:50%; font-size:10px; color:var(--cdu-primary); cursor:help; position:relative; }
         .tip .tipbox { display:none; position:absolute; bottom:130%; right:0; width:248px; background:#0b1220; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; }
         .tip:hover .tipbox { display:block; }
@@ -216,7 +222,8 @@
                 <button class="pro" id="ccPro">Pro ★</button>
             </div>
             <button class="cc-pdf" id="ccPdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--cdu-muted);">PDF builds in your browser — no server transmission.</span>
+            <button class="cc-pdf" id="ccCsv"><i class="fas fa-file-csv"></i> Export CSV</button>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--cdu-muted);">Exports build in your browser — no server transmission.</span>
         </div>
 
         <!-- INPUTS -->
@@ -287,6 +294,7 @@
         <!-- RESULTS -->
         <div>
             <div class="cc-results-head"><h2>Sizing results</h2><span class="vtag" id="ccEngTag">engine —</span></div>
+            <div class="cc-validation" id="ccValidation" role="alert" aria-live="polite" hidden></div>
             <div class="cc-kpis" id="ccKpis"></div>
             <div class="cc-note" style="margin-top:1rem;">
                 <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Pro analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
@@ -371,6 +379,37 @@
         function $(id){ return document.getElementById(id); }
         function val(id){ var el=$(id); return el ? (el.tagName==='SELECT'? el.value : parseFloat(el.value)) : null; }
 
+        // Production hardening: validate every numeric input against its min/max
+        // (from the element attributes), mark offenders, and never feed NaN to the engine.
+        var NUM_FIELDS = {
+            inLoad:'IT load', inDt:'ΔT', inGlycol:'Glycol %', inSupply:'Supply temp',
+            inLen:'Pipe length', inK:'ΣK fittings', inPumpEff:'Pump efficiency',
+            inMotorEff:'Motor efficiency', inPerPump:'Flow per pump', inFac:'Facility supply',
+            inNtu:'NTU', inAir:'Room air temp', inRh:'Room RH'
+        };
+        function validateInputs(){
+            var errors = [];
+            Object.keys(NUM_FIELDS).forEach(function(id){
+                var el=$(id); if(!el) return;
+                el.classList.remove('invalid'); el.removeAttribute('aria-invalid');
+                var raw = (el.value||'').trim();
+                var v = parseFloat(raw);
+                var min = el.hasAttribute('min') ? parseFloat(el.getAttribute('min')) : -Infinity;
+                var max = el.hasAttribute('max') ? parseFloat(el.getAttribute('max')) : Infinity;
+                if(raw==='' || !isFinite(v)){ errors.push({id:id, msg:NUM_FIELDS[id]+' is required'}); }
+                else if(v < min || v > max){ errors.push({id:id, msg:NUM_FIELDS[id]+' must be '+min+'–'+max}); }
+                if(errors.length && errors[errors.length-1].id===id){ el.classList.add('invalid'); el.setAttribute('aria-invalid','true'); }
+            });
+            return { ok: errors.length===0, errors: errors };
+        }
+        function showValidation(errors){
+            var box=$('ccValidation'); if(!box) return;
+            box.innerHTML = '<b>Check '+errors.length+' input'+(errors.length>1?'s':'')+':</b> ' +
+                errors.map(function(e){ return e.msg; }).join(' · ');
+            box.hidden = false;
+        }
+        function hideValidation(){ var box=$('ccValidation'); if(box){ box.hidden=true; box.innerHTML=''; } }
+
         function chipFor(state){ return state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'derived'); }
         function kpiCard(label, value, unit, sub, state){
             var cls = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'ok');
@@ -387,7 +426,13 @@
                 supply=val('inSupply'), dn=val('inDn'), len=val('inLen'), K=val('inK'),
                 pumpEff=val('inPumpEff'), motorEff=val('inMotorEff'), perPump=val('inPerPump'),
                 fac=val('inFac'), ntu=val('inNtu'), air=val('inAir'), rh=val('inRh');
-            if(!(load>0)||!(dt>0)){ return; }
+            var vres = validateInputs();
+            if(!vres.ok){
+                showValidation(vres.errors);
+                $('ccKpis').innerHTML = '<div class="kpi warn" style="grid-column:1/-1"><div class="kpi-label">Awaiting valid inputs</div><div class="kpi-sub">Correct the highlighted field'+(vres.errors.length>1?'s':'')+' above to compute sizing.</div></div>';
+                return;
+            }
+            hideValidation();
 
             var fp = E.fluidProps(fluid, supply, glycol);
             var rhoKgL = fp.rho/1000;
@@ -431,6 +476,18 @@
             $('ccKpis').innerHTML = html;
             $('ccEngTag').textContent = 'engine v'+E.version+' · '+fluid.toUpperCase()+' @ '+supply+'°C';
 
+            // Structured results for CSV export.
+            window.__cduKpis = [
+                { label:'Secondary flow', value:flow.toFixed(0), unit:'LPM', note:perKw.toFixed(2)+' LPM/kW' },
+                { label:'Pipe velocity', value:leg.velocityMs.toFixed(2), unit:'m/s', note:dn+' · Re '+(leg.reynolds/1000).toFixed(0)+'k' },
+                { label:'Pressure drop', value:leg.dpTotalBar.toFixed(2), unit:'bar', note:'Haaland f '+leg.frictionFactor.toFixed(4) },
+                { label:'HX approach', value:approach.toFixed(1), unit:'degC', note:'eps '+eps.toFixed(2)+' (NTU '+ntu+')' },
+                { label:'NPSH margin', value:margin.toFixed(0), unit:'%', note:'avail '+npshA.toFixed(1)+'m vs req '+M.pump.npshRequiredMDefault+'m' },
+                { label:'Dew-point margin', value:dewMargin.toFixed(1), unit:'K', note:'supply '+supply+'C vs dew '+dew.toFixed(1)+'C' },
+                { label:'Pump electrical', value:elec.toFixed(2), unit:'kW', note:'shaft '+shaft.toFixed(2)+' kW · hyd '+hyd.toFixed(2)+' kW' },
+                { label:'Pumps (N+1)', value:String(npumps), unit:'units', note:Math.max(npumps-1,1)+' duty + 1 standby' }
+            ];
+
             var act = document.querySelector('.preset-btn.active');
             window.__cdu = { type: act ? (act.getAttribute('data-type')||'inrow') : 'inrow',
                 load:load, dt:dt, fluid:fluid, glycol:glycol, supply:supply, dn:dn, len:len, K:K,
@@ -452,12 +509,41 @@
             compute();
         }
 
+        function csvEscape(s){ s=String(s==null?'':s); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; }
+        function downloadCSV(){
+            var k = window.__cduKpis;
+            if(!k || !k.length){ // recompute first if inputs are valid
+                compute(); k = window.__cduKpis;
+                if(!k || !k.length){ return; }
+            }
+            var lines = ['# CDU sizing results — resistancezero.com (validated engine, educational reference)'];
+            lines.push('# Generated ' + new Date().toISOString());
+            lines.push('');
+            lines.push('Section,Field,Value,Unit,Note');
+            // Inputs
+            Object.keys(NUM_FIELDS).forEach(function(id){
+                var el=$(id); if(el) lines.push(['Input', csvEscape(NUM_FIELDS[id]), csvEscape(el.value), csvEscape(el.getAttribute('data-unit')||''), ''].join(','));
+            });
+            var fl=$('inFluid'), dnv=$('inDn');
+            if(fl) lines.push(['Input','Fluid',csvEscape(fl.value),'',''].join(','));
+            if(dnv) lines.push(['Input','Pipe size',csvEscape(dnv.value),'',''].join(','));
+            // Results
+            k.forEach(function(r){ lines.push(['Result', csvEscape(r.label), csvEscape(r.value), csvEscape(r.unit), csvEscape(r.note)].join(',')); });
+            var blob = new Blob([lines.join('\r\n')], { type:'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = 'cdu-sizing-' + new Date().toISOString().slice(0,10) + '.csv';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+        }
+
         function init(){
             ['inLoad','inDt','inFluid','inGlycol','inSupply','inDn','inLen','inK','inPumpEff','inMotorEff','inPerPump','inFac','inNtu','inAir','inRh'].forEach(function(id){
                 var el=$(id); if(el){ el.addEventListener('input', compute); el.addEventListener('change', compute); }
             });
             document.querySelectorAll('.preset-btn').forEach(function(b){ b.addEventListener('click', function(){ setPreset(b.getAttribute('data-type')); }); });
             $('ccReset').addEventListener('click', reset);
+            var csvBtn=$('ccCsv'); if(csvBtn){ csvBtn.addEventListener('click', downloadCSV); }
             compute();
         }
         if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }

@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.50.28 — 2026-07-03 (CDU calculator — production hardening: input validation + CSV export)
+
+**Added / Changed** — production-readiness pass on `cdu-calculator.html` (Program Phase 2).
+
+- **Input validation + error states.** Every numeric input is validated against its
+  min/max before the engine runs. Invalid or empty fields are marked (`.invalid` +
+  `aria-invalid`) and a clear inline summary appears (e.g. "ΔT must be 3–20", "IT load
+  is required"); the results panel shows an "Awaiting valid inputs" prompt instead of
+  feeding `NaN` to the engine. Fixes silent/NaN output when a field is cleared or out of range.
+- **CSV export.** New "Export CSV" button downloads the full run — all inputs plus the
+  8 computed KPIs (flow, velocity, ΔP, HX approach, NPSH margin, dew-point margin, pump
+  power, N+1 count) — built entirely in the browser (no server transmission), matching
+  the existing PDF export.
+- Verified headless: valid state renders 8 KPIs + 8 CSV rows; cleared/out-of-range
+  fields trigger the summary + field marking; recovery restores results; 0 JS errors;
+  script-tag + js-syntax audits clean.
+
+---
+
 ## v1.50.26 — 2026-07-03 (Homepage gradient backdrop + index-only Rainbow mode)
 
 **Added** — the homepage (`index.html`) now has a full-page gradient backdrop and a
@@ -38,6 +57,18 @@ third, index-only **Rainbow** theme, per owner reference designs.
 CSS lives ONLY in `styles-index.css` (index-only feature; 2-stylesheet architecture).
 
 ---
+
+## v1.50.27 — 2026-07-03 (Search unification complete — all 29 inline copies migrated)
+
+### Changed
+- **The remaining 29 pages with per-page inline Fuse.js search** (index, articles, insights,
+  datacenter-solutions, articles 1–19, geopolitics + geopolitics-1/2/3, FF-1, future-forward) migrated to the
+  shared `js/rz-command-palette.js`: each page's dedicated "Feature 21: Global Search" inline script block
+  removed and replaced by the module. **Zero inline search copies remain** — one implementation site-wide, and
+  every page now also gets the "/" shortcut + Commands group (theme toggle, quick nav). Verified over HTTP on 7
+  representative migrated pages: Ctrl+K opens, queries return results, commands present, 0 page errors.
+  (article-19 had a marker variant + an eager fuse.js CDN tag — both removed; fuse.js is now lazy-loaded
+  everywhere.) This completes the search unification begun in v1.50.23.
 
 ## v1.50.26 — 2026-07-03 (Scrollytelling flagship — the Colossus build, step by step)
 
