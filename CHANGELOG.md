@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.50.33 — 2026-07-03 (Portfolio CTA — differentiate Get Started from Download Resume)
+
+**Fixed** — the previous portfolio pass made the amber gradient apply to BOTH primary
+CTAs (Download Resume + Get Started, which share `.btn-bento-primary`). Per the
+reference, only Download Resume is amber; **Get Started is now a distinct violet-tinted,
+violet-bordered button** (`.bento-cta-row .btn-bento-primary`), with a stronger violet
+edge in rainbow mode. Contact Us stays the plain outline. Verified across day/dark/
+rainbow (amber vs violet confirmed, identity card matches reference), 0 console errors;
+gates CLEAN (dark both modes, responsive). Index-only CSS, re-minified.
+
+---
+
 ## v1.50.32 — 2026-07-03 (Homepage portfolio — reference-matched colored card treatment)
 
 **Changed** — reworked the homepage portfolio (bento) section to match the owner's
