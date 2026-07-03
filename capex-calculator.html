@@ -1058,6 +1058,7 @@
 
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
@@ -2236,12 +2237,16 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <button onclick="gatedAction('pdf')" id="btnExportPDF" class="action-btn-pdf" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));color:#f87171;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(239,68,68,0.12);">
                             <i class="fas fa-file-pdf"></i> <span id="btnPdfLabel">Export PDF</span>
                         </button>
+                        <button onclick="exportCapexCSV()" id="btnExportCSV" class="action-btn-pdf" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));color:#f87171;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(239,68,68,0.12);">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
                         <div style="display:none;" id="btnClearRow">
                             <button onclick="clearComparison()" id="btnClearCompare" style="width:100%;padding:10px 8px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04));color:#f87171;cursor:pointer;font-weight:600;font-size:0.75rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:5px;">
                                 <i class="fas fa-times"></i> Clear
                             </button>
                         </div>
                     </div>
+                    <div class="rz-calc-validation" id="capexValidation" role="alert" aria-live="polite" hidden></div>
                     <!-- Saved indicator -->
                     <div id="savedIndicator" style="display:none;margin-top:0.5rem;padding:6px 10px;border-radius:8px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;color:#34d399;text-align:center;">
                         <i class="fas fa-check-circle" style="margin-right:4px;"></i> Scenario A saved — change inputs for Scenario B
@@ -2849,6 +2854,15 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
         }
 
         function calculateCosts() {
+            // Production hardening: non-blocking input feedback. The calc is defensive
+            // (parseInt(...)||default), so we flag out-of-range inputs without gating.
+            if (window.RZCalc) {
+                var _vr = RZCalc.validateNumbers([
+                    { id: 'itLoad', label: 'IT load' },
+                    { id: 'fuelHours', label: 'Fuel autonomy' }
+                ]);
+                RZCalc.showErrors('capexValidation', _vr.errors);
+            }
             const itLoad = parseInt(document.getElementById('itLoad').value) || 1000;
             const rackType = getSelectedValue('rackType');
             const coolingType = getSelectedValue('coolingType');
@@ -3945,6 +3959,37 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                     ].map(function(k) { return '<div style="flex:1;padding:6px;background:rgba(255,255,255,0.06);border-radius:6px;margin:0 2px;"><div style="font-size:13px;font-weight:700;font-family:monospace;">' + k.value + '</div><div style="font-size:8px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">' + k.label + '</div></div>'; }).join('') +
                 '</div>' +
             '</div>';
+        }
+
+        // ═══ EXPORT CSV ═══
+        function exportCapexCSV() {
+            if (!window.RZCalc) return;
+            function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
+            function selText(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
+            var rows = [
+                ['Input', 'IT load', txt('itLoad'), 'kW', ''],
+                ['Input', 'Rack density', getSelectedValue('rackType') || '', '', ''],
+                ['Input', 'Cooling type', getSelectedValue('coolingType') || '', '', ''],
+                ['Input', 'Redundancy', getSelectedValue('redundancy') || '', '', ''],
+                ['Input', 'Fuel autonomy', txt('fuelHours'), 'h', ''],
+                ['Input', 'Building type', selText('buildingType'), '', ''],
+                ['Input', 'Seismic zone', selText('seismicZone'), '', ''],
+                ['Input', 'Fire suppression', selText('fireType'), '', ''],
+                ['Input', 'Fire alarm', selText('alarmType'), '', ''],
+                ['Input', 'UPS type', selText('upsType'), '', ''],
+                ['Input', 'Generator type', selText('genType'), '', ''],
+                ['Input', 'Location', selText('locationFactor'), '', ''],
+                ['Input', 'City market', selText('cityMarket'), '', ''],
+                ['Result', 'Total CAPEX', txt('totalCost'), '', ''],
+                ['Result', 'Cost per kW', txt('perKwCost'), '', ''],
+                ['Result', 'Tier class', txt('tierClass'), '', ''],
+                ['Result', 'Uptime', txt('uptimeValue'), '', ''],
+                ['Result', 'PUE', txt('pueValue'), '', ''],
+                ['Result', 'Annual energy cost', txt('energyCost'), '', '']
+            ];
+            var header = ['# CAPEX calculation — resistancezero.com (educational reference)',
+                '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
+            RZCalc.downloadCSV('capex-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
         }
 
         // ═══ EXPORT PDF ═══

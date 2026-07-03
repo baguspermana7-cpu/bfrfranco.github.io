@@ -615,6 +615,7 @@
 
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 <style id="rz-mobile-v18">
@@ -781,8 +782,10 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         <div class="cf-toolbar-actions">
             <button class="cf-btn-reset" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset</button>
             <button class="cf-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <button class="cf-btn-pdf" id="btnExportCSV" onclick="exportCarbonCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
         </div>
     </div>
+    <div class="rz-calc-validation" id="carbonValidation" role="alert" aria-live="polite" hidden style="max-width:1400px;margin:0 auto 1rem;"></div>
 
     <!-- ═══ CALCULATOR GRID ═══ -->
     <section class="calculator-section">
@@ -1838,6 +1841,17 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
     // 12. MAIN CALCULATE FUNCTION
     // ══════════════════════════════════════════════════════════════
     function calculate() {
+        // Production hardening: non-blocking input feedback (calc is defensive with
+        // defaults, so we flag out-of-range inputs rather than gate the result).
+        if (window.RZCalc) {
+            var _vr = RZCalc.validateNumbers([
+                { id: 'itLoad', label: 'IT load' },
+                { id: 'pueValue', label: 'PUE' },
+                { id: 'leakRate', label: 'Refrigerant leak rate' },
+                { id: 'facilityMW', label: 'Facility size' }
+            ]);
+            RZCalc.showErrors('carbonValidation', _vr.errors);
+        }
         // === Common inputs ===
         var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
         var pue = parseFloat(document.getElementById('pueValue').value) || 1.58;
@@ -2375,6 +2389,39 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         document.getElementById('compTax').textContent = '$' + Math.round(tax).toLocaleString();
         document.getElementById('compCBAM').textContent = intensity > 0.6 ? 'High' : intensity > 0.3 ? 'Medium' : 'Low';
         document.getElementById('compSEC').textContent = '3 gaps';
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 15. CSV EXPORT FUNCTION (shared RZCalc util)
+    // ══════════════════════════════════════════════════════════════
+    function exportCarbonCSV() {
+        if (!window.RZCalc) return;
+        function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
+        function selText(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
+        function mlbl(id) { var e = document.getElementById(id); var l = e && e.parentElement ? e.parentElement.querySelector('.metric-label') : null; return l ? (l.textContent || '').trim() : id; }
+        var rows = [
+            ['Input', 'IT load (kW)', txt('itLoad'), 'kW', ''],
+            ['Input', 'PUE', txt('pueValue'), '', ''],
+            ['Input', 'Country', selText('countrySelect'), '', ''],
+            ['Input', 'Renewable share', txt('renewablePct'), '%', ''],
+            ['Input', 'Cooling type', selText('coolingType'), '', ''],
+            ['Input', 'Generator type', selText('genType'), '', ''],
+            ['Input', 'Refrigerant leak rate', txt('leakRate'), '%', ''],
+            ['Input', 'Facility size', txt('facilityMW'), 'MW', ''],
+            ['Input', 'Workload type', selText('workloadType'), '', ''],
+            ['Result', txt('primaryLabel'), txt('primaryValue'), txt('primaryUnit'), txt('gradeText')],
+            ['Result', mlbl('metScope1'), txt('metScope1'), '', ''],
+            ['Result', mlbl('metScope2'), txt('metScope2'), '', ''],
+            ['Result', mlbl('metScope3'), txt('metScope3'), '', ''],
+            ['Result', mlbl('metIntensity'), txt('metIntensity'), '', ''],
+            ['Result', mlbl('metOffset'), txt('metOffset'), '', ''],
+            ['Result', mlbl('metTax'), txt('metTax'), '', ''],
+            ['Result', mlbl('metEnergy'), txt('metEnergy'), '', ''],
+            ['Result', mlbl('metRating'), txt('metRating'), '', '']
+        ];
+        var header = ['# Carbon footprint — resistancezero.com (educational reference)',
+            '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
+        RZCalc.downloadCSV('carbon-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
     }
 
     // ══════════════════════════════════════════════════════════════

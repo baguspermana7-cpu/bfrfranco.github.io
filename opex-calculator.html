@@ -1342,6 +1342,7 @@
         [data-theme="dark"] .model-card.active i { color:#10b981; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
@@ -2271,10 +2272,14 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
                     <button onclick="exportOpexPDF()" style="padding:12px 8px;border-radius:10px;border:1px solid var(--glass-border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;font-weight:500;font-size:0.85rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;">
                         <i class="fas fa-file-pdf"></i> Export PDF
                     </button>
+                    <button onclick="exportOpexCSV()" id="btnExportOpexCSV" style="padding:12px 8px;border-radius:10px;border:1px solid var(--glass-border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;font-weight:500;font-size:0.85rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
                     <button onclick="clearOpexComparison()" id="btnClearOpex" style="display:none;padding:12px 8px;border-radius:10px;border:1px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(239,68,68,0.03));color:#ef4444;cursor:pointer;font-weight:600;font-size:0.85rem;font-family:inherit;transition:all 0.3s;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
                         <i class="fas fa-times-circle"></i> Clear Comparison
                     </button>
                 </div>
+                <div class="rz-calc-validation" id="opexValidation" role="alert" aria-live="polite" hidden></div>
                 <!-- Saved indicator -->
                 <div id="opexSavedIndicator" style="display:none;margin-top:0.5rem;padding:8px 12px;border-radius:8px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);font-size:0.78rem;color:#10b981;text-align:center;">
                     <i class="fas fa-check-circle" style="margin-right:4px;"></i> Scenario A saved — change inputs to create Scenario B
@@ -3501,8 +3506,42 @@ html:not([data-theme="dark"]) td[style*="color:#a855f7"] { color:#6d28d9 !import
         // =====================================================
         // UI UPDATE FUNCTIONS
         // =====================================================
+        function exportOpexCSV() {
+            if (!window.RZCalc) return;
+            function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
+            function selText(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
+            var rows = [
+                ['Input', 'Country', selText('countrySelect'), '', ''],
+                ['Input', 'IT load', txt('itLoad'), 'kW', ''],
+                ['Input', 'PUE', txt('pueValue'), '', ''],
+                ['Input', 'Tier level', selText('tierLevel'), '', ''],
+                ['Input', 'Facility age', selText('facilityAge'), '', ''],
+                ['Input', 'Utilization', txt('utilizationValue'), '', ''],
+                ['Input', 'Climate zone', selText('climateZone'), '', ''],
+                ['Input', 'Cooling type', selText('coolingType'), '', ''],
+                ['Input', 'Generator config', selText('genConfig'), '', ''],
+                ['Result', 'Country', txt('summaryCountry'), '', ''],
+                ['Result', 'Total annual OPEX', txt('totalOpex'), '', ''],
+                ['Result', 'Monthly OPEX', txt('monthlyOpex'), '', ''],
+                ['Result', 'OPEX per kW/yr', txt('perKwOpex'), '', ''],
+                ['Result', 'OPEX per kWh', txt('perKwhOpex'), '', ''],
+                ['Result', 'Total FTE', txt('totalFte'), '', '']
+            ];
+            var header = ['# OPEX calculation — resistancezero.com (educational reference)',
+                '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
+            RZCalc.downloadCSV('opex-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
+        }
+
         function updateCalculation() {
             try {
+                // Production hardening: non-blocking input feedback (calc is defensive
+                // with defaults, so we flag out-of-range inputs rather than gate).
+                if (window.RZCalc) {
+                    var _vr = RZCalc.validateNumbers([
+                        { id: 'itLoad', label: 'IT load' }
+                    ]);
+                    RZCalc.showErrors('opexValidation', _vr.errors);
+                }
                 const result = calculateOPEX();
                 const cf = countryData[document.getElementById('countrySelect').value];
                 const country = document.getElementById('countrySelect').value;

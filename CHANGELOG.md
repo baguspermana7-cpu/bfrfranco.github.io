@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v1.50.31 — 2026-07-03 (Calc-hardening rollout complete — all financial calculators)
+
+**Changed** — rolled the shared `RZCalc` hardening (input validation with error states
++ CSV export) across the remaining engine-backed calculators, completing the program.
+
+- **capex-calculator** (validate IT load + fuel autonomy), **opex-calculator** (IT load),
+  **roi-calculator** (10 financial inputs), **tco-calculator** (4 core inputs; the
+  4.8k-line flagship, integrated non-invasively — bespoke theme + Pro machinery
+  untouched), **carbon-footprint** (4 editable inputs; readonly/derived excluded), and
+  **cx-calculator** (validation on its button-triggered `cxCalculate()`; its existing
+  Gantt CSV kept). Each gets an **Export CSV** button (except cx, which already had one).
+- All use the shared `js/rz-calc-utils.js` (`window.RZCalc`) — no per-page duplication.
+  Validation is **non-gating** on these (they read inputs defensively with `||default`
+  / `getVal(id,default)`), so out-of-range inputs are flagged (`.rz-invalid` + inline
+  summary) without altering the compute.
+- **Every engine-backed calculator on the site is now hardened**: cdu, fire, pue, capex,
+  opex, roi, tco, carbon, cx. Tracker: `standarization/CALC_HARDENING_ROLLOUT.md`.
+- Verified headless — all 6: util loaded, calc renders results, out-of-range → summary +
+  field marked, restore → cleared, 0 code-level console errors (only pre-existing
+  external geo-IP requests). Audits CLEAN (js-syntax, script-tags, version-stamp,
+  dark-coverage both modes, responsive).
+
+---
+
 ## v1.50.30 — 2026-07-03 (Shared calc-hardening utility + PUE calculator rollout)
 
 **Added** — a reusable production-hardening utility for the engine-backed calculators

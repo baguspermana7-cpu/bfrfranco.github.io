@@ -538,6 +538,7 @@
 
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
@@ -727,8 +728,10 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
         <div class="roi-toolbar-actions">
             <button class="roi-btn-reset" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset</button>
             <button class="roi-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <button class="roi-btn-pdf" id="btnExportCSV" onclick="exportRoiCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
         </div>
     </div>
+    <div class="rz-calc-validation" id="roiValidation" role="alert" aria-live="polite" hidden></div>
 
     <!-- ═══ CALCULATOR GRID ═══ -->
     <section class="calculator-section">
@@ -1381,6 +1384,24 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
     // 8. MAIN CALCULATE ENGINE
     // ══════════════════════════════════════════════════════════════
     function calculate() {
+        // Production hardening: non-blocking input feedback (calc is defensive with
+        // defaults via parseFloat()||default, so we flag out-of-range inputs rather
+        // than gate the result).
+        if (window.RZCalc) {
+            var _vr = RZCalc.validateNumbers([
+                { id: 'totalCapex', label: 'Total CAPEX' },
+                { id: 'itCapacity', label: 'IT Capacity' },
+                { id: 'revenuePerKw', label: 'Revenue per kW' },
+                { id: 'electricityRate', label: 'Electricity rate' },
+                { id: 'pueValue', label: 'PUE' },
+                { id: 'staffingCost', label: 'Staffing cost' },
+                { id: 'maintenanceCost', label: 'Maintenance cost' },
+                { id: 'insuranceCost', label: 'Insurance & other' },
+                { id: 'interestRate', label: 'Interest rate' },
+                { id: 'discountRate', label: 'Discount rate' }
+            ]);
+            RZCalc.showErrors('roiValidation', _vr.errors);
+        }
         // Read inputs
         var totalCapex = parseFloat(document.getElementById('totalCapex').value) || 80;
         var itCapacityMW = parseFloat(document.getElementById('itCapacity').value) || 10;
@@ -1846,7 +1867,57 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
     }
 
     // ══════════════════════════════════════════════════════════════
-    // 16. PDF EXPORT
+    // 16. CSV EXPORT (shared RZCalc hardening util)
+    // ══════════════════════════════════════════════════════════════
+    function exportRoiCSV() {
+        if (!window.RZCalc) return;
+        function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
+        function selText(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
+        var rows = [
+            ['Input', 'Total CAPEX', txt('totalCapex'), '$M', ''],
+            ['Input', 'IT Capacity', txt('itCapacity'), 'MW', ''],
+            ['Input', 'Project lifetime', selText('projectLife'), '', ''],
+            ['Input', 'Construction period', selText('constructionMonths'), '', ''],
+            ['Input', 'Revenue model', selText('revenueModel'), '', ''],
+            ['Input', 'Revenue per kW/month', txt('revenuePerKw'), '$', ''],
+            ['Input', 'Price escalation', txt('escalationVal'), '%', ''],
+            ['Input', 'Ancillary revenue', selText('ancillaryPct'), '', ''],
+            ['Input', 'Electricity rate', txt('electricityRate'), '$/kWh', ''],
+            ['Input', 'PUE', txt('pueValue'), '', ''],
+            ['Input', 'Annual staffing', txt('staffingCost'), '$M', ''],
+            ['Input', 'Annual maintenance', txt('maintenanceCost'), '$M', ''],
+            ['Input', 'Insurance & other', txt('insuranceCost'), '$M/yr', ''],
+            ['Input', 'OPEX escalation', txt('opexEscVal'), '%', ''],
+            ['Input', 'Year 1 occupancy', txt('occ1Val'), '%', ''],
+            ['Input', 'Year 3 occupancy', txt('occ3Val'), '%', ''],
+            ['Input', 'Year 5 occupancy', txt('occ5Val'), '%', ''],
+            ['Input', 'Steady-state occupancy', txt('occMaxVal'), '%', ''],
+            ['Input', 'Debt/Equity split', selText('debtRatio'), '', ''],
+            ['Input', 'Interest rate', txt('interestRate'), '%', ''],
+            ['Input', 'Loan term', selText('loanTerm'), '', ''],
+            ['Input', 'Discount rate / WACC', txt('discountRate'), '%', ''],
+            ['Input', 'Corporate tax rate', txt('taxRateVal'), '%', ''],
+            ['Input', 'Depreciation method', selText('depreciationMethod'), '', ''],
+            ['Input', 'Terminal value method', selText('terminalMethod'), '', ''],
+            ['Input', 'Exit cap rate', txt('capRateVal'), '%', ''],
+            ['Result', 'NPV', txt('primaryValue'), '', ''],
+            ['Result', 'Rating / IRR', txt('gradeText'), '', ''],
+            ['Result', 'IRR', txt('metIRR'), '', ''],
+            ['Result', 'Payback', txt('metPayback'), '', ''],
+            ['Result', 'Profitability Index', txt('metPI'), '', ''],
+            ['Result', 'ROIC', txt('metROIC'), '', ''],
+            ['Result', 'Peak Revenue', txt('metRevenue'), '', ''],
+            ['Result', 'Peak NOI', txt('metNOI'), '', ''],
+            ['Result', 'Yield on Cost', txt('metYield'), '', ''],
+            ['Result', 'Terminal Value', txt('metTerminal'), '', '']
+        ];
+        var header = ['# ROI calculation — resistancezero.com (educational reference)',
+            '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
+        RZCalc.downloadCSV('roi-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // 17. PDF EXPORT
     // ══════════════════════════════════════════════════════════════
     function exportPDF() {
         if (!isPremiumUser) { handlePremiumTab(); return; }

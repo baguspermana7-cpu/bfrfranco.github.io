@@ -633,6 +633,7 @@ a:hover{text-decoration:underline;}
 [data-theme="dark"] .cx-currency-sel { background:rgba(30,41,59,0.6); color:#94a3b8; border-color:rgba(148,163,184,0.15); }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>    <meta property="og:image:alt" content="Data Center Commissioning Calculator | L0-L6 Cost & Schedule">
 
@@ -943,6 +944,8 @@ a:hover{text-decoration:underline;}
   <div class="cx-actions">
     <button class="cx-btn-primary" onclick="cxCalculate()"><i class="fas fa-calculator" style="margin-right:8px;"></i>Calculate Commissioning Cost</button>
   </div>
+
+  <div class="rz-calc-validation" id="cxValidation" role="alert" aria-live="polite" hidden></div>
 
   <!-- Loading Spinner -->
   <div class="cx-loading" id="cxLoading"><span class="cx-spinner"></span>Running Monte Carlo simulation (10,000 iterations)...</div>
@@ -5118,6 +5121,7 @@ function cxRenderDashboard(inp,res,ganttData){
 }
 
 function cxCalculate(){
+  if(window.RZCalc){var _vr=RZCalc.validateNumbers([{id:'cxItLoadNum',label:'IT load (kW)'}]);RZCalc.showErrors('cxValidation',_vr.errors);}
   var inp=cxReadInputs();
   cxLastInputs=inp;
   var res=cxCalcTotalCost(inp);

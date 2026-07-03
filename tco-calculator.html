@@ -2039,6 +2039,7 @@
         [data-theme="dark"] .nav-theme-btn:hover { color:#fbbf24; border-color:rgba(251,191,36,0.4); background:rgba(251,191,36,0.08); }
     </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
+    <script src="js/rz-calc-utils.js?v=2026-07-03" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
@@ -2730,10 +2731,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         <button class="tco-action-btn tco-action-btn-pdf" id="tcoExportPdf" onclick="exportPDF()">
                             <i class="fas fa-file-pdf"></i> Export PDF
                         </button>
+                        <button class="tco-action-btn tco-action-btn-reset" onclick="exportTcoCSV()">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
                         <button class="tco-action-btn tco-action-btn-reset" onclick="resetInputs()">
                             <i class="fas fa-redo"></i> Reset
                         </button>
                     </div>
+                    <div class="rz-calc-validation" id="tcoValidation" role="alert" aria-live="polite" hidden></div>
 
                     <!-- Privacy Badge -->
                     <div class="tco-privacy-badge">
@@ -3297,6 +3302,32 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
         /* ─────────── DOM REFS ─────────── */
         function el(id) { return document.getElementById(id); }
+        function exportTcoCSV() {
+            if (!window.RZCalc) return;
+            function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
+            function sel(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : (e ? e.value : ''); }
+            var rows = [
+                ['Input', 'Region', sel('tcoRegion'), '', ''],
+                ['Input', 'IT load', txt('tcoItLoad'), 'MW', ''],
+                ['Input', 'Period', sel('tcoPeriod'), 'years', ''],
+                ['Input', 'Tier', sel('tcoTier'), '', ''],
+                ['Input', 'PUE', txt('tcoPue'), '', ''],
+                ['Input', 'Utilization', txt('tcoUtil'), '%', ''],
+                ['Input', 'Cooling', sel('tcoCooling'), '', ''],
+                ['Input', 'Growth', txt('tcoGrowth'), '%/yr', ''],
+                ['Result', 'Build TCO', txt('kpiBuildTco'), '', txt('kpiBuildSub')],
+                ['Result', 'Colo TCO', txt('kpiColoTco'), '', txt('kpiColoSub')],
+                ['Result', 'Cloud TCO', txt('kpiCloudTco'), '', txt('kpiCloudSub')],
+                ['Result', 'Best option', txt('kpiBestOption'), '', txt('kpiBestSub')],
+                ['Result', 'Build capex', txt('kpiBuildCapex'), '', ''],
+                ['Result', 'Annual opex', txt('kpiAnnualOpex'), '', ''],
+                ['Result', 'Cost per kW/yr', txt('kpiCostPerKw'), '', txt('kpiCostPerKwSub')],
+                ['Result', 'Breakeven', txt('kpiBreakeven'), '', '']
+            ];
+            var header = ['# TCO calculation — resistancezero.com (educational reference)',
+                '# Generated ' + new Date().toISOString(), '', 'Section,Field,Value,Unit,Note'];
+            RZCalc.downloadCSV('tco-calculation-' + new Date().toISOString().slice(0, 10) + '.csv', header, rows);
+        }
 
         /* ─────────── FORMATTING ─────────── */
         function fmtM(val) {
@@ -3320,6 +3351,17 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
 
         /* ─────────── CALCULATION ENGINE ─────────── */
         function calculate() {
+            // Production hardening: non-blocking input feedback (calc is defensive via
+            // getVal(id,default), so we flag out-of-range inputs rather than gate).
+            if (window.RZCalc) {
+                var _vr = RZCalc.validateNumbers([
+                    { id: 'tcoItLoad', label: 'IT load' },
+                    { id: 'tcoPue', label: 'PUE' },
+                    { id: 'tcoUtil', label: 'Utilization' },
+                    { id: 'tcoGrowth', label: 'Growth rate' }
+                ]);
+                RZCalc.showErrors('tcoValidation', _vr.errors);
+            }
             var region = getSelect('tcoRegion');
             var mkt = MARKET_DATA[region];
             var itMW = getVal('tcoItLoad', 5);

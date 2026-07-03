@@ -27,12 +27,12 @@ shared engine). Self-contained, injects its own theme-aware CSS. API:
 | cdu-calculator | ✅ v1.50.28 | ✅ | inline (pre-util); gated (engine NaN-sensitive) |
 | fire-calculator | ✅ v1.50.29 | ✅ | inline (pre-util); gated; concentration optional |
 | **pue-calculator** | ✅ v1.50.30 | ✅ | **shared `RZCalc`**; non-gating (calc uses `||default`); validate `itLoad` only (rackCount is auto-derived) |
-| capex-calculator | ⬜ | ⬜ | pending — shared util |
-| opex-calculator | ⬜ | ⬜ | pending — shared util |
-| roi-calculator | ⬜ | ⬜ | pending — 10 inputs; check NaN-sensitivity |
-| tco-calculator | ⬜ | ⬜ | pending — flagship, 4.8k lines, bespoke theme + Pro machinery; integrate carefully |
-| carbon-footprint | ⬜ | ⬜ | pending — 12 inputs |
-| cx-calculator | ⬜ | ⬜ | pending — already has a CSV hook; add validation |
+| capex-calculator | ✅ v1.50.31 | ✅ | shared `RZCalc`; non-gating; validate itLoad + fuelHours |
+| opex-calculator | ✅ v1.50.31 | ✅ | shared `RZCalc`; non-gating; validate itLoad |
+| roi-calculator | ✅ v1.50.31 | ✅ | shared `RZCalc`; non-gating (defensive `||default`); 10 inputs validated |
+| tco-calculator | ✅ v1.50.31 | ✅ | shared `RZCalc`; non-gating (`getVal(id,default)`); validate 4 core inputs |
+| carbon-footprint | ✅ v1.50.31 | ✅ | shared `RZCalc`; non-gating; validate 4 editable inputs (readonly/derived excluded) |
+| cx-calculator | ✅ v1.50.31 | ✅ (pre-existing Gantt CSV kept) | shared `RZCalc`; validation on `cxCalculate()` (button-triggered) |
 
 ## Verification (per page, headless)
 Valid state renders results + N CSV rows; out-of-range/cleared field → summary shown +
