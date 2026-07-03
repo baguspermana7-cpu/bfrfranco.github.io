@@ -86,3 +86,15 @@ uses `basisTag: "illustrative"` and says so in the caption.
 
 Reference implementations: `article-13` (2N power SLD — UPS-A failure re-routes flow, rack unaffected) and
 `article-9` (warm-water DLC loop — "Tropical: Jakarta 35°C" collapses the dry-cooler approach; CDU pump failover).
+
+
+## Scrollytelling (v1.50.26)
+
+Scroll-driven step narratives via **`js/rz-scrolly.js`**: `<div class="rz-scrolly" data-rz-scrolly>` =
+`.rz-scrolly-canvas` (sticky; carry class `rz-diagram` to reuse the living-diagram SVG tokens) +
+`.rz-scrolly-steps > .rz-scrolly-step` cards (each `.rz-scrolly-step-inner` with a mono kicker) + a
+`script.rz-scrolly-cfg` JSON (`counters`: one `{key: target}` object per step; `duration`). Canvas layers use
+`class="st-layer st-lN"` — revealed by the `[data-step]` CSS ladder in `css/rz-article-dark.css`; counters are
+`<text data-cv="key">`. Steps activate on crossing the viewport middle and reverse cleanly. Reduced-motion =
+instant states; no-IO = final state. Milestones must be the article's own stated facts (ILLUSTRATIVE-chipped
+caption for the schematic). Flagship reference: `article-23` (the Colossus 122-day build).

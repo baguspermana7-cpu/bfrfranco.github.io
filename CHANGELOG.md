@@ -39,6 +39,23 @@ CSS lives ONLY in `styles-index.css` (index-only feature; 2-stylesheet architect
 
 ---
 
+## v1.50.26 — 2026-07-03 (Scrollytelling flagship — the Colossus build, step by step)
+
+### Added
+- **`js/rz-scrolly.js`** — a zero-dep scroll-driven narrative system: a pinned canvas (`position:sticky`)
+  evolves as step cards cross the viewport middle (IntersectionObserver band). Steps set `data-step` on the
+  container (CSS reveals canvas layers) and animate `<text data-cv>` counters (rAF easeOutCubic; instant under
+  `prefers-reduced-motion`; no-IO browsers see the final state). Works forwards AND backwards.
+- **Flagship: `article-23`** ("xAI Colossus: 150 MW in 122 Days") — right after "xAI did it in 122 days," the
+  reader scrolls through the build: (0) an empty Electrolux plant, construction 19 days after conception →
+  (1) unpermitted gas turbines + Tesla Megapack BESS power up, **MW counter climbs to 150** → (2) rack rows fill
+  the hall, **GPU counter spins to 100,000** → (3) **DAY 122 — LIVE**, with the Huang quote. Every milestone as
+  stated in the article body (ILLUSTRATIVE-chipped schematic). Canvas reuses the living-diagram SVG tokens +
+  dash-flow. Verified by real scroll-through: steps 0→3 advance with correct counters/layers and fully reverse,
+  0 page errors.
+- Scrollytelling authoring recipe added to ARTICLE_DATAVIZ_STANDARD.md. This completes the 4-phase
+  "jauh lebih keren" program (v1.50.23 palette → .24 polish → .25 living diagrams → .26 scrollytelling).
+
 ## v1.50.25 — 2026-07-03 (LIVING DIAGRAMS — animated schematics in the reading flow)
 
 ### Added
