@@ -1844,7 +1844,6 @@ Shared module **`js/rz-command-palette.js`** is the standard search+command impl
   shown when the query is empty and substring-matched while typing.
 - Guard: `window.__rzPalette` — pages still carrying a working inline Fuse copy must NOT load this file
   (double Ctrl+K handlers cancel each other). New pages: include the shared module, do NOT copy the inline script.
-- Rollout state: shared module live on FF-2/FF-3 + articles 20–27 (previously DEAD search) and article-26
-  (previously a degraded `tags`-field filter). 29 older pages (index/articles/articles 1–19/geopolitics/FF-1/
-  insights/datacenter-solutions) still run the inline copy — migrate opportunistically by deleting the inline
-  search block and adding the module.
+- Rollout state: **COMPLETE (v1.50.27)** — the shared module is the ONLY search implementation site-wide
+  (40 pages). All 29 former inline Fuse copies ("Feature 21: Global Search" blocks) were removed in v1.50.27.
+  New pages: just include `js/rz-command-palette.js` (defer); never re-add an inline copy.
