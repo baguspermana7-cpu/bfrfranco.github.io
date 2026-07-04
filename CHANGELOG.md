@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v1.50.36 — 2026-07-03 (Page weight — shared TOC + non-blocking Inter fonts)
+
+### Changed
+- **The article TOC is now a shared module** — 32 pages each carried a ~3.6KB duplicate inline copy of the
+  TOC/scrollspy script; all excised (marker- and signature-bounded, with sanity asserts) and replaced by
+  **`js/rz-article-toc.js`** (idempotent: skips pages without TOC markup or where a list was already built;
+  strips the heading-anchor glyph from labels). ~115KB of duplicated inline JS removed site-wide; one
+  implementation to maintain. Scrollspy verified live (active-section highlight on scroll).
+- **The Inter/JetBrains Google-Fonts stylesheet is now non-blocking** (`media="print" onload` + `<noscript>`)
+  on 34 article/FF/geopolitics pages — the second render-blocking font request removed (the editorial
+  Fraunces set went async in v1.50.24). Interaction + dark-coverage gates CLEAN.
+
 ## v1.50.36 — 2026-07-03 (SEO — fix the 3 pages missing required Open Graph tags)
 
 **Fixed** — the SEO audit's only REQUIRED-tag errors: three pages

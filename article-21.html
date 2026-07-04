@@ -80,7 +80,7 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.10 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.26">
@@ -1596,91 +1596,8 @@ function copyLink(){navigator.clipboard.writeText(shareUrl).then(function(){var 
 })();
 </script>
 
-<!-- TOC Sidebar -->
-<script>
-(function() {
-    var sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
-    if (!sections.length) {
-        var allH2s = document.querySelectorAll('.article-body h2, .article-content h2');
-        allH2s.forEach(function(h2, i) {
-            if (!h2.id) h2.id = 'toc-section-' + (i + 1);
-        });
-        sections = document.querySelectorAll('.article-body h2[id], .article-content h2[id]');
-    }
-    if (!sections.length) return;
-
-    var sidebarList = document.getElementById('tocSidebarList');
-    var mobileList = document.getElementById('tocMobileList');
-    var tocToggle = document.getElementById('tocMobileToggle');
-    var tocDrawer = document.getElementById('tocMobileDrawer');
-    var tocBackdrop = document.getElementById('tocMobileBackdrop');
-    var tocClose = document.getElementById('tocDrawerClose');
-
-    var tocData = [];
-    sections.forEach(function(h2, i) {
-        var id = h2.getAttribute('id');
-        var numMatch = id.match(/\d+/);
-        var num = numMatch ? numMatch[0] : String(i + 1);
-        var text = h2.textContent.replace(/^\s*\d+[\.\s]*/, '').trim();
-        tocData.push({ id: id, num: num, text: text });
-    });
-
-    function buildList(container, isMobile) {
-        tocData.forEach(function(item) {
-            var li = document.createElement('li');
-            if (!isMobile) li.className = 'toc-sidebar-item';
-            var a = document.createElement('a');
-            a.href = '#' + item.id;
-            a.setAttribute('data-section', item.id);
-            if (isMobile) {
-                a.textContent = item.num + '. ' + item.text;
-            } else {
-                a.className = 'toc-sidebar-link';
-                a.innerHTML = '<span class="toc-sidebar-num">' + item.num + '</span>' + item.text;
-            }
-            a.addEventListener('click', function(e) {
-                e.preventDefault();
-                var target = document.getElementById(item.id);
-                if (target) window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
-                if (isMobile) closeMobileDrawer();
-            });
-            li.appendChild(a);
-            container.appendChild(li);
-        });
-    }
-
-    buildList(sidebarList, false);
-    buildList(mobileList, true);
-
-    var currentSection = null;
-    var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                var id = entry.target.getAttribute('id');
-                if (currentSection !== id) {
-                    currentSection = id;
-                    sidebarList.querySelectorAll('.toc-sidebar-link').forEach(function(link) {
-                        link.classList.toggle('active', link.getAttribute('data-section') === id);
-                    });
-                }
-            }
-        });
-    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
-
-    sections.forEach(function(s) { observer.observe(s); });
-
-    function closeMobileDrawer() {
-        if (tocDrawer) tocDrawer.classList.remove('open');
-        if (tocBackdrop) tocBackdrop.classList.remove('visible');
-    }
-    if (tocToggle) tocToggle.addEventListener('click', function() {
-        tocDrawer.classList.toggle('open');
-        tocBackdrop.classList.toggle('visible');
-    });
-    if (tocBackdrop) tocBackdrop.addEventListener('click', closeMobileDrawer);
-    if (tocClose) tocClose.addEventListener('click', closeMobileDrawer);
-})();
-</script>
+<!-- TOC: shared js/rz-article-toc.js -->
+<script src="js/rz-article-toc.js?v=1.50.36" defer></script>
 
 <script src="auth.js?v=2026-05-09-v1" defer></script>
 <script src="rz-engine.min.js?v=2026-04-28" defer></script>
