@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v1.50.37 — 2026-07-03 (Engagement events for the new interactive systems)
+
+### Added
+- **rz-tracker events** (guarded, no-op when the tracker is absent) so the admin dashboard can measure the new
+  systems: `rz_search_open` / `rz_search_go` (destination + query) / `rz_command` (palette),
+  `rz_diagram_scenario` (living diagrams), `rz_scrolly_complete` (scrollytelling reached the final step, fired
+  once). Verified recording into `rz_user_events`; interaction gate CLEAN. Modules cache-busted to ?v=1.50.37.
+
 ## v1.50.36 — 2026-07-03 (Page weight — shared TOC + non-blocking Inter fonts)
 
 ### Changed

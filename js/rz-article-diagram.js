@@ -33,6 +33,7 @@
    ============================================================================ */
 (function () {
   'use strict';
+  function rzt(type, extra) { try { if (window.rzTrack) window.rzTrack(type, extra); } catch (e) {} }
 
   function fmt(v, dp) { return (dp === 0 || dp) ? v.toFixed(dp) : String(Math.round(v)); }
 
@@ -71,6 +72,7 @@
         });
         b.classList.add('active');
         b.setAttribute('aria-pressed', 'true');
+        rzt('rz_diagram_scenario', { scenario: s ? (s.id || s.label) : 'normal' });
         applyState();
         msg.textContent = s && s.msg ? s.msg : '';
         tick(); /* immediate feedback */

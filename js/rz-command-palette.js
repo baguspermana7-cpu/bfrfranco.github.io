@@ -16,6 +16,7 @@
   if (window.__rzPalette) return;
   window.__rzPalette = true;
 
+  function rzt(type, extra) { try { if (window.rzTrack) window.rzTrack(type, extra); } catch (e) {} }
   var RECENT_KEY = 'rz-search-recent';
   var fuse = null, searchData = null, focusedIdx = -1, activeFilter = 'all', lastResults = [];
   var sections = null;   /* deep search: [{t: heading, u: "page.html#id", a: article title}] */
@@ -89,7 +90,7 @@
   function bindCommandRows() {
     resultsEl.querySelectorAll('.rz-cmd').forEach(function (el) {
       var c = COMMANDS[parseInt(el.getAttribute('data-cmd'), 10)];
-      if (c && c.run) el.addEventListener('click', function (ev) { ev.preventDefault(); c.run(); closeSearch(); });
+      if (c && c.run) el.addEventListener('click', function (ev) { ev.preventDefault(); rzt('rz_command', { cmd: c.title }); c.run(); closeSearch(); });
     });
   }
 
@@ -125,6 +126,7 @@
   }
 
   function openSearch() {
+    rzt('rz_search_open');
     overlay.style.display = '';
     modal.style.display = '';
     overlay.classList.add('active');
@@ -280,7 +282,7 @@
       var idx = parseInt(el.getAttribute('data-idx'), 10);
       el.addEventListener('mouseenter', function () { showPreview(filtered[idx], el); });
       el.addEventListener('mouseleave', function () { hidePreview(); });
-      el.addEventListener('click', function () { saveRecent(input.value.trim()); });
+      el.addEventListener('click', function () { rzt('rz_search_go', { to: el.getAttribute('href'), q: input.value.trim() }); saveRecent(input.value.trim()); });
     });
   }
 

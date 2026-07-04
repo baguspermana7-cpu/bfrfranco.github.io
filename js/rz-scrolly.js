@@ -23,6 +23,7 @@
    ============================================================================ */
 (function () {
   'use strict';
+  function rzt(type, extra) { try { if (window.rzTrack) window.rzTrack(type, extra); } catch (e) {} }
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   function fmtN(v) {
@@ -69,7 +70,9 @@
       anim = requestAnimationFrame(frame);
     }
 
+    var completed = false;
     function activate(i, instant) {
+      if (!instant && i === steps.length - 1 && !completed) { completed = true; rzt('rz_scrolly_complete', { steps: steps.length }); }
       root.setAttribute('data-step', String(i));
       [].forEach.call(steps, function (s, j) { s.classList.toggle('active', j === i); });
       setCounters(counters[i], instant);
