@@ -346,6 +346,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/build-sitemap.py` | regen sitemap.xml from filesystem |
 | `tools/build-llms-txt.py` | regen llms.txt |
 | `tools/build-llms-full.py` | regen llms-full.txt (concatenated Markdown) |
+| `tools/build-search-sections.py` | regen search-sections.json (palette deep search over h2 sections) — run `--apply` after adding/renaming article sections |
 | `tools/build-og-images.py` | generate per-page OG cards |
 | `tools/build-changelog-html.py` | regen public /changelog.html from CHANGELOG.md |
 | `tools/insert-version-script.py` | walk pages and inject `<script src="js/rz-version.js">` |

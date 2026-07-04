@@ -18,6 +18,7 @@
 
   var RECENT_KEY = 'rz-search-recent';
   var fuse = null, searchData = null, focusedIdx = -1, activeFilter = 'all', lastResults = [];
+  var sections = null;   /* deep search: [{t: heading, u: "page.html#id", a: article title}] */
   var overlay, modal, input, resultsEl, chipsEl, previewEl;
 
   /* ---- commands (beyond search) ---- */
@@ -147,6 +148,8 @@
       };
       var loadData = function () {
         fetch('search-index.json').then(function (r) { return r.json(); }).then(initFuse).catch(function () {});
+        /* deep search corpus (section headings with static ids) — optional, best-effort */
+        fetch('search-sections.json').then(function (r) { return r.json(); }).then(function (d) { sections = d; }).catch(function () {});
       };
       if (typeof Fuse === 'undefined') {
         var s = document.createElement('script');
@@ -223,17 +226,39 @@
       .filter(function (x) { return x.c.title.toLowerCase().indexOf(q) !== -1; });
   }
 
+  /* deep search: section headings, ranked by earliest match position */
+  function matchedSections(q) {
+    if (!sections || q.length < 3) return [];
+    q = q.toLowerCase();
+    var hits = [];
+    for (var i = 0; i < sections.length; i++) {
+      var pos = sections[i].t.toLowerCase().indexOf(q);
+      if (pos !== -1) hits.push({ s: sections[i], pos: pos });
+    }
+    hits.sort(function (a, b) { return a.pos - b.pos; });
+    return hits.slice(0, 3).map(function (h) { return h.s; });
+  }
+  function sectionRow(s) {
+    return '<a href="' + s.u + '" class="search-result-item rz-section">' +
+      '<div class="search-result-icon">&#167;</div>' +
+      '<div class="search-result-info">' +
+      '<div class="search-result-category">Section &#183; ' + escapeHtml(s.a) + '</div>' +
+      '<div class="search-result-title">' + escapeHtml(s.t) + '</div>' +
+      '</div></a>';
+  }
+
   function renderResults(results) {
     var filtered = filterResults(results);
     var q = input.value.trim();
     var cmds = activeFilter === 'all' ? matchedCommands(q) : [];
-    if (!filtered.length && !cmds.length) {
+    var secs = activeFilter === 'all' ? matchedSections(q) : [];
+    if (!filtered.length && !cmds.length && !secs.length) {
       resultsEl.innerHTML = '<div class="search-empty">No results found</div>';
       focusedIdx = -1; hidePreview(); return;
     }
     var html = '';
     cmds.slice(0, 2).forEach(function (x) { html += commandRow(x.c, x.i); });
-    filtered.slice(0, 8).forEach(function (r, i) {
+    filtered.slice(0, 6).forEach(function (r, i) {
       var item = r.item;
       html += '<a href="' + item.url + '" class="search-result-item" data-idx="' + i + '">' +
         '<div class="search-result-icon ' + getIconClass(item.category) + '">' + getIconLabel(item) + '</div>' +
@@ -243,6 +268,7 @@
         '<div class="search-result-desc">' + highlightText(item.description, r.matches, 'description') + '</div>' +
         '</div></a>';
     });
+    secs.forEach(function (s) { html += sectionRow(s); });
     resultsEl.innerHTML = html;
     focusedIdx = -1;
     bindCommandRows();
