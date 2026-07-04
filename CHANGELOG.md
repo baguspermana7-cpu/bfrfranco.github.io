@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.51.2 — 2026-07-05 (CAPEX calculator — engine-powered Monte-Carlo uncertainty panel)
+
+**Added**
+- **Cost Uncertainty & Sensitivity panel** on `capex-calculator.html` — an ADDITIVE, engine-powered
+  analysis that does NOT change the calculator's own (superior, city-level T&T/C&W 2025) cost data or
+  point estimate. It runs a 4,000-iteration Monte-Carlo (`RZEngine.models.sim.monteCarlo`, seeded/
+  reproducible) around the computed total, varying construction-bid spread, multi-year escalation, and
+  scope growth → **P10 / P50 / P90** CAPEX range + a histogram, plus a **sensitivity tornado**
+  (`RZEngine.models.sim.tornado`) ranking which driver moves the total most. Charts are RZEngine v2.0
+  framework-free SVG builders. Renders on `window.load` (after the deferred engine is ready) and
+  degrades gracefully — the panel simply stays hidden if the engine is unavailable, never breaking the
+  calculator. Dark-mode-safe (built on the page's theme vars); verified 0 console errors both themes.
+  This is the owner-chosen approach ("leave the calculators' data, add new engine capabilities they
+  lack") for making RZEngine v2.0 deliver value to the calculators without regressing them.
+
 ## v1.51.1 — 2026-07-04 (RZEngine v2.0.0 — calculator + dcmoc reconciliation audit)
 
 **Changed** (docs/verification — no runtime change)
