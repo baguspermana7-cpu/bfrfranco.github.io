@@ -119,13 +119,17 @@
   /* a11y: horizontally-scrollable table wrappers must be keyboard-reachable (v1.50.39) */
   function focusableScrollers(){
     var body=document.querySelector('.article-body'); if(!body) return;
-    [].forEach.call(body.querySelectorAll('div,figure'),function(el){
+    [].forEach.call(body.querySelectorAll('div,figure,table'),function(el){
       if(el.hasAttribute('tabindex')) return;
       var cs=getComputedStyle(el);
-      if((cs.overflowX==='auto'||cs.overflowX==='scroll') && el.scrollWidth>el.clientWidth+2){
+      if((cs.overflowX==='auto'||cs.overflowX==='scroll') && el.scrollWidth>el.clientWidth){
         el.setAttribute('tabindex','0');
-        el.setAttribute('role','group');
-        if(!el.getAttribute('aria-label')) el.setAttribute('aria-label','Scrollable table');
+        /* a table scrolls itself when styled display:block — keep its native
+           semantics; role/label only on generic div/figure wrappers */
+        if(el.tagName!=='TABLE'){
+          el.setAttribute('role','group');
+          if(!el.getAttribute('aria-label')) el.setAttribute('aria-label','Scrollable table');
+        }
       }
     });
   }
@@ -134,6 +138,10 @@
     try{ buildRail(); }catch(e){}
     try{ buildAnchors(); }catch(e){}
     try{ focusableScrollers(); }catch(e){}
+    /* fonts/images widen tables after DOMContentLoaded — re-scan once settled */
+    window.addEventListener('load',function(){ try{ focusableScrollers(); }catch(e){} });
+    if(document.fonts&&document.fonts.ready&&document.fonts.ready.then)
+      document.fonts.ready.then(function(){ try{ focusableScrollers(); }catch(e){} });
     var minLeft=null;
     try{ minLeft=buildMinLeft(); }catch(e){}
     /* read-progress bar */

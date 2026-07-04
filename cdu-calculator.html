@@ -26,7 +26,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <link rel="stylesheet" href="styles.min.css?v=2026-07-04-a11y">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -40,8 +40,9 @@
     </script>
     <style>
         :root { --cdu-primary:#06b6d4; --cdu-accent:#0891b2; }
+        :root:not([data-theme="dark"]) { --cdu-primary:#0e7490; --cdu-accent:#0e7490; }
         [data-theme="dark"] { --cdu-bg:#0f172a; --cdu-card:#1e293b; --cdu-border:#334155; --cdu-text:#f1f5f9; --cdu-muted:#94a3b8; --cdu-inset:#0b1220; }
-        :root:not([data-theme="dark"]) { --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#64748b; --cdu-inset:#f1f5f9; }
+        :root:not([data-theme="dark"]) { --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#475569; --cdu-inset:#f1f5f9; }
         body { font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif; background:var(--cdu-bg); color:var(--cdu-text); }
         main { background:var(--cdu-bg); }
         .cc-hero { position:relative; padding:7rem 1.5rem 1.6rem; border-bottom:1px solid var(--cdu-border); overflow:hidden; }
@@ -92,13 +93,13 @@
         .kpi-val { font-size:1.32rem; font-weight:700; font-family:'JetBrains Mono',monospace; margin:.2rem 0 .1rem; font-variant-numeric:tabular-nums slashed-zero; }
         .kpi-sub { font-size:.72rem; color:var(--cdu-muted); line-height:1.4; }
         .chip { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; letter-spacing:.06em; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
-        .chip.derived { background:rgba(6,182,212,.14); color:#0891b2; }
-        .chip.warn { background:rgba(217,119,6,.16); color:#b45309; }
-        .chip.alarm { background:rgba(220,38,38,.16); color:#dc2626; }
+        .chip.derived { background:rgba(6,182,212,.14); color:#155e75; }
+        .chip.warn { background:rgba(217,119,6,.16); color:#92400e; }
+        .chip.alarm { background:rgba(220,38,38,.16); color:#b91c1c; }
         [data-theme="dark"] .chip.derived { color:#67e8f9; }
         .cc-note { grid-column:1 / -1; border:1px dashed var(--cdu-border); border-radius:10px; background:var(--cdu-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--cdu-muted); line-height:1.6; }
         .cc-note b { color:var(--cdu-text); }
-        .cc-note a { color:var(--cdu-primary); }
+        .cc-note a { color:var(--cdu-primary); text-decoration:underline; text-underline-offset:2px; }
         /* toolbar: mode toggle + PDF */
         .cc-actionbar { grid-column:1 / -1; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
         .cc-mode { display:inline-flex; border:1px solid var(--cdu-border); border-radius:8px; overflow:hidden; }
@@ -111,7 +112,7 @@
         /* pro section + gate */
         .cc-pro { grid-column:1 / -1; position:relative; margin-top:.4rem; }
         .cc-pro.locked > .cc-pro-inner { filter:blur(6px); user-select:none; pointer-events:none; }
-        .cc-pro-overlay { display:none; position:absolute; inset:0; z-index:10; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:rgba(15,23,42,.55); border-radius:12px; cursor:pointer; }
+        .cc-pro-overlay { display:none; position:absolute; inset:0; z-index:10; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:rgba(15,23,42,.78); border-radius:12px; cursor:pointer; }
         .cc-pro.locked .cc-pro-overlay { display:flex; }
         .cc-pro-overlay i { font-size:1.8rem; color:#a855f7; }
         .cc-pro-overlay .t { font-weight:700; color:#fff; }
@@ -159,10 +160,16 @@
         .rz-chart-src{ font-family:'JetBrains Mono',monospace; font-size:.64rem; color:var(--cdu-muted); margin-top:.7rem; line-height:1.5; }
         .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cdu-muted); }
         .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
-        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#d97706; }
+        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
         [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
         [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
-    </style>
+    
+/* a11y (v1.50.41): dark keeps cyan for text but active buttons need a darker
+   fill for white labels; warn/alarm chips brighten on dark tints */
+[data-theme="dark"] .preset-btn.active, [data-theme="dark"] .cc-mode button.free.active, [data-theme="dark"] .cc-mode button.pro.active { background:#0e7490; border-color:#0e7490; }
+[data-theme="dark"] .chip.warn { color:#fbbf24; }
+[data-theme="dark"] .chip.alarm { color:#f87171; }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -267,7 +274,7 @@
                 </div>
                 <div class="input-row">
                     <label class="input-label" for="inPumpEff">Pump / motor efficiency <span class="tip">?<span class="tipbox"><b>Efficiencies</b> — pump BEP (~0.70) and motor (~0.92). Used for shaft and electrical pump power.</span></span></label>
-                    <div style="display:flex; gap:.5rem;"><input class="input-field" id="inPumpEff" type="number" value="0.70" min="0.3" max="0.9" step="0.01"><input class="input-field" id="inMotorEff" type="number" value="0.92" min="0.7" max="0.99" step="0.01"></div>
+                    <div style="display:flex; gap:.5rem;"><input class="input-field" id="inPumpEff" type="number" value="0.70" min="0.3" max="0.9" step="0.01"><input class="input-field" id="inMotorEff" aria-label="Motor efficiency" type="number" value="0.92" min="0.7" max="0.99" step="0.01"></div>
                 </div>
                 <div class="input-row">
                     <label class="input-label" for="inPerPump">Per-pump capacity (LPM) <span class="tip">?<span class="tipbox"><b>Duty pump flow</b> — capacity of one pump; drives the N+1 count (OCP Deschutes mandates N+1).</span></span></label>
@@ -286,7 +293,7 @@
                 </div>
                 <div class="input-row">
                     <label class="input-label" for="inAir">Room air T / RH (°C / %) <span class="tip">?<span class="tipbox"><b>Dew-point inputs</b> — room air temperature and relative humidity set the dew point. Supply must stay ≥2–3 °C above it.</span></span></label>
-                    <div style="display:flex; gap:.5rem;"><input class="input-field" id="inAir" type="number" value="24" min="10" max="40" step="0.5"><input class="input-field" id="inRh" type="number" value="60" min="10" max="100" step="1"></div>
+                    <div style="display:flex; gap:.5rem;"><input class="input-field" id="inAir" type="number" value="24" min="10" max="40" step="0.5"><input class="input-field" id="inRh" aria-label="Relative humidity (%)" type="number" value="60" min="10" max="100" step="1"></div>
                 </div>
             </div>
         </div>

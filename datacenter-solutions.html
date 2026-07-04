@@ -111,7 +111,7 @@
             /* Text Colors */
             --text-primary: #212529;
             --text-secondary: #495057;
-            --text-muted: #6c757d;
+            --text-muted: #495057;
 
             /* Glassmorphism - Light Mode */
             --glass-bg: rgba(255, 255, 255, 0.85);
@@ -140,7 +140,7 @@
 
             --text-primary: #e2e8f0;
             --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --text-muted: #94a3b8;
 
             --glass-bg: rgba(18, 18, 30, 0.9);
             --glass-bg-dark: rgba(10, 10, 20, 0.95);
@@ -2830,6 +2830,22 @@
     .bento-photo { max-height: 220px; }
     .nav-brand-text { display: none; }
 }
+
+/* a11y (v1.50.41): open-btn was near-white on pale blue in light mode; h2 used
+   --dark-blue (#1e3a5f) in dark; standard-tag emerald 2.6:1 on its mint tint;
+   neon instrument tokens (#00DDFF/#00FF88/#60a5fa) are dark-mode colors — darken in light */
+:root:not([data-theme="dark"]) .ds-item-open-btn { color:#1e3a5f; }
+:root:not([data-theme="dark"]) .standard-tag { color:#047857; }
+:root:not([data-theme="dark"]) .ds-open-btn { color:#1e5a80; }
+:root:not([data-theme="dark"]) [style*="color:#00DDFF"] { color:#056177 !important; }
+:root:not([data-theme="dark"]) [style*="color:#00FF88"] { color:#047857 !important; }
+:root:not([data-theme="dark"]) [style*="color:#60a5fa"] { color:#1d4ed8 !important; }
+[data-theme="dark"] .section-header h2 { color: var(--text-primary); }
+[data-theme="dark"] .section-header p, [data-theme="dark"] #pln-monitor > p { color:#94a3b8; }
+[data-theme="dark"] .paper-info h4 { color: var(--text-primary); }
+[data-theme="dark"] #faq h2 { color: var(--text-primary); }
+[data-theme="dark"] [style*="color:#64748b"], [data-theme="dark"] [style*="color: #64748b"] { color:#94a3b8 !important; }
+[data-theme="dark"] [style*="color:var(--dark-blue)"] { color:#e2e8f0 !important; }
 </style>
 
     <!-- Structured Data - BreadcrumbList -->

@@ -44,6 +44,7 @@ python3 tools/audit-seo.py                         # SEO meta + JSON-LD
 node   tools/audit-dark-coverage.mjs --strict      # NO white body/content in dark mode (v1.47.x)
 node   tools/audit-article-charts.mjs --strict     # every article chart carries source + basisTag (v1.50.1)
 node   tools/audit-interactions.mjs --strict      # REAL-input gate: palette, living diagrams, scrolly, polish (v1.50.34)
+node   tools/audit-a11y.mjs --strict               # axe-core render gate: 0 critical/serious on 8-page set x both themes (v1.50.41)
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):

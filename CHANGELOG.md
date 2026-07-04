@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v1.50.41 — 2026-07-04 (Accessibility — permanent axe gate + full 8-page WCAG-AA pass)
+
+**Added**
+- **`tools/audit-a11y.mjs`** — permanent accessibility render gate (in the ship suite +
+  CLAUDE.md): vendored axe-core 4.10.2 (`tools/vendor/axe.min.js`) over an 8-page
+  representative set (index, articles, article-13, article-26, fire/cdu calculators,
+  glossary, datacenter-solutions) x both themes, over local HTTP with the
+  localStorage+attribute theme method. Fails on any critical/serious violation;
+  moderate/minor (heading-order, region) are reported as non-gating advisories.
+
+**Changed** — extended the WCAG-AA sweep from v1.50.40's 4-page audit set to the full
+8-page gate set (341 flagged nodes → 0 critical/serious, both themes):
+- `article-13.html`: brand company badges (AWS/Google/Microsoft/NVIDIA) darkened on
+  their tinted chips with dark-mode counterparts; 44 inline emerald + 39 amber/red/violet
+  table accents darkened with paired dark overrides; TOC section numbers + reference
+  numbers (`#06b6d4` at 2.3:1) → `#0e7490`/`#22d3ee`; `.article-body h4` dark override;
+  neon code-span colors (`#67e8f9`/`#f472b6`/`#ff9900`) darkened in light mode only.
+- `articles.html`: card excerpts + category chips darkened (light) with dark pairs.
+- `datacenter-solutions.html`: `--text-muted` both themes; open-buttons were near-white
+  on pale blue; neon instrument tokens darkened light-only; section/paper/FAQ headings
+  used `--dark-blue` (#1e3a5f) in dark mode → readable overrides.
+- `cdu-calculator.html`: derived/warn/alarm chips, mode buttons, pro-gate overlay scrim
+  (.55 → .78), 2 remaining unlabeled inputs (`aria-label`), note links underlined.
+- Shared `styles.css`: `.calc-disclaimer .disc-fine` used `#64748b !important`
+  (beat every page-level fix) → theme-correct colors + readable disclaimer links.
+- Shared `js/rz-article-editorial.js`: focusable-scroller tagging now also covers
+  tables that scroll themselves (`display:block` tables), re-scans on `window.load` +
+  `document.fonts.ready`, and matches axe's any-overflow threshold.
+- Cache-busts: `styles.min.css` (69 pages — was still on `v=2026-05-18` after
+  v1.50.40's edit), `styles-index.min.css`, `rz-article-editorial.js` (37 pages).
+
+**Verification** — `audit-a11y --strict` CLEAN (8pp x 2 themes, 0 critical/serious, 56
+non-gating advisories); full suite green: script-tags, js-syntax, version-stamp 185/191,
+mobile 0 fail, responsive-layout CLEAN (113pp), dark-coverage CLEAN (114pp), charts 25/25,
+interactions CLEAN.
+
 ## v1.50.40 — 2026-07-04 (Accessibility — WCAG-AA sweep: labels, contrast, focusable scrollers, landmarks)
 
 **Added**

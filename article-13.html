@@ -80,11 +80,11 @@
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.39">
-    <script src="js/rz-article-editorial.js?v=1.50.39" defer></script>
+    <script src="js/rz-article-editorial.js?v=1.50.41" defer></script>
     <script src="js/rz-article-diagram.js?v=1.50.37" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
-    <link rel="stylesheet" href="styles.min.css?v=2026-05-18-lm">
+    <link rel="stylesheet" href="styles.min.css?v=2026-07-04-a11y">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-13-cover.jpg">
 
@@ -304,7 +304,7 @@
 
         .toc-item-number {
             font-size: 0.75rem;
-            color: var(--accent-cyan);
+            color: #0e7490;
             font-weight: 700;
             margin-bottom: 0.25rem;
         }
@@ -322,7 +322,7 @@
         }
         .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
         .toc-item.toc-calculator .toc-calc-badge {
-            font-size: 0.6rem; background: #06b6d4; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+            font-size: 0.6rem; background: #0e7490; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
         }
         [data-theme="dark"] .toc-item.toc-calculator {
             background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(6,182,212,0.08) 100%);
@@ -436,11 +436,11 @@
             font-weight: 600;
         }
 
-        .company-badge.aws { background: #ff990033; color: #ff9900; }
-        .company-badge.google { background: #4285f433; color: #4285f4; }
-        .company-badge.microsoft { background: #00a4ef33; color: #00a4ef; }
+        .company-badge.aws { background: #ff990033; color: #8a5300; }
+        .company-badge.google { background: #4285f433; color: #1d4ed8; }
+        .company-badge.microsoft { background: #00a4ef33; color: #155e75; }
         .company-badge.xai { background: #00000020; color: #333; }
-        .company-badge.nvidia { background: #76b90033; color: #76b900; }
+        .company-badge.nvidia { background: #76b90033; color: #3f6212; }
 
         /* Info Boxes */
         .info-box {
@@ -731,8 +731,8 @@
             font-weight: 600;
         }
 
-        .failure-severity.critical { background: #fef2f2; color: #dc2626; }
-        .failure-severity.high { background: #fff7ed; color: #ea580c; }
+        .failure-severity.critical { background: #fef2f2; color: #b91c1c; }
+        .failure-severity.high { background: #fff7ed; color: #9a3412; }
         .failure-severity.medium { background: #fffbeb; color: #d97706; }
 
         .failure-sequence {
@@ -795,7 +795,7 @@
         }
 
         .reference-number {
-            color: var(--accent-cyan);
+            color: #0e7490;
             font-weight: 700;
             flex-shrink: 0;
         }
@@ -1093,6 +1093,37 @@
             background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 4px;
             color: #67e8f9; margin-top: 4px; display: block;
         }
+
+/* a11y (v1.50.41): dark overrides for light-swept + inline colors; links distinguishable */
+[data-theme="dark"] .toc-item-number { color: #22d3ee; }
+[data-theme="dark"] .article-body h4 { color: #94a3b8; }
+[data-theme="dark"] .aig-kpi-sublabel { color: #94a3b8; }
+[data-theme="dark"] [style*="color: #047857"], [data-theme="dark"] [style*="color:#047857"] { color:#34d399 !important; }
+[data-theme="dark"] [style*="color: #ef4444"], [data-theme="dark"] [style*="color:#ef4444"] { color:#f87171 !important; }
+[data-theme="dark"] [style*="color: #8b5cf6"], [data-theme="dark"] [style*="color:#8b5cf6"] { color:#a5b4fc !important; }
+[data-theme="dark"] [style*="color: #92400e"], [data-theme="dark"] [style*="color:#92400e"] { color:#fbbf24 !important; }
+[data-theme="dark"] [style*="color: #b91c1c"], [data-theme="dark"] [style*="color:#b91c1c"] { color:#f87171 !important; }
+[data-theme="dark"] [style*="color: #6d28d9"], [data-theme="dark"] [style*="color:#6d28d9"] { color:#a5b4fc !important; }
+[data-theme="dark"] .company-badge.aws { color:#ffb84d; }
+[data-theme="dark"] .company-badge.google { color:#8ab4f8; }
+[data-theme="dark"] .company-badge.microsoft { color:#5bc9f5; }
+[data-theme="dark"] .company-badge.nvidia { color:#a3d95c; }
+[data-theme="dark"] .failure-severity.high { background:rgba(234,88,12,.16); color:#fdba74; }
+/* code syntax colors are dark-box colors — darken when the box renders light */
+:root:not([data-theme="dark"]) .code-block .keyword { color:#be185d; }
+:root:not([data-theme="dark"]) .code-block .variable { color:#0e7490; }
+:root:not([data-theme="dark"]) .formula-box pre span.keyword { color:#be185d; }
+:root:not([data-theme="dark"]) .formula-box pre span.variable { color:#0e7490; }
+/* pre/formula spans carry inline neon colors meant for dark boxes */
+:root:not([data-theme="dark"]) [style*="color: #67e8f9"] { color:#0e7490 !important; }
+:root:not([data-theme="dark"]) [style*="color: #f472b6"] { color:#be185d !important; }
+:root:not([data-theme="dark"]) [style*="color: #ff9900"] { color:#8a5300 !important; }
+:root:not([data-theme="dark"]) [style*="color: #60a5fa"] { color:#1d4ed8 !important; }
+[data-theme="dark"] .reference-number { color:#22d3ee; }
+[data-theme="dark"] .failure-severity.critical { background:rgba(220,38,38,.16); color:#f87171; }
+[data-theme="dark"] [style*="color: #1e3a5f"] { color:#93c5fd !important; border-color:#3b82f6 !important; }
+[data-theme="dark"] .cookie-banner a, [data-theme="dark"] #cookieBanner a { color:#93c5fd; }
+.reference-item a, .article-body p a { text-decoration: underline; text-underline-offset: 2px; }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
@@ -1178,16 +1209,16 @@
                     <ul class="dropdown-menu" role="menu">
                         <li role="menuitem"><a href="datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="datahallAI.html" style="color: #8b5cf6;">DC AI/HPC</a></li>
+                        <li role="menuitem"><a href="datahallAI.html" style="color: #6d28d9;">DC AI/HPC</a></li>
                         <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li role="menuitem"><a href="tco-calculator.html" style="color: #4f46e5; font-weight: 600;">TCO Calculator</a></li>
-                        <li role="menuitem"><a href="capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
-                        <li role="menuitem"><a href="opex-calculator.html" style="color: #10b981;">OPEX Calculator</a></li>
+                        <li role="menuitem"><a href="capex-calculator.html" style="color: #92400e;">CAPEX Calculator</a></li>
+                        <li role="menuitem"><a href="opex-calculator.html" style="color: #047857;">OPEX Calculator</a></li>
                         <li role="menuitem"><a href="roi-calculator.html" style="color: #3b82f6;">ROI Calculator</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li role="menuitem"><a href="dc-market-tracker.html" style="color: #0d9488; font-weight: 600;">DC Market</a></li>
-                        <li role="menuitem"><a href="dcmoc/" style="color: #ef4444; font-weight: 600;">DC MOC</a></li>
+                        <li role="menuitem"><a href="dcmoc/" style="color: #b91c1c; font-weight: 600;">DC MOC</a></li>
                     </ul>
                 </li>
                 <li class="nav-dropdown">
@@ -1199,7 +1230,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
-                        <li><a href="geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
+                        <li><a href="geopolitics.html" style="color: #b91c1c;">Global Analysis</a></li>
                         <li><a href="future-forward.html" style="color: #a855f7;">Future Forward</a></li>
                                 <li><a href="glossary.html" style="color: #14b8a6;">Glossary</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
@@ -1634,7 +1665,7 @@ P_loss(48V) = (P / 48)² × R = P²R / 2304
 
 Ratio: P_loss(12V) / P_loss(48V) = 2304 / 144 = 16
 
-<span style="color: #10b981;">Result: 48V reduces distribution losses by 93.75%</span></pre>
+<span style="color: #047857;">Result: 48V reduces distribution losses by 93.75%</span></pre>
                 </div>
 
                 <h4>Google's Power Architecture Evolution</h4>
@@ -1741,19 +1772,19 @@ Ratio: P_loss(12V) / P_loss(48V) = 2304 / 144 = 16
                                 <td>Colossus 1</td>
                                 <td>150 MW (grid) + 35 MW (generators)</td>
                                 <td>100,000 H100</td>
-                                <td style="color: #10b981;">Operational (July 2024)</td>
+                                <td style="color: #047857;">Operational (July 2024)</td>
                             </tr>
                             <tr>
                                 <td>Phase 2</td>
                                 <td>300 MW total</td>
                                 <td>200,000 H100/H200</td>
-                                <td style="color: #10b981;">Operational (2025)</td>
+                                <td style="color: #047857;">Operational (2025)</td>
                             </tr>
                             <tr>
                                 <td>Colossus 2</td>
                                 <td><strong>2 GW total</strong></td>
                                 <td>555,000 GPUs</td>
-                                <td style="color: #f59e0b;">Announced (Jan 2026)</td>
+                                <td style="color: #92400e;">Announced (Jan 2026)</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1941,13 +1972,13 @@ Compute Power:           100,000 × 2,700W = <strong>270 MW</strong>
 DLC + Cooling (PUE 1.12): 270 MW × 0.12 = 32 MW
 <strong>Total Azure Capacity:   ~300 MW</strong>
 
-<span style="color: #8b5cf6; font-weight: 600;">═══ FLUIDSTACK PARTNERSHIP ═══</span>
+<span style="color: #6d28d9; font-weight: 600;">═══ FLUIDSTACK PARTNERSHIP ═══</span>
 Texas Training Cluster:  ~200 MW (GPU compute)
 NY Inference Cluster:    ~50 MW
 Cooling & Infrastructure: ~50 MW
 <strong>Total Fluidstack:       ~300 MW</strong>
 
-<span style="color: #10b981; font-weight: 700;">═══ COMBINED ANTHROPIC INFRASTRUCTURE ═══</span>
+<span style="color: #047857; font-weight: 700;">═══ COMBINED ANTHROPIC INFRASTRUCTURE ═══</span>
 AWS Project Rainier:     600 MW
 Google Cloud TPU:        500 MW → 1,100 MW (2026)
 Microsoft Azure:         300 MW
@@ -1983,49 +2014,49 @@ Annual Energy:          ~15-20 TWh/year</pre>
                                 <td>~10% of Rainier capacity</td>
                                 <td>~60 MW</td>
                                 <td>Auto-failover to other AZs + Google/Azure</td>
-                                <td style="color: #10b981;"><strong>&lt;5 min</strong></td>
+                                <td style="color: #047857;"><strong>&lt;5 min</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>AWS Complete Outage</strong></td>
                                 <td>All Trainium2 workloads</td>
                                 <td>~600 MW (26%)</td>
                                 <td>Shift training to Google TPU; inference to Azure</td>
-                                <td style="color: #f59e0b;"><strong>15-30 min</strong></td>
+                                <td style="color: #92400e;"><strong>15-30 min</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Google Cloud Outage</strong></td>
                                 <td>All TPU workloads</td>
                                 <td>~500-1,100 MW (35%)</td>
                                 <td>Route to AWS Trainium2; Azure for GPU tasks</td>
-                                <td style="color: #f59e0b;"><strong>15-30 min</strong></td>
+                                <td style="color: #92400e;"><strong>15-30 min</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Microsoft Azure Outage</strong></td>
                                 <td>GB200 GPU workloads</td>
                                 <td>~300 MW (13%)</td>
                                 <td>Failover to Fluidstack GPU clusters</td>
-                                <td style="color: #10b981;"><strong>&lt;10 min</strong></td>
+                                <td style="color: #047857;"><strong>&lt;10 min</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Fluidstack Outage</strong></td>
                                 <td>Custom GPU inference</td>
                                 <td>~300 MW (13%)</td>
                                 <td>Shift to Azure or Google inference pods</td>
-                                <td style="color: #10b981;"><strong>&lt;10 min</strong></td>
+                                <td style="color: #047857;"><strong>&lt;10 min</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Simultaneous Dual Outage</strong></td>
                                 <td>Any two providers</td>
                                 <td>~40-50% capacity</td>
                                 <td>Degraded mode; prioritize inference</td>
-                                <td style="color: #ef4444;"><strong>30-60 min</strong></td>
+                                <td style="color: #b91c1c;"><strong>30-60 min</strong></td>
                             </tr>
                             <tr style="background: rgba(239, 68, 68, 0.1);">
                                 <td><strong>Triple Provider Outage</strong></td>
                                 <td>Catastrophic (AWS+Google+Azure)</td>
                                 <td>~85% capacity</td>
                                 <td>Fluidstack-only operation; emergency mode</td>
-                                <td style="color: #ef4444;"><strong>>1 hour</strong></td>
+                                <td style="color: #b91c1c;"><strong>>1 hour</strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -2063,7 +2094,7 @@ Annual Energy:          ~15-20 TWh/year</pre>
   Microsoft Azure:     99.95% = 4.38 hours downtime/year
   Fluidstack (est):    99.9%  = 8.76 hours downtime/year
 
-<span style="color: #10b981; font-weight: 600;">Multi-Cloud Availability (Parallel Redundancy):</span>
+<span style="color: #047857; font-weight: 600;">Multi-Cloud Availability (Parallel Redundancy):</span>
   For service requiring ANY ONE provider operational:
 
   P(all down) = P(AWS down) × P(GCP down) × P(Azure down) × P(Fluid down)
@@ -2071,15 +2102,15 @@ Annual Energy:          ~15-20 TWh/year</pre>
   P(all down) = 2.5 × 10⁻¹⁴
 
   <strong>Combined Availability = 1 - P(all down)</strong>
-  <strong style="color: #10b981;">Combined Availability = 99.9999999999975%</strong>
-  <strong style="color: #10b981;">Theoretical Downtime = 0.0008 seconds/year</strong>
+  <strong style="color: #047857;">Combined Availability = 99.9999999999975%</strong>
+  <strong style="color: #047857;">Theoretical Downtime = 0.0008 seconds/year</strong>
 
-<span style="color: #f59e0b; font-weight: 600;">Practical Limitations:</span>
+<span style="color: #92400e; font-weight: 600;">Practical Limitations:</span>
   - Workload migration latency: 15-30 minutes
   - Training job restart overhead: 30-60 minutes
   - Checkpoint sync delays: 5-15 minutes
 
-<span style="color: #ef4444; font-weight: 600;">Realistic Effective Availability:</span>
+<span style="color: #b91c1c; font-weight: 600;">Realistic Effective Availability:</span>
   Accounting for migration overhead:
   <strong>Effective Availability ≈ 99.99% (52 min downtime/year)</strong>
 
@@ -2105,7 +2136,7 @@ Annual Energy:          ~15-20 TWh/year</pre>
                             <tr>
                                 <td><strong>Fluidstack Texas</strong></td>
                                 <td>ERCOT Grid</td>
-                                <td style="color: #10b981;"><strong>$0.04-0.06/kWh</strong></td>
+                                <td style="color: #047857;"><strong>$0.04-0.06/kWh</strong></td>
                                 <td>Large training runs</td>
                                 <td>Lowest cost for batch</td>
                             </tr>
@@ -2133,7 +2164,7 @@ Annual Energy:          ~15-20 TWh/year</pre>
                             <tr>
                                 <td><strong>Fluidstack NY</strong></td>
                                 <td>NYISO Grid</td>
-                                <td style="color: #ef4444;">$0.12-0.15/kWh</td>
+                                <td style="color: #b91c1c;">$0.12-0.15/kWh</td>
                                 <td>Low-latency inference</td>
                                 <td>Premium for latency</td>
                             </tr>
@@ -2155,7 +2186,7 @@ Inference Workloads (30% of compute):
   Higher-cost regions: 600 MW × $0.10/kWh × 8,760 hr/yr
   = <strong>$526 million/year</strong>
 
-<span style="color: #10b981; font-weight: 600;">Total Annual Power Cost (2 GW scenario):</span>
+<span style="color: #047857; font-weight: 600;">Total Annual Power Cost (2 GW scenario):</span>
   Training + Inference = $674M + $526M
   <strong style="font-size: 1rem;">≈ $1.2 billion/year in electricity</strong>
 
@@ -2290,7 +2321,7 @@ Azure GB200 (300 MW):
   Battery capacity: 300 MW × 0.083 hr = 25 MWh
   With 80% DoD: <strong>31.25 MWh installed</strong>
 
-<span style="color: #10b981; font-weight: 600;">Total Anthropic Battery Infrastructure:</span>
+<span style="color: #047857; font-weight: 600;">Total Anthropic Battery Infrastructure:</span>
   AWS + Google + Azure + Fluidstack
   <strong>≈ 80-100 MWh total battery capacity</strong>
   Equivalent to: ~1,600 Tesla Model S batteries</pre>
@@ -2361,7 +2392,7 @@ Where:
   Cp = Specific heat capacity (kJ/kg·K)
   ΔT = Temperature difference (K)
 
-<span style="color: #f59e0b; font-weight: 600;">NVIDIA GB200 NVL72 Rack (120 kW):</span>
+<span style="color: #92400e; font-weight: 600;">NVIDIA GB200 NVL72 Rack (120 kW):</span>
   Required flow rate: Q / (Cp × ΔT)
   = 120 kW / (4.18 kJ/kg·K × 15K)
   = 1.91 kg/s = <strong>114 L/min per rack</strong>
@@ -2369,7 +2400,7 @@ Where:
   For 2,500 racks (Azure allocation):
   Total flow: 285,000 L/min = <strong>4,750 L/s</strong>
 
-<span style="color: #10b981; font-weight: 600;">Cooling Power Overhead (by PUE):</span>
+<span style="color: #047857; font-weight: 600;">Cooling Power Overhead (by PUE):</span>
   AWS (PUE 1.18):   600 MW × 0.18 = 108 MW cooling
   Google (PUE 1.10): 500 MW × 0.10 = 50 MW cooling
   Azure (PUE 1.12):  300 MW × 0.12 = 36 MW cooling
@@ -2400,7 +2431,7 @@ Where:
                                 <td><strong>Control Plane Outage</strong></td>
                                 <td>Orchestrator → All providers lose routing</td>
                                 <td>100% workloads orphaned</td>
-                                <td style="color: #ef4444;"><strong>Immediate</strong></td>
+                                <td style="color: #b91c1c;"><strong>Immediate</strong></td>
                                 <td>Multi-region control plane; local autonomy mode</td>
                             </tr>
                             <tr>
@@ -2421,7 +2452,7 @@ Where:
                                 <td><strong>DNS/CDN Failure</strong></td>
                                 <td>Cloudflare/Route53 → API unreachable</td>
                                 <td>All inference endpoints</td>
-                                <td style="color: #ef4444;"><strong>Immediate</strong></td>
+                                <td style="color: #b91c1c;"><strong>Immediate</strong></td>
                                 <td>Multi-provider DNS; anycast routing</td>
                             </tr>
                             <tr>
@@ -2442,7 +2473,7 @@ Where:
                                 <td><strong>Common Mode: Solar Storm (Carrington-class)</strong></td>
                                 <td>Grid instability → All US providers affected</td>
                                 <td>Potentially 100%</td>
-                                <td style="color: #ef4444;"><strong>Hours</strong></td>
+                                <td style="color: #b91c1c;"><strong>Hours</strong></td>
                                 <td>Geographic diversity (EU/APAC); generator islands</td>
                             </tr>
                         </tbody>
@@ -2499,12 +2530,12 @@ Model Size: ~175B parameters (estimated)
 Checkpoint Size: 175B × 4 bytes (FP32) = 700 GB
                  175B × 2 bytes (BF16) = 350 GB
 
-<span style="color: #f59e0b; font-weight: 600;">Step 1: Failure Detection</span>
+<span style="color: #92400e; font-weight: 600;">Step 1: Failure Detection</span>
   Health check interval:        5 seconds
   Confirmation threshold:       3 consecutive fails
   Detection time:               <strong>15 seconds</strong>
 
-<span style="color: #f59e0b; font-weight: 600;">Step 2: Checkpoint Save</span>
+<span style="color: #92400e; font-weight: 600;">Step 2: Checkpoint Save</span>
   Write speed (NVMe):           3.5 GB/s per node
   Parallel nodes:               1,000
   Aggregate bandwidth:          3.5 TB/s
@@ -2512,27 +2543,27 @@ Checkpoint Size: 175B × 4 bytes (FP32) = 700 GB
 
   Upload to S3/GCS (100 Gbps):  350 GB / 12.5 GB/s = <strong>28 seconds</strong>
 
-<span style="color: #f59e0b; font-weight: 600;">Step 3: Target Provider Selection</span>
+<span style="color: #92400e; font-weight: 600;">Step 3: Target Provider Selection</span>
   Capacity check API calls:     <strong>2-5 seconds</strong>
 
-<span style="color: #f59e0b; font-weight: 600;">Step 4: Resource Allocation</span>
+<span style="color: #92400e; font-weight: 600;">Step 4: Resource Allocation</span>
   AWS Trainium2 (pre-reserved): <strong>30-60 seconds</strong>
   Google TPU (on-demand):       <strong>2-5 minutes</strong>
   Azure GB200 (spot):           <strong>5-15 minutes</strong>
 
-<span style="color: #f59e0b; font-weight: 600;">Step 5: State Restoration</span>
+<span style="color: #92400e; font-weight: 600;">Step 5: State Restoration</span>
   Download checkpoint:          28 seconds (symmetric)
   Load into accelerator memory: <strong>15-30 seconds</strong>
 
-<span style="color: #f59e0b; font-weight: 600;">Step 6: Training Resume</span>
+<span style="color: #92400e; font-weight: 600;">Step 6: Training Resume</span>
   Warmup iterations:            <strong>30-60 seconds</strong>
 
-<span style="color: #10b981; font-weight: 600;">Total Migration Time:</span>
+<span style="color: #047857; font-weight: 600;">Total Migration Time:</span>
   Best case (pre-reserved):     15 + 28 + 3 + 45 + 43 + 45 = <strong>~3 minutes</strong>
   Typical case (on-demand):     15 + 28 + 5 + 180 + 43 + 45 = <strong>~5-6 minutes</strong>
   Worst case (spot capacity):   15 + 28 + 5 + 900 + 43 + 60 = <strong>~17 minutes</strong>
 
-<span style="color: #ef4444; font-weight: 600;">Training Time Lost (per migration):</span>
+<span style="color: #b91c1c; font-weight: 600;">Training Time Lost (per migration):</span>
   Tokens processed/second:      ~50,000 (estimated)
   5-minute migration:           5 × 60 × 50,000 = <strong>15M tokens lost</strong>
   Cost at $0.01/1K tokens:      <strong>$150 opportunity cost</strong></pre>
@@ -2679,7 +2710,7 @@ Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
   Energy: 2,628 GWh/year
   Carbon: 2,628 × 350 = <strong>0.92 Mt CO₂/year</strong>
 
-<span style="color: #10b981; font-weight: 600;">Total Anthropic Carbon Footprint:</span>
+<span style="color: #047857; font-weight: 600;">Total Anthropic Carbon Footprint:</span>
   Gross emissions: 2.21 + 1.40 + 1.00 + 0.92 = <strong>5.53 Mt CO₂/year</strong>
 
   With PPA offsets (Google 100% matched, AWS 50%):
@@ -2769,9 +2800,9 @@ Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
                                 <td><strong>Anthropic</strong></td>
                                 <td>Multi (AWS/GCP/Azure/Fluid)</td>
                                 <td>Each other</td>
-                                <td style="color: #10b981;"><strong>99.99%</strong></td>
-                                <td style="color: #10b981;"><strong>99.97%</strong></td>
-                                <td style="color: #10b981;">Low</td>
+                                <td style="color: #047857;"><strong>99.99%</strong></td>
+                                <td style="color: #047857;"><strong>99.97%</strong></td>
+                                <td style="color: #047857;">Low</td>
                             </tr>
                             <tr>
                                 <td>OpenAI</td>
@@ -2779,7 +2810,7 @@ Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
                                 <td>Limited self-hosted</td>
                                 <td>99.9%</td>
                                 <td>99.85%</td>
-                                <td style="color: #f59e0b;">Medium</td>
+                                <td style="color: #92400e;">Medium</td>
                             </tr>
                             <tr>
                                 <td>Google DeepMind</td>
@@ -2787,7 +2818,7 @@ Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
                                 <td>None (internal)</td>
                                 <td>Internal SLO</td>
                                 <td>~99.95%</td>
-                                <td style="color: #f59e0b;">Medium</td>
+                                <td style="color: #92400e;">Medium</td>
                             </tr>
                             <tr>
                                 <td>xAI</td>
@@ -2795,7 +2826,7 @@ Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
                                 <td>Oracle (partial)</td>
                                 <td>N/A (private)</td>
                                 <td>~99.5% (est.)</td>
-                                <td style="color: #ef4444;">High</td>
+                                <td style="color: #b91c1c;">High</td>
                             </tr>
                             <tr>
                                 <td>Meta AI</td>
@@ -2803,7 +2834,7 @@ Fluidstack Texas (300 MW, 8,760 hrs, 350 g/kWh):
                                 <td>Azure (some)</td>
                                 <td>Internal SLO</td>
                                 <td>~99.9%</td>
-                                <td style="color: #f59e0b;">Medium</td>
+                                <td style="color: #92400e;">Medium</td>
                             </tr>
                         </tbody>
                     </table>
@@ -2861,7 +2892,7 @@ Where:
 <span style="color: #67e8f9;">For same power, same conductor:</span>
   P_loss ∝ 1/V²
 
-<span style="color: #10b981;">Voltage Comparison (normalized to 12V = 100%):</span>
+<span style="color: #047857;">Voltage Comparison (normalized to 12V = 100%):</span>
   12V:  100.0% loss (baseline)
   48V:    6.25% loss (16x reduction)
   380V:   0.10% loss (1,003x reduction)
@@ -2894,21 +2925,21 @@ Where:
                                 <td>6.25% (16x better)</td>
                                 <td>25% of 12V</td>
                                 <td>50-100 kW</td>
-                                <td style="color: #10b981;">Mainstream</td>
+                                <td style="color: #047857;">Mainstream</td>
                             </tr>
                             <tr>
                                 <td><strong>380V DC</strong></td>
                                 <td>0.1% (1000x better)</td>
                                 <td>3% of 12V</td>
                                 <td>100-300 kW</td>
-                                <td style="color: #f59e0b;">Emerging</td>
+                                <td style="color: #92400e;">Emerging</td>
                             </tr>
                             <tr>
                                 <td><strong>800V DC</strong></td>
                                 <td>0.02% (4444x better)</td>
                                 <td>1.5% of 12V</td>
                                 <td>500 kW - 1 MW+</td>
-                                <td style="color: #8b5cf6;">Next-Gen (2026+)</td>
+                                <td style="color: #6d28d9;">Next-Gen (2026+)</td>
                             </tr>
                         </tbody>
                     </table>
@@ -2987,13 +3018,13 @@ Where:
                             </tr>
                             <tr>
                                 <td>Cycle Life</td>
-                                <td style="color: #10b981;"><strong>2,000-5,000 cycles</strong></td>
+                                <td style="color: #047857;"><strong>2,000-5,000 cycles</strong></td>
                                 <td>1,000-2,000 cycles</td>
                                 <td>300-500 cycles</td>
                             </tr>
                             <tr>
                                 <td>Thermal Stability</td>
-                                <td style="color: #10b981;"><strong>Excellent (safest)</strong></td>
+                                <td style="color: #047857;"><strong>Excellent (safest)</strong></td>
                                 <td>Moderate</td>
                                 <td>Good</td>
                             </tr>
@@ -3005,8 +3036,8 @@ Where:
                             </tr>
                             <tr>
                                 <td>Thermal Runaway Risk</td>
-                                <td style="color: #10b981;"><strong>Very Low</strong></td>
-                                <td style="color: #f59e0b;">Moderate</td>
+                                <td style="color: #047857;"><strong>Very Low</strong></td>
+                                <td style="color: #92400e;">Moderate</td>
                                 <td>Low (hydrogen gas)</td>
                             </tr>
                             <tr>
@@ -3047,12 +3078,12 @@ Where:
                         <tbody>
                             <tr>
                                 <td>Failure Domain</td>
-                                <td style="color: #10b981;"><strong>Single rack</strong></td>
+                                <td style="color: #047857;"><strong>Single rack</strong></td>
                                 <td>Entire facility/zone</td>
                             </tr>
                             <tr>
                                 <td>Efficiency</td>
-                                <td style="color: #10b981;"><strong>Higher (fewer conversions)</strong></td>
+                                <td style="color: #047857;"><strong>Higher (fewer conversions)</strong></td>
                                 <td>Lower (AC-DC-AC-DC)</td>
                             </tr>
                             <tr>
@@ -3062,12 +3093,12 @@ Where:
                             </tr>
                             <tr>
                                 <td>Serviceability</td>
-                                <td style="color: #10b981;"><strong>Replace single BBU</strong></td>
+                                <td style="color: #047857;"><strong>Replace single BBU</strong></td>
                                 <td>Complex maintenance window</td>
                             </tr>
                             <tr>
                                 <td>Third-Party Software</td>
-                                <td style="color: #10b981;"><strong>Eliminated</strong></td>
+                                <td style="color: #047857;"><strong>Eliminated</strong></td>
                                 <td>Required (vendor UPS)</td>
                             </tr>
                         </tbody>
@@ -3291,7 +3322,7 @@ Where:
                             </div>
                             <div class="failure-step">
                                 <span class="failure-step-number">4</span>
-                                <span style="color: #f59e0b;"><strong>Off-gassing begins (VOC release) — DETECTION WINDOW</strong></span>
+                                <span style="color: #92400e;"><strong>Off-gassing begins (VOC release) — DETECTION WINDOW</strong></span>
                             </div>
                             <div class="failure-step">
                                 <span class="failure-step-number">5</span>
@@ -3327,7 +3358,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
   D = Working distance (mm)
   x = Distance exponent
 
-<span style="color: #10b981;">PPE Categories (NFPA 70E):</span>
+<span style="color: #047857;">PPE Categories (NFPA 70E):</span>
   Cat 1: 1.2 - 4 cal/cm²
   Cat 2: 4 - 8 cal/cm²
   Cat 3: 8 - 25 cal/cm²
@@ -3400,7 +3431,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
   0.1 seconds (6 cycles) for electronic devices
   0.3 seconds for mechanical devices
 
-<span style="color: #10b981;">Verification required for:</span>
+<span style="color: #047857;">Verification required for:</span>
   • All fault current magnitudes from minimum to maximum
   • Both phase and ground faults
   • All operating modes (normal, emergency, maintenance)</pre>
@@ -3444,7 +3475,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             <tr>
                                 <td>Active Arc Flash Mitigation</td>
                                 <td>&lt;1 cycle</td>
-                                <td style="color: #10b981;"><strong>Maximum</strong></td>
+                                <td style="color: #047857;"><strong>Maximum</strong></td>
                                 <td>Light + current sensors</td>
                             </tr>
                         </tbody>
@@ -3478,10 +3509,10 @@ E = Cf × En × (t/0.2) × (610/D)^x
                                 <td>Good</td>
                             </tr>
                             <tr>
-                                <td style="color: #10b981;"><strong>High Resistance (HRG)</strong></td>
-                                <td style="color: #10b981;"><strong>1-10A</strong></td>
-                                <td style="color: #10b981;"><strong>Continue operation</strong></td>
-                                <td style="color: #10b981;"><strong>Recommended</strong></td>
+                                <td style="color: #047857;"><strong>High Resistance (HRG)</strong></td>
+                                <td style="color: #047857;"><strong>1-10A</strong></td>
+                                <td style="color: #047857;"><strong>Continue operation</strong></td>
+                                <td style="color: #047857;"><strong>Recommended</strong></td>
                             </tr>
                             <tr>
                                 <td>Ungrounded</td>
@@ -3830,13 +3861,13 @@ E = Cf × En × (t/0.2) × (610/D)^x
                     <!-- Calculator Disclaimer -->
                     <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
                         <div style="display:flex;align-items:flex-start;gap:0.75rem;">
-                            <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
+                            <div style="color:#92400e;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
                             <div>
                                 <div class="disc-title" style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> Uptime Institute Tier I-IV classification standards, IEEE 1584-2018 arc flash analysis, MTBF/MTTR reliability databases, Monte Carlo 10K iterations, EU AI Act Article 13 transparency requirements.</p>
                                 <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                                <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+                                <p class="disc-fine" style="font-size:0.68rem;color:#475569;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
                             </div>
                         </div>
                     </div>
@@ -3857,7 +3888,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
 <span style="color: #a5f3fc;">Parallel System (any one works):</span>
   A_total = 1 - (1-A₁) × (1-A₂) × ... × (1-Aₙ)
 
-<span style="color: #10b981;">Annual Downtime (minutes):</span>
+<span style="color: #047857;">Annual Downtime (minutes):</span>
   Downtime = 525,600 × (1 - Availability)
 
 <span style="color: #fbbf24;">Example: 99.995% availability</span>
@@ -3898,14 +3929,14 @@ E = Cf × En × (t/0.2) × (610/D)^x
                                 <td>99.982%</td>
                                 <td>1.6 hours</td>
                                 <td>N+1, dual path</td>
-                                <td style="color: #10b981;"><strong>Yes</strong></td>
+                                <td style="color: #047857;"><strong>Yes</strong></td>
                             </tr>
                             <tr>
                                 <td>Tier IV</td>
-                                <td style="color: #10b981;"><strong>99.995%</strong></td>
-                                <td style="color: #10b981;"><strong>26 minutes</strong></td>
+                                <td style="color: #047857;"><strong>99.995%</strong></td>
+                                <td style="color: #047857;"><strong>26 minutes</strong></td>
                                 <td>2N</td>
-                                <td style="color: #10b981;"><strong>Yes + Fault Tolerant</strong></td>
+                                <td style="color: #047857;"><strong>Yes + Fault Tolerant</strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -3945,19 +3976,19 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             </tr>
                             <tr>
                                 <td><span class="company-badge nvidia">NVIDIA GB200 NVL72</span></td>
-                                <td style="color: #10b981;"><strong>120 kW/rack</strong></td>
+                                <td style="color: #047857;"><strong>120 kW/rack</strong></td>
                                 <td>13 TB HBM3e (cluster)</td>
                                 <td>Liquid-cooled rack</td>
                             </tr>
                             <tr>
                                 <td><span class="company-badge nvidia">NVIDIA GB300 NVL72</span></td>
-                                <td style="color: #10b981;"><strong>140 kW/rack</strong></td>
+                                <td style="color: #047857;"><strong>140 kW/rack</strong></td>
                                 <td>~16 TB HBM3e</td>
                                 <td>Liquid-cooled rack</td>
                             </tr>
                             <tr>
                                 <td><span class="company-badge nvidia">Vera Rubin NVL144</span></td>
-                                <td style="color: #f59e0b;"><strong>600 kW/rack</strong></td>
+                                <td style="color: #92400e;"><strong>600 kW/rack</strong></td>
                                 <td>TBD</td>
                                 <td>2026 target</td>
                             </tr>
@@ -4008,17 +4039,17 @@ E = Cf × En × (t/0.2) × (610/D)^x
                             <tr>
                                 <td>Large Language Models</td>
                                 <td>70-100 kW</td>
-                                <td style="color: #f59e0b;"><strong>Direct liquid cooling required</strong></td>
+                                <td style="color: #92400e;"><strong>Direct liquid cooling required</strong></td>
                             </tr>
                             <tr>
                                 <td>GB200/GB300 Clusters</td>
                                 <td>120-140 kW</td>
-                                <td style="color: #ef4444;"><strong>Mandatory liquid cooling</strong></td>
+                                <td style="color: #b91c1c;"><strong>Mandatory liquid cooling</strong></td>
                             </tr>
                             <tr>
                                 <td>Next-Gen (2026+)</td>
                                 <td>500 kW - 1 MW</td>
-                                <td style="color: #ef4444;"><strong>Advanced liquid + 800V DC</strong></td>
+                                <td style="color: #b91c1c;"><strong>Advanced liquid + 800V DC</strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -4058,7 +4089,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="color: #10b981;"><strong>Near-term (2025-2026)</strong></td>
+                                <td style="color: #047857;"><strong>Near-term (2025-2026)</strong></td>
                                 <td>
                                     • 48V DC distribution<br>
                                     • LFP battery UPS<br>
@@ -4068,7 +4099,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
                                 <td>50-100 kW/rack</td>
                             </tr>
                             <tr>
-                                <td style="color: #f59e0b;"><strong>Medium-term (2026-2028)</strong></td>
+                                <td style="color: #92400e;"><strong>Medium-term (2026-2028)</strong></td>
                                 <td>
                                     • 380V DC (Mt Diablo/Diablo 400)<br>
                                     • Grid-interactive UPS<br>
@@ -4078,7 +4109,7 @@ E = Cf × En × (t/0.2) × (610/D)^x
                                 <td>100-300 kW/rack</td>
                             </tr>
                             <tr>
-                                <td style="color: #8b5cf6;"><strong>Long-term (2028+)</strong></td>
+                                <td style="color: #6d28d9;"><strong>Long-term (2028+)</strong></td>
                                 <td>
                                     • 800V DC (NVIDIA architecture)<br>
                                     • Solid-state transformers<br>
@@ -4152,14 +4183,14 @@ E = Cf × En × (t/0.2) × (610/D)^x
                         <div class="aig-login-error" id="aigLoginError">Invalid credentials. Please try again.</div>
                         <button class="login-submit" onclick="aigDoLogin()">Sign In</button>
                         <div class="demo-hint">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
-<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#8b5cf6;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
+<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#6d28d9;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#6d28d9;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                     </div>
                 </div>
 
                 
                 <!-- Independence Disclaimer -->
                 <div style="margin:2rem 0 0;padding:1rem 0;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
-                    <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#8b5cf6;">Terms &amp; Disclaimer</a></p>
+                    <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#6d28d9;">Terms &amp; Disclaimer</a></p>
                 </div>
 
 <!-- References -->
