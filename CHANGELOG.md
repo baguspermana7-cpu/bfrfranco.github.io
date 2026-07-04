@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v1.50.42 — 2026-07-04 (Homepage — portfolio glow consistency + clean gradient background)
+
+**Changed**
+- **Portfolio consistency**: extended the reference bottom-rising colored-glow card treatment
+  (already on the hero bento cards) to the rest of the homepage — `.metric-card` (Career
+  Achievements), `.oe-card` (Operational Excellence ×8), and `.case-card` (Case Studies ×3).
+  Each card now carries an always-visible bottom radial glow in a per-card accent (blue / green /
+  amber / violet / magenta / teal rotation via `nth-child`), content stacked above via
+  `> * { z-index: 1 }`, intensity scaled by mode (day .30 / dark .58 / rainbow .95). Index-only,
+  in `styles-index.css` per the 2-stylesheet architecture.
+
+**Removed**
+- **Hero grid**: dropped the gold 60px line-grid on `.hero-background` (`background: transparent`);
+  the soft radial washes + `.rz-bg-gradient` / aurora provide the backdrop — reference is a smooth
+  gradient, and this aligns with rejected-pattern #1 (no dot-grid/line-grid noise on the hero).
+- **Film-grain dots**: disabled the sitewide `[data-theme="dark"] body::before` feTurbulence noise
+  overlay ON THE HOMEPAGE ONLY (index-only stylesheet — `content: none; background: none`), so the
+  dark + rainbow background stays a clean smooth gradient (removes the "titik2" speckle). Other
+  pages keep the grain via `styles.css`.
+
 ## v1.50.41 — 2026-07-04 (Accessibility — permanent axe gate + full 8-page WCAG-AA pass)
 
 **Added**
