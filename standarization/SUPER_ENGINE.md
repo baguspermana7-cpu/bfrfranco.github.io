@@ -345,9 +345,22 @@ reachability + provenance).
 - **Uncertainty + new models** — `models.sim.monteCarlo/tornado/sensitivityGrid` (seeded, reproducible);
   `models.carbon.*` and `models.water.*`; `charts.*` implemented as framework-free SVG-string builders.
 
-### Coupling rule (RZEngine ↔ dcmoc)
+### Coupling rule (RZEngine ↔ dcmoc) — audited 2026-07-04
 
-`dcmoc/` (Next.js) keeps its OWN engines. When a shared number changes in `RZEngine.data`
-(capex per MW, carbon grid factors, salaries), update the matching constant in
-`dcmoc/src/lib/*` + `dcmoc/src/data/*` in the same change and re-run `npm run build`. Future work:
-a shared upstream `data/engine/*.json` both consume.
+`dcmoc/` (Next.js) keeps its OWN engines, at a **finer granularity** than RZEngine:
+- `dcmoc/src/lib/capex-data.ts` — **per-city $/W** (T&T 2025, C&W 2025, CBRE MENA 2025). e.g.
+  Silicon Valley 13.30, Virginia 13.40, Jakarta 11.21, Singapore 14.53, Mumbai 6.64.
+- `dcmoc/src/modules/analytics/CarbonEngine.ts` — 0.49 kgCO₂/kWh global avg (IEA 2024-2025) +
+  grid-mix inputs + refrigerant GWP + Scope 1/2/3.
+
+RZEngine is **coarse regional planning defaults** (`capexPerMw` $/MW by macro-region × tier ×
+cooling; `carbon.gridFactor` by region). The 2026 audit found the two **consistent in magnitude and
+NOT divergent** — RZEngine US air-Tier-III ≈ $11/W sits inside dcmoc's US city band ($9.3–14.3/W);
+RZEngine's regional carbon factors (US 0.37 … APAC 0.55) bracket dcmoc's 0.49 global average.
+
+**Rule**: do NOT overwrite dcmoc's city-level sourced numbers with RZEngine's coarser regional
+estimates — that would *degrade* dcmoc. When RZEngine's regional capex/carbon is refreshed,
+sanity-check that dcmoc's cities in that region stay within the new regional range; reconcile only if
+they fall outside it. The two are intentionally different resolutions of the same reality. Future
+work (optional): a shared upstream `data/engine/*.json` that RZEngine consumes coarsely and dcmoc
+refines per-city — one provenance root without flattening dcmoc's granularity.

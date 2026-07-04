@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.51.1 — 2026-07-04 (RZEngine v2.0.0 — calculator + dcmoc reconciliation audit)
+
+**Changed** (docs/verification — no runtime change)
+- **A9 calculator audit**: re-verified all 6 engine-consuming calculators (capex/opex/pue/roi/tco/cx)
+  on RZEngine v2.0.0 — 0 console errors; roi-calculator's IRR (now Newton-with-bracket honoring the
+  guess) computes correctly (NPV/IRR sane). Finding recorded: capex/opex/cx/tco are self-contained
+  (own defaults + math) and consume only the engine's shared MATH (pue/roi models) + auth/modal/pdf/ui
+  helpers — full adoption of the refreshed `DATA` values is a per-calculator enhancement, deliberately
+  NOT forced here to avoid regressing the hardened, working calculators.
+- **A10 dcmoc reconciliation**: audited `dcmoc/src/lib/capex-data.ts` (per-city $/W, T&T/C&W/CBRE 2025)
+  and `CarbonEngine.ts` (IEA 2024-2025) against the refreshed RZEngine regional data. They are
+  **consistent in magnitude and NOT divergent** — dcmoc is intentionally finer-grained and equally
+  current, so its city-level numbers are NOT overwritten with RZEngine's coarser regional estimates
+  (that would degrade dcmoc). Coupling rule corrected in `standarization/SUPER_ENGINE.md` §Z; dcmoc
+  source unchanged (build state preserved).
+
 ## v1.51.0 — 2026-07-04 (RZEngine v2.0.0 — database + model upgrade)
 
 Upgraded the shared Super Engine (`rz-engine.js`, `window.RZEngine`) and its database from
