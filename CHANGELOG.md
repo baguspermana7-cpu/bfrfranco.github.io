@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v1.50.34 — 2026-07-03 (Interaction gate — the new interactive systems are now CI-protected)
+
+### Added
+- **`tools/audit-interactions.mjs`** — a permanent ship-gate that exercises the interactive systems with REAL
+  keyboard/mouse/scroll in a headless browser (spins its own static HTTP server so `search-index.json` fetches
+  work): command palette (Ctrl+K / query / Esc / "/" on a migrated + a previously-dead page), living-diagram
+  scenario injection (article-13/9), scrollytelling step advance + reverse with counter targets (article-23),
+  and the reading-polish features (anchors, min-left chip, exactly one progress bar). Counter checks poll until
+  settled. Added to the CLAUDE.md audit suite. First run: CLEAN.
+
 ## v1.50.33 — 2026-07-03 (Portfolio CTA — differentiate Get Started from Download Resume)
 
 **Fixed** — the previous portfolio pass made the amber gradient apply to BOTH primary

@@ -43,6 +43,7 @@ node   tools/audit-responsive-layout.mjs --strict  # render gate: real horizonta
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD
 node   tools/audit-dark-coverage.mjs --strict      # NO white body/content in dark mode (v1.47.x)
 node   tools/audit-article-charts.mjs --strict     # every article chart carries source + basisTag (v1.50.1)
+node   tools/audit-interactions.mjs --strict      # REAL-input gate: palette, living diagrams, scrolly, polish (v1.50.34)
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):
@@ -340,6 +341,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/audit-dark-coverage.mjs` | render gate — fails any page with white body/content in dark mode + the `:root,` cascade bug — STRICT for CI (v1.47.x) |
 | `tools/audit-responsive-layout.mjs` | render gate — fails real mobile/tablet horizontal scroll (actual `scrollX`) + article tables wider than the reading column — STRICT for CI (v1.49.8) |
 | `tools/audit-article-charts.mjs` | data-viz provenance gate — fails any `[data-rz-chart]` config missing `source`/`basisTag` — STRICT for CI (v1.50.1) |
+| `tools/audit-interactions.mjs` | interaction gate — exercises palette / living diagrams / scrollytelling / reading polish with real keyboard+scroll input (own HTTP server) — STRICT for CI (v1.50.34) |
 | `tools/audit-seo.py` | per-page SEO meta health — non-strict |
 | `tools/build-sitemap.py` | regen sitemap.xml from filesystem |
 | `tools/build-llms-txt.py` | regen llms.txt |
