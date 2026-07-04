@@ -18,6 +18,7 @@
     stamp.id = 'rzVersionStamp';
     stamp.className = 'rz-version-stamp';
     stamp.setAttribute('aria-label', 'Site version');
+    stamp.setAttribute('role', 'complementary');
     stamp.innerHTML = '<img src="assets/favicon-32.png" alt="" width="20" height="20" loading="lazy">' +
                       '<span class="rz-version-label">Latest version</span>' +
                       '<a href="changelog.html" class="rz-version-link" title="View changelog">' +

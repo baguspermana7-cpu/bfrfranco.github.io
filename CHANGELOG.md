@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.50.44 — 2026-07-04 (Accessibility — advisory cleanup: heading order + landmarks, audit fully CLEAN)
+
+**Changed** — cleared all 56 non-gating axe advisories from v1.50.41; `audit-a11y` now
+reports **zero findings of any severity** on the 8-page set x both themes:
+- **Heading order**: article-26 callout boxes (`.pfas-insight/warning/danger-box`) h4 → h3
+  with an `!important` re-assertion of the compact box-heading look (the shared editorial
+  `.article-body h3` rule uses `!important` sizes); fire/cdu calculator input panels
+  h3 → h2 (they sat directly under the page h1); paper cards + footer column labels on
+  datacenter-solutions, articles, fire h4 → h3. Styling preserved (computed
+  font-size/color verified per page).
+- **Landmarks**: the version stamp is now a labelled `complementary` landmark (shared
+  `script.js`/`script.min.js` — `contentinfo` would duplicate the footer landmark); the
+  TOC mobile drawer + sidebar get `role="navigation"` from shared `js/rz-article-toc.js`;
+  article-26 evidence block + series nav labelled; articles.html decorative particles
+  canvas `aria-hidden` and floating side cards a labelled complementary; the glossary
+  disclaimer moved inside `<main>`.
+- Cache-busts: `script.min.js` (71 pages), `rz-article-toc.js` (32 pages).
+
+**Verification** — audit-a11y CLEAN (0 critical/serious, 0 advisory); full suite green:
+script-tags, js-syntax, version-stamp, mobile 0 fail, responsive-layout CLEAN (113pp),
+dark-coverage CLEAN (114pp), charts 25/25, interactions CLEAN.
+
 ## v1.50.43 — 2026-07-04 (Second Brain — proper Knowledge Wiki node, repo docs split out)
 
 **Fixed**

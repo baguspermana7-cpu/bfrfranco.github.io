@@ -339,14 +339,14 @@
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
-        .pfas-insight-box h4 {
+        .pfas-insight-box h3 {
             color: #92400e;
             margin-bottom: 0.5rem;
             font-size: 0.95rem;
         }
         .pfas-insight-box p { font-size: 0.9rem; color: #374151; line-height: 1.6; margin: 0; }
         [data-theme="dark"] .pfas-insight-box { background: linear-gradient(135deg, rgba(180,83,9,0.1), rgba(217,119,6,0.08)); border-color: rgba(252,211,77,0.3); }
-        [data-theme="dark"] .pfas-insight-box h4 { color: #fcd34d; }
+        [data-theme="dark"] .pfas-insight-box h3 { color: #fcd34d; }
         [data-theme="dark"] .pfas-insight-box p { color: #d1d5db; }
 
         /* Warning box */
@@ -358,10 +358,10 @@
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
-        .pfas-warning-box h4 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .pfas-warning-box h3 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
         .pfas-warning-box p { font-size: 0.9rem; color: #78350f; line-height: 1.6; margin: 0; }
         [data-theme="dark"] .pfas-warning-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.4); }
-        [data-theme="dark"] .pfas-warning-box h4 { color: #fbbf24; }
+        [data-theme="dark"] .pfas-warning-box h3 { color: #fbbf24; }
         [data-theme="dark"] .pfas-warning-box p { color: #fde68a; }
 
         /* Danger box */
@@ -373,10 +373,10 @@
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
-        .pfas-danger-box h4 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .pfas-danger-box h3 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
         .pfas-danger-box p { font-size: 0.9rem; color: #78350f; line-height: 1.6; margin: 0; }
         [data-theme="dark"] .pfas-danger-box { background: rgba(180,83,9,0.1); border-color: rgba(217,119,6,0.4); }
-        [data-theme="dark"] .pfas-danger-box h4 { color: #fcd34d; }
+        [data-theme="dark"] .pfas-danger-box h3 { color: #fcd34d; }
         [data-theme="dark"] .pfas-danger-box p { color: #fde68a; }
 
         /* Inline stat */
@@ -684,6 +684,17 @@
 :root:not([data-theme="dark"]) .pfas-engineer-note p { color:#374151 !important; }
 :root:not([data-theme="dark"]) .pfas-engineer-note strong, :root:not([data-theme="dark"]) .engineer-label { color:#92400e !important; }
 .pfas-privacy, .pfas-disclaimer { color:#64748b; }
+
+/* the shared editorial h3 rule (html[register] .article-body h3) out-specifies the
+   box rules after the h4->h3 heading-order fix — re-assert the box heading look */
+html[data-rz-register="editorial"] .article-body .pfas-insight-box h3,
+html[data-rz-register="editorial"] .article-body .pfas-warning-box h3,
+html[data-rz-register="editorial"] .article-body .pfas-danger-box h3 {
+  color:#92400e !important; margin:0 0 0.5rem !important; font-size:0.95rem !important; line-height:1.4 !important;
+}
+html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-insight-box h3,
+html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-danger-box h3 { color:#fcd34d !important; }
+html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warning-box h3 { color:#fbbf24 !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-05-09e" defer></script>
@@ -830,7 +841,7 @@
 </header>
 
 <!-- Evidence Block -->
-<div class="pfas-evidence-block">
+<div class="pfas-evidence-block" role="region" aria-label="Evidence summary">
     <div class="pfas-evidence-grid">
         <div class="pfas-evidence-card">
             <div class="pfas-evidence-value">12,000+</div>
@@ -861,7 +872,7 @@
 </div>
 
 <!-- Series Navigation -->
-<div class="series-nav" style="margin-top: 1rem;">
+<div class="series-nav" role="navigation" aria-label="Article series" style="margin-top: 1rem;">
     <div class="series-badge">
         <span class="series-badge-icon">26</span>
         Global Analysis &mdash; Environmental Investigation
@@ -914,7 +925,7 @@
     <p>3M announced its exit from PFAS manufacturing in December 2022 and completed that exit by the end of 2025. The primary market alternatives now are Chemours' Opteon series (marketed as SF and 2P50 variants) and Solvay's Galden HT line. Both of these vendors will matter more in section four &mdash; because the replacement story is more complicated than the press releases suggest. For now, understand that the installed base of Novec 7000 systems is still operational across hundreds of hyperscale and colocation deployments worldwide, running on stockpiled fluid supply with no clear replacement timeline at scale.</p>
 
     <div class="pfas-insight-box">
-        <h4><i class="fas fa-flask"></i> The Three PFAS Vectors in Data Centers</h4>
+        <h3><i class="fas fa-flask"></i> The Three PFAS Vectors in Data Centers</h3>
         <p><strong>1. Two-phase immersion cooling fluids</strong> (primary concern): Novec 7000, Fluorinert FC-40/FC-72, Galden HT series — all PFAS, all used in direct contact with server hardware.<br><br>
         <strong>2. Cable jacket coatings</strong> (secondary): PTFE and FEP in plenum-rated cables throughout the facility — releases PFAS particulates when cables are cut or damaged.<br><br>
         <strong>3. Historical fire suppression</strong> (legacy): PFOS-based Halon replacements in older facilities — most replaced, but remediation of contaminated areas is incomplete in many sites.</p>
@@ -930,7 +941,7 @@
     <p>The real release vector is not system leaks. It is maintenance vapor release &mdash; the entirely routine, entirely expected, entirely unregulated process of opening a two-phase cooling system to perform scheduled service. This happens on a quarterly basis at minimum. In high-density GPU clusters running at or near thermal design limits, pump seal inspections happen every six weeks, and any anomalous performance reading triggers an unscheduled inspection within 24 hours. Every time a technician opens one of these systems, PFAS vapor is released directly to atmosphere. No filter, no capture system, no regulatory requirement to measure or report it.</p>
 
     <div class="pfas-danger-box">
-        <h4><i class="fas fa-exclamation-triangle"></i> The Regulatory Blind Spot</h4>
+        <h3><i class="fas fa-exclamation-triangle"></i> The Regulatory Blind Spot</h3>
         <p>EPA's Toxic Release Inventory (TRI) under EPCRA Section 313 requires PFAS reporting for facilities that manufacture, process, or otherwise use PFAS above threshold quantities. The manufacturing and processing thresholds apply to chemical producers. The "otherwise use" pathway theoretically covers data centers &mdash; but only for facilities exceeding <strong>25,000 lbs per year</strong> of a listed compound. More critically, the TRI framework requires reporting of <em>releases</em> &mdash; and maintenance vapor release is not measured, therefore cannot be reported. You cannot report what you do not measure, and there is no requirement to measure it.</p>
     </div>
 
@@ -1096,7 +1107,7 @@
     </div>
 
     <div class="pfas-warning-box">
-        <h4><i class="fas fa-magnifying-glass"></i> The gaps are the story</h4>
+        <h3><i class="fas fa-magnifying-glass"></i> The gaps are the story</h3>
         <p>Read the &ldquo;Typical magnitude&rdquo; column again. The two largest, most routine zones &mdash; <strong>seal permeation</strong> and the <strong>per-event maintenance loss from sensor swaps and top-ups</strong> &mdash; have <em>no published value</em>. The literature quantifies water-vapour transmission through packaging films, but not fluorocarbon-fluid permeation through data-center seals; and the patent corpus is full of inventions to <em>reduce</em> hot-swap loss, which only confirms that a baseline loss exists and has never been measured. When the most frequent loss pathways are also the least quantified, &ldquo;invisible&rdquo; is not a metaphor &mdash; it is an accurate description of the data.</p>
     </div>
 
@@ -1249,7 +1260,7 @@
     </div>
 
     <div class="pfas-warning-box">
-        <h4><i class="fas fa-circle-exclamation"></i> What the numbers do and do not say</h4>
+        <h3><i class="fas fa-circle-exclamation"></i> What the numbers do and do not say</h3>
         <p>These models are bounded by two real anchors &mdash; a vendor &ldquo;sealed&rdquo; claim and a single published field measurement &mdash; not by a population of audited sites, because that population does not exist. Treat the field-loss column as a credible upper-middle case, not a worst case, and the well-run column as an aspiration few operators have independently verified. The honest conclusion is not &ldquo;every tank loses 137&nbsp;litres a year&rdquo;; it is that <strong>the plausible range spans an order of magnitude, the climate and TFA consequences are large at the top of that range, and nobody is currently measuring where on the range any given facility actually sits.</strong></p>
     </div>
 
@@ -1284,7 +1295,7 @@
     <p>Studies from European research groups &mdash; notably work published through the German Environment Agency (Umweltbundesamt) &mdash; have documented rising TFA concentrations in precipitation, surface water, and groundwater across monitoring sites in Western Europe over the past two decades, correlated with the increasing global use of HFC and HFO refrigerants [17]. Atmospheric modelling of HFC-134a degradation alone put U.S. rainwater TFA at roughly <span class="pfas-stat">0.89&nbsp;&micro;g/L on average, peaking near 7.8&nbsp;&micro;g/L</span> &mdash; a useful scale against which any incremental two-phase-cooling contribution should be measured [18]. The researchers do not describe TFA as definitively harmless. Its health effects are under active investigation, with particular attention to reproductive and developmental impacts at concentration levels that are already measurable in some water sources.</p>
 
     <div class="pfas-warning-box">
-        <h4><i class="fas fa-triangle-exclamation"></i> The Regulatory Approval Accelerator</h4>
+        <h3><i class="fas fa-triangle-exclamation"></i> The Regulatory Approval Accelerator</h3>
         <p>A Grist investigation published in April 2026 reported that the EPA, under a directive from the Trump administration, is fast-tracking environmental review of novel data center cooling chemicals, potentially approving new compounds with less than one year of production safety data. If accurate, this means facilities could be deploying HFO-based replacement fluids operating under expedited review &mdash; compounds whose long-term breakdown product profiles are not fully characterized &mdash; under a regulatory framework designed to accelerate approvals rather than require comprehensive pre-market safety assessment.</p>
     </div>
 
@@ -1336,7 +1347,7 @@
     <p>The EPA's Safer Choice program, which evaluates chemical alternatives for environmental and health impact, explicitly excludes halogenated compounds &mdash; meaning compounds with C-F or C-Cl bonds &mdash; from its preferred certification pathway. HFOs, because they contain C-F bonds, fall outside the Safer Choice preferred category, even as they are being marketed across the industry as the PFAS-free transition solution. The regulatory framing and the marketing framing are not describing the same thing. When a vendor says "PFAS-free," they typically mean their compound does not appear on the EPA's current PFAS candidate list. They do not necessarily mean it breaks down to non-fluorinated compounds, or that its breakdown products are assessed for safety, or that it has cleared Safer Choice evaluation. The nomenclature is doing a great deal of work in those two syllables.</p>
 
     <div class="pfas-insight-box">
-        <h4><i class="fas fa-search"></i> The Unanswered Question No Vendor Will Address</h4>
+        <h3><i class="fas fa-search"></i> The Unanswered Question No Vendor Will Address</h3>
         <p>If a data center deploys 500,000 liters of HFO-1336mzz-Z across a campus-scale immersion cooling deployment, and 2-5% of that volume is released to atmosphere annually through maintenance vapor release, and 100% of that atmospheric release degrades to trifluoroacetic acid within 26 days, what is the cumulative TFA loading on local watershed systems over a 10-year operational period? This is a solvable engineering calculation. No vendor, no hyperscaler, no regulatory body has published a model for it. The data to populate that model does not exist &mdash; because nobody is measuring the maintenance vapor release in the first place.</p>
     </div>
 
@@ -1396,7 +1407,7 @@
     <p>None of these proposals require new science. The measurement protocols exist. The regulatory frameworks exist. What doesn't exist is the political will to apply them to an industry that has been granted a decade of regulatory deference in exchange for building AI infrastructure.</p>
 
     <div class="pfas-insight-box">
-        <h4><i class="fas fa-gavel"></i> The Precedent Already Exists</h4>
+        <h3><i class="fas fa-gavel"></i> The Precedent Already Exists</h3>
         <p>Clean Air Act Section 608 has required refrigerant recovery before servicing since 1993. The data center industry has been operating two-phase PFAS systems for over a decade with no equivalent requirement, despite PFAS compounds having significantly higher environmental persistence than the HFCs they regulate. The regulatory asymmetry is not a technical necessity — it is a policy choice that has never been formally examined.</p>
     </div>
 
@@ -1457,7 +1468,7 @@
     </div>
 
     <div class="pfas-warning-box">
-        <h4><i class="fas fa-gauge-high"></i> The cheapest instrument you already own</h4>
+        <h3><i class="fas fa-gauge-high"></i> The cheapest instrument you already own</h3>
         <p>Of all of these, <strong>make-up rate is the one to put on a dashboard tomorrow.</strong> It needs no new sensor &mdash; it is purchasing data you already have: litres of fluid bought to keep the system topped up, divided by the installed charge. A loop quietly running at 8&ndash;10%/yr make-up is leaking the equivalent of <span class="pfas-stat">several thousand dollars of fluid</span> and an unreported PFAS plume to atmosphere every year, and the only place it shows up today is the consumables budget. Trend it, set an alarm band against the EPA 608 sealed-leak benchmark [22], and the invisible leak becomes a number on a screen.</p>
     </div>
 
@@ -1466,7 +1477,7 @@
     <p>This piece first went out in April 2026. In the months since, the regulatory picture moved harder and faster than the body above anticipated &mdash; mostly against the &ldquo;PFAS-free&rdquo; HFO narrative the industry has leaned on. An operator reading this today should treat the following as the live compliance horizon, not a forecast.</p>
 
     <div class="pfas-danger-box">
-        <h4><i class="fas fa-tower-broadcast"></i> Regulatory update &mdash; the two that postdate publication</h4>
+        <h3><i class="fas fa-tower-broadcast"></i> Regulatory update &mdash; the two that postdate publication</h3>
         <p><strong>ECHA &mdash; TFA classified as Reproductive Toxicant Category&nbsp;1B (RAC opinion adopted June&nbsp;2026).</strong> The European Chemicals Agency's Committee for Risk Assessment adopted its opinion harmonising classification of <strong>trifluoroacetic acid</strong> &mdash; the very breakdown product of the HFO &ldquo;PFAS-free&rdquo; replacements &mdash; as a reproductive toxicant (H360Df) and hazardous to the ozone layer [21]. The marketing claim that HFOs solve the PFAS problem inverts: the degradation product now carries a formal hazard classification of its own. <strong>EU Drinking Water Directive &mdash; PFAS limits live since 12 January 2026.</strong> Directive (EU) 2020/2184 brought a PFAS-Total parametric value of <span class="pfas-stat">0.5&nbsp;&micro;g/L</span> (and PFAS-Sum 0.1&nbsp;&micro;g/L) into force [19] &mdash; a measurable line that TFA-loaded groundwater near a large deployment can realistically approach.</p>
     </div>
 
@@ -1855,7 +1866,7 @@
         </a>
     </div>
     <div class="pfas-warning-box" style="margin-top:1rem;">
-        <h4><i class="fas fa-magnifying-glass-minus"></i> The dataset that doesn't exist</h4>
+        <h3><i class="fas fa-magnifying-glass-minus"></i> The dataset that doesn't exist</h3>
         <p>Querying the USGS Water Quality Portal for <strong>trifluoroacetic acid (TFA)</strong> &mdash; the breakdown product at the centre of this article &mdash; returns <strong>zero records</strong>, under every name variant. PFOA, PFOS and even GenX are monitored in the thousands; the compound the &ldquo;PFAS-free&rdquo; cooling fluids actually become is not monitored in US water-quality systems at all. The absence is the evidence.</p>
     </div>
     <p style="font-size:0.82rem;color:#6b7280;"><i class="fas fa-circle-info" style="color:#b45309;"></i> The full raw archives (EPA UCMR&nbsp;5 PFAS results, the complete USGS water-quality record, NOAA halocarbon time series) are hundreds of megabytes and live on the agencies' own portals &mdash; <a href="data/article-26/external-databases.csv" download>external-databases.csv</a> links each one directly rather than mirroring government files here. A full manifest is in <a href="data/article-26/README.md" download>README.md</a>; every dataset has a committed regeneration script.</p>
@@ -2146,7 +2157,7 @@
     </div>
 </footer>
 
-<script src="script.min.js?v=2026-05-09-v1"></script>
+<script src="script.min.js?v=2026-07-04-a11y2"></script>
 <script src="rz-tracker.js" defer></script>
 
 <!-- Share Functions -->
@@ -2188,7 +2199,7 @@ function copyLink() {
 </script>
 
 <!-- TOC: shared js/rz-article-toc.js -->
-<script src="js/rz-article-toc.js?v=1.50.36" defer></script>
+<script src="js/rz-article-toc.js?v=1.50.42" defer></script>
 
 <!-- Search: shared js/rz-command-palette.js -->
 

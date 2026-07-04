@@ -28,6 +28,15 @@
 
     var tocToggle = document.getElementById('tocMobileToggle');
     var tocDrawer = document.getElementById('tocMobileDrawer');
+    if (tocDrawer && !tocDrawer.getAttribute('role')) {
+      tocDrawer.setAttribute('role', 'navigation');
+      tocDrawer.setAttribute('aria-label', 'Table of contents');
+    }
+    var tocSidebarEl = document.getElementById('tocSidebar');
+    if (tocSidebarEl && !tocSidebarEl.getAttribute('role')) {
+      tocSidebarEl.setAttribute('role', 'navigation');
+      tocSidebarEl.setAttribute('aria-label', 'Table of contents');
+    }
     var tocBackdrop = document.getElementById('tocMobileBackdrop');
     var tocClose = document.getElementById('tocDrawerClose');
 
