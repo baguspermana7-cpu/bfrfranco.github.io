@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.50.36 — 2026-07-03 (SEO — fix the 3 pages missing required Open Graph tags)
+
+**Fixed** — the SEO audit's only REQUIRED-tag errors: three pages
+(`all-in-one-dashboard.html`, `network-compare.html`, `network-visualization-hub.html`)
+had **no Open Graph tags at all**, so they rendered as bare links when shared on
+social/messaging. Added the full block per page — `og:type/url/title/description/image`
+(+ image dims/alt where a dedicated OG card exists; `assets/profile-photo.jpg` fallback
+for the dashboard), `twitter:card/title/description/image`, and a `WebPage`/`CollectionPage`
+JSON-LD. `audit-seo.py` REQUIRED errors: 3 → **0** (61+ clean pages). JSON-LD validated,
+js-syntax + script-tags CLEAN.
+
+---
+
 ## v1.50.35 — 2026-07-03 (Deep search — the palette now finds article SECTIONS)
 
 ### Added
