@@ -1345,13 +1345,25 @@
         }
         function current(){try{if(localStorage.getItem(KEY_R)==='1')return 'rainbow';return localStorage.getItem(KEY_T)||'light';}catch(e){return 'light';}}
         function next(c){return c==='light'?'dark':c==='dark'?'rainbow':'light';} // day → dark → rainbow → day
+        // Re-assert the stored mode — undoes any clobber by the shared theme script
+        // (script.min.js reads the 'theme' key at DOMContentLoaded and would set
+        // data-theme=light while rz-rainbow stays → light cards on a rainbow bg).
+        function enforce(){apply(current());}
         function bind(){
+            enforce();
             var btn=document.getElementById('themeToggle');if(!btn)return;
             var clone=btn.cloneNode(true);btn.parentNode.replaceChild(clone,btn); // strip shared 2-way listener
             function sync(){var c=current();clone.setAttribute('data-mode',c);clone.setAttribute('title','Theme: '+c+' — click for '+next(c));clone.setAttribute('aria-label','Theme: '+c+'. Activate for '+next(c)+' mode');}
             clone.addEventListener('click',function(){apply(next(current()));sync();this.style.transform='scale(0.95)';var b=this;setTimeout(function(){b.style.transform='';},150);});
             sync();
         }
+        // Instant guard: if rainbow is active and something flips data-theme off "dark",
+        // put it back (catches the shared script's clobber with minimal flash).
+        try{new MutationObserver(function(){var d=document.documentElement;
+            if(localStorage.getItem(KEY_R)==='1' && d.getAttribute('data-theme')!=='dark'){
+                d.setAttribute('data-theme','dark'); d.classList.add('rz-rainbow');}
+        }).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}
+        window.addEventListener('pageshow',enforce); // bfcache restore (back/forward)
         if(document.readyState==='complete')bind();else window.addEventListener('load',bind);
     })();</script>
 
@@ -1869,7 +1881,7 @@
 </script>
 
 <!-- Cookie Consent Banner -->
-<div class="cookie-banner hidden" id="cookieBanner">
+<div class="cookie-banner hidden" id="cookieBanner" role="region" aria-label="Cookie notice">
     <p>We use cookies for analytics to improve your experience. <a href="privacy.html">Read our Privacy Policy</a></p>
     <div class="cookie-actions">
         <button class="cookie-accept" id="cookieAccept">Accept</button>

@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v1.50.39 — 2026-07-03 (Fix — Rainbow mode showing light cards after navigating home)
+
+**Fixed** — a reported bug: after returning to the homepage while in Rainbow mode, the
+bento cards rendered in **light/day** even though the rainbow background + toggle icon
+were active. Root cause: the shared `script.min.js` runs `applyTheme(getPreferredTheme())`
+at DOMContentLoaded from the `theme` key; if that key had drifted to `light` (e.g. the
+2-way toggle was used on another page) while `rzRainbow=1`, it overwrote `data-theme`
+to `light` while the index-only `.rz-rainbow` class stayed → light cards on a rainbow
+background. The index theme controller wasn't re-asserting afterward.
+
+- The controller now **re-asserts the stored mode on load** (`enforce()`) and on
+  **bfcache restore** (`pageshow`, browser back/forward), and normalizes the `theme`
+  key back to `dark` whenever rainbow is active.
+- Added a `MutationObserver` on `data-theme`: while `rzRainbow=1`, if anything flips it
+  off `dark`, it's restored immediately (catches the clobber with minimal flash).
+- Verified headless across all states (clobber `rzRainbow=1`+`theme=light` → corrected
+  to dark cards; normal rainbow/dark/day consistent) + visual screenshot of the
+  previously-broken state now correct; 0 console errors; js-syntax + script-tags CLEAN.
+  Index-only inline JS (no CSS change).
+
+---
+
 ## v1.50.38 — 2026-07-03 (Living-diagram + scrollytelling rollout — article-25 & article-16)
 
 ### Added
