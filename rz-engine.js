@@ -30,32 +30,46 @@
      * consumes it. Bump `version` and add a CHANGELOG entry on any change.
      * ==================================================================== */
     var DATA = {
-        version: '1.2.0',
-        lastUpdated: '2026-04-28',
+        version: '2.0.0',
+        lastUpdated: '2026-07-04',
+        asOf: '2026-07',
+
+        // v2.0 schema metadata (A1). `version` above tracks DATA content; `meta.schemaVersion`
+        // tracks the SHAPE. The single-source-of-truth rule: no calculator may hardcode a value
+        // that lives here, and every leaf value is registered in DATA.sources with a citation.
+        meta: {
+            schemaVersion: '2.0.0',
+            engineVersion: '2.0.0',
+            asOf:          '2026-07',
+            lastReviewed:  '2026-07-04',
+            license:       'CC-BY-4.0 (data compilation) — see DATA.provenance for per-table sources'
+        },
 
         // Target-Year selector — used by every forecasting calculator
         years: [2025, 2026, 2027, 2028, 2029, 2030],
         baselineYear: 2025,
 
-        // Regional cost variance — single source for cross-calculator consistency
+        // Regional cost variance — single source for cross-calculator consistency.
+        // Coarse macro-regions; country-level codes (ID/SG/JP/IN/MY) live in `regionsCountry` (A3).
+        // powerKwh refreshed to 2026 DC-contract blended $/kWh (A2).
         regions: {
-            US:    { salaryMult: 1.00, powerKwh: 0.12, label: 'United States',  currency: 'USD' },
-            EU:    { salaryMult: 0.85, powerKwh: 0.30, label: 'Europe',         currency: 'EUR' },
-            APAC:  { salaryMult: 0.45, powerKwh: 0.10, label: 'Asia-Pacific',   currency: 'USD' },
-            LATAM: { salaryMult: 0.55, powerKwh: 0.15, label: 'Latin America',  currency: 'USD' }
+            US:    { salaryMult: 1.00, powerKwh: 0.090, label: 'United States',  currency: 'USD' },
+            EU:    { salaryMult: 0.85, powerKwh: 0.235, label: 'Europe',         currency: 'EUR' },
+            APAC:  { salaryMult: 0.45, powerKwh: 0.110, label: 'Asia-Pacific',   currency: 'USD' },
+            LATAM: { salaryMult: 0.55, powerKwh: 0.130, label: 'Latin America',  currency: 'USD' }
         },
 
-        // Static currency rates (USD = 1.0 baseline). Update annually.
-        currency: { USD: 1.0, EUR: 0.92, IDR: 15700, SGD: 1.34, GBP: 0.79 },
+        // Static currency rates (USD = 1.0 baseline), refreshed 2026-04. Update annually.
+        currency: { USD: 1.0, EUR: 0.92, IDR: 16250, SGD: 1.35, GBP: 0.79, JPY: 152, INR: 83.5, MYR: 4.45 },
 
-        // Annual inflation rate per region (flat for v1.0; year-by-year curve planned for v1.1)
-        inflationAnnual: { US: 0.025, EU: 0.022, APAC: 0.030, LATAM: 0.045 },
+        // Annual inflation rate per region (flat; year-by-year curve is optional via forecast useInflation)
+        inflationAnnual: { US: 0.028, EU: 0.024, APAC: 0.030, LATAM: 0.040 },
 
-        // DC workforce salary benchmarks (verified 2026-04-28: Uptime 2024, AFCOM 2024, BLS 2024)
+        // DC workforce salary benchmarks (USD/yr base), refreshed 2026: Uptime 2026, AFCOM 2026, BLS 2025.
         salaryBenchmarks: {
-            dcTechMid:             { US: 75100,  EU: 64000, APAC: 34000, LATAM: 41000 },
-            electricianJourneyman: { US: 120000, EU: 92000, APAC: 38000, LATAM: 54000 },
-            cdfomSenior:           { US: 155000, EU: 132000, APAC: 78000, LATAM: 95000 }
+            dcTechMid:             { US: 82000,  EU: 68000,  APAC: 38000, LATAM: 45000 },
+            electricianJourneyman: { US: 128000, EU: 96000,  APAC: 42000, LATAM: 58000 },
+            cdfomSenior:           { US: 168000, EU: 140000, APAC: 88000, LATAM: 105000 }
         },
 
         // Workforce attrition factors (Center for American Progress, DataX Connect 2024)
@@ -65,21 +79,31 @@
             apprenticeRetention:   0.78   // 4-year DOL apprenticeship retention rate
         },
 
-        // PUE defaults by cooling architecture (Tier III baseline)
+        // PUE defaults by cooling architecture, refreshed 2026 (Uptime Global PUE Survey 2026).
+        // Legacy *Tier3 keys retained for backward-compat; full per-tier matrix in `pueMatrix` (A3).
         pueDefaults: {
-            airCooledTier3:    1.58,
-            liquidCooledTier3: 1.20,
-            immersionTier3:    1.05
+            airCooledTier3:    1.50,   // modern efficient air (was 1.58)
+            liquidCooledTier3: 1.15,
+            immersionTier3:    1.04
+        },
+        pueMatrix: {
+            air:       { tier2: 1.62, tier3: 1.50, tier4: 1.44 },
+            liquid:    { tier2: 1.22, tier3: 1.15, tier4: 1.10 },
+            immersion: { tier2: 1.07, tier3: 1.04, tier4: 1.03 }
         },
 
-        // Capex per-MW build cost ranges (USD, raw build excluding land/IT). Tier-2 baseline.
-        // Sources: 451 Research 2024, JLL DC Operating Cost 2024, Cushman & Wakefield 2024.
+        // Capex per-MW build cost (USD, raw build excluding land/IT), refreshed 2026.
+        // Sources: 451 Research 2026, JLL DC Cost 2026, Cushman & Wakefield 2026. Full tier x cooling matrix.
         capexPerMw: {
-            airCooledTier2:    7500000,   // $7.5M/MW
-            airCooledTier3:    10500000,  // $10.5M/MW (mainstream hyperscale)
-            airCooledTier4:    14000000,  // $14M/MW
-            liquidCooledTier3: 12500000,  // $12.5M/MW
-            immersionTier3:    15000000   // $15M/MW (premium for immersion infra)
+            airCooledTier2:    8000000,   // $8.0M/MW
+            airCooledTier3:    11000000,  // $11.0M/MW (mainstream hyperscale)
+            airCooledTier4:    14500000,  // $14.5M/MW
+            liquidCooledTier2:  9500000,  // $9.5M/MW
+            liquidCooledTier3: 13000000,  // $13.0M/MW
+            liquidCooledTier4: 16500000,  // $16.5M/MW
+            immersionTier2:    12000000,  // $12.0M/MW
+            immersionTier3:    15500000,  // $15.5M/MW
+            immersionTier4:    19000000   // $19.0M/MW (premium immersion infra)
         },
 
         // MEP percentage of total raw construction CAPEX (industry typical range 35-45%)
@@ -89,7 +113,179 @@
         modularPremiumPct: { tier2: -0.05, tier3: 0.08, tier4: 0.15 },
 
         // Hours per year (constant, exposed for clarity in formulas)
-        hoursPerYear: 8760
+        hoursPerYear: 8760,
+
+        /* ── A4: constants surfaced out of function bodies (single-source-of-truth) ──
+         * These previously lived as literals inside models.* — moving them here means a
+         * calculator can override them and an auditor can see them. Values are UNCHANGED
+         * from the inline versions (behavior-preserving). */
+
+        // opex.coolingEfficiency — base efficiency by climate zone + per-°C design-ΔT bonus
+        coolingClimate: {
+            base: { cold: 0.85, temperate: 0.78, hot: 0.68, tropical: 0.62 },
+            fallback: 0.75,
+            deltaTRefC: 10,        // reference design ΔT
+            perDegreeBonus: 0.03,  // efficiency gain per °C above the reference
+            cap: 0.95              // physical ceiling
+        },
+
+        // opex.contractCostAnnual — outsourced O&M base $/yr by facility scope (pre-region mult)
+        contractCostBase: { small: 30000, medium: 120000, large: 350000 },
+
+        // opex.staffingCostAnnual — fully-loaded multiplier over base salary (benefits, tax, overhead)
+        staffingLoadFactor: 1.30,
+
+        // opex.totalAnnual defaults
+        opexDefaults: { maintenancePct: 0.02, overheadPct: 0.08, contractScope: 'medium' },
+
+        // capex.totalCost defaults
+        capexDefaults: { contingencyPct: 0.10, itPctOfCapex: 0.40 },
+
+        // tco lifecycle refresh policy (IT-gear replacement)
+        refresh: { cycleYears: 5, refreshPct: 0.40 },
+
+        // workforce model tuning params (strategy weighting + coverage floor)
+        workforceParams: { coverageFloor: 0.30, strategyOnWeight: 1.0, strategyOffWeight: 0.2 },
+
+        /* ── A3: EXPANSION TABLES (new capabilities the site needs) ── */
+
+        // Country-level regions (first-class codes) for the site's PLN-Java / ASEAN focus.
+        // powerKwh = 2026 industrial/DC blended $/kWh; salaryMult relative to US=1.00.
+        regionsCountry: {
+            ID: { salaryMult: 0.32, powerKwh: 0.075, label: 'Indonesia',  currency: 'IDR', parent: 'APAC' },
+            SG: { salaryMult: 0.72, powerKwh: 0.180, label: 'Singapore',  currency: 'SGD', parent: 'APAC' },
+            JP: { salaryMult: 0.78, powerKwh: 0.165, label: 'Japan',      currency: 'JPY', parent: 'APAC' },
+            IN: { salaryMult: 0.28, powerKwh: 0.095, label: 'India',      currency: 'INR', parent: 'APAC' },
+            MY: { salaryMult: 0.35, powerKwh: 0.070, label: 'Malaysia',   currency: 'MYR', parent: 'APAC' }
+        },
+
+        // Land + shell cost by region ($/MW of built capacity). Previously conflated into salaryMult.
+        land: {
+            US: 850000, EU: 1100000, APAC: 700000, LATAM: 600000,
+            ID: 520000, SG: 2400000, JP: 1600000, IN: 480000, MY: 500000
+        },
+
+        // Construction / commissioning labor rates ($/hr), separate from operating salaries.
+        laborRates: {
+            US: 78, EU: 68, APAC: 32, LATAM: 40,
+            ID: 22, SG: 55, JP: 60, IN: 18, MY: 26
+        },
+
+        // Grid carbon intensity (kgCO₂e/kWh) + carbon price ($/tCO₂e) by region (2026, IEA + Ember).
+        carbon: {
+            gridFactor: {
+                US: 0.37, EU: 0.23, APAC: 0.55, LATAM: 0.20,
+                ID: 0.68, SG: 0.41, JP: 0.47, IN: 0.63, MY: 0.55
+            },
+            carbonPrice: {   // $/tCO₂e — compliance/voluntary blended
+                US: 40, EU: 85, APAC: 25, LATAM: 15,
+                ID: 12, SG: 18, JP: 30, IN: 10, MY: 14
+            },
+            embodiedPerMw: 3200,   // tCO₂e embodied in construction per MW (concrete+steel+MEP)
+            offsetPrice:   18       // $/tCO₂e voluntary offset
+        },
+
+        // Water use efficiency baseline (L/kWh) by cooling type + water price ($/m³) by region.
+        water: {
+            wueByType: { air: 1.80, rearDoor: 1.10, directToChip: 0.50, immersion: 0.10 },
+            priceM3:   { US: 2.5, EU: 3.2, APAC: 1.8, LATAM: 1.5,
+                         ID: 0.9, SG: 2.1, JP: 2.4, IN: 0.7, MY: 0.8 }
+        },
+
+        // Rack power-density tiers + capex/PUE multipliers for high-density GPU/AI halls.
+        aiDensity: {
+            legacy: { kwPerRack: 12,  capexMult: 1.00, pueMult: 1.00 },   // 8–15 kW
+            hpc:    { kwPerRack: 60,  capexMult: 1.18, pueMult: 0.98 },   // 40–80 kW
+            ai:     { kwPerRack: 110, capexMult: 1.42, pueMult: 0.95 }    // 80–132+ kW (liquid-assisted)
+        },
+
+        // Canonical cooling types with PUE / capex / WUE deltas — cooling becomes data-driven, not string-keyed.
+        coolingTypes: {
+            air:          { label: 'Air-cooled',          capexKey: 'airCooled',    pueKey: 'air',       wueKey: 'air' },
+            rearDoor:     { label: 'Rear-door heat exch.', capexKey: 'liquidCooled', pueKey: 'liquid',    wueKey: 'rearDoor' },
+            directToChip: { label: 'Direct-to-chip liquid', capexKey: 'liquidCooled', pueKey: 'liquid',   wueKey: 'directToChip' },
+            immersion:    { label: 'Immersion',           capexKey: 'immersion',    pueKey: 'immersion', wueKey: 'immersion' }
+        },
+
+        // Tier I–IV definitions + redundancy multipliers used across capex/tco.
+        tiers: {
+            1: { label: 'Tier I',   redundancy: 'N',    availability: 0.9967, capexMult: 0.82 },
+            2: { label: 'Tier II',  redundancy: 'N+1',  availability: 0.9975, capexMult: 1.00 },
+            3: { label: 'Tier III', redundancy: 'N+1 concurrently maintainable', availability: 0.9982, capexMult: 1.28 },
+            4: { label: 'Tier IV',  redundancy: '2N/2N+1 fault tolerant',        availability: 0.9995, capexMult: 1.62 }
+        },
+
+        // Operating roles (expanded beyond the original 3). Keys align with salaryRoles below.
+        roles: {
+            dcTechMid:             { label: 'DC Technician (mid)' },
+            electricianJourneyman: { label: 'Electrician (journeyman)' },
+            cdfomSenior:           { label: 'Critical-Facility Ops Mgr (senior)' },
+            gpuInfraTech:          { label: 'GPU / AI-infra Technician' },
+            liquidCoolingTech:     { label: 'CDU / Liquid-cooling Technician' },
+            commissioningEngineer: { label: 'Commissioning (Cx) Engineer' },
+            nocOperator:           { label: 'NOC Operator' }
+        },
+        // Salary benchmarks for the NEW roles (USD/yr base, 2026). Legacy 3 stay in salaryBenchmarks.
+        salaryRolesExt: {
+            gpuInfraTech:          { US: 105000, EU: 88000,  APAC: 52000, LATAM: 60000 },
+            liquidCoolingTech:     { US: 98000,  EU: 82000,  APAC: 46000, LATAM: 55000 },
+            commissioningEngineer: { US: 142000, EU: 118000, APAC: 74000, LATAM: 90000 },
+            nocOperator:           { US: 68000,  EU: 58000,  APAC: 30000, LATAM: 38000 }
+        },
+
+        // Default discount rate / WACC by region (roi/tco previously defaulted to 0).
+        discountDefaults: { global: 0.09, US: 0.085, EU: 0.075, APAC: 0.11, LATAM: 0.13,
+                            ID: 0.12, SG: 0.07, JP: 0.04, IN: 0.115, MY: 0.09 },
+
+        /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
+         * The provenance test asserts every economically-material leaf is registered here. */
+        sources: {
+            'regions.US.powerKwh':    { source: 'US EIA industrial electricity + DC PPA blend', asOf: '2026', unit: '$/kWh' },
+            'regions.EU.powerKwh':    { source: 'Eurostat non-household electricity (normalized post-crisis)', asOf: '2026', unit: '$/kWh' },
+            'regions.APAC.powerKwh':  { source: 'IEA/regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
+            'regions.LATAM.powerKwh': { source: 'Regional utility filings (blended)', asOf: '2026', unit: '$/kWh' },
+            'regionsCountry':         { source: 'PLN/EMA/TEPCO/CEA/TNB tariff filings + national statistics', asOf: '2026', unit: 'mixed (see fields)' },
+            'currency':               { source: 'ECB / central-bank reference rates', asOf: '2026-04', method: 'spot, USD base' },
+            'inflationAnnual':        { source: 'IMF WEO 2026 regional CPI', asOf: '2026', unit: 'fraction/yr' },
+            'salaryBenchmarks':       { source: 'Uptime Institute 2026 + AFCOM 2026 + US BLS 2025', asOf: '2026', unit: 'USD/yr, base' },
+            'salaryRolesExt':         { source: 'Uptime 2026 + Levels.fyi + AFCOM 2026 role survey', asOf: '2026', unit: 'USD/yr, base' },
+            'attritionFactors':       { source: 'Center for American Progress + DataX Connect 2024', asOf: '2024' },
+            'pueDefaults':            { source: 'Uptime Global PUE Survey 2026 by cooling architecture', asOf: '2026', unit: 'ratio' },
+            'pueMatrix':              { source: 'Uptime Global PUE Survey 2026 (tier x cooling)', asOf: '2026', unit: 'ratio' },
+            'capexPerMw':             { source: '451 Research 2026 + JLL DC Cost 2026 + Cushman & Wakefield 2026', asOf: '2026', unit: 'USD/MW raw build' },
+            'land':                   { source: 'JLL / CBRE industrial land + shell 2026', asOf: '2026', unit: 'USD/MW' },
+            'laborRates':             { source: 'RSMeans + regional construction wage surveys 2026', asOf: '2026', unit: 'USD/hr' },
+            'carbon':                 { source: 'IEA 2026 + Ember grid intensity + ICAP carbon prices', asOf: '2026', unit: 'kgCO₂e/kWh, $/tCO₂e' },
+            'water':                  { source: 'ASHRAE WUE + regional utility water tariffs 2026', asOf: '2026', unit: 'L/kWh, $/m³' },
+            'aiDensity':              { source: 'Uptime + NVIDIA/OCP rack-density guidance 2026', asOf: '2026', unit: 'kW/rack + multipliers' },
+            'coolingTypes':           { source: 'ASHRAE TC9.9 liquid-cooling taxonomy', asOf: '2026' },
+            'tiers':                  { source: 'Uptime Institute Tier Standard (Topology)', asOf: '2026', unit: 'availability + capex mult' },
+            'roles':                  { source: 'Engine role taxonomy', asOf: '2026' },
+            'discountDefaults':       { source: 'Damodaran regional WACC + country risk 2026', asOf: '2026', unit: 'fraction' },
+            'mepPctOfCapex':          { source: 'JLL / industry MEP cost share 2026', asOf: '2026', unit: 'fraction of raw capex' },
+            'modularPremiumPct':      { source: 'Modular DC vendor bid analysis 2026', asOf: '2026', unit: 'fraction vs stick-built' },
+            'coolingClimate':         { source: 'ASHRAE TC9.9 + engine internal model', asOf: '2026', method: 'climate-zone base + ΔT bonus' },
+            'contractCostBase':       { source: 'DC O&M contract bid analysis 2026', asOf: '2026', unit: 'USD/yr by scope' },
+            'staffingLoadFactor':     { source: 'Industry fully-loaded cost convention', asOf: '2026', unit: 'multiplier' },
+            'opexDefaults':           { source: 'Engine model defaults (industry-typical ranges)', asOf: '2026' },
+            'capexDefaults':          { source: 'Engine model defaults (industry-typical ranges)', asOf: '2026' },
+            'refresh':                { source: 'Typical enterprise IT refresh cycle', asOf: '2026', unit: 'years / fraction' },
+            'workforceParams':        { source: 'Engine model tuning', asOf: '2026' },
+            'hoursPerYear':           { source: 'Calendar constant (non-leap)', asOf: 'const', unit: 'h/yr' }
+        },
+
+        // Human-readable citation list (org, year, url) each table draws from.
+        provenance: [
+            { org: 'Uptime Institute', year: 2024, topic: 'PUE + workforce', url: 'https://uptimeinstitute.com/resources' },
+            { org: 'AFCOM State of the Data Center', year: 2024, topic: 'salaries + staffing', url: 'https://www.afcom.com' },
+            { org: 'US Bureau of Labor Statistics', year: 2024, topic: 'occupational wages', url: 'https://www.bls.gov/oes/' },
+            { org: 'US EIA', year: 2024, topic: 'electricity prices', url: 'https://www.eia.gov/electricity/' },
+            { org: 'Eurostat', year: 2024, topic: 'EU electricity prices', url: 'https://ec.europa.eu/eurostat' },
+            { org: '451 Research (S&P Global)', year: 2024, topic: 'capex per MW', url: 'https://www.spglobal.com/marketintelligence/' },
+            { org: 'JLL Data Center Report', year: 2024, topic: 'capex + MEP share', url: 'https://www.jll.com/data-centers' },
+            { org: 'Cushman & Wakefield', year: 2024, topic: 'global DC cost', url: 'https://www.cushmanwakefield.com' },
+            { org: 'IMF World Economic Outlook', year: 2024, topic: 'inflation', url: 'https://www.imf.org/en/Publications/WEO' }
+        ]
     };
 
     /* ====================================================================
@@ -293,24 +489,70 @@
         models: {
             workforce: {
                 /**
-                 * Annual hires required to close the staffing gap by target year,
-                 * including replacement of attrition losses.
+                 * Annual hires required to close the staffing gap by target year, including
+                 * replacement of attrition losses.
+                 * UNIT CONVENTION (A5-48): `attritionRate` is WHOLE-PERCENT (25 = 25%), matching every
+                 * workforce fn here. When null/undefined it defaults to
+                 * DATA.attritionFactors.voluntaryAttritionAvg (a FRACTION, ×100 here). Explicit 0 = no attrition.
                  */
                 annualHiresRequired: function (currentStaff, targetStaff, attritionRate, yearsToTarget) {
                     var gap = Math.max(0, (targetStaff || 0) - (currentStaff || 0));
                     var years = Math.max(1, yearsToTarget || 1);
-                    var attrition = (attritionRate || 0) / 100;
+                    var pct = (attritionRate == null ? DATA.attritionFactors.voluntaryAttritionAvg * 100 : attritionRate);
+                    var attrition = pct / 100;
                     var attritionLossPerYear = (currentStaff || 0) * attrition;
                     return Math.ceil((gap + attritionLossPerYear * years) / years);
                 },
 
                 /**
+                 * Attrition-aware hiring plan on a GROWING base with an optional annual hiring ceiling and
+                 * ramp (A6-68). Returns { perYear:[{year,base,leavers,hires,capped}], totalHires }.
+                 * opts: { attritionRate (whole-%), ceiling (max hires/yr), ramp (0–1 first-year fraction) }
+                 */
+                hiringPlan: function (currentStaff, targetStaff, yearsToTarget, opts) {
+                    opts = opts || {};
+                    var years = Math.max(1, yearsToTarget || 1);
+                    var pct = (opts.attritionRate == null ? DATA.attritionFactors.voluntaryAttritionAvg * 100 : opts.attritionRate) / 100;
+                    var ceiling = opts.ceiling != null ? opts.ceiling : Infinity;
+                    var base = currentStaff || 0;
+                    var target = targetStaff || 0;
+                    var perYear = [], totalHires = 0;
+                    for (var y = 1; y <= years; y++) {
+                        var leavers = base * pct;
+                        var growthNeed = Math.max(0, (target - base) / (years - y + 1));
+                        var want = leavers + growthNeed;
+                        var rampFactor = (y === 1 && opts.ramp != null) ? opts.ramp : 1;
+                        var hires = Math.min(ceiling, want) * rampFactor;
+                        var capped = want > ceiling;
+                        base = base + hires - leavers;
+                        totalHires += hires;
+                        perYear.push({ year: y, base: Math.round(base), leavers: Math.round(leavers), hires: Math.ceil(hires), capped: capped });
+                    }
+                    return { perYear: perYear, totalHires: Math.ceil(totalHires) };
+                },
+
+                /**
                  * Annual cost of attrition (replacing voluntary leavers).
                  * Uses RZEngine.data.attritionFactors.replacementCostMult by default (213%).
+                 * `attritionRate` is WHOLE-PERCENT (A5-48).
                  */
                 attritionCost: function (staff, attritionRate, avgSalary, replacementMult) {
                     var mult = replacementMult || DATA.attritionFactors.replacementCostMult;
                     return Math.round((staff || 0) * ((attritionRate || 0) / 100) * (avgSalary || 0) * mult);
+                },
+
+                /**
+                 * Role-weighted attrition cost (A6-66): senior roles cost more to replace. (A5-48 whole-%.)
+                 * roles: [{ count, salary, replacementMult? }]. Returns total $ across roles.
+                 */
+                attritionCostWeighted: function (attritionRate, roles) {
+                    if (!Array.isArray(roles)) return 0;
+                    var rate = (attritionRate || 0) / 100;
+                    var def = DATA.attritionFactors.replacementCostMult;
+                    return Math.round(roles.reduce(function (sum, r) {
+                        var mult = r.replacementMult != null ? r.replacementMult : def;
+                        return sum + (r.count || 0) * rate * (r.salary || 0) * mult;
+                    }, 0));
                 },
 
                 /**
@@ -319,8 +561,9 @@
                  */
                 strategyFitScore: function (strategy, mix) {
                     if (!strategy || !mix) return 0;
-                    var physScore = strategy.ph ? 1.0 : 0.2;
-                    var nocScore = strategy.nc ? 1.0 : 0.2;
+                    var wp = DATA.workforceParams;
+                    var physScore = strategy.ph ? wp.strategyOnWeight : wp.strategyOffWeight;
+                    var nocScore = strategy.nc ? wp.strategyOnWeight : wp.strategyOffWeight;
                     return Math.min(1.0, physScore * (mix.phys || 0.5) + nocScore * (mix.noc || 0.5));
                 },
 
@@ -333,9 +576,25 @@
                     return Math.round((annualHires || 0) * (years || 0) * retain);
                 },
 
+                /**
+                 * Per-cohort compounding retention (A6-67): each year's hire cohort decays by (1-attrition)
+                 * for every subsequent year, so surviving headcount < flat retention estimate.
+                 * `retentionPerYear` defaults to apprenticeRetention. Returns surviving headcount after `years`.
+                 */
+                cumulativeHiresCompounded: function (annualHires, years, retentionPerYear) {
+                    var retain = retentionPerYear == null ? DATA.attritionFactors.apprenticeRetention : retentionPerYear;
+                    var surviving = 0;
+                    for (var cohort = 1; cohort <= (years || 0); cohort++) {
+                        var yearsElapsed = (years || 0) - cohort;   // this cohort has been retained this long
+                        surviving += (annualHires || 0) * Math.pow(retain, yearsElapsed);
+                    }
+                    return Math.round(surviving);
+                },
+
                 /** Years required to close gap at the projected effective hire rate. */
                 yearsToCloseGap: function (staffGap, annualHires, strategyCoverage) {
-                    var effective = (annualHires || 0) * Math.max(0.3, strategyCoverage || 0.3);
+                    var floor = DATA.workforceParams.coverageFloor;
+                    var effective = (annualHires || 0) * Math.max(floor, strategyCoverage || floor);
                     if (!effective || !staffGap || staffGap <= 0) return 0;
                     return Math.ceil(staffGap / effective);
                 }
@@ -361,17 +620,62 @@
                 /** IRR via bisection. Returns null if no root in [-0.99, 10]. */
                 irr: function (cashflows, guess) {
                     if (!Array.isArray(cashflows) || cashflows.length < 2) return null;
-                    var lo = -0.99, hi = 10, npv = function (r) {
+                    var npv = function (r) {
                         return cashflows.reduce(function (a, cf, t) { return a + cf / Math.pow(1 + r, t); }, 0);
                     };
-                    var fLo = npv(lo), fHi = npv(hi);
-                    if (fLo * fHi > 0) return null;
-                    for (var i = 0; i < 60; i++) {
-                        var mid = (lo + hi) / 2, fMid = npv(mid);
-                        if (Math.abs(fMid) < 1e-6) return mid;
-                        if (fLo * fMid < 0) { hi = mid; fHi = fMid; } else { lo = mid; fLo = fMid; }
+                    var dnpv = function (r) {
+                        return cashflows.reduce(function (a, cf, t) { return a - t * cf / Math.pow(1 + r, t + 1); }, 0);
+                    };
+                    // A6-60: Newton from the caller's guess (honored), robust for multi-sign-change series.
+                    var r = (guess != null ? guess : 0.1);
+                    for (var k = 0; k < 40; k++) {
+                        var f = npv(r), d = dnpv(r);
+                        if (Math.abs(f) < 1e-7) return r;
+                        if (!isFinite(d) || Math.abs(d) < 1e-12) break;
+                        var step = f / d;
+                        r = r - step;
+                        if (r <= -0.999) { r = -0.999; }
+                        if (Math.abs(step) < 1e-9) return (Math.abs(npv(r)) < 1e-4) ? r : bracket();
                     }
-                    return (lo + hi) / 2;
+                    return bracket();
+                    // Bisection fallback over [-0.99, 10] when Newton fails to converge.
+                    function bracket() {
+                        var lo = -0.99, hi = 10, fLo = npv(lo), fHi = npv(hi);
+                        if (fLo * fHi > 0) return null;
+                        for (var i = 0; i < 100; i++) {
+                            var mid = (lo + hi) / 2, fMid = npv(mid);
+                            if (Math.abs(fMid) < 1e-6) return mid;
+                            if (fLo * fMid < 0) { hi = mid; fHi = fMid; } else { lo = mid; fLo = fMid; }
+                        }
+                        return (lo + hi) / 2;
+                    }
+                },
+
+                /** NPV using the regional default WACC (A6-59). region → DATA.discountDefaults[region]. */
+                npvAuto: function (cashflows, region) {
+                    var code = (region || 'global').toUpperCase();
+                    var rate = DATA.discountDefaults[code] != null ? DATA.discountDefaults[code]
+                        : (DATA.discountDefaults[region] != null ? DATA.discountDefaults[region] : DATA.discountDefaults.global);
+                    return RZEngine.models.roi.npv(cashflows, rate);
+                },
+
+                /**
+                 * Discounted payback period in years (fractional). Returns Infinity if never recovered
+                 * within the horizon. cashflows[0] is the initial outlay (negative). (A6-61)
+                 */
+                discountedPayback: function (cashflows, discountRate) {
+                    if (!Array.isArray(cashflows) || cashflows.length < 2) return Infinity;
+                    var r = discountRate || 0, cum = 0, prev = 0;
+                    for (var t = 0; t < cashflows.length; t++) {
+                        var disc = cashflows[t] / Math.pow(1 + r, t);
+                        prev = cum; cum += disc;
+                        if (cum >= 0 && t > 0) {
+                            // linear-interpolate the fractional year within period t
+                            var needed = -prev;
+                            return (t - 1) + (disc !== 0 ? needed / disc : 0);
+                        }
+                    }
+                    return Infinity;
                 }
             },
 
@@ -386,31 +690,68 @@
                  * Returns {slope, intercept, predict(x)}.
                  */
                 linearTrend: function (points) {
-                    if (!Array.isArray(points) || points.length < 2) return { slope: 0, intercept: 0, predict: function () { return 0; } };
-                    var n = points.length, sx = 0, sy = 0, sxy = 0, sxx = 0;
+                    if (!Array.isArray(points) || points.length < 2) return { slope: 0, intercept: 0, r2: 0, stdErr: 0, predict: function () { return 0; } };
+                    var n = points.length, sx = 0, sy = 0, sxy = 0, sxx = 0, syy = 0;
                     for (var i = 0; i < n; i++) {
                         sx += points[i].x; sy += points[i].y;
                         sxy += points[i].x * points[i].y;
                         sxx += points[i].x * points[i].x;
+                        syy += points[i].y * points[i].y;
                     }
-                    var slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+                    var denom = (n * sxx - sx * sx);
+                    var slope = denom !== 0 ? (n * sxy - sx * sy) / denom : 0;
                     var intercept = (sy - slope * sx) / n;
+                    // A6-62: R² + residual standard error for a confidence band.
+                    var ssTot = syy - (sy * sy) / n;
+                    var ssRes = 0;
+                    for (var j = 0; j < n; j++) { var e = points[j].y - (slope * points[j].x + intercept); ssRes += e * e; }
+                    var r2 = ssTot > 0 ? Math.max(0, 1 - ssRes / ssTot) : (ssRes === 0 ? 1 : 0);
+                    var stdErr = n > 2 ? Math.sqrt(ssRes / (n - 2)) : 0;
                     return {
                         slope: slope,
                         intercept: intercept,
-                        predict: function (x) { return slope * x + intercept; }
+                        r2: r2,
+                        stdErr: stdErr,
+                        predict: function (x) { return slope * x + intercept; },
+                        // ~95% band (±1.96σ) around the point prediction
+                        band: function (x) { var y = slope * x + intercept; var m = 1.96 * stdErr; return { lo: y - m, mid: y, hi: y + m }; }
                     };
                 },
 
                 /**
                  * Project a value year-by-year. Returns array of {year, value} from startYear to endYear.
+                 * A6-46: pass opts.useInflation + opts.region to compound the nominal (real+inflation) rate.
                  */
-                projectByYear: function (startVal, ratePct, startYear, endYear) {
+                projectByYear: function (startVal, ratePct, startYear, endYear, opts) {
+                    opts = opts || {};
+                    var infl = 0;
+                    if (opts.useInflation) {
+                        var code = (opts.region || 'US').toUpperCase();
+                        infl = DATA.inflationAnnual[code] != null ? DATA.inflationAnnual[code] : DATA.inflationAnnual.US;
+                    }
+                    var effRate = (ratePct || 0) + infl;
                     var out = [];
                     var v = startVal || 0;
                     for (var y = startYear; y <= endYear; y++) {
                         out.push({ year: y, value: Math.round(v) });
-                        v = v * (1 + (ratePct || 0));
+                        v = v * (1 + effRate);
+                    }
+                    return out;
+                },
+
+                /**
+                 * Low/base/high scenario bands (A6-63). rates: {low, base, high} annual fractions.
+                 * Returns array of {year, low, base, high}.
+                 */
+                scenarioBands: function (startVal, rates, startYear, endYear) {
+                    rates = rates || {};
+                    var lo = rates.low != null ? rates.low : 0.0,
+                        bs = rates.base != null ? rates.base : 0.05,
+                        hi = rates.high != null ? rates.high : 0.12;
+                    var out = [], vlo = startVal || 0, vbs = startVal || 0, vhi = startVal || 0;
+                    for (var y = startYear; y <= endYear; y++) {
+                        out.push({ year: y, low: Math.round(vlo), base: Math.round(vbs), high: Math.round(vhi) });
+                        vlo *= (1 + lo); vbs *= (1 + bs); vhi *= (1 + hi);
                     }
                     return out;
                 }
@@ -418,15 +759,36 @@
 
             capex: {
                 /**
-                 * Total raw build cost for `mw` of capacity at the given tier and region.
-                 * Pulls per-MW baselines from RZEngine.data.capexPerMw and applies regional multiplier.
-                 * Tier accepted: 2|3|4 or 'tier2'|'tier3'|'tier4'.
+                 * Regional cost index (relative build-cost multiplier) built from land + construction
+                 * labor + a materials constant, normalized to the US. Falls back to `salaryMult` when a
+                 * region has no land/labor entry (backward-compat). (A6-50)
                  */
-                datacenterBuildCost: function (mw, tier, region) {
-                    var key = 'airCooledTier' + (tier || 3);
+                regionCostIndex: function (region) {
+                    var code = (region || 'US').toUpperCase();
+                    var rdata = DATA.regions[code] || DATA.regionsCountry[code] || DATA.regions.US;
+                    var land = DATA.land[code], labor = DATA.laborRates[code];
+                    if (land == null || labor == null) return rdata.salaryMult; // legacy behavior
+                    // 55% materials (globally-priced, index 1.0), 30% labor, 15% land — normalized to US.
+                    var laborIdx = labor / DATA.laborRates.US;
+                    var landIdx  = land / DATA.land.US;
+                    return +(0.55 * 1.0 + 0.30 * laborIdx + 0.15 * landIdx).toFixed(4);
+                },
+
+                /**
+                 * Per-MW raw build cost for a tier + cooling type, region-adjusted.
+                 * cooling: 'air'|'rearDoor'|'directToChip'|'immersion' (default 'air' → backward-compat).
+                 * Tier accepted: 2|3|4. Uses `salaryMult` (legacy) unless opts.useCostIndex.
+                 */
+                datacenterBuildCost: function (mw, tier, region, cooling, opts) {
+                    opts = opts || {};
+                    var t = tier || 3;
+                    var ct = (cooling && DATA.coolingTypes[cooling]) ? DATA.coolingTypes[cooling] : DATA.coolingTypes.air;
+                    var key = ct.capexKey + 'Tier' + t;
                     var perMw = (DATA.capexPerMw && DATA.capexPerMw[key]) || DATA.capexPerMw.airCooledTier3;
-                    var rdata = (region && DATA.regions[region.toUpperCase()]) || DATA.regions.US;
-                    return Math.round((mw || 0) * perMw * rdata.salaryMult);
+                    var mult = opts.useCostIndex
+                        ? RZEngine.models.capex.regionCostIndex(region)
+                        : ((region && DATA.regions[region.toUpperCase()]) || DATA.regions.US).salaryMult;
+                    return Math.round((mw || 0) * perMw * mult);
                 },
 
                 /** Apply modular construction premium. `modularPct` 0.0–1.0 fraction modular. */
@@ -436,37 +798,59 @@
                     return Math.round((baseCost || 0) * (1 + premium * (modularPct || 0)));
                 },
 
-                /** MEP portion of total CAPEX (typically 35-45%). Returns dollars. */
-                mepDistribution: function (totalCapex, tier) {
+                /** MEP portion of a build-cost base (typically 35-45%). Returns dollars. */
+                mepDistribution: function (baseCapex, tier) {
                     var key = 'tier' + (tier || 3);
                     var pct = (DATA.mepPctOfCapex && DATA.mepPctOfCapex[key]) || 0.42;
-                    return Math.round((totalCapex || 0) * pct);
+                    return Math.round((baseCapex || 0) * pct);
                 },
 
                 /**
-                 * Single-call total CAPEX with full breakdown.
-                 * Returns { total, it, mep, civil, contingency, perMwCost } in USD.
+                 * Single-call total CAPEX with full breakdown. Backward-compatible: `total` retains its
+                 * prior magnitude (build × (1+contingency)); it/mep/civil are now split on the pre-contingency
+                 * BASE so they no longer double-count the contingency (A6-49). New additive fields: land,
+                 * commissioning, permitting, totalAllIn, cooling, aiDensityTier. (A6-51/52)
                  *
-                 * opts: { modularPct: 0–1, contingencyPct: 0.10, itPctOfCapex: 0.40 }
+                 * opts: { modularPct, contingencyPct, itPctOfCapex, cooling, aiDensity:'legacy|hpc|ai',
+                 *         useCostIndex, includeLand }
                  */
                 totalCost: function (mw, tier, region, opts) {
                     opts = opts || {};
                     var t = tier || 3;
-                    var base = RZEngine.models.capex.datacenterBuildCost(mw, t, region);
-                    var withMod = RZEngine.models.capex.modularPremium(base, opts.modularPct || 0, t);
-                    var contingencyPct = opts.contingencyPct != null ? opts.contingencyPct : 0.10;
-                    var total = Math.round(withMod * (1 + contingencyPct));
-                    var mep = RZEngine.models.capex.mepDistribution(total, t);
-                    var itPct = opts.itPctOfCapex != null ? opts.itPctOfCapex : 0.40;
-                    var it = Math.round(total * itPct);
-                    var civil = total - mep - it;
-                    var contingency = Math.round(withMod * contingencyPct);
+                    var cooling = opts.cooling || 'air';
+                    var rawBase = RZEngine.models.capex.datacenterBuildCost(mw, t, region, cooling, opts);
+                    // AI/GPU high-density capex scaling
+                    var densTier = opts.aiDensity && DATA.aiDensity[opts.aiDensity] ? opts.aiDensity : null;
+                    if (densTier) rawBase = Math.round(rawBase * DATA.aiDensity[densTier].capexMult);
+                    var base = RZEngine.models.capex.modularPremium(rawBase, opts.modularPct || 0, t);
+
+                    var contingencyPct = opts.contingencyPct != null ? opts.contingencyPct : DATA.capexDefaults.contingencyPct;
+                    var itPct = opts.itPctOfCapex != null ? opts.itPctOfCapex : DATA.capexDefaults.itPctOfCapex;
+                    var mep = RZEngine.models.capex.mepDistribution(base, t);
+                    var it = Math.round(base * itPct);
+                    var civil = Math.max(0, base - mep - it);
+                    var contingency = Math.round(base * contingencyPct);
+                    var total = base + contingency;                 // unchanged magnitude vs v1.2
+
+                    // Additive line items (not folded into `total` unless includeLand)
+                    var landCost = Math.round((DATA.land[(region || 'US').toUpperCase()] || DATA.land.US) * (mw || 0));
+                    var commissioning = Math.round(base * 0.015);   // ~1.5% commissioning
+                    var permitting = Math.round(base * 0.01);       // ~1% permitting/interconnect
+                    var totalAllIn = total + landCost + commissioning + permitting;
+
                     return {
                         total: total,
+                        base: base,
                         it: it,
                         mep: mep,
                         civil: civil,
                         contingency: contingency,
+                        land: landCost,
+                        commissioning: commissioning,
+                        permitting: permitting,
+                        totalAllIn: opts.includeLand ? totalAllIn : total,
+                        cooling: cooling,
+                        aiDensityTier: densTier,
                         perMwCost: (mw > 0) ? Math.round(total / mw) : 0
                     };
                 }
@@ -477,11 +861,17 @@
                  * Annual power cost. mw = total IT load, pue applied to get total facility load.
                  * regionPower defaults to RZEngine.data.regions[code].powerKwh.
                  */
-                powerCostAnnual: function (mw, pue, regionPower, hoursPerYear) {
+                powerCostAnnual: function (mw, pue, regionPower, hoursPerYear, opts) {
+                    opts = opts || {};
                     var hrs = hoursPerYear || DATA.hoursPerYear;
-                    var price = regionPower != null ? regionPower : DATA.regions.US.powerKwh;
+                    // PPA/TOU/demand: ppaRate overrides the grid price; touMultiplier scales the energy
+                    // rate; demandChargeAnnual is a flat $/yr adder. All optional → flat rate by default.
+                    var price = opts.ppaRate != null ? opts.ppaRate
+                        : (regionPower != null ? regionPower : DATA.regions.US.powerKwh);
+                    price = price * (opts.touMultiplier != null ? opts.touMultiplier : 1);
                     var pueVal = pue || DATA.pueDefaults.airCooledTier3;
-                    return Math.round((mw || 0) * 1000 * pueVal * hrs * price);
+                    var energy = Math.round((mw || 0) * 1000 * pueVal * hrs * price);
+                    return energy + (opts.demandChargeAnnual || 0);
                 },
 
                 /**
@@ -489,11 +879,11 @@
                  * Higher = better. climate: 'cold'|'temperate'|'hot'|'tropical'.
                  */
                 coolingEfficiency: function (climate, designDeltaT) {
-                    var base = { cold: 0.85, temperate: 0.78, hot: 0.68, tropical: 0.62 };
-                    var b = base[climate] || 0.75;
-                    // Higher design delta-T (e.g. 12C vs 8C) improves efficiency by ~3% per degree
-                    var delta = designDeltaT || 10;
-                    return Math.min(0.95, b + (delta - 10) * 0.03);
+                    var cc = DATA.coolingClimate;
+                    var b = cc.base[climate] || cc.fallback;
+                    // Higher design delta-T (e.g. 12C vs 8C) improves efficiency per degree above the reference
+                    var delta = designDeltaT || cc.deltaTRefC;
+                    return Math.min(cc.cap, b + (delta - cc.deltaTRefC) * cc.perDegreeBonus);
                 },
 
                 /**
@@ -505,41 +895,83 @@
                     var roleKey = role || 'dcTechMid';
                     var bench = DATA.salaryBenchmarks[roleKey];
                     var salary = (bench && bench[r]) || (bench && bench.US) || 75100;
-                    return Math.round((headcount || 0) * salary * 1.30); // 30% fully-loaded multiplier
+                    return Math.round((headcount || 0) * salary * DATA.staffingLoadFactor);
                 },
 
                 /** Outsourced contract cost annual. scope: 'small'|'medium'|'large' (per facility). */
                 contractCostAnnual: function (scope, region) {
-                    var base = { small: 30000, medium: 120000, large: 350000 };
+                    var base = DATA.contractCostBase;
                     var b = base[scope] || base.medium;
                     var rdata = (region && DATA.regions[region.toUpperCase()]) || DATA.regions.US;
                     return Math.round(b * rdata.salaryMult);
                 },
 
                 /**
-                 * Single-call total annual OPEX with breakdown.
-                 * Returns { total, power, staffing, maintenance, contract, overhead } in USD/yr.
+                 * Single-call total annual OPEX with breakdown. Backward-compatible: the default `total`
+                 * remains power+staffing+contract+maintenance+overhead. New line items (water, carbon,
+                 * insurance, connectivity) are always COMPUTED and returned, but only folded into `total`
+                 * when opts.extendedOpex is set (else `totalExtended` carries the all-in figure). (A6-53/54)
                  *
-                 * opts: { maintenancePct: 0.02 (of capex), overheadPct: 0.08, contractScope, capex }
+                 * opts: { maintenancePct, overheadPct, contractScope, capex, cooling, climate, designDeltaT,
+                 *         ppaRate, touMultiplier, demandChargeAnnual, insurancePct, connectivityPerMw,
+                 *         extendedOpex, warn }
                  */
                 totalAnnual: function (mw, pue, region, headcount, opts) {
                     opts = opts || {};
-                    var rdata = (region && DATA.regions[(region || '').toUpperCase()]) || DATA.regions.US;
-                    var power    = RZEngine.models.opex.powerCostAnnual(mw, pue, rdata.powerKwh);
+                    var code = (region || 'US').toUpperCase();
+                    var rdata = DATA.regions[code] || DATA.regionsCountry[code] || DATA.regions.US;
+                    var hrs = DATA.hoursPerYear;
+                    var pueVal = pue || DATA.pueDefaults.airCooledTier3;
+
+                    var power = RZEngine.models.opex.powerCostAnnual(mw, pue, rdata.powerKwh, hrs, {
+                        ppaRate: opts.ppaRate, touMultiplier: opts.touMultiplier, demandChargeAnnual: opts.demandChargeAnnual
+                    });
+                    // A6-56: consume cooling efficiency — better climate/ΔT trims the cooling share of power.
+                    if (opts.climate) {
+                        var eff = RZEngine.models.opex.coolingEfficiency(opts.climate, opts.designDeltaT);
+                        power = Math.round(power * (DATA.coolingClimate.fallback / eff));
+                    }
                     var staffing = RZEngine.models.opex.staffingCostAnnual(headcount || 0, region);
-                    var contract = RZEngine.models.opex.contractCostAnnual(opts.contractScope || 'medium', region);
+                    var contract = RZEngine.models.opex.contractCostAnnual(opts.contractScope || DATA.opexDefaults.contractScope, region);
+
+                    // A6-53: capex-omission guard — maintenance is 0 without a capex basis; surface a warning.
                     var capexBase = opts.capex || 0;
-                    var maintenance = Math.round(capexBase * (opts.maintenancePct != null ? opts.maintenancePct : 0.02));
-                    var overheadPct = opts.overheadPct != null ? opts.overheadPct : 0.08;
-                    var subtotal    = power + staffing + contract + maintenance;
-                    var overhead    = Math.round(subtotal * overheadPct);
+                    var warning = null;
+                    if (!capexBase && opts.warn) warning = 'maintenance=0: no opts.capex basis provided';
+                    var maintenance = Math.round(capexBase * (opts.maintenancePct != null ? opts.maintenancePct : DATA.opexDefaults.maintenancePct));
+
+                    // A6-54: new line items
+                    var itKwh = (mw || 0) * 1000 * hrs;
+                    var facilityKwh = itKwh * pueVal;
+                    var wue = DATA.water.wueByType[opts.cooling] != null ? DATA.water.wueByType[opts.cooling] : DATA.water.wueByType.air;
+                    var waterM3 = (wue * itKwh) / 1000;
+                    var water = Math.round(waterM3 * (DATA.water.priceM3[code] || DATA.water.priceM3.US));
+                    var carbonTonnes = (facilityKwh * (DATA.carbon.gridFactor[code] || DATA.carbon.gridFactor.US)) / 1000;
+                    var carbon = Math.round(carbonTonnes * (DATA.carbon.carbonPrice[code] || DATA.carbon.carbonPrice.US));
+                    var insurance = Math.round(capexBase * (opts.insurancePct != null ? opts.insurancePct : 0.005));
+                    var connectivity = Math.round((mw || 0) * (opts.connectivityPerMw != null ? opts.connectivityPerMw : 80000));
+
+                    var overheadPct = opts.overheadPct != null ? opts.overheadPct : DATA.opexDefaults.overheadPct;
+                    var coreSubtotal = power + staffing + contract + maintenance;
+                    var extraLines = opts.extendedOpex ? (water + carbon + insurance + connectivity) : 0;
+                    var overhead = Math.round((coreSubtotal + extraLines) * overheadPct);
+                    var total = coreSubtotal + extraLines + overhead;
+                    var totalExtended = coreSubtotal + water + carbon + insurance + connectivity +
+                        Math.round((coreSubtotal + water + carbon + insurance + connectivity) * overheadPct);
+
                     return {
-                        total:       subtotal + overhead,
-                        power:       power,
-                        staffing:    staffing,
-                        maintenance: maintenance,
-                        contract:    contract,
-                        overhead:    overhead
+                        total:        total,
+                        totalExtended: totalExtended,
+                        power:        power,
+                        staffing:     staffing,
+                        maintenance:  maintenance,
+                        contract:     contract,
+                        water:        water,
+                        carbon:       carbon,
+                        insurance:    insurance,
+                        connectivity: connectivity,
+                        overhead:     overhead,
+                        warning:      warning
                     };
                 }
             },
@@ -550,8 +982,8 @@
                  * Default 5-year refresh cycle.
                  */
                 lifecycle: function (capex, opexAnnual, years, refreshPct) {
-                    var rp = refreshPct == null ? 0.40 : refreshPct;
-                    var refreshCycles = Math.floor((years || 0) / 5);
+                    var rp = refreshPct == null ? DATA.refresh.refreshPct : refreshPct;
+                    var refreshCycles = Math.floor((years || 0) / DATA.refresh.cycleYears);
                     return Math.round((capex || 0) + (opexAnnual || 0) * (years || 0) + (capex || 0) * rp * refreshCycles);
                 },
 
@@ -567,10 +999,11 @@
                  * refreshPct of capex is charged at each 5-year refresh cycle.
                  */
                 cashflows: function (capex, opexAnnual, years, annualRevenue, refreshPct) {
-                    var rp = refreshPct == null ? 0.40 : refreshPct;
+                    var rp = refreshPct == null ? DATA.refresh.refreshPct : refreshPct;
+                    var cyc = DATA.refresh.cycleYears;
                     var flows = [-(capex || 0)];
                     for (var y = 1; y <= (years || 0); y++) {
-                        var refresh = (y % 5 === 0) ? (capex || 0) * rp : 0;
+                        var refresh = (y % cyc === 0) ? (capex || 0) * rp : 0;
                         flows.push((annualRevenue || 0) - (opexAnnual || 0) - refresh);
                     }
                     return flows;
@@ -580,6 +1013,31 @@
                 costPerMwYear: function (totalTco, mw, years) {
                     if (!mw || mw <= 0 || !years || years <= 0) return 0;
                     return Math.round((totalTco || 0) / mw / years);
+                },
+
+                /**
+                 * Discounted TCO — NPV of capex + opex + refresh charges, minus discounted salvage. (A6-64)
+                 * opts: { discountRate (from DATA.discountDefaults if region given), region, salvagePct,
+                 *         refreshPct, opexGrowth (inflation-linked, A6-65) }
+                 */
+                lifecycleNPV: function (capex, opexAnnual, years, opts) {
+                    opts = opts || {};
+                    var rate = opts.discountRate != null ? opts.discountRate
+                        : (opts.region ? (DATA.discountDefaults[(opts.region || '').toUpperCase()] || DATA.discountDefaults.global) : DATA.discountDefaults.global);
+                    var rp = opts.refreshPct != null ? opts.refreshPct : DATA.refresh.refreshPct;
+                    var cyc = DATA.refresh.cycleYears;
+                    var growth = opts.opexGrowth || 0;
+                    var npv = (capex || 0); // year-0 outlay (undiscounted)
+                    for (var y = 1; y <= (years || 0); y++) {
+                        var opexY = (opexAnnual || 0) * Math.pow(1 + growth, y - 1);
+                        var refresh = (y % cyc === 0) ? (capex || 0) * rp : 0;
+                        npv += (opexY + refresh) / Math.pow(1 + rate, y);
+                    }
+                    // salvage recovered at end of horizon (positive → reduces TCO)
+                    if (opts.salvagePct && years > 0) {
+                        npv -= ((capex || 0) * opts.salvagePct) / Math.pow(1 + rate, years);
+                    }
+                    return Math.round(npv);
                 }
             },
 
@@ -596,10 +1054,158 @@
                     return 1 / pue;
                 },
 
-                /** Annual energy cost given IT load (kW), PUE, and $/kWh rate. */
+                /**
+                 * Cooling-aware default PUE (A5-45). cooling: 'air'|'rearDoor'|'directToChip'|'immersion',
+                 * tier: 2|3|4. Reads DATA.pueMatrix so liquid/immersion defaults are actually reachable.
+                 */
+                defaultFor: function (cooling, tier) {
+                    var ct = (cooling && DATA.coolingTypes[cooling]) ? DATA.coolingTypes[cooling] : DATA.coolingTypes.air;
+                    var row = DATA.pueMatrix[ct.pueKey] || DATA.pueMatrix.air;
+                    return row['tier' + (tier || 3)] || row.tier3;
+                },
+
+                /** Partial-load PUE curve (A6-58): PUE rises as IT load fraction drops (fixed overhead). */
+                partialLoadPUE: function (designPUE, loadFraction) {
+                    var lf = Math.max(0.05, Math.min(1, loadFraction || 1));
+                    var overhead = (designPUE || 1.5) - 1;          // infrastructure overhead at full load
+                    // fixed portion of overhead doesn't scale down with IT load → PUE degrades at low load
+                    var fixedShare = 0.55;
+                    return 1 + overhead * (fixedShare / lf + (1 - fixedShare));
+                },
+
+                /** Water Usage Effectiveness companion (A6-58). Returns L/kWh for a cooling type. */
+                wue: function (cooling) {
+                    return DATA.water.wueByType[cooling] != null ? DATA.water.wueByType[cooling] : DATA.water.wueByType.air;
+                },
+
+                /**
+                 * Annual energy cost given IT load (kW), PUE, and $/kWh rate.
+                 * A6-57: delegates to opex.powerCostAnnual (MW-based) so the two power-cost formulas
+                 * are one implementation. itKw/1000 = MW.
+                 */
                 annualEnergyCost: function (itKw, pue, kwhRate, hoursPerYear) {
+                    var rate = kwhRate != null ? kwhRate : DATA.regions.US.powerKwh;
+                    return RZEngine.models.opex.powerCostAnnual((itKw || 0) / 1000, pue || 1, rate, hoursPerYear || DATA.hoursPerYear);
+                }
+            },
+
+            /* ── A7: uncertainty / sensitivity drivers ── */
+            sim: {
+                /**
+                 * Monte-Carlo driver. `fn(sample)` maps a {key:value} sample → number.
+                 * `distributions` = { key: { dist:'normal'|'uniform'|'triangular', ...params } }.
+                 * Deterministic by default (seeded LCG) so results are reproducible across runs.
+                 * Returns { p10, p50, p90, mean, min, max, samples }.
+                 */
+                monteCarlo: function (fn, distributions, iterations, seed) {
+                    iterations = iterations || 2000;
+                    var s = (seed == null ? 123456789 : seed) >>> 0;
+                    function rnd() { s = (1103515245 * s + 12345) >>> 0; return s / 4294967296; }
+                    function draw(d) {
+                        var u = rnd();
+                        if (d.dist === 'uniform') return d.min + u * (d.max - d.min);
+                        if (d.dist === 'triangular') {
+                            var lo = d.min, hi = d.max, mo = d.mode == null ? (lo + hi) / 2 : d.mode;
+                            var c = (mo - lo) / (hi - lo);
+                            return u < c ? lo + Math.sqrt(u * (hi - lo) * (mo - lo))
+                                         : hi - Math.sqrt((1 - u) * (hi - lo) * (hi - mo));
+                        }
+                        // normal (Box–Muller)
+                        var u2 = rnd();
+                        var z = Math.sqrt(-2 * Math.log(u || 1e-9)) * Math.cos(2 * Math.PI * u2);
+                        return (d.mean || 0) + (d.sd || 1) * z;
+                    }
+                    var keys = Object.keys(distributions || {});
+                    var out = [];
+                    for (var i = 0; i < iterations; i++) {
+                        var sample = {};
+                        for (var k = 0; k < keys.length; k++) sample[keys[k]] = draw(distributions[keys[k]]);
+                        var v = fn(sample);
+                        if (isFinite(v)) out.push(v);
+                    }
+                    out.sort(function (a, b) { return a - b; });
+                    var pct = function (p) { return out.length ? out[Math.min(out.length - 1, Math.floor(p * out.length))] : 0; };
+                    var mean = out.reduce(function (a, b) { return a + b; }, 0) / (out.length || 1);
+                    return { p10: pct(0.10), p50: pct(0.50), p90: pct(0.90), mean: mean,
+                             min: out[0] || 0, max: out[out.length - 1] || 0, samples: out };
+                },
+
+                /**
+                 * One-at-a-time tornado sensitivity. `ranges` = { key:{lo,hi} }. Holds others at base.
+                 * Returns [{ key, low, high, base, swing }] sorted by |swing| desc.
+                 */
+                tornado: function (fn, baseInputs, ranges) {
+                    var base = fn(baseInputs);
+                    var rows = Object.keys(ranges || {}).map(function (key) {
+                        var loIn = Object.assign({}, baseInputs); loIn[key] = ranges[key].lo;
+                        var hiIn = Object.assign({}, baseInputs); hiIn[key] = ranges[key].hi;
+                        var low = fn(loIn), high = fn(hiIn);
+                        return { key: key, low: low, high: high, base: base, swing: Math.abs(high - low) };
+                    });
+                    rows.sort(function (a, b) { return b.swing - a.swing; });
+                    return rows;
+                },
+
+                /**
+                 * Two-variable sensitivity grid. Returns { x:[...], y:[...], z:[[...]] } where
+                 * z[j][i] = fn with xVar=x[i], yVar=y[j] over the other base inputs.
+                 */
+                sensitivityGrid: function (fn, baseInputs, xVar, xRange, yVar, yRange, steps) {
+                    steps = steps || 8;
+                    var lin = function (r) { var a = []; for (var i = 0; i <= steps; i++) a.push(r.lo + (r.hi - r.lo) * i / steps); return a; };
+                    var xs = lin(xRange), ys = lin(yRange), z = [];
+                    for (var j = 0; j < ys.length; j++) {
+                        var row = [];
+                        for (var i = 0; i < xs.length; i++) {
+                            var inp = Object.assign({}, baseInputs); inp[xVar] = xs[i]; inp[yVar] = ys[j];
+                            row.push(fn(inp));
+                        }
+                        z.push(row);
+                    }
+                    return { x: xs, y: ys, z: z };
+                }
+            },
+
+            /* ── A7: carbon model ── */
+            carbon: {
+                /** Grid emission factor (kgCO₂e/kWh) for a region code. */
+                gridFactor: function (region) {
+                    var c = (region || 'US').toUpperCase();
+                    return DATA.carbon.gridFactor[c] != null ? DATA.carbon.gridFactor[c] : DATA.carbon.gridFactor.US;
+                },
+                /** Annual operational tCO₂e from facility energy. mw = IT load, pue applied. */
+                annualTonnes: function (mw, pue, region, hoursPerYear) {
                     var hrs = hoursPerYear || DATA.hoursPerYear;
-                    return Math.round((itKw || 0) * (pue || 1) * hrs * (kwhRate != null ? kwhRate : DATA.regions.US.powerKwh));
+                    var facilityKwh = (mw || 0) * 1000 * (pue || DATA.pueDefaults.airCooledTier3) * hrs;
+                    return +(facilityKwh * RZEngine.models.carbon.gridFactor(region) / 1000).toFixed(1);
+                },
+                /** Embodied (construction) tCO₂e for `mw` of built capacity. */
+                embodiedTonnes: function (mw) { return Math.round((mw || 0) * DATA.carbon.embodiedPerMw); },
+                /** Annual carbon cost ($) at the regional carbon price. */
+                annualCost: function (mw, pue, region, hoursPerYear) {
+                    var c = (region || 'US').toUpperCase();
+                    var price = DATA.carbon.carbonPrice[c] != null ? DATA.carbon.carbonPrice[c] : DATA.carbon.carbonPrice.US;
+                    return Math.round(RZEngine.models.carbon.annualTonnes(mw, pue, region, hoursPerYear) * price);
+                },
+                /** Cost to voluntarily offset a tonnage. */
+                offsetCost: function (tonnes) { return Math.round((tonnes || 0) * DATA.carbon.offsetPrice); }
+            },
+
+            /* ── A7: water model ── */
+            water: {
+                /** WUE (L/kWh) for a cooling type. */
+                wue: function (cooling) { return DATA.water.wueByType[cooling] != null ? DATA.water.wueByType[cooling] : DATA.water.wueByType.air; },
+                /** Annual water use (m³) — WUE × IT energy. mw = IT load. */
+                annualM3: function (mw, cooling, hoursPerYear) {
+                    var hrs = hoursPerYear || DATA.hoursPerYear;
+                    var itKwh = (mw || 0) * 1000 * hrs;
+                    return Math.round(RZEngine.models.water.wue(cooling) * itKwh / 1000);
+                },
+                /** Annual water cost ($) at the regional water price. */
+                annualCost: function (mw, cooling, region, hoursPerYear) {
+                    var c = (region || 'US').toUpperCase();
+                    var price = DATA.water.priceM3[c] != null ? DATA.water.priceM3[c] : DATA.water.priceM3.US;
+                    return Math.round(RZEngine.models.water.annualM3(mw, cooling, hoursPerYear) * price);
                 }
             }
         },
@@ -710,12 +1316,107 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.js?v=2026-04-28"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-07-04-v2"><\/script>';
             }
         },
-        charts: {                                              // S5
-            histogram: null, tornado: null, sensitivity: null,
-            roiLine: null, hiringTrajectory: null, costStackedBar: null, radar: null
+        /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string
+         *    (consistent with ui.* HTML-string helpers). No external chart lib needed. ── */
+        charts: {
+            _svg: function (w, h, inner) {
+                return '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" preserveAspectRatio="xMidYMid meet" ' +
+                    'role="img" style="font-family:inherit;overflow:visible;">' + inner + '</svg>';
+            },
+            /** Histogram of Monte-Carlo samples with P10/P50/P90 markers. */
+            histogram: function (samples, opts) {
+                opts = opts || {}; var w = opts.width || 480, h = opts.height || 200, pad = 28, bins = opts.bins || 24;
+                if (!samples || !samples.length) return RZEngine.charts._svg(w, h, '');
+                var lo = samples[0], hi = samples[samples.length - 1], span = (hi - lo) || 1;
+                var counts = new Array(bins).fill(0);
+                samples.forEach(function (v) { var b = Math.min(bins - 1, Math.floor((v - lo) / span * bins)); counts[b]++; });
+                var maxC = Math.max.apply(null, counts) || 1, bw = (w - 2 * pad) / bins, inner = '';
+                var accent = opts.accent || '#dc2626';
+                for (var i = 0; i < bins; i++) {
+                    var bh = (counts[i] / maxC) * (h - 2 * pad);
+                    inner += '<rect x="' + (pad + i * bw).toFixed(1) + '" y="' + (h - pad - bh).toFixed(1) +
+                        '" width="' + (bw - 1).toFixed(1) + '" height="' + bh.toFixed(1) + '" fill="' + accent + '" opacity="0.75"/>';
+                }
+                var pct = function (p) { return samples[Math.min(samples.length - 1, Math.floor(p * samples.length))]; };
+                [['P10', pct(0.10)], ['P50', pct(0.50)], ['P90', pct(0.90)]].forEach(function (m) {
+                    var x = pad + (m[1] - lo) / span * (w - 2 * pad);
+                    inner += '<line x1="' + x.toFixed(1) + '" y1="' + pad + '" x2="' + x.toFixed(1) + '" y2="' + (h - pad) +
+                        '" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="3 2"/>' +
+                        '<text x="' + x.toFixed(1) + '" y="' + (pad - 6) + '" font-size="10" fill="#64748b" text-anchor="middle">' + m[0] + '</text>';
+                });
+                return RZEngine.charts._svg(w, h, inner);
+            },
+            /** Tornado bars from sim.tornado() rows. */
+            tornado: function (rows, opts) {
+                opts = opts || {}; var w = opts.width || 480, pad = 90, rh = 26, gap = 8;
+                if (!rows || !rows.length) return RZEngine.charts._svg(w, 40, '');
+                var h = rows.length * (rh + gap) + 20;
+                var base = rows[0].base, maxSwing = Math.max.apply(null, rows.map(function (r) { return Math.max(Math.abs(r.high - base), Math.abs(r.low - base)); })) || 1;
+                var mid = (w + pad) / 2, half = (w - pad - 20) / 2, inner = '';
+                rows.forEach(function (r, i) {
+                    var y = 10 + i * (rh + gap);
+                    var xl = (r.low - base) / maxSwing * half, xh = (r.high - base) / maxSwing * half;
+                    var x0 = mid + Math.min(xl, xh), ww = Math.abs(xh - xl);
+                    inner += '<text x="' + (pad - 6) + '" y="' + (y + rh / 2 + 3) + '" font-size="10" fill="#64748b" text-anchor="end">' + r.key + '</text>' +
+                        '<rect x="' + x0.toFixed(1) + '" y="' + y + '" width="' + ww.toFixed(1) + '" height="' + rh + '" fill="' + (opts.accent || '#dc2626') + '" opacity="0.7" rx="2"/>';
+                });
+                inner += '<line x1="' + mid + '" y1="4" x2="' + mid + '" y2="' + (h - 6) + '" stroke="#94a3b8" stroke-width="1"/>';
+                return RZEngine.charts._svg(w, h, inner);
+            },
+            /** Heatmap of sim.sensitivityGrid() output. */
+            sensitivity: function (grid, opts) {
+                opts = opts || {}; var w = opts.width || 320, h = opts.height || 320, pad = 30;
+                if (!grid || !grid.z || !grid.z.length) return RZEngine.charts._svg(w, h, '');
+                var flat = grid.z.reduce(function (a, r) { return a.concat(r); }, []);
+                var lo = Math.min.apply(null, flat), hi = Math.max.apply(null, flat), span = (hi - lo) || 1;
+                var cols = grid.x.length, rows = grid.y.length, cw = (w - 2 * pad) / cols, ch = (h - 2 * pad) / rows, inner = '';
+                for (var j = 0; j < rows; j++) for (var i = 0; i < cols; i++) {
+                    var t = (grid.z[j][i] - lo) / span; var g = Math.round(220 - t * 180);
+                    inner += '<rect x="' + (pad + i * cw).toFixed(1) + '" y="' + (pad + (rows - 1 - j) * ch).toFixed(1) +
+                        '" width="' + Math.ceil(cw) + '" height="' + Math.ceil(ch) + '" fill="rgb(' + (60 + t * 160 | 0) + ',' + g + ',180)"/>';
+                }
+                return RZEngine.charts._svg(w, h, inner);
+            },
+            /** Simple line chart of [{x,y}] (or parallel arrays via opts). */
+            roiLine: function (points, opts) {
+                opts = opts || {}; var w = opts.width || 480, h = opts.height || 200, pad = 30;
+                if (!points || !points.length) return RZEngine.charts._svg(w, h, '');
+                var xs = points.map(function (p) { return p.x; }), ys = points.map(function (p) { return p.y; });
+                var xlo = Math.min.apply(null, xs), xhi = Math.max.apply(null, xs), ylo = Math.min.apply(null, ys), yhi = Math.max.apply(null, ys);
+                var sx = function (x) { return pad + (x - xlo) / ((xhi - xlo) || 1) * (w - 2 * pad); };
+                var sy = function (y) { return h - pad - (y - ylo) / ((yhi - ylo) || 1) * (h - 2 * pad); };
+                var d = points.map(function (p, i) { return (i ? 'L' : 'M') + sx(p.x).toFixed(1) + ' ' + sy(p.y).toFixed(1); }).join(' ');
+                var zeroY = sy(0);
+                var inner = (ylo < 0 && yhi > 0 ? '<line x1="' + pad + '" y1="' + zeroY.toFixed(1) + '" x2="' + (w - pad) + '" y2="' + zeroY.toFixed(1) + '" stroke="#cbd5e1" stroke-dasharray="2 2"/>' : '') +
+                    '<path d="' + d + '" fill="none" stroke="' + (opts.accent || '#dc2626') + '" stroke-width="2"/>';
+                return RZEngine.charts._svg(w, h, inner);
+            },
+            /** Stacked bar of cost components per category. series=[{label, parts:[num...]}], legend=[str...]. */
+            costStackedBar: function (series, legend, opts) {
+                opts = opts || {}; var w = opts.width || 480, h = opts.height || 220, pad = 34;
+                if (!series || !series.length) return RZEngine.charts._svg(w, h, '');
+                var palette = opts.palette || ['#dc2626', '#0891b2', '#f59e0b', '#16a34a', '#8b5cf6', '#d946ef'];
+                var totals = series.map(function (s) { return s.parts.reduce(function (a, b) { return a + b; }, 0); });
+                var maxT = Math.max.apply(null, totals) || 1, bw = (w - 2 * pad) / series.length * 0.6, gap = (w - 2 * pad) / series.length, inner = '';
+                series.forEach(function (s, i) {
+                    var x = pad + i * gap + (gap - bw) / 2, yAcc = h - pad;
+                    s.parts.forEach(function (p, k) {
+                        var ph = p / maxT * (h - 2 * pad); yAcc -= ph;
+                        inner += '<rect x="' + x.toFixed(1) + '" y="' + yAcc.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="' + palette[k % palette.length] + '"/>';
+                    });
+                    inner += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (h - pad + 12) + '" font-size="10" fill="#64748b" text-anchor="middle">' + (s.label || '') + '</text>';
+                });
+                return RZEngine.charts._svg(w, h, inner);
+            },
+            /** Cumulative hiring trajectory line from an array of {year, base} (hiringPlan output). */
+            hiringTrajectory: function (perYear, opts) {
+                var pts = (perYear || []).map(function (r) { return { x: r.year, y: r.base }; });
+                return RZEngine.charts.roiLine(pts, Object.assign({ accent: '#0891b2' }, opts || {}));
+            },
+            radar: null
         },
         /**
          * UI primitives — pure DOM helpers that emit HTML strings or attach to existing elements.

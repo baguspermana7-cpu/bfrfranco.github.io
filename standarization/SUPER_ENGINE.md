@@ -301,3 +301,53 @@ After this document ships:
 5. **Backward compat with current calculators**: during phased rollout, calculators that haven't been migrated need a shim. Default plan: `window.CalcEngine` and `window.CalcModels` exist as aliases pointing to subsets of `RZEngine.*` until S6 sunsets them.
 
 These should be resolved by review comments before S0 starts.
+
+---
+
+## Z. v2.0.0 — Database + Model upgrade (2026-07-04)
+
+`RZEngine.data.version` → **2.0.0** (`meta.schemaVersion` 2.0.0). Shipped as staged,
+individually-verified changes, all backward-compatible (existing `models.*` signatures
+unchanged; every addition is a new key or an OPTIONAL param). Verified by
+`node tools/test-rz-engine.mjs` (76 assertions: model worked examples + data invariants +
+reachability + provenance).
+
+### Rules now enforced
+
+1. **No buried constants.** Every economically-material literal lives in `DATA`, never inside a
+   function body. The A4 pass moved `coolingClimate`, `contractCostBase`, `staffingLoadFactor`,
+   `opexDefaults`, `capexDefaults`, `refresh`, `workforceParams` out of `models.*`. A calculator
+   that needs to override one sets the DATA-backed option; it never re-hardcodes the number.
+2. **Every value is sourced.** `DATA.sources` is a sidecar keyed by DATA path → `{ source, asOf,
+   unit?, method? }`, and `DATA.provenance[]` lists the citations. The harness fails if a
+   registered `sources` entry is missing `source`+`asOf`. `DATA.meta` carries `schemaVersion`,
+   `engineVersion`, `asOf`, `lastReviewed`, `license`.
+3. **Single version source.** `DATA.version` is the one content-version; `pdf.scriptTagsHTML()`
+   cache-bust and the page `?v=` query are bumped together (`2026-07-04-v2`). No more 3-way drift.
+4. **Reproducible min build.** `rz-engine.min.js` is regenerated with
+   `terser rz-engine.js -c -m -o rz-engine.min.js` — never hand-edited. A parity check confirms the
+   min output matches the source engine's values.
+
+### New capabilities (all additive)
+
+- **Reachability fixes** — `capex.datacenterBuildCost(mw,tier,region,cooling)` +
+  `pue.defaultFor(cooling,tier)` read the tier×cooling matrices (`capexPerMw` liquid/immersion
+  tiers, `pueMatrix`), so liquid/immersion are no longer dead data.
+- **Expansion tables** — `regionsCountry` (ID/SG/JP/IN/MY), `land`, `laborRates`, `carbon`,
+  `water`, `aiDensity`, `coolingTypes`, `tiers`, `roles`+`salaryRolesExt`, `discountDefaults`,
+  `refresh`, `pueMatrix`.
+- **Model math** — corrected capex civil≥0 + no contingency double-count; AI/GPU density + land/
+  commissioning/permitting line items; opex water/carbon/insurance/connectivity (opt-in) + PPA/TOU/
+  demand + cooling-efficiency consumption; roi `npvAuto`/`discountedPayback` + Newton-with-bracket
+  IRR honoring `guess`; forecast R²/confidence band + inflation wiring + scenario bands; tco
+  `lifecycleNPV` (discounting + salvage + inflation-linked opex); workforce `hiringPlan` (growing
+  base + ceiling + ramp), `attritionCostWeighted`, `cumulativeHiresCompounded`.
+- **Uncertainty + new models** — `models.sim.monteCarlo/tornado/sensitivityGrid` (seeded, reproducible);
+  `models.carbon.*` and `models.water.*`; `charts.*` implemented as framework-free SVG-string builders.
+
+### Coupling rule (RZEngine ↔ dcmoc)
+
+`dcmoc/` (Next.js) keeps its OWN engines. When a shared number changes in `RZEngine.data`
+(capex per MW, carbon grid factors, salaries), update the matching constant in
+`dcmoc/src/lib/*` + `dcmoc/src/data/*` in the same change and re-run `npm run build`. Future work:
+a shared upstream `data/engine/*.json` both consume.

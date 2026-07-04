@@ -52,7 +52,15 @@ node   tools/audit-a11y.mjs --strict               # axe-core render gate: 0 cri
 node tools/test-datahall-calc.mjs                  # 57/57 doc-21 worked examples
 node tools/test-conv-calc.mjs                      # 22/22 conv DoD identities
 RZ_BASE=file node tools/probe-accuracy-validation.mjs   # 40/40 reviewer acceptance tests
+node tools/test-rz-engine.mjs                      # RZEngine v2.0 — model worked examples + data invariants + reachability + provenance (gate any change to rz-engine.js)
 ```
+
+**RZEngine build step** (whenever `rz-engine.js` changes): regenerate the min twin reproducibly, never hand-edit it, then bump the shared `?v=` on the pages that load it:
+```bash
+terser rz-engine.js -c -m -o rz-engine.min.js     # reproducible minify (A8)
+# then bump rz-engine.min.js?v=YYYY-MM-DD-tag across engine-consuming pages + pdf.scriptTagsHTML()
+```
+Every `DATA` value must carry a `DATA.sources` entry (`source`+`asOf`); no economically-material literal may live inside a `models.*` function body. See `standarization/SUPER_ENGINE.md` §Z.
 
 The probe is the verification harness for `Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md` + `Documents/screenshot bms rz/conv/review/16-accuracy-validation-and-correction-list.md`. It covers per-page assertions on `datahallAI.html`, `dc-conventional.html`, `datahall.html` + cross-page consistency (PUE/WUE/IT reconciles across all displaying pages). See `standarization/ACCURACY_VALIDATION.md` for the 6 rules + 23 acceptance tests it enforces.
 

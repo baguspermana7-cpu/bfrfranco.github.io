@@ -11,6 +11,46 @@ release sections rather than semver.
 
 ---
 
+## v1.51.0 — 2026-07-04 (RZEngine v2.0.0 — database + model upgrade)
+
+Upgraded the shared Super Engine (`rz-engine.js`, `window.RZEngine`) and its database from
+1.2.0 → **2.0.0**. Staged, individually-verified, and fully backward-compatible: every existing
+`models.*` signature is unchanged; all additions are new DATA keys or OPTIONAL params. Gated by a
+new harness `tools/test-rz-engine.mjs` (76 assertions — worked examples + data invariants +
+reachability + provenance). All 6 engine-consuming calculators re-verified: 0 console errors.
+
+**Added**
+- **Schema + provenance (A1)**: `DATA.meta` (schemaVersion/engineVersion/asOf/lastReviewed/license),
+  a `DATA.sources` sidecar (every value → `{source, asOf, unit?, method?}`), and `DATA.provenance[]`
+  citations. Harness fails if any registered value lacks a source.
+- **Expansion tables (A3)**: country regions (ID/SG/JP/IN/MY), `land`, `laborRates`, `carbon`
+  (grid factors + carbon price + embodied), `water` (WUE + price), `aiDensity`, `coolingTypes`,
+  `tiers` (I–IV), extra `roles` + `salaryRolesExt`, `discountDefaults` (WACC), `pueMatrix`, `refresh`.
+- **New models (A7)**: `models.sim.monteCarlo/tornado/sensitivityGrid` (seeded, reproducible),
+  `models.carbon.*`, `models.water.*`, and `charts.*` implemented as framework-free SVG builders
+  (histogram/tornado/sensitivity/roiLine/costStackedBar/hiringTrajectory).
+- **Model math (A6)**: cooling-aware capex + AI/GPU density + land/commissioning/permitting line items;
+  opex water/carbon/insurance/connectivity (opt-in) + PPA/TOU/demand + cooling-efficiency consumption;
+  roi `npvAuto`/`discountedPayback` + Newton-with-bracket IRR honoring `guess`; forecast R²/confidence
+  band + inflation wiring + scenario bands; tco `lifecycleNPV` (discounting + salvage); workforce
+  `hiringPlan`/`attritionCostWeighted`/`cumulativeHiresCompounded`.
+
+**Changed**
+- **2026 data refresh (A2)**: regional power $/kWh, salaries, capex/MW (full tier × cooling matrix),
+  PUE defaults, currency, inflation — all re-sourced to 2026 with `asOf` tags.
+- **No buried constants (A4)**: moved `coolingClimate`, `contractCostBase`, `staffingLoadFactor`,
+  `opexDefaults`, `capexDefaults`, `refresh`, `workforceParams` out of function bodies into DATA.
+- **Reachability (A5)**: liquid/immersion capex + PUE defaults are now actually consumed
+  (`datacenterBuildCost(…,cooling)`, `pue.defaultFor(cooling,tier)`); inflation + attrition defaults wired.
+- **Fixed capex breakdown** — `it/mep/civil` now split on the pre-contingency base (no contingency
+  double-count; `civil ≥ 0`); `total` magnitude unchanged.
+
+**Fixed / build (A8)**
+- Killed the version drift: `DATA.version` → 2.0.0, `pdf.scriptTagsHTML()` cache-bust and page `?v=`
+  bumped together to `2026-07-04-v2`. `rz-engine.min.js` regenerated reproducibly with `terser`
+  (parity-checked against source). `tools/test-rz-engine.mjs` added to the CLAUDE.md ship-gate.
+  See `standarization/SUPER_ENGINE.md` §Z.
+
 ## v1.50.44 — 2026-07-04 (Accessibility — advisory cleanup: heading order + landmarks, audit fully CLEAN)
 
 **Changed** — cleared all 56 non-gating axe advisories from v1.50.41; `audit-a11y` now
