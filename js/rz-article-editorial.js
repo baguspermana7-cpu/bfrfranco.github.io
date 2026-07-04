@@ -116,9 +116,24 @@
     };
   }
 
+  /* a11y: horizontally-scrollable table wrappers must be keyboard-reachable (v1.50.39) */
+  function focusableScrollers(){
+    var body=document.querySelector('.article-body'); if(!body) return;
+    [].forEach.call(body.querySelectorAll('div,figure'),function(el){
+      if(el.hasAttribute('tabindex')) return;
+      var cs=getComputedStyle(el);
+      if((cs.overflowX==='auto'||cs.overflowX==='scroll') && el.scrollWidth>el.clientWidth+2){
+        el.setAttribute('tabindex','0');
+        el.setAttribute('role','group');
+        if(!el.getAttribute('aria-label')) el.setAttribute('aria-label','Scrollable table');
+      }
+    });
+  }
+
   function init(){
     try{ buildRail(); }catch(e){}
     try{ buildAnchors(); }catch(e){}
+    try{ focusableScrollers(); }catch(e){}
     var minLeft=null;
     try{ minLeft=buildMinLeft(); }catch(e){}
     /* read-progress bar */

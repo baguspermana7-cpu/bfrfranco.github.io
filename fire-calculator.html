@@ -70,7 +70,7 @@
         .input-field:focus { outline:2px solid var(--fc-primary); outline-offset:1px; border-color:var(--fc-primary); }
         [data-theme="dark"] select.input-field option { background:#1e293b; color:#f1f5f9; }
         /* production hardening: input validation error states */
-        .input-field.invalid { border-color:#ef4444; background:rgba(239,68,68,.06); }
+        .input-field.invalid { border-color:#b91c1c; background:rgba(239,68,68,.06); }
         .cc-csv { font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 12px; border-radius:7px; border:1px solid var(--fc-border); background:transparent; color:var(--fc-muted); cursor:pointer; }
         .cc-csv:hover { color:var(--fc-text); border-color:var(--fc-muted); }
         .fc-validation { margin:0 0 .75rem; padding:8px 12px; border:1px solid #ef4444; border-radius:8px; background:rgba(239,68,68,.08); color:#b91c1c; font-size:.78rem; line-height:1.5; }
@@ -90,8 +90,8 @@
         .kpi-val { font-size:1.32rem; font-weight:700; font-family:'JetBrains Mono',monospace; margin:.2rem 0 .1rem; font-variant-numeric:tabular-nums slashed-zero; }
         .kpi-sub { font-size:.72rem; color:var(--fc-muted); line-height:1.4; }
         .chip { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; letter-spacing:.06em; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
-        .chip.derived { background:rgba(10,138,90,.14); color:#0a8a5a; }
-        .chip.warn { background:rgba(217,119,6,.16); color:#b45309; }
+        .chip.derived { background:rgba(10,138,90,.14); color:#076445; }
+        .chip.warn { background:rgba(217,119,6,.16); color:#92400e; }
         .chip.alarm { background:rgba(220,38,38,.16); color:#dc2626; }
         [data-theme="dark"] .chip.derived { color:#34d399; }
         [data-theme="dark"] .chip.warn { color:#fbbf24; }
@@ -113,7 +113,13 @@
             button, a.btn, [role="button"] { min-height:44px; }
             .tip .tipbox { width:200px; }
         }
-    </style>
+    /* a11y fc light (v1.50.39): red primary too light on white; darken in light mode only */
+:root:not([data-theme="dark"]) { --fc-primary:#b91c1c; }
+:root:not([data-theme="dark"]) .chip.alarm { color:#b91c1c; }
+:root:not([data-theme="dark"]) .fc-note, :root:not([data-theme="dark"]) .fc-note code { color:#475569; }
+/* a11y (v1.50.39): dark --fc-primary #ef4444 leaves white btn text at 2.76:1 — darken active preset */
+[data-theme="dark"] .preset-btn.active { background:#b91c1c; border-color:#b91c1c; }
+</style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -126,10 +132,10 @@
                 <li class="nav-dropdown">
                     <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#ef4444;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#b91c1c;font-weight:600;">DC Solutions Hub</a></li>
                         <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                        <li role="menuitem"><a href="pillar-fire-safety.html" style="color:#ef4444;">Fire Safety Pillar</a></li>
-                        <li role="menuitem"><a href="fire-calculator.html" style="color:#ef4444;">Fire Calculator</a></li>
+                        <li role="menuitem"><a href="pillar-fire-safety.html" style="color:#b91c1c;">Fire Safety Pillar</a></li>
+                        <li role="menuitem"><a href="fire-calculator.html" style="color:#b91c1c;">Fire Calculator</a></li>
                         <li role="menuitem"><a href="fire-system.html">Fire System (P&amp;ID)</a></li>
                         <li role="menuitem"><a href="ltc-nfpa-fire-risk.html">NFPA Fire Risk</a></li>
                     </ul>
@@ -168,37 +174,37 @@
             <div class="input-section">
                 <h3>Protected space</h3>
                 <div class="input-row">
-                    <label class="input-label">Room volume (m³) <span class="tip" tabindex="0">?<span class="tipbox"><b>Net volume</b> of the protected enclosure. Drives clean-agent quantity directly (W &prop; V). Deduct solid obstructions; do not deduct racks.</span></span></label>
+                    <label class="input-label" for="inVol">Room volume (m³) <span class="tip" tabindex="0">?<span class="tipbox"><b>Net volume</b> of the protected enclosure. Drives clean-agent quantity directly (W &prop; V). Deduct solid obstructions; do not deduct racks.</span></span></label>
                     <input class="input-field" id="inVol" type="number" value="500" min="1" step="10">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Floor area (m²) <span class="tip" tabindex="0">?<span class="tipbox"><b>Floor area</b> for spot smoke-detector coverage (NFPA 72 ~84 m² per detector / ~9.1 m spacing).</span></span></label>
+                    <label class="input-label" for="inArea">Floor area (m²) <span class="tip" tabindex="0">?<span class="tipbox"><b>Floor area</b> for spot smoke-detector coverage (NFPA 72 ~84 m² per detector / ~9.1 m spacing).</span></span></label>
                     <input class="input-field" id="inArea" type="number" value="170" min="1" step="5">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Ambient temperature (°C) <span class="tip" tabindex="0">?<span class="tipbox"><b>Design temperature</b> at discharge. The agent's specific vapour volume s = k1 + k2·T rises with T, so warmer rooms need slightly more agent mass.</span></span></label>
+                    <label class="input-label" for="inTemp">Ambient temperature (°C) <span class="tip" tabindex="0">?<span class="tipbox"><b>Design temperature</b> at discharge. The agent's specific vapour volume s = k1 + k2·T rises with T, so warmer rooms need slightly more agent mass.</span></span></label>
                     <input class="input-field" id="inTemp" type="number" value="20" min="0" max="55" step="1">
                 </div>
             </div>
             <div class="input-section">
                 <h3>Clean agent</h3>
                 <div class="input-row">
-                    <label class="input-label">Agent <span class="tip" tabindex="0">?<span class="tipbox"><b>Suppression agent.</b> Halocarbons (Novec 1230, FM-200) discharge in ≤10 s by mass; inert gases (IG-541) flood by volume. GWP differs by ~3000× — Novec 1230 GWP 1 vs FM-200 GWP 3220.</span></span></label>
+                    <label class="input-label" for="inAgent">Agent <span class="tip" tabindex="0">?<span class="tipbox"><b>Suppression agent.</b> Halocarbons (Novec 1230, FM-200) discharge in ≤10 s by mass; inert gases (IG-541) flood by volume. GWP differs by ~3000× — Novec 1230 GWP 1 vs FM-200 GWP 3220.</span></span></label>
                     <select class="input-field" id="inAgent"><option value="novec1230" selected>Novec 1230 (FK-5-1-12)</option><option value="fm200">FM-200 (HFC-227ea)</option><option value="ig541">IG-541 (Inergen)</option></select>
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Design concentration (%) <span class="tip" tabindex="0">?<span class="tipbox"><b>Design concentration.</b> Leave at the agent default (Class-A) or override. Must stay ≤ the agent's NOAEL for an occupied space.</span></span></label>
+                    <label class="input-label" for="inConc">Design concentration (%) <span class="tip" tabindex="0">?<span class="tipbox"><b>Design concentration.</b> Leave at the agent default (Class-A) or override. Must stay ≤ the agent's NOAEL for an occupied space.</span></span></label>
                     <input class="input-field" id="inConc" type="number" value="" placeholder="default (Class-A)" min="1" max="60" step="0.1">
                 </div>
             </div>
             <div class="input-section">
                 <h3>Lithium-ion BBU (optional)</h3>
                 <div class="input-row">
-                    <label class="input-label">Battery chemistry <span class="tip" tabindex="0">?<span class="tipbox"><b>BBU chemistry.</b> NMC (datahallAI uses 8× 1,333 kWh NMC) runs away at ~150 °C; LFP is safer (~167 °C). "None" hides the Li-ion panel.</span></span></label>
+                    <label class="input-label" for="inChem">Battery chemistry <span class="tip" tabindex="0">?<span class="tipbox"><b>BBU chemistry.</b> NMC (datahallAI uses 8× 1,333 kWh NMC) runs away at ~150 °C; LFP is safer (~167 °C). "None" hides the Li-ion panel.</span></span></label>
                     <select class="input-field" id="inChem"><option value="">None (no Li-ion in room)</option><option value="nmc" selected>NMC</option><option value="lfp">LFP</option><option value="lco">LCO</option></select>
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Pack energy (kWh) <span class="tip" tabindex="0">?<span class="tipbox"><b>Battery energy</b> in the protected room. Drives the thermal-runaway heat release and vent-gas (off-gas) volume — the basis for NFPA 855 gas detection + ventilation.</span></span></label>
+                    <label class="input-label" for="inKwh">Pack energy (kWh) <span class="tip" tabindex="0">?<span class="tipbox"><b>Battery energy</b> in the protected room. Drives the thermal-runaway heat release and vent-gas (off-gas) volume — the basis for NFPA 855 gas detection + ventilation.</span></span></label>
                     <input class="input-field" id="inKwh" type="number" value="333" min="0" step="10">
                 </div>
             </div>

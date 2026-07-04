@@ -33,6 +33,7 @@ EXCLUDE_DIRS = {
     'node_modules', '.git', '.cache', 'archive', '.qa-screens',
     'dcmoc', 'Dunia-Emosi', 'Apps', 'embed', 'Automation',
     'Article', 'standarization', 'Data', 'prompts', 'tools',
+    '.claude',  # agent worktrees checked out under .claude/worktrees/
 }
 
 # Files that aren't user-facing pages (email signatures, search-engine

@@ -231,61 +231,61 @@
             <div class="input-section">
                 <h3>Heat load &amp; loop</h3>
                 <div class="input-row">
-                    <label class="input-label">IT heat load (kW) <span class="tip">?<span class="tipbox"><b>Heat load</b> — total rack/cold-plate heat the CDU must remove. The denominator for flow-per-kW. AI racks today run 60–130 kW.</span></span></label>
+                    <label class="input-label" for="inLoad">IT heat load (kW) <span class="tip">?<span class="tipbox"><b>Heat load</b> — total rack/cold-plate heat the CDU must remove. The denominator for flow-per-kW. AI racks today run 60–130 kW.</span></span></label>
                     <input class="input-field" id="inLoad" type="number" value="300" min="1" step="10">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Secondary &Delta;T (K) <span class="tip">?<span class="tipbox"><b>&Delta;T</b> — secondary supply-to-return rise. Band 8–12 K (cdu-checklist §01). Higher &Delta;T = lower flow for the same heat.</span></span></label>
+                    <label class="input-label" for="inDt">Secondary &Delta;T (K) <span class="tip">?<span class="tipbox"><b>&Delta;T</b> — secondary supply-to-return rise. Band 8–12 K (cdu-checklist §01). Higher &Delta;T = lower flow for the same heat.</span></span></label>
                     <input class="input-field" id="inDt" type="number" value="11" min="3" max="20" step="0.5">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Fluid <span class="tip">?<span class="tipbox"><b>Secondary fluid</b> — water or PG-25 (25% propylene glycol, OCP direct-to-chip grade). PG-25 carries ~9% less heat per litre.</span></span></label>
+                    <label class="input-label" for="inFluid">Fluid <span class="tip">?<span class="tipbox"><b>Secondary fluid</b> — water or PG-25 (25% propylene glycol, OCP direct-to-chip grade). PG-25 carries ~9% less heat per litre.</span></span></label>
                     <select class="input-field" id="inFluid"><option value="pg25" selected>PG-25 (glycol)</option><option value="water">Water</option></select>
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Glycol % (PG only) <span class="tip">?<span class="tipbox"><b>Glycol fraction</b> — band 20–35% vol. 25% freezes near −10 °C. Affects cp, density and viscosity.</span></span></label>
+                    <label class="input-label" for="inGlycol">Glycol % (PG only) <span class="tip">?<span class="tipbox"><b>Glycol fraction</b> — band 20–35% vol. 25% freezes near −10 °C. Affects cp, density and viscosity.</span></span></label>
                     <input class="input-field" id="inGlycol" type="number" value="25" min="0" max="50" step="1">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Secondary supply T (°C) <span class="tip">?<span class="tipbox"><b>TCS supply</b> — temperature delivered to the cold plates. Band 17–45 °C (ASHRAE W-classes). Must stay above room dew point.</span></span></label>
+                    <label class="input-label" for="inSupply">Secondary supply T (°C) <span class="tip">?<span class="tipbox"><b>TCS supply</b> — temperature delivered to the cold plates. Band 17–45 °C (ASHRAE W-classes). Must stay above room dew point.</span></span></label>
                     <input class="input-field" id="inSupply" type="number" value="32" min="10" max="50" step="0.5">
                 </div>
             </div>
             <div class="input-section">
                 <h3>Hydraulics</h3>
                 <div class="input-row">
-                    <label class="input-label">Pipe size (secondary) <span class="tip">?<span class="tipbox"><b>Nominal pipe</b> — sets internal diameter for velocity + Darcy-Weisbach friction. Velocity band 1.5–3.0 m/s.</span></span></label>
+                    <label class="input-label" for="inDn">Pipe size (secondary) <span class="tip">?<span class="tipbox"><b>Nominal pipe</b> — sets internal diameter for velocity + Darcy-Weisbach friction. Velocity band 1.5–3.0 m/s.</span></span></label>
                     <select class="input-field" id="inDn"><option>DN40</option><option selected>DN50</option><option>DN65</option><option>DN80</option><option>DN100</option><option>DN125</option><option>DN150</option></select>
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Run length, one-way (m) <span class="tip">?<span class="tipbox"><b>Pipe length</b> — straight-run length for friction loss. Total developed length of the worst secondary leg.</span></span></label>
+                    <label class="input-label" for="inLen">Run length, one-way (m) <span class="tip">?<span class="tipbox"><b>Pipe length</b> — straight-run length for friction loss. Total developed length of the worst secondary leg.</span></span></label>
                     <input class="input-field" id="inLen" type="number" value="20" min="1" max="200" step="1">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Fittings (sum K) <span class="tip">?<span class="tipbox"><b>Fitting loss</b> — sum of minor-loss K-values (elbows ~0.9, tee ~1.8, valve, QD couplers ~1.5). Crane TP-410 typical.</span></span></label>
+                    <label class="input-label" for="inK">Fittings (sum K) <span class="tip">?<span class="tipbox"><b>Fitting loss</b> — sum of minor-loss K-values (elbows ~0.9, tee ~1.8, valve, QD couplers ~1.5). Crane TP-410 typical.</span></span></label>
                     <input class="input-field" id="inK" type="number" value="8" min="0" max="50" step="0.5">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Pump / motor efficiency <span class="tip">?<span class="tipbox"><b>Efficiencies</b> — pump BEP (~0.70) and motor (~0.92). Used for shaft and electrical pump power.</span></span></label>
+                    <label class="input-label" for="inPumpEff">Pump / motor efficiency <span class="tip">?<span class="tipbox"><b>Efficiencies</b> — pump BEP (~0.70) and motor (~0.92). Used for shaft and electrical pump power.</span></span></label>
                     <div style="display:flex; gap:.5rem;"><input class="input-field" id="inPumpEff" type="number" value="0.70" min="0.3" max="0.9" step="0.01"><input class="input-field" id="inMotorEff" type="number" value="0.92" min="0.7" max="0.99" step="0.01"></div>
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Per-pump capacity (LPM) <span class="tip">?<span class="tipbox"><b>Duty pump flow</b> — capacity of one pump; drives the N+1 count (OCP Deschutes mandates N+1).</span></span></label>
+                    <label class="input-label" for="inPerPump">Per-pump capacity (LPM) <span class="tip">?<span class="tipbox"><b>Duty pump flow</b> — capacity of one pump; drives the N+1 count (OCP Deschutes mandates N+1).</span></span></label>
                     <input class="input-field" id="inPerPump" type="number" value="600" min="50" max="3000" step="50">
                 </div>
             </div>
             <div class="input-section">
                 <h3>Heat exchanger &amp; environment</h3>
                 <div class="input-row">
-                    <label class="input-label">Facility supply T (°C) <span class="tip">?<span class="tipbox"><b>FWS supply</b> — primary/facility water temperature into the CDU heat exchanger. The cold side of the approach.</span></span></label>
+                    <label class="input-label" for="inFac">Facility supply T (°C) <span class="tip">?<span class="tipbox"><b>FWS supply</b> — primary/facility water temperature into the CDU heat exchanger. The cold side of the approach.</span></span></label>
                     <input class="input-field" id="inFac" type="number" value="28" min="5" max="45" step="0.5">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">HX NTU <span class="tip">?<span class="tipbox"><b>NTU</b> — heat-exchanger size (UA/Cmin). Higher NTU → higher effectiveness → smaller approach. Typical CDU plate HX 1.5–3.</span></span></label>
+                    <label class="input-label" for="inNtu">HX NTU <span class="tip">?<span class="tipbox"><b>NTU</b> — heat-exchanger size (UA/Cmin). Higher NTU → higher effectiveness → smaller approach. Typical CDU plate HX 1.5–3.</span></span></label>
                     <input class="input-field" id="inNtu" type="number" value="2.0" min="0.5" max="6" step="0.1">
                 </div>
                 <div class="input-row">
-                    <label class="input-label">Room air T / RH (°C / %) <span class="tip">?<span class="tipbox"><b>Dew-point inputs</b> — room air temperature and relative humidity set the dew point. Supply must stay ≥2–3 °C above it.</span></span></label>
+                    <label class="input-label" for="inAir">Room air T / RH (°C / %) <span class="tip">?<span class="tipbox"><b>Dew-point inputs</b> — room air temperature and relative humidity set the dew point. Supply must stay ≥2–3 °C above it.</span></span></label>
                     <div style="display:flex; gap:.5rem;"><input class="input-field" id="inAir" type="number" value="24" min="10" max="40" step="0.5"><input class="input-field" id="inRh" type="number" value="60" min="10" max="100" step="1"></div>
                 </div>
             </div>

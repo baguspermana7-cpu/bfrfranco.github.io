@@ -11,6 +11,49 @@ release sections rather than semver.
 
 ---
 
+## v1.50.40 — 2026-07-04 (Accessibility — WCAG-AA sweep: labels, contrast, focusable scrollers, landmarks)
+
+**Added**
+- **Form-label associations**: 7 calculator inputs on `fire-calculator.html` and 13 on
+  `cdu-calculator.html` now carry explicit `<label for="…">` associations (axe
+  `label`/`select-name` criticals — all resolved).
+- **Keyboard-reachable scrollable tables**: `js/rz-article-editorial.js` now tags every
+  horizontally-scrollable table wrapper in the article body with `tabindex="0"` +
+  `role="group"` + an `aria-label`, so keyboard users can scroll wide tables
+  (axe `scrollable-region-focusable`).
+- **Cookie-banner landmark**: the cookie notice on 78 pages is now a named region
+  (`role="region"` + `aria-label="Cookie notice"`).
+
+**Changed**
+- **WCAG-AA contrast sweep** (~478 flagged nodes → 0 on the audit set, both themes):
+  darkened low-contrast light-mode colors (`#94a3b8→#64748b`, `#f59e0b/#d97706→#92400e`,
+  `#22c55e→#15803d`, `#2563eb→#1d4ed8`, `#8b5cf6→#6d28d9`, fire `--fc-primary` →
+  `#b91c1c` light-only) with paired dark-mode overrides where the swept colors sat on
+  dark panels (article-26 PFAS tables/cards, glossary term counter, fire preset buttons).
+- **Version stamp readable**: the footer stamp no longer washes its text to 2.4:1 via
+  container opacity — text runs at full opacity with dedicated colors
+  (`.rz-version-label` / `.rz-version-num`, both themes); subtlety moved to the logo image.
+- **In-paragraph links distinguishable without color** (WCAG 1.4.1): terms/privacy/footer
+  prose links are underlined (`text-underline-offset: 2px`).
+- Inline `style="color:…"` attributes (including JS-set `el.style.color`, which
+  serializes to `rgb()`) are neutralized in dark mode via per-value
+  `[style*="…"]` overrides on `article-26.html` + `glossary.html`.
+
+**Fixed**
+- `tools/audit-dark-coverage.mjs` false positive on `index.html`: pages that re-apply
+  the theme from localStorage on `window.load` (rainbow-mode init) undid the gate's bare
+  attribute flip — the gate now writes `localStorage.theme` together with the attribute,
+  mirroring the real toggle.
+- `tools/audit-mobile-responsive.py` no longer walks into `.claude/worktrees/` agent
+  checkouts (4 false FAILs from email-signature templates in a stale worktree).
+- Version stamp injected on 5 internal pages that were missing it (`plan-article-experience`,
+  `rz-index-mockup*`, `rz-index-polish`, `rz-index-redesign`).
+
+**Verification** — axe-core 4.10.2 sweep (index, article-26, fire-calculator, glossary ×
+light+dark): 0 contrast / 0 link-in-text-block / 0 label violations. Full gate suite green:
+script-tags, js-syntax, version-stamp 185/191, mobile-responsive 0 fail, responsive-layout
+CLEAN (113pp), dark-coverage CLEAN both modes (114pp), article-charts 25/25, interactions CLEAN.
+
 ## v1.50.39 — 2026-07-03 (Fix — Rainbow mode showing light cards after navigating home)
 
 **Fixed** — a reported bug: after returning to the homepage while in Rainbow mode, the
