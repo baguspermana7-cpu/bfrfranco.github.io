@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.50.43 — 2026-07-04 (Second Brain — proper Knowledge Wiki node, repo docs split out)
+
+**Fixed**
+- **Second Brain "Wiki" pointed at the wrong content**: the graph's `wiki` node and the
+  header **Wiki** link both opened `standarization/repos/REPO_INSTALL_PLAN.md` (a repo
+  *install* plan), not a knowledge wiki. Both now open the real vault landing
+  `obsidian-knowledge-vault/00-Hub/Wiki.md`.
+
+**Added**
+- **`obsidian-knowledge-vault/00-Hub/Wiki.md`** — a proper knowledge-wiki landing: what the
+  vault is, the 8 hubs (articles / calculators / apps / series / standards / comparisons /
+  reports / automation) with `[[wikilinks]]`, and how to navigate by connections.
+- **`repos` graph node** ("Repo Install Plans") — the repo/tooling install docs remain
+  reachable but no longer masquerade as the Wiki; edges `wiki↔repos`, `rzstd↔repos`,
+  `asb↔repos`. `sync-graph.py`: 0 dead URLs, graph renders 0 console errors.
+
 ## v1.50.42 — 2026-07-04 (Homepage — portfolio glow consistency + clean gradient background)
 
 **Changed**
