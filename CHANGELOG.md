@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v1.50.38 — 2026-07-03 (Living-diagram + scrollytelling rollout — article-25 & article-16)
+
+### Added
+- **`article-25`** (PJM Grid Crisis) — a live grid schematic: GENERATION FLEET → PJM GRID → LOAD. Click
+  **"Fast-forward: 2027–28"** and ~40 GW of thermal retires (warn), the grid's capacity gap hits **6 GW**
+  (alarm), generation flow slows — with 65M people downstream and data centers driving 40% of load growth.
+  All figures as stated in the article body.
+- **`article-16`** (SE Asia bubble) — a scrollytelling of **Johor's 5.8 GW pipeline, stage by stage**: 487 MW
+  live → +422 MW building → +1.4 GW committed → +3.4 GW on paper, with a cumulative MW counter (487 → 5,709)
+  and proportional bars that make the bear case visible (most of the headline is the red "planning" bar).
+  Values from the already-verified `data/article-16/johor-pipeline.csv` (PUBLISHED chip).
+- Both verified interactively (scenario alarms/flows; scrolly 0→3 + reverse; 0 errors). The site now has
+  **3 living diagrams + 2 scrollytelling stories**, all provenance-gated (25 configs CLEAN).
+
 ## v1.50.37 — 2026-07-03 (Engagement events for the new interactive systems)
 
 ### Added

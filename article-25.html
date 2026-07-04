@@ -85,6 +85,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/rz-article-dark.css?v=1.50.26">
     <script src="js/rz-article-editorial.js?v=1.50.24" defer></script>
+    <script src="js/rz-article-diagram.js?v=1.50.37" defer></script>
     <script src="js/rz-command-palette.js?v=1.50.37" defer></script>
     <script src="js/rz-article-chart.js?v=1.50.19" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
@@ -959,6 +960,37 @@
     <p>The immediate concern is not the 2039 horizon. It is the near-term window of 2027-2028, when multiple stress factors converge. PJM's reserve margin &mdash; the percentage of excess supply above the forecasted peak demand &mdash; has been steadily declining. The target reserve margin is <span class="pjm-stat">14.7%</span>, the level PJM considers necessary to maintain reliability with a loss-of-load expectation of one event in ten years. By the mid-2020s delivery years, the actual reserve margin under stress scenarios approaches or breaches that threshold.</p>
 
     <p>The arithmetic is brutally simple. On the supply side, approximately 40 GW of thermal generation &mdash; primarily coal, but also aging natural gas plants &mdash; face retirement risk by 2030 due to a combination of EPA regulations, unfavorable economics, and age-related mechanical decline. On the demand side, data centers, electrification, and industrial load are driving growth rates that PJM has not seen in a generation. The gap between what is retiring and what is being built to replace it is the <span class="pjm-stat">6 GW shortfall</span> that has regulators, grid operators, and capacity market participants deeply concerned.</p>
+<figure class="rz-diagram" data-rz-diagram>
+<svg viewBox="0 0 760 310" role="img" aria-label="Animated PJM grid schematic: generation fleet feeding the grid and its loads; fast-forward scenario opens a 6 GW gap">
+  <g data-flow="genGrid"><path class="dg-pipe-base" d="M180,155 L310,155"/><path class="dg-pipe alt" d="M180,155 L310,155"/></g>
+  <g data-flow="gridLoad"><path class="dg-pipe-base" d="M450,155 L600,155"/><path class="dg-pipe alt" d="M450,155 L600,155"/></g>
+  <g data-inst="gen">
+    <rect class="dg-box" x="30" y="115" width="150" height="90" rx="6"/>
+    <circle class="dg-inst-ring" cx="162" cy="128" r="4.5"/>
+    <text class="dg-name" x="105" y="140" text-anchor="middle">GENERATION FLEET</text>
+    <text class="dg-label" x="105" y="156" text-anchor="middle">coal &#183; gas &#183; nuclear</text>
+    <text class="dg-label" x="105" y="176" text-anchor="middle">retired by 2030</text>
+    <text class="dg-pv" data-pv="retired" x="105" y="192" text-anchor="middle">0 GW</text>
+  </g>
+  <g data-inst="grid">
+    <rect class="dg-box" x="310" y="115" width="140" height="90" rx="6"/>
+    <circle class="dg-inst-ring" cx="432" cy="128" r="4.5"/>
+    <text class="dg-name" x="380" y="140" text-anchor="middle">PJM GRID</text>
+    <text class="dg-label" x="380" y="156" text-anchor="middle">65M people</text>
+    <text class="dg-label" x="380" y="176" text-anchor="middle">capacity gap</text>
+    <text class="dg-pv" data-pv="shortfall" x="380" y="192" text-anchor="middle">0 GW</text>
+  </g>
+  <rect class="dg-box" x="600" y="110" width="140" height="95" rx="6"/>
+  <text class="dg-name" x="670" y="138" text-anchor="middle">LOAD</text>
+  <text class="dg-label" x="670" y="156" text-anchor="middle">data centers drive</text>
+  <text class="dg-label" x="670" y="171" text-anchor="middle">40% of load growth</text>
+  <text class="dg-label" x="380" y="298" text-anchor="middle">retirements vs interconnection queue &#8212; the race the article quantifies</text>
+</svg>
+<script type="application/json" class="rz-diagram-cfg">
+{"title": "Live: fast-forward PJM to 2027–28 and watch the 6 GW gap open", "interval": 1000, "baselines": {"retired": {"v": 0, "unit": "GW", "dp": 0}, "shortfall": {"v": 0, "unit": "GW", "dp": 0}}, "flows": {"genGrid": "flow", "gridLoad": "flow"}, "scenarios": [{"id": "ff2027", "label": "Fast-forward: 2027–28", "exact": {"retired": 40, "shortfall": 6}, "flows": {"genGrid": "slow"}, "alarms": {"gen": "warn", "grid": "alarm"}, "msg": "~40 GW of thermal generation retires faster than replacements clear the interconnection queue — PJM's projected capacity gap reaches 6 GW, with 65 million people downstream and data centers driving 40% of load growth."}], "source": "Illustrative PJM schematic. 6 GW shortfall by 2027–28, ~40 GW thermal retirements by 2030, data centers = 40% of load growth, 65M customers — as stated in the article body.", "basisTag": "illustrative"}
+</script>
+</figure>
+
 
     <div class="pjm-table-container">
         <table>

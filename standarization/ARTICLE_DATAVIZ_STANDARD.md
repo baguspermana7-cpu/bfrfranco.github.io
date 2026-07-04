@@ -84,8 +84,8 @@ Provenance: same gate as charts — `tools/audit-article-charts.mjs` validates `
 (source + basisTag mandatory). Values must trace to the article body; anything modelled beyond stated figures
 uses `basisTag: "illustrative"` and says so in the caption.
 
-Reference implementations: `article-13` (2N power SLD — UPS-A failure re-routes flow, rack unaffected) and
-`article-9` (warm-water DLC loop — "Tropical: Jakarta 35°C" collapses the dry-cooler approach; CDU pump failover).
+Reference implementations: `article-13` (2N power SLD), `article-9` (warm-water DLC loop), `article-25`
+(PJM grid — "Fast-forward: 2027–28" opens the 6 GW gap).
 
 
 ## Scrollytelling (v1.50.26)
@@ -97,4 +97,4 @@ Scroll-driven step narratives via **`js/rz-scrolly.js`**: `<div class="rz-scroll
 `class="st-layer st-lN"` — revealed by the `[data-step]` CSS ladder in `css/rz-article-dark.css`; counters are
 `<text data-cv="key">`. Steps activate on crossing the viewport middle and reverse cleanly. Reduced-motion =
 instant states; no-IO = final state. Milestones must be the article's own stated facts (ILLUSTRATIVE-chipped
-caption for the schematic). Flagship reference: `article-23` (the Colossus 122-day build).
+caption for the schematic). References: `article-23` (the Colossus 122-day build) and `article-16` (Johor's 5.8 GW pipeline, stage by stage).
